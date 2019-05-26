@@ -3,11 +3,20 @@
 * http file sharing hub (py2/py3)
 * MIT-Licensed, 2019-05-26, ed @ irc.rizon.net
 
+## summary
+
+turn your phone or raspi into a portable file server with resumable uploads/downloads using IE6 or any other browser
+
+* resumable uploads need firefox 12+ / chrome 6+ / safari 6+ / IE 10+ (File.prototype.slice && FileReader && FileList)
+* server runs on everything with py2.7 or 3.3+
+* code standard: black
+
 ## status
 
 * [x] sanic multipart parser
 * [x] load balancer (multiprocessing)
-* [ ] upload
+* [ ] upload (plain multipart, ie6 support)
+* [ ] upload (js, resumable, multithreaded)
 * [ ] download
 * [ ] browser
 * [ ] thumbnails
