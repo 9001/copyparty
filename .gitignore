@@ -1,0 +1,23 @@
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+MANIFEST.in
+MANIFEST
+copyparty.egg-info/
+buildenv/
+build/
+dist/
+*.rst
+
+# sublime
+*.sublime-workspace
+
+# vscode
+.vscode
+
+# winmerge
+*.bak
+
+# other licenses
+contrib/

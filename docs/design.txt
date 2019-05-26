@@ -1,0 +1,22 @@
+need log interface
+  tcpsrv creates it
+  httpsrv must use interface
+
+msgsvc
+  simulates a multiprocessing queue
+  takes events from httpsrv
+    logging
+  mpsrv pops queue and forwards to this
+
+tcpsrv
+  tcp listener
+  pass tcp clients to worker
+  api to get status messages from workers
+
+mpsrv
+  uses multiprocessing to handle incoming clients
+
+httpsrv
+  takes client sockets, starts threads
+  takes argv acc/vol through init args
+  loads acc/vol from config file
