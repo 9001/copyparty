@@ -121,7 +121,7 @@ class HttpCli(object):
         for ln in form_segm[1:]:
             self.log(ln)
 
-        fn = "/dev/null"
+        fn = os.devnull
         fn0 = "inc.{0:.6f}".format(time.time())
 
         files = []

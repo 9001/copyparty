@@ -8,8 +8,8 @@ import threading
 from datetime import datetime, timedelta
 import calendar
 
+from .__init__ import *
 from .msgsvc import *
-from .mpsrv import *
 
 
 class TcpSrv(object):
@@ -20,6 +20,8 @@ class TcpSrv(object):
     """
 
     def __init__(self, args):
+        self.args = args
+
         self.log_mutex = threading.Lock()
         self.msgsvc = MsgSvc(self.log)
         self.next_day = 0
@@ -46,12 +48,7 @@ class TcpSrv(object):
 
         self.log("root", "listening @ {0}:{1}".format(bind_ip, bind_port))
 
-        if args.j == 0:
-            self.log("root", "multiprocessing disabled")
-            httpsrv = HttpSrv(args, self.log)
-        else:
-            httpsrv = MpSrv(args, self.log)
-
+        httpsrv = self.create_server()
         while True:
             if httpsrv.num_clients() >= args.nc:
                 time.sleep(0.1)
@@ -59,6 +56,52 @@ class TcpSrv(object):
 
             sck, addr = srv.accept()
             httpsrv.accept(sck, addr)
+
+    def check_mp_support(self):
+        vmin = sys.version_info[1]
+        if WINDOWS:
+            if PY2:
+                # ForkingPickler doesn't support winsock
+                return False
+            elif vmin < 4:
+                return False
+        else:
+            if not PY2 and vmin < 4:
+                return False
+
+        try:
+            # fails on py3.3, works on py2.7
+            from multiprocessing.reduction import ForkingPickler
+        except:
+            return False
+
+        return True
+
+    def create_server(self):
+        if self.args.j == 0:
+            self.log("root", "multiprocessing disabled by argument -j 0;")
+            return self.create_threading_server()
+
+        if not self.check_mp_support():
+            if WINDOWS:
+                self.log("root", "need python 3.4 or newer for multiprocessing;")
+            else:
+                self.log("root", "need python 2.7 or 3.4+ for multiprocessing;")
+
+            return self.create_threading_server()
+
+        return self.create_multiprocessing_server()
+
+    def create_threading_server(self):
+        from .httpsrv import HttpSrv
+
+        self.log("root", "cannot efficiently use multiple CPU cores")
+        return HttpSrv(self.args, self.log)
+
+    def create_multiprocessing_server(self):
+        from .mpsrv import MpSrv
+
+        return MpSrv(self.args, self.log)
 
     def log(self, src, msg):
         now = time.time()

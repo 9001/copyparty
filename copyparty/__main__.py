@@ -86,8 +86,11 @@ def main():
     thr.daemon = True
     thr.start()
 
-    while True:
-        time.sleep(9001)
+    try:
+        while True:
+            time.sleep(9001)
+    except:
+        print("bye")
 
 
 if __name__ == "__main__":

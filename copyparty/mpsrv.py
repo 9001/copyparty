@@ -37,8 +37,11 @@ class MpWorker(object):
         thr.daemon = True
         thr.start()
 
-        while True:
-            time.sleep(9001)
+        try:
+            while True:
+                time.sleep(9001)
+        except:
+            self.logw("bye")
 
     def log(self, src, msg):
         self.q_yield.put(["log", src, msg])
