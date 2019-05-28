@@ -200,12 +200,16 @@ class MpSrv(object):
             proc.workload += 50
 
     def debug_load_balancer(self):
-        while True:
+        last = ""
+        while self.procs:
             msg = ""
             for proc in self.procs:
-                msg += "{} \033[36m{}\033[0m   ".format(
+                msg += "\033[1m{}\033[0;36m{:4}\033[0m ".format(
                     len(proc.clients), proc.workload
                 )
 
-            print(msg)
+            if msg != last:
+                last = msg
+                print(msg)
+
             time.sleep(0.1)

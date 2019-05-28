@@ -30,25 +30,31 @@ class HttpCli(object):
         self.log_func(self.log_src, msg)
 
     def run(self):
-        headerlines = self.read_header()
-        if not self.ok:
-            return
+        while self.ok:
+            headerlines = self.read_header()
+            if not self.ok:
+                return
 
-        self.headers = {}
-        mode, self.req, _ = headerlines[0].split(" ")
+            self.headers = {}
+            try:
+                mode, self.req, _ = headerlines[0].split(" ")
+            except:
+                self.log("bad headers:\n" + "\n".join(headerlines))
+                self.s.close()
+                return
 
-        for header_line in headerlines[1:]:
-            k, v = header_line.split(":", 1)
-            self.headers[k.lower()] = v.strip()
+            for header_line in headerlines[1:]:
+                k, v = header_line.split(":", 1)
+                self.headers[k.lower()] = v.strip()
 
-        # self.bufsz = int(self.req.split('/')[-1]) * 1024
+            # self.bufsz = int(self.req.split('/')[-1]) * 1024
 
-        if mode == "GET":
-            self.handle_get()
-        elif mode == "POST":
-            self.handle_post()
-        else:
-            self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
+            if mode == "GET":
+                self.handle_get()
+            elif mode == "POST":
+                self.handle_post()
+            else:
+                self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
 
     def panic(self, msg):
         self.log("client disconnected ({0})".format(msg).upper())
@@ -79,7 +85,7 @@ class HttpCli(object):
         return ret[:-4].decode("utf-8", "replace").split("\r\n")
 
     def reply(self, body):
-        header = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {0}\r\n\r\n".format(
+        header = "HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nContent-Type: text/html\r\nContent-Length: {0}\r\n\r\n".format(
             len(body)
         ).encode(
             "utf-8"
@@ -87,7 +93,6 @@ class HttpCli(object):
         if self.ok:
             self.s.send(header + body)
 
-        self.s.close()
         return body
 
     def loud_reply(self, body):
@@ -187,6 +192,15 @@ class HttpCli(object):
                         + "\n"
                     ).encode("utf-8")
                 )
+
+        try:
+            # TODO: check if actually part of multipart footer
+            buf = self.sr.recv(2)
+            if buf != b"\r\n":
+                raise Exception("oh")
+        except:
+            self.log("client is done")
+            self.s.close()
 
     def handle_multipart(self, ofd):
         tlen = 0
