@@ -108,9 +108,9 @@ class MpSrv(object):
         self.args = args
 
         self.disconnect_func = None
-        self.procs = []
-
         self.mutex = threading.Lock()
+
+        self.procs = []
 
         cores = args.j
         if cores is None:

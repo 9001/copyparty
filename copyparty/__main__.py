@@ -52,15 +52,15 @@ def main():
         epilog=dedent(
             """
             -a takes username:password,
-            -v takes path:permset:permset:... where "permset" is
+            -v takes src:dst:permset:permset:... where "permset" is
                accesslevel followed by username (no separator)
             
             example:\033[35m
-              -a ed:hunter2 -v .:r:aed -v ../inc:w:aed  \033[36m
-              share current directory with
+              -a ed:hunter2 -v .::r:aed -v ../inc:dump:w:aed  \033[36m
+              mount current directory at "/" with
                * r (read-only) for everyone
                * a (read+write) for ed
-              share ../inc with
+              mount ../inc at "/dump" with
                * w (write-only) for everyone
                * a (read+write) for ed  \033[0m
             
@@ -72,14 +72,16 @@ def main():
             """
         ),
     )
-    ap.add_argument("-c", metavar="PATH", type=str, help="config file")
+    ap.add_argument(
+        "-c", metavar="PATH", type=str, action="append", help="add config file"
+    )
     ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind")
     ap.add_argument("-p", metavar="PORT", type=int, default=1234, help="port to bind")
     ap.add_argument("-nc", metavar="NUM", type=int, default=16, help="max num clients")
     ap.add_argument("-j", metavar="CORES", type=int, help="max num cpu cores")
-    ap.add_argument("-a", metavar="ACCT", type=str, help="add account")
-    ap.add_argument("-v", metavar="VOL", type=str, help="add volume")
-    ap.add_argument("-nw", action="store_true", help="DEBUG: disable writing")
+    ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
+    ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
+    ap.add_argument("-nw", action="store_true", help="benchmark: disable writing")
     al = ap.parse_args()
 
     tcpsrv = TcpSrv(al)

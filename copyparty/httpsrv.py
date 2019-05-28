@@ -5,6 +5,7 @@ from __future__ import print_function
 import threading
 
 from .httpcli import *
+from .authsrv import *
 
 
 class HttpSrv(object):
@@ -18,11 +19,12 @@ class HttpSrv(object):
         self.args = args
 
         self.disconnect_func = None
+        self.mutex = threading.Lock()
+
         self.clients = {}
         self.workload = 0
         self.workload_thr_alive = False
-
-        self.mutex = threading.Lock()
+        self.auth = AuthSrv(args, log_func)
 
     def accept(self, sck, addr):
         """takes an incoming tcp connection and creates a thread to handle it"""
