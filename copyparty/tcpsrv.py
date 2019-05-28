@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import *
-from .msgsvc import *
 
 
 class TcpSrv(object):
@@ -23,11 +22,11 @@ class TcpSrv(object):
         self.args = args
 
         self.log_mutex = threading.Lock()
-        self.msgsvc = MsgSvc(self.log)
         self.next_day = 0
 
-        bind_ip = args.i
-        bind_port = args.p
+    def run(self):
+        bind_ip = self.args.i
+        bind_port = self.args.p
 
         ip = "127.0.0.1"
         if bind_ip != ip:
@@ -44,36 +43,33 @@ class TcpSrv(object):
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         srv.bind((bind_ip, bind_port))
-        srv.listen(100)
+        srv.listen(self.args.nc)
 
         self.log("root", "listening @ {0}:{1}".format(bind_ip, bind_port))
 
-        httpsrv = self.create_server()
+        self.httpsrv = self.create_server()
         while True:
-            if httpsrv.num_clients() >= args.nc:
+            if self.httpsrv.num_clients() >= self.args.nc:
                 time.sleep(0.1)
                 continue
 
             sck, addr = srv.accept()
-            httpsrv.accept(sck, addr)
+            self.httpsrv.accept(sck, addr)
+
+    def shutdown(self):
+        self.httpsrv.shutdown()
 
     def check_mp_support(self):
         vmin = sys.version_info[1]
         if WINDOWS:
             if PY2:
-                # ForkingPickler doesn't support winsock
+                # py2 pickler doesn't support winsock
                 return False
-            elif vmin < 4:
+            elif vmin < 3:
                 return False
         else:
-            if not PY2 and vmin < 4:
+            if not PY2 and vmin < 3:
                 return False
-
-        try:
-            # fails on py3.3, works on py2.7
-            from multiprocessing.reduction import ForkingPickler
-        except:
-            return False
 
         return True
 
@@ -84,9 +80,9 @@ class TcpSrv(object):
 
         if not self.check_mp_support():
             if WINDOWS:
-                self.log("root", "need python 3.4 or newer for multiprocessing;")
+                self.log("root", "need python 3.3 or newer for multiprocessing;")
             else:
-                self.log("root", "need python 2.7 or 3.4+ for multiprocessing;")
+                self.log("root", "need python 2.7 or 3.3+ for multiprocessing;")
 
             return self.create_threading_server()
 

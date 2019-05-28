@@ -82,15 +82,19 @@ def main():
     ap.add_argument("-nw", action="store_true", help="DEBUG: disable writing")
     al = ap.parse_args()
 
-    thr = threading.Thread(target=TcpSrv, args=(al,))
+    tcpsrv = TcpSrv(al)
+    thr = threading.Thread(target=tcpsrv.run)
     thr.daemon = True
     thr.start()
 
+    # winxp/py2.7 support: thr.join() kills signals
     try:
         while True:
             time.sleep(9001)
-    except:
-        print("bye")
+    except KeyboardInterrupt:
+        print("OPYTHAT")
+        tcpsrv.shutdown()
+        print("nailed it")
 
 
 if __name__ == "__main__":

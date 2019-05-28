@@ -3,18 +3,17 @@
 from __future__ import print_function
 
 import time
+import signal
 import threading
 import multiprocessing as mp
-from multiprocessing.reduction import ForkingPickler
-import pickle
 
 from .__init__ import *
 from .httpsrv import *
 
-if PY2:
+if PY2 and not WINDOWS:
+    from multiprocessing.reduction import ForkingPickler
     from StringIO import StringIO as MemesIO
-else:
-    from io import BytesIO as MemesIO
+    import pickle
 
 
 class MpWorker(object):
@@ -33,15 +32,20 @@ class MpWorker(object):
         self.mutex = threading.Lock()
         self.workload_thr_active = False
 
+        # we inherited signal_handler from parent,
+        # replace it with something harmless
+        signal.signal(signal.SIGINT, self.signal_handler)
+
+        # on winxp and some other platforms,
+        # use thr.join() to block all signals
         thr = threading.Thread(target=self.main)
         thr.daemon = True
         thr.start()
+        thr.join()
 
-        try:
-            while True:
-                time.sleep(9001)
-        except:
-            self.logw("bye")
+    def signal_handler(self, signal, frame):
+        # print('k')
+        pass
 
     def log(self, src, msg):
         self.q_yield.put(["log", src, msg])
@@ -57,16 +61,18 @@ class MpWorker(object):
         self.httpsrv.disconnect_func = self.disconnect_cb
 
         while True:
-            self.logw("awaiting work")
             d = self.q_pend.get()
 
-            self.logw("work: [{}]".format(d[0]))
-            if d[0] == "terminate":
-                self.logw("bye")
+            # self.logw("work: [{}]".format(d[0]))
+            if d[0] == "shutdown":
+                self.logw("ok bye")
                 sys.exit(0)
                 return
 
-            sck = pickle.loads(d[1])
+            sck = d[1]
+            if PY2:
+                sck = pickle.loads(sck)
+
             self.httpsrv.accept(sck, d[2])
 
             with self.mutex:
@@ -138,6 +144,23 @@ class MpSrv(object):
         with self.mutex:
             return sum(len(x.clients) for x in self.procs)
 
+    def shutdown(self):
+        self.log("mpsrv", "shutting down")
+        for proc in self.procs:
+            thr = threading.Thread(target=proc.q_pend.put(["shutdown"]))
+            thr.start()
+
+        with self.mutex:
+            procs = self.procs
+            self.procs = []
+
+        while procs:
+            if procs[-1].is_alive():
+                time.sleep(0.1)
+                continue
+
+            procs.pop()
+
     def collector(self, proc):
         while True:
             msg = proc.q_yield.get()
@@ -164,10 +187,13 @@ class MpSrv(object):
     def accept(self, sck, addr):
         proc = sorted(self.procs, key=lambda x: x.workload)[0]
 
-        # can't put unpickled sockets <3.4
-        buf = MemesIO()
-        ForkingPickler(buf).dump(sck)
-        proc.q_pend.put(["socket", buf.getvalue(), addr])
+        sck2 = sck
+        if PY2:
+            buf = MemesIO()
+            ForkingPickler(buf).dump(sck)
+            sck2 = buf.getvalue()
+
+        proc.q_pend.put(["socket", sck2, addr])
 
         with self.mutex:
             proc.clients[addr] = 50

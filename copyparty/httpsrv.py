@@ -34,6 +34,9 @@ class HttpSrv(object):
         with self.mutex:
             return len(self.clients)
 
+    def shutdown(self):
+        print("ok bye")
+
     def thr_client(self, sck, addr, log):
         """thread managing one tcp client"""
         try:
