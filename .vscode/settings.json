@@ -1,5 +1,6 @@
 {
     "workbench.colorCustomizations": {
+        // https://ocv.me/dot/bifrost.html
         "terminal.background": "#1e1e1e",
         "terminal.foreground": "#d2d2d2",
         "terminalCursor.background": "#93A1A1",

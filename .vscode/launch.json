@@ -10,7 +10,7 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "-j",
-                "2",
+                "0",
                 "-nc",
                 "4",
                 "-nw",
