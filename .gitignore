@@ -13,9 +13,6 @@ dist/
 # sublime
 *.sublime-workspace
 
-# vscode
-.vscode
-
 # winmerge
 *.bak
 

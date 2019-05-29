@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run copyparty",
+            "type": "python",
+            "request": "launch",
+            "module": "copyparty",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-j",
+                "2",
+                "-nc",
+                "4",
+                "-nw",
+            ]
+        },
+        {
+            "name": "Run active unit test",
+            "type": "python",
+            "request": "launch",
+            "module": "unittest",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-v",
+                "${file}"
+            ]
+        },
+    ]
+}
