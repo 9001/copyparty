@@ -136,6 +136,54 @@ class AuthSrv(object):
         else:
             return {v: k for k, v in orig.items()}
 
+    def laggy_iter(self, iterable):
+        """returns [value,isFinalValue]"""
+        it = iter(iterable)
+        prev = next(it)
+        for x in it:
+            yield prev, False
+            prev = x
+
+        yield prev, True
+
+    def _parse_config_file(self, fd, user, mread, mwrite, mount):
+        vol_src = None
+        vol_dst = None
+        for ln in [x.decode("utf-8").strip() for x in fd]:
+            if not ln and vol_src is not None:
+                vol_src = None
+                vol_dst = None
+
+            if not ln or ln.startswith("#"):
+                continue
+
+            if vol_src is None:
+                if ln.startswith("u "):
+                    u, p = ln[2:].split(":", 1)
+                    user[u] = p
+                else:
+                    vol_src = ln
+                continue
+
+            if vol_src and vol_dst is None:
+                vol_dst = ln
+                if not vol_dst.startswith("/"):
+                    raise Exception('invalid mountpoint "{}"'.format(vol_dst))
+
+                # cfg files override arguments and previous files
+                vol_src = os.path.abspath(vol_src)
+                vol_dst = vol_dst.strip("/")
+                mount[vol_dst] = vol_src
+                mread[vol_dst] = []
+                mwrite[vol_dst] = []
+                continue
+
+            lvl, uname = ln.split(" ")
+            if lvl in "ra":
+                mread[vol_dst].append(uname)
+            if lvl in "wa":
+                mwrite[vol_dst].append(uname)
+
     def reload(self):
         """
         construct a flat list of mountpoints and usernames
@@ -174,11 +222,9 @@ class AuthSrv(object):
                         mwrite[dst].append(uname)
 
         if self.args.c:
-            for logfile in self.args.c:
-                with open(logfile, "rb") as f:
-                    for ln in [x.decode("utf-8").rstrip() for x in f]:
-                        # self.log(ln)
-                        pass
+            for cfg_fn in self.args.c:
+                with open(cfg_fn, "rb") as f:
+                    self._parse_config_file(f, user, mread, mwrite, mount)
 
         # -h says our defaults are CWD at root and read/write for everyone
         vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])

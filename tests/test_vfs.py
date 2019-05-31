@@ -7,6 +7,8 @@ import json
 import shutil
 import unittest
 
+from io import StringIO
+from textwrap import dedent
 from argparse import Namespace
 from copyparty.authsrv import *
 
@@ -173,4 +175,39 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(r1, r2)
         self.assertEqual(v1, v2)
 
+        # config file parser
+        cfg_path = "/dev/shm/test.cfg"
+        with open(cfg_path, "wb") as f:
+            f.write(
+                dedent(
+                    """
+                    u a:123
+                    u asd:fgh:jkl
+                    
+                    ./src
+                    /dst
+                    r a
+                    a asd
+                    """
+                ).encode("utf-8")
+            )
+
+        au = AuthSrv(Namespace(c=[cfg_path], a=[], v=[]), None)
+        self.assertEqual(au.user["a"], "123")
+        self.assertEqual(au.user["asd"], "fgh:jkl")
+        n = au.vfs
+        # root was not defined, so PWD with everyone r/w
+        self.assertEqual(n.vpath, "")
+        self.assertEqual(n.realpath, td)
+        self.assertEqual(n.uread, ["*"])
+        self.assertEqual(n.uwrite, ["*"])
+        self.assertEqual(len(n.nodes), 1)
+        n = n.nodes["dst"]
+        self.assertEqual(n.vpath, "dst")
+        self.assertEqual(n.realpath, td + "/src")
+        self.assertEqual(n.uread, ["a", "asd"])
+        self.assertEqual(n.uwrite, ["asd"])
+        self.assertEqual(len(n.nodes), 0)
+
         shutil.rmtree(td)
+        os.unlink(cfg_path)
