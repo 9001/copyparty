@@ -24,12 +24,8 @@ class TcpSrv(object):
         self.log_mutex = threading.Lock()
         self.next_day = 0
 
-    def run(self):
-        bind_ip = self.args.i
-        bind_port = self.args.p
-
         ip = "127.0.0.1"
-        if bind_ip != ip:
+        if self.args.i != ip:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
                 s.connect(("10.255.255.255", 1))
@@ -38,14 +34,26 @@ class TcpSrv(object):
                 pass
             s.close()
 
-        self.log("root", "available @ http://{0}:{1}/".format(ip, bind_port))
+        self.log("root", "available @ http://{0}:{1}/".format(ip, self.args.p))
 
-        srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        srv.bind((bind_ip, bind_port))
-        srv.listen(self.args.nc)
+        self.srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            self.srv.bind((self.args.i, self.args.p))
+        except OSError as ex:
+            if ex.errno != 98:
+                raise
 
-        self.log("root", "listening @ {0}:{1}".format(bind_ip, bind_port))
+            raise Exception(
+                "\033[1;31mport {} is busy on interface {}\033[0m".format(
+                    self.args.p, self.args.i
+                )
+            )
+
+    def run(self):
+        self.srv.listen(self.args.nc)
+
+        self.log("root", "listening @ {0}:{1}".format(self.args.i, self.args.p))
 
         self.httpsrv = self.create_server()
         while True:
@@ -53,7 +61,7 @@ class TcpSrv(object):
                 time.sleep(0.1)
                 continue
 
-            sck, addr = srv.accept()
+            sck, addr = self.srv.accept()
             self.httpsrv.accept(sck, addr)
 
     def shutdown(self):
