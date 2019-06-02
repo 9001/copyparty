@@ -37,9 +37,10 @@ VERSION = None
 data_files = [("share/doc/copyparty", ["README.rst", "README.md", "LICENSE"])]
 manifest = ""
 for dontcare, files in data_files:
-    # print(dontcare)
     for fn in files:
         manifest += "include {0}\n".format(fn)
+
+manifest += "recursive-include copyparty/web *\n"
 
 here = os.path.abspath(os.path.dirname(__file__))
 

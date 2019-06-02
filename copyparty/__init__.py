@@ -14,6 +14,7 @@ if PY2:
 
 class EnvParams(object):
     def __init__(self):
+        self.mod = os.path.dirname(os.path.realpath(__file__))
         if sys.platform == "win32":
             self.cfg = os.path.normpath(os.environ["APPDATA"] + "/copyparty")
         elif sys.platform == "darwin":

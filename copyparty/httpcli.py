@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import time
 import hashlib
+import mimetypes
 
 from .__init__ import *
 from .util import *
@@ -84,9 +85,9 @@ class HttpCli(object):
 
         return ret[:-4].decode("utf-8", "replace").split("\r\n")
 
-    def reply(self, body):
-        header = "HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nContent-Type: text/html\r\nContent-Length: {0}\r\n\r\n".format(
-            len(body)
+    def reply(self, body, status="200 OK", mime="text/html"):
+        header = "HTTP/1.1 {}\r\nConnection: Keep-Alive\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n".format(
+            status, mime, len(body)
         ).encode(
             "utf-8"
         )
@@ -95,16 +96,43 @@ class HttpCli(object):
 
         return body
 
-    def loud_reply(self, body):
+    def loud_reply(self, body, **kwargs):
         self.log(body.rstrip())
-        self.reply(b"<pre>" + body.encode("utf-8"))
+        self.reply(b"<pre>" + body.encode("utf-8"), **kwargs)
+
+    def send_file(self, path):
+        sz = os.path.getsize(path)
+        mime = mimetypes.guess_type(path)[0]
+        header = "HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n".format(
+            mime, sz
+        ).encode(
+            "utf-8"
+        )
+
+        if self.ok:
+            self.s.send(header)
+
+        with open(path, "rb") as f:
+            while self.ok:
+                buf = f.read(4096)
+                if not buf:
+                    break
+
+                self.s.send(buf)
 
     def handle_get(self):
         self.log("")
         self.log("GET  {0} {1}".format(self.addr[0], self.req))
-        self.reply(
-            b'<form method="post" enctype="multipart/form-data"><h5><input type="file" name="f" multiple><h5><input type="submit" value="start upload">'
-        )
+
+        static_path = os.path.join(E.mod, "web", self.req.split("?")[0][1:])
+
+        if os.path.isfile(static_path):
+            return self.send_file(static_path)
+
+        if self.req == "/":
+            return self.send_file(os.path.join(E.mod, "web/splash.html"))
+
+        return self.loud_reply("404 not found", status="404 Not Found")
 
     def handle_post(self):
         self.log("")

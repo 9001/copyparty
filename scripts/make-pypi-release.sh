@@ -52,12 +52,13 @@ EOF
 	chmod 600 ~/.pypirc
 	sed -ri 's/qwer/username/;s/asdf/password/' ~/.pypirc
 
-	# setup build env
-	cd ~/dev/copyparty &&
-	virtualenv buildenv
-	. buildenv/bin/activate
-	pip install m2r
-	deactivate
+	# if PY2: create build env
+	cd ~/dev/copyparty && virtualenv buildenv
+	(. buildenv/bin/activate && pip install m2r)
+
+	# if PY3: create build env
+	cd ~/dev/copyparty && python3 -m venv buildenv
+	(. buildenv/bin/activate && pip install m2r wheel)
 	
 	# test rst
 	pip install docutils

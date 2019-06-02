@@ -1,0 +1,15 @@
+html, body, #wrap {
+	color: #333;
+	background: #f7f7f7;
+	font-family: sans-serif;
+}
+#wrap {
+	max-width: 40em;
+	margin: 2em auto;
+	padding: 0 1em 3em 1em;
+}
+h1 {
+	border-bottom: 1px solid #ccc;
+	margin: 2em 0 .4em 0;
+	padding: 0 0 .2em 0;
+}
