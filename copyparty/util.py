@@ -60,7 +60,7 @@ class MultipartParser(object):
                 if m.group(1).lower() == "multipart/mixed":
                     # rfc-7578 overrides rfc-2388 so this is not-impl
                     # (opera >=9 <11.10 is the only thing i've ever seen use it)
-                    raise Exception(
+                    raise Pebkac(
                         "you can't use that browser to upload multiple files at once"
                     )
 

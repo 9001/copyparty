@@ -69,6 +69,9 @@ class HttpCli(object):
                         continue
 
                     v = unescape_cookie(v)
+                    if v == "x":
+                        break
+
                     if not v in self.auth.iuser:
                         msg = u'bad_cpwd "{}"'.format(v)
                         nuke = u"Set-Cookie: cppwd=x; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
@@ -83,12 +86,16 @@ class HttpCli(object):
                 print(self.rvol)
                 print(self.wvol)
 
-            if mode == "GET":
-                self.handle_get()
-            elif mode == "POST":
-                self.handle_post()
-            else:
-                self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
+            try:
+                if mode == "GET":
+                    self.handle_get()
+                elif mode == "POST":
+                    self.handle_post()
+                else:
+                    self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
+
+            except Pebkac as ex:
+                self.loud_reply(str(ex))
 
     def panic(self, msg):
         self.log("client disconnected ({0})".format(msg).upper())
