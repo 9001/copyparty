@@ -6,14 +6,44 @@
     <title>copyparty</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.8">
-    <link rel="stylesheet" type="text/css" media="screen" href="/splash.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/splash.css">
 </head>
 
 <body>
     <div id="wrap">
-        <h1>hello world</h1>
+        <p>hello {{ this.uname }}</p>
+
+        <h1>you can browse these:</h1>
+        <ul>
+            {% for mp in this.rvol %}
+            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <h1>you can upload to:</h1>
+        <ul>
+            {% for mp in this.wvol %}
+            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <h1>login for more:</h1>
+        <ul>
+            <form method="post" enctype="multipart/form-data" action="/">
+                <input type="hidden" name="act" value="login" />
+                <input type="password" name="cppwd" />
+                <input type="submit" value="Login" />
+            </form>
+        </ul>
+
+        <h1>[debug] fallback upload</h1>
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="act" value="bput" />
+            <h5><input type="file" name="f" multiple></h5>
+            <h5><input type="submit" value="start upload"></h5>
+        </form>
     </div>
-    <script src="/splash.js"></script>
+    <script src="/.cpr/splash.js"></script>
 </body>
 
 </html>

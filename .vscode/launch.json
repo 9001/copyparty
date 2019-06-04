@@ -14,6 +14,10 @@
                 "-nc",
                 "4",
                 "-nw",
+                "-a",
+                "ed:wark",
+                "-v",
+                "/home/ed/inc:inc:r:aed"
             ]
         },
         {

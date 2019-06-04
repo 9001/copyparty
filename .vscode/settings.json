@@ -34,4 +34,5 @@
     ],
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
+    "python.pythonPath": "/usr/bin/python3",
 }

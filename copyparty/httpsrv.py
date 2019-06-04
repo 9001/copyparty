@@ -42,7 +42,9 @@ class HttpSrv(object):
     def thr_client(self, sck, addr, log):
         """thread managing one tcp client"""
         try:
-            cli = HttpCli(sck, addr, self.args, log)
+            # TODO HttpConn between HttpSrv and HttpCli
+            # to ensure no state is kept between http requests
+            cli = HttpCli(sck, addr, self.args, self.auth, log)
             with self.mutex:
                 self.clients[cli] = 0
                 self.workload += 50

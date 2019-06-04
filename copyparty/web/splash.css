@@ -7,9 +7,21 @@ html, body, #wrap {
 	max-width: 40em;
 	margin: 2em auto;
 	padding: 0 1em 3em 1em;
+	line-height: 1.3em;
 }
 h1 {
 	border-bottom: 1px solid #ccc;
 	margin: 2em 0 .4em 0;
 	padding: 0 0 .2em 0;
+}
+li {
+	margin: 1em 0;
+}
+a {
+	color: #047;
+	background: #eee;
+	background: linear-gradient(to bottom, #eee, #ddd 49%, #ccc 50%, #eee);
+	border-bottom: 1px solid #aaa;
+	border-radius: .2em;
+	padding: .2em .5em;
 }
