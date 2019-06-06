@@ -238,8 +238,12 @@ class AuthSrv(object):
                 with open(cfg_fn, "rb") as f:
                     self._parse_config_file(f, user, mread, mwrite, mount)
 
-        # -h says our defaults are CWD at root and read/write for everyone
-        vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
+        if not mount:
+            # -h says our defaults are CWD at root and read/write for everyone
+            vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
+        elif not "" in mount:
+            # there's volumes but no root; make root inaccessible
+            vfs = VFS(os.path.abspath("."), "", [], [])
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
