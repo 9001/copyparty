@@ -19,8 +19,7 @@ li {
 }
 a {
 	color: #047;
-	background: #eee;
-	background: linear-gradient(to bottom, #eee, #ddd 49%, #ccc 50%, #eee);
+	background: #fff;
 	border-bottom: 1px solid #aaa;
 	border-radius: .2em;
 	padding: .2em .5em;

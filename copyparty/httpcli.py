@@ -75,8 +75,8 @@ class HttpCli(object):
         if self.uname:
             self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
             self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
-            print(self.rvol)
-            print(self.wvol)
+            self.log(self.rvol)
+            self.log(self.wvol)
 
         try:
             if mode == "GET":
@@ -113,22 +113,59 @@ class HttpCli(object):
 
     def handle_get(self):
         self.log("")
-        self.log("GET  {0} {1}".format(self.addr[0], self.req))
+        self.log("GET  " + self.req)
 
+        # "embedded" resources
         if self.req.startswith("/.cpr/"):
             static_path = os.path.join(E.mod, "web", self.req.split("?")[0][6:])
 
             if os.path.isfile(static_path):
                 return self.tx_file(static_path)
 
-        if self.req == "/":
+        # split req into vpath + args
+        args = {}
+        vpath = self.req[1:]
+        if "?" in vpath:
+            vpath, arglist = vpath.split("?", 1)
+            for k in arglist.split("&"):
+                if "=" in k:
+                    k, v = k.split("=", 1)
+                    args[k.lower()] = v.strip()
+                else:
+                    args[k.lower()] = True
+
+        # conditional redirect to single volumes
+        if vpath == "" and not args:
+            nread = len(self.rvol)
+            nwrite = len(self.wvol)
+            if nread + nwrite == 1:
+                if nread == 1:
+                    vpath = self.rvol[0]
+                else:
+                    vpath = self.wvol[0]
+
+        # go home if verboten
+        readable = vpath in self.rvol
+        writable = vpath in self.wvol
+        if not readable and not writable:
+            self.log("inaccessible: {}".format(vpath))
+            args = {"h"}
+
+        self.vpath = vpath
+        self.args = args
+
+        if "h" in self.args:
+            self.vpath = None
             return self.tx_mounts()
 
-        return self.loud_reply("404 not found", "404 Not Found")
+        if readable:
+            return self.tx_browser()
+        else:
+            return self.tx_jupper()
 
     def handle_post(self):
         self.log("")
-        self.log("POST {0} {1}".format(self.addr[0], self.req))
+        self.log("POST " + self.req)
 
         try:
             if self.headers["expect"].lower() == "100-continue":
@@ -239,3 +276,10 @@ class HttpCli(object):
     def tx_mounts(self):
         html = self.conn.tpl_mounts.render(this=self)
         self.reply(html.encode("utf-8"))
+
+    def tx_jupper(self):
+        self.loud_reply("TODO jupper {}".format(self.vpath))
+
+    def tx_browser(self):
+        self.loud_reply("TODO browser {}".format(self.vpath))
+
