@@ -6,6 +6,7 @@ import os
 import json
 import shutil
 import unittest
+import subprocess as sp
 
 from io import StringIO
 from textwrap import dedent
@@ -32,8 +33,36 @@ class TestVFS(unittest.TestCase):
     def absify(self, root, names):
         return ["{}/{}".format(root, x).replace("//", "/") for x in names]
 
+    def runcmd(self, *argv):
+        p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
+        stdout, stderr = p.communicate()
+        try:
+            stdout = stdout.decode("utf-8")
+            stderr = stderr.decode("utf-8")
+        except:
+            pass
+
+        return [p.returncode, stdout, stderr]
+
+    def chkcmd(self, *argv):
+        ok, sout, serr = self.runcmd(*argv)
+        if ok != 0:
+            raise Exception(serr)
+
+    def get_ramdisk(self):
+        for vol in ["/dev/shm", "/Volumes/cptd"]:
+            if os.path.exists(vol):
+                return vol
+
+        if os.path.exists("/Volumes"):
+            devname, _ = self.chkcmd("hdiutil", "attach", "-nomount", "ram://8192")
+            _, _ = self.chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
+            return "/Volumes/cptd"
+
+        raise Exception("TODO support windows")
+
     def test(self):
-        td = "/dev/shm/vfs"
+        td = self.get_ramdisk() + "/vfs"
         try:
             shutil.rmtree(td)
         except:
@@ -176,7 +205,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(v1, v2)
 
         # config file parser
-        cfg_path = "/dev/shm/test.cfg"
+        cfg_path = self.get_ramdisk() + "/test.cfg"
         with open(cfg_path, "wb") as f:
             f.write(
                 dedent(
