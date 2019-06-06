@@ -6,6 +6,7 @@ import os
 import threading
 
 from .__init__ import *
+from .util import undot
 
 
 class VFS(object):
@@ -49,24 +50,9 @@ class VFS(object):
         self.nodes[dst] = vn
         return vn
 
-    def undot(self, path):
-        ret = []
-        for node in path.split("/"):
-            if node in ["", "."]:
-                continue
-
-            if node == "..":
-                if ret:
-                    ret.pop()
-                continue
-
-            ret.append(node)
-
-        return "/".join(ret)
-
     def _find(self, vpath):
         """return [vfs,remainder]"""
-        vpath = self.undot(vpath)
+        vpath = undot(vpath)
         if vpath == "":
             return [self, ""]
 

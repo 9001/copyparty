@@ -264,6 +264,22 @@ def read_header(sr):
     return ret[:-4].decode("utf-8", "replace").split("\r\n")
 
 
+def undot(path):
+    ret = []
+    for node in path.split(u"/"):
+        if node in [u"", u"."]:
+            continue
+
+        if node == u"..":
+            if ret:
+                ret.pop()
+            continue
+
+        ret.append(node)
+
+    return u"/".join(ret)
+
+
 def sanitize_fn(fn):
     return fn.replace("\\", "/").split("/")[-1].strip()
 

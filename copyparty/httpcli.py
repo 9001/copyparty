@@ -22,16 +22,15 @@ class HttpCli(object):
     def __init__(self, conn):
         self.conn = conn
         self.s = conn.s
+        self.sr = conn.sr
         self.addr = conn.addr
         self.args = conn.args
         self.auth = conn.auth
-
-        self.sr = conn.sr
-        self.bufsz = 1024 * 32
-        self.ok = True
-
         self.log_func = conn.log_func
         self.log_src = conn.log_src
+
+        self.ok = True
+        self.bufsz = 1024 * 32
 
     def log(self, msg):
         self.log_func(self.log_src, msg)
@@ -42,13 +41,12 @@ class HttpCli(object):
         except:
             return False
 
-        self.headers = {}
         try:
             mode, self.req, _ = headerlines[0].split(" ")
         except:
-            self.log("bad headers:\n" + "\n".join(headerlines))
-            return False
+            raise Pebkac("bad headers:\n" + "\n".join(headerlines))
 
+        self.headers = {}
         for header_line in headerlines[1:]:
             k, v = header_line.split(":", 1)
             self.headers[k.lower()] = v.strip()
@@ -61,22 +59,33 @@ class HttpCli(object):
                     continue
 
                 v = unescape_cookie(v)
-                if v == "x":
-                    break
+                if v in self.auth.iuser:
+                    self.uname = self.auth.iuser[v]
 
-                if not v in self.auth.iuser:
-                    msg = u'bad_cpwd "{}"'.format(v)
-                    nuke = u"Set-Cookie: cppwd=x; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-                    self.loud_reply(msg, headers=[nuke])
-                    return True
-
-                self.uname = self.auth.iuser[v]
+                break
 
         if self.uname:
             self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
             self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
             self.log(self.rvol)
             self.log(self.wvol)
+
+        # split req into vpath + args
+        args = {}
+        if not "?" in self.req:
+            vpath = undot(self.req)
+        else:
+            vpath, arglist = self.req.split("?", 1)
+            vpath = undot(vpath)
+            for k in arglist.split("&"):
+                if "=" in k:
+                    k, v = k.split("=", 1)
+                    args[k.lower()] = v.strip()
+                else:
+                    args[k.lower()] = True
+
+        self.args = args
+        self.vpath = vpath
 
         try:
             if mode == "GET":
@@ -116,43 +125,28 @@ class HttpCli(object):
         self.log("GET  " + self.req)
 
         # "embedded" resources
-        if self.req.startswith("/.cpr/"):
-            static_path = os.path.join(E.mod, "web", self.req.split("?")[0][6:])
+        if self.vpath.startswith(u".cpr"):
+            static_path = os.path.join(E.mod, "web/", self.vpath[5:])
 
             if os.path.isfile(static_path):
                 return self.tx_file(static_path)
 
-        # split req into vpath + args
-        args = {}
-        vpath = self.req[1:]
-        if "?" in vpath:
-            vpath, arglist = vpath.split("?", 1)
-            for k in arglist.split("&"):
-                if "=" in k:
-                    k, v = k.split("=", 1)
-                    args[k.lower()] = v.strip()
-                else:
-                    args[k.lower()] = True
-
         # conditional redirect to single volumes
-        if vpath == "" and not args:
+        if self.vpath == "" and not self.args:
             nread = len(self.rvol)
             nwrite = len(self.wvol)
             if nread + nwrite == 1:
                 if nread == 1:
-                    vpath = self.rvol[0]
+                    self.vpath = self.rvol[0]
                 else:
-                    vpath = self.wvol[0]
+                    self.vpath = self.wvol[0]
 
         # go home if verboten
-        readable = vpath in self.rvol
-        writable = vpath in self.wvol
+        readable = self.vpath in self.rvol
+        writable = self.vpath in self.wvol
         if not readable and not writable:
-            self.log("inaccessible: {}".format(vpath))
-            args = {"h"}
-
-        self.vpath = vpath
-        self.args = args
+            self.log("inaccessible: {}".format(self.vpath))
+            self.args = {"h": True}
 
         if "h" in self.args:
             self.vpath = None
@@ -190,12 +184,17 @@ class HttpCli(object):
 
     def handle_login(self):
         pwd = self.parser.require("cppwd", 64)
-        if not pwd in self.auth.iuser:
-            h = [u"Set-Cookie: cppwd=x; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"]
-            self.loud_reply(u'bad_ppwd "{}"'.format(pwd), headers=h)
+        self.parser.drop()
+
+        if pwd in self.auth.iuser:
+            msg = u"login ok"
         else:
-            h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
-            self.loud_reply(u"login_ok", headers=h)
+            msg = u"naw dude"
+            pwd = u"x"
+
+        h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
+        html = u'<h1>{}<h2><a href="/">ack'.format(msg)
+        self.reply(html.encode("utf-8"), headers=h)
 
     def handle_plain_upload(self):
         nullwrite = self.args.nw
