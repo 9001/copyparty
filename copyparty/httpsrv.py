@@ -4,13 +4,13 @@ from __future__ import print_function
 
 import threading
 
-from .httpcli import *
+from .httpconn import *
 from .authsrv import *
 
 
 class HttpSrv(object):
     """
-    handles incoming connections (parses http and produces responses)
+    handles incoming connections using HttpConn to process http,
     relying on MpSrv for performance (HttpSrv is just plain threads)
     """
 
@@ -41,20 +41,18 @@ class HttpSrv(object):
 
     def thr_client(self, sck, addr, log):
         """thread managing one tcp client"""
+        cli = HttpConn(sck, addr, self.args, self.auth, log)
+        with self.mutex:
+            self.clients[cli] = 0
+            self.workload += 50
+
+            if not self.workload_thr_alive:
+                self.workload_thr_alive = True
+                thr = threading.Thread(target=self.thr_workload)
+                thr.daemon = True
+                thr.start()
+
         try:
-            # TODO HttpConn between HttpSrv and HttpCli
-            # to ensure no state is kept between http requests
-            cli = HttpCli(sck, addr, self.args, self.auth, log)
-            with self.mutex:
-                self.clients[cli] = 0
-                self.workload += 50
-
-                if not self.workload_thr_alive:
-                    self.workload_thr_alive = True
-                    thr = threading.Thread(target=self.thr_workload)
-                    thr.daemon = True
-                    thr.start()
-
             cli.run()
 
         finally:

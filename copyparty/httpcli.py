@@ -10,97 +10,87 @@ import jinja2
 from .__init__ import *
 from .util import *
 
-if PY2:
-    from cStringIO import StringIO as BytesIO
-else:
+if not PY2:
     unicode = str
-    from io import BytesIO as BytesIO
 
 
 class HttpCli(object):
-    def __init__(self, sck, addr, args, auth, log_func):
-        self.s = sck
-        self.addr = addr
-        self.args = args
-        self.auth = auth
+    """
+    Spawned by HttpConn to process one http transaction
+    """
 
-        self.sr = Unrecv(sck)
+    def __init__(self, conn):
+        self.conn = conn
+        self.s = conn.s
+        self.addr = conn.addr
+        self.args = conn.args
+        self.auth = conn.auth
+
+        self.sr = conn.sr
         self.bufsz = 1024 * 32
-        self.workload = 0
         self.ok = True
 
-        self.log_func = log_func
-        self.log_src = "{} \033[36m{}".format(addr[0], addr[1]).ljust(26)
-
-        with open(self.respath("splash.html"), "rb") as f:
-            self.tpl_mounts = jinja2.Template(f.read().decode("utf-8"))
-
-    def respath(self, res_name):
-        return os.path.join(E.mod, "web", res_name)
+        self.log_func = conn.log_func
+        self.log_src = conn.log_src
 
     def log(self, msg):
         self.log_func(self.log_src, msg)
 
     def run(self):
-        while self.ok:
-            try:
-                headerlines = read_header(self.sr)
-            except:
-                self.ok = False
-                return
+        try:
+            headerlines = read_header(self.sr)
+        except:
+            return False
 
-            self.headers = {}
-            try:
-                mode, self.req, _ = headerlines[0].split(" ")
-            except:
-                self.log("bad headers:\n" + "\n".join(headerlines))
-                self.s.close()
-                return
+        self.headers = {}
+        try:
+            mode, self.req, _ = headerlines[0].split(" ")
+        except:
+            self.log("bad headers:\n" + "\n".join(headerlines))
+            return False
 
-            for header_line in headerlines[1:]:
-                k, v = header_line.split(":", 1)
-                self.headers[k.lower()] = v.strip()
+        for header_line in headerlines[1:]:
+            k, v = header_line.split(":", 1)
+            self.headers[k.lower()] = v.strip()
 
-            self.uname = "*"
-            if "cookie" in self.headers:
-                cookies = self.headers["cookie"].split(";")
-                for k, v in [x.split("=", 1) for x in cookies]:
-                    if k != "cppwd":
-                        continue
+        self.uname = "*"
+        if "cookie" in self.headers:
+            cookies = self.headers["cookie"].split(";")
+            for k, v in [x.split("=", 1) for x in cookies]:
+                if k != "cppwd":
+                    continue
 
-                    v = unescape_cookie(v)
-                    if v == "x":
-                        break
+                v = unescape_cookie(v)
+                if v == "x":
+                    break
 
-                    if not v in self.auth.iuser:
-                        msg = u'bad_cpwd "{}"'.format(v)
-                        nuke = u"Set-Cookie: cppwd=x; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-                        self.loud_reply(msg, headers=[nuke])
-                        return
+                if not v in self.auth.iuser:
+                    msg = u'bad_cpwd "{}"'.format(v)
+                    nuke = u"Set-Cookie: cppwd=x; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+                    self.loud_reply(msg, headers=[nuke])
+                    return True
 
-                    self.uname = self.auth.iuser[v]
+                self.uname = self.auth.iuser[v]
 
-            if self.uname:
-                self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
-                self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
-                print(self.rvol)
-                print(self.wvol)
+        if self.uname:
+            self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
+            self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
+            print(self.rvol)
+            print(self.wvol)
 
-            try:
-                if mode == "GET":
-                    self.handle_get()
-                elif mode == "POST":
-                    self.handle_post()
-                else:
-                    self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
+        try:
+            if mode == "GET":
+                self.handle_get()
+            elif mode == "POST":
+                self.handle_post()
+            else:
+                self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
 
-            except Pebkac as ex:
-                self.loud_reply(str(ex))
+        except Pebkac as ex:
+            self.loud_reply(str(ex))
+            return False
 
-    def panic(self, msg):
-        self.log("client disconnected ({0})".format(msg).upper())
-        self.ok = False
-        self.s.close()
+        return self.ok
 
     def reply(self, body, status="200 OK", mime="text/html", headers=[]):
         # TODO something to reply with user-supplied values safely
@@ -186,7 +176,7 @@ class HttpCli(object):
 
             with open(fn, "wb") as f:
                 self.log("writing to {0}".format(fn))
-                sz, sha512 = hashcopy(self, p_data, f)
+                sz, sha512 = hashcopy(self.conn, p_data, f)
                 if sz == 0:
                     break
 
@@ -247,5 +237,5 @@ class HttpCli(object):
                 self.s.send(buf)
 
     def tx_mounts(self):
-        html = self.tpl_mounts.render(this=self)
+        html = self.conn.tpl_mounts.render(this=self)
         self.reply(html.encode("utf-8"))

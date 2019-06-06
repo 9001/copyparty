@@ -9,6 +9,7 @@ buildenv/
 build/
 dist/
 *.rst
+.env/
 
 # sublime
 *.sublime-workspace
