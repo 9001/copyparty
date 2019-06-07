@@ -14,8 +14,8 @@ import threading
 from textwrap import dedent
 import multiprocessing as mp
 
-from .__version__ import *
-from .tcpsrv import *
+from .__version__ import S_VERSION, S_BUILD_DT
+from .tcpsrv import TcpSrv
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -41,7 +41,7 @@ def main():
     try:
         # support vscode debugger (bonus: same behavior as on windows)
         mp.set_start_method("spawn", True)
-    except:
+    except AttributeError:
         # py2.7 probably
         pass
 

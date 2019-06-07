@@ -5,7 +5,7 @@ from __future__ import print_function
 import os
 import threading
 
-from .__init__ import *
+from .__init__ import PY2
 from .util import undot
 
 
@@ -21,8 +21,8 @@ class VFS(object):
 
     def add(self, src, dst):
         """get existing, or add new path to the vfs"""
-        assert not src.endswith("/")
-        assert not dst.endswith("/")
+        assert not src.endswith("/")  # nosec
+        assert not dst.endswith("/")  # nosec
 
         if "/" in dst:
             # requires breadth-first population (permissions trickle down)
@@ -93,7 +93,7 @@ class VFS(object):
             for name in virt_all:
                 try:
                     real.remove(name)
-                except:
+                except ValueError:
                     pass
 
         absreal = []
@@ -227,14 +227,14 @@ class AuthSrv(object):
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
-        elif not "" in mount:
+        elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             vfs = VFS(os.path.abspath("."), "", [], [])
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
             depth = dst.count("/")
-            assert maxdepth <= depth
+            assert maxdepth <= depth  # nosec
             maxdepth = depth
 
             if dst == "":

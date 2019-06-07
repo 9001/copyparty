@@ -6,12 +6,11 @@ import os
 import json
 import shutil
 import unittest
-import subprocess as sp
+import subprocess as sp  # nosec
 
-from io import StringIO
 from textwrap import dedent
 from argparse import Namespace
-from copyparty.authsrv import *
+from copyparty.authsrv import AuthSrv
 
 
 class TestVFS(unittest.TestCase):
@@ -36,12 +35,8 @@ class TestVFS(unittest.TestCase):
     def runcmd(self, *argv):
         p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
         stdout, stderr = p.communicate()
-        try:
-            stdout = stdout.decode("utf-8")
-            stderr = stderr.decode("utf-8")
-        except:
-            pass
-
+        stdout = stdout.decode("utf-8")
+        stderr = stderr.decode("utf-8")
         return [p.returncode, stdout, stderr]
 
     def chkcmd(self, *argv):
@@ -49,8 +44,10 @@ class TestVFS(unittest.TestCase):
         if ok != 0:
             raise Exception(serr)
 
+        return sout, serr
+
     def get_ramdisk(self):
-        for vol in ["/dev/shm", "/Volumes/cptd"]:
+        for vol in ["/dev/shm", "/Volumes/cptd"]:  # nosec (singleton test)
             if os.path.exists(vol):
                 return vol
 
@@ -65,7 +62,7 @@ class TestVFS(unittest.TestCase):
         td = self.get_ramdisk() + "/vfs"
         try:
             shutil.rmtree(td)
-        except:
+        except OSError:
             pass
 
         os.mkdir(td)

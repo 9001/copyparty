@@ -2,13 +2,12 @@
 # coding: utf-8
 from __future__ import print_function
 
+import os
 import time
-import hashlib
 import mimetypes
-import jinja2
 
-from .__init__ import *
-from .util import *
+from .__init__ import E, PY2
+from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 
 if not PY2:
     unicode = str
@@ -72,7 +71,7 @@ class HttpCli(object):
 
         # split req into vpath + args
         args = {}
-        if not "?" in self.req:
+        if "?" not in self.req:
             vpath = undot(self.req)
         else:
             vpath, arglist = self.req.split("?", 1)
@@ -164,7 +163,7 @@ class HttpCli(object):
         try:
             if self.headers["expect"].lower() == "100-continue":
                 self.s.send(b"HTTP/1.1 100 Continue\r\n\r\n")
-        except:
+        except KeyError:
             pass
 
         self.parser = MultipartParser(self.log, self.sr, self.headers)
@@ -190,7 +189,7 @@ class HttpCli(object):
             msg = u"login ok"
         else:
             msg = u"naw dude"
-            pwd = u"x"
+            pwd = u"x"  # nosec
 
         h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
         html = u'<h1>{}<h2><a href="/">ack'.format(msg)
@@ -281,4 +280,3 @@ class HttpCli(object):
 
     def tx_browser(self):
         self.loud_reply("TODO browser {}".format(self.vpath))
-

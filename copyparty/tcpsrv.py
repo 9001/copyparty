@@ -2,13 +2,14 @@
 # coding: utf-8
 from __future__ import print_function
 
+import sys
 import time
 import socket
 import threading
 from datetime import datetime, timedelta
 import calendar
 
-from .__init__ import *
+from .__init__ import PY2, WINDOWS
 
 
 class TcpSrv(object):
@@ -30,7 +31,7 @@ class TcpSrv(object):
             try:
                 s.connect(("10.255.255.255", 1))
                 ip = s.getsockname()[0]
-            except:
+            except OSError:
                 pass
             s.close()
 

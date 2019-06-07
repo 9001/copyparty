@@ -2,10 +2,11 @@
 # coding: utf-8
 from __future__ import print_function
 
+import time
 import threading
 
-from .httpconn import *
-from .authsrv import *
+from .httpconn import HttpConn
+from .authsrv import AuthSrv
 
 
 class HttpSrv(object):
@@ -60,7 +61,7 @@ class HttpSrv(object):
                 del self.clients[cli]
 
             if self.disconnect_func:
-                self.disconnect_func(addr)
+                self.disconnect_func(addr)  # pylint: disable=not-callable
 
     def thr_workload(self):
         """indicates the python interpreter workload caused by this HttpSrv"""

@@ -3,10 +3,9 @@
 from __future__ import print_function
 
 import os
-import time
 import jinja2
 
-from .__init__ import *
+from .__init__ import E
 from .util import Unrecv
 from .httpcli import HttpCli
 
@@ -42,4 +41,3 @@ class HttpConn(object):
             if not cli.run():
                 self.s.close()
                 return
-

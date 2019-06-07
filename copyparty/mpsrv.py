@@ -2,18 +2,19 @@
 # coding: utf-8
 from __future__ import print_function
 
+import sys
 import time
 import signal
 import threading
 import multiprocessing as mp
 
-from .__init__ import *
-from .httpsrv import *
+from .__init__ import PY2, WINDOWS
+from .httpsrv import HttpSrv
 
 if PY2 and not WINDOWS:
     from multiprocessing.reduction import ForkingPickler
-    from StringIO import StringIO as MemesIO
-    import pickle
+    from StringIO import StringIO as MemesIO  # pylint: disable=import-error
+    import pickle  # nosec
 
 
 class MpWorker(object):
@@ -71,7 +72,7 @@ class MpWorker(object):
 
             sck = d[1]
             if PY2:
-                sck = pickle.loads(sck)
+                sck = pickle.loads(sck)  # nosec
 
             self.httpsrv.accept(sck, d[2])
 
@@ -182,7 +183,7 @@ class MpSrv(object):
                         proc.workload = 0
 
                 if self.disconnect_func:
-                    self.disconnect_func(addr)
+                    self.disconnect_func(addr)  # pylint: disable=not-callable
 
     def accept(self, sck, addr):
         proc = sorted(self.procs, key=lambda x: x.workload)[0]

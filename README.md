@@ -25,3 +25,15 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [ ] accounts
 
 conclusion: don't bother
+
+## dependencies
+
+* jinja2
+  * markupsafe
+
+## dev env
+
+    python3 -v venv .env
+    . .env/bin/activate
+    pip install jinja2  # dependencies
+    pip install black bandit pylint flake8  # vscode tooling
