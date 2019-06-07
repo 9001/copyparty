@@ -67,12 +67,17 @@ class VFS(object):
 
         return [self, vpath]
 
+    def can_access(self, vpath, user):
+        """return [readable,writable]"""
+        vn, _ = self._find(vpath)
+        return [user in vn.uread, user in vn.uwrite]
+
     def ls(self, vpath, user):
-        """return user-readable [virt,real] items at vpath"""
+        """return user-readable [fsdir,real,virt] items at vpath"""
         vn, rem = self._find(vpath)
 
         if user not in vn.uread:
-            return [[], []]
+            return [vn.realpath, [], []]
 
         rp = vn.realpath
         if rem:
@@ -96,11 +101,7 @@ class VFS(object):
                 except ValueError:
                     pass
 
-        absreal = []
-        for p in real:
-            absreal.append("{}/{}".format(rp, p).replace("//", "/"))
-
-        return [absreal, virt_vis]
+        return [rp, real, virt_vis]
 
     def user_tree(self, uname, readable=False, writable=False):
         ret = []

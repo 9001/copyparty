@@ -3,14 +3,20 @@
 from __future__ import print_function
 
 import os
+import stat
 import time
+from datetime import datetime
 import mimetypes
+import cgi
 
 from .__init__ import E, PY2
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 
 if not PY2:
     unicode = str
+    from urllib.parse import unquote_plus
+else:
+    from urllib import unquote_plus
 
 
 class HttpCli(object):
@@ -30,6 +36,8 @@ class HttpCli(object):
 
         self.ok = True
         self.bufsz = 1024 * 32
+        self.absolute_urls = False
+        self.out_headers = {}
 
     def log(self, msg):
         self.log_func(self.log_src, msg)
@@ -72,9 +80,15 @@ class HttpCli(object):
         # split req into vpath + args
         args = {}
         if "?" not in self.req:
+            if not self.req.endswith("/"):
+                self.absolute_urls = True
+
             vpath = undot(self.req)
         else:
             vpath, arglist = self.req.split("?", 1)
+            if not vpath.endswith("/"):
+                self.absolute_urls = True
+
             vpath = undot(vpath)
             for k in arglist.split("&"):
                 if "=" in k:
@@ -108,6 +122,9 @@ class HttpCli(object):
             u"Content-Type: " + mime,
             u"Content-Length: " + str(len(body)),
         ]
+        for k, v in self.out_headers.items():
+            response.append("{}: {}".format(k, v))
+
         response.extend(headers)
         response_str = u"\r\n".join(response).encode("utf-8")
         if self.ok:
@@ -140,9 +157,10 @@ class HttpCli(object):
                 else:
                     self.vpath = self.wvol[0]
 
+                self.absolute_urls = True
+
         # go home if verboten
-        readable = self.vpath in self.rvol
-        writable = self.vpath in self.wvol
+        readable, writable = self.conn.auth.vfs.can_access(self.vpath, self.uname)
         if not readable and not writable:
             self.log("inaccessible: {}".format(self.vpath))
             self.args = {"h": True}
@@ -154,7 +172,7 @@ class HttpCli(object):
         if readable:
             return self.tx_browser()
         else:
-            return self.tx_jupper()
+            return self.tx_upper()
 
     def handle_post(self):
         self.log("")
@@ -275,8 +293,48 @@ class HttpCli(object):
         html = self.conn.tpl_mounts.render(this=self)
         self.reply(html.encode("utf-8"))
 
-    def tx_jupper(self):
+    def tx_upper(self):
+        # return html for basic uploader;
+        # js rewrites to up2k unless args['b']
         self.loud_reply("TODO jupper {}".format(self.vpath))
 
     def tx_browser(self):
-        self.loud_reply("TODO browser {}".format(self.vpath))
+        vpath = u""
+        vpnodes = [[u"/", u"/"]]
+        for node in self.vpath.split("/"):
+            vpath += u"/" + node
+            vpnodes.append([cgi.escape(vpath) + "/", cgi.escape(node)])
+
+        fsroot, vfs_ls, vfs_virt = self.auth.vfs.ls(self.vpath, self.uname)
+        vfs_ls.extend(vfs_virt)
+
+        dirs = []
+        files = []
+        for fn in vfs_ls:
+            href = fn
+            if self.absolute_urls:
+                href = vpath + "/" + fn
+
+            fspath = fsroot + "/" + fn
+            inf = os.stat(fspath)
+
+            is_dir = stat.S_ISDIR(inf.st_mode)
+            if is_dir:
+                margin = "DIR"
+                href += "/"
+            else:
+                margin = "-"
+
+            sz = inf.st_size
+            dt = datetime.utcfromtimestamp(inf.st_mtime)
+            dt = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+            item = [margin, cgi.escape(href), cgi.escape(fn), sz, dt]
+            if is_dir:
+                dirs.append(item)
+            else:
+                files.append(item)
+
+        dirs.extend(files)
+        html = self.conn.tpl_browser.render(vpnodes=vpnodes, files=dirs)
+        self.reply(html.encode("utf-8"))

@@ -12,8 +12,8 @@
 <body>
     <h1 id="path">
         {% for n in vpnodes[:-1] %}
-        <a href="{{ n[0] }}">/{{ n[1] }}</a>
-        {% endfor %}
+        <a href="{{ n[0] }}">{{ n[1] }}</a>
+        {%- endfor %}
         <span>{{ vpnodes[-1][1] }}</li>
     </h1>
     <table id="files">
@@ -26,14 +26,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for f in files %}
-            <tr>
-                <td>{{ f[0] }}</td>
-                <td><a href="{{ f[1] }}">{{ f[2] }}</a></td>
-                <td>{{ f[3] }}</td>
-                <td>{{ f[4] }}</td>
-            </tr>
-            {% endfor %}
+
+{% for f in files %}
+<tr><td>{{ f[0] }}</td><td><a href="{{ f[1] }}">{{ f[2] }}</a></td><td>{{ f[3] }}</td><td>{{ f[4] }}</td></tr>
+{%- endfor %}
+
         </tbody>
     </table>
     </div>

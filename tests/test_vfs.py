@@ -11,6 +11,7 @@ import subprocess as sp  # nosec
 from textwrap import dedent
 from argparse import Namespace
 from copyparty.authsrv import AuthSrv
+from copyparty import util
 
 
 class TestVFS(unittest.TestCase):
@@ -24,10 +25,10 @@ class TestVFS(unittest.TestCase):
         return foo
 
     def undot(self, vfs, query, response):
-        self.assertEqual(vfs.undot(query), response)
+        self.assertEqual(util.undot(query), response)
         query = self.unfoo(query)
         response = self.unfoo(response)
-        self.assertEqual(vfs.undot(query), response)
+        self.assertEqual(util.undot(query), response)
 
     def absify(self, root, names):
         return ["{}/{}".format(root, x).replace("//", "/") for x in names]
@@ -130,34 +131,39 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(n.uread, ["k"])
         self.assertEqual(n.uwrite, ["*", "k"])
 
-        real, virt = vfs.ls("/", "*")
-        self.assertEqual(real, self.absify(td, ["b", "c"]))
+        fsdir, real, virt = vfs.ls("/", "*")
+        self.assertEqual(fsdir, td)
+        self.assertEqual(real, ["b", "c"])
         self.assertEqual(virt, ["a"])
 
-        real, virt = vfs.ls("a", "*")
-        self.assertEqual(real, self.absify(td, ["a/aa", "a/ab"]))
+        fsdir, real, virt = vfs.ls("a", "*")
+        self.assertEqual(fsdir, td + "/a")
+        self.assertEqual(real, ["aa", "ab"])
         self.assertEqual(virt, ["ac"])
 
-        real, virt = vfs.ls("a/ab", "*")
-        self.assertEqual(real, self.absify(td, ["a/ab/aba", "a/ab/abb", "a/ab/abc"]))
+        fsdir, real, virt = vfs.ls("a/ab", "*")
+        self.assertEqual(fsdir, td + "/a/ab")
+        self.assertEqual(real, ["aba", "abb", "abc"])
         self.assertEqual(virt, [])
 
-        real, virt = vfs.ls("a/ac", "*")
-        self.assertEqual(real, self.absify(td, ["a/ac/aca", "a/ac/acc"]))
+        fsdir, real, virt = vfs.ls("a/ac", "*")
+        self.assertEqual(fsdir, td + "/a/ac")
+        self.assertEqual(real, ["aca", "acc"])
         self.assertEqual(virt, [])
 
-        real, virt = vfs.ls("a/ac", "k")
-        self.assertEqual(real, self.absify(td, ["a/ac/aca", "a/ac/acc"]))
+        fsdir, real, virt = vfs.ls("a/ac", "k")
+        self.assertEqual(fsdir, td + "/a/ac")
+        self.assertEqual(real, ["aca", "acc"])
         self.assertEqual(virt, ["acb"])
 
-        real, virt = vfs.ls("a/ac/acb", "*")
+        fsdir, real, virt = vfs.ls("a/ac/acb", "*")
+        self.assertEqual(fsdir, td + "/a/ac/acb")
         self.assertEqual(real, [])
         self.assertEqual(virt, [])
 
-        real, virt = vfs.ls("a/ac/acb", "k")
-        self.assertEqual(
-            real, self.absify(td, ["a/ac/acb/acba", "a/ac/acb/acbb", "a/ac/acb/acbc"])
-        )
+        fsdir, real, virt = vfs.ls("a/ac/acb", "k")
+        self.assertEqual(fsdir, td + "/a/ac/acb")
+        self.assertEqual(real, ["acba", "acbb", "acbc"])
         self.assertEqual(virt, [])
 
         # breadth-first construction
@@ -187,17 +193,21 @@ class TestVFS(unittest.TestCase):
         # shadowing
         vfs = AuthSrv(Namespace(c=None, a=[], v=[".::r", "b:a/ac:r"]), None).vfs
 
-        r1, v1 = vfs.ls("", "*")
-        self.assertEqual(r1, self.absify(td, ["b", "c"]))
+        fsp, r1, v1 = vfs.ls("", "*")
+        self.assertEqual(fsp, td)
+        self.assertEqual(r1, ["b", "c"])
         self.assertEqual(v1, ["a"])
 
-        r1, v1 = vfs.ls("a", "*")
-        self.assertEqual(r1, self.absify(td, ["a/aa", "a/ab"]))
+        fsp, r1, v1 = vfs.ls("a", "*")
+        self.assertEqual(fsp, td + "/a")
+        self.assertEqual(r1, ["aa", "ab"])
         self.assertEqual(v1, ["ac"])
 
-        r1, v1 = vfs.ls("a/ac", "*")
-        r2, v2 = vfs.ls("b", "*")
-        self.assertEqual(r1, self.absify(td, ["b/ba", "b/bb", "b/bc"]))
+        fsp1, r1, v1 = vfs.ls("a/ac", "*")
+        fsp2, r2, v2 = vfs.ls("b", "*")
+        self.assertEqual(fsp1, td + "/b")
+        self.assertEqual(fsp2, td + "/b")
+        self.assertEqual(r1, ["ba", "bb", "bc"])
         self.assertEqual(r1, r2)
         self.assertEqual(v1, v2)
 
