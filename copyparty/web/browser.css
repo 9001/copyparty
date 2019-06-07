@@ -1,0 +1,251 @@
+html,body,tr,th,td,#files,a {
+	color: inherit;
+	background: none;
+	font-weight: inherit;
+	font-size: inherit;
+	padding: none;
+	border: none;
+}
+html {
+	color: #ccc;
+	background: #333;
+	font-family: sans-serif;
+	text-shadow: 1px 1px 0px #000;
+}
+html, body {
+	margin: 0;
+	padding: 0;
+}
+body {
+	padding-bottom: 5em;
+}
+#path {
+	color: #aca;
+	text-shadow: 1px 1px 0 #000;
+	font-variant: small-caps;
+	font-weight: normal;
+	background: #4c4c4c;
+	display: inline-block;
+	padding: .2em .5em .2em 1em;
+	border-radius: 0 .3em .3em 0;
+	box-shadow: .1em .1em .4em #222;
+	margin: 1em 0;
+	font-size: 1.4em;
+}
+#files {
+	border-collapse: collapse;
+}
+#files tbody a {
+	display: block;
+	padding: .3em 0;
+}
+a {
+	color: #fc5;
+	padding: .2em;
+	text-decoration: none;
+}
+#files a:hover {
+	color: #fff;
+	background: #161616;
+}
+thead a {
+	color: #999;
+	font-weight: normal;
+}
+tr:hover {
+	background: #1c1c1c;
+}
+thead th {
+	padding: .5em 1.3em .3em 1.3em;
+}
+thead th:last-child {
+	background: #444;
+	border-radius: .7em 0 0 0;
+}
+thead th:first-child {
+	background: #222;
+}
+tbody,
+thead th:nth-child(2) {
+	background: #222;
+	border-radius: 0 .7em 0 0;
+}
+td {
+	margin: 0;
+	padding: 0 .5em;
+}
+tbody td:nth-child(3) {
+	font-family: monospace;
+	font-size: 1.3em;
+	text-align: right;
+	padding-right: 1em;
+	white-space: nowrap;
+}
+tbody td:first-child {
+	padding-left: 1.5em;
+	color: #888;
+}
+tbody tr:first-child td {
+	padding-top: .9em;
+}
+tbody tr:last-child td {
+	padding-bottom: 1.3em;
+	border-bottom: .5em solid #444;
+}
+thead th[style] {
+	width: auto !important;
+}
+#path a {
+	margin: 0 0 0 -.2em;
+	padding: 0 0 0 .4em;
+}
+#path a:after {
+	content: '';
+	width: 1.05em;
+	height: 1.05em;
+	margin: -.2em .3em -.2em -.4em;
+	display: inline-block;
+	border: 1px solid rgba(255,224,192,0.3);
+	border-width: .05em .05em 0 0;
+	transform: rotate(45deg);
+	background: linear-gradient(45deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 75%, rgba(0,0,0,0.35));
+}
+#path a:hover {
+	color: #fff;
+	background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
+}
+#path span {
+	padding-left: .2em;
+}
+a.play {
+	color: #e70;
+}
+a.play.act {
+	color: #af0;
+}
+#blocked {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #333;
+	font-size: 2.5em;
+	z-index:99;
+}
+#blk_play,
+#blk_abrt {
+	position: fixed;
+	display: table;
+	width: 80%;
+}
+#blk_play {
+	height: 60%;
+	left: 10%;
+	top: 5%;
+}
+#blk_abrt {
+	height: 25%;
+	left: 10%;
+	bottom: 5%;
+}
+#blk_play a,
+#blk_abrt a {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	background: #444;
+	border-radius: 2em;
+}
+#widget {
+	position: fixed;
+	font-size: 1.5em;
+	left: 0;
+	right: 0;
+	bottom: -6em;
+	height: 6em;
+	width: 100%;
+	transition: bottom 0.15s;
+}
+#widget.open {
+	box-shadow: 0 0 1em rgba(0,48,64,0.2);
+	bottom: 0;
+}
+#widgeti {
+	position: relative;
+	z-index: 10;
+	width: 100%;
+	height: 100%;
+	background: #3c3c3c;
+}
+#wtoggle {
+	cursor: url(/.cpr/dd/1.png), pointer;
+	animation: cursor 500ms infinite;
+}
+@keyframes cursor {
+	 0% {cursor: url(/.cpr/dd/2.png), pointer}
+	30% {cursor: url(/.cpr/dd/3.png), pointer}
+	50% {cursor: url(/.cpr/dd/4.png), pointer}
+	75% {cursor: url(/.cpr/dd/5.png), pointer}
+	85% {cursor: url(/.cpr/dd/1.png), pointer}
+}
+#wtoggle {
+	position: absolute;
+	top: -1em;
+	right: 0;
+	width: 1.2em;
+	height: 1em;
+	font-size: 2em;
+	line-height: 1em;
+	text-align: center;
+	text-shadow: none;
+	background: #3c3c3c;
+	box-shadow: 0 0 .5em #222;
+	border-radius: .3em 0 0 0;
+	padding-left: .07em;
+	color: #fff;
+}
+#barpos,
+#barbuf {
+	position: absolute;
+	bottom: 1em;
+	left: 1em;
+	height: 2em;
+	border-radius: 9em;
+	width: calc(100% - 2em);
+}
+#barbuf {
+	background: rgba(0,0,0,0.2);
+	z-index: 21;
+}
+#barpos {
+	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
+	z-index: 22;
+}
+#pctl {
+	position: absolute;
+	top: .5em;
+	left: 1em;
+}
+#pctl a {
+	background: rgba(0,0,0,0.1);
+	display: inline-block;
+	font-size: 1.25em;
+	width: 1.3em;
+	height: 1.2em;
+	line-height: 1em;
+	text-align: center;
+	margin-right: .5em;
+	border-radius: .3em;
+	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
+}
+#pvol {
+	position: absolute;
+	top: .7em;
+	right: 1em;
+	height: 1.6em;
+	border-radius: 9em;
+	max-width: 12em;
+	width: calc(100% - 10.5em);
+	background: rgba(0,0,0,0.2);
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>copyparty</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css">
+</head>
+
+<body>
+    <h1 id="path">
+        {% for n in vpnodes[:-1] %}
+        <a href="{{ n[0] }}">/{{ n[1] }}</a>
+        {% endfor %}
+        <span>{{ vpnodes[-1][1] }}</li>
+    </h1>
+    <table id="files">
+        <thead>
+            <tr>
+                <th></th>
+                <th>File Name</th>
+                <th>File Size</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in files %}
+            <tr>
+                <td>{{ f[0] }}</td>
+                <td><a href="{{ f[1] }}">{{ f[2] }}</a></td>
+                <td>{{ f[3] }}</td>
+                <td>{{ f[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <div id="widget">
+        <div id="wtoggle">=</div>
+        <div id="widgeti">
+            <div id="pctl"><a href="#" id="bprev">⏮</a><a href="#" id="bplay">▶</a><a href="#" id="bnext">⏭</a></div>
+            <canvas id="pvol" width="288" height="38"></canvas>
+            <canvas id="barpos"></canvas>
+            <canvas id="barbuf"></canvas>
+        </div>
+    </div>
+</body>
+
+</html>
