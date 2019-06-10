@@ -33,6 +33,11 @@ class TestVFS(unittest.TestCase):
     def absify(self, root, names):
         return ["{}/{}".format(root, x).replace("//", "/") for x in names]
 
+    def ls(self, vfs, vpath, uname):
+        """helper for resolving and listing a folder"""
+        vn, rem = vfs.get(vpath, uname, True, False)
+        return vn.ls(rem, uname)
+
     def runcmd(self, *argv):
         p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
         stdout, stderr = p.communicate()
@@ -131,37 +136,34 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(n.uread, ["k"])
         self.assertEqual(n.uwrite, ["*", "k"])
 
-        fsdir, real, virt = vfs.ls("/", "*")
+        fsdir, real, virt = self.ls(vfs, "/", "*")
         self.assertEqual(fsdir, td)
         self.assertEqual(real, ["b", "c"])
         self.assertEqual(virt, ["a"])
 
-        fsdir, real, virt = vfs.ls("a", "*")
+        fsdir, real, virt = self.ls(vfs, "a", "*")
         self.assertEqual(fsdir, td + "/a")
         self.assertEqual(real, ["aa", "ab"])
         self.assertEqual(virt, ["ac"])
 
-        fsdir, real, virt = vfs.ls("a/ab", "*")
+        fsdir, real, virt = self.ls(vfs, "a/ab", "*")
         self.assertEqual(fsdir, td + "/a/ab")
         self.assertEqual(real, ["aba", "abb", "abc"])
         self.assertEqual(virt, [])
 
-        fsdir, real, virt = vfs.ls("a/ac", "*")
+        fsdir, real, virt = self.ls(vfs, "a/ac", "*")
         self.assertEqual(fsdir, td + "/a/ac")
         self.assertEqual(real, ["aca", "acc"])
         self.assertEqual(virt, [])
 
-        fsdir, real, virt = vfs.ls("a/ac", "k")
+        fsdir, real, virt = self.ls(vfs, "a/ac", "k")
         self.assertEqual(fsdir, td + "/a/ac")
         self.assertEqual(real, ["aca", "acc"])
         self.assertEqual(virt, ["acb"])
 
-        fsdir, real, virt = vfs.ls("a/ac/acb", "*")
-        self.assertEqual(fsdir, td + "/a/ac/acb")
-        self.assertEqual(real, [])
-        self.assertEqual(virt, [])
+        self.assertRaises(util.Pebkac, vfs.get, "a/ac/acb", "*", True, False)
 
-        fsdir, real, virt = vfs.ls("a/ac/acb", "k")
+        fsdir, real, virt = self.ls(vfs, "a/ac/acb", "k")
         self.assertEqual(fsdir, td + "/a/ac/acb")
         self.assertEqual(real, ["acba", "acbb", "acbc"])
         self.assertEqual(virt, [])
@@ -193,18 +195,18 @@ class TestVFS(unittest.TestCase):
         # shadowing
         vfs = AuthSrv(Namespace(c=None, a=[], v=[".::r", "b:a/ac:r"]), None).vfs
 
-        fsp, r1, v1 = vfs.ls("", "*")
+        fsp, r1, v1 = self.ls(vfs, "", "*")
         self.assertEqual(fsp, td)
         self.assertEqual(r1, ["b", "c"])
         self.assertEqual(v1, ["a"])
 
-        fsp, r1, v1 = vfs.ls("a", "*")
+        fsp, r1, v1 = self.ls(vfs, "a", "*")
         self.assertEqual(fsp, td + "/a")
         self.assertEqual(r1, ["aa", "ab"])
         self.assertEqual(v1, ["ac"])
 
-        fsp1, r1, v1 = vfs.ls("a/ac", "*")
-        fsp2, r2, v2 = vfs.ls("b", "*")
+        fsp1, r1, v1 = self.ls(vfs, "a/ac", "*")
+        fsp2, r2, v2 = self.ls(vfs, "b", "*")
         self.assertEqual(fsp1, td + "/b")
         self.assertEqual(fsp2, td + "/b")
         self.assertEqual(r1, ["ba", "bb", "bc"])

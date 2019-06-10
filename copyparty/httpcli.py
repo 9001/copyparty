@@ -98,7 +98,7 @@ class HttpCli(object):
                     args[k.lower()] = True
 
         self.args = args
-        self.vpath = vpath
+        self.vpath = unquote_plus(vpath)
 
         try:
             if mode == "GET":
@@ -305,7 +305,12 @@ class HttpCli(object):
             vpath += u"/" + node
             vpnodes.append([cgi.escape(vpath) + "/", cgi.escape(node)])
 
-        fsroot, vfs_ls, vfs_virt = self.auth.vfs.ls(self.vpath, self.uname)
+        vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
+        abspath = vn.canonical(rem)
+        if not os.path.isdir(abspath):
+            return self.tx_file(abspath)
+
+        fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)
         vfs_ls.extend(vfs_virt)
 
         dirs = []

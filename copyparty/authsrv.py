@@ -6,7 +6,7 @@ import os
 import threading
 
 from .__init__ import PY2
-from .util import undot
+from .util import undot, Pebkac
 
 
 class VFS(object):
@@ -67,32 +67,44 @@ class VFS(object):
 
         return [self, vpath]
 
-    def can_access(self, vpath, user):
+    def can_access(self, vpath, uname):
         """return [readable,writable]"""
         vn, _ = self._find(vpath)
-        return [user in vn.uread, user in vn.uwrite]
+        return [uname in vn.uread, uname in vn.uwrite]
 
-    def ls(self, vpath, user):
-        """return user-readable [fsdir,real,virt] items at vpath"""
+    def get(self, vpath, uname, will_read, will_write):
+        """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         vn, rem = self._find(vpath)
 
-        if user not in vn.uread:
-            return [vn.realpath, [], []]
+        if will_read and uname not in vn.uread:
+            raise Pebkac("you don't have read-access for this location")
 
-        rp = vn.realpath
+        if will_write and uname not in vn.uwrite:
+            raise Pebkac("you don't have write-access for this location")
+
+        return vn, rem
+
+    def canonical(self, rem):
+        """returns the canonical path (fully-resolved absolute fs path)"""
+        rp = self.realpath
         if rem:
             rp += "/" + rem
 
-        real = os.listdir(rp)
+        return os.path.realpath(rp)
+
+    def ls(self, rem, uname):
+        """return user-readable [fsdir,real,virt] items at vpath"""
+        abspath = self.canonical(rem)
+        real = os.listdir(abspath)
         real.sort()
         if rem:
             virt_vis = []
         else:
             virt_all = []  # all nodes that exist
             virt_vis = []  # nodes readable by user
-            for name, vn2 in sorted(vn.nodes.items()):
+            for name, vn2 in sorted(self.nodes.items()):
                 virt_all.append(name)
-                if user in vn2.uread:
+                if uname in vn2.uread:
                     virt_vis.append(name)
 
             for name in virt_all:
@@ -101,7 +113,7 @@ class VFS(object):
                 except ValueError:
                     pass
 
-        return [rp, real, virt_vis]
+        return [abspath, real, virt_vis]
 
     def user_tree(self, uname, readable=False, writable=False):
         ret = []
