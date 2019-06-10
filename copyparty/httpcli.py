@@ -15,8 +15,10 @@ from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 if not PY2:
     unicode = str
     from urllib.parse import unquote_plus
+    from urllib.parse import quote_plus
 else:
     from urllib import unquote_plus  # pylint: disable=no-name-in-module
+    from urllib import quote_plus
 
 
 class HttpCli(object):
@@ -151,7 +153,7 @@ class HttpCli(object):
         if self.vpath == "" and not self.uparam:
             nread = len(self.rvol)
             nwrite = len(self.wvol)
-            if nread + nwrite == 1:
+            if nread + nwrite == 1 or (self.rvol == self.wvol and nread == 1):
                 if nread == 1:
                     self.vpath = self.rvol[0]
                 else:
@@ -212,19 +214,25 @@ class HttpCli(object):
             pwd = u"x"  # nosec
 
         h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
-        html = u'<h1>{}</h1><h2><a href="/">ack</a></h2>'.format(msg)
-        html += '<script>setTimeout(function(){window.location.replace("/");},500);</script>'
+        html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
         self.reply(html.encode("utf-8"), headers=h)
 
     def handle_plain_upload(self):
         nullwrite = self.args.nw
+        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+
+        # rem is escaped at this point,
+        # this is just a sanity check to prevent any disasters
+        if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
+            raise Exception("that was close")
 
         files = []
         t0 = time.time()
         for nfile, (p_field, p_file, p_data) in enumerate(self.parser.gen):
             fn = os.devnull
             if not nullwrite:
-                fn = sanitize_fn(p_file)
+                fn = os.path.join(vfs.realpath, rem, sanitize_fn(p_file))
+
                 # TODO broker which avoid this race
                 # and provides a new filename if taken
                 if os.path.exists(fn):
@@ -253,7 +261,14 @@ class HttpCli(object):
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
 
-        self.loud_reply(msg)
+        html = self.conn.tpl_msg.render(
+            h2='<a href="/{}">return to /{}</a>'.format(
+                quote_plus(self.vpath, safe="/"), cgi.escape(self.vpath, quote=True)
+            ),
+            pre=msg,
+        )
+        self.log(msg)
+        self.reply(html.encode("utf-8"))
 
         if not nullwrite:
             # TODO this is bad
@@ -310,10 +325,15 @@ class HttpCli(object):
         vpnodes = [[u"/", u"/"]]
         for node in self.vpath.split("/"):
             vpath += u"/" + node
-            vpnodes.append([cgi.escape(vpath) + "/", cgi.escape(node)])
+            vpnodes.append([quote_plus(vpath, safe="/") + "/", cgi.escape(node)])
 
         vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
         abspath = vn.canonical(rem)
+
+        if not os.path.exists(abspath):
+            print(abspath)
+            raise Pebkac("404 not found")
+
         if not os.path.isdir(abspath):
             return self.tx_file(abspath)
 
@@ -341,7 +361,13 @@ class HttpCli(object):
             dt = datetime.utcfromtimestamp(inf.st_mtime)
             dt = dt.strftime("%Y-%m-%d %H:%M:%S")
 
-            item = [margin, cgi.escape(href), cgi.escape(fn), sz, dt]
+            item = [
+                margin,
+                quote_plus(href, safe="/"),
+                cgi.escape(fn, quote=True),
+                sz,
+                dt,
+            ]
             if is_dir:
                 dirs.append(item)
             else:

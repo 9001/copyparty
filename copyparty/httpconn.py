@@ -31,6 +31,7 @@ class HttpConn(object):
 
         self.tpl_mounts = self.load_tpl("splash.html")
         self.tpl_browser = self.load_tpl("browser.html")
+        self.tpl_msg = self.load_tpl("msg.html")
 
     def load_tpl(self, fn):
         with open(self.respath(fn), "rb") as f:

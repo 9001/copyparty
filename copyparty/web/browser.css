@@ -251,9 +251,8 @@ a.play.act {
 }
 #bup {
 	padding: .5em .5em .5em .3em;
-	margin-bottom: 1em;
 	background: #2d2d2d;
-	border-radius: 0 .5em .5em 0;
+	border-radius: 0 0 1em 0;
 	border-right: .3em solid #3a3a3a;
 	max-width: 40em;
 }

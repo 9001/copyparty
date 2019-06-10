@@ -10,13 +10,6 @@
 </head>
 
 <body>
-    <h1 id="path">
-        {%- for n in vpnodes[:-1] %}
-        <a href="{{ n[0] }}">{{ n[1] }}</a>
-        {%- endfor %}
-        <span>{{ vpnodes[-1][1] }}</span>
-    </h1>
-
     {%- if can_upload %}
     <div id="bup">
         <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
@@ -26,6 +19,13 @@
         </form>
     </div>
     {%- endif %}
+    
+    <h1 id="path">
+        {%- for n in vpnodes[:-1] %}
+        <a href="{{ n[0] }}">{{ n[1] }}</a>
+        {%- endfor %}
+        <span>{{ vpnodes[-1][1] }}</span>
+    </h1>
     
     <table id="files">
         <thead>

@@ -36,6 +36,12 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 
 
 ##
+## bad filenames
+
+echo hi > 'qwe,rty;asd fgh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'.html
+
+
+##
 ## vscode
 
 # replace variable name

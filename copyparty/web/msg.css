@@ -1,0 +1,31 @@
+html,body,tr,th,td,#files,a {
+	color: inherit;
+	background: none;
+	font-weight: inherit;
+	font-size: inherit;
+	padding: none;
+	border: none;
+}
+html {
+	color: #ccc;
+	background: #333;
+	font-family: sans-serif;
+	text-shadow: 1px 1px 0px #000;
+}
+html, body {
+	margin: 0;
+	padding: 0;
+}
+body {
+	padding-bottom: 5em;
+}
+#box {
+    padding: .5em 1em;
+    background: #2c2c2c;
+}
+pre {
+	font-family: monospace, monospace;
+}
+a {
+	color: #fc5;
+}

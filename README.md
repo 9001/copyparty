@@ -15,7 +15,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 * [x] sanic multipart parser
 * [x] load balancer (multiprocessing)
-* [ ] upload (plain multipart, ie6 support)
+* [x] upload (plain multipart, ie6 support)
 * [ ] upload (js, resumable, multithreaded)
 * [x] download
 * [x] browser
@@ -24,6 +24,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [ ] download as zip
 * [x] volumes
 * [x] accounts
+
+summary: it works
 
 
 # dependencies
@@ -64,9 +66,10 @@ pip install black bandit pylint flake8  # vscode tooling
 ```
 
 
-# TODO
+# immediate todo
 
 roughly sorted by priority
 
+* http error handling (conn.status or handler-retval)
 * last-modified header
 * support pillow-simd
