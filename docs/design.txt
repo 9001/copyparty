@@ -1,3 +1,24 @@
+##
+## current design
+
+main
+  tcpsrv
+    httpsrv
+    mpsrv
+      mpworker
+        httpsrv
+          ...
+
+##
+## thumbnails
+
+two components:
+  thumbcache is directly accessed by httpd to return pregenerated thumbnails
+  thumbsrv is accessed through a broker on cache miss to generate and return
+
+##
+## initial ideas
+
 need log interface
   tcpsrv creates it
   httpsrv must use interface

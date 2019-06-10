@@ -25,18 +25,47 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [x] volumes
 * [x] accounts
 
-conclusion: mostly useless
 
-## dependencies
+# dependencies
 
-* jinja2
-  * markupsafe
+* `jinja2`
+  * pulls in `markupsafe`
 
-## dev env
+optional, enables thumbnails:
+* `Pillow` (requires py2.7 or py3.5+)
+
+
+# install on android
+
+install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then
+```sh
+apt install python
+python3 -m venv ~/pe/ve.copyparty
+. ~/pe/ve.copyparty/activate
+pip install jinja2
+# download copyparty somehow
+python3 -m copyparty
 ```
+
+for image thumbnails, install optional dependency [Pillow](https://pypi.org/project/Pillow/):
+```sh
+apt install clang python-dev zlib-dev libjpeg-turbo-dev libcrypt-dev ndk-sysroot
+CFLAGS=-I$HOME/../usr/include/ pip install Pillow
+```
+
+
+# dev env setup
+```sh
 python3 -v venv .env
 . .env/bin/activate
-pip install jinja2  # dependencies
+pip install jinja2  # mandatory deps
+pip install Pillow  # thumbnail deps
 pip install black bandit pylint flake8  # vscode tooling
 ```
 
+
+# TODO
+
+roughly sorted by priority
+
+* support pillow-simd
