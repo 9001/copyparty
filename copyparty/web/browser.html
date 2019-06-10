@@ -16,6 +16,17 @@
         {%- endfor %}
         <span>{{ vpnodes[-1][1] }}</span>
     </h1>
+
+    {%- if can_upload %}
+    <div id="bup">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
+            <input type="hidden" name="act" value="bput" />
+            <input type="file" name="f" multiple><br />
+            <input type="submit" value="start upload">
+        </form>
+    </div>
+    {%- endif %}
+    
     <table id="files">
         <thead>
             <tr>
@@ -33,6 +44,9 @@
 
         </tbody>
     </table>
+    
+    <h2><a href="?h">control-panel</a></h2>
+
     <div id="widget">
         <div id="wtoggle">=</div>
         <div id="widgeti">

@@ -68,4 +68,5 @@ pip install black bandit pylint flake8  # vscode tooling
 
 roughly sorted by priority
 
+* last-modified header
 * support pillow-simd

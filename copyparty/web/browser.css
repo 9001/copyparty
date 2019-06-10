@@ -249,3 +249,14 @@ a.play.act {
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
 }
+#bup {
+	padding: .5em .5em .5em .3em;
+	margin-bottom: 1em;
+	background: #2d2d2d;
+	border-radius: 0 .5em .5em 0;
+	border-right: .3em solid #3a3a3a;
+	max-width: 40em;
+}
+#bup input {
+	margin: .5em;
+}

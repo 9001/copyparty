@@ -16,7 +16,7 @@ if not PY2:
     unicode = str
     from urllib.parse import unquote_plus
 else:
-    from urllib import unquote_plus
+    from urllib import unquote_plus  # pylint: disable=no-name-in-module
 
 
 class HttpCli(object):
@@ -77,8 +77,8 @@ class HttpCli(object):
             self.log(self.rvol)
             self.log(self.wvol)
 
-        # split req into vpath + args
-        args = {}
+        # split req into vpath + uparam
+        uparam = {}
         if "?" not in self.req:
             if not self.req.endswith("/"):
                 self.absolute_urls = True
@@ -93,11 +93,11 @@ class HttpCli(object):
             for k in arglist.split("&"):
                 if "=" in k:
                     k, v = k.split("=", 1)
-                    args[k.lower()] = v.strip()
+                    uparam[k.lower()] = v.strip()
                 else:
-                    args[k.lower()] = True
+                    uparam[k.lower()] = True
 
-        self.args = args
+        self.uparam = uparam
         self.vpath = unquote_plus(vpath)
 
         try:
@@ -148,7 +148,7 @@ class HttpCli(object):
                 return self.tx_file(static_path)
 
         # conditional redirect to single volumes
-        if self.vpath == "" and not self.args:
+        if self.vpath == "" and not self.uparam:
             nread = len(self.rvol)
             nwrite = len(self.wvol)
             if nread + nwrite == 1:
@@ -160,16 +160,18 @@ class HttpCli(object):
                 self.absolute_urls = True
 
         # go home if verboten
-        readable, writable = self.conn.auth.vfs.can_access(self.vpath, self.uname)
-        if not readable and not writable:
+        self.readable, self.writable = self.conn.auth.vfs.can_access(
+            self.vpath, self.uname
+        )
+        if not self.readable and not self.writable:
             self.log("inaccessible: {}".format(self.vpath))
-            self.args = {"h": True}
+            self.uparam = {"h": True}
 
-        if "h" in self.args:
+        if "h" in self.uparam:
             self.vpath = None
             return self.tx_mounts()
 
-        if readable:
+        if self.readable:
             return self.tx_browser()
         else:
             return self.tx_upper()
@@ -210,7 +212,8 @@ class HttpCli(object):
             pwd = u"x"  # nosec
 
         h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
-        html = u'<h1>{}<h2><a href="/">ack'.format(msg)
+        html = u'<h1>{}</h1><h2><a href="/">ack</a></h2>'.format(msg)
+        html += '<script>setTimeout(function(){window.location.replace("/");},500);</script>'
         self.reply(html.encode("utf-8"), headers=h)
 
     def handle_plain_upload(self):
@@ -299,7 +302,7 @@ class HttpCli(object):
 
     def tx_upper(self):
         # return html for basic uploader;
-        # js rewrites to up2k unless args['b']
+        # js rewrites to up2k unless uparam['b']
         self.loud_reply("TODO jupper {}".format(self.vpath))
 
     def tx_browser(self):
@@ -345,5 +348,7 @@ class HttpCli(object):
                 files.append(item)
 
         dirs.extend(files)
-        html = self.conn.tpl_browser.render(vpnodes=vpnodes, files=dirs)
+        html = self.conn.tpl_browser.render(
+            vpnodes=vpnodes, files=dirs, can_upload=self.writable
+        )
         self.reply(html.encode("utf-8"))
