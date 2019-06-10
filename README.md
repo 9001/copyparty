@@ -17,14 +17,15 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [x] load balancer (multiprocessing)
 * [ ] upload (plain multipart, ie6 support)
 * [ ] upload (js, resumable, multithreaded)
-* [ ] download
-* [ ] browser
+* [x] download
+* [x] browser
+* [x] media player
 * [ ] thumbnails
 * [ ] download as zip
-* [ ] volumes
-* [ ] accounts
+* [x] volumes
+* [x] accounts
 
-conclusion: don't bother
+conclusion: mostly useless
 
 ## dependencies
 
@@ -32,8 +33,10 @@ conclusion: don't bother
   * markupsafe
 
 ## dev env
+```
+python3 -v venv .env
+. .env/bin/activate
+pip install jinja2  # dependencies
+pip install black bandit pylint flake8  # vscode tooling
+```
 
-    python3 -v venv .env
-    . .env/bin/activate
-    pip install jinja2  # dependencies
-    pip install black bandit pylint flake8  # vscode tooling
