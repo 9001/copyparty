@@ -287,7 +287,11 @@ class HttpCli(object):
                 if not buf:
                     break
 
-                self.s.send(buf)
+                try:
+                    self.s.send(buf)
+                except ConnectionResetError:
+                    return False
+                    # TODO propagate (self.ok or return)
 
     def tx_mounts(self):
         html = self.conn.tpl_mounts.render(this=self)
