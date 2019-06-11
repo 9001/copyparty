@@ -1,0 +1,178 @@
+##
+## up2k-php protocol
+
+client initiates handshake:
+POST text/plain;charset=UTF-8
+{"name":"pokemon.webm","size":2505628,"hash":["fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0","d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4","Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s"]}
+	"name": "pokemon.webm",
+	"size": "2505628",
+	"hash": [
+		"fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0",
+		"d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4",
+		"Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s"
+	],
+
+server creates session id and replies with the same json:
+	msg['hash'] = base64(sha256('\n'.join[
+		secretsalt, name, size, *hash
+	]))[:32].replace('+','-').replace('/','_')
+
+cilent uploads each chunk:
+POST application/octet-stream
+X-Up2k-Hash: fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0
+X-Up2k-Wark: CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo
+Content-Length: 1048576
+
+server reads wark.txt and checks that hash is expected,
+writes each POST to "part/{$wark}/{$hash}"
+replies 200 OK then verifies hash
+creates flagfile partfile.ok
+
+client does the handshake again,
+server replies with list of all missing or corrupt chunks,
+combines parts into final file if all-ok
+
+
+
+##
+## differences in this impl
+
+use sha512 instead of sha256 everywhere
+write directly to .$wark.tmp instead of parts, then move to destination
+
+
+
+##
+## copyparty approach
+
+up2k-registry keeps track of warks and chunks
+serialize to disk periodically and on shutdown
+all incoming up2k POSTs are announced to registry at start and finish
+registry moves file into place when all chunks are verified
+
+
+
+##
+## required capabilities
+
+replace mpsrv with general-purpose broker
+(ensures synchronous communication with registry from httpsrv)
+
+
+
+##
+## sample transaction, up2k-php
+
+POST /up/handshake.php HTTP/1.1
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 185
+
+{"name":"pokemon.webm","size":2505628,"hash":["fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0","d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4","Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s"]}
+name	pokemon.webm
+size	2505628
+hash	[…]
+0	fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0
+1	d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4
+2	Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+
+{"name":"pokemon.webm","size":2505628,"hash":["fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0","d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4","Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s"],"wark":"CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo"}
+name	pokemon.webm
+size	2505628
+hash	[…]
+0	fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0
+1	d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4
+2	Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s
+wark	CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo
+
+POST /up/chunkpit.php HTTP/1.1
+X-Up2k-Hash: fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0
+X-Up2k-Wark: CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo
+Content-Type: application/octet-stream
+Content-Length: 1048576
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+
+POST /up/chunkpit.php HTTP/1.1
+X-Up2k-Hash: d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4
+X-Up2k-Wark: CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo
+Content-Type: application/octet-stream
+Content-Length: 1048576
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+
+POST /up/chunkpit.php HTTP/1.1
+X-Up2k-Hash: Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s
+X-Up2k-Wark: CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo
+Content-Type: application/octet-stream
+Content-Length: 408476
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+
+POST /up/handshake.php HTTP/1.1
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 185
+
+{"name":"pokemon.webm","size":2505628,"hash":["fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0","d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4","Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s"]}
+hash	[…]
+0	fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0
+1	d5a1aJiv2F3mkf3gUT5ZKddxKyw8R0uv7U4ol_umao4
+2	Z0V45L5x9S_djQKeKNRM5FJgiSE0RVQ6_LAi1_CII6s
+name	pokemon.webm
+size	2505628
+
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+
+{"name":"pokemon.webm","size":2505628,"hash":[],"wark":"CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo"}
+name	pokemon.webm
+size	2505628
+hash	[]
+wark	CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo
+
+
+
+##
+## client javascript excerpt
+
+gotfile(ev) 
+
+		var entry = {
+			"n": parseInt(st.files.length.toString()),
+			"fobj": fobj,
+			"name": fobj.name,
+			"size": fobj.size,
+			"hash": []
+		};
+
+		st.files.push(entry);
+		st.todo.hash.push(entry);
+
+exec_hash()
+
+		var car = nchunk * chunksize;
+		var cdr = car + chunksize;
+		reader.readAsArrayBuffer(
+			bobslice.call(t.fobj, car, cdr));
+        
+        const hashbuf = await crypto.subtle.digest('SHA-256', ev.target.result);
+		t.hash.push(buf2b64(hashbuf));
+
+		st.todo.handshake.push(t);
+
+exec_handshake()
+
+	var t = st.todo.handshake.shift();
+
+	xhr.open('POST', 'handshake.php', true);
+	xhr.responseType = 'json';
+	xhr.send(JSON.stringify({
+		"name": t.name,
+		"size": t.size,
+		"hash": t.hash
+	}));
