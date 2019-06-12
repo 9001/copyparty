@@ -38,7 +38,9 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 ##
 ## bad filenames
 
-echo hi > 'qwe,rty;asd fgh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'.html
+dirs=("$HOME/vfs/ほげ" "$HOME/vfs/ほげ/ぴよ" "$HOME/vfs/$(printf \\xed\\x91)" "$HOME/vfs/$(printf \\xed\\x91/\\xed\\x92)")
+mkdir -p "${dirs[@]}"
+for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qwe,rty;asd fgh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'; do echo "$dir" > "$dir/$fn.html"; done; done
 
 
 ##

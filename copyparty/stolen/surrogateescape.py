@@ -2,7 +2,10 @@
 This is Victor Stinner's pure-Python implementation of PEP 383: the "surrogateescape" error
 handler of Python 3.
 
-Source: misc/python/surrogateescape.py in https://bitbucket.org/haypo/misc
+Scissored from the python-future module to avoid 4.4MB of additional dependencies:
+https://github.com/PythonCharmers/python-future/blob/e12549c42ed3a38ece45b9d88c75f5f3ee4d658d/src/future/utils/surrogateescape.py
+
+Original source: misc/python/surrogateescape.py in https://bitbucket.org/haypo/misc
 """
 
 # This code is released under the Python license and the BSD 2-clause license
@@ -10,32 +13,32 @@ Source: misc/python/surrogateescape.py in https://bitbucket.org/haypo/misc
 import codecs
 import sys
 
-from future import utils
+PY3 = sys.version_info[0] > 2
 
+FS_ERRORS = "surrogateescape"
 
-FS_ERRORS = 'surrogateescape'
-
-#     # -- Python 2/3 compatibility -------------------------------------
-#     FS_ERRORS = 'my_surrogateescape'
 
 def u(text):
-    if utils.PY3:
+    if PY3:
         return text
     else:
-        return text.decode('unicode_escape')
+        return text.decode("unicode_escape")
+
 
 def b(data):
-    if utils.PY3:
-        return data.encode('latin1')
+    if PY3:
+        return data.encode("latin1")
     else:
         return data
 
-if utils.PY3:
+
+if PY3:
     _unichr = chr
     bytes_chr = lambda code: bytes((code,))
 else:
     _unichr = unichr
     bytes_chr = chr
+
 
 def surrogateescape_handler(exc):
     """
@@ -44,7 +47,7 @@ def surrogateescape_handler(exc):
     character U+DCxx on decoding, and these are translated into the
     original bytes on encoding.
     """
-    mystring = exc.object[exc.start:exc.end]
+    mystring = exc.object[exc.start : exc.end]
 
     try:
         if isinstance(exc, UnicodeDecodeError):
@@ -75,9 +78,6 @@ def replace_surrogate_encode(mystring):
     """
     decoded = []
     for ch in mystring:
-        # if utils.PY3:
-        #     code = ch
-        # else:
         code = ord(ch)
 
         # The following magic comes from Py3.3's Python/codecs.c file:
@@ -114,16 +114,12 @@ def replace_surrogate_decode(mybytes):
         elif code <= 0x7F:
             decoded.append(_unichr(code))
         else:
-            # # It may be a bad byte
-            # # Try swallowing it.
-            # continue
-            # print("RAISE!")
             raise NotASurrogateError
     return str().join(decoded)
 
 
 def encodefilename(fn):
-    if FS_ENCODING == 'ascii':
+    if FS_ENCODING == "ascii":
         # ASCII encoder of Python 2 expects that the error handler returns a
         # Unicode string encodable to ASCII, whereas our surrogateescape error
         # handler has to return bytes in 0x80-0xFF range.
@@ -135,12 +131,12 @@ def encodefilename(fn):
             elif 0xDC80 <= code <= 0xDCFF:
                 ch = bytes_chr(code - 0xDC00)
             else:
-                raise UnicodeEncodeError(FS_ENCODING,
-                    fn, index, index+1,
-                    'ordinal not in range(128)')
+                raise UnicodeEncodeError(
+                    FS_ENCODING, fn, index, index + 1, "ordinal not in range(128)"
+                )
             encoded.append(ch)
         return bytes().join(encoded)
-    elif FS_ENCODING == 'utf-8':
+    elif FS_ENCODING == "utf-8":
         # UTF-8 encoder of Python 2 encodes surrogates, so U+DC80-U+DCFF
         # doesn't go through our error handler
         encoded = []
@@ -152,19 +148,22 @@ def encodefilename(fn):
                     encoded.append(ch)
                 else:
                     raise UnicodeEncodeError(
-                        FS_ENCODING,
-                        fn, index, index+1, 'surrogates not allowed')
+                        FS_ENCODING, fn, index, index + 1, "surrogates not allowed"
+                    )
             else:
-                ch_utf8 = ch.encode('utf-8')
+                ch_utf8 = ch.encode("utf-8")
                 encoded.append(ch_utf8)
         return bytes().join(encoded)
     else:
         return fn.encode(FS_ENCODING, FS_ERRORS)
 
+
 def decodefilename(fn):
     return fn.decode(FS_ENCODING, FS_ERRORS)
 
-FS_ENCODING = 'ascii'; fn = b('[abc\xff]'); encoded = u('[abc\udcff]')
+
+FS_ENCODING = sys.getfilesystemencoding()
+# FS_ENCODING = "ascii"; fn = b("[abc\xff]"); encoded = u("[abc\udcff]")
 # FS_ENCODING = 'cp932'; fn = b('[abc\x81\x00]'); encoded = u('[abc\udc81\x00]')
 # FS_ENCODING = 'UTF-8'; fn = b('[abc\xff]'); encoded = u('[abc\udcff]')
 
@@ -178,21 +177,9 @@ def register_surrogateescape():
     """
     Registers the surrogateescape error handler on Python 2 (only)
     """
-    if utils.PY3:
+    if PY3:
         return
     try:
         codecs.lookup_error(FS_ERRORS)
     except LookupError:
         codecs.register_error(FS_ERRORS, surrogateescape_handler)
-
-
-if __name__ == '__main__':
-    pass
-    # # Tests:
-    # register_surrogateescape()
-
-    # b = decodefilename(fn)
-    # assert b == encoded, "%r != %r" % (b, encoded)
-    # c = encodefilename(b)
-    # assert c == fn, '%r != %r' % (c, fn)
-    # # print("ok")

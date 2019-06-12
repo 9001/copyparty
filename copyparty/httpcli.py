@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import stat
@@ -14,11 +14,6 @@ from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 
 if not PY2:
     unicode = str
-    from urllib.parse import unquote_plus
-    from urllib.parse import quote_plus
-else:
-    from urllib import unquote_plus  # pylint: disable=no-name-in-module
-    from urllib import quote_plus
 
 
 class HttpCli(object):
@@ -76,8 +71,6 @@ class HttpCli(object):
         if self.uname:
             self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
             self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
-            self.log(self.rvol)
-            self.log(self.wvol)
 
         # split req into vpath + uparam
         uparam = {}
@@ -100,7 +93,7 @@ class HttpCli(object):
                     uparam[k.lower()] = True
 
         self.uparam = uparam
-        self.vpath = unquote_plus(vpath)
+        self.vpath = unquotep(vpath)
 
         try:
             if mode == "GET":
@@ -108,7 +101,7 @@ class HttpCli(object):
             elif mode == "POST":
                 self.handle_post()
             else:
-                self.loud_reply(u'invalid HTTP mode "{0}"'.format(mode))
+                self.loud_reply('invalid HTTP mode "{0}"'.format(mode))
 
         except Pebkac as ex:
             self.loud_reply(str(ex))
@@ -119,16 +112,16 @@ class HttpCli(object):
     def reply(self, body, status="200 OK", mime="text/html", headers=[]):
         # TODO something to reply with user-supplied values safely
         response = [
-            u"HTTP/1.1 " + status,
-            u"Connection: Keep-Alive",
-            u"Content-Type: " + mime,
-            u"Content-Length: " + str(len(body)),
+            "HTTP/1.1 " + status,
+            "Connection: Keep-Alive",
+            "Content-Type: " + mime,
+            "Content-Length: " + str(len(body)),
         ]
         for k, v in self.out_headers.items():
             response.append("{}: {}".format(k, v))
 
         response.extend(headers)
-        response_str = u"\r\n".join(response).encode("utf-8")
+        response_str = "\r\n".join(response).encode("utf-8")
         if self.ok:
             self.s.send(response_str + b"\r\n\r\n" + body)
 
@@ -143,7 +136,7 @@ class HttpCli(object):
         self.log("GET  " + self.req)
 
         # "embedded" resources
-        if self.vpath.startswith(u".cpr"):
+        if self.vpath.startswith(".cpr"):
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
 
             if os.path.isfile(static_path):
@@ -193,11 +186,11 @@ class HttpCli(object):
 
         act = self.parser.require("act", 64)
 
-        if act == u"bput":
+        if act == "bput":
             self.handle_plain_upload()
             return
 
-        if act == u"login":
+        if act == "login":
             self.handle_login()
             return
 
@@ -208,10 +201,10 @@ class HttpCli(object):
         self.parser.drop()
 
         if pwd in self.auth.iuser:
-            msg = u"login ok"
+            msg = "login ok"
         else:
-            msg = u"naw dude"
-            pwd = u"x"  # nosec
+            msg = "naw dude"
+            pwd = "x"  # nosec
 
         h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
         html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
@@ -235,7 +228,7 @@ class HttpCli(object):
 
                 # TODO broker which avoid this race
                 # and provides a new filename if taken
-                if os.path.exists(fn):
+                if os.path.exists(fsenc(fn)):
                     fn += ".{:.6f}".format(time.time())
 
             with open(fn, "wb") as f:
@@ -254,10 +247,10 @@ class HttpCli(object):
         if not self.ok:
             status = "ERROR"
 
-        msg = u"{0} // {1} bytes // {2:.3f} MiB/s\n".format(status, sz_total, spd)
+        msg = "{0} // {1} bytes // {2:.3f} MiB/s\n".format(status, sz_total, spd)
 
         for sz, sha512 in files:
-            msg += u"sha512: {0} // {1} bytes\n".format(sha512[:56], sz)
+            msg += "sha512: {0} // {1} bytes\n".format(sha512[:56], sz)
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
 
@@ -276,10 +269,10 @@ class HttpCli(object):
             with open(log_fn, "wb") as f:
                 f.write(
                     (
-                        u"\n".join(
+                        "\n".join(
                             unicode(x)
                             for x in [
-                                u":".join(unicode(x) for x in self.addr),
+                                ":".join(unicode(x) for x in self.addr),
                                 msg.rstrip(),
                             ]
                         )
@@ -288,7 +281,7 @@ class HttpCli(object):
                 )
 
     def tx_file(self, path):
-        sz = os.path.getsize(path)
+        sz = os.path.getsize(fsenc(path))
         mime = mimetypes.guess_type(path)[0]
         header = "HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n".format(
             mime, sz
@@ -299,7 +292,7 @@ class HttpCli(object):
         if self.ok:
             self.s.send(header)
 
-        with open(path, "rb") as f:
+        with open(fsenc(path), "rb") as f:
             while self.ok:
                 buf = f.read(4096)
                 if not buf:
@@ -321,20 +314,20 @@ class HttpCli(object):
         self.loud_reply("TODO jupper {}".format(self.vpath))
 
     def tx_browser(self):
-        vpath = u""
-        vpnodes = [[u"/", u"/"]]
+        vpath = ""
+        vpnodes = [["/", "/"]]
         for node in self.vpath.split("/"):
-            vpath += u"/" + node
-            vpnodes.append([quote_plus(vpath, safe="/") + "/", cgi.escape(node)])
+            vpath += "/" + node
+            vpnodes.append([quotep(vpath) + "/", cgi.escape(node)])
 
         vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
         abspath = vn.canonical(rem)
 
-        if not os.path.exists(abspath):
+        if not os.path.exists(fsenc(abspath)):
             print(abspath)
             raise Pebkac("404 not found")
 
-        if not os.path.isdir(abspath):
+        if not os.path.isdir(fsenc(abspath)):
             return self.tx_file(abspath)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)
@@ -348,7 +341,7 @@ class HttpCli(object):
                 href = vpath + "/" + fn
 
             fspath = fsroot + "/" + fn
-            inf = os.stat(fspath)
+            inf = os.stat(fsenc(fspath))
 
             is_dir = stat.S_ISDIR(inf.st_mode)
             if is_dir:
@@ -361,13 +354,7 @@ class HttpCli(object):
             dt = datetime.utcfromtimestamp(inf.st_mtime)
             dt = dt.strftime("%Y-%m-%d %H:%M:%S")
 
-            item = [
-                margin,
-                quote_plus(href, safe="/"),
-                cgi.escape(fn, quote=True),
-                sz,
-                dt,
-            ]
+            item = [margin, quotep(href), cgi.escape(fn, quote=True), sz, dt]
             if is_dir:
                 dirs.append(item)
             else:
@@ -377,4 +364,4 @@ class HttpCli(object):
         html = self.conn.tpl_browser.render(
             vpnodes=vpnodes, files=dirs, can_upload=self.writable
         )
-        self.reply(html.encode("utf-8"))
+        self.reply(html.encode("utf-8", "replace"))

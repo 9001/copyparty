@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import threading
 
 from .__init__ import PY2
-from .util import undot, Pebkac
+from .util import undot, Pebkac, fsdec, fsenc
 
 
 class VFS(object):
@@ -90,12 +90,12 @@ class VFS(object):
         if rem:
             rp += "/" + rem
 
-        return os.path.realpath(rp)
+        return fsdec(os.path.realpath(fsenc(rp)))
 
     def ls(self, rem, uname):
         """return user-readable [fsdir,real,virt] items at vpath"""
         abspath = self.canonical(rem)
-        real = os.listdir(abspath)
+        real = [fsdec(x) for x in os.listdir(fsenc(abspath))]
         real.sort()
         if rem:
             virt_vis = []
@@ -182,7 +182,7 @@ class AuthSrv(object):
                     raise Exception('invalid mountpoint "{}"'.format(vol_dst))
 
                 # cfg files override arguments and previous files
-                vol_src = os.path.abspath(vol_src)
+                vol_src = fsdec(os.path.abspath(fsenc(vol_src)))
                 vol_dst = vol_dst.strip("/")
                 mount[vol_dst] = vol_src
                 mread[vol_dst] = []
@@ -217,7 +217,7 @@ class AuthSrv(object):
             # list of src:dst:permset:permset:...
             # permset is [rwa]username
             for src, dst, perms in [x.split(":", 2) for x in self.args.v]:
-                src = os.path.abspath(src)
+                src = fsdec(os.path.abspath(fsenc(src)))
                 dst = dst.strip("/")
                 mount[dst] = src
                 mread[dst] = []

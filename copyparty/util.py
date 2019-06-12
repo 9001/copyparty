@@ -1,9 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import re
+import sys
 import hashlib
+
+from .__init__ import PY2
+
+if not PY2:
+    from urllib.parse import unquote_to_bytes as unquote
+    from urllib.parse import quote_from_bytes as quote
+else:
+    from urllib import unquote  # pylint: disable=no-name-in-module
+    from urllib import quote
+
+from .stolen import surrogateescape
+
+surrogateescape.register_surrogateescape()
+FS_ENCODING = sys.getfilesystemencoding()
 
 
 class Unrecv(object):
@@ -103,18 +118,18 @@ class MultipartParser(object):
             # this breaks on firefox uploads that contain \"
             # since firefox escapes " but forgets to escape \
             # so it'll truncate after the \
-            ret = u""
+            ret = ""
             esc = False
             for ch in fn:
                 if esc:
-                    if ch in [u'"', u"\\"]:
-                        ret += u'"'
+                    if ch in ['"', "\\"]:
+                        ret += '"'
                     else:
                         ret += esc + ch
                     esc = False
-                elif ch == u"\\":
+                elif ch == "\\":
                     esc = True
-                elif ch == u'"':
+                elif ch == '"':
                     break
                 else:
                     ret += ch
@@ -204,7 +219,7 @@ class MultipartParser(object):
         # discard junk before the first boundary
         for junk in self._read_data():
             self.log(
-                u"discarding preamble: [{}]".format(junk.decode("utf-8", "ignore"))
+                "discarding preamble: [{}]".format(junk.decode("utf-8", "replace"))
             )
 
         # nice, now make it fast
@@ -220,7 +235,7 @@ class MultipartParser(object):
         if p_field != field_name:
             raise Pebkac('expected field "{}", got "{}"'.format(field_name, p_field))
 
-        return self._read_value(p_data, max_len).decode("utf-8", "ignore")
+        return self._read_value(p_data, max_len).decode("utf-8", "surrogateescape")
 
     def drop(self):
         """discards the remaining multipart body"""
@@ -261,27 +276,62 @@ def read_header(sr):
 
         ret += buf
 
-    return ret[:-4].decode("utf-8", "replace").split("\r\n")
+    return ret[:-4].decode("utf-8", "surrogateescape").split("\r\n")
 
 
 def undot(path):
     ret = []
-    for node in path.split(u"/"):
-        if node in [u"", u"."]:
+    for node in path.split("/"):
+        if node in ["", "."]:
             continue
 
-        if node == u"..":
+        if node == "..":
             if ret:
                 ret.pop()
             continue
 
         ret.append(node)
 
-    return u"/".join(ret)
+    return "/".join(ret)
 
 
 def sanitize_fn(fn):
     return fn.replace("\\", "/").split("/")[-1].strip()
+
+
+def quotep(txt):
+    """url quoter which deals with bytes correctly"""
+    btxt = fsenc(txt)
+    quot1 = quote(btxt, safe=b"/")
+    if not PY2:
+        quot1 = quot1.encode('ascii')
+    
+    quot2 = quot1.replace(b" ", b"+")
+    return fsdec(quot2)
+
+
+def unquotep(txt):
+    """url unquoter which deals with bytes correctly"""
+    btxt = fsenc(txt)
+    unq1 = btxt.replace(b"+", b" ")
+    unq2 = unquote(unq1)
+    return fsdec(unq2)
+
+
+def fsdec(txt):
+    """decodes filesystem-bytes to wtf8"""
+    if PY2:
+        return surrogateescape.decodefilename(txt)
+
+    return txt.decode(FS_ENCODING, "surrogateescape")
+
+
+def fsenc(txt):
+    """encodes wtf8 to filesystem-bytes"""
+    if PY2:
+        return surrogateescape.encodefilename(txt)
+
+    return txt.encode(FS_ENCODING, "surrogateescape")
 
 
 def hashcopy(actor, fin, fout):
@@ -302,10 +352,10 @@ def hashcopy(actor, fin, fout):
 
 def unescape_cookie(orig):
     # mw=idk; doot=qwe%2Crty%3Basd+fgh%2Bjkl%25zxc%26vbn  # qwe,rty;asd fgh+jkl%zxc&vbn
-    ret = u""
-    esc = u""
+    ret = ""
+    esc = ""
     for ch in orig:
-        if ch == u"%":
+        if ch == "%":
             if len(esc) > 0:
                 ret += esc
             esc = ch
@@ -317,7 +367,7 @@ def unescape_cookie(orig):
                     ret += chr(int(esc[1:], 16))
                 except:
                     ret += esc
-                    esc = u""
+                    esc = ""
 
         else:
             ret += ch

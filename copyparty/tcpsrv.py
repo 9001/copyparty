@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import sys
 import time
@@ -31,8 +31,10 @@ class TcpSrv(object):
             try:
                 s.connect(("10.255.255.255", 1))
                 ip = s.getsockname()[0]
-            except OSError:
-                pass
+            except (OSError, socket.error) as ex:
+                if ex.errno != 101:
+                    raise
+
             s.close()
 
         self.log("root", "available @ http://{0}:{1}/".format(ip, self.args.p))
@@ -41,7 +43,7 @@ class TcpSrv(object):
         self.srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             self.srv.bind((self.args.i, self.args.p))
-        except OSError as ex:
+        except (OSError, socket.error) as ex:
             if ex.errno != 98:
                 raise
 
