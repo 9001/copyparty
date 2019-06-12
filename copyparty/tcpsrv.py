@@ -2,6 +2,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import re
 import sys
 import time
 import socket
@@ -10,6 +11,7 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import PY2, WINDOWS
+from .util import chkcmd
 
 
 class TcpSrv(object):
@@ -26,18 +28,18 @@ class TcpSrv(object):
         self.next_day = 0
 
         ip = "127.0.0.1"
-        if self.args.i != ip:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            try:
-                s.connect(("10.255.255.255", 1))
-                ip = s.getsockname()[0]
-            except (OSError, socket.error) as ex:
-                if ex.errno != 101:
-                    raise
+        if self.args.i == ip:
+            eps = {ip: "local only"}
+        else:
+            eps = self.detect_interfaces(self.args.i)
 
-            s.close()
-
-        self.log("root", "available @ http://{0}:{1}/".format(ip, self.args.p))
+        for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
+            self.log(
+                "root",
+                "available @ http://{}:{}/  (\033[33m{}\033[0m)".format(
+                    ip, self.args.p, desc
+                ),
+            )
 
         self.srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -127,3 +129,42 @@ class TcpSrv(object):
         with self.log_mutex:
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S")
             print("\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg))
+
+    def detect_interfaces(self, ext_ip):
+        eps = {}
+
+        # get all ips and their interfaces
+        try:
+            ip_addr, _ = chkcmd("ip", "addr")
+        except:
+            ip_addr = None
+
+        if ip_addr:
+            r = re.compile("^\s+inet ([^ ]+)/.* (.*)")
+            for ln in ip_addr.split("\n"):
+                try:
+                    ip, dev = r.match(ln.rstrip()).groups()
+                    if ext_ip in ["0.0.0.0", ip]:
+                        eps[ip] = dev
+                except:
+                    pass
+
+        # get ip with default route
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("10.255.255.255", 1))
+            ip = s.getsockname()[0]
+        except (OSError, socket.error) as ex:
+            if ex.errno != 101:
+                raise
+
+        s.close()
+
+        if ext_ip in ["0.0.0.0", ip]:
+            desc = "\033[32mexternal"
+            try:
+                eps[ip] += ", " + desc
+            except:
+                eps[ip] = desc
+
+        return eps

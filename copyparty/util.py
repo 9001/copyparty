@@ -5,6 +5,7 @@ from __future__ import print_function, unicode_literals
 import re
 import sys
 import hashlib
+import subprocess as sp  # nosec
 
 from .__init__ import PY2
 
@@ -304,8 +305,8 @@ def quotep(txt):
     btxt = fsenc(txt)
     quot1 = quote(btxt, safe=b"/")
     if not PY2:
-        quot1 = quot1.encode('ascii')
-    
+        quot1 = quot1.encode("ascii")
+
     quot2 = quot1.replace(b" ", b"+")
     return fsdec(quot2)
 
@@ -376,6 +377,22 @@ def unescape_cookie(orig):
         ret += esc
 
     return ret
+
+
+def runcmd(*argv):
+    p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
+    stdout, stderr = p.communicate()
+    stdout = stdout.decode("utf-8")
+    stderr = stderr.decode("utf-8")
+    return [p.returncode, stdout, stderr]
+
+
+def chkcmd(*argv):
+    ok, sout, serr = runcmd(*argv)
+    if ok != 0:
+        raise Exception(serr)
+
+    return sout, serr
 
 
 class Pebkac(Exception):
