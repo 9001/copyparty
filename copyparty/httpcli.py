@@ -132,7 +132,6 @@ class HttpCli(object):
         self.reply(b"<pre>" + body.encode("utf-8"), *list(args), **kwargs)
 
     def handle_get(self):
-        self.log("")
         self.log("GET  " + self.req)
 
         # "embedded" resources
@@ -172,7 +171,6 @@ class HttpCli(object):
             return self.tx_upper()
 
     def handle_post(self):
-        self.log("")
         self.log("POST " + self.req)
 
         try:
@@ -222,8 +220,11 @@ class HttpCli(object):
         files = []
         t0 = time.time()
         for nfile, (p_field, p_file, p_data) in enumerate(self.parser.gen):
+            if not p_file:
+                self.log("discarding incoming file without filename")
+
             fn = os.devnull
-            if not nullwrite:
+            if p_file and not nullwrite:
                 fn = os.path.join(vfs.realpath, rem, sanitize_fn(p_file))
 
                 # TODO broker which avoid this race
@@ -238,6 +239,8 @@ class HttpCli(object):
                     break
 
                 files.append([sz, sha512])
+
+        self.parser.drop()
 
         td = time.time() - t0
         sz_total = sum(x[0] for x in files)
@@ -256,7 +259,7 @@ class HttpCli(object):
 
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}">return to /{}</a>'.format(
-                quote_plus(self.vpath, safe="/"), cgi.escape(self.vpath, quote=True)
+                quotep(self.vpath), cgi.escape(self.vpath, quote=True)
             ),
             pre=msg,
         )
@@ -317,7 +320,11 @@ class HttpCli(object):
         vpath = ""
         vpnodes = [["/", "/"]]
         for node in self.vpath.split("/"):
-            vpath += "/" + node
+            if not vpath:
+                vpath = node
+            else:
+                vpath += "/" + node
+
             vpnodes.append([quotep(vpath) + "/", cgi.escape(node)])
 
         vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
@@ -362,6 +369,6 @@ class HttpCli(object):
 
         dirs.extend(files)
         html = self.conn.tpl_browser.render(
-            vpnodes=vpnodes, files=dirs, can_upload=self.writable
+            vdir=self.vpath, vpnodes=vpnodes, files=dirs, can_upload=self.writable
         )
         self.reply(html.encode("utf-8", "replace"))

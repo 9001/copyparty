@@ -12,7 +12,7 @@
 <body>
     {%- if can_upload %}
     <div id="bup">
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
             <input type="hidden" name="act" value="bput" />
             <input type="file" name="f" multiple><br />
             <input type="submit" value="start upload">

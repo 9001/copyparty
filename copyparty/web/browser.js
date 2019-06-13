@@ -571,7 +571,10 @@ function autoplay_blocked(tid) {
 	var go = ebi('blk_go');
 	var na = ebi('blk_na');
 
-	go.textContent = 'Play "' + mp.tracks[mp.au.tid].split(/\//).pop() + '"';
+	var fn = mp.tracks[mp.au.tid].split(/\//).pop();
+	fn = decodeURIComponent(fn.replace(/\+/g, ' '));
+
+	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function () {
 		unblocked();
 		mp.au.play();
