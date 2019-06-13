@@ -72,7 +72,6 @@ pip install black bandit pylint flake8  # vscode tooling
 
 roughly sorted by priority
 
-* deal with multiprocessing being busted on android
 * permissions break for `ed` on `-v /home/ed/vfs:moji:r -v /home/ed/inc:inc:r:aed`
 * http error handling (conn.status or handler-retval)
 * look into android thumbnail cache file format
@@ -80,3 +79,4 @@ roughly sorted by priority
 * last-modified header
 * support pillow-simd
 * figure out the deal with pixel3a not being connectable as hotspot
+  * pixel3a having unpredictable 3sec latency in general :||||
