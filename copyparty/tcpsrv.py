@@ -7,6 +7,7 @@ import sys
 import time
 import socket
 import threading
+import multiprocessing as mp
 from datetime import datetime, timedelta
 import calendar
 
@@ -75,28 +76,35 @@ class TcpSrv(object):
     def check_mp_support(self):
         vmin = sys.version_info[1]
         if WINDOWS:
+            msg = "need python 3.3 or newer for multiprocessing;"
             if PY2:
                 # py2 pickler doesn't support winsock
-                return False
+                return msg
             elif vmin < 3:
-                return False
+                return msg
         else:
+            msg = "need python 2.7 or 3.3+ for multiprocessing;"
             if not PY2 and vmin < 3:
-                return False
+                return msg
 
-        return True
+        try:
+            x = mp.Queue(1)
+            x.put(["foo", "bar"])
+            if x.get()[0] != "foo":
+                raise Exception()
+        except:
+            return "multiprocessing is not supported on your platform;"
+
+        return ""
 
     def create_server(self):
         if self.args.j == 0:
             self.log("root", "multiprocessing disabled by argument -j 0;")
             return self.create_threading_server()
 
-        if not self.check_mp_support():
-            if WINDOWS:
-                self.log("root", "need python 3.3 or newer for multiprocessing;")
-            else:
-                self.log("root", "need python 2.7 or 3.3+ for multiprocessing;")
-
+        err = self.check_mp_support()
+        if err:
+            self.log("root", err)
             return self.create_threading_server()
 
         return self.create_multiprocessing_server()
