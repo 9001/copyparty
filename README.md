@@ -42,6 +42,7 @@ optional, enables thumbnails:
 install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
 ```sh
 apt update && apt -y full-upgrade && termux-setup-storage && apt -y install curl && cd && curl -L https://github.com/9001/copyparty/raw/master/scripts/copyparty-android.sh > copyparty-android.sh && chmod 755 copyparty-android.sh && ./copyparty-android.sh -h
+echo $?
 ```
 
 after the initial setup (and restarting bash), you can launch copyparty at any time by running "copyparty" in Termux
