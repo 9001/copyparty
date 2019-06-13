@@ -37,25 +37,14 @@ optional, enables thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
 
 
-# install on android (fully automatic soon™)
+# install on android
 
-install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then
+install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
 ```sh
-apt install python
-python3 -m venv ~/pe/ve.copyparty
-. ~/pe/ve.copyparty/bin/activate
-pip install jinja2
-# download copyparty somehow, for example from git:
-git clone https://github.com/9001/copyparty
-cd copyparty
-python3 -m copyparty
+apt update && apt -y full-upgrade && termux-setup-storage && apt -y install curl && cd && curl -L https://github.com/9001/copyparty/raw/master/scripts/copyparty-android.sh > copyparty-android.sh && chmod 755 copyparty-android.sh && ./copyparty-android.sh -h
 ```
 
-for image thumbnails, install optional dependency [Pillow](https://pypi.org/project/Pillow/):
-```sh
-apt install clang python-dev zlib-dev libjpeg-turbo-dev libcrypt-dev ndk-sysroot
-CFLAGS=-I$HOME/../usr/include/ pip install Pillow
-```
+after the initial setup (and restarting bash), you can launch copyparty at any time by running "copyparty" in Termux
 
 
 # dev env setup
