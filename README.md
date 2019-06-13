@@ -65,7 +65,6 @@ roughly sorted by priority
 * permissions break for `ed` on `-v /home/ed/vfs:moji:r -v /home/ed/inc:inc:r:aed`
 * http error handling (conn.status or handler-retval)
 * look into android thumbnail cache file format
-* run-script for android
 * last-modified header
 * support pillow-simd
 * figure out the deal with pixel3a not being connectable as hotspot

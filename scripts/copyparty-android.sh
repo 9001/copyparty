@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-msg() { printf '\n\033[1;30m>\033[0;33m>\033[1m>\033[0m %s\n' "$1" >&2; }
+_msg() { printf "$2"'\033[1;30m>\033[0;33m>\033[1m>\033[0m %s\n' "$1" >&2; }
+imsg() { _msg "$1" ''; }
+msg() { _msg "$1" \\n; }
 
 mkdir -p ~/src
-cd ~/src
 
 ##
 ## helper which installs termux packages
@@ -26,16 +27,17 @@ addpkg() {
 ##
 ## ensure git and copyparty is available
 
-[ -e copyparty/.ok ] || {
+[ -e ~/src/copyparty/.ok ] || {
 	command -v git >/dev/null ||
 		addpkg git
 	
-	# in case of partial clone
-	rm -rf copyparty
-
 	msg "downloading copyparty from github"
-	git clone https://github.com/9001/copyparty
-	touch copyparty/.ok
+	(
+		cd ~/src
+		rm -rf copyparty
+		git clone https://github.com/9001/copyparty
+		touch copyparty/.ok
+	)
 }
 
 ##
@@ -47,9 +49,8 @@ command -v python3 >/dev/null ||
 ##
 ## ensure virtualenv and dependencies are available
 
-cd ~/src/copyparty
-
-[ -e .env/.ok ] || {
+[ -e ~/src/copyparty/.env/.ok ] || { (
+	cd ~/src/copyparty
 	rm -rf .env
 
 	msg "creating python3 virtualenv"
@@ -60,7 +61,8 @@ cd ~/src/copyparty
 	pip install jinja2
 
 	deactivate
-}
+	touch .env/.ok
+) }
 
 ##
 ## add copyparty alias to bashrc
@@ -73,9 +75,9 @@ grep -qE '^alias copyparty=' ~/.bashrc 2>/dev/null || {
 ##
 ## start copyparty
 
-msg "activating virtualenv"
-. .env/bin/activate
+imsg "activating virtualenv"
+. ~/src/copyparty/.env/bin/activate
 
-msg "starting copyparty"
-python3 -m copyparty "$@"
+imsg "starting copyparty"
+PYTHONPATH=~/src/copyparty python3 -m copyparty "$@"
 
