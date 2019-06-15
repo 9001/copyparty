@@ -70,16 +70,19 @@ class VFS(object):
     def can_access(self, vpath, uname):
         """return [readable,writable]"""
         vn, _ = self._find(vpath)
-        return [uname in vn.uread, uname in vn.uwrite]
+        return [
+            uname in vn.uread or "*" in vn.uread,
+            uname in vn.uwrite or "*" in vn.uwrite,
+        ]
 
     def get(self, vpath, uname, will_read, will_write):
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         vn, rem = self._find(vpath)
 
-        if will_read and uname not in vn.uread:
+        if will_read and (uname not in vn.uread and "*" not in vn.uread):
             raise Pebkac("you don't have read-access for this location")
 
-        if will_write and uname not in vn.uwrite:
+        if will_write and (uname not in vn.uwrite and "*" not in vn.uwrite):
             raise Pebkac("you don't have write-access for this location")
 
         return vn, rem
@@ -117,8 +120,8 @@ class VFS(object):
 
     def user_tree(self, uname, readable=False, writable=False):
         ret = []
-        opt1 = readable and uname in self.uread
-        opt2 = writable and uname in self.uwrite
+        opt1 = readable and (uname in self.uread or "*" in self.uread)
+        opt2 = writable and (uname in self.uwrite or "*" in self.uwrite)
         if opt1 or opt2:
             ret.append(self.vpath)
 
