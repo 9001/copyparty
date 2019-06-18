@@ -232,13 +232,17 @@ class HttpCli(object):
                 if os.path.exists(fsenc(fn)):
                     fn += ".{:.6f}".format(time.time())
 
-            with open(fn, "wb") as f:
-                self.log("writing to {0}".format(fn))
-                sz, sha512 = hashcopy(self.conn, p_data, f)
-                if sz == 0:
-                    break
+            try:
+                with open(fn, "wb") as f:
+                    self.log("writing to {0}".format(fn))
+                    sz, sha512 = hashcopy(self.conn, p_data, f)
+                    if sz == 0:
+                        break
 
-                files.append([sz, sha512])
+                    files.append([sz, sha512])
+
+            except FileNotFoundError:
+                raise Pebkac("create that folder before uploading to it")
 
         self.parser.drop()
 
@@ -318,7 +322,7 @@ class HttpCli(object):
 
     def tx_browser(self):
         vpath = ""
-        vpnodes = [["/", "/"]]
+        vpnodes = [["", "/"]]
         for node in self.vpath.split("/"):
             if not vpath:
                 vpath = node

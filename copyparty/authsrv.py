@@ -138,6 +138,8 @@ class AuthSrv(object):
         self.log_func = log_func
         self.args = args
 
+        self.warn_anonwrite = True
+
         self.mutex = threading.Lock()
         self.reload()
 
@@ -261,6 +263,18 @@ class AuthSrv(object):
             v = vfs.add(mount[dst], dst)
             v.uread = mread[dst]
             v.uwrite = mwrite[dst]
+
+        try:
+            vfs.get("/", "*", False, True)
+            if self.warn_anonwrite:
+                self.warn_anonwrite = False
+                self.log(
+                    "\033[31manyone can write to the current directory: {}\033[0m".format(
+                        os.getcwd()
+                    )
+                )
+        except Pebkac:
+            self.warn_anonwrite = True
 
         with self.mutex:
             self.vfs = vfs

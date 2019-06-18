@@ -39,6 +39,9 @@
         "--max-line-length=120",
         "--ignore=E722,F405,E203,W503,W293",
     ],
+    "python.linting.banditArgs": [
+        "--ignore=B104"
+    ],
     "python.formatting.provider": "black",
     "editor.formatOnSave": true,
     "[html]": {
