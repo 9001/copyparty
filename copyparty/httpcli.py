@@ -426,9 +426,16 @@ class HttpCli(object):
             else:
                 files.append(item)
 
+        ts = ""
+        # ts = "?{}".format(time.time())
+
         dirs.extend(files)
         html = self.conn.tpl_browser.render(
-            vdir=self.vpath, vpnodes=vpnodes, files=dirs, can_upload=self.writable
+            vdir=self.vpath,
+            vpnodes=vpnodes,
+            files=dirs,
+            can_upload=self.writable,
+            ts=ts,
         )
         self.reply(html.encode("utf-8", "replace"))
         return True

@@ -65,6 +65,10 @@ function ebi(id) {
 	return document.getElementById(id);
 }
 
+function dbg(msg) {
+	ebi('path').innerHTML = msg;
+}
+
 
 // extract songs + add play column
 var mp = (function () {
@@ -359,13 +363,26 @@ var vbar = (function () {
 		bskip(1);
 	};
 	ebi('barpos').onclick = function (e) {
-		if (!mp.au)
+		if (!mp.au) {
+			//dbg((new Date()).getTime());
 			return play(0);
+		}
 
 		var rect = pbar.pcan.getBoundingClientRect();
 		var x = e.clientX - rect.left;
 		var mul = x * 1.0 / rect.width;
-		mp.au.currentTime = mp.au.duration * mul;
+
+		/*
+		dbg(//Math.round(rect.width) + 'x' + Math.round(rect.height) + '+' +
+			//Math.round(rect.left) + '+' + Math.round(rect.top) + ', ' +
+			//Math.round(e.clientX) + 'x' + Math.round(e.clientY) + ', ' +
+			Math.round(mp.au.currentTime * 10) / 10 + ', ' +
+			Math.round(mp.au.duration * 10) / 10 + '*' +
+			Math.round(mul * 1000) / 1000);
+		*/
+
+		mp.au.currentTime = Math.round(mp.au.duration * mul);
+
 		if (mp.au === mp.au_native)
 			// hack: ogv.js breaks on .play() during playback
 			mp.au.play();

@@ -11,6 +11,7 @@ html {
 	background: #333;
 	font-family: sans-serif;
 	text-shadow: 1px 1px 0px #000;
+	line-height: 1.3em;
 }
 html, body {
 	margin: 0;
@@ -19,6 +20,11 @@ html, body {
 body {
 	padding-bottom: 5em;
 }
+#path,
+#path * {
+	font-size: 1em;
+	line-height: 1em;
+}
 #path {
 	color: #aca;
 	text-shadow: 1px 1px 0 #000;
@@ -26,7 +32,7 @@ body {
 	font-weight: normal;
 	background: #4c4c4c;
 	display: inline-block;
-	padding: .2em .5em .2em 1em;
+	padding: .35em .5em .2em 1em;
 	border-radius: 0 .3em .3em 0;
 	box-shadow: .1em .1em .4em #222;
 	margin: 1em 0;
@@ -191,7 +197,7 @@ a.play.act {
 }
 #wtoggle {
 	position: absolute;
-	top: -1em;
+	top: -1.2em;
 	right: 0;
 	width: 1.2em;
 	height: 1em;
@@ -202,7 +208,7 @@ a.play.act {
 	background: #3c3c3c;
 	box-shadow: 0 0 .5em #222;
 	border-radius: .3em 0 0 0;
-	padding-left: .07em;
+	padding: .2em 0 0 .07em;
 	color: #fff;
 }
 #barpos,
