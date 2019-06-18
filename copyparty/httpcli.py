@@ -129,7 +129,7 @@ class HttpCli(object):
         response.extend(headers)
         response_str = "\r\n".join(response).encode("utf-8")
         try:
-            self.s.send(response_str + b"\r\n\r\n" + body)
+            self.s.sendall(response_str + b"\r\n\r\n" + body)
         except:
             raise Pebkac("client disconnected before http response")
 
@@ -140,7 +140,17 @@ class HttpCli(object):
         self.reply(b"<pre>" + body.encode("utf-8"), *list(args), **kwargs)
 
     def handle_get(self):
-        self.log("{:4} {}".format(self.mode, self.req))
+        logmsg = "{:4} {}".format(self.mode, self.req)
+
+        if "range" in self.headers:
+            try:
+                rval = self.headers["range"].split("=", 1)[1]
+            except:
+                rval += self.headers["range"]
+
+            logmsg += " [\033[36m" + rval + "\033[0m]"
+
+        self.log(logmsg)
 
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
@@ -183,7 +193,7 @@ class HttpCli(object):
 
         try:
             if self.headers["expect"].lower() == "100-continue":
-                self.s.send(b"HTTP/1.1 100 Continue\r\n\r\n")
+                self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
         except KeyError:
             pass
 
@@ -317,6 +327,13 @@ class HttpCli(object):
         file_lastmod = file_dt.strftime("%a, %b %d %Y %H:%M:%S GMT")
 
         do_send = True
+        status = "200 OK"
+        extra_headers = []
+        logmsg = "{:4} {} {}".format("", self.req, status)
+
+        #
+        # if-modified
+
         if "if-modified-since" in self.headers:
             cli_lastmod = self.headers["if-modified-since"]
             try:
@@ -327,9 +344,46 @@ class HttpCli(object):
                 self.log("bad lastmod format: {}".format(cli_lastmod))
                 do_send = file_lastmod != cli_lastmod
 
-        status = "200 OK"
         if not do_send:
             status = "304 Not Modified"
+
+        #
+        # partial
+
+        file_sz = os.path.getsize(fsenc(path))
+        lower = 0
+        upper = file_sz
+
+        if do_send and "range" in self.headers:
+            try:
+                hrange = self.headers["range"]
+                a, b = hrange.split("=", 1)[1].split("-")
+
+                if a.strip():
+                    lower = int(a.strip())
+                else:
+                    lower = 0
+
+                if b.strip():
+                    upper = int(b.strip()) + 1
+                else:
+                    upper = file_sz
+
+                if lower < 0 or lower >= file_sz or upper < 0 or upper > file_sz:
+                    raise Pebkac("na")
+
+            except:
+                self.loud_reply("invalid range requested: " + hrange)
+
+            status = "206 Partial Content"
+            extra_headers.append(
+                "Content-Range: bytes {}-{}/{}".format(lower, upper - 1, file_sz)
+            )
+
+            logmsg += " [\033[36m" + str(lower) + "-" + str(upper) + "\033[0m]"
+
+        #
+        # send reply
 
         mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
 
@@ -337,28 +391,38 @@ class HttpCli(object):
             "HTTP/1.1 " + status,
             "Connection: Keep-Alive",
             "Content-Type: " + mime,
-            "Content-Length: " + str(os.path.getsize(fsenc(path))),
+            "Content-Length: " + str(upper - lower),
+            "Accept-Ranges: bytes",
             "Last-Modified: " + file_lastmod,
         ]
-
+        headers.extend(extra_headers)
         headers = "\r\n".join(headers).encode("utf-8") + b"\r\n\r\n"
-        self.s.send(headers)
-
-        logmsg = "{:4} {} {}".format("", self.req, status)
+        self.s.sendall(headers)
 
         if self.mode == "HEAD" or not do_send:
             self.log(logmsg)
             return True
 
-        with open(fsenc(path), "rb") as f:
-            while True:
+        # 512 kB is optimal for huge files, use 64k
+        with open(fsenc(path), "rb", 64 * 1024) as f:
+            remains = upper - lower
+            f.seek(lower)
+            while remains > 0:
+                # time.sleep(0.01)
                 buf = f.read(4096)
                 if not buf:
                     break
 
+                if remains < len(buf):
+                    buf = buf[:remains]
+
+                remains -= len(buf)
+
                 try:
-                    self.s.send(buf)
+                    self.s.sendall(buf)
                 except:
+                    logmsg += " \033[31m" + str(upper - remains) + "\033[0m"
+                    self.log(logmsg)
                     return False
 
         self.log(logmsg)
