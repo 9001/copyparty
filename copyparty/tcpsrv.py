@@ -41,14 +41,17 @@ class TcpSrv(object):
         try:
             self.srv.bind((self.args.i, self.args.p))
         except (OSError, socket.error) as ex:
-            if ex.errno != 98:
-                raise
-
-            raise Exception(
-                "\033[1;31mport {} is busy on interface {}\033[0m".format(
-                    self.args.p, self.args.i
+            if ex.errno == 98:
+                raise Exception(
+                    "\033[1;31mport {} is busy on interface {}\033[0m".format(
+                        self.args.p, self.args.i
+                    )
                 )
-            )
+
+            if ex.errno == 99:
+                raise Exception(
+                    "\033[1;31minterface {} does not exist\033[0m".format(self.args.i)
+                )
 
     def run(self):
         self.srv.listen(self.args.nc)

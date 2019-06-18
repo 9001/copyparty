@@ -115,8 +115,6 @@ class HttpCli(object):
 
             return False
 
-        return True
-
     def reply(self, body, status="200 OK", mime="text/html", headers=[]):
         # TODO something to reply with user-supplied values safely
         response = [
@@ -195,12 +193,10 @@ class HttpCli(object):
         act = self.parser.require("act", 64)
 
         if act == "bput":
-            self.handle_plain_upload()
-            return
+            return self.handle_plain_upload()
 
         if act == "login":
-            self.handle_login()
-            return
+            return self.handle_login()
 
         raise Pebkac('invalid action "{}"'.format(act))
 
@@ -217,6 +213,7 @@ class HttpCli(object):
         h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
         html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
         self.reply(html.encode("utf-8"), headers=h)
+        return True
 
     def handle_plain_upload(self):
         nullwrite = self.args.nw
@@ -311,8 +308,8 @@ class HttpCli(object):
             pre=msg,
         )
         self.reply(html.encode("utf-8"))
-
         self.parser.drop()
+        return True
 
     def tx_file(self, path):
         file_ts = os.path.getmtime(fsenc(path))
@@ -334,10 +331,12 @@ class HttpCli(object):
         if not do_send:
             status = "304 Not Modified"
 
+        mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
+
         headers = [
             "HTTP/1.1 " + status,
             "Connection: Keep-Alive",
-            "Content-Type: " + mimetypes.guess_type(path)[0],
+            "Content-Type: " + mime,
             "Content-Length: " + str(os.path.getsize(fsenc(path))),
             "Last-Modified: " + file_lastmod,
         ]
@@ -359,7 +358,7 @@ class HttpCli(object):
 
                 try:
                     self.s.send(buf)
-                except ConnectionResetError:
+                except:
                     return False
 
         self.log(logmsg)
@@ -368,11 +367,13 @@ class HttpCli(object):
     def tx_mounts(self):
         html = self.conn.tpl_mounts.render(this=self)
         self.reply(html.encode("utf-8"))
+        return True
 
     def tx_upper(self):
         # return html for basic uploader;
         # js rewrites to up2k unless uparam['b']
         self.loud_reply("TODO jupper {}".format(self.vpath))
+        return True
 
     def tx_browser(self):
         vpath = ""
@@ -430,3 +431,4 @@ class HttpCli(object):
             vdir=self.vpath, vpnodes=vpnodes, files=dirs, can_upload=self.writable
         )
         self.reply(html.encode("utf-8", "replace"))
+        return True
