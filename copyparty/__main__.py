@@ -8,6 +8,7 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
+import locale
 import argparse
 from textwrap import dedent
 
@@ -35,6 +36,18 @@ class RiceFormatter(argparse.HelpFormatter):
 
 
 def main():
+    for x in [
+        "en_US.UTF-8",
+        "English_United States.UTF8",
+        "English_United States.1252",
+    ]:
+        try:
+            locale.setlocale(locale.LC_ALL, x)
+            print("Locale:", x)
+            break
+        except:
+            continue
+
     ap = argparse.ArgumentParser(
         formatter_class=RiceFormatter,
         prog="copyparty",

@@ -6,6 +6,7 @@ import os
 import stat
 import time
 from datetime import datetime
+import calendar
 import mimetypes
 import cgi
 
@@ -45,7 +46,7 @@ class HttpCli(object):
                 return False
 
             try:
-                mode, self.req, _ = headerlines[0].split(" ")
+                self.mode, self.req, _ = headerlines[0].split(" ")
             except:
                 raise Pebkac("bad headers:\n" + "\n".join(headerlines))
 
@@ -99,12 +100,12 @@ class HttpCli(object):
         self.vpath = unquotep(vpath)
 
         try:
-            if mode == "GET":
+            if self.mode in ["GET", "HEAD"]:
                 return self.handle_get()
-            elif mode == "POST":
+            elif self.mode == "POST":
                 return self.handle_post()
             else:
-                raise Pebkac('invalid HTTP mode "{0}"'.format(mode))
+                raise Pebkac('invalid HTTP mode "{0}"'.format(self.mode))
 
         except Pebkac as ex:
             try:
@@ -113,6 +114,8 @@ class HttpCli(object):
                 pass
 
             return False
+
+        return True
 
     def reply(self, body, status="200 OK", mime="text/html", headers=[]):
         # TODO something to reply with user-supplied values safely
@@ -139,7 +142,7 @@ class HttpCli(object):
         self.reply(b"<pre>" + body.encode("utf-8"), *list(args), **kwargs)
 
     def handle_get(self):
-        self.log("GET  " + self.req)
+        self.log("{:4} {}".format(self.mode, self.req))
 
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
@@ -312,15 +315,41 @@ class HttpCli(object):
         self.parser.drop()
 
     def tx_file(self, path):
-        sz = os.path.getsize(fsenc(path))
-        mime = mimetypes.guess_type(path)[0]
-        header = "HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n".format(
-            mime, sz
-        ).encode(
-            "utf-8"
-        )
+        file_ts = os.path.getmtime(fsenc(path))
+        file_dt = datetime.utcfromtimestamp(file_ts)
+        file_lastmod = file_dt.strftime("%a, %b %d %Y %H:%M:%S GMT")
 
-        self.s.send(header)
+        do_send = True
+        if "if-modified-since" in self.headers:
+            cli_lastmod = self.headers["if-modified-since"]
+            try:
+                cli_dt = time.strptime(cli_lastmod, "%a, %b %d %Y %H:%M:%S GMT")
+                cli_ts = calendar.timegm(cli_dt)
+                do_send = int(file_ts) > int(cli_ts)
+            except:
+                self.log("bad lastmod format: {}".format(cli_lastmod))
+                do_send = file_lastmod != cli_lastmod
+
+        status = "200 OK"
+        if not do_send:
+            status = "304 Not Modified"
+
+        headers = [
+            "HTTP/1.1 " + status,
+            "Connection: Keep-Alive",
+            "Content-Type: " + mimetypes.guess_type(path)[0],
+            "Content-Length: " + str(os.path.getsize(fsenc(path))),
+            "Last-Modified: " + file_lastmod,
+        ]
+
+        headers = "\r\n".join(headers).encode("utf-8") + b"\r\n\r\n"
+        self.s.send(headers)
+
+        logmsg = "{:4} {} {}".format("", self.req, status)
+
+        if self.mode == "HEAD" or not do_send:
+            self.log(logmsg)
+            return True
 
         with open(fsenc(path), "rb") as f:
             while True:
@@ -332,6 +361,9 @@ class HttpCli(object):
                     self.s.send(buf)
                 except ConnectionResetError:
                     return False
+
+        self.log(logmsg)
+        return True
 
     def tx_mounts(self):
         html = self.conn.tpl_mounts.render(this=self)

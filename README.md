@@ -62,9 +62,7 @@ pip install black bandit pylint flake8  # vscode tooling
 
 roughly sorted by priority
 
-* http error handling (conn.status or handler-retval)
 * look into android thumbnail cache file format
-* last-modified header
 * support pillow-simd
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||
