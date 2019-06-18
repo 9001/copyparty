@@ -24,7 +24,6 @@ class HttpConn(object):
 
         self.sr = Unrecv(sck)
         self.workload = 0
-        self.ok = True
 
         self.log_func = log_func
         self.log_src = "{} \033[36m{}".format(addr[0], addr[1]).ljust(26)

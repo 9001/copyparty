@@ -159,7 +159,7 @@ class MultipartParser(object):
             buf = self.sr.recv(bufsz)
             if not buf:
                 # abort: client disconnected
-                raise Exception("client disconnected during post")
+                raise Pebkac("client disconnected during post")
 
             while True:
                 ofs = buf.find(self.boundary)
@@ -193,7 +193,7 @@ class MultipartParser(object):
                 buf2 = self.sr.recv(bufsz)
                 if not buf2:
                     # abort: client disconnected
-                    raise Exception("client disconnected during post")
+                    raise Pebkac("client disconnected during post")
 
                 buf += buf2
 
@@ -288,7 +288,13 @@ def read_header(sr):
 
         buf = sr.recv(n)
         if not buf:
-            raise Exception("failed to read headers")
+            if not ret:
+                return None
+
+            raise Pebkac(
+                "protocol error while reading headers:\n"
+                + ret.decode("utf-8", "replace")
+            )
 
         ret += buf
 

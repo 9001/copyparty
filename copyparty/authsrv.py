@@ -269,7 +269,7 @@ class AuthSrv(object):
             if self.warn_anonwrite:
                 self.warn_anonwrite = False
                 self.log(
-                    "\033[31manyone can write to the current directory: {}\033[0m".format(
+                    "\033[31manyone can read/write the current directory: {}\033[0m".format(
                         os.getcwd()
                     )
                 )

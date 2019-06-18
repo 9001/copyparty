@@ -31,7 +31,6 @@ class HttpCli(object):
         self.log_func = conn.log_func
         self.log_src = conn.log_src
 
-        self.ok = True
         self.bufsz = 1024 * 32
         self.absolute_urls = False
         self.out_headers = {}
@@ -42,13 +41,17 @@ class HttpCli(object):
     def run(self):
         try:
             headerlines = read_header(self.sr)
-        except:
-            return False
+            if not headerlines:
+                return False
 
-        try:
-            mode, self.req, _ = headerlines[0].split(" ")
-        except:
-            raise Pebkac("bad headers:\n" + "\n".join(headerlines))
+            try:
+                mode, self.req, _ = headerlines[0].split(" ")
+            except:
+                raise Pebkac("bad headers:\n" + "\n".join(headerlines))
+
+        except Pebkac as ex:
+            self.loud_reply(str(ex))
+            return False
 
         self.headers = {}
         for header_line in headerlines[1:]:
@@ -97,17 +100,19 @@ class HttpCli(object):
 
         try:
             if mode == "GET":
-                self.handle_get()
+                return self.handle_get()
             elif mode == "POST":
-                self.handle_post()
+                return self.handle_post()
             else:
-                self.loud_reply('invalid HTTP mode "{0}"'.format(mode))
+                raise Pebkac('invalid HTTP mode "{0}"'.format(mode))
 
         except Pebkac as ex:
-            self.loud_reply(str(ex))
-            return False
+            try:
+                self.loud_reply(str(ex))
+            except Pebkac:
+                pass
 
-        return self.ok
+            return False
 
     def reply(self, body, status="200 OK", mime="text/html", headers=[]):
         # TODO something to reply with user-supplied values safely
@@ -122,8 +127,10 @@ class HttpCli(object):
 
         response.extend(headers)
         response_str = "\r\n".join(response).encode("utf-8")
-        if self.ok:
+        try:
             self.s.send(response_str + b"\r\n\r\n" + body)
+        except:
+            raise Pebkac("client disconnected before http response")
 
         return body
 
@@ -218,40 +225,53 @@ class HttpCli(object):
             raise Exception("that was close")
 
         files = []
+        errmsg = ""
         t0 = time.time()
-        for nfile, (p_field, p_file, p_data) in enumerate(self.parser.gen):
-            if not p_file:
-                self.log("discarding incoming file without filename")
+        try:
+            for nfile, (p_field, p_file, p_data) in enumerate(self.parser.gen):
+                if not p_file:
+                    self.log("discarding incoming file without filename")
+                    # fallthrough
 
-            fn = os.devnull
-            if p_file and not nullwrite:
-                fn = os.path.join(vfs.realpath, rem, sanitize_fn(p_file))
+                fn = os.devnull
+                if p_file and not nullwrite:
+                    fdir = os.path.join(vfs.realpath, rem)
+                    fn = os.path.join(fdir, sanitize_fn(p_file))
 
-                # TODO broker which avoid this race
-                # and provides a new filename if taken
-                if os.path.exists(fsenc(fn)):
-                    fn += ".{:.6f}".format(time.time())
+                    if not os.path.isdir(fsenc(fdir)):
+                        raise Pebkac("that folder does not exist")
 
-            try:
-                with open(fn, "wb") as f:
-                    self.log("writing to {0}".format(fn))
-                    sz, sha512 = hashcopy(self.conn, p_data, f)
-                    if sz == 0:
-                        break
+                    # TODO broker which avoid this race
+                    # and provides a new filename if taken
+                    if os.path.exists(fsenc(fn)):
+                        fn += ".{:.6f}".format(time.time())
 
-                    files.append([sz, sha512])
+                try:
+                    with open(fsenc(fn), "wb") as f:
+                        self.log("writing to {0}".format(fn))
+                        sz, sha512 = hashcopy(self.conn, p_data, f)
+                        if sz == 0:
+                            raise Pebkac("empty files in post")
 
-            except FileNotFoundError:
-                raise Pebkac("create that folder before uploading to it")
+                        files.append([sz, sha512])
 
-        self.parser.drop()
+                except Pebkac:
+                    if not nullwrite:
+                        os.rename(fsenc(fn), fsenc(fn + ".PARTIAL"))
+
+                    raise
+
+        except Pebkac as ex:
+            errmsg = str(ex)
 
         td = time.time() - t0
         sz_total = sum(x[0] for x in files)
         spd = (sz_total / td) / (1024 * 1024)
 
         status = "OK"
-        if not self.ok:
+        if errmsg:
+            self.log(errmsg)
+            errmsg = "ERROR: " + errmsg
             status = "ERROR"
 
         msg = "{0} // {1} bytes // {2:.3f} MiB/s\n".format(status, sz_total, spd)
@@ -261,15 +281,7 @@ class HttpCli(object):
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
 
-        html = self.conn.tpl_msg.render(
-            h2='<a href="/{}">return to /{}</a>'.format(
-                quotep(self.vpath), cgi.escape(self.vpath, quote=True)
-            ),
-            pre=msg,
-        )
         self.log(msg)
-        self.reply(html.encode("utf-8"))
-
         if not nullwrite:
             # TODO this is bad
             log_fn = "up.{:.6f}.txt".format(t0)
@@ -284,8 +296,20 @@ class HttpCli(object):
                             ]
                         )
                         + "\n"
+                        + errmsg
+                        + "\n"
                     ).encode("utf-8")
                 )
+
+        html = self.conn.tpl_msg.render(
+            h2='<a href="/{}">return to /{}</a>'.format(
+                quotep(self.vpath), cgi.escape(self.vpath, quote=True)
+            ),
+            pre=msg,
+        )
+        self.reply(html.encode("utf-8"))
+
+        self.parser.drop()
 
     def tx_file(self, path):
         sz = os.path.getsize(fsenc(path))
@@ -296,11 +320,10 @@ class HttpCli(object):
             "utf-8"
         )
 
-        if self.ok:
-            self.s.send(header)
+        self.s.send(header)
 
         with open(fsenc(path), "rb") as f:
-            while self.ok:
+            while True:
                 buf = f.read(4096)
                 if not buf:
                     break
@@ -309,7 +332,6 @@ class HttpCli(object):
                     self.s.send(buf)
                 except ConnectionResetError:
                     return False
-                    # TODO propagate (self.ok or return)
 
     def tx_mounts(self):
         html = self.conn.tpl_mounts.render(this=self)
