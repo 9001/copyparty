@@ -3,30 +3,24 @@
 from __future__ import print_function, unicode_literals
 
 import re
-import sys
 import time
 import socket
-import threading
-import multiprocessing as mp
-from datetime import datetime, timedelta
-import calendar
 
-from .__init__ import PY2, WINDOWS
-from .util import chkcmd
+from .util import chkcmd, Counter
 
 
 class TcpSrv(object):
     """
-    toplevel component starting everything else,
-    tcplistener which forwards clients to httpsrv
-    (through mpsrv if platform provides support)
+    tcplistener which forwards clients to Hub
+    which then uses the least busy HttpSrv to handle it
     """
 
-    def __init__(self, args):
-        self.args = args
+    def __init__(self, hub):
+        self.hub = hub
+        self.args = hub.args
+        self.log = hub.log
 
-        self.log_mutex = threading.Lock()
-        self.next_day = 0
+        self.num_clients = Counter()
 
         ip = "127.0.0.1"
         if self.args.i == ip:
@@ -36,7 +30,7 @@ class TcpSrv(object):
 
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             self.log(
-                "root",
+                "tcpsrv",
                 "available @ http://{}:{}/  (\033[33m{}\033[0m)".format(
                     ip, self.args.p, desc
                 ),
@@ -59,84 +53,19 @@ class TcpSrv(object):
     def run(self):
         self.srv.listen(self.args.nc)
 
-        self.log("root", "listening @ {0}:{1}".format(self.args.i, self.args.p))
+        self.log("tcpsrv", "listening @ {0}:{1}".format(self.args.i, self.args.p))
 
-        self.httpsrv = self.create_server()
         while True:
-            if self.httpsrv.num_clients() >= self.args.nc:
+            if self.num_clients.v >= self.args.nc:
                 time.sleep(0.1)
                 continue
 
             sck, addr = self.srv.accept()
-            self.httpsrv.accept(sck, addr)
+            self.num_clients.add()
+            self.hub.broker.put(None, "httpconn", sck, addr)
 
     def shutdown(self):
-        self.httpsrv.shutdown()
-
-    def check_mp_support(self):
-        vmin = sys.version_info[1]
-        if WINDOWS:
-            msg = "need python 3.3 or newer for multiprocessing;"
-            if PY2:
-                # py2 pickler doesn't support winsock
-                return msg
-            elif vmin < 3:
-                return msg
-        else:
-            msg = "need python 2.7 or 3.3+ for multiprocessing;"
-            if not PY2 and vmin < 3:
-                return msg
-
-        try:
-            x = mp.Queue(1)
-            x.put(["foo", "bar"])
-            if x.get()[0] != "foo":
-                raise Exception()
-        except:
-            return "multiprocessing is not supported on your platform;"
-
-        return ""
-
-    def create_server(self):
-        if self.args.j == 0:
-            self.log("root", "multiprocessing disabled by argument -j 0;")
-            return self.create_threading_server()
-
-        err = self.check_mp_support()
-        if err:
-            self.log("root", err)
-            return self.create_threading_server()
-
-        return self.create_multiprocessing_server()
-
-    def create_threading_server(self):
-        from .httpsrv import HttpSrv
-
-        self.log("root", "cannot efficiently use multiple CPU cores")
-        return HttpSrv(self.args, self.log)
-
-    def create_multiprocessing_server(self):
-        from .mpsrv import MpSrv
-
-        return MpSrv(self.args, self.log)
-
-    def log(self, src, msg):
-        now = time.time()
-        if now >= self.next_day:
-            dt = datetime.utcfromtimestamp(now)
-            print("\033[36m{}\033[0m".format(dt.strftime("%Y-%m-%d")))
-
-            # unix timestamp of next 00:00:00 (leap-seconds safe)
-            day_now = dt.day
-            while dt.day == day_now:
-                dt += timedelta(hours=12)
-
-            dt = dt.replace(hour=0, minute=0, second=0)
-            self.next_day = calendar.timegm(dt.utctimetuple())
-
-        with self.log_mutex:
-            ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S")
-            print("\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg))
+        self.log("tcpsrv", "ok bye")
 
     def detect_interfaces(self, ext_ip):
         eps = {}
@@ -148,7 +77,7 @@ class TcpSrv(object):
             ip_addr = None
 
         if ip_addr:
-            r = re.compile("^\s+inet ([^ ]+)/.* (.*)")
+            r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
             for ln in ip_addr.split("\n"):
                 try:
                     ip, dev = r.match(ln.rstrip()).groups()

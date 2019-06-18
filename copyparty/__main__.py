@@ -8,14 +8,11 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
-import time
 import argparse
-import threading
 from textwrap import dedent
-import multiprocessing as mp
 
 from .__version__ import S_VERSION, S_BUILD_DT
-from .tcpsrv import TcpSrv
+from .svchub import SvcHub
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -38,13 +35,6 @@ class RiceFormatter(argparse.HelpFormatter):
 
 
 def main():
-    try:
-        # support vscode debugger (bonus: same behavior as on windows)
-        mp.set_start_method("spawn", True)
-    except AttributeError:
-        # py2.7 probably
-        pass
-
     ap = argparse.ArgumentParser(
         formatter_class=RiceFormatter,
         prog="copyparty",
@@ -84,19 +74,7 @@ def main():
     ap.add_argument("-nw", action="store_true", help="benchmark: disable writing")
     al = ap.parse_args()
 
-    tcpsrv = TcpSrv(al)
-    thr = threading.Thread(target=tcpsrv.run)
-    thr.daemon = True
-    thr.start()
-
-    # winxp/py2.7 support: thr.join() kills signals
-    try:
-        while True:
-            time.sleep(9001)
-    except KeyboardInterrupt:
-        print("OPYTHAT")
-        tcpsrv.shutdown()
-        print("nailed it")
+    SvcHub(al).run()
 
 
 if __name__ == "__main__":

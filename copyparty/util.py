@@ -5,21 +5,36 @@ from __future__ import print_function, unicode_literals
 import re
 import sys
 import hashlib
+import threading
 import subprocess as sp  # nosec
 
 from .__init__ import PY2
+from .stolen import surrogateescape
 
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
-    from urllib import quote
+    from urllib import quote  # pylint: disable=no-name-in-module
 
-from .stolen import surrogateescape
 
 surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
+
+
+class Counter(object):
+    def __init__(self, v=0):
+        self.v = v
+        self.mutex = threading.Lock()
+
+    def add(self, delta=1):
+        with self.mutex:
+            self.v += delta
+
+    def set(self, absval):
+        with self.mutex:
+            self.v = absval
 
 
 class Unrecv(object):
