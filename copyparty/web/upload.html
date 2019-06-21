@@ -1,0 +1,50 @@
+    <div id="bup">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
+            <input type="hidden" name="act" value="bput" />
+            <input type="file" name="f" multiple><br />
+            <input type="submit" value="start upload">
+        </form>
+    </div>
+
+    <div id="up2k">
+
+        <a href="#" id="u2tgl">upload</a>
+
+        <div id="u2body">
+            <form id="u2form" method="POST" enctype="multipart/form-data" onsubmit="return false;"></form>
+
+            <table id="u2conf">
+                <tr>
+                    <td>parallel uploads</td>
+                    <td>file split (megabyte)</td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#" onclick="nthread_sub()">&ndash;</a>
+                        <input id="nthread" value="2" />
+                        <a href="#" onclick="nthread_add()">+</a>
+                    </td>
+                    <td>
+                        <a href="#" onclick="chunksz_sub()">&ndash;</a>
+                        <input id="chunksz" value="8" />
+                        <a href="#" onclick="chunksz_add()">+</a>
+                    </td>
+                </tr>
+            </table>
+
+            <div id="u2btn">
+                drop files here<br />
+                (or click me)
+            </div>
+
+            <table id="u2tab">
+                <tr>
+                    <td>filename</td>
+                    <td>status</td>
+                    <td>progress</td>
+                </tr>
+            </table>
+
+            switch to the <a href="#" id="u2nope">basic uploader</a>
+        </div>
+    </div>

@@ -7,17 +7,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css">
+    {%- if can_upload %}
+    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css">
+    {%- endif %}
 </head>
 
 <body>
     {%- if can_upload %}
-    <div id="bup">
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
-            <input type="hidden" name="act" value="bput" />
-            <input type="file" name="f" multiple><br />
-            <input type="submit" value="start upload">
-        </form>
-    </div>
+    {%- include 'upload.html' %}
     {%- endif %}
     
     <h1 id="path">
@@ -44,7 +41,7 @@
 
         </tbody>
     </table>
-    
+
     <h2><a href="?h">control-panel</a></h2>
 
     <div id="widget">
@@ -57,6 +54,9 @@
         </div>
     </div>
     <script src="/.cpr/browser.js{{ ts }}"></script>
+    {%- if can_upload %}
+    <script src="/.cpr/up2k.js{{ ts }}"></script>
+    {%- endif %}
 </body>
 
 </html>

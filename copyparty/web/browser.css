@@ -54,51 +54,51 @@ a {
 	color: #fff;
 	background: #161616;
 }
-thead a {
+#files thead a {
 	color: #999;
 	font-weight: normal;
 }
-tr:hover {
+#files tr:hover {
 	background: #1c1c1c;
 }
-thead th {
+#files thead th {
 	padding: .5em 1.3em .3em 1.3em;
 }
-thead th:last-child {
+#files thead th:last-child {
 	background: #444;
 	border-radius: .7em 0 0 0;
 }
-thead th:first-child {
+#files thead th:first-child {
 	background: #222;
 }
-tbody,
-thead th:nth-child(2) {
+#files tbody,
+#files thead th:nth-child(2) {
 	background: #222;
 	border-radius: 0 .7em 0 0;
 }
-td {
+#files td {
 	margin: 0;
 	padding: 0 .5em;
 }
-tbody td:nth-child(3) {
+#files tbody td:nth-child(3) {
 	font-family: monospace;
 	font-size: 1.3em;
 	text-align: right;
 	padding-right: 1em;
 	white-space: nowrap;
 }
-tbody td:first-child {
+#files tbody td:first-child {
 	padding-left: 1.5em;
 	color: #888;
 }
-tbody tr:first-child td {
+#files tbody tr:first-child td {
 	padding-top: .9em;
 }
-tbody tr:last-child td {
+#files tbody tr:last-child td {
 	padding-bottom: 1.3em;
 	border-bottom: .5em solid #444;
 }
-thead th[style] {
+#files thead th[style] {
 	width: auto !important;
 }
 #path a {
@@ -254,14 +254,4 @@ a.play.act {
 	max-width: 12em;
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
-}
-#bup {
-	padding: .5em .5em .5em .3em;
-	background: #2d2d2d;
-	border-radius: 0 0 1em 0;
-	border-right: .3em solid #3a3a3a;
-	max-width: 40em;
-}
-#bup input {
-	margin: .5em;
 }

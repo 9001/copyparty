@@ -381,7 +381,7 @@ var vbar = (function () {
 			Math.round(mul * 1000) / 1000);
 		*/
 
-		mp.au.currentTime = Math.round(mp.au.duration * mul);
+		mp.au.currentTime = mp.au.duration * mul;
 
 		if (mp.au === mp.au_native)
 			// hack: ogv.js breaks on .play() during playback

@@ -28,13 +28,11 @@ class HttpConn(object):
         self.log_func = log_func
         self.log_src = "{} \033[36m{}".format(addr[0], addr[1]).ljust(26)
 
-        self.tpl_mounts = self.load_tpl("splash.html")
-        self.tpl_browser = self.load_tpl("browser.html")
-        self.tpl_msg = self.load_tpl("msg.html")
-
-    def load_tpl(self, fn):
-        with open(self.respath(fn), "rb") as f:
-            return jinja2.Template(f.read().decode("utf-8"))
+        env = jinja2.Environment()
+        env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
+        self.tpl_mounts = env.get_template("splash.html")
+        self.tpl_browser = env.get_template("browser.html")
+        self.tpl_msg = env.get_template("msg.html")
 
     def respath(self, res_name):
         return os.path.join(E.mod, "web", res_name)
