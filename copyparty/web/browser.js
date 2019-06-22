@@ -1,3 +1,5 @@
+"use strict";
+
 // error handler for mobile devices
 function hcroak(msg) {
 	document.body.innerHTML = msg;
@@ -61,12 +63,12 @@ function import_js(url, cb) {
 }
 
 
-function ebi(id) {
+function o(id) {
 	return document.getElementById(id);
 }
 
 function dbg(msg) {
-	ebi('path').innerHTML = msg;
+	o('path').innerHTML = msg;
 }
 
 
@@ -99,7 +101,7 @@ var mp = (function () {
 	}
 
 	for (var a = 0, aa = tracks.length; a < aa; a++)
-		ebi('trk' + a).onclick = ev_play;
+		o('trk' + a).onclick = ev_play;
 
 	ret.vol = localStorage.getItem('vol');
 	if (ret.vol !== null)
@@ -156,7 +158,7 @@ var widget = (function () {
 	ret.paused = function (paused) {
 		if (was_paused != paused) {
 			was_paused = paused;
-			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
+			o('bplay').innerHTML = paused ? '▶' : '⏸';
 		}
 	};
 	var click_handler = function (e) {
@@ -180,8 +182,8 @@ var widget = (function () {
 // buffer/position bar
 var pbar = (function () {
 	var r = {};
-	r.bcan = ebi('barbuf');
-	r.pcan = ebi('barpos');
+	r.bcan = o('barbuf');
+	r.pcan = o('barpos');
 	r.bctx = r.bcan.getContext('2d');
 	r.pctx = r.pcan.getContext('2d');
 
@@ -246,7 +248,7 @@ var pbar = (function () {
 // volume bar
 var vbar = (function () {
 	var r = {};
-	r.can = ebi('pvol');
+	r.can = o('pvol');
 	r.ctx = r.can.getContext('2d');
 
 	var bctx = r.ctx;
@@ -343,7 +345,7 @@ var vbar = (function () {
 		else
 			play(0);
 	};
-	ebi('bplay').onclick = function (e) {
+	o('bplay').onclick = function (e) {
 		e.preventDefault();
 		if (mp.au) {
 			if (mp.au.paused)
@@ -354,15 +356,15 @@ var vbar = (function () {
 		else
 			play(0);
 	};
-	ebi('bprev').onclick = function (e) {
+	o('bprev').onclick = function (e) {
 		e.preventDefault();
 		bskip(-1);
 	};
-	ebi('bnext').onclick = function (e) {
+	o('bnext').onclick = function (e) {
 		e.preventDefault();
 		bskip(1);
 	};
-	ebi('barpos').onclick = function (e) {
+	o('barpos').onclick = function (e) {
 		if (!mp.au) {
 			//dbg((new Date()).getTime());
 			return play(0);
@@ -437,7 +439,7 @@ function ev_play(e) {
 
 
 function setclass(id, clas) {
-	ebi(id).setAttribute('class', clas);
+	o(id).setAttribute('class', clas);
 }
 
 
@@ -569,7 +571,7 @@ function show_modal(html) {
 
 // hide fullscreen message
 function unblocked() {
-	var dom = ebi('blocked');
+	var dom = o('blocked');
 	if (dom)
 		dom.remove();
 }
@@ -585,8 +587,8 @@ function autoplay_blocked(tid) {
 			<a id="blk_na">Cancel<br /><br />(show file list)</a>
 		</div>`);
 
-	var go = ebi('blk_go');
-	var na = ebi('blk_na');
+	var go = o('blk_go');
+	var na = o('blk_na');
 
 	var fn = mp.tracks[mp.au.tid].split(/\//).pop();
 	fn = decodeURIComponent(fn.replace(/\+/g, ' '));

@@ -1,4 +1,5 @@
     <div id="bup">
+        <div id="u2err"></div>
         <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
             <input type="hidden" name="act" value="bput" />
             <input type="file" name="f" multiple><br />
@@ -7,9 +8,7 @@
     </div>
 
     <div id="up2k">
-
-        <a href="#" id="u2tgl">upload</a>
-
+        <a href="#" id="u2tgl">you can upload here</a>
         <div id="u2body">
             <form id="u2form" method="POST" enctype="multipart/form-data" onsubmit="return false;"></form>
 
@@ -20,14 +19,14 @@
                 </tr>
                 <tr>
                     <td>
-                        <a href="#" onclick="nthread_sub()">&ndash;</a>
+                        <a href="#" id="nthread_sub">&ndash;</a>
                         <input id="nthread" value="2" />
-                        <a href="#" onclick="nthread_add()">+</a>
+                        <a href="#" id="nthread_add">+</a>
                     </td>
                     <td>
-                        <a href="#" onclick="chunksz_sub()">&ndash;</a>
+                        <a href="#" id="chunksz_sub">&ndash;</a>
                         <input id="chunksz" value="8" />
-                        <a href="#" onclick="chunksz_add()">+</a>
+                        <a href="#" id="chunksz_add">+</a>
                     </td>
                 </tr>
             </table>
@@ -45,6 +44,6 @@
                 </tr>
             </table>
 
-            switch to the <a href="#" id="u2nope">basic uploader</a>
+            switch to the <a href="#" id="u2nope">basic uploader</a> if you don't need resumable uploads and progress bars
         </div>
     </div>

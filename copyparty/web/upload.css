@@ -2,7 +2,9 @@
 	padding: .5em .5em .5em .3em;
 	background: #2d2d2d;
 	border-radius: 0 0 1em 0;
-	border-right: .3em solid #3a3a3a;
+	border: 1px solid #3a3a3a;
+	border-width: 0 .3em .3em 0;
+	box-shadow: 0 0 1em #222 inset;
 	max-width: 40em;
 }
 #bup input {
@@ -10,19 +12,19 @@
 }
 #up2k {
 	display: none;
+	padding: 1.5em 1em 0 1em;
+}
+#u2err.err {
+	color: #f87;
+	padding: .5em;
 }
 #u2tgl {
-	display: block;
 	color: #fc5;
-	background: #444;
-	width: 14em;
 	font-size: 1.5em;
-	padding: 1em 1em .25em 1em;
-	border-bottom: 2px solid #2c2c2c;
-	border-radius: 0 0 .3em 0;
 }
 #u2body {
 	display: none;
+	padding-bottom: 2em;
 }
 #u2form {
 	width: 2px;
