@@ -5,6 +5,7 @@ from __future__ import print_function, unicode_literals
 import os
 import stat
 import time
+import json
 from datetime import datetime
 import calendar
 import mimetypes
@@ -197,6 +198,23 @@ class HttpCli(object):
         except KeyError:
             pass
 
+        if 'content-type' not in self.headers:
+            raise Pebkac("you can't post without a content-type header")
+
+        ctype = self.headers['content-type'].lower()
+
+        if 'multipart/form-data' in ctype:
+            return self.handle_post_multipart()
+
+        if 'text/plain' in ctype:
+            return self.handle_post_json()
+
+        if 'application/octet-stream' in ctype:
+            return self.handle_post_binary()
+
+        raise Pebkac("don't know how to handle a {} POST".format(ctype))
+
+    def handle_post_multipart(self):
         self.parser = MultipartParser(self.log, self.sr, self.headers)
         self.parser.parse()
 
@@ -209,6 +227,34 @@ class HttpCli(object):
             return self.handle_login()
 
         raise Pebkac('invalid action "{}"'.format(act))
+
+    def handle_post_json(self):
+        if 'content-length' not in self.headers:
+            raise Pebkac('you must supply a content-length for JSON POST')
+
+        remains = int(self.headers['content-length'])
+        if remains > 1024 * 1024:
+            raise Pebkac('json 2big')
+
+        enc = 'utf-8'
+        ctype = ctype = self.headers['content-type'].lower()
+        if 'charset' in ctype:
+            enc = ctype.split('charset')[1].strip(' =').split(';')[0].strip()
+
+        json_buf = b''
+        while len(json_buf) < remains:
+            json_buf += self.sr.recv(32 * 1024)
+
+        self.log('decoding {} bytes of {} json'.format(len(json_buf), enc))
+        try:
+            body = json.loads(json_buf.decode(enc, 'replace'))
+        except:
+            raise Pebkac("you POSTed invalid json")
+
+        print(body)
+
+    def handle_post_binary(self):
+        raise Exception('todo')
 
     def handle_login(self):
         pwd = self.parser.require("cppwd", 64)
