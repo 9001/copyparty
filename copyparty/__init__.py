@@ -25,5 +25,11 @@ class EnvParams(object):
                 + "/copyparty"
             )
 
+        try:
+            os.mkdir(self.cfg)
+        except:
+            if not os.path.isdir(self.cfg):
+                raise
+
 
 E = EnvParams()

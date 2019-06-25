@@ -46,7 +46,7 @@
 	font-size: 2em;
 	margin: 1em auto;
 	padding: 1em 0;
-	width: 15em;
+	width: 12em;
 	cursor: pointer;
 	box-shadow: .4em .4em 0 #111;
 }
@@ -71,7 +71,7 @@
 }
 #u2conf {
 	margin: 1em auto;
-	width: 30em;
+	width: 26em;
 }
 #u2conf * {
 	text-align: center;

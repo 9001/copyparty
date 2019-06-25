@@ -8,10 +8,14 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
+import os
+import shutil
+import filecmp
 import locale
 import argparse
 from textwrap import dedent
 
+from .__init__ import E
 from .__version__ import S_VERSION, S_BUILD_DT
 from .svchub import SvcHub
 
@@ -35,7 +39,7 @@ class RiceFormatter(argparse.HelpFormatter):
         return "".join(indent + line + "\n" for line in text.splitlines())
 
 
-def main():
+def ensure_locale():
     for x in [
         "en_US.UTF-8",
         "English_United States.UTF8",
@@ -47,6 +51,37 @@ def main():
             break
         except:
             continue
+
+
+def ensure_cert():
+    """
+    the default cert (and the entire TLS support) is only here to enable the
+    crypto.subtle javascript API, which is necessary due to the webkit guys
+    being massive memers (https://www.chromium.org/blink/webcrypto)
+
+    i feel awful about this and so should they
+    """
+    cert_insec = os.path.join(E.mod, "res/insecure.pem")
+    cert_cfg = os.path.join(E.cfg, "cert.pem")
+    if not os.path.exists(cert_cfg):
+        shutil.copy2(cert_insec, cert_cfg)
+
+    try:
+        if filecmp.cmp(cert_cfg, cert_insec):
+            print(
+                "\033[33m\n  using default TLS certificate; https will be insecure."
+                + "\033[36m\n  certificate location: {}\033[0m\n".format(cert_cfg)
+            )
+    except:
+        pass
+
+    # speaking of the default cert,
+    # printf 'NO\n.\n.\n.\n.\ncopyparty-insecure\n.\n' | faketime '2000-01-01 00:00:00' openssl req -x509 -sha256 -newkey rsa:2048 -keyout insecure.pem -out insecure.pem -days $((($(printf %d 0x7fffffff)-$(date +%s --date=2000-01-01T00:00:00Z))/(60*60*24))) -nodes && ls -al insecure.pem && openssl x509 -in insecure.pem -text -noout
+
+
+def main():
+    ensure_locale()
+    ensure_cert()
 
     ap = argparse.ArgumentParser(
         formatter_class=RiceFormatter,

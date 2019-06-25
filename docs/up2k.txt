@@ -39,6 +39,10 @@ combines parts into final file if all-ok
 
 use sha512 instead of sha256 everywhere
 write directly to .$wark.tmp instead of parts, then move to destination
+may have to forego the predictable wark and instead use random key:
+  webkit is doing the https-only meme for crypto.subtle.*
+  so native sha512 is unavailable on LAN (oh no)
+  so having the client hash everything before first byte is NG
 
 
 
@@ -49,6 +53,20 @@ up2k-registry keeps track of warks and chunks
 serialize to disk periodically and on shutdown
 all incoming up2k POSTs are announced to registry at start and finish
 registry moves file into place when all chunks are verified
+
+
+
+##
+## in case we can't rely on sha512 of entire file
+
+handshake
+client gets wark (random session-key)
+localstorage[filename+size] = wark
+thread 1: sha512 chunks
+thread 2: upload chunks
+server renames wark to filename on last chunk finished
+if conflict with another wark during upload: all files are renamed
+if conflict with existing filename: new file is renamed
 
 
 
