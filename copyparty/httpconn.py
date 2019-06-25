@@ -46,11 +46,11 @@ class HttpConn(object):
         if self.cert_path:
             method = self.s.recv(4, socket.MSG_PEEK)
             if len(method) != 4:
-                err = b"need at least 4 bytes in the first packet; got {}".format(
+                err = "need at least 4 bytes in the first packet; got {}".format(
                     len(method)
                 )
                 self.log(err)
-                self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err)
+                self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
                 return
 
         if method not in [None, b"GET ", b"HEAD", b"POST"]:
@@ -60,10 +60,18 @@ class HttpConn(object):
                     self.s, server_side=True, certfile=self.cert_path
                 )
             except Exception as ex:
-                if "ALERT_BAD_CERTIFICATE" in str(ex):
+                em = str(ex)
+
+                if "ALERT_BAD_CERTIFICATE" in em:
+                    # firefox-linux if there is no exception yet
                     self.log("client rejected our certificate (nice)")
+
+                elif "ALERT_CERTIFICATE_UNKNOWN" in em:
+                    # chrome-android keeps doing this
+                    pass
+
                 else:
-                    self.log("\033[35mhandshake\033[0m " + str(ex))
+                    self.log("\033[35mhandshake\033[0m " + em)
 
                 return
 

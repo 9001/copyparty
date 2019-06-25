@@ -3,6 +3,7 @@
 * http file sharing hub (py2/py3)
 * MIT-Licensed, 2019-05-26, ed @ irc.rizon.net
 
+
 ## summary
 
 turn your phone or raspi into a portable file server with resumable uploads/downloads using IE6 or any other browser
@@ -10,6 +11,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * server runs on anything with `py2.7` or `py3.2+`
 * *resumable* uploads need `firefox 12+` / `chrome 6+` / `safari 6+` / `IE 10+`
 * code standard: `black`
+
 
 ## status
 
@@ -49,6 +51,7 @@ after the initial setup (and restarting bash), you can launch copyparty at any t
 
 
 # dev env setup
+
 ```sh
 python3 -m venv .env
 . .env/bin/activate
@@ -56,6 +59,15 @@ pip install jinja2  # mandatory deps
 pip install Pillow  # thumbnail deps
 pip install black bandit pylint flake8  # vscode tooling
 ```
+
+
+# how to release
+
+in the `scripts` folder:
+
+* run `make -C deps-docker` to build all dependencies
+* create github release with `make-tgz-release.sh`
+* upload to pypi with `make-pypi-release.(sh|bat)`
 
 
 # immediate todo
