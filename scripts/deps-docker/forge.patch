@@ -1,0 +1,14 @@
+diff -NarU3 forge-0.8.5/webpack.config.js forge-0.8.5-mod/webpack.config.js
+--- forge-0.8.5/webpack.config.js	2019-06-19 03:05:22.000000000 +0200
++++ forge-0.8.5-mod/webpack.config.js	2019-06-26 00:11:42.108019160 +0200
+@@ -31,6 +31,10 @@
+     library: null,
+     libraryTarget: null
+   }
++  ,{
++    entry: ['./lib/sha512.js', './lib/forge.js'],
++    filenameBase: 'forge.sha512'
++  }
+   // Custom builds can be created by specifying the high level files you need
+   // webpack will pull in dependencies as needed.
+   //

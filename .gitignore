@@ -19,3 +19,6 @@ dist/
 
 # other licenses
 contrib/
+
+# deps
+copyparty/web/deps
