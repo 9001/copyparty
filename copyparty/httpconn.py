@@ -59,11 +59,11 @@ class HttpConn(object):
                 self.s = ssl.wrap_socket(
                     self.s, server_side=True, certfile=self.cert_path
                 )
-            except OSError as ex:
-                if "ALERT_BAD_CERTIFICATE" in ex.strerror:
+            except Exception as ex:
+                if "ALERT_BAD_CERTIFICATE" in str(ex):
                     self.log("client rejected our certificate (nice)")
                 else:
-                    raise
+                    self.log("\033[35mhandshake\033[0m " + str(ex))
 
                 return
 

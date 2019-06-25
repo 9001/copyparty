@@ -59,11 +59,14 @@ class TcpSrv(object):
         self.log("tcpsrv", "listening @ {0}:{1}".format(self.args.i, self.args.p))
 
         while True:
+            self.log("tcpsrv", "-" * 1 + "C-ncli")
             if self.num_clients.v >= self.args.nc:
                 time.sleep(0.1)
                 continue
 
+            self.log("tcpsrv", "-" * 2 + "C-acc1")
             sck, addr = self.srv.accept()
+            self.log(str(addr), "-" * 3 + "C-acc2")
             self.num_clients.add()
             self.hub.broker.put(None, "httpconn", sck, addr)
 

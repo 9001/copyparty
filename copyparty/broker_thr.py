@@ -27,6 +27,7 @@ class BrokerThr(object):
     def put(self, retq, act, *args):
         if act == "httpconn":
             sck, addr = args
+            self.log(str(addr), "-" * 4 + "C-qpop")
             self.httpsrv.accept(sck, addr)
 
         else:
