@@ -186,9 +186,10 @@ args = {
 if setuptools_available:
     args.update(
         {
-            "install_requires": [],
-            "include_package_data": True,
             "packages": ["copyparty"],
+            "install_requires": ["jinja2"],
+            "extras_require": {"thumbnails": ["Pillow"]},
+            "include_package_data": True,
             "entry_points": {
                 "console_scripts": ["copyparty = copyparty.__main__:main"]
             },

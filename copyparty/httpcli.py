@@ -176,7 +176,7 @@ class HttpCli(object):
             self.vpath, self.uname
         )
         if not self.readable and not self.writable:
-            self.log("inaccessible: {}".format(self.vpath))
+            self.log("inaccessible: [{}]".format(self.vpath))
             self.uparam = {"h": True}
 
         if "h" in self.uparam:
@@ -191,16 +191,12 @@ class HttpCli(object):
     def handle_post(self):
         self.log("POST " + self.req)
 
-        try:
-            if self.headers["expect"].lower() == "100-continue":
-                self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
-        except KeyError:
-            pass
+        if self.headers.get("expect", "").lower() == "100-continue":
+            self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
 
-        if "content-type" not in self.headers:
+        ctype = self.headers.get("content-type", "").lower()
+        if not ctype:
             raise Pebkac("you can't post without a content-type header")
-
-        ctype = self.headers["content-type"].lower()
 
         if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
@@ -211,7 +207,7 @@ class HttpCli(object):
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
 
-        raise Pebkac("don't know how to handle a {} POST".format(ctype))
+        raise Pebkac("don't know how to handle {} POST".format(ctype))
 
     def handle_post_multipart(self):
         self.parser = MultipartParser(self.log, self.sr, self.headers)
@@ -228,15 +224,16 @@ class HttpCli(object):
         raise Pebkac('invalid action "{}"'.format(act))
 
     def handle_post_json(self):
-        if "content-length" not in self.headers:
+        try:
+            remains = int(self.headers["content-length"])
+        except:
             raise Pebkac("you must supply a content-length for JSON POST")
 
-        remains = int(self.headers["content-length"])
         if remains > 1024 * 1024:
             raise Pebkac("json 2big")
 
         enc = "utf-8"
-        ctype = ctype = self.headers["content-type"].lower()
+        ctype = self.headers.get("content-type", "").lower()
         if "charset" in ctype:
             enc = ctype.split("charset")[1].strip(" =").split(";")[0].strip()
 
@@ -394,10 +391,10 @@ class HttpCli(object):
         file_dt = datetime.utcfromtimestamp(file_ts)
         file_lastmod = file_dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-        if "if-modified-since" in self.headers:
-            cli_lastmod = self.headers["if-modified-since"]
+        cli_lastmod = self.headers.get("if-modified-since")
+        if cli_lastmod:
             try:
-                cli_dt = time.strptime(cli_lastmod, "%a, %b %d %Y %H:%M:%S GMT")
+                cli_dt = time.strptime(cli_lastmod, "%a, %d %b %Y %H:%M:%S GMT")
                 cli_ts = calendar.timegm(cli_dt)
                 do_send = int(file_ts) > int(cli_ts)
             except:
@@ -412,10 +409,10 @@ class HttpCli(object):
 
         lower = 0
         upper = file_sz
+        hrange = self.headers.get("range")
 
-        if do_send and not is_gzip and "range" in self.headers:
+        if do_send and not is_gzip and hrange:
             try:
-                hrange = self.headers["range"]
                 a, b = hrange.split("=", 1)[1].split("-")
 
                 if a.strip():
@@ -448,8 +445,8 @@ class HttpCli(object):
         if is_gzip:
             if "gzip" not in self.headers.get("accept-encoding", "").lower():
                 decompress = True
-            elif "user-agent" in self.headers:
-                ua = self.headers["user-agent"]
+            else:
+                ua = self.headers.get("user-agent", "")
                 if re.match(r"MSIE [4-6]\.", ua) and " SV1" not in ua:
                     decompress = True
 
