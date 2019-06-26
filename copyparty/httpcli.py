@@ -50,10 +50,10 @@ class HttpCli(object):
             try:
                 self.mode, self.req, _ = headerlines[0].split(" ")
             except:
-                raise Pebkac("bad headers:\n" + "\n".join(headerlines))
+                raise Pebkac(400, "bad headers:\n" + "\n".join(headerlines))
 
         except Pebkac as ex:
-            self.loud_reply(str(ex))
+            self.loud_reply(str(ex), status=ex.code)
             return False
 
         self.headers = {}
@@ -107,20 +107,20 @@ class HttpCli(object):
             elif self.mode == "POST":
                 return self.handle_post()
             else:
-                raise Pebkac('invalid HTTP mode "{0}"'.format(self.mode))
+                raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
         except Pebkac as ex:
             try:
-                self.loud_reply(str(ex))
+                self.loud_reply(str(ex), status=ex.code)
             except Pebkac:
                 pass
 
             return False
 
-    def reply(self, body, status="200 OK", mime="text/html", headers=[]):
+    def reply(self, body, status=200, mime="text/html", headers=[]):
         # TODO something to reply with user-supplied values safely
         response = [
-            "HTTP/1.1 " + status,
+            "HTTP/1.1 {} {}".format(status, HTTPCODE[status]),
             "Connection: Keep-Alive",
             "Content-Type: " + mime,
             "Content-Length: " + str(len(body)),
@@ -133,7 +133,7 @@ class HttpCli(object):
         try:
             self.s.sendall(response_str + b"\r\n\r\n" + body)
         except:
-            raise Pebkac("client disconnected before http response")
+            raise Pebkac(400, "client disconnected before http response")
 
         return body
 
@@ -148,7 +148,7 @@ class HttpCli(object):
             try:
                 rval = self.headers["range"].split("=", 1)[1]
             except:
-                rval += self.headers["range"]
+                rval = self.headers["range"]
 
             logmsg += " [\033[36m" + rval + "\033[0m]"
 
@@ -196,7 +196,7 @@ class HttpCli(object):
 
         ctype = self.headers.get("content-type", "").lower()
         if not ctype:
-            raise Pebkac("you can't post without a content-type header")
+            raise Pebkac(400, "you can't post without a content-type header")
 
         if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
@@ -207,7 +207,7 @@ class HttpCli(object):
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
 
-        raise Pebkac("don't know how to handle {} POST".format(ctype))
+        raise Pebkac(405, "don't know how to handle {} POST".format(ctype))
 
     def handle_post_multipart(self):
         self.parser = MultipartParser(self.log, self.sr, self.headers)
@@ -221,16 +221,16 @@ class HttpCli(object):
         if act == "login":
             return self.handle_login()
 
-        raise Pebkac('invalid action "{}"'.format(act))
+        raise Pebkac(422, 'invalid action "{}"'.format(act))
 
     def handle_post_json(self):
         try:
             remains = int(self.headers["content-length"])
         except:
-            raise Pebkac("you must supply a content-length for JSON POST")
+            raise Pebkac(400, "you must supply a content-length for JSON POST")
 
         if remains > 1024 * 1024:
-            raise Pebkac("json 2big")
+            raise Pebkac(413, "json 2big")
 
         enc = "utf-8"
         ctype = self.headers.get("content-type", "").lower()
@@ -245,7 +245,7 @@ class HttpCli(object):
         try:
             body = json.loads(json_buf.decode(enc, "replace"))
         except:
-            raise Pebkac("you POSTed invalid json")
+            raise Pebkac(422, "you POSTed invalid json")
 
         print(body)
 
@@ -291,7 +291,7 @@ class HttpCli(object):
                     fn = os.path.join(fdir, sanitize_fn(p_file))
 
                     if not os.path.isdir(fsenc(fdir)):
-                        raise Pebkac("that folder does not exist")
+                        raise Pebkac(404, "that folder does not exist")
 
                     # TODO broker which avoid this race
                     # and provides a new filename if taken
@@ -303,7 +303,7 @@ class HttpCli(object):
                         self.log("writing to {0}".format(fn))
                         sz, sha512 = hashcopy(self.conn, p_data, f)
                         if sz == 0:
-                            raise Pebkac("empty files in post")
+                            raise Pebkac(400, "empty files in post")
 
                         files.append([sz, sha512])
 
@@ -365,9 +365,9 @@ class HttpCli(object):
 
     def tx_file(self, req_path):
         do_send = True
-        status = "200 OK"
+        status = 200
         extra_headers = []
-        logmsg = "{:4} {} {}".format("", self.req, status)
+        logmsg = "{:4} {} {}".format("", self.req, "200 OK")
 
         #
         # if request is for foo.js, check if we have foo.js.gz
@@ -382,7 +382,7 @@ class HttpCli(object):
             try:
                 file_sz = os.path.getsize(fsenc(fs_path))
             except:
-                raise Pebkac("404 Not Found")
+                raise Pebkac(404)
 
         #
         # if-modified
@@ -402,7 +402,7 @@ class HttpCli(object):
                 do_send = file_lastmod != cli_lastmod
 
         if not do_send:
-            status = "304 Not Modified"
+            status = 304
 
         #
         # partial
@@ -426,12 +426,12 @@ class HttpCli(object):
                     upper = file_sz
 
                 if lower < 0 or lower >= file_sz or upper < 0 or upper > file_sz:
-                    raise Pebkac("na")
+                    raise Exception()
 
             except:
-                self.loud_reply("invalid range requested: " + hrange)
+                raise Pebkac(400, "invalid range requested: " + hrange)
 
-            status = "206 Partial Content"
+            status = 206
             extra_headers.append(
                 "Content-Range: bytes {}-{}/{}".format(lower, upper - 1, file_sz)
             )
@@ -469,7 +469,7 @@ class HttpCli(object):
         mime = mimetypes.guess_type(req_path)[0] or "application/octet-stream"
 
         headers = [
-            "HTTP/1.1 " + status,
+            "HTTP/1.1 {} {}".format(status, HTTPCODE[status]),
             "Connection: Keep-Alive",
             "Content-Type: " + mime,
             "Content-Length: " + str(upper - lower),
@@ -535,7 +535,7 @@ class HttpCli(object):
 
         if not os.path.exists(fsenc(abspath)):
             print(abspath)
-            raise Pebkac("404 not found")
+            raise Pebkac(404)
 
         if not os.path.isdir(fsenc(abspath)):
             return self.tx_file(abspath)

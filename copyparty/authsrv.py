@@ -80,10 +80,10 @@ class VFS(object):
         vn, rem = self._find(vpath)
 
         if will_read and (uname not in vn.uread and "*" not in vn.uread):
-            raise Pebkac("you don't have read-access for this location")
+            raise Pebkac(403, "you don't have read-access for this location")
 
         if will_write and (uname not in vn.uwrite and "*" not in vn.uwrite):
-            raise Pebkac("you don't have write-access for this location")
+            raise Pebkac(403, "you don't have write-access for this location")
 
         return vn, rem
 

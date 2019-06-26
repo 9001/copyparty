@@ -24,6 +24,21 @@ surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
 
 
+HTTPCODE = {
+    200: "OK",
+    206: "Partial Content",
+    304: "Not Modified",
+    400: "Bad Request",
+    403: "Forbidden",
+    404: "Not Found",
+    405: "Method Not Allowed",
+    413: "Payload Too Large",
+    422: "Unprocessable Entity",
+    500: "Internal Server Error",
+    501: "Not Implemented",
+}
+
+
 class Counter(object):
     def __init__(self, v=0):
         self.v = v
@@ -104,12 +119,12 @@ class MultipartParser(object):
                 continue
 
             if m.group(1).lower() != "form-data":
-                raise Pebkac("not form-data: {}".format(ln))
+                raise Pebkac(400, "not form-data: {}".format(ln))
 
             try:
                 field = self.re_cdisp_field.match(ln).group(1)
             except:
-                raise Pebkac("missing field name: {}".format(ln))
+                raise Pebkac(400, "missing field name: {}".format(ln))
 
             try:
                 fn = self.re_cdisp_file.match(ln).group(1)
@@ -160,7 +175,7 @@ class MultipartParser(object):
             buf = self.sr.recv(bufsz)
             if not buf:
                 # abort: client disconnected
-                raise Pebkac("client disconnected during post")
+                raise Pebkac(400, "client disconnected during post")
 
             while True:
                 ofs = buf.find(self.boundary)
@@ -194,7 +209,7 @@ class MultipartParser(object):
                 buf2 = self.sr.recv(bufsz)
                 if not buf2:
                     # abort: client disconnected
-                    raise Pebkac("client disconnected during post")
+                    raise Pebkac(400, "client disconnected during post")
 
                 buf += buf2
 
@@ -217,14 +232,14 @@ class MultipartParser(object):
                 return
 
             if tail != b"\r\n":
-                raise Pebkac("protocol error after field value")
+                raise Pebkac(400, "protocol error after field value")
 
     def _read_value(self, iterator, max_len):
         ret = b""
         for buf in iterator:
             ret += buf
             if len(ret) > max_len:
-                raise Pebkac("field length is too long")
+                raise Pebkac(400, "field length is too long")
 
         return ret
 
@@ -250,7 +265,9 @@ class MultipartParser(object):
         """
         p_field, _, p_data = next(self.gen)
         if p_field != field_name:
-            raise Pebkac('expected field "{}", got "{}"'.format(field_name, p_field))
+            raise Pebkac(
+                422, 'expected field "{}", got "{}"'.format(field_name, p_field)
+            )
 
         return self._read_value(p_data, max_len).decode("utf-8", "surrogateescape")
 
@@ -268,7 +285,7 @@ def get_boundary(headers):
     ct = headers["content-type"]
     m = re.match(ptn, ct, re.IGNORECASE)
     if not m:
-        raise Pebkac("invalid content-type for a multipart post: {}".format(ct))
+        raise Pebkac(400, "invalid content-type for a multipart post: {}".format(ct))
 
     return m.group(2)
 
@@ -293,8 +310,9 @@ def read_header(sr):
                 return None
 
             raise Pebkac(
+                400,
                 "protocol error while reading headers:\n"
-                + ret.decode("utf-8", "replace")
+                + ret.decode("utf-8", "replace"),
             )
 
         ret += buf
@@ -424,4 +442,6 @@ def gzip_orig_sz(fn):
 
 
 class Pebkac(Exception):
-    pass
+    def __init__(self, code, msg=None):
+        super(Pebkac, self).__init__(msg or HTTPCODE[code])
+        self.code = code
