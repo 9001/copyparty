@@ -47,6 +47,9 @@
     "[html]": {
         "editor.formatOnSave": false,
     },
+    "files.associations": {
+        "*.makefile": "makefile"
+    },
     "editor.codeActionsOnSaveTimeout": 9001,
     "editor.formatOnSaveTimeout": 9001,
     //

@@ -16,6 +16,11 @@ all:
 
 	chown -R `stat $(self) -c %u:%g` $(vend)
 
+purge:
+	-docker kill `docker ps -q`
+	-docker rm   `docker ps -qa`
+	-docker rmi  `docker images -qa`
+
 sh:
 	@printf "\n\033[1;31mopening a shell in the most recently created docker image\033[0m\n"
 	docker run --rm -it `docker images -aq | head -n 1` /bin/bash

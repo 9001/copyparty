@@ -40,13 +40,10 @@ RUN     cd ogvjs-$ver_ogvjs \
             ogv-decoder-audio-vorbis-wasm.js \
             ogv-decoder-audio-vorbis-wasm.wasm \
             dynamicaudio.swf \
-            /z/dist \
+            /z/dist
+
 # compress
-        && find /z/dist | \
-        while IFS= read -r x; do \
-            echo "compressing $x"; \
-            pigz -11 -I 50 $x; \
-        done
-        # -I 1000 = 503587
-        # -I 15   = 503650 (default)
-        # -I 3    = 503994
+COPY    zopfli.makefile /z/dist/Makefile
+RUN     cd /z/dist \
+        && make -j$(nproc) \
+        && rm Makefile
