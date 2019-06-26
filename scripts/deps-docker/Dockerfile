@@ -4,7 +4,7 @@ ENV     ver_forge=0.8.5 \
         ver_ogvjs=1.6.1
 
 # download
-RUN     apk add make g++ git bash npm patch wget tar gzip unzip \
+RUN     apk add make g++ git bash npm patch wget tar pigz gzip unzip \
         && wget https://github.com/digitalbazaar/forge/archive/$ver_forge.tar.gz \
         && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip \
         && tar -xf $ver_forge.tar.gz \
@@ -40,4 +40,13 @@ RUN     cd ogvjs-$ver_ogvjs \
             ogv-decoder-audio-vorbis-wasm.js \
             ogv-decoder-audio-vorbis-wasm.wasm \
             dynamicaudio.swf \
-            /z/dist
+            /z/dist \
+# compress
+        && find /z/dist | \
+        while IFS= read -r x; do \
+            echo "compressing $x"; \
+            pigz -11 -I 50 $x; \
+        done
+        # -I 1000 = 503587
+        # -I 15   = 503650 (default)
+        # -I 3    = 503994
