@@ -47,6 +47,8 @@
     "[html]": {
         "editor.formatOnSave": false,
     },
+    "editor.codeActionsOnSaveTimeout": 9001,
+    "editor.formatOnSaveTimeout": 9001,
     //
     //  things you may wanna edit:
     //

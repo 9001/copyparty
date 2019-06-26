@@ -197,18 +197,18 @@ class HttpCli(object):
         except KeyError:
             pass
 
-        if 'content-type' not in self.headers:
+        if "content-type" not in self.headers:
             raise Pebkac("you can't post without a content-type header")
 
-        ctype = self.headers['content-type'].lower()
+        ctype = self.headers["content-type"].lower()
 
-        if 'multipart/form-data' in ctype:
+        if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
 
-        if 'text/plain' in ctype:
+        if "text/plain" in ctype:
             return self.handle_post_json()
 
-        if 'application/octet-stream' in ctype:
+        if "application/octet-stream" in ctype:
             return self.handle_post_binary()
 
         raise Pebkac("don't know how to handle a {} POST".format(ctype))
@@ -228,32 +228,32 @@ class HttpCli(object):
         raise Pebkac('invalid action "{}"'.format(act))
 
     def handle_post_json(self):
-        if 'content-length' not in self.headers:
-            raise Pebkac('you must supply a content-length for JSON POST')
+        if "content-length" not in self.headers:
+            raise Pebkac("you must supply a content-length for JSON POST")
 
-        remains = int(self.headers['content-length'])
+        remains = int(self.headers["content-length"])
         if remains > 1024 * 1024:
-            raise Pebkac('json 2big')
+            raise Pebkac("json 2big")
 
-        enc = 'utf-8'
-        ctype = ctype = self.headers['content-type'].lower()
-        if 'charset' in ctype:
-            enc = ctype.split('charset')[1].strip(' =').split(';')[0].strip()
+        enc = "utf-8"
+        ctype = ctype = self.headers["content-type"].lower()
+        if "charset" in ctype:
+            enc = ctype.split("charset")[1].strip(" =").split(";")[0].strip()
 
-        json_buf = b''
+        json_buf = b""
         while len(json_buf) < remains:
             json_buf += self.sr.recv(32 * 1024)
 
-        self.log('decoding {} bytes of {} json'.format(len(json_buf), enc))
+        self.log("decoding {} bytes of {} json".format(len(json_buf), enc))
         try:
-            body = json.loads(json_buf.decode(enc, 'replace'))
+            body = json.loads(json_buf.decode(enc, "replace"))
         except:
             raise Pebkac("you POSTed invalid json")
 
         print(body)
 
     def handle_post_binary(self):
-        raise Exception('todo')
+        raise Exception("todo")
 
     def handle_login(self):
         pwd = self.parser.require("cppwd", 64)
@@ -381,12 +381,12 @@ class HttpCli(object):
             file_sz = os.path.getsize(fsenc(fs_path))
         except:
             is_gzip = True
-            fs_path += '.gz'
+            fs_path += ".gz"
             try:
                 file_sz = os.path.getsize(fsenc(fs_path))
             except:
-                raise Pebkac('404 Not Found')
-        
+                raise Pebkac("404 Not Found")
+
         #
         # if-modified
 
@@ -446,25 +446,25 @@ class HttpCli(object):
 
         decompress = False
         if is_gzip:
-            if 'gzip' not in self.headers.get('accept-encoding', '').lower():
+            if "gzip" not in self.headers.get("accept-encoding", "").lower():
                 decompress = True
-            elif 'user-agent' in self.headers:
-                ua = self.headers['user-agent']
-                if re.match(r'MSIE [4-6]\.', ua) and ' SV1' not in ua:
+            elif "user-agent" in self.headers:
+                ua = self.headers["user-agent"]
+                if re.match(r"MSIE [4-6]\.", ua) and " SV1" not in ua:
                     decompress = True
-            
+
             if not decompress:
-                extra_headers.append('Content-Encoding: gzip')
+                extra_headers.append("Content-Encoding: gzip")
 
         if decompress:
             open_func = gzip.open
-            open_args = [fsenc(fs_path), 'rb']
+            open_args = [fsenc(fs_path), "rb"]
             # Content-Length := original file size
             upper = gzip_orig_sz(fs_path)
         else:
             open_func = open
             # 512 kB is optimal for huge files, use 64k
-            open_args = [fsenc(fs_path), 'rb', 64 * 1024]
+            open_args = [fsenc(fs_path), "rb", 64 * 1024]
 
         #
         # send reply

@@ -418,9 +418,9 @@ def chkcmd(*argv):
 
 
 def gzip_orig_sz(fn):
-    with open(fsenc(fn), 'rb') as f:
+    with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)
-        return struct.unpack('I', f.read(4))[0]
+        return struct.unpack("I", f.read(4))[0]
 
 
 class Pebkac(Exception):

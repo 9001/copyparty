@@ -4,18 +4,6 @@ exit 1
 
 
 ##
-## prep debug env (vscode embedded terminal)
-
-renice 20 -p $$
-
-
-##
-## cleanup after a busted shutdown
-
-ps ax | awk '/python[23]?[ ]-m copyparty/ {print $1}' | tee /dev/stderr | xargs kill
-
-
-##
 ## create a test payload
 
 head -c $((2*1024*1024*1024)) /dev/zero | openssl enc -aes-256-ctr -pass pass:hunter2 -nosalt > garbage.file
@@ -54,3 +42,12 @@ wget -S --header='Accept-Encoding: gzip' -U 'MSIE 6.0; SV1' http://127.0.0.1:123
 
 # replace variable name
 # (^|[^\w])oldname([^\w]|$) => $1newname$2
+
+# monitor linter progress
+htop -d 2 -p $(ps ax | awk '/electron[ ]/ {printf "%s%s", v, $1;v=","}')
+
+# prep debug env (vscode embedded terminal)
+renice 20 -p $$
+
+# cleanup after a busted shutdown
+ps ax | awk '/python[23]? -m copyparty/ {print $1}' | tee /dev/stderr | xargs kill

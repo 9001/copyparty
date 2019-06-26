@@ -2,7 +2,8 @@ self := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 vend := $(self)/../../copyparty/web/deps
 
 all:
-	service docker start
+	-service docker start
+	-systemctl start docker
 	
 	docker build -t build-copyparty-deps .
 	
