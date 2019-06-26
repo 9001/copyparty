@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 
 import re
 import sys
+import struct
 import hashlib
 import threading
 import subprocess as sp  # nosec
@@ -414,6 +415,12 @@ def chkcmd(*argv):
         raise Exception(serr)
 
     return sout, serr
+
+
+def gzip_orig_sz(fn):
+    with open(fsenc(fn), 'rb') as f:
+        f.seek(-4, 2)
+        return struct.unpack('I', f.read(4))[0]
 
 
 class Pebkac(Exception):

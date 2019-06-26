@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 
 import os
 import stat
+import gzip
 import time
 import json
 from datetime import datetime
@@ -156,9 +157,7 @@ class HttpCli(object):
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
-
-            if os.path.isfile(static_path):
-                return self.tx_file(static_path)
+            return self.tx_file(static_path)
 
         # conditional redirect to single volumes
         if self.vpath == "" and not self.uparam:
@@ -367,18 +366,33 @@ class HttpCli(object):
         self.parser.drop()
         return True
 
-    def tx_file(self, path):
-        file_ts = os.path.getmtime(fsenc(path))
-        file_dt = datetime.utcfromtimestamp(file_ts)
-        file_lastmod = file_dt.strftime("%a, %b %d %Y %H:%M:%S GMT")
-
+    def tx_file(self, req_path):
         do_send = True
         status = "200 OK"
         extra_headers = []
         logmsg = "{:4} {} {}".format("", self.req, status)
 
         #
+        # if request is for foo.js, check if we have foo.js.gz
+
+        is_gzip = False
+        fs_path = req_path
+        try:
+            file_sz = os.path.getsize(fsenc(fs_path))
+        except:
+            is_gzip = True
+            fs_path += '.gz'
+            try:
+                file_sz = os.path.getsize(fsenc(fs_path))
+            except:
+                raise Pebkac('404 Not Found')
+        
+        #
         # if-modified
+
+        file_ts = os.path.getmtime(fsenc(fs_path))
+        file_dt = datetime.utcfromtimestamp(file_ts)
+        file_lastmod = file_dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
         if "if-modified-since" in self.headers:
             cli_lastmod = self.headers["if-modified-since"]
@@ -396,11 +410,10 @@ class HttpCli(object):
         #
         # partial
 
-        file_sz = os.path.getsize(fsenc(path))
         lower = 0
         upper = file_sz
 
-        if do_send and "range" in self.headers:
+        if do_send and not is_gzip and "range" in self.headers:
             try:
                 hrange = self.headers["range"]
                 a, b = hrange.split("=", 1)[1].split("-")
@@ -429,9 +442,34 @@ class HttpCli(object):
             logmsg += " [\033[36m" + str(lower) + "-" + str(upper) + "\033[0m]"
 
         #
+        # Accept-Encoding and UA decides if we can send gzip as-is
+
+        decompress = False
+        if is_gzip:
+            if 'gzip' not in self.headers.get('accept-encoding', '').lower():
+                decompress = True
+            elif 'user-agent' in self.headers:
+                ua = self.headers['user-agent']
+                if re.match(r'MSIE [4-6]\.', ua) and ' SV1' not in ua:
+                    decompress = True
+            
+            if not decompress:
+                extra_headers.append('Content-Encoding: gzip')
+
+        if decompress:
+            open_func = gzip.open
+            open_args = [fsenc(fs_path), 'rb']
+            # Content-Length := original file size
+            upper = gzip_orig_sz(fs_path)
+        else:
+            open_func = open
+            # 512 kB is optimal for huge files, use 64k
+            open_args = [fsenc(fs_path), 'rb', 64 * 1024]
+
+        #
         # send reply
 
-        mime = mimetypes.guess_type(path)[0] or "application/octet-stream"
+        mime = mimetypes.guess_type(req_path)[0] or "application/octet-stream"
 
         headers = [
             "HTTP/1.1 " + status,
@@ -449,8 +487,7 @@ class HttpCli(object):
             self.log(logmsg)
             return True
 
-        # 512 kB is optimal for huge files, use 64k
-        with open(fsenc(path), "rb", 64 * 1024) as f:
+        with open_func(*open_args) as f:
             remains = upper - lower
             f.seek(lower)
             while remains > 0:
