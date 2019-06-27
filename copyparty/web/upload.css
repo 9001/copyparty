@@ -14,6 +14,16 @@
 	display: none;
 	padding: 1.5em 1em 0 1em;
 }
+#u2form {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+#u2form input {
+	background: #444;
+	border: 0px solid #444;
+	outline: none;
+}
 #u2err.err {
 	color: #f87;
 	padding: .5em;
@@ -24,7 +34,7 @@
 }
 #u2body {
 	display: none;
-	padding-bottom: 2em;
+	padding-bottom: 1em;
 }
 #u2form {
 	width: 2px;
@@ -49,6 +59,12 @@
 	width: 12em;
 	cursor: pointer;
 	box-shadow: .4em .4em 0 #111;
+}
+#u2notbtn {
+	display: none;
+	text-align: center;
+	background: #333;
+	padding-top: 1em;
 }
 #u2tab {
 	margin: 3em auto;

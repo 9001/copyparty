@@ -9,8 +9,8 @@
 
     <div id="up2k">
         <a href="#" id="u2tgl">you can upload here</a>
+        <form id="u2form" method="POST" enctype="multipart/form-data" onsubmit="return false;"></form>
         <div id="u2body">
-            <form id="u2form" method="POST" enctype="multipart/form-data" onsubmit="return false;"></form>
 
             <table id="u2conf">
                 <tr>
@@ -31,6 +31,8 @@
                 </tr>
             </table>
 
+            <div id="u2notbtn"></div>
+
             <div id="u2btn">
                 drop files here<br />
                 (or click me)
@@ -44,6 +46,7 @@
                 </tr>
             </table>
 
-            switch to the <a href="#" id="u2nope">basic uploader</a> if you don't need resumable uploads and progress bars
+            <p id="u2foot"></p>
+            <p>( if you don't need resumable uploads and progress bars just use the <a href="#" id="u2nope" onclick="javascript:un2k();">basic uploader</a>)</p>
         </div>
     </div>

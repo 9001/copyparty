@@ -37,20 +37,60 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
     hcroak(html.join('\n'));
 };
 
+
+// https://stackoverflow.com/a/950146
+function import_js(url, cb) {
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    script.onreadystatechange = cb;
+    script.onload = cb;
+
+    head.appendChild(script);
+}
+
+
 function o(id) {
     return document.getElementById(id);
 }
 
+
 (function () {
-    // hide basic uploader
-    o('up2k').style.display = 'block';
-    o('bup').style.display = 'none';
+    // show modal message
+    function showmodal(msg) {
+        o('u2notbtn').innerHTML = msg;
+        o('u2btn').style.display = 'none';
+        o('u2notbtn').style.display = 'block';
+        o('u2conf').style.opacity = '0.5';
+    }
+
+    // hide modal message
+    function unmodal() {
+        o('u2notbtn').style.display = 'none';
+        o('u2btn').style.display = 'block';
+        o('u2conf').style.opacity = '1';
+        o('u2notbtn').innerHTML = '';
+    }
+
+    // might need sha512 polyfill when non-https (thx webkit (again))
+    var have_crypto = window.crypto && crypto.subtle && crypto.subtle.digest;
+    var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>'
+    //have_crypto = false;
 
     // upload ui hidden by default, clicking the header shows it
     o('u2tgl').onclick = function (e) {
         e.preventDefault();
         o('u2tgl').style.display = 'none';
         o('u2body').style.display = 'block';
+
+        if (!have_crypto && !window.asmCrypto) {
+            showmodal('<h1>loading sha512.js</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
+            import_js('/.cpr/deps/sha512.js', unmodal);
+
+            o('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
+        }
     };
 
     // shows or clears an error message in the basic uploader ui
@@ -123,10 +163,13 @@ function o(id) {
     };
 
     var bobslice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
-    var have_crypto = window.crypto && crypto.subtle && crypto.subtle.digest;
 
-    if (!bobslice || !window.FileReader || !window.FileList || !have_crypto)
-        return un2k("this is the basic uploader; the good one needs at least<br />chrome 37 // firefox 34 // edge 12 // opera 24 // safari 7");
+    if (!bobslice || !window.FileReader || !window.FileList)
+        return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
+
+    // probably safe now
+    o('up2k').style.display = 'block';
+    o('bup').style.display = 'none';
 
     function nav() {
         o('file' + fdom_ctr).click();
@@ -157,6 +200,7 @@ function o(id) {
             var fobj = files[a];
             var entry = {
                 "n": parseInt(st.files.length.toString()),
+                "t0": new Date().getTime(),  // TODO remove probably
                 "fobj": fobj,
                 "name": fobj.name,
                 "size": fobj.size,
@@ -317,8 +361,25 @@ function o(id) {
         };
 
         var segm_load = async function (ev) {
-            const hashbuf = await crypto.subtle.digest('SHA-256', ev.target.result);
-            t.hash.push(buf2b64(hashbuf));
+            var filebuf = ev.target.result;
+            var hashbuf;
+            if (have_crypto)
+                hashbuf = await crypto.subtle.digest('SHA-512', filebuf);
+            else {
+                var ofs = 0;
+                var eof = filebuf.byteLength;
+                var hasher = new asmCrypto.Sha512();
+                //hasher.process(new Uint8Array(filebuf));
+                while (ofs < eof) {
+                    // saves memory, doesn't affect perf
+                    var ofs2 = Math.min(eof, ofs + 1024 * 1024);
+                    hasher.process(new Uint8Array(filebuf.slice(ofs, ofs2)));
+                    ofs = ofs2;
+                }
+                hasher.finish();
+                hashbuf = hasher.result;
+            }
+            t.hash.push(buf2b64(hashbuf).substr(0, 44));
 
             prog(t.n, nchunk, col_hashed);
             if (++nchunk < nchunks) {
@@ -346,6 +407,10 @@ function o(id) {
     function exec_handshake() {
         var t = st.todo.handshake.shift();
         st.busy.handshake.push(t);
+
+        // TODO remove
+        var ts = new Date().getTime();
+        alert((ts - t.t0) + '\n' + t.hash.join('\n'));
 
         var xhr = new XMLHttpRequest();
         xhr.onload = function (ev) {

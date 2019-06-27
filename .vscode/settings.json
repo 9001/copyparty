@@ -22,7 +22,7 @@
         "terminal.ansiBrightCyan": "#9cf0ed",
         "terminal.ansiBrightWhite": "#ffffff",
     },
-    "python.testing.pyTestEnabled": false,
+    "python.testing.pytestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
