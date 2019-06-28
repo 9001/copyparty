@@ -212,6 +212,14 @@ function o(id) {
 
                 fobj = fobj.getAsFile();
             }
+            try {
+                fobj.size;
+            }
+            catch {
+                return alert(
+                    'Due to a browser bug, Firefox-Android can only do one file at a time:\n' +
+                    'https://bugzilla.mozilla.org/show_bug.cgi?id=1456557');
+            }
             var entry = {
                 "n": parseInt(st.files.length.toString()),
                 "t0": new Date().getTime(),  // TODO remove probably
