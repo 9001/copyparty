@@ -189,8 +189,16 @@ function o(id) {
         ev.stopPropagation();
         ev.preventDefault();
 
-        var files = ev.dataTransfer ?
-            ev.dataTransfer.files : ev.target.files;
+        var files;
+        var is_itemlist = false;
+        if (ev.dataTransfer) {
+            if (ev.dataTransfer.items) {
+                files = ev.dataTransfer.items; // DataTransferItemList
+                is_itemlist = true;
+            }
+            else files = ev.dataTransfer.files; // FileList
+        }
+        else files = ev.target.files;
 
         if (files.length == 0)
             return alert('no files selected??');
@@ -198,6 +206,12 @@ function o(id) {
         more_one_file();
         for (var a = 0; a < files.length; a++) {
             var fobj = files[a];
+            if (is_itemlist) {
+                if (fobj.kind !== 'file')
+                    continue;
+
+                fobj = fobj.getAsFile();
+            }
             var entry = {
                 "n": parseInt(st.files.length.toString()),
                 "t0": new Date().getTime(),  // TODO remove probably
