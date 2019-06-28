@@ -162,6 +162,7 @@ a.play.act {
 	text-align: center;
 	background: #444;
 	border-radius: 2em;
+	line-height: 1em;
 }
 #widget {
 	position: fixed;

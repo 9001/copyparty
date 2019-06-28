@@ -484,7 +484,7 @@ function play(tid, call_depth) {
 
 			show_modal('<h1>loading ogv.js</h1><h2>thanks apple</h2>');
 
-			import_js('/.nfi-audio/ogvjs-1.5.8/ogv.js', function () {
+			import_js('/.cpr/deps/ogv.js', function () {
 				play(tid, 1);
 			});
 
@@ -584,7 +584,7 @@ function autoplay_blocked(tid) {
 			<a id="blk_go"></a>
 		</div>
 		<div id="blk_abrt">
-			<a id="blk_na">Cancel<br /><br />(show file list)</a>
+			<a id="blk_na">Cancel<br />(show file list)</a>
 		</div>`);
 
 	var go = o('blk_go');
