@@ -58,6 +58,23 @@ function o(id) {
 
 
 (function () {
+    // chrome requires https to use crypto.subtle,
+    // usually it's undefined but some chromes throw on invoke
+    try {
+        crypto.subtle.digest(
+            'SHA-512', new Uint8Array(1)
+        ).then(
+            function(x) {up2k_init(true)},
+            function(x) {up2k_init(false)}
+        );
+    }
+    catch (ex) {
+        up2k_init(false);
+    }
+})();
+
+
+function up2k_init(have_crypto) {
     // show modal message
     function showmodal(msg) {
         o('u2notbtn').innerHTML = msg;
@@ -74,10 +91,11 @@ function o(id) {
         o('u2notbtn').innerHTML = '';
     }
 
-    // might need sha512 polyfill when non-https (thx webkit (again))
-    var have_crypto = window.crypto && crypto.subtle && crypto.subtle.digest;
     var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>'
-    //have_crypto = false;
+    var is_https = (window.location + '').indexOf('https:') === 0;
+    if (is_https)
+        // chrome<37 firefox<34 edge<12 ie<11 opera<24 safari<10.1
+        shame = 'your browser is impressively ancient'
 
     // upload ui hidden by default, clicking the header shows it
     o('u2tgl').onclick = function (e) {
@@ -89,7 +107,10 @@ function o(id) {
             showmodal('<h1>loading sha512.js</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
             import_js('/.cpr/deps/sha512.js', unmodal);
 
-            o('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
+            if (is_https)
+                o('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500kB/s at best';
+            else
+                o('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
         }
     };
 
@@ -215,7 +236,7 @@ function o(id) {
             try {
                 fobj.size;
             }
-            catch {
+            catch (ex) {
                 return alert(
                     'Due to a browser bug, Firefox-Android can only do one file at a time:\n' +
                     'https://bugzilla.mozilla.org/show_bug.cgi?id=1456557');
@@ -382,11 +403,11 @@ function o(id) {
             prog(t.n, nchunk, col_hashing);
         };
 
-        var segm_load = async function (ev) {
+        var segm_load = function (ev) {
             var filebuf = ev.target.result;
             var hashbuf;
             if (have_crypto)
-                hashbuf = await crypto.subtle.digest('SHA-512', filebuf);
+                crypto.subtle.digest('SHA-512', filebuf).then(hash_done);
             else {
                 var ofs = 0;
                 var eof = filebuf.byteLength;
@@ -399,8 +420,11 @@ function o(id) {
                     ofs = ofs2;
                 }
                 hasher.finish();
-                hashbuf = hasher.result;
+                hash_done(hasher.result);
             }
+        };
+
+        var hash_done = function (hashbuf) {
             t.hash.push(buf2b64(hashbuf).substr(0, 44));
 
             prog(t.n, nchunk, col_hashed);
@@ -658,4 +682,4 @@ function o(id) {
 
     bumpchunk({ "target": 1 })
     bumpthread({ "target": 1 })
-})();
+}

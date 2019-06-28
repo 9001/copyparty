@@ -82,8 +82,8 @@ var mp = (function () {
 		'tracks': tracks,
 		'cover_url': ''
 	};
-	var re_audio = new RegExp(/\.(opus|ogg|m4a|aac|mp3|wav|flac)$/, 'i');
-	var re_cover = new RegExp(/^(cover|folder|cd|front|back)\.(jpe?g|png|gif)$/, 'i');
+	var re_audio = new RegExp('\.(opus|ogg|m4a|aac|mp3|wav|flac)$', 'i');
+	var re_cover = new RegExp('^(cover|folder|cd|front|back)\.(jpe?g|png|gif)$', 'i');
 
 	var trs = document.getElementById('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
@@ -579,13 +579,9 @@ function unblocked() {
 
 // show ui to manually start playback of a linked song
 function autoplay_blocked(tid) {
-	show_modal(`
-		<div id="blk_play">
-			<a id="blk_go"></a>
-		</div>
-		<div id="blk_abrt">
-			<a id="blk_na">Cancel<br />(show file list)</a>
-		</div>`);
+	show_modal(
+		'<div id="blk_play"><a id="blk_go"></a></div>' +
+		'<div id="blk_abrt"><a id="blk_na">Cancel<br />(show file list)</a></div>');
 
 	var go = o('blk_go');
 	var na = o('blk_na');
