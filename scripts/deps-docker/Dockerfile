@@ -17,8 +17,7 @@ RUN     apk add make g++ git bash npm patch wget tar pigz gzip unzip \
 RUN     cd asmcrypto.js-$ver_asmcrypto \
         && echo "export { Sha512 } from './hash/sha512/sha512';" > src/entry-export_all.ts \
         && node -r esm build.js \
-        && mv asmcrypto.all.es5.js /z/dist/sha512.js \
-        && mv dist_es5/hash/sha512/sha512.asm.js /z/dist/
+        && mv asmcrypto.all.es5.js /z/dist/sha512.js
 
 # build ogvjs
 RUN     cd ogvjs-$ver_ogvjs \

@@ -66,6 +66,9 @@
 	background: #333;
 	padding-top: 1em;
 }
+#u2notbtn * {
+	line-height: 1.3em;
+}
 #u2tab {
 	margin: 3em auto;
 	width: calc(100% - 2em);

@@ -70,11 +70,14 @@ in the `scripts` folder:
 * upload to pypi with `make-pypi-release.(sh|bat)`
 
 
-# immediate todo
+# todo
 
 roughly sorted by priority
 
 * look into android thumbnail cache file format
 * support pillow-simd
+* cache sha512 chunks on client
+* symlink existing files on upload
+  * enforce chunksize and sha512('\n'.join(chunks))
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||

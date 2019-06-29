@@ -64,8 +64,8 @@ function o(id) {
         crypto.subtle.digest(
             'SHA-512', new Uint8Array(1)
         ).then(
-            function(x) {up2k_init(true)},
-            function(x) {up2k_init(false)}
+            function (x) { up2k_init(true) },
+            function (x) { up2k_init(false) }
         );
     }
     catch (ex) {
@@ -75,6 +75,8 @@ function o(id) {
 
 
 function up2k_init(have_crypto) {
+    //have_crypto = false;
+
     // show modal message
     function showmodal(msg) {
         o('u2notbtn').innerHTML = msg;
@@ -234,12 +236,14 @@ function up2k_init(have_crypto) {
                 fobj = fobj.getAsFile();
             }
             try {
-                fobj.size;
+                if (fobj.size < 1)
+                    throw 1;
             }
             catch (ex) {
                 return alert(
-                    'Due to a browser bug, Firefox-Android can only do one file at a time:\n' +
-                    'https://bugzilla.mozilla.org/show_bug.cgi?id=1456557');
+                    'Due to a browser bug, Firefox-Android can only select one file at a time. ' +
+                    'This works in "Firefox Preview" (new Firefox, currently in beta).\n\n' +
+                    'Google firefox bug 1456557 for more info');
             }
             var entry = {
                 "n": parseInt(st.files.length.toString()),
@@ -425,7 +429,7 @@ function up2k_init(have_crypto) {
         };
 
         var hash_done = function (hashbuf) {
-            t.hash.push(buf2b64(hashbuf).substr(0, 44));
+            t.hash.push(buf2b64(hashbuf).substr(0, 43));
 
             prog(t.n, nchunk, col_hashed);
             if (++nchunk < nchunks) {
@@ -456,7 +460,8 @@ function up2k_init(have_crypto) {
 
         // TODO remove
         var ts = new Date().getTime();
-        alert((ts - t.t0) + '\n' + t.hash.join('\n'));
+        var spd = (t.size / ((ts - t.t0) / 1000.)) / (1024 * 1024.);
+        alert('{0} ms, {1} MB/s\n'.format(ts - t.t0, spd.toFixed(3)) + t.hash.join('\n'));
 
         var xhr = new XMLHttpRequest();
         xhr.onload = function (ev) {
