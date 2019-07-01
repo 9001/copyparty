@@ -1,26 +1,27 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
 import sys
 import time
 import threading
-import multiprocessing as mp
 from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import PY2, WINDOWS
 from .tcpsrv import TcpSrv
+from .up2k import Up2k
+from .util import mp
 
 
 class SvcHub(object):
     """
     Hosts all services which cannot be parallelized due to reliance on monolithic resources.
     Creates a Broker which does most of the heavy stuff; hosted services can use this to perform work:
-        hub.broker.put(retq, action, arg1, argN).
-    
+        hub.broker.put(want_reply, destination, args_list).
+
     Either BrokerThr (plain threads) or BrokerMP (multiprocessing) is used depending on configuration.
-    To receive any output returned by action, provide a queue-object for retq, else None.
+    Nothing is returned synchronously; if you want any value returned from the call,
+    put() can return a queue (if want_reply=True) which has a blocking get() with the response.
     """
 
     def __init__(self, args):
@@ -31,6 +32,7 @@ class SvcHub(object):
 
         # initiate all services to manage
         self.tcpsrv = TcpSrv(self)
+        self.up2k = Up2k(self)
 
         # decide which worker impl to use
         if self.check_mp_enable():

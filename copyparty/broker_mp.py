@@ -1,13 +1,12 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
 import time
 import threading
-import multiprocessing as mp
 
 from .__init__ import PY2, WINDOWS
 from .broker_mpw import MpWorker
+from .util import mp
 
 
 if PY2 and not WINDOWS:
@@ -23,9 +22,10 @@ class BrokerMp(object):
         self.log = hub.log
         self.args = hub.args
 
-        self.mutex = threading.Lock()
-
         self.procs = []
+        self.retpend = {}
+        self.retpend_mutex = threading.Lock()
+        self.mutex = threading.Lock()
 
         cores = self.args.j
         if cores is None:
@@ -58,7 +58,7 @@ class BrokerMp(object):
     def shutdown(self):
         self.log("broker", "shutting down")
         for proc in self.procs:
-            thr = threading.Thread(target=proc.q_pend.put(["shutdown"]))
+            thr = threading.Thread(target=proc.q_pend.put([0, "shutdown", []]))
             thr.start()
 
         with self.mutex:
@@ -73,19 +73,20 @@ class BrokerMp(object):
             procs.pop()
 
     def collector(self, proc):
+        """receive message from hub in other process"""
         while True:
             msg = proc.q_yield.get()
-            k = msg[0]
+            retq_id, dest, args = msg
 
-            if k == "log":
-                self.log(*msg[1:])
+            if dest == "log":
+                self.log(*args)
 
-            elif k == "workload":
+            elif dest == "workload":
                 with self.mutex:
-                    proc.workload = msg[1]
+                    proc.workload = args[0]
 
-            elif k == "httpdrop":
-                addr = msg[1]
+            elif dest == "httpdrop":
+                addr = args[0]
 
                 with self.mutex:
                     del proc.clients[addr]
@@ -94,8 +95,32 @@ class BrokerMp(object):
 
                 self.hub.tcpsrv.num_clients.add(-1)
 
-    def put(self, retq, act, *args):
-        if act == "httpconn":
+            elif dest == "retq":
+                # response from previous ipc call
+                with self.retpend_mutex:
+                    retq = self.retpend.pop(retq_id)
+
+                retq.put(args)
+
+            else:
+                # new ipc invoking managed service in hub
+                obj = self.hub
+                for node in dest.split("."):
+                    obj = getattr(obj, node)
+
+                # TODO will deadlock if dest performs another ipc
+                rv = obj(*args)
+
+                if retq_id:
+                    proc.q_pend.put([retq_id, "retq", rv])
+
+    def put(self, want_retval, dest, *args):
+        """
+        send message to non-hub component in other process,
+        returns a Queue object which eventually contains the response if want_retval
+        (not-impl here since nothing uses it yet)
+        """
+        if dest == "httpconn":
             sck, addr = args
             sck2 = sck
             if PY2:
@@ -104,13 +129,14 @@ class BrokerMp(object):
                 sck2 = buf.getvalue()
 
             proc = sorted(self.procs, key=lambda x: x.workload)[0]
-            proc.q_pend.put(["httpconn", sck2, addr])
+            proc.q_pend.put([0, dest, [sck2, addr]])
 
             with self.mutex:
                 proc.clients[addr] = 50
                 proc.workload += 50
+
         else:
-            raise Exception("what is " + str(act))
+            raise Exception("what is " + str(dest))
 
     def debug_load_balancer(self):
         last = ""

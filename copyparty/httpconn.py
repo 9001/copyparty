@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -18,15 +17,17 @@ class HttpConn(object):
     creates an HttpCli for each request (Connection: Keep-Alive)
     """
 
-    def __init__(self, sck, addr, args, auth, log_func, cert_path):
+    def __init__(self, sck, addr, hsrv):
         self.s = sck
         self.addr = addr
-        self.args = args
-        self.auth = auth
-        self.cert_path = cert_path
+        self.hsrv = hsrv
+
+        self.args = hsrv.args
+        self.auth = hsrv.auth
+        self.cert_path = hsrv.cert_path
 
         self.workload = 0
-        self.log_func = log_func
+        self.log_func = hsrv.log
         self.log_src = "{} \033[36m{}".format(addr[0], addr[1]).ljust(26)
 
         env = jinja2.Environment()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -9,15 +8,20 @@ import hashlib
 import threading
 import subprocess as sp  # nosec
 
+# import multiprocessing.dummy as mp  # noqa: F401
+import multiprocessing as mp  # noqa: F401
+
 from .__init__ import PY2
 from .stolen import surrogateescape
 
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
+    from queue import Queue  # noqa: F401
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
     from urllib import quote  # pylint: disable=no-name-in-module
+    from Queue import Queue  # pylint: disable=no-name-in-module  # noqa: F401
 
 
 surrogateescape.register_surrogateescape()

@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 
 import threading
 
+from .util import Queue
 from .httpsrv import HttpSrv
 
 
@@ -17,21 +18,36 @@ class BrokerThr(object):
 
         self.mutex = threading.Lock()
 
-        self.httpsrv = HttpSrv(self.args, self.log)
+        # instantiate all services here (TODO: inheritance?)
+        self.httpsrv = HttpSrv(self)
         self.httpsrv.disconnect_func = self.httpdrop
 
     def shutdown(self):
         # self.log("broker", "shutting down")
         pass
 
-    def put(self, retq, act, *args):
-        if act == "httpconn":
+    def put(self, want_retval, dest, *args):
+        if dest == "httpconn":
             sck, addr = args
             self.log(str(addr), "-" * 4 + "C-qpop")
             self.httpsrv.accept(sck, addr)
 
         else:
-            raise Exception("what is " + str(act))
+            # new ipc invoking managed service in hub
+            obj = self.hub
+            for node in dest.split("."):
+                obj = getattr(obj, node)
+
+            # TODO will deadlock if dest performs another ipc
+            rv = obj(*args)
+
+            if not want_retval:
+                return
+
+            # pretend we're broker_mp
+            retq = Queue(1)
+            retq.put(rv)
+            return retq
 
     def httpdrop(self, addr):
         self.hub.tcpsrv.num_clients.add(-1)

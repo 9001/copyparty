@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -68,7 +67,7 @@ class TcpSrv(object):
             sck, addr = self.srv.accept()
             self.log(str(addr), "-" * 3 + "C-acc2")
             self.num_clients.add()
-            self.hub.broker.put(None, "httpconn", sck, addr)
+            self.hub.broker.put(False, "httpconn", sck, addr)
 
     def shutdown(self):
         self.log("tcpsrv", "ok bye")

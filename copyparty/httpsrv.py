@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -17,9 +16,10 @@ class HttpSrv(object):
     relying on MpSrv for performance (HttpSrv is just plain threads)
     """
 
-    def __init__(self, args, log_func):
-        self.log = log_func
-        self.args = args
+    def __init__(self, broker):
+        self.broker = broker
+        self.args = broker.args
+        self.log = broker.log
 
         self.disconnect_func = None
         self.mutex = threading.Lock()
@@ -27,7 +27,7 @@ class HttpSrv(object):
         self.clients = {}
         self.workload = 0
         self.workload_thr_alive = False
-        self.auth = AuthSrv(args, log_func)
+        self.auth = AuthSrv(self.args, self.log)
 
         cert_path = os.path.join(E.cfg, "cert.pem")
         if os.path.exists(cert_path):
@@ -38,7 +38,7 @@ class HttpSrv(object):
     def accept(self, sck, addr):
         """takes an incoming tcp connection and creates a thread to handle it"""
         self.log(str(addr), "-" * 5 + "C-cthr")
-        thr = threading.Thread(target=self.thr_client, args=(sck, addr, self.log))
+        thr = threading.Thread(target=self.thr_client, args=(sck, addr))
         thr.daemon = True
         thr.start()
 
@@ -49,9 +49,9 @@ class HttpSrv(object):
     def shutdown(self):
         print("ok bye")
 
-    def thr_client(self, sck, addr, log):
+    def thr_client(self, sck, addr):
         """thread managing one tcp client"""
-        cli = HttpConn(sck, addr, self.args, self.auth, log, self.cert_path)
+        cli = HttpConn(sck, addr, self)
         with self.mutex:
             self.clients[cli] = 0
             self.workload += 50

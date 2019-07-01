@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -9,6 +8,7 @@ import threading
 
 from .__init__ import PY2, WINDOWS
 from .httpsrv import HttpSrv
+from .util import Queue
 
 if PY2 and not WINDOWS:
     import pickle  # nosec
@@ -23,6 +23,8 @@ class MpWorker(object):
         self.args = args
         self.n = n
 
+        self.retpend = {}
+        self.retpend_mutex = threading.Lock()
         self.mutex = threading.Lock()
         self.workload_thr_active = False
 
@@ -30,7 +32,8 @@ class MpWorker(object):
         # replace it with something harmless
         signal.signal(signal.SIGINT, self.signal_handler)
 
-        self.httpsrv = HttpSrv(self.args, self.log)
+        # instantiate all services here (TODO: inheritance?)
+        self.httpsrv = HttpSrv(self)
         self.httpsrv.disconnect_func = self.httpdrop
 
         # on winxp and some other platforms,
@@ -45,31 +48,31 @@ class MpWorker(object):
         pass
 
     def log(self, src, msg):
-        self.q_yield.put(["log", src, msg])
+        self.q_yield.put([0, "log", [src, msg]])
 
     def logw(self, msg):
         self.log("mp{}".format(self.n), msg)
 
     def httpdrop(self, addr):
-        self.q_yield.put(["httpdrop", addr])
+        self.q_yield.put([0, "httpdrop", [addr]])
 
     def main(self):
         while True:
-            d = self.q_pend.get()
+            retq_id, dest, args = self.q_pend.get()
 
             # self.logw("work: [{}]".format(d[0]))
-            if d[0] == "shutdown":
+            if dest == "shutdown":
                 self.logw("ok bye")
                 sys.exit(0)
                 return
 
-            elif d[0] == "httpconn":
-                sck = d[1]
+            elif dest == "httpconn":
+                sck, addr = args
                 if PY2:
                     sck = pickle.loads(sck)  # nosec
 
-                self.log(str(d[2]), "-" * 4 + "C-qpop")
-                self.httpsrv.accept(sck, d[2])
+                self.log(str(addr), "-" * 4 + "C-qpop")
+                self.httpsrv.accept(sck, addr)
 
                 with self.mutex:
                     if not self.workload_thr_active:
@@ -78,8 +81,28 @@ class MpWorker(object):
                         thr.daemon = True
                         thr.start()
 
+            elif dest == "retq":
+                # response from previous ipc call
+                with self.retpend_mutex:
+                    retq = self.retpend.pop(retq_id)
+
+                retq.put(args)
+
             else:
-                raise Exception("what is " + str(d[0]))
+                raise Exception("what is " + str(dest))
+
+    def put(self, want_retval, dest, *args):
+        if want_retval:
+            retq = Queue(1)
+            retq_id = id(retq)
+            with self.retpend_mutex:
+                self.retpend[retq_id] = retq
+        else:
+            retq = None
+            retq_id = 0
+
+        self.q_yield.put([retq_id, dest, args])
+        return retq
 
     def thr_workload(self):
         """announce workloads to MpSrv (the mp controller / loadbalancer)"""
@@ -92,4 +115,4 @@ class MpWorker(object):
                     self.workload_thr_alive = False
                     return
 
-            self.q_yield.put(["workload", self.httpsrv.workload])
+            self.q_yield.put([0, "workload", [self.httpsrv.workload]])

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -248,7 +247,12 @@ class HttpCli(object):
         except:
             raise Pebkac(422, "you POSTed invalid json")
 
-        print(body)
+        # \suger0r/
+        x = self.conn.hsrv.broker.put(True, "up2k._get_wark", body)
+        wark = x.get()
+        msg = '{{ "wark": "{}" }}'.format(wark)
+        self.log(msg)
+        self.reply(msg.encode("utf-8"), headers=["Content-Type: application/json"])
 
     def handle_post_binary(self):
         raise Exception("todo")

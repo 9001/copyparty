@@ -1,21 +1,4 @@
 ##
-## current design
-
-main
-  tcpsrv
-    httpsrv
-    mpsrv
-      mpworker
-        httpsrv
-          ...
-
-##
-## things which need the broker
-
-moving uploaded files into place
-creating a thumbnail
-
-##
 ## thumbnails
 
 two components:
