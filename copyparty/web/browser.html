@@ -24,6 +24,10 @@
         <span>{{ vpnodes[-1][1] }}</span>
     </h1>
     
+    {%- if prologue %}
+    <div id="pro" class="logue">{{ prologue }}</div>
+    {%- endif %}
+
     <table id="files">
         <thead>
             <tr>
@@ -41,6 +45,10 @@
 
         </tbody>
     </table>
+    
+    {%- if epilogue %}
+    <div id="epi" class="logue">{{ epilogue }}</div>
+    {%- endif %}
 
     <h2><a href="?h">control-panel</a></h2>
 

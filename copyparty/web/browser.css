@@ -123,6 +123,9 @@ a {
 #path span {
 	padding-left: .2em;
 }
+.logue {
+	padding: .2em 1.5em;
+}
 a.play {
 	color: #e70;
 }

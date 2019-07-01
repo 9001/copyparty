@@ -344,6 +344,12 @@ def sanitize_fn(fn):
     return fn.replace("\\", "/").split("/")[-1].strip()
 
 
+def exclude_dotfiles(filepaths):
+    for fpath in filepaths:
+        if not fpath.split("/")[-1].startswith("."):
+            yield fpath
+
+
 def quotep(txt):
     """url quoter which deals with bytes correctly"""
     btxt = fsenc(txt)

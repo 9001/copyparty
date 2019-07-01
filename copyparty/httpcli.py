@@ -550,10 +550,10 @@ class HttpCli(object):
 
         dirs = []
         files = []
-        for fn in vfs_ls:
+        for fn in exclude_dotfiles(vfs_ls):
             href = fn
             if self.absolute_urls:
-                href = vpath + "/" + fn
+                href = "/" + vpath + "/" + fn
 
             fspath = fsroot + "/" + fn
             inf = os.stat(fsenc(fspath))
@@ -575,6 +575,13 @@ class HttpCli(object):
             else:
                 files.append(item)
 
+        logues = [None, None]
+        for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
+            fn = os.path.join(abspath, fn)
+            if os.path.exists(fn):
+                with open(fn, "rb") as f:
+                    logues[n] = f.read().decode("utf-8")
+
         ts = ""
         # ts = "?{}".format(time.time())
 
@@ -585,6 +592,8 @@ class HttpCli(object):
             files=dirs,
             can_upload=self.writable,
             ts=ts,
+            prologue=logues[0],
+            epilogue=logues[1],
         )
         self.reply(html.encode("utf-8", "replace"))
         return True
