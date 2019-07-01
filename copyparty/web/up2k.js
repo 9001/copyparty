@@ -161,8 +161,6 @@ function up2k_init(have_crypto) {
     }
 
     var parallel_uploads = cfg('nthread');
-    var chunksize_mb = cfg('chunksz');
-    var chunksize = chunksize_mb * 1024 * 1024;
 
     var col_hashing = '#0099ff'; //'#d7d7d7';
     //var col_hashed    = '#e8a6df'; //'#decb7f';
@@ -376,12 +374,28 @@ function up2k_init(have_crypto) {
         return hexCodes.join("");
     }
 
+    function get_chunksize(filesize) {
+        var chunksize = 1024 * 1024;
+        var stepsize = 512 * 1024;
+        while (true) {
+            for (var mul = 1; mul <= 2; mul++) {
+                var nchunks = Math.ceil(filesize / chunksize);
+                if (nchunks <= 256)
+                    return chunksize;
+
+                chunksize += stepsize;
+                stepsize *= mul;
+            }
+        }
+    }
+
     function exec_hash() {
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
 
-        var nchunks = Math.ceil(t.size / chunksize);
         var nchunk = 0;
+        var chunksize = get_chunksize(t.size);
+        var nchunks = Math.ceil(t.size / chunksize);
 
         var pb_html = '';
         var pb_perc = 99.9 / nchunks;
@@ -522,6 +536,7 @@ function up2k_init(have_crypto) {
 
         prog(t.n, npart, col_uploading);
 
+        var chunksize = get_chunksize(t.size);
         var car = npart * chunksize;
         var cdr = car + chunksize;
         if (cdr >= t.size)
@@ -590,41 +605,6 @@ function up2k_init(have_crypto) {
     ///   config ui
     //
 
-    function bumpchunk(dir) {
-        try {
-            dir.stopPropagation();
-            dir.preventDefault();
-        } catch (ex) { }
-
-        if (st.files.length > 0)
-            return alert('only possible before you start uploading\n\n(refresh and try again)')
-
-        var obj = o('chunksz');
-        if (dir.target) {
-            obj.style.background = '#922';
-            var v = Math.floor(parseInt(obj.value));
-            if (v < 1 || v > 1024 || v !== v)
-                return;
-
-            chunksize_mb = v;
-            chunksize = chunksize_mb * 1024 * 1024;
-            localStorage.setItem('chunksz', v);
-            obj.style.background = '#444';
-            return;
-        }
-
-        chunksize_mb = Math.floor(chunksize_mb * dir);
-
-        if (chunksize_mb < 1)
-            chunksize_mb = 1;
-
-        if (chunksize_mb > 1024)
-            chunksize_mb = 1024;
-
-        obj.value = chunksize_mb;
-        bumpchunk({ "target": 1 })
-    }
-
     function bumpthread(dir) {
         try {
             dir.stopPropagation();
@@ -661,14 +641,6 @@ function up2k_init(have_crypto) {
         this.click();
     }
 
-    o('chunksz_add').onclick = function (ev) {
-        ev.preventDefault();
-        bumpchunk(2);
-    };
-    o('chunksz_sub').onclick = function (ev) {
-        ev.preventDefault();
-        bumpchunk(0.5);
-    };
     o('nthread_add').onclick = function (ev) {
         ev.preventDefault();
         bumpthread(1);
@@ -678,13 +650,11 @@ function up2k_init(have_crypto) {
         bumpthread(-1);
     };
 
-    o('chunksz').addEventListener('input', bumpchunk, false);
     o('nthread').addEventListener('input', bumpthread, false);
 
     var nodes = o('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)
         nodes[a].addEventListener('touchend', nop, false);
 
-    bumpchunk({ "target": 1 })
     bumpthread({ "target": 1 })
 }
