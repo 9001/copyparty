@@ -443,12 +443,19 @@ function up2k_init(have_crypto) {
         };
 
         var hash_done = function (hashbuf) {
-            t.hash.push(buf2b64(hashbuf).substr(0, 43));
+            t.hash.push(buf2b64(hashbuf.slice(0, 32)).replace(/=$/, ''));
 
             prog(t.n, nchunk, col_hashed);
             if (++nchunk < nchunks) {
                 prog(t.n, nchunk, col_hashing);
                 return segm_next();
+            }
+
+            // TODO remove
+            if (t.n == 0) {
+                var ts = new Date().getTime();
+                var spd = (t.size / ((ts - t.t0) / 1000.)) / (1024 * 1024.);
+                alert('{0} ms, {1} MB/s\n'.format(ts - t.t0, spd.toFixed(3)) + t.hash.join('\n'));
             }
 
             o('f{0}t'.format(t.n)).innerHTML = 'connecting';
@@ -472,17 +479,14 @@ function up2k_init(have_crypto) {
         var t = st.todo.handshake.shift();
         st.busy.handshake.push(t);
 
-        // TODO remove
-        var ts = new Date().getTime();
-        var spd = (t.size / ((ts - t.t0) / 1000.)) / (1024 * 1024.);
-        alert('{0} ms, {1} MB/s\n'.format(ts - t.t0, spd.toFixed(3)) + t.hash.join('\n'));
-
         var xhr = new XMLHttpRequest();
         xhr.onload = function (ev) {
             if (xhr.status == 200) {
+                var response = JSON.parse(xhr.responseText);
+
                 t.postlist = [];
-                t.wark = xhr.response.wark;
-                var missing = xhr.response.hash;
+                t.wark = response.wark;
+                var missing = response.hash;
                 for (var a = 0; a < missing.length; a++) {
                     var idx = t.hash.indexOf(missing[a]);
                     if (idx < 0)
@@ -510,11 +514,13 @@ function up2k_init(have_crypto) {
             }
             else
                 alert("server broke (error {0}):\n\"{1}\"\n".format(
-                    xhr.status, (xhr.response && xhr.response.err) ||
+                    xhr.status,
+                    (xhr.response && xhr.response.err) ||
+                    (xhr.responseText && xhr.responseText) ||
                     "no further information"));
         };
         xhr.open('POST', 'handshake.php', true);
-        xhr.responseType = 'json';
+        xhr.responseType = 'text';
         xhr.send(JSON.stringify({
             "name": t.name,
             "size": t.size,
@@ -566,7 +572,9 @@ function up2k_init(have_crypto) {
                 }
                 else
                     alert("server broke (error {0}):\n\"{1}\"\n".format(
-                        xhr.status, (xhr.response && xhr.response.err) ||
+                        xhr.status,
+                        (xhr.response && xhr.response.err) ||
+                        (xhr.responseText && xhr.responseText) ||
                         "no further information"));
             };
             xhr.open('POST', 'chunkpit.php', true);
@@ -575,7 +583,7 @@ function up2k_init(have_crypto) {
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             xhr.overrideMimeType('Content-Type', 'application/octet-stream');
-            xhr.responseType = 'json';
+            xhr.responseType = 'text';
             xhr.send(ev.target.result);
         };
 

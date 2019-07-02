@@ -18,7 +18,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [x] sanic multipart parser
 * [x] load balancer (multiprocessing)
 * [x] upload (plain multipart, ie6 support)
-* [ ] upload (js, resumable, multithreaded)
+* [x] upload (js, resumable, multithreaded)
 * [x] download
 * [x] browser
 * [x] media player
@@ -27,7 +27,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [x] volumes
 * [x] accounts
 
-summary: it works
+summary: close to beta
 
 
 # dependencies
@@ -78,6 +78,5 @@ roughly sorted by priority
 * support pillow-simd
 * cache sha512 chunks on client
 * symlink existing files on upload
-  * enforce chunksize and sha512('\n'.join(chunks))
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||

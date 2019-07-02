@@ -39,8 +39,9 @@ wget -S --header='Accept-Encoding: gzip' -U 'MSIE 6.0; SV1' http://127.0.0.1:123
 
 ##
 ## sha512(file) | base64
+## usage:  shab64 chunksize_mb filepath
 
-f=/boot/vmlinuz-4.19-x86_64; sp=2; v=0; sz=$(stat -c%s "$f"); while true; do w=$((v+sp*1024*1024)); printf $(tail -c +$((v+1)) "$f" | head -c $((w-v)) | sha512sum | sed -r 's/ .*//;s/(..)/\\x\1/g') | base64 -w0 | cut -c-44 | tr '+/' '-_'; v=$w; [ $v -lt $sz ] || break; done
+shab64() { sp=$1; f="$2"; v=0; sz=$(stat -c%s "$f"); while true; do w=$((v+sp*1024*1024)); printf $(tail -c +$((v+1)) "$f" | head -c $((w-v)) | sha512sum | cut -c-64 | sed -r 's/ .*//;s/(..)/\\x\1/g') | base64 -w0 | cut -c-43 | tr '+/' '-_'; v=$w; [ $v -lt $sz ] || break; done; }
 
 
 ##

@@ -247,15 +247,69 @@ class HttpCli(object):
         except:
             raise Pebkac(422, "you POSTed invalid json")
 
-        # \suger0r/
-        x = self.conn.hsrv.broker.put(True, "up2k._get_wark", body)
-        wark = x.get()
-        msg = '{{ "wark": "{}" }}'.format(wark)
-        self.log(msg)
-        self.reply(msg.encode("utf-8"), headers=["Content-Type: application/json"])
+        # prefer this over undot; no reason to allow traversion
+        if "/" in body["name"]:
+            raise Pebkac(400, "folders verboten")
+
+        # up2k-php compat
+        for k in "/chunkpit.php", "/handshake.php":
+            if self.vpath.endswith(k):
+                self.vpath = self.vpath[: -len(k)]
+
+        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+
+        body["vdir"] = os.path.join(vfs.realpath, rem)
+        body["addr"] = self.conn.addr[0]
+
+        x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
+        response = x.get()
+        response = json.dumps(response)
+
+        self.log(response)
+        self.reply(response.encode("utf-8"), headers=["Content-Type: application/json"])
 
     def handle_post_binary(self):
-        raise Exception("todo")
+        try:
+            remains = int(self.headers["content-length"])
+        except:
+            raise Pebkac(400, "you must supply a content-length for binary POST")
+
+        try:
+            chash = self.headers["x-up2k-hash"]
+            wark = self.headers["x-up2k-wark"]
+        except KeyError:
+            raise Pebkac(400, "need hash and wark headers for binary POST")
+
+        x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", wark, chash)
+        response = x.get()
+        chunksize, ofs, path = response
+
+        if self.args.nw:
+            path = os.devnull
+
+        if remains > chunksize:
+            raise Pebkac(400, "your chunk is too big to fit")
+
+        self.log("writing {} #{} @{} len {}".format(path, chash, ofs, remains))
+
+        reader = read_socket(self.sr, remains)
+
+        with open(path, "rb+") as f:
+            f.seek(ofs)
+            post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
+
+        if sha_b64 != chash:
+            raise Pebkac(
+                400,
+                "your chunk got corrupted somehow:\n{} expected,\n{} received ({} bytes)".format(
+                    chash, sha_b64, post_sz
+                ),
+            )
+
+        x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", wark, chash)
+        response = x.get()
+
+        self.loud_reply("thank")
 
     def handle_login(self):
         pwd = self.parser.require("cppwd", 64)
@@ -306,11 +360,11 @@ class HttpCli(object):
                 try:
                     with open(fsenc(fn), "wb") as f:
                         self.log("writing to {0}".format(fn))
-                        sz, sha512 = hashcopy(self.conn, p_data, f)
+                        sz, sha512_hex, _ = hashcopy(self.conn, p_data, f)
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
-                        files.append([sz, sha512])
+                        files.append([sz, sha512_hex])
 
                 except Pebkac:
                     if not nullwrite:

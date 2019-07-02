@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import re
 import sys
+import base64
 import struct
 import hashlib
 import threading
@@ -17,11 +18,9 @@ from .stolen import surrogateescape
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
-    from queue import Queue  # noqa: F401
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
     from urllib import quote  # pylint: disable=no-name-in-module
-    from Queue import Queue  # pylint: disable=no-name-in-module  # noqa: F401
 
 
 surrogateescape.register_surrogateescape()
@@ -385,6 +384,18 @@ def fsenc(txt):
     return txt.encode(FS_ENCODING, "surrogateescape")
 
 
+def read_socket(sr, total_size):
+    remains = total_size
+    while remains > 0:
+        bufsz = 32 * 1024
+        if bufsz > remains:
+            bufsz = remains
+
+        buf = sr.recv(bufsz)
+        remains -= len(buf)
+        yield buf
+
+
 def hashcopy(actor, fin, fout):
     u32_lim = int((2 ** 31) * 0.9)
     hashobj = hashlib.sha512()
@@ -398,7 +409,10 @@ def hashcopy(actor, fin, fout):
         hashobj.update(buf)
         fout.write(buf)
 
-    return tlen, hashobj.hexdigest()
+    digest32 = hashobj.digest()[:32]
+    digest_b64 = base64.urlsafe_b64encode(digest32).decode("utf-8").rstrip("=")
+
+    return tlen, hashobj.hexdigest(), digest_b64
 
 
 def unescape_cookie(orig):
