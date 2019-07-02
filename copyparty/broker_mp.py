@@ -7,6 +7,7 @@ import threading
 from .__init__ import PY2, WINDOWS
 from .broker_mpw import MpWorker
 from .util import mp
+from .broker_util import *
 
 
 if PY2 and not WINDOWS:
@@ -109,7 +110,7 @@ class BrokerMp(object):
                     obj = getattr(obj, node)
 
                 # TODO will deadlock if dest performs another ipc
-                rv = obj(*args)
+                rv = try_exec(obj, *args, want_retval=retq_id)
 
                 if retq_id:
                     proc.q_pend.put([retq_id, "retq", rv])

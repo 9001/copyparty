@@ -8,7 +8,7 @@ import threading
 
 from .__init__ import PY2, WINDOWS
 from .httpsrv import HttpSrv
-from .util import Queue
+from .broker_util import *
 
 if PY2 and not WINDOWS:
     import pickle  # nosec
@@ -93,7 +93,7 @@ class MpWorker(object):
 
     def put(self, want_retval, dest, *args):
         if want_retval:
-            retq = Queue(1)
+            retq = ExceptionalQueue(1)
             retq_id = id(retq)
             with self.retpend_mutex:
                 self.retpend[retq_id] = retq

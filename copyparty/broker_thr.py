@@ -4,8 +4,8 @@ from __future__ import print_function, unicode_literals
 
 import threading
 
-from .util import Queue
 from .httpsrv import HttpSrv
+from .broker_util import *
 
 
 class BrokerThr(object):
@@ -39,13 +39,12 @@ class BrokerThr(object):
                 obj = getattr(obj, node)
 
             # TODO will deadlock if dest performs another ipc
-            rv = obj(*args)
-
+            rv = try_exec(obj, *args, want_retval=want_retval)
             if not want_retval:
                 return
 
             # pretend we're broker_mp
-            retq = Queue(1)
+            retq = ExceptionalQueue(1)
             retq.put(rv)
             return retq
 
