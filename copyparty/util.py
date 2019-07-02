@@ -9,11 +9,16 @@ import hashlib
 import threading
 import subprocess as sp  # nosec
 
-# import multiprocessing.dummy as mp  # noqa: F401
-import multiprocessing as mp  # noqa: F401
-
 from .__init__ import PY2
 from .stolen import surrogateescape
+
+FAKE_MP = False
+
+if FAKE_MP:
+    import multiprocessing.dummy as mp  # noqa: F401
+else:
+    import multiprocessing as mp  # noqa: F401
+
 
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
@@ -21,7 +26,6 @@ if not PY2:
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
     from urllib import quote  # pylint: disable=no-name-in-module
-
 
 surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()

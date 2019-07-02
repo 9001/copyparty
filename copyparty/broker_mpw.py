@@ -7,8 +7,9 @@ import signal
 import threading
 
 from .__init__ import PY2, WINDOWS
+from .broker_util import ExceptionalQueue
 from .httpsrv import HttpSrv
-from .broker_util import *
+from .util import FAKE_MP
 
 if PY2 and not WINDOWS:
     import pickle  # nosec
@@ -30,7 +31,8 @@ class MpWorker(object):
 
         # we inherited signal_handler from parent,
         # replace it with something harmless
-        signal.signal(signal.SIGINT, self.signal_handler)
+        if not FAKE_MP:
+            signal.signal(signal.SIGINT, self.signal_handler)
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self)

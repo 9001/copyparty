@@ -5,9 +5,9 @@ import time
 import threading
 
 from .__init__ import PY2, WINDOWS
+from .broker_util import try_exec
 from .broker_mpw import MpWorker
 from .util import mp
-from .broker_util import *
 
 
 if PY2 and not WINDOWS:
