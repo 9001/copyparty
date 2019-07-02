@@ -164,12 +164,10 @@ function up2k_init(have_crypto) {
 
     var parallel_uploads = cfg('nthread');
 
-    var col_hashing = '#0099ff'; //'#d7d7d7';
-    //var col_hashed    = '#e8a6df'; //'#decb7f';
-    //var col_hashed    = '#0099ff';
-    var col_hashed = '#eeeeee';
+    var col_hashing = '#0099ff';
+    var col_hashed = '#004466';
     var col_uploading = '#ffcc44';
-    var col_uploaded = '#00cc00';
+    var col_uploaded = '#00bb00';
     var fdom_ctr = 0;
     var st = {
         "files": [],

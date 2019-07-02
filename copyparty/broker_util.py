@@ -13,7 +13,7 @@ else:
     from Queue import Queue  # pylint: disable=import-error,no-name-in-module
 
 
-class ExceptionalQueue(Queue):
+class ExceptionalQueue(Queue, object):
     def get(self, block=True, timeout=None):
         rv = super(ExceptionalQueue, self).get(block, timeout)
 
@@ -28,7 +28,7 @@ class ExceptionalQueue(Queue):
         return rv
 
 
-def try_exec(func, *args, want_retval=False):
+def try_exec(want_retval, func, *args):
     try:
         return func(*args)
 

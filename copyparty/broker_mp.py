@@ -110,7 +110,7 @@ class BrokerMp(object):
                     obj = getattr(obj, node)
 
                 # TODO will deadlock if dest performs another ipc
-                rv = try_exec(obj, *args, want_retval=retq_id)
+                rv = try_exec(retq_id, obj, *args)
 
                 if retq_id:
                     proc.q_pend.put([retq_id, "retq", rv])

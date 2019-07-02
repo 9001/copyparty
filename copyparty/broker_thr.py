@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -39,7 +38,7 @@ class BrokerThr(object):
                 obj = getattr(obj, node)
 
             # TODO will deadlock if dest performs another ipc
-            rv = try_exec(obj, *args, want_retval=want_retval)
+            rv = try_exec(want_retval, obj, *args)
             if not want_retval:
                 return
 

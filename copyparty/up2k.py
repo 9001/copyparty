@@ -114,7 +114,9 @@ class Up2k(object):
                 raise Pebkac(400, "at least one hash is not according to spec")
 
         # server-reproducible file identifier, independent of name or location
-        ident = "\n".join([self.salt, str(cj["size"]), *cj["hash"]])
+        ident = [self.salt, str(cj["size"])]
+        ident.extend(cj["hash"])
+        ident = "\n".join(ident)
 
         hasher = hashlib.sha512()
         hasher.update(ident.encode("utf-8"))

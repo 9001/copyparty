@@ -633,8 +633,8 @@ class HttpCli(object):
         logues = [None, None]
         for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
             fn = os.path.join(abspath, fn)
-            if os.path.exists(fn):
-                with open(fn, "rb") as f:
+            if os.path.exists(fsenc(fn)):
+                with open(fsenc(fn), "rb") as f:
                     logues[n] = f.read().decode("utf-8")
 
         ts = ""
