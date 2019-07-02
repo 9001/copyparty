@@ -267,6 +267,7 @@ class HttpCli(object):
 
         self.log(response)
         self.reply(response.encode("utf-8"), headers=["Content-Type: application/json"])
+        return True
 
     def handle_post_binary(self):
         try:
@@ -306,7 +307,7 @@ class HttpCli(object):
                     ),
                 )
 
-            if len(cstart) > 1:
+            if len(cstart) > 1 and path != os.devnull:
                 self.log(
                     "clone {} to {}".format(
                         cstart[0], " & ".join(str(x) for x in cstart[1:])

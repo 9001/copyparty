@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import os
 import time
+import socket
 import threading
 
 from .__init__ import E
@@ -68,6 +69,7 @@ class HttpSrv(object):
 
         finally:
             self.log(str(addr), "-" * 7 + "C-done")
+            sck.shutdown(socket.SHUT_RDWR)
             sck.close()
             with self.mutex:
                 del self.clients[cli]

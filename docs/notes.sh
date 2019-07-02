@@ -57,4 +57,7 @@ htop -d 2 -p $(ps ax | awk '/electron[ ]/ {printf "%s%s", v, $1;v=","}')
 renice 20 -p $$
 
 # cleanup after a busted shutdown
-ps ax | awk '/python[23]? -m copyparty/ {print $1}' | tee /dev/stderr | xargs kill
+ps ax | awk '/python[23]? -m copyparty|python[ ]-c from multiproc/ {print $1}' | tee /dev/stderr | xargs kill
+
+# last line of each function in a file
+cat copyparty/httpcli.py | awk '/^[^a-zA-Z0-9]+def / {printf "%s\n%s\n\n", f, pl; f=$2} /[a-zA-Z0-9]/ {pl=$0}'
