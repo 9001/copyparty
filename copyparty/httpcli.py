@@ -282,7 +282,7 @@ class HttpCli(object):
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", wark, chash)
         response = x.get()
-        chunksize, ofs, path = response
+        chunksize, cstart, path = response
 
         if self.args.nw:
             path = os.devnull
@@ -290,21 +290,40 @@ class HttpCli(object):
         if remains > chunksize:
             raise Pebkac(400, "your chunk is too big to fit")
 
-        self.log("writing {} #{} @{} len {}".format(path, chash, ofs, remains))
+        self.log("writing {} #{} @{} len {}".format(path, chash, cstart, remains))
 
         reader = read_socket(self.sr, remains)
 
-        with open(path, "rb+") as f:
-            f.seek(ofs)
+        with open(path, "rb+", 512 * 1024) as f:
+            f.seek(cstart[0])
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
-        if sha_b64 != chash:
-            raise Pebkac(
-                400,
-                "your chunk got corrupted somehow:\n{} expected,\n{} received ({} bytes)".format(
-                    chash, sha_b64, post_sz
-                ),
-            )
+            if sha_b64 != chash:
+                raise Pebkac(
+                    400,
+                    "your chunk got corrupted somehow:\n{} expected,\n{} received ({} bytes)".format(
+                        chash, sha_b64, post_sz
+                    ),
+                )
+
+            if len(cstart) > 1:
+                self.log(
+                    "clone {} to {}".format(
+                        cstart[0], " & ".join(str(x) for x in cstart[1:])
+                    )
+                )
+                ofs = 0
+                while ofs < chunksize:
+                    bufsz = min(chunksize - ofs, 4 * 1024 * 1024)
+                    f.seek(cstart[0] + ofs)
+                    buf = f.read(bufsz)
+                    for wofs in cstart[1:]:
+                        f.seek(wofs + ofs)
+                        f.write(buf)
+
+                    ofs += len(buf)
+
+                self.log("clone {} done".format(cstart[0]))
 
         x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", wark, chash)
         response = x.get()
@@ -652,3 +671,4 @@ class HttpCli(object):
         )
         self.reply(html.encode("utf-8", "replace"))
         return True
+

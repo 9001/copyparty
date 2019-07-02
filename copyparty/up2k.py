@@ -56,15 +56,24 @@ class Up2k(object):
                     "name": cj["name"],
                     "size": cj["size"],
                     "hash": deepcopy(cj["hash"]),
-                    # upload state
-                    "pend": deepcopy(cj["hash"]),
                 }
+
+                # one chunk may occur multiple times in a file;
+                # filter to unique values for the list of missing chunks
+                # (preserve order to reduce disk thrashing)
+                job["need"] = []
+                lut = {}
+                for k in cj["hash"]:
+                    if k not in lut:
+                        job["need"].append(k)
+                        lut[k] = 1
+
                 self._new_upload(job)
 
             return {
                 "name": job["name"],
                 "size": job["size"],
-                "hash": job["pend"],
+                "hash": job["need"],
                 "wark": wark,
             }
 
@@ -74,16 +83,15 @@ class Up2k(object):
             if not job:
                 raise Pebkac(404, "unknown wark")
 
-            if chash not in job["pend"]:
+            if chash not in job["need"]:
                 raise Pebkac(200, "already got that but thanks??")
 
-            try:
-                nchunk = job["hash"].index(chash)
-            except ValueError:
+            nchunk = [n for n, v in enumerate(job["hash"]) if v == chash]
+            if not nchunk:
                 raise Pebkac(404, "unknown chunk")
 
         chunksize = self._get_chunksize(job["size"])
-        ofs = nchunk * chunksize
+        ofs = [chunksize * x for x in nchunk]
 
         path = os.path.join(job["vdir"], job["name"])
 
@@ -91,7 +99,7 @@ class Up2k(object):
 
     def confirm_chunk(self, wark, chash):
         with self.mutex:
-            self.registry[wark]["pend"].remove(chash)
+            self.registry[wark]["need"].remove(chash)
 
     def _get_chunksize(self, filesize):
         chunksize = 1024 * 1024
@@ -131,3 +139,4 @@ class Up2k(object):
         with open(path, "wb") as f:
             f.seek(job["size"] - 1)
             f.write(b"e")
+
