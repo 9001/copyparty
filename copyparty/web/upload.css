@@ -126,6 +126,9 @@
 #u2conf input+a {
 	background: #d80;
 }
+.prog {
+	font-family: monospace, monospace;
+}
 .prog>div {
 	display: inline-block;
 	position: relative;

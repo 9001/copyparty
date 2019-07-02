@@ -93,6 +93,8 @@ function up2k_init(have_crypto) {
         o('u2notbtn').innerHTML = '';
     }
 
+    var post_url = o('bup').getElementsByTagName('form')[0].getAttribute('action');
+
     var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>'
     var is_https = (window.location + '').indexOf('https:') === 0;
     if (is_https)
@@ -286,23 +288,46 @@ function up2k_init(have_crypto) {
     ///   actuator
     //
 
-    function boss() {
-        if (st.todo.hash.length > 0 &&
-            st.busy.hash.length == 0)
-            exec_hash();
+    var tasker = (function () {
+        var mutex = false;
 
-        if (st.todo.handshake.length > 0 &&
-            st.busy.handshake.length == 0 &&
-            st.busy.upload.length < parallel_uploads)
-            exec_handshake();
+        function taskerd() {
+            if (mutex)
+                return;
 
-        if (st.todo.upload.length > 0 &&
-            st.busy.upload.length < parallel_uploads)
-            exec_upload();
+            mutex = true;
+            while (true) {
+                var mou_ikkai = false;
 
-        setTimeout(boss, 100);
-    }
-    boss();
+                if (st.todo.hash.length > 0 &&
+                    st.busy.hash.length == 0) {
+                    exec_hash();
+                    mou_ikkai = true;
+                }
+
+                if (st.todo.handshake.length > 0 &&
+                    st.busy.handshake.length == 0 &&
+                    st.busy.upload.length < parallel_uploads) {
+                    exec_handshake();
+                    mou_ikkai = true;
+                }
+
+                if (st.todo.upload.length > 0 &&
+                    st.busy.upload.length < parallel_uploads) {
+                    exec_upload();
+                    mou_ikkai = true;
+                }
+
+                if (!mou_ikkai) {
+                    setTimeout(taskerd, 100);
+                    mutex = false;
+                    return;
+                }
+            }
+        }
+        taskerd();
+        return taskerd;
+    })();
 
     /////
     ////
@@ -451,11 +476,11 @@ function up2k_init(have_crypto) {
                 return segm_next();
             }
 
-            // TODO remove
+            t.t1 = new Date().getTime();
             if (t.n == 0) {
-                var ts = new Date().getTime();
-                var spd = (t.size / ((ts - t.t0) / 1000.)) / (1024 * 1024.);
-                alert('{0} ms, {1} MB/s\n'.format(ts - t.t0, spd.toFixed(3)) + t.hash.join('\n'));
+                // TODO remove
+                var spd = (t.size / ((t.t1 - t.t0) / 1000.)) / (1024 * 1024.);
+                alert('{0} ms, {1} MB/s\n'.format(t.t1 - t.t0, spd.toFixed(3)) + t.hash.join('\n'));
             }
 
             o('f{0}t'.format(t.n)).innerHTML = 'connecting';
@@ -499,6 +524,7 @@ function up2k_init(have_crypto) {
                     prog(t.n, a, (t.postlist.indexOf(a) == -1)
                         ? col_uploaded : col_hashed);
 
+                var done = true;
                 var msg = 'completed';
                 if (t.postlist.length > 0) {
                     for (var a = 0; a < t.postlist.length; a++)
@@ -508,9 +534,17 @@ function up2k_init(have_crypto) {
                         });
 
                     msg = 'uploading';
+                    done = false;
                 }
                 o('f{0}t'.format(t.n)).innerHTML = msg;
                 st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+
+                if (done) {
+                    var spd1 = (t.size / ((t.t1 - t.t0) / 1000.)) / (1024 * 1024.);
+                    var spd2 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
+                    o('f{0}p'.format(t.n)).innerHTML = '&#x1f3b7;&#x1f41b; (hash {0} MB/s | upload {1} MB/s)'.format(
+                        spd1.toFixed(2), spd2.toFixed(2));
+                }
             }
             else
                 alert("server broke (error {0}):\n\"{1}\"\n".format(
@@ -519,7 +553,7 @@ function up2k_init(have_crypto) {
                     (xhr.responseText && xhr.responseText) ||
                     "no further information"));
         };
-        xhr.open('POST', 'handshake.php', true);
+        xhr.open('POST', post_url + '/handshake.php', true);
         xhr.responseType = 'text';
         xhr.send(JSON.stringify({
             "name": t.name,
@@ -566,9 +600,11 @@ function up2k_init(have_crypto) {
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
+                        t.t2 = new Date().getTime();
                         o('f{0}t'.format(t.n)).innerHTML = 'verifying';
                         st.todo.handshake.push(t);
                     }
+                    tasker();
                 }
                 else
                     alert("server broke (error {0}):\n\"{1}\"\n".format(
@@ -577,7 +613,7 @@ function up2k_init(have_crypto) {
                         (xhr.responseText && xhr.responseText) ||
                         "no further information"));
             };
-            xhr.open('POST', 'chunkpit.php', true);
+            xhr.open('POST', post_url + '/chunkpit.php', true);
             //xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart].substr(1) + "x");
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);

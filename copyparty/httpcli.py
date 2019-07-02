@@ -310,6 +310,7 @@ class HttpCli(object):
         response = x.get()
 
         self.loud_reply("thank")
+        return True
 
     def handle_login(self):
         pwd = self.parser.require("cppwd", 64)
