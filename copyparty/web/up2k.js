@@ -153,7 +153,7 @@ function up2k_init(have_crypto) {
         };
     }
 
-    function cfg(name) {
+    function cfg_get(name) {
         var val = localStorage.getItem(name);
         if (val === null)
             return parseInt(o(name).value);
@@ -162,9 +162,29 @@ function up2k_init(have_crypto) {
         return val;
     }
 
-    var parallel_uploads = cfg('nthread');
+    function bcfg_get(name, defval) {
+        var val = localStorage.getItem(name);
+        if (val === null)
+            val = defval;
+        else
+            val = (val == '1');
 
-    var col_hashing = '#0099ff';
+        o(name).checked = val;
+        return val;
+    }
+
+    function bcfg_set(name, val) {
+        localStorage.setItem(
+            name, val ? '1' : '0');
+
+        o(name).checked = val;
+        return val;
+    }
+
+    var parallel_uploads = cfg_get('nthread');
+    var multitask = bcfg_get('multitask', true);
+
+    var col_hashing = '#00bbff';
     var col_hashed = '#004466';
     var col_uploading = '#ffcc44';
     var col_uploaded = '#00bb00';
@@ -225,6 +245,7 @@ function up2k_init(have_crypto) {
             return alert('no files selected??');
 
         more_one_file();
+        var bad_files = [];
         for (var a = 0; a < files.length; a++) {
             var fobj = files[a];
             if (is_itemlist) {
@@ -238,10 +259,8 @@ function up2k_init(have_crypto) {
                     throw 1;
             }
             catch (ex) {
-                return alert(
-                    'Due to a browser bug, Firefox-Android can only select one file at a time. ' +
-                    'This works in "Firefox Preview" (new Firefox, currently in beta).\n\n' +
-                    'Google firefox bug 1456557 for more info');
+                bad_files.push([a, fobj.name]);
+                continue;
             }
             var entry = {
                 "n": parseInt(st.files.length.toString()),
@@ -269,6 +288,17 @@ function up2k_init(have_crypto) {
             st.files.push(entry);
             st.todo.hash.push(entry);
         }
+
+        if (bad_files.length > 0) {
+            var msg = 'These files were skipped because they are empty:\n';
+            for (var a = 0; a < bad_files.length; a++)
+                msg += '-- ' + bad_files[a][1] + '\n';
+
+            if (files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
+                msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
+
+            alert(msg);
+        }
     }
     o('u2btn').addEventListener('drop', gotfile, false);
 
@@ -286,6 +316,19 @@ function up2k_init(have_crypto) {
     ///   actuator
     //
 
+    function handshakes_permitted() {
+        return multitask || (
+            st.todo.upload.length == 0 &&
+            st.busy.upload.length == 0);
+    }
+
+    function hashing_permitted() {
+        return multitask || (
+            handshakes_permitted() &&
+            st.todo.handshake.length == 0 &&
+            st.busy.handshake.length == 0);
+    }
+
     var tasker = (function () {
         var mutex = false;
 
@@ -297,13 +340,8 @@ function up2k_init(have_crypto) {
             while (true) {
                 var mou_ikkai = false;
 
-                if (st.todo.hash.length > 0 &&
-                    st.busy.hash.length == 0) {
-                    exec_hash();
-                    mou_ikkai = true;
-                }
-
-                if (st.todo.handshake.length > 0 &&
+                if (handshakes_permitted() &&
+                    st.todo.handshake.length > 0 &&
                     st.busy.handshake.length == 0 &&
                     st.busy.upload.length < parallel_uploads) {
                     exec_handshake();
@@ -313,6 +351,13 @@ function up2k_init(have_crypto) {
                 if (st.todo.upload.length > 0 &&
                     st.busy.upload.length < parallel_uploads) {
                     exec_upload();
+                    mou_ikkai = true;
+                }
+
+                if (hashing_permitted() &&
+                    st.todo.hash.length > 0 &&
+                    st.busy.hash.length == 0) {
+                    exec_hash();
                     mou_ikkai = true;
                 }
 
@@ -466,7 +511,9 @@ function up2k_init(have_crypto) {
         };
 
         var hash_done = function (hashbuf) {
-            t.hash.push(buf2b64(hashbuf.slice(0, 32)).replace(/=$/, ''));
+            var hslice = new Uint8Array(hashbuf).subarray(0, 32);
+            var b64str = buf2b64(hslice).replace(/=$/, '');
+            t.hash.push(b64str);
 
             prog(t.n, nchunk, col_hashed);
             if (++nchunk < nchunks) {
@@ -523,7 +570,7 @@ function up2k_init(have_crypto) {
                         ? col_uploaded : col_hashed);
 
                 var done = true;
-                var msg = 'completed';
+                var msg = '&#x1f3b7;&#x1f41b;';
                 if (t.postlist.length > 0) {
                     for (var a = 0; a < t.postlist.length; a++)
                         st.todo.upload.push({
@@ -540,7 +587,7 @@ function up2k_init(have_crypto) {
                 if (done) {
                     var spd1 = (t.size / ((t.t1 - t.t0) / 1000.)) / (1024 * 1024.);
                     var spd2 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
-                    o('f{0}p'.format(t.n)).innerHTML = '&#x1f3b7;&#x1f41b; (hash {0} MB/s | upload {1} MB/s)'.format(
+                    o('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2));
                 }
             }
@@ -678,6 +725,11 @@ function up2k_init(have_crypto) {
         bumpthread({ "target": 1 })
     }
 
+    function tgl_multitask() {
+        multitask = !multitask;
+        bcfg_set('multitask', multitask);
+    }
+
     function nop(ev) {
         ev.preventDefault();
         this.click();
@@ -693,6 +745,7 @@ function up2k_init(have_crypto) {
     };
 
     o('nthread').addEventListener('input', bumpthread, false);
+    o('multitask').addEventListener('click', tgl_multitask, false);
 
     var nodes = o('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)

@@ -44,6 +44,7 @@ class Up2k(object):
             try:
                 job = self.registry[wark]
                 if job["vdir"] != cj["vdir"] or job["name"] != cj["name"]:
+                    print("\n".join([job["vdir"], cj["vdir"], job["name"], cj["name"]]))
                     raise Pebkac(400, "unexpected filepath")
 
             except KeyError:
@@ -119,7 +120,9 @@ class Up2k(object):
 
         for k in cj["hash"]:
             if not self.r_hash.match(k):
-                raise Pebkac(400, "at least one hash is not according to spec")
+                raise Pebkac(
+                    400, "at least one hash is not according to spec: {}".format(k)
+                )
 
         # server-reproducible file identifier, independent of name or location
         ident = [self.salt, str(cj["size"])]

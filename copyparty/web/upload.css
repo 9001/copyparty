@@ -86,7 +86,7 @@
 	width: 40%;
 }
 #u2tab tr+tr:hover td {
-	background: #fea;
+	background: #222;
 }
 #u2conf {
 	margin: 1em auto;
@@ -100,7 +100,7 @@
 	border: none;
 	outline: none;
 }
-#u2conf input {
+#u2conf .txtbox {
 	width: 4em;
 	color: #fff;
 	background: #444;
@@ -126,8 +126,12 @@
 #u2conf input+a {
 	background: #d80;
 }
+#u2foot {
+	color: #fff;
+	font-style: italic;
+}
 .prog {
-	font-family: monospace, monospace;
+	font-family: monospace;
 }
 .prog>div {
 	display: inline-block;
