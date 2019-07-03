@@ -48,7 +48,7 @@ class HttpSrv(object):
             return len(self.clients)
 
     def shutdown(self):
-        print("ok bye")
+        self.log("ok bye")
 
     def thr_client(self, sck, addr):
         """thread managing one tcp client"""
@@ -69,13 +69,20 @@ class HttpSrv(object):
 
         finally:
             self.log(str(addr), "-" * 7 + "C-done")
-            sck.shutdown(socket.SHUT_RDWR)
-            sck.close()
-            with self.mutex:
-                del self.clients[cli]
+            try:
+                sck.shutdown(socket.SHUT_RDWR)
+                sck.close()
+            except (OSError, socket.error) as ex:
+                if ex.errno not in [107, 9]:
+                    # 107 Transport endpoint not connected
+                    #   9 Bad file descriptor
+                    raise
+            finally:
+                with self.mutex:
+                    del self.clients[cli]
 
-            if self.disconnect_func:
-                self.disconnect_func(addr)  # pylint: disable=not-callable
+                if self.disconnect_func:
+                    self.disconnect_func(addr)  # pylint: disable=not-callable
 
     def thr_workload(self):
         """indicates the python interpreter workload caused by this HttpSrv"""

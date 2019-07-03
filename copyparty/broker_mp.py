@@ -150,6 +150,7 @@ class BrokerMp(object):
 
             if msg != last:
                 last = msg
-                print(msg)
+                with self.hub.log_mutex:
+                    print(msg)
 
             time.sleep(0.1)

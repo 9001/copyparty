@@ -52,28 +52,31 @@ class SvcHub(object):
         try:
             while True:
                 time.sleep(9001)
+
         except KeyboardInterrupt:
-            print("OPYTHAT")
+            with self.log_mutex:
+                print("OPYTHAT")
+
             self.tcpsrv.shutdown()
             self.broker.shutdown()
             print("nailed it")
 
     def log(self, src, msg):
         """handles logging from all components"""
-        now = time.time()
-        if now >= self.next_day:
-            dt = datetime.utcfromtimestamp(now)
-            print("\033[36m{}\033[0m".format(dt.strftime("%Y-%m-%d")))
-
-            # unix timestamp of next 00:00:00 (leap-seconds safe)
-            day_now = dt.day
-            while dt.day == day_now:
-                dt += timedelta(hours=12)
-
-            dt = dt.replace(hour=0, minute=0, second=0)
-            self.next_day = calendar.timegm(dt.utctimetuple())
-
         with self.log_mutex:
+            now = time.time()
+            if now >= self.next_day:
+                dt = datetime.utcfromtimestamp(now)
+                print("\033[36m{}\033[0m".format(dt.strftime("%Y-%m-%d")))
+
+                # unix timestamp of next 00:00:00 (leap-seconds safe)
+                day_now = dt.day
+                while dt.day == day_now:
+                    dt += timedelta(hours=12)
+
+                dt = dt.replace(hour=0, minute=0, second=0)
+                self.next_day = calendar.timegm(dt.utctimetuple())
+
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S")
             print("\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg))
 

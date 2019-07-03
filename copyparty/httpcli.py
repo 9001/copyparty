@@ -614,7 +614,7 @@ class HttpCli(object):
         abspath = vn.canonical(rem)
 
         if not os.path.exists(fsenc(abspath)):
-            print(abspath)
+            # print(abspath)
             raise Pebkac(404)
 
         if not os.path.isdir(fsenc(abspath)):
