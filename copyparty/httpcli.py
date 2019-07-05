@@ -302,8 +302,8 @@ class HttpCli(object):
             if sha_b64 != chash:
                 raise Pebkac(
                     400,
-                    "your chunk got corrupted somehow:\n{} expected,\n{} received ({} bytes)".format(
-                        chash, sha_b64, post_sz
+                    "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}".format(
+                        post_sz, chash, sha_b64
                     ),
                 )
 
@@ -447,7 +447,8 @@ class HttpCli(object):
         do_send = True
         status = 200
         extra_headers = []
-        logmsg = "{:4} {} {}".format("", self.req, "200 OK")
+        logmsg = "{:4} {} ".format("", self.req)
+        logtail = ""
 
         #
         # if request is for foo.js, check if we have foo.js.gz
@@ -516,7 +517,7 @@ class HttpCli(object):
                 "Content-Range: bytes {}-{}/{}".format(lower, upper - 1, file_sz)
             )
 
-            logmsg += " [\033[36m" + str(lower) + "-" + str(upper) + "\033[0m]"
+            logtail += " [\033[36m{}-{}\033[0m]".format(lower, upper)
 
         #
         # Accept-Encoding and UA decides if we can send gzip as-is
@@ -545,6 +546,8 @@ class HttpCli(object):
 
         #
         # send reply
+
+        logmsg += str(status) + logtail
 
         mime = mimetypes.guess_type(req_path)[0] or "application/octet-stream"
 

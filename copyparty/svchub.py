@@ -77,7 +77,7 @@ class SvcHub(object):
                 dt = dt.replace(hour=0, minute=0, second=0)
                 self.next_day = calendar.timegm(dt.utctimetuple())
 
-            ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S")
+            ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
             print("\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg))
 
     def check_mp_support(self):

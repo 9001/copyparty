@@ -76,6 +76,7 @@ function o(id) {
 
 function up2k_init(have_crypto) {
     //have_crypto = false;
+    var need_filereader_cache = undefined;
 
     // show modal message
     function showmodal(msg) {
@@ -448,7 +449,7 @@ function up2k_init(have_crypto) {
         while (true) {
             for (var mul = 1; mul <= 2; mul++) {
                 var nchunks = Math.ceil(filesize / chunksize);
-                if (nchunks <= 256)
+                if (nchunks <= 256 || chunksize >= 32 * 1024 * 1024)
                     return chunksize;
 
                 chunksize += stepsize;
@@ -457,13 +458,69 @@ function up2k_init(have_crypto) {
         }
     }
 
+    function test_filereader_speed(segm_err) {
+        var f = st.todo.hash[0].fobj,
+            sz = Math.min(2, f.size),
+            reader = new FileReader(),
+            t0, ctr = 0;
+
+        var segm_next = function () {
+            var t = new Date().getTime(),
+                td = t - t0;
+
+            if (++ctr > 2) {
+                need_filereader_cache = td > 50;
+                st.busy.hash.pop();
+                return;
+            }
+            t0 = t;
+            reader.onload = segm_next;
+            reader.onerror = segm_err;
+            reader.readAsArrayBuffer(
+                bobslice.call(f, 0, sz));
+        };
+
+        segm_next();
+    }
+
+    function ensure_rendered(func) {
+        var hidden = false;
+        var keys = ['hidden', 'msHidden', 'webkitHidden'];
+        for (var a = 0; a < keys.length; a++)
+            if (typeof document[keys[a]] !== "undefined")
+                hidden = document[keys[a]];
+
+        if (hidden)
+            return func();
+
+        window.requestAnimationFrame(func);
+    }
+
     function exec_hash() {
+        if (need_filereader_cache === undefined) {
+            st.busy.hash.push(1);
+            return test_filereader_speed(segm_err);
+        }
+
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
 
         var nchunk = 0;
         var chunksize = get_chunksize(t.size);
         var nchunks = Math.ceil(t.size / chunksize);
+
+        // android-chrome has 180ms latency on FileReader calls,
+        // detect this and do 32MB at a time
+        var cache_buf = undefined,
+            cache_ofs = 0,
+            subchunks = 2;
+
+        while (subchunks * chunksize <= 32 * 1024 * 1024)
+            subchunks++;
+
+        subchunks--;
+        if (!need_filereader_cache)
+            subchunks = 1;
 
         var pb_html = '';
         var pb_perc = 99.9 / nchunks;
@@ -473,13 +530,17 @@ function up2k_init(have_crypto) {
 
         o('f{0}p'.format(t.n)).innerHTML = pb_html;
 
+        var reader = new FileReader();
+
         var segm_next = function () {
-            var reader = new FileReader();
+            if (cache_buf) {
+                return hash_calc();
+            }
             reader.onload = segm_load;
             reader.onerror = segm_err;
 
             var car = nchunk * chunksize;
-            var cdr = car + chunksize;
+            var cdr = car + chunksize * subchunks;
             if (cdr >= t.size)
                 cdr = t.size;
 
@@ -490,24 +551,39 @@ function up2k_init(have_crypto) {
         };
 
         var segm_load = function (ev) {
-            var filebuf = ev.target.result;
-            var hashbuf;
-            if (have_crypto)
-                crypto.subtle.digest('SHA-512', filebuf).then(hash_done);
+            cache_buf = ev.target.result;
+            cache_ofs = 0;
+            hash_calc();
+        };
+
+        var hash_calc = function () {
+            var buf = cache_buf;
+            if (chunksize >= buf.byteLength)
+                cache_buf = undefined;
             else {
-                var ofs = 0;
-                var eof = filebuf.byteLength;
-                var hasher = new asmCrypto.Sha512();
-                //hasher.process(new Uint8Array(filebuf));
-                while (ofs < eof) {
-                    // saves memory, doesn't affect perf
-                    var ofs2 = Math.min(eof, ofs + 1024 * 1024);
-                    hasher.process(new Uint8Array(filebuf.slice(ofs, ofs2)));
-                    ofs = ofs2;
-                }
-                hasher.finish();
-                hash_done(hasher.result);
+                var ofs = cache_ofs;
+                var ofs2 = ofs + Math.min(chunksize, cache_buf.byteLength - cache_ofs);
+                cache_ofs = ofs2;
+                buf = new Uint8Array(cache_buf).subarray(ofs, ofs2);
+                if (ofs2 >= cache_buf.byteLength)
+                    cache_buf = undefined;
             }
+
+            var func = function () {
+                if (have_crypto)
+                    crypto.subtle.digest('SHA-512', buf).then(hash_done);
+                else {
+                    var hasher = new asmCrypto.Sha512();
+                    hasher.process(new Uint8Array(buf));
+                    hasher.finish();
+                    hash_done(hasher.result);
+                }
+            };
+
+            if (cache_buf)
+                ensure_rendered(func);
+            else
+                func();
         };
 
         var hash_done = function (hashbuf) {
