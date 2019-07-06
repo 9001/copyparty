@@ -41,6 +41,7 @@ class HttpCli(object):
         self.log_func(self.log_src, msg)
 
     def run(self):
+        """returns true if connection can be reused"""
         try:
             headerlines = read_header(self.sr)
             if not headerlines:
@@ -59,6 +60,9 @@ class HttpCli(object):
         for header_line in headerlines[1:]:
             k, v = header_line.split(":", 1)
             self.headers[k.lower()] = v.strip()
+
+        v = self.headers.get("connection", "").lower()
+        self.keepalive = not v.startswith("close")
 
         self.uname = "*"
         if "cookie" in self.headers:
@@ -102,9 +106,9 @@ class HttpCli(object):
 
         try:
             if self.mode in ["GET", "HEAD"]:
-                return self.handle_get()
+                return self.handle_get() and self.keepalive
             elif self.mode == "POST":
-                return self.handle_post()
+                return self.handle_post() and self.keepalive
             else:
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
@@ -120,9 +124,9 @@ class HttpCli(object):
         # TODO something to reply with user-supplied values safely
         response = [
             "HTTP/1.1 {} {}".format(status, HTTPCODE[status]),
-            "Connection: Keep-Alive",
             "Content-Type: " + mime,
             "Content-Length: " + str(len(body)),
+            "Connection: " + ("Keep-Alive" if self.keepalive else "Close"),
         ]
         for k, v in self.out_headers.items():
             response.append("{}: {}".format(k, v))
@@ -266,7 +270,7 @@ class HttpCli(object):
         response = json.dumps(response)
 
         self.log(response)
-        self.reply(response.encode("utf-8"), headers=["Content-Type: application/json"])
+        self.reply(response.encode("utf-8"), mime="application/json")
         return True
 
     def handle_post_binary(self):
@@ -553,12 +557,13 @@ class HttpCli(object):
 
         headers = [
             "HTTP/1.1 {} {}".format(status, HTTPCODE[status]),
-            "Connection: Keep-Alive",
             "Content-Type: " + mime,
             "Content-Length: " + str(upper - lower),
             "Accept-Ranges: bytes",
             "Last-Modified: " + file_lastmod,
+            "Connection: " + ("Keep-Alive" if self.keepalive else "Close"),
         ]
+
         headers.extend(extra_headers)
         headers = "\r\n".join(headers).encode("utf-8") + b"\r\n\r\n"
         self.s.sendall(headers)

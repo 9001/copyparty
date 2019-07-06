@@ -86,5 +86,6 @@ roughly sorted by priority
 * support pillow-simd
 * cache sha512 chunks on client
 * symlink existing files on upload
+* comment field
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||
