@@ -666,6 +666,7 @@ function up2k_init(have_crypto) {
                     o('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2));
                 }
+                tasker();
             }
             else
                 alert("server broke (error {0}):\n\"{1}\"\n".format(
