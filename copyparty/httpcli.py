@@ -256,7 +256,7 @@ class HttpCli(object):
             raise Pebkac(400, "folders verboten")
 
         # up2k-php compat
-        for k in "/chunkpit.php", "/handshake.php":
+        for k in "chunkpit.php", "handshake.php":
             if self.vpath.endswith(k):
                 self.vpath = self.vpath[: -len(k)]
 

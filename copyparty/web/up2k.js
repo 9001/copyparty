@@ -95,12 +95,14 @@ function up2k_init(have_crypto) {
     }
 
     var post_url = o('bup').getElementsByTagName('form')[0].getAttribute('action');
+    if (post_url && post_url.charAt(post_url.length - 1) !== '/')
+        post_url += '/';
 
     var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>'
     var is_https = (window.location + '').indexOf('https:') === 0;
     if (is_https)
         // chrome<37 firefox<34 edge<12 ie<11 opera<24 safari<10.1
-        shame = 'your browser is impressively ancient'
+        shame = 'your browser is impressively ancient';
 
     // upload ui hidden by default, clicking the header shows it
     o('u2tgl').onclick = function (e) {
@@ -675,7 +677,7 @@ function up2k_init(have_crypto) {
                     (xhr.responseText && xhr.responseText) ||
                     "no further information"));
         };
-        xhr.open('POST', post_url + '/handshake.php', true);
+        xhr.open('POST', post_url + 'handshake.php', true);
         xhr.responseType = 'text';
         xhr.send(JSON.stringify({
             "name": t.name,
@@ -735,7 +737,7 @@ function up2k_init(have_crypto) {
                         (xhr.responseText && xhr.responseText) ||
                         "no further information"));
             };
-            xhr.open('POST', post_url + '/chunkpit.php', true);
+            xhr.open('POST', post_url + 'chunkpit.php', true);
             //xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart].substr(1) + "x");
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
