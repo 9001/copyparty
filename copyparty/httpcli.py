@@ -597,7 +597,9 @@ class HttpCli(object):
         return True
 
     def tx_mounts(self):
-        html = self.conn.tpl_mounts.render(this=self)
+        rvol = [x + "/" if x else x for x in self.rvol]
+        wvol = [x + "/" if x else x for x in self.wvol]
+        html = self.conn.tpl_mounts.render(this=self, rvol=rvol, wvol=wvol)
         self.reply(html.encode("utf-8"))
         return True
 
@@ -610,13 +612,14 @@ class HttpCli(object):
     def tx_browser(self):
         vpath = ""
         vpnodes = [["", "/"]]
-        for node in self.vpath.split("/"):
-            if not vpath:
-                vpath = node
-            else:
-                vpath += "/" + node
+        if self.vpath:
+            for node in self.vpath.split("/"):
+                if not vpath:
+                    vpath = node
+                else:
+                    vpath += "/" + node
 
-            vpnodes.append([quotep(vpath) + "/", cgi.escape(node)])
+                vpnodes.append([quotep(vpath) + "/", cgi.escape(node)])
 
         vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
         abspath = vn.canonical(rem)
@@ -635,7 +638,7 @@ class HttpCli(object):
         files = []
         for fn in exclude_dotfiles(vfs_ls):
             href = fn
-            if self.absolute_urls:
+            if self.absolute_urls and vpath:
                 href = "/" + vpath + "/" + fn
 
             fspath = fsroot + "/" + fn

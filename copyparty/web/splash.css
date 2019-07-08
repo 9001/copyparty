@@ -20,7 +20,8 @@ li {
 a {
 	color: #047;
 	background: #fff;
+	text-decoration: none;
 	border-bottom: 1px solid #aaa;
 	border-radius: .2em;
-	padding: .2em .5em;
+	padding: .2em .8em;
 }

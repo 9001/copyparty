@@ -15,15 +15,15 @@
 
         <h1>you can browse these:</h1>
         <ul>
-            {% for mp in this.rvol %}
-            <li><a href="/{{ mp }}/">/{{ mp }}/</a></li>
+            {% for mp in rvol %}
+            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
             {% endfor %}
         </ul>
 
         <h1>you can upload to:</h1>
         <ul>
-            {% for mp in this.wvol %}
-            <li><a href="/{{ mp }}/">/{{ mp }}/</a></li>
+            {% for mp in wvol %}
+            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
             {% endfor %}
         </ul>
 

@@ -32,7 +32,7 @@ body {
 	font-weight: normal;
 	background: #4c4c4c;
 	display: inline-block;
-	padding: .35em .5em .2em 1em;
+	padding: .35em .5em .2em .5em;
 	border-radius: 0 .3em .3em 0;
 	box-shadow: .1em .1em .4em #222;
 	margin: 1em 0;
@@ -104,8 +104,14 @@ a {
 #path a {
 	margin: 0 0 0 -.2em;
 	padding: 0 0 0 .4em;
+	/* ie: */
+	border-bottom: .1em solid #777\9;
+	margin-right: 1em\9;
 }
-#path a:after {
+#path a:first-child {
+	padding-left: .8em;
+}
+#path a:not(:last-child):after {
 	content: '';
 	width: 1.05em;
 	height: 1.05em;
@@ -119,9 +125,6 @@ a {
 #path a:hover {
 	color: #fff;
 	background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
-}
-#path span {
-	padding-left: .2em;
 }
 .logue {
 	padding: .2em 1.5em;

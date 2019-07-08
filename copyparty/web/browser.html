@@ -18,10 +18,9 @@
     {%- endif %}
     
     <h1 id="path">
-        {%- for n in vpnodes[:-1] %}
+        {%- for n in vpnodes %}
         <a href="/{{ n[0] }}">{{ n[1] }}</a>
         {%- endfor %}
-        <span>{{ vpnodes[-1][1] }}</span>
     </h1>
     
     {%- if prologue %}
