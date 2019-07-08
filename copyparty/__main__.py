@@ -18,6 +18,7 @@ from textwrap import dedent
 from .__init__ import E
 from .__version__ import S_VERSION, S_BUILD_DT
 from .svchub import SvcHub
+from .util import py_desc
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -69,7 +70,7 @@ def ensure_cert():
     try:
         if filecmp.cmp(cert_cfg, cert_insec):
             print(
-                "\033[33m\n  using default TLS certificate; https will be insecure."
+                "\033[33m  using default TLS certificate; https will be insecure."
                 + "\033[36m\n  certificate location: {}\033[0m\n".format(cert_cfg)
             )
     except:
@@ -80,6 +81,9 @@ def ensure_cert():
 
 
 def main():
+    f = "\033[36mcopyparty v{} ({})\n   python v{}\033[0m\n"
+    print(f.format(S_VERSION, S_BUILD_DT, py_desc()))
+
     ensure_locale()
     ensure_cert()
 

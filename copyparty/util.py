@@ -6,6 +6,7 @@ import sys
 import base64
 import struct
 import hashlib
+import platform
 import threading
 import subprocess as sp  # nosec
 
@@ -467,6 +468,18 @@ def gzip_orig_sz(fn):
     with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)
         return struct.unpack("I", f.read(4))[0]
+
+
+def py_desc():
+    py_ver = ".".join([str(x) for x in sys.version_info])
+    ofs = py_ver.find(".final.")
+    if ofs > 0:
+        py_ver = py_ver[:ofs]
+
+    bitness = struct.calcsize("P") * 8
+    host_os = platform.system()
+
+    return "{0} on {1}{2}".format(py_ver, host_os, bitness)
 
 
 class Pebkac(Exception):
