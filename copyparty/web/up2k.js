@@ -506,6 +506,7 @@ function up2k_init(have_crypto) {
 
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
+        t.t1 = new Date().getTime();
 
         var nchunk = 0;
         var chunksize = get_chunksize(t.size);
@@ -599,11 +600,11 @@ function up2k_init(have_crypto) {
                 return segm_next();
             }
 
-            t.t1 = new Date().getTime();
+            t.t2 = new Date().getTime();
             if (t.n == 0) {
                 // TODO remove
-                var spd = (t.size / ((t.t1 - t.t0) / 1000.)) / (1024 * 1024.);
-                alert('{0} ms, {1} MB/s\n'.format(t.t1 - t.t0, spd.toFixed(3)) + t.hash.join('\n'));
+                var spd = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
+                alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
             }
 
             o('f{0}t'.format(t.n)).innerHTML = 'connecting';
@@ -663,8 +664,8 @@ function up2k_init(have_crypto) {
                 st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
 
                 if (done) {
-                    var spd1 = (t.size / ((t.t1 - t.t0) / 1000.)) / (1024 * 1024.);
-                    var spd2 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
+                    var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
+                    var spd2 = (t.size / ((t.t3 - t.t2) / 1000.)) / (1024 * 1024.);
                     o('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2));
                 }
@@ -724,7 +725,7 @@ function up2k_init(have_crypto) {
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
-                        t.t2 = new Date().getTime();
+                        t.t3 = new Date().getTime();
                         o('f{0}t'.format(t.n)).innerHTML = 'verifying';
                         st.todo.handshake.push(t);
                     }

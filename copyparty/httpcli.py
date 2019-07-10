@@ -392,7 +392,7 @@ class HttpCli(object):
                         files.append([sz, sha512_hex])
 
                 except Pebkac:
-                    if not nullwrite:
+                    if fn != os.devnull:
                         os.rename(fsenc(fn), fsenc(fn + ".PARTIAL"))
 
                     raise
@@ -443,7 +443,7 @@ class HttpCli(object):
             ),
             pre=msg,
         )
-        self.reply(html.encode("utf-8"))
+        self.reply(html.encode("utf-8", "replace"))
         self.parser.drop()
         return True
 
@@ -673,7 +673,7 @@ class HttpCli(object):
 
         dirs.extend(files)
         html = self.conn.tpl_browser.render(
-            vdir=self.vpath,
+            vdir=quotep(self.vpath),
             vpnodes=vpnodes,
             files=dirs,
             can_upload=self.writable,

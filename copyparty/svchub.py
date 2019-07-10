@@ -78,7 +78,11 @@ class SvcHub(object):
                 self.next_day = calendar.timegm(dt.utctimetuple())
 
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
-            print("\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg))
+            msg = "\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg)
+            try:
+                print(msg)
+            except UnicodeEncodeError as ex:
+                print(msg.encode("utf-8", "replace").decode())
 
     def check_mp_support(self):
         vmin = sys.version_info[1]

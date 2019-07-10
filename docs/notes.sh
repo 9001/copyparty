@@ -32,6 +32,14 @@ for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qwe,rty;asd
 
 
 ##
+## upload mojibake
+
+fn=$(printf '\xba\xdc\xab.cab')
+echo asdf > "$fn"
+curl --cookie cppwd=wark -sF "act=bput" -F "f=@$fn" http://127.0.0.1:1234/moji/%ED%91/
+
+
+##
 ## test compression
 
 wget -S --header='Accept-Encoding: gzip' -U 'MSIE 6.0; SV1' http://127.0.0.1:1234/.cpr/deps/ogv.js -O- | md5sum; p=~ed/dev/copyparty/copyparty/web/deps/ogv.js.gz; md5sum $p; gzip -d < $p | md5sum
@@ -61,3 +69,10 @@ ps ax | awk '/python[23]? -m copyparty|python[ ]-c from multiproc/ {print $1}' |
 
 # last line of each function in a file
 cat copyparty/httpcli.py | awk '/^[^a-zA-Z0-9]+def / {printf "%s\n%s\n\n", f, pl; f=$2} /[a-zA-Z0-9]/ {pl=$0}'
+
+
+##
+## meta
+
+# create a folder with symlinks to big files
+for d in /usr /var; do find $d -type f -size +30M 2>/dev/null; done | while IFS= read -r x; do ln -s "$x" big/; done
