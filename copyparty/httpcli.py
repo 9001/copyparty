@@ -642,7 +642,11 @@ class HttpCli(object):
                 href = "/" + vpath + "/" + fn
 
             fspath = fsroot + "/" + fn
-            inf = os.stat(fsenc(fspath))
+            try:
+                inf = os.stat(fsenc(fspath))
+            except FileNotFoundError as ex:
+                self.log("broken symlink: {}".format(fspath))
+                continue
 
             is_dir = stat.S_ISDIR(inf.st_mode)
             if is_dir:

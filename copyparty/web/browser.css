@@ -1,3 +1,6 @@
+* {
+	line-height: 1.2em;
+}
 html,body,tr,th,td,#files,a {
 	color: inherit;
 	background: none;
@@ -11,7 +14,6 @@ html {
 	background: #333;
 	font-family: sans-serif;
 	text-shadow: 1px 1px 0px #000;
-	line-height: 1.3em;
 }
 html, body {
 	margin: 0;
@@ -23,7 +25,6 @@ body {
 #path,
 #path * {
 	font-size: 1em;
-	line-height: 1em;
 }
 #path {
 	color: #aca;
@@ -168,7 +169,6 @@ a.play.act {
 	text-align: center;
 	background: #444;
 	border-radius: 2em;
-	line-height: 1em;
 }
 #widget {
 	position: fixed;
@@ -246,7 +246,6 @@ a.play.act {
 	font-size: 1.25em;
 	width: 1.3em;
 	height: 1.2em;
-	line-height: 1em;
 	text-align: center;
 	margin-right: .5em;
 	border-radius: .3em;
