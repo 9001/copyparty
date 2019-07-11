@@ -52,6 +52,8 @@ class HttpSrv(object):
 
     def thr_client(self, sck, addr):
         """thread managing one tcp client"""
+        sck.settimeout(120)
+
         cli = HttpConn(sck, addr, self)
         with self.mutex:
             self.clients[cli] = 0
