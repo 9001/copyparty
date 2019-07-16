@@ -42,10 +42,17 @@ class HttpCli(object):
 
     def run(self):
         """returns true if connection can be reused"""
+        self.keepalive = False
+        self.headers = {}
         try:
             headerlines = read_header(self.sr)
             if not headerlines:
                 return False
+
+            if not headerlines[0]:
+                # seen after login with IE6.0.2900.5512.xpsp.080413-2111 (xp-sp3)
+                self.log("\033[1;31mBUG: trailing newline from previous request\033[0m")
+                headerlines.pop(0)
 
             try:
                 self.mode, self.req, _ = headerlines[0].split(" ")
@@ -56,7 +63,6 @@ class HttpCli(object):
             self.loud_reply(str(ex), status=ex.code)
             return False
 
-        self.headers = {}
         for header_line in headerlines[1:]:
             k, v = header_line.split(":", 1)
             self.headers[k.lower()] = v.strip()

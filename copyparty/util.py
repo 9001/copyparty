@@ -325,6 +325,9 @@ def read_header(sr):
 
         ret += buf
 
+        if len(ret) > 1024 * 64:
+            raise Pebkac(400, "header 2big")
+
     return ret[:-4].decode("utf-8", "surrogateescape").split("\r\n")
 
 
