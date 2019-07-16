@@ -293,7 +293,7 @@ function up2k_init(have_crypto) {
         }
 
         if (bad_files.length > 0) {
-            var msg = 'These files were skipped because they are empty:\n';
+            var msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, files.length);
             for (var a = 0; a < bad_files.length; a++)
                 msg += '-- ' + bad_files[a][1] + '\n';
 

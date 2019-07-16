@@ -71,6 +71,12 @@ function dbg(msg) {
 	o('path').innerHTML = msg;
 }
 
+function ev(e) {
+	e = e || window.event;
+	e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+	return e;
+}
+
 
 // extract songs + add play column
 var mp = (function () {
@@ -152,7 +158,7 @@ var widget = (function () {
 	};
 	ret.toggle = function (e) {
 		ret.open() || ret.close();
-		e.preventDefault();
+		ev(e);
 		return false;
 	};
 	ret.paused = function (paused) {
@@ -346,7 +352,7 @@ var vbar = (function () {
 			play(0);
 	};
 	o('bplay').onclick = function (e) {
-		e.preventDefault();
+		ev(e);
 		if (mp.au) {
 			if (mp.au.paused)
 				mp.au.play();
@@ -357,11 +363,11 @@ var vbar = (function () {
 			play(0);
 	};
 	o('bprev').onclick = function (e) {
-		e.preventDefault();
+		ev(e);
 		bskip(-1);
 	};
 	o('bnext').onclick = function (e) {
-		e.preventDefault();
+		ev(e);
 		bskip(1);
 	};
 	o('barpos').onclick = function (e) {
@@ -432,7 +438,7 @@ var vbar = (function () {
 
 // event from play button next to a file in the list
 function ev_play(e) {
-	e.preventDefault();
+	ev(e);
 	play(parseInt(this.getAttribute('id').substr(3)));
 	return false;
 }
