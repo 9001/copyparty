@@ -25,7 +25,7 @@ class EnvParams(object):
             )
 
         try:
-            os.mkdir(self.cfg)
+            os.makedirs(self.cfg)
         except:
             if not os.path.isdir(self.cfg):
                 raise
