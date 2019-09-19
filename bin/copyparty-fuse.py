@@ -41,6 +41,10 @@ def log(msg):
     print(msg[4:], end="")
 
 
+def get_tid():
+    return threading.current_thread().ident
+
+
 class CacheNode(object):
     def __init__(self, name, data):
         self.name = name
@@ -71,11 +75,10 @@ class Gateway(object):
     def quotep(self, path):
         # TODO: mojibake support
         path = path.encode("utf-8", "ignore")
-        path = path.replace(b" ", b"+")
-        return quote(path)
+        return quote(path, safe="/")
 
     def getconn(self, tid=None):
-        tid = tid or threading.current_thread().ident
+        tid = tid or get_tid()
         try:
             return self.conns[tid]
         except:
@@ -87,7 +90,7 @@ class Gateway(object):
             return conn
 
     def closeconn(self, tid=None):
-        tid = tid or threading.current_thread().ident
+        tid = tid or get_tid()
         try:
             self.conns[tid].close()
             del self.conns[tid]
@@ -95,26 +98,28 @@ class Gateway(object):
             pass
 
     def sendreq(self, *args, **kwargs):
-        tid = threading.current_thread().ident
+        tid = get_tid()
         try:
             c = self.getconn(tid)
             c.request(*list(args), **kwargs)
+            return c.getresponse()
         except:
             self.closeconn(tid)
             c = self.getconn(tid)
             c.request(*list(args), **kwargs)
-
-        return c
+            return c.getresponse()
 
     def listdir(self, path):
         web_path = "/" + "/".join([self.web_root, path])
 
-        c = self.sendreq("GET", self.quotep(web_path))
-
-        r = c.getresponse()
+        r = self.sendreq("GET", self.quotep(web_path))
         if r.status != 200:
             self.closeconn()
-            raise Exception("http error {}".format(r.status))
+            raise Exception(
+                "http error {} reading dir {} in {:x}".format(
+                    r.status, web_path, get_tid()
+                )
+            )
 
         return self.parse_html(r)
 
@@ -122,12 +127,14 @@ class Gateway(object):
         web_path = "/" + "/".join([self.web_root, path])
         hdr_range = "bytes={}-{}".format(ofs1, ofs2)
 
-        c = self.sendreq("GET", self.quotep(web_path), headers={"Range": hdr_range})
-
-        r = c.getresponse()
+        r = self.sendreq("GET", self.quotep(web_path), headers={"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
             self.closeconn()
-            raise Exception("http error {}".format(r.status))
+            raise Exception(
+                "http error {} reading file {} range {} in {:x}".format(
+                    r.status, web_path, hdr_range, get_tid()
+                )
+            )
 
         return r.read()
 
