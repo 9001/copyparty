@@ -2,9 +2,10 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import re
 import threading
 
-from .__init__ import PY2
+from .__init__ import PY2, WINDOWS
 from .util import undot, Pebkac, fsdec, fsenc
 
 
@@ -139,6 +140,11 @@ class AuthSrv(object):
 
         self.warn_anonwrite = True
 
+        if WINDOWS:
+            self.re_vol = re.compile(r'^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)')
+        else:
+            self.re_vol = re.compile(r'^([^:]*):([^:]*):(.*)')
+
         self.mutex = threading.Lock()
         self.reload()
 
@@ -220,7 +226,12 @@ class AuthSrv(object):
         if self.args.v:
             # list of src:dst:permset:permset:...
             # permset is [rwa]username
-            for src, dst, perms in [x.split(":", 2) for x in self.args.v]:
+            for vol_match in [self.re_vol.match(x) for x in self.args.v]:
+                try:
+                    src, dst, perms = vol_match.groups()
+                except:
+                    raise Exception('invalid -v argument')
+
                 src = fsdec(os.path.abspath(fsenc(src)))
                 dst = dst.strip("/")
                 mount[dst] = src

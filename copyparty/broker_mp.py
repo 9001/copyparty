@@ -140,13 +140,15 @@ class BrokerMp(object):
             raise Exception("what is " + str(dest))
 
     def debug_load_balancer(self):
+        fmt = "\033[1m{}\033[0;36m{:4}\033[0m "
+        if WINDOWS:
+            fmt = "({}{:4})"
+
         last = ""
         while self.procs:
             msg = ""
             for proc in self.procs:
-                msg += "\033[1m{}\033[0;36m{:4}\033[0m ".format(
-                    len(proc.clients), proc.workload
-                )
+                msg += fmt.format(len(proc.clients), proc.workload)
 
             if msg != last:
                 last = msg

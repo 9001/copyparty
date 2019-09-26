@@ -15,7 +15,7 @@ import locale
 import argparse
 from textwrap import dedent
 
-from .__init__ import E
+from .__init__ import E, WINDOWS
 from .__version__ import S_VERSION, S_BUILD_DT
 from .svchub import SvcHub
 from .util import py_desc
@@ -27,12 +27,16 @@ class RiceFormatter(argparse.HelpFormatter):
         same as ArgumentDefaultsHelpFormatter(HelpFormatter)
         except the help += [...] line now has colors
         """
+        fmt = "\033[36m (default: \033[35m%(default)s\033[36m)\033[0m"
+        if WINDOWS:
+            fmt = " (default: %(default)s)"
+
         help = action.help
         if "%(default)" not in action.help:
             if action.default is not argparse.SUPPRESS:
                 defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
                 if action.option_strings or action.nargs in defaulting_nargs:
-                    help += "\033[36m (default: \033[35m%(default)s\033[36m)\033[0m"
+                    help += fmt
         return help
 
     def _fill_text(self, text, width, indent):
@@ -123,6 +127,7 @@ def main():
     ap.add_argument("-j", metavar="CORES", type=int, help="max num cpu cores")
     ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
     ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
+    ap.add_argument("-q", action="store_true", help="quiet")
     ap.add_argument("-nw", action="store_true", help="benchmark: disable writing")
     al = ap.parse_args()
 

@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import re
 import sys
 import time
 import threading
@@ -27,8 +28,11 @@ class SvcHub(object):
     def __init__(self, args):
         self.args = args
 
+        self.ansi_re = re.compile("\033\\[[^m]*m")
         self.log_mutex = threading.Lock()
         self.next_day = 0
+
+        self.log = self._log_disabled if args.q else self._log_enabled
 
         # initiate all services to manage
         self.tcpsrv = TcpSrv(self)
@@ -61,7 +65,10 @@ class SvcHub(object):
             self.broker.shutdown()
             print("nailed it")
 
-    def log(self, src, msg):
+    def _log_disabled(self, src, msg):
+        pass
+
+    def _log_enabled(self, src, msg):
         """handles logging from all components"""
         with self.log_mutex:
             now = time.time()
@@ -78,10 +85,20 @@ class SvcHub(object):
                 self.next_day = calendar.timegm(dt.utctimetuple())
 
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
-            msg = "\033[36m{} \033[33m{:21} \033[0m{}".format(ts, src, msg)
+
+            if not WINDOWS:
+                fmt = "\033[36m{} \033[33m{:21} \033[0m{}"
+            else:
+                fmt = "{} {:21} {}"
+                if "\033" in msg:
+                    msg = self.ansi_re.sub("", msg)
+                if "\033" in src:
+                    src = self.ansi_re.sub("", src)
+
+            msg = fmt.format(ts, src, msg)
             try:
                 print(msg)
-            except UnicodeEncodeError as ex:
+            except UnicodeEncodeError:
                 print(msg.encode("utf-8", "replace").decode())
 
     def check_mp_support(self):
