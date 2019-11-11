@@ -44,8 +44,21 @@ class HttpConn(object):
 
     def run(self):
         method = None
+        self.sr = None
         if self.cert_path:
-            method = self.s.recv(4, socket.MSG_PEEK)
+            try:
+                method = self.s.recv(4, socket.MSG_PEEK)
+            except AttributeError:
+                # jython does not support msg_peek; forget about https
+                method = self.s.recv(4)
+                self.sr = Unrecv(self.s)
+                self.sr.buf = method
+
+                # jython used to do this, they stopped since it's broken
+                # but reimplementing sendall is out of scope for now
+                if not getattr(self.s, "sendall", None):
+                    self.s.sendall = self.s.send
+
             if len(method) != 4:
                 err = "need at least 4 bytes in the first packet; got {}".format(
                     len(method)
@@ -55,6 +68,10 @@ class HttpConn(object):
                 return
 
         if method not in [None, b"GET ", b"HEAD", b"POST"]:
+            if self.sr:
+                self.log("\033[1;31mTODO: cannot do https in jython\033[0m")
+                return
+
             self.log_src = self.log_src.replace("[36m", "[35m")
             try:
                 self.s = ssl.wrap_socket(
@@ -76,7 +93,8 @@ class HttpConn(object):
 
                 return
 
-        self.sr = Unrecv(self.s)
+        if not self.sr:
+            self.sr = Unrecv(self.s)
 
         while True:
             cli = HttpCli(self)
