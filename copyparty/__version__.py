@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 2, 1)
+VERSION = (0, 2, 3)
 BUILD_DT = (2020, 1, 19)
 
 S_VERSION = ".".join(map(str, VERSION))

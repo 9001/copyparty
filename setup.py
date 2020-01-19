@@ -11,7 +11,7 @@ from shutil import rmtree
 setuptools_available = True
 try:
     # need setuptools to build wheel
-    from setuptools import setup, Command
+    from setuptools import setup, Command, find_packages
 
 except ImportError:
     # works in a pinch
@@ -25,21 +25,15 @@ if "bdist_wheel" in sys.argv and not setuptools_available:
     sys.exit(1)
 
 
-def mglob(dirname, extensions):
-    ret = []
-    for ext in extensions:
-        ret.extend(glob(dirname + "/*." + ext))
-    return ret
-
-
 NAME = "copyparty"
 VERSION = None
-data_files = [("share/doc/copyparty", ["README.rst", "README.md", "LICENSE"])]
+data_files = [("share/doc/copyparty", ["README.md", "LICENSE"])]
 manifest = ""
 for dontcare, files in data_files:
     for fn in files:
         manifest += "include {0}\n".format(fn)
 
+manifest += "recursive-include copyparty/res *\n"
 manifest += "recursive-include copyparty/web *\n"
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -47,21 +41,9 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(here + "/MANIFEST.in", "wb") as f:
     f.write(manifest.encode("utf-8"))
 
-
-try:
-    LONG_DESCRIPTION = ""
-    LDCT = ""
-    with open(here + "/README.rst", "rb") as f:
-        txt = f.read().decode("utf-8")
-        txt = txt[txt.find("`") :]
-        LONG_DESCRIPTION = txt
-        LDCT = "text/x-rst"
-except:
-    print("\n### could not open README.rst ###\n")
-    with open(here + "/README.md", "rb") as f:
-        txt = f.read().decode("utf-8")
-        LONG_DESCRIPTION = txt
-        LDCT = "text/markdown"
+with open(here + "/README.md", "rb") as f:
+    txt = f.read().decode("utf-8")
+    long_description = txt
 
 
 about = {}
@@ -99,11 +81,10 @@ class clean2(Command):
         for (dirpath, dirnames, filenames) in os.walk("."):
             for fn in filenames:
                 if (
-                    fn.endswith(".rst")
+                    fn.startswith("MANIFEST")
                     or fn.endswith(".pyc")
                     or fn.endswith(".pyo")
                     or fn.endswith(".pyd")
-                    or fn.startswith("MANIFEST")
                 ):
                     nuke.append(dirpath + "/" + fn)
 
@@ -111,58 +92,19 @@ class clean2(Command):
             os.unlink(fn)
 
 
-class rstconv(Command):
-    description = "Converts markdown to rst"
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        self.proc_dir(".")
-        self.proc_dir("docs")
-
-    def proc_dir(self, path):
-        import m2r
-
-        for (dirpath, dirnames, filenames) in os.walk(path):
-
-            dirnames.sort()
-            for fn in sorted(filenames):
-
-                fn = dirpath + "/" + fn
-                if not fn.endswith(".md"):
-                    continue
-
-                rst_fn = fn[:-3] + ".rst"
-                with open(fn, "rb") as f:
-                    md = f.read().decode("utf-8")
-
-                md = md.replace("* **[", "* [").replace(")** <-", ") <-")
-                rst = m2r.convert(md)
-                rst = rst.replace(":raw-html-m2r:`<del>", ":sub:`")
-                rst = rst.replace("</del>`", "`")
-
-                with open(rst_fn, "wb") as f:
-                    f.write(rst.encode("utf-8"))
-
-
 args = {
     "name": NAME,
     "version": about["__version__"],
     "description": "http file sharing hub",
-    "long_description": LONG_DESCRIPTION,
-    "long_description_content_type": LDCT,
+    "long_description": long_description,
+    "long_description_content_type": "text/markdown",
     "author": "ed",
     "author_email": "copyparty@ocv.me",
     "url": "https://github.com/9001/copyparty",
     "license": "MIT",
     "data_files": data_files,
     "classifiers": [
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
@@ -174,29 +116,39 @@ args = {
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Environment :: Console",
-        "Topic :: Communications :: Chat",
+        "Environment :: No Input/Output (Daemon)",
+        "Topic :: Communications :: File Sharing",
     ],
-    "cmdclass": {"rstconv": rstconv, "clean2": clean2},
+    "cmdclass": {"clean2": clean2},
 }
 
 
 if setuptools_available:
     args.update(
         {
-            "packages": ["copyparty"],
+            "packages": find_packages(),
             "install_requires": ["jinja2"],
             "extras_require": {"thumbnails": ["Pillow"]},
             "include_package_data": True,
             "entry_points": {
                 "console_scripts": ["copyparty = copyparty.__main__:main"]
             },
+            "scripts": [
+                "bin/copyparty-fuse.py"
+            ]
         }
     )
 else:
-    args.update({"packages": ["copyparty"], "scripts": ["bin/copyparty"]})
+    args.update(
+        {
+            "packages": ["copyparty", "copyparty.stolen"],
+            "scripts": ["bin/copyparty", "bin/copyparty-fuse.py"]
+        }
+    )
 
 
 # import pprint

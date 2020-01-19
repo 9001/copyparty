@@ -17,8 +17,13 @@ import threading
 import http.client  # py2: httplib
 import urllib.parse
 from datetime import datetime
-from fuse import FUSE, FuseOSError, Operations
 from urllib.parse import quote_from_bytes as quote
+
+try:
+    from fuse import FUSE, FuseOSError, Operations
+except:
+    print("\n    could not import fuse;\n    pip install fusepy\n")
+    raise
 
 
 """

@@ -13,15 +13,15 @@ which md5sum 2>/dev/null >/dev/null &&
 
 mode="$1"
 
-[[ "x$mode" == x ]] &&
+[ -z "$mode" ] &&
 {
-	echo "need argument 1:  (D)ry or (U)pload"
+	echo "need argument 1:  (D)ry, (T)est, (U)pload"
 	echo
 	exit 1
 }
 
-[[ -e copyparty/__main__.py ]] || cd ..
-[[ -e copyparty/__main__.py ]] ||
+[ -e copyparty/__main__.py ] || cd ..
+[ -e copyparty/__main__.py ] ||
 {
 	echo "run me from within the copyparty folder"
 	echo
@@ -39,13 +39,14 @@ index-servers =
   pypitest
 
 [pypi]
-username=qwer
-password=asdf
+repository: https://upload.pypi.org/legacy/
+username: qwer
+password: asdf
 
 [pypitest]
 repository: https://test.pypi.org/legacy/
-username=qwer
-password=asdf
+username: qwer
+password: asdf
 EOF
 
 	# set pypi password
@@ -54,15 +55,11 @@ EOF
 
 	# if PY2: create build env
 	cd ~/dev/copyparty && virtualenv buildenv
-	(. buildenv/bin/activate && pip install m2r)
+	(. buildenv/bin/activate && pip install twine)
 
 	# if PY3: create build env
 	cd ~/dev/copyparty && python3 -m venv buildenv
-	(. buildenv/bin/activate && pip install m2r wheel)
-	
-	# test rst
-	pip install docutils
-	./setup.py --long-description | tee ~/Desktop/rst | rst2html.py > ~/Desktop/rst.html
+	(. buildenv/bin/activate && pip install twine wheel)
 }
 
 
@@ -72,7 +69,7 @@ pydir="$(
 	sed -r 's@[^/]*$@@'
 )"
 
-[[ -e "$pydir/activate" ]] &&
+[ -e "$pydir/activate" ] &&
 {
 	echo '`deactivate` your virtualenv'
 	exit 1
@@ -85,12 +82,12 @@ function have() {
 . buildenv/bin/activate
 have setuptools
 have wheel
-have m2r
+have twine
 ./setup.py clean2
-./setup.py rstconv
 ./setup.py sdist bdist_wheel --universal
-[[ "x$mode" == "xu" ]] &&
-	./setup.py sdist bdist_wheel upload -r pypi
+
+[ "$mode" == t ] && twine upload -r pypitest dist/*
+[ "$mode" == u ] && twine upload -r pypi dist/*
 
 cat <<EOF
 
