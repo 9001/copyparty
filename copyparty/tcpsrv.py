@@ -22,10 +22,9 @@ class TcpSrv(object):
         self.num_clients = Counter()
 
         ip = "127.0.0.1"
-        if self.args.i == ip:
-            eps = {ip: "local only"}
-        else:
-            eps = self.detect_interfaces(self.args.i)
+        eps = {ip: "local only"}
+        if self.args.i != ip:
+            eps = self.detect_interfaces(self.args.i) or eps
 
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             self.log(
@@ -97,8 +96,10 @@ class TcpSrv(object):
             s.connect(("10.255.255.255", 1))
             ip = s.getsockname()[0]
         except (OSError, socket.error) as ex:
-            if ex.errno != 101:
+            if ex.errno not in [101, 10065]:
                 raise
+
+            return None
 
         s.close()
 

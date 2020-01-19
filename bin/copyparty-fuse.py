@@ -54,7 +54,7 @@ def boring_log(msg):
 
 def rice_tid():
     tid = threading.current_thread().ident
-    c = struct.unpack("B" * 5, struct.pack(">Q", tid)[-5:])
+    c = struct.unpack(b"B" * 5, struct.pack(b">Q", tid)[-5:])
     return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c)
 
 

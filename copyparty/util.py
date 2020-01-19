@@ -15,11 +15,14 @@ from .stolen import surrogateescape
 
 FAKE_MP = False
 
-if FAKE_MP:
-    import multiprocessing.dummy as mp  # noqa: F401
-else:
-    import multiprocessing as mp  # noqa: F401
-
+try:
+    if FAKE_MP:
+        import multiprocessing.dummy as mp  # noqa: F401
+    else:
+        import multiprocessing as mp  # noqa: F401
+except ImportError:
+    # support jython
+    mp = None
 
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
@@ -473,7 +476,7 @@ def chkcmd(*argv):
 def gzip_orig_sz(fn):
     with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)
-        return struct.unpack("I", f.read(4))[0]
+        return struct.unpack(b"I", f.read(4))[0]
 
 
 def py_desc():
@@ -482,7 +485,7 @@ def py_desc():
     if ofs > 0:
         py_ver = py_ver[:ofs]
 
-    bitness = struct.calcsize("P") * 8
+    bitness = struct.calcsize(b"P") * 8
     host_os = platform.system()
 
     return "{0} on {1}{2}".format(py_ver, host_os, bitness)
