@@ -9,13 +9,15 @@ import json
 from datetime import datetime
 import calendar
 import mimetypes
-import cgi
 
 from .__init__ import E, PY2
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 
 if not PY2:
     unicode = str
+    from html import escape as html_escape
+else:
+    from cgi import escape as html_escape
 
 
 class HttpCli(object):
@@ -192,11 +194,8 @@ class HttpCli(object):
             self.vpath = None
             return self.tx_mounts()
 
-        if self.readable:
-            return self.tx_browser()
-        else:
-            return self.tx_upper()
-
+        return self.tx_browser()
+        
     def handle_post(self):
         self.log("POST " + self.req)
 
@@ -445,7 +444,7 @@ class HttpCli(object):
 
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}">return to /{}</a>'.format(
-                quotep(self.vpath), cgi.escape(self.vpath, quote=True)
+                quotep(self.vpath), html_escape(self.vpath, quote=False)
             ),
             pre=msg,
         )
@@ -609,12 +608,6 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"))
         return True
 
-    def tx_upper(self):
-        # return html for basic uploader;
-        # js rewrites to up2k unless uparam['b']
-        self.loud_reply("TODO jupper {}".format(self.vpath))
-        return True
-
     def tx_browser(self):
         vpath = ""
         vpnodes = [["", "/"]]
@@ -625,9 +618,9 @@ class HttpCli(object):
                 else:
                     vpath += "/" + node
 
-                vpnodes.append([quotep(vpath) + "/", cgi.escape(node)])
+                vpnodes.append([quotep(vpath) + "/", html_escape(node, quote=False)])
 
-        vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
+        vn, rem = self.auth.vfs.get(self.vpath, self.uname, self.readable, self.writable)
         abspath = vn.canonical(rem)
 
         if not os.path.exists(fsenc(abspath)):
@@ -665,7 +658,7 @@ class HttpCli(object):
             dt = datetime.utcfromtimestamp(inf.st_mtime)
             dt = dt.strftime("%Y-%m-%d %H:%M:%S")
 
-            item = [margin, quotep(href), cgi.escape(fn, quote=True), sz, dt]
+            item = [margin, quotep(href), html_escape(fn, quote=False), sz, dt]
             if is_dir:
                 dirs.append(item)
             else:
@@ -687,6 +680,7 @@ class HttpCli(object):
             vpnodes=vpnodes,
             files=dirs,
             can_upload=self.writable,
+            can_read=self.readable,
             ts=ts,
             prologue=logues[0],
             epilogue=logues[1],

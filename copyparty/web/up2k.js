@@ -105,8 +105,10 @@ function up2k_init(have_crypto) {
         shame = 'your browser is impressively ancient';
 
     // upload ui hidden by default, clicking the header shows it
-    o('u2tgl').onclick = function (e) {
-        e.preventDefault();
+    function toggle_upload_visible(ev) {
+        if (ev)
+            ev.preventDefault();
+        
         o('u2tgl').style.display = 'none';
         o('u2body').style.display = 'block';
 
@@ -120,6 +122,11 @@ function up2k_init(have_crypto) {
                 o('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
         }
     };
+    o('u2tgl').onclick = toggle_upload_visible;
+    
+    // show uploader if the user only has write-access
+    if (!o('files'))
+        toggle_upload_visible();
 
     // shows or clears an error message in the basic uploader ui
     function setmsg(msg) {
@@ -601,8 +608,7 @@ function up2k_init(have_crypto) {
             }
 
             t.t2 = new Date().getTime();
-            if (t.n == 0) {
-                // TODO remove
+            if (t.n == 0 && window.location.hash == '#dbg') {
                 var spd = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                 alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
             }

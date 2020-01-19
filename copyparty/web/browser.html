@@ -13,16 +13,17 @@
 </head>
 
 <body>
-    {%- if can_upload %}
-    {%- include 'upload.html' %}
-    {%- endif %}
-    
     <h1 id="path">
         {%- for n in vpnodes %}
         <a href="/{{ n[0] }}">{{ n[1] }}</a>
         {%- endfor %}
     </h1>
     
+    {%- if can_upload %}
+    {%- include 'upload.html' %}
+    {%- endif %}
+    
+    {%- if can_read %}
     {%- if prologue %}
     <div id="pro" class="logue">{{ prologue }}</div>
     {%- endif %}
@@ -48,6 +49,7 @@
     {%- if epilogue %}
     <div id="epi" class="logue">{{ epilogue }}</div>
     {%- endif %}
+    {%- endif %}
 
     <h2><a href="?h">control-panel</a></h2>
 
@@ -60,7 +62,11 @@
             <canvas id="barbuf"></canvas>
         </div>
     </div>
+    
+    {%- if can_read %}
     <script src="/.cpr/browser.js{{ ts }}"></script>
+    {%- endif %}
+    
     {%- if can_upload %}
     <script src="/.cpr/up2k.js{{ ts }}"></script>
     {%- endif %}

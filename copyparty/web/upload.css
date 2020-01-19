@@ -1,7 +1,8 @@
 #bup {
 	padding: .5em .5em .5em .3em;
+	margin: 1em 0 2em 0;
 	background: #2d2d2d;
-	border-radius: 0 0 1em 0;
+	border-radius: 0 1em 1em 0;
 	border: 1px solid #3a3a3a;
 	border-width: 0 .3em .3em 0;
 	box-shadow: 0 0 1em #222 inset;
@@ -12,7 +13,7 @@
 }
 #up2k {
 	display: none;
-	padding: 1.5em 1em 0 1em;
+	padding: 0 1em;
 }
 #u2form {
 	position: absolute;
@@ -31,6 +32,8 @@
 #u2tgl {
 	color: #fc5;
 	font-size: 1.5em;
+	margin: .5em 0 1em 0;
+	display: block;
 }
 #u2body {
 	display: none;

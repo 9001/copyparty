@@ -36,11 +36,12 @@ body {
 	padding: .35em .5em .2em .5em;
 	border-radius: 0 .3em .3em 0;
 	box-shadow: .1em .1em .4em #222;
-	margin: 1em 0;
+	margin: 2em 0 1em 0;
 	font-size: 1.4em;
 }
 #files {
 	border-collapse: collapse;
+	margin-top: 1em;
 }
 #files tbody a {
 	display: block;
