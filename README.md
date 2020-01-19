@@ -1,6 +1,6 @@
 # ⇆🎉 copyparty
 
-* http file sharing hub (py2/py3)
+* http file sharing hub (py2/py3) [(on PyPI)](https://pypi.org/project/copyparty/)
 * MIT-Licensed, 2019-05-26, ed @ irc.rizon.net
 
 
