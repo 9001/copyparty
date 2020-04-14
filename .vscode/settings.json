@@ -55,6 +55,6 @@
     //
     //  things you may wanna edit:
     //
-    "python.pythonPath": ".env/bin/python",
+    "python.pythonPath": ".venv/bin/python",
     //"python.linting.enabled": true,
 }

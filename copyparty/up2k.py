@@ -9,8 +9,10 @@ import math
 import base64
 import hashlib
 import threading
+from queue import Queue
 from copy import deepcopy
 
+from .__init__ import WINDOWS
 from .util import Pebkac
 
 
@@ -35,6 +37,13 @@ class Up2k(object):
         self.registry = {}
         self.mutex = threading.Lock()
 
+        if WINDOWS:
+            # usually fails to set lastmod too quickly
+            self.lastmod_q = Queue()
+            thr = threading.Thread(target=self._lastmodder)
+            thr.daemon = True
+            thr.start()
+
         # static
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
 
@@ -56,6 +65,7 @@ class Up2k(object):
                     # client-provided, sanitized by _get_wark:
                     "name": cj["name"],
                     "size": cj["size"],
+                    "lmod": cj["lmod"],
                     "hash": deepcopy(cj["hash"]),
                 }
 
@@ -74,6 +84,7 @@ class Up2k(object):
             return {
                 "name": job["name"],
                 "size": job["size"],
+                "lmod": job["lmod"],
                 "hash": job["need"],
                 "wark": wark,
             }
@@ -96,11 +107,19 @@ class Up2k(object):
 
         path = os.path.join(job["vdir"], job["name"])
 
-        return [chunksize, ofs, path]
+        return [chunksize, ofs, path, job["lmod"]]
 
     def confirm_chunk(self, wark, chash):
         with self.mutex:
-            self.registry[wark]["need"].remove(chash)
+            job = self.registry[wark]
+            job["need"].remove(chash)
+            ret = len(job["need"])
+
+            if WINDOWS and ret == 0:
+                path = os.path.join(job["vdir"], job["name"])
+                self.lastmod_q.put([path, (int(time.time()), int(job["lmod"]))])
+
+            return ret
 
     def _get_chunksize(self, filesize):
         chunksize = 1024 * 1024
@@ -115,7 +134,7 @@ class Up2k(object):
                 stepsize *= mul
 
     def _get_wark(self, cj):
-        if len(cj["name"]) > 1024 or len(cj["hash"]) > 256:
+        if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
             raise Pebkac(400, "name or numchunks not according to spec")
 
         for k in cj["hash"]:
@@ -123,6 +142,12 @@ class Up2k(object):
                 raise Pebkac(
                     400, "at least one hash is not according to spec: {}".format(k)
                 )
+
+        # try to use client-provided timestamp, don't care if it fails somehow
+        try:
+            cj["lmod"] = int(cj["lmod"])
+        except:
+            cj["lmod"] = int(time.time())
 
         # server-reproducible file identifier, independent of name or location
         ident = [self.salt, str(cj["size"])]
@@ -143,3 +168,16 @@ class Up2k(object):
             f.seek(job["size"] - 1)
             f.write(b"e")
 
+    def _lastmodder(self):
+        while True:
+            ready = []
+            while not self.lastmod_q.empty():
+                ready.append(self.lastmod_q.get())
+
+            # self.log("lmod", "got {}".format(len(ready)))
+            time.sleep(5)
+            for path, times in ready:
+                try:
+                    os.utime(path, times)
+                except:
+                    self.log("lmod", "failed to utime ({}, {})".format(path, times))

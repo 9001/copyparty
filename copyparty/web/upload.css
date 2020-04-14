@@ -1,19 +1,97 @@
-#bup {
-	padding: .5em .5em .5em .3em;
-	margin: 1em 0 2em 0;
-	background: #2d2d2d;
-	border-radius: 0 1em 1em 0;
+.opview {
+	display: none;
+}
+.opview.act {
+	display: block;
+}
+#ops a {
+	color: #fc5;
+	font-size: 1.5em;
+	padding: 0 .3em;
+	margin: 0;
+	outline: none;
+}
+#ops a.act {
+	text-decoration: underline;
+}
+/*
+#ops a+a:after,
+#ops a:first-child:after {
+	content: 'x';
+	color: #282828;
+	text-shadow: 0 0 .08em #01a7e1;
+	margin-left: .3em;
+	position: relative;
+}
+#ops a+a:before {
+	content: 'x';
+	color: #282828;
+	text-shadow: 0 0 .08em #ff3f1a;
+	margin-right: .3em;
+	margin-left: -.3em;
+}
+#ops a:last-child:after {
+	content: '';
+}
+#ops a.act:before,
+#ops a.act:after {
+	text-decoration: none !important;
+}
+*/
+#ops i {
+	font-size: 1.5em;
+}
+#ops i:before {
+	content: 'x';
+	color: #282828;
+	text-shadow: 0 0 .08em #01a7e1;
+	position: relative;
+}
+#ops i:after {
+	content: 'x';
+	color: #282828;
+	text-shadow: 0 0 .08em #ff3f1a;
+	margin-left: -.35em;
+	font-size: 1.05em;
+}
+#ops,
+#op_bup,
+#op_mkdir {
 	border: 1px solid #3a3a3a;
-	border-width: 0 .3em .3em 0;
 	box-shadow: 0 0 1em #222 inset;
+}
+#ops {
+	display: inline-block;
+	background: #333;
+	margin: 1em 1.5em;
+	padding: .3em .6em;
+	border-radius: .3em;
+	border-width: .15em 0;
+}
+#op_bup,
+#op_mkdir {
+	background: #2d2d2d;
+	margin: 1em 0 2em 0;
+	padding: .5em;
+	border-radius: 0 1em 1em 0;
+	border-width: .15em .3em .3em 0;
 	max-width: 40em;
 }
-#bup input {
+#op_mkdir input,
+#op_bup input {
 	margin: .5em;
 }
-#up2k {
-	display: none;
-	padding: 0 1em;
+#op_mkdir input[type=text] {
+	color: #fff;
+	background: #383838;
+	border: none;
+	box-shadow: 0 0 .3em #222;
+	border-bottom: 1px solid #fc5;
+	border-radius: .2em;
+	padding: .2em .3em;
+}
+#op_up2k {
+	padding: 0 1em 1em 1em;
 }
 #u2form {
 	position: absolute;
@@ -28,16 +106,6 @@
 #u2err.err {
 	color: #f87;
 	padding: .5em;
-}
-#u2tgl {
-	color: #fc5;
-	font-size: 1.5em;
-	margin: .5em 0 1em 0;
-	display: block;
-}
-#u2body {
-	display: none;
-	padding-bottom: 1em;
 }
 #u2form {
 	width: 2px;

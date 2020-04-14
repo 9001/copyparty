@@ -85,16 +85,7 @@ class SvcHub(object):
                 self.next_day = calendar.timegm(dt.utctimetuple())
 
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
-
-            if not WINDOWS:
-                fmt = "\033[36m{} \033[33m{:21} \033[0m{}"
-            else:
-                fmt = "{} {:21} {}"
-                if "\033" in msg:
-                    msg = self.ansi_re.sub("", msg)
-                if "\033" in src:
-                    src = self.ansi_re.sub("", src)
-
+            fmt = "\033[36m{} \033[33m{:21} \033[0m{}"
             msg = fmt.format(ts, src, msg)
             try:
                 print(msg)

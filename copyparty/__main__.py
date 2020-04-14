@@ -28,8 +28,6 @@ class RiceFormatter(argparse.HelpFormatter):
         except the help += [...] line now has colors
         """
         fmt = "\033[36m (default: \033[35m%(default)s\033[36m)\033[0m"
-        if WINDOWS:
-            fmt = " (default: %(default)s)"
 
         help = action.help
         if "%(default)" not in action.help:
@@ -85,6 +83,9 @@ def ensure_cert():
 
 
 def main():
+    if WINDOWS:
+        os.system("")  # enables colors
+
     f = "\033[36mcopyparty v{} ({})\n   python v{}\033[0m\n"
     print(f.format(S_VERSION, S_BUILD_DT, py_desc()))
 

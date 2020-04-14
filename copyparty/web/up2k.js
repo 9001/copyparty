@@ -58,20 +58,59 @@ function o(id) {
 
 
 (function () {
-    // chrome requires https to use crypto.subtle,
-    // usually it's undefined but some chromes throw on invoke
-    try {
-        crypto.subtle.digest(
-            'SHA-512', new Uint8Array(1)
-        ).then(
-            function (x) { up2k_init(true) },
-            function (x) { up2k_init(false) }
-        );
-    }
-    catch (ex) {
-        up2k_init(false);
+    var ops = document.querySelectorAll('#ops>a');
+    for (var a = 0; a < ops.length; a++) {
+        ops[a].onclick = opclick;
     }
 })();
+
+
+function opclick(ev) {
+    ev.preventDefault();
+    goto(this.getAttribute('data-dest'));
+}
+
+
+function goto(dest) {
+    var obj = document.querySelectorAll('.opview.act');
+    for (var a = obj.length - 1; a >= 0; a--)
+        obj[a].setAttribute('class', 'opview');
+
+    var obj = document.querySelectorAll('#ops>a');
+    for (var a = obj.length - 1; a >= 0; a--)
+        obj[a].setAttribute('class', '');
+
+    document.querySelector('#ops>a[data-dest=' + dest + ']').setAttribute('class', 'act');
+    document.getElementById('op_' + dest).setAttribute('class', 'opview act');
+
+    var fn = window['goto_' + dest];
+    if (fn)
+        fn();
+}
+
+
+function goto_up2k() {
+    if (!up2k)
+        return setTimeout(goto_up2k, 100);
+
+    up2k.init_deps();
+}
+
+
+// chrome requires https to use crypto.subtle,
+// usually it's undefined but some chromes throw on invoke
+var up2k = null;
+try {
+    crypto.subtle.digest(
+        'SHA-512', new Uint8Array(1)
+    ).then(
+        function (x) { up2k = up2k_init(true) },
+        function (x) { up2k = up2k_init(false) }
+    );
+}
+catch (ex) {
+    up2k = up2k_init(false);
+}
 
 
 function up2k_init(have_crypto) {
@@ -94,7 +133,7 @@ function up2k_init(have_crypto) {
         o('u2notbtn').innerHTML = '';
     }
 
-    var post_url = o('bup').getElementsByTagName('form')[0].getAttribute('action');
+    var post_url = o('op_bup').getElementsByTagName('form')[0].getAttribute('action');
     if (post_url && post_url.charAt(post_url.length - 1) !== '/')
         post_url += '/';
 
@@ -105,13 +144,7 @@ function up2k_init(have_crypto) {
         shame = 'your browser is impressively ancient';
 
     // upload ui hidden by default, clicking the header shows it
-    function toggle_upload_visible(ev) {
-        if (ev)
-            ev.preventDefault();
-        
-        o('u2tgl').style.display = 'none';
-        o('u2body').style.display = 'block';
-
+    function init_deps() {
         if (!have_crypto && !window.asmCrypto) {
             showmodal('<h1>loading sha512.js</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
             import_js('/.cpr/deps/sha512.js', unmodal);
@@ -122,11 +155,10 @@ function up2k_init(have_crypto) {
                 o('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
         }
     };
-    o('u2tgl').onclick = toggle_upload_visible;
-    
+
     // show uploader if the user only has write-access
     if (!o('files'))
-        toggle_upload_visible();
+        goto('up2k');
 
     // shows or clears an error message in the basic uploader ui
     function setmsg(msg) {
@@ -142,8 +174,7 @@ function up2k_init(have_crypto) {
 
     // switches to the basic uploader with msg as error message
     function un2k(msg) {
-        o('up2k').style.display = 'none';
-        o('bup').style.display = 'block';
+        goto('bup');
         setmsg(msg);
     }
 
@@ -218,10 +249,6 @@ function up2k_init(have_crypto) {
     if (!bobslice || !window.FileReader || !window.FileList)
         return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
 
-    // probably safe now
-    o('up2k').style.display = 'block';
-    o('bup').style.display = 'none';
-
     function nav() {
         o('file' + fdom_ctr).click();
     }
@@ -272,12 +299,15 @@ function up2k_init(have_crypto) {
                 bad_files.push([a, fobj.name]);
                 continue;
             }
+            var now = new Date().getTime();
+            var lmod = fobj.lastModified || now;
             var entry = {
                 "n": parseInt(st.files.length.toString()),
-                "t0": new Date().getTime(),  // TODO remove probably
+                "t0": now,  // TODO remove probably
                 "fobj": fobj,
                 "name": fobj.name,
                 "size": fobj.size,
+                "lmod": lmod / 1000,
                 "hash": []
             };
 
@@ -689,6 +719,7 @@ function up2k_init(have_crypto) {
         xhr.send(JSON.stringify({
             "name": t.name,
             "size": t.size,
+            "lmod": t.lmod,
             "hash": t.hash
         }));
     }
@@ -838,4 +869,6 @@ function up2k_init(have_crypto) {
         nodes[a].addEventListener('touchend', nop, false);
 
     bumpthread({ "target": 1 })
+
+    return { "init_deps": init_deps }
 }

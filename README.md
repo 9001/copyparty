@@ -61,8 +61,8 @@ after the initial setup (and restarting bash), you can launch copyparty at any t
 # dev env setup
 
 ```sh
-python3 -m venv .env
-. .env/bin/activate
+python3 -m venv .venv
+. .venv/bin/activate
 pip install jinja2  # mandatory deps
 pip install Pillow  # thumbnail deps
 pip install black bandit pylint flake8  # vscode tooling

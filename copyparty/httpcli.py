@@ -10,7 +10,7 @@ from datetime import datetime
 import calendar
 import mimetypes
 
-from .__init__ import E, PY2
+from .__init__ import E, PY2, WINDOWS
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 
 if not PY2:
@@ -195,7 +195,7 @@ class HttpCli(object):
             return self.tx_mounts()
 
         return self.tx_browser()
-        
+
     def handle_post(self):
         self.log("POST " + self.req)
 
@@ -224,11 +224,14 @@ class HttpCli(object):
 
         act = self.parser.require("act", 64)
 
-        if act == "bput":
-            return self.handle_plain_upload()
-
         if act == "login":
             return self.handle_login()
+
+        if act == "mkdir":
+            return self.handle_mkdir()
+
+        if act == "bput":
+            return self.handle_plain_upload()
 
         raise Pebkac(422, 'invalid action "{}"'.format(act))
 
@@ -292,7 +295,7 @@ class HttpCli(object):
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", wark, chash)
         response = x.get()
-        chunksize, cstart, path = response
+        chunksize, cstart, path, lastmod = response
 
         if self.args.nw:
             path = os.devnull
@@ -336,7 +339,15 @@ class HttpCli(object):
                 self.log("clone {} done".format(cstart[0]))
 
         x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", wark, chash)
-        response = x.get()
+        num_left = x.get()
+
+        if not WINDOWS and num_left == 0:
+            times = (int(time.time()), int(lastmod))
+            self.log("no more chunks, setting times {}".format(times))
+            try:
+                os.utime(path, times)
+            except:
+                self.log("failed to utime ({}, {})".format(path, times))
 
         self.loud_reply("thank")
         return True
@@ -354,6 +365,36 @@ class HttpCli(object):
         h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
         html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
         self.reply(html.encode("utf-8"), headers=h)
+        return True
+
+    def handle_mkdir(self):
+        new_dir = self.parser.require("name", 512)
+        self.parser.drop()
+
+        nullwrite = self.args.nw
+        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+
+        # rem is escaped at this point,
+        # this is just a sanity check to prevent any disasters
+        if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
+            raise Exception("that was close")
+
+        if not nullwrite:
+            fdir = os.path.join(vfs.realpath, rem)
+            fn = os.path.join(fdir, sanitize_fn(new_dir))
+
+            if not os.path.isdir(fsenc(fdir)):
+                raise Pebkac(404, "that folder does not exist")
+
+            os.mkdir(fsenc(fn))
+
+        html = self.conn.tpl_msg.render(
+            h2='<a href="/{}">return to /{}</a>'.format(
+                quotep(self.vpath), html_escape(self.vpath, quote=False)
+            ),
+            pre="aight",
+        )
+        self.reply(html.encode("utf-8", "replace"))
         return True
 
     def handle_plain_upload(self):
@@ -620,7 +661,9 @@ class HttpCli(object):
 
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, quote=False)])
 
-        vn, rem = self.auth.vfs.get(self.vpath, self.uname, self.readable, self.writable)
+        vn, rem = self.auth.vfs.get(
+            self.vpath, self.uname, self.readable, self.writable
+        )
         abspath = vn.canonical(rem)
 
         if not os.path.exists(fsenc(abspath)):
@@ -684,7 +727,7 @@ class HttpCli(object):
             ts=ts,
             prologue=logues[0],
             epilogue=logues[1],
+            title=quotep(self.vpath),
         )
         self.reply(html.encode("utf-8", "replace"))
         return True
-

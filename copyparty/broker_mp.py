@@ -141,8 +141,6 @@ class BrokerMp(object):
 
     def debug_load_balancer(self):
         fmt = "\033[1m{}\033[0;36m{:4}\033[0m "
-        if WINDOWS:
-            fmt = "({}{:4})"
 
         last = ""
         while self.procs:

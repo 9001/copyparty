@@ -1,4 +1,9 @@
-    <div id="bup">
+    <div id="ops"><a
+        href="#" data-dest="up2k">up2k</a><i></i><a
+        href="#" data-dest="bup">bup</a><i></i><a
+        href="#" data-dest="mkdir">mkdir</a></div>
+
+    <div id="op_bup" class="opview">
         <div id="u2err"></div>
         <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
             <input type="hidden" name="act" value="bput" />
@@ -7,10 +12,16 @@
         </form>
     </div>
 
-    <div id="up2k">
-        <a href="#" id="u2tgl">you can upload here</a>
-        <form id="u2form" method="POST" enctype="multipart/form-data" onsubmit="return false;"></form>
-        <div id="u2body">
+    <div id="op_mkdir" class="opview">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
+            <input type="hidden" name="act" value="mkdir" />
+            <input type="text" name="name" size="30">
+            <input type="submit" value="mkdir">
+        </form>
+    </div>
+
+    <div id="op_up2k" class="opview">
+        <form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>
 
             <table id="u2conf">
                 <tr>
@@ -45,6 +56,5 @@
             </table>
 
             <p id="u2foot"></p>
-            <p>( if you don't need resumable uploads and progress bars just use the <a href="#" id="u2nope" onclick="javascript:un2k();">basic uploader</a>)</p>
-        </div>
+            <p>( if you don't need resumable uploads and progress bars just use the <a href="#" id="u2nope" onclick="javascript:goto('bup');">basic uploader</a>)</p>
     </div>
