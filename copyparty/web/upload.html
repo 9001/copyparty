@@ -1,9 +1,10 @@
     <div id="ops"><a
+        href="#" data-dest="">---</a><i></i><a
         href="#" data-dest="up2k">up2k</a><i></i><a
         href="#" data-dest="bup">bup</a><i></i><a
         href="#" data-dest="mkdir">mkdir</a></div>
 
-    <div id="op_bup" class="opview">
+    <div id="op_bup" class="opview act">
         <div id="u2err"></div>
         <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
             <input type="hidden" name="act" value="bput" />
@@ -12,7 +13,7 @@
         </form>
     </div>
 
-    <div id="op_mkdir" class="opview">
+    <div id="op_mkdir" class="opview act">
         <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
             <input type="hidden" name="act" value="mkdir" />
             <input type="text" name="name" size="30">

@@ -61,9 +61,8 @@
 	box-shadow: 0 0 1em #222 inset;
 }
 #ops {
-	display: inline-block;
 	background: #333;
-	margin: 1em 1.5em;
+	margin: 1.7em 1.5em 0 1.5em;
 	padding: .3em .6em;
 	border-radius: .3em;
 	border-width: .15em 0;
@@ -71,7 +70,7 @@
 #op_bup,
 #op_mkdir {
 	background: #2d2d2d;
-	margin: 1em 0 2em 0;
+	margin: 1.5em 0 0 0;
 	padding: .5em;
 	border-radius: 0 1em 1em 0;
 	border-width: .15em .3em .3em 0;

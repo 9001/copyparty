@@ -67,7 +67,13 @@ function o(id) {
 
 function opclick(ev) {
     ev.preventDefault();
-    goto(this.getAttribute('data-dest'));
+    var dest = this.getAttribute('data-dest');
+    goto(dest);
+
+    try {
+        localStorage.opmode = dest;
+    }
+    catch { }
 }
 
 
@@ -80,12 +86,14 @@ function goto(dest) {
     for (var a = obj.length - 1; a >= 0; a--)
         obj[a].setAttribute('class', '');
 
-    document.querySelector('#ops>a[data-dest=' + dest + ']').setAttribute('class', 'act');
-    document.getElementById('op_' + dest).setAttribute('class', 'opview act');
+    if (dest) {
+        document.querySelector('#ops>a[data-dest=' + dest + ']').setAttribute('class', 'act');
+        document.getElementById('op_' + dest).setAttribute('class', 'opview act');
 
-    var fn = window['goto_' + dest];
-    if (fn)
-        fn();
+        var fn = window['goto_' + dest];
+        if (fn)
+            fn();
+    }
 }
 
 
@@ -95,6 +103,14 @@ function goto_up2k() {
 
     up2k.init_deps();
 }
+
+
+goto();
+try {
+    var op = localStorage.opmode;
+    goto(op);
+}
+catch { }
 
 
 // chrome requires https to use crypto.subtle,
