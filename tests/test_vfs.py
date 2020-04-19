@@ -64,6 +64,9 @@ class TestVFS(unittest.TestCase):
 
         raise Exception("TODO support windows")
 
+    def log(self, src, msg):
+        pass
+
     def test(self):
         td = self.get_ramdisk() + "/vfs"
         try:
@@ -85,7 +88,7 @@ class TestVFS(unittest.TestCase):
                             f.write(fn)
 
         # defaults
-        vfs = AuthSrv(Namespace(c=None, a=[], v=[]), None).vfs
+        vfs = AuthSrv(Namespace(c=None, a=[], v=[]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td)
@@ -93,7 +96,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(vfs.uwrite, ["*"])
 
         # single read-only rootfs (relative path)
-        vfs = AuthSrv(Namespace(c=None, a=[], v=["a/ab/::r"]), None).vfs
+        vfs = AuthSrv(Namespace(c=None, a=[], v=["a/ab/::r"]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td + "/a/ab")
@@ -101,7 +104,9 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(vfs.uwrite, [])
 
         # single read-only rootfs (absolute path)
-        vfs = AuthSrv(Namespace(c=None, a=[], v=[td + "//a/ac/../aa//::r"]), None).vfs
+        vfs = AuthSrv(
+            Namespace(c=None, a=[], v=[td + "//a/ac/../aa//::r"]), self.log
+        ).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td + "/a/aa")
@@ -110,7 +115,8 @@ class TestVFS(unittest.TestCase):
 
         # read-only rootfs with write-only subdirectory (read-write for k)
         vfs = AuthSrv(
-            Namespace(c=None, a=["k:k"], v=[".::r:ak", "a/ac/acb:a/ac/acb:w:ak"]), None
+            Namespace(c=None, a=["k:k"], v=[".::r:ak", "a/ac/acb:a/ac/acb:w:ak"]),
+            self.log,
         ).vfs
         self.assertEqual(len(vfs.nodes), 1)
         self.assertEqual(vfs.vpath, "")
@@ -139,34 +145,34 @@ class TestVFS(unittest.TestCase):
         fsdir, real, virt = self.ls(vfs, "/", "*")
         self.assertEqual(fsdir, td)
         self.assertEqual(real, ["b", "c"])
-        self.assertEqual(virt, ["a"])
+        self.assertEqual(list(virt), ["a"])
 
         fsdir, real, virt = self.ls(vfs, "a", "*")
         self.assertEqual(fsdir, td + "/a")
         self.assertEqual(real, ["aa", "ab"])
-        self.assertEqual(virt, ["ac"])
+        self.assertEqual(list(virt), ["ac"])
 
         fsdir, real, virt = self.ls(vfs, "a/ab", "*")
         self.assertEqual(fsdir, td + "/a/ab")
         self.assertEqual(real, ["aba", "abb", "abc"])
-        self.assertEqual(virt, [])
+        self.assertEqual(list(virt), [])
 
         fsdir, real, virt = self.ls(vfs, "a/ac", "*")
         self.assertEqual(fsdir, td + "/a/ac")
         self.assertEqual(real, ["aca", "acc"])
-        self.assertEqual(virt, [])
+        self.assertEqual(list(virt), [])
 
         fsdir, real, virt = self.ls(vfs, "a/ac", "k")
         self.assertEqual(fsdir, td + "/a/ac")
         self.assertEqual(real, ["aca", "acc"])
-        self.assertEqual(virt, ["acb"])
+        self.assertEqual(list(virt), ["acb"])
 
         self.assertRaises(util.Pebkac, vfs.get, "a/ac/acb", "*", True, False)
 
         fsdir, real, virt = self.ls(vfs, "a/ac/acb", "k")
         self.assertEqual(fsdir, td + "/a/ac/acb")
         self.assertEqual(real, ["acba", "acbb", "acbc"])
-        self.assertEqual(virt, [])
+        self.assertEqual(list(virt), [])
 
         # breadth-first construction
         vfs = AuthSrv(
@@ -181,7 +187,7 @@ class TestVFS(unittest.TestCase):
                     "a/ac:a/ac:w",
                 ],
             ),
-            None,
+            self.log,
         ).vfs
 
         # sanitizing relative paths
@@ -193,17 +199,17 @@ class TestVFS(unittest.TestCase):
         self.undot(vfs, "./.././foo/..", "")
 
         # shadowing
-        vfs = AuthSrv(Namespace(c=None, a=[], v=[".::r", "b:a/ac:r"]), None).vfs
+        vfs = AuthSrv(Namespace(c=None, a=[], v=[".::r", "b:a/ac:r"]), self.log).vfs
 
         fsp, r1, v1 = self.ls(vfs, "", "*")
         self.assertEqual(fsp, td)
         self.assertEqual(r1, ["b", "c"])
-        self.assertEqual(v1, ["a"])
+        self.assertEqual(list(v1), ["a"])
 
         fsp, r1, v1 = self.ls(vfs, "a", "*")
         self.assertEqual(fsp, td + "/a")
         self.assertEqual(r1, ["aa", "ab"])
-        self.assertEqual(v1, ["ac"])
+        self.assertEqual(list(v1), ["ac"])
 
         fsp1, r1, v1 = self.ls(vfs, "a/ac", "*")
         fsp2, r2, v2 = self.ls(vfs, "b", "*")
@@ -211,7 +217,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(fsp2, td + "/b")
         self.assertEqual(r1, ["ba", "bb", "bc"])
         self.assertEqual(r1, r2)
-        self.assertEqual(v1, v2)
+        self.assertEqual(list(v1), list(v2))
 
         # config file parser
         cfg_path = self.get_ramdisk() + "/test.cfg"
@@ -230,7 +236,7 @@ class TestVFS(unittest.TestCase):
                 ).encode("utf-8")
             )
 
-        au = AuthSrv(Namespace(c=[cfg_path], a=[], v=[]), None)
+        au = AuthSrv(Namespace(c=[cfg_path], a=[], v=[]), self.log)
         self.assertEqual(au.user["a"], "123")
         self.assertEqual(au.user["asd"], "fgh:jkl")
         n = au.vfs

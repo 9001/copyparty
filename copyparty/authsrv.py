@@ -97,24 +97,17 @@ class VFS(object):
 
     def ls(self, rem, uname):
         """return user-readable [fsdir,real,virt] items at vpath"""
+        virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
         real = [fsdec(x) for x in os.listdir(fsenc(abspath))]
         real.sort()
-        if rem:
-            virt_vis = []
-        else:
-            virt_all = []  # all nodes that exist
-            virt_vis = []  # nodes readable by user
+        if not rem:
             for name, vn2 in sorted(self.nodes.items()):
-                virt_all.append(name)
                 if uname in vn2.uread:
-                    virt_vis.append(name)
+                    virt_vis[name] = vn2
 
-            for name in virt_all:
-                try:
-                    real.remove(name)
-                except ValueError:
-                    pass
+            # no vfs nodes in the list of real inodes
+            real = [x for x in real if x not in self.nodes]
 
         return [abspath, real, virt_vis]
 
@@ -273,6 +266,21 @@ class AuthSrv(object):
             v = vfs.add(mount[dst], dst)
             v.uread = mread[dst]
             v.uwrite = mwrite[dst]
+
+        missing_users = {}
+        for d in [mread, mwrite]:
+            for _, ul in d.items():
+                for usr in ul:
+                    if usr != "*" and usr not in user:
+                        missing_users[usr] = 1
+
+        if missing_users:
+            self.log(
+                "\033[31myou must -a the following users: "
+                + ", ".join(k for k in sorted(missing_users))
+                + "\033[0m"
+            )
+            raise Exception("invalid config")
 
         try:
             v, _ = vfs.get("/", "*", False, True)

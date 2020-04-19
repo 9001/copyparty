@@ -17,7 +17,7 @@ if not PY2:
     unicode = str
     from html import escape as html_escape
 else:
-    from cgi import escape as html_escape
+    from cgi import escape as html_escape  # pylint: disable=no-name-in-module
 
 
 class HttpCli(object):
@@ -682,7 +682,7 @@ class HttpCli(object):
             return self.tx_file(abspath)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)
-        vfs_ls.extend(vfs_virt)
+        vfs_ls.extend(vfs_virt.keys())
 
         dirs = []
         files = []
@@ -691,10 +691,14 @@ class HttpCli(object):
             if self.absolute_urls and vpath:
                 href = "/" + vpath + "/" + fn
 
-            fspath = fsroot + "/" + fn
+            if fn in vfs_virt:
+                fspath = vfs_virt[fn].realpath
+            else:
+                fspath = fsroot + "/" + fn
+
             try:
                 inf = os.stat(fsenc(fspath))
-            except FileNotFoundError as ex:
+            except FileNotFoundError:
                 self.log("broken symlink: {}".format(fspath))
                 continue
 
