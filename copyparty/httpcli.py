@@ -384,13 +384,21 @@ class HttpCli(object):
             fn = os.path.join(fdir, sanitize_fn(new_dir))
 
             if not os.path.isdir(fsenc(fdir)):
-                raise Pebkac(404, "that folder does not exist")
+                raise Pebkac(500, "parent folder does not exist")
 
-            os.mkdir(fsenc(fn))
+            if os.path.isdir(fsenc(fn)):
+                raise Pebkac(500, "that folder exists already")
 
+            try:
+                os.mkdir(fsenc(fn))
+            except:
+                raise Pebkac(500, "mkdir failed, check the logs")
+
+        vpath = "{}/{}".format(self.vpath, new_dir).lstrip("/")
+        redir = '<script>document.getElementsByTagName("a")[0].click()</script>'
         html = self.conn.tpl_msg.render(
-            h2='<a href="/{}">return to /{}</a>'.format(
-                quotep(self.vpath), html_escape(self.vpath, quote=False)
+            h2='<a href="/{}">go to /{}</a>{}'.format(
+                quotep(vpath), html_escape(vpath, quote=False), redir
             ),
             pre="aight",
         )

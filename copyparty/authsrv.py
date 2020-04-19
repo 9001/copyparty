@@ -141,9 +141,9 @@ class AuthSrv(object):
         self.warn_anonwrite = True
 
         if WINDOWS:
-            self.re_vol = re.compile(r'^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)')
+            self.re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)")
         else:
-            self.re_vol = re.compile(r'^([^:]*):([^:]*):(.*)')
+            self.re_vol = re.compile(r"^([^:]*):([^:]*):(.*)")
 
         self.mutex = threading.Lock()
         self.reload()
@@ -230,7 +230,7 @@ class AuthSrv(object):
                 try:
                     src, dst, perms = vol_match.groups()
                 except:
-                    raise Exception('invalid -v argument')
+                    raise Exception("invalid -v argument")
 
                 src = fsdec(os.path.abspath(fsenc(src)))
                 dst = dst.strip("/")
@@ -275,12 +275,12 @@ class AuthSrv(object):
             v.uwrite = mwrite[dst]
 
         try:
-            vfs.get("/", "*", False, True)
-            if self.warn_anonwrite:
+            v, _ = vfs.get("/", "*", False, True)
+            if self.warn_anonwrite and os.getcwd() == v.realpath:
                 self.warn_anonwrite = False
                 self.log(
                     "\033[31manyone can read/write the current directory: {}\033[0m".format(
-                        os.getcwd()
+                        v.realpath
                     )
                 )
         except Pebkac:
