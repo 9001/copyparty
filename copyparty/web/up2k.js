@@ -66,7 +66,9 @@ function o(id) {
 
 
 function opclick(ev) {
-    ev.preventDefault();
+    if (ev) //ie
+        ev.preventDefault();
+
     var dest = this.getAttribute('data-dest');
     goto(dest);
 

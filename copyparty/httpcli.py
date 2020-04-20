@@ -270,7 +270,8 @@ class HttpCli(object):
 
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
 
-        body["vdir"] = os.path.join(vfs.realpath, rem)
+        body["vdir"] = self.vpath
+        body["rdir"] = os.path.join(vfs.realpath, rem)
         body["addr"] = self.conn.addr[0]
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)

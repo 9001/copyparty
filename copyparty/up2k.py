@@ -6,6 +6,7 @@ import os
 import re
 import time
 import math
+import shutil
 import base64
 import hashlib
 import threading
@@ -50,18 +51,27 @@ class Up2k(object):
     def handle_json(self, cj):
         wark = self._get_wark(cj)
         with self.mutex:
-            try:
+            # TODO use registry persistence here to symlink any matching wark
+            if wark in self.registry:
                 job = self.registry[wark]
-                if job["vdir"] != cj["vdir"] or job["name"] != cj["name"]:
-                    print("\n".join([job["vdir"], cj["vdir"], job["name"], cj["name"]]))
-                    raise Pebkac(400, "unexpected filepath")
-
-            except KeyError:
+                if job["rdir"] != cj["rdir"] or job["name"] != cj["name"]:
+                    src = os.path.join(job["rdir"], job["name"])
+                    dst = os.path.join(cj["rdir"], cj["name"])
+                    if job["need"]:
+                        self.log("up2k", "unfinished:\n  {0}\n  {1}".format(src, dst))
+                        err = "partial upload exists at a different location; please resume uploading here instead:\n{0}{1} ".format(
+                            job["vdir"], job["name"]
+                        )
+                        raise Pebkac(400, err)
+                    else:
+                        self._symlink(src, dst)
+            else:
                 job = {
                     "wark": wark,
                     "t0": int(time.time()),
                     "addr": cj["addr"],
                     "vdir": cj["vdir"],
+                    "rdir": cj["rdir"],
                     # client-provided, sanitized by _get_wark:
                     "name": cj["name"],
                     "size": cj["size"],
@@ -89,6 +99,34 @@ class Up2k(object):
                 "wark": wark,
             }
 
+    def _symlink(self, src, dst):
+        # TODO store this in linktab so we never delete src if there are links to it
+        self.log("up2k", "linking dupe:\n  {0}\n  {1}".format(src, dst))
+        try:
+            lsrc = src
+            ldst = dst
+            fs1 = os.stat(cj["rdir"]).st_dev
+            fs2 = os.stat(job["rdir"]).st_dev
+            if fs1 == 0:
+                # py2 on winxp or other unsupported combination
+                raise OSError()
+            elif fs1 == fs2:
+                # same fs; make symlink as relative as possible
+                nsrc = src.replace("\\", "/").split("/")
+                ndst = dst.replace("\\", "/").split("/")
+                nc = 0
+                for a, b in zip(nsrc, ndst):
+                    if a != b:
+                        break
+                    nc += 1
+                if nc > 1:
+                    lsrc = nsrc[nc:]
+                    lsrc = "../" * (len(lsrc) - 1) + "/".join(lsrc)
+            os.symlink(lsrc, ldst)
+        except (AttributeError, OSError) as ex:
+            self.log("up2k", "cannot symlink; creating copy")
+            shutil.copy2(src, dst)
+
     def handle_chunk(self, wark, chash):
         with self.mutex:
             job = self.registry.get(wark)
@@ -105,7 +143,7 @@ class Up2k(object):
         chunksize = self._get_chunksize(job["size"])
         ofs = [chunksize * x for x in nchunk]
 
-        path = os.path.join(job["vdir"], job["name"])
+        path = os.path.join(job["rdir"], job["name"])
 
         return [chunksize, ofs, path, job["lmod"]]
 
@@ -116,7 +154,7 @@ class Up2k(object):
             ret = len(job["need"])
 
             if WINDOWS and ret == 0:
-                path = os.path.join(job["vdir"], job["name"])
+                path = os.path.join(job["rdir"], job["name"])
                 self.lastmod_q.put([path, (int(time.time()), int(job["lmod"]))])
 
             return ret
@@ -163,7 +201,7 @@ class Up2k(object):
 
     def _new_upload(self, job):
         self.registry[job["wark"]] = job
-        path = os.path.join(job["vdir"], job["name"])
+        path = os.path.join(job["rdir"], job["name"])
         with open(path, "wb") as f:
             f.seek(job["size"] - 1)
             f.write(b"e")
