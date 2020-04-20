@@ -61,6 +61,7 @@
 	box-shadow: 0 0 1em #222 inset;
 }
 #ops {
+	display: none;
 	background: #333;
 	margin: 1.7em 1.5em 0 1.5em;
 	padding: .3em .6em;

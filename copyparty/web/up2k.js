@@ -73,7 +73,7 @@ function opclick(ev) {
     goto(dest);
 
     // writing a blank value makes ie8 segfault w
-    if (window['localStorage'])
+    if (window.localStorage)
         localStorage.setItem('opmode', dest || '.');
 }
 
@@ -99,6 +99,9 @@ function goto(dest) {
 
 
 function goto_up2k() {
+    if (up2k === false)
+        return goto('bup');
+
     if (!up2k)
         return setTimeout(goto_up2k, 100);
 
@@ -106,12 +109,15 @@ function goto_up2k() {
 }
 
 
-goto();
-if (window['localStorage']) {
-    var op = localStorage.getItem('opmode');
-    if (op !== null && op !== '.')
-        goto(op);
-}
+(function () {
+    goto();
+    if (window.localStorage) {
+        var op = localStorage.getItem('opmode');
+        if (op !== null && op !== '.')
+            goto(op);
+    }
+    document.getElementById('ops').style.display = 'block';
+})();
 
 
 // chrome requires https to use crypto.subtle,
@@ -126,7 +132,10 @@ try {
     );
 }
 catch (ex) {
-    up2k = up2k_init(false);
+    try {
+        up2k = up2k_init(false);
+    }
+    catch (ex) { }
 }
 
 
@@ -191,8 +200,8 @@ function up2k_init(have_crypto) {
 
     // switches to the basic uploader with msg as error message
     function un2k(msg) {
-        goto('bup');
         setmsg(msg);
+        return false;
     }
 
     // handle user intent to use the basic uploader instead
@@ -261,7 +270,9 @@ function up2k_init(have_crypto) {
         }
     };
 
-    var bobslice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+    var bobslice = null;
+    if (window.File)
+        bobslice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
 
     if (!bobslice || !window.FileReader || !window.FileList)
         return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
