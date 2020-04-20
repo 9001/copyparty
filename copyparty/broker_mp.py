@@ -4,7 +4,7 @@ from __future__ import print_function, unicode_literals
 import time
 import threading
 
-from .__init__ import PY2, WINDOWS
+from .__init__ import PY2, WINDOWS, VT100
 from .broker_util import try_exec
 from .broker_mpw import MpWorker
 from .util import mp
@@ -141,6 +141,8 @@ class BrokerMp(object):
 
     def debug_load_balancer(self):
         fmt = "\033[1m{}\033[0;36m{:4}\033[0m "
+        if not VT100:
+            fmt = "({}{:4})"
 
         last = ""
         while self.procs:

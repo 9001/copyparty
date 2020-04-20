@@ -10,7 +10,7 @@ import platform
 import threading
 import subprocess as sp  # nosec
 
-from .__init__ import PY2
+from .__init__ import PY2, WINDOWS
 from .stolen import surrogateescape
 
 FAKE_MP = False
@@ -27,12 +27,16 @@ except ImportError:
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
+    from queue import Queue
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
     from urllib import quote  # pylint: disable=no-name-in-module
+    from Queue import Queue  # pylint: disable=import-error,no-name-in-module
 
 surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
+if WINDOWS and PY2:
+    FS_ENCODING = "utf-8"
 
 
 HTTPCODE = {
@@ -362,24 +366,24 @@ def exclude_dotfiles(filepaths):
 
 def quotep(txt):
     """url quoter which deals with bytes correctly"""
-    btxt = fsenc(txt)
+    btxt = w8enc(txt)
     quot1 = quote(btxt, safe=b"/")
     if not PY2:
         quot1 = quot1.encode("ascii")
 
     quot2 = quot1.replace(b" ", b"+")
-    return fsdec(quot2)
+    return w8dec(quot2)
 
 
 def unquotep(txt):
     """url unquoter which deals with bytes correctly"""
-    btxt = fsenc(txt)
+    btxt = w8enc(txt)
     unq1 = btxt.replace(b"+", b" ")
     unq2 = unquote(unq1)
-    return fsdec(unq2)
+    return w8dec(unq2)
 
 
-def fsdec(txt):
+def w8dec(txt):
     """decodes filesystem-bytes to wtf8"""
     if PY2:
         return surrogateescape.decodefilename(txt)
@@ -387,12 +391,25 @@ def fsdec(txt):
     return txt.decode(FS_ENCODING, "surrogateescape")
 
 
-def fsenc(txt):
+def w8enc(txt):
     """encodes wtf8 to filesystem-bytes"""
     if PY2:
         return surrogateescape.encodefilename(txt)
 
     return txt.encode(FS_ENCODING, "surrogateescape")
+
+
+if PY2 and WINDOWS:
+    # moonrunes become \x3f with bytestrings,
+    # losing mojibake support is worth
+    def _not_actually_mbcs(txt):
+        return txt
+
+    fsenc = _not_actually_mbcs
+    fsdec = _not_actually_mbcs
+else:
+    fsenc = w8enc
+    fsdec = w8dec
 
 
 def read_socket(sr, total_size):

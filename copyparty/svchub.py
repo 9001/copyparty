@@ -8,7 +8,7 @@ import threading
 from datetime import datetime, timedelta
 import calendar
 
-from .__init__ import PY2, WINDOWS
+from .__init__ import PY2, WINDOWS, VT100
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
 from .util import mp
@@ -84,13 +84,23 @@ class SvcHub(object):
                 dt = dt.replace(hour=0, minute=0, second=0)
                 self.next_day = calendar.timegm(dt.utctimetuple())
 
-            ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
             fmt = "\033[36m{} \033[33m{:21} \033[0m{}"
+            if not VT100:
+                fmt = "{} {:21} {}"
+                if "\033" in msg:
+                    msg = self.ansi_re.sub("", msg)
+                if "\033" in src:
+                    src = self.ansi_re.sub("", src)
+
+            ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
             msg = fmt.format(ts, src, msg)
             try:
                 print(msg)
             except UnicodeEncodeError:
-                print(msg.encode("utf-8", "replace").decode())
+                try:
+                    print(msg.encode("utf-8", "replace").decode())
+                except:
+                    print(msg.encode("ascii", "replace").decode())
 
     def check_mp_support(self):
         vmin = sys.version_info[1]

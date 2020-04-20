@@ -5,10 +5,16 @@ import platform
 import sys
 import os
 
-WINDOWS = platform.system() == "Windows"
 PY2 = sys.version_info[0] == 2
 if PY2:
     sys.dont_write_bytecode = True
+
+WINDOWS = False
+if platform.system() == "Windows":
+    WINDOWS = [int(x) for x in platform.version().split(".")]
+
+VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
+# introduced in anniversary update
 
 
 class EnvParams(object):
@@ -24,6 +30,7 @@ class EnvParams(object):
                 + "/copyparty"
             )
 
+        self.cfg = self.cfg.replace("\\", "/")
         try:
             os.makedirs(self.cfg)
         except:

@@ -5,12 +5,7 @@ from __future__ import print_function, unicode_literals
 import traceback
 
 from .__init__ import PY2
-from .util import Pebkac
-
-if not PY2:
-    from queue import Queue
-else:
-    from Queue import Queue  # pylint: disable=import-error,no-name-in-module
+from .util import Pebkac, Queue
 
 
 class ExceptionalQueue(Queue, object):

@@ -10,11 +10,10 @@ import shutil
 import base64
 import hashlib
 import threading
-from queue import Queue
 from copy import deepcopy
 
 from .__init__ import WINDOWS
-from .util import Pebkac
+from .util import Pebkac, Queue
 
 
 class Up2k(object):
@@ -105,8 +104,8 @@ class Up2k(object):
         try:
             lsrc = src
             ldst = dst
-            fs1 = os.stat(cj["rdir"]).st_dev
-            fs2 = os.stat(job["rdir"]).st_dev
+            fs1 = os.stat(os.path.split(src)[0]).st_dev
+            fs2 = os.stat(os.path.split(dst)[0]).st_dev
             if fs1 == 0:
                 # py2 on winxp or other unsupported combination
                 raise OSError()

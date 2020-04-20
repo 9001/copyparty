@@ -15,7 +15,7 @@ import locale
 import argparse
 from textwrap import dedent
 
-from .__init__ import E, WINDOWS
+from .__init__ import E, WINDOWS, VT100
 from .__version__ import S_VERSION, S_BUILD_DT
 from .svchub import SvcHub
 from .util import py_desc
@@ -28,6 +28,8 @@ class RiceFormatter(argparse.HelpFormatter):
         except the help += [...] line now has colors
         """
         fmt = "\033[36m (default: \033[35m%(default)s\033[36m)\033[0m"
+        if not VT100:
+            fmt = " (default: %(default)s)"
 
         help = action.help
         if "%(default)" not in action.help:

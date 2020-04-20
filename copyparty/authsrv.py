@@ -99,7 +99,8 @@ class VFS(object):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
-        real = [fsdec(x) for x in os.listdir(fsenc(abspath))]
+        items = os.listdir(fsenc(abspath))
+        real = [fsdec(x) for x in items]
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):

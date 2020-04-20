@@ -10,11 +10,12 @@ Original source: misc/python/surrogateescape.py in https://bitbucket.org/haypo/m
 
 # This code is released under the Python license and the BSD 2-clause license
 
+import platform
 import codecs
 import sys
 
 PY3 = sys.version_info[0] > 2
-
+WINDOWS = platform.system() == "Windows"
 FS_ERRORS = "surrogateescape"
 
 
@@ -166,6 +167,11 @@ FS_ENCODING = sys.getfilesystemencoding()
 # FS_ENCODING = "ascii"; fn = b("[abc\xff]"); encoded = u("[abc\udcff]")
 # FS_ENCODING = 'cp932'; fn = b('[abc\x81\x00]'); encoded = u('[abc\udc81\x00]')
 # FS_ENCODING = 'UTF-8'; fn = b('[abc\xff]'); encoded = u('[abc\udcff]')
+
+
+if WINDOWS and not PY3:
+    # py2 thinks win* is mbcs, probably a bug? anyways this works
+    FS_ENCODING = 'utf-8'
 
 
 # normalize the filesystem encoding name.
