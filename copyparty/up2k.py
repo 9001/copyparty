@@ -13,7 +13,7 @@ import threading
 from copy import deepcopy
 
 from .__init__ import WINDOWS
-from .util import Pebkac, Queue
+from .util import Pebkac, Queue, fsenc
 
 
 class Up2k(object):
@@ -49,6 +49,7 @@ class Up2k(object):
 
     def handle_json(self, cj):
         wark = self._get_wark(cj)
+        now = time.time()
         with self.mutex:
             # TODO use registry persistence here to symlink any matching wark
             if wark in self.registry:
@@ -63,11 +64,16 @@ class Up2k(object):
                         )
                         raise Pebkac(400, err)
                     else:
-                        self._symlink(src, dst)
+                        # symlink to the client-provided name,
+                        # returning the previous upload info
+                        job = deepcopy(job)
+                        suffix = self._suffix(dst, now, job["addr"])
+                        job["name"] = cj["name"] + suffix
+                        self._symlink(src, dst + suffix)
             else:
                 job = {
                     "wark": wark,
-                    "t0": int(time.time()),
+                    "t0": now,
                     "addr": cj["addr"],
                     "vdir": cj["vdir"],
                     "rdir": cj["rdir"],
@@ -77,6 +83,9 @@ class Up2k(object):
                     "lmod": cj["lmod"],
                     "hash": deepcopy(cj["hash"]),
                 }
+
+                path = os.path.join(job["rdir"], job["name"])
+                job["name"] += self._suffix(path, now, cj["addr"])
 
                 # one chunk may occur multiple times in a file;
                 # filter to unique values for the list of missing chunks
@@ -98,14 +107,22 @@ class Up2k(object):
                 "wark": wark,
             }
 
+    def _suffix(self, fpath, ts, ip):
+        # TODO broker which avoid this race and
+        # provides a new filename if taken (same as bup)
+        if not os.path.exists(fsenc(fpath)):
+            return ""
+
+        return ".{:.6f}-{}".format(ts, ip)
+
     def _symlink(self, src, dst):
         # TODO store this in linktab so we never delete src if there are links to it
         self.log("up2k", "linking dupe:\n  {0}\n  {1}".format(src, dst))
         try:
             lsrc = src
             ldst = dst
-            fs1 = os.stat(os.path.split(src)[0]).st_dev
-            fs2 = os.stat(os.path.split(dst)[0]).st_dev
+            fs1 = os.stat(fsenc(os.path.split(src)[0])).st_dev
+            fs2 = os.stat(fsenc(os.path.split(dst)[0])).st_dev
             if fs1 == 0:
                 # py2 on winxp or other unsupported combination
                 raise OSError()
@@ -121,10 +138,10 @@ class Up2k(object):
                 if nc > 1:
                     lsrc = nsrc[nc:]
                     lsrc = "../" * (len(lsrc) - 1) + "/".join(lsrc)
-            os.symlink(lsrc, ldst)
+            os.symlink(fsenc(lsrc), fsenc(ldst))
         except (AttributeError, OSError) as ex:
             self.log("up2k", "cannot symlink; creating copy")
-            shutil.copy2(src, dst)
+            shutil.copy2(fsenc(src), fsenc(dst))
 
     def handle_chunk(self, wark, chash):
         with self.mutex:
@@ -201,7 +218,7 @@ class Up2k(object):
     def _new_upload(self, job):
         self.registry[job["wark"]] = job
         path = os.path.join(job["rdir"], job["name"])
-        with open(path, "wb") as f:
+        with open(fsenc(path), "wb") as f:
             f.seek(job["size"] - 1)
             f.write(b"e")
 
@@ -215,6 +232,6 @@ class Up2k(object):
             time.sleep(5)
             for path, times in ready:
                 try:
-                    os.utime(path, times)
+                    os.utime(fsenc(path), times)
                 except:
                     self.log("lmod", "failed to utime ({}, {})".format(path, times))

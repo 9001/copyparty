@@ -338,7 +338,7 @@ function up2k_init(have_crypto) {
                 continue;
 
             var tr = document.createElement('tr');
-            tr.innerHTML = '<td></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
+            tr.innerHTML = '<td id="f{0}n"></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
             tr.getElementsByTagName('td')[0].textContent = entry.name;
             o('u2tab').appendChild(tr);
 
@@ -685,6 +685,12 @@ function up2k_init(have_crypto) {
         xhr.onload = function (ev) {
             if (xhr.status == 200) {
                 var response = JSON.parse(xhr.responseText);
+
+                if (response.name !== t.name) {
+                    // file exists; server renamed us
+                    t.name = response.name;
+                    o('f{0}n'.format(t.n)).textContent = t.name;
+                }
 
                 t.postlist = [];
                 t.wark = response.wark;

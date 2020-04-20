@@ -275,7 +275,7 @@ class HttpCli(object):
 
         body["vdir"] = self.vpath
         body["rdir"] = os.path.join(vfs.realpath, rem)
-        body["addr"] = self.conn.addr[0]
+        body["addr"] = self.addr[0]
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
         response = x.get()
@@ -435,10 +435,12 @@ class HttpCli(object):
                     if not os.path.isdir(fsenc(fdir)):
                         raise Pebkac(404, "that folder does not exist")
 
-                    # TODO broker which avoid this race
-                    # and provides a new filename if taken
+                    # TODO broker which avoid this race and
+                    # provides a new filename if taken (same as up2k)
                     if os.path.exists(fsenc(fn)):
-                        fn += ".{:.6f}".format(time.time())
+                        fn += ".{:.6f}-{}".format(time.time(), self.addr[0])
+                        # using current-time instead of t0 cause clients
+                        # may reuse a name for multiple files in one post
 
                 try:
                     with open(fsenc(fn), "wb") as f:
