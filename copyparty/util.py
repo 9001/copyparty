@@ -190,7 +190,7 @@ class MultipartParser(object):
             buf = self.sr.recv(bufsz)
             if not buf:
                 # abort: client disconnected
-                raise Pebkac(400, "client disconnected during multipart post")
+                raise Pebkac(400, "client d/c during multipart post")
 
             while True:
                 ofs = buf.find(self.boundary)
@@ -224,7 +224,7 @@ class MultipartParser(object):
                 buf2 = self.sr.recv(bufsz)
                 if not buf2:
                     # abort: client disconnected
-                    raise Pebkac(400, "client disconnected during multipart post")
+                    raise Pebkac(400, "client d/c during multipart post")
 
                 buf += buf2
 
@@ -421,7 +421,7 @@ def read_socket(sr, total_size):
 
         buf = sr.recv(bufsz)
         if not buf:
-            raise Pebkac(400, "client disconnected during binary post")
+            raise Pebkac(400, "client d/c during binary post")
 
         remains -= len(buf)
         yield buf

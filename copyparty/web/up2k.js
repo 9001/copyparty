@@ -72,10 +72,9 @@ function opclick(ev) {
     var dest = this.getAttribute('data-dest');
     goto(dest);
 
-    try {
-        localStorage.opmode = dest;
-    }
-    catch { }
+    // writing a blank value makes ie8 segfault w
+    if (window['localStorage'])
+        localStorage.setItem('opmode', dest || '.');
 }
 
 
@@ -108,11 +107,11 @@ function goto_up2k() {
 
 
 goto();
-try {
-    var op = localStorage.opmode;
-    goto(op);
+if (window['localStorage']) {
+    var op = localStorage.getItem('opmode');
+    if (op !== null && op !== '.')
+        goto(op);
 }
-catch { }
 
 
 // chrome requires https to use crypto.subtle,
@@ -217,7 +216,7 @@ function up2k_init(have_crypto) {
         if (val === null)
             return parseInt(o(name).value);
 
-        o(name).value = val
+        o(name).value = val;
         return val;
     }
 

@@ -144,7 +144,7 @@ class HttpCli(object):
         try:
             self.s.sendall(response_str + b"\r\n\r\n" + body)
         except:
-            raise Pebkac(400, "client disconnected before http response")
+            raise Pebkac(400, "client d/c before http response")
 
         return body
 
@@ -200,7 +200,10 @@ class HttpCli(object):
         self.log("POST " + self.req)
 
         if self.headers.get("expect", "").lower() == "100-continue":
-            self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
+            try:
+                self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
+            except:
+                raise Pebkac(400, "client d/c before 100 continue")
 
         ctype = self.headers.get("content-type", "").lower()
         if not ctype:
@@ -621,7 +624,10 @@ class HttpCli(object):
 
         headers.extend(extra_headers)
         headers = "\r\n".join(headers).encode("utf-8") + b"\r\n\r\n"
-        self.s.sendall(headers)
+        try:
+            self.s.sendall(headers)
+        except:
+            raise Pebkac(400, "client d/c before http response")
 
         if self.mode == "HEAD" or not do_send:
             self.log(logmsg)
