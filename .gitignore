@@ -8,6 +8,7 @@ copyparty.egg-info/
 buildenv/
 build/
 dist/
+sfx/
 .venv/
 
 # sublime

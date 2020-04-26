@@ -2,6 +2,7 @@
 set -e
 echo
 
+tar=$( which gtar  2>/dev/null || which tar)
 sed=$( which gsed  2>/dev/null || which sed)
 find=$(which gfind 2>/dev/null || which find)
 sort=$(which gsort 2>/dev/null || which sort)
@@ -22,14 +23,14 @@ ver="$1"
 [[ -e copyparty/__main__.py ]] || cd ..
 [[ -e copyparty/__main__.py ]] ||
 {
-	echo "run me from within the copyparty folder"
+	echo "run me from within the project root folder"
 	echo
 	exit 1
 }
 
-out_dir="$(pwd | $sed -r 's@/[^/]+$@@')"
-zip_path="$out_dir/copyparty-$ver.zip"
-tgz_path="$out_dir/copyparty-$ver.tar.gz"
+mkdir -p dist
+zip_path="dist/copyparty-$ver.zip"
+tgz_path="dist/copyparty-$ver.tar.gz"
 
 [[ -e "$zip_path" ]] ||
 [[ -e "$tgz_path" ]] &&
@@ -50,9 +51,11 @@ tmp="$(mktemp -d)"
 rls_dir="$tmp/copyparty-$ver"
 mkdir "$rls_dir"
 
-echo ">>> export"
-git archive master |
-tar -x -C "$rls_dir"
+echo ">>> export from git"
+git archive master | $tar -xC "$rls_dir"
+
+echo ">>> export untracked deps"
+$tar -c copyparty/web/deps | $tar -xC "$rls_dir"
 
 cd "$rls_dir"
 $find -type d -exec chmod 755 '{}' \+
@@ -60,7 +63,7 @@ $find -type f -exec chmod 644 '{}' \+
 
 commaver="$(
 	printf '%s\n' "$ver" |
-	sed -r 's/\./,/g'
+	sed -r 's/\./, /g'
 )"
 
 grep -qE "^VERSION *= \(${commaver}\)$" copyparty/__version__.py ||
@@ -93,8 +96,8 @@ $sed -r 's/^(.{32}) \./\1  ./' > ../.sums.md5
 mv ../.sums.md5 .
 
 cd ..
-echo ">>> tar"; tar -czf "$tgz_path" "copyparty-$ver"
-echo ">>> zip"; zip -qr  "$zip_path" "copyparty-$ver"
+echo ">>> tar"; $tar -czf "$tgz_path" "copyparty-$ver"
+echo ">>> zip"; zip  -qr  "$zip_path" "copyparty-$ver"
 
 rm -rf "$tmp"
 echo
