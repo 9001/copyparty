@@ -93,7 +93,7 @@ py="$(command -v python2)" || {
 	done
 
 	# delete the bundled jinja2 if we have a better one
-	python3 -c 'import jinja2' 2>/dev/null &&
+	"$py" -c 'import jinja2' 2>/dev/null &&
 		rm -rf $dir/jinja2
 	true
 ) >&2 || exit 1
