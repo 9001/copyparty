@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head>
+	<meta charset="utf-8">
+	<title>📝🎉 {{ title }}</title> <!-- 📜 -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.7">
+	<link href="/.cpr/md.css" rel="stylesheet">
+</head>
+<body>
+	<div id="toc"></div>
+	<div id="mw">
+		<div id="mn"></div>
+		<div id="mh">
+			<a id="lightswitch" href="#">dark</a>
+			there will soon be more buttons on this row so it looks less dumb
+		</div>
+		<div id="ml">
+			<div style="text-align:center;margin:5em 0">
+				<div style="font-size:2em;margin:1em 0">Loading</div>
+				if you're still reading this, check that javascript is allowed
+			</div>
+		</div>
+		<div id="m">
+			<textarea id="mt" style="display:none">{{ md }}</textarea>
+		</div>
+	</div>
+	<script>
+
+var link_md_as_html = false;  // TODO (does nothing)
+
+(function () {
+    var btn = document.getElementById("lightswitch");
+    var toggle = function () {
+        var dark = !document.documentElement.getAttribute("class");
+        document.documentElement.setAttribute("class", dark ? "dark" : "");
+        btn.innerHTML = dark ? "light" : "dark";
+        if (window.localStorage)
+            localStorage.setItem('md-dark', dark ? 1 : 0);
+    };
+    btn.onclick = toggle;
+    if (window.localStorage && localStorage.getItem('md-dark') == 1)
+		toggle();
+})();
+
+	</script>
+	<script src="/.cpr/deps/marked.full.js"></script>
+	<script src="/.cpr/md.js"></script>
+</body></html>

@@ -1,0 +1,10 @@
+diff -NarU1 markdown-it-10.0.0-orig/lib/common/entities.js markdown-it-10.0.0-edit/lib/common/entities.js
+--- markdown-it-10.0.0-orig/lib/common/entities.js	2019-09-10 21:39:58.000000000 +0000
++++ markdown-it-10.0.0-edit/lib/common/entities.js	2020-04-26 10:24:33.043023331 +0000
+@@ -5,2 +5,5 @@
+ /*eslint quotes:0*/
+-module.exports = require('entities/lib/maps/entities.json');
++//module.exports = require('entities/lib/maps/entities.json');
++module.exports = {
++    "amp": "&", "quot": "\"", "gt": ">", "lt": "<"
++}

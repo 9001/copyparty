@@ -706,6 +706,48 @@ class HttpCli(object):
         self.log(logmsg)
         return True
 
+    def tx_md(self, fs_path):
+        logmsg = "{:4} {} ".format("", self.req)
+        html_path = os.path.join(E.mod, "web/md.html")
+
+        st = os.stat(fsenc(fs_path))
+        sz_md = st.st_size
+        ts_md = st.st_mtime
+
+        st = os.stat(fsenc(html_path))
+        ts_html = st.st_mtime
+
+        file_ts = max(ts_md, ts_html)
+        file_lastmod, do_send = self._chk_lastmod(file_ts)
+        self.out_headers["Last-Modified"] = file_lastmod
+        status = 200 if do_send else 304
+
+        targs = {
+            "title": html_escape(self.vpath, quote=False),
+            "md": "",
+        }
+        sz_html = len(self.conn.tpl_md.render(**targs).encode("utf-8"))
+        self.send_headers(sz_html + sz_md, status)
+
+        logmsg += str(status)
+        if self.mode == "HEAD" or not do_send:
+            self.log(logmsg)
+            return True
+
+        with open(fsenc(fs_path), "rb") as f:
+            md = f.read()
+
+        targs["md"] = md.decode("utf-8", "replace")
+        html = self.conn.tpl_md.render(**targs).encode("utf-8")
+        try:
+            self.s.sendall(html)
+        except:
+            self.log(logmsg + " \033[31md/c\033[0m")
+            return False
+
+        self.log(logmsg + " " + str(len(html)))
+        return True
+
     def tx_mounts(self):
         rvol = [x + "/" if x else x for x in self.rvol]
         wvol = [x + "/" if x else x for x in self.wvol]
@@ -735,6 +777,9 @@ class HttpCli(object):
             raise Pebkac(404)
 
         if not os.path.isdir(fsenc(abspath)):
+            if abspath.endswith(".md") and "raw" not in self.uparam:
+                return self.tx_md(abspath)
+
             return self.tx_file(abspath)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)

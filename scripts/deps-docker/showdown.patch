@@ -1,0 +1,214 @@
+diff -NarU1 showdown-orig/Gruntfile.js showdown-mod/Gruntfile.js
+--- showdown-orig/Gruntfile.js	2020-04-23 06:22:01.486676149 +0000
++++ showdown-mod/Gruntfile.js	2020-04-23 08:03:56.700219788 +0000
+@@ -27,3 +27,2 @@
+           'src/subParsers/*.js',
+-          'src/subParsers/makeMarkdown/*.js',
+           'src/loader.js'
+diff -NarU1 showdown-orig/src/converter.js showdown-mod/src/converter.js
+--- showdown-orig/src/converter.js	2020-04-23 06:22:01.496676150 +0000
++++ showdown-mod/src/converter.js	2020-04-23 08:20:11.056920123 +0000
+@@ -84,5 +84,5 @@
+ 
+-    if (options.extensions) {
++    /*if (options.extensions) {
+       showdown.helper.forEach(options.extensions, _parseExtension);
+-    }
++    }*/
+   }
+@@ -95,3 +95,3 @@
+    */
+-  function _parseExtension (ext, name) {
++  /*function _parseExtension (ext, name) {
+ 
+@@ -159,3 +159,3 @@
+    */
+-  function legacyExtensionLoading (ext, name) {
++  /*function legacyExtensionLoading (ext, name) {
+     if (typeof ext === 'function') {
+@@ -351,3 +351,3 @@
+    */
+-  this.makeMarkdown = this.makeMd = function (src, HTMLParser) {
++  /*this.makeMarkdown = this.makeMd = function (src, HTMLParser) {
+ 
+@@ -482,3 +482,3 @@
+    */
+-  this.addExtension = function (extension, name) {
++  /*this.addExtension = function (extension, name) {
+     name = name || null;
+@@ -491,3 +491,3 @@
+    */
+-  this.useExtension = function (extensionName) {
++  /*this.useExtension = function (extensionName) {
+     _parseExtension(extensionName);
+@@ -526,3 +526,3 @@
+    */
+-  this.removeExtension = function (extension) {
++  /*this.removeExtension = function (extension) {
+     if (!showdown.helper.isArray(extension)) {
+@@ -549,3 +549,3 @@
+    */
+-  this.getAllExtensions = function () {
++  /*this.getAllExtensions = function () {
+     return {
+diff -NarU1 showdown-orig/src/options.js showdown-mod/src/options.js
+--- showdown-orig/src/options.js	2020-04-23 06:22:01.496676150 +0000
++++ showdown-mod/src/options.js	2020-04-23 08:24:29.176929018 +0000
+@@ -118,3 +118,3 @@
+     },
+-    ghMentions: {
++    /*ghMentions: {
+       defaultValue: false,
+@@ -127,3 +127,3 @@
+       type: 'string'
+-    },
++    },*/
+     encodeEmails: {
+diff -NarU1 showdown-orig/src/showdown.js showdown-mod/src/showdown.js
+--- showdown-orig/src/showdown.js	2020-04-23 06:22:01.496676150 +0000
++++ showdown-mod/src/showdown.js	2020-04-23 08:25:01.976930148 +0000
+@@ -7,3 +7,2 @@
+     parsers = {},
+-    extensions = {},
+     globalOptions = getDefaultOpts(true),
+@@ -25,5 +24,4 @@
+         ghCompatibleHeaderId:                 true,
+-        ghMentions:                           true,
++        //ghMentions:                           true,
+         backslashEscapesHTMLTags:             true,
+-        emoji:                                true,
+         splitAdjacentBlockquotes:             true
+@@ -48,3 +46,3 @@
+         requireSpaceBeforeHeadingText:        true,
+-        ghMentions:                           false,
++        //ghMentions:                           false,
+         encodeEmails:                         true
+@@ -65,3 +63,2 @@
+  */
+-showdown.extensions = {};
+ 
+@@ -193,3 +190,3 @@
+  */
+-showdown.extension = function (name, ext) {
++/*showdown.extension = function (name, ext) {
+   'use strict';
+@@ -235,3 +232,3 @@
+  */
+-showdown.getAllExtensions = function () {
++/*showdown.getAllExtensions = function () {
+   'use strict';
+@@ -244,3 +241,3 @@
+  */
+-showdown.removeExtension = function (name) {
++/*showdown.removeExtension = function (name) {
+   'use strict';
+@@ -252,3 +249,3 @@
+  */
+-showdown.resetExtensions = function () {
++/*showdown.resetExtensions = function () {
+   'use strict';
+@@ -263,3 +260,3 @@
+  */
+-function validate (extension, name) {
++/*function validate (extension, name) {
+   'use strict';
+@@ -370,3 +367,3 @@
+  */
+-showdown.validateExtension = function (ext) {
++/*showdown.validateExtension = function (ext) {
+   'use strict';
+@@ -380 +377,2 @@
+ };
++*/
+diff -NarU1 showdown-orig/src/subParsers/anchors.js showdown-mod/src/subParsers/anchors.js
+--- showdown-orig/src/subParsers/anchors.js	2020-04-23 06:22:01.496676150 +0000
++++ showdown-mod/src/subParsers/anchors.js	2020-04-23 08:25:26.880264347 +0000
+@@ -76,3 +76,3 @@
+   // Lastly handle GithubMentions if option is enabled
+-  if (options.ghMentions) {
++  /*if (options.ghMentions) {
+     text = text.replace(/(^|\s)(\\)?(@([a-z\d]+(?:[a-z\d.-]+?[a-z\d]+)*))/gmi, function (wm, st, escape, mentions, username) {
+@@ -93,3 +93,3 @@
+     });
+-  }
++  }*/
+ 
+diff -NarU1 showdown-orig/src/subParsers/spanGamut.js showdown-mod/src/subParsers/spanGamut.js
+--- showdown-orig/src/subParsers/spanGamut.js	2020-04-23 06:22:01.496676150 +0000
++++ showdown-mod/src/subParsers/spanGamut.js	2020-04-23 08:07:50.460227880 +0000
+@@ -22,3 +22,2 @@
+   text = showdown.subParser('simplifiedAutoLinks')(text, options, globals);
+-  text = showdown.subParser('emoji')(text, options, globals);
+   text = showdown.subParser('underline')(text, options, globals);
+@@ -26,3 +25,2 @@
+   text = showdown.subParser('strikethrough')(text, options, globals);
+-  text = showdown.subParser('ellipsis')(text, options, globals);
+ 
+diff -NarU1 showdown-orig/test/node/showdown.Converter.js showdown-mod/test/node/showdown.Converter.js
+--- showdown-orig/test/node/showdown.Converter.js	2020-04-23 06:22:01.520009484 +0000
++++ showdown-mod/test/node/showdown.Converter.js	2020-04-23 08:14:58.086909318 +0000
+@@ -29,3 +29,3 @@
+ 
+-  describe('Converter.options extensions', function () {
++  /*describe('Converter.options extensions', function () {
+     var runCount;
+@@ -48,3 +48,3 @@
+     });
+-  });
++  });*/
+ 
+@@ -115,3 +115,3 @@
+ 
+-  describe('extension methods', function () {
++  /*describe('extension methods', function () {
+     var extObjMock = {
+@@ -145,3 +145,3 @@
+     });
+-  });
++  });*/
+ 
+diff -NarU1 showdown-orig/test/node/showdown.js showdown-mod/test/node/showdown.js
+--- showdown-orig/test/node/showdown.js	2020-04-23 06:22:01.523342816 +0000
++++ showdown-mod/test/node/showdown.js	2020-04-23 08:14:31.733575073 +0000
+@@ -25,3 +25,3 @@
+ 
+-describe('showdown.extension()', function () {
++/*describe('showdown.extension()', function () {
+   'use strict';
+@@ -110,3 +110,3 @@
+   });
+-});
++});*/
+ 
+diff -NarU1 showdown-orig/test/node/testsuite.features.js showdown-mod/test/node/testsuite.features.js
+--- showdown-orig/test/node/testsuite.features.js	2020-04-23 06:22:01.523342816 +0000
++++ showdown-mod/test/node/testsuite.features.js	2020-04-23 08:25:48.880265106 +0000
+@@ -13,3 +13,2 @@
+     rawPrefixHeaderIdSuite = bootstrap.getTestSuite('test/features/rawPrefixHeaderId/'),
+-    emojisSuite = bootstrap.getTestSuite('test/features/emojis/'),
+     underlineSuite = bootstrap.getTestSuite('test/features/underline/'),
+@@ -69,4 +68,4 @@
+         converter = new showdown.Converter({ghCompatibleHeaderId: true});
+-      } else if (testsuite[i].name === 'ghMentions') {
+-        converter = new showdown.Converter({ghMentions: true});
++      //} else if (testsuite[i].name === 'ghMentions') {
++      //  converter = new showdown.Converter({ghMentions: true});
+       } else if (testsuite[i].name === 'disable-email-encoding') {
+@@ -185,17 +184,2 @@
+       it(suite[i].name.replace(/-/g, ' '), assertion(suite[i], converter));
+-    }
+-  });
+-
+-  /** test emojis support **/
+-  describe('emojis support', function () {
+-    var converter,
+-        suite = emojisSuite;
+-    for (var i = 0; i < suite.length; ++i) {
+-      if (suite[i].name === 'simplifiedautolinks') {
+-        converter = new showdown.Converter({emoji: true, simplifiedAutoLink: true});
+-      } else {
+-        converter = new showdown.Converter({emoji: true});
+-      }
+-
+-      it(suite[i].name.replace(/-/g, ' '), assertion(suite[i], converter));
+     }

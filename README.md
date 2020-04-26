@@ -34,8 +34,10 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [ ] download as zip
 * [x] volumes
 * [x] accounts
+* [x] markdown viewer
+* [ ] markdown editor? w
 
-summary: close to beta
+summary: it works! you can use it! (but technically not even close to beta)
 
 
 # dependencies
@@ -82,6 +84,7 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
+* sortable browser columns
 * up2k handle filename too long
 * up2k fails on empty files? alert then stuck
 * unexpected filepath on dupe up2k

@@ -1,24 +1,49 @@
 FROM    alpine:3.11
 WORKDIR /z
 ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
+        ver_markdownit=10.0.0 \
+        ver_showdown=1.9.1 \
+        ver_marked=1.0.0 \
         ver_ogvjs=1.6.1
 
 
 # download
 RUN     apk add make g++ git bash npm patch wget tar pigz brotli gzip unzip \
-        && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip \
-        && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz \
-        && unzip ogvjs-$ver_ogvjs.zip \
-        && tar -xf $ver_asmcrypto.tar.gz \
-        && cd asmcrypto.js-$ver_asmcrypto \
-        && npm install \
+        && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip -O ogvjs.zip \
+        && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
+        && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
+        && unzip ogvjs.zip \
+        && (tar -xf asmcrypto.tgz \
+            && cd asmcrypto.js-$ver_asmcrypto \
+            && npm install ) \
+        && (tar -xf marked.tgz \
+            && cd marked-$ver_marked \
+            && npm install \
+            && npm i grunt uglify-js -g ) \
         && mkdir /z/dist
+
+
+# uncomment if you wanna test the abandoned markdown converters
+#ENV     build_abandoned=1
+
+
+RUN     [ $build_abandoned ] || exit 0; \
+        git clone --depth 1 --branch $ver_showdown https://github.com/showdownjs/showdown/ \
+        && wget https://github.com/markdown-it/markdown-it/archive/$ver_markdownit.tar.gz -O markdownit.tgz \
+        && (cd showdown \
+            && npm install \
+            && npm i grunt -g ) \
+        && (tar -xf markdownit.tgz \
+            && cd markdown-it-$ver_markdownit \
+            && npm install )
+
 
 # build asmcrypto
 RUN     cd asmcrypto.js-$ver_asmcrypto \
         && echo "export { Sha512 } from './hash/sha512/sha512';" > src/entry-export_all.ts \
         && node -r esm build.js \
         && mv asmcrypto.all.es5.js /z/dist/sha512.js
+
 
 # build ogvjs
 RUN     cd ogvjs-$ver_ogvjs \
@@ -40,8 +65,90 @@ RUN     cd ogvjs-$ver_ogvjs \
             dynamicaudio.swf \
             /z/dist
 
+
+# build marked
+COPY    marked.patch /z/
+RUN     cd marked-$ver_marked \
+        && patch -p1 < /z/marked.patch \
+        && npm run build \
+        && cp -pv marked.min.js /z/dist/marked.js \
+        && cp -pv lib/marked.js /z/dist/marked.full.js
+#        && npm run test \
+
+
+# build showdown (abandoned; disabled by default)
+COPY    showdown.patch /z/
+RUN     [ $build_abandoned ] || exit 0; \
+        cd showdown \
+        && rm -rf bin dist \
+#       # remove ellipsis plugin \
+        && rm \
+            src/subParsers/ellipsis.js \
+            test/cases/ellipsis* \
+#       # remove html-to-md converter \
+        && rm \
+            test/node/testsuite.makemd.js \
+            test/node/showdown.Converter.makeMarkdown.js \
+#       # remove emojis \
+        && rm src/subParsers/emoji.js \
+        && awk '/^showdown.helper.emojis/ {o=1} !o; /^\}/ {o=0}' \
+            >f <src/helpers.js \
+        && mv f src/helpers.js \
+        && rm -rf test/features/emojis \
+#       # remove ghmentions \
+        && rm test/features/ghMentions.* \
+#       # remove option descriptions \
+        && sed -ri '/descri(ption|be): /d' src/options.js \
+        && patch -p1 < /z/showdown.patch
+
+RUN     [ $build_abandoned ] || exit 0; \
+        cd showdown \
+        && grunt build \
+        && sed -ri '/sourceMappingURL=showdown.min.js.map/d' dist/showdown.min.js \
+        && mv dist/showdown.min.js /z/dist/showdown.js \
+        && ls -al /z/dist/showdown.js
+
+
+# build markdownit (abandoned; disabled by default)
+COPY    markdown-it.patch /z/
+RUN     [ $build_abandoned ] || exit 0; \
+        cd markdown-it-$ver_markdownit \
+        && patch -p1 < /z/markdown-it.patch \
+        && make browserify \
+        && cp -pv dist/markdown-it.min.js /z/dist/markdown-it.js \
+        && cp -pv dist/markdown-it.js /z/dist/markdown-it-full.js
+
+
 # compress
 COPY    zopfli.makefile /z/dist/Makefile
 RUN     cd /z/dist \
         && make -j$(nproc) \
         && rm Makefile
+
+
+# showdown: abandoned due to code-blocks in lists failing
+# 22770 orig
+# 12154 no-emojis
+# 12134 no-srcmap
+# 11189 no-descriptions
+# 11152 no-ellipsis
+# 10617 no-this.makeMd
+#  9569 no-extensions
+#  9537 no-extensions
+#  9410 no-mentions
+
+
+# markdown-it: abandoned because no header anchors (and too big)
+#       32322 107754 orig (wowee)
+# 19619 21392  71540 less entities
+
+
+# marked:
+# 9253 29773 orig
+# 9159 29633 no copyright (reverted)
+# 9040 29057 no sanitize
+# 8870 28631 no email-mangle
+# so really not worth it, just drop the patch when that stops working
+
+
+# f=../../copyparty/web/deps/marked.js.gz; (cd ~ed/src/ && diff -NarU1 marked-1.0.0-orig/ marked-1.0.0-edit/) >marked.patch; make && printf '%d ' $(wc -c <$f) $(gzip -d <$f | wc -c); echo

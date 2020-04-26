@@ -1,0 +1,269 @@
+diff -NarU1 marked-1.0.0-orig/src/defaults.js marked-1.0.0-edit/src/defaults.js
+--- marked-1.0.0-orig/src/defaults.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/src/defaults.js	2020-04-25 19:16:56.124621393 +0000
+@@ -9,10 +9,6 @@
+     langPrefix: 'language-',
+-    mangle: true,
+     pedantic: false,
+     renderer: null,
+-    sanitize: false,
+-    sanitizer: null,
+     silent: false,
+     smartLists: false,
+-    smartypants: false,
+     tokenizer: null,
+diff -NarU1 marked-1.0.0-orig/src/helpers.js marked-1.0.0-edit/src/helpers.js
+--- marked-1.0.0-orig/src/helpers.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/src/helpers.js	2020-04-25 18:58:43.001320210 +0000
+@@ -65,16 +65,3 @@
+ const originIndependentUrl = /^$|^[a-z][a-z0-9+.-]*:|^[?#]/i;
+-function cleanUrl(sanitize, base, href) {
+-  if (sanitize) {
+-    let prot;
+-    try {
+-      prot = decodeURIComponent(unescape(href))
+-        .replace(nonWordAndColonTest, '')
+-        .toLowerCase();
+-    } catch (e) {
+-      return null;
+-    }
+-    if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0 || prot.indexOf('data:') === 0) {
+-      return null;
+-    }
+-  }
++function cleanUrl(base, href) {
+   if (base && !originIndependentUrl.test(href)) {
+@@ -224,8 +211,2 @@
+ 
+-function checkSanitizeDeprecation(opt) {
+-  if (opt && opt.sanitize && !opt.silent) {
+-    console.warn('marked(): sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options');
+-  }
+-}
+-
+ module.exports = {
+@@ -240,4 +221,3 @@
+   rtrim,
+-  findClosingBracket,
+-  checkSanitizeDeprecation
++  findClosingBracket
+ };
+diff -NarU1 marked-1.0.0-orig/src/Lexer.js marked-1.0.0-edit/src/Lexer.js
+--- marked-1.0.0-orig/src/Lexer.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/src/Lexer.js	2020-04-25 22:46:54.107584066 +0000
+@@ -6,3 +6,3 @@
+  * smartypants text replacement
+- */
++ *
+ function smartypants(text) {
+@@ -27,3 +27,3 @@
+  * mangle email addresses
+- */
++ *
+ function mangle(text) {
+@@ -388,3 +388,3 @@
+       // autolink
+-      if (token = this.tokenizer.autolink(src, mangle)) {
++      if (token = this.tokenizer.autolink(src)) {
+         src = src.substring(token.raw.length);
+@@ -395,3 +395,3 @@
+       // url (gfm)
+-      if (!inLink && (token = this.tokenizer.url(src, mangle))) {
++      if (!inLink && (token = this.tokenizer.url(src))) {
+         src = src.substring(token.raw.length);
+@@ -402,3 +402,3 @@
+       // text
+-      if (token = this.tokenizer.inlineText(src, inRawBlock, smartypants)) {
++      if (token = this.tokenizer.inlineText(src, inRawBlock)) {
+         src = src.substring(token.raw.length);
+diff -NarU1 marked-1.0.0-orig/src/marked.js marked-1.0.0-edit/src/marked.js
+--- marked-1.0.0-orig/src/marked.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/src/marked.js	2020-04-25 22:42:55.140924439 +0000
+@@ -8,3 +8,2 @@
+   merge,
+-  checkSanitizeDeprecation,
+   escape
+@@ -37,3 +36,2 @@
+     opt = merge({}, marked.defaults, opt || {});
+-    checkSanitizeDeprecation(opt);
+     const highlight = opt.highlight;
+@@ -101,6 +99,5 @@
+     opt = merge({}, marked.defaults, opt || {});
+-    checkSanitizeDeprecation(opt);
+     return Parser.parse(Lexer.lex(src, opt), opt);
+   } catch (e) {
+-    e.message += '\nPlease report this to https://github.com/markedjs/marked.';
++    e.message += '\nmake issue @ https://github.com/9001/copyparty';
+     if ((opt || marked.defaults).silent) {
+diff -NarU1 marked-1.0.0-orig/src/Renderer.js marked-1.0.0-edit/src/Renderer.js
+--- marked-1.0.0-orig/src/Renderer.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/src/Renderer.js	2020-04-25 18:59:15.091319265 +0000
+@@ -134,3 +134,3 @@
+   link(href, title, text) {
+-    href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
++    href = cleanUrl(this.options.baseUrl, href);
+     if (href === null) {
+@@ -147,3 +147,3 @@
+   image(href, title, text) {
+-    href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
++    href = cleanUrl(this.options.baseUrl, href);
+     if (href === null) {
+diff -NarU1 marked-1.0.0-orig/src/Tokenizer.js marked-1.0.0-edit/src/Tokenizer.js
+--- marked-1.0.0-orig/src/Tokenizer.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/src/Tokenizer.js	2020-04-25 22:47:07.610917004 +0000
+@@ -256,9 +256,6 @@
+       return {
+-        type: this.options.sanitize
+-          ? 'paragraph'
+-          : 'html',
+-        raw: cap[0],
+-        pre: !this.options.sanitizer
+-          && (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
+-        text: this.options.sanitize ? (this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0])) : cap[0]
++        type: 'html',
++        raw: cap[0],
++        pre: cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style',
++        text: cap[0]
+       };
+@@ -382,5 +379,3 @@
+       return {
+-        type: this.options.sanitize
+-          ? 'text'
+-          : 'html',
++        type: 'html',
+         raw: cap[0],
+@@ -388,7 +383,3 @@
+         inRawBlock,
+-        text: this.options.sanitize
+-          ? (this.options.sanitizer
+-            ? this.options.sanitizer(cap[0])
+-            : escape(cap[0]))
+-          : cap[0]
++        text: cap[0]
+       };
+@@ -504,3 +495,3 @@
+ 
+-  autolink(src, mangle) {
++  autolink(src) {
+     const cap = this.rules.inline.autolink.exec(src);
+@@ -509,3 +500,3 @@
+       if (cap[2] === '@') {
+-        text = escape(this.options.mangle ? mangle(cap[1]) : cap[1]);
++        text = escape(cap[1]);
+         href = 'mailto:' + text;
+@@ -532,3 +523,3 @@
+ 
+-  url(src, mangle) {
++  url(src) {
+     let cap;
+@@ -537,3 +528,3 @@
+       if (cap[2] === '@') {
+-        text = escape(this.options.mangle ? mangle(cap[0]) : cap[0]);
++        text = escape(cap[0]);
+         href = 'mailto:' + text;
+@@ -569,3 +560,3 @@
+ 
+-  inlineText(src, inRawBlock, smartypants) {
++  inlineText(src, inRawBlock) {
+     const cap = this.rules.inline.text.exec(src);
+@@ -574,5 +565,5 @@
+       if (inRawBlock) {
+-        text = this.options.sanitize ? (this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0])) : cap[0];
++        text = cap[0];
+       } else {
+-        text = escape(this.options.smartypants ? smartypants(cap[0]) : cap[0]);
++        text = escape(cap[0]);
+       }
+diff -NarU1 marked-1.0.0-orig/test/bench.js marked-1.0.0-edit/test/bench.js
+--- marked-1.0.0-orig/test/bench.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/test/bench.js	2020-04-25 19:02:27.227980287 +0000
+@@ -34,3 +34,2 @@
+     pedantic: false,
+-    sanitize: false,
+     smartLists: false
+@@ -46,3 +45,2 @@
+     pedantic: false,
+-    sanitize: false,
+     smartLists: false
+@@ -59,3 +57,2 @@
+     pedantic: false,
+-    sanitize: false,
+     smartLists: false
+@@ -71,3 +68,2 @@
+     pedantic: false,
+-    sanitize: false,
+     smartLists: false
+@@ -84,3 +80,2 @@
+     pedantic: true,
+-    sanitize: false,
+     smartLists: false
+@@ -96,3 +91,2 @@
+     pedantic: true,
+-    sanitize: false,
+     smartLists: false
+diff -NarU1 marked-1.0.0-orig/test/specs/run-spec.js marked-1.0.0-edit/test/specs/run-spec.js
+--- marked-1.0.0-orig/test/specs/run-spec.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/test/specs/run-spec.js	2020-04-25 19:05:24.321308408 +0000
+@@ -21,6 +21,2 @@
+           }
+-          if (spec.options.sanitizer) {
+-            // eslint-disable-next-line no-eval
+-            spec.options.sanitizer = eval(spec.options.sanitizer);
+-          }
+           (spec.only ? fit : (spec.skip ? xit : it))('should ' + passFail + example, async() => {
+@@ -49,2 +45 @@
+ runSpecs('ReDOS', './redos');
+-runSpecs('Security', './security', false, { silent: true }); // silent - do not show deprecation warning
+diff -NarU1 marked-1.0.0-orig/test/unit/Lexer-spec.js marked-1.0.0-edit/test/unit/Lexer-spec.js
+--- marked-1.0.0-orig/test/unit/Lexer-spec.js	2020-04-21 01:03:48.000000000 +0000
++++ marked-1.0.0-edit/test/unit/Lexer-spec.js	2020-04-25 22:47:27.170916427 +0000
+@@ -464,3 +464,3 @@
+ 
+-    it('sanitize', () => {
++    /*it('sanitize', () => {
+       expectTokens({
+@@ -482,3 +482,3 @@
+       });
+-    });
++    });*/
+   });
+@@ -586,3 +586,3 @@
+ 
+-      it('html sanitize', () => {
++      /*it('html sanitize', () => {
+         expectInlineTokens({
+@@ -596,3 +596,3 @@
+         });
+-      });
++      });*/
+ 
+@@ -825,3 +825,3 @@
+ 
+-        it('autolink mangle email', () => {
++        /*it('autolink mangle email', () => {
+           expectInlineTokens({
+@@ -845,3 +845,3 @@
+           });
+-        });
++        });*/
+ 
+@@ -882,3 +882,3 @@
+ 
+-        it('url mangle email', () => {
++        /*it('url mangle email', () => {
+           expectInlineTokens({
+@@ -902,3 +902,3 @@
+           });
+-        });
++        });*/
+       });
+@@ -918,3 +918,3 @@
+ 
+-      describe('smartypants', () => {
++      /*describe('smartypants', () => {
+         it('single quotes', () => {
+@@ -988,3 +988,3 @@
+         });
+-      });
++      });*/
+     });
