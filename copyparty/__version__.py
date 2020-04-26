@@ -1,7 +1,7 @@
 # coding: utf-8
 
 VERSION = (0, 2, 3)
-BUILD_DT = (2020, 1, 19)
+BUILD_DT = (2020, 4, 27)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

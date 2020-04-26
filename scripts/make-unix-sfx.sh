@@ -62,6 +62,7 @@ dir="$(
 	awk '/./ {print; exit}'
 )/pe-copyparty"
 
+printf '%s\n' "$pybin" | grep -qE ... && [ -e "$pybin" ] && py="$pybin" ||
 py="$(command -v python3)" ||
 py="$(command -v python)"  ||
 py="$(command -v python2)" || {
@@ -84,7 +85,9 @@ py="$(command -v python2)" || {
 	
 	now=$(date -u +%s)
 	for d in "$dir".*; do
-		ts=$(stat -c%Y -- "$d")
+		ts=$(stat -c%Y -- "$d" 2>/dev/null) ||
+		ts=$(stat -f %m%n -- "$d" 2>/dev/null)
+
 		[ $((now-ts)) -gt 300 ] &&
 			rm -rf "$d"
 	done
