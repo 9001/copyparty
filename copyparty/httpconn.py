@@ -48,6 +48,8 @@ class HttpConn(object):
         if self.cert_path:
             try:
                 method = self.s.recv(4, socket.MSG_PEEK)
+            except socket.timeout:
+                return
             except AttributeError:
                 # jython does not support msg_peek; forget about https
                 method = self.s.recv(4)

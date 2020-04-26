@@ -42,6 +42,9 @@ class HttpCli(object):
     def log(self, msg):
         self.log_func(self.log_src, msg)
 
+    def _check_nonfatal(self, ex):
+        return ex.code in [403, 404]
+
     def run(self):
         """returns true if connection can be reused"""
         self.keepalive = False
@@ -62,9 +65,13 @@ class HttpCli(object):
                 raise Pebkac(400, "bad headers:\n" + "\n".join(headerlines))
 
         except Pebkac as ex:
+            # self.log("pebkac at httpcli.run #1: " + repr(ex))
+            self.keepalive = self._check_nonfatal(ex)
             self.loud_reply(str(ex), status=ex.code)
-            return False
+            return self.keepalive
 
+        # normalize incoming headers to lowercase;
+        # outgoing headers however are Correct-Case
         for header_line in headerlines[1:]:
             k, v = header_line.split(":", 1)
             self.headers[k.lower()] = v.strip()
@@ -122,29 +129,52 @@ class HttpCli(object):
 
         except Pebkac as ex:
             try:
+                # self.log("pebkac at httpcli.run #2: " + repr(ex))
+                self.keepalive = self._check_nonfatal(ex)
                 self.loud_reply(str(ex), status=ex.code)
+                return self.keepalive
             except Pebkac:
-                pass
+                return False
 
-            return False
+    def send_headers(self, length, status=200, mime=None, headers={}):
+        response = ["HTTP/1.1 {} {}".format(status, HTTPCODE[status])]
 
-    def reply(self, body, status=200, mime="text/html", headers=[]):
-        # TODO something to reply with user-supplied values safely
-        response = [
-            "HTTP/1.1 {} {}".format(status, HTTPCODE[status]),
-            "Content-Type: " + mime,
-            "Content-Length: " + str(len(body)),
-            "Connection: " + ("Keep-Alive" if self.keepalive else "Close"),
-        ]
+        if length is None:
+            self.keepalive = False
+        else:
+            response.append("Content-Length: " + str(length))
+
+        # close if unknown length, otherwise take client's preference
+        response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
+
+        # headers{} overrides anything set previously
+        self.out_headers.update(headers)
+
+        # default to utf8 html if no content-type is set
+        try:
+            mime = mime or self.out_headers["Content-Type"]
+        except KeyError:
+            mime = "text/html; charset=UTF-8"
+
+        self.out_headers["Content-Type"] = mime
+
         for k, v in self.out_headers.items():
             response.append("{}: {}".format(k, v))
 
-        response.extend(headers)
-        response_str = "\r\n".join(response).encode("utf-8")
         try:
-            self.s.sendall(response_str + b"\r\n\r\n" + body)
+            # best practice to separate headers and body into different packets
+            self.s.sendall("\r\n".join(response).encode("utf-8") + b"\r\n\r\n")
         except:
-            raise Pebkac(400, "client d/c before http response")
+            raise Pebkac(400, "client d/c while replying headers")
+
+    def reply(self, body, status=200, mime=None, headers={}):
+        # TODO something to reply with user-supplied values safely
+        self.send_headers(len(body), status, mime, headers)
+
+        try:
+            self.s.sendall(body)
+        except:
+            raise Pebkac(400, "client d/c while replying body")
 
         return body
 
@@ -366,7 +396,7 @@ class HttpCli(object):
             msg = "naw dude"
             pwd = "x"  # nosec
 
-        h = ["Set-Cookie: cppwd={}; Path=/".format(pwd)]
+        h = {"Set-Cookie": "cppwd={}; Path=/".format(pwd)}
         html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
         self.reply(html.encode("utf-8"), headers=h)
         return True
@@ -507,32 +537,7 @@ class HttpCli(object):
         self.parser.drop()
         return True
 
-    def tx_file(self, req_path):
-        do_send = True
-        status = 200
-        extra_headers = []
-        logmsg = "{:4} {} ".format("", self.req)
-        logtail = ""
-
-        #
-        # if request is for foo.js, check if we have foo.js.gz
-
-        is_gzip = False
-        fs_path = req_path
-        try:
-            file_sz = os.path.getsize(fsenc(fs_path))
-        except:
-            is_gzip = True
-            fs_path += ".gz"
-            try:
-                file_sz = os.path.getsize(fsenc(fs_path))
-            except:
-                raise Pebkac(404)
-
-        #
-        # if-modified
-
-        file_ts = os.path.getmtime(fsenc(fs_path))
+    def _chk_lastmod(self, file_ts):
         file_dt = datetime.utcfromtimestamp(file_ts)
         file_lastmod = file_dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
@@ -541,13 +546,80 @@ class HttpCli(object):
             try:
                 cli_dt = time.strptime(cli_lastmod, "%a, %d %b %Y %H:%M:%S GMT")
                 cli_ts = calendar.timegm(cli_dt)
-                do_send = int(file_ts) > int(cli_ts)
+                return file_lastmod, int(file_ts) > int(cli_ts)
             except:
                 self.log("bad lastmod format: {}".format(cli_lastmod))
-                do_send = file_lastmod != cli_lastmod
+                return file_lastmod, file_lastmod != cli_lastmod
 
+        return file_lastmod, True
+
+    def tx_file(self, req_path):
+        status = 200
+        logmsg = "{:4} {} ".format("", self.req)
+        logtail = ""
+
+        #
+        # if request is for foo.js, check if we have foo.js.{gz,br}
+
+        file_ts = 0
+        editions = {}
+        for ext in ["", ".gz", ".br"]:
+            try:
+                fs_path = req_path + ext
+                st = os.stat(fsenc(fs_path))
+                file_ts = max(file_ts, st.st_mtime)
+                editions[ext or "plain"] = [fs_path, st.st_size]
+            except:
+                pass
+
+        if not editions:
+            raise Pebkac(404)
+
+        #
+        # if-modified
+
+        file_lastmod, do_send = self._chk_lastmod(file_ts)
+        self.out_headers["Last-Modified"] = file_lastmod
         if not do_send:
             status = 304
+
+        #
+        # Accept-Encoding and UA decides which edition to send
+
+        decompress = False
+        supported_editions = [
+            x.strip()
+            for x in self.headers.get("accept-encoding", "").lower().split(",")
+        ]
+        if ".br" in editions and "br" in supported_editions:
+            is_compressed = True
+            selected_edition = ".br"
+            fs_path, file_sz = editions[".br"]
+            self.out_headers["Content-Encoding"] = "br"
+        elif ".gz" in editions:
+            is_compressed = True
+            selected_edition = ".gz"
+            fs_path, file_sz = editions[".gz"]
+            if "gzip" not in supported_editions:
+                decompress = True
+            else:
+                ua = self.headers.get("user-agent", "")
+                if re.match(r"MSIE [4-6]\.", ua) and " SV1" not in ua:
+                    decompress = True
+
+            if not decompress:
+                self.out_headers["Content-Encoding"] = "gzip"
+        else:
+            is_compressed = False
+            selected_edition = "plain"
+
+        try:
+            fs_path, file_sz = editions[selected_edition]
+            logmsg += "{} ".format(selected_edition.lstrip("."))
+        except:
+            # client is old and we only have .br
+            # (could make brotli a dep to fix this but it's not worth)
+            raise Pebkac(404)
 
         #
         # partial
@@ -556,7 +628,8 @@ class HttpCli(object):
         upper = file_sz
         hrange = self.headers.get("range")
 
-        if do_send and not is_gzip and hrange:
+        # let's not support 206 with compression
+        if do_send and not is_compressed and hrange:
             try:
                 a, b = hrange.split("=", 1)[1].split("-")
 
@@ -577,26 +650,11 @@ class HttpCli(object):
                 raise Pebkac(400, "invalid range requested: " + hrange)
 
             status = 206
-            extra_headers.append(
-                "Content-Range: bytes {}-{}/{}".format(lower, upper - 1, file_sz)
+            self.out_headers["Content-Range"] = "bytes {}-{}/{}".format(
+                lower, upper - 1, file_sz
             )
 
             logtail += " [\033[36m{}-{}\033[0m]".format(lower, upper)
-
-        #
-        # Accept-Encoding and UA decides if we can send gzip as-is
-
-        decompress = False
-        if is_gzip:
-            if "gzip" not in self.headers.get("accept-encoding", "").lower():
-                decompress = True
-            else:
-                ua = self.headers.get("user-agent", "")
-                if re.match(r"MSIE [4-6]\.", ua) and " SV1" not in ua:
-                    decompress = True
-
-            if not decompress:
-                extra_headers.append("Content-Encoding: gzip")
 
         if decompress:
             open_func = gzip.open
@@ -611,25 +669,14 @@ class HttpCli(object):
         #
         # send reply
 
+        self.out_headers["Accept-Ranges"] = "bytes"
+        self.send_headers(
+            length=upper - lower,
+            status=status,
+            mime=mimetypes.guess_type(req_path)[0] or "application/octet-stream",
+        )
+
         logmsg += str(status) + logtail
-
-        mime = mimetypes.guess_type(req_path)[0] or "application/octet-stream"
-
-        headers = [
-            "HTTP/1.1 {} {}".format(status, HTTPCODE[status]),
-            "Content-Type: " + mime,
-            "Content-Length: " + str(upper - lower),
-            "Accept-Ranges: bytes",
-            "Last-Modified: " + file_lastmod,
-            "Connection: " + ("Keep-Alive" if self.keepalive else "Close"),
-        ]
-
-        headers.extend(extra_headers)
-        headers = "\r\n".join(headers).encode("utf-8") + b"\r\n\r\n"
-        try:
-            self.s.sendall(headers)
-        except:
-            raise Pebkac(400, "client d/c before http response")
 
         if self.mode == "HEAD" or not do_send:
             self.log(logmsg)
@@ -748,7 +795,7 @@ class HttpCli(object):
             ts=ts,
             prologue=logues[0],
             epilogue=logues[1],
-            title=quotep(self.vpath),
+            title=html_escape(self.vpath, quote=False),
         )
         self.reply(html.encode("utf-8", "replace"))
         return True

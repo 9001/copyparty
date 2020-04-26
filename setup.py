@@ -137,16 +137,14 @@ if setuptools_available:
             "entry_points": {
                 "console_scripts": ["copyparty = copyparty.__main__:main"]
             },
-            "scripts": [
-                "bin/copyparty-fuse.py"
-            ]
+            "scripts": ["bin/copyparty-fuse.py"],
         }
     )
 else:
     args.update(
         {
             "packages": ["copyparty", "copyparty.stolen"],
-            "scripts": ["bin/copyparty", "bin/copyparty-fuse.py"]
+            "scripts": ["bin/copyparty-fuse.py"],
         }
     )
 

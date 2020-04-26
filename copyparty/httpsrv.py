@@ -75,7 +75,7 @@ class HttpSrv(object):
                 sck.shutdown(socket.SHUT_RDWR)
                 sck.close()
             except (OSError, socket.error) as ex:
-                # self.log(str(addr), "shut_rdwr err: " + repr(sck))
+                self.log(str(addr), "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex))
                 if ex.errno not in [10038, 107, 57, 9]:
                     # 10038 No longer considered a socket
                     #   107 Transport endpoint not connected

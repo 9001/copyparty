@@ -1,10 +1,11 @@
-FROM    alpine:3.10
+FROM    alpine:3.11
 WORKDIR /z
 ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
         ver_ogvjs=1.6.1
 
+
 # download
-RUN     apk add make g++ git bash npm patch wget tar pigz gzip unzip \
+RUN     apk add make g++ git bash npm patch wget tar pigz brotli gzip unzip \
         && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip \
         && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz \
         && unzip ogvjs-$ver_ogvjs.zip \
