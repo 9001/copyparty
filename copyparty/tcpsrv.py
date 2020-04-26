@@ -71,7 +71,7 @@ class TcpSrv(object):
     def shutdown(self):
         self.log("tcpsrv", "ok bye")
 
-    def detect_interfaces(self, ext_ip):
+    def detect_interfaces(self, listen_ip):
         eps = {}
 
         # get all ips and their interfaces
@@ -85,29 +85,27 @@ class TcpSrv(object):
             for ln in ip_addr.split("\n"):
                 try:
                     ip, dev = r.match(ln.rstrip()).groups()
-                    if ext_ip in ["0.0.0.0", ip]:
+                    if listen_ip in ["0.0.0.0", ip]:
                         eps[ip] = dev
                 except:
                     pass
 
-        # get ip with default route
+        default_route = None
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             s.connect(("10.255.255.255", 1))
-            ip = s.getsockname()[0]
+            default_route = s.getsockname()[0]
         except (OSError, socket.error) as ex:
             if ex.errno not in [101, 10065]:
                 raise
 
-            return None
-
         s.close()
 
-        if ext_ip in ["0.0.0.0", ip]:
+        if default_route and listen_ip in ["0.0.0.0", default_route]:
             desc = "\033[32mexternal"
             try:
-                eps[ip] += ", " + desc
+                eps[default_route] += ", " + desc
             except:
-                eps[ip] = desc
+                eps[default_route] = desc
 
         return eps
