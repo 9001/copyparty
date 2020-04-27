@@ -131,6 +131,9 @@ class SvcHub(object):
             self.log("root", "multiprocessing disabled by argument -j 0;")
             return False
 
+        if mp.cpu_count() <= 1:
+            return False
+        
         try:
             # support vscode debugger (bonus: same behavior as on windows)
             mp.set_start_method("spawn", True)

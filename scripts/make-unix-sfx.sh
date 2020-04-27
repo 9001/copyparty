@@ -30,7 +30,8 @@ cd sfx
 
 f=~/Downloads/Jinja2-2.6.tar.gz
 [ -e "$f" ] ||
-	(cd ~/Downloads && wget https://files.pythonhosted.org/packages/25/c8/212b1c2fd6df9eaf536384b6c6619c4e70a3afd2dffdd00e5296ffbae940/Jinja2-2.6.tar.gz)
+	(url=https://files.pythonhosted.org/packages/25/c8/212b1c2fd6df9eaf536384b6c6619c4e70a3afd2dffdd00e5296ffbae940/Jinja2-2.6.tar.gz;
+	cd ~/Downloads && wget "$url" || curl -LO "$url")
 
 tar -xf $f
 mv Jinja2-*/jinja2 .
@@ -54,21 +55,13 @@ mkdir -p ../dist
 sfx_out=../dist/copyparty-$ver.sfx
 
 sed "s/PACK_TS/$ts/; s/PACK_HTS/$hts/; s/CPP_VER/$ver/" >$sfx_out <<'EOF'
-#!/bin/bash
+# use current/default shell
 set -e
 
 dir="$(
 	printf '%s\n' "$TMPDIR" /tmp |
 	awk '/./ {print; exit}'
 )/pe-copyparty"
-
-printf '%s\n' "$pybin" | grep -qE ... && [ -e "$pybin" ] && py="$pybin" ||
-py="$(command -v python3)" ||
-py="$(command -v python)"  ||
-py="$(command -v python2)" || {
-	printf '\033[1;31mpls install python\033[0m\n' >&2
-	exit 1
-}
 
 [ -e "$dir/vPACK_TS" ] || (
 	printf '\033[36munpacking copyparty vCPP_VER (sfx-PACK_HTS)\033[1;30m\n\n'
@@ -91,14 +84,47 @@ py="$(command -v python2)" || {
 		[ $((now-ts)) -gt 300 ] &&
 			rm -rf "$d"
 	done
-
-	# delete the bundled jinja2 if we have a better one
-	"$py" -c 'import jinja2' 2>/dev/null &&
-		rm -rf $dir/jinja2
 	true
 ) >&2 || exit 1
 
-PYTHONPATH=$dir exec "$py" -m copyparty "$@"
+# detect available pythons
+(IFS=:; for d in $PATH; do
+	printf '%s\n' "$d"/python* "$d"/pypy*;
+done) | grep -E '(python|pypy)[0-9\.-]*$' > $dir/pys || true
+
+# see if we made a choice before
+[ -z "$pybin" ] && pybin="$(cat $dir/py 2>/dev/null || true)"
+
+# otherwise find a python with jinja2
+[ -z "$pybin" ] && pybin="$(cat $dir/pys | while IFS= read -r _py; do
+	printf '\033[1;30mlooking for jinja2 in [%s]\033[0m\n' "$_py" >&2
+	$_py -c 'import jinja2' 2>/dev/null || continue
+	printf '%s\n' "$_py"
+	rm -rf $dir/jinja2
+	break
+done)"
+
+# otherwise find python2 (bundled jinja2 is way old)
+[ -z "$pybin" ] && {
+	printf '\033[0;33mcould not find jinja2; will use py2 + the bundled version\033[0m\n' >&2
+	pybin="$(cat $dir/pys | while IFS= read -r _py; do
+		printf '\033[1;30mtesting if py2 [%s]\033[0m\n' "$_py" >&2
+		_ver=$($_py -c 'import sys; sys.stdout.write(str(sys.version_info[0]))' 2>/dev/null) || continue
+		[ $_ver = 2 ] || continue
+		printf '%s\n' "$_py"
+		break
+	done)"
+}
+
+[ -z "$pybin" ] && {
+	printf '\033[1;31m\ncould not find a python with jinja2 installed; please do one of these:\n\n  pip install --user jinja2\n\n  install python2\033[0m\n\n' >&2
+	exit 1
+}
+
+printf '\033[1;30musing [%s]. you can reset with this:\n  rm -rf %s*\033[0m\n\n' "$pybin" "$dir"
+printf '%s\n' "$pybin" > $dir/py
+
+PYTHONPATH=$dir exec "$pybin" -m copyparty "$@"
 
 sfx_eof
 EOF
