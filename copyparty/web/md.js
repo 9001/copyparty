@@ -126,8 +126,14 @@ function init_toc() {
             };
         }
         else if (is_precode) {
-            elm.innerHTML = elm.innerHTML.replace(
-                /\r?\n<\/code>$/i, '</code>').split(/\r?\n/g).join('</code>\n<code>');
+            // not actually toc-related (sorry),
+            // split <pre><code /></pre> into one <code> per line
+            var nline = parseInt(elm.getAttribute('data-ln')) + 1;
+            var lines = elm.innerHTML.replace(/\r?\n<\/code>$/i, '</code>').split(/\r?\n/g);
+            for (var b = 0; b < lines.length - 1; b++)
+                lines[b] += '</code>\n<code data-ln="' + (nline + b) + '">';
+
+            elm.innerHTML = lines.join('');
         }
 
         if (!is_header && anchor)
@@ -161,7 +167,7 @@ function init_toc() {
             return;
 
         var ptop = window.pageYOffset || document.documentElement.scrollTop;
-        var hit = -1;
+        var hit = anchors.length - 1;
         for (var a = 0; a < anchors.length; a++) {
             if (anchors[a].y >= ptop - 8) {  //???
                 hit = a;

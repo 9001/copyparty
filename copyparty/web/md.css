@@ -373,3 +373,12 @@ blink {
 		display: none;
 	}
 }
+
+/*
+*[data-ln]:before {
+	content: attr(data-ln);
+	font-size: .8em;
+	margin: 0 .4em;
+	color: #f0c;
+}
+*/

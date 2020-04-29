@@ -99,6 +99,7 @@ a newline toplevel
 ## ep2
 
 
+
 #######################################################################
 
 
@@ -142,7 +143,18 @@ https://github.com/markdown-it/markdown-it
 
 almost-all-pass:
 
+https://github.com/Ionaru/easy-markdown-editor
+  https://easymde.tk/
+  simplemde fork (the most active)
+
+https://github.com/Inscryb/inscryb-markdown-editor
+  simplemde fork
+
+other simplemde forks:
+  pulkitmittal
+
 https://simplemde.com/
+  (dead)
 
 https://github.com/nhn/tui.editor
   https://nhn.github.io/tui.editor/latest/tutorial-example01-editor-basic
@@ -153,3 +165,9 @@ https://github.com/nhn/tui.editor
 unrelated neat stuff:
   https://github.com/gnab/remark
 
+
+
+```sh
+awk '/./ {printf "%s %d\n", $0, NR; next} 1' <test.md >ln.md
+gawk '{print gensub(/([a-zA-Z\.])/,NR" \\1","1")}' <test.md >ln.md
+```

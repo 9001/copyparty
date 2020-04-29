@@ -68,7 +68,9 @@ RUN     cd ogvjs-$ver_ogvjs \
 
 # build marked
 COPY    marked.patch /z/
+COPY    marked-ln.patch /z/
 RUN     cd marked-$ver_marked \
+        && patch -p1 < /z/marked-ln.patch \
         && patch -p1 < /z/marked.patch \
         && npm run build \
         && cp -pv marked.min.js /z/dist/marked.js \
@@ -152,3 +154,7 @@ RUN     cd /z/dist \
 
 
 # f=../../copyparty/web/deps/marked.js.gz; (cd ~ed/src/ && diff -NarU1 marked-1.0.0-orig/ marked-1.0.0-edit/) >marked.patch; make && printf '%d ' $(wc -c <$f) $(gzip -d <$f | wc -c); echo
+
+
+# d=/home/ed/dev/copyparty/scripts/deps-docker/; scp Dockerfile marked-ln.patch root@$bip:$d && ssh root@$bip "cd $d && make" && ssh root@$bip 'tar -cC /home/ed/dev/copyparty/copyparty/web deps' | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
+# gzip -dkf ../dev/copyparty/copyparty/web/deps/deps/marked.full.js.gz && diff -NarU2 ../dev/copyparty/copyparty/web/deps/{,deps/}marked.full.js
