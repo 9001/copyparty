@@ -1,0 +1,75 @@
+/* fontawesome is 2big */
+.fa { font-size: 1.5em; line-height: 1em; margin: -3em; position: relative; left: -.05em; font-style: normal }
+.fa-bold:before { content: 'B'; font-weight: bold }
+.fa-italic:before { content: 'I'; font-style: italic }
+.fa-strikethrough:before { content: ' S '; text-decoration: line-through }
+.fa-header:before { content: 'H'; font-weight: bold; font-family: serif; top: -.2em; left: .5em }
+.fa-quote-left:before { content: '❝'; font-family: serif; top: -.5em }
+.fa-list-ul:before { content: '•' }
+.fa-list-ol:before { content: '①' }
+.fa-link:before { content: '🔗'; font-size: .8em }
+.fa-image:before { content: '🎨' }
+.fa-eye:before { content: '👀'; font-size: .9em }
+.fa-columns:before { content: '◫' }
+.fa-arrows-alt:before { content: '⛶' }
+.fa-undo:before { content: '⟲' }
+.fa-redo:before { content: '⟳' }
+.fa-question-circle:before { content: '?' }
+.fa-code:before { content: '‹/›'; font-size: .8em; }
+.fa-eraser:before { content: '⁋' }
+.fa-table:before { content: '⊞' }
+.fa-minus:before { content: '−' }
+
+/*
+https://dev.w3.org/html5/html-author/charref
+http://xahlee.info/comp/unicode_arrows.html
+https://www.fileformat.info/info/unicode/block/miscellaneous_symbols_and_pictographs/list.htm
+↶ ↷ 💾 🗙 
+*/
+
+button { border: 1px solid #999 !important; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: sans-serif;
+}
+#mn {
+    font-weight: normal;
+    margin: 1.3em 0 .7em 1em;
+    font-size: 1.4em;
+}
+#mn a {
+    color: #444;
+    margin: 0 0 0 -.2em;
+    padding: 0 0 0 .4em;
+    text-decoration: none;
+}
+#mn a:first-child {
+    padding-left: .5em;
+}
+#mn a:last-child {
+    padding-right: .5em;
+}
+#mn a:not(:last-child):after {
+    content: '';
+    width: 1.05em;
+    height: 1.05em;
+    margin: -.2em .3em -.2em -.4em;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-width: .05em .05em 0 0;
+    transform: rotate(45deg);
+}
+#mn a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+    
+*[data-ln]:before {
+	content: attr(data-ln);
+	font-size: .8em;
+	margin: 0 .4em;
+	color: #f0c;
+}

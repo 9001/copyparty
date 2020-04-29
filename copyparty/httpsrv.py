@@ -38,7 +38,7 @@ class HttpSrv(object):
 
     def accept(self, sck, addr):
         """takes an incoming tcp connection and creates a thread to handle it"""
-        self.log(str(addr), "-" * 5 + "C-cthr")
+        self.log("%s %s" % addr, "-" * 5 + "C-cthr")
         thr = threading.Thread(target=self.thr_client, args=(sck, addr))
         thr.daemon = True
         thr.start()
@@ -66,16 +66,18 @@ class HttpSrv(object):
                 thr.start()
 
         try:
-            self.log(str(addr), "-" * 6 + "C-crun")
+            self.log("%s %s" % addr, "-" * 6 + "C-crun")
             cli.run()
 
         finally:
-            self.log(str(addr), "-" * 7 + "C-done")
+            self.log("%s %s" % addr, "-" * 7 + "C-done")
             try:
                 sck.shutdown(socket.SHUT_RDWR)
                 sck.close()
             except (OSError, socket.error) as ex:
-                self.log(str(addr), "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex))
+                self.log(
+                    "%s %s" % addr, "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex),
+                )
                 if ex.errno not in [10038, 107, 57, 9]:
                     # 10038 No longer considered a socket
                     #   107 Transport endpoint not connected

@@ -64,7 +64,7 @@ class TcpSrv(object):
 
             self.log("tcpsrv", "-" * 2 + "C-acc1")
             sck, addr = self.srv.accept()
-            self.log(str(addr), "-" * 3 + "C-acc2")
+            self.log("%s %s" % addr, "-" * 3 + "C-acc2")
             self.num_clients.add()
             self.hub.broker.put(False, "httpconn", sck, addr)
 

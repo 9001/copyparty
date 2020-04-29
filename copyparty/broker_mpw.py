@@ -73,7 +73,7 @@ class MpWorker(object):
                 if PY2:
                     sck = pickle.loads(sck)  # nosec
 
-                self.log(str(addr), "-" * 4 + "C-qpop")
+                self.log("%s %s" % addr, "-" * 4 + "C-qpop")
                 self.httpsrv.accept(sck, addr)
 
                 with self.mutex:

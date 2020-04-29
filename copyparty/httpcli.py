@@ -708,7 +708,14 @@ class HttpCli(object):
 
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)
-        html_path = os.path.join(E.mod, "web/md.html")
+        if "edit" in self.uparam:
+            html_path = "web/mde.html"
+            template = self.conn.tpl_mde
+        else:
+            html_path = "web/md.html"
+            template = self.conn.tpl_md
+
+        html_path = os.path.join(E.mod, html_path)
 
         st = os.stat(fsenc(fs_path))
         sz_md = st.st_size
@@ -726,7 +733,7 @@ class HttpCli(object):
             "title": html_escape(self.vpath, quote=False),
             "md": "",
         }
-        sz_html = len(self.conn.tpl_md.render(**targs).encode("utf-8"))
+        sz_html = len(template.render(**targs).encode("utf-8"))
         self.send_headers(sz_html + sz_md, status)
 
         logmsg += str(status)
@@ -738,7 +745,7 @@ class HttpCli(object):
             md = f.read()
 
         targs["md"] = md.decode("utf-8", "replace")
-        html = self.conn.tpl_md.render(**targs).encode("utf-8")
+        html = template.render(**targs).encode("utf-8")
         try:
             self.s.sendall(html)
         except:

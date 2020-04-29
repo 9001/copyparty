@@ -36,6 +36,7 @@ class HttpConn(object):
         self.tpl_browser = env.get_template("browser.html")
         self.tpl_msg = env.get_template("msg.html")
         self.tpl_md = env.get_template("md.html")
+        self.tpl_mde = env.get_template("mde.html")
 
     def respath(self, res_name):
         return os.path.join(E.mod, "web", res_name)

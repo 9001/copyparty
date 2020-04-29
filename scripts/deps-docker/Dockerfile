@@ -4,7 +4,8 @@ ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
         ver_markdownit=10.0.0 \
         ver_showdown=1.9.1 \
         ver_marked=1.0.0 \
-        ver_ogvjs=1.6.1
+        ver_ogvjs=1.6.1 \
+        ver_mde=2.10.1
 
 
 # download
@@ -12,6 +13,7 @@ RUN     apk add make g++ git bash npm patch wget tar pigz brotli gzip unzip \
         && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip -O ogvjs.zip \
         && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
+        && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
         && unzip ogvjs.zip \
         && (tar -xf asmcrypto.tgz \
             && cd asmcrypto.js-$ver_asmcrypto \
@@ -20,7 +22,13 @@ RUN     apk add make g++ git bash npm patch wget tar pigz brotli gzip unzip \
             && cd marked-$ver_marked \
             && npm install \
             && npm i grunt uglify-js -g ) \
+        && (tar -xf mde.tgz \
+            && cd easy-markdown-editor* \
+            && npm install \
+            && npm i gulp-cli -g ) \
         && mkdir /z/dist
+#        && wget https://github.com/FortAwesome/Font-Awesome/releases/download/5.0.11/fontawesome-free-5.0.11.zip -O fontawesome.zip \
+#        && unzip fontawesome.zip \
 
 
 # uncomment if you wanna test the abandoned markdown converters
@@ -74,8 +82,24 @@ RUN     cd marked-$ver_marked \
         && patch -p1 < /z/marked.patch \
         && npm run build \
         && cp -pv marked.min.js /z/dist/marked.js \
-        && cp -pv lib/marked.js /z/dist/marked.full.js
+        && cp -pv lib/marked.js /z/dist/marked.full.js \
+        && mkdir -p /z/nodepkgs \
+        && ln -s $(pwd) /z/nodepkgs/marked
 #        && npm run test \
+
+
+# build easymde (TODO man this thing is big)
+RUN     cd easy-markdown-editor-$ver_mde \
+        && sed -ri 's`https://registry.npmjs.org/marked/-/marked-0.8.2.tgz`file:/z/nodepkgs/marked`' package-lock.json \
+        && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
+        && npm install \
+        && gulp \
+        && cp -pv dist/easymde.min.css /z/dist/easymde.css \
+        && cp -pv dist/easymde.min.js /z/dist/easymde.js \
+        && sed -ri '/pipe.terser/d; /cleanCSS/d' gulpfile.js \
+        && gulp \
+        && cp -pv dist/easymde.min.css /z/dist/easymde.full.css \
+        && cp -pv dist/easymde.min.js /z/dist/easymde.full.js
 
 
 # build showdown (abandoned; disabled by default)
@@ -126,6 +150,9 @@ COPY    zopfli.makefile /z/dist/Makefile
 RUN     cd /z/dist \
         && make -j$(nproc) \
         && rm Makefile
+#        && cp -pv "$(find /z/fontawesome-fre* -name fa-regular-400.woff | head -n 1)" fontawesome.woff
+#        && cp -pv "$(find /z/fontawesome-fre* -name fontawesome.min.css | head -n 1)" fontawesome.css \
+#        && sed -ri 's`@font-face.*``' fontawesome.css \
 
 
 # showdown: abandoned due to code-blocks in lists failing
@@ -156,5 +183,5 @@ RUN     cd /z/dist \
 # f=../../copyparty/web/deps/marked.js.gz; (cd ~ed/src/ && diff -NarU1 marked-1.0.0-orig/ marked-1.0.0-edit/) >marked.patch; make && printf '%d ' $(wc -c <$f) $(gzip -d <$f | wc -c); echo
 
 
-# d=/home/ed/dev/copyparty/scripts/deps-docker/; scp Dockerfile marked-ln.patch root@$bip:$d && ssh root@$bip "cd $d && make" && ssh root@$bip 'tar -cC /home/ed/dev/copyparty/copyparty/web deps' | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
+# d=/home/ed/dev/copyparty/scripts/deps-docker/; tar -cf ../x . && ssh root@$bip "cd $d && tar -xv >&2 && make >&2 && tar -cC ../../copyparty/web deps" <../x | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
 # gzip -dkf ../dev/copyparty/copyparty/web/deps/deps/marked.full.js.gz && diff -NarU2 ../dev/copyparty/copyparty/web/deps/{,deps/}marked.full.js

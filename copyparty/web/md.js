@@ -14,15 +14,15 @@ var dom_md = document.getElementById('mt');
 // add toolbar buttons
 (function () {
     var n = document.location + '';
-    n = n.substr(n.indexOf('//') + 2).split('/');
+    n = n.substr(n.indexOf('//') + 2).split('?')[0].split('/');
     n[0] = 'top';
+    var loc = [];
     var nav = [];
-    var url = '/';
     for (var a = 0; a < n.length; a++) {
         if (a > 0)
-            url += n[a] + '/';
+            loc.push(n[a]);
 
-        nav.push('<a href="' + url + '">' + n[a] + '</a>');
+        nav.push('<a href="/' + loc.join('/') + '">' + n[a] + '</a>');
     }
     dom_nav.innerHTML = nav.join('');
 })();
