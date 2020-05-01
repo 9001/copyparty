@@ -1,33 +1,11 @@
-/* fontawesome is 2big */
-.fa { font-size: 1.5em; line-height: 1em; margin: -3em; position: relative; left: -.05em; font-style: normal }
-.fa-bold:before { content: 'B'; font-weight: bold }
-.fa-italic:before { content: 'I'; font-style: italic }
-.fa-strikethrough:before { content: ' S '; text-decoration: line-through }
-.fa-header:before { content: 'H'; font-weight: bold; font-family: serif; top: -.2em; left: .5em }
-.fa-quote-left:before { content: '❝'; font-family: serif; top: -.5em }
-.fa-list-ul:before { content: '•' }
-.fa-list-ol:before { content: '①' }
-.fa-link:before { content: '🔗'; font-size: .8em }
-.fa-image:before { content: '🎨' }
-.fa-eye:before { content: '👀'; font-size: .9em }
-.fa-columns:before { content: '◫' }
-.fa-arrows-alt:before { content: '⛶' }
-.fa-undo:before { content: '⟲' }
-.fa-redo:before { content: '⟳' }
-.fa-question-circle:before { content: '?' }
-.fa-code:before { content: '‹/›'; font-size: .8em; }
-.fa-eraser:before { content: '⁋' }
-.fa-table:before { content: '⊞' }
-.fa-minus:before { content: '−' }
-
-/*
-https://dev.w3.org/html5/html-author/charref
-http://xahlee.info/comp/unicode_arrows.html
-https://www.fileformat.info/info/unicode/block/miscellaneous_symbols_and_pictographs/list.htm
-↶ ↷ 💾 🗙 
-*/
-
-button { border: 1px solid #999 !important; }
+html .editor-toolbar>button { margin-left: -1px; border: 1px solid rgba(0,0,0,0.1) }
+html .editor-toolbar>button+button { border-left: 1px solid rgba(0,0,0,0) }
+html .editor-toolbar>button:hover,
+html .editor-toolbar>button:active { box-shadow: 0 .1em .3em #999; z-index: 9 }
+html .editor-toolbar>button:active,
+html .editor-toolbar>button.active { border-color: rgba(0,0,0,0.4); background: #fc0 }
+html .editor-toolbar>i.separator { border-left: 1px solid #ccc; }
+html .editor-toolbar.disabled-for-preview>button:not(.no-disable) { opacity: .35 }
 
 html, body {
     margin: 0;

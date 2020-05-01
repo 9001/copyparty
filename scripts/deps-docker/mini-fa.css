@@ -1,0 +1,52 @@
+
+/*
+that was the original copyright ^
+now here's a tiny subset of fontawesome
+*/
+
+@font-face {
+font-family: 'fa';
+font-style: normal;
+font-weight: 400;
+font-display: block;
+src: url("/.cpr/deps/mini-fa.woff") format("woff");
+}
+
+.fa,
+.fas,
+.far,
+.fal,
+.fad,
+.fab {
+-moz-osx-font-smoothing: grayscale;
+-webkit-font-smoothing: antialiased;
+display: inline-block;
+font-style: normal;
+font-variant: normal;
+text-rendering: auto;
+line-height: 1;
+font-family: 'fa';
+font-weight: 400;
+}
+
+:add
+arrows-alt
+bold
+code
+columns
+eraser
+eye
+heading
+image
+italic
+link
+list-ol
+list-ul
+minus
+question-circle
+quote-left
+redo
+save
+strikethrough
+table
+undo

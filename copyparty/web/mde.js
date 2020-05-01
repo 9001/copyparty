@@ -19,6 +19,20 @@ var dom_md = document.getElementById('mt');
 })();
 
 (function () {
+    var tbar = [
+        {
+            name: "save",
+            title: "save",
+            className: "fa fa-save",
+            action: (mde) => {
+                alert("TODO save (" + (mde.value().length / 1024) + ' kB)');
+            }
+        }, '|',
+        'bold', 'italic', 'strikethrough', 'heading', '|',
+        'code', 'quote', 'unordered-list', 'ordered-list', 'clean-block', '|',
+        'link', 'image', 'table', 'horizontal-rule', '|',
+        'preview', 'side-by-side', 'fullscreen', '|',
+        'undo', 'redo'];
     var mde = new EasyMDE({
         autoDownloadFontAwesome: false,
         autofocus: true,
@@ -31,7 +45,7 @@ var dom_md = document.getElementById('mt');
         },
         spellChecker: false,
         tabSize: 4,
-        showIcons: ['strikethrough', 'code', 'table', 'undo', 'redo', 'heading', 'clean-block', 'horizontal-rule']
+        toolbar: tbar
     });
     var loader = document.getElementById('ml');
     loader.parentNode.removeChild(loader);
