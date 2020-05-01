@@ -31,6 +31,10 @@
         {%- if html %}
         {{ html }}
         {%- endif %}
+
+        {%- if click %}
+        <script>document.getElementsByTagName("a")[0].click()</script>
+        {%- endif %}
     </div>
 
     {%- if redir %}

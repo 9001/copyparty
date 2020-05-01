@@ -1,6 +1,6 @@
 diff -NarU2 easymde-mod1/src/js/easymde.js easymde-edit/src/js/easymde.js
 --- easymde-mod1/src/js/easymde.js	2020-05-01 14:34:19.878774400 +0200
-+++ easymde-edit/src/js/easymde.js	2020-05-01 19:26:56.843140600 +0200
++++ easymde-edit/src/js/easymde.js	2020-05-01 21:24:44.142611200 +0200
 @@ -2189,4 +2189,5 @@
  };
  
@@ -63,8 +63,8 @@ diff -NarU2 easymde-mod1/src/js/easymde.js easymde-edit/src/js/easymde.js
 +        var pre2 = get_pre_line(pre1[0] + 1, true) ||
 +            [cm.lineCount(), null, preview.scrollHeight];
 +        
-+        console.log('code-center %d, frac %.2f, pre [%d,%d] [%d,%d]',
-+            md_center_n, md_frac, pre1[0], pre1[2], pre2[0], pre2[2]);
++        //console.log('code-center %d, frac %.2f, pre [%d,%d] [%d,%d]',
++        //    md_center_n, md_frac, pre1[0], pre1[2], pre2[0], pre2[2]);
 +        
 +        // [0] is the markdown line which matches that preview y-pos
 +        // and since not all preview lines are tagged with a line-number

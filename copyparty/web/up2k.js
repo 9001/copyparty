@@ -81,15 +81,15 @@ function opclick(ev) {
 function goto(dest) {
     var obj = document.querySelectorAll('.opview.act');
     for (var a = obj.length - 1; a >= 0; a--)
-        obj[a].setAttribute('class', 'opview');
+        obj[a].classList.remove('act');
 
     var obj = document.querySelectorAll('#ops>a');
     for (var a = obj.length - 1; a >= 0; a--)
-        obj[a].setAttribute('class', '');
+        obj[a].classList.remove('act');
 
     if (dest) {
-        document.querySelector('#ops>a[data-dest=' + dest + ']').setAttribute('class', 'act');
-        document.getElementById('op_' + dest).setAttribute('class', 'opview act');
+        var dom_obj = document.getElementById('op_' + dest).classList.add('act');
+        document.querySelector('#ops>a[data-dest=' + dest + ']').classList.add('act');
 
         var fn = window['goto_' + dest];
         if (fn)

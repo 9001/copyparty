@@ -45,6 +45,14 @@ html, body {
     text-decoration: underline;
 }
 
+html .editor-toolbar>button.disabled {
+    opacity: .35;
+    pointer-events: none;
+}
+html .editor-toolbar>button.save.force-save {
+    background: #f97;
+}
+
 /*
 *[data-ln]:before {
 	content: attr(data-ln);

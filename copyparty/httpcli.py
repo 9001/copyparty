@@ -45,6 +45,11 @@ class HttpCli(object):
     def _check_nonfatal(self, ex):
         return ex.code in [403, 404]
 
+    def _assert_safe_rem(self, rem):
+        # sanity check to prevent any disasters
+        if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
+            raise Exception("that was close")
+
     def run(self):
         """returns true if connection can be reused"""
         self.keepalive = False
@@ -263,8 +268,15 @@ class HttpCli(object):
         if act == "mkdir":
             return self.handle_mkdir()
 
+        if act == "new_md":
+            # kinda silly but has the least side effects
+            return self.handle_new_md()
+
         if act == "bput":
             return self.handle_plain_upload()
+
+        if act == "tput":
+            return self.handle_text_upload()
 
         raise Pebkac(422, 'invalid action "{}"'.format(act))
 
@@ -407,11 +419,7 @@ class HttpCli(object):
 
         nullwrite = self.args.nw
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
-
-        # rem is escaped at this point,
-        # this is just a sanity check to prevent any disasters
-        if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
-            raise Exception("that was close")
+        self._assert_safe_rem(rem)
 
         if not nullwrite:
             fdir = os.path.join(vfs.realpath, rem)
@@ -429,12 +437,44 @@ class HttpCli(object):
                 raise Pebkac(500, "mkdir failed, check the logs")
 
         vpath = "{}/{}".format(self.vpath, new_dir).lstrip("/")
-        redir = '<script>document.getElementsByTagName("a")[0].click()</script>'
         html = self.conn.tpl_msg.render(
-            h2='<a href="/{}">go to /{}</a>{}'.format(
-                quotep(vpath), html_escape(vpath, quote=False), redir
+            h2='<a href="/{}">go to /{}</a>'.format(
+                quotep(vpath), html_escape(vpath, quote=False)
             ),
             pre="aight",
+            click=True,
+        )
+        self.reply(html.encode("utf-8", "replace"))
+        return True
+
+    def handle_new_md(self):
+        new_file = self.parser.require("name", 512)
+        self.parser.drop()
+
+        nullwrite = self.args.nw
+        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        self._assert_safe_rem(rem)
+
+        if not new_file.endswith(".md"):
+            new_file += ".md"
+
+        if not nullwrite:
+            fdir = os.path.join(vfs.realpath, rem)
+            fn = os.path.join(fdir, sanitize_fn(new_file))
+
+            if os.path.exists(fsenc(fn)):
+                raise Pebkac(500, "that file exists already")
+
+            with open(fsenc(fn), "wb") as f:
+                f.write(b"`GRUNNUR`\n")
+
+        vpath = "{}/{}".format(self.vpath, new_file).lstrip("/")
+        html = self.conn.tpl_msg.render(
+            h2='<a href="/{}?edit">go to /{}?edit</a>'.format(
+                quotep(vpath), html_escape(vpath, quote=False)
+            ),
+            pre="aight",
+            click=True,
         )
         self.reply(html.encode("utf-8", "replace"))
         return True
@@ -442,11 +482,7 @@ class HttpCli(object):
     def handle_plain_upload(self):
         nullwrite = self.args.nw
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
-
-        # rem is escaped at this point,
-        # this is just a sanity check to prevent any disasters
-        if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
-            raise Exception("that was close")
+        self._assert_safe_rem(rem)
 
         files = []
         errmsg = ""
@@ -535,6 +571,86 @@ class HttpCli(object):
         )
         self.reply(html.encode("utf-8", "replace"))
         self.parser.drop()
+        return True
+
+    def handle_text_upload(self):
+        try:
+            cli_lastmod3 = int(self.parser.require("lastmod", 16))
+        except:
+            raise Pebkac(400, "could not read lastmod from request")
+
+        nullwrite = self.args.nw
+        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        self._assert_safe_rem(rem)
+
+        # TODO:
+        #   the per-volume read/write permissions must be replaced with permission flags
+        #   which would decide how to handle uploads to filenames which are taken,
+        #   current behavior of creating a new name is a good default for binary files
+        #   but should also offer a flag to takeover the filename and rename the old one
+        #
+        # stopgap:
+        if not rem.endswith(".md"):
+            raise Pebkac(400, "only markdown pls")
+
+        if nullwrite:
+            response = json.dumps({"ok": True, "lastmod": 0})
+            self.log(response)
+            # TODO reply should parser.drop()
+            self.parser.drop()
+            self.reply(response.encode("utf-8"))
+            return True
+
+        fn = os.path.join(vfs.realpath, rem)
+        srv_lastmod = -1
+        try:
+            st = os.stat(fsenc(fn))
+            srv_lastmod = st.st_mtime
+            srv_lastmod3 = int(srv_lastmod * 1000)
+        except OSError as ex:
+            if ex.errno != 2:
+                raise
+
+        # if file exists, chekc that timestamp matches the client's
+        if srv_lastmod >= 0:
+            if cli_lastmod3 not in [-1, srv_lastmod3]:
+                response = json.dumps(
+                    {
+                        "ok": False,
+                        "lastmod": srv_lastmod3,
+                        "now": int(time.time() * 1000),
+                    }
+                )
+                self.log(
+                    "{} - {} = {}".format(
+                        srv_lastmod3, cli_lastmod3, srv_lastmod3 - cli_lastmod3
+                    )
+                )
+                self.log(response)
+                self.parser.drop()
+                self.reply(response.encode("utf-8"))
+                return True
+
+            # TODO another hack re: pending permissions rework
+            os.rename(fn, "{}.bak-{:.3f}.md".format(fn[:-3], srv_lastmod))
+
+        p_field, _, p_data = next(self.parser.gen)
+        if p_field != "body":
+            raise Pebkac(400, "expected body, got {}".format(p_field))
+
+        with open(fn, "wb") as f:
+            sz, sha512, _ = hashcopy(self.conn, p_data, f)
+
+        new_lastmod = os.stat(fsenc(fn)).st_mtime
+        new_lastmod3 = int(new_lastmod * 1000)
+        sha512 = sha512[:56]
+
+        response = json.dumps(
+            {"ok": True, "lastmod": new_lastmod3, "size": sz, "sha512": sha512}
+        )
+        self.log(response)
+        self.parser.drop()
+        self.reply(response.encode("utf-8"))
         return True
 
     def _chk_lastmod(self, file_ts):
@@ -731,6 +847,7 @@ class HttpCli(object):
 
         targs = {
             "title": html_escape(self.vpath, quote=False),
+            "lastmod": int(ts_md * 1000),
             "md": "",
         }
         sz_html = len(template.render(**targs).encode("utf-8"))

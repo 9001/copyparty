@@ -35,7 +35,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [x] volumes
 * [x] accounts
 * [x] markdown viewer
-* [ ] markdown editor? w
+* [x] markdown editor
 
 summary: it works! you can use it! (but technically not even close to beta)
 

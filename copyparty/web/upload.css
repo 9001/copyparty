@@ -55,8 +55,7 @@
 	font-size: 1.05em;
 }
 #ops,
-#op_bup,
-#op_mkdir {
+.opbox {
 	border: 1px solid #3a3a3a;
 	box-shadow: 0 0 1em #222 inset;
 }
@@ -68,8 +67,7 @@
 	border-radius: .3em;
 	border-width: .15em 0;
 }
-#op_bup,
-#op_mkdir {
+.opbox {
 	background: #2d2d2d;
 	margin: 1.5em 0 0 0;
 	padding: .5em;
@@ -77,11 +75,10 @@
 	border-width: .15em .3em .3em 0;
 	max-width: 40em;
 }
-#op_mkdir input,
-#op_bup input {
+.opbox input {
 	margin: .5em;
 }
-#op_mkdir input[type=text] {
+.opbox input[type=text] {
 	color: #fff;
 	background: #383838;
 	border: none;
