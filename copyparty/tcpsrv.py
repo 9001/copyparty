@@ -92,12 +92,24 @@ class TcpSrv(object):
 
         default_route = None
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            s.connect(("10.255.255.255", 1))
-            default_route = s.getsockname()[0]
-        except (OSError, socket.error) as ex:
-            if ex.errno not in [101, 10065]:
-                raise
+        for ip in [
+            "10.255.255.255",
+            "172.31.255.255",
+            "192.168.255.255",
+            "239.255.255.255",
+            # could add 1.1.1.1 as a final fallback
+            # but external connections is kinshi
+        ]:
+            try:
+                s.connect((ip, 1))
+                # raise OSError(13, "a")
+                default_route = s.getsockname()[0]
+                break
+            except (OSError, socket.error) as ex:
+                if ex.errno == 13:
+                    self.log("tcpsrv", "eaccess {} (trying next)".format(ip))
+                elif ex.errno not in [101, 10065]:
+                    raise
 
         s.close()
 

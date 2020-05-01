@@ -2,9 +2,24 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import sys
 import ssl
 import socket
-import jinja2
+
+try:
+    import jinja2
+except ImportError:
+    print(
+        """\033[1;31m
+  you do not have jinja2 installed,\033[33m
+  choose one of these:\033[0m
+   * apt install python-jinja2
+   * python3 -m pip install --user jinja2
+   * (try another python version, if you have one)
+   * (try copyparty.sfx instead)
+"""
+    )
+    sys.exit(1)
 
 from .__init__ import E
 from .util import Unrecv

@@ -15,7 +15,7 @@
                 "-a",
                 "ed:wark",
                 "-v",
-                "/home/ed/inc:inc:r:aed"
+                "srv::r:aed"
             ]
         },
         {
