@@ -1,0 +1,52 @@
+diff -NarU2 easymde-orig/gulpfile.js easymde-mod1/gulpfile.js
+--- easymde-orig/gulpfile.js	2020-04-06 14:09:36.000000000 +0200
++++ easymde-mod1/gulpfile.js	2020-05-01 14:33:52.260175200 +0200
+@@ -25,5 +25,4 @@
+     './node_modules/codemirror/lib/codemirror.css',
+     './src/css/*.css',
+-    './node_modules/codemirror-spell-checker/src/css/spell-checker.css',
+ ];
+ 
+diff -NarU2 easymde-orig/package.json easymde-mod1/package.json
+--- easymde-orig/package.json	2020-04-06 14:09:36.000000000 +0200
++++ easymde-mod1/package.json	2020-05-01 14:33:57.189975800 +0200
+@@ -21,5 +21,4 @@
+     "dependencies": {
+         "codemirror": "^5.52.2",
+-        "codemirror-spell-checker": "1.1.2",
+         "marked": "^0.8.2"
+     },
+diff -NarU2 easymde-orig/src/js/easymde.js easymde-mod1/src/js/easymde.js
+--- easymde-orig/src/js/easymde.js	2020-04-06 14:09:36.000000000 +0200
++++ easymde-mod1/src/js/easymde.js	2020-05-01 14:34:19.878774400 +0200
+@@ -11,5 +11,4 @@
+ require('codemirror/mode/gfm/gfm.js');
+ require('codemirror/mode/xml/xml.js');
+-var CodeMirrorSpellChecker = require('codemirror-spell-checker');
+ var marked = require('marked/lib/marked');
+ 
+@@ -1889,18 +1888,7 @@
+ 
+     var mode, backdrop;
+-    if (options.spellChecker !== false) {
+-        mode = 'spell-checker';
+-        backdrop = options.parsingConfig;
+-        backdrop.name = 'gfm';
+-        backdrop.gitHubSpice = false;
+-
+-        CodeMirrorSpellChecker({
+-            codeMirrorInstance: CodeMirror,
+-        });
+-    } else {
+         mode = options.parsingConfig;
+         mode.name = 'gfm';
+         mode.gitHubSpice = false;
+-    }
+ 
+     // eslint-disable-next-line no-unused-vars
+@@ -1927,5 +1915,4 @@
+         configureMouse: configureMouse,
+         inputStyle: (options.inputStyle != undefined) ? options.inputStyle : isMobile() ? 'contenteditable' : 'textarea',
+-        spellcheck: (options.nativeSpellcheck != undefined) ? options.nativeSpellcheck : true,
+     });
+ 

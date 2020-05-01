@@ -1,0 +1,95 @@
+diff -NarU2 easymde-mod1/src/js/easymde.js easymde-edit/src/js/easymde.js
+--- easymde-mod1/src/js/easymde.js	2020-05-01 14:34:19.878774400 +0200
++++ easymde-edit/src/js/easymde.js	2020-05-01 19:26:56.843140600 +0200
+@@ -2189,4 +2189,5 @@
+ };
+ 
++
+ EasyMDE.prototype.createSideBySide = function () {
+     var cm = this.codemirror;
+@@ -2223,12 +2224,80 @@
+         }
+         pScroll = true;
+-        var height = v.getScrollInfo().height - v.getScrollInfo().clientHeight;
+-        var ratio = parseFloat(v.getScrollInfo().top) / height;
+-        var move = (preview.scrollHeight - preview.clientHeight) * ratio;
+-        preview.scrollTop = move;
++        var md_vp = v.getScrollInfo();
++        // viewport top: top
++        // viewport size: clientHeight
++        // document size: height
++        var md_scroll_y = md_vp.top + md_vp.clientHeight / 2;
++        var md_center_n = cm.lineAtHeight(md_scroll_y, 'local') + 1;
++        var md_next_n = md_center_n;
++        var md_top = cm.heightAtLine(md_center_n - 1, 'local');
++        while (md_next_n < cm.lineCount())
++            if (cm.getLine(md_next_n++).replace(/\s+/g, '').length > 0)
++                break;
++        var md_end = cm.heightAtLine(md_next_n - 1, 'local');
++        var md_frac = (md_scroll_y - md_top) * 1.0 / (md_end - md_top);
++        var get_pre_line = function(line_n, increase) {
++            var end = 0;
++            var step = -1;
++            if (increase) {
++                step = 1;
++                end = line_n + 1000;
++            }
++            // there might be multiple elements in the marked.js output,
++            // take the element with the biggest height
++            var biggest = -1;
++            var line_dom = null;
++            for (; line_n != end; line_n += step) {
++                var hits = document.querySelectorAll('.editor-preview-side *[data-ln=\'' + line_n + '\']');
++                for (var i = 0; i < hits.length; i++) {
++                    var hit_size = hits[i].offsetHeight;
++                    if (biggest < hit_size) {
++                        biggest = hit_size;
++                        line_dom = hits[i];
++                    }
++                }
++                if (line_dom) {
++                    var ret_y = 0;
++                    var el = line_dom;
++                    while ((el.getAttribute('class') + '').indexOf('editor-preview-side') < 0) {
++                        ret_y += el.offsetTop;
++                        el = el.offsetParent;
++                    }
++                    return [line_n, line_dom, ret_y];
++                }
++            }
++            return null;
++        };
++        var pre1 = get_pre_line(md_center_n, false);
++        var pre2 = get_pre_line(pre1[0] + 1, true) ||
++            [cm.lineCount(), null, preview.scrollHeight];
++        
++        console.log('code-center %d, frac %.2f, pre [%d,%d] [%d,%d]',
++            md_center_n, md_frac, pre1[0], pre1[2], pre2[0], pre2[2]);
++        
++        // [0] is the markdown line which matches that preview y-pos
++        // and since not all preview lines are tagged with a line-number
++        // take the lineno diff and divide it by the distance
++        var pre_frac = md_frac / ((pre2[0] - pre1[0]) / (md_next_n - md_center_n));
++
++        // then use that fraction for the scroll offset
++        var pre_y = pre1[2] + (pre2[2] - pre1[2]) * pre_frac;
++
++        // unless we couldn't match the markdown line exactly to any preview line
++        if (md_center_n > pre1[0] && md_center_n < pre2[0])
++            pre_y = pre2[2];
++
++        // except jump to the top or bottom if we're close enough
++        if (md_vp.top < 32)
++            pre_y = 0;
++        else if (md_vp.top + 32 >= md_vp.height - md_vp.clientHeight)
++            pre_y = preview.scrollHeight;
++
++        preview.scrollTop = pre_y - preview.clientHeight / 2;
+     });
+ 
+     // Syncs scroll  preview -> editor
+-    preview.onscroll = function () {
++    // disabled since it should be possible to intentionally unsync
++    preview.onscroll_fgsfds = function () {
+         if (pScroll) {
+             pScroll = false;

@@ -44,10 +44,13 @@ html, body {
     color: #000;
     text-decoration: underline;
 }
-    
+
+/*
 *[data-ln]:before {
 	content: attr(data-ln);
 	font-size: .8em;
 	margin: 0 .4em;
 	color: #f0c;
 }
+.cm-header { font-size: .4em !important }
+*/

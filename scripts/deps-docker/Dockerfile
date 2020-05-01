@@ -106,10 +106,16 @@ RUN     cd marked-$ver_marked \
 
 
 # build easymde (TODO man this thing is big)
+COPY    easymde.patch /z/
 RUN     cd easy-markdown-editor-$ver_mde \
+        && patch -p1 < /z/easymde.patch \
         && sed -ri 's`https://registry.npmjs.org/marked/-/marked-0.8.2.tgz`file:/z/nodepkgs/marked`' package-lock.json \
         && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
-        && npm install \
+        && npm install
+
+COPY    easymde-ln.patch /z/
+RUN     cd easy-markdown-editor-$ver_mde \
+        && patch -p1 < /z/easymde-ln.patch \
         && gulp \
         && cp -pv dist/easymde.min.css /z/dist/easymde.css \
         && cp -pv dist/easymde.min.js /z/dist/easymde.js \
@@ -202,7 +208,9 @@ RUN     cd /z/dist \
 # so really not worth it, just drop the patch when that stops working
 
 
-# f=../../copyparty/web/deps/marked.js.gz; (cd ~ed/src/ && diff -NarU1 marked-1.0.0-orig/ marked-1.0.0-edit/) >marked.patch; make && printf '%d ' $(wc -c <$f) $(gzip -d <$f | wc -c); echo
+# easymde:
+# 91836 orig
+# 88635 no spellcheck
 
 
 # d=/home/ed/dev/copyparty/scripts/deps-docker/; tar -cf ../x . && ssh root@$bip "cd $d && tar -xv >&2 && make >&2 && tar -cC ../../copyparty/web deps" <../x | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
