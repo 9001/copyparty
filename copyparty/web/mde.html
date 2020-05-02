@@ -25,6 +25,19 @@
 var link_md_as_html = false;  // TODO (does nothing)
 var last_modified = {{ lastmod }};
 
+var lightswitch = (function () {
+	var fun = function () {
+		var dark = !!!document.documentElement.getAttribute("class");
+		document.documentElement.setAttribute("class", dark ? "dark" : "");
+		if (window.localStorage)
+			localStorage.setItem('darkmode', dark ? 1 : 0);
+	};
+	if (window.localStorage && localStorage.getItem('darkmode') == 1)
+		fun();
+	
+	return fun;
+})();
+
 	</script>
 	<script src="/.cpr/deps/easymde.full.js"></script>
 	<script src="/.cpr/mde.js"></script>

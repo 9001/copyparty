@@ -21,6 +21,11 @@ var dom_md = document.getElementById('mt');
 (function () {
     var tbar = [
         {
+            name: "light",
+            title: "light",
+            className: "fa fa-lightbulb",
+            action: lightswitch
+        }, {
             name: "save",
             title: "save",
             className: "fa fa-save",
@@ -35,16 +40,17 @@ var dom_md = document.getElementById('mt');
     var mde = new EasyMDE({
         autoDownloadFontAwesome: false,
         autofocus: true,
-        insertTexts: ["[](", ")"],
+        spellChecker: false,
         renderingConfig: {
             markedOptions: {
                 breaks: true,
                 gfm: true
             }
         },
-        spellChecker: false,
+        insertTexts: ["[](", ")"],
         tabSize: 4,
-        toolbar: tbar
+        toolbar: tbar,
+        previewClass: 'mdo'
     });
     md_changed(mde, true);
     mde.codemirror.on("change", function () {
@@ -107,7 +113,7 @@ function save_cb() {
     try {
         r = JSON.parse(this.responseText);
     }
-    catch {
+    catch (ex) {
         alert('Failed to parse reply from server:\n\n' + this.responseText);
         return;
     }

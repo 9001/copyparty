@@ -7,11 +7,16 @@ html .editor-toolbar>button.active { border-color: rgba(0,0,0,0.4); background: 
 html .editor-toolbar>i.separator { border-left: 1px solid #ccc; }
 html .editor-toolbar.disabled-for-preview>button:not(.no-disable) { opacity: .35 }
 
+html {
+    line-height: 1.5em;
+}
 html, body {
     margin: 0;
     padding: 0;
     min-height: 100%;
     font-family: sans-serif;
+    background: #f7f7f7;
+    color: #333;
 }
 #mn {
     font-weight: normal;
@@ -23,6 +28,9 @@ html, body {
     margin: 0 0 0 -.2em;
     padding: 0 0 0 .4em;
     text-decoration: none;
+    /* ie: */
+    border-bottom: .1em solid #777\9;
+    margin-right: 1em\9;
 }
 #mn a:first-child {
     padding-left: .5em;
@@ -62,3 +70,233 @@ html .editor-toolbar>button.save.force-save {
 }
 .cm-header { font-size: .4em !important }
 */
+
+
+
+
+
+/* copied from md.css for now */
+.mdo pre,
+.mdo code,
+.mdo a {
+	color: #480;
+	background: #f7f7f7;
+	border: .07em solid #ddd;
+	border-radius: .2em;
+	padding: .1em .3em;
+	margin: 0 .1em;
+}
+.mdo code {
+	font-size: .96em;
+}
+.mdo pre,
+.mdo code {
+	font-family: monospace, monospace;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+.mdo pre code {
+	display: block;
+	margin: 0 -.3em;
+	padding: .4em .5em;
+	line-height: 1.1em;
+}
+.mdo a {
+    color: #fff;
+    background: #39b;
+    text-decoration: none;
+    padding: 0 .3em;
+    border: none;
+    border-bottom: .07em solid #079;
+}
+.mdo h2 {
+    color: #fff;
+    background: #555;
+    margin-top: 2em;
+    border-bottom: .22em solid #999;
+    border-top: none;
+}
+.mdo h1 {
+    color: #fff;
+    background: #444;
+    font-weight: normal;
+    border-top: .4em solid #fb0;
+    border-bottom: .4em solid #777;
+    border-radius: 0 1em 0 1em;
+    margin: 3em 0 1em 0;
+    padding: .5em 0;
+}
+h1, h2 {
+	line-height: 1.5em;
+}
+h1 {
+	font-size: 1.7em;
+	text-align: center;
+	border: 1em solid #777;
+	border-width: .05em 0;
+	margin: 3em 0;
+}
+h2 {
+	font-size: 1.5em;
+	font-weight: normal;
+	background: #f7f7f7;
+	border-top: .07em solid #fff;
+	border-bottom: .07em solid #bbb;
+	border-radius: .5em .5em 0 0;
+	padding-left: .4em;
+	margin-top: 3em;
+}
+.mdo ul,
+.mdo ol {
+	border-left: .3em solid #ddd;
+}
+.mdo>ul,
+.mdo>ol {
+	border-color: #bbb;
+}
+.mdo ul>li {
+	list-style-type: disc;
+}
+.mdo ul>li,
+.mdo ol>li {
+	margin: .7em 0;
+}
+p>em,
+li>em {
+	color: #c50;
+	padding: .1em;
+	border-bottom: .1em solid #bbb;
+}
+blockquote {
+	font-family: serif;
+	background: #f7f7f7;
+	border: .07em dashed #ccc;
+	padding: 0 2em;
+	margin: 1em 0;
+}
+small {
+	opacity: .8;
+}
+table {
+	border-collapse: collapse;
+}
+td {
+	padding: .2em .5em;
+	border: .12em solid #aaa;
+}
+th {
+	border: .12em solid #aaa;
+}
+
+
+
+
+
+/* mde support */
+.mdo {
+    padding: 1em;
+    background: #f7f7f7;
+}
+html.dark .mdo {
+    background: #1c1c1c;
+}
+.CodeMirror {
+    background: #f7f7f7;
+}
+
+
+
+
+
+/* darkmode */
+html.dark .mdo,
+html.dark .CodeMirror {
+    border-color: #222;
+}
+html.dark,
+html.dark body,
+html.dark .CodeMirror {
+    background: #222;
+    color: #ccc;
+}
+html.dark .mdo a {
+    background: #057;
+}
+html.dark .mdo h1 a, html.dark .mdo h4 a,
+html.dark .mdo h2 a, html.dark .mdo h5 a,
+html.dark .mdo h3 a, html.dark .mdo h6 a {
+    color: inherit;
+    background: none;
+}
+html.dark pre,
+html.dark code {
+    color: #8c0;
+    background: #1a1a1a;
+    border: .07em solid #333;
+}
+html.dark .mdo ul,
+html.dark .mdo ol {
+    border-color: #444;
+}
+html.dark .mdo>ul,
+html.dark .mdo>ol {
+    border-color: #555;
+}
+html.dark p>em,
+html.dark li>em {
+    color: #f94;
+    border-color: #666;
+}
+html.dark h1 {
+    background: #383838;
+    border-top: .4em solid #b80;
+    border-bottom: .4em solid #4c4c4c;
+}
+html.dark h2 {
+    background: #444;
+    border-bottom: .22em solid #555;
+}
+html.dark td,
+html.dark th {
+    border-color: #444;
+}
+html.dark blockquote {
+    background: #282828;
+    border: .07em dashed #444;
+}
+
+
+
+html.dark #mn a {
+    color: #ccc;
+}
+html.dark #mn a:not(:last-child):after {
+    border-color: rgba(255,255,255,0.3);
+}
+html.dark .editor-toolbar {
+    border-color: #2c2c2c;
+    background: #1c1c1c;
+}
+html.dark .editor-toolbar>i.separator {
+    border-left: 1px solid #444;
+    border-right: 1px solid #111;
+}
+html.dark .editor-toolbar>button {
+    margin-left: -1px; border: 1px solid rgba(255,255,255,0.1);
+    color: #aaa;
+}
+
+
+
+html.dark .editor-toolbar>button:hover {
+    color: #333;
+}
+html.dark .editor-toolbar>button.active {
+    color: #333;
+    border-color: #ec1;
+    background: #c90;
+}
+html.dark .editor-toolbar::after,
+html.dark .editor-toolbar::before {
+    background: none;
+}

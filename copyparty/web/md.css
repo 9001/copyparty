@@ -182,6 +182,10 @@ blink {
 	}
 }
 @media screen {
+	html, body {
+		margin: 0;
+		padding: 0;
+	}
 	a {
 		color: #fff;
 		background: #39b;
@@ -208,16 +212,17 @@ blink {
 		padding: .5em 0;
 	}
 	#mn {
-		text-shadow: 1px 1px 0 #000;
-		xfont-variant: small-caps;
 		font-weight: normal;
-		margin: 1.3em 0 0 0;
+		padding: 1.3em 0 .7em 1em;
 		font-size: 1.4em;
 	}
 	#mn a {
-		background: #2c2c2c;
+		color: #444;
+		background: none;
 		margin: 0 0 0 -.2em;
 		padding: 0 0 0 .4em;
+		text-decoration: none;
+		border: none;
 		/* ie: */
 		border-bottom: .1em solid #777\9;
 		margin-right: 1em\9;
@@ -234,17 +239,16 @@ blink {
 		height: 1.05em;
 		margin: -.2em .3em -.2em -.4em;
 		display: inline-block;
-		border: 1px solid rgba(255,224,192,0.3);
+		border: 1px solid rgba(0,0,0,0.3);
 		border-width: .05em .05em 0 0;
 		transform: rotate(45deg);
-		background: linear-gradient(45deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 75%, rgba(0,0,0,0.35));
 	}
 	#mn a:hover {
-		color: #fff;
-		background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
+		color: #000;
+		text-decoration: underline;
 	}
 	#mh {
-		margin: 1.5em 0;
+		margin: 0 0 1.5em 0;
 	}
 
 
@@ -312,6 +316,12 @@ blink {
 		background: #282828;
 		border: .07em dashed #444;
 	}
+	html.dark #mn a:not(:last-child):after {
+		border-color: rgba(255,255,255,0.3);
+	}
+	html.dark #mn a {
+		color: #ccc;
+	}
 }
 @media screen and (min-width: 64em) {
 	#mw {
@@ -365,6 +375,9 @@ blink {
 		text-decoration: none;
 		border-bottom: .07em solid #4ac;
 		padding: 0 .3em;
+	}
+	#toc {
+		margin: 0 !important;
 	}
 	#toc>ul {
 		border-left: .1em solid #84c4dd;

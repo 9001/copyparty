@@ -220,10 +220,16 @@ var toc = init_toc();
         clearTimeout(final);
         timer_active = false;
         toc.refresh();
+
+        var y = 0;
+        if (window.matchMedia('(min-width: 64em)').matches)
+            y = parseInt(dom_nav.offsetHeight) - window.scrollY;
+
+        dom_toc.style.marginTop = y < 0 ? 0 : y + "px";
     }
     onscroll();
 
-    window.onscroll = function () {
+    function ev_onscroll() {
         // long timeout: scroll ended
         clearTimeout(final);
         final = setTimeout(onscroll, 100);
@@ -235,4 +241,7 @@ var toc = init_toc();
         timer_active = true;
         setTimeout(onscroll, 10);
     };
+
+    window.onscroll = ev_onscroll;
+    window.onresize = ev_onscroll;
 })();

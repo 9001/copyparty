@@ -6,12 +6,12 @@
 	<link href="/.cpr/md.css" rel="stylesheet">
 </head>
 <body>
+	<div id="mn"></div>
 	<div id="toc"></div>
 	<div id="mw">
-		<div id="mn"></div>
 		<div id="mh">
-			<a id="lightswitch" href="#">dark</a>
-			<a id="edit" href="?edit">edit</a>
+			<a id="lightswitch" href="#">go dark</a> //
+			<a id="edit" href="?edit">edit this</a>
 		</div>
 		<div id="ml">
 			<div style="text-align:center;margin:5em 0">
@@ -32,12 +32,12 @@ var link_md_as_html = false;  // TODO (does nothing)
     var toggle = function () {
         var dark = !document.documentElement.getAttribute("class");
         document.documentElement.setAttribute("class", dark ? "dark" : "");
-        btn.innerHTML = dark ? "light" : "dark";
+        btn.innerHTML = "go " + (dark ? "light" : "dark");
         if (window.localStorage)
-            localStorage.setItem('md-dark', dark ? 1 : 0);
+            localStorage.setItem('darkmode', dark ? 1 : 0);
     };
     btn.onclick = toggle;
-    if (window.localStorage && localStorage.getItem('md-dark') == 1)
+    if (window.localStorage && localStorage.getItem('darkmode') == 1)
 		toggle();
 })();
 
