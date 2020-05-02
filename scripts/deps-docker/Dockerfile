@@ -6,6 +6,7 @@ ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
         ver_marked=1.0.0 \
         ver_ogvjs=1.6.1 \
         ver_mde=2.10.1 \
+        ver_codemirror=5.53.2 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -16,6 +17,7 @@ RUN     apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzi
         && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
         && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
+        && wget https://github.com/codemirror/CodeMirror/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
         && wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
         && unzip ogvjs.zip \
@@ -26,6 +28,9 @@ RUN     apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzi
             && cd marked-$ver_marked \
             && npm install \
             && npm i grunt uglify-js -g ) \
+        && (tar -xf codemirror.tgz \
+            && cd CodeMirror-$ver_codemirror \
+            && npm install ) \
         && (tar -xf mde.tgz \
             && cd easy-markdown-editor* \
             && npm install \
@@ -105,12 +110,22 @@ RUN     cd marked-$ver_marked \
 #        && npm run test \
 
 
-# build easymde (TODO man this thing is big)
+# build codemirror
+COPY    codemirror.patch /z/
+RUN     cd CodeMirror-$ver_codemirror \
+        && patch -p1 < /z/codemirror.patch \
+        && sed -ri '/^var urlRE = /d' mode/gfm/gfm.js \
+        && npm run build \
+        && ln -s $(pwd) /z/nodepkgs/codemirror
+
+
+# build easymde
 COPY    easymde.patch /z/
 RUN     cd easy-markdown-editor-$ver_mde \
         && patch -p1 < /z/easymde.patch \
         && sed -ri 's`https://registry.npmjs.org/marked/-/marked-0.8.2.tgz`file:/z/nodepkgs/marked`' package-lock.json \
         && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
+        && sed -ri 's`("codemirror": ")[^"]+`\1file:/z/nodepkgs/codemirror`' ./package.json \
         && npm install
 
 COPY    easymde-ln.patch /z/
@@ -211,6 +226,9 @@ RUN     cd /z/dist \
 # easymde:
 # 91836 orig
 # 88635 no spellcheck
+# 88392 no urlRE
+# 85651 less bidi
+# 82855 less mode meta
 
 
 # d=/home/ed/dev/copyparty/scripts/deps-docker/; tar -cf ../x . && ssh root@$bip "cd $d && tar -xv >&2 && make >&2 && tar -cC ../../copyparty/web deps" <../x | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
