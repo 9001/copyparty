@@ -24,6 +24,9 @@ which md5sum 2>/dev/null >/dev/null &&
 	exit 1
 }
 
+$find -name '*.pyc' -delete
+$find -name __pycache__ -delete
+
 rm -rf sfx
 mkdir sfx
 cd sfx
