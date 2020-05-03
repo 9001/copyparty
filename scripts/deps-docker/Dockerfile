@@ -97,9 +97,14 @@ RUN     cd ogvjs-$ver_ogvjs \
 
 
 # build marked
+RUN     wget https://github.com/markedjs/marked/commit/5c166d4164791f643693478e4ac094d63d6e0c9a.patch -O marked-git-1.patch \
+        && wget https://patch-diff.githubusercontent.com/raw/markedjs/marked/pull/1652.patch -O marked-git-2.patch
+
 COPY    marked.patch /z/
 COPY    marked-ln.patch /z/
 RUN     cd marked-$ver_marked \
+        && patch -p1 < /z/marked-git-1.patch \
+        && patch -p1 < /z/marked-git-2.patch \
         && patch -p1 < /z/marked-ln.patch \
         && patch -p1 < /z/marked.patch \
         && npm run build \

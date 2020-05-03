@@ -1,5 +1,5 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
-adds linetracking to marked.js v1.0.0;
+adds linetracking to marked.js v1.0.0 +git;
 add data-ln="%d" to most tags, %d is the source markdown line
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
@@ -28,8 +28,8 @@ add data-ln="%d" to most tags, %d is the source markdown line
 @@ -113,10 +125,15 @@ module.exports = class Lexer {
    blockTokens(src, tokens = [], top = true) {
      src = src.replace(/^ +$/gm, '');
--    let token, i, l;
-+    let token, i, l, ln;
+-    let token, i, l, lastToken;
++    let token, i, l, lastToken, ln;
  
      while (src) {
 +      // this.ln will be bumped by recursive calls into this func;
@@ -46,33 +46,33 @@ add data-ln="%d" to most tags, %d is the source markdown line
        if (token = this.tokenizer.code(src, tokens)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
-         tokens.push(token);
-         continue;
-@@ -135,4 +153,5 @@ module.exports = class Lexer {
+         if (token.type) {
+           tokens.push(token);
+@@ -141,4 +159,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.fences(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -142,4 +161,5 @@ module.exports = class Lexer {
+@@ -148,4 +167,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.heading(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -149,4 +169,5 @@ module.exports = class Lexer {
+@@ -155,4 +175,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.nptable(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -156,4 +177,5 @@ module.exports = class Lexer {
+@@ -162,4 +183,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.hr(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -164,4 +186,7 @@ module.exports = class Lexer {
+@@ -170,4 +192,7 @@ module.exports = class Lexer {
          src = src.substring(token.raw.length);
          token.tokens = this.blockTokens(token.text, [], top);
 +        // recursive call to blockTokens probably bumped this.ln,
@@ -80,7 +80,7 @@ add data-ln="%d" to most tags, %d is the source markdown line
 +        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -174,5 +199,9 @@ module.exports = class Lexer {
+@@ -180,5 +205,9 @@ module.exports = class Lexer {
          for (i = 0; i < l; i++) {
            token.items[i].tokens = this.blockTokens(token.items[i].text, [], false);
 +          // list entries don't bump the linecounter, so let's
@@ -90,43 +90,43 @@ add data-ln="%d" to most tags, %d is the source markdown line
 +        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -182,4 +211,5 @@ module.exports = class Lexer {
+@@ -188,4 +217,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.html(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -189,4 +219,5 @@ module.exports = class Lexer {
+@@ -195,4 +225,5 @@ module.exports = class Lexer {
        if (top && (token = this.tokenizer.def(src))) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          if (!this.tokens.links[token.tag]) {
            this.tokens.links[token.tag] = {
-@@ -201,4 +232,5 @@ module.exports = class Lexer {
+@@ -207,4 +238,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.table(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -208,4 +240,5 @@ module.exports = class Lexer {
+@@ -214,4 +246,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.lheading(src)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -215,4 +248,5 @@ module.exports = class Lexer {
+@@ -221,4 +254,5 @@ module.exports = class Lexer {
        if (top && (token = this.tokenizer.paragraph(src))) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
          tokens.push(token);
          continue;
-@@ -222,4 +256,5 @@ module.exports = class Lexer {
-       if (token = this.tokenizer.text(src)) {
+@@ -228,4 +262,5 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.text(src, tokens)) {
          src = src.substring(token.raw.length);
 +        this.set_ln(token);
-         tokens.push(token);
-         continue;
-@@ -251,4 +286,7 @@ module.exports = class Lexer {
+         if (token.type) {
+           tokens.push(token);
+@@ -263,4 +298,7 @@ module.exports = class Lexer {
      for (i = 0; i < l; i++) {
        token = tokens[i];
 +      // this.ln is at EOF when inline() is invoked;
@@ -134,7 +134,7 @@ add data-ln="%d" to most tags, %d is the source markdown line
 +      this.ln = token.ln || this.ln;
        switch (token.type) {
          case 'paragraph':
-@@ -374,4 +412,6 @@ module.exports = class Lexer {
+@@ -386,4 +424,6 @@ module.exports = class Lexer {
        if (token = this.tokenizer.br(src)) {
          src = src.substring(token.raw.length);
 +        // no need to reset (no more blockTokens anyways)
@@ -142,7 +142,6 @@ add data-ln="%d" to most tags, %d is the source markdown line
          tokens.push(token);
          continue;
 diff --git a/src/Parser.js b/src/Parser.js
-index bad3ac7..882da47 100644
 --- a/src/Parser.js
 +++ b/src/Parser.js
 @@ -18,4 +18,5 @@ module.exports = class Parser {
@@ -214,7 +213,6 @@ index bad3ac7..882da47 100644
            break;
          }
 diff --git a/src/Renderer.js b/src/Renderer.js
-index a86732c..7ed907b 100644
 --- a/src/Renderer.js
 +++ b/src/Renderer.js
 @@ -11,6 +11,12 @@ module.exports = class Renderer {
