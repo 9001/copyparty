@@ -8,7 +8,6 @@ import time
 import json
 from datetime import datetime
 import calendar
-import mimetypes
 
 from .__init__ import E, PY2, WINDOWS
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
@@ -526,7 +525,7 @@ class HttpCli(object):
         except Pebkac as ex:
             errmsg = str(ex)
 
-        td = time.time() - t0
+        td = max(0.1, time.time() - t0)
         sz_total = sum(x[0] for x in files)
         spd = (sz_total / td) / (1024 * 1024)
 
@@ -665,6 +664,7 @@ class HttpCli(object):
                 return file_lastmod, int(file_ts) > int(cli_ts)
             except:
                 self.log("bad lastmod format: {}".format(cli_lastmod))
+                self.log("   expected format: {}".format(file_lastmod))
                 return file_lastmod, file_lastmod != cli_lastmod
 
         return file_lastmod, True
@@ -789,7 +789,7 @@ class HttpCli(object):
         self.send_headers(
             length=upper - lower,
             status=status,
-            mime=mimetypes.guess_type(req_path)[0] or "application/octet-stream",
+            mime=guess_mime(req_path)[0] or "application/octet-stream",
         )
 
         logmsg += str(status) + logtail

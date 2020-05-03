@@ -8,6 +8,7 @@ import struct
 import hashlib
 import platform
 import threading
+import mimetypes
 import subprocess as sp  # nosec
 
 from .__init__ import PY2, WINDOWS
@@ -472,6 +473,13 @@ def unescape_cookie(orig):
         ret += esc
 
     return ret
+
+
+def guess_mime(url):
+    if url.endswith(".md"):
+        return ["text/plain; charset=UTF-8"]
+
+    return mimetypes.guess_type(url)
 
 
 def runcmd(*argv):

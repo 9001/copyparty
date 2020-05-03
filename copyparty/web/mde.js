@@ -47,6 +47,9 @@ var dom_md = document.getElementById('mt');
                 gfm: true
             }
         },
+        shortcuts: {
+            "save": "Ctrl-S"
+        },
         insertTexts: ["[](", ")"],
         tabSize: 4,
         toolbar: tbar,
@@ -85,10 +88,12 @@ function save(mde) {
         return;
     }
 
+    var txt = mde.value();
+
     var fd = new FormData();
     fd.append("act", "tput");
     fd.append("lastmod", (force ? -1 : last_modified));
-    fd.append("body", mde.value());
+    fd.append("body", txt);
 
     var url = (document.location + '').split('?')[0] + '?raw';
     var xhr = new XMLHttpRequest();
@@ -97,6 +102,7 @@ function save(mde) {
     xhr.onreadystatechange = save_cb;
     xhr.btn = save_btn;
     xhr.mde = mde;
+    xhr.txt = txt;
     xhr.send(fd);
 }
 
@@ -138,8 +144,55 @@ function save_cb() {
         return;
     }
 
-    last_modified = r.lastmod;
     this.btn.classList.remove('force-save');
-    alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
+    //alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
+
+    // download the saved doc from the server and compare
+    var url = (document.location + '').split('?')[0] + '?raw';
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'text';
+    xhr.onreadystatechange = save_chk;
+    xhr.btn = this.save_btn;
+    xhr.mde = this.mde;
+    xhr.txt = this.txt;
+    xhr.lastmod = r.lastmod;
+    xhr.send();
+}
+
+function save_chk() {
+    if (this.readyState != XMLHttpRequest.DONE)
+        return;
+
+    if (this.status !== 200) {
+        alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
+        return;
+    }
+
+    var doc1 = this.txt.replace(/\r/g, "");
+    var doc2 = this.responseText.replace(/\r/g, "");
+    if (doc1 != doc2) {
+        alert(
+            'Error! The document on the server does not appear to have saved correctly (your editor contents and the server copy is not identical). Place the document on your clipboard for now and check the server logs for hints\n\n' +
+            'Length: yours=' + doc1.length + ', server=' + doc2.length
+        );
+        alert('yours, ' + doc1.length + ' byte:\n[' + doc1 + ']');
+        alert('server, ' + doc2.length + ' byte:\n[' + doc2 + ']');
+        return;
+    }
+
+    last_modified = this.lastmod;
     md_changed(this.mde, true);
+
+    var ok = document.createElement('div');
+    ok.setAttribute('style', 'font-size:6em;font-family:serif;font-weight:bold;color:#cf6;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);width:4em;text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1');
+    ok.innerHTML = 'OK✔️';
+    var parent = document.getElementById('m');
+    document.documentElement.appendChild(ok);
+    setTimeout(function () {
+        ok.style.opacity = 0;
+    }, 500);
+    setTimeout(function () {
+        ok.parentNode.removeChild(ok);
+    }, 750);
 }
