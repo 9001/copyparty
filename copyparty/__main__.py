@@ -16,7 +16,7 @@ import argparse
 from textwrap import dedent
 
 from .__init__ import E, WINDOWS, VT100
-from .__version__ import S_VERSION, S_BUILD_DT
+from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
 from .util import py_desc
 
@@ -88,8 +88,10 @@ def main():
     if WINDOWS:
         os.system("")  # enables colors
 
-    f = "\033[36mcopyparty v{} ({})\n   python v{}\033[0m\n"
-    print(f.format(S_VERSION, S_BUILD_DT, py_desc()))
+    desc = py_desc().replace("[", "\033[1;30m[")
+
+    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0m\n'
+    print(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
 
     ensure_locale()
     ensure_cert()

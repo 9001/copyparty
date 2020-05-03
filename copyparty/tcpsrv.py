@@ -108,8 +108,8 @@ class TcpSrv(object):
             except (OSError, socket.error) as ex:
                 if ex.errno == 13:
                     self.log("tcpsrv", "eaccess {} (trying next)".format(ip))
-                elif ex.errno not in [101, 10065]:
-                    raise
+                elif ex.errno not in [101, 10065, 10051]:
+                    self.log("tcpsrv", "route lookup failed; err {}".format(ex.errno))
 
         s.close()
 

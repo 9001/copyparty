@@ -505,6 +505,7 @@ def gzip_orig_sz(fn):
 
 
 def py_desc():
+    interp = platform.python_implementation()
     py_ver = ".".join([str(x) for x in sys.version_info])
     ofs = py_ver.find(".final.")
     if ofs > 0:
@@ -512,8 +513,14 @@ def py_desc():
 
     bitness = struct.calcsize(b"P") * 8
     host_os = platform.system()
+    compiler = platform.python_compiler()
 
-    return "{0} on {1}{2}".format(py_ver, host_os, bitness)
+    os_ver = re.search(r"([0-9]+\.[0-9\.]+)", platform.version())
+    os_ver = os_ver.group(1) if os_ver else ""
+
+    return "{:>9} v{} on {}{} {} [{}]".format(
+        interp, py_ver, host_os, bitness, os_ver, compiler
+    )
 
 
 class Pebkac(Exception):
