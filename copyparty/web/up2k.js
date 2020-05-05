@@ -75,6 +75,10 @@ function opclick(ev) {
     // writing a blank value makes ie8 segfault w
     if (window.localStorage)
         localStorage.setItem('opmode', dest || '.');
+
+    var input = document.querySelector('.opview.act input:not([type="hidden"])')
+    if (input)
+        input.focus();
 }
 
 
@@ -88,7 +92,7 @@ function goto(dest) {
         obj[a].classList.remove('act');
 
     if (dest) {
-        var dom_obj = document.getElementById('op_' + dest).classList.add('act');
+        document.getElementById('op_' + dest).classList.add('act');
         document.querySelector('#ops>a[data-dest=' + dest + ']').classList.add('act');
 
         var fn = window['goto_' + dest];

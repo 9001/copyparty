@@ -50,7 +50,7 @@ diff -NarU2 easymde-mod1/src/js/easymde.js easymde-edit/src/js/easymde.js
 +                if (line_dom) {
 +                    var ret_y = 0;
 +                    var el = line_dom;
-+                    while ((el.getAttribute('class') + '').indexOf('editor-preview-side') < 0) {
++                    while (el && (el.getAttribute('class') + '').indexOf('editor-preview-side') < 0) {
 +                        ret_y += el.offsetTop;
 +                        el = el.offsetParent;
 +                    }
