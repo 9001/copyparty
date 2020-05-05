@@ -2,10 +2,13 @@
 set -e
 echo
 
-tar=$( which gtar  2>/dev/null || which tar)
-sed=$( which gsed  2>/dev/null || which sed)
-find=$(which gfind 2>/dev/null || which find)
-sort=$(which gsort 2>/dev/null || which sort)
+command -v gtar  >/dev/null &&
+command -v gfind >/dev/null && {
+	tar()  { gtar  "$@"; }
+	sed()  { gsed  "$@"; }
+	find() { gfind "$@"; }
+	sort() { gsort "$@"; }
+}
 
 which md5sum 2>/dev/null >/dev/null &&
 	md5sum=md5sum ||
@@ -29,8 +32,8 @@ ver="$1"
 }
 
 mkdir -p dist
-zip_path="dist/copyparty-$ver.zip"
-tgz_path="dist/copyparty-$ver.tar.gz"
+zip_path="$(pwd)/dist/copyparty-$ver.zip"
+tgz_path="$(pwd)/dist/copyparty-$ver.tar.gz"
 
 [[ -e "$zip_path" ]] ||
 [[ -e "$tgz_path" ]] &&
@@ -45,21 +48,21 @@ tgz_path="dist/copyparty-$ver.tar.gz"
 rm "$zip_path" 2>/dev/null || true
 rm "$tgz_path" 2>/dev/null || true
 
-#$sed -ri "s/^(ADMIN_PWD *= *u).*/\1'hunter2'/" copyparty/config.py
+#sed -ri "s/^(ADMIN_PWD *= *u).*/\1'hunter2'/" copyparty/config.py
 
 tmp="$(mktemp -d)"
 rls_dir="$tmp/copyparty-$ver"
 mkdir "$rls_dir"
 
 echo ">>> export from git"
-git archive master | $tar -xC "$rls_dir"
+git archive master | tar -xC "$rls_dir"
 
 echo ">>> export untracked deps"
-$tar -c copyparty/web/deps | $tar -xC "$rls_dir"
+tar -c copyparty/web/deps | tar -xC "$rls_dir"
 
 cd "$rls_dir"
-$find -type d -exec chmod 755 '{}' \+
-$find -type f -exec chmod 644 '{}' \+
+find -type d -exec chmod 755 '{}' \+
+find -type f -exec chmod 644 '{}' \+
 
 commaver="$(
 	printf '%s\n' "$ver" |
@@ -88,16 +91,23 @@ rm \
 
 mv LICENSE LICENSE.txt
 
-# messy because osx support
-$find -type f -exec $md5sum '{}' \+ |
-$sed -r 's/(.{32})(.*)/\2\1/' | LC_COLLATE=c $sort |
-$sed -r 's/(.*)(.{32})/\2\1/' |
-$sed -r 's/^(.{32}) \./\1  ./' > ../.sums.md5
+# the regular cleanup memes
+find -name '*.pyc' -delete
+find -name __pycache__ -delete
+find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
+find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
+
+# also messy because osx support
+find -type f -exec $md5sum '{}' \+ |
+sed -r 's/(.{32})(.*)/\2\1/' | LC_COLLATE=c sort |
+sed -r 's/(.*)(.{32})/\2\1/' |
+sed -r 's/^(.{32}) \./\1  ./' > ../.sums.md5
 mv ../.sums.md5 .
 
 cd ..
-echo ">>> tar"; $tar -czf "$tgz_path" "copyparty-$ver"
-echo ">>> zip"; zip  -qr  "$zip_path" "copyparty-$ver"
+pwd
+echo ">>> tar"; tar -czf "$tgz_path" --owner=1000 --group=1000 --numeric-owner "copyparty-$ver"
+echo ">>> zip"; zip  -qr "$zip_path" "copyparty-$ver"
 
 rm -rf "$tmp"
 echo
@@ -106,5 +116,5 @@ echo "  $zip_path"
 echo "  $tgz_path"
 echo
 
-# function alr() { ls -alR copyparty-$1 | $sed -r "s/copyparty-$1/copyparty/" | $sed -r 's/[A-Z][a-z]{2} [0-9 ]{2} [0-9]{2}:[0-9]{2}//' > $1; }; for x in master rls src ; do alr $x; done
+# function alr() { ls -alR copyparty-$1 | sed -r "s/copyparty-$1/copyparty/" | sed -r 's/[A-Z][a-z]{2} [0-9 ]{2} [0-9]{2}:[0-9]{2}//' > $1; }; for x in master rls src ; do alr $x; done
 

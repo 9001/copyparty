@@ -3,9 +3,13 @@ set -e
 echo
 
 # osx support
-sed=$( which gsed  2>/dev/null || which sed)
-find=$(which gfind 2>/dev/null || which find)
-sort=$(which gsort 2>/dev/null || which sort)
+command -v gtar  >/dev/null &&
+command -v gfind >/dev/null && {
+	tar()  { gtar  "$@"; }
+	sed()  { gsed  "$@"; }
+	find() { gfind "$@"; }
+	sort() { gsort "$@"; }
+}
 
 which md5sum 2>/dev/null >/dev/null &&
 	md5sum=md5sum ||
