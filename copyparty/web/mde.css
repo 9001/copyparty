@@ -219,6 +219,18 @@ html.dark .CodeMirror {
     background: #222;
     color: #ccc;
 }
+html.dark .CodeMirror-cursor {
+    border-color: #fff;
+}
+html.dark .CodeMirror-selected {
+    box-shadow: 0 0 1px #0cf inset;
+}
+html.dark .CodeMirror-selected,
+html.dark .CodeMirror-selectedtext {
+    border-radius: .1em;
+    background: #246;
+    color: #fff;
+}
 html.dark .mdo a {
     background: #057;
 }
