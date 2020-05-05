@@ -2,16 +2,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re
-import os
-import sys
-import time
-import signal
-import shutil
-import tarfile
-import hashlib
-import platform
-import tempfile
+import re, os, sys, stat, time, shutil, tarfile, hashlib, platform, tempfile
 import subprocess as sp
 
 """
@@ -20,7 +11,7 @@ run me with any version of python, i will unpack and run copyparty
 (but please don't edit this file with a text editor
   since that would probably corrupt the binary stuff at the end)
 
-there is zero binaries! just plaintext python scripts all the way down
+there's zero binaries! just plaintext python scripts all the way down
   so you can easily unpack the archive and inspect it for shady stuff
 
 the archive data is attached after the b"\n# eof\n" archive marker,
@@ -29,12 +20,13 @@ the archive data is attached after the b"\n# eof\n" archive marker,
   b"\n# " decodes to b""
 """
 
-# metadata set when building the sfx
+# set by make-sfx.sh
 VER = None
 SIZE = None
 CKSUM = None
 STAMP = None
 
+PY2 = sys.version_info[0] == 2
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
 
@@ -46,7 +38,7 @@ def eprint(*args, **kwargs):
 
 def msg(*args, **kwargs):
     if args:
-        args = ["[SFX] {}".format(args[0])] + list(args[1:])
+        args = ["[SFX]", args[0]] + list(args[1:])
 
     eprint(*args, **kwargs)
 
@@ -146,7 +138,7 @@ def testchk(cdata):
     msg(txt)
 
 
-def encode(data, size, cksum, ver):
+def encode(data, size, cksum, ver, ts):
     """creates a new sfx; `data` should yield bufs to attach"""
     nin = 0
     nout = 0
@@ -169,7 +161,7 @@ def encode(data, size, cksum, ver):
             ["VER", '"' + ver + '"'],
             ["SIZE", size],
             ["CKSUM", '"' + cksum + '"'],
-            ["STAMP", int(time.time())],
+            ["STAMP", ts],
         ]:
             v1 = "\n{} = None\n".format(k)
             v2 = "\n{} = {}\n".format(k, v)
@@ -190,10 +182,10 @@ def encode(data, size, cksum, ver):
     msg("wrote {:x}H bytes ({:x}H after encode)".format(nin, nout))
 
 
-def makesfx(tar_src, ver):
+def makesfx(tar_src, ver, ts):
     sz = os.path.getsize(tar_src)
     cksum = hashfile(tar_src)
-    encode(yieldfile(tar_src), sz, cksum, ver)
+    encode(yieldfile(tar_src), sz, cksum, ver, ts)
 
 
 # skip 0
@@ -261,7 +253,9 @@ def read_py(binp):
     ]
     p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
     ver, _ = p.communicate()
-    return ver.split(b" ")[:3], p.returncode == 0
+    ver = ver.decode("utf-8").split(" ")[:3]
+    ver = [int(x) if x.isdigit() else 0 for x in ver]
+    return ver, p.returncode == 0
 
 
 def get_pys():
@@ -277,9 +271,9 @@ def get_pys():
 
     ret = []
     for binp in hits.values():
-        msg("testing", binp)
         ver, chk = read_py(binp)
         ret.append([chk, ver, binp])
+        msg("\t".join(str(x) for x in ret[-1]))
 
     return ret
 
@@ -300,29 +294,21 @@ def hashfile(fn):
 
 def unpack():
     """unpacks the tar yielded by `data`"""
-    tag = "copyparty-{}".format(STAMP)
-    tmp = tempfile.gettempdir()
+    name = "pe-copyparty"
+    withpid = "{}.{}".format(name, os.getpid())
+    top = tempfile.gettempdir()
+    final = os.path.join(top, name)
+    mine = os.path.join(top, withpid)
+    tar = os.path.join(mine, "tar")
+    tag_mine = os.path.join(mine, "v" + str(STAMP))
+    tag_final = os.path.join(final, "v" + str(STAMP))
 
-    for fn in os.listdir(tmp):
-        if fn.startswith("copyparty-") and fn != tag:
-            try:
-                old = os.path.join(tmp, fn)
-                shutil.rmtree(old)
-            except:
-                pass
+    if os.path.exists(tag_final):
+        msg("found early")
+        return final
 
-    tmp = os.path.join(tmp, tag)
-    tar = os.path.join(tmp, "tar")
-    ok = os.path.join(tmp, "ok")
-
-    if os.path.exists(ok):
-        return tmp
-
-    if os.path.exists(tmp):
-        shutil.rmtree(tmp)
-
-    os.mkdir(tmp)
     nwrite = 0
+    os.mkdir(mine)
     with open(tar, "wb") as f:
         for buf in get_payload():
             nwrite += len(buf)
@@ -338,14 +324,44 @@ def unpack():
         raise Exception(t)
 
     with tarfile.open(tar, "r:bz2") as tf:
-        tf.extractall(tmp)
+        tf.extractall(mine)
 
     os.remove(tar)
 
-    with open(ok, "wb") as f:
+    with open(tag_mine, "wb") as f:
+        f.write(b"h\n")
+
+    if os.path.exists(tag_final):
+        msg("found late")
+        return final
+
+    try:
+        if os.path.islink(final):
+            os.remove(final)
+        else:
+            shutil.rmtree(final)
+    except:
         pass
 
-    return tmp
+    try:
+        os.symlink(mine, final)
+    except:
+        try:
+            os.rename(mine, final)
+        except:
+            msg("reloc fail,", mine)
+            return mine
+
+    for fn in os.listdir(top):
+        if fn.startswith(name) and fn not in [name, withpid]:
+            try:
+                old = os.path.join(top, fn)
+                if time.time() - os.path.getmtime(old) > 10:
+                    shutil.rmtree(old)
+            except:
+                pass
+
+    return final
 
 
 def get_payload():
@@ -402,50 +418,29 @@ def get_payload():
 def confirm():
     msg()
     msg("*** hit enter to exit ***")
-    try:
-        raw_input()
-    except NameError:
-        input()
+    raw_input() if PY2 else input()
 
 
 def run(tmp, py):
     msg("OK")
     msg("will use:", py)
-    msg("bound to:", tmp, "\n")
+    msg("bound to:", tmp)
 
     fp_py = os.path.join(tmp, "py")
     with open(fp_py, "wb") as f:
         f.write(py.encode("utf-8") + b"\n")
 
-    env = os.environ.copy()
-    try:
-        libs = "{}:{}".format(tmp, env["PYTHONPATH"])
-    except:
-        libs = tmp
+    # avoid loading ./copyparty.py
+    cmd = [
+        py,
+        "-c",
+        'import sys, runpy; sys.path.insert(0, r"'
+        + tmp
+        + '"); runpy.run_module("copyparty", run_name="__main__")',
+    ] + list(sys.argv[1:])
 
-    env[str("PYTHONPATH")] = str(libs)
-
-    # skip 1
-    if False:
-        # mingw64 py3.8.2 doesn't emit any prints without -u
-        env[str("PYTHONUNBUFFERED")] = str("ja")
-
-        # it also doesn't deal with ^C and none of this helps
-        def orz(sig, frame):
-            p.terminate()
-
-        signal.signal(signal.SIGINT, orz)
-
-        while True:
-            try:
-                time.sleep(9001)
-            except:
-                p.terminate()
-                break
-    # skip 0
-
-    cmd = [py, "-m", "copyparty"] + list(sys.argv[1:])
-    p = sp.Popen([str(x) for x in cmd], env=env)
+    msg("\n", cmd, "\n")
+    p = sp.Popen(str(x) for x in cmd)
     try:
         p.wait()
     except:
@@ -458,11 +453,12 @@ def run(tmp, py):
 
 
 def main():
-    os.system("")
     sysver = str(sys.version).replace("\n", "\n" + " " * 18)
+    pktime = time.strftime("%Y-%m-%d, %H:%M:%S", time.gmtime(STAMP))
+    os.system("")
     msg()
     msg("   this is: copyparty", VER)
-    msg(" packed at:", time.strftime("%Y-%m-%d, %H:%M:%S UTC", time.gmtime(STAMP)))
+    msg(" packed at:", pktime, "UTC,", STAMP)
     msg("archive is:", me)
     msg("python bin:", sys.executable)
     msg("python ver:", platform.python_implementation(), sysver)
@@ -477,16 +473,14 @@ def main():
     # skip 1
 
     if arg == "--sfx-testgen":
-        return encode(testptn(), 1, "x", "x")
+        return encode(testptn(), 1, "x", "x", 1)
 
     if arg == "--sfx-testchk":
         return testchk(get_payload())
 
     if arg == "--sfx-make":
-        tar, ver = sys.argv[2:]
-        return makesfx(tar, ver)
-
-    # https://docs.microsoft.com/en-us/windows/win32/shell/knownfolderid?redirectedfrom=MSDN
+        tar, ver, ts = sys.argv[2:]
+        return makesfx(tar, ver, ts)
 
     # skip 0
 
@@ -495,13 +489,18 @@ def main():
     if os.path.exists(fp_py):
         with open(fp_py, "rb") as f:
             py = f.read().decode("utf-8").rstrip()
-            return run(tmp, py)
+
+        return run(tmp, py)
 
     pys = get_pys()
     pys.sort(reverse=True)
     j2, ver, py = pys[0]
     if j2:
-        shutil.rmtree(os.path.join(tmp, "jinja2"))
+        try:
+            os.rename(os.path.join(tmp, "jinja2"), os.path.join(tmp, "x.jinja2"))
+        except:
+            pass
+
         return run(tmp, py)
 
     msg("\n  could not find jinja2; will use py2 + the bundled version\n")

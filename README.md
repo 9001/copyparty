@@ -49,6 +49,25 @@ optional, enables thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
 
 
+# sfx
+
+currently there are two self-contained binaries:
+* `copyparty-sfx.sh` for unix (linux and osx) -- smaller, more robust
+* `copyparty-sfx.py` for windows (unix too) -- crossplatform, beta
+
+launch either of them and it'll unpack and run copyparty, assuming you have python installed of course
+
+pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `copyparty.py` and keep it in the same folder because `sys.path` is funky
+
+if you don't need all the features you can repack the sfx and save a bunch of space, tho currently the only removable feature is the opus/vorbis javascript decoder which is needed by apple devices to play foss audio files
+
+steps to reduce the sfx size from `720 kB` to `250 kB` roughly:
+* run one of the sfx'es once to unpack it
+* `./scripts/make-sfx.sh re no-ogv` creates a new pair of sfx
+
+no internet connection needed, just download an sfx and the repo zip (also if you're on windows use msys2)
+
+
 # install on android
 
 install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
@@ -78,6 +97,7 @@ in the `scripts` folder:
 * run `make -C deps-docker` to build all dependencies
 * create github release with `make-tgz-release.sh`
 * upload to pypi with `make-pypi-release.(sh|bat)`
+* create sfx with `make-sfx.sh`
 
 
 # todo
