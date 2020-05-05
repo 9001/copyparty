@@ -18,7 +18,7 @@ var dom_md = document.getElementById('mt');
     dom_nav.innerHTML = nav.join('');
 })();
 
-(function () {
+var mde = (function () {
     var tbar = [
         {
             name: "light",
@@ -53,7 +53,8 @@ var dom_md = document.getElementById('mt');
         insertTexts: ["[](", ")"],
         tabSize: 4,
         toolbar: tbar,
-        previewClass: 'mdo'
+        previewClass: 'mdo',
+        onToggleFullScreen: set_jumpto,
     });
     md_changed(mde, true);
     mde.codemirror.on("change", function () {
@@ -61,7 +62,27 @@ var dom_md = document.getElementById('mt');
     });
     var loader = document.getElementById('ml');
     loader.parentNode.removeChild(loader);
+    return mde;
 })();
+
+function set_jumpto() {
+    document.querySelector('.editor-preview-side').onclick = jumpto;
+}
+
+function jumpto(ev) {
+    var tgt = ev.target || ev.srcElement;
+    var ln = null;
+    while (tgt && !ln) {
+        ln = tgt.getAttribute('data-ln');
+        tgt = tgt.parentElement;
+    }
+    var ln = parseInt(ln);
+    console.log(ln);
+    var cm = mde.codemirror;
+    var y = cm.heightAtLine(ln - 1, 'local');
+    var y2 = cm.heightAtLine(ln, 'local');
+    cm.scrollTo(null, y + (y2 - y) - cm.getScrollInfo().clientHeight / 2);
+}
 
 function md_changed(mde, on_srv) {
     if (on_srv)
@@ -74,6 +95,8 @@ function md_changed(mde, on_srv) {
         save_btn.classList.add('disabled');
     else
         save_btn.classList.remove('disabled');
+
+    set_jumpto();
 }
 
 function save(mde) {
@@ -169,8 +192,8 @@ function save_chk() {
         return;
     }
 
-    var doc1 = this.txt.replace(/\r/g, "");
-    var doc2 = this.responseText.replace(/\r/g, "");
+    var doc1 = this.txt.replace(/\r\n/g, "\n");
+    var doc2 = this.responseText.replace(/\r\n/g, "\n");
     if (doc1 != doc2) {
         alert(
             'Error! The document on the server does not appear to have saved correctly (your editor contents and the server copy is not identical). Place the document on your clipboard for now and check the server logs for hints\n\n' +
