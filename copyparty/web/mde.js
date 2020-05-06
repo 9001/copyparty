@@ -13,7 +13,9 @@ var dom_md = document.getElementById('mt');
         if (a > 0)
             loc.push(n[a]);
 
-        nav.push('<a href="/' + loc.join('/') + '">' + n[a] + '</a>');
+        var dec = decodeURIComponent(n[a]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
     }
     dom_nav.innerHTML = nav.join('');
 })();
