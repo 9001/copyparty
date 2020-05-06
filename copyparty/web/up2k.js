@@ -211,7 +211,8 @@ function up2k_init(have_crypto) {
     // handle user intent to use the basic uploader instead
     o('u2nope').onclick = function (e) {
         e.preventDefault();
-        un2k();
+        setmsg('');
+        goto('bup');
     };
 
     if (!String.prototype.format) {

@@ -239,8 +239,8 @@ blink {
 		height: 1.05em;
 		margin: -.2em .3em -.2em -.4em;
 		display: inline-block;
-		border: 1px solid rgba(0,0,0,0.3);
-		border-width: .05em .05em 0 0;
+		border: 1px solid rgba(0,0,0,0.2);
+		border-width: .2em .2em 0 0;
 		transform: rotate(45deg);
 	}
 	#mn a:hover {
