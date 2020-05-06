@@ -24,7 +24,7 @@ class TcpSrv(object):
         ip = "127.0.0.1"
         eps = {ip: "local only"}
         if self.args.i != ip:
-            eps = self.detect_interfaces(self.args.i) or eps
+            eps = self.detect_interfaces(self.args.i) or {self.args.i: "external"}
 
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             self.log(

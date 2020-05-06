@@ -420,9 +420,11 @@ class HttpCli(object):
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
+        sanitized = sanitize_fn(new_dir)
+
         if not nullwrite:
             fdir = os.path.join(vfs.realpath, rem)
-            fn = os.path.join(fdir, sanitize_fn(new_dir))
+            fn = os.path.join(fdir, sanitized)
 
             if not os.path.isdir(fsenc(fdir)):
                 raise Pebkac(500, "parent folder does not exist")
@@ -435,7 +437,7 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, "mkdir failed, check the logs")
 
-        vpath = "{}/{}".format(self.vpath, new_dir).lstrip("/")
+        vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}">go to /{}</a>'.format(
                 quotep(vpath), html_escape(vpath, quote=False)
@@ -457,9 +459,11 @@ class HttpCli(object):
         if not new_file.endswith(".md"):
             new_file += ".md"
 
+        sanitized = sanitize_fn(new_file)
+
         if not nullwrite:
             fdir = os.path.join(vfs.realpath, rem)
-            fn = os.path.join(fdir, sanitize_fn(new_file))
+            fn = os.path.join(fdir, sanitized)
 
             if os.path.exists(fsenc(fn)):
                 raise Pebkac(500, "that file exists already")
@@ -467,7 +471,7 @@ class HttpCli(object):
             with open(fsenc(fn), "wb") as f:
                 f.write(b"`GRUNNUR`\n")
 
-        vpath = "{}/{}".format(self.vpath, new_file).lstrip("/")
+        vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}?edit">go to /{}?edit</a>'.format(
                 quotep(vpath), html_escape(vpath, quote=False)

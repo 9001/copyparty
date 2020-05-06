@@ -356,7 +356,30 @@ def undot(path):
 
 
 def sanitize_fn(fn):
-    return fn.replace("\\", "/").split("/")[-1].strip()
+    fn = fn.replace("\\", "/").split("/")[-1]
+
+    if WINDOWS:
+        for bad, good in [
+            ["<", "＜"],
+            [">", "＞"],
+            [":", "："],
+            ['"', "＂"],
+            ["/", "／"],
+            ["\\", "＼"],
+            ["|", "｜"],
+            ["?", "？"],
+            ["*", "＊"],
+        ]:
+            fn = fn.replace(bad, good)
+
+        bad = ["con", "prn", "aux", "nul"]
+        for n in range(1, 10):
+            bad += "com{0} lpt{0}".format(n).split(" ")
+
+        if fn.lower() in bad:
+            fn = "_" + fn
+
+    return fn.strip()
 
 
 def exclude_dotfiles(filepaths):

@@ -13,7 +13,7 @@ import threading
 from copy import deepcopy
 
 from .__init__ import WINDOWS
-from .util import Pebkac, Queue, fsenc
+from .util import Pebkac, Queue, fsenc, sanitize_fn
 
 
 class Up2k(object):
@@ -48,6 +48,7 @@ class Up2k(object):
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
 
     def handle_json(self, cj):
+        cj["name"] = sanitize_fn(cj["name"])
         wark = self._get_wark(cj)
         now = time.time()
         with self.mutex:

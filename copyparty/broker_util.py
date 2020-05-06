@@ -4,7 +4,6 @@ from __future__ import print_function, unicode_literals
 
 import traceback
 
-from .__init__ import PY2
 from .util import Pebkac, Queue
 
 
