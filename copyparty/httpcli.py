@@ -604,10 +604,10 @@ class HttpCli(object):
             self.reply(response.encode("utf-8"))
             return True
 
-        fn = os.path.join(vfs.realpath, rem)
+        fp = os.path.join(vfs.realpath, rem)
         srv_lastmod = -1
         try:
-            st = os.stat(fsenc(fn))
+            st = os.stat(fsenc(fp))
             srv_lastmod = st.st_mtime
             srv_lastmod3 = int(srv_lastmod * 1000)
         except OSError as ex:
@@ -635,16 +635,22 @@ class HttpCli(object):
                 return True
 
             # TODO another hack re: pending permissions rework
-            os.rename(fn, "{}.bak-{:.3f}.md".format(fn[:-3], srv_lastmod))
+            mdir, mfile = os.path.split(fp)
+            mfile2 = "{}.{:.3f}.md".format(mfile[:-3], srv_lastmod)
+            try:
+                os.mkdir(os.path.join(mdir, ".hist"))
+            except:
+                pass
+            os.rename(fp, os.path.join(mdir, ".hist", mfile2))
 
         p_field, _, p_data = next(self.parser.gen)
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
 
-        with open(fn, "wb") as f:
+        with open(fp, "wb") as f:
             sz, sha512, _ = hashcopy(self.conn, p_data, f)
 
-        new_lastmod = os.stat(fsenc(fn)).st_mtime
+        new_lastmod = os.stat(fsenc(fp)).st_mtime
         new_lastmod3 = int(new_lastmod * 1000)
         sha512 = sha512[:56]
 
@@ -913,12 +919,30 @@ class HttpCli(object):
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)
         vfs_ls.extend(vfs_virt.keys())
 
+        # check for old versions of files,
+        hist = {}  # [num-backups, most-recent, hist-path]
+        histdir = os.path.join(fsroot, ".hist")
+        ptn = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[^\.]+)$")
+        try:
+            for hfn in os.listdir(histdir):
+                m = ptn.match(hfn)
+                if not m:
+                    continue
+
+                fn = m.group(1) + m.group(3)
+                n, ts, _ = hist.get(fn, [0, 0, ""])
+                hist[fn] = [n + 1, max(ts, float(m.group(2))), hfn]
+        except:
+            pass
+
         dirs = []
         files = []
         for fn in exclude_dotfiles(vfs_ls):
+            base = ""
             href = fn
             if self.absolute_urls and vpath:
-                href = "/" + vpath + "/" + fn
+                base = "/" + vpath + "/"
+                href = base + fn
 
             if fn in vfs_virt:
                 fspath = vfs_virt[fn].realpath
@@ -935,6 +959,10 @@ class HttpCli(object):
             if is_dir:
                 margin = "DIR"
                 href += "/"
+            elif fn in hist:
+                margin = '<a href="{}.hist/{}">#{}</a>'.format(
+                    base, html_escape(hist[fn][2], quote=True), hist[fn][0]
+                )
             else:
                 margin = "-"
 
