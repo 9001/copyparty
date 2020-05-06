@@ -68,7 +68,7 @@ a {
 }
 #files thead th:last-child {
 	background: #444;
-	border-radius: .7em 0 0 0;
+	border-radius: .7em .7em 0 0;
 }
 #files thead th:first-child {
 	background: #222;

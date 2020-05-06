@@ -101,7 +101,7 @@ grep -lE '\.full\.(js|css)' copyparty/web/* |
 while IFS= read -r x; do sed -ri 's/\.full\.(js|css)/.\1/g' "$x"; done
 
 [ $no_ogv ] &&
-	rm -rf copyparty/web/deps/{dynamicaudio,ogv}* copyparty/web/browser.js
+	rm -rf copyparty/web/deps/{dynamicaudio,ogv}*
 
 echo creating tar
 args=(--owner=1000 --group=1000)

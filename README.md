@@ -104,10 +104,8 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* sortable browser columns
 * up2k handle filename too long
 * up2k fails on empty files? alert then stuck
-* unexpected filepath on dupe up2k
 * drop onto folders
 * look into android thumbnail cache file format
 * support pillow-simd

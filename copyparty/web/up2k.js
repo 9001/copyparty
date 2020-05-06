@@ -34,6 +34,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
                     esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
     }
     document.body.style.fontSize = '0.8em';
+    document.body.style.padding = '0 1em 1em 1em';
     hcroak(html.join('\n'));
 };
 
