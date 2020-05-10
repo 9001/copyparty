@@ -834,7 +834,7 @@ class HttpCli(object):
 
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)
-        if "edit" in self.uparam:
+        if "edit2" in self.uparam:
             html_path = "web/mde.html"
             template = self.conn.tpl_mde
         else:
@@ -844,11 +844,17 @@ class HttpCli(object):
         html_path = os.path.join(E.mod, html_path)
 
         st = os.stat(fsenc(fs_path))
-        sz_md = st.st_size
+        # sz_md = st.st_size
         ts_md = st.st_mtime
 
         st = os.stat(fsenc(html_path))
         ts_html = st.st_mtime
+
+        # TODO dont load into memory ;_;
+        #   (trivial fix, count the &'s)
+        with open(fsenc(fs_path), "rb") as f:
+            md = f.read().replace(b"&", b"&amp;")
+            sz_md = len(md)
 
         file_ts = max(ts_md, ts_html)
         file_lastmod, do_send = self._chk_lastmod(file_ts)
@@ -856,6 +862,7 @@ class HttpCli(object):
         status = 200 if do_send else 304
 
         targs = {
+            "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, quote=False),
             "lastmod": int(ts_md * 1000),
             "md": "",
@@ -868,9 +875,7 @@ class HttpCli(object):
             self.log(logmsg)
             return True
 
-        with open(fsenc(fs_path), "rb") as f:
-            md = f.read()
-
+        # TODO jinja2 can stream this right?
         targs["md"] = md.decode("utf-8", "replace")
         html = template.render(**targs).encode("utf-8")
         try:

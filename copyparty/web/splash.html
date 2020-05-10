@@ -36,7 +36,11 @@
             </form>
         </ul>
     </div>
-    <!-- script src="/.cpr/splash.js"></script -->
-</body>
+    <script>
 
+if (window.localStorage && localStorage.getItem('darkmode') == 1)
+    document.documentElement.setAttribute("class", "dark");
+
+</script>
+</body>
 </html>

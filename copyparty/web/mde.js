@@ -53,7 +53,8 @@ var mde = (function () {
             "save": "Ctrl-S"
         },
         insertTexts: ["[](", ")"],
-        tabSize: 4,
+        indentWithTabs: false,
+        tabSize: 2,
         toolbar: tbar,
         previewClass: 'mdo',
         onToggleFullScreen: set_jumpto,

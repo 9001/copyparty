@@ -1,17 +1,16 @@
-/*var conv = new showdown.Converter();
-conv.setFlavor('github');
-conv.setOption('tasklists', 0);
-var mhtml = conv.makeHtml(dom_md.value);
-*/
-
 var dom_toc = document.getElementById('toc');
 var dom_wrap = document.getElementById('mw');
-var dom_head = document.getElementById('mh');
+var dom_hbar = document.getElementById('mh');
 var dom_nav = document.getElementById('mn');
-var dom_doc = document.getElementById('m');
-var dom_md = document.getElementById('mt');
+var dom_pre = document.getElementById('mp');
+var dom_src = document.getElementById('mt');
+var dom_navtgl = document.getElementById('navtoggle');
 
-// add toolbar buttons
+function hesc(txt) {
+    return txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// add navbar
 (function () {
     var n = document.location + '';
     n = n.substr(n.indexOf('//') + 2).split('?')[0].split('/');
@@ -22,7 +21,7 @@ var dom_md = document.getElementById('mt');
         if (a > 0)
             loc.push(n[a]);
 
-        var dec = decodeURIComponent(n[a]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        var dec = hesc(decodeURIComponent(n[a]));
 
         nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
     }
@@ -36,13 +35,10 @@ function convert_markdown(md_text) {
         gfm: true
     });
     var html = marked(md_text);
-    dom_doc.innerHTML = html;
-
-    var loader = document.getElementById('ml');
-    loader.parentNode.removeChild(loader);
+    dom_pre.innerHTML = html;
 
     // todo-lists (should probably be a marked extension)
-    var nodes = dom_doc.getElementsByTagName('input');
+    var nodes = dom_pre.getElementsByTagName('input');
     for (var a = nodes.length - 1; a >= 0; a--) {
         var dom_box = nodes[a];
         if (dom_box.getAttribute('type') !== 'checkbox')
@@ -61,9 +57,32 @@ function convert_markdown(md_text) {
             '<span class="todo_' + clas + '">' + char + '</span>' +
             html.substr(html.indexOf('>') + 1);
     }
+
+    var manip_nodes = dom_pre.getElementsByTagName('*');
+    for (var a = manip_nodes.length - 1; a >= 0; a--) {
+        var el = manip_nodes[a];
+
+        var is_precode =
+            el.tagName == 'PRE' &&
+            el.childNodes.length === 1 &&
+            el.childNodes[0].tagName == 'CODE';
+
+        if (!is_precode)
+            continue;
+
+        var nline = parseInt(el.getAttribute('data-ln')) + 1;
+        var lines = el.innerHTML.replace(/\r?\n<\/code>$/i, '</code>').split(/\r?\n/g);
+        for (var b = 0; b < lines.length - 1; b++)
+            lines[b] += '</code>\n<code data-ln="' + (nline + b) + '">';
+
+        el.innerHTML = lines.join('');
+    }
 }
 
 function init_toc() {
+    var loader = document.getElementById('ml');
+    loader.parentNode.removeChild(loader);
+
     var anchors = [];  // list of toc entries, complex objects
     var anchor = null; // current toc node
     var id_seen = {};  // taken IDs
@@ -71,7 +90,7 @@ function init_toc() {
     var lv = 0;        // current indentation level in the toc html
     var re = new RegExp('^[Hh]([1-3])');
 
-    var manip_nodes_dyn = dom_doc.getElementsByTagName('*');
+    var manip_nodes_dyn = dom_pre.getElementsByTagName('*');
     var manip_nodes = [];
     for (var a = 0, aa = manip_nodes_dyn.length; a < aa; a++)
         manip_nodes.push(manip_nodes_dyn[a]);
@@ -79,16 +98,7 @@ function init_toc() {
     for (var a = 0, aa = manip_nodes.length; a < aa; a++) {
         var elm = manip_nodes[a];
         var m = re.exec(elm.tagName);
-
-        var is_header =
-            m !== null;
-
-        var is_precode =
-            !is_header &&
-            elm.tagName == 'PRE' &&
-            elm.childNodes.length === 1 &&
-            elm.childNodes[0].tagName == 'CODE';
-
+        var is_header = m !== null;
         if (is_header) {
             var nlv = m[1];
             while (lv < nlv) {
@@ -127,17 +137,6 @@ function init_toc() {
                 y: null
             };
         }
-        else if (is_precode) {
-            // not actually toc-related (sorry),
-            // split <pre><code /></pre> into one <code> per line
-            var nline = parseInt(elm.getAttribute('data-ln')) + 1;
-            var lines = elm.innerHTML.replace(/\r?\n<\/code>$/i, '</code>').split(/\r?\n/g);
-            for (var b = 0; b < lines.length - 1; b++)
-                lines[b] += '</code>\n<code data-ln="' + (nline + b) + '">';
-
-            elm.innerHTML = lines.join('');
-        }
-
         if (!is_header && anchor)
             anchor.kids.push(elm);
     }
@@ -209,41 +208,77 @@ function init_toc() {
 
 
 // "main" :p
-convert_markdown(dom_md.value);
+convert_markdown(dom_src.value);
 var toc = init_toc();
 
 
 // scroll handler
-(function () {
-    var timer_active = false;
-    var final = null;
+var redraw = (function () {
+    var sbs = false;
+    function onresize() {
+        sbs = window.matchMedia('(min-width: 64em)').matches;
+        var y = (dom_hbar.offsetTop + dom_hbar.offsetHeight) + 'px';
+        if (sbs) {
+            dom_toc.style.top = y;
+            dom_wrap.style.top = y;
+            dom_toc.style.marginTop = '0';
+        }
+        onscroll();
+    }
 
     function onscroll() {
-        clearTimeout(final);
-        timer_active = false;
         toc.refresh();
-
-        var y = 0;
-        if (window.matchMedia('(min-width: 64em)').matches)
-            y = parseInt(dom_nav.offsetHeight) - window.scrollY;
-
-        dom_toc.style.marginTop = y < 0 ? 0 : y + "px";
     }
-    onscroll();
 
-    function ev_onscroll() {
-        // long timeout: scroll ended
-        clearTimeout(final);
-        final = setTimeout(onscroll, 100);
+    window.onresize = onresize;
+    window.onscroll = onscroll;
+    dom_wrap.onscroll = onscroll;
 
-        // short timeout: continuous updates
-        if (timer_active)
+    onresize();
+    return onresize;
+})();
+
+
+dom_navtgl.onclick = function () {
+    var timeout = null;
+    function show_nav(e) {
+        if (e && e.target == dom_hbar && e.pageX && e.pageX < dom_hbar.offsetWidth / 2)
             return;
 
-        timer_active = true;
-        setTimeout(onscroll, 10);
-    };
+        clearTimeout(timeout);
+        dom_nav.style.display = 'block';
+    }
+    function hide_nav() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+            dom_nav.style.display = 'none';
+        }, 30);
+    }
+    var hidden = dom_navtgl.innerHTML == 'hide nav';
+    dom_navtgl.innerHTML = hidden ? 'show nav' : 'hide nav';
+    if (hidden) {
+        dom_nav.setAttribute('class', 'undocked');
+        dom_nav.style.display = 'none';
+        dom_nav.style.top = dom_hbar.offsetHeight + 'px';
+        dom_nav.onmouseenter = show_nav;
+        dom_nav.onmouseleave = hide_nav;
+        dom_hbar.onmouseenter = show_nav;
+        dom_hbar.onmouseleave = hide_nav;
+    }
+    else {
+        dom_nav.setAttribute('class', '');
+        dom_nav.style.display = 'block';
+        dom_nav.style.top = '0';
+        dom_nav.onmouseenter = null;
+        dom_nav.onmouseleave = null;
+        dom_hbar.onmouseenter = null;
+        dom_hbar.onmouseleave = null;
+    }
+    if (window.localStorage)
+        localStorage.setItem('hidenav', hidden ? 1 : 0);
 
-    window.onscroll = ev_onscroll;
-    window.onresize = ev_onscroll;
-})();
+    redraw();
+};
+
+if (window.localStorage && localStorage.getItem('hidenav') == 1)
+    dom_navtgl.onclick();

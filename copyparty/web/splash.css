@@ -13,6 +13,7 @@ h1 {
 	border-bottom: 1px solid #ccc;
 	margin: 2em 0 .4em 0;
 	padding: 0 0 .2em 0;
+	font-weight: normal;
 }
 li {
 	margin: 1em 0;
@@ -24,4 +25,29 @@ a {
 	border-bottom: 1px solid #aaa;
 	border-radius: .2em;
 	padding: .2em .8em;
+}
+
+
+html.dark,
+html.dark body,
+html.dark #wrap {
+	background: #222;
+	color: #ccc;
+}
+html.dark h1 {
+	border-color: #777;
+}
+html.dark a {
+	color: #fff;
+	background: #057;
+	border-color: #37a;
+}
+html.dark input {
+	color: #fff;
+	background: #624;
+	border: 1px solid #c27;
+	border-width: 1px 0 0 0;
+	border-radius: .5em;
+	padding: .5em .7em;
+	margin: 0 .5em 0 0;
 }

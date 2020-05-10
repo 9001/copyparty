@@ -13,6 +13,9 @@ echo
 #
 # `no-ogv` saves ~500k by removing the opus/vorbis audio codecs
 #   (only affects apple devices; everything else has native support)
+#
+# `no-cm` saves ~90k by removing easymde/codemirror
+#   (the fancy markdown editor)
 
 
 command -v gtar  >/dev/null &&
@@ -35,6 +38,7 @@ while [ ! -z "$1" ]; do
 	[ "$1" = clean  ] && clean=1  && shift && continue
 	[ "$1" = re     ] && repack=1 && shift && continue
 	[ "$1" = no-ogv ] && no_ogv=1 && shift && continue
+	[ "$1" = no-cm  ] && no_cm=1  && shift && continue
 	break
 done
 
@@ -102,6 +106,11 @@ while IFS= read -r x; do sed -ri 's/\.full\.(js|css)/.\1/g' "$x"; done
 
 [ $no_ogv ] &&
 	rm -rf copyparty/web/deps/{dynamicaudio,ogv}*
+
+[ $no_cm ] && {
+	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
+	sed -ri '/edit2">edit \(fancy/d' copyparty/web/md.html
+}
 
 echo creating tar
 args=(--owner=1000 --group=1000)
