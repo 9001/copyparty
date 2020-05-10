@@ -88,19 +88,19 @@ h2 a, h4 a, h6 a {
 	padding: 0;
 	margin: 0;
 }
-#m ul,
-#m ol {
+#mp ul,
+#mp ol {
 	border-left: .3em solid #ddd;
 }
 #m>ul,
 #m>ol {
 	border-color: #bbb;
 }
-#m ul>li {
+#mp ul>li {
 	list-style-type: disc;
 }
-#m ul>li,
-#m ol>li {
+#mp ul>li,
+#mp ol>li {
 	margin: .7em 0;
 }
 p>em,
@@ -309,12 +309,12 @@ blink {
 	html.dark #toc li {
 		border-width: 0;
 	}
-	html.dark #m a {
+	html.dark #mp a {
 		background: #057;
 	}
-	html.dark #m h1 a, html.dark #m h4 a,
-	html.dark #m h2 a, html.dark #m h5 a,
-	html.dark #m h3 a, html.dark #m h6 a {
+	html.dark #mp h1 a, html.dark #mp h4 a,
+	html.dark #mp h2 a, html.dark #mp h5 a,
+	html.dark #mp h3 a, html.dark #mp h6 a {
 		color: inherit;
 		background: none;
 	}
@@ -324,8 +324,8 @@ blink {
 		background: #1a1a1a;
 		border: .07em solid #333;
 	}
-	html.dark #m ul,
-	html.dark #m ol {
+	html.dark #mp ul,
+	html.dark #mp ol {
 		border-color: #444;
 	}
 	html.dark #m>ul,

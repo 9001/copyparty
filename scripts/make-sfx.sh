@@ -110,6 +110,7 @@ while IFS= read -r x; do sed -ri 's/\.full\.(js|css)/.\1/g' "$x"; done
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
 	sed -ri '/edit2">edit \(fancy/d' copyparty/web/md.html
+	echo h > copyparty/web/mde.html
 }
 
 echo creating tar
