@@ -45,6 +45,9 @@ html.dark #mt {
     background: #f97;
     border-radius: .15em;
 }
+#save.disabled {
+    opacity: .4;
+}
 #helpbox {
     display: none;
     position: fixed;

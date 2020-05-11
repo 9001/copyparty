@@ -68,6 +68,13 @@ var nlines = 0;
         dom_ref.innerHTML = html.join('\n');
         map_src = genmap(dom_ref);
         map_pre = genmap(dom_pre);
+
+        var sb = document.getElementById('save');
+        var cl = (sb.getAttribute('class') + '').replace(/ disabled/, "");
+        if (src == server_md)
+            cl += ' disabled';
+
+        sb.setAttribute('class', cl);
     }
     dom_src.oninput();
 })();
@@ -158,14 +165,14 @@ redraw = (function () {
 function save(e) {
     if (e) e.preventDefault();
     var save_btn = document.getElementById("save"),
-        save_cls = save_btn.getAttribute('class');
+        save_cls = save_btn.getAttribute('class') + '';
 
-    if (save_cls == 'disabled') {
+    if (save_cls.indexOf('disabled') >= 0) {
         alert('there is nothing to save');
         return;
     }
 
-    var force = save_cls == 'force-save';
+    var force = (save_cls.indexOf('force-save') >= 0);
     if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document')) {
         alert('ok, aborted');
         return;
@@ -264,6 +271,7 @@ function save_chk() {
 
     last_modified = this.lastmod;
     server_md = this.txt;
+    dom_src.oninput();
 
     var ok = document.createElement('div');
     ok.setAttribute('style', 'font-size:6em;font-family:serif;font-weight:bold;color:#cf6;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);width:4em;text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1');
@@ -348,7 +356,7 @@ function md_header(dedent) {
 }
 
 
-// hotkeys
+// hotkeys / toolbar
 (function () {
     function keydown(ev) {
         ev = ev || window.event;
@@ -371,6 +379,7 @@ function md_header(dedent) {
         }
     }
     document.onkeydown = keydown;
+    document.getElementById('save').onclick = save;
 })();
 
 
