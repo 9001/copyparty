@@ -42,6 +42,11 @@ while [ ! -z "$1" ]; do
 	break
 done
 
+tmv() {
+	touch -r "$1" t
+	mv t "$1"
+}
+
 rm -rf sfx/*
 mkdir -p sfx build
 cd sfx
@@ -102,16 +107,26 @@ rm -f copyparty/web/deps/*.full.*
 
 # it's fine dw
 grep -lE '\.full\.(js|css)' copyparty/web/* |
-while IFS= read -r x; do sed -ri 's/\.full\.(js|css)/.\1/g' "$x"; done
+while IFS= read -r x; do
+	sed -r 's/\.full\.(js|css)/.\1/g' <"$x" >t
+	tmv "$x"
+done
 
 [ $no_ogv ] &&
 	rm -rf copyparty/web/deps/{dynamicaudio,ogv}*
 
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
-	sed -ri '/edit2">edit \(fancy/d' copyparty/web/md.html
 	echo h > copyparty/web/mde.html
+	f=copyparty/web/md.html
+	sed -r '/edit2">edit \(fancy/d' <$f >t && tmv "$f"
 }
+
+# up2k goes from 28k to 22k laff
+for f in copyparty/web/*.js; do
+	unexpand.exe -t 4 --first-only <"$f" >t
+	tmv "$f"
+done
 
 echo creating tar
 args=(--owner=1000 --group=1000)
@@ -141,20 +156,3 @@ chmod 755 $sfx_out.*
 printf "done:\n"
 printf "  %s\n" "$(realpath $sfx_out)."{sh,py}
 # rm -rf *
-
-# -rw-r--r--  1 ed ed 811271 May  5 14:35 tar.bz2
-# -rw-r--r--  1 ed ed 732016 May  5 14:35 tar.xz
-
-# -rwxr-xr-x  1 ed ed 830425 May  5 14:35 copyparty-sfx.py*
-# -rwxr-xr-x  1 ed ed 734088 May  5 14:35 copyparty-sfx.sh*
-
-# -rwxr-xr-x  1 ed ed 799690 May  5 14:45 copyparty-sfx.py*
-# -rwxr-xr-x  1 ed ed 735004 May  5 14:45 copyparty-sfx.sh*
-
-# time pigz -11 -J 34 -I 5730 < tar > tar.gz.5730
-# real	8m50.622s
-# user	33m9.821s
-# -rw-r--r--  1 ed ed 1136640 May  5 14:50 tar
-# -rw-r--r--  1 ed ed  296334 May  5 14:50 tar.bz2
-# -rw-r--r--  1 ed ed  324705 May  5 15:01 tar.gz.5730
-# -rw-r--r--  1 ed ed  257208 May  5 14:50 tar.xz

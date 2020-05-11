@@ -287,108 +287,127 @@ function save_chk() {
 }
 
 
-// get selection bounds, expanded to whole lines
+// returns car/cdr (selection bounds) and n1/n2 (grown to full lines)
 function linebounds(just_car) {
-    var car = dom_src.selectionStart;
-    var cdr = dom_src.selectionEnd;
+    var car = dom_src.selectionStart,
+        cdr = dom_src.selectionEnd;
+
     console.log(car, cdr);
 
     if (just_car)
         cdr = car;
 
-    var txt = dom_src.value;
-    car = Math.max(car, 0);
-    cdr = Math.min(cdr, txt.length - 1);
+    var md = dom_src.value,
+        n1 = Math.max(car, 0),
+        n2 = Math.min(cdr, md.length - 1);
 
-    if (car < cdr && txt[car] == '\n')
-        car++;
+    if (n1 < n2 && md[n1] == '\n')
+        n1++;
 
-    if (car < cdr && txt[cdr - 1] == '\n')
-        cdr -= 2;
+    if (n1 < n2 && md[n2 - 1] == '\n')
+        n2 -= 2;
 
-    car = txt.lastIndexOf('\n', car - 1) + 1;
-    cdr = txt.indexOf('\n', cdr);
-    if (cdr < car)
-        cdr = txt.length;
+    n1 = md.lastIndexOf('\n', n1 - 1) + 1;
+    n2 = md.indexOf('\n', n2);
+    if (n2 < n1)
+        n2 = md.length;
 
-    return [car, cdr];
+    return {
+        "car": car,
+        "cdr": cdr,
+        "n1": n1,
+        "n2": n2,
+        "md": md
+    }
 }
 
 
-// returns [before,selection,after]
+// linebounds + the three textranges
 function getsel() {
-    var lb = linebounds(false),
-        txt = dom_src.value;
-
-    return [
-        txt.substring(0, lb[0]),
-        txt.substring(lb[0], lb[1]),
-        txt.substring(lb[1])
-    ];
+    var s = linebounds(false);
+    s.pre = s.md.substring(0, s.n1);
+    s.sel = s.md.substring(s.n1, s.n2);
+    s.post = s.md.substring(s.n2);
+    return s;
 }
 
 
 // place modified getsel into markdown
-function setsel(a, b, c) {
-    dom_src.value = [a, b, c].join('');
-    dom_src.setSelectionRange(a.length, a.length + b.length);
-    dom_src.oninput();
+function setsel(s) {
+    if (s.car != s.cdr) {
+        s.car = s.pre.length;
+        s.cdr = s.pre.length + s.sel.length;
+    }
+    dom_src.value = [s.pre, s.sel, s.post].join('');
+    dom_src.setSelectionRange(s.car, s.cdr);
+    try {
+        dom_src.oninput();
+    }
+    catch (ex) { }
 }
 
 
 // indent/dedent
 function md_indent(dedent) {
-    var r = getsel(),
-        pre = r[0],
-        sel = r[1],
-        post = r[2];
+    var s = getsel(),
+        sel0 = s.sel;
 
     if (dedent)
-        sel = sel.replace(/^  /, "").replace(/\n  /g, "\n");
+        s.sel = s.sel.replace(/^  /, "").replace(/\n  /g, "\n");
     else
-        sel = '  ' + sel.replace(/\n/g, '\n  ');
+        s.sel = '  ' + s.sel.replace(/\n/g, '\n  ');
 
-    setsel(pre, sel, post);
+    if (s.car == s.cdr)
+        s.car = s.cdr += s.sel.length - sel0.length;
+
+    setsel(s);
 }
 
 
 // header
 function md_header(dedent) {
-    var r = getsel(),
-        pre = r[0],
-        sel = r[1],
-        post = r[2];
+    var s = getsel(),
+        sel0 = s.sel;
 
     if (dedent)
-        sel = sel.replace(/^#/, "").replace(/^ +/, "");
+        s.sel = s.sel.replace(/^#/, "").replace(/^ +/, "");
     else
-        sel = sel.replace(/^(#*) ?/, "#$1 ");
+        s.sel = s.sel.replace(/^(#*) ?/, "#$1 ");
 
-    setsel(pre, sel, post);
+    if (s.car == s.cdr)
+        s.car = s.cdr += s.sel.length - sel0.length;
+
+    setsel(s);
 }
 
 
 // smart-home
 function md_home(shift) {
-    var car = dom_src.selectionStart,
-        sb = linebounds(true),
-        n1 = sb[0],
-        n2 = sb[1];
+    var s = linebounds(!shift),
+        ln = s.md.substring(s.n1, s.n2),
+        m = /^[ \t#>+-]*(\* )?([0-9]+\. +)?/.exec(ln),
+        home = s.n1 + m[0].length,
+        car = (s.car == home) ? s.n1 : home,
+        cdr = shift ? s.cdr : car;
 
-    var ln = dom_src.value.substring(n1, n2);
-    var m = /^[ \t#>*_~`+-]*([0-9]+\. +)?/.exec(ln);
-    if (!m)
-        return true;
-
-    var home = n1 + m[0].length;
-    car = (car == home) ? n1 : home;
-
-    var cdr = shift ? dom_src.selectionEnd : car;
     if (car > cdr)
         car = [cdr, cdr = car][0];
 
     dom_src.setSelectionRange(car, cdr);
-    return false;
+}
+
+
+// autoindent
+function md_newline() {
+    var s = linebounds(true),
+        ln = s.md.substring(s.n1, s.n2),
+        m = /^[ \t#>+-]*(\* )?([0-9]+\. +)?/.exec(ln);
+
+    s.pre = s.md.substring(0, s.car) + '\n' + m[0];
+    s.sel = '';
+    s.post = s.md.substring(s.car);
+    s.car = s.cdr = s.pre.length;
+    setsel(s);
 }
 
 
@@ -413,7 +432,12 @@ function md_home(shift) {
                 return false;
             }
             if (!ctrl && (ev.code == "Home" || kc == 36)) {
-                return md_home(ev.shiftKey);
+                md_home(ev.shiftKey);
+                return false;
+            }
+            if (!ctrl && !ev.shiftKey && (ev.code == "Enter" || kc == 13)) {
+                md_newline();
+                return false;
             }
         }
     }
