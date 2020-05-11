@@ -287,11 +287,14 @@ function save_chk() {
 }
 
 
-// returns [before,selection,after]
-function getsel() {
+// get selection bounds, expanded to whole lines
+function linebounds(just_car) {
     var car = dom_src.selectionStart;
     var cdr = dom_src.selectionEnd;
     console.log(car, cdr);
+
+    if (just_car)
+        cdr = car;
 
     var txt = dom_src.value;
     car = Math.max(car, 0);
@@ -308,10 +311,19 @@ function getsel() {
     if (cdr < car)
         cdr = txt.length;
 
+    return [car, cdr];
+}
+
+
+// returns [before,selection,after]
+function getsel() {
+    var lb = linebounds(false),
+        txt = dom_src.value;
+
     return [
-        txt.substring(0, car),
-        txt.substring(car, cdr),
-        txt.substring(cdr)
+        txt.substring(0, lb[0]),
+        txt.substring(lb[0], lb[1]),
+        txt.substring(lb[1])
     ];
 }
 
@@ -356,6 +368,30 @@ function md_header(dedent) {
 }
 
 
+// smart-home
+function md_home(shift) {
+    var car = dom_src.selectionStart,
+        sb = linebounds(true),
+        n1 = sb[0],
+        n2 = sb[1];
+
+    var ln = dom_src.value.substring(n1, n2);
+    var m = /^[ \t#>*_~`+-]*([0-9]+\. +)?/.exec(ln);
+    if (!m)
+        return true;
+
+    var home = n1 + m[0].length;
+    car = (car == home) ? n1 : home;
+
+    var cdr = shift ? dom_src.selectionEnd : car;
+    if (car > cdr)
+        car = [cdr, cdr = car][0];
+
+    dom_src.setSelectionRange(car, cdr);
+    return false;
+}
+
+
 // hotkeys / toolbar
 (function () {
     function keydown(ev) {
@@ -375,6 +411,9 @@ function md_header(dedent) {
             if (ctrl && (ev.code == "KeyH" || kc == 72)) {
                 md_header(ev.shiftKey);
                 return false;
+            }
+            if (!ctrl && (ev.code == "Home" || kc == 36)) {
+                return md_home(ev.shiftKey);
             }
         }
     }

@@ -859,6 +859,7 @@ class HttpCli(object):
         file_ts = max(ts_md, ts_html)
         file_lastmod, do_send = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
+        self.out_headers["Cache-Control"] = "no-cache"
         status = 200 if do_send else 304
 
         targs = {

@@ -11,14 +11,12 @@ dist/
 sfx/
 .venv/
 
-# sublime
+# ide
 *.sublime-workspace
 
 # winmerge
 *.bak
 
-# other licenses
-contrib/
-
-# deps
-copyparty/web/deps
+# derived
+copyparty/web/deps/
+srv/
