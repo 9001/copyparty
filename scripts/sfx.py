@@ -260,7 +260,7 @@ def read_py(binp):
 
 def get_pys():
     ver, chk = read_py(sys.executable)
-    if chk:
+    if chk or PY2:
         return [[chk, ver, sys.executable]]
 
     hits = {sys.executable.lower(): sys.executable}

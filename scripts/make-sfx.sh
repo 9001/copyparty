@@ -71,7 +71,7 @@ cd sfx
 
 	tar -zxf $f
 	mv Jinja2-*/jinja2 .
-	rm -rf Jinja2-* jinja2/testsuite
+	rm -rf Jinja2-* jinja2/testsuite jinja2/tests.py
 
 	# msys2 tar is bad, make the best of it
 	echo collecting source
@@ -123,8 +123,9 @@ done
 }
 
 # up2k goes from 28k to 22k laff
-for f in copyparty/web/*.js; do
-	unexpand.exe -t 4 --first-only <"$f" >t
+echo entabbening
+find | grep -E '\.(js|css|html|py)$' | while IFS= read -r f; do
+	unexpand -t 4 --first-only <"$f" >t
 	tmv "$f"
 done
 
