@@ -8,7 +8,7 @@ import threading
 from datetime import datetime, timedelta
 import calendar
 
-from .__init__ import PY2, WINDOWS, VT100
+from .__init__ import PY2, WINDOWS, MACOS, VT100
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
 from .util import mp
@@ -111,6 +111,8 @@ class SvcHub(object):
                 return msg
             elif vmin < 3:
                 return msg
+        elif MACOS:
+            return "multiprocessing is wonky on mac osx;"
         else:
             msg = "need python 2.7 or 3.3+ for multiprocessing;"
             if not PY2 and vmin < 3:
@@ -133,7 +135,7 @@ class SvcHub(object):
 
         if mp.cpu_count() <= 1:
             return False
-        
+
         try:
             # support vscode debugger (bonus: same behavior as on windows)
             mp.set_start_method("spawn", True)

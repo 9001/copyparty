@@ -24,6 +24,7 @@ command -v gfind >/dev/null && {
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
+	unexpand() { gunexpand "$@"; }
 }
 
 [ -e copyparty/__main__.py ] || cd ..
@@ -71,7 +72,15 @@ cd sfx
 
 	tar -zxf $f
 	mv Jinja2-*/jinja2 .
-	rm -rf Jinja2-* jinja2/testsuite jinja2/tests.py
+	rm -rf Jinja2-* jinja2/testsuite jinja2/_markupsafe/tests.py jinja2/_stringdefs.py
+	
+	f=jinja2/lexer.py
+	sed -r '/.*föö.*/    raise SyntaxError/' <$f >t
+	tmv $f
+	
+	f=jinja2/_markupsafe/_constants.py
+	awk '!/: [0-9]+,?$/ || /(amp|gt|lt|quot|apos|nbsp).:/' <$f >t
+	tmv $f
 
 	# msys2 tar is bad, make the best of it
 	echo collecting source

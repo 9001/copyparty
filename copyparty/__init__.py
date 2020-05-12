@@ -16,6 +16,8 @@ if platform.system() == "Windows":
 VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
 # introduced in anniversary update
 
+MACOS = platform.system() == "Darwin"
+
 
 class EnvParams(object):
     def __init__(self):
