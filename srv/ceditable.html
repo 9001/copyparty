@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=0.8">
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    border: none;
+    font-size: 1em;
+    line-height: 1em;
+    font-family: monospace, monospace;
+    color: #333;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    background: #ddd;
+}
+html {
+    font-size: 1.3em;
+}
+li, #edit {
+    list-style-type: none;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    word-wrap: break-word; /*ie*/
+}
+li:nth-child(even) {
+    background: #ddd;
+}
+#edit, #html, #txt1, #txt2 {
+    background: #eee;
+    position: fixed;
+    width: calc(50% - .8em);
+    height: calc(50% - .8em);
+}
+#txt1 { top: .5em; left: .5em }
+#edit { top: .5em; right: .5em }
+#html { bottom: .5em; left: .5em }
+#txt2 { bottom: .5em; right: .5em }
+
+</style></head><body>
+<pre id="edit" contenteditable="true"></pre>
+<textarea id="html"></textarea>
+<ul id="txt1"></ul>
+<ul id="txt2"></ul>
+<script>
+
+var edit = document.getElementById('edit'),
+    html = document.getElementById('html'),
+    txt1 = document.getElementById('txt1'),
+    txt2 = document.getElementById('txt2');
+
+var oh = null;
+function fun() {
+    var h = edit.innerHTML;
+    if (oh != h) {
+        oh = h;
+        html.value = h;
+        var t = edit.innerText;
+        if (h.indexOf('<div><br></div>') >= 0)
+            t = t.replace(/\n\n/g, "\n");
+        
+        t = '<li>' + t.
+            replace(/&/g, "&amp;").
+            replace(/</g, "&lt;").
+            replace(/>/g, "&gt;").
+            split('\n').join('</li>\n<li>') + '</li>';
+        
+        t = t.replace(/<li><\/li>/g, '<li> </li>');
+        txt1.innerHTML = t;
+        txt2.innerHTML = t;
+    }
+    setTimeout(fun, 100);
+}
+fun();
+
+</script>
+</body>
+</html>

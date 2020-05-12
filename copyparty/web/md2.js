@@ -16,6 +16,11 @@ var dom_ref = (function () {
 })();
 
 
+// replace it with the real deal in the console
+var dbg = function () { };
+// dbg = console.log
+
+
 // line->scrollpos maps
 var map_src = [];
 var map_pre = [];
@@ -53,6 +58,7 @@ function genmap(dom) {
 
 
 // input handler
+var action_stack = null;
 var nlines = 0;
 (function () {
     dom_src.oninput = function (e) {
@@ -75,6 +81,8 @@ var nlines = 0;
             cl += ' disabled';
 
         sb.setAttribute('class', cl);
+        if (action_stack)
+            action_stack.push();
     }
     dom_src.oninput();
 })();
@@ -89,7 +97,7 @@ redraw = (function () {
         dom_ref.style.width = (dom_src.offsetWidth - 4) + 'px';
         map_src = genmap(dom_ref);
         map_pre = genmap(dom_pre);
-        console.log(document.body.clientWidth + 'x' + document.body.clientHeight);
+        dbg(document.body.clientWidth + 'x' + document.body.clientHeight);
     };
 
     window.onresize = onresize;
@@ -292,7 +300,7 @@ function linebounds(just_car) {
     var car = dom_src.selectionStart,
         cdr = dom_src.selectionEnd;
 
-    console.log(car, cdr);
+    dbg(car, cdr);
 
     if (just_car)
         cdr = car;
@@ -439,6 +447,18 @@ function md_newline() {
                 md_newline();
                 return false;
             }
+            if (ctrl && (ev.code == "KeyZ" || kc == 90)) {
+                if (ev.shiftKey)
+                    action_stack.redo();
+                else
+                    action_stack.undo();
+
+                return false;
+            }
+            if (ctrl && (ev.code == "KeyY" || kc == 89)) {
+                action_stack.redo();
+                return false;
+            }
         }
     }
     document.onkeydown = keydown;
@@ -458,3 +478,113 @@ document.getElementById('help').onclick = function (e) {
         dom.style.display = 'none';
     };
 };
+
+
+// blame steen
+action_stack = (function () {
+    var undos = [];
+    var redos = [];
+    var sched_txt = '';
+    var sched_timer = null;
+    var ignore = false;
+    var ref = dom_src.value;
+
+    function diff(from, to) {
+        if (from === to)
+            return null;
+
+        var car = 0,
+            max = Math.max(from.length, to.length);
+
+        for (; car < max; car++)
+            if (from[car] != to[car])
+                break;
+
+        var p1 = from.length,
+            p2 = to.length;
+
+        while (p1 --> 0 && p2 --> 0)
+            if (from[p1] != to[p2])
+                break;
+
+        if (car > ++p1) {
+            car = p1;
+        }
+
+        var txt = from.substring(car, p1)
+        return {
+            car: car,
+            cdr: ++p2,
+            txt: txt
+        };
+    }
+
+    function undiff(from, change) {
+        return {
+            txt: from.substring(0, change.car) + change.txt + from.substring(change.cdr),
+            cursor: change.car + change.txt.length
+        };
+    }
+
+    function apply(src, dst) {
+        dbg('undos(%d) redos(%d)', undos.length, redos.length);
+
+        if (src.length === 0)
+            return false;
+
+        var state = undiff(ref, src.pop()),
+            change = diff(ref, state.txt);
+
+        if (change === null)
+            return false;
+
+        dst.push(change);
+        ref = state.txt;
+        nodrop = true;
+        dom_src.value = ref;
+        dom_src.setSelectionRange(state.cursor, state.cursor);
+        return true;
+    }
+
+    function schedule_push() {
+        if (ignore) {
+            ignore = false;
+            return;
+        }
+        redos = [];
+        sched_txt = dom_src.value;
+        clearTimeout(sched_timer);
+        sched_timer = setTimeout(push, 500);
+    }
+
+    function undo() {
+        return apply(undos, redos);
+    }
+
+    function redo() {
+        return apply(redos, undos);
+    }
+
+    function push() {
+        var change = diff(ref, sched_txt, dom_src.selectionStart);
+        if (change !== null)
+            undos.push(change);
+
+        ref = sched_txt;
+        dbg('undos(%d) redos(%d)', undos.length, redos.length);
+        if (undos.length > 0)
+            dbg(undos.slice(-1)[0]);
+        if (redos.length > 0)
+            dbg(redos.slice(-1)[0]);
+    }
+
+    return {
+        push: push,
+        undo: undo,
+        redo: redo,
+        push: schedule_push,
+        _undos: undos,
+        _redos: redos,
+        _ref: ref
+    }
+})();
