@@ -11,12 +11,34 @@
 #mw {
     left: calc(100% - 57em);
 }
+
+
+/* single-screen */
+#mtw.preview,
+#mw.editor {
+    opacity: 0;
+    z-index: 1;
+}
+#mw.preview,
+#mtw.editor {
+    z-index: 3;
+}
+#mtw.single,
+#mw.single {
+    left: calc((100% - 58em) / 2);
+    margin: 0;
+}
+#mtw.single {
+    width: 57em;
+}
+
+
 #mp {
     position: relative;
 }
 #mt, #mtr {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 5px);
     color: #444;
     background: #f7f7f7;
     border: 1px solid #999;
@@ -56,6 +78,8 @@ html.dark #mt {
     border-radius: .4em;
     padding: 2em;
     top: 4em;
+    overflow-y: auto;
+    height: calc(100% - 12em);
     left: calc(50% - 15em);
     right: 0;
     width: 30em;

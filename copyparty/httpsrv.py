@@ -6,7 +6,7 @@ import time
 import socket
 import threading
 
-from .__init__ import E
+from .__init__ import E, MACOS
 from .httpconn import HttpConn
 from .authsrv import AuthSrv
 
@@ -75,9 +75,11 @@ class HttpSrv(object):
                 sck.shutdown(socket.SHUT_RDWR)
                 sck.close()
             except (OSError, socket.error) as ex:
-                self.log(
-                    "%s %s" % addr, "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex),
-                )
+                if not MACOS:
+                    self.log(
+                        "%s %s" % addr,
+                        "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex),
+                    )
                 if ex.errno not in [10038, 107, 57, 9]:
                     # 10038 No longer considered a socket
                     #   107 Transport endpoint not connected

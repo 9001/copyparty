@@ -4,6 +4,8 @@ var server_md = dom_src.value;
 
 // dom nodes
 var dom_swrap = document.getElementById('mtw');
+var dom_sbs = document.getElementById('sbs');
+var dom_nsbs = document.getElementById('nsbs');
 var dom_ref = (function () {
     var d = document.createElement('div');
     d.setAttribute('id', 'mtr');
@@ -98,11 +100,26 @@ redraw = (function () {
         map_src = genmap(dom_ref);
         map_pre = genmap(dom_pre);
         dbg(document.body.clientWidth + 'x' + document.body.clientHeight);
-    };
+    }
+    function setsbs() {
+        dom_wrap.setAttribute('class', '');
+        dom_swrap.setAttribute('class', '');
+        onresize();
+    }
+    function modetoggle() {
+        mode = dom_nsbs.innerHTML;
+        dom_nsbs.innerHTML = mode == 'editor' ? 'preview' : 'editor';
+        mode += ' single';
+        dom_wrap.setAttribute('class', mode);
+        dom_swrap.setAttribute('class', mode);
+        onresize();
+    }
 
     window.onresize = onresize;
     window.onscroll = null;
     dom_wrap.onscroll = null;
+    dom_sbs.onclick = setsbs;
+    dom_nsbs.onclick = modetoggle;
 
     onresize();
     return onresize;

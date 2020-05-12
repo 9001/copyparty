@@ -15,6 +15,8 @@
 		<a id="navtoggle" href="#">hide nav</a>
 		{%- if edit %}
 			<a id="save" href="?edit">save</a>
+			<a id="sbs" href="#">sbs</a>
+			<a id="nsbs" href="#">editor</a>
 			<a id="help" href="#">help</a>
 		{%- else %}
 			<a href="?edit">edit (basic)</a>
@@ -46,6 +48,16 @@ write markdown (html is permitted)
 * `Ctrl-H` / `Ctrl-Shift-H` to create a header
 * `TAB` / `Shift-TAB` to indent/dedent a selection
 
+### toolbar
+1. toggle dark mode
+2. show/hide navigation bar
+3. save changes on server
+4. side-by-side editing
+5. toggle editor/preview
+6. this thing :^)
+
+.
+
 		</textarea>
 	</div>
 	{%- endif %}
@@ -70,12 +82,10 @@ var last_modified = {{ lastmod }};
 		toggle();
 })();
 
-// TODO babel or es5 shims (fix Object.defineProperty too)
-// https://stackoverflow.com/questions/48803257/
 if (!String.startsWith) {
-	String.prototype.startsWith = function(search, rawPos) {
-		var pos = rawPos > 0 ? rawPos|0 : 0;
-		return this.substring(pos, pos + search.length) === search;
+	String.prototype.startsWith = function(s, i) {
+		i = i>0 ? i|0 : 0;
+		return this.substring(i, i + s.length) === s;
 	};
 }
 
