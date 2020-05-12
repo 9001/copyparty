@@ -59,13 +59,16 @@ launch either of them and it'll unpack and run copyparty, assuming you have pyth
 
 pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `copyparty.py` and keep it in the same folder because `sys.path` is funky
 
-if you don't need all the features you can repack the sfx and save a bunch of space, tho currently the only removable feature is the opus/vorbis javascript decoder which is needed by apple devices to play foss audio files
+if you don't need all the features you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except for either msys2 or WSL if you're on windows)
+* `724K` original size as of v0.4.0
+* `256K` after `./scripts/make-sfx.sh re no-ogv`
+* `164K` after `./scripts/make-sfx.sh re no-ogv no-cm`
 
-steps to reduce the sfx size from `720 kB` to `250 kB` roughly:
-* run one of the sfx'es once to unpack it
-* `./scripts/make-sfx.sh re no-ogv` creates a new pair of sfx
+the features you can opt to drop are
+* `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files
+* `cm`/easymde, the "fancy" markdown editor
 
-no internet connection needed, just download an sfx and the repo zip (also if you're on windows use msys2)
+for the `re`pack to work, first run one of the sfx'es once to unpack it
 
 
 # install on android
