@@ -540,9 +540,11 @@ action_stack = (function () {
 
         dst.push(change);
         ref = state.txt;
-        nodrop = true;
+        ignore = true; // just some browsers
         dom_src.value = ref;
         dom_src.setSelectionRange(state.cursor, state.cursor);
+        ignore = true; // all browsers
+        dom_src.oninput();
         return true;
     }
 
