@@ -23,6 +23,7 @@ var map_src = [];
 var map_pre = [];
 function genmap(dom) {
     var ret = [];
+    var last_y = -1;
     var parent_y = 0;
     var parent_n = null;
     var nodes = dom.querySelectorAll('*[data-ln]');
@@ -48,11 +49,14 @@ function genmap(dom) {
         while (ln > ret.length)
             ret.push(null);
 
-        if (parent_y == 0 && n.offsetTop == 0)
+        var y = parent_y + n.offsetTop;
+        if (y <= last_y)
             //console.log('awawa');
             continue;
 
-        ret.push(parent_y + n.offsetTop);
+        //console.log('%d  %d  (%d+%d)', a, y, parent_y, n.offsetTop);
+        ret.push(y);
+        last_y = y;
     }
     return ret;
 }

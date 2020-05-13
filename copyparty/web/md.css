@@ -425,6 +425,16 @@ blink {
 	html.dark #mw {
 		scrollbar-color: #b80 #282828;
 	}
+	html.dark #toc::-webkit-scrollbar-track {
+		background: #282828;
+	}
+	html.dark #toc::-webkit-scrollbar {
+		background: #282828;
+		width: .8em;
+	}
+	html.dark #toc::-webkit-scrollbar-thumb {
+		background: #eb0;
+	}
 	html.dark #mn.undocked {
 		box-shadow: 0 0 .5em #555;
 		border: none;
