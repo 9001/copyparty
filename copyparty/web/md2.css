@@ -45,9 +45,12 @@
     color: #444;
     background: #f7f7f7;
     border: 1px solid #999;
+    outline: none;
+    padding: 0;
+    margin: 0;
     font-family: 'consolas', monospace, monospace;
     white-space: pre-wrap;
-    word-break: break-all;
+    word-break: break-word;
     overflow-wrap: break-word;
     word-wrap: break-word; /*ie*/
     overflow-y: scroll;
@@ -62,8 +65,8 @@ html.dark #mt {
 }
 #mtr {
     position: absolute;
-    top: 1px;
-    left: 1px;
+    top: 0;
+    left: 0;
 }
 #save.force-save {
     color: #400;
@@ -98,8 +101,4 @@ html.dark #helpbox {
     border-width: 1px 0;
 }
 
-/* dbg:
-#mt {
-    opacity: .5;
-}
-*/
+# mt {opacity: .5;top:1px}

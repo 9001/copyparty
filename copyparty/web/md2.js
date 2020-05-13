@@ -48,6 +48,10 @@ function genmap(dom) {
         while (ln > ret.length)
             ret.push(null);
 
+        if (parent_y == 0 && n.offsetTop == 0)
+            //console.log('awawa');
+            continue;
+
         ret.push(parent_y + n.offsetTop);
     }
     return ret;
@@ -99,7 +103,7 @@ redraw = (function () {
         var y = (dom_hbar.offsetTop + dom_hbar.offsetHeight) + 'px';
         dom_wrap.style.top = y;
         dom_swrap.style.top = y;
-        dom_ref.style.width = (dom_src.offsetWidth - 4) + 'px';
+        dom_ref.style.width = getComputedStyle(dom_src).offsetWidth + 'px';
         map_src = genmap(dom_ref);
         map_pre = genmap(dom_pre);
         dbg(document.body.clientWidth + 'x' + document.body.clientHeight);
@@ -615,3 +619,14 @@ action_stack = (function () {
         _ref: ref
     }
 })();
+
+/*
+document.getElementById('help').onclick = function () {
+    var c1 = getComputedStyle(dom_src).cssText.split(';');
+    var c2 = getComputedStyle(dom_ref).cssText.split(';');
+    var max = Math.min(c1.length, c2.length);
+    for (var a = 0; a < max; a++)
+        if (c1[a] !== c2[a])
+            console.log(c1[a] + '\n' + c2[a]);
+}
+*/
