@@ -10,6 +10,9 @@
 }
 #mw {
     left: calc(100% - 57em);
+    overflow-y: auto;
+    position: fixed;
+    bottom: 0;
 }
 
 
@@ -21,7 +24,7 @@
 }
 #mw.preview,
 #mtw.editor {
-    z-index: 3;
+    z-index: 5;
 }
 #mtw.single,
 #mw.single {

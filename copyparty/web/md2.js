@@ -18,11 +18,6 @@ var dom_ref = (function () {
 })();
 
 
-// replace it with the real deal in the console
-var dbg = function () { };
-// dbg = console.log
-
-
 // line->scrollpos maps
 var map_src = [];
 var map_pre = [];
@@ -62,8 +57,10 @@ function genmap(dom) {
 // input handler
 var action_stack = null;
 var nlines = 0;
-(function () {
-    dom_src.oninput = function (e) {
+var draw_md = (function () {
+    var delay = 1;
+    function draw_md() {
+        var t0 = new Date().getTime();
         var src = dom_src.value;
         convert_markdown(src);
 
@@ -77,16 +74,22 @@ var nlines = 0;
         map_src = genmap(dom_ref);
         map_pre = genmap(dom_pre);
 
-        var sb = document.getElementById('save');
-        var cl = (sb.getAttribute('class') + '').replace(/ disabled/, "");
-        if (src == server_md)
-            cl += ' disabled';
+        cls(document.getElementById('save'), 'disabled', src == server_md);
 
-        sb.setAttribute('class', cl);
+        var t1 = new Date().getTime();
+        delay = t1 - t0;
+    }
+
+    var timeout = null;
+    dom_src.oninput = function (e) {
+        clearTimeout(timeout);
+        timeout = setTimeout(draw_md, delay);
         if (action_stack)
             action_stack.push();
-    }
-    dom_src.oninput();
+    };
+
+    draw_md();
+    return draw_md;
 })();
 
 
@@ -296,7 +299,7 @@ function save_chk() {
 
     last_modified = this.lastmod;
     server_md = this.txt;
-    dom_src.oninput();
+    draw_md();
 
     var ok = document.createElement('div');
     ok.setAttribute('style', 'font-size:6em;font-family:serif;font-weight:bold;color:#cf6;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);width:4em;text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1');
@@ -366,7 +369,7 @@ function setsel(s) {
     dom_src.value = [s.pre, s.sel, s.post].join('');
     dom_src.setSelectionRange(s.car, s.cdr);
     try {
-        dom_src.oninput();
+        draw_md();
     }
     catch (ex) { }
 }
@@ -426,7 +429,7 @@ function md_home(shift) {
 function md_newline() {
     var s = linebounds(true),
         ln = s.md.substring(s.n1, s.n2),
-        m = /^[ \t#>+-]*(\* )?([0-9]+\. +)?/.exec(ln);
+        m = /^[ \t>+-]*(\* )?([0-9]+\. +)?/.exec(ln);
 
     s.pre = s.md.substring(0, s.car) + '\n' + m[0];
     s.sel = '';
@@ -561,7 +564,7 @@ action_stack = (function () {
         dom_src.value = ref;
         dom_src.setSelectionRange(state.cursor, state.cursor);
         ignore = true; // all browsers
-        dom_src.oninput();
+        draw_md();
         return true;
     }
 
@@ -577,6 +580,10 @@ action_stack = (function () {
     }
 
     function undo() {
+        if (redos.length == 0) {
+            clearTimeout(sched_timer);
+            push();
+        }
         return apply(undos, redos);
     }
 

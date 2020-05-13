@@ -6,9 +6,29 @@ var dom_pre = document.getElementById('mp');
 var dom_src = document.getElementById('mt');
 var dom_navtgl = document.getElementById('navtoggle');
 
+
+// chrome 49 needs this
+var chromedbg = function () { console.log(arguments); }
+
+// null-logger
+var dbg = function () { };
+
+// replace dbg with the real deal here or in the console:
+// dbg = chromedbg
+// dbg = console.log
+
+
 function hesc(txt) {
     return txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+
+function cls(dom, name, add) {
+    var re = new RegExp('(^| )' + name + '( |$)');
+    var lst = (dom.getAttribute('class') + '').replace(re, "$1$2").replace(/  /, "");
+    dom.setAttribute('class', lst + (add ? ' ' + name : ''));
+}
+
 
 // add navbar
 (function () {
@@ -28,17 +48,105 @@ function hesc(txt) {
     dom_nav.innerHTML = nav.join('');
 })();
 
+
+// faster than replacing the entire html (chrome 1.8x, firefox 1.6x)
+function copydom(src, dst, lv) {
+    var sc = src.childNodes,
+        dc = dst.childNodes;
+
+    if (sc.length !== dc.length) {
+        dbg("replace L%d (%d/%d) |%d|",
+            lv, sc.length, dc.length, src.innerHTML.length);
+
+        dst.innerHTML = src.innerHTML;
+        return;
+    }
+
+    var rpl = [];
+    for (var a = sc.length - 1; a >= 0; a--) {
+        var st = sc[a].tagName,
+            dt = dc[a].tagName;
+
+        if (st !== dt) {
+            dbg("replace L%d (%d/%d) type %s/%s", lv, a, sc.length, st, dt);
+            rpl.push(a);
+            continue;
+        }
+
+        var sa = sc[a].attributes || [],
+            da = dc[a].attributes || [];
+
+        if (sa.length !== da.length) {
+            dbg("replace L%d (%d/%d) attr# %d/%d",
+                lv, a, sc.length, sa.length, da.length);
+
+            rpl.push(a);
+            continue;
+        }
+
+        var dirty = false;
+        for (var b = sa.length - 1; b >= 0; b--) {
+            var name = sa[b].name,
+                sv = sa[b].value,
+                dv = dc[a].getAttribute(name);
+
+            if (name == "data-ln" && sv !== dv) {
+                dc[a].setAttribute(name, sv);
+                continue;
+            }
+
+            if (sv !== dv) {
+                dbg("replace L%d (%d/%d) attr %s [%s] [%s]",
+                    lv, a, sc.length, name, sv, dv);
+
+                dirty = true;
+                break;
+            }
+        }
+        if (dirty)
+            rpl.push(a);
+    }
+
+    // TODO pure guessing
+    if (rpl.length > sc.length / 3) {
+        dbg("replace L%d fully, %s (%d/%d) |%d|",
+            lv, rpl.length, sc.length, src.innerHTML.length);
+
+        dst.innerHTML = src.innerHTML;
+        return;
+    }
+
+    // repl is reversed; build top-down
+    var nbytes = 0;
+    for (var a = rpl.length - 1; a >= 0; a--) {
+        var html = sc[rpl[a]].outerHTML;
+        dc[rpl[a]].outerHTML = html;
+        nbytes += html.length;
+    }
+    if (nbytes > 0)
+        dbg("replaced %d bytes L%d", nbytes, lv);
+
+    for (var a = 0; a < sc.length; a++)
+        copydom(sc[a], dc[a], lv + 1);
+
+    if (src.innerHTML !== dst.innerHTML) {
+        dbg("setting %d bytes L%d", src.innerHTML.length, lv);
+        dst.innerHTML = src.innerHTML;
+    }
+}
+
+
 function convert_markdown(md_text) {
     marked.setOptions({
         //headerPrefix: 'h-',
         breaks: true,
         gfm: true
     });
-    var html = marked(md_text);
-    dom_pre.innerHTML = html;
+    var md_html = marked(md_text);
+    var md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
 
     // todo-lists (should probably be a marked extension)
-    var nodes = dom_pre.getElementsByTagName('input');
+    var nodes = md_dom.getElementsByTagName('input');
     for (var a = nodes.length - 1; a >= 0; a--) {
         var dom_box = nodes[a];
         if (dom_box.getAttribute('type') !== 'checkbox')
@@ -58,9 +166,10 @@ function convert_markdown(md_text) {
             html.substr(html.indexOf('>') + 1);
     }
 
-    var manip_nodes = dom_pre.getElementsByTagName('*');
-    for (var a = manip_nodes.length - 1; a >= 0; a--) {
-        var el = manip_nodes[a];
+    // separate <code> for each line in <pre>
+    var nodes = md_dom.getElementsByTagName('pre');
+    for (var a = nodes.length - 1; a >= 0; a--) {
+        var el = nodes[a];
 
         var is_precode =
             el.tagName == 'PRE' &&
@@ -77,7 +186,36 @@ function convert_markdown(md_text) {
 
         el.innerHTML = lines.join('');
     }
+
+    // self-link headers
+    var id_seen = {},
+        dyn = md_dom.getElementsByTagName('*');
+
+    nodes = [];
+    for (var a = 0, aa = dyn.length; a < aa; a++)
+        if (/^[Hh]([1-6])/.exec(dyn[a].tagName) !== null)
+            nodes.push(dyn[a]);
+
+    for (var a = 0; a < nodes.length; a++) {
+        el = nodes[a];
+        var id = el.getAttribute('id'),
+            orig_id = id;
+
+        if (id_seen[id]) {
+            for (var n = 1; n < 4096; n++) {
+                id = orig_id + '-' + n;
+                if (!id_seen[id])
+                    break;
+            }
+            el.setAttribute('id', id);
+        }
+        id_seen[id] = 1;
+        el.innerHTML = '<a href="#' + id + '">' + el.innerHTML + '</a>';
+    }
+
+    copydom(md_dom, dom_pre, 0);
 }
+
 
 function init_toc() {
     var loader = document.getElementById('ml');
@@ -85,10 +223,8 @@ function init_toc() {
 
     var anchors = [];  // list of toc entries, complex objects
     var anchor = null; // current toc node
-    var id_seen = {};  // taken IDs
     var html = [];     // generated toc html
     var lv = 0;        // current indentation level in the toc html
-    var re = new RegExp('^[Hh]([1-3])');
 
     var manip_nodes_dyn = dom_pre.getElementsByTagName('*');
     var manip_nodes = [];
@@ -97,7 +233,7 @@ function init_toc() {
 
     for (var a = 0, aa = manip_nodes.length; a < aa; a++) {
         var elm = manip_nodes[a];
-        var m = re.exec(elm.tagName);
+        var m = /^[Hh]([1-6])/.exec(elm.tagName);
         var is_header = m !== null;
         if (is_header) {
             var nlv = m[1];
@@ -110,23 +246,7 @@ function init_toc() {
                 lv--;
             }
 
-            var orig_id = elm.getAttribute('id');
-            var id = orig_id;
-            if (id_seen[id]) {
-                for (var n = 1; n < 4096; n++) {
-                    id = orig_id + '-' + n;
-                    if (!id_seen[id])
-                        break;
-                }
-                elm.setAttribute('id', id);
-            }
-            id_seen[id] = 1;
-
-            var ahref = '<a href="#' + id + '">' +
-                elm.innerHTML + '</a>';
-
-            html.push('<li>' + ahref + '</li>');
-            elm.innerHTML = ahref;
+            html.push('<li>' + elm.innerHTML + '</li>');
 
             if (anchor != null)
                 anchors.push(anchor);

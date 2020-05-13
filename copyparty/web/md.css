@@ -83,6 +83,7 @@ h3 {
 h1 a, h3 a, h5 a,
 h2 a, h4 a, h6 a {
 	color: inherit;
+	display: block;
 	background: none;
 	border: none;
 	padding: 0;
@@ -239,7 +240,7 @@ blink {
 	}
 	#mn.undocked {
         position: fixed;
-		padding: 1.2em 0 1em 1em;
+		padding: 1.7em 0 1.5em 1em;
 		box-shadow: 0 0 .5em rgba(0, 0, 0, 0.3);
 		background: #f7f7f7;
 	}
