@@ -368,10 +368,7 @@ function setsel(s) {
     }
     dom_src.value = [s.pre, s.sel, s.post].join('');
     dom_src.setSelectionRange(s.car, s.cdr);
-    try {
-        draw_md();
-    }
-    catch (ex) { }
+    dom_src.oninput();
 }
 
 
@@ -504,12 +501,12 @@ document.getElementById('help').onclick = function (e) {
 action_stack = (function () {
     var undos = [];
     var redos = [];
-    var sched_txt = '';
+    var sched_cpos = 0;
     var sched_timer = null;
     var ignore = false;
     var ref = dom_src.value;
 
-    function diff(from, to) {
+    function diff(from, to, cpos) {
         if (from === to)
             return null;
 
@@ -535,14 +532,15 @@ action_stack = (function () {
         return {
             car: car,
             cdr: ++p2,
-            txt: txt
+            txt: txt,
+            cpos: cpos
         };
     }
 
     function undiff(from, change) {
         return {
             txt: from.substring(0, change.car) + change.txt + from.substring(change.cdr),
-            cursor: change.car + change.txt.length
+            cpos: change.cpos
         };
     }
 
@@ -552,17 +550,19 @@ action_stack = (function () {
         if (src.length === 0)
             return false;
 
-        var state = undiff(ref, src.pop()),
-            change = diff(ref, state.txt);
+        var patch = src.pop(),
+            applied = undiff(ref, patch),
+            cpos = patch.cpos - (patch.cdr - patch.car) + patch.txt.length,
+            reverse = diff(ref, applied.txt, cpos);
 
-        if (change === null)
+        if (reverse === null)
             return false;
 
-        dst.push(change);
-        ref = state.txt;
+        dst.push(reverse);
+        ref = applied.txt;
         ignore = true; // just some browsers
         dom_src.value = ref;
-        dom_src.setSelectionRange(state.cursor, state.cursor);
+        dom_src.setSelectionRange(cpos, cpos);
         ignore = true; // all browsers
         draw_md();
         return true;
@@ -574,8 +574,8 @@ action_stack = (function () {
             return;
         }
         redos = [];
-        sched_txt = dom_src.value;
         clearTimeout(sched_timer);
+        sched_cpos = dom_src.selectionEnd;
         sched_timer = setTimeout(push, 500);
     }
 
@@ -592,11 +592,12 @@ action_stack = (function () {
     }
 
     function push() {
-        var change = diff(ref, sched_txt, dom_src.selectionStart);
+        var newtxt = dom_src.value;
+        var change = diff(ref, newtxt, sched_cpos);
         if (change !== null)
             undos.push(change);
 
-        ref = sched_txt;
+        ref = newtxt;
         dbg('undos(%d) redos(%d)', undos.length, redos.length);
         if (undos.length > 0)
             dbg(undos.slice(-1)[0]);
