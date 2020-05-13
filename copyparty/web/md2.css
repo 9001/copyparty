@@ -28,11 +28,13 @@
 }
 #mtw.single,
 #mw.single {
-    left: calc((100% - 58em) / 2);
     margin: 0;
+    left: 1em;
+    left: max(1em, calc((100% - 58em) / 2));
 }
 #mtw.single {
     width: 57em;
+    width: min(57em, calc(100% - 2em));
 }
 
 
@@ -57,11 +59,13 @@
     line-height: 1.3em;
     font-size: .9em;
     position: relative;
+    scrollbar-color: #eb0 #f7f7f7;
 }
 html.dark #mt {
     color: #eee;
     background: #222;
     border: 1px solid #777;
+    scrollbar-color: #b80 #282828;
 }
 #mtr {
     position: absolute;

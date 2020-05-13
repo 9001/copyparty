@@ -85,7 +85,7 @@ var draw_md = (function () {
         cls(document.getElementById('save'), 'disabled', src == server_md);
 
         var t1 = new Date().getTime();
-        delay = t1 - t0;
+        delay = t1 - t0 > 150 ? 25 : 1;
     }
 
     var timeout = null;
