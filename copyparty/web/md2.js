@@ -323,12 +323,25 @@ function save_chk() {
 }
 
 
+// firefox bug: initial selection offset isn't cleared properly through js
+var ff_clearsel = (function () {
+    if (navigator.userAgent.indexOf(') Gecko/') === -1)
+        return function () { }
+
+    return function () {
+        var txt = dom_src.value;
+        var y = dom_src.scrollTop;
+        dom_src.value = '';
+        dom_src.value = txt;
+        dom_src.scrollTop = y;
+    };
+})();
+
+
 // returns car/cdr (selection bounds) and n1/n2 (grown to full lines)
-function linebounds(just_car) {
+function linebounds(just_car, greedy_growth) {
     var car = dom_src.selectionStart,
         cdr = dom_src.selectionEnd;
-
-    dbg(car, cdr);
 
     if (just_car)
         cdr = car;
@@ -337,11 +350,13 @@ function linebounds(just_car) {
         n1 = Math.max(car, 0),
         n2 = Math.min(cdr, md.length - 1);
 
-    if (n1 < n2 && md[n1] == '\n')
-        n1++;
+    if (greedy_growth !== true) {
+        if (n1 < n2 && md[n1] == '\n')
+            n1++;
 
-    if (n1 < n2 && md[n2 - 1] == '\n')
-        n2 -= 2;
+        if (n1 < n2 && md[n2 - 1] == '\n')
+            n2 -= 2;
+    }
 
     n1 = md.lastIndexOf('\n', n1 - 1) + 1;
     n2 = md.indexOf('\n', n2);
@@ -375,7 +390,7 @@ function setsel(s) {
         s.cdr = s.pre.length + s.sel.length;
     }
     dom_src.value = [s.pre, s.sel, s.post].join('');
-    dom_src.setSelectionRange(s.car, s.cdr);
+    dom_src.setSelectionRange(s.car, s.cdr, dom_src.selectionDirection);
     dom_src.oninput();
 }
 
@@ -416,17 +431,32 @@ function md_header(dedent) {
 
 // smart-home
 function md_home(shift) {
-    var s = linebounds(!shift),
+    var s = linebounds(false, true),
         ln = s.md.substring(s.n1, s.n2),
-        m = /^[ \t#>+-]*(\* )?([0-9]+\. +)?/.exec(ln),
-        home = s.n1 + m[0].length,
-        car = (s.car == home) ? s.n1 : home,
-        cdr = shift ? s.cdr : car;
+        dir = dom_src.selectionDirection,
+        rev = dir === 'backward',
+        p1 = rev ? s.car : s.cdr,
+        p2 = rev ? s.cdr : s.car,
+        home = 0,
+        lf = ln.lastIndexOf('\n') + 1,
+        re = /^[ \t#>+-]*(\* )?([0-9]+\. +)?/;
 
-    if (car > cdr)
-        car = [cdr, cdr = car][0];
+    if (rev)
+        home = s.n1 + re.exec(ln)[0].length;
+    else
+        home = s.n1 + lf + re.exec(ln.substring(lf))[0].length;
 
-    dom_src.setSelectionRange(car, cdr);
+    p1 = (p1 !== home) ? home : (rev ? s.n1 : s.n1 + lf);
+    if (!shift)
+        p2 = p1;
+
+    if (rev !== p1 < p2)
+        dir = rev ? 'forward' : 'backward';
+
+    if (!shift)
+        ff_clearsel();
+
+    dom_src.setSelectionRange(Math.min(p1, p2), Math.max(p1, p2), dir);
 }
 
 
@@ -507,8 +537,10 @@ document.getElementById('help').onclick = function (e) {
 
 // blame steen
 action_stack = (function () {
-    var undos = [];
-    var redos = [];
+    var hist = {
+        un: [],
+        re: []
+    };
     var sched_cpos = 0;
     var sched_timer = null;
     var ignore = false;
@@ -553,7 +585,7 @@ action_stack = (function () {
     }
 
     function apply(src, dst) {
-        dbg('undos(%d) redos(%d)', undos.length, redos.length);
+        dbg('undos(%d) redos(%d)', hist.un.length, hist.re.length);
 
         if (src.length === 0)
             return false;
@@ -581,36 +613,36 @@ action_stack = (function () {
             ignore = false;
             return;
         }
-        redos = [];
+        hist.re = [];
         clearTimeout(sched_timer);
         sched_cpos = dom_src.selectionEnd;
         sched_timer = setTimeout(push, 500);
     }
 
     function undo() {
-        if (redos.length == 0) {
+        if (hist.re.length == 0) {
             clearTimeout(sched_timer);
             push();
         }
-        return apply(undos, redos);
+        return apply(hist.un, hist.re);
     }
 
     function redo() {
-        return apply(redos, undos);
+        return apply(hist.re, hist.un);
     }
 
     function push() {
         var newtxt = dom_src.value;
         var change = diff(ref, newtxt, sched_cpos);
         if (change !== null)
-            undos.push(change);
+            hist.un.push(change);
 
         ref = newtxt;
-        dbg('undos(%d) redos(%d)', undos.length, redos.length);
-        if (undos.length > 0)
-            dbg(undos.slice(-1)[0]);
-        if (redos.length > 0)
-            dbg(redos.slice(-1)[0]);
+        dbg('undos(%d) redos(%d)', hist.un.length, hist.re.length);
+        if (hist.un.length > 0)
+            dbg(static(hist.un.slice(-1)[0]));
+        if (hist.re.length > 0)
+            dbg(static(hist.re.slice(-1)[0]));
     }
 
     return {
@@ -618,8 +650,7 @@ action_stack = (function () {
         undo: undo,
         redo: redo,
         push: schedule_push,
-        _undos: undos,
-        _redos: redos,
+        _hist: hist,
         _ref: ref
     }
 })();

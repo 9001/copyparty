@@ -30,6 +30,11 @@ function cls(dom, name, add) {
 }
 
 
+function static(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+
 // add navbar
 (function () {
     var n = document.location + '';
