@@ -80,8 +80,9 @@ class HttpSrv(object):
                         "%s %s" % addr,
                         "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex),
                     )
-                if ex.errno not in [10038, 107, 57, 9]:
+                if ex.errno not in [10038, 10054, 107, 57, 9]:
                     # 10038 No longer considered a socket
+                    # 10054 Foribly closed by remote
                     #   107 Transport endpoint not connected
                     #    57 Socket is not connected
                     #     9 Bad file descriptor

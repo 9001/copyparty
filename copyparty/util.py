@@ -309,18 +309,7 @@ def get_boundary(headers):
 def read_header(sr):
     ret = b""
     while True:
-        if ret.endswith(b"\r\n\r\n"):
-            break
-        elif ret.endswith(b"\r\n\r"):
-            n = 1
-        elif ret.endswith(b"\r\n"):
-            n = 2
-        elif ret.endswith(b"\r"):
-            n = 3
-        else:
-            n = 4
-
-        buf = sr.recv(n)
+        buf = sr.recv(1024)
         if not buf:
             if not ret:
                 return None
@@ -332,11 +321,15 @@ def read_header(sr):
             )
 
         ret += buf
+        ofs = ret.find(b"\r\n\r\n")
+        if ofs < 0:
+            if len(ret) > 1024 * 64:
+                raise Pebkac(400, "header 2big")
+            else:
+                continue
 
-        if len(ret) > 1024 * 64:
-            raise Pebkac(400, "header 2big")
-
-    return ret[:-4].decode("utf-8", "surrogateescape").split("\r\n")
+        sr.unrecv(ret[ofs + 4 :])
+        return ret[:ofs].decode("utf-8", "surrogateescape").split("\r\n")
 
 
 def undot(path):

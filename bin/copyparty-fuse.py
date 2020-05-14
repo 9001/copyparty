@@ -22,7 +22,9 @@ from urllib.parse import quote_from_bytes as quote
 try:
     from fuse import FUSE, FuseOSError, Operations
 except:
-    print("\n    could not import fuse;\n    pip install fusepy\n")
+    print(
+        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fusepy\n    apt install libfuse\n    modprobe fuse"
+    )
     raise
 
 
@@ -34,9 +36,7 @@ usage:
 
 dependencies:
   sudo apk add fuse-dev
-  python3 -m venv ~/pe/ve.fusepy
-  . ~/pe/ve.fusepy/bin/activate
-  pip install fusepy
+  python3 -m pip install --user fusepy
 
 
 MB/s
@@ -60,20 +60,21 @@ def boring_log(msg):
 def rice_tid():
     tid = threading.current_thread().ident
     c = struct.unpack(b"B" * 5, struct.pack(b">Q", tid)[-5:])
-    return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c)
+    return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c) + "\033[0m"
 
 
 def fancy_log(msg):
-    print("{}\033[0m {}\n".format(rice_tid(), msg), end="")
+    print("{} {}\n".format(rice_tid(), msg), end="")
 
 
 def null_log(msg):
     pass
 
 
-log = boring_log
+info = fancy_log
 log = fancy_log
-log = threadless_log
+dbg = fancy_log
+log = null_log
 dbg = null_log
 
 
@@ -118,7 +119,7 @@ class Gateway(object):
         try:
             return self.conns[tid]
         except:
-            log("new conn [{}] [{}]".format(self.web_host, self.web_port))
+            info("new conn [{}] [{}]".format(self.web_host, self.web_port))
 
             conn = http.client.HTTPConnection(self.web_host, self.web_port, timeout=260)
 
@@ -152,7 +153,7 @@ class Gateway(object):
         if r.status != 200:
             self.closeconn()
             raise Exception(
-                "http error {} reading dir {} in {:x}".format(
+                "http error {} reading dir {} in {}".format(
                     r.status, web_path, rice_tid()
                 )
             )
@@ -161,14 +162,14 @@ class Gateway(object):
 
     def download_file_range(self, path, ofs1, ofs2):
         web_path = "/" + "/".join([self.web_root, path])
-        hdr_range = "bytes={}-{}".format(ofs1, ofs2)
+        hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
         log("downloading {}".format(hdr_range))
 
         r = self.sendreq("GET", self.quotep(web_path), headers={"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
             self.closeconn()
             raise Exception(
-                "http error {} reading file {} range {} in {:x}".format(
+                "http error {} reading file {} range {} in {}".format(
                     r.status, web_path, hdr_range, rice_tid()
                 )
             )
@@ -246,14 +247,14 @@ class CPPF(Operations):
         self.filecache = []
         self.filecache_mtx = threading.Lock()
 
-        log("up")
+        info("up")
 
     def clean_dircache(self):
         """not threadsafe"""
         now = time.time()
         cutoff = 0
         for cn in self.dircache:
-            if cn.ts - now > 1:
+            if now - cn.ts > 1:
                 cutoff += 1
             else:
                 break
@@ -398,7 +399,7 @@ class CPPF(Operations):
                 )
             )
 
-            buf = self.gw.download_file_range(path, h_ofs, h_end - 1)
+            buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = buf[-buf_ofs:] + cdr
 
         elif car:
@@ -416,7 +417,7 @@ class CPPF(Operations):
                 )
             )
 
-            buf = self.gw.download_file_range(path, h_ofs, h_end - 1)
+            buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = car + buf[:buf_ofs]
 
         else:
@@ -438,7 +439,7 @@ class CPPF(Operations):
                 )
             )
 
-            buf = self.gw.download_file_range(path, h_ofs, h_end - 1)
+            buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = buf[buf_ofs:buf_end]
 
         cn = CacheNode([path, h_ofs], buf)
@@ -472,13 +473,16 @@ class CPPF(Operations):
         log("read {} @ {} len {} end {}".format(path, offset, length, ofs2))
 
         file_sz = self.getattr(path)["st_size"]
-        if ofs2 >= file_sz:
-            ofs2 = file_sz - 1
-            log("truncate to len {} end {}".format((ofs2 - offset) + 1, ofs2))
+        if ofs2 > file_sz:
+            ofs2 = file_sz
+            log("truncate to len {} end {}".format(ofs2 - offset, ofs2))
+
+        if file_sz == 0 or offset >= ofs2:
+            return b""
 
         # toggle cache here i suppose
         # return self.get_cached_file(path, offset, ofs2, file_sz)
-        return self.gw.download_file_range(path, offset, ofs2 - 1)
+        return self.gw.download_file_range(path, offset, ofs2)
 
     def getattr(self, path, fh=None):
         path = path.strip("/")
@@ -495,7 +499,7 @@ class CPPF(Operations):
 
         cn = self.get_cached_dir(dirpath)
         if cn:
-            # log('cache ok')
+            log("cache ok")
             dents = cn.data
         else:
             log("cache miss")
