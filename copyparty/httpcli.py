@@ -769,11 +769,18 @@ class HttpCli(object):
                 else:
                     upper = file_sz
 
-                if lower < 0 or lower >= file_sz or upper < 0 or upper > file_sz:
+                if upper > file_sz:
+                    upper = file_sz
+
+                if lower < 0 or lower >= upper:
                     raise Exception()
 
             except:
-                raise Pebkac(400, "invalid range requested: " + hrange)
+                err = "invalid range ({}), size={}".format(hrange, file_sz)
+                self.loud_reply(err, status=416, headers={
+                    "Content-Range": "bytes */{}".format(file_sz)
+                })
+                return True
 
             status = 206
             self.out_headers["Content-Range"] = "bytes {}-{}/{}".format(

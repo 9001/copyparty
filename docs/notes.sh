@@ -80,3 +80,22 @@ for d in /usr /var; do find $d -type f -size +30M 2>/dev/null; done | while IFS=
 # py2 on osx
 brew install python@2
 pip install virtualenv
+
+
+##
+## http 206
+
+# az = abcdefghijklmnopqrstuvwxyz
+
+printf '%s\r\n' 'GET /az HTTP/1.1' 'Host: ocv.me' 'Range: bytes=5-10' '' | ncat ocv.me 80 
+# Content-Range: bytes 5-10/26
+# Content-Length: 6
+# fghijk
+
+Range: bytes=0-1    "ab" Content-Range: bytes 0-1/26
+Range: bytes=24-24  "y"  Content-Range: bytes 24-24/26
+Range: bytes=24-25  "yz" Content-Range: bytes 24-25/26
+Range: bytes=24-    "yz" Content-Range: bytes 24-25/26
+Range: bytes=25-29  "z"  Content-Range: bytes 25-25/26
+Range: bytes=26-         Content-Range: bytes */26
+  HTTP/1.1 416 Requested Range Not Satisfiable
