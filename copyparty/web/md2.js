@@ -464,13 +464,37 @@ function md_home(shift) {
 function md_newline() {
     var s = linebounds(true),
         ln = s.md.substring(s.n1, s.n2),
-        m = /^[ \t>+-]*(\* )?([0-9]+\. +)?/.exec(ln);
+        m1 = /^( *)([0-9]+)(\. +)/.exec(ln),
+        m2 = /^[ \t>+-]*(\* )?/.exec(ln);
 
-    s.pre = s.md.substring(0, s.car) + '\n' + m[0];
+    var pre = m2[0];
+    if (m1 !== null)
+        pre = m1[1] + (parseInt(m1[2]) + 1) + m1[3];
+
+    s.pre = s.md.substring(0, s.car) + '\n' + pre;
     s.sel = '';
     s.post = s.md.substring(s.car);
     s.car = s.cdr = s.pre.length;
     setsel(s);
+}
+
+
+// backspace
+function md_backspace() {
+    var s = linebounds(true),
+        ln = s.md.substring(s.n1, s.n2),
+        m = /^[ \t>+-]*(\* )?([0-9]+\. +)?/.exec(ln);
+
+    var v = m[0].replace(/[^ ]/g, " ");
+    if (v === m[0] || v.length !== ln.length)
+        return true;
+
+    s.pre = s.md.substring(0, s.n1) + v;
+    s.sel = '';
+    s.post = s.md.substring(s.car);
+    s.car = s.cdr = s.pre.length;
+    setsel(s);
+    return false;
 }
 
 
@@ -513,6 +537,9 @@ function md_newline() {
             if (ctrl && (ev.code == "KeyY" || kc == 89)) {
                 action_stack.redo();
                 return false;
+            }
+            if (!ctrl && !ev.shiftKey && kc == 8) {
+                return md_backspace();
             }
         }
     }

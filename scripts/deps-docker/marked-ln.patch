@@ -180,7 +180,7 @@ diff --git a/src/Parser.js b/src/Parser.js
 +            // similar to tables, writing contents before the <ul> tag
 +            // so update the tag attribute as we go
 +            // (assuming all list entries got tagged with a source-line, probably safe w)
-+            body += this.renderer.tag_ln(item.tokens[0].ln).listitem(itemBody, task, checked);
++            body += this.renderer.tag_ln((item.tokens[0] || token).ln).listitem(itemBody, task, checked);
            }
  
 -          out += this.renderer.list(body, ordered, start);
