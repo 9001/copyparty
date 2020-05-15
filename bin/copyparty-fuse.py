@@ -147,7 +147,7 @@ class Gateway(object):
             return c.getresponse()
 
     def listdir(self, path):
-        web_path = "/" + "/".join([self.web_root, path])
+        web_path = "/" + "/".join([self.web_root, path]) + "?dots"
 
         r = self.sendreq("GET", self.quotep(web_path))
         if r.status != 200:
@@ -161,7 +161,7 @@ class Gateway(object):
         return self.parse_html(r)
 
     def download_file_range(self, path, ofs1, ofs2):
-        web_path = "/" + "/".join([self.web_root, path])
+        web_path = "/" + "/".join([self.web_root, path]) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
         log("downloading {}".format(hdr_range))
 

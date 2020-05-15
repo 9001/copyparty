@@ -777,9 +777,11 @@ class HttpCli(object):
 
             except:
                 err = "invalid range ({}), size={}".format(hrange, file_sz)
-                self.loud_reply(err, status=416, headers={
-                    "Content-Range": "bytes */{}".format(file_sz)
-                })
+                self.loud_reply(
+                    err,
+                    status=416,
+                    headers={"Content-Range": "bytes */{}".format(file_sz)},
+                )
                 return True
 
             status = 206
@@ -948,9 +950,13 @@ class HttpCli(object):
         except:
             pass
 
+        # show dotfiles if permitted and requested
+        if not self.args.ed or "dots" not in self.uparam:
+            vfs_ls = exclude_dotfiles(vfs_ls)
+
         dirs = []
         files = []
-        for fn in exclude_dotfiles(vfs_ls):
+        for fn in vfs_ls:
             base = ""
             href = fn
             if self.absolute_urls and vpath:
