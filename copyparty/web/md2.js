@@ -19,14 +19,12 @@ var dom_ref = (function () {
 
 
 // line->scrollpos maps
-var map_src = [];
-var map_pre = [];
-function genmap(dom) {
+function genmapq(dom, query) {
     var ret = [];
     var last_y = -1;
     var parent_y = 0;
     var parent_n = null;
-    var nodes = dom.querySelectorAll('*[data-ln]');
+    var nodes = dom.querySelectorAll(query);
     for (var a = 0; a < nodes.length; a++) {
         var n = nodes[a];
         var ln = parseInt(n.getAttribute('data-ln'));
@@ -35,7 +33,7 @@ function genmap(dom) {
 
         var y = 0;
         var par = n.offsetParent;
-        if (par != parent_n) {
+        if (par && par != parent_n) {
             while (par && par != dom) {
                 y += par.offsetTop;
                 par = par.offsetParent;
@@ -49,7 +47,7 @@ function genmap(dom) {
         while (ln > ret.length)
             ret.push(null);
 
-        var y = parent_y + n.offsetTop;
+        y = parent_y + n.offsetTop;
         if (y <= last_y)
             //console.log('awawa');
             continue;
@@ -59,6 +57,25 @@ function genmap(dom) {
         last_y = y;
     }
     return ret;
+}
+var map_src = [];
+var map_pre = [];
+function genmap(dom, oldmap) {
+    var find = nlines;
+    while (oldmap && find --> 0) {
+        var tmap = genmapq(dom, '*[data-ln="' + find + '"]');
+        if (!tmap || !tmap.length)
+            continue;
+
+        var cy = tmap[find];
+        var oy = parseInt(oldmap[find]);
+        if (cy + 24 > oy && cy - 24 < oy)
+            return oldmap;
+
+        console.log('map regen', dom.getAttribute('id'), find, oy, cy, oy - cy);
+        break;
+    }
+    return genmapq(dom, '*[data-ln]');
 }
 
 
@@ -79,13 +96,13 @@ var draw_md = (function () {
             html.push('<span data-ln="' + (a + 1) + '">' + lines[a] + "</span>");
 
         dom_ref.innerHTML = html.join('\n');
-        map_src = genmap(dom_ref);
-        map_pre = genmap(dom_pre);
+        map_src = genmap(dom_ref, map_src);
+        map_pre = genmap(dom_pre, map_pre);
 
         cls(document.getElementById('save'), 'disabled', src == server_md);
 
         var t1 = new Date().getTime();
-        delay = t1 - t0 > 150 ? 25 : 1;
+        delay = t1 - t0 > 100 ? 25 : 1;
     }
 
     var timeout = null;
@@ -108,8 +125,8 @@ redraw = (function () {
         dom_wrap.style.top = y;
         dom_swrap.style.top = y;
         dom_ref.style.width = getComputedStyle(dom_src).offsetWidth + 'px';
-        map_src = genmap(dom_ref);
-        map_pre = genmap(dom_pre);
+        map_src = genmap(dom_ref, map_src);
+        map_pre = genmap(dom_pre, map_pre);
         dbg(document.body.clientWidth + 'x' + document.body.clientHeight);
     }
     function setsbs() {

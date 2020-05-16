@@ -9,8 +9,6 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-j",
-                "0",
                 //"-nw",
                 "-a",
                 "ed:wark",
