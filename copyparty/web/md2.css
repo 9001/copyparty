@@ -4,12 +4,12 @@
 #mtw {
     display: block;
     position: fixed;
-    left: 0;
+    left: .5em;
     bottom: 0;
-    width: calc(100% - 58em);
+    width: calc(100% - 56em);
 }
 #mw {
-    left: calc(100% - 57em);
+    left: calc(100% - 55em);
     overflow-y: auto;
     position: fixed;
     bottom: 0;
@@ -30,11 +30,11 @@
 #mw.single {
     margin: 0;
     left: 1em;
-    left: max(1em, calc((100% - 58em) / 2));
+    left: max(1em, calc((100% - 56em) / 2));
 }
 #mtw.single {
-    width: 57em;
-    width: min(57em, calc(100% - 2em));
+    width: 55em;
+    width: min(55em, calc(100% - 2em));
 }
 
 
@@ -43,7 +43,7 @@
 }
 #mt, #mtr {
     width: 100%;
-    height: calc(100% - 5px);
+    height: calc(100% - 1px);
     color: #444;
     background: #f7f7f7;
     border: 1px solid #999;

@@ -70,7 +70,7 @@ var draw_md = (function () {
     function draw_md() {
         var t0 = new Date().getTime();
         var src = dom_src.value;
-        convert_markdown(src);
+        convert_markdown(src, dom_pre);
 
         var lines = hesc(src).replace(/\r/g, "").split('\n');
         nlines = lines.length;
@@ -552,8 +552,10 @@ document.getElementById('help').onclick = function (e) {
     if (e) e.preventDefault();
     var dom = document.getElementById('helpbox');
     var dtxt = dom.getElementsByTagName('textarea');
-    if (dtxt.length > 0)
-        dom.innerHTML = '<a href="#" id="helpclose">close</a>' + marked(dtxt[0].value);
+    if (dtxt.length > 0) {
+        convert_markdown(dtxt[0].value, dom);
+        dom.innerHTML = '<a href="#" id="helpclose">close</a>' + dom.innerHTML;
+    }
 
     dom.style.display = 'block';
     document.getElementById('helpclose').onclick = function () {

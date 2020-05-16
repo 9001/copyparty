@@ -21,6 +21,7 @@
 		{%- else %}
 			<a href="?edit">edit (basic)</a>
 			<a href="?edit2">edit (fancy)</a>
+			<a href="?raw">view raw</a>
 		{%- endif %}
 	</div>
 	<div id="toc"></div>
@@ -41,14 +42,14 @@
 	<div id="helpbox">
 		<textarea>
 
-write markdown (html is permitted)
+write markdown (most html is 🙆 too)
 
-### hotkey list
+## hotkey list
 * `Ctrl-S` to save
 * `Ctrl-H` / `Ctrl-Shift-H` to create a header
 * `TAB` / `Shift-TAB` to indent/dedent a selection
 
-### toolbar
+## toolbar
 1. toggle dark mode
 2. show/hide navigation bar
 3. save changes on server
@@ -56,8 +57,56 @@ write markdown (html is permitted)
 5. toggle editor/preview
 6. this thing :^)
 
-.
+## markdown
+|||
+|--|--|
+|`**bold**`|**bold**|
+|`_italic_`|_italic_|
+|`~~strike~~`|~~strike~~|
+|`` `code` ``|`code`|
+|`[](#hotkey-list)`|[](#hotkey-list)|
+|`[](/foo/bar.md#header)`|[](/foo/bar.md#header)|
+|`<blink>💯</blink>`|<blink>💯</blink>|
 
+## tables
+    |left-aligned|centered|right-aligned
+    | ---------- | :----: | ----------:
+    |one         |two     |three
+
+|left-aligned|centered|right-aligned
+| ---------- | :----: | ----------:
+|one         |two     |three
+
+## lists
+	* one
+	* two
+	1. one
+	1. two
+* one
+* two
+1. one
+1. two
+
+## headers
+	# level 1
+	## level 2
+	### level 3
+
+## quote
+	> hello
+> hello
+
+## codeblock
+		four spaces (no tab pls)
+
+## code in lists
+	* foo
+	  bar
+          six spaces total
+* foo
+  bar
+      six spaces total
+.
 		</textarea>
 	</div>
 	{%- endif %}

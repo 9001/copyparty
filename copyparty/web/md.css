@@ -13,6 +13,7 @@ html, body {
 }
 #mw {
 	margin: 0 auto;
+	padding: 0 1.5em;
 }
 pre, code, a {
 	color: #480;
@@ -46,7 +47,7 @@ pre code {
 pre code:last-child {
 	border-bottom: none;
 }
-pre code:before {
+pre code::before {
 	content: counter(precode);
 	-webkit-user-select: none;
 	display: inline-block;
@@ -172,12 +173,10 @@ small {
 }
 table {
 	border-collapse: collapse;
+	margin: 1em 0;
 }
-td {
+th, td {
 	padding: .2em .5em;
-	border: .12em solid #aaa;
-}
-th {
 	border: .12em solid #aaa;
 }
 blink {
@@ -202,13 +201,15 @@ blink {
 		height: 100%;
 	}
 	#mw {
-		padding: 0 1em;
 		margin: 0 auto;
 		right: 0;
 	}
 	#mp {
-		max-width: 54em;
+		max-width: 52em;
 		margin-bottom: 6em;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		word-wrap: break-word; /*ie*/
 	}
 	a {
 		color: #fff;
@@ -265,7 +266,7 @@ blink {
 	#mn a:last-child {
 		padding-right: .5em;
 	}
-	#mn a:not(:last-child):after {
+	#mn a:not(:last-child)::after {
 		content: '';
 		width: 1.05em;
 		height: 1.05em;
@@ -359,7 +360,7 @@ blink {
 		background: #282828;
 		border: .07em dashed #444;
 	}
-	html.dark #mn a:not(:last-child):after {
+	html.dark #mn a:not(:last-child)::after {
 		border-color: rgba(255,255,255,0.3);
 	}
 	html.dark #mn a {
@@ -378,19 +379,19 @@ blink {
 	}
 }
 
-@media screen and (min-width: 70em) {
+@media screen and (min-width: 66em) {
 	#mw {
 		position: fixed;
 		overflow-y: auto;
 		left: 14em;
-		left: calc(100% - 57em);
+		left: calc(100% - 55em);
 		max-width: none;
 		bottom: 0;
 		scrollbar-color: #eb0 #f7f7f7;
 	}
 	#toc {
 		width: 13em;
-		width: calc(100% - 57.3em);
+		width: calc(100% - 55.3em);
 		max-width: 30em;
 		background: #eee;
 		position: fixed;
@@ -445,25 +446,63 @@ blink {
 		background: #0a0a0a;
 	}
 }
-@media screen and (min-width: 87.5em) {
+@media screen and (min-width: 85.5em) {
 	#toc { width: 30em }
 	#mw { left: 30.5em }
 }
 @media print {
+	@page {
+		size: A4;
+		padding: 0;
+		margin: .5in .2in;
+		mso-header-margin: .2in;
+		mso-footer-margin: .2in;
+		mso-paper-source: 0;
+	}
 	a {
 		color: #079;
 		text-decoration: none;
 		border-bottom: .07em solid #4ac;
 		padding: 0 .3em;
 	}
-	#toc {
-		margin: 0 !important;
-	}
 	#toc>ul {
 		border-left: .1em solid #84c4dd;
+		text-decoration: underline;
 	}
 	#mn, #mh {
 		display: none;
+	}
+	html, body, #toc, #mw {
+		margin: 0 !important;
+		word-break: break-word;
+		width: 52em;
+	}
+	#toc {
+		margin-left: 1em !important;
+	}
+	pre code::before {
+		color: #058;
+	}
+	h1 {
+		margin: 2em 0;
+	}
+	table {
+		page-break-inside: auto;
+	}
+	tr {
+		page-break-inside: avoid;
+		page-break-after: auto;
+	}
+	thead {
+		display: table-header-group;
+	}
+	tfoot {
+		display: table-footer-group;
+	}
+	#mp a.vis::after {
+		content: ' (' attr(href) ')';
+		border-bottom: 1px solid #bbb;
+		color: #777;
 	}
 }
 

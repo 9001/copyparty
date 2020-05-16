@@ -35,6 +35,19 @@ function static(obj) {
 }
 
 
+// dodge browser issues
+(function () {
+    var ua = navigator.userAgent;
+    if (ua.indexOf(') Gecko/') !== -1 && ua.indexOf('Linux') !== -1) {
+        // necessary on ff-68.7 at least
+        var s = document.createElement('style');
+        s.innerHTML = '@page { margin: .6in .2in .8in .2in; }';
+        console.log(s.innerHTML);
+        document.head.appendChild(s);
+    }
+})();
+
+
 // add navbar
 (function () {
     var n = document.location + '';
@@ -141,7 +154,7 @@ function copydom(src, dst, lv) {
 }
 
 
-function convert_markdown(md_text) {
+function convert_markdown(md_text, dest_dom) {
     marked.setOptions({
         //headerPrefix: 'h-',
         breaks: true,
@@ -229,7 +242,7 @@ function convert_markdown(md_text) {
         el.innerHTML = '<a href="#' + id + '">' + el.innerHTML + '</a>';
     }
 
-    copydom(md_dom, dom_pre, 0);
+    copydom(md_dom, dest_dom, 0);
 }
 
 
@@ -344,7 +357,7 @@ function init_toc() {
 
 
 // "main" :p
-convert_markdown(dom_src.value);
+convert_markdown(dom_src.value, dom_pre);
 var toc = init_toc();
 
 
