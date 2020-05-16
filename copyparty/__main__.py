@@ -129,7 +129,9 @@ def main():
     ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind")
     ap.add_argument("-p", metavar="PORT", type=int, default=1234, help="port to bind")
     ap.add_argument("-nc", metavar="NUM", type=int, default=16, help="max num clients")
-    ap.add_argument("-j", metavar="CORES", type=int, help="max num cpu cores")
+    ap.add_argument(
+        "-j", metavar="CORES", type=int, default=1, help="max num cpu cores"
+    )
     ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
     ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
     ap.add_argument("-q", action="store_true", help="quiet")

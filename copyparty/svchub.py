@@ -129,8 +129,8 @@ class SvcHub(object):
         return None
 
     def check_mp_enable(self):
-        if self.args.j == 0:
-            self.log("root", "multiprocessing disabled by argument -j 0;")
+        if self.args.j == 1:
+            self.log("root", "multiprocessing disabled by argument -j 1;")
             return False
 
         if mp.cpu_count() <= 1:

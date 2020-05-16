@@ -29,7 +29,7 @@ class BrokerMp(object):
         self.mutex = threading.Lock()
 
         cores = self.args.j
-        if cores is None:
+        if not cores:
             cores = mp.cpu_count()
 
         self.log("broker", "booting {} subprocesses".format(cores))
