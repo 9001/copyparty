@@ -150,8 +150,19 @@ function convert_markdown(md_text) {
     var md_html = marked(md_text);
     var md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
 
+    var nodes = md_dom.getElementsByTagName('a');
+    for (var a = nodes.length - 1; a >= 0; a--) {
+        var href = nodes[a].getAttribute('href');
+        var txt = nodes[a].textContent;
+
+        if (!txt)
+            nodes[a].textContent = href;
+        else if (href !== txt)
+            nodes[a].setAttribute('class', 'vis');
+    }
+
     // todo-lists (should probably be a marked extension)
-    var nodes = md_dom.getElementsByTagName('input');
+    nodes = md_dom.getElementsByTagName('input');
     for (var a = nodes.length - 1; a >= 0; a--) {
         var dom_box = nodes[a];
         if (dom_box.getAttribute('type') !== 'checkbox')
