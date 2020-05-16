@@ -26,3 +26,6 @@ awk '/:before .content:"\\/ {sub(/[^"]+"./,""); sub(/".*/,""); print}' </z/dist/
 
 # and finally create a woff with just our icons
 pyftsubset "$orig_woff" --unicodes-file=/z/icon.list --no-ignore-missing-unicodes --flavor=woff --with-zopfli --output-file=/z/dist/no-pk/mini-fa.woff --verbose
+
+# scp is easier, just want basic latin
+pyftsubset /z/scp.woff2 --unicodes="20-7e,ab,b7,bb,2022" --no-ignore-missing-unicodes --flavor=woff2 --output-file=/z/dist/no-pk/scp.woff2 --verbose

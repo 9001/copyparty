@@ -1,3 +1,7 @@
+@font-face {
+	font-family: 'scp';
+	src: local('Source Code Pro Regular'), local('SourceCodePro-Regular'), url(/.cpr/deps/scp.woff2) format('woff2');
+}
 html, body {
 	color: #333;
 	background: #eee;
@@ -22,7 +26,7 @@ code {
 	font-size: .96em;
 }
 pre, code {
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
 	white-space: pre-wrap;
 	word-break: break-all;
 }

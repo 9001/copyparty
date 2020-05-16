@@ -11,8 +11,11 @@ ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
         ver_zopfli=1.0.3
 
 
-# download
-RUN     apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev \
+# download;
+# the scp url is latin from https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap
+RUN     mkdir -p /z/dist/no-pk \
+        && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
+        && apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev brotli py3-brotli \
         && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip -O ogvjs.zip \
         && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
@@ -36,8 +39,7 @@ RUN     apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzi
             && npm install \
             && npm i gulp-cli -g ) \
         && unzip fontawesome.zip \
-        && tar -xf zopfli.tgz \
-        && mkdir -p /z/dist/no-pk
+        && tar -xf zopfli.tgz
 
 
 # uncomment if you wanna test the abandoned markdown converters
@@ -188,7 +190,7 @@ RUN     [ $build_abandoned ] || exit 0; \
         && cp -pv dist/markdown-it.js /z/dist/markdown-it-full.js
 
 
-# build fontawesome
+# build fontawesome and scp
 COPY    mini-fa.sh /z
 COPY    mini-fa.css /z
 RUN     /bin/ash /z/mini-fa.sh
@@ -201,39 +203,6 @@ RUN     cd /z/dist \
         && rm Makefile \
         && mv no-pk/* . \
         && rmdir no-pk
-
-
-# showdown: abandoned due to code-blocks in lists failing
-# 22770 orig
-# 12154 no-emojis
-# 12134 no-srcmap
-# 11189 no-descriptions
-# 11152 no-ellipsis
-# 10617 no-this.makeMd
-#  9569 no-extensions
-#  9537 no-extensions
-#  9410 no-mentions
-
-
-# markdown-it: abandoned because no header anchors (and too big)
-#       32322 107754 orig (wowee)
-# 19619 21392  71540 less entities
-
-
-# marked:
-# 9253 29773 orig
-# 9159 29633 no copyright (reverted)
-# 9040 29057 no sanitize
-# 8870 28631 no email-mangle
-# so really not worth it, just drop the patch when that stops working
-
-
-# easymde:
-# 91836 orig
-# 88635 no spellcheck
-# 88392 no urlRE
-# 85651 less bidi
-# 82855 less mode meta
 
 
 # d=/home/ed/dev/copyparty/scripts/deps-docker/; tar -cf ../x . && ssh root@$bip "cd $d && tar -xv >&2 && make >&2 && tar -cC ../../copyparty/web deps" <../x | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
