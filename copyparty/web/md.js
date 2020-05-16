@@ -41,7 +41,7 @@ function static(obj) {
     if (ua.indexOf(') Gecko/') !== -1 && ua.indexOf('Linux') !== -1) {
         // necessary on ff-68.7 at least
         var s = document.createElement('style');
-        s.innerHTML = '@page { margin: .6in .2in .8in .2in; }';
+        s.innerHTML = '@page { margin: .5in .6in .8in .6in; }';
         console.log(s.innerHTML);
         document.head.appendChild(s);
     }
@@ -254,6 +254,7 @@ function init_toc() {
     var anchor = null; // current toc node
     var html = [];     // generated toc html
     var lv = 0;        // current indentation level in the toc html
+    var ctr = [0, 0, 0, 0, 0, 0];
 
     var manip_nodes_dyn = dom_pre.getElementsByTagName('*');
     var manip_nodes = [];
@@ -274,6 +275,11 @@ function init_toc() {
                 html.push('</ul>');
                 lv--;
             }
+            ctr[lv - 1]++;
+            for (var b = lv; b < 6; b++)
+                ctr[b] = 0;
+
+            elm.childNodes[0].setAttribute('ctr', ctr.slice(0, lv).join('.'));
 
             html.push('<li>' + elm.innerHTML + '</li>');
 

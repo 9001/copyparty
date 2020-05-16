@@ -99,3 +99,17 @@ Range: bytes=24-    "yz" Content-Range: bytes 24-25/26
 Range: bytes=25-29  "z"  Content-Range: bytes 25-25/26
 Range: bytes=26-         Content-Range: bytes */26
   HTTP/1.1 416 Requested Range Not Satisfiable
+
+
+##
+## md perf
+
+var tsh = [];
+function convert_markdown(md_text, dest_dom) {
+    tsh.push(new Date().getTime());
+    while (tsh.length > 10)
+        tsh.shift();
+    if (tsh.length > 1) {
+        var end = tsh.slice(-2);
+        console.log("render", end.pop() - end.pop(), (tsh[tsh.length - 1] - tsh[0]) / (tsh.length - 1));
+    }

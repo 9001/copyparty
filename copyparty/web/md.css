@@ -438,7 +438,7 @@ blink {
 		width: .8em;
 	}
 	html.dark #toc::-webkit-scrollbar-thumb {
-		background: #eb0;
+		background: #b80;
 	}
 	html.dark #mn.undocked {
 		box-shadow: 0 0 .5em #555;
@@ -454,9 +454,9 @@ blink {
 	@page {
 		size: A4;
 		padding: 0;
-		margin: .5in .2in;
-		mso-header-margin: .2in;
-		mso-footer-margin: .2in;
+		margin: .5in .6in;
+		mso-header-margin: .6in;
+		mso-footer-margin: .6in;
 		mso-paper-source: 0;
 	}
 	a {
@@ -467,7 +467,6 @@ blink {
 	}
 	#toc>ul {
 		border-left: .1em solid #84c4dd;
-		text-decoration: underline;
 	}
 	#mn, #mh {
 		display: none;
@@ -480,11 +479,37 @@ blink {
 	#toc {
 		margin-left: 1em !important;
 	}
-	pre code::before {
-		color: #058;
+	#toc a {
+		color: #000 !important;
+	}
+	#toc a::after {
+		/* hopefully supported by browsers eventually */
+		content: leader('.') target-counter(attr(href), page);
+	}
+	a[ctr]::before {
+		content: attr(ctr) '. ';
 	}
 	h1 {
 		margin: 2em 0;
+	}
+	h2 {
+		margin: 2em 0 0 0;
+	}
+	h1, h2, h3 {
+		page-break-inside: avoid;
+	}
+	h1::after,
+	h2::after,
+	h3::after {
+		content: 'orz';
+		color: transparent;
+		display: block;
+		line-height: 1em;
+		padding: 4em 0 0 0;
+		margin: 0 0 -5em 0;
+	}
+	p {
+		page-break-inside: avoid;
 	}
 	table {
 		page-break-inside: auto;
@@ -502,7 +527,33 @@ blink {
 	#mp a.vis::after {
 		content: ' (' attr(href) ')';
 		border-bottom: 1px solid #bbb;
-		color: #777;
+		color: #444;
+	}
+	blockquote {
+		border-color: #555;
+	}
+	code {
+		border-color: #bbb;
+	}
+	pre, pre code {
+		border-color: #999;
+	}
+	pre code::before {
+		color: #058;
+	}
+
+
+	
+	html.dark a {
+		color: #000;
+	}
+	html.dark pre,
+	html.dark code {
+		color: #240;
+	}
+	html.dark p>em,
+	html.dark li>em {
+		color: #940;
 	}
 }
 

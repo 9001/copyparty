@@ -19,6 +19,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * Android-Chrome: set max "parallel uploads" for 200% upload speed (android bug)
 * Android-Firefox: takes a while to select files (in order to avoid the above android-chrome issue)
 * Desktop-Firefox: may use gigabytes of RAM if your connection is great and your files are massive
+* paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
+  * because no browsers currently implement the media-query to do this properly orz
 
 
 ## status
