@@ -395,40 +395,10 @@ var redraw = (function () {
 
 
 dom_navtgl.onclick = function () {
-    var timeout = null;
-    function show_nav(e) {
-        if (e && e.target == dom_hbar && e.pageX && e.pageX < dom_hbar.offsetWidth / 2)
-            return;
-
-        clearTimeout(timeout);
-        dom_nav.style.display = 'block';
-    }
-    function hide_nav() {
-        clearTimeout(timeout);
-        timeout = setTimeout(function () {
-            dom_nav.style.display = 'none';
-        }, 30);
-    }
     var hidden = dom_navtgl.innerHTML == 'hide nav';
     dom_navtgl.innerHTML = hidden ? 'show nav' : 'hide nav';
-    if (hidden) {
-        dom_nav.setAttribute('class', 'undocked');
-        dom_nav.style.display = 'none';
-        dom_nav.style.top = dom_hbar.offsetHeight + 'px';
-        dom_nav.onmouseenter = show_nav;
-        dom_nav.onmouseleave = hide_nav;
-        dom_hbar.onmouseenter = show_nav;
-        dom_hbar.onmouseleave = hide_nav;
-    }
-    else {
-        dom_nav.setAttribute('class', '');
-        dom_nav.style.display = 'block';
-        dom_nav.style.top = '0';
-        dom_nav.onmouseenter = null;
-        dom_nav.onmouseleave = null;
-        dom_hbar.onmouseenter = null;
-        dom_hbar.onmouseleave = null;
-    }
+    dom_nav.style.display = hidden ? 'none' : 'block';
+
     if (window.localStorage)
         localStorage.setItem('hidenav', hidden ? 1 : 0);
 

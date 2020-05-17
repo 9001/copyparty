@@ -243,12 +243,6 @@ blink {
 		z-index: 10;
 		width: calc(100% - 1em);
 	}
-	#mn.undocked {
-        position: fixed;
-		padding: 1.7em 0 1.5em 1em;
-		box-shadow: 0 0 .5em rgba(0, 0, 0, 0.3);
-		background: #f7f7f7;
-	}
 	#mn a {
 		color: #444;
 		background: none;
@@ -439,11 +433,6 @@ blink {
 	}
 	html.dark #toc::-webkit-scrollbar-thumb {
 		background: #b80;
-	}
-	html.dark #mn.undocked {
-		box-shadow: 0 0 .5em #555;
-		border: none;
-		background: #0a0a0a;
 	}
 }
 @media screen and (min-width: 85.5em) {
