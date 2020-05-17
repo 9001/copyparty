@@ -3,7 +3,7 @@ WORKDIR /z
 ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
         ver_markdownit=10.0.0 \
         ver_showdown=1.9.1 \
-        ver_marked=1.0.0 \
+        ver_marked=1.1.0 \
         ver_ogvjs=1.6.1 \
         ver_mde=2.10.1 \
         ver_codemirror=5.53.2 \
@@ -99,14 +99,9 @@ RUN     cd ogvjs-$ver_ogvjs \
 
 
 # build marked
-RUN     wget https://github.com/markedjs/marked/commit/5c166d4164791f643693478e4ac094d63d6e0c9a.patch -O marked-git-1.patch \
-        && wget https://patch-diff.githubusercontent.com/raw/markedjs/marked/pull/1652.patch -O marked-git-2.patch
-
 COPY    marked.patch /z/
 COPY    marked-ln.patch /z/
 RUN     cd marked-$ver_marked \
-        && patch -p1 < /z/marked-git-1.patch \
-        && patch -p1 < /z/marked-git-2.patch \
         && patch -p1 < /z/marked-ln.patch \
         && patch -p1 < /z/marked.patch \
         && npm run build \
@@ -205,5 +200,6 @@ RUN     cd /z/dist \
         && rmdir no-pk
 
 
-# d=/home/ed/dev/copyparty/scripts/deps-docker/; tar -cf ../x . && ssh root@$bip "cd $d && tar -xv >&2 && make >&2 && tar -cC ../../copyparty/web deps" <../x | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz)
+# git diff -U2 --no-index marked-1.1.0-orig/ marked-1.1.0-edit/ -U2 | sed -r '/^index /d;s`^(diff --git a/)[^/]+/(.* b/)[^/]+/`\1\2`; s`^(---|\+\+\+) ([ab]/)[^/]+/`\1 \2`' > ../dev/copyparty/scripts/deps-docker/marked-ln.patch
+# d=/home/ed/dev/copyparty/scripts/deps-docker/; tar -cf ../x . && ssh root@$bip "cd $d && tar -xv >&2 && make >&2 && tar -cC ../../copyparty/web deps" <../x | (cd ../../copyparty/web/; cat > the.tgz; tar -xvf the.tgz; rm the.tgz)
 # gzip -dkf ../dev/copyparty/copyparty/web/deps/deps/marked.full.js.gz && diff -NarU2 ../dev/copyparty/copyparty/web/deps/{,deps/}marked.full.js

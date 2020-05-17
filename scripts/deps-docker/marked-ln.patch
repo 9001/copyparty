@@ -35,7 +35,7 @@ add data-ln="%d" to most tags, %d is the source markdown line
 +      // this.ln will be bumped by recursive calls into this func;
 +      // reset the count and rely on the outermost token's raw only
 +      ln = this.ln;
-+      
++
        // newline
        if (token = this.tokenizer.space(src)) {
          src = src.substring(token.raw.length);
@@ -234,7 +234,7 @@ diff --git a/src/Renderer.js b/src/Renderer.js
 -      return '<pre><code>'
 +      return '<pre' + this.ln + '><code>'
          + (escaped ? code : escape(code, true))
-         + '</code></pre>';
+         + '</code></pre>\n';
      }
  
 -    return '<pre><code class="'
