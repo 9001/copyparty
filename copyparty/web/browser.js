@@ -106,7 +106,9 @@ function makeSortable(table) {
 	if (th) i = th.length;
 	else return; // if no `<thead>` then do nothing
 	while (--i >= 0) (function (i) {
-		th[i].addEventListener('click', function () { sortTable(table, i) });
+		th[i].onclick = function () {
+			sortTable(table, i);
+		};
 	}(i));
 }
 makeSortable(o('files'));
@@ -123,7 +125,6 @@ var mp = (function () {
 		'cover_url': ''
 	};
 	var re_audio = new RegExp('\.(opus|ogg|m4a|aac|mp3|wav|flac)$', 'i');
-	var re_cover = new RegExp('^(cover|folder|cd|front|back)\.(jpe?g|png|gif)$', 'i');
 
 	var trs = document.getElementById('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
@@ -414,15 +415,6 @@ var vbar = (function () {
 		var x = e.clientX - rect.left;
 		var mul = x * 1.0 / rect.width;
 
-		/*
-		dbg(//Math.round(rect.width) + 'x' + Math.round(rect.height) + '+' +
-			//Math.round(rect.left) + '+' + Math.round(rect.top) + ', ' +
-			//Math.round(e.clientX) + 'x' + Math.round(e.clientY) + ', ' +
-			Math.round(mp.au.currentTime * 10) / 10 + ', ' +
-			Math.round(mp.au.duration * 10) / 10 + '*' +
-			Math.round(mul * 1000) / 1000);
-		*/
-
 		mp.au.currentTime = mp.au.duration * mul;
 
 		if (mp.au === mp.au_native)
@@ -483,8 +475,14 @@ function setclass(id, clas) {
 }
 
 
-var iOS = !!navigator.platform &&
-	/iPad|iPhone|iPod/.test(navigator.platform);
+var need_ogv = true;
+try {
+	need_ogv = new Audio().canPlayType('audio/ogg; codecs=opus') !== 'probably';
+
+	if (/ Edge\//.exec(navigator.userAgent + ''))
+		need_ogv = true;
+}
+catch (ex) { }
 
 
 // plays the tid'th audio file on the page
@@ -507,7 +505,7 @@ function play(tid, call_depth) {
 	var hack_attempt_play = true;
 
 	var url = mp.tracks[tid];
-	if (iOS && /\.(ogg|opus)$/i.test(url)) {
+	if (need_ogv && /\.(ogg|opus)$/i.test(url)) {
 		if (mp.au_ogvjs) {
 			mp.au = mp.au_ogvjs;
 		}
@@ -594,7 +592,6 @@ function evau_error(e) {
 	err += '\n\nFile: «' + decodeURIComponent(eplaya.src.split('/').slice(-1)[0]) + '»';
 
 	alert(err);
-	play(eplaya.tid + 1);
 }
 
 
@@ -613,7 +610,7 @@ function show_modal(html) {
 function unblocked() {
 	var dom = o('blocked');
 	if (dom)
-		dom.remove();
+		dom.parentNode.removeChild(dom);
 }
 
 

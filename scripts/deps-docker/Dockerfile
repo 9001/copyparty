@@ -42,21 +42,6 @@ RUN     mkdir -p /z/dist/no-pk \
         && tar -xf zopfli.tgz
 
 
-# uncomment if you wanna test the abandoned markdown converters
-#ENV     build_abandoned=1
-
-
-RUN     [ $build_abandoned ] || exit 0; \
-        git clone --depth 1 --branch $ver_showdown https://github.com/showdownjs/showdown/ \
-        && wget https://github.com/markdown-it/markdown-it/archive/$ver_markdownit.tar.gz -O markdownit.tgz \
-        && (cd showdown \
-            && npm install \
-            && npm i grunt -g ) \
-        && (tar -xf markdownit.tgz \
-            && cd markdown-it-$ver_markdownit \
-            && npm install )
-
-
 # build fonttools (which needs zopfli)
 RUN     tar -xf zopfli.tgz \
         && cd zopfli* \
@@ -82,20 +67,21 @@ RUN     cd ogvjs-$ver_ogvjs \
         && cp -pv \
             ogv.js \
             ogv-worker-audio.js \
-            ogv-demuxer-ogg.js \
             ogv-demuxer-ogg-wasm.js \
             ogv-demuxer-ogg-wasm.wasm \
-            ogv-demuxer-webm.js \
             ogv-demuxer-webm-wasm.js \
             ogv-demuxer-webm-wasm.wasm \
-            ogv-decoder-audio-opus.js \
             ogv-decoder-audio-opus-wasm.js \
             ogv-decoder-audio-opus-wasm.wasm \
-            ogv-decoder-audio-vorbis.js \
             ogv-decoder-audio-vorbis-wasm.js \
             ogv-decoder-audio-vorbis-wasm.wasm \
-            dynamicaudio.swf \
             /z/dist
+
+#            ogv-demuxer-ogg.js \
+#            ogv-demuxer-webm.js \
+#            ogv-decoder-audio-opus.js \
+#            ogv-decoder-audio-vorbis.js \
+#            dynamicaudio.swf \
 
 
 # build marked
@@ -135,54 +121,7 @@ RUN     cd easy-markdown-editor-$ver_mde \
         && patch -p1 < /z/easymde-ln.patch \
         && gulp \
         && cp -pv dist/easymde.min.css /z/dist/easymde.css \
-        && cp -pv dist/easymde.min.js /z/dist/easymde.js \
-        && sed -ri '/pipe.terser/d; /cleanCSS/d' gulpfile.js \
-        && gulp \
-        && cp -pv dist/easymde.min.css /z/dist/easymde.full.css \
-        && cp -pv dist/easymde.min.js /z/dist/easymde.full.js
-
-
-# build showdown (abandoned; disabled by default)
-COPY    showdown.patch /z/
-RUN     [ $build_abandoned ] || exit 0; \
-        cd showdown \
-        && rm -rf bin dist \
-#       # remove ellipsis plugin \
-        && rm \
-            src/subParsers/ellipsis.js \
-            test/cases/ellipsis* \
-#       # remove html-to-md converter \
-        && rm \
-            test/node/testsuite.makemd.js \
-            test/node/showdown.Converter.makeMarkdown.js \
-#       # remove emojis \
-        && rm src/subParsers/emoji.js \
-        && awk '/^showdown.helper.emojis/ {o=1} !o; /^\}/ {o=0}' \
-            >f <src/helpers.js \
-        && mv f src/helpers.js \
-        && rm -rf test/features/emojis \
-#       # remove ghmentions \
-        && rm test/features/ghMentions.* \
-#       # remove option descriptions \
-        && sed -ri '/descri(ption|be): /d' src/options.js \
-        && patch -p1 < /z/showdown.patch
-
-RUN     [ $build_abandoned ] || exit 0; \
-        cd showdown \
-        && grunt build \
-        && sed -ri '/sourceMappingURL=showdown.min.js.map/d' dist/showdown.min.js \
-        && mv dist/showdown.min.js /z/dist/showdown.js \
-        && ls -al /z/dist/showdown.js
-
-
-# build markdownit (abandoned; disabled by default)
-COPY    markdown-it.patch /z/
-RUN     [ $build_abandoned ] || exit 0; \
-        cd markdown-it-$ver_markdownit \
-        && patch -p1 < /z/markdown-it.patch \
-        && make browserify \
-        && cp -pv dist/markdown-it.min.js /z/dist/markdown-it.js \
-        && cp -pv dist/markdown-it.js /z/dist/markdown-it-full.js
+        && cp -pv dist/easymde.min.js /z/dist/easymde.js
 
 
 # build fontawesome and scp
