@@ -488,11 +488,16 @@ function md_newline() {
     if (m1 !== null)
         pre = m1[1] + (parseInt(m1[2]) + 1) + m1[3];
 
+    if (pre.length > s.car - s.n1)
+        // in gutter, do nothing
+        return true;
+
     s.pre = s.md.substring(0, s.car) + '\n' + pre;
     s.sel = '';
     s.post = s.md.substring(s.car);
     s.car = s.cdr = s.pre.length;
     setsel(s);
+    return false;
 }
 
 
@@ -540,8 +545,7 @@ function md_backspace() {
                 return false;
             }
             if (!ctrl && !ev.shiftKey && (ev.code == "Enter" || kc == 13)) {
-                md_newline();
-                return false;
+                return md_newline();
             }
             if (ctrl && (ev.code == "KeyZ" || kc == 90)) {
                 if (ev.shiftKey)
@@ -650,7 +654,7 @@ action_stack = (function () {
         dom_src.value = ref;
         dom_src.setSelectionRange(cpos, cpos);
         ignore = true; // all browsers
-        draw_md();
+        dom_src.oninput();
         return true;
     }
 
