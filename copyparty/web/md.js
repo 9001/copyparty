@@ -38,7 +38,7 @@ function static(obj) {
 // dodge browser issues
 (function () {
     var ua = navigator.userAgent;
-    if (ua.indexOf(') Gecko/') !== -1 && ua.indexOf('Linux') !== -1) {
+    if (ua.indexOf(') Gecko/') !== -1 && /Linux| Mac /.exec(ua)) {
         // necessary on ff-68.7 at least
         var s = document.createElement('style');
         s.innerHTML = '@page { margin: .5in .6in .8in .6in; }';
