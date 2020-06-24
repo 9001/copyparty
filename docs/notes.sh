@@ -113,3 +113,12 @@ function convert_markdown(md_text, dest_dom) {
         var end = tsh.slice(-2);
         console.log("render", end.pop() - end.pop(), (tsh[tsh.length - 1] - tsh[0]) / (tsh.length - 1));
     }
+
+
+##
+## tmpfiles.d meme
+
+mk() { rm -rf /tmp/foo; sudo -u ed bash -c 'mkdir /tmp/foo; echo hi > /tmp/foo/bar'; }
+mk && t0="$(date)" && while true; do date -s "$(date '+ 1 hour')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; done; echo "$t0"
+mk && sudo -u ed flock /tmp/foo sleep 40 & sleep 1; ps aux | grep -E 'sleep 40$' && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; done; echo "$t0"
+mk && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; tar -cf/dev/null /tmp/foo; done; echo "$t0"

@@ -57,9 +57,12 @@ currently there are two self-contained binaries:
 * `copyparty-sfx.sh` for unix (linux and osx) -- smaller, more robust
 * `copyparty-sfx.py` for windows (unix too) -- crossplatform, beta
 
-launch either of them and it'll unpack and run copyparty, assuming you have python installed of course
+launch either of them (**use sfx.py on systemd**) and it'll unpack and run copyparty, assuming you have python installed of course
 
 pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `copyparty.py` and keep it in the same folder because `sys.path` is funky
+
+
+## sfx repack
 
 if you don't need all the features you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except for either msys2 or WSL if you're on windows)
 * `724K` original size as of v0.4.0

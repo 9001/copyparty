@@ -426,6 +426,16 @@ def run(tmp, py):
     msg("will use:", py)
     msg("bound to:", tmp)
 
+    # "systemd-tmpfiles-clean.timer"?? HOW do you even come up with this shit
+    try:
+        import fcntl
+
+        fd = os.open(tmp, os.O_RDONLY)
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        tmp = os.readlink(tmp)  # can't flock a symlink, even with O_NOFOLLOW
+    except:
+        pass
+
     fp_py = os.path.join(tmp, "py")
     with open(fp_py, "wb") as f:
         f.write(py.encode("utf-8") + b"\n")
