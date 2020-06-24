@@ -118,7 +118,7 @@ printf ']}' >> /dev/shm/$salt.hs
 
 printf '\033[36m'
 
-#curl "http://$target:1234$posturl/handshake.php" -H "Content-Type: text/plain;charset=UTF-8" -H "Cookie: cppwd=$passwd" --data "$(cat "/dev/shm/$salt.hs")" | tee /dev/shm/$salt.res
+#curl "http://$target:3923$posturl/handshake.php" -H "Content-Type: text/plain;charset=UTF-8" -H "Cookie: cppwd=$passwd" --data "$(cat "/dev/shm/$salt.hs")" | tee /dev/shm/$salt.res
 
 {
     {
@@ -135,7 +135,7 @@ EOF
     cat /dev/shm/$salt.hs
 } |
 tee /dev/shm/$salt.hsb |
-ncat $target 1234 |
+ncat $target 3923 |
 tee /dev/shm/$salt.hs1r
 
 wark="$(cat /dev/shm/$salt.hs1r | getwark)"
@@ -190,7 +190,7 @@ EOF
     nchunk=$((nchunk+1))
 
 done |
-ncat $target 1234 |
+ncat $target 3923 |
 tee /dev/shm/$salt.pr
 
 t=$(date +%s.%N)
@@ -201,7 +201,7 @@ t=$(date +%s.%N)
 
 printf '\033[36m'
 
-ncat $target 1234 < /dev/shm/$salt.hsb |
+ncat $target 3923 < /dev/shm/$salt.hsb |
 tee /dev/shm/$salt.hs2r |
 grep -E '"hash": ?\[ *\]'
 

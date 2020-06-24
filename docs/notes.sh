@@ -13,7 +13,7 @@ head -c $((2*1024*1024*1024)) /dev/zero | openssl enc -aes-256-ctr -pass pass:hu
 ## testing multiple parallel uploads
 ## usage:  para | tee log
 
-para() { for s in 1 2 3 4 5 6 7 8 12 16 24 32 48 64; do echo $s; for r in {1..4}; do for ((n=0;n<s;n++)); do curl -sF "act=bput" -F "f=@garbage.file" http://127.0.0.1:1234/ 2>&1 & done; wait; echo; done; done; }
+para() { for s in 1 2 3 4 5 6 7 8 12 16 24 32 48 64; do echo $s; for r in {1..4}; do for ((n=0;n<s;n++)); do curl -sF "act=bput" -F "f=@garbage.file" http://127.0.0.1:3923/ 2>&1 & done; wait; echo; done; done; }
 
 
 ##
@@ -36,13 +36,13 @@ for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qwe,rty;asd
 
 fn=$(printf '\xba\xdc\xab.cab')
 echo asdf > "$fn"
-curl --cookie cppwd=wark -sF "act=bput" -F "f=@$fn" http://127.0.0.1:1234/moji/%ED%91/
+curl --cookie cppwd=wark -sF "act=bput" -F "f=@$fn" http://127.0.0.1:3923/moji/%ED%91/
 
 
 ##
 ## test compression
 
-wget -S --header='Accept-Encoding: gzip' -U 'MSIE 6.0; SV1' http://127.0.0.1:1234/.cpr/deps/ogv.js -O- | md5sum; p=~ed/dev/copyparty/copyparty/web/deps/ogv.js.gz; md5sum $p; gzip -d < $p | md5sum
+wget -S --header='Accept-Encoding: gzip' -U 'MSIE 6.0; SV1' http://127.0.0.1:3923/.cpr/deps/ogv.js -O- | md5sum; p=~ed/dev/copyparty/copyparty/web/deps/ogv.js.gz; md5sum $p; gzip -d < $p | md5sum
 
 
 ##

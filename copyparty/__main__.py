@@ -127,7 +127,7 @@ def main():
         "-c", metavar="PATH", type=str, action="append", help="add config file"
     )
     ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind")
-    ap.add_argument("-p", metavar="PORT", type=int, default=1234, help="port to bind")
+    ap.add_argument("-p", metavar="PORT", type=int, default=3923, help="port to bind")
     ap.add_argument("-nc", metavar="NUM", type=int, default=16, help="max num clients")
     ap.add_argument(
         "-j", metavar="CORES", type=int, default=1, help="max num cpu cores"

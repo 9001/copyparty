@@ -32,7 +32,7 @@ except:
 mount a copyparty server (local or remote) as a filesystem
 
 usage:
-  python copyparty-fuse.py ./music http://192.168.1.69:1234/
+  python copyparty-fuse.py ./music http://192.168.1.69:3923/
 
 dependencies:
   sudo apk add fuse-dev
