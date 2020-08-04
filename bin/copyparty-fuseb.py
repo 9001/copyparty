@@ -37,10 +37,10 @@ except:
 mount a copyparty server (local or remote) as a filesystem
 
 usage:
-  python ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /export/ro
+  python ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /mnt/nas
 
 dependencies:
-  sudo apk add fuse-dev
+  sudo apk add fuse-dev python3-dev
   python3 -m pip install --user fuse-python
 
 fork of copyparty-fuse.py based on fuse-python which
@@ -540,7 +540,7 @@ class CPPF(Fuse):
 
         if not path:
             ret = self.gw.stat_dir(time.time())
-            log("=root")
+            dbg("=root")
             return ret
 
         cn = self.get_cached_dir(dirpath)
@@ -553,7 +553,7 @@ class CPPF(Fuse):
 
         for cache_name, cache_stat, _ in dents:
             if cache_name == fname:
-                log("=file")
+                dbg("=file")
                 return cache_stat
 
         log("=404")
@@ -562,10 +562,20 @@ class CPPF(Fuse):
 
 def main():
     server = CPPF()
-    server.parser.add_option(mountopt="url", metavar="BASE_URL", default='http://127.0.0.1:3923/')
+    server.parser.add_option(mountopt="url", metavar="BASE_URL", default=None)
     server.parse(values=server, errex=1)
+    if not server.url or not str(server.url).startswith('http'):
+        print('\nerror:')
+        print('  need argument: -o url=<...>')
+        print('  need argument: mount-path')
+        print('example:')
+        print('  ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /mnt/nas')
+        sys.exit(1)
+    
     server.init2()
-    server.main()
+    threading.Thread(target=server.main, daemon=True).start()
+    while True:
+        time.sleep(9001)
 
 
 if __name__ == "__main__":

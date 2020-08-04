@@ -36,7 +36,7 @@ usage:
   python copyparty-fuse.py ./music http://192.168.1.69:3923/
 
 dependencies:
-  sudo apk add fuse-dev
+  sudo apk add fuse
   python3 -m pip install --user fusepy
 
 
@@ -474,7 +474,7 @@ class CPPF(Operations):
 
     def readdir(self, path, fh=None):
         path = path.strip("/")
-        log("readdir {}".format(path))
+        log("readdir [{}] [{}]".format(path, fh))
 
         ret = self.gw.listdir(path)
 
@@ -532,7 +532,7 @@ class CPPF(Operations):
                 dbg("=" + repr(cache_stat))
                 return cache_stat
 
-        log("=404")
+        log("=404 ({})".format(path))
         raise FuseOSError(errno.ENOENT)
 
     access = None
@@ -585,8 +585,7 @@ class CPPF(Operations):
 
     if sys.platform == 'win32':
         # quick compat for /mingw64/bin/python3 (msys2)
-        def open(self, path, flags):
-            log("open [{}] [{}]".format(path, flags))
+        def _open(self, path):
             try:
                 x = self.getattr(path)
                 if x["st_mode"] <= 0:
@@ -594,7 +593,7 @@ class CPPF(Operations):
                 
                 self.junk_fh_ctr += 1
                 if self.junk_fh_ctr > 32000:  # TODO untested
-					self.junk_fh_ctr = 4
+                    self.junk_fh_ctr = 4
                 
                 return self.junk_fh_ctr
             
@@ -602,13 +601,31 @@ class CPPF(Operations):
                 log("open ERR {}".format(repr(ex)))
                 raise FuseOSError(errno.ENOENT)
         
+        def open(self, path, flags):
+            log("open [{}] [{}]".format(path, flags))
+            return self._open(path)
+        
+        def opendir(self, path):
+            log("opendir [{}]".format(path))
+            return self._open(path)
+        
         def flush(self, path, fh):
             log("flush [{}] [{}]".format(path, fh))
-            return True
 
         def release(self, ino, fi):
             log("release [{}] [{}]".format(ino, fi))
-            return True
+
+        def releasedir(self, ino, fi):
+            log("releasedir [{}] [{}]".format(ino, fi))
+        
+        def access(self, path, mode):
+            log("access [{}] [{}]".format(path, mode))
+            try:
+                x = self.getattr(path)
+                if x["st_mode"] <= 0:
+                    raise Exception()
+            except:
+                raise FuseOSError(errno.ENOENT)
 
 
 def main():
