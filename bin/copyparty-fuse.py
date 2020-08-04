@@ -13,6 +13,7 @@ import time
 import stat
 import errno
 import struct
+import builtins
 import threading
 import http.client  # py2: httplib
 import urllib.parse
@@ -48,6 +49,20 @@ MB/s
 """
 
 
+def print(*args, **kwargs):
+    try:
+        builtins.print(*list(args), **kwargs)
+    except:
+        builtins.print(termsafe(' '.join(str(x) for x in args)), **kwargs)
+
+
+def termsafe(txt):
+    try:
+        return txt.encode(sys.stdout.encoding, 'backslashreplace').decode(sys.stdout.encoding)
+    except:
+        return txt.encode(sys.stdout.encoding, 'replace').decode(sys.stdout.encoding)
+
+
 def threadless_log(msg):
     print(msg + "\n", end="")
 
@@ -80,6 +95,10 @@ dbg = null_log
 
 def get_tid():
     return threading.current_thread().ident
+
+
+def html_dec(txt):
+    return txt.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&')
 
 
 class CacheNode(object):
@@ -147,9 +166,8 @@ class Gateway(object):
             return c.getresponse()
 
     def listdir(self, path):
-        web_path = "/" + "/".join([self.web_root, path]) + "?dots"
-
-        r = self.sendreq("GET", self.quotep(web_path))
+        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots"
+        r = self.sendreq("GET", web_path)
         if r.status != 200:
             self.closeconn()
             raise Exception(
@@ -161,11 +179,11 @@ class Gateway(object):
         return self.parse_html(r)
 
     def download_file_range(self, path, ofs1, ofs2):
-        web_path = "/" + "/".join([self.web_root, path]) + "?raw"
+        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
         log("downloading {}".format(hdr_range))
 
-        r = self.sendreq("GET", self.quotep(web_path), headers={"Range": hdr_range})
+        r = self.sendreq("GET", web_path, headers={"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
             self.closeconn()
             raise Exception(
@@ -203,6 +221,7 @@ class Gateway(object):
                     continue
 
                 ftype, fname, fsize, fdate = m.groups()
+                fname = html_dec(fname)
                 ts = datetime.strptime(fdate, "%Y-%m-%d %H:%M:%S").timestamp()
                 sz = int(fsize)
                 if ftype == "-":
@@ -214,7 +233,7 @@ class Gateway(object):
 
     def stat_dir(self, ts, sz=4096):
         return {
-            "st_mode": 0o555 | stat.S_IFDIR,
+            "st_mode": stat.S_IFDIR | 0o555,
             "st_uid": 1000,
             "st_gid": 1000,
             "st_size": sz,
@@ -226,7 +245,7 @@ class Gateway(object):
 
     def stat_file(self, ts, sz):
         return {
-            "st_mode": 0o444 | stat.S_IFREG,
+            "st_mode": stat.S_IFREG | 0o444,
             "st_uid": 1000,
             "st_gid": 1000,
             "st_size": sz,
@@ -240,6 +259,7 @@ class Gateway(object):
 class CPPF(Operations):
     def __init__(self, base_url):
         self.gw = Gateway(base_url)
+        self.junk_fh_ctr = 3
 
         self.dircache = []
         self.dircache_mtx = threading.Lock()
@@ -485,6 +505,8 @@ class CPPF(Operations):
         return self.gw.download_file_range(path, offset, ofs2)
 
     def getattr(self, path, fh=None):
+        log("getattr [{}]".format(path))
+
         path = path.strip("/")
         try:
             dirpath, fname = path.rsplit("/", 1)
@@ -492,10 +514,10 @@ class CPPF(Operations):
             dirpath = ""
             fname = path
 
-        log("getattr {}".format(path))
-
         if not path:
-            return self.gw.stat_dir(time.time())
+            ret = self.gw.stat_dir(time.time())
+            dbg("=" + repr(ret))
+            return ret
 
         cn = self.get_cached_dir(dirpath)
         if cn:
@@ -507,8 +529,10 @@ class CPPF(Operations):
 
         for cache_name, cache_stat, _ in dents:
             if cache_name == fname:
+                dbg("=" + repr(cache_stat))
                 return cache_stat
 
+        log("=404")
         raise FuseOSError(errno.ENOENT)
 
     access = None
@@ -520,6 +544,71 @@ class CPPF(Operations):
     release = None
     releasedir = None
     statfs = None
+    
+    if False:
+        # incorrect semantics but good for debugging stuff like samba and msys2
+        def access(self, path, mode):
+            log("@@ access [{}] [{}]".format(path, mode))
+            return 1 if self.getattr(path) else 0
+        
+        def flush(self, path, fh):
+            log("@@ flush [{}] [{}]".format(path, fh))
+            return True
+        
+        def getxattr(self, *args):
+            log("@@ getxattr [{}]".format('] ['.join(str(x) for x in args)))
+            return False
+        
+        def listxattr(self, *args):
+            log("@@ listxattr [{}]".format('] ['.join(str(x) for x in args)))
+            return False
+        
+        def open(self, path, flags):
+            log("@@ open [{}] [{}]".format(path, flags))
+            return 42
+        
+        def opendir(self, fh):
+            log("@@ opendir [{}]".format(fh))
+            return 69
+        
+        def release(self, ino, fi):
+            log("@@ release [{}] [{}]".format(ino, fi))
+            return True
+        
+        def releasedir(self, ino, fi):
+            log("@@ releasedir [{}] [{}]".format(ino, fi))
+            return True
+        
+        def statfs(self, path):
+            log("@@ statfs [{}]".format(path))
+            return {}
+
+    if sys.platform == 'win32':
+        # quick compat for /mingw64/bin/python3 (msys2)
+        def open(self, path, flags):
+            log("open [{}] [{}]".format(path, flags))
+            try:
+                x = self.getattr(path)
+                if x["st_mode"] <= 0:
+                    raise Exception()
+                
+                self.junk_fh_ctr += 1
+                if self.junk_fh_ctr > 32000:  # TODO untested
+					self.junk_fh_ctr = 4
+                
+                return self.junk_fh_ctr
+            
+            except Exception as ex:
+                log("open ERR {}".format(repr(ex)))
+                raise FuseOSError(errno.ENOENT)
+        
+        def flush(self, path, fh):
+            log("flush [{}] [{}]".format(path, fh))
+            return True
+
+        def release(self, ino, fi):
+            log("release [{}] [{}]".format(ino, fi))
+            return True
 
 
 def main():
@@ -530,7 +619,7 @@ def main():
         print("need arg 2: root url")
         return
 
-    FUSE(CPPF(remote), local, foreground=True, nothreads=True)
+    FUSE(CPPF(remote), local, foreground=True, nothreads=True, allow_other=True, nonempty=True)
     # if nothreads=False also uncomment the `with *_mtx` things
 
 
