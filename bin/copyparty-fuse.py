@@ -16,6 +16,7 @@ import errno
 import struct
 import builtins
 import threading
+import traceback
 import http.client  # py2: httplib
 import urllib.parse
 from datetime import datetime
@@ -36,8 +37,12 @@ mount a copyparty server (local or remote) as a filesystem
 usage:
   python copyparty-fuse.py ./music http://192.168.1.69:3923/
 
-dependencies:
+dependencies (linux/macos):
   sudo apk add fuse
+  python3 -m pip install --user fusepy
+
+dependencies (windows):
+  https://github.com/billziss-gh/winfsp/releases/latest
   python3 -m pip install --user fusepy
 """
 
@@ -82,6 +87,7 @@ def null_log(msg):
     pass
 
 
+# set loglevel here
 info = fancy_log
 log = fancy_log
 dbg = fancy_log
@@ -172,7 +178,11 @@ class Gateway(object):
                 )
             )
 
-        return self.parse_html(r)
+        try:
+            return self.parse_html(r)
+        except:
+            traceback.print_exc()
+            raise
 
     def download_file_range(self, path, ofs1, ofs2):
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
@@ -218,8 +228,15 @@ class Gateway(object):
 
                 ftype, fname, fsize, fdate = m.groups()
                 fname = html_dec(fname)
-                ts = datetime.strptime(fdate, "%Y-%m-%d %H:%M:%S").timestamp()
-                sz = int(fsize)
+                sz = 1
+                ts = 60 * 60 * 24 * 2
+                try:
+                    sz = int(fsize)
+                    ts = datetime.strptime(fdate, "%Y-%m-%d %H:%M:%S").timestamp()
+                except:
+                    info("bad HTML or OS [{}] [{}]".format(fdate, fsize))
+                    # python cannot strptime(1959-01-01) on windows
+
                 if ftype == "-":
                     ret.append([fname, self.stat_file(ts, sz), 0])
                 else:
