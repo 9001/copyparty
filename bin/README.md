@@ -4,10 +4,21 @@
 * **supports Windows!** -- expect `87 MiB/s` sequential read over wifi
 * **supports macos** -- expect `17 MiB/s` sequential read over wifi
 
-to run this on windows you
-* definitely need `msys2`
-* probably need `dokany` or `winfsp`, not sure which #todo
-* should do this `/mingw64/bin/python3 ./copyparty-fuse.py n: http://192.168.1.69:3923/`
+## to run this on windows:
+* install [winfsp](https://github.com/billziss-gh/winfsp/releases/latest) and [python 3](https://www.python.org/downloads/)
+  * [x] add python 3.x to PATH (it asks during install)
+* `python -m pip install --user fusepy`
+* `python ./copyparty-fuse.py n: http://192.168.1.69:3923/`
+
+10% faster in [msys2](https://www.msys2.org/), 700% faster if debug prints are enabled:
+* `pacman -S mingw64/mingw-w64-x86_64-python{,-pip}`
+* `/mingw64/bin/python3 -m pip install --user fusepy`
+* `/mingw64/bin/python3 ./copyparty-fuse.py [...]`
+
+you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releases/latest), let me know if you [figure out how](https://github.com/dokan-dev/dokany/wiki/FUSE)  
+(winfsp's sshfs leaks, doesn't look like winfsp itself does, should be fine)
+
+
 
 # copyparty-fuse🅱️.py
 * mount a copyparty server as a local filesystem (read-only)

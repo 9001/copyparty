@@ -8,6 +8,7 @@ __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
 import re
+import os
 import sys
 import time
 import stat
@@ -24,7 +25,7 @@ try:
     from fuse import FUSE, FuseOSError, Operations
 except:
     print(
-        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fusepy\n    apt install libfuse\n    modprobe fuse"
+        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fusepy\n    apt install libfuse\n    modprobe fuse\n"
     )
     raise
 
@@ -38,15 +39,10 @@ usage:
 dependencies:
   sudo apk add fuse
   python3 -m pip install --user fusepy
-
-
-MB/s
- 28   cache NOthread
- 24   cache   thread
- 29   cache NOthread NOmutex
- 67 NOcache NOthread NOmutex  (　´・ω・) nyoro~n
- 10 NOcache   thread NOmutex
 """
+
+
+WINDOWS = sys.platform == 'win32'
 
 
 def print(*args, **kwargs):
@@ -283,8 +279,7 @@ class CPPF(Operations):
             self.dircache = self.dircache[cutoff:]
 
     def get_cached_dir(self, dirpath):
-        # with self.dircache_mtx:
-        if True:
+        with self.dircache_mtx:
             self.clean_dircache()
             for cn in self.dircache:
                 if cn.tag == dirpath:
@@ -321,8 +316,7 @@ class CPPF(Operations):
         car = None
         cdr = None
         ncn = -1
-        # with self.filecache_mtx:
-        if True:
+        with self.filecache_mtx:
             dbg("cache request from {} to {}, size {}".format(get1, get2, file_sz))
             for cn in self.filecache:
                 ncn += 1
@@ -463,8 +457,7 @@ class CPPF(Operations):
             ret = buf[buf_ofs:buf_end]
 
         cn = CacheNode([path, h_ofs], buf)
-        # with self.filecache_mtx:
-        if True:
+        with self.filecache_mtx:
             if len(self.filecache) > 6:
                 self.filecache = self.filecache[1:] + [cn]
             else:
@@ -478,8 +471,7 @@ class CPPF(Operations):
 
         ret = self.gw.listdir(path)
 
-        # with self.dircache_mtx:
-        if True:
+        with self.dircache_mtx:
             cn = CacheNode(path, ret)
             self.dircache.append(cn)
             self.clean_dircache()
@@ -632,12 +624,24 @@ def main():
     try:
         local, remote = sys.argv[1:]
     except:
-        print("need arg 1: local directory")
+        where = "local directory"
+        if WINDOWS:
+            where += " or DRIVE:"
+        
+        print("need arg 1: " + where)
         print("need arg 2: root url")
+        print()
+        print("example:")
+        print("  copyparty-fuse.py ./music http://192.168.1.69:3923/music/")
+        if WINDOWS:
+            print("  copyparty-fuse.py M: http://192.168.1.69:3923/music/")
+        
         return
 
+    if WINDOWS:
+        os.system("")
+    
     FUSE(CPPF(remote), local, foreground=True, nothreads=True, allow_other=True, nonempty=True)
-    # if nothreads=False also uncomment the `with *_mtx` things
 
 
 if __name__ == "__main__":

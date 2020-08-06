@@ -28,7 +28,7 @@ try:
         raise Exception('your fuse-python is way old')
 except:
     print(
-        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fuse-python\n    apt install libfuse\n    modprobe fuse"
+        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fuse-python\n    apt install libfuse\n    modprobe fuse\n"
     )
     raise
 
