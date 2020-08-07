@@ -11,6 +11,7 @@ PYTHONPATH=.. python3 -m copyparty -v /dev/shm/fusefuzz/r::r -i 127.0.0.1
 
 
 def main():
+    v = "virt"
     for n in range(5):
         with open(f"r/{n}", "wb") as f:
             f.write(b"h" * n)
@@ -19,7 +20,7 @@ def main():
         with open("r/f", "wb", fsz) as f:
             f.write(b"\xab" * fsz)
 
-        for rsz in range(62, 66):
+        for rsz in range(64 * 1024 - 2, 64 * 1024 + 2):
             ofslist = [0, 1, 2]
             for n in range(3):
                 ofslist.append(fsz - n)
@@ -34,12 +35,12 @@ def main():
                         continue
 
                     for n in range(1, 3):
-                        with open(f"v/{n}", "rb") as f:
+                        with open(f"{v}/{n}", "rb") as f:
                             f.read()
 
                     prev_ofs = -99
                     with open("r/f", "rb", rsz) as rf:
-                        with open("v/f", "rb", rsz) as vf:
+                        with open(f"{v}/f", "rb", rsz) as vf:
                             while True:
                                 ofs += shift
                                 if ofs < 0 or ofs > fsz or ofs == prev_ofs:
@@ -66,6 +67,39 @@ def main():
 
                                 ofs += len(rb)
 
+                    for n in range(1, 3):
+                        with open(f"{v}/{n}", "rb") as f:
+                            f.read()
+
+                    with open("r/f", "rb", rsz) as rf:
+                        with open(f"{v}/f", "rb", rsz) as vf:
+                            for n in range(2):
+                                ofs += shift
+                                if ofs < 0 or ofs > fsz:
+                                    break
+
+                                if ofs != rf.tell():
+                                    rf.seek(ofs)
+                                    vf.seek(ofs)
+
+                                rb = rf.read(rsz)
+                                vb = vf.read(rsz)
+
+                                print(
+                                    f"fsz {fsz} rsz {rsz} ofs {ofs0} shift {shift} ofs {ofs} = {len(rb)}"
+                                )
+
+                                if rb != vb:
+                                    raise Exception(f"{len(rb)} != {len(vb)}")
+
+                                ofs -= rsz
+
 
 if __name__ == "__main__":
     main()
+
+
+"""
+f() { cat virt/{1,2,AAAAAAAAAAAAA}; echo; dd if=virt/f bs=${1} | cmp r/f; }
+901120
+"""

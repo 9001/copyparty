@@ -135,9 +135,9 @@ class AuthSrv(object):
         self.warn_anonwrite = True
 
         if WINDOWS:
-            self.re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)")
+            self.re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):([^:]*)$")
         else:
-            self.re_vol = re.compile(r"^([^:]*):([^:]*):(.*)")
+            self.re_vol = re.compile(r"^([^:]*):([^:]*):([^:]*)$")
 
         self.mutex = threading.Lock()
         self.reload()
@@ -220,11 +220,13 @@ class AuthSrv(object):
         if self.args.v:
             # list of src:dst:permset:permset:...
             # permset is [rwa]username
-            for vol_match in [self.re_vol.match(x) for x in self.args.v]:
-                try:
-                    src, dst, perms = vol_match.groups()
-                except:
-                    raise Exception("invalid -v argument")
+            for v_str in self.args.v:
+                m = self.re_vol.match(v_str)
+                if not m:
+                    raise Exception("invalid -v argument: [{}]".format(v_str))
+
+                src, dst, perms = m.groups()
+                print("\n".join([src, dst, perms]))
 
                 src = fsdec(os.path.abspath(fsenc(src)))
                 dst = dst.strip("/")

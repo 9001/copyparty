@@ -296,8 +296,8 @@ class CPPF(Operations):
         for n, cn in enumerate(self.filecache):
             cache_path, cache1 = cn.tag
             cache2 = cache1 + len(cn.data)
-            msg += "\n#{} = {}  {}  {}\n{}\n".format(
-                n, cache1, len(cn.data), cache2, cache_path
+            msg += "\n#{} |{}| {}:{} {}".format(
+                n, len(cn.data), cache1, cache2, cache_path
             )
         return msg
 
@@ -353,7 +353,10 @@ class CPPF(Operations):
         cdr = None
         ncn = -1
         with self.filecache_mtx:
-            dbg("cache request from {} to {}, size {}".format(get1, get2, file_sz))
+            dbg(
+                "cache request {}:{} |{}|".format(get1, get2, file_sz)
+                + self._describe()
+            )
             for cn in self.filecache:
                 ncn += 1
 
@@ -373,7 +376,7 @@ class CPPF(Operations):
                     buf_ofs = get1 - cache1
                     buf_end = buf_ofs + (get2 - get1)
                     dbg(
-                        "found all ({}, {} to {}, len {}) [{}:{}] = {}".format(
+                        "found all (#{} {}:{} |{}|) [{}:{}] = {}".format(
                             ncn,
                             cache1,
                             cache2,
@@ -385,11 +388,11 @@ class CPPF(Operations):
                     )
                     return cn.data[buf_ofs:buf_end]
 
-                if get2 < cache2:
+                if get2 <= cache2:
                     x = cn.data[: get2 - cache1]
                     if not cdr or len(cdr) < len(x):
                         dbg(
-                            "found car ({}, {} to {}, len {}) [:{}-{}] = [:{}] = {}".format(
+                            "found cdr (#{} {}:{} |{}|) [:{}-{}] = [:{}] = {}".format(
                                 ncn,
                                 cache1,
                                 cache2,
@@ -404,11 +407,11 @@ class CPPF(Operations):
 
                     continue
 
-                if get1 > cache1:
-                    x = cn.data[-(cache2 - get1) :]
+                if get1 >= cache1:
+                    x = cn.data[-(max(0, cache2 - get1)) :]
                     if not car or len(car) < len(x):
                         dbg(
-                            "found cdr ({}, {} to {}, len {}) [-({}-{}):] = [-{}:] = {}".format(
+                            "found car (#{} {}:{} |{}|) [-({}-{}):] = [-{}:] = {}".format(
                                 ncn,
                                 cache1,
                                 cache2,
@@ -436,18 +439,11 @@ class CPPF(Operations):
                 msg += self._describe()
                 raise Exception(msg)
 
-        if car and cdr:
+        if car and cdr and len(car) + len(cdr) == get2 - get1:
             dbg("<cache> have both")
+            return car + cdr
 
-            ret = car + cdr
-            if len(ret) == get2 - get1:
-                return ret
-
-            msg = "{} + {} != {} - {}".format(len(car), len(cdr), get2, get1)
-            msg += self._describe()
-            raise Exception(msg)
-
-        elif cdr:
+        elif cdr and (not car or len(car) < len(cdr)):
             h_end = get1 + (get2 - get1) - len(cdr)
             h_ofs = h_end - 512 * 1024
 
@@ -457,7 +453,7 @@ class CPPF(Operations):
             buf_ofs = (get2 - get1) - len(cdr)
 
             dbg(
-                "<cache> cdr {}, car {}-{}={} [-{}:]".format(
+                "<cache> cdr {}, car {}:{} |{}| [-{}:]".format(
                     len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs
                 )
             )
@@ -475,7 +471,7 @@ class CPPF(Operations):
             buf_ofs = (get2 - get1) - len(car)
 
             dbg(
-                "<cache> car {}, cdr {}-{}={} [:{}]".format(
+                "<cache> car {}, cdr {}:{} |{}| [:{}]".format(
                     len(car), h_ofs, h_end, h_end - h_ofs, buf_ofs
                 )
             )
@@ -497,7 +493,7 @@ class CPPF(Operations):
             buf_end = buf_ofs + get2 - get1
 
             dbg(
-                "<cache> {}-{}={} [{}:{}]".format(
+                "<cache> {}:{} |{}| [{}:{}]".format(
                     h_ofs, h_end, h_end - h_ofs, buf_ofs, buf_end
                 )
             )
@@ -536,12 +532,11 @@ class CPPF(Operations):
         path = path.strip("/")
 
         ofs2 = offset + length
-        log("read {} @ {} len {} end {}".format(path, offset, length, ofs2))
-
         file_sz = self.getattr(path)["st_size"]
+        log("read {} |{}| {}:{} max {}".format(path, length, offset, ofs2, file_sz))
         if ofs2 > file_sz:
             ofs2 = file_sz
-            log("truncate to len {} end {}".format(ofs2 - offset, ofs2))
+            log("truncate to |{}| :{}".format(ofs2 - offset, ofs2))
 
         if file_sz == 0 or offset >= ofs2:
             return b""
