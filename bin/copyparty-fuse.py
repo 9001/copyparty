@@ -194,7 +194,7 @@ class Gateway(object):
     def download_file_range(self, path, ofs1, ofs2):
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
-        log("downloading {}".format(hdr_range))
+        log("downloading {:4.0f}K, {}".format((ofs2 - ofs1) / 1024.0, hdr_range))
 
         r = self.sendreq("GET", web_path, headers={"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
@@ -277,9 +277,11 @@ class Gateway(object):
 
 
 class CPPF(Operations):
-    def __init__(self, base_url):
+    def __init__(self, base_url, dircache, filecache):
         self.gw = Gateway(base_url)
         self.junk_fh_ctr = 3
+        self.n_dircache = dircache
+        self.n_filecache = filecache
 
         self.dircache = []
         self.dircache_mtx = threading.Lock()
@@ -289,12 +291,22 @@ class CPPF(Operations):
 
         info("up")
 
+    def _describe(self):
+        msg = ""
+        for n, cn in enumerate(self.filecache):
+            cache_path, cache1 = cn.tag
+            cache2 = cache1 + len(cn.data)
+            msg += "\n#{} = {}  {}  {}\n{}\n".format(
+                n, cache1, len(cn.data), cache2, cache_path
+            )
+        return msg
+
     def clean_dircache(self):
         """not threadsafe"""
         now = time.time()
         cutoff = 0
         for cn in self.dircache:
-            if now - cn.ts > 1:
+            if now - cn.ts > self.n_dircache:
                 cutoff += 1
             else:
                 break
@@ -411,7 +423,18 @@ class CPPF(Operations):
 
                     continue
 
-                raise Exception("what")
+                msg = "cache fallthrough\n{} {} {}\n{} {} {}\n{} {} --\n".format(
+                    get1,
+                    get2,
+                    get2 - get1,
+                    cache1,
+                    cache2,
+                    cache2 - cache1,
+                    get1 - cache1,
+                    get2 - cache2,
+                )
+                msg += self._describe()
+                raise Exception(msg)
 
         if car and cdr:
             dbg("<cache> have both")
@@ -420,7 +443,9 @@ class CPPF(Operations):
             if len(ret) == get2 - get1:
                 return ret
 
-            raise Exception("{} + {} != {} - {}".format(len(car), len(cdr), get2, get1))
+            msg = "{} + {} != {} - {}".format(len(car), len(cdr), get2, get1)
+            msg += self._describe()
+            raise Exception(msg)
 
         elif cdr:
             h_end = get1 + (get2 - get1) - len(cdr)
@@ -482,18 +507,20 @@ class CPPF(Operations):
 
         cn = CacheNode([path, h_ofs], buf)
         with self.filecache_mtx:
-            if len(self.filecache) > 6:
+            if len(self.filecache) >= self.n_filecache:
                 self.filecache = self.filecache[1:] + [cn]
             else:
                 self.filecache.append(cn)
 
         return ret
 
-    def readdir(self, path, fh=None):
+    def _readdir(self, path, fh=None):
         path = path.strip("/")
         log("readdir [{}] [{}]".format(path, fh))
 
         ret = self.gw.listdir(path)
+        if not self.n_dircache:
+            return ret
 
         with self.dircache_mtx:
             cn = CacheNode(path, ret)
@@ -501,6 +528,9 @@ class CPPF(Operations):
             self.clean_dircache()
 
         return ret
+
+    def readdir(self, path, fh=None):
+        return [".", ".."] + self._readdir(path, fh)
 
     def read(self, path, length, offset, fh=None):
         path = path.strip("/")
@@ -516,9 +546,10 @@ class CPPF(Operations):
         if file_sz == 0 or offset >= ofs2:
             return b""
 
-        # toggle cache here i suppose
-        # return self.get_cached_file(path, offset, ofs2, file_sz)
-        return self.gw.download_file_range(path, offset, ofs2)
+        if not self.n_filecache:
+            return self.gw.download_file_range(path, offset, ofs2)
+
+        return self.get_cached_file(path, offset, ofs2, file_sz)
 
     def getattr(self, path, fh=None):
         log("getattr [{}]".format(path))
@@ -532,7 +563,7 @@ class CPPF(Operations):
 
         if not path:
             ret = self.gw.stat_dir(time.time())
-            dbg("=" + repr(ret))
+            # dbg("=" + repr(ret))
             return ret
 
         cn = self.get_cached_dir(dirpath)
@@ -541,11 +572,11 @@ class CPPF(Operations):
             dents = cn.data
         else:
             log("cache miss")
-            dents = self.readdir(dirpath)
+            dents = self._readdir(dirpath)
 
         for cache_name, cache_stat, _ in dents:
             if cache_name == fname:
-                dbg("=" + repr(cache_stat))
+                # dbg("=" + repr(cache_stat))
                 return cache_stat
 
         log("=404 ({})".format(path))
@@ -646,7 +677,9 @@ class CPPF(Operations):
 
 def main():
     try:
-        local, remote = sys.argv[1:]
+        local, remote = sys.argv[1:3]
+        filecache = 7 if len(sys.argv) <= 3 else int(sys.argv[3])
+        dircache = 1 if len(sys.argv) <= 4 else float(sys.argv[4])
     except:
         where = "local directory"
         if WINDOWS:
@@ -654,6 +687,8 @@ def main():
 
         print("need arg 1: " + where)
         print("need arg 2: root url")
+        print("optional 3: num files in filecache (7)")
+        print("optional 4: num seconds / dircache (1)")
         print()
         print("example:")
         print("  copyparty-fuse.py ./music http://192.168.1.69:3923/music/")
@@ -666,7 +701,7 @@ def main():
         os.system("")
 
     FUSE(
-        CPPF(remote),
+        CPPF(remote, dircache, filecache),
         local,
         foreground=True,
         nothreads=True,
