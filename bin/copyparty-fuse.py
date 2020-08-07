@@ -47,21 +47,23 @@ dependencies (windows):
 """
 
 
-WINDOWS = sys.platform == 'win32'
+WINDOWS = sys.platform == "win32"
 
 
 def print(*args, **kwargs):
     try:
         builtins.print(*list(args), **kwargs)
     except:
-        builtins.print(termsafe(' '.join(str(x) for x in args)), **kwargs)
+        builtins.print(termsafe(" ".join(str(x) for x in args)), **kwargs)
 
 
 def termsafe(txt):
     try:
-        return txt.encode(sys.stdout.encoding, 'backslashreplace').decode(sys.stdout.encoding)
+        return txt.encode(sys.stdout.encoding, "backslashreplace").decode(
+            sys.stdout.encoding
+        )
     except:
-        return txt.encode(sys.stdout.encoding, 'replace').decode(sys.stdout.encoding)
+        return txt.encode(sys.stdout.encoding, "replace").decode(sys.stdout.encoding)
 
 
 def threadless_log(msg):
@@ -100,7 +102,12 @@ def get_tid():
 
 
 def html_dec(txt):
-    return txt.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&')
+    return (
+        txt.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+        .replace("&amp;", "&")
+    )
 
 
 class CacheNode(object):
@@ -553,71 +560,71 @@ class CPPF(Operations):
     release = None
     releasedir = None
     statfs = None
-    
+
     if False:
         # incorrect semantics but good for debugging stuff like samba and msys2
         def access(self, path, mode):
             log("@@ access [{}] [{}]".format(path, mode))
             return 1 if self.getattr(path) else 0
-        
+
         def flush(self, path, fh):
             log("@@ flush [{}] [{}]".format(path, fh))
             return True
-        
+
         def getxattr(self, *args):
-            log("@@ getxattr [{}]".format('] ['.join(str(x) for x in args)))
+            log("@@ getxattr [{}]".format("] [".join(str(x) for x in args)))
             return False
-        
+
         def listxattr(self, *args):
-            log("@@ listxattr [{}]".format('] ['.join(str(x) for x in args)))
+            log("@@ listxattr [{}]".format("] [".join(str(x) for x in args)))
             return False
-        
+
         def open(self, path, flags):
             log("@@ open [{}] [{}]".format(path, flags))
             return 42
-        
+
         def opendir(self, fh):
             log("@@ opendir [{}]".format(fh))
             return 69
-        
+
         def release(self, ino, fi):
             log("@@ release [{}] [{}]".format(ino, fi))
             return True
-        
+
         def releasedir(self, ino, fi):
             log("@@ releasedir [{}] [{}]".format(ino, fi))
             return True
-        
+
         def statfs(self, path):
             log("@@ statfs [{}]".format(path))
             return {}
 
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         # quick compat for /mingw64/bin/python3 (msys2)
         def _open(self, path):
             try:
                 x = self.getattr(path)
                 if x["st_mode"] <= 0:
                     raise Exception()
-                
+
                 self.junk_fh_ctr += 1
                 if self.junk_fh_ctr > 32000:  # TODO untested
                     self.junk_fh_ctr = 4
-                
+
                 return self.junk_fh_ctr
-            
+
             except Exception as ex:
                 log("open ERR {}".format(repr(ex)))
                 raise FuseOSError(errno.ENOENT)
-        
+
         def open(self, path, flags):
             log("open [{}] [{}]".format(path, flags))
             return self._open(path)
-        
+
         def opendir(self, path):
             log("opendir [{}]".format(path))
             return self._open(path)
-        
+
         def flush(self, path, fh):
             log("flush [{}] [{}]".format(path, fh))
 
@@ -626,7 +633,7 @@ class CPPF(Operations):
 
         def releasedir(self, ino, fi):
             log("releasedir [{}] [{}]".format(ino, fi))
-        
+
         def access(self, path, mode):
             log("access [{}] [{}]".format(path, mode))
             try:
@@ -644,7 +651,7 @@ def main():
         where = "local directory"
         if WINDOWS:
             where += " or DRIVE:"
-        
+
         print("need arg 1: " + where)
         print("need arg 2: root url")
         print()
@@ -652,13 +659,20 @@ def main():
         print("  copyparty-fuse.py ./music http://192.168.1.69:3923/music/")
         if WINDOWS:
             print("  copyparty-fuse.py M: http://192.168.1.69:3923/music/")
-        
+
         return
 
     if WINDOWS:
         os.system("")
-    
-    FUSE(CPPF(remote), local, foreground=True, nothreads=True, allow_other=True, nonempty=True)
+
+    FUSE(
+        CPPF(remote),
+        local,
+        foreground=True,
+        nothreads=True,
+        allow_other=True,
+        nonempty=True,
+    )
 
 
 if __name__ == "__main__":

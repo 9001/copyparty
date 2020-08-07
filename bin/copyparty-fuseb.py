@@ -23,9 +23,10 @@ from urllib.parse import quote_from_bytes as quote
 try:
     import fuse
     from fuse import Fuse
+
     fuse.fuse_python_api = (0, 2)
-    if not hasattr(fuse, '__version__'):
-        raise Exception('your fuse-python is way old')
+    if not hasattr(fuse, "__version__"):
+        raise Exception("your fuse-python is way old")
 except:
     print(
         "\n  could not import fuse; these may help:\n    python3 -m pip install --user fuse-python\n    apt install libfuse\n    modprobe fuse\n"
@@ -84,7 +85,12 @@ def get_tid():
 
 
 def html_dec(txt):
-    return txt.replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&amp;', '&')
+    return (
+        txt.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+        .replace("&amp;", "&")
+    )
 
 
 class CacheNode(object):
@@ -254,7 +260,7 @@ class Gateway(object):
 class CPPF(Fuse):
     def __init__(self, *args, **kwargs):
         Fuse.__init__(self, *args, **kwargs)
-        
+
         self.url = None
 
         self.dircache = []
@@ -265,7 +271,7 @@ class CPPF(Fuse):
 
     def init2(self):
         # TODO figure out how python-fuse wanted this to go
-        self.gw = Gateway(self.url) #.decode('utf-8'))
+        self.gw = Gateway(self.url)  # .decode('utf-8'))
         info("up")
 
     def clean_dircache(self):
@@ -484,28 +490,28 @@ class CPPF(Fuse):
             self.clean_dircache()
 
         return ret
-    
+
     def readdir(self, path, offset):
         for e in self._readdir(path)[offset:]:
-            #log("yield [{}]".format(e[0]))
+            # log("yield [{}]".format(e[0]))
             yield fuse.Direntry(e[0])
 
     def open(self, path, flags):
         if (flags & (os.O_RDONLY | os.O_WRONLY | os.O_RDWR)) != os.O_RDONLY:
             return -errno.EACCES
-        
+
         st = self.getattr(path)
         try:
             if st.st_nlink > 0:
                 return st
         except:
             return st  # -int(os.errcode)
-    
+
     def read(self, path, length, offset, fh=None, *args):
         if args:
             log("unexpected args [" + "] [".join(repr(x) for x in args) + "]")
             raise Exception()
-        
+
         path = path.strip("/")
 
         ofs2 = offset + length
@@ -516,7 +522,7 @@ class CPPF(Fuse):
             file_sz = st.st_size
         except:
             return st  # -int(os.errcode)
-        
+
         if ofs2 > file_sz:
             ofs2 = file_sz
             log("truncate to len {} end {}".format(ofs2 - offset, ofs2))
@@ -564,14 +570,16 @@ def main():
     server = CPPF()
     server.parser.add_option(mountopt="url", metavar="BASE_URL", default=None)
     server.parse(values=server, errex=1)
-    if not server.url or not str(server.url).startswith('http'):
-        print('\nerror:')
-        print('  need argument: -o url=<...>')
-        print('  need argument: mount-path')
-        print('example:')
-        print('  ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /mnt/nas')
+    if not server.url or not str(server.url).startswith("http"):
+        print("\nerror:")
+        print("  need argument: -o url=<...>")
+        print("  need argument: mount-path")
+        print("example:")
+        print(
+            "  ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /mnt/nas"
+        )
         sys.exit(1)
-    
+
     server.init2()
     threading.Thread(target=server.main, daemon=True).start()
     while True:
