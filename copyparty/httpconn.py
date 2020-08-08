@@ -86,7 +86,7 @@ class HttpConn(object):
                 self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
                 return
 
-        if method not in [None, b"GET ", b"HEAD", b"POST"]:
+        if method not in [None, b"GET ", b"HEAD", b"POST", b"PUT ", b"OPTI"]:
             if self.sr:
                 self.log("\033[1;31mTODO: cannot do https in jython\033[0m")
                 return

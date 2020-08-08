@@ -36,13 +36,13 @@ class HttpCli(object):
 
         self.bufsz = 1024 * 32
         self.absolute_urls = False
-        self.out_headers = {}
+        self.out_headers = {"Access-Control-Allow-Origin": "*"}
 
     def log(self, msg):
         self.log_func(self.log_src, msg)
 
     def _check_nonfatal(self, ex):
-        return ex.code in [403, 404]
+        return ex.code in [404]
 
     def _assert_safe_rem(self, rem):
         # sanity check to prevent any disasters
@@ -128,6 +128,10 @@ class HttpCli(object):
                 return self.handle_get() and self.keepalive
             elif self.mode == "POST":
                 return self.handle_post() and self.keepalive
+            elif self.mode == "PUT":
+                return self.handle_put() and self.keepalive
+            elif self.mode == "OPTIONS":
+                return self.handle_options() and self.keepalive
             else:
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
@@ -143,9 +147,7 @@ class HttpCli(object):
     def send_headers(self, length, status=200, mime=None, headers={}):
         response = ["HTTP/1.1 {} {}".format(status, HTTPCODE[status])]
 
-        if length is None:
-            self.keepalive = False
-        else:
+        if length is not None:
             response.append("Content-Length: " + str(length))
 
         # close if unknown length, otherwise take client's preference
@@ -230,6 +232,30 @@ class HttpCli(object):
 
         return self.tx_browser()
 
+    def handle_options(self):
+        self.log("OPTIONS " + self.req)
+        self.send_headers(
+            None,
+            204,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+        )
+        return True
+
+    def handle_put(self):
+        self.log("PUT " + self.req)
+
+        if self.headers.get("expect", "").lower() == "100-continue":
+            try:
+                self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
+            except:
+                raise Pebkac(400, "client d/c before 100 continue")
+
+        return self.handle_stash()
+
     def handle_post(self):
         self.log("POST " + self.req)
 
@@ -243,6 +269,9 @@ class HttpCli(object):
         if not ctype:
             raise Pebkac(400, "you can't post without a content-type header")
 
+        if "raw" in self.uparam:
+            return self.handle_stash()
+
         if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
 
@@ -254,6 +283,28 @@ class HttpCli(object):
             return self.handle_post_binary()
 
         raise Pebkac(405, "don't know how to handle {} POST".format(ctype))
+
+    def handle_stash(self):
+        remains = int(self.headers.get("content-length", None))
+        if remains is None:
+            reader = read_socket_unbounded(self.sr)
+            self.keepalive = False
+        else:
+            reader = read_socket(self.sr, remains)
+
+        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        fdir = os.path.join(vfs.realpath, rem)
+
+        addr = self.conn.addr[0].replace(":", ".")
+        fn = "put-{:.6f}-{}.bin".format(time.time(), addr)
+        path = os.path.join(fdir, fn)
+
+        with open(path, "wb", 512 * 1024) as f:
+            post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
+
+        self.log("wrote {}/{} bytes to {}".format(post_sz, remains, path))
+        self.reply("{}\n{}\n".format(post_sz, sha_b64).encode("utf-8"))
+        return True
 
     def handle_post_multipart(self):
         self.parser = MultipartParser(self.log, self.sr, self.headers)

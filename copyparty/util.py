@@ -42,6 +42,7 @@ if WINDOWS and PY2:
 
 HTTPCODE = {
     200: "OK",
+    204: "No Content",
     206: "Partial Content",
     304: "Not Modified",
     400: "Bad Request",
@@ -442,6 +443,15 @@ def read_socket(sr, total_size):
             raise Pebkac(400, "client d/c during binary post")
 
         remains -= len(buf)
+        yield buf
+
+
+def read_socket_unbounded(sr):
+    while True:
+        buf = sr.recv(32 * 1024)
+        if not buf:
+            return
+
         yield buf
 
 
