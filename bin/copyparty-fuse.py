@@ -47,6 +47,8 @@ dependencies (windows):
 """
 
 
+DEBUG = False  # ctrl-f this to configure logging
+
 WINDOWS = sys.platform == "win32"
 
 
@@ -89,12 +91,68 @@ def null_log(msg):
     pass
 
 
-# set loglevel here
-info = fancy_log
-log = fancy_log
-dbg = fancy_log
-log = null_log
-dbg = null_log
+class RecentLog(object):
+    def __init__(self):
+        self.mtx = threading.Lock()
+        self.q = []
+
+        thr = threading.Thread(target=self.printer)
+        thr.daemon = True
+        thr.start()
+
+    def put(self, msg):
+        with self.mtx:
+            self.q.append("{} {}\n".format(rice_tid(), msg))
+            if len(self.q) > 200:
+                self.q = self.q[-50:]
+
+    def printer(self):
+        while True:
+            time.sleep(0.05)
+            with self.mtx:
+                q = self.q
+                if not q:
+                    continue
+
+                self.q = []
+
+            print("".join(q), end="")
+
+
+if DEBUG:
+    # debug=on,
+    #   windows terminals are slow (cmd.exe, mintty)
+    #   otoh fancy_log beats RecentLog on linux
+    logger = RecentLog().put if WINDOWS else fancy_log
+
+    info = logger
+    log = logger
+    dbg = logger
+else:
+    # debug=off, speed is dontcare
+    info = fancy_log
+    log = null_log
+    dbg = null_log
+
+
+# [windows/cmd/cpy3]  python dev\copyparty\bin\copyparty-fuse.py q: http://192.168.1.159:1234/
+# [windows/cmd/msys2] C:\msys64\mingw64\bin\python3 dev\copyparty\bin\copyparty-fuse.py q: http://192.168.1.159:1234/
+# [windows/mty/msys2] /mingw64/bin/python3 /c/Users/ed/dev/copyparty/bin/copyparty-fuse.py q: http://192.168.1.159:1234/
+#
+# [windows] find /q/music/albums/Phant*24bit -printf '%s %p\n' | sort -n | tail -n 8 | sed -r 's/^[0-9]+ //' | while IFS= read -r x; do dd if="$x" of=/dev/null bs=4k count=8192 & done
+# [alpine]  ll t; for x in t/2020_0724_16{2,3}*; do dd if="$x" of=/dev/null bs=4k count=10240 & done
+#
+#  72.4983 windows mintty msys2 fancy_log
+# 219.5781 windows cmd msys2 fancy_log
+# nope.avi windows cmd cpy3 fancy_log
+#   9.8817 windows mintty msys2 RecentLog 200 50 0.1
+#  10.2241 windows cmd cpy3 RecentLog 200 50 0.1
+#   9.8494 windows cmd msys2 RecentLog 200 50 0.1
+#   7.8061 windows mintty msys2 fancy_log <info-only>
+#   7.9961 windows mintty msys2 RecentLog <info-only>
+#   4.2603 alpine xfce4 cpy3 RecentLog
+#   4.1538 alpine xfce4 cpy3 fancy_log
+#   3.1742 alpine urxvt cpy3 fancy_log
 
 
 def get_tid():
@@ -300,7 +358,7 @@ class CPPF(Operations):
         for n, cn in enumerate(self.filecache):
             cache_path, cache1 = cn.tag
             cache2 = cache1 + len(cn.data)
-            msg += "\n#{} |{}| {}:{} {}".format(
+            msg += "\n{:<2} {:>7} {:>10}:{:<9} {}".format(
                 n, len(cn.data), cache1, cache2, cache_path
             )
         return msg
@@ -539,8 +597,14 @@ class CPPF(Operations):
         return [".", ".."] + self._readdir(path, fh)
 
     def read(self, path, length, offset, fh=None):
-        path = path.strip("/")
+        req_max = 1024 * 1024 * 8
+        cache_max = 1024 * 1024 * 2
+        if length > req_max:
+            # windows actually doing 240 MiB read calls, sausage
+            info("truncate |{}| to {}MiB".format(length, req_max >> 20))
+            length = req_max
 
+        path = path.strip("/")
         ofs2 = offset + length
         file_sz = self.getattr(path)["st_size"]
         log("read {} |{}| {}:{} max {}".format(path, length, offset, ofs2, file_sz))
@@ -551,7 +615,7 @@ class CPPF(Operations):
         if file_sz == 0 or offset >= ofs2:
             return b""
 
-        if not self.n_filecache:
+        if not self.n_filecache or length > cache_max:
             return self.gw.download_file_range(path, offset, ofs2)
 
         return self.get_cached_file(path, offset, ofs2, file_sz)
@@ -681,10 +745,21 @@ class CPPF(Operations):
 
 
 def main():
+    # filecache helps for reads that are ~64k or smaller;
+    #   linux generally does 128k so the cache is a slowdown,
+    #   windows likes to use 4k and 64k so cache is required,
+    #   value is numChunks (~1M each) to keep in the cache
+    nf = 24 if WINDOWS else 0
+
+    # dircache is always a boost,
+    #   only want to disable it for tests etc,
+    #   value is numSec until an entry goes stale
+    nd = 1
+
     try:
         local, remote = sys.argv[1:3]
-        filecache = 16 if len(sys.argv) <= 3 else int(sys.argv[3])
-        dircache = 1 if len(sys.argv) <= 4 else float(sys.argv[4])
+        filecache = nf if len(sys.argv) <= 3 else int(sys.argv[3])
+        dircache = nd if len(sys.argv) <= 4 else float(sys.argv[4])
     except:
         where = "local directory"
         if WINDOWS:
@@ -692,8 +767,8 @@ def main():
 
         print("need arg 1: " + where)
         print("need arg 2: root url")
-        print("optional 3: num files in filecache (7)")
-        print("optional 4: num seconds / dircache (1)")
+        print("optional 3: num files in filecache ({})".format(nf))
+        print("optional 4: num seconds / dircache ({})".format(nd))
         print()
         print("example:")
         print("  copyparty-fuse.py ./music http://192.168.1.69:3923/music/")
