@@ -194,7 +194,11 @@ class Gateway(object):
     def download_file_range(self, path, ofs1, ofs2):
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
-        log("downloading {:4.0f}K, {}".format((ofs2 - ofs1) / 1024.0, hdr_range))
+        info(
+            "DL {:4.0f}K\033[36m{:>9}-{:<9}\033[0m{}".format(
+                (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, path
+            )
+        )
 
         r = self.sendreq("GET", web_path, headers={"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
@@ -366,6 +370,12 @@ class CPPF(Operations):
 
                 cache2 = cache1 + len(cn.data)
                 if get2 <= cache1 or get1 >= cache2:
+                    # request does not overlap with cached area at all
+                    continue
+
+                if get1 < cache1 and get2 > cache2:
+                    # cached area does overlap, but must specifically contain
+                    # either the first or last byte in the requested range
                     continue
 
                 if get1 >= cache1 and get2 <= cache2:
@@ -566,7 +576,7 @@ class CPPF(Operations):
             log("cache ok")
             dents = cn.data
         else:
-            log("cache miss")
+            dbg("cache miss")
             dents = self._readdir(dirpath)
 
         for cache_name, cache_stat, _ in dents:
@@ -574,7 +584,7 @@ class CPPF(Operations):
                 # dbg("=" + repr(cache_stat))
                 return cache_stat
 
-        log("=404 ({})".format(path))
+        info("=ENOENT ({})".format(path))
         raise FuseOSError(errno.ENOENT)
 
     access = None
@@ -644,24 +654,24 @@ class CPPF(Operations):
                 raise FuseOSError(errno.ENOENT)
 
         def open(self, path, flags):
-            log("open [{}] [{}]".format(path, flags))
+            dbg("open [{}] [{}]".format(path, flags))
             return self._open(path)
 
         def opendir(self, path):
-            log("opendir [{}]".format(path))
+            dbg("opendir [{}]".format(path))
             return self._open(path)
 
         def flush(self, path, fh):
-            log("flush [{}] [{}]".format(path, fh))
+            dbg("flush [{}] [{}]".format(path, fh))
 
         def release(self, ino, fi):
-            log("release [{}] [{}]".format(ino, fi))
+            dbg("release [{}] [{}]".format(ino, fi))
 
         def releasedir(self, ino, fi):
-            log("releasedir [{}] [{}]".format(ino, fi))
+            dbg("releasedir [{}] [{}]".format(ino, fi))
 
         def access(self, path, mode):
-            log("access [{}] [{}]".format(path, mode))
+            dbg("access [{}] [{}]".format(path, mode))
             try:
                 x = self.getattr(path)
                 if x["st_mode"] <= 0:
@@ -673,7 +683,7 @@ class CPPF(Operations):
 def main():
     try:
         local, remote = sys.argv[1:3]
-        filecache = 7 if len(sys.argv) <= 3 else int(sys.argv[3])
+        filecache = 16 if len(sys.argv) <= 3 else int(sys.argv[3])
         dircache = 1 if len(sys.argv) <= 4 else float(sys.argv[4])
     except:
         where = "local directory"
