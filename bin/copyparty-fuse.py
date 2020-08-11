@@ -94,6 +94,7 @@ def null_log(msg):
 class RecentLog(object):
     def __init__(self):
         self.mtx = threading.Lock()
+        self.f = None  # open("copyparty-fuse.log", "wb")
         self.q = []
 
         thr = threading.Thread(target=self.printer)
@@ -101,8 +102,13 @@ class RecentLog(object):
         thr.start()
 
     def put(self, msg):
+        msg = "{} {}\n".format(rice_tid(), msg)
+        if self.f:
+            fmsg = " ".join([datetime.utcnow().strftime("%H%M%S.%f"), str(msg)])
+            self.f.write(fmsg.encode("utf-8"))
+
         with self.mtx:
-            self.q.append("{} {}\n".format(rice_tid(), msg))
+            self.q.append(msg)
             if len(self.q) > 200:
                 self.q = self.q[-50:]
 
@@ -355,12 +361,13 @@ class CPPF(Operations):
 
     def _describe(self):
         msg = ""
-        for n, cn in enumerate(self.filecache):
-            cache_path, cache1 = cn.tag
-            cache2 = cache1 + len(cn.data)
-            msg += "\n{:<2} {:>7} {:>10}:{:<9} {}".format(
-                n, len(cn.data), cache1, cache2, cache_path
-            )
+        with self.filecache_mtx:
+            for n, cn in enumerate(self.filecache):
+                cache_path, cache1 = cn.tag
+                cache2 = cache1 + len(cn.data)
+                msg += "\n{:<2} {:>7} {:>10}:{:<9} {}".format(
+                    n, len(cn.data), cache1, cache2, cache_path
+                )
         return msg
 
     def clean_dircache(self):
@@ -414,11 +421,8 @@ class CPPF(Operations):
         car = None
         cdr = None
         ncn = -1
+        dbg("cache request {}:{} |{}|".format(get1, get2, file_sz) + self._describe())
         with self.filecache_mtx:
-            dbg(
-                "cache request {}:{} |{}|".format(get1, get2, file_sz)
-                + self._describe()
-            )
             for cn in self.filecache:
                 ncn += 1
 
@@ -513,25 +517,33 @@ class CPPF(Operations):
 
         elif cdr and (not car or len(car) < len(cdr)):
             h_end = get1 + (get2 - get1) - len(cdr)
-            h_ofs = h_end - 512 * 1024
+            h_ofs = min(get1, h_end - 512 * 1024)
 
             if h_ofs < 0:
                 h_ofs = 0
 
-            buf_ofs = (get2 - get1) - len(cdr)
+            buf_ofs = get1 - h_ofs
 
             dbg(
-                "<cache> cdr {}, car {}:{} |{}| [-{}:]".format(
+                "<cache> cdr {}, car {}:{} |{}| [{}:]".format(
                     len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs
                 )
             )
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
-            ret = buf[-buf_ofs:] + cdr
+            if len(buf) == h_end - h_ofs:
+                ret = buf[buf_ofs:] + cdr
+            else:
+                ret = buf[get1 - h_ofs :]
+                info(
+                    "remote truncated {}:{} to |{}|, will return |{}|".format(
+                        h_ofs, h_end, len(buf), len(ret)
+                    )
+                )
 
         elif car:
             h_ofs = get1 + len(car)
-            h_end = h_ofs + 1024 * 1024
+            h_end = max(get2, h_ofs + 1024 * 1024)
 
             if h_end > file_sz:
                 h_end = file_sz
@@ -548,8 +560,13 @@ class CPPF(Operations):
             ret = car + buf[:buf_ofs]
 
         else:
-            h_ofs = get1 - 256 * 1024
-            h_end = get2 + 1024 * 1024
+            if get2 - get1 <= 1024 * 1024:
+                h_ofs = get1 - 256 * 1024
+                h_end = get2 + 1024 * 1024
+            else:
+                # big enough, doesn't need pads
+                h_ofs = get1
+                h_end = get2
 
             if h_ofs < 0:
                 h_ofs = 0
@@ -615,10 +632,35 @@ class CPPF(Operations):
         if file_sz == 0 or offset >= ofs2:
             return b""
 
-        if not self.n_filecache or length > cache_max:
-            return self.gw.download_file_range(path, offset, ofs2)
+        if self.n_filecache and length <= cache_max:
+            ret = self.get_cached_file(path, offset, ofs2, file_sz)
+        else:
+            ret = self.gw.download_file_range(path, offset, ofs2)
 
-        return self.get_cached_file(path, offset, ofs2, file_sz)
+        return ret
+
+        fn = "cppf-{}-{}-{}".format(time.time(), offset, length)
+        if False:
+            with open(fn, "wb", len(ret)) as f:
+                f.write(ret)
+        elif self.n_filecache:
+            ret2 = self.gw.download_file_range(path, offset, ofs2)
+            if ret != ret2:
+                info(fn)
+                for v in [ret, ret2]:
+                    try:
+                        info(len(v))
+                    except:
+                        info("uhh " + repr(v))
+
+                with open(fn + ".bad", "wb") as f:
+                    f.write(ret)
+                with open(fn + ".good", "wb") as f:
+                    f.write(ret2)
+
+                raise Exception("cache bork")
+
+        return ret
 
     def getattr(self, path, fh=None):
         log("getattr [{}]".format(path))
@@ -748,7 +790,7 @@ def main():
     # filecache helps for reads that are ~64k or smaller;
     #   linux generally does 128k so the cache is a slowdown,
     #   windows likes to use 4k and 64k so cache is required,
-    #   value is numChunks (~1M each) to keep in the cache
+    #   value is numChunks (1~3M each) to keep in the cache
     nf = 24 if WINDOWS else 0
 
     # dircache is always a boost,

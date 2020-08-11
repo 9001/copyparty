@@ -11,7 +11,7 @@ PYTHONPATH=.. python3 -m copyparty -v /dev/shm/fusefuzz/r::r -i 127.0.0.1
 
 
 def main():
-    v = "virt"
+    v = "v"
     for n in range(5):
         with open(f"r/{n}", "wb") as f:
             f.write(b"h" * n)
