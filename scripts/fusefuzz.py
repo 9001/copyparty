@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 
 """
 mkdir -p /dev/shm/fusefuzz/{r,v}
@@ -10,15 +11,36 @@ PYTHONPATH=.. python3 -m copyparty -v /dev/shm/fusefuzz/r::r -i 127.0.0.1
 """
 
 
+def chk(fsz, rsz, ofs0, shift, ofs, rf, vf):
+    if ofs != rf.tell():
+        rf.seek(ofs)
+        vf.seek(ofs)
+
+    rb = rf.read(rsz)
+    vb = vf.read(rsz)
+
+    print(f"fsz {fsz} rsz {rsz} ofs {ofs0} shift {shift} ofs {ofs} = {len(rb)}")
+
+    if rb != vb:
+        for n, buf in enumerate([rb, vb]):
+            with open("buf." + str(n), "wb") as f:
+                f.write(buf)
+
+        raise Exception(f"{len(rb)} != {len(vb)}")
+
+    return rb, vb
+
+
 def main():
     v = "v"
     for n in range(5):
         with open(f"r/{n}", "wb") as f:
             f.write(b"h" * n)
 
+    rand = os.urandom(7919)  # prime
     for fsz in range(1024 * 1024 * 2 - 3, 1024 * 1024 * 2 + 3):
         with open("r/f", "wb", fsz) as f:
-            f.write(b"\xab" * fsz)
+            f.write((rand * int(fsz / len(rand) + 1))[:fsz])
 
         for rsz in range(64 * 1024 - 2, 64 * 1024 + 2):
             ofslist = [0, 1, 2]
@@ -48,19 +70,7 @@ def main():
 
                                 prev_ofs = ofs
 
-                                if ofs != rf.tell():
-                                    rf.seek(ofs)
-                                    vf.seek(ofs)
-
-                                rb = rf.read(rsz)
-                                vb = vf.read(rsz)
-
-                                print(
-                                    f"fsz {fsz} rsz {rsz} ofs {ofs0} shift {shift} ofs {ofs} = {len(rb)}"
-                                )
-
-                                if rb != vb:
-                                    raise Exception(f"{len(rb)} != {len(vb)}")
+                                rb, vb = chk(fsz, rsz, ofs0, shift, ofs, rf, vf)
 
                                 if not rb:
                                     break
@@ -78,28 +88,13 @@ def main():
                                 if ofs < 0 or ofs > fsz:
                                     break
 
-                                if ofs != rf.tell():
-                                    rf.seek(ofs)
-                                    vf.seek(ofs)
-
-                                rb = rf.read(rsz)
-                                vb = vf.read(rsz)
-
-                                print(
-                                    f"fsz {fsz} rsz {rsz} ofs {ofs0} shift {shift} ofs {ofs} = {len(rb)}"
-                                )
-
-                                if rb != vb:
-                                    raise Exception(f"{len(rb)} != {len(vb)}")
+                                rb, vb = chk(fsz, rsz, ofs0, shift, ofs, rf, vf)
 
                                 ofs -= rsz
+
+        # bumping fsz, sleep away the dentry cache in cppf
+        time.sleep(1)
 
 
 if __name__ == "__main__":
     main()
-
-
-"""
-f() { cat virt/{1,2,AAAAAAAAAAAAA}; echo; dd if=virt/f bs=${1} | cmp r/f; }
-901120
-"""
