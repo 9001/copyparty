@@ -1062,6 +1062,17 @@ class HttpCli(object):
                 with open(fsenc(fn), "rb") as f:
                     logues[n] = f.read().decode("utf-8")
 
+        if False:
+            # this is a mistake
+            md = None
+            for fn in [x[2] for x in files]:
+                if fn.lower() == "readme.md":
+                    fn = os.path.join(abspath, fn)
+                    with open(fn, "rb") as f:
+                        md = f.read().decode("utf-8")
+
+                    break
+
         ts = ""
         # ts = "?{}".format(time.time())
 

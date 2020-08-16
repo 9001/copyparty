@@ -1,8 +1,15 @@
 # copyparty-fuse.py
 * mount a copyparty server as a local filesystem (read-only)
-* **supports Linux** -- expect `117 MiB/s` sequential read over wifi
-* **supports Windows!** -- expect `87 MiB/s` sequential read over wifi
-* **supports macos** -- expect `17 MiB/s` sequential read over wifi
+* **supports Windows!** -- expect `194 MiB/s` sequential read
+* **supports Linux** -- expect `117 MiB/s` sequential read
+* **supports macos** -- expect `85 MiB/s` sequential read
+
+filecache is default-on for windows and macos;
+* macos readsize is 64kB, so speed ~32 MiB/s without the cache
+* windows readsize varies by software; explorer=1M, pv=32k
+
+note that copyparty should run with `-ed` to enable dotfiles (hidden otherwise)
+
 
 ## to run this on windows:
 * install [winfsp](https://github.com/billziss-gh/winfsp/releases/latest) and [python 3](https://www.python.org/downloads/)

@@ -559,6 +559,11 @@ function md_p_jump(down) {
             save();
             return false;
         }
+        if (ev.code == "Escape" || kc == 27) {
+            var d = document.getElementById('helpclose');
+            if (d)
+                d.click();
+        }
         if (document.activeElement == dom_src) {
             if (ev.code == "Tab" || kc == 9) {
                 md_indent(ev.shiftKey);

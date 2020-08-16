@@ -7,6 +7,21 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
+
+"""
+mount a copyparty server (local or remote) as a filesystem
+
+usage:
+  python copyparty-fuse.py ./music http://192.168.1.69:3923/
+
+dependencies:
+  python3 -m pip install --user fusepy
+  + on Linux: sudo apk add fuse
+  + on Macos: https://osxfuse.github.io/
+  + on Windows: https://github.com/billziss-gh/winfsp/releases/latest
+"""
+
+
 import re
 import os
 import sys
@@ -15,6 +30,7 @@ import stat
 import errno
 import struct
 import builtins
+import platform
 import threading
 import traceback
 import http.client  # py2: httplib
@@ -22,34 +38,31 @@ import urllib.parse
 from datetime import datetime
 from urllib.parse import quote_from_bytes as quote
 
-try:
-    from fuse import FUSE, FuseOSError, Operations
-except:
-    print(
-        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fusepy\n    apt install libfuse\n    modprobe fuse\n"
-    )
-    raise
-
-
-"""
-mount a copyparty server (local or remote) as a filesystem
-
-usage:
-  python copyparty-fuse.py ./music http://192.168.1.69:3923/
-
-dependencies (linux/macos):
-  sudo apk add fuse
-  python3 -m pip install --user fusepy
-
-dependencies (windows):
-  https://github.com/billziss-gh/winfsp/releases/latest
-  python3 -m pip install --user fusepy
-"""
-
 
 DEBUG = False  # ctrl-f this to configure logging
 
+
 WINDOWS = sys.platform == "win32"
+MACOS = platform.system() == "Darwin"
+
+
+try:
+    from fuse import FUSE, FuseOSError, Operations
+except:
+    if WINDOWS:
+        libfuse = "install https://github.com/billziss-gh/winfsp/releases/latest"
+    elif MACOS:
+        libfuse = "install https://osxfuse.github.io/"
+    else:
+        libfuse = "apt install libfuse\n    modprobe fuse"
+
+    print(
+        "\n  could not import fuse; these may help:"
+        + "\n    python3 -m pip install --user fusepy\n    "
+        + libfuse
+        + "\n"
+    )
+    raise
 
 
 def print(*args, **kwargs):
@@ -791,7 +804,7 @@ def main():
     #   linux generally does 128k so the cache is a slowdown,
     #   windows likes to use 4k and 64k so cache is required,
     #   value is numChunks (1~3M each) to keep in the cache
-    nf = 24 if WINDOWS else 0
+    nf = 24 if WINDOWS or MACOS else 0
 
     # dircache is always a boost,
     #   only want to disable it for tests etc,
@@ -822,14 +835,17 @@ def main():
     if WINDOWS:
         os.system("")
 
-    FUSE(
-        CPPF(remote, dircache, filecache),
-        local,
-        foreground=True,
-        nothreads=True,
-        allow_other=True,
-        nonempty=True,
-    )
+    try:
+        with open("/etc/fuse.conf", "rb") as f:
+            allow_other = b"\nuser_allow_other" in f.read()
+    except:
+        allow_other = WINDOWS or MACOS
+
+    args = {"foreground": True, "nothreads": True, "allow_other": allow_other}
+    if not MACOS:
+        args["nonempty"] = True
+
+    FUSE(CPPF(remote, dircache, filecache), local, **args)
 
 
 if __name__ == "__main__":
