@@ -131,6 +131,17 @@ a {
 .logue {
 	padding: .2em 1.5em;
 }
+#srv_info {
+	opacity: .5;
+	font-size: .8em;
+	color: #fc5;
+	position: absolute;
+	top: .5em;
+	left: 2em;
+}
+#srv_info span {
+	color: #fff;
+}
 a.play {
 	color: #e70;
 }

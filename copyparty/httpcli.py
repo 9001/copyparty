@@ -6,6 +6,7 @@ import stat
 import gzip
 import time
 import json
+import socket
 from datetime import datetime
 import calendar
 
@@ -1076,6 +1077,27 @@ class HttpCli(object):
 
                     break
 
+        srv_info = []
+        
+        try:
+            if not self.args.nih:
+                srv_info.append(str(socket.gethostname()).split('.')[0])
+        except:
+            self.log("#wow #whoa")
+            pass
+
+        try:
+            # some fuses misbehave
+            if not self.args.nid:
+                sv = os.statvfs(abspath)
+                free = humansize(sv.f_frsize * sv.f_bfree, True)
+                total = humansize(sv.f_frsize * sv.f_blocks, True)
+                
+                srv_info.append(free + " free")
+                srv_info.append(total)
+        except:
+            pass
+
         ts = ""
         # ts = "?{}".format(time.time())
 
@@ -1090,6 +1112,7 @@ class HttpCli(object):
             prologue=logues[0],
             epilogue=logues[1],
             title=html_escape(self.vpath, quote=False),
+            srv_info='</span> /// <span>'.join(srv_info)
         )
         self.reply(html.encode("utf-8", "replace"))
         return True

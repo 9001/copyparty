@@ -53,6 +53,10 @@
 
     <h2><a href="?h">control-panel</a></h2>
 
+    {%- if srv_info %}
+    <div id="srv_info"><span>{{ srv_info }}</span></div>
+    {%- endif %}
+
     <div id="widget">
         <div id="wtoggle">♫</div>
         <div id="widgeti">

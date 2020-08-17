@@ -334,6 +334,21 @@ def read_header(sr):
         return ret[:ofs].decode("utf-8", "surrogateescape").split("\r\n")
 
 
+def humansize(sz, terse=False):
+    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
+        if sz < 1024:
+            break
+         
+        sz /= 1024
+   
+    ret = ' '.join([str(sz)[:4].rstrip('.'), unit])
+    
+    if not terse:
+        return ret
+    
+    return ret.replace('iB', '').replace(' ', '')
+
+
 def undot(path):
     ret = []
     for node in path.split("/"):
