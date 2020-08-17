@@ -221,7 +221,7 @@ function save(e) {
         save_cls = save_btn.getAttribute('class') + '';
 
     if (save_cls.indexOf('disabled') >= 0) {
-        alert('there is nothing to save');
+        toast('font-size:2em;color:#fc6;width:9em;', 'no changes');
         return;
     }
 
@@ -238,7 +238,7 @@ function save(e) {
     fd.append("lastmod", (force ? -1 : last_modified));
     fd.append("body", txt);
 
-    var url = (document.location + '').split('?')[0] + '?raw';
+    var url = (document.location + '').split('?')[0];
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
     xhr.responseType = 'text';
@@ -325,10 +325,14 @@ function save_chk() {
     last_modified = this.lastmod;
     server_md = this.txt;
     draw_md();
+    toast('font-size:6em;font-family:serif;color:#cf6;width:4em;', 'OK✔️');
+}
 
+function toast(style, msg) {
     var ok = document.createElement('div');
-    ok.setAttribute('style', 'font-size:6em;font-family:serif;font-weight:bold;color:#cf6;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);width:4em;text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1');
-    ok.innerHTML = 'OK✔️';
+    style += 'font-weight:bold;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1';
+    ok.setAttribute('style', style);
+    ok.innerHTML = msg;
     var parent = document.getElementById('m');
     document.documentElement.appendChild(ok);
     setTimeout(function () {
@@ -520,6 +524,30 @@ function md_backspace() {
 }
 
 
+// paragraph jump
+function md_p_jump(down) {
+    var ofs = dom_src.selectionStart;
+    var txt = dom_src.value;
+
+    if (down) {
+        while (txt[ofs] == '\n' && --ofs > 0);
+        ofs = txt.indexOf("\n\n", ofs);
+        if (ofs < 0)
+            ofs = txt.length - 1;
+
+        while (txt[ofs] == '\n' && ++ofs < txt.length - 1);
+    }
+    else {
+        txt += '\n\n';
+        while (ofs > 1 && txt[ofs - 1] == '\n') ofs--;
+        ofs = Math.max(0, txt.lastIndexOf("\n\n", ofs - 1));
+        while (txt[ofs] == '\n' && ++ofs < txt.length - 1);
+    }
+
+    dom_src.setSelectionRange(ofs, ofs, "none");
+}
+
+
 // hotkeys / toolbar
 (function () {
     function keydown(ev) {
@@ -561,6 +589,12 @@ function md_backspace() {
             }
             if (!ctrl && !ev.shiftKey && kc == 8) {
                 return md_backspace();
+            }
+            var up = ev.code == "ArrowUp" || kc == 38;
+            var dn = ev.code == "ArrowDown" || kc == 40;
+            if (ctrl && (up || dn)) {
+                md_p_jump(dn);
+                return false;
             }
         }
     }
