@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 5, 0)
+VERSION = (0, 5, 1)
 CODENAME = "fuse jelly"
 BUILD_DT = (2020, 8, 17)
 
