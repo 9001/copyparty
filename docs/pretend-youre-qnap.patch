@@ -1,0 +1,35 @@
+diff --git a/copyparty/httpcli.py b/copyparty/httpcli.py
+index 2d3c1ad..e1e85a0 100644
+--- a/copyparty/httpcli.py
++++ b/copyparty/httpcli.py
+@@ -864,6 +864,30 @@ class HttpCli(object):
+         #
+         # send reply
+ 
++        try:
++            fakefn = self.conn.hsrv.fakefn
++            fakectr = self.conn.hsrv.fakectr
++            fakedata = self.conn.hsrv.fakedata
++        except:
++            fakefn = b''
++            fakectr = 0
++            fakedata = b''
++        
++        self.log('\n{} {}\n{}'.format(fakefn, fakectr, open_args[0]))
++        if fakefn == open_args[0] and fakectr > 0:
++            self.reply(fakedata, mime=guess_mime(req_path)[0])
++            self.conn.hsrv.fakectr = fakectr - 1
++        else:
++            with open_func(*open_args) as f:
++                fakedata = f.read()
++            
++            self.conn.hsrv.fakefn = open_args[0]
++            self.conn.hsrv.fakedata = fakedata
++            self.conn.hsrv.fakectr = 15
++            self.reply(fakedata, mime=guess_mime(req_path)[0])
++        
++        return True
++
+         self.out_headers["Accept-Ranges"] = "bytes"
+         self.send_headers(
+             length=upper - lower,

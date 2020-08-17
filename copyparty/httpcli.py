@@ -864,6 +864,9 @@ class HttpCli(object):
         #
         # send reply
 
+        if not is_compressed:
+            self.out_headers["Cache-Control"] = "no-cache"
+        
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(
             length=upper - lower,

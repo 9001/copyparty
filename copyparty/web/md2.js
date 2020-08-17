@@ -289,19 +289,24 @@ function save_cb() {
     this.btn.classList.remove('force-save');
     //alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
 
+    run_savechk(r.lastmod, this.txt, this.btn, 0);
+}
+
+function run_savechk(lastmod, txt, btn, ntry) {
     // download the saved doc from the server and compare
-    var url = (document.location + '').split('?')[0] + '?raw';
+    var url = (document.location + '').split('?')[0] + '?raw&_=' + new Date().getTime();
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
-    xhr.onreadystatechange = save_chk;
-    xhr.btn = this.save_btn;
-    xhr.txt = this.txt;
-    xhr.lastmod = r.lastmod;
+    xhr.onreadystatechange = savechk_cb;
+    xhr.lastmod = lastmod;
+    xhr.txt = txt;
+    xhr.btn = btn;
+    xhr.ntry = ntry;
     xhr.send();
 }
 
-function save_chk() {
+function savechk_cb() {
     if (this.readyState != XMLHttpRequest.DONE)
         return;
 
@@ -313,6 +318,14 @@ function save_chk() {
     var doc1 = this.txt.replace(/\r\n/g, "\n");
     var doc2 = this.responseText.replace(/\r\n/g, "\n");
     if (doc1 != doc2) {
+        var that = this;
+        if (that.ntry < 10) {
+            // qnap funny, try a few more times
+            setTimeout(function () {
+                run_savechk(that.lastmod, that.txt, that.btn, that.ntry + 1)
+            }, 100);
+            return;
+        }
         alert(
             'Error! The document on the server does not appear to have saved correctly (your editor contents and the server copy is not identical). Place the document on your clipboard for now and check the server logs for hints\n\n' +
             'Length: yours=' + doc1.length + ', server=' + doc2.length
@@ -325,7 +338,8 @@ function save_chk() {
     last_modified = this.lastmod;
     server_md = this.txt;
     draw_md();
-    toast('font-size:6em;font-family:serif;color:#cf6;width:4em;', 'OK✔️');
+    toast('font-size:6em;font-family:serif;color:#cf6;width:4em;',
+        'OK✔️<span style="font-size:.2em;color:#999">' + this.ntry + '</span>');
 }
 
 function toast(style, msg) {
