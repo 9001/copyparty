@@ -667,7 +667,16 @@ class HttpCli(object):
 
         # if file exists, chekc that timestamp matches the client's
         if srv_lastmod >= 0:
-            if cli_lastmod3 not in [-1, srv_lastmod3]:
+            same_lastmod = cli_lastmod3 in [-1, srv_lastmod3]
+            if not same_lastmod:
+                # some filesystems/transports limit precision to 1sec, hopefully floored
+                same_lastmod = (
+                    srv_lastmod == int(srv_lastmod)
+                    and cli_lastmod3 > srv_lastmod3
+                    and cli_lastmod3 - srv_lastmod3 < 1000
+                )
+
+            if not same_lastmod:
                 response = json.dumps(
                     {
                         "ok": False,
