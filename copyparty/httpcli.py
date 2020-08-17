@@ -7,6 +7,7 @@ import gzip
 import time
 import json
 import socket
+import ctypes
 from datetime import datetime
 import calendar
 
@@ -867,7 +868,7 @@ class HttpCli(object):
 
         if not is_compressed:
             self.out_headers["Cache-Control"] = "no-cache"
-        
+
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(
             length=upper - lower,
@@ -1078,10 +1079,10 @@ class HttpCli(object):
                     break
 
         srv_info = []
-        
+
         try:
             if not self.args.nih:
-                srv_info.append(str(socket.gethostname()).split('.')[0])
+                srv_info.append(str(socket.gethostname()).split(".")[0])
         except:
             self.log("#wow #whoa")
             pass
@@ -1089,12 +1090,19 @@ class HttpCli(object):
         try:
             # some fuses misbehave
             if not self.args.nid:
-                sv = os.statvfs(abspath)
-                free = humansize(sv.f_frsize * sv.f_bfree, True)
-                total = humansize(sv.f_frsize * sv.f_blocks, True)
-                
-                srv_info.append(free + " free")
-                srv_info.append(total)
+                if WINDOWS:
+                    bfree = ctypes.c_ulonglong(0)
+                    ctypes.windll.kernel32.GetDiskFreeSpaceExW(
+                        ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
+                    )
+                    srv_info.append(humansize(bfree.value) + " free")
+                else:
+                    sv = os.statvfs(abspath)
+                    free = humansize(sv.f_frsize * sv.f_bfree, True)
+                    total = humansize(sv.f_frsize * sv.f_blocks, True)
+
+                    srv_info.append(free + " free")
+                    srv_info.append(total)
         except:
             pass
 
@@ -1112,7 +1120,7 @@ class HttpCli(object):
             prologue=logues[0],
             epilogue=logues[1],
             title=html_escape(self.vpath, quote=False),
-            srv_info='</span> /// <span>'.join(srv_info)
+            srv_info="</span> /// <span>".join(srv_info),
         )
         self.reply(html.encode("utf-8", "replace"))
         return True
