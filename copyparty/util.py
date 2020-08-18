@@ -339,7 +339,7 @@ def humansize(sz, terse=False):
         if sz < 1024:
             break
          
-        sz /= 1024
+        sz /= 1024.
    
     ret = ' '.join([str(sz)[:4].rstrip('.'), unit])
     
