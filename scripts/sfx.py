@@ -191,6 +191,16 @@ def makesfx(tar_src, ver, ts):
 # skip 0
 
 
+def u8(gen):
+    try:
+        for s in gen:
+            yield s.decode("utf-8", "ignore")
+    except:
+        yield s
+        for s in gen:
+            yield s
+
+
 def get_py_win(ret):
     tops = []
     p = str(os.getenv("LocalAppdata"))
@@ -216,11 +226,11 @@ def get_py_win(ret):
     # $WIRESHARK_SLOGAN
     for top in tops:
         try:
-            for name1 in sorted(os.listdir(top), reverse=True):
+            for name1 in u8(sorted(os.listdir(top), reverse=True)):
                 if name1.lower().startswith("python"):
                     path1 = os.path.join(top, name1)
                     try:
-                        for name2 in os.listdir(path1):
+                        for name2 in u8(os.listdir(path1)):
                             if name2.lower() == "python.exe":
                                 path2 = os.path.join(path1, name2)
                                 ret[path2.lower()] = path2
@@ -237,7 +247,7 @@ def get_py_nix(ret):
             next
 
         try:
-            for fn in os.listdir(bindir):
+            for fn in u8(os.listdir(bindir)):
                 if ptn.match(fn):
                     fn = os.path.join(bindir, fn)
                     ret[fn.lower()] = fn
@@ -352,7 +362,7 @@ def unpack():
             msg("reloc fail,", mine)
             return mine
 
-    for fn in os.listdir(top):
+    for fn in u8(os.listdir(top)):
         if fn.startswith(name) and fn not in [name, withpid]:
             try:
                 old = os.path.join(top, fn)
