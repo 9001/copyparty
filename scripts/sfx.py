@@ -2,7 +2,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re, os, sys, stat, time, shutil, tarfile, hashlib, platform, tempfile
+import re, os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile
 import subprocess as sp
 
 """
@@ -29,6 +29,7 @@ STAMP = None
 PY2 = sys.version_info[0] == 2
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
+cpp = None
 
 
 def eprint(*args, **kwargs):
@@ -305,17 +306,19 @@ def hashfile(fn):
 def unpack():
     """unpacks the tar yielded by `data`"""
     name = "pe-copyparty"
+    tag = "v" + str(STAMP)
     withpid = "{}.{}".format(name, os.getpid())
     top = tempfile.gettempdir()
     final = os.path.join(top, name)
     mine = os.path.join(top, withpid)
     tar = os.path.join(mine, "tar")
-    tag_mine = os.path.join(mine, "v" + str(STAMP))
-    tag_final = os.path.join(final, "v" + str(STAMP))
 
-    if os.path.exists(tag_final):
-        msg("found early")
-        return final
+    try:
+        if tag in os.listdir(final):
+            msg("found early")
+            return final
+    except:
+        pass
 
     nwrite = 0
     os.mkdir(mine)
@@ -338,12 +341,15 @@ def unpack():
 
     os.remove(tar)
 
-    with open(tag_mine, "wb") as f:
+    with open(os.path.join(mine, tag), "wb") as f:
         f.write(b"h\n")
 
-    if os.path.exists(tag_final):
-        msg("found late")
-        return final
+    try:
+        if tag in os.listdir(final):
+            msg("found late")
+            return final
+    except:
+        pass
 
     try:
         if os.path.islink(final):
@@ -428,10 +434,15 @@ def get_payload():
 def confirm():
     msg()
     msg("*** hit enter to exit ***")
-    raw_input() if PY2 else input()
+    try:
+        raw_input() if PY2 else input()
+    except:
+        pass
 
 
 def run(tmp, py):
+    global cpp
+
     msg("OK")
     msg("will use:", py)
     msg("bound to:", tmp)
@@ -447,8 +458,11 @@ def run(tmp, py):
         pass
 
     fp_py = os.path.join(tmp, "py")
-    with open(fp_py, "wb") as f:
-        f.write(py.encode("utf-8") + b"\n")
+    try:
+        with open(fp_py, "wb") as f:
+            f.write(py.encode("utf-8") + b"\n")
+    except:
+        pass
 
     # avoid loading ./copyparty.py
     cmd = [
@@ -460,16 +474,21 @@ def run(tmp, py):
     ] + list(sys.argv[1:])
 
     msg("\n", cmd, "\n")
-    p = sp.Popen(str(x) for x in cmd)
+    cpp = sp.Popen(str(x) for x in cmd)
     try:
-        p.wait()
+        cpp.wait()
     except:
-        p.wait()
+        cpp.wait()
 
-    if p.returncode != 0:
+    if cpp.returncode != 0:
         confirm()
 
-    sys.exit(p.returncode)
+    sys.exit(cpp.returncode)
+
+
+def bye(sig, frame):
+    if cpp is not None:
+        cpp.terminate()
 
 
 def main():
@@ -503,6 +522,8 @@ def main():
         return makesfx(tar, ver, ts)
 
     # skip 0
+
+    signal.signal(signal.SIGTERM, bye)
 
     tmp = unpack()
     fp_py = os.path.join(tmp, "py")
