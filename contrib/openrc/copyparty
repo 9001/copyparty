@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+
+# this will start `/usr/local/bin/copyparty-sfx.py`
+# and share '/mnt' with anonymous read+write
+#
+# installation:
+#   cp -pv copyparty /etc/init.d && rc-update add copyparty
+#
+# you may want to:
+#   change '/usr/bin/python' to another interpreter
+#   change '/mnt::a' to another location or permission-set
+
+name="$SVCNAME"
+command_background=true
+pidfile="/var/run/$SVCNAME.pid"
+
+command="/usr/bin/python /usr/local/bin/copyparty-sfx.py"
+command_args="-q -v /mnt::a"

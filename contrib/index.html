@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>⇆🎉 redirect</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<style>
+
+html, body {
+	font-family: sans-serif;
+}
+body {
+	padding: 1em 2em;
+	font-size: 1.5em;
+}
+a {
+	font-size: 1.2em;
+	padding: .1em;
+}
+
+</style>
+</head>
+<body>
+	<span id="desc">you probably want</span> <a id="redir" href="//10.13.1.1:3923/">copyparty</a>
+	<script>
+
+var a = document.getElementById('redir'),
+	proto = window.location.protocol.indexOf('https') === 0 ? 'https' : 'http',
+	loc = window.location.hostname || '127.0.0.1',
+	port = a.getAttribute('href').split(':').pop().split('/')[0],
+	url = proto + '://' + loc + ':' + port + '/';
+
+a.setAttribute('href', url);
+document.getElementById('desc').innerHTML = 'redirecting to';
+
+setTimeout(function() {
+	window.location.href = url;
+}, 500);
+
+</script>
+</body>
+</html>
