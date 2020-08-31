@@ -19,6 +19,9 @@ dependencies:
   + on Linux: sudo apk add fuse
   + on Macos: https://osxfuse.github.io/
   + on Windows: https://github.com/billziss-gh/winfsp/releases/latest
+
+get server cert:
+  awk '/-BEGIN CERTIFICATE-/ {a=1} a; /-END CERTIFICATE-/{exit}' <(openssl s_client -connect 127.0.0.1:3923 </dev/null 2>/dev/null) >cert.pem
 """
 
 
@@ -31,6 +34,7 @@ import errno
 import struct
 import builtins
 import platform
+import argparse
 import threading
 import traceback
 import http.client  # py2: httplib
@@ -39,11 +43,9 @@ from datetime import datetime
 from urllib.parse import quote_from_bytes as quote
 
 
-DEBUG = False  # ctrl-f this to configure logging
-
-
 WINDOWS = sys.platform == "win32"
 MACOS = platform.system() == "Darwin"
+info = log = dbg = None
 
 
 try:
@@ -138,22 +140,6 @@ class RecentLog(object):
             print("".join(q), end="")
 
 
-if DEBUG:
-    # debug=on,
-    #   windows terminals are slow (cmd.exe, mintty)
-    #   otoh fancy_log beats RecentLog on linux
-    logger = RecentLog().put if WINDOWS else fancy_log
-
-    info = logger
-    log = logger
-    dbg = logger
-else:
-    # debug=off, speed is dontcare
-    info = fancy_log
-    log = null_log
-    dbg = null_log
-
-
 # [windows/cmd/cpy3]  python dev\copyparty\bin\copyparty-fuse.py q: http://192.168.1.159:1234/
 # [windows/cmd/msys2] C:\msys64\mingw64\bin\python3 dev\copyparty\bin\copyparty-fuse.py q: http://192.168.1.159:1234/
 # [windows/mty/msys2] /mingw64/bin/python3 /c/Users/ed/dev/copyparty/bin/copyparty-fuse.py q: http://192.168.1.159:1234/
@@ -195,10 +181,11 @@ class CacheNode(object):
 
 
 class Gateway(object):
-    def __init__(self, base_url):
-        self.base_url = base_url
+    def __init__(self, ar):
+        self.base_url = ar.base_url
+        self.password = ar.a
 
-        ui = urllib.parse.urlparse(base_url)
+        ui = urllib.parse.urlparse(self.base_url)
         self.web_root = ui.path.strip("/")
         try:
             self.web_host, self.web_port = ui.netloc.split(":")
@@ -208,9 +195,20 @@ class Gateway(object):
             if ui.scheme == "http":
                 self.web_port = 80
             elif ui.scheme == "https":
-                raise Exception("todo")
+                self.web_port = 443
             else:
                 raise Exception("bad url?")
+
+        self.ssl_context = None
+        self.use_tls = ui.scheme.lower() == "https"
+        if self.use_tls:
+            import ssl
+
+            if ar.td:
+                self.ssl_context = ssl._create_unverified_context()
+            elif ar.te:
+                self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                self.ssl_context.load_verify_locations(ar.te)
 
         self.conns = {}
 
@@ -226,7 +224,15 @@ class Gateway(object):
         except:
             info("new conn [{}] [{}]".format(self.web_host, self.web_port))
 
-            conn = http.client.HTTPConnection(self.web_host, self.web_port, timeout=260)
+            args = {}
+            if not self.use_tls:
+                C = http.client.HTTPConnection
+            else:
+                C = http.client.HTTPSConnection
+                if self.ssl_context:
+                    args = {"context": self.ssl_context}
+
+            conn = C(self.web_host, self.web_port, timeout=260, **args)
 
             self.conns[tid] = conn
             return conn
@@ -239,33 +245,53 @@ class Gateway(object):
         except:
             pass
 
-    def sendreq(self, *args, **kwargs):
+    def sendreq(self, *args, headers={}, **kwargs):
         tid = get_tid()
+        if self.password:
+            headers["Cookie"] = "=".join(["cppwd", self.password])
+
         try:
             c = self.getconn(tid)
-            c.request(*list(args), **kwargs)
+            c.request(*list(args), headers=headers, **kwargs)
             return c.getresponse()
         except:
-            self.closeconn(tid)
+            dbg("bad conn")
+
+        self.closeconn(tid)
+        try:
             c = self.getconn(tid)
-            c.request(*list(args), **kwargs)
+            c.request(*list(args), headers=headers, **kwargs)
             return c.getresponse()
+        except:
+            info("http connection failed:\n" + traceback.format_exc())
+            if self.use_tls and not self.ssl_context:
+                import ssl
+
+                cert = ssl.get_server_certificate((self.web_host, self.web_port))
+                info("server certificate probably not trusted:\n" + cert)
+
+            raise
 
     def listdir(self, path):
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots"
         r = self.sendreq("GET", web_path)
         if r.status != 200:
             self.closeconn()
-            raise Exception(
+            log(
                 "http error {} reading dir {} in {}".format(
                     r.status, web_path, rice_tid()
                 )
             )
+            raise FuseOSError(errno.ENOENT)
+
+        if not r.getheader("Content-Type", "").startswith("text/html"):
+            log("listdir on file: {}".format(path))
+            raise FuseOSError(errno.ENOENT)
 
         try:
             return self.parse_html(r)
         except:
-            traceback.print_exc()
+            info(repr(path) + "\n" + traceback.format_exc())
             raise
 
     def download_file_range(self, path, ofs1, ofs2):
@@ -358,11 +384,11 @@ class Gateway(object):
 
 
 class CPPF(Operations):
-    def __init__(self, base_url, dircache, filecache):
-        self.gw = Gateway(base_url)
+    def __init__(self, ar):
+        self.gw = Gateway(ar)
         self.junk_fh_ctr = 3
-        self.n_dircache = dircache
-        self.n_filecache = filecache
+        self.n_dircache = ar.cd
+        self.n_filecache = ar.cf
 
         self.dircache = []
         self.dircache_mtx = threading.Lock()
@@ -799,7 +825,15 @@ class CPPF(Operations):
                 raise FuseOSError(errno.ENOENT)
 
 
+class TheArgparseFormatter(
+    argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
+):
+    pass
+
+
 def main():
+    global info, log, dbg
+
     # filecache helps for reads that are ~64k or smaller;
     #   linux generally does 128k so the cache is a slowdown,
     #   windows likes to use 4k and 64k so cache is required,
@@ -811,26 +845,46 @@ def main():
     #   value is numSec until an entry goes stale
     nd = 1
 
-    try:
-        local, remote = sys.argv[1:3]
-        filecache = nf if len(sys.argv) <= 3 else int(sys.argv[3])
-        dircache = nd if len(sys.argv) <= 4 else float(sys.argv[4])
-    except:
-        where = "local directory"
-        if WINDOWS:
-            where += " or DRIVE:"
+    where = "local directory"
+    if WINDOWS:
+        where += " or DRIVE:"
 
-        print("need arg 1: " + where)
-        print("need arg 2: root url")
-        print("optional 3: num files in filecache ({})".format(nf))
-        print("optional 4: num seconds / dircache ({})".format(nd))
-        print()
-        print("example:")
-        print("  copyparty-fuse.py ./music http://192.168.1.69:3923/music/")
-        if WINDOWS:
-            print("  copyparty-fuse.py M: http://192.168.1.69:3923/music/")
+    ex_pre = "\n  " + os.path.basename(__file__) + "  "
+    examples = ["http://192.168.1.69:3923/music/  ./music"]
+    if WINDOWS:
+        examples.append("http://192.168.1.69:3923/music/  M:")
 
-        return
+    ap = argparse.ArgumentParser(
+        formatter_class=TheArgparseFormatter,
+        epilog="example:" + ex_pre + ex_pre.join(examples),
+    )
+    ap.add_argument(
+        "-cd", metavar="NUM_SECONDS", type=float, default=nd, help="directory cache"
+    )
+    ap.add_argument(
+        "-cf", metavar="NUM_BLOCKS", type=int, default=nf, help="file cache"
+    )
+    ap.add_argument("-a", metavar="PASSWORD", help="password")
+    ap.add_argument("-d", action="store_true", help="enable debug")
+    ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
+    ap.add_argument("-td", action="store_true", help="disable certificate check")
+    ap.add_argument("base_url", type=str, help="remote copyparty URL to mount")
+    ap.add_argument("local_path", type=str, help=where + " to mount it on")
+    ar = ap.parse_args()
+
+    if ar.d:
+        # windows terminals are slow (cmd.exe, mintty)
+        # otoh fancy_log beats RecentLog on linux
+        logger = RecentLog().put if WINDOWS else fancy_log
+
+        info = logger
+        log = logger
+        dbg = logger
+    else:
+        # debug=off, speed is dontcare
+        info = fancy_log
+        log = null_log
+        dbg = null_log
 
     if WINDOWS:
         os.system("")
@@ -845,7 +899,7 @@ def main():
     if not MACOS:
         args["nonempty"] = True
 
-    FUSE(CPPF(remote, dircache, filecache), local, **args)
+    FUSE(CPPF(ar), ar.local_path, **args)
 
 
 if __name__ == "__main__":
