@@ -32,6 +32,7 @@ import time
 import stat
 import errno
 import struct
+import codecs
 import builtins
 import platform
 import argparse
@@ -41,7 +42,7 @@ import http.client  # py2: httplib
 import urllib.parse
 from datetime import datetime
 from urllib.parse import quote_from_bytes as quote
-
+from urllib.parse import unquote_to_bytes as unquote
 
 WINDOWS = sys.platform == "win32"
 MACOS = platform.system() == "Darwin"
@@ -104,6 +105,47 @@ def fancy_log(msg):
 
 def null_log(msg):
     pass
+
+
+def hexler(binary):
+    return binary.replace("\r", "\\r").replace("\n", "\\n")
+    return " ".join(["{}\033[36m{:02x}\033[0m".format(b, ord(b)) for b in binary])
+    return " ".join(map(lambda b: format(ord(b), "02x"), binary))
+
+
+def register_wtf8():
+    def wtf8_enc(text):
+        return str(text).encode("utf-8", "surrogateescape"), len(text)
+
+    def wtf8_dec(binary):
+        return bytes(binary).decode("utf-8", "surrogateescape"), len(binary)
+
+    def wtf8_search(encoding_name):
+        return codecs.CodecInfo(wtf8_enc, wtf8_dec, name="wtf-8")
+
+    codecs.register(wtf8_search)
+
+
+bad_good = {}
+good_bad = {}
+
+
+def enwin(txt):
+    return "".join([bad_good.get(x, x) for x in txt])
+
+    for bad, good in bad_good.items():
+        txt = txt.replace(bad, good)
+
+    return txt
+
+
+def dewin(txt):
+    return "".join([good_bad.get(x, x) for x in txt])
+
+    for bad, good in bad_good.items():
+        txt = txt.replace(good, bad)
+
+    return txt
 
 
 class RecentLog(object):
@@ -169,6 +211,8 @@ def html_dec(txt):
         txt.replace("&lt;", "<")
         .replace("&gt;", ">")
         .replace("&quot;", '"')
+        .replace("&#13;", "\r")
+        .replace("&#10;", "\n")
         .replace("&amp;", "&")
     )
 
@@ -213,8 +257,7 @@ class Gateway(object):
         self.conns = {}
 
     def quotep(self, path):
-        # TODO: mojibake support
-        path = path.encode("utf-8", "ignore")
+        path = path.encode("wtf-8")
         return quote(path, safe="/")
 
     def getconn(self, tid=None):
@@ -273,6 +316,9 @@ class Gateway(object):
             raise
 
     def listdir(self, path):
+        if bad_good:
+            path = dewin(path)
+
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots"
         r = self.sendreq("GET", web_path)
         if r.status != 200:
@@ -295,11 +341,14 @@ class Gateway(object):
             raise
 
     def download_file_range(self, path, ofs1, ofs2):
+        if bad_good:
+            path = dewin(path)
+
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
         info(
             "DL {:4.0f}K\033[36m{:>9}-{:<9}\033[0m{}".format(
-                (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, path
+                (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, hexler(path)
             )
         )
 
@@ -318,7 +367,7 @@ class Gateway(object):
         ret = []
         remainder = b""
         ptn = re.compile(
-            r"^<tr><td>(-|DIR)</td><td><a [^>]+>([^<]+)</a></td><td>([^<]+)</td><td>([^<]+)</td></tr>$"
+            r'^<tr><td>(-|DIR)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>([^<]+)</td></tr>$'
         )
 
         while True:
@@ -340,8 +389,13 @@ class Gateway(object):
                     # print(line)
                     continue
 
-                ftype, fname, fsize, fdate = m.groups()
-                fname = html_dec(fname)
+                ftype, furl, fname, fsize, fdate = m.groups()
+                fname = furl.rstrip("/").split("/")[-1]
+                fname = unquote(fname)
+                fname = fname.decode("wtf-8")
+                if bad_good:
+                    fname = enwin(fname)
+
                 sz = 1
                 ts = 60 * 60 * 24 * 2
                 try:
@@ -405,7 +459,11 @@ class CPPF(Operations):
                 cache_path, cache1 = cn.tag
                 cache2 = cache1 + len(cn.data)
                 msg += "\n{:<2} {:>7} {:>10}:{:<9} {}".format(
-                    n, len(cn.data), cache1, cache2, cache_path
+                    n,
+                    len(cn.data),
+                    cache1,
+                    cache2,
+                    cache_path.replace("\r", "\\r").replace("\n", "\\n"),
                 )
         return msg
 
@@ -636,7 +694,7 @@ class CPPF(Operations):
 
     def _readdir(self, path, fh=None):
         path = path.strip("/")
-        log("readdir [{}] [{}]".format(path, fh))
+        log("readdir [{}] [{}]".format(hexler(path), fh))
 
         ret = self.gw.listdir(path)
         if not self.n_dircache:
@@ -663,7 +721,11 @@ class CPPF(Operations):
         path = path.strip("/")
         ofs2 = offset + length
         file_sz = self.getattr(path)["st_size"]
-        log("read {} |{}| {}:{} max {}".format(path, length, offset, ofs2, file_sz))
+        log(
+            "read {} |{}| {}:{} max {}".format(
+                hexler(path), length, offset, ofs2, file_sz
+            )
+        )
         if ofs2 > file_sz:
             ofs2 = file_sz
             log("truncate to |{}| :{}".format(ofs2 - offset, ofs2))
@@ -702,7 +764,9 @@ class CPPF(Operations):
         return ret
 
     def getattr(self, path, fh=None):
-        log("getattr [{}]".format(path))
+        log("getattr [{}]".format(hexler(path)))
+        if WINDOWS:
+            path = enwin(path)  # windows occasionally decodes f0xx to xx
 
         path = path.strip("/")
         try:
@@ -725,11 +789,20 @@ class CPPF(Operations):
             dents = self._readdir(dirpath)
 
         for cache_name, cache_stat, _ in dents:
+            # if "qw" in cache_name and "qw" in fname:
+            #     info(
+            #         "cmp\n  [{}]\n  [{}]\n\n{}\n".format(
+            #             hexler(cache_name),
+            #             hexler(fname),
+            #             "\n".join(traceback.format_stack()[:-1]),
+            #         )
+            #     )
+
             if cache_name == fname:
                 # dbg("=" + repr(cache_stat))
                 return cache_stat
 
-        info("=ENOENT ({})".format(path))
+        info("=ENOENT ({})".format(hexler(path)))
         raise FuseOSError(errno.ENOENT)
 
     access = None
@@ -799,24 +872,24 @@ class CPPF(Operations):
                 raise FuseOSError(errno.ENOENT)
 
         def open(self, path, flags):
-            dbg("open [{}] [{}]".format(path, flags))
+            dbg("open [{}] [{}]".format(hexler(path), flags))
             return self._open(path)
 
         def opendir(self, path):
-            dbg("opendir [{}]".format(path))
+            dbg("opendir [{}]".format(hexler(path)))
             return self._open(path)
 
         def flush(self, path, fh):
-            dbg("flush [{}] [{}]".format(path, fh))
+            dbg("flush [{}] [{}]".format(hexler(path), fh))
 
         def release(self, ino, fi):
-            dbg("release [{}] [{}]".format(ino, fi))
+            dbg("release [{}] [{}]".format(hexler(ino), fi))
 
         def releasedir(self, ino, fi):
-            dbg("releasedir [{}] [{}]".format(ino, fi))
+            dbg("releasedir [{}] [{}]".format(hexler(ino), fi))
 
         def access(self, path, mode):
-            dbg("access [{}] [{}]".format(path, mode))
+            dbg("access [{}] [{}]".format(hexler(path), mode))
             try:
                 x = self.getattr(path)
                 if x["st_mode"] <= 0:
@@ -838,7 +911,7 @@ def main():
     #   linux generally does 128k so the cache is a slowdown,
     #   windows likes to use 4k and 64k so cache is required,
     #   value is numChunks (1~3M each) to keep in the cache
-    nf = 24 if WINDOWS or MACOS else 0
+    nf = 24
 
     # dircache is always a boost,
     #   only want to disable it for tests etc,
@@ -889,6 +962,20 @@ def main():
     if WINDOWS:
         os.system("")
 
+        for ch in '<>:"\\|?*':
+            # microsoft maps illegal characters to f0xx
+            # (e000 to f8ff is basic-plane private-use)
+            bad_good[ch] = chr(ord(ch) + 0xF000)
+
+        for n in range(0, 0x100):
+            # map surrogateescape to another private-use area
+            bad_good[chr(n + 0xDC00)] = chr(n + 0xF100)
+
+        for k, v in bad_good.items():
+            good_bad[v] = k
+
+    register_wtf8()
+
     try:
         with open("/etc/fuse.conf", "rb") as f:
             allow_other = b"\nuser_allow_other" in f.read()
@@ -899,7 +986,7 @@ def main():
     if not MACOS:
         args["nonempty"] = True
 
-    FUSE(CPPF(ar), ar.local_path, **args)
+    FUSE(CPPF(ar), ar.local_path, encoding="wtf-8", **args)
 
 
 if __name__ == "__main__":
