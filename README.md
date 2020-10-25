@@ -38,7 +38,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [x] accounts
 * [x] markdown viewer
 * [x] markdown editor
-* [x] FUSE client
+* [x] FUSE client (read-only)
 
 summary: it works! you can use it! (but technically not even close to beta)
 
@@ -49,7 +49,9 @@ summary: it works! you can use it! (but technically not even close to beta)
   * `await fetch('https://127.0.0.1:3923/', {method:"PUT", body: JSON.stringify(foo)});`
   * `var xhr = new XMLHttpRequest(); xhr.open('POST', 'https://127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
 
-* FUSE: mount a copyparty server as a local filesystem (see [./bin/](bin/))
+* FUSE: mount a copyparty server as a local filesystem
+  * cross-platform python client available in [./bin/](bin/)
+  * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
 
 
 # dependencies

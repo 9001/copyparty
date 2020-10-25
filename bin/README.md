@@ -10,6 +10,8 @@ filecache is default-on for windows and macos;
 
 note that copyparty should run with `-ed` to enable dotfiles (hidden otherwise)
 
+also consider using [../docs/rclone.md](../docs/rclone.md) instead for 5x performance
+
 
 ## to run this on windows:
 * install [winfsp](https://github.com/billziss-gh/winfsp/releases/latest) and [python 3](https://www.python.org/downloads/)
