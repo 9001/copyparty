@@ -16,9 +16,6 @@ from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 
 if not PY2:
     unicode = str
-    from html import escape as html_escape
-else:
-    from cgi import escape as html_escape  # pylint: disable=no-name-in-module
 
 
 class HttpCli(object):
@@ -125,6 +122,11 @@ class HttpCli(object):
         self.uparam = uparam
         self.vpath = unquotep(vpath)
 
+        ua = self.headers.get("user-agent", "")
+        if ua.startswith("rclone/"):
+            uparam["raw"] = True
+            uparam["dots"] = True
+
         try:
             if self.mode in ["GET", "HEAD"]:
                 return self.handle_get() and self.keepalive
@@ -141,7 +143,7 @@ class HttpCli(object):
             try:
                 # self.log("pebkac at httpcli.run #2: " + repr(ex))
                 self.keepalive = self._check_nonfatal(ex)
-                self.loud_reply(str(ex), status=ex.code)
+                self.loud_reply("{}: {}".format(str(ex), self.vpath), status=ex.code)
                 return self.keepalive
             except Pebkac:
                 return False
@@ -180,7 +182,8 @@ class HttpCli(object):
         self.send_headers(len(body), status, mime, headers)
 
         try:
-            self.s.sendall(body)
+            if self.mode != "HEAD":
+                self.s.sendall(body)
         except:
             raise Pebkac(400, "client d/c while replying body")
 
@@ -188,7 +191,7 @@ class HttpCli(object):
 
     def loud_reply(self, body, *args, **kwargs):
         self.log(body.rstrip())
-        self.reply(b"<pre>" + body.encode("utf-8"), *list(args), **kwargs)
+        self.reply(b"<pre>" + body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
 
     def handle_get(self):
         logmsg = "{:4} {}".format(self.mode, self.req)
@@ -493,7 +496,7 @@ class HttpCli(object):
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}">go to /{}</a>'.format(
-                quotep(vpath), html_escape(vpath, quote=False)
+                quotep(vpath), html_escape(vpath)
             ),
             pre="aight",
             click=True,
@@ -527,7 +530,7 @@ class HttpCli(object):
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}?edit">go to /{}?edit</a>'.format(
-                quotep(vpath), html_escape(vpath, quote=False)
+                quotep(vpath), html_escape(vpath)
             ),
             pre="aight",
             click=True,
@@ -621,7 +624,7 @@ class HttpCli(object):
 
         html = self.conn.tpl_msg.render(
             h2='<a href="/{}">return to /{}</a>'.format(
-                quotep(self.vpath), html_escape(self.vpath, quote=False)
+                quotep(self.vpath), html_escape(self.vpath)
             ),
             pre=msg,
         )
@@ -938,7 +941,7 @@ class HttpCli(object):
 
         targs = {
             "edit": "edit" in self.uparam,
-            "title": html_escape(self.vpath, quote=False),
+            "title": html_escape(self.vpath),
             "lastmod": int(ts_md * 1000),
             "md": "",
         }
@@ -979,7 +982,7 @@ class HttpCli(object):
                 else:
                     vpath += "/" + node
 
-                vpnodes.append([quotep(vpath) + "/", html_escape(node, quote=False)])
+                vpnodes.append([quotep(vpath) + "/", html_escape(node)])
 
         vn, rem = self.auth.vfs.get(
             self.vpath, self.uname, self.readable, self.writable
@@ -1054,7 +1057,7 @@ class HttpCli(object):
             dt = datetime.utcfromtimestamp(inf.st_mtime)
             dt = dt.strftime("%Y-%m-%d %H:%M:%S")
 
-            item = [margin, quotep(href), html_escape(fn, quote=False), sz, dt]
+            item = [margin, quotep(href), html_escape(fn), sz, dt]
             if is_dir:
                 dirs.append(item)
             else:
@@ -1119,7 +1122,7 @@ class HttpCli(object):
             ts=ts,
             prologue=logues[0],
             epilogue=logues[1],
-            title=html_escape(self.vpath, quote=False),
+            title=html_escape(self.vpath),
             srv_info="</span> /// <span>".join(srv_info),
         )
         self.reply(html.encode("utf-8", "replace"))

@@ -335,18 +335,18 @@ def read_header(sr):
 
 
 def humansize(sz, terse=False):
-    for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
+    for unit in ["B", "KiB", "MiB", "GiB", "TiB"]:
         if sz < 1024:
             break
-         
-        sz /= 1024.
-   
-    ret = ' '.join([str(sz)[:4].rstrip('.'), unit])
-    
+
+        sz /= 1024.0
+
+    ret = " ".join([str(sz)[:4].rstrip("."), unit])
+
     if not terse:
         return ret
-    
-    return ret.replace('iB', '').replace(' ', '')
+
+    return ret.replace("iB", "").replace(" ", "")
 
 
 def undot(path):
@@ -398,6 +398,21 @@ def exclude_dotfiles(filepaths):
             yield fpath
 
 
+def html_escape(s, quote=False):
+    """html.escape but also newlines"""
+    s = (
+        s.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\r", "&#13;")
+        .replace("\n", "&#10;")
+    )
+    if quote:
+        s = s.replace('"', "&quot;").replace("'", "&#x27;")
+
+    return s
+
+
 def quotep(txt):
     """url quoter which deals with bytes correctly"""
     btxt = w8enc(txt)
@@ -412,8 +427,8 @@ def quotep(txt):
 def unquotep(txt):
     """url unquoter which deals with bytes correctly"""
     btxt = w8enc(txt)
-    unq1 = btxt.replace(b"+", b" ")
-    unq2 = unquote(unq1)
+    # btxt = btxt.replace(b"+", b" ")
+    unq2 = unquote(btxt)
     return w8dec(unq2)
 
 
