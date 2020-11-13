@@ -170,7 +170,7 @@ redraw = (function () {
             dst.scrollTop = 0;
             return;
         }
-        if (y + 8 + src.clientHeight > src.scrollHeight) {
+        if (y + 48 + src.clientHeight > src.scrollHeight) {
             dst.scrollTop = dst.scrollHeight - dst.clientHeight;
             return;
         }
