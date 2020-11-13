@@ -24,6 +24,7 @@ class HttpCli(object):
     """
 
     def __init__(self, conn):
+        self.t0 = time.time()
         self.conn = conn
         self.s = conn.s
         self.sr = conn.sr
@@ -86,7 +87,7 @@ class HttpCli(object):
         if "cookie" in self.headers:
             cookies = self.headers["cookie"].split(";")
             for k, v in [x.split("=", 1) for x in cookies]:
-                if k != "cppwd":
+                if k.strip() != "cppwd":
                     continue
 
                 v = unescape_cookie(v)
@@ -307,9 +308,18 @@ class HttpCli(object):
         with open(path, "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
-        self.log("wrote {}/{} bytes to {}".format(post_sz, remains, path))
+        spd = self._spd(post_sz)
+        self.log("{} wrote {}/{} bytes to {}".format(spd, post_sz, remains, path))
         self.reply("{}\n{}\n".format(post_sz, sha_b64).encode("utf-8"))
         return True
+
+    def _spd(self, nbytes, add=True):
+        if add:
+            self.conn.nbyte += nbytes
+
+        spd1 = get_spd(nbytes, self.t0)
+        spd2 = get_spd(self.conn.nbyte, self.conn.t0)
+        return spd1 + " " + spd2
 
     def handle_post_multipart(self):
         self.parser = MultipartParser(self.log, self.sr, self.headers)
@@ -450,7 +460,9 @@ class HttpCli(object):
             except:
                 self.log("failed to utime ({}, {})".format(path, times))
 
-        self.loud_reply("thank")
+        spd = self._spd(post_sz)
+        self.log("{} thank".format(spd))
+        self.reply("thank")
         return True
 
     def handle_login(self):
@@ -463,7 +475,7 @@ class HttpCli(object):
             msg = "naw dude"
             pwd = "x"  # nosec
 
-        h = {"Set-Cookie": "cppwd={}; Path=/".format(pwd)}
+        h = {"Set-Cookie": "cppwd={}; Path=/; SameSite=Lax".format(pwd)}
         html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
         self.reply(html.encode("utf-8"), headers=h)
         return True
@@ -575,6 +587,7 @@ class HttpCli(object):
                             raise Pebkac(400, "empty files in post")
 
                         files.append([sz, sha512_hex])
+                        self.conn.nbyte += sz
 
                 except Pebkac:
                     if fn != os.devnull:
@@ -602,7 +615,9 @@ class HttpCli(object):
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
 
-        self.log(msg)
+        vspd = self._spd(sz_total, False)
+        self.log("{} {}".format(vspd, msg))
+
         if not nullwrite:
             # TODO this is bad
             log_fn = "up.{:.6f}.txt".format(t0)
@@ -885,6 +900,7 @@ class HttpCli(object):
             self.log(logmsg)
             return True
 
+        ret = True
         with open_func(*open_args) as f:
             remains = upper - lower
             f.seek(lower)
@@ -897,17 +913,17 @@ class HttpCli(object):
                 if remains < len(buf):
                     buf = buf[:remains]
 
-                remains -= len(buf)
-
                 try:
                     self.s.sendall(buf)
+                    remains -= len(buf)
                 except:
                     logmsg += " \033[31m" + str(upper - remains) + "\033[0m"
-                    self.log(logmsg)
-                    return False
+                    ret = False
+                    break
 
-        self.log(logmsg)
-        return True
+        spd = self._spd((upper - lower) - remains)
+        self.log("{},  {}".format(logmsg, spd))
+        return ret
 
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)

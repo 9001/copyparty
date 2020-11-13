@@ -32,8 +32,12 @@ dir="$(
 
 # detect available pythons
 (IFS=:; for d in $PATH; do
-	printf '%s\n' "$d"/python* "$d"/pypy* | tac;
-done) | grep -E '(python|pypy)[0-9\.-]*$' > $dir/pys || true
+	printf '%s\n' "$d"/python* "$d"/pypy*;
+done) |
+(sed -E 's/(.*\/[^/0-9]+)([0-9]?[^/]*)$/\2 \1/' || cat) |
+(sort -nr || cat) |
+(sed -E 's/([^ ]*) (.*)/\2\1/' || cat) |
+grep -E '/(python|pypy)[0-9\.-]*$' >$dir/pys || true
 
 # see if we made a choice before
 [ -z "$pybin" ] && pybin="$(cat $dir/py 2>/dev/null || true)"

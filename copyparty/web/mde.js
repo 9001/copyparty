@@ -121,7 +121,7 @@ function save(mde) {
     fd.append("lastmod", (force ? -1 : last_modified));
     fd.append("body", txt);
 
-    var url = (document.location + '').split('?')[0] + '?raw';
+    var url = (document.location + '').split('?')[0];
     var xhr = new XMLHttpRequest();
     xhr.open('POST', url, true);
     xhr.responseType = 'text';

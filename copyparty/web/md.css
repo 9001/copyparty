@@ -109,8 +109,12 @@ h2 a, h4 a, h6 a {
 #mp ol>li {
 	margin: .7em 0;
 }
+strong {
+	color: #000;
+}
 p>em,
-li>em {
+li>em,
+td>em {
 	color: #c50;
 	padding: .1em;
 	border-bottom: .1em solid #bbb;
@@ -289,6 +293,32 @@ blink {
 		text-decoration: underline;
 		border: none;
 	}
+	#mh a:hover {
+		color: #000;
+		background: #ddd;
+	}
+	#toolsbox {
+		overflow: hidden;
+		display: inline-block;
+		background: #eee;
+		height: 1.5em;
+		padding: 0 .2em;
+		margin: 0 .2em;
+		position: absolute;
+	}
+	#toolsbox.open {
+		height: auto;
+		overflow: visible;
+		background: #eee;
+		box-shadow: 0 .2em .2em #ccc;
+		padding-bottom: .2em;
+	}
+	#toolsbox a {
+		display: block;
+	}
+	#toolsbox a+a {
+		text-decoration: none;
+	}
 
 
 
@@ -332,8 +362,12 @@ blink {
 	html.dark #m>ol {
 		border-color: #555;
 	}
+	html.dark strong {
+		color: #fff;
+	}
 	html.dark p>em,
-	html.dark li>em {
+	html.dark li>em,
+	html.dark td>em {
 		color: #f94;
 		border-color: #666;
 	}
@@ -370,6 +404,17 @@ blink {
 	html.dark #mh a {
 		color: #ccc;
 		background: none;
+	}
+	html.dark #mh a:hover {
+		background: #333;
+		color: #fff;
+	}
+	html.dark #toolsbox {
+		background: #222;
+	}
+	html.dark #toolsbox.open {
+		box-shadow: 0 .2em .2em #069;
+		border-radius: 0 0 .4em .4em;
 	}
 }
 
@@ -541,7 +586,8 @@ blink {
 		color: #240;
 	}
 	html.dark p>em,
-	html.dark li>em {
+	html.dark li>em,
+	html.dark td>em {
 		color: #940;
 	}
 }

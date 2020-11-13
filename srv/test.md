@@ -1,5 +1,16 @@
 ### hello world
 
+* qwe
+* asd
+  * zxc
+  * 573
+    * one
+    * two
+    
+  * |||
+    |--|--|
+    |listed|table|
+
 ```
 [72....................................................................]
 [80............................................................................]
@@ -20,6 +31,8 @@
 ```
 l[i]=1I;(){}o0O</> var foo = "$(`bar`)"; a's'd
 ```
+
+🔍🌽.📕.🍙🔎
 
 [](#s1)
 [s1](#s1)
@@ -120,6 +133,11 @@ a newline toplevel
 |--|--:|
 | a table | on the right |
 | second row | foo bar |
+
+||
+--|:-:|-:
+a table | big text in this | aaakbfddd
+second row | centred | bbb
 
 * list entry
 * [x] yes

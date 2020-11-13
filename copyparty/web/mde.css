@@ -160,8 +160,12 @@ h2 {
 .mdo ol>li {
 	margin: .7em 0;
 }
+strong {
+	color: #000;
+}
 p>em,
-li>em {
+li>em,
+td>em {
 	color: #c50;
 	padding: .1em;
 	border-bottom: .1em solid #bbb;
@@ -253,8 +257,12 @@ html.dark .mdo>ul,
 html.dark .mdo>ol {
     border-color: #555;
 }
+html.dark strong {
+    color: #fff;
+}
 html.dark p>em,
-html.dark li>em {
+html.dark li>em,
+html.dark td>em {
     color: #f94;
     border-color: #666;
 }

@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import ssl
+import time
 import socket
 
 try:
@@ -41,6 +42,8 @@ class HttpConn(object):
         self.auth = hsrv.auth
         self.cert_path = hsrv.cert_path
 
+        self.t0 = time.time()
+        self.nbyte = 0
         self.workload = 0
         self.log_func = hsrv.log
         self.log_src = "{} \033[36m{}".format(addr[0], addr[1]).ljust(26)

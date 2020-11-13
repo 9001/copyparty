@@ -17,7 +17,14 @@
 			<a id="save" href="?edit">save</a>
 			<a id="sbs" href="#">sbs</a>
 			<a id="nsbs" href="#">editor</a>
-			<a id="help" href="#">help</a>
+			<div id="toolsbox">
+				<a id="tools" href="#">tools</a>
+				<a id="fmt_table" href="#">prettify table (ctrl-k)</a>
+				<a id="iter_uni" href="#">non-ascii: iterate (ctrl-u)</a>
+				<a id="mark_uni" href="#">non-ascii: markup</a>
+				<a id="cfg_uni" href="#">non-ascii: whitelist</a>
+				<a id="help" href="#">help</a>
+			</div>
 		{%- else %}
 			<a href="?edit">edit (basic)</a>
 			<a href="?edit2">edit (fancy)</a>
@@ -46,6 +53,9 @@ write markdown (most html is 🙆 too)
 
 ## hotkey list
 * `Ctrl-S` to save
+* `Ctrl-E` to toggle mode
+* `Ctrl-K` to prettyprint a table
+* `Ctrl-U` to iterate non-ascii chars
 * `Ctrl-H` / `Ctrl-Shift-H` to create a header
 * `TAB` / `Shift-TAB` to indent/dedent a selection
 

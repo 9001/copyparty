@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import re
 import sys
+import time
 import base64
 import struct
 import hashlib
@@ -347,6 +348,16 @@ def humansize(sz, terse=False):
         return ret
 
     return ret.replace("iB", "").replace(" ", "")
+
+
+def get_spd(nbyte, t0, t=None):
+    if t is None:
+        t = time.time()
+
+    bps = nbyte / ((t - t0) + 0.001)
+    s1 = humansize(nbyte).replace(" ", "\033[33m").replace("iB", "")
+    s2 = humansize(bps).replace(" ", "\033[35m").replace("iB", "")
+    return "{} \033[0m{}/s\033[0m".format(s1, s2)
 
 
 def undot(path):

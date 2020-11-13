@@ -2,10 +2,16 @@
 var server_md = dom_src.value;
 
 
+// the non-ascii whitelist
+var esc_uni_whitelist = '\\n\\t\\x20-\\x7eÆØÅæøå';
+var js_uni_whitelist = eval('\'' + esc_uni_whitelist + '\'');
+
+
 // dom nodes
 var dom_swrap = document.getElementById('mtw');
 var dom_sbs = document.getElementById('sbs');
 var dom_nsbs = document.getElementById('nsbs');
+var dom_tbox = document.getElementById('toolsbox');
 var dom_ref = (function () {
     var d = document.createElement('div');
     d.setAttribute('id', 'mtr');
@@ -339,7 +345,7 @@ function savechk_cb() {
     server_md = this.txt;
     draw_md();
     toast('font-size:6em;font-family:serif;color:#cf6;width:4em;',
-        'OK✔️<span style="font-size:.2em;color:#999">' + this.ntry + '</span>');
+        'OK✔️<span style="font-size:.2em;color:#999;position:absolute">' + this.ntry + '</span>');
 }
 
 function toast(style, msg) {
@@ -427,6 +433,9 @@ function setsel(s) {
     dom_src.value = [s.pre, s.sel, s.post].join('');
     dom_src.setSelectionRange(s.car, s.cdr, dom_src.selectionDirection);
     dom_src.oninput();
+    // support chrome:
+    dom_src.blur();
+    dom_src.focus();
 }
 
 
@@ -500,7 +509,8 @@ function md_newline() {
     var s = linebounds(true),
         ln = s.md.substring(s.n1, s.n2),
         m1 = /^( *)([0-9]+)(\. +)/.exec(ln),
-        m2 = /^[ \t>+-]*(\* )?/.exec(ln);
+        m2 = /^[ \t>+-]*(\* )?/.exec(ln),
+        drop = dom_src.selectionEnd - dom_src.selectionStart;
 
     var pre = m2[0];
     if (m1 !== null)
@@ -512,7 +522,7 @@ function md_newline() {
 
     s.pre = s.md.substring(0, s.car) + '\n' + pre;
     s.sel = '';
-    s.post = s.md.substring(s.car);
+    s.post = s.md.substring(s.car + drop);
     s.car = s.cdr = s.pre.length;
     setsel(s);
     return false;
@@ -522,11 +532,17 @@ function md_newline() {
 // backspace
 function md_backspace() {
     var s = linebounds(true),
-        ln = s.md.substring(s.n1, s.n2),
-        m = /^[ \t>+-]*(\* )?([0-9]+\. +)?/.exec(ln);
+        o0 = dom_src.selectionStart,
+        left = s.md.slice(s.n1, o0),
+        m = /^[ \t>+-]*(\* )?([0-9]+\. +)?/.exec(left);
 
+    // if car is in whitespace area, do nothing
+    if (/^\s*$/.test(left))
+        return true;
+
+    // same if line is all-whitespace or non-markup
     var v = m[0].replace(/[^ ]/g, " ");
-    if (v === m[0] || v.length !== ln.length)
+    if (v === m[0] || v.length !== left.length)
         return true;
 
     s.pre = s.md.substring(0, s.n1) + v;
@@ -540,8 +556,8 @@ function md_backspace() {
 
 // paragraph jump
 function md_p_jump(down) {
-    var ofs = dom_src.selectionStart;
-    var txt = dom_src.value;
+    var txt = dom_src.value,
+        ofs = dom_src.selectionStart;
 
     if (down) {
         while (txt[ofs] == '\n' && --ofs > 0);
@@ -559,6 +575,202 @@ function md_p_jump(down) {
     }
 
     dom_src.setSelectionRange(ofs, ofs, "none");
+}
+
+
+function reLastIndexOf(txt, ptn, end) {
+    var ofs = (typeof end !== 'undefined') ? end : txt.length;
+    end = ofs;
+    while (ofs >= 0) {
+        var sub = txt.slice(ofs, end);
+        if (ptn.test(sub))
+            return ofs;
+
+        ofs--;
+    }
+    return -1;
+}
+
+
+// table formatter
+function fmt_table(e) {
+    if (e) e.preventDefault();
+    //dom_tbox.setAttribute('class', '');
+
+    var txt = dom_src.value,
+        ofs = dom_src.selectionStart,
+        //o0 = txt.lastIndexOf('\n\n', ofs),
+        //o1 = txt.indexOf('\n\n', ofs);
+        o0 = reLastIndexOf(txt, /\n\s*\n/m, ofs),
+        o1 = txt.slice(ofs).search(/\n\s*\n/m);
+    // note \s contains \n but its fine
+
+    if (o0 < 0)
+        o0 = 0;
+    else {
+        // seek past the hit
+        var m = /\n\s*\n/m.exec(txt.slice(o0));
+        o0 += m[0].length;
+    }
+
+    o1 = o1 < 0 ? txt.length : o1 + ofs;
+
+    var err = 'cannot format table due to ',
+        tab = txt.slice(o0, o1).split(/\s*\n/),
+        re_ind = /^\s*/,
+        ind = tab[1].match(re_ind)[0],
+        r0_ind = tab[0].slice(0, ind.length),
+        lpipe = tab[1].indexOf('|') < tab[1].indexOf('-'),
+        rpipe = tab[1].lastIndexOf('|') > tab[1].lastIndexOf('-'),
+        re_lpipe = lpipe ? /^\s*\|\s*/ : /^\s*/,
+        re_rpipe = rpipe ? /\s*\|\s*$/ : /\s*$/;
+
+    for (var a = 0; a < tab.length; a++) {
+        var ind2 = tab[a].match(re_ind)[0];
+        if (ind != ind2 && a > 0)  // the table can be a list entry or something, ignore [0]
+            return alert(err + 'indentation mismatch on row 2 and ' + (a + 1) + ',\n' + tab[a]);
+
+        var t = tab[a].slice(ind.length);
+        t = t.replace(re_lpipe, "");
+        t = t.replace(re_rpipe, "");
+        tab[a] = t.split(/\s*\|\s*/g);
+
+        if (a == 0)
+            ncols = tab[a].length;
+
+        if (ncols != tab[a].length)
+            return alert(err + 'num.columns mismatch on row 2 and ' + (a + 1) + '; ' + ncols + ' != ' + tab[a].length);
+    }
+
+    var re_align = /^ *(:?)-+(:?) *$/;
+    var align = [];
+    for (var col = 0; col < tab[1].length; col++) {
+        var m = tab[1][col].match(re_align);
+        if (!m)
+            return alert(err + 'invalid column specification, row 2, col ' + (col + 1) + ', [' + tab[1][col] + ']');
+
+        if (m[2]) {
+            if (m[1])
+                align.push('c');
+            else
+                align.push('r');
+        }
+        else
+            align.push('l');
+    }
+
+    var pad = [];
+    var tmax = 0;
+    for (var col = 0; col < ncols; col++) {
+        var max = 0;
+        for (var row = 0; row < tab.length; row++)
+            max = Math.max(max, tab[row][col].length);
+
+        var s = '';
+        for (var n = 0; n < max; n++)
+            s += ' ';
+
+        pad.push(s);
+        tmax = Math.max(max, tmax);
+    }
+
+    var dashes = '';
+    for (var a = 0; a < tmax; a++)
+        dashes += '-';
+
+    var ret = [];
+    for (var row = 0; row < tab.length; row++) {
+        var ln = [];
+        for (var col = 0; col < tab[row].length; col++) {
+            var p = pad[col];
+            var s = tab[row][col];
+
+            if (align[col] == 'l') {
+                s = (s + p).slice(0, p.length);
+            }
+            else if (align[col] == 'r') {
+                s = (p + s).slice(-p.length);
+            }
+            else {
+                var pt = p.length - s.length;
+                var pl = p.slice(0, Math.floor(pt / 2));
+                var pr = p.slice(0, pt - pl.length);
+                s = pl + s + pr;
+            }
+
+            if (row == 1) {
+                if (align[col] == 'l')
+                    s = dashes.slice(0, p.length);
+                else if (align[col] == 'r')
+                    s = dashes.slice(0, p.length - 1) + ':';
+                else
+                    s = ':' + dashes.slice(0, p.length - 2) + ':';
+            }
+            ln.push(s);
+        }
+        ret.push(ind + '| ' + ln.join(' | ') + ' |');
+    }
+
+    // restore any markup in the row0 gutter
+    ret[0] = r0_ind + ret[0].slice(ind.length);
+
+    ret = {
+        "pre": txt.slice(0, o0),
+        "sel": ret.join('\n'),
+        "post": txt.slice(o1),
+        "car": o0,
+        "cdr": o0
+    };
+    setsel(ret);
+}
+
+
+// show unicode
+function mark_uni(e) {
+    if (e) e.preventDefault();
+    dom_tbox.setAttribute('class', '');
+
+    var txt = dom_src.value,
+        ptn = new RegExp('([^' + js_uni_whitelist + ']+)', 'g');
+
+    mod = txt.replace(/\r/g, "").replace(ptn, "\u2588\u2770$1\u2771");
+
+    if (txt == mod) {
+        alert('no results;  no modifications were made');
+        return;
+    }
+    dom_src.value = mod;
+}
+
+
+// iterate unicode
+function iter_uni(e) {
+    if (e) e.preventDefault();
+
+    var txt = dom_src.value,
+        ofs = dom_src.selectionDirection == "forward" ? dom_src.selectionEnd : dom_src.selectionStart,
+        re = new RegExp('([^' + js_uni_whitelist + ']+)'),
+        m = re.exec(txt.slice(ofs));
+
+    if (!m) {
+        alert('no more hits from cursor onwards');
+        return;
+    }
+    ofs += m.index;
+
+    dom_src.setSelectionRange(ofs, ofs + m[0].length, "forward");
+    dom_src.oninput();
+    // support chrome:
+    dom_src.blur();
+    dom_src.focus();
+}
+
+
+// configure whitelist
+function cfg_uni(e) {
+    if (e) e.preventDefault();
+    esc_uni_whitelist = prompt("unicode whitelist", esc_uni_whitelist);
+    js_uni_whitelist = eval('\'' + esc_uni_whitelist + '\'');
 }
 
 
@@ -609,6 +821,19 @@ function md_p_jump(down) {
             if (!ctrl && !ev.shiftKey && kc == 8) {
                 return md_backspace();
             }
+            if (ctrl && (ev.code == "KeyK")) {
+                fmt_table();
+                return false;
+            }
+            if (ctrl && (ev.code == "KeyU")) {
+                iter_uni();
+                return false;
+            }
+            if (ctrl && (ev.code == "KeyE")) {
+                dom_nsbs.click();
+                //fmt_table();
+                return false;
+            }
             var up = ev.code == "ArrowUp" || kc == 38;
             var dn = ev.code == "ArrowDown" || kc == 40;
             if (ctrl && (up || dn)) {
@@ -622,8 +847,17 @@ function md_p_jump(down) {
 })();
 
 
+document.getElementById('tools').onclick = function (e) {
+    if (e) e.preventDefault();
+    var is_open = dom_tbox.getAttribute('class') != 'open';
+    dom_tbox.setAttribute('class', is_open ? 'open' : '');
+};
+
+
 document.getElementById('help').onclick = function (e) {
     if (e) e.preventDefault();
+    dom_tbox.setAttribute('class', '');
+
     var dom = document.getElementById('helpbox');
     var dtxt = dom.getElementsByTagName('textarea');
     if (dtxt.length > 0) {
@@ -636,6 +870,12 @@ document.getElementById('help').onclick = function (e) {
         dom.style.display = 'none';
     };
 };
+
+
+document.getElementById('fmt_table').onclick = fmt_table;
+document.getElementById('mark_uni').onclick = mark_uni;
+document.getElementById('iter_uni').onclick = iter_uni;
+document.getElementById('cfg_uni').onclick = cfg_uni;
 
 
 // blame steen
