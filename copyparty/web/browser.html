@@ -34,13 +34,14 @@
                 <th></th>
                 <th>File Name</th>
                 <th sort="int">File Size</th>
+                <th>T</th>
                 <th>Date</th>
             </tr>
         </thead>
         <tbody>
 
 {%- for f in files %}
-<tr><td>{{ f[0] }}</td><td><a href="{{ f[1] }}">{{ f[2] }}</a></td><td>{{ f[3] }}</td><td>{{ f[4] }}</td></tr>
+<tr><td>{{ f[0] }}</td><td><a href="{{ f[1] }}">{{ f[2] }}</a></td><td>{{ f[3] }}</td><td>{{ f[4] }}</td><td>{{ f[5] }}</td></tr>
 {%- endfor %}
 
         </tbody>

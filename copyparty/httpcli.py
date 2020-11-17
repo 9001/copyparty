@@ -1077,7 +1077,12 @@ class HttpCli(object):
             dt = datetime.utcfromtimestamp(inf.st_mtime)
             dt = dt.strftime("%Y-%m-%d %H:%M:%S")
 
-            item = [margin, quotep(href), html_escape(fn), sz, dt]
+            try:
+                ext = "---" if is_dir else fn.rsplit(".", 1)[1]
+            except:
+                ext = "%"
+
+            item = [margin, quotep(href), html_escape(fn), sz, ext, dt]
             if is_dir:
                 dirs.append(item)
             else:

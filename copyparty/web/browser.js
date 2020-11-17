@@ -617,8 +617,8 @@ function unblocked() {
 // show ui to manually start playback of a linked song
 function autoplay_blocked(tid) {
 	show_modal(
-		'<div id="blk_play"><a id="blk_go"></a></div>' +
-		'<div id="blk_abrt"><a id="blk_na">Cancel<br />(show file list)</a></div>');
+		'<div id="blk_play"><a href="#" id="blk_go"></a></div>' +
+		'<div id="blk_abrt"><a href="#" id="blk_na">Cancel<br />(show file list)</a></div>');
 
 	var go = o('blk_go');
 	var na = o('blk_na');
@@ -627,7 +627,8 @@ function autoplay_blocked(tid) {
 	fn = decodeURIComponent(fn.replace(/\+/g, ' '));
 
 	go.textContent = 'Play "' + fn + '"';
-	go.onclick = function () {
+	go.onclick = function (e) {
+		if (e) e.preventDefault();
 		unblocked();
 		mp.au.play();
 	};
