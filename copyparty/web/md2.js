@@ -602,7 +602,7 @@ function fmt_table(e) {
         //o0 = txt.lastIndexOf('\n\n', ofs),
         //o1 = txt.indexOf('\n\n', ofs);
         o0 = reLastIndexOf(txt, /\n\s*\n/m, ofs),
-        o1 = txt.slice(ofs).search(/\n\s*\n/m);
+        o1 = txt.slice(ofs).search(/\n\s*\n|\n\s*$/m);
     // note \s contains \n but its fine
 
     if (o0 < 0)
@@ -625,10 +625,18 @@ function fmt_table(e) {
         re_lpipe = lpipe ? /^\s*\|\s*/ : /^\s*/,
         re_rpipe = rpipe ? /\s*\|\s*$/ : /\s*$/;
 
+    // the second row defines the table,
+    // need to process that first
+    var tmp = tab[0];
+    tab[0] = tab[1];
+    tab[1] = tmp;
+
     for (var a = 0; a < tab.length; a++) {
+        var row_name = (a == 1) ? 'header' : 'row#' + (a + 1);
+
         var ind2 = tab[a].match(re_ind)[0];
-        if (ind != ind2 && a > 0)  // the table can be a list entry or something, ignore [0]
-            return alert(err + 'indentation mismatch on row 2 and ' + (a + 1) + ',\n' + tab[a]);
+        if (ind != ind2 && a != 1)  // the table can be a list entry or something, ignore [0]
+            return alert(err + 'indentation mismatch on row#2 and ' + row_name + ',\n' + tab[a]);
 
         var t = tab[a].slice(ind.length);
         t = t.replace(re_lpipe, "");
@@ -637,17 +645,25 @@ function fmt_table(e) {
 
         if (a == 0)
             ncols = tab[a].length;
+        else if (ncols < tab[a].length)
+            return alert(err + 'num.columns(' + row_name + ') exceeding row#2;  ' + ncols + ' < ' + tab[a].length);
 
-        if (ncols != tab[a].length)
-            return alert(err + 'num.columns mismatch on row 2 and ' + (a + 1) + '; ' + ncols + ' != ' + tab[a].length);
+        // if row has less columns than row2, fill them in
+        while (tab[a].length < ncols)
+            tab[a].push('');
     }
+
+    // aight now swap em back
+    tmp = tab[0];
+    tab[0] = tab[1];
+    tab[1] = tmp;
 
     var re_align = /^ *(:?)-+(:?) *$/;
     var align = [];
     for (var col = 0; col < tab[1].length; col++) {
         var m = tab[1][col].match(re_align);
         if (!m)
-            return alert(err + 'invalid column specification, row 2, col ' + (col + 1) + ', [' + tab[1][col] + ']');
+            return alert(err + 'invalid column specification, row#2, col ' + (col + 1) + ', [' + tab[1][col] + ']');
 
         if (m[2]) {
             if (m[1])

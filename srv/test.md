@@ -139,6 +139,10 @@ a newline toplevel
 a table | big text in this | aaakbfddd
 second row | centred | bbb
 
+||
+--|--|--
+foo
+
 * list entry
 * [x] yes
 * [ ] no
@@ -227,3 +231,7 @@ unrelated neat stuff:
 awk '/./ {printf "%s %d\n", $0, NR; next} 1' <test.md >ln.md
 gawk '{print gensub(/([a-zA-Z\.])/,NR" \\1","1")}' <test.md >ln.md
 ```
+
+a|b|c
+--|--|--
+foo
