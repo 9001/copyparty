@@ -83,6 +83,10 @@ class HttpCli(object):
         v = self.headers.get("connection", "").lower()
         self.keepalive = not v.startswith("close")
 
+        v = self.headers.get("x-forwarded-for", None)
+        if v is not None and self.conn.addr[0] in ["127.0.0.1", "::1"]:
+            self.log_src = self.conn.set_rproxy(v.split(",")[0])
+
         self.uname = "*"
         if "cookie" in self.headers:
             cookies = self.headers["cookie"].split(";")
@@ -462,7 +466,7 @@ class HttpCli(object):
 
         spd = self._spd(post_sz)
         self.log("{} thank".format(spd))
-        self.reply("thank")
+        self.reply(b"thank")
         return True
 
     def handle_login(self):

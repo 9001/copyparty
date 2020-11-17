@@ -13,3 +13,7 @@
 init-scripts to start copyparty as a service
 * [`systemd/copyparty.service`](systemd/copyparty.service)
 * [`openrc/copyparty`](openrc/copyparty)
+
+# Reverse-proxy
+copyparty has basic support for running behind another webserver
+* [`nginx/copyparty.conf`](nginx/copyparty.conf)

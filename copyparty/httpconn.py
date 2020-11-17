@@ -46,7 +46,7 @@ class HttpConn(object):
         self.nbyte = 0
         self.workload = 0
         self.log_func = hsrv.log
-        self.log_src = "{} \033[36m{}".format(addr[0], addr[1]).ljust(26)
+        self.set_rproxy()
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
@@ -55,6 +55,18 @@ class HttpConn(object):
         self.tpl_msg = env.get_template("msg.html")
         self.tpl_md = env.get_template("md.html")
         self.tpl_mde = env.get_template("mde.html")
+
+    def set_rproxy(self, ip=None):
+        if ip is None:
+            color = 36
+            ip = self.addr[0]
+            self.rproxy = None
+        else:
+            color = 34
+            self.rproxy = ip
+
+        self.log_src = "{} \033[{}m{}".format(ip, color, self.addr[1]).ljust(26)
+        return self.log_src
 
     def respath(self, res_name):
         return os.path.join(E.mod, "web", res_name)
