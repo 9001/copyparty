@@ -87,16 +87,18 @@ the features you can opt to drop are
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 
+**note:** you can also just download and run [scripts/copyparty-repack.sh](scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a `no-ogv no-cm` repack; works on linux/macos (and windows with msys2 or WSL)
+
 
 # install on android
 
 install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
 ```sh
-apt update && apt -y full-upgrade && termux-setup-storage && apt -y install curl && cd && curl -L https://github.com/9001/copyparty/raw/master/scripts/copyparty-android.sh > copyparty-android.sh && chmod 755 copyparty-android.sh && ./copyparty-android.sh -h
+apt update && apt -y full-upgrade && termux-setup-storage && apt -y install python && python -m ensurepip && python -m pip install -U copyparty
 echo $?
 ```
 
-after the initial setup (and restarting bash), you can launch copyparty at any time by running "copyparty" in Termux
+after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux
 
 
 # dev env setup
