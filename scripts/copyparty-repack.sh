@@ -40,11 +40,8 @@ cache="$od/.copyparty-repack.cache"
 		awk -F\" '/"browser_download_url".*(\.tar\.gz|-sfx\.)/ {print$4}'
 	) |
 	tee /dev/stderr |
-	sed 's/\r$//' |
-	while IFS= read -r url; do
-		# download src and sfx
-		curl -LO "$url"
-	done
+	tr -d '\r' | tr '\n' '\0' | xargs -0 curl -L --remote-name-all
+
 	# debug: create cache
 	#tar -czvf "$cache" *
 }
@@ -87,6 +84,10 @@ mv copyparty-*/bin/copyparty-fuse.py .
 cp -pv sfx-lite/copyparty-sfx.py ../copyparty
 rm -rf copyparty-{0..9}*.*.*{0..9}
 )
+
+
+ # and include the repacker itself too
+cp -pv "$od/$0" copyparty-extras/ 
 
 
 # create the bundle
