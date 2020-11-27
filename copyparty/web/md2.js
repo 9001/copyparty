@@ -177,7 +177,7 @@ redraw = (function () {
         y += src.clientHeight / 2;
         var sy1 = -1, sy2 = -1, dy1 = -1, dy2 = -1;
         for (var a = 1; a < nlines + 1; a++) {
-            if (srcmap[a] === null || dstmap[a] === null)
+            if (srcmap[a] == null || dstmap[a] == null)
                 continue;
 
             if (srcmap[a] > y) {
