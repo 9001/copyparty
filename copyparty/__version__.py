@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (0, 5, 4)
+VERSION = (0, 5, 5)
 CODENAME = "fuse jelly"
-BUILD_DT = (2020, 11, 17)
+BUILD_DT = (2020, 11, 27)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)
