@@ -123,8 +123,11 @@ write markdown (most html is 🙆 too)
 	
 	<script>
 
-var link_md_as_html = false;  // TODO (does nothing)
 var last_modified = {{ lastmod }};
+var md_opt = {
+	link_md_as_html: false,
+	allow_plugins: {{ md_plug }}
+};
 
 (function () {
     var btn = document.getElementById("lightswitch");

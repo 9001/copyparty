@@ -963,6 +963,7 @@ class HttpCli(object):
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath),
             "lastmod": int(ts_md * 1000),
+            "md_plug": "true" if self.args.emp else "false",
             "md": "",
         }
         sz_html = len(template.render(**targs).encode("utf-8"))

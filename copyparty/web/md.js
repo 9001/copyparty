@@ -18,6 +18,10 @@ var dbg = function () { };
 // dbg = console.log
 
 
+// plugins
+var md_plug = {};
+
+
 function hesc(txt) {
     return txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -154,12 +158,52 @@ function copydom(src, dst, lv) {
 }
 
 
+function load_plug(md_text, plug_type) {
+    if (!md_opt.allow_plugins)
+        return md_text;
+
+    var find = '\n```copyparty_' + plug_type + '\n';
+    var ofs = md_text.indexOf(find);
+    if (ofs === -1)
+        return md_text;
+
+    var ofs2 = md_text.indexOf('\n```', ofs + 1);
+    if (ofs2 == -1)
+        return md_text;
+
+    var js = md_text.slice(ofs + find.length, ofs2 + 1);
+    var md = md_text.slice(0, ofs + 1) + md_text.slice(ofs2 + 4);
+
+    var old_plug = md_plug[plug_type];
+    if (!old_plug || old_plug[1] != js) {
+        js = 'const x = { ' + js + ' }; x;';
+        var x = eval(js);
+        if (x['ctor']) {
+            x['ctor']();
+            delete x['ctor'];
+        }
+        md_plug[plug_type] = [x, js];
+    }
+
+    return md;
+}
+
+
 function convert_markdown(md_text, dest_dom) {
+    md_text = md_text.replace(/\r/g, '');
+    md_text = load_plug(md_text, 'pre');
+    md_text = load_plug(md_text, 'post');
+
     marked.setOptions({
         //headerPrefix: 'h-',
         breaks: true,
         gfm: true
     });
+
+    if (md_plug['pre']) {
+        marked.use(md_plug['pre'][0]);
+    }
+
     var md_html = marked(md_text);
     var md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
 
@@ -209,7 +253,7 @@ function convert_markdown(md_text, dest_dom) {
             continue;
 
         var nline = parseInt(el.getAttribute('data-ln')) + 1;
-        var lines = el.innerHTML.replace(/\r?\n<\/code>$/i, '</code>').split(/\r?\n/g);
+        var lines = el.innerHTML.replace(/\n<\/code>$/i, '</code>').split(/\n/g);
         for (var b = 0; b < lines.length - 1; b++)
             lines[b] += '</code>\n<code data-ln="' + (nline + b) + '">';
 
@@ -241,6 +285,9 @@ function convert_markdown(md_text, dest_dom) {
         id_seen[id] = 1;
         el.innerHTML = '<a href="#' + id + '">' + el.innerHTML + '</a>';
     }
+
+    if (md_plug['post'])
+        md_plug['post'][0].render(md_dom);
 
     copydom(md_dom, dest_dom, 0);
 }
@@ -281,7 +328,12 @@ function init_toc() {
 
             elm.childNodes[0].setAttribute('ctr', ctr.slice(0, lv).join('.'));
 
-            html.push('<li>' + elm.innerHTML + '</li>');
+            var elm2 = elm.cloneNode(true);
+            elm2.childNodes[0].textContent = elm.textContent;
+            while (elm2.childNodes.length > 1)
+                elm2.removeChild(elm2.childNodes[1]);
+
+            html.push('<li>' + elm2.innerHTML + '</li>');
 
             if (anchor != null)
                 anchors.push(anchor);

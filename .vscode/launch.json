@@ -10,6 +10,8 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 //"-nw",
+                "-ed",
+                "-emp",
                 "-a",
                 "ed:wark",
                 "-v",

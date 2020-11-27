@@ -136,6 +136,7 @@ def main():
     ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
     ap.add_argument("-q", action="store_true", help="quiet")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
+    ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
     ap.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap.add_argument("-nih", action="store_true", help="no info hostname")
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
