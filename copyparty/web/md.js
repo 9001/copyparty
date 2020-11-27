@@ -158,6 +158,38 @@ function copydom(src, dst, lv) {
 }
 
 
+function md_plug_err(ex, js) {
+    var errbox = document.getElementById('md_errbox');
+    if (errbox)
+        errbox.parentNode.removeChild(errbox);
+
+    if (!ex)
+        return;
+
+    var msg = (ex + '').split('\n')[0];
+    var ln = ex.lineNumber;
+    var o = null;
+    if (ln) {
+        msg = "Line " + ln + ", " + msg;
+        var lns = js.split('\n');
+        if (ln < lns.length) {
+            o = document.createElement('span');
+            o.style.cssText = 'color:#ac2;font-size:.9em;font-family:scp;display:block';
+            o.textContent = lns[ln - 1];
+        }
+    }
+    errbox = document.createElement('div');
+    errbox.setAttribute('id', 'md_errbox');
+    errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
+    errbox.textContent = msg;
+    if (o) {
+        errbox.appendChild(o);
+        errbox.style.padding = '.25em .5em';
+    }
+    dom_nav.appendChild(errbox);
+}
+
+
 function load_plug(md_text, plug_type) {
     if (!md_opt.allow_plugins)
         return md_text;
@@ -177,7 +209,14 @@ function load_plug(md_text, plug_type) {
     var old_plug = md_plug[plug_type];
     if (!old_plug || old_plug[1] != js) {
         js = 'const x = { ' + js + ' }; x;';
-        var x = eval(js);
+        try {
+            var x = eval(js);
+        }
+        catch (ex) {
+            md_plug[plug_type] = null;
+            md_plug_err(ex, js);
+            return md;
+        }
         if (x['ctor']) {
             x['ctor']();
             delete x['ctor'];
@@ -191,20 +230,30 @@ function load_plug(md_text, plug_type) {
 
 function convert_markdown(md_text, dest_dom) {
     md_text = md_text.replace(/\r/g, '');
+
+    md_plug_err(null);
     md_text = load_plug(md_text, 'pre');
     md_text = load_plug(md_text, 'post');
 
-    marked.setOptions({
+    var marked_opts = {
         //headerPrefix: 'h-',
         breaks: true,
         gfm: true
-    });
+    };
 
-    if (md_plug['pre']) {
-        marked.use(md_plug['pre'][0]);
+    var ext = md_plug['pre'];
+    if (ext)
+        Object.assign(marked_opts, ext[0]);
+
+    try {
+        var md_html = marked(md_text, marked_opts);
     }
+    catch (ex) {
+        if (ext)
+            md_plug_err(ex, ext[1]);
 
-    var md_html = marked(md_text);
+        throw ex;
+    }
     var md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
 
     var nodes = md_dom.getElementsByTagName('a');
@@ -286,8 +335,14 @@ function convert_markdown(md_text, dest_dom) {
         el.innerHTML = '<a href="#' + id + '">' + el.innerHTML + '</a>';
     }
 
-    if (md_plug['post'])
-        md_plug['post'][0].render(md_dom);
+    ext = md_plug['post'];
+    if (ext)
+        try {
+            ext[0].render(md_dom);
+        }
+        catch (ex) {
+            md_plug_err(ex, ext[1]);
+        }
 
     copydom(md_dom, dest_dom, 0);
 }
