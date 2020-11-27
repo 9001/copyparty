@@ -3,6 +3,7 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import time
 import json
 import shutil
 import unittest
@@ -59,8 +60,15 @@ class TestVFS(unittest.TestCase):
 
         if os.path.exists("/Volumes"):
             devname, _ = self.chkcmd("hdiutil", "attach", "-nomount", "ram://8192")
-            _, _ = self.chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
-            return "/Volumes/cptd"
+            for _ in range(10):
+                try:
+                    _, _ = self.chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
+                    return "/Volumes/cptd"
+                except:
+                    print('lol macos')
+                    time.sleep(0.25)
+            
+            raise Exception("ramdisk creation failed")
 
         raise Exception("TODO support windows")
 
