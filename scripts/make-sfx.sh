@@ -94,8 +94,39 @@ cd sfx
 	rm -f ../tar
 }
 
-ver="$(awk '/^VERSION *= \(/ {
-	gsub(/[^0-9,]/,""); gsub(/,/,"."); print; exit}' < ../copyparty/__version__.py)"
+ver=
+command -v git >/dev/null && {
+	git_ver="$(git describe --tags)";  # v0.5.5-2-gb164aa0
+	ver="$(printf '%s\n' "$git_ver" | sed -r 's/^v//; s/-g?/./g')";
+	t_ver=
+
+	printf '%s\n' "$git_ver" | grep -qE '^v[0-9\.]+$' && {
+		# short format (exact version number)
+		t_ver="$(printf '%s\n' "$ver" | sed -r 's/\./, /g')";
+	}
+
+	printf '%s\n' "$git_ver" | grep -qE '^v[0-9\.]+-[0-9]+-g[0-9a-f]+$' && {
+		# long format (unreleased commit)
+		t_ver="$(printf '%s\n' "$ver" | sed -r 's/\./, /g; s/(.*) (.*)/\1 "\2"/')"
+	}
+
+	[ -z "$t_ver" ] && {
+		printf 'unexpected git version format: [%s]\n' "$git_ver"
+		exit 1
+	}
+
+	dt="$(git log -1 --format=%cd --date=format:'%Y, %m, %d')"
+	printf 'git %3s: \033[36m%s\033[0m\n' ver "$ver" dt "$dt"
+	sed -ri '
+		s/^(VERSION =)(.*)/#\1\2\n\1 ('"$t_ver"')/;
+		s/^(S_VERSION =)(.*)/#\1\2\n\1 "'"$ver"'"/;
+		s/^(BUILD_DT =)(.*)/#\1\2\n\1 ('"$dt"')/;
+	' copyparty/__version__.py
+}
+
+[ -z "$ver" ] && 
+	ver="$(awk '/^VERSION *= \(/ {
+		gsub(/[^0-9,]/,""); gsub(/,/,"."); print; exit}' < copyparty/__version__.py)"
 
 ts=$(date -u +%s)
 hts=$(date -u +%Y-%m%d-%H%M%S) # --date=@$ts (thx osx)
