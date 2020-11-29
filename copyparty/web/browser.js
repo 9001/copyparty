@@ -1,75 +1,9 @@
 "use strict";
 
-// error handler for mobile devices
-function hcroak(msg) {
-	document.body.innerHTML = msg;
-	window.onerror = undefined;
-	throw 'fatal_err';
-}
-function croak(msg) {
-	document.body.textContent = msg;
-	window.onerror = undefined;
-	throw msg;
-}
-function esc(txt) {
-	return txt.replace(/[&"<>]/g, function (c) {
-		return {
-			'&': '&amp;',
-			'"': '&quot;',
-			'<': '&lt;',
-			'>': '&gt;'
-		}[c];
-	});
-}
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-	window.onerror = undefined;
-	var html = ['<h1>you hit a bug!</h1><p>please screenshot this error and send me a copy arigathanks gozaimuch (ed/irc.rizon.net or ed#2644)</p><p>',
-		esc(String(msg)), '</p><p>', esc(url + ' @' + lineNo + ':' + columnNo), '</p>'];
-
-	if (error) {
-		var find = ['desc', 'stack', 'trace'];
-		for (var a = 0; a < find.length; a++)
-			if (String(error[find[a]]) !== 'undefined')
-				html.push('<h2>' + find[a] + '</h2>' +
-					esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
-	}
-	document.body.style.fontSize = '0.8em';
-	document.body.style.padding = '0 1em 1em 1em';
-	hcroak(html.join('\n'));
-};
-
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
-if (!String.prototype.endsWith) {
-	String.prototype.endsWith = function (search, this_len) {
-		if (this_len === undefined || this_len > this.length) {
-			this_len = this.length;
-		}
-		return this.substring(this_len - search.length, this_len) === search;
-	};
-}
-
-
-// https://stackoverflow.com/a/950146
-function import_js(url, cb) {
-	var head = document.head || document.getElementsByTagName('head')[0];
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.src = url;
-
-	script.onreadystatechange = cb;
-	script.onload = cb;
-
-	head.appendChild(script);
-}
-
-
-function o(id) {
-	return document.getElementById(id);
-}
+window.onerror = vis_exh;
 
 function dbg(msg) {
-	o('path').innerHTML = msg;
+	ebi('path').innerHTML = msg;
 }
 
 function ev(e) {
@@ -78,40 +12,7 @@ function ev(e) {
 	return e;
 }
 
-
-function sortTable(table, col) {
-	var tb = table.tBodies[0], // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
-		th = table.tHead.rows[0].cells,
-		tr = Array.prototype.slice.call(tb.rows, 0),
-		i, reverse = th[col].className == 'sort1' ? -1 : 1;
-	for (var a = 0, thl = th.length; a < thl; a++)
-		th[a].className = '';
-	th[col].className = 'sort' + reverse;
-	var stype = th[col].getAttribute('sort');
-	tr = tr.sort(function (a, b) {
-		var v1 = a.cells[col].textContent.trim();
-		var v2 = b.cells[col].textContent.trim();
-		if (stype == 'int') {
-			v1 = parseInt(v1.replace(/,/g, ''));
-			v2 = parseInt(v2.replace(/,/g, ''));
-			return reverse * (v1 - v2);
-		}
-		return reverse * (v1.localeCompare(v2));
-	});
-	for (i = 0; i < tr.length; ++i) tb.appendChild(tr[i]);
-}
-function makeSortable(table) {
-	var th = table.tHead, i;
-	th && (th = th.rows[0]) && (th = th.cells);
-	if (th) i = th.length;
-	else return; // if no `<thead>` then do nothing
-	while (--i >= 0) (function (i) {
-		th[i].onclick = function () {
-			sortTable(table, i);
-		};
-	}(i));
-}
-makeSortable(o('files'));
+makeSortable(ebi('files'));
 
 
 // extract songs + add play column
@@ -142,7 +43,7 @@ var mp = (function () {
 	}
 
 	for (var a = 0, aa = tracks.length; a < aa; a++)
-		o('trk' + a).onclick = ev_play;
+		ebi('trk' + a).onclick = ev_play;
 
 	ret.vol = localStorage.getItem('vol');
 	if (ret.vol !== null)
@@ -199,7 +100,7 @@ var widget = (function () {
 	ret.paused = function (paused) {
 		if (was_paused != paused) {
 			was_paused = paused;
-			o('bplay').innerHTML = paused ? '▶' : '⏸';
+			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
 		}
 	};
 	var click_handler = function (e) {
@@ -223,8 +124,8 @@ var widget = (function () {
 // buffer/position bar
 var pbar = (function () {
 	var r = {};
-	r.bcan = o('barbuf');
-	r.pcan = o('barpos');
+	r.bcan = ebi('barbuf');
+	r.pcan = ebi('barpos');
 	r.bctx = r.bcan.getContext('2d');
 	r.pctx = r.pcan.getContext('2d');
 
@@ -289,7 +190,7 @@ var pbar = (function () {
 // volume bar
 var vbar = (function () {
 	var r = {};
-	r.can = o('pvol');
+	r.can = ebi('pvol');
 	r.ctx = r.can.getContext('2d');
 
 	var bctx = r.ctx;
@@ -386,7 +287,7 @@ var vbar = (function () {
 		else
 			play(0);
 	};
-	o('bplay').onclick = function (e) {
+	ebi('bplay').onclick = function (e) {
 		ev(e);
 		if (mp.au) {
 			if (mp.au.paused)
@@ -397,15 +298,15 @@ var vbar = (function () {
 		else
 			play(0);
 	};
-	o('bprev').onclick = function (e) {
+	ebi('bprev').onclick = function (e) {
 		ev(e);
 		bskip(-1);
 	};
-	o('bnext').onclick = function (e) {
+	ebi('bnext').onclick = function (e) {
 		ev(e);
 		bskip(1);
 	};
-	o('barpos').onclick = function (e) {
+	ebi('barpos').onclick = function (e) {
 		if (!mp.au) {
 			//dbg((new Date()).getTime());
 			return play(0);
@@ -471,7 +372,7 @@ function ev_play(e) {
 
 
 function setclass(id, clas) {
-	o(id).setAttribute('class', clas);
+	ebi(id).setAttribute('class', clas);
 }
 
 
@@ -608,7 +509,7 @@ function show_modal(html) {
 
 // hide fullscreen message
 function unblocked() {
-	var dom = o('blocked');
+	var dom = ebi('blocked');
 	if (dom)
 		dom.parentNode.removeChild(dom);
 }
@@ -620,8 +521,8 @@ function autoplay_blocked(tid) {
 		'<div id="blk_play"><a href="#" id="blk_go"></a></div>' +
 		'<div id="blk_abrt"><a href="#" id="blk_na">Cancel<br />(show file list)</a></div>');
 
-	var go = o('blk_go');
-	var na = o('blk_na');
+	var go = ebi('blk_go');
+	var na = ebi('blk_na');
 
 	var fn = mp.tracks[mp.au.tid].split(/\//).pop();
 	fn = decodeURIComponent(fn.replace(/\+/g, ' '));

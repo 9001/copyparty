@@ -1,61 +1,6 @@
 "use strict";
 
-// error handler for mobile devices
-function hcroak(msg) {
-    document.body.innerHTML = msg;
-    window.onerror = undefined;
-    throw 'fatal_err';
-}
-function croak(msg) {
-    document.body.textContent = msg;
-    window.onerror = undefined;
-    throw msg;
-}
-function esc(txt) {
-    return txt.replace(/[&"<>]/g, function (c) {
-        return {
-            '&': '&amp;',
-            '"': '&quot;',
-            '<': '&lt;',
-            '>': '&gt;'
-        }[c];
-    });
-}
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-    window.onerror = undefined;
-    var html = ['<h1>you hit a bug!</h1><p>please screenshot this error and send me a copy arigathanks gozaimuch (ed/irc.rizon.net or ed#2644)</p><p>',
-        esc(String(msg)), '</p><p>', esc(url + ' @' + lineNo + ':' + columnNo), '</p>'];
-
-    if (error) {
-        var find = ['desc', 'stack', 'trace'];
-        for (var a = 0; a < find.length; a++)
-            if (String(error[find[a]]) !== 'undefined')
-                html.push('<h2>' + find[a] + '</h2>' +
-                    esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
-    }
-    document.body.style.fontSize = '0.8em';
-    document.body.style.padding = '0 1em 1em 1em';
-    hcroak(html.join('\n'));
-};
-
-
-// https://stackoverflow.com/a/950146
-function import_js(url, cb) {
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
-
-    script.onreadystatechange = cb;
-    script.onload = cb;
-
-    head.appendChild(script);
-}
-
-
-function o(id) {
-    return document.getElementById(id);
-}
+window.onerror = vis_exh;
 
 
 (function () {
@@ -150,21 +95,21 @@ function up2k_init(have_crypto) {
 
     // show modal message
     function showmodal(msg) {
-        o('u2notbtn').innerHTML = msg;
-        o('u2btn').style.display = 'none';
-        o('u2notbtn').style.display = 'block';
-        o('u2conf').style.opacity = '0.5';
+        ebi('u2notbtn').innerHTML = msg;
+        ebi('u2btn').style.display = 'none';
+        ebi('u2notbtn').style.display = 'block';
+        ebi('u2conf').style.opacity = '0.5';
     }
 
     // hide modal message
     function unmodal() {
-        o('u2notbtn').style.display = 'none';
-        o('u2btn').style.display = 'block';
-        o('u2conf').style.opacity = '1';
-        o('u2notbtn').innerHTML = '';
+        ebi('u2notbtn').style.display = 'none';
+        ebi('u2btn').style.display = 'block';
+        ebi('u2conf').style.opacity = '1';
+        ebi('u2notbtn').innerHTML = '';
     }
 
-    var post_url = o('op_bup').getElementsByTagName('form')[0].getAttribute('action');
+    var post_url = ebi('op_bup').getElementsByTagName('form')[0].getAttribute('action');
     if (post_url && post_url.charAt(post_url.length - 1) !== '/')
         post_url += '/';
 
@@ -181,25 +126,25 @@ function up2k_init(have_crypto) {
             import_js('/.cpr/deps/sha512.js', unmodal);
 
             if (is_https)
-                o('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500kB/s at best';
+                ebi('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500kB/s at best';
             else
-                o('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
+                ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
         }
     };
 
     // show uploader if the user only has write-access
-    if (!o('files'))
+    if (!ebi('files'))
         goto('up2k');
 
     // shows or clears an error message in the basic uploader ui
     function setmsg(msg) {
         if (msg !== undefined) {
-            o('u2err').setAttribute('class', 'err');
-            o('u2err').innerHTML = msg;
+            ebi('u2err').setAttribute('class', 'err');
+            ebi('u2err').innerHTML = msg;
         }
         else {
-            o('u2err').setAttribute('class', '');
-            o('u2err').innerHTML = '';
+            ebi('u2err').setAttribute('class', '');
+            ebi('u2err').innerHTML = '';
         }
     }
 
@@ -210,7 +155,7 @@ function up2k_init(have_crypto) {
     }
 
     // handle user intent to use the basic uploader instead
-    o('u2nope').onclick = function (e) {
+    ebi('u2nope').onclick = function (e) {
         e.preventDefault();
         setmsg('');
         goto('bup');
@@ -229,9 +174,9 @@ function up2k_init(have_crypto) {
     function cfg_get(name) {
         var val = localStorage.getItem(name);
         if (val === null)
-            return parseInt(o(name).value);
+            return parseInt(ebi(name).value);
 
-        o(name).value = val;
+        ebi(name).value = val;
         return val;
     }
 
@@ -242,7 +187,7 @@ function up2k_init(have_crypto) {
         else
             val = (val == '1');
 
-        o(name).checked = val;
+        ebi(name).checked = val;
         return val;
     }
 
@@ -250,7 +195,7 @@ function up2k_init(have_crypto) {
         localStorage.setItem(
             name, val ? '1' : '0');
 
-        o(name).checked = val;
+        ebi(name).checked = val;
         return val;
     }
 
@@ -284,9 +229,9 @@ function up2k_init(have_crypto) {
         return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
 
     function nav() {
-        o('file' + fdom_ctr).click();
+        ebi('file' + fdom_ctr).click();
     }
-    o('u2btn').addEventListener('click', nav, false);
+    ebi('u2btn').addEventListener('click', nav, false);
 
     function ondrag(ev) {
         ev.stopPropagation();
@@ -294,8 +239,8 @@ function up2k_init(have_crypto) {
         ev.dataTransfer.dropEffect = 'copy';
         ev.dataTransfer.effectAllowed = 'copy';
     }
-    o('u2btn').addEventListener('dragover', ondrag, false);
-    o('u2btn').addEventListener('dragenter', ondrag, false);
+    ebi('u2btn').addEventListener('dragover', ondrag, false);
+    ebi('u2btn').addEventListener('dragenter', ondrag, false);
 
     function gotfile(ev) {
         ev.stopPropagation();
@@ -357,7 +302,7 @@ function up2k_init(have_crypto) {
             var tr = document.createElement('tr');
             tr.innerHTML = '<td id="f{0}n"></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
             tr.getElementsByTagName('td')[0].textContent = entry.name;
-            o('u2tab').appendChild(tr);
+            ebi('u2tab').appendChild(tr);
 
             st.files.push(entry);
             st.todo.hash.push(entry);
@@ -374,14 +319,14 @@ function up2k_init(have_crypto) {
             alert(msg);
         }
     }
-    o('u2btn').addEventListener('drop', gotfile, false);
+    ebi('u2btn').addEventListener('drop', gotfile, false);
 
     function more_one_file() {
         fdom_ctr++;
         var elm = document.createElement('div')
         elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" />'.format(fdom_ctr);
-        o('u2form').appendChild(elm);
-        o('file' + fdom_ctr).addEventListener('change', gotfile, false);
+        ebi('u2form').appendChild(elm);
+        ebi('file' + fdom_ctr).addEventListener('change', gotfile, false);
     }
     more_one_file();
 
@@ -602,7 +547,7 @@ function up2k_init(have_crypto) {
             pb_html += '<div id="f{0}p{1}" style="width:{2}%"><div></div></div>'.format(
                 t.n, a, pb_perc);
 
-        o('f{0}p'.format(t.n)).innerHTML = pb_html;
+        ebi('f{0}p'.format(t.n)).innerHTML = pb_html;
 
         var reader = new FileReader();
 
@@ -677,7 +622,7 @@ function up2k_init(have_crypto) {
                 alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
             }
 
-            o('f{0}t'.format(t.n)).innerHTML = 'connecting';
+            ebi('f{0}t'.format(t.n)).innerHTML = 'connecting';
             st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
             st.todo.handshake.push(t);
         };
@@ -706,7 +651,7 @@ function up2k_init(have_crypto) {
                 if (response.name !== t.name) {
                     // file exists; server renamed us
                     t.name = response.name;
-                    o('f{0}n'.format(t.n)).textContent = t.name;
+                    ebi('f{0}n'.format(t.n)).textContent = t.name;
                 }
 
                 t.postlist = [];
@@ -736,13 +681,13 @@ function up2k_init(have_crypto) {
                     msg = 'uploading';
                     done = false;
                 }
-                o('f{0}t'.format(t.n)).innerHTML = msg;
+                ebi('f{0}t'.format(t.n)).innerHTML = msg;
                 st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
 
                 if (done) {
                     var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                     var spd2 = (t.size / ((t.t3 - t.t2) / 1000.)) / (1024 * 1024.);
-                    o('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
+                    ebi('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2));
                 }
                 tasker();
@@ -803,7 +748,7 @@ function up2k_init(have_crypto) {
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
                         t.t3 = new Date().getTime();
-                        o('f{0}t'.format(t.n)).innerHTML = 'verifying';
+                        ebi('f{0}t'.format(t.n)).innerHTML = 'verifying';
                         st.todo.handshake.push(t);
                     }
                     tasker();
@@ -834,7 +779,7 @@ function up2k_init(have_crypto) {
     //
 
     function prog(nfile, nchunk, color, percent) {
-        var n1 = o('f{0}p{1}'.format(nfile, nchunk));
+        var n1 = ebi('f{0}p{1}'.format(nfile, nchunk));
         var n2 = n1.getElementsByTagName('div')[0];
         if (percent === undefined) {
             n1.style.background = color;
@@ -857,7 +802,7 @@ function up2k_init(have_crypto) {
             dir.preventDefault();
         } catch (ex) { }
 
-        var obj = o('nthread');
+        var obj = ebi('nthread');
         if (dir.target) {
             obj.style.background = '#922';
             var v = Math.floor(parseInt(obj.value));
@@ -892,19 +837,19 @@ function up2k_init(have_crypto) {
         this.click();
     }
 
-    o('nthread_add').onclick = function (ev) {
+    ebi('nthread_add').onclick = function (ev) {
         ev.preventDefault();
         bumpthread(1);
     };
-    o('nthread_sub').onclick = function (ev) {
+    ebi('nthread_sub').onclick = function (ev) {
         ev.preventDefault();
         bumpthread(-1);
     };
 
-    o('nthread').addEventListener('input', bumpthread, false);
-    o('multitask').addEventListener('click', tgl_multitask, false);
+    ebi('nthread').addEventListener('input', bumpthread, false);
+    ebi('multitask').addEventListener('click', tgl_multitask, false);
 
-    var nodes = o('u2conf').getElementsByTagName('a');
+    var nodes = ebi('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)
         nodes[a].addEventListener('touchend', nop, false);
 

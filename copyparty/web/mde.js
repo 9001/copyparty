@@ -1,3 +1,5 @@
+"use strict";
+
 var dom_wrap = document.getElementById('mw');
 var dom_nav = document.getElementById('mn');
 var dom_doc = document.getElementById('m');

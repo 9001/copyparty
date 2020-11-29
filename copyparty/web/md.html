@@ -144,17 +144,11 @@ var md_opt = {
 		toggle();
 })();
 
-if (!String.startsWith) {
-	String.prototype.startsWith = function(s, i) {
-		i = i>0 ? i|0 : 0;
-		return this.substring(i, i + s.length) === s;
-	};
-}
-
 	</script>
+    <script src="/.cpr/util.js"></script>
 	<script src="/.cpr/deps/marked.full.js"></script>
 	<script src="/.cpr/md.js"></script>
 	{%- if edit %}
-		<script src="/.cpr/md2.js"></script>
+	<script src="/.cpr/md2.js"></script>
 	{%- endif %}
 </body></html>

@@ -1,3 +1,5 @@
+"use strict";
+
 var dom_toc = document.getElementById('toc');
 var dom_wrap = document.getElementById('mw');
 var dom_hbar = document.getElementById('mh');
@@ -34,7 +36,7 @@ function cls(dom, name, add) {
 }
 
 
-function static(obj) {
+function statify(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 

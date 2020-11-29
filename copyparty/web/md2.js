@@ -1,3 +1,6 @@
+"use strict";
+
+
 // server state
 var server_md = dom_src.value;
 
@@ -1000,9 +1003,9 @@ action_stack = (function () {
         ref = newtxt;
         dbg('undos(%d) redos(%d)', hist.un.length, hist.re.length);
         if (hist.un.length > 0)
-            dbg(static(hist.un.slice(-1)[0]));
+            dbg(statify(hist.un.slice(-1)[0]));
         if (hist.re.length > 0)
-            dbg(static(hist.re.slice(-1)[0]));
+            dbg(statify(hist.re.slice(-1)[0]));
     }
 
     return {
