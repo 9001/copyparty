@@ -680,7 +680,8 @@ function fmt_table(e) {
     for (var col = 0; col < ncols; col++) {
         var max = 0;
         for (var row = 0; row < tab.length; row++)
-            max = Math.max(max, tab[row][col].length);
+            if (row != 1)
+                max = Math.max(max, tab[row][col].length);
 
         var s = '';
         for (var n = 0; n < max; n++)
