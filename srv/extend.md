@@ -18,6 +18,8 @@ this one becomes a hyperlink to ./except/ thanks to
 
 it is a passthrough to the markdown extension api, see https://marked.js.org/using_pro
 
+in addition to the markdown extension functions, `ctor` will be called on document init
+
 
 ### these/
 and this one becomes ./except/these/
@@ -36,12 +38,21 @@ whic hshoud be ./except/also-this.md
 # ok
 now for another extension type, `copyparty_post` which is called to manipulate the generated dom instead
 
+`copyparty_post` can have the following functions, all optional
+* `ctor` is called on document init
+* `render` is called when the dom is done but still in-memory
+* `render2` is called with the live browser dom as-displayed
+
+## post example
+
 the values in the `ex:` columns are linkified to `example.com/$value`
 
 | ex:foo       | bar      | ex:baz |
 | ------------ | -------- | ------ |
 | asdf         | nice     | fgsfds |
 | more one row | hi hello | aaa    |
+
+and the table can be sorted by clicking the headers
 
 the difference is that with `copyparty_pre` you'll probably break various copyparty features but if you use `copyparty_post` then future copyparty versions will probably break you
 
@@ -123,5 +134,8 @@ render(dom) {
             }
         }
     }
+},
+render2(dom) {
+    window.makeSortable(dom.getElementsByTagName('table')[0]);
 }
 ```

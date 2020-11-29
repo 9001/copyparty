@@ -184,11 +184,19 @@ function md_plug_err(ex, js) {
     errbox.setAttribute('id', 'md_errbox');
     errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
     errbox.textContent = msg;
+    errbox.onclick = function () {
+        alert('' + ex.stack);
+    };
     if (o) {
         errbox.appendChild(o);
         errbox.style.padding = '.25em .5em';
     }
     dom_nav.appendChild(errbox);
+
+    try {
+        console.trace();
+    }
+    catch (ex2) { }
 }
 
 
@@ -338,7 +346,7 @@ function convert_markdown(md_text, dest_dom) {
     }
 
     ext = md_plug['post'];
-    if (ext)
+    if (ext && ext[0].render)
         try {
             ext[0].render(md_dom);
         }
@@ -347,6 +355,14 @@ function convert_markdown(md_text, dest_dom) {
         }
 
     copydom(md_dom, dest_dom, 0);
+
+    if (ext && ext[0].render2)
+        try {
+            ext[0].render2(dest_dom);
+        }
+        catch (ex) {
+            md_plug_err(ex, ext[1]);
+        }
 }
 
 
