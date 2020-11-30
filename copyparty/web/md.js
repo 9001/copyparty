@@ -1,12 +1,12 @@
 "use strict";
 
-var dom_toc = document.getElementById('toc');
-var dom_wrap = document.getElementById('mw');
-var dom_hbar = document.getElementById('mh');
-var dom_nav = document.getElementById('mn');
-var dom_pre = document.getElementById('mp');
-var dom_src = document.getElementById('mt');
-var dom_navtgl = document.getElementById('navtoggle');
+var dom_toc = ebi('toc');
+var dom_wrap = ebi('mw');
+var dom_hbar = ebi('mh');
+var dom_nav = ebi('mn');
+var dom_pre = ebi('mp');
+var dom_src = ebi('mt');
+var dom_navtgl = ebi('navtoggle');
 
 
 // chrome 49 needs this
@@ -161,7 +161,7 @@ function copydom(src, dst, lv) {
 
 
 function md_plug_err(ex, js) {
-    var errbox = document.getElementById('md_errbox');
+    var errbox = ebi('md_errbox');
     if (errbox)
         errbox.parentNode.removeChild(errbox);
 
@@ -367,7 +367,7 @@ function convert_markdown(md_text, dest_dom) {
 
 
 function init_toc() {
-    var loader = document.getElementById('ml');
+    var loader = ebi('ml');
     loader.parentNode.removeChild(loader);
 
     var anchors = [];  // list of toc entries, complex objects

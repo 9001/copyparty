@@ -25,7 +25,8 @@
 var last_modified = {{ lastmod }};
 var md_opt = {
 	link_md_as_html: false,
-	allow_plugins: {{ md_plug }}
+	allow_plugins: {{ md_plug }},
+	modpoll_freq: {{ md_chk_rate }}
 };
 
 var lightswitch = (function () {

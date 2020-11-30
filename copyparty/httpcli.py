@@ -964,6 +964,7 @@ class HttpCli(object):
             "title": html_escape(self.vpath),
             "lastmod": int(ts_md * 1000),
             "md_plug": "true" if self.args.emp else "false",
+            "md_chk_rate": self.args.mcr,
             "md": "",
         }
         sz_html = len(template.render(**targs).encode("utf-8"))

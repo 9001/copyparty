@@ -77,32 +77,52 @@ html.dark #mt {
     background: #f97;
     border-radius: .15em;
 }
+html.dark #save.force-save {
+    color: #fca;
+    background: #720;
+}
 #save.disabled {
     opacity: .4;
+}
+#helpbox,
+#toast {
+    background: #f7f7f7;
+    border-radius: .4em;
+    z-index: 9001;
 }
 #helpbox {
     display: none;
     position: fixed;
-    background: #f7f7f7;
-    box-shadow: 0 .5em 2em #777;
-    border-radius: .4em;
     padding: 2em;
     top: 4em;
     overflow-y: auto;
+    box-shadow: 0 .5em 2em #777;
     height: calc(100% - 12em);
     left: calc(50% - 15em);
     right: 0;
     width: 30em;
-    z-index: 9001;
 }
 #helpclose {
     display: block;
 }
 html.dark #helpbox {
-    background: #222;
     box-shadow: 0 .5em 2em #444;
+}
+html.dark #helpbox,
+html.dark #toast {
+    background: #222;
     border: 1px solid #079;
     border-width: 1px 0;
+}
+#toast {
+    font-weight: bold;
+    text-align: center;
+    padding: .6em 0;
+    position: fixed;
+    z-index: 9001;
+    top: 30%;
+    transition: opacity 0.2s ease-in-out;
+    opacity: 1;
 }
 
 # mt {opacity: .5;top:1px}

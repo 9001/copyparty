@@ -11,15 +11,15 @@ var js_uni_whitelist = eval('\'' + esc_uni_whitelist + '\'');
 
 
 // dom nodes
-var dom_swrap = document.getElementById('mtw');
-var dom_sbs = document.getElementById('sbs');
-var dom_nsbs = document.getElementById('nsbs');
-var dom_tbox = document.getElementById('toolsbox');
+var dom_swrap = ebi('mtw');
+var dom_sbs = ebi('sbs');
+var dom_nsbs = ebi('nsbs');
+var dom_tbox = ebi('toolsbox');
 var dom_ref = (function () {
     var d = document.createElement('div');
     d.setAttribute('id', 'mtr');
     dom_swrap.appendChild(d);
-    d = document.getElementById('mtr');
+    d = ebi('mtr');
     // hide behind the textarea (offsetTop is not computed if display:none)
     dom_src.style.zIndex = '4';
     d.style.zIndex = '3';
@@ -108,7 +108,7 @@ var draw_md = (function () {
         map_src = genmap(dom_ref, map_src);
         map_pre = genmap(dom_pre, map_pre);
 
-        cls(document.getElementById('save'), 'disabled', src == server_md);
+        cls(ebi('save'), 'disabled', src == server_md);
 
         var t1 = new Date().getTime();
         delay = t1 - t0 > 100 ? 25 : 1;
@@ -223,14 +223,108 @@ redraw = (function () {
 })();
 
 
+// modification checker
+function Modpoll() {
+    this.skip_one = true;
+    this.disabled = false;
+
+    this.periodic = function () {
+        var that = this;
+        setTimeout(function () {
+            that.periodic();
+        }, 1000 * md_opt.modpoll_freq);
+
+        var skip = null;
+
+        if (ebi('toast'))
+            skip = 'toast';
+
+        else if (this.skip_one)
+            skip = 'saved';
+
+        else if (this.disabled)
+            skip = 'disabled';
+
+        if (skip) {
+            console.log('modpoll skip, ' + skip);
+            this.skip_one = false;
+            return;
+        }
+
+        console.log('modpoll...');
+        var url = (document.location + '').split('?')[0] + '?raw&_=' + new Date().getTime();
+        var xhr = new XMLHttpRequest();
+        xhr.modpoll = this;
+        xhr.open('GET', url, true);
+        xhr.responseType = 'text';
+        xhr.onreadystatechange = this.cb;
+        xhr.send();
+    }
+
+    this.cb = function () {
+        if (this.modpoll.disabled || this.modpoll.skip_one) {
+            console.log('modpoll abort');
+            return;
+        }
+
+        if (this.readyState != XMLHttpRequest.DONE)
+            return;
+
+        if (this.status !== 200) {
+            console.log('modpoll err ' + this.status + ": " + this.responseText);
+            return;
+        }
+
+        if (!this.responseText)
+            return;
+
+        var server_ref = server_md.replace(/\r/g, '');
+        var server_now = this.responseText.replace(/\r/g, '');
+
+        if (server_ref != server_now) {
+            console.log("modpoll diff |" + server_ref.length + "|, |" + server_now.length + "|");
+            this.modpoll.disabled = true;
+            var msg = [
+                "The document has changed on the server.<br />" +
+                "The changes will NOT be loaded into your editor automatically.",
+
+                "Press F5 or CTRL-R to refresh the page,<br />" +
+                "replacing your document with the server copy.",
+
+                "You can click this message to ignore and contnue."
+            ];
+            return toast(false, "box-shadow:0 1em 2em rgba(64,64,64,0.8);font-weight:normal",
+                36, "<p>" + msg.join('</p>\n<p>') + '</p>');
+        }
+
+        console.log('modpoll eq');
+    }
+
+    if (md_opt.modpoll_freq > 0)
+        this.periodic();
+
+    return this;
+};
+var modpoll = new Modpoll();
+
+
+window.onbeforeunload = function (e) {
+    if ((ebi("save").getAttribute('class') + '').indexOf('disabled') >= 0)
+        return; //nice (todo)
+
+    e.preventDefault(); //ff
+    e.returnValue = ''; //chrome
+};
+
+
 // save handler
 function save(e) {
     if (e) e.preventDefault();
-    var save_btn = document.getElementById("save"),
+    var save_btn = ebi("save"),
         save_cls = save_btn.getAttribute('class') + '';
 
     if (save_cls.indexOf('disabled') >= 0) {
-        toast('font-size:2em;color:#fc6;width:9em;', 'no changes');
+        toast(true, ";font-size:2em;color:#c90", 9, "no changes");
         return;
     }
 
@@ -254,6 +348,8 @@ function save(e) {
     xhr.onreadystatechange = save_cb;
     xhr.btn = save_btn;
     xhr.txt = txt;
+
+    modpoll.skip_one = true;  // skip one iteration while we save
     xhr.send(fd);
 }
 
@@ -347,23 +443,44 @@ function savechk_cb() {
     last_modified = this.lastmod;
     server_md = this.txt;
     draw_md();
-    toast('font-size:6em;font-family:serif;color:#cf6;width:4em;',
+    toast(true, ";font-size:6em;font-family:serif;color:#9b4", 4,
         'OK✔️<span style="font-size:.2em;color:#999;position:absolute">' + this.ntry + '</span>');
+
+    modpoll.disabled = false;
 }
 
-function toast(style, msg) {
-    var ok = document.createElement('div');
-    style += 'font-weight:bold;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1';
+function toast(autoclose, style, width, msg) {
+    var ok = ebi("toast");
+    if (ok)
+        ok.parentNode.removeChild(ok);
+
+    style = "width:" + width + "em;left:calc(50% - " + (width / 2) + "em);" + style;
+    ok = document.createElement('div');
+    ok.setAttribute('id', 'toast');
     ok.setAttribute('style', style);
     ok.innerHTML = msg;
-    var parent = document.getElementById('m');
+    var parent = ebi('m');
     document.documentElement.appendChild(ok);
-    setTimeout(function () {
-        ok.style.opacity = 0;
-    }, 500);
-    setTimeout(function () {
-        ok.parentNode.removeChild(ok);
-    }, 750);
+
+    var hide = function (delay) {
+        delay = delay || 0;
+
+        setTimeout(function () {
+            ok.style.opacity = 0;
+        }, delay);
+
+        setTimeout(function () {
+            if (ok.parentNode)
+                ok.parentNode.removeChild(ok);
+        }, delay + 250);
+    }
+
+    ok.onclick = function () {
+        hide(0);
+    };
+
+    if (autoclose)
+        hide(500);
 }
 
 
@@ -806,7 +923,7 @@ function cfg_uni(e) {
             return false;
         }
         if (ev.code == "Escape" || kc == 27) {
-            var d = document.getElementById('helpclose');
+            var d = ebi('helpclose');
             if (d)
                 d.click();
         }
@@ -863,22 +980,22 @@ function cfg_uni(e) {
         }
     }
     document.onkeydown = keydown;
-    document.getElementById('save').onclick = save;
+    ebi('save').onclick = save;
 })();
 
 
-document.getElementById('tools').onclick = function (e) {
+ebi('tools').onclick = function (e) {
     if (e) e.preventDefault();
     var is_open = dom_tbox.getAttribute('class') != 'open';
     dom_tbox.setAttribute('class', is_open ? 'open' : '');
 };
 
 
-document.getElementById('help').onclick = function (e) {
+ebi('help').onclick = function (e) {
     if (e) e.preventDefault();
     dom_tbox.setAttribute('class', '');
 
-    var dom = document.getElementById('helpbox');
+    var dom = ebi('helpbox');
     var dtxt = dom.getElementsByTagName('textarea');
     if (dtxt.length > 0) {
         convert_markdown(dtxt[0].value, dom);
@@ -886,16 +1003,16 @@ document.getElementById('help').onclick = function (e) {
     }
 
     dom.style.display = 'block';
-    document.getElementById('helpclose').onclick = function () {
+    ebi('helpclose').onclick = function () {
         dom.style.display = 'none';
     };
 };
 
 
-document.getElementById('fmt_table').onclick = fmt_table;
-document.getElementById('mark_uni').onclick = mark_uni;
-document.getElementById('iter_uni').onclick = iter_uni;
-document.getElementById('cfg_uni').onclick = cfg_uni;
+ebi('fmt_table').onclick = fmt_table;
+ebi('mark_uni').onclick = mark_uni;
+ebi('iter_uni').onclick = iter_uni;
+ebi('cfg_uni').onclick = cfg_uni;
 
 
 // blame steen
@@ -1019,7 +1136,7 @@ action_stack = (function () {
 })();
 
 /*
-document.getElementById('help').onclick = function () {
+ebi('help').onclick = function () {
     var c1 = getComputedStyle(dom_src).cssText.split(';');
     var c2 = getComputedStyle(dom_ref).cssText.split(';');
     var max = Math.min(c1.length, c2.length);

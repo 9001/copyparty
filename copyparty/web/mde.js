@@ -1,9 +1,9 @@
 "use strict";
 
-var dom_wrap = document.getElementById('mw');
-var dom_nav = document.getElementById('mn');
-var dom_doc = document.getElementById('m');
-var dom_md = document.getElementById('mt');
+var dom_wrap = ebi('mw');
+var dom_nav = ebi('mn');
+var dom_doc = ebi('m');
+var dom_md = ebi('mt');
 
 (function () {
     var n = document.location + '';
@@ -65,7 +65,7 @@ var mde = (function () {
     mde.codemirror.on("change", function () {
         md_changed(mde);
     });
-    var loader = document.getElementById('ml');
+    var loader = ebi('ml');
     loader.parentNode.removeChild(loader);
     return mde;
 })();
@@ -215,7 +215,7 @@ function save_chk() {
     var ok = document.createElement('div');
     ok.setAttribute('style', 'font-size:6em;font-family:serif;font-weight:bold;color:#cf6;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);width:4em;text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1');
     ok.innerHTML = 'OK✔️';
-    var parent = document.getElementById('m');
+    var parent = ebi('m');
     document.documentElement.appendChild(ok);
     setTimeout(function () {
         ok.style.opacity = 0;

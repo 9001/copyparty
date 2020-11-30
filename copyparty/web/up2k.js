@@ -38,7 +38,7 @@ function goto(dest) {
         obj[a].classList.remove('act');
 
     if (dest) {
-        document.getElementById('op_' + dest).classList.add('act');
+        ebi('op_' + dest).classList.add('act');
         document.querySelector('#ops>a[data-dest=' + dest + ']').classList.add('act');
 
         var fn = window['goto_' + dest];
@@ -66,7 +66,7 @@ function goto_up2k() {
         if (op !== null && op !== '.')
             goto(op);
     }
-    document.getElementById('ops').style.display = 'block';
+    ebi('ops').style.display = 'block';
 })();
 
 

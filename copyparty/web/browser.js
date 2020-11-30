@@ -27,7 +27,7 @@ var mp = (function () {
 	};
 	var re_audio = new RegExp('\.(opus|ogg|m4a|aac|mp3|wav|flac)$', 'i');
 
-	var trs = document.getElementById('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
 		var tds = trs[a].getElementsByTagName('td');
 		var link = tds[1].getElementsByTagName('a')[0];
@@ -70,8 +70,8 @@ var mp = (function () {
 // toggle player widget
 var widget = (function () {
 	var ret = {};
-	var widget = document.getElementById('widget');
-	var wtoggle = document.getElementById('wtoggle');
+	var widget = ebi('widget');
+	var wtoggle = ebi('wtoggle');
 	var touchmode = false;
 	var side_open = false;
 	var was_paused = true;

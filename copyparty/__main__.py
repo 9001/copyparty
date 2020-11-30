@@ -123,20 +123,17 @@ def main():
             """
         ),
     )
-    ap.add_argument(
-        "-c", metavar="PATH", type=str, action="append", help="add config file"
-    )
+    ap.add_argument("-c", metavar="PATH", type=str, action="append", help="add config file")
     ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind")
     ap.add_argument("-p", metavar="PORT", type=int, default=3923, help="port to bind")
     ap.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
-    ap.add_argument(
-        "-j", metavar="CORES", type=int, default=1, help="max num cpu cores"
-    )
+    ap.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores")
     ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
     ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
     ap.add_argument("-q", action="store_true", help="quiet")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
+    ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap.add_argument("-nih", action="store_true", help="no info hostname")
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
