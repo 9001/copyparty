@@ -19,7 +19,8 @@ set -e
 # -rwxr-xr-x  0 ed ed  183808 Nov 19 00:43 copyparty-extras/sfx-lite/copyparty-sfx.py
 
 
-command -v gtar && tar=gtar || tar=tar
+command -v gtar && tar() { gtar "$@"; }
+command -v gsed && sed() { gsed "$@"; }
 td="$(mktemp -d)"
 od="$(pwd)"
 cd "$td"
@@ -29,7 +30,7 @@ pwd
 # debug: if cache exists, use that instead of bothering github
 cache="$od/.copyparty-repack.cache"
 [ -e "$cache" ] &&
-	$tar -xvf "$cache" ||
+	tar -xvf "$cache" ||
 {
 	# get download links from github
 	curl https://api.github.com/repos/9001/copyparty/releases/latest |
@@ -44,7 +45,7 @@ cache="$od/.copyparty-repack.cache"
 	tr -d '\r' | tr '\n' '\0' | xargs -0 curl -L --remote-name-all
 
 	# debug: create cache
-	#$tar -czvf "$cache" *
+	#tar -czvf "$cache" *
 }
 
 
@@ -57,7 +58,7 @@ mv copyparty-*.tar.gz copyparty-extras/
 
 # unpack the source code
 ( cd copyparty-extras/
-$tar -xvf *.tar.gz
+tar -xvf *.tar.gz
 )
 
 
@@ -71,6 +72,7 @@ chmod 755 \
 ( cd copyparty-extras/sfx-full/
 ./copyparty-sfx.py -h
 cd ../copyparty-*/
+sed -ri 's`^command -v git >/dev/null`false`' ./scripts/make-sfx.sh  # TODO remove on next rls
 ./scripts/make-sfx.sh re no-ogv no-cm
 )
 
@@ -87,13 +89,13 @@ rm -rf copyparty-{0..9}*.*.*{0..9}
 )
 
 
- # and include the repacker itself too
+# and include the repacker itself too
 cp -pv "$od/$0" copyparty-extras/ 
 
 
 # create the bundle
 fn=copyparty-$(date +%Y-%m%d-%H%M%S).tgz
-$tar -czvf "$od/$fn" *
+tar -czvf "$od/$fn" *
 cd "$od"
 rm -rf "$td"
 
