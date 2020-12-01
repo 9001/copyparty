@@ -25,7 +25,7 @@ var mp = (function () {
 		'tracks': tracks,
 		'cover_url': ''
 	};
-	var re_audio = new RegExp('\.(opus|ogg|m4a|aac|mp3|wav|flac)$', 'i');
+	var re_audio = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i;
 
 	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
@@ -468,7 +468,6 @@ function play(tid, call_depth) {
 function evau_error(e) {
 	var err = '';
 	var eplaya = (e && e.target) || (window.event && window.event.srcElement);
-	var url = eplaya.src;
 
 	switch (eplaya.error.code) {
 		case eplaya.error.MEDIA_ERR_ABORTED:
@@ -516,7 +515,7 @@ function unblocked() {
 
 
 // show ui to manually start playback of a linked song
-function autoplay_blocked(tid) {
+function autoplay_blocked() {
 	show_modal(
 		'<div id="blk_play"><a href="#" id="blk_go"></a></div>' +
 		'<div id="blk_abrt"><a href="#" id="blk_na">Cancel<br />(show file list)</a></div>');

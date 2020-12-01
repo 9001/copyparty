@@ -756,9 +756,12 @@ class HttpCli(object):
                 cli_dt = time.strptime(cli_lastmod, "%a, %d %b %Y %H:%M:%S GMT")
                 cli_ts = calendar.timegm(cli_dt)
                 return file_lastmod, int(file_ts) > int(cli_ts)
-            except:
-                self.log("bad lastmod format: {}".format(cli_lastmod))
-                self.log("   expected format: {}".format(file_lastmod))
+            except Exception as ex:
+                self.log(
+                    "lastmod {}\nremote: [{}]\n local: [{}]".format(
+                        repr(ex), cli_lastmod, file_lastmod
+                    )
+                )
                 return file_lastmod, file_lastmod != cli_lastmod
 
         return file_lastmod, True

@@ -72,7 +72,6 @@ chmod 755 \
 ( cd copyparty-extras/sfx-full/
 ./copyparty-sfx.py -h
 cd ../copyparty-*/
-sed -ri 's`^command -v git >/dev/null`false`' ./scripts/make-sfx.sh  # TODO remove on next rls
 ./scripts/make-sfx.sh re no-ogv no-cm
 )
 

@@ -299,7 +299,7 @@ function convert_markdown(md_text, dest_dom) {
     }
 
     // separate <code> for each line in <pre>
-    var nodes = md_dom.getElementsByTagName('pre');
+    nodes = md_dom.getElementsByTagName('pre');
     for (var a = nodes.length - 1; a >= 0; a--) {
         var el = nodes[a];
 

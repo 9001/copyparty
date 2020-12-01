@@ -144,7 +144,7 @@ redraw = (function () {
         onresize();
     }
     function modetoggle() {
-        mode = dom_nsbs.innerHTML;
+        var mode = dom_nsbs.innerHTML;
         dom_nsbs.innerHTML = mode == 'editor' ? 'preview' : 'editor';
         mode += ' single';
         dom_wrap.setAttribute('class', mode);
@@ -304,7 +304,7 @@ function Modpoll() {
         this.periodic();
 
     return this;
-};
+}
 var modpoll = new Modpoll();
 
 
@@ -743,7 +743,8 @@ function fmt_table(e) {
         lpipe = tab[1].indexOf('|') < tab[1].indexOf('-'),
         rpipe = tab[1].lastIndexOf('|') > tab[1].lastIndexOf('-'),
         re_lpipe = lpipe ? /^\s*\|\s*/ : /^\s*/,
-        re_rpipe = rpipe ? /\s*\|\s*$/ : /\s*$/;
+        re_rpipe = rpipe ? /\s*\|\s*$/ : /\s*$/,
+        ncols;
 
     // the second row defines the table,
     // need to process that first
@@ -868,9 +869,8 @@ function mark_uni(e) {
     dom_tbox.setAttribute('class', '');
 
     var txt = dom_src.value,
-        ptn = new RegExp('([^' + js_uni_whitelist + ']+)', 'g');
-
-    mod = txt.replace(/\r/g, "").replace(ptn, "\u2588\u2770$1\u2771");
+        ptn = new RegExp('([^' + js_uni_whitelist + ']+)', 'g'),
+        mod = txt.replace(/\r/g, "").replace(ptn, "\u2588\u2770$1\u2771");
 
     if (txt == mod) {
         alert('no results;  no modifications were made');
@@ -906,7 +906,12 @@ function iter_uni(e) {
 // configure whitelist
 function cfg_uni(e) {
     if (e) e.preventDefault();
-    esc_uni_whitelist = prompt("unicode whitelist", esc_uni_whitelist);
+
+    var reply = prompt("unicode whitelist", esc_uni_whitelist);
+    if (reply === null)
+        return;
+
+    esc_uni_whitelist = reply;
     js_uni_whitelist = eval('\'' + esc_uni_whitelist + '\'');
 }
 
@@ -1126,7 +1131,6 @@ action_stack = (function () {
     }
 
     return {
-        push: push,
         undo: undo,
         redo: redo,
         push: schedule_push,

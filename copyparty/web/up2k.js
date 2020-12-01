@@ -33,7 +33,7 @@ function goto(dest) {
     for (var a = obj.length - 1; a >= 0; a--)
         obj[a].classList.remove('act');
 
-    var obj = document.querySelectorAll('#ops>a');
+    obj = document.querySelectorAll('#ops>a');
     for (var a = obj.length - 1; a >= 0; a--)
         obj[a].classList.remove('act');
 
@@ -130,7 +130,7 @@ function up2k_init(have_crypto) {
             else
                 ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
         }
-    };
+    }
 
     // show uploader if the user only has write-access
     if (!ebi('files'))
@@ -397,17 +397,6 @@ function up2k_init(have_crypto) {
     //
 
     // https://gist.github.com/jonleighton/958841
-    function buf2b64_maybe_fucky(buffer) {
-        var ret = '';
-        var view = new DataView(buffer);
-        for (var i = 0; i < view.byteLength; i++) {
-            ret += String.fromCharCode(view.getUint8(i));
-        }
-        return window.btoa(ret).replace(
-            /\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    }
-
-    // https://gist.github.com/jonleighton/958841
     function buf2b64(arrayBuffer) {
         var base64 = '';
         var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
@@ -445,20 +434,6 @@ function up2k_init(have_crypto) {
         }
 
         return base64;
-    }
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-    function buf2hex(buffer) {
-        var hexCodes = [];
-        var view = new DataView(buffer);
-        for (var i = 0; i < view.byteLength; i += 4) {
-            var value = view.getUint32(i) // 4 bytes per iter
-            var stringValue = value.toString(16) // doesn't pad
-            var padding = '00000000'
-            var paddedValue = (padding + stringValue).slice(-padding.length)
-            hexCodes.push(paddedValue);
-        }
-        return hexCodes.join("");
     }
 
     function get_chunksize(filesize) {

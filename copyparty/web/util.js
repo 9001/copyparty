@@ -36,7 +36,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     document.body.style.fontSize = '0.8em';
     document.body.style.padding = '0 1em 1em 1em';
     hcroak(html.join('\n'));
-};
+}
 
 
 function ebi(id) {
