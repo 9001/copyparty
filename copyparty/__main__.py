@@ -9,6 +9,7 @@ __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
 import os
+import time
 import shutil
 import filecmp
 import locale
@@ -85,6 +86,7 @@ def ensure_cert():
 
 
 def main():
+    time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
         os.system("")  # enables colors
 

@@ -906,6 +906,7 @@ class TheArgparseFormatter(
 
 def main():
     global info, log, dbg
+    time.strptime("19970815", "%Y%m%d")  # python#7980
 
     # filecache helps for reads that are ~64k or smaller;
     #   linux generally does 128k so the cache is a slowdown,

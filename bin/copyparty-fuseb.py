@@ -567,6 +567,8 @@ class CPPF(Fuse):
 
 
 def main():
+    time.strptime("19970815", "%Y%m%d")  # python#7980
+
     server = CPPF()
     server.parser.add_option(mountopt="url", metavar="BASE_URL", default=None)
     server.parse(values=server, errex=1)
