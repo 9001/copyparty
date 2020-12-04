@@ -6,6 +6,7 @@ import os
 import time
 import json
 import shutil
+import tempfile
 import unittest
 import subprocess as sp  # nosec
 
@@ -30,9 +31,6 @@ class TestVFS(unittest.TestCase):
         query = self.unfoo(query)
         response = self.unfoo(response)
         self.assertEqual(util.undot(query), response)
-
-    def absify(self, root, names):
-        return ["{}/{}".format(root, x).replace("//", "/") for x in names]
 
     def ls(self, vfs, vpath, uname):
         """helper for resolving and listing a folder"""
@@ -60,23 +58,31 @@ class TestVFS(unittest.TestCase):
 
         if os.path.exists("/Volumes"):
             devname, _ = self.chkcmd("hdiutil", "attach", "-nomount", "ram://8192")
+            devname = devname.strip()
+            print("devname: [{}]".format(devname))
             for _ in range(10):
                 try:
-                    _, _ = self.chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
+                    _, _ = self.chkcmd(
+                        "diskutil", "eraseVolume", "HFS+", "cptd", devname
+                    )
                     return "/Volumes/cptd"
-                except:
-                    print('lol macos')
+                except Exception as ex:
+                    print(repr(ex))
                     time.sleep(0.25)
-            
+
             raise Exception("ramdisk creation failed")
 
-        raise Exception("TODO support windows")
+        ret = os.path.join(tempfile.gettempdir(), "copyparty-test")
+        try:
+            os.mkdir(ret)
+        finally:
+            return ret
 
     def log(self, src, msg):
         pass
 
     def test(self):
-        td = self.get_ramdisk() + "/vfs"
+        td = os.path.join(self.get_ramdisk(), "vfs")
         try:
             shutil.rmtree(td)
         except OSError:
@@ -107,7 +113,7 @@ class TestVFS(unittest.TestCase):
         vfs = AuthSrv(Namespace(c=None, a=[], v=["a/ab/::r"]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
-        self.assertEqual(vfs.realpath, td + "/a/ab")
+        self.assertEqual(vfs.realpath, os.path.join(td, "a", "ab"))
         self.assertEqual(vfs.uread, ["*"])
         self.assertEqual(vfs.uwrite, [])
 
@@ -117,7 +123,7 @@ class TestVFS(unittest.TestCase):
         ).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
-        self.assertEqual(vfs.realpath, td + "/a/aa")
+        self.assertEqual(vfs.realpath, os.path.join(td, "a", "aa"))
         self.assertEqual(vfs.uread, ["*"])
         self.assertEqual(vfs.uwrite, [])
 
@@ -146,9 +152,12 @@ class TestVFS(unittest.TestCase):
         n = n.nodes["acb"]
         self.assertEqual(n.nodes, {})
         self.assertEqual(n.vpath, "a/ac/acb")
-        self.assertEqual(n.realpath, td + "/a/ac/acb")
+        self.assertEqual(n.realpath, os.path.join(td, "a", "ac", "acb"))
         self.assertEqual(n.uread, ["k"])
         self.assertEqual(n.uwrite, ["*", "k"])
+
+        # something funky about the windows path normalization,
+        # doesn't really matter but makes the test messy, TODO?
 
         fsdir, real, virt = self.ls(vfs, "/", "*")
         self.assertEqual(fsdir, td)
@@ -156,31 +165,49 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(list(virt), ["a"])
 
         fsdir, real, virt = self.ls(vfs, "a", "*")
-        self.assertEqual(fsdir, td + "/a")
+        self.assertEqual(fsdir, os.path.join(td, "a"))
         self.assertEqual(real, ["aa", "ab"])
         self.assertEqual(list(virt), ["ac"])
 
         fsdir, real, virt = self.ls(vfs, "a/ab", "*")
-        self.assertEqual(fsdir, td + "/a/ab")
+        self.assertEqual(fsdir, os.path.join(td, "a", "ab"))
         self.assertEqual(real, ["aba", "abb", "abc"])
         self.assertEqual(list(virt), [])
 
         fsdir, real, virt = self.ls(vfs, "a/ac", "*")
-        self.assertEqual(fsdir, td + "/a/ac")
+        self.assertEqual(fsdir, os.path.join(td, "a", "ac"))
         self.assertEqual(real, ["aca", "acc"])
         self.assertEqual(list(virt), [])
 
         fsdir, real, virt = self.ls(vfs, "a/ac", "k")
-        self.assertEqual(fsdir, td + "/a/ac")
+        self.assertEqual(fsdir, os.path.join(td, "a", "ac"))
         self.assertEqual(real, ["aca", "acc"])
         self.assertEqual(list(virt), ["acb"])
 
         self.assertRaises(util.Pebkac, vfs.get, "a/ac/acb", "*", True, False)
 
         fsdir, real, virt = self.ls(vfs, "a/ac/acb", "k")
-        self.assertEqual(fsdir, td + "/a/ac/acb")
+        self.assertEqual(fsdir, os.path.join(td, "a", "ac", "acb"))
         self.assertEqual(real, ["acba", "acbb", "acbc"])
         self.assertEqual(list(virt), [])
+
+        # admin-only rootfs with all-read-only subfolder
+        vfs = AuthSrv(Namespace(c=None, a=["k:k"], v=[".::ak", "a:a:r"]), self.log,).vfs
+        self.assertEqual(len(vfs.nodes), 1)
+        self.assertEqual(vfs.vpath, "")
+        self.assertEqual(vfs.realpath, td)
+        self.assertEqual(vfs.uread, ["k"])
+        self.assertEqual(vfs.uwrite, ["k"])
+        n = vfs.nodes["a"]
+        self.assertEqual(len(vfs.nodes), 1)
+        self.assertEqual(n.vpath, "a")
+        self.assertEqual(n.realpath, os.path.join(td, "a"))
+        self.assertEqual(n.uread, ["*"])
+        self.assertEqual(n.uwrite, [])
+        self.assertEqual(vfs.can_access("/", "*"), [False, False])
+        self.assertEqual(vfs.can_access("/", "k"), [True, True])
+        self.assertEqual(vfs.can_access("/a", "*"), [True, False])
+        self.assertEqual(vfs.can_access("/a", "k"), [True, False])
 
         # breadth-first construction
         vfs = AuthSrv(
@@ -215,20 +242,20 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(list(v1), ["a"])
 
         fsp, r1, v1 = self.ls(vfs, "a", "*")
-        self.assertEqual(fsp, td + "/a")
+        self.assertEqual(fsp, os.path.join(td, "a"))
         self.assertEqual(r1, ["aa", "ab"])
         self.assertEqual(list(v1), ["ac"])
 
         fsp1, r1, v1 = self.ls(vfs, "a/ac", "*")
         fsp2, r2, v2 = self.ls(vfs, "b", "*")
-        self.assertEqual(fsp1, td + "/b")
-        self.assertEqual(fsp2, td + "/b")
+        self.assertEqual(fsp1, os.path.join(td, "b"))
+        self.assertEqual(fsp2, os.path.join(td, "b"))
         self.assertEqual(r1, ["ba", "bb", "bc"])
         self.assertEqual(r1, r2)
         self.assertEqual(list(v1), list(v2))
 
         # config file parser
-        cfg_path = self.get_ramdisk() + "/test.cfg"
+        cfg_path = os.path.join(self.get_ramdisk(), "test.cfg")
         with open(cfg_path, "wb") as f:
             f.write(
                 dedent(
@@ -256,10 +283,11 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(len(n.nodes), 1)
         n = n.nodes["dst"]
         self.assertEqual(n.vpath, "dst")
-        self.assertEqual(n.realpath, td + "/src")
+        self.assertEqual(n.realpath, os.path.join(td, "src"))
         self.assertEqual(n.uread, ["a", "asd"])
         self.assertEqual(n.uwrite, ["asd"])
         self.assertEqual(len(n.nodes), 0)
 
+        os.chdir(tempfile.gettempdir())
         shutil.rmtree(td)
         os.unlink(cfg_path)
