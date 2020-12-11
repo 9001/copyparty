@@ -667,12 +667,26 @@ function up2k_init(have_crypto) {
                 }
                 tasker();
             }
-            else
+            else {
+                var err = "";
+                var rsp = (xhr.responseText + '');
+                if (rsp.indexOf('partial upload exists') !== -1) {
+                    err = rsp.slice(5);
+                }
+                if (err != "") {
+                    ebi('f{0}t'.format(t.n)).innerHTML = "ERROR";
+                    ebi('f{0}p'.format(t.n)).innerHTML = err;
+
+                    st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                    tasker();
+                    return;
+                }
                 alert("server broke (error {0}):\n\"{1}\"\n".format(
                     xhr.status,
                     (xhr.response && xhr.response.err) ||
                     (xhr.responseText && xhr.responseText) ||
                     "no further information"));
+            }
         };
         xhr.open('POST', post_url + 'handshake.php', true);
         xhr.responseType = 'text';
