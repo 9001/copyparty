@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import re
+import os
 import sys
 import time
 import base64
@@ -10,6 +11,7 @@ import hashlib
 import platform
 import threading
 import mimetypes
+import contextlib
 import subprocess as sp  # nosec
 
 from .__init__ import PY2, WINDOWS
@@ -94,6 +96,77 @@ class Unrecv(object):
 
     def unrecv(self, buf):
         self.buf = buf + self.buf
+
+
+@contextlib.contextmanager
+def ren_open(fname, *args, fdir=None, suffix=None, **kwargs):
+    if hasattr(fname, "write"):
+        with open(fname, *args, **kwargs) as f:
+            yield {"orz": [f, fname]}
+            return
+
+    orig_name = fname
+    bname = fname
+    ext = ""
+    while True:
+        ofs = bname.rfind(".")
+        if ofs < 0 or ofs < len(bname) - 7:
+            # doesn't look like an extension anymore
+            break
+
+        ext = bname[ofs:] + ext
+        bname = bname[:ofs]
+
+    b64 = ""
+    while True:
+        try:
+            if fdir:
+                fpath = os.path.join(fdir, fname)
+            else:
+                fpath = fname
+
+            if suffix and os.path.exists(fpath):
+                fpath += suffix
+                fname += suffix
+                ext += suffix
+
+            with open(fsenc(fpath), *args, **kwargs) as f:
+                if b64:
+                    fp2 = "fn-trunc.{}.txt".format(b64)
+                    fp2 = os.path.join(fdir, fp2)
+                    with open(fsenc(fp2), "wb") as f2:
+                        f2.write(orig_name.encode("utf-8"))
+
+                yield {"orz": [f, fname]}
+                return
+
+        except OSError as ex_:
+            ex = ex_
+            if ex.errno != 36:
+                raise
+
+        if not b64:
+            b64 = (bname + ext).encode("utf-8", "replace")
+            b64 = hashlib.sha512(b64).digest()[:12]
+            b64 = base64.urlsafe_b64encode(b64).decode("utf-8").rstrip("=")
+
+        badlen = len(fname)
+        while len(fname) >= badlen:
+            if len(bname) < 8:
+                raise ex
+
+            if len(bname) > len(ext):
+                # drop the last letter of the filename
+                bname = bname[:-1]
+            else:
+                try:
+                    # drop the leftmost sub-extension
+                    _, ext = ext.split(".", 1)
+                except:
+                    # okay do the first letter then
+                    ext = "." + ext[2:]
+
+            fname = "{}~{}{}".format(bname, b64, ext)
 
 
 class MultipartParser(object):

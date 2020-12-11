@@ -13,7 +13,7 @@ import threading
 from copy import deepcopy
 
 from .__init__ import WINDOWS
-from .util import Pebkac, Queue, fsenc, sanitize_fn
+from .util import Pebkac, Queue, fsenc, sanitize_fn, ren_open
 
 
 class Up2k(object):
@@ -68,9 +68,11 @@ class Up2k(object):
                         # symlink to the client-provided name,
                         # returning the previous upload info
                         job = deepcopy(job)
-                        suffix = self._suffix(dst, now, job["addr"])
-                        job["name"] = cj["name"] + suffix
-                        self._symlink(src, dst + suffix)
+                        job["rdir"] = cj["rdir"]
+                        job["name"] = self._untaken(cj["rdir"], cj["name"], now, cj["addr"])
+                        dst = os.path.join(job["rdir"], job["name"])
+                        os.unlink(fsenc(dst))  # TODO ed pls
+                        self._symlink(src, dst)
             else:
                 job = {
                     "wark": wark,
@@ -84,9 +86,6 @@ class Up2k(object):
                     "lmod": cj["lmod"],
                     "hash": deepcopy(cj["hash"]),
                 }
-
-                path = os.path.join(job["rdir"], job["name"])
-                job["name"] += self._suffix(path, now, cj["addr"])
 
                 # one chunk may occur multiple times in a file;
                 # filter to unique values for the list of missing chunks
@@ -108,13 +107,12 @@ class Up2k(object):
                 "wark": wark,
             }
 
-    def _suffix(self, fpath, ts, ip):
+    def _untaken(self, fdir, fname, ts, ip):
         # TODO broker which avoid this race and
         # provides a new filename if taken (same as bup)
-        if not os.path.exists(fsenc(fpath)):
-            return ""
-
-        return ".{:.6f}-{}".format(ts, ip)
+        suffix = ".{:.6f}-{}".format(ts, ip)
+        with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as f:
+            return f["orz"][1]
 
     def _symlink(self, src, dst):
         # TODO store this in linktab so we never delete src if there are links to it
@@ -218,8 +216,9 @@ class Up2k(object):
 
     def _new_upload(self, job):
         self.registry[job["wark"]] = job
-        path = os.path.join(job["rdir"], job["name"])
-        with open(fsenc(path), "wb") as f:
+        suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
+        with ren_open(job["name"], "wb", fdir=job["rdir"], suffix=suffix) as f:
+            f, job["name"] = f["orz"]
             f.seek(job["size"] - 1)
             f.write(b"e")
 

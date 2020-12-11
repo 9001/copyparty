@@ -568,24 +568,24 @@ class HttpCli(object):
                     self.log("discarding incoming file without filename")
                     # fallthrough
 
-                fn = os.devnull
                 if p_file and not nullwrite:
                     fdir = os.path.join(vfs.realpath, rem)
-                    fn = os.path.join(fdir, sanitize_fn(p_file))
+                    fname = sanitize_fn(p_file)
 
                     if not os.path.isdir(fsenc(fdir)):
                         raise Pebkac(404, "that folder does not exist")
 
-                    # TODO broker which avoid this race and
-                    # provides a new filename if taken (same as up2k)
-                    if os.path.exists(fsenc(fn)):
-                        fn += ".{:.6f}-{}".format(time.time(), self.addr[0])
-                        # using current-time instead of t0 cause clients
-                        # may reuse a name for multiple files in one post
+                    suffix = ".{:.6f}-{}".format(time.time(), self.addr[0])
+                    open_args = {"fdir": fdir, "suffix": suffix}
+                else:
+                    open_args = {}
+                    fname = os.devnull
+                    fdir = ""
 
                 try:
-                    with open(fsenc(fn), "wb") as f:
-                        self.log("writing to {0}".format(fn))
+                    with ren_open(fname, "wb", **open_args) as f:
+                        f, fname = f["orz"]
+                        self.log("writing to {}/{}".format(fdir, fname))
                         sz, sha512_hex, _ = hashcopy(self.conn, p_data, f)
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
@@ -594,8 +594,14 @@ class HttpCli(object):
                         self.conn.nbyte += sz
 
                 except Pebkac:
-                    if fn != os.devnull:
-                        os.rename(fsenc(fn), fsenc(fn + ".PARTIAL"))
+                    if fname != os.devnull:
+                        fp = os.path.join(fdir, fname)
+                        suffix = ".PARTIAL"
+                        try:
+                            os.rename(fsenc(fp), fsenc(fp + suffix))
+                        except:
+                            fp = fp[: -len(suffix)]
+                            os.rename(fsenc(fp), fsenc(fp + suffix))
 
                     raise
 
