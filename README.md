@@ -126,13 +126,16 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* up2k handle filename too long
-* up2k fails on empty files? alert then stuck
+* `os.sendfile` (and `os.copy_file_range` for up2k cloning)
+* reduce up2k roundtrips
+  * start from a chunk index and just go
+  * terminate client on bad data
 * drop onto folders
-* look into android thumbnail cache file format
 * support pillow-simd
 * cache sha512 chunks on client
-* symlink existing files on upload
+* ~~symlink existing files on upload~~
+  * ok at runtime, up2k db still not persisted
 * comment field
+* ~~look into android thumbnail cache file format~~ bad idea
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||
