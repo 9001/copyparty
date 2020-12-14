@@ -27,13 +27,24 @@ cd "$td"
 pwd
 
 
+dl_text() {
+	command -v curl && exec curl "$@"
+	exec wget -O- "$@"
+}
+dl_files() {
+	command -v curl && exec curl -L --remote-name-all "$@"
+	exec wget "$@"
+}
+export -f dl_files
+
+
 # debug: if cache exists, use that instead of bothering github
 cache="$od/.copyparty-repack.cache"
 [ -e "$cache" ] &&
 	tar -xvf "$cache" ||
 {
 	# get download links from github
-	curl https://api.github.com/repos/9001/copyparty/releases/latest |
+	dl_text https://api.github.com/repos/9001/copyparty/releases/latest |
 	(
 		# prefer jq if available
 		jq -r '.assets[]|select(.name|test("-sfx|tar.gz")).browser_download_url' ||
@@ -42,7 +53,8 @@ cache="$od/.copyparty-repack.cache"
 		awk -F\" '/"browser_download_url".*(\.tar\.gz|-sfx\.)/ {print$4}'
 	) |
 	tee /dev/stderr |
-	tr -d '\r' | tr '\n' '\0' | xargs -0 curl -L --remote-name-all
+	tr -d '\r' | tr '\n' '\0' |
+	xargs -0 bash -c 'dl_files "$@"' _
 
 	# debug: create cache
 	#tar -czvf "$cache" *
