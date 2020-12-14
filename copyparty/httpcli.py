@@ -583,7 +583,7 @@ class HttpCli(object):
                     fdir = ""
 
                 try:
-                    with ren_open(fname, "wb", **open_args) as f:
+                    with ren_open(fname, "wb", 512 * 1024, **open_args) as f:
                         f, fname = f["orz"]
                         self.log("writing to {}/{}".format(fdir, fname))
                         sz, sha512_hex, _ = hashcopy(self.conn, p_data, f)
@@ -737,7 +737,7 @@ class HttpCli(object):
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
 
-        with open(fp, "wb") as f:
+        with open(fp, "wb", 512 * 1024) as f:
             sz, sha512, _ = hashcopy(self.conn, p_data, f)
 
         new_lastmod = os.stat(fsenc(fp)).st_mtime

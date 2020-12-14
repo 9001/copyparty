@@ -99,12 +99,15 @@ class Unrecv(object):
 
 
 @contextlib.contextmanager
-def ren_open(fname, *args, fdir=None, suffix=None, **kwargs):
-    if hasattr(fname, "write"):
+def ren_open(fname, *args, **kwargs):
+    fdir = kwargs.pop("fdir", None)
+    suffix = kwargs.pop("suffix", None)
+
+    if fname == os.devnull:
         with open(fname, *args, **kwargs) as f:
             yield {"orz": [f, fname]}
             return
-
+    
     orig_name = fname
     bname = fname
     ext = ""
