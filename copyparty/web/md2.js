@@ -660,6 +660,10 @@ function md_backspace() {
     if (/^\s*$/.test(left))
         return true;
 
+    // same if selection
+    if (o0 != dom_src.selectionEnd)
+        return true;
+
     // same if line is all-whitespace or non-markup
     var v = m[0].replace(/[^ ]/g, " ");
     if (v === m[0] || v.length !== left.length)
