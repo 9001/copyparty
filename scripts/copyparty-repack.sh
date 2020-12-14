@@ -1,4 +1,5 @@
 #!/bin/bash
+repacker=1
 set -e
 
 # -- download latest copyparty (source.tgz and sfx),
@@ -38,10 +39,10 @@ dl_files() {
 export -f dl_files
 
 
-# debug: if cache exists, use that instead of bothering github
+# if cache exists, use that instead of bothering github
 cache="$od/.copyparty-repack.cache"
 [ -e "$cache" ] &&
-	tar -xvf "$cache" ||
+	tar -xf "$cache" ||
 {
 	# get download links from github
 	dl_text https://api.github.com/repos/9001/copyparty/releases/latest |
@@ -56,8 +57,7 @@ cache="$od/.copyparty-repack.cache"
 	tr -d '\r' | tr '\n' '\0' |
 	xargs -0 bash -c 'dl_files "$@"' _
 
-	# debug: create cache
-	#tar -czvf "$cache" *
+	tar -czf "$cache" *
 }
 
 
@@ -70,8 +70,19 @@ mv copyparty-*.tar.gz copyparty-extras/
 
 # unpack the source code
 ( cd copyparty-extras/
-tar -xvf *.tar.gz
+tar -xf *.tar.gz
 )
+
+
+# use repacker from release if that is newer
+p_other=copyparty-extras/copyparty-*/scripts/copyparty-repack.sh
+other=$(awk -F= 'BEGIN{v=-1} NR<10&&/^repacker=/{v=$NF} END{print v}' <$p_other) 
+[ $repacker -lt $other ] &&
+  cat $p_other >"$od/$0" && cd "$od" && rm -rf "$td" && exec "$0" "$@"
+
+
+# now drop the cache
+rm -f "$cache"
 
 
 # fix permissions
@@ -101,7 +112,9 @@ rm -rf copyparty-{0..9}*.*.*{0..9}
 
 
 # and include the repacker itself too
-cp -pv "$od/$0" copyparty-extras/ 
+cp -av "$od/$0" copyparty-extras/ ||
+cp -av "$0" copyparty-extras/ ||
+true
 
 
 # create the bundle
