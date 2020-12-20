@@ -115,7 +115,7 @@ git describe --tags >/dev/null 2>/dev/null && {
 		exit 1
 	}
 
-	dt="$(git log -1 --format=%cd --date=format:'%Y,%m,%d' | sed 's/,0?/, /g')"
+	dt="$(git log -1 --format=%cd --date=format:'%Y,%m,%d' | sed -E 's/,0?/, /g')"
 	printf 'git %3s: \033[36m%s\033[0m\n' ver "$ver" dt "$dt"
 	sed -ri '
 		s/^(VERSION =)(.*)/#\1\2\n\1 ('"$t_ver"')/;

@@ -16,15 +16,15 @@ which md5sum 2>/dev/null >/dev/null &&
 
 ver="$1"
 
-[[ "x$ver" == x ]] &&
+[ "x$ver" = x ] &&
 {
 	echo "need argument 1:  version"
 	echo
 	exit 1
 }
 
-[[ -e copyparty/__main__.py ]] || cd ..
-[[ -e copyparty/__main__.py ]] ||
+[ -e copyparty/__main__.py ] || cd ..
+[ -e copyparty/__main__.py ] ||
 {
 	echo "run me from within the project root folder"
 	echo
@@ -35,8 +35,8 @@ mkdir -p dist
 zip_path="$(pwd)/dist/copyparty-$ver.zip"
 tgz_path="$(pwd)/dist/copyparty-$ver.tar.gz"
 
-[[ -e "$zip_path" ]] ||
-[[ -e "$tgz_path" ]] &&
+[ -e "$zip_path" ] ||
+[ -e "$tgz_path" ] &&
 {
 	echo "found existing archives for this version"
 	echo "  $zip_path"
