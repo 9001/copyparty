@@ -367,7 +367,7 @@ class Gateway(object):
         ret = []
         remainder = b""
         ptn = re.compile(
-            r'^<tr><td>(-|DIR)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>([^<]+)</td></tr>$'
+            r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>[^<]+</td><td>([^<]+)</td></tr>$'
         )
 
         while True:
