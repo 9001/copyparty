@@ -13,6 +13,17 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * code standard: `black`
 
 
+## quickstart
+
+download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
+
+running the sfx without arguments (for example doubleclicking it on Windows) will let anyone access the current folder; see `-h` for help if you want accounts and volumes etc
+
+you may also want these, especially on servers:
+* [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
+* [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for legit https)
+
+
 ## notes
 
 * iPhone/iPad: use Firefox to download files
