@@ -104,7 +104,7 @@ def rice_tid():
 
 
 def fancy_log(msg):
-    print("{} {}\n".format(rice_tid(), msg), end="")
+    print("{:10.6f} {} {}\n".format(time.time() % 900, rice_tid(), msg), end="")
 
 
 def null_log(msg):
@@ -163,7 +163,7 @@ class RecentLog(object):
         thr.start()
 
     def put(self, msg):
-        msg = "{} {}\n".format(rice_tid(), msg)
+        msg = "{:10.6f} {} {}\n".format(time.time() % 900, rice_tid(), msg)
         if self.f:
             fmsg = " ".join([datetime.utcnow().strftime("%H%M%S.%f"), str(msg)])
             self.f.write(fmsg.encode("utf-8"))
