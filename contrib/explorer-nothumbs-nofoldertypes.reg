@@ -1,0 +1,31 @@
+﻿Windows Registry Editor Version 5.00
+
+; this will do 3 things, all optional:
+;  1) disable thumbnails
+;  2) delete all existing folder type settings/detections
+;  3) disable folder type detection (force default columns)
+;
+; this makes the file explorer way faster,
+; especially on slow/networked locations
+
+
+; =====================================================================
+; 1) disable thumbnails
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"IconsOnly"=dword:00000001
+
+
+; =====================================================================
+; 2) delete all existing folder type settings/detections
+
+[-HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags]
+
+[-HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU]
+
+
+; =====================================================================
+; 3) disable folder type detection
+
+[HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell]
+"FolderType"="NotSpecified"

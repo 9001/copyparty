@@ -1,4 +1,6 @@
 * text eol=lf
 
+*.reg text eol=crlf
+
 *.png binary
 *.gif binary
