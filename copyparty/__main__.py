@@ -139,6 +139,7 @@ def main():
     ap.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap.add_argument("-nih", action="store_true", help="no info hostname")
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
+    ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     al = ap.parse_args()
 
     SvcHub(al).run()

@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import base64
+import select
 import struct
 import hashlib
 import platform
@@ -589,6 +590,46 @@ def hashcopy(actor, fin, fout):
     digest_b64 = base64.urlsafe_b64encode(digest32).decode("utf-8").rstrip("=")
 
     return tlen, hashobj.hexdigest(), digest_b64
+
+
+def sendfile_py(lower, upper, f, s):
+    remains = upper - lower
+    f.seek(lower)
+    while remains > 0:
+        # time.sleep(0.01)
+        buf = f.read(min(4096, remains))
+        if not buf:
+            return remains
+
+        try:
+            s.sendall(buf)
+            remains -= len(buf)
+        except:
+            return remains
+
+    return 0
+
+
+def sendfile_kern(lower, upper, f, s):
+    out_fd = s.fileno()
+    in_fd = f.fileno()
+    ofs = lower
+    while ofs < upper:
+        try:
+            req = min(2 ** 30, upper - ofs)
+            select.select([], [out_fd], [], 10)
+            n = os.sendfile(out_fd, in_fd, ofs, req)
+        except Exception as ex:
+            # print("sendfile: " + repr(ex))
+            n = 0
+        
+        if n <= 0:
+            return upper - ofs
+        
+        ofs += n
+        # print("sendfile: ok, sent {} now, {} total, {} remains".format(n, ofs - lower, upper - ofs))
+
+    return 0
 
 
 def unescape_cookie(orig):

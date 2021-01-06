@@ -4,10 +4,10 @@ import os
 import time
 
 """
-mkdir -p /dev/shm/fusefuzz/{r,v}
-PYTHONPATH=.. python3 -m copyparty -v /dev/shm/fusefuzz/r::r -i 127.0.0.1
-../bin/copyparty-fuse.py /dev/shm/fusefuzz/v http://127.0.0.1:3923/ 2 0
-(d="$PWD"; cd /dev/shm/fusefuzz && "$d"/fusefuzz.py)
+td=/dev/shm/; [ -e $td ] || td=$HOME; mkdir -p $td/fusefuzz/{r,v}
+PYTHONPATH=.. python3 -m copyparty -v $td/fusefuzz/r::r -i 127.0.0.1
+../bin/copyparty-fuse.py http://127.0.0.1:3923/ $td/fusefuzz/v -cf 2 -cd 0.5
+(d="$PWD"; cd $td/fusefuzz && "$d"/fusefuzz.py)
 """
 
 

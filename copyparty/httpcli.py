@@ -884,6 +884,7 @@ class HttpCli(object):
 
             logtail += " [\033[36m{}-{}\033[0m]".format(lower, upper)
 
+        use_sendfile = False
         if decompress:
             open_func = gzip.open
             open_args = [fsenc(fs_path), "rb"]
@@ -893,6 +894,8 @@ class HttpCli(object):
             open_func = open
             # 512 kB is optimal for huge files, use 64k
             open_args = [fsenc(fs_path), "rb", 64 * 1024]
+            if hasattr(os, 'sendfile'):
+                use_sendfile = not self.args.no_sendfile
 
         #
         # send reply
@@ -915,24 +918,13 @@ class HttpCli(object):
 
         ret = True
         with open_func(*open_args) as f:
-            remains = upper - lower
-            f.seek(lower)
-            while remains > 0:
-                # time.sleep(0.01)
-                buf = f.read(4096)
-                if not buf:
-                    break
-
-                if remains < len(buf):
-                    buf = buf[:remains]
-
-                try:
-                    self.s.sendall(buf)
-                    remains -= len(buf)
-                except:
-                    logmsg += " \033[31m" + str(upper - remains) + "\033[0m"
-                    ret = False
-                    break
+            if use_sendfile:
+                remains = sendfile_kern(lower, upper, f, self.s)
+            else:
+                remains = sendfile_py(lower, upper, f, self.s)
+        
+        if remains > 0:
+            logmsg += " \033[31m" + str(upper - remains) + "\033[0m"
 
         spd = self._spd((upper - lower) - remains)
         self.log("{},  {}".format(logmsg, spd))

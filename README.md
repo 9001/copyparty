@@ -137,11 +137,11 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* `os.sendfile` (and `os.copy_file_range` for up2k cloning)
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
 * drop onto folders
+* `os.copy_file_range` for up2k cloning
 * support pillow-simd
 * cache sha512 chunks on client
 * ~~symlink existing files on upload~~
