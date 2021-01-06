@@ -12,13 +12,17 @@ __url__ = "https://github.com/9001/copyparty/"
 mount a copyparty server (local or remote) as a filesystem
 
 usage:
-  python copyparty-fuse.py ./music http://192.168.1.69:3923/
+  python copyparty-fuse.py http://192.168.1.69:3923/  ./music
 
 dependencies:
   python3 -m pip install --user fusepy
   + on Linux: sudo apk add fuse
   + on Macos: https://osxfuse.github.io/
   + on Windows: https://github.com/billziss-gh/winfsp/releases/latest
+
+note:
+  you probably want to run this on windows clients:
+  https://github.com/9001/copyparty/blob/master/contrib/explorer-nothumbs-nofoldertypes.reg
 
 get server cert:
   awk '/-BEGIN CERTIFICATE-/ {a=1} a; /-END CERTIFICATE-/{exit}' <(openssl s_client -connect 127.0.0.1:3923 </dev/null 2>/dev/null) >cert.pem
@@ -405,7 +409,7 @@ class Gateway(object):
                     info("bad HTML or OS [{}] [{}]".format(fdate, fsize))
                     # python cannot strptime(1959-01-01) on windows
 
-                if ftype == "-":
+                if ftype != "DIR":
                     ret.append([fname, self.stat_file(ts, sz), 0])
                 else:
                     ret.append([fname, self.stat_dir(ts, sz), 0])
@@ -658,8 +662,18 @@ class CPPF(Operations):
 
         else:
             if get2 - get1 <= 1024 * 1024:
-                h_ofs = get1 - 256 * 1024
-                h_end = get2 + 1024 * 1024
+                # unless the request is for the last n bytes of the file,
+                # grow the start to cache some stuff around the range
+                if get2 < file_sz - 1:
+                    h_ofs = get1 - 1024 * 256
+                else:
+                    h_ofs = get1 - 1024 * 32
+
+                # likewise grow the end unless start is 0
+                if get1 > 0:
+                    h_end = get2 + 1024 * 1024
+                else:
+                    h_end = get2 + 1024 * 64
             else:
                 # big enough, doesn't need pads
                 h_ofs = get1
