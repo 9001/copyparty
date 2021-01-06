@@ -719,6 +719,7 @@ class CPPF(Operations):
             self.dircache.append(cn)
             self.clean_dircache()
 
+        # import pprint; pprint.pprint(ret)
         return ret
 
     def readdir(self, path, fh=None):
@@ -816,7 +817,11 @@ class CPPF(Operations):
                 # dbg("=" + repr(cache_stat))
                 return cache_stat
 
-        info("=ENOENT ({})".format(hexler(path)))
+        fun = info
+        if MACOS and path.split('/')[-1].startswith('._'):
+            fun = dbg
+        
+        fun("=ENOENT ({})".format(hexler(path)))
         raise FuseOSError(errno.ENOENT)
 
     access = None

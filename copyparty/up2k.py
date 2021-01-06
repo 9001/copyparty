@@ -139,7 +139,7 @@ class Up2k(object):
                     lsrc = "../" * (len(lsrc) - 1) + "/".join(lsrc)
             os.symlink(fsenc(lsrc), fsenc(ldst))
         except (AttributeError, OSError) as ex:
-            self.log("up2k", "cannot symlink; creating copy")
+            self.log("up2k", "cannot symlink; creating copy: " + repr(ex))
             shutil.copy2(fsenc(src), fsenc(dst))
 
     def handle_chunk(self, wark, chash):

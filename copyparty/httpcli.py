@@ -686,7 +686,7 @@ class HttpCli(object):
             return True
 
         fp = os.path.join(vfs.realpath, rem)
-        srv_lastmod = -1
+        srv_lastmod = srv_lastmod3 = -1
         try:
             st = os.stat(fsenc(fp))
             srv_lastmod = st.st_mtime
