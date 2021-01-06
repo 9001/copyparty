@@ -36,6 +36,7 @@ class TcpSrv(object):
 
         self.srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         try:
             self.srv.bind((self.args.i, self.args.p))
         except (OSError, socket.error) as ex:
