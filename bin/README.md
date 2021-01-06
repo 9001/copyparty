@@ -34,3 +34,8 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 * does the same thing except more correct, `samba` approves
 * **supports Linux** -- expect `18 MiB/s` (wait what)
 * **supports Macos** -- probably
+
+
+
+# copyparty-fuse-streaming.py
+* pretend this doesn't exist
