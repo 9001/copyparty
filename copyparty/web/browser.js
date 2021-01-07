@@ -315,8 +315,12 @@ var vbar = (function () {
 		var rect = pbar.pcan.getBoundingClientRect();
 		var x = e.clientX - rect.left;
 		var mul = x * 1.0 / rect.width;
+		var seek = mp.au.duration * mul;
+		console.log('seek: ' + seek);
+		if (!isFinite(seek))
+			return;
 
-		mp.au.currentTime = mp.au.duration * mul;
+		mp.au.currentTime = seek;
 
 		if (mp.au === mp.au_native)
 			// hack: ogv.js breaks on .play() during playback
