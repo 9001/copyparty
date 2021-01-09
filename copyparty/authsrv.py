@@ -12,11 +12,12 @@ from .util import undot, Pebkac, fsdec, fsenc
 class VFS(object):
     """single level in the virtual fs"""
 
-    def __init__(self, realpath, vpath, uread=[], uwrite=[]):
+    def __init__(self, realpath, vpath, uread=[], uwrite=[], flags={}):
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
         self.uread = uread  # users who can read this
         self.uwrite = uwrite  # users who can write this
+        self.flags = flags  # config switches
         self.nodes = {}  # child nodes
 
     def add(self, src, dst):
@@ -36,6 +37,7 @@ class VFS(object):
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.uread,
                 self.uwrite,
+                self.flags,
             )
             self.nodes[name] = vn
             return vn.add(src, dst)
@@ -161,7 +163,7 @@ class AuthSrv(object):
 
         yield prev, True
 
-    def _parse_config_file(self, fd, user, mread, mwrite, mount):
+    def _parse_config_file(self, fd, user, mread, mwrite, mflags, mount):
         vol_src = None
         vol_dst = None
         for ln in [x.decode("utf-8").strip() for x in fd]:
@@ -191,6 +193,7 @@ class AuthSrv(object):
                 mount[vol_dst] = vol_src
                 mread[vol_dst] = []
                 mwrite[vol_dst] = []
+                mflags[vol_dst] = {}
                 continue
 
             lvl, uname = ln.split(" ")
@@ -198,6 +201,9 @@ class AuthSrv(object):
                 mread[vol_dst].append(uname)
             if lvl in "wa":
                 mwrite[vol_dst].append(uname)
+            if lvl == "c":
+                # config option, currently switches only
+                mflags[vol_dst][uname] = True
 
     def reload(self):
         """
@@ -210,6 +216,7 @@ class AuthSrv(object):
         user = {}  # username:password
         mread = {}  # mountpoint:[username]
         mwrite = {}  # mountpoint:[username]
+        mflags = {}  # mountpoint:[flag]
         mount = {}  # dst:src (mountpoint:realpath)
 
         if self.args.a:
@@ -232,9 +239,13 @@ class AuthSrv(object):
                 mount[dst] = src
                 mread[dst] = []
                 mwrite[dst] = []
+                mflags[dst] = {}
 
                 perms = perms.split(":")
                 for (lvl, uname) in [[x[0], x[1:]] for x in perms]:
+                    if lvl == "c":
+                        # config option, currently switches only
+                        mflags[dst][uname] = True
                     if uname == "":
                         uname = "*"
                     if lvl in "ra":
@@ -245,14 +256,14 @@ class AuthSrv(object):
         if self.args.c:
             for cfg_fn in self.args.c:
                 with open(cfg_fn, "rb") as f:
-                    self._parse_config_file(f, user, mread, mwrite, mount)
+                    self._parse_config_file(f, user, mread, mwrite, mflags, mount)
 
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(os.path.abspath("."), "", [], [])
+            vfs = VFS(os.path.abspath("."), "")
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
@@ -262,12 +273,13 @@ class AuthSrv(object):
 
             if dst == "":
                 # rootfs was mapped; fully replaces the default CWD vfs
-                vfs = VFS(mount[dst], dst, mread[dst], mwrite[dst])
+                vfs = VFS(mount[dst], dst, mread[dst], mwrite[dst], mflags[dst])
                 continue
 
             v = vfs.add(mount[dst], dst)
             v.uread = mread[dst]
             v.uwrite = mwrite[dst]
+            v.flags = mflags[dst]
 
         missing_users = {}
         for d in [mread, mwrite]:

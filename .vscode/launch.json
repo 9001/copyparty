@@ -15,7 +15,7 @@
                 "-a",
                 "ed:wark",
                 "-v",
-                "srv::r:aed"
+                "srv::r:aed:cnodupe"
             ]
         },
         {

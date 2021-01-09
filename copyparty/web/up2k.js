@@ -670,7 +670,8 @@ function up2k_init(have_crypto) {
             else {
                 var err = "";
                 var rsp = (xhr.responseText + '');
-                if (rsp.indexOf('partial upload exists') !== -1) {
+                if (rsp.indexOf('partial upload exists') !== -1 ||
+                    rsp.indexOf('file already exists') !== -1) {
                     err = rsp.slice(5);
                 }
                 if (err != "") {

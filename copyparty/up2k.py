@@ -64,6 +64,12 @@ class Up2k(object):
                             job["vdir"], job["name"]
                         )
                         raise Pebkac(400, err)
+                    elif "nodupe" in job["flag"]:
+                        self.log("up2k", "dupe-reject:\n  {0}\n  {1}".format(src, dst))
+                        err = "upload rejected, file already exists:\n{0}{1} ".format(
+                            job["vdir"], job["name"]
+                        )
+                        raise Pebkac(400, err)
                     else:
                         # symlink to the client-provided name,
                         # returning the previous upload info
@@ -80,6 +86,7 @@ class Up2k(object):
                     "addr": cj["addr"],
                     "vdir": cj["vdir"],
                     "rdir": cj["rdir"],
+                    "flag": cj["flag"],
                     # client-provided, sanitized by _get_wark:
                     "name": cj["name"],
                     "size": cj["size"],
