@@ -8,7 +8,14 @@ function dbg(msg) {
 
 function ev(e) {
 	e = e || window.event;
-	e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+
+	if (e.preventDefault)
+		e.preventDefault()
+
+	if (e.stopPropagation)
+		e.stopPropagation();
+
+	e.returnValue = false;
 	return e;
 }
 
@@ -447,7 +454,8 @@ function play(tid, call_depth) {
 	mp.au.tid = tid;
 	mp.au.src = url;
 	mp.au.volume = mp.expvol();
-	setclass('trk' + tid, 'play act');
+	var oid = 'trk' + tid;
+	setclass(oid, 'play act');
 
 	try {
 		if (hack_attempt_play)
@@ -456,7 +464,11 @@ function play(tid, call_depth) {
 		if (mp.au.paused)
 			autoplay_blocked();
 
-		location.hash = 'trk' + tid;
+		var o = ebi(oid);
+		o.setAttribute('id', 'thx_js');
+		location.hash = oid;
+		o.setAttribute('id', oid);
+
 		pbar.drawbuf();
 		return true;
 	}
