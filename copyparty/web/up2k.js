@@ -672,7 +672,10 @@ function up2k_init(have_crypto) {
                 var rsp = (xhr.responseText + '');
                 if (rsp.indexOf('partial upload exists') !== -1 ||
                     rsp.indexOf('file already exists') !== -1) {
-                    err = rsp.slice(5);
+                    err = rsp;
+                    var ofs = err.lastIndexOf(' : ');
+                    if (ofs > 0)
+                        err = err.slice(0, ofs);
                 }
                 if (err != "") {
                     ebi('f{0}t'.format(t.n)).innerHTML = "ERROR";

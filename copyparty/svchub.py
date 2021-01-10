@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import PY2, WINDOWS, MACOS, VT100
+from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
 from .util import mp
@@ -37,6 +38,10 @@ class SvcHub(object):
         # initiate all services to manage
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
+
+        if self.args.e2d and self.args.e2s:
+            auth = AuthSrv(self.args, self.log)
+            self.up2k.build_indexes(auth.all_writable)
 
         # decide which worker impl to use
         if self.check_mp_enable():

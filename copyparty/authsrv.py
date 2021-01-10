@@ -258,6 +258,7 @@ class AuthSrv(object):
                 with open(cfg_fn, "rb") as f:
                     self._parse_config_file(f, user, mread, mwrite, mflags, mount)
 
+        self.all_writable = []
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
@@ -280,6 +281,11 @@ class AuthSrv(object):
             v.uread = mread[dst]
             v.uwrite = mwrite[dst]
             v.flags = mflags[dst]
+            if v.uwrite:
+                self.all_writable.append(v)
+
+        if vfs.uwrite and vfs not in self.all_writable:
+            self.all_writable.append(vfs)
 
         missing_users = {}
         for d in [mread, mwrite]:

@@ -28,6 +28,7 @@ class HttpCli(object):
         self.conn = conn
         self.s = conn.s
         self.sr = conn.sr
+        self.ip = conn.addr[0]
         self.addr = conn.addr
         self.args = conn.args
         self.auth = conn.auth
@@ -42,7 +43,7 @@ class HttpCli(object):
         self.log_func(self.log_src, msg)
 
     def _check_nonfatal(self, ex):
-        return ex.code in [404]
+        return ex.code < 400 or ex.code == 404
 
     def _assert_safe_rem(self, rem):
         # sanity check to prevent any disasters
@@ -85,7 +86,8 @@ class HttpCli(object):
 
         v = self.headers.get("x-forwarded-for", None)
         if v is not None and self.conn.addr[0] in ["127.0.0.1", "::1"]:
-            self.log_src = self.conn.set_rproxy(v.split(",")[0])
+            self.ip = v.split(",")[0]
+            self.log_src = self.conn.set_rproxy(self.ip)
 
         self.uname = "*"
         if "cookie" in self.headers:
@@ -305,7 +307,7 @@ class HttpCli(object):
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
         fdir = os.path.join(vfs.realpath, rem)
 
-        addr = self.conn.addr[0].replace(":", ".")
+        addr = self.ip.replace(":", ".")
         fn = "put-{:.6f}-{}.bin".format(time.time(), addr)
         path = os.path.join(fdir, fn)
 
@@ -384,9 +386,10 @@ class HttpCli(object):
 
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
 
-        body["vdir"] = self.vpath
-        body["rdir"] = os.path.join(vfs.realpath, rem)
-        body["addr"] = self.addr[0]
+        body["vtop"] = vfs.vpath
+        body["ptop"] = vfs.realpath
+        body["prel"] = rem
+        body["addr"] = self.ip
         body["flag"] = vfs.flags
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
@@ -409,7 +412,10 @@ class HttpCli(object):
         except KeyError:
             raise Pebkac(400, "need hash and wark headers for binary POST")
 
-        x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", wark, chash)
+        vfs, _ = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        ptop = vfs.realpath
+
+        x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", ptop, wark, chash)
         response = x.get()
         chunksize, cstart, path, lastmod = response
 
@@ -454,7 +460,7 @@ class HttpCli(object):
 
                 self.log("clone {} done".format(cstart[0]))
 
-        x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", wark, chash)
+        x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", ptop, wark, chash)
         num_left = x.get()
 
         if not WINDOWS and num_left == 0:
@@ -576,7 +582,7 @@ class HttpCli(object):
                     if not os.path.isdir(fsenc(fdir)):
                         raise Pebkac(404, "that folder does not exist")
 
-                    suffix = ".{:.6f}-{}".format(time.time(), self.addr[0])
+                    suffix = ".{:.6f}-{}".format(time.time(), self.ip)
                     open_args = {"fdir": fdir, "suffix": suffix}
                 else:
                     open_args = {}
@@ -638,7 +644,7 @@ class HttpCli(object):
                         "\n".join(
                             unicode(x)
                             for x in [
-                                ":".join(unicode(x) for x in self.addr),
+                                ":".join(unicode(x) for x in [self.ip, self.addr[1]]),
                                 msg.rstrip(),
                             ]
                         )
@@ -895,7 +901,7 @@ class HttpCli(object):
             open_func = open
             # 512 kB is optimal for huge files, use 64k
             open_args = [fsenc(fs_path), "rb", 64 * 1024]
-            if hasattr(os, 'sendfile'):
+            if hasattr(os, "sendfile"):
                 use_sendfile = not self.args.no_sendfile
 
         #
@@ -1020,6 +1026,9 @@ class HttpCli(object):
         if not os.path.isdir(fsenc(abspath)):
             if abspath.endswith(".md") and "raw" not in self.uparam:
                 return self.tx_md(abspath)
+
+            if abspath.endswith("{0}.hist{0}up2k.db".format(os.sep)):
+                raise Pebkac(403)
 
             return self.tx_file(abspath)
 

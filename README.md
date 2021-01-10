@@ -144,8 +144,7 @@ roughly sorted by priority
 * `os.copy_file_range` for up2k cloning
 * support pillow-simd
 * cache sha512 chunks on client
-* ~~symlink existing files on upload~~
-  * ok at runtime, up2k db still not persisted
+* persist unfinished up2k uploads too
 * comment field
 * ~~look into android thumbnail cache file format~~ bad idea
 * figure out the deal with pixel3a not being connectable as hotspot

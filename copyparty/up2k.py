@@ -6,6 +6,7 @@ import os
 import re
 import time
 import math
+import stat
 import shutil
 import base64
 import hashlib
@@ -13,7 +14,15 @@ import threading
 from copy import deepcopy
 
 from .__init__ import WINDOWS
-from .util import Pebkac, Queue, fsenc, sanitize_fn, ren_open
+from .util import Pebkac, Queue, fsdec, fsenc, sanitize_fn, ren_open
+
+HAVE_SQLITE3 = False
+try:
+    import sqlite3
+
+    HAVE_SQLITE3 = True
+except:
+    pass
 
 
 class Up2k(object):
@@ -22,20 +31,21 @@ class Up2k(object):
       * documentation
       * registry persistence
         * ~/.config flatfiles for active jobs
-        * wark->path database for finished uploads
     """
 
     def __init__(self, broker):
         self.broker = broker
         self.args = broker.args
         self.log = broker.log
+        self.persist = self.args.e2d
 
         # config
         self.salt = "hunter2"  # TODO: config
 
         # state
-        self.registry = {}
         self.mutex = threading.Lock()
+        self.registry = {}
+        self.db = {}
 
         if WINDOWS:
             # usually fails to set lastmod too quickly
@@ -47,57 +57,234 @@ class Up2k(object):
         # static
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
 
+        if self.persist and not HAVE_SQLITE3:
+            m = "could not initialize sqlite3, will use in-memory registry only"
+            self.log("up2k", m)
+
+    def register_vpath(self, ptop):
+        with self.mutex:
+            if ptop in self.registry:
+                return None
+
+            self.registry[ptop] = {}
+            if not self.persist or not HAVE_SQLITE3:
+                return None
+
+            try:
+                os.mkdir(os.path.join(ptop, ".hist"))
+            except:
+                pass
+
+            db_path = os.path.join(ptop, ".hist", "up2k.db")
+            if ptop in self.db:
+                # self.db[ptop].close()
+                return None
+
+            try:
+                db = self._open_db(db_path)
+                self.db[ptop] = db
+                return db
+            except Exception as ex:
+                m = "failed to open [{}]: {}".format(ptop, repr(ex))
+                self.log("up2k", m)
+
+            return None
+
+    def build_indexes(self, writeables):
+        tops = [d.realpath for d in writeables]
+        for top in tops:
+            db = self.register_vpath(top)
+            if db:
+                # can be symlink so don't `and d.startswith(top)``
+                excl = set([d for d in tops if d != top])
+                self._build_dir([db, 0], top, excl, top)
+                self._drop_lost(db, top)
+                db.commit()
+
+    def _build_dir(self, dbw, top, excl, cdir):
+        histdir = os.path.join(top, ".hist")
+        for inode in [fsdec(x) for x in os.listdir(fsenc(cdir))]:
+            abspath = os.path.join(cdir, inode)
+            inf = os.stat(fsenc(abspath))
+            if stat.S_ISDIR(inf.st_mode):
+                if abspath in excl or abspath == histdir:
+                    continue
+                self.log("up2k", "dir: {}".format(abspath))
+                self._build_dir(dbw, top, excl, abspath)
+            else:
+                # self.log("up2k", "file: {}".format(abspath))
+                rp = abspath[len(top) :].replace("\\", "/").strip("/")
+                c = dbw[0].execute("select * from up where rp = ?", (rp,))
+                in_db = list(c.fetchall())
+                if in_db:
+                    _, dts, dsz, _ = in_db[0]
+                    if len(in_db) > 1:
+                        m = "WARN: multiple entries: [{}] => [{}] ({})"
+                        self.log("up2k", m.format(top, rp, len(in_db)))
+                        dts = -1
+
+                    if dts == inf.st_mtime and dsz == inf.st_size:
+                        continue
+
+                    m = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
+                        top, rp, dts, inf.st_mtime, dsz, inf.st_size
+                    )
+                    self.log("up2k", m)
+                    self.db_rm(dbw[0], rp)
+                    dbw[1] += 1
+                    in_db = None
+
+                self.log("up2k", "file: {}".format(abspath))
+                hashes = self._hashlist_from_file(abspath)
+                wark = self._wark_from_hashlist(inf.st_size, hashes)
+                self.db_add(dbw[0], wark, rp, inf.st_mtime, inf.st_size)
+                dbw[1] += 1
+                if dbw[1] > 1024:
+                    dbw[0].commit()
+                    dbw[1] = 0
+
+    def _drop_lost(self, db, top):
+        rm = []
+        c = db.execute("select * from up")
+        for dwark, dts, dsz, drp in c:
+            abspath = os.path.join(top, drp)
+            if not os.path.exists(abspath):
+                rm.append(drp)
+
+        if not rm:
+            return
+
+        self.log("up2k", "forgetting {} deleted files".format(len(rm)))
+        for rp in rm:
+            self.db_rm(db, rp)
+
+    def _open_db(self, db_path):
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+        try:
+            c = conn.execute(r"select * from kv where k = 'sver'")
+            rows = c.fetchall()
+            if rows:
+                ver = rows[0][1]
+            else:
+                self.log("up2k", "WARN: no sver in kv, DB corrupt?")
+                ver = "unknown"
+
+            if ver == "1":
+                try:
+                    nfiles = next(conn.execute("select count(w) from up"))[0]
+                    self.log("up2k", "found DB at {} |{}|".format(db_path, nfiles))
+                    return conn
+                except Exception as ex:
+                    m = "WARN: could not list files, DB corrupt?\n  " + repr(ex)
+                    self.log("up2k", m)
+
+            m = "REPLACING unsupported DB (v.{}) at {}".format(ver, db_path)
+            self.log("up2k", m)
+            conn.close()
+            os.unlink(db_path)
+            conn = sqlite3.connect(db_path, check_same_thread=False)
+        except:
+            pass
+
+        # sqlite is variable-width only, no point in using char/nchar/varchar
+        for cmd in [
+            r"create table kv (k text, v text)",
+            r"create table up (w text, mt int, sz int, rp text)",
+            r"insert into kv values ('sver', '1')",
+            r"create index up_w on up(w)",
+        ]:
+            conn.execute(cmd)
+
+        conn.commit()
+        self.log("up2k", "created DB at {}".format(db_path))
+        return conn
+
     def handle_json(self, cj):
+        self.register_vpath(cj["ptop"])
         cj["name"] = sanitize_fn(cj["name"])
         wark = self._get_wark(cj)
         now = time.time()
+        job = None
         with self.mutex:
-            # TODO use registry persistence here to symlink any matching wark
-            if wark in self.registry:
-                job = self.registry[wark]
-                if job["rdir"] != cj["rdir"] or job["name"] != cj["name"]:
-                    src = os.path.join(job["rdir"], job["name"])
-                    dst = os.path.join(cj["rdir"], cj["name"])
+            db = self.db.get(cj["ptop"], None)
+            reg = self.registry[cj["ptop"]]
+            if wark not in reg and db:
+                cur = db.execute(r"select * from up where w = ?", (wark,))
+                for _, dtime, dsize, dp_rel in cur:
+                    dp_abs = os.path.join(cj["ptop"], dp_rel).replace("\\", "/")
+                    # relying on path.exists to return false on broken symlinks
+                    if os.path.exists(dp_abs):
+                        try:
+                            prel, name = dp_rel.rsplit("/", 1)
+                        except:
+                            prel = ""
+                            name = dp_rel
+
+                        job = {
+                            "name": name,
+                            "prel": prel,
+                            "vtop": cj["vtop"],
+                            "ptop": cj["ptop"],
+                            "flag": cj["flag"],
+                            "size": dsize,
+                            "lmod": dtime,
+                            "hash": [],
+                            "need": [],
+                        }
+                        break
+
+            if job or wark in reg:
+                job = job or reg[wark]
+                if job["prel"] != cj["prel"] or job["name"] != cj["name"]:
+                    src = os.path.join(job["ptop"], job["prel"], job["name"])
+                    dst = os.path.join(cj["ptop"], cj["prel"], cj["name"])
+                    vsrc = os.path.join(job["vtop"], job["prel"], job["name"])
+                    vsrc = vsrc.replace("\\", "/")  # just for prints anyways
                     if job["need"]:
                         self.log("up2k", "unfinished:\n  {0}\n  {1}".format(src, dst))
-                        err = "partial upload exists at a different location; please resume uploading here instead:\n{0}{1} ".format(
-                            job["vdir"], job["name"]
-                        )
+                        err = "partial upload exists at a different location; please resume uploading here instead:\n"
+                        err += vsrc + " "
                         raise Pebkac(400, err)
                     elif "nodupe" in job["flag"]:
                         self.log("up2k", "dupe-reject:\n  {0}\n  {1}".format(src, dst))
-                        err = "upload rejected, file already exists:\n{0}{1} ".format(
-                            job["vdir"], job["name"]
-                        )
+                        err = "upload rejected, file already exists:\n " + vsrc + " "
                         raise Pebkac(400, err)
                     else:
                         # symlink to the client-provided name,
                         # returning the previous upload info
                         job = deepcopy(job)
-                        job["rdir"] = cj["rdir"]
-                        job["name"] = self._untaken(cj["rdir"], cj["name"], now, cj["addr"])
-                        dst = os.path.join(job["rdir"], job["name"])
+                        for k in ["ptop", "vtop", "prel"]:
+                            job[k] = cj[k]
+
+                        pdir = os.path.join(cj["ptop"], cj["prel"])
+                        job["name"] = self._untaken(pdir, cj["name"], now, cj["addr"])
+                        dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         os.unlink(fsenc(dst))  # TODO ed pls
                         self._symlink(src, dst)
-            else:
+
+            if not job:
                 job = {
                     "wark": wark,
                     "t0": now,
-                    "addr": cj["addr"],
-                    "vdir": cj["vdir"],
-                    "rdir": cj["rdir"],
-                    "flag": cj["flag"],
-                    # client-provided, sanitized by _get_wark:
-                    "name": cj["name"],
-                    "size": cj["size"],
-                    "lmod": cj["lmod"],
                     "hash": deepcopy(cj["hash"]),
+                    "need": [],
                 }
+                # client-provided, sanitized by _get_wark: name, size, lmod
+                for k in [
+                    "addr",
+                    "vtop",
+                    "ptop",
+                    "prel",
+                    "flag",
+                    "name",
+                    "size",
+                    "lmod",
+                ]:
+                    job[k] = cj[k]
 
                 # one chunk may occur multiple times in a file;
                 # filter to unique values for the list of missing chunks
                 # (preserve order to reduce disk thrashing)
-                job["need"] = []
                 lut = {}
                 for k in cj["hash"]:
                     if k not in lut:
@@ -149,35 +336,46 @@ class Up2k(object):
             self.log("up2k", "cannot symlink; creating copy: " + repr(ex))
             shutil.copy2(fsenc(src), fsenc(dst))
 
-    def handle_chunk(self, wark, chash):
+    def handle_chunk(self, ptop, wark, chash):
         with self.mutex:
-            job = self.registry.get(wark)
+            job = self.registry[ptop].get(wark, None)
             if not job:
-                raise Pebkac(404, "unknown wark")
+                raise Pebkac(400, "unknown wark")
 
             if chash not in job["need"]:
                 raise Pebkac(200, "already got that but thanks??")
 
             nchunk = [n for n, v in enumerate(job["hash"]) if v == chash]
             if not nchunk:
-                raise Pebkac(404, "unknown chunk")
+                raise Pebkac(400, "unknown chunk")
 
         chunksize = self._get_chunksize(job["size"])
         ofs = [chunksize * x for x in nchunk]
 
-        path = os.path.join(job["rdir"], job["name"])
+        path = os.path.join(job["ptop"], job["prel"], job["name"])
 
         return [chunksize, ofs, path, job["lmod"]]
 
-    def confirm_chunk(self, wark, chash):
+    def confirm_chunk(self, ptop, wark, chash):
         with self.mutex:
-            job = self.registry[wark]
+            job = self.registry[ptop][wark]
             job["need"].remove(chash)
             ret = len(job["need"])
+            if ret > 0:
+                return ret
 
-            if WINDOWS and ret == 0:
-                path = os.path.join(job["rdir"], job["name"])
+            if WINDOWS:
+                path = os.path.join(job["ptop"], job["prel"], job["name"])
                 self.lastmod_q.put([path, (int(time.time()), int(job["lmod"]))])
+
+            db = self.db.get(job["ptop"], None)
+            if db:
+                rp = os.path.join(job["prel"], job["name"]).replace("\\", "/")
+                self.db_rm(db, rp)
+                self.db_add(db, job["wark"], rp, job["lmod"], job["size"])
+                db.commit()
+                del self.registry[ptop][wark]
+                # in-memory registry is reserved for unfinished uploads
 
             return ret
 
@@ -192,6 +390,14 @@ class Up2k(object):
 
                 chunksize += stepsize
                 stepsize *= mul
+
+    def db_rm(self, db, rp):
+        db.execute("delete from up where rp = ?", (rp,))
+
+    def db_add(self, db, wark, rp, ts, sz):
+        db.execute(
+            "insert into up values (?,?,?,?)", (wark, ts, sz, rp,),
+        )
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
@@ -209,9 +415,13 @@ class Up2k(object):
         except:
             cj["lmod"] = int(time.time())
 
-        # server-reproducible file identifier, independent of name or location
-        ident = [self.salt, str(cj["size"])]
-        ident.extend(cj["hash"])
+        wark = self._wark_from_hashlist(cj["size"], cj["hash"])
+        return wark
+
+    def _wark_from_hashlist(self, filesize, hashes):
+        """ server-reproducible file identifier, independent of name or location """
+        ident = [self.salt, str(filesize)]
+        ident.extend(hashes)
         ident = "\n".join(ident)
 
         hasher = hashlib.sha512()
@@ -221,10 +431,34 @@ class Up2k(object):
         wark = base64.urlsafe_b64encode(digest)
         return wark.decode("utf-8").rstrip("=")
 
+    def _hashlist_from_file(self, path):
+        fsz = os.path.getsize(path)
+        csz = self._get_chunksize(fsz)
+        ret = []
+        with open(path, "rb", 512 * 1024) as f:
+            while fsz > 0:
+                hashobj = hashlib.sha512()
+                rem = min(csz, fsz)
+                fsz -= rem
+                while rem > 0:
+                    buf = f.read(min(rem, 64 * 1024))
+                    if not buf:
+                        raise Exception("EOF at " + str(f.tell()))
+
+                    hashobj.update(buf)
+                    rem -= len(buf)
+
+                digest = hashobj.digest()[:32]
+                digest = base64.urlsafe_b64encode(digest)
+                ret.append(digest.decode("utf-8").rstrip("="))
+
+        return ret
+
     def _new_upload(self, job):
-        self.registry[job["wark"]] = job
+        self.registry[job["ptop"]][job["wark"]] = job
         suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
-        with ren_open(job["name"], "wb", fdir=job["rdir"], suffix=suffix) as f:
+        pdir = os.path.join(job["ptop"], job["prel"])
+        with ren_open(job["name"], "wb", fdir=pdir, suffix=suffix) as f:
             f, job["name"] = f["orz"]
             f.seek(job["size"] - 1)
             f.write(b"e")

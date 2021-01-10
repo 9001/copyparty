@@ -712,3 +712,6 @@ class Pebkac(Exception):
     def __init__(self, code, msg=None):
         super(Pebkac, self).__init__(msg or HTTPCODE[code])
         self.code = code
+
+    def __repr__(self):
+        return "Pebkac({}, {})".format(self.code, repr(self.args))

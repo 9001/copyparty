@@ -105,17 +105,22 @@ def main():
         epilog=dedent(
             """
             -a takes username:password,
-            -v takes src:dst:permset:permset:... where "permset" is
-               accesslevel followed by username (no separator)
+            -v takes src:dst:permset:permset:cflag:cflag:...
+               where "permset" is accesslevel followed by username (no separator)
+               and "cflag" is config flags to set on this volume
             
+            list of cflags:
+              cnodupe rejects existing files (instead of symlinking them)
+
             example:\033[35m
-              -a ed:hunter2 -v .::r:aed -v ../inc:dump:w:aed  \033[36m
+              -a ed:hunter2 -v .::r:aed -v ../inc:dump:w:aed:cnodupe  \033[36m
               mount current directory at "/" with
                * r (read-only) for everyone
                * a (read+write) for ed
               mount ../inc at "/dump" with
                * w (write-only) for everyone
-               * a (read+write) for ed  \033[0m
+               * a (read+write) for ed
+               * reject duplicate files  \033[0m
             
             if no accounts or volumes are configured,
             current folder will be read/write for everyone
@@ -125,6 +130,7 @@ def main():
             """
         ),
     )
+    # fmt: off
     ap.add_argument("-c", metavar="PATH", type=str, action="append", help="add config file")
     ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind")
     ap.add_argument("-p", metavar="PORT", type=int, default=3923, help="port to bind")
@@ -135,12 +141,15 @@ def main():
     ap.add_argument("-q", action="store_true", help="quiet")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
+    ap.add_argument("-e2d", action="store_true", help="enable up2k database")
+    ap.add_argument("-e2s", action="store_true", help="enable up2k db-scanner")
     ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap.add_argument("-nih", action="store_true", help="no info hostname")
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     al = ap.parse_args()
+    # fmt: on
 
     SvcHub(al).run()
 

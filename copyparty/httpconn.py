@@ -65,6 +65,7 @@ class HttpConn(object):
             color = 34
             self.rproxy = ip
 
+        self.ip = ip
         self.log_src = "{} \033[{}m{}".format(ip, color, self.addr[1]).ljust(26)
         return self.log_src
 
