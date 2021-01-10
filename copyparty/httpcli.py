@@ -461,7 +461,7 @@ class HttpCli(object):
                 self.log("clone {} done".format(cstart[0]))
 
         x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", ptop, wark, chash)
-        num_left = x.get()
+        num_left, path = x.get()
 
         if not WINDOWS and num_left == 0:
             times = (int(time.time()), int(lastmod))
@@ -929,7 +929,7 @@ class HttpCli(object):
                 remains = sendfile_kern(lower, upper, f, self.s)
             else:
                 remains = sendfile_py(lower, upper, f, self.s)
-        
+
         if remains > 0:
             logmsg += " \033[31m" + str(upper - remains) + "\033[0m"
 
@@ -1027,7 +1027,8 @@ class HttpCli(object):
             if abspath.endswith(".md") and "raw" not in self.uparam:
                 return self.tx_md(abspath)
 
-            if abspath.endswith("{0}.hist{0}up2k.db".format(os.sep)):
+            bad = "{0}.hist{0}up2k.".format(os.sep)
+            if abspath.endswith(bad + "db") or abspath.endswith(bad + "snap"):
                 raise Pebkac(403)
 
             return self.tx_file(abspath)
