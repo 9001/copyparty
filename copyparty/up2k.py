@@ -102,14 +102,25 @@ class Up2k(object):
                 db.commit()
 
     def _build_dir(self, dbw, top, excl, cdir):
+        try:
+            inodes = [fsdec(x) for x in os.listdir(fsenc(cdir))]
+        except Exception as ex:
+            self.log("up2k", "listdir: " + repr(ex))
+            return
+        
         histdir = os.path.join(top, ".hist")
-        for inode in [fsdec(x) for x in os.listdir(fsenc(cdir))]:
+        for inode in inodes:
             abspath = os.path.join(cdir, inode)
-            inf = os.stat(fsenc(abspath))
+            try:
+                inf = os.stat(fsenc(abspath))
+            except Exception as ex:
+                self.log("up2k", "stat: " + repr(ex))
+                continue
+            
             if stat.S_ISDIR(inf.st_mode):
                 if abspath in excl or abspath == histdir:
                     continue
-                self.log("up2k", "dir: {}".format(abspath))
+                self.log("up2k", " dir: {}".format(abspath))
                 self._build_dir(dbw, top, excl, abspath)
             else:
                 # self.log("up2k", "file: {}".format(abspath))
@@ -135,7 +146,12 @@ class Up2k(object):
                     in_db = None
 
                 self.log("up2k", "file: {}".format(abspath))
-                hashes = self._hashlist_from_file(abspath)
+                try:
+                    hashes = self._hashlist_from_file(abspath)
+                except Exception as ex:
+                    self.log("up2k", "hash: " + repr(ex))
+                    continue
+                
                 wark = self._wark_from_hashlist(inf.st_size, hashes)
                 self.db_add(dbw[0], wark, rp, inf.st_mtime, inf.st_size)
                 dbw[1] += 1
@@ -148,8 +164,11 @@ class Up2k(object):
         c = db.execute("select * from up")
         for dwark, dts, dsz, drp in c:
             abspath = os.path.join(top, drp)
-            if not os.path.exists(abspath):
-                rm.append(drp)
+            try:
+                if not os.path.exists(fsenc(abspath)):
+                    rm.append(drp)
+            except Exception as ex:
+                self.log("up2k", "stat-rm: " + repr(ex))
 
         if not rm:
             return
@@ -213,7 +232,7 @@ class Up2k(object):
                 for _, dtime, dsize, dp_rel in cur:
                     dp_abs = os.path.join(cj["ptop"], dp_rel).replace("\\", "/")
                     # relying on path.exists to return false on broken symlinks
-                    if os.path.exists(dp_abs):
+                    if os.path.exists(fsenc(dp_abs)):
                         try:
                             prel, name = dp_rel.rsplit("/", 1)
                         except:
