@@ -549,6 +549,16 @@ else:
     fsdec = w8dec
 
 
+def atomic_move(src, dst):
+    if not PY2:
+        os.replace(src, dst)
+    else:
+        if os.path.exists(dst):
+            os.unlink(dst)
+
+        os.rename(src, dst)
+
+
 def read_socket(sr, total_size):
     remains = total_size
     while remains > 0:
