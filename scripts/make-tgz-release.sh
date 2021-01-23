@@ -2,12 +2,16 @@
 set -e
 echo
 
-command -v gtar  >/dev/null &&
-command -v gfind >/dev/null && {
-	tar()  { gtar  "$@"; }
+# osx support
+# port install gnutar findutils gsed coreutils
+gtar=$(command -v gtar || command -v gnutar) || true
+[ ! -z "$gtar" ] && command -v gfind >/dev/null && {
+	tar()  { $gtar "$@"; }
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
+	command -v grealpath >/dev/null &&
+		realpath() { grealpath "$@"; }
 }
 
 which md5sum 2>/dev/null >/dev/null &&
