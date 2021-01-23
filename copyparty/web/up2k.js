@@ -262,6 +262,7 @@ function up2k_init(have_crypto) {
 
         more_one_file();
         var bad_files = [];
+        var good_files = [];
         for (var a = 0; a < files.length; a++) {
             var fobj = files[a];
             if (is_itemlist) {
@@ -275,9 +276,32 @@ function up2k_init(have_crypto) {
                     throw 1;
             }
             catch (ex) {
-                bad_files.push([a, fobj.name]);
+                bad_files.push(fobj.name);
                 continue;
             }
+            good_files.push(fobj);
+        }
+
+        if (bad_files.length > 0) {
+            var msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, files.length);
+            for (var a = 0; a < bad_files.length; a++)
+                msg += '-- ' + bad_files[a] + '\n';
+
+            if (files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
+                msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
+
+            alert(msg);
+        }
+
+        var msg = ['upload these ' + good_files.length + ' files?'];
+        for (var a = 0; a < good_files.length; a++)
+            msg.push(good_files[a].name);
+
+        if (!confirm(msg.join('\n')))
+            return;
+
+        for (var a = 0; a < good_files.length; a++) {
+            var fobj = good_files[a];
             var now = new Date().getTime();
             var lmod = fobj.lastModified || now;
             var entry = {
@@ -306,17 +330,6 @@ function up2k_init(have_crypto) {
 
             st.files.push(entry);
             st.todo.hash.push(entry);
-        }
-
-        if (bad_files.length > 0) {
-            var msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, files.length);
-            for (var a = 0; a < bad_files.length; a++)
-                msg += '-- ' + bad_files[a][1] + '\n';
-
-            if (files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
-                msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
-
-            alert(msg);
         }
     }
     ebi('u2btn').addEventListener('drop', gotfile, false);
