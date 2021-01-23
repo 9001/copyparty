@@ -335,6 +335,7 @@ class Up2k(object):
                     "name",
                     "size",
                     "lmod",
+                    "poke",
                 ]:
                     job[k] = cj[k]
 
@@ -458,9 +459,8 @@ class Up2k(object):
         db.execute("delete from up where rp = ?", (rp,))
 
     def db_add(self, db, wark, rp, ts, sz):
-        db.execute(
-            "insert into up values (?,?,?,?)", (wark, ts, sz, rp,),
-        )
+        v = (wark, ts, sz, rp)
+        db.execute("insert into up values (?,?,?,?)", v)
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
@@ -563,9 +563,14 @@ class Up2k(object):
             for job in rm:
                 del reg[job["wark"]]
                 try:
-                    # remove the placeholder zero-byte file (keep the PARTIAL)
+                    # remove the filename reservation
                     path = os.path.join(job["ptop"], job["prel"], job["name"])
                     if os.path.getsize(path) == 0:
+                        os.unlink(path)
+
+                    if len(job["hash"]) == len(job["need"]):
+                        # PARTIAL is empty, delete that too
+                        path = os.path.join(job["ptop"], job["prel"], job["tnam"])
                         os.unlink(path)
                 except:
                     pass
