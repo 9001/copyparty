@@ -18,13 +18,16 @@ echo
 #   (the fancy markdown editor)
 
 
-command -v gtar  >/dev/null &&
-command -v gfind >/dev/null && {
-	tar()  { gtar  "$@"; }
+# port install gnutar findutils gsed coreutils
+gtar=$(command -v gtar || command -v gnutar) || true
+[ ! -z "$gtar" ] && command -v gfind >/dev/null && {
+	tar()  { $gtar "$@"; }
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
 	unexpand() { gunexpand "$@"; }
+	command -v grealpath >/dev/null &&
+		realpath() { grealpath "$@"; }
 }
 
 [ -e copyparty/__main__.py ] || cd ..
