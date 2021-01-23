@@ -349,16 +349,17 @@ function up2k_init(have_crypto) {
     //
 
     function handshakes_permitted() {
-        return multitask || (
-            st.todo.upload.length == 0 &&
-            st.busy.upload.length == 0);
+        var lim = multitask ? 1 : 0;
+        return lim >=
+            st.todo.upload.length +
+            st.busy.upload.length;
     }
 
     function hashing_permitted() {
-        return multitask || (
-            handshakes_permitted() &&
-            st.todo.handshake.length == 0 &&
-            st.busy.handshake.length == 0);
+        var lim = multitask ? 1 : 0;
+        return handshakes_permitted() && lim >=
+            st.todo.handshake.length +
+            st.busy.handshake.length;
     }
 
     var tasker = (function () {

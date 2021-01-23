@@ -293,7 +293,8 @@ class Up2k(object):
                 job = job or reg[wark]
                 if job["prel"] == cj["prel"] and job["name"] == cj["name"]:
                     # ensure the files haven't been deleted manually
-                    for fn in job["name"], job["tnam"]:
+                    names = [job[x] for x in ["name", "tnam"] if x in job]
+                    for fn in names:
                         path = os.path.join(job["ptop"], job["prel"], fn)
                         if not os.path.exists(path):
                             job = None
