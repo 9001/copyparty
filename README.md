@@ -142,6 +142,7 @@ roughly sorted by priority
   * terminate client on bad data
 * drop onto folders
 * `os.copy_file_range` for up2k cloning
+* up2k partials ui
 * support pillow-simd
 * cache sha512 chunks on client
 * comment field

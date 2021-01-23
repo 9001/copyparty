@@ -4,6 +4,14 @@ exit 1
 
 
 ##
+## delete all partial uploads
+##  (supports linux/macos, probably windows+msys2)
+
+gzip -d < .hist/up2k.snap | jq -r '.[].tnam' | while IFS= read -r f; do rm -f -- "$f"; done
+gzip -d < .hist/up2k.snap | jq -r '.[].name' | while IFS= read -r f; do wc -c -- "$f" | grep -qiE '^[^0-9a-z]*0' & rm -f -- "$f"; done
+
+
+##
 ## create a test payload
 
 head -c $((2*1024*1024*1024)) /dev/zero | openssl enc -aes-256-ctr -pass pass:hunter2 -nosalt > garbage.file
