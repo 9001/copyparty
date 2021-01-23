@@ -291,7 +291,15 @@ class Up2k(object):
 
             if job or wark in reg:
                 job = job or reg[wark]
-                if job["prel"] != cj["prel"] or job["name"] != cj["name"]:
+                if job["prel"] == cj["prel"] and job["name"] == cj["name"]:
+                    # ensure the files haven't been deleted manually
+                    for fn in job["name"], job["tnam"]:
+                        path = os.path.join(job["ptop"], job["prel"], fn)
+                        if not os.path.exists(path):
+                            job = None
+                            break
+                else:
+                    # file contents match, but not the path
                     src = os.path.join(job["ptop"], job["prel"], job["name"])
                     dst = os.path.join(cj["ptop"], cj["prel"], cj["name"])
                     vsrc = os.path.join(job["vtop"], job["prel"], job["name"])
