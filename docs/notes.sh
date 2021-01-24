@@ -8,7 +8,7 @@ exit 1
 ##  (supports linux/macos, probably windows+msys2)
 
 gzip -d < .hist/up2k.snap | jq -r '.[].tnam' | while IFS= read -r f; do rm -f -- "$f"; done
-gzip -d < .hist/up2k.snap | jq -r '.[].name' | while IFS= read -r f; do wc -c -- "$f" | grep -qiE '^[^0-9a-z]*0' & rm -f -- "$f"; done
+gzip -d < .hist/up2k.snap | jq -r '.[].name' | while IFS= read -r f; do wc -c -- "$f" | grep -qiE '^[^0-9a-z]*0' && rm -f -- "$f"; done
 
 
 ##
