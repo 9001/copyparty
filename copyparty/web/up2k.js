@@ -201,6 +201,7 @@ function up2k_init(have_crypto) {
 
     var parallel_uploads = cfg_get('nthread');
     var multitask = bcfg_get('multitask', true);
+    var ask_up = bcfg_get('ask_up', true);
 
     var col_hashing = '#00bbff';
     var col_hashed = '#004466';
@@ -297,7 +298,7 @@ function up2k_init(have_crypto) {
         for (var a = 0; a < good_files.length; a++)
             msg.push(good_files[a].name);
 
-        if (!confirm(msg.join('\n')))
+        if (ask_up && !confirm(msg.join('\n')))
             return;
 
         for (var a = 0; a < good_files.length; a++) {
@@ -839,6 +840,11 @@ function up2k_init(have_crypto) {
         bcfg_set('multitask', multitask);
     }
 
+    function tgl_ask_up() {
+        ask_up = !ask_up;
+        bcfg_set('ask_up', ask_up);
+    }
+
     function nop(ev) {
         ev.preventDefault();
         this.click();
@@ -855,6 +861,7 @@ function up2k_init(have_crypto) {
 
     ebi('nthread').addEventListener('input', bumpthread, false);
     ebi('multitask').addEventListener('click', tgl_multitask, false);
+    ebi('ask_up').addEventListener('click', tgl_ask_up, false);
 
     var nodes = ebi('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)

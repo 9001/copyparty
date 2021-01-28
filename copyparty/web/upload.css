@@ -194,6 +194,12 @@
 #u2conf input+a {
 	background: #d80;
 }
+#u2conf input[type="checkbox"]+label {
+	color: #f5a;
+}
+#u2conf input[type="checkbox"]:checked+label {
+	color: #fc5;
+}
 #u2foot {
 	color: #fff;
 	font-style: italic;
