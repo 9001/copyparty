@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "pre",
+            "command": "true;rm -rf inc/* inc/.hist/;mkdir -p inc;",
+            "type": "shell"
+        }
+    ]
+}

@@ -15,7 +15,7 @@ import hashlib
 import threading
 from copy import deepcopy
 
-from .__init__ import WINDOWS, PY2
+from .__init__ import WINDOWS
 from .util import Pebkac, Queue, fsdec, fsenc, sanitize_fn, ren_open, atomic_move
 
 HAVE_SQLITE3 = False
@@ -296,7 +296,12 @@ class Up2k(object):
                     names = [job[x] for x in ["name", "tnam"] if x in job]
                     for fn in names:
                         path = os.path.join(job["ptop"], job["prel"], fn)
-                        if not os.path.exists(path):
+                        try:
+                            if os.path.getsize(path) > 0:
+                                # upload completed or both present
+                                break
+                        except:
+                            # missing; restart
                             job = None
                             break
                 else:
@@ -530,6 +535,8 @@ class Up2k(object):
         self.registry[job["ptop"]][job["wark"]] = job
         pdir = os.path.join(job["ptop"], job["prel"])
         job["name"] = self._untaken(pdir, job["name"], job["t0"], job["addr"])
+        # if len(job["name"].split(".")) > 8:
+        #    raise Exception("aaa")
 
         tnam = job["name"] + ".PARTIAL"
         suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
