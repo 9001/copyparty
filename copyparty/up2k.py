@@ -561,7 +561,7 @@ class Up2k(object):
 
     def _snapshot(self):
         persist_interval = 30  # persist unfinished uploads index every 30 sec
-        discard_interval = 3600  # drop unfinished uploads after 1 hour inactivity
+        discard_interval = 21600  # drop unfinished uploads after 6 hours inactivity
         prev = {}
         while True:
             time.sleep(persist_interval)
