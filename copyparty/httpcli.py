@@ -797,6 +797,8 @@ class HttpCli(object):
                 editions[ext or "plain"] = [fs_path, st.st_size]
             except:
                 pass
+            if not self.vpath.startswith(".cpr/"):
+                break
 
         if not editions:
             raise Pebkac(404)
