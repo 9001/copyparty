@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import time
 import socket
+import select
 
 from .util import chkcmd, Counter
 
@@ -23,39 +24,50 @@ class TcpSrv(object):
 
         ip = "127.0.0.1"
         eps = {ip: "local only"}
-        if self.args.i != ip:
-            eps = self.detect_interfaces(self.args.i) or {self.args.i: "external"}
+        nonlocals = [x for x in self.args.i if x != ip]
+        if nonlocals:
+            eps = self.detect_interfaces(self.args.i)
+            if not eps:
+                for x in nonlocals:
+                    eps[x] = "external"
 
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
-            self.log(
-                "tcpsrv",
-                "available @ http://{}:{}/  (\033[33m{}\033[0m)".format(
-                    ip, self.args.p, desc
-                ),
-            )
+            for port in sorted(self.args.p):
+                self.log(
+                    "tcpsrv",
+                    "available @ http://{}:{}/  (\033[33m{}\033[0m)".format(
+                        ip, port, desc
+                    ),
+                )
 
-        self.srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.srv = []
+        for ip in self.args.i:
+            for port in self.args.p:
+                self.srv.append(self._listen(ip, port))
+
+    def _listen(self, ip, port):
+        srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         try:
-            self.srv.bind((self.args.i, self.args.p))
+            srv.bind((ip, port))
+            return srv
         except (OSError, socket.error) as ex:
             if ex.errno == 98:
                 raise Exception(
-                    "\033[1;31mport {} is busy on interface {}\033[0m".format(
-                        self.args.p, self.args.i
-                    )
+                    "\033[1;31mport {} is busy on interface {}\033[0m".format(port, ip)
                 )
 
             if ex.errno == 99:
                 raise Exception(
-                    "\033[1;31minterface {} does not exist\033[0m".format(self.args.i)
+                    "\033[1;31minterface {} does not exist\033[0m".format(ip)
                 )
 
     def run(self):
-        self.srv.listen(self.args.nc)
-
-        self.log("tcpsrv", "listening @ {0}:{1}".format(self.args.i, self.args.p))
+        for srv in self.srv:
+            srv.listen(self.args.nc)
+            ip, port = srv.getsockname()
+            self.log("tcpsrv", "listening @ {0}:{1}".format(ip, port))
 
         while True:
             self.log("tcpsrv", "\033[1;30m|%sC-ncli\033[0m" % ("-" * 1,))
@@ -64,15 +76,23 @@ class TcpSrv(object):
                 continue
 
             self.log("tcpsrv", "\033[1;30m|%sC-acc1\033[0m" % ("-" * 2,))
-            sck, addr = self.srv.accept()
-            self.log("%s %s" % addr, "\033[1;30m|%sC-acc2\033[0m" % ("-" * 3,))
-            self.num_clients.add()
-            self.hub.broker.put(False, "httpconn", sck, addr)
+            ready, _, _ = select.select(self.srv, [], [])
+            for srv in ready:
+                sck, addr = srv.accept()
+                sip, sport = srv.getsockname()
+                self.log(
+                    "%s %s" % addr,
+                    "\033[1;30m|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
+                        "-" * 3, sip, sport % 8, sport
+                    ),
+                )
+                self.num_clients.add()
+                self.hub.broker.put(False, "httpconn", sck, addr)
 
     def shutdown(self):
         self.log("tcpsrv", "ok bye")
 
-    def detect_interfaces(self, listen_ip):
+    def detect_interfaces(self, listen_ips):
         eps = {}
 
         # get all ips and their interfaces
@@ -86,8 +106,9 @@ class TcpSrv(object):
             for ln in ip_addr.split("\n"):
                 try:
                     ip, dev = r.match(ln.rstrip()).groups()
-                    if listen_ip in ["0.0.0.0", ip]:
-                        eps[ip] = dev
+                    for lip in listen_ips:
+                        if lip in ["0.0.0.0", ip]:
+                            eps[ip] = dev
                 except:
                     pass
 
@@ -114,11 +135,12 @@ class TcpSrv(object):
 
         s.close()
 
-        if default_route and listen_ip in ["0.0.0.0", default_route]:
-            desc = "\033[32mexternal"
-            try:
-                eps[default_route] += ", " + desc
-            except:
-                eps[default_route] = desc
+        for lip in listen_ips:
+            if default_route and lip in ["0.0.0.0", default_route]:
+                desc = "\033[32mexternal"
+                try:
+                    eps[default_route] += ", " + desc
+                except:
+                    eps[default_route] = desc
 
         return eps

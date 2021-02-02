@@ -132,8 +132,8 @@ def main():
     )
     # fmt: off
     ap.add_argument("-c", metavar="PATH", type=str, action="append", help="add config file")
-    ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind")
-    ap.add_argument("-p", metavar="PORT", type=int, default=3923, help="port to bind")
+    ap.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind (comma-sep.)")
+    ap.add_argument("-p", metavar="PORT", type=str, default="3923", help="ports to bind (comma/range)")
     ap.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
     ap.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores")
     ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
@@ -150,6 +150,16 @@ def main():
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     al = ap.parse_args()
     # fmt: on
+
+    al.i = al.i.split(",")
+    try:
+        if "-" in al.p:
+            lo, hi = [int(x) for x in al.p.split("-")]
+            al.p = list(range(lo, hi + 1))
+        else:
+            al.p = [int(x) for x in al.p.split(",")]
+    except:
+        raise Exception("invalid value for -p")
 
     SvcHub(al).run()
 
