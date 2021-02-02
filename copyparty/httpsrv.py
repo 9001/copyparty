@@ -38,7 +38,7 @@ class HttpSrv(object):
 
     def accept(self, sck, addr):
         """takes an incoming tcp connection and creates a thread to handle it"""
-        self.log("%s %s" % addr, "-" * 5 + "C-cthr")
+        self.log("%s %s" % addr, "\033[1;30m|%sC-cthr\033[0m" % ("-" * 5,))
         thr = threading.Thread(target=self.thr_client, args=(sck, addr))
         thr.daemon = True
         thr.start()
@@ -66,11 +66,11 @@ class HttpSrv(object):
                 thr.start()
 
         try:
-            self.log("%s %s" % addr, "-" * 6 + "C-crun")
+            self.log("%s %s" % addr, "\033[1;30m|%sC-crun\033[0m" % ("-" * 6,))
             cli.run()
 
         finally:
-            self.log("%s %s" % addr, "-" * 7 + "C-done")
+            self.log("%s %s" % addr, "\033[1;30m|%sC-cdone\033[0m" % ("-" * 7,))
             try:
                 sck.shutdown(socket.SHUT_RDWR)
                 sck.close()
