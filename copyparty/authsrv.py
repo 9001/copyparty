@@ -130,11 +130,10 @@ class VFS(object):
 class AuthSrv(object):
     """verifies users against given paths"""
 
-    def __init__(self, args, log_func):
-        self.log_func = log_func
+    def __init__(self, args, log_func, warn_anonwrite=True):
         self.args = args
-
-        self.warn_anonwrite = True
+        self.log_func = log_func
+        self.warn_anonwrite = warn_anonwrite
 
         if WINDOWS:
             self.re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)$")

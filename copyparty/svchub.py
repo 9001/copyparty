@@ -40,7 +40,7 @@ class SvcHub(object):
         self.up2k = Up2k(self)
 
         if self.args.e2d and self.args.e2s:
-            auth = AuthSrv(self.args, self.log)
+            auth = AuthSrv(self.args, self.log, False)
             self.up2k.build_indexes(auth.all_writable)
 
         # decide which worker impl to use
