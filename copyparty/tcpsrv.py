@@ -53,15 +53,13 @@ class TcpSrv(object):
             srv.bind((ip, port))
             return srv
         except (OSError, socket.error) as ex:
-            if ex.errno == 98:
-                raise Exception(
-                    "\033[1;31mport {} is busy on interface {}\033[0m".format(port, ip)
-                )
-
-            if ex.errno == 99:
-                raise Exception(
-                    "\033[1;31minterface {} does not exist\033[0m".format(ip)
-                )
+            if ex.errno in [98, 48]:
+                e = "\033[1;31mport {} is busy on interface {}\033[0m".format(port, ip)
+            elif ex.errno in [99, 49]:
+                e = "\033[1;31minterface {} does not exist\033[0m".format(ip)
+            else:
+                raise
+            raise Exception(e)
 
     def run(self):
         for srv in self.srv:
