@@ -3,7 +3,8 @@
         href="#" data-dest="up2k">up2k</a><i></i><a
         href="#" data-dest="bup">bup</a><i></i><a
         href="#" data-dest="mkdir">mkdir</a><i></i><a
-        href="#" data-dest="new_md">new.md</a></div>
+        href="#" data-dest="new_md">new.md</a><i></i><a
+        href="#" data-dest="msg">msg</a></div>
 
     <div id="op_bup" class="opview opbox act">
         <div id="u2err"></div>
@@ -27,6 +28,13 @@
             <input type="hidden" name="act" value="new_md" />
             <input type="text" name="name" size="30">
             <input type="submit" value="create doc">
+        </form>
+    </div>
+
+    <div id="op_msg" class="opview opbox">
+        <form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="/{{ vdir }}">
+            <input type="text" name="msg" size="30">
+            <input type="submit" value="send">
         </form>
     </div>
 

@@ -294,16 +294,37 @@ class HttpCli(object):
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
 
-        raise Pebkac(405, "don't know how to handle {} POST".format(ctype))
+        if "application/x-www-form-urlencoded" in ctype:
+            opt = self.args.urlform
+            if "stash" in opt:
+                return self.handle_stash()
 
-    def handle_stash(self):
+            if "save" in opt:
+                post_sz, _, _, path = self.dump_to_file()
+                self.log("urlform: {} bytes, {}".format(post_sz, path))
+            elif "print" in opt:
+                reader, _ = self.get_body_reader()
+                for buf in reader:
+                    buf = buf.decode("utf-8", "replace")
+                    self.log("urlform:\n  {}\n".format(buf))
+
+            if "get" in opt:
+                return self.handle_get()
+
+            raise Pebkac(405, "POST({}) is disabled".format(ctype))
+
+        raise Pebkac(405, "don't know how to handle POST({})".format(ctype))
+
+    def get_body_reader(self):
         remains = int(self.headers.get("content-length", None))
         if remains is None:
-            reader = read_socket_unbounded(self.sr)
             self.keepalive = False
+            return read_socket_unbounded(self.sr), remains
         else:
-            reader = read_socket(self.sr, remains)
+            return read_socket(self.sr, remains), remains
 
+    def dump_to_file(self):
+        reader, remains = self.get_body_reader()
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
         fdir = os.path.join(vfs.realpath, rem)
 
@@ -314,6 +335,10 @@ class HttpCli(object):
         with open(path, "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
+        return post_sz, sha_b64, remains, path
+
+    def handle_stash(self):
+        post_sz, sha_b64, remains, path = self.dump_to_file()
         spd = self._spd(post_sz)
         self.log("{} wrote {}/{} bytes to {}".format(spd, post_sz, remains, path))
         self.reply("{}\n{}\n".format(post_sz, sha_b64).encode("utf-8"))
@@ -517,10 +542,9 @@ class HttpCli(object):
                 raise Pebkac(500, "mkdir failed, check the logs")
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
+        esc_paths = [quotep(vpath), html_escape(vpath)]
         html = self.conn.tpl_msg.render(
-            h2='<a href="/{}">go to /{}</a>'.format(
-                quotep(vpath), html_escape(vpath)
-            ),
+            h2='<a href="/{}">go to /{}</a>'.format(*esc_paths),
             pre="aight",
             click=True,
         )

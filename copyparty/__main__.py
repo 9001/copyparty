@@ -127,6 +127,12 @@ def main():
 
             consider the config file for more flexible account/volume management,
             including dynamic reload at runtime (and being more readable w)
+
+            values for --urlform:
+              "stash" dumps the data to file and returns length + checksum
+              "save,get" dumps to file and returns the page like a GET
+              "print,get" prints the data in the log and returns GET
+              (leave out the ",get" to return an error instead)
             """
         ),
     )
@@ -148,6 +154,7 @@ def main():
     ap.add_argument("-nih", action="store_true", help="no info hostname")
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
+    ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
     al = ap.parse_args()
     # fmt: on
 
