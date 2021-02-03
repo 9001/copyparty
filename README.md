@@ -8,7 +8,7 @@
 
 turn your phone or raspi into a portable file server with resumable uploads/downloads using IE6 or any other browser
 
-* server runs on anything with `py2.7` or `py3.2+`
+* server runs on anything with `py2.7` or `py3.3+`
 * *resumable* uploads need `firefox 12+` / `chrome 6+` / `safari 6+` / `IE 10+`
 * code standard: `black`
 
@@ -68,9 +68,8 @@ summary: it works! you can use it! (but technically not even close to beta)
 # dependencies
 
 * `jinja2`
-  * pulls in `markupsafe` as of v2.7; use jinja 2.6 on py3.2
 
-optional, enables thumbnails:
+optional, will eventually enable thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
 
 

@@ -62,28 +62,32 @@ cd sfx
 	)/pe-copyparty"
 
 	echo "repack of files in $old"
-	cp -pR "$old/"*{jinja2,copyparty} .
-	mv {x.,}jinja2 2>/dev/null || true
+	cp -pR "$old/"*{dep-j2,copyparty} .
 }
 
 [ $repack ] || {
 	echo collecting jinja2
-	f="../build/Jinja2-2.6.tar.gz"
+	f="../build/Jinja2-2.11.3.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/25/c8/212b1c2fd6df9eaf536384b6c6619c4e70a3afd2dffdd00e5296ffbae940/Jinja2-2.6.tar.gz;
+		(url=https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-2.11.3.tar.gz;
 		wget -O$f "$url" || curl -L "$url" >$f)
 
 	tar -zxf $f
-	mv Jinja2-*/jinja2 .
-	rm -rf Jinja2-* jinja2/testsuite jinja2/_markupsafe/tests.py jinja2/_stringdefs.py
+	mv Jinja2-*/src/jinja2 .
+	rm -rf Jinja2-*
 	
-	f=jinja2/lexer.py
-	sed -r '/.*föö.*/    raise SyntaxError/' <$f >t
-	tmv $f
-	
-	f=jinja2/_markupsafe/_constants.py
-	awk '!/: [0-9]+,?$/ || /(amp|gt|lt|quot|apos|nbsp).:/' <$f >t
-	tmv $f
+	echo collecting markupsafe
+	f="../build/MarkupSafe-1.1.1.tar.gz"
+	[ -e "$f" ] ||
+		(url=https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz;
+		wget -O$f "$url" || curl -L "$url" >$f)
+
+	tar -zxf $f
+	mv MarkupSafe-*/src/markupsafe .
+	rm -rf MarkupSafe-* markupsafe/_speedups.c
+
+	mkdir dep-j2/
+	mv {markupsafe,jinja2} dep-j2/
 
 	# msys2 tar is bad, make the best of it
 	echo collecting source
@@ -177,7 +181,7 @@ args=(--owner=1000 --group=1000)
 [ "$OSTYPE" = msys ] &&
 	args=()
 
-tar -cf tar "${args[@]}" --numeric-owner copyparty jinja2
+tar -cf tar "${args[@]}" --numeric-owner copyparty dep-j2
 
 echo compressing tar
 # detect best level; bzip2 -7 is usually better than -9

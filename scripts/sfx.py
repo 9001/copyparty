@@ -2,7 +2,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re, os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile
+import os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile
 import subprocess as sp
 
 """
@@ -202,93 +202,6 @@ def u8(gen):
             yield s
 
 
-def get_py_win(ret):
-    tops = []
-    p = str(os.getenv("LocalAppdata"))
-    if p:
-        tops.append(os.path.join(p, "Programs", "Python"))
-
-    progfiles = {}
-    for p in ["ProgramFiles", "ProgramFiles(x86)"]:
-        p = str(os.getenv(p))
-        if p:
-            progfiles[p] = 1
-            # 32bit apps get x86 for both
-            if p.endswith(" (x86)"):
-                progfiles[p[:-6]] = 1
-
-    tops += list(progfiles.keys())
-
-    for sysroot in [me, sys.executable]:
-        sysroot = sysroot[:3].upper()
-        if sysroot[1] == ":" and sysroot not in tops:
-            tops.append(sysroot)
-
-    # $WIRESHARK_SLOGAN
-    for top in tops:
-        try:
-            for name1 in u8(sorted(os.listdir(top), reverse=True)):
-                if name1.lower().startswith("python"):
-                    path1 = os.path.join(top, name1)
-                    try:
-                        for name2 in u8(os.listdir(path1)):
-                            if name2.lower() == "python.exe":
-                                path2 = os.path.join(path1, name2)
-                                ret[path2.lower()] = path2
-                    except:
-                        pass
-        except:
-            pass
-
-
-def get_py_nix(ret):
-    ptn = re.compile(r"^(python|pypy)[0-9\.-]*$")
-    for bindir in os.getenv("PATH").split(":"):
-        if not bindir:
-            next
-
-        try:
-            for fn in u8(os.listdir(bindir)):
-                if ptn.match(fn):
-                    fn = os.path.join(bindir, fn)
-                    ret[fn.lower()] = fn
-        except:
-            pass
-
-
-def read_py(binp):
-    cmd = [
-        binp,
-        "-c",
-        "import sys; sys.stdout.write(' '.join(str(x) for x in sys.version_info)); import jinja2",
-    ]
-    p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-    ver, _ = p.communicate()
-    ver = ver.decode("utf-8").split(" ")[:3]
-    ver = [int(x) if x.isdigit() else 0 for x in ver]
-    return ver, p.returncode == 0
-
-
-def get_pys():
-    ver, chk = read_py(sys.executable)
-    if chk or PY2:
-        return [[chk, ver, sys.executable]]
-
-    hits = {sys.executable.lower(): sys.executable}
-    if platform.system() == "Windows":
-        get_py_win(hits)
-    else:
-        get_py_nix(hits)
-
-    ret = []
-    for binp in hits.values():
-        ver, chk = read_py(binp)
-        ret.append([chk, ver, binp])
-        msg("\t".join(str(x) for x in ret[-1]))
-
-    return ret
-
-
 def yieldfile(fn):
     with open(fn, "rb") as f:
         for block in iter(lambda: f.read(64 * 1024), b""):
@@ -440,12 +353,11 @@ def confirm():
         pass
 
 
-def run(tmp, py):
+def run(tmp, j2ver):
     global cpp
 
-    msg("OK")
-    msg("will use:", py)
-    msg("bound to:", tmp)
+    msg("jinja2:", j2ver or "bundled")
+    msg("sfxdir:", tmp)
 
     # "systemd-tmpfiles-clean.timer"?? HOW do you even come up with this shit
     try:
@@ -457,24 +369,20 @@ def run(tmp, py):
     except:
         pass
 
-    fp_py = os.path.join(tmp, "py")
-    try:
-        with open(fp_py, "wb") as f:
-            f.write(py.encode("utf-8") + b"\n")
-    except:
-        pass
+    ld = [tmp, os.path.join(tmp, "dep-j2")]
+    if j2ver:
+        del ld[-1]
 
-    # avoid loading ./copyparty.py
-    cmd = [
-        py,
-        "-c",
-        'import sys, runpy; sys.path.insert(0, r"'
-        + tmp
-        + '"); runpy.run_module("copyparty", run_name="__main__")',
-    ] + list(sys.argv[1:])
+    cmd = (
+        "import sys, runpy; "
+        + "".join(['sys.path.insert(0, r"' + x + '"); ' for x in ld])
+        + 'runpy.run_module("copyparty", run_name="__main__")'
+    )
+    cmd = [sys.executable, "-c", cmd] + list(sys.argv[1:])
 
+    cmd = [str(x) for x in cmd]
     msg("\n", cmd, "\n")
-    cpp = sp.Popen(str(x) for x in cmd)
+    cpp = sp.Popen(cmd)
     try:
         cpp.wait()
     except:
@@ -526,33 +434,13 @@ def main():
     signal.signal(signal.SIGTERM, bye)
 
     tmp = unpack()
-    fp_py = os.path.join(tmp, "py")
-    if os.path.exists(fp_py):
-        with open(fp_py, "rb") as f:
-            py = f.read().decode("utf-8").rstrip()
 
-        return run(tmp, py)
+    try:
+        from jinja2 import __version__ as j2ver
+    except:
+        j2ver = None
 
-    pys = get_pys()
-    pys.sort(reverse=True)
-    j2, ver, py = pys[0]
-    if j2:
-        try:
-            os.rename(os.path.join(tmp, "jinja2"), os.path.join(tmp, "x.jinja2"))
-        except:
-            pass
-
-        return run(tmp, py)
-
-    msg("\n  could not find jinja2; will use py2 + the bundled version\n")
-    for _, ver, py in pys:
-        if ver > [2, 7] and ver < [3, 0]:
-            return run(tmp, py)
-
-    m = "\033[1;31m\n\n\ncould not find a python with jinja2 installed; please do one of these:\n\n  pip install --user jinja2\n\n  install python2\n\n\033[0m"
-    msg(m)
-    confirm()
-    sys.exit(1)
+    return run(tmp, j2ver)
 
 
 if __name__ == "__main__":
