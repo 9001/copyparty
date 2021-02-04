@@ -402,7 +402,6 @@ def bye(sig, frame):
 def main():
     sysver = str(sys.version).replace("\n", "\n" + " " * 18)
     pktime = time.strftime("%Y-%m-%d, %H:%M:%S", time.gmtime(STAMP))
-    os.system("")
     msg()
     msg("   this is: copyparty", VER)
     msg(" packed at:", pktime, "UTC,", STAMP)

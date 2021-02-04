@@ -980,7 +980,7 @@ def main():
         dbg = null_log
 
     if WINDOWS:
-        os.system("")
+        os.system("rem")
 
         for ch in '<>:"\\|?*':
             # microsoft maps illegal characters to f0xx

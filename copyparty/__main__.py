@@ -88,7 +88,7 @@ def ensure_cert():
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
-        os.system("")  # enables colors
+        os.system("rem")  # enables colors
 
     desc = py_desc().replace("[", "\033[1;30m[")
 
