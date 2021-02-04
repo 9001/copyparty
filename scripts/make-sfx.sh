@@ -169,6 +169,15 @@ done
 	sed -r '/edit2">edit \(fancy/d' <$f >t && tmv "$f"
 }
 
+find | grep -E '\.py$' |
+  grep -vE '__version__' |
+  tr '\n' '\0' |
+  xargs -0 python ../scripts/uncomment.py
+
+f=dep-j2/jinja2/constants.py
+awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
+tmv "$f"
+
 # up2k goes from 28k to 22k laff
 echo entabbening
 find | grep -E '\.(js|css|html|py)$' | while IFS= read -r f; do
