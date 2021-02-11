@@ -937,8 +937,11 @@ class HttpCli(object):
             open_func = open
             # 512 kB is optimal for huge files, use 64k
             open_args = [fsenc(fs_path), "rb", 64 * 1024]
-            if hasattr(os, "sendfile"):
-                use_sendfile = not self.args.no_sendfile
+            use_sendfile = (
+                not self.ssl_suf
+                and not self.args.no_sendfile
+                and hasattr(os, "sendfile")
+            )
 
         #
         # send reply
