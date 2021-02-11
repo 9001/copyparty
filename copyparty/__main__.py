@@ -8,6 +8,7 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
+import re
 import os
 import time
 import shutil
@@ -85,6 +86,51 @@ def ensure_cert():
     # printf 'NO\n.\n.\n.\n.\ncopyparty-insecure\n.\n' | faketime '2000-01-01 00:00:00' openssl req -x509 -sha256 -newkey rsa:2048 -keyout insecure.pem -out insecure.pem -days $((($(printf %d 0x7fffffff)-$(date +%s --date=2000-01-01T00:00:00Z))/(60*60*24))) -nodes && ls -al insecure.pem && openssl x509 -in insecure.pem -text -noout
 
 
+def configure_ssl(al):
+    import ssl
+
+    def terse_sslver(txt):
+        txt = txt.lower()
+        for c in ["_", "v", "."]:
+            txt = txt.replace(c, "")
+
+        return txt.replace("tls10", "tls1")
+
+    # oh man i love openssl
+    # check this out
+    # hold my beer
+    ptn = re.compile(r"^OP_NO_(TLS|SSL)v")
+    sslver = terse_sslver(al.ssl_ver).split(",")
+    flags = [k for k in ssl.__dict__ if ptn.match(k)]
+    # SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv1_2 TLSv1_3
+    if "help" in sslver:
+        avail = [terse_sslver(x[6:]) for x in flags]
+        avail = " ".join(sorted(avail) + ["all"])
+        print("\navailable ssl/tls versions:\n  " + avail)
+        return
+
+    al.ssl_flags_en = 0
+    al.ssl_flags_de = 0
+    for flag in sorted(flags):
+        ver = terse_sslver(flag[6:])
+        num = getattr(ssl, flag)
+        if ver in sslver:
+            al.ssl_flags_en |= num
+        else:
+            al.ssl_flags_de |= num
+
+    if sslver == ["all"]:
+        x = al.ssl_flags_en
+        al.ssl_flags_en = al.ssl_flags_de
+        al.ssl_flags_de = x
+
+    for k in ["ssl_flags_en", "ssl_flags_de"]:
+        num = getattr(al, k)
+        print("{}: {:8x} ({})".format(k, num, num))
+
+    # think i need that beer now
+
+
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
@@ -133,6 +179,9 @@ def main():
               "save,get" dumps to file and returns the page like a GET
               "print,get" prints the data in the log and returns GET
               (leave out the ",get" to return an error instead)
+
+            see "--ssl-ver help" for available ssl/tls versions,
+              default is what python considers safe, usually >= TLS1
             """
         ),
     )
@@ -155,6 +204,7 @@ def main():
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
+    ap.add_argument("--ssl-ver", type=str, help="ssl/tls versions to allow")
     al = ap.parse_args()
     # fmt: on
 
@@ -167,6 +217,9 @@ def main():
             al.p = [int(x) for x in al.p.split(",")]
     except:
         raise Exception("invalid value for -p")
+
+    if al.ssl_ver:
+        configure_ssl(al)
 
     SvcHub(al).run()
 

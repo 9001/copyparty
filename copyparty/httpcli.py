@@ -134,6 +134,16 @@ class HttpCli(object):
             uparam["raw"] = True
             uparam["dots"] = True
 
+        if hasattr(self.s, "cipher"):
+            self.ssl_suf = "".join(
+                [
+                    " \033[3{}m{}".format(c, s)
+                    for c, s in zip([6, 3, 6], self.s.cipher())
+                ]
+            )
+        else:
+            self.ssl_suf = ""
+
         try:
             if self.mode in ["GET", "HEAD"]:
                 return self.handle_get() and self.keepalive
@@ -211,7 +221,7 @@ class HttpCli(object):
 
             logmsg += " [\033[36m" + rval + "\033[0m]"
 
-        self.log(logmsg)
+        self.log(logmsg + self.ssl_suf)
 
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
@@ -245,7 +255,7 @@ class HttpCli(object):
         return self.tx_browser()
 
     def handle_options(self):
-        self.log("OPTIONS " + self.req)
+        self.log("OPTIONS " + self.req + self.ssl_suf)
         self.send_headers(
             None,
             204,
@@ -258,7 +268,7 @@ class HttpCli(object):
         return True
 
     def handle_put(self):
-        self.log("PUT " + self.req)
+        self.log("PUT " + self.req + self.ssl_suf)
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
@@ -269,7 +279,7 @@ class HttpCli(object):
         return self.handle_stash()
 
     def handle_post(self):
-        self.log("POST " + self.req)
+        self.log("POST " + self.req + self.ssl_suf)
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:

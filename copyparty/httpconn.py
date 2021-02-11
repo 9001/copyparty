@@ -109,9 +109,13 @@ class HttpConn(object):
 
             self.log_src = self.log_src.replace("[36m", "[35m")
             try:
-                self.s = ssl.wrap_socket(
-                    self.s, server_side=True, certfile=self.cert_path
-                )
+                ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                ctx.load_cert_chain(self.cert_path)
+                if self.args.ssl_ver:
+                    ctx.options &= ~self.args.ssl_flags_en
+                    ctx.options |= self.args.ssl_flags_de
+                    # print(repr(ctx.options))
+                self.s = ctx.wrap_socket(self.s, server_side=True)
             except Exception as ex:
                 em = str(ex)
 
