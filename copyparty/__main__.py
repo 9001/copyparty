@@ -206,6 +206,7 @@ def main():
     ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--ssl-ver", type=str, help="ssl/tls versions to allow")
     ap.add_argument("--https-only", action="store_true", help="disable plaintext")
+    ap.add_argument("--http-only", action="store_true", help="disable ssl/tls")
     al = ap.parse_args()
     # fmt: on
 

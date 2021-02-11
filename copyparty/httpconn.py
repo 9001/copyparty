@@ -107,6 +107,8 @@ class HttpConn(object):
         self.sr = None
         if self.args.https_only:
             is_https = True
+        elif self.args.http_only:
+            is_https = False
         else:
             is_https = self._detect_https()
 
