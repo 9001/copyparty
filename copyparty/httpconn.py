@@ -75,9 +75,8 @@ class HttpConn(object):
     def log(self, msg):
         self.log_func(self.log_src, msg)
 
-    def run(self):
+    def _detect_https(self):
         method = None
-        self.sr = None
         if self.cert_path:
             try:
                 method = self.s.recv(4, socket.MSG_PEEK)
@@ -102,7 +101,16 @@ class HttpConn(object):
                 self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
                 return
 
-        if method not in [None, b"GET ", b"HEAD", b"POST", b"PUT ", b"OPTI"]:
+        return method not in [None, b"GET ", b"HEAD", b"POST", b"PUT ", b"OPTI"]
+
+    def run(self):
+        self.sr = None
+        if self.args.https_only:
+            is_https = True
+        else:
+            is_https = self._detect_https()
+
+        if is_https:
             if self.sr:
                 self.log("\033[1;31mTODO: cannot do https in jython\033[0m")
                 return
