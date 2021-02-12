@@ -2,10 +2,8 @@
 # coding: utf-8
 from __future__ import print_function
 
-import io
 import os
 import sys
-from glob import glob
 from shutil import rmtree
 
 setuptools_available = True
@@ -49,7 +47,7 @@ with open(here + "/README.md", "rb") as f:
 about = {}
 if not VERSION:
     with open(os.path.join(here, NAME, "__version__.py"), "rb") as f:
-        exec(f.read().decode("utf-8").split("\n\n", 1)[1], about)
+        exec (f.read().decode("utf-8").split("\n\n", 1)[1], about)
 else:
     about["__version__"] = VERSION
 
@@ -116,6 +114,7 @@ args = {
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Environment :: Console",

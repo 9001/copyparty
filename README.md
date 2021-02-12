@@ -76,8 +76,8 @@ optional, will eventually enable thumbnails:
 # sfx
 
 currently there are two self-contained binaries:
-* `copyparty-sfx.sh` for unix (linux and osx) -- smaller, more robust
-* `copyparty-sfx.py` for windows (unix too) -- crossplatform, beta
+* [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) -- pure python, works everywhere
+* [copyparty-sfx.sh](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.sh) -- smaller, but only for linux and macos
 
 launch either of them (**use sfx.py on systemd**) and it'll unpack and run copyparty, assuming you have python installed of course
 
