@@ -130,7 +130,7 @@ class Up2k(object):
             if db:
                 # can be symlink so don't `and d.startswith(top)``
                 excl = set([d for d in tops if d != top])
-                self._build_dir([db, 0], top, excl, top)
+                self._build_dir([db, 0, time.time()], top, excl, top)
                 self._drop_lost(db, top)
                 db.commit()
 
@@ -188,9 +188,12 @@ class Up2k(object):
                 wark = self._wark_from_hashlist(inf.st_size, hashes)
                 self.db_add(dbw[0], wark, rp, inf.st_mtime, inf.st_size)
                 dbw[1] += 1
-                if dbw[1] > 1024:
+                td = time.time() - dbw[2]
+                if dbw[1] > 1024 or td > 60:
+                    self.log("up2k", "commit {} files".format(dbw[1]))
                     dbw[0].commit()
                     dbw[1] = 0
+                    dbw[2] = time.time()
 
     def _drop_lost(self, db, top):
         rm = []
@@ -512,8 +515,15 @@ class Up2k(object):
         fsz = os.path.getsize(path)
         csz = self._get_chunksize(fsz)
         ret = []
+        last_print = time.time()
         with open(path, "rb", 512 * 1024) as f:
             while fsz > 0:
+                now = time.time()
+                td = now - last_print
+                if td >= 0.3:
+                    last_print = now
+                    print(" {}    \n\033[A".format(fsz), end="")
+
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
                 fsz -= rem

@@ -211,6 +211,7 @@ def main():
               "print,get" prints the data in the log and returns GET
               (leave out the ",get" to return an error instead)
 
+            see "--ciphers help" for available ssl/tls ciphers,
             see "--ssl-ver help" for available ssl/tls versions,
               default is what python considers safe, usually >= TLS1
             """
