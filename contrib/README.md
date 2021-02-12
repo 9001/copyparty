@@ -10,7 +10,12 @@
 * modify `10.13.1.1` as necessary if you wish to support browsers without javascript
 
 ### [`explorer-nothumbs-nofoldertypes.reg`](explorer-nothumbs-nofoldertypes.reg)
-disables thumbnails and folder-type detection in windows explorer, makes it way faster (especially for slow/networked locations (such as copyparty-fuse))
+* disables thumbnails and folder-type detection in windows explorer
+* makes it way faster (especially for slow/networked locations (such as copyparty-fuse))
+
+### [`cfssl.sh`](cfssl.sh)
+* creates CA and server certificates using cfssl
+* give a 3rd argument to install it to your copyparty config
 
 # OS integration
 init-scripts to start copyparty as a service
