@@ -5,6 +5,11 @@
             "label": "pre",
             "command": "true;rm -rf inc/* inc/.hist/;mkdir -p inc;",
             "type": "shell"
+        },
+        {
+            "label": "no_dbg",
+            "command": "${config:python.pythonPath} -m copyparty -ed -emp -e2d -e2s -a ed:wark -v srv::r:aed:cnodupe &&false",
+            "type": "shell"
         }
     ]
 }

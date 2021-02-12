@@ -21,6 +21,13 @@
             ]
         },
         {
+            "name": "No debug",
+            "preLaunchTask": "no_dbg",
+            "type": "python",
+            //"request": "attach", "port": 42069
+            // fork: nc -l 42069 </dev/null
+        },
+        {
             "name": "Run active unit test",
             "type": "python",
             "request": "launch",
