@@ -219,6 +219,10 @@ function up2k_init(have_crypto) {
             "hash": [],
             "handshake": [],
             "upload": []
+        },
+        "bytes": {
+            "hashed": 0,
+            "uploaded": 0
         }
     };
 
@@ -357,8 +361,11 @@ function up2k_init(have_crypto) {
     }
 
     function hashing_permitted() {
-        var lim = multitask ? 1 : 0;
-        return handshakes_permitted() && lim >=
+        if (multitask) {
+            var ahead = st.bytes.hashed - st.bytes.uploaded;
+            return ahead < 1024 * 1024 * 128;
+        }
+        return handshakes_permitted() && 0 ==
             st.todo.handshake.length +
             st.busy.handshake.length;
     }
@@ -512,6 +519,7 @@ function up2k_init(have_crypto) {
 
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
+        st.bytes.hashed += t.size;
         t.t1 = new Date().getTime();
 
         var nchunk = 0;
@@ -752,6 +760,7 @@ function up2k_init(have_crypto) {
             xhr.onload = function (xev) {
                 if (xhr.status == 200) {
                     prog(t.n, npart, col_uploaded);
+                    st.bytes.uploaded += cdr - car;
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
