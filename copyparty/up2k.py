@@ -138,7 +138,7 @@ class Up2k(object):
         try:
             inodes = [fsdec(x) for x in os.listdir(fsenc(cdir))]
         except Exception as ex:
-            self.log("up2k", "listdir: " + repr(ex))
+            self.log("up2k", "listdir: {} @ [{}]".format(repr(ex), cdir))
             return
 
         histdir = os.path.join(top, ".hist")
@@ -147,7 +147,7 @@ class Up2k(object):
             try:
                 inf = os.stat(fsenc(abspath))
             except Exception as ex:
-                self.log("up2k", "stat: " + repr(ex))
+                self.log("up2k", "stat: {} @ [{}]".format(repr(ex), abspath))
                 continue
 
             if stat.S_ISDIR(inf.st_mode):
@@ -182,7 +182,7 @@ class Up2k(object):
                 try:
                     hashes = self._hashlist_from_file(abspath)
                 except Exception as ex:
-                    self.log("up2k", "hash: " + repr(ex))
+                    self.log("up2k", "hash: {} @ [{}]".format(repr(ex), abspath))
                     continue
 
                 wark = self._wark_from_hashlist(inf.st_size, hashes)
@@ -204,7 +204,7 @@ class Up2k(object):
                 if not os.path.exists(fsenc(abspath)):
                     rm.append(drp)
             except Exception as ex:
-                self.log("up2k", "stat-rm: " + repr(ex))
+                self.log("up2k", "stat-rm: {} @ [{}]".format(repr(ex), abspath))
 
         if not rm:
             return
