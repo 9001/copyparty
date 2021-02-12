@@ -50,15 +50,9 @@
     "files.associations": {
         "*.makefile": "makefile"
     },
-    "editor.codeActionsOnSaveTimeout": 9001,
-    "editor.formatOnSaveTimeout": 9001,
-    //
-    //  things you may wanna edit:
-    //
-    "python.pythonPath": "/usr/bin/python3",
     "python.formatting.blackArgs": [
         "-t",
         "py27"
     ],
-    //"python.linting.enabled": true,
+    "python.linting.enabled": true,
 }
