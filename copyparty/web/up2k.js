@@ -381,6 +381,18 @@ function up2k_init(have_crypto) {
             while (true) {
                 var mou_ikkai = false;
 
+                if (st.todo.handshake.length > 0 &&
+                    st.busy.handshake.length == 0 && (
+                        st.todo.handshake[0].t3 || (
+                            handshakes_permitted() &&
+                            st.busy.upload.length < parallel_uploads
+                        )
+                    )
+                ) {
+                    exec_handshake();
+                    mou_ikkai = true;
+                }
+
                 if (handshakes_permitted() &&
                     st.todo.handshake.length > 0 &&
                     st.busy.handshake.length == 0 &&
@@ -688,6 +700,8 @@ function up2k_init(have_crypto) {
                     ebi('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2));
                 }
+                else t.t3 = undefined;
+
                 tasker();
             }
             else {
@@ -766,7 +780,7 @@ function up2k_init(have_crypto) {
                     if (t.postlist.length == 0) {
                         t.t3 = new Date().getTime();
                         ebi('f{0}t'.format(t.n)).innerHTML = 'verifying';
-                        st.todo.handshake.push(t);
+                        st.todo.handshake.unshift(t);
                     }
                     tasker();
                 }
