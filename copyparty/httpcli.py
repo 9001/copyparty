@@ -1095,6 +1095,10 @@ class HttpCli(object):
         if not self.args.ed or "dots" not in self.uparam:
             vfs_ls = exclude_dotfiles(vfs_ls)
 
+        hidden = []
+        if fsroot.endswith(str(os.sep) + ".hist"):
+            hidden = ["up2k.db", "up2k.snap"]
+
         dirs = []
         files = []
         for fn in vfs_ls:
@@ -1106,6 +1110,8 @@ class HttpCli(object):
 
             if fn in vfs_virt:
                 fspath = vfs_virt[fn].realpath
+            elif fn in hidden:
+                continue
             else:
                 fspath = fsroot + "/" + fn
 
