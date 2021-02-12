@@ -56,5 +56,9 @@
     //  things you may wanna edit:
     //
     "python.pythonPath": "/usr/bin/python3",
+    "python.formatting.blackArgs": [
+        "-t",
+        "py27"
+    ],
     //"python.linting.enabled": true,
 }

@@ -3,9 +3,14 @@ from __future__ import print_function, unicode_literals
 
 import os
 import sys
-import ssl
 import time
 import socket
+
+HAVE_SSL = True
+try:
+    import ssl
+except:
+    HAVE_SSL = False
 
 try:
     import jinja2
@@ -107,7 +112,7 @@ class HttpConn(object):
         self.sr = None
         if self.args.https_only:
             is_https = True
-        elif self.args.http_only:
+        elif self.args.http_only or not HAVE_SSL:
             is_https = False
         else:
             is_https = self._detect_https()
@@ -125,7 +130,28 @@ class HttpConn(object):
                     ctx.options &= ~self.args.ssl_flags_en
                     ctx.options |= self.args.ssl_flags_de
                     # print(repr(ctx.options))
+
+                if self.args.ssl_log:
+                    try:
+                        ctx.keylog_filename = self.args.ssl_log
+                    except:
+                        self.log("keylog failed; openssl or python too old")
+
+                if self.args.ciphers:
+                    ctx.set_ciphers(self.args.ciphers)
+
                 self.s = ctx.wrap_socket(self.s, server_side=True)
+                if self.args.ssl_dbg and hasattr(self.s, "shared_ciphers"):
+                    overlap = [y[::-1] for y in self.s.shared_ciphers()]
+                    lines = [str(x) for x in (["TLS cipher overlap:"] + overlap)]
+                    self.log("\n".join(lines))
+                    for k, v in [
+                        ["compression", self.s.compression()],
+                        ["ALPN proto", self.s.selected_alpn_protocol()],
+                        ["NPN proto", self.s.selected_npn_protocol()],
+                    ]:
+                        self.log("TLS {}: {}".format(k, v or "nah"))
+
             except Exception as ex:
                 em = str(ex)
 

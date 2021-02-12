@@ -10,6 +10,7 @@ __url__ = "https://github.com/9001/copyparty/"
 
 import re
 import os
+import sys
 import time
 import shutil
 import filecmp
@@ -20,7 +21,13 @@ from textwrap import dedent
 from .__init__ import E, WINDOWS, VT100
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
-from .util import py_desc
+from .util import py_desc, align_tab
+
+HAVE_SSL = True
+try:
+    import ssl
+except:
+    HAVE_SSL = False
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -86,9 +93,7 @@ def ensure_cert():
     # printf 'NO\n.\n.\n.\n.\ncopyparty-insecure\n.\n' | faketime '2000-01-01 00:00:00' openssl req -x509 -sha256 -newkey rsa:2048 -keyout insecure.pem -out insecure.pem -days $((($(printf %d 0x7fffffff)-$(date +%s --date=2000-01-01T00:00:00Z))/(60*60*24))) -nodes && ls -al insecure.pem && openssl x509 -in insecure.pem -text -noout
 
 
-def configure_ssl(al):
-    import ssl
-
+def configure_ssl_ver(al):
     def terse_sslver(txt):
         txt = txt.lower()
         for c in ["_", "v", "."]:
@@ -107,7 +112,7 @@ def configure_ssl(al):
         avail = [terse_sslver(x[6:]) for x in flags]
         avail = " ".join(sorted(avail) + ["all"])
         print("\navailable ssl/tls versions:\n  " + avail)
-        return
+        sys.exit(0)
 
     al.ssl_flags_en = 0
     al.ssl_flags_de = 0
@@ -131,6 +136,31 @@ def configure_ssl(al):
     # think i need that beer now
 
 
+def configure_ssl_ciphers(al):
+    ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    if al.ssl_ver:
+        ctx.options &= ~al.ssl_flags_en
+        ctx.options |= al.ssl_flags_de
+
+    is_help = al.ciphers == "help"
+
+    if al.ciphers:
+        try:
+            ctx.set_ciphers(al.ciphers)
+        except:
+            if not is_help:
+                print("\n\033[1;31mfailed to set ciphers\033[0m\n")
+
+    if not hasattr(ctx, "get_ciphers"):
+        print("cannot read cipher list: openssl or python too old")
+    else:
+        ciphers = [x["description"] for x in ctx.get_ciphers()]
+        print("\n  ".join(["\nenabled ciphers:"] + align_tab(ciphers) + [""]))
+
+    if is_help:
+        sys.exit(0)
+
+
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
@@ -142,7 +172,8 @@ def main():
     print(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
 
     ensure_locale()
-    ensure_cert()
+    if HAVE_SSL:
+        ensure_cert()
 
     ap = argparse.ArgumentParser(
         formatter_class=RiceFormatter,
@@ -204,9 +235,14 @@ def main():
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
-    ap.add_argument("--ssl-ver", type=str, help="ssl/tls versions to allow")
-    ap.add_argument("--https-only", action="store_true", help="disable plaintext")
-    ap.add_argument("--http-only", action="store_true", help="disable ssl/tls")
+
+    ap2 = ap.add_argument_group('SSL/TLS options')
+    ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")
+    ap2.add_argument("--https-only", action="store_true", help="disable plaintext")
+    ap2.add_argument("--ssl-ver", type=str, help="ssl/tls versions to allow")
+    ap2.add_argument("--ciphers", metavar="LIST", help="set allowed ciphers")
+    ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
+    ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
     al = ap.parse_args()
     # fmt: on
 
@@ -220,8 +256,14 @@ def main():
     except:
         raise Exception("invalid value for -p")
 
-    if al.ssl_ver:
-        configure_ssl(al)
+    if HAVE_SSL:
+        if al.ssl_ver:
+            configure_ssl_ver(al)
+
+        if al.ciphers:
+            configure_ssl_ciphers(al)
+    else:
+        print("\033[33m  ssl module does not exist; cannot enable https\033[0m\n")
 
     SvcHub(al).run()
 

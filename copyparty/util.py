@@ -108,7 +108,7 @@ def ren_open(fname, *args, **kwargs):
         with open(fname, *args, **kwargs) as f:
             yield {"orz": [f, fname]}
             return
-    
+
     orig_name = fname
     bname = fname
     ext = ""
@@ -632,10 +632,10 @@ def sendfile_kern(lower, upper, f, s):
         except Exception as ex:
             # print("sendfile: " + repr(ex))
             n = 0
-        
+
         if n <= 0:
             return upper - ofs
-        
+
         ofs += n
         # print("sendfile: ok, sent {} now, {} total, {} remains".format(n, ofs - lower, upper - ofs))
 
@@ -716,6 +716,22 @@ def py_desc():
     return "{:>9} v{} on {}{} {} [{}]".format(
         interp, py_ver, host_os, bitness, os_ver, compiler
     )
+
+
+def align_tab(lines):
+    rows = []
+    ncols = 0
+    for ln in lines:
+        row = [x for x in ln.split(" ") if x]
+        ncols = max(ncols, len(row))
+        rows.append(row)
+
+    lens = [0] * ncols
+    for row in rows:
+        for n, col in enumerate(row):
+            lens[n] = max(lens[n], len(col))
+
+    return ["".join(x.ljust(y + 2) for x, y in zip(row, lens)) for row in rows]
 
 
 class Pebkac(Exception):
