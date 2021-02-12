@@ -144,12 +144,11 @@ def configure_ssl_ciphers(al):
 
     is_help = al.ciphers == "help"
 
-    if al.ciphers:
+    if al.ciphers and not is_help:
         try:
             ctx.set_ciphers(al.ciphers)
         except:
-            if not is_help:
-                print("\n\033[1;31mfailed to set ciphers\033[0m\n")
+            print("\n\033[1;31mfailed to set ciphers\033[0m\n")
 
     if not hasattr(ctx, "get_ciphers"):
         print("cannot read cipher list: openssl or python too old")
@@ -211,8 +210,8 @@ def main():
               "print,get" prints the data in the log and returns GET
               (leave out the ",get" to return an error instead)
 
-            see "--ciphers help" for available ssl/tls ciphers,
-            see "--ssl-ver help" for available ssl/tls versions,
+            --ciphers help = available ssl/tls ciphers,
+            --ssl-ver help = available ssl/tls versions,
               default is what python considers safe, usually >= TLS1
             """
         ),

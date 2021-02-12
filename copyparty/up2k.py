@@ -130,8 +130,12 @@ class Up2k(object):
             if db:
                 # can be symlink so don't `and d.startswith(top)``
                 excl = set([d for d in tops if d != top])
-                self._build_dir([db, 0, time.time()], top, excl, top)
+                dbw = [db, 0, time.time()]
+                self._build_dir(dbw, top, excl, top)
                 self._drop_lost(db, top)
+                if dbw[1]:
+                    self.log("up2k", "commit {} new files".format(dbw[1]))
+
                 db.commit()
 
     def _build_dir(self, dbw, top, excl, cdir):
@@ -190,7 +194,7 @@ class Up2k(object):
                 dbw[1] += 1
                 td = time.time() - dbw[2]
                 if dbw[1] > 1024 or td > 60:
-                    self.log("up2k", "commit {} files".format(dbw[1]))
+                    self.log("up2k", "commit {} new files".format(dbw[1]))
                     dbw[0].commit()
                     dbw[1] = 0
                     dbw[2] = time.time()
