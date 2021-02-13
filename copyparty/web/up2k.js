@@ -89,6 +89,99 @@ catch (ex) {
 }
 
 
+function up2k_flagbus() {
+    var flag = {
+        "id": Math.floor(Math.random() * 1024 * 1024 * 1023 * 2),
+        "ch": new BroadcastChannel("up2k_flagbus"),
+        "ours": false,
+        "owner": null,
+        "wants": null,
+        "act": false,
+        "last_tx": ["x", null]
+    };
+    flag.ch.onmessage = function (ev) {
+        console.log('flagbus(' + flag.id + '): ' + ev.data);
+        var who = ev.data[0],
+            what = ev.data[1];
+
+        if (who == flag.id) {
+            console.log('flagbus: hi me (??)');
+            return;
+        }
+        flag.act = new Date().getTime();
+        if (what == "want") {
+            // lowest id wins, don't care if that's us
+            if (who < flag.id) {
+                console.log('flagbus: got wants (ack)');
+                flag.wants = [who, flag.act];
+            }
+            else {
+                console.log('flagbus: got wants (ign)');
+            }
+        }
+        else if (what == "have") {
+            console.log('flagbus: got have');
+            flag.owner = [who, flag.act];
+        }
+        else if (what == "give") {
+            if (flag.owner && flag.owner[0] == who) {
+                flag.owner = null;
+                console.log('flagbus: got good give');
+            }
+            else {
+                console.log('flagbus: got bad give wth');
+            }
+        }
+        else if (what == "hi") {
+            console.log('flagbus: got hi');
+            flag.ch.postMessage([flag.id, "hey"]);
+        }
+    };
+    var tx = function (now, msg) {
+        var td = now - flag.last_tx[1];
+        if (td > 500 || flag.last_tx[0] != msg) {
+            flag.ch.postMessage([flag.id, msg]);
+            console.log('flagbus: tx ' + msg);
+            flag.last_tx = [msg, now];
+        }
+    };
+    var do_take = function (now) {
+        console.log('flagbus: do_take');
+        tx(now, "have");
+        flag.owner = [flag.id, now];
+        flag.ours = true;
+    };
+    var do_want = function (now) {
+        console.log('flagbus: do_want');
+        tx(now, "want");
+    };
+    flag.take = function (now) {
+        if (flag.ours) {
+            do_take(now);
+            return;
+        }
+        if (flag.owner && now - flag.owner[1] > 5000) {
+            flag.owner = null;
+        }
+        if (flag.wants && now - flag.wants[1] > 5000) {
+            flag.wants = null;
+        }
+        if (!flag.owner && !flag.wants) {
+            do_take(now);
+            return;
+        }
+        do_want(now);
+    };
+    flag.give = function () {
+        flag.ch.postMessage([flag.id, "give"]);
+        console.log('flagbus: put give');
+        flag.owner = null;
+        flag.ours = false;
+    };
+    flag.ch.postMessage([flag.id, 'hi']);
+    return flag;
+}
+
 function up2k_init(have_crypto) {
     //have_crypto = false;
     var need_filereader_cache = undefined;
@@ -232,6 +325,14 @@ function up2k_init(have_crypto) {
 
     if (!bobslice || !window.FileReader || !window.FileList)
         return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
+
+    var flag = false;
+    try {
+        flag = up2k_flagbus();
+    }
+    catch (ex) {
+        console.log("flag error: " + ex.toString());
+    }
 
     function nav() {
         ebi('file' + fdom_ctr).click();
@@ -379,6 +480,38 @@ function up2k_init(have_crypto) {
 
             mutex = true;
             while (true) {
+                ebi('srv_info').innerHTML =
+                    new Date().getTime() + ", " +
+                    st.todo.hash.length + ", " +
+                    st.todo.handshake.length + ", " +
+                    st.todo.upload.length + ", " +
+                    st.busy.hash.length + ", " +
+                    st.busy.handshake.length + ", " +
+                    st.busy.upload.length;
+
+                if (flag) {
+                    var need_flag = 0 !=
+                        st.todo.hash.length +
+                        st.todo.handshake.length +
+                        st.todo.upload.length +
+                        st.busy.hash.length +
+                        st.busy.handshake.length +
+                        st.busy.upload.length;
+
+                    if (need_flag) {
+                        var now = new Date().getTime();
+                        flag.take(now);
+                        if (!flag.ours) {
+                            setTimeout(taskerd, 100);
+                            mutex = false;
+                            return;
+                        }
+                    }
+                    else if (flag.ours) {
+                        flag.give();
+                    }
+                }
+
                 var mou_ikkai = false;
 
                 if (st.todo.handshake.length > 0 &&
