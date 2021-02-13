@@ -99,60 +99,65 @@ function up2k_flagbus() {
         "act": false,
         "last_tx": ["x", null]
     };
+    var dbg = function (who, msg) {
+        console.log('flagbus(' + flag.id + '): [' + who + '] ' + msg);
+    };
     flag.ch.onmessage = function (ev) {
-        console.log('flagbus(' + flag.id + '): ' + ev.data);
         var who = ev.data[0],
             what = ev.data[1];
 
         if (who == flag.id) {
-            console.log('flagbus: hi me (??)');
+            dbg(who, 'hi me (??)');
             return;
         }
         flag.act = new Date().getTime();
         if (what == "want") {
             // lowest id wins, don't care if that's us
             if (who < flag.id) {
-                console.log('flagbus: got wants (ack)');
+                dbg(who, 'wants (ack)');
                 flag.wants = [who, flag.act];
             }
             else {
-                console.log('flagbus: got wants (ign)');
+                dbg(who, 'wants (ign)');
             }
         }
         else if (what == "have") {
-            console.log('flagbus: got have');
+            dbg(who, 'have');
             flag.owner = [who, flag.act];
         }
         else if (what == "give") {
             if (flag.owner && flag.owner[0] == who) {
                 flag.owner = null;
-                console.log('flagbus: got good give');
+                dbg(who, 'give (ok)');
             }
             else {
-                console.log('flagbus: got bad give wth');
+                dbg(who, 'give, INVALID, ' + flag.owner);
             }
         }
         else if (what == "hi") {
-            console.log('flagbus: got hi');
+            dbg(who, 'hi');
             flag.ch.postMessage([flag.id, "hey"]);
+        }
+        else {
+            dbg('?', ev.data);
         }
     };
     var tx = function (now, msg) {
         var td = now - flag.last_tx[1];
         if (td > 500 || flag.last_tx[0] != msg) {
+            dbg('*', 'tx ' + msg);
             flag.ch.postMessage([flag.id, msg]);
-            console.log('flagbus: tx ' + msg);
             flag.last_tx = [msg, now];
         }
     };
     var do_take = function (now) {
-        console.log('flagbus: do_take');
+        //dbg('*', 'do_take');
         tx(now, "have");
         flag.owner = [flag.id, now];
         flag.ours = true;
     };
     var do_want = function (now) {
-        console.log('flagbus: do_want');
+        //dbg('*', 'do_want');
         tx(now, "want");
     };
     flag.take = function (now) {
@@ -173,8 +178,8 @@ function up2k_flagbus() {
         do_want(now);
     };
     flag.give = function () {
+        dbg('#', 'put give');
         flag.ch.postMessage([flag.id, "give"]);
-        console.log('flagbus: put give');
         flag.owner = null;
         flag.ours = false;
     };
@@ -295,6 +300,7 @@ function up2k_init(have_crypto) {
     var parallel_uploads = cfg_get('nthread');
     var multitask = bcfg_get('multitask', true);
     var ask_up = bcfg_get('ask_up', true);
+    var flag_en = bcfg_get('flag_en', false);
 
     var col_hashing = '#00bbff';
     var col_hashed = '#004466';
@@ -327,12 +333,7 @@ function up2k_init(have_crypto) {
         return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
 
     var flag = false;
-    try {
-        flag = up2k_flagbus();
-    }
-    catch (ex) {
-        console.log("flag error: " + ex.toString());
-    }
+    apply_flag_cfg();
 
     function nav() {
         ebi('file' + fdom_ctr).click();
@@ -480,14 +481,16 @@ function up2k_init(have_crypto) {
 
             mutex = true;
             while (true) {
-                ebi('srv_info').innerHTML =
-                    new Date().getTime() + ", " +
-                    st.todo.hash.length + ", " +
-                    st.todo.handshake.length + ", " +
-                    st.todo.upload.length + ", " +
-                    st.busy.hash.length + ", " +
-                    st.busy.handshake.length + ", " +
-                    st.busy.upload.length;
+                if (false) {
+                    ebi('srv_info').innerHTML =
+                        new Date().getTime() + ", " +
+                        st.todo.hash.length + ", " +
+                        st.todo.handshake.length + ", " +
+                        st.todo.upload.length + ", " +
+                        st.busy.hash.length + ", " +
+                        st.busy.handshake.length + ", " +
+                        st.busy.upload.length;
+                }
 
                 if (flag) {
                     var need_flag = 0 !=
@@ -1001,6 +1004,28 @@ function up2k_init(have_crypto) {
         bcfg_set('ask_up', ask_up);
     }
 
+    function tgl_flag_en() {
+        flag_en = !flag_en;
+        bcfg_set('flag_en', flag_en);
+        apply_flag_cfg();
+    }
+
+    function apply_flag_cfg() {
+        if (flag_en && !flag) {
+            try {
+                flag = up2k_flagbus();
+            }
+            catch (ex) {
+                console.log("flag error: " + ex.toString());
+                tgl_flag_en();
+            }
+        }
+        else if (!flag_en && flag) {
+            flag.ch.close();
+            flag = false;
+        }
+    }
+
     function nop(ev) {
         ev.preventDefault();
         this.click();
@@ -1018,6 +1043,7 @@ function up2k_init(have_crypto) {
     ebi('nthread').addEventListener('input', bumpthread, false);
     ebi('multitask').addEventListener('click', tgl_multitask, false);
     ebi('ask_up').addEventListener('click', tgl_ask_up, false);
+    ebi('flag_en').addEventListener('click', tgl_flag_en, false);
 
     var nodes = ebi('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)
