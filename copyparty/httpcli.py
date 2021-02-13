@@ -496,7 +496,12 @@ class HttpCli(object):
                 self.log("clone {} done".format(cstart[0]))
 
         x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", ptop, wark, chash)
-        num_left, path = x.get()
+        x = x.get()
+        try:
+            num_left, path = x
+        except:
+            self.loud_reply(x, status=500)
+            return False
 
         if not WINDOWS and num_left == 0:
             times = (int(time.time()), int(lastmod))

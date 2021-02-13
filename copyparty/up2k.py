@@ -421,7 +421,7 @@ class Up2k(object):
                 raise Pebkac(400, "unknown wark")
 
             if chash not in job["need"]:
-                raise Pebkac(200, "already got that but thanks??")
+                raise Pebkac(400, "already got that but thanks??")
 
             nchunk = [n for n, v in enumerate(job["hash"]) if v == chash]
             if not nchunk:
@@ -438,12 +438,19 @@ class Up2k(object):
 
     def confirm_chunk(self, ptop, wark, chash):
         with self.mutex:
-            job = self.registry[ptop][wark]
-            pdir = os.path.join(job["ptop"], job["prel"])
-            src = os.path.join(pdir, job["tnam"])
-            dst = os.path.join(pdir, job["name"])
+            try:
+                job = self.registry[ptop][wark]
+                pdir = os.path.join(job["ptop"], job["prel"])
+                src = os.path.join(pdir, job["tnam"])
+                dst = os.path.join(pdir, job["name"])
+            except Exception as ex:
+                return "confirm_chunk, wark, " + repr(ex)
 
-            job["need"].remove(chash)
+            try:
+                job["need"].remove(chash)
+            except Exception as ex:
+                return "confirm_chunk, chash, " + repr(ex)
+
             ret = len(job["need"])
             if ret > 0:
                 return ret, src
