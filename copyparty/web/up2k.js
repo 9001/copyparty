@@ -668,6 +668,7 @@ function up2k_init(have_crypto) {
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
         st.bytes.hashed += t.size;
+        t.bytes_uploaded = 0;
         t.t1 = new Date().getTime();
 
         var nchunk = 0;
@@ -831,6 +832,7 @@ function up2k_init(have_crypto) {
                 st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
 
                 if (done) {
+                    st.bytes.uploaded += t.size - t.bytes_uploaded;
                     var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                     var spd2 = (t.size / ((t.t3 - t.t2) / 1000.)) / (1024 * 1024.);
                     ebi('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
@@ -911,6 +913,7 @@ function up2k_init(have_crypto) {
                 if (xhr.status == 200) {
                     prog(t.n, npart, col_uploaded);
                     st.bytes.uploaded += cdr - car;
+                    t.bytes_uploaded += cdr - car;
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
