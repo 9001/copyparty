@@ -78,7 +78,7 @@ class HttpSrv(object):
                 if not MACOS:
                     self.log(
                         "%s %s" % addr,
-                        "shut_rdwr err:\n  {}\n  {}".format(repr(sck), ex),
+                        "\033[1;30mshut({}): {}\033[0m".format(sck.fileno(), ex),
                     )
                 if ex.errno not in [10038, 10054, 107, 57, 9]:
                     # 10038 No longer considered a socket

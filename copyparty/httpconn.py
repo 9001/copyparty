@@ -141,6 +141,12 @@ class HttpConn(object):
                     ctx.set_ciphers(self.args.ciphers)
 
                 self.s = ctx.wrap_socket(self.s, server_side=True)
+                msg = [
+                    "\033[1;3{:d}m{}".format(c, s)
+                    for c, s in zip([0, 5, 0], self.s.cipher())
+                ]
+                self.log(" ".join(msg) + "\033[0m")
+
                 if self.args.ssl_dbg and hasattr(self.s, "shared_ciphers"):
                     overlap = [y[::-1] for y in self.s.shared_ciphers()]
                     lines = [str(x) for x in (["TLS cipher overlap:"] + overlap)]

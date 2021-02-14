@@ -2,8 +2,9 @@
 from __future__ import print_function, unicode_literals
 
 
-import os
 import re
+import os
+import sys
 import time
 import math
 import json
@@ -531,9 +532,10 @@ class Up2k(object):
             while fsz > 0:
                 now = time.time()
                 td = now - last_print
-                if td >= 0.3:
+                if td >= 0.1:
                     last_print = now
-                    print(" {}    \n\033[A".format(fsz), end="")
+                    msg = " {} MB   \r".format(int(fsz / 1024 / 1024))
+                    print(msg, end="", file=sys.stderr)
 
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
@@ -575,6 +577,7 @@ class Up2k(object):
             # self.log("lmod", "got {}".format(len(ready)))
             time.sleep(5)
             for path, times in ready:
+                self.log("lmod", "setting times {} on {}".format(times, path))
                 try:
                     os.utime(fsenc(path), times)
                 except:
