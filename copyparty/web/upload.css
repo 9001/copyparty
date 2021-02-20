@@ -35,14 +35,14 @@
 	text-align: center;
 	font-size: 1.5em;
 	margin: .5em auto;
-	padding: .6em 0;
+	padding: 1.2em 0;
 	width: 16em;
 	cursor: pointer;
 	box-shadow: .4em .4em 0 #111;
 }
 #u2conf #u2btn {
-	margin: -1em 0;
-	padding: .7em 0;
+	margin: -1.5em 0;
+	padding: 1.5em 0;
 	width: 100%;
 }
 #u2notbtn {
@@ -206,7 +206,7 @@
 	bottom: 0;
 	background: #0a0;
 }
-.prog>a>span {
+#u2tab a>span {
 	font-weight: bold;
 	font-style: italic;
 	color: #fff;

@@ -412,11 +412,11 @@ class Up2k(object):
                     if job["need"]:
                         self.log("unfinished:\n  {0}\n  {1}".format(src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
-                        err += vsrc + " "
+                        err += "/" + vsrc + " "
                         raise Pebkac(400, err)
                     elif "nodupe" in job["flag"]:
                         self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
-                        err = "upload rejected, file already exists:\n " + vsrc + " "
+                        err = "upload rejected, file already exists:\n/" + vsrc + " "
                         raise Pebkac(400, err)
                     else:
                         # symlink to the client-provided name,
@@ -644,14 +644,14 @@ class Up2k(object):
             while not self.lastmod_q.empty():
                 ready.append(self.lastmod_q.get())
 
-            # self.log("lmod", "got {}".format(len(ready)))
+            # self.log("lmod: got {}".format(len(ready)))
             time.sleep(5)
             for path, times in ready:
-                self.log("lmod", "setting times {} on {}".format(times, path))
+                self.log("lmod: setting times {} on {}".format(times, path))
                 try:
                     os.utime(fsenc(path), times)
                 except:
-                    self.log("lmod", "failed to utime ({}, {})".format(path, times))
+                    self.log("lmod: failed to utime ({}, {})".format(path, times))
 
     def _snapshot(self):
         persist_interval = 30  # persist unfinished uploads index every 30 sec

@@ -1,7 +1,7 @@
 
     <div id="op_bup" class="opview opbox act">
         <div id="u2err"></div>
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
             <input type="hidden" name="act" value="bput" />
             <input type="file" name="f" multiple><br />
             <input type="submit" value="start upload">
@@ -9,7 +9,7 @@
     </div>
 
     <div id="op_mkdir" class="opview opbox act">
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
             <input type="hidden" name="act" value="mkdir" />
             <input type="text" name="name" size="30">
             <input type="submit" value="mkdir">
@@ -17,7 +17,7 @@
     </div>
 
     <div id="op_new_md" class="opview opbox">
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="/{{ vdir }}">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8">
             <input type="hidden" name="act" value="new_md" />
             <input type="text" name="name" size="30">
             <input type="submit" value="create doc">
@@ -25,7 +25,7 @@
     </div>
 
     <div id="op_msg" class="opview opbox">
-        <form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="/{{ vdir }}">
+        <form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
             <input type="text" name="msg" size="30">
             <input type="submit" value="send msg">
         </form>

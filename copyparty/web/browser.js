@@ -928,7 +928,7 @@ function autoplay_blocked() {
 })();
 
 
-function reload_browser() {
+function reload_browser(not_mp) {
 	makeSortable(ebi('files'));
 
 	var parts = get_vpath().split('/');
@@ -945,10 +945,21 @@ function reload_browser() {
 		ebi('path').appendChild(o);
 	}
 
-	if (mp && mp.au) {
-		mp.au.pause();
-		mp.au = null;
+	var oo = document.querySelectorAll('#files>tbody>tr>td:nth-child(3)');
+	for (var a = 0, aa = oo.length; a < aa; a++) {
+		var sz = oo[a].textContent.replace(/ /g, ""),
+			hsz = sz.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+		oo[a].textContent = hsz;
 	}
-	widget.close();
-	mp = init_mp();
+
+	if (!not_mp) {
+		if (mp && mp.au) {
+			mp.au.pause();
+			mp.au = null;
+		}
+		widget.close();
+		mp = init_mp();
+	}
 }
+reload_browser(true);

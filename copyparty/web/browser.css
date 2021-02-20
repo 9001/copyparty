@@ -154,10 +154,12 @@ a,
 #srv_info span {
 	color: #fff;
 }
-a.play {
+#files tbody a.play {
 	color: #e70;
+	padding: .2em;
+	margin: -.2em;
 }
-a.play.act {
+#files tbody a.play.act {
 	color: #af0;
 }
 #blocked {
@@ -423,6 +425,8 @@ input[type="checkbox"]:checked+label {
 #detree {
 	padding: .3em .5em;
 	font-size: 1.5em;
+	display: inline-block;
+	width: 100%;
 }
 #treefiles #files tbody {
 	border-radius: 0 .7em 0 .7em;

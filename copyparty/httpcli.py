@@ -311,7 +311,7 @@ class HttpCli(object):
                 reader, _ = self.get_body_reader()
                 for buf in reader:
                     buf = buf.decode("utf-8", "replace")
-                    self.log("urlform:\n  {}\n".format(buf))
+                    self.log("urlform @ {}\n  {}\n".format(self.vpath, buf))
 
             if "get" in opt:
                 return self.handle_get()

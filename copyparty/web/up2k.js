@@ -151,10 +151,6 @@ function up2k_init(have_crypto) {
         ebi('u2notbtn').innerHTML = '';
     }
 
-    var post_url = ebi('op_bup').getElementsByTagName('form')[0].getAttribute('action');
-    if (post_url && post_url.charAt(post_url.length - 1) !== '/')
-        post_url += '/';
-
     var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>'
     var is_https = (window.location + '').indexOf('https:') === 0;
     if (is_https)
@@ -371,6 +367,7 @@ function up2k_init(have_crypto) {
                 "name": fobj.name,
                 "size": fobj.size,
                 "lmod": lmod / 1000,
+                "purl": get_vpath(),
                 "hash": []
             };
 
@@ -385,7 +382,7 @@ function up2k_init(have_crypto) {
 
             var tr = document.createElement('tr');
             tr.innerHTML = '<td id="f{0}n"></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
-            tr.getElementsByTagName('td')[0].textContent = entry.name;
+            tr.getElementsByTagName('td')[0].innerHTML = linksplit(esc(entry.purl + entry.name)).join(' ');
             ebi('u2tab').appendChild(tr);
 
             st.files.push(entry);
@@ -758,8 +755,7 @@ function up2k_init(have_crypto) {
                     else {
                         smsg = 'found';
                         var hit = response[0],
-                            links = linksplit(hit.rp),
-                            msg = links.join(''),
+                            msg = linksplit(hit.rp).join(''),
                             tr = new Date(hit.ts * 1000).toISOString().replace("T", " ").slice(0, -5),
                             tu = new Date(t.lmod * 1000).toISOString().replace("T", " ").slice(0, -5),
                             diff = parseInt(t.lmod) - parseInt(hit.ts),
@@ -779,7 +775,7 @@ function up2k_init(have_crypto) {
                 if (response.name !== t.name) {
                     // file exists; server renamed us
                     t.name = response.name;
-                    ebi('f{0}n'.format(t.n)).textContent = t.name;
+                    ebi('f{0}n'.format(t.n)).innerHTML = linksplit(esc(t.purl + t.name)).join(' ');
                 }
 
                 t.postlist = [];
@@ -832,6 +828,11 @@ function up2k_init(have_crypto) {
                     var ofs = err.lastIndexOf(' : ');
                     if (ofs > 0)
                         err = err.slice(0, ofs);
+
+                    ofs = err.indexOf('\n/');
+                    if (ofs !== -1) {
+                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2, -1)).join(' ');
+                    }
                 }
                 if (err != "") {
                     ebi('f{0}t'.format(t.n)).innerHTML = "ERROR";
@@ -858,7 +859,7 @@ function up2k_init(have_crypto) {
         if (fsearch)
             req.srch = 1;
 
-        xhr.open('POST', post_url + 'handshake.php', true);
+        xhr.open('POST', t.purl + 'handshake.php', true);
         xhr.responseType = 'text';
         xhr.send(JSON.stringify(req));
     }
@@ -916,7 +917,7 @@ function up2k_init(have_crypto) {
                         (xhr.responseText && xhr.responseText) ||
                         "no further information"));
             };
-            xhr.open('POST', post_url + 'chunkpit.php', true);
+            xhr.open('POST', t.purl + 'chunkpit.php', true);
             //xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart].substr(1) + "x");
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);

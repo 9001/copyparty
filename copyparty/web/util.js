@@ -174,6 +174,9 @@ function goto(dest) {
 function linksplit(rp) {
     var ret = [];
     var apath = '/';
+    if (rp && rp.charAt(0) == '/')
+        rp = rp.slice(1);
+
     while (rp) {
         var link = rp;
         var ofs = rp.indexOf('/');
