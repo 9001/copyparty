@@ -1095,7 +1095,7 @@ class HttpCli(object):
             ret["k" + excl] = self.gen_tree("/".join([top, excl]).strip("/"), target)
 
         try:
-            vn, rem = self.auth.vfs.get(top, self.uname, self.readable, self.writable)
+            vn, rem = self.auth.vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)
         except:
             vfs_ls = []

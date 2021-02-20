@@ -862,7 +862,8 @@ function autoplay_blocked() {
 	function parsetree(res, top) {
 		var ret = '';
 		for (var a = 0; a < res.a.length; a++) {
-			res['k' + res.a[a]] = 0;
+			if (res.a[a] !== '')
+				res['k' + res.a[a]] = 0;
 		}
 		delete res['a'];
 		var keys = Object.keys(res);
