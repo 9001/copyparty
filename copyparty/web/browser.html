@@ -13,11 +13,33 @@
 </head>
 
 <body>
+    <div id="ops">
+        <a href="#" data-dest="">---</a>
+        {%- if can_read %}
+        <a href="#" data-dest="search">🔎</a>
+        {%- endif %}
+        {%- if can_upload %}
+        <a href="#" data-dest="up2k">🚀</a>
+        <a href="#" data-dest="bup">🎈</a>
+        <a href="#" data-dest="mkdir">📂</a>
+        <a href="#" data-dest="new_md">📝</a>
+        <a href="#" data-dest="msg">📟</a>
+        {%- endif %}
+    </div>
+
+    {%- if can_read %}
+    <div id="op_search" class="opview">
+        <table id="srch_form"></table>
+        <div id="srch_q"></div>
+    </div>
+    {%- endif %}
+
     {%- if can_upload %}
     {%- include 'upload.html' %}
     {%- endif %}
     
     <h1 id="path">
+        <a href="#" id="entree">🌲</a>
         {%- for n in vpnodes %}
         <a href="/{{ n[0] }}">{{ n[1] }}</a>
         {%- endfor %}
@@ -27,6 +49,18 @@
     {%- if prologue %}
     <div id="pro" class="logue">{{ prologue }}</div>
     {%- endif %}
+
+    <table id="treetab">
+        <tr>
+            <td id="tree">
+                <a href="#" id="detree">🍞...</a>
+                <ul id="treeul">
+                    <div class="dumb_loader_thing">🌲</div>
+                </ul>
+            </td>
+            <td id="treefiles"></td>
+        </tr>
+    </table>
 
     <table id="files">
         <thead>

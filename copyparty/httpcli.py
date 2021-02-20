@@ -5,6 +5,7 @@ import os
 import stat
 import gzip
 import time
+import copy
 import json
 import socket
 import ctypes
@@ -125,15 +126,15 @@ class HttpCli(object):
                     k, v = k.split("=", 1)
                     uparam[k.lower()] = v.strip()
                 else:
-                    uparam[k.lower()] = True
+                    uparam[k.lower()] = False
 
         self.uparam = uparam
         self.vpath = unquotep(vpath)
 
         ua = self.headers.get("user-agent", "")
         if ua.startswith("rclone/"):
-            uparam["raw"] = True
-            uparam["dots"] = True
+            uparam["raw"] = False
+            uparam["dots"] = False
 
         try:
             if self.mode in ["GET", "HEAD"]:
@@ -237,11 +238,14 @@ class HttpCli(object):
         )
         if not self.readable and not self.writable:
             self.log("inaccessible: [{}]".format(self.vpath))
-            self.uparam = {"h": True}
+            self.uparam = {"h": False}
 
         if "h" in self.uparam:
             self.vpath = None
             return self.tx_mounts()
+
+        if "tree" in self.uparam:
+            return self.tx_tree()
 
         return self.tx_browser()
 
@@ -401,6 +405,9 @@ class HttpCli(object):
         except:
             raise Pebkac(422, "you POSTed invalid json")
 
+        if "srch" in self.uparam or "srch" in body:
+            return self.handle_search(body)
+
         # prefer this over undot; no reason to allow traversion
         if "/" in body["name"]:
             raise Pebkac(400, "folders verboten")
@@ -424,6 +431,30 @@ class HttpCli(object):
 
         self.log(response)
         self.reply(response.encode("utf-8"), mime="application/json")
+        return True
+
+    def handle_search(self, body):
+        vols = []
+        for vtop in self.rvol:
+            vfs, _ = self.conn.auth.vfs.get(vtop, self.uname, True, False)
+            vols.append([vfs.vpath, vfs.realpath, vfs.flags])
+
+        idx = self.conn.get_u2idx()
+        if "srch" in body:
+            # search by up2k hashlist
+            vbody = copy.deepcopy(body)
+            vbody["hash"] = len(vbody["hash"])
+            self.log("qj: " + repr(vbody))
+            hits = idx.fsearch(vols, body)
+            self.log("qh: " + repr(hits))
+        else:
+            # search by query params
+            self.log("qj: " + repr(body))
+            hits = idx.search(vols, body)
+            self.log("qh: " + str(len(hits)))
+
+        r = json.dumps(hits).encode("utf-8")
+        self.reply(r, mime="application/json")
         return True
 
     def handle_post_binary(self):
@@ -1037,6 +1068,60 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"))
         return True
 
+    def tx_tree(self):
+        top = self.uparam["tree"] or ""
+        dst = self.vpath
+        if top in [".", ".."]:
+            top = undot(self.vpath + "/" + top)
+
+        if top == dst:
+            dst = ""
+        elif top:
+            if not dst.startswith(top + "/"):
+                raise Pebkac(400, "arg funk")
+
+            dst = dst[len(top) + 1 :]
+
+        ret = self.gen_tree(top, dst)
+        ret = json.dumps(ret)
+        self.reply(ret.encode("utf-8"))
+        return True
+
+    def gen_tree(self, top, target):
+        ret = {}
+        excl = None
+        if target:
+            excl, target = (target.split("/", 1) + [""])[:2]
+            ret["k" + excl] = self.gen_tree("/".join([top, excl]).strip("/"), target)
+
+        try:
+            vn, rem = self.auth.vfs.get(top, self.uname, self.readable, self.writable)
+            fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname)
+        except:
+            vfs_ls = []
+            vfs_virt = {}
+            for v in self.rvol:
+                d1, d2 = v.rsplit("/", 1) if "/" in v else ["", v]
+                if d1 == top:
+                    vfs_virt[d2] = 0
+
+        dirs = []
+
+        if not self.args.ed or "dots" not in self.uparam:
+            vfs_ls = exclude_dotfiles(vfs_ls)
+
+        for fn in [x for x in vfs_ls if x != excl]:
+            abspath = os.path.join(fsroot, fn)
+            if os.path.isdir(abspath):
+                dirs.append(fn)
+
+        for x in vfs_virt.keys():
+            if x != excl:
+                dirs.append(x)
+
+        ret["a"] = dirs
+        return ret
+
     def tx_browser(self):
         vpath = ""
         vpnodes = [["", "/"]]
@@ -1062,8 +1147,7 @@ class HttpCli(object):
             if abspath.endswith(".md") and "raw" not in self.uparam:
                 return self.tx_md(abspath)
 
-            bad = "{0}.hist{0}up2k.".format(os.sep)
-            if abspath.endswith(bad + "db") or abspath.endswith(bad + "snap"):
+            if rem.startswith(".hist/up2k."):
                 raise Pebkac(403)
 
             return self.tx_file(abspath)
@@ -1092,8 +1176,8 @@ class HttpCli(object):
             vfs_ls = exclude_dotfiles(vfs_ls)
 
         hidden = []
-        if fsroot.endswith(str(os.sep) + ".hist"):
-            hidden = ["up2k.db", "up2k.snap"]
+        if rem == ".hist":
+            hidden = ["up2k."]
 
         dirs = []
         files = []
@@ -1106,7 +1190,7 @@ class HttpCli(object):
 
             if fn in vfs_virt:
                 fspath = vfs_virt[fn].realpath
-            elif fn in hidden:
+            elif hidden and any(fn.startswith(x) for x in hidden):
                 continue
             else:
                 fspath = fsroot + "/" + fn
@@ -1193,12 +1277,19 @@ class HttpCli(object):
         # ts = "?{}".format(time.time())
 
         dirs.extend(files)
+
+        if "ls" in self.uparam:
+            ret = json.dumps(dirs)
+            self.reply(ret.encode("utf-8", "replace"))
+            return True
+
         html = self.conn.tpl_browser.render(
             vdir=quotep(self.vpath),
             vpnodes=vpnodes,
             files=dirs,
             can_upload=self.writable,
             can_read=self.readable,
+            have_up2k_idx=self.args.e2d,
             ts=ts,
             prologue=logues[0],
             epilogue=logues[1],

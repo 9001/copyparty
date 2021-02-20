@@ -39,15 +39,27 @@ body {
 	margin: 1.3em 0 0 0;
 	font-size: 1.4em;
 }
+#path #entree {
+	margin-left: -.7em;
+}
+#treetab {
+	display: none;
+}
 #files {
 	border-collapse: collapse;
 	margin-top: 2em;
+	z-index: 1;
+	position: relative;
 }
 #files tbody a {
 	display: block;
 	padding: .3em 0;
 }
-a {
+#files[ts] tbody div a {
+	color: #f5a;
+}
+a,
+#files[ts] tbody div a:last-child {
 	color: #fc5;
 	padding: .2em;
 	text-decoration: none;
@@ -156,7 +168,7 @@ a.play.act {
 	height: 100%;
 	background: #333;
 	font-size: 2.5em;
-	z-index:99;
+	z-index: 99;
 }
 #blk_play,
 #blk_abrt {
@@ -190,6 +202,7 @@ a.play.act {
 	bottom: -6em;
 	height: 6em;
 	width: 100%;
+	z-index: 3;
 	transition: bottom 0.15s;
 }
 #widget.open {
@@ -213,6 +226,9 @@ a.play.act {
 	50% {cursor: url(/.cpr/dd/4.png), pointer}
 	75% {cursor: url(/.cpr/dd/5.png), pointer}
 	85% {cursor: url(/.cpr/dd/1.png), pointer}
+}
+@keyframes spin {
+	100% {transform: rotate(360deg)}
 }
 #wtoggle {
 	position: absolute;
@@ -272,4 +288,208 @@ a.play.act {
 	max-width: 12em;
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
+}
+
+
+
+.opview {
+	display: none;
+}
+.opview.act {
+	display: block;
+}
+#ops a {
+	color: #fc5;
+	font-size: 1.5em;
+	padding: .25em .3em;
+	margin: 0;
+	outline: none;
+}
+#ops a.act {
+	background: #281838;
+	border-radius: 0 0 .2em .2em;
+	border-bottom: .3em solid #d90;
+	box-shadow: 0 -.15em .2em #000 inset;
+	padding-bottom: .3em;
+}
+#ops i {
+	font-size: 1.5em;
+}
+#ops i:before {
+	content: 'x';
+	color: #282828;
+	text-shadow: 0 0 .08em #01a7e1;
+	position: relative;
+}
+#ops i:after {
+	content: 'x';
+	color: #282828;
+	text-shadow: 0 0 .08em #ff3f1a;
+	margin-left: -.35em;
+	font-size: 1.05em;
+}
+#ops,
+.opbox {
+	border: 1px solid #3a3a3a;
+	box-shadow: 0 0 1em #222 inset;
+}
+#ops {
+	display: none;
+	background: #333;
+	margin: 1.7em 1.5em 0 1.5em;
+	padding: .3em .6em;
+	border-radius: .3em;
+	border-width: .15em 0;
+}
+.opbox {
+	background: #2d2d2d;
+	margin: 1.5em 0 0 0;
+	padding: .5em;
+	border-radius: 0 1em 1em 0;
+	border-width: .15em .3em .3em 0;
+	max-width: 40em;
+}
+.opbox input {
+	margin: .5em;
+}
+.opview input[type=text] {
+	color: #fff;
+	background: #383838;
+	border: none;
+	box-shadow: 0 0 .3em #222;
+	border-bottom: 1px solid #fc5;
+	border-radius: .2em;
+	padding: .2em .3em;
+}
+input[type="checkbox"]+label {
+	color: #f5a;
+}
+input[type="checkbox"]:checked+label {
+	color: #fc5;
+}
+
+
+
+#op_search table {
+	border: 1px solid #3a3a3a;
+	box-shadow: 0 0 1em #222 inset;
+	background: #2d2d2d;
+	border-radius: .4em;
+	margin: 1.4em;
+	margin-bottom: 0;
+	padding: 0 .5em .5em 0;
+}
+#srch_form td {
+	padding: .6em .6em;
+}
+#op_search input {
+	margin: 0;
+}
+#srch_q {
+	white-space: pre;
+}
+#files td div span {
+	color: #fff;
+	padding: 0 .4em;
+	font-weight: bold;
+	font-style: italic;
+}
+#files td div a:hover {
+	background: #444;
+	color: #fff;
+}
+#files td div a {
+	display: table-cell;
+	white-space: nowrap;
+}
+#files td div a:last-child {
+	width: 100%;
+}
+#files td div {
+	display: table;
+	border-collapse: collapse;
+	width: 100%;
+}
+#files td div a:last-child {
+	width: 100%;
+}
+#tree,
+#treefiles {
+	vertical-align: top;
+}
+#tree {
+	padding-top: 2em;
+}
+#detree {
+	padding: .3em .5em;
+	font-size: 1.5em;
+}
+#treefiles #files tbody {
+	border-radius: 0 .7em 0 .7em;
+}
+#treefiles #files thead th:nth-child(1) {
+	border-radius: .7em 0 0 0;
+}
+#tree li {
+	list-style: none;
+}
+#tree ul,
+#tree li {
+	padding: 0;
+	margin: 0;
+}
+#tree ul {
+	border-left: .2em solid #444;
+}
+#tree li {
+	margin-left: 1em;
+}
+#tree a.hl {
+	color: #400;
+	background: #fc4;
+	border-radius: .3em;
+	text-shadow: none;
+}
+#tree li {
+	white-space: nowrap;
+}
+#tree a {
+	display: inline-block;
+}
+#tree a+a {
+	width: calc(100% - 2em);
+	background: #333;
+}
+#tree a+a:hover {
+	background: #222;
+	color: #fff;
+}
+#treeul {
+	position: relative;
+	overflow: hidden;
+	left: -1.7em;
+}
+#treeul:hover {
+	z-index: 2;
+	overflow: visible;
+}
+#treeul:hover a+a {
+	width: auto;
+	min-width: calc(100% - 2em);
+}
+#treeul a:first-child {
+	font-family: monospace, monospace;
+}
+#treefiles {
+	opacity: 1;
+	transition: opacity 0.2s ease-in-out;
+}
+#tree:hover+#treefiles {
+	opacity: .8;
+}
+.dumb_loader_thing {
+	display: inline-block;
+	margin: 1em;
+	font-size: 3em;
+	animation: spin 1s linear infinite;
 }

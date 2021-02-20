@@ -174,6 +174,18 @@ def main():
     if HAVE_SSL:
         ensure_cert()
 
+    deprecated = [["-e2s", "-e2ds"]]
+    for dk, nk in deprecated:
+        try:
+            idx = sys.argv.index(dk)
+        except:
+            continue
+
+        msg = "\033[1;31mWARNING:\033[0;1m\n  {} \033[0;33mwas replaced with\033[0;1m {} \033[0;33mand will be removed\n\033[0m"
+        print(msg.format(dk, nk))
+        sys.argv[idx] = nk
+        time.sleep(2)
+
     ap = argparse.ArgumentParser(
         formatter_class=RiceFormatter,
         prog="copyparty",
@@ -228,13 +240,15 @@ def main():
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
     ap.add_argument("-e2d", action="store_true", help="enable up2k database")
-    ap.add_argument("-e2s", action="store_true", help="enable up2k db-scanner")
+    ap.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
+    ap.add_argument("-e2dsa", action="store_true", help="scan all folders (for search), sets -e2ds")
     ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap.add_argument("-nih", action="store_true", help="no info hostname")
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
+    ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")
@@ -245,6 +259,12 @@ def main():
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
     al = ap.parse_args()
     # fmt: on
+
+    if al.e2dsa:
+        al.e2ds = True
+
+    if al.e2ds:
+        al.e2d = True
 
     al.i = al.i.split(",")
     try:

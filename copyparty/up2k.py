@@ -1,7 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-
 import re
 import os
 import sys
@@ -17,15 +16,23 @@ import threading
 from copy import deepcopy
 
 from .__init__ import WINDOWS
-from .util import Pebkac, Queue, fsdec, fsenc, sanitize_fn, ren_open, atomic_move
+from .util import (
+    Pebkac,
+    Queue,
+    ProgressPrinter,
+    fsdec,
+    fsenc,
+    sanitize_fn,
+    ren_open,
+    atomic_move,
+    u8safe,
+)
 
-HAVE_SQLITE3 = False
 try:
-    import sqlite3
-
     HAVE_SQLITE3 = True
+    import sqlite3
 except:
-    pass
+    HAVE_SQLITE3 = False
 
 
 class Up2k(object):
@@ -39,11 +46,11 @@ class Up2k(object):
     def __init__(self, broker):
         self.broker = broker
         self.args = broker.args
-        self.log = broker.log
+        self.log_func = broker.log
         self.persist = self.args.e2d
 
         # config
-        self.salt = "hunter2"  # TODO: config
+        self.salt = broker.args.salt
 
         # state
         self.mutex = threading.Lock()
@@ -66,8 +73,16 @@ class Up2k(object):
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
 
         if self.persist and not HAVE_SQLITE3:
-            m = "could not initialize sqlite3, will use in-memory registry only"
-            self.log("up2k", m)
+            self.log("could not initialize sqlite3, will use in-memory registry only")
+
+    def log(self, msg):
+        self.log_func("up2k", msg + "\033[K")
+
+    def _u8(self, rd, fn):
+        s_rd = u8safe(rd)
+        s_fn = u8safe(fn)
+        self.log("u8safe retry:\n  [{}]  [{}]\n  [{}]  [{}]".format(rd, fn, s_rd, s_fn))
+        return (s_rd, s_fn)
 
     def _vis_job_progress(self, job):
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
@@ -98,7 +113,7 @@ class Up2k(object):
 
                 m = "loaded snap {} |{}|".format(path, len(reg.keys()))
                 m = [m] + self._vis_reg_progress(reg)
-                self.log("up2k", "\n".join(m))
+                self.log("\n".join(m))
 
             self.registry[ptop] = reg
             if not self.persist or not HAVE_SQLITE3:
@@ -119,57 +134,86 @@ class Up2k(object):
                 self.db[ptop] = db
                 return db
             except Exception as ex:
-                m = "failed to open [{}]: {}".format(ptop, repr(ex))
-                self.log("up2k", m)
+                self.log("cannot use database at [{}]: {}".format(ptop, repr(ex)))
 
             return None
 
     def build_indexes(self, writeables):
         tops = [d.realpath for d in writeables]
+        self.pp = ProgressPrinter()
+        t0 = time.time()
         for top in tops:
             db = self.register_vpath(top)
-            if db:
-                # can be symlink so don't `and d.startswith(top)``
-                excl = set([d for d in tops if d != top])
-                dbw = [db, 0, time.time()]
-                self._build_dir(dbw, top, excl, top)
-                self._drop_lost(db, top)
-                if dbw[1]:
-                    self.log("up2k", "commit {} new files".format(dbw[1]))
+            if not db:
+                continue
 
-                db.commit()
+            self.pp.n = next(db.execute("select count(w) from up"))[0]
+            db_path = os.path.join(top, ".hist", "up2k.db")
+            sz0 = os.path.getsize(db_path) // 1024
+
+            # can be symlink so don't `and d.startswith(top)``
+            excl = set([d for d in tops if d != top])
+            dbw = [db, 0, time.time()]
+
+            n_add = self._build_dir(dbw, top, excl, top)
+            n_rm = self._drop_lost(db, top)
+            if dbw[1]:
+                self.log("commit {} new files".format(dbw[1]))
+
+            db.commit()
+            if n_add or n_rm:
+                db_path = os.path.join(top, ".hist", "up2k.db")
+                sz1 = os.path.getsize(db_path) // 1024
+                db.execute("vacuum")
+                sz2 = os.path.getsize(db_path) // 1024
+                msg = "{} new, {} del, {} kB vacced, {} kB gain, {} kB now".format(
+                    n_add, n_rm, sz1 - sz2, sz2 - sz0, sz2
+                )
+                self.log(msg)
+
+        self.pp.end = True
+        self.log("{} volumes in {:.2f} sec".format(len(tops), time.time() - t0))
 
     def _build_dir(self, dbw, top, excl, cdir):
         try:
             inodes = [fsdec(x) for x in os.listdir(fsenc(cdir))]
         except Exception as ex:
-            self.log("up2k", "listdir: {} @ [{}]".format(repr(ex), cdir))
-            return
+            self.log("listdir: {} @ [{}]".format(repr(ex), cdir))
+            return 0
 
+        self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histdir = os.path.join(top, ".hist")
+        ret = 0
         for inode in inodes:
             abspath = os.path.join(cdir, inode)
             try:
                 inf = os.stat(fsenc(abspath))
             except Exception as ex:
-                self.log("up2k", "stat: {} @ [{}]".format(repr(ex), abspath))
+                self.log("stat: {} @ [{}]".format(repr(ex), abspath))
                 continue
 
             if stat.S_ISDIR(inf.st_mode):
                 if abspath in excl or abspath == histdir:
                     continue
-                # self.log("up2k", " dir: {}".format(abspath))
-                self._build_dir(dbw, top, excl, abspath)
+                # self.log(" dir: {}".format(abspath))
+                ret += self._build_dir(dbw, top, excl, abspath)
             else:
-                # self.log("up2k", "file: {}".format(abspath))
+                # self.log("file: {}".format(abspath))
                 rp = abspath[len(top) :].replace("\\", "/").strip("/")
-                c = dbw[0].execute("select * from up where rp = ?", (rp,))
+                rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
+                sql = "select * from up where rd = ? and fn = ?"
+                try:
+                    c = dbw[0].execute(sql, (rd, fn))
+                except:
+                    c = dbw[0].execute(sql, self._u8(rd, fn))
+
                 in_db = list(c.fetchall())
                 if in_db:
-                    _, dts, dsz, _ = in_db[0]
+                    self.pp.n -= 1
+                    _, dts, dsz, _, _ = in_db[0]
                     if len(in_db) > 1:
                         m = "WARN: multiple entries: [{}] => [{}] ({})"
-                        self.log("up2k", m.format(top, rp, len(in_db)))
+                        self.log(m.format(top, rp, len(in_db)))
                         dts = -1
 
                     if dts == inf.st_mtime and dsz == inf.st_size:
@@ -178,68 +222,80 @@ class Up2k(object):
                     m = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
                         top, rp, dts, inf.st_mtime, dsz, inf.st_size
                     )
-                    self.log("up2k", m)
-                    self.db_rm(dbw[0], rp)
+                    self.log(m)
+                    self.db_rm(dbw[0], rd, fn)
+                    ret += 1
                     dbw[1] += 1
                     in_db = None
 
-                self.log("up2k", "file: {}".format(abspath))
+                self.pp.msg = "a{} {}".format(self.pp.n, abspath)
+                if inf.st_size > 1024 * 1024:
+                    self.log("file: {}".format(abspath))
+
                 try:
                     hashes = self._hashlist_from_file(abspath)
                 except Exception as ex:
-                    self.log("up2k", "hash: {} @ [{}]".format(repr(ex), abspath))
+                    self.log("hash: {} @ [{}]".format(repr(ex), abspath))
                     continue
 
-                wark = self._wark_from_hashlist(inf.st_size, hashes)
-                self.db_add(dbw[0], wark, rp, inf.st_mtime, inf.st_size)
+                wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
+                self.db_add(dbw[0], wark, rd, fn, inf.st_mtime, inf.st_size)
                 dbw[1] += 1
+                ret += 1
                 td = time.time() - dbw[2]
-                if dbw[1] > 1024 or td > 60:
-                    self.log("up2k", "commit {} new files".format(dbw[1]))
+                if dbw[1] >= 4096 or td >= 60:
+                    self.log("commit {} new files".format(dbw[1]))
                     dbw[0].commit()
                     dbw[1] = 0
                     dbw[2] = time.time()
+        return ret
 
     def _drop_lost(self, db, top):
         rm = []
+        nchecked = 0
+        nfiles = next(db.execute("select count(w) from up"))[0]
         c = db.execute("select * from up")
-        for dwark, dts, dsz, drp in c:
-            abspath = os.path.join(top, drp)
+        for dwark, dts, dsz, drd, dfn in c:
+            nchecked += 1
+            abspath = os.path.join(top, drd, dfn)
+            # almost zero overhead dw
+            self.pp.msg = "b{} {}".format(nfiles - nchecked, abspath)
             try:
                 if not os.path.exists(fsenc(abspath)):
-                    rm.append(drp)
+                    rm.append([drd, dfn])
             except Exception as ex:
-                self.log("up2k", "stat-rm: {} @ [{}]".format(repr(ex), abspath))
+                self.log("stat-rm: {} @ [{}]".format(repr(ex), abspath))
 
-        if not rm:
-            return
+        if rm:
+            self.log("forgetting {} deleted files".format(len(rm)))
+            for rd, fn in rm:
+                self.db_rm(db, rd, fn)
 
-        self.log("up2k", "forgetting {} deleted files".format(len(rm)))
-        for rp in rm:
-            self.db_rm(db, rp)
+        return len(rm)
 
     def _open_db(self, db_path):
+        existed = os.path.exists(db_path)
         conn = sqlite3.connect(db_path, check_same_thread=False)
         try:
-            c = conn.execute(r"select * from kv where k = 'sver'")
-            rows = c.fetchall()
-            if rows:
-                ver = rows[0][1]
-            else:
-                self.log("up2k", "WARN: no sver in kv, DB corrupt?")
-                ver = "unknown"
+            ver = self._read_ver(conn)
 
-            if ver == "1":
+            if ver == 1:
+                conn = self._upgrade_v1(conn, db_path)
+                ver = self._read_ver(conn)
+
+            if ver == 2:
                 try:
                     nfiles = next(conn.execute("select count(w) from up"))[0]
-                    self.log("up2k", "found DB at {} |{}|".format(db_path, nfiles))
+                    self.log("found DB at {} |{}|".format(db_path, nfiles))
                     return conn
                 except Exception as ex:
-                    m = "WARN: could not list files, DB corrupt?\n  " + repr(ex)
-                    self.log("up2k", m)
+                    self.log("WARN: could not list files, DB corrupt?\n  " + repr(ex))
 
-            m = "REPLACING unsupported DB (v.{}) at {}".format(ver, db_path)
-            self.log("up2k", m)
+            if ver is not None:
+                self.log("REPLACING unsupported DB (v.{}) at {}".format(ver, db_path))
+            elif not existed:
+                raise Exception("whatever")
+
             conn.close()
             os.unlink(db_path)
             conn = sqlite3.connect(db_path, check_same_thread=False)
@@ -247,17 +303,58 @@ class Up2k(object):
             pass
 
         # sqlite is variable-width only, no point in using char/nchar/varchar
+        self._create_v2(conn)
+        conn.commit()
+        self.log("created DB at {}".format(db_path))
+        return conn
+
+    def _read_ver(self, conn):
+        for tab in ["ki", "kv"]:
+            try:
+                c = conn.execute(r"select v from {} where k = 'sver'".format(tab))
+            except:
+                continue
+
+            rows = c.fetchall()
+            if rows:
+                return int(rows[0][0])
+
+    def _create_v2(self, conn):
         for cmd in [
-            r"create table kv (k text, v text)",
-            r"create table up (w text, mt int, sz int, rp text)",
-            r"insert into kv values ('sver', '1')",
+            r"create table ks (k text, v text)",
+            r"create table ki (k text, v int)",
+            r"create table up (w text, mt int, sz int, rd text, fn text)",
+            r"insert into ki values ('sver', 2)",
             r"create index up_w on up(w)",
+            r"create index up_rd on up(rd)",
+            r"create index up_fn on up(fn)",
         ]:
             conn.execute(cmd)
 
-        conn.commit()
-        self.log("up2k", "created DB at {}".format(db_path))
-        return conn
+    def _upgrade_v1(self, odb, db_path):
+        self.log("\033[33mupgrading v1 to v2:\033[0m {}".format(db_path))
+
+        npath = db_path + ".next"
+        if os.path.exists(npath):
+            os.unlink(npath)
+
+        ndb = sqlite3.connect(npath, check_same_thread=False)
+        self._create_v2(ndb)
+
+        c = odb.execute("select * from up")
+        for wark, ts, sz, rp in c:
+            rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
+            v = (wark, ts, sz, rd, fn)
+            ndb.execute("insert into up values (?,?,?,?,?)", v)
+
+        ndb.commit()
+        ndb.close()
+        odb.close()
+        bpath = db_path + ".bak.v1"
+        self.log("success; backup at: " + bpath)
+        atomic_move(db_path, bpath)
+        atomic_move(npath, db_path)
+        return sqlite3.connect(db_path, check_same_thread=False)
 
     def handle_json(self, cj):
         self.register_vpath(cj["ptop"])
@@ -271,19 +368,13 @@ class Up2k(object):
             reg = self.registry[cj["ptop"]]
             if db:
                 cur = db.execute(r"select * from up where w = ?", (wark,))
-                for _, dtime, dsize, dp_rel in cur:
-                    dp_abs = os.path.join(cj["ptop"], dp_rel).replace("\\", "/")
+                for _, dtime, dsize, dp_dir, dp_fn in cur:
+                    dp_abs = os.path.join(cj["ptop"], dp_dir, dp_fn).replace("\\", "/")
                     # relying on path.exists to return false on broken symlinks
                     if os.path.exists(fsenc(dp_abs)):
-                        try:
-                            prel, name = dp_rel.rsplit("/", 1)
-                        except:
-                            prel = ""
-                            name = dp_rel
-
                         job = {
-                            "name": name,
-                            "prel": prel,
+                            "name": dp_fn,
+                            "prel": dp_dir,
                             "vtop": cj["vtop"],
                             "ptop": cj["ptop"],
                             "flag": cj["flag"],
@@ -319,12 +410,12 @@ class Up2k(object):
                     vsrc = os.path.join(job["vtop"], job["prel"], job["name"])
                     vsrc = vsrc.replace("\\", "/")  # just for prints anyways
                     if job["need"]:
-                        self.log("up2k", "unfinished:\n  {0}\n  {1}".format(src, dst))
+                        self.log("unfinished:\n  {0}\n  {1}".format(src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += vsrc + " "
                         raise Pebkac(400, err)
                     elif "nodupe" in job["flag"]:
-                        self.log("up2k", "dupe-reject:\n  {0}\n  {1}".format(src, dst))
+                        self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
                         err = "upload rejected, file already exists:\n " + vsrc + " "
                         raise Pebkac(400, err)
                     else:
@@ -389,7 +480,7 @@ class Up2k(object):
 
     def _symlink(self, src, dst):
         # TODO store this in linktab so we never delete src if there are links to it
-        self.log("up2k", "linking dupe:\n  {0}\n  {1}".format(src, dst))
+        self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
         try:
             lsrc = src
             ldst = dst
@@ -412,7 +503,7 @@ class Up2k(object):
                     lsrc = "../" * (len(lsrc) - 1) + "/".join(lsrc)
             os.symlink(fsenc(lsrc), fsenc(ldst))
         except (AttributeError, OSError) as ex:
-            self.log("up2k", "cannot symlink; creating copy: " + repr(ex))
+            self.log("cannot symlink; creating copy: " + repr(ex))
             shutil.copy2(fsenc(src), fsenc(dst))
 
     def handle_chunk(self, ptop, wark, chash):
@@ -430,7 +521,7 @@ class Up2k(object):
 
         job["poke"] = time.time()
 
-        chunksize = self._get_chunksize(job["size"])
+        chunksize = up2k_chunksize(job["size"])
         ofs = [chunksize * x for x in nchunk]
 
         path = os.path.join(job["ptop"], job["prel"], job["tnam"])
@@ -463,33 +554,31 @@ class Up2k(object):
 
             db = self.db.get(job["ptop"], None)
             if db:
-                rp = os.path.join(job["prel"], job["name"]).replace("\\", "/")
-                self.db_rm(db, rp)
-                self.db_add(db, job["wark"], rp, job["lmod"], job["size"])
+                j = job
+                self.db_rm(db, j["prel"], j["name"])
+                self.db_add(db, j["wark"], j["prel"], j["name"], j["lmod"], j["size"])
                 db.commit()
                 del self.registry[ptop][wark]
                 # in-memory registry is reserved for unfinished uploads
 
             return ret, dst
 
-    def _get_chunksize(self, filesize):
-        chunksize = 1024 * 1024
-        stepsize = 512 * 1024
-        while True:
-            for mul in [1, 2]:
-                nchunks = math.ceil(filesize * 1.0 / chunksize)
-                if nchunks <= 256 or chunksize >= 32 * 1024 * 1024:
-                    return chunksize
+    def db_rm(self, db, rd, fn):
+        sql = "delete from up where rd = ? and fn = ?"
+        try:
+            db.execute(sql, (rd, fn))
+        except:
+            db.execute(sql, self._u8(rd, fn))
 
-                chunksize += stepsize
-                stepsize *= mul
-
-    def db_rm(self, db, rp):
-        db.execute("delete from up where rp = ?", (rp,))
-
-    def db_add(self, db, wark, rp, ts, sz):
-        v = (wark, ts, sz, rp)
-        db.execute("insert into up values (?,?,?,?)", v)
+    def db_add(self, db, wark, rd, fn, ts, sz):
+        sql = "insert into up values (?,?,?,?,?)"
+        v = (wark, ts, sz, rd, fn)
+        try:
+            db.execute(sql, v)
+        except:
+            rd, fn = self._u8(rd, fn)
+            v = (wark, ts, sz, rd, fn)
+            db.execute(sql, v)
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
@@ -507,36 +596,17 @@ class Up2k(object):
         except:
             cj["lmod"] = int(time.time())
 
-        wark = self._wark_from_hashlist(cj["size"], cj["hash"])
+        wark = up2k_wark_from_hashlist(self.salt, cj["size"], cj["hash"])
         return wark
-
-    def _wark_from_hashlist(self, filesize, hashes):
-        """ server-reproducible file identifier, independent of name or location """
-        ident = [self.salt, str(filesize)]
-        ident.extend(hashes)
-        ident = "\n".join(ident)
-
-        hasher = hashlib.sha512()
-        hasher.update(ident.encode("utf-8"))
-        digest = hasher.digest()[:32]
-
-        wark = base64.urlsafe_b64encode(digest)
-        return wark.decode("utf-8").rstrip("=")
 
     def _hashlist_from_file(self, path):
         fsz = os.path.getsize(path)
-        csz = self._get_chunksize(fsz)
+        csz = up2k_chunksize(fsz)
         ret = []
         last_print = time.time()
         with open(path, "rb", 512 * 1024) as f:
             while fsz > 0:
-                now = time.time()
-                td = now - last_print
-                if td >= 0.1:
-                    last_print = now
-                    msg = " {} MB   \r".format(int(fsz / 1024 / 1024))
-                    print(msg, end="", file=sys.stderr)
-
+                self.pp.msg = msg = "{} MB".format(int(fsz / 1024 / 1024))
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
                 fsz -= rem
@@ -599,7 +669,7 @@ class Up2k(object):
         if rm:
             m = "dropping {} abandoned uploads in {}".format(len(rm), k)
             vis = [self._vis_job_progress(x) for x in rm]
-            self.log("up2k", "\n".join([m] + vis))
+            self.log("\n".join([m] + vis))
             for job in rm:
                 del reg[job["wark"]]
                 try:
@@ -635,5 +705,32 @@ class Up2k(object):
 
         atomic_move(path2, path)
 
-        self.log("up2k", "snap: {} |{}|".format(path, len(reg.keys())))
+        self.log("snap: {} |{}|".format(path, len(reg.keys())))
         prev[k] = etag
+
+
+def up2k_chunksize(filesize):
+    chunksize = 1024 * 1024
+    stepsize = 512 * 1024
+    while True:
+        for mul in [1, 2]:
+            nchunks = math.ceil(filesize * 1.0 / chunksize)
+            if nchunks <= 256 or chunksize >= 32 * 1024 * 1024:
+                return chunksize
+
+            chunksize += stepsize
+            stepsize *= mul
+
+
+def up2k_wark_from_hashlist(salt, filesize, hashes):
+    """ server-reproducible file identifier, independent of name or location """
+    ident = [salt, str(filesize)]
+    ident.extend(hashes)
+    ident = "\n".join(ident)
+
+    hasher = hashlib.sha512()
+    hasher.update(ident.encode("utf-8"))
+    digest = hasher.digest()[:32]
+
+    wark = base64.urlsafe_b64encode(digest)
+    return wark.decode("utf-8").rstrip("=")

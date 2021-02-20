@@ -3,51 +3,6 @@
 window.onerror = vis_exh;
 
 
-(function () {
-    var ops = document.querySelectorAll('#ops>a');
-    for (var a = 0; a < ops.length; a++) {
-        ops[a].onclick = opclick;
-    }
-})();
-
-
-function opclick(ev) {
-    if (ev) //ie
-        ev.preventDefault();
-
-    var dest = this.getAttribute('data-dest');
-    goto(dest);
-
-    // writing a blank value makes ie8 segfault w
-    if (window.localStorage)
-        localStorage.setItem('opmode', dest || '.');
-
-    var input = document.querySelector('.opview.act input:not([type="hidden"])')
-    if (input)
-        input.focus();
-}
-
-
-function goto(dest) {
-    var obj = document.querySelectorAll('.opview.act');
-    for (var a = obj.length - 1; a >= 0; a--)
-        obj[a].classList.remove('act');
-
-    obj = document.querySelectorAll('#ops>a');
-    for (var a = obj.length - 1; a >= 0; a--)
-        obj[a].classList.remove('act');
-
-    if (dest) {
-        ebi('op_' + dest).classList.add('act');
-        document.querySelector('#ops>a[data-dest=' + dest + ']').classList.add('act');
-
-        var fn = window['goto_' + dest];
-        if (fn)
-            fn();
-    }
-}
-
-
 function goto_up2k() {
     if (up2k === false)
         return goto('bup');
@@ -57,17 +12,6 @@ function goto_up2k() {
 
     up2k.init_deps();
 }
-
-
-(function () {
-    goto();
-    if (window.localStorage) {
-        var op = localStorage.getItem('opmode');
-        if (op !== null && op !== '.')
-            goto(op);
-    }
-    ebi('ops').style.display = 'block';
-})();
 
 
 // chrome requires https to use crypto.subtle,
@@ -255,7 +199,7 @@ function up2k_init(have_crypto) {
     // handle user intent to use the basic uploader instead
     ebi('u2nope').onclick = function (e) {
         e.preventDefault();
-        setmsg('');
+        setmsg();
         goto('bup');
     };
 
@@ -279,13 +223,17 @@ function up2k_init(have_crypto) {
     }
 
     function bcfg_get(name, defval) {
+        var o = ebi(name);
+        if (!o)
+            return defval;
+
         var val = localStorage.getItem(name);
         if (val === null)
             val = defval;
         else
             val = (val == '1');
 
-        ebi(name).checked = val;
+        o.checked = val;
         return val;
     }
 
@@ -293,7 +241,10 @@ function up2k_init(have_crypto) {
         localStorage.setItem(
             name, val ? '1' : '0');
 
-        ebi(name).checked = val;
+        var o = ebi(name);
+        if (o)
+            o.checked = val;
+
         return val;
     }
 
@@ -301,6 +252,7 @@ function up2k_init(have_crypto) {
     var multitask = bcfg_get('multitask', true);
     var ask_up = bcfg_get('ask_up', true);
     var flag_en = bcfg_get('flag_en', false);
+    var fsearch = bcfg_get('fsearch', false);
 
     var col_hashing = '#00bbff';
     var col_hashed = '#004466';
@@ -334,6 +286,7 @@ function up2k_init(have_crypto) {
 
     var flag = false;
     apply_flag_cfg();
+    apply_fsearch_cfg();
 
     function nav() {
         ebi('file' + fdom_ctr).click();
@@ -404,7 +357,7 @@ function up2k_init(have_crypto) {
         for (var a = 0; a < good_files.length; a++)
             msg.push(good_files[a].name);
 
-        if (ask_up && !confirm(msg.join('\n')))
+        if (ask_up && !fsearch && !confirm(msg.join('\n')))
             return;
 
         for (var a = 0; a < good_files.length; a++) {
@@ -795,6 +748,34 @@ function up2k_init(have_crypto) {
             if (xhr.status == 200) {
                 var response = JSON.parse(xhr.responseText);
 
+                if (!response.name) {
+                    var msg = '';
+                    var smsg = '';
+                    if (!response || !response.length) {
+                        msg = 'not found on server';
+                        smsg = '404';
+                    }
+                    else {
+                        smsg = 'found';
+                        var hit = response[0],
+                            links = linksplit(hit.rp),
+                            msg = links.join(''),
+                            tr = new Date(hit.ts * 1000).toISOString().replace("T", " ").slice(0, -5),
+                            tu = new Date(t.lmod * 1000).toISOString().replace("T", " ").slice(0, -5),
+                            diff = parseInt(t.lmod) - parseInt(hit.ts),
+                            cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
+                            sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;
+
+                        msg += '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</span></span>';
+                    }
+                    ebi('f{0}p'.format(t.n)).innerHTML = msg;
+                    ebi('f{0}t'.format(t.n)).innerHTML = smsg;
+                    st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                    st.bytes.uploaded += t.size;
+                    tasker();
+                    return;
+                }
+
                 if (response.name !== t.name) {
                     // file exists; server renamed us
                     t.name = response.name;
@@ -867,14 +848,19 @@ function up2k_init(have_crypto) {
                     "no further information"));
             }
         };
-        xhr.open('POST', post_url + 'handshake.php', true);
-        xhr.responseType = 'text';
-        xhr.send(JSON.stringify({
+
+        var req = {
             "name": t.name,
             "size": t.size,
             "lmod": t.lmod,
             "hash": t.hash
-        }));
+        };
+        if (fsearch)
+            req.srch = 1;
+
+        xhr.open('POST', post_url + 'handshake.php', true);
+        xhr.responseType = 'text';
+        xhr.send(JSON.stringify(req));
     }
 
     /////
@@ -966,6 +952,46 @@ function up2k_init(have_crypto) {
     ///   config ui
     //
 
+    function onresize(ev) {
+        var bar = ebi('ops'),
+            wpx = innerWidth,
+            fpx = parseInt(getComputedStyle(bar)['font-size']),
+            wem = wpx * 1.0 / fpx,
+            wide = wem > 54,
+            parent = ebi(wide ? 'u2btn_cw' : 'u2btn_ct'),
+            btn = ebi('u2btn');
+
+        //console.log([wpx, fpx, wem]);
+        if (btn.parentNode !== parent) {
+            parent.appendChild(btn);
+            ebi('u2conf').setAttribute('class', wide ? 'has_btn' : '');
+        }
+    }
+    window.onresize = onresize;
+    onresize();
+
+    function desc_show(ev) {
+        var msg = this.getAttribute('alt');
+        msg = msg.replace(/\$N/g, "<br />");
+        var cdesc = ebi('u2cdesc');
+        cdesc.innerHTML = msg;
+        cdesc.setAttribute('class', 'show');
+    }
+    function desc_hide(ev) {
+        ebi('u2cdesc').setAttribute('class', '');
+    }
+    var o = document.querySelectorAll('#u2conf *[alt]');
+    for (var a = o.length - 1; a >= 0; a--) {
+        o[a].parentNode.getElementsByTagName('input')[0].setAttribute('alt', o[a].getAttribute('alt'));
+    }
+    var o = document.querySelectorAll('#u2conf *[alt]');
+    for (var a = 0; a < o.length; a++) {
+        o[a].onfocus = desc_show;
+        o[a].onblur = desc_hide;
+        o[a].onmouseenter = desc_show;
+        o[a].onmouseleave = desc_hide;
+    }
+
     function bumpthread(dir) {
         try {
             dir.stopPropagation();
@@ -1005,6 +1031,21 @@ function up2k_init(have_crypto) {
     function tgl_ask_up() {
         ask_up = !ask_up;
         bcfg_set('ask_up', ask_up);
+    }
+
+    function tgl_fsearch() {
+        fsearch = !fsearch;
+        bcfg_set('fsearch', fsearch);
+        apply_fsearch_cfg();
+    }
+
+    function apply_fsearch_cfg() {
+        var ks = ['multitask', 'ask_up'];
+        for (var a = 0; a < ks.length; a++) {
+            var lbl = document.querySelector('label[for="' + ks[a] + '"]');
+            lbl.setAttribute('class', fsearch ? 'gray' : '');
+        }
+        ebi('u2tab').setAttribute('class', fsearch ? 'srch' : '');
     }
 
     function tgl_flag_en() {
@@ -1047,6 +1088,9 @@ function up2k_init(have_crypto) {
     ebi('multitask').addEventListener('click', tgl_multitask, false);
     ebi('ask_up').addEventListener('click', tgl_ask_up, false);
     ebi('flag_en').addEventListener('click', tgl_flag_en, false);
+    var o = ebi('fsearch');
+    if (o)
+        o.addEventListener('click', tgl_fsearch, false);
 
     var nodes = ebi('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)

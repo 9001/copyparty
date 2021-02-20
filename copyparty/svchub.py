@@ -39,9 +39,13 @@ class SvcHub(object):
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
-        if self.args.e2d and self.args.e2s:
+        if self.args.e2ds:
             auth = AuthSrv(self.args, self.log, False)
-            self.up2k.build_indexes(auth.all_writable)
+            vols = auth.vfs.all_vols.values()
+            if not self.args.e2dsa:
+                vols = [x for x in vols if x.uwrite]
+
+            self.up2k.build_indexes(vols)
 
         # decide which worker impl to use
         if self.check_mp_enable():
@@ -79,7 +83,7 @@ class SvcHub(object):
             now = time.time()
             if now >= self.next_day:
                 dt = datetime.utcfromtimestamp(now)
-                print("\033[36m{}\033[0m".format(dt.strftime("%Y-%m-%d")))
+                print("\033[36m{}\033[0m\n".format(dt.strftime("%Y-%m-%d")), end="")
 
                 # unix timestamp of next 00:00:00 (leap-seconds safe)
                 day_now = dt.day
@@ -89,7 +93,7 @@ class SvcHub(object):
                 dt = dt.replace(hour=0, minute=0, second=0)
                 self.next_day = calendar.timegm(dt.utctimetuple())
 
-            fmt = "\033[36m{} \033[33m{:21} \033[0m{}"
+            fmt = "\033[36m{} \033[33m{:21} \033[0m{}\n"
             if not VT100:
                 fmt = "{} {:21} {}"
                 if "\033" in msg:
@@ -100,12 +104,12 @@ class SvcHub(object):
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
             msg = fmt.format(ts, src, msg)
             try:
-                print(msg)
+                print(msg, end="")
             except UnicodeEncodeError:
                 try:
-                    print(msg.encode("utf-8", "replace").decode())
+                    print(msg.encode("utf-8", "replace").decode(), end="")
                 except:
-                    print(msg.encode("ascii", "replace").decode())
+                    print(msg.encode("ascii", "replace").decode(), end="")
 
     def check_mp_support(self):
         vmin = sys.version_info[1]

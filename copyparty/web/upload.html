@@ -1,10 +1,3 @@
-    <div id="ops"><a
-        href="#" data-dest="">---</a><i></i><a
-        href="#" data-dest="up2k">up2k</a><i></i><a
-        href="#" data-dest="bup">bup</a><i></i><a
-        href="#" data-dest="mkdir">mkdir</a><i></i><a
-        href="#" data-dest="new_md">new.md</a><i></i><a
-        href="#" data-dest="msg">msg</a></div>
 
     <div id="op_bup" class="opview opbox act">
         <div id="u2err"></div>
@@ -34,7 +27,7 @@
     <div id="op_msg" class="opview opbox">
         <form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="/{{ vdir }}">
             <input type="text" name="msg" size="30">
-            <input type="submit" value="send">
+            <input type="submit" value="send msg">
         </form>
     </div>
 
@@ -44,6 +37,25 @@
             <table id="u2conf">
                 <tr>
                     <td>parallel uploads</td>
+                    <td rowspan="2">
+                        <input type="checkbox" id="multitask" />
+                        <label for="multitask" alt="continue hashing other files while uploading">🏃</label>
+                    </td>
+                    <td rowspan="2">
+                        <input type="checkbox" id="ask_up" />
+                        <label for="ask_up" alt="ask for confirmation befofre upload starts">💭</label>
+                    </td>
+                    <td rowspan="2">
+                        <input type="checkbox" id="flag_en" />
+                        <label for="flag_en" alt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</label>
+                    </td>
+                {%- if have_up2k_idx %}
+                    <td rowspan="2">
+                        <input type="checkbox" id="fsearch" />
+                        <label for="fsearch" alt="don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>
+                    </td>
+                {%- endif %}
+                    <td rowspan="2" id="u2btn_cw"></td>
                 </tr>
                 <tr>
                     <td>
@@ -51,26 +63,18 @@
                         <input class="txtbox" id="nthread" value="2" />
                         <a href="#" id="nthread_add">+</a>
                     </td>
-                    <td rowspan="2" style="padding-left:1.5em">
-                        <input type="checkbox" id="multitask" />
-                        <label for="multitask">hash<br />while<br />upping</label>
-                    </td>
-                    <td rowspan="2">
-                        <input type="checkbox" id="ask_up" />
-                        <label for="ask_up">ask<br />before<br />start</label>
-                    </td>
-                    <td rowspan="2">
-                        <input type="checkbox" id="flag_en" />
-                        <label for="flag_en">only<br />one tab<br />at once</label>
-                    </td>
                 </tr>
             </table>
 
+            <div id="u2cdesc"></div>
+
             <div id="u2notbtn"></div>
 
-            <div id="u2btn">
-                drop files here<br />
-                (or click me)
+            <div id="u2btn_ct">
+                <div id="u2btn">
+                    drop files here<br />
+                    (or click me)
+                </div>
             </div>
 
             <table id="u2tab">
@@ -82,5 +86,5 @@
             </table>
 
             <p id="u2foot"></p>
-            <p>( if you don't need lastmod timestamps, resumable uploads or progress bars just use the <a href="#" id="u2nope">basic uploader</a>)</p>
+            <p id="u2footfoot">( if you don't need lastmod timestamps, resumable uploads or progress bars just use the <a href="#" id="u2nope">basic uploader</a>)</p>
     </div>

@@ -30,6 +30,7 @@ except ImportError:
 from .__init__ import E
 from .util import Unrecv
 from .httpcli import HttpCli
+from .u2idx import U2idx
 
 
 class HttpConn(object):
@@ -50,6 +51,7 @@ class HttpConn(object):
         self.t0 = time.time()
         self.nbyte = 0
         self.workload = 0
+        self.u2idx = None
         self.log_func = hsrv.log
         self.set_rproxy()
 
@@ -79,6 +81,12 @@ class HttpConn(object):
 
     def log(self, msg):
         self.log_func(self.log_src, msg)
+
+    def get_u2idx(self):
+        if not self.u2idx:
+            self.u2idx = U2idx(self.args, self.log_func)
+
+        return self.u2idx
 
     def _detect_https(self):
         method = None

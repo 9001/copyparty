@@ -8,6 +8,8 @@ function dbg(msg) {
 
 function ev(e) {
 	e = e || window.event;
+	if (!e)
+		return;
 
 	if (e.preventDefault)
 		e.preventDefault()
@@ -23,7 +25,7 @@ makeSortable(ebi('files'));
 
 
 // extract songs + add play column
-var mp = (function () {
+function init_mp() {
 	var tracks = [];
 	var ret = {
 		'au': null,
@@ -37,7 +39,8 @@ var mp = (function () {
 	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
 		var tds = trs[a].getElementsByTagName('td');
-		var link = tds[1].getElementsByTagName('a')[0];
+		var link = tds[1].getElementsByTagName('a');
+		link = link[link.length - 1];
 		var url = link.getAttribute('href');
 
 		var m = re_audio.exec(url);
@@ -71,7 +74,8 @@ var mp = (function () {
 	};
 
 	return ret;
-})();
+}
+var mp = init_mp();
 
 
 // toggle player widget
@@ -466,7 +470,13 @@ function play(tid, call_depth) {
 
 		var o = ebi(oid);
 		o.setAttribute('id', 'thx_js');
-		location.hash = oid;
+		if (window.history && history.replaceState) {
+			var nurl = (document.location + '').split('#')[0] + '#' + oid;
+			history.replaceState(ebi('files').tBodies[0].innerHTML, nurl, nurl);
+		}
+		else {
+			document.location.hash = oid;
+		}
 		o.setAttribute('id', oid);
 
 		pbar.drawbuf();
@@ -561,3 +571,384 @@ function autoplay_blocked() {
 
 
 //widget.open();
+
+
+// search
+(function () {
+	var sconf = [
+		["size",
+			["szl", "sz_min", "minimum MiB", ""],
+			["szu", "sz_max", "maximum MiB", ""]
+		],
+		["date",
+			["dtl", "dt_min", "min. iso8601", ""],
+			["dtu", "dt_max", "max. iso8601", ""]
+		],
+		["path",
+			["pn", "path_no", "path NOT contains", "30"],
+			["py", "path_yes", "path contains", "30"]
+		],
+		["name",
+			["nn", "name_no", "name NOT contains", "30"],
+			["ny", "name_yes", "name contains", "30"]
+		]
+	];
+	var html = [];
+	for (var a = 0; a < sconf.length; a++) {
+		html.push('<tr><td><br />' + sconf[a][0] + '</td>');
+		for (var b = 1; b < 3; b++) {
+			var hn = "srch_" + sconf[a][b][0];
+			html.push(
+				'<td><input id="' + hn + 'c" type="checkbox">\n' +
+				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
+				'<br /><input id="' + hn + 'v" type="text" size="' + sconf[a][b][3] +
+				'" name="' + sconf[a][b][1] + '" /></td>');
+		}
+		html.push('</tr>');
+	}
+	ebi('srch_form').innerHTML = html.join('\n');
+
+	var o = document.querySelectorAll('#op_search input[type="text"]');
+	for (var a = 0; a < o.length; a++) {
+		o[a].oninput = ev_search_input;
+	}
+
+	var search_timeout;
+
+	function ev_search_input() {
+		var v = this.value;
+		var chk = ebi(this.getAttribute('id').slice(0, -1) + 'c');
+		chk.checked = ((v + '').length > 0);
+		clearTimeout(search_timeout);
+		search_timeout = setTimeout(do_search, 100);
+	}
+
+	function do_search() {
+		clearTimeout(search_timeout);
+		var params = {};
+		var o = document.querySelectorAll('#op_search input[type="text"]');
+		for (var a = 0; a < o.length; a++) {
+			var chk = ebi(o[a].getAttribute('id').slice(0, -1) + 'c');
+			if (!chk.checked)
+				continue;
+
+			params[o[a].getAttribute('name')] = o[a].value;
+		}
+		// ebi('srch_q').textContent = JSON.stringify(params, null, 4);
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/?srch', true);
+		xhr.onreadystatechange = xhr_search_results;
+		xhr.ts = new Date().getTime();
+		xhr.send(JSON.stringify(params));
+	}
+
+	function xhr_search_results() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.status !== 200) {
+			alert('ah fug\n' + this.status + ": " + this.responseText);
+			return;
+		}
+
+		var ofiles = ebi('files');
+		if (ofiles.getAttribute('ts') > this.ts)
+			return;
+
+		ebi('path').style.display = 'none';
+		ebi('tree').style.display = 'none';
+
+		var html = [];
+		var res = JSON.parse(this.responseText);
+		for (var a = 0; a < res.length; a++) {
+			var r = res[a],
+				ts = parseInt(r.ts),
+				sz = esc(r.sz + ''),
+				rp = esc(r.rp + ''),
+				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').slice(-1)[0] : '%',
+				links = linksplit(rp);
+
+			ts = new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
+
+			if (ext.length > 8)
+				ext = '%';
+
+			links = links.join('');
+			html.push('<tr><td>-</td><td><div>' + links + '</div></td><td>' + sz +
+				'</td><td>' + ext + '</td><td>' + ts + '</td></tr>');
+		}
+
+		ofiles.tBodies[0].innerHTML = html.join('\n');
+		ofiles.setAttribute("ts", this.ts);
+		reload_browser();
+	}
+})();
+
+
+// tree
+(function () {
+	var treedata = null;
+
+	function entree(e) {
+		ev(e);
+		ebi('path').style.display = 'none';
+
+		var treetab = ebi('treetab');
+		var treefiles = ebi('treefiles');
+
+		treetab.style.display = 'table';
+
+		var pro = ebi('pro');
+		if (pro)
+			treefiles.appendChild(pro);
+
+		treefiles.appendChild(ebi('files'));
+
+		var epi = ebi('epi');
+		if (epi)
+			treefiles.appendChild(epi);
+
+		localStorage.setItem('entreed', 'tree');
+		get_tree("", get_vpath());
+	}
+
+	function get_tree(top, dst) {
+		var xhr = new XMLHttpRequest();
+		xhr.top = top;
+		xhr.dst = dst;
+		xhr.open('GET', dst + '?tree=' + top, true);
+		xhr.onreadystatechange = recvtree;
+		xhr.send();
+	}
+
+	function recvtree() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.status !== 200) {
+			alert('ah fug\n' + this.status + ": " + this.responseText);
+			return;
+		}
+
+		var top = this.top == '.' ? this.dst : this.top,
+			name = top.split('/').slice(-2)[0],
+			rtop = top.replace(/^\/+/, "");
+
+		try {
+			var res = JSON.parse(this.responseText);
+		}
+		catch (ex) {
+			return;
+		}
+		var html = parsetree(res, rtop);
+		if (!this.top) {
+			html = '<li><a href="#">-</a><a href="/">[root]</a>\n<ul>' + html;
+			if (!ebi('treeul').getElementsByTagName('li').length)
+				ebi('treeul').innerHTML = html + '</ul></li>';
+		}
+		else {
+			html = '<a href="#">-</a><a href="' +
+				esc(top) + '">' + esc(name) + "</a>" + html;
+
+			var links = document.querySelectorAll('#tree a+a');
+			for (var a = 0, aa = links.length; a < aa; a++) {
+				if (links[a].getAttribute('href') == top) {
+					var o = links[a].parentNode;
+					if (!o.getElementsByTagName('li').length)
+						o.innerHTML = html;
+					//else
+					//	links[a].previousSibling.textContent = '-';
+				}
+			}
+		}
+		document.querySelector('#treeul>li>a+a').textContent = '[root]';
+		reload_tree();
+
+		var q = '#tree';
+		var nq = 0;
+		while (true) {
+			nq++;
+			q += '>ul>li';
+			if (!document.querySelector(q))
+				break;
+		}
+		ebi('treeul').style.width = (24 + nq) + 'em';
+	}
+
+	function reload_tree() {
+		var cdir = get_vpath();
+		var links = document.querySelectorAll('#tree a+a');
+		for (var a = 0, aa = links.length; a < aa; a++) {
+			var href = links[a].getAttribute('href');
+			links[a].setAttribute('class', href == cdir ? 'hl' : '');
+			links[a].onclick = treego;
+		}
+		links = document.querySelectorAll('#tree li>a:first-child');
+		for (var a = 0, aa = links.length; a < aa; a++) {
+			links[a].setAttribute('dst', links[a].nextSibling.getAttribute('href'));
+			links[a].onclick = treegrow;
+		}
+	}
+
+	function treego(e) {
+		ev(e);
+		if (this.getAttribute('class') == 'hl') {
+			treegrow.call(this.previousSibling, e);
+			return;
+		}
+		var xhr = new XMLHttpRequest();
+		xhr.top = this.getAttribute('href');
+		xhr.open('GET', xhr.top + '?ls', true);
+		xhr.onreadystatechange = recvls;
+		xhr.send();
+		get_tree('.', xhr.top);
+	}
+
+	function treegrow(e) {
+		ev(e);
+		if (this.textContent == '-') {
+			while (this.nextSibling.nextSibling) {
+				var rm = this.nextSibling.nextSibling;
+				rm.parentNode.removeChild(rm);
+				this.textContent = '+';
+			}
+			return;
+		}
+		var dst = this.getAttribute('dst');
+		get_tree('.', dst);
+	}
+
+	function recvls() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.status !== 200) {
+			alert('ah fug\n' + this.status + ": " + this.responseText);
+			return;
+		}
+
+		try {
+			var res = JSON.parse(this.responseText);
+		}
+		catch (ex) {
+			window.location = this.top;
+			return;
+		}
+		var top = this.top;
+		var html = [];
+		for (var a = 0; a < res.length; a++) {
+			var ln = '<tr><td>' + res[a][0] + '</td><td><a href="' +
+				top + res[a][1] + '">' + res[a][2] + '</a></td>';
+
+			for (var b = 3; b < res[a].length; b++) {
+				ln += '<td>' + res[a][b] + '</td>';
+			}
+			html.push(ln + '</tr>')
+		}
+		html = html.join('\n');
+		ebi('files').tBodies[0].innerHTML = html;
+		history.pushState(html, this.top, this.top);
+
+		var o = ebi('pro');
+		if (o) o.parentNode.removeChild(o);
+
+		o = ebi('epi');
+		if (o) o.parentNode.removeChild(o);
+
+		reload_tree();
+		reload_browser();
+	}
+
+	function parsetree(res, top) {
+		var ret = '';
+		for (var a = 0; a < res.a.length; a++) {
+			res['k' + res.a[a]] = 0;
+		}
+		delete res['a'];
+		var keys = Object.keys(res);
+		keys.sort();
+		for (var a = 0; a < keys.length; a++) {
+			var kk = keys[a],
+				k = kk.slice(1),
+				url = '/' + (top ? top + k : k) + '/',
+				ek = esc(k),
+				sym = res[kk] ? '-' : '+',
+				link = '<a href="#">' + sym + '</a><a href="' +
+					esc(url) + '">' + ek + '</a>';
+
+			if (res[kk]) {
+				var subtree = parsetree(res[kk], url.slice(1));
+				ret += '<li>' + link + '\n<ul>\n' + subtree + '</ul></li>\n';
+			}
+			else {
+				ret += '<li>' + link + '</li>\n';
+			}
+		}
+		return ret;
+	}
+
+	function detree(e) {
+		ev(e);
+		var treetab = ebi('treetab');
+
+		var pro = ebi('pro');
+		if (pro)
+			treetab.parentNode.insertBefore(pro, treetab);
+
+		treetab.parentNode.insertBefore(ebi('files'), treetab.nextSibling);
+
+		var epi = ebi('epi');
+		if (epi)
+			treetab.parentNode.insertBefore(epi, ebi('files').nextSibling);
+
+		ebi('path').style.display = 'inline-block';
+		treetab.style.display = 'none';
+
+		localStorage.setItem('entreed', 'na');
+	}
+
+	ebi('entree').onclick = entree;
+	ebi('detree').onclick = detree;
+	if (window.localStorage && localStorage.getItem('entreed') == 'tree')
+		entree();
+
+	window.onpopstate = function (e) {
+		console.log(e.url + ' ,, ' + ((e.state + '').slice(0, 64)));
+		if (e.state) {
+			ebi('files').tBodies[0].innerHTML = e.state;
+			reload_tree();
+			reload_browser();
+		}
+	};
+
+	if (window.history && history.pushState) {
+		var u = get_vpath();
+		history.replaceState(ebi('files').tBodies[0].innerHTML, u, u);
+	}
+})();
+
+
+function reload_browser() {
+	makeSortable(ebi('files'));
+
+	var parts = get_vpath().split('/');
+	var rm = document.querySelectorAll('#path>a+a+a');
+	for (a = rm.length - 1; a >= 0; a--)
+		rm[a].parentNode.removeChild(rm[a]);
+
+	var link = '/';
+	for (var a = 1; a < parts.length - 1; a++) {
+		link += parts[a] + '/';
+		var o = document.createElement('a');
+		o.setAttribute('href', link);
+		o.innerHTML = parts[a];
+		ebi('path').appendChild(o);
+	}
+
+	if (mp && mp.au) {
+		mp.au.pause();
+		mp.au = null;
+	}
+	widget.close();
+	mp = init_mp();
+}

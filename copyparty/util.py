@@ -99,6 +99,32 @@ class Unrecv(object):
         self.buf = buf + self.buf
 
 
+class ProgressPrinter(threading.Thread):
+    """
+    periodically print progress info without linefeeds
+    """
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.msg = None
+        self.end = False
+        self.start()
+
+    def run(self):
+        msg = None
+        while not self.end:
+            time.sleep(0.05)
+            if msg == self.msg or self.end:
+                continue
+
+            msg = self.msg
+            print(" {}\033[K\r".format(msg), end="")
+
+        print("\033[K", end="")
+        sys.stdout.flush()  # necessary on win10 even w/ stderr btw
+
+
 @contextlib.contextmanager
 def ren_open(fname, *args, **kwargs):
     fdir = kwargs.pop("fdir", None)
@@ -146,7 +172,7 @@ def ren_open(fname, *args, **kwargs):
 
         except OSError as ex_:
             ex = ex_
-            if ex.errno != 36:
+            if ex.errno not in [36, 63] and (not WINDOWS or ex.errno != 22):
                 raise
 
         if not b64:
@@ -478,6 +504,13 @@ def sanitize_fn(fn):
             fn = "_" + fn
 
     return fn.strip()
+
+
+def u8safe(txt):
+    try:
+        return txt.encode("utf-8", "xmlcharrefreplace").decode("utf-8", "replace")
+    except:
+        return txt.encode("utf-8", "replace").decode("utf-8", "replace")
 
 
 def exclude_dotfiles(filepaths):

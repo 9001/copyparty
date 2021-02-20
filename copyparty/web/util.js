@@ -107,3 +107,107 @@ function makeSortable(table) {
         };
     }(i));
 }
+
+
+
+(function () {
+    var ops = document.querySelectorAll('#ops>a');
+    for (var a = 0; a < ops.length; a++) {
+        ops[a].onclick = opclick;
+    }
+})();
+
+
+function opclick(ev) {
+    if (ev) //ie
+        ev.preventDefault();
+
+    var dest = this.getAttribute('data-dest');
+    goto(dest);
+
+    // writing a blank value makes ie8 segfault w
+    if (window.localStorage)
+        localStorage.setItem('opmode', dest || '.');
+
+    var input = document.querySelector('.opview.act input:not([type="hidden"])')
+    if (input)
+        input.focus();
+}
+
+
+function goto(dest) {
+    var obj = document.querySelectorAll('.opview.act');
+    for (var a = obj.length - 1; a >= 0; a--)
+        obj[a].classList.remove('act');
+
+    obj = document.querySelectorAll('#ops>a');
+    for (var a = obj.length - 1; a >= 0; a--)
+        obj[a].classList.remove('act');
+
+    var others = ['path', 'files', 'widget'];
+    for (var a = 0; a < others.length; a++)
+        ebi(others[a]).classList.remove('hidden');
+
+    if (dest) {
+        var ui = ebi('op_' + dest);
+        ui.classList.add('act');
+        document.querySelector('#ops>a[data-dest=' + dest + ']').classList.add('act');
+
+        var fn = window['goto_' + dest];
+        if (fn)
+            fn();
+    }
+}
+
+
+(function () {
+    goto();
+    if (window.localStorage) {
+        var op = localStorage.getItem('opmode');
+        if (op !== null && op !== '.')
+            goto(op);
+    }
+    ebi('ops').style.display = 'block';
+})();
+
+
+function linksplit(rp) {
+    var ret = [];
+    var apath = '/';
+    while (rp) {
+        var link = rp;
+        var ofs = rp.indexOf('/');
+        if (ofs === -1) {
+            rp = null;
+        }
+        else {
+            link = rp.slice(0, ofs + 1);
+            rp = rp.slice(ofs + 1);
+        }
+        var vlink = link;
+        if (link.indexOf('/') !== -1)
+            vlink = link.slice(0, -1) + '<span>/</span>';
+
+        ret.push('<a href="' + apath + link + '">' + vlink + '</a>');
+        apath += link;
+    }
+    return ret;
+}
+
+
+function get_evpath() {
+    var ret = document.location.pathname;
+
+    if (ret.indexOf('/') !== 0)
+        ret = '/' + ret;
+
+    if (ret.lastIndexOf('/') !== ret.length - 1)
+        ret += '/';
+
+    return ret;
+}
+
+
+function get_vpath() {
+    return decodeURIComponent(get_evpath());
+}

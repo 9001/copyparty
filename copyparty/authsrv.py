@@ -19,6 +19,11 @@ class VFS(object):
         self.uwrite = uwrite  # users who can write this
         self.flags = flags  # config switches
         self.nodes = {}  # child nodes
+        self.all_vols = {vpath: self}  # flattened recursive
+
+    def _trk(self, vol):
+        self.all_vols[vol.vpath] = vol
+        return vol
 
     def add(self, src, dst):
         """get existing, or add new path to the vfs"""
@@ -30,7 +35,7 @@ class VFS(object):
             name, dst = dst.split("/", 1)
             if name in self.nodes:
                 # exists; do not manipulate permissions
-                return self.nodes[name].add(src, dst)
+                return self._trk(self.nodes[name].add(src, dst))
 
             vn = VFS(
                 "{}/{}".format(self.realpath, name),
@@ -40,7 +45,7 @@ class VFS(object):
                 self.flags,
             )
             self.nodes[name] = vn
-            return vn.add(src, dst)
+            return self._trk(vn.add(src, dst))
 
         if dst in self.nodes:
             # leaf exists; return as-is
@@ -50,7 +55,7 @@ class VFS(object):
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
         vn = VFS(src, vp)
         self.nodes[dst] = vn
-        return vn
+        return self._trk(vn)
 
     def _find(self, vpath):
         """return [vfs,remainder]"""
@@ -257,7 +262,6 @@ class AuthSrv(object):
                 with open(cfg_fn, "rb") as f:
                     self._parse_config_file(f, user, mread, mwrite, mflags, mount)
 
-        self.all_writable = []
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
@@ -280,11 +284,6 @@ class AuthSrv(object):
             v.uread = mread[dst]
             v.uwrite = mwrite[dst]
             v.flags = mflags[dst]
-            if v.uwrite:
-                self.all_writable.append(v)
-
-        if vfs.uwrite and vfs not in self.all_writable:
-            self.all_writable.append(vfs)
 
         missing_users = {}
         for d in [mread, mwrite]:
