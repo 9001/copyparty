@@ -3,7 +3,6 @@ from __future__ import print_function, unicode_literals
 
 import re
 import os
-import sys
 import time
 import math
 import json
@@ -25,7 +24,8 @@ from .util import (
     sanitize_fn,
     ren_open,
     atomic_move,
-    u8safe,
+    w8b64enc,
+    w8b64dec,
 )
 
 try:
@@ -57,6 +57,13 @@ class Up2k(object):
         self.registry = {}
         self.db = {}
 
+        self.mem_db = None
+        if HAVE_SQLITE3:
+            # mojibake detector
+            self.mem_db = sqlite3.connect(":memory:", check_same_thread=False)
+            self.mem_db.execute(r"create table a (b text)")
+            self.mem_db.commit()
+
         if WINDOWS:
             # usually fails to set lastmod too quickly
             self.lastmod_q = Queue()
@@ -78,11 +85,28 @@ class Up2k(object):
     def log(self, msg):
         self.log_func("up2k", msg + "\033[K")
 
-    def _u8(self, rd, fn):
-        s_rd = u8safe(rd)
-        s_fn = u8safe(fn)
-        self.log("u8safe retry:\n  [{}]  [{}]\n  [{}]  [{}]".format(rd, fn, s_rd, s_fn))
-        return (s_rd, s_fn)
+    def w8enc(self, rd, fn):
+        ret = []
+        for k, v in [["d", rd], ["f", fn]]:
+            try:
+                self.mem_db.execute("select * from a where b = ?", (v,))
+                ret.append(v)
+            except:
+                ret.append("//" + w8b64enc(v))
+                self.log("mojien/{} [{}] {}".format(k, v, ret[-1][2:]))
+
+        return tuple(ret)
+
+    def w8dec(self, rd, fn):
+        ret = []
+        for k, v in [["d", rd], ["f", fn]]:
+            if v.startswith("//"):
+                ret.append(w8b64dec(v[2:]))
+                self.log("mojide/{} [{}] {}".format(k, ret[-1], v[2:]))
+            else:
+                ret.append(v)
+
+        return tuple(ret)
 
     def _vis_job_progress(self, job):
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
@@ -205,7 +229,7 @@ class Up2k(object):
                 try:
                     c = dbw[0].execute(sql, (rd, fn))
                 except:
-                    c = dbw[0].execute(sql, self._u8(rd, fn))
+                    c = dbw[0].execute(sql, self.w8enc(rd, fn))
 
                 in_db = list(c.fetchall())
                 if in_db:
@@ -257,6 +281,9 @@ class Up2k(object):
         c = db.execute("select * from up")
         for dwark, dts, dsz, drd, dfn in c:
             nchecked += 1
+            if drd.startswith("//") or dfn.startswith("//"):
+                drd, dfn = self.w8dec(drd, dfn)
+
             abspath = os.path.join(top, drd, dfn)
             # almost zero overhead dw
             self.pp.msg = "b{} {}".format(nfiles - nchecked, abspath)
@@ -269,6 +296,7 @@ class Up2k(object):
         if rm:
             self.log("forgetting {} deleted files".format(len(rm)))
             for rd, fn in rm:
+                # self.log("{} / {}".format(rd, fn))
                 self.db_rm(db, rd, fn)
 
         return len(rm)
@@ -369,6 +397,9 @@ class Up2k(object):
             if db:
                 cur = db.execute(r"select * from up where w = ?", (wark,))
                 for _, dtime, dsize, dp_dir, dp_fn in cur:
+                    if dp_dir.startswith("//") or dp_fn.startswith("//"):
+                        dp_dir, dp_fn = self.w8dec(dp_dir, dp_fn)
+
                     dp_abs = os.path.join(cj["ptop"], dp_dir, dp_fn).replace("\\", "/")
                     # relying on path.exists to return false on broken symlinks
                     if os.path.exists(fsenc(dp_abs)):
@@ -568,7 +599,7 @@ class Up2k(object):
         try:
             db.execute(sql, (rd, fn))
         except:
-            db.execute(sql, self._u8(rd, fn))
+            db.execute(sql, self.w8enc(rd, fn))
 
     def db_add(self, db, wark, rd, fn, ts, sz):
         sql = "insert into up values (?,?,?,?,?)"
@@ -576,7 +607,7 @@ class Up2k(object):
         try:
             db.execute(sql, v)
         except:
-            rd, fn = self._u8(rd, fn)
+            rd, fn = self.w8enc(rd, fn)
             v = (wark, ts, sz, rd, fn)
             db.execute(sql, v)
 

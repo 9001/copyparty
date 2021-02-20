@@ -569,6 +569,16 @@ def w8enc(txt):
     return txt.encode(FS_ENCODING, "surrogateescape")
 
 
+def w8b64dec(txt):
+    """decodes base64(filesystem-bytes) to wtf8"""
+    return w8dec(base64.urlsafe_b64decode(txt.encode("ascii")))
+
+
+def w8b64enc(txt):
+    """encodes wtf8 to base64(filesystem-bytes)"""
+    return base64.urlsafe_b64encode(w8enc(txt)).decode("ascii")
+
+
 if PY2 and WINDOWS:
     # moonrunes become \x3f with bytestrings,
     # losing mojibake support is worth
