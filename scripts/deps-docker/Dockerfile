@@ -1,12 +1,10 @@
-FROM    alpine:3.11
+FROM    alpine:3.13
 WORKDIR /z
-ENV     ver_asmcrypto=2821dd1dedd1196c378f5854037dda5c869313f3 \
-        ver_markdownit=10.0.0 \
-        ver_showdown=1.9.1 \
+ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_marked=1.1.0 \
-        ver_ogvjs=1.6.1 \
-        ver_mde=2.10.1 \
-        ver_codemirror=5.53.2 \
+        ver_ogvjs=1.8.0 \
+        ver_mde=2.14.0 \
+        ver_codemirror=5.59.3 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -17,7 +15,7 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
         && apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev brotli py3-brotli \
         && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip -O ogvjs.zip \
-        && wget https://github.com/asmcrypto/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
+        && wget https://github.com/openpgpjs/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
         && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
         && wget https://github.com/codemirror/CodeMirror/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
@@ -52,6 +50,7 @@ RUN     tar -xf zopfli.tgz \
             -S . \
         && make -C build \
         && make -C build install \
+        && python3 -m ensurepip \
         && python3 -m pip install fonttools zopfli
 
 

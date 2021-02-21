@@ -1,6 +1,6 @@
-diff -NarU2 CodeMirror-orig/mode/gfm/gfm.js CodeMirror-edit/mode/gfm/gfm.js
---- CodeMirror-orig/mode/gfm/gfm.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/mode/gfm/gfm.js	2020-05-02 02:13:32.142131800 +0200
+diff -NarU2 codemirror-5.59.3-orig/mode/gfm/gfm.js codemirror-5.59.3/mode/gfm/gfm.js
+--- codemirror-5.59.3-orig/mode/gfm/gfm.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/mode/gfm/gfm.js	2021-02-21 20:42:02.166174775 +0000
 @@ -97,5 +97,5 @@
          }
        }
@@ -15,9 +15,9 @@ diff -NarU2 CodeMirror-orig/mode/gfm/gfm.js CodeMirror-edit/mode/gfm/gfm.js
 +      }*/
        stream.next();
        return null;
-diff -NarU2 CodeMirror-orig/mode/meta.js CodeMirror-edit/mode/meta.js
---- CodeMirror-orig/mode/meta.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/mode/meta.js	2020-05-02 03:56:58.852408400 +0200
+diff -NarU2 codemirror-5.59.3-orig/mode/meta.js codemirror-5.59.3/mode/meta.js
+--- codemirror-5.59.3-orig/mode/meta.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/mode/meta.js	2021-02-21 20:42:54.798742821 +0000
 @@ -13,4 +13,5 @@
  
    CodeMirror.modeInfo = [
@@ -28,7 +28,7 @@ diff -NarU2 CodeMirror-orig/mode/meta.js CodeMirror-edit/mode/meta.js
      {name: "Gas", mime: "text/x-gas", mode: "gas", ext: ["s"]},
      {name: "Gherkin", mime: "text/x-feature", mode: "gherkin", ext: ["feature"]},
 +    */
-     {name: "GitHub Flavored Markdown", mime: "text/x-gfm", mode: "gfm", file: /^(readme|contributing|history).md$/i},
+     {name: "GitHub Flavored Markdown", mime: "text/x-gfm", mode: "gfm", file: /^(readme|contributing|history)\.md$/i},
 +    /*
      {name: "Go", mime: "text/x-go", mode: "go", ext: ["go"]},
      {name: "Groovy", mime: "text/x-groovy", mode: "groovy", ext: ["groovy", "gradle"], file: /^Jenkinsfile$/},
@@ -56,16 +56,16 @@ diff -NarU2 CodeMirror-orig/mode/meta.js CodeMirror-edit/mode/meta.js
 +    /*
      {name: "XQuery", mime: "application/xquery", mode: "xquery", ext: ["xy", "xquery"]},
      {name: "Yacas", mime: "text/x-yacas", mode: "yacas", ext: ["ys"]},
-@@ -171,4 +180,5 @@
-     {name: "xu", mime: "text/x-xu", mode: "mscgen", ext: ["xu"]},
-     {name: "msgenny", mime: "text/x-msgenny", mode: "mscgen", ext: ["msgenny"]}
+@@ -172,4 +181,5 @@
+     {name: "msgenny", mime: "text/x-msgenny", mode: "mscgen", ext: ["msgenny"]},
+     {name: "WebAssembly", mime: "text/webassembly", mode: "wast", ext: ["wat", "wast"]},
 +    */
    ];
    // Ensure all modes have a mime property for backwards compatibility
-diff -NarU2 CodeMirror-orig/src/display/selection.js CodeMirror-edit/src/display/selection.js
---- CodeMirror-orig/src/display/selection.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/display/selection.js	2020-05-02 03:27:30.144662800 +0200
-@@ -83,29 +83,21 @@
+diff -NarU2 codemirror-5.59.3-orig/src/display/selection.js codemirror-5.59.3/src/display/selection.js
+--- codemirror-5.59.3-orig/src/display/selection.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/display/selection.js	2021-02-21 20:44:14.860894328 +0000
+@@ -84,29 +84,21 @@
      let order = getOrder(lineObj, doc.direction)
      iterateBidiSections(order, fromArg || 0, toArg == null ? lineLen : toArg, (from, to, dir, i) => {
 -      let ltr = dir == "ltr"
@@ -105,24 +105,24 @@ diff -NarU2 CodeMirror-orig/src/display/selection.js CodeMirror-edit/src/display
 +          botRight = openEnd && last ? rightSide : toPos.right
          add(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom)
          if (fromPos.bottom < toPos.top) add(leftSide, fromPos.bottom, null, toPos.top)
-diff -NarU2 CodeMirror-orig/src/input/ContentEditableInput.js CodeMirror-edit/src/input/ContentEditableInput.js
---- CodeMirror-orig/src/input/ContentEditableInput.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/input/ContentEditableInput.js	2020-05-02 03:33:05.707995500 +0200
-@@ -391,4 +391,5 @@
+diff -NarU2 codemirror-5.59.3-orig/src/input/ContentEditableInput.js codemirror-5.59.3/src/input/ContentEditableInput.js
+--- codemirror-5.59.3-orig/src/input/ContentEditableInput.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/input/ContentEditableInput.js	2021-02-21 20:44:33.273953867 +0000
+@@ -399,4 +399,5 @@
    let info = mapFromLineView(view, line, pos.line)
  
 +  /*
    let order = getOrder(line, cm.doc.direction), side = "left"
    if (order) {
-@@ -396,4 +397,5 @@
+@@ -404,4 +405,5 @@
      side = partPos % 2 ? "right" : "left"
    }
 +  */
    let result = nodeAndOffsetInLineMap(info.map, pos.ch, side)
    result.offset = result.collapse == "right" ? result.end : result.start
-diff -NarU2 CodeMirror-orig/src/input/movement.js CodeMirror-edit/src/input/movement.js
---- CodeMirror-orig/src/input/movement.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/input/movement.js	2020-05-02 03:31:19.710773500 +0200
+diff -NarU2 codemirror-5.59.3-orig/src/input/movement.js codemirror-5.59.3/src/input/movement.js
+--- codemirror-5.59.3-orig/src/input/movement.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/input/movement.js	2021-02-21 20:45:12.763093671 +0000
 @@ -15,4 +15,5 @@
  
  export function endOfLine(visually, cm, lineObj, lineNo, dir) {
@@ -146,9 +146,9 @@ diff -NarU2 CodeMirror-orig/src/input/movement.js CodeMirror-edit/src/input/move
    return null
 +  */
  }
-diff -NarU2 CodeMirror-orig/src/line/line_data.js CodeMirror-edit/src/line/line_data.js
---- CodeMirror-orig/src/line/line_data.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/line/line_data.js	2020-05-02 03:17:02.785065000 +0200
+diff -NarU2 codemirror-5.59.3-orig/src/line/line_data.js codemirror-5.59.3/src/line/line_data.js
+--- codemirror-5.59.3-orig/src/line/line_data.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/line/line_data.js	2021-02-21 20:45:36.472549599 +0000
 @@ -79,6 +79,6 @@
      // Optionally wire in some hacks into the token-rendering
      // algorithm, to deal with browser quirks.
@@ -158,9 +158,9 @@ diff -NarU2 CodeMirror-orig/src/line/line_data.js CodeMirror-edit/src/line/line_
 +    //  builder.addToken = buildTokenBadBidi(builder.addToken, order)
      builder.map = []
      let allowFrontierUpdate = lineView != cm.display.externalMeasured && lineNo(line)
-diff -NarU2 CodeMirror-orig/src/measurement/position_measurement.js CodeMirror-edit/src/measurement/position_measurement.js
---- CodeMirror-orig/src/measurement/position_measurement.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/measurement/position_measurement.js	2020-05-02 03:35:20.674159600 +0200
+diff -NarU2 codemirror-5.59.3-orig/src/measurement/position_measurement.js codemirror-5.59.3/src/measurement/position_measurement.js
+--- codemirror-5.59.3-orig/src/measurement/position_measurement.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/measurement/position_measurement.js	2021-02-21 20:50:52.372945293 +0000
 @@ -380,5 +380,6 @@
      sticky = "after"
    }
@@ -199,9 +199,9 @@ diff -NarU2 CodeMirror-orig/src/measurement/position_measurement.js CodeMirror-e
 +*/
  
  let measureText
-diff -NarU2 CodeMirror-orig/src/util/bidi.js CodeMirror-edit/src/util/bidi.js
---- CodeMirror-orig/src/util/bidi.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/util/bidi.js	2020-05-02 03:12:44.418649800 +0200
+diff -NarU2 codemirror-5.59.3-orig/src/util/bidi.js codemirror-5.59.3/src/util/bidi.js
+--- codemirror-5.59.3-orig/src/util/bidi.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/util/bidi.js	2021-02-21 20:52:18.168092225 +0000
 @@ -4,5 +4,5 @@
  
  export function iterateBidiSections(order, from, to, f) {
@@ -239,20 +239,19 @@ diff -NarU2 CodeMirror-orig/src/util/bidi.js CodeMirror-edit/src/util/bidi.js
 +  var fun = function(str, direction) {
      let outerType = direction == "ltr" ? "L" : "R"
  
-@@ -204,12 +210,16 @@
+@@ -204,5 +210,11 @@
      return direction == "rtl" ? order.reverse() : order
    }
--})()
- 
 +  return function(str, direction) {
 +    var ret = fun(str, direction);
 +    console.log("bidiOrdering inner ([%s], %s) => [%s]", str, direction, ret);
 +    return ret;
 +  }
-+})()
+ })()
 +*/
+ 
  // Get the bidi ordering for the given line (and cache it). Returns
- // false for lines that are fully left-to-right, and an array of
+@@ -210,6 +222,4 @@
  // BidiSpan objects otherwise.
  export function getOrder(line, direction) {
 -  let order = line.order
@@ -260,9 +259,9 @@ diff -NarU2 CodeMirror-orig/src/util/bidi.js CodeMirror-edit/src/util/bidi.js
 -  return order
 +  return false;
  }
-diff -NarU2 CodeMirror-orig/src/util/feature_detection.js CodeMirror-edit/src/util/feature_detection.js
---- CodeMirror-orig/src/util/feature_detection.js	2020-04-21 12:47:20.000000000 +0200
-+++ CodeMirror-edit/src/util/feature_detection.js	2020-05-02 03:16:21.085621400 +0200
+diff -NarU2 codemirror-5.59.3-orig/src/util/feature_detection.js codemirror-5.59.3/src/util/feature_detection.js
+--- codemirror-5.59.3-orig/src/util/feature_detection.js	2021-02-20 21:24:57.000000000 +0000
++++ codemirror-5.59.3/src/util/feature_detection.js	2021-02-21 20:49:22.191269270 +0000
 @@ -25,4 +25,5 @@
  }
  
