@@ -44,13 +44,22 @@ you may also want these, especially on servers:
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ up2k: js, resumable, multithreaded
+  * ☑ stash: simple PUT filedropper
+  * ☑ symlink/discard existing files (content-matching)
 * download
   * ☑ single files in browser
   * ✖ folders as zip files
   * ☑ FUSE client (read-only)
 * browser
+  * ☑ tree-view
   * ☑ media player
   * ✖ thumbnails
+  * ✖ SPA (browse while uploading)
+    * currently safe using the file-tree on the left only, not folders in the file list
+* server indexing
+  * ☑ locate files by contents
+  * ☑ search by name/path/date/size
+  * ✖ search by ID3-tags etc.
 * markdown
   * ☑ viewer
   * ☑ editor (sure why not)
