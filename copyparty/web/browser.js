@@ -980,9 +980,11 @@ function apply_perms(perms) {
 	}
 
 	var act = document.querySelector('#ops>a.act');
-	var areq = act.getAttribute('data-perm');
-	if (areq && !has(perms, areq))
-		goto();
+	if (act) {
+		var areq = act.getAttribute('data-perm');
+		if (areq && !has(perms, areq))
+			goto();
+	}
 
 	var have_write = has(perms, "write");
 	var tds = document.querySelectorAll('#u2conf td');

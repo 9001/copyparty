@@ -424,6 +424,7 @@ function up2k_init(have_crypto) {
 
     var tasker = (function () {
         var mutex = false;
+        var was_busy = false;
 
         function taskerd() {
             if (mutex)
@@ -442,16 +443,25 @@ function up2k_init(have_crypto) {
                         st.busy.upload.length;
                 }
 
-                if (flag) {
-                    var need_flag = 0 !=
-                        st.todo.hash.length +
-                        st.todo.handshake.length +
-                        st.todo.upload.length +
-                        st.busy.hash.length +
-                        st.busy.handshake.length +
-                        st.busy.upload.length;
+                var is_busy = 0 !=
+                    st.todo.hash.length +
+                    st.todo.handshake.length +
+                    st.todo.upload.length +
+                    st.busy.hash.length +
+                    st.busy.handshake.length +
+                    st.busy.upload.length;
 
-                    if (need_flag) {
+                if (was_busy != is_busy) {
+                    was_busy = is_busy;
+
+                    if (is_busy)
+                        window.addEventListener("beforeunload", warn_uploader_busy);
+                    else
+                        window.removeEventListener("beforeunload", warn_uploader_busy);
+                }
+
+                if (flag) {
+                    if (is_busy) {
                         var now = new Date().getTime();
                         flag.take(now);
                         if (!flag.ours) {
@@ -1105,6 +1115,13 @@ function up2k_init(have_crypto) {
     bumpthread({ "target": 1 })
 
     return { "init_deps": init_deps, "set_fsearch": set_fsearch }
+}
+
+
+function warn_uploader_busy(e) {
+    e.preventDefault();
+    e.returnValue = '';
+    return "upload in progress, click abort and use the file-tree to navigate instead";
 }
 
 
