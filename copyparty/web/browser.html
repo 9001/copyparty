@@ -75,7 +75,7 @@
         <tbody>
 
 {%- for f in files %}
-<tr><td>{{ f[0] }}</td><td><a href="{{ f[1] }}">{{ f[2] }}</a></td><td>{{ f[3] }}</td><td>{{ f[4] }}</td><td>{{ f[5] }}</td></tr>
+<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td><td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
 {%- endfor %}
 
         </tbody>

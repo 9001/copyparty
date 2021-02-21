@@ -834,16 +834,18 @@ function autoplay_blocked() {
 			window.location = this.top;
 			return;
 		}
+
+		ebi('srv_info').innerHTML = res.srvinf;
+		var nodes = res.dirs.concat(res.files);
 		var top = this.top;
 		var html = [];
-		for (var a = 0; a < res.length; a++) {
-			var ln = '<tr><td>' + res[a][0] + '</td><td><a href="' +
-				top + res[a][1] + '">' + res[a][2] + '</a></td>';
+		for (var a = 0; a < nodes.length; a++) {
+			var r = nodes[a],
+				ln = '<tr><td>' + r.lead + '</td><td><a href="' +
+					top + r.href + '">' + esc(decodeURIComponent(r.href)) + '</a>';
 
-			for (var b = 3; b < res[a].length; b++) {
-				ln += '<td>' + res[a][b] + '</td>';
-			}
-			html.push(ln + '</tr>')
+			ln = [ln, r.sz, r.ext, r.dt].join('</td><td>');
+			html.push(ln + '</td></tr>');
 		}
 		html = html.join('\n');
 		ebi('files').tBodies[0].innerHTML = html;

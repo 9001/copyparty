@@ -1179,12 +1179,14 @@ class HttpCli(object):
         if rem == ".hist":
             hidden = ["up2k."]
 
+        is_ls = "ls" in self.uparam
+
         dirs = []
         files = []
         for fn in vfs_ls:
             base = ""
             href = fn
-            if self.absolute_urls and vpath:
+            if not is_ls and self.absolute_urls and vpath:
                 base = "/" + vpath + "/"
                 href = base + fn
 
@@ -1221,29 +1223,19 @@ class HttpCli(object):
             except:
                 ext = "%"
 
-            item = [margin, quotep(href), html_escape(fn), sz, ext, dt]
+            item = {
+                "lead": margin,
+                "href": quotep(href),
+                "name": fn,
+                "sz": sz,
+                "ext": ext,
+                "dt": dt,
+                "ts": inf.st_mtime,
+            }
             if is_dir:
                 dirs.append(item)
             else:
                 files.append(item)
-
-        logues = [None, None]
-        for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
-            fn = os.path.join(abspath, fn)
-            if os.path.exists(fsenc(fn)):
-                with open(fsenc(fn), "rb") as f:
-                    logues[n] = f.read().decode("utf-8")
-
-        if False:
-            # this is a mistake
-            md = None
-            for fn in [x[2] for x in files]:
-                if fn.lower() == "readme.md":
-                    fn = os.path.join(abspath, fn)
-                    with open(fn, "rb") as f:
-                        md = f.read().decode("utf-8")
-
-                    break
 
         srv_info = []
 
@@ -1273,15 +1265,25 @@ class HttpCli(object):
         except:
             pass
 
+        srv_info = "</span> /// <span>".join(srv_info)
+
+        if is_ls:
+            [x.pop("name") for y in [dirs, files] for x in y]
+            ret = json.dumps({"dirs": dirs, "files": files, "srvinf": srv_info})
+            self.reply(ret.encode("utf-8", "replace"))
+            return True
+
+        logues = [None, None]
+        for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
+            fn = os.path.join(abspath, fn)
+            if os.path.exists(fsenc(fn)):
+                with open(fsenc(fn), "rb") as f:
+                    logues[n] = f.read().decode("utf-8")
+
         ts = ""
         # ts = "?{}".format(time.time())
 
         dirs.extend(files)
-
-        if "ls" in self.uparam:
-            ret = json.dumps(dirs)
-            self.reply(ret.encode("utf-8", "replace"))
-            return True
 
         html = self.conn.tpl_browser.render(
             vdir=quotep(self.vpath),
@@ -1294,7 +1296,7 @@ class HttpCli(object):
             prologue=logues[0],
             epilogue=logues[1],
             title=html_escape(self.vpath),
-            srv_info="</span> /// <span>".join(srv_info),
+            srv_info=srv_info,
         )
         self.reply(html.encode("utf-8", "replace"))
         return True

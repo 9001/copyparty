@@ -382,7 +382,7 @@ function up2k_init(have_crypto) {
 
             var tr = document.createElement('tr');
             tr.innerHTML = '<td id="f{0}n"></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
-            tr.getElementsByTagName('td')[0].innerHTML = linksplit(esc(entry.purl + entry.name)).join(' ');
+            tr.getElementsByTagName('td')[0].innerHTML = fsearch ? entry.name : linksplit(esc(entry.purl + entry.name)).join(' ');
             ebi('u2tab').appendChild(tr);
 
             st.files.push(entry);
