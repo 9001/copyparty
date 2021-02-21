@@ -33,6 +33,7 @@ import re
 import os
 import sys
 import time
+import json
 import stat
 import errno
 import struct
@@ -323,7 +324,7 @@ class Gateway(object):
         if bad_good:
             path = dewin(path)
 
-        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots"
+        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots&ls"
         r = self.sendreq("GET", web_path)
         if r.status != 200:
             self.closeconn()
@@ -334,12 +335,17 @@ class Gateway(object):
             )
             raise FuseOSError(errno.ENOENT)
 
-        if not r.getheader("Content-Type", "").startswith("text/html"):
+        ctype = r.getheader("Content-Type", "")
+        if ctype == "application/json":
+            parser = self.parse_jls
+        elif ctype.startswith("text/html"):
+            parser = self.parse_html
+        else:
             log("listdir on file: {}".format(path))
             raise FuseOSError(errno.ENOENT)
 
         try:
-            return self.parse_html(r)
+            return parser(r)
         except:
             info(repr(path) + "\n" + traceback.format_exc())
             raise
@@ -366,6 +372,29 @@ class Gateway(object):
             )
 
         return r.read()
+
+    def parse_jls(self, datasrc):
+        rsp = b""
+        while True:
+            buf = datasrc.read(1024 * 32)
+            if not buf:
+                break
+
+            rsp += buf
+
+        rsp = json.loads(rsp.decode("utf-8"))
+        ret = []
+        for is_dir, nodes in [[True, rsp["dirs"]], [False, rsp["files"]]]:
+            for n in nodes:
+                fname = unquote(n["href"]).rstrip(b"/")
+                fname = fname.decode("wtf-8")
+                if bad_good:
+                    fname = enwin(fname)
+
+                fun = self.stat_dir if is_dir else self.stat_file
+                ret.append([fname, fun(n["ts"], n["sz"]), 0])
+
+        return ret
 
     def parse_html(self, datasrc):
         ret = []
@@ -818,9 +847,9 @@ class CPPF(Operations):
                 return cache_stat
 
         fun = info
-        if MACOS and path.split('/')[-1].startswith('._'):
+        if MACOS and path.split("/")[-1].startswith("._"):
             fun = dbg
-        
+
         fun("=ENOENT ({})".format(hexler(path)))
         raise FuseOSError(errno.ENOENT)
 

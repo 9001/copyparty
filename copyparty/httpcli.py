@@ -1084,7 +1084,7 @@ class HttpCli(object):
 
         ret = self.gen_tree(top, dst)
         ret = json.dumps(ret)
-        self.reply(ret.encode("utf-8"))
+        self.reply(ret.encode("utf-8"), mime="application/json")
         return True
 
     def gen_tree(self, top, target):
@@ -1270,7 +1270,7 @@ class HttpCli(object):
         if is_ls:
             [x.pop("name") for y in [dirs, files] for x in y]
             ret = json.dumps({"dirs": dirs, "files": files, "srvinf": srv_info})
-            self.reply(ret.encode("utf-8", "replace"))
+            self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
 
         logues = [None, None]
