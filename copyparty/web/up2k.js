@@ -756,8 +756,8 @@ function up2k_init(have_crypto) {
                         smsg = 'found';
                         var hit = response[0],
                             msg = linksplit(hit.rp).join(''),
-                            tr = new Date(hit.ts * 1000).toISOString().replace("T", " ").slice(0, -5),
-                            tu = new Date(t.lmod * 1000).toISOString().replace("T", " ").slice(0, -5),
+                            tr = unix2iso(hit.ts),
+                            tu = unix2iso(t.lmod),
                             diff = parseInt(t.lmod) - parseInt(hit.ts),
                             cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
                             sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;

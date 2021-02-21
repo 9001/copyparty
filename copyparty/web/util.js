@@ -214,3 +214,8 @@ function get_evpath() {
 function get_vpath() {
     return decodeURIComponent(get_evpath());
 }
+
+
+function unix2iso(ts) {
+    return new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
+}

@@ -668,14 +668,12 @@ function autoplay_blocked() {
 				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').slice(-1)[0] : '%',
 				links = linksplit(rp);
 
-			ts = new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
-
 			if (ext.length > 8)
 				ext = '%';
 
 			links = links.join('');
 			html.push('<tr><td>-</td><td><div>' + links + '</div></td><td>' + sz +
-				'</td><td>' + ext + '</td><td>' + ts + '</td></tr>');
+				'</td><td>' + ext + '</td><td>' + unix2iso(ts) + '</td></tr>');
 		}
 
 		ofiles.tBodies[0].innerHTML = html.join('\n');
@@ -748,7 +746,8 @@ function autoplay_blocked() {
 		}
 		else {
 			html = '<a href="#">-</a><a href="' +
-				esc(top) + '">' + esc(name) + "</a>" + html;
+				esc(top) + '">' + esc(name) +
+				"</a>\n<ul>\n" + html + "</ul>";
 
 			var links = document.querySelectorAll('#tree a+a');
 			for (var a = 0, aa = links.length; a < aa; a++) {
@@ -792,7 +791,8 @@ function autoplay_blocked() {
 
 	function treego(e) {
 		ev(e);
-		if (this.getAttribute('class') == 'hl') {
+		if (this.getAttribute('class') == 'hl' &&
+			this.previousSibling.textContent == '-') {
 			treegrow.call(this.previousSibling, e);
 			return;
 		}
@@ -810,8 +810,8 @@ function autoplay_blocked() {
 			while (this.nextSibling.nextSibling) {
 				var rm = this.nextSibling.nextSibling;
 				rm.parentNode.removeChild(rm);
-				this.textContent = '+';
 			}
+			this.textContent = '+';
 			return;
 		}
 		var dst = this.getAttribute('dst');
@@ -835,7 +835,7 @@ function autoplay_blocked() {
 			return;
 		}
 
-		ebi('srv_info').innerHTML = res.srvinf;
+		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
 		var nodes = res.dirs.concat(res.files);
 		var top = this.top;
 		var html = [];
@@ -844,7 +844,7 @@ function autoplay_blocked() {
 				ln = '<tr><td>' + r.lead + '</td><td><a href="' +
 					top + r.href + '">' + esc(decodeURIComponent(r.href)) + '</a>';
 
-			ln = [ln, r.sz, r.ext, r.dt].join('</td><td>');
+			ln = [ln, r.sz, r.ext, unix2iso(r.ts)].join('</td><td>');
 			html.push(ln + '</td></tr>');
 		}
 		html = html.join('\n');

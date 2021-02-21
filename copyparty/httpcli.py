@@ -1268,7 +1268,7 @@ class HttpCli(object):
         srv_info = "</span> /// <span>".join(srv_info)
 
         if is_ls:
-            [x.pop("name") for y in [dirs, files] for x in y]
+            [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
             ret = json.dumps({"dirs": dirs, "files": files, "srvinf": srv_info})
             self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
