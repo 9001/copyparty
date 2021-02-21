@@ -368,6 +368,7 @@ function up2k_init(have_crypto) {
                 "size": fobj.size,
                 "lmod": lmod / 1000,
                 "purl": get_vpath(),
+                "done": false,
                 "hash": []
             };
 
@@ -399,6 +400,19 @@ function up2k_init(have_crypto) {
         ebi('file' + fdom_ctr).addEventListener('change', gotfile, false);
     }
     more_one_file();
+
+    function u2cleanup(e) {
+        ev(e);
+        for (var a = 0; a < st.files.length; a++) {
+            var t = st.files[a];
+            if (t.done && t.name) {
+                var tr = ebi('f{0}p'.format(t.n)).parentNode;
+                tr.parentNode.removeChild(tr);
+                t.name = undefined;
+            }
+        }
+    }
+    ebi('u2cleanup').onclick = u2cleanup;
 
     /////
     ////
@@ -819,6 +833,7 @@ function up2k_init(have_crypto) {
                 st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
 
                 if (done) {
+                    t.done = true;
                     st.bytes.uploaded += t.size - t.bytes_uploaded;
                     var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                     var spd2 = (t.size / ((t.t3 - t.t2) / 1000.)) / (1024 * 1024.);
@@ -1111,6 +1126,10 @@ function up2k_init(have_crypto) {
     var nodes = ebi('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)
         nodes[a].addEventListener('touchend', nop, false);
+
+    var perms = document.body.getAttribute('perms');
+    if (perms && perms.indexOf('write') === -1)
+        set_fsearch();
 
     bumpthread({ "target": 1 })
 

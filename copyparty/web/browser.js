@@ -986,6 +986,8 @@ function apply_perms(perms) {
 			goto();
 	}
 
+	document.body.setAttribute('perms', perms.join(' '));
+
 	var have_write = has(perms, "write");
 	var tds = document.querySelectorAll('#u2conf td');
 	for (var a = 0; a < tds.length; a++) {
@@ -993,7 +995,7 @@ function apply_perms(perms) {
 			(have_write || tds[a].getAttribute('data-perm') == 'read') ?
 				'table-cell' : 'none';
 	}
-	if (!have_write)
+	if (!have_write && up2k)
 		up2k.set_fsearch();
 }
 
