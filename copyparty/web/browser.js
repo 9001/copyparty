@@ -732,6 +732,7 @@ function autoplay_blocked() {
 		xhr.open('GET', dst + '?tree=' + top, true);
 		xhr.onreadystatechange = recvtree;
 		xhr.send();
+		enspin('#tree');
 	}
 
 	function recvtree() {
@@ -776,6 +777,7 @@ function autoplay_blocked() {
 			}
 		}
 		document.querySelector('#treeul>li>a+a').textContent = '[root]';
+		despin('#tree');
 		reload_tree();
 
 		var q = '#tree';
@@ -817,6 +819,7 @@ function autoplay_blocked() {
 		xhr.onreadystatechange = recvls;
 		xhr.send();
 		get_tree('.', xhr.top);
+		enspin('#files');
 	}
 
 	function treegrow(e) {
@@ -865,6 +868,8 @@ function autoplay_blocked() {
 		html = html.join('\n');
 		ebi('files').tBodies[0].innerHTML = html;
 		history.pushState(html, this.top, this.top);
+		apply_perms(res.perms);
+		despin('#files');
 
 		var o = ebi('pro');
 		if (o) o.parentNode.removeChild(o);
@@ -944,6 +949,51 @@ function autoplay_blocked() {
 		history.replaceState(ebi('files').tBodies[0].innerHTML, u, u);
 	}
 })();
+
+
+function enspin(sel) {
+	despin(sel);
+	var d = document.createElement('div');
+	d.setAttribute('class', 'dumb_loader_thing');
+	d.innerHTML = '🌲';
+	var tgt = document.querySelector(sel);
+	tgt.insertBefore(d, tgt.childNodes[0]);
+}
+
+
+function despin(sel) {
+	var o = document.querySelectorAll(sel + '>.dumb_loader_thing');
+	for (var a = o.length - 1; a >= 0; a--)
+		o[a].parentNode.removeChild(o[a]);
+}
+
+
+function apply_perms(perms) {
+	var o = document.querySelectorAll('#ops>a[data-perm]');
+	for (var a = 0; a < o.length; a++)
+		o[a].style.display = 'none';
+
+	for (var a = 0; a < perms.length; a++) {
+		o = document.querySelectorAll('#ops>a[data-perm="' + perms[a] + '"]');
+		for (var b = 0; b < o.length; b++)
+			o[b].style.display = 'inline';
+	}
+
+	var act = document.querySelector('#ops>a.act');
+	var areq = act.getAttribute('data-perm');
+	if (areq && !has(perms, areq))
+		goto();
+
+	var have_write = has(perms, "write");
+	var tds = document.querySelectorAll('#u2conf td');
+	for (var a = 0; a < tds.length; a++) {
+		tds[a].style.display =
+			(have_write || tds[a].getAttribute('data-perm') == 'read') ?
+				'table-cell' : 'none';
+	}
+	if (!have_write)
+		up2k.set_fsearch();
+}
 
 
 function reload_browser(not_mp) {

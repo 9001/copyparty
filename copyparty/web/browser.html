@@ -7,36 +7,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css{{ ts }}">
-    {%- if can_upload %}
     <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css{{ ts }}">
-    {%- endif %}
 </head>
 
 <body>
     <div id="ops">
         <a href="#" data-dest="">---</a>
-        {%- if can_read %}
-        <a href="#" data-dest="search">🔎</a>
-        {%- endif %}
-        {%- if can_upload %}
+        <a href="#" data-perm="read" data-dest="search">🔎</a>
+        {%- if have_up2k_idx %}
         <a href="#" data-dest="up2k">🚀</a>
-        <a href="#" data-dest="bup">🎈</a>
-        <a href="#" data-dest="mkdir">📂</a>
-        <a href="#" data-dest="new_md">📝</a>
-        <a href="#" data-dest="msg">📟</a>
+        {%- else %}
+        <a href="#" data-perm="write" data-dest="up2k">🚀</a>
         {%- endif %}
+        <a href="#" data-perm="write" data-dest="bup">🎈</a>
+        <a href="#" data-perm="write" data-dest="mkdir">📂</a>
+        <a href="#" data-perm="write" data-dest="new_md">📝</a>
+        <a href="#" data-perm="write" data-dest="msg">📟</a>
     </div>
 
-    {%- if can_read %}
     <div id="op_search" class="opview">
         <table id="srch_form"></table>
         <div id="srch_q"></div>
     </div>
-    {%- endif %}
-
-    {%- if can_upload %}
     {%- include 'upload.html' %}
-    {%- endif %}
     
     <h1 id="path">
         <a href="#" id="entree">🌲</a>
@@ -45,7 +38,6 @@
         {%- endfor %}
     </h1>
     
-    {%- if can_read %}
     {%- if prologue %}
     <div id="pro" class="logue">{{ prologue }}</div>
     {%- endif %}
@@ -54,9 +46,7 @@
         <tr>
             <td id="tree">
                 <a href="#" id="detree">🍞...</a>
-                <ul id="treeul">
-                    <div class="dumb_loader_thing">🌲</div>
-                </ul>
+                <ul id="treeul"></ul>
             </td>
             <td id="treefiles"></td>
         </tr>
@@ -84,7 +74,6 @@
     {%- if epilogue %}
     <div id="epi" class="logue">{{ epilogue }}</div>
     {%- endif %}
-    {%- endif %}
 
     <h2><a href="?h">control-panel</a></h2>
 
@@ -103,14 +92,11 @@
     </div>
     
     <script src="/.cpr/util.js{{ ts }}"></script>
-
-    {%- if can_read %}
     <script src="/.cpr/browser.js{{ ts }}"></script>
-    {%- endif %}
-    
-    {%- if can_upload %}
     <script src="/.cpr/up2k.js{{ ts }}"></script>
-    {%- endif %}
+    <script>
+        apply_perms({{ perms }});
+    </script>
 </body>
 
 </html>

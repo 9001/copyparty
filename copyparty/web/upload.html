@@ -50,12 +50,12 @@
                         <label for="flag_en" alt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</label>
                     </td>
                 {%- if have_up2k_idx %}
-                    <td rowspan="2">
+                    <td data-perm="read" rowspan="2">
                         <input type="checkbox" id="fsearch" />
                         <label for="fsearch" alt="don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>
                     </td>
                 {%- endif %}
-                    <td rowspan="2" id="u2btn_cw"></td>
+                    <td data-perm="read" rowspan="2" id="u2btn_cw"></td>
                 </tr>
                 <tr>
                     <td>

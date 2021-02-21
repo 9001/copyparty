@@ -336,7 +336,6 @@ a,
 	box-shadow: 0 0 1em #222 inset;
 }
 #ops {
-	display: none;
 	background: #333;
 	margin: 1.7em 1.5em 0 1.5em;
 	padding: .3em .6em;
@@ -426,6 +425,7 @@ input[type="checkbox"]:checked+label {
 	padding: .3em .5em;
 	font-size: 1.5em;
 	display: inline-block;
+	min-width: 12em;
 	width: 100%;
 }
 #treefiles #files tbody {
@@ -433,9 +433,6 @@ input[type="checkbox"]:checked+label {
 }
 #treefiles #files thead th:nth-child(1) {
 	border-radius: .7em 0 0 0;
-}
-#tree li {
-	list-style: none;
 }
 #tree ul,
 #tree li {
@@ -447,15 +444,14 @@ input[type="checkbox"]:checked+label {
 }
 #tree li {
 	margin-left: 1em;
+	list-style: none;
+	white-space: nowrap;
 }
 #tree a.hl {
 	color: #400;
 	background: #fc4;
 	border-radius: .3em;
 	text-shadow: none;
-}
-#tree li {
-	white-space: nowrap;
 }
 #tree a {
 	display: inline-block;
@@ -497,4 +493,6 @@ input[type="checkbox"]:checked+label {
 	padding: 0 1.2em 0 0;
 	font-size: 4em;
 	animation: spin 1s linear infinite;
+	position: absolute;
+	z-index: 9;
 }

@@ -730,6 +730,11 @@ class Up2k(object):
         if etag == prev.get(k, None):
             return
 
+        try:
+            os.mkdir(os.path.join(k, ".hist"))
+        except:
+            pass
+
         path2 = "{}.{}".format(path, os.getpid())
         j = json.dumps(reg, indent=2, sort_keys=True).encode("utf-8")
         with gzip.GzipFile(path2, "wb") as f:

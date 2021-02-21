@@ -172,7 +172,6 @@ function goto(dest) {
         if (op !== null && op !== '.')
             goto(op);
     }
-    ebi('ops').style.display = 'block';
 })();
 
 
@@ -223,4 +222,13 @@ function get_vpath() {
 
 function unix2iso(ts) {
     return new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
+}
+
+
+function has(haystack, needle) {
+    for (var a = 0; a < haystack.length; a++)
+        if (haystack[a] == needle)
+            return true;
+
+    return false;
 }

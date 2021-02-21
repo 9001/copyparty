@@ -77,6 +77,8 @@ class HttpCli(object):
             self.loud_reply(str(ex), status=ex.code)
             return self.keepalive
 
+        # time.sleep(0.4)
+
         # normalize incoming headers to lowercase;
         # outgoing headers however are Correct-Case
         for header_line in headerlines[1:]:
@@ -1267,9 +1269,16 @@ class HttpCli(object):
 
         srv_info = "</span> /// <span>".join(srv_info)
 
+        perms = []
+        if self.readable:
+            perms.append("read")
+        if self.writable:
+            perms.append("write")
+
         if is_ls:
             [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
-            ret = json.dumps({"dirs": dirs, "files": files, "srvinf": srv_info})
+            ret = {"dirs": dirs, "files": files, "srvinf": srv_info, "perms": perms}
+            ret = json.dumps(ret)
             self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
 
@@ -1289,10 +1298,9 @@ class HttpCli(object):
             vdir=quotep(self.vpath),
             vpnodes=vpnodes,
             files=dirs,
-            can_upload=self.writable,
-            can_read=self.readable,
-            have_up2k_idx=self.args.e2d,
             ts=ts,
+            perms=json.dumps(perms),
+            have_up2k_idx=self.args.e2d,
             prologue=logues[0],
             epilogue=logues[1],
             title=html_escape(self.vpath),

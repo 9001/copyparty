@@ -1049,6 +1049,11 @@ function up2k_init(have_crypto) {
         ebi('u2tab').setAttribute('class', fsearch ? 'srch' : '');
     }
 
+    function set_fsearch() {
+        if (!fsearch)
+            tgl_fsearch();
+    }
+
     function tgl_flag_en() {
         flag_en = !flag_en;
         bcfg_set('flag_en', flag_en);
@@ -1099,5 +1104,9 @@ function up2k_init(have_crypto) {
 
     bumpthread({ "target": 1 })
 
-    return { "init_deps": init_deps }
+    return { "init_deps": init_deps, "set_fsearch": set_fsearch }
 }
+
+
+if (document.querySelector('#op_up2k.act'))
+    goto_up2k();
