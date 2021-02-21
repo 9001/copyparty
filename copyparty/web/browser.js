@@ -594,6 +594,7 @@ function autoplay_blocked() {
 		]
 	];
 	var html = [];
+	var orig_html = null;
 	for (var a = 0; a < sconf.length; a++) {
 		html.push('<tr><td><br />' + sconf[a][0] + '</td>');
 		for (var b = 1; b < 3; b++) {
@@ -658,7 +659,7 @@ function autoplay_blocked() {
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'none';
 
-		var html = [];
+		var html = ['<tr><td>-</td><td colspan="4"><a href="#" id="unsearch">close search results</a></td></tr>'];
 		var res = JSON.parse(this.responseText);
 		for (var a = 0; a < res.length; a++) {
 			var r = res[a],
@@ -676,8 +677,22 @@ function autoplay_blocked() {
 				'</td><td>' + ext + '</td><td>' + unix2iso(ts) + '</td></tr>');
 		}
 
+		if (!orig_html)
+			orig_html = ebi('files').tBodies[0].innerHTML;
+
 		ofiles.tBodies[0].innerHTML = html.join('\n');
 		ofiles.setAttribute("ts", this.ts);
+		reload_browser();
+
+		ebi('unsearch').onclick = unsearch;
+	}
+
+	function unsearch(e) {
+		ev(e);
+		ebi('path').style.display = 'inline-block';
+		ebi('tree').style.display = 'block';
+		ebi('files').tBodies[0].innerHTML = orig_html;
+		orig_html = null;
 		reload_browser();
 	}
 })();

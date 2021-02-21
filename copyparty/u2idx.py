@@ -70,8 +70,8 @@ class U2idx(object):
 
     def run_query(self, vols, qstr, qv):
         qv = tuple(qv)
-        self.log("qs: " + qstr)
-        self.log("qv: " + repr(qv))
+        # self.log("qs: " + qstr)
+        # self.log("qv: " + repr(qv))
 
         ret = []
         lim = 100
@@ -83,7 +83,7 @@ class U2idx(object):
                     continue
 
                 self.dbs[ptop] = db
-                self.log("idx /{} @ {} {}".format(vtop, ptop, flags))
+                # self.log("idx /{} @ {} {}".format(vtop, ptop, flags))
 
             c = db.execute(qstr, qv)
             for _, ts, sz, rd, fn in c:

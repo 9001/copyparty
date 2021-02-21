@@ -85,6 +85,11 @@ function sortTable(table, col) {
     th[col].className = 'sort' + reverse;
     var stype = th[col].getAttribute('sort');
     tr = tr.sort(function (a, b) {
+        if (!a.cells[col])
+            return -1;
+        if (!b.cells[col])
+            return 1;
+
         var v1 = a.cells[col].textContent.trim();
         var v2 = b.cells[col].textContent.trim();
         if (stype == 'int') {
