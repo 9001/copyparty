@@ -93,7 +93,7 @@ class Up2k(object):
                 ret.append(v)
             except:
                 ret.append("//" + w8b64enc(v))
-                self.log("mojien/{} [{}] {}".format(k, v, ret[-1][2:]))
+                # self.log("mojien/{} [{}] {}".format(k, v, ret[-1][2:]))
 
         return tuple(ret)
 
@@ -102,7 +102,7 @@ class Up2k(object):
         for k, v in [["d", rd], ["f", fn]]:
             if v.startswith("//"):
                 ret.append(w8b64dec(v[2:]))
-                self.log("mojide/{} [{}] {}".format(k, ret[-1], v[2:]))
+                # self.log("mojide/{} [{}] {}".format(k, ret[-1], v[2:]))
             else:
                 ret.append(v)
 
@@ -236,8 +236,9 @@ class Up2k(object):
                     self.pp.n -= 1
                     _, dts, dsz, _, _ = in_db[0]
                     if len(in_db) > 1:
-                        m = "WARN: multiple entries: [{}] => [{}] ({})"
-                        self.log(m.format(top, rp, len(in_db)))
+                        m = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
+                        rep_db = "\n".join([repr(x) for x in in_db])
+                        self.log(m.format(top, rp, len(in_db), rep_db))
                         dts = -1
 
                     if dts == inf.st_mtime and dsz == inf.st_size:

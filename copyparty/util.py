@@ -114,12 +114,19 @@ class ProgressPrinter(threading.Thread):
     def run(self):
         msg = None
         while not self.end:
-            time.sleep(0.05)
+            time.sleep(0.1)
             if msg == self.msg or self.end:
                 continue
 
             msg = self.msg
-            print(" {}\033[K\r".format(msg), end="")
+            m = " {}\033[K\r".format(msg)
+            try:
+                print(m, end="")
+            except UnicodeEncodeError:
+                try:
+                    print(m.encode("utf-8", "replace").decode(), end="")
+                except:
+                    print(m.encode("ascii", "replace").decode(), end="")
 
         print("\033[K", end="")
         sys.stdout.flush()  # necessary on win10 even w/ stderr btw
