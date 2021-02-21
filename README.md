@@ -36,20 +36,24 @@ you may also want these, especially on servers:
 
 ## status
 
-* [x] sanic multipart parser
-* [x] load balancer (multiprocessing)
-* [x] upload (plain multipart, ie6 support)
-* [x] upload (js, resumable, multithreaded)
-* [x] download
-* [x] browser
-* [x] media player
-* [ ] thumbnails
-* [ ] download as zip
-* [x] volumes
-* [x] accounts
-* [x] markdown viewer
-* [x] markdown editor
-* [x] FUSE client (read-only)
+* backend stuff
+  * ☑ sanic multipart parser
+  * ☑ load balancer (multiprocessing)
+  * ☑ volumes (mountpoints)
+  * ☑ accounts
+* upload
+  * ☑ basic: plain multipart, ie6 support
+  * ☑ up2k: js, resumable, multithreaded
+* download
+  * ☑ single files in browser
+  * ✖ folders as zip files
+  * ☑ FUSE client (read-only)
+* browser
+  * ☑ media player
+  * ✖ thumbnails
+* markdown
+  * ☑ viewer
+  * ☑ editor (sure why not)
 
 summary: it works! you can use it! (but technically not even close to beta)
 
