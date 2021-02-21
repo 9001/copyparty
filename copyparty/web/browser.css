@@ -493,7 +493,8 @@ input[type="checkbox"]:checked+label {
 }
 .dumb_loader_thing {
 	display: inline-block;
-	margin: 1em;
-	font-size: 3em;
+	margin: 1em .3em 1em 1em;
+	padding: 0 1.2em 0 0;
+	font-size: 4em;
 	animation: spin 1s linear infinite;
 }
