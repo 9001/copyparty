@@ -95,7 +95,7 @@ class SvcHub(object):
 
             fmt = "\033[36m{} \033[33m{:21} \033[0m{}\n"
             if not VT100:
-                fmt = "{} {:21} {}"
+                fmt = "{} {:21} {}\n"
                 if "\033" in msg:
                     msg = self.ansi_re.sub("", msg)
                 if "\033" in src:
