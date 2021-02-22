@@ -712,15 +712,9 @@ function autoplay_blocked() {
 
 		treetab.style.display = 'table';
 
-		var pro = ebi('pro');
-		if (pro)
-			treefiles.appendChild(pro);
-
+		treefiles.appendChild(ebi('pro'));
 		treefiles.appendChild(ebi('files'));
-
-		var epi = ebi('epi');
-		if (epi)
-			treefiles.appendChild(epi);
+		treefiles.appendChild(ebi('epi'));
 
 		localStorage.setItem('entreed', 'tree');
 		get_tree("", get_vpath());
@@ -872,11 +866,8 @@ function autoplay_blocked() {
 		apply_perms(res.perms);
 		despin('#files');
 
-		var o = ebi('pro');
-		if (o) o.parentNode.removeChild(o);
-
-		o = ebi('epi');
-		if (o) o.parentNode.removeChild(o);
+		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
+		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
 
 		reload_tree();
 		reload_browser();
@@ -915,15 +906,9 @@ function autoplay_blocked() {
 		ev(e);
 		var treetab = ebi('treetab');
 
-		var pro = ebi('pro');
-		if (pro)
-			treetab.parentNode.insertBefore(pro, treetab);
-
+		treetab.parentNode.insertBefore(ebi('pro'), treetab);
 		treetab.parentNode.insertBefore(ebi('files'), treetab.nextSibling);
-
-		var epi = ebi('epi');
-		if (epi)
-			treetab.parentNode.insertBefore(epi, ebi('files').nextSibling);
+		treetab.parentNode.insertBefore(ebi('epi'), ebi('files').nextSibling);
 
 		ebi('path').style.display = 'inline-block';
 		treetab.style.display = 'none';

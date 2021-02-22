@@ -38,9 +38,7 @@
         {%- endfor %}
     </h1>
     
-    {%- if prologue %}
-    <div id="pro" class="logue">{{ prologue }}</div>
-    {%- endif %}
+    <div id="pro" class="logue">{{ logues[0] }}</div>
 
     <table id="treetab">
         <tr>
@@ -71,9 +69,7 @@
         </tbody>
     </table>
     
-    {%- if epilogue %}
-    <div id="epi" class="logue">{{ epilogue }}</div>
-    {%- endif %}
+    <div id="epi" class="logue">{{ logues[1] }}</div>
 
     <h2><a href="?h">control-panel</a></h2>
 

@@ -1275,19 +1275,25 @@ class HttpCli(object):
         if self.writable:
             perms.append("write")
 
-        if is_ls:
-            [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
-            ret = {"dirs": dirs, "files": files, "srvinf": srv_info, "perms": perms}
-            ret = json.dumps(ret)
-            self.reply(ret.encode("utf-8", "replace"), mime="application/json")
-            return True
-
         logues = [None, None]
         for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
             fn = os.path.join(abspath, fn)
             if os.path.exists(fsenc(fn)):
                 with open(fsenc(fn), "rb") as f:
                     logues[n] = f.read().decode("utf-8")
+
+        if is_ls:
+            [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
+            ret = {
+                "dirs": dirs,
+                "files": files,
+                "srvinf": srv_info,
+                "perms": perms,
+                "logues": logues,
+            }
+            ret = json.dumps(ret)
+            self.reply(ret.encode("utf-8", "replace"), mime="application/json")
+            return True
 
         ts = ""
         # ts = "?{}".format(time.time())
@@ -1301,8 +1307,7 @@ class HttpCli(object):
             ts=ts,
             perms=json.dumps(perms),
             have_up2k_idx=self.args.e2d,
-            prologue=logues[0],
-            epilogue=logues[1],
+            logues=logues,
             title=html_escape(self.vpath),
             srv_info=srv_info,
         )
