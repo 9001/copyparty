@@ -72,6 +72,19 @@ summary: it works! you can use it! (but technically not even close to beta)
 * probably, pls let me know
 
 
+# searching
+
+when started with `-e2dsa` copyparty will scan/index all your files, avoiding duplicates on upload, and also makes the volumes searchable through the web-ui
+
+you can do queries for size/date/directory-path/filename, but you can also drag/drop a local file to see if the same contents exists somewhere on the server (you get the URL if it does)
+
+path/name queries are space-separated, AND'ed together, and words are negated with a `-` prefix, for example:
+* `shibayan -bossa` in the `path` field finds all files within a folder named `shibayan` but filters out any results where `bossa` exists somewhere in the path
+* `demetori styx` in the `name` field gives you [good stuff](https://www.youtube.com/watch?v=zGh0g14ZJ8I&list=PL3A147BD151EE5218&index=9)
+
+other metadata like song tags etc are not yet indexed for searching
+
+
 # client examples
 
 * javascript: dump some state into a file (two separate examples)
