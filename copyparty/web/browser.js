@@ -970,6 +970,8 @@ function despin(sel) {
 
 
 function apply_perms(perms) {
+	perms = perms || [];
+
 	var o = document.querySelectorAll('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++)
 		o[a].style.display = 'none';
