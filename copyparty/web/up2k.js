@@ -1066,18 +1066,25 @@ function up2k_init(have_crypto) {
 
     function set_fsearch(new_state) {
         var perms = document.body.getAttribute('perms');
+        var read_only = false;
 
         if (!ebi('fsearch')) {
             new_state = false;
         }
         else if (perms && perms.indexOf('write') === -1) {
             new_state = true;
+            read_only = true;
         }
 
         if (new_state !== undefined) {
             fsearch = new_state;
             bcfg_set('fsearch', fsearch);
         }
+
+        try {
+            document.querySelector('label[for="fsearch"]').style.opacity = read_only ? '0' : '1';
+        }
+        catch (ex) { }
 
         try {
             var fun = fsearch ? 'add' : 'remove';
