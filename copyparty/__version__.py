@@ -1,7 +1,7 @@
 # coding: utf-8
 
-VERSION = (0, 8, 1)
-CODENAME = "keeping track"
+VERSION = (0, 8, 2)
+CODENAME = "discovery"
 BUILD_DT = (2021, 2, 22)
 
 S_VERSION = ".".join(map(str, VERSION))
