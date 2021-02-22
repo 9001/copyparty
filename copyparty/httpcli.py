@@ -448,12 +448,12 @@ class HttpCli(object):
             vbody["hash"] = len(vbody["hash"])
             self.log("qj: " + repr(vbody))
             hits = idx.fsearch(vols, body)
-            self.log("qh: " + repr(hits))
+            self.log("q#: " + repr(hits))
         else:
             # search by query params
             self.log("qj: " + repr(body))
             hits = idx.search(vols, body)
-            self.log("qh: " + str(len(hits)))
+            self.log("q#: " + str(len(hits)))
 
         r = json.dumps(hits).encode("utf-8")
         self.reply(r, mime="application/json")

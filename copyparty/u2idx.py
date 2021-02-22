@@ -131,6 +131,9 @@ def _conv_txt(q, body, k, sql):
             inv = "not"
             v = v[1:]
 
+        if not v:
+            continue
+
         head = "'%'||"
         if v.startswith("^"):
             head = ""
