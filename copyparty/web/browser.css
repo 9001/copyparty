@@ -480,13 +480,6 @@ input[type="checkbox"]:checked+label {
 #treeul a:first-child {
 	font-family: monospace, monospace;
 }
-#treefiles {
-	opacity: 1;
-	transition: opacity 0.2s ease-in-out;
-}
-#tree:hover+#treefiles {
-	opacity: .8;
-}
 .dumb_loader_thing {
 	display: inline-block;
 	margin: 1em .3em 1em 1em;
