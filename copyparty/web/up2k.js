@@ -792,6 +792,7 @@ function up2k_init(have_crypto) {
                     ebi('f{0}t'.format(t.n)).innerHTML = smsg;
                     st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
                     st.bytes.uploaded += t.size;
+                    t.done = true;
                     tasker();
                     return;
                 }
@@ -1069,6 +1070,10 @@ function up2k_init(have_crypto) {
         try {
             var fun = fsearch ? 'add' : 'remove';
             ebi('op_up2k').classList[fun]('srch');
+
+            var ico = fsearch ? '🔎' : '🚀';
+            var desc = fsearch ? 'Search' : 'Upload';
+            ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
         }
         catch (ex) { }
     }

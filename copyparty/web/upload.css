@@ -33,17 +33,19 @@
 	text-align: center;
 	font-size: 1.5em;
 	margin: .5em auto;
-	padding: 1.2em 0;
+	padding: .8em 0;
 	width: 16em;
 	cursor: pointer;
 	box-shadow: .4em .4em 0 #111;
 }
 #op_up2k.srch #u2btn {
-	background: linear-gradient(to bottom, #270 0%, #5a1 50%, #381 51%, #270 100%);
+	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
+	text-shadow: 1px 1px 1px #fc6;
+	color: #333;
 }
 #u2conf #u2btn {
 	margin: -1.5em 0;
-	padding: 1.5em 0;
+	padding: .8em 0;
 	width: 100%;
 }
 #u2notbtn {

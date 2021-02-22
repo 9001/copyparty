@@ -585,10 +585,10 @@ function autoplay_blocked() {
 			["dtu", "dt_max", "max. iso8601", ""]
 		],
 		["path",
-			["path", "path", "path contains", "46"]
+			["path", "path", "path contains &nbsp; (space-separated)", "46"]
 		],
 		["name",
-			["name", "name", "name contains", "46"]
+			["name", "name", "name contains &nbsp; (negate with -nope)", "46"]
 		]
 	];
 	var html = [];
