@@ -6,6 +6,9 @@
 	position: absolute;
 	top: 0;
 	left: 0;
+	width: 2px;
+	height: 2px;
+	overflow: hidden;
 }
 #u2form input {
 	background: #444;
@@ -15,11 +18,6 @@
 #u2err.err {
 	color: #f87;
 	padding: .5em;
-}
-#u2form {
-	width: 2px;
-	height: 2px;
-	overflow: hidden;
 }
 #u2btn {
 	color: #eee;
@@ -40,6 +38,9 @@
 	cursor: pointer;
 	box-shadow: .4em .4em 0 #111;
 }
+#op_up2k.srch #u2btn {
+	background: linear-gradient(to bottom, #270 0%, #5a1 50%, #381 51%, #270 100%);
+}
 #u2conf #u2btn {
 	margin: -1.5em 0;
 	padding: 1.5em 0;
@@ -59,7 +60,7 @@
 	width: calc(100% - 2em);
 	max-width: 100em;
 }
-#u2tab.srch {
+#u2form.srch #u2tab {
 	max-width: none;
 }
 #u2tab td {
@@ -73,7 +74,7 @@
 #u2tab td:nth-child(3) {
 	width: 40%;
 }
-#u2tab.srch td:nth-child(3) {
+#u2form.srch #u2tab td:nth-child(3) {
 	font-family: sans-serif;
 	width: auto;
 }
@@ -150,11 +151,13 @@
 	box-shadow: 0 .1em .3em #fb0;
 	border-color: #fb0;
 }
-#u2conf input[type="checkbox"]+label.gray {
+#op_up2k.srch #u2conf td:nth-child(1)>*,
+#op_up2k.srch #u2conf td:nth-child(2)>*,
+#op_up2k.srch #u2conf td:nth-child(3)>* {
 	background: #777;
 	border-color: #ccc;
 	box-shadow: none;
-	opacity: .25;
+	opacity: .2;
 }
 #u2cdesc {
 	position: absolute;

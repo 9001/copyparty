@@ -1066,12 +1066,11 @@ function up2k_init(have_crypto) {
     }
 
     function apply_fsearch_cfg() {
-        var ks = ['multitask', 'ask_up'];
-        for (var a = 0; a < ks.length; a++) {
-            var lbl = document.querySelector('label[for="' + ks[a] + '"]');
-            lbl.setAttribute('class', fsearch ? 'gray' : '');
+        try {
+            var fun = fsearch ? 'add' : 'remove';
+            ebi('op_up2k').classList[fun]('srch');
         }
-        ebi('u2tab').setAttribute('class', fsearch ? 'srch' : '');
+        catch (ex) { }
     }
 
     function set_fsearch() {

@@ -67,6 +67,11 @@ you may also want these, especially on servers:
 summary: it works! you can use it! (but technically not even close to beta)
 
 
+# bugs
+
+* probably, pls let me know
+
+
 # client examples
 
 * javascript: dump some state into a file (two separate examples)
