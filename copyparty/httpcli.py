@@ -1275,7 +1275,7 @@ class HttpCli(object):
         if self.writable:
             perms.append("write")
 
-        logues = [None, None]
+        logues = ["", ""]
         for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
             fn = os.path.join(abspath, fn)
             if os.path.exists(fsenc(fn)):
