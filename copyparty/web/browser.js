@@ -585,12 +585,10 @@ function autoplay_blocked() {
 			["dtu", "dt_max", "max. iso8601", ""]
 		],
 		["path",
-			["pn", "path_no", "path NOT contains", "30"],
-			["py", "path_yes", "path contains", "30"]
+			["path", "path", "path contains", "46"]
 		],
 		["name",
-			["nn", "name_no", "name NOT contains", "30"],
-			["ny", "name_yes", "name contains", "30"]
+			["name", "name", "name contains", "46"]
 		]
 	];
 	var html = [];
@@ -599,11 +597,14 @@ function autoplay_blocked() {
 		html.push('<tr><td><br />' + sconf[a][0] + '</td>');
 		for (var b = 1; b < 3; b++) {
 			var hn = "srch_" + sconf[a][b][0];
+			var csp = (sconf[a].length == 2) ? 2 : 1;
 			html.push(
-				'<td><input id="' + hn + 'c" type="checkbox">\n' +
+				'<td colspan="' + csp + '"><input id="' + hn + 'c" type="checkbox">\n' +
 				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
 				'<br /><input id="' + hn + 'v" type="text" size="' + sconf[a][b][3] +
 				'" name="' + sconf[a][b][1] + '" /></td>');
+			if (csp == 2)
+				break;
 		}
 		html.push('</tr>');
 	}

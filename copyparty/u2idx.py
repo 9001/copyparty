@@ -50,17 +50,15 @@ class U2idx(object):
         _conv_dt(qobj, body, "dt_min", "mt >= ?")
         _conv_dt(qobj, body, "dt_max", "mt <= ?")
         for seg, dk in [["path", "rd"], ["name", "fn"]]:
-            for inv in ["no", "yes"]:
-                jk = "{}_{}".format(seg, inv)
-                if jk in body:
-                    _conv_txt(qobj, body, jk, dk)
+            if seg in body:
+                _conv_txt(qobj, body, seg, dk)
 
         qstr = "select * from up"
         qv = []
         if qobj:
             qk = []
             for k, v in sorted(qobj.items()):
-                qk.append(k)
+                qk.append(k.split("\n")[0])
                 qv.append(v)
 
             qstr = " and ".join(qk)
@@ -70,8 +68,7 @@ class U2idx(object):
 
     def run_query(self, vols, qstr, qv):
         qv = tuple(qv)
-        # self.log("qs: " + qstr)
-        # self.log("qv: " + repr(qv))
+        self.log("qs: {} {}".format(qstr, repr(qv)))
 
         ret = []
         lim = 100
@@ -128,19 +125,21 @@ def _conv_dt(q, body, k, sql):
 
 
 def _conv_txt(q, body, k, sql):
-    v = body[k]
-    print("[" + v + "]")
+    for v in body[k].split(" "):
+        inv = ""
+        if v.startswith("-"):
+            inv = "not"
+            v = v[1:]
 
-    head = "'%'||"
-    if v.startswith("^"):
-        head = ""
-        v = v[1:]
+        head = "'%'||"
+        if v.startswith("^"):
+            head = ""
+            v = v[1:]
 
-    tail = "||'%'"
-    if v.endswith("$"):
-        tail = ""
-        v = v[:-1]
+        tail = "||'%'"
+        if v.endswith("$"):
+            tail = ""
+            v = v[:-1]
 
-    inv = "not" if k.endswith("_no") else ""
-    qk = "{} {} like {}?{}".format(sql, inv, head, tail)
-    q[qk] = u8safe(v)
+        qk = "{} {} like {}?{}".format(sql, inv, head, tail)
+        q[qk + "\n" + v] = u8safe(v)
