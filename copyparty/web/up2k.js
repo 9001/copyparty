@@ -282,7 +282,7 @@ function up2k_init(have_crypto) {
 
     var flag = false;
     apply_flag_cfg();
-    apply_fsearch_cfg();
+    set_fsearch();
 
     function nav() {
         ebi('file' + fdom_ctr).click();
@@ -1061,12 +1061,24 @@ function up2k_init(have_crypto) {
     }
 
     function tgl_fsearch() {
-        fsearch = !fsearch;
-        bcfg_set('fsearch', fsearch);
-        apply_fsearch_cfg();
+        set_fsearch(!fsearch);
     }
 
-    function apply_fsearch_cfg() {
+    function set_fsearch(new_state) {
+        var perms = document.body.getAttribute('perms');
+
+        if (!ebi('fsearch')) {
+            new_state = false;
+        }
+        else if (perms && perms.indexOf('write') === -1) {
+            new_state = true;
+        }
+
+        if (new_state !== undefined) {
+            fsearch = new_state;
+            bcfg_set('fsearch', fsearch);
+        }
+
         try {
             var fun = fsearch ? 'add' : 'remove';
             ebi('op_up2k').classList[fun]('srch');
@@ -1076,11 +1088,6 @@ function up2k_init(have_crypto) {
             ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
         }
         catch (ex) { }
-    }
-
-    function set_fsearch() {
-        if (!fsearch)
-            tgl_fsearch();
     }
 
     function tgl_flag_en() {
@@ -1131,12 +1138,8 @@ function up2k_init(have_crypto) {
     for (var a = nodes.length - 1; a >= 0; a--)
         nodes[a].addEventListener('touchend', nop, false);
 
-    var perms = document.body.getAttribute('perms');
-    if (perms && perms.indexOf('write') === -1)
-        set_fsearch();
-
+    set_fsearch();
     bumpthread({ "target": 1 })
-
     return { "init_deps": init_deps, "set_fsearch": set_fsearch }
 }
 

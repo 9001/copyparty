@@ -983,7 +983,8 @@ function apply_perms(perms) {
 			(have_write || tds[a].getAttribute('data-perm') == 'read') ?
 				'table-cell' : 'none';
 	}
-	if (!have_write && up2k)
+
+	if (window['up2k'])
 		up2k.set_fsearch();
 }
 
@@ -1021,5 +1022,8 @@ function reload_browser(not_mp) {
 		widget.close();
 		mp = init_mp();
 	}
+
+	if (window['up2k'])
+		up2k.set_fsearch();
 }
 reload_browser(true);
