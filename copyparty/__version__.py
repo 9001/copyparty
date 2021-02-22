@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 8, 0)
+VERSION = (0, 8, 1)
 CODENAME = "keeping track"
 BUILD_DT = (2021, 2, 22)
 
