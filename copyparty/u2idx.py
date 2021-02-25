@@ -24,7 +24,7 @@ class U2idx(object):
             self.log("could not load sqlite3; searchign wqill be disabled")
             return
 
-        self.dbs = {}
+        self.cur = {}
 
     def log(self, msg):
         self.log_func("u2idx", msg)
@@ -73,16 +73,16 @@ class U2idx(object):
         ret = []
         lim = 100
         for (vtop, ptop, flags) in vols:
-            db = self.dbs.get(ptop)
-            if not db:
-                db = _open(ptop)
-                if not db:
+            cur = self.cur.get(ptop)
+            if not cur:
+                cur = _open(ptop)
+                if not cur:
                     continue
 
-                self.dbs[ptop] = db
+                self.cur[ptop] = cur
                 # self.log("idx /{} @ {} {}".format(vtop, ptop, flags))
 
-            c = db.execute(qstr, qv)
+            c = cur.execute(qstr, qv)
             for _, ts, sz, rd, fn in c:
                 lim -= 1
                 if lim <= 0:
@@ -97,7 +97,7 @@ class U2idx(object):
 def _open(ptop):
     db_path = os.path.join(ptop, ".hist", "up2k.db")
     if os.path.exists(db_path):
-        return sqlite3.connect(db_path)
+        return sqlite3.connect(db_path).cursor()
 
 
 def _conv_sz(q, body, k, sql):
