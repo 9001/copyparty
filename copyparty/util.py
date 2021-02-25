@@ -633,6 +633,40 @@ def read_socket_unbounded(sr):
         yield buf
 
 
+def read_socket_chunked(sr, log=None):
+    err = "expected chunk length, got [{}] |{}| instead"
+    while True:
+        buf = b""
+        while b"\r" not in buf:
+            rbuf = sr.recv(2)
+            if not rbuf or len(buf) > 16:
+                err = err.format(buf.decode("utf-8", "replace"), len(buf))
+                raise Pebkac(400, err)
+
+            buf += rbuf
+
+        if not buf.endswith(b"\n"):
+            sr.recv(1)
+
+        try:
+            chunklen = int(buf.rstrip(b"\r\n"), 16)
+        except:
+            err = err.format(buf.decode("utf-8", "replace"), len(buf))
+            raise Pebkac(400, err)
+
+        if chunklen == 0:
+            sr.recv(2)  # \r\n after final chunk
+            return
+
+        if log:
+            log("receiving {} byte chunk".format(chunklen))
+
+        for chunk in read_socket(sr, chunklen):
+            yield chunk
+
+        sr.recv(2)  # \r\n after each chunk too
+
+
 def hashcopy(actor, fin, fout):
     u32_lim = int((2 ** 31) * 0.9)
     hashobj = hashlib.sha512()

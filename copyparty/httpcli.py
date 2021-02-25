@@ -323,8 +323,11 @@ class HttpCli(object):
         raise Pebkac(405, "don't know how to handle POST({})".format(ctype))
 
     def get_body_reader(self):
-        remains = int(self.headers.get("content-length", None))
-        if remains is None:
+        chunked = "chunked" in self.headers.get("transfer-encoding", "").lower()
+        remains = int(self.headers.get("content-length", -1))
+        if chunked:
+            return read_socket_chunked(self.sr), remains
+        elif remains == -1:
             self.keepalive = False
             return read_socket_unbounded(self.sr), remains
         else:

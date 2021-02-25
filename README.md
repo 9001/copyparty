@@ -91,9 +91,22 @@ other metadata (like song tags etc) are not yet indexed for searching
   * `await fetch('https://127.0.0.1:3923/', {method:"PUT", body: JSON.stringify(foo)});`
   * `var xhr = new XMLHttpRequest(); xhr.open('POST', 'https://127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
 
+* curl/wget: upload some files (post=file, chunk=stdin)
+  * `post(){ curl -b cppwd=wark http://127.0.0.1:3923/ -F act=bput -F f=@"$1";}`  
+    `post movie.mkv`
+  * `post(){ wget --header='Cookie: cppwd=wark' http://127.0.0.1:3923/?raw --post-file="$1" -O-;}`  
+    `post movie.mkv`
+  * `chunk(){ curl -b cppwd=wark http://127.0.0.1:3923/ -T-;}`  
+    `chunk <movie.mkv`
+
 * FUSE: mount a copyparty server as a local filesystem
   * cross-platform python client available in [./bin/](bin/)
   * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
+
+copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uplaods:
+
+    b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|head -c43;}
+    b512 <movie.mkv
 
 
 # dependencies
