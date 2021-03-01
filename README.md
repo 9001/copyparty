@@ -59,7 +59,7 @@ you may also want these, especially on servers:
 * server indexing
   * ☑ locate files by contents
   * ☑ search by name/path/date/size
-  * ✖ search by ID3-tags etc.
+  * ☑ search by ID3-tags etc.
 * markdown
   * ☑ viewer
   * ☑ editor (sure why not)
@@ -145,6 +145,10 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 # dependencies
 
 * `jinja2`
+
+optional, enables music tags:
+* either `mutagen` (fast, pure-python, skips a few tags)
+* or `FFprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
 optional, will eventually enable thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
