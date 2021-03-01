@@ -43,6 +43,21 @@ function ebi(id) {
     return document.getElementById(id);
 }
 
+function ev(e) {
+    e = e || window.event;
+    if (!e)
+        return;
+
+    if (e.preventDefault)
+        e.preventDefault()
+
+    if (e.stopPropagation)
+        e.stopPropagation();
+
+    e.returnValue = false;
+    return e;
+}
+
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
 if (!String.prototype.endsWith) {
@@ -79,10 +94,10 @@ function sortTable(table, col) {
     var tb = table.tBodies[0],
         th = table.tHead.rows[0].cells,
         tr = Array.prototype.slice.call(tb.rows, 0),
-        i, reverse = th[col].className == 'sort1' ? -1 : 1;
+        i, reverse = th[col].className.indexOf('sort1') !== -1 ? -1 : 1;
     for (var a = 0, thl = th.length; a < thl; a++)
-        th[a].className = '';
-    th[col].className = 'sort' + reverse;
+        th[a].className = th[a].className.replace(/ *sort-?1 */, " ");
+    th[col].className += ' sort' + reverse;
     var stype = th[col].getAttribute('sort');
     tr = tr.sort(function (a, b) {
         if (!a.cells[col])
@@ -107,7 +122,8 @@ function makeSortable(table) {
     if (th) i = th.length;
     else return; // if no `<thead>` then do nothing
     while (--i >= 0) (function (i) {
-        th[i].onclick = function () {
+        th[i].onclick = function (e) {
+            ev(e);
             sortTable(table, i);
         };
     }(i));
@@ -123,16 +139,13 @@ function makeSortable(table) {
 })();
 
 
-function opclick(ev) {
-    if (ev) //ie
-        ev.preventDefault();
+function opclick(e) {
+    ev(e);
 
     var dest = this.getAttribute('data-dest');
     goto(dest);
 
-    // writing a blank value makes ie8 segfault w
-    if (window.localStorage)
-        localStorage.setItem('opmode', dest || '.');
+    swrite('opmode', dest || undefined);
 
     var input = document.querySelector('.opview.act input:not([type="hidden"])')
     if (input)
@@ -167,11 +180,9 @@ function goto(dest) {
 
 (function () {
     goto();
-    if (window.localStorage) {
-        var op = localStorage.getItem('opmode');
-        if (op !== null && op !== '.')
-            goto(op);
-    }
+    var op = sread('opmode');
+    if (op !== null && op !== '.')
+        goto(op);
 })();
 
 
@@ -237,4 +248,36 @@ function has(haystack, needle) {
             return true;
 
     return false;
+}
+
+
+function sread(key) {
+    if (window.localStorage)
+        return localStorage.getItem(key);
+
+    return '';
+}
+
+function swrite(key, val) {
+    if (window.localStorage) {
+        if (val === undefined)
+            localStorage.removeItem(key);
+        else
+            localStorage.setItem(key, val);
+    }
+}
+
+function jread(key, fb) {
+    var str = sread(key);
+    if (!str)
+        return fb;
+
+    return JSON.parse(str);
+}
+
+function jwrite(key, val) {
+    if (!val)
+        swrite(key);
+    else
+        swrite(key, JSON.stringify(val));
 }

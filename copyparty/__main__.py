@@ -257,7 +257,7 @@ def main():
     ap2.add_argument("--no-mutagen", action="store_true", help="use ffprobe for tags instead")
     ap2.add_argument("-mtm", metavar="M=t,t,t", action="append", type=str, help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=str, help="tags to index/display (comma-sep.)",
-        default="circle,album,.tn,artist,title,.dur,.q")
+        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q")
 
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")

@@ -6,21 +6,6 @@ function dbg(msg) {
 	ebi('path').innerHTML = msg;
 }
 
-function ev(e) {
-	e = e || window.event;
-	if (!e)
-		return;
-
-	if (e.preventDefault)
-		e.preventDefault()
-
-	if (e.stopPropagation)
-		e.stopPropagation();
-
-	e.returnValue = false;
-	return e;
-}
-
 makeSortable(ebi('files'));
 
 
@@ -55,7 +40,7 @@ function init_mp() {
 	for (var a = 0, aa = tracks.length; a < aa; a++)
 		ebi('trk' + a).onclick = ev_play;
 
-	ret.vol = localStorage.getItem('vol');
+	ret.vol = sread('vol');
 	if (ret.vol !== null)
 		ret.vol = parseFloat(ret.vol);
 	else
@@ -67,7 +52,7 @@ function init_mp() {
 
 	ret.setvol = function (vol) {
 		ret.vol = Math.max(Math.min(vol, 1), 0);
-		localStorage.setItem('vol', vol);
+		swrite('vol', vol);
 
 		if (ret.au)
 			ret.au.volume = ret.expvol();
@@ -460,6 +445,11 @@ function play(tid, call_depth) {
 	mp.au.volume = mp.expvol();
 	var oid = 'trk' + tid;
 	setclass(oid, 'play act');
+	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+	for (var a = 0, aa = trs.length; a < aa; a++) {
+		trs[a].className = trs[a].className.replace(/ *play */, "");
+	}
+	ebi(oid).parentElement.parentElement.className += ' play';
 
 	try {
 		if (hack_attempt_play)
@@ -708,6 +698,7 @@ function autoplay_blocked() {
 
 		ofiles.innerHTML = html.join('\n');
 		ofiles.setAttribute("ts", this.ts);
+		filecols.set_style();
 		reload_browser();
 
 		ebi('unsearch').onclick = unsearch;
@@ -741,7 +732,7 @@ function autoplay_blocked() {
 		treefiles.appendChild(ebi('files'));
 		treefiles.appendChild(ebi('epi'));
 
-		localStorage.setItem('entreed', 'tree');
+		swrite('entreed', 'tree');
 		get_tree("", get_vpath());
 	}
 
@@ -911,6 +902,7 @@ function autoplay_blocked() {
 		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
 		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
 
+		filecols.set_style();
 		reload_tree();
 		reload_browser();
 	}
@@ -955,12 +947,12 @@ function autoplay_blocked() {
 		ebi('path').style.display = 'inline-block';
 		treetab.style.display = 'none';
 
-		localStorage.setItem('entreed', 'na');
+		swrite('entreed', 'na');
 	}
 
 	ebi('entree').onclick = entree;
 	ebi('detree').onclick = detree;
-	if (window.localStorage && localStorage.getItem('entreed') == 'tree')
+	if (sread('entreed') == 'tree')
 		entree();
 
 	window.onpopstate = function (e) {
@@ -973,7 +965,7 @@ function autoplay_blocked() {
 	};
 
 	if (window.history && history.pushState) {
-		var u = get_vpath();
+		var u = get_vpath() + window.location.hash;
 		history.replaceState(ebi('files').innerHTML, u, u);
 	}
 })();
@@ -1032,28 +1024,118 @@ function apply_perms(perms) {
 
 
 function mk_files_header(taglist) {
-	var html = ['<thead>', '<th></th>', '<th>File Name</th>', '<th sort="int">Size</th>'];
+	var html = [
+		'<thead>',
+		'<th></th>',
+		'<th><span>File Name</span></th>',
+		'<th sort="int"><span>Size</span></th>'
+	];
 	for (var a = 0; a < taglist.length; a++) {
 		var tag = taglist[a];
 		var c1 = tag.slice(0, 1).toUpperCase();
 		tag = c1 + tag.slice(1);
 		if (c1 == '.')
-			tag = '<th sort="int">' + tag.slice(1);
+			tag = '<th sort="int"><span>' + tag.slice(1);
 		else
-			tag = '<th>' + tag;
+			tag = '<th><span>' + tag;
 
-		html.push(tag + '</th>');
+		html.push(tag + '</span></th>');
 	}
 	html = html.concat([
-		'<th>T</th>',
-		'<th>Date</th>',
+		'<th><span>T</span></th>',
+		'<th><span>Date</span></th>',
 		'</thead>',
 	]);
 	return html;
 }
 
 
+var filecols = (function () {
+	var hidden = jread('filecols', []);
+
+	var add_btns = function () {
+		var ths = document.querySelectorAll('#files th>span');
+		for (var a = 0, aa = ths.length; a < aa; a++) {
+			var th = ths[a].parentElement;
+			var is_hidden = has(hidden, ths[a].textContent);
+			th.innerHTML = '<div class="cfg"><a href="#">' +
+				(is_hidden ? '+' : '-') + '</a></div>' + ths[a].outerHTML;
+
+			th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
+		}
+	};
+
+	var set_style = function () {
+		add_btns();
+
+		var ohidden = [],
+			ths = document.querySelectorAll('#files th'),
+			ncols = ths.length;
+
+		for (var a = 0; a < ncols; a++) {
+			var span = ths[a].getElementsByTagName('span');
+			if (span.length <= 0)
+				continue;
+
+			var name = span[0].textContent,
+				cls = '';
+
+			if (has(hidden, name)) {
+				ohidden.push(a);
+				cls = ' min';
+			}
+			ths[a].className = ths[a].className.replace(/ *min */, " ") + cls;
+		}
+		for (var a = 0; a < ncols; a++) {
+			var cls = has(ohidden, a) ? 'min' : '';
+			var tds = document.querySelectorAll('#files>tbody>tr>td:nth-child(' + (a + 1) + ')');
+			for (var b = 0, bb = tds.length; b < bb; b++) {
+				tds[b].setAttribute('class', cls);
+				if (a < 2)
+					continue;
+
+				if (cls) {
+					if (!tds[b].hasAttribute('html')) {
+						tds[b].setAttribute('html', tds[b].innerHTML);
+						tds[b].innerHTML = '...';
+					}
+				}
+				else if (tds[b].hasAttribute('html')) {
+					tds[b].innerHTML = tds[b].getAttribute('html');
+					tds[b].removeAttribute('html');
+				}
+			}
+		}
+	};
+	set_style();
+
+	var toggle = function (name) {
+		var ofs = hidden.indexOf(name);
+		if (ofs !== -1)
+			hidden.splice(ofs, 1);
+		else
+			hidden.push(name);
+
+		jwrite("filecols", hidden);
+		set_style();
+	};
+
+	return {
+		"add_btns": add_btns,
+		"set_style": set_style,
+		"toggle": toggle,
+	};
+})();
+
+
+function ev_row_tgl(e) {
+	ev(e);
+	filecols.toggle(this.parentElement.parentElement.getElementsByTagName('span')[0].textContent);
+}
+
+
 function reload_browser(not_mp) {
+	filecols.set_style();
 	makeSortable(ebi('files'));
 
 	var parts = get_vpath().split('/');

@@ -8,7 +8,7 @@
         },
         {
             "label": "no_dbg",
-            "command": "${config:python.pythonPath} -m copyparty -ed -emp -e2dsa -a ed:wark -v srv::r:aed:cnodupe ;exit 1",
+            "command": "${config:python.pythonPath} -m copyparty -ed -emp -e2dsa -e2ts -a ed:wark -v srv::r:aed:cnodupe -v dist:dist:r ;exit 1",
             "type": "shell"
         }
     ]

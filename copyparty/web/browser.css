@@ -96,7 +96,10 @@ a,
 }
 #files td {
 	border-bottom: 1px solid #111;
+}
+#files td+td+td {
 	max-width: 30em;
+	overflow: hidden;
 }
 #files tr+tr td {
 	border-top: 1px solid #383838;
@@ -168,7 +171,8 @@ a,
 	margin: -.2em;
 }
 #files tbody a.play.act {
-	color: #af0;
+	color: #840;
+	text-shadow: 0 0 .3em #b80;
 }
 #blocked {
 	position: fixed;
@@ -298,6 +302,20 @@ a,
 	max-width: 12em;
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
+}
+@media (min-width: 100em) {
+	#barpos,
+	#barbuf {
+		width: calc(100% - 24em);
+		left: 10em;
+		top: .7em;
+		height: 1.6em;
+		bottom: auto;
+	}
+	#widget {
+		bottom: -3.2em;
+		height: 3.2em;
+	}
 }
 
 
@@ -495,4 +513,43 @@ input[type="checkbox"]:checked+label {
 	animation: spin 1s linear infinite;
 	position: absolute;
 	z-index: 9;
+}
+#files .cfg {
+	display: none;
+	font-size: 2em;
+	white-space: nowrap;
+}
+#files th:hover .cfg,
+#files th.min .cfg {
+	display: block;
+	width: 1em;
+	border-radius: .2em;
+	margin: -1.3em auto 0 auto;
+	background: #444;
+}
+#files th.min .cfg {
+	margin: -.6em;
+}
+#files>thead>tr>th.min span {
+	position: absolute;
+	transform: rotate(270deg);
+	background: linear-gradient(90deg, #222, #444);
+	margin-left: -4.6em;
+	padding: .4em;
+	top: 5.4em;
+	width: 8em;
+	text-align: right;
+	letter-spacing: .04em;
+}
+#files td:nth-child(2n) {
+	color: #f5a;
+}
+#files td.min a {
+	display: none;
+}
+#files tr.play td {
+	background: #fc4;
+	border-color: transparent;
+	color: #400;
+	text-shadow: none;
 }

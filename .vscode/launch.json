@@ -13,10 +13,13 @@
                 "-ed",
                 "-emp",
                 "-e2dsa",
+                "-e2ts",
                 "-a",
                 "ed:wark",
                 "-v",
-                "srv::r:aed:cnodupe"
+                "srv::r:aed:cnodupe",
+                "-v",
+                "dist:dist:r"
             ]
         },
         {

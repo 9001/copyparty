@@ -524,11 +524,9 @@ dom_navtgl.onclick = function () {
     dom_navtgl.innerHTML = hidden ? 'show nav' : 'hide nav';
     dom_nav.style.display = hidden ? 'none' : 'block';
 
-    if (window.localStorage)
-        localStorage.setItem('hidenav', hidden ? 1 : 0);
-
+    swrite('hidenav', hidden ? 1 : 0);
     redraw();
 };
 
-if (window.localStorage && localStorage.getItem('hidenav') == 1)
+if (sread('hidenav') == 1)
     dom_navtgl.onclick();

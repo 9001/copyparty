@@ -210,7 +210,7 @@ function up2k_init(have_crypto) {
     }
 
     function cfg_get(name) {
-        var val = localStorage.getItem(name);
+        var val = sread(name);
         if (val === null)
             return parseInt(ebi(name).value);
 
@@ -223,7 +223,7 @@ function up2k_init(have_crypto) {
         if (!o)
             return defval;
 
-        var val = localStorage.getItem(name);
+        var val = sread(name);
         if (val === null)
             val = defval;
         else
@@ -234,8 +234,7 @@ function up2k_init(have_crypto) {
     }
 
     function bcfg_set(name, val) {
-        localStorage.setItem(
-            name, val ? '1' : '0');
+        swrite(name, val ? '1' : '0');
 
         var o = ebi(name);
         if (o)
@@ -1033,7 +1032,7 @@ function up2k_init(have_crypto) {
                 return;
 
             parallel_uploads = v;
-            localStorage.setItem('nthread', v);
+            swrite('nthread', v);
             obj.style.background = '#444';
             return;
         }
