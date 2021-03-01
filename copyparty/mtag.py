@@ -24,7 +24,7 @@ class MTag(object):
             try:
                 import mutagen
             except:
-                self.log("could not load mutagen, trying ffprobe instead")
+                self.log("\033[33mcould not load mutagen, trying ffprobe instead")
                 backend = "ffprobe"
 
         if backend == "ffprobe":
