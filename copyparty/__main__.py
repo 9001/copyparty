@@ -198,7 +198,7 @@ def main():
                and "cflag" is config flags to set on this volume
             
             list of cflags:
-              cnodupe rejects existing files (instead of symlinking them)
+              "cnodupe" rejects existing files (instead of symlinking them)
 
             example:\033[35m
               -a ed:hunter2 -v .::r:aed -v ../inc:dump:w:aed:cnodupe  \033[36m
@@ -239,9 +239,6 @@ def main():
     ap.add_argument("-q", action="store_true", help="quiet")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
-    ap.add_argument("-e2d", action="store_true", help="enable up2k database")
-    ap.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
-    ap.add_argument("-e2dsa", action="store_true", help="scan all folders (for search), sets -e2ds")
     ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap.add_argument("-nih", action="store_true", help="no info hostname")
@@ -250,6 +247,18 @@ def main():
     ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
+    ap2 = ap.add_argument_group('database options')
+    ap2.add_argument("-e2d", action="store_true", help="enable up2k database")
+    ap2.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
+    ap2.add_argument("-e2dsa", action="store_true", help="scan all folders (for search), sets -e2ds")
+    ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing")
+    ap2.add_argument("-e2ts", action="store_true", help="enable metadata scanner, sets -e2t")
+    ap2.add_argument("-e2tsr", action="store_true", help="rescan all metadata, sets -e2ts")
+    ap2.add_argument("--no-mutagen", action="store_true", help="use ffprobe for tags instead")
+    ap2.add_argument("-mtm", metavar="M=t,t,t", action="append", type=str, help="add/replace metadata mapping")
+    ap2.add_argument("-mte", metavar="M,M,M", type=str, help="tags to index/display (comma-sep.)",
+        default="circle,album,.tn,artist,title,.dur,.q")
+
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext")
@@ -257,14 +266,20 @@ def main():
     ap2.add_argument("--ciphers", metavar="LIST", help="set allowed ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
+    
     al = ap.parse_args()
     # fmt: on
 
-    if al.e2dsa:
-        al.e2ds = True
-
-    if al.e2ds:
-        al.e2d = True
+    # propagate implications
+    for k1, k2 in [
+        ["e2dsa", "e2ds"],
+        ["e2ds", "e2d"],
+        ["e2tsr", "e2ts"],
+        ["e2ts", "e2t"],
+        ["e2t", "e2d"],
+    ]:
+        if getattr(al, k1):
+            setattr(al, k2, True)
 
     al.i = al.i.split(",")
     try:

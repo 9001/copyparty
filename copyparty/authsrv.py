@@ -206,8 +206,11 @@ class AuthSrv(object):
             if lvl in "wa":
                 mwrite[vol_dst].append(uname)
             if lvl == "c":
-                # config option, currently switches only
-                mflags[vol_dst][uname] = True
+                cval = True
+                if "=" in uname:
+                    uname, cval = uname.split("=", 1)
+
+                mflags[vol_dst][uname] = cval
 
     def reload(self):
         """
@@ -248,12 +251,19 @@ class AuthSrv(object):
                 perms = perms.split(":")
                 for (lvl, uname) in [[x[0], x[1:]] for x in perms]:
                     if lvl == "c":
-                        # config option, currently switches only
-                        mflags[dst][uname] = True
+                        cval = True
+                        if "=" in uname:
+                            uname, cval = uname.split("=", 1)
+
+                        mflags[dst][uname] = cval
+                        continue
+
                     if uname == "":
                         uname = "*"
+
                     if lvl in "ra":
                         mread[dst].append(uname)
+
                     if lvl in "wa":
                         mwrite[dst].append(uname)
 
@@ -268,6 +278,7 @@ class AuthSrv(object):
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             vfs = VFS(os.path.abspath("."), "")
+            vfs.flags["d2d"] = True
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
@@ -300,15 +311,27 @@ class AuthSrv(object):
             )
             raise Exception("invalid config")
 
+        for vol in vfs.all_vols.values():
+            if (self.args.e2ds and vol.uwrite) or self.args.e2dsa:
+                vol.flags["e2ds"] = True
+
+            if self.args.e2d:
+                vol.flags["e2d"] = True
+
+            for k in ["e2t", "e2ts", "e2tsr"]:
+                if getattr(self.args, k):
+                    vol.flags[k] = True
+
+            # default tag-list if unset
+            if "mte" not in vol.flags:
+                vol.flags["mte"] = self.args.mte
+
         try:
             v, _ = vfs.get("/", "*", False, True)
             if self.warn_anonwrite and os.getcwd() == v.realpath:
                 self.warn_anonwrite = False
-                self.log(
-                    "\033[31manyone can read/write the current directory: {}\033[0m".format(
-                        v.realpath
-                    )
-                )
+                msg = "\033[31manyone can read/write the current directory: {}\033[0m"
+                self.log(msg.format(v.realpath))
         except Pebkac:
             self.warn_anonwrite = True
 

@@ -82,7 +82,40 @@ path/name queries are space-separated, AND'ed together, and words are negated wi
 * path: `shibayan -bossa` finds all files where one of the folders contain `shibayan` but filters out any results where `bossa` exists somewhere in the path
 * name: `demetori styx` gives you [good stuff](https://www.youtube.com/watch?v=zGh0g14ZJ8I&list=PL3A147BD151EE5218&index=9)
 
-other metadata (like song tags etc) are not yet indexed for searching
+
+## search configuration
+
+searching relies on two databases, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`). Configuration can be done through arguments, volume flags, or a mix of both.
+
+through arguments:
+* `-e2d` enables file indexing on upload
+* `-e2ds` scans writable folders on startup
+* `-e2dsa` scans all mounted volumes (including readonly ones)
+* `-e2t` enables metadata indexing on upload
+* `-e2ts` scans for tags in all files that don't have tags yet
+* `-e2tsr` deletes all existing tags, so a full reindex
+
+in addition to `d2d` and `d2t`, the same arguments can be set as volume flags:
+* `-v ~/music::ce2dsa:ce2tsr` does a full reindex of everything on startup
+* `-v ~/music::cd2d` disables **all** indexing, even if any `-e2*` are on
+* `-v ~/music::cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
+
+`e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
+
+`-mte` decides which tags to index and display in the browser (and also the display order), this can be changed per-volume:
+* `-v ~/music::cmte=title,artist` indexes and displays *title* followed by *artist*
+
+if you add/remove a tag from `mte` you will need to run with `-e2tsr` once to rebuild the database, otherwise only new files will be affected
+
+`-mtm` can be used to add or redefine a metadata mapping, say you have media files with `foo` and `bar` tags and you want them to display as `qux` in the browser (preferring `foo` if both are present), then do `-mtm qux=foo,bar` and now you can `-mte artist,title,qux`
+
+see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copyparty/blob/master/copyparty/mtag.py) for the default mappings (should cover mp3,opus,flac,m4a,wav,aif,)
+
+`--no-mutagen` disables mutagen and uses ffprobe instead, which...
+* is about 20x slower than mutagen
+* catches a few tags that mutagen doesn't
+* avoids pulling any GPL code into copyparty
+* more importantly runs ffprobe on incoming files which is bad if your ffmpeg has a cve
 
 
 # client examples

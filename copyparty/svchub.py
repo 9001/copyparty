@@ -39,14 +39,6 @@ class SvcHub(object):
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
-        if self.args.e2ds:
-            auth = AuthSrv(self.args, self.log, False)
-            vols = auth.vfs.all_vols.values()
-            if not self.args.e2dsa:
-                vols = [x for x in vols if x.uwrite]
-
-            self.up2k.build_indexes(vols)
-
         # decide which worker impl to use
         if self.check_mp_enable():
             from .broker_mp import BrokerMp as Broker

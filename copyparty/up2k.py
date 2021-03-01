@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import re
 import os
+import sys
 import time
 import math
 import json
@@ -12,6 +13,7 @@ import shutil
 import base64
 import hashlib
 import threading
+import traceback
 from copy import deepcopy
 
 from .__init__ import WINDOWS
@@ -27,6 +29,8 @@ from .util import (
     w8b64enc,
     w8b64dec,
 )
+from .mtag import MTag
+from .authsrv import AuthSrv
 
 try:
     HAVE_SQLITE3 = True
@@ -55,12 +59,14 @@ class Up2k(object):
         # state
         self.mutex = threading.Lock()
         self.registry = {}
+        self.entags = {}
+        self.flags = {}
         self.cur = {}
 
         self.mem_cur = None
         if HAVE_SQLITE3:
             # mojibake detector
-            self.mem_cur = sqlite3.connect(":memory:", check_same_thread=False).cursor()
+            self.mem_cur = self._orz(":memory:")
             self.mem_cur.execute(r"create table a (b text)")
 
         if WINDOWS:
@@ -70,16 +76,24 @@ class Up2k(object):
             thr.daemon = True
             thr.start()
 
-        if self.persist:
-            thr = threading.Thread(target=self._snapshot)
-            thr.daemon = True
-            thr.start()
+        self.mtag = MTag(self.log_func, self.args)
+        if not self.mtag.usable:
+            self.mtag = None
 
         # static
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
 
         if self.persist and not HAVE_SQLITE3:
             self.log("could not initialize sqlite3, will use in-memory registry only")
+
+        # this is kinda jank
+        auth = AuthSrv(self.args, self.log, False)
+        self.init_indexes(auth)
+
+        if self.persist:
+            thr = threading.Thread(target=self._snapshot)
+            thr.daemon = True
+            thr.start()
 
     def log(self, msg):
         self.log_func("up2k", msg + "\033[K")
@@ -119,7 +133,49 @@ class Up2k(object):
 
         return ret
 
-    def register_vpath(self, ptop):
+    def init_indexes(self, auth):
+        self.pp = ProgressPrinter()
+        vols = auth.vfs.all_vols.values()
+        t0 = time.time()
+
+        # e2ds(a) volumes first,
+        # also covers tags where e2ts is set
+        for vol in vols:
+            en = {}
+            if "mte" in vol.flags:
+                en = {k: True for k in vol.flags["mte"].split(",")}
+
+            self.entags[vol.realpath] = en
+
+            if "e2ds" in vol.flags:
+                r = self._build_file_index(vol, vols)
+                if not r:
+                    needed_mutagen = True
+
+        # open the rest + do any e2ts(a)
+        needed_mutagen = False
+        for vol in vols:
+            r = self.register_vpath(vol.realpath, vol.flags)
+            if not r or "e2ts" not in vol.flags:
+                continue
+
+            cur, db_path, sz0 = r
+            n_add, n_rm, success = self._build_tags_index(vol.realpath)
+            if not success:
+                needed_mutagen = True
+
+            if n_add or n_rm:
+                self.vac(cur, db_path, n_add, n_rm, sz0)
+
+        self.pp.end = True
+        msg = "{} volumes in {:.2f} sec"
+        self.log(msg.format(len(vols), time.time() - t0))
+
+        if needed_mutagen:
+            msg = "\033[31mcould not read tags because no backends are available (mutagen or ffprobe)\033[0m"
+            self.log(msg)
+
+    def register_vpath(self, ptop, flags):
         with self.mutex:
             if ptop in self.registry:
                 return None
@@ -138,8 +194,9 @@ class Up2k(object):
                 m = [m] + self._vis_reg_progress(reg)
                 self.log("\n".join(m))
 
+            self.flags[ptop] = flags
             self.registry[ptop] = reg
-            if not self.persist or not HAVE_SQLITE3:
+            if not self.persist or not HAVE_SQLITE3 or "d2d" in flags:
                 return None
 
             try:
@@ -152,47 +209,54 @@ class Up2k(object):
                 return None
 
             try:
+                sz0 = 0
+                if os.path.exists(db_path):
+                    sz0 = os.path.getsize(db_path) // 1024
+
                 cur = self._open_db(db_path)
                 self.cur[ptop] = cur
-                return cur
-            except Exception as ex:
-                self.log("cannot use database at [{}]: {}".format(ptop, repr(ex)))
+                return [cur, db_path, sz0]
+            except:
+                msg = "cannot use database at [{}]:\n{}"
+                self.log(msg.format(ptop, traceback.format_exc()))
 
             return None
 
-    def build_indexes(self, writeables):
-        tops = [d.realpath for d in writeables]
-        self.pp = ProgressPrinter()
-        t0 = time.time()
-        for top in tops:
-            dbw = [self.register_vpath(top), 0, time.time()]
-            if not dbw[0]:
-                continue
+    def _build_file_index(self, vol, all_vols):
+        do_vac = False
+        top = vol.realpath
+        reg = self.register_vpath(top, vol.flags)
+        if not reg:
+            return
 
-            self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
-            db_path = os.path.join(top, ".hist", "up2k.db")
-            sz0 = os.path.getsize(db_path) // 1024
+        _, db_path, sz0 = reg
+        dbw = [reg[0], 0, time.time()]
+        self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
 
-            # can be symlink so don't `and d.startswith(top)``
-            excl = set([d for d in tops if d != top])
-            n_add = self._build_dir(dbw, top, excl, top)
-            n_rm = self._drop_lost(dbw[0], top)
-            if dbw[1]:
-                self.log("commit {} new files".format(dbw[1]))
-
+        # can be symlink so don't `and d.startswith(top)``
+        excl = set([d.realpath for d in all_vols if d != vol])
+        n_add = self._build_dir(dbw, top, excl, top)
+        n_rm = self._drop_lost(dbw[0], top)
+        if dbw[1]:
+            self.log("commit {} new files".format(dbw[1]))
             dbw[0].connection.commit()
-            if n_add or n_rm:
-                db_path = os.path.join(top, ".hist", "up2k.db")
-                sz1 = os.path.getsize(db_path) // 1024
-                dbw[0].execute("vacuum")
-                sz2 = os.path.getsize(db_path) // 1024
-                msg = "{} new, {} del, {} kB vacced, {} kB gain, {} kB now".format(
-                    n_add, n_rm, sz1 - sz2, sz2 - sz0, sz2
-                )
-                self.log(msg)
 
-        self.pp.end = True
-        self.log("{} volumes in {:.2f} sec".format(len(tops), time.time() - t0))
+        n_add, n_rm, success = self._build_tags_index(vol.realpath)
+
+        dbw[0].connection.commit()
+        if n_add or n_rm or do_vac:
+            self.vac(dbw[0], db_path, n_add, n_rm, sz0)
+
+        return success
+
+    def vac(self, cur, db_path, n_add, n_rm, sz0):
+        sz1 = os.path.getsize(db_path) // 1024
+        cur.execute("vacuum")
+        sz2 = os.path.getsize(db_path) // 1024
+        msg = "{} new, {} del, {} kB vacced, {} kB gain, {} kB now".format(
+            n_add, n_rm, sz1 - sz2, sz2 - sz0, sz2
+        )
+        self.log(msg)
 
     def _build_dir(self, dbw, top, excl, cdir):
         try:
@@ -298,39 +362,144 @@ class Up2k(object):
 
         return len(rm)
 
+    def _build_tags_index(self, ptop):
+        entags = self.entags[ptop]
+        flags = self.flags[ptop]
+        cur = self.cur[ptop]
+        n_add = 0
+        n_rm = 0
+        n_buf = 0
+        last_write = time.time()
+
+        if "e2tsr" in flags:
+            n_rm = cur.execute("select count(w) from mt").fetchone()[0]
+            if n_rm:
+                self.log("discarding {} media tags for a full rescan".format(n_rm))
+                cur.execute("delete from mt")
+            else:
+                self.log("volume has e2tsr but there are no media tags to discard")
+
+        # integrity: drop tags for tracks that were deleted
+        if "e2t" in flags:
+            drops = []
+            c2 = cur.connection.cursor()
+            up_q = "select w from up where substr(w,1,16) = ?"
+            for (w,) in cur.execute("select w from mt"):
+                if not c2.execute(up_q, (w,)).fetchone():
+                    drops.append(w)
+            c2.close()
+
+            if drops:
+                msg = "discarding media tags for {} deleted files"
+                self.log(msg.format(len(drops)))
+                n_rm += len(drops)
+                for w in drops:
+                    cur.execute("delete from up where rowid = ?", (w,))
+
+        # bail if a volume flag disables indexing
+        if "d2t" in flags or "d2d" in flags:
+            return n_add, n_rm, True
+
+        # add tags for new files
+        if "e2ts" in flags:
+            if not self.mtag:
+                return n_add, n_rm, False
+
+            c2 = cur.connection.cursor()
+            n_left = cur.execute("select count(w) from up").fetchone()[0]
+            for w, rd, fn in cur.execute("select w, rd, fn from up"):
+                n_left -= 1
+                q = "select w from mt where w = ?"
+                if c2.execute(q, (w[:16],)).fetchone():
+                    continue
+
+                abspath = os.path.join(ptop, rd, fn)
+                self.pp.msg = "c{} {}".format(n_left, abspath)
+                tags = self.mtag.get(abspath)
+                tags = {k: v for k, v in tags.items() if k in entags}
+                if not tags:
+                    # indicate scanned without tags
+                    tags = {"x": 0}
+
+                for k, v in tags.items():
+                    q = "insert into mt values (?,?,?)"
+                    c2.execute(q, (w[:16], k, v))
+                    n_add += 1
+                    n_buf += 1
+
+                td = time.time() - last_write
+                if n_buf >= 4096 or td >= 60:
+                    self.log("commit {} new tags".format(n_buf))
+                    cur.connection.commit()
+                    last_write = time.time()
+                    n_buf = 0
+
+            c2.close()
+
+        return n_add, n_rm, True
+
+    def _orz(self, db_path):
+        return sqlite3.connect(db_path, check_same_thread=False).cursor()
+
     def _open_db(self, db_path):
         existed = os.path.exists(db_path)
-        cur = sqlite3.connect(db_path, check_same_thread=False).cursor()
+        cur = self._orz(db_path)
         try:
             ver = self._read_ver(cur)
-
-            if ver == 1:
-                cur = self._upgrade_v1(cur, db_path)
-                ver = self._read_ver(cur)
-
-            if ver == 2:
-                try:
-                    nfiles = next(cur.execute("select count(w) from up"))[0]
-                    self.log("found DB at {} |{}|".format(db_path, nfiles))
-                    return cur
-                except Exception as ex:
-                    self.log("WARN: could not list files, DB corrupt?\n  " + repr(ex))
-
-            if ver is not None:
-                self.log("REPLACING unsupported DB (v.{}) at {}".format(ver, db_path))
-            elif not existed:
-                raise Exception("whatever")
-
-            conn = cur.connection
-            cur.close()
-            conn.close()
-            os.unlink(db_path)
-            cur = sqlite3.connect(db_path, check_same_thread=False).cursor()
         except:
-            pass
+            ver = None
+            if not existed:
+                return self._create_db(db_path, cur)
 
-        # sqlite is variable-width only, no point in using char/nchar/varchar
+        orig_ver = ver
+        if not ver or ver < 3:
+            bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
+            db = cur.connection
+            cur.close()
+            db.close()
+            msg = "creating new DB (old is bad); backup: {}"
+            if ver:
+                msg = "creating backup before upgrade: {}"
+
+            self.log(msg.format(bak))
+            shutil.copy2(db_path, bak)
+            cur = self._orz(db_path)
+
+        if ver == 1:
+            cur = self._upgrade_v1(cur, db_path)
+            if cur:
+                ver = 2
+
+        if ver == 2:
+            cur = self._create_v3(cur)
+            ver = self._read_ver(cur) if cur else None
+
+        if ver == 3:
+            if orig_ver != ver:
+                cur.connection.commit()
+                cur.execute("vacuum")
+                cur.connection.commit()
+
+            try:
+                nfiles = next(cur.execute("select count(w) from up"))[0]
+                self.log("OK: {} |{}|".format(db_path, nfiles))
+                return cur
+            except Exception as ex:
+                self.log("WARN: could not list files, DB corrupt?\n  " + repr(ex))
+
+        if cur:
+            db = cur.connection
+            cur.close()
+            db.close()
+
+        return self._create_db(db_path, None)
+
+    def _create_db(self, db_path, cur):
+        if not cur:
+            cur = self._orz(db_path)
+
         self._create_v2(cur)
+        self._create_v3(cur)
         cur.connection.commit()
         self.log("created DB at {}".format(db_path))
         return cur
@@ -348,24 +517,45 @@ class Up2k(object):
 
     def _create_v2(self, cur):
         for cmd in [
-            r"create table ks (k text, v text)",
-            r"create table ki (k text, v int)",
             r"create table up (w text, mt int, sz int, rd text, fn text)",
-            r"insert into ki values ('sver', 2)",
-            r"create index up_w on up(w)",
             r"create index up_rd on up(rd)",
             r"create index up_fn on up(fn)",
         ]:
             cur.execute(cmd)
+        return cur
+
+    def _create_v3(self, cur):
+        """
+        collision in 2^(n/2) files where n = bits (6 bits/ch)
+          10*6/2 = 2^30 =       1'073'741'824, 24.1mb idx
+          12*6/2 = 2^36 =      68'719'476'736, 24.8mb idx
+          16*6/2 = 2^48 = 281'474'976'710'656, 26.1mb idx
+        """
+        for c, ks in [["drop table k", "isv"], ["drop index up_", "w"]]:
+            for k in ks:
+                try:
+                    cur.execute(c + k)
+                except:
+                    pass
+
+        for cmd in [
+            r"create index up_w on up(substr(w,1,16))",
+            r"create table mt (w text, k text, v int)",
+            r"create index mt_w on mt(w)",
+            r"create index mt_k on mt(k)",
+            r"create index mt_v on mt(v)",
+            r"create table kv (k text, v int)",
+            r"insert into kv values ('sver', 3)",
+        ]:
+            cur.execute(cmd)
+        return cur
 
     def _upgrade_v1(self, odb, db_path):
-        self.log("\033[33mupgrading v1 to v2:\033[0m {}".format(db_path))
-
         npath = db_path + ".next"
         if os.path.exists(npath):
             os.unlink(npath)
 
-        ndb = sqlite3.connect(npath, check_same_thread=False).cursor()
+        ndb = self._orz(npath)
         self._create_v2(ndb)
 
         c = odb.execute("select * from up")
@@ -377,14 +567,10 @@ class Up2k(object):
         ndb.connection.commit()
         ndb.connection.close()
         odb.connection.close()
-        bpath = db_path + ".bak.v1"
-        self.log("success; backup at: " + bpath)
-        atomic_move(db_path, bpath)
         atomic_move(npath, db_path)
-        return sqlite3.connect(db_path, check_same_thread=False).cursor()
+        return self._orz(db_path)
 
     def handle_json(self, cj):
-        self.register_vpath(cj["ptop"])
         cj["name"] = sanitize_fn(cj["name"])
         cj["poke"] = time.time()
         wark = self._get_wark(cj)
@@ -394,7 +580,10 @@ class Up2k(object):
             cur = self.cur.get(cj["ptop"], None)
             reg = self.registry[cj["ptop"]]
             if cur:
-                cur = cur.execute(r"select * from up where w = ?", (wark,))
+                cur = cur.execute(
+                    r"select * from up where substr(w,1,16) = ? and w = ?",
+                    (wark[:16], wark,),
+                )
                 for _, dtime, dsize, dp_dir, dp_fn in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = self.w8dec(dp_dir, dp_fn)
@@ -407,7 +596,6 @@ class Up2k(object):
                             "prel": dp_dir,
                             "vtop": cj["vtop"],
                             "ptop": cj["ptop"],
-                            "flag": cj["flag"],
                             "size": dsize,
                             "lmod": dtime,
                             "hash": [],
@@ -444,7 +632,7 @@ class Up2k(object):
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += "/" + vsrc + " "
                         raise Pebkac(400, err)
-                    elif "nodupe" in job["flag"]:
+                    elif "nodupe" in self.flags[job["ptop"]]:
                         self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
                         err = "upload rejected, file already exists:\n/" + vsrc + " "
                         raise Pebkac(400, err)
@@ -474,7 +662,6 @@ class Up2k(object):
                     "vtop",
                     "ptop",
                     "prel",
-                    "flag",
                     "name",
                     "size",
                     "lmod",
@@ -603,7 +790,7 @@ class Up2k(object):
 
     def db_add(self, db, wark, rd, fn, ts, sz):
         sql = "insert into up values (?,?,?,?,?)"
-        v = (wark, ts, sz, rd, fn)
+        v = (wark, int(ts), sz, rd, fn)
         try:
             db.execute(sql, v)
         except:

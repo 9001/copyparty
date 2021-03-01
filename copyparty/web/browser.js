@@ -472,7 +472,7 @@ function play(tid, call_depth) {
 		o.setAttribute('id', 'thx_js');
 		if (window.history && history.replaceState) {
 			var nurl = (document.location + '').split('#')[0] + '#' + oid;
-			history.replaceState(ebi('files').tBodies[0].innerHTML, nurl, nurl);
+			history.replaceState(ebi('files').innerHTML, nurl, nurl);
 		}
 		else {
 			document.location.hash = oid;
@@ -591,6 +591,12 @@ function autoplay_blocked() {
 			["name", "name", "name contains &nbsp; (negate with -nope)", "46"]
 		]
 	];
+
+	if (document.querySelector('#srch_form.tags'))
+		sconf.push(["tags",
+			["tags", "tags", "tags contains", "46"]
+		]);
+
 	var html = [];
 	var orig_html = null;
 	for (var a = 0; a < sconf.length; a++) {
@@ -653,6 +659,9 @@ function autoplay_blocked() {
 			return;
 		}
 
+		var res = JSON.parse(this.responseText),
+			tagord = res.tag_order;
+
 		var ofiles = ebi('files');
 		if (ofiles.getAttribute('ts') > this.ts)
 			return;
@@ -660,10 +669,11 @@ function autoplay_blocked() {
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'none';
 
-		var html = ['<tr><td>-</td><td colspan="4"><a href="#" id="unsearch">close search results</a></td></tr>'];
-		var res = JSON.parse(this.responseText);
-		for (var a = 0; a < res.length; a++) {
-			var r = res[a],
+		var html = mk_files_header(tagord);
+		html.push('<tbody>');
+		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch">close search results</a></td></tr>');
+		for (var a = 0; a < res.hits.length; a++) {
+			var r = res.hits[a],
 				ts = parseInt(r.ts),
 				sz = esc(r.sz + ''),
 				rp = esc(r.rp + ''),
@@ -674,14 +684,29 @@ function autoplay_blocked() {
 				ext = '%';
 
 			links = links.join('');
-			html.push('<tr><td>-</td><td><div>' + links + '</div></td><td>' + sz +
-				'</td><td>' + ext + '</td><td>' + unix2iso(ts) + '</td></tr>');
+			var nodes = ['<tr><td>-</td><td><div>' + links + '</div>', sz];
+			for (var b = 0; b < tagord.length; b++) {
+				var k = tagord[b],
+					v = r.tags[k] || "";
+
+				if (k == "dur") {
+					var sv = s2ms(v);
+					nodes[nodes.length - 1] += '</td><td sortv="' + v + '">' + sv;
+					continue;
+				}
+
+				nodes.push(v);
+			}
+
+			nodes = nodes.concat([ext, unix2iso(ts)]);
+			html.push(nodes.join('</td><td>'));
+			html.push('</td></tr>');
 		}
 
 		if (!orig_html)
-			orig_html = ebi('files').tBodies[0].innerHTML;
+			orig_html = ebi('files').innerHTML;
 
-		ofiles.tBodies[0].innerHTML = html.join('\n');
+		ofiles.innerHTML = html.join('\n');
 		ofiles.setAttribute("ts", this.ts);
 		reload_browser();
 
@@ -692,7 +717,7 @@ function autoplay_blocked() {
 		ev(e);
 		ebi('path').style.display = 'inline-block';
 		ebi('tree').style.display = 'block';
-		ebi('files').tBodies[0].innerHTML = orig_html;
+		ebi('files').innerHTML = orig_html;
 		orig_html = null;
 		reload_browser();
 	}
@@ -851,17 +876,34 @@ function autoplay_blocked() {
 		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
 		var nodes = res.dirs.concat(res.files);
 		var top = this.top;
-		var html = [];
+		var html = mk_files_header(res.taglist);
+		html.push('<tbody>');
 		for (var a = 0; a < nodes.length; a++) {
 			var r = nodes[a],
-				ln = '<tr><td>' + r.lead + '</td><td><a href="' +
-					top + r.href + '">' + esc(decodeURIComponent(r.href)) + '</a>';
+				ln = ['<tr><td>' + r.lead + '</td><td><a href="' +
+					top + r.href + '">' + esc(decodeURIComponent(r.href)) + '</a>', r.sz];
 
-			ln = [ln, r.sz, r.ext, unix2iso(r.ts)].join('</td><td>');
+			for (var b = 0; b < res.taglist.length; b++) {
+				var k = res.taglist[b],
+					v = (r.tags || {})[k] || "";
+
+				if (k[0] == '.')
+					k = k.slice(1);
+
+				if (k == "dur") {
+					var sv = s2ms(v);
+					ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
+					continue;
+				}
+				ln.push(v);
+			}
+			ln = ln.concat([r.ext, unix2iso(r.ts)]).join('</td><td>');
 			html.push(ln + '</td></tr>');
 		}
+		html.push('</tbody>');
 		html = html.join('\n');
-		ebi('files').tBodies[0].innerHTML = html;
+		ebi('files').innerHTML = html;
+
 		history.pushState(html, this.top, this.top);
 		apply_perms(res.perms);
 		despin('#files');
@@ -924,7 +966,7 @@ function autoplay_blocked() {
 	window.onpopstate = function (e) {
 		console.log(e.url + ' ,, ' + ((e.state + '').slice(0, 64)));
 		if (e.state) {
-			ebi('files').tBodies[0].innerHTML = e.state;
+			ebi('files').innerHTML = e.state;
 			reload_tree();
 			reload_browser();
 		}
@@ -932,7 +974,7 @@ function autoplay_blocked() {
 
 	if (window.history && history.pushState) {
 		var u = get_vpath();
-		history.replaceState(ebi('files').tBodies[0].innerHTML, u, u);
+		history.replaceState(ebi('files').innerHTML, u, u);
 	}
 })();
 
@@ -989,6 +1031,28 @@ function apply_perms(perms) {
 }
 
 
+function mk_files_header(taglist) {
+	var html = ['<thead>', '<th></th>', '<th>File Name</th>', '<th sort="int">Size</th>'];
+	for (var a = 0; a < taglist.length; a++) {
+		var tag = taglist[a];
+		var c1 = tag.slice(0, 1).toUpperCase();
+		tag = c1 + tag.slice(1);
+		if (c1 == '.')
+			tag = '<th sort="int">' + tag.slice(1);
+		else
+			tag = '<th>' + tag;
+
+		html.push(tag + '</th>');
+	}
+	html = html.concat([
+		'<th>T</th>',
+		'<th>Date</th>',
+		'</thead>',
+	]);
+	return html;
+}
+
+
 function reload_browser(not_mp) {
 	makeSortable(ebi('files'));
 
@@ -1012,6 +1076,7 @@ function reload_browser(not_mp) {
 			hsz = sz.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
 		oo[a].textContent = hsz;
+		oo[a].setAttribute("sortv", sz);
 	}
 
 	if (!not_mp) {

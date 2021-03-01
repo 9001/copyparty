@@ -26,7 +26,11 @@
     </div>
 
     <div id="op_search" class="opview">
+        {%- if have_tags_idx %}
+        <table id="srch_form" class="tags"></table>
+        {%- else %}
         <table id="srch_form"></table>
+        {%- endif %}
         <div id="srch_q"></div>
     </div>
     {%- include 'upload.html' %}
@@ -55,7 +59,14 @@
             <tr>
                 <th></th>
                 <th>File Name</th>
-                <th sort="int">File Size</th>
+                <th sort="int">Size</th>
+                {%- for k in taglist %}
+                    {%- if k.startswith('.') %}
+                        <td sort="int">{{ k[1:] }}</td>
+                    {%- else %}
+                        <td>{{ k[0]|upper }}{{ k[1:] }}</td>
+                    {%- endif %}
+                {%- endfor %}
                 <th>T</th>
                 <th>Date</th>
             </tr>
@@ -63,7 +74,13 @@
         <tbody>
 
 {%- for f in files %}
-<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td><td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
+    <tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td>
+    {%- if f.tags is defined %}
+        {%- for k in taglist %}
+            <td>{{ f.tags[k] }}</td>
+        {%- endfor %}
+    {%- endif %}
+    <td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
 {%- endfor %}
 
         </tbody>
@@ -86,7 +103,10 @@
             <canvas id="barbuf"></canvas>
         </div>
     </div>
-    
+
+    <script>
+        var tag_order_cfg = {{ tag_order }};
+    </script>
     <script src="/.cpr/util.js{{ ts }}"></script>
     <script src="/.cpr/browser.js{{ ts }}"></script>
     <script src="/.cpr/up2k.js{{ ts }}"></script>

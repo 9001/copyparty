@@ -772,13 +772,13 @@ function up2k_init(have_crypto) {
                 if (!response.name) {
                     var msg = '';
                     var smsg = '';
-                    if (!response || !response.length) {
+                    if (!response || !response.hits || !response.hits.length) {
                         msg = 'not found on server';
                         smsg = '404';
                     }
                     else {
                         smsg = 'found';
-                        var hit = response[0],
+                        var hit = response.hits[0],
                             msg = linksplit(hit.rp).join(''),
                             tr = unix2iso(hit.ts),
                             tu = unix2iso(t.lmod),

@@ -46,7 +46,7 @@ body {
 	display: none;
 }
 #files {
-	border-collapse: collapse;
+	border-spacing: 0;
 	margin-top: 2em;
 	z-index: 1;
 	position: relative;
@@ -94,6 +94,13 @@ a,
 	margin: 0;
 	padding: 0 .5em;
 }
+#files td {
+	border-bottom: 1px solid #111;
+	max-width: 30em;
+}
+#files tr+tr td {
+	border-top: 1px solid #383838;
+}
 #files tbody td:nth-child(3) {
 	font-family: monospace;
 	font-size: 1.3em;
@@ -111,6 +118,7 @@ a,
 #files tbody tr:last-child td {
 	padding-bottom: 1.3em;
 	border-bottom: .5em solid #444;
+	white-space: nowrap;
 }
 #files thead th[style] {
 	width: auto !important;
@@ -400,14 +408,13 @@ input[type="checkbox"]:checked+label {
 	color: #fff;
 }
 #files td div a {
-	display: table-cell;
+	display: inline-block;
 	white-space: nowrap;
 }
 #files td div a:last-child {
 	width: 100%;
 }
 #files td div {
-	display: table;
 	border-collapse: collapse;
 	width: 100%;
 }

@@ -76,7 +76,7 @@ function import_js(url, cb) {
 
 
 function sortTable(table, col) {
-    var tb = table.tBodies[0], // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
+    var tb = table.tBodies[0],
         th = table.tHead.rows[0].cells,
         tr = Array.prototype.slice.call(tb.rows, 0),
         i, reverse = th[col].className == 'sort1' ? -1 : 1;
@@ -90,11 +90,11 @@ function sortTable(table, col) {
         if (!b.cells[col])
             return 1;
 
-        var v1 = a.cells[col].textContent.trim();
-        var v2 = b.cells[col].textContent.trim();
+        var v1 = a.cells[col].getAttribute('sortv') || a.cells[col].textContent.trim();
+        var v2 = b.cells[col].getAttribute('sortv') || b.cells[col].textContent.trim();
         if (stype == 'int') {
-            v1 = parseInt(v1.replace(/,/g, ''));
-            v2 = parseInt(v2.replace(/,/g, ''));
+            v1 = parseInt(v1.replace(/,/g, '')) || 0;
+            v2 = parseInt(v2.replace(/,/g, '')) || 0;
             return reverse * (v1 - v2);
         }
         return reverse * (v1.localeCompare(v2));
@@ -222,6 +222,12 @@ function get_vpath() {
 
 function unix2iso(ts) {
     return new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
+}
+
+
+function s2ms(s) {
+    var m = Math.floor(s / 60);
+    return m + ":" + ("0" + (s - m * 60)).slice(-2);
 }
 
 

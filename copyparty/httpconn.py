@@ -20,10 +20,12 @@ except ImportError:
   you do not have jinja2 installed,\033[33m
   choose one of these:\033[0m
    * apt install python-jinja2
-   * python3 -m pip install --user jinja2
+   * {} -m pip install --user jinja2
    * (try another python version, if you have one)
    * (try copyparty.sfx instead)
-"""
+""".format(
+            os.path.basename(sys.executable)
+        )
     )
     sys.exit(1)
 

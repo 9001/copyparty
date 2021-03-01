@@ -222,6 +222,9 @@ class HttpCli(object):
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
+        if "tree" in self.uparam:
+            return self.tx_tree()
+
         # conditional redirect to single volumes
         if self.vpath == "" and not self.uparam:
             nread = len(self.rvol)
@@ -245,9 +248,6 @@ class HttpCli(object):
         if "h" in self.uparam:
             self.vpath = None
             return self.tx_mounts()
-
-        if "tree" in self.uparam:
-            return self.tx_tree()
 
         return self.tx_browser()
 
@@ -428,7 +428,6 @@ class HttpCli(object):
         body["ptop"] = vfs.realpath
         body["prel"] = rem
         body["addr"] = self.ip
-        body["flag"] = vfs.flags
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
         response = x.get()
@@ -445,20 +444,31 @@ class HttpCli(object):
             vols.append([vfs.vpath, vfs.realpath, vfs.flags])
 
         idx = self.conn.get_u2idx()
+        t0 = time.time()
         if "srch" in body:
             # search by up2k hashlist
             vbody = copy.deepcopy(body)
             vbody["hash"] = len(vbody["hash"])
             self.log("qj: " + repr(vbody))
             hits = idx.fsearch(vols, body)
-            self.log("q#: " + repr(hits))
+            self.log("q#: {} ({:.2f}s)".format(repr(hits), time.time() - t0))
+            taglist = []
         else:
             # search by query params
             self.log("qj: " + repr(body))
-            hits = idx.search(vols, body)
-            self.log("q#: " + str(len(hits)))
+            hits, taglist = idx.search(vols, body)
+            self.log("q#: {} ({:.2f}s)".format(len(hits), time.time() - t0))
 
-        r = json.dumps(hits).encode("utf-8")
+        order = []
+        cfg = self.args.mte.split(",")
+        for t in cfg:
+            if t in taglist:
+                order.append(t)
+        for t in taglist:
+            if t not in order:
+                order.append(t)
+
+        r = json.dumps({"hits": hits, "tag_order": order}).encode("utf-8")
         self.reply(r, mime="application/json")
         return True
 
@@ -1186,6 +1196,11 @@ class HttpCli(object):
 
         is_ls = "ls" in self.uparam
 
+        icur = None
+        if "e2t" in vn.flags:
+            idx = self.conn.get_u2idx()
+            icur = idx.get_cur(vn.realpath)
+
         dirs = []
         files = []
         for fn in vfs_ls:
@@ -1241,6 +1256,31 @@ class HttpCli(object):
                 dirs.append(item)
             else:
                 files.append(item)
+                item["rd"] = rem
+
+        taglist = {}
+        for f in files:
+            fn = f["name"]
+            rd = f["rd"]
+            del f["rd"]
+            if icur:
+                q = "select w from up where rd = ? and fn = ?"
+                r = icur.execute(q, (rd, fn)).fetchone()
+                if not r:
+                    continue
+
+                w = r[0][:16]
+                tags = {}
+                for k, v in icur.execute("select k, v from mt where w = ?", (w,)):
+                    taglist[k] = True
+                    tags[k] = v
+
+                f["tags"] = tags
+
+        if icur:
+            taglist = [k for k in self.args.mte.split(",") if k in taglist]
+            for f in dirs:
+                f["tags"] = {}
 
         srv_info = []
 
@@ -1293,6 +1333,7 @@ class HttpCli(object):
                 "srvinf": srv_info,
                 "perms": perms,
                 "logues": logues,
+                "taglist": taglist,
             }
             ret = json.dumps(ret)
             self.reply(ret.encode("utf-8", "replace"), mime="application/json")
@@ -1309,7 +1350,10 @@ class HttpCli(object):
             files=dirs,
             ts=ts,
             perms=json.dumps(perms),
-            have_up2k_idx=self.args.e2d,
+            taglist=taglist,
+            tag_order=json.dumps(self.args.mte.split(",")),
+            have_up2k_idx=("e2d" in vn.flags),
+            have_tags_idx=("e2t" in vn.flags),
             logues=logues,
             title=html_escape(self.vpath),
             srv_info=srv_info,

@@ -37,7 +37,19 @@ class U2idx(object):
         fsize = body["size"]
         fhash = body["hash"]
         wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
-        return self.run_query(vols, "select * from up where w = ?", [wark])
+        return self.run_query(vols, "w = ?", [wark], "", [])
+
+    def get_cur(self, ptop):
+        cur = self.cur.get(ptop)
+        if cur:
+            return cur
+
+        cur = _open(ptop)
+        if not cur:
+            return None
+
+        self.cur[ptop] = cur
+        return cur
 
     def search(self, vols, body):
         """search by query params"""
@@ -45,53 +57,74 @@ class U2idx(object):
             return []
 
         qobj = {}
-        _conv_sz(qobj, body, "sz_min", "sz >= ?")
-        _conv_sz(qobj, body, "sz_max", "sz <= ?")
-        _conv_dt(qobj, body, "dt_min", "mt >= ?")
-        _conv_dt(qobj, body, "dt_max", "mt <= ?")
-        for seg, dk in [["path", "rd"], ["name", "fn"]]:
+        _conv_sz(qobj, body, "sz_min", "up.sz >= ?")
+        _conv_sz(qobj, body, "sz_max", "up.sz <= ?")
+        _conv_dt(qobj, body, "dt_min", "up.mt >= ?")
+        _conv_dt(qobj, body, "dt_max", "up.mt <= ?")
+        for seg, dk in [["path", "up.rd"], ["name", "up.fn"]]:
             if seg in body:
                 _conv_txt(qobj, body, seg, dk)
 
-        qstr = "select * from up"
-        qv = []
-        if qobj:
-            qk = []
-            for k, v in sorted(qobj.items()):
-                qk.append(k.split("\n")[0])
-                qv.append(v)
+        uq, uv = _sqlize(qobj)
 
-            qstr = " and ".join(qk)
-            qstr = "select * from up where " + qstr
+        tq = ""
+        tv = []
+        qobj = {}
+        if "tags" in body:
+            _conv_txt(qobj, body, "tags", "mt.v")
+            tq, tv = _sqlize(qobj)
 
-        return self.run_query(vols, qstr, qv)
+        return self.run_query(vols, uq, uv, tq, tv)
 
-    def run_query(self, vols, qstr, qv):
-        qv = tuple(qv)
-        self.log("qs: {} {}".format(qstr, repr(qv)))
+    def run_query(self, vols, uq, uv, tq, tv):
+        self.log("qs: {} {} ,  {} {}".format(uq, repr(uv), tq, repr(tv)))
 
         ret = []
-        lim = 100
+        lim = 1000
+        taglist = {}
         for (vtop, ptop, flags) in vols:
-            cur = self.cur.get(ptop)
+            cur = self.get_cur(ptop)
             if not cur:
-                cur = _open(ptop)
-                if not cur:
-                    continue
+                continue
 
-                self.cur[ptop] = cur
-                # self.log("idx /{} @ {} {}".format(vtop, ptop, flags))
+            if not tq:
+                if not uq:
+                    q = "select * from up"
+                    v = ()
+                else:
+                    q = "select * from up where " + uq
+                    v = tuple(uv)
+            else:
+                # naive assumption: tags first
+                q = "select up.* from up inner join mt on substr(up.w,1,16) = mt.w where {}"
+                q = q.format(" and ".join([tq, uq]) if uq else tq)
+                v = tuple(tv + uv)
 
-            c = cur.execute(qstr, qv)
-            for _, ts, sz, rd, fn in c:
+            sret = []
+            c = cur.execute(q, v)
+            for hit in c:
+                w, ts, sz, rd, fn = hit
                 lim -= 1
                 if lim <= 0:
                     break
 
                 rp = os.path.join(vtop, rd, fn).replace("\\", "/")
-                ret.append({"ts": int(ts), "sz": sz, "rp": rp})
+                sret.append({"ts": int(ts), "sz": sz, "rp": rp, "w": w[:16]})
 
-        return ret
+            for hit in sret:
+                w = hit["w"]
+                del hit["w"]
+                tags = {}
+                q = "select k, v from mt where w = ?"
+                for k, v in cur.execute(q, (w,)):
+                    taglist[k] = True
+                    tags[k] = v
+
+                hit["tags"] = tags
+
+            ret.extend(sret)
+
+        return ret, taglist.keys()
 
 
 def _open(ptop):
@@ -146,3 +179,13 @@ def _conv_txt(q, body, k, sql):
 
         qk = "{} {} like {}?{}".format(sql, inv, head, tail)
         q[qk + "\n" + v] = u8safe(v)
+
+
+def _sqlize(qobj):
+    keys = []
+    values = []
+    for k, v in sorted(qobj.items()):
+        keys.append(k.split("\n")[0])
+        values.append(v)
+
+    return " and ".join(keys), values
