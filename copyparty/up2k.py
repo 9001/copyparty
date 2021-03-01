@@ -386,7 +386,7 @@ class Up2k(object):
             up_q = "select w from up where substr(w,1,16) = ?"
             for (w,) in cur.execute("select w from mt"):
                 if not c2.execute(up_q, (w,)).fetchone():
-                    drops.append(w)
+                    drops.append(w[:16])
             c2.close()
 
             if drops:
@@ -394,7 +394,7 @@ class Up2k(object):
                 self.log(msg.format(len(drops)))
                 n_rm += len(drops)
                 for w in drops:
-                    cur.execute("delete from up where rowid = ?", (w,))
+                    cur.execute("delete from mt where w = ?", (w,))
 
         # bail if a volume flag disables indexing
         if "d2t" in flags or "d2d" in flags:

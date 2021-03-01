@@ -95,7 +95,7 @@ through arguments:
 * `-e2ts` scans for tags in all files that don't have tags yet
 * `-e2tsr` deletes all existing tags, so a full reindex
 
-in addition to `d2d` and `d2t`, the same arguments can be set as volume flags:
+the same arguments can be set as volume flags, in addition to `d2d` and `d2t` for disabling:
 * `-v ~/music::ce2dsa:ce2tsr` does a full reindex of everything on startup
 * `-v ~/music::cd2d` disables **all** indexing, even if any `-e2*` are on
 * `-v ~/music::cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
