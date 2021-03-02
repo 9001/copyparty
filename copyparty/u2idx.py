@@ -37,7 +37,7 @@ class U2idx(object):
         fsize = body["size"]
         fhash = body["hash"]
         wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
-        return self.run_query(vols, "w = ?", [wark], "", [])
+        return self.run_query(vols, "w = ?", [wark], "", [])[0]
 
     def get_cur(self, ptop):
         cur = self.cur.get(ptop)
@@ -115,7 +115,7 @@ class U2idx(object):
                 w = hit["w"]
                 del hit["w"]
                 tags = {}
-                q = "select k, v from mt where w = ?"
+                q = "select k, v from mt where w = ? and k != 'x'"
                 for k, v in cur.execute(q, (w,)):
                     taglist[k] = True
                     tags[k] = v
@@ -124,7 +124,7 @@ class U2idx(object):
 
             ret.extend(sret)
 
-        return ret, taglist.keys()
+        return ret, list(taglist.keys())
 
 
 def _open(ptop):

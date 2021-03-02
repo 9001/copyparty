@@ -138,6 +138,16 @@ class Up2k(object):
         vols = auth.vfs.all_vols.values()
         t0 = time.time()
 
+        live_vols = []
+        for vol in vols:
+            try:
+                os.listdir(vol.realpath)
+                live_vols.append(vol)
+            except:
+                self.log("\033[31mcannot access " + vol.realpath)
+
+        vols = live_vols
+
         # e2ds(a) volumes first,
         # also covers tags where e2ts is set
         for vol in vols:
@@ -444,12 +454,9 @@ class Up2k(object):
     def _open_db(self, db_path):
         existed = os.path.exists(db_path)
         cur = self._orz(db_path)
-        try:
-            ver = self._read_ver(cur)
-        except:
-            ver = None
-            if not existed:
-                return self._create_db(db_path, cur)
+        ver = self._read_ver(cur)
+        if not existed and ver is None:
+            return self._create_db(db_path, cur)
 
         orig_ver = ver
         if not ver or ver < 3:
@@ -571,6 +578,10 @@ class Up2k(object):
         return self._orz(db_path)
 
     def handle_json(self, cj):
+        if not self.register_vpath(cj["ptop"], cj["vcfg"]):
+            if cj["ptop"] not in self.registry:
+                raise Pebkac(410, "location unavailable")
+
         cj["name"] = sanitize_fn(cj["name"])
         cj["poke"] = time.time()
         wark = self._get_wark(cj)
@@ -580,10 +591,9 @@ class Up2k(object):
             cur = self.cur.get(cj["ptop"], None)
             reg = self.registry[cj["ptop"]]
             if cur:
-                cur = cur.execute(
-                    r"select * from up where substr(w,1,16) = ? and w = ?",
-                    (wark[:16], wark,),
-                )
+                q = r"select * from up where substr(w,1,16) = ? and w = ?"
+                argv = (wark[:16], wark)
+                cur = cur.execute(q, argv)
                 for _, dtime, dsize, dp_dir, dp_fn in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = self.w8dec(dp_dir, dp_fn)

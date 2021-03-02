@@ -428,6 +428,7 @@ class HttpCli(object):
         body["ptop"] = vfs.realpath
         body["prel"] = rem
         body["addr"] = self.ip
+        body["vcfg"] = vfs.flags
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
         response = x.get()
@@ -1271,7 +1272,8 @@ class HttpCli(object):
 
                 w = r[0][:16]
                 tags = {}
-                for k, v in icur.execute("select k, v from mt where w = ?", (w,)):
+                q = "select k, v from mt where w = ? and k != 'x'"
+                for k, v in icur.execute(q, (w,)):
                     taglist[k] = True
                     tags[k] = v
 
