@@ -82,6 +82,8 @@ path/name queries are space-separated, AND'ed together, and words are negated wi
 * path: `shibayan -bossa` finds all files where one of the folders contain `shibayan` but filters out any results where `bossa` exists somewhere in the path
 * name: `demetori styx` gives you [good stuff](https://www.youtube.com/watch?v=zGh0g14ZJ8I&list=PL3A147BD151EE5218&index=9)
 
+add `-e2ts` to also scan/index tags from music files:
+
 
 ## search configuration
 
@@ -144,13 +146,13 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 
 # dependencies
 
-* `jinja2`
+* `jinja2` (is built into the SFX)
 
-optional, enables music tags:
-* either `mutagen` (fast, pure-python, skips a few tags)
+**optional,** enables music tags:
+* either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
 * or `FFprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
-optional, will eventually enable thumbnails:
+**optional,** will eventually enable thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
 
 
