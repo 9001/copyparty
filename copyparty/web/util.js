@@ -99,22 +99,33 @@ function sortTable(table, col) {
         th[a].className = th[a].className.replace(/ *sort-?1 */, " ");
     th[col].className += ' sort' + reverse;
     var stype = th[col].getAttribute('sort');
-    tr = tr.sort(function (a, b) {
-        if (!a.cells[col])
+    var vl = [];
+    for (var a = 0; a < tr.length; a++) {
+        var cell = tr[a].cells[col];
+        if (!cell) {
+            vl.push([null, a]);
+            continue;
+        }
+        var v = cell.getAttribute('sortv') || cell.textContent.trim();
+        if (stype == 'int') {
+            v = parseInt(v.replace(/[, ]/g, '')) || 0;
+        }
+        vl.push([v, a]);
+    }
+    vl.sort(function (a, b) {
+        a = a[0];
+        b = b[0];
+        if (a === null)
             return -1;
-        if (!b.cells[col])
+        if (b === null)
             return 1;
 
-        var v1 = a.cells[col].getAttribute('sortv') || a.cells[col].textContent.trim();
-        var v2 = b.cells[col].getAttribute('sortv') || b.cells[col].textContent.trim();
         if (stype == 'int') {
-            v1 = parseInt(v1.replace(/,/g, '')) || 0;
-            v2 = parseInt(v2.replace(/,/g, '')) || 0;
-            return reverse * (v1 - v2);
+            return reverse * (a - b);
         }
-        return reverse * (v1.localeCompare(v2));
+        return reverse * (a.localeCompare(b));
     });
-    for (i = 0; i < tr.length; ++i) tb.appendChild(tr[i]);
+    for (i = 0; i < tr.length; ++i) tb.appendChild(tr[vl[i][1]]);
 }
 function makeSortable(table) {
     var th = table.tHead, i;

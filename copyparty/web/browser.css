@@ -121,6 +121,8 @@ a,
 #files tbody tr:last-child td {
 	padding-bottom: 1.3em;
 	border-bottom: .5em solid #444;
+}
+#files tbody tr td:last-child {
 	white-space: nowrap;
 }
 #files thead th[style] {
