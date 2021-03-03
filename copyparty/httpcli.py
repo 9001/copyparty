@@ -345,6 +345,10 @@ class HttpCli(object):
         with open(path, "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
+        self.conn.hsrv.broker.put(
+            False, "up2k.hash_file", vfs.realpath, vfs.flags, rem, fn
+        )
+
         return post_sz, sha_b64, remains, path
 
     def handle_stash(self):
@@ -675,6 +679,9 @@ class HttpCli(object):
                             raise Pebkac(400, "empty files in post")
 
                         files.append([sz, sha512_hex])
+                        self.conn.hsrv.broker.put(
+                            False, "up2k.hash_file", vfs.realpath, vfs.flags, rem, fname
+                        )
                         self.conn.nbyte += sz
 
                 except Pebkac:
@@ -1251,7 +1258,7 @@ class HttpCli(object):
                 "sz": sz,
                 "ext": ext,
                 "dt": dt,
-                "ts": inf.st_mtime,
+                "ts": int(inf.st_mtime),
             }
             if is_dir:
                 dirs.append(item)
