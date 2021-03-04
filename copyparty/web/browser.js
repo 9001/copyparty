@@ -721,6 +721,10 @@ function autoplay_blocked() {
 // tree
 (function () {
 	var treedata = null;
+	var dyn = bcfg_get('dyntree', true);
+	var treesz = icfg_get('treesz', 16);
+	treesz = isNaN(treesz) ? 16 : Math.min(Math.max(treesz, 4), 50);
+	console.log('treesz [' + treesz + ']');
 
 	function entree(e) {
 		ev(e);
@@ -779,7 +783,7 @@ function autoplay_blocked() {
 				esc(top) + '">' + esc(name) +
 				"</a>\n<ul>\n" + html + "</ul>";
 
-			var links = document.querySelectorAll('#tree a+a');
+			var links = document.querySelectorAll('#treeul a+a');
 			for (var a = 0, aa = links.length; a < aa; a++) {
 				if (links[a].getAttribute('href') == top) {
 					var o = links[a].parentNode;
@@ -793,7 +797,10 @@ function autoplay_blocked() {
 		document.querySelector('#treeul>li>a+a').textContent = '[root]';
 		despin('#tree');
 		reload_tree();
+		rescale_tree();
+	}
 
+	function rescale_tree() {
 		var q = '#tree';
 		var nq = 0;
 		while (true) {
@@ -802,18 +809,19 @@ function autoplay_blocked() {
 			if (!document.querySelector(q))
 				break;
 		}
-		ebi('treeul').style.width = (24 + nq) + 'em';
+		var w = treesz + (dyn ? nq : 0);
+		ebi('treeul').style.width = w + 'em';
 	}
 
 	function reload_tree() {
 		var cdir = get_vpath();
-		var links = document.querySelectorAll('#tree a+a');
+		var links = document.querySelectorAll('#treeul a+a');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			var href = links[a].getAttribute('href');
 			links[a].setAttribute('class', href == cdir ? 'hl' : '');
 			links[a].onclick = treego;
 		}
-		links = document.querySelectorAll('#tree li>a:first-child');
+		links = document.querySelectorAll('#treeul li>a:first-child');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			links[a].setAttribute('dst', links[a].nextSibling.getAttribute('href'));
 			links[a].onclick = treegrow;
@@ -844,6 +852,7 @@ function autoplay_blocked() {
 				rm.parentNode.removeChild(rm);
 			}
 			this.textContent = '+';
+			rescale_tree();
 			return;
 		}
 		var dst = this.getAttribute('dst');
@@ -953,8 +962,28 @@ function autoplay_blocked() {
 		swrite('entreed', 'na');
 	}
 
+	function dyntree(e) {
+		ev(e);
+		dyn = !dyn;
+		bcfg_set('dyntree', dyn);
+		rescale_tree();
+	}
+
+	function scaletree(e) {
+		ev(e);
+		treesz += parseInt(this.getAttribute("step"));
+		if (isNaN(treesz))
+			treesz = 16;
+
+		swrite('treesz', treesz);
+		rescale_tree();
+	}
+
 	ebi('entree').onclick = entree;
 	ebi('detree').onclick = detree;
+	ebi('dyntree').onclick = dyntree;
+	ebi('twig').onclick = scaletree;
+	ebi('twobytwo').onclick = scaletree;
 	if (sread('entreed') == 'tree')
 		entree();
 

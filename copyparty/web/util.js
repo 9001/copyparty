@@ -293,6 +293,51 @@ function jwrite(key, val) {
         swrite(key, JSON.stringify(val));
 }
 
+function icfg_get(name, defval) {
+    var o = ebi(name);
+
+    var val = parseInt(sread(name));
+    if (val === null)
+        return parseInt(o ? o.value : defval);
+
+    if (o)
+        o.value = val;
+
+    return val;
+}
+
+function bcfg_get(name, defval) {
+    var o = ebi(name);
+    if (!o)
+        return defval;
+
+    var val = sread(name);
+    if (val === null)
+        val = defval;
+    else
+        val = (val == '1');
+
+    bcfg_upd_ui(name, val);
+    return val;
+}
+
+function bcfg_set(name, val) {
+    swrite(name, val ? '1' : '0');
+    bcfg_upd_ui(name, val);
+    return val;
+}
+
+function bcfg_upd_ui(name, val) {
+    var o = ebi(name);
+    if (!o)
+        return;
+
+    if (o.getAttribute('type') == 'checkbox')
+        o.checked = val;
+    else if (o)
+        o.setAttribute('class', val ? 'on' : '');
+}
+
 
 function hist_push(html, url) {
     var key = new Date().getTime();

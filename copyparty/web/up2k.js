@@ -209,41 +209,7 @@ function up2k_init(have_crypto) {
         };
     }
 
-    function cfg_get(name) {
-        var val = sread(name);
-        if (val === null)
-            return parseInt(ebi(name).value);
-
-        ebi(name).value = val;
-        return val;
-    }
-
-    function bcfg_get(name, defval) {
-        var o = ebi(name);
-        if (!o)
-            return defval;
-
-        var val = sread(name);
-        if (val === null)
-            val = defval;
-        else
-            val = (val == '1');
-
-        o.checked = val;
-        return val;
-    }
-
-    function bcfg_set(name, val) {
-        swrite(name, val ? '1' : '0');
-
-        var o = ebi(name);
-        if (o)
-            o.checked = val;
-
-        return val;
-    }
-
-    var parallel_uploads = cfg_get('nthread');
+    var parallel_uploads = icfg_get('nthread');
     var multitask = bcfg_get('multitask', true);
     var ask_up = bcfg_get('ask_up', true);
     var flag_en = bcfg_get('flag_en', false);

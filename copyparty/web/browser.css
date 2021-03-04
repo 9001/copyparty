@@ -73,11 +73,12 @@ a,
 	color: #999;
 	font-weight: normal;
 }
-#files tr:hover {
+#files tr+tr:hover {
 	background: #1c1c1c;
 }
 #files thead th {
 	padding: .5em 1.3em .3em 1.3em;
+	cursor: pointer;
 }
 #files thead th:last-child {
 	background: #444;
@@ -310,7 +311,7 @@ a,
 	#barpos,
 	#barbuf {
 		width: calc(100% - 24em);
-		left: 10em;
+		left: 9.8em;
 		top: .7em;
 		height: 1.6em;
 		bottom: auto;
@@ -449,12 +450,27 @@ input[type="checkbox"]:checked+label {
 #tree {
 	padding-top: 2em;
 }
+#tree>a+a {
+	padding: .2em .4em;
+	font-size: 1.2em;
+	background: #2a2a2a;
+	box-shadow: 0 .1em .2em #222 inset;
+	border-radius: .3em;
+	margin: .2em;
+	position: relative;
+	top: -.2em;
+}
+#tree>a+a:hover {
+	background: #805;
+}
+#tree>a+a.on {
+	background: #fc4;
+	color: #400;
+	text-shadow: none;
+}
 #detree {
 	padding: .3em .5em;
 	font-size: 1.5em;
-	display: inline-block;
-	min-width: 12em;
-	width: 100%;
 }
 #treefiles #files tbody {
 	border-radius: 0 .7em 0 .7em;
@@ -475,20 +491,20 @@ input[type="checkbox"]:checked+label {
 	list-style: none;
 	white-space: nowrap;
 }
-#tree a.hl {
+#treeul a.hl {
 	color: #400;
 	background: #fc4;
 	border-radius: .3em;
 	text-shadow: none;
 }
-#tree a {
+#treeul a {
 	display: inline-block;
 }
-#tree a+a {
+#treeul a+a {
 	width: calc(100% - 2em);
 	background: #333;
 }
-#tree a+a:hover {
+#treeul a+a:hover {
 	background: #222;
 	color: #fff;
 }
