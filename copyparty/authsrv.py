@@ -6,7 +6,7 @@ import re
 import threading
 
 from .__init__ import PY2, WINDOWS
-from .util import undot, Pebkac, fsdec, fsenc
+from .util import undot, Pebkac, fsdec, fsenc, statdir
 
 
 class VFS(object):
@@ -102,12 +102,11 @@ class VFS(object):
 
         return fsdec(os.path.realpath(fsenc(rp)))
 
-    def ls(self, rem, uname):
+    def ls(self, rem, uname, scandir, lstat=False):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
-        items = os.listdir(fsenc(abspath))
-        real = [fsdec(x) for x in items]
+        real = list(statdir(print, scandir, lstat, abspath))
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):
@@ -115,7 +114,7 @@ class VFS(object):
                     virt_vis[name] = vn2
 
             # no vfs nodes in the list of real inodes
-            real = [x for x in real if x not in self.nodes]
+            real = [x for x in real if x[0] not in self.nodes]
 
         return [abspath, real, virt_vis]
 
@@ -315,7 +314,7 @@ class AuthSrv(object):
             if (self.args.e2ds and vol.uwrite) or self.args.e2dsa:
                 vol.flags["e2ds"] = True
 
-            if self.args.e2d:
+            if self.args.e2d or "e2ds" in vol.flags:
                 vol.flags["e2d"] = True
 
             for k in ["e2t", "e2ts", "e2tsr"]:

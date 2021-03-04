@@ -3,7 +3,6 @@ from __future__ import print_function, unicode_literals
 
 import re
 import os
-import sys
 import time
 import math
 import json
@@ -28,6 +27,7 @@ from .util import (
     atomic_move,
     w8b64enc,
     w8b64dec,
+    statdir,
 )
 from .mtag import MTag
 from .authsrv import AuthSrv
@@ -284,23 +284,11 @@ class Up2k(object):
         self.log(msg)
 
     def _build_dir(self, dbw, top, excl, cdir):
-        try:
-            inodes = [fsdec(x) for x in os.listdir(fsenc(cdir))]
-        except Exception as ex:
-            self.log("listdir: {} @ [{}]".format(repr(ex), cdir))
-            return 0
-
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histdir = os.path.join(top, ".hist")
         ret = 0
-        for inode in inodes:
-            abspath = os.path.join(cdir, inode)
-            try:
-                inf = os.stat(fsenc(abspath))
-            except Exception as ex:
-                self.log("stat: {} @ [{}]".format(repr(ex), abspath))
-                continue
-
+        for iname, inf in statdir(self.log, not self.args.no_scandir, False, cdir):
+            abspath = os.path.join(cdir, iname)
             lmod = int(inf.st_mtime)
             if stat.S_ISDIR(inf.st_mode):
                 if abspath in excl or abspath == histdir:

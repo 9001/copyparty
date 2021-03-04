@@ -521,9 +521,7 @@ def u8safe(txt):
 
 
 def exclude_dotfiles(filepaths):
-    for fpath in filepaths:
-        if not fpath.split("/")[-1].startswith("."):
-            yield fpath
+    return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
 
 
 def html_escape(s, quote=False):
@@ -724,6 +722,30 @@ def sendfile_kern(lower, upper, f, s):
         # print("sendfile: ok, sent {} now, {} total, {} remains".format(n, ofs - lower, upper - ofs))
 
     return 0
+
+
+def statdir(logger, scandir, lstat, top):
+    try:
+        btop = fsenc(top)
+        if scandir and hasattr(os, "scandir"):
+            src = "scandir"
+            with os.scandir(btop) as dh:
+                for fh in dh:
+                    try:
+                        yield [fsdec(fh.name), fh.stat(follow_symlinks=not lstat)]
+                    except Exception as ex:
+                        logger("scan-stat: {} @ {}".format(repr(ex), fsdec(fh.path)))
+        else:
+            src = "listdir"
+            fun = os.lstat if lstat else os.stat
+            for name in os.listdir(btop):
+                abspath = os.path.join(btop, name)
+                try:
+                    yield [fsdec(name), fun(abspath)]
+                except Exception as ex:
+                    logger("list-stat: {} @ {}".format(repr(ex), fsdec(abspath)))
+    except Exception as ex:
+        logger("{}: {} @ {}".format(src, repr(ex), top))
 
 
 def unescape_cookie(orig):
