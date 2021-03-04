@@ -462,7 +462,7 @@ function play(tid, call_depth) {
 		o.setAttribute('id', 'thx_js');
 		if (window.history && history.replaceState) {
 			var nurl = (document.location + '').split('#')[0] + '#' + oid;
-			hist_push(ebi('files').innerHTML, nurl);
+			hist_replace(ebi('files').innerHTML, nurl);
 		}
 		else {
 			document.location.hash = oid;
@@ -971,7 +971,7 @@ function autoplay_blocked() {
 
 	if (window.history && history.pushState) {
 		var u = get_vpath() + window.location.hash;
-		hist_push(ebi('files').innerHTML, u);
+		hist_replace(ebi('files').innerHTML, u);
 	}
 })();
 

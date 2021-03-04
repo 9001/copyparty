@@ -299,3 +299,9 @@ function hist_push(html, url) {
     sessionStorage.setItem(key, html);
     history.pushState(key, url, url);
 }
+
+function hist_replace(html, url) {
+    var key = new Date().getTime();
+    sessionStorage.setItem(key, html);
+    history.replaceState(key, url, url);
+}
