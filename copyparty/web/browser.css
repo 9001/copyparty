@@ -67,6 +67,7 @@ a,
 #files a:hover {
 	color: #fff;
 	background: #161616;
+	text-decoration: underline;
 }
 #files thead a {
 	color: #999;
@@ -305,7 +306,7 @@ a,
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
 }
-@media (min-width: 100em) {
+@media (min-width: 90em) {
 	#barpos,
 	#barbuf {
 		width: calc(100% - 24em);
@@ -535,7 +536,7 @@ input[type="checkbox"]:checked+label {
 #files>thead>tr>th.min span {
 	position: absolute;
 	transform: rotate(270deg);
-	background: linear-gradient(90deg, #222, #444);
+	background: linear-gradient(90deg, rgba(68,68,68,0), rgba(68,68,68,0.5) 70%, #444);
 	margin-left: -4.6em;
 	padding: .4em;
 	top: 5.4em;
@@ -554,4 +555,11 @@ input[type="checkbox"]:checked+label {
 	border-color: transparent;
 	color: #400;
 	text-shadow: none;
+}
+#files tr.play a {
+	color: inherit;
+}
+#files tr.play a:hover {
+	color: #300;
+	background: #fea;
 }

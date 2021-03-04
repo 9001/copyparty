@@ -462,7 +462,7 @@ function play(tid, call_depth) {
 		o.setAttribute('id', 'thx_js');
 		if (window.history && history.replaceState) {
 			var nurl = (document.location + '').split('#')[0] + '#' + oid;
-			history.replaceState(ebi('files').innerHTML, nurl, nurl);
+			hist_push(ebi('files').innerHTML, nurl);
 		}
 		else {
 			document.location.hash = oid;
@@ -898,7 +898,7 @@ function autoplay_blocked() {
 		html = html.join('\n');
 		ebi('files').innerHTML = html;
 
-		history.pushState(html, this.top, this.top);
+		hist_push(html, this.top);
 		apply_perms(res.perms);
 		despin('#files');
 
@@ -960,16 +960,18 @@ function autoplay_blocked() {
 
 	window.onpopstate = function (e) {
 		console.log(e.url + ' ,, ' + ((e.state + '').slice(0, 64)));
-		if (e.state) {
-			ebi('files').innerHTML = e.state;
-			reload_tree();
-			reload_browser();
-		}
+		var html = sessionStorage.getItem(e.state || 1);
+		if (!html)
+			return;
+
+		ebi('files').innerHTML = html;
+		reload_tree();
+		reload_browser();
 	};
 
 	if (window.history && history.pushState) {
 		var u = get_vpath() + window.location.hash;
-		history.replaceState(ebi('files').innerHTML, u, u);
+		hist_push(ebi('files').innerHTML, u);
 	}
 })();
 

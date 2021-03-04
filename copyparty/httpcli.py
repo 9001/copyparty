@@ -1228,7 +1228,7 @@ class HttpCli(object):
                 fspath = fsroot + "/" + fn
 
             try:
-                inf = stats.get(fn, os.stat(fsenc(fspath)))
+                inf = stats.get(fn) or os.stat(fsenc(fspath))
             except:
                 self.log("broken symlink: {}".format(repr(fspath)))
                 continue

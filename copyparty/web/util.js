@@ -292,3 +292,10 @@ function jwrite(key, val) {
     else
         swrite(key, JSON.stringify(val));
 }
+
+
+function hist_push(html, url) {
+    var key = new Date().getTime();
+    sessionStorage.setItem(key, html);
+    history.pushState(key, url, url);
+}
