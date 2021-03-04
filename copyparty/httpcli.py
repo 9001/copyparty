@@ -1119,7 +1119,7 @@ class HttpCli(object):
 
         try:
             vn, rem = self.auth.vfs.get(top, self.uname, True, False)
-            fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_sendfile)
+            fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_scandir)
         except:
             vfs_ls = []
             vfs_virt = {}
@@ -1175,7 +1175,7 @@ class HttpCli(object):
 
             return self.tx_file(abspath)
 
-        fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_sendfile)
+        fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_scandir)
         stats = {k: v for k, v in vfs_ls}
         vfs_ls = [x[0] for x in vfs_ls]
         vfs_ls.extend(vfs_virt.keys())

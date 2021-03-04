@@ -16,6 +16,12 @@ from copyparty.authsrv import AuthSrv
 from copyparty import util
 
 
+class Cfg(Namespace):
+    def __init__(self, a=[], v=[], c=None):
+        ex = {k: False for k in "e2d e2ds e2dsa e2t e2ts e2tsr mte".split()}
+        super(Cfg, self).__init__(a=a, v=v, c=c, **ex)
+
+
 class TestVFS(unittest.TestCase):
     def dump(self, vfs):
         print(json.dumps(vfs, indent=4, sort_keys=True, default=lambda o: o.__dict__))
@@ -35,7 +41,13 @@ class TestVFS(unittest.TestCase):
     def ls(self, vfs, vpath, uname):
         """helper for resolving and listing a folder"""
         vn, rem = vfs.get(vpath, uname, True, False)
-        return vn.ls(rem, uname)
+        r1 = vn.ls(rem, uname, False)
+        r2 = vn.ls(rem, uname, False)
+        self.assertEqual(r1, r2)
+
+        fsdir, real, virt = r1
+        real = [x[0] for x in real]
+        return fsdir, real, virt
 
     def runcmd(self, *argv):
         p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
@@ -102,7 +114,7 @@ class TestVFS(unittest.TestCase):
                             f.write(fn)
 
         # defaults
-        vfs = AuthSrv(Namespace(c=None, a=[], v=[]), self.log).vfs
+        vfs = AuthSrv(Cfg(), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td)
@@ -110,7 +122,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(vfs.uwrite, ["*"])
 
         # single read-only rootfs (relative path)
-        vfs = AuthSrv(Namespace(c=None, a=[], v=["a/ab/::r"]), self.log).vfs
+        vfs = AuthSrv(Cfg(v=["a/ab/::r"]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, os.path.join(td, "a", "ab"))
@@ -118,9 +130,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(vfs.uwrite, [])
 
         # single read-only rootfs (absolute path)
-        vfs = AuthSrv(
-            Namespace(c=None, a=[], v=[td + "//a/ac/../aa//::r"]), self.log
-        ).vfs
+        vfs = AuthSrv(Cfg(v=[td + "//a/ac/../aa//::r"]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, os.path.join(td, "a", "aa"))
@@ -129,7 +139,7 @@ class TestVFS(unittest.TestCase):
 
         # read-only rootfs with write-only subdirectory (read-write for k)
         vfs = AuthSrv(
-            Namespace(c=None, a=["k:k"], v=[".::r:ak", "a/ac/acb:a/ac/acb:w:ak"]),
+            Cfg(a=["k:k"], v=[".::r:ak", "a/ac/acb:a/ac/acb:w:ak"]),
             self.log,
         ).vfs
         self.assertEqual(len(vfs.nodes), 1)
@@ -192,7 +202,10 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(list(virt), [])
 
         # admin-only rootfs with all-read-only subfolder
-        vfs = AuthSrv(Namespace(c=None, a=["k:k"], v=[".::ak", "a:a:r"]), self.log,).vfs
+        vfs = AuthSrv(
+            Cfg(a=["k:k"], v=[".::ak", "a:a:r"]),
+            self.log,
+        ).vfs
         self.assertEqual(len(vfs.nodes), 1)
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td)
@@ -211,9 +224,7 @@ class TestVFS(unittest.TestCase):
 
         # breadth-first construction
         vfs = AuthSrv(
-            Namespace(
-                c=None,
-                a=[],
+            Cfg(
                 v=[
                     "a/ac/acb:a/ac/acb:w",
                     "a:a:w",
@@ -234,7 +245,7 @@ class TestVFS(unittest.TestCase):
         self.undot(vfs, "./.././foo/..", "")
 
         # shadowing
-        vfs = AuthSrv(Namespace(c=None, a=[], v=[".::r", "b:a/ac:r"]), self.log).vfs
+        vfs = AuthSrv(Cfg(v=[".::r", "b:a/ac:r"]), self.log).vfs
 
         fsp, r1, v1 = self.ls(vfs, "", "*")
         self.assertEqual(fsp, td)
@@ -271,7 +282,7 @@ class TestVFS(unittest.TestCase):
                 ).encode("utf-8")
             )
 
-        au = AuthSrv(Namespace(c=[cfg_path], a=[], v=[]), self.log)
+        au = AuthSrv(Cfg(c=[cfg_path]), self.log)
         self.assertEqual(au.user["a"], "123")
         self.assertEqual(au.user["asd"], "fgh:jkl")
         n = au.vfs
