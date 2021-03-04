@@ -63,6 +63,9 @@ class Up2k(object):
         self.entags = {}
         self.flags = {}
         self.cur = {}
+        self.mtag = None
+        self.n_mtag_thr_alive = 0
+        self.n_mtag_tags_added = 0
 
         self.mem_cur = None
         if HAVE_SQLITE3:
@@ -76,10 +79,6 @@ class Up2k(object):
             thr = threading.Thread(target=self._lastmodder)
             thr.daemon = True
             thr.start()
-
-        self.mtag = MTag(self.log_func, self.args)
-        if not self.mtag.usable:
-            self.mtag = None
 
         # static
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
@@ -157,6 +156,16 @@ class Up2k(object):
                 self.log("\033[31mcannot access " + vol.realpath)
 
         vols = live_vols
+
+        need_mtag = False
+        for vol in auth.vfs.all_vols.values():
+            if "e2t" in vol.flags:
+                need_mtag = True
+
+        if need_mtag:
+            self.mtag = MTag(self.log_func, self.args)
+            if not self.mtag.usable:
+                self.mtag = None
 
         # e2ds(a) volumes first,
         # also covers tags where e2ts is set
@@ -419,7 +428,24 @@ class Up2k(object):
             if not self.mtag:
                 return n_add, n_rm, False
 
+            mpool = False
+            if self.mtag.prefer_mt and not self.args.no_mtag_mt:
+                # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
+                # both do crazy runahead so lets reinvent another wheel
+                nw = os.cpu_count()
+                if not self.n_mtag_thr_alive:
+                    msg = 'using {} cores for tag reader "{}"'
+                    self.log(msg.format(nw, self.mtag.backend))
+
+                self.n_mtag_thr_alive = nw
+                mpool = Queue(nw)
+                for _ in range(nw):
+                    thr = threading.Thread(target=self._tag_thr, args=(mpool,))
+                    thr.daemon = True
+                    thr.start()
+
             c2 = cur.connection.cursor()
+            c3 = cur.connection.cursor()
             n_left = cur.execute("select count(w) from up").fetchone()[0]
             for w, rd, fn in cur.execute("select w, rd, fn from up"):
                 n_left -= 1
@@ -429,7 +455,15 @@ class Up2k(object):
 
                 abspath = os.path.join(ptop, rd, fn)
                 self.pp.msg = "c{} {}".format(n_left, abspath)
-                n_tags = self._tag_file(c2, entags, w, abspath)
+                args = c3, entags, w, abspath
+                if not mpool:
+                    n_tags = self._tag_file(*args)
+                else:
+                    mpool.put(args)
+                    with self.mutex:
+                        n_tags = self.n_mtag_tags_added
+                        self.n_mtag_tags_added = 0
+
                 n_add += n_tags
                 n_buf += n_tags
 
@@ -440,12 +474,37 @@ class Up2k(object):
                     last_write = time.time()
                     n_buf = 0
 
+            if self.n_mtag_thr_alive:
+                mpool.join()
+                for _ in range(self.n_mtag_thr_alive):
+                    mpool.put(None)
+
+            c3.close()
             c2.close()
 
         return n_add, n_rm, True
 
-    def _tag_file(self, write_cur, entags, wark, abspath):
-        tags = self.mtag.get(abspath)
+    def _tag_thr(self, q):
+        while True:
+            task = q.get()
+            if not task:
+                break
+
+            try:
+                write_cur, entags, wark, abspath = task
+                tags = self.mtag.get(abspath)
+                with self.mutex:
+                    n = self._tag_file(write_cur, entags, wark, abspath, tags)
+                    self.n_mtag_tags_added += n
+            except:
+                with self.mutex:
+                    self.n_mtag_thr_alive -= 1
+                raise
+            finally:
+                q.task_done()
+
+    def _tag_file(self, write_cur, entags, wark, abspath, tags=None):
+        tags = tags or self.mtag.get(abspath)
         tags = {k: v for k, v in tags.items() if k in entags}
         if not tags:
             # indicate scanned without tags

@@ -1,6 +1,5 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
-from math import fabs
 
 import re
 import os
@@ -16,19 +15,21 @@ class MTag(object):
     def __init__(self, log_func, args):
         self.log_func = log_func
         self.usable = True
+        self.prefer_mt = False
         mappings = args.mtm
-        backend = "ffprobe" if args.no_mutagen else "mutagen"
+        self.backend = "ffprobe" if args.no_mutagen else "mutagen"
 
-        if backend == "mutagen":
+        if self.backend == "mutagen":
             self.get = self.get_mutagen
             try:
                 import mutagen
             except:
                 self.log("\033[33mcould not load mutagen, trying ffprobe instead")
-                backend = "ffprobe"
+                self.backend = "ffprobe"
 
-        if backend == "ffprobe":
+        if self.backend == "ffprobe":
             self.get = self.get_ffprobe
+            self.prefer_mt = True
             # about 20x slower
             if PY2:
                 cmd = ["ffprobe", "-version"]

@@ -256,6 +256,7 @@ def main():
     ap2.add_argument("-e2ts", action="store_true", help="enable metadata scanner, sets -e2t")
     ap2.add_argument("-e2tsr", action="store_true", help="rescan all metadata, sets -e2ts")
     ap2.add_argument("--no-mutagen", action="store_true", help="use ffprobe for tags instead")
+    ap2.add_argument("--no-mtag-mt", action="store_true", help="disable tag-read parallelism")
     ap2.add_argument("-mtm", metavar="M=t,t,t", action="append", type=str, help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=str, help="tags to index/display (comma-sep.)",
         default="circle,album,.tn,artist,title,.bpm,key,.dur,.q")
