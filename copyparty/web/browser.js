@@ -138,6 +138,9 @@ var pbar = (function () {
 	var grad = null;
 
 	r.drawbuf = function () {
+		if (!mp.au)
+			return;
+
 		var cs = getComputedStyle(r.bcan);
 		var sw = parseInt(cs['width']);
 		var sh = parseInt(cs['height']);
@@ -164,6 +167,9 @@ var pbar = (function () {
 		}
 	};
 	r.drawpos = function () {
+		if (!mp.au)
+			return;
+
 		var cs = getComputedStyle(r.bcan);
 		var sw = parseInt(cs['width']);
 		var sh = parseInt(cs['height']);
