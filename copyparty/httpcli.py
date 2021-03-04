@@ -1130,13 +1130,13 @@ class HttpCli(object):
 
         dirs = []
 
-        vfs_ls = [x[0] for x in vfs_virt if stat.S_ISDIR(x[1])]
+        vfs_ls = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 
         if not self.args.ed or "dots" not in self.uparam:
             vfs_ls = exclude_dotfiles(vfs_ls)
 
         for fn in [x for x in vfs_ls if x != excl]:
-            dirs.append(os.path.join(fsroot, fn))
+            dirs.append(fn)
 
         for x in vfs_virt.keys():
             if x != excl:
