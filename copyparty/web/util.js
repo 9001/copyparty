@@ -173,10 +173,6 @@ function goto(dest) {
     for (var a = obj.length - 1; a >= 0; a--)
         obj[a].classList.remove('act');
 
-    var others = ['path', 'files', 'widget'];
-    for (var a = 0; a < others.length; a++)
-        ebi(others[a]).classList.remove('hidden');
-
     if (dest) {
         var ui = ebi('op_' + dest);
         ui.classList.add('act');
