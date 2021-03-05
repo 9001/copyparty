@@ -64,7 +64,6 @@ class Up2k(object):
         self.flags = {}
         self.cur = {}
         self.mtag = None
-        self.n_mtag_thr_alive = 0
         self.n_mtag_tags_added = 0
 
         self.mem_cur = None
@@ -432,12 +431,8 @@ class Up2k(object):
             if self.mtag.prefer_mt and not self.args.no_mtag_mt:
                 # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
                 # both do crazy runahead so lets reinvent another wheel
-                nw = os.cpu_count()
-                if not self.n_mtag_thr_alive:
-                    msg = 'using {} cores for tag reader "{}"'
-                    self.log(msg.format(nw, self.mtag.backend))
-
-                self.n_mtag_thr_alive = nw
+                nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
+                self.log("using {}x {}".format(nw, self.mtag.backend))
                 mpool = Queue(nw)
                 for _ in range(nw):
                     thr = threading.Thread(target=self._tag_thr, args=(mpool,))
@@ -474,10 +469,11 @@ class Up2k(object):
                     last_write = time.time()
                     n_buf = 0
 
-            if self.n_mtag_thr_alive:
-                mpool.join()
-                for _ in range(self.n_mtag_thr_alive):
+            if mpool:
+                for _ in range(mpool.maxsize):
                     mpool.put(None)
+
+                mpool.join()
 
             c3.close()
             c2.close()
@@ -488,7 +484,8 @@ class Up2k(object):
         while True:
             task = q.get()
             if not task:
-                break
+                q.task_done()
+                return
 
             try:
                 write_cur, entags, wark, abspath = task
@@ -497,11 +494,10 @@ class Up2k(object):
                     n = self._tag_file(write_cur, entags, wark, abspath, tags)
                     self.n_mtag_tags_added += n
             except:
-                with self.mutex:
-                    self.n_mtag_thr_alive -= 1
-                raise
-            finally:
-                q.task_done()
+                msg = "\033[33m{} failed to read tags from {}:\n{}"
+                self.log(msg.format(self.mtag.backend, abspath, traceback.format_exc()))
+
+            q.task_done()
 
     def _tag_file(self, write_cur, entags, wark, abspath, tags=None):
         tags = tags or self.mtag.get(abspath)
@@ -919,7 +915,7 @@ class Up2k(object):
         ret = []
         with open(path, "rb", 512 * 1024) as f:
             while fsz > 0:
-                self.pp.msg = "{} MB".format(int(fsz / 1024 / 1024))
+                self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
                 fsz -= rem

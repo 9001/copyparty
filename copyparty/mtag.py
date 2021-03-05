@@ -10,6 +10,9 @@ import subprocess as sp
 from .__init__ import PY2, WINDOWS
 from .util import fsenc, fsdec
 
+if not PY2:
+    unicode = str
+
 
 class MTag(object):
     def __init__(self, log_func, args):
@@ -18,6 +21,7 @@ class MTag(object):
         self.prefer_mt = False
         mappings = args.mtm
         self.backend = "ffprobe" if args.no_mutagen else "mutagen"
+        or_ffprobe = " or ffprobe"
 
         if self.backend == "mutagen":
             self.get = self.get_mutagen
@@ -32,7 +36,7 @@ class MTag(object):
             self.prefer_mt = True
             # about 20x slower
             if PY2:
-                cmd = ["ffprobe", "-version"]
+                cmd = [b"ffprobe", b"-version"]
                 try:
                     sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
                 except:
@@ -41,9 +45,15 @@ class MTag(object):
                 if not shutil.which("ffprobe"):
                     self.usable = False
 
+            if self.usable and WINDOWS and sys.version_info < (3, 8):
+                self.usable = False
+                or_ffprobe = " or python >= 3.8"
+                msg = "\033[31mfound ffprobe but your python is too old; need 3.8 or newer"
+                self.log(msg)
+
         if not self.usable:
-            msg = "\033[31mneed mutagen or ffprobe to read media tags so please run this:\n  {} -m pip install --user mutagen \033[0m"
-            self.log(msg.format(os.path.basename(sys.executable)))
+            msg = "\033[31mneed mutagen{} to read media tags so please run this:\n  {} -m pip install --user mutagen \033[0m"
+            self.log(msg.format(or_ffprobe, os.path.basename(sys.executable)))
             return
 
         # https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html
@@ -206,7 +216,7 @@ class MTag(object):
         return self.normalize_tags(ret, md)
 
     def get_ffprobe(self, abspath):
-        cmd = ["ffprobe", "-hide_banner", "--", fsenc(abspath)]
+        cmd = [b"ffprobe", b"-hide_banner", b"--", fsenc(abspath)]
         p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
         r = p.communicate()
         txt = r[1].decode("utf-8", "replace")

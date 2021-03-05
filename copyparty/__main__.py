@@ -18,7 +18,7 @@ import locale
 import argparse
 from textwrap import dedent
 
-from .__init__ import E, WINDOWS, VT100
+from .__init__ import E, WINDOWS, VT100, PY2
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
 from .util import py_desc, align_tab
@@ -51,6 +51,10 @@ class RiceFormatter(argparse.HelpFormatter):
     def _fill_text(self, text, width, indent):
         """same as RawDescriptionHelpFormatter(HelpFormatter)"""
         return "".join(indent + line + "\n" for line in text.splitlines())
+
+
+def warn(msg):
+    print("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
 
 
 def ensure_locale():
@@ -300,7 +304,13 @@ def main():
         if al.ciphers:
             configure_ssl_ciphers(al)
     else:
-        print("\033[33m  ssl module does not exist; cannot enable https\033[0m\n")
+        warn("ssl module does not exist; cannot enable https")
+
+    if PY2 and WINDOWS and al.e2d:
+        warn(
+            "windows py2 cannot do unicode filenames with -e2d\n"
+            + "  (if you crash with codec errors then that is why)"
+        )
 
     SvcHub(al).run()
 

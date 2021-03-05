@@ -69,7 +69,9 @@ summary: it works! you can use it! (but technically not even close to beta)
 
 # bugs
 
-* probably, pls let me know
+* Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
+* Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
+* probably more, pls let me know
 
 
 # searching
