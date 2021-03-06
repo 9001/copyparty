@@ -6,7 +6,7 @@ import re
 import threading
 
 from .__init__ import PY2, WINDOWS
-from .util import undot, Pebkac, fsdec, fsenc, statdir, uprint
+from .util import undot, Pebkac, fsdec, fsenc, statdir, nuprint
 
 
 class VFS(object):
@@ -106,7 +106,7 @@ class VFS(object):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
-        real = list(statdir(uprint, scandir, lstat, abspath))
+        real = list(statdir(nuprint, scandir, lstat, abspath))
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):

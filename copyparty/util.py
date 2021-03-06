@@ -135,6 +135,10 @@ def uprint(msg):
             print(msg.encode("ascii", "replace").decode(), end="")
 
 
+def nuprint(msg):
+    uprint("{}\n".format(msg))
+
+
 @contextlib.contextmanager
 def ren_open(fname, *args, **kwargs):
     fdir = kwargs.pop("fdir", None)
@@ -598,6 +602,31 @@ if PY2 and WINDOWS:
 else:
     fsenc = w8enc
     fsdec = w8dec
+
+
+def s3enc(mem_cur, rd, fn):
+    ret = []
+    for v in [rd, fn]:
+        try:
+            mem_cur.execute("select * from a where b = ?", (v,))
+            ret.append(v)
+        except:
+            ret.append("//" + w8b64enc(v))
+            # self.log("mojien/{} [{}] {}".format(k, v, ret[-1][2:]))
+
+    return tuple(ret)
+
+
+def s3dec(rd, fn):
+    ret = []
+    for k, v in [["d", rd], ["f", fn]]:
+        if v.startswith("//"):
+            ret.append(w8b64dec(v[2:]))
+            # self.log("mojide/{} [{}] {}".format(k, ret[-1], v[2:]))
+        else:
+            ret.append(v)
+
+    return tuple(ret)
 
 
 def atomic_move(src, dst):

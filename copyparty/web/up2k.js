@@ -332,7 +332,7 @@ function up2k_init(have_crypto) {
                 "name": fobj.name,
                 "size": fobj.size,
                 "lmod": lmod / 1000,
-                "purl": get_vpath(),
+                "purl": get_evpath(),
                 "done": false,
                 "hash": []
             };

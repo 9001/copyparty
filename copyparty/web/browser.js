@@ -467,7 +467,7 @@ function play(tid, call_depth) {
 		var o = ebi(oid);
 		o.setAttribute('id', 'thx_js');
 		if (window.history && history.replaceState) {
-			hist_replace((document.location + '').split('#')[0] + '#' + oid);
+			hist_replace(document.location.pathname + '#' + oid);
 		}
 		else {
 			document.location.hash = oid;
@@ -510,7 +510,7 @@ function evau_error(e) {
 	if (eplaya.error.message)
 		err += '\n\n' + eplaya.error.message;
 
-	err += '\n\nFile: «' + decodeURIComponent(eplaya.src.split('/').slice(-1)[0]) + '»';
+	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0]) + '»';
 
 	alert(err);
 }
@@ -545,7 +545,7 @@ function autoplay_blocked() {
 	var na = ebi('blk_na');
 
 	var fn = mp.tracks[mp.au.tid].split(/\//).pop();
-	fn = decodeURIComponent(fn.replace(/\+/g, ' '));
+	fn = uricom_dec(fn.replace(/\+/g, ' '));
 
 	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function (e) {
@@ -744,7 +744,7 @@ function autoplay_blocked() {
 		treefiles.appendChild(ebi('epi'));
 
 		swrite('entreed', 'tree');
-		get_tree("", get_vpath(), true);
+		get_tree("", get_evpath(), true);
 	}
 
 	function get_tree(top, dst, rst) {
@@ -776,7 +776,7 @@ function autoplay_blocked() {
 		ebi('treeul').setAttribute('ts', this.ts);
 
 		var top = this.top == '.' ? this.dst : this.top,
-			name = top.split('/').slice(-2)[0],
+			name = uricom_dec(top.split('/').slice(-2)[0]),
 			rtop = top.replace(/^\/+/, "");
 
 		try {
@@ -827,7 +827,7 @@ function autoplay_blocked() {
 	}
 
 	function reload_tree() {
-		var cdir = get_vpath();
+		var cdir = get_evpath();
 		var links = document.querySelectorAll('#treeul a+a');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			var href = links[a].getAttribute('href');
@@ -912,7 +912,7 @@ function autoplay_blocked() {
 		for (var a = 0; a < nodes.length; a++) {
 			var r = nodes[a],
 				ln = ['<tr><td>' + r.lead + '</td><td><a href="' +
-					top + r.href + '">' + esc(decodeURIComponent(r.href)) + '</a>', r.sz];
+					top + r.href + '">' + esc(uricom_dec(r.href)) + '</a>', r.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
@@ -960,12 +960,14 @@ function autoplay_blocked() {
 		keys.sort();
 		for (var a = 0; a < keys.length; a++) {
 			var kk = keys[a],
-				k = kk.slice(1),
-				url = '/' + (top ? top + k : k) + '/',
-				ek = esc(k),
+				ks = kk.slice(1),
+				k = uricom_dec(ks),
+				hek = esc(k),
+				uek = ks == k ? k : uricom_enc(k, true),
+				url = '/' + (top ? top + uek : uek) + '/',
 				sym = res[kk] ? '-' : '+',
 				link = '<a href="#">' + sym + '</a><a href="' +
-					esc(url) + '">' + ek + '</a>';
+					url + '">' + hek + '</a>';
 
 			if (res[kk]) {
 				var subtree = parsetree(res[kk], url.slice(1));
@@ -1019,12 +1021,17 @@ function autoplay_blocked() {
 
 	window.onpopstate = function (e) {
 		console.log("h-pop " + e.state);
-		get_tree("", e.state, true);
-		reqls(e.state);
+		if (!e.state)
+			return;
+
+		var url = new URL(e.state, "https://" + document.location.host);
+		url = url.pathname;
+		get_tree("", url, true);
+		reqls(url);
 	};
 
 	if (window.history && history.pushState) {
-		hist_replace(get_vpath() + window.location.hash);
+		hist_replace(get_evpath() + window.location.hash);
 	}
 })();
 
@@ -1196,7 +1203,7 @@ function reload_browser(not_mp) {
 	filecols.set_style();
 	makeSortable(ebi('files'));
 
-	var parts = get_vpath().split('/');
+	var parts = get_evpath().split('/');
 	var rm = document.querySelectorAll('#path>a+a+a');
 	for (a = rm.length - 1; a >= 0; a--)
 		rm[a].parentNode.removeChild(rm[a]);

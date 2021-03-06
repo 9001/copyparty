@@ -25,6 +25,8 @@ class U2idx(object):
             return
 
         self.cur = {}
+        self.mem_cur = sqlite3.connect(":memory:")
+        self.mem_cur.execute(r"create table a (b text)")
 
     def log(self, msg, c=0):
         self.log_func("u2idx", msg, c)
@@ -111,6 +113,9 @@ class U2idx(object):
                 lim -= 1
                 if lim <= 0:
                     break
+
+                if rd.startswith("//") or fn.startswith("//"):
+                    rd, fn = s3dec(rd, fn)
 
                 rp = os.path.join(vtop, rd, fn).replace("\\", "/")
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp, "w": w[:16]})

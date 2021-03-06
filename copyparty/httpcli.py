@@ -1136,7 +1136,7 @@ class HttpCli(object):
             vfs_ls = exclude_dotfiles(vfs_ls)
 
         for fn in [x for x in vfs_ls if x != excl]:
-            dirs.append(fn)
+            dirs.append(quotep(fn))
 
         for x in vfs_virt.keys():
             if x != excl:
@@ -1275,7 +1275,12 @@ class HttpCli(object):
             del f["rd"]
             if icur:
                 q = "select w from up where rd = ? and fn = ?"
-                r = icur.execute(q, (rd, fn)).fetchone()
+                try:
+                    r = icur.execute(q, (rd, fn)).fetchone()
+                except:
+                    args = s3enc(idx.mem_cur, rd, fn)
+                    r = icur.execute(q, args).fetchone()
+
                 if not r:
                     continue
 

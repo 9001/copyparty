@@ -220,6 +220,31 @@ function linksplit(rp) {
 }
 
 
+function uricom_enc(txt, do_fb_enc) {
+    try {
+        return encodeURIComponent(txt);
+    }
+    catch (ex) {
+        console.log("uce-err [" + txt + "]");
+        if (do_fb_enc)
+            return esc(txt);
+
+        return txt;
+    }
+}
+
+
+function uricom_dec(txt) {
+    try {
+        return decodeURIComponent(txt);
+    }
+    catch (ex) {
+        console.log("ucd-err [" + txt + "]");
+        return txt;
+    }
+}
+
+
 function get_evpath() {
     var ret = document.location.pathname;
 
@@ -234,7 +259,7 @@ function get_evpath() {
 
 
 function get_vpath() {
-    return decodeURIComponent(get_evpath());
+    return uricom_dec(get_evpath());
 }
 
 

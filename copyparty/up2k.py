@@ -25,8 +25,8 @@ from .util import (
     sanitize_fn,
     ren_open,
     atomic_move,
-    w8b64enc,
-    w8b64dec,
+    s3enc,
+    s3dec,
     statdir,
 )
 from .mtag import MTag
@@ -109,29 +109,6 @@ class Up2k(object):
 
     def log(self, msg, c=0):
         self.log_func("up2k", msg + "\033[K", c)
-
-    def w8enc(self, rd, fn):
-        ret = []
-        for v in [rd, fn]:
-            try:
-                self.mem_cur.execute("select * from a where b = ?", (v,))
-                ret.append(v)
-            except:
-                ret.append("//" + w8b64enc(v))
-                # self.log("mojien/{} [{}] {}".format(k, v, ret[-1][2:]))
-
-        return tuple(ret)
-
-    def w8dec(self, rd, fn):
-        ret = []
-        for k, v in [["d", rd], ["f", fn]]:
-            if v.startswith("//"):
-                ret.append(w8b64dec(v[2:]))
-                # self.log("mojide/{} [{}] {}".format(k, ret[-1], v[2:]))
-            else:
-                ret.append(v)
-
-        return tuple(ret)
 
     def _vis_job_progress(self, job):
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
@@ -340,7 +317,7 @@ class Up2k(object):
                 try:
                     c = dbw[0].execute(sql, (rd, fn))
                 except:
-                    c = dbw[0].execute(sql, self.w8enc(rd, fn))
+                    c = dbw[0].execute(sql, s3enc(self.mem_cur, rd, fn))
 
                 in_db = list(c.fetchall())
                 if in_db:
@@ -394,7 +371,7 @@ class Up2k(object):
         for dwark, dts, dsz, drd, dfn in c:
             nchecked += 1
             if drd.startswith("//") or dfn.startswith("//"):
-                drd, dfn = self.w8dec(drd, dfn)
+                drd, dfn = s3dec(drd, dfn)
 
             abspath = os.path.join(top, drd, dfn)
             # almost zero overhead dw
@@ -479,6 +456,9 @@ class Up2k(object):
                 q = "select w from mt where w = ?"
                 if c2.execute(q, (w[:16],)).fetchone():
                     continue
+
+                if rd.startswith("//") or fn.startswith("//"):
+                    rd, fn = s3dec(rd, fn)
 
                 abspath = os.path.join(ptop, rd, fn)
                 self.pp.msg = "c{} {}".format(n_left, abspath)
@@ -704,7 +684,7 @@ class Up2k(object):
                 cur = cur.execute(q, argv)
                 for _, dtime, dsize, dp_dir, dp_fn in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
-                        dp_dir, dp_fn = self.w8dec(dp_dir, dp_fn)
+                        dp_dir, dp_fn = s3dec(self.mem_cur, dp_dir, dp_fn)
 
                     dp_abs = os.path.join(cj["ptop"], dp_dir, dp_fn).replace("\\", "/")
                     # relying on path.exists to return false on broken symlinks
@@ -920,7 +900,7 @@ class Up2k(object):
         try:
             db.execute(sql, (rd, fn))
         except:
-            db.execute(sql, self.w8enc(rd, fn))
+            db.execute(sql, s3enc(self.mem_cur, rd, fn))
 
     def db_add(self, db, wark, rd, fn, ts, sz):
         sql = "insert into up values (?,?,?,?,?)"
@@ -928,7 +908,7 @@ class Up2k(object):
         try:
             db.execute(sql, v)
         except:
-            rd, fn = self.w8enc(rd, fn)
+            rd, fn = s3enc(self.mem_cur, rd, fn)
             v = (wark, ts, sz, rd, fn)
             db.execute(sql, v)
 

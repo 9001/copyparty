@@ -15,7 +15,7 @@ var dom_md = ebi('mt');
         if (a > 0)
             loc.push(n[a]);
 
-        var dec = decodeURIComponent(n[a]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        var dec = uricom_dec(n[a]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
         nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
     }
