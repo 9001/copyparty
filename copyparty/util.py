@@ -119,17 +119,20 @@ class ProgressPrinter(threading.Thread):
                 continue
 
             msg = self.msg
-            m = " {}\033[K\r".format(msg)
-            try:
-                print(m, end="")
-            except UnicodeEncodeError:
-                try:
-                    print(m.encode("utf-8", "replace").decode(), end="")
-                except:
-                    print(m.encode("ascii", "replace").decode(), end="")
+            uprint(" {}\033[K\r".format(msg))
 
         print("\033[K", end="")
         sys.stdout.flush()  # necessary on win10 even w/ stderr btw
+
+
+def uprint(msg):
+    try:
+        print(msg, end="")
+    except UnicodeEncodeError:
+        try:
+            print(msg.encode("utf-8", "replace").decode(), end="")
+        except:
+            print(msg.encode("ascii", "replace").decode(), end="")
 
 
 @contextlib.contextmanager
@@ -734,7 +737,8 @@ def statdir(logger, scandir, lstat, top):
                     try:
                         yield [fsdec(fh.name), fh.stat(follow_symlinks=not lstat)]
                     except Exception as ex:
-                        logger("scan-stat: {} @ {}".format(repr(ex), fsdec(fh.path)))
+                        msg = "scan-stat: \033[36m{} @ {}"
+                        logger(msg.format(repr(ex), fsdec(fh.path)))
         else:
             src = "listdir"
             fun = os.lstat if lstat else os.stat
@@ -743,9 +747,11 @@ def statdir(logger, scandir, lstat, top):
                 try:
                     yield [fsdec(name), fun(abspath)]
                 except Exception as ex:
-                    logger("list-stat: {} @ {}".format(repr(ex), fsdec(abspath)))
+                    msg = "list-stat: \033[36m{} @ {}"
+                    logger(msg.format(repr(ex), fsdec(abspath)))
+
     except Exception as ex:
-        logger("{}: {} @ {}".format(src, repr(ex), top))
+        logger("{}: \033[31m{} @ {}".format(src, repr(ex), top))
 
 
 def unescape_cookie(orig):

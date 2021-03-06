@@ -6,7 +6,7 @@ import re
 import threading
 
 from .__init__ import PY2, WINDOWS
-from .util import undot, Pebkac, fsdec, fsenc, statdir
+from .util import undot, Pebkac, fsdec, fsenc, statdir, uprint
 
 
 class VFS(object):
@@ -106,7 +106,7 @@ class VFS(object):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
-        real = list(statdir(print, scandir, lstat, abspath))
+        real = list(statdir(uprint, scandir, lstat, abspath))
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):
@@ -147,8 +147,8 @@ class AuthSrv(object):
         self.mutex = threading.Lock()
         self.reload()
 
-    def log(self, msg):
-        self.log_func("auth", msg)
+    def log(self, msg, c=0):
+        self.log_func("auth", msg, c)
 
     def invert(self, orig):
         if PY2:
@@ -304,9 +304,9 @@ class AuthSrv(object):
 
         if missing_users:
             self.log(
-                "\033[31myou must -a the following users: "
-                + ", ".join(k for k in sorted(missing_users))
-                + "\033[0m"
+                "you must -a the following users: "
+                + ", ".join(k for k in sorted(missing_users)),
+                c=1,
             )
             raise Exception("invalid config")
 
@@ -329,8 +329,8 @@ class AuthSrv(object):
             v, _ = vfs.get("/", "*", False, True)
             if self.warn_anonwrite and os.getcwd() == v.realpath:
                 self.warn_anonwrite = False
-                msg = "\033[31manyone can read/write the current directory: {}\033[0m"
-                self.log(msg.format(v.realpath))
+                msg = "anyone can read/write the current directory: {}"
+                self.log(msg.format(v.realpath), c=1)
         except Pebkac:
             self.warn_anonwrite = True
 

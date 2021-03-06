@@ -28,7 +28,7 @@ class MTag(object):
             try:
                 import mutagen
             except:
-                self.log("\033[33mcould not load mutagen, trying ffprobe instead")
+                self.log("could not load mutagen, trying ffprobe instead", c=3)
                 self.backend = "ffprobe"
 
         if self.backend == "ffprobe":
@@ -48,12 +48,12 @@ class MTag(object):
             if self.usable and WINDOWS and sys.version_info < (3, 8):
                 self.usable = False
                 or_ffprobe = " or python >= 3.8"
-                msg = "\033[31mfound ffprobe but your python is too old; need 3.8 or newer"
-                self.log(msg)
+                msg = "found ffprobe but your python is too old; need 3.8 or newer"
+                self.log(msg, c=1)
 
         if not self.usable:
-            msg = "\033[31mneed mutagen{} to read media tags so please run this:\n  {} -m pip install --user mutagen \033[0m"
-            self.log(msg.format(or_ffprobe, os.path.basename(sys.executable)))
+            msg = "need mutagen{} to read media tags so please run this:\n  {} -m pip install --user mutagen"
+            self.log(msg.format(or_ffprobe, os.path.basename(sys.executable)), c=1)
             return
 
         # https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html
@@ -125,8 +125,8 @@ class MTag(object):
         }
         # self.get = self.compare
 
-    def log(self, msg):
-        self.log_func("mtag", msg)
+    def log(self, msg, c=0):
+        self.log_func("mtag", msg, c)
 
     def normalize_tags(self, ret, md):
         for k, v in dict(md).items():
@@ -295,9 +295,7 @@ class MTag(object):
                             sec *= 60
                             sec += int(f)
                     except:
-                        self.log(
-                            "\033[33minvalid timestr from ffmpeg: [{}]".format(tstr)
-                        )
+                        self.log("invalid timestr from ffmpeg: [{}]".format(tstr), c=3)
 
                 ret[".dur"] = sec
                 m = ptn_br1.search(ln)

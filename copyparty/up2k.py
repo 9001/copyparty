@@ -91,7 +91,7 @@ class Up2k(object):
             self.log("could not initialize sqlite3, will use in-memory registry only")
 
         # this is kinda jank
-        auth = AuthSrv(self.args, self.log, False)
+        auth = AuthSrv(self.args, self.log_func, False)
         have_e2d = self.init_indexes(auth)
 
         if have_e2d:
@@ -107,8 +107,8 @@ class Up2k(object):
             thr.daemon = True
             thr.start()
 
-    def log(self, msg):
-        self.log_func("up2k", msg + "\033[K")
+    def log(self, msg, c=0):
+        self.log_func("up2k", msg + "\033[K", c)
 
     def w8enc(self, rd, fn):
         ret = []
@@ -170,8 +170,8 @@ class Up2k(object):
                     modified = True
 
             if modified:
-                msg = "\033[33mdisabling -e2t because your sqlite belongs in a museum"
-                self.log(msg)
+                msg = "disabling -e2t because your sqlite belongs in a museum"
+                self.log(msg, c=3)
 
         live_vols = []
         for vol in vols:
@@ -179,7 +179,7 @@ class Up2k(object):
                 os.listdir(vol.realpath)
                 live_vols.append(vol)
             except:
-                self.log("\033[31mcannot access " + vol.realpath)
+                self.log("cannot access " + vol.realpath, c=1)
 
         vols = live_vols
 
@@ -230,8 +230,8 @@ class Up2k(object):
         self.log(msg.format(len(vols), time.time() - t0))
 
         if needed_mutagen:
-            msg = "\033[31mcould not read tags because no backends are available (mutagen or ffprobe)\033[0m"
-            self.log(msg)
+            msg = "could not read tags because no backends are available (mutagen or ffprobe)"
+            self.log(msg, c=1)
 
         return have_e2d
 
@@ -526,8 +526,9 @@ class Up2k(object):
                     n = self._tag_file(write_cur, entags, wark, abspath, tags)
                     self.n_mtag_tags_added += n
             except:
-                msg = "\033[33m{} failed to read tags from {}:\n{}"
-                self.log(msg.format(self.mtag.backend, abspath, traceback.format_exc()))
+                ex = traceback.format_exc()
+                msg = "{} failed to read tags from {}:\n{}"
+                self.log(msg.format(self.mtag.backend, abspath, ex), c=3)
 
             q.task_done()
 
@@ -1071,12 +1072,12 @@ class Up2k(object):
             with self.mutex:
                 cur = self.cur[ptop]
                 if not cur:
-                    self.log("\033[31mno cursor to write tags with??")
+                    self.log("no cursor to write tags with??", c=1)
                     continue
 
                 entags = self.entags[ptop]
                 if not entags:
-                    self.log("\033[33mno entags okay.jpg")
+                    self.log("no entags okay.jpg", c=3)
                     continue
 
                 if "e2t" in self.flags[ptop]:

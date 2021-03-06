@@ -81,8 +81,8 @@ class HttpConn(object):
     def respath(self, res_name):
         return os.path.join(E.mod, "web", res_name)
 
-    def log(self, msg):
-        self.log_func(self.log_src, msg)
+    def log(self, msg, c=0):
+        self.log_func(self.log_src, msg, c)
 
     def get_u2idx(self):
         if not self.u2idx:
@@ -129,7 +129,7 @@ class HttpConn(object):
 
         if is_https:
             if self.sr:
-                self.log("\033[1;31mTODO: cannot do https in jython\033[0m")
+                self.log("TODO: cannot do https in jython", c="1;31")
                 return
 
             self.log_src = self.log_src.replace("[36m", "[35m")
@@ -180,7 +180,7 @@ class HttpConn(object):
                     pass
 
                 else:
-                    self.log("\033[35mhandshake\033[0m " + em)
+                    self.log("handshake\033[0m " + em, c=5)
 
                 return
 

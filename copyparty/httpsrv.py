@@ -38,7 +38,7 @@ class HttpSrv(object):
 
     def accept(self, sck, addr):
         """takes an incoming tcp connection and creates a thread to handle it"""
-        self.log("%s %s" % addr, "\033[1;30m|%sC-cthr\033[0m" % ("-" * 5,))
+        self.log("%s %s" % addr, "|%sC-cthr" % ("-" * 5,), c="1;30")
         thr = threading.Thread(target=self.thr_client, args=(sck, addr))
         thr.daemon = True
         thr.start()
@@ -66,11 +66,11 @@ class HttpSrv(object):
                 thr.start()
 
         try:
-            self.log("%s %s" % addr, "\033[1;30m|%sC-crun\033[0m" % ("-" * 6,))
+            self.log("%s %s" % addr, "|%sC-crun" % ("-" * 6,), c="1;30")
             cli.run()
 
         finally:
-            self.log("%s %s" % addr, "\033[1;30m|%sC-cdone\033[0m" % ("-" * 7,))
+            self.log("%s %s" % addr, "|%sC-cdone" % ("-" * 7,), c="1;30")
             try:
                 sck.shutdown(socket.SHUT_RDWR)
                 sck.close()
@@ -78,7 +78,8 @@ class HttpSrv(object):
                 if not MACOS:
                     self.log(
                         "%s %s" % addr,
-                        "\033[1;30mshut({}): {}\033[0m".format(sck.fileno(), ex),
+                        "shut({}): {}".format(sck.fileno(), ex),
+                        c="1;30",
                     )
                 if ex.errno not in [10038, 10054, 107, 57, 9]:
                     # 10038 No longer considered a socket

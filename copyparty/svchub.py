@@ -65,10 +65,10 @@ class SvcHub(object):
             self.broker.shutdown()
             print("nailed it")
 
-    def _log_disabled(self, src, msg):
+    def _log_disabled(self, src, msg, c=0):
         pass
 
-    def _log_enabled(self, src, msg):
+    def _log_enabled(self, src, msg, c=0):
         """handles logging from all components"""
         with self.log_mutex:
             now = time.time()
@@ -91,6 +91,13 @@ class SvcHub(object):
                     msg = self.ansi_re.sub("", msg)
                 if "\033" in src:
                     src = self.ansi_re.sub("", src)
+            elif c:
+                if isinstance(c, int):
+                    msg = "\033[3{}m{}".format(c, msg)
+                elif "\033" not in c:
+                    msg = "\033[{}m{}\033[0m".format(c, msg)
+                else:
+                    msg = "{}{}\033[0m".format(c, msg)
 
             ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
             msg = fmt.format(ts, src, msg)

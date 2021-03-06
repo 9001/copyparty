@@ -41,8 +41,8 @@ class HttpCli(object):
         self.absolute_urls = False
         self.out_headers = {"Access-Control-Allow-Origin": "*"}
 
-    def log(self, msg):
-        self.log_func(self.log_src, msg)
+    def log(self, msg, c=0):
+        self.log_func(self.log_src, msg, c)
 
     def _check_nonfatal(self, ex):
         return ex.code < 400 or ex.code == 404
@@ -63,7 +63,7 @@ class HttpCli(object):
 
             if not headerlines[0]:
                 # seen after login with IE6.0.2900.5512.xpsp.080413-2111 (xp-sp3)
-                self.log("\033[1;31mBUG: trailing newline from previous request\033[0m")
+                self.log("BUG: trailing newline from previous request", c="1;31")
                 headerlines.pop(0)
 
             try:

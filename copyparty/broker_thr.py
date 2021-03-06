@@ -28,7 +28,7 @@ class BrokerThr(object):
     def put(self, want_retval, dest, *args):
         if dest == "httpconn":
             sck, addr = args
-            self.log("%s %s" % addr, "\033[1;30m|%sC-qpop\033[0m" % ("-" * 4,))
+            self.log("%s %s" % addr, "|%sC-qpop" % ("-" * 4,), c="1;30")
             self.httpsrv.accept(sck, addr)
 
         else:

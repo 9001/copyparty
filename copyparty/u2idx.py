@@ -26,8 +26,8 @@ class U2idx(object):
 
         self.cur = {}
 
-    def log(self, msg):
-        self.log_func("u2idx", msg)
+    def log(self, msg, c=0):
+        self.log_func("u2idx", msg, c)
 
     def fsearch(self, vols, body):
         """search by up2k hashlist"""

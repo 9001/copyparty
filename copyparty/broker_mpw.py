@@ -49,11 +49,11 @@ class MpWorker(object):
         # print('k')
         pass
 
-    def log(self, src, msg):
-        self.q_yield.put([0, "log", [src, msg]])
+    def log(self, src, msg, c=0):
+        self.q_yield.put([0, "log", [src, msg, c]])
 
-    def logw(self, msg):
-        self.log("mp{}".format(self.n), msg)
+    def logw(self, msg, c=0):
+        self.log("mp{}".format(self.n), msg, c)
 
     def httpdrop(self, addr):
         self.q_yield.put([0, "httpdrop", [addr]])
@@ -73,7 +73,7 @@ class MpWorker(object):
                 if PY2:
                     sck = pickle.loads(sck)  # nosec
 
-                self.log("%s %s" % addr, "\033[1;30m|%sC-qpop\033[0m" % ("-" * 4,))
+                self.log("%s %s" % addr, "|%sC-qpop" % ("-" * 4,), c="1;30")
                 self.httpsrv.accept(sck, addr)
 
                 with self.mutex:
