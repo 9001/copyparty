@@ -37,7 +37,11 @@ class U2idx(object):
         fsize = body["size"]
         fhash = body["hash"]
         wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
-        return self.run_query(vols, "w = ?", [wark], "", [])[0]
+
+        uq = "substr(w,1,16) = ? and w = ?"
+        uv = [wark[:16], wark]
+
+        return self.run_query(vols, uq, uv, "", [])[0]
 
     def get_cur(self, ptop):
         cur = self.cur.get(ptop)

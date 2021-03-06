@@ -156,7 +156,7 @@ function opclick(e) {
     var dest = this.getAttribute('data-dest');
     goto(dest);
 
-    swrite('opmode', dest || undefined);
+    swrite('opmode', dest || null);
 
     var input = document.querySelector('.opview.act input:not([type="hidden"])')
     if (input)
@@ -262,12 +262,12 @@ function sread(key) {
     if (window.localStorage)
         return localStorage.getItem(key);
 
-    return '';
+    return null;
 }
 
 function swrite(key, val) {
     if (window.localStorage) {
-        if (val === undefined)
+        if (val === undefined || val === null)
             localStorage.removeItem(key);
         else
             localStorage.setItem(key, val);
@@ -293,7 +293,7 @@ function icfg_get(name, defval) {
     var o = ebi(name);
 
     var val = parseInt(sread(name));
-    if (val === null)
+    if (isNaN(val))
         return parseInt(o ? o.value : defval);
 
     if (o)

@@ -590,7 +590,7 @@ function autoplay_blocked() {
 
 	if (document.querySelector('#srch_form.tags'))
 		sconf.push(["tags",
-			["tags", "tags", "tags contains", "46"]
+			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "46"]
 		]);
 
 	var html = [];
@@ -654,7 +654,7 @@ function autoplay_blocked() {
 			return;
 
 		if (this.status !== 200) {
-			alert('ah fug\n' + this.status + ": " + this.responseText);
+			alert("http " + this.status + ": " + this.responseText);
 			return;
 		}
 
@@ -729,7 +729,7 @@ function autoplay_blocked() {
 	var treedata = null;
 	var dyn = bcfg_get('dyntree', true);
 	var treesz = icfg_get('treesz', 16);
-	treesz = isNaN(treesz) ? 16 : Math.min(Math.max(treesz, 4), 50);
+	treesz = Math.min(Math.max(treesz, 4), 50);
 	console.log('treesz [' + treesz + ']');
 
 	function entree(e) {
@@ -764,7 +764,7 @@ function autoplay_blocked() {
 			return;
 
 		if (this.status !== 200) {
-			alert('ah fug\n' + this.status + ": " + this.responseText);
+			alert("http " + this.status + ": " + this.responseText);
 			return;
 		}
 
@@ -870,7 +870,7 @@ function autoplay_blocked() {
 			return;
 
 		if (this.status !== 200) {
-			alert('ah fug\n' + this.status + ": " + this.responseText);
+			alert("http " + this.status + ": " + this.responseText);
 			return;
 		}
 
