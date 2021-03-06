@@ -67,10 +67,15 @@ class Up2k(object):
         self.n_mtag_tags_added = 0
 
         self.mem_cur = None
+        self.sqlite_ver = None
+        self.no_expr_idx = False
         if HAVE_SQLITE3:
             # mojibake detector
             self.mem_cur = self._orz(":memory:")
             self.mem_cur.execute(r"create table a (b text)")
+            self.sqlite_ver = tuple([int(x) for x in sqlite3.sqlite_version.split(".")])
+            if self.sqlite_ver < (3, 9):
+                self.no_expr_idx = True
 
         if WINDOWS:
             # usually fails to set lastmod too quickly
@@ -140,11 +145,33 @@ class Up2k(object):
 
         return ret
 
+    def _expr_idx_filter(self, flags):
+        if not self.no_expr_idx:
+            return False, flags
+
+        ret = {k: v for k, v in flags.items() if not k.startswith("e2t")}
+        if ret.keys() == flags.keys():
+            return False, flags
+
+        return True, ret
+
     def init_indexes(self, auth):
         self.pp = ProgressPrinter()
         vols = auth.vfs.all_vols.values()
         t0 = time.time()
         have_e2d = False
+
+        if self.no_expr_idx:
+            modified = False
+            for vol in vols:
+                m, f = self._expr_idx_filter(vol.flags)
+                if m:
+                    vol.flags = f
+                    modified = True
+
+            if modified:
+                msg = "\033[33mdisabling -e2t because your sqlite belongs in a museum"
+                self.log(msg)
 
         live_vols = []
         for vol in vols:
@@ -157,7 +184,7 @@ class Up2k(object):
         vols = live_vols
 
         need_mtag = False
-        for vol in auth.vfs.all_vols.values():
+        for vol in vols:
             if "e2t" in vol.flags:
                 need_mtag = True
 
@@ -212,6 +239,8 @@ class Up2k(object):
         with self.mutex:
             if ptop in self.registry:
                 return None
+
+            _, flags = self._expr_idx_filter(flags)
 
             reg = {}
             path = os.path.join(ptop, ".hist", "up2k.snap")
@@ -611,8 +640,12 @@ class Up2k(object):
                 except:
                     pass
 
+        idx = r"create index up_w on up(substr(w,1,16))"
+        if self.no_expr_idx:
+            idx = r"create index up_w on up(w)"
+
         for cmd in [
-            r"create index up_w on up(substr(w,1,16))",
+            idx,
             r"create table mt (w text, k text, v int)",
             r"create index mt_w on mt(w)",
             r"create index mt_k on mt(k)",
@@ -657,8 +690,13 @@ class Up2k(object):
             cur = self.cur.get(cj["ptop"], None)
             reg = self.registry[cj["ptop"]]
             if cur:
-                q = r"select * from up where substr(w,1,16) = ? and w = ?"
-                argv = (wark[:16], wark)
+                if self.no_expr_idx:
+                    q = r"select * from up where w = ?"
+                    argv = (wark,)
+                else:
+                    q = r"select * from up where substr(w,1,16) = ? and w = ?"
+                    argv = (wark[:16], wark)
+
                 cur = cur.execute(q, argv)
                 for _, dtime, dsize, dp_dir, dp_fn in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
