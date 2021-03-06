@@ -74,7 +74,7 @@ class HttpCli(object):
         except Pebkac as ex:
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = self._check_nonfatal(ex)
-            self.loud_reply(str(ex), status=ex.code)
+            self.loud_reply(unicode(ex), status=ex.code)
             return self.keepalive
 
         # time.sleep(0.4)
@@ -163,7 +163,7 @@ class HttpCli(object):
         response = ["HTTP/1.1 {} {}".format(status, HTTPCODE[status])]
 
         if length is not None:
-            response.append("Content-Length: " + str(length))
+            response.append("Content-Length: " + unicode(length))
 
         # close if unknown length, otherwise take client's preference
         response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
@@ -521,7 +521,7 @@ class HttpCli(object):
             if len(cstart) > 1 and path != os.devnull:
                 self.log(
                     "clone {} to {}".format(
-                        cstart[0], " & ".join(str(x) for x in cstart[1:])
+                        cstart[0], " & ".join(unicode(x) for x in cstart[1:])
                     )
                 )
                 ofs = 0
@@ -697,7 +697,7 @@ class HttpCli(object):
                     raise
 
         except Pebkac as ex:
-            errmsg = str(ex)
+            errmsg = unicode(ex)
 
         td = max(0.1, time.time() - t0)
         sz_total = sum(x[0] for x in files)
@@ -1006,7 +1006,7 @@ class HttpCli(object):
             mime=guess_mime(req_path)[0] or "application/octet-stream",
         )
 
-        logmsg += str(status) + logtail
+        logmsg += unicode(status) + logtail
 
         if self.mode == "HEAD" or not do_send:
             self.log(logmsg)
@@ -1020,7 +1020,7 @@ class HttpCli(object):
                 remains = sendfile_py(lower, upper, f, self.s)
 
         if remains > 0:
-            logmsg += " \033[31m" + str(upper - remains) + "\033[0m"
+            logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"
 
         spd = self._spd((upper - lower) - remains)
         self.log("{},  {}".format(logmsg, spd))
@@ -1067,7 +1067,7 @@ class HttpCli(object):
         sz_html = len(template.render(**targs).encode("utf-8"))
         self.send_headers(sz_html + sz_md, status)
 
-        logmsg += str(status)
+        logmsg += unicode(status)
         if self.mode == "HEAD" or not do_send:
             self.log(logmsg)
             return True
@@ -1081,7 +1081,7 @@ class HttpCli(object):
             self.log(logmsg + " \033[31md/c\033[0m")
             return False
 
-        self.log(logmsg + " " + str(len(html)))
+        self.log(logmsg + " " + unicode(len(html)))
         return True
 
     def tx_mounts(self):
@@ -1297,7 +1297,7 @@ class HttpCli(object):
 
         try:
             if not self.args.nih:
-                srv_info.append(str(socket.gethostname()).split(".")[0])
+                srv_info.append(unicode(socket.gethostname()).split(".")[0])
         except:
             self.log("#wow #whoa")
             pass

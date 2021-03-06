@@ -143,7 +143,7 @@ class MTag(object):
                 ret[mk] = [pref, v[0]]
 
         # take first value
-        ret = {k: str(v[1]).strip() for k, v in ret.items()}
+        ret = {k: unicode(v[1]).strip() for k, v in ret.items()}
 
         # track 3/7 => track 3
         for k, v in ret.items():
