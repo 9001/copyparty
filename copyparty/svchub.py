@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import PY2, WINDOWS, MACOS, VT100
-from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
 from .util import mp

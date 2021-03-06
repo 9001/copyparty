@@ -467,8 +467,7 @@ function play(tid, call_depth) {
 		var o = ebi(oid);
 		o.setAttribute('id', 'thx_js');
 		if (window.history && history.replaceState) {
-			var nurl = (document.location + '').split('#')[0] + '#' + oid;
-			hist_replace(ebi('files').innerHTML, nurl);
+			hist_replace((document.location + '').split('#')[0] + '#' + oid);
 		}
 		else {
 			document.location.hash = oid;
@@ -726,7 +725,6 @@ function autoplay_blocked() {
 
 // tree
 (function () {
-	var treedata = null;
 	var dyn = bcfg_get('dyntree', true);
 	var treesz = icfg_get('treesz', 16);
 	treesz = Math.min(Math.max(treesz, 4), 50);
@@ -746,13 +744,15 @@ function autoplay_blocked() {
 		treefiles.appendChild(ebi('epi'));
 
 		swrite('entreed', 'tree');
-		get_tree("", get_vpath());
+		get_tree("", get_vpath(), true);
 	}
 
-	function get_tree(top, dst) {
+	function get_tree(top, dst, rst) {
 		var xhr = new XMLHttpRequest();
 		xhr.top = top;
 		xhr.dst = dst;
+		xhr.rst = rst;
+		xhr.ts = new Date().getTime();
 		xhr.open('GET', dst + '?tree=' + top, true);
 		xhr.onreadystatechange = recvtree;
 		xhr.send();
@@ -768,6 +768,13 @@ function autoplay_blocked() {
 			return;
 		}
 
+		var cur = ebi('treeul').getAttribute('ts');
+		if (cur && parseInt(cur) > this.ts) {
+			console.log("reject tree");
+			return;
+		}
+		ebi('treeul').setAttribute('ts', this.ts);
+
 		var top = this.top == '.' ? this.dst : this.top,
 			name = top.split('/').slice(-2)[0],
 			rtop = top.replace(/^\/+/, "");
@@ -781,7 +788,7 @@ function autoplay_blocked() {
 		var html = parsetree(res, rtop);
 		if (!this.top) {
 			html = '<li><a href="#">-</a><a href="/">[root]</a>\n<ul>' + html;
-			if (!ebi('treeul').getElementsByTagName('li').length)
+			if (this.rst || !ebi('treeul').getElementsByTagName('li').length)
 				ebi('treeul').innerHTML = html + '</ul></li>';
 		}
 		else {
@@ -841,12 +848,20 @@ function autoplay_blocked() {
 			treegrow.call(this.previousSibling, e);
 			return;
 		}
+		reqls(this.getAttribute('href'), true);
+	}
+
+	function reqls(url, hpush) {
 		var xhr = new XMLHttpRequest();
-		xhr.top = this.getAttribute('href');
+		xhr.top = url;
+		xhr.hpush = hpush;
+		xhr.ts = new Date().getTime();
 		xhr.open('GET', xhr.top + '?ls', true);
 		xhr.onreadystatechange = recvls;
 		xhr.send();
-		get_tree('.', xhr.top);
+		if (hpush)
+			get_tree('.', xhr.top);
+
 		enspin('#files');
 	}
 
@@ -873,6 +888,13 @@ function autoplay_blocked() {
 			alert("http " + this.status + ": " + this.responseText);
 			return;
 		}
+
+		var cur = ebi('files').getAttribute('ts');
+		if (cur && parseInt(cur) > this.ts) {
+			console.log("reject ls");
+			return;
+		}
+		ebi('files').setAttribute('ts', this.ts);
 
 		try {
 			var res = JSON.parse(this.responseText);
@@ -913,7 +935,9 @@ function autoplay_blocked() {
 		html = html.join('\n');
 		ebi('files').innerHTML = html;
 
-		hist_push(html, this.top);
+		if (this.hpush)
+			hist_push(this.top);
+
 		apply_perms(res.perms);
 		despin('#files');
 
@@ -994,19 +1018,13 @@ function autoplay_blocked() {
 		entree();
 
 	window.onpopstate = function (e) {
-		console.log(e.url + ' ,, ' + ((e.state + '').slice(0, 64)));
-		var html = sessionStorage.getItem(e.state || 1);
-		if (!html)
-			return;
-
-		ebi('files').innerHTML = html;
-		reload_tree();
-		reload_browser();
+		console.log("h-pop " + e.state);
+		get_tree("", e.state, true);
+		reqls(e.state);
 	};
 
 	if (window.history && history.pushState) {
-		var u = get_vpath() + window.location.hash;
-		hist_replace(ebi('files').innerHTML, u);
+		hist_replace(get_vpath() + window.location.hash);
 	}
 })();
 

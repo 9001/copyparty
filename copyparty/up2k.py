@@ -64,7 +64,7 @@ class Up2k(object):
         self.flags = {}
         self.cur = {}
         self.mtag = None
-        self.n_mtag_tags_added = 0
+        self.n_mtag_tags_added = -1
 
         self.mem_cur = None
         self.sqlite_ver = None
@@ -461,7 +461,10 @@ class Up2k(object):
                 # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
                 # both do crazy runahead so lets reinvent another wheel
                 nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
-                self.log("using {}x {}".format(nw, self.mtag.backend))
+                if self.n_mtag_tags_added == -1:
+                    self.log("using {}x {}".format(nw, self.mtag.backend))
+                    self.n_mtag_tags_added = 0
+
                 mpool = Queue(nw)
                 for _ in range(nw):
                     thr = threading.Thread(target=self._tag_thr, args=(mpool,))
