@@ -90,7 +90,7 @@ class TestVFS(unittest.TestCase):
         finally:
             return ret
 
-    def log(self, src, msg):
+    def log(self, src, msg, c=0):
         pass
 
     def test(self):
