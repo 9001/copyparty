@@ -42,12 +42,8 @@ body {
 #path #entree {
 	margin-left: -.7em;
 }
-#treetab {
-	display: none;
-}
 #files {
 	border-spacing: 0;
-	margin-top: 2em;
 	z-index: 1;
 	position: relative;
 }
@@ -156,6 +152,15 @@ a, #files tbody div a:last-child {
 }
 .logue {
 	padding: .2em 1.5em;
+}
+.logue:empty {
+	display: none;
+}
+#pro.logue {
+	margin-bottom: .8em;
+}
+#epi.logue {
+	margin: .8em 0;
 }
 #srv_info {
 	opacity: .5;
@@ -442,12 +447,40 @@ input[type="checkbox"]:checked+label {
 #files td div a:last-child {
 	width: 100%;
 }
-#tree,
-#treefiles {
-	vertical-align: top;
+#wrap {
+	margin-top: 2em;
 }
 #tree {
-	padding-top: 2em;
+	display: none;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	top: 7em;
+	padding-top: .2em;
+	overflow-y: auto;
+	-ms-scroll-chaining: none;
+	overscroll-behavior-y: none;
+	scrollbar-color: #eb0 #333;
+}
+#thx_ff {
+	padding: 5em 0;
+}
+#tree::-webkit-scrollbar-track {
+	background: #333;
+}
+#tree::-webkit-scrollbar {
+	background: #333;
+}
+#tree::-webkit-scrollbar-thumb {
+	background: #eb0;
+}
+#tree:hover {
+	z-index: 2;
+}
+#treeul {
+	position: relative;
+	left: -1.7em;
+	width: calc(100% + 1.3em);
 }
 #tree>a+a {
 	padding: .2em .4em;
@@ -471,12 +504,6 @@ input[type="checkbox"]:checked+label {
 	padding: .3em .5em;
 	font-size: 1.5em;
 }
-#treefiles #files tbody {
-	border-radius: 0 .7em 0 .7em;
-}
-#treefiles #files thead th:nth-child(1) {
-	border-radius: .7em 0 0 0;
-}
 #tree ul,
 #tree li {
 	padding: 0;
@@ -488,7 +515,11 @@ input[type="checkbox"]:checked+label {
 #tree li {
 	margin-left: 1em;
 	list-style: none;
-	white-space: nowrap;
+	border-top: 1px solid #4c4c4c;
+	border-bottom: 1px solid #111;
+}
+#tree li:last-child {
+	border-bottom: none;
 }
 #treeul a.hl {
 	color: #400;
@@ -502,23 +533,11 @@ input[type="checkbox"]:checked+label {
 #treeul a+a {
 	width: calc(100% - 2em);
 	background: #333;
+	line-height: 1em;
 }
 #treeul a+a:hover {
 	background: #222;
 	color: #fff;
-}
-#treeul {
-	position: relative;
-	overflow: hidden;
-	left: -1.7em;
-}
-#treeul:hover {
-	z-index: 2;
-	overflow: visible;
-}
-#treeul:hover a+a {
-	width: auto;
-	min-width: calc(100% - 2em);
 }
 #treeul a:first-child {
 	font-family: monospace, monospace;

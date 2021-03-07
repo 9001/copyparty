@@ -46,9 +46,9 @@ function up2k_flagbus() {
     var dbg = function (who, msg) {
         console.log('flagbus(' + flag.id + '): [' + who + '] ' + msg);
     };
-    flag.ch.onmessage = function (ev) {
-        var who = ev.data[0],
-            what = ev.data[1];
+    flag.ch.onmessage = function (e) {
+        var who = e.data[0],
+            what = e.data[1];
 
         if (who == flag.id) {
             dbg(who, 'hi me (??)');
@@ -83,7 +83,7 @@ function up2k_flagbus() {
             flag.ch.postMessage([flag.id, "hey"]);
         }
         else {
-            dbg('?', ev.data);
+            dbg('?', e.data);
         }
     };
     var tx = function (now, msg) {
@@ -194,7 +194,7 @@ function up2k_init(have_crypto) {
 
     // handle user intent to use the basic uploader instead
     ebi('u2nope').onclick = function (e) {
-        e.preventDefault();
+        ev(e);
         setmsg();
         goto('bup');
     };
@@ -254,29 +254,29 @@ function up2k_init(have_crypto) {
     }
     ebi('u2btn').addEventListener('click', nav, false);
 
-    function ondrag(ev) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        ev.dataTransfer.dropEffect = 'copy';
-        ev.dataTransfer.effectAllowed = 'copy';
+    function ondrag(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        e.dataTransfer.effectAllowed = 'copy';
     }
     ebi('u2btn').addEventListener('dragover', ondrag, false);
     ebi('u2btn').addEventListener('dragenter', ondrag, false);
 
-    function gotfile(ev) {
-        ev.stopPropagation();
-        ev.preventDefault();
+    function gotfile(e) {
+        e.stopPropagation();
+        e.preventDefault();
 
         var files;
         var is_itemlist = false;
-        if (ev.dataTransfer) {
-            if (ev.dataTransfer.items) {
-                files = ev.dataTransfer.items; // DataTransferItemList
+        if (e.dataTransfer) {
+            if (e.dataTransfer.items) {
+                files = e.dataTransfer.items; // DataTransferItemList
                 is_itemlist = true;
             }
-            else files = ev.dataTransfer.files; // FileList
+            else files = e.dataTransfer.files; // FileList
         }
-        else files = ev.target.files;
+        else files = e.target.files;
 
         if (files.length == 0)
             return alert('no files selected??');
@@ -655,8 +655,8 @@ function up2k_init(have_crypto) {
             prog(t.n, nchunk, col_hashing);
         };
 
-        var segm_load = function (ev) {
-            cache_buf = ev.target.result;
+        var segm_load = function (e) {
+            cache_buf = e.target.result;
             cache_ofs = 0;
             hash_calc();
         };
@@ -730,7 +730,7 @@ function up2k_init(have_crypto) {
         st.busy.handshake.push(t);
 
         var xhr = new XMLHttpRequest();
-        xhr.onload = function (ev) {
+        xhr.onload = function (e) {
             if (xhr.status == 200) {
                 var response = JSON.parse(xhr.responseText);
 
@@ -881,7 +881,7 @@ function up2k_init(have_crypto) {
             alert('y o u   b r o k e    i t\n\n(was that a folder? just files please)');
         };
 
-        reader.onload = function (ev) {
+        reader.onload = function (e) {
             var xhr = new XMLHttpRequest();
             xhr.upload.onprogress = function (xev) {
                 var perc = xev.loaded / (cdr - car) * 100;
@@ -915,7 +915,7 @@ function up2k_init(have_crypto) {
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             xhr.overrideMimeType('Content-Type', 'application/octet-stream');
             xhr.responseType = 'text';
-            xhr.send(ev.target.result);
+            xhr.send(e.target.result);
         };
 
         reader.readAsArrayBuffer(bobslice.call(t.fobj, car, cdr));
@@ -944,7 +944,7 @@ function up2k_init(have_crypto) {
     ///   config ui
     //
 
-    function onresize(ev) {
+    function onresize(e) {
         var bar = ebi('ops'),
             wpx = innerWidth,
             fpx = parseInt(getComputedStyle(bar)['font-size']),
@@ -959,17 +959,17 @@ function up2k_init(have_crypto) {
             ebi('u2conf').setAttribute('class', wide ? 'has_btn' : '');
         }
     }
-    window.onresize = onresize;
+    window.addEventListener('resize', onresize);
     onresize();
 
-    function desc_show(ev) {
+    function desc_show(e) {
         var msg = this.getAttribute('alt');
         msg = msg.replace(/\$N/g, "<br />");
         var cdesc = ebi('u2cdesc');
         cdesc.innerHTML = msg;
         cdesc.setAttribute('class', 'show');
     }
-    function desc_hide(ev) {
+    function desc_hide(e) {
         ebi('u2cdesc').setAttribute('class', '');
     }
     var o = document.querySelectorAll('#u2conf *[alt]');
@@ -1084,17 +1084,17 @@ function up2k_init(have_crypto) {
         }
     }
 
-    function nop(ev) {
-        ev.preventDefault();
+    function nop(e) {
+        ev(e);
         this.click();
     }
 
-    ebi('nthread_add').onclick = function (ev) {
-        ev.preventDefault();
+    ebi('nthread_add').onclick = function (e) {
+        ev(e);
         bumpthread(1);
     };
-    ebi('nthread_sub').onclick = function (ev) {
-        ev.preventDefault();
+    ebi('nthread_sub').onclick = function (e) {
+        ev(e);
         bumpthread(-1);
     };
 

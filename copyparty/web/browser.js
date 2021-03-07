@@ -586,6 +586,7 @@ function autoplay_blocked() {
 			["name", "name", "name contains &nbsp; (negate with -nope)", "46"]
 		]
 	];
+	var oldcfg = [];
 
 	if (document.querySelector('#srch_form.tags'))
 		sconf.push(["tags",
@@ -664,8 +665,16 @@ function autoplay_blocked() {
 		if (ofiles.getAttribute('ts') > this.ts)
 			return;
 
-		ebi('path').style.display = 'none';
-		ebi('tree').style.display = 'none';
+		if (!oldcfg.length) {
+			oldcfg = [
+				ebi('path').style.display,
+				ebi('tree').style.display,
+				ebi('wrap').style.marginLeft
+			];
+			ebi('path').style.display = 'none';
+			ebi('tree').style.display = 'none';
+			ebi('wrap').style.marginLeft = '0';
+		}
 
 		var html = mk_files_header(tagord);
 		html.push('<tbody>');
@@ -714,8 +723,10 @@ function autoplay_blocked() {
 
 	function unsearch(e) {
 		ev(e);
-		ebi('path').style.display = 'inline-block';
-		ebi('tree').style.display = 'block';
+		ebi('path').style.display = oldcfg[0];
+		ebi('tree').style.display = oldcfg[1];
+		ebi('wrap').style.marginLeft = oldcfg[2];
+		oldcfg = [];
 		ebi('files').innerHTML = orig_html;
 		orig_html = null;
 		reload_browser();
@@ -723,8 +734,7 @@ function autoplay_blocked() {
 })();
 
 
-// tree
-(function () {
+var treectl = (function () {
 	var dyn = bcfg_get('dyntree', true);
 	var treesz = icfg_get('treesz', 16);
 	treesz = Math.min(Math.max(treesz, 4), 50);
@@ -734,18 +744,49 @@ function autoplay_blocked() {
 		ev(e);
 		ebi('path').style.display = 'none';
 
-		var treetab = ebi('treetab');
-		var treefiles = ebi('treefiles');
-
-		treetab.style.display = 'table';
-
-		treefiles.appendChild(ebi('pro'));
-		treefiles.appendChild(ebi('files'));
-		treefiles.appendChild(ebi('epi'));
+		var tree = ebi('tree');
+		tree.style.display = 'block';
 
 		swrite('entreed', 'tree');
 		get_tree("", get_evpath(), true);
+		onresize();
 	}
+
+	function detree(e) {
+		ev(e);
+		ebi('tree').style.display = 'none';
+		ebi('path').style.display = 'inline-block';
+		ebi('wrap').style.marginLeft = '0';
+		swrite('entreed', 'na');
+	}
+
+	function onscroll() {
+		var top = ebi('wrap').getBoundingClientRect().top;
+		ebi('tree').style.top = Math.max(0, parseInt(top)) + 'px';
+	}
+	window.addEventListener('scroll', onscroll);
+
+	function periodic() {
+		onscroll();
+		setTimeout(periodic, document.visibilityState ? 200 : 5000);
+	}
+	periodic();
+
+	function onresize(e) {
+		var q = '#tree';
+		var nq = 0;
+		while (dyn) {
+			nq++;
+			q += '>ul>li';
+			if (!document.querySelector(q))
+				break;
+		}
+		var w = treesz + nq;
+		ebi('tree').style.width = w + 'em';
+		ebi('wrap').style.marginLeft = w + 'em';
+		onscroll();
+	}
+	window.addEventListener('resize', onresize);
 
 	function get_tree(top, dst, rst) {
 		var xhr = new XMLHttpRequest();
@@ -810,20 +851,7 @@ function autoplay_blocked() {
 		document.querySelector('#treeul>li>a+a').textContent = '[root]';
 		despin('#tree');
 		reload_tree();
-		rescale_tree();
-	}
-
-	function rescale_tree() {
-		var q = '#tree';
-		var nq = 0;
-		while (true) {
-			nq++;
-			q += '>ul>li';
-			if (!document.querySelector(q))
-				break;
-		}
-		var w = treesz + (dyn ? nq : 0);
-		ebi('treeul').style.width = w + 'em';
+		onresize();
 	}
 
 	function reload_tree() {
@@ -873,7 +901,7 @@ function autoplay_blocked() {
 				rm.parentNode.removeChild(rm);
 			}
 			this.textContent = '+';
-			rescale_tree();
+			onresize();
 			return;
 		}
 		var dst = this.getAttribute('dst');
@@ -981,25 +1009,11 @@ function autoplay_blocked() {
 		return ret;
 	}
 
-	function detree(e) {
-		ev(e);
-		var treetab = ebi('treetab');
-
-		treetab.parentNode.insertBefore(ebi('pro'), treetab);
-		treetab.parentNode.insertBefore(ebi('files'), treetab.nextSibling);
-		treetab.parentNode.insertBefore(ebi('epi'), ebi('files').nextSibling);
-
-		ebi('path').style.display = 'inline-block';
-		treetab.style.display = 'none';
-
-		swrite('entreed', 'na');
-	}
-
 	function dyntree(e) {
 		ev(e);
 		dyn = !dyn;
 		bcfg_set('dyntree', dyn);
-		rescale_tree();
+		onresize();
 	}
 
 	function scaletree(e) {
@@ -1009,7 +1023,7 @@ function autoplay_blocked() {
 			treesz = 16;
 
 		swrite('treesz', treesz);
-		rescale_tree();
+		onresize();
 	}
 
 	ebi('entree').onclick = entree;
@@ -1033,6 +1047,10 @@ function autoplay_blocked() {
 
 	if (window.history && history.pushState) {
 		hist_replace(get_evpath() + window.location.hash);
+	}
+
+	return {
+		"onscroll": onscroll
 	}
 })();
 

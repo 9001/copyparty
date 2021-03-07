@@ -50,20 +50,18 @@
         {%- endfor %}
     </h1>
     
-    <div id="pro" class="logue">{{ logues[0] }}</div>
+    <div id="tree">
+        <a href="#" id="detree">🍞...</a>
+        <a href="#" step="2" id="twobytwo">+</a>
+        <a href="#" step="-2" id="twig">&ndash;</a>
+        <a href="#" id="dyntree">a</a>
+        <ul id="treeul"></ul>
+        <div id="thx_ff">&nbsp;</div>
+    </div>
 
-    <table id="treetab">
-        <tr>
-            <td id="tree">
-                <a href="#" id="detree">🍞...</a>
-                <a href="#" step="2" id="twobytwo">+</a>
-                <a href="#" step="-2" id="twig">&ndash;</a>
-                <a href="#" id="dyntree">a</a>
-                <ul id="treeul"></ul>
-            </td>
-            <td id="treefiles"></td>
-        </tr>
-    </table>
+<div id="wrap">
+
+    <div id="pro" class="logue">{{ logues[0] }}</div>
 
     <table id="files">
         <thead>
@@ -100,6 +98,8 @@
     <div id="epi" class="logue">{{ logues[1] }}</div>
 
     <h2><a href="?h">control-panel</a></h2>
+
+</div>
 
     {%- if srv_info %}
     <div id="srv_info"><span>{{ srv_info }}</span></div>

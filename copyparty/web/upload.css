@@ -62,7 +62,7 @@
 	width: calc(100% - 2em);
 	max-width: 100em;
 }
-#u2form.srch #u2tab {
+#op_up2k.srch #u2tab {
 	max-width: none;
 }
 #u2tab td {
@@ -76,7 +76,7 @@
 #u2tab td:nth-child(3) {
 	width: 40%;
 }
-#u2form.srch #u2tab td:nth-child(3) {
+#op_up2k.srch #u2tab td:nth-child(3) {
 	font-family: sans-serif;
 	width: auto;
 }

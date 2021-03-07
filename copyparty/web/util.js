@@ -183,6 +183,9 @@ function goto(dest) {
         if (fn)
             fn();
     }
+
+    if (window['treectl'])
+        treectl.onscroll();
 }
 
 
