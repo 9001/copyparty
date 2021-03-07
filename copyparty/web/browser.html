@@ -23,6 +23,7 @@
         <a href="#" data-perm="write" data-dest="mkdir">📂</a>
         <a href="#" data-perm="write" data-dest="new_md">📝</a>
         <a href="#" data-perm="write" data-dest="msg">📟</a>
+        <a href="#" data-dest="cfg">⚙️</a>
     </div>
 
     <div id="op_search" class="opview">
@@ -33,7 +34,13 @@
         {%- endif %}
         <div id="srch_q"></div>
     </div>
+
     {%- include 'upload.html' %}
+
+    <div id="op_cfg" class="opview opbox">
+        <h3>key notation</h3>
+        <div id="key_notation"></div>
+    </div>
     
     <h1 id="path">
         <a href="#" id="entree">🌲</a>

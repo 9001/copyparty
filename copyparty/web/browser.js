@@ -945,6 +945,7 @@ function autoplay_blocked() {
 		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
 
 		filecols.set_style();
+		mukey.render();
 		reload_tree();
 		reload_browser();
 	}
@@ -1193,6 +1194,108 @@ var filecols = (function () {
 })();
 
 
+var mukey = (function () {
+	var maps = {
+		"rekobo_alnum": [
+			"1B ", "2B ", "3B ", "4B ", "5B ", "6B ", "7B ", "8B ", "9B ", "10B", "11B", "12B",
+			"1A ", "2A ", "3A ", "4A ", "5A ", "6A ", "7A ", "8A ", "9A ", "10A", "11A", "12A"
+		],
+		"rekobo_classic": [
+			"B  ", "F# ", "Db ", "Ab ", "Eb ", "Bb ", "F  ", "C  ", "G  ", "D  ", "A  ", "E  ",
+			"Abm", "Ebm", "Bbm", "Fm ", "Cm ", "Gm ", "Dm ", "Am ", "Em ", "Bm ", "F#m", "Dbm"
+		],
+		"traktor_musical": [
+			"B  ", "Gb ", "Db ", "Ab ", "Eb ", "Bb ", "F  ", "C  ", "G  ", "D  ", "A  ", "E  ",
+			"Abm", "Ebm", "Bbm", "Fm ", "Cm ", "Gm ", "Dm ", "Am ", "Em ", "Bm ", "Gbm", "Dbm"
+		],
+		"traktor_sharps": [
+			"B  ", "F# ", "C# ", "G# ", "D# ", "A# ", "F  ", "C  ", "G  ", "D  ", "A  ", "E  ",
+			"G#m", "D#m", "A#m", "Fm ", "Cm ", "Gm ", "Dm ", "Am ", "Em ", "Bm ", "F#m", "C#m"
+		],
+		"traktor_open": [
+			"6d ", "7d ", "8d ", "9d ", "10d", "11d", "12d", "1d ", "2d ", "3d ", "4d ", "5d ",
+			"6m ", "7m ", "8m ", "9m ", "10m", "11m", "12m", "1m ", "2m ", "3m ", "4m ", "5m "
+		]
+	};
+	var map = {};
+
+	var html = [];
+	for (var k in maps) {
+		if (!maps.hasOwnProperty(k))
+			continue;
+
+		html.push(
+			'<span><input type="radio" name="keytype" value="' + k + '" id="key_' + k + '">' +
+			'<label for="key_' + k + '">' + k + '</label></span>');
+
+		for (var a = 0; a < 24; a++)
+			maps[k][a] = maps[k][a].trim();
+	}
+	ebi('key_notation').innerHTML = html.join('\n');
+
+	function set_key_notation(e) {
+		ev(e);
+		var notation = this.getAttribute('value');
+		load_notation(notation);
+		render();
+	}
+
+	function load_notation(notation) {
+		swrite("key_notation", notation);
+		map = {};
+		var dst = maps[notation];
+		for (var k in maps)
+			if (k != notation && maps.hasOwnProperty(k))
+				for (var a = 0; a < 24; a++)
+					if (maps[k][a] != dst[a])
+						map[maps[k][a]] = dst[a];
+	}
+
+	function render() {
+		var tds = ebi('files').tHead.getElementsByTagName('th');
+		var i = -1;
+		var min = false;
+		for (var a = 0; a < tds.length; a++) {
+			var spans = tds[a].getElementsByTagName('span');
+			if (spans.length && spans[0].textContent == 'Key') {
+				min = tds[a].getAttribute('class').indexOf('min') !== -1;
+				i = a;
+				break;
+			}
+		}
+
+		if (i == -1)
+			return;
+
+		var rows = ebi('files').tBodies[0].rows;
+
+		if (min)
+			for (var a = 0, aa = rows.length; a < aa; a++) {
+				var v = rows[a].cells[i].getAttribute('html');
+				rows[a].cells[i].setAttribute('html', map[v] || v);
+			}
+		else
+			for (var a = 0, aa = rows.length; a < aa; a++) {
+				var v = rows[a].cells[i].textContent;
+				rows[a].cells[i].textContent = map[v] || v;
+			}
+	}
+
+	var notation = sread("key_notation") || "rekobo_alnum";
+	ebi('key_' + notation).checked = true;
+	load_notation(notation);
+
+	var o = document.querySelectorAll('#key_notation input');
+	for (var a = 0; a < o.length; a++) {
+		o[a].onchange = set_key_notation;
+	}
+
+	return {
+		"render": render
+	};
+})();
+
+
 function ev_row_tgl(e) {
 	ev(e);
 	filecols.toggle(this.parentElement.parentElement.getElementsByTagName('span')[0].textContent);
@@ -1238,3 +1341,4 @@ function reload_browser(not_mp) {
 		up2k.set_fsearch();
 }
 reload_browser(true);
+mukey.render();

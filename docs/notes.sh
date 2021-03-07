@@ -12,6 +12,13 @@ gzip -d < .hist/up2k.snap | jq -r '.[].name' | while IFS= read -r f; do wc -c --
 
 
 ##
+## detect partial uploads based on file contents
+##  (in case of context loss or old copyparties)
+
+echo; find -type f | while IFS= read -r x; do printf '\033[A\033[36m%s\033[K\033[0m\n' "$x"; tail -c$((1024*1024)) <"$x" | xxd -a | awk 'NR==1&&/^[0: ]+.{16}$/{next} NR==2&&/^\*$/{next} NR==3&&/^[0f]+: [0 ]+65 +.{16}$/{next} {e=1} END {exit e}' || continue; printf '\033[A\033[31msus:\033[33m %s \033[0m\n\n' "$x"; done
+
+
+##
 ## create a test payload
 
 head -c $((2*1024*1024*1024)) /dev/zero | openssl enc -aes-256-ctr -pass pass:hunter2 -nosalt > garbage.file

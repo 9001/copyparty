@@ -579,3 +579,16 @@ input[type="checkbox"]:checked+label {
 	color: #300;
 	background: #fea;
 }
+#op_cfg {
+	max-width: none;
+	margin-right: 1.5em;
+}
+#key_notation>span {
+	display: inline-block;
+	padding: .2em .4em;
+}
+#op_cfg h3 {
+	margin: .8em 0 0 .6em;
+	padding: 0;
+	border-bottom: 1px solid #555;
+}
