@@ -1115,7 +1115,8 @@ class HttpCli(object):
         excl = None
         if target:
             excl, target = (target.split("/", 1) + [""])[:2]
-            ret["k" + excl] = self.gen_tree("/".join([top, excl]).strip("/"), target)
+            sub = self.gen_tree("/".join([top, excl]).strip("/"), target)
+            ret["k" + quotep(excl)] = sub
 
         try:
             vn, rem = self.auth.vfs.get(top, self.uname, True, False)

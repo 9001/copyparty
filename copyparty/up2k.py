@@ -684,7 +684,7 @@ class Up2k(object):
                 cur = cur.execute(q, argv)
                 for _, dtime, dsize, dp_dir, dp_fn in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
-                        dp_dir, dp_fn = s3dec(self.mem_cur, dp_dir, dp_fn)
+                        dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
                     dp_abs = os.path.join(cj["ptop"], dp_dir, dp_fn).replace("\\", "/")
                     # relying on path.exists to return false on broken symlinks
@@ -806,8 +806,13 @@ class Up2k(object):
                 raise OSError()
             elif fs1 == fs2:
                 # same fs; make symlink as relative as possible
-                nsrc = src.replace("\\", "/").split("/")
-                ndst = dst.replace("\\", "/").split("/")
+                v = []
+                for p in [src, dst]:
+                    if WINDOWS:
+                        p = p.replace("\\", "/")
+                    v.append(p.split("/"))
+
+                nsrc, ndst = v
                 nc = 0
                 for a, b in zip(nsrc, ndst):
                     if a != b:
@@ -815,7 +820,8 @@ class Up2k(object):
                     nc += 1
                 if nc > 1:
                     lsrc = nsrc[nc:]
-                    lsrc = "../" * (len(lsrc) - 1) + "/".join(lsrc)
+                    hops = len(ndst[nc:]) - 1
+                    lsrc = "../" * hops + "/".join(lsrc)
             os.symlink(fsenc(lsrc), fsenc(ldst))
         except (AttributeError, OSError) as ex:
             self.log("cannot symlink; creating copy: " + repr(ex))
