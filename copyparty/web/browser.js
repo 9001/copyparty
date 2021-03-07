@@ -510,7 +510,7 @@ function evau_error(e) {
 	if (eplaya.error.message)
 		err += '\n\n' + eplaya.error.message;
 
-	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0]) + '»';
+	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0])[0] + '»';
 
 	alert(err);
 }
@@ -545,7 +545,7 @@ function autoplay_blocked() {
 	var na = ebi('blk_na');
 
 	var fn = mp.tracks[mp.au.tid].split(/\//).pop();
-	fn = uricom_dec(fn.replace(/\+/g, ' '));
+	fn = uricom_dec(fn.replace(/\+/g, ' '))[0];
 
 	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function (e) {
@@ -776,7 +776,7 @@ function autoplay_blocked() {
 		ebi('treeul').setAttribute('ts', this.ts);
 
 		var top = this.top == '.' ? this.dst : this.top,
-			name = uricom_dec(top.split('/').slice(-2)[0]),
+			name = uricom_dec(top.split('/').slice(-2)[0])[0],
 			rtop = top.replace(/^\/+/, "");
 
 		try {
@@ -912,7 +912,7 @@ function autoplay_blocked() {
 		for (var a = 0; a < nodes.length; a++) {
 			var r = nodes[a],
 				ln = ['<tr><td>' + r.lead + '</td><td><a href="' +
-					top + r.href + '">' + esc(uricom_dec(r.href)) + '</a>', r.sz];
+					top + r.href + '">' + esc(uricom_dec(r.href)[0]) + '</a>', r.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
@@ -963,8 +963,8 @@ function autoplay_blocked() {
 			var kk = keys[a],
 				ks = kk.slice(1),
 				k = uricom_dec(ks),
-				hek = esc(k),
-				uek = ks == k ? k : uricom_enc(k, true),
+				hek = esc(k[0]),
+				uek = k[1] ? uricom_enc(k[0], true) : k[0],
 				url = '/' + (top ? top + uek : uek) + '/',
 				sym = res[kk] ? '-' : '+',
 				link = '<a href="#">' + sym + '</a><a href="' +
@@ -1293,6 +1293,18 @@ var mukey = (function () {
 	return {
 		"render": render
 	};
+})();
+
+
+(function () {
+	function set_tooltip(e) {
+		ev(e);
+		ebi('opdesc').innerHTML = this.getAttribute('data-desc');
+	}
+	var btns = document.querySelectorAll('#ops, #ops>a');
+	for (var a = 0; a < btns.length; a++) {
+		btns[a].onmouseenter = set_tooltip;
+	}
 })();
 
 

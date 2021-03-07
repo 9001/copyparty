@@ -55,11 +55,10 @@ body {
 	display: block;
 	padding: .3em 0;
 }
-#files[ts] tbody div a {
+#files tbody div a {
 	color: #f5a;
 }
-a,
-#files[ts] tbody div a:last-child {
+a, #files tbody div a:last-child {
 	color: #fc5;
 	padding: .2em;
 	text-decoration: none;
@@ -591,4 +590,26 @@ input[type="checkbox"]:checked+label {
 	margin: .8em 0 0 .6em;
 	padding: 0;
 	border-bottom: 1px solid #555;
+}
+#opdesc {
+	display: none;
+}
+#ops:hover #opdesc {
+	display: block;
+	background: linear-gradient(0deg,#555, #4c4c4c 80%, #444);
+	box-shadow: 0 .3em 1em #222;
+	padding: 1em;
+	border-radius: .3em;
+	position: absolute;
+	z-index: 3;
+	top: 6em;
+	right: 1.5em;
+}
+#opdesc code {
+	background: #3c3c3c;
+	padding: .2em .3em;
+	border-top: 1px solid #777;
+	border-radius: .3em;
+	font-family: monospace, monospace;
+	line-height: 2em;
 }

@@ -237,11 +237,11 @@ function uricom_enc(txt, do_fb_enc) {
 
 function uricom_dec(txt) {
     try {
-        return decodeURIComponent(txt);
+        return [decodeURIComponent(txt), true];
     }
     catch (ex) {
         console.log("ucd-err [" + txt + "]");
-        return txt;
+        return [txt, false];
     }
 }
 
@@ -260,7 +260,7 @@ function get_evpath() {
 
 
 function get_vpath() {
-    return uricom_dec(get_evpath());
+    return uricom_dec(get_evpath())[0];
 }
 
 

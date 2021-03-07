@@ -65,7 +65,7 @@ function statify(obj) {
         if (a > 0)
             loc.push(n[a]);
 
-        var dec = hesc(uricom_dec(n[a]));
+        var dec = hesc(uricom_dec(n[a])[0]);
 
         nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
     }
