@@ -1289,14 +1289,31 @@ var mukey = (function () {
 
 		if (min)
 			for (var a = 0, aa = rows.length; a < aa; a++) {
-				var v = rows[a].cells[i].getAttribute('html');
-				rows[a].cells[i].setAttribute('html', map[v] || v);
+				var c = rows[a].cells[i];
+				if (!c)
+					continue;
+
+				var v = c.getAttribute('html');
+				c.setAttribute('html', map[v] || v);
 			}
 		else
 			for (var a = 0, aa = rows.length; a < aa; a++) {
-				var v = rows[a].cells[i].textContent;
-				rows[a].cells[i].textContent = map[v] || v;
+				var c = rows[a].cells[i];
+				if (!c)
+					continue;
+
+				var v = c.textContent;
+				c.textContent = map[v] || v;
 			}
+	}
+
+	function try_render() {
+		try {
+			render();
+		}
+		catch (ex) {
+			console.log("key notation failed: " + ex);
+		}
 	}
 
 	var notation = sread("key_notation") || "rekobo_alnum";
@@ -1309,7 +1326,7 @@ var mukey = (function () {
 	}
 
 	return {
-		"render": render
+		"render": try_render
 	};
 })();
 
