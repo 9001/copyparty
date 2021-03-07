@@ -510,13 +510,13 @@ input[type="checkbox"]:checked+label {
 	margin: 0;
 }
 #tree ul {
-	border-left: .2em solid #444;
+	border-left: .2em solid #555;
 }
 #tree li {
 	margin-left: 1em;
 	list-style: none;
 	border-top: 1px solid #4c4c4c;
-	border-bottom: 1px solid #111;
+	border-bottom: 1px solid #222;
 }
 #tree li:last-child {
 	border-bottom: none;
