@@ -1282,17 +1282,17 @@ class HttpCli(object):
                     args = s3enc(idx.mem_cur, rd, fn)
                     r = icur.execute(q, args).fetchone()
 
+                tags = {}
+                f["tags"] = tags
+                
                 if not r:
                     continue
 
                 w = r[0][:16]
-                tags = {}
                 q = "select k, v from mt where w = ? and k != 'x'"
                 for k, v in icur.execute(q, (w,)):
                     taglist[k] = True
                     tags[k] = v
-
-                f["tags"] = tags
 
         if icur:
             taglist = [k for k in self.args.mte.split(",") if k in taglist]
