@@ -20,6 +20,7 @@ set -e
 # -rwxr-xr-x  0 ed ed  183808 Nov 19 00:43 copyparty-extras/sfx-lite/copyparty-sfx.py
 
 
+command -v gnutar && tar() { gnutar "$@"; }
 command -v gtar && tar() { gtar "$@"; }
 command -v gsed && sed() { gsed "$@"; }
 td="$(mktemp -d)"
@@ -29,11 +30,11 @@ pwd
 
 
 dl_text() {
-	command -v curl && exec curl "$@"
+	command -v curl >/dev/null && exec curl "$@"
 	exec wget -O- "$@"
 }
 dl_files() {
-	command -v curl && exec curl -L --remote-name-all "$@"
+	command -v curl >/dev/null && exec curl -L --remote-name-all "$@"
 	exec wget "$@"
 }
 export -f dl_files
