@@ -837,7 +837,11 @@ def chkcmd(*argv):
 def gzip_orig_sz(fn):
     with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)
-        return struct.unpack(b"I", f.read(4))[0]
+        rv = f.read(4)
+        try:
+            return struct.unpack(b"I", rv)[0]
+        except:
+            return struct.unpack("I", rv)[0]
 
 
 def py_desc():
@@ -847,7 +851,11 @@ def py_desc():
     if ofs > 0:
         py_ver = py_ver[:ofs]
 
-    bitness = struct.calcsize(b"P") * 8
+    try:
+        bitness = struct.calcsize(b"P") * 8
+    except:
+        bitness = struct.calcsize("P") * 8
+
     host_os = platform.system()
     compiler = platform.python_compiler()
 
