@@ -180,7 +180,7 @@ tmv "$f"
 
 # up2k goes from 28k to 22k laff
 echo entabbening
-find | grep -E '\.(js|css|html|py)$' | while IFS= read -r f; do
+find | grep -E '\.(js|css|html)$' | while IFS= read -r f; do
 	unexpand -t 4 --first-only <"$f" >t
 	tmv "$f"
 done
