@@ -6,7 +6,7 @@ function dbg(msg) {
 	ebi('path').innerHTML = msg;
 }
 
-makeSortable(ebi('files'));
+makeSortable(ebi('files'), reload_mp);
 
 
 // extract songs + add play column
@@ -1349,9 +1349,19 @@ function ev_row_tgl(e) {
 }
 
 
+function reload_mp() {
+	if (mp && mp.au) {
+		mp.au.pause();
+		mp.au = null;
+	}
+	widget.close();
+	mp = init_mp();
+}
+
+
 function reload_browser(not_mp) {
 	filecols.set_style();
-	makeSortable(ebi('files'));
+	makeSortable(ebi('files'), reload_mp);
 
 	var parts = get_evpath().split('/');
 	var rm = document.querySelectorAll('#path>a+a+a');
@@ -1375,14 +1385,8 @@ function reload_browser(not_mp) {
 		oo[a].textContent = hsz;
 	}
 
-	if (!not_mp) {
-		if (mp && mp.au) {
-			mp.au.pause();
-			mp.au = null;
-		}
-		widget.close();
-		mp = init_mp();
-	}
+	if (!not_mp)
+		reload_mp();
 
 	if (window['up2k'])
 		up2k.set_fsearch();

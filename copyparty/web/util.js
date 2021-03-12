@@ -128,7 +128,7 @@ function sortTable(table, col) {
     });
     for (i = 0; i < tr.length; ++i) tb.appendChild(tr[vl[i][1]]);
 }
-function makeSortable(table) {
+function makeSortable(table, cb) {
     var th = table.tHead, i;
     th && (th = th.rows[0]) && (th = th.cells);
     if (th) i = th.length;
@@ -137,6 +137,8 @@ function makeSortable(table) {
         th[i].onclick = function (e) {
             ev(e);
             sortTable(table, i);
+            if (cb)
+                cb();
         };
     }(i));
 }
