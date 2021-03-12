@@ -1008,6 +1008,12 @@ def main():
         log = null_log
         dbg = null_log
 
+    if ar.a and ar.a.startswith("$"):
+        fn = ar.a[1:]
+        log("reading password from file [{}]".format(fn))
+        with open(fn, "rb") as f:
+            ar.a = f.read().decode("utf-8").strip()
+
     if WINDOWS:
         os.system("rem")
 
