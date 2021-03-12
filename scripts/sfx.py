@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-# coding: utf-8
+# coding: latin-1
 from __future__ import print_function, unicode_literals
 
-import os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile
-import subprocess as sp
+import os, sys, time, shutil, runpy, tarfile, hashlib, platform, tempfile, traceback
 
 """
 run me with any version of python, i will unpack and run copyparty
@@ -344,13 +343,16 @@ def get_payload():
                 break
 
 
-def confirm():
+def confirm(rv):
     msg()
+    msg(traceback.format_exc())
     msg("*** hit enter to exit ***")
     try:
         raw_input() if PY2 else input()
     except:
         pass
+
+    sys.exit(rv)
 
 
 def run(tmp, j2ver):
@@ -358,6 +360,7 @@ def run(tmp, j2ver):
 
     msg("jinja2:", j2ver or "bundled")
     msg("sfxdir:", tmp)
+    msg()
 
     # "systemd-tmpfiles-clean.timer"?? HOW do you even come up with this shit
     try:
@@ -373,30 +376,16 @@ def run(tmp, j2ver):
     if j2ver:
         del ld[-1]
 
-    cmd = (
-        "import sys, runpy; "
-        + "".join(['sys.path.insert(0, r"' + x + '"); ' for x in ld])
-        + 'runpy.run_module("copyparty", run_name="__main__")'
-    )
-    cmd = [sys.executable, "-c", cmd] + list(sys.argv[1:])
+    for x in ld:
+        sys.path.insert(0, x)
 
-    cmd = [str(x) for x in cmd]
-    msg("\n", cmd, "\n")
-    cpp = sp.Popen(cmd)
     try:
-        cpp.wait()
+        runpy.run_module(str("copyparty"), run_name=str("__main__"))
+    except SystemExit as ex:
+        if ex.code:
+            confirm(ex.code)
     except:
-        cpp.wait()
-
-    if cpp.returncode != 0:
-        confirm()
-
-    sys.exit(cpp.returncode)
-
-
-def bye(sig, frame):
-    if cpp is not None:
-        cpp.terminate()
+        confirm(1)
 
 
 def main():
@@ -430,8 +419,6 @@ def main():
 
     # skip 0
 
-    signal.signal(signal.SIGTERM, bye)
-
     tmp = unpack()
 
     try:
@@ -439,7 +426,7 @@ def main():
     except:
         j2ver = None
 
-    return run(tmp, j2ver)
+    run(tmp, j2ver)
 
 
 if __name__ == "__main__":
