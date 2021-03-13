@@ -739,9 +739,11 @@ var treectl = (function () {
 	var treesz = icfg_get('treesz', 16);
 	treesz = Math.min(Math.max(treesz, 4), 50);
 	console.log('treesz [' + treesz + ']');
+	var entreed = false;
 
 	function entree(e) {
 		ev(e);
+		entreed = true;
 		ebi('path').style.display = 'none';
 
 		var tree = ebi('tree');
@@ -749,22 +751,29 @@ var treectl = (function () {
 
 		swrite('entreed', 'tree');
 		get_tree("", get_evpath(), true);
+		window.addEventListener('scroll', onscroll);
+		window.addEventListener('resize', onresize);
 		onresize();
 	}
 
 	function detree(e) {
 		ev(e);
+		entreed = false;
 		ebi('tree').style.display = 'none';
 		ebi('path').style.display = 'inline-block';
 		ebi('wrap').style.marginLeft = '0';
 		swrite('entreed', 'na');
+		window.removeEventListener('resize', onresize);
+		window.removeEventListener('scroll', onscroll);
 	}
 
 	function onscroll() {
+		if (!entreed)
+			return;
+
 		var top = ebi('wrap').getBoundingClientRect().top;
 		ebi('tree').style.top = Math.max(0, parseInt(top)) + 'px';
 	}
-	window.addEventListener('scroll', onscroll);
 
 	function periodic() {
 		onscroll();
@@ -773,6 +782,9 @@ var treectl = (function () {
 	periodic();
 
 	function onresize(e) {
+		if (!entreed)
+			return;
+
 		var q = '#tree';
 		var nq = 0;
 		while (dyn) {
@@ -786,7 +798,6 @@ var treectl = (function () {
 		ebi('wrap').style.marginLeft = w + 'em';
 		onscroll();
 	}
-	window.addEventListener('resize', onresize);
 
 	function get_tree(top, dst, rst) {
 		var xhr = new XMLHttpRequest();
