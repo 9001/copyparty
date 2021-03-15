@@ -214,5 +214,4 @@ printf "done:\n"
 printf "  %s\n" "$(realpath $sfx_out)."{sh,py}
 # rm -rf *
 
-# tar -tvf ../sfx/tar | sed -r 's/(.* ....-..-.. ..:.. )(.*)/\2 `` \1/' | sort | sed -r 's/(.*) `` (.*)/\2 \1/'| less
-# for n in {1..9}; do tar -tf tar | grep -vE '/$' | sed -r 's/(.*)\.(.*)/\2.\1/' | sort | sed -r 's/([^\.]+)\.(.*)/\2.\1/' | tar -cT- | bzip2 -c$n | wc -c; done 
+# while true; do ./make-sfx.sh; for f in ..//dist/copyparty-sfx.{sh,py}; do mv $f $f.$(wc -c <$f | awk '{print$1}'); done; done
