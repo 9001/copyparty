@@ -212,6 +212,7 @@ pip install black bandit pylint flake8  # vscode tooling
 in the `scripts` folder:
 
 * run `make -C deps-docker` to build all dependencies
+* `git tag v1.2.3 && git push origin --tags`
 * create github release with `make-tgz-release.sh`
 * upload to pypi with `make-pypi-release.(sh|bat)`
 * create sfx with `make-sfx.sh`
