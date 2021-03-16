@@ -158,6 +158,17 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 * `Pillow` (requires py2.7 or py3.5+)
 
 
+## optional gpl stuff
+
+some bundled examples have copyleft dependencies:
+* [audio-bpm.py](./copyparty/mods/audio-bpm.py), enabled with `TODO`, detects the BPM of music using the BeatRoot Vamp Plugin; imports GPL2
+* [audio-key.py](./copyparty/mods/audio-key.py), enabled with `TODO`, detects the melodic key of music using the Mixxx fork of keyfinder; imports GPL3
+
+these are not loaded or evaluated by default and are bundled as "plugins" (term used very loosely)
+
+each can be executed (through subprocess, not importing) during the analysis phase of `-e2ts` if enabled through the options mentioned above, kinda sounds like "arm's length" not that i'm qualified to say
+
+
 # sfx
 
 currently there are two self-contained binaries:

@@ -84,6 +84,7 @@ afun() { ffmpeg -hide_banner -v fatal -nostdin -ss $((dur/3)) -y -i /mnt/Users/e
 afun() { ffmpeg -hide_banner -v fatal -nostdin -ss $((dur/3)) -y -i /mnt/Users/ed/Music/"$fn" -ac 1 -ar 44100 /dev/shm/$core.wav || return 1; py="$(python3 -c 'from essentia.standard import *; a=MonoLoader(filename="/dev/shm/'$core'.wav")(); bpm,beats,confidence,_,intervals=RhythmExtractor2013(method="multifeature")(a); print("{:.2f}".format(bpm))')"; }; runfun
 
 
+
 ########################################################################
 ##
 ##  key detectyion
@@ -100,8 +101,18 @@ var m=''; for (var a=0; a<24; a++) m += 's/\\|(' + maps["traktor_sharps"][a].tri
 re='s/\|(B|B|B|6d)$/|1B/;s/\|(F#|F#|Gb|7d)$/|2B/;s/\|(C#|Db|Db|8d)$/|3B/;s/\|(G#|Ab|Ab|9d)$/|4B/;s/\|(D#|Eb|Eb|10d)$/|5B/;s/\|(A#|Bb|Bb|11d)$/|6B/;s/\|(F|F|F|12d)$/|7B/;s/\|(C|C|C|1d)$/|8B/;s/\|(G|G|G|2d)$/|9B/;s/\|(D|D|D|3d)$/|10B/;s/\|(A|A|A|4d)$/|11B/;s/\|(E|E|E|5d)$/|12B/;s/\|(G#m|Abm|Abm|6m)$/|1A/;s/\|(D#m|Ebm|Ebm|7m)$/|2A/;s/\|(A#m|Bbm|Bbm|8m)$/|3A/;s/\|(Fm|Fm|Fm|9m)$/|4A/;s/\|(Cm|Cm|Cm|10m)$/|5A/;s/\|(Gm|Gm|Gm|11m)$/|6A/;s/\|(Dm|Dm|Dm|12m)$/|7A/;s/\|(Am|Am|Am|1m)$/|8A/;s/\|(Em|Em|Em|2m)$/|9A/;s/\|(Bm|Bm|Bm|3m)$/|10A/;s/\|(F#m|F#m|Gbm|4m)$/|11A/;s/\|(C#m|Dbm|Dbm|5m)$/|12A/;'
 
 
+# runner/wrapper
+runfun() { cores=8; touch run; tbc() { bc | sed -r 's/(\.[0-9]{2}).*/\1/'; }; for ((core=0; core<$cores; core++)); do sqlite3 /mnt/Users/ed/Music/.hist/up2k.db 'select dur.w, dur.v, key.v from mt key join mt dur on key.w = dur.w where key.k = "key" and dur.k = ".dur" order by dur.w' | uniq -w16 | grep -vE '(Off-Key|None)$' | sed -r "s/ //g;$re" | uniq -w16 | while IFS=\| read w dur bpm; do sqlite3 /mnt/Users/ed/Music/.hist/up2k.db "select rd, fn from up where substr(w,1,16) = '$w'" | sed -r "s/^/$bpm /"; done| grep mir/cr | tr \| / | while read key fn; do [ -e run ] || break; n=$((n+1)); ncore=$((n%cores)); [ $ncore -eq $core ] || continue; t0=$(date +%s.%N); (afun || exit 1; t=$(date +%s.%N); td=$(echo "scale=3; $t - $t0" | tbc); [ "$key" = "$py" ] && c=2 || c=5; printf '%4s sec, %4s orig, \033[3%dm%4s py,\033[0m %s\n' $td "$key" $c "$py" "$fn") || break; done & done; time wait 2>/dev/null; }
+
+
 # ok: 26   1off: 10   2off: 1   fail: 3   #  15 sec, keyfinder
-cores=8; touch run; tbc() { bc | sed -r 's/(\.[0-9]{2}).*/\1/'; }; for ((core=0; core<$cores; core++)); do sqlite3 /mnt/Users/ed/Music/.hist/up2k.db 'select dur.w, dur.v, key.v from mt key join mt dur on key.w = dur.w where key.k = "key" and dur.k = ".dur" order by dur.w' | uniq -w16 | grep -vE '(Off-Key|None)$' | sed -r "s/ //g;$re" | uniq -w16 | while IFS=\| read w dur bpm; do sqlite3 /mnt/Users/ed/Music/.hist/up2k.db "select rd, fn from up where substr(w,1,16) = '$w'" | sed -r "s/^/$bpm /"; done| grep mir/cr | tr \| / | while read key fn; do [ -e run ] || break; n=$((n+1)); ncore=$((n%cores)); [ $ncore -eq $core ] || continue; ffmpeg -hide_banner -v fatal -nostdin -ss $((dur/3)) -y -i /mnt/Users/ed/Music/"$fn" -ac 1 -ar 44100 -t 60 /dev/shm/$core.wav || break; t0=$(date +%s.%N); py="$(python3 -c 'import sys; import keyfinder; print(keyfinder.key(sys.argv[1]).camelot())' "/dev/shm/$core.wav")"; t=$(date +%s.%N); td=$(echo "scale=3; $t - $t0" | tbc); [ "$key" = "$py" ] && c=2 || c=5; printf '%4s sec, %4s orig, \033[3%dm%4s py,\033[0m %s\n' $td "$key" $c "$py" "$fn"; done & done; time wait 2>/dev/null
+afun() { ffmpeg -hide_banner -v fatal -nostdin -ss $((dur/3)) -y -i /mnt/Users/ed/Music/"$fn" -ac 1 -ar 44100 -t 60 /dev/shm/$core.wav || break; py="$(python3 -c 'import sys; import keyfinder; print(keyfinder.key(sys.argv[1]).camelot())' "/dev/shm/$core.wav")"; }; runfun
+
+
+# https://github.com/MTG/essentia/raw/master/src/examples/tutorial/example_key_by_steps_streaming.py
+# https://essentia.upf.edu/reference/std_Key.html  # edma edmm braw bgate
+sed -ri 's/^(key = Key\().*/\1profileType="bgate")/' example_key_by_steps_streaming.py
+afun() { ffmpeg -hide_banner -v fatal -nostdin -ss $((dur/3)) -y -i /mnt/Users/ed/Music/"$fn" -ac 1 -ar 44100 -t 60 /dev/shm/$core.wav || break; py="$(python3 example_key_by_steps_streaming.py /dev/shm/$core.{wav,yml} 2>/dev/null | sed -r "s/ major//;s/ minor/m/;s/^/|/;$re;s/.//")"; }; runfun
 
 
 
