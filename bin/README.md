@@ -39,3 +39,9 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 
 # copyparty-fuse-streaming.py
 * pretend this doesn't exist
+
+
+
+# mtag/
+* standalone programs which perform misc. file analysis
+* copyparty can soon Popen programs like these during file indexing to collect additional metadata
