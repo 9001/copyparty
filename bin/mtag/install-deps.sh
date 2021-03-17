@@ -15,24 +15,43 @@ set -e
 #
 # does the following terrible things:
 #   modifies the keyfinder python lib to load the .so in ~/pe
+#
+# has the following manual dependencies, especially on mac:
+#   https://www.vamp-plugins.org/pack.html
 
 
 win=
 [ ! -z "$MSYSTEM" ] || [ -e /msys2.exe ] && {
 	[ "$MSYSTEM" = MINGW64 ] || {
-		echo incompatible windows environment, please use msys2-mingw64
+		echo windows detected, msys2-mingw64 required
 		exit 1
 	}
+	pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
 	win=1
 }
 
+mac=
+[ $(uname -s) = Darwin ] && {
+	#pybin="$(printf '%s\n' /opt/local/bin/python* | (sed -E 's/(.*\/[^/0-9]+)([0-9]?[^/]*)$/\2 \1/' || cat) | (sort -nr || cat) | (sed -E 's/([^ ]*) (.*)/\2\1/' || cat) | grep -E '/(python|pypy)[0-9\.-]*$' | head -n 1)"
+	pybin=/opt/local/bin/python3.9
+	[ -e "$pybin" ] || {
+		echo mac detected, python3 from macports required
+		exit 1
+	}
+	pkgs='ffmpeg python39 py39-wheel'
+	ninst=$(port installed | awk '/^  /{print$1}' | sort | uniq | grep -E '^('"$(echo "$pkgs" | tr ' ' '|')"')$' | wc -l)
+	[ $ninst -eq 3 ] || {
+		sudo port install $pkgs
+	}
+	mac=1
+}
 
-[ $win ] &&
-	pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
 hash -r
 
+[ $mac ] || {
+	command -v python3 && pybin=python3 || pybin=python
+}
 
-command -v python3 && pybin=python3 || pybin=python
 $pybin -m pip install --user numpy
 
 
@@ -118,17 +137,22 @@ install_keyfinder() {
 	h="$HOME"
 	so="lib/libkeyfinder.so"
 	memes=()
+
 	[ $win ] &&
 		so="bin/libkeyfinder.dll" &&
 		h="$(printf '%s\n' "$USERPROFILE" | tr '\\' '/')" &&
 		memes+=(-G "MinGW Makefiles" -DBUILD_TESTING=OFF)
+	
+	[ $mac ] &&
+		so="lib/libkeyfinder.dylib"
 
 	cmake -DCMAKE_INSTALL_PREFIX="$h/pe/keyfinder" "${memes[@]}" -S . -B build
-	cmake --build build --parallel $(nproc)
+	cmake --build build --parallel $(nproc || echo 4)
 	cmake --install build
 
-	CFLAGS=-I"$h/pe/keyfinder/include" \
-	LDFLAGS=-L"$h/pe/keyfinder/lib" \
+	# rm -rf /Users/ed/Library/Python/3.9/lib/python/site-packages/*keyfinder*
+	CFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include" \
+	LDFLAGS="-L$h/pe/keyfinder/lib -L/opt/local/lib" \
 	PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig \
 	$pybin -m pip install --user keyfinder
 
@@ -168,7 +192,7 @@ install_soundtouch() {
 	# https://github.com/jrising/pysoundtouch
 	./bootstrap
 	./configure --enable-integer-samples CXXFLAGS="-fPIC" --prefix="$HOME/pe/soundtouch"
-	make -j$(nproc)
+	make -j$(nproc || echo 4)
 	make install
 	
 	CFLAGS=-I$HOME/pe/soundtouch/include/ \
