@@ -17,9 +17,23 @@ set -e
 #   modifies the keyfinder python lib to load the .so in ~/pe
 
 
-echo the stuff installed by thsi script is not actually used by copyparty yet so continuing is mostly pointless
-echo press enter if you want to anyways
-read
+win=
+[ ! -z "$MSYSTEM" ] || [ -e /msys2.exe ] && {
+	[ "$MSYSTEM" = MINGW64 ] || {
+		echo incompatible windows environment, please use msys2-mingw64
+		exit 1
+	}
+	win=1
+}
+
+
+[ $win ] &&
+	pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
+hash -r
+
+
+command -v python3 && pybin=python3 || pybin=python
+$pybin -m pip install --user numpy
 
 
 command -v gnutar && tar() { gnutar "$@"; }
@@ -91,23 +105,35 @@ gitlab_tarball() {
 
 
 install_keyfinder() {
+	# windows support:
+	#   use msys2 in mingw-w64 mode
+	#   pacman -S --needed mingw-w64-x86_64-{ffmpeg,python}
+	
 	github_tarball https://api.github.com/repos/mixxxdj/libkeyfinder/releases/latest
 
-	tar -xvf mixxxdj-libkeyfinder-*
+	tar -xf mixxxdj-libkeyfinder-*
 	rm -- *.tar.gz
 	cd mixxxdj-libkeyfinder*
-	cmake -DCMAKE_INSTALL_PREFIX=$HOME/pe/keyfinder -S . -B build
+	
+	h="$HOME"
+	so="lib/libkeyfinder.so"
+	memes=()
+	[ $win ] &&
+		so="bin/libkeyfinder.dll" &&
+		h="$(printf '%s\n' "$USERPROFILE" | tr '\\' '/')" &&
+		memes+=(-G "MinGW Makefiles" -DBUILD_TESTING=OFF)
+
+	cmake -DCMAKE_INSTALL_PREFIX="$h/pe/keyfinder" "${memes[@]}" -S . -B build
 	cmake --build build --parallel $(nproc)
 	cmake --install build
 
-	command -v python3 && c=python3 || c=python
-	
-	CFLAGS=-I$HOME/pe/keyfinder/include \
-	LDFLAGS=-L$HOME/pe/keyfinder/lib \
-	$c -m pip install --user keyfinder
+	CFLAGS=-I"$h/pe/keyfinder/include" \
+	LDFLAGS=-L"$h/pe/keyfinder/lib" \
+	PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig \
+	$pybin -m pip install --user keyfinder
 
-	pypath="$($c -c 'import keyfinder; print(keyfinder.__file__)')"
-	libpath="$(echo "$HOME/pe/keyfinder/lib/libkeyfinder.so")"
+	pypath="$($pybin -c 'import keyfinder; print(keyfinder.__file__)')"
+	libpath="$(echo "$h/pe/keyfinder/$so")"
 
 	mv "$pypath"{,.bak}
 	(
@@ -122,7 +148,16 @@ install_keyfinder() {
 }
 
 
-# not in use because it kinda segfaults
+install_vamp() {
+	# windows support:
+	#   use msys2 in mingw-w64 mode
+	#   pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
+	
+	$pybin -m pip install --user vamp
+}
+
+
+# not in use because it kinda segfaults, also no windows support
 install_soundtouch() {
 	gitlab_tarball https://gitlab.com/api/v4/projects/soundtouch%2Fsoundtouch/releases
 	
@@ -136,13 +171,11 @@ install_soundtouch() {
 	make -j$(nproc)
 	make install
 	
-	command -v python3 && c=python3 || c=python
-	
 	CFLAGS=-I$HOME/pe/soundtouch/include/ \
 	LDFLAGS=-L$HOME/pe/soundtouch/lib \
-	$c -m pip install --user git+https://github.com/snowxmas/pysoundtouch.git
+	$pybin -m pip install --user git+https://github.com/snowxmas/pysoundtouch.git
 	
-	pypath="$($c -c 'import importlib; print(importlib.util.find_spec("soundtouch").origin)')"
+	pypath="$($pybin -c 'import importlib; print(importlib.util.find_spec("soundtouch").origin)')"
 	libpath="$(echo "$HOME/pe/soundtouch/lib/")"
 	patchelf --set-rpath "$libpath" "$pypath"
 
@@ -155,5 +188,8 @@ install_soundtouch() {
 
 [ "$1" = keyfinder ] && { install_keyfinder; exit $?; }
 [ "$1" = soundtouch ] && { install_soundtouch; exit $?; }
+[ "$1" = vamp ] && { install_vamp; exit $?; }
 
-echo need arg 1: keyfinder or soundtouch
+echo no args provided, installing keyfinder and vamp
+install_keyfinder
+install_vamp
