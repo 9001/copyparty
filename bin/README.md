@@ -1,4 +1,4 @@
-# copyparty-fuse.py
+# [`copyparty-fuse.py`](copyparty-fuse.py)
 * mount a copyparty server as a local filesystem (read-only)
 * **supports Windows!** -- expect `194 MiB/s` sequential read
 * **supports Linux** -- expect `117 MiB/s` sequential read
@@ -29,7 +29,7 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 
 
 
-# copyparty-fuse🅱️.py
+# [`copyparty-fuse🅱️.py`](copyparty-fuseb.py)
 * mount a copyparty server as a local filesystem (read-only)
 * does the same thing except more correct, `samba` approves
 * **supports Linux** -- expect `18 MiB/s` (wait what)
@@ -37,11 +37,11 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 
 
 
-# copyparty-fuse-streaming.py
+# [`copyparty-fuse-streaming.py`](copyparty-fuse-streaming.py)
 * pretend this doesn't exist
 
 
 
-# mtag/
+# [`mtag/`](mtag/)
 * standalone programs which perform misc. file analysis
 * copyparty can soon Popen programs like these during file indexing to collect additional metadata
