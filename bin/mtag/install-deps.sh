@@ -2,23 +2,24 @@
 set -e
 
 
-# install optional dependencies
-# works on linux, maybe on macos eventually
+# install dependencies for audio-*.py
 #
-# enables the following features:
-#   bpm detection
-#   tempo detection
-#  
+# linux: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} vamp-sdk-dev
+# win64: requires msys2-mingw64 environment
+# macos: requires macports
+#
+# has the following manual dependencies, especially on mac:
+#   https://www.vamp-plugins.org/pack.html
+#
 # installs stuff to the following locations:
 #   ~/pe/
 #   whatever your python uses for --user packages
 #
 # does the following terrible things:
 #   modifies the keyfinder python lib to load the .so in ~/pe
-#
-# has the following manual dependencies, especially on mac:
-#   https://www.vamp-plugins.org/pack.html
 
+
+linux=1
 
 win=
 [ ! -z "$MSYSTEM" ] || [ -e /msys2.exe ] && {
@@ -28,6 +29,7 @@ win=
 	}
 	pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
 	win=1
+	linux=
 }
 
 mac=
@@ -44,6 +46,7 @@ mac=
 		sudo port install $pkgs
 	}
 	mac=1
+	linux=
 }
 
 hash -r
@@ -67,6 +70,8 @@ need() {
 	}
 }
 need cmake
+need ffmpeg
+need $pybin
 #need patchelf
 
 
@@ -98,7 +103,7 @@ github_tarball() {
 		jq -r '.tarball_url' ||
 
 		# fallback to awk (sorry)
-		awk -F\" '/"tarball_url".*\.tar\.gz/ {print$4}'
+		awk -F\" '/"tarball_url": "/ {print$4}'
 	) |
 	tee /dev/stderr |
 	tr -d '\r' | tr '\n' '\0' |
@@ -150,15 +155,28 @@ install_keyfinder() {
 	cmake --build build --parallel $(nproc || echo 4)
 	cmake --install build
 
+	libpath="$h/pe/keyfinder/$so"
+	[ $linux ] && [ ! -e "$libpath" ] &&
+		so=lib64/libkeyfinder.so
+	
+	libpath="$h/pe/keyfinder/$so"
+	[ -e "$libpath" ] || {
+		echo "so not found at $sop"
+		exit 1
+	}
+	
 	# rm -rf /Users/ed/Library/Python/3.9/lib/python/site-packages/*keyfinder*
 	CFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include" \
-	LDFLAGS="-L$h/pe/keyfinder/lib -L/opt/local/lib" \
+	LDFLAGS="-L$h/pe/keyfinder/lib -L$h/pe/keyfinder/lib64 -L/opt/local/lib" \
 	PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig \
 	$pybin -m pip install --user keyfinder
 
 	pypath="$($pybin -c 'import keyfinder; print(keyfinder.__file__)')"
-	libpath="$(echo "$h/pe/keyfinder/$so")"
-
+	for pyso in "${pypath%/*}"/*.so; do
+		[ -e "$pyso" ] || break
+		patchelf --set-rpath "${libpath%/*}" "$pyso"
+	done
+	
 	mv "$pypath"{,.bak}
 	(
 		printf 'import ctypes\nctypes.cdll.LoadLibrary("%s")\n' "$libpath"
@@ -178,6 +196,8 @@ install_vamp() {
 	#   pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
 	
 	$pybin -m pip install --user vamp
+
+	$pybin -c 'import vampyhost; plugs = vampyhost.list_plugins(); print("\033[31mWARNING: could not find the vamp beatroot plugin, please install it for optimal results\033[0m" if "beatroot-vamp:beatroot" not in plugs else "\033[32mbeatroot detected, good stuff\033[0m")'
 }
 
 

@@ -35,8 +35,16 @@ def det(tf):
 
     with open(tf, "rb") as f:
         d = np.fromfile(f, dtype=np.float32)
-        c = vamp.collect(d, 22050, "beatroot-vamp:beatroot")
-        cl = c["list"]
+        try:
+            # 98% accuracy on jcore
+            c = vamp.collect(d, 22050, "beatroot-vamp:beatroot")
+            cl = c["list"]
+        except:
+            # fallback; 73% accuracy
+            plug = "vamp-example-plugins:fixedtempo"
+            c = vamp.collect(d, 22050, plug, parameters={"maxdflen": 40})
+            print(c["list"][0]["label"].split(" ")[0])
+            return
 
         # throws if detection failed:
         bpm = float(cl[-1]["timestamp"] - cl[1]["timestamp"])
