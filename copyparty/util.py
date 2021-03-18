@@ -61,6 +61,15 @@ HTTPCODE = {
 }
 
 
+IMPLICATIONS = [
+    ["e2dsa", "e2ds"],
+    ["e2ds", "e2d"],
+    ["e2tsr", "e2ts"],
+    ["e2ts", "e2t"],
+    ["e2t", "e2d"],
+]
+
+
 class Counter(object):
     def __init__(self, v=0):
         self.v = v

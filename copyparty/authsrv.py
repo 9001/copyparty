@@ -6,7 +6,7 @@ import re
 import threading
 
 from .__init__ import PY2, WINDOWS
-from .util import undot, Pebkac, fsdec, fsenc, statdir, nuprint
+from .util import IMPLICATIONS, undot, Pebkac, fsdec, fsenc, statdir, nuprint
 
 
 class VFS(object):
@@ -200,16 +200,39 @@ class AuthSrv(object):
                 continue
 
             lvl, uname = ln.split(" ")
-            if lvl in "ra":
-                mread[vol_dst].append(uname)
-            if lvl in "wa":
-                mwrite[vol_dst].append(uname)
-            if lvl == "c":
-                cval = True
-                if "=" in uname:
-                    uname, cval = uname.split("=", 1)
+            self._read_vol_str(
+                lvl, uname, mread[vol_dst], mwrite[vol_dst], mflags[vol_dst]
+            )
 
-                mflags[vol_dst][uname] = cval
+    def _read_vol_str(self, lvl, uname, mr, mw, mf):
+        if lvl == "c":
+            cval = True
+            if "=" in uname:
+                uname, cval = uname.split("=", 1)
+
+            self._read_volflag(mf, uname, cval, False)
+            return
+
+        if uname == "":
+            uname = "*"
+
+        if lvl in "ra":
+            mr.append(uname)
+
+        if lvl in "wa":
+            mw.append(uname)
+
+    def _read_volflag(self, flags, name, value, is_list):
+        if name not in ["mtp"]:
+            flags[name] = value
+            return
+
+        if not is_list:
+            value = [value]
+        elif not value:
+            return
+
+        flags[name] = flags.get(name, []) + value
 
     def reload(self):
         """
@@ -232,7 +255,7 @@ class AuthSrv(object):
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is [rwa]username
+            # permset is [rwa]username or [c]flag
             for v_str in self.args.v:
                 m = self.re_vol.match(v_str)
                 if not m:
@@ -249,22 +272,7 @@ class AuthSrv(object):
 
                 perms = perms.split(":")
                 for (lvl, uname) in [[x[0], x[1:]] for x in perms]:
-                    if lvl == "c":
-                        cval = True
-                        if "=" in uname:
-                            uname, cval = uname.split("=", 1)
-
-                        mflags[dst][uname] = cval
-                        continue
-
-                    if uname == "":
-                        uname = "*"
-
-                    if lvl in "ra":
-                        mread[dst].append(uname)
-
-                    if lvl in "wa":
-                        mwrite[dst].append(uname)
+                    self._read_vol_str(lvl, uname, mread[dst], mwrite[dst], mflags[dst])
 
         if self.args.c:
             for cfg_fn in self.args.c:
@@ -321,9 +329,16 @@ class AuthSrv(object):
                 if getattr(self.args, k):
                     vol.flags[k] = True
 
+            for k1, k2 in IMPLICATIONS:
+                if k1 in vol.flags:
+                    vol.flags[k2] = True
+
             # default tag-list if unset
             if "mte" not in vol.flags:
                 vol.flags["mte"] = self.args.mte
+
+            # append parsers from argv to volume-flags
+            self._read_volflag(vol.flags, "mtp", self.args.mtp, True)
 
         try:
             v, _ = vfs.get("/", "*", False, True)

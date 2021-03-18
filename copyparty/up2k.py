@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
+from os.path import abspath
 
 import re
 import os
@@ -104,6 +105,10 @@ class Up2k(object):
             thr.start()
 
             thr = threading.Thread(target=self._hasher)
+            thr.daemon = True
+            thr.start()
+
+            thr = threading.Thread(target=self._run_all_mtp)
             thr.daemon = True
             thr.start()
 
@@ -218,6 +223,9 @@ class Up2k(object):
                 return None
 
             _, flags = self._expr_idx_filter(flags)
+
+            a = ["\033[36m{}:\033[0m{}".format(k, v) for k, v in flags.items()]
+            self.log(" ".join(a))
 
             reg = {}
             path = os.path.join(ptop, ".hist", "up2k.snap")
@@ -435,18 +443,7 @@ class Up2k(object):
 
             mpool = False
             if self.mtag.prefer_mt and not self.args.no_mtag_mt:
-                # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
-                # both do crazy runahead so lets reinvent another wheel
-                nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
-                if self.n_mtag_tags_added == -1:
-                    self.log("using {}x {}".format(nw, self.mtag.backend))
-                    self.n_mtag_tags_added = 0
-
-                mpool = Queue(nw)
-                for _ in range(nw):
-                    thr = threading.Thread(target=self._tag_thr, args=(mpool,))
-                    thr.daemon = True
-                    thr.start()
+                mpool = self._start_mpool()
 
             c2 = cur.connection.cursor()
             c3 = cur.connection.cursor()
@@ -457,16 +454,20 @@ class Up2k(object):
                 if c2.execute(q, (w[:16],)).fetchone():
                     continue
 
+                if "mtp" in flags:
+                    q = "insert into mt values (?,'t:mtp','a')"
+                    c2.execute(q, (w[:16],))
+
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
                 abspath = os.path.join(ptop, rd, fn)
                 self.pp.msg = "c{} {}".format(n_left, abspath)
-                args = c3, entags, w, abspath
+                args = [c3, entags, w, abspath]
                 if not mpool:
                     n_tags = self._tag_file(*args)
                 else:
-                    mpool.put(args)
+                    mpool.put(["mtag"] + args)
                     with self.mutex:
                         n_tags = self.n_mtag_tags_added
                         self.n_mtag_tags_added = 0
@@ -481,16 +482,117 @@ class Up2k(object):
                     last_write = time.time()
                     n_buf = 0
 
-            if mpool:
-                for _ in range(mpool.maxsize):
-                    mpool.put(None)
-
-                mpool.join()
+            self._stop_mpool(mpool)
 
             c3.close()
             c2.close()
 
         return n_add, n_rm, True
+
+    def _run_all_mtp(self):
+        self.n_mtag_tags_added = 0
+        for ptop, flags in self.flags.items():
+            if "mtp" in flags:
+                self._run_one_mtp(ptop)
+
+    def _run_one_mtp(self, ptop):
+        force = {}
+        parsers = {}
+        for parser in self.flags[ptop]["mtp"]:
+            tag, parser = parser.split("=", 1)
+            if parser.lower().startswith("f,"):
+                parser = parser[2:]
+                force[tag] = True
+
+            parsers[tag] = parser
+
+        q = "select count(w) from mt where k = 't:mtp'"
+        with self.mutex:
+            cur = self.cur[ptop]
+            cur = cur.connection.cursor()
+            wcur = cur.connection.cursor()
+            n_left = cur.execute(q).fetchone()[0]
+
+        mpool = self._start_mpool()
+        batch_sz = mpool.maxsize * 4
+        seen = []
+        while True:
+            with self.mutex:
+                q = "select w from mt where k = 't:mtp' limit ?"
+                warks = cur.execute(q, (batch_sz,)).fetchall()
+                warks = [x[0] for x in warks]
+                warks = [x for x in warks if x not in seen]
+                seen = warks
+                jobs = []
+                for w in warks:
+                    q = "delete from mt where w = ? and k = 't:mtp'"
+                    cur.execute(q, (w,))
+
+                    q = "select rd, fn from up where substr(w,1,16)=? limit 1"
+                    rd, fn = cur.execute(q, (w,)).fetchone()
+                    rd, fn = s3dec(rd, fn)
+                    abspath = os.path.join(ptop, rd, fn)
+
+                    q = "select k from mt where w = ?"
+                    have = cur.execute(q, (w,)).fetchall()
+                    have = [x[0] for x in have]
+
+                    if ".dur" not in have:
+                        # skip non-audio
+                        n_left -= 1
+                        continue
+
+                    task_parsers = {
+                        k: v for k, v in parsers.items() if k in force or k not in have
+                    }
+                    jobs.append([task_parsers, wcur, None, w, abspath])
+
+            if not jobs:
+                break
+
+            with self.mutex:
+                msg = "mtp: {} done, {} left"
+                self.log(msg.format(self.n_mtag_tags_added, n_left))
+
+            for j in jobs:
+                n_left -= 1
+                mpool.put(j)
+
+            with self.mutex:
+                cur.connection.commit()
+
+        self._stop_mpool(mpool)
+        with self.mutex:
+            cur.connection.commit()
+            wcur.close()
+            cur.close()
+
+        self.log("mtp finished")
+
+    def _start_mpool(self):
+        # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
+        # both do crazy runahead so lets reinvent another wheel
+        nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
+        if self.n_mtag_tags_added == -1:
+            self.log("using {}x {}".format(nw, self.mtag.backend))
+            self.n_mtag_tags_added = 0
+
+        mpool = Queue(nw)
+        for _ in range(nw):
+            thr = threading.Thread(target=self._tag_thr, args=(mpool,))
+            thr.daemon = True
+            thr.start()
+
+        return mpool
+
+    def _stop_mpool(self, mpool):
+        if not mpool:
+            return
+
+        for _ in range(mpool.maxsize):
+            mpool.put(None)
+
+        mpool.join()
 
     def _tag_thr(self, q):
         while True:
@@ -500,24 +602,38 @@ class Up2k(object):
                 return
 
             try:
-                write_cur, entags, wark, abspath = task
-                tags = self.mtag.get(abspath)
+                parser, write_cur, entags, wark, abspath = task
+                if parser == "mtag":
+                    tags = self.mtag.get(abspath)
+                else:
+                    tags = self.mtag.get_bin(parser, abspath)
+                    vtags = [
+                        "\033[36m{} \033[33m{}".format(k, v) for k, v in tags.items()
+                    ]
+                    self.log("{}\033[0m [{}]".format(" ".join(vtags), abspath))
+
                 with self.mutex:
                     n = self._tag_file(write_cur, entags, wark, abspath, tags)
                     self.n_mtag_tags_added += n
             except:
                 ex = traceback.format_exc()
+                if parser == "mtag":
+                    parser = self.mtag.backend
+
                 msg = "{} failed to read tags from {}:\n{}"
-                self.log(msg.format(self.mtag.backend, abspath, ex), c=3)
+                self.log(msg.format(parser, abspath, ex), c=3)
 
             q.task_done()
 
     def _tag_file(self, write_cur, entags, wark, abspath, tags=None):
-        tags = tags or self.mtag.get(abspath)
-        tags = {k: v for k, v in tags.items() if k in entags}
-        if not tags:
-            # indicate scanned without tags
-            tags = {"x": 0}
+        if tags is None:
+            tags = self.mtag.get(abspath)
+
+        if entags:
+            tags = {k: v for k, v in tags.items() if k in entags}
+            if not tags:
+                # indicate scanned without tags
+                tags = {"x": 0}
 
         ret = 0
         for k, v in tags.items():

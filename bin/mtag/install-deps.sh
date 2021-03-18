@@ -4,7 +4,7 @@ set -e
 
 # install dependencies for audio-*.py
 #
-# linux: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} vamp-sdk-dev
+# linux: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} vamp-sdk-dev patchelf
 # win64: requires msys2-mingw64 environment
 # macos: requires macports
 #
@@ -174,7 +174,8 @@ install_keyfinder() {
 	pypath="$($pybin -c 'import keyfinder; print(keyfinder.__file__)')"
 	for pyso in "${pypath%/*}"/*.so; do
 		[ -e "$pyso" ] || break
-		patchelf --set-rpath "${libpath%/*}" "$pyso"
+		patchelf --set-rpath "${libpath%/*}" "$pyso" ||
+			echo "WARNING: patchelf failed (only fatal on musl-based distros)"
 	done
 	
 	mv "$pypath"{,.bak}

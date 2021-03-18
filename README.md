@@ -100,18 +100,23 @@ through arguments:
 * `-e2tsr` deletes all existing tags, so a full reindex
 
 the same arguments can be set as volume flags, in addition to `d2d` and `d2t` for disabling:
-* `-v ~/music::ce2dsa:ce2tsr` does a full reindex of everything on startup
-* `-v ~/music::cd2d` disables **all** indexing, even if any `-e2*` are on
-* `-v ~/music::cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
+* `-v ~/music::r:ce2dsa:ce2tsr` does a full reindex of everything on startup
+* `-v ~/music::r:cd2d` disables **all** indexing, even if any `-e2*` are on
+* `-v ~/music::r:cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
 `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
 
+
+## metadata from audio files
+
 `-mte` decides which tags to index and display in the browser (and also the display order), this can be changed per-volume:
-* `-v ~/music::cmte=title,artist` indexes and displays *title* followed by *artist*
+* `-v ~/music::r:cmte=title,artist` indexes and displays *title* followed by *artist*
 
 if you add/remove a tag from `mte` you will need to run with `-e2tsr` once to rebuild the database, otherwise only new files will be affected
 
 `-mtm` can be used to add or redefine a metadata mapping, say you have media files with `foo` and `bar` tags and you want them to display as `qux` in the browser (preferring `foo` if both are present), then do `-mtm qux=foo,bar` and now you can `-mte artist,title,qux`
+
+tags that start with a `.` such as `.bpm` and `.dur`(ation) indicate numeric value
 
 see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copyparty/blob/master/copyparty/mtag.py) for the default mappings (should cover mp3,opus,flac,m4a,wav,aif,)
 
@@ -120,6 +125,15 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 * catches a few tags that mutagen doesn't
 * avoids pulling any GPL code into copyparty
 * more importantly runs ffprobe on incoming files which is bad if your ffmpeg has a cve
+
+
+## file parser plugins
+
+copyparty can invoke external programs to collect additional metadata for files using `mtp` (as argument or volume flag)
+
+* `-mtp key=~/bin/audio-key.py` will execute `~/bin/audio-key.py` with filename as argument 1 to provide the `key` tag if that does not exist in the audio metadata
+* `-mtp .bpm=f,~/bin/audio-bpm.py` replaces (`f,`) any existing `.bpm` tag using the `~/bin/audio-bpm.py` program
+* `-v ~/music::r:cmtp=key=~/bin/audio-key.py:cmtp=.bpm=f,~/bin/audio-bpm.py` both as a per-volume config wow this is getting ugly
 
 
 # client examples

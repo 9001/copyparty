@@ -312,3 +312,23 @@ class MTag(object):
         ret = {k: [0, v] for k, v in ret.items()}
 
         return self.normalize_tags(ret, md)
+
+    def get_bin(self, parsers, abspath):
+        pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+        pypath = [str(pypath)] + [str(x) for x in sys.path if x]
+        pypath = str(os.pathsep.join(pypath))
+        env = os.environ.copy()
+        env["PYTHONPATH"] = pypath
+
+        ret = {}
+        for tagname, binpath in parsers.items():
+            try:
+                cmd = [sys.executable, binpath, abspath]
+                cmd = [fsenc(x) for x in cmd]
+                v = sp.check_output(cmd, env=env).strip()
+                if v:
+                    ret[tagname] = v.decode("utf-8")
+            except:
+                pass
+
+        return ret
