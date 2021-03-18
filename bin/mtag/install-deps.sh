@@ -89,8 +89,12 @@ dl_text() {
 	exec wget -O- "$@"
 }
 dl_files() {
-	command -v curl >/dev/null && exec curl -JOL "$@"
-	exec wget --trust-server-names "$@"
+	local yolo= ex=
+	[ $1 = "yolo" ] && yolo=1 && ex=k && shift
+	command -v curl >/dev/null && exec curl -${ex}JOL "$@"
+	
+	[ $yolo ] && ex=--no-check-certificate
+	exec wget --trust-server-names $ex "$@"
 }
 export -f dl_files
 
@@ -191,6 +195,11 @@ install_keyfinder() {
 }
 
 
+have_beatroot() {
+	$pybin -c 'import vampyhost, sys; plugs = vampyhost.list_plugins(); sys.exit(0 if "beatroot-vamp:beatroot" in plugs else 1)'
+}
+
+
 install_vamp() {
 	# windows support:
 	#   use msys2 in mingw-w64 mode
@@ -198,7 +207,23 @@ install_vamp() {
 	
 	$pybin -m pip install --user vamp
 
-	$pybin -c 'import vampyhost; plugs = vampyhost.list_plugins(); print("\033[31mWARNING: could not find the vamp beatroot plugin, please install it for optimal results\033[0m" if "beatroot-vamp:beatroot" not in plugs else "\033[32mbeatroot detected, good stuff\033[0m")'
+	have_beatroot || {
+		printf '\033[33mcould not find the vamp beatroot plugin, building from source\033[0m\n'
+		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/885/beatroot-vamp-v1.0.tar.gz)
+		sha512sum -c <(
+			echo "1f444d1d58ccf565c0adfe99f1a1aa62789e19f5071e46857e2adfbc9d453037bc1c4dcb039b02c16240e9b97f444aaff3afb625c86aa2470233e711f55b6874  -"
+		) <beatroot-vamp-v1.0.tar.gz
+		tar -xf beatroot-vamp-v1.0.tar.gz 
+		cd beatroot-vamp-v1.0
+		make -f Makefile.linux -j4
+		# /home/ed/vamp /home/ed/.vamp /usr/local/lib/vamp
+		mkdir ~/vamp
+		cp -pv beatroot-vamp.* ~/vamp/
+	}
+	
+	have_beatroot &&
+		printf '\033[32mfound the vamp beatroot plugin, nice\033[0m\n' ||
+		printf '\033[31mWARNING: could not find the vamp beatroot plugin, please install it for optimal results\033[0m\n'
 }
 
 
