@@ -13,6 +13,7 @@ import base64
 import hashlib
 import threading
 import traceback
+import subprocess as sp
 from copy import deepcopy
 
 from .__init__ import WINDOWS
@@ -223,8 +224,9 @@ class Up2k(object):
 
             _, flags = self._expr_idx_filter(flags)
 
-            a = ["\033[36m{}:\033[0m{}".format(k, v) for k, v in sorted(flags.items())]
-            self.log(" ".join(a))
+            a = "\033[0;36m{}:\033[1;30m{}"
+            a = [a.format(k, v) for k, v in sorted(flags.items())]
+            self.log(" ".join(a) + "\033[0m")
 
             reg = {}
             path = os.path.join(ptop, ".hist", "up2k.snap")
@@ -622,6 +624,12 @@ class Up2k(object):
         self.log("mtp finished")
 
     def _start_mpool(self):
+        if WINDOWS and False:
+            nah = open(os.devnull, "wb")
+            wmic = f"processid={os.getpid()}"
+            wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
+            sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
+
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
         # both do crazy runahead so lets reinvent another wheel
         nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
@@ -646,6 +654,11 @@ class Up2k(object):
 
         mpool.join()
         self._flush_mpool(wcur)
+        if WINDOWS and False:
+            nah = open(os.devnull, "wb")
+            wmic = f"processid={os.getpid()}"
+            wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
+            sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
 
     def _tag_thr(self, q):
         while True:

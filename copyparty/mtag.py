@@ -324,11 +324,15 @@ class MTag(object):
         for tagname, (binpath, timeout) in parsers.items():
             try:
                 cmd = [sys.executable, binpath, abspath]
-                if not WINDOWS:
+                args = {"env": env, "timeout": timeout}
+
+                if WINDOWS:
+                    args["creationflags"] = 0x4000
+                else:
                     cmd = ["nice"] + cmd
 
                 cmd = [fsenc(x) for x in cmd]
-                v = sp.check_output(cmd, env=env, timeout=timeout).strip()
+                v = sp.check_output(cmd, **args).strip()
                 if v:
                     ret[tagname] = v.decode("utf-8")
             except:

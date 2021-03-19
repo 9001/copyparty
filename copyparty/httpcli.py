@@ -1295,7 +1295,7 @@ class HttpCli(object):
                     tags[k] = v
 
         if icur:
-            taglist = [k for k in self.args.mte.split(",") if k in taglist]
+            taglist = [k for k in vn.flags["mte"].split(",") if k in taglist]
             for f in dirs:
                 f["tags"] = {}
 
@@ -1368,7 +1368,7 @@ class HttpCli(object):
             ts=ts,
             perms=json.dumps(perms),
             taglist=taglist,
-            tag_order=json.dumps(self.args.mte.split(",")),
+            tag_order=json.dumps(vn.flags["mte"].split(",")),
             have_up2k_idx=("e2d" in vn.flags),
             have_tags_idx=("e2t" in vn.flags),
             logues=logues,
