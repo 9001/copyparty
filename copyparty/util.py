@@ -10,6 +10,7 @@ import select
 import struct
 import hashlib
 import platform
+import traceback
 import threading
 import mimetypes
 import contextlib
@@ -146,6 +147,31 @@ def uprint(msg):
 
 def nuprint(msg):
     uprint("{}\n".format(msg))
+
+
+def rice_tid():
+    tid = threading.current_thread().ident
+    c = struct.unpack(b"B" * 5, struct.pack(b">Q", tid)[-5:])
+    return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c) + "\033[0m"
+
+
+def trace(*args, **kwargs):
+    t = time.time()
+    stack = "".join(
+        "\033[36m{}\033[33m{}".format(x[0].split(os.sep)[-1][:-3], x[1])
+        for x in traceback.extract_stack()[3:-1]
+    )
+    parts = ["{:.6f}".format(t), rice_tid(), stack]
+
+    if args:
+        parts.append(repr(args))
+
+    if kwargs:
+        parts.append(repr(kwargs))
+
+    msg = "\033[0m ".join(parts)
+    # _tracebuf.append(msg)
+    nuprint(msg)
 
 
 @contextlib.contextmanager

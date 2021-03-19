@@ -12,10 +12,13 @@ import re
 import os
 import sys
 import time
+import signal
 import shutil
 import filecmp
 import locale
 import argparse
+import threading
+import traceback
 from textwrap import dedent
 
 from .__init__ import E, WINDOWS, VT100, PY2
@@ -164,6 +167,16 @@ def configure_ssl_ciphers(al):
         sys.exit(0)
 
 
+def sighandler(signal=None, frame=None):
+    msg = [""] * 5
+    for th in threading.enumerate():
+        msg.append(str(th))
+        msg.extend(traceback.format_stack(sys._current_frames()[th.ident]))
+
+    msg.append("\n")
+    print("\n".join(msg))
+
+
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
@@ -306,6 +319,8 @@ def main():
             "windows py2 cannot do unicode filenames with -e2d\n"
             + "  (if you crash with codec errors then that is why)"
         )
+
+    # signal.signal(signal.SIGINT, sighandler)
 
     SvcHub(al).run()
 
