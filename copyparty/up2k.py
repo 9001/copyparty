@@ -223,7 +223,7 @@ class Up2k(object):
 
             _, flags = self._expr_idx_filter(flags)
 
-            a = ["\033[36m{}:\033[0m{}".format(k, v) for k, v in flags.items()]
+            a = ["\033[36m{}:\033[0m{}".format(k, v) for k, v in sorted(flags.items())]
             self.log(" ".join(a))
 
             reg = {}
@@ -495,6 +495,9 @@ class Up2k(object):
                 self._run_one_mtp(ptop)
 
     def _run_one_mtp(self, ptop):
+        db_path = os.path.join(ptop, ".hist", "up2k.db")
+        sz0 = os.path.getsize(db_path)
+
         force = {}
         parsers = {}
         for parser in self.flags[ptop]["mtp"]:
@@ -513,15 +516,14 @@ class Up2k(object):
             n_left = cur.execute(q).fetchone()[0]
 
         mpool = self._start_mpool()
-        batch_sz = mpool.maxsize * 4
-        seen = []
+        batch_sz = mpool.maxsize * 3
+        t_prev = time.time()
+        n_prev = n_left
         while True:
             with self.mutex:
                 q = "select w from mt where k = 't:mtp' limit ?"
                 warks = cur.execute(q, (batch_sz,)).fetchall()
                 warks = [x[0] for x in warks]
-                warks = [x for x in warks if x not in seen]
-                seen = warks
                 jobs = []
                 for w in warks:
                     q = "delete from mt where w = ? and k = 't:mtp'"
@@ -546,12 +548,27 @@ class Up2k(object):
                     }
                     jobs.append([task_parsers, wcur, None, w, abspath])
 
-            if not jobs:
+            if not warks:
                 break
 
+            if not jobs:
+                continue
+
+            try:
+                now = time.time()
+                s = ((now - t_prev) / (n_prev - n_left)) * n_left
+                h, s = divmod(s, 3600)
+                m, s = divmod(s, 60)
+                n_prev = n_left
+                t_prev = now
+            except:
+                h = 1
+                m = 1
+
+            msg = "mtp: {} done, {} left, eta {}h {:02d}m"
             with self.mutex:
-                msg = "mtp: {} done, {} left"
-                self.log(msg.format(self.n_mtag_tags_added, n_left))
+                msg = msg.format(self.n_mtag_tags_added, n_left, int(h), int(m))
+                self.log(msg, c=6)
 
             for j in jobs:
                 n_left -= 1
@@ -563,6 +580,9 @@ class Up2k(object):
         self._stop_mpool(mpool)
         with self.mutex:
             cur.connection.commit()
+            if self.n_mtag_tags_added:
+                self.vac(cur, db_path, self.n_mtag_tags_added, 0, sz0)
+            
             wcur.close()
             cur.close()
 

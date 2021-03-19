@@ -323,6 +323,7 @@ class MTag(object):
         ret = {}
         for tagname, binpath in parsers.items():
             try:
+                binpath = os.path.expanduser(binpath)
                 cmd = [sys.executable, binpath, abspath]
                 cmd = [fsenc(x) for x in cmd]
                 v = sp.check_output(cmd, env=env).strip()

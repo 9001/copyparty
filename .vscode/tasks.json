@@ -8,8 +8,10 @@
         },
         {
             "label": "no_dbg",
-            "command": "${config:python.pythonPath} -m copyparty -ed -emp -e2dsa -e2ts -a ed:wark -v srv::r:aed:cnodupe -v dist:dist:r ;exit 1",
-            "type": "shell"
+            "type": "shell",
+            "command": "${config:python.pythonPath} -m copyparty -ed -emp -e2dsa -e2ts -a ed:wark -v srv::r:aed:cnodupe -v dist:dist:r ;exit 1"
+            // -v ~/Music/mt:mt:r:cmtp=.bpm=~/dev/copyparty/bin/mtag/audio-bpm.py:cmtp=key=~/dev/copyparty/bin/mtag/audio-key.py:ce2tsr 
+            // -v ~/Music/mt:mt:r:cmtp=.bpm=~/dev/copyparty/bin/mtag/audio-bpm.py:ce2tsr
         }
     ]
 }
