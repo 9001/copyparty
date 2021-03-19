@@ -129,11 +129,11 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 ## file parser plugins
 
-copyparty can invoke external programs to collect additional metadata for files using `mtp` (as argument or volume flag)
+copyparty can invoke external programs to collect additional metadata for files using `mtp` (as argument or volume flag), there is a default timeout of 30sec
 
-* `-mtp key=~/bin/audio-key.py` will execute `~/bin/audio-key.py` with filename as argument 1 to provide the `key` tag if that does not exist in the audio metadata
-* `-mtp .bpm=f,~/bin/audio-bpm.py` replaces (`f,`) any existing `.bpm` tag using the `~/bin/audio-bpm.py` program
-* `-v ~/music::r:cmtp=key=~/bin/audio-key.py:cmtp=.bpm=f,~/bin/audio-bpm.py` both as a per-volume config wow this is getting ugly
+* `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
+* `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
+* `-v ~/music::r:cmtp=.bpm=~/bin/audio-bpm.py:cmtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
 
 
 # client examples

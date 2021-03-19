@@ -506,14 +506,37 @@ class Up2k(object):
         sz0 = os.path.getsize(db_path)
 
         force = {}
+        timeout = {}
         parsers = {}
         for parser in self.flags[ptop]["mtp"]:
+            orig = parser
             tag, parser = parser.split("=", 1)
-            if parser.lower().startswith("f,"):
-                parser = parser[2:]
-                force[tag] = True
+            while True:
+                try:
+                    bp = os.path.expanduser(parser)
+                    if os.path.exists(bp):
+                        parsers[tag] = [bp, timeout.get(tag, 30)]
+                        break
+                except:
+                    pass
 
-            parsers[tag] = parser
+                try:
+                    arg, parser = parser.split(",", 1)
+                    arg = arg.lower()
+
+                    if arg == "f":
+                        force[tag] = True
+                        continue
+
+                    if arg.startswith("t"):
+                        timeout[tag] = int(arg[1:])
+                        continue
+
+                    raise Exception()
+
+                except:
+                    self.log("invalid argument: " + orig, 1)
+                    return
 
         q = "select count(w) from mt where k = 't:mtp'"
         with self.mutex:

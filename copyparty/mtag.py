@@ -321,12 +321,11 @@ class MTag(object):
         env["PYTHONPATH"] = pypath
 
         ret = {}
-        for tagname, binpath in parsers.items():
+        for tagname, (binpath, timeout) in parsers.items():
             try:
-                binpath = os.path.expanduser(binpath)
                 cmd = [sys.executable, binpath, abspath]
                 cmd = [fsenc(x) for x in cmd]
-                v = sp.check_output(cmd, env=env).strip()
+                v = sp.check_output(cmd, env=env, timeout=timeout).strip()
                 if v:
                     ret[tagname] = v.decode("utf-8")
             except:
