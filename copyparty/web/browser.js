@@ -588,10 +588,14 @@ function autoplay_blocked() {
 	];
 	var oldcfg = [];
 
-	if (document.querySelector('#srch_form.tags'))
+	if (document.querySelector('#srch_form.tags')) {
 		sconf.push(["tags",
 			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "46"]
 		]);
+		sconf.push(["adv.",
+			["adv", "adv", "key=5A&nbsp; .bpm>159&nbsp; .bpm<169", "46"]
+		]);
+	}
 
 	var html = [];
 	var orig_html = null;
@@ -654,9 +658,10 @@ function autoplay_blocked() {
 			return;
 
 		if (this.status !== 200) {
-			alert("http " + this.status + ": " + this.responseText);
+			ebi('srch_q').textContent = "http " + this.status + ": " + this.responseText;
 			return;
 		}
+		ebi('srch_q').textContent = '';
 
 		var res = JSON.parse(this.responseText),
 			tagord = res.tag_order;

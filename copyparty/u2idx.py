@@ -1,10 +1,11 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import re
 import os
 from datetime import datetime
 
-from .util import u8safe
+from .util import u8safe, html_escape, Pebkac
 from .up2k import up2k_wark_from_hashlist
 
 
@@ -73,17 +74,47 @@ class U2idx(object):
 
         uq, uv = _sqlize(qobj)
 
-        tq = ""
-        tv = []
         qobj = {}
         if "tags" in body:
             _conv_txt(qobj, body, "tags", "mt.v")
-            tq, tv = _sqlize(qobj)
 
-        return self.run_query(vols, uq, uv, tq, tv)
+        if "adv" in body:
+            _conv_adv(qobj, body, "adv")
 
-    def run_query(self, vols, uq, uv, tq, tv):
-        self.log("qs: {} {} ,  {} {}".format(uq, repr(uv), tq, repr(tv)))
+        return self.run_query(vols, uq, uv, qobj)
+
+    def run_query(self, vols, uq, uv, targs):
+        self.log("qs: {} {} ,  {}".format(uq, repr(uv), repr(targs)))
+
+        if not targs:
+            if not uq:
+                q = "select * from up"
+                v = ()
+            else:
+                q = "select * from up where " + uq
+                v = tuple(uv)
+        else:
+            q = "select up.* from up"
+            keycmp = "substr(up.w,1,16)"
+            where = []
+            v = []
+            ctr = 0
+            for tq, tv in sorted(targs.items()):
+                ctr += 1
+                tq = tq.split("\n")[0]
+                keycmp2 = "mt{}.w".format(ctr)
+                q += " inner join mt mt{} on {} = {}".format(ctr, keycmp, keycmp2)
+                keycmp = keycmp2
+                where.append(tq.replace("mt.", keycmp[:-1]))
+                v.append(tv)
+
+            if uq:
+                where.append(uq)
+                v.extend(uv)
+
+            q += " where " + (" and ".join(where))
+
+        self.log("q2: {} {}".format(q, repr(v)))
 
         ret = []
         lim = 1000
@@ -92,19 +123,6 @@ class U2idx(object):
             cur = self.get_cur(ptop)
             if not cur:
                 continue
-
-            if not tq:
-                if not uq:
-                    q = "select * from up"
-                    v = ()
-                else:
-                    q = "select * from up where " + uq
-                    v = tuple(uv)
-            else:
-                # naive assumption: tags first
-                q = "select up.* from up inner join mt on substr(up.w,1,16) = mt.w where {}"
-                q = q.format(" and ".join([tq, uq]) if uq else tq)
-                v = tuple(tv + uv)
 
             sret = []
             c = cur.execute(q, v)
@@ -187,6 +205,23 @@ def _conv_txt(q, body, k, sql):
             v = v[:-1]
 
         qk = "{} {} like {}?{}".format(sql, inv, head, tail)
+        q[qk + "\n" + v] = u8safe(v)
+
+
+def _conv_adv(q, body, k):
+    ptn = re.compile(r"^(\.?[a-z]+) *(==?|!=|<=?|>=?) *(.*)$")
+
+    parts = body[k].split(" ")
+    parts = [x.strip() for x in parts if x.strip()]
+
+    for part in parts:
+        m = ptn.match(part)
+        if not m:
+            p = html_escape(part)
+            raise Pebkac(400, "invalid argument [" + p + "]")
+
+        k, op, v = m.groups()
+        qk = "mt.k = '{}' and mt.v {} ?".format(k, op)
         q[qk + "\n" + v] = u8safe(v)
 
 
