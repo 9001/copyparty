@@ -597,10 +597,10 @@ function autoplay_blocked() {
 		]);
 	}
 
-	var html = [];
+	var trs = [];
 	var orig_html = null;
 	for (var a = 0; a < sconf.length; a++) {
-		html.push('<tr><td><br />' + sconf[a][0] + '</td>');
+		var html = ['<tr><td><br />' + sconf[a][0] + '</td>'];
 		for (var b = 1; b < 3; b++) {
 			var hn = "srch_" + sconf[a][b][0];
 			var csp = (sconf[a].length == 2) ? 2 : 1;
@@ -613,6 +613,11 @@ function autoplay_blocked() {
 				break;
 		}
 		html.push('</tr>');
+		trs.push(html);
+	}
+	var html = [];
+	for (var a = 0; a < trs.length; a += 2) {
+		html.push('<table>' + (trs[a].concat(trs[a + 1])).join('\n') + '</table>');
 	}
 	ebi('srch_form').innerHTML = html.join('\n');
 
@@ -679,6 +684,7 @@ function autoplay_blocked() {
 			ebi('path').style.display = 'none';
 			ebi('tree').style.display = 'none';
 			ebi('wrap').style.marginLeft = '0';
+			treectl.hidden = true;
 		}
 
 		var html = mk_files_header(tagord);
@@ -731,6 +737,7 @@ function autoplay_blocked() {
 		ebi('path').style.display = oldcfg[0];
 		ebi('tree').style.display = oldcfg[1];
 		ebi('wrap').style.marginLeft = oldcfg[2];
+		treectl.hidden = false;
 		oldcfg = [];
 		ebi('files').innerHTML = orig_html;
 		orig_html = null;
@@ -740,6 +747,9 @@ function autoplay_blocked() {
 
 
 var treectl = (function () {
+	var treectl = {
+		"hidden": false
+	};
 	var dyn = bcfg_get('dyntree', true);
 	var treesz = icfg_get('treesz', 16);
 	treesz = Math.min(Math.max(treesz, 4), 50);
@@ -773,7 +783,7 @@ var treectl = (function () {
 	}
 
 	function onscroll() {
-		if (!entreed)
+		if (!entreed || treectl.hidden)
 			return;
 
 		var top = ebi('wrap').getBoundingClientRect().top;
@@ -787,7 +797,7 @@ var treectl = (function () {
 	periodic();
 
 	function onresize(e) {
-		if (!entreed)
+		if (!entreed || treectl.hidden)
 			return;
 
 		var q = '#tree';
@@ -1065,9 +1075,8 @@ var treectl = (function () {
 		hist_replace(get_evpath() + window.location.hash);
 	}
 
-	return {
-		"onscroll": onscroll
-	}
+	treectl.onscroll = onscroll;
+	return treectl;
 })();
 
 
