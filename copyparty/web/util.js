@@ -100,6 +100,27 @@ function sortTable(table, col) {
         th[a].className = th[a].className.replace(/ *sort-?1 */, " ");
     th[col].className += ' sort' + reverse;
     var stype = th[col].getAttribute('sort');
+    try {
+        var nrules = [], rules = jread("fsort", []);
+        rules.unshift([th[col].getAttribute('name'), reverse, stype || '']);
+        for (var a = 0; a < rules.length; a++) {
+            var add = true;
+            for (var b = 0; b < a; b++)
+                if (rules[a][0] == rules[b][0])
+                    add = false;
+
+            if (add)
+                nrules.push(rules[a]);
+
+            if (nrules.length >= 10)
+                break;
+        }
+        jwrite("fsort", nrules);
+    }
+    catch (ex) {
+        console.log("failed to persist sort rules, resetting: " + ex);
+        jwrite("fsort", null);
+    }
     var vl = [];
     for (var a = 0; a < tr.length; a++) {
         var cell = tr[a].cells[col];

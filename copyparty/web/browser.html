@@ -67,17 +67,17 @@
         <thead>
             <tr>
                 <th></th>
-                <th><span>File Name</span></th>
-                <th sort="int"><span>Size</span></th>
+                <th name="href"><span>File Name</span></th>
+                <th name="sz" sort="int"><span>Size</span></th>
                 {%- for k in taglist %}
                     {%- if k.startswith('.') %}
-                        <th sort="int"><span>{{ k[1:] }}</span></th>
+                        <th name="tags/{{ k }}" sort="int"><span>{{ k[1:] }}</span></th>
                     {%- else %}
-                        <th><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
+                        <th name="tags/{{ k }}"><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
                     {%- endif %}
                 {%- endfor %}
-                <th><span>T</span></th>
-                <th><span>Date</span></th>
+                <th name="ext"><span>T</span></th>
+                <th name="ts"><span>Date</span></th>
             </tr>
         </thead>
         <tbody>

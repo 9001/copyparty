@@ -1004,7 +1004,33 @@ var treectl = (function () {
 		}
 
 		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
-		var nodes = res.dirs.concat(res.files);
+		var nodes = res.dirs.concat(res.files),
+			sopts = jread('fsort', []);
+
+		try {
+			for (var a = sopts.length - 1; a >= 0; a--) {
+				var name = sopts[a][0], rev = sopts[a][1], typ = sopts[a][2];
+				if (name.indexOf('tags/') == -1) {
+					nodes.sort(function (v1, v2) {
+						if (!v1[name]) return -1 * rev;
+						if (!v2[name]) return 1 * rev;
+						return rev * (typ == 'int' ? (v1[name] - v2[name]) : (v1[name].localeCompare(v2[name])));
+					});
+				}
+				else {
+					name = name.slice(5);
+					nodes.sort(function (v1, v2) {
+						if (!v1.tags[name]) return -1 * rev;
+						if (!v2.tags[name]) return 1 * rev;
+						return rev * (typ == 'int' ? (v1.tags[name] - v2.tags[name]) : (v1.tags[name].localeCompare(v2.tags[name])));
+					});
+				}
+			}
+		}
+		catch (ex) {
+			console.log("failed to apply sort config: " + ex);
+		}
+
 		var top = this.top;
 		var html = mk_files_header(res.taglist);
 		html.push('<tbody>');
@@ -1198,23 +1224,23 @@ function mk_files_header(taglist) {
 	var html = [
 		'<thead>',
 		'<th></th>',
-		'<th><span>File Name</span></th>',
-		'<th sort="int"><span>Size</span></th>'
+		'<th name="href"><span>File Name</span></th>',
+		'<th name="sz" sort="int"><span>Size</span></th>'
 	];
 	for (var a = 0; a < taglist.length; a++) {
 		var tag = taglist[a];
 		var c1 = tag.slice(0, 1).toUpperCase();
 		tag = c1 + tag.slice(1);
 		if (c1 == '.')
-			tag = '<th sort="int"><span>' + tag.slice(1);
+			tag = '<th name="tags/' + tag + '" sort="int"><span>' + tag.slice(1);
 		else
-			tag = '<th><span>' + tag;
+			tag = '<th name="tags/' + tag + '"><span>' + tag;
 
 		html.push(tag + '</span></th>');
 	}
 	html = html.concat([
-		'<th><span>T</span></th>',
-		'<th><span>Date</span></th>',
+		'<th name="ext"><span>T</span></th>',
+		'<th name="ts"><span>Date</span></th>',
 		'</thead>',
 	]);
 	return html;
