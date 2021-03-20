@@ -5,7 +5,7 @@ import re
 import os
 from datetime import datetime
 
-from .util import u8safe, html_escape, Pebkac
+from .util import u8safe, s3dec, html_escape, Pebkac
 from .up2k import up2k_wark_from_hashlist
 
 
@@ -142,10 +142,10 @@ class U2idx(object):
                 w = hit["w"]
                 del hit["w"]
                 tags = {}
-                q = "select k, v from mt where w = ? and k != 'x'"
-                for k, v in cur.execute(q, (w,)):
+                q2 = "select k, v from mt where w = ? and k != 'x'"
+                for k, v2 in cur.execute(q2, (w,)):
                     taglist[k] = True
-                    tags[k] = v
+                    tags[k] = v2
 
                 hit["tags"] = tags
 
