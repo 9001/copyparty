@@ -3,6 +3,8 @@ from __future__ import print_function, unicode_literals
 
 import re
 import os
+import time
+import threading
 from datetime import datetime
 
 from .util import u8safe, s3dec, html_escape, Pebkac
@@ -20,6 +22,7 @@ class U2idx(object):
     def __init__(self, args, log_func):
         self.args = args
         self.log_func = log_func
+        self.timeout = args.srch_time
 
         if not HAVE_SQLITE3:
             self.log("could not load sqlite3; searchign wqill be disabled")
@@ -28,6 +31,9 @@ class U2idx(object):
         self.cur = {}
         self.mem_cur = sqlite3.connect(":memory:")
         self.mem_cur.execute(r"create table a (b text)")
+
+        self.p_end = None
+        self.p_dur = 0
 
     def log(self, msg, c=0):
         self.log_func("u2idx", msg, c)
@@ -44,7 +50,10 @@ class U2idx(object):
         uq = "substr(w,1,16) = ? and w = ?"
         uv = [wark[:16], wark]
 
-        return self.run_query(vols, uq, uv, "", [])[0]
+        try:
+            return self.run_query(vols, uq, uv, "", [])[0]
+        except Exception as ex:
+            raise Pebkac(500, repr(ex))
 
     def get_cur(self, ptop):
         cur = self.cur.get(ptop)
@@ -81,10 +90,19 @@ class U2idx(object):
         if "adv" in body:
             _conv_adv(qobj, body, "adv")
 
-        return self.run_query(vols, uq, uv, qobj)
+        try:
+            return self.run_query(vols, uq, uv, qobj)
+        except Exception as ex:
+            raise Pebkac(500, repr(ex))
 
     def run_query(self, vols, uq, uv, targs):
         self.log("qs: {} {} ,  {}".format(uq, repr(uv), repr(targs)))
+
+        done_flag = []
+        self.active_id = "{:.6f}_{}".format(time.time(), threading.current_thread().ident)
+        thr = threading.Thread(target=self.terminator, args=(self.active_id, done_flag, ))
+        thr.daemon = True
+        thr.start()
 
         if not targs:
             if not uq:
@@ -124,6 +142,8 @@ class U2idx(object):
             if not cur:
                 continue
 
+            self.active_cur = cur
+
             sret = []
             c = cur.execute(q, v)
             for hit in c:
@@ -151,7 +171,19 @@ class U2idx(object):
 
             ret.extend(sret)
 
+        done_flag.append(True)
+        self.active_id = None
+
         return ret, list(taglist.keys())
+
+    def terminator(self, identifier, done_flag):
+        for _ in range(self.timeout):
+            time.sleep(1)
+            if done_flag:
+                return
+
+        if identifier == self.active_id:
+            self.active_cur.connection.interrupt()
 
 
 def _open(ptop):

@@ -278,6 +278,7 @@ def main():
     ap2.add_argument("-mte", metavar="M,M,M", type=str, help="tags to index/display (comma-sep.)",
         default="circle,album,.tn,artist,title,.bpm,key,.dur,.q")
     ap2.add_argument("-mtp", metavar="M=[f,]bin", action="append", type=str, help="read tag M using bin")
+    ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
 
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")

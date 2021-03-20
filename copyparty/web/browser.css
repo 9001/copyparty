@@ -431,7 +431,8 @@ input[type="checkbox"]:checked+label {
 #srch_q {
 	white-space: pre;
 	color: #f80;
-	margin: .2em 0 0 1.6em
+	height: 1em;
+	margin: .2em 0 -1em 1.6em;
 }
 #files td div span {
 	color: #fff;

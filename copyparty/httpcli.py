@@ -45,7 +45,7 @@ class HttpCli(object):
         self.log_func(self.log_src, msg, c)
 
     def _check_nonfatal(self, ex):
-        return ex.code < 400 or ex.code == 404
+        return ex.code < 400 or ex.code in [404, 429]
 
     def _assert_safe_rem(self, rem):
         # sanity check to prevent any disasters
@@ -450,19 +450,30 @@ class HttpCli(object):
 
         idx = self.conn.get_u2idx()
         t0 = time.time()
+        if idx.p_end:
+            penalty = 0.7
+            t_idle = t0 - idx.p_end
+            if idx.p_dur > 0.7 and t_idle < penalty:
+                m = "rate-limit ({:.1f} sec), cost {:.2f}, idle {:.2f}"
+                raise Pebkac(429, m.format(penalty, idx.p_dur, t_idle))
+
         if "srch" in body:
             # search by up2k hashlist
             vbody = copy.deepcopy(body)
             vbody["hash"] = len(vbody["hash"])
             self.log("qj: " + repr(vbody))
             hits = idx.fsearch(vols, body)
-            self.log("q#: {} ({:.2f}s)".format(repr(hits), time.time() - t0))
+            msg = repr(hits)
             taglist = []
         else:
             # search by query params
             self.log("qj: " + repr(body))
             hits, taglist = idx.search(vols, body)
-            self.log("q#: {} ({:.2f}s)".format(len(hits), time.time() - t0))
+            msg = len(hits)
+
+        idx.p_end = time.time()
+        idx.p_dur = idx.p_end - t0
+        self.log("q#: {} ({:.2f}s)".format(msg, idx.p_dur))
 
         order = []
         cfg = self.args.mte.split(",")

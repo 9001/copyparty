@@ -621,7 +621,8 @@ class Up2k(object):
             wcur.close()
             cur.close()
 
-        self.log("mtp finished")
+        if n_done:
+            self.log("mtp finished")
 
     def _start_mpool(self):
         if WINDOWS and False:
