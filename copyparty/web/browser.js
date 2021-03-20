@@ -707,7 +707,7 @@ function autoplay_blocked() {
 				var k = tagord[b],
 					v = r.tags[k] || "";
 
-				if (k == "dur") {
+				if (k == ".dur") {
 					var sv = s2ms(v);
 					nodes[nodes.length - 1] += '</td><td sortv="' + v + '">' + sv;
 					continue;
@@ -972,10 +972,7 @@ var treectl = (function () {
 				var k = res.taglist[b],
 					v = (r.tags || {})[k] || "";
 
-				if (k[0] == '.')
-					k = k.slice(1);
-
-				if (k == "dur") {
+				if (k == ".dur") {
 					var sv = s2ms(v);
 					ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
 					continue;
@@ -1132,6 +1129,26 @@ function apply_perms(perms) {
 }
 
 
+function find_file_col(txt) {
+	var tds = ebi('files').tHead.getElementsByTagName('th');
+	var i = -1;
+	var min = false;
+	for (var a = 0; a < tds.length; a++) {
+		var spans = tds[a].getElementsByTagName('span');
+		if (spans.length && spans[0].textContent == txt) {
+			min = tds[a].getAttribute('class').indexOf('min') !== -1;
+			i = a;
+			break;
+		}
+	}
+
+	if (i == -1)
+		return;
+
+	return [i, min];
+}
+
+
 function mk_files_header(taglist) {
 	var html = [
 		'<thead>',
@@ -1229,6 +1246,21 @@ var filecols = (function () {
 		set_style();
 	};
 
+	try {
+		var ci = find_file_col('dur'),
+			i = ci[0],
+			min = ci[1],
+			rows = ebi('files').tBodies[0].rows;
+
+		if (!min)
+			for (var a = 0, aa = rows.length; a < aa; a++) {
+				var c = rows[a].cells[i];
+				if (c)
+					var v = c.textContent = s2ms(c.textContent);
+			}
+	}
+	catch (ex) { }
+
 	return {
 		"add_btns": add_btns,
 		"set_style": set_style,
@@ -1295,22 +1327,10 @@ var mukey = (function () {
 	}
 
 	function render() {
-		var tds = ebi('files').tHead.getElementsByTagName('th');
-		var i = -1;
-		var min = false;
-		for (var a = 0; a < tds.length; a++) {
-			var spans = tds[a].getElementsByTagName('span');
-			if (spans.length && spans[0].textContent == 'Key') {
-				min = tds[a].getAttribute('class').indexOf('min') !== -1;
-				i = a;
-				break;
-			}
-		}
-
-		if (i == -1)
-			return;
-
-		var rows = ebi('files').tBodies[0].rows;
+		var ci = find_file_col('Key'),
+			i = ci[0],
+			min = ci[1],
+			rows = ebi('files').tBodies[0].rows;
 
 		if (min)
 			for (var a = 0, aa = rows.length; a < aa; a++) {
