@@ -71,6 +71,43 @@ IMPLICATIONS = [
 ]
 
 
+REKOBO_KEY = {
+    v: ln.split(" ", 1)[0]
+    for ln in """
+1B 6d B
+2B 7d Gb F#
+3B 8d Db C#
+4B 9d Ab G#
+5B 10d Eb D#
+6B 11d Bb A#
+7B 12d F
+8B 1d C
+9B 2d G
+10B 3d D
+11B 4d A
+12B 5d E
+1A 6m Abm G#m
+2A 7m Ebm D#m
+3A 8m Bbm A#m
+4A 9m Fm
+5A 10m Cm
+6A 11m Gm
+7A 12m Dm
+8A 1m Am
+9A 2m Em
+10A 3m Bm
+11A 4m Gbm F#m
+12A 5m Dbm C#m
+""".strip().split(
+        "\n"
+    )
+    for v in ln.strip().split(" ")[1:]
+    if v
+}
+
+REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
+
+
 class Counter(object):
     def __init__(self, v=0):
         self.v = v

@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 
 from .__init__ import PY2, WINDOWS
-from .util import fsenc, fsdec
+from .util import fsenc, fsdec, REKOBO_LKEY
 
 if not PY2:
     unicode = str
@@ -150,6 +150,12 @@ class MTag(object):
             if k[0] == ".":
                 v = v.split("/")[0].strip().lstrip("0")
                 ret[k] = v or 0
+
+        # normalize key notation to rkeobo
+        okey = ret.get("key")
+        if okey:
+            key = okey.replace(" ", "").replace("maj", "").replace("min", "m")
+            ret["key"] = REKOBO_LKEY.get(key.lower(), okey)
 
         return ret
 
