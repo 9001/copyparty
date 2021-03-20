@@ -277,18 +277,37 @@ var vbar = (function () {
 })();
 
 
+function seek_au_mul(mul) {
+	seek_au_sec(mp.au.duration * mul);
+}
+
+function seek_au_sec(seek) {
+	console.log('seek: ' + seek);
+	if (!isFinite(seek))
+		return;
+
+	mp.au.currentTime = seek;
+
+	if (mp.au === mp.au_native)
+		// hack: ogv.js breaks on .play() during playback
+		mp.au.play();
+};
+
+
+function song_skip(n) {
+	var tid = null;
+	if (mp.au)
+		tid = mp.au.tid;
+
+	if (tid !== null)
+		play(tid + n);
+	else
+		play(0);
+};
+
+
 // hook up the widget buttons
 (function () {
-	var bskip = function (n) {
-		var tid = null;
-		if (mp.au)
-			tid = mp.au.tid;
-
-		if (tid !== null)
-			play(tid + n);
-		else
-			play(0);
-	};
 	ebi('bplay').onclick = function (e) {
 		ev(e);
 		if (mp.au) {
@@ -302,11 +321,11 @@ var vbar = (function () {
 	};
 	ebi('bprev').onclick = function (e) {
 		ev(e);
-		bskip(-1);
+		song_skip(-1);
 	};
 	ebi('bnext').onclick = function (e) {
 		ev(e);
-		bskip(1);
+		song_skip(1);
 	};
 	ebi('barpos').onclick = function (e) {
 		if (!mp.au) {
@@ -316,17 +335,7 @@ var vbar = (function () {
 
 		var rect = pbar.pcan.getBoundingClientRect();
 		var x = e.clientX - rect.left;
-		var mul = x * 1.0 / rect.width;
-		var seek = mp.au.duration * mul;
-		console.log('seek: ' + seek);
-		if (!isFinite(seek))
-			return;
-
-		mp.au.currentTime = seek;
-
-		if (mp.au === mp.au_native)
-			// hack: ogv.js breaks on .play() during playback
-			mp.au.play();
+		seek_au_mul(x * 1.0 / rect.width);
 	};
 })();
 
@@ -565,7 +574,25 @@ function autoplay_blocked() {
 })();
 
 
-//widget.open();
+document.onkeydown = function (e) {
+	if (document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
+		return;
+
+	var k = e.code, pos = -1;
+	if (k.indexOf('Digit') === 0)
+		pos = parseInt(k.slice(-1)) * 0.1;
+
+	if (pos !== -1)
+		return seek_au_mul(pos);
+
+	var n = k == 'KeyJ' ? -1 : k == 'KeyL' ? 1 : 0;
+	if (n !== 0)
+		return song_skip(n);
+
+	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
+	if (n !== 0)
+		return seek_au_sec(mp.au.currentTime + n);
+};
 
 
 // search
@@ -727,6 +754,7 @@ function autoplay_blocked() {
 		ofiles.innerHTML = html.join('\n');
 		ofiles.setAttribute("ts", this.ts);
 		filecols.set_style();
+		mukey.render();
 		reload_browser();
 
 		ebi('unsearch').onclick = unsearch;
