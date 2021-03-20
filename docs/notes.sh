@@ -68,6 +68,17 @@ shab64() { sp=$1; f="$2"; v=0; sz=$(stat -c%s "$f"); while true; do w=$((v+sp*10
 
 
 ##
+## sqlite3 stuff
+
+# find dupe metadata keys
+sqlite3 up2k.db 'select mt1.w, mt1.k, mt1.v, mt2.v from mt mt1 inner join mt mt2 on mt1.w = mt2.w where mt1.k = mt2.k and mt1.rowid != mt2.rowid'
+
+# partial reindex by deleting all tags for a list of files
+sqlite3 up2k.db 'select mt1.w from mt mt1 inner join mt mt2 on mt1.w = mt2.w where mt1.k = mt2.k and mt1.rowid != mt2.rowid'  > warks
+cat warks | while IFS= read -r x; do sqlite3 up2k.db "delete from mt where w = '$x'"; done
+
+
+##
 ## vscode
 
 # replace variable name

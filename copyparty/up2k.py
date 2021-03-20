@@ -700,6 +700,16 @@ class Up2k(object):
                 # indicate scanned without tags
                 tags = {"x": 0}
 
+        if not tags:
+            return 0
+
+        for k in tags.keys():
+            q = "delete from mt where w = ? and ({})".format(
+                " or ".join(["k = ?"] * len(tags))
+            )
+            args = [wark[:16]] + list(tags.keys())
+            write_cur.execute(q, tuple(args))
+
         ret = 0
         for k, v in tags.items():
             q = "insert into mt values (?,?,?)"
