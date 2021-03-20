@@ -653,7 +653,14 @@ document.onkeydown = function (e) {
 		o[a].oninput = ev_search_input;
 	}
 
+	function srch_msg(err, txt) {
+		var o = ebi('srch_q');
+		o.textContent = txt;
+		o.style.color = err ? '#f09' : '#c90';
+	}
+
 	var search_timeout;
+	var search_in_progress = 0;
 
 	function ev_search_input() {
 		var v = this.value;
@@ -663,10 +670,14 @@ document.onkeydown = function (e) {
 			chk.checked = ((v + '').length > 0);
 		}
 		clearTimeout(search_timeout);
-		search_timeout = setTimeout(do_search, 100);
+		var now = new Date().getTime();
+		if (now - search_in_progress > 30 * 1000)
+			search_timeout = setTimeout(do_search, 100);
 	}
 
 	function do_search() {
+		search_in_progress = new Date().getTime();
+		srch_msg(false, "searching...");
 		clearTimeout(search_timeout);
 		var params = {};
 		var o = document.querySelectorAll('#op_search input[type="text"]');
@@ -690,10 +701,16 @@ document.onkeydown = function (e) {
 			return;
 
 		if (this.status !== 200) {
-			ebi('srch_q').textContent = "http " + this.status + ": " + this.responseText;
+			var msg = this.responseText;
+			if (msg.indexOf('<pre>') === 0)
+				msg = msg.slice(5);
+
+			srch_msg(true, "http " + this.status + ": " + msg);
+			search_in_progress = 0;
 			return;
 		}
-		ebi('srch_q').textContent = '';
+		search_in_progress = 0;
+		srch_msg(false, '');
 
 		var res = JSON.parse(this.responseText),
 			tagord = res.tag_order;
