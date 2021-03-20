@@ -593,7 +593,7 @@ function autoplay_blocked() {
 			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "46"]
 		]);
 		sconf.push(["adv.",
-			["adv", "adv", "key=5A&nbsp; .bpm>159&nbsp; .bpm<169", "46"]
+			["adv", "adv", "key>=1A&nbsp; key<=2B&nbsp; .bpm>165", "46"]
 		]);
 	}
 

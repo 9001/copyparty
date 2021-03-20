@@ -169,6 +169,7 @@ done
 	sed -r '/edit2">edit \(fancy/d' <$f >t && tmv "$f"
 }
 
+[ $repack ] ||
 find | grep -E '\.py$' |
   grep -vE '__version__' |
   tr '\n' '\0' |
