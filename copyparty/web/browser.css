@@ -615,6 +615,9 @@ input[type="checkbox"]:checked+label {
 	max-width: none;
 	margin-right: 1.5em;
 }
+#op_cfg>div>a {
+	line-height: 2em;
+}
 #op_cfg>div>span {
 	display: inline-block;
 	padding: .2em .4em;
