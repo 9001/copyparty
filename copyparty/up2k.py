@@ -499,6 +499,8 @@ class Up2k(object):
             return ret
 
     def _run_all_mtp(self):
+        self.mtp_force = {}
+        self.mtp_parsers = {}
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
                 self._run_one_mtp(ptop)
@@ -507,12 +509,17 @@ class Up2k(object):
         db_path = os.path.join(ptop, ".hist", "up2k.db")
         sz0 = os.path.getsize(db_path) // 1024
 
+        entags = self.entags[ptop]
+
         force = {}
         timeout = {}
         parsers = {}
         for parser in self.flags[ptop]["mtp"]:
             orig = parser
             tag, parser = parser.split("=", 1)
+            if tag not in entags:
+                continue
+
             while True:
                 try:
                     bp = os.path.expanduser(parser)
@@ -539,6 +546,9 @@ class Up2k(object):
                 except:
                     self.log("invalid argument: " + orig, 1)
                     return
+
+        self.mtp_force[ptop] = force
+        self.mtp_parsers[ptop] = parsers
 
         q = "select count(w) from mt where k = 't:mtp'"
         with self.mutex:
@@ -570,7 +580,7 @@ class Up2k(object):
                     have = cur.execute(q, (w,)).fetchall()
                     have = [x[0] for x in have]
 
-                    if ".dur" not in have:
+                    if ".dur" not in have and ".dur" in entags:
                         # skip non-audio
                         to_delete[w] = True
                         n_left -= 1
@@ -1268,8 +1278,20 @@ class Up2k(object):
     def _tagger(self):
         while True:
             ptop, wark, rd, fn = self.tagq.get()
+            if "e2t" not in self.flags[ptop]:
+                continue
+
             abspath = os.path.join(ptop, rd, fn)
-            self.log("tagging " + abspath)
+            tags = self.mtag.get(abspath)
+            ntags1 = len(tags)
+            if self.mtp_parsers.get(ptop, {}):
+                parser = {
+                    k: v
+                    for k, v in self.mtp_parsers[ptop].items()
+                    if k in self.mtp_force[ptop] or k not in tags
+                }
+                tags.update(self.mtag.get_bin(parser, abspath))
+
             with self.mutex:
                 cur = self.cur[ptop]
                 if not cur:
@@ -1281,10 +1303,10 @@ class Up2k(object):
                     self.log("no entags okay.jpg", c=3)
                     continue
 
-                if "e2t" in self.flags[ptop]:
-                    self._tag_file(cur, entags, wark, abspath)
-
+                self._tag_file(cur, entags, wark, abspath, tags)
                 cur.connection.commit()
+
+            self.log("tagged {} ({}+{})".format(abspath, ntags1, len(tags) - ntags1))
 
     def _hasher(self):
         while True:
