@@ -5,7 +5,15 @@ some of these rely on libraries which are not MIT-compatible
 * [audio-bpm.py](./audio-bpm.py) detects the BPM of music using the BeatRoot Vamp Plugin; imports GPL2
 * [audio-key.py](./audio-key.py) detects the melodic key of music using the Mixxx fork of keyfinder; imports GPL3
 
+
+# dependencies
+
 run [`install-deps.sh`](install-deps.sh) to build/install most dependencies required by these programs (supports windows/linux/macos)
+
+*alternatively* (or preferably) use packages from your distro instead, then you'll need at least these:
+
+* from distro: `numpy vamp-plugin-sdk beatroot-vamp mixxx-keyfinder ffmpeg`
+* from pypy: `keyfinder vamp`
 
 
 # usage from copyparty
