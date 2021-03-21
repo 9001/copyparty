@@ -1,8 +1,9 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
 import re
+import os
+import sys
 import threading
 
 from .__init__ import PY2, WINDOWS
@@ -318,6 +319,8 @@ class AuthSrv(object):
             )
             raise Exception("invalid config")
 
+        all_mte = {}
+        errors = False
         for vol in vfs.all_vols.values():
             if (self.args.e2ds and vol.uwrite) or self.args.e2dsa:
                 vol.flags["e2ds"] = True
@@ -339,6 +342,49 @@ class AuthSrv(object):
 
             # append parsers from argv to volume-flags
             self._read_volflag(vol.flags, "mtp", self.args.mtp, True)
+
+            # verify tags mentioned by -mt[mp] are used by -mte
+            local_mtp = {}
+            local_only_mtp = {}
+            for a in vol.flags.get("mtp", []) + vol.flags.get("mtm", []):
+                a = a.split("=")[0]
+                local_mtp[a] = True
+                local = True
+                for b in self.args.mtp:
+                    b = b.split("=")[0]
+                    if a == b:
+                        local = False
+
+                if local:
+                    local_only_mtp[a] = True
+
+            local_mte = {}
+            for a in vol.flags.get("mte", "").split(","):
+                local = True
+                all_mte[a] = True
+                local_mte[a] = True
+                for b in self.args.mte.split(","):
+                    if not a or not b:
+                        continue
+
+                    if a == b:
+                        local = False
+
+            for mtp in local_only_mtp.keys():
+                if mtp not in local_mte:
+                    m = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volume-flags)'
+                    self.log(m.format(vol.vpath, mtp), 1)
+                    errors = True
+
+        for mtp in self.args.mtp:
+            mtp = mtp.split("=")[0]
+            if mtp not in all_mte:
+                m = 'metadata tag "{}" is defined by "-mtm" or "-mtp", but is not used by "-mte" (or by any "cmte" volume-flag)'
+                self.log(m.format(mtp), 1)
+                errors = True
+
+        if errors:
+            sys.exit(1)
 
         try:
             v, _ = vfs.get("/", "*", False, True)

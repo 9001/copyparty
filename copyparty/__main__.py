@@ -262,7 +262,7 @@ def main():
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile (for debugging)")
     ap.add_argument("--no-scandir", action="store_true", help="disable scandir (for debugging)")
-    ap.add_argument("--urlform", type=str, default="print,get", help="how to handle url-forms")
+    ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
     ap2 = ap.add_argument_group('database options')
@@ -283,7 +283,7 @@ def main():
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext")
-    ap2.add_argument("--ssl-ver", type=str, help="ssl/tls versions to allow")
+    ap2.add_argument("--ssl-ver", metavar="LIST", type=str, help="ssl/tls versions to allow")
     ap2.add_argument("--ciphers", metavar="LIST", help="set allowed ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")

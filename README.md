@@ -169,6 +169,12 @@ copyparty can invoke external programs to collect additional metadata for files 
 * `-v ~/music::r:cmtp=.bpm=~/bin/audio-bpm.py:cmtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
 
 
+## complete examples
+
+* read-only music server with bpm and key scanning
+* `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts -mtp .bpm=f,~/bin/audio-bpm.py -mtp key=f,~/bin/audio-key.py`
+
+
 # client examples
 
 * javascript: dump some state into a file (two separate examples)
