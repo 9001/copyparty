@@ -29,7 +29,10 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	command -v grealpath >/dev/null &&
 		realpath() { grealpath "$@"; }
 }
-pybin=$(command -v python3 || command -v python)
+pybin=$(command -v python3 || command -v python) || {
+	echo need python
+	exit 1
+}
 
 [ -e copyparty/__main__.py ] || cd ..
 [ -e copyparty/__main__.py ] ||
