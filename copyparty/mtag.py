@@ -231,7 +231,7 @@ class MTag(object):
         """
         note:
           tags which contain newline will be truncated on first \n,
-          ffmpeg emits \n and spacepads the : to align visually
+          ffprobe emits \n and spacepads the : to align visually
         note:
           the Stream ln always mentions Audio: if audio
           the Stream ln usually has kb/s, is more accurate
@@ -301,7 +301,7 @@ class MTag(object):
                             sec *= 60
                             sec += int(f)
                     except:
-                        self.log("invalid timestr from ffmpeg: [{}]".format(tstr), c=3)
+                        self.log("invalid timestr from ffprobe: [{}]".format(tstr), c=3)
 
                 ret[".dur"] = sec
                 m = ptn_br1.search(ln)

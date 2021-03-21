@@ -647,7 +647,7 @@ class Up2k(object):
     def _start_mpool(self):
         if WINDOWS and False:
             nah = open(os.devnull, "wb")
-            wmic = f"processid={os.getpid()}"
+            wmic = "processid={}".format(os.getpid())
             wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
             sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
 
@@ -677,7 +677,7 @@ class Up2k(object):
         done = self._flush_mpool(wcur)
         if WINDOWS and False:
             nah = open(os.devnull, "wb")
-            wmic = f"processid={os.getpid()}"
+            wmic = "processid={}".format(os.getpid())
             wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
             sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
 
