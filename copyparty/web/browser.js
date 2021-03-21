@@ -1522,9 +1522,9 @@ var mukey = (function () {
 
 function addcrc() {
 	var links = document.querySelectorAll('#files>tbody>tr>td:nth-child(2)>a');
-	for (var a = 0, aa = links.length; a < aa; a++) {
-		links[a].setAttribute('id', 'f-' + crc32(links[a].textContent));
-	}
+	for (var a = 0, aa = links.length; a < aa; a++)
+		if (!links[a].getAttribute('id'))
+			links[a].setAttribute('id', 'f-' + crc32(links[a].textContent));
 }
 
 
