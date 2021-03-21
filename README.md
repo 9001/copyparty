@@ -25,6 +25,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [search configuration](#search-configuration)
     * [metadata from audio files](#metadata-from-audio-files)
     * [file parser plugins](#file-parser-plugins)
+    * [complete examples](#complete-examples)
 * [client examples](#client-examples)
 * [dependencies](#dependencies)
     * [optional gpl stuff](#optional-gpl-stuff)
