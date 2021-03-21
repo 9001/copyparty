@@ -58,7 +58,7 @@ function MPlayer() {
 		var links = document.querySelectorAll('#files>tbody>tr>td:nth-child(1)>a');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			var tid = links[a].getAttribute('id');
-			if (tid.indexOf('af-') !== 0)
+			if (!tid || tid.indexOf('af-') !== 0)
 				continue;
 
 			order.push(tid.slice(1));
