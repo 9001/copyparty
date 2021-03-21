@@ -29,6 +29,7 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	command -v grealpath >/dev/null &&
 		realpath() { grealpath "$@"; }
 }
+pybin=$(command -v python3 || command -v python)
 
 [ -e copyparty/__main__.py ] || cd ..
 [ -e copyparty/__main__.py ] ||
@@ -173,7 +174,7 @@ done
 find | grep -E '\.py$' |
   grep -vE '__version__' |
   tr '\n' '\0' |
-  xargs -0 python ../scripts/uncomment.py
+  xargs -0 $pybin ../scripts/uncomment.py
 
 f=dep-j2/jinja2/constants.py
 awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
@@ -207,7 +208,7 @@ echo creating unix sfx
 ) >$sfx_out.sh
 
 echo creating generic sfx
-python ../scripts/sfx.py --sfx-make tar.bz2 $ver $ts
+$pybin ../scripts/sfx.py --sfx-make tar.bz2 $ver $ts
 mv sfx.out $sfx_out.py
 chmod 755 $sfx_out.*
 
@@ -215,4 +216,5 @@ printf "done:\n"
 printf "  %s\n" "$(realpath $sfx_out)."{sh,py}
 # rm -rf *
 
+# apk add bash python3 tar xz bzip2
 # while true; do ./make-sfx.sh; for f in ..//dist/copyparty-sfx.{sh,py}; do mv $f $f.$(wc -c <$f | awk '{print$1}'); done; done
