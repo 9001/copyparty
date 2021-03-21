@@ -117,6 +117,9 @@ for d in /usr /var; do find $d -type f -size +30M 2>/dev/null; done | while IFS=
 brew install python@2
 pip install virtualenv
 
+# readme toc
+cat README.md | awk '!/^#/{next} {lv=length($1);sub(/[^ ]+ /,"");bab=$0;gsub(/ /,"-",bab)} {printf "%" ((lv-1)*4+1) "s [%s](#%s)\n", "*",$0,bab}'
+
 
 ##
 ## http 206

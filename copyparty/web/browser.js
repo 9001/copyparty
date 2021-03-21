@@ -614,6 +614,10 @@ function autoplay_blocked() {
 
 function tree_neigh(n) {
 	var links = document.querySelectorAll('#treeul li>a+a');
+	if (!links.length) {
+		alert('switch to the tree for that');
+		return;
+	}
 	var act = -1;
 	for (var a = 0, aa = links.length; a < aa; a++) {
 		if (links[a].getAttribute('class') == 'hl') {
@@ -633,6 +637,10 @@ function tree_neigh(n) {
 
 function tree_up() {
 	var act = document.querySelector('#treeul a.hl');
+	if (!act) {
+		alert('switch to the tree for that');
+		return;
+	}
 	if (act.previousSibling.textContent == '-')
 		return act.previousSibling.click();
 

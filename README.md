@@ -13,6 +13,29 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * code standard: `black`
 
 
+## readme toc
+
+* top
+    * [quickstart](#quickstart)
+    * [notes](#notes)
+    * [status](#status)
+* [bugs](#bugs)
+* [usage](#usage)
+* [searching](#searching)
+    * [search configuration](#search-configuration)
+    * [metadata from audio files](#metadata-from-audio-files)
+    * [file parser plugins](#file-parser-plugins)
+* [client examples](#client-examples)
+* [dependencies](#dependencies)
+    * [optional gpl stuff](#optional-gpl-stuff)
+* [sfx](#sfx)
+    * [sfx repack](#sfx-repack)
+* [install on android](#install-on-android)
+* [dev env setup](#dev-env-setup)
+* [how to release](#how-to-release)
+* [todo](#todo)
+
+
 ## quickstart
 
 download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
@@ -72,6 +95,16 @@ summary: it works! you can use it! (but technically not even close to beta)
 * Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * probably more, pls let me know
+
+
+# usage
+
+the browser has the following hotkeys
+* `0..9` jump to 10%..90%
+* `U/O` skip 10sec back/forward
+* `J/L` prev/next song
+* `I/K` prev/next folder
+* `P` parent folder
 
 
 # searching
