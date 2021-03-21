@@ -91,7 +91,29 @@ function import_js(url, cb) {
 }
 
 
-function sortTable(table, col) {
+var crctab = (function () {
+    var c, tab = [];
+    for (var n = 0; n < 256; n++) {
+        c = n;
+        for (var k = 0; k < 8; k++) {
+            c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+        }
+        tab[n] = c;
+    }
+    return tab;
+})();
+
+
+function crc32(str) {
+    var crc = 0 ^ (-1);
+    for (var i = 0; i < str.length; i++) {
+        crc = (crc >>> 8) ^ crctab[(crc ^ str.charCodeAt(i)) & 0xFF];
+    }
+    return ((crc ^ (-1)) >>> 0).toString(16);
+};
+
+
+function sortTable(table, col, cb) {
     var tb = table.tBodies[0],
         th = table.tHead.rows[0].cells,
         tr = Array.prototype.slice.call(tb.rows, 0),
@@ -148,6 +170,7 @@ function sortTable(table, col) {
         return reverse * (a.localeCompare(b));
     });
     for (i = 0; i < tr.length; ++i) tb.appendChild(tr[vl[i][1]]);
+    if (cb) cb();
 }
 function makeSortable(table, cb) {
     var th = table.tHead, i;
@@ -157,9 +180,7 @@ function makeSortable(table, cb) {
     while (--i >= 0) (function (i) {
         th[i].onclick = function (e) {
             ev(e);
-            sortTable(table, i);
-            if (cb)
-                cb();
+            sortTable(table, i, cb);
         };
     }(i));
 }

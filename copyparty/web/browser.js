@@ -6,22 +6,19 @@ function dbg(msg) {
 	ebi('path').innerHTML = msg;
 }
 
-makeSortable(ebi('files'), reload_mp);
-
 
 // extract songs + add play column
-function init_mp() {
-	var tracks = [];
-	var ret = {
-		'au': null,
-		'au_native': null,
-		'au_ogvjs': null,
-		'tracks': tracks,
-		'cover_url': ''
-	};
-	var re_audio = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i;
+function MPlayer() {
+	this.id = new Date().getTime();
+	this.au = null;
+	this.au_native = null;
+	this.au_ogvjs = null;
+	this.cover_url = '';
+	this.tracks = {};
+	this.order = [];
 
-	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+	var re_audio = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i;
+	var trs = document.querySelectorAll('#files tbody tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
 		var tds = trs[a].getElementsByTagName('td');
 		var link = tds[1].getElementsByTagName('a');
@@ -30,37 +27,48 @@ function init_mp() {
 
 		var m = re_audio.exec(url);
 		if (m) {
-			var ntrack = tracks.length;
-			tracks.push(url);
-
-			tds[0].innerHTML = '<a id="trk' + ntrack + '" href="#trk' + ntrack + '" class="play">play</a></td>';
+			var tid = link.getAttribute('id');
+			this.order.push(tid);
+			this.tracks[tid] = url;
+			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">play</a></td>';
+			ebi('a' + tid).onclick = ev_play;
 		}
 	}
 
-	for (var a = 0, aa = tracks.length; a < aa; a++)
-		ebi('trk' + a).onclick = ev_play;
-
-	ret.vol = sread('vol');
-	if (ret.vol !== null)
-		ret.vol = parseFloat(ret.vol);
+	this.vol = sread('vol');
+	if (this.vol !== null)
+		this.vol = parseFloat(this.vol);
 	else
-		ret.vol = 0.5;
+		this.vol = 0.5;
 
-	ret.expvol = function () {
-		return 0.5 * ret.vol + 0.5 * ret.vol * ret.vol;
+	this.expvol = function () {
+		return 0.5 * this.vol + 0.5 * this.vol * this.vol;
 	};
 
-	ret.setvol = function (vol) {
-		ret.vol = Math.max(Math.min(vol, 1), 0);
+	this.setvol = function (vol) {
+		this.vol = Math.max(Math.min(vol, 1), 0);
 		swrite('vol', vol);
 
-		if (ret.au)
-			ret.au.volume = ret.expvol();
+		if (this.au)
+			this.au.volume = this.expvol();
 	};
 
-	return ret;
+	this.read_order = function () {
+		var order = [];
+		var links = document.querySelectorAll('#files>tbody>tr>td:nth-child(1)>a');
+		for (var a = 0, aa = links.length; a < aa; a++) {
+			var tid = links[a].getAttribute('id');
+			if (tid.indexOf('af-') !== 0)
+				continue;
+
+			order.push(tid.slice(1));
+		}
+		this.order = order;
+	};
 }
-var mp = init_mp();
+addcrc();
+var mp = new MPlayer();
+makeSortable(ebi('files'), mp.read_order.bind(mp));
 
 
 // toggle player widget
@@ -300,9 +308,9 @@ function song_skip(n) {
 		tid = mp.au.tid;
 
 	if (tid !== null)
-		play(tid + n);
+		play(mp.order.indexOf(tid) + n);
 	else
-		play(0);
+		play(mp.order[0]);
 };
 
 
@@ -329,7 +337,6 @@ function song_skip(n) {
 	};
 	ebi('barpos').onclick = function (e) {
 		if (!mp.au) {
-			//dbg((new Date()).getTime());
 			return play(0);
 		}
 
@@ -368,7 +375,7 @@ function song_skip(n) {
 				var len = mp.au.duration;
 				if (pos > 0 && pos > len - 0.1) {
 					last_skip_url = mp.au.src;
-					play(mp.au.tid + 1);
+					song_skip(1);
 				}
 			}
 		}
@@ -381,7 +388,7 @@ function song_skip(n) {
 // event from play button next to a file in the list
 function ev_play(e) {
 	ev(e);
-	play(parseInt(this.getAttribute('id').substr(3)));
+	play(this.getAttribute('id').slice(1));
 	return false;
 }
 
@@ -403,18 +410,24 @@ catch (ex) { }
 
 // plays the tid'th audio file on the page
 function play(tid, call_depth) {
-	if (mp.tracks.length == 0)
+	if (mp.order.length == 0)
 		return alert('no audio found wait what');
 
-	while (tid >= mp.tracks.length)
-		tid -= mp.tracks.length;
+	var tn = tid;
+	if ((tn + '').indexOf('f-') === 0)
+		tn = mp.order.indexOf(tn);
 
-	while (tid < 0)
-		tid += mp.tracks.length;
+	while (tn >= mp.order.length)
+		tn -= mp.order.length;
+
+	while (tn < 0)
+		tn += mp.order.length;
+
+	tid = mp.order[tn];
 
 	if (mp.au) {
 		mp.au.pause();
-		setclass('trk' + mp.au.tid, 'play');
+		setclass('a' + mp.au.tid, 'play');
 	}
 
 	// ogv.js breaks on .play() unless directly user-triggered
@@ -458,7 +471,7 @@ function play(tid, call_depth) {
 	mp.au.tid = tid;
 	mp.au.src = url;
 	mp.au.volume = mp.expvol();
-	var oid = 'trk' + tid;
+	var oid = 'a' + tid;
 	setclass(oid, 'play act');
 	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
@@ -489,8 +502,8 @@ function play(tid, call_depth) {
 	catch (ex) {
 		alert('playback failed: ' + ex);
 	}
-	setclass('trk' + mp.au.tid, 'play');
-	setTimeout('play(' + (mp.au.tid + 1) + ');', 500);
+	setclass(oid, 'play');
+	setTimeout('song_skip(1));', 500);
 }
 
 
@@ -569,8 +582,8 @@ function autoplay_blocked() {
 // autoplay linked track
 (function () {
 	var v = location.hash;
-	if (v && v.length > 4 && v.indexOf('#trk') === 0)
-		play(parseInt(v.substr(4)));
+	if (v && v.length == 12 && v.indexOf('#af-') === 0)
+		play(v.slice(2));
 })();
 
 
@@ -1447,6 +1460,14 @@ var mukey = (function () {
 })();
 
 
+function addcrc() {
+	var links = document.querySelectorAll('#files>tbody>tr>td:nth-child(2)>a');
+	for (var a = 0, aa = links.length; a < aa; a++) {
+		links[a].setAttribute('id', 'f-' + crc32(links[a].textContent));
+	}
+}
+
+
 (function () {
 	function set_tooltip(e) {
 		ev(e);
@@ -1471,13 +1492,12 @@ function reload_mp() {
 		mp.au = null;
 	}
 	widget.close();
-	mp = init_mp();
+	mp = new MPlayer();
 }
 
 
 function reload_browser(not_mp) {
 	filecols.set_style();
-	makeSortable(ebi('files'), reload_mp);
 
 	var parts = get_evpath().split('/');
 	var rm = document.querySelectorAll('#path>a+a+a');
@@ -1501,8 +1521,11 @@ function reload_browser(not_mp) {
 		oo[a].textContent = hsz;
 	}
 
-	if (!not_mp)
+	if (!not_mp) {
+		addcrc();
 		reload_mp();
+		makeSortable(ebi('files'), mp.read_order.bind(mp));
+	}
 
 	if (window['up2k'])
 		up2k.set_fsearch();
