@@ -1580,7 +1580,7 @@ function reload_browser(not_mp) {
 		link += parts[a] + '/';
 		var o = document.createElement('a');
 		o.setAttribute('href', link);
-		o.innerHTML = parts[a];
+		o.textContent = uricom_dec(parts[a])[0];
 		ebi('path').appendChild(o);
 	}
 
