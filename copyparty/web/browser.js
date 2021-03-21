@@ -188,10 +188,31 @@ var pbar = (function () {
 		pctx.setTransform(scale, 0, 0, scale, 0, 0);
 		pctx.clearRect(0, 0, sw, sh);
 
+		pctx.fillStyle = 'rgba(204,255,128,0.15)';
+		for (var p = 1, mins = mp.au.duration / 10; p <= mins; p++)
+			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, sh);
+
+		pctx.fillStyle = '#9b7';
+		pctx.fillStyle = 'rgba(192,255,96,0.5)';
+		for (var p = 1, mins = mp.au.duration / 60; p <= mins; p++)
+			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, sh);
+
 		var w = 8;
 		var x = sm * mp.au.currentTime;
 		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, sh);
 		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, 8, sh);
+
+		pctx.fillStyle = '#fff';
+		pctx.font = '1em sans-serif';
+		var txt = s2ms(mp.au.duration);
+		var tw = pctx.measureText(txt).width;
+		pctx.fillText(txt, sw - (tw + 8), sh / 3 * 2);
+
+		txt = s2ms(mp.au.currentTime);
+		tw = pctx.measureText(txt).width;
+		var gw = pctx.measureText("88:88::").width;
+		var xt = x < sw / 2 ? (x + 8) : (Math.min(sw - gw, x - 8) - tw);
+		pctx.fillText(txt, xt, sh / 3 * 2);
 	};
 	return r;
 })();

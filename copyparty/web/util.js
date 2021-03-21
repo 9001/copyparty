@@ -317,6 +317,7 @@ function unix2iso(ts) {
 
 
 function s2ms(s) {
+    s = Math.floor(s);
     var m = Math.floor(s / 60);
     return m + ":" + ("0" + (s - m * 60)).slice(-2);
 }
