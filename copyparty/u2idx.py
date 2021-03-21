@@ -51,7 +51,7 @@ class U2idx(object):
         uv = [wark[:16], wark]
 
         try:
-            return self.run_query(vols, uq, uv, "", [])[0]
+            return self.run_query(vols, uq, uv, {})[0]
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
@@ -99,8 +99,16 @@ class U2idx(object):
         self.log("qs: {} {} ,  {}".format(uq, repr(uv), repr(targs)))
 
         done_flag = []
-        self.active_id = "{:.6f}_{}".format(time.time(), threading.current_thread().ident)
-        thr = threading.Thread(target=self.terminator, args=(self.active_id, done_flag, ))
+        self.active_id = "{:.6f}_{}".format(
+            time.time(), threading.current_thread().ident
+        )
+        thr = threading.Thread(
+            target=self.terminator,
+            args=(
+                self.active_id,
+                done_flag,
+            ),
+        )
         thr.daemon = True
         thr.start()
 
