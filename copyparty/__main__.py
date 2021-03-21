@@ -254,6 +254,7 @@ def main():
     ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
     ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
     ap.add_argument("-q", action="store_true", help="quiet")
+    ap.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
     ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")

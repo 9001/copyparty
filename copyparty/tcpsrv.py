@@ -68,23 +68,29 @@ class TcpSrv(object):
             self.log("tcpsrv", "listening @ {0}:{1}".format(ip, port))
 
         while True:
-            self.log("tcpsrv", "|%sC-ncli" % ("-" * 1,), c="1;30")
+            if self.args.log_conn:
+                self.log("tcpsrv", "|%sC-ncli" % ("-" * 1,), c="1;30")
+
             if self.num_clients.v >= self.args.nc:
                 time.sleep(0.1)
                 continue
 
-            self.log("tcpsrv", "|%sC-acc1" % ("-" * 2,), c="1;30")
+            if self.args.log_conn:
+                self.log("tcpsrv", "|%sC-acc1" % ("-" * 2,), c="1;30")
+
             ready, _, _ = select.select(self.srv, [], [])
             for srv in ready:
                 sck, addr = srv.accept()
                 sip, sport = srv.getsockname()
-                self.log(
-                    "%s %s" % addr,
-                    "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
-                        "-" * 3, sip, sport % 8, sport
-                    ),
-                    c="1;30",
-                )
+                if self.args.log_conn:
+                    self.log(
+                        "%s %s" % addr,
+                        "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
+                            "-" * 3, sip, sport % 8, sport
+                        ),
+                        c="1;30",
+                    )
+
                 self.num_clients.add()
                 self.hub.broker.put(False, "httpconn", sck, addr)
 
