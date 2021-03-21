@@ -550,6 +550,16 @@ def get_spd(nbyte, t0, t=None):
     return "{} \033[0m{}/s\033[0m".format(s1, s2)
 
 
+def s2hms(s, optional_h=False):
+    s = int(s)
+    h, s = divmod(s, 3600)
+    m, s = divmod(s, 60)
+    if not h and optional_h:
+        return "{}:{:02}".format(m, s)
+
+    return "{}:{:02}:{:02}".format(h, m, s)
+
+
 def undot(path):
     ret = []
     for node in path.split("/"):

@@ -29,6 +29,7 @@ from .util import (
     s3enc,
     s3dec,
     statdir,
+    s2hms,
 )
 from .mtag import MTag
 from .authsrv import AuthSrv
@@ -499,11 +500,16 @@ class Up2k(object):
             return ret
 
     def _run_all_mtp(self):
+        t0 = time.time()
         self.mtp_force = {}
         self.mtp_parsers = {}
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
                 self._run_one_mtp(ptop)
+
+        td = time.time() - t0
+        msg = "mtp finished in {:.2f} sec ({})"
+        self.log(msg.format(td, s2hms(td, True)))
 
     def _run_one_mtp(self, ptop):
         db_path = os.path.join(ptop, ".hist", "up2k.db")
@@ -650,9 +656,6 @@ class Up2k(object):
 
             wcur.close()
             cur.close()
-
-        if n_done:
-            self.log("mtp finished")
 
     def _start_mpool(self):
         if WINDOWS and False:

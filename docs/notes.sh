@@ -68,6 +68,12 @@ shab64() { sp=$1; f="$2"; v=0; sz=$(stat -c%s "$f"); while true; do w=$((v+sp*10
 
 
 ##
+## poll url for performance issues
+
+command -v gdate && date() { gdate "$@"; }; while true; do t=$(date +%s.%N); (time wget http://127.0.0.1:3923/?ls -qO- | jq -C '.files[]|{sz:.sz,ta:.tags.artist,tb:.tags.".bpm"}|del(.[]|select(.==null))' | awk -F\" '/"/{t[$2]++} END {for (k in t){v=t[k];p=sprintf("%" (v+1) "s",v);gsub(/ /,"#",p);printf "\033[36m%s\033[33m%s   ",k,p}}') 2>&1 | awk -v ts=$t 'NR==1{t1=$0} NR==2{sub(/.*0m/,"");sub(/s$/,"");t2=$0;c=2; if(t2>0.3){c=3} if(t2>0.8){c=1} } END{sub(/[0-9]{6}$/,"",ts);printf "%s   \033[3%dm%s   %s\033[0m\n",ts,c,t2,t1}'; sleep 0.1 || break; done
+
+
+##
 ## sqlite3 stuff
 
 # find dupe metadata keys

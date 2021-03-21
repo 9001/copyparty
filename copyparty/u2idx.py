@@ -140,7 +140,7 @@ class U2idx(object):
 
             q += " where " + (" and ".join(where))
 
-        self.log("q2: {} {}".format(q, repr(v)))
+        # self.log("q2: {} {}".format(q, repr(v)))
 
         ret = []
         lim = 1000
@@ -181,6 +181,12 @@ class U2idx(object):
 
         done_flag.append(True)
         self.active_id = None
+
+        # undupe hits from multiple metadata keys
+        if len(ret) > 1:
+            ret = [ret[0]] + [
+                y for x, y in zip(ret[:-1], ret[1:]) if x["rp"] != y["rp"]
+            ]
 
         return ret, list(taglist.keys())
 
