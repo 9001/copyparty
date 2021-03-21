@@ -493,6 +493,7 @@ input[type="checkbox"]:checked+label {
 	left: -1.7em;
 	width: calc(100% + 1.3em);
 }
+.tglbtn,
 #tree>a+a {
 	padding: .2em .4em;
 	font-size: 1.2em;
@@ -503,9 +504,11 @@ input[type="checkbox"]:checked+label {
 	position: relative;
 	top: -.2em;
 }
+.tglbtn:hover,
 #tree>a+a:hover {
 	background: #805;
 }
+.tglbtn.on,
 #tree>a+a.on {
 	background: #fc4;
 	color: #400;
@@ -612,7 +615,7 @@ input[type="checkbox"]:checked+label {
 	max-width: none;
 	margin-right: 1.5em;
 }
-#key_notation>span {
+#op_cfg>div>span {
 	display: inline-block;
 	padding: .2em .4em;
 }
@@ -634,6 +637,9 @@ input[type="checkbox"]:checked+label {
 	z-index: 3;
 	top: 6em;
 	right: 1.5em;
+}
+#ops:hover #opdesc.off {
+	display: none;
 }
 #opdesc code {
 	background: #3c3c3c;

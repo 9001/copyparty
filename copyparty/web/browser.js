@@ -1469,14 +1469,25 @@ function addcrc() {
 
 
 (function () {
+	var tt = bcfg_get('tooltips', true);
+
 	function set_tooltip(e) {
 		ev(e);
-		ebi('opdesc').innerHTML = this.getAttribute('data-desc');
+		var o = ebi('opdesc');
+		o.innerHTML = this.getAttribute('data-desc');
+		o.setAttribute('class', tt ? '' : 'off');
 	}
+
 	var btns = document.querySelectorAll('#ops, #ops>a');
 	for (var a = 0; a < btns.length; a++) {
 		btns[a].onmouseenter = set_tooltip;
 	}
+
+	ebi('tooltips').onclick = function (e) {
+		ev(e);
+		tt = !tt;
+		bcfg_set('tooltips', tt);
+	};
 })();
 
 

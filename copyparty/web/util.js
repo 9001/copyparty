@@ -403,8 +403,10 @@ function bcfg_upd_ui(name, val) {
 
     if (o.getAttribute('type') == 'checkbox')
         o.checked = val;
-    else if (o)
-        o.setAttribute('class', val ? 'on' : '');
+    else if (o) {
+        var fun = val ? 'add' : 'remove';
+        o.classList[fun]('on');
+    }
 }
 
 
