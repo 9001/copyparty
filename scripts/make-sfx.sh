@@ -28,6 +28,9 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	unexpand() { gunexpand "$@"; }
 	command -v grealpath >/dev/null &&
 		realpath() { grealpath "$@"; }
+
+	[ -e /opt/local/bin/bzip2 ] &&
+		bzip2() { /opt/local/bin/bzip2 "$@"; }
 }
 pybin=$(command -v python3 || command -v python) || {
 	echo need python
@@ -42,11 +45,15 @@ pybin=$(command -v python3 || command -v python) || {
 	exit 1
 }
 
+do_sh=1
+do_py=1
 while [ ! -z "$1" ]; do
 	[ "$1" = clean  ] && clean=1  && shift && continue
 	[ "$1" = re     ] && repack=1 && shift && continue
 	[ "$1" = no-ogv ] && no_ogv=1 && shift && continue
 	[ "$1" = no-cm  ] && no_cm=1  && shift && continue
+	[ "$1" = no-sh  ] && do_sh=   && shift && continue
+	[ "$1" = no-py  ] && do_py=   && shift && continue
 	break
 done
 
@@ -199,25 +206,36 @@ tar -cf tar "${args[@]}" --numeric-owner copyparty dep-j2
 
 echo compressing tar
 # detect best level; bzip2 -7 is usually better than -9
-for n in {2..9}; do cp tar t.$n; bzip2 -$n t.$n & done; wait; mv -v $(ls -1S t.*.bz2 | tail -n 1) tar.bz2
-for n in {2..9}; do cp tar t.$n;  xz -ze$n t.$n & done; wait; mv -v $(ls -1S t.*.xz  | tail -n 1) tar.xz
-rm t.*
+[ $do_py ] && { for n in {2..9}; do cp tar t.$n; bzip2 -$n t.$n & done; wait; mv -v $(ls -1S t.*.bz2 | tail -n 1) tar.bz2; }
+[ $do_sh ] && { for n in {2..9}; do cp tar t.$n;  xz -ze$n t.$n & done; wait; mv -v $(ls -1S t.*.xz  | tail -n 1) tar.xz; }
+rm t.* || true
+exts=()
 
+
+[ $do_sh ] && {
+exts+=(sh)
 echo creating unix sfx
 (
 	sed "s/PACK_TS/$ts/; s/PACK_HTS/$hts/; s/CPP_VER/$ver/" <../scripts/sfx.sh |
 	grep -E '^sfx_eof$' -B 9001;
 	cat tar.xz
 ) >$sfx_out.sh
+}
 
+
+[ $do_py ] && {
+exts+=(py)
 echo creating generic sfx
 $pybin ../scripts/sfx.py --sfx-make tar.bz2 $ver $ts
 mv sfx.out $sfx_out.py
 chmod 755 $sfx_out.*
+}
+
 
 printf "done:\n"
-printf "  %s\n" "$(realpath $sfx_out)."{sh,py}
-# rm -rf *
+for ext in ${exts[@]}; do
+	printf "  %s\n" "$(realpath $sfx_out)."$ext
+done
 
 # apk add bash python3 tar xz bzip2
 # while true; do ./make-sfx.sh; for f in ..//dist/copyparty-sfx.{sh,py}; do mv $f $f.$(wc -c <$f | awk '{print$1}'); done; done
