@@ -307,10 +307,14 @@ var vbar = (function () {
 
 
 function seek_au_mul(mul) {
-	seek_au_sec(mp.au.duration * mul);
+	if (mp.au)
+		seek_au_sec(mp.au.duration * mul);
 }
 
 function seek_au_sec(seek) {
+	if (!mp.au)
+		return;
+
 	console.log('seek: ' + seek);
 	if (!isFinite(seek))
 		return;
@@ -608,6 +612,34 @@ function autoplay_blocked() {
 })();
 
 
+function tree_neigh(n) {
+	var links = document.querySelectorAll('#treeul li>a+a');
+	var act = -1;
+	for (var a = 0, aa = links.length; a < aa; a++) {
+		if (links[a].getAttribute('class') == 'hl') {
+			act = a;
+			break;
+		}
+	}
+	a += n;
+	if (a < 0)
+		a = links.length - 1;
+	if (a >= links.length)
+		a = 0;
+
+	links[a].click();
+}
+
+
+function tree_up() {
+	var act = document.querySelector('#treeul a.hl');
+	if (act.previousSibling.textContent == '-')
+		return act.previousSibling.click();
+
+	act.parentNode.parentNode.parentNode.getElementsByTagName('a')[1].click();
+}
+
+
 document.onkeydown = function (e) {
 	if (document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
 		return;
@@ -625,7 +657,14 @@ document.onkeydown = function (e) {
 
 	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
 	if (n !== 0)
-		return seek_au_sec(mp.au.currentTime + n);
+		return mp.au ? seek_au_sec(mp.au.currentTime + n) : true;
+
+	n = k == 'KeyI' ? -1 : k == 'KeyK' ? 1 : 0;
+	if (n !== 0)
+		return tree_neigh(n);
+
+	if (k == 'KeyP')
+		return tree_up();
 };
 
 
