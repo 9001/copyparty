@@ -79,6 +79,16 @@ cat warks | while IFS= read -r x; do sqlite3 up2k.db "delete from mt where w = '
 
 
 ##
+## media
+
+# split track into test files
+e=6; s=10; d=~/dev/copyparty/srv/aus; n=1; p=0; e=$((e*60)); rm -rf $d; mkdir $d; while true; do ffmpeg -hide_banner -ss $p -i 'nervous_testpilot - office.mp3' -c copy -t $s $d/$(printf %04d $n).mp3; n=$((n+1)); p=$((p+s)); [ $p -gt $e ] && break; done
+
+-v srv/aus:aus:r:ce2dsa:ce2ts:cmtp=fgsfds=bin/mtag/sleep.py
+sqlite3 .hist/up2k.db 'select * from mt where k="fgsfds" or k="t:mtp"' | tee /dev/stderr | wc -l
+
+
+##
 ## vscode
 
 # replace variable name

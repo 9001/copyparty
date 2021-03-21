@@ -469,7 +469,7 @@ class Up2k(object):
                     n_tags = self._tag_file(c3, *args)
                 else:
                     mpool.put(["mtag"] + args)
-                    n_tags = self._flush_mpool(c3)
+                    n_tags = len(self._flush_mpool(c3))
 
                 n_add += n_tags
                 n_buf += n_tags
@@ -490,10 +490,10 @@ class Up2k(object):
 
     def _flush_mpool(self, wcur):
         with self.mutex:
-            ret = 0
+            ret = []
             for x in self.pending_tags:
                 self._tag_file(wcur, *x)
-                ret += 1
+                ret.append(x[1])
 
             self.pending_tags = []
             return ret
@@ -552,6 +552,8 @@ class Up2k(object):
         t_prev = time.time()
         n_prev = n_left
         n_done = 0
+        to_delete = {}
+        in_progress = {}
         while True:
             with self.mutex:
                 q = "select w from mt where k = 't:mtp' limit ?"
@@ -559,9 +561,6 @@ class Up2k(object):
                 warks = [x[0] for x in warks]
                 jobs = []
                 for w in warks:
-                    q = "delete from mt where w = ? and k = 't:mtp'"
-                    cur.execute(q, (w,))
-
                     q = "select rd, fn from up where substr(w,1,16)=? limit 1"
                     rd, fn = cur.execute(q, (w,)).fetchone()
                     rd, fn = s3dec(rd, fn)
@@ -573,15 +572,32 @@ class Up2k(object):
 
                     if ".dur" not in have:
                         # skip non-audio
+                        to_delete[w] = True
                         n_left -= 1
+                        continue
+
+                    if w in in_progress:
                         continue
 
                     task_parsers = {
                         k: v for k, v in parsers.items() if k in force or k not in have
                     }
                     jobs.append([task_parsers, None, w, abspath])
+                    in_progress[w] = True
 
-            n_done += self._flush_mpool(wcur)
+            done = self._flush_mpool(wcur)
+
+            with self.mutex:
+                for w in done:
+                    to_delete[w] = True
+                    in_progress.pop(w)
+                    n_done += 1
+
+                for w in to_delete.keys():
+                    q = "delete from mt where w = ? and k = 't:mtp'"
+                    cur.execute(q, (w,))
+
+                to_delete = {}
 
             if not warks:
                 break
@@ -612,8 +628,12 @@ class Up2k(object):
             with self.mutex:
                 cur.connection.commit()
 
-        self._stop_mpool(mpool, wcur)
+        done = self._stop_mpool(mpool, wcur)
         with self.mutex:
+            for w in done:
+                q = "delete from mt where w = ? and k = 't:mtp'"
+                cur.execute(q, (w,))
+
             cur.connection.commit()
             if n_done:
                 self.vac(cur, db_path, n_done, 0, sz0)
@@ -654,12 +674,14 @@ class Up2k(object):
             mpool.put(None)
 
         mpool.join()
-        self._flush_mpool(wcur)
+        done = self._flush_mpool(wcur)
         if WINDOWS and False:
             nah = open(os.devnull, "wb")
             wmic = f"processid={os.getpid()}"
             wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
             sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
+
+        return done
 
     def _tag_thr(self, q):
         while True:
