@@ -1396,7 +1396,7 @@ var mukey = (function () {
 		ev(e);
 		var notation = this.getAttribute('value');
 		load_notation(notation);
-		render();
+		try_render();
 	}
 
 	function load_notation(notation) {

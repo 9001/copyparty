@@ -505,7 +505,7 @@ class Up2k(object):
 
     def _run_one_mtp(self, ptop):
         db_path = os.path.join(ptop, ".hist", "up2k.db")
-        sz0 = os.path.getsize(db_path)
+        sz0 = os.path.getsize(db_path) // 1024
 
         force = {}
         timeout = {}
