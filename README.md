@@ -171,8 +171,8 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 ## complete examples
 
-* read-only music server with bpm and key scanning
-* `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts -mtp .bpm=f,~/bin/audio-bpm.py -mtp key=f,~/bin/audio-key.py`
+* read-only music server with bpm and key scanning  
+  `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts -mtp .bpm=f,audio-bpm.py -mtp key=f,audio-key.py`
 
 
 # client examples

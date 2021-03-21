@@ -6,3 +6,21 @@ some of these rely on libraries which are not MIT-compatible
 * [audio-key.py](./audio-key.py) detects the melodic key of music using the Mixxx fork of keyfinder; imports GPL3
 
 run [`install-deps.sh`](install-deps.sh) to build/install most dependencies required by these programs (supports windows/linux/macos)
+
+
+# usage from copyparty
+
+`copyparty -e2dsa -e2ts -mtp key=f,audio-key.py -mtp .bpm=f,audio-bpm.py`
+
+* `f,` makes the detected value replace any existing values
+* the `.` in `.bpm` indicates numeric value
+* assumes the python files are in the folder you're launching copyparty from, replace the filename with a relative/absolute path if that's not the case
+* `mtp` modules will not run if a file has existing tags in the db, so clear out the tags with `-e2tsr` the first time you launch with new `mtp` options
+
+
+## usage with volume-flags
+
+instead of affecting all volumes, you can set the options for just one volume like so:
+```
+copyparty -v /mnt/nas/music:/music:r:cmtp=key=f,audio-key.py:cmtp=.bpm=f,audio-bpm.py:ce2dsa:ce2ts
+```
