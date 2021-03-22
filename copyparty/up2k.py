@@ -282,9 +282,12 @@ class Up2k(object):
         dbw = [reg[0], 0, time.time()]
         self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
 
-        # can be symlink so don't `and d.startswith(top)``
-        excl = set([d.realpath for d in all_vols if d != vol])
-        n_add = self._build_dir(dbw, top, excl, top)
+        excl = [
+            vol.realpath + d.vpath[len(vol.vpath) :]
+            for d in all_vols
+            if d.vpath.startswith(vol.vpath + "/")
+        ]
+        n_add = self._build_dir(dbw, top, set(excl), top)
         n_rm = self._drop_lost(dbw[0], top)
         if dbw[1]:
             self.log("commit {} new files".format(dbw[1]))
