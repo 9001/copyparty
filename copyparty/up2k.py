@@ -225,9 +225,14 @@ class Up2k(object):
 
             _, flags = self._expr_idx_filter(flags)
 
-            a = "\033[0;36m{}:\033[1;30m{}"
-            a = [a.format(k, v) for k, v in sorted(flags.items())]
-            self.log(" ".join(a) + "\033[0m")
+            ft = "\033[0;32m{}{:.0}"
+            ff = "\033[0;35m{}{:.0}"
+            fv = "\033[0;36m{}:\033[1;30m{}"
+            a = [
+                (ft if v is True else ff if v is False else fv).format(k, str(v))
+                for k, v in flags.items()
+            ]
+            self.log(" ".join(sorted(a)) + "\033[0m")
 
             reg = {}
             path = os.path.join(ptop, ".hist", "up2k.snap")
