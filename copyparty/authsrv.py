@@ -22,6 +22,14 @@ class VFS(object):
         self.nodes = {}  # child nodes
         self.all_vols = {vpath: self}  # flattened recursive
 
+    def __repr__(self):
+        return "VFS({})".format(
+            ", ".join(
+                "{}={!r}".format(k, self.__dict__[k])
+                for k in "realpath vpath uread uwrite flags".split()
+            )
+        )
+
     def _trk(self, vol):
         self.all_vols[vol.vpath] = vol
         return vol
@@ -342,6 +350,21 @@ class AuthSrv(object):
 
             # append parsers from argv to volume-flags
             self._read_volflag(vol.flags, "mtp", self.args.mtp, True)
+
+            # d2d drops all database features for a volume
+            for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"]]:
+                if not vol.flags.get(grp, False):
+                    continue
+
+                vol.flags["d2t"] = True
+                vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
+
+            # mt* needs e2t so drop those too
+            for grp, rm in [["e2t", "mt"]]:
+                if vol.flags.get(grp, False):
+                    continue
+
+                vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
 
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
