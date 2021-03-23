@@ -288,9 +288,9 @@ class Up2k(object):
         self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
 
         excl = [
-            vol.realpath + d.vpath[len(vol.vpath) :]
+            vol.realpath + "/" + d.vpath[len(vol.vpath) :].lstrip("/")
             for d in all_vols
-            if d.vpath.startswith(vol.vpath + "/")
+            if d != vol and (d.vpath.startswith(vol.vpath + "/") or not vol.vpath)
         ]
         n_add = self._build_dir(dbw, top, set(excl), top)
         n_rm = self._drop_lost(dbw[0], top)
