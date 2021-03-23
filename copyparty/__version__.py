@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 9, 12)
+VERSION = (0, 9, 13)
 CODENAME = "the strongest music server"
 BUILD_DT = (2021, 3, 23)
 
