@@ -232,7 +232,8 @@ class Up2k(object):
                 (ft if v is True else ff if v is False else fv).format(k, str(v))
                 for k, v in flags.items()
             ]
-            self.log(" ".join(sorted(a)) + "\033[0m")
+            if a:
+                self.log(" ".join(sorted(a)) + "\033[0m")
 
             reg = {}
             path = os.path.join(ptop, ".hist", "up2k.snap")

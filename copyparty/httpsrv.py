@@ -2,9 +2,27 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import sys
 import time
 import socket
 import threading
+
+try:
+    import jinja2
+except ImportError:
+    print(
+        """\033[1;31m
+  you do not have jinja2 installed,\033[33m
+  choose one of these:\033[0m
+   * apt install python-jinja2
+   * {} -m pip install --user jinja2
+   * (try another python version, if you have one)
+   * (try copyparty.sfx instead)
+""".format(
+            os.path.basename(sys.executable)
+        )
+    )
+    sys.exit(1)
 
 from .__init__ import E, MACOS
 from .httpconn import HttpConn
@@ -29,6 +47,13 @@ class HttpSrv(object):
         self.workload = 0
         self.workload_thr_alive = False
         self.auth = AuthSrv(self.args, self.log)
+
+        env = jinja2.Environment()
+        env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
+        self.j2 = {
+            x: env.get_template(x + ".html")
+            for x in ["splash", "browser", "msg", "md", "mde"]
+        }
 
         cert_path = os.path.join(E.cfg, "cert.pem")
         if os.path.exists(cert_path):

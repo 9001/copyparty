@@ -52,6 +52,10 @@ class HttpCli(object):
         if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
             raise Exception("that was close")
 
+    def j2(self, name, **kwargs):
+        tpl = self.conn.hsrv.j2[name]
+        return tpl.render(**kwargs) if kwargs else tpl
+
     def run(self):
         """returns true if connection can be reused"""
         self.keepalive = False
@@ -580,7 +584,7 @@ class HttpCli(object):
             pwd = "x"  # nosec
 
         h = {"Set-Cookie": "cppwd={}; Path=/; SameSite=Lax".format(pwd)}
-        html = self.conn.tpl_msg.render(h1=msg, h2='<a href="/">ack</a>', redir="/")
+        html = self.j2("msg", h1=msg, h2='<a href="/">ack</a>', redir="/")
         self.reply(html.encode("utf-8"), headers=h)
         return True
 
@@ -611,7 +615,8 @@ class HttpCli(object):
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         esc_paths = [quotep(vpath), html_escape(vpath)]
-        html = self.conn.tpl_msg.render(
+        html = self.j2(
+            "msg",
             h2='<a href="/{}">go to /{}</a>'.format(*esc_paths),
             pre="aight",
             click=True,
@@ -643,7 +648,8 @@ class HttpCli(object):
                 f.write(b"`GRUNNUR`\n")
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
-        html = self.conn.tpl_msg.render(
+        html = self.j2(
+            "msg",
             h2='<a href="/{}?edit">go to /{}?edit</a>'.format(
                 quotep(vpath), html_escape(vpath)
             ),
@@ -749,7 +755,8 @@ class HttpCli(object):
                     ).encode("utf-8")
                 )
 
-        html = self.conn.tpl_msg.render(
+        html = self.j2(
+            "msg",
             h2='<a href="/{}">return to /{}</a>'.format(
                 quotep(self.vpath), html_escape(self.vpath)
             ),
@@ -1039,14 +1046,10 @@ class HttpCli(object):
 
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)
-        if "edit2" in self.uparam:
-            html_path = "web/mde.html"
-            template = self.conn.tpl_mde
-        else:
-            html_path = "web/md.html"
-            template = self.conn.tpl_md
 
-        html_path = os.path.join(E.mod, html_path)
+        tpl = "mde" if "edit2" in self.uparam else "md"
+        html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
+        template = self.j2(tpl)
 
         st = os.stat(fsenc(fs_path))
         # sz_md = st.st_size
@@ -1098,7 +1101,7 @@ class HttpCli(object):
     def tx_mounts(self):
         rvol = [x + "/" if x else x for x in self.rvol]
         wvol = [x + "/" if x else x for x in self.wvol]
-        html = self.conn.tpl_mounts.render(this=self, rvol=rvol, wvol=wvol)
+        html = self.j2("splash", this=self, rvol=rvol, wvol=wvol)
         self.reply(html.encode("utf-8"))
         return True
 
@@ -1372,7 +1375,8 @@ class HttpCli(object):
 
         dirs.extend(files)
 
-        html = self.conn.tpl_browser.render(
+        html = self.j2(
+            "browser",
             vdir=quotep(self.vpath),
             vpnodes=vpnodes,
             files=dirs,

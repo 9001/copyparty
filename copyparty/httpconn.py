@@ -12,23 +12,6 @@ try:
 except:
     HAVE_SSL = False
 
-try:
-    import jinja2
-except ImportError:
-    print(
-        """\033[1;31m
-  you do not have jinja2 installed,\033[33m
-  choose one of these:\033[0m
-   * apt install python-jinja2
-   * {} -m pip install --user jinja2
-   * (try another python version, if you have one)
-   * (try copyparty.sfx instead)
-""".format(
-            os.path.basename(sys.executable)
-        )
-    )
-    sys.exit(1)
-
 from .__init__ import E
 from .util import Unrecv
 from .httpcli import HttpCli
@@ -56,14 +39,6 @@ class HttpConn(object):
         self.u2idx = None
         self.log_func = hsrv.log
         self.set_rproxy()
-
-        env = jinja2.Environment()
-        env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
-        self.tpl_mounts = env.get_template("splash.html")
-        self.tpl_browser = env.get_template("browser.html")
-        self.tpl_msg = env.get_template("msg.html")
-        self.tpl_md = env.get_template("md.html")
-        self.tpl_mde = env.get_template("mde.html")
 
     def set_rproxy(self, ip=None):
         if ip is None:
