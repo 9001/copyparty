@@ -424,14 +424,17 @@ class HttpCli(object):
         if "srch" in self.uparam or "srch" in body:
             return self.handle_search(body)
 
-        # prefer this over undot; no reason to allow traversion
-        if "/" in body["name"]:
-            raise Pebkac(400, "folders verboten")
-
         # up2k-php compat
         for k in "chunkpit.php", "handshake.php":
             if self.vpath.endswith(k):
                 self.vpath = self.vpath[: -len(k)]
+
+        sub = None
+        name = undot(body["name"])
+        if "/" in name:
+            sub, name = name.rsplit("/", 1)
+            self.vpath = "/".join([self.vpath, sub]).strip("/")
+            body["name"] = name
 
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
 
@@ -441,12 +444,22 @@ class HttpCli(object):
         body["addr"] = self.ip
         body["vcfg"] = vfs.flags
 
-        x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
-        response = x.get()
-        response = json.dumps(response)
+        if sub:
+            try:
+                dst = os.path.join(vfs.realpath, rem)
+                os.makedirs(dst)
+            except:
+                if not os.path.isdir(dst):
+                    raise Pebkac(400, "some file got your folder name")
 
-        self.log(response)
-        self.reply(response.encode("utf-8"), mime="application/json")
+        x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
+        ret = x.get()
+        if sub:
+            ret["name"] = "/".join([sub, ret["name"]])
+
+        ret = json.dumps(ret)
+        self.log(ret)
+        self.reply(ret.encode("utf-8"), mime="application/json")
         return True
 
     def handle_search(self, body):

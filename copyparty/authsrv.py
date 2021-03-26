@@ -54,6 +54,7 @@ class VFS(object):
                 self.uwrite,
                 self.flags,
             )
+            self._trk(vn)
             self.nodes[name] = vn
             return self._trk(vn.add(src, dst))
 

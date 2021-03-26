@@ -284,12 +284,21 @@ function up2k_init(have_crypto) {
         more_one_file();
         var bad_files = [];
         var good_files = [];
+        var dirs = [];
         for (var a = 0; a < files.length; a++) {
             var fobj = files[a];
             if (is_itemlist) {
                 if (fobj.kind !== 'file')
                     continue;
 
+                try {
+                    var wi = fobj.webkitGetAsEntry();
+                    if (wi.isDirectory) {
+                        dirs.push(wi);
+                        continue;
+                    }
+                }
+                catch (ex) { }
                 fobj = fobj.getAsFile();
             }
             try {
@@ -300,12 +309,69 @@ function up2k_init(have_crypto) {
                 bad_files.push(fobj.name);
                 continue;
             }
-            good_files.push(fobj);
+            good_files.push([fobj, fobj.name]);
+        }
+        if (dirs) {
+            return read_dirs(null, [], dirs, good_files, bad_files);
+        }
+    }
+
+    function read_dirs(rd, pf, dirs, good, bad) {
+        if (!dirs.length) {
+            if (!pf.length)
+                return gotallfiles(good, bad);
+
+            console.log("retry pf, " + pf.length);
+            setTimeout(function () {
+                read_dirs(rd, pf, dirs, good, bad);
+            }, 50);
+            return;
         }
 
+        if (!rd)
+            rd = dirs[0].createReader();
+
+        rd.readEntries(function (ents) {
+            var ngot = 0;
+            ents.forEach(function (dn) {
+                if (dn.isDirectory) {
+                    dirs.push(dn);
+                }
+                else {
+                    var name = dn.fullPath;
+                    if (name.indexOf('/') === 0)
+                        name = name.slice(1);
+
+                    pf.push(name);
+                    dn.file(function (fobj) {
+                        var idx = pf.indexOf(name);
+                        pf.splice(idx, 1);
+                        try {
+                            if (fobj.size > 0) {
+                                good.push([fobj, name]);
+                                return;
+                            }
+                        }
+                        catch (ex) { }
+                        bad.push(name);
+                    });
+                }
+                ngot += 1;
+            });
+            // console.log("ngot: " + ngot);
+            if (!ngot) {
+                dirs.shift();
+                rd = null;
+            }
+            return read_dirs(rd, pf, dirs, good, bad);
+        });
+    }
+
+    function gotallfiles(good_files, bad_files) {
         if (bad_files.length > 0) {
-            var msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, files.length);
-            for (var a = 0; a < bad_files.length; a++)
+            var ntot = bad_files.length + good_files.length;
+            var msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, ntot);
+            for (var a = 0, aa = Math.min(20, bad_files.length); a < aa; a++)
                 msg += '-- ' + bad_files[a] + '\n';
 
             if (files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
@@ -315,21 +381,21 @@ function up2k_init(have_crypto) {
         }
 
         var msg = ['upload these ' + good_files.length + ' files?'];
-        for (var a = 0; a < good_files.length; a++)
-            msg.push(good_files[a].name);
+        for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
+            msg.push(good_files[a][1]);
 
         if (ask_up && !fsearch && !confirm(msg.join('\n')))
             return;
 
         for (var a = 0; a < good_files.length; a++) {
-            var fobj = good_files[a];
+            var fobj = good_files[a][0];
             var now = new Date().getTime();
             var lmod = fobj.lastModified || now;
             var entry = {
                 "n": parseInt(st.files.length.toString()),
-                "t0": now,  // TODO remove probably
+                "t0": now,
                 "fobj": fobj,
-                "name": fobj.name,
+                "name": good_files[a][1],
                 "size": fobj.size,
                 "lmod": lmod / 1000,
                 "purl": get_evpath(),
