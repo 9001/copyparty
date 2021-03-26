@@ -72,7 +72,7 @@ you may also want these, especially on servers:
   * ☑ symlink/discard existing files (content-matching)
 * download
   * ☑ single files in browser
-  * ✖ folders as zip files
+  * ☑ folders as zip files *(not in release yet)*
   * ☑ FUSE client (read-only)
 * browser
   * ☑ tree-view

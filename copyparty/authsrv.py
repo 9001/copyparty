@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import os
 import sys
+import stat
 import threading
 
 from .__init__ import PY2, WINDOWS
@@ -126,6 +127,64 @@ class VFS(object):
             real = [x for x in real if x[0] not in self.nodes]
 
         return [abspath, real, virt_vis]
+
+    def walk(self, rel, rem, uname, dots, scandir, lstat=False):
+        """
+        recursively yields from ./rem;
+        rel is a unix-style user-defined vpath (not vfs-related)
+        """
+
+        fsroot, vfs_ls, vfs_virt = self.ls(rem, uname, scandir, lstat)
+        rfiles = [x for x in vfs_ls if not stat.S_ISDIR(x[1].st_mode)]
+        rdirs = [x for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+
+        rfiles.sort()
+        rdirs.sort()
+
+        yield rel, fsroot, rfiles, rdirs, vfs_virt
+
+        for rdir, _ in rdirs:
+            if not dots and rdir.startswith("."):
+                continue
+
+            wrel = (rel + "/" + rdir).lstrip("/")
+            wrem = (rem + "/" + rdir).lstrip("/")
+            for x in self.walk(wrel, wrem, uname, scandir, lstat):
+                yield x
+
+        for n, vfs in sorted(vfs_virt.items()):
+            if not dots and n.startswith("."):
+                continue
+
+            wrel = (rel + "/" + n).lstrip("/")
+            for x in vfs.walk(wrel, "", uname, scandir, lstat):
+                yield x
+
+    def zipgen(self, rems, uname, dots, scandir):
+        vtops = [["", [self, ""]]]
+        if rems:
+            # list of subfolders to zip was provided,
+            # add all the ones uname is allowed to access
+            vtops = []
+            for rem in rems:
+                try:
+                    vn = self.get(rem, uname, True, False)
+                    vtops.append([rem, vn])
+                except:
+                    pass
+
+        for rel, (vn, rem) in vtops:
+            for vpath, apath, files, _, _ in vn.walk(rel, rem, uname, dots, scandir):
+                # print(repr([vpath, apath, [x[0] for x in files]]))
+                files = [x for x in files if dots or not x[0].startswith(".")]
+                fnames = [n[0] for n in files]
+                vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
+                apaths = [os.path.join(apath, n) for n in fnames]
+                for f in [
+                    {"vp": vp, "ap": ap, "st": n[1]}
+                    for vp, ap, n in zip(vpaths, apaths, files)
+                ]:
+                    yield f
 
     def user_tree(self, uname, readable=False, writable=False):
         ret = []

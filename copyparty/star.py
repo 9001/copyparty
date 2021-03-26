@@ -1,8 +1,7 @@
-import os
 import tarfile
 import threading
 
-from .util import Queue
+from .util import Queue, fsenc
 
 
 class QFile(object):
@@ -46,11 +45,11 @@ class StreamTar(object):
 
     def _gen(self):
         for f in self.fgen:
-            src = f["a"]
-            name = f["n"]
-            inf = tarfile.TarInfo(name=name)
+            name = f["vp"]
+            src = f["ap"]
+            fsi = f["st"]
 
-            fsi = os.stat(src)
+            inf = tarfile.TarInfo(name=name)
             inf.mode = fsi.st_mode
             inf.size = fsi.st_size
             inf.mtime = fsi.st_mtime
@@ -58,7 +57,7 @@ class StreamTar(object):
             inf.gid = 0
 
             self.ci += inf.size
-            with open(src, "rb") as f:
+            with open(fsenc(src), "rb", 512 * 1024) as f:
                 self.tar.addfile(inf, f)
 
         self.tar.close()

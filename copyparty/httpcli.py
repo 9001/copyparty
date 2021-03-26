@@ -7,6 +7,7 @@ import gzip
 import time
 import copy
 import json
+import string
 import socket
 import ctypes
 from datetime import datetime
@@ -14,6 +15,8 @@ import calendar
 
 from .__init__ import E, PY2, WINDOWS
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
+from .szip import StreamZip
+from .star import StreamTar
 
 if not PY2:
     unicode = str
@@ -1044,6 +1047,63 @@ class HttpCli(object):
         self.log("{},  {}".format(logmsg, spd))
         return ret
 
+    def tx_zip(self, vn, rems, dots):
+        if self.args.no_zip:
+            raise Pebkac(400, "not enabled")
+
+        logmsg = "{:4} {} ".format("", self.req)
+        self.keepalive = False
+
+        fmt = "zip"
+        if fmt == "tar":
+            mime = "application/x-tar"
+        else:
+            mime = "application/zip"
+
+        if rems and rems[0]:
+            fn = rems[0]
+        else:
+            fn = self.vpath.rstrip("/").split("/")[-1]
+
+        if not fn:
+            fn = self.headers.get("host", "hey")
+
+        afn = "".join(
+            [x if x in (string.ascii_letters + string.digits) else "_" for x in fn]
+        )
+
+        ufn = "".join(
+            [
+                x
+                if x in (string.ascii_letters + string.digits)
+                else "%{:02x}".format(ord(x))
+                for x in fn
+            ]
+        )
+
+        cdis = 'attachment; filename="{}.{}", filename*=UTF-8''{}.{}"
+        cdis = cdis.format(afn, fmt, ufn, fmt)
+        self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
+
+        fgen = vn.zipgen(rems, self.uname, dots, not self.args.no_scandir)
+        # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
+        bgen = StreamZip(fgen, False, False)
+        bsent = 0
+        for buf in bgen.gen():
+            if not buf:
+                break
+
+            try:
+                self.s.sendall(buf)
+                bsent += len(buf)
+            except:
+                logmsg += " \033[31m" + unicode(bsent) + "\033[0m"
+                break
+
+        spd = self._spd(bsent)
+        self.log("{},  {}".format(logmsg, spd))
+        return True
+
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)
 
@@ -1190,6 +1250,9 @@ class HttpCli(object):
 
             return self.tx_file(abspath)
 
+        if "zip" in self.uparam:
+            return self.tx_zip(vn, None, False)
+
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_scandir)
         stats = {k: v for k, v in vfs_ls}
         vfs_ls = [x[0] for x in vfs_ls]
@@ -1250,8 +1313,11 @@ class HttpCli(object):
 
             is_dir = stat.S_ISDIR(inf.st_mode)
             if is_dir:
-                margin = "DIR"
                 href += "/"
+                if self.args.no_zip:
+                    margin = "DIR"
+                else:
+                    margin = '<a href="{}?zip">zip</a>'.format(html_escape(href))
             elif fn in hist:
                 margin = '<a href="{}.hist/{}">#{}</a>'.format(
                     base, html_escape(hist[fn][2], quote=True), hist[fn][0]
