@@ -1047,18 +1047,22 @@ class HttpCli(object):
         self.log("{},  {}".format(logmsg, spd))
         return ret
 
-    def tx_zip(self, vn, rem, items, dots):
+    def tx_zip(self, fmt, uarg, vn, rem, items, dots):
         if self.args.no_zip:
             raise Pebkac(400, "not enabled")
 
         logmsg = "{:4} {} ".format("", self.req)
         self.keepalive = False
 
-        fmt = "zip"
+        if not uarg:
+            uarg = ""
+
         if fmt == "tar":
             mime = "application/x-tar"
+            packer = StreamTar
         else:
             mime = "application/zip"
+            packer = StreamZip
 
         fn = items[0] if items and items[0] else self.vpath
         if fn:
@@ -1071,12 +1075,13 @@ class HttpCli(object):
         )
 
         bascii = unicode(string.ascii_letters + string.digits).encode("utf-8")
+        chcon = ord if PY2 else int
         ufn = b"".join(
             [
                 chr(x).encode("utf-8")
                 if x in bascii
-                else "%{:02x}".format(x).encode("ascii")
-                for x in fn.encode("utf-8")
+                else "%{:02x}".format(chcon(x)).encode("ascii")
+                for x in fn.encode("utf-8", "xmlcharrefreplace")
             ]
         ).decode("ascii")
 
@@ -1086,7 +1091,7 @@ class HttpCli(object):
 
         fgen = vn.zipgen(rem, items, self.uname, dots, not self.args.no_scandir)
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
-        bgen = StreamZip(fgen, False, False)
+        bgen = packer(fgen, utf8="utf" in uarg)
         bsent = 0
         for buf in bgen.gen():
             if not buf:
@@ -1249,8 +1254,10 @@ class HttpCli(object):
 
             return self.tx_file(abspath)
 
-        if "zip" in self.uparam:
-            return self.tx_zip(vn, rem, [], False)
+        for k in ["zip", "tar"]:
+            v = self.uparam.get(k)
+            if v is not None:
+                return self.tx_zip(k, v, vn, rem, [], self.args.ed)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_scandir)
         stats = {k: v for k, v in vfs_ls}
@@ -1316,7 +1323,7 @@ class HttpCli(object):
                 if self.args.no_zip:
                     margin = "DIR"
                 else:
-                    margin = '<a href="{}?zip">zip</a>'.format(html_escape(href))
+                    margin = '<a href="{}?zip">zip</a>'.format(quotep(href))
             elif fn in hist:
                 margin = '<a href="{}.hist/{}">#{}</a>'.format(
                     base, html_escape(hist[fn][2], quote=True), hist[fn][0]

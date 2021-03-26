@@ -174,7 +174,7 @@ def gen_ecdr64_loc(ecdr64_pos):
 
 
 class StreamZip(object):
-    def __init__(self, fgen, utf8, pre_crc):
+    def __init__(self, fgen, utf8=False, pre_crc=False):
         self.fgen = fgen
         self.utf8 = utf8
         self.pre_crc = pre_crc

@@ -17,11 +17,11 @@ class QFile(object):
 class StreamTar(object):
     """construct in-memory tar file from the given path"""
 
-    def __init__(self, top, fgen):
+    def __init__(self, fgen, **kwargs):
         self.ci = 0
         self.co = 0
         self.qfile = QFile()
-        self.srcfiles = fgen
+        self.fgen = fgen
 
         # python 3.8 changed to PAX_FORMAT as default,
         # waste of space and don't care about the new features

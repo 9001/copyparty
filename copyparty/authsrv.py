@@ -175,16 +175,31 @@ class VFS(object):
                     pass
 
         for rel, (vn, rem) in vtops:
-            for vpath, apath, files, _, _ in vn.walk(rel, rem, uname, dots, scandir):
+            for vpath, apath, files, rd, vd in vn.walk(rel, rem, uname, dots, scandir):
                 # print(repr([vpath, apath, [x[0] for x in files]]))
-                files = [x for x in files if dots or not x[0].startswith(".")]
                 fnames = [n[0] for n in files]
                 vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
                 apaths = [os.path.join(apath, n) for n in fnames]
-                for f in [
-                    {"vp": vp, "ap": ap, "st": n[1]}
-                    for vp, ap, n in zip(vpaths, apaths, files)
-                ]:
+                files = list(zip(vpaths, apaths, files))
+
+                if not dots:
+                    # dotfile filtering based on vpath (intended visibility)
+                    files = [x for x in files if "/." not in "/" + x[0]]
+
+                    rm = [x for x in rd if x[0].startswith(".")]
+                    for x in rm:
+                        rd.remove(x)
+
+                    rm = [k for k in vd.keys() if k.startswith(".")]
+                    for x in rm:
+                        del vd[x]
+
+                # up2k filetring based on actual abspath
+                files = [
+                    x for x in files if "{0}.hist{0}up2k.".format(os.sep) not in x[1]
+                ]
+
+                for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
                     yield f
 
     def user_tree(self, uname, readable=False, writable=False):

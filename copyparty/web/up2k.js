@@ -278,7 +278,7 @@ function up2k_init(have_crypto) {
         }
         else files = e.target.files;
 
-        if (files.length == 0)
+        if (!files || files.length == 0)
             return alert('no files selected??');
 
         more_one_file();
