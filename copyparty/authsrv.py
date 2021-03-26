@@ -160,15 +160,16 @@ class VFS(object):
             for x in vfs.walk(wrel, "", uname, scandir, lstat):
                 yield x
 
-    def zipgen(self, rems, uname, dots, scandir):
-        vtops = [["", [self, ""]]]
+    def zipgen(self, vrem, rems, uname, dots, scandir):
+        vtops = [["", [self, vrem]]]
         if rems:
             # list of subfolders to zip was provided,
             # add all the ones uname is allowed to access
             vtops = []
             for rem in rems:
                 try:
-                    vn = self.get(rem, uname, True, False)
+                    d = rem if not vrem else vrem + "/" + rem
+                    vn = self.get(d, uname, True, False)
                     vtops.append([rem, vn])
                 except:
                     pass

@@ -1047,7 +1047,7 @@ class HttpCli(object):
         self.log("{},  {}".format(logmsg, spd))
         return ret
 
-    def tx_zip(self, vn, rems, dots):
+    def tx_zip(self, vn, rem, items, dots):
         if self.args.no_zip:
             raise Pebkac(400, "not enabled")
 
@@ -1060,32 +1060,31 @@ class HttpCli(object):
         else:
             mime = "application/zip"
 
-        if rems and rems[0]:
-            fn = rems[0]
+        fn = items[0] if items and items[0] else self.vpath
+        if fn:
+            fn = fn.rstrip("/").split("/")[-1]
         else:
-            fn = self.vpath.rstrip("/").split("/")[-1]
-
-        if not fn:
             fn = self.headers.get("host", "hey")
 
         afn = "".join(
             [x if x in (string.ascii_letters + string.digits) else "_" for x in fn]
         )
 
-        ufn = "".join(
+        bascii = unicode(string.ascii_letters + string.digits).encode("utf-8")
+        ufn = b"".join(
             [
-                x
-                if x in (string.ascii_letters + string.digits)
-                else "%{:02x}".format(ord(x))
-                for x in fn
+                chr(x).encode("utf-8")
+                if x in bascii
+                else "%{:02x}".format(x).encode("ascii")
+                for x in fn.encode("utf-8")
             ]
-        )
+        ).decode("ascii")
 
-        cdis = 'attachment; filename="{}.{}", filename*=UTF-8''{}.{}"
+        cdis = "attachment; filename=\"{}.{}\"; filename*=UTF-8''{}.{}"
         cdis = cdis.format(afn, fmt, ufn, fmt)
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
-        fgen = vn.zipgen(rems, self.uname, dots, not self.args.no_scandir)
+        fgen = vn.zipgen(rem, items, self.uname, dots, not self.args.no_scandir)
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         bgen = StreamZip(fgen, False, False)
         bsent = 0
@@ -1251,7 +1250,7 @@ class HttpCli(object):
             return self.tx_file(abspath)
 
         if "zip" in self.uparam:
-            return self.tx_zip(vn, None, False)
+            return self.tx_zip(vn, rem, [], False)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(rem, self.uname, not self.args.no_scandir)
         stats = {k: v for k, v in vfs_ls}
