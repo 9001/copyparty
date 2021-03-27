@@ -237,7 +237,10 @@ function goto(dest) {
     goto();
     var op = sread('opmode');
     if (op !== null && op !== '.')
-        goto(op);
+        try {
+            goto(op);
+        }
+        catch (ex) { }
 })();
 
 

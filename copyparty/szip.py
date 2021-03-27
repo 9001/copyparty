@@ -3,7 +3,7 @@ import zlib
 import struct
 from datetime import datetime
 
-from .util import yieldfile
+from .util import yieldfile, sanitize_fn
 
 
 def dostime2unix(buf):
@@ -84,7 +84,9 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     vsz = 0xFFFFFFFF if z64 else sz
     ret += struct.pack("<LL", vsz, vsz)
 
-    bfn = fn.encode("utf-8" if utf8 else "cp437", "replace")
+    # windows support (the "?" replace below too)
+    fn = sanitize_fn(fn)
+    bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
     z64_len = len(z64v) * 8 + 4 if z64v else 0
     ret += struct.pack("<HH", len(bfn), z64_len)
