@@ -112,6 +112,8 @@ the browser has the following hotkeys
 
 ## zip downloads
 
+the `zip` link next to folders can produce various types of zip/tar files using these alternatives in the browser settings tab:
+
 | name | url-suffix | description |
 |--|--|--|
 | `tar` | `?tar` | plain gnutar, works great with `curl \| tar -xv` |
