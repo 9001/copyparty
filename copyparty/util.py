@@ -780,6 +780,16 @@ def read_socket_chunked(sr, log=None):
         sr.recv(2)  # \r\n after each chunk too
 
 
+def yieldfile(fn):
+    with open(fsenc(fn), "rb", 512 * 1024) as f:
+        while True:
+            buf = f.read(64 * 1024)
+            if not buf:
+                break
+
+            yield buf
+
+
 def hashcopy(actor, fin, fout):
     u32_lim = int((2 ** 31) * 0.9)
     hashobj = hashlib.sha512()

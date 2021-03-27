@@ -1,10 +1,9 @@
-import os
 import time
 import zlib
 import struct
 from datetime import datetime
 
-from .util import fsenc
+from .util import yieldfile
 
 
 def dostime2unix(buf):
@@ -195,19 +194,23 @@ class StreamZip(object):
             sz = st.st_size
             ts = st.st_mtime + 1
 
+            crc = 0
+            if self.pre_crc:
+                crc = 0
+                for buf in yieldfile(src):
+                    crc = zlib.crc32(buf, crc)
+
+                crc &= 0xFFFFFFFF
+
             h_pos = self.pos
             buf = gen_hdr(None, name, sz, ts, self.utf8, None, self.pre_crc)
             yield self._ct(buf)
 
-            crc = 0
-            with open(fsenc(src), "rb", 512 * 1024) as f:
-                while True:
-                    buf = f.read(64 * 1024)
-                    if not buf:
-                        break
-
+            for buf in yieldfile(src):
+                if not self.pre_crc:
                     crc = zlib.crc32(buf, crc)
-                    yield self._ct(buf)
+
+                yield self._ct(buf)
 
             crc &= 0xFFFFFFFF
 

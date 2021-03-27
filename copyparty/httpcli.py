@@ -1104,7 +1104,7 @@ class HttpCli(object):
 
         fgen = vn.zipgen(rem, items, self.uname, dots, not self.args.no_scandir)
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
-        bgen = packer(fgen, utf8="utf" in uarg)
+        bgen = packer(fgen, utf8="utf" in uarg, pre_crc="crc" in uarg)
         bsent = 0
         for buf in bgen.gen():
             if not buf:
