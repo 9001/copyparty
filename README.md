@@ -95,6 +95,7 @@ summary: it works! you can use it! (but technically not even close to beta)
 
 * Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
+* Windows: python 2.7 cannot handle filenames with mojibake
 * probably more, pls let me know
 
 
