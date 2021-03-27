@@ -161,7 +161,9 @@ class HttpCli(object):
             try:
                 # self.log("pebkac at httpcli.run #2: " + repr(ex))
                 self.keepalive = self._check_nonfatal(ex)
-                self.loud_reply("{}: {}".format(str(ex), self.vpath), status=ex.code)
+                self.log("{}\033[0m: {}".format(str(ex), self.vpath), 3)
+                msg = "<pre>{}: {}\r\n".format(str(ex), self.vpath)
+                self.reply(msg.encode("utf-8", "replace"), status=ex.code)
                 return self.keepalive
             except Pebkac:
                 return False
