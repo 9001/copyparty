@@ -21,6 +21,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [status](#status)
 * [bugs](#bugs)
 * [usage](#usage)
+    * [zip downloads](#zip-downloads)
 * [searching](#searching)
     * [search configuration](#search-configuration)
     * [metadata from audio files](#metadata-from-audio-files)
@@ -107,6 +108,21 @@ the browser has the following hotkeys
 * `J/L` prev/next song
 * `I/K` prev/next folder
 * `P` parent folder
+
+
+## zip downloads
+
+| name | url-suffix | description |
+|--|--|--|
+| `tar` | `?tar` | plain gnutar, works great with `curl \| tar -xv` |
+| `zip` | `?zip=utf8` | works everywhere, glitchy filenames on win7 and older |
+| `zip_dos` | `?zip` | traditional cp437 (no unicode) to fix glitchy filenames |
+| `zip_crc` | `?zip=crc` | cp437 with crc32 computed early for truly ancient software |
+
+* hidden files (dotfiles) are excluded unless `-ed`
+  * the up2k.db is always excluded
+* `zip_crc` will take longer to download since the server has to read each file twice
+  * please let me know if you find a program old enough to actually need this
 
 
 # searching
