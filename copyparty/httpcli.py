@@ -1090,15 +1090,17 @@ class HttpCli(object):
         )
 
         bascii = unicode(string.ascii_letters + string.digits).encode("utf-8")
-        chcon = ord if PY2 else int
-        ufn = b"".join(
-            [
+        ufn = fn.encode("utf-8", "xmlcharrefreplace")
+        if PY2:
+            ufn = [unicode(x) if x in bascii else "%{:02x}".format(ord(x)) for x in ufn]
+        else:
+            ufn = [
                 chr(x).encode("utf-8")
                 if x in bascii
-                else "%{:02x}".format(chcon(x)).encode("ascii")
-                for x in fn.encode("utf-8", "xmlcharrefreplace")
+                else "%{:02x}".format(x).encode("ascii")
+                for x in ufn
             ]
-        ).decode("ascii")
+        ufn = b"".join(ufn).decode("ascii")
 
         cdis = "attachment; filename=\"{}.{}\"; filename*=UTF-8''{}.{}"
         cdis = cdis.format(afn, fmt, ufn, fmt)

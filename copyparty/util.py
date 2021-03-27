@@ -576,11 +576,12 @@ def undot(path):
     return "/".join(ret)
 
 
-def sanitize_fn(fn):
-    fn = fn.replace("\\", "/").split("/")[-1]
+def sanitize_fn(fn, ok=""):
+    if "/" not in ok:
+        fn = fn.replace("\\", "/").split("/")[-1]
 
     if WINDOWS:
-        for bad, good in [
+        for bad, good in [x for x in [
             ["<", "＜"],
             [">", "＞"],
             [":", "："],
@@ -590,7 +591,7 @@ def sanitize_fn(fn):
             ["|", "｜"],
             ["?", "？"],
             ["*", "＊"],
-        ]:
+        ] if x[0] not in ok]:
             fn = fn.replace(bad, good)
 
         bad = ["con", "prn", "aux", "nul"]
