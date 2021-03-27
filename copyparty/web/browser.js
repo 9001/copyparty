@@ -1091,6 +1091,9 @@ var treectl = (function () {
 		try {
 			for (var a = sopts.length - 1; a >= 0; a--) {
 				var name = sopts[a][0], rev = sopts[a][1], typ = sopts[a][2];
+				if (!name)
+					continue;
+
 				if (name.indexOf('tags/') == -1) {
 					nodes.sort(function (v1, v2) {
 						if (!v1[name]) return -1 * rev;
@@ -1305,7 +1308,7 @@ function find_file_col(txt) {
 function mk_files_header(taglist) {
 	var html = [
 		'<thead>',
-		'<th></th>',
+		'<th name="lead"><span>c</span></th>',
 		'<th name="href"><span>File Name</span></th>',
 		'<th name="sz" sort="int"><span>Size</span></th>'
 	];
