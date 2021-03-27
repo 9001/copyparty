@@ -170,6 +170,7 @@ class VFS(object):
                 files = [x for x in files if x[0] in flt]
                 rd = [x for x in rd if x[0] in flt]
                 vd = {x: y for x, y in vd.items() if x in flt}
+                flt = None
 
             # print(repr([vpath, apath, [x[0] for x in files]]))
             fnames = [n[0] for n in files]

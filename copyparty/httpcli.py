@@ -417,7 +417,8 @@ class HttpCli(object):
             raise Pebkac(422, "need files list")
 
         items = items.replace("\r", "").split("\n")
-        items = [x for x in items if items]
+        items = [unquotep(x) for x in items if items]
+
         return self.tx_zip(k, v, vn, rem, items, self.args.ed)
 
     def handle_post_json(self):

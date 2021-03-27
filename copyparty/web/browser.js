@@ -1149,7 +1149,7 @@ var treectl = (function () {
 
 		filecols.set_style();
 		mukey.render();
-		arcfmt.render();
+		msel.render();
 		reload_tree();
 		reload_browser();
 	}
@@ -1631,7 +1631,7 @@ var msel = (function () {
 		var names = [];
 		var links = document.querySelectorAll('#files tbody tr.sel td:nth-child(2) a');
 		for (var a = 0, aa = links.length; a < aa; a++)
-			names.push(links[a].getAttribute('href'));
+			names.push(links[a].getAttribute('href').split('/').slice(-1));
 
 		return names;
 	}
@@ -1645,18 +1645,18 @@ var msel = (function () {
 		tr.classList.toggle('sel');
 		selui();
 	}
-	var trs = document.querySelectorAll('#files tbody tr');
-	ebi('selall').onclick = function (e) {
+	function evsel(e, fun) {
 		ev(e);
+		var trs = document.querySelectorAll('#files tbody tr');
 		for (var a = 0, aa = trs.length; a < aa; a++)
-			trs[a].classList.add('sel');
+			trs[a].classList[fun]('sel');
 		selui();
+	}
+	ebi('selall').onclick = function (e) {
+		evsel(e, "add");
 	};
 	ebi('selinv').onclick = function (e) {
-		ev(e);
-		for (var a = 0, aa = trs.length; a < aa; a++)
-			trs[a].classList.toggle('sel');
-		selui();
+		evsel(e, "toggle");
 	};
 	ebi('selzip').onclick = function (e) {
 		ev(e);
@@ -1682,10 +1682,16 @@ var msel = (function () {
 		console.log(txt);
 		frm.submit();
 	};
-	var tds = document.querySelectorAll('#files tbody td+td+td');
-	for (var a = 0, aa = tds.length; a < aa; a++) {
-		tds[a].onclick = seltgl;
+	function render() {
+		var tds = document.querySelectorAll('#files tbody td+td+td');
+		for (var a = 0, aa = tds.length; a < aa; a++) {
+			tds[a].onclick = seltgl;
+		}
+		arcfmt.render();
 	}
+	return {
+		"render": render
+	};
 })();
 
 
@@ -1741,4 +1747,4 @@ function reload_browser(not_mp) {
 }
 reload_browser(true);
 mukey.render();
-arcfmt.render();
+msel.render();
