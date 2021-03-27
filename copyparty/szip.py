@@ -94,9 +94,13 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     ret += struct.pack("<HH", len(bfn), z64_len)
 
     if h_pos is not None:
-        # 2b comment, 2b diskno, 2b internal.attr,
-        # 4b external.attr (infozip-linux: 0000(a481|ff81)) idk
-        ret += b"\x00" * 10
+        # 2b comment, 2b diskno
+        ret += b"\x00" * 4
+
+        # 2b internal.attr, 4b external.attr
+        # infozip-macos: 0100 0000 a481 file:644
+        # infozip-macos: 0100 0100 0080 file:000
+        ret += b"\x01\x00\x00\x00\xa4\x81"
 
         # 4b local-header-ofs
         ret += struct.pack("<L", min(h_pos, 0xFFFFFFFF))
