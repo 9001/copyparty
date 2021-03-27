@@ -161,8 +161,8 @@ class HttpCli(object):
             try:
                 # self.log("pebkac at httpcli.run #2: " + repr(ex))
                 self.keepalive = self._check_nonfatal(ex)
-                self.log("{}\033[0m: {}".format(str(ex), self.vpath), 3)
-                msg = "<pre>{}: {}\r\n".format(str(ex), self.vpath)
+                self.log("{}\033[0m, {}".format(str(ex), self.vpath), 3)
+                msg = "<pre>{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
                 self.reply(msg.encode("utf-8", "replace"), status=ex.code)
                 return self.keepalive
             except Pebkac:
@@ -397,7 +397,28 @@ class HttpCli(object):
         if act == "tput":
             return self.handle_text_upload()
 
+        if act == "zip":
+            return self.handle_zip_post()
+
         raise Pebkac(422, 'invalid action "{}"'.format(act))
+
+    def handle_zip_post(self):
+        for k in ["zip", "tar"]:
+            v = self.uparam.get(k)
+            if v is not None:
+                break
+
+        if not v:
+            raise Pebkac(422, "need zip or tar keyword")
+
+        vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
+        items = self.parser.require("files", 1024 * 1024)
+        if not items:
+            raise Pebkac(422, "need files list")
+
+        items = items.replace("\r", "").split("\n")
+        items = [x for x in items if items]
+        return self.tx_zip(k, v, vn, rem, items, self.args.ed)
 
     def handle_post_json(self):
         try:

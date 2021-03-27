@@ -87,7 +87,9 @@ class HttpConn(object):
                 err = "need at least 4 bytes in the first packet; got {}".format(
                     len(method)
                 )
-                self.log(err)
+                if method:
+                    self.log(err)
+
                 self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
                 return
 

@@ -161,47 +161,39 @@ class VFS(object):
             for x in vfs.walk(wrel, "", uname, scandir, lstat):
                 yield x
 
-    def zipgen(self, vrem, rems, uname, dots, scandir):
-        vtops = [["", [self, vrem]]]
-        if rems:
-            # list of subfolders to zip was provided,
-            # add all the ones uname is allowed to access
-            vtops = []
-            for rem in rems:
-                try:
-                    d = rem if not vrem else vrem + "/" + rem
-                    vn = self.get(d, uname, True, False)
-                    vtops.append([rem, vn])
-                except:
-                    pass
+    def zipgen(self, vrem, flt, uname, dots, scandir):
+        if flt:
+            flt = {k: True for k in flt}
 
-        for rel, (vn, rem) in vtops:
-            for vpath, apath, files, rd, vd in vn.walk(rel, rem, uname, dots, scandir):
-                # print(repr([vpath, apath, [x[0] for x in files]]))
-                fnames = [n[0] for n in files]
-                vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
-                apaths = [os.path.join(apath, n) for n in fnames]
-                files = list(zip(vpaths, apaths, files))
+        for vpath, apath, files, rd, vd in self.walk("", vrem, uname, dots, scandir):
+            if flt:
+                files = [x for x in files if x[0] in flt]
+                rd = [x for x in rd if x[0] in flt]
+                vd = {x: y for x, y in vd.items() if x in flt}
 
-                if not dots:
-                    # dotfile filtering based on vpath (intended visibility)
-                    files = [x for x in files if "/." not in "/" + x[0]]
+            # print(repr([vpath, apath, [x[0] for x in files]]))
+            fnames = [n[0] for n in files]
+            vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
+            apaths = [os.path.join(apath, n) for n in fnames]
+            files = list(zip(vpaths, apaths, files))
 
-                    rm = [x for x in rd if x[0].startswith(".")]
-                    for x in rm:
-                        rd.remove(x)
+            if not dots:
+                # dotfile filtering based on vpath (intended visibility)
+                files = [x for x in files if "/." not in "/" + x[0]]
 
-                    rm = [k for k in vd.keys() if k.startswith(".")]
-                    for x in rm:
-                        del vd[x]
+                rm = [x for x in rd if x[0].startswith(".")]
+                for x in rm:
+                    rd.remove(x)
 
-                # up2k filetring based on actual abspath
-                files = [
-                    x for x in files if "{0}.hist{0}up2k.".format(os.sep) not in x[1]
-                ]
+                rm = [k for k in vd.keys() if k.startswith(".")]
+                for x in rm:
+                    del vd[x]
 
-                for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
-                    yield f
+            # up2k filetring based on actual abspath
+            files = [x for x in files if "{0}.hist{0}up2k.".format(os.sep) not in x[1]]
+
+            for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
+                yield f
 
     def user_tree(self, uname, readable=False, writable=False):
         ret = []

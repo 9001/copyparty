@@ -182,6 +182,11 @@ a, #files tbody div a:last-child {
 	color: #840;
 	text-shadow: 0 0 .3em #b80;
 }
+#files tbody tr.sel td {
+	background: #80b;
+	color: #fff;
+	border-color: #a3d;
+}
 #blocked {
 	position: fixed;
 	top: 0;
@@ -267,6 +272,25 @@ a, #files tbody div a:last-child {
 	border-radius: .3em 0 0 0;
 	padding: .2em 0 0 .07em;
 	color: #fff;
+}
+#wtoggle>span {
+	display: none;
+}
+#wtoggle.sel {
+	width: 4.27em;
+}
+#wtoggle.sel>span {
+	display: inline-block;
+	line-height: 0;
+}
+#wtoggle.sel>span a {
+	font-size: .4em;
+	margin: -.3em 0;
+	position: relative;
+	display: inline-block;
+}
+#wtoggle.sel>span #selzip {
+	top: -.6em;
 }
 #barpos,
 #barbuf {

@@ -1595,6 +1595,8 @@ var arcfmt = (function () {
 			o.setAttribute("href", href.slice(0, ofs + 1) + arg);
 			o.textContent = fmt.split('_')[0];
 		}
+		ebi('selzip').textContent = fmt.split('_')[0];
+		ebi('selzip').setAttribute('fmt', arg);
 	}
 
 	function try_render() {
@@ -1621,6 +1623,69 @@ var arcfmt = (function () {
 	return {
 		"render": try_render
 	};
+})();
+
+
+var msel = (function () {
+	function getsel() {
+		var names = [];
+		var links = document.querySelectorAll('#files tbody tr.sel td:nth-child(2) a');
+		for (var a = 0, aa = links.length; a < aa; a++)
+			names.push(links[a].getAttribute('href'));
+
+		return names;
+	}
+	function selui() {
+		var fun = getsel().length ? "add" : "remove";
+		ebi('wtoggle').classList[fun]('sel');
+	}
+	function seltgl(e) {
+		ev(e);
+		var tr = this.parentNode;
+		tr.classList.toggle('sel');
+		selui();
+	}
+	var trs = document.querySelectorAll('#files tbody tr');
+	ebi('selall').onclick = function (e) {
+		ev(e);
+		for (var a = 0, aa = trs.length; a < aa; a++)
+			trs[a].classList.add('sel');
+		selui();
+	};
+	ebi('selinv').onclick = function (e) {
+		ev(e);
+		for (var a = 0, aa = trs.length; a < aa; a++)
+			trs[a].classList.toggle('sel');
+		selui();
+	};
+	ebi('selzip').onclick = function (e) {
+		ev(e);
+		var names = getsel();
+		var arg = ebi('selzip').getAttribute('fmt');
+		var txt = names.join('\n');
+		var frm = document.createElement('form');
+		frm.setAttribute('action', '?' + arg);
+		frm.setAttribute('method', 'post');
+		frm.setAttribute('target', '_blank');
+		frm.setAttribute('enctype', 'multipart/form-data');
+		frm.innerHTML = '<input name="act" value="zip" />' +
+			'<textarea name="files" id="ziptxt"></textarea>';
+		frm.style.display = 'none';
+
+		var oldform = document.querySelector('#widgeti>form');
+		if (oldform)
+			oldform.parentNode.removeChild(oldform);
+
+		ebi('widgeti').appendChild(frm);
+		var obj = ebi('ziptxt');
+		obj.value = txt;
+		console.log(txt);
+		frm.submit();
+	};
+	var tds = document.querySelectorAll('#files tbody td+td+td');
+	for (var a = 0, aa = tds.length; a < aa; a++) {
+		tds[a].onclick = seltgl;
+	}
 })();
 
 
