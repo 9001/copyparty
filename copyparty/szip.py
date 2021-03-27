@@ -1,8 +1,10 @@
+import os
 import time
 import zlib
 import struct
 from datetime import datetime
 
+from .sutil import errdesc
 from .util import yieldfile, sanitize_fn
 
 
@@ -187,43 +189,61 @@ class StreamZip(object):
         self.pos += len(buf)
         return buf
 
-    def gen(self):
-        for f in self.fgen:
-            name = f["vp"]
-            src = f["ap"]
-            st = f["st"]
+    def ser(self, f):
+        name = f["vp"]
+        src = f["ap"]
+        st = f["st"]
 
-            sz = st.st_size
-            ts = st.st_mtime + 1
+        sz = st.st_size
+        ts = st.st_mtime + 1
 
-            crc = None
-            if self.pre_crc:
-                crc = 0
-                for buf in yieldfile(src):
-                    crc = zlib.crc32(buf, crc)
-
-                crc &= 0xFFFFFFFF
-
-            h_pos = self.pos
-            buf = gen_hdr(None, name, sz, ts, self.utf8, crc, self.pre_crc)
-            yield self._ct(buf)
-
-            crc = crc or 0
+        crc = None
+        if self.pre_crc:
+            crc = 0
             for buf in yieldfile(src):
-                if not self.pre_crc:
-                    crc = zlib.crc32(buf, crc)
-
-                yield self._ct(buf)
+                crc = zlib.crc32(buf, crc)
 
             crc &= 0xFFFFFFFF
 
-            self.items.append([name, sz, ts, crc, h_pos])
+        h_pos = self.pos
+        buf = gen_hdr(None, name, sz, ts, self.utf8, crc, self.pre_crc)
+        yield self._ct(buf)
 
-            z64 = sz >= 4 * 1024 * 1024 * 1024
+        crc = crc or 0
+        for buf in yieldfile(src):
+            if not self.pre_crc:
+                crc = zlib.crc32(buf, crc)
 
-            if z64 or not self.pre_crc:
-                buf = gen_fdesc(sz, crc, z64)
-                yield self._ct(buf)
+            yield self._ct(buf)
+
+        crc &= 0xFFFFFFFF
+
+        self.items.append([name, sz, ts, crc, h_pos])
+
+        z64 = sz >= 4 * 1024 * 1024 * 1024
+
+        if z64 or not self.pre_crc:
+            buf = gen_fdesc(sz, crc, z64)
+            yield self._ct(buf)
+
+    def gen(self):
+        errors = []
+        for f in self.fgen:
+            if "err" in f:
+                errors.append([f["vp"], f["err"]])
+                continue
+
+            try:
+                for x in self.ser(f):
+                    yield x
+            except Exception as ex:
+                errors.append([f["vp"], repr(ex)])
+
+        if errors:
+            errf = errdesc(errors)
+            print(repr(errf))
+            for x in self.ser(errf):
+                yield x
 
         cdir_pos = self.pos
         for name, sz, ts, crc, h_pos in self.items:
@@ -242,3 +262,6 @@ class StreamZip(object):
 
         ecdr, _ = gen_ecdr(self.items, cdir_pos, cdir_end)
         yield self._ct(ecdr)
+
+        if errors:
+            os.unlink(errf["ap"])

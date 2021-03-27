@@ -1,6 +1,8 @@
+import os
 import tarfile
 import threading
 
+from .sutil import errdesc
 from .util import Queue, fsenc
 
 
@@ -22,6 +24,7 @@ class StreamTar(object):
         self.co = 0
         self.qfile = QFile()
         self.fgen = fgen
+        self.errf = None
 
         # python 3.8 changed to PAX_FORMAT as default,
         # waste of space and don't care about the new features
@@ -42,23 +45,40 @@ class StreamTar(object):
             yield buf
 
         yield None
+        if self.errf:
+            os.unlink(self.errf["ap"])
+
+    def ser(self, f):
+        name = f["vp"]
+        src = f["ap"]
+        fsi = f["st"]
+
+        inf = tarfile.TarInfo(name=name)
+        inf.mode = fsi.st_mode
+        inf.size = fsi.st_size
+        inf.mtime = fsi.st_mtime
+        inf.uid = 0
+        inf.gid = 0
+
+        self.ci += inf.size
+        with open(fsenc(src), "rb", 512 * 1024) as f:
+            self.tar.addfile(inf, f)
 
     def _gen(self):
+        errors = []
         for f in self.fgen:
-            name = f["vp"]
-            src = f["ap"]
-            fsi = f["st"]
+            if "err" in f:
+                errors.append([f["vp"], f["err"]])
+                continue
 
-            inf = tarfile.TarInfo(name=name)
-            inf.mode = fsi.st_mode
-            inf.size = fsi.st_size
-            inf.mtime = fsi.st_mtime
-            inf.uid = 0
-            inf.gid = 0
+            try:
+                self.ser(f)
+            except Exception as ex:
+                errors.append([f["vp"], repr(ex)])
 
-            self.ci += inf.size
-            with open(fsenc(src), "rb", 512 * 1024) as f:
-                self.tar.addfile(inf, f)
+        if errors:
+            self.errf = errdesc(errors)
+            self.ser(self.errf)
 
         self.tar.close()
         self.qfile.q.put(None)
