@@ -408,7 +408,7 @@ class HttpCli(object):
             if v is not None:
                 break
 
-        if not v:
+        if v is None:
             raise Pebkac(422, "need zip or tar keyword")
 
         vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
