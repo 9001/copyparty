@@ -196,7 +196,7 @@ class StreamZip(object):
             sz = st.st_size
             ts = st.st_mtime + 1
 
-            crc = 0
+            crc = None
             if self.pre_crc:
                 crc = 0
                 for buf in yieldfile(src):
@@ -205,9 +205,10 @@ class StreamZip(object):
                 crc &= 0xFFFFFFFF
 
             h_pos = self.pos
-            buf = gen_hdr(None, name, sz, ts, self.utf8, None, self.pre_crc)
+            buf = gen_hdr(None, name, sz, ts, self.utf8, crc, self.pre_crc)
             yield self._ct(buf)
 
+            crc = crc or 0
             for buf in yieldfile(src):
                 if not self.pre_crc:
                     crc = zlib.crc32(buf, crc)
