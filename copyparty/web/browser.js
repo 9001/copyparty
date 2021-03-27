@@ -1149,6 +1149,7 @@ var treectl = (function () {
 
 		filecols.set_style();
 		mukey.render();
+		arcfmt.render();
 		reload_tree();
 		reload_browser();
 	}
@@ -1559,6 +1560,70 @@ function addcrc() {
 })();
 
 
+var arcfmt = (function () {
+	if (!ebi('arc_fmt'))
+		return { "render": function () { } };
+
+	var html = [],
+		arcfmts = ["tar", "zip", "zip_dos", "zip_crc"],
+		arcv = ["tar", "zip=utf8", "zip", "zip=crc"];
+
+	for (var a = 0; a < arcfmts.length; a++) {
+		var k = arcfmts[a];
+		html.push(
+			'<span><input type="radio" name="arcfmt" value="' + k + '" id="arcfmt_' + k + '">' +
+			'<label for="arcfmt_' + k + '">' + k + '</label></span>');
+	}
+	ebi('arc_fmt').innerHTML = html.join('\n');
+
+	var fmt = sread("arc_fmt") || "zip";
+	ebi('arcfmt_' + fmt).checked = true;
+
+	function render() {
+		var arg = arcv[arcfmts.indexOf(fmt)],
+			tds = document.querySelectorAll('#files tbody td:first-child a');
+
+		for (var a = 0, aa = tds.length; a < aa; a++) {
+			var o = tds[a], txt = o.textContent, href = o.getAttribute('href');
+			if (txt != 'tar' && txt != 'zip')
+				continue;
+
+			var ofs = href.lastIndexOf('?');
+			if (ofs < 0)
+				throw 'missing arg in url';
+
+			o.setAttribute("href", href.slice(0, ofs + 1) + arg);
+			o.textContent = fmt.split('_')[0];
+		}
+	}
+
+	function try_render() {
+		try {
+			render();
+		}
+		catch (ex) {
+			console.log("arcfmt failed: " + ex);
+		}
+	}
+
+	function change_fmt(e) {
+		ev(e);
+		fmt = this.getAttribute('value');
+		swrite("arc_fmt", fmt);
+		try_render();
+	}
+
+	var o = document.querySelectorAll('#arc_fmt input');
+	for (var a = 0; a < o.length; a++) {
+		o[a].onchange = change_fmt;
+	}
+
+	return {
+		"render": try_render
+	};
+})();
+
+
 function ev_row_tgl(e) {
 	ev(e);
 	filecols.toggle(this.parentElement.parentElement.getElementsByTagName('span')[0].textContent);
@@ -1611,3 +1676,4 @@ function reload_browser(not_mp) {
 }
 reload_browser(true);
 mukey.render();
+arcfmt.render();

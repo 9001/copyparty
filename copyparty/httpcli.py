@@ -1473,6 +1473,7 @@ class HttpCli(object):
             ),
             have_up2k_idx=("e2d" in vn.flags),
             have_tags_idx=("e2t" in vn.flags),
+            have_zip=(not self.args.no_zip),
             logues=logues,
             title=html_escape(self.vpath),
             srv_info=srv_info,
