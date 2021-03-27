@@ -1,6 +1,7 @@
 import os
 import time
 import tempfile
+from datetime import datetime
 
 
 def errdesc(errors):
@@ -13,9 +14,12 @@ def errdesc(errors):
         tf_path = tf.name
         tf.write("\r\n".join(report).encode("utf-8", "replace"))
 
+    dt = datetime.utcfromtimestamp(time.time())
+    dt = dt.strftime("%Y-%m%d-%H%M%S")
+
     os.chmod(tf_path, 0o444)
     return {
-        "vp": "archive-errors-{}.txt".format(int(time.time())),
+        "vp": "archive-errors-{}.txt".format(dt),
         "ap": tf_path,
         "st": os.stat(tf_path),
     }
