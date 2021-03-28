@@ -11,9 +11,20 @@ class QFile(object):
 
     def __init__(self):
         self.q = Queue(64)
+        self.bq = []
+        self.nq = 0
 
     def write(self, buf):
-        self.q.put(buf)
+        if buf is None or self.nq >= 240 * 1024:
+            self.q.put(b"".join(self.bq))
+            self.bq = []
+            self.nq = 0
+
+        if buf is None:
+            self.q.put(None)
+        else:
+            self.bq.append(buf)
+            self.nq += len(buf)
 
 
 class StreamTar(object):
@@ -38,7 +49,7 @@ class StreamTar(object):
     def gen(self):
         while True:
             buf = self.qfile.q.get()
-            if buf is None:
+            if not buf:
                 break
 
             self.co += len(buf)
@@ -81,4 +92,4 @@ class StreamTar(object):
             self.ser(self.errf)
 
         self.tar.close()
-        self.qfile.q.put(None)
+        self.qfile.write(None)

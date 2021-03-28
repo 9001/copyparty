@@ -177,10 +177,13 @@ def sighandler(signal=None, frame=None):
     print("\n".join(msg))
 
 
-def main():
+def main(argv=None):
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
         os.system("rem")  # enables colors
+
+    if argv is None:
+        argv = sys.argv
 
     desc = py_desc().replace("[", "\033[1;30m[")
 
@@ -194,13 +197,13 @@ def main():
     deprecated = [["-e2s", "-e2ds"]]
     for dk, nk in deprecated:
         try:
-            idx = sys.argv.index(dk)
+            idx = argv.index(dk)
         except:
             continue
 
         msg = "\033[1;31mWARNING:\033[0;1m\n  {} \033[0;33mwas replaced with\033[0;1m {} \033[0;33mand will be removed\n\033[0m"
         print(msg.format(dk, nk))
-        sys.argv[idx] = nk
+        argv[idx] = nk
         time.sleep(2)
 
     ap = argparse.ArgumentParser(
@@ -290,7 +293,7 @@ def main():
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
     
-    al = ap.parse_args()
+    al = ap.parse_args(args=argv[1:])
     # fmt: on
 
     # propagate implications
