@@ -51,7 +51,7 @@ class BrokerMp(object):
             self.procs.append(proc)
             proc.start()
 
-        if True:
+        if not self.args.q:
             thr = threading.Thread(target=self.debug_load_balancer)
             thr.daemon = True
             thr.start()
