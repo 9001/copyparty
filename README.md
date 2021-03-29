@@ -97,6 +97,7 @@ summary: it works! you can use it! (but technically not even close to beta)
 * Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * Windows: python 2.7 cannot handle filenames with mojibake
+* hiding the contents at url `/d1/d2/d3` using `-v :d1/d2/d3:cd2d` has the side-effect of creating databases (for files/tags) inside folders d1 and d2, and those databases take precedence over the main db at the top of the vfs - this means all files in d2 and below will be reindexed unless you already had a vfs entry at or below d2
 * probably more, pls let me know
 
 
