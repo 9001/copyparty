@@ -1094,22 +1094,46 @@ var treectl = (function () {
 				if (!name)
 					continue;
 
-				if (name.indexOf('tags/') == -1) {
-					nodes.sort(function (v1, v2) {
-						if (!v1[name]) return -1 * rev;
-						if (!v2[name]) return 1 * rev;
-						return rev * (typ == 'int' ? (v1[name] - v2[name]) : (v1[name].localeCompare(v2[name])));
-					});
+				if (name.indexOf('tags/') === 0) {
+					name = name.slice(5);
+					for (var b = 0, bb = nodes.length; b < bb; b++)
+						nodes[b]._sv = nodes[b].tags[name];
 				}
 				else {
-					name = name.slice(5);
-					nodes.sort(function (v1, v2) {
-						if (!v1.tags[name]) return -1 * rev;
-						if (!v2.tags[name]) return 1 * rev;
-						return rev * (typ == 'int' ? (v1.tags[name] - v2.tags[name]) : (v1.tags[name].localeCompare(v2.tags[name])));
-					});
+					for (var b = 0, bb = nodes.length; b < bb; b++) {
+						var v = nodes[b][name];
+
+						if ((v + '').indexOf('<a ') === 0)
+							v = v.split('>')[1];
+						else if (name == "href" && v)
+							v = uricom_dec(v)[0]
+
+						nodes[b]._sv = v;
+					}
 				}
+
+				var onodes = nodes.map((x) => x);
+				nodes.sort(function (n1, n2) {
+					var v1 = n1._sv,
+						v2 = n2._sv;
+
+					if (v1 === undefined) {
+						if (v2 === undefined) {
+							return onodes.indexOf(n1) - onodes.indexOf(n2);
+						}
+						return -1 * rev;
+					}
+					if (v2 === undefined) return 1 * rev;
+
+					var ret = rev * (typ == 'int' ? (v1 - v2) : (v1.localeCompare(v2)));
+					if (ret === 0)
+						ret = onodes.indexOf(n1) - onodes.indexOf(n2);
+
+					return ret;
+				});
 			}
+			for (var b = 0, bb = nodes.length; b < bb; b++)
+				delete nodes[b]._sv;
 		}
 		catch (ex) {
 			console.log("failed to apply sort config: " + ex);

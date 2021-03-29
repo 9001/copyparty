@@ -129,6 +129,15 @@ pip install virtualenv
 # readme toc
 cat README.md | awk '!/^#/{next} {lv=length($1);sub(/[^ ]+ /,"");bab=$0;gsub(/ /,"-",bab)} {printf "%" ((lv-1)*4+1) "s [%s](#%s)\n", "*",$0,bab}'
 
+# fix firefox phantom breakpoints,
+# suggestions from bugtracker, doesnt work (debugger is not attachable)
+devtools settings >> advanced >> enable browser chrome debugging + enable remote debugging
+burger > developer >> browser toolbox  (ctrl-alt-shift-i)
+iframe btn topright >> chrome://devtools/content/debugger/index.html
+dbg.asyncStore.pendingBreakpoints = {}
+
+# fix firefox phantom breakpoints
+about:config >> devtools.debugger.prefs-schema-version = -1
 
 ##
 ## http 206
