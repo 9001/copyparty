@@ -1310,6 +1310,7 @@ class Up2k(object):
                     self.log("no cursor to write tags with??", c=1)
                     continue
 
+                # TODO is undef if vol 404 on startup
                 entags = self.entags[ptop]
                 if not entags:
                     self.log("no entags okay.jpg", c=3)

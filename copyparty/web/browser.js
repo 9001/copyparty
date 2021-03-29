@@ -833,7 +833,7 @@ document.onkeydown = function (e) {
 					v = r.tags[k] || "";
 
 				if (k == ".dur") {
-					var sv = s2ms(v);
+					var sv = v ? s2ms(v) : "";
 					nodes[nodes.length - 1] += '</td><td sortv="' + v + '">' + sv;
 					continue;
 				}
@@ -1128,7 +1128,7 @@ var treectl = (function () {
 					v = (r.tags || {})[k] || "";
 
 				if (k == ".dur") {
-					var sv = s2ms(v);
+					var sv = v ? s2ms(v) : "";
 					ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
 					continue;
 				}
@@ -1411,8 +1411,8 @@ var filecols = (function () {
 		if (!min)
 			for (var a = 0, aa = rows.length; a < aa; a++) {
 				var c = rows[a].cells[i];
-				if (c)
-					var v = c.textContent = s2ms(c.textContent);
+				if (c && c.textContent)
+					c.textContent = s2ms(c.textContent);
 			}
 	}
 	catch (ex) { }
@@ -1634,7 +1634,7 @@ var msel = (function () {
 		var names = [];
 		var links = document.querySelectorAll('#files tbody tr.sel td:nth-child(2) a');
 		for (var a = 0, aa = links.length; a < aa; a++)
-			names.push(links[a].getAttribute('href').split('/').slice(-1));
+			names.push(links[a].getAttribute('href').replace(/\/$/, "").split('/').slice(-1));
 
 		return names;
 	}

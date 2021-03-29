@@ -83,6 +83,9 @@ sqlite3 up2k.db 'select mt1.w, mt1.k, mt1.v, mt2.v from mt mt1 inner join mt mt2
 time sqlite3 up2k.db 'select mt1.w from mt mt1 inner join mt mt2 on mt1.w = mt2.w where mt1.k = +mt2.k and mt1.rowid != mt2.rowid'  > warks
 cat warks | while IFS= read -r x; do sqlite3 up2k.db "delete from mt where w = '$x'"; done
 
+# dump all dbs
+find -iname up2k.db | while IFS= read -r x; do sqlite3 "$x" 'select substr(w,1,12), rd, fn from up' | sed -r 's/\|/ \| /g' | while IFS= read -r y; do printf '%s | %s\n' "$x" "$y"; done; done
+
 
 ##
 ## media
