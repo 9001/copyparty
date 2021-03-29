@@ -1086,7 +1086,7 @@ var treectl = (function () {
 
 		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
 		var nodes = res.dirs.concat(res.files),
-			sopts = jread('fsort', []);
+			sopts = jread('fsort', [["lead", -1, ""], ["href", 1, ""]]);
 
 		try {
 			for (var a = sopts.length - 1; a >= 0; a--) {
@@ -1507,8 +1507,11 @@ var mukey = (function () {
 	}
 
 	function render() {
-		var ci = find_file_col('Key'),
-			i = ci[0],
+		var ci = find_file_col('Key');
+		if (!ci)
+			return;
+
+		var i = ci[0],
 			min = ci[1],
 			rows = ebi('files').tBodies[0].rows;
 

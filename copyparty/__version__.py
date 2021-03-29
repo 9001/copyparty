@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 10, 3)
+VERSION = (0, 10, 4)
 CODENAME = "zip it"
 BUILD_DT = (2021, 3, 29)
 
