@@ -161,7 +161,7 @@ find .. -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
 find .. -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
 
 echo use smol web deps
-rm -f copyparty/web/deps/*.full.*
+rm -f copyparty/web/deps/*.full.* copyparty/web/{Makefile,splash.js}
 
 # it's fine dw
 grep -lE '\.full\.(js|css)' copyparty/web/* |
