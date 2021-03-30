@@ -753,7 +753,7 @@ document.onkeydown = function (e) {
 		clearTimeout(search_timeout);
 		var now = new Date().getTime();
 		if (now - search_in_progress > 30 * 1000)
-			search_timeout = setTimeout(do_search, 100);
+			search_timeout = setTimeout(do_search, 200);
 	}
 
 	function do_search() {
@@ -796,6 +796,8 @@ document.onkeydown = function (e) {
 		var res = JSON.parse(this.responseText),
 			tagord = res.tag_order;
 
+		sortfiles(res.hits);
+
 		var ofiles = ebi('files');
 		if (ofiles.getAttribute('ts') > this.ts)
 			return;
@@ -814,7 +816,7 @@ document.onkeydown = function (e) {
 
 		var html = mk_files_header(tagord);
 		html.push('<tbody>');
-		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch">close search results</a></td></tr>');
+		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch">! close search results</a></td></tr>');
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
 				ts = parseInt(r.ts),
@@ -1085,59 +1087,8 @@ var treectl = (function () {
 		}
 
 		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
-		var nodes = res.dirs.concat(res.files),
-			sopts = jread('fsort', [["lead", -1, ""], ["href", 1, ""]]);
-
-		try {
-			for (var a = sopts.length - 1; a >= 0; a--) {
-				var name = sopts[a][0], rev = sopts[a][1], typ = sopts[a][2];
-				if (!name)
-					continue;
-
-				if (name.indexOf('tags/') === 0) {
-					name = name.slice(5);
-					for (var b = 0, bb = nodes.length; b < bb; b++)
-						nodes[b]._sv = nodes[b].tags[name];
-				}
-				else {
-					for (var b = 0, bb = nodes.length; b < bb; b++) {
-						var v = nodes[b][name];
-
-						if ((v + '').indexOf('<a ') === 0)
-							v = v.split('>')[1];
-						else if (name == "href" && v)
-							v = uricom_dec(v)[0]
-
-						nodes[b]._sv = v;
-					}
-				}
-
-				var onodes = nodes.map((x) => x);
-				nodes.sort(function (n1, n2) {
-					var v1 = n1._sv,
-						v2 = n2._sv;
-
-					if (v1 === undefined) {
-						if (v2 === undefined) {
-							return onodes.indexOf(n1) - onodes.indexOf(n2);
-						}
-						return -1 * rev;
-					}
-					if (v2 === undefined) return 1 * rev;
-
-					var ret = rev * (typ == 'int' ? (v1 - v2) : (v1.localeCompare(v2)));
-					if (ret === 0)
-						ret = onodes.indexOf(n1) - onodes.indexOf(n2);
-
-					return ret;
-				});
-			}
-			for (var b = 0, bb = nodes.length; b < bb; b++)
-				delete nodes[b]._sv;
-		}
-		catch (ex) {
-			console.log("failed to apply sort config: " + ex);
-		}
+		var nodes = res.dirs.concat(res.files);
+		nodes = sortfiles(nodes);
 
 		var top = this.top;
 		var html = mk_files_header(res.taglist);
@@ -1560,7 +1511,10 @@ var mukey = (function () {
 
 
 function addcrc() {
-	var links = document.querySelectorAll('#files>tbody>tr>td:nth-child(2)>a');
+	var links = document.querySelectorAll(
+		'#files>tbody>tr>td:nth-child(2)>' + (
+			ebi('unsearch') ? 'div>a:last-child' : 'a'));
+
 	for (var a = 0, aa = links.length; a < aa; a++)
 		if (!links[a].getAttribute('id'))
 			links[a].setAttribute('id', 'f-' + crc32(links[a].textContent));
