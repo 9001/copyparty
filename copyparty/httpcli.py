@@ -321,8 +321,19 @@ class HttpCli(object):
             elif "print" in opt:
                 reader, _ = self.get_body_reader()
                 for buf in reader:
-                    buf = buf.decode("utf-8", "replace")
-                    self.log("urlform @ {}\n  {}\n".format(self.vpath, buf))
+                    orig = buf.decode("utf-8", "replace")
+                    m = "urlform_raw {} @ {}\n  {}\n"
+                    self.log(m.format(len(orig), self.vpath, orig))
+                    try:
+                        plain = unquote(buf.replace(b"+", b" "))
+                        plain = plain.decode("utf-8", "replace")
+                        if buf.startswith(b"msg="):
+                            plain = plain[4:]
+
+                        m = "urlform_dec {} @ {}\n  {}\n"
+                        self.log(m.format(len(plain), self.vpath, plain))
+                    except Exception as ex:
+                        self.log(repr(ex))
 
             if "get" in opt:
                 return self.handle_get()

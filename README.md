@@ -306,7 +306,6 @@ roughly sorted by priority
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
-* drop onto folders
 * `os.copy_file_range` for up2k cloning
 * up2k partials ui
 * support pillow-simd
