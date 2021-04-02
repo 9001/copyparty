@@ -870,6 +870,7 @@ document.onkeydown = function (e) {
 		oldcfg = [];
 		ebi('files').innerHTML = orig_html;
 		orig_html = null;
+		msel.render();
 		reload_browser();
 	}
 })();
