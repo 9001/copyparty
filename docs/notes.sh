@@ -74,6 +74,13 @@ command -v gdate && date() { gdate "$@"; }; while true; do t=$(date +%s.%N); (ti
 
 
 ##
+## js oneliners
+
+# get all up2k search result URLs
+var t=[]; var b=document.location.href.split('#')[0].slice(0, -1); document.querySelectorAll('#u2tab .prog a').forEach((x) => {t.push(b+encodeURI(x.getAttribute("href")))}); console.log(t.join("\n"));
+
+
+##
 ## sqlite3 stuff
 
 # find dupe metadata keys
@@ -138,6 +145,7 @@ dbg.asyncStore.pendingBreakpoints = {}
 
 # fix firefox phantom breakpoints
 about:config >> devtools.debugger.prefs-schema-version = -1
+
 
 ##
 ## http 206

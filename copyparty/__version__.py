@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (0, 10, 6)
+VERSION = (0, 10, 7)
 CODENAME = "zip it"
-BUILD_DT = (2021, 4, 2)
+BUILD_DT = (2021, 4, 3)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

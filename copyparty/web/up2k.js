@@ -524,7 +524,7 @@ function up2k_init(have_crypto) {
 
                 if (st.todo.handshake.length > 0 &&
                     st.busy.handshake.length == 0 && (
-                        st.todo.handshake[0].t3 || (
+                        st.todo.handshake[0].t4 || (
                             handshakes_permitted() &&
                             st.busy.upload.length < parallel_uploads
                         )
@@ -868,27 +868,32 @@ function up2k_init(have_crypto) {
                     t.done = true;
                     st.bytes.uploaded += t.size - t.bytes_uploaded;
                     var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
-                    var spd2 = (t.size / ((t.t3 - t.t2) / 1000.)) / (1024 * 1024.);
+                    var spd2 = (t.size / ((t.t4 - t.t3) / 1000.)) / (1024 * 1024.);
                     ebi('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2));
                 }
-                else t.t3 = undefined;
+                else t.t4 = undefined;
 
                 tasker();
             }
             else {
-                var err = "";
-                var rsp = (xhr.responseText + '');
+                var err = "",
+                    rsp = (xhr.responseText + ''),
+                    ofs = rsp.lastIndexOf('\nURL: ');
+
+                if (ofs !== -1)
+                    rsp = rsp.slice(0, ofs);
+
+                if (rsp.indexOf('<pre>') === 0)
+                    rsp = rsp.slice(5);
+
+                st.bytes.uploaded += t.size;
                 if (rsp.indexOf('partial upload exists') !== -1 ||
                     rsp.indexOf('file already exists') !== -1) {
                     err = rsp;
-                    var ofs = err.lastIndexOf(' : ');
-                    if (ofs > 0)
-                        err = err.slice(0, ofs);
-
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
-                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2, -1)).join(' ');
+                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2)).join(' ');
                     }
                 }
                 if (err != "") {
@@ -961,7 +966,7 @@ function up2k_init(have_crypto) {
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
-                        t.t3 = new Date().getTime();
+                        t.t4 = new Date().getTime();
                         ebi('f{0}t'.format(t.n)).innerHTML = 'verifying';
                         st.todo.handshake.unshift(t);
                     }
@@ -984,6 +989,9 @@ function up2k_init(have_crypto) {
 
             xhr.responseType = 'text';
             xhr.send(e.target.result);
+
+            if (!t.t3)
+                t.t3 = new Date().getTime();
         };
 
         reader.readAsArrayBuffer(bobslice.call(t.fobj, car, cdr));
