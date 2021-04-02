@@ -27,6 +27,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [metadata from audio files](#metadata-from-audio-files)
     * [file parser plugins](#file-parser-plugins)
     * [complete examples](#complete-examples)
+* [browser support](#browser-support)
 * [client examples](#client-examples)
 * [dependencies](#dependencies)
     * [optional gpl stuff](#optional-gpl-stuff)
@@ -199,15 +200,18 @@ copyparty can invoke external programs to collect additional metadata for files 
 # browser support
 
 | feature         | ie6 | ie9 | ie10 | ie11 | ff 52+ | chr 49+ |
-| --------------- | --- | --- | ---- | ---- | ------ | ------- | 
-| browse files    | yep | yep | yep  | yep  | yep    | yep     | 
+| --------------- | --- | --- | ---- | ---- | ------ | ------- |
+| browse files    | yep | yep | yep  | yep  | yep    | yep     |
 | basic uploader  | yep | yep | yep  | yep  | yep    | yep     |
-| zip selection   |  -  | yep | yep  | yep  | yep    | yep     | 
+| make directory  | yep | yep | yep  | yep  | yep    | yep     |
+| send message    | yep | yep | yep  | yep  | yep    | yep     |
+| set sort order  |  -  | yep | yep  | yep  | yep    | yep     |
+| zip selection   |  -  | yep | yep  | yep  | yep    | yep     |
 | directory tree  |  -  |  -  | `*1` | yep  | yep    | yep     |
 | up2k            |  -  |  -  | yep  | yep  | yep    | yep     |
 | icons work      |  -  |  -  | yep  | yep  | yep    | yep     |
-| markdown editor |  -  |  -  | yep  | yep  | yep    | yep     |  
-| markdown viewer |  -  |  -  | yep  | yep  | yep    | yep     | 
+| markdown editor |  -  |  -  | yep  | yep  | yep    | yep     |
+| markdown viewer |  -  |  -  | yep  | yep  | yep    | yep     |
 | play mp3/mp4    |  -  | yep | yep  | yep  | yep    | yep     |
 | play ogg/opus   |  -  |  -  |  -   |  -   | yep    | yep     |
 
