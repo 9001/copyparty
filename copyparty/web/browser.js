@@ -500,7 +500,7 @@ function play(tid, call_depth) {
 	setclass(oid, 'play act');
 	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 	for (var a = 0, aa = trs.length; a < aa; a++) {
-		trs[a].className = trs[a].className.replace(/ *play */, "");
+		clmod(trs[a], 'play');
 	}
 	ebi(oid).parentElement.parentElement.className += ' play';
 
@@ -649,10 +649,10 @@ function tree_up() {
 
 
 document.onkeydown = function (e) {
-	if (document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
+	if (!document.activeElement || document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
 		return;
 
-	var k = e.code, pos = -1;
+	var k = (e.code + ''), pos = -1;
 	if (k.indexOf('Digit') === 0)
 		pos = parseInt(k.slice(-1)) * 0.1;
 
@@ -772,6 +772,7 @@ document.onkeydown = function (e) {
 		// ebi('srch_q').textContent = JSON.stringify(params, null, 4);
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', '/?srch', true);
+		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onreadystatechange = xhr_search_results;
 		xhr.ts = new Date().getTime();
 		xhr.send(JSON.stringify(params));
@@ -997,8 +998,6 @@ var treectl = (function () {
 					var o = links[a].parentNode;
 					if (!o.getElementsByTagName('li').length)
 						o.innerHTML = html;
-					//else
-					//	links[a].previousSibling.textContent = '-';
 				}
 			}
 		}
@@ -1282,7 +1281,7 @@ function find_file_col(txt) {
 
 function mk_files_header(taglist) {
 	var html = [
-		'<thead>',
+		'<thead><tr>',
 		'<th name="lead"><span>c</span></th>',
 		'<th name="href"><span>File Name</span></th>',
 		'<th name="sz" sort="int"><span>Size</span></th>'
@@ -1301,7 +1300,7 @@ function mk_files_header(taglist) {
 	html = html.concat([
 		'<th name="ext"><span>T</span></th>',
 		'<th name="ts"><span>Date</span></th>',
-		'</thead>',
+		'</tr></thead>',
 	]);
 	return html;
 }
@@ -1335,13 +1334,13 @@ var filecols = (function () {
 				continue;
 
 			var name = span[0].textContent,
-				cls = '';
+				cls = false;
 
 			if (has(hidden, name)) {
 				ohidden.push(a);
-				cls = ' min';
+				cls = true;
 			}
-			ths[a].className = ths[a].className.replace(/ *min */, " ") + cls;
+			clmod(ths[a], 'min', cls)
 		}
 		for (var a = 0; a < ncols; a++) {
 			var cls = has(ohidden, a) ? 'min' : '';
@@ -1512,12 +1511,12 @@ var mukey = (function () {
 
 function addcrc() {
 	var links = document.querySelectorAll(
-		'#files>tbody>tr>td:nth-child(2)>' + (
+		'#files>tbody>tr>td:first-child+td>' + (
 			ebi('unsearch') ? 'div>a:last-child' : 'a'));
 
 	for (var a = 0, aa = links.length; a < aa; a++)
 		if (!links[a].getAttribute('id'))
-			links[a].setAttribute('id', 'f-' + crc32(links[a].textContent));
+			links[a].setAttribute('id', 'f-' + crc32(links[a].textContent || links[a].innerText));
 }
 
 
@@ -1620,27 +1619,26 @@ var msel = (function () {
 		return names;
 	}
 	function selui() {
-		var fun = getsel().length ? "add" : "remove";
-		ebi('wtoggle').classList[fun]('sel');
+		clmod(ebi('wtoggle'), 'sel', getsel().length);
 	}
 	function seltgl(e) {
 		ev(e);
 		var tr = this.parentNode;
-		tr.classList.toggle('sel');
+		clmod(tr, 'sel', 't');
 		selui();
 	}
 	function evsel(e, fun) {
 		ev(e);
 		var trs = document.querySelectorAll('#files tbody tr');
 		for (var a = 0, aa = trs.length; a < aa; a++)
-			trs[a].classList[fun]('sel');
+			clmod(trs[a], 'sel', fun);
 		selui();
 	}
 	ebi('selall').onclick = function (e) {
 		evsel(e, "add");
 	};
 	ebi('selinv').onclick = function (e) {
-		evsel(e, "toggle");
+		evsel(e, "t");
 	};
 	ebi('selzip').onclick = function (e) {
 		ev(e);

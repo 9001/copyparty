@@ -979,7 +979,9 @@ function up2k_init(have_crypto) {
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-            xhr.overrideMimeType('Content-Type', 'application/octet-stream');
+            if (xhr.overrideMimeType)
+                xhr.overrideMimeType('Content-Type', 'application/octet-stream');
+
             xhr.responseType = 'text';
             xhr.send(e.target.result);
         };

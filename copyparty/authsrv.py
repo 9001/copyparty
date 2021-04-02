@@ -168,8 +168,13 @@ class VFS(object):
         for vpath, apath, files, rd, vd in self.walk("", vrem, uname, dots, scandir):
             if flt:
                 files = [x for x in files if x[0] in flt]
-                rd = [x for x in rd if x[0] in flt]
-                vd = {x: y for x, y in vd.items() if x in flt}
+
+                rm = [x for x in rd if x[0] not in flt]
+                [rd.remove(x) for x in rm]
+
+                rm = [x for x in vd.keys() if x not in flt]
+                [vd.pop(x) for x in rm]
+
                 flt = None
 
             # print(repr([vpath, apath, [x[0] for x in files]]))

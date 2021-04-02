@@ -1,5 +1,11 @@
 "use strict";
 
+if (!window['console'])
+    window['console'] = {
+        "log": function (msg) { }
+    };
+
+
 // error handler for mobile devices
 function hcroak(msg) {
     document.body.innerHTML = msg;
@@ -113,6 +119,15 @@ function crc32(str) {
 };
 
 
+function clmod(obj, cls, add) {
+    var re = new RegExp('\\s*\\b' + cls + '\\s*\\b', 'g');
+    if (add == 't')
+        add = !re.test(obj.className);
+
+    obj.className = obj.className.replace(re, ' ') + (add ? ' ' + cls : '');
+}
+
+
 function sortfiles(nodes) {
     var sopts = jread('fsort', [["lead", -1, ""], ["href", 1, ""]]);
 
@@ -149,7 +164,7 @@ function sortfiles(nodes) {
                 }
             }
 
-            var onodes = nodes.map((x) => x);
+            var onodes = nodes.map(function (x) { return x; });
             nodes.sort(function (n1, n2) {
                 var v1 = n1._sv,
                     v2 = n2._sv;
@@ -280,16 +295,16 @@ function opclick(e) {
 function goto(dest) {
     var obj = document.querySelectorAll('.opview.act');
     for (var a = obj.length - 1; a >= 0; a--)
-        obj[a].classList.remove('act');
+        clmod(obj[a], 'act');
 
     obj = document.querySelectorAll('#ops>a');
     for (var a = obj.length - 1; a >= 0; a--)
-        obj[a].classList.remove('act');
+        clmod(obj[a], 'act');
 
     if (dest) {
         var ui = ebi('op_' + dest);
-        ui.classList.add('act');
-        document.querySelector('#ops>a[data-dest=' + dest + ']').classList.add('act');
+        clmod(ui, 'act', true);
+        document.querySelector('#ops>a[data-dest=' + dest + ']').className += " act";
 
         var fn = window['goto_' + dest];
         if (fn)
@@ -476,8 +491,7 @@ function bcfg_upd_ui(name, val) {
     if (o.getAttribute('type') == 'checkbox')
         o.checked = val;
     else if (o) {
-        var fun = val ? 'add' : 'remove';
-        o.classList[fun]('on');
+        clmod(o, 'on', val);
     }
 }
 
