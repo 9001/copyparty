@@ -217,7 +217,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 | play mp3/m4a    |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
 | play ogg/opus   |  -  |  -  |  -   |  -   | yep   | yep  | `*2` | yep |
 
-* internet explorer 6 to 8 (and netscape 4.0) behave the same
+* internet explorer 6 to 8 behave the same
 * firefox 52 and chrome 49 are the last winxp versions
 * `*1` only public folders (login session is dropped) and no history / back-button
 * `*2` using a wasm decoder which can sometimes get stuck and consumes a bit more power
@@ -230,7 +230,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 * w3m (0.5.3/macports) can browse, login, upload at 100kB/s, mkdir/msg
 * netsurf (3.10/arch) is basically ie6 with much better css (javascript has almost no effect)
 * netscape 4.0 and 4.5 can browse (text is yellow on white), upload with `?b=u`
-* SerenityOS `browser` 22d13d8 hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying
+* SerenityOS (22d13d8) hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying
 
 # client examples
 
