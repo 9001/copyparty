@@ -199,23 +199,23 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 # browser support
 
-`ie`internet-explorer, `ff`firefox, `chr`chrome, `iOS`iPhone/iPad, `Andr`Android
+`ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
 
-| feature         | ie6 | ie9 | ie10 | ie11 | ff 52+ | chr 49+ | iOS | Andr |
-| --------------- | --- | --- | ---- | ---- | ------ | ------- | --- | ---- |
-| browse files    | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| basic uploader  | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| make directory  | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| send message    | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| set sort order  |  -  | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| zip selection   |  -  | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| directory tree  |  -  |  -  | `*1` | yep  | yep    | yep     | yep | yep  |
-| up2k            |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
-| icons work      |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
-| markdown editor |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
-| markdown viewer |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
-| play mp3/m4a    |  -  | yep | yep  | yep  | yep    | yep     | yep | yep  |
-| play ogg/opus   |  -  |  -  |  -   |  -   | yep    | yep     | `*2` | yep |
+| feature         | ie6 | ie9 | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| --------------- | --- | --- | ---- | ---- | ----- | ---- | --- | ---- |
+| browse files    | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| basic uploader  | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| make directory  | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| send message    | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| set sort order  |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| zip selection   |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| directory tree  |  -  |  -  | `*1` | yep  | yep   | yep  | yep | yep  |
+| up2k            |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
+| icons work      |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
+| markdown editor |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
+| markdown viewer |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
+| play mp3/m4a    |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
+| play ogg/opus   |  -  |  -  |  -   |  -   | yep   | yep  | `*2` | yep |
 
 * internet explorer 6 to 8 (and netscape 4.0) behave the same
 * firefox 52 and chrome 49 are the last winxp versions
