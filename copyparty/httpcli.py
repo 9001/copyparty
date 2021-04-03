@@ -74,7 +74,7 @@ class HttpCli(object):
                 headerlines.pop(0)
 
             try:
-                self.mode, self.req, _ = headerlines[0].split(" ")
+                self.mode, self.req, self.http_ver = headerlines[0].split(" ")
             except:
                 raise Pebkac(400, "bad headers:\n" + "\n".join(headerlines))
 
@@ -93,29 +93,12 @@ class HttpCli(object):
             self.headers[k.lower()] = v.strip()
 
         v = self.headers.get("connection", "").lower()
-        self.keepalive = not v.startswith("close")
+        self.keepalive = not v.startswith("close") and self.http_ver != "HTTP/1.0"
 
         v = self.headers.get("x-forwarded-for", None)
         if v is not None and self.conn.addr[0] in ["127.0.0.1", "::1"]:
             self.ip = v.split(",")[0]
             self.log_src = self.conn.set_rproxy(self.ip)
-
-        self.uname = "*"
-        if "cookie" in self.headers:
-            cookies = self.headers["cookie"].split(";")
-            for k, v in [x.split("=", 1) for x in cookies]:
-                if k.strip() != "cppwd":
-                    continue
-
-                v = unescape_cookie(v)
-                if v in self.auth.iuser:
-                    self.uname = self.auth.iuser[v]
-
-                break
-
-        if self.uname:
-            self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
-            self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
 
         # split req into vpath + uparam
         uparam = {}
@@ -140,6 +123,22 @@ class HttpCli(object):
         self.uparam = uparam
         self.vpath = unquotep(vpath)
 
+        pwd = None
+        if "cookie" in self.headers:
+            cookies = self.headers["cookie"].split(";")
+            for k, v in [x.split("=", 1) for x in cookies]:
+                if k.strip() != "cppwd":
+                    continue
+
+                pwd = unescape_cookie(v)
+                break
+
+        pwd = uparam.get("pw", pwd)
+        self.uname = self.auth.iuser.get(pwd, "*")
+        if self.uname:
+            self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
+            self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
+
         ua = self.headers.get("user-agent", "")
         if ua.startswith("rclone/"):
             uparam["raw"] = False
@@ -160,7 +159,9 @@ class HttpCli(object):
         except Pebkac as ex:
             try:
                 # self.log("pebkac at httpcli.run #2: " + repr(ex))
-                self.keepalive = self._check_nonfatal(ex)
+                if not self._check_nonfatal(ex):
+                    self.keepalive = False
+
                 self.log("{}\033[0m, {}".format(str(ex), self.vpath), 3)
                 msg = "<pre>{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
                 self.reply(msg.encode("utf-8", "replace"), status=ex.code)
@@ -169,7 +170,7 @@ class HttpCli(object):
                 return False
 
     def send_headers(self, length, status=200, mime=None, headers={}):
-        response = ["HTTP/1.1 {} {}".format(status, HTTPCODE[status])]
+        response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
 
         if length is not None:
             response.append("Content-Length: " + unicode(length))
@@ -1345,6 +1346,18 @@ class HttpCli(object):
             idx = self.conn.get_u2idx()
             icur = idx.get_cur(vn.realpath)
 
+        url_suf = []
+
+        basic = self.uparam.get("b")
+        if basic is not None:
+            url_suf.append("b" if not basic else "b=" + basic)
+
+        pwd = self.uparam.get("pw")
+        if pwd:
+            url_suf.append("pw=" + quotep(pwd))
+
+        url_suf = ("?" + "&".join(url_suf)) if url_suf else ""
+
         dirs = []
         files = []
         for fn in vfs_ls:
@@ -1497,8 +1510,12 @@ class HttpCli(object):
 
         dirs.extend(files)
 
+        tpl = "browser"
+        if "b" in self.uparam:
+            tpl = "browser2"
+
         html = self.j2(
-            "browser",
+            tpl,
             vdir=quotep(self.vpath),
             vpnodes=vpnodes,
             files=dirs,
@@ -1511,6 +1528,8 @@ class HttpCli(object):
             have_up2k_idx=("e2d" in vn.flags),
             have_tags_idx=("e2t" in vn.flags),
             have_zip=(not self.args.no_zip),
+            have_b_u=(self.writable and self.uparam.get("b") == "u"),
+            url_suf=url_suf,
             logues=logues,
             title=html_escape(self.vpath),
             srv_info=srv_info,

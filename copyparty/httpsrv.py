@@ -52,7 +52,7 @@ class HttpSrv(object):
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
         self.j2 = {
             x: env.get_template(x + ".html")
-            for x in ["splash", "browser", "msg", "md", "mde"]
+            for x in ["splash", "browser", "browser2", "msg", "md", "mde"]
         }
 
         cert_path = os.path.join(E.cfg, "cert.pem")

@@ -222,6 +222,13 @@ copyparty can invoke external programs to collect additional metadata for files 
 * `*1` only public folders (login session is dropped) and no history / back-button
 * `*2` using a wasm decoder which can sometimes get stuck and consumes a bit more power
 
+quick summary of more eccentric web-browsers trying to view a directory index:
+* links (2.21/macports) can browse, login, upload/mkdir/msg
+* lynx (2.8.9/macports) can browse, login, upload/mkdir/msg
+* w3m (0.5.3/macports) can browse, login, upload at 100kB/s, mkdir/msg
+* netsurf (3.10/arch) is basically ie6 with much better css (javascript has almost no effect)
+* netscape 4.0 and 4.5 can browse (text is yellow on white), upload with `?b=u`
+* SerenityOS `browser` 22d13d8 hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying
 
 # client examples
 
