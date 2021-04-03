@@ -223,6 +223,8 @@ copyparty can invoke external programs to collect additional metadata for files 
 * `*2` using a wasm decoder which can sometimes get stuck and consumes a bit more power
 
 quick summary of more eccentric web-browsers trying to view a directory index:
+* safari (14.0.3/macos) is chrome with janky wasm, so playing opus can deadlock the javascript engine
+* safari (14.0.1/iOS) same as macos, except it recovers from the deadlocks if you poke it a bit
 * links (2.21/macports) can browse, login, upload/mkdir/msg
 * lynx (2.8.9/macports) can browse, login, upload/mkdir/msg
 * w3m (0.5.3/macports) can browse, login, upload at 100kB/s, mkdir/msg
