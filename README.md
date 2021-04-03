@@ -330,14 +330,20 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
+* separate sqlite table per tag
+* audio fingerprinting
+* readme.md as epilogue
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
 * `os.copy_file_range` for up2k cloning
-* up2k partials ui
 * support pillow-simd
-* cache sha512 chunks on client
-* comment field
-* ~~look into android thumbnail cache file format~~ bad idea
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||
+
+discarded ideas
+
+* up2k partials ui
+* cache sha512 chunks on client
+* comment field
+* look into android thumbnail cache file format
