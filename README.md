@@ -199,25 +199,28 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 # browser support
 
-| feature         | ie6 | ie9 | ie10 | ie11 | ff 52+ | chr 49+ |
-| --------------- | --- | --- | ---- | ---- | ------ | ------- |
-| browse files    | yep | yep | yep  | yep  | yep    | yep     |
-| basic uploader  | yep | yep | yep  | yep  | yep    | yep     |
-| make directory  | yep | yep | yep  | yep  | yep    | yep     |
-| send message    | yep | yep | yep  | yep  | yep    | yep     |
-| set sort order  |  -  | yep | yep  | yep  | yep    | yep     |
-| zip selection   |  -  | yep | yep  | yep  | yep    | yep     |
-| directory tree  |  -  |  -  | `*1` | yep  | yep    | yep     |
-| up2k            |  -  |  -  | yep  | yep  | yep    | yep     |
-| icons work      |  -  |  -  | yep  | yep  | yep    | yep     |
-| markdown editor |  -  |  -  | yep  | yep  | yep    | yep     |
-| markdown viewer |  -  |  -  | yep  | yep  | yep    | yep     |
-| play mp3/mp4    |  -  | yep | yep  | yep  | yep    | yep     |
-| play ogg/opus   |  -  |  -  |  -   |  -   | yep    | yep     |
+`ie`internet-explorer, `ff`firefox, `chr`chrome, `iOS`iPhone/iPad, `Andr`Android
+
+| feature         | ie6 | ie9 | ie10 | ie11 | ff 52+ | chr 49+ | iOS | Andr |
+| --------------- | --- | --- | ---- | ---- | ------ | ------- | --- | ---- |
+| browse files    | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| basic uploader  | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| make directory  | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| send message    | yep | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| set sort order  |  -  | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| zip selection   |  -  | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| directory tree  |  -  |  -  | `*1` | yep  | yep    | yep     | yep | yep  |
+| up2k            |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
+| icons work      |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
+| markdown editor |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
+| markdown viewer |  -  |  -  | yep  | yep  | yep    | yep     | yep | yep  |
+| play mp3/m4a    |  -  | yep | yep  | yep  | yep    | yep     | yep | yep  |
+| play ogg/opus   |  -  |  -  |  -   |  -   | yep    | yep     | `*2` | yep |
 
 * internet explorer 6 to 8 (and netscape 4.0) behave the same
 * firefox 52 and chrome 49 are the last winxp versions
 * `*1` only public folders (login session is dropped) and no history / back-button
+* `*2` using a wasm decoder which can sometimes get stuck and consumes a bit more power
 
 
 # client examples

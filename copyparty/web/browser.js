@@ -75,7 +75,7 @@ makeSortable(ebi('files'), mp.read_order.bind(mp));
 var widget = (function () {
 	var ret = {};
 	var widget = ebi('widget');
-	var wtoggle = ebi('wtoggle');
+	var wtico = ebi('wtico');
 	var touchmode = false;
 	var side_open = false;
 	var was_paused = true;
@@ -113,14 +113,7 @@ var widget = (function () {
 
 		return false;
 	};
-	if (window.Touch) {
-		var touch_handler = function (e) {
-			touchmode = true;
-			return ret.toggle(e);
-		};
-		wtoggle.addEventListener('touchstart', touch_handler, false);
-	}
-	wtoggle.onclick = click_handler;
+	wtico.onclick = click_handler;
 	return ret;
 })();
 

@@ -243,7 +243,7 @@ a, #files tbody div a:last-child {
 	height: 100%;
 	background: #3c3c3c;
 }
-#wtoggle {
+#wtico {
 	cursor: url(/.cpr/dd/1.png), pointer;
 	animation: cursor 500ms infinite;
 }
@@ -273,24 +273,32 @@ a, #files tbody div a:last-child {
 	padding: .2em 0 0 .07em;
 	color: #fff;
 }
-#wtoggle>span {
+#wzip {
 	display: none;
+	margin-right: .3em;
+	padding-right: .3em;
+	border-right: .1em solid #555;
+}
+#wtoggle,
+#wtoggle * {
+	line-height: 1em;
 }
 #wtoggle.sel {
-	width: 4.27em;
+	width: 6em;
 }
-#wtoggle.sel>span {
+#wtoggle.sel #wzip {
 	display: inline-block;
-	line-height: 0;
 }
-#wtoggle.sel>span a {
+#wtoggle.sel #wzip a {
 	font-size: .4em;
-	margin: -.3em 0;
+	padding: 0 .3em;
+	margin: -.3em .2em;
 	position: relative;
 	display: inline-block;
 }
-#wtoggle.sel>span #selzip {
+#wtoggle.sel #wzip #selzip {
 	top: -.6em;
+	padding: .4em .3em;
 }
 #barpos,
 #barbuf {

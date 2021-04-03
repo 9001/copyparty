@@ -6,6 +6,9 @@ if (!window['console'])
     };
 
 
+var clickev = window.Touch ? 'touchstart' : 'click';
+
+
 // error handler for mobile devices
 function hcroak(msg) {
     document.body.innerHTML = msg;
