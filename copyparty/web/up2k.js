@@ -414,7 +414,8 @@ function up2k_init(have_crypto) {
 
             var tr = document.createElement('tr');
             tr.innerHTML = '<td id="f{0}n"></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
-            tr.getElementsByTagName('td')[0].innerHTML = fsearch ? entry.name : linksplit(esc(entry.purl + entry.name)).join(' ');
+            tr.getElementsByTagName('td')[0].innerHTML = fsearch ? esc(entry.name) : linksplit(
+                esc(uricom_dec(entry.purl)[0] + entry.name)).join(' ');
             ebi('u2tab').appendChild(tr);
 
             st.files.push(entry);
@@ -810,7 +811,7 @@ function up2k_init(have_crypto) {
                     else {
                         smsg = 'found';
                         var hit = response.hits[0],
-                            msg = linksplit(hit.rp).join(''),
+                            msg = linksplit(esc(hit.rp)).join(''),
                             tr = unix2iso(hit.ts),
                             tu = unix2iso(t.lmod),
                             diff = parseInt(t.lmod) - parseInt(hit.ts),
