@@ -330,6 +330,7 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
+* audio link with timestamp
 * separate sqlite table per tag
 * audio fingerprinting
 * readme.md as epilogue
