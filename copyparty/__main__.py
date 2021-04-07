@@ -196,6 +196,9 @@ def run_argparse(argv, formatter):
             
             list of cflags:
               "cnodupe" rejects existing files (instead of symlinking them)
+              "ce2d" sets -e2d (all -e2* args can be set using ce2* cflags)
+              "cd2t" disables metadata collection, overrides -e2t*
+              "cd2d" disables all database stuff, overrides -e2*
 
             example:\033[35m
               -a ed:hunter2 -v .::r:aed -v ../inc:dump:w:aed:cnodupe  \033[36m
