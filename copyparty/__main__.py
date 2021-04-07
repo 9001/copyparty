@@ -12,7 +12,6 @@ import re
 import os
 import sys
 import time
-import signal
 import shutil
 import filecmp
 import locale
@@ -54,6 +53,12 @@ class RiceFormatter(argparse.HelpFormatter):
     def _fill_text(self, text, width, indent):
         """same as RawDescriptionHelpFormatter(HelpFormatter)"""
         return "".join(indent + line + "\n" for line in text.splitlines())
+
+
+class Dodge11874(RiceFormatter):
+    def __init__(self, *args, **kwargs):
+        kwargs["width"] = 9003
+        super(Dodge11874, self).__init__(*args, **kwargs)
 
 
 def warn(msg):
@@ -167,7 +172,7 @@ def configure_ssl_ciphers(al):
         sys.exit(0)
 
 
-def sighandler(signal=None, frame=None):
+def sighandler(sig=None, frame=None):
     msg = [""] * 5
     for th in threading.enumerate():
         msg.append(str(th))
@@ -177,37 +182,9 @@ def sighandler(signal=None, frame=None):
     print("\n".join(msg))
 
 
-def main(argv=None):
-    time.strptime("19970815", "%Y%m%d")  # python#7980
-    if WINDOWS:
-        os.system("rem")  # enables colors
-
-    if argv is None:
-        argv = sys.argv
-
-    desc = py_desc().replace("[", "\033[1;30m[")
-
-    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0m\n'
-    print(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
-
-    ensure_locale()
-    if HAVE_SSL:
-        ensure_cert()
-
-    deprecated = [["-e2s", "-e2ds"]]
-    for dk, nk in deprecated:
-        try:
-            idx = argv.index(dk)
-        except:
-            continue
-
-        msg = "\033[1;31mWARNING:\033[0;1m\n  {} \033[0;33mwas replaced with\033[0;1m {} \033[0;33mand will be removed\n\033[0m"
-        print(msg.format(dk, nk))
-        argv[idx] = nk
-        time.sleep(2)
-
+def run_argparse(argv, formatter):
     ap = argparse.ArgumentParser(
-        formatter_class=RiceFormatter,
+        formatter_class=formatter,
         prog="copyparty",
         description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
         epilog=dedent(
@@ -293,8 +270,43 @@ def main(argv=None):
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
     
-    al = ap.parse_args(args=argv[1:])
+    return ap.parse_args(args=argv[1:])
     # fmt: on
+
+
+def main(argv=None):
+    time.strptime("19970815", "%Y%m%d")  # python#7980
+    if WINDOWS:
+        os.system("rem")  # enables colors
+
+    if argv is None:
+        argv = sys.argv
+
+    desc = py_desc().replace("[", "\033[1;30m[")
+
+    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0m\n'
+    print(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
+
+    ensure_locale()
+    if HAVE_SSL:
+        ensure_cert()
+
+    deprecated = [["-e2s", "-e2ds"]]
+    for dk, nk in deprecated:
+        try:
+            idx = argv.index(dk)
+        except:
+            continue
+
+        msg = "\033[1;31mWARNING:\033[0;1m\n  {} \033[0;33mwas replaced with\033[0;1m {} \033[0;33mand will be removed\n\033[0m"
+        print(msg.format(dk, nk))
+        argv[idx] = nk
+        time.sleep(2)
+
+    try:
+        al = run_argparse(argv, RiceFormatter)
+    except AssertionError:
+        al = run_argparse(argv, Dodge11874)
 
     # propagate implications
     for k1, k2 in IMPLICATIONS:
