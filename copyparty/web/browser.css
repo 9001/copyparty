@@ -495,7 +495,7 @@ input[type="checkbox"]:checked+label {
 }
 #tree {
 	display: none;
-	position: fixed;
+	position: absolute;
 	left: 0;
 	bottom: 0;
 	top: 7em;

@@ -872,12 +872,16 @@ document.onkeydown = function (e) {
 var treectl = (function () {
 	var treectl = {
 		"hidden": false
-	};
-	var dyn = bcfg_get('dyntree', true);
-	var treesz = icfg_get('treesz', 16);
+	},
+		entreed = false,
+		fixedpos = false,
+		prev_atop = null,
+		prev_winh = null,
+		dyn = bcfg_get('dyntree', true),
+		treesz = icfg_get('treesz', 16);
+
 	treesz = Math.min(Math.max(treesz, 4), 50);
 	console.log('treesz [' + treesz + ']');
-	var entreed = false;
 
 	function entree(e) {
 		ev(e);
@@ -909,13 +913,47 @@ var treectl = (function () {
 		if (!entreed || treectl.hidden)
 			return;
 
-		var top = ebi('wrap').getBoundingClientRect().top;
-		ebi('tree').style.top = Math.max(0, parseInt(top)) + 'px';
+		var tree = ebi('tree'),
+			wrap = ebi('wrap'),
+			atop = wrap.getBoundingClientRect().top,
+			winh = window.innerHeight;
+
+		if (atop === prev_atop && winh === prev_winh)
+			return;
+
+		prev_atop = atop;
+		prev_winh = winh;
+
+		if (fixedpos && atop >= 0) {
+			tree.style.position = 'absolute';
+			tree.style.bottom = '';
+			fixedpos = false;
+		}
+		else if (!fixedpos && atop < 0) {
+			tree.style.position = 'fixed';
+			tree.style.height = 'auto';
+			fixedpos = true;
+		}
+
+		if (fixedpos) {
+			tree.style.top = Math.max(0, parseInt(atop)) + 'px';
+		}
+		else {
+			var wraph = parseInt(getComputedStyle(ebi('wrap').offsetParent).height),
+				top = Math.max(0, parseInt(wrap.offsetTop)),
+				treeh = winh - atop;
+
+			if (treeh < 10)
+				return;
+
+			tree.style.top = top + 'px';
+			tree.style.height = treeh + 'px';
+		}
 	}
 
 	function periodic() {
 		onscroll();
-		setTimeout(periodic, document.visibilityState ? 200 : 5000);
+		setTimeout(periodic, document.visibilityState ? 100 : 5000);
 	}
 	periodic();
 
