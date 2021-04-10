@@ -941,13 +941,10 @@ var treectl = (function () {
 		else {
 			var wraph = parseInt(getComputedStyle(ebi('wrap').offsetParent).height),
 				top = Math.max(0, parseInt(wrap.offsetTop)),
-				treeh = winh - atop;
-
-			if (treeh < 10)
-				return;
+				treeh = (winh - atop) - 4;
 
 			tree.style.top = top + 'px';
-			tree.style.height = treeh + 'px';
+			tree.style.height = treeh < 10 ? '' : treeh + 'px';
 		}
 	}
 
