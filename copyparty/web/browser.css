@@ -183,9 +183,9 @@ a, #files tbody div a:last-child {
 	text-shadow: 0 0 .3em #b80;
 }
 #files tbody tr.sel td {
-	background: #80b;
 	color: #fff;
-	border-color: #a3d;
+	background: #925;
+	border-color: #c37;
 }
 #blocked {
 	position: fixed;

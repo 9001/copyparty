@@ -2,7 +2,7 @@
 # coding: latin-1
 from __future__ import print_function, unicode_literals
 
-import os, sys, time, shutil, runpy, tarfile, hashlib, platform, tempfile, traceback
+import os, sys, time, shutil, threading, tarfile, hashlib, platform, tempfile, traceback
 
 """
 run me with any version of python, i will unpack and run copyparty
@@ -26,6 +26,7 @@ CKSUM = None
 STAMP = None
 
 PY2 = sys.version_info[0] == 2
+WINDOWS = sys.platform == "win32"
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
 cpp = None
@@ -343,6 +344,21 @@ def get_payload():
                 break
 
 
+def utime(top):
+    i = 0
+    files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
+    while WINDOWS:
+        t = int(time.time())
+        if i:
+            msg("utime {}, {}".format(i, t))
+
+        for f in files:
+            os.utime(f, (t, t))
+
+        i += 1
+        time.sleep(78123)
+
+
 def confirm(rv):
     msg()
     msg(traceback.format_exc())
@@ -362,15 +378,20 @@ def run(tmp, j2ver):
     msg("sfxdir:", tmp)
     msg()
 
-    # "systemd-tmpfiles-clean.timer"?? HOW do you even come up with this shit
+    # block systemd-tmpfiles-clean.timer
     try:
         import fcntl
 
         fd = os.open(tmp, os.O_RDONLY)
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         tmp = os.readlink(tmp)  # can't flock a symlink, even with O_NOFOLLOW
-    except:
-        pass
+    except Exception as ex:
+        if not WINDOWS:
+            msg("\033[31mflock:", repr(ex))
+
+    t = threading.Thread(target=utime, args=(tmp,))
+    t.daemon = True
+    t.start()
 
     ld = [tmp, os.path.join(tmp, "dep-j2")]
     if j2ver:
@@ -380,7 +401,10 @@ def run(tmp, j2ver):
         sys.path.insert(0, x)
 
     try:
-        runpy.run_module(str("copyparty"), run_name=str("__main__"))
+        from copyparty.__main__ import main as copyparty
+
+        copyparty()
+
     except SystemExit as ex:
         if ex.code:
             confirm(ex.code)
