@@ -45,11 +45,13 @@ pybin=$(command -v python3 || command -v python) || {
 	exit 1
 }
 
+use_gz=
 do_sh=1
 do_py=1
 while [ ! -z "$1" ]; do
 	[ "$1" = clean  ] && clean=1  && shift && continue
 	[ "$1" = re     ] && repack=1 && shift && continue
+	[ "$1" = gz     ] && use_gz=1 && shift && continue
 	[ "$1" = no-ogv ] && no_ogv=1 && shift && continue
 	[ "$1" = no-cm  ] && no_cm=1  && shift && continue
 	[ "$1" = no-sh  ] && do_sh=   && shift && continue
@@ -204,16 +206,20 @@ args=(--owner=1000 --group=1000)
 
 tar -cf tar "${args[@]}" --numeric-owner copyparty dep-j2
 
+pc=bzip2
+pe=bz2
+[ $use_gz ] && pc=gzip && pe=gz
+
 echo compressing tar
 # detect best level; bzip2 -7 is usually better than -9
-[ $do_py ] && { for n in {2..9}; do cp tar t.$n; bzip2 -$n t.$n & done; wait; mv -v $(ls -1S t.*.bz2 | tail -n 1) tar.bz2; }
-[ $do_sh ] && { for n in {2..9}; do cp tar t.$n;  xz -ze$n t.$n & done; wait; mv -v $(ls -1S t.*.xz  | tail -n 1) tar.xz; }
+[ $do_py ] && { for n in {2..9}; do cp tar t.$n; $pc  -$n t.$n & done; wait; mv -v $(ls -1S t.*.$pe | tail -n 1) tar.bz2; }
+[ $do_sh ] && { for n in {2..9}; do cp tar t.$n; xz -ze$n t.$n & done; wait; mv -v $(ls -1S t.*.xz  | tail -n 1) tar.xz; }
 rm t.* || true
 exts=()
 
 
 [ $do_sh ] && {
-exts+=(sh)
+exts+=(.sh)
 echo creating unix sfx
 (
 	sed "s/PACK_TS/$ts/; s/PACK_HTS/$hts/; s/CPP_VER/$ver/" <../scripts/sfx.sh |
@@ -224,17 +230,30 @@ echo creating unix sfx
 
 
 [ $do_py ] && {
-exts+=(py)
-echo creating generic sfx
-$pybin ../scripts/sfx.py --sfx-make tar.bz2 $ver $ts
-mv sfx.out $sfx_out.py
-chmod 755 $sfx_out.*
+	echo creating generic sfx
+
+	py=../scripts/sfx.py
+	suf=
+	[ $use_gz ] && {
+		sed -r 's/"r:bz2"/"r:gz"/' <$py >$py.t
+		py=$py.t
+		suf=-gz
+	}
+
+	$pybin $py --sfx-make tar.bz2 $ver $ts
+	mv sfx.out $sfx_out$suf.py
+	
+	exts+=($suf.py)
+	[ $use_gz ] &&
+		rm $py
 }
 
 
+chmod 755 $sfx_out*
+
 printf "done:\n"
 for ext in ${exts[@]}; do
-	printf "  %s\n" "$(realpath $sfx_out)."$ext
+	printf "  %s\n" "$(realpath $sfx_out)"$ext
 done
 
 # apk add bash python3 tar xz bzip2
