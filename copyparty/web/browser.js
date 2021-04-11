@@ -648,6 +648,9 @@ document.onkeydown = function (e) {
 	if (!document.activeElement || document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
 		return;
 
+	if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey || e.isComposing)
+		return;
+
 	var k = (e.code + ''), pos = -1;
 	if (k.indexOf('Digit') === 0)
 		pos = parseInt(k.slice(-1)) * 0.1;
