@@ -214,6 +214,20 @@ class HttpCli(object):
         self.log(body.rstrip())
         self.reply(b"<pre>" + body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
 
+    def urlq(self, add={}, rm=[]):
+        """
+        generates url query based on uparam (b, pw, all others)
+        removing anything in rm, adding pairs in add
+        """
+
+        kv = {k: v for k, v in self.uparam.items() if k not in rm}
+        kv.update(add)
+        if not kv:
+            return ""
+
+        r = ["{}={}".format(k, quotep(v)) if v else k for k, v in kv.items()]
+        return "?" + "&amp;".join(r)
+
     def handle_get(self):
         logmsg = "{:4} {}".format(self.mode, self.req)
 
@@ -1214,11 +1228,7 @@ class HttpCli(object):
         return True
 
     def tx_mounts(self):
-        suf = [
-            "{}={}".format(k, v) if v else k for k, v in self.uparam.items() if k != "h"
-        ]
-        suf = "?" + "&amp;".join(suf) if suf else ""
-
+        suf = self.urlq(rm=["h"])
         rvol = [x + "/" if x else x for x in self.rvol]
         wvol = [x + "/" if x else x for x in self.wvol]
         html = self.j2("splash", this=self, rvol=rvol, wvol=wvol, url_suf=suf)
@@ -1351,17 +1361,7 @@ class HttpCli(object):
             idx = self.conn.get_u2idx()
             icur = idx.get_cur(vn.realpath)
 
-        url_suf = []
-
-        basic = self.uparam.get("b")
-        if basic is not None:
-            url_suf.append("b" if not basic else "b=" + basic)
-
-        pwd = self.uparam.get("pw")
-        if pwd:
-            url_suf.append("pw=" + quotep(pwd))
-
-        url_suf = ("?" + "&amp;".join(url_suf)) if url_suf else ""
+        url_suf = self.urlq()
 
         dirs = []
         files = []
