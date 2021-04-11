@@ -317,7 +317,7 @@ function seek_au_sec(seek) {
 	if (mp.au === mp.au_native)
 		// hack: ogv.js breaks on .play() during playback
 		mp.au.play();
-};
+}
 
 
 function song_skip(n) {
@@ -329,7 +329,7 @@ function song_skip(n) {
 		play(mp.order.indexOf(tid) + n);
 	else
 		play(mp.order[0]);
-};
+}
 
 
 // hook up the widget buttons
@@ -618,13 +618,16 @@ function tree_neigh(n) {
 			break;
 		}
 	}
-	a += n;
-	if (a < 0)
-		a = links.length - 1;
-	if (a >= links.length)
-		a = 0;
+	if (act == -1)
+		return;
 
-	links[a].click();
+	act += n;
+	if (act < 0)
+		act = links.length - 1;
+	if (act >= links.length)
+		act = 0;
+
+	links[act].click();
 }
 
 
@@ -939,8 +942,7 @@ var treectl = (function () {
 			tree.style.top = Math.max(0, parseInt(atop)) + 'px';
 		}
 		else {
-			var wraph = parseInt(getComputedStyle(ebi('wrap').offsetParent).height),
-				top = Math.max(0, parseInt(wrap.offsetTop)),
+			var top = Math.max(0, parseInt(wrap.offsetTop)),
 				treeh = (winh - atop) - 4;
 
 			tree.style.top = top + 'px';

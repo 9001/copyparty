@@ -119,7 +119,7 @@ function crc32(str) {
         crc = (crc >>> 8) ^ crctab[(crc ^ str.charCodeAt(i)) & 0xFF];
     }
     return ((crc ^ (-1)) >>> 0).toString(16);
-};
+}
 
 
 function clmod(obj, cls, add) {

@@ -374,7 +374,7 @@ function up2k_init(have_crypto) {
             for (var a = 0, aa = Math.min(20, bad_files.length); a < aa; a++)
                 msg += '-- ' + bad_files[a] + '\n';
 
-            if (files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
+            if (good_files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
                 msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
 
             alert(msg);
