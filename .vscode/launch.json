@@ -14,6 +14,8 @@
                 "-emp",
                 "-e2dsa",
                 "-e2ts",
+                "-mtp",
+                ".bpm=f,bin/mtag/audio-bpm.py",
                 "-a",
                 "ed:wark",
                 "-v",
