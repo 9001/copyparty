@@ -31,6 +31,7 @@ catch (ex) {
     }
     catch (ex) { }
 }
+treectl.onscroll();
 
 
 function up2k_flagbus() {
