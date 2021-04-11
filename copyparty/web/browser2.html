@@ -10,7 +10,7 @@
 
 <body>
     {%- if srv_info %}
-    <p>{{ srv_info }}</p>
+    <p><span>{{ srv_info }}</span></p>
     {%- endif %}
 
     {%- if have_b_u %}
@@ -49,7 +49,7 @@
     <div>{{ logues[1] }}</div><br />
     {%- endif %}
     
-    <h2><a href="?h">control-panel</a></h2>
+    <h2><a href="{{ url_suf }}&amp;h">control-panel</a></h2>
 
 </body>
 </html>

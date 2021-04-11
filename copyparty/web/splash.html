@@ -16,20 +16,20 @@
         <h1>you can browse these:</h1>
         <ul>
             {% for mp in rvol %}
-            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
+            <li><a href="/{{ mp }}{{ url_suf }}">/{{ mp }}</a></li>
             {% endfor %}
         </ul>
 
         <h1>you can upload to:</h1>
         <ul>
             {% for mp in wvol %}
-            <li><a href="/{{ mp }}">/{{ mp }}</a></li>
+            <li><a href="/{{ mp }}{{ url_suf }}">/{{ mp }}</a></li>
             {% endfor %}
         </ul>
 
         <h1>login for more:</h1>
         <ul>
-            <form method="post" enctype="multipart/form-data" action="/">
+            <form method="post" enctype="multipart/form-data" action="/{{ url_suf }}">
                 <input type="hidden" name="act" value="login" />
                 <input type="password" name="cppwd" />
                 <input type="submit" value="Login" />

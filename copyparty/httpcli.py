@@ -1214,9 +1214,14 @@ class HttpCli(object):
         return True
 
     def tx_mounts(self):
+        suf = [
+            "{}={}".format(k, v) if v else k for k, v in self.uparam.items() if k != "h"
+        ]
+        suf = "?" + "&amp;".join(suf) if suf else ""
+
         rvol = [x + "/" if x else x for x in self.rvol]
         wvol = [x + "/" if x else x for x in self.wvol]
-        html = self.j2("splash", this=self, rvol=rvol, wvol=wvol)
+        html = self.j2("splash", this=self, rvol=rvol, wvol=wvol, url_suf=suf)
         self.reply(html.encode("utf-8"))
         return True
 
@@ -1356,7 +1361,7 @@ class HttpCli(object):
         if pwd:
             url_suf.append("pw=" + quotep(pwd))
 
-        url_suf = ("?" + "&".join(url_suf)) if url_suf else ""
+        url_suf = ("?" + "&amp;".join(url_suf)) if url_suf else ""
 
         dirs = []
         files = []
