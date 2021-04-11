@@ -233,12 +233,6 @@ class AuthSrv(object):
     def log(self, msg, c=0):
         self.log_func("auth", msg, c)
 
-    def invert(self, orig):
-        if PY2:
-            return {v: k for k, v in orig.iteritems()}
-        else:
-            return {v: k for k, v in orig.items()}
-
     def laggy_iter(self, iterable):
         """returns [value,isFinalValue]"""
         it = iter(iterable)
@@ -495,7 +489,7 @@ class AuthSrv(object):
         with self.mutex:
             self.vfs = vfs
             self.user = user
-            self.iuser = self.invert(user)
+            self.iuser = {v: k for k, v in user.items()}
 
         # import pprint
         # pprint.pprint({"usr": user, "rd": mread, "wr": mwrite, "mnt": mount})

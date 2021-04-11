@@ -16,6 +16,7 @@ with open(".vscode/launch.json", "r") as f:
 
 oj = jstyleson.loads(tj)
 argv = oj["configurations"][0]["args"]
+argv = [os.path.expanduser(x) if x.startswith("~") else x for x in argv]
 try:
     copyparty(argv)
 except SystemExit as ex:
