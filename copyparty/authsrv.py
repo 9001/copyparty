@@ -111,7 +111,27 @@ class VFS(object):
         if rem:
             rp += "/" + rem
 
-        return fsdec(os.path.realpath(fsenc(rp)))
+        try:
+            return fsdec(os.path.realpath(fsenc(rp)))
+        except:
+            if not WINDOWS:
+                raise
+
+            # cpython bug introduced in 3.8, still exists in 3.9.1;
+            # some win7sp1 and win10:20H2 boxes cannot realpath a
+            # networked drive letter such as b"n:" or b"n:\\"
+            #
+            # requirements to trigger:
+            #  * bytestring (not unicode str)
+            #  * just the drive letter (subfolders are ok)
+            #  * networked drive (regular disks and vmhgfs are ok)
+            #  * on an enterprise network (idk, cannot repro with samba)
+            #
+            # hits the following exceptions in succession:
+            #  * access denied at L601: "path = _getfinalpathname(path)"
+            #  * "cant concat str to bytes" at L621: "return path + tail"
+            #
+            return os.path.realpath(rp)
 
     def ls(self, rem, uname, scandir, lstat=False):
         """return user-readable [fsdir,real,virt] items at vpath"""
