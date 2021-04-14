@@ -13,8 +13,8 @@
 <body>
     <div id="ops">
         <a href="#" data-dest="" data-desc="close submenu">---</a>
-        <a href="#" data-perm="read" data-dest="search" data-desc="search for files by attributes, path/name, music tags, or any combination of those.&lt;br /&gt;&lt;br /&gt;&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,&lt;br /&gt;&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,&lt;br /&gt;&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>
         {%- if have_up2k_idx %}
+        <a href="#" data-perm="read" data-dest="search" data-desc="search for files by attributes, path/name, music tags, or any combination of those.&lt;br /&gt;&lt;br /&gt;&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,&lt;br /&gt;&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,&lt;br /&gt;&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>
         <a href="#" data-dest="up2k" data-desc="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>
         {%- else %}
         <a href="#" data-perm="write" data-dest="up2k" data-desc="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>
