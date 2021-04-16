@@ -137,6 +137,9 @@ function U2pvis(act, btns) {
     this.act = act;
     this.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
     this.tab = [];
+    this.head = 0;
+    this.tail = -1;
+    this.wsz = 3;
 
     this.addfile = function (entry) {
         this.tab.push({
@@ -152,7 +155,10 @@ function U2pvis(act, btns) {
         this.ctr["q"]++;
         this.drawcard("q");
         if (this.act == "q") {
-            this.addrow(this.genrow(this.tab.length - 1));
+            this.addrow(this.tab.length - 1);
+        }
+        if (this.act == "bz") {
+            this.bzw();
         }
     };
 
@@ -228,7 +234,8 @@ function U2pvis(act, btns) {
 
     this.move = function (nfile, newcat) {
         var fo = this.tab[nfile],
-            oldcat = fo.in;
+            oldcat = fo.in,
+            bz_act = this.act == "bz";
 
         if (oldcat == newcat) {
             throw 42;
@@ -240,12 +247,52 @@ function U2pvis(act, btns) {
         this.drawcard(oldcat);
         this.drawcard(newcat);
         if (this.is_act(newcat)) {
-            this.addrow(this.genrow(nfile));
+            this.tail++;
+            if (!ebi('f' + nfile))
+                this.addrow(nfile);
         }
         else if (this.is_act(oldcat)) {
-            var tr = ebi("f{0}n".format(nfile)).parentNode;
-            tr.parentNode.removeChild(tr);
+            this.head++;
+            if (!bz_act) {
+                var tr = ebi("f" + nfile);
+                tr.parentNode.removeChild(tr);
+            }
         }
+        if (bz_act) {
+            this.bzw();
+        }
+    };
+
+    this.bzw_log = function (first, last) {
+        console.log("first %d   head %d   tail %d   last %d", first, this.head, this.tail, last);
+        var trs = document.querySelectorAll('#u2tab>tbody>tr'), msg = [];
+        for (var a = 0; a < trs.length; a++)
+            msg.push(trs[a].getAttribute('id'));
+
+        console.log(msg.join(' '));
+    }
+
+    this.bzw = function () {
+        var first = document.querySelector('#u2tab>tbody>tr:first-child');
+        if (!first)
+            return;
+
+        var last = document.querySelector('#u2tab>tbody>tr:last-child');
+        first = parseInt(first.getAttribute('id').slice(1));
+        last = parseInt(last.getAttribute('id').slice(1));
+        //this.bzw_log(first, last);
+
+        while (this.head - first > this.wsz) {
+            var obj = ebi('f' + (first++));
+            obj.parentNode.removeChild(obj);
+        }
+        while (last - this.tail < this.wsz && last < this.tab.length - 2) {
+            var obj = ebi('f' + (++last));
+            if (!obj)
+                this.addrow(last);
+        }
+        //this.bzw_log(first, last);
+        //console.log('--');
     };
 
     this.drawcard = function (cat) {
@@ -273,27 +320,52 @@ function U2pvis(act, btns) {
     this.changecard = function (card) {
         this.act = card;
         var html = [];
+        this.head = -1;
+        this.tail = -1;
         for (var a = 0; a < this.tab.length; a++) {
             var rt = this.tab[a].in;
             if (this.is_act(rt)) {
-                html.push(this.genrow(a));
+                html.push(this.genrow(a, true));
+
+                this.tail = a;
+                if (this.head == -1)
+                    this.head = a;
             }
         }
-        ebi('u2tab').tBodies[0].innerHTML =
-            '<tr>' + html.join('</tr>\n<tr>') + '</tr>';
+        if (this.head == -1) {
+            this.head = this.tab.length;
+            this.tail = this.head - 1;
+        }
+        if (card == "bz") {
+            for (var a = this.head - 1; a >= this.head - this.wsz && a >= 0; a--) {
+                html.unshift(this.genrow(a, true).replace(/><td>/, "><td>a "));
+            }
+            for (var a = this.tail + 1; a <= this.tail + this.wsz && a < this.tab.length; a++) {
+                html.push(this.genrow(a, true).replace(/><td>/, "><td>b "));
+            }
+        }
+        ebi('u2tab').tBodies[0].innerHTML = html.join('\n');
     };
 
-    this.genrow = function (nfile) {
+    this.genrow = function (nfile, as_html) {
         var r = this.tab[nfile],
             td1 = '<td id="f' + nfile,
-            td = '</td>' + td1;
+            td = '</td>' + td1,
+            ret = td1 + 'n">' + r.hn +
+                td + 't">' + r.ht +
+                td + 'p" class="prog">' + r.hp + '</td>';
 
-        return td1 + 'n">' + r.hn + td + 't">' + r.ht + td + 'p" class="prog">' + r.hp + '</td>';
+        if (as_html)
+            return '<tr id="f' + nfile + '">' + ret + '</tr>';
+
+        var obj = document.createElement('tr');
+        obj.setAttribute('id', 'f' + nfile);
+        obj.innerHTML = ret;
+        return obj;
     };
 
-    this.addrow = function (html) {
-        var tr = document.createElement('tr');
-        tr.innerHTML = html;
+    this.addrow = function (nfile) {
+        var tr = this.genrow(nfile);
         ebi('u2tab').tBodies[0].appendChild(tr);
     };
 
@@ -618,11 +690,10 @@ function up2k_init(have_crypto) {
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a];
             if (t.done && t.name) {
-                var tr = ebi('f{0}p'.format(t.n));
+                var tr = ebi('f' + t.n);
                 if (!tr)
                     continue;
 
-                tr = tr.parentNode;
                 tr.parentNode.removeChild(tr);
                 t.name = undefined;
             }
@@ -951,7 +1022,8 @@ function up2k_init(have_crypto) {
                 alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
             }
 
-            pvis.seth(t.n, 1, 'connecting');
+            pvis.seth(t.n, 2, 'hashing done');
+            pvis.seth(t.n, 1, 'pending');
             st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
             st.todo.handshake.push(t);
         };
@@ -1044,16 +1116,15 @@ function up2k_init(have_crypto) {
                     st.bytes.uploaded += t.size - t.bytes_uploaded;
                     var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                     var spd2 = (t.size / ((t.t4 - t.t3) / 1000.)) / (1024 * 1024.);
-                    pvis.move(t.n, 'ok');
                     pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2)));
+                    pvis.move(t.n, 'ok');
                 }
                 else t.t4 = undefined;
 
                 tasker();
             }
             else {
-                pvis.move(t.n, 'ng');
                 var err = "",
                     rsp = (xhr.responseText + ''),
                     ofs = rsp.lastIndexOf('\nURL: ');
@@ -1074,8 +1145,9 @@ function up2k_init(have_crypto) {
                     }
                 }
                 if (err != "") {
-                    seth(t.n, 1, "ERROR");
-                    seth(t.n, 2, err);
+                    pvis.seth(t.n, 1, "ERROR");
+                    pvis.seth(t.n, 2, err);
+                    pvis.move(t.n, 'ng');
 
                     st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
                     tasker();
