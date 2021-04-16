@@ -132,6 +132,187 @@ function up2k_flagbus() {
     return flag;
 }
 
+
+function U2pvis(act, btns) {
+    this.act = act;
+    this.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
+    this.tab = [];
+
+    this.addfile = function (entry) {
+        this.tab.push({
+            "hn": entry[0],
+            "ht": entry[1],
+            "hp": entry[2],
+            "in": 'q',
+            "nh": 0, //hashed
+            "nd": 0, //done
+            "pa": [], //percents
+            "pb": []  //active-list
+        });
+        this.ctr["q"]++;
+        this.drawcard("q");
+        if (this.act == "q") {
+            this.addrow(this.genrow(this.tab.length - 1));
+        }
+    };
+
+    this.is_act = function (card) {
+        if (this.act == "done")
+            return card == "ok" || card == "ng";
+
+        return this.act == card;
+    }
+
+    this.seth = function (nfile, field, html) {
+        var fo = this.tab[nfile];
+        field = ['hn', 'ht', 'hp'][field];
+        fo[field] = html;
+        if (this.is_act(fo.in))
+            ebi('f{0}{1}'.format(nfile, field.slice(1))).innerHTML = html;
+    };
+
+    this.setab = function (nfile, blocks) {
+        var t = [];
+        for (var a = 0; a < blocks; a++)
+            t.push(0);
+
+        this.tab[nfile].pa = t;
+    };
+
+    this.perc = function (n, t, e, t0) {
+        var p = (n + e) * 100.0 / t,
+            td = new Date().getTime() - t0,
+            eta = ((td / 1000) / p) * (100 - p);
+
+        return [p, s2ms(eta)];
+    };
+
+    this.hashed = function (nfile, t0) {
+        var fo = this.tab[nfile];
+        fo.nh++;
+        var p = this.perc(fo.nh, fo.pa.length, 0, t0);
+        fo.hp = '{0}% ({1})'.format(
+            p[0].toFixed(2), p[1]
+        );
+        if (this.is_act(fo.in))
+            ebi('f{0}p'.format(nfile)).innerHTML = fo.hp;
+    };
+
+    this.prog = function (nfile, nchunk, percent, t0) {
+        var fo = this.tab[nfile], pb = fo.pb;
+        var i = pb.indexOf(nchunk);
+        fo.pa[nchunk] = percent;
+        if (percent == 101) {
+            fo.nd++;
+            if (i >= 0)
+                pb.splice(i);
+        }
+        else if (i == -1) {
+            pb.push(nchunk);
+        }
+
+        var extra = 0;
+        for (var a = 0; a < pb.length; a++)
+            extra += fo.pa[a];
+
+        extra /= fo.pa.length;
+
+        var perc = this.perc(fo.nd, fo.pa.length, extra, t0);
+        fo.hp = '{0}% ({1})'.format(
+            perc[0].toFixed(2), perc[1]
+        );
+
+        if (this.is_act(fo.in))
+            ebi('f{0}p'.format(nfile)).innerHTML = fo.hp;
+    };
+
+    this.move = function (nfile, newcat) {
+        var fo = this.tab[nfile],
+            oldcat = fo.in;
+
+        if (oldcat == newcat) {
+            throw 42;
+        }
+
+        fo.in = newcat;
+        this.ctr[oldcat]--;
+        this.ctr[newcat]++;
+        this.drawcard(oldcat);
+        this.drawcard(newcat);
+        if (this.is_act(newcat)) {
+            this.addrow(this.genrow(nfile));
+        }
+        else if (this.is_act(oldcat)) {
+            var tr = ebi("f{0}n".format(nfile)).parentNode;
+            tr.parentNode.removeChild(tr);
+        }
+    };
+
+    this.drawcard = function (cat) {
+        var cards = document.querySelectorAll('#u2cards>a>span');
+
+        if (cat == "q") {
+            cards[4].innerHTML = this.ctr[cat];
+            return;
+        }
+        if (cat == "bz") {
+            cards[3].innerHTML = this.ctr[cat];
+            return;
+        }
+
+        cards[2].innerHTML = this.ctr["ok"] + this.ctr["ng"];
+
+        if (cat == "ng") {
+            cards[1].innerHTML = this.ctr[cat];
+        }
+        if (cat == "ok") {
+            cards[0].innerHTML = this.ctr[cat];
+        }
+    };
+
+    this.changecard = function (card) {
+        this.act = card;
+        var html = [];
+        for (var a = 0; a < this.tab.length; a++) {
+            var rt = this.tab[a].in;
+            if (this.is_act(rt)) {
+                html.push(this.genrow(a));
+            }
+        }
+        ebi('u2tab').tBodies[0].innerHTML =
+            '<tr>' + html.join('</tr>\n<tr>') + '</tr>';
+    };
+
+    this.genrow = function (nfile) {
+        var r = this.tab[nfile],
+            td1 = '<td id="f' + nfile,
+            td = '</td>' + td1;
+
+        return td1 + 'n">' + r.hn + td + 't">' + r.ht + td + 'p" class="prog">' + r.hp + '</td>';
+    };
+
+    this.addrow = function (html) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = html;
+        ebi('u2tab').tBodies[0].appendChild(tr);
+    };
+
+    var that = this;
+    btns = document.querySelectorAll(btns + '>a[act]');
+    for (var a = 0; a < btns.length; a++) {
+        btns[a].onclick = function (e) {
+            ev(e);
+            var newtab = this.getAttribute('act');
+            for (var b = 0; b < btns.length; b++) {
+                btns[b].className = (
+                    btns[b].getAttribute('act') == newtab) ? 'act' : '';
+            }
+            that.changecard(newtab);
+        };
+    }
+}
+
+
 function up2k_init(have_crypto) {
     //have_crypto = false;
     var need_filereader_cache = undefined;
@@ -216,10 +397,6 @@ function up2k_init(have_crypto) {
     var flag_en = bcfg_get('flag_en', false);
     var fsearch = bcfg_get('fsearch', false);
 
-    var col_hashing = '#00bbff';
-    var col_hashed = '#004466';
-    var col_uploading = '#ffcc44';
-    var col_uploaded = '#00bb00';
     var fdom_ctr = 0;
     var st = {
         "files": [],
@@ -238,6 +415,8 @@ function up2k_init(have_crypto) {
             "uploaded": 0
         }
     };
+
+    var pvis = new U2pvis("bz", '#u2cards');
 
     var bobslice = null;
     if (window.File)
@@ -413,12 +592,12 @@ function up2k_init(have_crypto) {
             if (skip)
                 continue;
 
-            var tr = document.createElement('tr');
-            tr.innerHTML = '<td id="f{0}n"></td><td id="f{0}t">hashing</td><td id="f{0}p" class="prog"></td>'.format(st.files.length);
-            tr.getElementsByTagName('td')[0].innerHTML = fsearch ? esc(entry.name) : linksplit(
-                esc(uricom_dec(entry.purl)[0] + entry.name)).join(' ');
-            ebi('u2tab').appendChild(tr);
-
+            pvis.addfile([
+                fsearch ? esc(entry.name) : linksplit(
+                    esc(uricom_dec(entry.purl)[0] + entry.name)).join(' '),
+                'hashing',
+                ''
+            ]);
             st.files.push(entry);
             st.todo.hash.push(entry);
         }
@@ -439,7 +618,11 @@ function up2k_init(have_crypto) {
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a];
             if (t.done && t.name) {
-                var tr = ebi('f{0}p'.format(t.n)).parentNode;
+                var tr = ebi('f{0}p'.format(t.n));
+                if (!tr)
+                    continue;
+
+                tr = tr.parentNode;
                 tr.parentNode.removeChild(tr);
                 t.name = undefined;
             }
@@ -695,13 +878,8 @@ function up2k_init(have_crypto) {
         if (!need_filereader_cache)
             subchunks = 1;
 
-        var pb_html = '';
-        var pb_perc = 99.9 / nchunks;
-        for (var a = 0; a < nchunks; a++)
-            pb_html += '<div id="f{0}p{1}" style="width:{2}%"><div></div></div>'.format(
-                t.n, a, pb_perc);
-
-        ebi('f{0}p'.format(t.n)).innerHTML = pb_html;
+        pvis.setab(t.n, nchunks);
+        pvis.move(t.n, 'bz');
 
         var reader = new FileReader();
 
@@ -719,8 +897,6 @@ function up2k_init(have_crypto) {
 
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
-
-            prog(t.n, nchunk, col_hashing);
         };
 
         var segm_load = function (e) {
@@ -764,9 +940,8 @@ function up2k_init(have_crypto) {
             var b64str = buf2b64(hslice).replace(/=$/, '');
             t.hash.push(b64str);
 
-            prog(t.n, nchunk, col_hashed);
+            pvis.hashed(t.n, t.t1);
             if (++nchunk < nchunks) {
-                prog(t.n, nchunk, col_hashing);
                 return segm_next();
             }
 
@@ -776,7 +951,7 @@ function up2k_init(have_crypto) {
                 alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
             }
 
-            ebi('f{0}t'.format(t.n)).innerHTML = 'connecting';
+            pvis.seth(t.n, 1, 'connecting');
             st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
             st.todo.handshake.push(t);
         };
@@ -821,8 +996,9 @@ function up2k_init(have_crypto) {
 
                         msg += '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</span></span>';
                     }
-                    ebi('f{0}p'.format(t.n)).innerHTML = msg;
-                    ebi('f{0}t'.format(t.n)).innerHTML = smsg;
+                    pvis.seth(t.n, 2, msg);
+                    pvis.seth(t.n, 1, smsg);
+                    pvis.move(t.n, smsg == '404' ? 'ng' : 'ok');
                     st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
                     st.bytes.uploaded += t.size;
                     t.done = true;
@@ -833,7 +1009,7 @@ function up2k_init(have_crypto) {
                 if (response.name !== t.name) {
                     // file exists; server renamed us
                     t.name = response.name;
-                    ebi('f{0}n'.format(t.n)).innerHTML = linksplit(esc(t.purl + t.name)).join(' ');
+                    pvis.seth(t.n, 0, linksplit(esc(t.purl + t.name)).join(' '));
                 }
 
                 t.postlist = [];
@@ -847,9 +1023,6 @@ function up2k_init(have_crypto) {
 
                     t.postlist.push(idx);
                 }
-                for (var a = 0; a < t.hash.length; a++)
-                    prog(t.n, a, (t.postlist.indexOf(a) == -1)
-                        ? col_uploaded : col_hashed);
 
                 var done = true;
                 var msg = '&#x1f3b7;&#x1f41b;';
@@ -863,7 +1036,7 @@ function up2k_init(have_crypto) {
                     msg = 'uploading';
                     done = false;
                 }
-                ebi('f{0}t'.format(t.n)).innerHTML = msg;
+                pvis.seth(t.n, 1, msg);
                 st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
 
                 if (done) {
@@ -871,14 +1044,16 @@ function up2k_init(have_crypto) {
                     st.bytes.uploaded += t.size - t.bytes_uploaded;
                     var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                     var spd2 = (t.size / ((t.t4 - t.t3) / 1000.)) / (1024 * 1024.);
-                    ebi('f{0}p'.format(t.n)).innerHTML = 'hash {0}, up {1} MB/s'.format(
-                        spd1.toFixed(2), spd2.toFixed(2));
+                    pvis.move(t.n, 'ok');
+                    pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
+                        spd1.toFixed(2), spd2.toFixed(2)));
                 }
                 else t.t4 = undefined;
 
                 tasker();
             }
             else {
+                pvis.move(t.n, 'ng');
                 var err = "",
                     rsp = (xhr.responseText + ''),
                     ofs = rsp.lastIndexOf('\nURL: ');
@@ -899,8 +1074,8 @@ function up2k_init(have_crypto) {
                     }
                 }
                 if (err != "") {
-                    ebi('f{0}t'.format(t.n)).innerHTML = "ERROR";
-                    ebi('f{0}p'.format(t.n)).innerHTML = err;
+                    seth(t.n, 1, "ERROR");
+                    seth(t.n, 2, err);
 
                     st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
                     tasker();
@@ -940,7 +1115,7 @@ function up2k_init(have_crypto) {
         var npart = upt.npart;
         var t = st.files[upt.nfile];
 
-        prog(t.n, npart, col_uploading);
+        pvis.seth(t.n, 1, "upping");
 
         var chunksize = get_chunksize(t.size);
         var car = npart * chunksize;
@@ -958,18 +1133,18 @@ function up2k_init(have_crypto) {
             var xhr = new XMLHttpRequest();
             xhr.upload.onprogress = function (xev) {
                 var perc = xev.loaded / (cdr - car) * 100;
-                prog(t.n, npart, '', perc);
+                pvis.prog(t.n, npart, perc, t.t3);
             };
             xhr.onload = function (xev) {
                 if (xhr.status == 200) {
-                    prog(t.n, npart, col_uploaded);
+                    pvis.prog(t.n, npart, 101, t.t3);
                     st.bytes.uploaded += cdr - car;
                     t.bytes_uploaded += cdr - car;
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                     t.postlist.splice(t.postlist.indexOf(npart), 1);
                     if (t.postlist.length == 0) {
                         t.t4 = new Date().getTime();
-                        ebi('f{0}t'.format(t.n)).innerHTML = 'verifying';
+                        pvis.seth(t.n, 1, 'verifying');
                         st.todo.handshake.unshift(t);
                     }
                     tasker();
@@ -1001,24 +1176,6 @@ function up2k_init(have_crypto) {
 
     /////
     ////
-    ///   progress bar
-    //
-
-    function prog(nfile, nchunk, color, percent) {
-        var n1 = ebi('f{0}p{1}'.format(nfile, nchunk));
-        var n2 = n1.getElementsByTagName('div')[0];
-        if (percent === undefined) {
-            n1.style.background = color;
-            n2.style.display = 'none';
-        }
-        else {
-            n2.style.width = percent + '%';
-            n2.style.display = 'block';
-        }
-    }
-
-    /////
-    ////
     ///   config ui
     //
 
@@ -1035,6 +1192,7 @@ function up2k_init(have_crypto) {
         if (btn.parentNode !== parent) {
             parent.appendChild(btn);
             ebi('u2conf').setAttribute('class', wide ? 'has_btn' : '');
+            ebi('u2cards').setAttribute('class', wide ? 'w' : '');
         }
     }
     window.addEventListener('resize', onresize);

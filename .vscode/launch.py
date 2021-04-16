@@ -5,6 +5,7 @@
 
 import os
 import sys
+import shlex
 
 sys.path.insert(0, os.getcwd())
 
@@ -16,9 +17,16 @@ with open(".vscode/launch.json", "r") as f:
 
 oj = jstyleson.loads(tj)
 argv = oj["configurations"][0]["args"]
+
+try:
+    sargv = " ".join([shlex.quote(x) for x in argv])
+    print(sys.executable + " -m copyparty " + sargv + "\n")
+except:
+    pass
+
 argv = [os.path.expanduser(x) if x.startswith("~") else x for x in argv]
 try:
-    copyparty(argv)
+    copyparty(["a"] + argv)
 except SystemExit as ex:
     if ex.code:
         raise
