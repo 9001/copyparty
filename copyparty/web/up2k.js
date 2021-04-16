@@ -737,7 +737,8 @@ function up2k_init(have_crypto) {
     function hashing_permitted() {
         if (multitask) {
             var ahead = st.bytes.hashed - st.bytes.uploaded;
-            return ahead < 1024 * 1024 * 128;
+            return ahead < 1024 * 1024 * 128 &&
+                st.todo.handshake.length + st.busy.handshake.length < 16;
         }
         return handshakes_permitted() && 0 ==
             st.todo.handshake.length +
