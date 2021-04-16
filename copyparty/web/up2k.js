@@ -173,8 +173,15 @@ function U2pvis(act, btns) {
         var fo = this.tab[nfile];
         field = ['hn', 'ht', 'hp'][field];
         fo[field] = html;
-        if (this.is_act(fo.in))
-            ebi('f{0}{1}'.format(nfile, field.slice(1))).innerHTML = html;
+        if (!this.is_act(fo.in))
+            return;
+
+        var obj = ebi('f{0}{1}'.format(nfile, field.slice(1)));
+        obj.innerHTML = html;
+        if (field == 'hp') {
+            obj.style.color = '';
+            obj.style.background = '';
+        }
     };
 
     this.setab = function (nfile, blocks) {
@@ -199,11 +206,17 @@ function U2pvis(act, btns) {
         var fo = this.tab[fobj.n];
         fo.nh++;
         var p = this.perc(fo.nh, fo.pa.length, 0, fobj.size, fobj.t1);
-        fo.hp = '{0}% ({1}, {2} MB/s)'.format(
+        fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
-        if (this.is_act(fo.in))
-            ebi('f{0}p'.format(fobj.n)).innerHTML = fo.hp;
+        if (!this.is_act(fo.in))
+            return;
+
+        var obj = ebi('f{0}p'.format(fobj.n));
+        obj.innerHTML = fo.hp;
+        obj.style.color = '#fff';
+        var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
+        obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #08d ' + o2 + '%, #333 ' + o3 + '%)';
     };
 
     this.prog = function (fobj, nchunk, percent) {
@@ -225,13 +238,19 @@ function U2pvis(act, btns) {
 
         extra /= fo.pa.length;
 
-        var perc = this.perc(fo.nd, fo.pa.length, extra, fobj.size, fobj.t3);
-        fo.hp = '{0}% ({1}, {2} MB/s)'.format(
-            perc[0].toFixed(2), perc[1], perc[2].toFixed(2)
+        var p = this.perc(fo.nd, fo.pa.length, extra, fobj.size, fobj.t3);
+        fo.hp = '{0}%, {1}, {2} MB/s'.format(
+            p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
 
-        if (this.is_act(fo.in))
-            ebi('f{0}p'.format(fobj.n)).innerHTML = fo.hp;
+        if (!this.is_act(fo.in))
+            return;
+
+        var obj = ebi('f{0}p'.format(fobj.n));
+        obj.innerHTML = fo.hp;
+        obj.style.color = '#fff';
+        var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
+        obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%)';
     };
 
     this.move = function (nfile, newcat) {
@@ -669,7 +688,7 @@ function up2k_init(have_crypto) {
             pvis.addfile([
                 fsearch ? esc(entry.name) : linksplit(
                     esc(uricom_dec(entry.purl)[0] + entry.name)).join(' '),
-                'hashing',
+                '📐 hash',
                 ''
             ]);
             st.files.push(entry);
@@ -1025,7 +1044,7 @@ function up2k_init(have_crypto) {
             }
 
             pvis.seth(t.n, 2, 'hashing done');
-            pvis.seth(t.n, 1, 'pending');
+            pvis.seth(t.n, 1, '📦 wait');
             st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
             st.todo.handshake.push(t);
         };
@@ -1155,11 +1174,11 @@ function up2k_init(have_crypto) {
                     tasker();
                     return;
                 }
-                alert("server broke (error {0}):\n\"{1}\"\n".format(
-                    xhr.status,
-                    (xhr.response && xhr.response.err) ||
-                    (xhr.responseText && xhr.responseText) ||
-                    "no further information"));
+                alert("server broke; hs-err {0} on file [{1}]:\n".format(
+                    xhr.status, t.name) + (
+                        (xhr.response && xhr.response.err) ||
+                        (xhr.responseText && xhr.responseText) ||
+                        "no further information"));
             }
         };
 
@@ -1189,7 +1208,7 @@ function up2k_init(have_crypto) {
         var npart = upt.npart;
         var t = st.files[upt.nfile];
 
-        pvis.seth(t.n, 1, "upping");
+        pvis.seth(t.n, 1, "🚀 send");
 
         var chunksize = get_chunksize(t.size);
         var car = npart * chunksize;
@@ -1224,11 +1243,11 @@ function up2k_init(have_crypto) {
                     tasker();
                 }
                 else
-                    alert("server broke (error {0}):\n\"{1}\"\n".format(
-                        xhr.status,
-                        (xhr.response && xhr.response.err) ||
-                        (xhr.responseText && xhr.responseText) ||
-                        "no further information"));
+                    alert("server broke; cu-err {0} on file [{1}]:\n".format(
+                        xhr.status, t.name) + (
+                            (xhr.response && xhr.response.err) ||
+                            (xhr.responseText && xhr.responseText) ||
+                            "no further information"));
             };
             xhr.open('POST', t.purl + 'chunkpit.php', true);
             //xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart].substr(1) + "x");

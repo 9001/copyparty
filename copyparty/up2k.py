@@ -1068,6 +1068,8 @@ class Up2k(object):
         with self.mutex:
             job = self.registry[ptop].get(wark, None)
             if not job:
+                known = " ".join([x for x in self.registry[ptop].keys()])
+                self.log("unknown wark [{}], known: {}".format(wark, known))
                 raise Pebkac(400, "unknown wark")
 
             if chash not in job["need"]:

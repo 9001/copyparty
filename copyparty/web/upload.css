@@ -77,6 +77,7 @@
 }
 #u2tab td:nth-child(2) {
 	width: 5em;
+	white-space: nowrap;
 }
 #u2tab td:nth-child(3) {
 	width: 40%;
@@ -113,6 +114,9 @@
 	border-radius: .3em .3em 0 0;
 	margin-left: -1px;
 	background: transparent;
+}
+#u2cards span {
+	color: #fff;
 }
 #u2conf {
 	margin: 1em auto;
