@@ -185,27 +185,29 @@ function U2pvis(act, btns) {
         this.tab[nfile].pa = t;
     };
 
-    this.perc = function (n, t, e, t0) {
+    this.perc = function (n, t, e, sz, t0) {
         var p = (n + e) * 100.0 / t,
             td = new Date().getTime() - t0,
-            eta = ((td / 1000) / p) * (100 - p);
+            pp = (td / 1000) / p,
+            spd = (sz / 100) / pp,
+            eta = pp * (100 - p);
 
-        return [p, s2ms(eta)];
+        return [p, s2ms(eta), spd / (1024 * 1024)];
     };
 
-    this.hashed = function (nfile, t0) {
-        var fo = this.tab[nfile];
+    this.hashed = function (fobj) {
+        var fo = this.tab[fobj.n];
         fo.nh++;
-        var p = this.perc(fo.nh, fo.pa.length, 0, t0);
-        fo.hp = '{0}% ({1})'.format(
-            p[0].toFixed(2), p[1]
+        var p = this.perc(fo.nh, fo.pa.length, 0, fobj.size, fobj.t1);
+        fo.hp = '{0}% ({1}, {2} MB/s)'.format(
+            p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
         if (this.is_act(fo.in))
-            ebi('f{0}p'.format(nfile)).innerHTML = fo.hp;
+            ebi('f{0}p'.format(fobj.n)).innerHTML = fo.hp;
     };
 
-    this.prog = function (nfile, nchunk, percent, t0) {
-        var fo = this.tab[nfile], pb = fo.pb;
+    this.prog = function (fobj, nchunk, percent) {
+        var fo = this.tab[fobj.n], pb = fo.pb;
         var i = pb.indexOf(nchunk);
         fo.pa[nchunk] = percent;
         if (percent == 101) {
@@ -223,13 +225,13 @@ function U2pvis(act, btns) {
 
         extra /= fo.pa.length;
 
-        var perc = this.perc(fo.nd, fo.pa.length, extra, t0);
-        fo.hp = '{0}% ({1})'.format(
-            perc[0].toFixed(2), perc[1]
+        var perc = this.perc(fo.nd, fo.pa.length, extra, fobj.size, fobj.t3);
+        fo.hp = '{0}% ({1}, {2} MB/s)'.format(
+            perc[0].toFixed(2), perc[1], perc[2].toFixed(2)
         );
 
         if (this.is_act(fo.in))
-            ebi('f{0}p'.format(nfile)).innerHTML = fo.hp;
+            ebi('f{0}p'.format(fobj.n)).innerHTML = fo.hp;
     };
 
     this.move = function (nfile, newcat) {
@@ -1011,7 +1013,7 @@ function up2k_init(have_crypto) {
             var b64str = buf2b64(hslice).replace(/=$/, '');
             t.hash.push(b64str);
 
-            pvis.hashed(t.n, t.t1);
+            pvis.hashed(t);
             if (++nchunk < nchunks) {
                 return segm_next();
             }
@@ -1205,11 +1207,11 @@ function up2k_init(have_crypto) {
             var xhr = new XMLHttpRequest();
             xhr.upload.onprogress = function (xev) {
                 var perc = xev.loaded / (cdr - car) * 100;
-                pvis.prog(t.n, npart, perc, t.t3);
+                pvis.prog(t, npart, perc, t);
             };
             xhr.onload = function (xev) {
                 if (xhr.status == 200) {
-                    pvis.prog(t.n, npart, 101, t.t3);
+                    pvis.prog(t, npart, 101, t);
                     st.bytes.uploaded += cdr - car;
                     t.bytes_uploaded += cdr - car;
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
