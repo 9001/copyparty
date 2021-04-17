@@ -216,7 +216,7 @@ function U2pvis(act, btns) {
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
         var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
-        obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #08d ' + o2 + '%, #333 ' + o3 + '%)';
+        obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
     this.prog = function (fobj, nchunk, percent) {
@@ -250,7 +250,7 @@ function U2pvis(act, btns) {
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
         var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
-        obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%)';
+        obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
     this.move = function (nfile, newcat) {
@@ -1051,7 +1051,7 @@ function up2k_init(have_crypto) {
         };
 
         var segm_err = function () {
-            alert('y o u   b r o k e    i t\n\n(was that a folder? just files please)');
+            alert('y o u   b r o k e    i t\nerror: ' + reader.error);
         };
 
         segm_next();
@@ -1220,7 +1220,7 @@ function up2k_init(have_crypto) {
         var reader = new FileReader();
 
         reader.onerror = function () {
-            alert('y o u   b r o k e    i t\n\n(was that a folder? just files please)');
+            alert('y o u   b r o k e    i t\nerror: ' + reader.error);
         };
 
         reader.onload = function (e) {
