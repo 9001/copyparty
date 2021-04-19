@@ -284,7 +284,7 @@ a, #files tbody div a:last-child {
 	line-height: 1em;
 }
 #wtoggle.sel {
-	width: 6em;
+	width: 6.4em;
 }
 #wtoggle.sel #wzip {
 	display: inline-block;
@@ -779,10 +779,10 @@ html.light #files tr:hover td {
 html.light #files tbody a.play {
 	color: #c0f;
 }
-html.light #files tr.play td {
+html.light tr.play td {
 	background: #fc5;
 }
-html.light #files tr.play a {
+html.light tr.play a {
 	color: #406;
 }
 html.light #files > thead > tr > th.min span {
@@ -802,17 +802,20 @@ html.light #widget a {
 html.light #files tr.sel:hover td {
 	background: #c37;
 }
+html.light #files tr.sel td {
+	color: #fff;
+}
 html.light #files tr.sel a {
 	color: #fff;
 }
 html.light input[type="checkbox"] + label {
 	color: #333;
 }
-.opview input[type="text"] {
+html.light .opview input[type="text"] {
 	background: #fff;
 	color: #333;
 	box-shadow: 0 0 2px #888;
-	border-color: #d38;
+	border-color: #38d;
 }
 html.light #ops:hover #opdesc {
 	background: #fff;
@@ -825,10 +828,6 @@ html.light #opdesc code {
 html.light #u2tab a>span,
 html.light #files td div span {
 	color: #000;
-}
-html.light #files a:hover {
-	color: #000;
-	background: #fff;
 }
 html.light #path {
 	background: #f7f7f7;
@@ -850,4 +849,9 @@ html.light #path a:hover {
 }
 html.light #files tbody div a {
 	color: #d38;
+}
+html.light #files a:hover,
+html.light #files tr.sel a:hover {
+	color: #000;
+	background: #fff;
 }

@@ -111,6 +111,8 @@ the browser has the following hotkeys
 * `I/K` prev/next folder
 * `P` parent folder
 
+you can link a particular timestamp in an audio file by adding it to the URL, such as `&20` / `&20s` / `&1m20` / `&1:20` after the `.../#af-c8960dab`
+
 
 ## zip downloads
 
@@ -339,7 +341,6 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* audio link with timestamp
 * separate sqlite table per tag
 * audio fingerprinting
 * readme.md as epilogue
