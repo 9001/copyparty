@@ -138,10 +138,10 @@ var md_opt = {
         document.documentElement.setAttribute("class", dark ? "dark" : "");
         btn.innerHTML = "go " + (dark ? "light" : "dark");
         if (window.localStorage)
-            localStorage.setItem('darkmode', dark ? 1 : 0);
+            localStorage.setItem('lightmode', dark ? 0 : 1);
     };
     btn.onclick = toggle;
-    if (window.localStorage && localStorage.getItem('darkmode') == 1)
+    if (window.localStorage && localStorage.getItem('lightmode') != 1)
 		toggle();
 })();
 

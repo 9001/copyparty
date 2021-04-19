@@ -141,6 +141,9 @@
 	font-size: 1.2em;
 	padding: .15em 0;
 }
+#u2conf .txtbox.err {
+	background: #922;
+}
 #u2conf a {
 	color: #fff;
 	background: #c38;
@@ -237,4 +240,36 @@
 #u2cleanup {
 	float: right;
 	margin-bottom: -.3em;
+}
+
+
+
+
+
+html.light #u2btn {
+	box-shadow: .4em .4em 0 #ccc;
+}
+html.light #u2cards span {
+	color: #000;
+}
+html.light #u2cards a {
+	background: linear-gradient(to bottom, #eee, #fff);
+}
+html.light #u2cards a.act {
+	background: inherit;
+}
+html.light #u2conf .txtbox {
+	background: #fff;
+	color: #444;
+}
+html.light #u2conf .txtbox.err {
+	background: #f96;
+	color: #300;
+}
+html.light #u2cdesc {
+	background: #fff;
+	border: none;
+}
+html.light #op_up2k.srch #u2btn {
+	border-color: #a80;
 }

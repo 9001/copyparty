@@ -685,3 +685,169 @@ input[type="checkbox"]:checked+label {
 	font-family: monospace, monospace;
 	line-height: 2em;
 }
+
+
+
+
+
+html.light {
+	color: #333;
+	background: #eee;
+	text-shadow: none;
+}
+html.light #ops,
+html.light .opbox,
+html.light #srch_form {
+	background: #f7f7f7;
+	box-shadow: 0 0 .3em #ddd;
+	border-color: #f7f7f7;
+}
+html.light #ops a.act {
+	box-shadow: 0 .2em .2em #ccc;
+	background: #f7f7f7;
+	border-color: #07a;
+	padding-top: .4em;
+}
+html.light #op_cfg h3 {
+	border-color: #ccc;
+}
+html.light .tglbtn,
+html.light #tree > a + a {
+	color: #666;
+	background: #ddd;
+	box-shadow: none;
+}
+html.light .tglbtn:hover,
+html.light #tree > a + a:hover {
+	background: #caf;
+}
+html.light .tglbtn.on,
+html.light #tree > a + a.on {
+	background: #4a0;
+	color: #fff;
+}
+html.light #srv_info {
+	color: #c83;
+	text-shadow: 1px 1px 0 #fff;
+}
+html.light #srv_info span {
+	color: #000;
+}
+html.light #treeul a+a {
+	background: inherit;
+	color: #06a;
+}
+html.light #treeul a.hl {
+	background: #07a;
+	color: #fff;
+}
+html.light #tree li {
+	border-color: #ddd #fff #f7f7f7 #fff;
+}
+html.light #tree ul {
+	border-color: #ccc;
+}
+html.light a,
+html.light #ops a,
+html.light #files tbody div a:last-child {
+	color: #06a;
+}
+html.light #files tbody {
+	background: #f7f7f7;
+}
+html.light #files {
+	box-shadow: 0 0 .3em #ccc;
+}
+html.light #files thead th {
+	background: #eee;
+}
+html.light #files tr+tr td {
+	border-top: 1px solid #ddd;
+}
+html.light #files td {
+	border-bottom: 1px solid #f7f7f7;
+}
+html.light #files tbody tr:last-child td {
+	border-bottom: .2em solid #ccc;
+}
+html.light #files td:nth-child(2n) {
+	color: #d38;
+}
+html.light #files tr:hover td {
+	background: #fff;
+}
+html.light #files tbody a.play {
+	color: #c0f;
+}
+html.light #files tr.play td {
+	background: #fc5;
+}
+html.light #files tr.play a {
+	color: #406;
+}
+html.light #files > thead > tr > th.min span {
+	background: linear-gradient(90deg, rgba(68,68,68,0), rgba(68,68,68,0.2) 70%, rgba(68,68,68,0.5));
+}
+html.light #blocked {
+	background: #eee;
+}
+html.light #blk_play a,
+html.light #blk_abrt a {
+	background: #fff;
+	box-shadow: 0 .2em .4em #ddd;
+}
+html.light #widget a {
+	color: #fc5;
+}
+html.light #files tr.sel:hover td {
+	background: #c37;
+}
+html.light #files tr.sel a {
+	color: #fff;
+}
+html.light input[type="checkbox"] + label {
+	color: #333;
+}
+.opview input[type="text"] {
+	background: #fff;
+	color: #333;
+	box-shadow: 0 0 2px #888;
+	border-color: #d38;
+}
+html.light #ops:hover #opdesc {
+	background: #fff;
+	box-shadow: 0 .3em 1em #ccc;
+}
+html.light #opdesc code {
+	background: #060;
+	color: #fff;
+}
+html.light #u2tab a>span,
+html.light #files td div span {
+	color: #000;
+}
+html.light #files a:hover {
+	color: #000;
+	background: #fff;
+}
+html.light #path {
+	background: #f7f7f7;
+	text-shadow: none;
+	box-shadow: 0 0 .3em #bbb;
+}
+html.light #path a {
+	color: #333;
+}
+html.light #path a:not(:last-child)::after {
+	border-color: #ccc;
+	background: none;
+	border-width: .1em .1em 0 0;
+	margin: -.2em .3em -.2em -.3em;
+}
+html.light #path a:hover {
+	background: none;
+	color: #60a;
+}
+html.light #files tbody div a {
+	color: #d38;
+}

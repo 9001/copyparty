@@ -31,12 +31,12 @@ var md_opt = {
 
 var lightswitch = (function () {
 	var fun = function () {
-		var dark = !!!document.documentElement.getAttribute("class");
+		var dark = !document.documentElement.getAttribute("class");
 		document.documentElement.setAttribute("class", dark ? "dark" : "");
 		if (window.localStorage)
-			localStorage.setItem('darkmode', dark ? 1 : 0);
+			localStorage.setItem('lightmode', dark ? 0 : 1);
 	};
-	if (window.localStorage && localStorage.getItem('darkmode') == 1)
+	if (window.localStorage && localStorage.getItem('lightmode') != 1)
 		fun();
 	
 	return fun;

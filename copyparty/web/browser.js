@@ -1577,6 +1577,24 @@ function addcrc() {
 })();
 
 
+(function () {
+	var light = bcfg_get('lightmode', false);
+
+	function freshen() {
+		document.documentElement.setAttribute("class", light ? "light" : "");
+	}
+
+	ebi('lightmode').onclick = function (e) {
+		ev(e);
+		light = !light;
+		bcfg_set('lightmode', light);
+		freshen();
+	};
+
+	freshen();
+})();
+
+
 var arcfmt = (function () {
 	if (!ebi('arc_fmt'))
 		return { "render": function () { } };

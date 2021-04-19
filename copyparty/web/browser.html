@@ -39,14 +39,17 @@
     {%- include 'upload.html' %}
 
     <div id="op_cfg" class="opview opbox">
-        <h3>key notation</h3>
-        <div id="key_notation"></div>
+        <h3>switches</h3>
+        <div>
+            <a id="tooltips" class="tglbtn" href="#">tooltips</a>
+            <a id="lightmode" class="tglbtn" href="#">lightmode</a>
+        </div>
         {%- if have_zip %}
         <h3>folder download</h3>
         <div id="arc_fmt"></div>
         {%- endif %}
-        <h3>tooltips</h3>
-        <div><a id="tooltips" class="tglbtn" href="#">enable</a></div>
+        <h3>key notation</h3>
+        <div id="key_notation"></div>
     </div>
     
     <h1 id="path">

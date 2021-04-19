@@ -1333,14 +1333,14 @@ function up2k_init(have_crypto) {
 
         var obj = ebi('nthread');
         if (dir.target) {
-            obj.style.background = '#922';
+            clmod(obj, 'err', 1);
             var v = Math.floor(parseInt(obj.value));
             if (v < 1 || v > 8 || v !== v)
                 return;
 
             parallel_uploads = v;
             swrite('nthread', v);
-            obj.style.background = '#444';
+            clmod(obj, 'err');
             return;
         }
 
