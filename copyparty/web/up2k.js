@@ -141,7 +141,7 @@ function U2pvis(act, btns) {
     this.tail = -1;
     this.wsz = 3;
 
-    this.addfile = function (entry) {
+    this.addfile = function (entry, sz) {
         this.tab.push({
             "hn": entry[0],
             "ht": entry[1],
@@ -149,8 +149,10 @@ function U2pvis(act, btns) {
             "in": 'q',
             "nh": 0, //hashed
             "nd": 0, //done
-            "pa": [], //percents
-            "pb": []  //active-list
+            "cb": [], // bytes done in chunk
+            "bt": sz, // bytes total
+            "bd": 0,  // bytes done
+            "bd0": 0  // upload start
         });
         this.ctr["q"]++;
         this.drawcard("q");
@@ -184,28 +186,39 @@ function U2pvis(act, btns) {
         }
     };
 
-    this.setab = function (nfile, blocks) {
+    this.setab = function (nfile, nblocks) {
         var t = [];
-        for (var a = 0; a < blocks; a++)
+        for (var a = 0; a < nblocks; a++)
             t.push(0);
 
-        this.tab[nfile].pa = t;
+        this.tab[nfile].cb = t;
     };
 
-    this.perc = function (n, t, e, sz, t0) {
-        var p = (n + e) * 100.0 / t,
-            td = new Date().getTime() - t0,
-            pp = (td / 1000) / p,
-            spd = (sz / 100) / pp,
-            eta = pp * (100 - p);
+    this.setat = function (nfile, blocktab) {
+        this.tab[nfile].cb = blocktab;
+
+        var bd = 0;
+        for (var a = 0; a < blocktab.length; a++)
+            bd += blocktab[a];
+
+        this.tab[nfile].bd = bd;
+        this.tab[nfile].bd0 = bd;
+    };
+
+    this.perc = function (bd, bd0, sz, t0) {
+        var td = new Date().getTime() - t0,
+            p = bd * 100.0 / sz,
+            nb = bd - bd0,
+            spd = nb / (td / 1000),
+            eta = (sz - bd) / spd;
 
         return [p, s2ms(eta), spd / (1024 * 1024)];
     };
 
     this.hashed = function (fobj) {
         var fo = this.tab[fobj.n];
-        fo.nh++;
-        var p = this.perc(fo.nh, fo.pa.length, 0, fobj.size, fobj.t1);
+        var nb = fo.bt * (++fo.nh / fo.cb.length);
+        var p = this.perc(nb, 0, fobj.size, fobj.t1);
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
@@ -219,26 +232,13 @@ function U2pvis(act, btns) {
         obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
-    this.prog = function (fobj, nchunk, percent) {
-        var fo = this.tab[fobj.n], pb = fo.pb;
-        var i = pb.indexOf(nchunk);
-        fo.pa[nchunk] = percent;
-        if (percent == 101) {
-            fo.nd++;
-            if (i >= 0)
-                pb.splice(i);
-        }
-        else if (i == -1) {
-            pb.push(nchunk);
-        }
+    this.prog = function (fobj, nchunk, cbd) {
+        var fo = this.tab[fobj.n];
+        var delta = cbd - fo.cb[nchunk];
+        fo.cb[nchunk] = cbd;
+        fo.bd += delta;
 
-        var extra = 0;
-        for (var a = 0; a < pb.length; a++)
-            extra += fo.pa[a];
-
-        extra /= fo.pa.length;
-
-        var p = this.perc(fo.nd, fo.pa.length, extra, fobj.size, fobj.t3);
+        var p = this.perc(fo.bd, fo.bd0, fo.bt, fobj.t3);
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
@@ -690,7 +690,7 @@ function up2k_init(have_crypto) {
                     esc(uricom_dec(entry.purl)[0] + entry.name)).join(' '),
                 '📐 hash',
                 ''
-            ]);
+            ], fobj.size);
             st.files.push(entry);
             st.todo.hash.push(entry);
         }
@@ -1106,6 +1106,14 @@ function up2k_init(have_crypto) {
                     pvis.seth(t.n, 0, linksplit(esc(t.purl + t.name)).join(' '));
                 }
 
+                var chunksize = get_chunksize(t.size);
+                var cdr_idx = Math.ceil(t.size / chunksize) - 1;
+                var cdr_sz = (t.size % chunksize) || chunksize;
+                var cbd = [];
+                for (var a = 0; a <= cdr_idx; a++) {
+                    cbd.push(a == cdr_idx ? cdr_sz : chunksize);
+                }
+
                 t.postlist = [];
                 t.wark = response.wark;
                 var missing = response.hash;
@@ -1116,7 +1124,11 @@ function up2k_init(have_crypto) {
                             missing[a], JSON.stringify(t)));
 
                     t.postlist.push(idx);
+                    cbd[idx] = 0;
                 }
+
+                pvis.setat(t.n, cbd);
+                pvis.prog(t, 0, cbd[0]);
 
                 var done = true;
                 var msg = '&#x1f3b7;&#x1f41b;';
@@ -1226,12 +1238,11 @@ function up2k_init(have_crypto) {
         reader.onload = function (e) {
             var xhr = new XMLHttpRequest();
             xhr.upload.onprogress = function (xev) {
-                var perc = xev.loaded / (cdr - car) * 100;
-                pvis.prog(t, npart, perc, t);
+                pvis.prog(t, npart, xev.loaded);
             };
             xhr.onload = function (xev) {
                 if (xhr.status == 200) {
-                    pvis.prog(t, npart, 101, t);
+                    pvis.prog(t, npart, cdr - car);
                     st.bytes.uploaded += cdr - car;
                     t.bytes_uploaded += cdr - car;
                     st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
