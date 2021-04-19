@@ -1223,6 +1223,8 @@ function up2k_init(have_crypto) {
 
         var npart = upt.npart;
         var t = st.files[upt.nfile];
+        if (!t.t3)
+            t.t3 = new Date().getTime();
 
         pvis.seth(t.n, 1, "🚀 send");
 
@@ -1232,54 +1234,40 @@ function up2k_init(have_crypto) {
         if (cdr >= t.size)
             cdr = t.size;
 
-        var reader = new FileReader();
-
-        reader.onerror = function () {
-            alert('y o u   b r o k e    i t\nerror: ' + reader.error);
+        var xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = function (xev) {
+            pvis.prog(t, npart, xev.loaded);
         };
-
-        reader.onload = function (e) {
-            var xhr = new XMLHttpRequest();
-            xhr.upload.onprogress = function (xev) {
-                pvis.prog(t, npart, xev.loaded);
-            };
-            xhr.onload = function (xev) {
-                if (xhr.status == 200) {
-                    pvis.prog(t, npart, cdr - car);
-                    st.bytes.uploaded += cdr - car;
-                    t.bytes_uploaded += cdr - car;
-                    st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
-                    t.postlist.splice(t.postlist.indexOf(npart), 1);
-                    if (t.postlist.length == 0) {
-                        t.t4 = new Date().getTime();
-                        pvis.seth(t.n, 1, 'verifying');
-                        st.todo.handshake.unshift(t);
-                    }
-                    tasker();
+        xhr.onload = function (xev) {
+            if (xhr.status == 200) {
+                pvis.prog(t, npart, cdr - car);
+                st.bytes.uploaded += cdr - car;
+                t.bytes_uploaded += cdr - car;
+                st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
+                t.postlist.splice(t.postlist.indexOf(npart), 1);
+                if (t.postlist.length == 0) {
+                    t.t4 = new Date().getTime();
+                    pvis.seth(t.n, 1, 'verifying');
+                    st.todo.handshake.unshift(t);
                 }
-                else
-                    alert("server broke; cu-err {0} on file [{1}]:\n".format(
-                        xhr.status, t.name) + (
-                            (xhr.response && xhr.response.err) ||
-                            (xhr.responseText && xhr.responseText) ||
-                            "no further information"));
-            };
-            xhr.open('POST', t.purl + 'chunkpit.php', true);
-            //xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart].substr(1) + "x");
-            xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
-            xhr.setRequestHeader("X-Up2k-Wark", t.wark);
-            xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-            if (xhr.overrideMimeType)
-                xhr.overrideMimeType('Content-Type', 'application/octet-stream');
-
-            xhr.responseType = 'text';
-            xhr.send(e.target.result);
-
-            if (!t.t3)
-                t.t3 = new Date().getTime();
+                tasker();
+            }
+            else
+                alert("server broke; cu-err {0} on file [{1}]:\n".format(
+                    xhr.status, t.name) + (
+                        (xhr.response && xhr.response.err) ||
+                        (xhr.responseText && xhr.responseText) ||
+                        "no further information"));
         };
+        xhr.open('POST', t.purl + 'chunkpit.php', true);
+        xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
+        xhr.setRequestHeader("X-Up2k-Wark", t.wark);
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        if (xhr.overrideMimeType)
+            xhr.overrideMimeType('Content-Type', 'application/octet-stream');
 
-        reader.readAsArrayBuffer(bobslice.call(t.fobj, car, cdr));
+        xhr.responseType = 'text';
+        xhr.send(bobslice.call(t.fobj, car, cdr));
     }
 
     /////
