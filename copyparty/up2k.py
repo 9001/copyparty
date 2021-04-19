@@ -101,17 +101,18 @@ class Up2k(object):
             thr.daemon = True
             thr.start()
 
-            thr = threading.Thread(target=self._tagger)
-            thr.daemon = True
-            thr.start()
-
             thr = threading.Thread(target=self._hasher)
             thr.daemon = True
             thr.start()
 
-            thr = threading.Thread(target=self._run_all_mtp)
-            thr.daemon = True
-            thr.start()
+            if self.mtag:
+                thr = threading.Thread(target=self._tagger)
+                thr.daemon = True
+                thr.start()
+
+                thr = threading.Thread(target=self._run_all_mtp)
+                thr.daemon = True
+                thr.start()
 
     def log(self, msg, c=0):
         self.log_func("up2k", msg + "\033[K", c)
