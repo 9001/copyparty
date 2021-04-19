@@ -174,6 +174,9 @@ function U2pvis(act, btns) {
     this.seth = function (nfile, field, html) {
         var fo = this.tab[nfile];
         field = ['hn', 'ht', 'hp'][field];
+        if (fo[field] === html)
+            return;
+
         fo[field] = html;
         if (!this.is_act(fo.in))
             return;
