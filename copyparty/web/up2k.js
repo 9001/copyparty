@@ -411,7 +411,6 @@ function U2pvis(act, btns) {
 
 function up2k_init(have_crypto) {
     //have_crypto = false;
-    var need_filereader_cache = undefined;
 
     // show modal message
     function showmodal(msg) {
@@ -907,31 +906,6 @@ function up2k_init(have_crypto) {
         }
     }
 
-    function test_filereader_speed(segm_err) {
-        var f = st.todo.hash[0].fobj,
-            sz = Math.min(2, f.size),
-            reader = new FileReader(),
-            t0, ctr = 0;
-
-        var segm_next = function () {
-            var t = new Date().getTime(),
-                td = t - t0;
-
-            if (++ctr > 2) {
-                need_filereader_cache = td > 50;
-                st.busy.hash.pop();
-                return;
-            }
-            t0 = t;
-            reader.onload = segm_next;
-            reader.onerror = segm_err;
-            reader.readAsArrayBuffer(
-                bobslice.call(f, 0, sz));
-        };
-
-        segm_next();
-    }
-
     function ensure_rendered(func) {
         var hidden = false;
         var keys = ['hidden', 'msHidden', 'webkitHidden'];
@@ -946,111 +920,84 @@ function up2k_init(have_crypto) {
     }
 
     function exec_hash() {
-        if (need_filereader_cache === undefined) {
-            st.busy.hash.push(1);
-            return test_filereader_speed(segm_err);
-        }
-
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
         st.bytes.hashed += t.size;
         t.bytes_uploaded = 0;
         t.t1 = new Date().getTime();
 
-        var nchunk = 0;
-        var chunksize = get_chunksize(t.size);
-        var nchunks = Math.ceil(t.size / chunksize);
-
-        // android-chrome has 180ms latency on FileReader calls,
-        // detect this and do 32MB at a time
-        var cache_buf = undefined,
-            cache_ofs = 0,
-            subchunks = 2;
-
-        while (subchunks * chunksize <= 32 * 1024 * 1024)
-            subchunks++;
-
-        subchunks--;
-        if (!need_filereader_cache)
-            subchunks = 1;
+        var bpend = 0,
+            nchunk = 0,
+            chunksize = get_chunksize(t.size),
+            nchunks = Math.ceil(t.size / chunksize),
+            hashtab = {};
 
         pvis.setab(t.n, nchunks);
         pvis.move(t.n, 'bz');
 
-        var reader = new FileReader();
-
         var segm_next = function () {
-            if (cache_buf) {
-                return hash_calc();
-            }
-            reader.onload = segm_load;
-            reader.onerror = segm_err;
+            if (nchunk >= nchunks || (bpend > chunksize && bpend >= 32 * 1024 * 1024))
+                return false;
 
-            var car = nchunk * chunksize;
-            var cdr = car + chunksize * subchunks;
+            var reader = new FileReader(),
+                nch = nchunk++,
+                car = nch * chunksize,
+                cdr = car + chunksize;
+
             if (cdr >= t.size)
                 cdr = t.size;
 
+            bpend += cdr - car;
+
+            reader.onload = function (e) {
+                hash_calc(nch, e.target.result);
+            };
+            reader.onerror = segm_err;
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
+
+            return true;
         };
 
-        var segm_load = function (e) {
-            cache_buf = e.target.result;
-            cache_ofs = 0;
-            hash_calc();
-        };
+        var hash_calc = function (nch, buf) {
+            while (segm_next());
 
-        var hash_calc = function () {
-            var buf = cache_buf;
-            if (chunksize >= buf.byteLength)
-                cache_buf = undefined;
-            else {
-                var ofs = cache_ofs;
-                var ofs2 = ofs + Math.min(chunksize, cache_buf.byteLength - cache_ofs);
-                cache_ofs = ofs2;
-                buf = new Uint8Array(cache_buf).subarray(ofs, ofs2);
-                if (ofs2 >= cache_buf.byteLength)
-                    cache_buf = undefined;
-            }
+            var hash_done = function (hashbuf) {
+                var hslice = new Uint8Array(hashbuf).subarray(0, 32);
+                var b64str = buf2b64(hslice).replace(/=$/, '');
+                hashtab[nch] = b64str;
+                t.hash.push(nch);
+                pvis.hashed(t);
 
-            var func = function () {
-                if (have_crypto)
-                    crypto.subtle.digest('SHA-512', buf).then(hash_done);
-                else {
-                    var hasher = new asmCrypto.Sha512();
-                    hasher.process(new Uint8Array(buf));
-                    hasher.finish();
-                    hash_done(hasher.result);
+                bpend -= buf.byteLength;
+                if (t.hash.length < nchunks) {
+                    return segm_next();
                 }
+                t.hash = [];
+                for (var a = 0; a < nchunks; a++) {
+                    t.hash.push(hashtab[a]);
+                }
+
+                t.t2 = new Date().getTime();
+                if (t.n == 0 && window.location.hash == '#dbg') {
+                    var spd = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
+                    alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
+                }
+
+                pvis.seth(t.n, 2, 'hashing done');
+                pvis.seth(t.n, 1, '📦 wait');
+                st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
+                st.todo.handshake.push(t);
             };
 
-            if (cache_buf)
-                ensure_rendered(func);
-            else
-                func();
-        };
-
-        var hash_done = function (hashbuf) {
-            var hslice = new Uint8Array(hashbuf).subarray(0, 32);
-            var b64str = buf2b64(hslice).replace(/=$/, '');
-            t.hash.push(b64str);
-
-            pvis.hashed(t);
-            if (++nchunk < nchunks) {
-                return segm_next();
+            if (have_crypto)
+                crypto.subtle.digest('SHA-512', buf).then(hash_done);
+            else {
+                var hasher = new asmCrypto.Sha512();
+                hasher.process(new Uint8Array(buf));
+                hasher.finish();
+                hash_done(hasher.result);
             }
-
-            t.t2 = new Date().getTime();
-            if (t.n == 0 && window.location.hash == '#dbg') {
-                var spd = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
-                alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
-            }
-
-            pvis.seth(t.n, 2, 'hashing done');
-            pvis.seth(t.n, 1, '📦 wait');
-            st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
-            st.todo.handshake.push(t);
         };
 
         var segm_err = function () {
