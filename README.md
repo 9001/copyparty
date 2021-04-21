@@ -101,6 +101,11 @@ summary: it works! you can use it! (but technically not even close to beta)
 * hiding the contents at url `/d1/d2/d3` using `-v :d1/d2/d3:cd2d` has the side-effect of creating databases (for files/tags) inside folders d1 and d2, and those databases take precedence over the main db at the top of the vfs - this means all files in d2 and below will be reindexed unless you already had a vfs entry at or below d2
 * probably more, pls let me know
 
+## not my bugs
+
+* Windows: msys2-python 3.8.6 occasionally throws "RuntimeError: release unlocked lock" when leaving a scoped mutex in up2k
+  * this is an msys2 bug, the regular windows edition of python is fine
+
 
 # usage
 
