@@ -616,17 +616,24 @@ def exclude_dotfiles(filepaths):
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
 
 
-def html_escape(s, quote=False):
+def html_escape(s, quote=False, crlf=False):
     """html.escape but also newlines"""
-    s = (
-        s.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace("\r", "&#13;")
-        .replace("\n", "&#10;")
-    )
+    s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     if quote:
         s = s.replace('"', "&quot;").replace("'", "&#x27;")
+    if crlf:
+        s = s.replace("\r", "&#13;").replace("\n", "&#10;")
+
+    return s
+
+
+def html_bescape(s, quote=False, crlf=False):
+    """html.escape but bytestrings"""
+    s = s.replace(b"&", b"&amp;").replace(b"<", b"&lt;").replace(b">", b"&gt;")
+    if quote:
+        s = s.replace(b'"', b"&quot;").replace(b"'", b"&#x27;")
+    if crlf:
+        s = s.replace(b"\r", b"&#13;").replace(b"\n", b"&#10;")
 
     return s
 

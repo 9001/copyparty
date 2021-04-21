@@ -680,7 +680,7 @@ class HttpCli(object):
                 raise Pebkac(500, "mkdir failed, check the logs")
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
-        esc_paths = [quotep(vpath), html_escape(vpath)]
+        esc_paths = [quotep(vpath), html_escape(vpath, crlf=True)]
         html = self.j2(
             "msg",
             h2='<a href="/{}">go to /{}</a>'.format(*esc_paths),
@@ -1181,17 +1181,16 @@ class HttpCli(object):
         template = self.j2(tpl)
 
         st = os.stat(fsenc(fs_path))
-        # sz_md = st.st_size
         ts_md = st.st_mtime
 
         st = os.stat(fsenc(html_path))
         ts_html = st.st_mtime
 
-        # TODO dont load into memory ;_;
-        #   (trivial fix, count the &'s)
-        with open(fsenc(fs_path), "rb") as f:
-            md = f.read().replace(b"&", b"&amp;")
-            sz_md = len(md)
+        sz_md = 0
+        for buf in yieldfile(fs_path):
+            sz_md += len(buf)
+            for c, v in [[b"&", 4], [b"<", 3], [b">", 3]]:
+                sz_md += (len(buf) - len(buf.replace(c, b""))) * v
 
         file_ts = max(ts_md, ts_html)
         file_lastmod, do_send = self._chk_lastmod(file_ts)
@@ -1199,27 +1198,34 @@ class HttpCli(object):
         self.out_headers["Cache-Control"] = "no-cache"
         status = 200 if do_send else 304
 
+        boundary = "\roll\tide"
         targs = {
             "edit": "edit" in self.uparam,
-            "title": html_escape(self.vpath),
+            "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
             "md_plug": "true" if self.args.emp else "false",
             "md_chk_rate": self.args.mcr,
-            "md": "",
+            "md": boundary,
         }
-        sz_html = len(template.render(**targs).encode("utf-8"))
-        self.send_headers(sz_html + sz_md, status)
+        html = template.render(**targs).encode("utf-8")
+        html = html.split(boundary.encode("utf-8"))
+        if len(html) != 2:
+            raise Exception("boundary appears in " + html_path)
+
+        self.send_headers(sz_md + len(html[0]) + len(html[1]), status)
 
         logmsg += unicode(status)
         if self.mode == "HEAD" or not do_send:
             self.log(logmsg)
             return True
 
-        # TODO jinja2 can stream this right?
-        targs["md"] = md.decode("utf-8", "replace")
-        html = template.render(**targs).encode("utf-8")
         try:
-            self.s.sendall(html)
+            self.s.sendall(html[0])
+            for buf in yieldfile(fs_path):
+                self.s.sendall(html_bescape(buf))
+
+            self.s.sendall(html[1])
+
         except:
             self.log(logmsg + " \033[31md/c\033[0m")
             return False
@@ -1300,7 +1306,7 @@ class HttpCli(object):
                 else:
                     vpath += "/" + node
 
-                vpnodes.append([quotep(vpath) + "/", html_escape(node)])
+                vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
         vn, rem = self.auth.vfs.get(
             self.vpath, self.uname, self.readable, self.writable
@@ -1394,7 +1400,7 @@ class HttpCli(object):
                     margin = '<a href="{}?zip">zip</a>'.format(quotep(href))
             elif fn in hist:
                 margin = '<a href="{}.hist/{}">#{}</a>'.format(
-                    base, html_escape(hist[fn][2], quote=True), hist[fn][0]
+                    base, html_escape(hist[fn][2], quote=True, crlf=True), hist[fn][0]
                 )
             else:
                 margin = "-"
@@ -1536,7 +1542,7 @@ class HttpCli(object):
             have_b_u=(self.writable and self.uparam.get("b") == "u"),
             url_suf=url_suf,
             logues=logues,
-            title=html_escape(self.vpath),
+            title=html_escape(self.vpath, crlf=True),
             srv_info=srv_info,
         )
         self.reply(html.encode("utf-8", "replace"))
