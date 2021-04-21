@@ -746,14 +746,10 @@ function up2k_init(have_crypto) {
     }
 
     var tasker = (function () {
-        var mutex = false,
+        var tto = null,
             was_busy = false;
 
         function taskerd() {
-            if (mutex)
-                return;
-
-            mutex = true;
             while (true) {
                 var is_busy = 0 !=
                     st.todo.hash.length +
@@ -775,8 +771,8 @@ function up2k_init(have_crypto) {
                         var now = new Date().getTime();
                         flag.take(now);
                         if (!flag.ours) {
-                            setTimeout(taskerd, 100);
-                            mutex = false;
+                            clearTimeout(tto);
+                            tto = setTimeout(taskerd, 100);
                             return;
                         }
                     }
@@ -821,8 +817,8 @@ function up2k_init(have_crypto) {
                 }
 
                 if (!mou_ikkai) {
-                    setTimeout(taskerd, 100);
-                    mutex = false;
+                    clearTimeout(tto);
+                    tto = setTimeout(taskerd, 100);
                     return;
                 }
             }

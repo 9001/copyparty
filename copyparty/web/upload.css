@@ -90,8 +90,10 @@
 	background: #222;
 }
 #u2cards {
-	margin: 2.5em auto -2.5em auto;
+	padding: 1em 0 .2em 0;
+	margin: 1.5em auto -2.5em auto;
 	text-align: center;
+	overflow: hidden;
 }
 #u2cards.w {
 	width: 45em;
@@ -110,12 +112,12 @@
 	border-radius: 0 .4em 0 0;
 }
 #u2cards a.act {
-	border-width: 1px 1px 0 1px;
+	border-width: 1px;
 	border-radius: .3em .3em 0 0;
 	margin-left: -1px;
 	background: linear-gradient(to bottom, #454, #333);
-	box-shadow: 0 -.2em .19em #380;
-	border-color: #7c5 #583 #000 #583;
+	box-shadow: 0 -.17em .67em #280;
+	border-color: #7c5 #583 #333 #583;
 	position: relative;
 	color: #fd7;
 }
@@ -260,8 +262,10 @@ html.light #u2cards a {
 	background: linear-gradient(to bottom, #eee, #fff);
 }
 html.light #u2cards a.act {
-	background: inherit;
 	color: #037;
+	background: inherit;
+	box-shadow: 0 -.17em .67em #0ad;
+	border-color: #09c #05a #eee #05a;
 }
 html.light #u2conf .txtbox {
 	background: #fff;
