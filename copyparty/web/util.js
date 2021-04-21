@@ -6,7 +6,8 @@ if (!window['console'])
     };
 
 
-var clickev = window.Touch ? 'touchstart' : 'click';
+var clickev = window.Touch ? 'touchstart' : 'click',
+    ANDROID = /(android)/i.test(navigator.userAgent);
 
 
 // error handler for mobile devices

@@ -219,25 +219,28 @@ function U2pvis(act, btns) {
     };
 
     this.hashed = function (fobj) {
-        var fo = this.tab[fobj.n];
-        var nb = fo.bt * (++fo.nh / fo.cb.length);
-        var p = this.perc(nb, 0, fobj.size, fobj.t1);
+        var fo = this.tab[fobj.n],
+            nb = fo.bt * (++fo.nh / fo.cb.length),
+            p = this.perc(nb, 0, fobj.size, fobj.t1);
+
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
         if (!this.is_act(fo.in))
             return;
 
-        var obj = ebi('f{0}p'.format(fobj.n));
+        var obj = ebi('f{0}p'.format(fobj.n)),
+            o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
+
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
-        var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
         obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
     this.prog = function (fobj, nchunk, cbd) {
-        var fo = this.tab[fobj.n];
-        var delta = cbd - fo.cb[nchunk];
+        var fo = this.tab[fobj.n],
+            delta = cbd - fo.cb[nchunk];
+
         fo.cb[nchunk] = cbd;
         fo.bd += delta;
 
@@ -249,10 +252,11 @@ function U2pvis(act, btns) {
         if (!this.is_act(fo.in))
             return;
 
-        var obj = ebi('f{0}p'.format(fobj.n));
+        var obj = ebi('f{0}p'.format(fobj.n)),
+            o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
+
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
-        var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
         obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
@@ -331,9 +335,9 @@ function U2pvis(act, btns) {
 
     this.changecard = function (card) {
         this.act = card;
-        var html = [];
         this.head = -1;
         this.tail = -1;
+        var html = [];
         for (var a = 0; a < this.tab.length; a++) {
             var rt = this.tab[a].in;
             if (this.is_act(rt)) {
@@ -416,8 +420,9 @@ function up2k_init(have_crypto) {
         ebi('u2notbtn').innerHTML = '';
     }
 
-    var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>'
-    var is_https = (window.location + '').indexOf('https:') === 0;
+    var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>',
+        is_https = (window.location + '').indexOf('https:') === 0;
+
     if (is_https)
         // chrome<37 firefox<34 edge<12 ie<11 opera<24 safari<10.1
         shame = 'your browser is impressively ancient';
@@ -474,14 +479,14 @@ function up2k_init(have_crypto) {
         };
     }
 
-    var parallel_uploads = icfg_get('nthread');
-    var multitask = bcfg_get('multitask', true);
-    var ask_up = bcfg_get('ask_up', true);
-    var flag_en = bcfg_get('flag_en', false);
-    var fsearch = bcfg_get('fsearch', false);
-    var min_filebuf = 0;
+    var parallel_uploads = icfg_get('nthread'),
+        multitask = bcfg_get('multitask', true),
+        ask_up = bcfg_get('ask_up', true),
+        flag_en = bcfg_get('flag_en', false),
+        fsearch = bcfg_get('fsearch', false),
+        fdom_ctr = 0,
+        min_filebuf = 0;
 
-    var fdom_ctr = 0;
     var st = {
         "files": [],
         "todo": {
@@ -531,8 +536,9 @@ function up2k_init(have_crypto) {
         e.stopPropagation();
         e.preventDefault();
 
-        var files;
-        var is_itemlist = false;
+        var files,
+            is_itemlist = false;
+
         if (e.dataTransfer) {
             if (e.dataTransfer.items) {
                 files = e.dataTransfer.items; // DataTransferItemList
@@ -546,9 +552,10 @@ function up2k_init(have_crypto) {
             return alert('no files selected??');
 
         more_one_file();
-        var bad_files = [];
-        var good_files = [];
-        var dirs = [];
+        var bad_files = [],
+            good_files = [],
+            dirs = [];
+
         for (var a = 0; a < files.length; a++) {
             var fobj = files[a];
             if (is_itemlist) {
@@ -633,12 +640,13 @@ function up2k_init(have_crypto) {
 
     function gotallfiles(good_files, bad_files) {
         if (bad_files.length > 0) {
-            var ntot = bad_files.length + good_files.length;
-            var msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, ntot);
+            var ntot = bad_files.length + good_files.length,
+                msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, ntot);
+
             for (var a = 0, aa = Math.min(20, bad_files.length); a < aa; a++)
                 msg += '-- ' + bad_files[a] + '\n';
 
-            if (good_files.length - bad_files.length <= 1 && /(android)/i.test(navigator.userAgent))
+            if (good_files.length - bad_files.length <= 1 && ANDROID)
                 msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
 
             alert(msg);
@@ -652,9 +660,10 @@ function up2k_init(have_crypto) {
             return;
 
         for (var a = 0; a < good_files.length; a++) {
-            var fobj = good_files[a][0];
-            var now = new Date().getTime();
-            var lmod = fobj.lastModified || now;
+            var fobj = good_files[a][0],
+                now = new Date().getTime(),
+                lmod = fobj.lastModified || now;
+
             var entry = {
                 "n": parseInt(st.files.length.toString()),
                 "t0": now,
@@ -690,7 +699,7 @@ function up2k_init(have_crypto) {
 
     function more_one_file() {
         fdom_ctr++;
-        var elm = document.createElement('div')
+        var elm = document.createElement('div');
         elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" />'.format(fdom_ctr);
         ebi('u2form').appendChild(elm);
         ebi('file' + fdom_ctr).addEventListener('change', gotfile, false);
@@ -737,8 +746,8 @@ function up2k_init(have_crypto) {
     }
 
     var tasker = (function () {
-        var mutex = false;
-        var was_busy = false;
+        var mutex = false,
+            was_busy = false;
 
         function taskerd() {
             if (mutex)
@@ -757,10 +766,8 @@ function up2k_init(have_crypto) {
                 if (was_busy != is_busy) {
                     was_busy = is_busy;
 
-                    if (is_busy)
-                        window.addEventListener("beforeunload", warn_uploader_busy);
-                    else
-                        window.removeEventListener("beforeunload", warn_uploader_busy);
+                    window[(is_busy ? "add" : "remove") +
+                        "EventListener"]("beforeunload", warn_uploader_busy);
                 }
 
                 if (flag) {
@@ -831,47 +838,47 @@ function up2k_init(have_crypto) {
 
     // https://gist.github.com/jonleighton/958841
     function buf2b64(arrayBuffer) {
-        var base64 = '';
-        var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-        var bytes = new Uint8Array(arrayBuffer);
-        var byteLength = bytes.byteLength;
-        var byteRemainder = byteLength % 3;
-        var mainLength = byteLength - byteRemainder;
-        var a, b, c, d;
-        var chunk;
+        var base64 = '',
+            cset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',
+            src = new Uint8Array(arrayBuffer),
+            nbytes = src.byteLength,
+            byteRem = nbytes % 3,
+            mainLen = nbytes - byteRem,
+            a, b, c, d, chunk;
 
-        for (var i = 0; i < mainLength; i = i + 3) {
-            chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+        for (var i = 0; i < mainLen; i = i + 3) {
+            chunk = (src[i] << 16) | (src[i + 1] << 8) | src[i + 2];
             // create 8*3=24bit segment then split into 6bit segments
-            a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
-            b = (chunk & 258048) >> 12; // 258048   = (2^6 - 1) << 12
-            c = (chunk & 4032) >> 6; // 4032     = (2^6 - 1) << 6
-            d = chunk & 63;               // 63       = 2^6 - 1
+            a = (chunk & 16515072) >> 18; // (2^6 - 1) << 18
+            b = (chunk & 258048) >> 12; // (2^6 - 1) << 12
+            c = (chunk & 4032) >> 6; // (2^6 - 1) << 6
+            d = chunk & 63; // 2^6 - 1
 
             // Convert the raw binary segments to the appropriate ASCII encoding
-            base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
+            base64 += cset[a] + cset[b] + cset[c] + cset[d];
         }
 
-        if (byteRemainder == 1) {
-            chunk = bytes[mainLength];
-            a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
-            b = (chunk & 3) << 4; // 3   = 2^2 - 1  (zero 4 LSB)
-            base64 += encodings[a] + encodings[b];//+ '==';
+        if (byteRem == 1) {
+            chunk = src[mainLen];
+            a = (chunk & 252) >> 2; // (2^6 - 1) << 2
+            b = (chunk & 3) << 4; // 2^2 - 1  (zero 4 LSB)
+            base64 += cset[a] + cset[b];//+ '==';
         }
-        else if (byteRemainder == 2) {
-            chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
-            a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
-            b = (chunk & 1008) >> 4; // 1008  = (2^6 - 1) << 4
-            c = (chunk & 15) << 2; // 15    = 2^4 - 1  (zero 2 LSB)
-            base64 += encodings[a] + encodings[b] + encodings[c];//+ '=';
+        else if (byteRem == 2) {
+            chunk = (src[mainLen] << 8) | src[mainLen + 1];
+            a = (chunk & 64512) >> 10; // (2^6 - 1) << 10
+            b = (chunk & 1008) >> 4; // (2^6 - 1) << 4
+            c = (chunk & 15) << 2; // 2^4 - 1  (zero 2 LSB)
+            base64 += cset[a] + cset[b] + cset[c];//+ '=';
         }
 
         return base64;
     }
 
     function get_chunksize(filesize) {
-        var chunksize = 1024 * 1024;
-        var stepsize = 512 * 1024;
+        var chunksize = 1024 * 1024,
+            stepsize = 512 * 1024;
+
         while (true) {
             for (var mul = 1; mul <= 2; mul++) {
                 var nchunks = Math.ceil(filesize / chunksize);
@@ -889,7 +896,6 @@ function up2k_init(have_crypto) {
         st.busy.hash.push(t);
         st.bytes.hashed += t.size;
         t.bytes_uploaded = 0;
-        t.t1 = new Date().getTime();
 
         var bpend = 0,
             nchunk = 0,
@@ -926,7 +932,9 @@ function up2k_init(have_crypto) {
                 }
                 hash_calc(nch, e.target.result);
             };
-            reader.onerror = segm_err;
+            reader.onerror = function () {
+                alert('y o u   b r o k e    i t\nerror: ' + reader.error);
+            };
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
 
@@ -937,8 +945,9 @@ function up2k_init(have_crypto) {
             while (segm_next());
 
             var hash_done = function (hashbuf) {
-                var hslice = new Uint8Array(hashbuf).subarray(0, 32);
-                var b64str = buf2b64(hslice).replace(/=$/, '');
+                var hslice = new Uint8Array(hashbuf).subarray(0, 32),
+                    b64str = buf2b64(hslice).replace(/=$/, '');
+
                 hashtab[nch] = b64str;
                 t.hash.push(nch);
                 pvis.hashed(t);
@@ -974,10 +983,7 @@ function up2k_init(have_crypto) {
             }
         };
 
-        var segm_err = function () {
-            alert('y o u   b r o k e    i t\nerror: ' + reader.error);
-        };
-
+        t.t1 = new Date().getTime();
         segm_next();
     }
 
@@ -996,8 +1002,9 @@ function up2k_init(have_crypto) {
                 var response = JSON.parse(xhr.responseText);
 
                 if (!response.name) {
-                    var msg = '';
-                    var smsg = '';
+                    var msg = '',
+                        smsg = '';
+
                     if (!response || !response.hits || !response.hits.length) {
                         msg = 'not found on server';
                         smsg = '404';
@@ -1030,10 +1037,11 @@ function up2k_init(have_crypto) {
                     pvis.seth(t.n, 0, linksplit(esc(t.purl + t.name)).join(' '));
                 }
 
-                var chunksize = get_chunksize(t.size);
-                var cdr_idx = Math.ceil(t.size / chunksize) - 1;
-                var cdr_sz = (t.size % chunksize) || chunksize;
-                var cbd = [];
+                var chunksize = get_chunksize(t.size),
+                    cdr_idx = Math.ceil(t.size / chunksize) - 1,
+                    cdr_sz = (t.size % chunksize) || chunksize,
+                    cbd = [];
+
                 for (var a = 0; a <= cdr_idx; a++) {
                     cbd.push(a == cdr_idx ? cdr_sz : chunksize);
                 }
@@ -1054,8 +1062,9 @@ function up2k_init(have_crypto) {
                 pvis.setat(t.n, cbd);
                 pvis.prog(t, 0, cbd[0]);
 
-                var done = true;
-                var msg = '&#x1f3b7;&#x1f41b;';
+                var done = true,
+                    msg = '&#x1f3b7;&#x1f41b;';
+
                 if (t.postlist.length > 0) {
                     for (var a = 0; a < t.postlist.length; a++)
                         st.todo.upload.push({
@@ -1072,10 +1081,12 @@ function up2k_init(have_crypto) {
                 if (done) {
                     t.done = true;
                     st.bytes.uploaded += t.size - t.bytes_uploaded;
-                    var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
-                    var spd2 = (t.size / ((t.t4 - t.t3) / 1000.)) / (1024 * 1024.);
+                    var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.),
+                        spd2 = (t.size / ((t.t4 - t.t3) / 1000.)) / (1024 * 1024.);
+
                     pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2)));
+
                     pvis.move(t.n, 'ok');
                 }
                 else t.t4 = undefined;
@@ -1142,16 +1153,18 @@ function up2k_init(have_crypto) {
         var upt = st.todo.upload.shift();
         st.busy.upload.push(upt);
 
-        var npart = upt.npart;
-        var t = st.files[upt.nfile];
+        var npart = upt.npart,
+            t = st.files[upt.nfile];
+
         if (!t.t3)
             t.t3 = new Date().getTime();
 
         pvis.seth(t.n, 1, "🚀 send");
 
-        var chunksize = get_chunksize(t.size);
-        var car = npart * chunksize;
-        var cdr = car + chunksize;
+        var chunksize = get_chunksize(t.size),
+            car = npart * chunksize,
+            cdr = car + chunksize;
+
         if (cdr >= t.size)
             cdr = t.size;
 
@@ -1216,10 +1229,10 @@ function up2k_init(have_crypto) {
     onresize();
 
     function desc_show(e) {
-        var msg = this.getAttribute('alt');
-        msg = msg.replace(/\$N/g, "<br />");
-        var cdesc = ebi('u2cdesc');
-        cdesc.innerHTML = msg;
+        var msg = this.getAttribute('alt'),
+            cdesc = ebi('u2cdesc');
+
+        cdesc.innerHTML = msg.replace(/\$N/g, "<br />");
         cdesc.setAttribute('class', 'show');
     }
     function desc_hide(e) {
@@ -1283,8 +1296,8 @@ function up2k_init(have_crypto) {
     }
 
     function set_fsearch(new_state) {
-        var perms = document.body.getAttribute('perms');
-        var read_only = false;
+        var perms = document.body.getAttribute('perms'),
+            read_only = false;
 
         if (!ebi('fsearch')) {
             new_state = false;
@@ -1305,11 +1318,11 @@ function up2k_init(have_crypto) {
         catch (ex) { }
 
         try {
-            var fun = fsearch ? 'add' : 'remove';
-            ebi('op_up2k').classList[fun]('srch');
+            var fun = fsearch ? 'add' : 'remove',
+                ico = fsearch ? '🔎' : '🚀',
+                desc = fsearch ? 'Search' : 'Upload';
 
-            var ico = fsearch ? '🔎' : '🚀';
-            var desc = fsearch ? 'Search' : 'Upload';
+            ebi('op_up2k').classList[fun]('srch');
             ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
         }
         catch (ex) { }
