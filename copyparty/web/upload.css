@@ -90,7 +90,7 @@
 	background: #222;
 }
 #u2cards {
-	padding: 1em 0 .2em 0;
+	padding: 1em 0 .3em 0;
 	margin: 1.5em auto -2.5em auto;
 	text-align: center;
 	overflow: hidden;
@@ -112,10 +112,11 @@
 	border-radius: 0 .4em 0 0;
 }
 #u2cards a.act {
-	border-width: 1px;
+	padding-bottom: .5em;
+	border-width: 1px 1px .1em 1px;
 	border-radius: .3em .3em 0 0;
 	margin-left: -1px;
-	background: linear-gradient(to bottom, #454, #333);
+	background: linear-gradient(to bottom, #464, #333 80%);
 	box-shadow: 0 -.17em .67em #280;
 	border-color: #7c5 #583 #333 #583;
 	position: relative;
@@ -214,12 +215,13 @@
 	text-align: center;
 	overflow: hidden;
 	margin: 0 -2em;
-	height: 0;
 	padding: 0 1em;
+	height: 0;
 	opacity: .1;
     transition: all 0.14s ease-in-out;
-	border-radius: .4em;
 	box-shadow: 0 .2em .5em #222;
+	border-radius: .4em;
+	z-index: 1;
 }
 #u2cdesc.show {
 	padding: 1em;
