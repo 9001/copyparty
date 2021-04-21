@@ -113,7 +113,11 @@
 	border-width: 1px 1px 0 1px;
 	border-radius: .3em .3em 0 0;
 	margin-left: -1px;
-	background: transparent;
+	background: linear-gradient(to bottom, #454, #333);
+	box-shadow: 0 -.2em .19em #380;
+	border-color: #7c5 #583 #000 #583;
+	position: relative;
+	color: #fd7;
 }
 #u2cards span {
 	color: #fff;
@@ -134,12 +138,13 @@
 	outline: none;
 }
 #u2conf .txtbox {
-	width: 4em;
+	width: 3em;
 	color: #fff;
 	background: #444;
 	border: 1px solid #777;
 	font-size: 1.2em;
 	padding: .15em 0;
+	height: 1.05em;
 }
 #u2conf .txtbox.err {
 	background: #922;
@@ -151,13 +156,12 @@
 	border-radius: .1em;
 	font-size: 1.5em;
 	padding: .1em 0;
-	margin: 0 -.25em;
+	margin: 0 -1px;
 	width: 1.5em;
 	height: 1em;
 	display: inline-block;
 	position: relative;
-	line-height: 1em;
-	bottom: -.08em;
+	bottom: -0.08em;
 }
 #u2conf input+a {
 	background: #d80;
@@ -257,6 +261,7 @@ html.light #u2cards a {
 }
 html.light #u2cards a.act {
 	background: inherit;
+	color: #037;
 }
 html.light #u2conf .txtbox {
 	background: #fff;
