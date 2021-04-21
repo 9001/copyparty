@@ -491,6 +491,7 @@ function up2k_init(have_crypto) {
     var ask_up = bcfg_get('ask_up', true);
     var flag_en = bcfg_get('flag_en', false);
     var fsearch = bcfg_get('fsearch', false);
+    var min_filebuf = 0;
 
     var fdom_ctr = 0;
     var st = {
@@ -936,13 +937,14 @@ function up2k_init(have_crypto) {
         pvis.move(t.n, 'bz');
 
         var segm_next = function () {
-            if (nchunk >= nchunks || (bpend > chunksize && bpend >= 32 * 1024 * 1024))
+            if (nchunk >= nchunks || (bpend > chunksize && bpend >= min_filebuf))
                 return false;
 
             var reader = new FileReader(),
                 nch = nchunk++,
                 car = nch * chunksize,
-                cdr = car + chunksize;
+                cdr = car + chunksize,
+                t0 = new Date().getTime();
 
             if (cdr >= t.size)
                 cdr = t.size;
@@ -950,6 +952,14 @@ function up2k_init(have_crypto) {
             bpend += cdr - car;
 
             reader.onload = function (e) {
+                if (!min_filebuf && nch == 1) {
+                    min_filebuf = 1;
+                    var td = (new Date().getTime()) - t0;
+                    if (td > 50) {
+                        ebi('u2foot').innerHTML += "<p>excessive filereader latency (" + td + " ms), increasing readahead</p>";
+                        min_filebuf = 32 * 1024 * 1024;
+                    }
+                }
                 hash_calc(nch, e.target.result);
             };
             reader.onerror = segm_err;
