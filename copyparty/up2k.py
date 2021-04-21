@@ -668,12 +668,6 @@ class Up2k(object):
             cur.close()
 
     def _start_mpool(self):
-        if WINDOWS and False:
-            nah = open(os.devnull, "wb")
-            wmic = "processid={}".format(os.getpid())
-            wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
-            sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
-
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
         # both do crazy runahead so lets reinvent another wheel
         nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
@@ -698,12 +692,6 @@ class Up2k(object):
 
         mpool.join()
         done = self._flush_mpool(wcur)
-        if WINDOWS and False:
-            nah = open(os.devnull, "wb")
-            wmic = "processid={}".format(os.getpid())
-            wmic = ["wmic", "process", "where", wmic, "call", "setpriority"]
-            sp.call(wmic + ["below normal"], stdout=nah, stderr=nah)
-
         return done
 
     def _tag_thr(self, q):

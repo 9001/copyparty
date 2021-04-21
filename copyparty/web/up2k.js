@@ -287,15 +287,6 @@ function U2pvis(act, btns) {
         }
     };
 
-    this.bzw_log = function (first, last) {
-        console.log("first %d   head %d   tail %d   last %d", first, this.head, this.tail, last);
-        var trs = document.querySelectorAll('#u2tab>tbody>tr'), msg = [];
-        for (var a = 0; a < trs.length; a++)
-            msg.push(trs[a].getAttribute('id'));
-
-        console.log(msg.join(' '));
-    }
-
     this.bzw = function () {
         var first = document.querySelector('#u2tab>tbody>tr:first-child');
         if (!first)
@@ -304,7 +295,6 @@ function U2pvis(act, btns) {
         var last = document.querySelector('#u2tab>tbody>tr:last-child');
         first = parseInt(first.getAttribute('id').slice(1));
         last = parseInt(last.getAttribute('id').slice(1));
-        //this.bzw_log(first, last);
 
         while (this.head - first > this.wsz) {
             var obj = ebi('f' + (first++));
@@ -315,8 +305,6 @@ function U2pvis(act, btns) {
             if (!obj)
                 this.addrow(last);
         }
-        //this.bzw_log(first, last);
-        //console.log('--');
     };
 
     this.drawcard = function (cat) {
@@ -758,17 +746,6 @@ function up2k_init(have_crypto) {
 
             mutex = true;
             while (true) {
-                if (false) {
-                    ebi('srv_info').innerHTML =
-                        new Date().getTime() + ", " +
-                        st.todo.hash.length + ", " +
-                        st.todo.handshake.length + ", " +
-                        st.todo.upload.length + ", " +
-                        st.busy.hash.length + ", " +
-                        st.busy.handshake.length + ", " +
-                        st.busy.upload.length;
-                }
-
                 var is_busy = 0 !=
                     st.todo.hash.length +
                     st.todo.handshake.length +
@@ -905,19 +882,6 @@ function up2k_init(have_crypto) {
                 stepsize *= mul;
             }
         }
-    }
-
-    function ensure_rendered(func) {
-        var hidden = false;
-        var keys = ['hidden', 'msHidden', 'webkitHidden'];
-        for (var a = 0; a < keys.length; a++)
-            if (typeof document[keys[a]] !== "undefined")
-                hidden = document[keys[a]];
-
-        if (hidden)
-            return func();
-
-        window.requestAnimationFrame(func);
     }
 
     function exec_hash() {
