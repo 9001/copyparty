@@ -261,12 +261,14 @@ class HttpCli(object):
 
                 self.absolute_urls = True
 
-        # go home if verboten
         self.readable, self.writable = self.conn.auth.vfs.can_access(
             self.vpath, self.uname
         )
         if not self.readable and not self.writable:
-            self.log("inaccessible: [{}]".format(self.vpath))
+            if self.vpath:
+                self.log("inaccessible: [{}]".format(self.vpath))
+                raise Pebkac(404)
+
             self.uparam = {"h": False}
 
         if "h" in self.uparam:
