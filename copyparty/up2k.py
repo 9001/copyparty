@@ -1111,7 +1111,8 @@ class Up2k(object):
             atomic_move(src, dst)
 
             if ANYWIN:
-                self.lastmod_q.put([dst, (int(time.time()), int(job["lmod"]))])
+                a = [dst, job["size"], (int(time.time()), int(job["lmod"]))]
+                self.lastmod_q.put(a)
 
             # legit api sware 2 me mum
             if self.idx_wark(
@@ -1212,6 +1213,17 @@ class Up2k(object):
         suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as f:
             f, job["tnam"] = f["orz"]
+            if (
+                ANYWIN
+                and self.args.sparse
+                and self.args.sparse * 1024 * 1024 <= job["size"]
+            ):
+                fp = os.path.join(pdir, job["tnam"])
+                try:
+                    sp.check_call(["fsutil", "sparse", "setflag", fp])
+                except:
+                    self.log("could not sparse [{}]".format(fp), 3)
+
             f.seek(job["size"] - 1)
             f.write(b"e")
 
@@ -1223,12 +1235,18 @@ class Up2k(object):
 
             # self.log("lmod: got {}".format(len(ready)))
             time.sleep(5)
-            for path, times in ready:
+            for path, sz, times in ready:
                 self.log("lmod: setting times {} on {}".format(times, path))
                 try:
                     os.utime(fsenc(path), times)
                 except:
                     self.log("lmod: failed to utime ({}, {})".format(path, times))
+
+                if self.args.sparse and self.args.sparse * 1024 * 1024 <= sz:
+                    try:
+                        sp.check_call(["fsutil", "sparse", "setflag", path, "0"])
+                    except:
+                        self.log("could not unsparse [{}]".format(path), 3)
 
     def _snapshot(self):
         persist_interval = 30  # persist unfinished uploads index every 30 sec

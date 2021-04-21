@@ -247,6 +247,7 @@ def run_argparse(argv, formatter):
     ap.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
     ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile (for debugging)")
     ap.add_argument("--no-scandir", action="store_true", help="disable scandir (for debugging)")
+    ap.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
     ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
