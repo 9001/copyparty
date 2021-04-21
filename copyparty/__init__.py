@@ -16,6 +16,8 @@ if platform.system() == "Windows":
 VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
 # introduced in anniversary update
 
+ANYWIN = WINDOWS or sys.platform in ["msys"]
+
 MACOS = platform.system() == "Darwin"
 
 

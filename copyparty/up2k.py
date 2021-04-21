@@ -16,7 +16,7 @@ import traceback
 import subprocess as sp
 from copy import deepcopy
 
-from .__init__ import WINDOWS
+from .__init__ import WINDOWS, ANYWIN
 from .util import (
     Pebkac,
     Queue,
@@ -79,7 +79,7 @@ class Up2k(object):
             if self.sqlite_ver < (3, 9):
                 self.no_expr_idx = True
 
-        if WINDOWS:
+        if ANYWIN:
             # usually fails to set lastmod too quickly
             self.lastmod_q = Queue()
             thr = threading.Thread(target=self._lastmodder)
@@ -1110,7 +1110,7 @@ class Up2k(object):
 
             atomic_move(src, dst)
 
-            if WINDOWS:
+            if ANYWIN:
                 self.lastmod_q.put([dst, (int(time.time()), int(job["lmod"]))])
 
             # legit api sware 2 me mum

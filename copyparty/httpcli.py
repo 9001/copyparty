@@ -13,7 +13,7 @@ import ctypes
 from datetime import datetime
 import calendar
 
-from .__init__ import E, PY2, WINDOWS
+from .__init__ import E, PY2, WINDOWS, ANYWIN
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 from .szip import StreamZip
 from .star import StreamTar
@@ -626,7 +626,7 @@ class HttpCli(object):
             self.loud_reply(x, status=500)
             return False
 
-        if not WINDOWS and num_left == 0:
+        if not ANYWIN and num_left == 0:
             times = (int(time.time()), int(lastmod))
             self.log("no more chunks, setting times {}".format(times))
             try:

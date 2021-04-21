@@ -16,7 +16,7 @@ import mimetypes
 import contextlib
 import subprocess as sp  # nosec
 
-from .__init__ import PY2, WINDOWS
+from .__init__ import PY2, WINDOWS, ANYWIN
 from .stolen import surrogateescape
 
 FAKE_MP = False
@@ -580,8 +580,8 @@ def sanitize_fn(fn, ok=""):
     if "/" not in ok:
         fn = fn.replace("\\", "/").split("/")[-1]
 
-    if WINDOWS:
-        for bad, good in [x for x in [
+    if ANYWIN:
+        remap = [
             ["<", "＜"],
             [">", "＞"],
             [":", "："],
@@ -591,7 +591,8 @@ def sanitize_fn(fn, ok=""):
             ["|", "｜"],
             ["?", "？"],
             ["*", "＊"],
-        ] if x[0] not in ok]:
+        ]
+        for bad, good in [x for x in remap if x[0] not in ok]:
             fn = fn.replace(bad, good)
 
         bad = ["con", "prn", "aux", "nul"]
