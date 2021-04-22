@@ -90,7 +90,7 @@
 	background: #222;
 }
 #u2cards {
-	padding: 1em 0 .3em 0;
+	padding: 1em 0 .3em 1em;
 	margin: 1.5em auto -2.5em auto;
 	text-align: center;
 	overflow: hidden;
@@ -283,4 +283,7 @@ html.light #u2cdesc {
 }
 html.light #op_up2k.srch #u2btn {
 	border-color: #a80;
+}
+html.light #u2foot {
+	color: #000;
 }
