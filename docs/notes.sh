@@ -171,7 +171,7 @@ Range: bytes=26-         Content-Range: bytes */26
 
 var tsh = [];
 function convert_markdown(md_text, dest_dom) {
-    tsh.push(new Date().getTime());
+    tsh.push(Date.now());
     while (tsh.length > 10)
         tsh.shift();
     if (tsh.length > 1) {

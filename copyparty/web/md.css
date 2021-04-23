@@ -50,6 +50,9 @@ pre code:last-child {
 pre code::before {
 	content: counter(precode);
 	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 	display: inline-block;
 	text-align: right;
 	font-size: .75em;

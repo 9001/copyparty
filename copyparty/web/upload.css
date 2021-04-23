@@ -175,7 +175,6 @@
 	height: 1em;
 	padding: .4em 0;
 	display: block;
-	user-select: none;
 	border-radius: .25em;
 }
 #u2conf input[type="checkbox"] {

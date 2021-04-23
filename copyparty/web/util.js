@@ -50,9 +50,11 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 }
 
 
-function ebi(id) {
-    return document.getElementById(id);
-}
+var ebi = document.getElementById.bind(document),
+    QS = document.querySelector.bind(document),
+    QSA = document.querySelectorAll.bind(document),
+    mknod = document.createElement.bind(document);
+
 
 function ev(e) {
     e = e || window.event;
@@ -90,7 +92,7 @@ if (!String.startsWith) {
 // https://stackoverflow.com/a/950146
 function import_js(url, cb) {
     var head = document.head || document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
+    var script = mknod('script');
     script.type = 'text/javascript';
     script.src = url;
 
@@ -275,7 +277,7 @@ function makeSortable(table, cb) {
 
 
 (function () {
-    var ops = document.querySelectorAll('#ops>a');
+    var ops = QSA('#ops>a');
     for (var a = 0; a < ops.length; a++) {
         ops[a].onclick = opclick;
     }
@@ -290,25 +292,25 @@ function opclick(e) {
 
     swrite('opmode', dest || null);
 
-    var input = document.querySelector('.opview.act input:not([type="hidden"])')
+    var input = QS('.opview.act input:not([type="hidden"])')
     if (input)
         input.focus();
 }
 
 
 function goto(dest) {
-    var obj = document.querySelectorAll('.opview.act');
+    var obj = QSA('.opview.act');
     for (var a = obj.length - 1; a >= 0; a--)
         clmod(obj[a], 'act');
 
-    obj = document.querySelectorAll('#ops>a');
+    obj = QSA('#ops>a');
     for (var a = obj.length - 1; a >= 0; a--)
         clmod(obj[a], 'act');
 
     if (dest) {
         var ui = ebi('op_' + dest);
         clmod(ui, 'act', true);
-        document.querySelector('#ops>a[data-dest=' + dest + ']').className += " act";
+        QS('#ops>a[data-dest=' + dest + ']').className += " act";
 
         var fn = window['goto_' + dest];
         if (fn)

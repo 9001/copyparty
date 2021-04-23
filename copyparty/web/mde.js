@@ -71,7 +71,7 @@ var mde = (function () {
 })();
 
 function set_jumpto() {
-    document.querySelector('.editor-preview-side').onclick = jumpto;
+    QS('.editor-preview-side').onclick = jumpto;
 }
 
 function jumpto(ev) {
@@ -94,7 +94,7 @@ function md_changed(mde, on_srv) {
         window.md_saved = mde.value();
 
     var md_now = mde.value();
-    var save_btn = document.querySelector('.editor-toolbar button.save');
+    var save_btn = QS('.editor-toolbar button.save');
 
     if (md_now == window.md_saved)
         save_btn.classList.add('disabled');
@@ -105,7 +105,7 @@ function md_changed(mde, on_srv) {
 }
 
 function save(mde) {
-    var save_btn = document.querySelector('.editor-toolbar button.save');
+    var save_btn = QS('.editor-toolbar button.save');
     if (save_btn.classList.contains('disabled')) {
         alert('there is nothing to save');
         return;
@@ -212,7 +212,7 @@ function save_chk() {
     last_modified = this.lastmod;
     md_changed(this.mde, true);
 
-    var ok = document.createElement('div');
+    var ok = mknod('div');
     ok.setAttribute('style', 'font-size:6em;font-family:serif;font-weight:bold;color:#cf6;background:#444;border-radius:.3em;padding:.6em 0;position:fixed;top:30%;left:calc(50% - 2em);width:4em;text-align:center;z-index:9001;transition:opacity 0.2s ease-in-out;opacity:1');
     ok.innerHTML = 'OK✔️';
     var parent = ebi('m');

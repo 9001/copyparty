@@ -46,7 +46,7 @@ function statify(obj) {
     var ua = navigator.userAgent;
     if (ua.indexOf(') Gecko/') !== -1 && /Linux| Mac /.exec(ua)) {
         // necessary on ff-68.7 at least
-        var s = document.createElement('style');
+        var s = mknod('style');
         s.innerHTML = '@page { margin: .5in .6in .8in .6in; }';
         console.log(s.innerHTML);
         document.head.appendChild(s);
@@ -175,12 +175,12 @@ function md_plug_err(ex, js) {
         msg = "Line " + ln + ", " + msg;
         var lns = js.split('\n');
         if (ln < lns.length) {
-            o = document.createElement('span');
+            o = mknod('span');
             o.style.cssText = 'color:#ac2;font-size:.9em;font-family:scp;display:block';
             o.textContent = lns[ln - 1];
         }
     }
-    errbox = document.createElement('div');
+    errbox = mknod('div');
     errbox.setAttribute('id', 'md_errbox');
     errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
     errbox.textContent = msg;

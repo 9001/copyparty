@@ -55,7 +55,7 @@ function up2k_flagbus() {
             dbg(who, 'hi me (??)');
             return;
         }
-        flag.act = new Date().getTime();
+        flag.act = Date.now();
         if (what == "want") {
             // lowest id wins, don't care if that's us
             if (who < flag.id) {
@@ -209,7 +209,7 @@ function U2pvis(act, btns) {
     };
 
     this.perc = function (bd, bd0, sz, t0) {
-        var td = new Date().getTime() - t0,
+        var td = Date.now() - t0,
             p = bd * 100.0 / sz,
             nb = bd - bd0,
             spd = nb / (td / 1000),
@@ -292,11 +292,11 @@ function U2pvis(act, btns) {
     };
 
     this.bzw = function () {
-        var first = document.querySelector('#u2tab>tbody>tr:first-child');
+        var first = QS('#u2tab>tbody>tr:first-child');
         if (!first)
             return;
 
-        var last = document.querySelector('#u2tab>tbody>tr:last-child');
+        var last = QS('#u2tab>tbody>tr:last-child');
         first = parseInt(first.getAttribute('id').slice(1));
         last = parseInt(last.getAttribute('id').slice(1));
 
@@ -312,7 +312,7 @@ function U2pvis(act, btns) {
     };
 
     this.drawcard = function (cat) {
-        var cards = document.querySelectorAll('#u2cards>a>span');
+        var cards = QSA('#u2cards>a>span');
 
         if (cat == "q") {
             cards[4].innerHTML = this.ctr[cat];
@@ -374,7 +374,7 @@ function U2pvis(act, btns) {
         if (as_html)
             return '<tr id="f' + nfile + '">' + ret + '</tr>';
 
-        var obj = document.createElement('tr');
+        var obj = mknod('tr');
         obj.setAttribute('id', 'f' + nfile);
         obj.innerHTML = ret;
         return obj;
@@ -386,7 +386,7 @@ function U2pvis(act, btns) {
     };
 
     var that = this;
-    btns = document.querySelectorAll(btns + '>a[act]');
+    btns = QSA(btns + '>a[act]');
     for (var a = 0; a < btns.length; a++) {
         btns[a].onclick = function (e) {
             ev(e);
@@ -661,7 +661,7 @@ function up2k_init(have_crypto) {
 
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
-                now = new Date().getTime(),
+                now = Date.now(),
                 lmod = fobj.lastModified || now;
 
             var entry = {
@@ -699,7 +699,7 @@ function up2k_init(have_crypto) {
 
     function more_one_file() {
         fdom_ctr++;
-        var elm = document.createElement('div');
+        var elm = mknod('div');
         elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" />'.format(fdom_ctr);
         ebi('u2form').appendChild(elm);
         ebi('file' + fdom_ctr).addEventListener('change', gotfile, false);
@@ -780,7 +780,7 @@ function up2k_init(have_crypto) {
 
                 if (flag) {
                     if (is_busy) {
-                        var now = new Date().getTime();
+                        var now = Date.now();
                         flag.take(now);
                         if (!flag.ours)
                             return defer();
@@ -916,7 +916,7 @@ function up2k_init(have_crypto) {
                 nch = nchunk++,
                 car = nch * chunksize,
                 cdr = car + chunksize,
-                t0 = new Date().getTime();
+                t0 = Date.now();
 
             if (cdr >= t.size)
                 cdr = t.size;
@@ -926,7 +926,7 @@ function up2k_init(have_crypto) {
             reader.onload = function (e) {
                 if (!min_filebuf && nch == 1) {
                     min_filebuf = 1;
-                    var td = (new Date().getTime()) - t0;
+                    var td = Date.now() - t0;
                     if (td > 50) {
                         ebi('u2foot').innerHTML += "<p>excessive filereader latency (" + td + " ms), increasing readahead</p>";
                         min_filebuf = 32 * 1024 * 1024;
@@ -963,7 +963,7 @@ function up2k_init(have_crypto) {
                     t.hash.push(hashtab[a]);
                 }
 
-                t.t2 = new Date().getTime();
+                t.t2 = Date.now();
                 if (t.n == 0 && window.location.hash == '#dbg') {
                     var spd = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
                     alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
@@ -985,7 +985,7 @@ function up2k_init(have_crypto) {
             }
         };
 
-        t.t1 = new Date().getTime();
+        t.t1 = Date.now();
         segm_next();
     }
 
@@ -1159,7 +1159,7 @@ function up2k_init(have_crypto) {
             t = st.files[upt.nfile];
 
         if (!t.t3)
-            t.t3 = new Date().getTime();
+            t.t3 = Date.now();
 
         pvis.seth(t.n, 1, "🚀 send");
 
@@ -1182,7 +1182,7 @@ function up2k_init(have_crypto) {
                 st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
                 t.postlist.splice(t.postlist.indexOf(npart), 1);
                 if (t.postlist.length == 0) {
-                    t.t4 = new Date().getTime();
+                    t.t4 = Date.now();
                     pvis.seth(t.n, 1, 'verifying');
                     st.todo.handshake.unshift(t);
                 }
@@ -1240,11 +1240,11 @@ function up2k_init(have_crypto) {
     function desc_hide(e) {
         ebi('u2cdesc').setAttribute('class', '');
     }
-    var o = document.querySelectorAll('#u2conf *[alt]');
+    var o = QSA('#u2conf *[alt]');
     for (var a = o.length - 1; a >= 0; a--) {
         o[a].parentNode.getElementsByTagName('input')[0].setAttribute('alt', o[a].getAttribute('alt'));
     }
-    var o = document.querySelectorAll('#u2conf *[alt]');
+    var o = QSA('#u2conf *[alt]');
     for (var a = 0; a < o.length; a++) {
         o[a].onfocus = desc_show;
         o[a].onblur = desc_hide;
@@ -1315,7 +1315,7 @@ function up2k_init(have_crypto) {
         }
 
         try {
-            document.querySelector('label[for="fsearch"]').style.opacity = read_only ? '0' : '1';
+            QS('label[for="fsearch"]').style.opacity = read_only ? '0' : '1';
         }
         catch (ex) { }
 
@@ -1391,5 +1391,5 @@ function warn_uploader_busy(e) {
 }
 
 
-if (document.querySelector('#op_up2k.act'))
+if (QS('#op_up2k.act'))
     goto_up2k();

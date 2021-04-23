@@ -68,7 +68,7 @@ a, #files tbody div a:last-child {
 	color: #999;
 	font-weight: normal;
 }
-#files tr+tr:hover {
+#files tr:hover {
 	background: #1c1c1c;
 }
 #files thead th {
@@ -98,7 +98,7 @@ a, #files tbody div a:last-child {
 	max-width: 30em;
 	overflow: hidden;
 }
-#files tr+tr td {
+#files tr td {
 	border-top: 1px solid #383838;
 }
 #files tbody td:nth-child(3) {
@@ -685,6 +685,15 @@ input[type="checkbox"]:checked+label {
 	font-family: monospace, monospace;
 	line-height: 2em;
 }
+#pvol,
+#barbuf,
+#barpos,
+#u2conf label {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
 
 
 
@@ -704,7 +713,7 @@ html.light #srch_form {
 }
 html.light #ops a.act {
 	box-shadow: 0 .2em .2em #ccc;
-	background: #f7f7f7;
+	background: #fff;
 	border-color: #07a;
 	padding-top: .4em;
 }
@@ -761,7 +770,7 @@ html.light #files {
 html.light #files thead th {
 	background: #eee;
 }
-html.light #files tr+tr td {
+html.light #files tr td {
 	border-top: 1px solid #ddd;
 }
 html.light #files td {
@@ -785,8 +794,12 @@ html.light tr.play td {
 html.light tr.play a {
 	color: #406;
 }
+html.light #files th:hover .cfg,
+html.light #files th.min .cfg {
+	background: #ccc;
+}
 html.light #files > thead > tr > th.min span {
-	background: linear-gradient(90deg, rgba(68,68,68,0), rgba(68,68,68,0.2) 70%, rgba(68,68,68,0.5));
+	background: linear-gradient(90deg, rgba(204,204,204,0), rgba(204,204,204,0.5) 70%, #ccc);
 }
 html.light #blocked {
 	background: #eee;

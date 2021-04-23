@@ -16,7 +16,7 @@ var dom_sbs = ebi('sbs');
 var dom_nsbs = ebi('nsbs');
 var dom_tbox = ebi('toolsbox');
 var dom_ref = (function () {
-    var d = document.createElement('div');
+    var d = mknod('div');
     d.setAttribute('id', 'mtr');
     dom_swrap.appendChild(d);
     d = ebi('mtr');
@@ -71,7 +71,7 @@ var map_src = [];
 var map_pre = [];
 function genmap(dom, oldmap) {
     var find = nlines;
-    while (oldmap && find --> 0) {
+    while (oldmap && find-- > 0) {
         var tmap = genmapq(dom, '*[data-ln="' + find + '"]');
         if (!tmap || !tmap.length)
             continue;
@@ -94,7 +94,7 @@ var nlines = 0;
 var draw_md = (function () {
     var delay = 1;
     function draw_md() {
-        var t0 = new Date().getTime();
+        var t0 = Date.now();
         var src = dom_src.value;
         convert_markdown(src, dom_pre);
 
@@ -110,7 +110,7 @@ var draw_md = (function () {
 
         cls(ebi('save'), 'disabled', src == server_md);
 
-        var t1 = new Date().getTime();
+        var t1 = Date.now();
         delay = t1 - t0 > 100 ? 25 : 1;
     }
 
@@ -252,7 +252,7 @@ function Modpoll() {
         }
 
         console.log('modpoll...');
-        var url = (document.location + '').split('?')[0] + '?raw&_=' + new Date().getTime();
+        var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
         var xhr = new XMLHttpRequest();
         xhr.modpoll = this;
         xhr.open('GET', url, true);
@@ -399,7 +399,7 @@ function save_cb() {
 
 function run_savechk(lastmod, txt, btn, ntry) {
     // download the saved doc from the server and compare
-    var url = (document.location + '').split('?')[0] + '?raw&_=' + new Date().getTime();
+    var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
@@ -455,7 +455,7 @@ function toast(autoclose, style, width, msg) {
         ok.parentNode.removeChild(ok);
 
     style = "width:" + width + "em;left:calc(50% - " + (width / 2) + "em);" + style;
-    ok = document.createElement('div');
+    ok = mknod('div');
     ok.setAttribute('id', 'toast');
     ok.setAttribute('style', style);
     ok.innerHTML = msg;
@@ -1049,7 +1049,7 @@ action_stack = (function () {
         var p1 = from.length,
             p2 = to.length;
 
-        while (p1 --> 0 && p2 --> 0)
+        while (p1-- > 0 && p2-- > 0)
             if (from[p1] != to[p2])
                 break;
 
