@@ -29,7 +29,6 @@ PY2 = sys.version_info[0] == 2
 WINDOWS = sys.platform in ["win32", "msys"]
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
-cpp = None
 
 
 def eprint(*args, **kwargs):
@@ -209,11 +208,11 @@ def yieldfile(fn):
 
 
 def hashfile(fn):
-    hasher = hashlib.md5()
+    h = hashlib.md5()
     for block in yieldfile(fn):
-        hasher.update(block)
+        h.update(block)
 
-    return hasher.hexdigest()
+    return h.hexdigest()
 
 
 def unpack():
@@ -222,9 +221,10 @@ def unpack():
     tag = "v" + str(STAMP)
     withpid = "{}.{}".format(name, os.getpid())
     top = tempfile.gettempdir()
-    final = os.path.join(top, name)
-    mine = os.path.join(top, withpid)
-    tar = os.path.join(mine, "tar")
+    opj = os.path.join
+    final = opj(top, name)
+    mine = opj(top, withpid)
+    tar = opj(mine, "tar")
 
     try:
         if tag in os.listdir(final):
@@ -233,28 +233,24 @@ def unpack():
     except:
         pass
 
-    nwrite = 0
+    sz = 0
     os.mkdir(mine)
     with open(tar, "wb") as f:
         for buf in get_payload():
-            nwrite += len(buf)
+            sz += len(buf)
             f.write(buf)
 
-    if nwrite != SIZE:
-        t = "\n\n  bad file:\n    expected {} bytes, got {}\n".format(SIZE, nwrite)
-        raise Exception(t)
-
-    cksum = hashfile(tar)
-    if cksum != CKSUM:
-        t = "\n\n  bad file:\n    {} expected,\n    {} obtained\n".format(CKSUM, cksum)
-        raise Exception(t)
+    ck = hashfile(tar)
+    if ck != CKSUM:
+        t = "\n\nexpected {} ({} byte)\nobtained {} ({} byte)\nsfx corrupt"
+        raise Exception(t.format(CKSUM, SIZE, ck, sz))
 
     with tarfile.open(tar, "r:bz2") as tf:
         tf.extractall(mine)
 
     os.remove(tar)
 
-    with open(os.path.join(mine, tag), "wb") as f:
+    with open(opj(mine, tag), "wb") as f:
         f.write(b"h\n")
 
     try:
@@ -284,7 +280,7 @@ def unpack():
     for fn in u8(os.listdir(top)):
         if fn.startswith(name) and fn not in [name, withpid]:
             try:
-                old = os.path.join(top, fn)
+                old = opj(top, fn)
                 if time.time() - os.path.getmtime(old) > 10:
                     shutil.rmtree(old)
             except:
@@ -307,9 +303,8 @@ def get_payload():
         if ofs < 0:
             raise Exception("could not find archive marker")
 
-        # start reading from the final b"\n"
+        # start at final b"\n"
         fpos = ofs + len(ptn) - 3
-        # msg("tar found at", fpos)
         f.seek(fpos)
         dpos = 0
         leftovers = b""
@@ -371,10 +366,8 @@ def confirm(rv):
     sys.exit(rv)
 
 
-def run(tmp, j2ver):
-    global cpp
-
-    msg("jinja2:", j2ver or "bundled")
+def run(tmp, j2):
+    msg("jinja2:", j2 or "bundled")
     msg("sfxdir:", tmp)
     msg()
 
@@ -394,16 +387,16 @@ def run(tmp, j2ver):
     t.start()
 
     ld = [tmp, os.path.join(tmp, "dep-j2")]
-    if j2ver:
+    if j2:
         del ld[-1]
 
     for x in ld:
         sys.path.insert(0, x)
 
     try:
-        from copyparty.__main__ import main as copyparty
+        from copyparty.__main__ import main as p
 
-        copyparty()
+        p()
 
     except SystemExit as ex:
         if ex.code:
@@ -446,11 +439,11 @@ def main():
     tmp = unpack()
 
     try:
-        from jinja2 import __version__ as j2ver
+        from jinja2 import __version__ as j2
     except:
-        j2ver = None
+        j2 = None
 
-    run(tmp, j2ver)
+    run(tmp, j2)
 
 
 if __name__ == "__main__":
