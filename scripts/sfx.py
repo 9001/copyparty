@@ -268,25 +268,25 @@ def unpack():
     except:
         pass
 
+    for fn in u8(os.listdir(top)):
+        if fn.startswith(name) and fn != withpid:
+            try:
+                old = opj(top, fn)
+                if time.time() - os.path.getmtime(old) > 86400:
+                    shutil.rmtree(old)
+            except:
+                pass
+
     try:
         os.symlink(mine, final)
     except:
         try:
             os.rename(mine, final)
+            return final
         except:
             msg("reloc fail,", mine)
-            return mine
 
-    for fn in u8(os.listdir(top)):
-        if fn.startswith(name) and fn not in [name, withpid]:
-            try:
-                old = opj(top, fn)
-                if time.time() - os.path.getmtime(old) > 10:
-                    shutil.rmtree(old)
-            except:
-                pass
-
-    return final
+    return mine
 
 
 def get_payload():
@@ -377,7 +377,6 @@ def run(tmp, j2):
 
         fd = os.open(tmp, os.O_RDONLY)
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        tmp = os.readlink(tmp)  # can't flock a symlink, even with O_NOFOLLOW
     except Exception as ex:
         if not WINDOWS:
             msg("\033[31mflock:", repr(ex))
@@ -436,7 +435,7 @@ def main():
 
     # skip 0
 
-    tmp = unpack()
+    tmp = os.path.realpath(unpack())
 
     try:
         from jinja2 import __version__ as j2
