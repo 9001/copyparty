@@ -86,7 +86,7 @@
 	font-family: sans-serif;
 	width: auto;
 }
-#u2tab tr+tr:hover td {
+#u2tab tbody tr:hover td {
 	background: #222;
 }
 #u2cards {
@@ -285,4 +285,7 @@ html.light #op_up2k.srch #u2btn {
 }
 html.light #u2foot {
 	color: #000;
+}
+html.light #u2tab tbody tr:hover td {
+	background: #fff;
 }

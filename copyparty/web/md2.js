@@ -1142,14 +1142,3 @@ action_stack = (function () {
         _ref: ref
     }
 })();
-
-/*
-ebi('help').onclick = function () {
-    var c1 = getComputedStyle(dom_src).cssText.split(';');
-    var c2 = getComputedStyle(dom_ref).cssText.split(';');
-    var max = Math.min(c1.length, c2.length);
-    for (var a = 0; a < max; a++)
-        if (c1[a] !== c2[a])
-            console.log(c1[a] + '\n' + c2[a]);
-}
-*/
