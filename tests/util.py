@@ -53,6 +53,11 @@ def get_ramdisk():
         return ret
 
 
+class NullBroker(object):
+    def put(*args):
+        pass
+
+
 class VSock(object):
     def __init__(self, buf):
         self._query = buf
@@ -71,6 +76,8 @@ class VSock(object):
 
 class VHttpSrv(object):
     def __init__(self):
+        self.broker = NullBroker()
+
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
 
@@ -86,5 +93,5 @@ class VHttpConn(object):
         self.log_src = "a"
         self.hsrv = VHttpSrv()
         self.nbyte = 0
+        self.workload = 0
         self.t0 = time.time()
-

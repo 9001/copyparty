@@ -103,7 +103,7 @@ class TestHttpCli(unittest.TestCase):
                 durl = furl.rsplit("/", 1)[0] if "/" in furl else ""
 
                 # file download
-                ret = self.curl(furl)
+                h, ret = self.curl(furl)
                 res = "ok " + fp in ret
                 print("[{}] {} {} = {}".format(fp, rok, wok, res))
                 if rok != res:
@@ -111,7 +111,7 @@ class TestHttpCli(unittest.TestCase):
                     self.fail()
 
                 # file browser: html
-                ret = self.curl(durl)
+                h, ret = self.curl(durl)
                 res = "'{}'".format(self.fn) in ret
                 print(res)
                 if rok != res:
@@ -120,7 +120,7 @@ class TestHttpCli(unittest.TestCase):
 
                 # file browser: json
                 url = durl + "?ls"
-                ret = self.curl(url)
+                h, ret = self.curl(url)
                 res = '"{}"'.format(self.fn) in ret
                 print(res)
                 if rok != res:
@@ -142,15 +142,18 @@ class TestHttpCli(unittest.TestCase):
                 tar_ng = [x[0] for x in tar if not x[1]]
                 self.assertEqual([], tar_ng)
 
-                if durl.split("/")[-1] not in self.can_read:
-                    continue
+                if durl.split("/")[-1] in self.can_read:
+                    ref = [x for x in vfiles if self.in_dive(top + "/" + durl, x)]
+                    for f in ref:
+                        print("{}: {}".format("ok" if f in tar_ok else "NG", f))
+                    ref.sort()
+                    tar_ok.sort()
+                    self.assertEqual(ref, tar_ok)
 
-                ref = [x for x in vfiles if self.in_dive(top + "/" + durl, x)]
-                for f in ref:
-                    print("{}: {}".format("ok" if f in tar_ok else "NG", f))
-                ref.sort()
-                tar_ok.sort()
-                self.assertEqual(ref, tar_ok)
+                # stash
+                h, ret = self.put(url)
+                res = h.startswith("HTTP/1.1 200 ")
+                self.assertEqual(res, wok)
 
     def can_rw(self, fp):
         # lowest non-neutral folder declares permissions
@@ -178,14 +181,21 @@ class TestHttpCli(unittest.TestCase):
 
         return True
 
+    def put(self, url):
+        buf = "PUT /{0} HTTP/1.1\r\nCookie: cppwd=o\r\nConnection: close\r\nContent-Length: {1}\r\n\r\nok {0}\n"
+        buf = buf.format(url, len(url) + 4).encode("utf-8")
+        conn = tu.VHttpConn(self.args, self.auth, self.log, buf)
+        HttpCli(conn).run()
+        return conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+
     def curl(self, url, binary=False):
         conn = tu.VHttpConn(self.args, self.auth, self.log, hdr(url))
         HttpCli(conn).run()
         if binary:
             h, b = conn.s._reply.split(b"\r\n\r\n", 1)
-            return h, b
+            return [h.decode("utf-8"), b]
 
-        return conn.s._reply.decode("utf-8")
+        return conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
 
     def log(self, src, msg, c=0):
         # print(repr(msg))
