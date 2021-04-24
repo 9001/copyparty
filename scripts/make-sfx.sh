@@ -199,12 +199,19 @@ find | grep -E '\.(js|css|html)$' | while IFS= read -r f; do
 	tmv "$f"
 done
 
+echo gen tarlist
+for d in copyparty dep-j2; do find $d -type f; done |
+sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
+sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
+
+(grep -vE 'gz$' list1; grep -E 'gz$' list1) >list
+
 echo creating tar
 args=(--owner=1000 --group=1000)
 [ "$OSTYPE" = msys ] &&
 	args=()
 
-tar -cf tar "${args[@]}" --numeric-owner copyparty dep-j2
+tar -cf tar "${args[@]}" --numeric-owner -T list
 
 pc=bzip2
 pe=bz2
