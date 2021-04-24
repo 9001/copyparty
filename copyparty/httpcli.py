@@ -182,10 +182,8 @@ class HttpCli(object):
         self.out_headers.update(headers)
 
         # default to utf8 html if no content-type is set
-        try:
-            mime = mime or self.out_headers["Content-Type"]
-        except KeyError:
-            mime = "text/html; charset=UTF-8"
+        if not mime:
+            mime = self.out_headers.get("Content-Type", "text/html; charset=UTF-8")
 
         self.out_headers["Content-Type"] = mime
 
@@ -536,7 +534,7 @@ class HttpCli(object):
             self.log("qj: " + repr(vbody))
             hits = idx.fsearch(vols, body)
             msg = repr(hits)
-            taglist = []
+            taglist = {}
         else:
             # search by query params
             self.log("qj: " + repr(body))
@@ -1319,6 +1317,74 @@ class HttpCli(object):
             # print(abspath)
             raise Pebkac(404)
 
+        srv_info = []
+
+        try:
+            if not self.args.nih:
+                srv_info.append(unicode(socket.gethostname()).split(".")[0])
+        except:
+            self.log("#wow #whoa")
+
+        try:
+            # some fuses misbehave
+            if not self.args.nid:
+                if WINDOWS:
+                    bfree = ctypes.c_ulonglong(0)
+                    ctypes.windll.kernel32.GetDiskFreeSpaceExW(
+                        ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
+                    )
+                    srv_info.append(humansize(bfree.value) + " free")
+                else:
+                    sv = os.statvfs(abspath)
+                    free = humansize(sv.f_frsize * sv.f_bfree, True)
+                    total = humansize(sv.f_frsize * sv.f_blocks, True)
+
+                    srv_info.append(free + " free")
+                    srv_info.append(total)
+        except:
+            pass
+
+        srv_info = "</span> /// <span>".join(srv_info)
+
+        perms = []
+        if self.readable:
+            perms.append("read")
+        if self.writable:
+            perms.append("write")
+
+        url_suf = self.urlq()
+        is_ls = "ls" in self.uparam
+        ts = ""  # "?{}".format(time.time())
+
+        tpl = "browser"
+        if "b" in self.uparam:
+            tpl = "browser2"
+
+        j2a = {
+            "vdir": quotep(self.vpath),
+            "vpnodes": vpnodes,
+            "files": [],
+            "ts": ts,
+            "perms": json.dumps(perms),
+            "taglist": [],
+            "tag_order": [],
+            "have_up2k_idx": ("e2d" in vn.flags),
+            "have_tags_idx": ("e2t" in vn.flags),
+            "have_zip": (not self.args.no_zip),
+            "have_b_u": (self.writable and self.uparam.get("b") == "u"),
+            "url_suf": url_suf,
+            "logues": ["", ""],
+            "title": html_escape(self.vpath, crlf=True),
+            "srv_info": srv_info,
+        }
+        if not self.readable:
+            if is_ls:
+                raise Pebkac(403)
+
+            html = self.j2(tpl, **j2a)
+            self.reply(html.encode("utf-8", "replace"))
+            return True
+
         if not os.path.isdir(fsenc(abspath)):
             if abspath.endswith(".md") and "raw" not in self.uparam:
                 return self.tx_md(abspath)
@@ -1362,14 +1428,10 @@ class HttpCli(object):
         if rem == ".hist":
             hidden = ["up2k."]
 
-        is_ls = "ls" in self.uparam
-
         icur = None
         if "e2t" in vn.flags:
             idx = self.conn.get_u2idx()
             icur = idx.get_cur(vn.realpath)
-
-        url_suf = self.urlq()
 
         dirs = []
         files = []
@@ -1461,42 +1523,6 @@ class HttpCli(object):
             for f in dirs:
                 f["tags"] = {}
 
-        srv_info = []
-
-        try:
-            if not self.args.nih:
-                srv_info.append(unicode(socket.gethostname()).split(".")[0])
-        except:
-            self.log("#wow #whoa")
-            pass
-
-        try:
-            # some fuses misbehave
-            if not self.args.nid:
-                if WINDOWS:
-                    bfree = ctypes.c_ulonglong(0)
-                    ctypes.windll.kernel32.GetDiskFreeSpaceExW(
-                        ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
-                    )
-                    srv_info.append(humansize(bfree.value) + " free")
-                else:
-                    sv = os.statvfs(abspath)
-                    free = humansize(sv.f_frsize * sv.f_bfree, True)
-                    total = humansize(sv.f_frsize * sv.f_blocks, True)
-
-                    srv_info.append(free + " free")
-                    srv_info.append(total)
-        except:
-            pass
-
-        srv_info = "</span> /// <span>".join(srv_info)
-
-        perms = []
-        if self.readable:
-            perms.append("read")
-        if self.writable:
-            perms.append("write")
-
         logues = ["", ""]
         for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
             fn = os.path.join(abspath, fn)
@@ -1518,34 +1544,12 @@ class HttpCli(object):
             self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
 
-        ts = ""
-        # ts = "?{}".format(time.time())
+        j2a["files"] = dirs + files
+        j2a["logues"] = logues
+        j2a["taglist"] = taglist
+        if "mte" in vn.flags:
+            j2a["tag_order"] = json.dumps(vn.flags["mte"].split(","))
 
-        dirs.extend(files)
-
-        tpl = "browser"
-        if "b" in self.uparam:
-            tpl = "browser2"
-
-        html = self.j2(
-            tpl,
-            vdir=quotep(self.vpath),
-            vpnodes=vpnodes,
-            files=dirs,
-            ts=ts,
-            perms=json.dumps(perms),
-            taglist=taglist,
-            tag_order=json.dumps(
-                vn.flags["mte"].split(",") if "mte" in vn.flags else []
-            ),
-            have_up2k_idx=("e2d" in vn.flags),
-            have_tags_idx=("e2t" in vn.flags),
-            have_zip=(not self.args.no_zip),
-            have_b_u=(self.writable and self.uparam.get("b") == "u"),
-            url_suf=url_suf,
-            logues=logues,
-            title=html_escape(self.vpath, crlf=True),
-            srv_info=srv_info,
-        )
+        html = self.j2(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))
         return True

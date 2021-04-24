@@ -3,17 +3,17 @@
 from __future__ import print_function, unicode_literals
 
 import os
-import time
 import json
 import shutil
 import tempfile
 import unittest
-import subprocess as sp  # nosec
 
 from textwrap import dedent
 from argparse import Namespace
 from copyparty.authsrv import AuthSrv
 from copyparty import util
+
+from tests import util as tu
 
 
 class Cfg(Namespace):
@@ -51,52 +51,11 @@ class TestVFS(unittest.TestCase):
         real = [x[0] for x in real]
         return fsdir, real, virt
 
-    def runcmd(self, *argv):
-        p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
-        stdout, stderr = p.communicate()
-        stdout = stdout.decode("utf-8")
-        stderr = stderr.decode("utf-8")
-        return [p.returncode, stdout, stderr]
-
-    def chkcmd(self, *argv):
-        ok, sout, serr = self.runcmd(*argv)
-        if ok != 0:
-            raise Exception(serr)
-
-        return sout, serr
-
-    def get_ramdisk(self):
-        for vol in ["/dev/shm", "/Volumes/cptd"]:  # nosec (singleton test)
-            if os.path.exists(vol):
-                return vol
-
-        if os.path.exists("/Volumes"):
-            devname, _ = self.chkcmd("hdiutil", "attach", "-nomount", "ram://8192")
-            devname = devname.strip()
-            print("devname: [{}]".format(devname))
-            for _ in range(10):
-                try:
-                    _, _ = self.chkcmd(
-                        "diskutil", "eraseVolume", "HFS+", "cptd", devname
-                    )
-                    return "/Volumes/cptd"
-                except Exception as ex:
-                    print(repr(ex))
-                    time.sleep(0.25)
-
-            raise Exception("ramdisk creation failed")
-
-        ret = os.path.join(tempfile.gettempdir(), "copyparty-test")
-        try:
-            os.mkdir(ret)
-        finally:
-            return ret
-
     def log(self, src, msg, c=0):
         pass
 
     def test(self):
-        td = os.path.join(self.get_ramdisk(), "vfs")
+        td = os.path.join(tu.get_ramdisk(), "vfs")
         try:
             shutil.rmtree(td)
         except OSError:
@@ -268,7 +227,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(list(v1), list(v2))
 
         # config file parser
-        cfg_path = os.path.join(self.get_ramdisk(), "test.cfg")
+        cfg_path = os.path.join(tu.get_ramdisk(), "test.cfg")
         with open(cfg_path, "wb") as f:
             f.write(
                 dedent(
