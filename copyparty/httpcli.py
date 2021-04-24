@@ -1381,6 +1381,9 @@ class HttpCli(object):
             if is_ls:
                 raise Pebkac(403)
 
+            if not os.path.isdir(fsenc(abspath)):
+                raise Pebkac(404)
+
             html = self.j2(tpl, **j2a)
             self.reply(html.encode("utf-8", "replace"))
             return True
