@@ -8,67 +8,57 @@ html .editor-toolbar>i.separator { border-left: 1px solid #ccc; }
 html .editor-toolbar.disabled-for-preview>button:not(.no-disable) { opacity: .35 }
 
 html {
-    line-height: 1.5em;
+	line-height: 1.5em;
 }
 html, body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
-    font-family: sans-serif;
-    background: #f7f7f7;
-    color: #333;
+	margin: 0;
+	padding: 0;
+	min-height: 100%;
+	font-family: sans-serif;
+	background: #f7f7f7;
+	color: #333;
 }
 #mn {
-    font-weight: normal;
-    margin: 1.3em 0 .7em 1em;
+	font-weight: normal;
+	margin: 1.3em 0 .7em 1em;
 }
 #mn a {
-    color: #444;
-    margin: 0 0 0 -.2em;
-    padding: 0 0 0 .4em;
-    text-decoration: none;
-    /* ie: */
-    border-bottom: .1em solid #777\9;
-    margin-right: 1em\9;
+	color: #444;
+	margin: 0 0 0 -.2em;
+	padding: 0 0 0 .4em;
+	text-decoration: none;
+	/* ie: */
+	border-bottom: .1em solid #777\9;
+	margin-right: 1em\9;
 }
 #mn a:first-child {
-    padding-left: .5em;
+	padding-left: .5em;
 }
 #mn a:last-child {
-    padding-right: .5em;
+	padding-right: .5em;
 }
 #mn a:not(:last-child):after {
-    content: '';
-    width: 1.05em;
-    height: 1.05em;
-    margin: -.2em .3em -.2em -.4em;
-    display: inline-block;
-    border: 1px solid rgba(0,0,0,0.2);
-    border-width: .2em .2em 0 0;
-    transform: rotate(45deg);
+	content: '';
+	width: 1.05em;
+	height: 1.05em;
+	margin: -.2em .3em -.2em -.4em;
+	display: inline-block;
+	border: 1px solid rgba(0,0,0,0.2);
+	border-width: .2em .2em 0 0;
+	transform: rotate(45deg);
 }
 #mn a:hover {
-    color: #000;
-    text-decoration: underline;
+	color: #000;
+	text-decoration: underline;
 }
 
 html .editor-toolbar>button.disabled {
-    opacity: .35;
-    pointer-events: none;
+	opacity: .35;
+	pointer-events: none;
 }
 html .editor-toolbar>button.save.force-save {
-    background: #f97;
+	background: #f97;
 }
-
-/*
-*[data-ln]:before {
-	content: attr(data-ln);
-	font-size: .8em;
-	margin: 0 .4em;
-	color: #f0c;
-}
-.cm-header { font-size: .4em !important }
-*/
 
 
 
@@ -101,29 +91,29 @@ html .editor-toolbar>button.save.force-save {
 	line-height: 1.1em;
 }
 .mdo a {
-    color: #fff;
-    background: #39b;
-    text-decoration: none;
-    padding: 0 .3em;
-    border: none;
-    border-bottom: .07em solid #079;
+	color: #fff;
+	background: #39b;
+	text-decoration: none;
+	padding: 0 .3em;
+	border: none;
+	border-bottom: .07em solid #079;
 }
 .mdo h2 {
-    color: #fff;
-    background: #555;
-    margin-top: 2em;
-    border-bottom: .22em solid #999;
-    border-top: none;
+	color: #fff;
+	background: #555;
+	margin-top: 2em;
+	border-bottom: .22em solid #999;
+	border-top: none;
 }
 .mdo h1 {
-    color: #fff;
-    background: #444;
-    font-weight: normal;
-    border-top: .4em solid #fb0;
-    border-bottom: .4em solid #777;
-    border-radius: 0 1em 0 1em;
-    margin: 3em 0 1em 0;
-    padding: .5em 0;
+	color: #fff;
+	background: #444;
+	font-weight: normal;
+	border-top: .4em solid #fb0;
+	border-bottom: .4em solid #777;
+	border-radius: 0 1em 0 1em;
+	margin: 3em 0 1em 0;
+	padding: .5em 0;
 }
 h1, h2 {
 	line-height: 1.5em;
@@ -197,14 +187,14 @@ th {
 
 /* mde support */
 .mdo {
-    padding: 1em;
-    background: #f7f7f7;
+	padding: 1em;
+	background: #f7f7f7;
 }
 html.dark .mdo {
-    background: #1c1c1c;
+	background: #1c1c1c;
 }
 .CodeMirror {
-    background: #f7f7f7;
+	background: #f7f7f7;
 }
 
 
@@ -214,108 +204,108 @@ html.dark .mdo {
 /* darkmode */
 html.dark .mdo,
 html.dark .CodeMirror {
-    border-color: #222;
+	border-color: #222;
 }
 html.dark,
 html.dark body,
 html.dark .CodeMirror {
-    background: #222;
-    color: #ccc;
+	background: #222;
+	color: #ccc;
 }
 html.dark .CodeMirror-cursor {
-    border-color: #fff;
+	border-color: #fff;
 }
 html.dark .CodeMirror-selected {
-    box-shadow: 0 0 1px #0cf inset;
+	box-shadow: 0 0 1px #0cf inset;
 }
 html.dark .CodeMirror-selected,
 html.dark .CodeMirror-selectedtext {
-    border-radius: .1em;
-    background: #246;
-    color: #fff;
+	border-radius: .1em;
+	background: #246;
+	color: #fff;
 }
 html.dark .mdo a {
-    background: #057;
+	background: #057;
 }
 html.dark .mdo h1 a, html.dark .mdo h4 a,
 html.dark .mdo h2 a, html.dark .mdo h5 a,
 html.dark .mdo h3 a, html.dark .mdo h6 a {
-    color: inherit;
-    background: none;
+	color: inherit;
+	background: none;
 }
 html.dark pre,
 html.dark code {
-    color: #8c0;
-    background: #1a1a1a;
-    border: .07em solid #333;
+	color: #8c0;
+	background: #1a1a1a;
+	border: .07em solid #333;
 }
 html.dark .mdo ul,
 html.dark .mdo ol {
-    border-color: #444;
+	border-color: #444;
 }
 html.dark .mdo>ul,
 html.dark .mdo>ol {
-    border-color: #555;
+	border-color: #555;
 }
 html.dark strong {
-    color: #fff;
+	color: #fff;
 }
 html.dark p>em,
 html.dark li>em,
 html.dark td>em {
-    color: #f94;
-    border-color: #666;
+	color: #f94;
+	border-color: #666;
 }
 html.dark h1 {
-    background: #383838;
-    border-top: .4em solid #b80;
-    border-bottom: .4em solid #4c4c4c;
+	background: #383838;
+	border-top: .4em solid #b80;
+	border-bottom: .4em solid #4c4c4c;
 }
 html.dark h2 {
-    background: #444;
-    border-bottom: .22em solid #555;
+	background: #444;
+	border-bottom: .22em solid #555;
 }
 html.dark td,
 html.dark th {
-    border-color: #444;
+	border-color: #444;
 }
 html.dark blockquote {
-    background: #282828;
-    border: .07em dashed #444;
+	background: #282828;
+	border: .07em dashed #444;
 }
 
 
 
 html.dark #mn a {
-    color: #ccc;
+	color: #ccc;
 }
 html.dark #mn a:not(:last-child):after {
-    border-color: rgba(255,255,255,0.3);
+	border-color: rgba(255,255,255,0.3);
 }
 html.dark .editor-toolbar {
-    border-color: #2c2c2c;
-    background: #1c1c1c;
+	border-color: #2c2c2c;
+	background: #1c1c1c;
 }
 html.dark .editor-toolbar>i.separator {
-    border-left: 1px solid #444;
-    border-right: 1px solid #111;
+	border-left: 1px solid #444;
+	border-right: 1px solid #111;
 }
 html.dark .editor-toolbar>button {
-    margin-left: -1px; border: 1px solid rgba(255,255,255,0.1);
-    color: #aaa;
+	margin-left: -1px; border: 1px solid rgba(255,255,255,0.1);
+	color: #aaa;
 }
 
 
 
 html.dark .editor-toolbar>button:hover {
-    color: #333;
+	color: #333;
 }
 html.dark .editor-toolbar>button.active {
-    color: #333;
-    border-color: #ec1;
-    background: #c90;
+	color: #333;
+	border-color: #ec1;
+	background: #c90;
 }
 html.dark .editor-toolbar::after,
 html.dark .editor-toolbar::before {
-    background: none;
+	background: none;
 }

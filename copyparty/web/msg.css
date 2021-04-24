@@ -3,7 +3,7 @@ html,body,tr,th,td,#files,a {
 	background: none;
 	font-weight: inherit;
 	font-size: inherit;
-	padding: none;
+	padding: 0;
 	border: none;
 }
 html {
@@ -20,8 +20,8 @@ body {
 	padding-bottom: 5em;
 }
 #box {
-    padding: .5em 1em;
-    background: #2c2c2c;
+	padding: .5em 1em;
+	background: #2c2c2c;
 }
 pre {
 	font-family: monospace, monospace;

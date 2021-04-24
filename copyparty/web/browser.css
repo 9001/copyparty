@@ -6,7 +6,7 @@ html,body,tr,th,td,#files,a {
 	background: none;
 	font-weight: inherit;
 	font-size: inherit;
-	padding: none;
+	padding: 0;
 	border: none;
 }
 html {
@@ -90,15 +90,13 @@ a, #files tbody div a:last-child {
 #files td {
 	margin: 0;
 	padding: 0 .5em;
-}
-#files td {
 	border-bottom: 1px solid #111;
 }
 #files td+td+td {
 	max-width: 30em;
 	overflow: hidden;
 }
-#files tr td {
+#files tr+tr td {
 	border-top: 1px solid #383838;
 }
 #files tbody td:nth-child(3) {
@@ -485,9 +483,6 @@ input[type="checkbox"]:checked+label {
 }
 #files td div {
 	border-collapse: collapse;
-	width: 100%;
-}
-#files td div a:last-child {
 	width: 100%;
 }
 #wrap {

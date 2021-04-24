@@ -217,7 +217,7 @@
 	padding: 0 1em;
 	height: 0;
 	opacity: .1;
-    transition: all 0.14s ease-in-out;
+	transition: all 0.14s ease-in-out;
 	box-shadow: 0 .2em .5em #222;
 	border-radius: .4em;
 	z-index: 1;
