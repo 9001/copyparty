@@ -119,12 +119,12 @@ summary: it works! you can use it! (but technically not even close to beta)
 
 ## tabs
 
-* [🔎] search by size, last-modified, path, name, mp3 tags, ...
-* [🚀] and [🎈] are the uploaders, see [uploading](#uploading)
-* [📂] mkdir, create directories
-* [📝] new-md, create a new markdown document
-* [📟] send-msg, either to server-log or into textfiles if `--urlform save`
-* [⚙️] client configuration options
+* `[🔎]` search by size, last-modified, path, name, mp3 tags, ...
+* `[🚀]` and `[🎈]` are the uploaders, see [uploading](#uploading)
+* `[📂]` mkdir, create directories
+* `[📝]` new-md, create a new markdown document
+* `[📟]` send-msg, either to server-log or into textfiles if `--urlform save`
+* `[⚙️]` client configuration options
 
 
 ## hotkeys
@@ -141,7 +141,7 @@ the browser has the following hotkeys
 
 by default there's a breadcrumbs path; you can replace this with a tree-browser sidebar thing by clicking the 🌲
 
-click [-] and [+] to adjust the size, and the [a] toggles if the tree should widen dynamically as you go deeper or stay fixed-size
+click `[-]` and `[+]` to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
 
 
 ## zip downloads
@@ -183,23 +183,23 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
-* [🏃] analysis of other files should continue while one is uploading
-* [💭] ask for confirmation before files are added to the list
-* [💤] sync uploading between other copyparty tabs so only one is active
-* [🔎] switch between upload and file-search mode
+* `[🏃]` analysis of other files should continue while one is uploading
+* `[💭]` ask for confirmation before files are added to the list
+* `[💤]` sync uploading between other copyparty tabs so only one is active
+* `[🔎]` switch between upload and file-search mode
 
 and then theres the tabs below it,
-* [ok] is uploads which completed successfully
-* [ng] is the uploads which failed / got rejected (already exists, ...)
-* [done] shows a combined list of [ok] and [ng], chronological order
-* [busy] files which are currently hashing, pending-upload, or uploading
-  * plus up to 3 entries from [done] and [que] for context
-* [que] is all the files that are still queued
+* `[ok]` is uploads which completed successfully
+* `[ng]` is the uploads which failed / got rejected (already exists, ...)
+* `[done]` shows a combined list of `[ok]` and `[ng]`, chronological order
+* `[busy]` files which are currently hashing, pending-upload, or uploading
+  * plus up to 3 entries from `[done]` and `[que]` for context
+* `[que]` is all the files that are still queued
 
-file search mode checksums each file and checks if they exist; files go into [ok] if they exist (and you get a link to where it is), otherwise they land in [ng]
+file search mode checksums each file and checks if they exist; files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else
 
-adding the same file multiple times is NG, so if you first search for a file and then decide to upload it, you have to click the [cleanup] button to discard [done] files
+adding the same file multiple times is NG, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
 
 
 ## other tricks
