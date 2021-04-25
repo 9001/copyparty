@@ -12,7 +12,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * *resumable* uploads need `firefox 12+` / `chrome 6+` / `safari 6+` / `IE 10+`
 * code standard: `black`
 
-screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#markdown-viewer) // [search](#searching)
+📷 screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#markdown-viewer) // [search](#searching)
 
 
 ## readme toc
@@ -29,6 +29,7 @@ screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#mar
     * [tree-mode](#tree-mode)
     * [zip downloads](#zip-downloads)
     * [uploading](#uploading)
+        * [file-search](#file-search)
     * [markdown viewer](#markdown-viewer)
     * [other tricks](#other-tricks)
 * [searching](#searching)
@@ -124,7 +125,7 @@ summary: it works! you can use it! (but technically not even close to beta)
 
 ## tabs
 
-* `[🔎]` search by size, time, path/name, mp3-tags ... see [searching](#searching)
+* `[🔎]` search by size, date, path/name, mp3-tags ... see [searching](#searching)
 * `[🚀]` and `[🎈]` are the uploaders, see [uploading](#uploading)
 * `[📂]` mkdir, create directories
 * `[📝]` new-md, create a new markdown document
@@ -201,7 +202,11 @@ and then theres the tabs below it,
   * plus up to 3 entries from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
-file search mode checksums each file and checks if they exist; files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
+### file-search
+
+in the 🚀 up2k tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
+
+files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else
 
 adding the same file multiple times is NG, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
@@ -229,7 +234,7 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 
 when started with `-e2dsa` copyparty will scan/index all your files. This avoids duplicates on upload, and also makes the volumes searchable through the web-ui:
 * make search queries by `size`/`date`/`directory-path`/`filename`, or...
-* drag/drop a local file to see if the same contents exist somewhere on the server (you get the URL if it does)
+* drag/drop a local file to see if the same contents exist somewhere on the server, see [file-search](#file-search)
 
 path/name queries are space-separated, AND'ed together, and words are negated with a `-` prefix, so for example:
 * path: `shibayan -bossa` finds all files where one of the folders contain `shibayan` but filters out any results where `bossa` exists somewhere in the path
