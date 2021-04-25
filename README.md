@@ -20,8 +20,14 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [notes](#notes)
     * [status](#status)
 * [bugs](#bugs)
-* [usage](#usage)
+    * [not my bugs](#not-my-bugs)
+* [the browser](#the-browser)
+    * [tabs](#tabs)
+    * [hotkeys](#hotkeys)
+    * [tree-mode](#tree-mode)
     * [zip downloads](#zip-downloads)
+    * [uploading](#uploading)
+    * [other tricks](#other-tricks)
 * [searching](#searching)
     * [search configuration](#search-configuration)
     * [metadata from audio files](#metadata-from-audio-files)
@@ -29,6 +35,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [complete examples](#complete-examples)
 * [browser support](#browser-support)
 * [client examples](#client-examples)
+* [up2k](#up2k)
 * [dependencies](#dependencies)
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx)
@@ -107,7 +114,20 @@ summary: it works! you can use it! (but technically not even close to beta)
   * this is an msys2 bug, the regular windows edition of python is fine
 
 
-# usage
+# the browser
+
+
+## tabs
+
+* [🔎] search by size, last-modified, path, name, mp3 tags, ...
+* [🚀] and [🎈] are the uploaders, see [uploading](#uploading)
+* [📂] mkdir, create directories
+* [📝] new-md, create a new markdown document
+* [📟] send-msg, either to server-log or into textfiles if `--urlform save`
+* [⚙️] client configuration options
+
+
+## hotkeys
 
 the browser has the following hotkeys
 * `0..9` jump to 10%..90%
@@ -116,7 +136,12 @@ the browser has the following hotkeys
 * `I/K` prev/next folder
 * `P` parent folder
 
-you can link a particular timestamp in an audio file by adding it to the URL, such as `&20` / `&20s` / `&1m20` / `&1:20` after the `.../#af-c8960dab`
+
+## tree-mode
+
+by default there's a breadcrumbs path; you can replace this with a tree-browser sidebar thing by clicking the 🌲
+
+click [-] and [+] to adjust the size, and the [a] toggles if the tree should widen dynamically as you go deeper or stay fixed-size
 
 
 ## zip downloads
@@ -134,6 +159,52 @@ the `zip` link next to folders can produce various types of zip/tar files using 
   * the up2k.db is always excluded
 * `zip_crc` will take longer to download since the server has to read each file twice
   * please let me know if you find a program old enough to actually need this
+
+
+## uploading
+
+two upload methods are available in the html client:
+* 🎈 bup, the basic uploader, supports almost every browser since netscape 4.0
+* 🚀 up2k, the fancy one
+
+up2k has several advantages:
+* you can drop folders into the browser (files are added recursively)
+* files are processed in chunks, and each chunk is checksummed
+  * uploads resume if they are interrupted (for example by a reboot)
+  * server detects any corruption; the client reuploads affected chunks
+  * the client doesn't upload anything that already exists on the server
+* the last-modified timestamp of the file is preserved
+
+see [up2k](#up2k) for details on how it works
+
+since up2k has to read the file twice, bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
+
+up2k has saved a few uploads from becoming corrupted in-transfer already; caughtn android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
+
+the up2k UI is the epitome of polished inutitive experiences:
+* "parallel uploads" specifies how many chunks to upload at the same time
+* [🏃] analysis of other files should continue while one is uploading
+* [💭] ask for confirmation before files are added to the list
+* [💤] sync uploading between other copyparty tabs so only one is active
+* [🔎] switch between upload and file-search mode
+
+and then theres the tabs below it,
+* [ok] is uploads which completed successfully
+* [ng] is the uploads which failed / got rejected (already exists, ...)
+* [done] shows a combined list of [ok] and [ng], chronological order
+* [busy] files which are currently hashing, pending-upload, or uploading
+  * plus up to 3 entries from [done] and [que] for context
+* [que] is all the files that are still queued
+
+file search mode checksums each file and checks if they exist; files go into [ok] if they exist (and you get a link to where it is), otherwise they land in [ng]
+* the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else
+
+adding the same file multiple times is NG, so if you first search for a file and then decide to upload it, you have to click the [cleanup] button to discard [done] files
+
+
+## other tricks
+
+* you can link a particular timestamp in an audio file by adding it to the URL, such as `&20` / `&20s` / `&1m20` / `&t=1:20` after the `.../#af-c8960dab`
 
 
 # searching
@@ -261,6 +332,21 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|head -c43;}
     b512 <movie.mkv
+
+
+# up2k
+
+quick outline of the up2k protocol
+* the up2k client splits a file into an "optimal" number of chunks
+  * 1 MiB each, unless that becomes more than 256 chunks
+  * tries 1.5, 2, 3, 4, 6, ... until <= 256 or chunksize >= 32M
+* server creates the `wark`, an identifier for this upload
+  * `sha512( salt + filesize + chunk_hashes )`
+  * and a sparse file is created for the chunks to drop into
+* client uploads each chunk
+  * header entries for the chunk-hash and wark
+  * server writes chunks into place based on the hash
+* client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
 
 
 # dependencies
