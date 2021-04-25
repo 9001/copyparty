@@ -185,6 +185,16 @@ a, #files tbody div a:last-child {
 	background: #925;
 	border-color: #c37;
 }
+#files tr.sel a {
+	color: #fff;
+}
+#files tr.sel a.play {
+	color: #fc5;
+}
+#files tr.sel a.play.act {
+	color: #fff;
+	text-shadow: 0 0 1px #fff;
+}
 #blocked {
 	position: fixed;
 	top: 0;
@@ -506,9 +516,7 @@ input[type="checkbox"]:checked+label {
 #thx_ff {
 	padding: 5em 0;
 }
-#tree::-webkit-scrollbar-track {
-	background: #333;
-}
+#tree::-webkit-scrollbar-track,
 #tree::-webkit-scrollbar {
 	background: #333;
 }
@@ -819,6 +827,9 @@ html.light #files tr.sel td {
 html.light #files tr.sel a {
 	color: #fff;
 }
+html.light #files tr.sel a.play.act {
+	color: #fb0;
+}
 html.light input[type="checkbox"] + label {
 	color: #333;
 }
@@ -865,4 +876,14 @@ html.light #files a:hover,
 html.light #files tr.sel a:hover {
 	color: #000;
 	background: #fff;
+}
+html.light #tree {
+	scrollbar-color: #a70 #ddd;
+}
+html.light #tree::-webkit-scrollbar-track,
+html.light #tree::-webkit-scrollbar {
+	background: #ddd;
+}
+#tree::-webkit-scrollbar-thumb {
+	background: #da0;
 }

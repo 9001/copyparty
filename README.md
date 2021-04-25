@@ -12,7 +12,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * *resumable* uploads need `firefox 12+` / `chrome 6+` / `safari 6+` / `IE 10+`
 * code standard: `black`
 
-📷 screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#markdown-viewer) // [search](#searching)
+📷 screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#markdown-viewer) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [ie4](#browser-support)
 
 
 ## readme toc
@@ -64,9 +64,9 @@ you may also want these, especially on servers:
 ## notes
 
 * iPhone/iPad: use Firefox to download files
-* Android-Chrome: set max "parallel uploads" for 200% upload speed (android bug)
-* Android-Firefox: takes a while to select files (in order to avoid the above android-chrome issue)
-* Desktop-Firefox: may use gigabytes of RAM if your connection is great and your files are massive
+* Android-Chrome: increase "parallel uploads" for higher speed (android bug)
+* Android-Firefox: takes a while to select files (their fix for ☝️)
+* Desktop-Firefox: may use gigabytes of RAM if your files are massive
 * paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
   * because no browsers currently implement the media-query to do this properly orz
 
@@ -168,6 +168,7 @@ the `zip` link next to folders can produce various types of zip/tar files using 
 
 you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
 
+![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/116008321-372a2e00-a614-11eb-9a4a-4a1fd9074224.png)
 
 ## uploading
 
@@ -203,6 +204,8 @@ and then theres the tabs below it,
 * `[que]` is all the files that are still queued
 
 ### file-search
+
+![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/116008320-36919780-a614-11eb-803f-04162326a700.png)
 
 in the 🚀 up2k tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
 
@@ -300,6 +303,8 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 # browser support
 
+![copyparty-ie4-fs8](https://user-images.githubusercontent.com/241032/116009043-a1909d80-a617-11eb-9140-037ad6604899.png)
+
 `ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
 
 | feature         | ie6 | ie9 | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
@@ -330,7 +335,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 * lynx (2.8.9/macports) can browse, login, upload/mkdir/msg
 * w3m (0.5.3/macports) can browse, login, upload at 100kB/s, mkdir/msg
 * netsurf (3.10/arch) is basically ie6 with much better css (javascript has almost no effect)
-* netscape 4.0 and 4.5 can browse (text is yellow on white), upload with `?b=u`
+* ie4 and netscape 4.0 can browse (text is yellow on white), upload with `?b=u`
 * SerenityOS (22d13d8) hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying
 
 # client examples
@@ -359,7 +364,7 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 
 # up2k
 
-quick outline of the up2k protocol
+quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
 * the up2k client splits a file into an "optimal" number of chunks
   * 1 MiB each, unless that becomes more than 256 chunks
   * tries 1.5, 2, 3, 4, 6, ... until <= 256 or chunksize >= 32M
