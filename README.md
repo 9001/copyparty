@@ -12,6 +12,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * *resumable* uploads need `firefox 12+` / `chrome 6+` / `safari 6+` / `IE 10+`
 * code standard: `black`
 
+screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#markdown-viewer) // [search](#searching)
+
 
 ## readme toc
 
@@ -27,6 +29,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [tree-mode](#tree-mode)
     * [zip downloads](#zip-downloads)
     * [uploading](#uploading)
+    * [markdown viewer](#markdown-viewer)
     * [other tricks](#other-tricks)
 * [searching](#searching)
     * [search configuration](#search-configuration)
@@ -116,10 +119,12 @@ summary: it works! you can use it! (but technically not even close to beta)
 
 # the browser
 
+![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/115978054-65106380-a57d-11eb-98f8-59e3dee73557.png)
+
 
 ## tabs
 
-* `[🔎]` search by size, last-modified, path, name, mp3 tags, ...
+* `[🔎]` search by size, time, path/name, mp3-tags ... see [searching](#searching)
 * `[🚀]` and `[🎈]` are the uploaders, see [uploading](#uploading)
 * `[📂]` mkdir, create directories
 * `[📝]` new-md, create a new markdown document
@@ -160,6 +165,8 @@ the `zip` link next to folders can produce various types of zip/tar files using 
 * `zip_crc` will take longer to download since the server has to read each file twice
   * please let me know if you find a program old enough to actually need this
 
+you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
+
 
 ## uploading
 
@@ -177,9 +184,7 @@ up2k has several advantages:
 
 see [up2k](#up2k) for details on how it works
 
-since up2k has to read the file twice, bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
-
-up2k has saved a few uploads from becoming corrupted in-transfer already; caughtn android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
+![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/115978061-680b5400-a57d-11eb-9ef6-cbb5f60aeccc.png)
 
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
@@ -201,6 +206,17 @@ file search mode checksums each file and checks if they exist; files go into `[o
 
 adding the same file multiple times is NG, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
 
+note that since up2k has to read the file twice, bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
+
+up2k has saved a few uploads from becoming corrupted in-transfer already; caughtn android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
+
+
+## markdown viewer
+
+![copyparty-md-read-fs8](https://user-images.githubusercontent.com/241032/115978057-66419080-a57d-11eb-8539-d2be843991aa.png)
+
+* the document preview has a max-width which is the same as an A4 paper when printed
+
 
 ## other tricks
 
@@ -208,6 +224,8 @@ adding the same file multiple times is NG, so if you first search for a file and
 
 
 # searching
+
+![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/115978060-6772bd80-a57d-11eb-81d3-174e869b72c3.png)
 
 when started with `-e2dsa` copyparty will scan/index all your files. This avoids duplicates on upload, and also makes the volumes searchable through the web-ui:
 * make search queries by `size`/`date`/`directory-path`/`filename`, or...

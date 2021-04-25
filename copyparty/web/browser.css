@@ -341,10 +341,10 @@ a, #files tbody div a:last-child {
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
 }
-@media (min-width: 90em) {
+@media (min-width: 80em) {
 	#barpos,
 	#barbuf {
-		width: calc(100% - 24em);
+		width: calc(100% - 21em);
 		left: 9.8em;
 		top: .7em;
 		height: 1.6em;
@@ -353,6 +353,9 @@ a, #files tbody div a:last-child {
 	#widget {
 		bottom: -3.2em;
 		height: 3.2em;
+	}
+	#pvol {
+		max-width: 9em;
 	}
 }
 
