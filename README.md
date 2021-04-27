@@ -214,9 +214,9 @@ files go into `[ok]` if they exist (and you get a link to where it is), otherwis
 
 adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
 
-note that since up2k has to read the file twice, bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
+note that since up2k has to read the file twice, 🎈 bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
 
-up2k has saved a few uploads from becoming corrupted in-transfer already; caughtn android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
+up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
 
 
 ## markdown viewer
