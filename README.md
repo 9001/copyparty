@@ -212,7 +212,7 @@ in the 🚀 up2k tab, after toggling the `[🔎]` switch green, any files/folder
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else
 
-adding the same file multiple times is NG, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
+adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
 
 note that since up2k has to read the file twice, bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
 
