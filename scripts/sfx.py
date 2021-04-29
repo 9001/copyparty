@@ -2,7 +2,8 @@
 # coding: latin-1
 from __future__ import print_function, unicode_literals
 
-import os, sys, time, shutil, threading, tarfile, hashlib, platform, tempfile, traceback
+import re, os, sys, time, shutil, signal, threading, tarfile, hashlib, platform, tempfile, traceback
+import subprocess as sp
 
 """
 run me with any version of python, i will unpack and run copyparty
@@ -31,16 +32,16 @@ sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
 
 
-def eprint(*args, **kwargs):
-    kwargs["file"] = sys.stderr
-    print(*args, **kwargs)
+def eprint(*a, **ka):
+    ka["file"] = sys.stderr
+    print(*a, **ka)
 
 
-def msg(*args, **kwargs):
-    if args:
-        args = ["[SFX]", args[0]] + list(args[1:])
+def msg(*a, **ka):
+    if a:
+        a = ["[SFX]", a[0]] + list(a[1:])
 
-    eprint(*args, **kwargs)
+    eprint(*a, **ka)
 
 
 # skip 1
@@ -153,6 +154,9 @@ def encode(data, size, cksum, ver, ts):
 
             if ln.endswith("# skip 1") or skip:
                 skip = True
+                continue
+
+            if ln.strip().startswith("# fmt: "):
                 continue
 
             unpk += ln + "\n"
@@ -307,32 +311,29 @@ def get_payload():
         fpos = ofs + len(ptn) - 3
         f.seek(fpos)
         dpos = 0
-        leftovers = b""
+        rem = b""
         while True:
             rbuf = f.read(1024 * 32)
             if rbuf:
-                buf = leftovers + rbuf
+                buf = rem + rbuf
                 ofs = buf.rfind(b"\n")
                 if len(buf) <= 4:
-                    leftovers = buf
+                    rem = buf
                     continue
 
                 if ofs >= len(buf) - 4:
-                    leftovers = buf[ofs:]
+                    rem = buf[ofs:]
                     buf = buf[:ofs]
                 else:
-                    leftovers = b"\n# "
+                    rem = b"\n# "
             else:
-                buf = leftovers
+                buf = rem
 
             fpos += len(buf) + 1
-            buf = (
-                buf.replace(b"\n# ", b"")
-                .replace(b"\n#r", b"\r")
-                .replace(b"\n#n", b"\n")
-            )
-            dpos += len(buf) - 1
+            for a, b in [[b"\n# ", b""], [b"\n#r", b"\r"], [b"\n#n", b"\n"]]:
+                buf = buf.replace(a, b)
 
+            dpos += len(buf) - 1
             yield buf
 
             if not rbuf:
@@ -356,7 +357,7 @@ def utime(top):
 
 def confirm(rv):
     msg()
-    msg(traceback.format_exc())
+    msg("retcode", rv if rv else traceback.format_exc())
     msg("*** hit enter to exit ***")
     try:
         raw_input() if PY2 else input()
@@ -389,19 +390,36 @@ def run(tmp, j2):
     if j2:
         del ld[-1]
 
+    if any([re.match(r"^-.*j[0-9]", x) for x in sys.argv]):
+        run_s(ld)
+    else:
+        run_i(ld)
+
+
+def run_i(ld):
     for x in ld:
         sys.path.insert(0, x)
 
-    try:
-        from copyparty.__main__ import main as p
+    from copyparty.__main__ import main as p
 
-        p()
+    p()
 
-    except SystemExit as ex:
-        if ex.code:
-            confirm(ex.code)
-    except:
-        confirm(1)
+
+def run_s(ld):
+    # fmt: off
+    c = "import sys,runpy;" + "".join(['sys.path.insert(0,r"' + x + '");' for x in ld]) + 'runpy.run_module("copyparty",run_name="__main__")'
+    c = [str(x) for x in [sys.executable, "-c", c] + list(sys.argv[1:])]
+    # fmt: on
+    msg("\n", c, "\n")
+    p = sp.Popen(c)
+
+    def bye(*a):
+        p.send_signal(signal.SIGINT)
+
+    signal.signal(signal.SIGTERM, bye)
+    p.wait()
+
+    raise SystemExit(p.returncode)
 
 
 def main():
@@ -442,7 +460,16 @@ def main():
     except:
         j2 = None
 
-    run(tmp, j2)
+    try:
+        run(tmp, j2)
+    except SystemExit as ex:
+        c = ex.code
+        if c not in [0, -15]:
+            confirm(ex.code)
+    except KeyboardInterrupt:
+        pass
+    except:
+        confirm(0)
 
 
 if __name__ == "__main__":
