@@ -200,7 +200,7 @@ and then theres the tabs below it,
 * `[ng]` is the uploads which failed / got rejected (already exists, ...)
 * `[done]` shows a combined list of `[ok]` and `[ng]`, chronological order
 * `[busy]` files which are currently hashing, pending-upload, or uploading
-  * plus up to 3 entries from `[done]` and `[que]` for context
+  * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
 ### file-search
@@ -367,7 +367,8 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
 * the up2k client splits a file into an "optimal" number of chunks
   * 1 MiB each, unless that becomes more than 256 chunks
-  * tries 1.5, 2, 3, 4, 6, ... until <= 256 or chunksize >= 32M
+  * tries 1.5M, 2M, 3, 4, 6, ... until <= 256# or chunksize >= 32M
+* client posts the list of hashes, filename, size, last-modified
 * server creates the `wark`, an identifier for this upload
   * `sha512( salt + filesize + chunk_hashes )`
   * and a sparse file is created for the chunks to drop into
@@ -393,7 +394,7 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
 
 some bundled tools have copyleft dependencies, see [./bin/#mtag](bin/#mtag)
 
-these are standalone and will never be imported / evaluated by copyparty
+these are standalone programs and will never be imported / evaluated by copyparty
 
 
 # sfx

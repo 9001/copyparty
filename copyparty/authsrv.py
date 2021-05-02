@@ -241,6 +241,7 @@ class AuthSrv(object):
         self.args = args
         self.log_func = log_func
         self.warn_anonwrite = warn_anonwrite
+        self.line_ctr = 0
 
         if WINDOWS:
             self.re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)$")
@@ -266,7 +267,9 @@ class AuthSrv(object):
     def _parse_config_file(self, fd, user, mread, mwrite, mflags, mount):
         vol_src = None
         vol_dst = None
+        self.line_ctr = 0
         for ln in [x.decode("utf-8").strip() for x in fd]:
+            self.line_ctr += 1
             if not ln and vol_src is not None:
                 vol_src = None
                 vol_dst = None
@@ -296,7 +299,12 @@ class AuthSrv(object):
                 mflags[vol_dst] = {}
                 continue
 
-            lvl, uname = ln.split(" ")
+            if len(ln) > 1:
+                lvl, uname = ln.split(" ")
+            else:
+                lvl = ln
+                uname = "*"
+
             self._read_vol_str(
                 lvl, uname, mread[vol_dst], mwrite[vol_dst], mflags[vol_dst]
             )
@@ -374,7 +382,12 @@ class AuthSrv(object):
         if self.args.c:
             for cfg_fn in self.args.c:
                 with open(cfg_fn, "rb") as f:
-                    self._parse_config_file(f, user, mread, mwrite, mflags, mount)
+                    try:
+                        self._parse_config_file(f, user, mread, mwrite, mflags, mount)
+                    except:
+                        m = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
+                        print(m.format(cfg_fn, self.line_ctr))
+                        raise
 
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
