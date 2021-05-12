@@ -1,0 +1,29 @@
+<!--
+    save this as .epilogue.html inside a
+    write-only folder to declutter the UI
+-->
+
+<style>
+
+    /* make the up2k ui REALLY minimal by hiding a bunch of stuff: */
+
+    #ops, #tree, #path,  /* main tabs and navigators (tree/breadcrumbs) */
+
+    #u2cleanup, #u2conf tr:first-child>td[rowspan]:not(#u2btn_cw),  /* most of the config options */
+
+    #u2cards  /* and the upload progress tabs */
+
+    {display:none!important}  /* do it! */
+
+
+
+    /* add some margins because now it's weird */
+    .opview {margin-top: 2.5em}
+    #op_up2k {margin-top: 5em}
+
+    /* and embiggen the upload button */
+    #u2conf #u2btn, #u2btn {padding:1.5em 0}
+
+</style>
+
+<a href="#" onclick="this.parentNode.innerHTML='';">show advanced options</a>

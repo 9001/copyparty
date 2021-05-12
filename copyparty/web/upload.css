@@ -19,6 +19,10 @@
 	color: #f87;
 	padding: .5em;
 }
+#u2err.msg {
+	color: #999;
+	padding: .5em;
+}
 #u2btn {
 	color: #eee;
 	background: #555;

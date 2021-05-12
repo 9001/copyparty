@@ -420,6 +420,8 @@ function up2k_init(have_crypto) {
         ebi('u2notbtn').innerHTML = '';
     }
 
+    var suggest_up2k = 'this is the basic uploader; <a href="#" id="u2yea">up2k</a> is better';
+
     var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>',
         is_https = (window.location + '').indexOf('https:') === 0;
 
@@ -441,33 +443,42 @@ function up2k_init(have_crypto) {
     }
 
     // show uploader if the user only has write-access
-    if (!ebi('files'))
+    var perms = (document.body.getAttribute('perms') + '').split(' ');
+    if (!has(perms, 'read'))
         goto('up2k');
 
-    // shows or clears an error message in the basic uploader ui
-    function setmsg(msg) {
+    // shows or clears a message in the basic uploader ui
+    function setmsg(msg, type) {
         if (msg !== undefined) {
-            ebi('u2err').setAttribute('class', 'err');
+            ebi('u2err').setAttribute('class', type);
             ebi('u2err').innerHTML = msg;
         }
         else {
             ebi('u2err').setAttribute('class', '');
             ebi('u2err').innerHTML = '';
         }
+        if (msg == suggest_up2k) {
+            ebi('u2yea').onclick = function (e) {
+                ev(e);
+                goto('up2k');
+            };
+        }
     }
 
     // switches to the basic uploader with msg as error message
     function un2k(msg) {
-        setmsg(msg);
+        setmsg(msg, 'err');
         return false;
     }
 
     // handle user intent to use the basic uploader instead
     ebi('u2nope').onclick = function (e) {
         ev(e);
-        setmsg();
+        setmsg(suggest_up2k, 'msg');
         goto('bup');
     };
+
+    setmsg(suggest_up2k, 'msg');
 
     if (!String.prototype.format) {
         String.prototype.format = function () {

@@ -1326,6 +1326,7 @@ function apply_perms(perms) {
 	document.body.setAttribute('perms', perms.join(' '));
 
 	var have_write = has(perms, "write"),
+		have_read = has(perms, "read"),
 		tds = QSA('#u2conf td');
 
 	for (var a = 0; a < tds.length; a++) {
@@ -1336,6 +1337,11 @@ function apply_perms(perms) {
 
 	if (window['up2k'])
 		up2k.set_fsearch();
+
+	ebi('widget').style.display = have_read ? '' : 'none';
+	ebi('files').style.display = have_read ? '' : 'none';
+	if (!have_read)
+		goto('up2k');
 }
 
 
