@@ -87,7 +87,7 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     ret += struct.pack("<LL", vsz, vsz)
 
     # windows support (the "?" replace below too)
-    fn = sanitize_fn(fn, "/")
+    fn = sanitize_fn(fn, ok="/")
     bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
     z64_len = len(z64v) * 8 + 4 if z64v else 0

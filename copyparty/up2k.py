@@ -891,7 +891,7 @@ class Up2k(object):
             if cj["ptop"] not in self.registry:
                 raise Pebkac(410, "location unavailable")
 
-        cj["name"] = sanitize_fn(cj["name"])
+        cj["name"] = sanitize_fn(cj["name"], bad=[".prologue.html", ".epilogue.html"])
         cj["poke"] = time.time()
         wark = self._get_wark(cj)
         now = time.time()

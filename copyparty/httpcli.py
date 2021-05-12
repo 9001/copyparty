@@ -741,7 +741,9 @@ class HttpCli(object):
 
                 if p_file and not nullwrite:
                     fdir = os.path.join(vfs.realpath, rem)
-                    fname = sanitize_fn(p_file)
+                    fname = sanitize_fn(
+                        p_file, bad=[".prologue.html", ".epilogue.html"]
+                    )
 
                     if not os.path.isdir(fsenc(fdir)):
                         raise Pebkac(404, "that folder does not exist")
