@@ -136,11 +136,13 @@ summary: it works! you can use it! (but technically not even close to beta)
 ## hotkeys
 
 the browser has the following hotkeys
-* `0..9` jump to 10%..90%
-* `U/O` skip 10sec back/forward
-* `J/L` prev/next song
 * `I/K` prev/next folder
 * `P` parent folder
+* when playing audio:
+  * `0..9` jump to 10%..90%
+  * `U/O` skip 10sec back/forward
+  * `J/L` prev/next song
+    * `J` also starts playing the folder
 
 
 ## tree-mode
@@ -399,7 +401,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 # sfx
 
-currently there are two self-contained binaries:
+currently there are two self-contained "binaries":
 * [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) -- pure python, works everywhere
 * [copyparty-sfx.sh](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.sh) -- smaller, but only for linux and macos
 

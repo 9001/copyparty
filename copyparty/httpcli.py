@@ -1360,6 +1360,13 @@ class HttpCli(object):
         if "b" in self.uparam:
             tpl = "browser2"
 
+        logues = ["", ""]
+        for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
+            fn = os.path.join(abspath, fn)
+            if os.path.exists(fsenc(fn)):
+                with open(fsenc(fn), "rb") as f:
+                    logues[n] = f.read().decode("utf-8")
+
         j2a = {
             "vdir": quotep(self.vpath),
             "vpnodes": vpnodes,
@@ -1373,7 +1380,7 @@ class HttpCli(object):
             "have_zip": (not self.args.no_zip),
             "have_b_u": (self.writable and self.uparam.get("b") == "u"),
             "url_suf": url_suf,
-            "logues": ["", ""],
+            "logues": logues,
             "title": html_escape(self.vpath, crlf=True),
             "srv_info": srv_info,
         }
@@ -1525,13 +1532,6 @@ class HttpCli(object):
             taglist = [k for k in vn.flags.get("mte", "").split(",") if k in taglist]
             for f in dirs:
                 f["tags"] = {}
-
-        logues = ["", ""]
-        for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
-            fn = os.path.join(abspath, fn)
-            if os.path.exists(fsenc(fn)):
-                with open(fsenc(fn), "rb") as f:
-                    logues[n] = f.read().decode("utf-8")
 
         if is_ls:
             [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
