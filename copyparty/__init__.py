@@ -24,6 +24,9 @@ MACOS = platform.system() == "Darwin"
 class EnvParams(object):
     def __init__(self):
         self.mod = os.path.dirname(os.path.realpath(__file__))
+        if self.mod.endswith("__init__"):
+            self.mod = os.path.dirname(self.mod)
+
         if sys.platform == "win32":
             self.cfg = os.path.normpath(os.environ["APPDATA"] + "/copyparty")
         elif sys.platform == "darwin":
