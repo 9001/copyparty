@@ -1367,6 +1367,14 @@ class HttpCli(object):
                 with open(fsenc(fn), "rb") as f:
                     logues[n] = f.read().decode("utf-8")
 
+        ls_ret = {
+            "dirs": [],
+            "files": [],
+            "taglist": [],
+            "srvinf": srv_info,
+            "perms": perms,
+            "logues": logues,
+        }
         j2a = {
             "vdir": quotep(self.vpath),
             "vpnodes": vpnodes,
@@ -1386,7 +1394,9 @@ class HttpCli(object):
         }
         if not self.readable:
             if is_ls:
-                raise Pebkac(403)
+                ret = json.dumps(ls_ret)
+                self.reply(ret.encode("utf-8", "replace"), mime="application/json")
+                return True
 
             if not os.path.isdir(fsenc(abspath)):
                 raise Pebkac(404)
@@ -1535,15 +1545,10 @@ class HttpCli(object):
 
         if is_ls:
             [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
-            ret = {
-                "dirs": dirs,
-                "files": files,
-                "srvinf": srv_info,
-                "perms": perms,
-                "logues": logues,
-                "taglist": taglist,
-            }
-            ret = json.dumps(ret)
+            ls_ret["dirs"] = dirs
+            ls_ret["files"] = files
+            ls_ret["taglist"] = taglist
+            ret = json.dumps(ls_ret)
             self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
 

@@ -141,7 +141,12 @@ class VFS(object):
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):
-                if uname in vn2.uread or "*" in vn2.uread:
+                if (
+                    uname in vn2.uread
+                    or "*" in vn2.uread
+                    or uname in vn2.uwrite
+                    or "*" in vn2.uwrite
+                ):
                     virt_vis[name] = vn2
 
             # no vfs nodes in the list of real inodes
