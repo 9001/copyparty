@@ -205,6 +205,8 @@ and then theres the tabs below it,
   * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
+protip: you can avoid scaring away users by hiding some of the UI with hacks like [docs/minimal-up2k.html](docs/minimal-up2k.html)
+
 ### file-search
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/116008320-36919780-a614-11eb-803f-04162326a700.png)
