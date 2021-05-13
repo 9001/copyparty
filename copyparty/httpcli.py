@@ -654,13 +654,16 @@ class HttpCli(object):
 
         if pwd in self.auth.iuser:
             msg = "login ok"
+            dt = datetime.utcfromtimestamp(time.time() + 60 * 60 * 24 * 365)
+            exp = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
         else:
             msg = "naw dude"
             pwd = "x"  # nosec
+            exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
-        h = {"Set-Cookie": "cppwd={}; Path=/; SameSite=Lax".format(pwd)}
+        ck = "cppwd={}; Path=/; Expires={}; SameSite=Lax".format(pwd, exp)
         html = self.j2("msg", h1=msg, h2='<a href="/">ack</a>', redir="/")
-        self.reply(html.encode("utf-8"), headers=h)
+        self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
         return True
 
     def handle_mkdir(self):
@@ -939,13 +942,14 @@ class HttpCli(object):
         return True
 
     def _chk_lastmod(self, file_ts):
+        date_fmt = "%a, %d %b %Y %H:%M:%S GMT"
         file_dt = datetime.utcfromtimestamp(file_ts)
-        file_lastmod = file_dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        file_lastmod = file_dt.strftime(date_fmt)
 
         cli_lastmod = self.headers.get("if-modified-since")
         if cli_lastmod:
             try:
-                cli_dt = time.strptime(cli_lastmod, "%a, %d %b %Y %H:%M:%S GMT")
+                cli_dt = time.strptime(cli_lastmod, date_fmt)
                 cli_ts = calendar.timegm(cli_dt)
                 return file_lastmod, int(file_ts) > int(cli_ts)
             except Exception as ex:
