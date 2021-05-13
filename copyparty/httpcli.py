@@ -120,29 +120,31 @@ class HttpCli(object):
                 else:
                     uparam[k.lower()] = False
 
+        cookies = self.headers.get("cookie") or {}
+        if cookies:
+            cookies = [x.split("=", 1) for x in cookies.split(";") if "=" in x]
+            cookies = {k.strip(): unescape_cookie(v) for k, v in cookies}
+            for kc, ku in [["cppwd", "pw"], ["b", "b"]]:
+                if kc in cookies and ku not in uparam:
+                    uparam[ku] = cookies[kc]
+
         self.uparam = uparam
+        self.cookies = cookies
         self.vpath = unquotep(vpath)
 
-        pwd = None
-        if "cookie" in self.headers:
-            cookies = self.headers["cookie"].split(";")
-            for k, v in [x.split("=", 1) for x in cookies]:
-                if k.strip() != "cppwd":
-                    continue
-
-                pwd = unescape_cookie(v)
-                break
-
-        pwd = uparam.get("pw", pwd)
+        pwd = uparam.get("pw")
         self.uname = self.auth.iuser.get(pwd, "*")
         if self.uname:
             self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
             self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
 
         ua = self.headers.get("user-agent", "")
-        if ua.startswith("rclone/"):
+        self.is_rclone = ua.startswith("rclone/")
+        if self.is_rclone:
             uparam["raw"] = False
             uparam["dots"] = False
+            uparam["b"] = False
+            cookies["b"] = False
 
         try:
             if self.mode in ["GET", "HEAD"]:
@@ -218,7 +220,14 @@ class HttpCli(object):
         removing anything in rm, adding pairs in add
         """
 
-        kv = {k: v for k, v in self.uparam.items() if k not in rm}
+        if self.is_rclone:
+            return ""
+
+        kv = {
+            k: v
+            for k, v in self.uparam.items()
+            if k not in rm and self.cookies.get(k) != v
+        }
         kv.update(add)
         if not kv:
             return ""
