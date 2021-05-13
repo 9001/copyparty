@@ -49,6 +49,7 @@ HTTPCODE = {
     200: "OK",
     204: "No Content",
     206: "Partial Content",
+    302: "Found",
     304: "Not Modified",
     400: "Bad Request",
     403: "Forbidden",

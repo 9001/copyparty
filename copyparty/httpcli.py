@@ -235,6 +235,22 @@ class HttpCli(object):
         r = ["{}={}".format(k, quotep(v)) if v else k for k, v in kv.items()]
         return "?" + "&amp;".join(r)
 
+    def redirect(self, vpath, suf="", msg="aight", flavor="go to", use302=False):
+        html = self.j2(
+            "msg",
+            h2='<a href="/{}">{} /{}</a>'.format(
+                quotep(vpath) + suf, flavor, html_escape(vpath, crlf=True) + suf
+            ),
+            pre=msg,
+            click=True,
+        ).encode("utf-8", "replace")
+
+        if use302:
+            h = {"Location": "/" + vpath, "Cache-Control": "no-cache"}
+            self.reply(html, status=302, headers=h)
+        else:
+            self.reply(html)
+
     def handle_get(self):
         logmsg = "{:4} {}".format(self.mode, self.req)
 
@@ -262,11 +278,12 @@ class HttpCli(object):
             nwrite = len(self.wvol)
             if nread + nwrite == 1 or (self.rvol == self.wvol and nread == 1):
                 if nread == 1:
-                    self.vpath = self.rvol[0]
+                    vpath = self.rvol[0]
                 else:
-                    self.vpath = self.wvol[0]
+                    vpath = self.wvol[0]
 
-                self.absolute_urls = True
+                self.redirect(vpath, flavor="redirecting to", use302=True)
+                return True
 
         self.readable, self.writable = self.conn.auth.vfs.can_access(
             self.vpath, self.uname
@@ -692,14 +709,7 @@ class HttpCli(object):
                 raise Pebkac(500, "mkdir failed, check the logs")
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
-        esc_paths = [quotep(vpath), html_escape(vpath, crlf=True)]
-        html = self.j2(
-            "msg",
-            h2='<a href="/{}">go to /{}</a>'.format(*esc_paths),
-            pre="aight",
-            click=True,
-        )
-        self.reply(html.encode("utf-8", "replace"))
+        self.redirect(vpath)
         return True
 
     def handle_new_md(self):
@@ -726,15 +736,7 @@ class HttpCli(object):
                 f.write(b"`GRUNNUR`\n")
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
-        html = self.j2(
-            "msg",
-            h2='<a href="/{}?edit">go to /{}?edit</a>'.format(
-                quotep(vpath), html_escape(vpath)
-            ),
-            pre="aight",
-            click=True,
-        )
-        self.reply(html.encode("utf-8", "replace"))
+        self.redirect(vpath, "?edit")
         return True
 
     def handle_plain_upload(self):
@@ -835,14 +837,7 @@ class HttpCli(object):
                     ).encode("utf-8")
                 )
 
-        html = self.j2(
-            "msg",
-            h2='<a href="/{}">return to /{}</a>'.format(
-                quotep(self.vpath), html_escape(self.vpath)
-            ),
-            pre=msg,
-        )
-        self.reply(html.encode("utf-8", "replace"))
+        self.redirect(self.vpath, msg=msg, flavor="return to")
         self.parser.drop()
         return True
 
