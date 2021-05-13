@@ -17,14 +17,15 @@ __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
 
-def get_spd(nbyte, nsec):
+def get_spd(nbyte, nfiles, nsec):
     if not nsec:
-        return "0.000 MB   0.000 sec   0.000 MB/s"
+        return "0.000 MB   0 files   0.000 sec   0.000 MB/s   0.000 f/s"
 
     mb = nbyte / (1024 * 1024.0)
     spd = mb / nsec
+    nspd = nfiles / nsec
 
-    return f"{mb:.3f} MB   {nsec:.3f} sec   {spd:.3f} MB/s"
+    return f"{mb:.3f} MB   {nfiles} files   {nsec:.3f} sec   {spd:.3f} MB/s   {nspd:.3f} f/s"
 
 
 class Inf(object):
@@ -36,6 +37,7 @@ class Inf(object):
         self.mtx_reports = threading.Lock()
 
         self.n_byte = 0
+        self.n_file = 0
         self.n_sec = 0
         self.n_done = 0
         self.t0 = t0
@@ -63,7 +65,8 @@ class Inf(object):
                 continue
 
             msgs = msgs[-64:]
-            msgs = [f"{get_spd(self.n_byte, self.n_sec)}   {x}" for x in msgs]
+            spd = get_spd(self.n_byte, len(self.reports), self.n_sec)
+            msgs = [f"{spd}   {x}" for x in msgs]
             print("\n".join(msgs))
 
     def report(self, fn, n_byte, n_sec):
@@ -131,8 +134,9 @@ def main():
 
     num_threads = 8
     read_sz = 32 * 1024
+    targs = (q, inf, read_sz)
     for _ in range(num_threads):
-        thr = threading.Thread(target=worker, args=(q, inf, read_sz,))
+        thr = threading.Thread(target=worker, args=targs)
         thr.daemon = True
         thr.start()
 
@@ -151,14 +155,14 @@ def main():
     log = inf.reports
     log.sort()
     for nbyte, nsec, fn in log[-64:]:
-        print(f"{get_spd(nbyte, nsec)}   {fn}")
+        spd = get_spd(nbyte, len(log), nsec)
+        print(f"{spd}   {fn}")
 
     print()
     print("\n".join(inf.errors))
 
-    print(get_spd(inf.n_byte, t2 - t0))
+    print(get_spd(inf.n_byte, len(log), t2 - t0))
 
 
 if __name__ == "__main__":
     main()
-

@@ -12,7 +12,7 @@ sys.path.insert(0, os.getcwd())
 import jstyleson
 from copyparty.__main__ import main as copyparty
 
-with open(".vscode/launch.json", "r") as f:
+with open(".vscode/launch.json", "r", encoding="utf-8") as f:
     tj = f.read()
 
 oj = jstyleson.loads(tj)
