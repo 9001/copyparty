@@ -593,8 +593,8 @@ def sanitize_fn(fn, ok="", bad=[]):
             ["?", "？"],
             ["*", "＊"],
         ]
-        for bad, good in [x for x in remap if x[0] not in ok]:
-            fn = fn.replace(bad, good)
+        for a, b in [x for x in remap if x[0] not in ok]:
+            fn = fn.replace(a, b)
 
         bad.extend(["con", "prn", "aux", "nul"])
         for n in range(1, 10):
