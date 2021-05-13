@@ -13,19 +13,23 @@
     <div id="wrap">
         <p>hello {{ this.uname }}</p>
 
+        {%- if rvol %}
         <h1>you can browse these:</h1>
         <ul>
             {% for mp in rvol %}
             <li><a href="/{{ mp }}{{ url_suf }}">/{{ mp }}</a></li>
             {% endfor %}
         </ul>
+        {%- endif %}
 
+        {%- if wvol %}
         <h1>you can upload to:</h1>
         <ul>
             {% for mp in wvol %}
             <li><a href="/{{ mp }}{{ url_suf }}">/{{ mp }}</a></li>
             {% endfor %}
         </ul>
+        {%- endif %}
 
         <h1>login for more:</h1>
         <ul>
