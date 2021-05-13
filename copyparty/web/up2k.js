@@ -1309,15 +1309,19 @@ function up2k_init(have_crypto) {
     }
 
     function set_fsearch(new_state) {
-        var perms = document.body.getAttribute('perms'),
-            read_only = false;
+        var perms = (document.body.getAttribute('perms') + '').split(' '),
+            fixed = false;
 
         if (!ebi('fsearch')) {
             new_state = false;
         }
-        else if (perms && perms.indexOf('write') === -1) {
+        else if (!has(perms, 'write')) {
             new_state = true;
-            read_only = true;
+            fixed = true;
+        }
+        else if (!has(perms, 'read')) {
+            new_state = false;
+            fixed = true;
         }
 
         if (new_state !== undefined) {
@@ -1326,7 +1330,7 @@ function up2k_init(have_crypto) {
         }
 
         try {
-            QS('label[for="fsearch"]').style.opacity = read_only ? '0' : '1';
+            QS('label[for="fsearch"]').style.display = QS('#fsearch').style.display = fixed ? 'none' : '';
         }
         catch (ex) { }
 

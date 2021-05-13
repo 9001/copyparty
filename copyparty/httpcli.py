@@ -120,6 +120,8 @@ class HttpCli(object):
                 else:
                     uparam[k.lower()] = False
 
+        self.ouparam = {k: v for k, v in uparam.items()}
+
         cookies = self.headers.get("cookie") or {}
         if cookies:
             cookies = [x.split("=", 1) for x in cookies.split(";") if "=" in x]
@@ -273,7 +275,7 @@ class HttpCli(object):
             return self.tx_tree()
 
         # conditional redirect to single volumes
-        if self.vpath == "" and not self.uparam:
+        if self.vpath == "" and not self.ouparam:
             nread = len(self.rvol)
             nwrite = len(self.wvol)
             if nread + nwrite == 1 or (self.rvol == self.wvol and nread == 1):
@@ -282,8 +284,9 @@ class HttpCli(object):
                 else:
                     vpath = self.wvol[0]
 
-                self.redirect(vpath, flavor="redirecting to", use302=True)
-                return True
+                if self.vpath != vpath:
+                    self.redirect(vpath, flavor="redirecting to", use302=True)
+                    return True
 
         self.readable, self.writable = self.conn.auth.vfs.can_access(
             self.vpath, self.uname

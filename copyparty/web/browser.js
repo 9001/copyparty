@@ -1307,21 +1307,20 @@ function apply_perms(perms) {
 	perms = perms || [];
 
 	var o = QSA('#ops>a[data-perm]');
-	for (var a = 0; a < o.length; a++)
-		o[a].style.display = 'none';
-
-	for (var a = 0; a < perms.length; a++) {
-		o = QSA('#ops>a[data-perm="' + perms[a] + '"]');
-		for (var b = 0; b < o.length; b++)
-			o[b].style.display = 'inline';
+	for (var a = 0; a < o.length; a++) {
+		var display = 'inline';
+		var needed = o[a].getAttribute('data-perm').split(' ');
+		for (var b = 0; b < needed.length; b++) {
+			if (!has(perms, needed[b])) {
+				display = 'none';
+			}
+		}
+		o[a].style.display = display;
 	}
 
 	var act = QS('#ops>a.act');
-	if (act) {
-		var areq = act.getAttribute('data-perm');
-		if (areq && !has(perms, areq))
-			goto();
-	}
+	if (act && act.style.display === 'none')
+		goto();
 
 	document.body.setAttribute('perms', perms.join(' '));
 
