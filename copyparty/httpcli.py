@@ -789,12 +789,16 @@ class HttpCli(object):
                 except Pebkac:
                     if fname != os.devnull:
                         fp = os.path.join(fdir, fname)
+                        fp2 = fp
+                        if self.args.dotpart:
+                            fp2 = os.path.join(fdir, "." + fname)
+
                         suffix = ".PARTIAL"
                         try:
-                            os.rename(fsenc(fp), fsenc(fp + suffix))
+                            os.rename(fsenc(fp), fsenc(fp2 + suffix))
                         except:
-                            fp = fp[: -len(suffix)]
-                            os.rename(fsenc(fp), fsenc(fp + suffix))
+                            fp2 = fp2[: -len(suffix) - 1]
+                            os.rename(fsenc(fp), fsenc(fp2 + suffix))
 
                     raise
 

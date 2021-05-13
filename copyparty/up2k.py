@@ -1198,6 +1198,9 @@ class Up2k(object):
         #    raise Exception("aaa")
 
         tnam = job["name"] + ".PARTIAL"
+        if self.args.dotpart:
+            tnam = "." + tnam
+
         suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as f:
             f, job["tnam"] = f["orz"]
