@@ -307,7 +307,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 # browser support
 
-![copyparty-ie4-fs8](https://user-images.githubusercontent.com/241032/116009043-a1909d80-a617-11eb-9140-037ad6604899.png)
+![copyparty-ie4-fs8](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png)
 
 `ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
 
