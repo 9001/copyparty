@@ -190,7 +190,7 @@ see [up2k](#up2k) for details on how it works
 
 ![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/115978061-680b5400-a57d-11eb-9ef6-cbb5f60aeccc.png)
 
-**protip:** you can avoid scaring away users with [docs/minimal-up2k.html](docs/minimal-up2k.html) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118286284-98864400-b4d2-11eb-899d-314a556fe3c1.png)
+**protip:** you can avoid scaring away users with [docs/minimal-up2k.html](docs/minimal-up2k.html) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
 
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
