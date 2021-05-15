@@ -1306,7 +1306,7 @@ function despin(sel) {
 function apply_perms(perms) {
 	perms = perms || [];
 
-	var o = QSA('#ops>a[data-perm]');
+	var o = QSA('#ops>a[data-perm], #u2footfoot');
 	for (var a = 0; a < o.length; a++) {
 		var display = 'inline';
 		var needed = o[a].getAttribute('data-perm').split(' ');
