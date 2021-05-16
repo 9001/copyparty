@@ -423,7 +423,7 @@ function up2k_init(subtle) {
         is_https = (window.location + '').indexOf('https:') === 0;
 
     if (is_https)
-        // chrome<37 firefox<34 edge<12 ie<11 opera<24 safari<10.1
+        // chrome<37 firefox<34 edge<12 opera<24 safari<7
         shame = 'your browser is impressively ancient';
 
     // upload ui hidden by default, clicking the header shows it
@@ -440,8 +440,8 @@ function up2k_init(subtle) {
     }
 
     // show uploader if the user only has write-access
-    var perms = (document.body.getAttribute('perms') + '').split(' ');
-    if (!has(perms, 'read'))
+    var perms = document.body.getAttribute('perms');
+    if (perms && !has(perms.split(' '), 'read'))
         goto('up2k');
 
     // shows or clears a message in the basic uploader ui
