@@ -158,6 +158,8 @@ class HttpCli(object):
             uparam["b"] = False
             cookies["b"] = False
 
+        self.do_log = not self.conn.lf_url or not self.conn.lf_url.match(self.req)
+
         try:
             if self.mode in ["GET", "HEAD"]:
                 return self.handle_get() and self.keepalive
@@ -264,17 +266,18 @@ class HttpCli(object):
             self.reply(html)
 
     def handle_get(self):
-        logmsg = "{:4} {}".format(self.mode, self.req)
+        if self.do_log:
+            logmsg = "{:4} {}".format(self.mode, self.req)
 
-        if "range" in self.headers:
-            try:
-                rval = self.headers["range"].split("=", 1)[1]
-            except:
-                rval = self.headers["range"]
+            if "range" in self.headers:
+                try:
+                    rval = self.headers["range"].split("=", 1)[1]
+                except:
+                    rval = self.headers["range"]
 
-            logmsg += " [\033[36m" + rval + "\033[0m]"
+                logmsg += " [\033[36m" + rval + "\033[0m]"
 
-        self.log(logmsg)
+            self.log(logmsg)
 
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
@@ -315,7 +318,9 @@ class HttpCli(object):
         return self.tx_browser()
 
     def handle_options(self):
-        self.log("OPTIONS " + self.req)
+        if self.do_log:
+            self.log("OPTIONS " + self.req)
+
         self.send_headers(
             None,
             204,
@@ -836,23 +841,11 @@ class HttpCli(object):
         self.log("{} {}".format(vspd, msg))
 
         if not nullwrite:
-            # TODO this is bad
             log_fn = "up.{:.6f}.txt".format(t0)
             with open(log_fn, "wb") as f:
-                f.write(
-                    (
-                        "\n".join(
-                            unicode(x)
-                            for x in [
-                                ":".join(unicode(x) for x in [self.ip, self.addr[1]]),
-                                msg.rstrip(),
-                            ]
-                        )
-                        + "\n"
-                        + errmsg
-                        + "\n"
-                    ).encode("utf-8")
-                )
+                ft = "{}:{}".format(self.ip, self.addr[1])
+                ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
+                f.write(ft.encode("utf-8"))
 
         self.redirect(self.vpath, msg=msg, flavor="return to")
         self.parser.drop()
@@ -1120,7 +1113,9 @@ class HttpCli(object):
         logmsg += unicode(status) + logtail
 
         if self.mode == "HEAD" or not do_send:
-            self.log(logmsg)
+            if self.do_log:
+                self.log(logmsg)
+
             return True
 
         ret = True
@@ -1134,7 +1129,9 @@ class HttpCli(object):
             logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"
 
         spd = self._spd((upper - lower) - remains)
-        self.log("{},  {}".format(logmsg, spd))
+        if self.do_log:
+            self.log("{},  {}".format(logmsg, spd))
+
         return ret
 
     def tx_zip(self, fmt, uarg, vn, rem, items, dots):
@@ -1243,7 +1240,9 @@ class HttpCli(object):
 
         logmsg += unicode(status)
         if self.mode == "HEAD" or not do_send:
-            self.log(logmsg)
+            if self.do_log:
+                self.log(logmsg)
+
             return True
 
         try:
@@ -1257,7 +1256,9 @@ class HttpCli(object):
             self.log(logmsg + " \033[31md/c\033[0m")
             return False
 
-        self.log(logmsg + " " + unicode(len(html)))
+        if self.do_log:
+            self.log(logmsg + " " + unicode(len(html)))
+
         return True
 
     def tx_mounts(self):

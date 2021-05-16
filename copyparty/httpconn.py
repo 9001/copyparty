@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import re
 import os
 import sys
 import time
@@ -38,6 +39,7 @@ class HttpConn(object):
         self.workload = 0
         self.u2idx = None
         self.log_func = hsrv.log
+        self.lf_url = re.compile(self.args.lf_url) if self.args.lf_url else None
         self.set_rproxy()
 
     def set_rproxy(self, ip=None):

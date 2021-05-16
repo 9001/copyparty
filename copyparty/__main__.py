@@ -272,11 +272,12 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
 
-    ap2 = ap.add_argument_group('Debug options')
+    ap2 = ap.add_argument_group('debug options')
     ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
     ap2.add_argument("--ihead", metavar="HEADER", action='append', help="dump incoming header")
+    ap2.add_argument("--lf-url", metavar="RE", type=str, default=r"^/\.cpr/", help="dont log URLs matching")
     
     return ap.parse_args(args=argv[1:])
     # fmt: on
