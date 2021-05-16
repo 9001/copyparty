@@ -23,6 +23,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [notes](#notes)
     * [status](#status)
 * [bugs](#bugs)
+    * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
 * [the browser](#the-browser)
     * [tabs](#tabs)
@@ -217,14 +218,14 @@ and then theres the tabs below it,
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/116008320-36919780-a614-11eb-803f-04162326a700.png)
 
-in the `🚀 up2k` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
+in the `[🚀 up2k]` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
 
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
-* the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else
+* the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else, this is no longer the case but now i've warmed up to the idea too much
 
 adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
 
-note that since up2k has to read the file twice, `🎈 bup` can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
+note that since up2k has to read the file twice, `[🎈 bup]` can be up to 2x faster in extreme cases (if your internet connection is faster than the read-speed of your HDD)
 
 up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
 
@@ -346,14 +347,14 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 
 | browser | will it blend |
 | ------- | ------------- |
-| safari (14.0.3/macos) | is chrome with janky wasm, so playing opus can deadlock the javascript engine |
-| safari (14.0.1/iOS)   | same as macos, except it recovers from the deadlocks if you poke it a bit |
-| links (2.21/macports) | can browse, login, upload/mkdir/msg |
-| lynx (2.8.9/macports) | can browse, login, upload/mkdir/msg |
-| w3m (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
-| netsurf (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
-| ie4 and netscape 4.0  | can browse (text is yellow on white), upload with `?b=u` |
-| SerenityOS (22d13d8)  | hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying |
+| **safari** (14.0.3/macos) | is chrome with janky wasm, so playing opus can deadlock the javascript engine |
+| **safari** (14.0.1/iOS)   | same as macos, except it recovers from the deadlocks if you poke it a bit |
+| **links** (2.21/macports) | can browse, login, upload/mkdir/msg |
+| **lynx** (2.8.9/macports) | can browse, login, upload/mkdir/msg |
+| **w3m** (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
+| **netsurf** (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
+| **ie4** and **netscape** 4.0  | can browse (text is yellow on white), upload with `?b=u` |
+| **SerenityOS** (22d13d8)  | hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying |
 
 
 # client examples
