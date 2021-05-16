@@ -511,6 +511,7 @@ class Up2k(object):
 
     def _run_all_mtp(self):
         t0 = time.time()
+        self.mtp_audio = {}
         self.mtp_force = {}
         self.mtp_parsers = {}
         for ptop, flags in self.flags.items():
@@ -527,14 +528,17 @@ class Up2k(object):
 
         entags = self.entags[ptop]
 
-        force = {}
-        timeout = {}
+        audio = {}  # [r]equire [n]ot [d]ontcare
+        force = {}  # bool
+        timeout = {}  # int
         parsers = {}
         for parser in self.flags[ptop]["mtp"]:
             orig = parser
             tag, parser = parser.split("=", 1)
             if tag not in entags:
                 continue
+
+            audio[tag] = "y"
 
             while True:
                 try:
@@ -548,6 +552,10 @@ class Up2k(object):
                 try:
                     arg, parser = parser.split(",", 1)
                     arg = arg.lower()
+
+                    if arg.startswith("a"):
+                        audio[tag] = arg[1:]
+                        continue
 
                     if arg == "f":
                         force[tag] = True
@@ -563,6 +571,8 @@ class Up2k(object):
                     self.log("invalid argument: " + orig, 1)
                     return
 
+        # todo audio/force => parser attributes
+        self.mtp_audio[ptop] = audio
         self.mtp_force[ptop] = force
         self.mtp_parsers[ptop] = parsers
 
@@ -596,8 +606,8 @@ class Up2k(object):
                     have = cur.execute(q, (w,)).fetchall()
                     have = [x[0] for x in have]
 
-                    if ".dur" not in have and ".dur" in entags:
-                        # skip non-audio
+                    parsers = self._get_parsers(ptop, have)
+                    if not parsers:
                         to_delete[w] = True
                         n_left -= 1
                         continue
@@ -605,10 +615,7 @@ class Up2k(object):
                     if w in in_progress:
                         continue
 
-                    task_parsers = {
-                        k: v for k, v in parsers.items() if k in force or k not in have
-                    }
-                    jobs.append([task_parsers, None, w, abspath])
+                    jobs.append([parsers, None, w, abspath])
                     in_progress[w] = True
 
             done = self._flush_mpool(wcur)
@@ -666,6 +673,26 @@ class Up2k(object):
 
             wcur.close()
             cur.close()
+
+    def _get_parsers(self, ptop, have):
+        audio = self.mtp_audio[ptop]
+        force = self.mtp_force[ptop]
+        entags = self.entags[ptop]
+        parsers = {}
+        for k, v in self.mtp_parsers[ptop].items():
+            if ".dur" in entags:
+                if ".dur" in have:
+                    # is audio, require non-audio?
+                    if audio[k] == "n":
+                        continue
+                # is not audio, require audio?
+                elif audio[k] == "y":
+                    continue
+
+            parsers[k] = v
+
+        parsers = {k: v for k, v in parsers.items() if k in force or k not in have}
+        return parsers
 
     def _start_mpool(self):
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
@@ -1308,13 +1335,9 @@ class Up2k(object):
             abspath = os.path.join(ptop, rd, fn)
             tags = self.mtag.get(abspath)
             ntags1 = len(tags)
-            if self.mtp_parsers.get(ptop, {}):
-                parser = {
-                    k: v
-                    for k, v in self.mtp_parsers[ptop].items()
-                    if k in self.mtp_force[ptop] or k not in tags
-                }
-                tags.update(self.mtag.get_bin(parser, abspath))
+            parsers = self._get_parsers(ptop, tags)
+            if parsers:
+                tags.update(self.mtag.get_bin(parsers, abspath))
 
             with self.mutex:
                 cur = self.cur[ptop]

@@ -674,7 +674,7 @@ class HttpCli(object):
                 self.log("failed to utime ({}, {})".format(path, times))
 
         spd = self._spd(post_sz)
-        self.log("{} thank".format(spd))
+        self.log("binpost {} thank".format(spd))
         self.reply(b"thank")
         return True
 
