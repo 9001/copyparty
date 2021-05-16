@@ -418,6 +418,7 @@ a, #files tbody div a:last-child {
 	padding: .3em .6em;
 	border-radius: .3em;
 	border-width: .15em 0;
+	white-space: nowrap;
 }
 .opbox {
 	background: #2d2d2d;

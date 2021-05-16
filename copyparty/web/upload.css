@@ -97,6 +97,7 @@
 #u2cards {
 	padding: 1em 0 .3em 1em;
 	margin: 1.5em auto -2.5em auto;
+	white-space: nowrap;
 	text-align: center;
 	overflow: hidden;
 }

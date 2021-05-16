@@ -18,10 +18,10 @@ function goto_up2k() {
 // usually it's undefined but some chromes throw on invoke
 var up2k = null;
 try {
-    crypto.subtle.digest(
-        'SHA-512', new Uint8Array(1)
-    ).then(
-        function (x) { up2k = up2k_init(true) },
+    var cf = window.crypto || window.msCrypto;
+    cf = cf.subtle || cf.webkitSubtle;
+    cf.digest('SHA-512', new Uint8Array(1)).then(
+        function (x) { up2k = up2k_init(cf) },
         function (x) { up2k = up2k_init(false) }
     );
 }
@@ -401,9 +401,7 @@ function U2pvis(act, btns) {
 }
 
 
-function up2k_init(have_crypto) {
-    //have_crypto = false;
-
+function up2k_init(subtle) {
     // show modal message
     function showmodal(msg) {
         ebi('u2notbtn').innerHTML = msg;
@@ -431,7 +429,7 @@ function up2k_init(have_crypto) {
 
     // upload ui hidden by default, clicking the header shows it
     function init_deps() {
-        if (!have_crypto && !window.asmCrypto) {
+        if (!subtle && !window.asmCrypto) {
             showmodal('<h1>loading sha512.js</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
             import_js('/.cpr/deps/sha512.js', unmodal);
 
@@ -986,8 +984,8 @@ function up2k_init(have_crypto) {
                 st.todo.handshake.push(t);
             };
 
-            if (have_crypto)
-                crypto.subtle.digest('SHA-512', buf).then(hash_done);
+            if (subtle)
+                subtle.digest('SHA-512', buf).then(hash_done);
             else {
                 var hasher = new asmCrypto.Sha512();
                 hasher.process(new Uint8Array(buf));
