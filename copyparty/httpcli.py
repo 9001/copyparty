@@ -100,6 +100,16 @@ class HttpCli(object):
             self.ip = v.split(",")[0]
             self.log_src = self.conn.set_rproxy(self.ip)
 
+        if self.args.ihead:
+            keys = self.args.ihead
+            if "*" in keys:
+                keys = list(sorted(self.headers.keys()))
+
+            for k in keys:
+                v = self.headers.get(k)
+                if v is not None:
+                    self.log("[H] {}: \033[33m[{}]".format(k, v), 6)
+
         # split req into vpath + uparam
         uparam = {}
         if "?" not in self.req:

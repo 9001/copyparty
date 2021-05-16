@@ -237,7 +237,6 @@ def run_argparse(argv, formatter):
     ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
     ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
     ap.add_argument("-q", action="store_true", help="quiet")
-    ap.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
     ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
@@ -246,8 +245,6 @@ def run_argparse(argv, formatter):
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
     ap.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
-    ap.add_argument("--no-sendfile", action="store_true", help="disable sendfile (for debugging)")
-    ap.add_argument("--no-scandir", action="store_true", help="disable scandir (for debugging)")
     ap.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
     ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
@@ -274,6 +271,12 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--ciphers", metavar="LIST", help="set allowed ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
+
+    ap2 = ap.add_argument_group('Debug options')
+    ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
+    ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
+    ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
+    ap2.add_argument("--ihead", metavar="HEADER", action='append', help="dump incoming header")
     
     return ap.parse_args(args=argv[1:])
     # fmt: on
