@@ -9,7 +9,7 @@
 turn your phone or raspi into a portable file server with resumable uploads/downloads using IE6 or any other browser
 
 * server runs on anything with `py2.7` or `py3.3+`
-* browse/upload with `IE4` / `netscape 4` on `win3.11` (heh)
+* browse/upload with IE4 / netscape4.0 on win3.11 (heh)
 * *resumable* uploads need `firefox 34+` / `chrome 37+` / `safari 7+`
 * code standard: `black`
 
