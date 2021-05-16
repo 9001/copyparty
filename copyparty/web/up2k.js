@@ -18,8 +18,7 @@ function goto_up2k() {
 // usually it's undefined but some chromes throw on invoke
 var up2k = null;
 try {
-    var cf = window.crypto || window.msCrypto;
-    cf = cf.subtle || cf.webkitSubtle;
+    var cf = crypto.subtle || crypto.webkitSubtle;
     cf.digest('SHA-512', new Uint8Array(1)).then(
         function (x) { up2k = up2k_init(cf) },
         function (x) { up2k = up2k_init(false) }
