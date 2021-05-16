@@ -1242,6 +1242,10 @@ function up2k_init(have_crypto) {
     onresize();
 
     function desc_show(e) {
+        var cfg = sread('tooltips');
+        if (cfg !== null && cfg != '1')
+            return;
+
         var msg = this.getAttribute('alt'),
             cdesc = ebi('u2cdesc');
 
