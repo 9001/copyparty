@@ -985,12 +985,12 @@ function up2k_init(subtle) {
 
             if (subtle)
                 subtle.digest('SHA-512', buf).then(hash_done);
-            else {
+            else setTimeout(function () {
                 var hasher = new asmCrypto.Sha512();
                 hasher.process(new Uint8Array(buf));
                 hasher.finish();
                 hash_done(hasher.result);
-            }
+            }, 1);
         };
 
         t.t1 = Date.now();
