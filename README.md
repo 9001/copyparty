@@ -55,11 +55,11 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
 
-running the sfx without arguments (for example doubleclicking it on Windows) will let anyone access the current folder; see `-h` for help if you want accounts and volumes etc
+running the sfx without arguments (for example doubleclicking it on Windows) will give everyone full access to the current folder; see `-h` for help if you want accounts and volumes etc
 
 you may also want these, especially on servers:
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
-* [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for legit https)
+* [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for better https)
 
 
 ## notes
@@ -92,8 +92,8 @@ you may also want these, especially on servers:
   * ☑ tree-view
   * ☑ media player
   * ✖ thumbnails
-  * ✖ SPA (browse while uploading)
-    * currently safe using the file-tree on the left only, not folders in the file list
+  * ☑ SPA (browse while uploading)
+    * if you use the file-tree on the left only, not folders in the file list
 * server indexing
   * ☑ locate files by contents
   * ☑ search by name/path/date/size
@@ -110,6 +110,11 @@ summary: it works! you can use it! (but technically not even close to beta)
 * Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * Windows: python 2.7 cannot handle filenames with mojibake
+
+## general bugs
+
+* all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
+* cannot mount something at `/d1/d2/d3` unless `d2` exists inside `d1`
 * hiding the contents at url `/d1/d2/d3` using `-v :d1/d2/d3:cd2d` has the side-effect of creating databases (for files/tags) inside folders d1 and d2, and those databases take precedence over the main db at the top of the vfs - this means all files in d2 and below will be reindexed unless you already had a vfs entry at or below d2
 * probably more, pls let me know
 
@@ -176,8 +181,8 @@ you can also zip a selection of files or folders by clicking them in the browser
 ## uploading
 
 two upload methods are available in the html client:
-* 🎈 bup, the basic uploader, supports almost every browser since netscape 4.0
-* 🚀 up2k, the fancy one
+* `🎈 bup`, the basic uploader, supports almost every browser since netscape 4.0
+* `🚀 up2k`, the fancy one
 
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
@@ -212,14 +217,14 @@ and then theres the tabs below it,
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/116008320-36919780-a614-11eb-803f-04162326a700.png)
 
-in the 🚀 up2k tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
+in the `🚀 up2k` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
 
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else
 
 adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
 
-note that since up2k has to read the file twice, 🎈 bup can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
+note that since up2k has to read the file twice, `🎈 bup` can be up to 2x faster if your internet connection is faster than the read-speed of your HDD
 
 up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
 
@@ -299,7 +304,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
 * `-v ~/music::r:cmtp=.bpm=~/bin/audio-bpm.py:cmtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
 
-*but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` audio files are skipped, or `ad` always do it (d as in dontcare) 
+*but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` only do non-audio files, or `ad` do all files (d as in dontcare) 
 
 * `-mtp ext=an,~/bin/file-ext.py` runs `~/bin/file-ext.py` to get the `ext` tag only if file is not audio (`an`)
 
@@ -338,14 +343,18 @@ copyparty can invoke external programs to collect additional metadata for files 
 * `*2` using a wasm decoder which can sometimes get stuck and consumes a bit more power
 
 quick summary of more eccentric web-browsers trying to view a directory index:
-* safari (14.0.3/macos) is chrome with janky wasm, so playing opus can deadlock the javascript engine
-* safari (14.0.1/iOS) same as macos, except it recovers from the deadlocks if you poke it a bit
-* links (2.21/macports) can browse, login, upload/mkdir/msg
-* lynx (2.8.9/macports) can browse, login, upload/mkdir/msg
-* w3m (0.5.3/macports) can browse, login, upload at 100kB/s, mkdir/msg
-* netsurf (3.10/arch) is basically ie6 with much better css (javascript has almost no effect)
-* ie4 and netscape 4.0 can browse (text is yellow on white), upload with `?b=u`
-* SerenityOS (22d13d8) hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying
+
+| browser | will it blend |
+| ------- | ------------- |
+| safari (14.0.3/macos) | is chrome with janky wasm, so playing opus can deadlock the javascript engine |
+| safari (14.0.1/iOS)   | same as macos, except it recovers from the deadlocks if you poke it a bit |
+| links (2.21/macports) | can browse, login, upload/mkdir/msg |
+| lynx (2.8.9/macports) | can browse, login, upload/mkdir/msg |
+| w3m (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
+| netsurf (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
+| ie4 and netscape 4.0  | can browse (text is yellow on white), upload with `?b=u` |
+| SerenityOS (22d13d8)  | hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying |
+
 
 # client examples
 
@@ -376,7 +385,7 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
 * the up2k client splits a file into an "optimal" number of chunks
   * 1 MiB each, unless that becomes more than 256 chunks
-  * tries 1.5M, 2M, 3, 4, 6, ... until <= 256# or chunksize >= 32M
+  * tries 1.5M, 2M, 3, 4, 6, ... until <= 256 chunks or size >= 32M
 * client posts the list of hashes, filename, size, last-modified
 * server creates the `wark`, an identifier for this upload
   * `sha512( salt + filesize + chunk_hashes )`
@@ -409,8 +418,8 @@ these are standalone programs and will never be imported / evaluated by copypart
 # sfx
 
 currently there are two self-contained "binaries":
-* [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) -- pure python, works everywhere
-* [copyparty-sfx.sh](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.sh) -- smaller, but only for linux and macos
+* [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) -- pure python, works everywhere, **recommended**
+* [copyparty-sfx.sh](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.sh) -- smaller, but only for linux and macos, kinda deprecated
 
 launch either of them (**use sfx.py on systemd**) and it'll unpack and run copyparty, assuming you have python installed of course
 
@@ -478,6 +487,7 @@ roughly sorted by priority
   * terminate client on bad data
 * `os.copy_file_range` for up2k cloning
 * support pillow-simd
+* single sha512 across all up2k chunks? maybe
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||
 
