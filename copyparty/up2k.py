@@ -675,11 +675,16 @@ class Up2k(object):
             cur.close()
 
     def _get_parsers(self, ptop, have):
+        try:
+            all_parsers = self.mtp_parsers[ptop]
+        except:
+            return {}
+
         audio = self.mtp_audio[ptop]
         force = self.mtp_force[ptop]
         entags = self.entags[ptop]
         parsers = {}
-        for k, v in self.mtp_parsers[ptop].items():
+        for k, v in all_parsers.items():
             if ".dur" in entags:
                 if ".dur" in have:
                     # is audio, require non-audio?
