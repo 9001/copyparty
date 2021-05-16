@@ -249,14 +249,16 @@ class HttpCli(object):
         r = ["{}={}".format(k, quotep(v)) if v else k for k, v in kv.items()]
         return "?" + "&amp;".join(r)
 
-    def redirect(self, vpath, suf="", msg="aight", flavor="go to", use302=False):
+    def redirect(
+        self, vpath, suf="", msg="aight", flavor="go to", click=True, use302=False
+    ):
         html = self.j2(
             "msg",
             h2='<a href="/{}">{} /{}</a>'.format(
                 quotep(vpath) + suf, flavor, html_escape(vpath, crlf=True) + suf
             ),
             pre=msg,
-            click=True,
+            click=click,
         ).encode("utf-8", "replace")
 
         if use302:
@@ -679,7 +681,7 @@ class HttpCli(object):
                 self.log("failed to utime ({}, {})".format(path, times))
 
         spd = self._spd(post_sz)
-        self.log("binpost {} thank".format(spd))
+        self.log("{} thank".format(spd))
         self.reply(b"thank")
         return True
 
@@ -795,7 +797,7 @@ class HttpCli(object):
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
-                        files.append([sz, sha512_hex])
+                        files.append([sz, sha512_hex, p_file, fname])
                         self.conn.hsrv.broker.put(
                             False, "up2k.hash_file", vfs.realpath, vfs.flags, rem, fname
                         )
@@ -830,10 +832,13 @@ class HttpCli(object):
             errmsg = "ERROR: " + errmsg
             status = "ERROR"
 
-        msg = "{0} // {1} bytes // {2:.3f} MiB/s\n".format(status, sz_total, spd)
+        msg = "{} // {} bytes // {:.3f} MiB/s\n".format(status, sz_total, spd)
 
-        for sz, sha512 in files:
-            msg += "sha512: {0} // {1} bytes\n".format(sha512[:56], sz)
+        for sz, sha512, ofn, lfn in files:
+            vpath = self.vpath + "/" + lfn
+            msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a>\n'.format(
+                sha512[:56], sz, quotep(vpath), html_escape(ofn, crlf=True)
+            )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
 
@@ -847,7 +852,7 @@ class HttpCli(object):
                 ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
                 f.write(ft.encode("utf-8"))
 
-        self.redirect(self.vpath, msg=msg, flavor="return to")
+        self.redirect(self.vpath, msg=msg, flavor="return to", click=False)
         self.parser.drop()
         return True
 
