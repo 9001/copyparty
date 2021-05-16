@@ -1311,19 +1311,22 @@ function up2k_init(subtle) {
     }
 
     function set_fsearch(new_state) {
-        var perms = (document.body.getAttribute('perms') + '').split(' '),
+        var perms = document.body.getAttribute('perms'),
             fixed = false;
 
         if (!ebi('fsearch')) {
             new_state = false;
         }
-        else if (!has(perms, 'write')) {
-            new_state = true;
-            fixed = true;
-        }
-        else if (!has(perms, 'read')) {
-            new_state = false;
-            fixed = true;
+        else if (perms) {
+            perms = perms.split(' ');
+            if (!has(perms, 'write')) {
+                new_state = true;
+                fixed = true;
+            }
+            if (!has(perms, 'read')) {
+                new_state = false;
+                fixed = true;
+            }
         }
 
         if (new_state !== undefined) {
