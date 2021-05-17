@@ -20,11 +20,12 @@ var up2k = null;
 try {
     var cf = crypto.subtle || crypto.webkitSubtle;
     cf.digest('SHA-512', new Uint8Array(1)).then(
-        function (x) { up2k = up2k_init(cf) },
-        function (x) { up2k = up2k_init(false) }
+        function (x) { console.log('sha-ok'); up2k = up2k_init(cf); },
+        function (x) { console.log('sha-ng:', x); up2k = up2k_init(false); }
     );
 }
 catch (ex) {
+    console.log('sha-na:', ex);
     try {
         up2k = up2k_init(false);
     }

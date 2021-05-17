@@ -928,7 +928,6 @@ var treectl = (function () {
 		treesz = icfg_get('treesz', 16);
 
 	treesz = Math.min(Math.max(treesz, 4), 50);
-	console.log('treesz [' + treesz + ']');
 
 	function entree(e) {
 		ev(e);
