@@ -281,28 +281,47 @@ a, #files tbody div a:last-child {
 	padding: .2em 0 0 .07em;
 	color: #fff;
 }
-#wzip {
+#wzip, #wnp {
 	display: none;
 	margin-right: .3em;
 	padding-right: .3em;
 	border-right: .1em solid #555;
 }
+#wnp a {
+	position: relative;
+	font-size: .47em;
+	margin: 0 .1em;
+	top: -.4em;
+}
+#wnp a+a {
+	margin-left: .33em;
+}
 #wtoggle,
 #wtoggle * {
 	line-height: 1em;
 }
+#wtoggle.np {
+	width: 5.5em;
+}
 #wtoggle.sel {
 	width: 6.4em;
 }
-#wtoggle.sel #wzip {
+#wtoggle.sel #wzip,
+#wtoggle.np #wnp {
 	display: inline-block;
 }
-#wtoggle.sel #wzip a {
+#wtoggle.sel.np #wnp {
+	display: none;
+}
+#wzip a {
 	font-size: .4em;
 	padding: 0 .3em;
 	margin: -.3em .2em;
 	position: relative;
 	display: inline-block;
+}
+#wzip a+a {
+	margin-left: .8em;
 }
 #wtoggle.sel #wzip #selzip {
 	top: -.6em;

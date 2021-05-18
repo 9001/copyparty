@@ -7,6 +7,28 @@ function dbg(msg) {
 }
 
 
+// add widget buttons
+ebi('widget').innerHTML = (
+	'<div id="wtoggle">' +
+	'<span id="wzip"><a' +
+	' href="#" id="selall">sel.<br />all</a><a' +
+	' href="#" id="selinv">sel.<br />inv.</a><a' +
+	' href="#" id="selzip">zip</a>' +
+	'</span><span id="wnp"><a' +
+	' href="#" id="npirc">📋irc</a><a' +
+	' href="#" id="nptxt">📋txt</a>' +
+	'</span><a' +
+	'	href="#" id="wtico">♫</a>' +
+	'</div>' +
+	'<div id="widgeti">' +
+	'	<div id="pctl"><a href="#" id="bprev">⏮</a><a href="#" id="bplay">▶</a><a href="#" id="bnext">⏭</a></div>' +
+	'	<canvas id="pvol" width="288" height="38"></canvas>' +
+	'	<canvas id="barpos"></canvas>' +
+	'	<canvas id="barbuf"></canvas>' +
+	'</div>'
+);
+
+
 // extract songs + add play column
 function MPlayer() {
 	this.id = Date.now();
@@ -79,6 +101,8 @@ var widget = (function () {
 	var ret = {},
 		widget = ebi('widget'),
 		wtico = ebi('wtico'),
+		nptxt = ebi('nptxt'),
+		npirc = ebi('npirc'),
 		touchmode = false,
 		side_open = false,
 		was_paused = true;
@@ -115,6 +139,35 @@ var widget = (function () {
 			ret.toggle(e);
 
 		return false;
+	};
+	npirc.onclick = nptxt.onclick = function (e) {
+		ev(e);
+		var th = ebi('files').tHead.rows[0].cells,
+			tr = QS('#files tr.play').cells,
+			irc = this.getAttribute('id') == 'npirc',
+			ck = irc ? '06' : '',
+			cv = irc ? '07' : '',
+			m = ck + 'np: ' + cv;
+
+		for (var a = 1, aa = th.length; a < aa; a++) {
+			var tk = a == 1 ? '' : th[a].getAttribute('name').split('/').slice(-1)[0];
+			var tv = tr[a].getAttribute('html') || tr[a].textContent;
+			m += tk + '(' + cv + tv + ck + ') // ';
+		}
+
+		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
+
+		var o = document.createElement('input');
+		o.style.cssText = 'position:fixed;top:45%;left:48%;padding:1em';
+		o.value = m;
+		document.body.appendChild(o);
+		o.focus();
+		o.select();
+		document.execCommand("copy");
+		o.value = 'copied to clipboard ';
+		setTimeout(function () {
+			document.body.removeChild(o);
+		}, 500);
 	};
 	return ret;
 })();
@@ -513,6 +566,7 @@ function play(tid, seek, call_depth) {
 		clmod(trs[a], 'play');
 	}
 	ebi(oid).parentElement.parentElement.className += ' play';
+	clmod(ebi('wtoggle'), 'np', 1);
 
 	try {
 		if (attempt_play)

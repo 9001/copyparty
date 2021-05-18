@@ -114,22 +114,7 @@
     <div id="srv_info"><span>{{ srv_info }}</span></div>
     {%- endif %}
 
-    <div id="widget">
-        <div id="wtoggle">
-            <span id="wzip">
-                <a href="#" id="selall">sel.<br />all</a>
-                <a href="#" id="selinv">sel.<br />inv.</a>
-                <a href="#" id="selzip">zip</a>
-            </span><a
-                href="#" id="wtico">♫</a>
-        </div>
-        <div id="widgeti">
-            <div id="pctl"><a href="#" id="bprev">⏮</a><a href="#" id="bplay">▶</a><a href="#" id="bnext">⏭</a></div>
-            <canvas id="pvol" width="288" height="38"></canvas>
-            <canvas id="barpos"></canvas>
-            <canvas id="barbuf"></canvas>
-        </div>
-    </div>
+    <div id="widget"></div>
 
     <script>
         var tag_order_cfg = {{ tag_order }};
