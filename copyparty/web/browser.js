@@ -147,7 +147,7 @@ var widget = (function () {
 			irc = this.getAttribute('id') == 'npirc',
 			ck = irc ? '06' : '',
 			cv = irc ? '07' : '',
-			m = ck + 'np: ' + cv;
+			m = ck + 'np: ';
 
 		for (var a = 1, aa = th.length; a < aa; a++) {
 			var tk = a == 1 ? '' : th[a].getAttribute('name').split('/').slice(-1)[0];
@@ -158,7 +158,7 @@ var widget = (function () {
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
 		var o = document.createElement('input');
-		o.style.cssText = 'position:fixed;top:45%;left:48%;padding:1em';
+		o.style.cssText = 'position:fixed;top:45%;left:48%;padding:1em;z-index:9';
 		o.value = m;
 		document.body.appendChild(o);
 		o.focus();
@@ -1040,7 +1040,7 @@ var treectl = (function () {
 		}
 		else {
 			var top = Math.max(0, parseInt(wrap.offsetTop)),
-				treeh = (winh - atop) - 4;
+				treeh = winh - atop;
 
 			tree.style.top = top + 'px';
 			tree.style.height = treeh < 10 ? '' : treeh + 'px';

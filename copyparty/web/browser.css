@@ -527,7 +527,6 @@ input[type="checkbox"]:checked+label {
 	left: 0;
 	bottom: 0;
 	top: 7em;
-	padding-top: .2em;
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
 	overscroll-behavior-y: none;
@@ -575,6 +574,7 @@ input[type="checkbox"]:checked+label {
 #detree {
 	padding: .3em .5em;
 	font-size: 1.5em;
+	line-height: 1.5em;
 }
 #tree ul,
 #tree li {
