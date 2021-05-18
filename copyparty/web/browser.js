@@ -242,8 +242,8 @@ var pbar = (function () {
 	};
 
 	r.drawpos = function () {
-		if (!mp.au)
-			return;
+		if (!mp.au || isNaN(mp.au.duration) || isNaN(mp.au.currentTime))
+			return;  // not-init || unsupp-codec
 
 		var bc = r.buf,
 			pc = r.pos,
