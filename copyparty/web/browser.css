@@ -735,15 +735,27 @@ input[type="checkbox"]:checked+label {
 	overflow-wrap: break-word;
 	background: #383838;
 	border: 1px solid #444;
+	border-top: 1px solid #555;
+	box-shadow: 0 .1em .2em #222;
 	border-radius: .3em;
-	padding: .3em .6em;
+	padding: .3em;
 	margin: .5em;
 }
 #ggrid a img {
+	border-radius: .2em;
 	max-width: var(--grid-sz);
 	max-height: var(--grid-sz);
-	margin: 0 auto .5em auto;
+	margin: 0 auto;
 	display: block;
+}
+#ggrid a span {
+	padding: .2em .3em;
+	display: block;
+}
+#ggrid a:hover {
+	background: #444;
+	border-color: #555;
+	color: #fd9;
 }
 #pvol,
 #barbuf,

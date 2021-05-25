@@ -135,7 +135,7 @@ function clmod(obj, cls, add) {
 
 
 function sortfiles(nodes) {
-    var sopts = jread('fsort', [["lead", -1, ""], ["href", 1, ""]]);
+    var sopts = jread('fsort', [["href", 1, ""]]);
 
     try {
         var is_srch = false;
@@ -163,8 +163,12 @@ function sortfiles(nodes) {
 
                     if ((v + '').indexOf('<a ') === 0)
                         v = v.split('>')[1];
-                    else if (name == "href" && v)
+                    else if (name == "href" && v) {
+                        if (v.slice(-1) == '/')
+                            v = '\t' + v;
+
                         v = uricom_dec(v)[0]
+                    }
 
                     nodes[b]._sv = v;
                 }

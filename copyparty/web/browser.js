@@ -831,8 +831,8 @@ var thegrid = (function () {
 			}
 
 			html.push('<a href="' + href +
-				'"><img src="' + ihref + '">' +  // /.cpr/dd/1.png
-				ao.innerHTML + '</a>');
+				'"><img src="' + ihref + '"><span>' +
+				ao.innerHTML + '</span></a>');
 		}
 		lfiles.style.display = 'none';
 		gfiles.style.display = 'block';
@@ -1383,8 +1383,10 @@ var treectl = (function () {
 		nodes = sortfiles(nodes);
 		for (var a = 0; a < nodes.length; a++) {
 			var r = nodes[a],
-				ln = ['<tr><td>' + r.lead + '</td><td><a href="' +
-					top + r.href + '">' + esc(uricom_dec(r.href)[0]) + '</a>', r.sz];
+				hname = esc(uricom_dec(r.href)[0]),
+				sortv = (r.href.slice(-1) == '/' ? '\t' : '') + hname,
+				ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +
+					'"><a href="' + top + r.href + '">' + hname + '</a>', r.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
@@ -1996,6 +1998,22 @@ var msel = (function () {
 	return {
 		"render": render
 	};
+})();
+
+
+(function () {
+	try {
+		var tr = ebi('files').tBodies[0].rows;
+		for (var a = 0; a < tr.length; a++) {
+			var td = tr[a].cells[1],
+				href = td.firstChild.getAttribute('href'),
+				isdir = href.split('?')[0].slice(-1)[0] == '/',
+				txt = href.textContent;
+
+			td.setAttribute('sortv', (isdir ? '\t' : '') + txt);
+		}
+	}
+	catch (ex) { }
 })();
 
 
