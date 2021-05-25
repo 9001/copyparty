@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import re
+import os
 import sys
 import time
 import threading
@@ -39,8 +40,13 @@ class SvcHub(object):
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
-        enth = HAVE_PIL and not args.no_thumb
-        self.thumbsrv = ThumbSrv(self) if enth else None
+        self.thumbsrv = None
+        if not args.no_thumb:
+            if HAVE_PIL:
+                self.thumbsrv = ThumbSrv(self)
+            else:
+                msg = "need Pillow to create thumbnails; for example:\n  {} -m pip install --user Pillow"
+                self.log("thumb", msg.format(os.path.basename(sys.executable)), c=3)
 
         # decide which worker impl to use
         if self.check_mp_enable():

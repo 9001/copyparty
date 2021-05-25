@@ -1208,10 +1208,11 @@ class HttpCli(object):
         return True
 
     def tx_ico(self, ext):
-        n = ext.split(".")[::-1]
+        bad = re.compile(r"[](){}[]|^[0-9_-]*$")
+        n = ext.split(".")[1:][::-1]
         ext = ""
         for v in n:
-            if len(v) > 7:
+            if len(v) > 7 or bad.match(v):
                 break
 
             ext = "{}.{}".format(v, ext)
@@ -1374,9 +1375,6 @@ class HttpCli(object):
             raise Pebkac(404)
 
         if self.readable and not stat.S_ISDIR(st.st_mode):
-            if abspath.endswith(".md") and "raw" not in self.uparam:
-                return self.tx_md(abspath)
-
             if rem.startswith(".hist/up2k."):
                 raise Pebkac(403)
 
@@ -1389,6 +1387,9 @@ class HttpCli(object):
                     return self.tx_file(thp)
 
                 return self.tx_ico(rem)
+
+            if abspath.endswith(".md") and "raw" not in self.uparam:
+                return self.tx_md(abspath)
 
             return self.tx_file(abspath)
 

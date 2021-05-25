@@ -250,9 +250,9 @@ def run_argparse(argv, formatter):
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
     ap2 = ap.add_argument_group('thumbnail options')
-    ap.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
-    ap.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
-    ap.add_argument("--thumbsz", metavar="WxH", default="352x352", help="thumbnail res")
+    ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
+    ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
+    ap2.add_argument("--thumbsz", metavar="WxH", default="352x352", help="thumbnail res")
 
     ap2 = ap.add_argument_group('database options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")

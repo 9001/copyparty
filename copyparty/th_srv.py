@@ -127,7 +127,7 @@ class ThumbSrv(object):
         with self.mutex:
             try:
                 self.busy[tpath].append(cond)
-                self.log("conv {}".format(tpath))
+                self.log("wait {}".format(tpath))
             except:
                 thdir = os.path.dirname(tpath)
                 try:
@@ -142,7 +142,7 @@ class ThumbSrv(object):
 
                 self.busy[tpath] = [cond]
                 self.q.put([abspath, tpath])
-                self.log("CONV {}".format(tpath))
+                self.log("conv {}".format(tpath))
 
         while not self.stopping:
             with self.mutex:
@@ -198,7 +198,7 @@ class ThumbSrv(object):
 
     def conv_pil(self, abspath, tpath):
         with Image.open(abspath) as im:
-            if im.mode in ("RGBA", "P"):
+            if im.mode not in ("RGB", "L"):
                 im = im.convert("RGB")
 
             im.thumbnail(self.res)
