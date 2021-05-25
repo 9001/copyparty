@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import platform
+import time
 import sys
 import os
 
@@ -23,6 +24,7 @@ MACOS = platform.system() == "Darwin"
 
 class EnvParams(object):
     def __init__(self):
+        self.t0 = time.time()
         self.mod = os.path.dirname(os.path.realpath(__file__))
         if self.mod.endswith("__init__"):
             self.mod = os.path.dirname(self.mod)

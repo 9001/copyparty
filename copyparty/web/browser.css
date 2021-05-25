@@ -1,3 +1,6 @@
+:root {
+	--grid-sz: 10em;
+}
 * {
 	line-height: 1.2em;
 }
@@ -550,8 +553,7 @@ input[type="checkbox"]:checked+label {
 	left: -1.7em;
 	width: calc(100% + 1.3em);
 }
-.tglbtn,
-#tree>a+a {
+.btn {
 	padding: .2em .4em;
 	font-size: 1.2em;
 	background: #2a2a2a;
@@ -561,12 +563,10 @@ input[type="checkbox"]:checked+label {
 	position: relative;
 	top: -.2em;
 }
-.tglbtn:hover,
-#tree>a+a:hover {
+.btn:hover {
 	background: #805;
 }
-.tglbtn.on,
-#tree>a+a.on {
+.tgl.btn.on {
 	background: #fc4;
 	color: #400;
 	text-shadow: none;
@@ -711,6 +711,40 @@ input[type="checkbox"]:checked+label {
 	font-family: monospace, monospace;
 	line-height: 2em;
 }
+#griden.on+#thumbs {
+	opacity: .3;
+}
+#ghead {
+	background: #3c3c3c;
+	border: 1px solid #444;
+	border-radius: .3em;
+	padding: .5em;
+	margin: 0 1.5em 0 .4em;
+}
+#ghead .btn {
+	position: relative;
+	top: 0;
+}
+#ggrid {
+	padding-top: .5em;
+}
+#ggrid a {
+	display: inline-block;
+	width: var(--grid-sz);
+	vertical-align: top;
+	overflow-wrap: break-word;
+	background: #383838;
+	border: 1px solid #444;
+	border-radius: .3em;
+	padding: .3em .6em;
+	margin: .5em;
+}
+#ggrid a img {
+	max-width: var(--grid-sz);
+	max-height: var(--grid-sz);
+	margin: 0 auto .5em auto;
+	display: block;
+}
 #pvol,
 #barbuf,
 #barpos,
@@ -720,6 +754,21 @@ input[type="checkbox"]:checked+label {
 	-ms-user-select: none;
 	user-select: none;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -746,18 +795,15 @@ html.light #ops a.act {
 html.light #op_cfg h3 {
 	border-color: #ccc;
 }
-html.light .tglbtn,
-html.light #tree > a + a {
+html.light .btn {
 	color: #666;
 	background: #ddd;
 	box-shadow: none;
 }
-html.light .tglbtn:hover,
-html.light #tree > a + a:hover {
+html.light .btn:hover {
 	background: #caf;
 }
-html.light .tglbtn.on,
-html.light #tree > a + a.on {
+html.light .tgl.btn.on {
 	background: #4a0;
 	color: #fff;
 }

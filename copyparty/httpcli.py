@@ -36,6 +36,8 @@ class HttpCli(object):
         self.addr = conn.addr
         self.args = conn.args
         self.auth = conn.auth
+        self.ico = conn.ico
+        self.thumbcli = conn.thumbcli
         self.log_func = conn.log_func
         self.log_src = conn.log_src
         self.tls = hasattr(self.s, "cipher")
@@ -283,6 +285,9 @@ class HttpCli(object):
 
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
+            if self.vpath.startswith(".cpr/ico/"):
+                return self.tx_ico(self.vpath.split("/")[-1])
+
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
@@ -1112,7 +1117,7 @@ class HttpCli(object):
         self.send_headers(
             length=upper - lower,
             status=status,
-            mime=guess_mime(req_path)[0] or "application/octet-stream",
+            mime=guess_mime(req_path)[0],
         )
 
         logmsg += unicode(status) + logtail
@@ -1200,6 +1205,23 @@ class HttpCli(object):
 
         spd = self._spd(bsent)
         self.log("{},  {}".format(logmsg, spd))
+        return True
+
+    def tx_ico(self, ext):
+        n = ext.split(".")[::-1]
+        ext = ""
+        for v in n:
+            if len(v) > 7:
+                break
+
+            ext = "{}.{}".format(v, ext)
+
+        ext = ext.rstrip(".") or "unk"
+        mime, ico = self.ico.get(ext)
+
+        dt = datetime.utcfromtimestamp(E.t0)
+        lm = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 
     def tx_md(self, fs_path):
@@ -1346,9 +1368,29 @@ class HttpCli(object):
         )
         abspath = vn.canonical(rem)
 
-        if not os.path.exists(fsenc(abspath)):
-            # print(abspath)
+        try:
+            st = os.stat(fsenc(abspath))
+        except:
             raise Pebkac(404)
+
+        if self.readable and not stat.S_ISDIR(st.st_mode):
+            if abspath.endswith(".md") and "raw" not in self.uparam:
+                return self.tx_md(abspath)
+
+            if rem.startswith(".hist/up2k."):
+                raise Pebkac(403)
+
+            if "th" in self.uparam:
+                thp = None
+                if self.thumbcli:
+                    thp = self.thumbcli.get(vn.realpath, rem, int(st.st_mtime))
+
+                if thp:
+                    return self.tx_file(thp)
+
+                return self.tx_ico(rem)
+
+            return self.tx_file(abspath)
 
         srv_info = []
 
@@ -1431,21 +1473,12 @@ class HttpCli(object):
                 self.reply(ret.encode("utf-8", "replace"), mime="application/json")
                 return True
 
-            if not os.path.isdir(fsenc(abspath)):
+            if not stat.S_ISDIR(st.st_mode):
                 raise Pebkac(404)
 
             html = self.j2(tpl, **j2a)
             self.reply(html.encode("utf-8", "replace"))
             return True
-
-        if not os.path.isdir(fsenc(abspath)):
-            if abspath.endswith(".md") and "raw" not in self.uparam:
-                return self.tx_md(abspath)
-
-            if rem.startswith(".hist/up2k."):
-                raise Pebkac(403)
-
-            return self.tx_file(abspath)
 
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)

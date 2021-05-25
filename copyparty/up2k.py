@@ -49,13 +49,13 @@ class Up2k(object):
         * ~/.config flatfiles for active jobs
     """
 
-    def __init__(self, broker):
-        self.broker = broker
-        self.args = broker.args
-        self.log_func = broker.log
+    def __init__(self, hub):
+        self.hub = hub
+        self.args = hub.args
+        self.log_func = hub.log
 
         # config
-        self.salt = broker.args.salt
+        self.salt = self.args.salt
 
         # state
         self.mutex = threading.Lock()

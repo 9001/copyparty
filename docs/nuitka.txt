@@ -1,7 +1,7 @@
 ﻿# recipe for building an exe with nuitka (extreme jank edition)
 #
-# NOTE: on win7 the exe immediately hits a c0000005 in kernelbase.dll
-#   but win10 builds work on win10
+# NOTE: win7 and win10 builds both work on win10 but
+#   on win7 they immediately c0000005 in kernelbase.dll
 #
 # first install python-3.6.8-amd64.exe
 #   [x] add to path

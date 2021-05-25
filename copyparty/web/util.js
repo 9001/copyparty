@@ -456,11 +456,15 @@ function jwrite(key, val) {
 }
 
 function icfg_get(name, defval) {
+    return parseInt(fcfg_get(name, defval));
+}
+
+function fcfg_get(name, defval) {
     var o = ebi(name);
 
-    var val = parseInt(sread(name));
+    var val = parseFloat(sread(name));
     if (isNaN(val))
-        return parseInt(o ? o.value : defval);
+        return parseFloat(o ? o.value : defval);
 
     if (o)
         o.value = val;

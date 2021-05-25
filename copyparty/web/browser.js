@@ -696,6 +696,157 @@ function autoplay_blocked(seek) {
 })();
 
 
+var thegrid = (function () {
+	var lfiles = ebi('files');
+	var gfiles = document.createElement('div');
+	gfiles.setAttribute('id', 'gfiles');
+	gfiles.style.display = 'none';
+	gfiles.innerHTML = (
+		'<div id="ghead">' +
+		'<a href="#" class="tgl btn" id="gridsel">multiselect</a> &nbsp; zoom ' +
+		'<a href="#" class="btn" z="-1.2">&ndash;</a> ' +
+		'<a href="#" class="btn" z="1.2">+</a> &nbsp; sort by: ' +
+		'<a href="#" s="href">name</a>, ' +
+		'<a href="#" s="sz">size</a>, ' +
+		'<a href="#" s="ts">date</a>, ' +
+		'<a href="#" s="ext">type</a>' +
+		'</div>' +
+		'<div id="ggrid"></div>'
+	);
+	lfiles.parentNode.insertBefore(gfiles, lfiles);
+
+	var r = {
+		'thumbs': bcfg_get('thumbs', true),
+		'en': bcfg_get('griden', false),
+		'sel': bcfg_get('gridsel', false),
+		'sz': fcfg_get('gridsz', 10),
+		'isdirty': true
+	};
+
+	ebi('thumbs').onclick = function (e) {
+		ev(e);
+		r.thumbs = !r.thumbs;
+		bcfg_set('thumbs', r.thumbs);
+		if (r.en) {
+			loadgrid();
+		}
+	};
+
+	ebi('griden').onclick = function (e) {
+		ev(e);
+		r.en = !r.en;
+		bcfg_set('griden', r.en);
+		if (r.en) {
+			loadgrid();
+		}
+		else {
+			lfiles.style.display = '';
+			gfiles.style.display = 'none';
+		}
+	};
+
+	var click = function (e) {
+		ev(e);
+		var s = this.getAttribute('s'),
+			z = this.getAttribute('z');
+
+		if (z)
+			return setsz(z > 0 ? r.sz * z : r.sz / (-z));
+
+		var t = lfiles.tHead.rows[0].cells;
+		for (var a = 0; a < t.length; a++)
+			if (t[a].getAttribute('name') == s) {
+				t[a].click();
+				break;
+			}
+
+		r.setdirty();
+	};
+
+	var links = QSA('#ghead>a');
+	for (var a = 0; a < links.length; a++)
+		links[a].onclick = click;
+
+	ebi('gridsel').onclick = function (e) {
+		ev(e);
+		r.sel = !r.sel;
+		bcfg_set('gridsel', r.sel);
+	};
+
+	r.setvis = function (vis) {
+		(r.en ? gfiles : lfiles).style.display = vis ? '' : 'none';
+	}
+
+	r.setdirty = function () {
+		r.dirty = true;
+		if (r.en) {
+			loadgrid();
+		}
+	}
+
+	function setsz(v) {
+		if (v !== undefined) {
+			r.sz = v;
+			swrite('gridsz', r.sz);
+		}
+		document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
+	}
+	setsz();
+
+	function loadgrid() {
+		if (!r.dirty)
+			return;
+
+		var html = [];
+		var tr = lfiles.tBodies[0].rows;
+		for (var a = 0; a < tr.length; a++) {
+			var ao = tr[a].cells[1].firstChild,
+				href = esc(ao.getAttribute('href')),
+				isdir = href.split('?')[0].slice(-1)[0] == '/',
+				ihref = href;
+
+			if (isdir) {
+				ihref = '/.cpr/ico/folder'
+			}
+			else if (r.thumbs) {
+				ihref += ihref.indexOf('?') === -1 ? '?th' : '&th';
+			}
+			else {
+				var ar = href.split('?')[0].split('.');
+				if (ar.length > 1)
+					ar = ar.slice(1);
+
+				ihref = '';
+				ar.reverse();
+				for (var b = 0; b < ar.length; b++) {
+					if (ar[b].length > 7)
+						break;
+
+					ihref = ar[b] + '.' + ihref;
+				}
+				if (!ihref) {
+					ihref = 'unk.';
+				}
+				ihref = '/.cpr/ico/' + ihref.slice(0, -1);
+			}
+
+			html.push('<a href="' + href +
+				'"><img src="' + ihref + '">' +  // /.cpr/dd/1.png
+				ao.innerHTML + '</a>');
+		}
+		lfiles.style.display = 'none';
+		gfiles.style.display = 'block';
+		ebi('ggrid').innerHTML = html.join('\n');
+	}
+
+	if (r.en) {
+		loadgrid();
+	}
+
+	return r;
+})();
+
+
 function tree_neigh(n) {
 	var links = QSA('#treeul li>a+a');
 	if (!links.length) {
@@ -763,6 +914,12 @@ document.onkeydown = function (e) {
 
 	if (k == 'KeyP')
 		return tree_up();
+
+	if (k == 'KeyG')
+		return ebi('griden').click();
+
+	if (k == 'KeyT')
+		return ebi('thumbs').click();
 };
 
 
@@ -1391,7 +1548,7 @@ function apply_perms(perms) {
 		up2k.set_fsearch();
 
 	ebi('widget').style.display = have_read ? '' : 'none';
-	ebi('files').style.display = have_read ? '' : 'none';
+	thegrid.setvis(have_read);
 	if (!have_read)
 		goto('up2k');
 }
@@ -1892,6 +2049,8 @@ function reload_browser(not_mp) {
 
 	if (window['up2k'])
 		up2k.set_fsearch();
+
+	thegrid.setdirty();
 }
 reload_browser(true);
 mukey.render();

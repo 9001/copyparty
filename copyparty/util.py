@@ -914,11 +914,11 @@ def unescape_cookie(orig):
     return ret
 
 
-def guess_mime(url):
+def guess_mime(url, fallback="application/octet-stream"):
     if url.endswith(".md"):
         return ["text/plain; charset=UTF-8"]
 
-    return mimetypes.guess_type(url)
+    return mimetypes.guess_type(url) or fallback
 
 
 def runcmd(*argv):

@@ -9,9 +9,10 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import PY2, WINDOWS, MACOS, VT100
+from .util import mp
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
-from .util import mp
+from .th_srv import ThumbSrv, HAVE_PIL
 
 
 class SvcHub(object):
@@ -38,6 +39,9 @@ class SvcHub(object):
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
+        enth = HAVE_PIL and not args.no_thumb
+        self.thumbsrv = ThumbSrv(self) if enth else None
+
         # decide which worker impl to use
         if self.check_mp_enable():
             from .broker_mp import BrokerMp as Broker
@@ -63,6 +67,13 @@ class SvcHub(object):
 
             self.tcpsrv.shutdown()
             self.broker.shutdown()
+            if self.thumbsrv:
+                self.thumbsrv.shutdown()
+
+                print("waiting for thumbsrv...")
+                while not self.thumbsrv.stopped():
+                    time.sleep(0.05)
+
             print("nailed it")
 
     def _log_disabled(self, src, msg, c=0):

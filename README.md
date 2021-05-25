@@ -93,6 +93,9 @@ you may also want these, especially on servers:
   * ☑ tree-view
   * ☑ media player
   * ✖ thumbnails
+    * ☑ images
+    * ✖ videos
+    * ✖ cache eviction
   * ☑ SPA (browse while uploading)
     * if you use the file-tree on the left only, not folders in the file list
 * server indexing
@@ -405,8 +408,17 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
 * or `FFprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
-**optional,** will eventually enable thumbnails:
+**optional,** enables thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
+
+**optional,** enables reading HEIF pictures:
+* `pyheif-pillow-opener` (requires Linux or a C compiler)
+
+
+## install recommended dependencies
+```
+python -m pip install --user -U jinja2 mutagen Pillow
+```
 
 
 ## optional gpl stuff
@@ -481,6 +493,10 @@ in the `scripts` folder:
 roughly sorted by priority
 
 * mtag mediainfo (multitag)
+* thumbnail expiration
+  * touch cachedir on access with cooldown
+  * drop dir if older than X and near maxsize
+  * drop outdated thumbs
 * separate sqlite table per tag
 * audio fingerprinting
 * readme.md as epilogue
@@ -488,7 +504,6 @@ roughly sorted by priority
   * start from a chunk index and just go
   * terminate client on bad data
 * `os.copy_file_range` for up2k cloning
-* support pillow-simd
 * single sha512 across all up2k chunks? maybe
 * figure out the deal with pixel3a not being connectable as hotspot
   * pixel3a having unpredictable 3sec latency in general :||||

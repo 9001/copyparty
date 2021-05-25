@@ -17,6 +17,9 @@ from .__init__ import E
 from .util import Unrecv
 from .httpcli import HttpCli
 from .u2idx import U2idx
+from .th_cli import ThumbCli
+from .th_srv import HAVE_PIL
+from .ico import Ico
 
 
 class HttpConn(object):
@@ -33,6 +36,10 @@ class HttpConn(object):
         self.args = hsrv.args
         self.auth = hsrv.auth
         self.cert_path = hsrv.cert_path
+
+        enth = HAVE_PIL and not self.args.no_thumb
+        self.thumbcli = ThumbCli(hsrv.broker) if enth else None
+        self.ico = Ico()
 
         self.t0 = time.time()
         self.nbyte = 0

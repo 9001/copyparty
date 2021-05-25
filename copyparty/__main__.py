@@ -245,6 +245,7 @@ def run_argparse(argv, formatter):
     ap.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
     ap.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
+    ap.add_argument("--no-thumb", action="store_true", help="disable thumbnails")
     ap.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
     ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")

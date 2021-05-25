@@ -41,8 +41,10 @@
     <div id="op_cfg" class="opview opbox">
         <h3>switches</h3>
         <div>
-            <a id="tooltips" class="tglbtn" href="#">tooltips</a>
-            <a id="lightmode" class="tglbtn" href="#">lightmode</a>
+            <a id="tooltips" class="tgl btn" href="#">tooltips</a>
+            <a id="lightmode" class="tgl btn" href="#">lightmode</a>
+            <a id="griden" class="tgl btn" href="#">the grid</a>
+            <a id="thumbs" class="tgl btn" href="#">thumbs</a>
         </div>
         {%- if have_zip %}
         <h3>folder download</h3>
@@ -61,9 +63,9 @@
     
     <div id="tree">
         <a href="#" id="detree">🍞...</a>
-        <a href="#" step="2" id="twobytwo">+</a>
-        <a href="#" step="-2" id="twig">&ndash;</a>
-        <a href="#" class="tglbtn" id="dyntree">a</a>
+        <a href="#" class="btn" step="2" id="twobytwo">+</a>
+        <a href="#" class="btn" step="-2" id="twig">&ndash;</a>
+        <a href="#" class="tgl btn" id="dyntree">a</a>
         <ul id="treeul"></ul>
         <div id="thx_ff">&nbsp;</div>
     </div>
