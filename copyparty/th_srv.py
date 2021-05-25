@@ -1,7 +1,18 @@
 import os
+import sys
 import base64
 import hashlib
 import threading
+import subprocess as sp
+
+from .__init__ import PY2
+from .util import fsenc, Queue
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, parse_ffprobe
+
+
+if not PY2:
+    unicode = str
+
 
 try:
     HAVE_PIL = True
@@ -17,12 +28,25 @@ try:
 except:
     HAVE_PIL = False
 
-from .util import fsenc, Queue
 
 # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
-FMT_PIL = {x: True for x in FMT_PIL.split(" ") if x}
-THUMBABLE = FMT_PIL
+# ffmpeg -formats
+FMT_PIL, FMT_FF = [
+    {x: True for x in y.split(" ") if x}
+    for y in [
+        "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm",
+        "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 mov 3gp mp4 ts mpegts nut ogv ogm rm vob wmv",
+    ]
+]
+
+
+THUMBABLE = {}
+
+if HAVE_PIL:
+    THUMBABLE.update(FMT_PIL)
+
+if HAVE_FFMPEG and HAVE_FFPROBE:
+    THUMBABLE.update(FMT_FF)
 
 
 def thumb_path(ptop, rem, mtime):
@@ -52,7 +76,10 @@ def thumb_path(ptop, rem, mtime):
 class ThumbSrv(object):
     def __init__(self, hub):
         self.hub = hub
+        self.args = hub.args
         self.log_func = hub.log
+
+        self.res = hub.args.thumbsz.split("x")
 
         self.mutex = threading.Lock()
         self.busy = {}
@@ -63,6 +90,22 @@ class ThumbSrv(object):
             t = threading.Thread(target=self.worker)
             t.daemon = True
             t.start()
+
+        if not HAVE_PIL:
+            msg = "need Pillow to create thumbnails so please run this:\n  {} -m pip install --user Pillow"
+            self.log(msg.format(os.path.basename(sys.executable)), c=1)
+
+        if not self.args.no_vthumb and (not HAVE_FFMPEG or not HAVE_FFPROBE):
+            missing = []
+            if not HAVE_FFMPEG:
+                missing.append("ffmpeg")
+
+            if not HAVE_FFPROBE:
+                missing.append("ffprobe")
+
+            msg = "cannot create video thumbnails since some of the required programs are not available: "
+            msg += ", ".join(missing)
+            self.log(msg, c=1)
 
     def log(self, msg, c=0):
         self.log_func("thumb", msg, c)
@@ -108,10 +151,14 @@ class ThumbSrv(object):
             with cond:
                 cond.wait()
 
-        if not os.path.exists(tpath):
-            return None
+        try:
+            st = os.stat(tpath)
+            if st.st_size:
+                return tpath
+        except:
+            pass
 
-        return tpath
+        return None
 
     def worker(self):
         while not self.stopping:
@@ -125,9 +172,16 @@ class ThumbSrv(object):
             if not os.path.exists(tpath):
                 if ext in FMT_PIL:
                     fun = self.conv_pil
+                elif ext in FMT_FF:
+                    fun = self.conv_ffmpeg
 
             if fun:
-                fun(abspath, tpath)
+                try:
+                    fun(abspath, tpath)
+                except:
+                    self.log("{} failed on {}".format(fun.__name__, abspath), 3)
+                    with open(tpath, "wb") as _:
+                        pass
 
             with self.mutex:
                 subs = self.busy[tpath]
@@ -141,12 +195,39 @@ class ThumbSrv(object):
             self.nthr -= 1
 
     def conv_pil(self, abspath, tpath):
-        try:
-            with Image.open(abspath) as im:
-                if im.mode in ("RGBA", "P"):
-                    im = im.convert("RGB")
+        with Image.open(abspath) as im:
+            if im.mode in ("RGBA", "P"):
+                im = im.convert("RGB")
 
-                im.thumbnail((256, 256))
-                im.save(tpath)
-        except:
-            pass
+            im.thumbnail(self.res)
+            im.save(tpath)
+
+    def conv_ffmpeg(self, abspath, tpath):
+        cmd = [b"ffprobe", b"-hide_banner", b"--", fsenc(abspath)]
+        p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
+        r = p.communicate()
+        txt = r[1].decode("utf-8", "replace")
+        ret, _ = parse_ffprobe(txt, self.log)
+
+        dur = ret[".dur"][1]
+        seek = "{:.0f}".format(dur / 3)
+        scale = "scale=w={}:h={}:force_original_aspect_ratio=decrease"
+        scale = scale.format(*list(self.res)).encode("utf-8")
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-hide_banner",
+            b"-ss",
+            seek,
+            b"-i",
+            fsenc(abspath),
+            b"-vf",
+            scale,
+            b"-vframes",
+            b"1",
+            b"-q:v",
+            b"5",
+            fsenc(tpath),
+        ]
+        p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
+        r = p.communicate()

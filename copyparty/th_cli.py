@@ -1,6 +1,6 @@
 import os
 
-from .th_srv import thumb_path, THUMBABLE
+from .th_srv import thumb_path, THUMBABLE, FMT_FF
 
 
 class ThumbCli(object):
@@ -13,9 +13,17 @@ class ThumbCli(object):
         if ext not in THUMBABLE:
             return None
 
+        if self.args.no_vthumb and ext in FMT_FF:
+            return None
+
         tpath = thumb_path(ptop, rem, mtime)
-        if os.path.exists(tpath):
-            return tpath
+        try:
+            st = os.stat(tpath)
+            if st.st_size:
+                return tpath
+            return None
+        except:
+            pass
 
         x = self.broker.put(True, "thumbsrv.get", ptop, rem, mtime)
         return x.get()

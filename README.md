@@ -94,7 +94,7 @@ you may also want these, especially on servers:
   * ☑ media player
   * ✖ thumbnails
     * ☑ images
-    * ✖ videos
+    * ☑ videos
     * ✖ cache eviction
   * ☑ SPA (browse while uploading)
     * if you use the file-tree on the left only, not folders in the file list
@@ -404,14 +404,20 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
 
 * `jinja2` (is built into the SFX)
 
-**optional,** enables music tags:
+
+## optional dependencies
+
+enable music tags:
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
 * or `FFprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
-**optional,** enables thumbnails:
+enable image thumbnails:
 * `Pillow` (requires py2.7 or py3.5+)
 
-**optional,** enables reading HEIF pictures:
+enable video thumbnails:
+* `ffmpeg` and `ffprobe` somewhere in `$PATH`
+
+enable reading HEIF pictures:
 * `pyheif-pillow-opener` (requires Linux or a C compiler)
 
 

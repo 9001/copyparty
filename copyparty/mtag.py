@@ -14,6 +14,117 @@ if not PY2:
     unicode = str
 
 
+def have_ff(cmd):
+    if PY2:
+        cmd = (cmd + " -version").encode("ascii").split(b" ")
+        try:
+            sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
+            return True
+        except:
+            return False
+    else:
+        return bool(shutil.which(cmd))
+
+
+HAVE_FFMPEG = have_ff("ffmpeg")
+HAVE_FFPROBE = have_ff("ffprobe")
+
+
+def parse_ffprobe(stdout, logger):
+    txt = [x.rstrip("\r") for x in stdout.split("\n")]
+
+    """
+    note:
+        tags which contain newline will be truncated on first \n,
+        ffprobe emits \n and spacepads the : to align visually
+    note:
+        the Stream ln always mentions Audio: if audio
+        the Stream ln usually has kb/s, is more accurate
+        the Duration ln always has kb/s
+        the Metadata: after Chapter may contain BPM info,
+        title : Tempo: 126.0
+
+    Input #0, wav,
+        Metadata:
+        date : <OK>
+        Duration:
+        Chapter #
+        Metadata:
+            title : <NG>
+
+    Input #0, mp3,
+        Metadata:
+        album : <OK>
+        Duration:
+        Stream #0:0: Audio:
+        Stream #0:1: Video:
+        Metadata:
+            comment : <NG>
+    """
+
+    ptn_md_beg = re.compile("^( +)Metadata:$")
+    ptn_md_kv = re.compile("^( +)([^:]+) *: (.*)")
+    ptn_dur = re.compile("^ *Duration: ([^ ]+)(, |$)")
+    ptn_br1 = re.compile("^ *Duration: .*, bitrate: ([0-9]+) kb/s(, |$)")
+    ptn_br2 = re.compile("^ *Stream.*: Audio:.* ([0-9]+) kb/s(, |$)")
+    ptn_audio = re.compile("^ *Stream .*: Audio: ")
+    ptn_au_parent = re.compile("^ *(Input #|Stream .*: Audio: )")
+
+    ret = {}
+    md = {}
+    in_md = False
+    is_audio = False
+    au_parent = False
+    for ln in txt:
+        m = ptn_md_kv.match(ln)
+        if m and in_md and len(m.group(1)) == in_md:
+            _, k, v = [x.strip() for x in m.groups()]
+            if k != "" and v != "":
+                md[k] = [v]
+            continue
+        else:
+            in_md = False
+
+        m = ptn_md_beg.match(ln)
+        if m and au_parent:
+            in_md = len(m.group(1)) + 2
+            continue
+
+        au_parent = bool(ptn_au_parent.search(ln))
+
+        if ptn_audio.search(ln):
+            is_audio = True
+
+        m = ptn_dur.search(ln)
+        if m:
+            sec = 0
+            tstr = m.group(1)
+            if tstr.lower() != "n/a":
+                try:
+                    tf = tstr.split(",")[0].split(".")[0].split(":")
+                    for f in tf:
+                        sec *= 60
+                        sec += int(f)
+                except:
+                    logger("invalid timestr from ffprobe: [{}]".format(tstr), c=3)
+
+            ret[".dur"] = sec
+            m = ptn_br1.search(ln)
+            if m:
+                ret[".q"] = m.group(1)
+
+        m = ptn_br2.search(ln)
+        if m:
+            ret[".q"] = m.group(1)
+
+    if not is_audio:
+        return {}, {}
+
+    ret = {k: [0, v] for k, v in ret.items()}
+
+    return ret, md
+
+
 class MTag(object):
     def __init__(self, log_func, args):
         self.log_func = log_func
@@ -35,15 +146,7 @@ class MTag(object):
             self.get = self.get_ffprobe
             self.prefer_mt = True
             # about 20x slower
-            if PY2:
-                cmd = [b"ffprobe", b"-version"]
-                try:
-                    sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-                except:
-                    self.usable = False
-            else:
-                if not shutil.which("ffprobe"):
-                    self.usable = False
+            self.usable = HAVE_FFPROBE
 
             if self.usable and WINDOWS and sys.version_info < (3, 8):
                 self.usable = False
@@ -226,97 +329,7 @@ class MTag(object):
         p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
         r = p.communicate()
         txt = r[1].decode("utf-8", "replace")
-        txt = [x.rstrip("\r") for x in txt.split("\n")]
-
-        """
-        note:
-          tags which contain newline will be truncated on first \n,
-          ffprobe emits \n and spacepads the : to align visually
-        note:
-          the Stream ln always mentions Audio: if audio
-          the Stream ln usually has kb/s, is more accurate
-          the Duration ln always has kb/s
-          the Metadata: after Chapter may contain BPM info,
-            title : Tempo: 126.0
-
-        Input #0, wav,
-          Metadata:
-            date : <OK>
-          Duration:
-            Chapter #
-            Metadata:
-              title : <NG>
-
-        Input #0, mp3,
-          Metadata:
-            album : <OK>
-          Duration:
-            Stream #0:0: Audio:
-            Stream #0:1: Video:
-            Metadata:
-              comment : <NG>
-        """
-
-        ptn_md_beg = re.compile("^( +)Metadata:$")
-        ptn_md_kv = re.compile("^( +)([^:]+) *: (.*)")
-        ptn_dur = re.compile("^ *Duration: ([^ ]+)(, |$)")
-        ptn_br1 = re.compile("^ *Duration: .*, bitrate: ([0-9]+) kb/s(, |$)")
-        ptn_br2 = re.compile("^ *Stream.*: Audio:.* ([0-9]+) kb/s(, |$)")
-        ptn_audio = re.compile("^ *Stream .*: Audio: ")
-        ptn_au_parent = re.compile("^ *(Input #|Stream .*: Audio: )")
-
-        ret = {}
-        md = {}
-        in_md = False
-        is_audio = False
-        au_parent = False
-        for ln in txt:
-            m = ptn_md_kv.match(ln)
-            if m and in_md and len(m.group(1)) == in_md:
-                _, k, v = [x.strip() for x in m.groups()]
-                if k != "" and v != "":
-                    md[k] = [v]
-                continue
-            else:
-                in_md = False
-
-            m = ptn_md_beg.match(ln)
-            if m and au_parent:
-                in_md = len(m.group(1)) + 2
-                continue
-
-            au_parent = bool(ptn_au_parent.search(ln))
-
-            if ptn_audio.search(ln):
-                is_audio = True
-
-            m = ptn_dur.search(ln)
-            if m:
-                sec = 0
-                tstr = m.group(1)
-                if tstr.lower() != "n/a":
-                    try:
-                        tf = tstr.split(",")[0].split(".")[0].split(":")
-                        for f in tf:
-                            sec *= 60
-                            sec += int(f)
-                    except:
-                        self.log("invalid timestr from ffprobe: [{}]".format(tstr), c=3)
-
-                ret[".dur"] = sec
-                m = ptn_br1.search(ln)
-                if m:
-                    ret[".q"] = m.group(1)
-
-            m = ptn_br2.search(ln)
-            if m:
-                ret[".q"] = m.group(1)
-
-        if not is_audio:
-            return {}
-
-        ret = {k: [0, v] for k, v in ret.items()}
-
+        ret, md = parse_ffprobe(txt, self.log)
         return self.normalize_tags(ret, md)
 
     def get_bin(self, parsers, abspath):
