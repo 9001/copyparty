@@ -35,7 +35,7 @@ FMT_PIL, FMT_FF = [
     {x: True for x in y.split(" ") if x}
     for y in [
         "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm",
-        "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 mov 3gp mp4 ts mpegts nut ogv ogm rm vob wmv",
+        "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv",
     ]
 ]
 
@@ -79,7 +79,8 @@ class ThumbSrv(object):
         self.args = hub.args
         self.log_func = hub.log
 
-        self.res = hub.args.thumbsz.split("x")
+        res = hub.args.thumbsz.split("x")
+        self.res = tuple([int(x) for x in res])
 
         self.mutex = threading.Lock()
         self.busy = {}
@@ -178,8 +179,9 @@ class ThumbSrv(object):
             if fun:
                 try:
                     fun(abspath, tpath)
-                except:
-                    self.log("{} failed on {}".format(fun.__name__, abspath), 3)
+                except Exception as ex:
+                    msg = "{} failed on {}\n  {!r}"
+                    self.log(msg.format(fun.__name__, abspath, ex), 3)
                     with open(tpath, "wb") as _:
                         pass
 
@@ -207,7 +209,7 @@ class ThumbSrv(object):
         p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
         r = p.communicate()
         txt = r[1].decode("utf-8", "replace")
-        ret, _ = parse_ffprobe(txt, self.log)
+        ret, _ = parse_ffprobe(txt, self.log, False)
 
         dur = ret[".dur"][1]
         seek = "{:.0f}".format(dur / 3)

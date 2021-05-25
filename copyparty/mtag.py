@@ -30,7 +30,7 @@ HAVE_FFMPEG = have_ff("ffmpeg")
 HAVE_FFPROBE = have_ff("ffprobe")
 
 
-def parse_ffprobe(stdout, logger):
+def parse_ffprobe(stdout, logger, require_audio=True):
     txt = [x.rstrip("\r") for x in stdout.split("\n")]
 
     """
@@ -117,7 +117,7 @@ def parse_ffprobe(stdout, logger):
         if m:
             ret[".q"] = m.group(1)
 
-    if not is_audio:
+    if not is_audio and require_audio:
         return {}, {}
 
     ret = {k: [0, v] for k, v in ret.items()}

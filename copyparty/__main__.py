@@ -252,7 +252,7 @@ def run_argparse(argv, formatter):
     ap2 = ap.add_argument_group('thumbnail options')
     ap.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
     ap.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
-    ap.add_argument("--thumbsz", metavar="WxH", default="420x420", help="thumbnail res")
+    ap.add_argument("--thumbsz", metavar="WxH", default="352x352", help="thumbnail res")
 
     ap2 = ap.add_argument_group('database options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")
