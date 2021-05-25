@@ -67,6 +67,11 @@ a, #files tbody div a:last-child {
 	background: #161616;
 	text-decoration: underline;
 }
+#files thead {
+	background: #333;
+	position: sticky;
+	top: 0;
+}
 #files thead a {
 	color: #999;
 	font-weight: normal;
@@ -183,10 +188,20 @@ a, #files tbody div a:last-child {
 	color: #840;
 	text-shadow: 0 0 .3em #b80;
 }
-#files tbody tr.sel td {
+#files tbody tr.sel td,
+#ggrid a.sel {
 	color: #fff;
 	background: #925;
 	border-color: #c37;
+}
+#files tbody tr.sel:hover td,
+#ggrid a.sel:hover {
+	color: #fff;
+	background: #a36;
+	border-color: #d48;
+}
+#ggrid a.sel {
+	box-shadow: 0 .1em .7em #b36;
 }
 #files tr.sel a {
 	color: #fff;
@@ -719,7 +734,9 @@ input[type="checkbox"]:checked+label {
 	border: 1px solid #444;
 	border-radius: .3em;
 	padding: .5em;
-	margin: 0 1.5em 0 .4em;
+	margin: 0 1.5em 1em .4em;
+	position: sticky;
+	top: 0;
 }
 #ghead .btn {
 	position: relative;

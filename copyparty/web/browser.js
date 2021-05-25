@@ -745,7 +745,7 @@ var thegrid = (function () {
 		}
 	};
 
-	var click = function (e) {
+	var btnclick = function (e) {
 		ev(e);
 		var s = this.getAttribute('s'),
 			z = this.getAttribute('z');
@@ -765,12 +765,13 @@ var thegrid = (function () {
 
 	var links = QSA('#ghead>a');
 	for (var a = 0; a < links.length; a++)
-		links[a].onclick = click;
+		links[a].onclick = btnclick;
 
 	ebi('gridsel').onclick = function (e) {
 		ev(e);
 		r.sel = !r.sel;
 		bcfg_set('gridsel', r.sel);
+		r.loadsel();
 	};
 
 	r.setvis = function (vis) {
@@ -793,15 +794,34 @@ var thegrid = (function () {
 	}
 	setsz();
 
+	function seltgl(e) {
+		ev(e);
+		var oth = ebi(this.getAttribute('ref')),
+			td = oth.parentNode.nextSibling,
+			tr = td.parentNode;
+
+		td.click();
+		this.setAttribute('class', tr.getAttribute('class'));
+	}
+
+	r.loadsel = function () {
+		var ths = QSA('#ggrid>a');
+		for (var a = 0, aa = ths.length; a < aa; a++) {
+			ths[a].onclick = r.sel ? seltgl : null;
+			ths[a].setAttribute('class', ebi(ths[a].getAttribute('ref')).parentNode.parentNode.getAttribute('class'));
+		}
+	}
+
 	function loadgrid() {
 		if (!r.dirty)
-			return;
+			return r.loadsel();
 
 		var html = [];
 		var tr = lfiles.tBodies[0].rows;
 		for (var a = 0; a < tr.length; a++) {
 			var ao = tr[a].cells[1].firstChild,
 				href = esc(ao.getAttribute('href')),
+				ref = ao.getAttribute('id'),
 				isdir = href.split('?')[0].slice(-1)[0] == '/',
 				ihref = href;
 
@@ -830,13 +850,13 @@ var thegrid = (function () {
 				ihref = '/.cpr/ico/' + ihref.slice(0, -1);
 			}
 
-			html.push('<a href="' + href +
-				'"><img src="' + ihref + '"><span>' +
-				ao.innerHTML + '</span></a>');
+			html.push('<a href="' + href + '" ref="' + ref + '"><img src="' +
+				ihref + '" /><span>' + ao.innerHTML + '</span></a>');
 		}
 		lfiles.style.display = 'none';
 		gfiles.style.display = 'block';
 		ebi('ggrid').innerHTML = html.join('\n');
+		r.loadsel();
 	}
 
 	if (r.en) {
@@ -920,6 +940,19 @@ document.onkeydown = function (e) {
 
 	if (k == 'KeyT')
 		return ebi('thumbs').click();
+
+	if (window['thegrid'] && thegrid.en) {
+		if (k == 'KeyS')
+			return ebi('gridsel').click();
+
+		if (k == 'KeyA')
+			return QSA('#ghead>a[z]')[0].click();
+
+		if (k == 'KeyD')
+			return QSA('#ghead>a[z]')[1].click();
+	}
+
+
 };
 
 
@@ -1943,6 +1976,8 @@ var msel = (function () {
 	}
 	function selui() {
 		clmod(ebi('wtoggle'), 'sel', getsel().length);
+		if (window['thegrid'])
+			thegrid.loadsel();
 	}
 	function seltgl(e) {
 		ev(e);

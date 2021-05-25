@@ -13,7 +13,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * *resumable* uploads need `firefox 34+` / `chrome 41+` / `safari 7+` for full speed
 * code standard: `black`
 
-📷 screenshots: [browser](#the-browser) // [upload](#uploading) // [md-viewer](#markdown-viewer) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [ie4](#browser-support)
+📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [thumbnails](#thumbnails) // [md-viewer](#markdown-viewer) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [ie4](#browser-support)
 
 
 ## readme toc
@@ -29,6 +29,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [tabs](#tabs)
     * [hotkeys](#hotkeys)
     * [tree-mode](#tree-mode)
+    * [thumbnails](#thumbnails)
     * [zip downloads](#zip-downloads)
     * [uploading](#uploading)
         * [file-search](#file-search)
@@ -43,6 +44,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [client examples](#client-examples)
 * [up2k](#up2k)
 * [dependencies](#dependencies)
+    * [optional dependencies](#optional-dependencies)
+    * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx)
     * [sfx repack](#sfx-repack)
@@ -148,11 +151,16 @@ summary: it works!
 the browser has the following hotkeys
 * `I/K` prev/next folder
 * `P` parent folder
+* `G` toggle list / grid view
+* `T` toggle thumbnails / icons
 * when playing audio:
   * `0..9` jump to 10%..90%
   * `U/O` skip 10sec back/forward
   * `J/L` prev/next song
     * `J` also starts playing the folder
+* in the grid view:
+  * `S` toggle multiselect
+  * `A/D` zoom
 
 
 ## tree-mode
@@ -160,6 +168,13 @@ the browser has the following hotkeys
 by default there's a breadcrumbs path; you can replace this with a tree-browser sidebar thing by clicking the 🌲
 
 click `[-]` and `[+]` to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
+
+
+## thumbnails
+
+![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/119577189-6d490200-bdba-11eb-81a6-7b2ef7bc1128.png)
+
+it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how destructive your users are
 
 
 ## zip downloads
@@ -421,7 +436,7 @@ enable reading HEIF pictures:
 * `pyheif-pillow-opener` (requires Linux or a C compiler)
 
 
-## install recommended dependencies
+## install recommended deps
 ```
 python -m pip install --user -U jinja2 mutagen Pillow
 ```

@@ -25,7 +25,8 @@ class Ico(object):
 <?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg"><g>
 <rect width="100%" height="100%" fill="#{}" />
-<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#{}" font-family="sans-serif" font-size="16px" xml:space="preserve">{}</text>
+<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" xml:space="preserve"
+  fill="#{}" font-family="monospace" font-size="14px" style="letter-spacing:.5px">{}</text>
 </g></svg>
 """
         svg = svg.format(c[:6], c[6:], ext).encode("utf-8")
