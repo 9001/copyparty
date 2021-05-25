@@ -286,7 +286,7 @@ class HttpCli(object):
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
             if self.vpath.startswith(".cpr/ico/"):
-                return self.tx_ico(self.vpath.split("/")[-1])
+                return self.tx_ico(self.vpath.split("/")[-1], exact=True)
 
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
@@ -1207,15 +1207,19 @@ class HttpCli(object):
         self.log("{},  {}".format(logmsg, spd))
         return True
 
-    def tx_ico(self, ext):
-        bad = re.compile(r"[](){}[]|^[0-9_-]*$")
-        n = ext.split(".")[1:][::-1]
-        ext = ""
-        for v in n:
-            if len(v) > 7 or bad.match(v):
-                break
+    def tx_ico(self, ext, exact=False):
+        if not exact:
+            if ext.endswith("/"):
+                ext = "a.folder"
 
-            ext = "{}.{}".format(v, ext)
+            bad = re.compile(r"[](){}[]|^[0-9_-]*$")
+            n = ext.split(".")[1:][::-1]
+            ext = ""
+            for v in n:
+                if len(v) > 7 or bad.match(v):
+                    break
+
+                ext = "{}.{}".format(v, ext)
 
         ext = ext.rstrip(".") or "unk"
         mime, ico = self.ico.get(ext)

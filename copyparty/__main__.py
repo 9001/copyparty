@@ -253,6 +253,9 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
     ap2.add_argument("--thumbsz", metavar="WxH", default="352x352", help="thumbnail res")
+    ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown")
+    ap2.add_argument("--th-clean", metavar="SEC", type=int, default=1800, help="cleanup interval")
+    ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age")
 
     ap2 = ap.add_argument_group('database options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")

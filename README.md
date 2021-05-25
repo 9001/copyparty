@@ -92,10 +92,10 @@ you may also want these, especially on servers:
 * browser
   * ☑ tree-view
   * ☑ media player
-  * ✖ thumbnails
-    * ☑ images
-    * ☑ videos
-    * ✖ cache eviction
+  * ☑ thumbnails
+    * ☑ images using Pillow
+    * ☑ videos using FFmpeg
+    * ☑ cache eviction (max-age; maybe max-size eventually)
   * ☑ SPA (browse while uploading)
     * if you use the file-tree on the left only, not folders in the file list
 * server indexing
@@ -106,7 +106,7 @@ you may also want these, especially on servers:
   * ☑ viewer
   * ☑ editor (sure why not)
 
-summary: it works! you can use it! (but technically not even close to beta)
+summary: it works!
 
 
 # bugs

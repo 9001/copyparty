@@ -124,6 +124,32 @@ class Counter(object):
             self.v = absval
 
 
+class Cooldown(object):
+    def __init__(self, maxage):
+        self.maxage = maxage
+        self.mutex = threading.Lock()
+        self.hist = {}
+        self.oldest = 0
+
+    def poke(self, key):
+        with self.mutex:
+            now = time.time()
+
+            ret = False
+            v = self.hist.get(key, 0)
+            if now - v > self.maxage:
+                self.hist[key] = now
+                ret = True
+
+            if self.oldest - now > self.maxage * 2:
+                self.hist = {
+                    k: v for k, v in self.hist.items() if now - v < self.maxage
+                }
+                self.oldest = sorted(self.hist.values())[0]
+
+            return ret
+
+
 class Unrecv(object):
     """
     undo any number of socket recv ops

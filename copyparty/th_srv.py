@@ -1,12 +1,14 @@
 import os
 import sys
+import time
+import shutil
 import base64
 import hashlib
 import threading
 import subprocess as sp
 
 from .__init__ import PY2
-from .util import fsenc, Queue
+from .util import fsenc, Queue, Cooldown
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, parse_ffprobe
 
 
@@ -74,13 +76,16 @@ def thumb_path(ptop, rem, mtime):
 
 
 class ThumbSrv(object):
-    def __init__(self, hub):
+    def __init__(self, hub, vols):
         self.hub = hub
+        self.vols = [v.realpath for v in vols.values()]
+
         self.args = hub.args
         self.log_func = hub.log
 
         res = hub.args.thumbsz.split("x")
         self.res = tuple([int(x) for x in res])
+        self.poke_cd = Cooldown(self.args.th_poke)
 
         self.mutex = threading.Lock()
         self.busy = {}
@@ -107,6 +112,10 @@ class ThumbSrv(object):
             msg = "cannot create video thumbnails since some of the required programs are not available: "
             msg += ", ".join(missing)
             self.log(msg, c=1)
+
+        t = threading.Thread(target=self.cleaner)
+        t.daemon = True
+        t.start()
 
     def log(self, msg, c=0):
         self.log_func("thumb", msg, c)
@@ -233,3 +242,78 @@ class ThumbSrv(object):
         ]
         p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
         r = p.communicate()
+
+    def poke(self, tdir):
+        if not self.poke_cd.poke(tdir):
+            return
+
+        ts = int(time.time())
+        try:
+            p1 = os.path.dirname(tdir)
+            p2 = os.path.dirname(p1)
+            for dp in [tdir, p1, p2]:
+                os.utime(fsenc(dp), (ts, ts))
+        except:
+            pass
+
+    def cleaner(self):
+        interval = self.args.th_clean
+        while True:
+            time.sleep(interval)
+            for vol in self.vols:
+                vol += "/.hist/th"
+                self.log("cln {}/".format(vol))
+                self.clean(vol)
+
+    def clean(self, vol):
+        # self.log("cln {}".format(vol))
+        maxage = self.args.th_maxage
+        now = time.time()
+        prev_b64 = None
+        prev_fp = None
+        try:
+            ents = os.listdir(vol)
+        except:
+            return
+
+        for f in sorted(ents):
+            fp = os.path.join(vol, f)
+            cmp = fp.lower().replace("\\", "/")
+
+            # "top" or b64 prefix/full (a folder)
+            if len(f) <= 3 or len(f) == 24:
+                age = now - os.path.getmtime(fp)
+                if age > maxage:
+                    with self.mutex:
+                        safe = True
+                        for k in self.busy.keys():
+                            if k.lower().replace("\\", "/").startswith(cmp):
+                                safe = False
+                                break
+
+                        if safe:
+                            self.log("rm -rf [{}]".format(fp))
+                            shutil.rmtree(fp, ignore_errors=True)
+                else:
+                    self.clean(fp)
+                continue
+
+            # thumb file
+            try:
+                b64, ts, ext = f.split(".")
+                if len(b64) != 24 or len(ts) != 8 or ext != "jpg":
+                    raise Exception()
+
+                ts = int(ts, 16)
+            except:
+                if f != "dir.txt":
+                    self.log("foreign file in thumbs dir: [{}]".format(fp), 1)
+
+                continue
+
+            if b64 == prev_b64:
+                self.log("rm replaced [{}]".format(fp))
+                os.unlink(prev_fp)
+
+            prev_b64 = b64
+            prev_fp = fp

@@ -32,7 +32,6 @@ from .util import (
     s2hms,
 )
 from .mtag import MTag
-from .authsrv import AuthSrv
 
 try:
     HAVE_SQLITE3 = True
@@ -49,10 +48,11 @@ class Up2k(object):
         * ~/.config flatfiles for active jobs
     """
 
-    def __init__(self, hub):
+    def __init__(self, hub, all_vols):
         self.hub = hub
         self.args = hub.args
         self.log_func = hub.log
+        self.all_vols = all_vols
 
         # config
         self.salt = self.args.salt
@@ -92,9 +92,7 @@ class Up2k(object):
         if not HAVE_SQLITE3:
             self.log("could not initialize sqlite3, will use in-memory registry only")
 
-        # this is kinda jank
-        auth = AuthSrv(self.args, self.log_func, False)
-        have_e2d = self.init_indexes(auth)
+        have_e2d = self.init_indexes()
 
         if have_e2d:
             thr = threading.Thread(target=self._snapshot)
@@ -139,9 +137,9 @@ class Up2k(object):
 
         return True, ret
 
-    def init_indexes(self, auth):
+    def init_indexes(self):
         self.pp = ProgressPrinter()
-        vols = auth.vfs.all_vols.values()
+        vols = self.all_vols.values()
         t0 = time.time()
         have_e2d = False
 

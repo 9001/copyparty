@@ -11,6 +11,7 @@ import calendar
 
 from .__init__ import PY2, WINDOWS, MACOS, VT100
 from .util import mp
+from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
 from .th_srv import ThumbSrv, HAVE_PIL
@@ -36,14 +37,17 @@ class SvcHub(object):
 
         self.log = self._log_disabled if args.q else self._log_enabled
 
+        # jank goes here
+        auth = AuthSrv(self.args, self.log, False)
+
         # initiate all services to manage
         self.tcpsrv = TcpSrv(self)
-        self.up2k = Up2k(self)
+        self.up2k = Up2k(self, auth.vfs.all_vols)
 
         self.thumbsrv = None
         if not args.no_thumb:
             if HAVE_PIL:
-                self.thumbsrv = ThumbSrv(self)
+                self.thumbsrv = ThumbSrv(self, auth.vfs.all_vols)
             else:
                 msg = "need Pillow to create thumbnails; for example:\n  {} -m pip install --user Pillow"
                 self.log("thumb", msg.format(os.path.basename(sys.executable)), c=3)
@@ -76,9 +80,13 @@ class SvcHub(object):
             if self.thumbsrv:
                 self.thumbsrv.shutdown()
 
-                print("waiting for thumbsrv...")
-                while not self.thumbsrv.stopped():
+                for n in range(200):  # 10s
                     time.sleep(0.05)
+                    if self.thumbsrv.stopped():
+                        break
+
+                    if n == 3:
+                        print("waiting for thumbsrv...")
 
             print("nailed it")
 
