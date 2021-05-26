@@ -1216,12 +1216,15 @@ class HttpCli(object):
             n = ext.split(".")[1:][::-1]
             ext = ""
             for v in n:
-                if len(v) > 7 or bad.match(v):
+                if len(v) > 7 or bad.search(v):
                     break
 
                 ext = "{}.{}".format(v, ext)
 
         ext = ext.rstrip(".") or "unk"
+        if len(ext) > 11:
+            ext = "⋯" + ext[-9:]
+
         mime, ico = self.ico.get(ext)
 
         dt = datetime.utcfromtimestamp(E.t0)

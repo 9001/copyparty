@@ -795,6 +795,9 @@ var thegrid = (function () {
 	setsz();
 
 	function seltgl(e) {
+		if (e && e.ctrlKey)
+			return true;
+
 		ev(e);
 		var oth = ebi(this.getAttribute('ref')),
 			td = oth.parentNode.nextSibling,

@@ -205,6 +205,7 @@ html.light #ggrid a.sel:hover {
 }
 #ggrid a.sel {
 	box-shadow: 0 .1em .7em #b36;
+	transition: all 0.2s cubic-bezier(.2, 2.2, .5, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
 }
 #files tr.sel a {
 	color: #fff;
@@ -764,7 +765,6 @@ html.light #ghead {
 	border-radius: .3em;
 	padding: .3em;
 	margin: .5em;
-	transition: all 0.2s cubic-bezier(.4, 2, .7, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
 }
 #ggrid a img {
 	border-radius: .2em;

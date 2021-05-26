@@ -152,6 +152,9 @@ function sortfiles(nodes) {
             if (!name)
                 continue;
 
+            if (name == 'ts')
+                typ = 'int';
+
             if (name.indexOf('tags/') === 0) {
                 name = name.slice(5);
                 for (var b = 0, bb = nodes.length; b < bb; b++)
@@ -202,6 +205,8 @@ function sortfiles(nodes) {
     }
     catch (ex) {
         console.log("failed to apply sort config: " + ex);
+        console.log("resetting fsort " + sread('fsort'))
+        localStorage.removeItem('fsort');
     }
     return nodes;
 }
