@@ -189,16 +189,19 @@ a, #files tbody div a:last-child {
 	text-shadow: 0 0 .3em #b80;
 }
 #files tbody tr.sel td,
-#ggrid a.sel {
+#ggrid a.sel,
+html.light #ggrid a.sel {
 	color: #fff;
 	background: #925;
 	border-color: #c37;
 }
 #files tbody tr.sel:hover td,
-#ggrid a.sel:hover {
+#ggrid a.sel:hover,
+html.light #ggrid a.sel:hover {
 	color: #fff;
 	background: #a36;
 	border-color: #d48;
+	text-shadow: 1px 1px 0 #804;
 }
 #ggrid a.sel {
 	box-shadow: 0 .1em .7em #b36;
@@ -736,7 +739,11 @@ input[type="checkbox"]:checked+label {
 	padding: .5em;
 	margin: 0 1.5em 1em .4em;
 	position: sticky;
-	top: 0;
+	top: -.3em;
+}
+html.light #ghead {
+	background: #f7f7f7;
+	border-color: #ddd;
 }
 #ghead .btn {
 	position: relative;
@@ -757,6 +764,7 @@ input[type="checkbox"]:checked+label {
 	border-radius: .3em;
 	padding: .3em;
 	margin: .5em;
+	transition: all 0.2s cubic-bezier(.4, 2, .7, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
 }
 #ggrid a img {
 	border-radius: .2em;
@@ -773,6 +781,17 @@ input[type="checkbox"]:checked+label {
 	background: #444;
 	border-color: #555;
 	color: #fd9;
+}
+html.light #ggrid a {
+	background: #f7f7f7;
+	border-color: #ddd;
+	box-shadow: 0 .1em .2em #ddd;
+}
+html.light #ggrid a:hover {
+	background: #fff;
+	border-color: #ccc;
+	color: #015;
+	box-shadow: 0 .1em .5em #aaa;
 }
 #pvol,
 #barbuf,

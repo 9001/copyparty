@@ -951,8 +951,6 @@ document.onkeydown = function (e) {
 		if (k == 'KeyD')
 			return QSA('#ghead>a[z]')[1].click();
 	}
-
-
 };
 
 
