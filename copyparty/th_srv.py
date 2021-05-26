@@ -9,7 +9,7 @@ import subprocess as sp
 
 from .__init__ import PY2
 from .util import fsenc, Queue, Cooldown
-from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, parse_ffprobe
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
 
 if not PY2:
@@ -214,11 +214,7 @@ class ThumbSrv(object):
             im.save(tpath)
 
     def conv_ffmpeg(self, abspath, tpath):
-        cmd = [b"ffprobe", b"-hide_banner", b"--", fsenc(abspath)]
-        p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-        r = p.communicate()
-        txt = r[1].decode("utf-8", "replace")
-        ret, _ = parse_ffprobe(txt, self.log, False)
+        ret, _ = run_ffprobe(abspath)
 
         dur = ret[".dur"][1]
         seek = "{:.0f}".format(dur / 3)
@@ -264,6 +260,8 @@ class ThumbSrv(object):
                 vol += "/.hist/th"
                 self.log("cln {}/".format(vol))
                 self.clean(vol)
+
+            self.log("cln ok")
 
     def clean(self, vol):
         # self.log("cln {}".format(vol))

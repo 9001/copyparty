@@ -268,7 +268,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-mtag-mt", action="store_true", help="disable tag-read parallelism")
     ap2.add_argument("-mtm", metavar="M=t,t,t", action="append", type=str, help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=str, help="tags to index/display (comma-sep.)",
-        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q")
+        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,acodec,vcodec,res,.fps")
     ap2.add_argument("-mtp", metavar="M=[f,]bin", action="append", type=str, help="read tag M using bin")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
 

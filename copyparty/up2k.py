@@ -740,7 +740,8 @@ class Up2k(object):
                     vtags = [
                         "\033[36m{} \033[33m{}".format(k, v) for k, v in tags.items()
                     ]
-                    self.log("{}\033[0m [{}]".format(" ".join(vtags), abspath))
+                    if vtags:
+                        self.log("{}\033[0m [{}]".format(" ".join(vtags), abspath))
 
                 with self.mutex:
                     self.pending_tags.append([entags, wark, abspath, tags])

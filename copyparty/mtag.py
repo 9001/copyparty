@@ -30,95 +30,135 @@ HAVE_FFMPEG = have_ff("ffmpeg")
 HAVE_FFPROBE = have_ff("ffprobe")
 
 
-def parse_ffprobe(stdout, logger, require_audio=True):
-    txt = [x.rstrip("\r") for x in stdout.split("\n")]
+def ffprobe(abspath):
+    cmd = [
+        b"ffprobe",
+        b"-hide_banner",
+        b"-show_streams",
+        b"-show_format",
+        b"--",
+        fsenc(abspath),
+    ]
+    p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
+    r = p.communicate()
+    txt = r[0].decode("utf-8", "replace")
+    return parse_ffprobe(txt)
 
-    """
-    note:
-        tags which contain newline will be truncated on first \n,
-        ffprobe emits \n and spacepads the : to align visually
-    note:
-        the Stream ln always mentions Audio: if audio
-        the Stream ln usually has kb/s, is more accurate
-        the Duration ln always has kb/s
-        the Metadata: after Chapter may contain BPM info,
-        title : Tempo: 126.0
 
-    Input #0, wav,
-        Metadata:
-        date : <OK>
-        Duration:
-        Chapter #
-        Metadata:
-            title : <NG>
-
-    Input #0, mp3,
-        Metadata:
-        album : <OK>
-        Duration:
-        Stream #0:0: Audio:
-        Stream #0:1: Video:
-        Metadata:
-            comment : <NG>
-    """
-
-    ptn_md_beg = re.compile("^( +)Metadata:$")
-    ptn_md_kv = re.compile("^( +)([^:]+) *: (.*)")
-    ptn_dur = re.compile("^ *Duration: ([^ ]+)(, |$)")
-    ptn_br1 = re.compile("^ *Duration: .*, bitrate: ([0-9]+) kb/s(, |$)")
-    ptn_br2 = re.compile("^ *Stream.*: Audio:.* ([0-9]+) kb/s(, |$)")
-    ptn_audio = re.compile("^ *Stream .*: Audio: ")
-    ptn_au_parent = re.compile("^ *(Input #|Stream .*: Audio: )")
-
-    ret = {}
-    md = {}
-    in_md = False
-    is_audio = False
-    au_parent = False
-    for ln in txt:
-        m = ptn_md_kv.match(ln)
-        if m and in_md and len(m.group(1)) == in_md:
-            _, k, v = [x.strip() for x in m.groups()]
-            if k != "" and v != "":
-                md[k] = [v]
+def parse_ffprobe(txt):
+    """ffprobe -show_format -show_streams"""
+    streams = []
+    g = None
+    for ln in [x.rstrip("\r") for x in txt.split("\n")]:
+        try:
+            k, v = ln.split("=", 1)
+            g[k] = v
             continue
-        else:
-            in_md = False
+        except:
+            pass
 
-        m = ptn_md_beg.match(ln)
-        if m and au_parent:
-            in_md = len(m.group(1)) + 2
+        if ln == "[STREAM]":
+            g = {}
+            streams.append(g)
+
+        if ln == "[FORMAT]":
+            g = {"codec_type": "format"}  # heh
+            streams.append(g)
+
+    ret = {}  # processed
+    md = {}  # raw tags
+
+    have = {}
+    for strm in streams:
+        typ = strm.get("codec_type")
+        if typ in have:
             continue
 
-        au_parent = bool(ptn_au_parent.search(ln))
+        have[typ] = True
 
-        if ptn_audio.search(ln):
-            is_audio = True
+        if typ == "audio":
+            kvm = [
+                ["codec_name", "ac"],
+                ["channel_layout", "chs"],
+                ["sample_rate", ".hz"],
+                ["bit_rate", ".aq"],
+                ["duration", ".dur"],
+            ]
 
-        m = ptn_dur.search(ln)
-        if m:
-            sec = 0
-            tstr = m.group(1)
-            if tstr.lower() != "n/a":
+        if typ == "video":
+            if strm.get("DISPOSITION:attached_pic") == "1" or strm.get(
+                "duration_ts"
+            ) in ["1", "N/A"]:
+                continue
+
+            kvm = [
+                ["codec_name", "vc"],
+                ["pix_fmt", "pixfmt"],
+                ["r_frame_rate", ".fps"],
+                ["bit_rate", ".vq"],
+                ["width", ".resw"],
+                ["height", ".resh"],
+                ["duration", ".dur"],
+            ]
+
+        if typ == "format":
+            kvm = [["duration", ".dur"], ["bit_rate", ".q"]]
+
+        for sk, rk in kvm:
+            v = strm.get(sk)
+            if v is None:
+                continue
+
+            if rk.startswith("."):
                 try:
-                    tf = tstr.split(",")[0].split(".")[0].split(":")
-                    for f in tf:
-                        sec *= 60
-                        sec += int(f)
+                    v = float(v)
+                    v2 = ret.get(rk)
+                    if v2 is None or v > v2:
+                        ret[rk] = v
                 except:
-                    logger("invalid timestr from ffprobe: [{}]".format(tstr), c=3)
+                    # sqlite doesnt care but the code below does
+                    if v not in ["N/A"]:
+                        ret[rk] = v
+            else:
+                ret[rk] = v
 
-            ret[".dur"] = sec
-            m = ptn_br1.search(ln)
-            if m:
-                ret[".q"] = m.group(1)
+    for strm in streams:
+        for k, v in strm.items():
+            if not k.startswith("TAG:"):
+                continue
 
-        m = ptn_br2.search(ln)
-        if m:
-            ret[".q"] = m.group(1)
+            k = k[4:].strip()
+            v = v.strip()
+            if k and v:
+                md[k] = [v]
 
-    if not is_audio and require_audio:
-        return {}, {}
+    for k in [".q", ".vq", ".aq"]:
+        if k in ret:
+            ret[k] /= 1000  # bit_rate=320000
+
+    for k in [".q", ".vq", ".aq", ".resw", ".resh"]:
+        if k in ret:
+            ret[k] = int(ret[k])
+
+    if ".fps" in ret:
+        fps = ret[".fps"]
+        if "/" in fps:
+            fa, fb = fps.split("/")
+            fps = int(fa) * 1.0 / int(fb)
+
+        if fps < 1000:
+            ret[".fps"] = round(fps, 3)
+        else:
+            del ret[".fps"]
+
+    if ".dur" in ret:
+        if ret[".dur"] < 0.1:
+            del ret[".dur"]
+            if ".q" in ret:
+                del ret[".q"]
+
+    if ".resw" in ret and ".resh" in ret:
+        ret["res"] = "{}x{}".format(ret[".resw"], ret[".resh"])
 
     ret = {k: [0, v] for k, v in ret.items()}
 
@@ -325,11 +365,7 @@ class MTag(object):
         return self.normalize_tags(ret, md)
 
     def get_ffprobe(self, abspath):
-        cmd = [b"ffprobe", b"-hide_banner", b"--", fsenc(abspath)]
-        p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-        r = p.communicate()
-        txt = r[1].decode("utf-8", "replace")
-        ret, md = parse_ffprobe(txt, self.log)
+        ret, md = ffprobe(abspath)
         return self.normalize_tags(ret, md)
 
     def get_bin(self, parsers, abspath):
