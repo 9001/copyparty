@@ -78,6 +78,8 @@ you may also want these, especially on servers:
 
 ## status
 
+summary: all planned features work! now please enjoy the bloatening
+
 * backend stuff
   * ☑ sanic multipart parser
   * ☑ load balancer (multiprocessing)
@@ -108,8 +110,6 @@ you may also want these, especially on servers:
 * markdown
   * ☑ viewer
   * ☑ editor (sure why not)
-
-summary: it works!
 
 
 # bugs
@@ -311,6 +311,7 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 `--no-mutagen` disables mutagen and uses ffprobe instead, which...
 * is about 20x slower than mutagen
 * catches a few tags that mutagen doesn't
+  * melodic key, video resolution, framerate, pixfmt
 * avoids pulling any GPL code into copyparty
 * more importantly runs ffprobe on incoming files which is bad if your ffmpeg has a cve
 
@@ -514,10 +515,6 @@ in the `scripts` folder:
 roughly sorted by priority
 
 * mtag mediainfo (multitag)
-* thumbnail expiration
-  * touch cachedir on access with cooldown
-  * drop dir if older than X and near maxsize
-  * drop outdated thumbs
 * separate sqlite table per tag
 * audio fingerprinting
 * readme.md as epilogue
