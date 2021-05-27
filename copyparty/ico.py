@@ -5,10 +5,10 @@ from .__init__ import PY2
 
 
 class Ico(object):
-    def __init__(self):
-        pass
+    def __init__(self, args):
+        self.args = args
 
-    def get(self, ext):
+    def get(self, ext, as_thumb):
         """placeholder to make thumbnails not break"""
 
         h = hashlib.md5(ext.encode("utf-8")).digest()[:2]
@@ -21,14 +21,19 @@ class Ico(object):
         c = [int(x * 255) for x in c]
         c = "".join(["{:02x}".format(x) for x in c])
 
+        h = 30
+        if not self.args.th_nocrop and as_thumb:
+            w, h = self.args.th_size.split("x")
+            h = int(100 / (float(w) / float(h)))
+
         svg = """\
 <?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.1" viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg"><g>
+<svg version="1.1" viewBox="0 0 100 {}" xmlns="http://www.w3.org/2000/svg"><g>
 <rect width="100%" height="100%" fill="#{}" />
 <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" xml:space="preserve"
   fill="#{}" font-family="monospace" font-size="14px" style="letter-spacing:.5px">{}</text>
 </g></svg>
 """
-        svg = svg.format(c[:6], c[6:], ext).encode("utf-8")
+        svg = svg.format(h, c[:6], c[6:], ext).encode("utf-8")
 
         return ["image/svg+xml", svg]

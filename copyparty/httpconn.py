@@ -39,7 +39,7 @@ class HttpConn(object):
 
         enth = HAVE_PIL and not self.args.no_thumb
         self.thumbcli = ThumbCli(hsrv.broker) if enth else None
-        self.ico = Ico()
+        self.ico = Ico(self.args)
 
         self.t0 = time.time()
         self.nbyte = 0

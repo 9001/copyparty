@@ -1225,7 +1225,7 @@ class HttpCli(object):
         if len(ext) > 11:
             ext = "⋯" + ext[-9:]
 
-        mime, ico = self.ico.get(ext)
+        mime, ico = self.ico.get(ext, not exact)
 
         dt = datetime.utcfromtimestamp(E.t0)
         lm = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")

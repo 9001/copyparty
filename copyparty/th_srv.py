@@ -18,7 +18,7 @@ if not PY2:
 
 try:
     HAVE_PIL = True
-    from PIL import Image
+    from PIL import Image, ImageOps
 
     try:
         HAVE_HEIF = True
@@ -83,7 +83,7 @@ class ThumbSrv(object):
         self.args = hub.args
         self.log_func = hub.log
 
-        res = hub.args.thumbsz.split("x")
+        res = hub.args.th_size.split("x")
         self.res = tuple([int(x) for x in res])
         self.poke_cd = Cooldown(self.args.th_poke)
 
@@ -207,18 +207,35 @@ class ThumbSrv(object):
 
     def conv_pil(self, abspath, tpath):
         with Image.open(abspath) as im:
+            crop = not self.args.th_nocrop
+            res2 = self.res
+            if crop:
+                res2 = (res2[0] * 2, res2[1] * 2)
+
+            try:
+                im.thumbnail(res2, resample=Image.LANCZOS)
+                if crop:
+                    im = ImageOps.fit(im, self.res, method=Image.LANCZOS)
+            except:
+                im.thumbnail(self.res)
+
             if im.mode not in ("RGB", "L"):
                 im = im.convert("RGB")
 
-            im.thumbnail(self.res)
-            im.save(tpath)
+            im.save(tpath, quality=50)
 
     def conv_ffmpeg(self, abspath, tpath):
-        ret, _ = run_ffprobe(abspath)
+        ret, _ = ffprobe(abspath)
 
         dur = ret[".dur"][1]
         seek = "{:.0f}".format(dur / 3)
-        scale = "scale=w={}:h={}:force_original_aspect_ratio=decrease"
+
+        scale = "scale={0}:{1}:force_original_aspect_ratio="
+        if self.args.th_nocrop:
+            scale += "decrease,setsar=1:1"
+        else:
+            scale += "increase,crop={0}:{1},setsar=1:1"
+
         scale = scale.format(*list(self.res)).encode("utf-8")
         cmd = [
             b"ffmpeg",
@@ -233,11 +250,11 @@ class ThumbSrv(object):
             b"-vframes",
             b"1",
             b"-q:v",
-            b"5",
+            b"6",
             fsenc(tpath),
         ]
         p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-        r = p.communicate()
+        p.communicate()
 
     def poke(self, tdir):
         if not self.poke_cd.poke(tdir):
