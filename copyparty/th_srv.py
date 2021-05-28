@@ -8,13 +8,12 @@ import threading
 import subprocess as sp
 
 from .__init__ import PY2
-from .util import fsenc, Queue, Cooldown
+from .util import fsenc, Queue, Cooldown, BytesIO
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
 
 if not PY2:
     unicode = str
-
 
 try:
     HAVE_PIL = True
@@ -27,6 +26,12 @@ try:
         register_heif_opener()
     except:
         HAVE_HEIF = False
+
+    try:
+        Image.new("RGB", (2, 2)).save(BytesIO(), format="webp")
+        HAVE_WEBP = True
+    except:
+        HAVE_WEBP = False
 except:
     HAVE_PIL = False
 
@@ -339,7 +344,7 @@ class ThumbSrv(object):
             # thumb file
             try:
                 b64, ts, ext = f.split(".")
-                if len(b64) != 24 or len(ts) != 8 or ext != "jpg":
+                if len(b64) != 24 or len(ts) != 8 or ext not in ["jpg", "webp"]:
                     raise Exception()
 
                 ts = int(ts, 16)

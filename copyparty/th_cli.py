@@ -21,11 +21,11 @@ class ThumbCli(object):
         if self.args.no_vthumb and ext in FMT_FF:
             return None
 
-        if fmt == "w" and self.args.th_no_webp:
-            fmt = "j"
-
         if fmt == "j" and self.args.th_no_jpg:
             fmt = "w"
+
+        if fmt == "w" and self.args.th_no_webp:
+            fmt = "j"
 
         tpath = thumb_path(ptop, rem, mtime, fmt)
         ret = None

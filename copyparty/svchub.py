@@ -14,7 +14,7 @@ from .util import mp
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
-from .th_srv import ThumbSrv, HAVE_PIL
+from .th_srv import ThumbSrv, HAVE_PIL, HAVE_WEBP
 
 
 class SvcHub(object):
@@ -47,6 +47,11 @@ class SvcHub(object):
         self.thumbsrv = None
         if not args.no_thumb:
             if HAVE_PIL:
+                if not HAVE_WEBP:
+                    args.th_no_webp = True
+                    msg = "setting --th-no-webp because either libwebp is not available or your Pillow is too old"
+                    self.log("thumb", msg, c=3)
+
                 self.thumbsrv = ThumbSrv(self, auth.vfs.all_vols)
             else:
                 msg = "need Pillow to create thumbnails; for example:\n  {} -m pip install --user Pillow"

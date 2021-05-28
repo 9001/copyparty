@@ -34,10 +34,12 @@ if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
     from queue import Queue
+    from io import BytesIO
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
     from urllib import quote  # pylint: disable=no-name-in-module
     from Queue import Queue  # pylint: disable=import-error,no-name-in-module
+    from StringIO import StringIO as BytesIO
 
 surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
