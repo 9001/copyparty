@@ -2058,9 +2058,10 @@ var msel = (function () {
 		var tr = ebi('files').tBodies[0].rows;
 		for (var a = 0; a < tr.length; a++) {
 			var td = tr[a].cells[1],
-				href = td.firstChild.getAttribute('href'),
+				ao = td.firstChild,
+				href = ao.getAttribute('href'),
 				isdir = href.split('?')[0].slice(-1)[0] == '/',
-				txt = href.textContent;
+				txt = ao.textContent;
 
 			td.setAttribute('sortv', (isdir ? '\t' : '') + txt);
 		}
