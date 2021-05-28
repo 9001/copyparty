@@ -28,6 +28,12 @@ try:
         HAVE_HEIF = False
 
     try:
+        HAVE_AVIF = True
+        import pillow_avif
+    except:
+        HAVE_AVIF = False
+
+    try:
         Image.new("RGB", (2, 2)).save(BytesIO(), format="webp")
         HAVE_WEBP = True
     except:
@@ -38,13 +44,16 @@ except:
 
 # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 # ffmpeg -formats
-FMT_PIL, FMT_FF = [
-    {x: True for x in y.split(" ") if x}
-    for y in [
-        "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm",
-        "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv",
-    ]
-]
+FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
+FMT_FF = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
+
+if HAVE_HEIF:
+    FMT_PIL += " heif heifs heic heics"
+
+if HAVE_AVIF:
+    FMT_PIL += " avif avifs"
+
+FMT_PIL, FMT_FF = [{x: True for x in y.split(" ") if x} for y in [FMT_PIL, FMT_FF]]
 
 
 THUMBABLE = {}

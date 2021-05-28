@@ -436,6 +436,9 @@ enable video thumbnails:
 enable reading HEIF pictures:
 * `pyheif-pillow-opener` (requires Linux or a C compiler)
 
+enable reading AVIF pictures:
+* `pillow-avif-plugin`
+
 
 ## install recommended deps
 ```
