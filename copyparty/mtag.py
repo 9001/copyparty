@@ -75,6 +75,7 @@ def parse_ffprobe(txt):
             continue
 
         have[typ] = True
+        kvm = []
 
         if typ == "audio":
             kvm = [

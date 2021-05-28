@@ -254,7 +254,7 @@ class ThumbSrv(object):
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
 
-        dur = ret[".dur"][1]
+        dur = ret[".dur"][1] if ".dur" in ret else 4
         seek = "{:.0f}".format(dur / 3)
 
         scale = "scale={0}:{1}:force_original_aspect_ratio="
