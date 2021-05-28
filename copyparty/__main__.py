@@ -288,7 +288,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
     ap2.add_argument("--ihead", metavar="HEADER", action='append', help="dump incoming header")
-    ap2.add_argument("--lf-url", metavar="RE", type=str, default=r"^/\.cpr/", help="dont log URLs matching")
+    ap2.add_argument("--lf-url", metavar="RE", type=str, default=r"^/\.cpr/|\?th=[wj]$", help="dont log URLs matching")
     
     return ap.parse_args(args=argv[1:])
     # fmt: on

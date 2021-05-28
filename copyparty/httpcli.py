@@ -160,7 +160,7 @@ class HttpCli(object):
             uparam["b"] = False
             cookies["b"] = False
 
-        self.do_log = not self.conn.lf_url or not self.conn.lf_url.match(self.req)
+        self.do_log = not self.conn.lf_url or not self.conn.lf_url.search(self.req)
 
         try:
             if self.mode in ["GET", "HEAD"]:

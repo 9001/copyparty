@@ -167,7 +167,7 @@ class ThumbSrv(object):
 
                 self.busy[tpath] = [cond]
                 self.q.put([abspath, tpath])
-                self.log("conv {}".format(tpath))
+                self.log("conv {} \033[0m{}".format(tpath, abspath), c=6)
 
         while not self.stopping:
             with self.mutex:
