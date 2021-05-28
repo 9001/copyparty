@@ -48,6 +48,7 @@ def ffprobe(abspath):
 def parse_ffprobe(txt):
     """ffprobe -show_format -show_streams"""
     streams = []
+    fmt = {}
     g = None
     for ln in [x.rstrip("\r") for x in txt.split("\n")]:
         try:
@@ -63,8 +64,9 @@ def parse_ffprobe(txt):
 
         if ln == "[FORMAT]":
             g = {"codec_type": "format"}  # heh
-            streams.append(g)
+            fmt = g
 
+    streams = [fmt] + streams
     ret = {}  # processed
     md = {}  # raw tags
 
@@ -87,9 +89,9 @@ def parse_ffprobe(txt):
             ]
 
         if typ == "video":
-            if strm.get("DISPOSITION:attached_pic") == "1" or strm.get(
-                "duration_ts"
-            ) in ["1", "N/A"]:
+            if strm.get("DISPOSITION:attached_pic") == "1" or fmt.get(
+                "format_name"
+            ) in ["mp3", "ogg", "flac"]:
                 continue
 
             kvm = [
@@ -123,6 +125,9 @@ def parse_ffprobe(txt):
             else:
                 ret[rk] = v
 
+    if ret.get("vc") == "ansi":  # shellscript
+        return {}, {}
+
     for strm in streams:
         for k, v in strm.items():
             if not k.startswith("TAG:"):
@@ -147,7 +152,7 @@ def parse_ffprobe(txt):
             fa, fb = fps.split("/")
             fps = int(fa) * 1.0 / int(fb)
 
-        if fps < 1000:
+        if fps < 1000 and fmt.get("format_name") not in ["image2", "png_pipe"]:
             ret[".fps"] = round(fps, 3)
         else:
             del ret[".fps"]
