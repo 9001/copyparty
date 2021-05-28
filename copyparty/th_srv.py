@@ -231,7 +231,10 @@ class ThumbSrv(object):
             try:
                 im.thumbnail(res2, resample=Image.LANCZOS)
                 if crop:
-                    im = ImageOps.fit(im, self.res, method=Image.LANCZOS)
+                    iw, ih = im.size
+                    dw, dh = self.res
+                    res = (min(iw, dw), min(ih, dh))
+                    im = ImageOps.fit(im, res, method=Image.LANCZOS)
             except:
                 im.thumbnail(self.res)
 
