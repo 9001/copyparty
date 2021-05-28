@@ -1208,18 +1208,21 @@ class HttpCli(object):
         return True
 
     def tx_ico(self, ext, exact=False):
+        if ext.endswith("/"):
+            ext = "folder"
+            exact = True
+
+        bad = re.compile(r"[](){}/[]|^[0-9_-]*$")
+        n = ext.split(".")[::-1]
         if not exact:
-            if ext.endswith("/"):
-                ext = "a.folder"
+            n = n[:-1]
 
-            bad = re.compile(r"[](){}[]|^[0-9_-]*$")
-            n = ext.split(".")[1:][::-1]
-            ext = ""
-            for v in n:
-                if len(v) > 7 or bad.search(v):
-                    break
+        ext = ""
+        for v in n:
+            if len(v) > 7 or bad.search(v):
+                break
 
-                ext = "{}.{}".format(v, ext)
+            ext = "{}.{}".format(v, ext)
 
         ext = ext.rstrip(".") or "unk"
         if len(ext) > 11:
