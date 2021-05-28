@@ -22,7 +22,7 @@ class Ico(object):
         c = "".join(["{:02x}".format(x) for x in c])
 
         h = 30
-        if not self.args.th_nocrop and as_thumb:
+        if not self.args.th_no_crop and as_thumb:
             w, h = self.args.th_size.split("x")
             h = int(100 / (float(w) / float(h)))
 

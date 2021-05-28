@@ -1385,10 +1385,11 @@ class HttpCli(object):
             if rem.startswith(".hist/up2k."):
                 raise Pebkac(403)
 
-            if "th" in self.uparam:
+            th_fmt = self.uparam.get("th")
+            if th_fmt is not None:
                 thp = None
                 if self.thumbcli:
-                    thp = self.thumbcli.get(vn.realpath, rem, int(st.st_mtime))
+                    thp = self.thumbcli.get(vn.realpath, rem, int(st.st_mtime), th_fmt)
 
                 if thp:
                     return self.tx_file(thp)

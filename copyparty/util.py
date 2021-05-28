@@ -944,6 +944,9 @@ def guess_mime(url, fallback="application/octet-stream"):
     if url.endswith(".md"):
         return ["text/plain; charset=UTF-8"]
 
+    if url.endswith(".webp"):
+        return ["image/webp"]
+
     return mimetypes.guess_type(url) or fallback
 
 

@@ -13,7 +13,7 @@ class ThumbCli(object):
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
 
-    def get(self, ptop, rem, mtime):
+    def get(self, ptop, rem, mtime, fmt):
         ext = rem.rsplit(".")[-1].lower()
         if ext not in THUMBABLE:
             return None
@@ -21,7 +21,13 @@ class ThumbCli(object):
         if self.args.no_vthumb and ext in FMT_FF:
             return None
 
-        tpath = thumb_path(ptop, rem, mtime)
+        if fmt == "w" and self.args.th_no_webp:
+            fmt = "j"
+
+        if fmt == "j" and self.args.th_no_jpg:
+            fmt = "w"
+
+        tpath = thumb_path(ptop, rem, mtime, fmt)
         ret = None
         try:
             st = os.stat(tpath)
@@ -39,5 +45,5 @@ class ThumbCli(object):
 
             return ret
 
-        x = self.broker.put(True, "thumbsrv.get", ptop, rem, mtime)
+        x = self.broker.put(True, "thumbsrv.get", ptop, rem, mtime, fmt)
         return x.get()

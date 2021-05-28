@@ -29,6 +29,19 @@ ebi('widget').innerHTML = (
 );
 
 
+var have_webp = null;
+(function () {
+	var img = new Image();
+	img.onload = function () {
+		have_webp = img.width > 0 && img.height > 0;
+	};
+	img.onerror = function () {
+		have_webp = false;
+	};
+	img.src = "data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA";
+})();
+
+
 // extract songs + add play column
 function MPlayer() {
 	this.id = Date.now();
@@ -816,6 +829,9 @@ var thegrid = (function () {
 	}
 
 	function loadgrid() {
+		if (have_webp === null)
+			return setTimeout(loadgrid, 50);
+
 		if (!r.dirty)
 			return r.loadsel();
 
@@ -832,7 +848,7 @@ var thegrid = (function () {
 				ihref = '/.cpr/ico/folder'
 			}
 			else if (r.thumbs) {
-				ihref += ihref.indexOf('?') === -1 ? '?th' : '&th';
+				ihref += (ihref.indexOf('?') === -1 ? '?' : '&') + 'th=' + (have_webp ? 'w' : 'j');
 			}
 			else {
 				var ar = href.split('?')[0].split('.');

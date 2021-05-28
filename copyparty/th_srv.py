@@ -51,7 +51,7 @@ if HAVE_FFMPEG and HAVE_FFPROBE:
     THUMBABLE.update(FMT_FF)
 
 
-def thumb_path(ptop, rem, mtime):
+def thumb_path(ptop, rem, mtime, fmt):
     # base16 = 16 = 256
     # b64-lc = 38 = 1444
     # base64 = 64 = 4096
@@ -72,7 +72,9 @@ def thumb_path(ptop, rem, mtime):
     h = hashlib.sha512(fsenc(fn)).digest()[:24]
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
-    return "{}/.hist/th/{}/{}.{:x}.jpg".format(ptop, rd, fn, int(mtime))
+    return "{}/.hist/th/{}/{}.{:x}.{}".format(
+        ptop, rd, fn, int(mtime), "webp" if fmt == "w" else "jpg"
+    )
 
 
 class ThumbSrv(object):
@@ -129,8 +131,8 @@ class ThumbSrv(object):
         with self.mutex:
             return not self.nthr
 
-    def get(self, ptop, rem, mtime):
-        tpath = thumb_path(ptop, rem, mtime)
+    def get(self, ptop, rem, mtime, fmt):
+        tpath = thumb_path(ptop, rem, mtime, fmt)
         abspath = os.path.join(ptop, rem)
         cond = threading.Condition()
         with self.mutex:
@@ -207,7 +209,7 @@ class ThumbSrv(object):
 
     def conv_pil(self, abspath, tpath):
         with Image.open(abspath) as im:
-            crop = not self.args.th_nocrop
+            crop = not self.args.th_no_crop
             res2 = self.res
             if crop:
                 res2 = (res2[0] * 2, res2[1] * 2)
@@ -222,7 +224,15 @@ class ThumbSrv(object):
             if im.mode not in ("RGB", "L"):
                 im = im.convert("RGB")
 
-            im.save(tpath, quality=50)
+            if tpath.endswith(".webp"):
+                # quality 80 = pillow-default
+                # quality 75 = ffmpeg-default
+                # method 0 = pillow-default, fast
+                # method 4 = ffmpeg-default
+                # method 6 = max, slow
+                im.save(tpath, quality=40, method=6)
+            else:
+                im.save(tpath, quality=40)  # default=75
 
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
@@ -231,7 +241,7 @@ class ThumbSrv(object):
         seek = "{:.0f}".format(dur / 3)
 
         scale = "scale={0}:{1}:force_original_aspect_ratio="
-        if self.args.th_nocrop:
+        if self.args.th_no_crop:
             scale += "decrease,setsar=1:1"
         else:
             scale += "increase,crop={0}:{1},setsar=1:1"
@@ -249,10 +259,23 @@ class ThumbSrv(object):
             scale,
             b"-vframes",
             b"1",
-            b"-q:v",
-            b"6",
-            fsenc(tpath),
         ]
+
+        if tpath.endswith(".jpg"):
+            cmd += [
+                b"-q:v",
+                b"6",  # default=??
+            ]
+        else:
+            cmd += [
+                b"-q:v",
+                b"50",  # default=75
+                b"-compression_level:v",
+                b"6",  # default=4, 0=fast, 6=max
+            ]
+
+        cmd += [fsenc(tpath)]
+
         p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
         p.communicate()
 
