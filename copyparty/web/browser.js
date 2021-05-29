@@ -1125,7 +1125,7 @@ document.onkeydown = function (e) {
 				sz = esc(r.sz + ''),
 				rp = esc(r.rp + ''),
 				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').slice(-1)[0] : '%',
-				links = linksplit(rp);
+				links = linksplit(r.rp + '');
 
 			if (ext.length > 8)
 				ext = '%';
@@ -1464,6 +1464,8 @@ var treectl = (function () {
 
 		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
 		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
+
+		document.title = '⇆🎉 ' + uricom_dec(document.location.pathname.slice(1, -1))[0];
 
 		filecols.set_style();
 		mukey.render();

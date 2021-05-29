@@ -358,12 +358,16 @@ function linksplit(rp) {
             link = rp.slice(0, ofs + 1);
             rp = rp.slice(ofs + 1);
         }
-        var vlink = link;
-        if (link.indexOf('/') !== -1)
-            vlink = link.slice(0, -1) + '<span>/</span>';
+        var vlink = esc(link),
+            elink = uricom_enc(link);
 
-        ret.push('<a href="' + apath + link + '">' + vlink + '</a>');
-        apath += link;
+        if (link.indexOf('/') !== -1) {
+            vlink = vlink.slice(0, -1) + '<span>/</span>';
+            elink = elink.slice(0, -3) + '/';
+        }
+
+        ret.push('<a href="' + apath + elink + '">' + vlink + '</a>');
+        apath += elink;
     }
     return ret;
 }

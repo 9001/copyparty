@@ -696,7 +696,7 @@ function up2k_init(subtle) {
 
             pvis.addfile([
                 fsearch ? esc(entry.name) : linksplit(
-                    esc(uricom_dec(entry.purl)[0] + entry.name)).join(' '),
+                    uricom_dec(entry.purl)[0] + entry.name).join(' '),
                 '📐 hash',
                 ''
             ], fobj.size);
@@ -1023,7 +1023,7 @@ function up2k_init(subtle) {
                     else {
                         smsg = 'found';
                         var hit = response.hits[0],
-                            msg = linksplit(esc(hit.rp)).join(''),
+                            msg = linksplit(hit.rp).join(''),
                             tr = unix2iso(hit.ts),
                             tu = unix2iso(t.lmod),
                             diff = parseInt(t.lmod) - parseInt(hit.ts),
@@ -1045,7 +1045,7 @@ function up2k_init(subtle) {
                 if (response.name !== t.name) {
                     // file exists; server renamed us
                     t.name = response.name;
-                    pvis.seth(t.n, 0, linksplit(esc(t.purl + t.name)).join(' '));
+                    pvis.seth(t.n, 0, linksplit(t.purl + t.name).join(' '));
                 }
 
                 var chunksize = get_chunksize(t.size),
