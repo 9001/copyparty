@@ -274,7 +274,10 @@ html.light #ggrid a.sel:hover {
 	background: #3c3c3c;
 }
 #wtico {
-	cursor: url(/.cpr/dd/1.png), pointer;
+	cursor: url(/.cpr/dd/4.png), pointer;
+	animation: cursor 500ms;
+}
+#wtico:hover {
 	animation: cursor 500ms infinite;
 }
 @keyframes cursor {
@@ -282,7 +285,7 @@ html.light #ggrid a.sel:hover {
 	30% {cursor: url(/.cpr/dd/3.png), pointer}
 	50% {cursor: url(/.cpr/dd/4.png), pointer}
 	75% {cursor: url(/.cpr/dd/5.png), pointer}
-	85% {cursor: url(/.cpr/dd/1.png), pointer}
+	85% {cursor: url(/.cpr/dd/4.png), pointer}
 }
 @keyframes spin {
 	100% {transform: rotate(360deg)}
