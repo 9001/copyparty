@@ -31,7 +31,7 @@ from .util import (
     statdir,
     s2hms,
 )
-from .mtag import MTag
+from .mtag import MTag, MParser
 
 try:
     HAVE_SQLITE3 = True
@@ -509,8 +509,6 @@ class Up2k(object):
 
     def _run_all_mtp(self):
         t0 = time.time()
-        self.mtp_audio = {}
-        self.mtp_force = {}
         self.mtp_parsers = {}
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
@@ -526,58 +524,18 @@ class Up2k(object):
 
         entags = self.entags[ptop]
 
-        audio = {}  # [r]equire [n]ot [d]ontcare
-        force = {}  # bool
-        timeout = {}  # int
         parsers = {}
         for parser in self.flags[ptop]["mtp"]:
-            orig = parser
-            tag, parser = parser.split("=", 1)
+            try:
+                parser = MParser(parser)
+            except:
+                self.log("invalid argument: " + parser, 1)
+                return
 
-            skip = False
-            for t in tag.split(","):
-                if t and t not in entags:
-                    skip = True
+            for tag in entags:
+                if tag in parser.tags:
+                    parsers[parser.tag] = parser
 
-            if skip:
-                continue
-
-            audio[tag] = "y"
-
-            while True:
-                try:
-                    bp = os.path.expanduser(parser)
-                    if os.path.exists(bp):
-                        parsers[tag] = [bp, timeout.get(tag, 30)]
-                        break
-                except:
-                    pass
-
-                try:
-                    arg, parser = parser.split(",", 1)
-                    arg = arg.lower()
-
-                    if arg.startswith("a"):
-                        audio[tag] = arg[1:]
-                        continue
-
-                    if arg == "f":
-                        force[tag] = True
-                        continue
-
-                    if arg.startswith("t"):
-                        timeout[tag] = int(arg[1:])
-                        continue
-
-                    raise Exception()
-
-                except:
-                    self.log("invalid argument: " + orig, 1)
-                    return
-
-        # todo audio/force => parser attributes
-        self.mtp_audio[ptop] = audio
-        self.mtp_force[ptop] = force
         self.mtp_parsers[ptop] = parsers
 
         q = "select count(w) from mt where k = 't:mtp'"
@@ -610,7 +568,7 @@ class Up2k(object):
                     have = cur.execute(q, (w,)).fetchall()
                     have = [x[0] for x in have]
 
-                    parsers = self._get_parsers(ptop, have)
+                    parsers = self._get_parsers(ptop, have, abspath)
                     if not parsers:
                         to_delete[w] = True
                         n_left -= 1
@@ -678,29 +636,37 @@ class Up2k(object):
             wcur.close()
             cur.close()
 
-    def _get_parsers(self, ptop, have):
+    def _get_parsers(self, ptop, have, abspath):
         try:
             all_parsers = self.mtp_parsers[ptop]
         except:
             return {}
 
-        audio = self.mtp_audio[ptop]
-        force = self.mtp_force[ptop]
         entags = self.entags[ptop]
         parsers = {}
         for k, v in all_parsers.items():
             if "ac" in entags or ".aq" in entags:
                 if "ac" in have or ".aq" in have:
                     # is audio, require non-audio?
-                    if audio[k] == "n":
+                    if v.audio == "n":
                         continue
                 # is not audio, require audio?
-                elif audio[k] == "y":
+                elif v.audio == "y":
                     continue
+
+            match = False
+            if v.ext:
+                for ext in v.ext:
+                    if abspath.lower().endswith("." + ext):
+                        match = True
+                        break
+
+            if not match:
+                continue
 
             parsers[k] = v
 
-        parsers = {k: v for k, v in parsers.items() if k in force or k not in have}
+        parsers = {k: v for k, v in parsers.items() if v.force or k not in have}
         return parsers
 
     def _start_mpool(self):
@@ -1348,7 +1314,7 @@ class Up2k(object):
             abspath = os.path.join(ptop, rd, fn)
             tags = self.mtag.get(abspath)
             ntags1 = len(tags)
-            parsers = self._get_parsers(ptop, tags)
+            parsers = self._get_parsers(ptop, tags, abspath)
             if parsers:
                 tags.update(self.mtag.get_bin(parsers, abspath))
 

@@ -31,6 +31,47 @@ HAVE_FFMPEG = have_ff("ffmpeg")
 HAVE_FFPROBE = have_ff("ffprobe")
 
 
+class MParser(object):
+    def __init__(self, cmdline):
+        self.tag, args = cmdline.split("=", 1)
+        self.tags = self.tag.split(",")
+
+        self.timeout = 30
+        self.force = False
+        self.audio = "y"
+        self.ext = []
+
+        while True:
+            try:
+                bp = os.path.expanduser(args)
+                if os.path.exists(bp):
+                    self.bin = bp
+                    return
+            except:
+                pass
+
+            arg, args = args.split(",", 1)
+            arg = arg.lower()
+
+            if arg.startswith("a"):
+                self.audio = arg[1:]  # [r]equire [n]ot [d]ontcare
+                continue
+
+            if arg == "f":
+                self.force = True
+                continue
+
+            if arg.startswith("t"):
+                self.timeout = int(arg[1:])
+                continue
+
+            if arg.startswith("e"):
+                self.ext.append(arg[1:])
+                continue
+
+            raise Exception()
+
+
 def ffprobe(abspath):
     cmd = [
         b"ffprobe",
@@ -383,10 +424,10 @@ class MTag(object):
         env["PYTHONPATH"] = pypath
 
         ret = {}
-        for tagname, (binpath, timeout) in parsers.items():
+        for tagname, mp in parsers.items():
             try:
-                cmd = [sys.executable, binpath, abspath]
-                args = {"env": env, "timeout": timeout}
+                cmd = [sys.executable, mp.bin, abspath]
+                args = {"env": env, "timeout": mp.timeout}
 
                 if WINDOWS:
                     args["creationflags"] = 0x4000
