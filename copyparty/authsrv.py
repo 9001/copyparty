@@ -475,8 +475,10 @@ class AuthSrv(object):
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
             local_only_mtp = {}
-            for a in vol.flags.get("mtp", []) + vol.flags.get("mtm", []):
-                a = a.split("=")[0]
+            tags = vol.flags.get("mtp", []) + vol.flags.get("mtm", [])
+            tags = [x.split("=")[0] for x in tags]
+            tags = [y for x in tags for y in x.split(",")]
+            for a in tags:
                 local_mtp[a] = True
                 local = True
                 for b in self.args.mtp or []:

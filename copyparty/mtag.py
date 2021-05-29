@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import os
 import sys
+import json
 import shutil
 import subprocess as sp
 
@@ -394,8 +395,16 @@ class MTag(object):
 
                 cmd = [fsenc(x) for x in cmd]
                 v = sp.check_output(cmd, **args).strip()
-                if v:
+                if not v:
+                    continue
+
+                if "," not in tagname:
                     ret[tagname] = v.decode("utf-8")
+                else:
+                    v = json.loads(v)
+                    for tag in tagname.split(","):
+                        if tag and tag in v:
+                            ret[tag] = v[tag]
             except:
                 pass
 

@@ -533,7 +533,13 @@ class Up2k(object):
         for parser in self.flags[ptop]["mtp"]:
             orig = parser
             tag, parser = parser.split("=", 1)
-            if tag not in entags:
+
+            skip = False
+            for t in tag.split(","):
+                if t and t not in entags:
+                    skip = True
+
+            if skip:
                 continue
 
             audio[tag] = "y"
@@ -683,8 +689,8 @@ class Up2k(object):
         entags = self.entags[ptop]
         parsers = {}
         for k, v in all_parsers.items():
-            if ".dur" in entags:
-                if ".dur" in have:
+            if "ac" in entags or ".aq" in entags:
+                if "ac" in have or ".aq" in have:
                     # is audio, require non-audio?
                     if audio[k] == "n":
                         continue
@@ -701,6 +707,9 @@ class Up2k(object):
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
         # both do crazy runahead so lets reinvent another wheel
         nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
+        if self.args.no_mtag_mt:
+            nw = 1
+
         if self.pending_tags is None:
             self.log("using {}x {}".format(nw, self.mtag.backend))
             self.pending_tags = []
