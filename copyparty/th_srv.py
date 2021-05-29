@@ -119,10 +119,6 @@ class ThumbSrv(object):
             t.daemon = True
             t.start()
 
-        if not HAVE_PIL:
-            msg = "need Pillow to create thumbnails so please run this:\n  {} -m pip install --user Pillow"
-            self.log(msg.format(os.path.basename(sys.executable)), c=1)
-
         if not self.args.no_vthumb and (not HAVE_FFMPEG or not HAVE_FFPROBE):
             missing = []
             if not HAVE_FFMPEG:
@@ -131,7 +127,7 @@ class ThumbSrv(object):
             if not HAVE_FFPROBE:
                 missing.append("ffprobe")
 
-            msg = "cannot create video thumbnails since some of the required programs are not available: "
+            msg = "cannot create video thumbnails because some of the required programs are not available: "
             msg += ", ".join(missing)
             self.log(msg, c=1)
 
@@ -299,7 +295,7 @@ class ThumbSrv(object):
 
         cmd += [fsenc(tpath)]
 
-        mchkcmd(*cmd)
+        mchkcmd(cmd)
 
     def poke(self, tdir):
         if not self.poke_cd.poke(tdir):

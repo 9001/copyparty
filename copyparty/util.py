@@ -985,7 +985,7 @@ def chkcmd(*argv):
     return sout, serr
 
 
-def mchkcmd(*argv, timeout=10):
+def mchkcmd(argv, timeout=10):
     if PY2:
         with open(os.devnull, "wb") as f:
             rv = sp.call(argv, stdout=f, stderr=f)

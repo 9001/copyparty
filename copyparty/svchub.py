@@ -54,8 +54,10 @@ class SvcHub(object):
 
                 self.thumbsrv = ThumbSrv(self, auth.vfs.all_vols)
             else:
-                msg = "need Pillow to create thumbnails; for example:\n  {} -m pip install --user Pillow"
-                self.log("thumb", msg.format(os.path.basename(sys.executable)), c=3)
+                msg = "need Pillow to create thumbnails; for example:\n{}{} -m pip install --user Pillow\n"
+                self.log(
+                    "thumb", msg.format(" " * 37, os.path.basename(sys.executable)), c=3
+                )
 
         # decide which worker impl to use
         if self.check_mp_enable():

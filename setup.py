@@ -5,22 +5,7 @@ from __future__ import print_function
 import os
 import sys
 from shutil import rmtree
-
-setuptools_available = True
-try:
-    # need setuptools to build wheel
-    from setuptools import setup, Command, find_packages
-
-except ImportError:
-    # works in a pinch
-    setuptools_available = False
-    from distutils.core import setup, Command
-
-from distutils.spawn import spawn
-
-if "bdist_wheel" in sys.argv and not setuptools_available:
-    print("cannot build wheel without setuptools")
-    sys.exit(1)
+from setuptools import setup, Command, find_packages
 
 
 NAME = "copyparty"
@@ -100,9 +85,8 @@ args = {
     "author_email": "copyparty@ocv.me",
     "url": "https://github.com/9001/copyparty",
     "license": "MIT",
-    "data_files": data_files,
     "classifiers": [
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
@@ -120,35 +104,16 @@ args = {
         "Environment :: Console",
         "Environment :: No Input/Output (Daemon)",
         "Topic :: Communications :: File Sharing",
+        "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
     ],
+    "include_package_data": True,
+    "data_files": data_files,
+    "packages": find_packages(),
+    "install_requires": ["jinja2"],
+    "extras_require": {"thumbnails": ["Pillow"], "audiotags": ["mutagen"]},
+    "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
+    "scripts": ["bin/copyparty-fuse.py"],
     "cmdclass": {"clean2": clean2},
 }
-
-
-if setuptools_available:
-    args.update(
-        {
-            "packages": find_packages(),
-            "install_requires": ["jinja2"],
-            "extras_require": {"thumbnails": ["Pillow"]},
-            "include_package_data": True,
-            "entry_points": {
-                "console_scripts": ["copyparty = copyparty.__main__:main"]
-            },
-            "scripts": ["bin/copyparty-fuse.py"],
-        }
-    )
-else:
-    args.update(
-        {
-            "packages": ["copyparty", "copyparty.stolen"],
-            "scripts": ["bin/copyparty-fuse.py"],
-        }
-    )
-
-
-# import pprint
-# pprint.PrettyPrinter().pprint(args)
-# sys.exit(0)
 
 setup(**args)

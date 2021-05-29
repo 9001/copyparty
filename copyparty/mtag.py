@@ -243,8 +243,10 @@ class MTag(object):
                 self.log(msg, c=1)
 
         if not self.usable:
-            msg = "need mutagen{} to read media tags so please run this:\n  {} -m pip install --user mutagen"
-            self.log(msg.format(or_ffprobe, os.path.basename(sys.executable)), c=1)
+            msg = "need mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"
+            self.log(
+                msg.format(or_ffprobe, " " * 37, os.path.basename(sys.executable)), c=1
+            )
             return
 
         # https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html

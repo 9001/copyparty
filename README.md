@@ -172,7 +172,7 @@ click `[-]` and `[+]` to adjust the size, and the `[a]` toggles if the tree shou
 
 ## thumbnails
 
-![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/119577189-6d490200-bdba-11eb-81a6-7b2ef7bc1128.png)
+![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/120070302-10836b00-c08a-11eb-8eb4-82004a34c342.png)
 
 it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how destructive your users are
 

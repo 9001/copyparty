@@ -199,13 +199,20 @@ html.light #ggrid a.sel {
 #ggrid a.sel:hover,
 html.light #ggrid a.sel:hover {
 	color: #fff;
-	background: #a36;
+	background: #d39;
 	border-color: #d48;
 	text-shadow: 1px 1px 0 #804;
 }
-#ggrid a.sel {
-	box-shadow: 0 .1em .7em #b36;
+#ggrid a.sel,
+html.light #ggrid a.sel {
+	border-top: 1px solid #d48;
+	box-shadow: 0 .1em 1.2em #b36;
 	transition: all 0.2s cubic-bezier(.2, 2.2, .5, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
+}
+#ggrid a.sel img {
+	opacity: .7;
+	box-shadow: 0 0 1em #b36;
+	filter: contrast(130%) brightness(107%);
 }
 #files tr.sel a {
 	color: #fff;
@@ -772,7 +779,7 @@ html.light #ghead {
 #ggrid a img {
 	border-radius: .2em;
 	max-width: var(--grid-sz);
-	max-height: var(--grid-sz);
+	max-height: calc(var(--grid-sz)/1.25);
 	margin: 0 auto;
 	display: block;
 }
