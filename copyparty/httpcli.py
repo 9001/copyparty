@@ -22,6 +22,10 @@ if not PY2:
     unicode = str
 
 
+NO_CACHE = {"Cache-Control": "no-cache"}
+NO_STORE = {"Cache-Control": "no-store; max-age=0"}
+
+
 class HttpCli(object):
     """
     Spawned by HttpConn to process one http transaction
@@ -957,14 +961,11 @@ class HttpCli(object):
         return True
 
     def _chk_lastmod(self, file_ts):
-        date_fmt = "%a, %d %b %Y %H:%M:%S GMT"
-        file_dt = datetime.utcfromtimestamp(file_ts)
-        file_lastmod = file_dt.strftime(date_fmt)
-
+        file_lastmod = http_ts(file_ts)
         cli_lastmod = self.headers.get("if-modified-since")
         if cli_lastmod:
             try:
-                cli_dt = time.strptime(cli_lastmod, date_fmt)
+                cli_dt = time.strptime(cli_lastmod, HTTP_TS_FMT)
                 cli_ts = calendar.timegm(cli_dt)
                 return file_lastmod, int(file_ts) > int(cli_ts)
             except Exception as ex:
@@ -1111,7 +1112,7 @@ class HttpCli(object):
         # send reply
 
         if not is_compressed:
-            self.out_headers["Cache-Control"] = "no-cache"
+            self.out_headers.update(NO_CACHE)
 
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(
@@ -1257,7 +1258,7 @@ class HttpCli(object):
         file_ts = max(ts_md, ts_html)
         file_lastmod, do_send = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
-        self.out_headers["Cache-Control"] = "no-cache"
+        self.out_headers.update(NO_CACHE)
         status = 200 if do_send else 304
 
         boundary = "\roll\tide"
@@ -1304,7 +1305,7 @@ class HttpCli(object):
         rvol = [x + "/" if x else x for x in self.rvol]
         wvol = [x + "/" if x else x for x in self.wvol]
         html = self.j2("splash", this=self, rvol=rvol, wvol=wvol, url_suf=suf)
-        self.reply(html.encode("utf-8"))
+        self.reply(html.encode("utf-8"), headers=NO_STORE)
         return True
 
     def tx_tree(self):
@@ -1482,14 +1483,18 @@ class HttpCli(object):
         if not self.readable:
             if is_ls:
                 ret = json.dumps(ls_ret)
-                self.reply(ret.encode("utf-8", "replace"), mime="application/json")
+                self.reply(
+                    ret.encode("utf-8", "replace"),
+                    mime="application/json",
+                    headers=NO_STORE,
+                )
                 return True
 
             if not stat.S_ISDIR(st.st_mode):
                 raise Pebkac(404)
 
             html = self.j2(tpl, **j2a)
-            self.reply(html.encode("utf-8", "replace"))
+            self.reply(html.encode("utf-8", "replace"), headers=NO_STORE)
             return True
 
         for k in ["zip", "tar"]:
@@ -1627,7 +1632,11 @@ class HttpCli(object):
             ls_ret["files"] = files
             ls_ret["taglist"] = taglist
             ret = json.dumps(ls_ret)
-            self.reply(ret.encode("utf-8", "replace"), mime="application/json")
+            self.reply(
+                ret.encode("utf-8", "replace"),
+                mime="application/json",
+                headers=NO_STORE,
+            )
             return True
 
         j2a["files"] = dirs + files
@@ -1637,5 +1646,5 @@ class HttpCli(object):
             j2a["tag_order"] = json.dumps(vn.flags["mte"].split(","))
 
         html = self.j2(tpl, **j2a)
-        self.reply(html.encode("utf-8", "replace"))
+        self.reply(html.encode("utf-8", "replace"), headers=NO_STORE)
         return True

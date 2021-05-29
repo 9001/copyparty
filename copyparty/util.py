@@ -15,6 +15,7 @@ import threading
 import mimetypes
 import contextlib
 import subprocess as sp  # nosec
+from datetime import datetime
 
 from .__init__ import PY2, WINDOWS, ANYWIN
 from .stolen import surrogateescape
@@ -45,6 +46,9 @@ surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
 if WINDOWS and PY2:
     FS_ENCODING = "utf-8"
+
+
+HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
 HTTPCODE = {
@@ -650,6 +654,11 @@ def u8safe(txt):
 
 def exclude_dotfiles(filepaths):
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
+
+
+def http_ts(ts):
+    file_dt = datetime.utcfromtimestamp(ts)
+    return file_dt.strftime(HTTP_TS_FMT)
 
 
 def html_escape(s, quote=False, crlf=False):
