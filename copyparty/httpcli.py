@@ -1117,7 +1117,7 @@ class HttpCli(object):
         self.send_headers(
             length=upper - lower,
             status=status,
-            mime=guess_mime(req_path)[0],
+            mime=guess_mime(req_path),
         )
 
         logmsg += unicode(status) + logtail

@@ -75,6 +75,13 @@ IMPLICATIONS = [
 ]
 
 
+MIMES = {
+    "md": "text/plain; charset=UTF-8",
+    "opus": "audio/ogg; codecs=opus",
+    "webp": "image/webp",
+}
+
+
 REKOBO_KEY = {
     v: ln.split(" ", 1)[0]
     for ln in """
@@ -945,13 +952,12 @@ def unescape_cookie(orig):
 
 
 def guess_mime(url, fallback="application/octet-stream"):
-    if url.endswith(".md"):
-        return ["text/plain; charset=UTF-8"]
+    try:
+        _, ext = url.rsplit(".", 1)
+    except:
+        return fallback
 
-    if url.endswith(".webp"):
-        return ["image/webp"]
-
-    return mimetypes.guess_type(url) or fallback
+    return MIMES.get(ext) or mimetypes.guess_type(url)[0] or fallback
 
 
 def runcmd(*argv):
