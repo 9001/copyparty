@@ -428,7 +428,7 @@ class HttpCli(object):
         fn = "put-{:.6f}-{}.bin".format(time.time(), addr)
         path = os.path.join(fdir, fn)
 
-        with open(path, "wb", 512 * 1024) as f:
+        with open(fsenc(path), "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
         self.conn.hsrv.broker.put(
@@ -548,9 +548,9 @@ class HttpCli(object):
         if sub:
             try:
                 dst = os.path.join(vfs.realpath, rem)
-                os.makedirs(dst)
+                os.makedirs(fsenc(dst))
             except:
-                if not os.path.isdir(dst):
+                if not os.path.isdir(fsenc(dst)):
                     raise Pebkac(400, "some file got your folder name")
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
@@ -638,7 +638,7 @@ class HttpCli(object):
 
         reader = read_socket(self.sr, remains)
 
-        with open(path, "rb+", 512 * 1024) as f:
+        with open(fsenc(path), "rb+", 512 * 1024) as f:
             f.seek(cstart[0])
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
@@ -681,7 +681,7 @@ class HttpCli(object):
             times = (int(time.time()), int(lastmod))
             self.log("no more chunks, setting times {}".format(times))
             try:
-                os.utime(path, times)
+                os.utime(fsenc(path), times)
             except:
                 self.log("failed to utime ({}, {})".format(path, times))
 
@@ -932,16 +932,16 @@ class HttpCli(object):
             mdir, mfile = os.path.split(fp)
             mfile2 = "{}.{:.3f}.md".format(mfile[:-3], srv_lastmod)
             try:
-                os.mkdir(os.path.join(mdir, ".hist"))
+                os.mkdir(fsenc(os.path.join(mdir, ".hist")))
             except:
                 pass
-            os.rename(fp, os.path.join(mdir, ".hist", mfile2))
+            os.rename(fsenc(fp), fsenc(os.path.join(mdir, ".hist", mfile2)))
 
         p_field, _, p_data = next(self.parser.gen)
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
 
-        with open(fp, "wb", 512 * 1024) as f:
+        with open(fsenc(fp), "wb", 512 * 1024) as f:
             sz, sha512, _ = hashcopy(self.conn, p_data, f)
 
         new_lastmod = os.stat(fsenc(fp)).st_mtime
@@ -1269,7 +1269,7 @@ class HttpCli(object):
             "md_chk_rate": self.args.mcr,
             "md": boundary,
         }
-        html = template.render(**targs).encode("utf-8")
+        html = template.render(**targs).encode("utf-8", "replace")
         html = html.split(boundary.encode("utf-8"))
         if len(html) != 2:
             raise Exception("boundary appears in " + html_path)
@@ -1422,7 +1422,7 @@ class HttpCli(object):
                     )
                     srv_info.append(humansize(bfree.value) + " free")
                 else:
-                    sv = os.statvfs(abspath)
+                    sv = os.statvfs(fsenc(abspath))
                     free = humansize(sv.f_frsize * sv.f_bfree, True)
                     total = humansize(sv.f_frsize * sv.f_blocks, True)
 

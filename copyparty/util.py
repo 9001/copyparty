@@ -271,7 +271,7 @@ def ren_open(fname, *args, **kwargs):
             else:
                 fpath = fname
 
-            if suffix and os.path.exists(fpath):
+            if suffix and os.path.exists(fsenc(fpath)):
                 fpath += suffix
                 fname += suffix
                 ext += suffix
@@ -751,6 +751,8 @@ def s3dec(rd, fn):
 
 
 def atomic_move(src, dst):
+    src = fsenc(src)
+    dst = fsenc(dst)
     if not PY2:
         os.replace(src, dst)
     else:

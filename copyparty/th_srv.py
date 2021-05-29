@@ -228,7 +228,7 @@ class ThumbSrv(object):
             self.nthr -= 1
 
     def conv_pil(self, abspath, tpath):
-        with Image.open(abspath) as im:
+        with Image.open(fsenc(abspath)) as im:
             crop = not self.args.th_no_crop
             res2 = self.res
             if crop:

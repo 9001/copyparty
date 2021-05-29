@@ -918,7 +918,7 @@ class Up2k(object):
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
-                    dp_abs = os.path.join(cj["ptop"], dp_dir, dp_fn).replace("\\", "/")
+                    dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
                     # relying on path.exists to return false on broken symlinks
                     if os.path.exists(fsenc(dp_abs)):
                         job = {
@@ -944,7 +944,7 @@ class Up2k(object):
                     for fn in names:
                         path = os.path.join(job["ptop"], job["prel"], fn)
                         try:
-                            if os.path.getsize(path) > 0:
+                            if os.path.getsize(fsenc(path)) > 0:
                                 # upload completed or both present
                                 break
                         except:
@@ -1068,6 +1068,9 @@ class Up2k(object):
                 raise Pebkac(400, "unknown wark")
 
             if chash not in job["need"]:
+                msg = "chash = {} , need:\n".format(chash)
+                msg += "\n".join(job["need"])
+                self.log(msg)
                 raise Pebkac(400, "already got that but thanks??")
 
             nchunk = [n for n, v in enumerate(job["hash"]) if v == chash]
@@ -1173,10 +1176,10 @@ class Up2k(object):
         return wark
 
     def _hashlist_from_file(self, path):
-        fsz = os.path.getsize(path)
+        fsz = os.path.getsize(fsenc(path))
         csz = up2k_chunksize(fsz)
         ret = []
-        with open(path, "rb", 512 * 1024) as f:
+        with open(fsenc(path), "rb", 512 * 1024) as f:
             while fsz > 0:
                 self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
                 hashobj = hashlib.sha512()
@@ -1267,13 +1270,13 @@ class Up2k(object):
                 try:
                     # remove the filename reservation
                     path = os.path.join(job["ptop"], job["prel"], job["name"])
-                    if os.path.getsize(path) == 0:
-                        os.unlink(path)
+                    if os.path.getsize(fsenc(path)) == 0:
+                        os.unlink(fsenc(path))
 
                     if len(job["hash"]) == len(job["need"]):
                         # PARTIAL is empty, delete that too
                         path = os.path.join(job["ptop"], job["prel"], job["tnam"])
-                        os.unlink(path)
+                        os.unlink(fsenc(path))
                 except:
                     pass
 
@@ -1281,8 +1284,8 @@ class Up2k(object):
         if not reg:
             if k not in prev or prev[k] is not None:
                 prev[k] = None
-                if os.path.exists(path):
-                    os.unlink(path)
+                if os.path.exists(fsenc(path)):
+                    os.unlink(fsenc(path))
             return
 
         newest = max(x["poke"] for _, x in reg.items()) if reg else 0

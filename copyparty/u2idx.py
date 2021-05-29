@@ -163,7 +163,7 @@ class U2idx(object):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
-                rp = os.path.join(vtop, rd, fn).replace("\\", "/")
+                rp = "/".join([vtop, rd, fn])
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp, "w": w[:16]})
 
             for hit in sret:

@@ -392,7 +392,7 @@ class MTag(object):
         import mutagen
 
         try:
-            md = mutagen.File(abspath, easy=True)
+            md = mutagen.File(fsenc(abspath), easy=True)
             x = md.info.length
         except Exception as ex:
             return {}
@@ -403,7 +403,7 @@ class MTag(object):
             try:
                 q = int(md.info.bitrate / 1024)
             except:
-                q = int((os.path.getsize(abspath) / dur) / 128)
+                q = int((os.path.getsize(fsenc(abspath)) / dur) / 128)
 
             ret[".dur"] = [0, dur]
             ret[".q"] = [0, q]
