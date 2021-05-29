@@ -15,32 +15,38 @@ from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 if not PY2:
     unicode = str
 
+
+HAVE_PIL = False
+HAVE_HEIF = False
+HAVE_AVIF = False
+HAVE_WEBP = False
+
 try:
-    HAVE_PIL = True
     from PIL import Image, ImageOps
 
-    try:
-        HAVE_HEIF = True
-        from pyheif_pillow_opener import register_heif_opener
-
-        register_heif_opener()
-    except:
-        HAVE_HEIF = False
-
-    try:
-        HAVE_AVIF = True
-        import pillow_avif
-    except:
-        HAVE_AVIF = False
-
+    HAVE_PIL = True
     try:
         Image.new("RGB", (2, 2)).save(BytesIO(), format="webp")
         HAVE_WEBP = True
     except:
-        HAVE_WEBP = False
-except:
-    HAVE_PIL = False
+        pass
 
+    try:
+        from pyheif_pillow_opener import register_heif_opener
+
+        register_heif_opener()
+        HAVE_HEIF = True
+    except:
+        pass
+
+    try:
+        import pillow_avif
+
+        HAVE_AVIF = True
+    except:
+        pass
+except:
+    pass
 
 # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 # ffmpeg -formats
