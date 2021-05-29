@@ -985,6 +985,17 @@ def chkcmd(*argv):
     return sout, serr
 
 
+def mchkcmd(*argv, timeout=10):
+    if PY2:
+        with open(os.devnull, "wb") as f:
+            rv = sp.call(argv, stdout=f, stderr=f)
+    else:
+        rv = sp.call(argv, stdout=sp.DEVNULL, stderr=sp.DEVNULL, timeout=timeout)
+
+    if rv:
+        raise sp.CalledProcessError(rv, (argv[0], b"...", argv[-1]))
+
+
 def gzip_orig_sz(fn):
     with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)

@@ -8,7 +8,7 @@ import threading
 import subprocess as sp
 
 from .__init__ import PY2
-from .util import fsenc, Queue, Cooldown, BytesIO
+from .util import fsenc, mchkcmd, Queue, Cooldown, BytesIO
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
 
@@ -299,8 +299,7 @@ class ThumbSrv(object):
 
         cmd += [fsenc(tpath)]
 
-        p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-        p.communicate()
+        mchkcmd(*cmd)
 
     def poke(self, tdir):
         if not self.poke_cd.poke(tdir):
