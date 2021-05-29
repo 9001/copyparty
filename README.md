@@ -327,6 +327,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 *but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` only do non-audio files, or `ad` do all files (d as in dontcare) 
 
 * `-mtp ext=an,~/bin/file-ext.py` runs `~/bin/file-ext.py` to get the `ext` tag only if file is not audio (`an`)
+* `-mtp arch,built,ver,orig=an,~/bin/mtag/exe.py` runs `~/bin/mtag/exe.py` to get properties about windows-binaries only if file is not audio (`an`)
 
 
 ## complete examples
