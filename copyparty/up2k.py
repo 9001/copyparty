@@ -654,15 +654,15 @@ class Up2k(object):
                 elif v.audio == "y":
                     continue
 
-            match = False
             if v.ext:
+                match = False
                 for ext in v.ext:
                     if abspath.lower().endswith("." + ext):
                         match = True
                         break
 
-            if not match:
-                continue
+                if not match:
+                    continue
 
             parsers[k] = v
 

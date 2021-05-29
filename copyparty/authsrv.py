@@ -507,8 +507,10 @@ class AuthSrv(object):
                     self.log(m.format(vol.vpath, mtp), 1)
                     errors = True
 
-        for mtp in self.args.mtp or []:
-            mtp = mtp.split("=")[0]
+        tags = self.args.mtp or []
+        tags = [x.split("=")[0] for x in tags]
+        tags = [y for x in tags for y in x.split(",")]
+        for mtp in tags:
             if mtp not in all_mte:
                 m = 'metadata tag "{}" is defined by "-mtm" or "-mtp", but is not used by "-mte" (or by any "cmte" volume-flag)'
                 self.log(m.format(mtp), 1)
