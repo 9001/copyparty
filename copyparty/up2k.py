@@ -240,9 +240,14 @@ class Up2k(object):
                 with gzip.GzipFile(path, "rb") as f:
                     j = f.read().decode("utf-8")
 
-                reg = json.loads(j)
-                for _, job in reg.items():
-                    job["poke"] = time.time()
+                reg2 = json.loads(j)
+                for k, job in reg2.items():
+                    path = os.path.join(job["ptop"], job["prel"], job["name"])
+                    if os.path.exists(fsenc(path)):
+                        reg[k] = job
+                        job["poke"] = time.time()
+                    else:
+                        self.log("ign deleted file in snap: [{}]".format(path))
 
                 m = "loaded snap {} |{}|".format(path, len(reg.keys()))
                 m = [m] + self._vis_reg_progress(reg)
