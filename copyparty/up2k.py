@@ -52,7 +52,6 @@ class Up2k(object):
         self.hub = hub
         self.args = hub.args
         self.log_func = hub.log
-        self.all_vols = all_vols
 
         # config
         self.salt = self.args.salt
@@ -61,12 +60,14 @@ class Up2k(object):
         self.mutex = threading.Lock()
         self.hashq = Queue()
         self.tagq = Queue()
+        self.volstate = {}
         self.registry = {}
         self.entags = {}
         self.flags = {}
         self.cur = {}
         self.mtag = None
         self.pending_tags = None
+        self.mtp_parsers = {}
 
         self.mem_cur = None
         self.sqlite_ver = None
@@ -92,7 +93,15 @@ class Up2k(object):
         if not HAVE_SQLITE3:
             self.log("could not initialize sqlite3, will use in-memory registry only")
 
-        have_e2d = self.init_indexes()
+        if self.args.no_fastboot:
+            self.deferred_init(all_vols)
+        else:
+            t = threading.Thread(target=self.deferred_init, args=(all_vols,))
+            t.daemon = True
+            t.start()
+
+    def deferred_init(self, all_vols):
+        have_e2d = self.init_indexes(all_vols)
 
         if have_e2d:
             thr = threading.Thread(target=self._snapshot)
@@ -114,6 +123,19 @@ class Up2k(object):
 
     def log(self, msg, c=0):
         self.log_func("up2k", msg + "\033[K", c)
+
+    def get_volstate(self):
+        return json.dumps(self.volstate, indent=4)
+
+    def rescan(self, all_vols, scan_vols):
+        if hasattr(self, "pp"):
+            return "cannot initiate; scan is already in progress"
+
+        args = (all_vols, scan_vols)
+        t = threading.Thread(target=self.init_indexes, args=args)
+        t.daemon = True
+        t.start()
+        return None
 
     def _vis_job_progress(self, job):
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
@@ -137,9 +159,9 @@ class Up2k(object):
 
         return True, ret
 
-    def init_indexes(self):
+    def init_indexes(self, all_vols, scan_vols=[]):
         self.pp = ProgressPrinter()
-        vols = self.all_vols.values()
+        vols = all_vols.values()
         t0 = time.time()
         have_e2d = False
 
@@ -159,24 +181,32 @@ class Up2k(object):
         for vol in vols:
             try:
                 os.listdir(vol.realpath)
-                live_vols.append(vol)
+                if not self.register_vpath(vol.realpath, vol.flags):
+                    raise Exception()
+
+                if vol.vpath in scan_vols or not scan_vols:
+                    live_vols.append(vol)
+
+                if vol.vpath not in self.volstate:
+                    self.volstate[vol.vpath] = "OFFLINE (not initialized)"
             except:
-                self.log("cannot access " + vol.realpath, c=1)
+                # self.log("db not enabled for {}".format(m, vol.realpath))
+                pass
 
         vols = live_vols
+        need_vac = {}
 
         need_mtag = False
         for vol in vols:
             if "e2t" in vol.flags:
                 need_mtag = True
 
-        if need_mtag:
+        if need_mtag and not self.mtag:
             self.mtag = MTag(self.log_func, self.args)
             if not self.mtag.usable:
                 self.mtag = None
 
-        # e2ds(a) volumes first,
-        # also covers tags where e2ts is set
+        # e2ds(a) volumes first
         for vol in vols:
             en = {}
             if "mte" in vol.flags:
@@ -188,26 +218,45 @@ class Up2k(object):
                 have_e2d = True
 
             if "e2ds" in vol.flags:
-                r = self._build_file_index(vol, vols)
-                if not r:
-                    needed_mutagen = True
+                self.volstate[vol.vpath] = "busy (hashing files)"
+                _, vac = self._build_file_index(vol, list(all_vols.values()))
+                if vac:
+                    need_vac[vol] = True
+
+            if "e2ts" not in vol.flags:
+                m = "online, idle"
+            else:
+                m = "online (tags pending)"
+
+            self.volstate[vol.vpath] = m
 
         # open the rest + do any e2ts(a)
         needed_mutagen = False
         for vol in vols:
-            r = self.register_vpath(vol.realpath, vol.flags)
-            if not r or "e2ts" not in vol.flags:
+            if "e2ts" not in vol.flags:
                 continue
 
-            cur, db_path, sz0 = r
-            n_add, n_rm, success = self._build_tags_index(vol.realpath)
+            m = "online (reading tags)"
+            self.volstate[vol.vpath] = m
+            self.log("{} [{}]".format(m, vol.realpath))
+
+            nadd, nrm, success = self._build_tags_index(vol)
             if not success:
                 needed_mutagen = True
 
-            if n_add or n_rm:
-                self.vac(cur, db_path, n_add, n_rm, sz0)
+            if nadd or nrm:
+                need_vac[vol] = True
+
+            self.volstate[vol.vpath] = "online (mtp soon)"
+
+        for vol in need_vac:
+            cur, _ = self.register_vpath(vol.realpath, vol.flags)
+            with self.mutex:
+                cur.connection.commit()
+                cur.execute("vacuum")
 
         self.pp.end = True
+
         msg = "{} volumes in {:.2f} sec"
         self.log(msg.format(len(vols), time.time() - t0))
 
@@ -215,110 +264,104 @@ class Up2k(object):
             msg = "could not read tags because no backends are available (mutagen or ffprobe)"
             self.log(msg, c=1)
 
+        thr = None
+        if self.mtag:
+            m = "online (running mtp)"
+            if scan_vols:
+                thr = threading.Thread(target=self._run_all_mtp)
+                thr.daemon = True
+        else:
+            del self.pp
+            m = "online, idle"
+
+        for vol in vols:
+            self.volstate[vol.vpath] = m
+
+        if thr:
+            thr.start()
+
         return have_e2d
 
     def register_vpath(self, ptop, flags):
-        with self.mutex:
-            if ptop in self.registry:
-                return None
+        db_path = os.path.join(ptop, ".hist", "up2k.db")
+        if ptop in self.registry:
+            return [self.cur[ptop], db_path]
 
-            _, flags = self._expr_idx_filter(flags)
+        _, flags = self._expr_idx_filter(flags)
 
-            ft = "\033[0;32m{}{:.0}"
-            ff = "\033[0;35m{}{:.0}"
-            fv = "\033[0;36m{}:\033[1;30m{}"
-            a = [
-                (ft if v is True else ff if v is False else fv).format(k, str(v))
-                for k, v in flags.items()
-            ]
-            if a:
-                self.log(" ".join(sorted(a)) + "\033[0m")
+        ft = "\033[0;32m{}{:.0}"
+        ff = "\033[0;35m{}{:.0}"
+        fv = "\033[0;36m{}:\033[1;30m{}"
+        a = [
+            (ft if v is True else ff if v is False else fv).format(k, str(v))
+            for k, v in flags.items()
+        ]
+        if a:
+            self.log(" ".join(sorted(a)) + "\033[0m")
 
-            reg = {}
-            path = os.path.join(ptop, ".hist", "up2k.snap")
-            if "e2d" in flags and os.path.exists(path):
-                with gzip.GzipFile(path, "rb") as f:
-                    j = f.read().decode("utf-8")
+        reg = {}
+        path = os.path.join(ptop, ".hist", "up2k.snap")
+        if "e2d" in flags and os.path.exists(path):
+            with gzip.GzipFile(path, "rb") as f:
+                j = f.read().decode("utf-8")
 
-                reg2 = json.loads(j)
-                for k, job in reg2.items():
-                    path = os.path.join(job["ptop"], job["prel"], job["name"])
-                    if os.path.exists(fsenc(path)):
-                        reg[k] = job
-                        job["poke"] = time.time()
-                    else:
-                        self.log("ign deleted file in snap: [{}]".format(path))
+            reg2 = json.loads(j)
+            for k, job in reg2.items():
+                path = os.path.join(job["ptop"], job["prel"], job["name"])
+                if os.path.exists(fsenc(path)):
+                    reg[k] = job
+                    job["poke"] = time.time()
+                else:
+                    self.log("ign deleted file in snap: [{}]".format(path))
 
-                m = "loaded snap {} |{}|".format(path, len(reg.keys()))
-                m = [m] + self._vis_reg_progress(reg)
-                self.log("\n".join(m))
+            m = "loaded snap {} |{}|".format(path, len(reg.keys()))
+            m = [m] + self._vis_reg_progress(reg)
+            self.log("\n".join(m))
 
-            self.flags[ptop] = flags
-            self.registry[ptop] = reg
-            if not HAVE_SQLITE3 or "e2d" not in flags or "d2d" in flags:
-                return None
-
-            try:
-                os.mkdir(os.path.join(ptop, ".hist"))
-            except:
-                pass
-
-            db_path = os.path.join(ptop, ".hist", "up2k.db")
-            if ptop in self.cur:
-                return None
-
-            try:
-                sz0 = 0
-                if os.path.exists(db_path):
-                    sz0 = os.path.getsize(db_path) // 1024
-
-                cur = self._open_db(db_path)
-                self.cur[ptop] = cur
-                return [cur, db_path, sz0]
-            except:
-                msg = "cannot use database at [{}]:\n{}"
-                self.log(msg.format(ptop, traceback.format_exc()))
-
+        self.flags[ptop] = flags
+        self.registry[ptop] = reg
+        if not HAVE_SQLITE3 or "e2d" not in flags or "d2d" in flags:
             return None
+
+        try:
+            os.mkdir(os.path.join(ptop, ".hist"))
+        except:
+            pass
+
+        try:
+            cur = self._open_db(db_path)
+            self.cur[ptop] = cur
+            return [cur, db_path]
+        except:
+            msg = "cannot use database at [{}]:\n{}"
+            self.log(msg.format(ptop, traceback.format_exc()))
+
+        return None
 
     def _build_file_index(self, vol, all_vols):
         do_vac = False
         top = vol.realpath
-        reg = self.register_vpath(top, vol.flags)
-        if not reg:
-            return
+        with self.mutex:
+            cur, _ = self.register_vpath(top, vol.flags)
 
-        _, db_path, sz0 = reg
-        dbw = [reg[0], 0, time.time()]
-        self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
+            dbw = [cur, 0, time.time()]
+            self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
 
-        excl = [
-            vol.realpath + "/" + d.vpath[len(vol.vpath) :].lstrip("/")
-            for d in all_vols
-            if d != vol and (d.vpath.startswith(vol.vpath + "/") or not vol.vpath)
-        ]
-        n_add = self._build_dir(dbw, top, set(excl), top)
-        n_rm = self._drop_lost(dbw[0], top)
-        if dbw[1]:
-            self.log("commit {} new files".format(dbw[1]))
-            dbw[0].connection.commit()
+            excl = [
+                vol.realpath + "/" + d.vpath[len(vol.vpath) :].lstrip("/")
+                for d in all_vols
+                if d != vol and (d.vpath.startswith(vol.vpath + "/") or not vol.vpath)
+            ]
+            if WINDOWS:
+                excl = [x.replace("/", "\\") for x in excl]
 
-        n_add, n_rm, success = self._build_tags_index(vol.realpath)
+            n_add = self._build_dir(dbw, top, set(excl), top)
+            n_rm = self._drop_lost(dbw[0], top)
+            if dbw[1]:
+                self.log("commit {} new files".format(dbw[1]))
+                dbw[0].connection.commit()
 
-        dbw[0].connection.commit()
-        if n_add or n_rm or do_vac:
-            self.vac(dbw[0], db_path, n_add, n_rm, sz0)
-
-        return success
-
-    def vac(self, cur, db_path, n_add, n_rm, sz0):
-        sz1 = os.path.getsize(db_path) // 1024
-        cur.execute("vacuum")
-        sz2 = os.path.getsize(db_path) // 1024
-        msg = "{} new, {} del, {} kB vacced, {} kB gain, {} kB now".format(
-            n_add, n_rm, sz1 - sz2, sz2 - sz0, sz2
-        )
-        self.log(msg)
+            return True, n_add or n_rm or do_vac
 
     def _build_dir(self, dbw, top, excl, cdir):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
@@ -413,45 +456,53 @@ class Up2k(object):
 
         return len(rm)
 
-    def _build_tags_index(self, ptop):
-        entags = self.entags[ptop]
-        flags = self.flags[ptop]
-        cur = self.cur[ptop]
+    def _build_tags_index(self, vol):
+        ptop = vol.realpath
+        with self.mutex:
+            _, db_path = self.register_vpath(ptop, vol.flags)
+            entags = self.entags[ptop]
+            flags = self.flags[ptop]
+            cur = self.cur[ptop]
+
         n_add = 0
         n_rm = 0
         n_buf = 0
         last_write = time.time()
 
         if "e2tsr" in flags:
-            n_rm = cur.execute("select count(w) from mt").fetchone()[0]
-            if n_rm:
-                self.log("discarding {} media tags for a full rescan".format(n_rm))
-                cur.execute("delete from mt")
-            else:
-                self.log("volume has e2tsr but there are no media tags to discard")
+            with self.mutex:
+                n_rm = cur.execute("select count(w) from mt").fetchone()[0]
+                if n_rm:
+                    self.log("discarding {} media tags for a full rescan".format(n_rm))
+                    cur.execute("delete from mt")
 
         # integrity: drop tags for tracks that were deleted
         if "e2t" in flags:
-            drops = []
-            c2 = cur.connection.cursor()
-            up_q = "select w from up where substr(w,1,16) = ?"
-            for (w,) in cur.execute("select w from mt"):
-                if not c2.execute(up_q, (w,)).fetchone():
-                    drops.append(w[:16])
-            c2.close()
+            with self.mutex:
+                drops = []
+                c2 = cur.connection.cursor()
+                up_q = "select w from up where substr(w,1,16) = ?"
+                for (w,) in cur.execute("select w from mt"):
+                    if not c2.execute(up_q, (w,)).fetchone():
+                        drops.append(w[:16])
+                c2.close()
 
-            if drops:
-                msg = "discarding media tags for {} deleted files"
-                self.log(msg.format(len(drops)))
-                n_rm += len(drops)
-                for w in drops:
-                    cur.execute("delete from mt where w = ?", (w,))
+                if drops:
+                    msg = "discarding media tags for {} deleted files"
+                    self.log(msg.format(len(drops)))
+                    n_rm += len(drops)
+                    for w in drops:
+                        cur.execute("delete from mt where w = ?", (w,))
 
         # bail if a volume flag disables indexing
         if "d2t" in flags or "d2d" in flags:
             return n_add, n_rm, True
 
         # add tags for new files
+        gcur = cur
+        with self.mutex:
+            gcur.connection.commit()
+
         if "e2ts" in flags:
             if not self.mtag:
                 return n_add, n_rm, False
@@ -460,8 +511,10 @@ class Up2k(object):
             if self.mtag.prefer_mt and not self.args.no_mtag_mt:
                 mpool = self._start_mpool()
 
-            c2 = cur.connection.cursor()
-            c3 = cur.connection.cursor()
+            conn = sqlite3.connect(db_path, timeout=15)
+            cur = conn.cursor()
+            c2 = conn.cursor()
+            c3 = conn.cursor()
             n_left = cur.execute("select count(w) from up").fetchone()[0]
             for w, rd, fn in cur.execute("select w, rd, fn from up"):
                 n_left -= 1
@@ -483,7 +536,8 @@ class Up2k(object):
                     n_tags = self._tag_file(c3, *args)
                 else:
                     mpool.put(["mtag"] + args)
-                    n_tags = len(self._flush_mpool(c3))
+                    with self.mutex:
+                        n_tags = len(self._flush_mpool(c3))
 
                 n_add += n_tags
                 n_buf += n_tags
@@ -495,26 +549,32 @@ class Up2k(object):
                     last_write = time.time()
                     n_buf = 0
 
-            self._stop_mpool(mpool, c3)
+            self._stop_mpool(mpool)
+            with self.mutex:
+                n_add += len(self._flush_mpool(c3))
 
+            conn.commit()
             c3.close()
             c2.close()
+            cur.close()
+            conn.close()
+
+        with self.mutex:
+            gcur.connection.commit()
 
         return n_add, n_rm, True
 
     def _flush_mpool(self, wcur):
-        with self.mutex:
-            ret = []
-            for x in self.pending_tags:
-                self._tag_file(wcur, *x)
-                ret.append(x[1])
+        ret = []
+        for x in self.pending_tags:
+            self._tag_file(wcur, *x)
+            ret.append(x[1])
 
-            self.pending_tags = []
-            return ret
+        self.pending_tags = []
+        return ret
 
     def _run_all_mtp(self):
         t0 = time.time()
-        self.mtp_parsers = {}
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
                 self._run_one_mtp(ptop)
@@ -523,10 +583,11 @@ class Up2k(object):
         msg = "mtp finished in {:.2f} sec ({})"
         self.log(msg.format(td, s2hms(td, True)))
 
-    def _run_one_mtp(self, ptop):
-        db_path = os.path.join(ptop, ".hist", "up2k.db")
-        sz0 = os.path.getsize(db_path) // 1024
+        del self.pp
+        for k in list(self.volstate.keys()):
+            self.volstate[k] = "online, idle"
 
+    def _run_one_mtp(self, ptop):
         entags = self.entags[ptop]
 
         parsers = {}
@@ -585,9 +646,8 @@ class Up2k(object):
                     jobs.append([parsers, None, w, abspath])
                     in_progress[w] = True
 
-            done = self._flush_mpool(wcur)
-
             with self.mutex:
+                done = self._flush_mpool(wcur)
                 for w in done:
                     to_delete[w] = True
                     in_progress.pop(w)
@@ -628,15 +688,16 @@ class Up2k(object):
             with self.mutex:
                 cur.connection.commit()
 
-        done = self._stop_mpool(mpool, wcur)
+        self._stop_mpool(mpool)
         with self.mutex:
+            done = self._flush_mpool(wcur)
             for w in done:
                 q = "delete from mt where w = ? and k = 't:mtp'"
                 cur.execute(q, (w,))
 
             cur.connection.commit()
             if n_done:
-                self.vac(cur, db_path, n_done, 0, sz0)
+                cur.execute("vacuum")
 
             wcur.close()
             cur.close()
@@ -693,7 +754,7 @@ class Up2k(object):
 
         return mpool
 
-    def _stop_mpool(self, mpool, wcur):
+    def _stop_mpool(self, mpool):
         if not mpool:
             return
 
@@ -701,8 +762,6 @@ class Up2k(object):
             mpool.put(None)
 
         mpool.join()
-        done = self._flush_mpool(wcur)
-        return done
 
     def _tag_thr(self, q):
         while True:

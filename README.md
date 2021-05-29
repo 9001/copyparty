@@ -294,6 +294,8 @@ the same arguments can be set as volume flags, in addition to `d2d` and `d2t` fo
 
 `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
 
+the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
+
 
 ## metadata from audio files
 

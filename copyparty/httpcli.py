@@ -10,6 +10,7 @@ import json
 import string
 import socket
 import ctypes
+import traceback
 from datetime import datetime
 import calendar
 
@@ -155,6 +156,7 @@ class HttpCli(object):
         if self.uname:
             self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
             self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
+            self.avol = self.auth.vfs.user_tree(self.uname, True, True, True)
 
         ua = self.headers.get("user-agent", "")
         self.is_rclone = ua.startswith("rclone/")
@@ -325,6 +327,12 @@ class HttpCli(object):
         if "h" in self.uparam:
             self.vpath = None
             return self.tx_mounts()
+
+        if "scan" in self.uparam:
+            return self.scanvol()
+
+        if "stack" in self.uparam:
+            return self.tx_stack()
 
         return self.tx_browser()
 
@@ -1304,9 +1312,60 @@ class HttpCli(object):
         suf = self.urlq(rm=["h"])
         rvol = [x + "/" if x else x for x in self.rvol]
         wvol = [x + "/" if x else x for x in self.wvol]
-        html = self.j2("splash", this=self, rvol=rvol, wvol=wvol, url_suf=suf)
+
+        vstate = {}
+        if self.avol and not self.args.no_rescan:
+            x = self.conn.hsrv.broker.put(True, "up2k.get_volstate")
+            vstate = json.loads(x.get())
+
+        html = self.j2(
+            "splash",
+            this=self,
+            rvol=rvol,
+            wvol=wvol,
+            avol=self.avol,
+            vstate=vstate,
+            url_suf=suf,
+        )
         self.reply(html.encode("utf-8"), headers=NO_STORE)
         return True
+
+    def scanvol(self):
+        if not self.readable or not self.writable:
+            raise Pebkac(403, "not admin")
+
+        if self.args.no_rescan:
+            raise Pebkac(403, "disabled by argv")
+
+        vn, _ = self.auth.vfs.get(self.vpath, self.uname, True, True)
+
+        args = [self.auth.vfs.all_vols, [vn.vpath]]
+        x = self.conn.hsrv.broker.put(True, "up2k.rescan", *args)
+        x = x.get()
+        if not x:
+            self.redirect("", "?h")
+            return ""
+
+        raise Pebkac(500, x)
+
+    def tx_stack(self):
+        if not self.readable or not self.writable:
+            raise Pebkac(403, "not admin")
+
+        if self.args.no_stack:
+            raise Pebkac(403, "disabled by argv")
+
+        ret = []
+        names = dict([(t.ident, t.name) for t in threading.enumerate()])
+        for tid, stack in sys._current_frames().items():
+            ret.append("\n\n# {} ({:x})".format(names.get(tid), tid))
+            for fn, lno, name, line in traceback.extract_stack(stack):
+                ret.append('File: "{}", line {}, in {}'.format(fn, lno, name))
+                if line:
+                    ret.append("  " + str(line.strip()))
+
+        ret = ("<pre>" + "\n".join(ret)).encode("utf-8")
+        self.reply(ret)
 
     def tx_tree(self):
         top = self.uparam["tree"] or ""

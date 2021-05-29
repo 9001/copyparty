@@ -14,11 +14,12 @@ from .util import IMPLICATIONS, undot, Pebkac, fsdec, fsenc, statdir, nuprint
 class VFS(object):
     """single level in the virtual fs"""
 
-    def __init__(self, realpath, vpath, uread=[], uwrite=[], flags={}):
+    def __init__(self, realpath, vpath, uread=[], uwrite=[], uadm=[], flags={}):
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
         self.uread = uread  # users who can read this
         self.uwrite = uwrite  # users who can write this
+        self.uadm = uadm  # users who are regular admins
         self.flags = flags  # config switches
         self.nodes = {}  # child nodes
         self.all_vols = {vpath: self}  # flattened recursive
@@ -27,7 +28,7 @@ class VFS(object):
         return "VFS({})".format(
             ", ".join(
                 "{}={!r}".format(k, self.__dict__[k])
-                for k in "realpath vpath uread uwrite flags".split()
+                for k in "realpath vpath uread uwrite uadm flags".split()
             )
         )
 
@@ -52,6 +53,7 @@ class VFS(object):
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.uread,
                 self.uwrite,
+                self.uadm,
                 self.flags,
             )
             self._trk(vn)
@@ -226,15 +228,19 @@ class VFS(object):
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
                 yield f
 
-    def user_tree(self, uname, readable=False, writable=False):
+    def user_tree(self, uname, readable=False, writable=False, admin=False):
         ret = []
         opt1 = readable and (uname in self.uread or "*" in self.uread)
         opt2 = writable and (uname in self.uwrite or "*" in self.uwrite)
-        if opt1 or opt2:
-            ret.append(self.vpath)
+        if admin:
+            if opt1 and opt2:
+                ret.append(self.vpath)
+        else:
+            if opt1 or opt2:
+                ret.append(self.vpath)
 
         for _, vn in sorted(self.nodes.items()):
-            ret.extend(vn.user_tree(uname, readable, writable))
+            ret.extend(vn.user_tree(uname, readable, writable, admin))
 
         return ret
 
@@ -269,7 +275,7 @@ class AuthSrv(object):
 
         yield prev, True
 
-    def _parse_config_file(self, fd, user, mread, mwrite, mflags, mount):
+    def _parse_config_file(self, fd, user, mread, mwrite, madm, mflags, mount):
         vol_src = None
         vol_dst = None
         self.line_ctr = 0
@@ -301,6 +307,7 @@ class AuthSrv(object):
                 mount[vol_dst] = vol_src
                 mread[vol_dst] = []
                 mwrite[vol_dst] = []
+                madm[vol_dst] = []
                 mflags[vol_dst] = {}
                 continue
 
@@ -311,10 +318,15 @@ class AuthSrv(object):
                 uname = "*"
 
             self._read_vol_str(
-                lvl, uname, mread[vol_dst], mwrite[vol_dst], mflags[vol_dst]
+                lvl,
+                uname,
+                mread[vol_dst],
+                mwrite[vol_dst],
+                madm[vol_dst],
+                mflags[vol_dst],
             )
 
-    def _read_vol_str(self, lvl, uname, mr, mw, mf):
+    def _read_vol_str(self, lvl, uname, mr, mw, ma, mf):
         if lvl == "c":
             cval = True
             if "=" in uname:
@@ -331,6 +343,9 @@ class AuthSrv(object):
 
         if lvl in "wa":
             mw.append(uname)
+
+        if lvl == "a":
+            ma.append(uname)
 
     def _read_volflag(self, flags, name, value, is_list):
         if name not in ["mtp"]:
@@ -355,6 +370,7 @@ class AuthSrv(object):
         user = {}  # username:password
         mread = {}  # mountpoint:[username]
         mwrite = {}  # mountpoint:[username]
+        madm = {}  # mountpoint:[username]
         mflags = {}  # mountpoint:[flag]
         mount = {}  # dst:src (mountpoint:realpath)
 
@@ -378,17 +394,22 @@ class AuthSrv(object):
                 mount[dst] = src
                 mread[dst] = []
                 mwrite[dst] = []
+                madm[dst] = []
                 mflags[dst] = {}
 
                 perms = perms.split(":")
                 for (lvl, uname) in [[x[0], x[1:]] for x in perms]:
-                    self._read_vol_str(lvl, uname, mread[dst], mwrite[dst], mflags[dst])
+                    self._read_vol_str(
+                        lvl, uname, mread[dst], mwrite[dst], madm[dst], mflags[dst]
+                    )
 
         if self.args.c:
             for cfg_fn in self.args.c:
                 with open(cfg_fn, "rb") as f:
                     try:
-                        self._parse_config_file(f, user, mread, mwrite, mflags, mount)
+                        self._parse_config_file(
+                            f, user, mread, mwrite, madm, mflags, mount
+                        )
                     except:
                         m = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
                         print(m.format(cfg_fn, self.line_ctr))
@@ -410,12 +431,15 @@ class AuthSrv(object):
 
             if dst == "":
                 # rootfs was mapped; fully replaces the default CWD vfs
-                vfs = VFS(mount[dst], dst, mread[dst], mwrite[dst], mflags[dst])
+                vfs = VFS(
+                    mount[dst], dst, mread[dst], mwrite[dst], madm[dst], mflags[dst]
+                )
                 continue
 
             v = vfs.add(mount[dst], dst)
             v.uread = mread[dst]
             v.uwrite = mwrite[dst]
+            v.uadm = madm[dst]
             v.flags = mflags[dst]
 
         missing_users = {}

@@ -249,6 +249,10 @@ def run_argparse(argv, formatter):
     ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
+    ap2 = ap.add_argument_group('admin panel options')
+    ap2.add_argument("--no-rescan", action="store_true", help="disable ?scan (volume reindexing)")
+    ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks)")
+
     ap2 = ap.add_argument_group('thumbnail options')
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
@@ -287,6 +291,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
+    ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing")
     ap2.add_argument("--ihead", metavar="HEADER", action='append', help="dump incoming header")
     ap2.add_argument("--lf-url", metavar="RE", type=str, default=r"^/\.cpr/|\?th=[wj]$", help="dont log URLs matching")
     

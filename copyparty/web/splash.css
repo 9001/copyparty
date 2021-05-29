@@ -26,6 +26,13 @@ a {
 	border-radius: .2em;
 	padding: .2em .8em;
 }
+td, th {
+	padding: .3em .6em;
+	text-align: left;
+}
+.btns {
+	margin: 1em 0;
+}
 
 
 html.dark,
