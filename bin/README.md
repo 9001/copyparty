@@ -45,3 +45,18 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 # [`mtag/`](mtag/)
 * standalone programs which perform misc. file analysis
 * copyparty can Popen programs like these during file indexing to collect additional metadata
+
+
+# [`dbtool.py`](dbtool.py)
+upgrade utility which can show db info and help transfer data between databases, for example when a new version of copyparty recommends to wipe the DB and reindex because it now collects additional metadata during analysis, but you have some really expensive `-mtp` parsers and want to copy over the tags from the old db
+
+for that example (upgrading to v0.11.0), first move the old db aside, launch copyparty, let it rebuild the db until the point where it starts running mtp (colored messages as it adds the mtp tags), then CTRL-C and patch in the old mtp tags from the old db instead
+
+so assuming you have `-mtp` parsers to provide the tags `key` and `.bpm`:
+
+```
+~/bin/dbtool.py -ls up2k.db
+~/bin/dbtool.py -src up2k.db.v0.10.22 up2k.db -cmp
+~/bin/dbtool.py -src up2k.db.v0.10.22 up2k.db -rm-mtp-flag -copy key
+~/bin/dbtool.py -src up2k.db.v0.10.22 up2k.db -rm-mtp-flag -copy .bpm -vac
+```
