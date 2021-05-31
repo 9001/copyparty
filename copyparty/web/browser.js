@@ -1026,6 +1026,7 @@ document.onkeydown = function (e) {
 	for (var a = 0; a < trs.length; a += 2) {
 		html.push('<table>' + (trs[a].concat(trs[a + 1])).join('\n') + '</table>');
 	}
+	html.push('<table id="tq_raw"><tr><td>raw</td><td><input id="q_raw" type="text" name="q" /></td></tr></table>');
 	ebi('srch_form').innerHTML = html.join('\n');
 
 	var o = QSA('#op_search input');
@@ -1050,9 +1051,67 @@ document.onkeydown = function (e) {
 			var chk = ebi(id.slice(0, -1) + 'c');
 			chk.checked = ((v + '').length > 0);
 		}
+
+		if (id != "q_raw")
+			encode_query();
+
 		clearTimeout(search_timeout);
 		if (Date.now() - search_in_progress > 30 * 1000)
 			search_timeout = setTimeout(do_search, 200);
+	}
+
+	function encode_query() {
+		var q = '';
+		for (var a = 0; a < sconf.length; a++) {
+			for (var b = 1; b < sconf[a].length; b++) {
+				var k = sconf[a][b][0],
+					chk = 'srch_' + k + 'c',
+					tvs = ebi('srch_' + k + 'v').value.split(/ /g);
+
+				if (!ebi(chk).checked)
+					continue;
+
+				for (var c = 0; c < tvs.length; c++) {
+					var tv = tvs[c];
+					q += ' and ';
+
+					if (k == 'adv') {
+						q += tv.replace(/ /g, " and ");
+						continue;
+					}
+
+					if (k.length == 3) {
+						q += k.replace(/sz/, 'size').replace(/dt/, 'date').replace(/l$/, ' >= ').replace(/u$/, ' <= ') + tv;
+						continue;
+					}
+
+					if (k == 'path' || k == 'name' || k == 'tags') {
+						var not = ' ';
+						if (tv.slice(0, 1) == '-') {
+							tv = tv.slice(1);
+							not = ' not ';
+						}
+
+						if (tv.slice(0, 1) == '^') {
+							tv = tv.slice(1);
+						}
+						else {
+							tv = '*' + tv;
+						}
+
+						if (tv.slice(-1) == '$') {
+							tv = tv.slice(0, -1);
+						}
+						else {
+							tv += '*';
+						}
+
+						q += k + not + 'like ' + tv;
+					}
+				}
+			}
+		}
+		ebi('q_raw').value = q.slice(5);
 	}
 
 	function do_search() {
@@ -1060,23 +1119,12 @@ document.onkeydown = function (e) {
 		srch_msg(false, "searching...");
 		clearTimeout(search_timeout);
 
-		var params = {},
-			o = QSA('#op_search input[type="text"]');
-
-		for (var a = 0; a < o.length; a++) {
-			var chk = ebi(o[a].getAttribute('id').slice(0, -1) + 'c');
-			if (!chk.checked)
-				continue;
-
-			params[o[a].getAttribute('name')] = o[a].value;
-		}
-		// ebi('srch_q').textContent = JSON.stringify(params, null, 4);
 		var xhr = new XMLHttpRequest();
 		xhr.open('POST', '/?srch', true);
 		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onreadystatechange = xhr_search_results;
 		xhr.ts = Date.now();
-		xhr.send(JSON.stringify(params));
+		xhr.send(JSON.stringify({"q": ebi('q_raw').value}));
 	}
 
 	function xhr_search_results() {

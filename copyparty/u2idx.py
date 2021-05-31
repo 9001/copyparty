@@ -51,7 +51,7 @@ class U2idx(object):
         uv = [wark[:16], wark]
 
         try:
-            return self.run_query(vols, uq, uv, {})[0]
+            return self.run_query(vols, uq, uv)[0]
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
@@ -67,36 +67,121 @@ class U2idx(object):
         self.cur[ptop] = cur
         return cur
 
-    def search(self, vols, body):
+    def search(self, vols, uq):
         """search by query params"""
         if not HAVE_SQLITE3:
             return []
 
-        qobj = {}
-        _conv_sz(qobj, body, "sz_min", "up.sz >= ?")
-        _conv_sz(qobj, body, "sz_max", "up.sz <= ?")
-        _conv_dt(qobj, body, "dt_min", "up.mt >= ?")
-        _conv_dt(qobj, body, "dt_max", "up.mt <= ?")
-        for seg, dk in [["path", "up.rd"], ["name", "up.fn"]]:
-            if seg in body:
-                _conv_txt(qobj, body, seg, dk)
+        q = ""
+        va = []
+        joins = ""
+        is_key = True
+        is_size = False
+        is_date = False
+        kw_key = ["(", ")", "and ", "or ", "not "]
+        kw_val = ["==", "=", "!=", ">", ">=", "<", "<=", "like "]
+        ptn_mt = re.compile(r"^\.?[a-z]+$")
+        mt_ctr = 0
+        mt_keycmp = "substr(up.w,1,16)"
+        mt_keycmp2 = None
 
-        uq, uv = _sqlize(qobj)
+        while True:
+            uq = uq.strip()
+            if not uq:
+                break
 
-        qobj = {}
-        if "tags" in body:
-            _conv_txt(qobj, body, "tags", "mt.v")
+            ok = False
+            for kw in kw_key + kw_val:
+                if uq.startswith(kw):
+                    is_key = kw in kw_key
+                    uq = uq[len(kw) :]
+                    ok = True
+                    q += kw
+                    break
 
-        if "adv" in body:
-            _conv_adv(qobj, body, "adv")
+            if ok:
+                continue
+
+            v, uq = (uq + " ").split(" ", 1)
+            if is_key:
+                is_key = False
+
+                if v == "size":
+                    v = "up.sz"
+                    is_size = True
+
+                elif v == "date":
+                    v = "up.mt"
+                    is_date = True
+
+                elif v == "path":
+                    v = "up.rd"
+
+                elif v == "name":
+                    v = "up.fn"
+
+                elif v == "tags":
+                    v = "mt.v"
+
+                elif ptn_mt.match(v):
+                    mt_ctr += 1
+                    mt_keycmp2 = "mt{}.w".format(mt_ctr)
+                    joins += "inner join mt mt{} on {} = {} ".format(
+                        mt_ctr, mt_keycmp, mt_keycmp2
+                    )
+                    v = "mt{0}.k = '{1}' and mt{0}.v".format(mt_ctr, v)
+
+                else:
+                    raise Pebkac(400, "invalid key [" + v + "]")
+
+                q += v + " "
+                continue
+
+            head = ""
+            tail = ""
+
+            if is_date:
+                is_date = False
+                v = v.upper().rstrip("Z").replace(",", " ").replace("T", " ")
+                while "  " in v:
+                    v = v.replace("  ", " ")
+
+                for fmt in [
+                    "%Y-%m-%d %H:%M:%S",
+                    "%Y-%m-%d %H:%M",
+                    "%Y-%m-%d %H",
+                    "%Y-%m-%d",
+                ]:
+                    try:
+                        v = datetime.strptime(v, fmt).timestamp()
+                        break
+                    except:
+                        v = None
+
+            elif is_size:
+                is_size = False
+                v = int(float(v) * 1024 * 1024)
+
+            else:
+                if v.startswith("*"):
+                    head = "'%'||"
+                    v = v[1:]
+
+                if v.endswith("*"):
+                    tail = "||'%'"
+                    v = v[:-1]
+
+            q += "{}?{} ".format(head, tail)
+            va.append(v)
+            is_key = True
 
         try:
-            return self.run_query(vols, uq, uv, qobj)
+            return self.run_query(vols, joins + q, va)
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
-    def run_query(self, vols, uq, uv, targs):
-        self.log("qs: {} {} ,  {}".format(uq, repr(uv), repr(targs)))
+    def run_query(self, vols, uq, uv):
+        self.log("qs: {} {}".format(uq, repr(uv)))
 
         done_flag = []
         self.active_id = "{:.6f}_{}".format(
@@ -112,33 +197,12 @@ class U2idx(object):
         thr.daemon = True
         thr.start()
 
-        if not targs:
-            if not uq:
-                q = "select * from up"
-                v = ()
-            else:
-                q = "select * from up where " + uq
-                v = tuple(uv)
+        if not uq:
+            q = "select * from up"
+            v = ()
         else:
-            q = "select up.* from up"
-            keycmp = "substr(up.w,1,16)"
-            where = []
-            v = []
-            ctr = 0
-            for tq, tv in sorted(targs.items()):
-                ctr += 1
-                tq = tq.split("\n")[0]
-                keycmp2 = "mt{}.w".format(ctr)
-                q += " inner join mt mt{} on {} = {}".format(ctr, keycmp, keycmp2)
-                keycmp = keycmp2
-                where.append(tq.replace("mt.", keycmp[:-1]))
-                v.append(tv)
-
-            if uq:
-                where.append(uq)
-                v.extend(uv)
-
-            q += " where " + (" and ".join(where))
+            q = "select * from up where " + uq
+            v = tuple(uv)
 
         # self.log("q2: {} {}".format(q, repr(v)))
 
@@ -204,78 +268,3 @@ def _open(ptop):
     db_path = os.path.join(ptop, ".hist", "up2k.db")
     if os.path.exists(db_path):
         return sqlite3.connect(db_path).cursor()
-
-
-def _conv_sz(q, body, k, sql):
-    if k in body:
-        q[sql] = int(float(body[k]) * 1024 * 1024)
-
-
-def _conv_dt(q, body, k, sql):
-    if k not in body:
-        return
-
-    v = body[k].upper().rstrip("Z").replace(",", " ").replace("T", " ")
-    while "  " in v:
-        v = v.replace("  ", " ")
-
-    for fmt in ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d %H", "%Y-%m-%d"]:
-        try:
-            ts = datetime.strptime(v, fmt).timestamp()
-            break
-        except:
-            ts = None
-
-    if ts:
-        q[sql] = ts
-
-
-def _conv_txt(q, body, k, sql):
-    for v in body[k].split(" "):
-        inv = ""
-        if v.startswith("-"):
-            inv = "not"
-            v = v[1:]
-
-        if not v:
-            continue
-
-        head = "'%'||"
-        if v.startswith("^"):
-            head = ""
-            v = v[1:]
-
-        tail = "||'%'"
-        if v.endswith("$"):
-            tail = ""
-            v = v[:-1]
-
-        qk = "{} {} like {}?{}".format(sql, inv, head, tail)
-        q[qk + "\n" + v] = u8safe(v)
-
-
-def _conv_adv(q, body, k):
-    ptn = re.compile(r"^(\.?[a-z]+) *(==?|!=|<=?|>=?) *(.*)$")
-
-    parts = body[k].split(" ")
-    parts = [x.strip() for x in parts if x.strip()]
-
-    for part in parts:
-        m = ptn.match(part)
-        if not m:
-            p = html_escape(part)
-            raise Pebkac(400, "invalid argument [" + p + "]")
-
-        k, op, v = m.groups()
-        qk = "mt.k = '{}' and mt.v {} ?".format(k, op)
-        q[qk + "\n" + v] = u8safe(v)
-
-
-def _sqlize(qobj):
-    keys = []
-    values = []
-    for k, v in sorted(qobj.items()):
-        keys.append(k.split("\n")[0])
-        values.append(v)
-
-    return " and ".join(keys), values

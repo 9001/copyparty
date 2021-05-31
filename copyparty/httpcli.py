@@ -600,8 +600,9 @@ class HttpCli(object):
             taglist = {}
         else:
             # search by query params
-            self.log("qj: " + repr(body))
-            hits, taglist = idx.search(vols, body)
+            q = body["q"]
+            self.log("qj: " + q)
+            hits, taglist = idx.search(vols, q)
             msg = len(hits)
 
         idx.p_end = time.time()

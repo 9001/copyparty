@@ -529,6 +529,17 @@ input[type="checkbox"]:checked+label {
 	height: 1em;
 	margin: .2em 0 -1em 1.6em;
 }
+#tq_raw {
+	width: calc(100% - 2em);
+	margin: .3em 0 0 1.4em;
+}
+#tq_raw td+td {
+	width: 100%;
+}
+#op_search #q_raw {
+	width: 100%;
+	display: block;
+}
 #files td div span {
 	color: #fff;
 	padding: 0 .4em;
