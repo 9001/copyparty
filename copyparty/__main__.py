@@ -261,7 +261,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
     ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown")
-    ap2.add_argument("--th-clean", metavar="SEC", type=int, default=1800, help="cleanup interval")
+    ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval")
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age")
 
     ap2 = ap.add_argument_group('database options')

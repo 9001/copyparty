@@ -316,10 +316,10 @@ class ThumbSrv(object):
             time.sleep(interval)
             for vol in self.vols:
                 vol += "/.hist/th"
-                self.log("cln {}/".format(vol))
+                self.log("\033[Jcln {}/\033[A".format(vol))
                 self.clean(vol)
 
-            self.log("cln ok")
+            self.log("\033[Jcln ok")
 
     def clean(self, vol):
         # self.log("cln {}".format(vol))
