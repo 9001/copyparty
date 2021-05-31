@@ -1245,7 +1245,9 @@ class Up2k(object):
         ret = []
         with open(fsenc(path), "rb", 512 * 1024) as f:
             while fsz > 0:
-                self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
+                if self.pp:
+                    self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
+                
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
                 fsz -= rem
