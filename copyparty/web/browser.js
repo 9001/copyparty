@@ -811,6 +811,9 @@ var thegrid = (function () {
 		if (e && e.ctrlKey)
 			return true;
 
+		if (QS('#ggrid a[ref="unsearch"]'))
+			return ebi('unsearch').click();
+
 		ev(e);
 		var oth = ebi(this.getAttribute('ref')),
 			td = oth.parentNode.nextSibling,
@@ -836,9 +839,9 @@ var thegrid = (function () {
 			return r.loadsel();
 
 		var html = [];
-		var tr = lfiles.tBodies[0].rows;
-		for (var a = 0; a < tr.length; a++) {
-			var ao = tr[a].cells[1].firstChild,
+		var files = QSA('#files>tbody>tr>td:nth-child(2) a[id]');
+		for (var a = 0, aa = files.length; a < aa; a++) {
+			var ao = files[a],
 				href = esc(ao.getAttribute('href')),
 				ref = ao.getAttribute('id'),
 				isdir = href.split('?')[0].slice(-1)[0] == '/',
@@ -1124,7 +1127,7 @@ document.onkeydown = function (e) {
 		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onreadystatechange = xhr_search_results;
 		xhr.ts = Date.now();
-		xhr.send(JSON.stringify({"q": ebi('q_raw').value}));
+		xhr.send(JSON.stringify({ "q": ebi('q_raw').value }));
 	}
 
 	function xhr_search_results() {

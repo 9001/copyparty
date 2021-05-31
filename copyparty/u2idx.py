@@ -227,7 +227,7 @@ class U2idx(object):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
-                rp = "/".join([vtop, rd, fn])
+                rp = "/".join([x for x in [vtop, rd, fn] if x])
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp, "w": w[:16]})
 
             for hit in sret:
