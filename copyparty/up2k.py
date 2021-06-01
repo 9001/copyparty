@@ -181,17 +181,20 @@ class Up2k(object):
         for vol in vols:
             try:
                 os.listdir(vol.realpath)
-                if not self.register_vpath(vol.realpath, vol.flags):
-                    raise Exception()
-
-                if vol.vpath in scan_vols or not scan_vols:
-                    live_vols.append(vol)
-
-                if vol.vpath not in self.volstate:
-                    self.volstate[vol.vpath] = "OFFLINE (not initialized)"
             except:
+                self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
+                self.log("cannot access " + vol.realpath, c=1)
+                continue
+
+            if not self.register_vpath(vol.realpath, vol.flags):
                 # self.log("db not enabled for {}".format(m, vol.realpath))
-                pass
+                continue
+
+            if vol.vpath in scan_vols or not scan_vols:
+                live_vols.append(vol)
+
+            if vol.vpath not in self.volstate:
+                self.volstate[vol.vpath] = "OFFLINE (pending initialization)"
 
         vols = live_vols
         need_vac = {}
@@ -585,7 +588,8 @@ class Up2k(object):
 
         del self.pp
         for k in list(self.volstate.keys()):
-            self.volstate[k] = "online, idle"
+            if "OFFLINE" not in self.volstate[k]:
+                self.volstate[k] = "online, idle"
 
     def _run_one_mtp(self, ptop):
         entags = self.entags[ptop]
@@ -1247,7 +1251,7 @@ class Up2k(object):
             while fsz > 0:
                 if self.pp:
                     self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
-                
+
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
                 fsz -= rem

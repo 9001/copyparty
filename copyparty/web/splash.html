@@ -20,13 +20,13 @@
             <tbody>
                 {% for mp in avol %}
                 {%- if mp in vstate and vstate[mp] %}
-                <tr><td>/{{ mp }}</td><td><a href="/{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
+                <tr><td><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a href="{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
                 {%- endif %}
                 {% endfor %}
             </tbody>
         </table>
         <div class="btns">
-            <a href="/{{ avol[0] }}?stack">dump stack</a>
+            <a href="{{ avol[0] }}?stack">dump stack</a>
         </div>
         {%- endif %}
 
@@ -34,7 +34,7 @@
         <h1>you can browse these:</h1>
         <ul>
             {% for mp in rvol %}
-            <li><a href="/{{ mp }}{{ url_suf }}">/{{ mp }}</a></li>
+            <li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
             {% endfor %}
         </ul>
         {%- endif %}
@@ -43,7 +43,7 @@
         <h1>you can upload to:</h1>
         <ul>
             {% for mp in wvol %}
-            <li><a href="/{{ mp }}{{ url_suf }}">/{{ mp }}</a></li>
+            <li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
             {% endfor %}
         </ul>
         {%- endif %}

@@ -1311,20 +1311,23 @@ class HttpCli(object):
 
     def tx_mounts(self):
         suf = self.urlq(rm=["h"])
-        rvol = [x + "/" if x else x for x in self.rvol]
-        wvol = [x + "/" if x else x for x in self.wvol]
+        rvol, wvol, avol = [
+            [("/" + x).rstrip("/") + "/" for x in y]
+            for y in [self.rvol, self.wvol, self.avol]
+        ]
 
         vstate = {}
         if self.avol and not self.args.no_rescan:
             x = self.conn.hsrv.broker.put(True, "up2k.get_volstate")
             vstate = json.loads(x.get())
+            vstate = {("/" + k).rstrip("/") + "/": v for k, v in vstate.items()}
 
         html = self.j2(
             "splash",
             this=self,
             rvol=rvol,
             wvol=wvol,
-            avol=self.avol,
+            avol=avol,
             vstate=vstate,
             url_suf=suf,
         )
