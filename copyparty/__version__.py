@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 11, 3)
+VERSION = (0, 11, 4)
 CODENAME = "the grid"
 BUILD_DT = (2021, 6, 1)
 
