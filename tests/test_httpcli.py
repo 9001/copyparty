@@ -8,6 +8,7 @@ import time
 import shutil
 import pprint
 import tarfile
+import tempfile
 import unittest
 
 from argparse import Namespace
@@ -42,13 +43,15 @@ class Cfg(Namespace):
 
 
 class TestHttpCli(unittest.TestCase):
-    def test(self):
-        td = os.path.join(tu.get_ramdisk(), "vfs")
-        try:
-            shutil.rmtree(td)
-        except OSError:
-            pass
+    def setUp(self):
+        self.td = tu.get_ramdisk()
 
+    def tearDown(self):
+        os.chdir(tempfile.gettempdir())
+        shutil.rmtree(self.td)
+
+    def test(self):
+        td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
 

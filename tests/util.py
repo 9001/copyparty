@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 import jinja2
 import tempfile
 import subprocess as sp
@@ -28,18 +29,25 @@ def chkcmd(*argv):
 
 
 def get_ramdisk():
+    def subdir(top):
+        ret = os.path.join(top, "cptd-{}".format(os.getpid()))
+        shutil.rmtree(ret, True)
+        os.mkdir(ret)
+        return ret
+
     for vol in ["/dev/shm", "/Volumes/cptd"]:  # nosec (singleton test)
         if os.path.exists(vol):
-            return vol
+            return subdir(vol)
 
     if os.path.exists("/Volumes"):
-        devname, _ = chkcmd("hdiutil", "attach", "-nomount", "ram://32768")
+        # hdiutil eject /Volumes/cptd/
+        devname, _ = chkcmd("hdiutil", "attach", "-nomount", "ram://65536")
         devname = devname.strip()
         print("devname: [{}]".format(devname))
         for _ in range(10):
             try:
                 _, _ = chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
-                return "/Volumes/cptd"
+                return subdir("/Volumes/cptd")
             except Exception as ex:
                 print(repr(ex))
                 time.sleep(0.25)
@@ -50,7 +58,7 @@ def get_ramdisk():
     try:
         os.mkdir(ret)
     finally:
-        return ret
+        return subdir(ret)
 
 
 class NullBroker(object):

@@ -25,6 +25,13 @@ class Cfg(Namespace):
 
 
 class TestVFS(unittest.TestCase):
+    def setUp(self):
+        self.td = tu.get_ramdisk()
+
+    def tearDown(self):
+        os.chdir(tempfile.gettempdir())
+        shutil.rmtree(self.td)
+
     def dump(self, vfs):
         print(json.dumps(vfs, indent=4, sort_keys=True, default=lambda o: o.__dict__))
 
@@ -55,12 +62,7 @@ class TestVFS(unittest.TestCase):
         pass
 
     def test(self):
-        td = os.path.join(tu.get_ramdisk(), "vfs")
-        try:
-            shutil.rmtree(td)
-        except OSError:
-            pass
-
+        td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
 
@@ -227,7 +229,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(list(v1), list(v2))
 
         # config file parser
-        cfg_path = os.path.join(tu.get_ramdisk(), "test.cfg")
+        cfg_path = os.path.join(self.td, "test.cfg")
         with open(cfg_path, "wb") as f:
             f.write(
                 dedent(
@@ -260,6 +262,4 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(n.uwrite, ["asd"])
         self.assertEqual(len(n.nodes), 0)
 
-        os.chdir(tempfile.gettempdir())
-        shutil.rmtree(td)
         os.unlink(cfg_path)
