@@ -126,10 +126,11 @@ class U2idx(object):
                     joins += "inner join mt mt{} on {} = {} ".format(
                         mt_ctr, mt_keycmp, mt_keycmp2
                     )
+                    mt_keycmp = mt_keycmp2
                     if v == "tags":
                         v = "mt{0}.v".format(mt_ctr)
                     else:
-                        v = "mt{0}.k = '{1}' and mt{0}.v".format(mt_ctr, v)
+                        v = "+mt{0}.k = '{1}' and mt{0}.v".format(mt_ctr, v)
 
                 else:
                     raise Pebkac(400, "invalid key [" + v + "]")
