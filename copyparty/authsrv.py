@@ -135,7 +135,7 @@ class VFS(object):
             #
             return os.path.realpath(rp)
 
-    def ls(self, rem, uname, scandir, lstat=False):
+    def ls(self, rem, uname, scandir, incl_wo=False, lstat=False):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
@@ -143,12 +143,12 @@ class VFS(object):
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):
-                if (
-                    uname in vn2.uread
-                    or "*" in vn2.uread
-                    or uname in vn2.uwrite
-                    or "*" in vn2.uwrite
-                ):
+                ok = uname in vn2.uread or "*" in vn2.uread
+
+                if not ok and incl_wo:
+                    ok = uname in vn2.uwrite or "*" in vn2.uwrite
+
+                if ok:
                     virt_vis[name] = vn2
 
             # no vfs nodes in the list of real inodes
@@ -162,7 +162,7 @@ class VFS(object):
         rel is a unix-style user-defined vpath (not vfs-related)
         """
 
-        fsroot, vfs_ls, vfs_virt = self.ls(rem, uname, scandir, lstat)
+        fsroot, vfs_ls, vfs_virt = self.ls(rem, uname, scandir, False, lstat)
         rfiles = [x for x in vfs_ls if not stat.S_ISDIR(x[1].st_mode)]
         rdirs = [x for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 

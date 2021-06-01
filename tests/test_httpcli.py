@@ -32,6 +32,8 @@ class Cfg(Namespace):
             no_zip=False,
             no_scandir=False,
             no_sendfile=True,
+            no_rescan=True,
+            ihead=False,
             nih=True,
             mtp=[],
             mte="a",

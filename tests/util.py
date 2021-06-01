@@ -91,7 +91,10 @@ class VHttpConn(object):
         self.auth = auth
         self.log_func = log
         self.log_src = "a"
+        self.lf_url = None
         self.hsrv = VHttpSrv()
         self.nbyte = 0
         self.workload = 0
+        self.ico = None
+        self.thumbcli = None
         self.t0 = time.time()
