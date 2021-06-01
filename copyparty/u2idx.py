@@ -196,7 +196,7 @@ class U2idx(object):
         thr.daemon = True
         thr.start()
 
-        if not uq:
+        if not uq or not uv:
             q = "select * from up"
             v = ()
         else:
