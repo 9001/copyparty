@@ -47,7 +47,7 @@ class U2idx(object):
         fhash = body["hash"]
         wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
 
-        uq = "substr(w,1,16) = ? and w = ?"
+        uq = "where substr(w,1,16) = ? and w = ?"
         uv = [wark[:16], wark]
 
         try:
@@ -156,7 +156,7 @@ class U2idx(object):
                         v = datetime.strptime(v, fmt).timestamp()
                         break
                     except:
-                        v = None
+                        pass
 
             elif is_size:
                 is_size = False
@@ -171,18 +171,16 @@ class U2idx(object):
                     tail = "||'%'"
                     v = v[:-1]
 
-            q += "{}?{} ".format(head, tail)
+            q += " {}?{} ".format(head, tail)
             va.append(v)
             is_key = True
 
         try:
-            return self.run_query(vols, joins + q, va)
+            return self.run_query(vols, joins + "where " + q, va)
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
     def run_query(self, vols, uq, uv):
-        self.log("qs: {} {}".format(uq, repr(uv)))
-
         done_flag = []
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
@@ -201,10 +199,10 @@ class U2idx(object):
             q = "select * from up"
             v = ()
         else:
-            q = "select * from up where " + uq
+            q = "select up.* from up " + uq
             v = tuple(uv)
 
-        # self.log("q2: {} {}".format(q, repr(v)))
+        self.log("qs: {!r} {!r}".format(q, v))
 
         ret = []
         lim = 1000

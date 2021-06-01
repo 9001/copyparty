@@ -1076,10 +1076,13 @@ document.onkeydown = function (e) {
 
 				for (var c = 0; c < tvs.length; c++) {
 					var tv = tvs[c];
+					if (!tv.length)
+						break;
+
 					q += ' and ';
 
 					if (k == 'adv') {
-						q += tv.replace(/ /g, " and ");
+						q += tv.replace(/ /g, " and ").replace(/([=!><]=?)/, " $1 ");
 						continue;
 					}
 
