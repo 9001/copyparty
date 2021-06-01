@@ -84,7 +84,8 @@ var t=[]; var b=document.location.href.split('#')[0].slice(0, -1); document.quer
 ## bash oneliners
 
 # get the size and video-id of all youtube vids in folder, assuming filename ends with -id.ext, and create a copyparty search query
-find -maxdepth 1 -printf '%s %p\n' | sort -n | awk '!/-([0-9a-zA-Z_-]{11})\.(mkv|mp4|webm)$/{next} {sub(/\.[^\.]+$/,"");n=length($0);v=substr($0,n-10);print $1, v}' | tee /dev/stderr | awk 'BEGIN {p="("} {printf("%s name like -%s.* ",p,$2);p="or"} END {print ")\n"}' | cat >&2
+find -maxdepth 1 -printf '%s %p\n' | sort -n | awk '!/-([0-9a-zA-Z_-]{11})\.(mkv|mp4|webm)$/{next} {sub(/\.[^\.]+$/,"");n=length($0);v=substr($0,n-10);print $1, v}' | tee /dev/stderr | awk 'BEGIN {p="("} {printf("%s name like *-%s.* ",p,$2);p="or"} END {print ")\n"}' | cat >&2
+
 
 ##
 ## sqlite3 stuff
