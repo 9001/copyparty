@@ -1244,13 +1244,14 @@ class Up2k(object):
         return wark
 
     def _hashlist_from_file(self, path):
+        pp = self.pp if hasattr(self, "pp") else None
         fsz = os.path.getsize(fsenc(path))
         csz = up2k_chunksize(fsz)
         ret = []
         with open(fsenc(path), "rb", 512 * 1024) as f:
             while fsz > 0:
-                if self.pp:
-                    self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
+                if pp:
+                    pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
 
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)

@@ -811,9 +811,6 @@ var thegrid = (function () {
 		if (e && e.ctrlKey)
 			return true;
 
-		if (QS('#ggrid a[ref="unsearch"]'))
-			return ebi('unsearch').click();
-
 		ev(e);
 		var oth = ebi(this.getAttribute('ref')),
 			td = oth.parentNode.nextSibling,
@@ -829,6 +826,11 @@ var thegrid = (function () {
 			ths[a].onclick = r.sel ? seltgl : null;
 			ths[a].setAttribute('class', ebi(ths[a].getAttribute('ref')).parentNode.parentNode.getAttribute('class'));
 		}
+		var uns = QS('#ggrid a[ref="unsearch"]');
+		if (uns)
+			uns.onclick = function () {
+				ebi('unsearch').click();
+			};
 	}
 
 	function loadgrid() {
