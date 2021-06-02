@@ -520,20 +520,26 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* separate sqlite table per tag
-* audio fingerprinting
+* traversal report per-user
 * readme.md as epilogue
+* single sha512 across all up2k chunks? maybe
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
-* `os.copy_file_range` for up2k cloning
-* single sha512 across all up2k chunks? maybe
-* figure out the deal with pixel3a not being connectable as hotspot
-  * pixel3a having unpredictable 3sec latency in general :||||
 
 discarded ideas
 
+* separate sqlite table per tag
+  * performance fixed by skipping some indexes (`+mt.k`)
+* audio fingerprinting
+  * only makes sense if there can be a wasm client and that doesn't exist yet (except for olaf which is agpl hence counts as not existing)
+* `os.copy_file_range` for up2k cloning
+  * almost never hit this path anyways
 * up2k partials ui
+  * feels like there isn't much point
 * cache sha512 chunks on client
+  * too dangerous
 * comment field
+  * nah
 * look into android thumbnail cache file format
+  * absolutely not
