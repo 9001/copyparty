@@ -965,7 +965,7 @@ document.onkeydown = function (e) {
 	if (k == 'KeyT')
 		return ebi('thumbs').click();
 
-	if (window['thegrid'] && thegrid.en) {
+	if (thegrid.en) {
 		if (k == 'KeyS')
 			return ebi('gridsel').click();
 
@@ -1437,7 +1437,7 @@ var treectl = (function () {
 		if (hpush)
 			get_tree('.', xhr.top);
 
-		enspin('#files');
+		enspin(thegrid.en ? '#gfiles' : '#files');
 	}
 
 	function treegrow(e) {
@@ -1517,6 +1517,7 @@ var treectl = (function () {
 
 		apply_perms(res.perms);
 		despin('#files');
+		despin('#gfiles');
 
 		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
 		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
@@ -2051,8 +2052,7 @@ var msel = (function () {
 	}
 	function selui() {
 		clmod(ebi('wtoggle'), 'sel', getsel().length);
-		if (window['thegrid'])
-			thegrid.loadsel();
+		thegrid.loadsel();
 	}
 	function seltgl(e) {
 		ev(e);
