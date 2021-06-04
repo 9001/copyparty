@@ -552,9 +552,10 @@ class Up2k(object):
                     last_write = time.time()
                     n_buf = 0
 
-            self._stop_mpool(mpool)
-            with self.mutex:
-                n_add += len(self._flush_mpool(c3))
+            if mpool:
+                self._stop_mpool(mpool)
+                with self.mutex:
+                    n_add += len(self._flush_mpool(c3))
 
             conn.commit()
             c3.close()
