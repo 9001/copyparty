@@ -225,6 +225,19 @@ def run_argparse(argv, formatter):
             --ciphers help = available ssl/tls ciphers,
             --ssl-ver help = available ssl/tls versions,
               default is what python considers safe, usually >= TLS1
+            
+            values for --ls:
+              "USR" is a user to browse as; * is anonymous, ** is all users
+              "VOL" is a single volume to scan, default is * (all vols)
+              "FLAG" is flags;
+                "v" in addition to realpaths, print usernames and vpaths
+                "ln" only prints symlinks leaving the volume mountpoint
+                "p" exits 1 if any such symlinks are found
+                "r" resumes startup after the listing
+            examples:
+              --ls '**'          # list all files which are possible to read
+              --ls '**,*,ln'     # check for dangerous symlinks
+              --ls '**,*,ln,p,r' # check, then start normally if safe
             """
         ),
     )
@@ -288,6 +301,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
 
     ap2 = ap.add_argument_group('debug options')
+    ap2.add_argument("--ls", metavar="U[,V[,F]]", help="scan all volumes")
     ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")

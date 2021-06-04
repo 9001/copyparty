@@ -39,6 +39,8 @@ class SvcHub(object):
 
         # jank goes here
         auth = AuthSrv(self.args, self.log, False)
+        if args.ls:
+            auth.dbg_ls()
 
         # initiate all services to manage
         self.tcpsrv = TcpSrv(self)

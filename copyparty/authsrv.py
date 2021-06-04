@@ -559,3 +559,90 @@ class AuthSrv(object):
 
         # import pprint
         # pprint.pprint({"usr": user, "rd": mread, "wr": mwrite, "mnt": mount})
+
+    def dbg_ls(self):
+        users = self.args.ls
+        vols = "*"
+        flags = []
+
+        try:
+            users, vols = users.split(",", 1)
+        except:
+            pass
+
+        try:
+            vols, flags = vols.split(",", 1)
+            flags = flags.split(",")
+        except:
+            pass
+
+        if users == "**":
+            users = list(self.user.keys()) + ["*"]
+        else:
+            users = [users]
+
+        for u in users:
+            if u not in self.user and u != "*":
+                raise Exception("user not found: " + u)
+
+        if vols == "*":
+            vols = ["/" + x for x in self.vfs.all_vols.keys()]
+        else:
+            vols = [vols]
+
+        for v in vols:
+            if not v.startswith("/"):
+                raise Exception("volumes must start with /")
+
+            if v[1:] not in self.vfs.all_vols:
+                raise Exception("volume not found: " + v)
+
+        self.log({"users": users, "vols": vols, "flags": flags})
+        for k, v in self.vfs.all_vols.items():
+            self.log("/{}: read({}) write({})".format(k, v.uread, v.uwrite))
+
+        flag_v = "v" in flags
+        flag_ln = "ln" in flags
+        flag_p = "p" in flags
+        flag_r = "r" in flags
+
+        n_bads = 0
+        for v in vols:
+            v = v[1:]
+            vtop = "/{}/".format(v) if v else "/"
+            for u in users:
+                self.log("checking /{} as {}".format(v, u))
+                try:
+                    vn, _ = self.vfs.get(v, u, True, False)
+                except:
+                    continue
+
+                atop = vn.realpath
+                g = vn.walk("", "", u, True, not self.args.no_scandir, lstat=False)
+                for vpath, apath, files, _, _ in g:
+                    fnames = [n[0] for n in files]
+                    vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
+                    vpaths = [vtop + x for x in vpaths]
+                    apaths = [os.path.join(apath, n) for n in fnames]
+                    files = list(zip(vpaths, apaths))
+
+                    if flag_ln:
+                        files = [x for x in files if not x[1].startswith(atop + os.sep)]
+                        n_bads += len(files)
+
+                    if flag_v:
+                        msg = [
+                            '# user "{}", vpath "{}"\n{}'.format(u, vp, ap)
+                            for vp, ap in files
+                        ]
+                    else:
+                        msg = [x[1] for x in files]
+
+                    if msg:
+                        nuprint("\n".join(msg))
+
+                if n_bads and flag_p:
+                    raise Exception("found symlink leaving volume, and strict is set")
+
+        if not flag_r:
+            sys.exit(0)

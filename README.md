@@ -520,7 +520,6 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* traversal report per-user
 * readme.md as epilogue
 * single sha512 across all up2k chunks? maybe
 * reduce up2k roundtrips
