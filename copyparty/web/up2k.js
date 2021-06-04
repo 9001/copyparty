@@ -17,6 +17,7 @@ function goto_up2k() {
 // chrome requires https to use crypto.subtle,
 // usually it's undefined but some chromes throw on invoke
 var up2k = null;
+var sha_js = window.WebAssembly ? 'hw' : 'ac';  // ff53,c57,sa11
 try {
     var cf = crypto.subtle || crypto.webkitSubtle;
     cf.digest('SHA-512', new Uint8Array(1)).then(
@@ -430,13 +431,15 @@ function up2k_init(subtle) {
     // upload ui hidden by default, clicking the header shows it
     function init_deps() {
         if (!subtle && !window.asmCrypto) {
-            showmodal('<h1>loading sha512.js</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
-            import_js('/.cpr/deps/sha512.js', unmodal);
+            var fn = 'sha512.' + sha_js + '.js';
+            showmodal('<h1>loading ' + fn + '</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
+            import_js('/.cpr/deps/' + fn, unmodal);
 
             if (is_https)
                 ebi('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500kB/s at best';
             else
-                ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance';
+                ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span>(' +
+                    (sha_js == 'ac' ? 'it will be pretty bad' : 'but dont worry too much') + ')</span>';
         }
     }
 
@@ -886,6 +889,10 @@ function up2k_init(subtle) {
         return base64;
     }
 
+    function hex2u8(txt) {
+        return new Uint8Array(txt.match(/.{2}/g).map(function (b) { return parseInt(b, 16); }));
+    }
+
     function get_chunksize(filesize) {
         var chunksize = 1024 * 1024,
             stepsize = 512 * 1024;
@@ -987,10 +994,18 @@ function up2k_init(subtle) {
             if (subtle)
                 subtle.digest('SHA-512', buf).then(hash_done);
             else setTimeout(function () {
-                var hasher = new asmCrypto.Sha512();
-                hasher.process(new Uint8Array(buf));
-                hasher.finish();
-                hash_done(hasher.result);
+                var u8buf = new Uint8Array(buf);
+                if (sha_js == 'hw') {
+                    hashwasm.sha512(u8buf).then(function (v) {
+                        hash_done(hex2u8(v))
+                    });
+                }
+                else {
+                    var hasher = new asmCrypto.Sha512();
+                    hasher.process(u8buf);
+                    hasher.finish();
+                    hash_done(hasher.result);
+                }
             }, 1);
         };
 

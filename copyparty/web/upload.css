@@ -238,6 +238,10 @@
 	color: #fff;
 	font-style: italic;
 }
+#u2foot span {
+	color: #999;
+	font-size: .9em;
+}
 #u2footfoot {
 	margin-bottom: -1em;
 }

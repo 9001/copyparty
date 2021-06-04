@@ -9,6 +9,11 @@ ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_zopfli=1.0.3
 
 
+# TODO
+# sha512.hw.js https://github.com/Daninet/hash-wasm
+# sha512.kc.js https://github.com/chm-diederichs/sha3-wasm
+
+
 # download;
 # the scp url is latin from https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap
 RUN     mkdir -p /z/dist/no-pk \
