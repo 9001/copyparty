@@ -438,8 +438,8 @@ function up2k_init(subtle) {
             if (is_https)
                 ebi('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500kB/s at best';
             else
-                ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span>(' +
-                    (sha_js == 'ac' ? 'it will be pretty bad' : 'but dont worry too much') + ')</span>';
+                ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span style="color:#' +
+                    (sha_js == 'ac' ? 'c84">(expecting 20' : '8a5">(but dont worry too much, expect 100') + ' MiB/s)</span>';
         }
     }
 
