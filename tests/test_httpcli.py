@@ -10,12 +10,11 @@ import pprint
 import tarfile
 import tempfile
 import unittest
-
 from argparse import Namespace
-from copyparty.authsrv import AuthSrv
-from copyparty.httpcli import HttpCli
 
 from tests import util as tu
+from copyparty.authsrv import AuthSrv
+from copyparty.httpcli import HttpCli
 
 
 def hdr(query):

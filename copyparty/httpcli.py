@@ -153,10 +153,8 @@ class HttpCli(object):
 
         pwd = uparam.get("pw")
         self.uname = self.auth.iuser.get(pwd, "*")
-        if self.uname:
-            self.rvol = self.auth.vfs.user_tree(self.uname, readable=True)
-            self.wvol = self.auth.vfs.user_tree(self.uname, writable=True)
-            self.avol = self.auth.vfs.user_tree(self.uname, True, True, True)
+        self.rvol, self.wvol, self.avol = [[], [], []]
+        self.auth.vfs.user_tree(self.uname, self.rvol, self.wvol, self.avol)
 
         ua = self.headers.get("user-agent", "")
         self.is_rclone = ua.startswith("rclone/")

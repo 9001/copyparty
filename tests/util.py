@@ -1,15 +1,34 @@
 import os
+import sys
 import time
 import shutil
 import jinja2
 import tempfile
+import platform
 import subprocess as sp
 
-from copyparty.util import Unrecv
 
+WINDOWS = platform.system() == "Windows"
+ANYWIN = WINDOWS or sys.platform in ["msys"]
+MACOS = platform.system() == "Darwin"
 
 J2_ENV = jinja2.Environment(loader=jinja2.BaseLoader)
 J2_FILES = J2_ENV.from_string("{{ files|join('\n') }}")
+
+
+def nah(*a, **ka):
+    return False
+
+
+if MACOS:
+    import posixpath
+
+    posixpath.islink = nah
+    os.path.islink = nah
+    # 25% faster; until any tests do symlink stuff
+
+
+from copyparty.util import Unrecv
 
 
 def runcmd(*argv):

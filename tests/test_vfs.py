@@ -7,13 +7,12 @@ import json
 import shutil
 import tempfile
 import unittest
-
 from textwrap import dedent
 from argparse import Namespace
-from copyparty.authsrv import AuthSrv
-from copyparty import util
 
 from tests import util as tu
+from copyparty.authsrv import AuthSrv
+from copyparty import util
 
 
 class Cfg(Namespace):

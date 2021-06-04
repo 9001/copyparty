@@ -228,21 +228,19 @@ class VFS(object):
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
                 yield f
 
-    def user_tree(self, uname, readable=False, writable=False, admin=False):
-        ret = []
-        opt1 = readable and (uname in self.uread or "*" in self.uread)
-        opt2 = writable and (uname in self.uwrite or "*" in self.uwrite)
-        if admin:
-            if opt1 and opt2:
-                ret.append(self.vpath)
-        else:
-            if opt1 or opt2:
-                ret.append(self.vpath)
+    def user_tree(self, uname, readable, writable, admin):
+        is_readable = False
+        if uname in self.uread or "*" in self.uread:
+            readable.append(self.vpath)
+            is_readable = True
+
+        if uname in self.uwrite or "*" in self.uwrite:
+            writable.append(self.vpath)
+            if is_readable:
+                admin.append(self.vpath)
 
         for _, vn in sorted(self.nodes.items()):
-            ret.extend(vn.user_tree(uname, readable, writable, admin))
-
-        return ret
+            vn.user_tree(uname, readable, writable, admin)
 
 
 class AuthSrv(object):
