@@ -12,6 +12,7 @@ ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
 # TODO
 # sha512.hw.js https://github.com/Daninet/hash-wasm
 # sha512.kc.js https://github.com/chm-diederichs/sha3-wasm
+# awk '/HMAC state/{o=1}  /var HEAP/{o=0}  /function hmac_reset/{o=1}  /return \{/{o=0}  /var __extends =/{o=1}  /var Hash =/{o=0}  /hmac_|pbkdf2_/{next}  o{next}  {gsub(/IllegalStateError/,"Exception")}  {sub(/^ +/,"");sub(/^\/\/ .*/,"");sub(/;$/," ;")}  1' <sha512.ac.js.orig >sha512.ac.js; for fn in sha512.ac.js.orig sha512.ac.js; do wc -c <$fn; wc -c <$fn.gz ; for n in {1..9}; do printf '%8d %d bz\n' $(bzip2 -c$n <$fn | wc -c) $n; done; done
 
 
 # download;
