@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (0, 11, 6)
+VERSION = (0, 11, 7)
 CODENAME = "the grid"
-BUILD_DT = (2021, 6, 1)
+BUILD_DT = (2021, 6, 5)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)
