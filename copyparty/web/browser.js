@@ -803,7 +803,10 @@ var thegrid = (function () {
 			r.sz = v;
 			swrite('gridsz', r.sz);
 		}
-		document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
+		try {
+			document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
+		}
+		catch (ex) { }
 	}
 	setsz();
 
@@ -820,10 +823,18 @@ var thegrid = (function () {
 		this.setAttribute('class', tr.getAttribute('class'));
 	}
 
+	function bgopen(e) {
+		ev(e);
+		var url = this.getAttribute('href');
+		window.open(url, '_blank');
+	}
+
 	r.loadsel = function () {
-		var ths = QSA('#ggrid>a');
+		var ths = QSA('#ggrid>a'),
+			have_sel = !!QS('#files tr.sel');
+
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			ths[a].onclick = r.sel ? seltgl : null;
+			ths[a].onclick = r.sel ? seltgl : have_sel ? bgopen : null;
 			ths[a].setAttribute('class', ebi(ths[a].getAttribute('ref')).parentNode.parentNode.getAttribute('class'));
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');
