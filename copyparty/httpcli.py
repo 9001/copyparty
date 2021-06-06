@@ -849,14 +849,28 @@ class HttpCli(object):
             status = "ERROR"
 
         msg = "{} // {} bytes // {:.3f} MiB/s\n".format(status, sz_total, spd)
+        jmsg = {"status": status, "sz": sz_total, "mbps": round(spd, 3), "files": []}
 
         for sz, sha512, ofn, lfn in files:
-            vpath = self.vpath + "/" + lfn
+            vpath = (self.vpath + "/" if self.vpath else "") + lfn
             msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a>\n'.format(
                 sha512[:56], sz, quotep(vpath), html_escape(ofn, crlf=True)
             )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
+            jpart = {
+                "url": "{}://{}/{}".format(
+                    "https" if self.tls else "http",
+                    self.headers.get("host", "copyparty"),
+                    vpath,
+                ),
+                "sha512": sha512[:56],
+                "sz": sz,
+                "fn": lfn,
+                "fn_orig": ofn,
+                "path": vpath,
+            }
+            jmsg["files"].append(jpart)
 
         vspd = self._spd(sz_total, False)
         self.log("{} {}".format(vspd, msg))
@@ -868,7 +882,12 @@ class HttpCli(object):
                 ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
                 f.write(ft.encode("utf-8"))
 
-        self.redirect(self.vpath, msg=msg, flavor="return to", click=False)
+        if "j" in self.uparam:
+            jtxt = json.dumps(jmsg, indent=2, sort_keys=True)
+            self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
+        else:
+            self.redirect(self.vpath, msg=msg, flavor="return to", click=False)
+
         self.parser.drop()
         return True
 

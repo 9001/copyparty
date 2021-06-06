@@ -204,7 +204,7 @@ for d in copyparty dep-j2; do find $d -type f; done |
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 
-(grep -vE 'gz$' list1; grep -E 'gz$' list1) >list
+(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1) >list || true
 
 echo creating tar
 args=(--owner=1000 --group=1000)

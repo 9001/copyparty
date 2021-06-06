@@ -129,7 +129,7 @@ class ThumbSrv(object):
 
             msg = "cannot create video thumbnails because some of the required programs are not available: "
             msg += ", ".join(missing)
-            self.log(msg, c=1)
+            self.log(msg, c=3)
 
         t = threading.Thread(target=self.cleaner)
         t.daemon = True
