@@ -377,6 +377,9 @@ def main(argv=None):
             + "  (if you crash with codec errors then that is why)"
         )
 
+    if WINDOWS and sys.version_info < (3, 6):
+        al.no_scandir = True
+
     # signal.signal(signal.SIGINT, sighandler)
 
     SvcHub(al).run()
