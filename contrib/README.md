@@ -12,7 +12,7 @@
 ### [`sharex.sxcu`](sharex.sxcu)
 * sharex config file to upload screenshots and grab the URL
 * `RequestURL`: full URL to the target folder
-* `URL`: full URL to the root folder followed by `$regex:1|1$`
+* `URL`: full URL to the root folder (with trailing slash) followed by `$regex:1|1$`
 * `pw`: password (or remove `Parameters` if anon-write)
 
 ### [`explorer-nothumbs-nofoldertypes.reg`](explorer-nothumbs-nofoldertypes.reg)
