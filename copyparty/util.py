@@ -262,6 +262,11 @@ def ren_open(fname, *args, **kwargs):
             yield {"orz": [f, fname]}
             return
 
+    if suffix:
+        ext = fname.split(".")[-1]
+        if len(ext) < 7:
+            suffix += "." + ext
+
     orig_name = fname
     bname = fname
     ext = ""
