@@ -1,0 +1,19 @@
+{
+  "Version": "13.5.0",
+  "Name": "copyparty",
+  "DestinationType": "ImageUploader",
+  "RequestMethod": "POST",
+  "RequestURL": "http://127.0.0.1:3923/sharex",
+  "Parameters": {
+    "pw": "wark"
+  },
+  "Body": "MultipartFormData",
+  "Arguments": {
+    "act": "bput"
+  },
+  "FileFormName": "f",
+  "RegexList": [
+    "bytes // <a href=\"/([^\"]+)\""
+  ],
+  "URL": "http://127.0.0.1:3923/$regex:1|1$"
+}

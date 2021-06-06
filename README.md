@@ -397,6 +397,8 @@ quick summary of more eccentric web-browsers trying to view a directory index:
   * cross-platform python client available in [./bin/](bin/)
   * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
 
+* sharex (screenshot utility): see [./contrib/sharex.sxcu](contrib/#sharexsxcu)
+
 copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uplaods:
 
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|head -c43;}

@@ -9,6 +9,12 @@
 * assumes the webserver and copyparty is running on the same server/IP
 * modify `10.13.1.1` as necessary if you wish to support browsers without javascript
 
+### [`sharex.sxcu`](sharex.sxcu)
+* sharex config file to upload screenshots and grab the URL
+* `RequestURL`: full URL to the target folder
+* `URL`: full URL to the root folder followed by `$regex:1|1$`
+* `pw`: password (or remove `Parameters` if anon-write)
+
 ### [`explorer-nothumbs-nofoldertypes.reg`](explorer-nothumbs-nofoldertypes.reg)
 * disables thumbnails and folder-type detection in windows explorer
 * makes it way faster (especially for slow/networked locations (such as copyparty-fuse))
