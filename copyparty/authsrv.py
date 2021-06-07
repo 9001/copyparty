@@ -7,7 +7,7 @@ import sys
 import stat
 import threading
 
-from .__init__ import PY2, WINDOWS
+from .__init__ import WINDOWS
 from .util import IMPLICATIONS, undot, Pebkac, fsdec, fsenc, statdir, nuprint
 
 
@@ -96,6 +96,7 @@ class VFS(object):
         ]
 
     def get(self, vpath, uname, will_read, will_write):
+        # type: (str, str, bool, bool) -> tuple[VFS, str]
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         vn, rem = self._find(vpath)
 
@@ -136,6 +137,7 @@ class VFS(object):
             return os.path.realpath(rp)
 
     def ls(self, rem, uname, scandir, incl_wo=False, lstat=False):
+        # type: (str, str, bool, bool, bool) -> tuple[str, str, dict[str, VFS]]
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
@@ -156,13 +158,21 @@ class VFS(object):
 
         return [abspath, real, virt_vis]
 
-    def walk(self, rel, rem, uname, dots, scandir, lstat=False):
+    def walk(self, rel, rem, seen, uname, dots, scandir, lstat):
         """
         recursively yields from ./rem;
         rel is a unix-style user-defined vpath (not vfs-related)
         """
 
-        fsroot, vfs_ls, vfs_virt = self.ls(rem, uname, scandir, False, lstat)
+        fsroot, vfs_ls, vfs_virt = self.ls(
+            rem, uname, scandir, incl_wo=False, lstat=lstat
+        )
+
+        if seen and not fsroot.startswith(seen[-1]) and fsroot in seen:
+            print("bailing from symlink loop,\n  {}\n  {}".format(seen[-1], fsroot))
+            return
+
+        seen = seen[:] + [fsroot]
         rfiles = [x for x in vfs_ls if not stat.S_ISDIR(x[1].st_mode)]
         rdirs = [x for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 
@@ -177,7 +187,7 @@ class VFS(object):
 
             wrel = (rel + "/" + rdir).lstrip("/")
             wrem = (rem + "/" + rdir).lstrip("/")
-            for x in self.walk(wrel, wrem, uname, scandir, lstat):
+            for x in self.walk(wrel, wrem, seen, uname, dots, scandir, lstat):
                 yield x
 
         for n, vfs in sorted(vfs_virt.items()):
@@ -185,14 +195,16 @@ class VFS(object):
                 continue
 
             wrel = (rel + "/" + n).lstrip("/")
-            for x in vfs.walk(wrel, "", uname, scandir, lstat):
+            for x in vfs.walk(wrel, "", seen, uname, dots, scandir, lstat):
                 yield x
 
     def zipgen(self, vrem, flt, uname, dots, scandir):
         if flt:
             flt = {k: True for k in flt}
 
-        for vpath, apath, files, rd, vd in self.walk("", vrem, uname, dots, scandir):
+        for vpath, apath, files, rd, vd in self.walk(
+            "", vrem, [], uname, dots, scandir, False
+        ):
             if flt:
                 files = [x for x in files if x[0] in flt]
 
@@ -616,13 +628,13 @@ class AuthSrv(object):
                     continue
 
                 atop = vn.realpath
-                g = vn.walk("", "", u, True, not self.args.no_scandir, lstat=False)
+                g = vn.walk("", "", [], u, True, not self.args.no_scandir, False)
                 for vpath, apath, files, _, _ in g:
                     fnames = [n[0] for n in files]
                     vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
                     vpaths = [vtop + x for x in vpaths]
                     apaths = [os.path.join(apath, n) for n in fnames]
-                    files = list(zip(vpaths, apaths))
+                    files = [[vpath + "/", apath + os.sep]] + list(zip(vpaths, apaths))
 
                     if flag_ln:
                         files = [x for x in files if not x[1].startswith(atop + os.sep)]

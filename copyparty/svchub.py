@@ -95,9 +95,11 @@ class SvcHub(object):
                         break
 
                     if n == 3:
-                        print("waiting for thumbsrv...")
+                        print("waiting for thumbsrv (10sec)...")
 
-            print("nailed it")
+            print("nailed it", end="")
+        finally:
+            print("\033[0m")
 
     def _log_disabled(self, src, msg, c=0):
         pass

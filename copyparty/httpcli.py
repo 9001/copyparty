@@ -16,6 +16,7 @@ import calendar
 
 from .__init__ import E, PY2, WINDOWS, ANYWIN
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
+from .authsrv import AuthSrv
 from .szip import StreamZip
 from .star import StreamTar
 
@@ -35,12 +36,12 @@ class HttpCli(object):
     def __init__(self, conn):
         self.t0 = time.time()
         self.conn = conn
-        self.s = conn.s
-        self.sr = conn.sr
+        self.s = conn.s  # type: socket
+        self.sr = conn.sr  # type: Unrecv
         self.ip = conn.addr[0]
-        self.addr = conn.addr
+        self.addr = conn.addr  # type: tuple[str, int]
         self.args = conn.args
-        self.auth = conn.auth
+        self.auth = conn.auth  # type: AuthSrv
         self.ico = conn.ico
         self.thumbcli = conn.thumbcli
         self.log_func = conn.log_func
@@ -1418,7 +1419,7 @@ class HttpCli(object):
         try:
             vn, rem = self.auth.vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
-                rem, self.uname, not self.args.no_scandir, True
+                rem, self.uname, not self.args.no_scandir, incl_wo=True
             )
         except:
             vfs_ls = []
@@ -1585,7 +1586,7 @@ class HttpCli(object):
                 return self.tx_zip(k, v, vn, rem, [], self.args.ed)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
-            rem, self.uname, not self.args.no_scandir, True
+            rem, self.uname, not self.args.no_scandir, incl_wo=True
         )
         stats = {k: v for k, v in vfs_ls}
         vfs_ls = [x[0] for x in vfs_ls]

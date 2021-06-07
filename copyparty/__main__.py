@@ -238,6 +238,7 @@ def run_argparse(argv, formatter):
               --ls '**'          # list all files which are possible to read
               --ls '**,*,ln'     # check for dangerous symlinks
               --ls '**,*,ln,p,r' # check, then start normally if safe
+            \033[0m
             """
         ),
     )

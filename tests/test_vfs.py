@@ -11,7 +11,7 @@ from textwrap import dedent
 from argparse import Namespace
 
 from tests import util as tu
-from copyparty.authsrv import AuthSrv
+from copyparty.authsrv import AuthSrv, VFS
 from copyparty import util
 
 
@@ -47,6 +47,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(util.undot(query), response)
 
     def ls(self, vfs, vpath, uname):
+        # type: (VFS, str, str) -> tuple[str, str, str]
         """helper for resolving and listing a folder"""
         vn, rem = vfs.get(vpath, uname, True, False)
         r1 = vn.ls(rem, uname, False)

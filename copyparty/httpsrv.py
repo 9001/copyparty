@@ -25,8 +25,8 @@ except ImportError:
     sys.exit(1)
 
 from .__init__ import E, MACOS
-from .httpconn import HttpConn
 from .authsrv import AuthSrv
+from .httpconn import HttpConn
 
 
 class HttpSrv(object):
