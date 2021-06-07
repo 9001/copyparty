@@ -153,6 +153,9 @@ dbg.asyncStore.pendingBreakpoints = {}
 # fix firefox phantom breakpoints
 about:config >> devtools.debugger.prefs-schema-version = -1
 
+# determine server version
+git reset --hard origin/HEAD && git log --format=format:"%H %ai %d" --decorate=full > /dev/shm/revs && cat /dev/shm/revs | while read -r rev extra; do (git reset --hard $rev >/dev/null 2>/dev/null && dsz=$(cat copyparty/web/{util,browser,up2k}.js 2>/dev/null | diff -wNarU0 - <(cat /mnt/Users/ed/Downloads/ref/{util,browser,up2k}.js) | wc -c) && printf '%s %6s %s\n' "$rev" $dsz "$extra") </dev/null; done                
+
 
 ##
 ## http 206
