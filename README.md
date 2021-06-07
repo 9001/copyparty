@@ -68,12 +68,16 @@ you may also want these, especially on servers:
 
 ## notes
 
+general:
+* paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
+  * because no browsers currently implement the media-query to do this properly orz
+
+browser-specific:
 * iPhone/iPad: use Firefox to download files
 * Android-Chrome: increase "parallel uploads" for higher speed (android bug)
 * Android-Firefox: takes a while to select files (their fix for ☝️)
 * Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
-* paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
-  * because no browsers currently implement the media-query to do this properly orz
+* Desktop-Firefox: may stop you from deleting folders you've uploaded until you visit `about:memory` and click `Minimize memory usage`
 
 
 ## status
