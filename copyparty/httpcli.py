@@ -994,6 +994,8 @@ class HttpCli(object):
         cli_lastmod = self.headers.get("if-modified-since")
         if cli_lastmod:
             try:
+                # some browser append "; length=573"
+                cli_lastmod = cli_lastmod.split(";")[0].strip()
                 cli_dt = time.strptime(cli_lastmod, HTTP_TS_FMT)
                 cli_ts = calendar.timegm(cli_dt)
                 return file_lastmod, int(file_ts) > int(cli_ts)
