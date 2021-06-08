@@ -32,6 +32,10 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	[ -e /opt/local/bin/bzip2 ] &&
 		bzip2() { /opt/local/bin/bzip2 "$@"; }
 }
+
+gawk=$(command -v gawk || command -v gnuawk || command -v awk)
+awk() { $gawk "$@"; }
+
 pybin=$(command -v python3 || command -v python) || {
 	echo need python
 	exit 1
@@ -194,10 +198,39 @@ tmv "$f"
 
 # up2k goes from 28k to 22k laff
 echo entabbening
-find | grep -E '\.(js|css|html)$' | while IFS= read -r f; do
+find | grep -E '\.css$' | while IFS= read -r f; do
+	awk '{
+		sub(/^[ \t]+/,"");
+		sub(/[ \t]+$/,"");
+		$0=gensub(/^([a-z-]+) *: *(.*[^ ]) *;$/,"\\1:\\2;","1");
+		sub(/ +\{$/,"{");
+		gsub(/, /,",")
+	}
+	!/\}$/ {printf "%s",$0;next}
+	1
+	' <$f | gsed 's/;\}$/}/' >t
+	tmv "$f"
+done
+find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 	unexpand -t 4 --first-only <"$f" >t
 	tmv "$f"
 done
+
+
+gzres() {
+command -v pigz &&
+	pk='pigz -11 -J 34 -I 100' ||
+	pk='gzip'
+
+echo "$pk"
+find | grep -E '\.(js|css)$' | while IFS= read -r f; do
+	echo -n .
+	$pk "$f"
+done
+echo
+}
+gzres
+
 
 echo gen tarlist
 for d in copyparty dep-j2; do find $d -type f; done |
