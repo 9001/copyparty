@@ -507,6 +507,7 @@ class HttpCli(object):
         items = items.replace("\r", "").split("\n")
         items = [unquotep(x) for x in items if items]
 
+        self.parser.drop()
         return self.tx_zip(k, v, vn, rem, items, self.args.ed)
 
     def handle_post_json(self):

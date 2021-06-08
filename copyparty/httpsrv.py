@@ -99,6 +99,7 @@ class HttpSrv(object):
             cli.run()
 
         finally:
+            sck = cli.s
             if self.args.log_conn:
                 self.log("%s %s" % addr, "|%sC-cdone" % ("-" * 7,), c="1;30")
 
