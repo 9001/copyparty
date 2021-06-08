@@ -381,7 +381,8 @@ class Up2k(object):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histdir = os.path.join(top, ".hist")
         ret = 0
-        for iname, inf in statdir(self.log, not self.args.no_scandir, False, cdir):
+        g = statdir(self.log, not self.args.no_scandir, False, cdir)
+        for iname, inf in sorted(g):
             abspath = os.path.join(cdir, iname)
             lmod = int(inf.st_mtime)
             if stat.S_ISDIR(inf.st_mode):

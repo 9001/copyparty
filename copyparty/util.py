@@ -208,6 +208,8 @@ class ProgressPrinter(threading.Thread):
 
             msg = self.msg
             uprint(" {}\033[K\r".format(msg))
+            if PY2:
+                sys.stdout.flush()
 
         print("\033[K", end="")
         sys.stdout.flush()  # necessary on win10 even w/ stderr btw
