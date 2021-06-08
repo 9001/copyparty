@@ -54,6 +54,12 @@ MACOS = platform.system() == "Darwin"
 info = log = dbg = None
 
 
+print("{} v{} @ {}".format(
+    platform.python_implementation(),
+    ".".join([str(x) for x in sys.version_info]),
+    sys.executable))
+
+
 try:
     from fuse import FUSE, FuseOSError, Operations
 except:
