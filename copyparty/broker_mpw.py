@@ -27,7 +27,7 @@ class MpWorker(object):
         self.retpend = {}
         self.retpend_mutex = threading.Lock()
         self.mutex = threading.Lock()
-        self.workload_thr_active = False
+        self.workload_thr_alive = False
 
         # we inherited signal_handler from parent,
         # replace it with something harmless
@@ -40,7 +40,7 @@ class MpWorker(object):
 
         # on winxp and some other platforms,
         # use thr.join() to block all signals
-        thr = threading.Thread(target=self.main)
+        thr = threading.Thread(target=self.main, name="mpw-main")
         thr.daemon = True
         thr.start()
         thr.join()
@@ -79,9 +79,11 @@ class MpWorker(object):
                 self.httpsrv.accept(sck, addr)
 
                 with self.mutex:
-                    if not self.workload_thr_active:
+                    if not self.workload_thr_alive:
                         self.workload_thr_alive = True
-                        thr = threading.Thread(target=self.thr_workload)
+                        thr = threading.Thread(
+                            target=self.thr_workload, name="mpw-workload"
+                        )
                         thr.daemon = True
                         thr.start()
 

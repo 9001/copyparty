@@ -192,6 +192,7 @@ class U2idx(object):
                 self.active_id,
                 done_flag,
             ),
+            name="u2idx-terminator",
         )
         thr.daemon = True
         thr.start()

@@ -193,7 +193,7 @@ class ProgressPrinter(threading.Thread):
     """
 
     def __init__(self):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name="pp")
         self.daemon = True
         self.msg = None
         self.end = False

@@ -114,8 +114,10 @@ class ThumbSrv(object):
         self.stopping = False
         self.nthr = os.cpu_count() if hasattr(os, "cpu_count") else 4
         self.q = Queue(self.nthr * 4)
-        for _ in range(self.nthr):
-            t = threading.Thread(target=self.worker)
+        for n in range(self.nthr):
+            t = threading.Thread(
+                target=self.worker, name="thumb-{}-{}".format(n, self.nthr)
+            )
             t.daemon = True
             t.start()
 
@@ -131,7 +133,7 @@ class ThumbSrv(object):
             msg += ", ".join(missing)
             self.log(msg, c=3)
 
-        t = threading.Thread(target=self.cleaner)
+        t = threading.Thread(target=self.cleaner, name="thumb-cleaner")
         t.daemon = True
         t.start()
 

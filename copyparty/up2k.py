@@ -83,7 +83,7 @@ class Up2k(object):
         if ANYWIN:
             # usually fails to set lastmod too quickly
             self.lastmod_q = Queue()
-            thr = threading.Thread(target=self._lastmodder)
+            thr = threading.Thread(target=self._lastmodder, name="up2k-lastmod")
             thr.daemon = True
             thr.start()
 
@@ -96,7 +96,9 @@ class Up2k(object):
         if self.args.no_fastboot:
             self.deferred_init(all_vols)
         else:
-            t = threading.Thread(target=self.deferred_init, args=(all_vols,))
+            t = threading.Thread(
+                target=self.deferred_init, args=(all_vols,), name="up2k-deferred-init"
+            )
             t.daemon = True
             t.start()
 
@@ -104,20 +106,20 @@ class Up2k(object):
         have_e2d = self.init_indexes(all_vols)
 
         if have_e2d:
-            thr = threading.Thread(target=self._snapshot)
+            thr = threading.Thread(target=self._snapshot, name="up2k-snapshot")
             thr.daemon = True
             thr.start()
 
-            thr = threading.Thread(target=self._hasher)
+            thr = threading.Thread(target=self._hasher, name="up2k-hasher")
             thr.daemon = True
             thr.start()
 
             if self.mtag:
-                thr = threading.Thread(target=self._tagger)
+                thr = threading.Thread(target=self._tagger, name="up2k-tagger")
                 thr.daemon = True
                 thr.start()
 
-                thr = threading.Thread(target=self._run_all_mtp)
+                thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-init")
                 thr.daemon = True
                 thr.start()
 
@@ -132,7 +134,11 @@ class Up2k(object):
             return "cannot initiate; scan is already in progress"
 
         args = (all_vols, scan_vols)
-        t = threading.Thread(target=self.init_indexes, args=args)
+        t = threading.Thread(
+            target=self.init_indexes,
+            args=args,
+            name="up2k-rescan-{}".format(scan_vols[0]),
+        )
         t.daemon = True
         t.start()
         return None
@@ -273,7 +279,7 @@ class Up2k(object):
         if self.mtag:
             m = "online (running mtp)"
             if scan_vols:
-                thr = threading.Thread(target=self._run_all_mtp)
+                thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-scan")
                 thr.daemon = True
         else:
             del self.pp
@@ -758,7 +764,9 @@ class Up2k(object):
 
         mpool = Queue(nw)
         for _ in range(nw):
-            thr = threading.Thread(target=self._tag_thr, args=(mpool,))
+            thr = threading.Thread(
+                target=self._tag_thr, args=(mpool,), name="up2k-mpool"
+            )
             thr.daemon = True
             thr.start()
 

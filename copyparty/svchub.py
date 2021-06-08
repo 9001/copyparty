@@ -71,7 +71,7 @@ class SvcHub(object):
         self.broker = Broker(self)
 
     def run(self):
-        thr = threading.Thread(target=self.tcpsrv.run)
+        thr = threading.Thread(target=self.tcpsrv.run, name="svchub-main")
         thr.daemon = True
         thr.start()
 

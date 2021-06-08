@@ -67,7 +67,11 @@ class HttpSrv(object):
         if self.args.log_conn:
             self.log("%s %s" % addr, "|%sC-cthr" % ("-" * 5,), c="1;30")
 
-        thr = threading.Thread(target=self.thr_client, args=(sck, addr))
+        thr = threading.Thread(
+            target=self.thr_client,
+            args=(sck, addr),
+            name="httpsrv-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
+        )
         thr.daemon = True
         thr.start()
 
@@ -90,7 +94,9 @@ class HttpSrv(object):
                 self.workload += 50
                 if not self.workload_thr_alive:
                     self.workload_thr_alive = True
-                    thr = threading.Thread(target=self.thr_workload)
+                    thr = threading.Thread(
+                        target=self.thr_workload, name="httpsrv-workload"
+                    )
                     thr.daemon = True
                     thr.start()
 

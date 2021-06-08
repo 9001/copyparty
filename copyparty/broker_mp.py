@@ -44,7 +44,9 @@ class BrokerMp(object):
             proc.clients = {}
             proc.workload = 0
 
-            thr = threading.Thread(target=self.collector, args=(proc,))
+            thr = threading.Thread(
+                target=self.collector, args=(proc,), name="mp-collector"
+            )
             thr.daemon = True
             thr.start()
 
@@ -52,14 +54,19 @@ class BrokerMp(object):
             proc.start()
 
         if not self.args.q:
-            thr = threading.Thread(target=self.debug_load_balancer)
+            thr = threading.Thread(
+                target=self.debug_load_balancer, name="mp-dbg-loadbalancer"
+            )
             thr.daemon = True
             thr.start()
 
     def shutdown(self):
         self.log("broker", "shutting down")
-        for proc in self.procs:
-            thr = threading.Thread(target=proc.q_pend.put([0, "shutdown", []]))
+        for n, proc in enumerate(self.procs):
+            thr = threading.Thread(
+                target=proc.q_pend.put([0, "shutdown", []]),
+                name="mp-shutdown-{}-{}".format(n, len(self.procs)),
+            )
             thr.start()
 
         with self.mutex:

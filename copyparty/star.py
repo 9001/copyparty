@@ -42,7 +42,7 @@ class StreamTar(object):
         fmt = tarfile.GNU_FORMAT
         self.tar = tarfile.open(fileobj=self.qfile, mode="w|", format=fmt)
 
-        w = threading.Thread(target=self._gen)
+        w = threading.Thread(target=self._gen, name="star-gen")
         w.daemon = True
         w.start()
 
