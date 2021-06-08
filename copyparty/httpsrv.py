@@ -35,8 +35,9 @@ class HttpSrv(object):
     relying on MpSrv for performance (HttpSrv is just plain threads)
     """
 
-    def __init__(self, broker):
+    def __init__(self, broker, is_mp=False):
         self.broker = broker
+        self.is_mp = is_mp
         self.args = broker.args
         self.log = broker.log
 
@@ -84,13 +85,14 @@ class HttpSrv(object):
         cli = HttpConn(sck, addr, self)
         with self.mutex:
             self.clients[cli] = 0
-            self.workload += 50
 
-            if not self.workload_thr_alive:
-                self.workload_thr_alive = True
-                thr = threading.Thread(target=self.thr_workload)
-                thr.daemon = True
-                thr.start()
+            if self.is_mp:
+                self.workload += 50
+                if not self.workload_thr_alive:
+                    self.workload_thr_alive = True
+                    thr = threading.Thread(target=self.thr_workload)
+                    thr.daemon = True
+                    thr.start()
 
         try:
             if self.args.log_conn:

@@ -35,7 +35,7 @@ class MpWorker(object):
             signal.signal(signal.SIGINT, self.signal_handler)
 
         # instantiate all services here (TODO: inheritance?)
-        self.httpsrv = HttpSrv(self)
+        self.httpsrv = HttpSrv(self, True)
         self.httpsrv.disconnect_func = self.httpdrop
 
         # on winxp and some other platforms,
@@ -75,7 +75,7 @@ class MpWorker(object):
 
                 if self.args.log_conn:
                     self.log("%s %s" % addr, "|%sC-qpop" % ("-" * 4,), c="1;30")
-                
+
                 self.httpsrv.accept(sck, addr)
 
                 with self.mutex:

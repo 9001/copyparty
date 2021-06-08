@@ -35,6 +35,7 @@ class HttpConn(object):
 
         self.args = hsrv.args
         self.auth = hsrv.auth
+        self.is_mp = hsrv.is_mp
         self.cert_path = hsrv.cert_path
 
         enth = HAVE_PIL and not self.args.no_thumb
@@ -174,6 +175,11 @@ class HttpConn(object):
             self.sr = Unrecv(self.s)
 
         while True:
+            if self.is_mp:
+                self.workload += 50
+                if self.workload >= 2 ** 31:
+                    self.workload = 100
+
             cli = HttpCli(self)
             if not cli.run():
                 return

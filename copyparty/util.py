@@ -852,13 +852,14 @@ def yieldfile(fn):
 
 
 def hashcopy(actor, fin, fout):
-    u32_lim = int((2 ** 31) * 0.9)
+    is_mp = actor.is_mp
     hashobj = hashlib.sha512()
     tlen = 0
     for buf in fin:
-        actor.workload += 1
-        if actor.workload > u32_lim:
-            actor.workload = 100  # prevent overflow
+        if is_mp:
+            actor.workload += 1
+            if actor.workload > 2 ** 31:
+                actor.workload = 100  # prevent overflow
 
         tlen += len(buf)
         hashobj.update(buf)

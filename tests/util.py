@@ -116,6 +116,7 @@ class VHttpConn(object):
         self.addr = ("127.0.0.1", "42069")
         self.args = args
         self.auth = auth
+        self.is_mp = False
         self.log_func = log
         self.log_src = "a"
         self.lf_url = None
