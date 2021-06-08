@@ -22,7 +22,7 @@ class VFS(object):
         self.uadm = uadm  # users who are regular admins
         self.flags = flags  # config switches
         self.nodes = {}  # child nodes
-        self.all_vols = {vpath: self}  # flattened recursive
+        self.all_vols = {vpath: self} if realpath else {}  # flattened recursive
 
     def __repr__(self):
         return "VFS({})".format(
@@ -430,7 +430,7 @@ class AuthSrv(object):
             vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(os.path.abspath("."), "")
+            vfs = VFS(None, "")
             vfs.flags["d2d"] = True
 
         maxdepth = 0

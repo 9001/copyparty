@@ -251,7 +251,7 @@ class TestVFS(unittest.TestCase):
         n = au.vfs
         # root was not defined, so PWD with no access to anyone
         self.assertEqual(n.vpath, "")
-        self.assertEqual(n.realpath, td)
+        self.assertEqual(n.realpath, None)
         self.assertEqual(n.uread, [])
         self.assertEqual(n.uwrite, [])
         self.assertEqual(len(n.nodes), 1)

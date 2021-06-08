@@ -186,12 +186,14 @@ class Up2k(object):
                 self.log("cannot access " + vol.realpath, c=1)
                 continue
 
+            if scan_vols and vol.vpath not in scan_vols:
+                continue
+
             if not self.register_vpath(vol.realpath, vol.flags):
                 # self.log("db not enabled for {}".format(m, vol.realpath))
                 continue
 
-            if vol.vpath in scan_vols or not scan_vols:
-                live_vols.append(vol)
+            live_vols.append(vol)
 
             if vol.vpath not in self.volstate:
                 self.volstate[vol.vpath] = "OFFLINE (pending initialization)"
@@ -288,7 +290,10 @@ class Up2k(object):
     def register_vpath(self, ptop, flags):
         db_path = os.path.join(ptop, ".hist", "up2k.db")
         if ptop in self.registry:
-            return [self.cur[ptop], db_path]
+            try:
+                return [self.cur[ptop], db_path]
+            except:
+                return None
 
         _, flags = self._expr_idx_filter(flags)
 
