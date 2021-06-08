@@ -859,7 +859,7 @@ def hashcopy(actor, fin, fout):
         if is_mp:
             actor.workload += 1
             if actor.workload > 2 ** 31:
-                actor.workload = 100  # prevent overflow
+                actor.workload = 100
 
         tlen += len(buf)
         hashobj.update(buf)
@@ -871,12 +871,17 @@ def hashcopy(actor, fin, fout):
     return tlen, hashobj.hexdigest(), digest_b64
 
 
-def sendfile_py(lower, upper, f, s):
+def sendfile_py(lower, upper, f, s, actor=None):
     remains = upper - lower
     f.seek(lower)
     while remains > 0:
+        if actor:
+            actor.workload += 1
+            if actor.workload > 2 ** 31:
+                actor.workload = 100
+
         # time.sleep(0.01)
-        buf = f.read(min(4096, remains))
+        buf = f.read(min(1024 * 32, remains))
         if not buf:
             return remains
 

@@ -41,6 +41,7 @@ class HttpCli(object):
         self.ip = conn.addr[0]
         self.addr = conn.addr  # type: tuple[str, int]
         self.args = conn.args
+        self.is_mp = conn.is_mp
         self.auth = conn.auth  # type: AuthSrv
         self.ico = conn.ico
         self.thumbcli = conn.thumbcli
@@ -1162,7 +1163,8 @@ class HttpCli(object):
             if use_sendfile:
                 remains = sendfile_kern(lower, upper, f, self.s)
             else:
-                remains = sendfile_py(lower, upper, f, self.s)
+                actor = self.conn if self.is_mp else None
+                remains = sendfile_py(lower, upper, f, self.s, actor)
 
         if remains > 0:
             logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"
