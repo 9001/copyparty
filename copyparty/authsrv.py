@@ -5,6 +5,8 @@ import re
 import os
 import sys
 import stat
+import base64
+import hashlib
 import threading
 
 from .__init__ import WINDOWS
@@ -22,7 +24,14 @@ class VFS(object):
         self.uadm = uadm  # users who are regular admins
         self.flags = flags  # config switches
         self.nodes = {}  # child nodes
-        self.all_vols = {vpath: self} if realpath else {}  # flattened recursive
+        self.histtab = None  # all realpath->histpath
+
+        if realpath:
+            self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
+            self.all_vols = {vpath: self}  # flattened recursive
+        else:
+            self.histpath = None
+            self.all_vols = {}
 
     def __repr__(self):
         return "VFS({})".format(
@@ -273,7 +282,8 @@ class AuthSrv(object):
         self.reload()
 
     def log(self, msg, c=0):
-        self.log_func("auth", msg, c)
+        if self.log_func:
+            self.log_func("auth", msg, c)
 
     def laggy_iter(self, iterable):
         """returns [value,isFinalValue]"""
@@ -466,6 +476,46 @@ class AuthSrv(object):
                 c=1,
             )
             raise Exception("invalid config")
+
+        for vol in vfs.all_vols.values():
+            hid = hashlib.sha512(fsenc(vol.realpath)).digest()
+            hid = base64.b32encode(hid).decode("ascii").lower()
+            vflag = vol.flags.get("hist")
+            if vflag == "-":
+                pass
+            elif vflag:
+                if WINDOWS and vflag.startswith("/"):
+                    vflag = "{}:\\{}".format(vflag[1], vflag[3:])
+                vol.histpath = vflag
+            elif self.args.hist:
+                for nch in range(len(hid)):
+                    hpath = os.path.join(self.args.hist, hid[: nch + 1])
+                    try:
+                        os.makedirs(hpath)
+                    except:
+                        pass
+
+                    powner = os.path.join(hpath, "owner.txt")
+                    try:
+                        with open(powner, "rb") as f:
+                            owner = f.read().rstrip()
+                    except:
+                        owner = None
+
+                    me = fsenc(vol.realpath).rstrip()
+                    if owner not in [None, me]:
+                        continue
+
+                    if owner is None:
+                        with open(powner, "wb") as f:
+                            f.write(me)
+
+                    vol.histpath = hpath
+                    break
+
+            vol.histpath = os.path.realpath(vol.histpath)
+
+        vfs.histtab = {v.realpath: v.histpath for v in vfs.all_vols.values()}
 
         all_mte = {}
         errors = False

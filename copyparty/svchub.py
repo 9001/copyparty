@@ -44,7 +44,7 @@ class SvcHub(object):
 
         # initiate all services to manage
         self.tcpsrv = TcpSrv(self)
-        self.up2k = Up2k(self, auth.vfs.all_vols)
+        self.up2k = Up2k(self, auth.vfs)
 
         self.thumbsrv = None
         if not args.no_thumb:
@@ -54,7 +54,7 @@ class SvcHub(object):
                     msg = "setting --th-no-webp because either libwebp is not available or your Pillow is too old"
                     self.log("thumb", msg, c=3)
 
-                self.thumbsrv = ThumbSrv(self, auth.vfs.all_vols)
+                self.thumbsrv = ThumbSrv(self, auth.vfs)
             else:
                 msg = "need Pillow to create thumbnails; for example:\n{}{} -m pip install --user Pillow\n"
                 self.log(

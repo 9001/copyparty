@@ -74,7 +74,7 @@ if HAVE_FFMPEG and HAVE_FFPROBE:
     THUMBABLE.update(FMT_FF)
 
 
-def thumb_path(ptop, rem, mtime, fmt):
+def thumb_path(hist, rem, mtime, fmt):
     # base16 = 16 = 256
     # b64-lc = 38 = 1444
     # base64 = 64 = 4096
@@ -95,15 +95,16 @@ def thumb_path(ptop, rem, mtime, fmt):
     h = hashlib.sha512(fsenc(fn)).digest()[:24]
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
-    return "{}/.hist/th/{}/{}.{:x}.{}".format(
-        ptop, rd, fn, int(mtime), "webp" if fmt == "w" else "jpg"
+    return "{}/th/{}/{}.{:x}.{}".format(
+        hist, rd, fn, int(mtime), "webp" if fmt == "w" else "jpg"
     )
 
 
 class ThumbSrv(object):
-    def __init__(self, hub, vols):
+    def __init__(self, hub, vfs):
         self.hub = hub
-        self.vols = [v.realpath for v in vols.values()]
+        self.vols = [v.realpath for v in vfs.all_vols.values()]
+        self.hist = vfs.histtab
 
         self.args = hub.args
         self.log_func = hub.log
@@ -153,7 +154,8 @@ class ThumbSrv(object):
             return not self.nthr
 
     def get(self, ptop, rem, mtime, fmt):
-        tpath = thumb_path(ptop, rem, mtime, fmt)
+        hist = self.hist[ptop]
+        tpath = thumb_path(hist, rem, mtime, fmt)
         abspath = os.path.join(ptop, rem)
         cond = threading.Condition()
         with self.mutex:
@@ -319,26 +321,29 @@ class ThumbSrv(object):
         interval = self.args.th_clean
         while True:
             time.sleep(interval)
-            for vol in self.vols:
-                vol += "/.hist/th"
-                self.log("\033[Jcln {}/\033[A".format(vol))
-                self.clean(vol)
+            for vol, hist in self.hist.items():
+                if hist.startswith(vol):
+                    self.log("\033[Jcln {}/\033[A".format(hist))
+                else:
+                    self.log("\033[Jcln {} ({})/\033[A".format(hist, vol))
+
+                self.clean(hist)
 
             self.log("\033[Jcln ok")
 
-    def clean(self, vol):
-        # self.log("cln {}".format(vol))
+    def clean(self, hist):
+        # self.log("cln {}".format(hist))
         maxage = self.args.th_maxage
         now = time.time()
         prev_b64 = None
         prev_fp = None
         try:
-            ents = os.listdir(vol)
+            ents = os.listdir(hist)
         except:
             return
 
         for f in sorted(ents):
-            fp = os.path.join(vol, f)
+            fp = os.path.join(hist, f)
             cmp = fp.lower().replace("\\", "/")
 
             # "top" or b64 prefix/full (a folder)

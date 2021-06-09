@@ -37,6 +37,7 @@ class Cfg(Namespace):
             nih=True,
             mtp=[],
             mte="a",
+            hist=None,
             **{k: False for k in "e2d e2ds e2dsa e2t e2ts e2tsr".split()}
         )
 

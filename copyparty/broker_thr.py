@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import threading
 
+from .authsrv import AuthSrv
 from .httpsrv import HttpSrv
 from .broker_util import ExceptionalQueue, try_exec
 
@@ -16,6 +17,9 @@ class BrokerThr(object):
         self.args = hub.args
 
         self.mutex = threading.Lock()
+
+        # starting to look like a good idea
+        self.authsrv = AuthSrv(self.args, None, False)
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self)

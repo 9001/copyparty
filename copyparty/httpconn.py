@@ -71,7 +71,7 @@ class HttpConn(object):
 
     def get_u2idx(self):
         if not self.u2idx:
-            self.u2idx = U2idx(self.args, self.log_func)
+            self.u2idx = U2idx(self.args, self.log_func, self.auth.vfs)
 
         return self.u2idx
 

@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import os
-import time
 
 from .util import Cooldown
 from .th_srv import thumb_path, THUMBABLE, FMT_FF
@@ -12,6 +11,7 @@ class ThumbCli(object):
     def __init__(self, broker):
         self.broker = broker
         self.args = broker.args
+        self.hist = broker.authsrv.vfs.histtab
 
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
@@ -30,7 +30,8 @@ class ThumbCli(object):
         if fmt == "w" and self.args.th_no_webp:
             fmt = "j"
 
-        tpath = thumb_path(ptop, rem, mtime, fmt)
+        hist = self.hist[ptop]
+        tpath = thumb_path(hist, rem, mtime, fmt)
         ret = None
         try:
             st = os.stat(tpath)

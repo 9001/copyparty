@@ -285,6 +285,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing")
     ap2.add_argument("-e2ts", action="store_true", help="enable metadata scanner, sets -e2t")
     ap2.add_argument("-e2tsr", action="store_true", help="rescan all metadata, sets -e2ts")
+    ap2.add_argument("--hist", metavar="PATH", type=str, help="where to store volume state")
     ap2.add_argument("--no-mutagen", action="store_true", help="use ffprobe for tags instead")
     ap2.add_argument("--no-mtag-mt", action="store_true", help="disable tag-read parallelism")
     ap2.add_argument("-mtm", metavar="M=t,t,t", action="append", type=str, help="add/replace metadata mapping")

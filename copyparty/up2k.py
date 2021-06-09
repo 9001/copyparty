@@ -48,8 +48,10 @@ class Up2k(object):
         * ~/.config flatfiles for active jobs
     """
 
-    def __init__(self, hub, all_vols):
+    def __init__(self, hub, vfs):
         self.hub = hub
+        self.vfs = vfs
+        # TODO stop passing around vfs, do auth or broker instead
         self.args = hub.args
         self.log_func = hub.log
 
@@ -94,10 +96,12 @@ class Up2k(object):
             self.log("could not initialize sqlite3, will use in-memory registry only")
 
         if self.args.no_fastboot:
-            self.deferred_init(all_vols)
+            self.deferred_init(vfs.all_vols)
         else:
             t = threading.Thread(
-                target=self.deferred_init, args=(all_vols,), name="up2k-deferred-init"
+                target=self.deferred_init,
+                args=(vfs.all_vols,),
+                name="up2k-deferred-init",
             )
             t.daemon = True
             t.start()
@@ -294,7 +298,7 @@ class Up2k(object):
         return have_e2d
 
     def register_vpath(self, ptop, flags):
-        db_path = os.path.join(ptop, ".hist", "up2k.db")
+        db_path = os.path.join(self.vfs.histtab[ptop], "up2k.db")
         if ptop in self.registry:
             try:
                 return [self.cur[ptop], db_path]
@@ -314,7 +318,7 @@ class Up2k(object):
             self.log(" ".join(sorted(a)) + "\033[0m")
 
         reg = {}
-        path = os.path.join(ptop, ".hist", "up2k.snap")
+        path = os.path.join(self.vfs.histtab[ptop], "up2k.snap")
         if "e2d" in flags and os.path.exists(path):
             with gzip.GzipFile(path, "rb") as f:
                 j = f.read().decode("utf-8")
@@ -338,7 +342,7 @@ class Up2k(object):
             return None
 
         try:
-            os.mkdir(os.path.join(ptop, ".hist"))
+            os.makedirs(self.vfs.histtab[ptop])
         except:
             pass
 
@@ -379,7 +383,7 @@ class Up2k(object):
 
     def _build_dir(self, dbw, top, excl, cdir):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
-        histdir = os.path.join(top, ".hist")
+        histdir = self.vfs.histtab[top]
         ret = 0
         g = statdir(self.log, not self.args.no_scandir, False, cdir)
         for iname, inf in sorted(g):
@@ -928,7 +932,7 @@ class Up2k(object):
     def _create_v3(self, cur):
         """
         collision in 2^(n/2) files where n = bits (6 bits/ch)
-          10*6/2 = 2^30 =       1'073'741'824, 24.1mb idx
+          10*6/2 = 2^30 =       1'073'741'824, 24.1mb idx  1<<(3*10)
           12*6/2 = 2^36 =      68'719'476'736, 24.8mb idx
           16*6/2 = 2^48 = 281'474'976'710'656, 26.1mb idx
         """
@@ -1366,7 +1370,7 @@ class Up2k(object):
                 except:
                     pass
 
-        path = os.path.join(k, ".hist", "up2k.snap")
+        path = os.path.join(self.vfs.histtab[k], "up2k.snap")
         if not reg:
             if k not in prev or prev[k] is not None:
                 prev[k] = None
@@ -1380,7 +1384,7 @@ class Up2k(object):
             return
 
         try:
-            os.mkdir(os.path.join(k, ".hist"))
+            os.makedirs(self.vfs.histtab[k])
         except:
             pass
 

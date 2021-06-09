@@ -40,6 +40,7 @@ class HttpSrv(object):
         self.is_mp = is_mp
         self.args = broker.args
         self.log = broker.log
+        self.auth = broker.authsrv
 
         self.disconnect_func = None
         self.mutex = threading.Lock()
@@ -47,7 +48,6 @@ class HttpSrv(object):
         self.clients = {}
         self.workload = 0
         self.workload_thr_alive = False
-        self.auth = AuthSrv(self.args, self.log)
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))

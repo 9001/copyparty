@@ -301,6 +301,18 @@ the same arguments can be set as volume flags, in addition to `d2d` and `d2t` fo
 the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
 
+## database location
+
+copyparty creates a subfolder named `.hist` inside each volume where it stores the database, thumbnails, and some other stuff
+
+this can instead be kept in a single place using the `--hist` argument, or the `hist=` volume flag, or a mix of both:
+* `--hist ~/.cache/copyparty -v ~/music::r:chist=-` sets `~/.cache/copyparty` as the default place to put volume info, but `~/music` gets the regular `.hist` subfolder (`-` restores default behavior)
+
+btw,
+* markdown edits are always stored in a local `.hist` subdirectory
+* on windows the volflag path is cyglike, so `/c/temp` means `C:\temp`
+
+
 ## metadata from audio files
 
 `-mte` decides which tags to index and display in the browser (and also the display order), this can be changed per-volume:

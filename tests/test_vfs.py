@@ -18,8 +18,8 @@ from copyparty import util
 class Cfg(Namespace):
     def __init__(self, a=[], v=[], c=None):
         ex = {k: False for k in "e2d e2ds e2dsa e2t e2ts e2tsr".split()}
-        ex["mtp"] = []
-        ex["mte"] = "a"
+        ex2 = {"mtp": [], "mte": "a", "hist": None}
+        ex.update(ex2)
         super(Cfg, self).__init__(a=a, v=v, c=c, **ex)
 
 

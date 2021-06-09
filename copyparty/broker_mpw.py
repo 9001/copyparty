@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
+from copyparty.authsrv import AuthSrv
 
 import sys
 import time
@@ -33,6 +34,9 @@ class MpWorker(object):
         # replace it with something harmless
         if not FAKE_MP:
             signal.signal(signal.SIGINT, self.signal_handler)
+
+        # starting to look like a good idea
+        self.authsrv = AuthSrv(args, None, False)
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self, True)

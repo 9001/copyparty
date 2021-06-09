@@ -7,7 +7,7 @@ import time
 import threading
 from datetime import datetime
 
-from .util import u8safe, s3dec, html_escape, Pebkac
+from .util import s3dec, Pebkac
 from .up2k import up2k_wark_from_hashlist
 
 
@@ -19,9 +19,11 @@ except:
 
 
 class U2idx(object):
-    def __init__(self, args, log_func):
+    def __init__(self, args, log_func, vfs):
         self.args = args
         self.log_func = log_func
+        self.vfs = vfs
+
         self.timeout = args.srch_time
 
         if not HAVE_SQLITE3:
@@ -60,10 +62,11 @@ class U2idx(object):
         if cur:
             return cur
 
-        cur = _open(ptop)
-        if not cur:
+        db_path = os.path.join(self.vfs.histtab[ptop], "up2k.db")
+        if not os.path.exists(db_path):
             return None
 
+        cur = sqlite3.connect(db_path).cursor()
         self.cur[ptop] = cur
         return cur
 
@@ -262,9 +265,3 @@ class U2idx(object):
 
         if identifier == self.active_id:
             self.active_cur.connection.interrupt()
-
-
-def _open(ptop):
-    db_path = os.path.join(ptop, ".hist", "up2k.db")
-    if os.path.exists(db_path):
-        return sqlite3.connect(db_path).cursor()
