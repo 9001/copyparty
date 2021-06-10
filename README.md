@@ -37,6 +37,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [other tricks](#other-tricks)
 * [searching](#searching)
     * [search configuration](#search-configuration)
+    * [database location](#database-location)
     * [metadata from audio files](#metadata-from-audio-files)
     * [file parser plugins](#file-parser-plugins)
     * [complete examples](#complete-examples)
@@ -126,7 +127,6 @@ summary: all planned features work! now please enjoy the bloatening
 
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
 * cannot mount something at `/d1/d2/d3` unless `d2` exists inside `d1`
-* hiding the contents at url `/d1/d2/d3` using `-v :d1/d2/d3:cd2d` has the side-effect of creating databases (for files/tags) inside folders d1 and d2, and those databases take precedence over the main db at the top of the vfs - this means all files in d2 and below will be reindexed unless you already had a vfs entry at or below d2
 * probably more, pls let me know
 
 ## not my bugs

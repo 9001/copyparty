@@ -113,13 +113,13 @@ class TestVFS(unittest.TestCase):
         n = vfs.nodes["a"]
         self.assertEqual(len(vfs.nodes), 1)
         self.assertEqual(n.vpath, "a")
-        self.assertEqual(n.realpath, td + "/a")
+        self.assertEqual(n.realpath, os.path.join(td, "a"))
         self.assertEqual(n.uread, ["*", "k"])
         self.assertEqual(n.uwrite, ["k"])
         n = n.nodes["ac"]
         self.assertEqual(len(vfs.nodes), 1)
         self.assertEqual(n.vpath, "a/ac")
-        self.assertEqual(n.realpath, td + "/a/ac")
+        self.assertEqual(n.realpath, os.path.join(td, "a", "ac"))
         self.assertEqual(n.uread, ["*", "k"])
         self.assertEqual(n.uwrite, ["k"])
         n = n.nodes["acb"]

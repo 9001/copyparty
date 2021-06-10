@@ -443,8 +443,10 @@ class HttpCli(object):
         with open(fsenc(path), "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
+        vfs, vrem = vfs.get_dbv(rem)
+
         self.conn.hsrv.broker.put(
-            False, "up2k.hash_file", vfs.realpath, vfs.flags, rem, fn
+            False, "up2k.hash_file", vfs.realpath, vfs.flags, vrem, fn
         )
 
         return post_sz, sha_b64, remains, path
@@ -551,12 +553,13 @@ class HttpCli(object):
             body["name"] = name
 
         vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        dbv, vrem = vfs.get_dbv(rem)
 
-        body["vtop"] = vfs.vpath
-        body["ptop"] = vfs.realpath
-        body["prel"] = rem
+        body["vtop"] = dbv.vpath
+        body["ptop"] = dbv.realpath
+        body["prel"] = vrem
         body["addr"] = self.ip
-        body["vcfg"] = vfs.flags
+        body["vcfg"] = dbv.flags
 
         if sub:
             try:
@@ -578,8 +581,14 @@ class HttpCli(object):
 
     def handle_search(self, body):
         vols = []
+        seen = {}
         for vtop in self.rvol:
             vfs, _ = self.conn.auth.vfs.get(vtop, self.uname, True, False)
+            vfs = vfs.dbv or vfs
+            if vfs in seen:
+                continue
+
+            seen[vfs] = True
             vols.append([vfs.vpath, vfs.realpath, vfs.flags])
 
         idx = self.conn.get_u2idx()
@@ -636,7 +645,7 @@ class HttpCli(object):
             raise Pebkac(400, "need hash and wark headers for binary POST")
 
         vfs, _ = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
-        ptop = vfs.realpath
+        ptop = (vfs.dbv or vfs).realpath
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", ptop, wark, chash)
         response = x.get()
@@ -817,8 +826,14 @@ class HttpCli(object):
                             raise Pebkac(400, "empty files in post")
 
                         files.append([sz, sha512_hex, p_file, fname])
+                        dbv, vrem = vfs.get_dbv(vrem)
                         self.conn.hsrv.broker.put(
-                            False, "up2k.hash_file", vfs.realpath, vfs.flags, rem, fname
+                            False,
+                            "up2k.hash_file",
+                            dbv.realpath,
+                            dbv.flags,
+                            vrem,
+                            fname,
                         )
                         self.conn.nbyte += sz
 
@@ -1483,6 +1498,7 @@ class HttpCli(object):
             self.vpath, self.uname, self.readable, self.writable
         )
         abspath = vn.canonical(rem)
+        dbv, vrem = vn.get_dbv(rem)
 
         try:
             st = os.stat(fsenc(abspath))
@@ -1497,7 +1513,9 @@ class HttpCli(object):
             if th_fmt is not None:
                 thp = None
                 if self.thumbcli:
-                    thp = self.thumbcli.get(vn.realpath, rem, int(st.st_mtime), th_fmt)
+                    thp = self.thumbcli.get(
+                        dbv.realpath, vrem, int(st.st_mtime), th_fmt
+                    )
 
                 if thp:
                     return self.tx_file(thp)
@@ -1640,7 +1658,7 @@ class HttpCli(object):
         icur = None
         if "e2t" in vn.flags:
             idx = self.conn.get_u2idx()
-            icur = idx.get_cur(vn.realpath)
+            icur = idx.get_cur(dbv.realpath)
 
         dirs = []
         files = []
@@ -1708,6 +1726,9 @@ class HttpCli(object):
             rd = f["rd"]
             del f["rd"]
             if icur:
+                if vn != dbv:
+                    _, rd = vn.get_dbv(rd)
+
                 q = "select w from up where rd = ? and fn = ?"
                 try:
                     r = icur.execute(q, (rd, fn)).fetchone()

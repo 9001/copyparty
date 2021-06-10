@@ -25,6 +25,7 @@ class VFS(object):
         self.flags = flags  # config switches
         self.nodes = {}  # child nodes
         self.histtab = None  # all realpath->histpath
+        self.dbv = None  # closest full/non-jump parent
 
         if realpath:
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
@@ -64,8 +65,9 @@ class VFS(object):
                 self.uread,
                 self.uwrite,
                 self.uadm,
-                self.flags,
+                self._copy_flags(name),
             )
+            vn.dbv = self.dbv or self
             self.nodes[name] = vn
             return vn.add(src, dst)
 
@@ -76,8 +78,26 @@ class VFS(object):
         # leaf does not exist; create and keep permissions blank
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
         vn = VFS(src, vp)
+        vn.dbv = self.dbv or self
         self.nodes[dst] = vn
         return vn
+
+    def _copy_flags(self, name):
+        flags = {k: v for k, v in self.flags.items()}
+        hist = flags.get("hist")
+        if hist and hist != "-":
+            flags["hist"] = "{}/{}".format(hist.rstrip("/"), name)
+
+        return flags
+
+    def bubble_flags(self):
+        if self.dbv:
+            for k, v in self.dbv.flags:
+                if k not in ["hist"]:
+                    self.flags[k] = v
+
+        for v in self.nodes.values():
+            v.bubble_flags()
 
     def _find(self, vpath):
         """return [vfs,remainder]"""
@@ -116,6 +136,15 @@ class VFS(object):
             raise Pebkac(403, "you don't have write-access for this location")
 
         return vn, rem
+
+    def get_dbv(self, vrem):
+        dbv = self.dbv
+        if not dbv:
+            return self, vrem
+
+        vrem = [self.vpath[len(dbv.vpath) + 1 :], vrem]
+        vrem = "/".join([x for x in vrem if x])
+        return dbv, vrem
 
     def canonical(self, rem):
         """returns the canonical path (fully-resolved absolute fs path)"""
@@ -461,6 +490,7 @@ class AuthSrv(object):
             v.uwrite = mwrite[dst]
             v.uadm = madm[dst]
             v.flags = mflags[dst]
+            v.dbv = None
 
         vfs.all_vols = {}
         vfs.get_all_vols(vfs.all_vols)
@@ -480,6 +510,8 @@ class AuthSrv(object):
             )
             raise Exception("invalid config")
 
+        promote = []
+        demote = []
         for vol in vfs.all_vols.values():
             hid = hashlib.sha512(fsenc(vol.realpath)).digest()
             hid = base64.b32encode(hid).decode("ascii").lower()
@@ -517,6 +549,27 @@ class AuthSrv(object):
                     break
 
             vol.histpath = os.path.realpath(vol.histpath)
+            if vol.dbv:
+                if os.path.exists(os.path.join(vol.histpath, "up2k.db")):
+                    promote.append(vol)
+                    vol.dbv = None
+                else:
+                    demote.append(vol)
+
+        # discard jump-vols
+        for v in demote:
+            vfs.all_vols.pop(v.vpath)
+
+        if promote:
+            msg = [
+                "\n  the following jump-volumes were generated to assist the vfs.\n  As they contain a database (probably from v0.11.11 or older),\n  they are promoted to full volumes:"
+            ]
+            for vol in promote:
+                msg.append(
+                    "  /{}  ({})  ({})".format(vol.vpath, vol.realpath, vol.histpath)
+                )
+
+            self.log("\n\n".join(msg) + "\n", c=3)
 
         vfs.histtab = {v.realpath: v.histpath for v in vfs.all_vols.values()}
 
@@ -609,6 +662,8 @@ class AuthSrv(object):
 
         if errors:
             sys.exit(1)
+
+        vfs.bubble_flags()
 
         try:
             v, _ = vfs.get("/", "*", False, True)
