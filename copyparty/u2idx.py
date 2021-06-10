@@ -7,7 +7,7 @@ import time
 import threading
 from datetime import datetime
 
-from .util import s3dec, Pebkac
+from .util import s3dec, Pebkac, min_ex
 from .up2k import up2k_wark_from_hashlist
 
 
@@ -54,8 +54,8 @@ class U2idx(object):
 
         try:
             return self.run_query(vols, uq, uv)[0]
-        except Exception as ex:
-            raise Pebkac(500, repr(ex))
+        except:
+            raise Pebkac(500, min_ex())
 
     def get_cur(self, ptop):
         cur = self.cur.get(ptop)
@@ -245,6 +245,7 @@ class U2idx(object):
                 hit["tags"] = tags
 
             ret.extend(sret)
+            # print("[{}] {}".format(ptop, sret))
 
         done_flag.append(True)
         self.active_id = None

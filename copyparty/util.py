@@ -254,6 +254,17 @@ def trace(*args, **kwargs):
     nuprint(msg)
 
 
+def min_ex():
+    et, ev, tb = sys.exc_info()
+    tb = traceback.extract_tb(tb, 2)
+    ex = [
+        "{} @ {} <{}>: {}".format(fp.split(os.sep)[-1], ln, fun, txt)
+        for fp, ln, fun, txt in tb
+    ]
+    ex.append("{}: {}".format(et.__name__, ev))
+    return "\n".join(ex)
+
+
 @contextlib.contextmanager
 def ren_open(fname, *args, **kwargs):
     fdir = kwargs.pop("fdir", None)

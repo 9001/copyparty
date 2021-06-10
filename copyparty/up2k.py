@@ -359,6 +359,7 @@ class Up2k(object):
     def _build_file_index(self, vol, all_vols):
         do_vac = False
         top = vol.realpath
+        nohash = "dhash" in vol.flags
         with self.mutex:
             cur, _ = self.register_vpath(top, vol.flags)
 
@@ -373,7 +374,7 @@ class Up2k(object):
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
 
-            n_add = self._build_dir(dbw, top, set(excl), top)
+            n_add = self._build_dir(dbw, top, set(excl), top, nohash)
             n_rm = self._drop_lost(dbw[0], top)
             if dbw[1]:
                 self.log("commit {} new files".format(dbw[1]))
@@ -381,7 +382,7 @@ class Up2k(object):
 
             return True, n_add or n_rm or do_vac
 
-    def _build_dir(self, dbw, top, excl, cdir):
+    def _build_dir(self, dbw, top, excl, cdir, nohash):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histdir = self.vfs.histtab[top]
         ret = 0
@@ -389,16 +390,17 @@ class Up2k(object):
         for iname, inf in sorted(g):
             abspath = os.path.join(cdir, iname)
             lmod = int(inf.st_mtime)
+            sz = inf.st_size
             if stat.S_ISDIR(inf.st_mode):
                 if abspath in excl or abspath == histdir:
                     continue
                 # self.log(" dir: {}".format(abspath))
-                ret += self._build_dir(dbw, top, excl, abspath)
+                ret += self._build_dir(dbw, top, excl, abspath, nohash)
             else:
                 # self.log("file: {}".format(abspath))
                 rp = abspath[len(top) :].replace("\\", "/").strip("/")
                 rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
-                sql = "select * from up where rd = ? and fn = ?"
+                sql = "select w, mt, sz from up where rd = ? and fn = ?"
                 try:
                     c = dbw[0].execute(sql, (rd, fn))
                 except:
@@ -407,18 +409,18 @@ class Up2k(object):
                 in_db = list(c.fetchall())
                 if in_db:
                     self.pp.n -= 1
-                    _, dts, dsz, _, _ = in_db[0]
+                    dw, dts, dsz = in_db[0]
                     if len(in_db) > 1:
                         m = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
                         rep_db = "\n".join([repr(x) for x in in_db])
                         self.log(m.format(top, rp, len(in_db), rep_db))
                         dts = -1
 
-                    if dts == lmod and dsz == inf.st_size:
+                    if dts == lmod and dsz == sz and (nohash or dw[0] != "#"):
                         continue
 
                     m = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
-                        top, rp, dts, lmod, dsz, inf.st_size
+                        top, rp, dts, lmod, dsz, sz
                     )
                     self.log(m)
                     self.db_rm(dbw[0], rd, fn)
@@ -427,17 +429,22 @@ class Up2k(object):
                     in_db = None
 
                 self.pp.msg = "a{} {}".format(self.pp.n, abspath)
-                if inf.st_size > 1024 * 1024:
-                    self.log("file: {}".format(abspath))
 
-                try:
-                    hashes = self._hashlist_from_file(abspath)
-                except Exception as ex:
-                    self.log("hash: {} @ [{}]".format(repr(ex), abspath))
-                    continue
+                if nohash:
+                    wark = up2k_wark_from_metadata(self.salt, sz, lmod, rd, fn)
+                else:
+                    if sz > 1024 * 1024:
+                        self.log("file: {}".format(abspath))
 
-                wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
-                self.db_add(dbw[0], wark, rd, fn, lmod, inf.st_size)
+                    try:
+                        hashes = self._hashlist_from_file(abspath)
+                    except Exception as ex:
+                        self.log("hash: {} @ [{}]".format(repr(ex), abspath))
+                        continue
+
+                    wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
+
+                self.db_add(dbw[0], wark, rd, fn, lmod, sz)
                 dbw[1] += 1
                 ret += 1
                 td = time.time() - dbw[2]
@@ -1466,9 +1473,12 @@ def up2k_wark_from_hashlist(salt, filesize, hashes):
     ident.extend(hashes)
     ident = "\n".join(ident)
 
-    hasher = hashlib.sha512()
-    hasher.update(ident.encode("utf-8"))
-    digest = hasher.digest()[:32]
+    wark = hashlib.sha512(ident.encode("utf-8")).digest()
+    wark = base64.urlsafe_b64encode(wark)
+    return wark.decode("ascii")[:43]
 
-    wark = base64.urlsafe_b64encode(digest)
-    return wark.decode("utf-8").rstrip("=")
+
+def up2k_wark_from_metadata(salt, sz, lastmod, rd, fn):
+    ret = fsenc("{}\n{}\n{}\n{}\n{}".format(salt, lastmod, sz, rd, fn))
+    ret = base64.urlsafe_b64encode(hashlib.sha512(ret).digest())
+    return "#{}".format(ret[:42].decode("ascii"))

@@ -296,9 +296,16 @@ the same arguments can be set as volume flags, in addition to `d2d` and `d2t` fo
 * `-v ~/music::r:cd2d` disables **all** indexing, even if any `-e2*` are on
 * `-v ~/music::r:cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
-`e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
+note:
+* `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
+* the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
-the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
+you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `cnhash`, this has the following consequences:
+* initial indexing is way faster, especially when the volume is on a networked disk
+* makes it impossible to [file-search](#file-search)
+* if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
+
+if you set `--no-hash`, you can enable hashing for specific volumes using flag `cehash`
 
 
 ## database location
@@ -308,9 +315,9 @@ copyparty creates a subfolder named `.hist` inside each volume where it stores t
 this can instead be kept in a single place using the `--hist` argument, or the `hist=` volume flag, or a mix of both:
 * `--hist ~/.cache/copyparty -v ~/music::r:chist=-` sets `~/.cache/copyparty` as the default place to put volume info, but `~/music` gets the regular `.hist` subfolder (`-` restores default behavior)
 
-btw,
+note:
 * markdown edits are always stored in a local `.hist` subdirectory
-* on windows the volflag path is cyglike, so `/c/temp` means `C:\temp`
+* on windows the volflag path is cyglike, so `/c/temp` means `C:\temp` but use regular paths for `--hist`
 
 
 ## metadata from audio files

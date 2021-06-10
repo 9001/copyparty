@@ -31,7 +31,7 @@ class VFS(object):
             self.all_vols = {vpath: self}  # flattened recursive
         else:
             self.histpath = None
-            self.all_vols = {}
+            self.all_vols = None
 
     def __repr__(self):
         return "VFS({})".format(
@@ -41,9 +41,10 @@ class VFS(object):
             )
         )
 
-    def _trk(self, vol):
-        self.all_vols[vol.vpath] = vol
-        return vol
+    def get_all_vols(self, outdict):
+        for v in self.nodes.values():
+            v.get_all_vols(outdict)
+            outdict[v.vpath] = v
 
     def add(self, src, dst):
         """get existing, or add new path to the vfs"""
@@ -55,19 +56,18 @@ class VFS(object):
             name, dst = dst.split("/", 1)
             if name in self.nodes:
                 # exists; do not manipulate permissions
-                return self._trk(self.nodes[name].add(src, dst))
+                return self.nodes[name].add(src, dst)
 
             vn = VFS(
-                "{}/{}".format(self.realpath, name),
+                os.path.join(self.realpath, name),
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.uread,
                 self.uwrite,
                 self.uadm,
                 self.flags,
             )
-            self._trk(vn)
             self.nodes[name] = vn
-            return self._trk(vn.add(src, dst))
+            return vn.add(src, dst)
 
         if dst in self.nodes:
             # leaf exists; return as-is
@@ -77,7 +77,7 @@ class VFS(object):
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
         vn = VFS(src, vp)
         self.nodes[dst] = vn
-        return self._trk(vn)
+        return vn
 
     def _find(self, vpath):
         """return [vfs,remainder]"""
@@ -462,6 +462,9 @@ class AuthSrv(object):
             v.uadm = madm[dst]
             v.flags = mflags[dst]
 
+        vfs.all_vols = {}
+        vfs.get_all_vols(vfs.all_vols)
+
         missing_users = {}
         for d in [mread, mwrite]:
             for _, ul in d.items():
@@ -525,6 +528,10 @@ class AuthSrv(object):
 
             if self.args.e2d or "e2ds" in vol.flags:
                 vol.flags["e2d"] = True
+
+            if self.args.no_hash:
+                if "ehash" not in vol.flags:
+                    vol.flags["dhash"] = True
 
             for k in ["e2t", "e2ts", "e2tsr"]:
                 if getattr(self.args, k):

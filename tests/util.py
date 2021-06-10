@@ -60,7 +60,7 @@ def get_ramdisk():
 
     if os.path.exists("/Volumes"):
         # hdiutil eject /Volumes/cptd/
-        devname, _ = chkcmd("hdiutil", "attach", "-nomount", "ram://65536")
+        devname, _ = chkcmd("hdiutil", "attach", "-nomount", "ram://131072")
         devname = devname.strip()
         print("devname: [{}]".format(devname))
         for _ in range(10):
