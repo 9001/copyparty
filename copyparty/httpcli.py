@@ -258,7 +258,14 @@ class HttpCli(object):
         return "?" + "&amp;".join(r)
 
     def redirect(
-        self, vpath, suf="", msg="aight", flavor="go to", click=True, use302=False
+        self,
+        vpath,
+        suf="",
+        msg="aight",
+        flavor="go to",
+        click=True,
+        status=200,
+        use302=False,
     ):
         html = self.j2(
             "msg",
@@ -273,7 +280,7 @@ class HttpCli(object):
             h = {"Location": "/" + vpath, "Cache-Control": "no-cache"}
             self.reply(html, status=302, headers=h)
         else:
-            self.reply(html)
+            self.reply(html, status=status)
 
     def handle_get(self):
         if self.do_log:
@@ -826,7 +833,7 @@ class HttpCli(object):
                             raise Pebkac(400, "empty files in post")
 
                         files.append([sz, sha512_hex, p_file, fname])
-                        dbv, vrem = vfs.get_dbv(vrem)
+                        dbv, vrem = vfs.get_dbv(rem)
                         self.conn.hsrv.broker.put(
                             False,
                             "up2k.hash_file",
@@ -863,11 +870,15 @@ class HttpCli(object):
         status = "OK"
         if errmsg:
             self.log(errmsg)
-            errmsg = "ERROR: " + errmsg
             status = "ERROR"
 
         msg = "{} // {} bytes // {:.3f} MiB/s\n".format(status, sz_total, spd)
         jmsg = {"status": status, "sz": sz_total, "mbps": round(spd, 3), "files": []}
+
+        if errmsg:
+            msg += errmsg + "\n"
+            jmsg["error"] = errmsg
+            errmsg = "ERROR: " + errmsg
 
         for sz, sha512, ofn, lfn in files:
             vpath = (self.vpath + "/" if self.vpath else "") + lfn
@@ -900,11 +911,21 @@ class HttpCli(object):
                 ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
                 f.write(ft.encode("utf-8"))
 
+        status = 400 if errmsg else 200
         if "j" in self.uparam:
-            jtxt = json.dumps(jmsg, indent=2, sort_keys=True)
-            self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
+            jtxt = json.dumps(jmsg, indent=2, sort_keys=True).encode("utf-8", "replace")
+            self.reply(jtxt, mime="application/json", status=status)
         else:
-            self.redirect(self.vpath, msg=msg, flavor="return to", click=False)
+            self.redirect(
+                self.vpath,
+                msg=msg,
+                flavor="return to",
+                click=False,
+                status=status,
+            )
+
+        if errmsg:
+            return False
 
         self.parser.drop()
         return True

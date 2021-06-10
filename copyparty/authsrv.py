@@ -60,7 +60,7 @@ class VFS(object):
                 return self.nodes[name].add(src, dst)
 
             vn = VFS(
-                os.path.join(self.realpath, name),
+                os.path.join(self.realpath, name) if self.realpath else name,
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.uread,
                 self.uwrite,
@@ -92,7 +92,7 @@ class VFS(object):
 
     def bubble_flags(self):
         if self.dbv:
-            for k, v in self.dbv.flags:
+            for k, v in self.dbv.flags.items():
                 if k not in ["hist"]:
                     self.flags[k] = v
 

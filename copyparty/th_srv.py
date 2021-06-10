@@ -54,7 +54,7 @@ except:
 # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 # ffmpeg -formats
 FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
-FMT_FF = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
+FMT_FF = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
 
 if HAVE_HEIF:
     FMT_PIL += " heif heifs heic heics"

@@ -579,8 +579,10 @@ def read_header(sr):
             else:
                 continue
 
-        sr.unrecv(ret[ofs + 4 :])
-        return ret[:ofs].decode("utf-8", "surrogateescape").split("\r\n")
+        if len(ret) > ofs + 4:
+            sr.unrecv(ret[ofs + 4 :])
+
+        return ret[:ofs].decode("utf-8", "surrogateescape").lstrip("\r\n").split("\r\n")
 
 
 def humansize(sz, terse=False):
