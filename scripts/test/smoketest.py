@@ -46,7 +46,7 @@ def main():
     with open(vidp, "rb") as f:
         ovid = f.read()
 
-    args = ["-p", "4321", "-e2dsa", "-e2tsr"]
+    args = ["-p", "4321", "-e2dsa", "-e2tsr", "--th-ff-jpg"]
     pdirs = []
 
     for d1 in ["r", "w", "a"]:
@@ -97,12 +97,7 @@ def main():
     for d, p in zip(udirs, perms):
         u = "{}{}/a.h264?th=j".format(ub, d)
         r = requests.get(u)
-        ok = False
-        if r:
-            r.raw.decode_content = True
-            buf = r.raw.read(256)
-            if buf[:3] == b"\xff\xd8\xff":
-                ok = True
+        ok = bool(r and r.content[:3] == b"\xff\xd8\xff")
         if ok != (p in ["a"]):
             raise Exception("thumb {} with perm {} at {}".format(ok, p, u))
 
