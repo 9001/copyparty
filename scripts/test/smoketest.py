@@ -44,14 +44,15 @@ class Cpp(object):
 
     def await_idle(self, ub, timeout):
         req = ["scanning</td><td>False", "hash-q</td><td>0", "tag-q</td><td>0"]
+        lim = int(timeout * 10)
         u = ub + "?h"
-        for _ in range(timeout * 10):
+        for n in range(lim):
             try:
                 time.sleep(0.1)
                 r = requests.get(u, timeout=0.1)
                 for x in req:
                     if x not in r.text:
-                        print("ST: miss " + x)
+                        print("ST: {}/{} miss {}".format(n, lim, x))
                         raise Exception()
                 print("ST: idle")
                 return

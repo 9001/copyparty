@@ -301,7 +301,7 @@ note:
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
-you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `cnhash`, this has the following consequences:
+you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `cdhash`, this has the following consequences:
 * initial indexing is way faster, especially when the volume is on a networked disk
 * makes it impossible to [file-search](#file-search)
 * if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
@@ -319,6 +319,7 @@ this can instead be kept in a single place using the `--hist` argument, or the `
 note:
 * markdown edits are always stored in a local `.hist` subdirectory
 * on windows the volflag path is cyglike, so `/c/temp` means `C:\temp` but use regular paths for `--hist`
+  * you can use cygpaths for volumes too, `-v C:\Users::r` and `-v /c/users::r` both work
 
 
 ## metadata from audio files

@@ -439,6 +439,9 @@ class AuthSrv(object):
                     raise Exception("invalid -v argument: [{}]".format(v_str))
 
                 src, dst, perms = m.groups()
+                if WINDOWS and src.startswith("/"):
+                    src = "{}:\\{}".format(src[1], src[3:])
+
                 # print("\n".join([src, dst, perms]))
                 src = fsdec(os.path.abspath(fsenc(src)))
                 dst = dst.strip("/")
