@@ -21,14 +21,16 @@ class ThumbCli(object):
         if ext not in THUMBABLE:
             return None
 
-        if self.args.no_vthumb and ext in FMT_FF:
+        is_vid = ext in FMT_FF
+        if is_vid and self.args.no_vthumb:
             return None
 
         if fmt == "j" and self.args.th_no_jpg:
             fmt = "w"
 
-        if fmt == "w" and self.args.th_no_webp:
-            fmt = "j"
+        if fmt == "w":
+            if self.args.th_no_webp or (is_vid and self.args.th_ff_jpg):
+                fmt = "j"
 
         hist = self.hist[ptop]
         tpath = thumb_path(hist, rem, mtime, fmt)

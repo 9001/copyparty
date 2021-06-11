@@ -46,20 +46,22 @@ def main():
     with open(vidp, "rb") as f:
         ovid = f.read()
 
-    args = ["-p", "4321"]
+    args = ["-p", "4321", "-e2dsa", "-e2tsr"]
     pdirs = []
 
     for d1 in ["r", "w", "a"]:
         pdirs.append("{}/{}".format(td, d1))
+        pdirs.append("{}/{}/j".format(td, d1))
         for d2 in ["r", "w", "a"]:
             d = os.path.join(td, d1, "j", d2)
             pdirs.append(d.replace("\\", "/"))
             os.makedirs(d)
 
     udirs = [x.split("/", 2)[2] for x in pdirs]
-    for pd, ud in zip(pdirs, udirs):
+    perms = [x.rstrip("j/")[-1] for x in pdirs]
+    for pd, ud, p in zip(pdirs, udirs, perms):
         # args += ["-v", "{}:{}:{}".format(d.split("/", 1)[1], d, d[-1])]
-        args += ["-v", "{}:{}:{}".format(pd, ud, ud[-1])]
+        args += ["-v", "{}:{}:{}".format(pd, ud, p)]
 
     cpp = Cpp(args)
 
@@ -74,14 +76,36 @@ def main():
             pass
 
     assert up
-    # for d in dirs:
-    #    rd, fn = d.rsplit("/", 1)
-    #    requests.post(ub + rd, files={"act": "mkdir", "name": fn})
 
     for d in udirs:
         vid = ovid + "\n{}".format(d).encode("utf-8")
         requests.post(ub + d, data={"act": "bput"}, files={"f": ("a.h264", vid)})
-    time.sleep(3)
+
+    for d, p in zip(udirs, perms):
+        u = "{}{}/a.h264".format(ub, d)
+        r = requests.get(u)
+        ok = bool(r)
+        if ok != (p in ["a"]):
+            raise Exception("get {} with perm {} at {}".format(ok, p, u))
+
+    for d, p in zip(pdirs, perms):
+        u = "{}/a.h264".format(d)
+        ok = os.path.exists(u)
+        if ok != (p in ["a", "w"]):
+            raise Exception("stat {} with perm {} at {}".format(ok, p, u))
+
+    for d, p in zip(udirs, perms):
+        u = "{}{}/a.h264?th=j".format(ub, d)
+        r = requests.get(u)
+        ok = False
+        if r:
+            r.raw.decode_content = True
+            buf = r.raw.read(256)
+            if buf[:3] == b"\xff\xd8\xff":
+                ok = True
+        if ok != (p in ["a"]):
+            raise Exception("thumb {} with perm {} at {}".format(ok, p, u))
+
     cpp.stop(True)
 
 

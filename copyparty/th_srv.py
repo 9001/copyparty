@@ -11,7 +11,7 @@ import threading
 import subprocess as sp
 
 from .__init__ import PY2
-from .util import fsenc, mchkcmd, Queue, Cooldown, BytesIO
+from .util import fsenc, runcmd, Queue, Cooldown, BytesIO, min_ex
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
 
@@ -213,9 +213,9 @@ class ThumbSrv(object):
             if fun:
                 try:
                     fun(abspath, tpath)
-                except Exception as ex:
-                    msg = "{} failed on {}\n  {!r}"
-                    self.log(msg.format(fun.__name__, abspath, ex), 3)
+                except:
+                    msg = "{} failed on {}\n{}"
+                    self.log(msg.format(fun.__name__, abspath, min_ex()), 3)
                     with open(tpath, "wb") as _:
                         pass
 
@@ -263,8 +263,13 @@ class ThumbSrv(object):
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
 
-        dur = ret[".dur"][1] if ".dur" in ret else 4
-        seek = "{:.0f}".format(dur / 3)
+        ext = abspath.rsplit(".")[-1]
+        if ext in ["h264", "h265"]:
+            seek = []
+        else:
+            dur = ret[".dur"][1] if ".dur" in ret else 4
+            seek = "{:.0f}".format(dur / 3)
+            seek = [b"-ss", seek.encode("utf-8")]
 
         scale = "scale={0}:{1}:force_original_aspect_ratio="
         if self.args.th_no_crop:
@@ -273,19 +278,20 @@ class ThumbSrv(object):
             scale += "increase,crop={0}:{1},setsar=1:1"
 
         scale = scale.format(*list(self.res)).encode("utf-8")
+        # fmt: off
         cmd = [
             b"ffmpeg",
             b"-nostdin",
-            b"-hide_banner",
-            b"-ss",
-            seek,
-            b"-i",
-            fsenc(abspath),
-            b"-vf",
-            scale,
-            b"-vframes",
-            b"1",
+            b"-v", b"error",
+            b"-hide_banner"
         ]
+        cmd += seek
+        cmd += [
+            b"-i", fsenc(abspath),
+            b"-vf", scale,
+            b"-vframes", b"1",
+        ]
+        # fmt: on
 
         if tpath.endswith(".jpg"):
             cmd += [
@@ -302,7 +308,11 @@ class ThumbSrv(object):
 
         cmd += [fsenc(tpath)]
 
-        mchkcmd(cmd)
+        ret, sout, serr = runcmd(*cmd)
+        if ret != 0:
+            msg = ["ff: {}".format(x) for x in serr.split("\n")]
+            self.log("FFmpeg failed:\n" + "\n".join(msg), c="1;30")
+            raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
     def poke(self, tdir):
         if not self.poke_cd.poke(tdir):

@@ -998,8 +998,8 @@ def guess_mime(url, fallback="application/octet-stream"):
 def runcmd(*argv):
     p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
-    stdout = stdout.decode("utf-8")
-    stderr = stderr.decode("utf-8")
+    stdout = stdout.decode("utf-8", "replace")
+    stderr = stderr.decode("utf-8", "replace")
     return [p.returncode, stdout, stderr]
 
 
