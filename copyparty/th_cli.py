@@ -11,7 +11,7 @@ class ThumbCli(object):
     def __init__(self, broker):
         self.broker = broker
         self.args = broker.args
-        self.hist = broker.authsrv.vfs.histtab
+        self.asrv = broker.asrv
 
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
@@ -32,8 +32,8 @@ class ThumbCli(object):
             if self.args.th_no_webp or (is_vid and self.args.th_ff_jpg):
                 fmt = "j"
 
-        hist = self.hist[ptop]
-        tpath = thumb_path(hist, rem, mtime, fmt)
+        histpath = self.asrv.vfs.histtab[ptop]
+        tpath = thumb_path(histpath, rem, mtime, fmt)
         ret = None
         try:
             st = os.stat(tpath)

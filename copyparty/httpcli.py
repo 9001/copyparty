@@ -42,7 +42,7 @@ class HttpCli(object):
         self.addr = conn.addr  # type: tuple[str, int]
         self.args = conn.args
         self.is_mp = conn.is_mp
-        self.auth = conn.auth  # type: AuthSrv
+        self.asrv = conn.asrv  # type: AuthSrv
         self.ico = conn.ico
         self.thumbcli = conn.thumbcli
         self.log_func = conn.log_func
@@ -154,9 +154,9 @@ class HttpCli(object):
         self.vpath = unquotep(vpath)
 
         pwd = uparam.get("pw")
-        self.uname = self.auth.iuser.get(pwd, "*")
+        self.uname = self.asrv.iuser.get(pwd, "*")
         self.rvol, self.wvol, self.avol = [[], [], []]
-        self.auth.vfs.user_tree(self.uname, self.rvol, self.wvol, self.avol)
+        self.asrv.vfs.user_tree(self.uname, self.rvol, self.wvol, self.avol)
 
         ua = self.headers.get("user-agent", "")
         self.is_rclone = ua.startswith("rclone/")
@@ -321,9 +321,7 @@ class HttpCli(object):
                     self.redirect(vpath, flavor="redirecting to", use302=True)
                     return True
 
-        self.readable, self.writable = self.conn.auth.vfs.can_access(
-            self.vpath, self.uname
-        )
+        self.readable, self.writable = self.asrv.vfs.can_access(self.vpath, self.uname)
         if not self.readable and not self.writable:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
@@ -440,7 +438,7 @@ class HttpCli(object):
 
     def dump_to_file(self):
         reader, remains = self.get_body_reader()
-        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         fdir = os.path.join(vfs.realpath, rem)
 
         addr = self.ip.replace(":", ".")
@@ -509,7 +507,7 @@ class HttpCli(object):
         if v is None:
             raise Pebkac(422, "need zip or tar keyword")
 
-        vn, rem = self.auth.vfs.get(self.vpath, self.uname, True, False)
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
         items = self.parser.require("files", 1024 * 1024)
         if not items:
             raise Pebkac(422, "need files list")
@@ -559,7 +557,7 @@ class HttpCli(object):
             self.vpath = "/".join([self.vpath, sub]).strip("/")
             body["name"] = name
 
-        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         dbv, vrem = vfs.get_dbv(rem)
 
         body["vtop"] = dbv.vpath
@@ -590,7 +588,7 @@ class HttpCli(object):
         vols = []
         seen = {}
         for vtop in self.rvol:
-            vfs, _ = self.conn.auth.vfs.get(vtop, self.uname, True, False)
+            vfs, _ = self.asrv.vfs.get(vtop, self.uname, True, False)
             vfs = vfs.dbv or vfs
             if vfs in seen:
                 continue
@@ -651,7 +649,7 @@ class HttpCli(object):
         except KeyError:
             raise Pebkac(400, "need hash and wark headers for binary POST")
 
-        vfs, _ = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, _ = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         ptop = (vfs.dbv or vfs).realpath
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", ptop, wark, chash)
@@ -724,7 +722,7 @@ class HttpCli(object):
         pwd = self.parser.require("cppwd", 64)
         self.parser.drop()
 
-        if pwd in self.auth.iuser:
+        if pwd in self.asrv.iuser:
             msg = "login ok"
             dt = datetime.utcfromtimestamp(time.time() + 60 * 60 * 24 * 365)
             exp = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -743,7 +741,7 @@ class HttpCli(object):
         self.parser.drop()
 
         nullwrite = self.args.nw
-        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
         sanitized = sanitize_fn(new_dir)
@@ -772,7 +770,7 @@ class HttpCli(object):
         self.parser.drop()
 
         nullwrite = self.args.nw
-        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
         if not new_file.endswith(".md"):
@@ -796,7 +794,7 @@ class HttpCli(object):
 
     def handle_plain_upload(self):
         nullwrite = self.args.nw
-        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
         files = []
@@ -937,7 +935,7 @@ class HttpCli(object):
             raise Pebkac(400, "could not read lastmod from request")
 
         nullwrite = self.args.nw
-        vfs, rem = self.conn.auth.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
         # TODO:
@@ -1400,9 +1398,10 @@ class HttpCli(object):
         if self.args.no_rescan:
             raise Pebkac(403, "disabled by argv")
 
-        vn, _ = self.auth.vfs.get(self.vpath, self.uname, True, True)
+        vn, _ = self.asrv.vfs.get(self.vpath, self.uname, True, True)
 
-        args = [self.auth.vfs.all_vols, [vn.vpath]]
+        args = [self.asrv.vfs.all_vols, [vn.vpath]]
+
         x = self.conn.hsrv.broker.put(True, "up2k.rescan", *args)
         x = x.get()
         if not x:
@@ -1474,7 +1473,7 @@ class HttpCli(object):
             ret["k" + quotep(excl)] = sub
 
         try:
-            vn, rem = self.auth.vfs.get(top, self.uname, True, False)
+            vn, rem = self.asrv.vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
                 rem, self.uname, not self.args.no_scandir, incl_wo=True
             )
@@ -1515,7 +1514,7 @@ class HttpCli(object):
 
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
-        vn, rem = self.auth.vfs.get(
+        vn, rem = self.asrv.vfs.get(
             self.vpath, self.uname, self.readable, self.writable
         )
         abspath = vn.canonical(rem)

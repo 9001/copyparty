@@ -36,7 +36,7 @@ class MpWorker(object):
             signal.signal(signal.SIGINT, self.signal_handler)
 
         # starting to look like a good idea
-        self.authsrv = AuthSrv(args, None, False)
+        self.asrv = AuthSrv(args, None, False)
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self, True)

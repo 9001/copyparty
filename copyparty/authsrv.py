@@ -43,7 +43,9 @@ class VFS(object):
         )
 
     def get_all_vols(self, outdict):
-        outdict[self.vpath] = self
+        if self.realpath:
+            outdict[self.vpath] = self
+
         for v in self.nodes.values():
             v.get_all_vols(outdict)
 
@@ -60,7 +62,7 @@ class VFS(object):
                 return self.nodes[name].add(src, dst)
 
             vn = VFS(
-                os.path.join(self.realpath, name) if self.realpath else name,
+                os.path.join(self.realpath, name) if self.realpath else None,
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.uread,
                 self.uwrite,

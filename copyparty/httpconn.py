@@ -34,7 +34,7 @@ class HttpConn(object):
         self.hsrv = hsrv
 
         self.args = hsrv.args
-        self.auth = hsrv.auth
+        self.asrv = hsrv.asrv
         self.is_mp = hsrv.is_mp
         self.cert_path = hsrv.cert_path
 
@@ -71,7 +71,7 @@ class HttpConn(object):
 
     def get_u2idx(self):
         if not self.u2idx:
-            self.u2idx = U2idx(self.args, self.log_func, self.auth.vfs)
+            self.u2idx = U2idx(self)
 
         return self.u2idx
 

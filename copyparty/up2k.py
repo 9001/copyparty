@@ -48,10 +48,9 @@ class Up2k(object):
         * ~/.config flatfiles for active jobs
     """
 
-    def __init__(self, hub, vfs):
+    def __init__(self, hub):
         self.hub = hub
-        self.vfs = vfs
-        # TODO stop passing around vfs, do auth or broker instead
+        self.asrv = hub.asrv
         self.args = hub.args
         self.log_func = hub.log
 
@@ -96,17 +95,17 @@ class Up2k(object):
             self.log("could not initialize sqlite3, will use in-memory registry only")
 
         if self.args.no_fastboot:
-            self.deferred_init(vfs.all_vols)
+            self.deferred_init()
         else:
             t = threading.Thread(
                 target=self.deferred_init,
-                args=(vfs.all_vols,),
                 name="up2k-deferred-init",
             )
             t.daemon = True
             t.start()
 
-    def deferred_init(self, all_vols):
+    def deferred_init(self):
+        all_vols = self.asrv.vfs.all_vols
         have_e2d = self.init_indexes(all_vols)
 
         if have_e2d:
@@ -300,7 +299,8 @@ class Up2k(object):
         return have_e2d
 
     def register_vpath(self, ptop, flags):
-        db_path = os.path.join(self.vfs.histtab[ptop], "up2k.db")
+        histpath = self.asrv.vfs.histtab[ptop]
+        db_path = os.path.join(histpath, "up2k.db")
         if ptop in self.registry:
             try:
                 return [self.cur[ptop], db_path]
@@ -320,7 +320,7 @@ class Up2k(object):
             self.log(" ".join(sorted(a)) + "\033[0m")
 
         reg = {}
-        path = os.path.join(self.vfs.histtab[ptop], "up2k.snap")
+        path = os.path.join(histpath, "up2k.snap")
         if "e2d" in flags and os.path.exists(path):
             with gzip.GzipFile(path, "rb") as f:
                 j = f.read().decode("utf-8")
@@ -344,7 +344,7 @@ class Up2k(object):
             return None
 
         try:
-            os.makedirs(self.vfs.histtab[ptop])
+            os.makedirs(histpath)
         except:
             pass
 
@@ -386,7 +386,7 @@ class Up2k(object):
 
     def _build_dir(self, dbw, top, excl, cdir, nohash):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
-        histdir = self.vfs.histtab[top]
+        histpath = self.asrv.vfs.histtab[top]
         ret = 0
         g = statdir(self.log, not self.args.no_scandir, False, cdir)
         for iname, inf in sorted(g):
@@ -394,7 +394,7 @@ class Up2k(object):
             lmod = int(inf.st_mtime)
             sz = inf.st_size
             if stat.S_ISDIR(inf.st_mode):
-                if abspath in excl or abspath == histdir:
+                if abspath in excl or abspath == histpath:
                     continue
                 # self.log(" dir: {}".format(abspath))
                 ret += self._build_dir(dbw, top, excl, abspath, nohash)
@@ -1358,11 +1358,12 @@ class Up2k(object):
                 for k, reg in self.registry.items():
                     self._snap_reg(prev, k, reg, discard_interval)
 
-    def _snap_reg(self, prev, k, reg, discard_interval):
+    def _snap_reg(self, prev, ptop, reg, discard_interval):
         now = time.time()
+        histpath = self.asrv.vfs.histtab[ptop]
         rm = [x for x in reg.values() if now - x["poke"] > discard_interval]
         if rm:
-            m = "dropping {} abandoned uploads in {}".format(len(rm), k)
+            m = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
             vis = [self._vis_job_progress(x) for x in rm]
             self.log("\n".join([m] + vis))
             for job in rm:
@@ -1380,21 +1381,21 @@ class Up2k(object):
                 except:
                     pass
 
-        path = os.path.join(self.vfs.histtab[k], "up2k.snap")
+        path = os.path.join(histpath, "up2k.snap")
         if not reg:
-            if k not in prev or prev[k] is not None:
-                prev[k] = None
+            if ptop not in prev or prev[ptop] is not None:
+                prev[ptop] = None
                 if os.path.exists(fsenc(path)):
                     os.unlink(fsenc(path))
             return
 
         newest = max(x["poke"] for _, x in reg.items()) if reg else 0
         etag = [len(reg), newest]
-        if etag == prev.get(k, None):
+        if etag == prev.get(ptop, None):
             return
 
         try:
-            os.makedirs(self.vfs.histtab[k])
+            os.makedirs(histpath)
         except:
             pass
 
@@ -1406,7 +1407,7 @@ class Up2k(object):
         atomic_move(path2, path)
 
         self.log("snap: {} |{}|".format(path, len(reg.keys())))
-        prev[k] = etag
+        prev[ptop] = etag
 
     def _tagger(self):
         while True:

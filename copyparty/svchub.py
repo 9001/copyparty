@@ -37,14 +37,13 @@ class SvcHub(object):
 
         self.log = self._log_disabled if args.q else self._log_enabled
 
-        # jank goes here
-        auth = AuthSrv(self.args, self.log, False)
-        if args.ls:
-            auth.dbg_ls()
-
         # initiate all services to manage
+        self.asrv = AuthSrv(self.args, self.log, False)
+        if args.ls:
+            self.asrv.dbg_ls()
+
         self.tcpsrv = TcpSrv(self)
-        self.up2k = Up2k(self, auth.vfs)
+        self.up2k = Up2k(self)
 
         self.thumbsrv = None
         if not args.no_thumb:
@@ -54,7 +53,7 @@ class SvcHub(object):
                     msg = "setting --th-no-webp because either libwebp is not available or your Pillow is too old"
                     self.log("thumb", msg, c=3)
 
-                self.thumbsrv = ThumbSrv(self, auth.vfs)
+                self.thumbsrv = ThumbSrv(self)
             else:
                 msg = "need Pillow to create thumbnails; for example:\n{}{} -m pip install --user Pillow\n"
                 self.log(

@@ -19,12 +19,11 @@ except:
 
 
 class U2idx(object):
-    def __init__(self, args, log_func, vfs):
-        self.args = args
-        self.log_func = log_func
-        self.vfs = vfs
-
-        self.timeout = args.srch_time
+    def __init__(self, conn):
+        self.log_func = conn.log_func
+        self.asrv = conn.asrv
+        self.args = conn.args
+        self.timeout = self.args.srch_time
 
         if not HAVE_SQLITE3:
             self.log("could not load sqlite3; searchign wqill be disabled")
@@ -62,7 +61,8 @@ class U2idx(object):
         if cur:
             return cur
 
-        db_path = os.path.join(self.vfs.histtab[ptop], "up2k.db")
+        histpath = self.asrv.vfs.histtab[ptop]
+        db_path = os.path.join(histpath, "up2k.db")
         if not os.path.exists(db_path):
             return None
 

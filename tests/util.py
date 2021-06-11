@@ -110,12 +110,12 @@ class VHttpSrv(object):
 
 
 class VHttpConn(object):
-    def __init__(self, args, auth, log, buf):
+    def __init__(self, args, asrv, log, buf):
         self.s = VSock(buf)
         self.sr = Unrecv(self.s)
         self.addr = ("127.0.0.1", "42069")
         self.args = args
-        self.auth = auth
+        self.asrv = asrv
         self.is_mp = False
         self.log_func = log
         self.log_src = "a"

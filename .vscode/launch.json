@@ -16,12 +16,9 @@
                 "-e2ts",
                 "-mtp",
                 ".bpm=f,bin/mtag/audio-bpm.py",
-                "-a",
-                "ed:wark",
-                "-v",
-                "srv::r:aed:cnodupe",
-                "-v",
-                "dist:dist:r"
+                "-aed:wark",
+                "-vsrv::r:aed:cnodupe",
+                "-vdist:dist:r"
             ]
         },
         {

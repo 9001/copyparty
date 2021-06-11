@@ -40,7 +40,7 @@ class HttpSrv(object):
         self.is_mp = is_mp
         self.args = broker.args
         self.log = broker.log
-        self.auth = broker.authsrv
+        self.asrv = broker.asrv
 
         self.disconnect_func = None
         self.mutex = threading.Lock()
