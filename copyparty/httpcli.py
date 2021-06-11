@@ -1525,12 +1525,24 @@ class HttpCli(object):
         except:
             raise Pebkac(404)
 
-        if self.readable and not stat.S_ISDIR(st.st_mode):
+        if self.readable:
             if rem.startswith(".hist/up2k."):
                 raise Pebkac(403)
 
+            is_dir = stat.S_ISDIR(st.st_mode)
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
+                if is_dir:
+                    for fn in ["cover.png", "cover.jpg"]:
+                        fp = os.path.join(abspath, fn)
+                        if os.path.exists(fp):
+                            vrem = "{}/{}".format(vrem.rstrip("/"), fn)
+                            is_dir = False
+                            break
+
+                    if is_dir:
+                        return self.tx_ico("/")
+
                 thp = None
                 if self.thumbcli:
                     thp = self.thumbcli.get(
@@ -1542,10 +1554,11 @@ class HttpCli(object):
 
                 return self.tx_ico(rem)
 
-            if abspath.endswith(".md") and "raw" not in self.uparam:
-                return self.tx_md(abspath)
+            if not is_dir:
+                if abspath.endswith(".md") and "raw" not in self.uparam:
+                    return self.tx_md(abspath)
 
-            return self.tx_file(abspath)
+                return self.tx_file(abspath)
 
         srv_info = []
 

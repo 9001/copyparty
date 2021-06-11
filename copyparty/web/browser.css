@@ -798,6 +798,13 @@ html.light #ghead {
 	padding: .2em .3em;
 	display: block;
 }
+#ggrid span.dir:before {
+	content: '📂';
+	line-height: 0;
+	font-size: 2em;
+	display: inline-block;
+	margin: -.7em 0 -.5em -.3em;
+}
 #ggrid a:hover {
 	background: #444;
 	border-color: #555;

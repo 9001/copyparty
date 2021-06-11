@@ -858,13 +858,14 @@ var thegrid = (function () {
 				href = esc(ao.getAttribute('href')),
 				ref = ao.getAttribute('id'),
 				isdir = href.split('?')[0].slice(-1)[0] == '/',
+				ac = isdir ? ' class="dir"' : '',
 				ihref = href;
 
-			if (isdir) {
-				ihref = '/.cpr/ico/folder'
-			}
-			else if (r.thumbs) {
+			if (r.thumbs) {
 				ihref += (ihref.indexOf('?') === -1 ? '?' : '&') + 'th=' + (have_webp ? 'w' : 'j');
+			}
+			else if (isdir) {
+				ihref = '/.cpr/ico/folder';
 			}
 			else {
 				var ar = href.split('?')[0].split('.');
@@ -886,7 +887,7 @@ var thegrid = (function () {
 			}
 
 			html.push('<a href="' + href + '" ref="' + ref + '"><img src="' +
-				ihref + '" /><span>' + ao.innerHTML + '</span></a>');
+				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		lfiles.style.display = 'none';
 		gfiles.style.display = 'block';
