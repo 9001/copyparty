@@ -29,6 +29,17 @@ class Cpp(object):
 
 
 def main():
+    t1 = set(list(os.listdir()))
+    try:
+        main2()
+    finally:
+        t2 = os.listdir()
+        for f in t2:
+            if f not in t1 and f.startswith("up."):
+                os.unlink(f)
+
+
+def main2():
     ub = "http://127.0.0.1:4321/"
     td = os.path.join("srv", "smoketest")
     try:
@@ -54,15 +65,18 @@ def main():
         pdirs.append("{}/{}/j".format(td, d1))
         for d2 in ["r", "w", "a"]:
             d = os.path.join(td, d1, "j", d2)
-            pdirs.append(d.replace("\\", "/"))
+            pdirs.append(d)
             os.makedirs(d)
 
+    pdirs = [x.replace("\\", "/") for x in pdirs]
     udirs = [x.split("/", 2)[2] for x in pdirs]
     perms = [x.rstrip("j/")[-1] for x in pdirs]
     for pd, ud, p in zip(pdirs, udirs, perms):
         # args += ["-v", "{}:{}:{}".format(d.split("/", 1)[1], d, d[-1])]
         args += ["-v", "{}:{}:{}".format(pd, ud, p)]
 
+    # print(repr(args))
+    # return
     cpp = Cpp(args)
 
     up = False
@@ -79,7 +93,10 @@ def main():
 
     for d in udirs:
         vid = ovid + "\n{}".format(d).encode("utf-8")
-        requests.post(ub + d, data={"act": "bput"}, files={"f": ("a.h264", vid)})
+        try:
+            requests.post(ub + d, data={"act": "bput"}, files={"f": ("a.h264", vid)})
+        except:
+            pass
 
     for d, p in zip(udirs, perms):
         u = "{}{}/a.h264".format(ub, d)

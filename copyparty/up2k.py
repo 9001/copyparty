@@ -188,25 +188,27 @@ class Up2k(object):
                 self.log(msg, c=3)
 
         live_vols = []
-        for vol in vols:
-            try:
-                os.listdir(vol.realpath)
-            except:
-                self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
-                self.log("cannot access " + vol.realpath, c=1)
-                continue
+        with self.mutex:
+            # only need to protect register_vpath but all in one go feels right
+            for vol in vols:
+                try:
+                    os.listdir(vol.realpath)
+                except:
+                    self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
+                    self.log("cannot access " + vol.realpath, c=1)
+                    continue
 
-            if scan_vols and vol.vpath not in scan_vols:
-                continue
+                if scan_vols and vol.vpath not in scan_vols:
+                    continue
 
-            if not self.register_vpath(vol.realpath, vol.flags):
-                # self.log("db not enabled for {}".format(m, vol.realpath))
-                continue
+                if not self.register_vpath(vol.realpath, vol.flags):
+                    # self.log("db not enable for {}".format(m, vol.realpath))
+                    continue
 
-            live_vols.append(vol)
+                live_vols.append(vol)
 
-            if vol.vpath not in self.volstate:
-                self.volstate[vol.vpath] = "OFFLINE (pending initialization)"
+                if vol.vpath not in self.volstate:
+                    self.volstate[vol.vpath] = "OFFLINE (pending initialization)"
 
         vols = live_vols
         need_vac = {}
@@ -987,9 +989,10 @@ class Up2k(object):
         return self._orz(db_path)
 
     def handle_json(self, cj):
-        if not self.register_vpath(cj["ptop"], cj["vcfg"]):
-            if cj["ptop"] not in self.registry:
-                raise Pebkac(410, "location unavailable")
+        with self.mutex:
+            if not self.register_vpath(cj["ptop"], cj["vcfg"]):
+                if cj["ptop"] not in self.registry:
+                    raise Pebkac(410, "location unavailable")
 
         cj["name"] = sanitize_fn(cj["name"], bad=[".prologue.html", ".epilogue.html"])
         cj["poke"] = time.time()
@@ -1411,6 +1414,7 @@ class Up2k(object):
             if "e2t" not in self.flags[ptop]:
                 continue
 
+            # self.log("\n  " + repr([ptop, rd, fn]))
             abspath = os.path.join(ptop, rd, fn)
             tags = self.mtag.get(abspath)
             ntags1 = len(tags)
@@ -1450,8 +1454,9 @@ class Up2k(object):
                 self.idx_wark(ptop, wark, rd, fn, inf.st_mtime, inf.st_size)
 
     def hash_file(self, ptop, flags, rd, fn):
-        self.register_vpath(ptop, flags)
-        self.hashq.put([ptop, rd, fn])
+        with self.mutex:
+            self.register_vpath(ptop, flags)
+            self.hashq.put([ptop, rd, fn])
 
 
 def up2k_chunksize(filesize):

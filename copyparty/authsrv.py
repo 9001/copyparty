@@ -43,9 +43,9 @@ class VFS(object):
         )
 
     def get_all_vols(self, outdict):
+        outdict[self.vpath] = self
         for v in self.nodes.values():
             v.get_all_vols(outdict)
-            outdict[v.vpath] = v
 
     def add(self, src, dst):
         """get existing, or add new path to the vfs"""

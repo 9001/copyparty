@@ -6,9 +6,13 @@
 import re
 import os
 import sys
+
+print(sys.executable)
+
 import shlex
 import jstyleson
 import subprocess as sp
+
 
 with open(".vscode/launch.json", "r", encoding="utf-8") as f:
     tj = f.read()
