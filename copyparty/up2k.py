@@ -61,6 +61,8 @@ class Up2k(object):
         self.mutex = threading.Lock()
         self.hashq = Queue()
         self.tagq = Queue()
+        self.n_hashq = 0
+        self.n_tagq = 0
         self.volstate = {}
         self.registry = {}
         self.entags = {}
@@ -129,8 +131,14 @@ class Up2k(object):
     def log(self, msg, c=0):
         self.log_func("up2k", msg + "\033[K", c)
 
-    def get_volstate(self):
-        return json.dumps(self.volstate, indent=4)
+    def get_state(self):
+        ret = {
+            "volstate": self.volstate,
+            "scanning": hasattr(self, "pp"),
+            "hashq": self.n_hashq,
+            "tagq": self.n_tagq,
+        }
+        return json.dumps(ret, indent=4)
 
     def rescan(self, all_vols, scan_vols):
         if hasattr(self, "pp"):
@@ -1233,6 +1241,7 @@ class Up2k(object):
 
         if "e2t" in self.flags[ptop]:
             self.tagq.put([ptop, wark, rd, fn])
+            self.n_tagq += 1
 
         return True
 
@@ -1410,7 +1419,13 @@ class Up2k(object):
         prev[ptop] = etag
 
     def _tagger(self):
+        with self.mutex:
+            self.n_tagq += 1
+
         while True:
+            with self.mutex:
+                self.n_tagq -= 1
+
             ptop, wark, rd, fn = self.tagq.get()
             if "e2t" not in self.flags[ptop]:
                 continue
@@ -1441,8 +1456,16 @@ class Up2k(object):
             self.log("tagged {} ({}+{})".format(abspath, ntags1, len(tags) - ntags1))
 
     def _hasher(self):
+        with self.mutex:
+            self.n_hashq += 1
+
         while True:
+            with self.mutex:
+                self.n_hashq -= 1
+            # self.log("hashq {}".format(self.n_hashq))
+
             ptop, rd, fn = self.hashq.get()
+            # self.log("hashq {} pop {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
             if "e2d" not in self.flags[ptop]:
                 continue
 
@@ -1458,6 +1481,8 @@ class Up2k(object):
         with self.mutex:
             self.register_vpath(ptop, flags)
             self.hashq.put([ptop, rd, fn])
+            self.n_hashq += 1
+        # self.log("hashq {} push {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
 
 
 def up2k_chunksize(filesize):

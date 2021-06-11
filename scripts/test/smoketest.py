@@ -1,18 +1,25 @@
 import os
 import sys
 import time
-import signal
+import shlex
 import shutil
+import signal
 import tempfile
 import requests
 import threading
 import subprocess as sp
 
 
+CPP = []
+
+
 class Cpp(object):
     def __init__(self, args):
+        args = [sys.executable, "-m", "copyparty"] + args
+        print(" ".join([shlex.quote(x) for x in args]))
+
         self.ls_pre = set(list(os.listdir()))
-        self.p = sp.Popen([sys.executable, "-m", "copyparty"] + args)
+        self.p = sp.Popen(args)
         # , stdout=sp.PIPE, stderr=sp.PIPE)
 
         self.t = threading.Thread(target=self._run)
@@ -23,16 +30,33 @@ class Cpp(object):
         self.so, self.se = self.p.communicate()
 
     def stop(self, wait):
-        # self.p.kill()
-        os.kill(self.p.pid, signal.SIGINT)
         if wait:
-            self.t.join()
+            os.kill(self.p.pid, signal.SIGINT)
+            self.t.join(timeout=2)
+        else:
+            self.p.kill()  # macos py3.8
 
     def clean(self):
         t = os.listdir()
         for f in t:
             if f not in self.ls_pre and f.startswith("up."):
                 os.unlink(f)
+
+    def await_idle(self, ub, timeout):
+        req = ["scanning</td><td>False", "hash-q</td><td>0", "tag-q</td><td>0"]
+        u = ub + "?h"
+        for _ in range(timeout * 10):
+            try:
+                time.sleep(0.1)
+                r = requests.get(u, timeout=0.1)
+                for x in req:
+                    if x not in r.text:
+                        print("ST: miss " + x)
+                        raise Exception()
+                print("ST: idle")
+                return
+            except:
+                pass
 
 
 def tc1():
@@ -61,10 +85,10 @@ def tc1():
         ovid = f.read()
 
     args = [
-        "-p",
-        "4321",
+        "-p4321",
         "-e2dsa",
         "-e2tsr",
+        "--no-mutagen",
         "--th-ff-jpg",
         "--hist",
         os.path.join(td, "dbm"),
@@ -89,30 +113,24 @@ def tc1():
 
         hp = None
         if pd.endswith("st/a"):
-            hp = os.path.join(td, "db1")
+            hp = hpaths[ud] = os.path.join(td, "db1")
         elif pd[:-1].endswith("a/j/"):
-            hp = os.path.join(td, "dbm")
+            hpaths[ud] = os.path.join(td, "dbm")
+            hp = None
         else:
             hp = "-"
+            hpaths[ud] = os.path.join(pd, ".hist")
 
-        hpaths[ud] = os.path.join(pd, ".hist") if hp == "-" else hp
-        args += ["-v", "{}:{}:{}:chist={}".format(pd, ud, p, hp)]
+        arg = "{}:{}:{}".format(pd, ud, p, hp)
+        if hp:
+            arg += ":chist=" + hp
 
-    # print(repr(args))
+        args += ["-v", arg]
+
     # return
     cpp = Cpp(args)
-
-    up = False
-    for n in range(30):
-        try:
-            time.sleep(0.1)
-            requests.get(ub + "?h", timeout=0.1)
-            up = True
-            break
-        except:
-            pass
-
-    assert up
+    CPP.append(cpp)
+    cpp.await_idle(ub, 3)
 
     for d in udirs:
         vid = ovid + "\n{}".format(d).encode("utf-8")
@@ -147,6 +165,7 @@ def tc1():
             raise Exception("thumb {} with perm {} at {}".format(ok, p, u))
 
     # check tags
+    cpp.await_idle(ub, 5)
     for d, p in zip(udirs, perms):
         u = "{}{}?ls".format(ub, d)
         r = requests.get(u)
@@ -163,7 +182,7 @@ def tc1():
             raise Exception("ls {} with perm {} at {}".format(ok, p, u))
 
         if (tag and p != "a") or (not tag and p == "a"):
-            raise Exception("tag {} with perm {} at {}".format(ok, p, u))
+            raise Exception("tag {} with perm {} at {}".format(tag, p, u))
 
         if tag is not None and tag != "48x32":
             raise Exception("tag [{}] at {}".format(tag, u))
@@ -171,8 +190,18 @@ def tc1():
     cpp.stop(True)
 
 
+def run(tc):
+    try:
+        tc()
+    finally:
+        try:
+            CPP[0].stop(False)
+        except:
+            pass
+
+
 def main():
-    tc1()
+    run(tc1)
 
 
 if __name__ == "__main__":

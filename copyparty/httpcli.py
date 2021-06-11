@@ -1373,11 +1373,13 @@ class HttpCli(object):
             for y in [self.rvol, self.wvol, self.avol]
         ]
 
-        vstate = {}
         if self.avol and not self.args.no_rescan:
-            x = self.conn.hsrv.broker.put(True, "up2k.get_volstate")
-            vstate = json.loads(x.get())
-            vstate = {("/" + k).rstrip("/") + "/": v for k, v in vstate.items()}
+            x = self.conn.hsrv.broker.put(True, "up2k.get_state")
+            vs = json.loads(x.get())
+            vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
+        else:
+            vstate = {}
+            vs = {"scanning": None, "hashq": None, "tagq": None}
 
         html = self.j2(
             "splash",
@@ -1386,6 +1388,9 @@ class HttpCli(object):
             wvol=wvol,
             avol=avol,
             vstate=vstate,
+            scanning=vs["scanning"],
+            hashq=vs["hashq"],
+            tagq=vs["tagq"],
             url_suf=suf,
         )
         self.reply(html.encode("utf-8"), headers=NO_STORE)

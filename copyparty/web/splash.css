@@ -26,9 +26,19 @@ a {
 	border-radius: .2em;
 	padding: .2em .8em;
 }
-td, th {
+table {
+	border-collapse: collapse;
+}
+.vols td,
+.vols th {
 	padding: .3em .6em;
 	text-align: left;
+}
+.num td {
+	padding: .1em .7em .1em 0;
+}
+.num td:first-child {
+	text-align: right;
 }
 .btns {
 	margin: 1em 0;

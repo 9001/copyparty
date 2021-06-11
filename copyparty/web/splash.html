@@ -15,16 +15,24 @@
 
         {%- if avol %}
         <h1>admin panel:</h1>
-        <table>
-            <thead><tr><th>vol</th><th>action</th><th>status</th></tr></thead>
-            <tbody>
-                {% for mp in avol %}
-                {%- if mp in vstate and vstate[mp] %}
-                <tr><td><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a href="{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
-                {%- endif %}
-                {% endfor %}
-            </tbody>
-        </table>
+        <table><tr><td> <!-- hehehe -->
+            <table class="num">
+                <tr><td>scanning</td><td>{{ scanning }}</td></tr>
+                <tr><td>hash-q</td><td>{{ hashq }}</td></tr>
+                <tr><td>tag-q</td><td>{{ tagq }}</td></tr>
+            </table>            
+        </td><td>
+            <table class="vols">
+                <thead><tr><th>vol</th><th>action</th><th>status</th></tr></thead>
+                <tbody>
+                    {% for mp in avol %}
+                    {%- if mp in vstate and vstate[mp] %}
+                    <tr><td><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a href="{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
+                    {%- endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </td></tr></table>
         <div class="btns">
             <a href="{{ avol[0] }}?stack">dump stack</a>
         </div>
