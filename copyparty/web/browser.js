@@ -709,8 +709,9 @@ function autoplay_blocked(seek) {
 
 
 var thegrid = (function () {
-	var lfiles = ebi('files');
-	var gfiles = document.createElement('div');
+	var lfiles = ebi('files'),
+		gfiles = document.createElement('div');
+
 	gfiles.setAttribute('id', 'gfiles');
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
@@ -732,7 +733,8 @@ var thegrid = (function () {
 		'en': bcfg_get('griden', false),
 		'sel': bcfg_get('gridsel', false),
 		'sz': fcfg_get('gridsz', 10),
-		'isdirty': true
+		'isdirty': true,
+		'bbox': null
 	};
 
 	ebi('thumbs').onclick = function (e) {
@@ -891,8 +893,36 @@ var thegrid = (function () {
 		lfiles.style.display = 'none';
 		gfiles.style.display = 'block';
 		ebi('ggrid').innerHTML = html.join('\n');
+		r.bagit();
 		r.loadsel();
 	}
+
+	r.bagit = function () {
+		if (!window.baguetteBox)
+			return;
+
+		if (r.bbox)
+			baguetteBox.destroy();
+
+		r.bbox = baguetteBox.run('#ggrid', {
+			captions: function (g) {
+				var idx = -1,
+					h = '' + g;
+
+				for (var a = 0; a < r.bbox.length; a++)
+					if (r.bbox[a].imageElement == g)
+						idx = a;
+
+				return '<a download href="' + h +
+					'">' + (idx + 1) + ' / ' + r.bbox.length + ' -- ' +
+					esc(uricom_dec(h.split('/').slice(-1)[0])[0]) + '</a>';
+			}
+		})[0];
+	};
+
+	setTimeout(function () {
+		import_js('/.cpr/baguettebox.js', r.bagit);
+	}, 1);
 
 	if (r.en) {
 		loadgrid();

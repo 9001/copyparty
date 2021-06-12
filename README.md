@@ -106,6 +106,7 @@ summary: all planned features work! now please enjoy the bloatening
     * ☑ images using Pillow
     * ☑ videos using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
+  * ☑ image gallery
   * ☑ SPA (browse while uploading)
     * if you use the file-tree on the left only, not folders in the file list
 * server indexing

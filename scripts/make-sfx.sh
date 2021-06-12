@@ -208,7 +208,7 @@ find | grep -E '\.css$' | while IFS= read -r f; do
 	}
 	!/\}$/ {printf "%s",$0;next}
 	1
-	' <$f | gsed 's/;\}$/}/' >t
+	' <$f | sed 's/;\}$/}/' >t
 	tmv "$f"
 done
 find | grep -E '\.(js|html)$' | while IFS= read -r f; do
@@ -223,7 +223,7 @@ command -v pigz &&
 	pk='gzip'
 
 echo "$pk"
-find | grep -E '\.(js|css)$' | while IFS= read -r f; do
+find | grep -E '\.(js|css)$' | grep -vF /deps/ | while IFS= read -r f; do
 	echo -n .
 	$pk "$f"
 done
