@@ -1,0 +1,68 @@
+/* put filetype icons inline with text
+#ggrid>a>span:before,
+#ggrid>a>span.dir:before {
+	display: inline;
+	line-height: 0;
+	font-size: 1.7em;
+	margin: -.7em .1em -.5em -.6em;
+}
+*/
+
+
+/* move folder icons top-left */
+#ggrid>a>span.dir:before {
+	content: initial;
+}
+#ggrid>a[href$="/"]:before {
+	content: '📂';
+    display: block;
+    position: absolute;
+    margin: -.1em -.4em;
+    text-shadow: 0 0 .1em #000;
+    font-size: 2em;
+}
+
+
+/* put filetype icons top-left */
+#ggrid>a:before {
+    display: block;
+    position: absolute;
+    margin: -.1em -.4em;
+    text-shadow: 0 0 .1em #000;
+    font-size: 2em;
+}
+
+
+/* video */
+#ggrid>a:is(
+[href$=".mkv"i],
+[href$=".mp4"i],
+[href$=".webm"i],
+):before {
+    content: '📺';
+}
+
+
+/* audio */
+#ggrid>a:is(
+[href$=".mp3"i],
+[href$=".ogg"i],
+[href$=".opus"i],
+[href$=".flac"i],
+[href$=".m4a"i],
+[href$=".aac"i],
+):before {
+    content: '🎵';
+}
+
+
+/* image */
+#ggrid>a:is(
+[href$=".jpg"i],
+[href$=".jpeg"i],
+[href$=".png"i],
+[href$=".gif"i],
+[href$=".webp"i],
+):before {
+    content: '🎨';
+}
