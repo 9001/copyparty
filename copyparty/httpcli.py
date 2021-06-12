@@ -1379,7 +1379,7 @@ class HttpCli(object):
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
         else:
             vstate = {}
-            vs = {"scanning": None, "hashq": None, "tagq": None}
+            vs = {"scanning": None, "hashq": None, "tagq": None, "mtpq": None}
 
         html = self.j2(
             "splash",
@@ -1391,6 +1391,7 @@ class HttpCli(object):
             scanning=vs["scanning"],
             hashq=vs["hashq"],
             tagq=vs["tagq"],
+            mtpq=vs["mtpq"],
             url_suf=suf,
         )
         self.reply(html.encode("utf-8"), headers=NO_STORE)

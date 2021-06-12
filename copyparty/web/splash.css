@@ -34,6 +34,9 @@ table {
 	padding: .3em .6em;
 	text-align: left;
 }
+.num {
+	border-right: 1px solid #bbb;
+}
 .num td {
 	padding: .1em .7em .1em 0;
 }
@@ -67,4 +70,7 @@ html.dark input {
 	border-radius: .5em;
 	padding: .5em .7em;
 	margin: 0 .5em 0 0;
+}
+html.dark .num {
+	border-color: #777;
 }

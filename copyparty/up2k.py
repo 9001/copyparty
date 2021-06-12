@@ -132,11 +132,25 @@ class Up2k(object):
         self.log_func("up2k", msg + "\033[K", c)
 
     def get_state(self):
+        mtpq = 0
+        q = "select count(w) from mt where k = 't:mtp'"
+        got_lock = self.mutex.acquire(timeout=0.5)
+        if got_lock:
+            for cur in self.cur.values():
+                try:
+                    mtpq += cur.execute(q).fetchone()[0]
+                except:
+                    pass
+            self.mutex.release()
+        else:
+            mtpq = "?"
+
         ret = {
             "volstate": self.volstate,
             "scanning": hasattr(self, "pp"),
             "hashq": self.n_hashq,
             "tagq": self.n_tagq,
+            "mtpq": mtpq,
         }
         return json.dumps(ret, indent=4)
 
