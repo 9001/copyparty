@@ -263,6 +263,9 @@ def run_argparse(argv, formatter):
     ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
     ap.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
+    ap2 = ap.add_argument_group('appearance options')
+    ap2.add_argument("--css-browser", metavar="L", help="URL to additional CSS to include")
+
     ap2 = ap.add_argument_group('admin panel options')
     ap2.add_argument("--no-rescan", action="store_true", help="disable ?scan (volume reindexing)")
     ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks)")
@@ -274,10 +277,10 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
+    ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg for video thumbs")
     ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown")
     ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval")
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age")
-    ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg for video thumbs")
 
     ap2 = ap.add_argument_group('database options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")

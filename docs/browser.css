@@ -1,0 +1,29 @@
+html {
+    background: url('/wp/wallhaven-mdjrqy.jpg') center / cover no-repeat fixed;
+}
+#files th {
+    background: rgba(32, 32, 32, 0.9) !important;
+}
+#ops,
+#treeul,
+#files td {
+    background: rgba(32, 32, 32, 0.3) !important;
+}
+
+
+html.light {
+    background: url('/wp/wallhaven-dpxl6l.png') center / cover no-repeat fixed;
+}
+html.light #files th {
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+html.light #ops,
+html.light #treeul,
+html.light #files td {
+    background: rgba(248, 248, 248, 0.8) !important;
+}
+
+
+#files * {
+    background: transparent !important;
+}

@@ -1808,8 +1808,12 @@ class HttpCli(object):
         j2a["files"] = dirs + files
         j2a["logues"] = logues
         j2a["taglist"] = taglist
+
         if "mte" in vn.flags:
             j2a["tag_order"] = json.dumps(vn.flags["mte"].split(","))
+
+        if self.args.css_browser:
+            j2a["css"] = self.args.css_browser
 
         html = self.j2(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"), headers=NO_STORE)

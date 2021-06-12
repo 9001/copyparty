@@ -644,7 +644,6 @@ input[type="checkbox"]:checked+label {
 }
 #treeul a+a {
 	width: calc(100% - 2em);
-	background: #333;
 	line-height: 1em;
 }
 #treeul a+a:hover {
