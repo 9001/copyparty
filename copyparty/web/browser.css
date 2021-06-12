@@ -917,6 +917,7 @@ html.light #files {
 }
 html.light #files thead th {
 	background: #eee;
+	border-radius: 0;
 }
 html.light #files tr td {
 	border-top: 1px solid #ddd;

@@ -38,7 +38,7 @@ var have_webp = null;
 	img.onerror = function () {
 		have_webp = false;
 	};
-	img.src = "data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA";
+	img.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
 })();
 
 

@@ -244,8 +244,8 @@ class ThumbSrv(object):
             except:
                 im.thumbnail(self.res)
 
-            if im.mode not in ("RGB", "L"):
-                im = im.convert("RGB")
+            fmts = ["RGB", "L"]
+            args = {"quality": 40}
 
             if tpath.endswith(".webp"):
                 # quality 80 = pillow-default
@@ -253,9 +253,16 @@ class ThumbSrv(object):
                 # method 0 = pillow-default, fast
                 # method 4 = ffmpeg-default
                 # method 6 = max, slow
-                im.save(tpath, quality=40, method=6)
+                fmts += ["RGBA", "LA"]
+                args["method"] = 6
             else:
-                im.save(tpath, quality=40)  # default=75
+                pass  # default q = 75
+
+            if im.mode not in fmts:
+                print("conv {}".format(im.mode))
+                im = im.convert("RGB")
+
+            im.save(tpath, quality=40, method=6)
 
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
