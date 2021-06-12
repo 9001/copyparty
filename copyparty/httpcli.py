@@ -1539,7 +1539,7 @@ class HttpCli(object):
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
                 if is_dir:
-                    for fn in ["cover.png", "cover.jpg"]:
+                    for fn in ["folder.png", "folder.jpg"]:
                         fp = os.path.join(abspath, fn)
                         if os.path.exists(fp):
                             vrem = "{}/{}".format(vrem.rstrip("/"), fn)
@@ -1547,7 +1547,7 @@ class HttpCli(object):
                             break
 
                     if is_dir:
-                        return self.tx_ico("/")
+                        return self.tx_ico("a.folder")
 
                 thp = None
                 if self.thumbcli:

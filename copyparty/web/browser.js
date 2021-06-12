@@ -48,7 +48,6 @@ function MPlayer() {
 	this.au = null;
 	this.au_native = null;
 	this.au_ogvjs = null;
-	this.cover_url = '';
 	this.tracks = {};
 	this.order = [];
 

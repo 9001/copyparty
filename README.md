@@ -181,6 +181,8 @@ click `[-]` and `[+]` to adjust the size, and the `[a]` toggles if the tree shou
 
 it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how destructive your users are
 
+images named `folder.jpg` and `folder.png` become the thumbnail of the folder they're in
+
 
 ## zip downloads
 
