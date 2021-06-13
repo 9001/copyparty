@@ -1434,33 +1434,8 @@ class HttpCli(object):
         if self.args.no_stack:
             raise Pebkac(403, "disabled by argv")
 
-        threads = {}
-        names = dict([(t.ident, t.name) for t in threading.enumerate()])
-        for tid, stack in sys._current_frames().items():
-            name = "{} ({:x})".format(names.get(tid), tid)
-            threads[name] = stack
-
-        rret = []
-        bret = []
-        for name, stack in sorted(threads.items()):
-            ret = ["\n\n# {}".format(name)]
-            pad = None
-            for fn, lno, name, line in traceback.extract_stack(stack):
-                fn = os.sep.join(fn.split(os.sep)[-3:])
-                ret.append('File: "{}", line {}, in {}'.format(fn, lno, name))
-                if line:
-                    ret.append("  " + str(line.strip()))
-                    if "self.not_empty.wait()" in line:
-                        pad = " " * 4
-
-            if pad:
-                bret += [ret[0]] + [pad + x for x in ret[1:]]
-            else:
-                rret += ret
-
-        ret = rret + bret
-        ret = ("<pre>" + "\n".join(ret)).encode("utf-8")
-        self.reply(ret)
+        ret = "<pre>{}\n{}".format(time.time(), alltrace())
+        self.reply(ret.encode("utf-8"))
 
     def tx_tree(self):
         top = self.uparam["tree"] or ""

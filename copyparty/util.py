@@ -254,6 +254,34 @@ def trace(*args, **kwargs):
     nuprint(msg)
 
 
+def alltrace():
+    threads = {}
+    names = dict([(t.ident, t.name) for t in threading.enumerate()])
+    for tid, stack in sys._current_frames().items():
+        name = "{} ({:x})".format(names.get(tid), tid)
+        threads[name] = stack
+
+    rret = []
+    bret = []
+    for name, stack in sorted(threads.items()):
+        ret = ["\n\n# {}".format(name)]
+        pad = None
+        for fn, lno, name, line in traceback.extract_stack(stack):
+            fn = os.sep.join(fn.split(os.sep)[-3:])
+            ret.append('File: "{}", line {}, in {}'.format(fn, lno, name))
+            if line:
+                ret.append("  " + str(line.strip()))
+                if "self.not_empty.wait()" in line:
+                    pad = " " * 4
+
+        if pad:
+            bret += [ret[0]] + [pad + x for x in ret[1:]]
+        else:
+            rret += ret
+
+    return "\n".join(rret + bret)
+
+
 def min_ex():
     et, ev, tb = sys.exc_info()
     tb = traceback.extract_tb(tb, 2)

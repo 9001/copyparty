@@ -23,7 +23,7 @@ from textwrap import dedent
 from .__init__ import E, WINDOWS, VT100, PY2
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
-from .util import py_desc, align_tab, IMPLICATIONS
+from .util import py_desc, align_tab, IMPLICATIONS, alltrace
 
 HAVE_SSL = True
 try:
@@ -182,6 +182,16 @@ def sighandler(sig=None, frame=None):
     print("\n".join(msg))
 
 
+def stackmon(fp, ival):
+    ctr = 0
+    while True:
+        ctr += 1
+        time.sleep(ival)
+        st = "{}, {}\n{}".format(ctr, time.time(), alltrace())
+        with open(fp, "wb") as f:
+            f.write(st.encode("utf-8", "replace"))
+
+
 def run_argparse(argv, formatter):
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
@@ -320,6 +330,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
     ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing")
+    ap2.add_argument("--stackmon", metavar="P,S", help="write stacktrace to Path every S second")
     
     return ap.parse_args(args=argv[1:])
     # fmt: on
@@ -358,6 +369,16 @@ def main(argv=None):
         al = run_argparse(argv, RiceFormatter)
     except AssertionError:
         al = run_argparse(argv, Dodge11874)
+
+    if al.stackmon:
+        fp, f = al.stackmon.rsplit(",", 1)
+        f = int(f)
+        t = threading.Thread(
+            target=stackmon,
+            args=(fp, f),
+        )
+        t.daemon = True
+        t.start()
 
     # propagate implications
     for k1, k2 in IMPLICATIONS:
