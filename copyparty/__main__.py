@@ -222,10 +222,6 @@ def run_argparse(argv, formatter):
               "print,get" prints the data in the log and returns GET
               (leave out the ",get" to return an error instead)
 
-            --ciphers help = available ssl/tls ciphers,
-            --ssl-ver help = available ssl/tls versions,
-              default is what python considers safe, usually >= TLS1
-            
             values for --ls:
               "USR" is a user to browse as; * is anonymous, ** is all users
               "VOL" is a single volume to scan, default is * (all vols)
@@ -246,25 +242,25 @@ def run_argparse(argv, formatter):
     ap.add_argument("-c", metavar="PATH", type=str, action="append", help="add config file")
     ap.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
     ap.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores")
-    ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account")
-    ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume")
+    ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account, USER:PASS; example [ed:wark")
+    ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume, SRC:DST:FLAG; example [.::r], [/mnt/nas/music:/music:r:aed")
     ap.add_argument("-ed", action="store_true", help="enable ?dots")
     ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
     ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
     ap.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
-    ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms")
+    ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms; examples: [stash], [save,get]")
 
     ap2 = ap.add_argument_group('network options')
     ap2.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind (comma-sep.)")
     ap2.add_argument("-p", metavar="PORT", type=str, default="3923", help="ports to bind (comma/range)")
-    ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=0, help="number of proxies; 0 = direct http(s), 1 = nginx, 2 = nginx + cloudflare, -1 = trust origin (unsafe)")
+    ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to keep; 0 = tcp, 1 = origin (first x-fwd), 2 = cloudflare, 3 = nginx, -1 = closest proxy")
     
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext")
-    ap2.add_argument("--ssl-ver", metavar="LIST", type=str, help="ssl/tls versions to allow")
-    ap2.add_argument("--ciphers", metavar="LIST", help="set allowed ciphers")
+    ap2.add_argument("--ssl-ver", metavar="LIST", type=str, help="set allowed ssl/tls versions; [help] shows available versions; default is what your python version considers safe")
+    ap2.add_argument("--ciphers", metavar="LIST", help="set allowed ssl/tls ciphers; [help] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", help="log master secrets")
 
@@ -275,7 +271,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
 
     ap2 = ap.add_argument_group('safety options')
-    ap2.add_argument("--ls", metavar="U[,V[,F]]", help="scan all volumes")
+    ap2.add_argument("--ls", metavar="U[,V[,F]]", help="scan all volumes; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
     ap2.add_argument("--salt", type=str, default="hunter2", help="up2k file-hash salt")
 
     ap2 = ap.add_argument_group('logging options')
