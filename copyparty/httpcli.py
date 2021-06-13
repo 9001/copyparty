@@ -104,10 +104,17 @@ class HttpCli(object):
         v = self.headers.get("connection", "").lower()
         self.keepalive = not v.startswith("close") and self.http_ver != "HTTP/1.0"
 
-        v = self.headers.get("x-forwarded-for", None)
-        if v is not None and self.conn.addr[0] in ["127.0.0.1", "::1"]:
-            self.ip = v.split(",")[0]
-            self.log_src = self.conn.set_rproxy(self.ip)
+        if self.args.rproxy:
+            v = self.headers.get("x-forwarded-for")
+            if v is not None and self.conn.addr[0] in ["127.0.0.1", "::1"]:
+                vs = v.split(",")[0]
+                try:
+                    self.ip = vs[self.args.rproxy].strip()
+                except:
+                    self.ip = vs[-1].strip()
+                    self.log("rproxy={} oob x-fwd {}".format(self.args.rproxy, v), c=3)
+
+                self.log_src = self.conn.set_rproxy(self.ip)
 
         if self.args.ihead:
             keys = self.args.ihead

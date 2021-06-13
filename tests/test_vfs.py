@@ -24,6 +24,7 @@ class Cfg(Namespace):
             "hist": None,
             "no_hash": False,
             "css_browser": None,
+            "rproxy": 0,
         }
         ex.update(ex2)
         super(Cfg, self).__init__(a=a, v=v, c=c, **ex)

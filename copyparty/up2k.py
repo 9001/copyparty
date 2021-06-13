@@ -1022,7 +1022,7 @@ class Up2k(object):
         now = time.time()
         job = None
         with self.mutex:
-            cur = self.cur.get(cj["ptop"], None)
+            cur = self.cur.get(cj["ptop"])
             reg = self.registry[cj["ptop"]]
             if cur:
                 if self.no_expr_idx:
@@ -1180,7 +1180,7 @@ class Up2k(object):
 
     def handle_chunk(self, ptop, wark, chash):
         with self.mutex:
-            job = self.registry[ptop].get(wark, None)
+            job = self.registry[ptop].get(wark)
             if not job:
                 known = " ".join([x for x in self.registry[ptop].keys()])
                 self.log("unknown wark [{}], known: {}".format(wark, known))
@@ -1245,7 +1245,7 @@ class Up2k(object):
         return ret, dst
 
     def idx_wark(self, ptop, wark, rd, fn, lmod, sz):
-        cur = self.cur.get(ptop, None)
+        cur = self.cur.get(ptop)
         if not cur:
             return False
 
@@ -1414,7 +1414,7 @@ class Up2k(object):
 
         newest = max(x["poke"] for _, x in reg.items()) if reg else 0
         etag = [len(reg), newest]
-        if etag == prev.get(ptop, None):
+        if etag == prev.get(ptop):
             return
 
         try:

@@ -28,6 +28,7 @@ class Cfg(Namespace):
             a=a,
             v=v,
             c=c,
+            rproxy=0,
             ed=False,
             no_zip=False,
             no_scandir=False,
