@@ -804,6 +804,14 @@ function up2k_init(subtle) {
 
                 var mou_ikkai = false;
 
+                if (st.busy.handshake.length > 0 &&
+                    st.busy.handshake[0].busied < Date.now() - 30 * 1000
+                ) {
+                    console.log("retrying stuck handshake");
+                    var t = st.busy.handshake.shift();
+                    st.todo.handshake.unshift(t);
+                }
+
                 if (st.todo.handshake.length > 0 &&
                     st.busy.handshake.length == 0 && (
                         st.todo.handshake[0].t4 || (
@@ -1019,11 +1027,27 @@ function up2k_init(subtle) {
     //
 
     function exec_handshake() {
-        var t = st.todo.handshake.shift();
+        var t = st.todo.handshake.shift(),
+            me = Date.now();
+
         st.busy.handshake.push(t);
+        t.busied = me;
 
         var xhr = new XMLHttpRequest();
+        xhr.onerror = function () {
+            if (t.busied != me) {
+                console.log('zombie handshake onerror,', t);
+                return;
+            }
+            console.log('handshake onerror, retrying');
+            st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+            st.todo.handshake.unshift(t);
+        };
         xhr.onload = function (e) {
+            if (t.busied != me) {
+                console.log('zombie handshake onload,', t);
+                return;
+            }
             if (xhr.status == 200) {
                 var response = JSON.parse(xhr.responseText);
 
