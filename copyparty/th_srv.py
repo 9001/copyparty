@@ -154,7 +154,8 @@ class ThumbSrv(object):
         histpath = self.asrv.vfs.histtab[ptop]
         tpath = thumb_path(histpath, rem, mtime, fmt)
         abspath = os.path.join(ptop, rem)
-        cond = threading.Condition()
+        cond = threading.Condition(self.mutex)
+        do_conv = False
         with self.mutex:
             try:
                 self.busy[tpath].append(cond)
@@ -172,8 +173,11 @@ class ThumbSrv(object):
                         f.write(fsenc(os.path.dirname(abspath)))
 
                 self.busy[tpath] = [cond]
-                self.q.put([abspath, tpath])
-                self.log("conv {} \033[0m{}".format(tpath, abspath), c=6)
+                do_conv = True
+
+        if do_conv:
+            self.q.put([abspath, tpath])
+            self.log("conv {} \033[0m{}".format(tpath, abspath), c=6)
 
         while not self.stopping:
             with self.mutex:
