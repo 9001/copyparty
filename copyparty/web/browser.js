@@ -508,6 +508,167 @@ try {
 catch (ex) { }
 
 
+var audio_eq = (function () {
+	var r = {
+		"en": false,
+		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
+		"gains": [0, -1, -2, -3, -4, -4, -3, -2, -1, 0],
+		"filters": [],
+		"last_au": null
+	};
+
+	try {
+		r.gains = jread('au_eq_gain', r.gains);
+	}
+	catch (ex) { }
+
+	r.draw = function () {
+		var max = 0;
+		for (var a = 0; a < r.gains.length; a++)
+			if (max < r.gains[a])
+				max = r.gains[a];
+
+		if (max > 0)
+			for (var a = 0; a < r.gains.length; a++)
+				r.gains[a] -= max;
+
+		jwrite('au_eq_gain', r.gains);
+
+		var txt = QSA('input.eq_gain');
+		for (var a = 0; a < r.bands.length; a++)
+			txt[a].value = r.gains[a];
+	};
+
+	r.apply = function () {
+		r.draw();
+
+		var Ctx = window.AudioContext || window.webkitAudioContext;
+		if (!Ctx)
+			bcfg_set('au_eq', false);
+
+		if (!Ctx || !mp.au)
+			return;
+
+		if (!r.en && !mp.ac)
+			return;
+
+		if (mp.ac) {
+			for (var a = 0; a < r.filters.length; a++)
+				r.filters[a].disconnect();
+
+			mp.acs.disconnect();
+		}
+
+		if (!mp.ac || mp.au != r.last_au) {
+			if (mp.ac)
+				mp.ac.close();
+
+			r.last_au = mp.au;
+			mp.ac = new Ctx();
+			mp.acs = mp.ac.createMediaElementSource(mp.au);
+		}
+
+		if (!r.en) {
+			mp.acs.connect(mp.ac.destination);
+			return;
+		}
+
+		r.filters = [];
+		for (var a = 0; a < r.bands.length; a++) {
+			var fi = mp.ac.createBiquadFilter();
+			fi.frequency.value = r.bands[a];
+			fi.gain.value = r.gains[a];
+			fi.Q.value = a == 0 ? 0 : 1;
+			fi.type = a == 0 ? 'lowshelf' : a == r.bands.length - 1 ? 'highshelf' : 'peaking';
+			r.filters.push(fi);
+		}
+		for (var a = r.bands.length - 1; a >= 0; a--) {
+			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
+		}
+		mp.acs.connect(r.filters[r.filters.length - 1]);
+	}
+
+	function eq_step(e) {
+		ev(e);
+		var band = parseInt(this.getAttribute('band')),
+			step = parseFloat(this.getAttribute('step'));
+
+		r.gains[band] += step;
+		r.apply();
+	}
+
+	function adj_band(that, step) {
+		try {
+			var band = parseInt(that.getAttribute('band')),
+				v = parseFloat(that.value);
+
+			if (isNaN(v))
+				throw 42;
+
+			r.gains[band] = v + step;
+		}
+		catch (ex) {
+			return;
+		}
+		r.apply();
+	}
+
+	function eq_mod(e) {
+		ev(e);
+		adj_band(this, 0);
+	}
+
+	function eq_keydown(e) {
+		var step = e.key == 'ArrowUp' ? 0.25 : e.key == 'ArrowDown' ? -0.25 : 0;
+		if (step != 0)
+			adj_band(this, step);
+	}
+
+	var html = ['<table><tr><td rowspan="4">',
+		'<a id="au_eq" class="tgl btn" href="#">enable</a></td>'],
+		h2 = [], h3 = [], h4 = [];
+
+	for (var a = 0; a < r.bands.length; a++) {
+		var hz = r.bands[a];
+		if (hz >= 1000)
+			hz = (hz / 1000) + 'k';
+
+		hz = (hz + '').split('.')[0];
+		html.push('<td><a href="#" class="eq_step" step="0.5" band="' + a + '">+</a></td>');
+		h2.push('<td>' + hz + '</td>');
+		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + a + '">&ndash;</a></td>');
+		h3.push('<td><input type="text" class="eq_gain" band="' + a + '" value="' + r.gains[a] + '" /></td>');
+	}
+	html.push('</tr><tr>');
+	html = html.join('\n');
+	html += h2.join('\n') + '</tr><tr>';
+	html += h3.join('\n') + '</tr><tr>';
+	html += h4.join('\n') + '</tr><table>';
+	ebi('audio_eq').innerHTML = html;
+
+	var stp = QSA('a.eq_step');
+	for (var a = 0, aa = stp.length; a < aa; a++)
+		stp[a].onclick = eq_step;
+
+	var txt = QSA('input.eq_gain');
+	for (var a = 0; a < r.gains.length; a++) {
+		txt[a].oninput = eq_mod;
+		txt[a].onkeydown = eq_keydown;
+	}
+
+	r.en = bcfg_get('au_eq', false);
+	ebi('au_eq').onclick = function (e) {
+		ev(e);
+		r.en = !r.en;
+		bcfg_set('au_eq', r.en);
+		r.apply();
+	};
+
+	r.draw();
+	return r;
+})();
+
+
 // plays the tid'th audio file on the page
 function play(tid, seek, call_depth) {
 	if (mp.order.length == 0)
@@ -567,6 +728,8 @@ function play(tid, seek, call_depth) {
 		}
 		mp.au = mp.au_native;
 	}
+
+	audio_eq.apply();
 
 	mp.au.tid = tid;
 	mp.au.src = url;

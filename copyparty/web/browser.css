@@ -497,6 +497,27 @@ input[type="checkbox"]+label {
 input[type="checkbox"]:checked+label {
 	color: #fc5;
 }
+input.eq_gain {
+	width: 3em;
+	text-align: center;
+	margin: 0 .6em;
+}
+#audio_eq table {
+	border-collapse: collapse;
+}
+#audio_eq td {
+	text-align: center;
+}
+#audio_eq a.eq_step {
+	font-size: 1.5em;
+	display: block;
+	padding: 0;
+}
+#au_eq {
+	display: block;
+	margin-top: .5em;
+	padding: 1.3em .3em;
+}
 
 
 
