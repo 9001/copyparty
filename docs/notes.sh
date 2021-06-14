@@ -86,6 +86,9 @@ var t=[]; var b=document.location.href.split('#')[0].slice(0, -1); document.quer
 # get the size and video-id of all youtube vids in folder, assuming filename ends with -id.ext, and create a copyparty search query
 find -maxdepth 1 -printf '%s %p\n' | sort -n | awk '!/-([0-9a-zA-Z_-]{11})\.(mkv|mp4|webm)$/{next} {sub(/\.[^\.]+$/,"");n=length($0);v=substr($0,n-10);print $1, v}' | tee /dev/stderr | awk 'BEGIN {p="("} {printf("%s name like *-%s.* ",p,$2);p="or"} END {print ")\n"}' | cat >&2
 
+# unique stacks in a stackdump
+f=a; rm -rf stacks; mkdir stacks; grep -E '^#' $f | while IFS= read -r n; do awk -v n="$n" '!$0{o=0} o; $0==n{o=1}' <$f >stacks/f; h=$(sha1sum <stacks/f | cut -c-16); mv stacks/f stacks/$h-"$n"; done ; find stacks/ | sort | uniq -cw24
+
 
 ##
 ## sqlite3 stuff

@@ -804,7 +804,6 @@ html.light #ghead {
 	content: '📂';
 	line-height: 0;
 	font-size: 2em;
-	display: inline-block;
 	margin: -.7em .1em -.5em -.3em;
 }
 #ggrid a:hover {

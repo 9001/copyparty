@@ -185,7 +185,7 @@ class ThumbSrv(object):
                     break
 
             with cond:
-                cond.wait()
+                cond.wait(3)
 
         try:
             st = os.stat(tpath)
