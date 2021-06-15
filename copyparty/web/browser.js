@@ -50,6 +50,31 @@ function MPlayer() {
 	this.au_ogvjs = null;
 	this.tracks = {};
 	this.order = [];
+	this.pb_mode = sread('pb_mode') || 'loop-folder';
+	var r = this;
+
+	ebi('op_player').innerHTML = (
+		'<h3>playback mode</h3><div id="pb_mode">' +
+		'<a href="#" class="tgl btn">loop-folder</a>' +
+		'<a href="#" class="tgl btn">next-folder</a>' +
+		//'<a href="#" class="tgl btn">playlist</a>' +
+		'</div>');
+
+	function draw_pb_mode() {
+		var btns = QSA('#pb_mode>a');
+		for (var a = 0, aa = btns.length; a < aa; a++) {
+			clmod(btns[a], 'on', btns[a].textContent == r.pb_mode);
+			btns[a].onclick = set_pb_mode;
+		}
+	}
+	draw_pb_mode();
+
+	function set_pb_mode(e) {
+		ev(e);
+		r.pb_mode = this.textContent;
+		swrite('pb_mode', r.pb_mode);
+		draw_pb_mode();
+	}
 
 	var re_audio = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i,
 		trs = QSA('#files tbody tr');
@@ -408,7 +433,7 @@ function song_skip(n) {
 	if (tid !== null)
 		play(mp.order.indexOf(tid) + n);
 	else
-		play(mp.order[0]);
+		play(mp.order[n == -1 ? mp.order.length - 1 : 0]);
 }
 
 
@@ -703,11 +728,25 @@ function play(tid, seek, call_depth) {
 	if ((tn + '').indexOf('f-') === 0)
 		tn = mp.order.indexOf(tn);
 
-	while (tn >= mp.order.length)
-		tn -= mp.order.length;
+	if (tn >= mp.order.length) {
+		if (mp.pb_mode == 'loop-folder') {
+			tn = 0;
+		}
+		else if (mp.pb_mode == 'next-folder') {
+			treectl.ls_cb = function () { song_skip(1); };
+			return tree_neigh(1);
+		}
+	}
 
-	while (tn < 0)
-		tn += mp.order.length;
+	if (tn < 0) {
+		if (mp.pb_mode == 'loop-folder') {
+			tn = mp.order.length - 1;
+		}
+		else if (mp.pb_mode == 'next-folder') {
+			treectl.ls_cb = function () { song_skip(-1); };
+			return tree_neigh(-1);
+		}
+	}
 
 	tid = mp.order[tn];
 
@@ -1464,7 +1503,8 @@ document.onkeydown = function (e) {
 
 var treectl = (function () {
 	var treectl = {
-		"hidden": false
+		"hidden": false,
+		"ls_cb": null
 	},
 		entreed = false,
 		fixedpos = false,
@@ -1758,6 +1798,12 @@ var treectl = (function () {
 		msel.render();
 		reload_tree();
 		reload_browser();
+
+		var fun = treectl.ls_cb;
+		if (fun) {
+			treectl.ls_cb = null;
+			fun();
+		}
 	}
 
 	function parsetree(res, top) {
