@@ -596,6 +596,12 @@ input.eq_gain {
 	overscroll-behavior-y: none;
 	scrollbar-color: #eb0 #333;
 }
+#treeh {
+	background: #333;
+	position: sticky;
+	z-index: 1;
+	top: 0;
+}
 #thx_ff {
 	padding: 5em 0;
 }
