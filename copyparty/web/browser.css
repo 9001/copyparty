@@ -1032,6 +1032,9 @@ html.light #files tr.sel a:hover {
 	color: #000;
 	background: #fff;
 }
+html.light #treeh {
+	background: #eee;
+}
 html.light #tree {
 	scrollbar-color: #a70 #ddd;
 }
