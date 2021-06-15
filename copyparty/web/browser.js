@@ -512,26 +512,35 @@ var audio_eq = (function () {
 	var r = {
 		"en": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
-		"gains": [0, -1, -2, -3, -4, -4, -3, -2, -1, 0],
+		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"filters": [],
 		"last_au": null
 	};
 
+	var cfg = [ // hz, q, g
+		[31.25 * 0.88, 0, 1.4],  // shelf
+		[31.25 * 1.04, 0.7, 0.96],  // peak
+		[62.5, 0.7, 1],
+		[125, 0.8, 1],
+		[250, 0.9, 1.03],
+		[500, 0.9, 1.1],
+		[1000, 0.9, 1.1],
+		[2000, 0.9, 1.105],
+		[4000, 0.88, 1.05],
+		[8000 * 1.006, 0.73, 1.24],
+		[16000 * 0.89, 0.7, 1.26],  // peak
+		[16000 * 1.13, 0.82, 1.09],  // peak
+		[16000 * 1.205, 0, 1.9]  // shelf
+	];
+
 	try {
-		r.gains = jread('au_eq_gain', r.gains);
+		var gains = jread('au_eq_gain', r.gains);
+		if (r.gains.length == gains.length)
+			r.gains = gains;
 	}
 	catch (ex) { }
 
 	r.draw = function () {
-		var max = 0;
-		for (var a = 0; a < r.gains.length; a++)
-			if (max < r.gains[a])
-				max = r.gains[a];
-
-		if (max > 0)
-			for (var a = 0; a < r.gains.length; a++)
-				r.gains[a] -= max;
-
 		jwrite('au_eq_gain', r.gains);
 
 		var txt = QSA('input.eq_gain');
@@ -568,21 +577,36 @@ var audio_eq = (function () {
 			mp.acs = mp.ac.createMediaElementSource(mp.au);
 		}
 
+		r.filters = [];
+
 		if (!r.en) {
 			mp.acs.connect(mp.ac.destination);
 			return;
 		}
 
-		r.filters = [];
-		for (var a = 0; a < r.bands.length; a++) {
+		var max = 0;
+		for (var a = 0; a < r.gains.length; a++)
+			if (max < r.gains[a])
+				max = r.gains[a];
+
+		var gains = []
+		for (var a = 0; a < r.gains.length; a++)
+			gains.push(r.gains[a] - max);
+
+		var t = gains[gains.length - 1];
+		gains.push(t);
+		gains.push(t);
+		gains.unshift(gains[0]);
+
+		for (var a = 0; a < cfg.length; a++) {
 			var fi = mp.ac.createBiquadFilter();
-			fi.frequency.value = r.bands[a];
-			fi.gain.value = r.gains[a];
-			fi.Q.value = a == 0 ? 0 : 1;
-			fi.type = a == 0 ? 'lowshelf' : a == r.bands.length - 1 ? 'highshelf' : 'peaking';
+			fi.frequency.value = cfg[a][0];
+			fi.gain.value = cfg[a][2] * gains[a];
+			fi.Q.value = cfg[a][1];
+			fi.type = a == 0 ? 'lowshelf' : a == cfg.length - 1 ? 'highshelf' : 'peaking';
 			r.filters.push(fi);
 		}
-		for (var a = r.bands.length - 1; a >= 0; a--) {
+		for (var a = r.filters.length - 1; a >= 0; a--) {
 			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
 		}
 		mp.acs.connect(r.filters[r.filters.length - 1]);
