@@ -643,7 +643,11 @@ var audio_eq = (function () {
 		for (var a = r.filters.length - 1; a >= 0; a--) {
 			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
 		}
-		mp.acs.connect(r.filters[r.filters.length - 1]);
+		fi = mp.ac.createGain();
+		fi.gain.value = '0.94';  // +.137 dB measured; now -.25 dB and almost bitperfect
+		mp.acs.connect(fi);
+		fi.connect(r.filters[r.filters.length - 1]);
+		r.filters.push(fi);
 	}
 
 	function eq_step(e) {
@@ -697,8 +701,7 @@ var audio_eq = (function () {
 		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + a + '">&ndash;</a></td>');
 		h3.push('<td><input type="text" class="eq_gain" band="' + a + '" value="' + r.gains[a] + '" /></td>');
 	}
-	html.push('</tr><tr>');
-	html = html.join('\n');
+	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><tr>';
 	html += h3.join('\n') + '</tr><tr>';
 	html += h4.join('\n') + '</tr><table>';
