@@ -628,6 +628,7 @@ input.eq_gain {
 	box-shadow: 0 .1em .2em #222 inset;
 	border-radius: .3em;
 	margin: .2em;
+	white-space: pre;
 	position: relative;
 	top: -.2em;
 }

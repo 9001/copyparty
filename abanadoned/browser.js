@@ -49,11 +49,32 @@ var mpl = (function () {
 		'<h3>playback mode</h3><div id="pb_mode">' +
 		'<a href="#" class="tgl btn">🔁 loop-folder</a>' +
 		'<a href="#" class="tgl btn">📂 next-folder</a>' +
-		'</div>');
+		'<a href="#" class="tgl btn">📃 playlist</a>' +
+		'</div>' +
+
+		'<h3>playlists</h3><div id="pb_lists"></div>' +
+
+		'<h3>edit</h3><div id="pb_edit">' +
+		'<a href="#" class="btn">🗒️ new-playlist</a>' +
+		'<a href="#" class="btn">🏷️ rename</a>' +
+		'<a href="#" class="btn">💣 delete</a> //<br />' +
+		'<a href="#" class="btn">📌 add-folder</a>' +
+		'<a href="#" class="btn">🗑️ remove</a>' +
+		'<a href="#" class="btn">⤴ move-up</a>' +
+		'<a href="#" class="btn">⤵ move-down</a>' +
+		'</div>' +
+
+		'<select id="pb_list" size="7" style="display:none"></select>');
 
 	var r = {
+		"playlists": jread('playlists', []),
+		"playlist": null,
 		"pb_mode": sread('pb_mode') || 'loop-folder'
 	};
+
+	var iplaylist = parseInt(sread('iplaylist') || -1);
+	if (iplaylist >= 0 && iplaylist < r.playlists.length)
+		r.playlist = r.playlists[iplaylist];
 
 	function draw_pb_mode() {
 		var btns = QSA('#pb_mode>a');
@@ -71,7 +92,147 @@ var mpl = (function () {
 		draw_pb_mode();
 	}
 
-	return r;
+	function draw_playlists() {
+		var html = [];
+		for (var a = 0; a < r.playlists.length; a++)
+			html.push('<a href="#" n="' + a + '" class="tgl btn">' + esc(r.playlists[a].name) + '</a>');
+
+		if (!html.length)
+			html.push('no playlists created');
+
+		ebi('pb_lists').innerHTML = html.join('\n');
+		hilight_active_playlist();
+
+		html = [];
+		var pl = r.playlist,
+			pb_list = ebi('pb_list'),
+			dirs = (pl || {}).folders;
+
+		if (!pl) {
+			pb_list.innerHTML = '';
+			pb_list.style.display = 'none';
+			return;
+		}
+
+		for (var a = 0; a < dirs.length; a++)
+			html.push('<option>' + esc(dirs[a]) + '</option>');
+
+		if (!html.length)
+			html.push('<option>no folders added yet</option>');
+
+		pb_list.innerHTML = html.join('\n');
+		pb_list.style.display = 'block';
+
+		jwrite('playlists', r.playlists);
+		swrite('iplaylist', r.playlists.indexOf(r.playlist));
+	}
+
+	function hilight_active_playlist() {
+		var btns = QSA('#pb_lists>a'),
+			act = r.playlists.indexOf(r.playlist);
+
+		for (var a = 0, aa = btns.length; a < aa; a++)
+			clmod(btns[a], 'on', parseInt(btns[a].getAttribute('n')) == act);
+	}
+
+	ebi('pb_lists').onclick = function (e) {
+		ev(e);
+		var t = e.target;
+		if (t.tagName != 'A')
+			return;
+
+		r.playlist = r.playlists[parseInt(t.getAttribute('n'))];
+		return draw_playlists();
+	}
+
+	ebi('pb_edit').onclick = function (e) {
+		ev(e);
+		var t = e.target;
+		if (t.tagName != 'A')
+			return;
+
+		var act = t.textContent.split(' ').slice(-1)[0];
+		if (act == 'new-playlist') {
+			r.playlist = {
+				"name": "my mixtape",
+				"folders": []
+			};
+			r.playlists.push(r.playlist);
+			return draw_playlists();
+		}
+
+		if (act == 'rename') {
+			var name = prompt("new name:", r.playlist.name);
+			if (name === null)
+				return;
+
+			r.playlist.name = name;
+			return draw_playlists();
+		}
+
+		if (act == 'delete') {
+			r.playlists.splice(r.playlists.indexOf(r.playlist), 1);
+			r.playlist = null;
+			return draw_playlists();
+		}
+
+		if (act == 'add-folder')
+			return add_folder();
+
+		if (act == 'move-up')
+			return move_folder(-1);
+
+		if (act == 'move-down')
+			return move_folder(1);
+
+		if (act == 'remove-folder')
+			return remove_folder();
+	}
+
+	function add_folder() {
+		var dsel = QSA('#files tbody tr.sel td:nth-child(2) a'),
+			links = [];
+
+		for (var a = 0, aa = dsel.length; a < aa; a++) {
+			var url = dsel[a].getAttribute('href');
+			if (url.slice(-1) == '/')
+				links.push(url);
+		}
+
+		if (!links.length)
+			links.push(document.location.pathname);
+
+		for (var a = 0; a < links.length; a++)
+			r.playlist.folders.push(links[a]);
+
+		draw_playlists();
+	}
+
+	function move_folder(steps) {
+		var pb_list = ebi('pb_list'),
+			dirs = r.playlist.folders,
+			name = pb_list.value,
+			idx = dirs.indexOf(name);
+
+		if (idx == -1 ||
+			steps < 0 && idx < 0 ||
+			steps > 0 && idx >= dirs.length - 1)
+			return;
+
+		dirs.splice(idx, 1);
+		dirs.splice(idx + steps, 0, name);
+	}
+
+	function remove_folder() {
+		throw 42;
+	}
+
+	ebi('pb_list').ondblclick = function (e) {
+		ev(e);
+		treectl.goto(this.value, true);
+	}
+
+	draw_playlists();
 })();
 
 
