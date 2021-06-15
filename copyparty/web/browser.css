@@ -723,18 +723,18 @@ input.eq_gain {
 	color: #300;
 	background: #fea;
 }
-#op_cfg {
+.opwide {
 	max-width: none;
 	margin-right: 1.5em;
 }
-#op_cfg>div>a {
+.opwide>div>a {
 	line-height: 2em;
 }
 #op_cfg>div>span {
 	display: inline-block;
 	padding: .2em .4em;
 }
-#op_cfg h3 {
+.opbox h3 {
 	margin: .8em 0 0 .6em;
 	padding: 0;
 	border-bottom: 1px solid #555;

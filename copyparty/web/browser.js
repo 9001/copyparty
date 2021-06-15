@@ -54,6 +54,7 @@ function MPlayer() {
 	var r = this;
 
 	ebi('op_player').innerHTML = (
+		'<h3>audio equalizer</h3><div id="audio_eq"></div>' +
 		'<h3>playback mode</h3><div id="pb_mode">' +
 		'<a href="#" class="tgl btn">loop-folder</a>' +
 		'<a href="#" class="tgl btn">next-folder</a>' +
