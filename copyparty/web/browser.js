@@ -162,8 +162,9 @@ var widget = (function () {
 			m = ck + 'np: ';
 
 		for (var a = 1, aa = th.length; a < aa; a++) {
-			var tk = a == 1 ? '' : th[a].getAttribute('name').split('/').slice(-1)[0];
-			var tv = tr[a].getAttribute('html') || tr[a].textContent;
+			var tv = tr[a].textContent,
+				tk = a == 1 ? '' : th[a].getAttribute('name').split('/').slice(-1)[0];
+
 			m += tk + '(' + cv + tv + ck + ') // ';
 		}
 
@@ -1948,17 +1949,34 @@ var filecols = (function () {
 	var add_btns = function () {
 		var ths = QSA('#files th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			var th = ths[a].parentElement,
-				is_hidden = has(hidden, ths[a].textContent);
-
-			th.innerHTML = '<div class="cfg"><a href="#">' +
-				(is_hidden ? '+' : '-') + '</a></div>' + ths[a].outerHTML;
-
+			var th = ths[a].parentElement;
+			th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + ths[a].outerHTML;
 			th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
 		}
 	};
 
+	function hcols_click(e) {
+		ev(e);
+		var t = e.target;
+		if (t.tagName != 'A')
+			return;
+
+		toggle(t.textContent);
+	}
+
 	var set_style = function () {
+		hidden.sort();
+
+		var html = [],
+			hcols = ebi('hcols');
+
+		for (var a = 0; a < hidden.length; a++) {
+			html.push('<a href="#" class="btn">' + esc(hidden[a]) + '</a>');
+		}
+		hcols.previousSibling.style.display = html.length ? 'block' : 'none';
+		hcols.innerHTML = html.join('\n');
+		hcols.onclick = hcols_click;
+
 		add_btns();
 
 		var ohidden = [],
@@ -1983,22 +2001,8 @@ var filecols = (function () {
 			var cls = has(ohidden, a) ? 'min' : '',
 				tds = QSA('#files>tbody>tr>td:nth-child(' + (a + 1) + ')');
 
-			for (var b = 0, bb = tds.length; b < bb; b++) {
+			for (var b = 0, bb = tds.length; b < bb; b++)
 				tds[b].setAttribute('class', cls);
-				if (a < 2)
-					continue;
-
-				if (cls) {
-					if (!tds[b].hasAttribute('html')) {
-						tds[b].setAttribute('html', tds[b].innerHTML);
-						tds[b].innerHTML = '...';
-					}
-				}
-				else if (tds[b].hasAttribute('html')) {
-					tds[b].innerHTML = tds[b].getAttribute('html');
-					tds[b].removeAttribute('html');
-				}
-			}
 		}
 	};
 	set_style();
@@ -2017,15 +2021,13 @@ var filecols = (function () {
 	try {
 		var ci = find_file_col('dur'),
 			i = ci[0],
-			min = ci[1],
 			rows = ebi('files').tBodies[0].rows;
 
-		if (!min)
-			for (var a = 0, aa = rows.length; a < aa; a++) {
-				var c = rows[a].cells[i];
-				if (c && c.textContent)
-					c.textContent = s2ms(c.textContent);
-			}
+		for (var a = 0, aa = rows.length; a < aa; a++) {
+			var c = rows[a].cells[i];
+			if (c && c.textContent)
+				c.textContent = s2ms(c.textContent);
+		}
 	}
 	catch (ex) { }
 

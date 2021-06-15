@@ -584,6 +584,7 @@ input.eq_gain {
 }
 #wrap {
 	margin-top: 2em;
+	min-height: 90vh;
 }
 #tree {
 	display: none;
@@ -694,33 +695,19 @@ input.eq_gain {
 	font-size: 2em;
 	white-space: nowrap;
 }
-#files th:hover .cfg,
-#files th.min .cfg {
+#files th:hover .cfg {
 	display: block;
 	width: 1em;
 	border-radius: .2em;
 	margin: -1.3em auto 0 auto;
 	background: #444;
 }
-#files th.min .cfg {
-	margin: -.6em;
-}
-#files>thead>tr>th.min span {
-	position: absolute;
-	transform: rotate(270deg);
-	background: linear-gradient(90deg, rgba(68,68,68,0), rgba(68,68,68,0.5) 70%, #444);
-	margin-left: -4.6em;
-	padding: .4em;
-	top: 5.4em;
-	width: 8em;
-	text-align: right;
-	letter-spacing: .04em;
+#files>thead>tr>th.min,
+#files td.min {
+		display: none;
 }
 #files td:nth-child(2n) {
 	color: #f5a;
-}
-#files td.min a {
-	display: none;
 }
 #files tr.play td,
 #files tr.play div a {
@@ -971,12 +958,8 @@ html.light tr.play td {
 html.light tr.play a {
 	color: #406;
 }
-html.light #files th:hover .cfg,
-html.light #files th.min .cfg {
+html.light #files th:hover .cfg {
 	background: #ccc;
-}
-html.light #files > thead > tr > th.min span {
-	background: linear-gradient(90deg, rgba(204,204,204,0), rgba(204,204,204,0.5) 70%, #ccc);
 }
 html.light #blocked {
 	background: #eee;
