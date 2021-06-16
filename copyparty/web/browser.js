@@ -551,6 +551,7 @@ var audio_eq = (function () {
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"filters": [],
+		"amp": 0,
 		"last_au": null
 	};
 
@@ -571,6 +572,7 @@ var audio_eq = (function () {
 	];
 
 	try {
+		r.amp = fcfg_get('au_eq_amp', r.amp);
 		var gains = jread('au_eq_gain', r.gains);
 		if (r.gains.length == gains.length)
 			r.gains = gains;
@@ -579,10 +581,13 @@ var audio_eq = (function () {
 
 	r.draw = function () {
 		jwrite('au_eq_gain', r.gains);
+		swrite('au_eq_amp', r.amp);
 
 		var txt = QSA('input.eq_gain');
 		for (var a = 0; a < r.bands.length; a++)
 			txt[a].value = r.gains[a];
+
+		QS('input.eq_gain[band="amp"]').value = r.amp;
 	};
 
 	r.apply = function () {
@@ -647,7 +652,7 @@ var audio_eq = (function () {
 			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
 		}
 		fi = mp.ac.createGain();
-		fi.gain.value = '0.94';  // +.137 dB measured; now -.25 dB and almost bitperfect
+		fi.gain.value = r.amp + 0.94;  // +.137 dB measured; now -.25 dB and almost bitperfect
 		mp.acs.connect(fi);
 		fi.connect(r.filters[r.filters.length - 1]);
 		r.filters.push(fi);
@@ -658,7 +663,11 @@ var audio_eq = (function () {
 		var band = parseInt(this.getAttribute('band')),
 			step = parseFloat(this.getAttribute('step'));
 
-		r.gains[band] += step;
+		if (isNaN(band))
+			r.amp = Math.round((r.amp + step * 0.2) * 100) / 100;
+		else
+			r.gains[band] += step;
+
 		r.apply();
 	}
 
@@ -670,7 +679,10 @@ var audio_eq = (function () {
 			if (isNaN(v))
 				throw 42;
 
-			r.gains[band] = v + step;
+			if (isNaN(band))
+				r.amp = Math.round((v + step * 0.2) * 100) / 100;
+			else
+				r.gains[band] = v + step;
 		}
 		catch (ex) {
 			return;
@@ -693,16 +705,23 @@ var audio_eq = (function () {
 		'<a id="au_eq" class="tgl btn" href="#">enable</a></td>'],
 		h2 = [], h3 = [], h4 = [];
 
+	var vs = [];
 	for (var a = 0; a < r.bands.length; a++) {
 		var hz = r.bands[a];
 		if (hz >= 1000)
 			hz = (hz / 1000) + 'k';
 
 		hz = (hz + '').split('.')[0];
-		html.push('<td><a href="#" class="eq_step" step="0.5" band="' + a + '">+</a></td>');
-		h2.push('<td>' + hz + '</td>');
-		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + a + '">&ndash;</a></td>');
-		h3.push('<td><input type="text" class="eq_gain" band="' + a + '" value="' + r.gains[a] + '" /></td>');
+		vs.push([a, hz, r.gains[a]]);
+	}
+	vs.push(["amp", "boost", r.amp]);
+
+	for (var a = 0; a < vs.length; a++) {
+		var b = vs[a][0];
+		html.push('<td><a href="#" class="eq_step" step="0.5" band="' + b + '">+</a></td>');
+		h2.push('<td>' + vs[a][1] + '</td>');
+		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + b + '">&ndash;</a></td>');
+		h3.push('<td><input type="text" class="eq_gain" band="' + b + '" value="' + vs[a][2] + '" /></td>');
 	}
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><tr>';
@@ -715,7 +734,7 @@ var audio_eq = (function () {
 		stp[a].onclick = eq_step;
 
 	var txt = QSA('input.eq_gain');
-	for (var a = 0; a < r.gains.length; a++) {
+	for (var a = 0; a < txt.length; a++) {
 		txt[a].oninput = eq_mod;
 		txt[a].onkeydown = eq_keydown;
 	}
