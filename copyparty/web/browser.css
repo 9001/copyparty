@@ -484,13 +484,20 @@ html.light #ggrid a.sel {
 	margin: .5em;
 }
 .opview input[type=text] {
-	color: #fff;
 	background: #383838;
+	color: #fff;
 	border: none;
 	box-shadow: 0 0 .3em #222;
 	border-bottom: 1px solid #fc5;
 	border-radius: .2em;
 	padding: .2em .3em;
+}
+.opview input.err {
+	background: #a20;
+	border-color: #f00;
+	box-shadow: 0 0 .7em #f00;
+	text-shadow: 1px 1px 0 #500;
+	outline: none;
 }
 input[type="checkbox"]+label {
 	color: #f5a;

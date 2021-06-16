@@ -648,14 +648,16 @@ var audio_eq = (function () {
 			fi.type = a == 0 ? 'lowshelf' : a == cfg.length - 1 ? 'highshelf' : 'peaking';
 			r.filters.push(fi);
 		}
-		for (var a = r.filters.length - 1; a >= 0; a--) {
-			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
-		}
+
+		// pregain, keep first in chain
 		fi = mp.ac.createGain();
 		fi.gain.value = r.amp + 0.94;  // +.137 dB measured; now -.25 dB and almost bitperfect
-		mp.acs.connect(fi);
-		fi.connect(r.filters[r.filters.length - 1]);
 		r.filters.push(fi);
+
+		for (var a = r.filters.length - 1; a >= 0; a--)
+			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
+
+		mp.acs.connect(r.filters[r.filters.length - 1]);
 	}
 
 	function eq_step(e) {
@@ -672,22 +674,26 @@ var audio_eq = (function () {
 	}
 
 	function adj_band(that, step) {
+		var err = false;
 		try {
 			var band = parseInt(that.getAttribute('band')),
-				v = parseFloat(that.value);
+				vs = that.value,
+				v = parseFloat(vs);
 
-			if (isNaN(v))
+			if (isNaN(v) || v + '' != vs)
 				throw 42;
 
 			if (isNaN(band))
 				r.amp = Math.round((v + step * 0.2) * 100) / 100;
 			else
 				r.gains[band] = v + step;
+
+			r.apply();
 		}
 		catch (ex) {
-			return;
+			err = true;
 		}
-		r.apply();
+		clmod(that, 'err', err);
 	}
 
 	function eq_mod(e) {
