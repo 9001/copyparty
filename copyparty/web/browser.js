@@ -445,19 +445,22 @@ function song_skip(n) {
 }
 
 
+function playpause(e) {
+	ev(e);
+	if (mp.au) {
+		if (mp.au.paused)
+			mp.au.play();
+		else
+			mp.au.pause();
+	}
+	else
+		play(0);
+};
+
+
 // hook up the widget buttons
 (function () {
-	ebi('bplay').onclick = function (e) {
-		ev(e);
-		if (mp.au) {
-			if (mp.au.paused)
-				mp.au.play();
-			else
-				mp.au.pause();
-		}
-		else
-			play(0);
-	};
+	ebi('bplay').onclick = playpause;
 	ebi('bprev').onclick = function (e) {
 		ev(e);
 		song_skip(-1);
@@ -1226,6 +1229,9 @@ document.onkeydown = function (e) {
 	var n = k == 'KeyJ' ? -1 : k == 'KeyL' ? 1 : 0;
 	if (n !== 0)
 		return song_skip(n);
+
+	if (k == 'KeyM')
+		return playpause();
 
 	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
 	if (n !== 0)

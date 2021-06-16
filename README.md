@@ -171,7 +171,7 @@ the browser has the following hotkeys
   * `0..9` jump to 10%..90%
   * `U/O` skip 10sec back/forward
   * `J/L` prev/next song
-    * `J` also starts playing the folder
+  * `M` play/pause (also starts playing the folder)
 * in the grid view:
   * `S` toggle multiselect
   * `A/D` zoom
