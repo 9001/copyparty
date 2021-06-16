@@ -44,12 +44,12 @@ var have_webp = null;
 
 var mpl = (function () {
 	ebi('op_player').innerHTML = (
-		'<h3>audio equalizer</h3><div id="audio_eq"></div>' +
-
-		'<h3>playback mode</h3><div id="pb_mode">' +
+		'<div><h3>playback mode</h3><div id="pb_mode">' +
 		'<a href="#" class="tgl btn">🔁 loop-folder</a>' +
 		'<a href="#" class="tgl btn">📂 next-folder</a>' +
-		'</div>');
+		'</div></div>' +
+
+		'<div><h3>audio equalizer</h3><div id="audio_eq"></div></div>');
 
 	var r = {
 		"pb_mode": sread('pb_mode') || 'loop-folder'

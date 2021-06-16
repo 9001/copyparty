@@ -45,18 +45,20 @@
     {%- include 'upload.html' %}
 
     <div id="op_cfg" class="opview opbox opwide">
-        <h3>switches</h3>
         <div>
-            <a id="tooltips" class="tgl btn" href="#">ℹ️ tooltips</a>
-            <a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>
-            <a id="griden" class="tgl btn" href="#">田 the grid</a>
-            <a id="thumbs" class="tgl btn" href="#">🖼️ thumbs</a>
+            <h3>switches</h3>
+            <div>
+                <a id="tooltips" class="tgl btn" href="#">ℹ️ tooltips</a>
+                <a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>
+                <a id="griden" class="tgl btn" href="#">田 the grid</a>
+                <a id="thumbs" class="tgl btn" href="#">🖼️ thumbs</a>
+            </div>
         </div>
         {%- if have_zip %}
-        <h3>folder download</h3><div id="arc_fmt"></div>
+        <div><h3>folder download</h3><div id="arc_fmt"></div></div>
         {%- endif %}
-        <h3>key notation</h3><div id="key_notation"></div>
-        <h3>hidden columns</h3><div id="hcols"></div>
+        <div><h3>key notation</h3><div id="key_notation"></div></div>
+        <div class="fill"><h3>hidden columns</h3><div id="hcols"></div></div>
     </div>
     
     <h1 id="path">

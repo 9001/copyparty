@@ -728,10 +728,20 @@ input.eq_gain {
 	max-width: none;
 	margin-right: 1.5em;
 }
-.opwide>div>a {
+.opwide>div {
+	display: inline-block;
+	vertical-align: top;
+	border-left: .2em solid #444;
+	margin-left: .5em;
+	padding-left: .5em;
+}
+.opwide>div.fill {
+	display: block;
+}
+.opwide>div>div>a {
 	line-height: 2em;
 }
-#op_cfg>div>span {
+#op_cfg>div>div>span {
 	display: inline-block;
 	padding: .2em .4em;
 }
@@ -987,6 +997,9 @@ html.light #files tr.sel a.play.act {
 }
 html.light input[type="checkbox"] + label {
 	color: #333;
+}
+html.light .opwide>div {
+	border-color: #ddd;
 }
 html.light .opview input[type="text"] {
 	background: #fff;
