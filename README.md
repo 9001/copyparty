@@ -62,6 +62,13 @@ download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/do
 
 running the sfx without arguments (for example doubleclicking it on Windows) will give everyone full access to the current folder; see `-h` for help if you want accounts and volumes etc
 
+some recommended options:
+* `-e2dsa` enables general file indexing, see [search configuration](#search-configuration)
+* `-e2ts` enables audio metadata indexing (needs either FFprobe or mutagen), see [optional dependencies](#optional-dependencies)
+* `-v /mnt/music:/music:r:afoo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, with user `foo` as `a`dmin (read/write), password `bar`
+  * replace `:r:afoo` with `:rfoo` to only make the folder readable by `foo` and nobody else
+  * in addition to `r`ead and `a`dmin, `w`rite makes a folder write-only, so cannot list/access files in it
+
 you may also want these, especially on servers:
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for better https)
@@ -101,7 +108,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ FUSE client (read-only)
 * browser
   * ☑ tree-view
-  * ☑ media player
+  * ☑ audio player
   * ☑ thumbnails
     * ☑ images using Pillow
     * ☑ videos using FFmpeg
@@ -301,7 +308,7 @@ the same arguments can be set as volume flags, in addition to `d2d` and `d2t` fo
 * `-v ~/music::r:cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
 note:
-* `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and cause `e2ts` to reindex those
+* `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
 you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `cdhash`, this has the following consequences:
