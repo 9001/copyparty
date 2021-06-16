@@ -339,29 +339,32 @@ class ThumbSrv(object):
         interval = self.args.th_clean
         while True:
             time.sleep(interval)
+            ndirs = 0
             for vol, histpath in self.asrv.vfs.histtab.items():
                 if histpath.startswith(vol):
                     self.log("\033[Jcln {}/\033[A".format(histpath))
                 else:
                     self.log("\033[Jcln {} ({})/\033[A".format(histpath, vol))
 
-                self.clean(histpath)
+                ndirs += self.clean(histpath)
 
-            self.log("\033[Jcln ok")
+            self.log("\033[Jcln ok; rm {} dirs".format(ndirs))
 
     def clean(self, histpath):
-        # self.log("cln {}".format(histpath))
+        thumbpath = os.path.join(histpath, "th")
+        # self.log("cln {}".format(thumbpath))
         maxage = self.args.th_maxage
         now = time.time()
         prev_b64 = None
         prev_fp = None
         try:
-            ents = os.listdir(histpath)
+            ents = os.listdir(thumbpath)
         except:
-            return
+            return 0
 
+        ndirs = 0
         for f in sorted(ents):
-            fp = os.path.join(histpath, f)
+            fp = os.path.join(thumbpath, f)
             cmp = fp.lower().replace("\\", "/")
 
             # "top" or b64 prefix/full (a folder)
@@ -376,10 +379,11 @@ class ThumbSrv(object):
                                 break
 
                         if safe:
+                            ndirs += 1
                             self.log("rm -rf [{}]".format(fp))
                             shutil.rmtree(fp, ignore_errors=True)
                 else:
-                    self.clean(fp)
+                    ndirs += self.clean(fp)
                 continue
 
             # thumb file
@@ -401,3 +405,5 @@ class ThumbSrv(object):
 
             prev_b64 = b64
             prev_fp = fp
+
+        return ndirs
