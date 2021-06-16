@@ -53,6 +53,7 @@ body {
 #files tbody a {
 	display: block;
 	padding: .3em 0;
+	scroll-margin-top: 45vh;
 }
 #files tbody div a {
 	color: #f5a;
@@ -68,7 +69,6 @@ a, #files tbody div a:last-child {
 	text-decoration: underline;
 }
 #files thead {
-	background: #333;
 	position: sticky;
 	top: 0;
 }
@@ -76,29 +76,30 @@ a, #files tbody div a:last-child {
 	color: #999;
 	font-weight: normal;
 }
-#files tr:hover {
+#files tr:hover td {
 	background: #1c1c1c;
 }
 #files thead th {
-	padding: .5em 1.3em .3em 1.3em;
+	padding: .5em .3em .3em .3em;
+	border-right: 2px solid #3c3c3c;
+	border-bottom: 2px solid #444;
+	background: #333;
 	cursor: pointer;
 }
+#files thead th+th {
+	border-left: 2px solid #2a2a2a;
+}
 #files thead th:last-child {
-	background: #444;
-	border-radius: .7em .7em 0 0;
+	border-right: none;
 }
-#files thead th:first-child {
+#files tbody {
 	background: #222;
-}
-#files tbody,
-#files thead th:nth-child(2) {
-	background: #222;
-	border-radius: 0 .7em 0 0;
 }
 #files td {
 	margin: 0;
 	padding: 0 .5em;
 	border-bottom: 1px solid #111;
+	border-left: 1px solid #2c2c2c;
 }
 #files td+td+td {
 	max-width: 30em;
@@ -185,7 +186,7 @@ a, #files tbody div a:last-child {
 	margin: -.2em;
 }
 #files tbody a.play.act {
-	color: #840;
+	color: #720;
 	text-shadow: 0 0 .3em #b80;
 }
 #files tbody tr.sel td,
@@ -943,13 +944,14 @@ html.light #files {
 }
 html.light #files thead th {
 	background: #eee;
-	border-radius: 0;
+	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
 }
-html.light #files tr td {
-	border-top: 1px solid #ddd;
+html.light #files thead th {
+	border-left: 1px solid #f7f7f7;
 }
 html.light #files td {
-	border-bottom: 1px solid #f7f7f7;
+	border-color: #ddd #fff #fff #ddd;
 }
 html.light #files tbody tr:last-child td {
 	border-bottom: .2em solid #ccc;
@@ -957,14 +959,18 @@ html.light #files tbody tr:last-child td {
 html.light #files td:nth-child(2n) {
 	color: #d38;
 }
-html.light #files tr:hover td {
-	background: #fff;
+html.light #files tr.play td:nth-child(2n) {
+	color: #c16;
 }
 html.light #files tbody a.play {
 	color: #c0f;
 }
-html.light tr.play td {
+html.light #files tr.play td {
 	background: #fc5;
+	border-color: #eb1;
+}
+html.light #files tr:hover td {
+	background: #fff;
 }
 html.light tr.play a {
 	color: #406;
@@ -981,7 +987,21 @@ html.light #blk_abrt a {
 	box-shadow: 0 .2em .4em #ddd;
 }
 html.light #widget a {
-	color: #fc5;
+	color: #06a;
+}
+html.light #wtoggle,
+html.light #widgeti {
+	background: #eee;
+}
+html.light #wtoggle {
+	box-shadow: 0 0 .5em #bbb;
+}
+html.light #widget.open {
+	border-top: .2em solid #f7f7f7;
+}
+html.light #wzip,
+html.light #wnp {
+	border-color: #ccc;
 }
 html.light #files tr.sel:hover td {
 	background: #c37;
