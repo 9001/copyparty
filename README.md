@@ -68,6 +68,7 @@ some recommended options:
 * `-v /mnt/music:/music:r:afoo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, with user `foo` as `a`dmin (read/write), password `bar`
   * replace `:r:afoo` with `:rfoo` to only make the folder readable by `foo` and nobody else
   * in addition to `r`ead and `a`dmin, `w`rite makes a folder write-only, so cannot list/access files in it
+* `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access
 
 you may also want these, especially on servers:
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
