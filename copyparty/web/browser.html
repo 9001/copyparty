@@ -15,19 +15,19 @@
 
 <body>
     <div id="ops">
-        <a href="#" data-dest="" data-desc="close submenu">---</a>
+        <a href="#" data-dest="" tt="close submenu">---</a>
         {%- if have_up2k_idx %}
-        <a href="#" data-perm="read" data-dest="search" data-desc="search for files by attributes, path/name, music tags, or any combination of those.&lt;br /&gt;&lt;br /&gt;&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,&lt;br /&gt;&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,&lt;br /&gt;&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>
-        <a href="#" data-dest="up2k" data-desc="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>
+        <a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those.&lt;br /&gt;&lt;br /&gt;&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,&lt;br /&gt;&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,&lt;br /&gt;&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>
+        <a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>
         {%- else %}
-        <a href="#" data-perm="write" data-dest="up2k" data-desc="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>
+        <a href="#" data-perm="write" data-dest="up2k" tt="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>
         {%- endif %}
-        <a href="#" data-perm="write" data-dest="bup" data-desc="bup: basic uploader, even supports netscape 4.0">🎈</a>
-        <a href="#" data-perm="write" data-dest="mkdir" data-desc="mkdir: create a new directory">📂</a>
-        <a href="#" data-perm="read write" data-dest="new_md" data-desc="new-md: create a new markdown document">📝</a>
-        <a href="#" data-perm="write" data-dest="msg" data-desc="msg: send a message to the server log">📟</a>
-        <a href="#" data-dest="player" data-desc="media player options">🎺</a>
-        <a href="#" data-dest="cfg" data-desc="configuration options">⚙️</a>
+        <a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>
+        <a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>
+        <a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>
+        <a href="#" data-perm="write" data-dest="msg" tt="msg: send a message to the server log">📟</a>
+        <a href="#" data-dest="player" tt="media player options">🎺</a>
+        <a href="#" data-dest="cfg" tt="configuration options">⚙️</a>
         <div id="opdesc"></div>
     </div>
 
@@ -48,10 +48,10 @@
         <div>
             <h3>switches</h3>
             <div>
-                <a id="tooltips" class="tgl btn" href="#">ℹ️ tooltips</a>
+                <a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>
                 <a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>
-                <a id="griden" class="tgl btn" href="#">田 the grid</a>
-                <a id="thumbs" class="tgl btn" href="#">🖼️ thumbs</a>
+                <a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>
+                <a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>
             </div>
         </div>
         {%- if have_zip %}
@@ -62,7 +62,7 @@
     </div>
     
     <h1 id="path">
-        <a href="#" id="entree">🌲</a>
+        <a href="#" id="entree" tt="show directory tree$NHotkey: B">🌲</a>
         {%- for n in vpnodes %}
         <a href="/{{ n[0] }}">{{ n[1] }}</a>
         {%- endfor %}
@@ -70,10 +70,10 @@
     
     <div id="tree">
         <div id="treeh">
-            <a href="#" id="detree">🍞...</a>
+            <a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>
             <a href="#" class="btn" step="2" id="twobytwo">+</a>
             <a href="#" class="btn" step="-2" id="twig">&ndash;</a>
-            <a href="#" class="tgl btn" id="dyntree">a</a>
+            <a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>
         </div>
         <ul id="treeul"></ul>
         <div id="thx_ff">&nbsp;</div>

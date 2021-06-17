@@ -16,6 +16,7 @@ if not PY2:
 
 def have_ff(cmd):
     if PY2:
+        print("# checking {}".format(cmd))
         cmd = (cmd + " -version").encode("ascii").split(b" ")
         try:
             sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE).communicate()

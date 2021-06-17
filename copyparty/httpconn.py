@@ -43,12 +43,21 @@ class HttpConn(object):
         self.ico = Ico(self.args)
 
         self.t0 = time.time()
+        self.stopping = False
         self.nbyte = 0
         self.workload = 0
         self.u2idx = None
         self.log_func = hsrv.log
         self.lf_url = re.compile(self.args.lf_url) if self.args.lf_url else None
         self.set_rproxy()
+
+    def shutdown(self):
+        self.stopping = True
+        try:
+            self.s.shutdown(socket.SHUT_RDWR)
+            self.s.close()
+        except:
+            pass
 
     def set_rproxy(self, ip=None):
         if ip is None:
@@ -174,7 +183,7 @@ class HttpConn(object):
         if not self.sr:
             self.sr = Unrecv(self.s)
 
-        while True:
+        while not self.stopping:
             if self.is_mp:
                 self.workload += 50
                 if self.workload >= 2 ** 31:

@@ -68,6 +68,7 @@ class MpWorker(object):
 
             # self.logw("work: [{}]".format(d[0]))
             if dest == "shutdown":
+                self.httpsrv.shutdown()
                 self.logw("ok bye")
                 sys.exit(0)
                 return

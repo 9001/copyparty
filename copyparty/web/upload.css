@@ -211,29 +211,6 @@
 	box-shadow: none;
 	opacity: .2;
 }
-#u2cdesc {
-	position: absolute;
-	width: 34em;
-	left: calc(50% - 15em);
-	background: #222;
-	border: 0 solid #555;
-	text-align: center;
-	overflow: hidden;
-	margin: 0 -2em;
-	padding: 0 1em;
-	height: 0;
-	opacity: .1;
-	transition: all 0.14s ease-in-out;
-	box-shadow: 0 .2em .5em #222;
-	border-radius: .4em;
-	z-index: 1;
-}
-#u2cdesc.show {
-	padding: 1em;
-	height: auto;
-	border-width: .2em 0;
-	opacity: 1;
-}
 #u2foot {
 	color: #fff;
 	font-style: italic;
@@ -285,10 +262,6 @@ html.light #u2conf .txtbox {
 html.light #u2conf .txtbox.err {
 	background: #f96;
 	color: #300;
-}
-html.light #u2cdesc {
-	background: #fff;
-	border: none;
 }
 html.light #op_up2k.srch #u2btn {
 	border-color: #a80;

@@ -16,7 +16,7 @@ import traceback
 import subprocess as sp
 from copy import deepcopy
 
-from .__init__ import WINDOWS, ANYWIN
+from .__init__ import WINDOWS, ANYWIN, PY2
 from .util import (
     Pebkac,
     Queue,
@@ -134,7 +134,7 @@ class Up2k(object):
     def get_state(self):
         mtpq = 0
         q = "select count(w) from mt where k = 't:mtp'"
-        got_lock = self.mutex.acquire(timeout=0.5)
+        got_lock = False if PY2 else self.mutex.acquire(timeout=0.5)
         if got_lock:
             for cur in self.cur.values():
                 try:

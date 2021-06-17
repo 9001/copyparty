@@ -1278,31 +1278,11 @@ function up2k_init(subtle) {
     window.addEventListener('resize', onresize);
     onresize();
 
-    function desc_show(e) {
-        var cfg = sread('tooltips');
-        if (cfg !== null && cfg != '1')
-            return;
-
-        var msg = this.getAttribute('alt'),
-            cdesc = ebi('u2cdesc');
-
-        cdesc.innerHTML = msg.replace(/\$N/g, "<br />");
-        cdesc.setAttribute('class', 'show');
-    }
-    function desc_hide(e) {
-        ebi('u2cdesc').setAttribute('class', '');
-    }
-    var o = QSA('#u2conf *[alt]');
+    var o = QSA('#u2conf *[tt]');
     for (var a = o.length - 1; a >= 0; a--) {
-        o[a].parentNode.getElementsByTagName('input')[0].setAttribute('alt', o[a].getAttribute('alt'));
+        o[a].parentNode.getElementsByTagName('input')[0].setAttribute('tt', o[a].getAttribute('tt'));
     }
-    var o = QSA('#u2conf *[alt]');
-    for (var a = 0; a < o.length; a++) {
-        o[a].onfocus = desc_show;
-        o[a].onblur = desc_hide;
-        o[a].onmouseenter = desc_show;
-        o[a].onmouseleave = desc_hide;
-    }
+    tt.init();
 
     function bumpthread(dir) {
         try {
@@ -1449,6 +1429,8 @@ function warn_uploader_busy(e) {
     return "upload in progress, click abort and use the file-tree to navigate instead";
 }
 
+
+tt.init();
 
 if (QS('#op_up2k.act'))
     goto_up2k();

@@ -92,20 +92,34 @@ chmod 755 \
   copyparty-extras/copyparty-*/{scripts,bin}/*
 
 
-# extract and repack the sfx with less features enabled
+# extract the sfx
 ( cd copyparty-extras/sfx-full/
 ./copyparty-sfx.py -h
-cd ../copyparty-*/
-./scripts/make-sfx.sh re no-ogv no-cm
 )
 
 
-# put new sfx into copyparty-extras/sfx-lite/,
-# fuse client into copyparty-extras/,
+repack() {
+
+	# do the repack
+	(cd copyparty-extras/copyparty-*/
+	./scripts/make-sfx.sh $2
+	)
+
+	# put new sfx into copyparty-extras/$name/,
+	( cd copyparty-extras/
+	mv copyparty-*/dist/* $1/
+	)
+}
+
+repack sfx-full "re gz no-sh"
+repack sfx-lite "re no-ogv no-cm"
+repack sfx-lite "re no-ogv no-cm gz no-sh"
+
+
+# move fuse client into copyparty-extras/,
 # copy lite-sfx.py to ./copyparty,
 # delete extracted source code
 ( cd copyparty-extras/
-mv copyparty-*/dist/* sfx-lite/
 mv copyparty-*/bin/copyparty-fuse.py .
 cp -pv sfx-lite/copyparty-sfx.py ../copyparty
 rm -rf copyparty-{0..9}*.*.*{0..9}
@@ -119,6 +133,7 @@ true
 
 
 # create the bundle
+printf '\n\n'
 fn=copyparty-$(date +%Y-%m%d-%H%M%S).tgz
 tar -czvf "$od/$fn" *
 cd "$od"

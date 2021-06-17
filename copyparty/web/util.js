@@ -528,3 +528,63 @@ function hist_replace(url) {
     console.log("h-repl " + url);
     history.replaceState(url, url, url);
 }
+
+
+var tt = (function () {
+    var r = {
+        "tt": mknod("div"),
+        "en": bcfg_get('tooltips', true),
+    };
+
+    r.tt.setAttribute('id', 'tt');
+    document.body.appendChild(r.tt);
+
+    function show() {
+        var cfg = sread('tooltips');
+        if (cfg !== null && cfg != '1')
+            return;
+
+        var msg = this.getAttribute('tt');
+        if (!msg)
+            return;
+
+        var pos = this.getBoundingClientRect(),
+            left = pos.left < window.innerWidth / 2,
+            top = pos.top < window.innerHeight / 2;
+
+        r.tt.style.top = top ? pos.bottom + 'px' : 'auto';
+        r.tt.style.bottom = top ? 'auto' : (window.innerHeight - pos.top) + 'px';
+        r.tt.style.left = left ? pos.left + 'px' : 'auto';
+        r.tt.style.right = left ? 'auto' : (window.innerWidth - pos.right) + 'px';
+
+        r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
+        clmod(r.tt, 'show', 1);
+    }
+
+    function hide() {
+        clmod(r.tt, 'show');
+    }
+
+    r.init = function () {
+        var _show = r.en ? show : null,
+            _hide = r.en ? hide : null;
+
+        var o = QSA('*[tt]');
+        for (var a = o.length - 1; a >= 0; a--) {
+            o[a].onfocus = _show;
+            o[a].onblur = _hide;
+            o[a].onmouseenter = _show;
+            o[a].onmouseleave = _hide;
+        }
+        hide();
+    };
+
+    ebi('tooltips').onclick = function (e) {
+        ev(e);
+        r.en = !r.en;
+        bcfg_set('tooltips', r.en);
+        r.init();
+    };
+
+    return r;
+})();

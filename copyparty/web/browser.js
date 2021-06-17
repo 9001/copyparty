@@ -11,17 +11,17 @@ function dbg(msg) {
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wzip"><a' +
-	' href="#" id="selall">sel.<br />all</a><a' +
-	' href="#" id="selinv">sel.<br />inv.</a><a' +
-	' href="#" id="selzip">zip</a>' +
+	' href="#" id="selall" tt="select all files">sel.<br />all</a><a' +
+	' href="#" id="selinv" tt="invert selection">sel.<br />inv.</a><a' +
+	' href="#" id="selzip" tt="download selection as archive">zip</a>' +
 	'</span><span id="wnp"><a' +
-	' href="#" id="npirc">📋irc</a><a' +
-	' href="#" id="nptxt">📋txt</a>' +
+	' href="#" id="npirc" tt="copy irc-formatted track info">📋irc</a><a' +
+	' href="#" id="nptxt" tt="copy plaintext track info">📋txt</a>' +
 	'</span><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
-	'	<div id="pctl"><a href="#" id="bprev">⏮</a><a href="#" id="bplay">▶</a><a href="#" id="bnext">⏭</a></div>' +
+	'	<div id="pctl"><a href="#" id="bprev" tt="previous track$NHotkey: J">⏮</a><a href="#" id="bplay" tt="play/pause$NHotkey: P">▶</a><a href="#" id="bnext" tt="next track$NHotkey: L">⏭</a></div>' +
 	'	<canvas id="pvol" width="288" height="38"></canvas>' +
 	'	<canvas id="barpos"></canvas>' +
 	'	<canvas id="barbuf"></canvas>' +
@@ -44,15 +44,35 @@ var have_webp = null;
 
 var mpl = (function () {
 	ebi('op_player').innerHTML = (
+		'<div><h3>switches</h3><div>' +
+		'<a href="#" class="tgl btn" id="au_preload" tt="start loading the next song near the end for gapless playback">preload</a>' +
+		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np clip</a>' +
+		'</div></div>' +
+
 		'<div><h3>playback mode</h3><div id="pb_mode">' +
-		'<a href="#" class="tgl btn">🔁 loop-folder</a>' +
-		'<a href="#" class="tgl btn">📂 next-folder</a>' +
+		'<a href="#" class="tgl btn" tt="loop the open folder">🔁 loop-folder</a>' +
+		'<a href="#" class="tgl btn" tt="load the next folder and continue">📂 next-folder</a>' +
 		'</div></div>' +
 
 		'<div><h3>audio equalizer</h3><div id="audio_eq"></div></div>');
 
 	var r = {
-		"pb_mode": sread('pb_mode') || 'loop-folder'
+		"pb_mode": sread('pb_mode') || 'loop-folder',
+		"preload": bcfg_get('au_preload', true),
+		"clip": bcfg_get('au_npclip', false)
+	};
+
+	ebi('au_preload').onclick = function (e) {
+		ev(e);
+		r.preload = !r.preload;
+		bcfg_set('au_preload', r.preload);
+	};
+
+	ebi('au_npclip').onclick = function (e) {
+		ev(e);
+		r.clip = !r.clip;
+		bcfg_set('au_npclip', r.clip);
+		clmod(ebi('wtoggle'), 'np', r.clip && mp.au);
 	};
 
 	function draw_pb_mode() {
@@ -80,7 +100,9 @@ function MPlayer() {
 	this.id = Date.now();
 	this.au = null;
 	this.au_native = null;
+	this.au_native2 = null;
 	this.au_ogvjs = null;
+	this.au_ogvjs2 = null;
 	this.tracks = {};
 	this.order = [];
 
@@ -135,7 +157,30 @@ function MPlayer() {
 		}
 		this.order = order;
 	};
+
+	this.preload = function (url) {
+		var au = null;
+		if (need_ogv_for(url)) {
+			au = mp.au_ogvjs2;
+			if (!au && window['OGVPlayer']) {
+				au = new OGVPlayer();
+				au.preload = "auto";
+				this.au_ogvjs2 = au;
+			}
+		} else {
+			au = mp.au_native2;
+			if (!au) {
+				au = new Audio();
+				au.preload = "auto";
+				this.au_native2 = au;
+			}
+		}
+		if (au) {
+			au.src = url + (url.indexOf('?') < 0 ? '?cache' : '&cache');
+		}
+	};
 }
+
 addcrc();
 var mp = new MPlayer();
 makeSortable(ebi('files'), mp.read_order.bind(mp));
@@ -236,12 +281,12 @@ function canvas_cfg(can) {
 }
 
 
-function glossy_grad(can, hsl) {
+function glossy_grad(can, h, s, l) {
 	var g = can.ctx.createLinearGradient(0, 0, 0, can.h),
-		s = [0, 0.49, 0.50, 1];
+		p = [0, 0.49, 0.50, 1];
 
-	for (var a = 0; a < hsl.length; a++)
-		g.addColorStop(s[a], 'hsl(' + hsl[a] + ')');
+	for (var a = 0; a < p.length; a++)
+		g.addColorStop(p[a], 'hsl(' + h + ',' + s[a] + '%,' + l[a] + '%)');
 
 	return g;
 }
@@ -266,16 +311,12 @@ var pbar = (function () {
 
 		var bc = r.buf,
 			bctx = bc.ctx,
-			sm = bc.w * 1.0 / mp.au.duration;
+			sm = bc.w * 1.0 / mp.au.duration,
+			gk = bc.h + '' + light;
 
-		if (gradh != bc.h) {
-			gradh = bc.h;
-			grad = glossy_grad(bc, [
-				'85,35%,42%',
-				'85,40%,49%',
-				'85,37%,47%',
-				'85,35%,42%'
-			]);
+		if (gradh != gk) {
+			gradh = gk;
+			grad = glossy_grad(bc, 85, [35, 40, 37, 35], light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
 		}
 		bctx.fillStyle = grad;
 		bctx.clearRect(0, 0, bc.w, bc.h);
@@ -297,12 +338,11 @@ var pbar = (function () {
 			sm = bc.w * 1.0 / mp.au.duration;
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
-		pctx.fillStyle = 'rgba(204,255,128,0.15)';
+		pctx.fillStyle = light ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
 		for (var p = 1, mins = mp.au.duration / 10; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
-		pctx.fillStyle = '#9b7';
-		pctx.fillStyle = 'rgba(192,255,96,0.5)';
+		pctx.fillStyle = light ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
 		for (var p = 1, mins = mp.au.duration / 60; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
@@ -349,20 +389,11 @@ var vbar = (function () {
 	}
 
 	r.draw = function () {
-		if (gradh != h) {
-			gradh = h;
-			grad1 = glossy_grad(r.can, [
-				'50,45%,42%',
-				'50,50%,49%',
-				'50,47%,47%',
-				'50,45%,42%'
-			]);
-			grad2 = glossy_grad(r.can, [
-				'205,10%,16%',
-				'205,15%,20%',
-				'205,13%,18%',
-				'205,10%,16%'
-			]);
+		var gh = h + '' + light;
+		if (gradh != gh) {
+			gradh = gh;
+			grad1 = glossy_grad(r.can, 50, light ? [50, 55, 52, 48] : [45, 52, 47, 43], light ? [54, 60, 52, 47] : [42, 51, 47, 42]);
+			grad2 = glossy_grad(r.can, 205, [10, 15, 13, 10], [16, 20, 18, 16]);
 		}
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
@@ -430,6 +461,8 @@ function seek_au_sec(seek) {
 	// ogv.js breaks on .play() during playback
 	if (mp.au === mp.au_native)
 		mp.au.play();
+
+	mpui.progress_updater();
 }
 
 
@@ -443,6 +476,14 @@ function song_skip(n) {
 	else
 		play(mp.order[n == -1 ? mp.order.length - 1 : 0]);
 }
+function next_song(e) {
+	ev(e);
+	return song_skip(1);
+}
+function prev_song(e) {
+	ev(e);
+	return song_skip(-1);
+}
 
 
 function playpause(e) {
@@ -452,6 +493,8 @@ function playpause(e) {
 			mp.au.play();
 		else
 			mp.au.pause();
+
+		mpui.progress_updater();
 	}
 	else
 		play(0);
@@ -461,14 +504,8 @@ function playpause(e) {
 // hook up the widget buttons
 (function () {
 	ebi('bplay').onclick = playpause;
-	ebi('bprev').onclick = function (e) {
-		ev(e);
-		song_skip(-1);
-	};
-	ebi('bnext').onclick = function (e) {
-		ev(e);
-		song_skip(1);
-	};
+	ebi('bprev').onclick = prev_song;
+	ebi('bnext').onclick = next_song;
 	ebi('barpos').onclick = function (e) {
 		if (!mp.au) {
 			return play(0);
@@ -483,42 +520,54 @@ function playpause(e) {
 
 
 // periodic tasks
-(function () {
-	var nth = 0,
-		last_skip_url = '';
+var mpui = (function () {
+	var r = {},
+		nth = 0,
+		timeout = null,
+		preloaded = null;
 
-	var progress_updater = function () {
+	r.progress_updater = function () {
+		clearTimeout(timeout);
+
 		if (!mp.au) {
 			widget.paused(true);
+			return;
 		}
-		else {
-			// indicate playback state in ui
-			widget.paused(mp.au.paused);
 
-			// draw current position in song
-			if (!mp.au.paused)
-				pbar.drawpos();
+		// indicate playback state in ui
+		widget.paused(mp.au.paused);
 
-			// occasionally draw buffered regions
-			if (++nth == 10) {
-				pbar.drawbuf();
-				nth = 0;
-			}
+		// draw current position in song
+		if (!mp.au.paused)
+			pbar.drawpos();
 
-			// switch to next track if approaching the end
-			if (last_skip_url != mp.au.src) {
-				var pos = mp.au.currentTime,
-					len = mp.au.duration;
+		// occasionally draw buffered regions
+		if (++nth == 5) {
+			pbar.drawbuf();
+			nth = 0;
+		}
 
-				if (pos > 0 && pos > len - 0.1) {
-					last_skip_url = mp.au.src;
-					song_skip(1);
+		// preload next song
+		if (mpl.preload && preloaded != mp.au.src) {
+			var pos = mp.au.currentTime,
+				len = mp.au.duration;
+
+			if (pos > 0 && pos > len - 10) {
+				preloaded = mp.au.src;
+				try {
+					mp.preload(ebi(mp.order[mp.order.indexOf(mp.au.tid) + 1]).href);
+				}
+				catch (ex) {
+					console.log("preload failed", ex);
 				}
 			}
 		}
-		setTimeout(progress_updater, 100);
+
+		if (!mp.au.paused)
+			timeout = setTimeout(r.progress_updater, 100);
 	};
-	progress_updater();
+	r.progress_updater();
+	return r;
 })();
 
 
@@ -543,6 +592,11 @@ try {
 		need_ogv = true;
 }
 catch (ex) { }
+
+
+function need_ogv_for(url) {
+	return need_ogv && /\.(ogg|opus)$/i.test(url);
+}
 
 
 var audio_eq = (function () {
@@ -708,7 +762,7 @@ var audio_eq = (function () {
 	}
 
 	var html = ['<table><tr><td rowspan="4">',
-		'<a id="au_eq" class="tgl btn" href="#">enable</a></td>'],
+		'<a id="au_eq" class="tgl btn" href="#" tt="enables the equalizer and gain control">enable</a></td>'],
 		h2 = [], h3 = [], h4 = [];
 
 	var vs = [];
@@ -772,7 +826,7 @@ function play(tid, seek, call_depth) {
 			tn = 0;
 		}
 		else if (mpl.pb_mode == 'next-folder') {
-			treectl.ls_cb = function () { song_skip(1); };
+			treectl.ls_cb = next_song;
 			return tree_neigh(1);
 		}
 	}
@@ -782,7 +836,7 @@ function play(tid, seek, call_depth) {
 			tn = mp.order.length - 1;
 		}
 		else if (mpl.pb_mode == 'next-folder') {
-			treectl.ls_cb = function () { song_skip(-1); };
+			treectl.ls_cb = prev_song;
 			return tree_neigh(-1);
 		}
 	}
@@ -798,7 +852,7 @@ function play(tid, seek, call_depth) {
 	var attempt_play = true;
 
 	var url = mp.tracks[tid];
-	if (need_ogv && /\.(ogg|opus)$/i.test(url)) {
+	if (need_ogv_for(url)) {
 		if (mp.au_ogvjs) {
 			mp.au = mp.au_ogvjs;
 		}
@@ -806,7 +860,8 @@ function play(tid, seek, call_depth) {
 			mp.au = mp.au_ogvjs = new OGVPlayer();
 			attempt_play = false;
 			mp.au.addEventListener('error', evau_error, true);
-			mp.au.addEventListener('progress', pbar.drawpos, false);
+			mp.au.addEventListener('progress', pbar.drawpos);
+			mp.au.addEventListener('ended', next_song);
 			widget.open();
 		}
 		else {
@@ -826,7 +881,8 @@ function play(tid, seek, call_depth) {
 		if (!mp.au_native) {
 			mp.au = mp.au_native = new Audio();
 			mp.au.addEventListener('error', evau_error, true);
-			mp.au.addEventListener('progress', pbar.drawpos, false);
+			mp.au.addEventListener('progress', pbar.drawpos);
+			mp.au.addEventListener('ended', next_song);
 			widget.open();
 		}
 		mp.au = mp.au_native;
@@ -835,7 +891,7 @@ function play(tid, seek, call_depth) {
 	audio_eq.apply();
 
 	mp.au.tid = tid;
-	mp.au.src = url;
+	mp.au.src = url + (url.indexOf('?') < 0 ? '?cache' : '&cache');
 	mp.au.volume = mp.expvol();
 	var oid = 'a' + tid;
 	setclass(oid, 'play act');
@@ -844,7 +900,9 @@ function play(tid, seek, call_depth) {
 		clmod(trs[a], 'play');
 	}
 	ebi(oid).parentElement.parentElement.className += ' play';
-	clmod(ebi('wtoggle'), 'np', 1);
+	clmod(ebi('wtoggle'), 'np', mpl.clip);
+	if (window.thegrid)
+		thegrid.loadsel();
 
 	try {
 		if (attempt_play)
@@ -868,6 +926,7 @@ function play(tid, seek, call_depth) {
 			o.setAttribute('id', oid);
 		}
 
+		mpui.progress_updater();
 		pbar.drawbuf();
 		return true;
 	}
@@ -875,7 +934,7 @@ function play(tid, seek, call_depth) {
 		alert('playback failed: ' + ex);
 	}
 	setclass(oid, 'play');
-	setTimeout('song_skip(1));', 500);
+	setTimeout(next_song, 500);
 }
 
 
@@ -949,6 +1008,8 @@ function autoplay_blocked(seek) {
 		mp.au.play();
 		if (seek)
 			seek_au_sec(seek);
+		else
+			mpui.progress_updater();
 	};
 	na.onclick = unblocked;
 }
@@ -982,9 +1043,9 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead">' +
-		'<a href="#" class="tgl btn" id="gridsel">multiselect</a> &nbsp; zoom ' +
-		'<a href="#" class="btn" z="-1.2">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2">+</a> &nbsp; sort by: ' +
+		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> &nbsp; zoom ' +
+		'<a href="#" class="btn" z="-1.2" tt="Hotkey: A">&ndash;</a> ' +
+		'<a href="#" class="btn" z="1.2" tt="Hotkey: D">+</a> &nbsp; sort by: ' +
 		'<a href="#" s="href">name</a>, ' +
 		'<a href="#" s="sz">size</a>, ' +
 		'<a href="#" s="ts">date</a>, ' +
@@ -1007,9 +1068,7 @@ var thegrid = (function () {
 		ev(e);
 		r.thumbs = !r.thumbs;
 		bcfg_set('thumbs', r.thumbs);
-		if (r.en) {
-			loadgrid();
-		}
+		r.setdirty();
 	};
 
 	ebi('griden').onclick = function (e) {
@@ -1097,6 +1156,9 @@ var thegrid = (function () {
 	}
 
 	r.loadsel = function () {
+		if (r.dirty)
+			return;
+
 		var ths = QSA('#ggrid>a'),
 			have_sel = !!QS('#files tr.sel');
 
@@ -1114,6 +1176,9 @@ var thegrid = (function () {
 	function loadgrid() {
 		if (have_webp === null)
 			return setTimeout(loadgrid, 50);
+
+		lfiles.style.display = 'none';
+		gfiles.style.display = 'block';
 
 		if (!r.dirty)
 			return r.loadsel();
@@ -1156,9 +1221,8 @@ var thegrid = (function () {
 			html.push('<a href="' + href + '" ref="' + ref + '"><img src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
-		lfiles.style.display = 'none';
-		gfiles.style.display = 'block';
 		ebi('ggrid').innerHTML = html.join('\n');
+		r.dirty = false;
 		r.bagit();
 		r.loadsel();
 	}
@@ -1201,7 +1265,10 @@ var thegrid = (function () {
 function tree_neigh(n) {
 	var links = QSA('#treeul li>a+a');
 	if (!links.length) {
-		alert('switch to the tree for that');
+		treectl.dir_cb = function () {
+			tree_neigh(n);
+		};
+		treectl.entree();
 		return;
 	}
 	var act = -1;
@@ -1227,7 +1294,8 @@ function tree_neigh(n) {
 function tree_up() {
 	var act = QS('#treeul a.hl');
 	if (!act) {
-		alert('switch to the tree for that');
+		treectl.dir_cb = tree_up;
+		treectl.entree();
 		return;
 	}
 	if (act.previousSibling.textContent == '-')
@@ -1255,7 +1323,7 @@ document.onkeydown = function (e) {
 	if (n !== 0)
 		return song_skip(n);
 
-	if (k == 'KeyM')
+	if (k == 'KeyP')
 		return playpause();
 
 	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
@@ -1266,8 +1334,12 @@ document.onkeydown = function (e) {
 	if (n !== 0)
 		return tree_neigh(n);
 
-	if (k == 'KeyP')
+	if (k == 'KeyM')
 		return tree_up();
+
+	if (k == 'KeyB')
+		//return treectl.hidden ? treectl.show() : treectl.hide();
+		return treectl.hidden ? treectl.entree() : treectl.detree();
 
 	if (k == 'KeyG')
 		return ebi('griden').click();
@@ -1318,6 +1390,7 @@ document.onkeydown = function (e) {
 	}
 
 	var trs = [],
+		orig_url = null,
 		orig_html = null;
 
 	for (var a = 0; a < sconf.length; a++) {
@@ -1470,17 +1543,7 @@ document.onkeydown = function (e) {
 		if (ofiles.getAttribute('ts') > this.ts)
 			return;
 
-		if (!oldcfg.length) {
-			oldcfg = [
-				ebi('path').style.display,
-				ebi('tree').style.display,
-				ebi('wrap').style.marginLeft
-			];
-			ebi('path').style.display = 'none';
-			ebi('tree').style.display = 'none';
-			ebi('wrap').style.marginLeft = '0';
-			treectl.hidden = true;
-		}
+		treectl.hide();
 
 		var html = mk_files_header(tagord);
 		html.push('<tbody>');
@@ -1516,25 +1579,23 @@ document.onkeydown = function (e) {
 			html.push('</td></tr>');
 		}
 
-		if (!orig_html)
+		if (!orig_html || orig_url != get_evpath()) {
 			orig_html = ebi('files').innerHTML;
+			orig_url = get_evpath();
+		}
 
 		ofiles.innerHTML = html.join('\n');
 		ofiles.setAttribute("ts", this.ts);
-		filecols.set_style();
 		mukey.render();
 		reload_browser();
+		filecols.set_style(['File Name']);
 
 		ebi('unsearch').onclick = unsearch;
 	}
 
 	function unsearch(e) {
 		ev(e);
-		ebi('path').style.display = oldcfg[0];
-		ebi('tree').style.display = oldcfg[1];
-		ebi('wrap').style.marginLeft = oldcfg[2];
-		treectl.hidden = false;
-		oldcfg = [];
+		treectl.show();
 		ebi('files').innerHTML = orig_html;
 		orig_html = null;
 		msel.render();
@@ -1545,8 +1606,9 @@ document.onkeydown = function (e) {
 
 var treectl = (function () {
 	var treectl = {
-		"hidden": false,
-		"ls_cb": null
+		"hidden": true,
+		"ls_cb": null,
+		"dir_cb": null
 	},
 		entreed = false,
 		fixedpos = false,
@@ -1557,28 +1619,42 @@ var treectl = (function () {
 
 	treesz = Math.min(Math.max(treesz, 4), 50);
 
-	function entree(e) {
+	treectl.entree = function (e) {
 		ev(e);
 		entreed = true;
-		ebi('path').style.display = 'none';
-
-		var tree = ebi('tree');
-		tree.style.display = 'block';
-
 		swrite('entreed', 'tree');
+
 		get_tree("", get_evpath(), true);
+		treectl.show();
+	}
+
+	treectl.show = function () {
+		treectl.hidden = false;
+		if (!entreed) {
+			ebi('path').style.display = 'inline-block';
+			return;
+		}
+		ebi('path').style.display = 'none';
+		ebi('tree').style.display = 'block';
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
 		onresize();
-	}
+	};
 
-	function detree(e) {
+	treectl.detree = function (e) {
 		ev(e);
 		entreed = false;
-		ebi('tree').style.display = 'none';
-		ebi('path').style.display = 'inline-block';
-		ebi('wrap').style.marginLeft = '0';
 		swrite('entreed', 'na');
+
+		treectl.hide();
+		ebi('path').style.display = 'inline-block';
+	}
+
+	treectl.hide = function () {
+		treectl.hidden = true;
+		ebi('path').style.display = 'none';
+		ebi('tree').style.display = 'none';
+		ebi('wrap').style.marginLeft = '0';
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
 	}
@@ -1714,6 +1790,12 @@ var treectl = (function () {
 		despin('#tree');
 		reload_tree();
 		onresize();
+
+		var fun = treectl.dir_cb;
+		if (fun) {
+			treectl.dir_cb = null;
+			fun();
+		}
 	}
 
 	function reload_tree() {
@@ -1901,13 +1983,13 @@ var treectl = (function () {
 		onresize();
 	}
 
-	ebi('entree').onclick = entree;
-	ebi('detree').onclick = detree;
+	ebi('entree').onclick = treectl.entree;
+	ebi('detree').onclick = treectl.detree;
 	ebi('dyntree').onclick = dyntree;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
 	if (sread('entreed') == 'tree')
-		entree();
+		treectl.entree();
 
 	window.onpopstate = function (e) {
 		console.log("h-pop " + e.state);
@@ -2055,8 +2137,11 @@ var filecols = (function () {
 		toggle(t.textContent);
 	}
 
-	var set_style = function () {
+	var set_style = function (unhide) {
 		hidden.sort();
+
+		if (!unhide)
+			unhide = [];
 
 		var html = [],
 			hcols = ebi('hcols');
@@ -2082,7 +2167,7 @@ var filecols = (function () {
 			var name = span[0].textContent,
 				cls = false;
 
-			if (has(hidden, name)) {
+			if (has(hidden, name) && !has(unhide, name)) {
 				ohidden.push(a);
 				cls = true;
 			}
@@ -2254,34 +2339,15 @@ function addcrc() {
 }
 
 
+var light;
 (function () {
-	var tt = bcfg_get('tooltips', true);
-
-	function set_tooltip(e) {
-		ev(e);
-		var o = ebi('opdesc');
-		o.innerHTML = this.getAttribute('data-desc');
-		o.setAttribute('class', tt ? '' : 'off');
-	}
-
-	var btns = QSA('#ops, #ops>a');
-	for (var a = 0; a < btns.length; a++) {
-		btns[a].onmouseenter = set_tooltip;
-	}
-
-	ebi('tooltips').onclick = function (e) {
-		ev(e);
-		tt = !tt;
-		bcfg_set('tooltips', tt);
-	};
-})();
-
-
-(function () {
-	var light = bcfg_get('lightmode', false);
+	light = bcfg_get('lightmode', false);
 
 	function freshen() {
 		document.documentElement.setAttribute("class", light ? "light" : "");
+		pbar.drawbuf();
+		pbar.drawpos();
+		vbar.draw();
 	}
 
 	ebi('lightmode').onclick = function (e) {
@@ -2300,23 +2366,34 @@ var arcfmt = (function () {
 		return { "render": function () { } };
 
 	var html = [],
-		arcfmts = ["tar", "zip", "zip_dos", "zip_crc"],
-		arcv = ["tar", "zip=utf8", "zip", "zip=crc"];
+		fmts = [
+			["tar", "tar", "plain gnutar file"],
+			["zip", "zip=utf8", "zip with utf8 filenames (maybe wonky on windows 7 and older)"],
+			["zip_dos", "zip", "zip with traditional cp437 filenames, for really old software"],
+			["zip_crc", "zip=crc", "cp437 with crc32 computed early for truly ancient software$N(takes longer to process before download can start)"]
+		];
 
-	for (var a = 0; a < arcfmts.length; a++) {
-		var k = arcfmts[a];
+	for (var a = 0; a < fmts.length; a++) {
+		var k = fmts[a][0];
 		html.push(
-			'<span><input type="radio" name="arcfmt" value="' + k + '" id="arcfmt_' + k + '">' +
-			'<label for="arcfmt_' + k + '">' + k + '</label></span>');
+			'<span><input type="radio" name="arcfmt" value="' + k + '" id="arcfmt_' + k + '" tt="' + fmts[a][2] + '">' +
+			'<label for="arcfmt_' + k + '" tt="' + fmts[a][2] + '">' + k + '</label></span>');
 	}
 	ebi('arc_fmt').innerHTML = html.join('\n');
 
-	var fmt = sread("arc_fmt") || "zip";
+	var fmt = sread("arc_fmt");
+	if (!ebi('arcfmt_' + fmt))
+		fmt = "zip";
+
 	ebi('arcfmt_' + fmt).checked = true;
 
 	function render() {
-		var arg = arcv[arcfmts.indexOf(fmt)],
+		var arg = null,
 			tds = QSA('#files tbody td:first-child a');
+
+		for (var a = 0; a < fmts.length; a++)
+			if (fmts[a][0] == fmt)
+				arg = fmts[a][1];
 
 		for (var a = 0, aa = tds.length; a < aa; a++) {
 			var o = tds[a], txt = o.textContent, href = o.getAttribute('href');

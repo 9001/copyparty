@@ -11,6 +11,10 @@ echo
 # `re` does a repack of an sfx which you already executed once
 #   (grabs files from the sfx-created tempdir), overrides `clean`
 #
+# `gz` creates a gzip-compressed python sfx instead of bzip2
+#
+# `no-sh` makes just the python sfx, skips the sh/unix sfx
+#
 # `no-ogv` saves ~500k by removing the opus/vorbis audio codecs
 #   (only affects apple devices; everything else has native support)
 #

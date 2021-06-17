@@ -256,10 +256,11 @@ class HttpCli(object):
         if self.is_rclone:
             return ""
 
+        cmap = {"pw": "cppwd"}
         kv = {
             k: v
             for k, v in self.uparam.items()
-            if k not in rm and self.cookies.get(k) != v
+            if k not in rm and self.cookies.get(cmap.get(k, k)) != v
         }
         kv.update(add)
         if not kv:
@@ -581,9 +582,16 @@ class HttpCli(object):
             try:
                 dst = os.path.join(vfs.realpath, rem)
                 os.makedirs(fsenc(dst))
-            except:
-                if not os.path.isdir(fsenc(dst)):
+            except OSError as ex:
+                if ex.errno == 13:
+                    raise Pebkac(500, "the server OS denied write-access")
+
+                if ex.errno == 17:
                     raise Pebkac(400, "some file got your folder name")
+
+                raise Pebkac(500, min_ex())
+            except:
+                raise Pebkac(500, min_ex())
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
         ret = x.get()
@@ -769,8 +777,13 @@ class HttpCli(object):
 
             try:
                 os.mkdir(fsenc(fn))
+            except OSError as ex:
+                if ex.errno == 13:
+                    raise Pebkac(500, "the server OS denied write-access")
+
+                raise Pebkac(500, "mkdir failed:\n" + min_ex())
             except:
-                raise Pebkac(500, "mkdir failed, check the logs")
+                raise Pebkac(500, min_ex())
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.redirect(vpath)
@@ -1187,7 +1200,7 @@ class HttpCli(object):
         #
         # send reply
 
-        if not is_compressed:
+        if not is_compressed and "cache" not in self.uparam:
             self.out_headers.update(NO_CACHE)
 
         self.out_headers["Accept-Ranges"] = "bytes"

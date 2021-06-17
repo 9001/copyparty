@@ -21,6 +21,7 @@ class TcpSrv(object):
         self.log = hub.log
 
         self.num_clients = Counter()
+        self.stopping = False
 
         ip = "127.0.0.1"
         eps = {ip: "local only"}
@@ -67,7 +68,7 @@ class TcpSrv(object):
             ip, port = srv.getsockname()
             self.log("tcpsrv", "listening @ {0}:{1}".format(ip, port))
 
-        while True:
+        while not self.stopping:
             if self.args.log_conn:
                 self.log("tcpsrv", "|%sC-ncli" % ("-" * 1,), c="1;30")
 
@@ -80,6 +81,9 @@ class TcpSrv(object):
 
             ready, _, _ = select.select(self.srv, [], [])
             for srv in ready:
+                if self.stopping:
+                    break
+
                 sck, addr = srv.accept()
                 sip, sport = srv.getsockname()
                 if self.args.log_conn:
@@ -95,6 +99,13 @@ class TcpSrv(object):
                 self.hub.broker.put(False, "httpconn", sck, addr)
 
     def shutdown(self):
+        self.stopping = True
+        try:
+            for srv in self.srv:
+                srv.close()
+        except:
+            pass
+
         self.log("tcpsrv", "ok bye")
 
     def detect_interfaces(self, listen_ips):

@@ -80,7 +80,14 @@ class HttpSrv(object):
             return len(self.clients)
 
     def shutdown(self):
-        self.log("ok bye")
+        clients = list(self.clients.keys())
+        for cli in clients:
+            try:
+                cli.shutdown()
+            except:
+                pass
+
+        self.log("httpsrv-n", "ok bye")
 
     def thr_client(self, sck, addr):
         """thread managing one tcp client"""
@@ -100,11 +107,20 @@ class HttpSrv(object):
                     thr.daemon = True
                     thr.start()
 
+        fno = sck.fileno()
         try:
             if self.args.log_conn:
                 self.log("%s %s" % addr, "|%sC-crun" % ("-" * 6,), c="1;30")
 
             cli.run()
+
+        except (OSError, socket.error) as ex:
+            if ex.errno not in [10038, 10054, 107, 57, 9]:
+                self.log(
+                    "%s %s" % addr,
+                    "run({}): {}".format(fno, ex),
+                    c=6,
+                )
 
         finally:
             sck = cli.s
@@ -112,13 +128,14 @@ class HttpSrv(object):
                 self.log("%s %s" % addr, "|%sC-cdone" % ("-" * 7,), c="1;30")
 
             try:
+                fno = sck.fileno()
                 sck.shutdown(socket.SHUT_RDWR)
                 sck.close()
             except (OSError, socket.error) as ex:
                 if not MACOS:
                     self.log(
                         "%s %s" % addr,
-                        "shut({}): {}".format(sck.fileno(), ex),
+                        "shut({}): {}".format(fno, ex),
                         c="1;30",
                     )
                 if ex.errno not in [10038, 10054, 107, 57, 9]:

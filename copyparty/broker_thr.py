@@ -25,6 +25,7 @@ class BrokerThr(object):
 
     def shutdown(self):
         # self.log("broker", "shutting down")
+        self.httpsrv.shutdown()
         pass
 
     def put(self, want_retval, dest, *args):

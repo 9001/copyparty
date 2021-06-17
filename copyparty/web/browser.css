@@ -25,6 +25,35 @@ html, body {
 body {
 	padding-bottom: 5em;
 }
+#tt {
+	position: fixed;
+	max-width: 34em;
+	background: #222;
+	border: 0 solid #555;
+	overflow: hidden;
+	margin-top: 1em;
+	padding: 0 1em;
+	height: 0;
+	opacity: .1;
+	transition: opacity 0.14s, height 0.14s, padding 0.14s;
+	box-shadow: 0 .2em .5em #222;
+	border-radius: .4em;
+	z-index: 9001;
+}
+#tt.show {
+	padding: 1em;
+	height: auto;
+	border-width: .2em 0;
+	opacity: 1;
+}
+#tt code {
+	background: #3c3c3c;
+	padding: .2em .3em;
+	border-top: 1px solid #777;
+	border-radius: .3em;
+	font-family: monospace, monospace;
+	line-height: 2em;
+}
 #path,
 #path * {
 	font-size: 1em;
@@ -189,6 +218,14 @@ a, #files tbody div a:last-child {
 	color: #720;
 	text-shadow: 0 0 .3em #b80;
 }
+#ggrid a.play,
+html.light #ggrid a.play {
+	color: #fff;
+	background: #750;
+	border-color: #c90;
+	border-top: 1px solid #da4;
+	box-shadow: 0 .1em 1.2em #b83;
+}
 #files tbody tr.sel td,
 #ggrid a.sel,
 html.light #ggrid a.sel {
@@ -210,10 +247,16 @@ html.light #ggrid a.sel {
 	box-shadow: 0 .1em 1.2em #b36;
 	transition: all 0.2s cubic-bezier(.2, 2.2, .5, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
 }
-#ggrid a.sel img {
+#ggrid a.sel img,
+#ggrid a.play img {
 	opacity: .7;
-	box-shadow: 0 0 1em #b36;
 	filter: contrast(130%) brightness(107%);
+}
+#ggrid a.sel img {
+	box-shadow: 0 0 1em #b36;
+}
+#ggrid a.play img {
+	box-shadow: 0 0 1em #b83;
 }
 #files tr.sel a {
 	color: #fff;
@@ -739,7 +782,7 @@ input.eq_gain {
 .opwide>div {
 	display: inline-block;
 	vertical-align: top;
-	border-left: .2em solid #444;
+	border-left: .2em solid #4c4c4c;
 	margin-left: .5em;
 	padding-left: .5em;
 }
@@ -757,31 +800,6 @@ input.eq_gain {
 	margin: .8em 0 0 .6em;
 	padding: 0;
 	border-bottom: 1px solid #555;
-}
-#opdesc {
-	display: none;
-}
-#ops:hover #opdesc {
-	display: block;
-	background: linear-gradient(0deg,#555, #4c4c4c 80%, #444);
-	box-shadow: 0 .3em 1em #222;
-	padding: 1em;
-	border-radius: .3em;
-	position: absolute;
-	z-index: 3;
-	top: 6em;
-	right: 1.5em;
-}
-#ops:hover #opdesc.off {
-	display: none;
-}
-#opdesc code {
-	background: #3c3c3c;
-	padding: .2em .3em;
-	border-top: 1px solid #777;
-	border-radius: .3em;
-	font-family: monospace, monospace;
-	line-height: 2em;
 }
 #thumbs {
 	opacity: .3;
@@ -889,6 +907,15 @@ html.light {
 	background: #eee;
 	text-shadow: none;
 }
+html.light #tt {
+	background: #fff;
+	border-color: #888;
+	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
+}
+html.light #tt code {
+	background: #060;
+	color: #fff;
+}
 html.light #ops,
 html.light .opbox,
 html.light #srch_form {
@@ -972,6 +999,9 @@ html.light #files tr.play td:nth-child(2n) {
 html.light #files tbody a.play {
 	color: #c0f;
 }
+html.light #files tbody a.play.act {
+	color: #90c;
+}
 html.light #files tr.play td {
 	background: #fc5;
 	border-color: #eb1;
@@ -1026,21 +1056,13 @@ html.light input[type="checkbox"] + label {
 	color: #333;
 }
 html.light .opwide>div {
-	border-color: #ddd;
+	border-color: #ccc;
 }
 html.light .opview input[type="text"] {
 	background: #fff;
 	color: #333;
 	box-shadow: 0 0 2px #888;
 	border-color: #38d;
-}
-html.light #ops:hover #opdesc {
-	background: #fff;
-	box-shadow: 0 .3em 1em #ccc;
-}
-html.light #opdesc code {
-	background: #060;
-	color: #fff;
 }
 html.light #u2tab a>span,
 html.light #files td div span {
@@ -1051,9 +1073,6 @@ html.light #path {
 	text-shadow: none;
 	box-shadow: 0 0 .3em #bbb;
 }
-html.light #path a {
-	color: #333;
-}
 html.light #path a:not(:last-child)::after {
 	border-color: #ccc;
 	background: none;
@@ -1062,7 +1081,7 @@ html.light #path a:not(:last-child)::after {
 }
 html.light #path a:hover {
 	background: none;
-	color: #60a;
+	color: #90d;
 }
 html.light #files tbody div a {
 	color: #d38;

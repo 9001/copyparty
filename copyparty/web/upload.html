@@ -39,20 +39,20 @@
                     <td><br />parallel uploads:</td>
                     <td rowspan="2">
                         <input type="checkbox" id="multitask" />
-                        <label for="multitask" alt="continue hashing other files while uploading">🏃</label>
+                        <label for="multitask" tt="continue hashing other files while uploading">🏃</label>
                     </td>
                     <td rowspan="2">
                         <input type="checkbox" id="ask_up" />
-                        <label for="ask_up" alt="ask for confirmation befofre upload starts">💭</label>
+                        <label for="ask_up" tt="ask for confirmation befofre upload starts">💭</label>
                     </td>
                     <td rowspan="2">
                         <input type="checkbox" id="flag_en" />
-                        <label for="flag_en" alt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</label>
+                        <label for="flag_en" tt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</label>
                     </td>
                 {%- if have_up2k_idx %}
                     <td data-perm="read" rowspan="2">
                         <input type="checkbox" id="fsearch" />
-                        <label for="fsearch" alt="don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>
+                        <label for="fsearch" tt="don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>
                     </td>
                 {%- endif %}
                     <td data-perm="read" rowspan="2" id="u2btn_cw"></td>
@@ -66,8 +66,6 @@
                 </tr>
             </table>
 
-            <div id="u2cdesc"></div>
-
             <div id="u2notbtn"></div>
 
             <div id="u2btn_ct">
@@ -80,11 +78,11 @@
             </div>
 
             <div id="u2cards">
-                <a href="#" act="ok">ok <span>0</span></a><a
-                href="#" act="ng">ng <span>0</span></a><a
-                href="#" act="done">done <span>0</span></a><a
-                href="#" act="bz" class="act">busy <span>0</span></a><a
-                href="#" act="q">que <span>0</span></a>
+                <a href="#" act="ok" tt="completed successfully">ok <span>0</span></a><a
+                href="#" act="ng" tt="failed / rejected / not-found">ng <span>0</span></a><a
+                href="#" act="done" tt="ok and ng combined">done <span>0</span></a><a
+                href="#" act="bz" tt="hashing or uploading" class="act">busy <span>0</span></a><a
+                href="#" act="q" tt="idle, pending">que <span>0</span></a>
             </div>
 
             <table id="u2tab">
@@ -92,7 +90,7 @@
                     <tr>
                         <td>filename</td>
                         <td>status</td>
-                        <td>progress<a href="#" id="u2cleanup">cleanup</a></td>
+                        <td>progress<a href="#" id="u2cleanup" tt="remove completed uploads$N(makes it possible to upload a file after searching for it)">cleanup</a></td>
                     </tr>
                 </thead>
                 <tbody></tbody>
