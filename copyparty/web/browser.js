@@ -767,7 +767,7 @@ var audio_eq = (function () {
 	}
 
 	var html = ['<table><tr><td rowspan="4">',
-		'<a id="au_eq" class="tgl btn" href="#" tt="enables the equalizer and gain control">enable</a></td>'],
+		'<a id="au_eq" class="tgl btn" href="#" tt="enables the equalizer and gain control;$Nboost 0 = unmodified 100% volume">enable</a></td>'],
 		h2 = [], h3 = [], h4 = [];
 
 	var vs = [];

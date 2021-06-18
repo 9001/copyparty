@@ -311,6 +311,7 @@ html.light #ggrid a.sel {
 	height: 6em;
 	width: 100%;
 	z-index: 3;
+	touch-action: none;
 	transition: bottom 0.15s;
 }
 #widget.open {
@@ -547,6 +548,12 @@ input[type="checkbox"]+label {
 }
 input[type="checkbox"]:checked+label {
 	color: #fc5;
+}
+input[type="radio"]:checked+label {
+	color: #fc0;
+}
+html.light input[type="radio"]:checked+label {
+	color: #07c;
 }
 input.eq_gain {
 	width: 3em;
@@ -1115,6 +1122,7 @@ html.light #tree::-webkit-scrollbar {
 	opacity: 0;
 	position: fixed;
 	overflow: hidden;
+	touch-action: none;
 	top: 0;
 	left: 0;
 	width: 100%;
