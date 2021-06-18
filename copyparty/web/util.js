@@ -6,7 +6,8 @@ if (!window['console'])
     };
 
 
-var is_touch = 'ontouchstart' in window,
+var perms = [],
+    is_touch = 'ontouchstart' in window,
     ANDROID = /(android)/i.test(navigator.userAgent);
 
 

@@ -444,8 +444,7 @@ function up2k_init(subtle) {
     }
 
     // show uploader if the user only has write-access
-    var perms = document.body.getAttribute('perms');
-    if (perms && !has(perms.split(' '), 'read'))
+    if (perms.length && !has(perms, 'read'))
         goto('up2k');
 
     // shows or clears a message in the basic uploader ui
@@ -1265,7 +1264,7 @@ function up2k_init(subtle) {
             fpx = parseInt(getComputedStyle(bar)['font-size']),
             wem = wpx * 1.0 / fpx,
             wide = wem > 54,
-            parent = ebi(wide ? 'u2btn_cw' : 'u2btn_ct'),
+            parent = ebi(wide && has(perms, 'write') ? 'u2btn_cw' : 'u2btn_ct'),
             btn = ebi('u2btn');
 
         //console.log([wpx, fpx, wem]);
@@ -1277,6 +1276,13 @@ function up2k_init(subtle) {
     }
     window.addEventListener('resize', onresize);
     onresize();
+
+    if (is_touch) {
+        // android-chrome wobbles for a bit; firefox / iOS-safari are OK
+        setTimeout(onresize, 20);
+        setTimeout(onresize, 100);
+        setTimeout(onresize, 500);
+    }
 
     var o = QSA('#u2conf *[tt]');
     for (var a = o.length - 1; a >= 0; a--) {
@@ -1330,14 +1336,12 @@ function up2k_init(subtle) {
     }
 
     function set_fsearch(new_state) {
-        var perms = document.body.getAttribute('perms'),
-            fixed = false;
+        var fixed = false;
 
         if (!ebi('fsearch')) {
             new_state = false;
         }
-        else if (perms) {
-            perms = perms.split(' ');
+        else if (perms.length) {
             if (!has(perms, 'write')) {
                 new_state = true;
                 fixed = true;
@@ -1367,6 +1371,8 @@ function up2k_init(subtle) {
             ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
         }
         catch (ex) { }
+
+        onresize();
     }
 
     function tgl_flag_en() {

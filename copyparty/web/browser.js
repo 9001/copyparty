@@ -2042,8 +2042,8 @@ function despin(sel) {
 }
 
 
-function apply_perms(perms) {
-	perms = perms || [];
+function apply_perms(newperms) {
+	perms = newperms || [];
 
 	var o = QSA('#ops>a[data-perm], #u2footfoot');
 	for (var a = 0; a < o.length; a++) {
@@ -2065,7 +2065,15 @@ function apply_perms(perms) {
 
 	var have_write = has(perms, "write"),
 		have_read = has(perms, "read"),
+		de = document.documentElement,
 		tds = QSA('#u2conf td');
+
+	/* good idea maybe
+	clmod(de, "read", have_read);
+	clmod(de, "write", have_write);
+	clmod(de, "nread", !have_read);
+	clmod(de, "nwrite", !have_write);
+	*/
 
 	for (var a = 0; a < tds.length; a++) {
 		tds[a].style.display =
@@ -2360,7 +2368,7 @@ var light;
 	light = bcfg_get('lightmode', false);
 
 	function freshen() {
-		document.documentElement.setAttribute("class", light ? "light" : "");
+		clmod(document.documentElement, "light", light);
 		pbar.drawbuf();
 		pbar.drawpos();
 		vbar.draw();
