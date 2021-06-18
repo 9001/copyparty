@@ -1040,6 +1040,9 @@ html.light #wzip,
 html.light #wnp {
 	border-color: #ccc;
 }
+html.light #barbuf {
+	background: none;
+}
 html.light #files tr.sel:hover td {
 	background: #c37;
 }

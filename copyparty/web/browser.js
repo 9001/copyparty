@@ -352,19 +352,24 @@ var pbar = (function () {
 		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
 		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, 8, pc.h);
 
+		pctx.lineWidth = 2.5;
 		pctx.fillStyle = '#fff';
+		pctx.strokeStyle = 'rgba(24,56,0,0.4)';
 		pctx.font = '1em sans-serif';
-		var txt = s2ms(mp.au.duration),
-			tw = pctx.measureText(txt).width;
 
-		pctx.fillText(txt, pc.w - (tw + 8), pc.h / 3 * 2);
+		var m = pctx.measureText.bind(pctx),
+			t1 = s2ms(mp.au.duration),
+			t2 = s2ms(mp.au.currentTime),
+			yt = pc.h / 3 * 2.1,
+			xt1 = pc.w - (m(t1).width + 12),
+			xt2 = x < pc.w / 2 ? (x + 12) : (Math.min(pc.w - m(t1 + ":88").width, x - 12) - m(t2).width);
 
-		txt = s2ms(mp.au.currentTime);
-		tw = pctx.measureText(txt).width;
-		var gw = pctx.measureText("88:88::").width,
-			xt = x < pc.w / 2 ? (x + 8) : (Math.min(pc.w - gw, x - 8) - tw);
-
-		pctx.fillText(txt, xt, pc.h / 3 * 2);
+		pctx.strokeText(t1, xt1 + 1, yt + 1);
+		pctx.strokeText(t2, xt2 + 1, yt + 1);
+		pctx.strokeText(t1, xt1, yt);
+		pctx.strokeText(t2, xt2, yt);
+		pctx.fillText(t1, xt1, yt);
+		pctx.fillText(t2, xt2, yt);
 	};
 
 	window.addEventListener('resize', onresize);
