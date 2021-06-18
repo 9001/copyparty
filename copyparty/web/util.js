@@ -6,7 +6,7 @@ if (!window['console'])
     };
 
 
-var clickev = window.Touch ? 'touchstart' : 'click',
+var is_touch = 'ontouchstart' in window,
     ANDROID = /(android)/i.test(navigator.userAgent);
 
 

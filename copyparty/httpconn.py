@@ -172,7 +172,7 @@ class HttpConn(object):
                     self.log("client rejected our certificate (nice)")
 
                 elif "ALERT_CERTIFICATE_UNKNOWN" in em:
-                    # chrome-android keeps doing this
+                    # android-chrome keeps doing this
                     pass
 
                 else:

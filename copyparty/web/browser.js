@@ -298,7 +298,7 @@ var pbar = (function () {
 		gradh = -1,
 		grad;
 
-	function onresize() {
+	r.onresize = function () {
 		r.buf = canvas_cfg(ebi('barbuf'));
 		r.pos = canvas_cfg(ebi('barpos'));
 		r.drawbuf();
@@ -372,8 +372,8 @@ var pbar = (function () {
 		pctx.fillText(t2, xt2, yt);
 	};
 
-	window.addEventListener('resize', onresize);
-	onresize();
+	window.addEventListener('resize', r.onresize);
+	r.onresize();
 	return r;
 })();
 
@@ -384,7 +384,7 @@ var vbar = (function () {
 		gradh = -1,
 		can, ctx, w, h, grad1, grad2;
 
-	function onresize() {
+	r.onresize = function () {
 		r.can = canvas_cfg(ebi('pvol'));
 		can = r.can.can;
 		ctx = r.can.ctx;
@@ -403,8 +403,8 @@ var vbar = (function () {
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
 	};
-	window.addEventListener('resize', onresize);
-	onresize();
+	window.addEventListener('resize', r.onresize);
+	r.onresize();
 
 	var rect;
 	function mousedown(e) {
@@ -542,14 +542,23 @@ var mpui = (function () {
 		// indicate playback state in ui
 		widget.paused(mp.au.paused);
 
-		// draw current position in song
-		if (!mp.au.paused)
-			pbar.drawpos();
-
-		// occasionally draw buffered regions
-		if (++nth == 5) {
-			pbar.drawbuf();
+		if (++nth > 69) {
+			// android-chrome breaks aspect ratio with unannounced viewport changes
 			nth = 0;
+			if (is_touch) {
+				nth = 1;
+				pbar.onresize();
+				vbar.onresize();
+			}
+		}
+		else {
+			// draw current position in song
+			if (!mp.au.paused)
+				pbar.drawpos();
+
+			// occasionally draw buffered regions
+			if (++nth % 5 == 0)
+				pbar.drawbuf();
 		}
 
 		// preload next song
@@ -820,7 +829,7 @@ var audio_eq = (function () {
 // plays the tid'th audio file on the page
 function play(tid, seek, call_depth) {
 	if (mp.order.length == 0)
-		return alert('no audio found wait what');
+		return console.log('no audio found wait what');
 
 	var tn = tid;
 	if ((tn + '').indexOf('f-') === 0)
@@ -1087,6 +1096,8 @@ var thegrid = (function () {
 			lfiles.style.display = '';
 			gfiles.style.display = 'none';
 		}
+		pbar.onresize();
+		vbar.onresize();
 	};
 
 	var btnclick = function (e) {
