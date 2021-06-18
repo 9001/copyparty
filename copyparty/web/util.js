@@ -302,7 +302,7 @@ function opclick(e) {
     swrite('opmode', dest || null);
 
     var input = QS('.opview.act input:not([type="hidden"])')
-    if (input)
+    if (input && !is_touch)
         input.focus();
 }
 
@@ -533,7 +533,7 @@ function hist_replace(url) {
 var tt = (function () {
     var r = {
         "tt": mknod("div"),
-        "en": bcfg_get('tooltips', true),
+        "en": bcfg_get('tooltips', true)
     };
 
     r.tt.setAttribute('id', 'tt');
