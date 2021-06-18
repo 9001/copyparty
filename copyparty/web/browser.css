@@ -665,6 +665,7 @@ input.eq_gain {
 }
 #thx_ff {
 	padding: 5em 0;
+	/* widget */
 }
 #tree::-webkit-scrollbar-track,
 #tree::-webkit-scrollbar {
@@ -725,10 +726,10 @@ input.eq_gain {
 #treeul a.hl {
 	color: #400;
 	background: #fc4;
-	border-radius: .3em;
 	text-shadow: none;
 }
 #treeul a {
+	border-radius: .3em;
 	display: inline-block;
 }
 #treeul a+a {
@@ -969,7 +970,10 @@ html.light #treeul a.hl {
 	color: #fff;
 }
 html.light #tree li {
-	border-color: #ddd #fff #f7f7f7 #fff;
+	border-color: #f7f7f7 #fff #ddd #fff;
+}
+html.light #tree a:hover {
+	background: #fff;
 }
 html.light #tree ul {
 	border-color: #ccc;
@@ -987,14 +991,14 @@ html.light #files {
 }
 html.light #files thead th {
 	background: #eee;
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
+	border: 1px solid #ccc;
+	border-top: none;
 }
-html.light #files thead th {
+html.light #files thead th+th {
 	border-left: 1px solid #f7f7f7;
 }
 html.light #files td {
-	border-color: #ddd #fff #fff #ddd;
+	border-color: #fff #fff #ddd #ddd;
 }
 html.light #files tbody tr:last-child td {
 	border-bottom: .2em solid #ccc;
