@@ -6,8 +6,7 @@ if (!window['console'])
     };
 
 
-var perms = [],
-    is_touch = 'ontouchstart' in window,
+var is_touch = 'ontouchstart' in window,
     ANDROID = /(android)/i.test(navigator.userAgent);
 
 
@@ -286,63 +285,6 @@ function makeSortable(table, cb) {
 }
 
 
-(function () {
-    var ops = QSA('#ops>a');
-    for (var a = 0; a < ops.length; a++) {
-        ops[a].onclick = opclick;
-    }
-})();
-
-
-function opclick(e) {
-    ev(e);
-
-    var dest = this.getAttribute('data-dest');
-    goto(dest);
-
-    swrite('opmode', dest || null);
-
-    var input = QS('.opview.act input:not([type="hidden"])')
-    if (input && !is_touch)
-        input.focus();
-}
-
-
-function goto(dest) {
-    var obj = QSA('.opview.act');
-    for (var a = obj.length - 1; a >= 0; a--)
-        clmod(obj[a], 'act');
-
-    obj = QSA('#ops>a');
-    for (var a = obj.length - 1; a >= 0; a--)
-        clmod(obj[a], 'act');
-
-    if (dest) {
-        var ui = ebi('op_' + dest);
-        clmod(ui, 'act', true);
-        QS('#ops>a[data-dest=' + dest + ']').className += " act";
-
-        var fn = window['goto_' + dest];
-        if (fn)
-            fn();
-    }
-
-    if (window['treectl'])
-        treectl.onscroll();
-}
-
-
-(function () {
-    goto();
-    var op = sread('opmode');
-    if (op !== null && op !== '.')
-        try {
-            goto(op);
-        }
-        catch (ex) { }
-})();
-
-
 function linksplit(rp) {
     var ret = [];
     var apath = '/';
@@ -578,13 +520,15 @@ var tt = (function () {
             o[a].onmouseleave = _hide;
         }
         hide();
-    };
 
-    ebi('tooltips').onclick = function (e) {
-        ev(e);
-        r.en = !r.en;
-        bcfg_set('tooltips', r.en);
-        r.init();
+        var ttb = ebi('tooltips');
+        if (ttb)
+            ttb.onclick = function (e) {
+                ev(e);
+                r.en = !r.en;
+                bcfg_set('tooltips', r.en);
+                r.init();
+            };
     };
 
     return r;

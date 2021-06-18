@@ -14,22 +14,7 @@
 </head>
 
 <body>
-    <div id="ops">
-        <a href="#" data-dest="" tt="close submenu">---</a>
-        {%- if have_up2k_idx %}
-        <a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those.$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>
-        <a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>
-        {%- else %}
-        <a href="#" data-perm="write" data-dest="up2k" tt="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>
-        {%- endif %}
-        <a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>
-        <a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>
-        <a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>
-        <a href="#" data-perm="write" data-dest="msg" tt="msg: send a message to the server log">📟</a>
-        <a href="#" data-dest="player" tt="media player options">🎺</a>
-        <a href="#" data-dest="cfg" tt="configuration options">⚙️</a>
-        <div id="opdesc"></div>
-    </div>
+    <div id="ops"></div>
 
     <div id="op_search" class="opview">
         {%- if have_tags_idx %}
@@ -42,24 +27,41 @@
 
     <div id="op_player" class="opview opbox opwide"></div>
 
-    {%- include 'upload.html' %}
-
-    <div id="op_cfg" class="opview opbox opwide">
-        <div>
-            <h3>switches</h3>
-            <div>
-                <a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>
-                <a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>
-                <a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>
-                <a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>
-            </div>
-        </div>
-        {%- if have_zip %}
-        <div><h3>folder download</h3><div id="arc_fmt"></div></div>
-        {%- endif %}
-        <div><h3>key notation</h3><div id="key_notation"></div></div>
-        <div class="fill"><h3>hidden columns</h3><div id="hcols"></div></div>
+    <div id="op_bup" class="opview opbox act">
+        <div id="u2err"></div>
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+            <input type="hidden" name="act" value="bput" />
+            <input type="file" name="f" multiple><br />
+            <input type="submit" value="start upload">
+        </form>
     </div>
+
+    <div id="op_mkdir" class="opview opbox act">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+            <input type="hidden" name="act" value="mkdir" />
+            <input type="text" name="name" size="30">
+            <input type="submit" value="mkdir">
+        </form>
+    </div>
+
+    <div id="op_new_md" class="opview opbox">
+        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+            <input type="hidden" name="act" value="new_md" />
+            <input type="text" name="name" size="30">
+            <input type="submit" value="create doc">
+        </form>
+    </div>
+
+    <div id="op_msg" class="opview opbox act">
+        <form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
+            <input type="text" name="msg" size="30">
+            <input type="submit" value="send msg">
+        </form>
+    </div>
+
+    <div id="op_up2k" class="opview"></div>
+
+    <div id="op_cfg" class="opview opbox opwide"></div>
     
     <h1 id="path">
         <a href="#" id="entree" tt="show directory tree$NHotkey: B">🌲</a>
@@ -68,16 +70,7 @@
         {%- endfor %}
     </h1>
     
-    <div id="tree">
-        <div id="treeh">
-            <a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>
-            <a href="#" class="btn" step="2" id="twobytwo">+</a>
-            <a href="#" class="btn" step="-2" id="twig">&ndash;</a>
-            <a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>
-        </div>
-        <ul id="treeul"></ul>
-        <div id="thx_ff">&nbsp;</div>
-    </div>
+    <div id="tree"></div>
 
 <div id="wrap">
 
@@ -128,14 +121,15 @@
     <div id="widget"></div>
 
     <script>
-        var tag_order_cfg = {{ tag_order }};
+        var perms = {{ perms }},
+            tag_order_cfg = {{ tag_order }},
+            have_up2k_idx = {{ have_up2k_idx|tojson }},
+            have_tags_idx = {{ have_tags_idx|tojson }},
+            have_zip = {{ have_zip|tojson }};
     </script>
     <script src="/.cpr/util.js{{ ts }}"></script>
     <script src="/.cpr/browser.js{{ ts }}"></script>
     <script src="/.cpr/up2k.js{{ ts }}"></script>
-    <script>
-        apply_perms({{ perms }});
-    </script>
 </body>
 
 </html>

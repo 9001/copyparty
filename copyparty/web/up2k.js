@@ -1440,3 +1440,5 @@ tt.init();
 
 if (QS('#op_up2k.act'))
     goto_up2k();
+
+apply_perms(perms);

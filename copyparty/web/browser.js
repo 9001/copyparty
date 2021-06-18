@@ -7,7 +7,26 @@ function dbg(msg) {
 }
 
 
-// add widget buttons
+// toolbar
+ebi('ops').innerHTML = (
+	'<a href="#" data-dest="" tt="close submenu">---</a>\n' +
+	(have_up2k_idx ? (
+		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those.$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>\n' +
+		'<a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>\n'
+	) : (
+		'<a href="#" data-perm="write" data-dest="up2k" tt="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>\n'
+	)) +
+	'<a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>\n' +
+	'<a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>\n' +
+	'<a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>\n' +
+	'<a href="#" data-perm="write" data-dest="msg" tt="msg: send a message to the server log">📟</a>\n' +
+	'<a href="#" data-dest="player" tt="media player options">🎺</a>\n' +
+	'<a href="#" data-dest="cfg" tt="configuration options">⚙️</a>\n' +
+	'<div id="opdesc"></div>'
+);
+
+
+// media player
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wzip"><a' +
@@ -27,6 +46,166 @@ ebi('widget').innerHTML = (
 	'	<canvas id="barbuf"></canvas>' +
 	'</div>'
 );
+
+
+// up2k ui
+ebi('op_up2k').innerHTML = (
+	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
+
+	'<table id="u2conf">\n' +
+	'	<tr>\n' +
+	'		<td><br />parallel uploads:</td>\n' +
+	'		<td rowspan="2">\n' +
+	'			<input type="checkbox" id="multitask" />\n' +
+	'			<label for="multitask" tt="continue hashing other files while uploading">🏃</label>\n' +
+	'		</td>\n' +
+	'		<td rowspan="2">\n' +
+	'			<input type="checkbox" id="ask_up" />\n' +
+	'			<label for="ask_up" tt="ask for confirmation befofre upload starts">💭</label>\n' +
+	'		</td>\n' +
+	'		<td rowspan="2">\n' +
+	'			<input type="checkbox" id="flag_en" />\n' +
+	'			<label for="flag_en" tt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</label>\n' +
+	'		</td>\n' +
+	(have_up2k_idx ? (
+		'		<td data-perm="read" rowspan="2">\n' +
+		'			<input type="checkbox" id="fsearch" />\n' +
+		'			<label for="fsearch" tt="don\'t actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>\n' +
+		'		</td>\n'
+	) : '') +
+	'		<td data-perm="read" rowspan="2" id="u2btn_cw"></td>\n' +
+	'	</tr>\n' +
+	'	<tr>\n' +
+	'		<td>\n' +
+	'			<a href="#" id="nthread_sub">&ndash;</a><input\n' +
+	'				class="txtbox" id="nthread" value="2"/><a\n' +
+	'				href="#" id="nthread_add">+</a><br />&nbsp;\n' +
+	'		</td>\n' +
+	'	</tr>\n' +
+	'</table>\n' +
+
+	'<div id="u2notbtn"></div>\n' +
+
+	'<div id="u2btn_ct">\n' +
+	'	<div id="u2btn">\n' +
+	'		<span id="u2bm"></span><br />\n' +
+	'		drag/drop files<br />\n' +
+	'		and folders here<br />\n' +
+	'		(or click me)\n' +
+	'	</div>\n' +
+	'</div>\n' +
+
+	'<div id="u2cards">\n' +
+	'	<a href="#" act="ok" tt="completed successfully">ok <span>0</span></a><a\n' +
+	'	href="#" act="ng" tt="failed / rejected / not-found">ng <span>0</span></a><a\n' +
+	'	href="#" act="done" tt="ok and ng combined">done <span>0</span></a><a\n' +
+	'	href="#" act="bz" tt="hashing or uploading" class="act">busy <span>0</span></a><a\n' +
+	'	href="#" act="q" tt="idle, pending">que <span>0</span></a>\n' +
+	'</div>\n' +
+
+	'<table id="u2tab">\n' +
+	'	<thead>\n' +
+	'		<tr>\n' +
+	'			<td>filename</td>\n' +
+	'			<td>status</td>\n' +
+	'			<td>progress<a href="#" id="u2cleanup" tt="remove completed uploads$N(makes it possible to upload a file after searching for it)">cleanup</a></td>\n' +
+	'		</tr>\n' +
+	'	</thead>\n' +
+	'	<tbody></tbody>\n' +
+	'</table>\n' +
+
+	'<p id="u2foot"></p>\n' +
+	'<p id="u2footfoot" data-perm="write">( you can use the <a href="#" id="u2nope">basic uploader</a> if you don\'t need lastmod timestamps, resumable uploads, or progress bars )</p>'
+);
+
+
+// config panel
+ebi('op_cfg').innerHTML = (
+	'<div>\n' +
+	'	<h3>switches</h3>\n' +
+	'	<div>\n' +
+	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
+	'		<a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>\n' +
+	'		<a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>\n' +
+	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+	(have_zip ? (
+		'<div><h3>folder download</h3><div id="arc_fmt"></div></div>\n'
+	) : '') +
+	'<div><h3>key notation</h3><div id="key_notation"></div></div>\n' +
+	'<div class="fill"><h3>hidden columns</h3><div id="hcols"></div></div>'
+);
+
+
+// tree sidebar
+ebi('tree').innerHTML = (
+	'<div id="treeh">\n' +
+	'	<a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>\n' +
+	'	<a href="#" class="btn" step="2" id="twobytwo">+</a>\n' +
+	'	<a href="#" class="btn" step="-2" id="twig">&ndash;</a>\n' +
+	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
+	'</div>\n' +
+	'<ul id="treeul"></ul>\n' +
+	'<div id="thx_ff">&nbsp;</div>'
+);
+
+
+(function () {
+	var ops = QSA('#ops>a');
+	for (var a = 0; a < ops.length; a++) {
+		ops[a].onclick = opclick;
+	}
+})();
+
+
+function opclick(e) {
+	ev(e);
+
+	var dest = this.getAttribute('data-dest');
+	goto(dest);
+
+	swrite('opmode', dest || null);
+
+	var input = QS('.opview.act input:not([type="hidden"])')
+	if (input && !is_touch)
+		input.focus();
+}
+
+
+function goto(dest) {
+	var obj = QSA('.opview.act');
+	for (var a = obj.length - 1; a >= 0; a--)
+		clmod(obj[a], 'act');
+
+	obj = QSA('#ops>a');
+	for (var a = obj.length - 1; a >= 0; a--)
+		clmod(obj[a], 'act');
+
+	if (dest) {
+		var ui = ebi('op_' + dest);
+		clmod(ui, 'act', true);
+		QS('#ops>a[data-dest=' + dest + ']').className += " act";
+
+		var fn = window['goto_' + dest];
+		if (fn)
+			fn();
+	}
+
+	if (window['treectl'])
+		treectl.onscroll();
+}
+
+
+(function () {
+	goto();
+	var op = sread('opmode');
+	if (op !== null && op !== '.')
+		try {
+			goto(op);
+		}
+		catch (ex) { }
+})();
 
 
 var have_webp = null;
