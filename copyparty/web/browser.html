@@ -2,134 +2,134 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>⇆🎉 {{ title }}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8">
-    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css{{ ts }}">
-    <link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css{{ ts }}">
-    {%- if css %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ css }}{{ ts }}">
-    {%- endif %}
+	<meta charset="utf-8">
+	<title>⇆🎉 {{ title }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css{{ ts }}">
+	<link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css{{ ts }}">
+	{%- if css %}
+	<link rel="stylesheet" type="text/css" media="screen" href="{{ css }}{{ ts }}">
+	{%- endif %}
 </head>
 
 <body>
-    <div id="ops"></div>
+	<div id="ops"></div>
 
-    <div id="op_search" class="opview">
-        {%- if have_tags_idx %}
-        <div id="srch_form" class="tags"></div>
-        {%- else %}
-        <div id="srch_form"></div>
-        {%- endif %}
-        <div id="srch_q"></div>
-    </div>
+	<div id="op_search" class="opview">
+		{%- if have_tags_idx %}
+		<div id="srch_form" class="tags"></div>
+		{%- else %}
+		<div id="srch_form"></div>
+		{%- endif %}
+		<div id="srch_q"></div>
+	</div>
 
-    <div id="op_player" class="opview opbox opwide"></div>
+	<div id="op_player" class="opview opbox opwide"></div>
 
-    <div id="op_bup" class="opview opbox act">
-        <div id="u2err"></div>
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-            <input type="hidden" name="act" value="bput" />
-            <input type="file" name="f" multiple><br />
-            <input type="submit" value="start upload">
-        </form>
-    </div>
+	<div id="op_bup" class="opview opbox act">
+		<div id="u2err"></div>
+		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+			<input type="hidden" name="act" value="bput" />
+			<input type="file" name="f" multiple><br />
+			<input type="submit" value="start upload">
+		</form>
+	</div>
 
-    <div id="op_mkdir" class="opview opbox act">
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-            <input type="hidden" name="act" value="mkdir" />
-            <input type="text" name="name" size="30">
-            <input type="submit" value="mkdir">
-        </form>
-    </div>
+	<div id="op_mkdir" class="opview opbox act">
+		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+			<input type="hidden" name="act" value="mkdir" />
+			<input type="text" name="name" size="30">
+			<input type="submit" value="mkdir">
+		</form>
+	</div>
 
-    <div id="op_new_md" class="opview opbox">
-        <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-            <input type="hidden" name="act" value="new_md" />
-            <input type="text" name="name" size="30">
-            <input type="submit" value="create doc">
-        </form>
-    </div>
+	<div id="op_new_md" class="opview opbox">
+		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+			<input type="hidden" name="act" value="new_md" />
+			<input type="text" name="name" size="30">
+			<input type="submit" value="create doc">
+		</form>
+	</div>
 
-    <div id="op_msg" class="opview opbox act">
-        <form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
-            <input type="text" name="msg" size="30">
-            <input type="submit" value="send msg">
-        </form>
-    </div>
+	<div id="op_msg" class="opview opbox act">
+		<form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
+			<input type="text" name="msg" size="30">
+			<input type="submit" value="send msg">
+		</form>
+	</div>
 
-    <div id="op_up2k" class="opview"></div>
+	<div id="op_up2k" class="opview"></div>
 
-    <div id="op_cfg" class="opview opbox opwide"></div>
-    
-    <h1 id="path">
-        <a href="#" id="entree" tt="show directory tree$NHotkey: B">🌲</a>
-        {%- for n in vpnodes %}
-        <a href="/{{ n[0] }}">{{ n[1] }}</a>
-        {%- endfor %}
-    </h1>
-    
-    <div id="tree"></div>
+	<div id="op_cfg" class="opview opbox opwide"></div>
+	
+	<h1 id="path">
+		<a href="#" id="entree" tt="show directory tree$NHotkey: B">🌲</a>
+		{%- for n in vpnodes %}
+		<a href="/{{ n[0] }}">{{ n[1] }}</a>
+		{%- endfor %}
+	</h1>
+	
+	<div id="tree"></div>
 
 <div id="wrap">
 
-    <div id="pro" class="logue">{{ logues[0] }}</div>
+	<div id="pro" class="logue">{{ logues[0] }}</div>
 
-    <table id="files">
-        <thead>
-            <tr>
-                <th name="lead"><span>c</span></th>
-                <th name="href"><span>File Name</span></th>
-                <th name="sz" sort="int"><span>Size</span></th>
-                {%- for k in taglist %}
-                    {%- if k.startswith('.') %}
-                        <th name="tags/{{ k }}" sort="int"><span>{{ k[1:] }}</span></th>
-                    {%- else %}
-                        <th name="tags/{{ k }}"><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
-                    {%- endif %}
-                {%- endfor %}
-                <th name="ext"><span>T</span></th>
-                <th name="ts"><span>Date</span></th>
-            </tr>
-        </thead>
-        <tbody>
+	<table id="files">
+		<thead>
+			<tr>
+				<th name="lead"><span>c</span></th>
+				<th name="href"><span>File Name</span></th>
+				<th name="sz" sort="int"><span>Size</span></th>
+				{%- for k in taglist %}
+					{%- if k.startswith('.') %}
+				<th name="tags/{{ k }}" sort="int"><span>{{ k[1:] }}</span></th>
+					{%- else %}
+				<th name="tags/{{ k }}"><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
+					{%- endif %}
+				{%- endfor %}
+				<th name="ext"><span>T</span></th>
+				<th name="ts"><span>Date</span></th>
+			</tr>
+		</thead>
+<tbody>
 
 {%- for f in files %}
-    <tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td>
-    {%- if f.tags is defined %}
-        {%- for k in taglist %}
-            <td>{{ f.tags[k] }}</td>
-        {%- endfor %}
-    {%- endif %}
-    <td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
+<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td>
+	{%- if f.tags is defined %}
+		{%- for k in taglist %}
+<td>{{ f.tags[k] }}</td>
+		{%- endfor %}
+	{%- endif %}
+<td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
 {%- endfor %}
 
-        </tbody>
-    </table>
-    
-    <div id="epi" class="logue">{{ logues[1] }}</div>
+		</tbody>
+	</table>
+	
+	<div id="epi" class="logue">{{ logues[1] }}</div>
 
-    <h2><a href="?h">control-panel</a></h2>
+	<h2><a href="?h">control-panel</a></h2>
 
 </div>
 
-    {%- if srv_info %}
-    <div id="srv_info"><span>{{ srv_info }}</span></div>
-    {%- endif %}
+	{%- if srv_info %}
+	<div id="srv_info"><span>{{ srv_info }}</span></div>
+	{%- endif %}
 
-    <div id="widget"></div>
+	<div id="widget"></div>
 
-    <script>
-        var perms = {{ perms }},
-            tag_order_cfg = {{ tag_order }},
-            have_up2k_idx = {{ have_up2k_idx|tojson }},
-            have_tags_idx = {{ have_tags_idx|tojson }},
-            have_zip = {{ have_zip|tojson }};
-    </script>
-    <script src="/.cpr/util.js{{ ts }}"></script>
-    <script src="/.cpr/browser.js{{ ts }}"></script>
-    <script src="/.cpr/up2k.js{{ ts }}"></script>
+	<script>
+		var perms = {{ perms }},
+			tag_order_cfg = {{ tag_order }},
+			have_up2k_idx = {{ have_up2k_idx|tojson }},
+			have_tags_idx = {{ have_tags_idx|tojson }},
+			have_zip = {{ have_zip|tojson }};
+	</script>
+	<script src="/.cpr/util.js{{ ts }}"></script>
+	<script src="/.cpr/browser.js{{ ts }}"></script>
+	<script src="/.cpr/up2k.js{{ ts }}"></script>
 </body>
 
 </html>

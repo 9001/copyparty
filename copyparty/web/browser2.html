@@ -2,59 +2,59 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>{{ title }}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8">
-    <style>
-        html{font-family:sans-serif}
-        td{border:1px solid #999;border-width:1px 1px 0 0;padding:0 5px}
-        a{display:block}
-    </style>
+	<meta charset="utf-8">
+	<title>{{ title }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<style>
+		html{font-family:sans-serif}
+		td{border:1px solid #999;border-width:1px 1px 0 0;padding:0 5px}
+		a{display:block}
+	</style>
 </head>
 
 <body>
-    {%- if srv_info %}
-    <p><span>{{ srv_info }}</span></p>
-    {%- endif %}
+	{%- if srv_info %}
+	<p><span>{{ srv_info }}</span></p>
+	{%- endif %}
 
-    {%- if have_b_u %}
-    <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-        <input type="hidden" name="act" value="bput" />
-        <input type="file" name="f" multiple /><br />
-        <input type="submit" value="start upload" />
-    </form>
-    <br />
-    {%- endif %}
+	{%- if have_b_u %}
+	<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+		<input type="hidden" name="act" value="bput" />
+		<input type="file" name="f" multiple /><br />
+		<input type="submit" value="start upload" />
+	</form>
+	<br />
+	{%- endif %}
 
-    {%- if logues[0] %}
-    <div>{{ logues[0] }}</div><br />
-    {%- endif %}
+	{%- if logues[0] %}
+	<div>{{ logues[0] }}</div><br />
+	{%- endif %}
 
-    <table id="files">
-        <thead>
-            <tr>
-                <th name="lead"><span>c</span></th>
-                <th name="href"><span>File Name</span></th>
-                <th name="sz" sort="int"><span>Size</span></th>
-                <th name="ts"><span>Date</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td></td><td><a href="../{{ url_suf }}">parent folder</a></td><td>-</td><td>-</td></tr>
+	<table id="files">
+		<thead>
+			<tr>
+				<th name="lead"><span>c</span></th>
+				<th name="href"><span>File Name</span></th>
+				<th name="sz" sort="int"><span>Size</span></th>
+				<th name="ts"><span>Date</span></th>
+			</tr>
+		</thead>
+		<tbody>
+<tr><td></td><td><a href="../{{ url_suf }}">parent folder</a></td><td>-</td><td>-</td></tr>
 
 {%- for f in files %}
-    <tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}{{ url_suf }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td><td>{{ f.dt }}</td></tr>
+<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}{{ url_suf }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td><td>{{ f.dt }}</td></tr>
 {%- endfor %}
 
-        </tbody>
-    </table>
-    
-    {%- if logues[1] %}
-    <div>{{ logues[1] }}</div><br />
-    {%- endif %}
-    
-    <h2><a href="{{ url_suf }}{{ url_suf and '&amp;' or '?' }}h">control-panel</a></h2>
+		</tbody>
+	</table>
+	
+	{%- if logues[1] %}
+	<div>{{ logues[1] }}</div><br />
+	{%- endif %}
+	
+	<h2><a href="{{ url_suf }}{{ url_suf and '&amp;' or '?' }}h">control-panel</a></h2>
 
 </body>
 </html>
