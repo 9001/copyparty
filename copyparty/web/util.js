@@ -476,7 +476,7 @@ function hist_replace(url) {
 var tt = (function () {
     var r = {
         "tt": mknod("div"),
-        "en": bcfg_get('tooltips', true)
+        "en": true
     };
 
     r.tt.setAttribute('id', 'tt');
@@ -509,6 +509,17 @@ var tt = (function () {
     }
 
     r.init = function () {
+        var ttb = ebi('tooltips');
+        if (ttb) {
+            ttb.onclick = function (e) {
+                ev(e);
+                r.en = !r.en;
+                bcfg_set('tooltips', r.en);
+                r.init();
+            };
+            r.en = bcfg_get('tooltips', true)
+        }
+
         var _show = r.en ? show : null,
             _hide = r.en ? hide : null;
 
@@ -520,15 +531,6 @@ var tt = (function () {
             o[a].onmouseleave = _hide;
         }
         hide();
-
-        var ttb = ebi('tooltips');
-        if (ttb)
-            ttb.onclick = function (e) {
-                ev(e);
-                r.en = !r.en;
-                bcfg_set('tooltips', r.en);
-                r.init();
-            };
     };
 
     return r;
