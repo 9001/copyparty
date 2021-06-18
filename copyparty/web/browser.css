@@ -536,7 +536,9 @@ html.light #ggrid a.sel {
 	border-radius: .2em;
 	padding: .2em .3em;
 }
-.opview input.err {
+.opview input.err,
+html.light .opview input[type="text"].err {
+	color: #fff;
 	background: #a20;
 	border-color: #f00;
 	box-shadow: 0 0 .7em #f00;
