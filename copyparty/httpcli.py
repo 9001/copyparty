@@ -115,7 +115,7 @@ class HttpCli(object):
                 try:
                     self.ip = vs[n].strip()
                 except:
-                    self.ip = vs[-1].strip()
+                    self.ip = vs[0].strip()
                     self.log("rproxy={} oob x-fwd {}".format(self.args.rproxy, v), c=3)
 
                 self.log_src = self.conn.set_rproxy(self.ip)
