@@ -51,8 +51,10 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [sfx](#sfx)
     * [sfx repack](#sfx-repack)
 * [install on android](#install-on-android)
-* [dev env setup](#dev-env-setup)
-* [how to release](#how-to-release)
+* [building](#building)
+    * [dev env setup](#dev-env-setup)
+    * [just the sfx](#just-the-sfx)
+    * [complete release](#complete-release)
 * [todo](#todo)
 
 
@@ -532,18 +534,45 @@ echo $?
 after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux
 
 
-# dev env setup
+# building
+
+## dev env setup
+
+mostly optional; if you need a working env for vscode or similar
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-pip install jinja2  # mandatory deps
-pip install Pillow  # thumbnail deps
+pip install jinja2  # mandatory
+pip install mutagen  # audio metadata
+pip install Pillow pyheif-pillow-opener pillow-avif-plugin  # thumbnails
 pip install black bandit pylint flake8  # vscode tooling
 ```
 
 
-# how to release
+## just the sfx
+
+unless you need to modify something in the web-dependencies, it's faster to grab those from a previous release:
+
+```sh
+rm -rf copyparty/web/deps
+curl -L https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py >x.py
+python3 x.py -h
+rm x.py
+mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/
+```
+
+then build the sfx using any of the following examples:
+
+```sh
+./scripts/make-sfx.sh  # both python and sh editions
+./scripts/make-sfx.sh no-sh gz  # just python with gzip
+```
+
+
+## complete release
+
+also builds the sfx so disregard the sfx section above
 
 in the `scripts` folder:
 

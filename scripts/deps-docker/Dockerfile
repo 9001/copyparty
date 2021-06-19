@@ -1,18 +1,13 @@
 FROM    alpine:3.13
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
+        ver_hashwasm=4.7.0 \
         ver_marked=1.1.0 \
         ver_ogvjs=1.8.0 \
         ver_mde=2.14.0 \
         ver_codemirror=5.59.3 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
-
-
-# TODO
-# sha512.hw.js https://github.com/Daninet/hash-wasm
-# sha512.kc.js https://github.com/chm-diederichs/sha3-wasm
-# awk '/HMAC state/{o=1}  /var HEAP/{o=0}  /function hmac_reset/{o=1}  /return \{/{o=0}  /var __extends =/{o=1}  /var Hash =/{o=0}  /hmac_|pbkdf2_/{next}  o{next}  {gsub(/IllegalStateError/,"Exception")}  {sub(/^ +/,"");sub(/^\/\/ .*/,"");sub(/;$/," ;")}  1' <sha512.ac.js.orig >sha512.ac.js; for fn in sha512.ac.js.orig sha512.ac.js; do wc -c <$fn; wc -c <$fn.gz ; for n in {1..9}; do printf '%8d %d bz\n' $(bzip2 -c$n <$fn | wc -c) $n; done; done
 
 
 # download;
@@ -27,7 +22,11 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://github.com/codemirror/CodeMirror/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
         && wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
+        && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
         && unzip ogvjs.zip \
+        && (mkdir hash-wasm \
+            && cd hash-wasm \
+            && unzip ../hash-wasm.zip) \
         && (tar -xf asmcrypto.tgz \
             && cd asmcrypto.js-$ver_asmcrypto \
             && npm install ) \
@@ -64,7 +63,12 @@ RUN     tar -xf zopfli.tgz \
 RUN     cd asmcrypto.js-$ver_asmcrypto \
         && echo "export { Sha512 } from './hash/sha512/sha512';" > src/entry-export_all.ts \
         && node -r esm build.js \
-        && mv asmcrypto.all.es5.js /z/dist/sha512.js
+        && awk '/HMAC state/{o=1}  /var HEAP/{o=0}  /function hmac_reset/{o=1}  /return \{/{o=0}  /var __extends =/{o=1}  /var Hash =/{o=0}  /hmac_|pbkdf2_/{next}  o{next}  {gsub(/IllegalStateError/,"Exception")}  {sub(/^ +/,"");sub(/^\/\/ .*/,"");sub(/;$/," ;")}  1' < asmcrypto.all.es5.js > /z/dist/sha512.ac.js
+
+
+# build hash-wasm
+RUN     cd hash-wasm \
+        && mv sha512.umd.min.js /z/dist/sha512.hw.js
 
 
 # build ogvjs
