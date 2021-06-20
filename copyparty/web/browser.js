@@ -419,6 +419,9 @@ var widget = (function () {
 			m = ck + 'np: ';
 
 		for (var a = 1, aa = th.length; a < aa; a++) {
+			if (th[a].className.indexOf('min') !== -1)
+				continue;
+
 			var tv = tr[a].textContent,
 				tk = a == 1 ? '' : th[a].getAttribute('name').split('/').slice(-1)[0];
 
