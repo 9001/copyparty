@@ -79,7 +79,14 @@ class TcpSrv(object):
             if self.args.log_conn:
                 self.log("tcpsrv", "|%sC-acc1" % ("-" * 2,), c="1;30")
 
-            ready, _, _ = select.select(self.srv, [], [])
+            try:
+                # macos throws bad-fd
+                ready, _, _ = select.select(self.srv, [], [])
+            except:
+                ready = []
+                if not self.stopping:
+                    raise
+
             for srv in ready:
                 if self.stopping:
                     break
