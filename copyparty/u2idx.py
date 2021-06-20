@@ -66,7 +66,7 @@ class U2idx(object):
         if not os.path.exists(db_path):
             return None
 
-        cur = sqlite3.connect(db_path).cursor()
+        cur = sqlite3.connect(db_path, 2).cursor()
         self.cur[ptop] = cur
         return cur
 

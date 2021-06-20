@@ -1770,11 +1770,16 @@ class HttpCli(object):
                     _, rd = vn.get_dbv(rd)
 
                 q = "select w from up where rd = ? and fn = ?"
+                r = None
                 try:
                     r = icur.execute(q, (rd, fn)).fetchone()
-                except:
-                    args = s3enc(idx.mem_cur, rd, fn)
-                    r = icur.execute(q, args).fetchone()
+                except Exception as ex:
+                    if "database is locked" not in str(ex):
+                        try:
+                            args = s3enc(idx.mem_cur, rd, fn)
+                            r = icur.execute(q, args).fetchone()
+                        except:
+                            self.log("tag list error:\n" + min_ex())
 
                 tags = {}
                 f["tags"] = tags
@@ -1784,9 +1789,12 @@ class HttpCli(object):
 
                 w = r[0][:16]
                 q = "select k, v from mt where w = ? and k != 'x'"
-                for k, v in icur.execute(q, (w,)):
-                    taglist[k] = True
-                    tags[k] = v
+                try:
+                    for k, v in icur.execute(q, (w,)):
+                        taglist[k] = True
+                        tags[k] = v
+                except:
+                    self.log("tag read error:\n" + min_ex())
 
         if icur:
             taglist = [k for k in vn.flags.get("mte", "").split(",") if k in taglist]
