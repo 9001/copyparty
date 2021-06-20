@@ -2,10 +2,13 @@
 
 import os
 import sys
+import time
+import shutil
 import sqlite3
 import argparse
 
-DB_VER = 3
+DB_VER1 = 3
+DB_VER2 = 4
 
 
 def die(msg):
@@ -45,18 +48,21 @@ def compare(n1, d1, n2, d2, verbose):
     nt = next(d1.execute("select count(w) from up"))[0]
     n = 0
     miss = 0
-    for w, rd, fn in d1.execute("select w, rd, fn from up"):
+    for w1, rd, fn in d1.execute("select w, rd, fn from up"):
         n += 1
         if n % 25_000 == 0:
             m = f"\033[36mchecked {n:,} of {nt:,} files in {n1} against {n2}\033[0m"
             print(m)
 
-        q = "select w from up where substr(w,1,16) = ?"
-        hit = d2.execute(q, (w[:16],)).fetchone()
+        if rd.split("/", 1)[0] == ".hist":
+            continue
+
+        q = "select w from up where rd = ? and fn = ?"
+        hit = d2.execute(q, (rd, fn)).fetchone()
         if not hit:
             miss += 1
             if verbose:
-                print(f"file in {n1} missing in {n2}: [{w}] {rd}/{fn}")
+                print(f"file in {n1} missing in {n2}: [{w1}] {rd}/{fn}")
 
     print(f" {miss} files in {n1} missing in {n2}\n")
 
@@ -64,15 +70,30 @@ def compare(n1, d1, n2, d2, verbose):
     n = 0
     miss = {}
     nmiss = 0
-    for w, k, v in d1.execute("select * from mt"):
+    for w1, k, v in d1.execute("select * from mt"):
+
         n += 1
         if n % 100_000 == 0:
             m = f"\033[36mchecked {n:,} of {nt:,} tags in {n1} against {n2}, so far {nmiss} missing tags\033[0m"
             print(m)
 
-        v2 = d2.execute("select v from mt where w = ? and +k = ?", (w, k)).fetchone()
-        if v2:
-            v2 = v2[0]
+        q = "select rd, fn from up where substr(w,1,16) = ?"
+        rd, fn = d1.execute(q, (w1,)).fetchone()
+        if rd.split("/", 1)[0] == ".hist":
+            continue
+
+        q = "select substr(w,1,16) from up where rd = ? and fn = ?"
+        w2 = d2.execute(q, (rd, fn)).fetchone()
+        if w2:
+            w2 = w2[0]
+
+        v2 = None
+        if w2:
+            v2 = d2.execute(
+                "select v from mt where w = ? and +k = ?", (w2, k)
+            ).fetchone()
+            if v2:
+                v2 = v2[0]
 
         # if v != v2 and v2 and k in [".bpm", "key"] and n2 == "src":
         #    print(f"{w} [{rd}/{fn}] {k} = [{v}] / [{v2}]")
@@ -99,9 +120,7 @@ def compare(n1, d1, n2, d2, verbose):
                 miss[k] = 1
 
             if verbose:
-                q = "select rd, fn from up where substr(w,1,16) = ?"
-                rd, fn = d1.execute(q, (w,)).fetchone()
-                print(f"missing in {n2}: [{w}] [{rd}/{fn}] {k} = {v}")
+                print(f"missing in {n2}: [{w1}] [{rd}/{fn}] {k} = {v}")
 
     for k, v in sorted(miss.items()):
         if v:
@@ -114,24 +133,35 @@ def copy_mtp(d1, d2, tag, rm):
     nt = next(d1.execute("select count(w) from mt where k = ?", (tag,)))[0]
     n = 0
     ndone = 0
-    for w, k, v in d1.execute("select * from mt where k = ?", (tag,)):
+    for w1, k, v in d1.execute("select * from mt where k = ?", (tag,)):
         n += 1
         if n % 25_000 == 0:
             m = f"\033[36m{n:,} of {nt:,} tags checked, so far {ndone} copied\033[0m"
             print(m)
 
-        hit = d2.execute("select v from mt where w = ? and +k = ?", (w, k)).fetchone()
+        q = "select rd, fn from up where substr(w,1,16) = ?"
+        rd, fn = d1.execute(q, (w1,)).fetchone()
+        if rd.split("/", 1)[0] == ".hist":
+            continue
+
+        q = "select substr(w,1,16) from up where rd = ? and fn = ?"
+        w2 = d2.execute(q, (rd, fn)).fetchone()
+        if not w2:
+            continue
+
+        w2 = w2[0]
+        hit = d2.execute("select v from mt where w = ? and +k = ?", (w2, k)).fetchone()
         if hit:
             hit = hit[0]
 
         if hit != v:
             ndone += 1
             if hit is not None:
-                d2.execute("delete from mt where w = ? and +k = ?", (w, k))
+                d2.execute("delete from mt where w = ? and +k = ?", (w2, k))
 
-            d2.execute("insert into mt values (?,?,?)", (w, k, v))
+            d2.execute("insert into mt values (?,?,?)", (w2, k, v))
             if rm:
-                d2.execute("delete from mt where w = ? and +k = 't:mtp'", (w,))
+                d2.execute("delete from mt where w = ? and +k = 't:mtp'", (w2,))
 
     d2.commit()
     print(f"copied {ndone} {tag} tags over")
@@ -140,7 +170,7 @@ def copy_mtp(d1, d2, tag, rm):
 def main():
     os.system("")
     print()
-    
+
     ap = argparse.ArgumentParser()
     ap.add_argument("db", help="database to work on")
     ap.add_argument("-src", metavar="DB", type=str, help="database to copy from")
@@ -168,6 +198,23 @@ def main():
     db = sqlite3.connect(ar.db)
     ds = sqlite3.connect(ar.src) if ar.src else None
 
+    # revert journals
+    for d, p in [[db, ar.db], [ds, ar.src]]:
+        if not d:
+            continue
+
+        pj = "{}-journal".format(p)
+        if not os.path.exists(pj):
+            continue
+
+        d.execute("create table foo (bar int)")
+        d.execute("drop table foo")
+
+    if ar.copy:
+        db.close()
+        shutil.copy2(ar.db, "{}.bak.dbtool.{:x}".format(ar.db, int(time.time())))
+        db = sqlite3.connect(ar.db)
+
     for d, n in [[ds, "src"], [db, "dst"]]:
         if not d:
             continue
@@ -176,8 +223,8 @@ def main():
         if ver == "corrupt":
             die("{} database appears to be corrupt, sorry")
 
-        if ver != DB_VER:
-            m = f"{n} db is version {ver}, this tool only supports version {DB_VER}, please upgrade it with copyparty first"
+        if ver < DB_VER1 or ver > DB_VER2:
+            m = f"{n} db is version {ver}, this tool only supports versions between {DB_VER1} and {DB_VER2}, please upgrade it with copyparty first"
             die(m)
 
     if ar.ls:
