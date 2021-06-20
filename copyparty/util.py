@@ -649,10 +649,10 @@ def s2hms(s, optional_h=False):
 
 
 def uncyg(path):
-    if not path.startswith("/"):
+    if len(path) < 2 or not path.startswith("/"):
         return path
 
-    if len(path) < 3 and path[2] != "/":
+    if len(path) > 2 and path[2] != "/":
         return path
 
     return "{}:\\{}".format(path[1], path[3:])

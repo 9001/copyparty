@@ -143,6 +143,9 @@ summary: all planned features work! now please enjoy the bloatening
 
 ## not my bugs
 
+* Windows: folders cannot be accessed if the name ends with `.`
+  * python or windows bug
+
 * Windows: msys2-python 3.8.6 occasionally throws "RuntimeError: release unlocked lock" when leaving a scoped mutex in up2k
   * this is an msys2 bug, the regular windows edition of python is fine
 
@@ -439,7 +442,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 
 copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uplaods:
 
-    b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|head -c44;}
+    b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
     b512 <movie.mkv
 
 

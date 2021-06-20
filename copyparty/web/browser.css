@@ -969,6 +969,9 @@ html.light #treeul a.hl {
 	background: #07a;
 	color: #fff;
 }
+html.light #treeul a.hl:hover {
+	background: #059;
+}
 html.light #tree li {
 	border-color: #f7f7f7 #fff #ddd #fff;
 }
