@@ -996,6 +996,7 @@ function up2k_init(subtle) {
                 pvis.seth(t.n, 1, '📦 wait');
                 st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
                 st.todo.handshake.push(t);
+                tasker();
             };
 
             if (subtle)
@@ -1041,6 +1042,7 @@ function up2k_init(subtle) {
             console.log('handshake onerror, retrying');
             st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
             st.todo.handshake.unshift(t);
+            tasker();
         };
         xhr.onload = function (e) {
             if (t.busied != me) {
