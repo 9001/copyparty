@@ -84,14 +84,14 @@ def thumb_path(histpath, rem, mtime, fmt):
         fn = rem
 
     if rd:
-        h = hashlib.sha512(fsenc(rd)).digest()[:24]
+        h = hashlib.sha512(fsenc(rd)).digest()
         b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]
         rd = "{}/{}/".format(b64[:2], b64[2:4]).lower() + b64
     else:
         rd = "top"
 
     # could keep original filenames but this is safer re pathlen
-    h = hashlib.sha512(fsenc(fn)).digest()[:24]
+    h = hashlib.sha512(fsenc(fn)).digest()
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
     return "{}/th/{}/{}.{:x}.{}".format(

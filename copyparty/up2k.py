@@ -30,6 +30,7 @@ from .util import (
     s3dec,
     statdir,
     s2hms,
+    min_ex,
 )
 from .mtag import MTag, MParser
 
@@ -38,6 +39,8 @@ try:
     import sqlite3
 except:
     HAVE_SQLITE3 = False
+
+DB_VER = 4
 
 
 class Up2k(object):
@@ -91,7 +94,7 @@ class Up2k(object):
             thr.start()
 
         # static
-        self.r_hash = re.compile("^[0-9a-zA-Z_-]{43}$")
+        self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
 
         if not HAVE_SQLITE3:
             self.log("could not initialize sqlite3, will use in-memory registry only")
@@ -887,58 +890,30 @@ class Up2k(object):
         if not existed and ver is None:
             return self._create_db(db_path, cur)
 
-        orig_ver = ver
-        if not ver or ver < 3:
-            bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
-            db = cur.connection
-            cur.close()
-            db.close()
-            msg = "creating new DB (old is bad); backup: {}"
-            if ver:
-                msg = "creating backup before upgrade: {}"
-
-            self.log(msg.format(bak))
-            shutil.copy2(db_path, bak)
-            cur = self._orz(db_path)
-
-        if ver == 1:
-            cur = self._upgrade_v1(cur, db_path)
-            if cur:
-                ver = 2
-
-        if ver == 2:
-            cur = self._create_v3(cur)
-            ver = self._read_ver(cur) if cur else None
-
-        if ver == 3:
-            if orig_ver != ver:
-                cur.connection.commit()
-                cur.execute("vacuum")
-                cur.connection.commit()
-
+        if ver == DB_VER:
             try:
                 nfiles = next(cur.execute("select count(w) from up"))[0]
                 self.log("OK: {} |{}|".format(db_path, nfiles))
                 return cur
-            except Exception as ex:
-                self.log("WARN: could not list files, DB corrupt?\n  " + repr(ex))
+            except:
+                self.log("WARN: could not list files; DB corrupt?\n" + min_ex())
 
-        if cur:
-            db = cur.connection
-            cur.close()
-            db.close()
+        elif ver > DB_VER:
+            m = "database is version {}, this copyparty only supports versions <= {}"
+            raise Exception(m.format(ver, DB_VER))
+
+        bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
+        db = cur.connection
+        cur.close()
+        db.close()
+        msg = "creating new DB (old is bad); backup: {}"
+        if ver:
+            msg = "creating new DB (too old to upgrade); backup: {}"
+
+        self.log(msg.format(bak))
+        os.rename(fsenc(db_path), fsenc(bak))
 
         return self._create_db(db_path, None)
-
-    def _create_db(self, db_path, cur):
-        if not cur:
-            cur = self._orz(db_path)
-
-        self._create_v2(cur)
-        self._create_v3(cur)
-        cur.connection.commit()
-        self.log("created DB at {}".format(db_path))
-        return cur
 
     def _read_ver(self, cur):
         for tab in ["ki", "kv"]:
@@ -951,64 +926,37 @@ class Up2k(object):
             if rows:
                 return int(rows[0][0])
 
-    def _create_v2(self, cur):
-        for cmd in [
-            r"create table up (w text, mt int, sz int, rd text, fn text)",
-            r"create index up_rd on up(rd)",
-            r"create index up_fn on up(fn)",
-        ]:
-            cur.execute(cmd)
-        return cur
-
-    def _create_v3(self, cur):
+    def _create_db(self, db_path, cur):
         """
         collision in 2^(n/2) files where n = bits (6 bits/ch)
           10*6/2 = 2^30 =       1'073'741'824, 24.1mb idx  1<<(3*10)
           12*6/2 = 2^36 =      68'719'476'736, 24.8mb idx
           16*6/2 = 2^48 = 281'474'976'710'656, 26.1mb idx
         """
-        for c, ks in [["drop table k", "isv"], ["drop index up_", "w"]]:
-            for k in ks:
-                try:
-                    cur.execute(c + k)
-                except:
-                    pass
+        if not cur:
+            cur = self._orz(db_path)
 
         idx = r"create index up_w on up(substr(w,1,16))"
         if self.no_expr_idx:
             idx = r"create index up_w on up(w)"
 
         for cmd in [
+            r"create table up (w text, mt int, sz int, rd text, fn text)",
+            r"create index up_rd on up(rd)",
+            r"create index up_fn on up(fn)",
             idx,
             r"create table mt (w text, k text, v int)",
             r"create index mt_w on mt(w)",
             r"create index mt_k on mt(k)",
             r"create index mt_v on mt(v)",
             r"create table kv (k text, v int)",
-            r"insert into kv values ('sver', 3)",
+            r"insert into kv values ('sver', {})".format(DB_VER),
         ]:
             cur.execute(cmd)
+
+        cur.connection.commit()
+        self.log("created DB at {}".format(db_path))
         return cur
-
-    def _upgrade_v1(self, odb, db_path):
-        npath = db_path + ".next"
-        if os.path.exists(npath):
-            os.unlink(npath)
-
-        ndb = self._orz(npath)
-        self._create_v2(ndb)
-
-        c = odb.execute("select * from up")
-        for wark, ts, sz, rp in c:
-            rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
-            v = (wark, ts, sz, rd, fn)
-            ndb.execute("insert into up values (?,?,?,?,?)", v)
-
-        ndb.connection.commit()
-        ndb.connection.close()
-        odb.connection.close()
-        atomic_move(npath, db_path)
-        return self._orz(db_path)
 
     def handle_json(self, cj):
         with self.mutex:
@@ -1316,9 +1264,9 @@ class Up2k(object):
                     hashobj.update(buf)
                     rem -= len(buf)
 
-                digest = hashobj.digest()[:32]
+                digest = hashobj.digest()[:33]
                 digest = base64.urlsafe_b64encode(digest)
-                ret.append(digest.decode("utf-8").rstrip("="))
+                ret.append(digest.decode("utf-8"))
 
         return ret
 
@@ -1518,12 +1466,12 @@ def up2k_wark_from_hashlist(salt, filesize, hashes):
     ident.extend(hashes)
     ident = "\n".join(ident)
 
-    wark = hashlib.sha512(ident.encode("utf-8")).digest()
+    wark = hashlib.sha512(ident.encode("utf-8")).digest()[:33]
     wark = base64.urlsafe_b64encode(wark)
-    return wark.decode("ascii")[:43]
+    return wark.decode("ascii")
 
 
 def up2k_wark_from_metadata(salt, sz, lastmod, rd, fn):
     ret = fsenc("{}\n{}\n{}\n{}\n{}".format(salt, lastmod, sz, rd, fn))
     ret = base64.urlsafe_b64encode(hashlib.sha512(ret).digest())
-    return "#{}".format(ret[:42].decode("ascii"))
+    return "#{}".format(ret.decode("ascii"))[:44]

@@ -351,7 +351,7 @@ def ren_open(fname, *args, **kwargs):
         if not b64:
             b64 = (bname + ext).encode("utf-8", "replace")
             b64 = hashlib.sha512(b64).digest()[:12]
-            b64 = base64.urlsafe_b64encode(b64).decode("utf-8").rstrip("=")
+            b64 = base64.urlsafe_b64encode(b64).decode("utf-8")
 
         badlen = len(fname)
         while len(fname) >= badlen:
@@ -908,8 +908,8 @@ def hashcopy(actor, fin, fout):
         hashobj.update(buf)
         fout.write(buf)
 
-    digest32 = hashobj.digest()[:32]
-    digest_b64 = base64.urlsafe_b64encode(digest32).decode("utf-8").rstrip("=")
+    digest = hashobj.digest()[:33]
+    digest_b64 = base64.urlsafe_b64encode(digest).decode("utf-8")
 
     return tlen, hashobj.hexdigest(), digest_b64
 

@@ -439,7 +439,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 
 copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uplaods:
 
-    b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|head -c43;}
+    b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|head -c44;}
     b512 <movie.mkv
 
 

@@ -970,8 +970,8 @@ function up2k_init(subtle) {
             while (segm_next());
 
             var hash_done = function (hashbuf) {
-                var hslice = new Uint8Array(hashbuf).subarray(0, 32),
-                    b64str = buf2b64(hslice).replace(/=$/, '');
+                var hslice = new Uint8Array(hashbuf).subarray(0, 33),
+                    b64str = buf2b64(hslice);
 
                 hashtab[nch] = b64str;
                 t.hash.push(nch);
