@@ -425,7 +425,10 @@ class Up2k(object):
                 ret += self._build_dir(dbw, top, excl, abspath, nohash)
             else:
                 # self.log("file: {}".format(abspath))
-                rp = abspath[len(top) :].replace("\\", "/").strip("/")
+                rp = abspath[len(top) + 1 :]
+                if WINDOWS:
+                    rp = rp.replace("\\", "/").strip("/")
+
                 rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
                 sql = "select w, mt, sz from up where rd = ? and fn = ?"
                 try:
