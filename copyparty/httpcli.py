@@ -1765,36 +1765,44 @@ class HttpCli(object):
             fn = f["name"]
             rd = f["rd"]
             del f["rd"]
-            if icur:
-                if vn != dbv:
-                    _, rd = vn.get_dbv(rd)
+            if not icur:
+                break
 
-                q = "select w from up where rd = ? and fn = ?"
-                r = None
+            if vn != dbv:
+                _, rd = vn.get_dbv(rd)
+
+            q = "select w from up where rd = ? and fn = ?"
+            r = None
+            try:
+                r = icur.execute(q, (rd, fn)).fetchone()
+            except Exception as ex:
+                if "database is locked" in str(ex):
+                    break
+
                 try:
-                    r = icur.execute(q, (rd, fn)).fetchone()
-                except Exception as ex:
-                    if "database is locked" not in str(ex):
-                        try:
-                            args = s3enc(idx.mem_cur, rd, fn)
-                            r = icur.execute(q, args).fetchone()
-                        except:
-                            self.log("tag list error:\n" + min_ex())
-
-                tags = {}
-                f["tags"] = tags
-
-                if not r:
-                    continue
-
-                w = r[0][:16]
-                q = "select k, v from mt where w = ? and k != 'x'"
-                try:
-                    for k, v in icur.execute(q, (w,)):
-                        taglist[k] = True
-                        tags[k] = v
+                    args = s3enc(idx.mem_cur, rd, fn)
+                    r = icur.execute(q, args).fetchone()
                 except:
-                    self.log("tag read error:\n" + min_ex())
+                    m = "tag list error, {}/{}\n{}"
+                    self.log(m.format(rd, fn, min_ex()))
+                    break
+
+            tags = {}
+            f["tags"] = tags
+
+            if not r:
+                continue
+
+            w = r[0][:16]
+            q = "select k, v from mt where w = ? and k != 'x'"
+            try:
+                for k, v in icur.execute(q, (w,)):
+                    taglist[k] = True
+                    tags[k] = v
+            except:
+                m = "tag read error, {}/{} [{}]:\n{}"
+                self.log(m.format(rd, fn, w, min_ex()))
+                break
 
         if icur:
             taglist = [k for k in vn.flags.get("mte", "").split(",") if k in taglist]
