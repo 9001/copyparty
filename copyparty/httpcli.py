@@ -581,8 +581,10 @@ class HttpCli(object):
         if sub:
             try:
                 dst = os.path.join(vfs.realpath, rem)
-                os.makedirs(fsenc(dst))
+                if not os.path.isdir(fsenc(dst)):
+                    os.makedirs(fsenc(dst))
             except OSError as ex:
+                self.log("makedirs failed [{}]".format(dst))
                 if ex.errno == 13:
                     raise Pebkac(500, "the server OS denied write-access")
 
