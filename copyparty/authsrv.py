@@ -469,6 +469,17 @@ class AuthSrv(object):
                         print(m.format(cfg_fn, self.line_ctr))
                         raise
 
+        # case-insensitive; normalize
+        if WINDOWS:
+            cased = {}
+            for k, v in mount.items():
+                try:
+                    cased[k] = fsdec(os.path.realpath(fsenc(v)))
+                except:
+                    cased[k] = v
+
+            mount = cased
+
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
