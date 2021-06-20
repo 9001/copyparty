@@ -648,6 +648,16 @@ def s2hms(s, optional_h=False):
     return "{}:{:02}:{:02}".format(h, m, s)
 
 
+def uncyg(path):
+    if not path.startswith("/"):
+        return path
+
+    if len(path) < 3 and path[2] != "/":
+        return path
+
+    return "{}:\\{}".format(path[1], path[3:])
+
+
 def undot(path):
     ret = []
     for node in path.split("/"):

@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 
 from .__init__ import PY2, WINDOWS
-from .util import fsenc, fsdec, REKOBO_LKEY
+from .util import fsenc, fsdec, uncyg, REKOBO_LKEY
 
 if not PY2:
     unicode = str
@@ -44,6 +44,9 @@ class MParser(object):
         while True:
             try:
                 bp = os.path.expanduser(args)
+                if WINDOWS:
+                    bp = uncyg(bp)
+
                 if os.path.exists(bp):
                     self.bin = bp
                     return

@@ -10,7 +10,7 @@ import hashlib
 import threading
 
 from .__init__ import WINDOWS
-from .util import IMPLICATIONS, undot, Pebkac, fsdec, fsenc, statdir, nuprint
+from .util import IMPLICATIONS, uncyg, undot, Pebkac, fsdec, fsenc, statdir, nuprint
 
 
 class VFS(object):
@@ -439,8 +439,8 @@ class AuthSrv(object):
                     raise Exception("invalid -v argument: [{}]".format(v_str))
 
                 src, dst, perms = m.groups()
-                if WINDOWS and src.startswith("/"):
-                    src = "{}:\\{}".format(src[1], src[3:])
+                if WINDOWS:
+                    src = uncyg(src)
 
                 # print("\n".join([src, dst, perms]))
                 src = fsdec(os.path.abspath(fsenc(src)))
@@ -524,9 +524,7 @@ class AuthSrv(object):
             if vflag == "-":
                 pass
             elif vflag:
-                if WINDOWS and vflag.startswith("/"):
-                    vflag = "{}:\\{}".format(vflag[1], vflag[3:])
-                vol.histpath = vflag
+                vol.histpath = uncyg(vflag) if WINDOWS else vflag
             elif self.args.hist:
                 for nch in range(len(hid)):
                     hpath = os.path.join(self.args.hist, hid[: nch + 1])
