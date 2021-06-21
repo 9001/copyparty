@@ -1305,7 +1305,7 @@ class HttpCli(object):
             ext = "folder"
             exact = True
 
-        bad = re.compile(r"[](){}/[]|^[0-9_-]*$")
+        bad = re.compile(r"[](){}/ []|^[0-9_-]*$")
         n = ext.split(".")[::-1]
         if not exact:
             n = n[:-1]
