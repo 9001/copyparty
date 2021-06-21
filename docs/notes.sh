@@ -103,6 +103,9 @@ cat warks | while IFS= read -r x; do sqlite3 up2k.db "delete from mt where w = '
 # dump all dbs
 find -iname up2k.db | while IFS= read -r x; do sqlite3 "$x" 'select substr(w,1,12), rd, fn from up' | sed -r 's/\|/ \| /g' | while IFS= read -r y; do printf '%s | %s\n' "$x" "$y"; done; done
 
+# unschedule mtp scan for all files somewhere under "enc/"
+sqlite3 -readonly up2k.db 'select substr(up.w,1,16) from up inner join mt on mt.w = substr(up.w,1,16) where rd like "enc/%" and +mt.k = "t:mtp"' > keys; awk '{printf "delete from mt where w = \"%s\" and +k = \"t:mtp\";\n", $0}' <keys | tee /dev/stderr | sqlite3 up2k.db
+
 
 ##
 ## media
@@ -200,3 +203,4 @@ mk() { rm -rf /tmp/foo; sudo -u ed bash -c 'mkdir /tmp/foo; echo hi > /tmp/foo/b
 mk && t0="$(date)" && while true; do date -s "$(date '+ 1 hour')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; done; echo "$t0"
 mk && sudo -u ed flock /tmp/foo sleep 40 & sleep 1; ps aux | grep -E 'sleep 40$' && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; done; echo "$t0"
 mk && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; tar -cf/dev/null /tmp/foo; done; echo "$t0"
+
