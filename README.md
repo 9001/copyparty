@@ -168,15 +168,16 @@ summary: all planned features work! now please enjoy the bloatening
 ## hotkeys
 
 the browser has the following hotkeys
+* `B` toggle breadcrumbs / directory tree
 * `I/K` prev/next folder
-* `P` parent folder
+* `M` parent folder
 * `G` toggle list / grid view
 * `T` toggle thumbnails / icons
 * when playing audio:
   * `0..9` jump to 10%..90%
   * `U/O` skip 10sec back/forward
   * `J/L` prev/next song
-  * `M` play/pause (also starts playing the folder)
+  * `P` play/pause (also starts playing the folder)
 * in the grid view:
   * `S` toggle multiselect
   * `A/D` zoom
@@ -184,9 +185,9 @@ the browser has the following hotkeys
 
 ## tree-mode
 
-by default there's a breadcrumbs path; you can replace this with a tree-browser sidebar thing by clicking the 🌲
+by default there's a breadcrumbs path; you can replace this with a tree-browser sidebar thing by clicking the `🌲` or pressing the `B` hotkey
 
-click `[-]` and `[+]` to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
+click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
 
 
 ## thumbnails
@@ -279,6 +280,8 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 ## other tricks
 
 * you can link a particular timestamp in an audio file by adding it to the URL, such as `&20` / `&20s` / `&1m20` / `&t=1:20` after the `.../#af-c8960dab`
+
+* if you are using media hotkeys to switch songs and are getting tired of seeing the OSD popup which Windows doesn't let you disable, consider https://ocv.me/dev/?media-osd-bgone.ps1
 
 
 # searching
