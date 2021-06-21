@@ -26,7 +26,7 @@ class U2idx(object):
         self.timeout = self.args.srch_time
 
         if not HAVE_SQLITE3:
-            self.log("could not load sqlite3; searchign wqill be disabled")
+            self.log("your python does not have sqlite3; searching will be disabled")
             return
 
         self.cur = {}
@@ -57,6 +57,9 @@ class U2idx(object):
             raise Pebkac(500, min_ex())
 
     def get_cur(self, ptop):
+        if not HAVE_SQLITE3:
+            return None
+
         cur = self.cur.get(ptop)
         if cur:
             return cur
