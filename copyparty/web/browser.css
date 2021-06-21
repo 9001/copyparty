@@ -811,10 +811,12 @@ input.eq_gain {
 	padding: 0;
 	border-bottom: 1px solid #555;
 }
-#thumbs {
+#thumbs,
+#au_osd_cv {
 	opacity: .3;
 }
-#griden.on+#thumbs {
+#griden.on+#thumbs,
+#au_os_ctl.on+#au_osd_cv {
 	opacity: 1;
 }
 #ghead {

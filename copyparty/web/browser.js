@@ -222,10 +222,14 @@ var have_webp = null;
 
 
 var mpl = (function () {
+	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
+
 	ebi('op_player').innerHTML = (
 		'<div><h3>switches</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="start loading the next song near the end for gapless playback">preload</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np clip</a>' +
+		'<a href="#" class="tgl btn" id="au_os_ctl" tt="os integration (media hotkeys / osd)">os-ctl</a>' +
+		'<a href="#" class="tgl btn" id="au_osd_cv" tt="show album cover in osd">osd-cv</a>' +
 		'</div></div>' +
 
 		'<div><h3>playback mode</h3><div id="pb_mode">' +
@@ -238,7 +242,9 @@ var mpl = (function () {
 	var r = {
 		"pb_mode": sread('pb_mode') || 'loop-folder',
 		"preload": bcfg_get('au_preload', true),
-		"clip": bcfg_get('au_npclip', false)
+		"clip": bcfg_get('au_npclip', false),
+		"os_ctl": bcfg_get('au_os_ctl', false) && have_mctl,
+		"osd_cv": bcfg_get('au_osd_cv', true),
 	};
 
 	ebi('au_preload').onclick = function (e) {
@@ -252,6 +258,20 @@ var mpl = (function () {
 		r.clip = !r.clip;
 		bcfg_set('au_npclip', r.clip);
 		clmod(ebi('wtoggle'), 'np', r.clip && mp.au);
+	};
+
+	ebi('au_os_ctl').onclick = function (e) {
+		ev(e);
+		r.os_ctl = !r.os_ctl && have_mctl;
+		bcfg_set('au_os_ctl', r.os_ctl);
+		if (!have_mctl)
+			alert('need firefox 82+ or chrome 73+');
+	};
+
+	ebi('au_osd_cv').onclick = function (e) {
+		ev(e);
+		r.osd_cv = !r.osd_cv;
+		bcfg_set('au_osd_cv', r.osd_cv);
 	};
 
 	function draw_pb_mode() {
@@ -269,6 +289,50 @@ var mpl = (function () {
 		swrite('pb_mode', r.pb_mode);
 		draw_pb_mode();
 	}
+
+	r.announce = function () {
+		if (!r.os_ctl)
+			return;
+
+		var np = get_np()[0],
+			fns = np.file.split(' - '),
+			artist = (np.circle ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
+			tags = {
+				title: np.title || fns.slice(-1)[0]
+			};
+
+		if (artist)
+			tags.artist = artist;
+
+		if (np.album)
+			tags.album = np.album;
+
+		if (r.osd_cv) {
+			var files = QSA("#files tr>td:nth-child(2)>a[id]"),
+				cover = null;
+
+			for (var a = 0, aa = files.length; a < aa; a++) {
+				if (/^(cover|folder)\.(jpe?g|png|gif)$/.test(files[a].textContent)) {
+					cover = files[a].getAttribute('href');
+					break;
+				}
+			}
+
+			if (cover) {
+				cover += (cover.indexOf('?') === -1 ? '?' : '&') + 'th=j';
+				tags.artwork = [{ "src": cover, type: "image/jpeg" }];
+			}
+		}
+
+		navigator.mediaSession.metadata = new MediaMetadata(tags);
+		navigator.mediaSession.playbackState = mp.au.paused ? "paused" : "playing";
+		navigator.mediaSession.setActionHandler('play', playpause);
+		navigator.mediaSession.setActionHandler('pause', playpause);
+		navigator.mediaSession.setActionHandler('seekbackward', function () { seek_au_rel(-10); });
+		navigator.mediaSession.setActionHandler('seekforward', function () { seek_au_rel(10); });
+		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
+		navigator.mediaSession.setActionHandler('nexttrack', next_song);
+	};
 
 	return r;
 })();
@@ -365,6 +429,28 @@ var mp = new MPlayer();
 makeSortable(ebi('files'), mp.read_order.bind(mp));
 
 
+function get_np() {
+	var th = ebi('files').tHead.rows[0].cells,
+		tr = QS('#files tr.play').cells,
+		rv = [],
+		ra = [],
+		rt = {};
+
+	for (var a = 1, aa = th.length; a < aa; a++) {
+		var tv = tr[a].textContent,
+			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').slice(-1)[0],
+			vis = th[a].className.indexOf('min') === -1;
+
+		if (!tv)
+			continue;
+
+		(vis ? rv : ra).push(tk);
+		rt[tk] = tv;
+	}
+	return [rt, rv, ra];
+};
+
+
 // toggle player widget
 var widget = (function () {
 	var ret = {},
@@ -411,22 +497,16 @@ var widget = (function () {
 	};
 	npirc.onclick = nptxt.onclick = function (e) {
 		ev(e);
-		var th = ebi('files').tHead.rows[0].cells,
-			tr = QS('#files tr.play').cells,
-			irc = this.getAttribute('id') == 'npirc',
+		var irc = this.getAttribute('id') == 'npirc',
 			ck = irc ? '06' : '',
 			cv = irc ? '07' : '',
-			m = ck + 'np: ';
+			m = ck + 'np: ',
+			npr = get_np(),
+			npk = npr[1],
+			np = npr[0];
 
-		for (var a = 1, aa = th.length; a < aa; a++) {
-			if (th[a].className.indexOf('min') !== -1)
-				continue;
-
-			var tv = tr[a].textContent,
-				tk = a == 1 ? '' : th[a].getAttribute('name').split('/').slice(-1)[0];
-
-			m += tk + '(' + cv + tv + ck + ') // ';
-		}
+		for (var a = 0; a < npk.length; a++)
+			m += (npk[a] == 'file' ? '' : npk[a]) + '(' + cv + np[npk[a]] + ck + ') // ';
 
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
@@ -635,6 +715,11 @@ function seek_au_mul(mul) {
 		seek_au_sec(mp.au.duration * mul);
 }
 
+function seek_au_rel(sec) {
+	if (mp.au)
+		seek_au_sec(mp.au.currentTime + sec);
+}
+
 function seek_au_sec(seek) {
 	if (!mp.au)
 		return;
@@ -685,6 +770,9 @@ function playpause(e) {
 	}
 	else
 		play(0);
+
+	if (navigator.mediaSession)
+		navigator.mediaSession.playbackState = mp.au.paused ? "paused" : "playing";
 };
 
 
@@ -1124,6 +1212,7 @@ function play(tid, seek, call_depth) {
 
 		mpui.progress_updater();
 		pbar.drawbuf();
+		mpl.announce();
 		return true;
 	}
 	catch (ex) {
@@ -1206,6 +1295,8 @@ function autoplay_blocked(seek) {
 			seek_au_sec(seek);
 		else
 			mpui.progress_updater();
+
+		mpl.announce();
 	};
 	na.onclick = unblocked;
 }
@@ -1515,18 +1606,18 @@ document.onkeydown = function (e) {
 		pos = parseInt(k.slice(-1)) * 0.1;
 
 	if (pos !== -1)
-		return seek_au_mul(pos);
+		return seek_au_mul(pos) || true;
 
 	var n = k == 'KeyJ' ? -1 : k == 'KeyL' ? 1 : 0;
 	if (n !== 0)
-		return song_skip(n);
+		return song_skip(n) || true;
 
 	if (k == 'KeyP')
-		return playpause();
+		return playpause() || true;
 
 	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
 	if (n !== 0)
-		return mp.au ? seek_au_sec(mp.au.currentTime + n) : true;
+		return seek_au_rel(n) || true;
 
 	n = k == 'KeyI' ? -1 : k == 'KeyK' ? 1 : 0;
 	if (n !== 0)
@@ -1536,7 +1627,6 @@ document.onkeydown = function (e) {
 		return tree_up();
 
 	if (k == 'KeyB')
-		//return treectl.hidden ? treectl.show() : treectl.hide();
 		return treectl.hidden ? treectl.entree() : treectl.detree();
 
 	if (k == 'KeyG')
