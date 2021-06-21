@@ -359,6 +359,15 @@ function get_vpath() {
 }
 
 
+function get_pwd() {
+	var pwd = ('; ' + document.cookie).split('; cppwd=');
+	if (pwd.length < 2)
+		return null;
+
+	return pwd[1].split(';')[0];
+}
+
+
 function unix2iso(ts) {
     return new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
 }

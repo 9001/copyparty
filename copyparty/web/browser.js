@@ -320,6 +320,11 @@ var mpl = (function () {
 
 			if (cover) {
 				cover += (cover.indexOf('?') === -1 ? '?' : '&') + 'th=j';
+
+				var pwd = get_pwd();
+				if (pwd)
+					cover += '&pw=' + uricom_enc(pwd);
+
 				tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 			}
 		}
