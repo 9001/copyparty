@@ -111,7 +111,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ FUSE client (read-only)
 * browser
   * ☑ tree-view
-  * ☑ audio player
+  * ☑ audio player (with OS media controls)
   * ☑ thumbnails
     * ☑ images using Pillow
     * ☑ videos using FFmpeg
