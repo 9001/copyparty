@@ -44,6 +44,8 @@ def main():
 
     try:
         det(tf)
+    except:
+        pass  # mute
     finally:
         os.unlink(tf)
 
