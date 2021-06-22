@@ -901,7 +901,7 @@ class Up2k(object):
             except:
                 self.log("WARN: could not list files; DB corrupt?\n" + min_ex())
 
-        elif ver > DB_VER:
+        if (ver or 0) > DB_VER:
             m = "database is version {}, this copyparty only supports versions <= {}"
             raise Exception(m.format(ver, DB_VER))
 
