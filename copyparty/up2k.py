@@ -653,7 +653,7 @@ class Up2k(object):
             try:
                 parser = MParser(parser)
             except:
-                self.log("invalid argument: " + parser, 1)
+                self.log("invalid argument (could not find program): " + parser, 1)
                 return
 
             for tag in entags:

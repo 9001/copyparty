@@ -10,7 +10,6 @@ import json
 import string
 import socket
 import ctypes
-import traceback
 from datetime import datetime
 import calendar
 
@@ -50,6 +49,7 @@ class HttpCli(object):
         self.tls = hasattr(self.s, "cipher")
 
         self.bufsz = 1024 * 32
+        self.hint = None
         self.absolute_urls = False
         self.out_headers = {"Access-Control-Allow-Origin": "*"}
 
@@ -72,6 +72,7 @@ class HttpCli(object):
         """returns true if connection can be reused"""
         self.keepalive = False
         self.headers = {}
+        self.hint = None
         try:
             headerlines = read_header(self.sr)
             if not headerlines:
@@ -129,6 +130,9 @@ class HttpCli(object):
                 v = self.headers.get(k)
                 if v is not None:
                     self.log("[H] {}: \033[33m[{}]".format(k, v), 6)
+
+        if "&" in self.req and "?" not in self.req:
+            self.hint = "did you mean '?' instead of '&'"
 
         # split req into vpath + uparam
         uparam = {}
@@ -199,6 +203,9 @@ class HttpCli(object):
 
                 self.log("{}\033[0m, {}".format(str(ex), self.vpath), 3)
                 msg = "<pre>{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
+                if self.hint:
+                    msg += "hint: {}\r\n".format(self.hint)
+
                 self.reply(msg.encode("utf-8", "replace"), status=ex.code)
                 return self.keepalive
             except Pebkac:
