@@ -106,6 +106,12 @@ find -iname up2k.db | while IFS= read -r x; do sqlite3 "$x" 'select substr(w,1,1
 # unschedule mtp scan for all files somewhere under "enc/"
 sqlite3 -readonly up2k.db 'select substr(up.w,1,16) from up inner join mt on mt.w = substr(up.w,1,16) where rd like "enc/%" and +mt.k = "t:mtp"' > keys; awk '{printf "delete from mt where w = \"%s\" and +k = \"t:mtp\";\n", $0}' <keys | tee /dev/stderr | sqlite3 up2k.db
 
+# compare metadata key "key" between two databases
+sqlite3 -readonly up2k.db.key-full 'select w, v from mt where k = "key" order by w' > k1; sqlite3 -readonly up2k.db 'select w, v from mt where k = "key" order by w' > k2; ok=0; ng=0; while IFS='|' read w k2; do k1="$(grep -E "^$w" k1 | sed -r 's/.*\|//')"; [ "$k1" = "$k2" ] && ok=$((ok+1)) || { ng=$((ng+1)); printf '%3s %3s  %s\n' "$k1" "$k2" "$(sqlite3 -readonly up2k.db.key-full "select * from up where substr(w,1,16) = '$w'" | sed -r 's/\|/ | /g')"; }; done < <(cat k2); echo "match $ok   diff $ng"
+
+# actually this is much better
+sqlite3 -readonly up2k.db.key-full 'select w, v from mt where k = "key" order by w' > k1; sqlite3 -readonly up2k.db 'select mt.w, mt.v, up.rd, up.fn from mt inner join up on mt.w = substr(up.w,1,16) where mt.k = "key" order by up.rd, up.fn' > k2; ok=0; ng=0; while IFS='|' read w k2 path; do k1="$(grep -E "^$w" k1 | sed -r 's/.*\|//')"; [ "$k1" = "$k2" ] && ok=$((ok+1)) || { ng=$((ng+1)); printf '%3s %3s  %s\n' "$k1" "$k2" "$path"; }; done < <(cat k2); echo "match $ok   diff $ng"
+
 
 ##
 ## media

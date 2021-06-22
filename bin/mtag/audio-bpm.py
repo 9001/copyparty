@@ -59,8 +59,6 @@ def main():
 
     try:
         det(tf)
-    except:
-        pass
     finally:
         os.unlink(tf)
 
