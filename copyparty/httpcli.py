@@ -54,7 +54,15 @@ class HttpCli(object):
         self.out_headers = {"Access-Control-Allow-Origin": "*"}
 
     def log(self, msg, c=0):
+        ptn = self.asrv.re_pwd
+        if ptn.search(msg):
+            msg = ptn.sub(self.unpwd, msg)
+
         self.log_func(self.log_src, msg, c)
+
+    def unpwd(self, m):
+        a, b = m.groups()
+        return "=\033[7m {} \033[27m{}".format(self.asrv.iuser[a], b)
 
     def _check_nonfatal(self, ex):
         return ex.code < 400 or ex.code in [404, 429]
