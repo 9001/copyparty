@@ -115,6 +115,19 @@ def parse_ffprobe(txt):
     ret = {}  # processed
     md = {}  # raw tags
 
+    is_audio = fmt.get("format_name") in ["mp3", "ogg", "flac", "wav"]
+    if fmt.get("filename", "").split(".")[-1].lower() in ["m4a", "aac"]:
+        is_audio = True
+
+    # if audio file, ensure audio stream appears first
+    if (
+        is_audio
+        and len(streams) > 2
+        and streams[1].get("codec_type") != "audio"
+        and streams[2].get("codec_type") == "audio"
+    ):
+        streams = [fmt, streams[2], streams[1]] + streams[3:]
+
     have = {}
     for strm in streams:
         typ = strm.get("codec_type")
@@ -134,9 +147,7 @@ def parse_ffprobe(txt):
             ]
 
         if typ == "video":
-            if strm.get("DISPOSITION:attached_pic") == "1" or fmt.get(
-                "format_name"
-            ) in ["mp3", "ogg", "flac"]:
+            if strm.get("DISPOSITION:attached_pic") == "1" or is_audio:
                 continue
 
             kvm = [
@@ -180,7 +191,7 @@ def parse_ffprobe(txt):
 
             k = k[4:].strip()
             v = v.strip()
-            if k and v:
+            if k and v and k not in md:
                 md[k] = [v]
 
     for k in [".q", ".vq", ".aq"]:
