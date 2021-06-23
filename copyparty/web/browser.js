@@ -1272,7 +1272,8 @@ function show_modal(html) {
 
 
 // hide fullscreen message
-function unblocked() {
+function unblocked(e) {
+	ev(e);
 	var dom = ebi('blocked');
 	if (dom)
 		dom.parentNode.removeChild(dom);
@@ -1287,15 +1288,20 @@ function autoplay_blocked(seek) {
 
 	var go = ebi('blk_go'),
 		na = ebi('blk_na'),
-		fn = mp.tracks[mp.au.tid].split(/\//).pop();
+		tid = mp.au.tid,
+		fn = mp.tracks[tid].split(/\//).pop();
 
 	fn = uricom_dec(fn.replace(/\+/g, ' '))[0];
 
 	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function (e) {
-		if (e) e.preventDefault();
-		unblocked();
+		unblocked(e);
 		mp.au.play();
+		if (mp.au.paused) {
+			console.log("reload tid " + tid);
+			reload_mp();
+			return play(tid, seek);
+		}
 		if (seek)
 			seek_au_sec(seek);
 		else
