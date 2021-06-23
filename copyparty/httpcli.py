@@ -638,7 +638,7 @@ class HttpCli(object):
             penalty = 0.7
             t_idle = t0 - idx.p_end
             if idx.p_dur > 0.7 and t_idle < penalty:
-                m = "rate-limit ({:.1f} sec), cost {:.2f}, idle {:.2f}"
+                m = "rate-limit {:.1f} sec, cost {:.2f}, idle {:.2f}"
                 raise Pebkac(429, m.format(penalty, idx.p_dur, t_idle))
 
         if "srch" in body:

@@ -740,9 +740,17 @@ function up2k_init(subtle) {
 
     function handshakes_permitted() {
         var lim = multitask ? 1 : 0;
-        return lim >=
+
+        if (lim <
             st.todo.upload.length +
-            st.busy.upload.length;
+            st.busy.upload.length)
+            return false;
+
+        var cd = st.todo.handshake.length ? st.todo.handshake[0].cooldown : 0;
+        if (cd && cd - Date.now() > 0)
+            return false;
+
+        return true;
     }
 
     function hashing_permitted() {
@@ -1154,6 +1162,15 @@ function up2k_init(subtle) {
 
                 if (rsp.indexOf('<pre>') === 0)
                     rsp = rsp.slice(5);
+
+                if (rsp.indexOf('rate-limit ') !== -1) {
+                    var penalty = rsp.replace(/.*rate-limit /, "").split(' ')[0];
+                    console.log("rate-limit: " + penalty);
+                    t.cooldown = Date.now() + parseFloat(penalty) * 1000;
+                    st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                    st.todo.handshake.unshift(t);
+                    return;
+                }
 
                 st.bytes.uploaded += t.size;
                 if (rsp.indexOf('partial upload exists') !== -1 ||
