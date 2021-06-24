@@ -1296,18 +1296,10 @@ function autoplay_blocked(seek) {
 	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function (e) {
 		unblocked(e);
-		mp.au.play();
-		if (mp.au.paused) {
-			console.log("reload tid " + tid);
-			reload_mp();
-			return play(tid, seek);
-		}
-		if (seek)
-			seek_au_sec(seek);
-		else
-			mpui.progress_updater();
-
-		mpl.announce();
+		// chrome 91 may permanently taint on a failed play()
+		// depending on win10 settings or something? idk
+		mp.au_native = mp.au_ogvjs = null;
+		play(tid, seek);
 	};
 	na.onclick = unblocked;
 }
