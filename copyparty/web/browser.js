@@ -345,14 +345,15 @@ var mpl = (function () {
 
 // extract songs + add play column
 function MPlayer() {
-	this.id = Date.now();
-	this.au = null;
-	this.au_native = null;
-	this.au_native2 = null;
-	this.au_ogvjs = null;
-	this.au_ogvjs2 = null;
-	this.tracks = {};
-	this.order = [];
+	var r = this;
+	r.id = Date.now();
+	r.au = null;
+	r.au_native = null;
+	r.au_native2 = null;
+	r.au_ogvjs = null;
+	r.au_ogvjs2 = null;
+	r.tracks = {};
+	r.order = [];
 
 	var re_audio = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i,
 		trs = QSA('#files tbody tr');
@@ -367,32 +368,33 @@ function MPlayer() {
 
 		if (m) {
 			var tid = link.getAttribute('id');
-			this.order.push(tid);
-			this.tracks[tid] = url;
+			r.order.push(tid);
+			r.tracks[tid] = url;
 			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">play</a></td>';
 			ebi('a' + tid).onclick = ev_play;
 		}
 	}
 
-	this.vol = sread('vol');
-	if (this.vol !== null)
-		this.vol = parseFloat(this.vol);
+	r.vol = sread('vol');
+	if (r.vol !== null)
+		r.vol = parseFloat(r.vol);
 	else
-		this.vol = 0.5;
+		r.vol = 0.5;
 
-	this.expvol = function () {
-		return 0.5 * this.vol + 0.5 * this.vol * this.vol;
+	r.expvol = function (v) {
+		return 0.5 * v + 0.5 * v * v;
 	};
 
-	this.setvol = function (vol) {
-		this.vol = Math.max(Math.min(vol, 1), 0);
+	r.setvol = function (vol) {
+		r.vol = Math.max(Math.min(vol, 1), 0);
 		swrite('vol', vol);
+		r.stopfade(true);
 
-		if (this.au)
-			this.au.volume = this.expvol();
+		if (r.au)
+			r.au.volume = r.expvol(r.vol);
 	};
 
-	this.read_order = function () {
+	r.read_order = function () {
 		var order = [],
 			links = QSA('#files>tbody>tr>td:nth-child(1)>a');
 
@@ -403,24 +405,69 @@ function MPlayer() {
 
 			order.push(tid.slice(1));
 		}
-		this.order = order;
+		r.order = order;
 	};
 
-	this.preload = function (url) {
+	r.fdir = 0;
+	r.fvol = -1;
+	r.ftid = -1;
+	r.ftimer = null;
+	r.fade_in = function () {
+		r.fvol = 0;
+		r.fdir = 0.025;
+		if (r.au) {
+			r.ftid = r.au.tid;
+			r.au.play();
+			fader();
+		}
+	};
+	r.fade_out = function () {
+		r.fvol = r.vol;
+		r.fdir = -0.05;
+		r.ftid = r.au.tid;
+		fader();
+	};
+	r.stopfade = function (hard) {
+		clearTimeout(r.ftimer);
+		if (hard)
+			r.ftid = -1;
+	}
+	function fader() {
+		r.stopfade();
+		if (!r.au || r.au.tid !== r.ftid)
+			return;
+
+		var done = true;
+		r.fvol += r.fdir;
+		if (r.fvol < 0) {
+			r.fvol = 0;
+			r.au.pause();
+		}
+		else if (r.fvol > r.vol)
+			r.fvol = r.vol;
+		else
+			done = false;
+
+		r.au.volume = r.expvol(r.fvol);
+		if (!done)
+			setTimeout(fader, 10);
+	}
+
+	r.preload = function (url) {
 		var au = null;
 		if (need_ogv_for(url)) {
 			au = mp.au_ogvjs2;
 			if (!au && window['OGVPlayer']) {
 				au = new OGVPlayer();
 				au.preload = "auto";
-				this.au_ogvjs2 = au;
+				r.au_ogvjs2 = au;
 			}
 		} else {
 			au = mp.au_native2;
 			if (!au) {
 				au = new Audio();
 				au.preload = "auto";
-				this.au_native2 = au;
+				r.au_native2 = au;
 			}
 		}
 		if (au) {
@@ -735,9 +782,8 @@ function seek_au_sec(seek) {
 
 	mp.au.currentTime = seek;
 
-	// ogv.js breaks on .play() during playback
-	if (mp.au === mp.au_native)
-		mp.au.play();
+	if (mp.au.paused)
+		mp.fade_in();
 
 	mpui.progress_updater();
 }
@@ -759,6 +805,10 @@ function next_song(e) {
 }
 function prev_song(e) {
 	ev(e);
+
+	if (mp.au && !mp.au.paused && mp.au.currentTime > 3)
+		return seek_au_sec(0);
+
 	return song_skip(-1);
 }
 
@@ -767,9 +817,9 @@ function playpause(e) {
 	ev(e);
 	if (mp.au) {
 		if (mp.au.paused)
-			mp.au.play();
+			mp.fade_in();
 		else
-			mp.au.pause();
+			mp.fade_out();
 
 		mpui.progress_updater();
 	}
@@ -788,7 +838,8 @@ function playpause(e) {
 	ebi('bnext').onclick = next_song;
 	ebi('barpos').onclick = function (e) {
 		if (!mp.au) {
-			return play(0);
+			play(0);
+			return mp.fade_in();
 		}
 
 		var rect = pbar.buf.can.getBoundingClientRect(),
@@ -863,7 +914,12 @@ var mpui = (function () {
 // event from play button next to a file in the list
 function ev_play(e) {
 	ev(e);
+
+	var fade = !mp.au || mp.au.paused;
 	play(this.getAttribute('id').slice(1));
+	if (fade)
+		mp.fade_in();
+
 	return false;
 }
 
@@ -1106,6 +1162,8 @@ function play(tid, seek, call_depth) {
 	if (mp.order.length == 0)
 		return console.log('no audio found wait what');
 
+	mp.stopfade(true);
+
 	var tn = tid;
 	if ((tn + '').indexOf('f-') === 0)
 		tn = mp.order.indexOf(tn);
@@ -1181,7 +1239,7 @@ function play(tid, seek, call_depth) {
 
 	mp.au.tid = tid;
 	mp.au.src = url + (url.indexOf('?') < 0 ? '?cache' : '&cache');
-	mp.au.volume = mp.expvol();
+	mp.au.volume = mp.expvol(mp.vol);
 	var oid = 'a' + tid;
 	setclass(oid, 'play act');
 	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
@@ -1300,6 +1358,7 @@ function autoplay_blocked(seek) {
 		// depending on win10 settings or something? idk
 		mp.au_native = mp.au_ogvjs = null;
 		play(tid, seek);
+		mp.fade_in();
 	};
 	na.onclick = unblocked;
 }
@@ -1611,9 +1670,11 @@ document.onkeydown = function (e) {
 	if (pos !== -1)
 		return seek_au_mul(pos) || true;
 
-	var n = k == 'KeyJ' ? -1 : k == 'KeyL' ? 1 : 0;
-	if (n !== 0)
-		return song_skip(n) || true;
+	if (k == 'KeyJ')
+		return prev_song() || true;
+
+	if (k == 'KeyL')
+		return next_song() || true;
 
 	if (k == 'KeyP')
 		return playpause() || true;
