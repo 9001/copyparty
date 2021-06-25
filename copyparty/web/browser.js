@@ -243,7 +243,7 @@ var mpl = (function () {
 		"pb_mode": sread('pb_mode') || 'loop-folder',
 		"preload": bcfg_get('au_preload', true),
 		"clip": bcfg_get('au_npclip', false),
-		"os_ctl": bcfg_get('au_os_ctl', false) && have_mctl,
+		"os_ctl": bcfg_get('au_os_ctl', true) && have_mctl,
 		"osd_cv": bcfg_get('au_osd_cv', true),
 	};
 
