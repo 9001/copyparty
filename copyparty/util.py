@@ -1030,7 +1030,13 @@ def guess_mime(url, fallback="application/octet-stream"):
     except:
         return fallback
 
-    return MIMES.get(ext) or mimetypes.guess_type(url)[0] or fallback
+    ret = MIMES.get(ext) or mimetypes.guess_type(url)[0] or fallback
+
+    if ";" not in ret:
+        if ret.startswith("text/") or ret.endswith("/javascript"):
+            ret += "; charset=UTF-8"
+    
+    return ret
 
 
 def runcmd(*argv):

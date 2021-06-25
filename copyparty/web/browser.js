@@ -1664,7 +1664,7 @@ document.onkeydown = function (e) {
 	if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey || e.isComposing)
 		return;
 
-	var k = (e.code + ''), pos = -1;
+	var k = (e.code + ''), pos = -1, n;
 	if (k.indexOf('Digit') === 0)
 		pos = parseInt(k.slice(-1)) * 0.1;
 
