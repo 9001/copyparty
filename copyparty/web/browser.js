@@ -637,12 +637,15 @@ var pbar = (function () {
 	}
 
 	r.drawbuf = function () {
+		var bc = r.buf,
+			bctx = bc.ctx;
+
+		bctx.clearRect(0, 0, bc.w, bc.h);
+
 		if (!mp.au)
 			return;
 
-		var bc = r.buf,
-			bctx = bc.ctx,
-			sm = bc.w * 1.0 / mp.au.duration,
+		var sm = bc.w * 1.0 / mp.au.duration,
 			gk = bc.h + '' + light;
 
 		if (gradh != gk) {
@@ -650,7 +653,6 @@ var pbar = (function () {
 			grad = glossy_grad(bc, 85, [35, 40, 37, 35], light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
 		}
 		bctx.fillStyle = grad;
-		bctx.clearRect(0, 0, bc.w, bc.h);
 		for (var a = 0; a < mp.au.buffered.length; a++) {
 			var x1 = sm * mp.au.buffered.start(a),
 				x2 = sm * mp.au.buffered.end(a);
@@ -660,15 +662,17 @@ var pbar = (function () {
 	};
 
 	r.drawpos = function () {
+		var bc = r.buf,
+			pc = r.pos,
+			pctx = pc.ctx;
+
+		pctx.clearRect(0, 0, pc.w, pc.h);
+
 		if (!mp.au || isNaN(mp.au.duration) || isNaN(mp.au.currentTime))
 			return;  // not-init || unsupp-codec
 
-		var bc = r.buf,
-			pc = r.pos,
-			pctx = pc.ctx,
-			sm = bc.w * 1.0 / mp.au.duration;
+		var sm = bc.w * 1.0 / mp.au.duration;
 
-		pctx.clearRect(0, 0, pc.w, pc.h);
 		pctx.fillStyle = light ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
 		for (var p = 1, mins = mp.au.duration / 10; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
@@ -2917,6 +2921,7 @@ function reload_mp() {
 	mpl.stop();
 	widget.close();
 	mp = new MPlayer();
+	setTimeout(pbar.onresize, 1);
 }
 
 
