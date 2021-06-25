@@ -1535,8 +1535,22 @@ var thegrid = (function () {
 			href = this.getAttribute('href'),
 			aplay = ebi('a' + oth.getAttribute('id')),
 			is_img = /\.(gif|jpe?g|png|webp)(\?|$)/i.test(href),
+			in_tree = null,
+			have_sel = QS('#files tr.sel'),
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
+
+		if (/\/(\?|$)/.test(href)) {
+			var ta = QSA('#treeul li>a+a'),
+				ahref = this.href;
+
+			for (var a = 0, aa = ta.length; a < aa; a++) {
+				if (ta[a].href == ahref) {
+					in_tree = ta[a];
+					break;
+				}
+			}
+		}
 
 		if (r.sel) {
 			td.click();
@@ -1545,7 +1559,10 @@ var thegrid = (function () {
 		else if (widget.is_open && aplay)
 			aplay.click();
 
-		else if (!is_img && QS('#files tr.sel'))
+		else if (in_tree && !have_sel)
+			in_tree.click();
+
+		else if (!is_img && have_sel)
 			window.open(href, '_blank');
 
 		else return true;
@@ -1561,7 +1578,6 @@ var thegrid = (function () {
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var tr = ebi(ths[a].getAttribute('ref')).closest('tr');
 			ths[a].setAttribute('class', tr.getAttribute('class'));
-			ths[a].onclick = gclick;
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');
 		if (uns)
@@ -1619,6 +1635,11 @@ var thegrid = (function () {
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ebi('ggrid').innerHTML = html.join('\n');
+
+		var ths = QSA('#ggrid>a');
+		for (var a = 0, aa = ths.length; a < aa; a++)
+			ths[a].onclick = gclick;
+
 		r.dirty = false;
 		r.bagit();
 		r.loadsel();
