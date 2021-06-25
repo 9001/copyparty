@@ -181,6 +181,9 @@ class HttpCli(object):
         self.rvol, self.wvol, self.avol = [[], [], []]
         self.asrv.vfs.user_tree(self.uname, self.rvol, self.wvol, self.avol)
 
+        if pwd and "pw" in self.ouparam and pwd != cookies.get("cppwd"):
+            self.out_headers["Set-Cookie"] = self.get_pwd_cookie(pwd)[0]
+
         ua = self.headers.get("user-agent", "")
         self.is_rclone = ua.startswith("rclone/")
         if self.is_rclone:
@@ -758,6 +761,12 @@ class HttpCli(object):
         pwd = self.parser.require("cppwd", 64)
         self.parser.drop()
 
+        ck, msg = self.get_pwd_cookie(pwd)
+        html = self.j2("msg", h1=msg, h2='<a href="/">ack</a>', redir="/")
+        self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
+        return True
+
+    def get_pwd_cookie(self, pwd):
         if pwd in self.asrv.iuser:
             msg = "login ok"
             dt = datetime.utcfromtimestamp(time.time() + 60 * 60 * 24 * 365)
@@ -768,9 +777,7 @@ class HttpCli(object):
             exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
         ck = "cppwd={}; Path=/; Expires={}; SameSite=Lax".format(pwd, exp)
-        html = self.j2("msg", h1=msg, h2='<a href="/">ack</a>', redir="/")
-        self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
-        return True
+        return [ck, msg]
 
     def handle_mkdir(self):
         new_dir = self.parser.require("name", 512)
