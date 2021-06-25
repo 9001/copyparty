@@ -15,11 +15,6 @@
 }
 #ggrid>a[href$="/"]:before {
 	content: '📂';
-    display: block;
-    position: absolute;
-    margin: -.1em -.4em;
-    text-shadow: 0 0 .1em #000;
-    font-size: 2em;
 }
 
 
@@ -27,8 +22,11 @@
 #ggrid>a:before {
     display: block;
     position: absolute;
-    margin: -.1em -.4em;
+	padding: .3em 0;
+    margin: -.4em;
     text-shadow: 0 0 .1em #000;
+	background: linear-gradient(135deg,rgba(255,255,255,0) 50%,rgba(255,255,255,0.2));
+	border-radius: .3em;
     font-size: 2em;
 }
 
