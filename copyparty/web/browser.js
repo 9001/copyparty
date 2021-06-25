@@ -1608,6 +1608,8 @@ var thegrid = (function () {
 
 			if (r.thumbs) {
 				ihref += (ihref.indexOf('?') === -1 ? '?' : '&') + 'th=' + (have_webp ? 'w' : 'j');
+				if (href == "#")
+					ihref = '/.cpr/ico/⏏️';
 			}
 			else if (isdir) {
 				ihref = '/.cpr/ico/folder';
