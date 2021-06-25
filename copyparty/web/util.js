@@ -67,6 +67,9 @@ function ev(e) {
     if (e.stopPropagation)
         e.stopPropagation();
 
+    if (e.stopImmediatePropagation)
+        e.stopImmediatePropagation();
+
     e.returnValue = false;
     return e;
 }
@@ -360,11 +363,11 @@ function get_vpath() {
 
 
 function get_pwd() {
-	var pwd = ('; ' + document.cookie).split('; cppwd=');
-	if (pwd.length < 2)
-		return null;
+    var pwd = ('; ' + document.cookie).split('; cppwd=');
+    if (pwd.length < 2)
+        return null;
 
-	return pwd[1].split(';')[0];
+    return pwd[1].split(';')[0];
 }
 
 

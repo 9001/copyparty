@@ -1532,7 +1532,9 @@ var thegrid = (function () {
 			return true;
 
 		var oth = ebi(this.getAttribute('ref')),
+			href = this.getAttribute('href'),
 			aplay = ebi('a' + oth.getAttribute('id')),
+			is_img = /\.(gif|jpe?g|png|webp)(\?|$)/i.test(href),
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
@@ -1543,11 +1545,11 @@ var thegrid = (function () {
 		else if (widget.is_open && aplay)
 			aplay.click();
 
-		else if (QS('#files tr.sel'))
-			window.open(this.getAttribute('href'), '_blank');
+		else if (!is_img && QS('#files tr.sel'))
+			window.open(href, '_blank');
 
 		else return true;
-		return ev(e);
+		ev(e);
 	}
 
 	r.loadsel = function () {
