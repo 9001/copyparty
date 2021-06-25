@@ -1541,11 +1541,11 @@ var thegrid = (function () {
 			tr = td.parentNode;
 
 		if (/\/(\?|$)/.test(href)) {
-			var ta = QSA('#treeul li>a+a'),
-				ahref = this.href;
+			var ta = QSA('#treeul a.hl+ul>li>a+a'),
+				txt = oth.textContent.slice(0, -1);
 
 			for (var a = 0, aa = ta.length; a < aa; a++) {
-				if (ta[a].href == ahref) {
+				if (ta[a].textContent == txt) {
 					in_tree = ta[a];
 					break;
 				}
