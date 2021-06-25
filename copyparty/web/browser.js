@@ -1203,8 +1203,11 @@ function play(tid, is_ev, seek, call_depth) {
 	mp.stopfade(true);
 
 	var tn = tid;
-	if ((tn + '').indexOf('f-') === 0)
+	if ((tn + '').indexOf('f-') === 0) {
 		tn = mp.order.indexOf(tn);
+		if (tn < 0)
+			return;
+	}
 
 	if (tn >= mp.order.length) {
 		if (mpl.pb_mode == 'loop-folder') {
@@ -1402,8 +1405,7 @@ function autoplay_blocked(seek) {
 }
 
 
-// autoplay linked track
-(function () {
+function play_linked() {
 	var v = location.hash;
 	if (v && v.indexOf('#af-') === 0) {
 		var id = v.slice(2).split('&');
@@ -1419,7 +1421,7 @@ function autoplay_blocked(seek) {
 
 		return play(id[0], false, parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0));
 	}
-})();
+};
 
 
 var thegrid = (function () {
@@ -1531,7 +1533,7 @@ var thegrid = (function () {
 
 		var oth = ebi(this.getAttribute('ref')),
 			aplay = ebi('a' + oth.getAttribute('id')),
-			td = oth.parentNode.nextSibling,
+			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
 		if (r.sel) {
@@ -1555,8 +1557,9 @@ var thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
+			var tr = ebi(ths[a].getAttribute('ref')).closest('tr');
+			ths[a].setAttribute('class', tr.getAttribute('class'));
 			ths[a].onclick = gclick;
-			ths[a].setAttribute('class', ebi(ths[a].getAttribute('ref')).parentNode.parentNode.getAttribute('class'));
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');
 		if (uns)
@@ -2985,3 +2988,4 @@ function reload_browser(not_mp) {
 reload_browser(true);
 mukey.render();
 msel.render();
+play_linked();
