@@ -2914,6 +2914,7 @@ function reload_mp() {
 		mp.au.pause();
 		mp.au = null;
 	}
+	mpl.stop();
 	widget.close();
 	mp = new MPlayer();
 }
