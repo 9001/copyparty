@@ -290,6 +290,13 @@ var mpl = (function () {
 		draw_pb_mode();
 	}
 
+	r.pp = function () {
+		if (!r.os_ctl)
+			return;
+
+		navigator.mediaSession.playbackState = mp.au && !mp.au.paused ? "playing" : "paused";
+	};
+
 	r.announce = function () {
 		if (!r.os_ctl)
 			return;
@@ -330,13 +337,21 @@ var mpl = (function () {
 		}
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
-		navigator.mediaSession.playbackState = mp.au.paused ? "paused" : "playing";
 		navigator.mediaSession.setActionHandler('play', playpause);
 		navigator.mediaSession.setActionHandler('pause', playpause);
 		navigator.mediaSession.setActionHandler('seekbackward', function () { seek_au_rel(-10); });
 		navigator.mediaSession.setActionHandler('seekforward', function () { seek_au_rel(10); });
 		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
 		navigator.mediaSession.setActionHandler('nexttrack', next_song);
+		r.pp();
+	};
+
+	r.stop = function () {
+		if (!r.os_ctl || !navigator.mediaSession.metadata)
+			return;
+
+		navigator.mediaSession.metadata = null;
+		navigator.mediaSession.playbackState = "paused";
 	};
 
 	return r;
@@ -418,6 +433,7 @@ function MPlayer() {
 		if (r.au) {
 			r.ftid = r.au.tid;
 			r.au.play();
+			mpl.pp();
 			fader();
 		}
 	};
@@ -442,6 +458,7 @@ function MPlayer() {
 		if (r.fvol < 0) {
 			r.fvol = 0;
 			r.au.pause();
+			mpl.pp();
 		}
 		else if (r.fvol > r.vol)
 			r.fvol = r.vol;
@@ -827,8 +844,7 @@ function playpause(e) {
 	else
 		play(0, true);
 
-	if (navigator.mediaSession)
-		navigator.mediaSession.playbackState = mp.au.paused ? "paused" : "playing";
+	mpl.pp();
 };
 
 
