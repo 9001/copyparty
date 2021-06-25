@@ -814,6 +814,7 @@ function prev_song(e) {
 
 
 function playpause(e) {
+	// must be event-chain
 	ev(e);
 	if (mp.au) {
 		if (mp.au.paused)
@@ -824,7 +825,7 @@ function playpause(e) {
 		mpui.progress_updater();
 	}
 	else
-		play(0);
+		play(0, true);
 
 	if (navigator.mediaSession)
 		navigator.mediaSession.playbackState = mp.au.paused ? "paused" : "playing";
@@ -838,7 +839,7 @@ function playpause(e) {
 	ebi('bnext').onclick = next_song;
 	ebi('barpos').onclick = function (e) {
 		if (!mp.au) {
-			play(0);
+			play(0, true);
 			return mp.fade_in();
 		}
 
@@ -916,7 +917,7 @@ function ev_play(e) {
 	ev(e);
 
 	var fade = !mp.au || mp.au.paused;
-	play(this.getAttribute('id').slice(1));
+	play(this.getAttribute('id').slice(1), true);
 	if (fade)
 		mp.fade_in();
 
@@ -1158,7 +1159,7 @@ var audio_eq = (function () {
 
 
 // plays the tid'th audio file on the page
-function play(tid, seek, call_depth) {
+function play(tid, is_ev, seek, call_depth) {
 	if (mp.order.length == 0)
 		return console.log('no audio found wait what');
 
@@ -1205,7 +1206,7 @@ function play(tid, seek, call_depth) {
 		}
 		else if (window['OGVPlayer']) {
 			mp.au = mp.au_ogvjs = new OGVPlayer();
-			attempt_play = false;
+			attempt_play = is_ev;
 			mp.au.addEventListener('error', evau_error, true);
 			mp.au.addEventListener('progress', pbar.drawpos);
 			mp.au.addEventListener('ended', next_song);
@@ -1218,7 +1219,7 @@ function play(tid, seek, call_depth) {
 			show_modal('<h1>loading ogv.js</h1><h2>thanks apple</h2>');
 
 			import_js('/.cpr/deps/ogv.js', function () {
-				play(tid, seek, 1);
+				play(tid, false, seek, 1);
 			});
 
 			return;
@@ -1357,7 +1358,7 @@ function autoplay_blocked(seek) {
 		// chrome 91 may permanently taint on a failed play()
 		// depending on win10 settings or something? idk
 		mp.au_native = mp.au_ogvjs = null;
-		play(tid, seek);
+		play(tid, true, seek);
 		mp.fade_in();
 	};
 	na.onclick = unblocked;
@@ -1379,7 +1380,7 @@ function autoplay_blocked(seek) {
 		if (!m)
 			return play(id[0]);
 
-		return play(id[0], parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0));
+		return play(id[0], false, parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0));
 	}
 })();
 
