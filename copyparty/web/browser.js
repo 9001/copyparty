@@ -858,7 +858,10 @@ function playpause(e) {
 	ebi('bplay').onclick = playpause;
 	ebi('bprev').onclick = prev_song;
 	ebi('bnext').onclick = next_song;
-	ebi('barpos').onclick = function (e) {
+
+	var bar = ebi('barpos');
+
+	bar.onclick = function (e) {
 		if (!mp.au) {
 			play(0, true);
 			return mp.fade_in();
@@ -869,6 +872,19 @@ function playpause(e) {
 
 		seek_au_mul(x * 1.0 / rect.width);
 	};
+
+	if (!is_touch)
+		bar.onwheel = function (e) {
+			var dist = Math.sign(e.deltaY) * 15;
+			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
+				dist = e.deltaY;
+
+			if (!dist || !mp.au)
+				return true;
+
+			seek_au_rel(dist);
+			ev(e);
+		};
 })();
 
 
