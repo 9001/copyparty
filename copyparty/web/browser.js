@@ -522,37 +522,38 @@ function get_np() {
 
 // toggle player widget
 var widget = (function () {
-	var ret = {},
+	var r = {},
 		widget = ebi('widget'),
 		wtico = ebi('wtico'),
 		nptxt = ebi('nptxt'),
 		npirc = ebi('npirc'),
 		touchmode = false,
-		side_open = false,
 		was_paused = true;
 
-	ret.open = function () {
-		if (side_open)
+	r.is_open = false;
+
+	r.open = function () {
+		if (r.is_open)
 			return false;
 
 		widget.className = 'open';
-		side_open = true;
+		r.is_open = true;
 		return true;
 	};
-	ret.close = function () {
-		if (!side_open)
+	r.close = function () {
+		if (!r.is_open)
 			return false;
 
 		widget.className = '';
-		side_open = false;
+		r.is_open = false;
 		return true;
 	};
-	ret.toggle = function (e) {
-		ret.open() || ret.close();
+	r.toggle = function (e) {
+		r.open() || r.close();
 		ev(e);
 		return false;
 	};
-	ret.paused = function (paused) {
+	r.paused = function (paused) {
 		if (was_paused != paused) {
 			was_paused = paused;
 			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
@@ -560,7 +561,7 @@ var widget = (function () {
 	};
 	wtico.onclick = function (e) {
 		if (!touchmode)
-			ret.toggle(e);
+			r.toggle(e);
 
 		return false;
 	};
@@ -591,7 +592,7 @@ var widget = (function () {
 			document.body.removeChild(o);
 		}, 500);
 	};
-	return ret;
+	return r;
 })();
 
 
@@ -1508,34 +1509,37 @@ var thegrid = (function () {
 	}
 	setsz();
 
-	function seltgl(e) {
+	function gclick(e) {
 		if (e && e.ctrlKey)
 			return true;
 
-		ev(e);
 		var oth = ebi(this.getAttribute('ref')),
+			aplay = ebi('a' + oth.getAttribute('id')),
 			td = oth.parentNode.nextSibling,
 			tr = td.parentNode;
 
-		td.click();
-		this.setAttribute('class', tr.getAttribute('class'));
-	}
+		if (r.sel) {
+			td.click();
+			this.setAttribute('class', tr.getAttribute('class'));
+		}
+		else if (widget.is_open && aplay)
+			aplay.click();
 
-	function bgopen(e) {
-		ev(e);
-		var url = this.getAttribute('href');
-		window.open(url, '_blank');
+		else if (QS('#files tr.sel'))
+			window.open(this.getAttribute('href'), '_blank');
+
+		else return true;
+		return ev(e);
 	}
 
 	r.loadsel = function () {
 		if (r.dirty)
 			return;
 
-		var ths = QSA('#ggrid>a'),
-			have_sel = !!QS('#files tr.sel');
+		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			ths[a].onclick = r.sel ? seltgl : have_sel ? bgopen : null;
+			ths[a].onclick = gclick;
 			ths[a].setAttribute('class', ebi(ths[a].getAttribute('ref')).parentNode.parentNode.getAttribute('class'));
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');

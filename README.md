@@ -198,6 +198,8 @@ it does static images with Pillow and uses FFmpeg for video files, so you may wa
 
 images named `folder.jpg` and `folder.png` become the thumbnail of the folder they're in
 
+in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
+
 
 ## zip downloads
 
