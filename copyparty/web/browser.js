@@ -875,7 +875,7 @@ function playpause(e) {
 
 	if (!is_touch)
 		bar.onwheel = function (e) {
-			var dist = Math.sign(e.deltaY) * 15;
+			var dist = Math.sign(e.deltaY) * 10;
 			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
 				dist = e.deltaY;
 
