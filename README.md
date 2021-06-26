@@ -20,7 +20,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 * top
     * [quickstart](#quickstart)
-        * [debian](#debian)
+        * [on debian](#on-debian)
     * [notes](#notes)
     * [status](#status)
 * [bugs](#bugs)
@@ -69,6 +69,7 @@ some recommended options:
 * `-e2dsa` enables general file indexing, see [search configuration](#search-configuration)
 * `-e2ts` enables audio metadata indexing (needs either FFprobe or mutagen), see [optional dependencies](#optional-dependencies)
 * `-v /mnt/music:/music:r:afoo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, with user `foo` as `a`dmin (read/write), password `bar`
+  * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
   * replace `:r:afoo` with `:rfoo` to only make the folder readable by `foo` and nobody else
   * in addition to `r`ead and `a`dmin, `w`rite makes a folder write-only, so cannot list/access files in it
 * `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access
@@ -77,17 +78,18 @@ you may also want these, especially on servers:
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for better https)
 
-### debian
+
+### on debian
 
 recommended steps to enable audio metadata and thumbnails (from images and videos):
 
 * as root, run the following:  
-  `apt install python3 python3-pip ffmpeg python3-dev`
+  `apt install python3 python3-pip python3-dev ffmpeg`
 
 * then, as the user which will be running copyparty (so hopefully not root), run this:  
   `python3 -m pip install --user -U Pillow pillow-avif-plugin`
 
-(`pyheif-pillow-opener` was skipped because apparently debian is too old to build it)
+(skipped `pyheif-pillow-opener` because apparently debian is too old to build it)
 
 
 ## notes
