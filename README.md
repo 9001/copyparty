@@ -81,10 +81,10 @@ you may also want these, especially on servers:
 
 recommended steps to enable audio metadata and thumbnails (from images and videos):
 
-* as root, run the following:
+* as root, run the following:  
   `apt install python3 python3-pip ffmpeg python3-dev`
 
-* then, as the user which will be running copyparty (so hopefully not root), run this:
+* then, as the user which will be running copyparty (so hopefully not root), run this:  
   `python3 -m pip install --user -U Pillow pillow-avif-plugin`
 
 (`pyheif-pillow-opener` was skipped because apparently debian is too old to build it)
