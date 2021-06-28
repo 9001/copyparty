@@ -193,9 +193,11 @@ the browser has the following hotkeys
   * `U/O` skip 10sec back/forward
   * `J/L` prev/next song
   * `P` play/pause (also starts playing the folder)
+* when tree-sidebar is open:
+  * `A/D` adjust tree width
 * in the grid view:
   * `S` toggle multiselect
-  * `A/D` zoom
+  * shift+`A/D` zoom
 
 
 ## tree-mode

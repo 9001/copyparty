@@ -1729,10 +1729,14 @@ document.onkeydown = function (e) {
 	if (!document.activeElement || document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
 		return;
 
-	if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey || e.isComposing)
+	if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
 		return;
 
 	var k = (e.code + ''), pos = -1, n;
+
+	if (e.shiftKey && k != 'KeyA' && k != 'KeyD')
+		return;
+
 	if (k.indexOf('Digit') === 0)
 		pos = parseInt(k.slice(-1)) * 0.1;
 
@@ -1767,6 +1771,14 @@ document.onkeydown = function (e) {
 
 	if (k == 'KeyT')
 		return ebi('thumbs').click();
+
+	if (!treectl.hidden && (!e.shiftKey || !thegrid.en)) {
+		if (k == 'KeyA')
+			return QS('#twig').click();
+
+		if (k == 'KeyD')
+			return QS('#twobytwo').click();
+	}
 
 	if (thegrid.en) {
 		if (k == 'KeyS')
