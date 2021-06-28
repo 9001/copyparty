@@ -55,7 +55,7 @@ class HttpCli(object):
 
     def log(self, msg, c=0):
         ptn = self.asrv.re_pwd
-        if ptn.search(msg):
+        if ptn and ptn.search(msg):
             msg = ptn.sub(self.unpwd, msg)
 
         self.log_func(self.log_src, msg, c)

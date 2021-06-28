@@ -693,8 +693,10 @@ class AuthSrv(object):
             self.user = user
             self.iuser = {v: k for k, v in user.items()}
 
+            self.re_pwd = None
             pwds = [re.escape(x) for x in self.iuser.keys()]
-            self.re_pwd = re.compile("=(" + "|".join(pwds) + ")([]&; ]|$)")
+            if pwds:
+                self.re_pwd = re.compile("=(" + "|".join(pwds) + ")([]&; ]|$)")
 
         # import pprint
         # pprint.pprint({"usr": user, "rd": mread, "wr": mwrite, "mnt": mount})
