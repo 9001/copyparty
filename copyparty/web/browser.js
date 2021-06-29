@@ -1879,6 +1879,7 @@ document.onkeydown = function (e) {
 	}
 
 	var search_timeout,
+		defer_timeout,
 		search_in_progress = 0;
 
 	function ev_search_input() {
@@ -1893,9 +1894,29 @@ document.onkeydown = function (e) {
 		if (id != "q_raw")
 			encode_query();
 
-		clearTimeout(search_timeout);
-		if (Date.now() - search_in_progress > 30 * 1000)
+		set_vq();
+
+		clearTimeout(defer_timeout);
+		defer_timeout = setTimeout(try_search, 2000);
+		try_search();
+	}
+
+	function try_search() {
+		if (Date.now() - search_in_progress > 30 * 1000) {
+			clearTimeout(defer_timeout);
+			clearTimeout(search_timeout);
 			search_timeout = setTimeout(do_search, 200);
+		}
+	}
+
+	function set_vq() {
+		if (search_in_progress)
+			return;
+
+		var q = ebi('q_raw').value,
+			vq = ebi('files').getAttribute('q_raw');
+
+		srch_msg(false, (q == vq) ? '' : 'search results below are from a previous query:\n  ' + (vq ? vq : '(*)'));
 	}
 
 	function encode_query() {
@@ -1965,7 +1986,8 @@ document.onkeydown = function (e) {
 		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onreadystatechange = xhr_search_results;
 		xhr.ts = Date.now();
-		xhr.send(JSON.stringify({ "q": ebi('q_raw').value }));
+		xhr.q_raw = ebi('q_raw').value;
+		xhr.send(JSON.stringify({ "q": xhr.q_raw }));
 	}
 
 	function xhr_search_results() {
@@ -2036,6 +2058,8 @@ document.onkeydown = function (e) {
 
 		ofiles.innerHTML = html.join('\n');
 		ofiles.setAttribute("ts", this.ts);
+		ofiles.setAttribute("q_raw", this.q_raw);
+		set_vq();
 		mukey.render();
 		reload_browser();
 		filecols.set_style(['File Name']);

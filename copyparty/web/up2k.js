@@ -1,7 +1,5 @@
 "use strict";
 
-window.onerror = vis_exh;
-
 
 function goto_up2k() {
     if (up2k === false)
@@ -32,7 +30,7 @@ catch (ex) {
     }
     catch (ex) { }
 }
-window['treectl'].onscroll();  // uhh
+treectl.onscroll();
 
 
 function up2k_flagbus() {

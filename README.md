@@ -614,8 +614,6 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* ctrl-click overrides onclick (tree, ...)
-* indicate dropped queries in search ui
 * readme.md as epilogue
 * reduce up2k roundtrips
   * start from a chunk index and just go

@@ -32,6 +32,9 @@ function esc(txt) {
     });
 }
 function vis_exh(msg, url, lineNo, columnNo, error) {
+    if (!window.onerror)
+        return;
+
     window.onerror = undefined;
     window['vis_exh'] = null;
     var html = ['<h1>you hit a bug!</h1><p>please screenshot this error and send me a copy arigathanks gozaimuch (ed/irc.rizon.net or ed#2644)</p><p>',
