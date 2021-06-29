@@ -121,6 +121,7 @@ class VHttpConn(object):
         self.log_src = "a"
         self.lf_url = None
         self.hsrv = VHttpSrv()
+        self.nreq = 0
         self.nbyte = 0
         self.workload = 0
         self.ico = None

@@ -614,8 +614,6 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* option to set rgba 126,163,75,0.6 bg on barbuf
-* include num req in _spd
 * ctrl-click overrides onclick (tree, ...)
 * indicate dropped queries in search ui
 * readme.md as epilogue

@@ -499,7 +499,7 @@ class HttpCli(object):
 
         spd1 = get_spd(nbytes, self.t0)
         spd2 = get_spd(self.conn.nbyte, self.conn.t0)
-        return spd1 + " " + spd2
+        return "{} {} n{}".format(spd1, spd2, self.conn.nreq)
 
     def handle_post_multipart(self):
         self.parser = MultipartParser(self.log, self.sr, self.headers)
@@ -1562,7 +1562,7 @@ class HttpCli(object):
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
                 if is_dir:
-                    for fn in self.args.th_covers.split(','):
+                    for fn in self.args.th_covers.split(","):
                         fp = os.path.join(abspath, fn)
                         if os.path.exists(fp):
                             vrem = "{}/{}".format(vrem.rstrip("/"), fn)

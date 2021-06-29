@@ -43,6 +43,7 @@ class HttpConn(object):
 
         self.t0 = time.time()
         self.stopping = False
+        self.nreq = 0
         self.nbyte = 0
         self.workload = 0
         self.u2idx = None
@@ -188,6 +189,7 @@ class HttpConn(object):
                 if self.workload >= 2 ** 31:
                     self.workload = 100
 
+            self.nreq += 1
             cli = HttpCli(self)
             if not cli.run():
                 return
