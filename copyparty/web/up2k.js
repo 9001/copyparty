@@ -1319,7 +1319,7 @@ function up2k_init(subtle) {
         if (dir.target) {
             clmod(obj, 'err', 1);
             var v = Math.floor(parseInt(obj.value));
-            if (v < 1 || v > 8 || v !== v)
+            if (v < 1 || v > 64 || v !== v)
                 return;
 
             parallel_uploads = v;
@@ -1333,8 +1333,8 @@ function up2k_init(subtle) {
         if (parallel_uploads < 1)
             parallel_uploads = 1;
 
-        if (parallel_uploads > 8)
-            parallel_uploads = 8;
+        if (parallel_uploads > 16)
+            parallel_uploads = 16;
 
         obj.value = parallel_uploads;
         bumpthread({ "target": 1 })
