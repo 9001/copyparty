@@ -619,6 +619,7 @@ roughly sorted by priority
 * ctrl-click overrides onclick (tree, ...)
 * indicate dropped queries in search ui
 * readme.md as epilogue
+* pause button for uploads (thx kip)
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
