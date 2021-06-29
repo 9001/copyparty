@@ -2071,6 +2071,7 @@ document.onkeydown = function (e) {
 		ev(e);
 		treectl.show();
 		ebi('files').innerHTML = orig_html;
+		ebi('files').removeAttribute('q_raw');
 		orig_html = null;
 		msel.render();
 		reload_browser();
