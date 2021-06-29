@@ -6,10 +6,10 @@ import re, os, sys, time, shutil, signal, threading, tarfile, hashlib, platform,
 import subprocess as sp
 
 """
-run me with any version of python, i will unpack and run copyparty
+pls don't edit this file with a text editor,
+  it breaks the compressed stuff at the end
 
-(but please don't edit this file with a text editor
-  since that would probably corrupt the binary stuff at the end)
+run me with any version of python, i will unpack and run copyparty
 
 there's zero binaries! just plaintext python scripts all the way down
   so you can easily unpack the archive and inspect it for shady stuff
