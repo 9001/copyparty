@@ -614,14 +614,19 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
+* option to set rgba 126,163,75,0.6 bg on barbuf
+* include num req in _spd
+* ctrl-click overrides onclick (tree, ...)
+* indicate dropped queries in search ui
 * readme.md as epilogue
-* single sha512 across all up2k chunks? maybe
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
 
 discarded ideas
 
+* single sha512 across all up2k chunks?
+  * crypto.subtle cannot into streaming, would have to use hashwasm, expensive
 * separate sqlite table per tag
   * performance fixed by skipping some indexes (`+mt.k`)
 * audio fingerprinting
