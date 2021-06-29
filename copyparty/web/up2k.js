@@ -32,7 +32,7 @@ catch (ex) {
     }
     catch (ex) { }
 }
-treectl.onscroll();
+window['treectl'].onscroll();  // uhh
 
 
 function up2k_flagbus() {

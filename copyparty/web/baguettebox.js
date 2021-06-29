@@ -119,7 +119,7 @@ window.baguetteBox = (function () {
             var gallery = [];
             [].forEach.call(tagsNodeList, function (imageElement, imageIndex) {
                 var imageElementClickHandler = function (event) {
-                    if (event && event.ctrlKey)
+                    if (event && (event.ctrlKey || event.metaKey))
                         return true;
 
                     event.preventDefault ? event.preventDefault() : event.returnValue = false;

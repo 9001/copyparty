@@ -1545,7 +1545,7 @@ var thegrid = (function () {
 	setsz();
 
 	function gclick(e) {
-		if (e && e.ctrlKey)
+		if (e && (e.ctrlKey || e.metaKey))
 			return true;
 
 		var oth = ebi(this.getAttribute('ref')),
@@ -2265,6 +2265,9 @@ var treectl = (function () {
 	}
 
 	function treego(e) {
+		if (e && (e.ctrlKey || e.metaKey))
+			return true;
+
 		ev(e);
 		if (this.getAttribute('class') == 'hl' &&
 			this.previousSibling.textContent == '-') {
