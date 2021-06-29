@@ -1562,7 +1562,7 @@ class HttpCli(object):
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
                 if is_dir:
-                    for fn in ["folder.png", "folder.jpg"]:
+                    for fn in self.args.th_covers.split(','):
                         fp = os.path.join(abspath, fn)
                         if os.path.exists(fp):
                             vrem = "{}/{}".format(vrem.rstrip("/"), fn)

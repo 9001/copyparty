@@ -621,7 +621,6 @@ roughly sorted by priority
 * readme.md as epilogue
 * thx kip:
   * pause button for uploads
-  * also look for cover.*
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
