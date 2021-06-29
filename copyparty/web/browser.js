@@ -78,7 +78,7 @@ ebi('op_up2k').innerHTML = (
 	'	<tr>\n' +
 	'		<td>\n' +
 	'			<a href="#" id="nthread_sub">&ndash;</a><input\n' +
-	'				class="txtbox" id="nthread" value="2"/><a\n' +
+	'				class="txtbox" id="nthread" value="2" tt="pause uploads by setting it to 0"/><a\n' +
 	'				href="#" id="nthread_add">+</a><br />&nbsp;\n' +
 	'		</td>\n' +
 	'	</tr>\n' +

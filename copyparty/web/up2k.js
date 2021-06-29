@@ -1309,6 +1309,17 @@ function up2k_init(subtle) {
     }
     tt.init();
 
+    function bumpthread2(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+            return;
+
+        if (e.code == 'ArrowUp')
+            bumpthread(1);
+
+        if (e.code == 'ArrowDown')
+            bumpthread(-1);
+    }
+
     function bumpthread(dir) {
         try {
             dir.stopPropagation();
@@ -1319,7 +1330,7 @@ function up2k_init(subtle) {
         if (dir.target) {
             clmod(obj, 'err', 1);
             var v = Math.floor(parseInt(obj.value));
-            if (v < 1 || v > 64 || v !== v)
+            if (v < 0 || v > 64 || v !== v)
                 return;
 
             parallel_uploads = v;
@@ -1330,8 +1341,8 @@ function up2k_init(subtle) {
 
         parallel_uploads += dir;
 
-        if (parallel_uploads < 1)
-            parallel_uploads = 1;
+        if (parallel_uploads < 0)
+            parallel_uploads = 0;
 
         if (parallel_uploads > 16)
             parallel_uploads = 16;
@@ -1430,6 +1441,7 @@ function up2k_init(subtle) {
         bumpthread(-1);
     };
 
+    ebi('nthread').onkeydown = bumpthread2;
     ebi('nthread').addEventListener('input', bumpthread, false);
     ebi('multitask').addEventListener('click', tgl_multitask, false);
     ebi('ask_up').addEventListener('click', tgl_ask_up, false);
@@ -1443,7 +1455,10 @@ function up2k_init(subtle) {
         nodes[a].addEventListener('touchend', nop, false);
 
     set_fsearch();
-    bumpthread({ "target": 1 })
+    bumpthread({ "target": 1 });
+    if (parallel_uploads < 1)
+        bumpthread(1);
+
     return { "init_deps": init_deps, "set_fsearch": set_fsearch }
 }
 
