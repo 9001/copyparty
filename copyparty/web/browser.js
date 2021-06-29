@@ -237,6 +237,10 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" tt="load the next folder and continue">📂 next-folder</a>' +
 		'</div></div>' +
 
+		'<div><h3>tint</h3><div>' +
+		'<input type="text" id="pb_tint" size="3" value="0" tt="background level (0-100) on the seekbar$Nto make buffering less distracting" />' +
+		'</div></div>' +
+
 		'<div><h3>audio equalizer</h3><div id="audio_eq"></div></div>');
 
 	var r = {
@@ -289,6 +293,19 @@ var mpl = (function () {
 		swrite('pb_mode', r.pb_mode);
 		draw_pb_mode();
 	}
+
+	function set_tint() {
+		var tint = icfg_get('pb_tint', 0);
+		if (!tint)
+			ebi('barbuf').style.removeProperty('background');
+		else
+			ebi('barbuf').style.background = 'rgba(126,163,75,' + (tint / 100.0) + ')';
+	}
+	ebi('pb_tint').oninput = function (e) {
+		swrite('pb_tint', this.value);
+		set_tint();
+	};
+	set_tint();
 
 	r.pp = function () {
 		if (!r.os_ctl)
