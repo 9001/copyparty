@@ -142,7 +142,7 @@ function U2pvis(act, btns) {
     this.tail = -1;
     this.wsz = 3;
 
-    this.addfile = function (entry, sz) {
+    this.addfile = function (entry, sz, draw) {
         this.tab.push({
             "hn": entry[0],
             "ht": entry[1],
@@ -156,6 +156,9 @@ function U2pvis(act, btns) {
             "bd0": 0  // upload start
         });
         this.ctr["q"]++;
+        if (!draw)
+            return;
+
         this.drawcard("q");
         if (this.act == "q") {
             this.addrow(this.tab.length - 1);
@@ -350,8 +353,21 @@ function U2pvis(act, btns) {
             }
         }
         if (this.head == -1) {
-            this.head = this.tab.length;
-            this.tail = this.head - 1;
+            var precard = has(["ok", "ng", "done"], this.act) ? {} : this.act == "bz" ? { "ok": 1, "ng": 1 } : { "ok": 1, "ng": 1, "bz": 1 },
+                postcard = has(["ok", "ng", "done"], this.act) ? { "bz": 1, "q": 1 } : this.act == "bz" ? { "q": 1 } : {};
+
+            for (var a = 0; a < this.tab.length; a++) {
+                var rt = this.tab[a].in;
+                if (precard[rt]) {
+                    this.head = a + 1;
+                    this.tail = a;
+                }
+                else if (postcard[rt]) {
+                    this.head = a;
+                    this.tail = a - 1;
+                    break;
+                }
+            }
         }
         if (card == "bz") {
             for (var a = this.head - 1; a >= this.head - this.wsz && a >= 0; a--) {
@@ -706,40 +722,49 @@ function up2k_init(subtle) {
         if (ask_up && !fsearch && !confirm(msg.join('\n')))
             return;
 
+        var seen = {},
+            evpath = get_evpath(),
+            draw_each = good_files.length < 50;
+
+        for (var a = 0; a < st.files.length; a++)
+            seen[st.files[a].name + '\n' + st.files[a].size] = 1;
+
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
                 now = Date.now(),
                 lmod = fobj.lastModified || now;
 
             var entry = {
-                "n": parseInt(st.files.length.toString()),
+                "n": st.files.length,
                 "t0": now,
                 "fobj": fobj,
                 "name": good_files[a][1],
                 "size": fobj.size,
                 "lmod": lmod / 1000,
-                "purl": get_evpath(),
+                "purl": evpath,
                 "done": false,
                 "hash": []
-            };
+            },
+                key = entry.name + '\n' + entry.size;
 
-            var skip = false;
-            for (var b = 0; b < st.files.length; b++)
-                if (entry.name == st.files[b].name &&
-                    entry.size == st.files[b].size)
-                    skip = true;
-
-            if (skip)
+            if (seen[key])
                 continue;
+
+            seen[key] = 1;
 
             pvis.addfile([
                 fsearch ? esc(entry.name) : linksplit(
                     uricom_dec(entry.purl)[0] + entry.name).join(' '),
                 '📐 hash',
                 ''
-            ], fobj.size);
+            ], fobj.size, draw_each);
+
             st.files.push(entry);
             st.todo.hash.push(entry);
+        }
+        if (!draw_each) {
+            pvis.drawcard("q");
+            pvis.changecard(pvis.act);
         }
     }
     ebi('u2btn').addEventListener('drop', gotfile, false);
