@@ -1359,11 +1359,7 @@ function up2k_init(subtle) {
         if (cdr >= t.size)
             cdr = t.size;
 
-        var xhr = new XMLHttpRequest();
-        xhr.upload.onprogress = function (xev) {
-            pvis.prog(t, npart, xev.loaded);
-        };
-        function orz() {
+        function orz(xhr) {
             if (xhr.status == 200) {
                 pvis.prog(t, npart, cdr - car);
                 st.bytes.uploaded += cdr - car;
@@ -1384,18 +1380,32 @@ function up2k_init(subtle) {
                         (xhr.responseText && xhr.responseText) ||
                         "no further information"));
         }
-        xhr.onload = function (xev) {
-            try { orz(); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
-        };
-        xhr.open('POST', t.purl + 'chunkpit.php', true);
-        xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
-        xhr.setRequestHeader("X-Up2k-Wark", t.wark);
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-        if (xhr.overrideMimeType)
-            xhr.overrideMimeType('Content-Type', 'application/octet-stream');
+        function do_send() {
+            var xhr = new XMLHttpRequest();
+            xhr.upload.onprogress = function (xev) {
+                pvis.prog(t, npart, xev.loaded);
+            };
+            xhr.onload = function (xev) {
+                try { orz(xhr); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
+            };
+            xhr.onerror = function (xev) {
+                if (!window['vis_exh'])
+                    return;
 
-        xhr.responseType = 'text';
-        xhr.send(bobslice.call(t.fobj, car, cdr));
+                console.log('chunkpit onerror, retrying', t);
+                do_send();
+            };
+            xhr.open('POST', t.purl + 'chunkpit.php', true);
+            xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
+            xhr.setRequestHeader("X-Up2k-Wark", t.wark);
+            xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+            if (xhr.overrideMimeType)
+                xhr.overrideMimeType('Content-Type', 'application/octet-stream');
+
+            xhr.responseType = 'text';
+            xhr.send(bobslice.call(t.fobj, car, cdr));
+        }
+        do_send();
     }
 
     /////
