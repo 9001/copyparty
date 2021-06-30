@@ -259,6 +259,40 @@ function U2pvis(act, btns) {
         var obj = ebi('f{0}p'.format(fobj.n)),
             o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
 
+        if (!obj) { //} || true) {
+            var msg = [
+                "act", this.act,
+                "in", fo.in,
+                "is_act", this.is_act(fo.in),
+                "head", this.head,
+                "tail", this.tail,
+                "nfile", fobj.n,
+                "name", fobj.name,
+                "sz", fobj.size,
+                "bytesDelta", delta,
+                "bytesDone", fo.bd,
+            ],
+                m2 = '',
+                ds = QSA("#u2tab>tbody>tr>td:first-child>a:last-child");
+
+            for (var a = 0; a < msg.length; a += 2)
+                m2 += msg[a] + '=' + msg[a + 1] + ', ';
+
+            console.log(m2);
+
+            for (var a = 0, aa = ds.length; a < aa; a++) {
+                var id = ds[a].parentNode.getAttribute('id').slice(1, -1);
+                console.log("dom %d/%d = [%s] in(%s) is_act(%s) %s",
+                    a, aa, id, this.tab[id].in, this.is_act(fo.in), ds[a].textContent);
+            }
+
+            for (var a = 0, aa = this.tab.length; a < aa; a++)
+                if (this.is_act(this.tab[a].in))
+                    console.log("tab %d/%d = sz %s", a, aa, this.tab[a].bt);
+
+            console.log("a");
+        }
+
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
         obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
@@ -279,12 +313,14 @@ function U2pvis(act, btns) {
         this.drawcard(oldcat);
         this.drawcard(newcat);
         if (this.is_act(newcat)) {
-            this.tail++;
+            this.tail = Math.max(this.tail, nfile + 1);
             if (!ebi('f' + nfile))
                 this.addrow(nfile);
         }
         else if (this.is_act(oldcat)) {
-            this.head++;
+            while (this.head < this.tab.length && (this.head == nfile || !this.is_act(this.tab[this.head].in)))
+                this.head++;
+
             if (!bz_act) {
                 var tr = ebi("f" + nfile);
                 tr.parentNode.removeChild(tr);
@@ -842,7 +878,7 @@ function up2k_init(subtle) {
 
             clearTimeout(tto);
             running = true;
-            while (true) {
+            while (window['vis_exh']) {
                 var is_busy = 0 !=
                     st.todo.hash.length +
                     st.todo.handshake.length +
@@ -1030,7 +1066,7 @@ function up2k_init(subtle) {
                 try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
             };
             reader.onerror = function () {
-                alert('y o u   b r o k e    i t\nerror: ' + reader.error);
+                alert('y o u   b r o k e    i t\nfile: ' + t.name + '\nerror: ' + reader.error);
             };
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
@@ -1111,7 +1147,7 @@ function up2k_init(subtle) {
                 console.log('zombie handshake onerror,', t);
                 return;
             }
-            console.log('handshake onerror, retrying');
+            console.log('handshake onerror, retrying', t);
             st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
             st.todo.handshake.unshift(t);
             tasker();
