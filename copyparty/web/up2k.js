@@ -598,14 +598,50 @@ function up2k_init(subtle) {
         }
     }
 
-    function read_dirs(rd, pf, dirs, good, bad) {
+    function rd_flatten(pf, dirs) {
+        var ret = jcp(pf);
+        for (var a = 0; a < dirs.length; a++)
+            ret.push(dirs.fullPath || '');
+
+        ret.sort();
+        return ret;
+    }
+
+    var rd_missing_ref = [];
+    function read_dirs(rd, pf, dirs, good, bad, spins) {
+        spins = spins || 0;
+        if (++spins == 5)
+            rd_missing_ref = rd_flatten(pf, dirs);
+
+        if (spins == 200) {
+            var missing = rd_flatten(pf, dirs),
+                match = rd_missing_ref.length == missing.length,
+                aa = match ? missing.length : 0;
+
+            missing.sort();
+            for (var a = 0; a < aa; a++)
+                if (rd_missing_ref[a] != missing[a])
+                    match = false;
+
+            if (match) {
+                var msg = ['directory iterator got stuck on the following {0} items; good chance your browser is about to spinlock:'.format(missing.length)];
+                for (var a = 0; a < Math.min(20, missing.length); a++)
+                    msg.push(missing[a]);
+
+                alert(msg.join('\n-- '));
+                dirs = [];
+                pf = [];
+            }
+            spins = 0;
+        }
+
         if (!dirs.length) {
             if (!pf.length)
                 return gotallfiles(good, bad);
 
             console.log("retry pf, " + pf.length);
             setTimeout(function () {
-                read_dirs(rd, pf, dirs, good, bad);
+                read_dirs(rd, pf, dirs, good, bad, spins);
             }, 50);
             return;
         }
@@ -645,7 +681,7 @@ function up2k_init(subtle) {
                 dirs.shift();
                 rd = null;
             }
-            return read_dirs(rd, pf, dirs, good, bad);
+            return read_dirs(rd, pf, dirs, good, bad, spins);
         });
     }
 

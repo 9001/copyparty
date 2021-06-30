@@ -389,6 +389,11 @@ function has(haystack, needle) {
 }
 
 
+function jcp(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+
 function sread(key) {
     if (window.localStorage)
         return localStorage.getItem(key);
