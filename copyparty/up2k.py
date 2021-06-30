@@ -1019,7 +1019,8 @@ class Up2k(object):
                                 break
                         except:
                             # missing; restart
-                            job = None
+                            if not self.args.nw:
+                                job = None
                             break
                 else:
                     # file contents match, but not the path
@@ -1089,6 +1090,9 @@ class Up2k(object):
             }
 
     def _untaken(self, fdir, fname, ts, ip):
+        if self.args.nw:
+            return fname
+
         # TODO broker which avoid this race and
         # provides a new filename if taken (same as bup)
         suffix = ".{:.6f}-{}".format(ts, ip)
@@ -1098,6 +1102,9 @@ class Up2k(object):
     def _symlink(self, src, dst):
         # TODO store this in linktab so we never delete src if there are links to it
         self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
+        if self.args.nw:
+            return
+
         try:
             lsrc = src
             ldst = dst
@@ -1174,6 +1181,10 @@ class Up2k(object):
             ret = len(job["need"])
             if ret > 0:
                 return ret, src
+
+            if self.args.nw:
+                # del self.registry[ptop][wark]
+                return ret, dst
 
             atomic_move(src, dst)
 
@@ -1283,6 +1294,10 @@ class Up2k(object):
         tnam = job["name"] + ".PARTIAL"
         if self.args.dotpart:
             tnam = "." + tnam
+
+        if self.args.nw:
+            job["tnam"] = tnam
+            return
 
         suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as f:
