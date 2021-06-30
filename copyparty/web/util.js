@@ -11,16 +11,6 @@ var is_touch = 'ontouchstart' in window,
 
 
 // error handler for mobile devices
-function hcroak(msg) {
-    document.body.innerHTML = msg;
-    window.onerror = undefined;
-    throw 'fatal_err';
-}
-function croak(msg) {
-    document.body.textContent = msg;
-    window.onerror = undefined;
-    throw msg;
-}
 function esc(txt) {
     return txt.replace(/[&"<>]/g, function (c) {
         return {
@@ -37,7 +27,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
     window.onerror = undefined;
     window['vis_exh'] = null;
-    var html = ['<h1>you hit a bug!</h1><p>please screenshot this error and send me a copy arigathanks gozaimuch (ed/irc.rizon.net or ed#2644)</p><p>',
+    var html = ['<h1>you hit a bug!</h1><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code><br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)</p><p>',
         esc(String(msg)), '</p><p>', esc(url + ' @' + lineNo + ':' + columnNo), '</p>'];
 
     if (error) {
@@ -47,9 +37,13 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                 html.push('<h2>' + find[a] + '</h2>' +
                     esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
     }
-    document.body.style.fontSize = '0.8em';
-    document.body.style.padding = '0 1em 1em 1em';
-    hcroak(html.join('\n'));
+    document.body.innerHTML = html.join('\n');
+
+    var s = mknod('style');
+    s.innerHTML = 'body{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em} code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} *{line-height:1.5em}';
+    document.head.appendChild(s);
+
+    throw 'fatal_err';
 }
 
 

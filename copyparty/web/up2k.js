@@ -14,17 +14,19 @@ function goto_up2k() {
 
 // chrome requires https to use crypto.subtle,
 // usually it's undefined but some chromes throw on invoke
-var up2k = null;
-var sha_js = window.WebAssembly ? 'hw' : 'ac';  // ff53,c57,sa11
+var up2k = null,
+    sha_js = window.WebAssembly ? 'hw' : 'ac',  // ff53,c57,sa11
+    m = 'will use ' + sha_js + ' instead of native sha512 due to';
+
 try {
     var cf = crypto.subtle || crypto.webkitSubtle;
     cf.digest('SHA-512', new Uint8Array(1)).then(
         function (x) { console.log('sha-ok'); up2k = up2k_init(cf); },
-        function (x) { console.log('sha-ng:', x); up2k = up2k_init(false); }
+        function (x) { console.log(m, x); up2k = up2k_init(false); }
     );
 }
 catch (ex) {
-    console.log('sha-na:', ex);
+    console.log(m, ex);
     try {
         up2k = up2k_init(false);
     }
@@ -952,7 +954,7 @@ function up2k_init(subtle) {
 
             bpend += cdr - car;
 
-            reader.onload = function (e) {
+            function orz(e) {
                 if (!min_filebuf && nch == 1) {
                     min_filebuf = 1;
                     var td = Date.now() - t0;
@@ -962,6 +964,9 @@ function up2k_init(subtle) {
                     }
                 }
                 hash_calc(nch, e.target.result);
+            }
+            reader.onload = function (e) {
+                try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
             };
             reader.onerror = function () {
                 alert('y o u   b r o k e    i t\nerror: ' + reader.error);
@@ -1050,7 +1055,7 @@ function up2k_init(subtle) {
             st.todo.handshake.unshift(t);
             tasker();
         };
-        xhr.onload = function (e) {
+        function orz(e) {
             if (t.busied != me) {
                 console.log('zombie handshake onload,', t);
                 return;
@@ -1090,6 +1095,7 @@ function up2k_init(subtle) {
 
                 if (response.name !== t.name) {
                     // file exists; server renamed us
+                    console.log("server-rename [" + t.name + "] to [" + response.name + "]");
                     t.name = response.name;
                     pvis.seth(t.n, 0, linksplit(t.purl + t.name).join(' '));
                 }
@@ -1194,6 +1200,9 @@ function up2k_init(subtle) {
                         (xhr.responseText && xhr.responseText) ||
                         "no further information"));
             }
+        }
+        xhr.onload = function (e) {
+            try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
         };
 
         var req = {
@@ -1238,7 +1247,7 @@ function up2k_init(subtle) {
         xhr.upload.onprogress = function (xev) {
             pvis.prog(t, npart, xev.loaded);
         };
-        xhr.onload = function (xev) {
+        function orz() {
             if (xhr.status == 200) {
                 pvis.prog(t, npart, cdr - car);
                 st.bytes.uploaded += cdr - car;
@@ -1258,6 +1267,9 @@ function up2k_init(subtle) {
                         (xhr.response && xhr.response.err) ||
                         (xhr.responseText && xhr.responseText) ||
                         "no further information"));
+        }
+        xhr.onload = function (xev) {
+            try { orz(); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
         };
         xhr.open('POST', t.purl + 'chunkpit.php', true);
         xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
