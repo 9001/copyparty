@@ -291,6 +291,7 @@ function U2pvis(act, btns) {
                     console.log("tab %d/%d = sz %s", a, aa, this.tab[a].bt);
 
             console.log("a");
+            throw 42;
         }
 
         obj.innerHTML = fo.hp;
@@ -318,7 +319,7 @@ function U2pvis(act, btns) {
                 this.addrow(nfile);
         }
         else if (this.is_act(oldcat)) {
-            while (this.head < this.tab.length && (this.head == nfile || !this.is_act(this.tab[this.head].in)))
+            while (this.head < Math.min(this.tab.length, this.tail) && (this.head == nfile || !this.is_act(this.tab[this.head].in)))
                 this.head++;
 
             if (!bz_act) {
@@ -1066,7 +1067,25 @@ function up2k_init(subtle) {
                 try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
             };
             reader.onerror = function () {
-                alert('y o u   b r o k e    i t\nfile: ' + t.name + '\nerror: ' + reader.error);
+                var err = reader.error + '';
+                var handled = false;
+
+                if (err.indexOf('NotReadableError') !== -1 || // win10-chrome defender
+                    err.indexOf('NotFoundError') !== -1  // macos-firefox permissions
+                ) {
+                    pvis.seth(t.n, 1, 'OS-error');
+                    pvis.seth(t.n, 2, err);
+                    handled = true;
+                }
+
+                if (handled) {
+                    pvis.move(t.n, 'ng');
+                    st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
+                    st.bytes.uploaded += t.size;
+                    return tasker();
+                }
+
+                alert('y o u   b r o k e    i t\nfile: ' + t.name + '\nerror: ' + err);
             };
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
