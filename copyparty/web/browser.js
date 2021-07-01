@@ -1552,6 +1552,7 @@ var thegrid = (function () {
 			href = this.getAttribute('href'),
 			aplay = ebi('a' + oth.getAttribute('id')),
 			is_img = /\.(gif|jpe?g|png|webp)(\?|$)/i.test(href),
+			is_vid = /\.(av1|asf|avi|flv|m4v|mkv|mjpeg|mjpg|mpg|mpeg|mpg2|mpeg2|h264|avc|h265|hevc|mov|3gp|mp4|ts|mpegts|nut|ogv|ogm|rm|vob|webm|wmv)(\?|$)/i.test(href),
 			in_tree = null,
 			have_sel = QS('#files tr.sel'),
 			td = oth.closest('td').nextSibling,
@@ -1578,6 +1579,9 @@ var thegrid = (function () {
 
 		else if (in_tree && !have_sel)
 			in_tree.click();
+
+		else if (is_vid)
+			window.open(href + (href.indexOf('?') === -1 ? '?' : '&') + 'vcr', '_blank');
 
 		else if (!is_img && have_sel)
 			window.open(href, '_blank');

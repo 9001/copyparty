@@ -324,6 +324,9 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-mtp", metavar="M=[f,]bin", action="append", type=str, help="read tag M using bin")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
 
+    ap2 = ap.add_argument_group('video streaming options')
+    ap2.add_argument("--vcr", action="store_true", help="enable video streaming")
+
     ap2 = ap.add_argument_group('appearance options')
     ap2.add_argument("--css-browser", metavar="L", help="URL to additional CSS to include")
 

@@ -18,6 +18,8 @@ from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 from .authsrv import AuthSrv
 from .szip import StreamZip
 from .star import StreamTar
+from .vcr import VCR_Direct
+from .th_srv import FMT_FF
 
 if not PY2:
     unicode = str
@@ -229,7 +231,9 @@ class HttpCli(object):
     def send_headers(self, length, status=200, mime=None, headers={}):
         response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
 
-        if length is not None:
+        if length is None:
+            self.keepalive = False
+        else:
             response.append("Content-Length: " + unicode(length))
 
         # close if unknown length, otherwise take client's preference
@@ -1562,6 +1566,15 @@ class HttpCli(object):
         if self.readable:
             if rem.startswith(".hist/up2k."):
                 raise Pebkac(403)
+
+            if "vcr" in self.uparam:
+                ext = abspath.rsplit(".")[-1]
+                if not self.args.vcr or ext not in FMT_FF:
+                    raise Pebkac(403)
+
+                vcr = VCR_Direct(self, abspath)
+                vcr.run()
+                return False
 
             is_dir = stat.S_ISDIR(st.st_mode)
             th_fmt = self.uparam.get("th")
