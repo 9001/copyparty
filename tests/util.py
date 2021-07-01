@@ -108,6 +108,9 @@ class VHttpSrv(object):
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
 
+    def cachebuster(self):
+        return "a"
+
 
 class VHttpConn(object):
     def __init__(self, args, asrv, log, buf):

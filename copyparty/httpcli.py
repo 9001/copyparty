@@ -72,9 +72,13 @@ class HttpCli(object):
         if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
             raise Exception("that was close")
 
-    def j2(self, name, **kwargs):
+    def j2(self, name, **ka):
         tpl = self.conn.hsrv.j2[name]
-        return tpl.render(**kwargs) if kwargs else tpl
+        if ka:
+            ka["ts"] = self.conn.hsrv.cachebuster()
+            return tpl.render(**ka)
+
+        return tpl
 
     def run(self):
         """returns true if connection can be reused"""
@@ -1383,6 +1387,7 @@ class HttpCli(object):
             "md_plug": "true" if self.args.emp else "false",
             "md_chk_rate": self.args.mcr,
             "md": boundary,
+            "ts": self.conn.hsrv.cachebuster(),
         }
         html = template.render(**targs).encode("utf-8", "replace")
         html = html.split(boundary.encode("utf-8"))
@@ -1626,7 +1631,6 @@ class HttpCli(object):
 
         url_suf = self.urlq()
         is_ls = "ls" in self.uparam
-        ts = ""  # "?{}".format(time.time())
 
         tpl = "browser"
         if "b" in self.uparam:
@@ -1651,7 +1655,6 @@ class HttpCli(object):
             "vdir": quotep(self.vpath),
             "vpnodes": vpnodes,
             "files": [],
-            "ts": ts,
             "perms": json.dumps(perms),
             "taglist": [],
             "tag_order": [],

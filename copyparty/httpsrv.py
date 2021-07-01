@@ -4,6 +4,8 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import time
+import base64
+import struct
 import socket
 import threading
 
@@ -25,7 +27,6 @@ except ImportError:
     sys.exit(1)
 
 from .__init__ import E, MACOS
-from .authsrv import AuthSrv
 from .httpconn import HttpConn
 
 
@@ -48,6 +49,8 @@ class HttpSrv(object):
         self.clients = {}
         self.workload = 0
         self.workload_thr_alive = False
+        self.cb_ts = 0
+        self.cb_v = 0
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
@@ -177,3 +180,25 @@ class HttpSrv(object):
                     self.clients[cli] = now
 
             self.workload = total
+
+    def cachebuster(self):
+        if time.time() - self.cb_ts < 1:
+            return self.cb_v
+
+        with self.mutex:
+            if time.time() - self.cb_ts < 1:
+                return self.cb_v
+
+            v = E.t0
+            try:
+                with os.scandir(os.path.join(E.mod, "web")) as dh:
+                    for fh in dh:
+                        inf = fh.stat(follow_symlinks=False)
+                        v = max(v, inf.st_mtime)
+            except:
+                pass
+
+            v = base64.urlsafe_b64encode(struct.pack(">xxL", int(v)))
+            self.cb_v = v.decode("ascii")[-4:]
+            self.cb_ts = time.time()
+            return self.cb_v

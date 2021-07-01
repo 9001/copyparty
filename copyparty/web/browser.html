@@ -6,10 +6,10 @@
 	<title>⇆🎉 {{ title }}</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=0.8">
-	<link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css{{ ts }}">
-	<link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css{{ ts }}">
+	<link rel="stylesheet" type="text/css" media="screen" href="/.cpr/browser.css?_={{ ts }}">
+	<link rel="stylesheet" type="text/css" media="screen" href="/.cpr/upload.css?_={{ ts }}">
 	{%- if css %}
-	<link rel="stylesheet" type="text/css" media="screen" href="{{ css }}{{ ts }}">
+	<link rel="stylesheet" type="text/css" media="screen" href="{{ css }}?_={{ ts }}">
 	{%- endif %}
 </head>
 
@@ -127,9 +127,9 @@
 			have_tags_idx = {{ have_tags_idx|tojson }},
 			have_zip = {{ have_zip|tojson }};
 	</script>
-	<script src="/.cpr/util.js{{ ts }}"></script>
-	<script src="/.cpr/browser.js{{ ts }}"></script>
-	<script src="/.cpr/up2k.js{{ ts }}"></script>
+	<script src="/.cpr/util.js?_={{ ts }}"></script>
+	<script src="/.cpr/browser.js?_={{ ts }}"></script>
+	<script src="/.cpr/up2k.js?_={{ ts }}"></script>
 </body>
 
 </html>

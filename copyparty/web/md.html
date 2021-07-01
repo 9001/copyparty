@@ -3,9 +3,9 @@
 	<title>📝🎉 {{ title }}</title> <!-- 📜 -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=0.7">
-	<link href="/.cpr/md.css" rel="stylesheet">
+	<link href="/.cpr/md.css?_={{ ts }}" rel="stylesheet">
 	{%- if edit %}
-	<link href="/.cpr/md2.css" rel="stylesheet">
+	<link href="/.cpr/md2.css?_={{ ts }}" rel="stylesheet">
 	{%- endif %}
 </head>
 <body>
@@ -146,10 +146,10 @@ var md_opt = {
 })();
 
 	</script>
-    <script src="/.cpr/util.js"></script>
-	<script src="/.cpr/deps/marked.js"></script>
-	<script src="/.cpr/md.js"></script>
+    <script src="/.cpr/util.js?_={{ ts }}"></script>
+	<script src="/.cpr/deps/marked.js?_={{ ts }}"></script>
+	<script src="/.cpr/md.js?_={{ ts }}"></script>
 	{%- if edit %}
-	<script src="/.cpr/md2.js"></script>
+	<script src="/.cpr/md2.js?_={{ ts }}"></script>
 	{%- endif %}
 </body></html>
