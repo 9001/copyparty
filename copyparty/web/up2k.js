@@ -1360,25 +1360,28 @@ function up2k_init(subtle) {
             cdr = t.size;
 
         function orz(xhr) {
+            var txt = ((xhr.response && xhr.response.err) || xhr.responseText) + '';
             if (xhr.status == 200) {
                 pvis.prog(t, npart, cdr - car);
                 st.bytes.uploaded += cdr - car;
                 t.bytes_uploaded += cdr - car;
-                st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
-                t.postlist.splice(t.postlist.indexOf(npart), 1);
-                if (t.postlist.length == 0) {
-                    t.t4 = Date.now();
-                    pvis.seth(t.n, 1, 'verifying');
-                    st.todo.handshake.unshift(t);
-                }
-                tasker();
             }
-            else
+            else if (txt.indexOf('already got that') !== -1) {
+                console.log("ignoring dupe-segment error");
+            }
+            else {
                 alert("server broke; cu-err {0} on file [{1}]:\n".format(
-                    xhr.status, t.name) + (
-                        (xhr.response && xhr.response.err) ||
-                        (xhr.responseText && xhr.responseText) ||
-                        "no further information"));
+                    xhr.status, t.name) + (txt || "no further information"));
+                return;
+            }
+            st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
+            t.postlist.splice(t.postlist.indexOf(npart), 1);
+            if (t.postlist.length == 0) {
+                t.t4 = Date.now();
+                pvis.seth(t.n, 1, 'verifying');
+                st.todo.handshake.unshift(t);
+            }
+            tasker();
         }
         function do_send() {
             var xhr = new XMLHttpRequest();

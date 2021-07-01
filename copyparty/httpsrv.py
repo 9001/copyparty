@@ -141,11 +141,12 @@ class HttpSrv(object):
                         "shut({}): {}".format(fno, ex),
                         c="1;30",
                     )
-                if ex.errno not in [10038, 10054, 107, 57, 9]:
+                if ex.errno not in [10038, 10054, 107, 57, 49, 9]:
                     # 10038 No longer considered a socket
                     # 10054 Foribly closed by remote
                     #   107 Transport endpoint not connected
                     #    57 Socket is not connected
+                    #    49 Can't assign requested address (wifi down)
                     #     9 Bad file descriptor
                     raise
             finally:
