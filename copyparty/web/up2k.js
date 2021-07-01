@@ -1367,7 +1367,7 @@ function up2k_init(subtle) {
                 t.bytes_uploaded += cdr - car;
             }
             else if (txt.indexOf('already got that') !== -1) {
-                console.log("ignoring dupe-segment error");
+                console.log("ignoring dupe-segment error", t);
             }
             else {
                 alert("server broke; cu-err {0} on file [{1}]:\n".format(
