@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="utf-8">
+	<title>hls-test</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head><body>
+
+<video id="vid" controls></video>
+<script src="hls.light.js"></script>
+<script>
+
+var video = document.getElementById('vid');
+var hls = new Hls({
+	debug: true,
+	autoStartLoad: false
+});
+hls.loadSource('live/v.m3u8');
+hls.attachMedia(video);
+hls.on(Hls.Events.MANIFEST_PARSED, function() {
+	hls.startLoad(0);
+});
+hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+	video.muted = true;
+	video.play();
+});
+
+/*
+general good news:
+- doesn't need fixed-length segments; ok to let x264 pick optimal keyframes and slice on those
+- hls.js polls the m3u8 for new segments, scales the duration accordingly, seeking works great
+- the sfx will grow by 66 KiB since that's how small hls.js can get, wait thats not good
+
+# vod, creates m3u8 at the end, fixed keyframes, v bad
+ffmpeg -hide_banner -threads 0 -flags -global_header -i ..\CowboyBebopMovie-OP1.webm -vf scale=1280:-4,format=yuv420p -ac 2 -c:a libopus -b:a 128k -c:v libx264 -preset slow -crf 24 -maxrate:v 5M -bufsize:v 10M -g 120 -keyint_min 120 -sc_threshold 0 -hls_time 4 -hls_playlist_type vod -hls_segment_filename v%05d.ts v.m3u8
+
+# live, updates m3u8 as it goes, dynamic keyframes, streamable with hls.js
+ffmpeg -hide_banner -threads 0 -flags -global_header -i ..\..\CowboyBebopMovie-OP1.webm -vf scale=1280:-4,format=yuv420p -ac 2 -c:a libopus -b:a 128k -c:v libx264 -preset slow -crf 24 -maxrate:v 5M -bufsize:v 10M -f segment -segment_list v.m3u8 -segment_format mpegts -segment_list_flags live v%05d.ts
+
+# fmp4 (fragmented mp4), doesn't work with hls.js, gets duratoin 149:07:51 (536871s), probably the tkhd/mdhd 0xffffffff (timebase 8000? ok)
+ffmpeg -re -hide_banner -threads 0 -flags +cgop -i ..\..\CowboyBebopMovie-OP1.webm -vf scale=1280:-4,format=yuv420p -ac 2 -c:a libopus -b:a 128k -c:v libx264 -preset slow -crf 24 -maxrate:v 5M -bufsize:v 10M -f segment -segment_list v.m3u8 -segment_format fmp4 -segment_list_flags live v%05d.mp4
+
+# try 2, works, uses tempfiles for m3u8 updates, good, 6% smaller
+ffmpeg -re -hide_banner -threads 0 -flags +cgop -i ..\..\CowboyBebopMovie-OP1.webm -vf scale=1280:-4,format=yuv420p -ac 2 -c:a libopus -b:a 128k -c:v libx264 -preset slow -crf 24 -maxrate:v 5M -bufsize:v 10M -f hls -hls_segment_type fmp4 -hls_list_size 0 -hls_segment_filename v%05d.mp4 v.m3u8
+
+more notes
+- adding -hls_flags single_file makes duration wack during playback (for both fmp4 and ts), ok once finalized and refreshed, gives no size reduction anyways
+- bebop op has good keyframe spacing for testing hls.js, in particular it hops one seg back and immediately resumes if it hits eof with the explicit hls.startLoad(0); otherwise it jumps into the middle of a seg and becomes art
+- can probably -c:v copy most of the time, is there a way to check for cgop? todo
+
+*/
+</script>
+</body></html>
