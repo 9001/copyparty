@@ -618,6 +618,8 @@ roughly sorted by priority
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
+* logging to file
+* indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m
 
 discarded ideas
 
