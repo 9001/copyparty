@@ -23,6 +23,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
         * [on debian](#on-debian)
     * [notes](#notes)
     * [status](#status)
+    * [testimonials](#testimonials)
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
@@ -141,6 +142,13 @@ summary: all planned features work! now please enjoy the bloatening
 * markdown
   * ☑ viewer
   * ☑ editor (sure why not)
+
+
+## testimonials
+
+small collection of user feedback
+
+`good enough`, `surprisingly correct`, `certified good software`, `guaranteed to 400gb ™`, `why`
 
 
 # bugs
@@ -619,8 +627,6 @@ roughly sorted by priority
   * start from a chunk index and just go
   * terminate client on bad data
 * logging to file
-* indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m, 500k items before autoeviction
-  * blank hashlist when up-ok to skip handshake
 
 discarded ideas
 
@@ -640,3 +646,6 @@ discarded ideas
   * nah
 * look into android thumbnail cache file format
   * absolutely not
+* indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m, 500k items before autoeviction
+  * blank hashlist when up-ok to skip handshake
+    * too many confusing side-effects
