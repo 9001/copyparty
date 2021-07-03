@@ -612,7 +612,7 @@ function up2k_init(subtle) {
         }
         else files = e.target.files;
 
-        if (!files || files.length == 0)
+        if (!files || !files.length)
             return alert('no files selected??');
 
         more_one_file();
@@ -837,11 +837,18 @@ function up2k_init(subtle) {
     //
 
     function handshakes_permitted() {
-        var lim = multitask ? 1 : 0;
+        // verification
+        if (st.todo.handshake.length &&
+            st.todo.handshake[0].t4)
+            return true;
 
-        if (lim <
+        if ((multitask ? 2 : 0) <
             st.todo.upload.length +
             st.busy.upload.length)
+            return false;
+
+        if (parallel_uploads <
+            st.busy.handshake.length)
             return false;
 
         var cd = st.todo.handshake.length ? st.todo.handshake[0].cooldown : 0;
@@ -917,22 +924,8 @@ function up2k_init(subtle) {
                     st.todo.handshake.unshift(t);
                 }
 
-                if (st.todo.handshake.length > 0 &&
-                    st.busy.handshake.length == 0 && (
-                        st.todo.handshake[0].t4 || (
-                            handshakes_permitted() &&
-                            st.busy.upload.length < parallel_uploads
-                        )
-                    )
-                ) {
-                    exec_handshake();
-                    mou_ikkai = true;
-                }
-
                 if (handshakes_permitted() &&
-                    st.todo.handshake.length > 0 &&
-                    st.busy.handshake.length == 0 &&
-                    st.busy.upload.length < parallel_uploads) {
+                    st.todo.handshake.length) {
                     exec_handshake();
                     mou_ikkai = true;
                 }
@@ -945,7 +938,7 @@ function up2k_init(subtle) {
 
                 if (hashing_permitted() &&
                     st.todo.hash.length > 0 &&
-                    st.busy.hash.length == 0) {
+                    !st.busy.hash.length) {
                     exec_hash();
                     mou_ikkai = true;
                 }
@@ -1376,7 +1369,7 @@ function up2k_init(subtle) {
             }
             st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
             t.postlist.splice(t.postlist.indexOf(npart), 1);
-            if (t.postlist.length == 0) {
+            if (!t.postlist.length) {
                 t.t4 = Date.now();
                 pvis.seth(t.n, 1, 'verifying');
                 st.todo.handshake.unshift(t);

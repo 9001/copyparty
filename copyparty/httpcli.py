@@ -607,13 +607,14 @@ class HttpCli(object):
                     os.makedirs(fsenc(dst))
             except OSError as ex:
                 self.log("makedirs failed [{}]".format(dst))
-                if ex.errno == 13:
-                    raise Pebkac(500, "the server OS denied write-access")
+                if not os.path.isdir(fsenc(dst)):
+                    if ex.errno == 13:
+                        raise Pebkac(500, "the server OS denied write-access")
 
-                if ex.errno == 17:
-                    raise Pebkac(400, "some file got your folder name")
+                    if ex.errno == 17:
+                        raise Pebkac(400, "some file got your folder name")
 
-                raise Pebkac(500, min_ex())
+                    raise Pebkac(500, min_ex())
             except:
                 raise Pebkac(500, min_ex())
 

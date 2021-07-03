@@ -622,6 +622,8 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
+* keepalive handshake after 5h
+  * skip pushing postlist if todo.upload has entries
 * readme.md as epilogue
 * reduce up2k roundtrips
   * start from a chunk index and just go
