@@ -619,7 +619,8 @@ roughly sorted by priority
   * start from a chunk index and just go
   * terminate client on bad data
 * logging to file
-* indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m
+* indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m, 500k items before autoeviction
+  * blank hashlist when up-ok to skip handshake
 
 discarded ideas
 
