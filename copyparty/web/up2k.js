@@ -934,8 +934,7 @@ function up2k_init(subtle) {
 
                     nprev = nf;
                     var t = st.files[nf];
-                    if (t.t_busied &&
-                        now - t.t_busied > 1000 * 30 &&
+                    if (now - t.t_busied > 1000 * 30 &&
                         now - t.t_handshake > 1000 * (21600 - 1800)
                     ) {
                         apop(st.todo.handshake, t);
