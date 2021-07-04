@@ -148,7 +148,7 @@ summary: all planned features work! now please enjoy the bloatening
 
 small collection of user feedback
 
-`good enough`, `surprisingly correct`, `certified good software`, `guaranteed to 400gb ™`, `why`
+`good enough`, `surprisingly correct`, `certified good software`, `just works`, `why`
 
 
 # bugs

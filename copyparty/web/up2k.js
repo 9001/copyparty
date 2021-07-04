@@ -225,7 +225,7 @@ function U2pvis(act, btns) {
     this.hashed = function (fobj) {
         var fo = this.tab[fobj.n],
             nb = fo.bt * (++fo.nh / fo.cb.length),
-            p = this.perc(nb, 0, fobj.size, fobj.t1);
+            p = this.perc(nb, 0, fobj.size, fobj.t_hashing);
 
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
@@ -248,7 +248,7 @@ function U2pvis(act, btns) {
         fo.cb[nchunk] = cbd;
         fo.bd += delta;
 
-        var p = this.perc(fo.bd, fo.bd0, fo.bt, fobj.t3);
+        var p = this.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
@@ -715,8 +715,7 @@ function up2k_init(subtle) {
 
                     pf.push(name);
                     dn.file(function (fobj) {
-                        var idx = pf.indexOf(name);
-                        pf.splice(idx, 1);
+                        apop(pf, name);
                         try {
                             if (fobj.size > 0) {
                                 good.push([fobj, name]);
@@ -739,7 +738,7 @@ function up2k_init(subtle) {
     }
 
     function gotallfiles(good_files, bad_files) {
-        if (bad_files.length > 0) {
+        if (bad_files.length) {
             var ntot = bad_files.length + good_files.length,
                 msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, ntot);
 
@@ -837,22 +836,25 @@ function up2k_init(subtle) {
     //
 
     function handshakes_permitted() {
-        // verification
-        if (st.todo.handshake.length &&
-            st.todo.handshake[0].t4)
+        if (!st.todo.handshake.length)
             return true;
 
-        if ((multitask ? 2 : 0) <
-            st.todo.upload.length +
-            st.busy.upload.length)
+        var cd = st.todo.handshake[0].cooldown;
+        if (cd && cd - Date.now() > 0)
             return false;
+
+        // keepalive or verify
+        if (st.todo.handshake[0].keepalive ||
+            st.todo.handshake[0].t_uploaded)
+            return true;
 
         if (parallel_uploads <
             st.busy.handshake.length)
             return false;
 
-        var cd = st.todo.handshake.length ? st.todo.handshake[0].cooldown : 0;
-        if (cd && cd - Date.now() > 0)
+        if ((multitask ? parallel_uploads : 0) <
+            st.todo.upload.length +
+            st.busy.upload.length)
             return false;
 
         return true;
@@ -887,13 +889,14 @@ function up2k_init(subtle) {
             clearTimeout(tto);
             running = true;
             while (window['vis_exh']) {
-                var is_busy = 0 !=
-                    st.todo.hash.length +
-                    st.todo.handshake.length +
-                    st.todo.upload.length +
-                    st.busy.hash.length +
-                    st.busy.handshake.length +
-                    st.busy.upload.length;
+                var now = Date.now(),
+                    is_busy = 0 !=
+                        st.todo.hash.length +
+                        st.todo.handshake.length +
+                        st.todo.upload.length +
+                        st.busy.hash.length +
+                        st.busy.handshake.length +
+                        st.busy.upload.length;
 
                 if (was_busy != is_busy) {
                     was_busy = is_busy;
@@ -904,7 +907,6 @@ function up2k_init(subtle) {
 
                 if (flag) {
                     if (is_busy) {
-                        var now = Date.now();
                         flag.take(now);
                         if (!flag.ours)
                             return defer();
@@ -916,12 +918,30 @@ function up2k_init(subtle) {
 
                 var mou_ikkai = false;
 
-                if (st.busy.handshake.length > 0 &&
-                    st.busy.handshake[0].busied < Date.now() - 30 * 1000
+                if (st.busy.handshake.length &&
+                    st.busy.handshake[0].t_busied < now - 30 * 1000
                 ) {
                     console.log("retrying stuck handshake");
                     var t = st.busy.handshake.shift();
                     st.todo.handshake.unshift(t);
+                }
+
+                var nprev = -1;
+                for (var a = 0; a < st.todo.upload.length; a++) {
+                    var nf = st.todo.upload[a].nfile;
+                    if (nprev == nf)
+                        continue;
+
+                    nprev = nf;
+                    var t = st.files[nf];
+                    if (t.t_busied &&
+                        now - t.t_busied > 1000 * 30 &&
+                        now - t.t_handshake > 1000 * (21600 - 1800)
+                    ) {
+                        apop(st.todo.handshake, t);
+                        st.todo.handshake.unshift(t);
+                        t.keepalive = true;
+                    }
                 }
 
                 if (handshakes_permitted() &&
@@ -930,14 +950,14 @@ function up2k_init(subtle) {
                     mou_ikkai = true;
                 }
 
-                if (st.todo.upload.length > 0 &&
+                if (st.todo.upload.length &&
                     st.busy.upload.length < parallel_uploads) {
                     exec_upload();
                     mou_ikkai = true;
                 }
 
                 if (hashing_permitted() &&
-                    st.todo.hash.length > 0 &&
+                    st.todo.hash.length &&
                     !st.busy.hash.length) {
                     exec_hash();
                     mou_ikkai = true;
@@ -1073,7 +1093,7 @@ function up2k_init(subtle) {
 
                 if (handled) {
                     pvis.move(t.n, 'ng');
-                    st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
+                    apop(st.busy.hash, t);
                     st.bytes.uploaded += t.size;
                     return tasker();
                 }
@@ -1106,15 +1126,15 @@ function up2k_init(subtle) {
                     t.hash.push(hashtab[a]);
                 }
 
-                t.t2 = Date.now();
+                t.t_hashed = Date.now();
                 if (t.n == 0 && window.location.hash == '#dbg') {
-                    var spd = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.);
-                    alert('{0} ms, {1} MB/s\n'.format(t.t2 - t.t1, spd.toFixed(3)) + t.hash.join('\n'));
+                    var spd = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.);
+                    alert('{0} ms, {1} MB/s\n'.format(t.t_hashed - t.t_hashing, spd.toFixed(3)) + t.hash.join('\n'));
                 }
 
                 pvis.seth(t.n, 2, 'hashing done');
                 pvis.seth(t.n, 1, '📦 wait');
-                st.busy.hash.splice(st.busy.hash.indexOf(t), 1);
+                apop(st.busy.hash, t);
                 st.todo.handshake.push(t);
                 tasker();
             };
@@ -1137,7 +1157,7 @@ function up2k_init(subtle) {
             }, 1);
         };
 
-        t.t1 = Date.now();
+        t.t_hashing = Date.now();
         segm_next();
     }
 
@@ -1148,30 +1168,41 @@ function up2k_init(subtle) {
 
     function exec_handshake() {
         var t = st.todo.handshake.shift(),
+            keepalive = t.keepalive,
             me = Date.now();
 
         st.busy.handshake.push(t);
-        t.busied = me;
+        t.keepalive = undefined;
+        t.t_busied = me;
+
+        if (keepalive)
+            console.log("sending keepalive handshake", t);
 
         var xhr = new XMLHttpRequest();
         xhr.onerror = function () {
-            if (t.busied != me) {
+            if (t.t_busied != me) {
                 console.log('zombie handshake onerror,', t);
                 return;
             }
             console.log('handshake onerror, retrying', t);
-            st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+            apop(st.busy.handshake, t);
             st.todo.handshake.unshift(t);
+            t.keepalive = keepalive;
             tasker();
         };
         function orz(e) {
-            if (t.busied != me) {
+            if (t.t_busied != me) {
                 console.log('zombie handshake onload,', t);
                 return;
             }
             if (xhr.status == 200) {
-                var response = JSON.parse(xhr.responseText);
+                t.t_handshake = Date.now();
+                if (keepalive) {
+                    apop(st.busy.handshake, t);
+                    return;
+                }
 
+                var response = JSON.parse(xhr.responseText);
                 if (!response.name) {
                     var msg = '',
                         smsg = '';
@@ -1195,7 +1226,7 @@ function up2k_init(subtle) {
                     pvis.seth(t.n, 2, msg);
                     pvis.seth(t.n, 1, smsg);
                     pvis.move(t.n, smsg == '404' ? 'ng' : 'ok');
-                    st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                    apop(st.busy.handshake, t);
                     st.bytes.uploaded += t.size;
                     t.done = true;
                     tasker();
@@ -1237,7 +1268,7 @@ function up2k_init(subtle) {
                 var done = true,
                     msg = '&#x1f3b7;&#x1f41b;';
 
-                if (t.postlist.length > 0) {
+                if (t.postlist.length) {
                     for (var a = 0; a < t.postlist.length; a++)
                         st.todo.upload.push({
                             'nfile': t.n,
@@ -1248,20 +1279,20 @@ function up2k_init(subtle) {
                     done = false;
                 }
                 pvis.seth(t.n, 1, msg);
-                st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                apop(st.busy.handshake, t);
 
                 if (done) {
                     t.done = true;
                     st.bytes.uploaded += t.size - t.bytes_uploaded;
-                    var spd1 = (t.size / ((t.t2 - t.t1) / 1000.)) / (1024 * 1024.),
-                        spd2 = (t.size / ((t.t4 - t.t3) / 1000.)) / (1024 * 1024.);
+                    var spd1 = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.),
+                        spd2 = (t.size / ((t.t_uploaded - t.t_uploading) / 1000.)) / (1024 * 1024.);
 
                     pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
                         spd1.toFixed(2), spd2.toFixed(2)));
 
                     pvis.move(t.n, 'ok');
                 }
-                else t.t4 = undefined;
+                else t.t_uploaded = undefined;
 
                 tasker();
             }
@@ -1280,7 +1311,7 @@ function up2k_init(subtle) {
                     var penalty = rsp.replace(/.*rate-limit /, "").split(' ')[0];
                     console.log("rate-limit: " + penalty);
                     t.cooldown = Date.now() + parseFloat(penalty) * 1000;
-                    st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                    apop(st.busy.handshake, t);
                     st.todo.handshake.unshift(t);
                     return;
                 }
@@ -1299,7 +1330,7 @@ function up2k_init(subtle) {
                     pvis.seth(t.n, 2, err);
                     pvis.move(t.n, 'ng');
 
-                    st.busy.handshake.splice(st.busy.handshake.indexOf(t), 1);
+                    apop(st.busy.handshake, t);
                     tasker();
                     return;
                 }
@@ -1340,8 +1371,8 @@ function up2k_init(subtle) {
         var npart = upt.npart,
             t = st.files[upt.nfile];
 
-        if (!t.t3)
-            t.t3 = Date.now();
+        if (!t.t_uploading)
+            t.t_uploading = Date.now();
 
         pvis.seth(t.n, 1, "🚀 send");
 
@@ -1367,10 +1398,10 @@ function up2k_init(subtle) {
                     xhr.status, t.name) + (txt || "no further information"));
                 return;
             }
-            st.busy.upload.splice(st.busy.upload.indexOf(upt), 1);
-            t.postlist.splice(t.postlist.indexOf(npart), 1);
+            apop(st.busy.upload, upt);
+            apop(t.postlist, npart);
             if (!t.postlist.length) {
-                t.t4 = Date.now();
+                t.t_uploaded = Date.now();
                 pvis.seth(t.n, 1, 'verifying');
                 st.todo.handshake.unshift(t);
             }

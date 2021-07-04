@@ -389,6 +389,13 @@ function has(haystack, needle) {
 }
 
 
+function apop(arr, v) {
+    var ofs = arr.indexOf(v);
+    if (ofs !== -1)
+        arr.splice(ofs, 1);
+}
+
+
 function jcp(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
