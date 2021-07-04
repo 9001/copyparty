@@ -1047,8 +1047,9 @@ class Up2k(object):
                         pdir = os.path.join(cj["ptop"], cj["prel"])
                         job["name"] = self._untaken(pdir, cj["name"], now, cj["addr"])
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
-                        os.unlink(fsenc(dst))  # TODO ed pls
-                        self._symlink(src, dst)
+                        if not self.args.nw:
+                            os.unlink(fsenc(dst))  # TODO ed pls
+                            self._symlink(src, dst)
 
             if not job:
                 job = {
