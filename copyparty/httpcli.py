@@ -1561,7 +1561,9 @@ class HttpCli(object):
             raise Pebkac(404)
 
         if self.readable:
-            if rem.startswith(".hist/up2k."):
+            if rem.startswith(".hist/up2k.") or (
+                rem.endswith("/dir.txt") and rem.startswith(".hist/th/")
+            ):
                 raise Pebkac(403)
 
             is_dir = stat.S_ISDIR(st.st_mode)

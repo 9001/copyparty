@@ -242,6 +242,10 @@ class VFS(object):
         if flt:
             flt = {k: True for k in flt}
 
+        f1 = "{0}.hist{0}up2k.".format(os.sep)
+        f2a = os.sep + "dir.txt"
+        f2b = "{0}.hist{0}".format(os.sep)
+
         for vpath, apath, files, rd, vd in self.walk(
             "", vrem, [], uname, dots, scandir, False
         ):
@@ -275,7 +279,11 @@ class VFS(object):
                     del vd[x]
 
             # up2k filetring based on actual abspath
-            files = [x for x in files if "{0}.hist{0}up2k.".format(os.sep) not in x[1]]
+            files = [
+                x
+                for x in files
+                if f1 not in x[1] and (not x[1].endswith(f2a) or f2b not in x[1])
+            ]
 
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
                 yield f
