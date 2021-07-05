@@ -66,7 +66,10 @@ class TcpSrv(object):
         for srv in self.srv:
             srv.listen(self.args.nc)
             ip, port = srv.getsockname()
-            self.log("tcpsrv", "listening @ {0}:{1}".format(ip, port))
+            msg = "listening @ {0}:{1}".format(ip, port)
+            self.log("tcpsrv", msg)
+            if self.args.q:
+                print(msg)
 
         while not self.stopping:
             if self.args.log_conn:

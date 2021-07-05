@@ -9,13 +9,9 @@ import hashlib
 import threading
 import subprocess as sp
 
-from .__init__ import PY2
+from .__init__ import PY2, unicode
 from .util import fsenc, runcmd, Queue, Cooldown, BytesIO, min_ex
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
-
-
-if not PY2:
-    unicode = str
 
 
 HAVE_PIL = False

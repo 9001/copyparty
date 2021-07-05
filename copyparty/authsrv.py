@@ -10,13 +10,14 @@ import hashlib
 import threading
 
 from .__init__ import WINDOWS
-from .util import IMPLICATIONS, uncyg, undot, Pebkac, fsdec, fsenc, statdir, nuprint
+from .util import IMPLICATIONS, uncyg, undot, Pebkac, fsdec, fsenc, statdir
 
 
 class VFS(object):
     """single level in the virtual fs"""
 
-    def __init__(self, realpath, vpath, uread=[], uwrite=[], uadm=[], flags={}):
+    def __init__(self, log, realpath, vpath, uread=[], uwrite=[], uadm=[], flags={}):
+        self.log = log
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
         self.uread = uread  # users who can read this
@@ -62,6 +63,7 @@ class VFS(object):
                 return self.nodes[name].add(src, dst)
 
             vn = VFS(
+                self.log,
                 os.path.join(self.realpath, name) if self.realpath else None,
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.uread,
@@ -79,7 +81,7 @@ class VFS(object):
 
         # leaf does not exist; create and keep permissions blank
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
-        vn = VFS(src, vp)
+        vn = VFS(self.log, src, vp)
         vn.dbv = self.dbv or self
         self.nodes[dst] = vn
         return vn
@@ -181,7 +183,7 @@ class VFS(object):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
-        real = list(statdir(nuprint, scandir, lstat, abspath))
+        real = list(statdir(self.log, scandir, lstat, abspath))
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):
@@ -209,7 +211,10 @@ class VFS(object):
         )
 
         if seen and not fsroot.startswith(seen[-1]) and fsroot in seen:
-            print("bailing from symlink loop,\n  {}\n  {}".format(seen[-1], fsroot))
+            self.log(
+                "vfs.walk",
+                "bailing from symlink loop,\n  {}\n  {}".format(seen[-1], fsroot),
+            )
             return
 
         seen = seen[:] + [fsroot]
@@ -474,7 +479,7 @@ class AuthSrv(object):
                         )
                     except:
                         m = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
-                        print(m.format(cfg_fn, self.line_ctr))
+                        self.log(m.format(cfg_fn, self.line_ctr), 1)
                         raise
 
         # case-insensitive; normalize
@@ -490,10 +495,10 @@ class AuthSrv(object):
 
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
-            vfs = VFS(os.path.abspath("."), "", ["*"], ["*"])
+            vfs = VFS(self.log_func, os.path.abspath("."), "", ["*"], ["*"])
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(None, "")
+            vfs = VFS(self.log_func, None, "")
             vfs.flags["d2d"] = True
 
         maxdepth = 0
@@ -505,7 +510,13 @@ class AuthSrv(object):
             if dst == "":
                 # rootfs was mapped; fully replaces the default CWD vfs
                 vfs = VFS(
-                    mount[dst], dst, mread[dst], mwrite[dst], madm[dst], mflags[dst]
+                    self.log_func,
+                    mount[dst],
+                    dst,
+                    mread[dst],
+                    mwrite[dst],
+                    madm[dst],
+                    mflags[dst],
                 )
                 continue
 
@@ -788,7 +799,7 @@ class AuthSrv(object):
                         msg = [x[1] for x in files]
 
                     if msg:
-                        nuprint("\n".join(msg))
+                        self.log("\n" + "\n".join(msg))
 
                 if n_bads and flag_p:
                     raise Exception("found symlink leaving volume, and strict is set")

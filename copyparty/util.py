@@ -979,8 +979,7 @@ def statdir(logger, scandir, lstat, top):
                     try:
                         yield [fsdec(fh.name), fh.stat(follow_symlinks=not lstat)]
                     except Exception as ex:
-                        msg = "scan-stat: \033[36m{} @ {}"
-                        logger(msg.format(repr(ex), fsdec(fh.path)))
+                        logger(src, "stat {} @ {}".format(repr(ex), fsdec(fh.path)), 6)
         else:
             src = "listdir"
             fun = os.lstat if lstat else os.stat
@@ -989,11 +988,10 @@ def statdir(logger, scandir, lstat, top):
                 try:
                     yield [fsdec(name), fun(abspath)]
                 except Exception as ex:
-                    msg = "list-stat: \033[36m{} @ {}"
-                    logger(msg.format(repr(ex), fsdec(abspath)))
+                    logger(src, "stat {} @ {}".format(repr(ex), fsdec(abspath)), 6)
 
     except Exception as ex:
-        logger("{}: \033[31m{} @ {}".format(src, repr(ex), top))
+        logger(src, "{} @ {}".format(repr(ex), top), 1)
 
 
 def unescape_cookie(orig):
@@ -1035,7 +1033,7 @@ def guess_mime(url, fallback="application/octet-stream"):
     if ";" not in ret:
         if ret.startswith("text/") or ret.endswith("/javascript"):
             ret += "; charset=UTF-8"
-    
+
     return ret
 
 

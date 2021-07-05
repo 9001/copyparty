@@ -20,7 +20,7 @@ import threading
 import traceback
 from textwrap import dedent
 
-from .__init__ import E, WINDOWS, VT100, PY2
+from .__init__ import E, WINDOWS, VT100, PY2, unicode
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
 from .util import py_desc, align_tab, IMPLICATIONS, alltrace
@@ -30,6 +30,8 @@ try:
     import ssl
 except:
     HAVE_SSL = False
+
+printed = ""
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -61,8 +63,15 @@ class Dodge11874(RiceFormatter):
         super(Dodge11874, self).__init__(*args, **kwargs)
 
 
+def lprint(*a, **ka):
+    global printed
+
+    printed += " ".join(unicode(x) for x in a) + ka.get("end", "\n")
+    print(*a, **ka)
+
+
 def warn(msg):
-    print("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
+    lprint("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
 
 
 def ensure_locale():
@@ -73,7 +82,7 @@ def ensure_locale():
     ]:
         try:
             locale.setlocale(locale.LC_ALL, x)
-            print("Locale:", x)
+            lprint("Locale:", x)
             break
         except:
             continue
@@ -94,7 +103,7 @@ def ensure_cert():
 
     try:
         if filecmp.cmp(cert_cfg, cert_insec):
-            print(
+            lprint(
                 "\033[33m  using default TLS certificate; https will be insecure."
                 + "\033[36m\n  certificate location: {}\033[0m\n".format(cert_cfg)
             )
@@ -123,7 +132,7 @@ def configure_ssl_ver(al):
     if "help" in sslver:
         avail = [terse_sslver(x[6:]) for x in flags]
         avail = " ".join(sorted(avail) + ["all"])
-        print("\navailable ssl/tls versions:\n  " + avail)
+        lprint("\navailable ssl/tls versions:\n  " + avail)
         sys.exit(0)
 
     al.ssl_flags_en = 0
@@ -143,7 +152,7 @@ def configure_ssl_ver(al):
 
     for k in ["ssl_flags_en", "ssl_flags_de"]:
         num = getattr(al, k)
-        print("{}: {:8x} ({})".format(k, num, num))
+        lprint("{}: {:8x} ({})".format(k, num, num))
 
     # think i need that beer now
 
@@ -160,13 +169,13 @@ def configure_ssl_ciphers(al):
         try:
             ctx.set_ciphers(al.ciphers)
         except:
-            print("\n\033[1;31mfailed to set ciphers\033[0m\n")
+            lprint("\n\033[1;31mfailed to set ciphers\033[0m\n")
 
     if not hasattr(ctx, "get_ciphers"):
-        print("cannot read cipher list: openssl or python too old")
+        lprint("cannot read cipher list: openssl or python too old")
     else:
         ciphers = [x["description"] for x in ctx.get_ciphers()]
-        print("\n  ".join(["\nenabled ciphers:"] + align_tab(ciphers) + [""]))
+        lprint("\n  ".join(["\nenabled ciphers:"] + align_tab(ciphers) + [""]))
 
     if is_help:
         sys.exit(0)
@@ -249,17 +258,18 @@ def run_argparse(argv, formatter):
         ),
     )
     # fmt: off
-    ap.add_argument("-c", metavar="PATH", type=str, action="append", help="add config file")
-    ap.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
-    ap.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores")
-    ap.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account, USER:PASS; example [ed:wark")
-    ap.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume, SRC:DST:FLAG; example [.::r], [/mnt/nas/music:/music:r:aed")
-    ap.add_argument("-ed", action="store_true", help="enable ?dots")
-    ap.add_argument("-emp", action="store_true", help="enable markdown plugins")
-    ap.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
-    ap.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
-    ap.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
-    ap.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms; examples: [stash], [save,get]")
+    ap2 = ap.add_argument_group('general options')
+    ap2.add_argument("-c", metavar="PATH", type=str, action="append", help="add config file")
+    ap2.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
+    ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores")
+    ap2.add_argument("-a", metavar="ACCT", type=str, action="append", help="add account, USER:PASS; example [ed:wark")
+    ap2.add_argument("-v", metavar="VOL", type=str, action="append", help="add volume, SRC:DST:FLAG; example [.::r], [/mnt/nas/music:/music:r:aed")
+    ap2.add_argument("-ed", action="store_true", help="enable ?dots")
+    ap2.add_argument("-emp", action="store_true", help="enable markdown plugins")
+    ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
+    ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
+    ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
+    ap2.add_argument("--urlform", metavar="MODE", type=str, default="print,get", help="how to handle url-forms; examples: [stash], [save,get]")
 
     ap2 = ap.add_argument_group('network options')
     ap2.add_argument("-i", metavar="IP", type=str, default="0.0.0.0", help="ip to bind (comma-sep.)")
@@ -286,6 +296,7 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")
+    ap2.add_argument("-lo", metavar="PATH", type=str, help="logfile, example: cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
     ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap2.add_argument("--ihead", metavar="HEADER", action='append', help="dump incoming header")
     ap2.add_argument("--lf-url", metavar="RE", type=str, default=r"^/\.cpr/|\?th=[wj]$", help="dont log URLs matching")
@@ -348,7 +359,7 @@ def main(argv=None):
     desc = py_desc().replace("[", "\033[1;30m[")
 
     f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0m\n'
-    print(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
+    lprint(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
 
     ensure_locale()
     if HAVE_SSL:
@@ -362,7 +373,7 @@ def main(argv=None):
             continue
 
         msg = "\033[1;31mWARNING:\033[0;1m\n  {} \033[0;33mwas replaced with\033[0;1m {} \033[0;33mand will be removed\n\033[0m"
-        print(msg.format(dk, nk))
+        lprint(msg.format(dk, nk))
         argv[idx] = nk
         time.sleep(2)
 
@@ -416,7 +427,7 @@ def main(argv=None):
 
     # signal.signal(signal.SIGINT, sighandler)
 
-    SvcHub(al).run()
+    SvcHub(al, argv, printed).run()
 
 
 if __name__ == "__main__":

@@ -342,7 +342,15 @@ class Up2k(object):
             for k, v in flags.items()
         ]
         if a:
-            self.log(" ".join(sorted(a)) + "\033[0m")
+            vpath = "?"
+            for k, v in self.asrv.vfs.all_vols.items():
+                if v.realpath == ptop:
+                    vpath = k
+
+            if vpath:
+                vpath += "/"
+
+            self.log("/{} {}".format(vpath, " ".join(sorted(a))), "35")
 
         reg = {}
         path = os.path.join(histpath, "up2k.snap")
@@ -413,7 +421,7 @@ class Up2k(object):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histpath = self.asrv.vfs.histtab[top]
         ret = 0
-        g = statdir(self.log, not self.args.no_scandir, False, cdir)
+        g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
         for iname, inf in sorted(g):
             abspath = os.path.join(cdir, iname)
             lmod = int(inf.st_mtime)

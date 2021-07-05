@@ -5,6 +5,7 @@ import re
 import os
 import sys
 import time
+import shlex
 import threading
 from datetime import datetime, timedelta
 import calendar
@@ -28,7 +29,7 @@ class SvcHub(object):
     put() can return a queue (if want_reply=True) which has a blocking get() with the response.
     """
 
-    def __init__(self, args):
+    def __init__(self, args, argv, printed):
         self.args = args
 
         self.ansi_re = re.compile("\033\\[[^m]*m")
@@ -36,6 +37,7 @@ class SvcHub(object):
         self.next_day = 0
 
         self.log = self._log_disabled if args.q else self._log_enabled
+        self.logf = self._setup_logfile(argv, printed) if args.lo else None
 
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log, False)
@@ -69,6 +71,33 @@ class SvcHub(object):
 
         self.broker = Broker(self)
 
+    def _setup_logfile(self, argv, printed):
+        dt = datetime.utcfromtimestamp(time.time())
+        fn = self.args.lo
+        for fs in "YmdHMS":
+            fs = "%" + fs
+            if fs in fn:
+                fn = fn.replace(fs, dt.strftime(fs))
+
+        try:
+            import lzma
+
+            lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
+
+        except:
+            import codecs
+
+            lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
+
+        argv = [sys.executable] + argv
+        if hasattr(shlex, "quote"):
+            argv = [shlex.quote(x) for x in argv]
+        else:
+            argv = ['"{}"'.format(x) for x in argv]
+
+        lh.write("argv: " + " ".join(argv) + "\n\n" + printed)
+        return lh
+
     def run(self):
         thr = threading.Thread(target=self.tcpsrv.run, name="svchub-main")
         thr.daemon = True
@@ -99,8 +128,15 @@ class SvcHub(object):
             print("nailed it", end="")
         finally:
             print("\033[0m")
+            if self.logf:
+                self.logf.close()
 
     def _log_disabled(self, src, msg, c=0):
+        if self.logf:
+            ts = datetime.utcfromtimestamp(time.time())
+            ts = ts.strftime("%Y-%m%d-%H%M%S.%f")[:-3]
+            self.logf.write("{} [{}] {}\n".format(ts, src, msg))
+
         pass
 
     def _log_enabled(self, src, msg, c=0):
@@ -143,6 +179,9 @@ class SvcHub(object):
                     print(msg.encode("utf-8", "replace").decode(), end="")
                 except:
                     print(msg.encode("ascii", "replace").decode(), end="")
+
+            if self.logf:
+                self.logf.write(msg)
 
     def check_mp_support(self):
         vmin = sys.version_info[1]

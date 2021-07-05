@@ -7,11 +7,8 @@ import json
 import shutil
 import subprocess as sp
 
-from .__init__ import PY2, WINDOWS
+from .__init__ import PY2, WINDOWS, unicode
 from .util import fsenc, fsdec, uncyg, REKOBO_LKEY
-
-if not PY2:
-    unicode = str
 
 
 def have_ff(cmd):

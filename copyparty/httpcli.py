@@ -13,14 +13,11 @@ import ctypes
 from datetime import datetime
 import calendar
 
-from .__init__ import E, PY2, WINDOWS, ANYWIN
+from .__init__ import E, PY2, WINDOWS, ANYWIN, unicode
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 from .authsrv import AuthSrv
 from .szip import StreamZip
 from .star import StreamTar
-
-if not PY2:
-    unicode = str
 
 
 NO_CACHE = {"Cache-Control": "no-cache"}
