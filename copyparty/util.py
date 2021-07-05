@@ -979,7 +979,7 @@ def statdir(logger, scandir, lstat, top):
                     try:
                         yield [fsdec(fh.name), fh.stat(follow_symlinks=not lstat)]
                     except Exception as ex:
-                        logger(src, "stat {} @ {}".format(repr(ex), fsdec(fh.path)), 6)
+                        logger(src, "[s] {} @ {}".format(repr(ex), fsdec(fh.path)), 6)
         else:
             src = "listdir"
             fun = os.lstat if lstat else os.stat
@@ -988,7 +988,7 @@ def statdir(logger, scandir, lstat, top):
                 try:
                     yield [fsdec(name), fun(abspath)]
                 except Exception as ex:
-                    logger(src, "stat {} @ {}".format(repr(ex), fsdec(abspath)), 6)
+                    logger(src, "[s] {} @ {}".format(repr(ex), fsdec(abspath)), 6)
 
     except Exception as ex:
         logger(src, "{} @ {}".format(repr(ex), top), 1)

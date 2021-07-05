@@ -32,13 +32,15 @@ class SvcHub(object):
     def __init__(self, args, argv, printed):
         self.args = args
         self.argv = argv
+        self.logf = None
 
         self.ansi_re = re.compile("\033\\[[^m]*m")
         self.log_mutex = threading.Lock()
         self.next_day = 0
 
         self.log = self._log_disabled if args.q else self._log_enabled
-        self.logf = self._setup_logfile(printed) if args.lo else None
+        if args.lo:
+            self._setup_logfile(printed)
 
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log, False)
@@ -112,8 +114,11 @@ class SvcHub(object):
         else:
             argv = ['"{}"'.format(x) for x in argv]
 
+        msg = "[+] opened logfile [{}]\n".format(fn)
+        printed += msg
         lh.write("t0: {:.3f}\nargv: {}\n\n{}".format(E.t0, " ".join(argv), printed))
-        return lh
+        self.logf = lh
+        print(msg, end="")
 
     def run(self):
         thr = threading.Thread(target=self.tcpsrv.run, name="svchub-main")
@@ -164,7 +169,7 @@ class SvcHub(object):
     def _set_next_day(self):
         if self.next_day and self.logf and self.logf.base_fn != self._logname():
             self.logf.close()
-            self.logf = self._setup_logfile("")
+            self._setup_logfile("")
 
         dt = datetime.utcfromtimestamp(time.time())
 
@@ -258,5 +263,5 @@ class SvcHub(object):
         if not err:
             return True
         else:
-            self.log("root", err)
+            self.log("svchub", err)
             return False
