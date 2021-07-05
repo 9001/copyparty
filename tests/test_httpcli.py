@@ -30,6 +30,7 @@ class Cfg(Namespace):
             c=c,
             rproxy=0,
             ed=False,
+            nw=False,
             no_zip=False,
             no_scandir=False,
             no_sendfile=True,

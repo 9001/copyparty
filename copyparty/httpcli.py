@@ -475,15 +475,17 @@ class HttpCli(object):
         addr = self.ip.replace(":", ".")
         fn = "put-{:.6f}-{}.bin".format(time.time(), addr)
         path = os.path.join(fdir, fn)
+        if self.args.nw:
+            path = os.devnull
 
         with open(fsenc(path), "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
 
-        vfs, vrem = vfs.get_dbv(rem)
-
-        self.conn.hsrv.broker.put(
-            False, "up2k.hash_file", vfs.realpath, vfs.flags, vrem, fn
-        )
+        if not self.args.nw:
+            vfs, vrem = vfs.get_dbv(rem)
+            self.conn.hsrv.broker.put(
+                False, "up2k.hash_file", vfs.realpath, vfs.flags, vrem, fn
+            )
 
         return post_sz, sha_b64, remains, path
 
