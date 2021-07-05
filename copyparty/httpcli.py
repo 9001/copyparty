@@ -95,9 +95,13 @@ class HttpCli(object):
             try:
                 self.mode, self.req, self.http_ver = headerlines[0].split(" ")
             except:
-                raise Pebkac(400, "bad headers:\n" + "\n".join(headerlines))
+                msg = " ]\n#[ ".join(headerlines)
+                raise Pebkac(400, "bad headers:\n#[ " + msg + " ]")
 
         except Pebkac as ex:
+            self.mode = "GET"
+            self.req = "[junk]"
+            self.http_ver = "HTTP/1.1"
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = self._check_nonfatal(ex)
             self.loud_reply(unicode(ex), status=ex.code)
