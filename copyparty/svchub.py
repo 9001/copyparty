@@ -10,7 +10,7 @@ import threading
 from datetime import datetime, timedelta
 import calendar
 
-from .__init__ import PY2, WINDOWS, MACOS, VT100
+from .__init__ import E, PY2, WINDOWS, MACOS, VT100
 from .util import mp
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
@@ -31,13 +31,14 @@ class SvcHub(object):
 
     def __init__(self, args, argv, printed):
         self.args = args
+        self.argv = argv
 
         self.ansi_re = re.compile("\033\\[[^m]*m")
         self.log_mutex = threading.Lock()
         self.next_day = 0
 
         self.log = self._log_disabled if args.q else self._log_enabled
-        self.logf = self._setup_logfile(argv, printed) if args.lo else None
+        self.logf = self._setup_logfile(printed) if args.lo else None
 
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log, False)
@@ -71,13 +72,27 @@ class SvcHub(object):
 
         self.broker = Broker(self)
 
-    def _setup_logfile(self, argv, printed):
+    def _logname(self):
         dt = datetime.utcfromtimestamp(time.time())
         fn = self.args.lo
         for fs in "YmdHMS":
             fs = "%" + fs
             if fs in fn:
                 fn = fn.replace(fs, dt.strftime(fs))
+
+        return fn
+
+    def _setup_logfile(self, printed):
+        base_fn = fn = sel_fn = self._logname()
+        if fn != self.args.lo:
+            ctr = 0
+            # yup this is a race; if started sufficiently concurrently, two
+            # copyparties can grab the same logfile (considered and ignored)
+            while os.path.exists(sel_fn):
+                ctr += 1
+                sel_fn = "{}.{}".format(fn, ctr)
+
+        fn = sel_fn
 
         try:
             import lzma
@@ -89,13 +104,15 @@ class SvcHub(object):
 
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
 
-        argv = [sys.executable] + argv
+        lh.base_fn = base_fn
+
+        argv = [sys.executable] + self.argv
         if hasattr(shlex, "quote"):
             argv = [shlex.quote(x) for x in argv]
         else:
             argv = ['"{}"'.format(x) for x in argv]
 
-        lh.write("argv: " + " ".join(argv) + "\n\n" + printed)
+        lh.write("t0: {:.3f}\nargv: {}\n\n{}".format(E.t0, " ".join(argv), printed))
         return lh
 
     def run(self):
@@ -132,12 +149,32 @@ class SvcHub(object):
                 self.logf.close()
 
     def _log_disabled(self, src, msg, c=0):
-        if self.logf:
+        if not self.logf:
+            return
+
+        with self.log_mutex:
             ts = datetime.utcfromtimestamp(time.time())
             ts = ts.strftime("%Y-%m%d-%H%M%S.%f")[:-3]
-            self.logf.write("{} [{}] {}\n".format(ts, src, msg))
+            self.logf.write("@{} [{}] {}\n".format(ts, src, msg))
 
-        pass
+            now = time.time()
+            if now >= self.next_day:
+                self._set_next_day()
+
+    def _set_next_day(self):
+        if self.next_day and self.logf and self.logf.base_fn != self._logname():
+            self.logf.close()
+            self.logf = self._setup_logfile("")
+
+        dt = datetime.utcfromtimestamp(time.time())
+
+        # unix timestamp of next 00:00:00 (leap-seconds safe)
+        day_now = dt.day
+        while dt.day == day_now:
+            dt += timedelta(hours=12)
+
+        dt = dt.replace(hour=0, minute=0, second=0)
+        self.next_day = calendar.timegm(dt.utctimetuple())
 
     def _log_enabled(self, src, msg, c=0):
         """handles logging from all components"""
@@ -146,14 +183,7 @@ class SvcHub(object):
             if now >= self.next_day:
                 dt = datetime.utcfromtimestamp(now)
                 print("\033[36m{}\033[0m\n".format(dt.strftime("%Y-%m-%d")), end="")
-
-                # unix timestamp of next 00:00:00 (leap-seconds safe)
-                day_now = dt.day
-                while dt.day == day_now:
-                    dt += timedelta(hours=12)
-
-                dt = dt.replace(hour=0, minute=0, second=0)
-                self.next_day = calendar.timegm(dt.utctimetuple())
+                self._set_next_day()
 
             fmt = "\033[36m{} \033[33m{:21} \033[0m{}\n"
             if not VT100:
