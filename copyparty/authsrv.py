@@ -210,11 +210,13 @@ class VFS(object):
             rem, uname, scandir, incl_wo=False, lstat=lstat
         )
 
-        if seen and not fsroot.startswith(seen[-1]) and fsroot in seen:
-            self.log(
-                "vfs.walk",
-                "bailing from symlink loop,\n  {}\n  {}".format(seen[-1], fsroot),
-            )
+        if (
+            seen
+            and (not fsroot.startswith(seen[-1]) or fsroot == seen[-1])
+            and fsroot in seen
+        ):
+            m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}/{}"
+            self.log("vfs.walk", m.format(seen[-1], fsroot, self.vpath, rem), 3)
             return
 
         seen = seen[:] + [fsroot]

@@ -409,7 +409,7 @@ class Up2k(object):
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
 
-            n_add = self._build_dir(dbw, top, set(excl), top, nohash)
+            n_add = self._build_dir(dbw, top, set(excl), top, nohash, [])
             n_rm = self._drop_lost(dbw[0], top)
             if dbw[1]:
                 self.log("commit {} new files".format(dbw[1]))
@@ -417,7 +417,21 @@ class Up2k(object):
 
             return True, n_add or n_rm or do_vac
 
-    def _build_dir(self, dbw, top, excl, cdir, nohash):
+    def _build_dir(self, dbw, top, excl, cdir, nohash, seen):
+        rcdir = cdir
+        if not ANYWIN:
+            try:
+                # a bit expensive but worth
+                rcdir = os.path.realpath(cdir)
+            except:
+                pass
+
+        if rcdir in seen:
+            m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
+            self.log(m.format(seen[-1], rcdir, cdir), 3)
+            return 0
+
+        seen = seen + [cdir]
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histpath = self.asrv.vfs.histtab[top]
         ret = 0
@@ -430,7 +444,7 @@ class Up2k(object):
                 if abspath in excl or abspath == histpath:
                     continue
                 # self.log(" dir: {}".format(abspath))
-                ret += self._build_dir(dbw, top, excl, abspath, nohash)
+                ret += self._build_dir(dbw, top, excl, abspath, nohash, seen)
             else:
                 # self.log("file: {}".format(abspath))
                 rp = abspath[len(top) + 1 :]
