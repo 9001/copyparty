@@ -514,8 +514,10 @@ var tt = (function () {
 
         var pos = this.getBoundingClientRect(),
             left = pos.left < window.innerWidth / 2,
-            top = pos.top < window.innerHeight / 2;
+            top = pos.top < window.innerHeight / 2,
+            big = this.className.indexOf(' ttb') !== -1;
 
+        clmod(r.tt, 'b', big);
         r.tt.style.top = top ? pos.bottom + 'px' : 'auto';
         r.tt.style.bottom = top ? 'auto' : (window.innerHeight - pos.top) + 'px';
         r.tt.style.left = left ? pos.left + 'px' : 'auto';

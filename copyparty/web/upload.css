@@ -215,9 +215,31 @@
 	color: #fff;
 	font-style: italic;
 }
+#u2foot .warn {
+	font-size: 1.3em;
+	padding: .5em .8em;
+	margin: 1em -.6em;
+	color: #f74;
+	background: #322;
+	border: 1px solid #633;
+	border-width: .1em 0;
+	text-align: center;
+}
+#u2foot .warn span {
+	color: #f86;
+}
+html.light #u2foot .warn {
+	color: #b00;
+	background: #fca;
+	border-color: #f70;
+}
+html.light #u2foot .warn span {
+	color: #930;
+}
 #u2foot span {
 	color: #999;
 	font-size: .9em;
+	font-weight: normal;
 }
 #u2footfoot {
 	margin-bottom: -1em;

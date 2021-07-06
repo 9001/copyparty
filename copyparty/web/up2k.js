@@ -308,6 +308,12 @@ function U2pvis(act, btns) {
             throw 42;
         }
 
+        //console.log("oldcat %s %d, newcat %s %d, head=%d, tail=%d, file=%d, act.old=%s, act.new=%s, bz_act=%s",
+        //    oldcat, this.ctr[oldcat],
+        //    newcat, this.ctr[newcat],
+        //    this.head, this.tail, nfile,
+        //    this.is_act(oldcat), this.is_act(newcat), bz_act);
+
         fo.in = newcat;
         this.ctr[oldcat]--;
         this.ctr[newcat]++;
@@ -319,7 +325,7 @@ function U2pvis(act, btns) {
                 this.addrow(nfile);
         }
         else if (this.is_act(oldcat)) {
-            while (this.head < Math.min(this.tab.length, this.tail) && (this.head == nfile || !this.is_act(this.tab[this.head].in)))
+            while (this.head < Math.min(this.tab.length, this.tail) && this.precard[this.tab[this.head].in])
                 this.head++;
 
             if (!bz_act) {
@@ -327,9 +333,10 @@ function U2pvis(act, btns) {
                 tr.parentNode.removeChild(tr);
             }
         }
-        if (bz_act) {
+        else return;
+
+        if (bz_act)
             this.bzw();
-        }
     };
 
     this.bzw = function () {
@@ -343,7 +350,8 @@ function U2pvis(act, btns) {
 
         while (this.head - first > this.wsz) {
             var obj = ebi('f' + (first++));
-            obj.parentNode.removeChild(obj);
+            if (obj)
+                obj.parentNode.removeChild(obj);
         }
         while (last - this.tail < this.wsz && last < this.tab.length - 2) {
             var obj = ebi('f' + (++last));
@@ -376,6 +384,8 @@ function U2pvis(act, btns) {
 
     this.changecard = function (card) {
         this.act = card;
+        this.precard = has(["ok", "ng", "done"], this.act) ? {} : this.act == "bz" ? { "ok": 1, "ng": 1 } : { "ok": 1, "ng": 1, "bz": 1 };
+        this.postcard = has(["ok", "ng", "done"], this.act) ? { "bz": 1, "q": 1 } : this.act == "bz" ? { "q": 1 } : {};
         this.head = -1;
         this.tail = -1;
         var html = [];
@@ -390,16 +400,13 @@ function U2pvis(act, btns) {
             }
         }
         if (this.head == -1) {
-            var precard = has(["ok", "ng", "done"], this.act) ? {} : this.act == "bz" ? { "ok": 1, "ng": 1 } : { "ok": 1, "ng": 1, "bz": 1 },
-                postcard = has(["ok", "ng", "done"], this.act) ? { "bz": 1, "q": 1 } : this.act == "bz" ? { "q": 1 } : {};
-
             for (var a = 0; a < this.tab.length; a++) {
                 var rt = this.tab[a].in;
-                if (precard[rt]) {
+                if (this.precard[rt]) {
                     this.head = a + 1;
                     this.tail = a;
                 }
-                else if (postcard[rt]) {
+                else if (this.postcard[rt]) {
                     this.head = a;
                     this.tail = a - 1;
                     break;
@@ -452,6 +459,8 @@ function U2pvis(act, btns) {
             that.changecard(newtab);
         };
     }
+
+    this.changecard(this.act);
 }
 
 
@@ -548,17 +557,21 @@ function up2k_init(subtle) {
         ask_up = bcfg_get('ask_up', true),
         flag_en = bcfg_get('flag_en', false),
         fsearch = bcfg_get('fsearch', false),
+        turbo = bcfg_get('u2turbo', false),
+        datechk = bcfg_get('u2tdate', true),
         fdom_ctr = 0,
         min_filebuf = 0;
 
     var st = {
         "files": [],
         "todo": {
+            "head": [],
             "hash": [],
             "handshake": [],
             "upload": []
         },
         "busy": {
+            "head": [],
             "hash": [],
             "handshake": [],
             "upload": []
@@ -568,6 +581,15 @@ function up2k_init(subtle) {
             "uploaded": 0
         }
     };
+
+    function push_t(arr, t) {
+        var sort = arr.length && arr[arr.length - 1].n > t.n;
+        arr.push(t);
+        if (sort)
+            arr.sort(function (a, b) {
+                return a.n < b.n ? -1 : 1;
+            });
+    }
 
     var pvis = new U2pvis("bz", '#u2cards');
 
@@ -796,7 +818,10 @@ function up2k_init(subtle) {
             ], fobj.size, draw_each);
 
             st.files.push(entry);
-            st.todo.hash.push(entry);
+            if (turbo)
+                push_t(st.todo.head, entry);
+            else
+                push_t(st.todo.hash, entry);
         }
         if (!draw_each) {
             pvis.drawcard("q");
@@ -891,9 +916,11 @@ function up2k_init(subtle) {
             while (window['vis_exh']) {
                 var now = Date.now(),
                     is_busy = 0 !=
+                        st.todo.head.length +
                         st.todo.hash.length +
                         st.todo.handshake.length +
                         st.todo.upload.length +
+                        st.busy.head.length +
                         st.busy.hash.length +
                         st.busy.handshake.length +
                         st.busy.upload.length;
@@ -941,6 +968,12 @@ function up2k_init(subtle) {
                         st.todo.handshake.unshift(t);
                         t.keepalive = true;
                     }
+                }
+
+                if (st.todo.head.length &&
+                    st.busy.head.length < parallel_uploads) {
+                    exec_head();
+                    mou_ikkai = true;
                 }
 
                 if (handshakes_permitted() &&
@@ -1162,6 +1195,53 @@ function up2k_init(subtle) {
 
     /////
     ////
+    ///   head
+    //
+
+    function exec_head() {
+        var t = st.todo.head.shift();
+        st.busy.head.push(t);
+
+        var xhr = new XMLHttpRequest();
+        xhr.onerror = function () {
+            console.log('head onerror, retrying', t);
+            apop(st.busy.head, t);
+            st.todo.head.unshift(t);
+            tasker();
+        };
+        function orz(e) {
+            var ok = false;
+            if (xhr.status == 200) {
+                var srv_sz = xhr.getResponseHeader('Content-Length'),
+                    srv_ts = xhr.getResponseHeader('Last-Modified');
+
+                ok = t.size == srv_sz;
+                if (ok && datechk) {
+                    srv_ts = new Date(srv_ts) / 1000;
+                    ok = Math.abs(srv_ts - t.lmod) < 2;
+                }
+            }
+            apop(st.busy.head, t);
+            if (!ok)
+                return push_t(st.todo.hash, t);
+
+            t.done = true;
+            st.bytes.hashed += t.size;
+            st.bytes.uploaded += t.size;
+            pvis.seth(t.n, 1, 'YOLO');
+            pvis.seth(t.n, 2, "turbo'd");
+            pvis.move(t.n, 'ok');
+        };
+        xhr.onload = function (e) {
+            try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
+        };
+
+        xhr.open('HEAD', t.purl + t.name, true);
+        xhr.send();
+    }
+
+    /////
+    ////
     ///   handshake
     //
 
@@ -1268,14 +1348,24 @@ function up2k_init(subtle) {
                     msg = '&#x1f3b7;&#x1f41b;';
 
                 if (t.postlist.length) {
+                    var arr = st.todo.upload,
+                        sort = arr.length && arr[arr.length - 1].nfile > t.n;
+
                     for (var a = 0; a < t.postlist.length; a++)
-                        st.todo.upload.push({
+                        arr.push({
                             'nfile': t.n,
                             'npart': t.postlist[a]
                         });
 
                     msg = 'uploading';
                     done = false;
+
+                    if (sort)
+                        arr.sort(function (a, b) {
+                            return a.nfile < b.nfile ? -1 :
+                            /*  */ a.nfile > b.nfile ? 1 :
+                                    a.npart < b.npart ? -1 : 1;
+                        });
                 }
                 pvis.seth(t.n, 1, msg);
                 apop(st.busy.handshake, t);
@@ -1527,6 +1617,30 @@ function up2k_init(subtle) {
         set_fsearch(!fsearch);
     }
 
+    function tgl_turbo() {
+        turbo = !turbo;
+        bcfg_set('u2turbo', turbo);
+        draw_turbo();
+    }
+
+    function tgl_datechk() {
+        datechk = !datechk;
+        bcfg_set('u2tdate', datechk);
+    }
+
+    function draw_turbo() {
+        var msg = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
+            html = ebi('u2foot').innerHTML;
+
+        if (turbo && html.indexOf(msg) === -1)
+            html += msg;
+        else if (!turbo)
+            html = html.replace(msg, '');
+
+        ebi('u2foot').innerHTML = html;
+    }
+    draw_turbo();
+
     function set_fsearch(new_state) {
         var fixed = false;
 
@@ -1608,6 +1722,8 @@ function up2k_init(subtle) {
     ebi('multitask').addEventListener('click', tgl_multitask, false);
     ebi('ask_up').addEventListener('click', tgl_ask_up, false);
     ebi('flag_en').addEventListener('click', tgl_flag_en, false);
+    ebi('u2turbo').addEventListener('click', tgl_turbo, false);
+    ebi('u2tdate').addEventListener('click', tgl_datechk, false);
     var o = ebi('fsearch');
     if (o)
         o.addEventListener('click', tgl_fsearch, false);

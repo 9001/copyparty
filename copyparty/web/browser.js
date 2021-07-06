@@ -133,6 +133,13 @@ ebi('op_cfg').innerHTML = (
 	(have_zip ? (
 		'<div><h3>folder download</h3><div id="arc_fmt"></div></div>\n'
 	) : '') +
+	'<div>\n' +
+	'	<h3>up2k switches</h3>\n' +
+	'	<div>\n' +
+	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them">turbo</a>\n' +
+	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished/corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards">date-chk</a>\n' +
+	'	</div>\n' +
+	'</div>\n' +
 	'<div><h3>key notation</h3><div id="key_notation"></div></div>\n' +
 	'<div class="fill"><h3>hidden columns</h3><div id="hcols"></div></div>'
 );
