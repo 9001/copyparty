@@ -413,6 +413,10 @@ function U2pvis(act, btns) {
                 }
             }
         }
+
+        if (this.head < 0)
+            this.head = 0;
+
         if (card == "bz") {
             for (var a = this.head - 1; a >= this.head - this.wsz && a >= 0; a--) {
                 html.unshift(this.genrow(a, true).replace(/><td>/, "><td>a "));
@@ -864,20 +868,27 @@ function up2k_init(subtle) {
         if (!st.todo.handshake.length)
             return true;
 
-        var cd = st.todo.handshake[0].cooldown;
+        var t = st.todo.handshake[0],
+            cd = t.cooldown;
+
         if (cd && cd - Date.now() > 0)
             return false;
 
         // keepalive or verify
-        if (st.todo.handshake[0].keepalive ||
-            st.todo.handshake[0].t_uploaded)
+        if (t.keepalive ||
+            t.t_uploaded)
             return true;
 
         if (parallel_uploads <
             st.busy.handshake.length)
             return false;
 
-        if ((multitask ? parallel_uploads : 0) <
+        if (st.busy.handshake.length)
+            for (var n = t.n - 1; n >= t.n - parallel_uploads && n >= 0; n--)
+                if (st.files[n].t_uploading)
+                    return false;
+
+        if ((multitask ? 1 : 0) <
             st.todo.upload.length +
             st.busy.upload.length)
             return false;
@@ -1629,15 +1640,20 @@ function up2k_init(subtle) {
     }
 
     function draw_turbo() {
-        var msg = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
-            html = ebi('u2foot').innerHTML;
+        var msgu = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
+            msgs = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search may give false-positives; see turbo-button tooltip</span></p>',
+            msg = fsearch ? msgs : msgu,
+            omsg = fsearch ? msgu : msgs,
+            html = ebi('u2foot').innerHTML,
+            ohtml = html;
 
         if (turbo && html.indexOf(msg) === -1)
-            html += msg;
+            html = html.replace(omsg, '') + msg;
         else if (!turbo)
-            html = html.replace(msg, '');
+            html = html.replace(msgu, '').replace(msgs, '');
 
-        ebi('u2foot').innerHTML = html;
+        if (html !== ohtml)
+            ebi('u2foot').innerHTML = html;
     }
     draw_turbo();
 
@@ -1678,6 +1694,7 @@ function up2k_init(subtle) {
         }
         catch (ex) { }
 
+        draw_turbo();
         onresize();
     }
 
