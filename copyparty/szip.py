@@ -4,15 +4,14 @@ from __future__ import print_function, unicode_literals
 import os
 import time
 import zlib
-import struct
 from datetime import datetime
 
 from .sutil import errdesc
-from .util import yieldfile, sanitize_fn
+from .util import yieldfile, sanitize_fn, spack, sunpack
 
 
 def dostime2unix(buf):
-    t, d = struct.unpack("<HH", buf)
+    t, d = sunpack(b"<HH", buf)
 
     ts = (t & 0x1F) * 2
     tm = (t >> 5) & 0x3F
@@ -36,13 +35,13 @@ def unixtime2dos(ts):
 
     bd = ((dy - 1980) << 9) + (dm << 5) + dd
     bt = (th << 11) + (tm << 5) + ts // 2
-    return struct.pack("<HH", bt, bd)
+    return spack(b"<HH", bt, bd)
 
 
 def gen_fdesc(sz, crc32, z64):
     ret = b"\x50\x4b\x07\x08"
-    fmt = "<LQQ" if z64 else "<LLL"
-    ret += struct.pack(fmt, crc32, sz, sz)
+    fmt = b"<LQQ" if z64 else b"<LLL"
+    ret += spack(fmt, crc32, sz, sz)
     return ret
 
 
@@ -66,7 +65,7 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     req_ver = b"\x2d\x00" if z64 else b"\x0a\x00"
 
     if crc32:
-        crc32 = struct.pack("<L", crc32)
+        crc32 = spack(b"<L", crc32)
     else:
         crc32 = b"\x00" * 4
 
@@ -87,14 +86,14 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     # however infozip does actual sz and it even works on winxp
     # (same reasning for z64 extradata later)
     vsz = 0xFFFFFFFF if z64 else sz
-    ret += struct.pack("<LL", vsz, vsz)
+    ret += spack(b"<LL", vsz, vsz)
 
     # windows support (the "?" replace below too)
     fn = sanitize_fn(fn, ok="/")
     bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
     z64_len = len(z64v) * 8 + 4 if z64v else 0
-    ret += struct.pack("<HH", len(bfn), z64_len)
+    ret += spack(b"<HH", len(bfn), z64_len)
 
     if h_pos is not None:
         # 2b comment, 2b diskno
@@ -106,12 +105,12 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
         ret += b"\x01\x00\x00\x00\xa4\x81"
 
         # 4b local-header-ofs
-        ret += struct.pack("<L", min(h_pos, 0xFFFFFFFF))
+        ret += spack(b"<L", min(h_pos, 0xFFFFFFFF))
 
     ret += bfn
 
     if z64v:
-        ret += struct.pack("<HH" + "Q" * len(z64v), 1, len(z64v) * 8, *z64v)
+        ret += spack(b"<HH" + b"Q" * len(z64v), 1, len(z64v) * 8, *z64v)
 
     return ret
 
@@ -136,7 +135,7 @@ def gen_ecdr(items, cdir_pos, cdir_end):
     need_64 = nitems == 0xFFFF or 0xFFFFFFFF in [csz, cpos]
 
     # 2b tnfiles, 2b dnfiles, 4b dir sz, 4b dir pos
-    ret += struct.pack("<HHLL", nitems, nitems, csz, cpos)
+    ret += spack(b"<HHLL", nitems, nitems, csz, cpos)
 
     # 2b comment length
     ret += b"\x00\x00"
@@ -163,7 +162,7 @@ def gen_ecdr64(items, cdir_pos, cdir_end):
 
     # 8b tnfiles, 8b dnfiles, 8b dir sz, 8b dir pos
     cdir_sz = cdir_end - cdir_pos
-    ret += struct.pack("<QQQQ", len(items), len(items), cdir_sz, cdir_pos)
+    ret += spack(b"<QQQQ", len(items), len(items), cdir_sz, cdir_pos)
 
     return ret
 
@@ -178,7 +177,7 @@ def gen_ecdr64_loc(ecdr64_pos):
     ret = b"\x50\x4b\x06\x07"
 
     # 4b cdisk, 8b start of ecdr64, 4b ndisks
-    ret += struct.pack("<LQL", 0, ecdr64_pos, 1)
+    ret += spack(b"<LQL", 0, ecdr64_pos, 1)
 
     return ret
 

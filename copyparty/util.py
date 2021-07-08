@@ -42,6 +42,20 @@ else:
     from Queue import Queue  # pylint: disable=import-error,no-name-in-module
     from StringIO import StringIO as BytesIO
 
+
+try:
+    struct.unpack(b">i", b"idgi")
+    spack = struct.pack
+    sunpack = struct.unpack
+except:
+
+    def spack(f, *a, **ka):
+        return struct.pack(f.decode("ascii"), *a, **ka)
+
+    def sunpack(f, *a, **ka):
+        return struct.unpack(f.decode("ascii"), *a, **ka)
+
+
 surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
 if WINDOWS and PY2:
@@ -231,7 +245,7 @@ def nuprint(msg):
 
 def rice_tid():
     tid = threading.current_thread().ident
-    c = struct.unpack(b"B" * 5, struct.pack(b">Q", tid)[-5:])
+    c = sunpack(b"B" * 5, spack(b">Q", tid)[-5:])
     return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c) + "\033[0m"
 
 
@@ -1068,10 +1082,7 @@ def gzip_orig_sz(fn):
     with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)
         rv = f.read(4)
-        try:
-            return struct.unpack(b"I", rv)[0]
-        except:
-            return struct.unpack("I", rv)[0]
+        return sunpack(b"I", rv)[0]
 
 
 def py_desc():

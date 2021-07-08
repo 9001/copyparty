@@ -5,7 +5,6 @@ import os
 import sys
 import time
 import base64
-import struct
 import socket
 import threading
 
@@ -27,6 +26,7 @@ except ImportError:
     sys.exit(1)
 
 from .__init__ import E, MACOS
+from .util import spack
 from .httpconn import HttpConn
 
 
@@ -199,7 +199,7 @@ class HttpSrv(object):
             except:
                 pass
 
-            v = base64.urlsafe_b64encode(struct.pack(">xxL", int(v)))
+            v = base64.urlsafe_b64encode(spack(b">xxL", int(v)))
             self.cb_v = v.decode("ascii")[-4:]
             self.cb_ts = time.time()
             return self.cb_v
