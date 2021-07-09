@@ -46,6 +46,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [browser support](#browser-support)
 * [client examples](#client-examples)
 * [up2k](#up2k)
+* [performance](#performance)
 * [dependencies](#dependencies)
     * [optional dependencies](#optional-dependencies)
     * [install recommended deps](#install-recommended-deps)
@@ -492,6 +493,23 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
   * header entries for the chunk-hash and wark
   * server writes chunks into place based on the hash
 * client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
+
+
+# performance
+
+defaults are good for most cases, don't mind the `cannot efficiently use multiple CPU cores` message, it's very unlikely to be a problem
+
+below are some tweaks roughly ordered by usefulness:
+
+* `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
+* `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
+* `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
+* `--no-hash` when indexing a networked disk if you don't care about the actual filehashes and only want the names/tags searchable
+* `-j` enables multiprocessing (actual multithreading) and can theoretically make copyparty perform better in cpu-intensive workloads, for example:
+  * huge amount of short-lived connections
+  * really heavy traffic (downloads/uploads)
+  
+  however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
 
 
 # dependencies
