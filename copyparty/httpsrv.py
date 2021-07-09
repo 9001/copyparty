@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import time
+import math
 import base64
 import socket
 import threading
@@ -58,8 +59,9 @@ class HttpSrv(object):
         self.tp_q = None if self.args.no_htp else queue.LifoQueue()
 
         self.srvs = []
-        self.ncli = 0
-        self.clients = {}
+        self.ncli = 0  # exact
+        self.clients = {}  # laggy
+        self.nclimax = 0
         self.cb_ts = 0
         self.cb_v = 0
 
@@ -112,8 +114,9 @@ class HttpSrv(object):
                 if self.tp_nthr > self.tp_ncli + 8:
                     self.stop_threads(4)
 
-    def listen(self, sck):
+    def listen(self, sck, nlisteners):
         self.srvs.append(sck)
+        self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
         t = threading.Thread(target=self.thr_listen, args=(sck,))
         t.daemon = True
         t.start()
@@ -128,9 +131,9 @@ class HttpSrv(object):
             if self.args.log_conn:
                 self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="1;30")
 
-            if self.ncli >= self.args.nc:
+            if self.ncli >= self.nclimax:
                 self.log(self.name, "at connection limit; waiting", 3)
-                while self.ncli >= self.args.nc:
+                while self.ncli >= self.nclimax:
                     time.sleep(0.1)
 
             if self.args.log_conn:

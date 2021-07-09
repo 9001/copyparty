@@ -64,7 +64,7 @@ class MpWorker(object):
                 return
 
             elif dest == "listen":
-                self.httpsrv.listen(args[0])
+                self.httpsrv.listen(args[0], args[1])
 
             elif dest == "retq":
                 # response from previous ipc call

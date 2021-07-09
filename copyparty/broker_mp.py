@@ -102,7 +102,7 @@ class BrokerMp(object):
         """
         if dest == "listen":
             for p in self.procs:
-                p.q_pend.put([0, dest, args])
+                p.q_pend.put([0, dest, [args[0], len(self.procs)]])
 
         else:
             raise Exception("what is " + str(dest))

@@ -28,7 +28,7 @@ class BrokerThr(object):
 
     def put(self, want_retval, dest, *args):
         if dest == "listen":
-            self.httpsrv.listen(args[0])
+            self.httpsrv.listen(args[0], 1)
 
         else:
             # new ipc invoking managed service in hub
