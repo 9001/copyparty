@@ -48,7 +48,7 @@ class HttpSrv(object):
         self.log = broker.log
         self.asrv = broker.asrv
 
-        self.name = "httpsrv-i" + str(os.getpid())
+        self.name = "httpsrv-i{:x}".format(os.getpid())
         self.mutex = threading.Lock()
         self.stopping = False
 
@@ -138,6 +138,7 @@ class HttpSrv(object):
                 sck, addr = srv_sck.accept()
             except (OSError, socket.error) as ex:
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
+                time.sleep(0.02)
                 continue
 
             if self.args.log_conn:
