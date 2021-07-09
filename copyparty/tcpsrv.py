@@ -2,9 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import re
-import time
 import socket
-import select
 
 from .util import chkcmd, Counter
 
@@ -66,47 +64,13 @@ class TcpSrv(object):
         for srv in self.srv:
             srv.listen(self.args.nc)
             ip, port = srv.getsockname()
-            msg = "listening @ {0}:{1}".format(ip, port)
+            fno = srv.fileno()
+            msg = "listening @ {}:{}  f{}".format(ip, port, fno)
             self.log("tcpsrv", msg)
             if self.args.q:
                 print(msg)
 
-        while not self.stopping:
-            if self.args.log_conn:
-                self.log("tcpsrv", "|%sC-ncli" % ("-" * 1,), c="1;30")
-
-            if self.num_clients.v >= self.args.nc:
-                time.sleep(0.1)
-                continue
-
-            if self.args.log_conn:
-                self.log("tcpsrv", "|%sC-acc1" % ("-" * 2,), c="1;30")
-
-            try:
-                # macos throws bad-fd
-                ready, _, _ = select.select(self.srv, [], [])
-            except:
-                ready = []
-                if not self.stopping:
-                    raise
-
-            for srv in ready:
-                if self.stopping:
-                    break
-
-                sck, addr = srv.accept()
-                sip, sport = srv.getsockname()
-                if self.args.log_conn:
-                    self.log(
-                        "%s %s" % addr,
-                        "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
-                            "-" * 3, sip, sport % 8, sport
-                        ),
-                        c="1;30",
-                    )
-
-                self.num_clients.add()
-                self.hub.broker.put(False, "httpconn", sck, addr)
+            self.hub.broker.put(False, "listen", srv)
 
     def shutdown(self):
         self.stopping = True

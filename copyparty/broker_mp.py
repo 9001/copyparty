@@ -4,15 +4,9 @@ from __future__ import print_function, unicode_literals
 import time
 import threading
 
-from .__init__ import PY2, WINDOWS, VT100
 from .broker_util import try_exec
 from .broker_mpw import MpWorker
 from .util import mp
-
-
-if PY2 and not WINDOWS:
-    from multiprocessing.reduction import ForkingPickler
-    from StringIO import StringIO as MemesIO  # pylint: disable=import-error
 
 
 class BrokerMp(object):
@@ -42,7 +36,6 @@ class BrokerMp(object):
             proc.q_yield = q_yield
             proc.nid = n
             proc.clients = {}
-            proc.workload = 0
 
             thr = threading.Thread(
                 target=self.collector, args=(proc,), name="mp-collector"
@@ -52,13 +45,6 @@ class BrokerMp(object):
 
             self.procs.append(proc)
             proc.start()
-
-        if not self.args.q:
-            thr = threading.Thread(
-                target=self.debug_load_balancer, name="mp-dbg-loadbalancer"
-            )
-            thr.daemon = True
-            thr.start()
 
     def shutdown(self):
         self.log("broker", "shutting down")
@@ -89,20 +75,6 @@ class BrokerMp(object):
             if dest == "log":
                 self.log(*args)
 
-            elif dest == "workload":
-                with self.mutex:
-                    proc.workload = args[0]
-
-            elif dest == "httpdrop":
-                addr = args[0]
-
-                with self.mutex:
-                    del proc.clients[addr]
-                    if not proc.clients:
-                        proc.workload = 0
-
-                self.hub.tcpsrv.num_clients.add(-1)
-
             elif dest == "retq":
                 # response from previous ipc call
                 with self.retpend_mutex:
@@ -128,38 +100,9 @@ class BrokerMp(object):
         returns a Queue object which eventually contains the response if want_retval
         (not-impl here since nothing uses it yet)
         """
-        if dest == "httpconn":
-            sck, addr = args
-            sck2 = sck
-            if PY2:
-                buf = MemesIO()
-                ForkingPickler(buf).dump(sck)
-                sck2 = buf.getvalue()
-
-            proc = sorted(self.procs, key=lambda x: x.workload)[0]
-            proc.q_pend.put([0, dest, [sck2, addr]])
-
-            with self.mutex:
-                proc.clients[addr] = 50
-                proc.workload += 50
+        if dest == "listen":
+            for p in self.procs:
+                p.q_pend.put([0, dest, args])
 
         else:
             raise Exception("what is " + str(dest))
-
-    def debug_load_balancer(self):
-        fmt = "\033[1m{}\033[0;36m{:4}\033[0m "
-        if not VT100:
-            fmt = "({}{:4})"
-
-        last = ""
-        while self.procs:
-            msg = ""
-            for proc in self.procs:
-                msg += fmt.format(len(proc.clients), proc.workload)
-
-            if msg != last:
-                last = msg
-                with self.hub.log_mutex:
-                    print(msg)
-
-            time.sleep(0.1)

@@ -45,7 +45,6 @@ class HttpConn(object):
         self.stopping = False
         self.nreq = 0
         self.nbyte = 0
-        self.workload = 0
         self.u2idx = None
         self.log_func = hsrv.log
         self.lf_url = re.compile(self.args.lf_url) if self.args.lf_url else None
@@ -184,11 +183,6 @@ class HttpConn(object):
             self.sr = Unrecv(self.s)
 
         while not self.stopping:
-            if self.is_mp:
-                self.workload += 50
-                if self.workload >= 2 ** 31:
-                    self.workload = 100
-
             self.nreq += 1
             cli = HttpCli(self)
             if not cli.run():

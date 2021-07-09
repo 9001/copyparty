@@ -222,16 +222,13 @@ class SvcHub(object):
         vmin = sys.version_info[1]
         if WINDOWS:
             msg = "need python 3.3 or newer for multiprocessing;"
-            if PY2:
-                # py2 pickler doesn't support winsock
-                return msg
-            elif vmin < 3:
+            if PY2 or vmin < 3:
                 return msg
         elif MACOS:
             return "multiprocessing is wonky on mac osx;"
         else:
-            msg = "need python 2.7 or 3.3+ for multiprocessing;"
-            if not PY2 and vmin < 3:
+            msg = "need python 3.3+ for multiprocessing;"
+            if PY2 or vmin < 3:
                 return msg
 
         try:

@@ -103,13 +103,15 @@ class Up2k(object):
             self.deferred_init()
         else:
             t = threading.Thread(
-                target=self.deferred_init,
-                name="up2k-deferred-init",
+                target=self.deferred_init, name="up2k-deferred-init", args=(0.5,)
             )
             t.daemon = True
             t.start()
 
-    def deferred_init(self):
+    def deferred_init(self, wait=0):
+        if wait:
+            time.sleep(wait)
+
         all_vols = self.asrv.vfs.all_vols
         have_e2d = self.init_indexes(all_vols)
 

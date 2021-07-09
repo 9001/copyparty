@@ -483,7 +483,7 @@ class HttpCli(object):
             path = os.devnull
 
         with open(fsenc(path), "wb", 512 * 1024) as f:
-            post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
+            post_sz, _, sha_b64 = hashcopy(reader, f)
 
         if not self.args.nw:
             vfs, vrem = vfs.get_dbv(rem)
@@ -715,7 +715,7 @@ class HttpCli(object):
 
         with open(fsenc(path), "rb+", 512 * 1024) as f:
             f.seek(cstart[0])
-            post_sz, _, sha_b64 = hashcopy(self.conn, reader, f)
+            post_sz, _, sha_b64 = hashcopy(reader, f)
 
             if sha_b64 != chash:
                 raise Pebkac(
@@ -882,7 +882,7 @@ class HttpCli(object):
                     with ren_open(fname, "wb", 512 * 1024, **open_args) as f:
                         f, fname = f["orz"]
                         self.log("writing to {}/{}".format(fdir, fname))
-                        sz, sha512_hex, _ = hashcopy(self.conn, p_data, f)
+                        sz, sha512_hex, _ = hashcopy(p_data, f)
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
@@ -1065,7 +1065,7 @@ class HttpCli(object):
             raise Pebkac(400, "expected body, got {}".format(p_field))
 
         with open(fsenc(fp), "wb", 512 * 1024) as f:
-            sz, sha512, _ = hashcopy(self.conn, p_data, f)
+            sz, sha512, _ = hashcopy(p_data, f)
 
         new_lastmod = os.stat(fsenc(fp)).st_mtime
         new_lastmod3 = int(new_lastmod * 1000)
@@ -1255,8 +1255,7 @@ class HttpCli(object):
             if use_sendfile:
                 remains = sendfile_kern(lower, upper, f, self.s)
             else:
-                actor = self.conn if self.is_mp else None
-                remains = sendfile_py(lower, upper, f, self.s, actor)
+                remains = sendfile_py(lower, upper, f, self.s)
 
         if remains > 0:
             logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"

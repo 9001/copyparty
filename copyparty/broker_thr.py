@@ -3,7 +3,6 @@ from __future__ import print_function, unicode_literals
 
 import threading
 
-from .authsrv import AuthSrv
 from .httpsrv import HttpSrv
 from .broker_util import ExceptionalQueue, try_exec
 
@@ -21,7 +20,6 @@ class BrokerThr(object):
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self)
-        self.httpsrv.disconnect_func = self.httpdrop
 
     def shutdown(self):
         # self.log("broker", "shutting down")
@@ -29,12 +27,8 @@ class BrokerThr(object):
         pass
 
     def put(self, want_retval, dest, *args):
-        if dest == "httpconn":
-            sck, addr = args
-            if self.args.log_conn:
-                self.log("%s %s" % addr, "|%sC-qpop" % ("-" * 4,), c="1;30")
-
-            self.httpsrv.accept(sck, addr)
+        if dest == "listen":
+            self.httpsrv.listen(args[0])
 
         else:
             # new ipc invoking managed service in hub
@@ -51,6 +45,3 @@ class BrokerThr(object):
             retq = ExceptionalQueue(1)
             retq.put(rv)
             return retq
-
-    def httpdrop(self, addr):
-        self.hub.tcpsrv.num_clients.add(-1)
