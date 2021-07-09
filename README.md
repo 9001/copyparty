@@ -505,11 +505,11 @@ below are some tweaks roughly ordered by usefulness:
 * `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
 * `--no-hash` when indexing a networked disk if you don't care about the actual filehashes and only want the names/tags searchable
-* `-j` enables multiprocessing (actual multithreading) and can theoretically make copyparty perform better in cpu-intensive workloads, for example:
+* `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
   * huge amount of short-lived connections
   * really heavy traffic (downloads/uploads)
   
-  however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
+  ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
 
 
 # dependencies
