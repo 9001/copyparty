@@ -20,6 +20,8 @@ class MpWorker(object):
         self.args = args
         self.n = n
 
+        self.log = self._log_disabled if args.q and not args.lo else self._log_enabled
+
         self.retpend = {}
         self.retpend_mutex = threading.Lock()
         self.mutex = threading.Lock()
@@ -46,8 +48,11 @@ class MpWorker(object):
         # print('k')
         pass
 
-    def log(self, src, msg, c=0):
+    def _log_enabled(self, src, msg, c=0):
         self.q_yield.put([0, "log", [src, msg, c]])
+
+    def _log_disabled(self, src, msg, c=0):
+        pass
 
     def logw(self, msg, c=0):
         self.log("mp{}".format(self.n), msg, c)
