@@ -1474,7 +1474,7 @@ class HttpCli(object):
         raise Pebkac(500, x)
 
     def tx_stack(self):
-        if not self.readable or not self.writable:
+        if not self.avol:
             raise Pebkac(403, "not admin")
 
         if self.args.no_stack:
