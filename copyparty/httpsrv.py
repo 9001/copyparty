@@ -48,6 +48,7 @@ class HttpSrv(object):
         self.log = broker.log
         self.asrv = broker.asrv
 
+        self.name = "httpsrv-i" + str(os.getpid())
         self.mutex = threading.Lock()
         self.stopping = False
 
@@ -84,7 +85,7 @@ class HttpSrv(object):
     def start_threads(self, n):
         self.tp_nthr += n
         if self.args.log_htp:
-            self.log("httpsrv", "workers += {} = {}".format(n, self.tp_nthr), 6)
+            self.log(self.name, "workers += {} = {}".format(n, self.tp_nthr), 6)
 
         for _ in range(n):
             thr = threading.Thread(
@@ -97,7 +98,7 @@ class HttpSrv(object):
     def stop_threads(self, n):
         self.tp_nthr -= n
         if self.args.log_htp:
-            self.log("httpsrv", "workers -= {} = {}".format(n, self.tp_nthr), 6)
+            self.log(self.name, "workers -= {} = {}".format(n, self.tp_nthr), 6)
 
         for _ in range(n):
             self.tp_q.put(None)
@@ -120,25 +121,23 @@ class HttpSrv(object):
         """listens on a shared tcp server"""
         ip, port = srv_sck.getsockname()
         fno = srv_sck.fileno()
-        msg = "subscribed @ {}:{}  f{},p{}".format(ip, port, fno, os.getpid())
-        self.log("httpsrv", msg)
+        msg = "subscribed @ {}:{}  f{}".format(ip, port, fno)
+        self.log(self.name, msg)
         while not self.stopping:
             if self.args.log_conn:
-                self.log("httpsrv", "|%sC-ncli" % ("-" * 1,), c="1;30")
+                self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="1;30")
 
             if len(self.clients) >= self.args.nc:
                 time.sleep(0.1)
                 continue
 
             if self.args.log_conn:
-                self.log("httpsrv", "|%sC-acc1" % ("-" * 2,), c="1;30")
+                self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="1;30")
 
             try:
                 sck, addr = srv_sck.accept()
             except (OSError, socket.error) as ex:
-                self.log("httpsrv", "accept({}): {}".format(fno, ex), c=6)
-                if ex.errno not in [10038, 10054, 107, 57, 49, 9]:
-                    raise
+                self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 continue
 
             if self.args.log_conn:
@@ -167,7 +166,7 @@ class HttpSrv(object):
 
         if not self.args.no_htp:
             m = "looks like the httpserver threadpool died; please make an issue on github and tell me the story of how you pulled that off, thanks and dog bless\n"
-            self.log("httpsrv", m, 1)
+            self.log(self.name, m, 1)
 
         thr = threading.Thread(
             target=self.thr_client,
@@ -195,7 +194,7 @@ class HttpSrv(object):
                 self.thr_client(sck, addr)
                 me.name = "httpsrv-poolw"
             except:
-                self.log("httpsrv", "thr_client: " + min_ex(), 3)
+                self.log(self.name, "thr_client: " + min_ex(), 3)
 
     def num_clients(self):
         with self.mutex:
@@ -216,7 +215,14 @@ class HttpSrv(object):
             except:
                 pass
 
-        self.log("httpsrv-n", "ok bye")
+        if self.tp_q:
+            self.stop_threads(self.tp_nthr)
+            for _ in range(10):
+                time.sleep(0.05)
+                if self.tp_q.empty():
+                    break
+
+        self.log("httpsrv-i" + str(os.getpid()), "ok bye")
 
     def thr_client(self, sck, addr):
         """thread managing one tcp client"""
