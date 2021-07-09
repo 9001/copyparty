@@ -298,6 +298,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-q", action="store_true", help="quiet")
     ap2.add_argument("-lo", metavar="PATH", type=str, help="logfile, example: cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
     ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
+    ap2.add_argument("--log-htp", action="store_true", help="print http-server threadpool scaling")
     ap2.add_argument("--ihead", metavar="HEADER", action='append', help="dump incoming header")
     ap2.add_argument("--lf-url", metavar="RE", type=str, default=r"^/\.cpr/|\?th=[wj]$", help="dont log URLs matching")
 
@@ -342,6 +343,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
     ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing")
+    ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
     ap2.add_argument("--stackmon", metavar="P,S", help="write stacktrace to Path every S second")
     
     return ap.parse_args(args=argv[1:])
