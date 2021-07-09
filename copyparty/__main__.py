@@ -315,7 +315,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
     ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg for video thumbs")
     ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown")
-    ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval")
+    ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval; 0=disabled")
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age")
     ap2.add_argument("--th-covers", metavar="N,N", type=str, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat for")
 

@@ -130,9 +130,10 @@ class ThumbSrv(object):
             msg += ", ".join(missing)
             self.log(msg, c=3)
 
-        t = threading.Thread(target=self.cleaner, name="thumb-cleaner")
-        t.daemon = True
-        t.start()
+        if self.args.th_clean:
+            t = threading.Thread(target=self.cleaner, name="thumb-cleaner")
+            t.daemon = True
+            t.start()
 
     def log(self, msg, c=0):
         self.log_func("thumb", msg, c)
