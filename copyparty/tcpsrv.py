@@ -4,7 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import socket
 
-from .util import chkcmd, Counter
+from .util import chkcmd
 
 
 class TcpSrv(object):
@@ -18,7 +18,6 @@ class TcpSrv(object):
         self.args = hub.args
         self.log = hub.log
 
-        self.num_clients = Counter()
         self.stopping = False
 
         ip = "127.0.0.1"

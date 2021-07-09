@@ -58,6 +58,7 @@ class HttpSrv(object):
         self.tp_q = None if self.args.no_htp else queue.LifoQueue()
 
         self.srvs = []
+        self.ncli = 0
         self.clients = {}
         self.cb_ts = 0
         self.cb_v = 0
@@ -107,7 +108,7 @@ class HttpSrv(object):
         while True:
             time.sleep(2 if self.tp_ncli else 30)
             with self.mutex:
-                self.tp_ncli = max(len(self.clients), self.tp_ncli - 2)
+                self.tp_ncli = max(self.ncli, self.tp_ncli - 2)
                 if self.tp_nthr > self.tp_ncli + 8:
                     self.stop_threads(4)
 
@@ -127,9 +128,10 @@ class HttpSrv(object):
             if self.args.log_conn:
                 self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="1;30")
 
-            if len(self.clients) >= self.args.nc:
-                time.sleep(0.1)
-                continue
+            if self.ncli >= self.args.nc:
+                self.log(self.name, "at connection limit; waiting", 3)
+                while self.ncli >= self.args.nc:
+                    time.sleep(0.1)
 
             if self.args.log_conn:
                 self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="1;30")
@@ -159,15 +161,19 @@ class HttpSrv(object):
         if self.tp_q:
             self.tp_q.put((sck, addr))
             with self.mutex:
+                self.ncli += 1
                 self.tp_time = self.tp_time or now
-                self.tp_ncli = max(self.tp_ncli, len(self.clients) + 1)
-                if self.tp_nthr < len(self.clients) + 4:
+                self.tp_ncli = max(self.tp_ncli, self.ncli + 1)
+                if self.tp_nthr < self.ncli + 4:
                     self.start_threads(8)
             return
 
         if not self.args.no_htp:
             m = "looks like the httpserver threadpool died; please make an issue on github and tell me the story of how you pulled that off, thanks and dog bless\n"
             self.log(self.name, m, 1)
+
+        with self.mutex:
+            self.ncli += 1
 
         thr = threading.Thread(
             target=self.thr_client,
@@ -196,10 +202,6 @@ class HttpSrv(object):
                 me.name = "httpsrv-poolw"
             except:
                 self.log(self.name, "thr_client: " + min_ex(), 3)
-
-    def num_clients(self):
-        with self.mutex:
-            return len(self.clients)
 
     def shutdown(self):
         self.stopping = True
@@ -275,6 +277,7 @@ class HttpSrv(object):
             finally:
                 with self.mutex:
                     del self.clients[cli]
+                    self.ncli -= 1
 
     def cachebuster(self):
         if time.time() - self.cb_ts < 1:

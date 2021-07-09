@@ -137,20 +137,6 @@ REKOBO_KEY = {
 REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
 
 
-class Counter(object):
-    def __init__(self, v=0):
-        self.v = v
-        self.mutex = threading.Lock()
-
-    def add(self, delta=1):
-        with self.mutex:
-            self.v += delta
-
-    def set(self, absval):
-        with self.mutex:
-            self.v = absval
-
-
 class Cooldown(object):
     def __init__(self, maxage):
         self.maxage = maxage
