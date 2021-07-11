@@ -1174,7 +1174,8 @@ html.light #tree::-webkit-scrollbar {
 	margin: 0;
 	height: 100%;
 }
-#baguetteBox-overlay .full-image img {
+#baguetteBox-overlay .full-image img,
+#baguetteBox-overlay .full-image video {
 	display: inline-block;
 	width: auto;
 	height: auto;

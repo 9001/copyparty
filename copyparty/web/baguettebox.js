@@ -28,7 +28,8 @@ window.baguetteBox = (function () {
         isOverlayVisible = false,
         touch = {},  // start-pos
         touchFlag = false,  // busy
-        regex = /.+\.(gif|jpe?g|png|webp)/i,
+        re_i = /.+\.(gif|jpe?g|png|webp)/i,
+        re_v = /.+\.(webm|mp4)/i,
         data = {},  // all galleries
         imagesElements = [],
         documentLastFocus = null;
@@ -96,10 +97,6 @@ window.baguetteBox = (function () {
         data[selector] = selectorData;
 
         [].forEach.call(galleryNodeList, function (galleryElement) {
-            if (userOptions && userOptions.filter) {
-                regex = userOptions.filter;
-            }
-
             var tagsNodeList = [];
             if (galleryElement.tagName === 'A') {
                 tagsNodeList = [galleryElement];
@@ -109,7 +106,7 @@ window.baguetteBox = (function () {
 
             tagsNodeList = [].filter.call(tagsNodeList, function (element) {
                 if (element.className.indexOf(userOptions && userOptions.ignoreClass) === -1) {
-                    return regex.test(element.href);
+                    return re_i.test(element.href) || re_v.test(element.href);
                 }
             });
             if (tagsNodeList.length === 0) {
@@ -366,6 +363,7 @@ window.baguetteBox = (function () {
 
     function hideOverlay(e) {
         ev(e);
+        playvid(false);
         if (options.noScrollbars) {
             document.documentElement.style.overflowY = 'auto';
             document.body.style.overflowY = 'auto';
@@ -398,8 +396,8 @@ window.baguetteBox = (function () {
             return;  // out-of-bounds or gallery dirty
         }
 
-        if (imageContainer.getElementsByTagName('img')[0]) {
-            // image is loaded, cb and bail
+        if (imageContainer.querySelector('img, video')) {
+            // was loaded, cb and bail
             if (callback) {
                 callback();
             }
@@ -408,7 +406,7 @@ window.baguetteBox = (function () {
 
         var imageElement = galleryItem.imageElement,
             imageSrc = imageElement.href,
-            thumbnailElement = imageElement.getElementsByTagName('img')[0],
+            thumbnailElement = imageElement.querySelector('img, video'),
             imageCaption = typeof options.captions === 'function' ?
                 options.captions.call(currentGallery, imageElement) :
                 imageElement.getAttribute('data-caption') || imageElement.title;
@@ -428,16 +426,18 @@ window.baguetteBox = (function () {
         }
         imageContainer.appendChild(figure);
 
-        var image = mknod('img');
-        image.onload = function () {
+        var is_vid = re_v.test(imageSrc),
+            image = mknod(is_vid ? 'video' : 'img');
+
+        image.addEventListener(is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
             var spinner = document.querySelector('#baguette-img-' + index + ' .baguetteBox-spinner');
             figure.removeChild(spinner);
-            if (!options.async && callback) {
+            if (!options.async && callback)
                 callback();
-            }
-        };
+        });
         image.setAttribute('src', imageSrc);
+        image.setAttribute('controls', 'controls');
         image.alt = thumbnailElement ? thumbnailElement.alt || '' : '';
         if (options.titleTag && imageCaption) {
             image.title = imageCaption;
@@ -480,6 +480,7 @@ window.baguetteBox = (function () {
      * @return {boolean} - true on success or false if the index is invalid
      */
     function show(index, gallery) {
+        playvid(false);
         if (!isOverlayVisible && index >= 0 && index < gallery.length) {
             prepareOverlay(gallery, options);
             showOverlay(index);
@@ -512,6 +513,14 @@ window.baguetteBox = (function () {
         return true;
     }
 
+    function playvid(play) {
+        var vid = imagesElements[currentIndex].querySelector('video'),
+            fun = play ? 'play' : 'pause';
+
+        if (vid)
+            vid[fun]();
+    }
+
     /**
      * Triggers the bounce animation
      * @param {('left'|'right')} direction - Direction of the movement
@@ -534,6 +543,8 @@ window.baguetteBox = (function () {
         } else {
             slider.style.transform = 'translate3d(' + offset + ',0,0)';
         }
+        playvid(false);
+        playvid(true);
     }
 
     function preloadNext(index) {
