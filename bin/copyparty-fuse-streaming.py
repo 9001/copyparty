@@ -345,7 +345,7 @@ class Gateway(object):
         except:
             pass
 
-    def sendreq(self, *args, headers={}, **kwargs):
+    def sendreq(self, meth, path, headers, **kwargs):
         if self.password:
             headers["Cookie"] = "=".join(["cppwd", self.password])
 
@@ -354,21 +354,21 @@ class Gateway(object):
             if c.rx_path:
                 raise Exception()
 
-            c.request(*list(args), headers=headers, **kwargs)
+            c.request(meth, path, headers=headers, **kwargs)
             c.rx = c.getresponse()
             return c
         except:
             tid = threading.current_thread().ident
             dbg(
-                "\033[1;37;44mbad conn {:x}\n  {}\n  {}\033[0m".format(
-                    tid, " ".join(str(x) for x in args), c.rx_path if c else "(null)"
+                "\033[1;37;44mbad conn {:x}\n  {} {}\n  {}\033[0m".format(
+                    tid, meth, path, c.rx_path if c else "(null)"
                 )
             )
 
         self.closeconn(c)
         c = self.getconn()
         try:
-            c.request(*list(args), headers=headers, **kwargs)
+            c.request(meth, path, headers=headers, **kwargs)
             c.rx = c.getresponse()
             return c
         except:
@@ -386,7 +386,7 @@ class Gateway(object):
             path = dewin(path)
 
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots"
-        c = self.sendreq("GET", web_path)
+        c = self.sendreq("GET", web_path, {})
         if c.rx.status != 200:
             self.closeconn(c)
             log(
@@ -440,7 +440,7 @@ class Gateway(object):
             )
         )
 
-        c = self.sendreq("GET", web_path, headers={"Range": hdr_range})
+        c = self.sendreq("GET", web_path, {"Range": hdr_range})
         if c.rx.status != http.client.PARTIAL_CONTENT:
             self.closeconn(c)
             raise Exception(

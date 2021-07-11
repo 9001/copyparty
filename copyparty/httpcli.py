@@ -227,7 +227,7 @@ class HttpCli(object):
             except Pebkac:
                 return False
 
-    def send_headers(self, length, status=200, mime=None, headers={}):
+    def send_headers(self, length, status=200, mime=None, headers=None):
         response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
 
         if length is not None:
@@ -237,7 +237,8 @@ class HttpCli(object):
         response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
 
         # headers{} overrides anything set previously
-        self.out_headers.update(headers)
+        if headers:
+            self.out_headers.update(headers)
 
         # default to utf8 html if no content-type is set
         if not mime:
@@ -254,7 +255,7 @@ class HttpCli(object):
         except:
             raise Pebkac(400, "client d/c while replying headers")
 
-    def reply(self, body, status=200, mime=None, headers={}):
+    def reply(self, body, status=200, mime=None, headers=None):
         # TODO something to reply with user-supplied values safely
         self.send_headers(len(body), status, mime, headers)
 
@@ -270,7 +271,7 @@ class HttpCli(object):
         self.log(body.rstrip())
         self.reply(b"<pre>" + body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
 
-    def urlq(self, add={}, rm=[]):
+    def urlq(self, add, rm):
         """
         generates url query based on uparam (b, pw, all others)
         removing anything in rm, adding pairs in add
@@ -795,7 +796,7 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
-        sanitized = sanitize_fn(new_dir)
+        sanitized = sanitize_fn(new_dir, "", [])
 
         if not nullwrite:
             fdir = os.path.join(vfs.realpath, rem)
@@ -832,7 +833,7 @@ class HttpCli(object):
         if not new_file.endswith(".md"):
             new_file += ".md"
 
-        sanitized = sanitize_fn(new_file)
+        sanitized = sanitize_fn(new_file, "", [])
 
         if not nullwrite:
             fdir = os.path.join(vfs.realpath, rem)
@@ -865,7 +866,7 @@ class HttpCli(object):
                 if p_file and not nullwrite:
                     fdir = os.path.join(vfs.realpath, rem)
                     fname = sanitize_fn(
-                        p_file, bad=[".prologue.html", ".epilogue.html"]
+                        p_file, "", [".prologue.html", ".epilogue.html"]
                     )
 
                     if not os.path.isdir(fsenc(fdir)):
@@ -1423,7 +1424,7 @@ class HttpCli(object):
         return True
 
     def tx_mounts(self):
-        suf = self.urlq(rm=["h"])
+        suf = self.urlq({}, ["h"])
         rvol, wvol, avol = [
             [("/" + x).rstrip("/") + "/" for x in y]
             for y in [self.rvol, self.wvol, self.avol]
@@ -1634,7 +1635,7 @@ class HttpCli(object):
         if self.writable:
             perms.append("write")
 
-        url_suf = self.urlq()
+        url_suf = self.urlq({}, [])
         is_ls = "ls" in self.uparam
 
         tpl = "browser"

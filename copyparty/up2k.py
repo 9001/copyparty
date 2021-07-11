@@ -195,7 +195,7 @@ class Up2k(object):
 
         return True, ret
 
-    def init_indexes(self, all_vols, scan_vols=[]):
+    def init_indexes(self, all_vols, scan_vols=None):
         self.pp = ProgressPrinter()
         vols = all_vols.values()
         t0 = time.time()
@@ -991,7 +991,7 @@ class Up2k(object):
                 if cj["ptop"] not in self.registry:
                     raise Pebkac(410, "location unavailable")
 
-        cj["name"] = sanitize_fn(cj["name"], bad=[".prologue.html", ".epilogue.html"])
+        cj["name"] = sanitize_fn(cj["name"], "", [".prologue.html", ".epilogue.html"])
         cj["poke"] = time.time()
         wark = self._get_wark(cj)
         now = time.time()

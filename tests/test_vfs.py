@@ -16,7 +16,7 @@ from copyparty import util
 
 
 class Cfg(Namespace):
-    def __init__(self, a=[], v=[], c=None):
+    def __init__(self, a=None, v=None, c=None):
         ex = {k: False for k in "nw e2d e2ds e2dsa e2t e2ts e2tsr".split()}
         ex2 = {
             "mtp": [],
@@ -27,7 +27,7 @@ class Cfg(Namespace):
             "rproxy": 0,
         }
         ex.update(ex2)
-        super(Cfg, self).__init__(a=a, v=v, c=c, **ex)
+        super(Cfg, self).__init__(a=a or [], v=v or [], c=c, **ex)
 
 
 class TestVFS(unittest.TestCase):

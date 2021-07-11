@@ -23,10 +23,10 @@ def hdr(query):
 
 
 class Cfg(Namespace):
-    def __init__(self, a=[], v=[], c=None):
+    def __init__(self, a=None, v=None, c=None):
         super(Cfg, self).__init__(
-            a=a,
-            v=v,
+            a=a or [],
+            v=v or [],
             c=c,
             rproxy=0,
             ed=False,

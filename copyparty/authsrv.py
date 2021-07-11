@@ -16,7 +16,7 @@ from .util import IMPLICATIONS, uncyg, undot, Pebkac, fsdec, fsenc, statdir
 class VFS(object):
     """single level in the virtual fs"""
 
-    def __init__(self, log, realpath, vpath, uread=[], uwrite=[], uadm=[], flags={}):
+    def __init__(self, log, realpath, vpath, uread, uwrite, uadm, flags):
         self.log = log
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
@@ -81,7 +81,7 @@ class VFS(object):
 
         # leaf does not exist; create and keep permissions blank
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
-        vn = VFS(self.log, src, vp)
+        vn = VFS(self.log, src, vp, [], [], [], {})
         vn.dbv = self.dbv or self
         self.nodes[dst] = vn
         return vn
@@ -497,10 +497,10 @@ class AuthSrv(object):
 
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
-            vfs = VFS(self.log_func, os.path.abspath("."), "", ["*"], ["*"])
+            vfs = VFS(self.log_func, os.path.abspath("."), "", ["*"], ["*"], ["*"], {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(self.log_func, None, "")
+            vfs = VFS(self.log_func, None, "", [], [], [], {})
             vfs.flags["d2d"] = True
 
         maxdepth = 0

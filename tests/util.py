@@ -126,7 +126,6 @@ class VHttpConn(object):
         self.hsrv = VHttpSrv()
         self.nreq = 0
         self.nbyte = 0
-        self.workload = 0
         self.ico = None
         self.thumbcli = None
         self.t0 = time.time()

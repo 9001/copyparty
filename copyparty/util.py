@@ -672,7 +672,7 @@ def undot(path):
     return "/".join(ret)
 
 
-def sanitize_fn(fn, ok="", bad=[]):
+def sanitize_fn(fn, ok, bad):
     if "/" not in ok:
         fn = fn.replace("\\", "/").split("/")[-1]
 

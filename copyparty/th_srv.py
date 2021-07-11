@@ -260,7 +260,7 @@ class ThumbSrv(object):
                 pass  # default q = 75
 
             if im.mode not in fmts:
-                print("conv {}".format(im.mode))
+                # print("conv {}".format(im.mode))
                 im = im.convert("RGB")
 
             im.save(tpath, quality=40, method=6)

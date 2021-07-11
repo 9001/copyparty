@@ -54,10 +54,13 @@ MACOS = platform.system() == "Darwin"
 info = log = dbg = None
 
 
-print("{} v{} @ {}".format(
-    platform.python_implementation(),
-    ".".join([str(x) for x in sys.version_info]),
-    sys.executable))
+print(
+    "{} v{} @ {}".format(
+        platform.python_implementation(),
+        ".".join([str(x) for x in sys.version_info]),
+        sys.executable,
+    )
+)
 
 
 try:
@@ -299,14 +302,14 @@ class Gateway(object):
         except:
             pass
 
-    def sendreq(self, *args, headers={}, **kwargs):
+    def sendreq(self, meth, path, headers, **kwargs):
         tid = get_tid()
         if self.password:
             headers["Cookie"] = "=".join(["cppwd", self.password])
 
         try:
             c = self.getconn(tid)
-            c.request(*list(args), headers=headers, **kwargs)
+            c.request(meth, path, headers=headers, **kwargs)
             return c.getresponse()
         except:
             dbg("bad conn")
@@ -314,7 +317,7 @@ class Gateway(object):
         self.closeconn(tid)
         try:
             c = self.getconn(tid)
-            c.request(*list(args), headers=headers, **kwargs)
+            c.request(meth, path, headers=headers, **kwargs)
             return c.getresponse()
         except:
             info("http connection failed:\n" + traceback.format_exc())
@@ -331,7 +334,7 @@ class Gateway(object):
             path = dewin(path)
 
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots&ls"
-        r = self.sendreq("GET", web_path)
+        r = self.sendreq("GET", web_path, {})
         if r.status != 200:
             self.closeconn()
             log(
@@ -368,7 +371,7 @@ class Gateway(object):
             )
         )
 
-        r = self.sendreq("GET", web_path, headers={"Range": hdr_range})
+        r = self.sendreq("GET", web_path, {"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
             self.closeconn()
             raise Exception(
