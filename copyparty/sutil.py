@@ -25,4 +25,4 @@ def errdesc(errors):
         "vp": "archive-errors-{}.txt".format(dt),
         "ap": tf_path,
         "st": os.stat(tf_path),
-    }
+    }, report

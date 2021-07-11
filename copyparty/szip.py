@@ -183,7 +183,8 @@ def gen_ecdr64_loc(ecdr64_pos):
 
 
 class StreamZip(object):
-    def __init__(self, fgen, utf8=False, pre_crc=False):
+    def __init__(self, log, fgen, utf8=False, pre_crc=False):
+        self.log = log
         self.fgen = fgen
         self.utf8 = utf8
         self.pre_crc = pre_crc
@@ -246,8 +247,8 @@ class StreamZip(object):
                 errors.append([f["vp"], repr(ex)])
 
         if errors:
-            errf = errdesc(errors)
-            print(repr(errf))
+            errf, txt = errdesc(errors)
+            self.log("\n".join(([repr(errf)] + txt[1:])))
             for x in self.ser(errf):
                 yield x
 

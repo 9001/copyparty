@@ -33,10 +33,11 @@ class QFile(object):
 class StreamTar(object):
     """construct in-memory tar file from the given path"""
 
-    def __init__(self, fgen, **kwargs):
+    def __init__(self, log, fgen, **kwargs):
         self.ci = 0
         self.co = 0
         self.qfile = QFile()
+        self.log = log
         self.fgen = fgen
         self.errf = None
 
@@ -91,7 +92,8 @@ class StreamTar(object):
                 errors.append([f["vp"], repr(ex)])
 
         if errors:
-            self.errf = errdesc(errors)
+            self.errf, txt = errdesc(errors)
+            self.log("\n".join(([repr(self.errf)] + txt[1:])))
             self.ser(self.errf)
 
         self.tar.close()
