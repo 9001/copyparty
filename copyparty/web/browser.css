@@ -1184,6 +1184,9 @@ html.light #tree::-webkit-scrollbar {
 	vertical-align: middle;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
+#baguetteBox-overlay .full-image video {
+	background: #333;
+}
 #baguetteBox-overlay .full-image figcaption {
 	display: block;
 	position: absolute;

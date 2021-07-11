@@ -443,6 +443,8 @@ window.baguetteBox = (function () {
         var is_vid = re_v.test(imageSrc),
             image = mknod(is_vid ? 'video' : 'img');
 
+        clmod(imageContainer, 'vid', is_vid);
+
         image.addEventListener(is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
             var spinner = document.querySelector('#baguette-img-' + index + ' .baguetteBox-spinner');
