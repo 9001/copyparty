@@ -200,10 +200,16 @@ the browser has the following hotkeys
 * `G` toggle list / grid view
 * `T` toggle thumbnails / icons
 * when playing audio:
-  * `0..9` jump to 10%..90%
-  * `U/O` skip 10sec back/forward
   * `J/L` prev/next song
+  * `U/O` skip 10sec back/forward
+  * `0..9` jump to 10%..90%
   * `P` play/pause (also starts playing the folder)
+* when viewing images / playing videos:
+  * `J/L, Left/Right` prev/next file
+  * `Home/End` first/last file
+  * `U/O` skip 10sec back/forward
+  * `P/K/Space` play/pause video
+  * `Esc` close viewer
 * when tree-sidebar is open:
   * `A/D` adjust tree width
 * in the grid view:

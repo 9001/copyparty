@@ -206,24 +206,36 @@ window.baguetteBox = (function () {
         bindEvents();
     }
 
-    function keyDownHandler(event) {
-        switch (event.keyCode) {
-            case 37: // Left
-                showPreviousImage();
-                break;
-            case 39: // Right
-                showNextImage();
-                break;
-            case 27: // Esc
-                hideOverlay();
-                break;
-            case 36: // Home
-                showFirstImage(event);
-                break;
-            case 35: // End
-                showLastImage(event);
-                break;
-        }
+    function keyDownHandler(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+            return;
+
+        var k = e.code + '';
+
+        if (k == "ArrowLeft" || k == "KeyJ")
+            showPreviousImage();
+        else if (k == "ArrowRight" || k == "KeyL")
+            showNextImage();
+        else if (k == "Escape")
+            hideOverlay();
+        else if (k == "Home")
+            showFirstImage(e);
+        else if (k == "End")
+            showLastImage(e);
+        else if (k == "Space" || k == "KeyP" || k == "KeyK")
+            playpause();
+        else if (k == "KeyU" || k == "KeyO")
+            relseek(k == "KeyU" ? -10 : 10);
+    }
+
+    function keyUpHandler(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+            return;
+
+        var k = e.code + '';
+
+        if (k == "Space")
+            ev(e);
     }
 
     var passiveSupp = false;
@@ -322,6 +334,7 @@ window.baguetteBox = (function () {
         }
 
         bind(document, 'keydown', keyDownHandler);
+        bind(document, 'keyup', keyUpHandler);
         currentIndex = chosenImageIndex;
         touch = {
             count: 0,
@@ -373,6 +386,7 @@ window.baguetteBox = (function () {
         }
 
         unbind(document, 'keydown', keyDownHandler);
+        unbind(document, 'keyup', keyUpHandler);
         // Fade out and hide the overlay
         overlay.className = '';
         setTimeout(function () {
@@ -480,7 +494,6 @@ window.baguetteBox = (function () {
      * @return {boolean} - true on success or false if the index is invalid
      */
     function show(index, gallery) {
-        playvid(false);
         if (!isOverlayVisible && index >= 0 && index < gallery.length) {
             prepareOverlay(gallery, options);
             showOverlay(index);
@@ -499,6 +512,7 @@ window.baguetteBox = (function () {
             return false;
         }
 
+        playvid(false);
         currentIndex = index;
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);
@@ -513,12 +527,24 @@ window.baguetteBox = (function () {
         return true;
     }
 
-    function playvid(play) {
-        var vid = imagesElements[currentIndex].querySelector('video'),
-            fun = play ? 'play' : 'pause';
+    function vid() {
+        return imagesElements[currentIndex].querySelector('video');
+    }
 
-        if (vid)
-            vid[fun]();
+    function playvid(play) {
+        if (vid())
+            vid()[play ? 'play' : 'pause']();
+    }
+
+    function playpause() {
+        var v = vid();
+        if (v)
+            v[v.paused ? "play" : "pause"]();
+    }
+
+    function relseek(sec) {
+        if (vid())
+            vid().currentTime += sec;
     }
 
     /**
@@ -577,6 +603,7 @@ window.baguetteBox = (function () {
         unbindEvents();
         clearCachedData();
         unbind(document, 'keydown', keyDownHandler);
+        unbind(document, 'keyup', keyUpHandler);
         document.getElementsByTagName('body')[0].removeChild(ebi('baguetteBox-overlay'));
         data = {};
         currentGallery = [];
@@ -588,6 +615,8 @@ window.baguetteBox = (function () {
         show: show,
         showNext: showNextImage,
         showPrevious: showPreviousImage,
+        relseek: relseek,
+        playpause: playpause,
         hide: hideOverlay,
         destroy: destroyPlugin
     };
