@@ -1179,8 +1179,10 @@ html.light #tree::-webkit-scrollbar {
 	display: inline-block;
 	width: auto;
 	height: auto;
-	max-height: 100%;
 	max-width: 100%;
+	max-height: 100%;
+	max-height: calc(100% - 1.4em);
+	margin-bottom: 1.4em;
 	vertical-align: middle;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
@@ -1189,11 +1191,10 @@ html.light #tree::-webkit-scrollbar {
 }
 #baguetteBox-overlay .full-image figcaption {
 	display: block;
-	position: absolute;
-	bottom: 0;
+	position: fixed;
+	bottom: .1em;
 	width: 100%;
 	text-align: center;
-	line-height: 1.8;
 	white-space: normal;
 	color: #ccc;
 }
