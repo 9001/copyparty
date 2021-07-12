@@ -34,7 +34,6 @@ class HttpConn(object):
 
         self.args = hsrv.args
         self.asrv = hsrv.asrv
-        self.is_mp = hsrv.is_mp
         self.cert_path = hsrv.cert_path
 
         enth = HAVE_PIL and not self.args.no_thumb

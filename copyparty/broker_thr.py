@@ -19,7 +19,7 @@ class BrokerThr(object):
         self.mutex = threading.Lock()
 
         # instantiate all services here (TODO: inheritance?)
-        self.httpsrv = HttpSrv(self)
+        self.httpsrv = HttpSrv(self, None)
 
     def shutdown(self):
         # self.log("broker", "shutting down")

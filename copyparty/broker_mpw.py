@@ -35,7 +35,7 @@ class MpWorker(object):
         self.asrv = AuthSrv(args, None, False)
 
         # instantiate all services here (TODO: inheritance?)
-        self.httpsrv = HttpSrv(self, True)
+        self.httpsrv = HttpSrv(self, n)
 
         # on winxp and some other platforms,
         # use thr.join() to block all signals

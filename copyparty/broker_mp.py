@@ -27,18 +27,17 @@ class BrokerMp(object):
             cores = mp.cpu_count()
 
         self.log("broker", "booting {} subprocesses".format(cores))
-        for n in range(cores):
+        for n in range(1, cores + 1):
             q_pend = mp.Queue(1)
             q_yield = mp.Queue(64)
 
             proc = mp.Process(target=MpWorker, args=(q_pend, q_yield, self.args, n))
             proc.q_pend = q_pend
             proc.q_yield = q_yield
-            proc.nid = n
             proc.clients = {}
 
             thr = threading.Thread(
-                target=self.collector, args=(proc,), name="mp-collector"
+                target=self.collector, args=(proc,), name="mp-sink-{}".format(n)
             )
             thr.daemon = True
             thr.start()

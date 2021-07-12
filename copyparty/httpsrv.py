@@ -27,7 +27,7 @@ except ImportError:
     sys.exit(1)
 
 from .__init__ import E, PY2, MACOS
-from .util import spack, min_ex
+from .util import spack, min_ex, start_stackmon, start_log_thrs
 from .httpconn import HttpConn
 
 if PY2:
@@ -42,14 +42,14 @@ class HttpSrv(object):
     relying on MpSrv for performance (HttpSrv is just plain threads)
     """
 
-    def __init__(self, broker, is_mp=False):
+    def __init__(self, broker, nid):
         self.broker = broker
-        self.is_mp = is_mp
+        self.nid = nid
         self.args = broker.args
         self.log = broker.log
         self.asrv = broker.asrv
 
-        self.name = "httpsrv-i{:x}".format(os.getpid())
+        self.name = "httpsrv" + ("-n{}-i{:x}".format(nid, os.getpid()) if nid else "")
         self.mutex = threading.Lock()
         self.stopping = False
 
@@ -81,9 +81,17 @@ class HttpSrv(object):
         if self.tp_q:
             self.start_threads(4)
 
-            t = threading.Thread(target=self.thr_scaler)
+            name = "httpsrv-scaler" + ("-{}".format(nid) if nid else "")
+            t = threading.Thread(target=self.thr_scaler, name=name)
             t.daemon = True
             t.start()
+
+        if nid:
+            if self.args.stackmon:
+                start_stackmon(self.args.stackmon, nid)
+
+            if self.args.log_thrs:
+                start_log_thrs(self.log, self.args.log_thrs, nid)
 
     def start_threads(self, n):
         self.tp_nthr += n
@@ -93,7 +101,7 @@ class HttpSrv(object):
         for _ in range(n):
             thr = threading.Thread(
                 target=self.thr_poolw,
-                name="httpsrv-poolw",
+                name=self.name + "-poolw",
             )
             thr.daemon = True
             thr.start()
@@ -115,9 +123,14 @@ class HttpSrv(object):
                     self.stop_threads(4)
 
     def listen(self, sck, nlisteners):
+        ip, port = sck.getsockname()
         self.srvs.append(sck)
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
-        t = threading.Thread(target=self.thr_listen, args=(sck,))
+        t = threading.Thread(
+            target=self.thr_listen,
+            args=(sck,),
+            name="httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),
+        )
         t.daemon = True
         t.start()
 
@@ -181,7 +194,7 @@ class HttpSrv(object):
         thr = threading.Thread(
             target=self.thr_client,
             args=(sck, addr),
-            name="httpsrv-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
+            name="httpconn-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
         )
         thr.daemon = True
         thr.start()
@@ -198,11 +211,11 @@ class HttpSrv(object):
             try:
                 sck, addr = task
                 me = threading.current_thread()
-                me.name = (
-                    "httpsrv-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
+                me.name = "httpconn-{}-{}".format(
+                    addr[0].split(".", 2)[-1][-6:], addr[1]
                 )
                 self.thr_client(sck, addr)
-                me.name = "httpsrv-poolw"
+                me.name = self.name + "-poolw"
             except:
                 self.log(self.name, "thr_client: " + min_ex(), 3)
 
@@ -228,7 +241,7 @@ class HttpSrv(object):
                 if self.tp_q.empty():
                     break
 
-        self.log("httpsrv-i" + str(os.getpid()), "ok bye")
+        self.log(self.name, "ok bye")
 
     def thr_client(self, sck, addr):
         """thread managing one tcp client"""
