@@ -171,7 +171,7 @@ class HttpSrv(object):
         """takes an incoming tcp connection and creates a thread to handle it"""
         now = time.time()
 
-        if self.tp_time and now - self.tp_time > 300:
+        if now - (self.tp_time or now) > 300:
             self.tp_q = None
 
         if self.tp_q:
