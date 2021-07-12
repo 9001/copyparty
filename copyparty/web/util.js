@@ -37,6 +37,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                 html.push('<h2>' + find[a] + '</h2>' +
                     esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
     }
+    html.push('<p style="border-top:1px solid #999;margin-top:1.5em;font-size:1.4em">if you are stuck here, try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a></p>');
     document.body.innerHTML = html.join('\n');
 
     var s = mknod('style');
