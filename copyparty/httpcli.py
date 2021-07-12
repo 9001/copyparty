@@ -37,7 +37,6 @@ class HttpCli(object):
         self.ip = conn.addr[0]
         self.addr = conn.addr  # type: tuple[str, int]
         self.args = conn.args
-        self.is_mp = conn.is_mp
         self.asrv = conn.asrv  # type: AuthSrv
         self.ico = conn.ico
         self.thumbcli = conn.thumbcli
@@ -343,6 +342,9 @@ class HttpCli(object):
         if "tree" in self.uparam:
             return self.tx_tree()
 
+        if "stack" in self.uparam:
+            return self.tx_stack()
+
         # conditional redirect to single volumes
         if self.vpath == "" and not self.ouparam:
             nread = len(self.rvol)
@@ -371,9 +373,6 @@ class HttpCli(object):
 
         if "scan" in self.uparam:
             return self.scanvol()
-
-        if "stack" in self.uparam:
-            return self.tx_stack()
 
         return self.tx_browser()
 
