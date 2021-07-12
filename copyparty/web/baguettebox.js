@@ -32,7 +32,12 @@ window.baguetteBox = (function () {
         re_v = /.+\.(webm|mp4)(\?|$)/i,
         data = {},  // all galleries
         imagesElements = [],
-        documentLastFocus = null;
+        documentLastFocus = null,
+        isFullscreen = false;
+
+    var onFSC = function (e) {
+        isFullscreen = !!document.fullscreenElement;
+    };
 
     var overlayClickHandler = function (event) {
         if (event.target.id.indexOf('baguette-img') !== -1) {
@@ -226,6 +231,16 @@ window.baguetteBox = (function () {
             playpause();
         else if (k == "KeyU" || k == "KeyO")
             relseek(k == "KeyU" ? -10 : 10);
+        else if (k == "KeyM" && vid())
+            vid().muted = !vid().muted;
+        else if (k == "KeyF")
+            try {
+                if (isFullscreen)
+                    document.exitFullscreen();
+                else
+                    vid().requestFullscreen();
+            }
+            catch (ex) { }
     }
 
     function keyUpHandler(e) {
@@ -335,6 +350,7 @@ window.baguetteBox = (function () {
 
         bind(document, 'keydown', keyDownHandler);
         bind(document, 'keyup', keyUpHandler);
+        bind(document, 'fullscreenchange', onFSC);
         currentIndex = chosenImageIndex;
         touch = {
             count: 0,
@@ -387,6 +403,7 @@ window.baguetteBox = (function () {
 
         unbind(document, 'keydown', keyDownHandler);
         unbind(document, 'keyup', keyUpHandler);
+        unbind(document, 'fullscreenchange', onFSC);
         // Fade out and hide the overlay
         overlay.className = '';
         setTimeout(function () {
