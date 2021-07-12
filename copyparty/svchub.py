@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import E, PY2, WINDOWS, MACOS, VT100
-from .util import mp
+from .util import mp, start_log_thrs, start_stackmon
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
@@ -41,6 +41,12 @@ class SvcHub(object):
         self.log = self._log_disabled if args.q else self._log_enabled
         if args.lo:
             self._setup_logfile(printed)
+
+        if args.stackmon:
+            start_stackmon(args.stackmon, 0)
+
+        if args.log_thrs:
+            start_log_thrs(self.log, args.log_thrs, 0)
 
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log, False)

@@ -16,6 +16,7 @@ import mimetypes
 import contextlib
 import subprocess as sp  # nosec
 from datetime import datetime
+from collections import Counter
 
 from .__init__ import PY2, WINDOWS, ANYWIN
 from .stolen import surrogateescape
@@ -280,6 +281,62 @@ def alltrace():
             rret += ret
 
     return "\n".join(rret + bret)
+
+
+def start_stackmon(arg_str, nid):
+    suffix = "-{}".format(nid) if nid else ""
+    fp, f = arg_str.rsplit(",", 1)
+    f = int(f)
+    t = threading.Thread(
+        target=stackmon,
+        args=(fp, f, suffix),
+        name="stackmon" + suffix,
+    )
+    t.daemon = True
+    t.start()
+
+
+def stackmon(fp, ival, suffix):
+    ctr = 0
+    while True:
+        ctr += 1
+        time.sleep(ival)
+        st = "{}, {}\n{}".format(ctr, time.time(), alltrace())
+        with open(fp + suffix, "wb") as f:
+            f.write(st.encode("utf-8", "replace"))
+
+
+def start_log_thrs(logger, ival, nid):
+    ival = int(ival)
+    tname = lname = "log-thrs"
+    if nid:
+        tname = "logthr-n{}-i{:x}".format(nid, os.getpid())
+        lname = tname[3:]
+
+    t = threading.Thread(
+        target=log_thrs,
+        args=(logger, ival, lname),
+        name=tname,
+    )
+    t.daemon = True
+    t.start()
+
+
+def log_thrs(log, ival, name):
+    while True:
+        time.sleep(ival)
+        tv = [x.name for x in threading.enumerate()]
+        tv = [
+            x.split("-")[0]
+            if x.startswith("httpconn-") or x.startswith("thumb-")
+            else "listen"
+            if "-listen-" in x
+            else x
+            for x in tv
+            if not x.startswith("pydevd.")
+        ]
+        tv = ["{}\033[36m{}".format(v, k) for k, v in sorted(Counter(tv).items())]
+        log(name, "\033[0m \033[33m".join(tv), 3)
 
 
 def min_ex():
