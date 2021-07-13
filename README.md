@@ -207,9 +207,12 @@ the browser has the following hotkeys
 * when viewing images / playing videos:
   * `J/L, Left/Right` prev/next file
   * `Home/End` first/last file
-  * `U/O` skip 10sec back/forward
-  * `P/K/Space` play/pause video
   * `Esc` close viewer
+  * videos:
+    * `U/O` skip 10sec back/forward
+    * `P/K/Space` play/pause
+    * `F` fullscreen
+    * `M` mute
 * when tree-sidebar is open:
   * `A/D` adjust tree width
 * in the grid view:
