@@ -83,7 +83,7 @@ window.baguetteBox = (function () {
     var trapFocusInsideOverlay = function (event) {
         if (overlay.style.display === 'block' && (overlay.contains && !overlay.contains(event.target))) {
             event.stopPropagation();
-            initFocus();
+            closeButton.focus();
         }
     };
 
@@ -378,16 +378,8 @@ window.baguetteBox = (function () {
             options.onChange(currentIndex, imagesElements.length);
         }
         documentLastFocus = document.activeElement;
-        initFocus();
+        closeButton.focus();
         isOverlayVisible = true;
-    }
-
-    function initFocus() {
-        if (options.buttons) {
-            previousButton.focus();
-        } else {
-            closeButton.focus();
-        }
     }
 
     function hideOverlay(e) {

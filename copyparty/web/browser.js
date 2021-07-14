@@ -1756,6 +1756,9 @@ document.onkeydown = function (e) {
 	if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
 		return;
 
+	if (QS('#baguetteBox-overlay.visible'))
+		return;
+
 	var k = e.code + '', pos = -1, n;
 
 	if (e.shiftKey && k != 'KeyA' && k != 'KeyD')
