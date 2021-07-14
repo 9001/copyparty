@@ -53,6 +53,11 @@ var ebi = document.getElementById.bind(document),
     mknod = document.createElement.bind(document);
 
 
+function ctrl(e) {
+    return e && (e.ctrlKey || e.metaKey);
+}
+
+
 function ev(e) {
     e = e || window.event;
     if (!e)

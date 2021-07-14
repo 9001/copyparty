@@ -167,12 +167,13 @@ ebi('tree').innerHTML = (
 
 
 function opclick(e) {
-	ev(e);
-
 	var dest = this.getAttribute('data-dest');
-	goto(dest);
-
 	swrite('opmode', dest || null);
+	if (ctrl(e))
+		return;
+
+	ev(e);
+	goto(dest);
 
 	var input = QS('.opview.act input:not([type="hidden"])')
 	if (input && !is_touch)
