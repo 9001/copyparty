@@ -33,7 +33,9 @@ window.baguetteBox = (function () {
         data = {},  // all galleries
         imagesElements = [],
         documentLastFocus = null,
-        isFullscreen = false;
+        isFullscreen = false,
+        vmute = false,
+        resume_mp = false;
 
     var onFSC = function (e) {
         isFullscreen = !!document.fullscreenElement;
@@ -231,8 +233,10 @@ window.baguetteBox = (function () {
             playpause();
         else if (k == "KeyU" || k == "KeyO")
             relseek(k == "KeyU" ? -10 : 10);
-        else if (k == "KeyM" && vid())
-            vid().muted = !vid().muted;
+        else if (k == "KeyM" && vid()) {
+            vid().muted = vmute = !vmute;
+            mp_ctl();
+        }
         else if (k == "KeyF")
             try {
                 if (isFullscreen)
@@ -558,6 +562,18 @@ window.baguetteBox = (function () {
             vid().currentTime += sec;
     }
 
+    function mp_ctl() {
+        var v = vid();
+        if (!vmute && v && mp.au && !mp.au.paused) {
+            mp.fade_out();
+            resume_mp = true;
+        }
+        else if (resume_mp && (vmute || !v) && mp.au && mp.au.paused) {
+            mp.fade_in();
+            resume_mp = false;
+        }
+    }
+
     /**
      * Triggers the bounce animation
      * @param {('left'|'right')} direction - Direction of the movement
@@ -581,7 +597,12 @@ window.baguetteBox = (function () {
             slider.style.transform = 'translate3d(' + offset + ',0,0)';
         }
         playvid(false);
-        playvid(true);
+        var v = vid();
+        if (v) {
+            playvid(true);
+            v.muted = vmute;
+        }
+        mp_ctl();
     }
 
     function preloadNext(index) {
