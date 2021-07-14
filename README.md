@@ -202,7 +202,7 @@ the browser has the following hotkeys
 * when playing audio:
   * `J/L` prev/next song
   * `U/O` skip 10sec back/forward
-  * `0..9` jump to 10%..90%
+  * `0..9` jump to 0%..90%
   * `P` play/pause (also starts playing the folder)
 * when viewing images / playing videos:
   * `J/L, Left/Right` prev/next file
@@ -212,6 +212,7 @@ the browser has the following hotkeys
     * `U/O` skip 10sec back/forward
     * `P/K/Space` play/pause
     * `F` fullscreen
+    * `C` continue playing next video
     * `R` loop
     * `M` mute
 * when tree-sidebar is open:
@@ -234,7 +235,7 @@ click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` tog
 
 it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how destructive your users are
 
-images named `folder.jpg` and `folder.png` become the thumbnail of the folder they're in
+images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
 
 in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
 
