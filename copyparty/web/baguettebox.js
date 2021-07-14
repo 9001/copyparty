@@ -13,7 +13,7 @@ window.baguetteBox = (function () {
             captions: true,
             buttons: 'auto',
             noScrollbars: false,
-            bodyClass: 'baguetteBox-open',
+            bodyClass: 'bbox-open',
             titleTag: false,
             async: false,
             preload: 2,
@@ -22,7 +22,7 @@ window.baguetteBox = (function () {
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, previousButton, nextButton, closeButton,
+        overlay, slider, previousButton, nextButton, vmodeButton, closeButton,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -36,6 +36,7 @@ window.baguetteBox = (function () {
         isFullscreen = false,
         vmute = false,
         vloop = false,
+        vnext = false,
         resume_mp = false;
 
     var onFSC = function (e) {
@@ -171,46 +172,28 @@ window.baguetteBox = (function () {
     }
 
     function buildOverlay() {
-        overlay = ebi('baguetteBox-overlay');
-        if (overlay) {
-            slider = ebi('baguetteBox-slider');
-            previousButton = ebi('previous-button');
-            nextButton = ebi('next-button');
-            closeButton = ebi('close-button');
-            return;
+        overlay = ebi('bbox-overlay');
+        if (!overlay) {
+            var ctr = mknod('div');
+            ctr.innerHTML = (
+                '<div id="bbox-overlay" role="dialog">' +
+                '<div id="bbox-slider"></div>' +
+                '<button id="bbox-prev" class="bbox-btn" type="button" aria-label="Previous">&lt;</button>' +
+                '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">&gt;</button>' +
+                '<div id="bbox-btns">' +
+                '<button id="bbox-vmode" type="button" tt="a"></button>' +
+                '<button id="bbox-close" type="button" aria-label="Close">&times;</button>' +
+                '</div></div>'
+            );
+            overlay = ctr.firstChild;
+            QS('body').appendChild(overlay);
+            tt.init();
         }
-        overlay = mknod('div');
-        overlay.setAttribute('role', 'dialog');
-        overlay.id = 'baguetteBox-overlay';
-        document.getElementsByTagName('body')[0].appendChild(overlay);
-
-        slider = mknod('div');
-        slider.id = 'baguetteBox-slider';
-        overlay.appendChild(slider);
-
-        previousButton = mknod('button');
-        previousButton.setAttribute('type', 'button');
-        previousButton.id = 'previous-button';
-        previousButton.setAttribute('aria-label', 'Previous');
-        previousButton.innerHTML = '&lt;';
-        overlay.appendChild(previousButton);
-
-        nextButton = mknod('button');
-        nextButton.setAttribute('type', 'button');
-        nextButton.id = 'next-button';
-        nextButton.setAttribute('aria-label', 'Next');
-        nextButton.innerHTML = '&gt;';
-        overlay.appendChild(nextButton);
-
-        closeButton = mknod('button');
-        closeButton.setAttribute('type', 'button');
-        closeButton.id = 'close-button';
-        closeButton.setAttribute('aria-label', 'Close');
-        closeButton.innerHTML = '&times;';
-        overlay.appendChild(closeButton);
-
-        previousButton.className = nextButton.className = closeButton.className = 'baguetteBox-button';
-
+        slider = ebi('bbox-slider');
+        previousButton = ebi('bbox-prev');
+        nextButton = ebi('bbox-next');
+        vmodeButton = ebi('bbox-vmode');
+        closeButton = ebi('bbox-close');
         bindEvents();
     }
 
@@ -239,9 +222,14 @@ window.baguetteBox = (function () {
             mp_ctl();
         }
         else if (k == "KeyR" && v) {
-            v.loop = vloop = !vloop;
-            if (vloop && v.paused)
-                v.play();
+            vloop = !vloop;
+            vnext = vnext && !vloop;
+            setVmode();
+        }
+        else if (k == "KeyC" && v) {
+            vnext = !vnext;
+            vloop = vloop && !vnext;
+            setVmode();
         }
         else if (k == "KeyF")
             try {
@@ -251,6 +239,49 @@ window.baguetteBox = (function () {
                     v.requestFullscreen();
             }
             catch (ex) { }
+    }
+
+    function setVmode() {
+        var v = vid();
+        ebi('bbox-vmode').style.display = v ? '' : 'none';
+        if (!v)
+            return;
+
+        var msg = 'When video ends, ', lbl;
+        if (vloop) {
+            lbl = 'Loop';
+            msg += 'repeat it';
+        }
+        else if (vnext) {
+            lbl = 'Cont';
+            msg += 'continue to next';
+        }
+        else {
+            lbl = 'Stop';
+            msg += 'just stop'
+        }
+        vmodeButton.setAttribute('aria-label', msg);
+        vmodeButton.setAttribute('tt', msg);
+        vmodeButton.textContent = lbl;
+
+        v.loop = vloop
+        if (vloop && v.paused)
+            v.play();
+    }
+
+    function tglVmode() {
+        if (vloop) {
+            vnext = true;
+            vloop = false;
+        }
+        else if (vnext)
+            vnext = false;
+        else
+            vloop = true;
+
+        setVmode();
+        if (tt.en)
+            tt.show.bind(this)();
     }
 
     function keyUpHandler(e) {
@@ -285,6 +316,7 @@ window.baguetteBox = (function () {
         bind(previousButton, 'click', showPreviousImage);
         bind(nextButton, 'click', showNextImage);
         bind(closeButton, 'click', hideOverlay);
+        bind(vmodeButton, 'click', tglVmode);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -297,6 +329,7 @@ window.baguetteBox = (function () {
         unbind(previousButton, 'click', showPreviousImage);
         unbind(nextButton, 'click', showNextImage);
         unbind(closeButton, 'click', hideOverlay);
+        unbind(vmodeButton, 'click', tglVmode);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -321,8 +354,8 @@ window.baguetteBox = (function () {
             fullImage.id = 'baguette-img-' + i;
             imagesElements.push(fullImage);
 
-            imagesFiguresIds.push('baguetteBox-figure-' + i);
-            imagesCaptionsIds.push('baguetteBox-figcaption-' + i);
+            imagesFiguresIds.push('bbox-figure-' + i);
+            imagesCaptionsIds.push('bbox-figcaption-' + i);
             slider.appendChild(imagesElements[i]);
         }
         overlay.setAttribute('aria-labelledby', imagesFiguresIds.join(' '));
@@ -445,15 +478,15 @@ window.baguetteBox = (function () {
                 imageElement.getAttribute('data-caption') || imageElement.title;
 
         var figure = mknod('figure');
-        figure.id = 'baguetteBox-figure-' + index;
-        figure.innerHTML = '<div class="baguetteBox-spinner">' +
-            '<div class="baguetteBox-double-bounce1"></div>' +
-            '<div class="baguetteBox-double-bounce2"></div>' +
+        figure.id = 'bbox-figure-' + index;
+        figure.innerHTML = '<div class="bbox-spinner">' +
+            '<div class="bbox-double-bounce1"></div>' +
+            '<div class="bbox-double-bounce2"></div>' +
             '</div>';
 
         if (options.captions && imageCaption) {
             var figcaption = mknod('figcaption');
-            figcaption.id = 'baguetteBox-figcaption-' + index;
+            figcaption.id = 'bbox-figcaption-' + index;
             figcaption.innerHTML = imageCaption;
             figure.appendChild(figcaption);
         }
@@ -466,13 +499,16 @@ window.baguetteBox = (function () {
 
         image.addEventListener(is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
-            var spinner = document.querySelector('#baguette-img-' + index + ' .baguetteBox-spinner');
+            var spinner = document.querySelector('#baguette-img-' + index + ' .bbox-spinner');
             figure.removeChild(spinner);
             if (!options.async && callback)
                 callback();
         });
         image.setAttribute('src', imageSrc);
-        image.setAttribute('controls', 'controls');
+        if (is_vid) {
+            image.setAttribute('controls', 'controls');
+            image.onended = vidEnd;
+        }
         image.alt = thumbnailElement ? thumbnailElement.alt || '' : '';
         if (options.titleTag && imageCaption) {
             image.title = imageCaption;
@@ -568,6 +604,11 @@ window.baguetteBox = (function () {
             vid().currentTime += sec;
     }
 
+    function vidEnd() {
+        if (this == vid() && vnext)
+            showNextImage();
+    }
+
     function mp_ctl() {
         var v = vid();
         if (!vmute && v && mp.au && !mp.au.paused) {
@@ -610,6 +651,7 @@ window.baguetteBox = (function () {
             v.loop = vloop;
         }
         mp_ctl();
+        setVmode();
     }
 
     function preloadNext(index) {
@@ -643,7 +685,7 @@ window.baguetteBox = (function () {
         clearCachedData();
         unbind(document, 'keydown', keyDownHandler);
         unbind(document, 'keyup', keyUpHandler);
-        document.getElementsByTagName('body')[0].removeChild(ebi('baguetteBox-overlay'));
+        document.getElementsByTagName('body')[0].removeChild(ebi('bbox-overlay'));
         data = {};
         currentGallery = [];
         currentIndex = 0;

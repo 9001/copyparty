@@ -503,7 +503,7 @@ var tt = (function () {
     r.tt.setAttribute('id', 'tt');
     document.body.appendChild(r.tt);
 
-    function show() {
+    r.show = function () {
         var cfg = sread('tooltips');
         if (cfg !== null && cfg != '1')
             return;
@@ -527,7 +527,7 @@ var tt = (function () {
         clmod(r.tt, 'show', 1);
     }
 
-    function hide() {
+    r.hide = function () {
         clmod(r.tt, 'show');
     }
 
@@ -543,8 +543,8 @@ var tt = (function () {
             r.en = bcfg_get('tooltips', true)
         }
 
-        var _show = r.en ? show : null,
-            _hide = r.en ? hide : null;
+        var _show = r.en ? r.show : null,
+            _hide = r.en ? r.hide : null;
 
         var o = QSA('*[tt]');
         for (var a = o.length - 1; a >= 0; a--) {
@@ -553,7 +553,7 @@ var tt = (function () {
             o[a].onmouseenter = _show;
             o[a].onmouseleave = _hide;
         }
-        hide();
+        r.hide();
     };
 
     return r;
