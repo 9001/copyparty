@@ -470,12 +470,22 @@ window.baguetteBox = (function () {
             return;
         }
 
+        // maybe unloaded video
+        while (imageContainer.firstChild)
+            imageContainer.removeChild(imageContainer.firstChild);
+
         var imageElement = galleryItem.imageElement,
             imageSrc = imageElement.href,
+            is_vid = re_v.test(imageSrc),
             thumbnailElement = imageElement.querySelector('img, video'),
             imageCaption = typeof options.captions === 'function' ?
                 options.captions.call(currentGallery, imageElement) :
                 imageElement.getAttribute('data-caption') || imageElement.title;
+
+        imageSrc += imageSrc.indexOf('?') < 0 ? '?cache' : '&cache';
+
+        if (is_vid && index != currentIndex)
+            return;  // no preload
 
         var figure = mknod('figure');
         figure.id = 'bbox-figure-' + index;
@@ -492,9 +502,7 @@ window.baguetteBox = (function () {
         }
         imageContainer.appendChild(figure);
 
-        var is_vid = re_v.test(imageSrc),
-            image = mknod(is_vid ? 'video' : 'img');
-
+        var image = mknod(is_vid ? 'video' : 'img');
         clmod(imageContainer, 'vid', is_vid);
 
         image.addEventListener(is_vid ? 'loadedmetadata' : 'load', function () {
@@ -569,7 +577,13 @@ window.baguetteBox = (function () {
             return false;
         }
 
-        playvid(false);
+        var v = vid();
+        if (v) {
+            v.src = '';
+            v.load();
+            v.parentNode.removeChild(v);
+        }
+
         currentIndex = index;
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);

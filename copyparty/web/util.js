@@ -525,11 +525,11 @@ var tt = (function () {
 
         r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
         clmod(r.tt, 'show', 1);
-    }
+    };
 
     r.hide = function () {
         clmod(r.tt, 'show');
-    }
+    };
 
     r.init = function () {
         var ttb = ebi('tooltips');
