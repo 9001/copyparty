@@ -27,21 +27,20 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
     window.onerror = undefined;
     window['vis_exh'] = null;
-    var html = ['<h1>you hit a bug!</h1><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code><br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)</p><p>',
-        esc(String(msg)), '</p><p>', esc(url + ' @' + lineNo + ':' + columnNo), '</p>'];
+    var html = ['<h1>you hit a bug!</h1><p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here</p><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code><br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)</p><p>',
+        esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>'];
 
     if (error) {
         var find = ['desc', 'stack', 'trace'];
         for (var a = 0; a < find.length; a++)
             if (String(error[find[a]]) !== 'undefined')
-                html.push('<h2>' + find[a] + '</h2>' +
+                html.push('<h3>' + find[a] + '</h3>' +
                     esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
     }
-    html.push('<p style="border-top:1px solid #999;margin-top:1.5em;font-size:1.4em">if you are stuck here, try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a></p>');
     document.body.innerHTML = html.join('\n');
 
     var s = mknod('style');
-    s.innerHTML = 'body{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em} code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} *{line-height:1.5em}';
+    s.innerHTML = 'body{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em} h1{margin:.5em 1em 0 0;padding:0} h3{border-top:1px solid #999;margin:0} code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} a{text-decoration:underline} *{line-height:1.5em}';
     document.head.appendChild(s);
 
     throw 'fatal_err';
