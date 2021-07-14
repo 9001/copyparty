@@ -22,7 +22,7 @@ window.baguetteBox = (function () {
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, previousButton, nextButton, vmodeButton, closeButton,
+        overlay, slider, btnPrev, btnNext, btnVmode, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -43,26 +43,25 @@ window.baguetteBox = (function () {
         isFullscreen = !!document.fullscreenElement;
     };
 
-    var overlayClickHandler = function (event) {
-        if (event.target.id.indexOf('baguette-img') !== -1) {
+    var overlayClickHandler = function (e) {
+        if (e.target.id.indexOf('baguette-img') !== -1)
             hideOverlay();
-        }
     };
 
-    var touchstartHandler = function (event) {
+    var touchstartHandler = function (e) {
         touch.count++;
-        if (touch.count > 1) {
+        if (touch.count > 1)
             touch.multitouch = true;
-        }
-        touch.startX = event.changedTouches[0].pageX;
-        touch.startY = event.changedTouches[0].pageY;
+
+        touch.startX = e.changedTouches[0].pageX;
+        touch.startY = e.changedTouches[0].pageY;
     };
-    var touchmoveHandler = function (event) {
-        if (touchFlag || touch.multitouch) {
+    var touchmoveHandler = function (e) {
+        if (touchFlag || touch.multitouch)
             return;
-        }
-        event.preventDefault ? event.preventDefault() : event.returnValue = false;
-        var touchEvent = event.touches[0] || event.changedTouches[0];
+
+        e.preventDefault ? e.preventDefault() : e.returnValue = false;
+        var touchEvent = e.touches[0] || e.changedTouches[0];
         if (touchEvent.pageX - touch.startX > 40) {
             touchFlag = true;
             showPreviousImage();
@@ -75,19 +74,19 @@ window.baguetteBox = (function () {
     };
     var touchendHandler = function () {
         touch.count--;
-        if (touch.count <= 0) {
+        if (touch.count <= 0)
             touch.multitouch = false;
-        }
+
         touchFlag = false;
     };
     var contextmenuHandler = function () {
         touchendHandler();
     };
 
-    var trapFocusInsideOverlay = function (event) {
-        if (overlay.style.display === 'block' && (overlay.contains && !overlay.contains(event.target))) {
-            event.stopPropagation();
-            closeButton.focus();
+    var trapFocusInsideOverlay = function (e) {
+        if (overlay.style.display === 'block' && (overlay.contains && !overlay.contains(e.target))) {
+            e.stopPropagation();
+            btnClose.focus();
         }
     };
 
@@ -107,28 +106,25 @@ window.baguetteBox = (function () {
 
         [].forEach.call(galleryNodeList, function (galleryElement) {
             var tagsNodeList = [];
-            if (galleryElement.tagName === 'A') {
+            if (galleryElement.tagName === 'A')
                 tagsNodeList = [galleryElement];
-            } else {
+            else
                 tagsNodeList = galleryElement.getElementsByTagName('a');
-            }
 
             tagsNodeList = [].filter.call(tagsNodeList, function (element) {
-                if (element.className.indexOf(userOptions && userOptions.ignoreClass) === -1) {
+                if (element.className.indexOf(userOptions && userOptions.ignoreClass) === -1)
                     return re_i.test(element.href) || re_v.test(element.href);
-                }
             });
-            if (tagsNodeList.length === 0) {
+            if (!tagsNodeList.length)
                 return;
-            }
 
             var gallery = [];
             [].forEach.call(tagsNodeList, function (imageElement, imageIndex) {
-                var imageElementClickHandler = function (event) {
-                    if (event && (event.ctrlKey || event.metaKey))
+                var imageElementClickHandler = function (e) {
+                    if (ctrl(e))
                         return true;
 
-                    event.preventDefault ? event.preventDefault() : event.returnValue = false;
+                    e.preventDefault ? e.preventDefault() : e.returnValue = false;
                     prepareOverlay(gallery, userOptions);
                     showOverlay(imageIndex);
                 };
@@ -146,26 +142,23 @@ window.baguetteBox = (function () {
     }
 
     function clearCachedData() {
-        for (var selector in data) {
-            if (data.hasOwnProperty(selector)) {
+        for (var selector in data)
+            if (data.hasOwnProperty(selector))
                 removeFromCache(selector);
-            }
-        }
     }
 
     function removeFromCache(selector) {
-        if (!data.hasOwnProperty(selector)) {
+        if (!data.hasOwnProperty(selector))
             return;
-        }
+
         var galleries = data[selector].galleries;
         [].forEach.call(galleries, function (gallery) {
             [].forEach.call(gallery, function (imageItem) {
                 unbind(imageItem.imageElement, 'click', imageItem.eventHandler);
             });
 
-            if (currentGallery === gallery) {
+            if (currentGallery === gallery)
                 currentGallery = [];
-            }
         });
 
         delete data[selector];
@@ -190,10 +183,10 @@ window.baguetteBox = (function () {
             tt.init();
         }
         slider = ebi('bbox-slider');
-        previousButton = ebi('bbox-prev');
-        nextButton = ebi('bbox-next');
-        vmodeButton = ebi('bbox-vmode');
-        closeButton = ebi('bbox-close');
+        btnPrev = ebi('bbox-prev');
+        btnNext = ebi('bbox-next');
+        btnVmode = ebi('bbox-vmode');
+        btnClose = ebi('bbox-close');
         bindEvents();
     }
 
@@ -260,9 +253,9 @@ window.baguetteBox = (function () {
             lbl = 'Stop';
             msg += 'just stop'
         }
-        vmodeButton.setAttribute('aria-label', msg);
-        vmodeButton.setAttribute('tt', msg);
-        vmodeButton.textContent = lbl;
+        btnVmode.setAttribute('aria-label', msg);
+        btnVmode.setAttribute('tt', msg);
+        btnVmode.textContent = lbl;
 
         v.loop = vloop
         if (vloop && v.paused)
@@ -313,10 +306,10 @@ window.baguetteBox = (function () {
 
     function bindEvents() {
         bind(overlay, 'click', overlayClickHandler);
-        bind(previousButton, 'click', showPreviousImage);
-        bind(nextButton, 'click', showNextImage);
-        bind(closeButton, 'click', hideOverlay);
-        bind(vmodeButton, 'click', tglVmode);
+        bind(btnPrev, 'click', showPreviousImage);
+        bind(btnNext, 'click', showNextImage);
+        bind(btnClose, 'click', hideOverlay);
+        bind(btnVmode, 'click', tglVmode);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -326,10 +319,10 @@ window.baguetteBox = (function () {
 
     function unbindEvents() {
         unbind(overlay, 'click', overlayClickHandler);
-        unbind(previousButton, 'click', showPreviousImage);
-        unbind(nextButton, 'click', showNextImage);
-        unbind(closeButton, 'click', hideOverlay);
-        unbind(vmodeButton, 'click', tglVmode);
+        unbind(btnPrev, 'click', showPreviousImage);
+        unbind(btnNext, 'click', showNextImage);
+        unbind(btnClose, 'click', hideOverlay);
+        unbind(btnVmode, 'click', tglVmode);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -338,9 +331,9 @@ window.baguetteBox = (function () {
     }
 
     function prepareOverlay(gallery, userOptions) {
-        if (currentGallery === gallery) {
+        if (currentGallery === gallery)
             return;
-        }
+
         currentGallery = gallery;
         setOptions(userOptions);
         slider.innerHTML = '';
@@ -363,23 +356,21 @@ window.baguetteBox = (function () {
     }
 
     function setOptions(newOptions) {
-        if (!newOptions) {
+        if (!newOptions)
             newOptions = {};
-        }
+
         for (var item in defaults) {
             options[item] = defaults[item];
-            if (typeof newOptions[item] !== 'undefined') {
+            if (typeof newOptions[item] !== 'undefined')
                 options[item] = newOptions[item];
-            }
         }
         slider.style.transition = (options.animation === 'fadeIn' ? 'opacity .4s ease' :
             options.animation === 'slideIn' ? '' : 'none');
 
-        if (options.buttons === 'auto' && ('ontouchstart' in window || currentGallery.length === 1)) {
+        if (options.buttons === 'auto' && ('ontouchstart' in window || currentGallery.length === 1))
             options.buttons = false;
-        }
 
-        previousButton.style.display = nextButton.style.display = (options.buttons ? '' : 'none');
+        btnPrev.style.display = btnNext.style.display = (options.buttons ? '' : 'none');
     }
 
     function showOverlay(chosenImageIndex) {
@@ -387,9 +378,8 @@ window.baguetteBox = (function () {
             document.documentElement.style.overflowY = 'hidden';
             document.body.style.overflowY = 'scroll';
         }
-        if (overlay.style.display === 'block') {
+        if (overlay.style.display === 'block')
             return;
-        }
 
         bind(document, 'keydown', keyDownHandler);
         bind(document, 'keyup', keyUpHandler);
@@ -410,18 +400,18 @@ window.baguetteBox = (function () {
         // Fade in overlay
         setTimeout(function () {
             overlay.className = 'visible';
-            if (options.bodyClass && document.body.classList) {
+            if (options.bodyClass && document.body.classList)
                 document.body.classList.add(options.bodyClass);
-            }
-            if (options.afterShow) {
+
+            if (options.afterShow)
                 options.afterShow();
-            }
         }, 50);
-        if (options.onChange) {
+
+        if (options.onChange)
             options.onChange(currentIndex, imagesElements.length);
-        }
+
         documentLastFocus = document.activeElement;
-        closeButton.focus();
+        btnClose.focus();
         isOverlayVisible = true;
     }
 
@@ -432,9 +422,8 @@ window.baguetteBox = (function () {
             document.documentElement.style.overflowY = 'auto';
             document.body.style.overflowY = 'auto';
         }
-        if (overlay.style.display === 'none') {
+        if (overlay.style.display === 'none')
             return;
-        }
 
         unbind(document, 'keydown', keyDownHandler);
         unbind(document, 'keyup', keyUpHandler);
@@ -443,12 +432,12 @@ window.baguetteBox = (function () {
         overlay.className = '';
         setTimeout(function () {
             overlay.style.display = 'none';
-            if (options.bodyClass && document.body.classList) {
+            if (options.bodyClass && document.body.classList)
                 document.body.classList.remove(options.bodyClass);
-            }
-            if (options.afterHide) {
+
+            if (options.afterHide)
                 options.afterHide();
-            }
+
             documentLastFocus && documentLastFocus.focus();
             isOverlayVisible = false;
         }, 500);
@@ -458,17 +447,12 @@ window.baguetteBox = (function () {
         var imageContainer = imagesElements[index];
         var galleryItem = currentGallery[index];
 
-        if (typeof imageContainer === 'undefined' || typeof galleryItem === 'undefined') {
+        if (typeof imageContainer === 'undefined' || typeof galleryItem === 'undefined')
             return;  // out-of-bounds or gallery dirty
-        }
 
-        if (imageContainer.querySelector('img, video')) {
+        if (imageContainer.querySelector('img, video'))
             // was loaded, cb and bail
-            if (callback) {
-                callback();
-            }
-            return;
-        }
+            return callback ? callback() : null;
 
         // maybe unloaded video
         while (imageContainer.firstChild)
@@ -518,14 +502,13 @@ window.baguetteBox = (function () {
             image.onended = vidEnd;
         }
         image.alt = thumbnailElement ? thumbnailElement.alt || '' : '';
-        if (options.titleTag && imageCaption) {
+        if (options.titleTag && imageCaption)
             image.title = imageCaption;
-        }
+
         figure.appendChild(image);
 
-        if (options.async && callback) {
+        if (options.async && callback)
             callback();
-        }
     }
 
     function showNextImage(e) {
@@ -538,26 +521,20 @@ window.baguetteBox = (function () {
         return show(currentIndex - 1);
     }
 
-    function showFirstImage(event) {
-        if (event) {
-            event.preventDefault();
-        }
+    function showFirstImage(e) {
+        if (e)
+            e.preventDefault();
+
         return show(0);
     }
 
-    function showLastImage(event) {
-        if (event) {
-            event.preventDefault();
-        }
+    function showLastImage(e) {
+        if (e)
+            e.preventDefault();
+
         return show(currentGallery.length - 1);
     }
 
-    /**
-     * Move the gallery to a specific index
-     * @param `index` {number} - the position of the image
-     * @param `gallery` {array} - gallery which should be opened, if omitted assumes the currently opened one
-     * @return {boolean} - true on success or false if the index is invalid
-     */
     function show(index, gallery) {
         if (!isOverlayVisible && index >= 0 && index < gallery.length) {
             prepareOverlay(gallery, options);
@@ -565,15 +542,15 @@ window.baguetteBox = (function () {
             return true;
         }
         if (index < 0) {
-            if (options.animation) {
+            if (options.animation)
                 bounceAnimation('left');
-            }
+
             return false;
         }
         if (index >= imagesElements.length) {
-            if (options.animation) {
+            if (options.animation)
                 bounceAnimation('right');
-            }
+
             return false;
         }
 
@@ -591,9 +568,8 @@ window.baguetteBox = (function () {
         });
         updateOffset();
 
-        if (options.onChange) {
+        if (options.onChange)
             options.onChange(currentIndex, imagesElements.length);
-        }
 
         return true;
     }
@@ -635,10 +611,6 @@ window.baguetteBox = (function () {
         }
     }
 
-    /**
-     * Triggers the bounce animation
-     * @param {('left'|'right')} direction - Direction of the movement
-     */
     function bounceAnimation(direction) {
         slider.className = 'bounce-from-' + direction;
         setTimeout(function () {
@@ -669,18 +641,18 @@ window.baguetteBox = (function () {
     }
 
     function preloadNext(index) {
-        if (index - currentIndex >= options.preload) {
+        if (index - currentIndex >= options.preload)
             return;
-        }
+
         loadImage(index + 1, function () {
             preloadNext(index + 1);
         });
     }
 
     function preloadPrev(index) {
-        if (currentIndex - index >= options.preload) {
+        if (currentIndex - index >= options.preload)
             return;
-        }
+
         loadImage(index - 1, function () {
             preloadPrev(index - 1);
         });
