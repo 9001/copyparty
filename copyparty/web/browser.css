@@ -902,7 +902,8 @@ html.light #ggrid a:hover {
 #pvol,
 #barbuf,
 #barpos,
-#u2conf label {
+#u2conf label,
+#ops {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -1202,6 +1203,9 @@ html.light #tree::-webkit-scrollbar {
 	background: rgba(0, 0, 0, 0.6);
 	border-radius: .4em;
 	padding: .3em .6em;
+}
+html.light #bbox-overlay figcaption a {
+	color: #0bf;
 }
 .full-image:before {
 	content: "";
