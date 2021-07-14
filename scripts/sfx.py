@@ -6,8 +6,8 @@ import re, os, sys, time, shutil, signal, threading, tarfile, hashlib, platform,
 import subprocess as sp
 
 """
-pls don't edit this file with a text editor,
-  it breaks the compressed stuff at the end
+to edit this file, use HxD or "vim -b"
+  (there is compressed stuff at the end)
 
 run me with any version of python, i will unpack and run copyparty
 
