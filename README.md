@@ -212,6 +212,7 @@ the browser has the following hotkeys
     * `U/O` skip 10sec back/forward
     * `P/K/Space` play/pause
     * `F` fullscreen
+    * `R` loop
     * `M` mute
 * when tree-sidebar is open:
   * `A/D` adjust tree width

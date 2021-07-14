@@ -35,6 +35,7 @@ window.baguetteBox = (function () {
         documentLastFocus = null,
         isFullscreen = false,
         vmute = false,
+        vloop = false,
         resume_mp = false;
 
     var onFSC = function (e) {
@@ -217,7 +218,7 @@ window.baguetteBox = (function () {
         if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
             return;
 
-        var k = e.code + '';
+        var k = e.code + '', v = vid();
 
         if (k == "ArrowLeft" || k == "KeyJ")
             showPreviousImage();
@@ -233,16 +234,21 @@ window.baguetteBox = (function () {
             playpause();
         else if (k == "KeyU" || k == "KeyO")
             relseek(k == "KeyU" ? -10 : 10);
-        else if (k == "KeyM" && vid()) {
-            vid().muted = vmute = !vmute;
+        else if (k == "KeyM" && v) {
+            v.muted = vmute = !vmute;
             mp_ctl();
+        }
+        else if (k == "KeyR" && v) {
+            v.loop = vloop = !vloop;
+            if (vloop && v.paused)
+                v.play();
         }
         else if (k == "KeyF")
             try {
                 if (isFullscreen)
                     document.exitFullscreen();
                 else
-                    vid().requestFullscreen();
+                    v.requestFullscreen();
             }
             catch (ex) { }
     }
@@ -601,6 +607,7 @@ window.baguetteBox = (function () {
         if (v) {
             playvid(true);
             v.muted = vmute;
+            v.loop = vloop;
         }
         mp_ctl();
     }
