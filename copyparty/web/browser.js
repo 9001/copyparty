@@ -605,7 +605,7 @@ var widget = (function () {
 
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
-		var o = document.createElement('input');
+		var o = mknod('input');
 		o.style.cssText = 'position:fixed;top:45%;left:48%;padding:1em;z-index:9';
 		o.value = m;
 		document.body.appendChild(o);
@@ -1451,7 +1451,7 @@ function play_linked() {
 
 var thegrid = (function () {
 	var lfiles = ebi('files'),
-		gfiles = document.createElement('div');
+		gfiles = mknod('div');
 
 	gfiles.setAttribute('id', 'gfiles');
 	gfiles.style.display = 'none';
@@ -1553,7 +1553,7 @@ var thegrid = (function () {
 	setsz();
 
 	function gclick(e) {
-		if (e && (e.ctrlKey || e.metaKey))
+		if (ctrl(e))
 			return true;
 
 		var oth = ebi(this.getAttribute('ref')),
@@ -2301,7 +2301,7 @@ var treectl = (function () {
 	}
 
 	function treego(e) {
-		if (e && (e.ctrlKey || e.metaKey))
+		if (ctrl(e))
 			return true;
 
 		ev(e);

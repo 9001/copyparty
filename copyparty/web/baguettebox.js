@@ -97,7 +97,7 @@ window.baguetteBox = (function () {
     }
 
     function bindImageClickListeners(selector, userOptions) {
-        var galleryNodeList = document.querySelectorAll(selector);
+        var galleryNodeList = QSA(selector);
         var selectorData = {
             galleries: [],
             nodeList: galleryNodeList
@@ -491,7 +491,7 @@ window.baguetteBox = (function () {
 
         image.addEventListener(is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
-            var spinner = document.querySelector('#baguette-img-' + index + ' .bbox-spinner');
+            var spinner = QS('#baguette-img-' + index + ' .bbox-spinner');
             figure.removeChild(spinner);
             if (!options.async && callback)
                 callback();

@@ -925,9 +925,8 @@ function cfg_uni(e) {
     function keydown(ev) {
         ev = ev || window.event;
         var kc = ev.keyCode || ev.which;
-        var ctrl = ev.ctrlKey || ev.metaKey;
         //console.log(ev.code, kc);
-        if (ctrl && (ev.code == "KeyS" || kc == 83)) {
+        if (ctrl(ev) && (ev.code == "KeyS" || kc == 83)) {
             save();
             return false;
         }
@@ -936,23 +935,15 @@ function cfg_uni(e) {
             if (d)
                 d.click();
         }
-        if (document.activeElement == dom_src) {
-            if (ev.code == "Tab" || kc == 9) {
-                md_indent(ev.shiftKey);
-                return false;
-            }
-            if (ctrl && (ev.code == "KeyH" || kc == 72)) {
+        if (document.activeElement != dom_src)
+            return true;
+
+        if (ctrl(ev)) {
+            if (ev.code == "KeyH" || kc == 72) {
                 md_header(ev.shiftKey);
                 return false;
             }
-            if (!ctrl && (ev.code == "Home" || kc == 36)) {
-                md_home(ev.shiftKey);
-                return false;
-            }
-            if (!ctrl && !ev.shiftKey && (ev.code == "Enter" || kc == 13)) {
-                return md_newline();
-            }
-            if (ctrl && (ev.code == "KeyZ" || kc == 90)) {
+            if (ev.code == "KeyZ" || kc == 90) {
                 if (ev.shiftKey)
                     action_stack.redo();
                 else
@@ -960,31 +951,43 @@ function cfg_uni(e) {
 
                 return false;
             }
-            if (ctrl && (ev.code == "KeyY" || kc == 89)) {
+            if (ev.code == "KeyY" || kc == 89) {
                 action_stack.redo();
                 return false;
             }
-            if (!ctrl && !ev.shiftKey && kc == 8) {
-                return md_backspace();
-            }
-            if (ctrl && (ev.code == "KeyK")) {
+            if (ev.code == "KeyK") {
                 fmt_table();
                 return false;
             }
-            if (ctrl && (ev.code == "KeyU")) {
+            if (ev.code == "KeyU") {
                 iter_uni();
                 return false;
             }
-            if (ctrl && (ev.code == "KeyE")) {
+            if (ev.code == "KeyE") {
                 dom_nsbs.click();
-                //fmt_table();
                 return false;
             }
             var up = ev.code == "ArrowUp" || kc == 38;
             var dn = ev.code == "ArrowDown" || kc == 40;
-            if (ctrl && (up || dn)) {
+            if (up || dn) {
                 md_p_jump(dn);
                 return false;
+            }
+        }
+        else {
+            if (ev.code == "Tab" || kc == 9) {
+                md_indent(ev.shiftKey);
+                return false;
+            }
+            if (ev.code == "Home" || kc == 36) {
+                md_home(ev.shiftKey);
+                return false;
+            }
+            if (!ev.shiftKey && (ev.code == "Enter" || kc == 13)) {
+                return md_newline();
+            }
+            if (!ev.shiftKey && kc == 8) {
+                return md_backspace();
             }
         }
     }
