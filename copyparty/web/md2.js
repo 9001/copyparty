@@ -925,7 +925,7 @@ function cfg_uni(e) {
     function keydown(ev) {
         ev = ev || window.event;
         var kc = ev.code || ev.keyCode || ev.which;
-        //console.log(ev.code, kc);
+        //console.log(ev.key, ev.code, ev.keyCode, ev.which);
         if (ctrl(ev) && (ev.code == "KeyS" || kc == 83)) {
             save();
             return false;
