@@ -158,7 +158,7 @@ small collection of user feedback
 * Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * Windows: python 2.7 cannot handle filenames with mojibake
-* MacOS: `--th-ff-jpg` may fix thumbnails using macports-FFmpeg
+* `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions
 
 ## general bugs
 

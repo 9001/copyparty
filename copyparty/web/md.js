@@ -530,3 +530,6 @@ dom_navtgl.onclick = function () {
 
 if (sread('hidenav') == 1)
     dom_navtgl.onclick();
+
+if (window['tt'])
+    tt.init();

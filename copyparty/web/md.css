@@ -8,6 +8,47 @@ html, body {
 	font-family: sans-serif;
 	line-height: 1.5em;
 }
+#tt {
+	position: fixed;
+	max-width: 34em;
+	background: #222;
+	border: 0 solid #777;
+	overflow: hidden;
+	margin-top: 1em;
+	padding: 0 1.3em;
+	height: 0;
+	opacity: .1;
+	transition: opacity 0.14s, height 0.14s, padding 0.14s;
+	box-shadow: 0 .2em .5em #222;
+	border-radius: .4em;
+	z-index: 9001;
+}
+#tt.b {
+	padding: 0 2em;
+	border-radius: .5em;
+	box-shadow: 0 .2em 1em #000;
+}
+#tt.show {
+	padding: 1em 1.3em;
+	border-width: .4em 0;
+	height: auto;
+	opacity: 1;
+}
+#tt.show.b {
+	padding: 1.5em 2em;
+	border-width: .5em 0;
+}
+#tt code {
+	background: #3c3c3c;
+	padding: .1em .3em;
+	border-top: 1px solid #777;
+	border-radius: .3em;
+	font-family: monospace, monospace;
+	line-height: 1.7em;
+}
+#tt em {
+	color: #f6a;
+}
 #mtw {
 	display: none;
 }

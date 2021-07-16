@@ -14,9 +14,9 @@
 		<a id="lightswitch" href="#">go dark</a>
 		<a id="navtoggle" href="#">hide nav</a>
 		{%- if edit %}
-			<a id="save" href="?edit">save</a>
-			<a id="sbs" href="#">sbs</a>
-			<a id="nsbs" href="#">editor</a>
+			<a id="save" href="?edit" tt="Hotkey: ctrl-s">save</a>
+			<a id="sbs" href="#" tt="editor and preview side by side">sbs</a>
+			<a id="nsbs" href="#" tt="switch between editor and preview$NHotkey: ctrl-e">editor</a>
 			<div id="toolsbox">
 				<a id="tools" href="#">tools</a>
 				<a id="fmt_table" href="#">prettify table (ctrl-k)</a>
@@ -26,8 +26,8 @@
 				<a id="help" href="#">help</a>
 			</div>
 		{%- else %}
-			<a href="?edit">edit (basic)</a>
-			<a href="?edit2">edit (fancy)</a>
+			<a href="?edit" tt="good: higher performance$Ngood: same document width as viewer$Nbad: assumes you know markdown">edit (basic)</a>
+			<a href="?edit2" tt="not in-house so probably less buggy">edit (fancy)</a>
 			<a href="?raw">view raw</a>
 		{%- endif %}
 	</div>

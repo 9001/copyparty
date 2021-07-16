@@ -149,8 +149,8 @@ ebi('op_cfg').innerHTML = (
 ebi('tree').innerHTML = (
 	'<div id="treeh">\n' +
 	'	<a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>\n' +
-	'	<a href="#" class="btn" step="2" id="twobytwo">+</a>\n' +
-	'	<a href="#" class="btn" step="-2" id="twig">&ndash;</a>\n' +
+	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: A">+</a>\n' +
+	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: D">&ndash;</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
 	'</div>\n' +
 	'<ul id="treeul"></ul>\n' +
@@ -1458,8 +1458,8 @@ var thegrid = (function () {
 	gfiles.innerHTML = (
 		'<div id="ghead">' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> &nbsp; zoom ' +
-		'<a href="#" class="btn" z="-1.2" tt="Hotkey: A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2" tt="Hotkey: D">+</a> &nbsp; sort by: ' +
+		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
+		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a> &nbsp; sort by: ' +
 		'<a href="#" s="href">name</a>, ' +
 		'<a href="#" s="sz">size</a>, ' +
 		'<a href="#" s="ts">date</a>, ' +
@@ -2520,7 +2520,7 @@ function apply_perms(newperms) {
 
 	var o = QSA('#ops>a[data-perm], #u2footfoot');
 	for (var a = 0; a < o.length; a++) {
-		var display = 'inline';
+		var display = '';
 		var needed = o[a].getAttribute('data-perm').split(' ');
 		for (var b = 0; b < needed.length; b++) {
 			if (!has(perms, needed[b])) {

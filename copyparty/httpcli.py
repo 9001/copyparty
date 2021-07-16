@@ -1376,7 +1376,7 @@ class HttpCli(object):
             for c, v in [[b"&", 4], [b"<", 3], [b">", 3]]:
                 sz_md += (len(buf) - len(buf.replace(c, b""))) * v
 
-        file_ts = max(ts_md, ts_html)
+        file_ts = max(ts_md, ts_html, E.t0)
         file_lastmod, do_send = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
         self.out_headers.update(NO_CACHE)
