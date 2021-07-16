@@ -1249,8 +1249,7 @@ html.light #bbox-overlay figcaption a {
 .bbox-btn {
 	position: fixed;
 }
-.bbox-btn,
-#bbox-btns>button {
+#bbox-overlay button {
 	cursor: pointer;
 	outline: none;
 	padding: 0 .3em;
@@ -1258,19 +1257,17 @@ html.light #bbox-overlay figcaption a {
 	border: 0;
 	border-radius: 15%;
 	background: rgba(50, 50, 50, 0.5);
-	color: #ddd;
-	font: 1.6em sans-serif;
+	color: rgba(255,255,255,0.7);
 	transition: background-color .3s ease;
-	line-height: 1em;
+	transition: color .3s ease;
+	font-size: 1.4em;
+	line-height: 1.4em;
 	vertical-align: top;
 }
-.bbox-btn:focus,
-.bbox-btn:hover {
+#bbox-overlay button:focus,
+#bbox-overlay button:hover {
+	color: rgba(255,255,255,0.9);
 	background: rgba(50, 50, 50, 0.9);
-}
-button#bbox-vmode {
-	font-size: 1em;
-	line-height: 1.6em;
 }
 #bbox-next {
 	right: 1%;
@@ -1282,6 +1279,21 @@ button#bbox-vmode {
 	top: .5em;
 	right: 2%;
 	position: fixed;
+}
+#bbox-halp {
+	color: #fff;
+	background: #333;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 20;
+	padding: .4em;
+}
+#bbox-halp td {
+	padding: .2em .5em;
+}
+#bbox-halp td:first-child {
+	text-align: right;
 }
 .bbox-spinner {
 	width: 40px;

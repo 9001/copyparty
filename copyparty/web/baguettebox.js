@@ -22,7 +22,7 @@ window.baguetteBox = (function () {
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, btnPrev, btnNext, btnVmode, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnVmode, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -174,8 +174,9 @@ window.baguetteBox = (function () {
                 '<button id="bbox-prev" class="bbox-btn" type="button" aria-label="Previous">&lt;</button>' +
                 '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">&gt;</button>' +
                 '<div id="bbox-btns">' +
+                '<button id="bbox-help" type="button">?</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
-                '<button id="bbox-close" type="button" aria-label="Close">&times;</button>' +
+                '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
                 '</div></div>'
             );
             overlay = ctr.firstChild;
@@ -185,9 +186,43 @@ window.baguetteBox = (function () {
         slider = ebi('bbox-slider');
         btnPrev = ebi('bbox-prev');
         btnNext = ebi('bbox-next');
+        btnHelp = ebi('bbox-help');
         btnVmode = ebi('bbox-vmode');
         btnClose = ebi('bbox-close');
         bindEvents();
+    }
+
+    function halp() {
+        if (ebi('bbox-halp'))
+            return;
+
+        var list = [
+            ['<b># hotkey</b>', '<b># operation</b>'],
+            ['escape', 'close'],
+            ['left, J', 'previous file'],
+            ['right, L', 'next file'],
+            ['home', 'first file'],
+            ['end', 'last file'],
+            ['space, P, K', 'video: play / pause'],
+            ['U', 'video: seek 10sec back'],
+            ['P', 'video: seek 10sec ahead'],
+            ['M', 'video: toggle mute'],
+            ['R', 'video: toggle loop'],
+            ['C', 'video: toggle auto-next'],
+            ['F', 'video: toggle fullscreen'],
+        ],
+            d = mknod('table'),
+            html = ['<tbody>'];
+
+        for (var a = 0; a < list.length; a++)
+            html.push('<tr><td>' + list[a][0] + '</td><td>' + list[a][1] + '</td></tr>');
+
+        d.innerHTML = html.join('\n') + '</tbody>';
+        d.setAttribute('id', 'bbox-halp');
+        d.onclick = function () {
+            overlay.removeChild(d);
+        };
+        overlay.appendChild(d);
     }
 
     function keyDownHandler(e) {
@@ -310,6 +345,7 @@ window.baguetteBox = (function () {
         bind(btnNext, 'click', showNextImage);
         bind(btnClose, 'click', hideOverlay);
         bind(btnVmode, 'click', tglVmode);
+        bind(btnHelp, 'click', halp);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -323,6 +359,7 @@ window.baguetteBox = (function () {
         unbind(btnNext, 'click', showNextImage);
         unbind(btnClose, 'click', hideOverlay);
         unbind(btnVmode, 'click', tglVmode);
+        unbind(btnHelp, 'click', halp);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -434,6 +471,10 @@ window.baguetteBox = (function () {
             overlay.style.display = 'none';
             if (options.bodyClass && document.body.classList)
                 document.body.classList.remove(options.bodyClass);
+
+            var h = ebi('bbox-halp');
+            if (h)
+                h.parentNode.removeChild(h);
 
             if (options.afterHide)
                 options.afterHide();
