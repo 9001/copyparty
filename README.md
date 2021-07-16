@@ -114,7 +114,7 @@ summary: all planned features work! now please enjoy the bloatening
 
 * backend stuff
   * ☑ sanic multipart parser
-  * ☑ load balancer (multiprocessing)
+  * ☑ multiprocessing (actual multithreading)
   * ☑ volumes (mountpoints)
   * ☑ accounts
 * upload
@@ -130,10 +130,10 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ tree-view
   * ☑ audio player (with OS media controls)
   * ☑ thumbnails
-    * ☑ images using Pillow
-    * ☑ videos using FFmpeg
+    * ☑ ...of images using Pillow
+    * ☑ ...of videos using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
-  * ☑ image gallery
+  * ☑ image gallery with webm player
   * ☑ SPA (browse while uploading)
     * if you use the file-tree on the left only, not folders in the file list
 * server indexing
@@ -172,7 +172,7 @@ small collection of user feedback
 * Windows: folders cannot be accessed if the name ends with `.`
   * python or windows bug
 
-* Windows: msys2-python 3.8.6 occasionally throws "RuntimeError: release unlocked lock" when leaving a scoped mutex in up2k
+* Windows: msys2-python 3.8.6 occasionally throws `RuntimeError: release unlocked lock` when leaving a scoped mutex in up2k
   * this is an msys2 bug, the regular windows edition of python is fine
 
 
@@ -188,15 +188,16 @@ small collection of user feedback
 * `[📂]` mkdir, create directories
 * `[📝]` new-md, create a new markdown document
 * `[📟]` send-msg, either to server-log or into textfiles if `--urlform save`
-* `[⚙️]` client configuration options
+* `[🎺]` audio-player config options
+* `[⚙️]` general client config options
 
 
 ## hotkeys
 
-the browser has the following hotkeys
+the browser has the following hotkeys (assumes qwerty, ignores actual layout)
 * `B` toggle breadcrumbs / directory tree
 * `I/K` prev/next folder
-* `M` parent folder
+* `M` parent folder (or unexpand current)
 * `G` toggle list / grid view
 * `T` toggle thumbnails / icons
 * when playing audio:
@@ -220,7 +221,13 @@ the browser has the following hotkeys
 * in the grid view:
   * `S` toggle multiselect
   * shift+`A/D` zoom
-
+* in the markdown editor:
+  * `^s` save
+  * `^h` header
+  * `^k` autoformat table
+  * `^u` jump to next unicode character
+  * `^e` toggle editor / preview
+  ^ `^up, ^down` jump paragraphs
 
 ## tree-mode
 
@@ -233,7 +240,7 @@ click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` tog
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/120070302-10836b00-c08a-11eb-8eb4-82004a34c342.png)
 
-it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how destructive your users are
+it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
 
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
 
@@ -252,9 +259,9 @@ the `zip` link next to folders can produce various types of zip/tar files using 
 | `zip_crc` | `?zip=crc` | cp437 with crc32 computed early for truly ancient software |
 
 * hidden files (dotfiles) are excluded unless `-ed`
-  * the up2k.db is always excluded
+  * `up2k.db` and `dir.txt` is always excluded
 * `zip_crc` will take longer to download since the server has to read each file twice
-  * please let me know if you find a program old enough to actually need this
+  * this is only to support MS-DOS PKZIP v2.04g (october 1993) and older, how are you accessing copyparty actually
 
 you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
 
@@ -269,9 +276,11 @@ two upload methods are available in the html client:
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
 * files are processed in chunks, and each chunk is checksummed
-  * uploads resume if they are interrupted (for example by a reboot)
+  * uploads autoresume if they are interrupted by network issues
+  * uploads can be resumed if you reboot your browser or pc
   * server detects any corruption; the client reuploads affected chunks
   * the client doesn't upload anything that already exists on the server
+* much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
 * the last-modified timestamp of the file is preserved
 
 see [up2k](#up2k) for details on how it works
@@ -304,11 +313,11 @@ in the `[🚀 up2k]` tab, after toggling the `[🔎]` switch green, any files/fo
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else, this is no longer the case but now i've warmed up to the idea too much
 
-adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files
+adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files (or just refresh the page)
 
 note that since up2k has to read the file twice, `[🎈 bup]` can be up to 2x faster in extreme cases (if your internet connection is faster than the read-speed of your HDD)
 
-up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well thanks to tls also functioning as an integrity check
+up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
 
 
 ## markdown viewer
@@ -346,11 +355,11 @@ searching relies on two databases, the up2k filetree (`-e2d`) and the metadata t
 
 through arguments:
 * `-e2d` enables file indexing on upload
-* `-e2ds` scans writable folders on startup
+* `-e2ds` scans writable folders for new files on startup
 * `-e2dsa` scans all mounted volumes (including readonly ones)
 * `-e2t` enables metadata indexing on upload
 * `-e2ts` scans for tags in all files that don't have tags yet
-* `-e2tsr` deletes all existing tags, so a full reindex
+* `-e2tsr` deletes all existing tags, does a full reindex
 
 the same arguments can be set as volume flags, in addition to `d2d` and `d2t` for disabling:
 * `-v ~/music::r:ce2dsa:ce2tsr` does a full reindex of everything on startup
@@ -358,11 +367,11 @@ the same arguments can be set as volume flags, in addition to `d2d` and `d2t` fo
 * `-v ~/music::r:cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
 note:
-* `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those
+* `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
 you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `cdhash`, this has the following consequences:
-* initial indexing is way faster, especially when the volume is on a networked disk
+* initial indexing is way faster, especially when the volume is on a network disk
 * makes it impossible to [file-search](#file-search)
 * if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
 
@@ -405,7 +414,7 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 ## file parser plugins
 
-copyparty can invoke external programs to collect additional metadata for files using `mtp` (as argument or volume flag), there is a default timeout of 30sec
+copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volume flag), there is a default timeout of 30sec
 
 * `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
@@ -439,11 +448,12 @@ copyparty can invoke external programs to collect additional metadata for files 
 | zip selection   |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
 | directory tree  |  -  |  -  | `*1` | yep  | yep   | yep  | yep | yep  |
 | up2k            |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
-| icons work      |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
 | markdown editor |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
 | markdown viewer |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
 | play mp3/m4a    |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
 | play ogg/opus   |  -  |  -  |  -   |  -   | yep   | yep  | `*2` | yep |
+| thumbnail view  |  -  |  -  | -    | -    | yep   | yep  | yep | yep  |
+| image viewer    |  -  |  -  | -    | -    | yep   | yep  | yep | yep  |
 
 * internet explorer 6 to 8 behave the same
 * firefox 52 and chrome 49 are the last winxp versions
@@ -461,7 +471,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **w3m** (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
 | **netsurf** (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
 | **ie4** and **netscape** 4.0  | can browse (text is yellow on white), upload with `?b=u` |
-| **SerenityOS** (22d13d8)  | hits a page fault, works with `?b=u`, file input not-impl, url params are multiplying |
+| **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 
 
 # client examples
@@ -515,7 +525,7 @@ below are some tweaks roughly ordered by usefulness:
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
 * `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
-* `--no-hash` when indexing a networked disk if you don't care about the actual filehashes and only want the names/tags searchable
+* `--no-hash` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
   * huge amount of short-lived connections
   * really heavy traffic (downloads/uploads)
@@ -534,16 +544,16 @@ enable music tags:
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
 * or `FFprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
-enable image thumbnails:
+enable thumbnails of images:
 * `Pillow` (requires py2.7 or py3.5+)
 
-enable video thumbnails:
+enable thumbnails of videos:
 * `ffmpeg` and `ffprobe` somewhere in `$PATH`
 
-enable reading HEIF pictures:
+enable thumbnails of HEIF pictures:
 * `pyheif-pillow-opener` (requires Linux or a C compiler)
 
-enable reading AVIF pictures:
+enable thumbnails of AVIF pictures:
 * `pillow-avif-plugin`
 
 
@@ -557,7 +567,7 @@ python -m pip install --user -U jinja2 mutagen Pillow
 
 some bundled tools have copyleft dependencies, see [./bin/#mtag](bin/#mtag)
 
-these are standalone programs and will never be imported / evaluated by copyparty
+these are standalone programs and will never be imported / evaluated by copyparty, only executed standalone if enabled through `-mtp` configs
 
 
 # sfx
@@ -573,10 +583,10 @@ pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `
 
 ## sfx repack
 
-if you don't need all the features you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except for either msys2 or WSL if you're on windows)
-* `724K` original size as of v0.4.0
-* `256K` after `./scripts/make-sfx.sh re no-ogv`
-* `164K` after `./scripts/make-sfx.sh re no-ogv no-cm`
+if you don't need all the features, you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except if you're on windows then you need msys2 or WSL)
+* `525k` size of original sfx.py as of v0.11.30
+* `315k` after `./scripts/make-sfx.sh re no-ogv`
+* `223k` after `./scripts/make-sfx.sh re no-ogv no-cm`
 
 the features you can opt to drop are
 * `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files
@@ -623,7 +633,7 @@ rm -rf copyparty/web/deps
 curl -L https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py >x.py
 python3 x.py -h
 rm x.py
-mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/
+mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/deps/
 ```
 
 then build the sfx using any of the following examples:
@@ -651,14 +661,15 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
+* hls framework for Someone Else to drop code into :^)
 * readme.md as epilogue
-* reduce up2k roundtrips
-  * start from a chunk index and just go
-  * terminate client on bad data
-* logging to file
 
 discarded ideas
 
+* reduce up2k roundtrips
+  * start from a chunk index and just go
+  * terminate client on bad data
+    * not worth the effort, just throw enough conncetions at it
 * single sha512 across all up2k chunks?
   * crypto.subtle cannot into streaming, would have to use hashwasm, expensive
 * separate sqlite table per tag

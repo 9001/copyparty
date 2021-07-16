@@ -2867,7 +2867,7 @@ var arcfmt = (function () {
 			["tar", "tar", "plain gnutar file"],
 			["zip", "zip=utf8", "zip with utf8 filenames (maybe wonky on windows 7 and older)"],
 			["zip_dos", "zip", "zip with traditional cp437 filenames, for really old software"],
-			["zip_crc", "zip=crc", "cp437 with crc32 computed early for truly ancient software$N(takes longer to process before download can start)"]
+			["zip_crc", "zip=crc", "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)"]
 		];
 
 	for (var a = 0; a < fmts.length; a++) {
