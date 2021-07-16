@@ -59,6 +59,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [just the sfx](#just-the-sfx)
     * [complete release](#complete-release)
 * [todo](#todo)
+    * [discarded ideas](#discarded-ideas)
 
 
 ## quickstart
@@ -227,7 +228,7 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
   * `^k` autoformat table
   * `^u` jump to next unicode character
   * `^e` toggle editor / preview
-  ^ `^up, ^down` jump paragraphs
+  * `^up, ^down` jump paragraphs
 
 ## tree-mode
 
@@ -261,7 +262,8 @@ the `zip` link next to folders can produce various types of zip/tar files using 
 * hidden files (dotfiles) are excluded unless `-ed`
   * `up2k.db` and `dir.txt` is always excluded
 * `zip_crc` will take longer to download since the server has to read each file twice
-  * this is only to support MS-DOS PKZIP v2.04g (october 1993) and older, how are you accessing copyparty actually
+  * this is only to support MS-DOS PKZIP v2.04g (october 1993) and older
+    * how are you accessing copyparty actually
 
 you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
 
@@ -277,7 +279,7 @@ up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
 * files are processed in chunks, and each chunk is checksummed
   * uploads autoresume if they are interrupted by network issues
-  * uploads can be resumed if you reboot your browser or pc
+  * uploads resume if you reboot your browser or pc, just upload the same files again
   * server detects any corruption; the client reuploads affected chunks
   * the client doesn't upload anything that already exists on the server
 * much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
@@ -454,6 +456,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 | play ogg/opus   |  -  |  -  |  -   |  -   | yep   | yep  | `*2` | yep |
 | thumbnail view  |  -  |  -  | -    | -    | yep   | yep  | yep | yep  |
 | image viewer    |  -  |  -  | -    | -    | yep   | yep  | yep | yep  |
+| **= feature =** | ie6 | ie9 | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
 
 * internet explorer 6 to 8 behave the same
 * firefox 52 and chrome 49 are the last winxp versions
@@ -567,7 +570,7 @@ python -m pip install --user -U jinja2 mutagen Pillow
 
 some bundled tools have copyleft dependencies, see [./bin/#mtag](bin/#mtag)
 
-these are standalone programs and will never be imported / evaluated by copyparty, only executed standalone if enabled through `-mtp` configs
+these are standalone programs and will never be imported / evaluated by copyparty, and must be enabled through `-mtp` configs
 
 
 # sfx
@@ -664,7 +667,8 @@ roughly sorted by priority
 * hls framework for Someone Else to drop code into :^)
 * readme.md as epilogue
 
-discarded ideas
+
+## discarded ideas
 
 * reduce up2k roundtrips
   * start from a chunk index and just go
