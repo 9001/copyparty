@@ -337,10 +337,18 @@ html.light #ggrid a.sel {
 	height: 100%;
 	background: #3c3c3c;
 }
+#wtgrid,
 #wtico {
 	cursor: url(/.cpr/dd/4.png), pointer;
 	animation: cursor 500ms;
+	position: relative;
+	top: -.06em;
 }
+#wtgrid {
+	font-size: .8em;
+	top: -.12em;
+}
+#wtgrid:hover,
 #wtico:hover {
 	animation: cursor 500ms infinite;
 }
@@ -358,7 +366,7 @@ html.light #ggrid a.sel {
 	position: absolute;
 	top: -1.2em;
 	right: 0;
-	width: 1.2em;
+	width: 2.8em;
 	height: 1em;
 	font-size: 2em;
 	line-height: 1em;
@@ -390,10 +398,10 @@ html.light #ggrid a.sel {
 	line-height: 1em;
 }
 #wtoggle.np {
-	width: 5.5em;
+	width: 7em;
 }
 #wtoggle.sel {
-	width: 6.4em;
+	width: 7.68em;
 }
 #wtoggle.sel #wzip,
 #wtoggle.np #wnp {

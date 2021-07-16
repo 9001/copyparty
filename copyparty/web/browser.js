@@ -37,6 +37,7 @@ ebi('widget').innerHTML = (
 	' href="#" id="npirc" tt="copy irc-formatted track info">📋irc</a><a' +
 	' href="#" id="nptxt" tt="copy plaintext track info">📋txt</a>' +
 	'</span><a' +
+	'	href="#" id="wtgrid">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
@@ -1485,8 +1486,11 @@ var thegrid = (function () {
 		r.setdirty();
 	};
 
-	ebi('griden').onclick = function (e) {
+	ebi('griden').onclick = ebi('wtgrid').onclick = function (e) {
 		ev(e);
+		if (!this.closest)
+			return;
+
 		r.en = !r.en;
 		bcfg_set('griden', r.en);
 		if (r.en) {
