@@ -40,7 +40,7 @@
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="mkdir" />
 			<input type="text" name="name" size="30">
-			<input type="submit" value="mkdir">
+			<input type="submit" value="make directory">
 		</form>
 	</div>
 
@@ -48,14 +48,14 @@
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="new_md" />
 			<input type="text" name="name" size="30">
-			<input type="submit" value="create doc">
+			<input type="submit" value="new markdown document">
 		</form>
 	</div>
 
 	<div id="op_msg" class="opview opbox act">
 		<form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="text" name="msg" size="30">
-			<input type="submit" value="send msg">
+			<input type="submit" value="send msg to server log">
 		</form>
 	</div>
 

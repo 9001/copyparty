@@ -476,6 +476,17 @@ html.light #ggrid a.sel {
 		max-width: 9em;
 	}
 }
+@media (max-width: 35em) {
+	#ops>a[data-dest="new_md"],
+	#ops>a[data-dest="msg"] {
+		display: none;
+	}
+	#op_mkdir.act+div,
+	#op_mkdir.act+div+div {
+		display: block;
+		margin-top: 1em;
+	}
+}
 
 
 
