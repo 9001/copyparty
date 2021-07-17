@@ -518,9 +518,15 @@ var tt = (function () {
             return;
 
         var pos = this.getBoundingClientRect(),
+            dir = this.getAttribute('ttd') || '',
             left = pos.left < window.innerWidth / 2,
             top = pos.top < window.innerHeight / 2,
             big = this.className.indexOf(' ttb') !== -1;
+
+        if (dir.indexOf('u') + 1) top = false;
+        if (dir.indexOf('d') + 1) top = true;
+        if (dir.indexOf('l') + 1) left = false;
+        if (dir.indexOf('r') + 1) left = true;
 
         clmod(r.tt, 'b', big);
         r.tt.style.top = top ? pos.bottom + 'px' : 'auto';
@@ -536,6 +542,20 @@ var tt = (function () {
         clmod(r.tt, 'show');
     };
 
+    r.att = function (ctr) {
+        var _show = r.en ? r.show : null,
+            _hide = r.en ? r.hide : null,
+            o = ctr.querySelectorAll('*[tt]');
+
+        for (var a = o.length - 1; a >= 0; a--) {
+            o[a].onfocus = _show;
+            o[a].onblur = _hide;
+            o[a].onmouseenter = _show;
+            o[a].onmouseleave = _hide;
+        }
+        r.hide();
+    }
+
     r.init = function () {
         var ttb = ebi('tooltips');
         if (ttb) {
@@ -547,18 +567,7 @@ var tt = (function () {
             };
             r.en = bcfg_get('tooltips', true)
         }
-
-        var _show = r.en ? r.show : null,
-            _hide = r.en ? r.hide : null;
-
-        var o = QSA('*[tt]');
-        for (var a = o.length - 1; a >= 0; a--) {
-            o[a].onfocus = _show;
-            o[a].onblur = _hide;
-            o[a].onmouseenter = _show;
-            o[a].onmouseleave = _hide;
-        }
-        r.hide();
+        r.att(document);
     };
 
     return r;

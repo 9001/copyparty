@@ -181,7 +181,7 @@ window.baguetteBox = (function () {
             );
             overlay = ctr.firstChild;
             QS('body').appendChild(overlay);
-            tt.init();
+            tt.att(overlay);
         }
         slider = ebi('bbox-slider');
         btnPrev = ebi('bbox-prev');
@@ -275,21 +275,23 @@ window.baguetteBox = (function () {
         if (!v)
             return;
 
-        var msg = 'When video ends, ', lbl;
+        var msg = 'When video ends, ', tts = '', lbl;
         if (vloop) {
             lbl = 'Loop';
             msg += 'repeat it';
+            tts = '$NHotkey: R';
         }
         else if (vnext) {
             lbl = 'Cont';
             msg += 'continue to next';
+            tts = '$NHotkey: C';
         }
         else {
             lbl = 'Stop';
             msg += 'just stop'
         }
         btnVmode.setAttribute('aria-label', msg);
-        btnVmode.setAttribute('tt', msg);
+        btnVmode.setAttribute('tt', msg + tts);
         btnVmode.textContent = lbl;
 
         v.loop = vloop

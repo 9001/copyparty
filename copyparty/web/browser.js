@@ -2618,14 +2618,36 @@ function mk_files_header(taglist) {
 
 
 var filecols = (function () {
-	var hidden = jread('filecols', []);
+	var hidden = jread('filecols', []),
+		tts = {
+			"c": "action buttons",
+			"dur": "duration",
+			"q": "quality / bitrate",
+			"Ac": "audio codec",
+			"Vc": "video codec",
+			"Res": "resolution",
+			"T": "filetype",
+			"aq": "audio quality / bitrate",
+			"vq": "video quality / bitrate",
+			"pixfmt": "subsampling / pixel structure",
+			"resw": "horizontal resolution",
+			"resh": "veritcal resolution",
+			"acs": "audio channels",
+			"hz": "sample rate"
+		};
 
 	var add_btns = function () {
 		var ths = QSA('#files th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			var th = ths[a].parentElement;
+			var th = ths[a].parentElement,
+				ttv = tts[ths[a].textContent];
+
 			th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + ths[a].outerHTML;
 			th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
+			if (ttv) {
+				th.setAttribute("tt", ttv);
+				th.setAttribute("ttd", "u");
+			}
 		}
 	};
 
@@ -2648,7 +2670,10 @@ var filecols = (function () {
 			hcols = ebi('hcols');
 
 		for (var a = 0; a < hidden.length; a++) {
-			html.push('<a href="#" class="btn">' + esc(hidden[a]) + '</a>');
+			var ttv = tts[hidden[a]],
+				tta = ttv ? ' tt="' + ttv + '">' : '>';
+
+			html.push('<a href="#" class="btn"' + tta + esc(hidden[a]) + '</a>');
 		}
 		hcols.previousSibling.style.display = html.length ? 'block' : 'none';
 		hcols.innerHTML = html.join('\n');

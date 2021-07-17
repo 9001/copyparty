@@ -1570,7 +1570,7 @@ function up2k_init(subtle) {
     for (var a = o.length - 1; a >= 0; a--) {
         o[a].parentNode.getElementsByTagName('input')[0].setAttribute('tt', o[a].getAttribute('tt'));
     }
-    tt.init();
+    tt.att(QS('#u2conf'));
 
     function bumpthread2(e) {
         if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
