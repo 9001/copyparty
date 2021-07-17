@@ -9,7 +9,10 @@
         {
             "label": "no_dbg",
             "type": "shell",
-            "command": "${config:python.pythonPath} .vscode/launch.py"
+            "command": "${config:python.pythonPath}",
+            "args": [
+                ".vscode/launch.py"
+            ]
         }
     ]
 }
