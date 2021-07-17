@@ -66,6 +66,9 @@ def get_ramdisk():
         for _ in range(10):
             try:
                 _, _ = chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
+                with open("/Volumes/cptd/.metadata_never_index", "w") as f:
+                    f.write("orz")
+
                 return subdir("/Volumes/cptd")
             except Exception as ex:
                 print(repr(ex))
