@@ -119,7 +119,7 @@ class VHttpConn(object):
         self.addr = ("127.0.0.1", "42069")
         self.args = args
         self.asrv = asrv
-        self.is_mp = False
+        self.nid = None
         self.log_func = log
         self.log_src = "a"
         self.lf_url = None

@@ -12,6 +12,7 @@
 Description=copyparty file server
 
 [Service]
+Type=notify
 ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -v /mnt::a
 ExecStartPre=/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
 

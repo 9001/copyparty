@@ -29,7 +29,8 @@ class MpWorker(object):
         # we inherited signal_handler from parent,
         # replace it with something harmless
         if not FAKE_MP:
-            signal.signal(signal.SIGINT, self.signal_handler)
+            for sig in [signal.SIGINT, signal.SIGTERM]:
+                signal.signal(sig, self.signal_handler)
 
         # starting to look like a good idea
         self.asrv = AuthSrv(args, None, False)
@@ -44,7 +45,7 @@ class MpWorker(object):
         thr.start()
         thr.join()
 
-    def signal_handler(self, signal, frame):
+    def signal_handler(self, sig, frame):
         # print('k')
         pass
 

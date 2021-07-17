@@ -6,12 +6,15 @@ import os
 import sys
 import time
 import shlex
+import string
+import signal
+import socket
 import threading
 from datetime import datetime, timedelta
 import calendar
 
-from .__init__ import E, PY2, WINDOWS, MACOS, VT100
-from .util import mp, start_log_thrs, start_stackmon
+from .__init__ import E, PY2, WINDOWS, MACOS, VT100, unicode
+from .util import mp, start_log_thrs, start_stackmon, min_ex
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
@@ -33,6 +36,9 @@ class SvcHub(object):
         self.args = args
         self.argv = argv
         self.logf = None
+        self.stop_req = False
+        self.stopping = False
+        self.stop_cond = threading.Condition()
 
         self.ansi_re = re.compile("\033\\[[^m]*m")
         self.log_mutex = threading.Lock()
@@ -127,16 +133,49 @@ class SvcHub(object):
         print(msg, end="")
 
     def run(self):
-        thr = threading.Thread(target=self.tcpsrv.run, name="svchub-main")
+        self.tcpsrv.run()
+
+        thr = threading.Thread(target=self.sd_notify, name="sd-notify")
         thr.daemon = True
         thr.start()
 
-        # winxp/py2.7 support: thr.join() kills signals
-        try:
-            while True:
-                time.sleep(9001)
+        thr = threading.Thread(target=self.stop_thr, name="svchub-sig")
+        thr.daemon = True
+        thr.start()
 
-        except KeyboardInterrupt:
+        for sig in [signal.SIGINT, signal.SIGTERM]:
+            signal.signal(sig, self.signal_handler)
+
+        try:
+            while not self.stop_req:
+                time.sleep(9001)
+        except:
+            pass
+
+        self.shutdown()
+
+    def stop_thr(self):
+        while not self.stop_req:
+            with self.stop_cond:
+                self.stop_cond.wait(9001)
+
+        self.shutdown()
+
+    def signal_handler(self):
+        if self.stopping:
+            return
+
+        self.stop_req = True
+        with self.stop_cond:
+            self.stop_cond.notify_all()
+
+    def shutdown(self):
+        if self.stopping:
+            return
+
+        self.stopping = True
+        self.stop_req = True
+        try:
             with self.log_mutex:
                 print("OPYTHAT")
 
@@ -268,3 +307,22 @@ class SvcHub(object):
         else:
             self.log("svchub", err)
             return False
+
+    def sd_notify(self):
+        try:
+            addr = os.getenv("NOTIFY_SOCKET")
+            if not addr:
+                return
+
+            addr = unicode(addr)
+            if addr.startswith("@"):
+                addr = "\0" + addr[1:]
+
+            m = "".join(x for x in addr if x in string.printable)
+            self.log("sd_notify", m)
+
+            sck = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+            sck.connect(addr)
+            sck.sendall(b"READY=1")
+        except:
+            self.log("sd_notify", min_ex())
