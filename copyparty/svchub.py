@@ -181,6 +181,7 @@ class SvcHub(object):
 
             self.tcpsrv.shutdown()
             self.broker.shutdown()
+            self.up2k.shutdown()
             if self.thumbsrv:
                 self.thumbsrv.shutdown()
 

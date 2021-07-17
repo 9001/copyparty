@@ -1363,19 +1363,22 @@ class Up2k(object):
                         self.log("could not unsparse [{}]".format(path), 3)
 
     def _snapshot(self):
-        persist_interval = 30  # persist unfinished uploads index every 30 sec
-        discard_interval = 21600  # drop unfinished uploads after 6 hours inactivity
-        prev = {}
+        self.snap_persist_interval = 300  # persist unfinished index every 5 min
+        self.snap_discard_interval = 21600  # drop unfinished after 6 hours inactivity
+        self.snap_prev = {}
         while True:
-            time.sleep(persist_interval)
-            with self.mutex:
-                for k, reg in self.registry.items():
-                    self._snap_reg(prev, k, reg, discard_interval)
+            time.sleep(self.snap_persist_interval)
+            self.do_snapshot()
 
-    def _snap_reg(self, prev, ptop, reg, discard_interval):
+    def do_snapshot(self):
+        with self.mutex:
+            for k, reg in self.registry.items():
+                self._snap_reg(k, reg)
+
+    def _snap_reg(self, ptop, reg):
         now = time.time()
         histpath = self.asrv.vfs.histtab[ptop]
-        rm = [x for x in reg.values() if now - x["poke"] > discard_interval]
+        rm = [x for x in reg.values() if now - x["poke"] > self.snap_discard_interval]
         if rm:
             m = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
             vis = [self._vis_job_progress(x) for x in rm]
@@ -1397,15 +1400,15 @@ class Up2k(object):
 
         path = os.path.join(histpath, "up2k.snap")
         if not reg:
-            if ptop not in prev or prev[ptop] is not None:
-                prev[ptop] = None
+            if ptop not in self.snap_prev or self.snap_prev[ptop] is not None:
+                self.snap_prev[ptop] = None
                 if os.path.exists(fsenc(path)):
                     os.unlink(fsenc(path))
             return
 
         newest = max(x["poke"] for _, x in reg.items()) if reg else 0
         etag = [len(reg), newest]
-        if etag == prev.get(ptop):
+        if etag == self.snap_prev.get(ptop):
             return
 
         try:
@@ -1421,7 +1424,7 @@ class Up2k(object):
         atomic_move(path2, path)
 
         self.log("snap: {} |{}|".format(path, len(reg.keys())))
-        prev[ptop] = etag
+        self.snap_prev[ptop] = etag
 
     def _tagger(self):
         with self.mutex:
@@ -1488,6 +1491,11 @@ class Up2k(object):
             self.hashq.put([ptop, rd, fn])
             self.n_hashq += 1
         # self.log("hashq {} push {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
+
+    def shutdown(self):
+        if hasattr(self, "snap_prev"):
+            self.log("writing snapshot")
+            self.do_snapshot()
 
 
 def up2k_chunksize(filesize):
