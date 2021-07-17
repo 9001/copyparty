@@ -364,9 +364,10 @@ html.light #ggrid a.sel {
 }
 #wtoggle {
 	position: absolute;
+	white-space: nowrap;
 	top: -1.2em;
 	right: 0;
-	width: 2.8em;
+	width: 2.5em;
 	height: 1em;
 	font-size: 2em;
 	line-height: 1em;
@@ -398,10 +399,10 @@ html.light #ggrid a.sel {
 	line-height: 1em;
 }
 #wtoggle.np {
-	width: 7em;
+	width: 6.63em;
 }
 #wtoggle.sel {
-	width: 7.68em;
+	width: 7.57em;
 }
 #wtoggle.sel #wzip,
 #wtoggle.np #wnp {
