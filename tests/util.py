@@ -69,6 +69,11 @@ def get_ramdisk():
                 with open("/Volumes/cptd/.metadata_never_index", "w") as f:
                     f.write("orz")
 
+                try:
+                    shutil.rmtree("/Volumes/cptd/.fseventsd")
+                except:
+                    pass
+
                 return subdir("/Volumes/cptd")
             except Exception as ex:
                 print(repr(ex))
