@@ -380,7 +380,7 @@ def run(tmp, j2):
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except Exception as ex:
         if not WINDOWS:
-            msg("\033[31mflock:", repr(ex))
+            msg("\033[31mflock:{!r}\033[0m".format(ex))
 
     t = threading.Thread(target=utime, args=(tmp,))
     t.daemon = True
