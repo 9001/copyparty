@@ -502,7 +502,8 @@ function hist_replace(url) {
 var tt = (function () {
     var r = {
         "tt": mknod("div"),
-        "en": true
+        "en": true,
+        "el": null
     };
 
     r.tt.setAttribute('id', 'tt');
@@ -517,6 +518,7 @@ var tt = (function () {
         if (!msg)
             return;
 
+        r.el = this;
         var pos = this.getBoundingClientRect(),
             dir = this.getAttribute('ttd') || '',
             left = pos.left < window.innerWidth / 2,
@@ -535,12 +537,17 @@ var tt = (function () {
         r.tt.style.right = left ? 'auto' : (window.innerWidth - pos.right) + 'px';
 
         r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
+        r.el.addEventListener('mouseleave', r.hide);
         clmod(r.tt, 'show', 1);
     };
 
     r.hide = function () {
         clmod(r.tt, 'show');
+        if (r.el)
+            r.el.removeEventListener('mouseleave', r.hide);
     };
+
+    r.tt.onclick = r.hide;
 
     r.att = function (ctr) {
         var _show = r.en ? r.show : null,
