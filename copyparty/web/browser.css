@@ -798,6 +798,9 @@ input.eq_gain {
 	position: relative;
 	background: #444;
 }
+#files th span {
+	position: relative;
+}
 #files>thead>tr>th.min,
 #files td.min {
 		display: none;
