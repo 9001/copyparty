@@ -7,6 +7,12 @@
 # you may want to:
 #   change '/usr/bin/python' to another interpreter
 #   change '/mnt::a' to another location or permission-set
+#
+# with `Type=notify`, copyparty will signal systemd when it is ready to
+#   accept connections; correctly delaying units depending on copyparty.
+#   But note that journalctl does not show messages in the correct order
+#   (or with correct timestamps even), so you get confusing stuff like
+#   https://user-images.githubusercontent.com/241032/126040249-cb535cc7-c599-4931-a796-a5d9af691bad.png
 
 [Unit]
 Description=copyparty file server
