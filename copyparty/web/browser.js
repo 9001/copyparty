@@ -177,8 +177,10 @@ function opclick(e) {
 	goto(dest);
 
 	var input = QS('.opview.act input:not([type="hidden"])')
-	if (input && !is_touch)
+	if (input && !is_touch) {
+		tt.skip = true;
 		input.focus();
+	}
 }
 
 

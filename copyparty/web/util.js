@@ -503,13 +503,19 @@ var tt = (function () {
     var r = {
         "tt": mknod("div"),
         "en": true,
-        "el": null
+        "el": null,
+        "skip": false
     };
 
     r.tt.setAttribute('id', 'tt');
     document.body.appendChild(r.tt);
 
     r.show = function () {
+        if (r.skip) {
+            r.skip = false;
+            return;
+        }
+
         var cfg = sread('tooltips');
         if (cfg !== null && cfg != '1')
             return;
