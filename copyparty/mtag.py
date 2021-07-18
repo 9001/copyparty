@@ -237,14 +237,14 @@ class MTag(object):
             and (not WINDOWS or sys.version_info >= (3, 8))
         )
         mappings = args.mtm
-        or_ffprobe = " or ffprobe"
+        or_ffprobe = " or FFprobe"
 
         if self.backend == "mutagen":
             self.get = self.get_mutagen
             try:
                 import mutagen
             except:
-                self.log("could not load mutagen, trying ffprobe instead", c=3)
+                self.log("could not load Mutagen, trying FFprobe instead", c=3)
                 self.backend = "ffprobe"
 
         if self.backend == "ffprobe":
@@ -256,16 +256,16 @@ class MTag(object):
                 pass
 
             elif args.no_mtag_ff:
-                msg = "found ffprobe but it was disabled by --no-mtag-ff"
+                msg = "found FFprobe but it was disabled by --no-mtag-ff"
                 self.log(msg, c=3)
 
             elif WINDOWS and sys.version_info < (3, 8):
                 or_ffprobe = " or python >= 3.8"
-                msg = "found ffprobe but your python is too old; need 3.8 or newer"
+                msg = "found FFprobe but your python is too old; need 3.8 or newer"
                 self.log(msg, c=1)
 
         if not self.usable:
-            msg = "need mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"
+            msg = "need Mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"
             pybin = os.path.basename(sys.executable)
             self.log(msg.format(or_ffprobe, " " * 37, pybin), c=1)
             return
@@ -397,7 +397,7 @@ class MTag(object):
             v2 = r2.get(k)
             if v1 == v2:
                 print("  ", k, v1)
-            elif v1 != "0000":  # ffprobe date=0
+            elif v1 != "0000":  # FFprobe date=0
                 diffs.append(k)
                 print(" 1", k, v1)
                 print(" 2", k, v2)

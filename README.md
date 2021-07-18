@@ -70,7 +70,7 @@ running the sfx without arguments (for example doubleclicking it on Windows) wil
 
 some recommended options:
 * `-e2dsa` enables general file indexing, see [search configuration](#search-configuration)
-* `-e2ts` enables audio metadata indexing (needs either FFprobe or mutagen), see [optional dependencies](#optional-dependencies)
+* `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies)
 * `-v /mnt/music:/music:r:afoo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, with user `foo` as `a`dmin (read/write), password `bar`
   * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
   * replace `:r:afoo` with `:rfoo` to only make the folder readable by `foo` and nobody else
@@ -155,7 +155,7 @@ small collection of user feedback
 
 # bugs
 
-* Windows: python 3.7 and older cannot read tags with ffprobe, so use mutagen or upgrade
+* Windows: python 3.7 and older cannot read tags with FFprobe, so use Mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * Windows: python 2.7 cannot handle filenames with mojibake
 * `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions
@@ -409,12 +409,12 @@ tags that start with a `.` such as `.bpm` and `.dur`(ation) indicate numeric val
 
 see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copyparty/blob/master/copyparty/mtag.py) for the default mappings (should cover mp3,opus,flac,m4a,wav,aif,)
 
-`--no-mutagen` disables mutagen and uses ffprobe instead, which...
-* is about 20x slower than mutagen
-* catches a few tags that mutagen doesn't
+`--no-mutagen` disables Mutagen and uses FFprobe instead, which...
+* is about 20x slower than Mutagen
+* catches a few tags that Mutagen doesn't
   * melodic key, video resolution, framerate, pixfmt
 * avoids pulling any GPL code into copyparty
-* more importantly runs ffprobe on incoming files which is bad if your ffmpeg has a cve
+* more importantly runs FFprobe on incoming files which is bad if your FFmpeg has a cve
 
 
 ## file parser plugins
@@ -548,7 +548,7 @@ below are some tweaks roughly ordered by usefulness:
 
 enable music tags:
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
-* or `FFprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
+* or `ffprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
 enable thumbnails of images:
 * `Pillow` (requires py2.7 or py3.5+)

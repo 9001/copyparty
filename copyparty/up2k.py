@@ -304,7 +304,7 @@ class Up2k(object):
         self.log(msg.format(len(vols), time.time() - t0))
 
         if needed_mutagen:
-            msg = "could not read tags because no backends are available (mutagen or ffprobe)"
+            msg = "could not read tags because no backends are available (Mutagen or FFprobe)"
             self.log(msg, c=1)
 
         thr = None

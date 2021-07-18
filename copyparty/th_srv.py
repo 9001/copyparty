@@ -121,10 +121,10 @@ class ThumbSrv(object):
         if not self.args.no_vthumb and (not HAVE_FFMPEG or not HAVE_FFPROBE):
             missing = []
             if not HAVE_FFMPEG:
-                missing.append("ffmpeg")
+                missing.append("FFmpeg")
 
             if not HAVE_FFPROBE:
-                missing.append("ffprobe")
+                missing.append("FFprobe")
 
             msg = "cannot create video thumbnails because some of the required programs are not available: "
             msg += ", ".join(missing)
