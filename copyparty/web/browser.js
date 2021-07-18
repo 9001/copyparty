@@ -1711,6 +1711,25 @@ var thegrid = (function () {
 })();
 
 
+function tree_scrollto() {
+	var act = QS('#treeul a.hl');
+	if (!act)
+		return;
+
+	var ctr = ebi('tree'),
+		ul = act.offsetParent,
+		em = parseFloat(getComputedStyle(act).fontSize),
+		top = act.offsetTop + ul.offsetTop,
+		min = top - 11 * em,
+		max = top - (ctr.offsetHeight - 10 * em);
+
+	if (ctr.scrollTop > min)
+		ctr.scrollTop = Math.floor(min);
+	else if (ctr.scrollTop < max)
+		ctr.scrollTop = Math.floor(max);
+}
+
+
 function tree_neigh(n) {
 	var links = QSA('#treeul li>a+a');
 	if (!links.length) {
@@ -1736,6 +1755,7 @@ function tree_neigh(n) {
 	if (act >= links.length)
 		act = 0;
 
+	treectl.dir_cb = tree_scrollto;
 	links[act].click();
 }
 
