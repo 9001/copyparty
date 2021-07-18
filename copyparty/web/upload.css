@@ -257,6 +257,11 @@ html.light #u2foot .warn span {
 	float: right;
 	margin-bottom: -.3em;
 }
+.fsearch_explain {
+	padding-left: .7em;
+	font-size: 1.1em;
+	line-height: 0;
+}
 
 
 

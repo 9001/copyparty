@@ -1146,7 +1146,7 @@ var audio_eq = (function () {
 				v = parseFloat(vs);
 
 			if (isNaN(v) || v + '' != vs)
-				throw 42;
+				throw new Error('inval band');
 
 			if (isNaN(band))
 				r.amp = Math.round((v + step * 0.2) * 100) / 100;
@@ -2954,7 +2954,7 @@ var arcfmt = (function () {
 
 			var ofs = href.lastIndexOf('?');
 			if (ofs < 0)
-				throw 'missing arg in url';
+				throw new Error('missing arg in url');
 
 			o.setAttribute("href", href.slice(0, ofs + 1) + arg);
 			o.textContent = fmt.split('_')[0];

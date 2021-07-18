@@ -290,8 +290,7 @@ function U2pvis(act, btns) {
                 if (this.is_act(this.tab[a].in))
                     console.log("tab %d/%d = sz %s", a, aa, this.tab[a].bt);
 
-            console.log("a");
-            throw 42;
+            throw new Error('see console');
         }
 
         obj.innerHTML = fo.hp;
@@ -304,15 +303,8 @@ function U2pvis(act, btns) {
             oldcat = fo.in,
             bz_act = this.act == "bz";
 
-        if (oldcat == newcat) {
-            throw 42;
-        }
-
-        //console.log("oldcat %s %d, newcat %s %d, head=%d, tail=%d, file=%d, act.old=%s, act.new=%s, bz_act=%s",
-        //    oldcat, this.ctr[oldcat],
-        //    newcat, this.ctr[newcat],
-        //    this.head, this.tail, nfile,
-        //    this.is_act(oldcat), this.is_act(newcat), bz_act);
+        if (oldcat == newcat)
+            return;
 
         fo.in = newcat;
         this.ctr[oldcat]--;
@@ -465,6 +457,12 @@ function U2pvis(act, btns) {
     }
 
     this.changecard(this.act);
+}
+
+
+function fsearch_explain(e) {
+    ev(e);
+    alert('you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and then refresh\n\nsorry');
 }
 
 
@@ -1298,8 +1296,10 @@ function up2k_init(subtle) {
                         smsg = '';
 
                     if (!response || !response.hits || !response.hits.length) {
-                        msg = 'not found on server';
                         smsg = '404';
+                        msg = 'not found on server';
+                        if (has(perms, 'write'))
+                            msg += ' <a href="#" onclick="fsearch_explain()" class="fsearch_explain">(explain)</a>';
                     }
                     else {
                         smsg = 'found';
