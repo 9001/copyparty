@@ -229,7 +229,7 @@ class MTag(object):
         self.log_func = log_func
         self.args = args
         self.usable = True
-        self.prefer_mt = args.no_mtag_ff
+        self.prefer_mt = not args.no_mtag_ff
         self.backend = "ffprobe" if args.no_mutagen else "mutagen"
         self.can_ffprobe = (
             HAVE_FFPROBE
