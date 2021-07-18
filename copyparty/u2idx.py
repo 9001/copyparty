@@ -7,6 +7,7 @@ import time
 import threading
 from datetime import datetime
 
+from .__init__ import unicode
 from .util import s3dec, Pebkac, min_ex
 from .up2k import up2k_wark_from_hashlist
 
@@ -90,6 +91,8 @@ class U2idx(object):
         mt_ctr = 0
         mt_keycmp = "substr(up.w,1,16)"
         mt_keycmp2 = None
+        ptn_lc = re.compile(r" (mt[0-9]+\.v) ([=<!>]+) \? $")
+        ptn_lcv = re.compile(r"[a-zA-Z]")
 
         while True:
             uq = uq.strip()
@@ -181,6 +184,21 @@ class U2idx(object):
             q += " {}?{} ".format(head, tail)
             va.append(v)
             is_key = True
+
+            # lowercase tag searches
+            m = ptn_lc.search(q)
+            if not m or not ptn_lcv.search(unicode(v)):
+                continue
+
+            va.pop()
+            va.append(v.lower())
+            q = q[: m.start()]
+
+            field, oper = m.groups()
+            if oper in ["=", "=="]:
+                q += " {} like ? ".format(field)
+            else:
+                q += " lower({}) {} ? ".format(field, oper)
 
         try:
             return self.run_query(vols, joins + "where " + q, va)

@@ -596,7 +596,7 @@ class Up2k(object):
             c2 = conn.cursor()
             c3 = conn.cursor()
             n_left = cur.execute("select count(w) from up").fetchone()[0]
-            for w, rd, fn in cur.execute("select w, rd, fn from up"):
+            for w, rd, fn in cur.execute("select w, rd, fn from up order by rd, fn"):
                 n_left -= 1
                 q = "select w from mt where w = ?"
                 if c2.execute(q, (w[:16],)).fetchone():
@@ -1512,7 +1512,7 @@ def up2k_chunksize(filesize):
 
 
 def up2k_wark_from_hashlist(salt, filesize, hashes):
-    """ server-reproducible file identifier, independent of name or location """
+    """server-reproducible file identifier, independent of name or location"""
     ident = [salt, str(filesize)]
     ident.extend(hashes)
     ident = "\n".join(ident)

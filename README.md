@@ -176,6 +176,9 @@ small collection of user feedback
 * Windows: msys2-python 3.8.6 occasionally throws `RuntimeError: release unlocked lock` when leaving a scoped mutex in up2k
   * this is an msys2 bug, the regular windows edition of python is fine
 
+* VirtualBox: sqlite throws `Disk I/O Error` when running in a VM and the up2k database is in a vboxsf
+  * use `--hist` or the `hist` volflag (`-v [...]:chist=/tmp/foo`) to place the db inside the vm instead
+
 
 # the browser
 
