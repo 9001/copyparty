@@ -1940,7 +1940,7 @@ document.onkeydown = function (e) {
 			for (var b = 1; b < sconf[a].length; b++) {
 				var k = sconf[a][b][0],
 					chk = 'srch_' + k + 'c',
-					tvs = ebi('srch_' + k + 'v').value.split(/ /g);
+					tvs = ebi('srch_' + k + 'v').value.split(/ +/g);
 
 				if (!ebi(chk).checked)
 					continue;
@@ -1953,7 +1953,7 @@ document.onkeydown = function (e) {
 					q += ' and ';
 
 					if (k == 'adv') {
-						q += tv.replace(/ /g, " and ").replace(/([=!><]=?)/, " $1 ");
+						q += tv.replace(/ +/g, " and ").replace(/([=!><]=?)/, " $1 ");
 						continue;
 					}
 
@@ -3090,7 +3090,7 @@ function reload_browser(not_mp) {
 
 	var oo = QSA('#files>tbody>tr>td:nth-child(3)');
 	for (var a = 0, aa = oo.length; a < aa; a++) {
-		var sz = oo[a].textContent.replace(/ /g, ""),
+		var sz = oo[a].textContent.replace(/ +/g, ""),
 			hsz = sz.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
 		oo[a].textContent = hsz;
