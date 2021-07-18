@@ -2576,7 +2576,7 @@ function find_file_col(txt) {
 	for (var a = 0; a < tds.length; a++) {
 		var spans = tds[a].getElementsByTagName('span');
 		if (spans.length && spans[0].textContent == txt) {
-			min = tds[a].getAttribute('class').indexOf('min') !== -1;
+			min = (tds[a].getAttribute('class') || '').indexOf('min') !== -1;
 			i = a;
 			break;
 		}
