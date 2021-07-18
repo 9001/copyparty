@@ -2726,6 +2726,10 @@ var filecols = (function () {
 			for (var b = 0, bb = tds.length; b < bb; b++)
 				tds[b].setAttribute('class', cls);
 		}
+		if (window['tt']) {
+			tt.att(ebi('hcols'));
+			tt.att(QS('#files thead'));
+		}
 	};
 	set_style();
 
