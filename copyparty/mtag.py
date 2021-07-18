@@ -227,10 +227,16 @@ def parse_ffprobe(txt):
 class MTag(object):
     def __init__(self, log_func, args):
         self.log_func = log_func
+        self.args = args
         self.usable = True
-        self.prefer_mt = False
-        mappings = args.mtm
+        self.prefer_mt = args.no_mtag_ff
         self.backend = "ffprobe" if args.no_mutagen else "mutagen"
+        self.can_ffprobe = (
+            HAVE_FFPROBE
+            and not args.no_mtag_ff
+            and (not WINDOWS or sys.version_info >= (3, 8))
+        )
+        mappings = args.mtm
         or_ffprobe = " or ffprobe"
 
         if self.backend == "mutagen":
@@ -242,22 +248,26 @@ class MTag(object):
                 self.backend = "ffprobe"
 
         if self.backend == "ffprobe":
+            self.usable = self.can_ffprobe
             self.get = self.get_ffprobe
             self.prefer_mt = True
-            # about 20x slower
-            self.usable = HAVE_FFPROBE
 
-            if self.usable and WINDOWS and sys.version_info < (3, 8):
-                self.usable = False
+            if not HAVE_FFPROBE:
+                pass
+
+            elif args.no_mtag_ff:
+                msg = "found ffprobe but it was disabled by --no-mtag-ff"
+                self.log(msg, c=3)
+
+            elif WINDOWS and sys.version_info < (3, 8):
                 or_ffprobe = " or python >= 3.8"
                 msg = "found ffprobe but your python is too old; need 3.8 or newer"
                 self.log(msg, c=1)
 
         if not self.usable:
             msg = "need mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"
-            self.log(
-                msg.format(or_ffprobe, " " * 37, os.path.basename(sys.executable)), c=1
-            )
+            pybin = os.path.basename(sys.executable)
+            self.log(msg.format(or_ffprobe, " " * 37, pybin), c=1)
             return
 
         # https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html
@@ -408,20 +418,33 @@ class MTag(object):
             md = mutagen.File(fsenc(abspath), easy=True)
             x = md.info.length
         except Exception as ex:
-            return {}
+            return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
-        ret = {}
-        try:
-            dur = int(md.info.length)
+        sz = os.path.getsize(fsenc(abspath))
+        ret = {".q": [0, int((sz / md.info.length) / 128)]}
+
+        for attr, k, norm in [
+            ["codec", "ac", unicode],
+            ["channels", "chs", int],
+            ["sample_rate", ".hz", int],
+            ["bitrate", ".aq", int],
+            ["length", ".dur", int],
+        ]:
             try:
-                q = int(md.info.bitrate / 1024)
+                v = getattr(md.info, attr)
             except:
-                q = int((os.path.getsize(fsenc(abspath)) / dur) / 128)
+                continue
 
-            ret[".dur"] = [0, dur]
-            ret[".q"] = [0, q]
-        except:
-            pass
+            if not v:
+                continue
+
+            if k == ".aq":
+                v /= 1000
+
+            if k == "ac" and v.startswith("mp4a.40."):
+                v = "aac"
+
+            ret[k] = [0, norm(v)]
 
         return self.normalize_tags(ret, md)
 
