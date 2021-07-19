@@ -20,6 +20,9 @@ echo
 #
 # `no-cm` saves ~90k by removing easymde/codemirror
 #   (the fancy markdown editor)
+#
+# `no-fnt` saves ~9k by removing the source-code-pro font
+#   (mainly used my the markdown viewer/editor)
 
 
 # port install gnutar findutils gsed coreutils
@@ -61,6 +64,7 @@ while [ ! -z "$1" ]; do
 	[ "$1" = re     ] && repack=1 && shift && continue
 	[ "$1" = gz     ] && use_gz=1 && shift && continue
 	[ "$1" = no-ogv ] && no_ogv=1 && shift && continue
+	[ "$1" = no-fnt ] && no_fnt=1 && shift && continue
 	[ "$1" = no-cm  ] && no_cm=1  && shift && continue
 	[ "$1" = no-sh  ] && do_sh=   && shift && continue
 	[ "$1" = no-py  ] && do_py=   && shift && continue
@@ -188,6 +192,12 @@ done
 	echo h > copyparty/web/mde.html
 	f=copyparty/web/md.html
 	sed -r '/edit2">edit \(fancy/d' <$f >t && tmv "$f"
+}
+
+[ $no_fnt ] && {
+	rm -f copyparty/web/deps/scp.woff2
+	f=copyparty/web/md.css
+	sed -r '/scp\.woff2/d' <$f >t && tmv "$f"
 }
 
 [ $repack ] ||

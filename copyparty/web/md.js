@@ -176,7 +176,7 @@ function md_plug_err(ex, js) {
         var lns = js.split('\n');
         if (ln < lns.length) {
             o = mknod('span');
-            o.style.cssText = 'color:#ac2;font-size:.9em;font-family:scp;display:block';
+            o.style.cssText = "color:#ac2;font-size:.9em;font-family:'scp',monospace,monospace;display:block";
             o.textContent = lns[ln - 1];
         }
     }
