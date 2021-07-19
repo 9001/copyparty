@@ -23,6 +23,8 @@ echo
 #
 # `no-fnt` saves ~9k by removing the source-code-pro font
 #   (mainly used my the markdown viewer/editor)
+#
+# `no-dd` saves ~2k by removing the mouse cursor
 
 
 # port install gnutar findutils gsed coreutils
@@ -60,15 +62,18 @@ use_gz=
 do_sh=1
 do_py=1
 while [ ! -z "$1" ]; do
-	[ "$1" = clean  ] && clean=1  && shift && continue
-	[ "$1" = re     ] && repack=1 && shift && continue
-	[ "$1" = gz     ] && use_gz=1 && shift && continue
-	[ "$1" = no-ogv ] && no_ogv=1 && shift && continue
-	[ "$1" = no-fnt ] && no_fnt=1 && shift && continue
-	[ "$1" = no-cm  ] && no_cm=1  && shift && continue
-	[ "$1" = no-sh  ] && do_sh=   && shift && continue
-	[ "$1" = no-py  ] && do_py=   && shift && continue
-	break
+	case $1 in
+		clean)  clean=1  ; ;;
+		re)     repack=1 ; ;;
+		gz)     use_gz=1 ; ;;
+		no-ogv) no_ogv=1 ; ;;
+		no-fnt) no_fnt=1 ; ;;
+		no-dd)  no_dd=1  ; ;;
+		no-cm)  no_cm=1  ; ;;
+		no-sh)  do_sh=   ; ;;
+		no-py)  do_py=   ; ;;
+	esac
+	shift
 done
 
 tmv() {
@@ -198,6 +203,12 @@ done
 	rm -f copyparty/web/deps/scp.woff2
 	f=copyparty/web/md.css
 	sed -r '/scp\.woff2/d' <$f >t && tmv "$f"
+}
+
+[ $no_dd ] && {
+	rm -rf copyparty/web/dd
+	f=copyparty/web/browser.css
+	sed -r 's/(cursor: )url\([^)]+\), (pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: cursor/d' <$f >t && tmv "$f"
 }
 
 [ $repack ] ||
