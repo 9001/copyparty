@@ -1714,12 +1714,13 @@ var thegrid = (function () {
 
 
 function tree_scrollto() {
-	var act = QS('#treeul a.hl');
-	if (!act)
+	var act = QS('#treeul a.hl'),
+		ul = act ? act.offsetParent : null;
+
+	if (!ul)
 		return;
 
 	var ctr = ebi('tree'),
-		ul = act.offsetParent,
 		em = parseFloat(getComputedStyle(act).fontSize),
 		top = act.offsetTop + ul.offsetTop,
 		min = top - 11 * em,
@@ -2306,7 +2307,12 @@ var treectl = (function () {
 		var fun = treectl.dir_cb;
 		if (fun) {
 			treectl.dir_cb = null;
-			fun();
+			try {
+				fun();
+			}
+			catch (ex) {
+				console.log("dir_cb failed", ex);
+			}
 		}
 	}
 
