@@ -1653,6 +1653,7 @@ class HttpCli(object):
             "files": [],
             "taglist": [],
             "srvinf": srv_info,
+            "acct": self.uname,
             "perms": perms,
             "logues": logues,
         }
@@ -1660,6 +1661,7 @@ class HttpCli(object):
             "vdir": quotep(self.vpath),
             "vpnodes": vpnodes,
             "files": [],
+            "acct": self.uname,
             "perms": json.dumps(perms),
             "taglist": [],
             "tag_order": [],

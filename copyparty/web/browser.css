@@ -211,15 +211,39 @@ a, #files tbody div a:last-child {
 	margin: .8em 0;
 }
 #srv_info {
-	opacity: .5;
-	font-size: .8em;
-	color: #fc5;
+	color: #a73;
+	background: #333;
 	position: absolute;
-	top: .5em;
+	font-size: .8em;
+ 	top: .5em;
 	left: 2em;
+	padding-right: .5em;
 }
 #srv_info span {
-	color: #fff;
+	color: #aaa;
+}
+#acc_info {
+	position: absolute;
+	font-size: .81em;
+	top: .5em;
+	right: 2em;
+	color: #999;
+}
+#acc_info span:before {
+	color: #f4c;
+	border-bottom: 1px solid rgba(255,68,204,0.6);
+	margin-right: .6em;
+}
+html.read #acc_info span:before {
+	content: 'Read-Only access';
+}
+html.write #acc_info span:before {
+	content: 'Write-Only access';
+}
+html.read.write #acc_info span:before {
+	content: 'Read-Write access';
+	color: #999;
+	border: none;
 }
 #files tbody a.play {
 	color: #e70;
@@ -1001,10 +1025,14 @@ html.light .tgl.btn.on {
 }
 html.light #srv_info {
 	color: #c83;
+	background: #eee;
+}
+html.light #srv_info,
+html.light #acc_info {
 	text-shadow: 1px 1px 0 #fff;
 }
 html.light #srv_info span {
-	color: #000;
+	color: #777;
 }
 html.light #treeul a+a {
 	background: inherit;

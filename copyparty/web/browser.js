@@ -1452,6 +1452,13 @@ function play_linked() {
 };
 
 
+(function () {
+	var d = mknod('div');
+	d.setAttribute('id', 'acc_info');
+	document.body.insertBefore(d, ebi('ops'));
+})();
+
+
 var thegrid = (function () {
 	var lfiles = ebi('files'),
 		gfiles = mknod('div');
@@ -2434,6 +2441,7 @@ var treectl = (function () {
 		if (this.hpush)
 			hist_push(this.top);
 
+		acct = res.acct;
 		apply_perms(res.perms);
 		despin('#files');
 		despin('#gfiles');
@@ -2550,6 +2558,10 @@ function despin(sel) {
 function apply_perms(newperms) {
 	perms = newperms || [];
 
+	ebi('acc_info').innerHTML = '<span>' + (acct != '*' ?
+		'<a href="?pw=x">Logout ' + acct + '</a>' :
+		'<a href="?h">Login</a>') + '</span>';
+
 	var o = QSA('#ops>a[data-perm], #u2footfoot');
 	for (var a = 0; a < o.length; a++) {
 		var display = '';
@@ -2573,12 +2585,10 @@ function apply_perms(newperms) {
 		de = document.documentElement,
 		tds = QSA('#u2conf td');
 
-	/* good idea maybe
 	clmod(de, "read", have_read);
 	clmod(de, "write", have_write);
 	clmod(de, "nread", !have_read);
 	clmod(de, "nwrite", !have_write);
-	*/
 
 	for (var a = 0; a < tds.length; a++) {
 		tds[a].style.display =

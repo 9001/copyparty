@@ -462,6 +462,9 @@ function U2pvis(act, btns) {
 
 function fsearch_explain(e) {
     ev(e);
+    if (!has(perms, 'write'))
+        return alert('your access to this folder is Read-Only\n\n' + (acct == '*' ? 'you are currently not logged in' : 'you are currently logged in as ' + acct));
+
     alert('you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and then refresh\n\nsorry');
 }
 
@@ -1297,9 +1300,7 @@ function up2k_init(subtle) {
 
                     if (!response || !response.hits || !response.hits.length) {
                         smsg = '404';
-                        msg = 'not found on server';
-                        if (has(perms, 'write'))
-                            msg += ' <a href="#" onclick="fsearch_explain()" class="fsearch_explain">(explain)</a>';
+                        msg = 'not found on server <a href="#" onclick="fsearch_explain()" class="fsearch_explain">(explain)</a>';
                     }
                     else {
                         smsg = 'found';
