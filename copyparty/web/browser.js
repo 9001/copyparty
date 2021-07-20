@@ -2559,8 +2559,8 @@ function apply_perms(newperms) {
 	perms = newperms || [];
 
 	ebi('acc_info').innerHTML = '<span>' + (acct != '*' ?
-		'<a href="?pw=x">Logout ' + acct + '</a>' :
-		'<a href="?h">Login</a>') + '</span>';
+		'<a href="/?pw=x">Logout ' + acct + '</a>' :
+		'<a href="/?h">Login</a>') + '</span>';
 
 	var o = QSA('#ops>a[data-perm], #u2footfoot');
 	for (var a = 0; a < o.length; a++) {
