@@ -7,7 +7,8 @@ if (!window['console'])
 
 
 var is_touch = 'ontouchstart' in window,
-    ANDROID = /(android)/i.test(navigator.userAgent);
+    IPHONE = /iPhone|iPad|iPod/i.test(navigator.userAgent),
+    ANDROID = /android/i.test(navigator.userAgent);
 
 
 // error handler for mobile devices
@@ -547,11 +548,24 @@ var tt = (function () {
         clmod(r.tt, 'show', 1);
     };
 
-    r.hide = function () {
+    r.hide = function (e) {
+        ev(e);
         clmod(r.tt, 'show');
         if (r.el)
             r.el.removeEventListener('mouseleave', r.hide);
     };
+
+    if (is_touch && IPHONE) {
+        var f1 = r.show,
+            f2 = r.hide;
+
+        r.show = function () {
+            setTimeout(f1.bind(this), 301);
+        };
+        r.hide = function () {
+            setTimeout(f2.bind(this), 301);
+        };
+    }
 
     r.tt.onclick = r.hide;
 
