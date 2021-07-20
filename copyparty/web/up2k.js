@@ -496,8 +496,9 @@ function up2k_init(subtle) {
         shame = 'your browser is impressively ancient';
 
     // upload ui hidden by default, clicking the header shows it
+    var got_deps = false;
     function init_deps() {
-        if (!subtle && !window.asmCrypto) {
+        if (!got_deps && !subtle && !window.asmCrypto) {
             var fn = 'sha512.' + sha_js + '.js';
             showmodal('<h1>loading ' + fn + '</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
             import_js('/.cpr/deps/' + fn, unmodal);
@@ -508,6 +509,7 @@ function up2k_init(subtle) {
                 ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span style="color:#' +
                     (sha_js == 'ac' ? 'c84">(expecting 20' : '8a5">(but dont worry too much, expect 100') + ' MiB/s)</span>';
         }
+        got_deps = true;
     }
 
     // show uploader if the user only has write-access
