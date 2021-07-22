@@ -1094,6 +1094,11 @@ class Up2k(object):
                             os.unlink(fsenc(dst))  # TODO ed pls
                             self._symlink(src, dst)
 
+                        if cur:
+                            a = [cj[x] for x in "prel name lmod size".split()]
+                            self.db_add(cur, wark, *a)
+                            cur.connection.commit()
+
             if not job:
                 job = {
                     "wark": wark,
@@ -1144,7 +1149,6 @@ class Up2k(object):
             return f["orz"][1]
 
     def _symlink(self, src, dst):
-        # TODO store this in linktab so we never delete src if there are links to it
         self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
         if self.args.nw:
             return
@@ -1236,15 +1240,8 @@ class Up2k(object):
                 a = [dst, job["size"], (int(time.time()), int(job["lmod"]))]
                 self.lastmod_q.put(a)
 
-            # legit api sware 2 me mum
-            if self.idx_wark(
-                job["ptop"],
-                job["wark"],
-                job["prel"],
-                job["name"],
-                job["lmod"],
-                job["size"],
-            ):
+            a = [job[x] for x in "ptop wark prel name lmod size".split()]
+            if self.idx_wark(*a):
                 del self.registry[ptop][wark]
                 # in-memory registry is reserved for unfinished uploads
 
@@ -1256,7 +1253,7 @@ class Up2k(object):
             return False
 
         self.db_rm(cur, rd, fn)
-        self.db_add(cur, wark, rd, fn, int(lmod), sz)
+        self.db_add(cur, wark, rd, fn, lmod, sz)
         cur.connection.commit()
 
         if "e2t" in self.flags[ptop]:
@@ -1279,7 +1276,7 @@ class Up2k(object):
             db.execute(sql, v)
         except:
             rd, fn = s3enc(self.mem_cur, rd, fn)
-            v = (wark, ts, sz, rd, fn)
+            v = (wark, int(ts), sz, rd, fn)
             db.execute(sql, v)
 
     def _get_wark(self, cj):

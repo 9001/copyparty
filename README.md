@@ -164,8 +164,6 @@ small collection of user feedback
 
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
 * cannot mount something at `/d1/d2/d3` unless `d2` exists inside `d1`
-* dupe files will not have metadata (audio tags etc) displayed in the file listing
-  * because they don't get `up` entries in the db (probably best fix) and `tx_browser` does not `lstat`
 * probably more, pls let me know
 
 ## not my bugs
