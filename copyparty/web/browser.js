@@ -62,7 +62,7 @@ ebi('op_up2k').innerHTML = (
 	'		</td>\n' +
 	'		<td rowspan="2">\n' +
 	'			<input type="checkbox" id="ask_up" />\n' +
-	'			<label for="ask_up" tt="ask for confirmation befofre upload starts">💭</label>\n' +
+	'			<label for="ask_up" tt="ask for confirmation before upload starts">💭</label>\n' +
 	'		</td>\n' +
 	'		<td rowspan="2">\n' +
 	'			<input type="checkbox" id="flag_en" />\n' +
