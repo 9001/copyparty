@@ -23,6 +23,9 @@ function esc(txt) {
     });
 }
 function vis_exh(msg, url, lineNo, columnNo, error) {
+    if ((msg + '').indexOf('ResizeObserver') !== -1)
+        return;  // chrome issue 809574 (benign, from <video>)
+
     if (!window.onerror)
         return;
 
