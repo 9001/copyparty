@@ -207,37 +207,41 @@ class VFS(object):
             #
             return os.path.realpath(rp)
 
-    def ls(self, rem, uname, scandir, incl_wo=False, lstat=False):
-        # type: (str, str, bool, bool, bool) -> tuple[str, str, dict[str, VFS]]
+    def ls(self, rem, uname, scandir, permsets, lstat=False):
+        # type: (str, str, bool, list[list[bool]], bool) -> tuple[str, str, dict[str, VFS]]
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
         real = list(statdir(self.log, scandir, lstat, abspath))
         real.sort()
         if not rem:
-            for name, vn2 in sorted(self.nodes.items()):
-                ok = uname in vn2.axs.uread or "*" in vn2.axs.uread
+            # no vfs nodes in the list of real inodes
+            real = [x for x in real if x[0] not in self.nodes]
 
-                if not ok and incl_wo:
-                    ok = uname in vn2.axs.uwrite or "*" in vn2.axs.uwrite
+            for name, vn2 in sorted(self.nodes.items()):
+                ok = False
+                axs = vn2.axs
+                axs = [axs.uread, axs.uwrite, axs.umove, axs.udel]
+                for pset in permsets:
+                    ok = True
+                    for req, lst in zip(pset, axs):
+                        if req and uname not in lst and "*" not in lst:
+                            ok = False
+                    if ok:
+                        break
 
                 if ok:
                     virt_vis[name] = vn2
 
-            # no vfs nodes in the list of real inodes
-            real = [x for x in real if x[0] not in self.nodes]
-
         return [abspath, real, virt_vis]
 
-    def walk(self, rel, rem, seen, uname, dots, scandir, lstat):
+    def walk(self, rel, rem, seen, uname, permsets, dots, scandir, lstat):
         """
         recursively yields from ./rem;
         rel is a unix-style user-defined vpath (not vfs-related)
         """
 
-        fsroot, vfs_ls, vfs_virt = self.ls(
-            rem, uname, scandir, incl_wo=False, lstat=lstat
-        )
+        fsroot, vfs_ls, vfs_virt = self.ls(rem, uname, scandir, permsets, lstat=lstat)
 
         if (
             seen
@@ -263,7 +267,7 @@ class VFS(object):
 
             wrel = (rel + "/" + rdir).lstrip("/")
             wrem = (rem + "/" + rdir).lstrip("/")
-            for x in self.walk(wrel, wrem, seen, uname, dots, scandir, lstat):
+            for x in self.walk(wrel, wrem, seen, uname, permsets, dots, scandir, lstat):
                 yield x
 
         for n, vfs in sorted(vfs_virt.items()):
@@ -271,7 +275,7 @@ class VFS(object):
                 continue
 
             wrel = (rel + "/" + n).lstrip("/")
-            for x in vfs.walk(wrel, "", seen, uname, dots, scandir, lstat):
+            for x in vfs.walk(wrel, "", seen, uname, permsets, dots, scandir, lstat):
                 yield x
 
     def zipgen(self, vrem, flt, uname, dots, scandir):
@@ -282,9 +286,8 @@ class VFS(object):
         f2a = os.sep + "dir.txt"
         f2b = "{0}.hist{0}".format(os.sep)
 
-        for vpath, apath, files, rd, vd in self.walk(
-            "", vrem, [], uname, dots, scandir, False
-        ):
+        g = self.walk("", vrem, [], uname, [[True]], dots, scandir, False)
+        for vpath, apath, files, rd, vd in g:
             if flt:
                 files = [x for x in files if x[0] in flt]
 
@@ -789,7 +792,9 @@ class AuthSrv(object):
                     continue
 
                 atop = vn.realpath
-                g = vn.walk("", "", [], u, True, not self.args.no_scandir, False)
+                g = vn.walk(
+                    "", "", [], u, True, [[True]], not self.args.no_scandir, False
+                )
                 for vpath, apath, files, _, _ in g:
                     fnames = [n[0] for n in files]
                     vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames

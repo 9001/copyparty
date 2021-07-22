@@ -57,8 +57,8 @@ class TestVFS(unittest.TestCase):
         # type: (VFS, str, str) -> tuple[str, str, str]
         """helper for resolving and listing a folder"""
         vn, rem = vfs.get(vpath, uname, True, False)
-        r1 = vn.ls(rem, uname, False)
-        r2 = vn.ls(rem, uname, False)
+        r1 = vn.ls(rem, uname, False, [[True]])
+        r2 = vn.ls(rem, uname, False, [[True]])
         self.assertEqual(r1, r2)
 
         fsdir, real, virt = r1

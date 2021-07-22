@@ -277,6 +277,8 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('opt-outs')
     ap2.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
+    ap2.add_argument("--no-del", action="store_true", help="disable delete operations")
+    ap2.add_argument("--no-mv", action="store_true", help="disable move/rename operations")
     ap2.add_argument("-nih", action="store_true", help="no info hostname")
     ap2.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")

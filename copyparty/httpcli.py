@@ -370,6 +370,12 @@ class HttpCli(object):
 
             self.uparam = {"h": False}
 
+        if "delete" in self.uparam:
+            return self.handle_rm()
+
+        if "move" in self.uparam:
+            return self.handle_mv()
+
         if "h" in self.uparam:
             self.vpath = None
             return self.tx_mounts()
@@ -1451,7 +1457,7 @@ class HttpCli(object):
 
     def scanvol(self):
         if not self.can_read or not self.can_write:
-            raise Pebkac(403, "not admin")
+            raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_rescan:
             raise Pebkac(403, "disabled by argv")
@@ -1470,7 +1476,7 @@ class HttpCli(object):
 
     def tx_stack(self):
         if not [x for x in self.wvol if x in self.rvol]:
-            raise Pebkac(403, "not admin")
+            raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_stack:
             raise Pebkac(403, "disabled by argv")
@@ -1508,7 +1514,7 @@ class HttpCli(object):
         try:
             vn, rem = self.asrv.vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
-                rem, self.uname, not self.args.no_scandir, incl_wo=True
+                rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
             )
         except:
             vfs_ls = []
@@ -1534,6 +1540,53 @@ class HttpCli(object):
 
         ret["a"] = dirs
         return ret
+
+    def handle_rm(self):
+        if not self.can_delete:
+            raise Pebkac(403, "not allowed for user " + self.uname)
+
+        if self.args.no_del:
+            raise Pebkac(403, "disabled by argv")
+
+        permsets = [[True, False, False, True]]
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, *permsets[0])
+        abspath = vn.canonical(rem)
+
+        fun = os.lstat if os.supports_follow_symlinks else os.stat
+        st = fun(fsenc(abspath))
+        if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
+            self.log("rm file " + abspath)
+            return
+
+        scandir = not self.args.no_scandir
+        g = vn.walk("", rem, [], self.uname, permsets, True, scandir, True)
+        for vpath, apath, files, rd, vd in g:
+            for fn in files:
+                m = "rm file {} / {}".format(apath, fn[0])
+                if "yt" in m:
+                    self.log(m)
+
+                # build list of folders to rmdir after
+
+        self.loud_reply("k")
+
+    def handle_mv(self):
+        if not self.can_move:
+            raise Pebkac(403, "not allowed for user " + self.uname)
+
+        if self.args.no_mv:
+            raise Pebkac(403, "disabled by argv")
+
+        dst = self.uparam.get("to")
+        if dst is None:
+            raise Pebkac(400, "need dst vpath")
+
+        svn, srem = self.asrv.vfs.get(self.vpath, self.uname, True, False, True)
+        dvn, drem = self.asrv.vfs.get(dst, self.uname, False, True)
+        src = svn.canonical(srem)
+        dst = dvn.canonical(drem)
+
+        self.loud_reply("mv [{}] to [{}]".format(src, dst))
 
     def tx_browser(self):
         vpath = ""
@@ -1695,7 +1748,7 @@ class HttpCli(object):
                 return self.tx_zip(k, v, vn, rem, [], self.args.ed)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
-            rem, self.uname, not self.args.no_scandir, incl_wo=True
+            rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
         )
         stats = {k: v for k, v in vfs_ls}
         vfs_ls = [x[0] for x in vfs_ls]
