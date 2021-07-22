@@ -926,8 +926,11 @@ function up2k_init(subtle) {
                 return;
 
             clearTimeout(tto);
+            if (crashed)
+                return defer();
+
             running = true;
-            while (window['vis_exh']) {
+            while (true) {
                 var now = Date.now(),
                     is_busy = 0 !=
                         st.todo.head.length +
@@ -1009,7 +1012,7 @@ function up2k_init(subtle) {
                     mou_ikkai = true;
                 }
 
-                if (!mou_ikkai)
+                if (!mou_ikkai || crashed)
                     return defer();
             }
         }
@@ -1519,7 +1522,7 @@ function up2k_init(subtle) {
                 try { orz(xhr); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
             };
             xhr.onerror = function (xev) {
-                if (!window['vis_exh'])
+                if (crashed)
                     return;
 
                 console.log('chunkpit onerror, retrying', t);

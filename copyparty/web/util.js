@@ -11,6 +11,12 @@ var is_touch = 'ontouchstart' in window,
     ANDROID = /android/i.test(navigator.userAgent);
 
 
+var ebi = document.getElementById.bind(document),
+    QS = document.querySelector.bind(document),
+    QSA = document.querySelectorAll.bind(document),
+    mknod = document.createElement.bind(document);
+
+
 // error handler for mobile devices
 function esc(txt) {
     return txt.replace(/[&"<>]/g, function (c) {
@@ -22,16 +28,18 @@ function esc(txt) {
         }[c];
     });
 }
+var crashed = false, ignexd = {};
 function vis_exh(msg, url, lineNo, columnNo, error) {
     if ((msg + '').indexOf('ResizeObserver') !== -1)
         return;  // chrome issue 809574 (benign, from <video>)
 
-    if (!window.onerror)
+    var ekey = url + '\n' + lineNo + '\n' + msg;
+    if (ignexd[ekey] || crashed)
         return;
 
+    crashed = true;
     window.onerror = undefined;
-    window['vis_exh'] = null;
-    var html = ['<h1>you hit a bug!</h1><p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();" style="text-decoration:underline;color:#fc0">reset copyparty settings</a> if you are stuck here</p><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code><br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)</p><p>',
+    var html = ['<h1>you hit a bug!</h1><p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();" style="text-decoration:underline;color:#fc0">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code><br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)</p><p>',
         esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>'];
 
     try {
@@ -42,23 +50,38 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                     html.push('<h3>' + find[a] + '</h3>' +
                         esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
         }
+        ignexd[ekey] = true;
         html.push('<h3>localStore</h3>' + esc(JSON.stringify(localStorage)));
     }
     catch (e) { }
-    document.body.innerHTML = html.join('\n');
 
-    var s = mknod('style');
-    s.innerHTML = 'body{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em} h1{margin:.5em 1em 0 0;padding:0} h3{border-top:1px solid #999;margin:1em 0 0 0} code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} *{line-height:1.5em}';
-    document.head.appendChild(s);
+    try {
+        var exbox = ebi('exbox');
+        if (!exbox) {
+            exbox = mknod('div');
+            exbox.setAttribute('id', 'exbox');
+            document.body.appendChild(exbox);
 
+            var s = mknod('style');
+            s.innerHTML = '#exbox{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%} #exbox h1{margin:.5em 1em 0 0;padding:0} #exbox h3{border-top:1px solid #999;margin:1em 0 0 0} #exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} #exbox *{line-height:1.5em}';
+            document.head.appendChild(s);
+        }
+        exbox.innerHTML = html.join('\n');
+        exbox.style.display = 'block';
+    }
+    catch (e) {
+        document.body.innerHTML = html.join('\n');
+    }
     throw 'fatal_err';
 }
-
-
-var ebi = document.getElementById.bind(document),
-    QS = document.querySelector.bind(document),
-    QSA = document.querySelectorAll.bind(document),
-    mknod = document.createElement.bind(document);
+function ignex(all) {
+    var o = ebi('exbox');
+    o.style.display = 'none';
+    o.innerHTML = '';
+    crashed = false;
+    if (!all)
+        window.onerror = vis_exh;
+}
 
 
 function ctrl(e) {
