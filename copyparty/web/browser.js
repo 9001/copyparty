@@ -2558,9 +2558,22 @@ function despin(sel) {
 function apply_perms(newperms) {
 	perms = newperms || [];
 
-	ebi('acc_info').innerHTML = '<span>' + (acct != '*' ?
-		'<a href="/?pw=x">Logout ' + acct + '</a>' :
-		'<a href="/?h">Login</a>') + '</span>';
+	var axs = [],
+		aclass = '>',
+		chk = ['read', 'write', 'rename', 'delete'];
+
+	for (var a = 0; a < chk.length; a++)
+		if (has(perms, chk[a]))
+			axs.push(chk[a].slice(0, 1).toUpperCase() + chk[a].slice(1));
+
+	axs = axs.join('-');
+	if (perms.length == 1) {
+		aclass = ' class="warn">';
+		axs += '-Only';
+	}
+
+	ebi('acc_info').innerHTML = '<span' + aclass + axs + ' access</span>' + (acct != '*' ?
+		'<a href="/?pw=x">Logout ' + acct + '</a>' : '<a href="/?h">Login</a>');
 
 	var o = QSA('#ops>a[data-perm], #u2footfoot');
 	for (var a = 0; a < o.length; a++) {

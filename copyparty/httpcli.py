@@ -58,7 +58,7 @@ class HttpCli(object):
 
     def unpwd(self, m):
         a, b = m.groups()
-        return "=\033[7m {} \033[27m{}".format(self.asrv.iuser[a], b)
+        return "=\033[7m {} \033[27m{}".format(self.asrv.iacct[a], b)
 
     def _check_nonfatal(self, ex):
         return ex.code < 400 or ex.code in [404, 429]
@@ -181,9 +181,11 @@ class HttpCli(object):
         self.vpath = unquotep(vpath)
 
         pwd = uparam.get("pw")
-        self.uname = self.asrv.iuser.get(pwd, "*")
-        self.rvol, self.wvol, self.avol = [[], [], []]
-        self.asrv.vfs.user_tree(self.uname, self.rvol, self.wvol, self.avol)
+        self.uname = self.asrv.iacct.get(pwd, "*")
+        self.rvol = self.asrv.vfs.aread[self.uname]
+        self.wvol = self.asrv.vfs.awrite[self.uname]
+        self.mvol = self.asrv.vfs.amove[self.uname]
+        self.dvol = self.asrv.vfs.adel[self.uname]
 
         if pwd and "pw" in self.ouparam and pwd != cookies.get("cppwd"):
             self.out_headers["Set-Cookie"] = self.get_pwd_cookie(pwd)[0]
@@ -359,8 +361,9 @@ class HttpCli(object):
                     self.redirect(vpath, flavor="redirecting to", use302=True)
                     return True
 
-        self.readable, self.writable = self.asrv.vfs.can_access(self.vpath, self.uname)
-        if not self.readable and not self.writable:
+        x = self.asrv.vfs.can_access(self.vpath, self.uname)
+        self.can_read, self.can_write, self.can_move, self.can_delete = x
+        if not self.can_read and not self.can_write:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
                 raise Pebkac(404)
@@ -775,7 +778,7 @@ class HttpCli(object):
         return True
 
     def get_pwd_cookie(self, pwd):
-        if pwd in self.asrv.iuser:
+        if pwd in self.asrv.iacct:
             msg = "login ok"
             dt = datetime.utcfromtimestamp(time.time() + 60 * 60 * 24 * 365)
             exp = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -994,13 +997,6 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
-        # TODO:
-        #   the per-volume read/write permissions must be replaced with permission flags
-        #   which would decide how to handle uploads to filenames which are taken,
-        #   current behavior of creating a new name is a good default for binary files
-        #   but should also offer a flag to takeover the filename and rename the old one
-        #
-        # stopgap:
         if not rem.endswith(".md"):
             raise Pebkac(400, "only markdown pls")
 
@@ -1051,7 +1047,6 @@ class HttpCli(object):
                 self.reply(response.encode("utf-8"))
                 return True
 
-            # TODO another hack re: pending permissions rework
             mdir, mfile = os.path.split(fp)
             mfile2 = "{}.{:.3f}.md".format(mfile[:-3], srv_lastmod)
             try:
@@ -1424,12 +1419,13 @@ class HttpCli(object):
 
     def tx_mounts(self):
         suf = self.urlq({}, ["h"])
+        avol = [x for x in self.wvol if x in self.rvol]
         rvol, wvol, avol = [
             [("/" + x).rstrip("/") + "/" for x in y]
-            for y in [self.rvol, self.wvol, self.avol]
+            for y in [self.rvol, self.wvol, avol]
         ]
 
-        if self.avol and not self.args.no_rescan:
+        if avol and not self.args.no_rescan:
             x = self.conn.hsrv.broker.put(True, "up2k.get_state")
             vs = json.loads(x.get())
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
@@ -1454,7 +1450,7 @@ class HttpCli(object):
         return True
 
     def scanvol(self):
-        if not self.readable or not self.writable:
+        if not self.can_read or not self.can_write:
             raise Pebkac(403, "not admin")
 
         if self.args.no_rescan:
@@ -1473,7 +1469,7 @@ class HttpCli(object):
         raise Pebkac(500, x)
 
     def tx_stack(self):
-        if not self.avol:
+        if not [x for x in self.wvol if x in self.rvol]:
             raise Pebkac(403, "not admin")
 
         if self.args.no_stack:
@@ -1551,9 +1547,7 @@ class HttpCli(object):
 
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
-        vn, rem = self.asrv.vfs.get(
-            self.vpath, self.uname, self.readable, self.writable
-        )
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
         abspath = vn.canonical(rem)
         dbv, vrem = vn.get_dbv(rem)
 
@@ -1562,7 +1556,7 @@ class HttpCli(object):
         except:
             raise Pebkac(404)
 
-        if self.readable:
+        if self.can_read:
             if rem.startswith(".hist/up2k.") or (
                 rem.endswith("/dir.txt") and rem.startswith(".hist/th/")
             ):
@@ -1629,10 +1623,14 @@ class HttpCli(object):
         srv_info = "</span> /// <span>".join(srv_info)
 
         perms = []
-        if self.readable:
+        if self.can_read:
             perms.append("read")
-        if self.writable:
+        if self.can_write:
             perms.append("write")
+        if self.can_move:
+            perms.append("move")
+        if self.can_delete:
+            perms.append("delete")
 
         url_suf = self.urlq({}, [])
         is_ls = "ls" in self.uparam
@@ -1668,13 +1666,13 @@ class HttpCli(object):
             "have_up2k_idx": ("e2d" in vn.flags),
             "have_tags_idx": ("e2t" in vn.flags),
             "have_zip": (not self.args.no_zip),
-            "have_b_u": (self.writable and self.uparam.get("b") == "u"),
+            "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "url_suf": url_suf,
             "logues": logues,
             "title": html_escape(self.vpath, crlf=True),
             "srv_info": srv_info,
         }
-        if not self.readable:
+        if not self.can_read:
             if is_ls:
                 ret = json.dumps(ls_ret)
                 self.reply(

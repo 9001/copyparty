@@ -229,21 +229,13 @@ a, #files tbody div a:last-child {
 	right: 2em;
 	color: #999;
 }
-#acc_info span:before {
-	color: #f4c;
-	border-bottom: 1px solid rgba(255,68,204,0.6);
+#acc_info span {
+	color: #999;
 	margin-right: .6em;
 }
-html.read #acc_info span:before {
-	content: 'Read-Only access';
-}
-html.write #acc_info span:before {
-	content: 'Write-Only access';
-}
-html.read.write #acc_info span:before {
-	content: 'Read-Write access';
-	color: #999;
-	border: none;
+#acc_info span.warn {
+	color: #f4c;
+	border-bottom: 1px solid rgba(255,68,204,0.6);
 }
 #files tbody a.play {
 	color: #e70;

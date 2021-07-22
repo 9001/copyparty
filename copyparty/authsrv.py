@@ -13,17 +13,31 @@ from .__init__ import WINDOWS
 from .util import IMPLICATIONS, uncyg, undot, Pebkac, fsdec, fsenc, statdir
 
 
+class AXS(object):
+    def __init__(self, uread=None, uwrite=None, umove=None, udel=None):
+        self.uread = {} if uread is None else {k: 1 for k in uread}
+        self.uwrite = {} if uwrite is None else {k: 1 for k in uwrite}
+        self.umove = {} if umove is None else {k: 1 for k in umove}
+        self.udel = {} if udel is None else {k: 1 for k in udel}
+
+    def __repr__(self):
+        return "AXS({})".format(
+            ", ".join(
+                "{}={!r}".format(k, self.__dict__[k])
+                for k in "uread uwrite umove udel".split()
+            )
+        )
+
+
 class VFS(object):
     """single level in the virtual fs"""
 
-    def __init__(self, log, realpath, vpath, uread, uwrite, uadm, flags):
+    def __init__(self, log, realpath, vpath, axs, flags):
         self.log = log
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
-        self.uread = uread  # users who can read this
-        self.uwrite = uwrite  # users who can write this
-        self.uadm = uadm  # users who are regular admins
-        self.flags = flags  # config switches
+        self.axs = axs  # type: AXS
+        self.flags = flags  # config options
         self.nodes = {}  # child nodes
         self.histtab = None  # all realpath->histpath
         self.dbv = None  # closest full/non-jump parent
@@ -31,15 +45,23 @@ class VFS(object):
         if realpath:
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
             self.all_vols = {vpath: self}  # flattened recursive
+            self.aread = {}
+            self.awrite = {}
+            self.amove = {}
+            self.adel = {}
         else:
             self.histpath = None
             self.all_vols = None
+            self.aread = None
+            self.awrite = None
+            self.amove = None
+            self.adel = None
 
     def __repr__(self):
         return "VFS({})".format(
             ", ".join(
                 "{}={!r}".format(k, self.__dict__[k])
-                for k in "realpath vpath uread uwrite uadm flags".split()
+                for k in "realpath vpath axs flags".split()
             )
         )
 
@@ -66,9 +88,7 @@ class VFS(object):
                 self.log,
                 os.path.join(self.realpath, name) if self.realpath else None,
                 "{}/{}".format(self.vpath, name).lstrip("/"),
-                self.uread,
-                self.uwrite,
-                self.uadm,
+                self.axs,
                 self._copy_flags(name),
             )
             vn.dbv = self.dbv or self
@@ -81,7 +101,7 @@ class VFS(object):
 
         # leaf does not exist; create and keep permissions blank
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
-        vn = VFS(self.log, src, vp, [], [], [], {})
+        vn = VFS(self.log, src, vp, AXS(), {})
         vn.dbv = self.dbv or self
         self.nodes[dst] = vn
         return vn
@@ -121,23 +141,32 @@ class VFS(object):
         return [self, vpath]
 
     def can_access(self, vpath, uname):
-        """return [readable,writable]"""
+        # type: (str, str) -> tuple[bool, bool, bool, bool]
+        """can Read,Write,Move,Delete"""
         vn, _ = self._find(vpath)
+        c = vn.axs
         return [
-            uname in vn.uread or "*" in vn.uread,
-            uname in vn.uwrite or "*" in vn.uwrite,
+            uname in c.uread or "*" in c.uread,
+            uname in c.uwrite or "*" in c.uwrite,
+            uname in c.umove or "*" in c.umove,
+            uname in c.udel or "*" in c.udel,
         ]
 
-    def get(self, vpath, uname, will_read, will_write):
-        # type: (str, str, bool, bool) -> tuple[VFS, str]
+    def get(self, vpath, uname, will_read, will_write, will_move=False, will_del=False):
+        # type: (str, str, bool, bool, bool, bool) -> tuple[VFS, str]
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         vn, rem = self._find(vpath)
+        c = vn.axs
 
-        if will_read and (uname not in vn.uread and "*" not in vn.uread):
-            raise Pebkac(403, "you don't have read-access for this location")
-
-        if will_write and (uname not in vn.uwrite and "*" not in vn.uwrite):
-            raise Pebkac(403, "you don't have write-access for this location")
+        for req, d, msg in [
+            [will_read, c.uread, "read"],
+            [will_write, c.uwrite, "write"],
+            [will_move, c.umove, "move"],
+            [will_del, c.udel, "delete"],
+        ]:
+            if req and (uname not in d and "*" not in d):
+                m = "you don't have {}-access for this location"
+                raise Pebkac(403, m.format(msg))
 
         return vn, rem
 
@@ -187,10 +216,10 @@ class VFS(object):
         real.sort()
         if not rem:
             for name, vn2 in sorted(self.nodes.items()):
-                ok = uname in vn2.uread or "*" in vn2.uread
+                ok = uname in vn2.axs.uread or "*" in vn2.axs.uread
 
                 if not ok and incl_wo:
-                    ok = uname in vn2.uwrite or "*" in vn2.uwrite
+                    ok = uname in vn2.axs.uwrite or "*" in vn2.axs.uwrite
 
                 if ok:
                     virt_vis[name] = vn2
@@ -295,20 +324,6 @@ class VFS(object):
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
                 yield f
 
-    def user_tree(self, uname, readable, writable, admin):
-        is_readable = False
-        if uname in self.uread or "*" in self.uread:
-            readable.append(self.vpath)
-            is_readable = True
-
-        if uname in self.uwrite or "*" in self.uwrite:
-            writable.append(self.vpath)
-            if is_readable:
-                admin.append(self.vpath)
-
-        for _, vn in sorted(self.nodes.items()):
-            vn.user_tree(uname, readable, writable, admin)
-
 
 class AuthSrv(object):
     """verifies users against given paths"""
@@ -341,7 +356,8 @@ class AuthSrv(object):
 
         yield prev, True
 
-    def _parse_config_file(self, fd, user, mread, mwrite, madm, mflags, mount):
+    def _parse_config_file(self, fd, acct, daxs, mflags, mount):
+        # type: (any, str, dict[str, AXS], any, str) -> None
         vol_src = None
         vol_dst = None
         self.line_ctr = 0
@@ -357,7 +373,7 @@ class AuthSrv(object):
             if vol_src is None:
                 if ln.startswith("u "):
                     u, p = ln[2:].split(":", 1)
-                    user[u] = p
+                    acct[u] = p
                 else:
                     vol_src = ln
                 continue
@@ -371,47 +387,46 @@ class AuthSrv(object):
                 vol_src = fsdec(os.path.abspath(fsenc(vol_src)))
                 vol_dst = vol_dst.strip("/")
                 mount[vol_dst] = vol_src
-                mread[vol_dst] = []
-                mwrite[vol_dst] = []
-                madm[vol_dst] = []
+                daxs[vol_dst] = AXS()
                 mflags[vol_dst] = {}
                 continue
 
-            if len(ln) > 1:
-                lvl, uname = ln.split(" ")
-            else:
+            try:
+                lvl, uname = ln.split(" ", 1)
+            except:
                 lvl = ln
                 uname = "*"
 
-            self._read_vol_str(
-                lvl,
-                uname,
-                mread[vol_dst],
-                mwrite[vol_dst],
-                madm[vol_dst],
-                mflags[vol_dst],
-            )
+            if lvl == "a":
+                m = "WARNING (config-file): permission flag 'a' is deprecated; please use 'rw' instead"
+                self.log(m, 1)
 
-    def _read_vol_str(self, lvl, uname, mr, mw, ma, mf):
+            self._read_vol_str(lvl, uname, daxs[vol_dst], mflags[vol_dst])
+
+    def _read_vol_str(self, lvl, uname, axs, flags):
+        # type: (str, str, AXS, any) -> None
         if lvl == "c":
             cval = True
             if "=" in uname:
                 uname, cval = uname.split("=", 1)
 
-            self._read_volflag(mf, uname, cval, False)
+            self._read_volflag(flags, uname, cval, False)
             return
 
         if uname == "":
             uname = "*"
 
-        if lvl in "ra":
-            mr.append(uname)
+        if "r" in lvl:
+            axs.uread[uname] = 1
 
-        if lvl in "wa":
-            mw.append(uname)
+        if "w" in lvl:
+            axs.uwrite[uname] = 1
 
-        if lvl == "a":
-            ma.append(uname)
+        if "m" in lvl:
+            axs.umove[uname] = 1
+
+        if "d" in lvl:
+            axs.udel[uname] = 1
 
     def _read_volflag(self, flags, name, value, is_list):
         if name not in ["mtp"]:
@@ -433,21 +448,19 @@ class AuthSrv(object):
         before finally building the VFS
         """
 
-        user = {}  # username:password
-        mread = {}  # mountpoint:[username]
-        mwrite = {}  # mountpoint:[username]
-        madm = {}  # mountpoint:[username]
+        acct = {}  # username:password
+        daxs = {}  # type: dict[str, AXS]
         mflags = {}  # mountpoint:[flag]
         mount = {}  # dst:src (mountpoint:realpath)
 
         if self.args.a:
             # list of username:password
             for u, p in [x.split(":", 1) for x in self.args.a]:
-                user[u] = p
+                acct[u] = p
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is [rwa]username or [c]flag
+            # permset is <rwmd>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
                 m = self.re_vol.match(v_str)
                 if not m:
@@ -461,24 +474,18 @@ class AuthSrv(object):
                 src = fsdec(os.path.abspath(fsenc(src)))
                 dst = dst.strip("/")
                 mount[dst] = src
-                mread[dst] = []
-                mwrite[dst] = []
-                madm[dst] = []
+                daxs[dst] = AXS()
                 mflags[dst] = {}
 
-                perms = perms.split(":")
-                for (lvl, uname) in [[x[0], x[1:]] for x in perms]:
-                    self._read_vol_str(
-                        lvl, uname, mread[dst], mwrite[dst], madm[dst], mflags[dst]
-                    )
+                for x in perms.split(":"):
+                    lvl, uname = x.split(",", 1) if "," in x else [x, ""]
+                    self._read_vol_str(lvl, uname, daxs[dst], mflags[dst])
 
         if self.args.c:
             for cfg_fn in self.args.c:
                 with open(cfg_fn, "rb") as f:
                     try:
-                        self._parse_config_file(
-                            f, user, mread, mwrite, madm, mflags, mount
-                        )
+                        self._parse_config_file(f, acct, daxs, mflags, mount)
                     except:
                         m = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
                         self.log(m.format(cfg_fn, self.line_ctr), 1)
@@ -497,10 +504,11 @@ class AuthSrv(object):
 
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
-            vfs = VFS(self.log_func, os.path.abspath("."), "", ["*"], ["*"], ["*"], {})
+            axs = AXS(["*"], ["*"], None, None)
+            vfs = VFS(self.log_func, os.path.abspath("."), "", axs, {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(self.log_func, None, "", [], [], [], {})
+            vfs = VFS(self.log_func, None, "", AXS(), {})
             vfs.flags["d2d"] = True
 
         maxdepth = 0
@@ -511,32 +519,34 @@ class AuthSrv(object):
 
             if dst == "":
                 # rootfs was mapped; fully replaces the default CWD vfs
-                vfs = VFS(
-                    self.log_func,
-                    mount[dst],
-                    dst,
-                    mread[dst],
-                    mwrite[dst],
-                    madm[dst],
-                    mflags[dst],
-                )
+                vfs = VFS(self.log_func, mount[dst], dst, daxs[dst], mflags[dst])
                 continue
 
             v = vfs.add(mount[dst], dst)
-            v.uread = mread[dst]
-            v.uwrite = mwrite[dst]
-            v.uadm = madm[dst]
+            v.axs = daxs[dst]
             v.flags = mflags[dst]
             v.dbv = None
 
         vfs.all_vols = {}
         vfs.get_all_vols(vfs.all_vols)
 
+        for perm in "read write move del".split():
+            axs_key = "u" + perm
+            unames = ["*"] + list(acct.keys())
+            umap = {x: [] for x in unames}
+            for usr in unames:
+                for mp, vol in vfs.all_vols.items():
+                    if usr in getattr(vol.axs, axs_key):
+                        umap[usr].append(mp)
+            setattr(vfs, "a" + perm, umap)
+
+        all_users = {}
         missing_users = {}
-        for d in [mread, mwrite]:
-            for _, ul in d.items():
-                for usr in ul:
-                    if usr != "*" and usr not in user:
+        for axs in daxs.values():
+            for d in [axs.uread, axs.uwrite, axs.umove, axs.udel]:
+                for usr in d.keys():
+                    all_users[usr] = 1
+                    if usr != "*" and usr not in acct:
                         missing_users[usr] = 1
 
         if missing_users:
@@ -611,7 +621,7 @@ class AuthSrv(object):
         all_mte = {}
         errors = False
         for vol in vfs.all_vols.values():
-            if (self.args.e2ds and vol.uwrite) or self.args.e2dsa:
+            if (self.args.e2ds and vol.axs.uwrite) or self.args.e2dsa:
                 vol.flags["e2ds"] = True
 
             if self.args.e2d or "e2ds" in vol.flags:
@@ -711,16 +721,13 @@ class AuthSrv(object):
 
         with self.mutex:
             self.vfs = vfs
-            self.user = user
-            self.iuser = {v: k for k, v in user.items()}
+            self.acct = acct
+            self.iacct = {v: k for k, v in acct.items()}
 
             self.re_pwd = None
-            pwds = [re.escape(x) for x in self.iuser.keys()]
+            pwds = [re.escape(x) for x in self.iacct.keys()]
             if pwds:
                 self.re_pwd = re.compile("=(" + "|".join(pwds) + ")([]&; ]|$)")
-
-        # import pprint
-        # pprint.pprint({"usr": user, "rd": mread, "wr": mwrite, "mnt": mount})
 
     def dbg_ls(self):
         users = self.args.ls
@@ -739,12 +746,12 @@ class AuthSrv(object):
             pass
 
         if users == "**":
-            users = list(self.user.keys()) + ["*"]
+            users = list(self.acct.keys()) + ["*"]
         else:
             users = [users]
 
         for u in users:
-            if u not in self.user and u != "*":
+            if u not in self.acct and u != "*":
                 raise Exception("user not found: " + u)
 
         if vols == "*":
@@ -760,8 +767,10 @@ class AuthSrv(object):
                 raise Exception("volume not found: " + v)
 
         self.log({"users": users, "vols": vols, "flags": flags})
+        m = "/{}: read({}) write({}) move({}) del({})"
         for k, v in self.vfs.all_vols.items():
-            self.log("/{}: read({}) write({})".format(k, v.uread, v.uwrite))
+            vc = v.axs
+            self.log(m.format(k, vc.uread, vc.uwrite, vc.umove, vc.udel))
 
         flag_v = "v" in flags
         flag_ln = "ln" in flags
@@ -775,7 +784,7 @@ class AuthSrv(object):
             for u in users:
                 self.log("checking /{} as {}".format(v, u))
                 try:
-                    vn, _ = self.vfs.get(v, u, True, False)
+                    vn, _ = self.vfs.get(v, u, True, False, False, False)
                 except:
                     continue
 

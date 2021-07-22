@@ -200,23 +200,23 @@ def run_argparse(argv, formatter):
             """
             -a takes username:password,
             -v takes src:dst:permset:permset:cflag:cflag:...
-               where "permset" is accesslevel followed by username (no separator)
+               where "permset" is "accesslevel,username"
                and "cflag" is config flags to set on this volume
             
             list of cflags:
-              "cnodupe" rejects existing files (instead of symlinking them)
-              "ce2d" sets -e2d (all -e2* args can be set using ce2* cflags)
-              "cd2t" disables metadata collection, overrides -e2t*
-              "cd2d" disables all database stuff, overrides -e2*
+              "c,nodupe" rejects existing files (instead of symlinking them)
+              "c,e2d" sets -e2d (all -e2* args can be set using ce2* cflags)
+              "c,d2t" disables metadata collection, overrides -e2t*
+              "c,d2d" disables all database stuff, overrides -e2*
 
             example:\033[35m
-              -a ed:hunter2 -v .::r:aed -v ../inc:dump:w:aed:cnodupe  \033[36m
+              -a ed:hunter2 -v .::r:rw,ed -v ../inc:dump:w:rw,ed:c,nodupe  \033[36m
               mount current directory at "/" with
                * r (read-only) for everyone
-               * a (read+write) for ed
+               * rw (read+write) for ed
               mount ../inc at "/dump" with
                * w (write-only) for everyone
-               * a (read+write) for ed
+               * rw (read+write) for ed
                * reject duplicate files  \033[0m
             
             if no accounts or volumes are configured,
@@ -376,6 +376,36 @@ def main(argv=None):
         al = run_argparse(argv, RiceFormatter)
     except AssertionError:
         al = run_argparse(argv, Dodge11874)
+
+    nstrs = []
+    anymod = False
+    for ostr in al.v:
+        mod = False
+        oa = ostr.split(":")
+        na = oa[:2]
+        for opt in oa[2:]:
+            if opt and (opt[0] == "a" or (len(opt) > 1 and "," not in opt)):
+                mod = True
+                perm = opt[0]
+                if perm == "a":
+                    perm = "rw"
+                na.append(perm + "," + opt[1:])
+            elif opt and opt.startswith("c") and not opt.startswith("c,"):
+                mod = True
+                na.append("c," + opt[2:])
+            else:
+                na.append(opt)
+
+        nstr = ":".join(na)
+        nstrs.append(nstr if mod else ostr)
+        if mod:
+            msg = "\033[1;31mWARNING:\033[0;1m\n  -v {} \033[0;33mwas replaced with\033[0;1m\n  -v {} \n\033[0m"
+            lprint(msg.format(ostr, nstr))
+            anymod = True
+
+    if anymod:
+        al.v = nstrs
+        time.sleep(2)
 
     # propagate implications
     for k1, k2 in IMPLICATIONS:

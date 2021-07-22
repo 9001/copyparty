@@ -90,7 +90,7 @@ class TestHttpCli(unittest.TestCase):
                 if not vol.startswith(top):
                     continue
 
-                mode = vol[-2]
+                mode = vol[-2].replace("a", "rw")
                 usr = vol[-1]
                 if usr == "a":
                     usr = ""
@@ -99,7 +99,7 @@ class TestHttpCli(unittest.TestCase):
                     vol += "/"
 
                 top, sub = vol.split("/", 1)
-                vcfg.append("{0}/{1}:{1}:{2}{3}".format(top, sub, mode, usr))
+                vcfg.append("{0}/{1}:{1}:{2},{3}".format(top, sub, mode, usr))
 
             pprint.pprint(vcfg)
 
