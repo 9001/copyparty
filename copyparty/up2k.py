@@ -929,18 +929,37 @@ class Up2k(object):
             m = "database is version {}, this copyparty only supports versions <= {}"
             raise Exception(m.format(ver, DB_VER))
 
-        bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
-        db = cur.connection
-        cur.close()
-        db.close()
         msg = "creating new DB (old is bad); backup: {}"
         if ver:
             msg = "creating new DB (too old to upgrade); backup: {}"
 
-        self.log(msg.format(bak))
-        os.rename(fsenc(db_path), fsenc(bak))
-
+        cur = self._backup_db(db_path, cur, ver, msg)
+        db = cur.connection
+        cur.close()
+        db.close()
+        os.unlink(db_path)
         return self._create_db(db_path, None)
+
+    def _backup_db(self, db_path, cur, ver, msg):
+        bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
+        self.log(msg + bak)
+        try:
+            c2 = sqlite3.connect(bak)
+            with c2:
+                cur.connection.backup(c2)
+            return cur
+        except:
+            m = "native sqlite3 backup failed; using fallback method:\n"
+            self.log(m + min_ex())
+        finally:
+            c2.close()
+
+        db = cur.connection
+        cur.close()
+        db.close()
+
+        shutil.copy2(fsenc(db_path), fsenc(bak))
+        return self._orz(db_path)
 
     def _read_ver(self, cur):
         for tab in ["ki", "kv"]:
