@@ -383,7 +383,6 @@ html.light #ggrid a.sel {
 	white-space: nowrap;
 	top: -1.2em;
 	right: 0;
-	width: 2.5em;
 	height: 1em;
 	font-size: 2em;
 	line-height: 1em;
@@ -392,7 +391,7 @@ html.light #ggrid a.sel {
 	background: #3c3c3c;
 	box-shadow: 0 0 .5em #222;
 	border-radius: .3em 0 0 0;
-	padding: .2em 0 0 .07em;
+	padding: .2em .2em;
 	color: #fff;
 }
 #wzip, #wnp {
@@ -414,12 +413,6 @@ html.light #ggrid a.sel {
 #wtoggle * {
 	line-height: 1em;
 }
-#wtoggle.np {
-	width: 6.63em;
-}
-#wtoggle.sel {
-	width: 7.57em;
-}
 #wtoggle.sel #wzip,
 #wtoggle.np #wnp {
 	display: inline-block;
@@ -427,15 +420,21 @@ html.light #ggrid a.sel {
 #wtoggle.sel.np #wnp {
 	display: none;
 }
+#wfm a,
 #wzip a {
-	font-size: .4em;
+	font-size: .5em;
 	padding: 0 .3em;
 	margin: -.3em .2em;
 	position: relative;
 	display: inline-block;
 }
-#wzip a+a {
-	margin-left: .8em;
+#wfm span {
+	font-size: .6em;
+	display: block;
+}
+#wzip a {
+	font-size: .4em;
+	margin: -.3em .3em;
 }
 #wtoggle.sel #wzip #selzip {
 	top: -.6em;

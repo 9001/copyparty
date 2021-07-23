@@ -1548,27 +1548,8 @@ class HttpCli(object):
         if self.args.no_del:
             raise Pebkac(403, "disabled by argv")
 
-        permsets = [[True, False, False, True]]
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, *permsets[0])
-        abspath = vn.canonical(rem)
-
-        fun = os.lstat if os.supports_follow_symlinks else os.stat
-        st = fun(fsenc(abspath))
-        if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
-            self.log("rm file " + abspath)
-            return
-
-        scandir = not self.args.no_scandir
-        g = vn.walk("", rem, [], self.uname, permsets, True, scandir, True)
-        for vpath, apath, files, rd, vd in g:
-            for fn in files:
-                m = "rm file {} / {}".format(apath, fn[0])
-                if "yt" in m:
-                    self.log(m)
-
-                # build list of folders to rmdir after
-
-        self.loud_reply("k")
+        x = self.conn.hsrv.broker.put(True, "up2k.handle_rm", self.uname, self.vpath)
+        self.loud_reply(x.get())
 
     def handle_mv(self):
         if not self.can_move:
@@ -1585,6 +1566,9 @@ class HttpCli(object):
         dvn, drem = self.asrv.vfs.get(dst, self.uname, False, True)
         src = svn.canonical(srem)
         dst = dvn.canonical(drem)
+
+        if not srem:
+            raise Pebkac(400, "cannot move a mountpoint")
 
         self.loud_reply("mv [{}] to [{}]".format(src, dst))
 

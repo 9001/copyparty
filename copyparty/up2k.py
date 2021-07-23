@@ -32,6 +32,7 @@ from .util import (
     s2hms,
     min_ex,
 )
+from .authsrv import AuthSrv
 from .mtag import MTag, MParser
 
 try:
@@ -44,16 +45,9 @@ DB_VER = 4
 
 
 class Up2k(object):
-    """
-    TODO:
-      * documentation
-      * registry persistence
-        * ~/.config flatfiles for active jobs
-    """
-
     def __init__(self, hub):
         self.hub = hub
-        self.asrv = hub.asrv
+        self.asrv = hub.asrv  # type: AuthSrv
         self.args = hub.args
         self.log_func = hub.log
 
@@ -1278,6 +1272,64 @@ class Up2k(object):
             rd, fn = s3enc(self.mem_cur, rd, fn)
             v = (wark, int(ts), sz, rd, fn)
             db.execute(sql, v)
+
+    def handle_rm(self, uname, vpath):
+        dirs = {}
+        permsets = [[True, False, False, True]]
+        vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+        atop = vn.canonical(rem)
+        adir, fn = os.path.split(atop)
+
+        fun = os.lstat if os.supports_follow_symlinks else os.stat
+        st = fun(fsenc(atop))
+        if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
+            g = [[os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
+        else:
+            scandir = not self.args.no_scandir
+            g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
+
+        n_files = 0
+        for dbv, vrem, _, atop, files, rd, vd in g:
+            dirs[atop] = 1
+            for fn in [x[0] for x in files]:
+                n_files += 1
+                abspath = os.path.join(atop, fn)
+                vpath = "{}/{}".format(vrem, fn).strip("/")
+                self.log("rm file {}\n  vpath: {}".format(abspath, vpath))
+                # dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+                # dbv, vrem = dbv.get_dbv(vrem)
+                _ = dbv.get(vrem, uname, *permsets[0])
+                with self.mutex:
+                    self._drop_file(dbv.realpath, vpath)
+
+        n_dirs = 0
+        for d in dirs.keys():
+            try:
+                os.rmdir(d)
+                n_dirs += 1
+            except:
+                pass
+
+        return "deleted {} files (and {}/{} folders)".format(n_files, n_dirs, len(dirs))
+
+    def _drop_file(self, ptop, vrem):
+        cur = self.cur.get(ptop)
+        if cur:
+            q = "delete from up where rd=? and fn=?"
+            rd, fn = os.path.split(vrem)
+            self.log("{}, [{}], [{}]".format(q, rd, fn))
+            # self.db_rm(cur, rd, fn)
+
+        reg = self.registry.get(ptop)
+        if reg:
+            wark = [
+                x
+                for x, y in reg.items()
+                if fn in [y["name"], y.get("tnam")] and y["prel"] == vrem
+            ]
+            if wark:
+                self.log("forgetting wark {}".format(wark[0]))
+                del reg[wark[0]]
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB

@@ -29,7 +29,13 @@ ebi('ops').innerHTML = (
 // media player
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
-	'<span id="wzip"><a' +
+	'<span id="wfm"><a' +
+	' href="#" id="fren" tt="rename selected item$NHotkey: F2">✎<span>name</span></a><a' +
+	' href="#" id="fdel" tt="delete selected items">⌫<span>delete</span></a><a' +
+	' href="#" id="fcut" tt="cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-shift-X">✂<span>cut</span></a><a' +
+	' href="#" id="fcpy" tt="copy selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-shift-C">⧉<span>copy</span></a><a' +
+	' href="#" id="fpst" tt="paste a previously cut/copied selection$NHotkey: ctrl-shift-V">📋<span>paste</span></a>' +
+	'</span><span id="wzip"><a' +
 	' href="#" id="selall" tt="select all files">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="invert selection">sel.<br />inv.</a><a' +
 	' href="#" id="selzip" tt="download selection as archive">zip</a>' +
@@ -37,7 +43,7 @@ ebi('widget').innerHTML = (
 	' href="#" id="npirc" tt="copy irc-formatted track info">📋irc</a><a' +
 	' href="#" id="nptxt" tt="copy plaintext track info">📋txt</a>' +
 	'</span><a' +
-	'	href="#" id="wtgrid">田</a><a' +
+	'	href="#" id="wtgrid" tt="toggle grid/list view">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +

@@ -242,6 +242,7 @@ class VFS(object):
         """
 
         fsroot, vfs_ls, vfs_virt = self.ls(rem, uname, scandir, permsets, lstat=lstat)
+        dbv, vrem = self.get_dbv(rem)
 
         if (
             seen
@@ -259,7 +260,7 @@ class VFS(object):
         rfiles.sort()
         rdirs.sort()
 
-        yield rel, fsroot, rfiles, rdirs, vfs_virt
+        yield dbv, vrem, rel, fsroot, rfiles, rdirs, vfs_virt
 
         for rdir, _ in rdirs:
             if not dots and rdir.startswith("."):
@@ -287,7 +288,7 @@ class VFS(object):
         f2b = "{0}.hist{0}".format(os.sep)
 
         g = self.walk("", vrem, [], uname, [[True]], dots, scandir, False)
-        for vpath, apath, files, rd, vd in g:
+        for _, _, vpath, apath, files, rd, vd in g:
             if flt:
                 files = [x for x in files if x[0] in flt]
 
@@ -795,7 +796,7 @@ class AuthSrv(object):
                 g = vn.walk(
                     "", "", [], u, True, [[True]], not self.args.no_scandir, False
                 )
-                for vpath, apath, files, _, _ in g:
+                for _, _, vpath, apath, files, _, _ in g:
                     fnames = [n[0] for n in files]
                     vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
                     vpaths = [vtop + x for x in vpaths]
