@@ -10,7 +10,7 @@ import threading
 import subprocess as sp
 
 from .__init__ import PY2, unicode
-from .util import fsenc, runcmd, Queue, Cooldown, BytesIO, min_ex
+from .util import fsenc, vsplit, runcmd, Queue, Cooldown, BytesIO, min_ex
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
 
@@ -73,12 +73,7 @@ def thumb_path(histpath, rem, mtime, fmt):
     # base16 = 16 = 256
     # b64-lc = 38 = 1444
     # base64 = 64 = 4096
-    try:
-        rd, fn = rem.rsplit("/", 1)
-    except:
-        rd = ""
-        fn = rem
-
+    rd, fn = vsplit(rem)
     if rd:
         h = hashlib.sha512(fsenc(rd)).digest()
         b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]

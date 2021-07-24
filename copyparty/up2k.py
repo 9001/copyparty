@@ -23,9 +23,11 @@ from .util import (
     ProgressPrinter,
     fsdec,
     fsenc,
+    absreal,
     sanitize_fn,
     ren_open,
     atomic_move,
+    vsplit,
     s3enc,
     s3dec,
     statdir,
@@ -418,7 +420,7 @@ class Up2k(object):
         if not ANYWIN:
             try:
                 # a bit expensive but worth
-                rcdir = os.path.realpath(cdir)
+                rcdir = absreal(cdir)
             except:
                 pass
 
@@ -1277,6 +1279,7 @@ class Up2k(object):
         dirs = {}
         permsets = [[True, False, False, True]]
         vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+        ptop = vn.realpath
         atop = vn.canonical(rem)
         adir, fn = os.path.split(atop)
 
@@ -1300,7 +1303,11 @@ class Up2k(object):
                 # dbv, vrem = dbv.get_dbv(vrem)
                 _ = dbv.get(vrem, uname, *permsets[0])
                 with self.mutex:
-                    self._drop_file(dbv.realpath, vpath)
+                    ptop = dbv.realpath
+                    cur, wark = self._find_from_vpath(ptop, vrem)
+                    self._forget_file(ptop, vpath, cur, wark)
+
+                os.unlink(abspath)
 
         n_dirs = 0
         for d in dirs.keys():
@@ -1312,24 +1319,162 @@ class Up2k(object):
 
         return "deleted {} files (and {}/{} folders)".format(n_files, n_dirs, len(dirs))
 
-    def _drop_file(self, ptop, vrem):
+    def _handle_mv(self, uname, svp, dvp):
+        svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
+        dvn, drem = self.asrv.vfs.get(dvp, uname, False, True)
+        sabs = svn.canonical(srem)
+        dabs = dvn.canonical(drem)
+        drd, dfn = vsplit(drem)
+
+        if not srem:
+            raise Pebkac(400, "mv: cannot move a mountpoint")
+
+        if os.path.exists(dabs):
+            raise Pebkac(400, "mv: target file exists")
+
+        c1, w = self._find_from_vpath(svn.realpath, srem)
+        c2 = self.cur.get(dvn.realpath)
+        if c1 and c2:
+            q = "select rd, fn from up where substr(w,1,16)=? and w=?"
+            hit = c2.execute(q, (w[:16], w)).fetchone()
+            if hit:
+                # found in dest vol, just need a symlink
+                rd, fn = hit
+                if rd.startswith("//") or fn.startswith("//"):
+                    rd, fn = s3dec(rd, fn)
+
+                slabs = "{}/{}".join(rd, fn).strip("/")
+                slabs = absreal(os.path.join(dvn.realpath, slabs))
+                if os.path.exists(fsenc(slabs)):
+                    self.log("mv: quick relink, nice")
+                    self._symlink(fsenc(slabs), fsenc(dabs))
+                    st = os.stat(fsenc(sabs))
+                    self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
+                    os.unlink(fsenc(sabs))
+                else:
+                    self.log("mv: file in db missing? whatever, fixed")
+                    os.rename(fsenc(sabs), fsenc(slabs))
+
+                self._forget_file(svn.realpath, srem, c1, w)
+                return "k"
+
+            # not found in dst vol; copy info
+            self.log("mv: plain move")
+            self._copy_tags(c1, c2, w)
+            self._forget_file(svn.realpath, srem, c1, w)
+            st = os.stat(fsenc(sabs))
+            self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
+            os.rename(fsenc(sabs), fsenc(dabs))
+            return "k"
+
+    def _copy_tags(self, csrc, cdst, wark):
+        """copy all tags for wark from src-db to dst-db"""
+        w = wark[:16]
+
+        if cdst.execute("select * from mt where w=? limit 1", (w,)).fetchone():
+            return  # existing tags in dest db
+
+        for _, k, v in csrc.execute("select * from mt where w=?", (w,)):
+            cdst.execute("insert into mt values(?,?,?)", (w, k, v))
+
+    def _find_from_vpath(self, ptop, vrem):
         cur = self.cur.get(ptop)
-        if cur:
-            q = "delete from up where rd=? and fn=?"
-            rd, fn = os.path.split(vrem)
-            self.log("{}, [{}], [{}]".format(q, rd, fn))
-            # self.db_rm(cur, rd, fn)
+        if not cur:
+            return None, None
+
+        rd, fn = vsplit(vrem)
+        q = "select w from up where rd=? and fn=? limit 1"
+        try:
+            c = cur.execute(q, (rd, fn))
+        except:
+            c = cur.execute(q, s3enc(self.mem_cur, rd, fn))
+
+        wark = c.fetchone()
+        if wark:
+            return cur, wark[0]
+        return cur, None
+
+    def _forget_file(self, ptop, vrem, cur, wark):
+        """forgets file in db, fixes symlinks, does not delete"""
+        fn = vrem.split("/")[-1]
+        wark = None
+        dupes = []
+
+        self.log("forgetting {}".format(vrem))
+        if wark:
+            # found in db; find dupes
+            wark = wark[0]
+            self.log("found {} in db".format(wark))
+
+            q = "select rd, fn from up where substr(w,1,16)=? and w=?"
+            for rd, fn in cur.execute(q, (wark[:16], wark)):
+                if rd.startswith("//") or fn.startswith("//"):
+                    rd, fn = s3dec(rd, fn)
+
+                dvrem = "/".join([rd, fn]).strip("/")
+                if vrem != dvrem:
+                    dupes.append(dvrem)
+                    self.log("found {} dupe: {}".format(q, dvrem))
+
+        if dupes:
+            # fix symlinks
+            self._relink(ptop, dupes, vrem, None)
+        else:
+            # drop tags
+            q = "delete from mt where w=?"
+            cur.execute(q, (wark[:16],))
 
         reg = self.registry.get(ptop)
         if reg:
-            wark = [
-                x
-                for x, y in reg.items()
-                if fn in [y["name"], y.get("tnam")] and y["prel"] == vrem
-            ]
-            if wark:
-                self.log("forgetting wark {}".format(wark[0]))
-                del reg[wark[0]]
+            if not wark:
+                wark = [
+                    x
+                    for x, y in reg.items()
+                    if fn in [y["name"], y.get("tnam")] and y["prel"] == vrem
+                ]
+
+            if wark and wark in reg:
+                m = "forgetting partial upload {} ({})"
+                p = self._vis_job_progress(wark)
+                self.log(m.format(wark, p))
+                del reg[wark]
+
+    def _relink(self, ptop, dupes, vp1, vp2):
+        """
+        update symlinks from file at vp1 to vp2 (rename),
+        or to first remaining full if no vp2 (delete)
+        """
+
+        if not dupes:
+            return
+
+        def gabs(v):
+            return fsdec(os.path.abspath(fsenc(os.path.join(ptop, v))))
+
+        full = {}
+        links = {}
+        for vp in dupes:
+            ap = gabs(vp)
+            d = links if os.path.islink(ap) else full
+            d[vp] = ap
+
+        if not vp2 and not full:
+            # deleting final remaining full copy; swap it with a symlink
+            dvp = links.keys()[0]
+            dabs = links.pop(dvp)
+            sabs = gabs(vp1)
+            self.log("linkswap [{}] and [{}]".format(sabs, dabs))
+            os.unlink(dabs)
+            os.rename(sabs, dabs)
+            os.link(sabs, dabs)
+            full[vp1] = sabs
+
+        dvp = vp2 if vp2 else full.keys()[0]
+        dabs = gabs(dvp)
+        for alink in links.values():
+            self.log("relinking [{}] to [{}]".format(alink, dabs))
+            os.unlink(alink)
+            os.link(alink, dabs)
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB

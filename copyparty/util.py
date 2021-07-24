@@ -758,6 +758,19 @@ def sanitize_fn(fn, ok, bad):
     return fn.strip()
 
 
+def absreal(fpath):
+    try:
+        return fsdec(os.path.abspath(os.path.realpath(fsenc(fpath))))
+    except:
+        if not WINDOWS:
+            raise
+
+        # cpython bug introduced in 3.8, still exists in 3.9.1,
+        # some win7sp1 and win10:20H2 boxes cannot realpath a
+        # networked drive letter such as b"n:" or b"n:\\"
+        return os.path.abspath(os.path.realpath(fpath))
+
+
 def u8safe(txt):
     try:
         return txt.encode("utf-8", "xmlcharrefreplace").decode("utf-8", "replace")
@@ -813,6 +826,13 @@ def unquotep(txt):
     # btxt = btxt.replace(b"+", b" ")
     unq2 = unquote(btxt)
     return w8dec(unq2)
+
+
+def vsplit(vpath):
+    if "/" not in vpath:
+        return "", vpath
+
+    return vpath.rsplit("/", 1)
 
 
 def w8dec(txt):

@@ -1558,19 +1558,15 @@ class HttpCli(object):
         if self.args.no_mv:
             raise Pebkac(403, "disabled by argv")
 
+        # full path of new loc (incl filename)
         dst = self.uparam.get("to")
         if dst is None:
             raise Pebkac(400, "need dst vpath")
 
-        svn, srem = self.asrv.vfs.get(self.vpath, self.uname, True, False, True)
-        dvn, drem = self.asrv.vfs.get(dst, self.uname, False, True)
-        src = svn.canonical(srem)
-        dst = dvn.canonical(drem)
-
-        if not srem:
-            raise Pebkac(400, "cannot move a mountpoint")
-
-        self.loud_reply("mv [{}] to [{}]".format(src, dst))
+        x = self.conn.hsrv.broker.put(
+            True, "up2k.handle_mv", self.uname, self.vpath, dst
+        )
+        self.loud_reply(x.get())
 
     def tx_browser(self):
         vpath = ""

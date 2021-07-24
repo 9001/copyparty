@@ -10,7 +10,7 @@ import hashlib
 import threading
 
 from .__init__ import WINDOWS
-from .util import IMPLICATIONS, uncyg, undot, Pebkac, fsdec, fsenc, statdir
+from .util import IMPLICATIONS, uncyg, undot, absreal, Pebkac, fsdec, fsenc, statdir
 
 
 class AXS(object):
@@ -185,27 +185,7 @@ class VFS(object):
         if rem:
             rp += "/" + rem
 
-        try:
-            return fsdec(os.path.realpath(fsenc(rp)))
-        except:
-            if not WINDOWS:
-                raise
-
-            # cpython bug introduced in 3.8, still exists in 3.9.1;
-            # some win7sp1 and win10:20H2 boxes cannot realpath a
-            # networked drive letter such as b"n:" or b"n:\\"
-            #
-            # requirements to trigger:
-            #  * bytestring (not unicode str)
-            #  * just the drive letter (subfolders are ok)
-            #  * networked drive (regular disks and vmhgfs are ok)
-            #  * on an enterprise network (idk, cannot repro with samba)
-            #
-            # hits the following exceptions in succession:
-            #  * access denied at L601: "path = _getfinalpathname(path)"
-            #  * "cant concat str to bytes" at L621: "return path + tail"
-            #
-            return os.path.realpath(rp)
+        return absreal(rp)
 
     def ls(self, rem, uname, scandir, permsets, lstat=False):
         # type: (str, str, bool, list[list[bool]], bool) -> tuple[str, str, dict[str, VFS]]
@@ -500,7 +480,7 @@ class AuthSrv(object):
             cased = {}
             for k, v in mount.items():
                 try:
-                    cased[k] = fsdec(os.path.realpath(fsenc(v)))
+                    cased[k] = absreal(v)
                 except:
                     cased[k] = v
 
@@ -597,7 +577,7 @@ class AuthSrv(object):
                     vol.histpath = hpath
                     break
 
-            vol.histpath = os.path.realpath(vol.histpath)
+            vol.histpath = absreal(vol.histpath)
             if vol.dbv:
                 if os.path.exists(os.path.join(vol.histpath, "up2k.db")):
                     promote.append(vol)
