@@ -16,6 +16,11 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [thumbnails](#thumbnails) // [md-viewer](#markdown-viewer) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [ie4](#browser-support)
 
 
+## breaking changes \o/
+
+this is the readme for v0.12 (unreleased) which has a different expression for volume permissions (`-v`); see [the v0.11.x readme](https://github.com/9001/copyparty/tree/15b59822112dda56cee576df30f331252fc62628#readme) for stuff regarding the [current stable release](https://github.com/9001/copyparty/releases/tag/v0.11.47)
+
+
 ## readme toc
 
 * top
@@ -66,15 +71,14 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
 
-running the sfx without arguments (for example doubleclicking it on Windows) will give everyone full access to the current folder; see `-h` for help if you want accounts and volumes etc
+running the sfx without arguments (for example doubleclicking it on Windows) will give everyone full access to the current folder; see `-h` for help if you want [accounts and volumes](#accounts-and-volumes) etc
 
 some recommended options:
 * `-e2dsa` enables general file indexing, see [search configuration](#search-configuration)
 * `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies)
-* `-v /mnt/music:/music:r:afoo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, with user `foo` as `a`dmin (read/write), password `bar`
-  * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
-  * replace `:r:afoo` with `:rfoo` to only make the folder readable by `foo` and nobody else
-  * in addition to `r`ead and `a`dmin, `w`rite makes a folder write-only, so cannot list/access files in it
+* `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
+  * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
+  * see [accounts and volumes](#accounts-and-volumes) for the syntax and other access levels (`r`ead, `w`rite, `m`ove, `d`elete)
 * `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access
 
 you may also want these, especially on servers:
@@ -117,7 +121,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ sanic multipart parser
   * ☑ multiprocessing (actual multithreading)
   * ☑ volumes (mountpoints)
-  * ☑ accounts
+  * ☑ [accounts](#accounts-and-volumes)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ up2k: js, resumable, multithreaded
@@ -178,6 +182,30 @@ small collection of user feedback
   * use `--hist` or the `hist` volflag (`-v [...]:chist=/tmp/foo`) to place the db inside the vm instead
 
 
+# accounts and volumes
+
+* `-a usr:pwd` adds account `usr` with password `pwd`
+* `-v .::r` adds current-folder `.` as the webroot, `r`eadable by anyone
+  * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
+  * when granting permissions to an account, the names are comma-separated: `-v .::r,usr1,usr2:rw,usr3,usr4`
+
+permissions:
+* `r` (read): browse folder contents, download files, download as zip/tar
+* `w` (write): upload files, move files *into* folder
+* `m` (move): move files/folders *from* folder
+* `d` (delete): delete files/folders
+
+example:
+* add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
+* make folder `/srv` the root of the filesystem, read-only by anyone: `-v /srv::r`
+* make folder `/mnt/music` available at `/music`, read-only for u1 and u2, read-write for u3: `-v /mnt/music:music:r,u1,u2:rw,u3`
+  * unauthorized users accessing the webroot can see that the `music` folder exists, but cannot open it
+* make folder `/mnt/incoming` available at `/inc`, write-only for u1, read-move for u2: `-v /mnt/incoming:inc:w,u1:rm,u2`
+  * unauthorized users accessing the webroot can see that the `inc` folder exists, but cannot open it
+  * `u1` can open the `inc` folder, but cannot see the contents, only upload new files to it
+  * `u2` can browse it and move files *from* `/inc` into any folder where `u2` has write-access
+
+
 # the browser
 
 ![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/115978054-65106380-a57d-11eb-98f8-59e3dee73557.png)
@@ -230,6 +258,7 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
   * `^u` jump to next unicode character
   * `^e` toggle editor / preview
   * `^up, ^down` jump paragraphs
+
 
 ## tree-mode
 
