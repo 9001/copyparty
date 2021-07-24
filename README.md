@@ -40,6 +40,7 @@ this is the readme for v0.12 (unreleased) which has a different expression for v
     * [zip downloads](#zip-downloads)
     * [uploading](#uploading)
         * [file-search](#file-search)
+    * [file manager](#file-manager)
     * [markdown viewer](#markdown-viewer)
     * [other tricks](#other-tricks)
 * [searching](#searching)
@@ -230,6 +231,9 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
 * `M` parent folder (or unexpand current)
 * `G` toggle list / grid view
 * `T` toggle thumbnails / icons
+* `ctrl-X` cut selected files/folders
+* `ctrl-V` paste
+* `F2` rename selected file/folder
 * when playing audio:
   * `J/L` prev/next song
   * `U/O` skip 10sec back/forward
@@ -350,6 +354,13 @@ adding the same file multiple times is blocked, so if you first search for a fil
 note that since up2k has to read the file twice, `[🎈 bup]` can be up to 2x faster in extreme cases (if your internet connection is faster than the read-speed of your HDD)
 
 up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
+
+
+## file manager
+
+if you have the required permissions, you can cut/paste, rename, and delete files/folders
+
+you can move files across browser tabs (cut in one tab, paste in another)
 
 
 ## markdown viewer

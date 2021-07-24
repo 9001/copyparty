@@ -432,6 +432,27 @@ html.light #ggrid a.sel {
 	font-size: .6em;
 	display: block;
 }
+#wfm a:not(.en) {
+	opacity: .3;
+	color: #f6c;
+}
+html.light #wfm a:not(.en) {
+	color: #c4a;
+}
+#files tbody td.c1 {
+	animation: fcut1 .5s ease-out;
+}
+#files tbody td.c2 {
+	animation: fcut2 .5s ease-out;
+}
+@keyframes fcut1 {
+	0% {opacity:0}
+	100% {opacity:1}
+}
+@keyframes fcut2 {
+	0% {opacity:0}
+	100% {opacity:1}
+}
 #wzip a {
 	font-size: .4em;
 	margin: -.3em .3em;

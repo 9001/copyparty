@@ -31,10 +31,9 @@ ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wfm"><a' +
 	' href="#" id="fren" tt="rename selected item$NHotkey: F2">✎<span>name</span></a><a' +
-	' href="#" id="fdel" tt="delete selected items">⌫<span>delete</span></a><a' +
-	' href="#" id="fcut" tt="cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-shift-X">✂<span>cut</span></a><a' +
-	' href="#" id="fcpy" tt="copy selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-shift-C">⧉<span>copy</span></a><a' +
-	' href="#" id="fpst" tt="paste a previously cut/copied selection$NHotkey: ctrl-shift-V">📋<span>paste</span></a>' +
+	' href="#" id="fdel" tt="delete selected items$NHotkey: ctrl-K">⌫<span>delete</span></a><a' +
+	' href="#" id="fcut" tt="cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X">✂<span>cut</span></a><a' +
+	' href="#" id="fpst" tt="paste a previously cut/copied selection$NHotkey: ctrl-V">📋<span>paste</span></a>' +
 	'</span><span id="wzip"><a' +
 	' href="#" id="selall" tt="select all files">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="invert selection">sel.<br />inv.</a><a' +
@@ -1465,6 +1464,132 @@ function play_linked() {
 })();
 
 
+var fileman = (function () {
+	var bren = ebi('fren'),
+		bdel = ebi('fdel'),
+		bcut = ebi('fcut'),
+		bpst = ebi('fpst'),
+		r = {};
+
+	r.clip = null;
+	r.bus = new BroadcastChannel("fileman_bus");
+
+	r.render = function () {
+		if (r.clip === null)
+			r.clip = jread('fman_clip', []);
+
+		var sel = msel.getsel();
+		clmod(bren, 'en', sel.length == 1);
+		clmod(bdel, 'en', sel.length);
+		clmod(bcut, 'en', sel.length);
+		clmod(bpst, 'en', r.clip && r.clip.length);
+		bren.style.display = has(perms, 'write') && has(perms, 'move') ? '' : 'none';
+		bdel.style.display = has(perms, 'delete') ? '' : 'none';
+		bcut.style.display = has(perms, 'move') ? '' : 'none';
+		bpst.style.display = has(perms, 'write') ? '' : 'none';
+		bpst.setAttribute('tt', 'paste ' + r.clip.length + ' items$NHotkey: ctrl-V');
+	};
+
+	r.rename = function (e) {
+		ev(e);
+		var sel = msel.getsel();
+		if (sel.length !== 1)
+			return alert('select exactly 1 item to rename');
+
+		var fn = prompt('new filename:', sel[0]);
+		if (!fn || fn == sel[0])
+			return alert('aborted');
+	};
+
+	r.delete = function (e) {
+		ev(e);
+		var sel = msel.getsel(),
+			req = msel.selu;
+
+		if (!sel.length)
+			return alert('select at least 1 item to delete');
+
+		if (!confirm('===== DANGER =====\nDELETE these ' + req.length + ' items?\n\n' + req.join('\n')))
+			return;
+
+		if (!confirm('Last chance! Delete?'))
+			return;
+	};
+
+	r.cut = function (e) {
+		ev(e);
+		var sel = msel.getsel(),
+			vsel = msel.selu;
+
+		if (!sel.length)
+			return alert('select at least 1 item to cut');
+
+		var tds = QSA('#files tbody tr.sel td');
+		for (var a = 0; a < tds.length; a++) {
+			var cl = tds[a].classList, inv = cl.contains('c1');
+			cl.remove(inv ? 'c1' : 'c2');
+			cl.add(inv ? 'c2' : 'c1');
+		}
+
+		jwrite('fman_clip', vsel);
+		r.tx();
+	};
+
+	r.paste = function (e) {
+		ev(e);
+		if (!r.clip.length)
+			return alert('first cut some items to paste\n\nnote: you can cut/paste across different tabs');
+
+		var req = [],
+			exists = [],
+			indir = [],
+			links = QSA('#files tbody td:nth-child(2) a');
+
+		for (var a = 0, aa = links.length; a < aa; a++)
+			indir.push(links[a].getAttribute('name'));
+
+		for (var a = 0; a < r.clip.length; a++) {
+			var found = false;
+			for (var b = 0; b < indir.length; b++) {
+				if (r.clip[a].endsWith('/' + indir[b])) {
+					exists.push(r.clip[a]);
+					found = true;
+				}
+			}
+			if (!found)
+				req.push(r.clip[a]);
+		}
+
+		if (exists.length)
+			alert('these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + exists.join('\n'));
+
+		if (!confirm('paste these ' + req.length + ' items here?\n\n' + req.join('\n')))
+			return;
+
+		jwrite('fman_clip', []);
+		r.tx();
+	};
+
+	r.bus.onmessage = function () {
+		console.log('fman onmsg');
+		r.clip = null;
+		r.render();
+	};
+
+	r.tx = function () {
+		r.bus.postMessage(1);
+		r.bus.onmessage();
+	};
+
+	bren.onclick = r.rename;
+	bdel.onclick = r.delete;
+	bcut.onclick = r.cut;
+	bpst.onclick = r.paste;
+
+	return r;
+})();
+
+
 var thegrid = (function () {
 	var lfiles = ebi('files'),
 		gfiles = mknod('div');
@@ -1794,13 +1919,26 @@ document.onkeydown = function (e) {
 	if (!document.activeElement || document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
 		return;
 
-	if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+	if (e.altKey || e.isComposing)
 		return;
 
 	if (QS('#bbox-overlay.visible'))
 		return;
 
 	var k = e.code + '', pos = -1, n;
+
+	if (ctrl(e)) {
+		if (k == 'KeyX')
+			return fileman.cut();
+
+		if (k == 'KeyV')
+			return fileman.paste();
+
+		if (k == 'KeyK')
+			return fileman.delete();
+
+		return;
+	}
 
 	if (e.shiftKey && k != 'KeyA' && k != 'KeyD')
 		return;
@@ -1839,6 +1977,9 @@ document.onkeydown = function (e) {
 
 	if (k == 'KeyT')
 		return ebi('thumbs').click();
+
+	if (k == 'F2')
+		return fileman.rename();
 
 	if (!treectl.hidden && (!e.shiftKey || !thegrid.en)) {
 		if (k == 'KeyA')
@@ -3026,18 +3167,35 @@ var arcfmt = (function () {
 
 
 var msel = (function () {
-	function getsel() {
-		var names = [],
-			links = QSA('#files tbody tr.sel td:nth-child(2) a');
+	var r = {};
+	r.selu = null;
+	r.seln = null;
 
-		for (var a = 0, aa = links.length; a < aa; a++)
-			names.push(links[a].getAttribute('href').replace(/\/$/, "").split('/').slice(-1));
+	r.getsel = function () {
+		if (r.seln !== null)
+			return r.seln;
 
-		return names;
+		r.selu = [];
+		r.seln = [];
+		var links = QSA('#files tbody tr.sel td:nth-child(2) a'),
+			vbase = get_evpath();
+
+		for (var a = 0, aa = links.length; a < aa; a++) {
+			var url = links[a].getAttribute('href').replace(/\/$/, ""),
+				name = url.split('/').slice(-1);
+
+			r.selu.push(url.indexOf('/') !== -1 ? url : vbase + url);
+			r.seln.push(name);
+			links[a].setAttribute('name', name);
+		}
+
+		return r.seln;
 	}
 	function selui() {
-		clmod(ebi('wtoggle'), 'sel', getsel().length);
+		r.selu = r.seln = null;
+		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
 		thegrid.loadsel();
+		fileman.render();
 	}
 	function seltgl(e) {
 		ev(e);
@@ -3060,7 +3218,7 @@ var msel = (function () {
 	};
 	ebi('selzip').onclick = function (e) {
 		ev(e);
-		var names = getsel(),
+		var names = r.getsel(),
 			arg = ebi('selzip').getAttribute('fmt'),
 			txt = names.join('\n'),
 			frm = mknod('form');
@@ -3083,16 +3241,16 @@ var msel = (function () {
 		console.log(txt);
 		frm.submit();
 	};
-	function render() {
+	r.render = function () {
 		var tds = QSA('#files tbody td+td+td');
 		for (var a = 0, aa = tds.length; a < aa; a++) {
 			tds[a].onclick = seltgl;
 		}
+		r.selu = r.seln = null;
 		arcfmt.render();
+		fileman.render();
 	}
-	return {
-		"render": render
-	};
+	return r;
 })();
 
 

@@ -1357,14 +1357,21 @@ class Up2k(object):
                 self._forget_file(svn.realpath, srem, c1, w)
                 return "k"
 
-            # not found in dst vol; copy info
-            self.log("mv: plain move")
+        # not found in dst db; copy info
+        self.log("mv: plain move")
+        st = bos.stat(sabs)
+
+        if c1 and c2:
             self._copy_tags(c1, c2, w)
+
+        if c1:
             self._forget_file(svn.realpath, srem, c1, w)
-            st = bos.stat(sabs)
+
+        if c2:
             self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
-            bos.rename(sabs, dabs)
-            return "k"
+
+        bos.rename(sabs, dabs)
+        return "k"
 
     def _copy_tags(self, csrc, cdst, wark):
         """copy all tags for wark from src-db to dst-db"""
