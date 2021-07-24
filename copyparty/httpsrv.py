@@ -308,7 +308,7 @@ class HttpSrv(object):
             try:
                 with os.scandir(os.path.join(E.mod, "web")) as dh:
                     for fh in dh:
-                        inf = fh.stat(follow_symlinks=False)
+                        inf = fh.stat()
                         v = max(v, inf.st_mtime)
             except:
                 pass

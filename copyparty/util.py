@@ -1034,11 +1034,11 @@ def sendfile_kern(lower, upper, f, s):
 
 
 def statdir(logger, scandir, lstat, top):
-    lstat = lstat and os.supports_follow_symlinks
     try:
         btop = fsenc(top)
         if scandir and hasattr(os, "scandir"):
             src = "scandir"
+            lstat = lstat and os.supports_follow_symlinks
             with os.scandir(btop) as dh:
                 for fh in dh:
                     try:

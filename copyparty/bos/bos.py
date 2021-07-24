@@ -10,8 +10,8 @@ from . import path
 # printf 'os\.(%s)' "$(grep ^def bos/__init__.py | gsed -r 's/^def //;s/\(.*//' | tr '\n' '|' | gsed -r 's/.$//')"
 
 
-def chmod(p, mode, follow_symlinks=True):
-    return os.chmod(fsenc(p), mode, follow_symlinks=follow_symlinks)
+def chmod(p, mode):
+    return os.chmod(fsenc(p), mode)
 
 
 def listdir(p="."):
@@ -22,8 +22,8 @@ def lstat(p):
     return os.lstat(fsenc(p))
 
 
-def makedirs(name, mode=0o755, exist_ok=None):
-    return os.makedirs(fsenc(name), mode=mode, exist_ok=exist_ok)
+def makedirs(name, mode=0o755):
+    return os.makedirs(fsenc(name), mode=mode)
 
 
 def mkdir(p, mode=0o755):
@@ -42,13 +42,13 @@ def rmdir(p):
     return os.rmdir(fsenc(p))
 
 
-def stat(p, follow_symlinks=True):
-    return os.stat(fsenc(p), follow_symlinks=follow_symlinks)
+def stat(p):
+    return os.stat(fsenc(p))
 
 
 def unlink(p):
     return os.unlink(fsenc(p))
 
 
-def utime(p, times=None, follow_symlinks=True):
-    return os.utime(fsenc(p), times, follow_symlinks=follow_symlinks)
+def utime(p, times=None):
+    return os.utime(fsenc(p), times)

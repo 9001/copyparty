@@ -381,7 +381,7 @@ def main(argv=None):
 
     nstrs = []
     anymod = False
-    for ostr in al.v:
+    for ostr in al.v or []:
         mod = False
         oa = ostr.split(":")
         na = oa[:2]

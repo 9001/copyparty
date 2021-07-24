@@ -1283,9 +1283,7 @@ class Up2k(object):
         ptop = vn.realpath
         atop = vn.canonical(rem)
         adir, fn = os.path.split(atop)
-
-        fun = bos.lstat if os.supports_follow_symlinks else bos.stat
-        st = fun(atop)
+        st = bos.lstat(atop)
         if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
             g = [[os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
         else:
