@@ -1,12 +1,12 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
 import tarfile
 import threading
 
 from .sutil import errdesc
 from .util import Queue, fsenc
+from .bos import bos
 
 
 class QFile(object):
@@ -61,7 +61,7 @@ class StreamTar(object):
 
         yield None
         if self.errf:
-            os.unlink(self.errf["ap"])
+            bos.unlink(self.errf["ap"])
 
     def ser(self, f):
         name = f["vp"]

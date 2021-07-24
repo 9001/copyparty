@@ -28,6 +28,7 @@ except ImportError:
 
 from .__init__ import E, PY2, MACOS
 from .util import spack, min_ex, start_stackmon, start_log_thrs
+from .bos import bos
 from .httpconn import HttpConn
 
 if PY2:
@@ -73,7 +74,7 @@ class HttpSrv(object):
         }
 
         cert_path = os.path.join(E.cfg, "cert.pem")
-        if os.path.exists(cert_path):
+        if bos.path.exists(cert_path):
             self.cert_path = cert_path
         else:
             self.cert_path = None

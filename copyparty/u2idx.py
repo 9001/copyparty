@@ -9,6 +9,7 @@ from datetime import datetime
 
 from .__init__ import unicode
 from .util import s3dec, Pebkac, min_ex
+from .bos import bos
 from .up2k import up2k_wark_from_hashlist
 
 
@@ -67,7 +68,7 @@ class U2idx(object):
 
         histpath = self.asrv.vfs.histtab[ptop]
         db_path = os.path.join(histpath, "up2k.db")
-        if not os.path.exists(db_path):
+        if not bos.path.exists(db_path):
             return None
 
         cur = sqlite3.connect(db_path, 2).cursor()

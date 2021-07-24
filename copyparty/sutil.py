@@ -1,10 +1,11 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
 import time
 import tempfile
 from datetime import datetime
+
+from .bos import bos
 
 
 def errdesc(errors):
@@ -20,9 +21,9 @@ def errdesc(errors):
     dt = datetime.utcfromtimestamp(time.time())
     dt = dt.strftime("%Y-%m%d-%H%M%S")
 
-    os.chmod(tf_path, 0o444)
+    bos.chmod(tf_path, 0o444)
     return {
         "vp": "archive-errors-{}.txt".format(dt),
         "ap": tf_path,
-        "st": os.stat(tf_path),
+        "st": bos.stat(tf_path),
     }, report

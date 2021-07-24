@@ -15,6 +15,7 @@ import calendar
 
 from .__init__ import E, PY2, WINDOWS, ANYWIN, unicode
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
+from .bos import bos
 from .authsrv import AuthSrv
 from .szip import StreamZip
 from .star import StreamTar
@@ -615,11 +616,11 @@ class HttpCli(object):
         if sub:
             try:
                 dst = os.path.join(vfs.realpath, rem)
-                if not os.path.isdir(fsenc(dst)):
-                    os.makedirs(fsenc(dst))
+                if not bos.path.isdir(dst):
+                    bos.makedirs(dst)
             except OSError as ex:
                 self.log("makedirs failed [{}]".format(dst))
-                if not os.path.isdir(fsenc(dst)):
+                if not bos.path.isdir(dst):
                     if ex.errno == 13:
                         raise Pebkac(500, "the server OS denied write-access")
 
@@ -765,7 +766,7 @@ class HttpCli(object):
             times = (int(time.time()), int(lastmod))
             self.log("no more chunks, setting times {}".format(times))
             try:
-                os.utime(fsenc(path), times)
+                bos.utime(path, times)
             except:
                 self.log("failed to utime ({}, {})".format(path, times))
 
@@ -810,14 +811,14 @@ class HttpCli(object):
             fdir = os.path.join(vfs.realpath, rem)
             fn = os.path.join(fdir, sanitized)
 
-            if not os.path.isdir(fsenc(fdir)):
+            if not bos.path.isdir(fdir):
                 raise Pebkac(500, "parent folder does not exist")
 
-            if os.path.isdir(fsenc(fn)):
+            if bos.path.isdir(fn):
                 raise Pebkac(500, "that folder exists already")
 
             try:
-                os.mkdir(fsenc(fn))
+                bos.mkdir(fn)
             except OSError as ex:
                 if ex.errno == 13:
                     raise Pebkac(500, "the server OS denied write-access")
@@ -847,7 +848,7 @@ class HttpCli(object):
             fdir = os.path.join(vfs.realpath, rem)
             fn = os.path.join(fdir, sanitized)
 
-            if os.path.exists(fsenc(fn)):
+            if bos.path.exists(fn):
                 raise Pebkac(500, "that file exists already")
 
             with open(fsenc(fn), "wb") as f:
@@ -877,7 +878,7 @@ class HttpCli(object):
                         p_file, "", [".prologue.html", ".epilogue.html"]
                     )
 
-                    if not os.path.isdir(fsenc(fdir)):
+                    if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")
 
                     suffix = ".{:.6f}-{}".format(time.time(), self.ip)
@@ -916,10 +917,10 @@ class HttpCli(object):
 
                         suffix = ".PARTIAL"
                         try:
-                            os.rename(fsenc(fp), fsenc(fp2 + suffix))
+                            bos.rename(fp, fp2 + suffix)
                         except:
                             fp2 = fp2[: -len(suffix) - 1]
-                            os.rename(fsenc(fp), fsenc(fp2 + suffix))
+                            bos.rename(fp, fp2 + suffix)
 
                     raise
 
@@ -1017,7 +1018,7 @@ class HttpCli(object):
         fp = os.path.join(vfs.realpath, rem)
         srv_lastmod = srv_lastmod3 = -1
         try:
-            st = os.stat(fsenc(fp))
+            st = bos.stat(fp)
             srv_lastmod = st.st_mtime
             srv_lastmod3 = int(srv_lastmod * 1000)
         except OSError as ex:
@@ -1056,10 +1057,10 @@ class HttpCli(object):
             mdir, mfile = os.path.split(fp)
             mfile2 = "{}.{:.3f}.md".format(mfile[:-3], srv_lastmod)
             try:
-                os.mkdir(fsenc(os.path.join(mdir, ".hist")))
+                bos.mkdir(os.path.join(mdir, ".hist"))
             except:
                 pass
-            os.rename(fsenc(fp), fsenc(os.path.join(mdir, ".hist", mfile2)))
+            bos.rename(fp, os.path.join(mdir, ".hist", mfile2))
 
         p_field, _, p_data = next(self.parser.gen)
         if p_field != "body":
@@ -1068,7 +1069,7 @@ class HttpCli(object):
         with open(fsenc(fp), "wb", 512 * 1024) as f:
             sz, sha512, _ = hashcopy(p_data, f)
 
-        new_lastmod = os.stat(fsenc(fp)).st_mtime
+        new_lastmod = bos.stat(fp).st_mtime
         new_lastmod3 = int(new_lastmod * 1000)
         sha512 = sha512[:56]
 
@@ -1113,7 +1114,7 @@ class HttpCli(object):
         for ext in ["", ".gz", ".br"]:
             try:
                 fs_path = req_path + ext
-                st = os.stat(fsenc(fs_path))
+                st = bos.stat(fs_path)
                 file_ts = max(file_ts, st.st_mtime)
                 editions[ext or "plain"] = [fs_path, st.st_size]
             except:
@@ -1365,10 +1366,10 @@ class HttpCli(object):
         html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
         template = self.j2(tpl)
 
-        st = os.stat(fsenc(fs_path))
+        st = bos.stat(fs_path)
         ts_md = st.st_mtime
 
-        st = os.stat(fsenc(html_path))
+        st = bos.stat(html_path)
         ts_html = st.st_mtime
 
         sz_md = 0
@@ -1585,7 +1586,7 @@ class HttpCli(object):
         dbv, vrem = vn.get_dbv(rem)
 
         try:
-            st = os.stat(fsenc(abspath))
+            st = bos.stat(abspath)
         except:
             raise Pebkac(404)
 
@@ -1601,7 +1602,7 @@ class HttpCli(object):
                 if is_dir:
                     for fn in self.args.th_covers.split(","):
                         fp = os.path.join(abspath, fn)
-                        if os.path.exists(fp):
+                        if bos.path.exists(fp):
                             vrem = "{}/{}".format(vrem.rstrip("/"), fn)
                             is_dir = False
                             break
@@ -1675,7 +1676,7 @@ class HttpCli(object):
         logues = ["", ""]
         for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
             fn = os.path.join(abspath, fn)
-            if os.path.exists(fsenc(fn)):
+            if bos.path.exists(fn):
                 with open(fsenc(fn), "rb") as f:
                     logues[n] = f.read().decode("utf-8")
 
@@ -1739,7 +1740,7 @@ class HttpCli(object):
         histdir = os.path.join(fsroot, ".hist")
         ptn = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[^\.]+)$")
         try:
-            for hfn in os.listdir(histdir):
+            for hfn in bos.listdir(histdir):
                 m = ptn.match(hfn)
                 if not m:
                     continue
@@ -1780,7 +1781,7 @@ class HttpCli(object):
                 fspath = fsroot + "/" + fn
 
             try:
-                inf = stats.get(fn) or os.stat(fsenc(fspath))
+                inf = stats.get(fn) or bos.stat(fspath)
             except:
                 self.log("broken symlink: {}".format(repr(fspath)))
                 continue

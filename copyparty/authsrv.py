@@ -11,6 +11,7 @@ import threading
 
 from .__init__ import WINDOWS
 from .util import IMPLICATIONS, uncyg, undot, absreal, Pebkac, fsdec, fsenc, statdir
+from .bos import bos
 
 
 class AXS(object):
@@ -555,7 +556,7 @@ class AuthSrv(object):
                 for nch in range(len(hid)):
                     hpath = os.path.join(self.args.hist, hid[: nch + 1])
                     try:
-                        os.makedirs(hpath)
+                        bos.makedirs(hpath)
                     except:
                         pass
 
@@ -579,7 +580,7 @@ class AuthSrv(object):
 
             vol.histpath = absreal(vol.histpath)
             if vol.dbv:
-                if os.path.exists(os.path.join(vol.histpath, "up2k.db")):
+                if bos.path.exists(os.path.join(vol.histpath, "up2k.db")):
                     promote.append(vol)
                     vol.dbv = None
                 else:

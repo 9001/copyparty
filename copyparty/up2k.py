@@ -34,6 +34,7 @@ from .util import (
     s2hms,
     min_ex,
 )
+from .bos import bos
 from .authsrv import AuthSrv
 from .mtag import MTag, MParser
 
@@ -214,7 +215,7 @@ class Up2k(object):
             # only need to protect register_vpath but all in one go feels right
             for vol in vols:
                 try:
-                    os.listdir(vol.realpath)
+                    bos.listdir(vol.realpath)
                 except:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
                     self.log("cannot access " + vol.realpath, c=1)
@@ -352,14 +353,14 @@ class Up2k(object):
 
         reg = {}
         path = os.path.join(histpath, "up2k.snap")
-        if "e2d" in flags and os.path.exists(path):
+        if "e2d" in flags and bos.path.exists(path):
             with gzip.GzipFile(path, "rb") as f:
                 j = f.read().decode("utf-8")
 
             reg2 = json.loads(j)
             for k, job in reg2.items():
                 path = os.path.join(job["ptop"], job["prel"], job["name"])
-                if os.path.exists(fsenc(path)):
+                if bos.path.exists(path):
                     reg[k] = job
                     job["poke"] = time.time()
                 else:
@@ -375,7 +376,7 @@ class Up2k(object):
             return None
 
         try:
-            os.makedirs(histpath)
+            bos.makedirs(histpath)
         except:
             pass
 
@@ -519,7 +520,7 @@ class Up2k(object):
             # almost zero overhead dw
             self.pp.msg = "b{} {}".format(nfiles - nchecked, abspath)
             try:
-                if not os.path.exists(fsenc(abspath)):
+                if not bos.path.exists(abspath):
                     rm.append([drd, dfn])
             except Exception as ex:
                 self.log("stat-rm: {} @ [{}]".format(repr(ex), abspath))
@@ -907,7 +908,7 @@ class Up2k(object):
         # x.set_trace_callback(trace)
 
     def _open_db(self, db_path):
-        existed = os.path.exists(db_path)
+        existed = bos.path.exists(db_path)
         cur = self._orz(db_path)
         ver = self._read_ver(cur)
         if not existed and ver is None:
@@ -933,7 +934,7 @@ class Up2k(object):
         db = cur.connection
         cur.close()
         db.close()
-        os.unlink(db_path)
+        bos.unlink(db_path)
         return self._create_db(db_path, None)
 
     def _backup_db(self, db_path, cur, ver, msg):
@@ -1029,7 +1030,7 @@ class Up2k(object):
 
                     dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
                     # relying on path.exists to return false on broken symlinks
-                    if os.path.exists(fsenc(dp_abs)):
+                    if bos.path.exists(dp_abs):
                         job = {
                             "name": dp_fn,
                             "prel": dp_dir,
@@ -1053,7 +1054,7 @@ class Up2k(object):
                     for fn in names:
                         path = os.path.join(job["ptop"], job["prel"], fn)
                         try:
-                            if os.path.getsize(fsenc(path)) > 0:
+                            if bos.path.getsize(path) > 0:
                                 # upload completed or both present
                                 break
                         except:
@@ -1087,7 +1088,7 @@ class Up2k(object):
                         job["name"] = self._untaken(pdir, cj["name"], now, cj["addr"])
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
-                            os.unlink(fsenc(dst))  # TODO ed pls
+                            bos.unlink(dst)  # TODO ed pls
                             self._symlink(src, dst)
 
                         if cur:
@@ -1152,8 +1153,8 @@ class Up2k(object):
         try:
             lsrc = src
             ldst = dst
-            fs1 = os.stat(fsenc(os.path.split(src)[0])).st_dev
-            fs2 = os.stat(fsenc(os.path.split(dst)[0])).st_dev
+            fs1 = bos.stat(os.path.split(src)[0]).st_dev
+            fs2 = bos.stat(os.path.split(dst)[0]).st_dev
             if fs1 == 0:
                 # py2 on winxp or other unsupported combination
                 raise OSError()
@@ -1283,8 +1284,8 @@ class Up2k(object):
         atop = vn.canonical(rem)
         adir, fn = os.path.split(atop)
 
-        fun = os.lstat if os.supports_follow_symlinks else os.stat
-        st = fun(fsenc(atop))
+        fun = bos.lstat if os.supports_follow_symlinks else bos.stat
+        st = fun(atop)
         if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
             g = [[os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
         else:
@@ -1307,12 +1308,12 @@ class Up2k(object):
                     cur, wark = self._find_from_vpath(ptop, vrem)
                     self._forget_file(ptop, vpath, cur, wark)
 
-                os.unlink(abspath)
+                bos.unlink(abspath)
 
         n_dirs = 0
         for d in dirs.keys():
             try:
-                os.rmdir(d)
+                bos.rmdir(d)
                 n_dirs += 1
             except:
                 pass
@@ -1329,7 +1330,7 @@ class Up2k(object):
         if not srem:
             raise Pebkac(400, "mv: cannot move a mountpoint")
 
-        if os.path.exists(dabs):
+        if bos.path.exists(dabs):
             raise Pebkac(400, "mv: target file exists")
 
         c1, w = self._find_from_vpath(svn.realpath, srem)
@@ -1345,15 +1346,15 @@ class Up2k(object):
 
                 slabs = "{}/{}".join(rd, fn).strip("/")
                 slabs = absreal(os.path.join(dvn.realpath, slabs))
-                if os.path.exists(fsenc(slabs)):
+                if bos.path.exists(slabs):
                     self.log("mv: quick relink, nice")
-                    self._symlink(fsenc(slabs), fsenc(dabs))
-                    st = os.stat(fsenc(sabs))
+                    self._symlink(slabs, dabs)
+                    st = bos.stat(sabs)
                     self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
-                    os.unlink(fsenc(sabs))
+                    bos.unlink(sabs)
                 else:
                     self.log("mv: file in db missing? whatever, fixed")
-                    os.rename(fsenc(sabs), fsenc(slabs))
+                    bos.rename(sabs, slabs)
 
                 self._forget_file(svn.realpath, srem, c1, w)
                 return "k"
@@ -1362,9 +1363,9 @@ class Up2k(object):
             self.log("mv: plain move")
             self._copy_tags(c1, c2, w)
             self._forget_file(svn.realpath, srem, c1, w)
-            st = os.stat(fsenc(sabs))
+            st = bos.stat(sabs)
             self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
-            os.rename(fsenc(sabs), fsenc(dabs))
+            bos.rename(sabs, dabs)
             return "k"
 
     def _copy_tags(self, csrc, cdst, wark):
@@ -1455,7 +1456,7 @@ class Up2k(object):
         links = {}
         for vp in dupes:
             ap = gabs(vp)
-            d = links if os.path.islink(ap) else full
+            d = links if bos.path.islink(ap) else full
             d[vp] = ap
 
         if not vp2 and not full:
@@ -1464,17 +1465,17 @@ class Up2k(object):
             dabs = links.pop(dvp)
             sabs = gabs(vp1)
             self.log("linkswap [{}] and [{}]".format(sabs, dabs))
-            os.unlink(dabs)
-            os.rename(sabs, dabs)
-            os.link(sabs, dabs)
+            bos.unlink(dabs)
+            bos.rename(sabs, dabs)
+            self._symlink(sabs, dabs)
             full[vp1] = sabs
 
         dvp = vp2 if vp2 else full.keys()[0]
         dabs = gabs(dvp)
         for alink in links.values():
             self.log("relinking [{}] to [{}]".format(alink, dabs))
-            os.unlink(alink)
-            os.link(alink, dabs)
+            bos.unlink(alink)
+            self._symlink(alink, dabs)
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
@@ -1497,7 +1498,7 @@ class Up2k(object):
 
     def _hashlist_from_file(self, path):
         pp = self.pp if hasattr(self, "pp") else None
-        fsz = os.path.getsize(fsenc(path))
+        fsz = bos.path.getsize(path)
         csz = up2k_chunksize(fsz)
         ret = []
         with open(fsenc(path), "rb", 512 * 1024) as f:
@@ -1565,7 +1566,7 @@ class Up2k(object):
             for path, sz, times in ready:
                 self.log("lmod: setting times {} on {}".format(times, path))
                 try:
-                    os.utime(fsenc(path), times)
+                    bos.utime(path, times)
                 except:
                     self.log("lmod: failed to utime ({}, {})".format(path, times))
 
@@ -1601,13 +1602,13 @@ class Up2k(object):
                 try:
                     # remove the filename reservation
                     path = os.path.join(job["ptop"], job["prel"], job["name"])
-                    if os.path.getsize(fsenc(path)) == 0:
-                        os.unlink(fsenc(path))
+                    if bos.path.getsize(path) == 0:
+                        bos.unlink(path)
 
                     if len(job["hash"]) == len(job["need"]):
                         # PARTIAL is empty, delete that too
                         path = os.path.join(job["ptop"], job["prel"], job["tnam"])
-                        os.unlink(fsenc(path))
+                        bos.unlink(path)
                 except:
                     pass
 
@@ -1615,8 +1616,8 @@ class Up2k(object):
         if not reg:
             if ptop not in self.snap_prev or self.snap_prev[ptop] is not None:
                 self.snap_prev[ptop] = None
-                if os.path.exists(fsenc(path)):
-                    os.unlink(fsenc(path))
+                if bos.path.exists(path):
+                    bos.unlink(path)
             return
 
         newest = max(x["poke"] for _, x in reg.items()) if reg else 0
@@ -1625,7 +1626,7 @@ class Up2k(object):
             return
 
         try:
-            os.makedirs(histpath)
+            bos.makedirs(histpath)
         except:
             pass
 
@@ -1692,7 +1693,7 @@ class Up2k(object):
 
             abspath = os.path.join(ptop, rd, fn)
             self.log("hashing " + abspath)
-            inf = os.stat(fsenc(abspath))
+            inf = bos.stat(abspath)
             hashes = self._hashlist_from_file(abspath)
             wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
             with self.mutex:

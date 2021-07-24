@@ -5,6 +5,7 @@ import os
 
 from .util import Cooldown
 from .th_srv import thumb_path, THUMBABLE, FMT_FF
+from .bos import bos
 
 
 class ThumbCli(object):
@@ -36,7 +37,7 @@ class ThumbCli(object):
         tpath = thumb_path(histpath, rem, mtime, fmt)
         ret = None
         try:
-            st = os.stat(tpath)
+            st = bos.stat(tpath)
             if st.st_size:
                 ret = tpath
             else:

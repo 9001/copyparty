@@ -9,6 +9,7 @@ import subprocess as sp
 
 from .__init__ import PY2, WINDOWS, unicode
 from .util import fsenc, fsdec, uncyg, REKOBO_LKEY
+from .bos import bos
 
 
 def have_ff(cmd):
@@ -44,7 +45,7 @@ class MParser(object):
                 if WINDOWS:
                     bp = uncyg(bp)
 
-                if os.path.exists(bp):
+                if bos.path.exists(bp):
                     self.bin = bp
                     return
             except:
@@ -420,7 +421,7 @@ class MTag(object):
         except Exception as ex:
             return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
-        sz = os.path.getsize(fsenc(abspath))
+        sz = bos.path.getsize(abspath)
         ret = {".q": [0, int((sz / md.info.length) / 128)]}
 
         for attr, k, norm in [

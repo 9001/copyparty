@@ -8,6 +8,7 @@ from datetime import datetime
 
 from .sutil import errdesc
 from .util import yieldfile, sanitize_fn, spack, sunpack
+from .bos import bos
 
 
 def dostime2unix(buf):
@@ -271,4 +272,4 @@ class StreamZip(object):
         yield self._ct(ecdr)
 
         if errors:
-            os.unlink(errf["ap"])
+            bos.unlink(errf["ap"])

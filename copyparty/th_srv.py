@@ -11,6 +11,7 @@ import subprocess as sp
 
 from .__init__ import PY2, unicode
 from .util import fsenc, vsplit, runcmd, Queue, Cooldown, BytesIO, min_ex
+from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
 
@@ -155,12 +156,12 @@ class ThumbSrv(object):
             except:
                 thdir = os.path.dirname(tpath)
                 try:
-                    os.makedirs(thdir)
+                    bos.makedirs(thdir)
                 except:
                     pass
 
                 inf_path = os.path.join(thdir, "dir.txt")
-                if not os.path.exists(inf_path):
+                if not bos.path.exists(inf_path):
                     with open(inf_path, "wb") as f:
                         f.write(fsenc(os.path.dirname(abspath)))
 
@@ -180,7 +181,7 @@ class ThumbSrv(object):
                 cond.wait(3)
 
         try:
-            st = os.stat(tpath)
+            st = bos.stat(tpath)
             if st.st_size:
                 return tpath
         except:
@@ -197,7 +198,7 @@ class ThumbSrv(object):
             abspath, tpath = task
             ext = abspath.split(".")[-1].lower()
             fun = None
-            if not os.path.exists(tpath):
+            if not bos.path.exists(tpath):
                 if ext in FMT_PIL:
                     fun = self.conv_pil
                 elif ext in FMT_FF:
@@ -323,7 +324,7 @@ class ThumbSrv(object):
             p1 = os.path.dirname(tdir)
             p2 = os.path.dirname(p1)
             for dp in [tdir, p1, p2]:
-                os.utime(fsenc(dp), (ts, ts))
+                bos.utime(dp, (ts, ts))
         except:
             pass
 
@@ -350,7 +351,7 @@ class ThumbSrv(object):
         prev_b64 = None
         prev_fp = None
         try:
-            ents = os.listdir(thumbpath)
+            ents = bos.listdir(thumbpath)
         except:
             return 0
 
@@ -361,7 +362,7 @@ class ThumbSrv(object):
 
             # "top" or b64 prefix/full (a folder)
             if len(f) <= 3 or len(f) == 24:
-                age = now - os.path.getmtime(fp)
+                age = now - bos.path.getmtime(fp)
                 if age > maxage:
                     with self.mutex:
                         safe = True
@@ -393,7 +394,7 @@ class ThumbSrv(object):
 
             if b64 == prev_b64:
                 self.log("rm replaced [{}]".format(fp))
-                os.unlink(prev_fp)
+                bos.unlink(prev_fp)
 
             prev_b64 = b64
             prev_fp = fp
