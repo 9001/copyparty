@@ -13,7 +13,7 @@ import threading
 from datetime import datetime, timedelta
 import calendar
 
-from .__init__ import E, PY2, WINDOWS, MACOS, VT100, unicode
+from .__init__ import E, PY2, WINDOWS, ANYWIN, MACOS, VT100, unicode
 from .util import mp, start_log_thrs, start_stackmon, min_ex
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
@@ -139,20 +139,29 @@ class SvcHub(object):
         thr.daemon = True
         thr.start()
 
-        thr = threading.Thread(target=self.stop_thr, name="svchub-sig")
-        thr.daemon = True
-        thr.start()
-
         for sig in [signal.SIGINT, signal.SIGTERM]:
             signal.signal(sig, self.signal_handler)
 
-        try:
-            while not self.stop_req:
-                time.sleep(9001)
-        except:
-            pass
+        # windows cannot ^c stop_cond,
+        # macos hangs after shutdown on sigterm with while-sleep,
+        # linux is fine with both,
+        # never lucky
+        if ANYWIN:
+            # msys-python probably fine but >msys-python
+            thr = threading.Thread(target=self.stop_thr, name="svchub-sig")
+            thr.daemon = True
+            thr.start()
 
-        self.shutdown()
+            ival = 1 if sys.gettrace() else 9001
+            try:
+                while not self.stop_req:
+                    time.sleep(ival)
+            except:
+                pass
+
+            self.shutdown()
+        else:
+            self.stop_thr()
 
     def stop_thr(self):
         while not self.stop_req:
@@ -161,7 +170,7 @@ class SvcHub(object):
 
         self.shutdown()
 
-    def signal_handler(self):
+    def signal_handler(self, sig, frame):
         if self.stopping:
             return
 
@@ -175,6 +184,7 @@ class SvcHub(object):
 
         self.stopping = True
         self.stop_req = True
+        ret = 1
         try:
             with self.log_mutex:
                 print("OPYTHAT")
@@ -194,10 +204,13 @@ class SvcHub(object):
                         print("waiting for thumbsrv (10sec)...")
 
             print("nailed it", end="")
+            ret = 0
         finally:
             print("\033[0m")
             if self.logf:
                 self.logf.close()
+
+            sys.exit(ret)
 
     def _log_disabled(self, src, msg, c=0):
         if not self.logf:
