@@ -123,6 +123,15 @@ if (!String.startsWith) {
         return this.substring(i, i + s.length) === s;
     };
 }
+if (!Element.prototype.closest) {
+    Element.prototype.closest = function (s) {
+        var el = this;
+        do {
+            if (el.msMatchesSelector(s)) return el;
+            el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+    }
+}
 
 
 // https://stackoverflow.com/a/950146

@@ -453,10 +453,10 @@ html.light #ggrid a.sel {
 html.light #wfm a:not(.en) {
 	color: #c4a;
 }
-#files tbody td.c1 {
+#files tbody tr.c1 td {
 	animation: fcut1 .5s ease-out;
 }
-#files tbody td.c2 {
+#files tbody tr.c2 td {
 	animation: fcut2 .5s ease-out;
 }
 @keyframes fcut1 {

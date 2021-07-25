@@ -1504,37 +1504,42 @@ var fileman = (function () {
 	r.delete = function (e) {
 		ev(e);
 		var sel = msel.getsel(),
-			req = msel.selu;
+			vps = [];
+
+		for (var a = 0; a < sel.length; a++)
+			vps.push(sel.vp);
 
 		if (!sel.length)
 			return alert('select at least 1 item to delete');
 
-		if (!confirm('===== DANGER =====\nDELETE these ' + req.length + ' items?\n\n' + req.join('\n')))
+		if (!confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + vps.join('\n')))
 			return;
 
 		if (!confirm('Last chance! Delete?'))
 			return;
 
-		toast.show(req.length + ' deletes left', 2000);
+		toast.show(vps.length + ' deletes left', 2000);
 	};
 
 	r.cut = function (e) {
 		ev(e);
 		var sel = msel.getsel(),
-			vsel = msel.selu;
+			vps = [];
 
 		if (!sel.length)
 			return alert('select at least 1 item to cut');
 
-		var tds = QSA('#files tbody tr.sel td');
-		for (var a = 0; a < tds.length; a++) {
-			var cl = tds[a].classList, inv = cl.contains('c1');
+		for (var a = 0; a < sel.length; a++) {
+			vps.push(sel[a].vp);
+			var cl = ebi(sel[a].id).closest('tr').classList,
+				inv = cl.contains('c1');
+
 			cl.remove(inv ? 'c1' : 'c2');
 			cl.add(inv ? 'c2' : 'c1');
 		}
 
 		toast.show('cut ' + sel.length + ' items', 1000);
-		jwrite('fman_clip', vsel);
+		jwrite('fman_clip', vps);
 		r.tx();
 	};
 
@@ -1631,9 +1636,6 @@ var thegrid = (function () {
 
 	ebi('griden').onclick = ebi('wtgrid').onclick = function (e) {
 		ev(e);
-		if (!this.closest)
-			return;
-
 		r.en = !r.en;
 		bcfg_set('griden', r.en);
 		if (r.en) {
@@ -2256,6 +2258,7 @@ document.onkeydown = function (e) {
 		ofiles.setAttribute("q_raw", this.q_raw);
 		set_vq();
 		mukey.render();
+		msel.render();
 		reload_browser();
 		filecols.set_style(['File Name']);
 
@@ -3171,31 +3174,45 @@ var arcfmt = (function () {
 
 var msel = (function () {
 	var r = {};
-	r.selu = null;
-	r.seln = null;
+	r.sel = null;
+	r.all = null;
 
-	r.getsel = function () {
-		if (r.seln !== null)
-			return r.seln;
+	r.load = function () {
+		if (r.sel)
+			return;
 
-		r.selu = [];
-		r.seln = [];
-		var links = QSA('#files tbody tr.sel td:nth-child(2) a'),
+		r.sel = [];
+		r.all = [];
+		var links = QSA('#files tbody td:nth-child(2) a:last-child'),
 			vbase = get_evpath();
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var url = links[a].getAttribute('href').replace(/\/$/, ""),
-				name = url.split('/').slice(-1);
+			var href = links[a].getAttribute('href').replace(/\/$/, ""),
+				item = {};
 
-			r.selu.push(url.indexOf('/') !== -1 ? url : vbase + url);
-			r.seln.push(name);
-			links[a].setAttribute('name', name);
+			item.id = links[a].getAttribute('id');
+			item.sel = links[a].closest('tr').classList.contains('sel');
+			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
+			item.name = href.split('/').slice(-1);
+
+			r.all.push(item);
+			if (item.sel)
+				r.sel.push(item);
+
+			links[a].setAttribute('name', item.name);
 		}
+	};
 
-		return r.seln;
-	}
+	r.getsel = function () {
+		r.load();
+		return r.sel;
+	};
+	r.getall = function () {
+		r.load();
+		return r.all;
+	};
 	function selui() {
-		r.selu = r.seln = null;
+		r.sel = r.all = null;
 		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
 		thegrid.loadsel();
 		fileman.render();
@@ -3249,9 +3266,10 @@ var msel = (function () {
 		for (var a = 0, aa = tds.length; a < aa; a++) {
 			tds[a].onclick = seltgl;
 		}
-		r.selu = r.seln = null;
+		r.sel = r.all = null;
 		arcfmt.render();
 		fileman.render();
+		ebi('selzip').style.display = ebi('unsearch') ? 'none' : '';
 	}
 	return r;
 })();
