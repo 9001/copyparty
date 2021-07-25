@@ -375,10 +375,7 @@ class Up2k(object):
         if not HAVE_SQLITE3 or "e2d" not in flags or "d2d" in flags:
             return None
 
-        try:
-            bos.makedirs(histpath)
-        except:
-            pass
+        bos.makedirs(histpath)
 
         try:
             cur = self._open_db(db_path)
@@ -1323,16 +1320,65 @@ class Up2k(object):
 
     def handle_mv(self, uname, svp, dvp):
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
-        dvn, drem = self.asrv.vfs.get(dvp, uname, False, True)
+        svn, srem = svn.get_dbv(srem)
         sabs = svn.canonical(srem)
-        dabs = dvn.canonical(drem)
-        drd, dfn = vsplit(drem)
 
         if not srem:
             raise Pebkac(400, "mv: cannot move a mountpoint")
 
+        st = bos.stat(sabs)
+        if stat.S_ISREG(st.st_mode):
+            return self._mv_file(uname, svp, dvp)
+
+        jail = svn.get_dbv(srem)[0]
+        permsets = [[True, False, True]]
+        scandir = not self.args.no_scandir
+
+        # following symlinks is too scary, TODO schedule rescans as needed
+        g = svn.walk("", srem, [], uname, permsets, True, scandir, True)
+        for dbv, vrem, _, atop, files, rd, vd in g:
+            if dbv != jail:
+                # fail early (prevent partial moves)
+                raise Pebkac(400, "mv: source folder contains other volumes")
+
+        dirs = {}
+        g = svn.walk("", srem, [], uname, permsets, True, scandir, True)
+        for dbv, vrem, _, atop, files, rd, vd in g:
+            if dbv != jail:
+                # the actual check (avoid toctou)
+                raise Pebkac(400, "mv: source folder contains other volumes")
+
+            dirs[atop] = 1
+            for fn in files:
+                svpf = "/".join(x for x in [dbv.vpath, vrem, fn[0]] if x)
+                if not svpf.startswith(svp + "/"):  # assert
+                    raise Pebkac(500, "mv: bug at {}, top {}".format(svpf, svp))
+
+                dvpf = dvp + svpf[len(svp) :]
+                self._mv_file(uname, svpf, dvpf)
+        
+        for d in list(dirs.keys()) + [sabs]:
+            try:
+                bos.rmdir(d)
+            except:
+                pass
+
+        return "k"
+
+    def _mv_file(self, uname, svp, dvp):
+        svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
+        svn, srem = svn.get_dbv(srem)
+
+        dvn, drem = self.asrv.vfs.get(dvp, uname, False, True)
+        dvn, drem = dvn.get_dbv(drem)
+
+        sabs = svn.canonical(srem)
+        dabs = dvn.canonical(drem)
+        drd, dfn = vsplit(drem)
+        st = bos.stat(sabs)
+
         if bos.path.exists(dabs):
-            raise Pebkac(400, "mv: target file exists")
+            raise Pebkac(400, "mv2: target file exists")
 
         c1, w = self._find_from_vpath(svn.realpath, srem)
         c2 = self.cur.get(dvn.realpath)
@@ -1365,7 +1411,6 @@ class Up2k(object):
 
         # not found in dst db; copy info
         self.log("mv: plain move")
-        st = bos.stat(sabs)
 
         if c1 and c2:
             self._copy_tags(c1, c2, w)
@@ -1378,6 +1423,7 @@ class Up2k(object):
             self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
             c2.connection.commit()
 
+        bos.makedirs(os.path.dirname(dabs))
         bos.rename(sabs, dabs)
         return "k"
 
@@ -1637,10 +1683,7 @@ class Up2k(object):
         if etag == self.snap_prev.get(ptop):
             return
 
-        try:
-            bos.makedirs(histpath)
-        except:
-            pass
+        bos.makedirs(histpath)
 
         path2 = "{}.{}".format(path, os.getpid())
         j = json.dumps(reg, indent=2, sort_keys=True).encode("utf-8")

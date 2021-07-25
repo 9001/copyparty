@@ -155,10 +155,7 @@ class ThumbSrv(object):
                 self.log("wait {}".format(tpath))
             except:
                 thdir = os.path.dirname(tpath)
-                try:
-                    bos.makedirs(thdir)
-                except:
-                    pass
+                bos.makedirs(thdir)
 
                 inf_path = os.path.join(thdir, "dir.txt")
                 if not bos.path.exists(inf_path):

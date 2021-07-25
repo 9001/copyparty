@@ -555,10 +555,7 @@ class AuthSrv(object):
             elif self.args.hist:
                 for nch in range(len(hid)):
                     hpath = os.path.join(self.args.hist, hid[: nch + 1])
-                    try:
-                        bos.makedirs(hpath)
-                    except:
-                        pass
+                    bos.makedirs(hpath)
 
                     powner = os.path.join(hpath, "owner.txt")
                     try:

@@ -22,8 +22,13 @@ def lstat(p):
     return os.lstat(fsenc(p))
 
 
-def makedirs(name, mode=0o755):
-    return os.makedirs(fsenc(name), mode=mode)
+def makedirs(name, mode=0o755, exist_ok=True):
+    bname = fsenc(name)
+    try:
+        os.makedirs(bname, mode=mode)
+    except:
+        if not exist_ok or not os.path.isdir(bname):
+            raise
 
 
 def mkdir(p, mode=0o755):
