@@ -1285,7 +1285,9 @@ class Up2k(object):
         adir, fn = os.path.split(atop)
         st = bos.lstat(atop)
         if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
-            g = [[os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
+            dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+            dbv, vrem = dbv.get_dbv(vrem)
+            g = [[dbv, vrem, os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
         else:
             scandir = not self.args.no_scandir
             g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
@@ -1297,9 +1299,7 @@ class Up2k(object):
                 n_files += 1
                 abspath = os.path.join(atop, fn)
                 vpath = "{}/{}".format(vrem, fn).strip("/")
-                self.log("rm file {}\n  vpath: {}".format(abspath, vpath))
-                # dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
-                # dbv, vrem = dbv.get_dbv(vrem)
+                self.log("rm {}\n  {}".format(vpath, abspath))
                 _ = dbv.get(vrem, uname, *permsets[0])
                 with self.mutex:
                     try:
@@ -1482,7 +1482,7 @@ class Up2k(object):
             self._symlink(sabs, dabs)
             full[vp1] = sabs
 
-        dvp = vp2 if vp2 else full.keys()[0]
+        dvp = vp2 if vp2 else list(sorted(full.keys()))[0]
         dabs = gabs(dvp)
         for alink in links.values():
             self.log("relinking [{}] to [{}]".format(alink, dabs))

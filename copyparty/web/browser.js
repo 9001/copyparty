@@ -1507,7 +1507,7 @@ var fileman = (function () {
 			vps = [];
 
 		for (var a = 0; a < sel.length; a++)
-			vps.push(sel.vp);
+			vps.push(sel[a].vp);
 
 		if (!sel.length)
 			return alert('select at least 1 item to delete');
@@ -1518,7 +1518,33 @@ var fileman = (function () {
 		if (!confirm('Last chance! Delete?'))
 			return;
 
-		toast.show(vps.length + ' deletes left', 2000);
+		function deleter() {
+			var xhr = new XMLHttpRequest(),
+				vp = vps.shift();
+
+			if (!vp) {
+				toast.show('delete OK', 2000);
+				treectl.goto(get_evpath());
+				return;
+			}
+			toast.show('deleting ' + (vps.length + 1) + ' items<br /><br />' + vp, 2000);
+
+			xhr.open('GET', vp + '?delete', true);
+			xhr.onreadystatechange = delete_cb;
+			xhr.send();
+		}
+		function delete_cb() {
+			if (this.readyState != XMLHttpRequest.DONE)
+				return;
+
+			if (this.status !== 200) {
+				var msg = this.responseText;
+				toast.show('delete failed:<br />' + msg, 2000);
+				return;
+			}
+			deleter();
+		}
+		deleter();
 	};
 
 	r.cut = function (e) {
