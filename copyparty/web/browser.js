@@ -1514,6 +1514,8 @@ var fileman = (function () {
 
 		if (!confirm('Last chance! Delete?'))
 			return;
+
+		toast.show(req.length + ' deletes left', 2000);
 	};
 
 	r.cut = function (e) {
@@ -1531,6 +1533,7 @@ var fileman = (function () {
 			cl.add(inv ? 'c2' : 'c1');
 		}
 
+		toast.show('cut ' + sel.length + ' items', 1000);
 		jwrite('fman_clip', vsel);
 		r.tx();
 	};

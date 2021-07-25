@@ -629,3 +629,28 @@ var tt = (function () {
 
     return r;
 })();
+
+
+var toast = (function () {
+    var r = {},
+        te = null,
+        obj = mknod('div');
+
+    obj.setAttribute('id', 'toast');
+    obj.onclick = r.hide;
+    document.body.appendChild(obj);;
+
+    r.hide = function () {
+        clearTimeout(te);
+        clmod(obj, 'vis');
+    };
+
+    r.show = function (txt, ms) {
+        clearTimeout(te);
+        te = setTimeout(r.hide, ms);
+        obj.innerHTML = txt;
+        clmod(obj, 'vis', 1000);
+    };
+
+    return r;
+})();
