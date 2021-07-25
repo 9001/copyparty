@@ -1560,8 +1560,8 @@ class HttpCli(object):
             raise Pebkac(403, "disabled by argv")
 
         # full path of new loc (incl filename)
-        dst = self.uparam.get("to")
-        if dst is None:
+        dst = self.uparam.get("move")
+        if not dst:
             raise Pebkac(400, "need dst vpath")
 
         x = self.conn.hsrv.broker.put(

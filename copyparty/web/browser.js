@@ -1546,7 +1546,7 @@ var fileman = (function () {
 	r.paste = function (e) {
 		ev(e);
 		if (!r.clip.length)
-			return alert('first cut some items to paste\n\nnote: you can cut/paste across different tabs');
+			return alert('first cut some items to paste\n\nnote: you can cut/paste across different browser tabs');
 
 		var req = [],
 			exists = [],
@@ -1573,6 +1573,36 @@ var fileman = (function () {
 
 		if (!confirm('paste these ' + req.length + ' items here?\n\n' + req.join('\n')))
 			return;
+
+		function paster() {
+			var xhr = new XMLHttpRequest(),
+				vp = req.shift();
+
+			if (!vp) {
+				toast.show('paste OK', 2000);
+				treectl.goto(get_evpath());
+				return;
+			}
+			toast.show('pasting ' + (req.length + 1) + ' items<br /><br />' + vp, 2000);
+
+			var dst = get_evpath() + vp.split('/').slice(-1)[0];
+
+			xhr.open('GET', vp + '?move=' + dst, true);
+			xhr.onreadystatechange = paste_cb;
+			xhr.send();
+		}
+		function paste_cb() {
+			if (this.readyState != XMLHttpRequest.DONE)
+				return;
+
+			if (this.status !== 200) {
+				var msg = this.responseText;
+				toast.show('paste failed:<br />' + msg, 2000);
+				return;
+			}
+			paster();
+		}
+		paster();
 
 		jwrite('fman_clip', []);
 		r.tx();

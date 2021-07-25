@@ -1302,9 +1302,12 @@ class Up2k(object):
                 # dbv, vrem = dbv.get_dbv(vrem)
                 _ = dbv.get(vrem, uname, *permsets[0])
                 with self.mutex:
-                    ptop = dbv.realpath
-                    cur, wark = self._find_from_vpath(ptop, vrem)
-                    self._forget_file(ptop, vpath, cur, wark)
+                    try:
+                        ptop = dbv.realpath
+                        cur, wark = self._find_from_vpath(ptop, vrem)
+                        self._forget_file(ptop, vpath, cur, wark)
+                    finally:
+                        cur.connection.commit()
 
                 bos.unlink(abspath)
 
@@ -1318,7 +1321,7 @@ class Up2k(object):
 
         return "deleted {} files (and {}/{} folders)".format(n_files, n_dirs, len(dirs))
 
-    def _handle_mv(self, uname, svp, dvp):
+    def handle_mv(self, uname, svp, dvp):
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
         dvn, drem = self.asrv.vfs.get(dvp, uname, False, True)
         sabs = svn.canonical(srem)
@@ -1335,15 +1338,16 @@ class Up2k(object):
         c2 = self.cur.get(dvn.realpath)
         if c1 and c2:
             q = "select rd, fn from up where substr(w,1,16)=? and w=?"
-            hit = c2.execute(q, (w[:16], w)).fetchone()
-            if hit:
-                # found in dest vol, just need a symlink
-                rd, fn = hit
+            for rd, fn in c2.execute(q, (w[:16], w)):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
-                slabs = "{}/{}".join(rd, fn).strip("/")
+                slabs = "{}/{}".format(rd, fn).strip("/")
                 slabs = absreal(os.path.join(dvn.realpath, slabs))
+                if slabs == sabs:
+                    # hit is src
+                    continue
+
                 if bos.path.exists(slabs):
                     self.log("mv: quick relink, nice")
                     self._symlink(slabs, dabs)
@@ -1355,6 +1359,8 @@ class Up2k(object):
                     bos.rename(sabs, slabs)
 
                 self._forget_file(svn.realpath, srem, c1, w)
+                c1.connection.commit()
+                c2.connection.commit()
                 return "k"
 
         # not found in dst db; copy info
@@ -1366,9 +1372,11 @@ class Up2k(object):
 
         if c1:
             self._forget_file(svn.realpath, srem, c1, w)
+            c1.connection.commit()
 
         if c2:
             self.db_add(c2, w, drd, dfn, st.st_mtime, st.st_size)
+            c2.connection.commit()
 
         bos.rename(sabs, dabs)
         return "k"
@@ -1402,14 +1410,12 @@ class Up2k(object):
 
     def _forget_file(self, ptop, vrem, cur, wark):
         """forgets file in db, fixes symlinks, does not delete"""
-        fn = vrem.split("/")[-1]
-        wark = None
+        srd, sfn = vsplit(vrem)
         dupes = []
 
         self.log("forgetting {}".format(vrem))
         if wark:
             # found in db; find dupes
-            wark = wark[0]
             self.log("found {} in db".format(wark))
 
             q = "select rd, fn from up where substr(w,1,16)=? and w=?"
@@ -1425,10 +1431,11 @@ class Up2k(object):
         if dupes:
             # fix symlinks
             self._relink(ptop, dupes, vrem, None)
-        else:
-            # drop tags
+        elif wark:
+            # thus cur; drop tags
             q = "delete from mt where w=?"
             cur.execute(q, (wark[:16],))
+            self.db_rm(cur, srd, sfn)
 
         reg = self.registry.get(ptop)
         if reg:
