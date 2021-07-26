@@ -31,6 +31,8 @@ class Cfg(Namespace):
             rproxy=0,
             ed=False,
             nw=False,
+            no_mv=False,
+            no_del=False,
             no_zip=False,
             no_voldump=True,
             no_scandir=False,

@@ -1699,6 +1699,8 @@ class HttpCli(object):
             "tag_order": [],
             "have_up2k_idx": ("e2d" in vn.flags),
             "have_tags_idx": ("e2t" in vn.flags),
+            "have_mv": (not self.args.no_mv),
+            "have_del": (not self.args.no_del),
             "have_zip": (not self.args.no_zip),
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "url_suf": url_suf,

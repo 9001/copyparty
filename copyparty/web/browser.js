@@ -1483,10 +1483,10 @@ var fileman = (function () {
 		clmod(bdel, 'en', sel.length);
 		clmod(bcut, 'en', sel.length);
 		clmod(bpst, 'en', r.clip && r.clip.length);
-		bren.style.display = has(perms, 'write') && has(perms, 'move') ? '' : 'none';
-		bdel.style.display = has(perms, 'delete') ? '' : 'none';
-		bcut.style.display = has(perms, 'move') ? '' : 'none';
-		bpst.style.display = has(perms, 'write') ? '' : 'none';
+		bren.style.display = have_mv && has(perms, 'write') && has(perms, 'move') ? '' : 'none';
+		bdel.style.display = have_del && has(perms, 'delete') ? '' : 'none';
+		bcut.style.display = have_mv && has(perms, 'move') ? '' : 'none';
+		bpst.style.display = have_mv && has(perms, 'write') ? '' : 'none';
 		bpst.setAttribute('tt', 'paste ' + r.clip.length + ' items$NHotkey: ctrl-V');
 		ebi('wfm').style.display = QS('#wfm a.en:not([display])') ? '' : 'none';
 	};
