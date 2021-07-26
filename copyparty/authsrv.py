@@ -180,13 +180,13 @@ class VFS(object):
         vrem = "/".join([x for x in vrem if x])
         return dbv, vrem
 
-    def canonical(self, rem):
+    def canonical(self, rem, resolve=True):
         """returns the canonical path (fully-resolved absolute fs path)"""
         rp = self.realpath
         if rem:
             rp += "/" + rem
 
-        return absreal(rp)
+        return absreal(rp) if resolve else rp
 
     def ls(self, rem, uname, scandir, permsets, lstat=False):
         # type: (str, str, bool, list[list[bool]], bool) -> tuple[str, str, dict[str, VFS]]

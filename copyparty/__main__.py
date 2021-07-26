@@ -324,6 +324,8 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-mutagen", action="store_true", help="use FFprobe for tags instead")
     ap2.add_argument("--no-mtag-mt", action="store_true", help="disable tag-read parallelism")
     ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader")
+    ap2.add_argument("--re-int", metavar="SEC", type=int, default=30, help="disk rescan check interval")
+    ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval (0=off)")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
         default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,ac,vc,res,.fps")
