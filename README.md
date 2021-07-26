@@ -234,6 +234,10 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
 * `ctrl-X` cut selected files/folders
 * `ctrl-V` paste
 * `F2` rename selected file/folder
+* when a file/folder is selected (in not-grid-view):
+  * `Up/Down` move cursor
+  * `Space` toggle file selection
+  * `Ctrl-A` toggle select all
 * when playing audio:
   * `J/L` prev/next song
   * `U/O` skip 10sec back/forward
