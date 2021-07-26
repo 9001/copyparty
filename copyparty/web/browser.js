@@ -35,7 +35,7 @@ ebi('widget').innerHTML = (
 	' href="#" id="fcut" tt="cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X">✂<span>cut</span></a><a' +
 	' href="#" id="fpst" tt="paste a previously cut/copied selection$NHotkey: ctrl-V">📋<span>paste</span></a>' +
 	'</span><span id="wzip"><a' +
-	' href="#" id="selall" tt="select all files">sel.<br />all</a><a' +
+	' href="#" id="selall" tt="select all files$NHotkey: ctrl-A (when file focused)">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="invert selection">sel.<br />inv.</a><a' +
 	' href="#" id="selzip" tt="download selection as archive">zip</a>' +
 	'</span><span id="wnp"><a' +
@@ -1600,7 +1600,7 @@ var fileman = (function () {
 	r.paste = function (e) {
 		ev(e);
 		if (!r.clip.length)
-			return alert('first cut some items to paste\n\nnote: you can cut/paste across different browser tabs');
+			return alert('first cut some files/folders to paste\n\nnote: you can cut/paste across different browser tabs');
 
 		var req = [],
 			exists = [],
@@ -2378,7 +2378,6 @@ document.onkeydown = function (e) {
 		ofiles.setAttribute("q_raw", this.q_raw);
 		set_vq();
 		mukey.render();
-		msel.render();
 		reload_browser();
 		filecols.set_style(['File Name']);
 
@@ -2391,7 +2390,6 @@ document.onkeydown = function (e) {
 		ebi('files').innerHTML = orig_html;
 		ebi('files').removeAttribute('q_raw');
 		orig_html = null;
-		msel.render();
 		reload_browser();
 	}
 })();
@@ -2726,7 +2724,6 @@ var treectl = (function () {
 
 		filecols.set_style();
 		mukey.render();
-		msel.render();
 		reload_tree();
 		reload_browser();
 
@@ -3467,8 +3464,8 @@ function reload_browser(not_mp) {
 		up2k.set_fsearch();
 
 	thegrid.setdirty();
+	msel.render();
 }
 reload_browser(true);
 mukey.render();
-msel.render();
 play_linked();

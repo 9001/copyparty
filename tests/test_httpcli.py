@@ -32,6 +32,7 @@ class Cfg(Namespace):
             ed=False,
             nw=False,
             no_zip=False,
+            no_voldump=True,
             no_scandir=False,
             no_sendfile=True,
             no_rescan=True,

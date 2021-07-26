@@ -199,10 +199,16 @@ def run_argparse(argv, formatter):
         epilog=dedent(
             """
             -a takes username:password,
-            -v takes src:dst:permset:permset:cflag:cflag:...
-               where "permset" is "accesslevel,username"
+            -v takes src:dst:perm1:perm2:permN:cflag1:cflag2:cflagN:...
+               where "perm" is "accesslevels,username1,username2,..."
                and "cflag" is config flags to set on this volume
             
+            list of accesslevels:
+              "r" (read):   list folder contents, download files
+              "w" (write):  upload files; need "r" to see the uploads
+              "m" (move):   move files and folders; need "w" at destination
+              "d" (delete): permanently delete files and folders
+
             list of cflags:
               "c,nodupe" rejects existing files (instead of symlinking them)
               "c,e2d" sets -e2d (all -e2* args can be set using ce2* cflags)
