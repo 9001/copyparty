@@ -388,15 +388,15 @@ def main(argv=None):
         oa = ostr.split(":")
         na = oa[:2]
         for opt in oa[2:]:
-            if opt and (opt[0] == "a" or (len(opt) > 1 and "," not in opt)):
+            if re.match("c[^,]", opt):
+                mod = True
+                na.append("c," + opt[2:])
+            elif re.sub("^[rwmd]*", "", opt) and "," not in opt:
                 mod = True
                 perm = opt[0]
                 if perm == "a":
                     perm = "rw"
                 na.append(perm + "," + opt[1:])
-            elif opt and opt.startswith("c") and not opt.startswith("c,"):
-                mod = True
-                na.append("c," + opt[2:])
             else:
                 na.append(opt)
 

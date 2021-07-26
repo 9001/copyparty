@@ -55,7 +55,7 @@ class SvcHub(object):
             start_log_thrs(self.log, args.log_thrs, 0)
 
         # initiate all services to manage
-        self.asrv = AuthSrv(self.args, self.log, False)
+        self.asrv = AuthSrv(self.args, self.log)
         if args.ls:
             self.asrv.dbg_ls()
 
