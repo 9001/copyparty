@@ -1500,9 +1500,9 @@ var fileman = (function () {
 		if (src.endsWith('/'))
 			src = src.slice(0, -1);
 
-		var ofs = src.lastIndexOf('/') + 1,
-			base = src.slice(0, ofs),
-			ofn = src.slice(ofs);
+		var vsp = vsplit(src),
+			base = vsp[0],
+			ofn = vsp[1];
 
 		var fn = prompt('new filename:', ofn);
 		if (!fn || fn == ofn)
@@ -1593,7 +1593,7 @@ var fileman = (function () {
 
 		toast.inf(1000, 'cut ' + sel.length + ' items');
 		jwrite('fman_clip', vps);
-		r.tx();
+		r.tx(1);
 	};
 
 	r.paste = function (e) {
@@ -1604,6 +1604,7 @@ var fileman = (function () {
 		var req = [],
 			exists = [],
 			indir = [],
+			srcdir = vsplit(r.clip[0])[0],
 			links = QSA('#files tbody td:nth-child(2) a');
 
 		for (var a = 0, aa = links.length; a < aa; a++)
@@ -1637,6 +1638,7 @@ var fileman = (function () {
 			if (!vp) {
 				toast.ok(2000, 'paste OK');
 				treectl.goto(get_evpath());
+				r.tx(srcdir);
 				return;
 			}
 			toast.inf(2000, 'pasting ' + (req.length + 1) + ' items<br /><br />' + vp);
@@ -1661,17 +1663,19 @@ var fileman = (function () {
 		paster();
 
 		jwrite('fman_clip', []);
-		r.tx();
 	};
 
-	r.bus.onmessage = function () {
-		console.log('fman onmsg');
+	r.bus.onmessage = function (e) {
 		r.clip = null;
-		r.render();
+		var me = get_evpath();
+		if (e && e.data == me)
+			treectl.goto(e.data);
+		else
+			r.render();
 	};
 
-	r.tx = function () {
-		r.bus.postMessage(1);
+	r.tx = function (msg) {
+		r.bus.postMessage(msg);
 		r.bus.onmessage();
 	};
 

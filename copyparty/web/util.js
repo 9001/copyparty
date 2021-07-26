@@ -361,6 +361,18 @@ function linksplit(rp) {
 }
 
 
+function vsplit(vp) {
+    if (vp.endsWith('/'))
+        vp = vp.slice(0, -1);
+
+    var ofs = vp.lastIndexOf('/') + 1,
+        base = vp.slice(0, ofs),
+        fn = vp.slice(ofs);
+
+    return [base, fn];
+}
+
+
 function uricom_enc(txt, do_fb_enc) {
     try {
         return encodeURIComponent(txt);
