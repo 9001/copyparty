@@ -2049,7 +2049,7 @@ document.onkeydown = function (e) {
 		}
 	}
 
-	if (aet && aet != 'a')
+	if (aet && aet != 'a' && aet != 'tr')
 		return;
 
 	if (ctrl(e)) {
