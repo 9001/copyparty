@@ -1488,6 +1488,7 @@ var fileman = (function () {
 		bcut.style.display = has(perms, 'move') ? '' : 'none';
 		bpst.style.display = has(perms, 'write') ? '' : 'none';
 		bpst.setAttribute('tt', 'paste ' + r.clip.length + ' items$NHotkey: ctrl-V');
+		ebi('wfm').style.display = QS('#wfm a.en:not([display])') ? '' : 'none';
 	};
 
 	r.rename = function (e) {
@@ -1667,11 +1668,10 @@ var fileman = (function () {
 
 	r.bus.onmessage = function (e) {
 		r.clip = null;
+		r.render();
 		var me = get_evpath();
 		if (e && e.data == me)
 			treectl.goto(e.data);
-		else
-			r.render();
 	};
 
 	r.tx = function (msg) {
@@ -3356,7 +3356,7 @@ var msel = (function () {
 		for (var a = 0, aa = tds.length; a < aa; a++) {
 			tds[a].onclick = seltgl;
 		}
-		r.sel = r.all = null;
+		selui();
 		arcfmt.render();
 		fileman.render();
 		ebi('selzip').style.display = ebi('unsearch') ? 'none' : '';
