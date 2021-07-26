@@ -290,6 +290,7 @@ def run_argparse(argv, formatter):
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")
     ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
+    ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
     ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
     ap2.add_argument("--log-htp", action="store_true", help="print http-server threadpool scaling")
     ap2.add_argument("--ihead", metavar="HEADER", type=u, action='append', help="dump incoming header")

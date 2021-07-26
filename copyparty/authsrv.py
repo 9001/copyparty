@@ -440,8 +440,13 @@ class AuthSrv(object):
 
         if self.args.a:
             # list of username:password
-            for u, p in [x.split(":", 1) for x in self.args.a]:
-                acct[u] = p
+            for x in self.args.a:
+                try:
+                    u, p = x.split(":", 1)
+                    acct[u] = p
+                except:
+                    m = '\n  invalid value "{}" for argument -a, must be username:password'
+                    raise Exception(m.format(x))
 
         if self.args.v:
             # list of src:dst:permset:permset:...
@@ -688,6 +693,27 @@ class AuthSrv(object):
             sys.exit(1)
 
         vfs.bubble_flags()
+
+        m = "volumes and permissions:\n"
+        for v in vfs.all_vols.values():
+            if not self.warn_anonwrite:
+                break
+
+            m += '\n\033[36m"/{}"  \033[33m{}\033[0m'.format(v.vpath, v.realpath)
+            for txt, attr in [
+                ["  read", "uread"],
+                [" write", "uwrite"],
+                ["  move", "umove"],
+                ["delete", "udel"],
+            ]:
+                u = list(sorted(getattr(v.axs, attr).keys()))
+                u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
+                u = u if u else "\033[36m--none--\033[0m"
+                m += "\n  {}:  {}".format(txt, u)
+            m += "\n"
+
+        if self.warn_anonwrite and not self.args.no_voldump:
+            self.log(m)
 
         try:
             v, _ = vfs.get("/", "*", False, True)
