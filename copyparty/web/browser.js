@@ -1523,11 +1523,11 @@ var fileman = (function () {
 				vp = vps.shift();
 
 			if (!vp) {
-				toast.show('delete OK', 2000);
+				toast.ok(2000, 'delete OK');
 				treectl.goto(get_evpath());
 				return;
 			}
-			toast.show('deleting ' + (vps.length + 1) + ' items<br /><br />' + vp, 2000);
+			toast.inf(2000, 'deleting ' + (vps.length + 1) + ' items<br /><br />' + vp);
 
 			xhr.open('GET', vp + '?delete', true);
 			xhr.onreadystatechange = delete_cb;
@@ -1539,7 +1539,7 @@ var fileman = (function () {
 
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.show('delete failed:<br />' + msg, 2000);
+				toast.err(2000, 'delete failed:<br />' + msg);
 				return;
 			}
 			deleter();
@@ -1564,7 +1564,7 @@ var fileman = (function () {
 			cl.add(inv ? 'c2' : 'c1');
 		}
 
-		toast.show('cut ' + sel.length + ' items', 1000);
+		toast.inf(1000, 'cut ' + sel.length + ' items');
 		jwrite('fman_clip', vps);
 		r.tx();
 	};
@@ -1597,6 +1597,9 @@ var fileman = (function () {
 		if (exists.length)
 			alert('these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + exists.join('\n'));
 
+		if (!req.length)
+			return;
+
 		if (!confirm('paste these ' + req.length + ' items here?\n\n' + req.join('\n')))
 			return;
 
@@ -1605,11 +1608,11 @@ var fileman = (function () {
 				vp = req.shift();
 
 			if (!vp) {
-				toast.show('paste OK', 2000);
+				toast.ok(2000, 'paste OK');
 				treectl.goto(get_evpath());
 				return;
 			}
-			toast.show('pasting ' + (req.length + 1) + ' items<br /><br />' + vp, 2000);
+			toast.inf(2000, 'pasting ' + (req.length + 1) + ' items<br /><br />' + vp);
 
 			var dst = get_evpath() + vp.split('/').slice(-1)[0];
 
@@ -1623,7 +1626,7 @@ var fileman = (function () {
 
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.show('paste failed:<br />' + msg, 2000);
+				toast.err(2000, 'paste failed:<br />' + msg);
 				return;
 			}
 			paster();

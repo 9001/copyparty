@@ -654,11 +654,24 @@ var toast = (function () {
         clmod(obj, 'vis');
     };
 
-    r.show = function (txt, ms) {
+    r.show = function (cl, ms, txt) {
         clearTimeout(te);
         te = setTimeout(r.hide, ms);
         obj.innerHTML = txt;
-        clmod(obj, 'vis', 1000);
+        obj.className = cl + ' vis';
+    };
+
+    r.ok = function (ms, txt) {
+        r.show('ok', ms, txt);
+    };
+    r.inf = function (ms, txt) {
+        r.show('inf', ms, txt);
+    };
+    r.warn = function (ms, txt) {
+        r.show('warn', ms, txt);
+    };
+    r.err = function (ms, txt) {
+        r.show('err', ms, txt);
     };
 
     return r;

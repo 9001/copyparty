@@ -48,11 +48,29 @@ body {
 	padding: 1em 1.3em;
 	border-width: .4em 0;
 	transform: translateX(100%);
-	transition: all .3s cubic-bezier(.2, 1.2, .5, 1);;
+	transition: all .3s cubic-bezier(.2, 1.2, .5, 1);
+	text-shadow: 1px 1px 0 #000;
+	color: #fff;
 }
 #toast.vis {
 	right: 1.3em;
 	transform: unset;
+}
+#toast.inf {
+	background: #07a;
+	border-color: #0be;
+}
+#toast.ok {
+	background: #4a0;
+	border-color: #8e4;
+}
+#toast.warn {
+	background: #a70;
+	border-color: #fc0;
+}
+#toast.err {
+	background: #b00;
+	border-color: #f00;
 }
 #tt.b {
 	padding: 0 2em;
@@ -1009,11 +1027,13 @@ html.light {
 	background: #eee;
 	text-shadow: none;
 }
-html.light #tt,
-html.light #toast {
+html.light #tt {
 	background: #fff;
 	border-color: #888 #000 #777 #000;
-	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
+}
+html.light #tt,
+html.light #toast {
+		box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
 html.light #tt code {
 	background: #060;
