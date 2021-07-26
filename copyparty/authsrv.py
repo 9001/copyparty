@@ -480,10 +480,7 @@ class AuthSrv(object):
         if WINDOWS:
             cased = {}
             for k, v in mount.items():
-                try:
-                    cased[k] = absreal(v)
-                except:
-                    cased[k] = v
+                cased[k] = absreal(v)
 
             mount = cased
 

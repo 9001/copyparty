@@ -1496,9 +1496,36 @@ var fileman = (function () {
 		if (sel.length !== 1)
 			return alert('select exactly 1 item to rename');
 
-		var fn = prompt('new filename:', sel[0]);
-		if (!fn || fn == sel[0])
-			return alert('aborted');
+		var src = sel[0].vp;
+		if (src.endsWith('/'))
+			src = src.slice(0, -1);
+
+		var ofs = src.lastIndexOf('/') + 1,
+			base = src.slice(0, ofs),
+			ofn = src.slice(ofs);
+
+		var fn = prompt('new filename:', ofn);
+		if (!fn || fn == ofn)
+			return toast.warn(1000, 'rename aborted');
+
+		var dst = base + fn;
+
+		function rename_cb() {
+			if (this.readyState != XMLHttpRequest.DONE)
+				return;
+
+			if (this.status !== 200) {
+				var msg = this.responseText;
+				toast.err(2000, 'rename failed:<br />' + msg);
+				return;
+			}
+			toast.ok(2000, 'rename OK');
+			treectl.goto(get_evpath());
+		}
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', src + '?move=' + dst, true);
+		xhr.onreadystatechange = rename_cb;
+		xhr.send();
 	};
 
 	r.delete = function (e) {

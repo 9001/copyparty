@@ -451,14 +451,7 @@ class Up2k(object):
             return True, n_add or n_rm or do_vac
 
     def _build_dir(self, dbw, top, excl, cdir, nohash, seen):
-        rcdir = cdir
-        if not ANYWIN:
-            try:
-                # a bit expensive but worth
-                rcdir = absreal(cdir)
-            except:
-                pass
-
+        rcdir = absreal(cdir)  # a bit expensive but worth
         if rcdir in seen:
             m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
             self.log(m.format(seen[-1], rcdir, cdir), 3)
@@ -1179,16 +1172,18 @@ class Up2k(object):
         with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as f:
             return f["orz"][1]
 
-    def _symlink(self, src, dst):
-        self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
+    def _symlink(self, src, dst, verbose=True):
+        if verbose:
+            self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
+
         if self.args.nw:
             return
 
         try:
             lsrc = src
             ldst = dst
-            fs1 = bos.stat(os.path.split(src)[0]).st_dev
-            fs2 = bos.stat(os.path.split(dst)[0]).st_dev
+            fs1 = bos.stat(os.path.dirname(src)).st_dev
+            fs2 = bos.stat(os.path.dirname(dst)).st_dev
             if fs1 == 0:
                 # py2 on winxp or other unsupported combination
                 raise OSError()
@@ -1416,12 +1411,18 @@ class Up2k(object):
         if bos.path.exists(dabs):
             raise Pebkac(400, "mv2: target file exists")
 
+        bos.makedirs(os.path.dirname(dabs))
+
         if bos.path.islink(sabs):
-            # following symlinks is too scary, schedule rescan of both vols
+            dlabs = absreal(sabs)
+            m = "moving symlink from [{}] to [{}], target [{}]"
+            self.log(m.format(sabs, dabs, dlabs))
+            os.unlink(sabs)
+            self._symlink(dlabs, dabs, False)
+
+            # folders are too scary, schedule rescan of both vols
             self.need_rescan[svn.vpath] = 1
             self.need_rescan[dvn.vpath] = 1
-            bos.makedirs(os.path.dirname(dabs))
-            bos.rename(sabs, dabs)
             return "k"
 
         c1, w, ftime, fsize = self._find_from_vpath(svn.realpath, srem)
@@ -1432,49 +1433,20 @@ class Up2k(object):
             ftime = st.st_mtime
             fsize = st.st_size
 
-        if not w:
-            self.log("not found in src db: [{}]".format(svp))
-
-        if w and c2:
-            q = "select rd, fn from up where substr(w,1,16)=? and w=?"
-            for rd, fn in c2.execute(q, (w[:16], w)):
-                if rd.startswith("//") or fn.startswith("//"):
-                    rd, fn = s3dec(rd, fn)
-
-                slabs = "{}/{}".format(rd, fn).strip("/")
-                slabs = absreal(os.path.join(dvn.realpath, slabs))
-                if slabs == sabs:
-                    # hit is src
-                    continue
-
-                if not bos.path.exists(slabs):
-                    continue
-
-                self.log("mv: quick relink, nice")
-                self._symlink(slabs, dabs)
-                self.db_add(c2, w, drd, dfn, ftime, fsize)
-                bos.unlink(sabs)
-
-                self._forget_file(svn.realpath, srem, c1, w)
-                c1.connection.commit()
-                c2.connection.commit()
-                return "k"
-
-        # not found in dst db; copy info
-        self.log("mv: plain move")
-
         if w:
             if c2:
                 self._copy_tags(c1, c2, w)
 
             self._forget_file(svn.realpath, srem, c1, w)
+            self._relink(w, svn.realpath, srem, dabs)
             c1.connection.commit()
 
             if c2:
                 self.db_add(c2, w, drd, dfn, ftime, fsize)
                 c2.connection.commit()
+        else:
+            self.log("not found in src db: [{}]".format(svp))
 
-        bos.makedirs(os.path.dirname(dabs))
         bos.rename(sabs, dabs)
         return "k"
 
@@ -1509,28 +1481,11 @@ class Up2k(object):
     def _forget_file(self, ptop, vrem, cur, wark):
         """forgets file in db, fixes symlinks, does not delete"""
         srd, sfn = vsplit(vrem)
-        dupes = []
-
         self.log("forgetting {}".format(vrem))
         if wark:
-            # found in db; find dupes
             self.log("found {} in db".format(wark))
+            self._relink(wark, ptop, vrem, None)
 
-            q = "select rd, fn from up where substr(w,1,16)=? and w=?"
-            for rd, fn in cur.execute(q, (wark[:16], wark)):
-                if rd.startswith("//") or fn.startswith("//"):
-                    rd, fn = s3dec(rd, fn)
-
-                dvrem = "/".join([rd, fn]).strip("/")
-                if vrem != dvrem:
-                    dupes.append(dvrem)
-                    self.log("found {} dupe: {}".format(q, dvrem))
-
-        if dupes:
-            # fix symlinks
-            self._relink(ptop, dupes, vrem, None)
-        elif wark:
-            # thus cur; drop tags
             q = "delete from mt where w=?"
             cur.execute(q, (wark[:16],))
             self.db_rm(cur, srd, sfn)
@@ -1550,42 +1505,61 @@ class Up2k(object):
                 self.log(m.format(wark, p))
                 del reg[wark]
 
-    def _relink(self, ptop, dupes, vp1, vp2):
+    def _relink(self, wark, sptop, srem, dabs):
         """
-        update symlinks from file at vp1 to vp2 (rename),
-        or to first remaining full if no vp2 (delete)
+        update symlinks from file at svn/srem to dabs (rename),
+        or to first remaining full if no dabs (delete)
         """
+        dupes = []
+        sabs = os.path.join(sptop, srem)
+        q = "select rd, fn from up where substr(w,1,16)=? and w=?"
+        for ptop, cur in self.cur.items():
+            for rd, fn in cur.execute(q, (wark[:16], wark)):
+                if rd.startswith("//") or fn.startswith("//"):
+                    rd, fn = s3dec(rd, fn)
+
+                dvrem = "/".join([rd, fn]).strip("/")
+                if ptop != sptop or srem != dvrem:
+                    dupes.append([ptop, dvrem])
+                    self.log("found {} dupe: [{}] {}".format(wark, ptop, dvrem))
 
         if not dupes:
             return
 
-        def gabs(v):
-            return fsdec(os.path.abspath(fsenc(os.path.join(ptop, v))))
-
         full = {}
         links = {}
-        for vp in dupes:
-            ap = gabs(vp)
-            d = links if bos.path.islink(ap) else full
-            d[vp] = ap
+        for ptop, vp in dupes:
+            ap = os.path.join(ptop, vp)
+            try:
+                d = links if bos.path.islink(ap) else full
+                d[ap] = [ptop, vp]
+            except:
+                self.log("relink: not found: [{}]".format(ap))
 
-        if not vp2 and not full:
+        if not dabs and not full and links:
             # deleting final remaining full copy; swap it with a symlink
-            dvp = links.keys()[0]
-            dabs = links.pop(dvp)
-            sabs = gabs(vp1)
+            slabs = list(sorted(links.keys()))[0]
+            ptop, rem = links.pop(slabs)
             self.log("linkswap [{}] and [{}]".format(sabs, dabs))
-            bos.unlink(dabs)
-            bos.rename(sabs, dabs)
-            self._symlink(sabs, dabs)
-            full[vp1] = sabs
+            bos.unlink(slabs)
+            bos.rename(sabs, slabs)
+            self._symlink(slabs, sabs, False)
+            full[slabs] = [ptop, rem]
 
-        dvp = vp2 if vp2 else list(sorted(full.keys()))[0]
-        dabs = gabs(dvp)
-        for alink in links.values():
-            self.log("relinking [{}] to [{}]".format(alink, dabs))
-            bos.unlink(alink)
-            self._symlink(alink, dabs)
+        if not dabs:
+            dabs = list(sorted(full.keys()))[0]
+
+        for alink in links.keys():
+            try:
+                if alink != sabs and absreal(alink) != sabs:
+                    continue
+
+                self.log("relinking [{}] to [{}]".format(alink, dabs))
+                bos.unlink(alink)
+            except:
+                pass
+
+            self._symlink(dabs, alink, False)
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
