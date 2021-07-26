@@ -2040,6 +2040,13 @@ document.onkeydown = function (e) {
 			msel.selui();
 			return ev(e);
 		}
+		if (k == 'KeyA' && ctrl(e)) {
+			var sel = msel.getsel(),
+				all = msel.getall();
+
+			msel.evsel(e, sel.length < all.length);
+			return ev(e);
+		}
 	}
 
 	if (aet && aet != 'a')
@@ -3337,7 +3344,7 @@ var msel = (function () {
 		clmod(tr, 'sel', 't');
 		r.selui();
 	}
-	function evsel(e, fun) {
+	r.evsel = function (e, fun) {
 		ev(e);
 		var trs = QSA('#files tbody tr');
 		for (var a = 0, aa = trs.length; a < aa; a++)
@@ -3345,10 +3352,10 @@ var msel = (function () {
 		r.selui();
 	}
 	ebi('selall').onclick = function (e) {
-		evsel(e, "add");
+		r.evsel(e, "add");
 	};
 	ebi('selinv').onclick = function (e) {
-		evsel(e, "t");
+		r.evsel(e, "t");
 	};
 	ebi('selzip').onclick = function (e) {
 		ev(e);
