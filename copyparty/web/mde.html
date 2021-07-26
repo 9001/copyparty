@@ -30,16 +30,15 @@ var md_opt = {
 };
 
 var lightswitch = (function () {
-	var fun = function () {
-		var dark = !document.documentElement.getAttribute("class");
-		document.documentElement.setAttribute("class", dark ? "dark" : "");
-		if (window.localStorage)
-			localStorage.setItem('lightmode', dark ? 0 : 1);
-	};
-	if (window.localStorage && localStorage.getItem('lightmode') != 1)
-		fun();
-	
-	return fun;
+	var l = localStorage,
+		drk = l.getItem('lightmode') != 1,
+		f = function (e) {
+if (e) drk = !drk;
+document.documentElement.setAttribute("class", drk? "dark":"light");
+l.setItem('lightmode', drk? 0:1);
+		};
+	f();
+	return f;
 })();
 
 	</script>

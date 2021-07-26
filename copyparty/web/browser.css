@@ -65,7 +65,7 @@ body {
 	border-color: #8e4;
 }
 #toast.warn {
-	background: #a70;
+	background: #970;
 	border-color: #fc0;
 }
 #toast.err {
@@ -1033,7 +1033,7 @@ html.light #tt {
 }
 html.light #tt,
 html.light #toast {
-		box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
+	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
 html.light #tt code {
 	background: #060;

@@ -447,19 +447,14 @@ function jcp(obj) {
 
 
 function sread(key) {
-    if (window.localStorage)
-        return localStorage.getItem(key);
-
-    return null;
+    return localStorage.getItem(key);
 }
 
 function swrite(key, val) {
-    if (window.localStorage) {
-        if (val === undefined || val === null)
-            localStorage.removeItem(key);
-        else
-            localStorage.setItem(key, val);
-    }
+    if (val === undefined || val === null)
+        localStorage.removeItem(key);
+    else
+        localStorage.setItem(key, val);
 }
 
 function jread(key, fb) {
@@ -643,6 +638,7 @@ var tt = (function () {
 var toast = (function () {
     var r = {},
         te = null,
+        visible = false,
         obj = mknod('div');
 
     obj.setAttribute('id', 'toast');
@@ -652,13 +648,17 @@ var toast = (function () {
     r.hide = function () {
         clearTimeout(te);
         clmod(obj, 'vis');
+        r.visible = false;
     };
 
     r.show = function (cl, ms, txt) {
         clearTimeout(te);
-        te = setTimeout(r.hide, ms);
+        if (ms)
+            te = setTimeout(r.hide, ms);
+
         obj.innerHTML = txt;
         obj.className = cl + ' vis';
+        r.visible = true;
     };
 
     r.ok = function (ms, txt) {

@@ -131,18 +131,18 @@ var md_opt = {
 };
 
 (function () {
-    var btn = document.getElementById("lightswitch");
-    var toggle = function (e) {
-		if (e) e.preventDefault();
-        var dark = !document.documentElement.getAttribute("class");
-        document.documentElement.setAttribute("class", dark ? "dark" : "");
-        btn.innerHTML = "go " + (dark ? "light" : "dark");
-        if (window.localStorage)
-            localStorage.setItem('lightmode', dark ? 0 : 1);
-    };
-    btn.onclick = toggle;
-    if (window.localStorage && localStorage.getItem('lightmode') != 1)
-		toggle();
+    var l = localStorage,
+		drk = l.getItem('lightmode') != 1,
+		btn = document.getElementById("lightswitch"),
+		f = function (e) {
+if (e) { e.preventDefault(); drk = !drk; }
+document.documentElement.setAttribute("class", drk? "dark":"light");
+btn.innerHTML = "go " + (drk ? "light":"dark");
+l.setItem('lightmode', drk? 0:1);
+    	};
+	
+	btn.onclick = f;
+	f();
 })();
 
 	</script>

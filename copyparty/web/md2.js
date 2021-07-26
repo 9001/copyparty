@@ -236,7 +236,7 @@ function Modpoll() {
 
         var skip = null;
 
-        if (ebi('toast'))
+        if (toast.visible)
             skip = 'toast';
 
         else if (this.skip_one)
@@ -293,8 +293,7 @@ function Modpoll() {
 
                 "You can click this message to ignore and contnue."
             ];
-            return toast(false, "box-shadow:0 1em 2em rgba(64,64,64,0.8);font-weight:normal",
-                36, "<p>" + msg.join('</p>\n<p>') + '</p>');
+            return toast.warn(0, "<p>" + msg.join('</p>\n<p>') + '</p>');
         }
 
         console.log('modpoll eq');
@@ -323,16 +322,12 @@ function save(e) {
     var save_btn = ebi("save"),
         save_cls = save_btn.getAttribute('class') + '';
 
-    if (save_cls.indexOf('disabled') >= 0) {
-        toast(true, ";font-size:2em;color:#c90", 9, "no changes");
-        return;
-    }
+    if (save_cls.indexOf('disabled') >= 0)
+        return toast.inf(2000, "no changes");
 
     var force = (save_cls.indexOf('force-save') >= 0);
-    if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document')) {
-        alert('ok, aborted');
-        return;
-    }
+    if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document'))
+        return alert('ok, aborted');
 
     var txt = dom_src.value;
 
@@ -443,44 +438,8 @@ function savechk_cb() {
     last_modified = this.lastmod;
     server_md = this.txt;
     draw_md();
-    toast(true, ";font-size:6em;font-family:serif;color:#9b4", 4,
-        'OK✔️<span style="font-size:.2em;color:#999;position:absolute">' + this.ntry + '</span>');
-
+    toast.ok(2000, 'save OK' + (this.ntry ? '<br />attempt ' + this.ntry : ''));
     modpoll.disabled = false;
-}
-
-function toast(autoclose, style, width, msg) {
-    var ok = ebi("toast");
-    if (ok)
-        ok.parentNode.removeChild(ok);
-
-    style = "width:" + width + "em;left:calc(50% - " + (width / 2) + "em);" + style;
-    ok = mknod('div');
-    ok.setAttribute('id', 'toast');
-    ok.setAttribute('style', style);
-    ok.innerHTML = msg;
-    var parent = ebi('m');
-    document.documentElement.appendChild(ok);
-
-    var hide = function (delay) {
-        delay = delay || 0;
-
-        setTimeout(function () {
-            ok.style.opacity = 0;
-        }, delay);
-
-        setTimeout(function () {
-            if (ok.parentNode)
-                ok.parentNode.removeChild(ok);
-        }, delay + 250);
-    }
-
-    ok.onclick = function () {
-        hide(0);
-    };
-
-    if (autoclose)
-        hide(500);
 }
 
 
