@@ -2011,8 +2011,9 @@ function tree_up() {
 
 
 document.onkeydown = function (e) {
-	if (!document.activeElement || document.activeElement != document.body && document.activeElement.nodeName.toLowerCase() != 'a')
-		return;
+	var ae = document.activeElement, aet = '';
+	if (ae && ae != document.body)
+		aet = ae.nodeName.toLowerCase();
 
 	if (e.altKey || e.isComposing)
 		return;
@@ -2021,6 +2022,28 @@ document.onkeydown = function (e) {
 		return;
 
 	var k = e.code + '', pos = -1, n;
+
+	if (aet == 'tr' && ae.closest('#files')) {
+		var d = '';
+		if (k == 'ArrowUp') d = 'previous';
+		if (k == 'ArrowDown') d = 'next';
+		if (d) {
+			var el = ae[d + 'ElementSibling'];
+			if (el) {
+				el.focus();
+				document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * el.offsetHeight;
+				return ev(e);
+			}
+		}
+		if (k == 'Space') {
+			clmod(ae, 'sel', 't');
+			msel.selui();
+			return ev(e);
+		}
+	}
+
+	if (aet && aet != 'a')
+		return;
 
 	if (ctrl(e)) {
 		if (k == 'KeyX')
@@ -3290,6 +3313,7 @@ var msel = (function () {
 				r.sel.push(item);
 
 			links[a].setAttribute('name', item.name);
+			links[a].closest('tr').setAttribute('tabindex', '0');
 		}
 	};
 
@@ -3301,24 +3325,24 @@ var msel = (function () {
 		r.load();
 		return r.all;
 	};
-	function selui() {
+	r.selui = function () {
 		r.sel = r.all = null;
 		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
 		thegrid.loadsel();
 		fileman.render();
 	}
-	function seltgl(e) {
+	r.seltgl = function (e) {
 		ev(e);
 		var tr = this.parentNode;
 		clmod(tr, 'sel', 't');
-		selui();
+		r.selui();
 	}
 	function evsel(e, fun) {
 		ev(e);
 		var trs = QSA('#files tbody tr');
 		for (var a = 0, aa = trs.length; a < aa; a++)
 			clmod(trs[a], 'sel', fun);
-		selui();
+		r.selui();
 	}
 	ebi('selall').onclick = function (e) {
 		evsel(e, "add");
@@ -3354,9 +3378,9 @@ var msel = (function () {
 	r.render = function () {
 		var tds = QSA('#files tbody td+td+td');
 		for (var a = 0, aa = tds.length; a < aa; a++) {
-			tds[a].onclick = seltgl;
+			tds[a].onclick = r.seltgl;
 		}
-		selui();
+		r.selui();
 		arcfmt.render();
 		fileman.render();
 		ebi('selzip').style.display = ebi('unsearch') ? 'none' : '';

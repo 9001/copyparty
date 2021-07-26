@@ -294,6 +294,7 @@ html.light #ggrid a.sel {
 	border-color: #c37;
 }
 #files tbody tr.sel:hover td,
+#files tbody tr.sel:focus td,
 #ggrid a.sel:hover,
 html.light #ggrid a.sel:hover {
 	color: #fff;
@@ -327,6 +328,21 @@ html.light #ggrid a.sel {
 #files tr.sel a.play.act {
 	color: #fff;
 	text-shadow: 0 0 1px #fff;
+}
+#files tr:focus {
+	outline: none;
+	position: relative;
+}
+#files tr:focus td {
+	background: #111;
+	border-color: #fc0 #111 #fc0 #111;
+	box-shadow: 0 .2em 0 #fc0, 0 -.2em 0 #fc0;
+}
+#files tr:focus td:first-child {
+	box-shadow: -.2em .2em 0 #fc0, -.2em -.2em 0 #fc0;
+}
+#files tr:focus+tr td {
+	border-top: 1px solid transparent;
 }
 #blocked {
 	position: fixed;
@@ -1126,6 +1142,17 @@ html.light #files td {
 html.light #files tbody tr:last-child td {
 	border-bottom: .2em solid #ccc;
 }
+html.light #files tr:focus td {
+	background: #fff;
+	border-color: #c37;
+	box-shadow: 0 .2em 0 #e80 , 0 -.2em 0 #e80;
+}
+html.light #files tr:focus td:first-child {
+	box-shadow: -.2em .2em 0 #e80, -.2em -.2em 0 #e80;
+}
+html.light #files tr.sel td {
+	background: #925;
+}
 html.light #files td:nth-child(2n) {
 	color: #d38;
 }
@@ -1179,7 +1206,8 @@ html.light #wnp {
 html.light #barbuf {
 	background: none;
 }
-html.light #files tr.sel:hover td {
+html.light #files tr.sel:hover td,
+html.light #files tr.sel:focus td {
 	background: #c37;
 }
 html.light #files tr.sel td {
