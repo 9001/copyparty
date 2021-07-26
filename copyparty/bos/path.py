@@ -5,6 +5,10 @@ import os
 from ..util import fsenc, fsdec
 
 
+def abspath(p):
+    return fsdec(os.path.abspath(fsenc(p)))
+
+
 def exists(p):
     return os.path.exists(fsenc(p))
 

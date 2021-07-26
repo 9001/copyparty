@@ -369,7 +369,7 @@ class AuthSrv(object):
                     raise Exception('invalid mountpoint "{}"'.format(vol_dst))
 
                 # cfg files override arguments and previous files
-                vol_src = fsdec(os.path.abspath(fsenc(vol_src)))
+                vol_src = bos.path.abspath(vol_src)
                 vol_dst = vol_dst.strip("/")
                 mount[vol_dst] = vol_src
                 daxs[vol_dst] = AXS()
@@ -461,7 +461,7 @@ class AuthSrv(object):
                     src = uncyg(src)
 
                 # print("\n".join([src, dst, perms]))
-                src = fsdec(os.path.abspath(fsenc(src)))
+                src = bos.path.abspath(src)
                 dst = dst.strip("/")
                 mount[dst] = src
                 daxs[dst] = AXS()
@@ -492,7 +492,7 @@ class AuthSrv(object):
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
-            vfs = VFS(self.log_func, os.path.abspath("."), "", axs, {})
+            vfs = VFS(self.log_func, bos.path.abspath("."), "", axs, {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             vfs = VFS(self.log_func, None, "", AXS(), {})
