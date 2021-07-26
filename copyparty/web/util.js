@@ -654,7 +654,6 @@ var toast = (function () {
         obj = mknod('div');
 
     obj.setAttribute('id', 'toast');
-    obj.onclick = r.hide;
     document.body.appendChild(obj);;
 
     r.hide = function () {
@@ -666,9 +665,9 @@ var toast = (function () {
     r.show = function (cl, ms, txt) {
         clearTimeout(te);
         if (ms)
-            te = setTimeout(r.hide, ms);
+            te = setTimeout(r.hide, ms * 1000);
 
-        obj.innerHTML = txt;
+        obj.innerHTML = txt.replace(/\n/g, '<br />\n');
         obj.className = cl + ' vis';
         r.visible = true;
     };
@@ -686,5 +685,6 @@ var toast = (function () {
         r.show('err', ms, txt);
     };
 
+    obj.onclick = r.hide;
     return r;
 })();

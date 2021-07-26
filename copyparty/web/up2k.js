@@ -1176,10 +1176,6 @@ function up2k_init(subtle) {
                 }
 
                 t.t_hashed = Date.now();
-                if (t.n == 0 && window.location.hash == '#dbg') {
-                    var spd = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.);
-                    alert('{0} ms, {1} MB/s\n'.format(t.t_hashed - t.t_hashing, spd.toFixed(3)) + t.hash.join('\n'));
-                }
 
                 pvis.seth(t.n, 2, 'hashing done');
                 pvis.seth(t.n, 1, '📦 wait');

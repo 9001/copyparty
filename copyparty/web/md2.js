@@ -323,11 +323,11 @@ function save(e) {
         save_cls = save_btn.getAttribute('class') + '';
 
     if (save_cls.indexOf('disabled') >= 0)
-        return toast.inf(2000, "no changes");
+        return toast.inf(2, "no changes");
 
     var force = (save_cls.indexOf('force-save') >= 0);
     if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document'))
-        return alert('ok, aborted');
+        return toast.inf(3, 'aborted');
 
     var txt = dom_src.value;
 
@@ -352,18 +352,15 @@ function save_cb() {
     if (this.readyState != XMLHttpRequest.DONE)
         return;
 
-    if (this.status !== 200) {
-        alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
-        return;
-    }
+    if (this.status !== 200)
+        return alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 
     var r;
     try {
         r = JSON.parse(this.responseText);
     }
     catch (ex) {
-        alert('Failed to parse reply from server:\n\n' + this.responseText);
-        return;
+        return alert('Failed to parse reply from server:\n\n' + this.responseText);
     }
 
     if (!r.ok) {
@@ -438,7 +435,7 @@ function savechk_cb() {
     last_modified = this.lastmod;
     server_md = this.txt;
     draw_md();
-    toast.ok(2000, 'save OK' + (this.ntry ? '<br />attempt ' + this.ntry : ''));
+    toast.ok(2, 'save OK' + (this.ntry ? '\nattempt ' + this.ntry : ''));
     modpoll.disabled = false;
 }
 
@@ -720,7 +717,7 @@ function fmt_table(e) {
 
         var ind2 = tab[a].match(re_ind)[0];
         if (ind != ind2 && a != 1)  // the table can be a list entry or something, ignore [0]
-            return alert(err + 'indentation mismatch on row#2 and ' + row_name + ',\n' + tab[a]);
+            return toast.err(7, err + 'indentation mismatch on row#2 and ' + row_name + ',\n' + tab[a]);
 
         var t = tab[a].slice(ind.length);
         t = t.replace(re_lpipe, "");
@@ -730,7 +727,7 @@ function fmt_table(e) {
         if (a == 0)
             ncols = tab[a].length;
         else if (ncols < tab[a].length)
-            return alert(err + 'num.columns(' + row_name + ') exceeding row#2;  ' + ncols + ' < ' + tab[a].length);
+            return toast.err(7, err + 'num.columns(' + row_name + ') exceeding row#2;  ' + ncols + ' < ' + tab[a].length);
 
         // if row has less columns than row2, fill them in
         while (tab[a].length < ncols)
@@ -747,7 +744,7 @@ function fmt_table(e) {
     for (var col = 0; col < tab[1].length; col++) {
         var m = tab[1][col].match(re_align);
         if (!m)
-            return alert(err + 'invalid column specification, row#2, col ' + (col + 1) + ', [' + tab[1][col] + ']');
+            return toast.err(7, err + 'invalid column specification, row#2, col ' + (col + 1) + ', [' + tab[1][col] + ']');
 
         if (m[2]) {
             if (m[1])
@@ -835,10 +832,9 @@ function mark_uni(e) {
         ptn = new RegExp('([^' + js_uni_whitelist + ']+)', 'g'),
         mod = txt.replace(/\r/g, "").replace(ptn, "\u2588\u2770$1\u2771");
 
-    if (txt == mod) {
-        alert('no results;  no modifications were made');
-        return;
-    }
+    if (txt == mod)
+        return toast.inf(5, 'no results;  no modifications were made');
+
     dom_src.value = mod;
 }
 
@@ -852,10 +848,9 @@ function iter_uni(e) {
         re = new RegExp('([^' + js_uni_whitelist + ']+)'),
         m = re.exec(txt.slice(ofs));
 
-    if (!m) {
-        alert('no more hits from cursor onwards');
-        return;
-    }
+    if (!m)
+        return toast.inf(5, 'no more hits from cursor onwards');
+
     ofs += m.index;
 
     dom_src.setSelectionRange(ofs, ofs + m[0].length, "forward");

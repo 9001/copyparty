@@ -106,15 +106,12 @@ function md_changed(mde, on_srv) {
 
 function save(mde) {
     var save_btn = QS('.editor-toolbar button.save');
-    if (save_btn.classList.contains('disabled')) {
-        alert('there is nothing to save');
-        return;
-    }
+    if (save_btn.classList.contains('disabled'))
+        return toast.inf(2, 'no changes');
+
     var force = save_btn.classList.contains('force-save');
-    if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document')) {
-        alert('ok, aborted');
-        return;
-    }
+    if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document'))
+        return toast.inf(3, 'aborted');
 
     var txt = mde.value();
 
@@ -138,18 +135,15 @@ function save_cb() {
     if (this.readyState != XMLHttpRequest.DONE)
         return;
 
-    if (this.status !== 200) {
-        alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
-        return;
-    }
+    if (this.status !== 200)
+        return alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 
     var r;
     try {
         r = JSON.parse(this.responseText);
     }
     catch (ex) {
-        alert('Failed to parse reply from server:\n\n' + this.responseText);
-        return;
+        return alert('Failed to parse reply from server:\n\n' + this.responseText);
     }
 
     if (!r.ok) {

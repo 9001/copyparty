@@ -285,7 +285,7 @@ var mpl = (function () {
 		r.os_ctl = !r.os_ctl && have_mctl;
 		bcfg_set('au_os_ctl', r.os_ctl);
 		if (!have_mctl)
-			alert('need firefox 82+ or chrome 73+');
+			toast.err(5, 'need firefox 82+ or chrome 73+');
 	};
 
 	ebi('au_osd_cv').onclick = function (e) {
@@ -1353,7 +1353,7 @@ function play(tid, is_ev, seek, call_depth) {
 		return true;
 	}
 	catch (ex) {
-		alert('playback failed: ' + ex);
+		toast.err(0, 'playback failed: ' + ex);
 	}
 	setclass(oid, 'play');
 	setTimeout(next_song, 500);
@@ -1495,7 +1495,7 @@ var fileman = (function () {
 		ev(e);
 		var sel = msel.getsel();
 		if (sel.length !== 1)
-			return alert('select exactly 1 item to rename');
+			return toast.err(3, 'select exactly 1 item to rename');
 
 		var src = sel[0].vp;
 		if (src.endsWith('/'))
@@ -1507,7 +1507,7 @@ var fileman = (function () {
 
 		var fn = prompt('new filename:', ofn);
 		if (!fn || fn == ofn)
-			return toast.warn(1000, 'rename aborted');
+			return toast.warn(1, 'rename aborted');
 
 		var dst = base + fn;
 
@@ -1517,10 +1517,10 @@ var fileman = (function () {
 
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.err(2000, 'rename failed:<br />' + msg);
+				toast.err(9, 'rename failed:\n' + msg);
 				return;
 			}
-			toast.ok(2000, 'rename OK');
+			toast.ok(2, 'rename OK');
 			treectl.goto(get_evpath());
 		}
 		var xhr = new XMLHttpRequest();
@@ -1538,7 +1538,7 @@ var fileman = (function () {
 			vps.push(sel[a].vp);
 
 		if (!sel.length)
-			return alert('select at least 1 item to delete');
+			return toast.err(3, 'select at least 1 item to delete');
 
 		if (!confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + vps.join('\n')))
 			return;
@@ -1551,11 +1551,11 @@ var fileman = (function () {
 				vp = vps.shift();
 
 			if (!vp) {
-				toast.ok(2000, 'delete OK');
+				toast.ok(2, 'delete OK');
 				treectl.goto(get_evpath());
 				return;
 			}
-			toast.inf(2000, 'deleting ' + (vps.length + 1) + ' items<br /><br />' + vp);
+			toast.inf(2, 'deleting ' + (vps.length + 1) + ' items\n\n' + vp);
 
 			xhr.open('GET', vp + '?delete', true);
 			xhr.onreadystatechange = delete_cb;
@@ -1567,7 +1567,7 @@ var fileman = (function () {
 
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.err(2000, 'delete failed:<br />' + msg);
+				toast.err(9, 'delete failed:\n' + msg);
 				return;
 			}
 			deleter();
@@ -1581,7 +1581,7 @@ var fileman = (function () {
 			vps = [];
 
 		if (!sel.length)
-			return alert('select at least 1 item to cut');
+			return toast.err(3, 'select at least 1 item to cut');
 
 		for (var a = 0; a < sel.length; a++) {
 			vps.push(sel[a].vp);
@@ -1592,7 +1592,7 @@ var fileman = (function () {
 			cl.add(inv ? 'c2' : 'c1');
 		}
 
-		toast.inf(1000, 'cut ' + sel.length + ' items');
+		toast.inf(1, 'cut ' + sel.length + ' items');
 		jwrite('fman_clip', vps);
 		r.tx(1);
 	};
@@ -1600,7 +1600,7 @@ var fileman = (function () {
 	r.paste = function (e) {
 		ev(e);
 		if (!r.clip.length)
-			return alert('first cut some files/folders to paste\n\nnote: you can cut/paste across different browser tabs');
+			return toast.err(5, 'first cut some files/folders to paste\n\nnote: you can cut/paste across different browser tabs');
 
 		var req = [],
 			exists = [],
@@ -1637,12 +1637,12 @@ var fileman = (function () {
 				vp = req.shift();
 
 			if (!vp) {
-				toast.ok(2000, 'paste OK');
+				toast.ok(2, 'paste OK');
 				treectl.goto(get_evpath());
 				r.tx(srcdir);
 				return;
 			}
-			toast.inf(2000, 'pasting ' + (req.length + 1) + ' items<br /><br />' + vp);
+			toast.inf(2, 'pasting ' + (req.length + 1) + ' items\n\n' + vp);
 
 			var dst = get_evpath() + vp.split('/').slice(-1)[0];
 
@@ -1656,7 +1656,7 @@ var fileman = (function () {
 
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.err(2000, 'paste failed:<br />' + msg);
+				toast.err(9, 'paste failed:\n' + msg);
 				return;
 			}
 			paster();
@@ -2535,7 +2535,7 @@ var treectl = (function () {
 			return;
 
 		if (this.status !== 200) {
-			alert("http " + this.status + ": " + this.responseText);
+			toast.err(0, "recvtree, http " + this.status + ": " + this.responseText);
 			return;
 		}
 
@@ -2657,7 +2657,7 @@ var treectl = (function () {
 			return;
 
 		if (this.status !== 200) {
-			alert("http " + this.status + ": " + this.responseText);
+			toast.err(0, "recvls, http " + this.status + ": " + this.responseText);
 			return;
 		}
 

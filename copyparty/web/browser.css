@@ -69,8 +69,8 @@ body {
 	border-color: #fc0;
 }
 #toast.err {
-	background: #b00;
-	border-color: #f00;
+	background: #900;
+	border-color: #d06;
 }
 #tt.b {
 	padding: 0 2em;
