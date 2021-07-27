@@ -35,7 +35,7 @@ this is the readme for v0.12 (unreleased) which has a different expression for v
 * [the browser](#the-browser)
     * [tabs](#tabs)
     * [hotkeys](#hotkeys)
-    * [tree-mode](#tree-mode)
+    * [navpane](#navpane)
     * [thumbnails](#thumbnails)
     * [zip downloads](#zip-downloads)
     * [uploading](#uploading)
@@ -133,7 +133,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ folders as zip / tar files
   * ☑ FUSE client (read-only)
 * browser
-  * ☑ tree-view
+  * ☑ navpane (directory tree sidebar)
   * ☑ audio player (with OS media controls)
   * ☑ thumbnails
     * ☑ ...of images using Pillow
@@ -141,7 +141,7 @@ summary: all planned features work! now please enjoy the bloatening
     * ☑ cache eviction (max-age; maybe max-size eventually)
   * ☑ image gallery with webm player
   * ☑ SPA (browse while uploading)
-    * if you use the file-tree on the left only, not folders in the file list
+    * if you use the navpane to navigate, not folders in the file list
 * server indexing
   * ☑ locate files by contents
   * ☑ search by name/path/date/size
@@ -226,7 +226,7 @@ example:
 ## hotkeys
 
 the browser has the following hotkeys (assumes qwerty, ignores actual layout)
-* `B` toggle breadcrumbs / directory tree
+* `B` toggle breadcrumbs / navpane
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
 * `G` toggle list / grid view
@@ -256,7 +256,7 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
     * `C` continue playing next video
     * `R` loop
     * `M` mute
-* when tree-sidebar is open:
+* when the navpane is open:
   * `A/D` adjust tree width
 * in the grid view:
   * `S` toggle multiselect
@@ -270,9 +270,9 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
   * `^up, ^down` jump paragraphs
 
 
-## tree-mode
+## navpane
 
-by default there's a breadcrumbs path; you can replace this with a tree-browser sidebar thing by clicking the `🌲` or pressing the `B` hotkey
+by default there's a breadcrumbs path; you can replace this with a navpane (tree-browser sidebar thing) by clicking the `🌲` or pressing the `B` hotkey
 
 click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
 
@@ -495,7 +495,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 | send message    | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
 | set sort order  |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
 | zip selection   |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| directory tree  |  -  |  -  | `*1` | yep  | yep   | yep  | yep | yep  |
+| navpane         |  -  |  -  | `*1` | yep  | yep   | yep  | yep | yep  |
 | up2k            |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
 | markdown editor |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
 | markdown viewer |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |

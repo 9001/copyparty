@@ -151,7 +151,7 @@ ebi('op_cfg').innerHTML = (
 );
 
 
-// tree sidebar
+// navpane
 ebi('tree').innerHTML = (
 	'<div id="treeh">\n' +
 	'	<a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>\n' +
