@@ -397,7 +397,7 @@ def main(argv=None):
         for opt in oa[2:]:
             if re.match("c[^,]", opt):
                 mod = True
-                na.append("c," + opt[2:])
+                na.append("c," + opt[1:])
             elif re.sub("^[rwmd]*", "", opt) and "," not in opt:
                 mod = True
                 perm = opt[0]
