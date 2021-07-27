@@ -32,7 +32,9 @@ html, body {
 	padding: 1em 1.3em;
 	border-width: .4em 0;
 	transform: translateX(100%);
-	transition: all .4s cubic-bezier(.2, 1.2, .5, 1);
+	transition:
+		transform .4s cubic-bezier(.2, 1.2, .5, 1),
+		right .4s cubic-bezier(.2, 1.2, .5, 1);
 	text-shadow: 1px 1px 0 #000;
 	color: #fff;
 }
@@ -51,7 +53,7 @@ html, body {
 	outline: none;
 	text-shadow: none;
 	border-radius: .5em 0 0 .5em;
-	transition: all .4s cubic-bezier(.2, 1, .5, 1);
+	transition: left .3s, width .3s, padding .3s, opacity .3s;
 }
 #toast.vis {
 	right: 1.3em;
