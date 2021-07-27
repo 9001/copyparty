@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import socket
 
+from .__init__ import MACOS
 from .util import chkcmd
 
 
@@ -81,25 +82,53 @@ class TcpSrv(object):
 
         self.log("tcpsrv", "ok bye")
 
+    def ips_linux(self):
+        eps = {}
+        try:
+            txt, _ = chkcmd("ip", "addr")
+        except:
+            return eps
+
+        r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
+        for ln in txt.split("\n"):
+            try:
+                ip, dev = r.match(ln.rstrip()).groups()
+                for lip in listen_ips:
+                    if lip in ["0.0.0.0", ip]:
+                        eps[ip] = dev
+            except:
+                pass
+
+        return eps
+
+    def ips_macos(self):
+        eps = {}
+        try:
+            txt, _ = chkcmd("ifconfig")
+        except:
+            return eps
+
+        rdev = re.compile(r"^([^ ]+):")
+        rip = re.compile(r"^\tinet ([0-9\.]+) ")
+        dev = None
+        for ln in txt.split("\n"):
+            m = rdev.match(ln)
+            if m:
+                dev = m.group(1)
+            
+            m = rip.match(ln)
+            if m:
+                eps[m.group(1)] = dev
+
+        return eps
+
     def detect_interfaces(self, listen_ips):
         eps = {}
 
-        # get all ips and their interfaces
-        try:
-            ip_addr, _ = chkcmd("ip", "addr")
-        except:
-            ip_addr = None
-
-        if ip_addr:
-            r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
-            for ln in ip_addr.split("\n"):
-                try:
-                    ip, dev = r.match(ln.rstrip()).groups()
-                    for lip in listen_ips:
-                        if lip in ["0.0.0.0", ip]:
-                            eps[ip] = dev
-                except:
-                    pass
+        if MACOS:
+            eps = self.ips_macos()
+        else:
+            eps = self.ips_linux()
 
         default_route = None
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
