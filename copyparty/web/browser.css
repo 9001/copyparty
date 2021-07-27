@@ -166,6 +166,10 @@ body {
 	padding: .3em 0;
 	scroll-margin-top: 45vh;
 }
+#files tr {
+	scroll-margin-top: 25vh;
+	scroll-margin-bottom: 20vh;
+}
 #files tbody div a {
 	color: #f5a;
 }

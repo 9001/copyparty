@@ -2031,7 +2031,9 @@ document.onkeydown = function (e) {
 			var el = ae[d + 'ElementSibling'];
 			if (el) {
 				el.focus();
-				document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * el.offsetHeight;
+				if (e.shiftKey)
+					document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * el.offsetHeight;
+
 				return ev(e);
 			}
 		}

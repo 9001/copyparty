@@ -236,6 +236,7 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
 * `F2` rename selected file/folder
 * when a file/folder is selected (in not-grid-view):
   * `Up/Down` move cursor
+  * shift+`Up/Down` move cursor and scroll viewport
   * `Space` toggle file selection
   * `Ctrl-A` toggle select all
 * when playing audio:
