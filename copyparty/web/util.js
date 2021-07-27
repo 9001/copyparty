@@ -656,7 +656,8 @@ var toast = (function () {
     obj.setAttribute('id', 'toast');
     document.body.appendChild(obj);;
 
-    r.hide = function () {
+    r.hide = function (e) {
+        ev(e);
         clearTimeout(te);
         clmod(obj, 'vis');
         r.visible = false;
@@ -667,8 +668,14 @@ var toast = (function () {
         if (ms)
             te = setTimeout(r.hide, ms * 1000);
 
-        obj.innerHTML = txt.replace(/\n/g, '<br />\n');
+        var html = '', hp = txt.split(/(?=<.?pre>)/i);
+        for (var a = 0; a < hp.length; a++)
+            html += hp[a].startsWith('<pre>') ? hp[a] :
+                hp[a].replace(/<br ?.?>\n/g, '\n').replace(/\n<br ?.?>/g, '\n').replace(/\n/g, '<br />\n');
+
+        obj.innerHTML = '<a href="#" id="toastc">x</a>' + html;
         obj.className = cl + ' vis';
+        ebi('toastc').onclick = r.hide;
         r.visible = true;
     };
 
@@ -685,6 +692,5 @@ var toast = (function () {
         r.show('err', ms, txt);
     };
 
-    obj.onclick = r.hide;
     return r;
 })();

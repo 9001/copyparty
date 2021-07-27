@@ -291,7 +291,7 @@ function Modpoll() {
                 "Press F5 or CTRL-R to refresh the page,<br />" +
                 "replacing your document with the server copy.",
 
-                "You can click this message to ignore and contnue."
+                "You can close this message to ignore and contnue."
             ];
             return toast.warn(0, "<p>" + msg.join('</p>\n<p>') + '</p>');
         }

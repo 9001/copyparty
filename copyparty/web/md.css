@@ -35,25 +35,52 @@ html, body {
 	text-shadow: 1px 1px 0 #000;
 	color: #fff;
 }
+#toastc {
+	position: relative;
+	left: -2.35em;
+	margin: 0 -1.05em;
+	padding: .5em .8em;
+	border-radius: .3em 0 0 .3em;
+	color: #000;
+	text-shadow: none;
+	opacity: 0;
+	transition: all .3s cubic-bezier(.2, 1.2, .5, 1);
+}
 #toast.vis {
 	right: 1.3em;
 	transform: unset;
+}
+#toast.vis #toastc {
+	opacity: 1;
 }
 #toast.inf {
 	background: #07a;
 	border-color: #0be;
 }
+#toast.inf #toastc {
+	background: #0be;
+}
 #toast.ok {
 	background: #4a0;
 	border-color: #8e4;
+}
+#toast.ok #toastc {
+	background: #8e4;
 }
 #toast.warn {
 	background: #970;
 	border-color: #fc0;
 }
+#toast.warn #toastc {
+	background: #fc0;
+}
 #toast.err {
 	background: #900;
 	border-color: #d06;
+}
+#toast.err #toastc {
+	background: #d06;
+};
 }
 #tt.b {
 	padding: 0 2em;
