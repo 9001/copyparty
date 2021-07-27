@@ -96,7 +96,6 @@ class SvcHub(object):
         m = "{}/{} workers failed to start"
         m = m.format(failed, self.broker.num_workers)
         self.log("root", m, 1)
-        #self.signal_handler(1,1)
         os._exit(1)
 
     def cb_httpsrv_up(self):
@@ -166,8 +165,8 @@ class SvcHub(object):
         for sig in [signal.SIGINT, signal.SIGTERM]:
             signal.signal(sig, self.signal_handler)
 
-        # windows cannot ^c stop_cond,
         # macos hangs after shutdown on sigterm with while-sleep,
+        # windows cannot ^c stop_cond (and win10 does the macos thing but winxp is fine??)
         # linux is fine with both,
         # never lucky
         if ANYWIN:
@@ -176,10 +175,9 @@ class SvcHub(object):
             thr.daemon = True
             thr.start()
 
-            ival = 1 if sys.gettrace() else 9001
             try:
                 while not self.stop_req:
-                    time.sleep(ival)
+                    time.sleep(1)
             except:
                 pass
 

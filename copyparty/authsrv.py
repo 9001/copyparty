@@ -709,7 +709,7 @@ class AuthSrv(object):
                 u = list(sorted(getattr(v.axs, attr).keys()))
                 u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
                 u = u if u else "\033[36m--none--\033[0m"
-                m += "\n  {}:  {}".format(txt, u)
+                m += "\n|  {}:  {}".format(txt, u)
             m += "\n"
 
         if self.warn_anonwrite and not self.args.no_voldump:
