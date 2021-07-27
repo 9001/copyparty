@@ -103,6 +103,7 @@ class SvcHub(object):
         if self.httpsrv_up != self.broker.num_workers:
             return
 
+        self.log("root", "workers OK\n")
         self.up2k.init_vols()
 
         thr = threading.Thread(target=self.sd_notify, name="sd-notify")

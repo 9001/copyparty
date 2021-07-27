@@ -30,14 +30,16 @@ class TcpSrv(object):
                 for x in nonlocals:
                     eps[x] = "external"
 
+        msgs = []
+        m = "available @ http://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             for port in sorted(self.args.p):
-                self.log(
-                    "tcpsrv",
-                    "available @ http://{}:{}/  (\033[33m{}\033[0m)".format(
-                        ip, port, desc
-                    ),
-                )
+                msgs.append(m.format(ip, port, desc))
+
+        if msgs:
+            msgs[-1] += "\n"
+            for m in msgs:
+                self.log("tcpsrv", m)
 
         self.srv = []
         for ip in self.args.i:
@@ -117,6 +119,7 @@ class TcpSrv(object):
             m = rip.match(ln)
             if m:
                 eps[m.group(1)] = dev
+                dev = None
 
         return eps
 

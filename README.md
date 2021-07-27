@@ -18,7 +18,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 ## breaking changes \o/
 
-this is the readme for v0.12 (unreleased) which has a different expression for volume permissions (`-v`); see [the v0.11.x readme](https://github.com/9001/copyparty/tree/15b59822112dda56cee576df30f331252fc62628#readme) for stuff regarding the [current stable release](https://github.com/9001/copyparty/releases/tag/v0.11.47)
+this is the readme for v0.12 which has a different expression for volume permissions (`-v`); see [the v0.11.x readme](https://github.com/9001/copyparty/tree/15b59822112dda56cee576df30f331252fc62628#readme) for stuff regarding the [current stable release](https://github.com/9001/copyparty/releases/tag/v0.11.47)
 
 
 ## readme toc
