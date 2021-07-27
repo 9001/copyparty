@@ -1493,6 +1493,9 @@ var fileman = (function () {
 
 	r.rename = function (e) {
 		ev(e);
+		if (bren.style.display)
+			return toast.err(3, 'cannot rename:\nyou do not have “move” permission in this folder');
+
 		var sel = msel.getsel();
 		if (sel.length !== 1)
 			return toast.err(3, 'select exactly 1 item to rename');
@@ -1531,6 +1534,9 @@ var fileman = (function () {
 
 	r.delete = function (e) {
 		ev(e);
+		if (bdel.style.display)
+			return toast.err(3, 'cannot delete:\nyou do not have “delete” permission in this folder');
+
 		var sel = msel.getsel(),
 			vps = [];
 
@@ -1577,6 +1583,9 @@ var fileman = (function () {
 
 	r.cut = function (e) {
 		ev(e);
+		if (bcut.style.display)
+			return toast.err(3, 'cannot cut:\nyou do not have “move” permission in this folder');
+
 		var sel = msel.getsel(),
 			vps = [];
 
@@ -1599,6 +1608,9 @@ var fileman = (function () {
 
 	r.paste = function (e) {
 		ev(e);
+		if (bpst.style.display)
+			return toast.err(3, 'cannot paste:\nyou do not have “write” permission in this folder');
+
 		if (!r.clip.length)
 			return toast.err(5, 'first cut some files/folders to paste\n\nnote: you can cut/paste across different browser tabs');
 
