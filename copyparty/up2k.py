@@ -30,6 +30,7 @@ from .util import (
     vsplit,
     s3enc,
     s3dec,
+    rmdirs,
     statdir,
     s2hms,
     min_ex,
@@ -1305,27 +1306,25 @@ class Up2k(object):
             db.execute(sql, v)
 
     def handle_rm(self, uname, vpath):
-        dirs = {}
         permsets = [[True, False, False, True]]
         vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
         ptop = vn.realpath
         atop = vn.canonical(rem)
         adir, fn = os.path.split(atop)
         st = bos.lstat(atop)
+        scandir = not self.args.no_scandir
         if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
             dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             dbv, vrem = dbv.get_dbv(vrem)
             g = [[dbv, vrem, os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
         else:
-            scandir = not self.args.no_scandir
             g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
 
         n_files = 0
-        for dbv, vrem, _, atop, files, rd, vd in g:
-            dirs[atop] = 1
+        for dbv, vrem, _, adir, files, rd, vd in g:
             for fn in [x[0] for x in files]:
                 n_files += 1
-                abspath = os.path.join(atop, fn)
+                abspath = os.path.join(adir, fn)
                 vpath = "{}/{}".format(vrem, fn).strip("/")
                 self.log("rm {}\n  {}".format(vpath, abspath))
                 _ = dbv.get(vrem, uname, *permsets[0])
@@ -1339,15 +1338,10 @@ class Up2k(object):
 
                 bos.unlink(abspath)
 
-        n_dirs = 0
-        for d in dirs.keys():
-            try:
-                bos.rmdir(d)
-                n_dirs += 1
-            except:
-                pass
-
-        return "deleted {} files (and {}/{} folders)".format(n_files, n_dirs, len(dirs))
+        rm = rmdirs(self.log_func, scandir, True, atop)
+        ok = len(rm[0])
+        ng = len(rm[1])
+        return "deleted {} files (and {}/{} folders)".format(n_files, ok, ok + ng)
 
     def handle_mv(self, uname, svp, dvp):
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
@@ -1372,14 +1366,12 @@ class Up2k(object):
                 # fail early (prevent partial moves)
                 raise Pebkac(400, "mv: source folder contains other volumes")
 
-        dirs = {}
         g = svn.walk("", srem, [], uname, permsets, True, scandir, True)
         for dbv, vrem, _, atop, files, rd, vd in g:
             if dbv != jail:
                 # the actual check (avoid toctou)
                 raise Pebkac(400, "mv: source folder contains other volumes")
 
-            dirs[atop] = 1
             for fn in files:
                 svpf = "/".join(x for x in [dbv.vpath, vrem, fn[0]] if x)
                 if not svpf.startswith(svp + "/"):  # assert
@@ -1388,12 +1380,7 @@ class Up2k(object):
                 dvpf = dvp + svpf[len(svp) :]
                 self._mv_file(uname, svpf, dvpf)
 
-        for d in list(dirs.keys()) + [sabs]:
-            try:
-                bos.rmdir(d)
-            except:
-                pass
-
+        rmdirs(self.log_func, scandir, True, sabs)
         return "k"
 
     def _mv_file(self, uname, svp, dvp):

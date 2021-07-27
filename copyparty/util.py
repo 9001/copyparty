@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import os
 import sys
+import stat
 import time
 import base64
 import select
@@ -1059,6 +1060,26 @@ def statdir(logger, scandir, lstat, top):
 
     except Exception as ex:
         logger(src, "{} @ {}".format(repr(ex), top), 1)
+
+
+def rmdirs(logger, scandir, lstat, top):
+    dirs = statdir(logger, scandir, lstat, top)
+    dirs = [x[0] for x in dirs if stat.S_ISDIR(x[1].st_mode)]
+    dirs = [os.path.join(top, x) for x in dirs]
+    ok = []
+    ng = []
+    for d in dirs[::-1]:
+        a, b = rmdirs(logger, scandir, lstat, d)
+        ok += a
+        ng += b
+
+    try:
+        os.rmdir(fsenc(top))
+        ok.append(top)
+    except:
+        ng.append(top)
+
+    return ok, ng
 
 
 def unescape_cookie(orig):

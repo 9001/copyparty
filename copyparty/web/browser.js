@@ -1555,7 +1555,7 @@ var fileman = (function () {
 				treectl.goto(get_evpath());
 				return;
 			}
-			toast.inf(2, 'deleting ' + (vps.length + 1) + ' items\n\n' + vp);
+			toast.inf(0, 'deleting ' + (vps.length + 1) + ' items\n\n' + vp);
 
 			xhr.open('GET', vp + '?delete', true);
 			xhr.onreadystatechange = delete_cb;
@@ -1642,7 +1642,7 @@ var fileman = (function () {
 				r.tx(srcdir);
 				return;
 			}
-			toast.inf(2, 'pasting ' + (req.length + 1) + ' items\n\n' + vp);
+			toast.inf(0, 'pasting ' + (req.length + 1) + ' items\n\n' + vp);
 
 			var dst = get_evpath() + vp.split('/').slice(-1)[0];
 
@@ -2034,8 +2034,10 @@ document.onkeydown = function (e) {
 				if (ctrl(e))
 					document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * el.offsetHeight;
 
-				if (e.shiftKey)
+				if (e.shiftKey) {
 					clmod(el, 'sel', 't');
+					msel.selui();
+				}
 
 				return ev(e);
 			}
