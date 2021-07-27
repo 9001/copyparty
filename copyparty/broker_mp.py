@@ -22,12 +22,9 @@ class BrokerMp(object):
         self.retpend_mutex = threading.Lock()
         self.mutex = threading.Lock()
 
-        cores = self.args.j
-        if not cores:
-            cores = mp.cpu_count()
-
-        self.log("broker", "booting {} subprocesses".format(cores))
-        for n in range(1, cores + 1):
+        self.num_workers = self.args.j or mp.cpu_count()
+        self.log("broker", "booting {} subprocesses".format(self.num_workers))
+        for n in range(1, self.num_workers + 1):
             q_pend = mp.Queue(1)
             q_yield = mp.Queue(64)
 
@@ -102,6 +99,9 @@ class BrokerMp(object):
         if dest == "listen":
             for p in self.procs:
                 p.q_pend.put([0, dest, [args[0], len(self.procs)]])
+
+        elif dest == "cb_httpsrv_up":
+            self.hub.cb_httpsrv_up()
 
         else:
             raise Exception("what is " + str(dest))

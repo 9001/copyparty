@@ -17,6 +17,7 @@ class BrokerThr(object):
         self.asrv = hub.asrv
 
         self.mutex = threading.Lock()
+        self.num_workers = 1
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self, None)

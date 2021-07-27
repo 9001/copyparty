@@ -39,6 +39,7 @@ class SvcHub(object):
         self.stop_req = False
         self.stopping = False
         self.stop_cond = threading.Condition()
+        self.httpsrv_up = 0
 
         self.ansi_re = re.compile("\033\\[[^m]*m")
         self.log_mutex = threading.Lock()
@@ -85,6 +86,29 @@ class SvcHub(object):
             from .broker_thr import BrokerThr as Broker
 
         self.broker = Broker(self)
+
+    def thr_httpsrv_up(self):
+        time.sleep(5)
+        failed = self.broker.num_workers - self.httpsrv_up
+        if not failed:
+            return
+
+        m = "{}/{} workers failed to start"
+        m = m.format(failed, self.broker.num_workers)
+        self.log("root", m, 1)
+        #self.signal_handler(1,1)
+        os._exit(1)
+
+    def cb_httpsrv_up(self):
+        self.httpsrv_up += 1
+        if self.httpsrv_up != self.broker.num_workers:
+            return
+
+        self.up2k.init_vols()
+
+        thr = threading.Thread(target=self.sd_notify, name="sd-notify")
+        thr.daemon = True
+        thr.start()
 
     def _logname(self):
         dt = datetime.utcfromtimestamp(time.time())
@@ -135,7 +159,7 @@ class SvcHub(object):
     def run(self):
         self.tcpsrv.run()
 
-        thr = threading.Thread(target=self.sd_notify, name="sd-notify")
+        thr = threading.Thread(target=self.thr_httpsrv_up)
         thr.daemon = True
         thr.start()
 
