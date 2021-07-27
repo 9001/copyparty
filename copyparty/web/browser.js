@@ -2031,8 +2031,11 @@ document.onkeydown = function (e) {
 			var el = ae[d + 'ElementSibling'];
 			if (el) {
 				el.focus();
-				if (e.shiftKey)
+				if (ctrl(e))
 					document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * el.offsetHeight;
+
+				if (e.shiftKey)
+					clmod(el, 'sel', 't');
 
 				return ev(e);
 			}
