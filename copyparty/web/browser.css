@@ -25,6 +25,12 @@ html, body {
 body {
 	padding-bottom: 5em;
 }
+pre, code, tt {
+	font-family: monospace, monospace;
+}
+
+
+
 #tt, #toast {
 	position: fixed;
 	max-width: 34em;
@@ -130,7 +136,6 @@ body {
 	padding: .1em .3em;
 	border-top: 1px solid #777;
 	border-radius: .3em;
-	font-family: monospace, monospace;
 	line-height: 1.7em;
 }
 #tt em {
@@ -224,8 +229,7 @@ a, #files tbody div a:last-child {
 	border-top: 1px solid #383838;
 }
 #files tbody td:nth-child(3) {
-	font-family: monospace;
-	font-size: 1.3em;
+	font-family: monospace, monospace;
 	text-align: right;
 	padding-right: 1em;
 	white-space: nowrap;

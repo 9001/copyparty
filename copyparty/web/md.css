@@ -8,6 +8,9 @@ html, body {
 	font-family: sans-serif;
 	line-height: 1.5em;
 }
+
+
+
 #tt, #toast {
 	position: fixed;
 	max-width: 34em;
@@ -92,7 +95,6 @@ html, body {
 }
 #toast.err #toastc {
 	background: #d06;
-};
 }
 #tt.b {
 	padding: 0 2em;
@@ -114,7 +116,6 @@ html, body {
 	padding: .1em .3em;
 	border-top: 1px solid #777;
 	border-radius: .3em;
-	font-family: monospace, monospace;
 	line-height: 1.7em;
 }
 #tt em {
@@ -156,7 +157,7 @@ pre, code, a {
 code {
 	font-size: .96em;
 }
-pre, code {
+pre, code, tt {
 	font-family: 'scp', monospace, monospace;
 	white-space: pre-wrap;
 	word-break: break-all;
@@ -296,7 +297,7 @@ small {
 	z-index: 99;
 	position: relative;
 	display: inline-block;
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
 	font-weight: bold;
 	font-size: 1.3em;
 	line-height: .1em;

@@ -87,8 +87,9 @@
 #u2tab td:nth-child(3) {
 	width: 40%;
 }
-#op_up2k.srch #u2tab td:nth-child(3) {
+#op_up2k.srch td.prog {
 	font-family: sans-serif;
+	font-size: 1em;
 	width: auto;
 }
 #u2tab tbody tr:hover td {
@@ -245,7 +246,7 @@ html.light #u2foot .warn span {
 	margin-bottom: -1em;
 }
 .prog {
-	font-family: monospace;
+	font-family: monospace, monospace;
 }
 #u2tab a>span {
 	font-weight: bold;
