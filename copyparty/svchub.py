@@ -182,6 +182,7 @@ class SvcHub(object):
                 pass
 
             self.shutdown()
+            thr.join()
         else:
             self.stop_thr()
 
@@ -206,6 +207,9 @@ class SvcHub(object):
 
         self.stopping = True
         self.stop_req = True
+        with self.stop_cond:
+            self.stop_cond.notify_all()
+
         ret = 1
         try:
             with self.log_mutex:
