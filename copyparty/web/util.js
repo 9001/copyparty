@@ -674,7 +674,9 @@ var toast = (function () {
                 hp[a].replace(/<br ?.?>\n/g, '\n').replace(/\n<br ?.?>/g, '\n').replace(/\n/g, '<br />\n');
 
         obj.innerHTML = '<a href="#" id="toastc">x</a>' + html;
-        obj.className = cl + ' vis';
+        obj.className = cl;
+        ms += obj.offsetWidth;
+        obj.className += ' vis';
         ebi('toastc').onclick = r.hide;
         r.visible = true;
     };

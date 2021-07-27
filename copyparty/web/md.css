@@ -28,29 +28,39 @@ html, body {
 #toast {
 	top: 1.4em;
 	right: -1em;
+	line-height: 1.5em;
 	padding: 1em 1.3em;
 	border-width: .4em 0;
 	transform: translateX(100%);
-	transition: all .3s cubic-bezier(.2, 1.2, .5, 1);
+	transition: all .4s cubic-bezier(.2, 1.2, .5, 1);
 	text-shadow: 1px 1px 0 #000;
 	color: #fff;
 }
 #toastc {
-	position: relative;
-	left: -2.35em;
-	margin: 0 -1.05em;
-	padding: .5em .8em;
-	border-radius: .3em 0 0 .3em;
-	color: #000;
-	text-shadow: none;
+	display: inline-block;
+	position: absolute;
+	overflow: hidden;
+	left: 0;
+	width: 0;
 	opacity: 0;
-	transition: all .3s cubic-bezier(.2, 1.2, .5, 1);
+	padding: .3em 0;
+	margin: -.3em 0 0 0;
+	line-height: 1.5em;
+	color: #000;
+	border: none;
+	outline: none;
+	text-shadow: none;
+	border-radius: .5em 0 0 .5em;
+	transition: all .4s cubic-bezier(.2, 1, .5, 1);
 }
 #toast.vis {
 	right: 1.3em;
 	transform: unset;
 }
 #toast.vis #toastc {
+	left: -2em;
+	width: .4em;
+	padding: .3em .8em;
 	opacity: 1;
 }
 #toast.inf {
