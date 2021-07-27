@@ -4,7 +4,7 @@ from __future__ import print_function, unicode_literals
 import re
 import socket
 
-from .__init__ import MACOS
+from .__init__ import MACOS, ANYWIN
 from .util import chkcmd
 
 
@@ -85,7 +85,7 @@ class TcpSrv(object):
     def ips_linux(self):
         eps = {}
         try:
-            txt, _ = chkcmd("ip", "addr")
+            txt, _ = chkcmd(["ip", "addr"])
         except:
             return eps
 
@@ -93,9 +93,7 @@ class TcpSrv(object):
         for ln in txt.split("\n"):
             try:
                 ip, dev = r.match(ln.rstrip()).groups()
-                for lip in listen_ips:
-                    if lip in ["0.0.0.0", ip]:
-                        eps[ip] = dev
+                eps[ip] = dev
             except:
                 pass
 
@@ -104,7 +102,7 @@ class TcpSrv(object):
     def ips_macos(self):
         eps = {}
         try:
-            txt, _ = chkcmd("ifconfig")
+            txt, _ = chkcmd(["ifconfig"])
         except:
             return eps
 
@@ -115,20 +113,68 @@ class TcpSrv(object):
             m = rdev.match(ln)
             if m:
                 dev = m.group(1)
-            
+
             m = rip.match(ln)
             if m:
                 eps[m.group(1)] = dev
 
         return eps
 
-    def detect_interfaces(self, listen_ips):
+    def ips_windows_ipconfig(self):
         eps = {}
+        try:
+            txt, _ = chkcmd(["ipconfig"])
+        except:
+            return eps
 
+        rdev = re.compile(r"(^[^ ].*):$")
+        rip = re.compile(r"^ +IPv?4? [^:]+: *([0-9\.]{7,15})$")
+        dev = None
+        for ln in txt.replace("\r", "").split("\n"):
+            m = rdev.match(ln)
+            if m:
+                dev = m.group(1).split(" adapter ", 1)[-1]
+
+            m = rip.match(ln)
+            if m and dev:
+                eps[m.group(1)] = dev
+                dev = None
+
+        return eps
+
+    def ips_windows_netsh(self):
+        eps = {}
+        try:
+            txt, _ = chkcmd("netsh interface ip show address".split())
+        except:
+            return eps
+
+        rdev = re.compile(r'.* "([^"]+)"$')
+        rip = re.compile(r".* IP\b.*: +([0-9\.]{7,15})$")
+        dev = None
+        for ln in txt.replace("\r", "").split("\n"):
+            m = rdev.match(ln)
+            if m:
+                dev = m.group(1)
+
+            m = rip.match(ln)
+            if m and dev:
+                eps[m.group(1)] = dev
+                dev = None
+
+        return eps
+
+    def detect_interfaces(self, listen_ips):
         if MACOS:
             eps = self.ips_macos()
+        elif ANYWIN:
+            eps = self.ips_windows_ipconfig()  # sees more interfaces
+            eps.update(self.ips_windows_netsh())  # has better names
         else:
             eps = self.ips_linux()
+
+        if "0.0.0.0" not in listen_ips:
+            eps = {k: v for k, v in eps if k in listen_ips}
 
         default_route = None
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

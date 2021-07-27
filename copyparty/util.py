@@ -1125,7 +1125,7 @@ def guess_mime(url, fallback="application/octet-stream"):
     return ret
 
 
-def runcmd(*argv):
+def runcmd(argv):
     p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
     stdout = stdout.decode("utf-8", "replace")
@@ -1133,8 +1133,8 @@ def runcmd(*argv):
     return [p.returncode, stdout, stderr]
 
 
-def chkcmd(*argv):
-    ok, sout, serr = runcmd(*argv)
+def chkcmd(argv):
+    ok, sout, serr = runcmd(argv)
     if ok != 0:
         raise Exception(serr)
 

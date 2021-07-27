@@ -306,7 +306,7 @@ class ThumbSrv(object):
 
         cmd += [fsenc(tpath)]
 
-        ret, sout, serr = runcmd(*cmd)
+        ret, sout, serr = runcmd(cmd)
         if ret != 0:
             msg = ["ff: {}".format(x) for x in serr.split("\n")]
             self.log("FFmpeg failed:\n" + "\n".join(msg), c="1;30")

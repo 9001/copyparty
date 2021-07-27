@@ -31,7 +31,7 @@ if MACOS:
 from copyparty.util import Unrecv
 
 
-def runcmd(*argv):
+def runcmd(argv):
     p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
     stdout, stderr = p.communicate()
     stdout = stdout.decode("utf-8")
@@ -39,8 +39,8 @@ def runcmd(*argv):
     return [p.returncode, stdout, stderr]
 
 
-def chkcmd(*argv):
-    ok, sout, serr = runcmd(*argv)
+def chkcmd(argv):
+    ok, sout, serr = runcmd(argv)
     if ok != 0:
         raise Exception(serr)
 
@@ -60,12 +60,12 @@ def get_ramdisk():
 
     if os.path.exists("/Volumes"):
         # hdiutil eject /Volumes/cptd/
-        devname, _ = chkcmd("hdiutil", "attach", "-nomount", "ram://131072")
+        devname, _ = chkcmd("hdiutil attach -nomount ram://131072".split())
         devname = devname.strip()
         print("devname: [{}]".format(devname))
         for _ in range(10):
             try:
-                _, _ = chkcmd("diskutil", "eraseVolume", "HFS+", "cptd", devname)
+                _, _ = chkcmd(["diskutil", "eraseVolume", "HFS+", "cptd", devname])
                 with open("/Volumes/cptd/.metadata_never_index", "w") as f:
                     f.write("orz")
 
