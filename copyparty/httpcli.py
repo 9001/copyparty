@@ -498,7 +498,14 @@ class HttpCli(object):
         if not self.args.nw:
             vfs, vrem = vfs.get_dbv(rem)
             self.conn.hsrv.broker.put(
-                False, "up2k.hash_file", vfs.realpath, vfs.flags, vrem, fn
+                False,
+                "up2k.hash_file",
+                vfs.realpath,
+                vfs.flags,
+                vrem,
+                fn,
+                self.ip,
+                time.time(),
             )
 
         return post_sz, sha_b64, remains, path
@@ -905,6 +912,8 @@ class HttpCli(object):
                             dbv.flags,
                             vrem,
                             fname,
+                            self.ip,
+                            time.time(),
                         )
                         self.conn.nbyte += sz
 

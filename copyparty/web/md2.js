@@ -285,15 +285,15 @@ function Modpoll() {
             console.log("modpoll diff |" + server_ref.length + "|, |" + server_now.length + "|");
             this.modpoll.disabled = true;
             var msg = [
-                "The document has changed on the server.<br />" +
+                "The document has changed on the server.",
                 "The changes will NOT be loaded into your editor automatically.",
-
-                "Press F5 or CTRL-R to refresh the page,<br />" +
+                "",
+                "Press F5 or CTRL-R to refresh the page,",
                 "replacing your document with the server copy.",
-
+                "",
                 "You can close this message to ignore and contnue."
             ];
-            return toast.warn(0, "<p>" + msg.join('</p>\n<p>') + '</p>');
+            return toast.warn(0, msg.join('\n'));
         }
 
         console.log('modpoll eq');

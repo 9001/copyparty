@@ -244,7 +244,7 @@ class U2idx(object):
             sret = []
             c = cur.execute(q, v)
             for hit in c:
-                w, ts, sz, rd, fn = hit
+                w, ts, sz, rd, fn, ip, at = hit
                 lim -= 1
                 if lim <= 0:
                     break
