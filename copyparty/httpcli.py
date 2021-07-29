@@ -346,11 +346,36 @@ class HttpCli(object):
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
+        x = self.asrv.vfs.can_access(self.vpath, self.uname)
+        self.can_read, self.can_write, self.can_move, self.can_delete = x
+        if not self.can_read and not self.can_write:
+            if self.vpath:
+                self.log("inaccessible: [{}]".format(self.vpath))
+                raise Pebkac(404)
+
+            self.uparam["h"] = False
+
         if "tree" in self.uparam:
             return self.tx_tree()
 
-        if not self.vpath and "stack" in self.uparam:
-            return self.tx_stack()
+        if "delete" in self.uparam:
+            return self.handle_rm()
+
+        if "move" in self.uparam:
+            return self.handle_mv()
+
+        if "scan" in self.uparam:
+            return self.scanvol()
+
+        if not self.vpath:
+            if "stack" in self.uparam:
+                return self.tx_stack()
+
+            if "ups" in self.uparam:
+                return self.tx_ups()
+
+            if "h" in self.uparam:
+                return self.tx_mounts()
 
         # conditional redirect to single volumes
         if self.vpath == "" and not self.ouparam:
@@ -365,31 +390,6 @@ class HttpCli(object):
                 if self.vpath != vpath:
                     self.redirect(vpath, flavor="redirecting to", use302=True)
                     return True
-
-        x = self.asrv.vfs.can_access(self.vpath, self.uname)
-        self.can_read, self.can_write, self.can_move, self.can_delete = x
-        if not self.can_read and not self.can_write:
-            if self.vpath:
-                self.log("inaccessible: [{}]".format(self.vpath))
-                raise Pebkac(404)
-
-            self.uparam = {"h": False}
-
-        if "delete" in self.uparam:
-            return self.handle_rm()
-
-        if "move" in self.uparam:
-            return self.handle_mv()
-
-        if "scan" in self.uparam:
-            return self.scanvol()
-
-        if not self.vpath:
-            if "h" in self.uparam:
-                return self.tx_mounts()
-
-            if "ups" in self.uparam:
-                return self.tx_ups()
 
         return self.tx_browser()
 
