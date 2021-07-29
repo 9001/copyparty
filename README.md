@@ -127,6 +127,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ basic: plain multipart, ie6 support
   * ☑ up2k: js, resumable, multithreaded
   * ☑ stash: simple PUT filedropper
+  * ☑ unpost: undo/delete accidental uploads
   * ☑ symlink/discard existing files (content-matching)
 * download
   * ☑ single files in browser
@@ -215,10 +216,11 @@ example:
 ## tabs
 
 * `[🔎]` search by size, date, path/name, mp3-tags ... see [searching](#searching)
+* `[🧯]` unpost: undo/delete accidental uploads
 * `[🚀]` and `[🎈]` are the uploaders, see [uploading](#uploading)
-* `[📂]` mkdir, create directories
-* `[📝]` new-md, create a new markdown document
-* `[📟]` send-msg, either to server-log or into textfiles if `--urlform save`
+* `[📂]` mkdir: create directories
+* `[📝]` new-md: create a new markdown document
+* `[📟]` send-msg: either to server-log or into textfiles if `--urlform save`
 * `[🎺]` audio-player config options
 * `[⚙️]` general client config options
 
@@ -312,8 +314,10 @@ you can also zip a selection of files or folders by clicking them in the browser
 ## uploading
 
 two upload methods are available in the html client:
-* `🎈 bup`, the basic uploader, supports almost every browser since netscape 4.0
-* `🚀 up2k`, the fancy one
+* `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
+* `[🚀] up2k`, the fancy one
+
+you can undo/delete uploads using `[🧯] unpost` if the server is running with `-e2d`
 
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
