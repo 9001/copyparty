@@ -41,6 +41,9 @@ html, body {
 	text-shadow: 1px 1px 0 #000;
 	color: #fff;
 }
+#toast pre {
+	margin: 0;
+}
 #toastc {
 	display: inline-block;
 	position: absolute;

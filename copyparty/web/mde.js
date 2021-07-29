@@ -75,7 +75,7 @@ function set_jumpto() {
 }
 
 function jumpto(ev) {
-    var tgt = ev.target || ev.srcElement;
+    var tgt = ev.target;
     var ln = null;
     while (tgt && !ln) {
         ln = tgt.getAttribute('data-ln');

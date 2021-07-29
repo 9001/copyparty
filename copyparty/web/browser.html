@@ -59,6 +59,8 @@
 		</form>
 	</div>
 
+	<div id="op_unpost" class="opview opbox"></div>
+
 	<div id="op_up2k" class="opview"></div>
 
 	<div id="op_cfg" class="opview opbox opwide"></div>
@@ -128,6 +130,7 @@
 			have_tags_idx = {{ have_tags_idx|tojson }},
 			have_mv = {{ have_mv|tojson }},
 			have_del = {{ have_del|tojson }},
+			have_unpost = {{ have_unpost|tojson }},
 			have_zip = {{ have_zip|tojson }};
 	</script>
 	<script src="/.cpr/util.js?_={{ ts }}"></script>

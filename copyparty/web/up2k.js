@@ -1773,3 +1773,14 @@ if (QS('#op_up2k.act'))
     goto_up2k();
 
 apply_perms(perms);
+
+
+(function () {
+    goto();
+    var op = sread('opmode');
+    if (op !== null && op !== '.')
+        try {
+            goto(op);
+        }
+        catch (ex) { }
+})();

@@ -78,6 +78,9 @@ pre, code, tt {
 	border-radius: .5em 0 0 .5em;
 	transition: left .3s, width .3s, padding .3s, opacity .3s;
 }
+#toast pre {
+	margin: 0;
+}
 #toast.vis {
 	right: 1.3em;
 	transform: unset;
@@ -952,7 +955,8 @@ input.eq_gain {
 	color: #300;
 	background: #fea;
 }
-.opwide {
+.opwide,
+#op_unpost {
 	max-width: none;
 	margin-right: 1.5em;
 }
@@ -1053,6 +1057,16 @@ html.light #ggrid a:hover {
 	border-color: #ccc;
 	color: #015;
 	box-shadow: 0 .1em .5em #aaa;
+}
+#op_unpost {
+	padding: 1em;
+}
+#op_unpost td {
+	padding: .2em .4em;
+}
+#op_unpost a {
+	margin: 0;
+	padding: 0;
 }
 #pvol,
 #barbuf,

@@ -1330,43 +1330,89 @@ class Up2k(object):
             v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
             db.execute(sql, v)
 
-    def handle_rm(self, uname, vpath):
-        permsets = [[True, False, False, True]]
-        vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+    def handle_rm(self, uname, ip, vpaths):
+        n_files = 0
+        ok = {}
+        ng = {}
+        for vp in vpaths:
+            a, b, c = self._handle_rm(uname, ip, vp)
+            n_files += a
+            for k in b:
+                ok[k] = 1
+            for k in c:
+                ng[k] = 1
+
+        ng = {k: 1 for k in ng if k not in ok}
+        ok = len(ok)
+        ng = len(ng)
+
+        return "deleted {} files (and {}/{} folders)".format(n_files, ok, ok + ng)
+
+    def _handle_rm(self, uname, ip, vpath):
+        try:
+            permsets = [[True, False, False, True]]
+            vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+            unpost = False
+        except:
+            # unpost with missing permissions? try read+write and verify with db
+            if not self.args.unpost:
+                raise Pebkac(400, "the unpost feature was disabled by server config")
+
+            unpost = True
+            permsets = [[True, True]]
+            vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+            _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
+
+            m = "you cannot delete this: "
+            if not dip:
+                m += "file not found"
+            elif dip != ip:
+                m += "not uploaded by (You)"
+            elif dat < time.time() - self.args.unpost:
+                m += "uploaded too long ago"
+            else:
+                m = None
+
+            if m:
+                raise Pebkac(400, m)
+
         ptop = vn.realpath
-        atop = vn.canonical(rem)
+        atop = vn.canonical(rem, False)
         adir, fn = os.path.split(atop)
         st = bos.lstat(atop)
         scandir = not self.args.no_scandir
         if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
             dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             dbv, vrem = dbv.get_dbv(vrem)
-            g = [[dbv, vrem, os.path.dirname(vpath), adir, [[fn, 0]], [], []]]
+            voldir = vsplit(vrem)[0]
+            vpath_dir = vsplit(vpath)[0]
+            g = [[dbv, voldir, vpath_dir, adir, [[fn, 0]], [], []]]
         else:
             g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
+            if unpost:
+                raise Pebkac(400, "cannot unpost folders")
 
         n_files = 0
         for dbv, vrem, _, adir, files, rd, vd in g:
             for fn in [x[0] for x in files]:
                 n_files += 1
                 abspath = os.path.join(adir, fn)
-                vpath = "{}/{}".format(vrem, fn).strip("/")
+                volpath = "{}/{}".format(vrem, fn).strip("/")
+                vpath = "{}/{}".format(dbv.vpath, volpath).strip("/")
                 self.log("rm {}\n  {}".format(vpath, abspath))
-                _ = dbv.get(vrem, uname, *permsets[0])
+                _ = dbv.get(volpath, uname, *permsets[0])
                 with self.mutex:
                     try:
                         ptop = dbv.realpath
-                        cur, wark, _, _, _, _ = self._find_from_vpath(ptop, vrem)
-                        self._forget_file(ptop, vpath, cur, wark)
+                        cur, wark, _, _, _, _ = self._find_from_vpath(ptop, volpath)
+                        self._forget_file(ptop, volpath, cur, wark)
                     finally:
                         cur.connection.commit()
 
                 bos.unlink(abspath)
 
         rm = rmdirs(self.log_func, scandir, True, atop)
-        ok = len(rm[0])
-        ng = len(rm[1])
-        return "deleted {} files (and {}/{} folders)".format(n_files, ok, ok + ng)
+        return n_files, rm[0], rm[1]
 
     def handle_mv(self, uname, svp, dvp):
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)

@@ -31,6 +31,7 @@ class Cfg(Namespace):
             rproxy=0,
             ed=False,
             nw=False,
+            unpost=600,
             no_mv=False,
             no_del=False,
             no_zip=False,

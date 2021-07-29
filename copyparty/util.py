@@ -1063,6 +1063,9 @@ def statdir(logger, scandir, lstat, top):
 
 
 def rmdirs(logger, scandir, lstat, top):
+    if not os.path.exists(fsenc(top)) or not os.path.isdir(fsenc(top)):
+        top = os.path.dirname(top)
+    
     dirs = statdir(logger, scandir, lstat, top)
     dirs = [x[0] for x in dirs if stat.S_ISDIR(x[1].st_mode)]
     dirs = [os.path.join(top, x) for x in dirs]

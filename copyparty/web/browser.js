@@ -12,6 +12,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" data-dest="" tt="close submenu">---</a>\n' +
 	(have_up2k_idx ? (
 		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those.$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>\n' +
+		(have_del && have_unpost ? '<a href="#" data-dest="unpost" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
 		'<a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>\n'
 	) : (
 		'<a href="#" data-perm="write" data-dest="up2k" tt="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>\n'
@@ -211,17 +212,6 @@ function goto(dest) {
 	if (window['treectl'])
 		treectl.onscroll();
 }
-
-
-(function () {
-	goto();
-	var op = sread('opmode');
-	if (op !== null && op !== '.')
-		try {
-			goto(op);
-		}
-		catch (ex) { }
-})();
 
 
 var have_webp = null;
@@ -3432,6 +3422,160 @@ var msel = (function () {
 function ev_row_tgl(e) {
 	ev(e);
 	filecols.toggle(this.parentElement.parentElement.getElementsByTagName('span')[0].textContent);
+}
+
+
+var unpost = (function () {
+	ebi('op_unpost').innerHTML = (
+		"you can delete your recent uploads below &ndash; click the fire-extinguisher icon to refresh" +
+		'<p>optional filter:&nbsp; URL must contain <input type="text" id="unpost_filt" size="20" /><a id="unpost_nofilt" href="#">clear filter</a></p>' +
+		'<div id="unpost"></div>'
+	);
+
+	var r = {},
+		ct = ebi('unpost'),
+		filt = ebi('unpost_filt');
+
+	r.files = [];
+	r.me = null;
+
+	r.load = function () {
+		var me = Date.now(),
+			html = [];
+
+		function unpost_load_cb() {
+			if (this.readyState != XMLHttpRequest.DONE)
+				return;
+
+			if (this.status !== 200) {
+				var msg = this.responseText;
+				toast.err(9, 'unpost-load failed:\n' + msg);
+				ebi('op_unpost').innerHTML = html.join('\n');
+				return;
+			}
+
+			var res = JSON.parse(this.responseText);
+			if (res.length) {
+				if (res.length == 2000)
+					html.push("<p>showing first 2000 files (use the filter)");
+				else
+					html.push("<p>" + res.length + " uploads can be deleted");
+
+				html.push(" &ndash; sorted by upload time &ndash; most recent first:</p>");
+				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>file</td></tr></thead><tbody>");
+			}
+			else
+				html.push("<p>sike! no uploads " + (filt.value ? 'matching that filter' : '') + " are sufficiently recent</p>");
+
+			var mods = [1000, 100, 10];
+			for (var a = 0; a < res.length; a++) {
+				for (var b = 0; b < mods.length; b++)
+					if (a % mods[b] == 0 && res.length > a + mods[b] / 10)
+						html.push(
+							'<tr><td></td><td colspan="3" style="padding:.5em">' +
+							'<a me="' + me + '" class="n' + a + '" n2="' + (a + mods[b]) +
+							'" href="#">delete the next ' + Math.min(mods[b], res.length - a) + ' files below</a></td></tr>');
+				html.push(
+					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">delete</a></td>' +
+					'<td>' + unix2iso(res[a].at) + '</td>' +
+					'<td>' + res[a].sz + '</td>' +
+					'<td>' + linksplit(res[a].vp).join(' ') + '</td></tr>');
+			}
+
+			html.push("</tbody></table>");
+			ct.innerHTML = html.join('\n');
+			r.files = res;
+			r.me = me;
+		}
+
+		var q = '/?ups';
+		if (filt.value)
+			q += '&filter=' + uricom_enc(filt.value, true);
+
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', q, true);
+		xhr.onreadystatechange = unpost_load_cb;
+		xhr.send();
+
+		ct.innerHTML = "<p><em>loading your recent uploads...</em></p>";
+	};
+
+	function unpost_delete_cb() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.status !== 200) {
+			var msg = this.responseText;
+			toast.err(9, 'unpost-delete failed:\n' + msg);
+			return;
+		}
+
+		for (var a = this.n; a < this.n2; a++) {
+			var o = QSA('#op_unpost a.n' + a);
+			for (var b = 0; b < o.length; b++) {
+				var o2 = o[b].closest('tr');
+				o2.parentNode.removeChild(o2);
+			}
+		}
+		toast.ok(5, this.responseText);
+
+		if (!QS('#op_unpost a[me]'))
+			ebi(goto_unpost());
+	}
+
+	ct.onclick = function (e) {
+		var tgt = e.target.closest('a[me]');
+		if (!tgt)
+			return;
+
+		if (!tgt.getAttribute('href'))
+			return;
+
+		var ame = tgt.getAttribute('me');
+		if (ame != r.me)
+			return toast.err(0, 'something broke, please try a refresh');
+
+		var n = parseInt(tgt.className.slice(1)),
+			n2 = parseInt(tgt.getAttribute('n2') || n + 1),
+			req = [];
+
+		for (var a = n; a < n2; a++)
+			if (QS('#op_unpost a.n' + a))
+				req.push(r.files[a].vp);
+
+		var links = QSA('#op_unpost a.n' + n);
+		for (var a = 0, aa = links.length; a < aa; a++) {
+			links[a].removeAttribute('href');
+			links[a].innerHTML = '[busy]';
+		}
+
+		toast.inf(0, "deleting " + req.length + " files...");
+
+		var xhr = new XMLHttpRequest();
+		xhr.n = n;
+		xhr.n2 = n2;
+		xhr.open('POST', '/?delete', true);
+		xhr.onreadystatechange = unpost_delete_cb;
+		xhr.send(JSON.stringify(req));
+	};
+
+	var tfilt = null;
+	filt.oninput = function () {
+		clearTimeout(tfilt);
+		tfilt = setTimeout(r.load, 250);
+	};
+
+	ebi('unpost_nofilt').onclick = function () {
+		filt.value = '';
+		r.load();
+	};
+
+	return r;
+})();
+
+
+function goto_unpost(e) {
+	unpost.load();
 }
 
 

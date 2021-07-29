@@ -795,7 +795,7 @@ class AuthSrv(object):
 
                 atop = vn.realpath
                 g = vn.walk(
-                    "", "", [], u, True, [[True]], not self.args.no_scandir, False
+                    vn.vpath, "", [], u, [[True]], True, not self.args.no_scandir, False
                 )
                 for _, _, vpath, apath, files, _, _ in g:
                     fnames = [n[0] for n in files]

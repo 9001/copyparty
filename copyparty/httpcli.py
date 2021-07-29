@@ -61,7 +61,10 @@ class HttpCli(object):
         a, b = m.groups()
         return "=\033[7m {} \033[27m{}".format(self.asrv.iacct[a], b)
 
-    def _check_nonfatal(self, ex):
+    def _check_nonfatal(self, ex, post):
+        if post:
+            return ex.code < 300
+
         return ex.code < 400 or ex.code in [404, 429]
 
     def _assert_safe_rem(self, rem):
@@ -103,7 +106,7 @@ class HttpCli(object):
             self.req = "[junk]"
             self.http_ver = "HTTP/1.1"
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
-            self.keepalive = self._check_nonfatal(ex)
+            self.keepalive = False
             self.loud_reply(unicode(ex), status=ex.code)
             return self.keepalive
 
@@ -216,7 +219,8 @@ class HttpCli(object):
         except Pebkac as ex:
             try:
                 # self.log("pebkac at httpcli.run #2: " + repr(ex))
-                if not self._check_nonfatal(ex):
+                post = self.mode in ["POST", "PUT"] or "content-length" in self.headers
+                if not self._check_nonfatal(ex, post):
                     self.keepalive = False
 
                 self.log("{}\033[0m, {}".format(str(ex), self.vpath), 3)
@@ -345,7 +349,7 @@ class HttpCli(object):
         if "tree" in self.uparam:
             return self.tx_tree()
 
-        if "stack" in self.uparam:
+        if not self.vpath and "stack" in self.uparam:
             return self.tx_stack()
 
         # conditional redirect to single volumes
@@ -377,12 +381,15 @@ class HttpCli(object):
         if "move" in self.uparam:
             return self.handle_mv()
 
-        if "h" in self.uparam:
-            self.vpath = None
-            return self.tx_mounts()
-
         if "scan" in self.uparam:
             return self.scanvol()
+
+        if not self.vpath:
+            if "h" in self.uparam:
+                return self.tx_mounts()
+
+            if "ups" in self.uparam:
+                return self.tx_ups()
 
         return self.tx_browser()
 
@@ -598,6 +605,9 @@ class HttpCli(object):
 
         if "srch" in self.uparam or "srch" in body:
             return self.handle_search(body)
+
+        if "delete" in self.uparam:
+            return self.handle_rm(body)
 
         # up2k-php compat
         for k in "chunkpit.php", "handshake.php":
@@ -1551,14 +1561,52 @@ class HttpCli(object):
         ret["a"] = dirs
         return ret
 
-    def handle_rm(self):
-        if not self.can_delete:
+    def tx_ups(self):
+        if not self.args.unpost:
+            raise Pebkac(400, "the unpost feature was disabled by server config")
+
+        filt = self.uparam.get("filter")
+        lm = "ups [{}]".format(filt)
+        self.log(lm)
+
+        ret = []
+        t0 = time.time()
+        idx = self.conn.get_u2idx()
+        lim = time.time() - self.args.unpost
+        for vol in self.asrv.vfs.all_vols.values():
+            cur = idx.get_cur(vol.realpath)
+            if not cur:
+                continue
+
+            q = "select sz, rd, fn, at from up where ip=? and at>?"
+            for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
+                vp = "/" + "/".join([rd, fn]).strip("/")
+                if filt and filt not in vp:
+                    continue
+
+                ret.append({"vp": vp, "sz": sz, "at": at})
+                if len(ret) > 3000:
+                    ret.sort(key=lambda x: x["at"], reverse=True)
+                    ret = ret[:2000]
+
+        ret.sort(key=lambda x: x["at"], reverse=True)
+        ret = ret[:2000]
+
+        jtxt = json.dumps(ret, indent=2, sort_keys=True).encode("utf-8", "replace")
+        self.log("{} #{} {:.2f}sec".format(lm, len(ret), time.time() - t0))
+        self.reply(jtxt, mime="application/json")
+
+    def handle_rm(self, req=None):
+        if not req and not self.can_delete:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_del:
             raise Pebkac(403, "disabled by argv")
 
-        x = self.conn.hsrv.broker.put(True, "up2k.handle_rm", self.uname, self.vpath)
+        if not req:
+            req = [self.vpath]
+
+        x = self.conn.hsrv.broker.put(True, "up2k.handle_rm", self.uname, self.ip, req)
         self.loud_reply(x.get())
 
     def handle_mv(self):
@@ -1711,6 +1759,7 @@ class HttpCli(object):
             "have_mv": (not self.args.no_mv),
             "have_del": (not self.args.no_del),
             "have_zip": (not self.args.no_zip),
+            "have_unpost": (self.args.unpost > 0),
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "url_suf": url_suf,
             "logues": logues,
