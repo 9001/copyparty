@@ -401,17 +401,18 @@ class AuthSrv(object):
         if uname == "":
             uname = "*"
 
-        if "r" in lvl:
-            axs.uread[uname] = 1
+        for un in uname.split(","):
+            if "r" in lvl:
+                axs.uread[un] = 1
 
-        if "w" in lvl:
-            axs.uwrite[uname] = 1
+            if "w" in lvl:
+                axs.uwrite[un] = 1
 
-        if "m" in lvl:
-            axs.umove[uname] = 1
+            if "m" in lvl:
+                axs.umove[un] = 1
 
-        if "d" in lvl:
-            axs.udel[uname] = 1
+            if "d" in lvl:
+                axs.udel[un] = 1
 
     def _read_volflag(self, flags, name, value, is_list):
         if name not in ["mtp"]:
