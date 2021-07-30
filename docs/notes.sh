@@ -44,7 +44,7 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 dirs=("$HOME/vfs/ほげ" "$HOME/vfs/ほげ/ぴよ" "$HOME/vfs/$(printf \\xed\\x91)" "$HOME/vfs/$(printf \\xed\\x91/\\xed\\x92)")
 mkdir -p "${dirs[@]}"
 for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qwe,rty;asd fgh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'; do echo "$dir" > "$dir/$fn.html"; done; done
-
+# qw er+ty%20ui%%20op<as>df&gh&amp;jk#zx'cv"bn`m=qw*er^ty?ui@op,as.df-gh_jk
 
 ##
 ## upload mojibake

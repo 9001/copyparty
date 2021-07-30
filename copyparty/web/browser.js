@@ -1468,10 +1468,10 @@ var fileman = (function () {
 		if (r.clip === null)
 			r.clip = jread('fman_clip', []);
 
-		var sel = msel.getsel();
-		clmod(bren, 'en', sel.length == 1);
-		clmod(bdel, 'en', sel.length);
-		clmod(bcut, 'en', sel.length);
+		var nsel = msel.getsel().length;
+		clmod(bren, 'en', nsel == 1);
+		clmod(bdel, 'en', nsel);
+		clmod(bcut, 'en', nsel);
 		clmod(bpst, 'en', r.clip && r.clip.length);
 		bren.style.display = have_mv && has(perms, 'write') && has(perms, 'move') ? '' : 'none';
 		bdel.style.display = have_del && has(perms, 'delete') ? '' : 'none';
@@ -3367,8 +3367,13 @@ var msel = (function () {
 		ev(e);
 		var names = r.getsel(),
 			arg = ebi('selzip').getAttribute('fmt'),
-			txt = names.join('\n'),
-			frm = mknod('form');
+			frm = mknod('form'),
+			txt = [];
+
+		for (var a = 0; a < names.length; a++)
+			txt.push(names[a].name);
+
+		txt = txt.join('\n');
 
 		frm.setAttribute('action', '?' + arg);
 		frm.setAttribute('method', 'post');

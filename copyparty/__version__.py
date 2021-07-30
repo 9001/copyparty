@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 12, 4)
+VERSION = (0, 12, 5)
 CODENAME = "fil\033[33med"
 BUILD_DT = (2021, 7, 30)
 

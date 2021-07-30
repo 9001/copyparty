@@ -182,7 +182,7 @@ class HttpCli(object):
 
         self.uparam = uparam
         self.cookies = cookies
-        self.vpath = unquotep(vpath)
+        self.vpath = unquotep(vpath)  # not query, so + means +
 
         pwd = uparam.get("pw")
         self.uname = self.asrv.iacct.get(pwd, "*")
@@ -1310,11 +1310,9 @@ class HttpCli(object):
         else:
             fn = self.headers.get("host", "hey")
 
-        afn = "".join(
-            [x if x in (string.ascii_letters + string.digits) else "_" for x in fn]
-        )
-
-        bascii = unicode(string.ascii_letters + string.digits).encode("utf-8")
+        safe = (string.ascii_letters + string.digits).replace("%", "")
+        afn = "".join([x if x in safe.replace('"', "") else "_" for x in fn])
+        bascii = unicode(safe).encode("utf-8")
         ufn = fn.encode("utf-8", "xmlcharrefreplace")
         if PY2:
             ufn = [unicode(x) if x in bascii else "%{:02x}".format(ord(x)) for x in ufn]
@@ -1329,6 +1327,7 @@ class HttpCli(object):
 
         cdis = "attachment; filename=\"{}.{}\"; filename*=UTF-8''{}.{}"
         cdis = cdis.format(afn, fmt, ufn, fmt)
+        self.log(cdis)
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
         fgen = vn.zipgen(rem, items, self.uname, dots, not self.args.no_scandir)
@@ -1621,6 +1620,9 @@ class HttpCli(object):
         if not dst:
             raise Pebkac(400, "need dst vpath")
 
+        # x-www-form-urlencoded (url query part) uses
+        # either + or %20 for 0x20 so handle both
+        dst = unquotep(dst.replace("+", " "))
         x = self.conn.hsrv.broker.put(
             True, "up2k.handle_mv", self.uname, self.vpath, dst
         )
