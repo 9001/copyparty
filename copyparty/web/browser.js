@@ -2839,7 +2839,7 @@ function apply_perms(newperms) {
 
 	var axs = [],
 		aclass = '>',
-		chk = ['read', 'write', 'rename', 'delete'];
+		chk = ['read', 'write', 'move', 'delete'];
 
 	for (var a = 0; a < chk.length; a++)
 		if (has(perms, chk[a]))
