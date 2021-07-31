@@ -1405,7 +1405,7 @@ class Up2k(object):
                     try:
                         ptop = dbv.realpath
                         cur, wark, _, _, _, _ = self._find_from_vpath(ptop, volpath)
-                        self._forget_file(ptop, volpath, cur, wark)
+                        self._forget_file(ptop, volpath, cur, wark, True)
                     finally:
                         cur.connection.commit()
 
@@ -1491,10 +1491,10 @@ class Up2k(object):
             fsize = st.st_size
 
         if w:
-            if c2:
+            if c2 and c2 != c1:
                 self._copy_tags(c1, c2, w)
 
-            self._forget_file(svn.realpath, srem, c1, w)
+            self._forget_file(svn.realpath, srem, c1, w, c1 != c2)
             self._relink(w, svn.realpath, srem, dabs)
             c1.connection.commit()
 
@@ -1535,17 +1535,19 @@ class Up2k(object):
             return cur, wark, ftime, fsize, ip, at
         return cur, None, None, None, None, None
 
-    def _forget_file(self, ptop, vrem, cur, wark):
+    def _forget_file(self, ptop, vrem, cur, wark, drop_tags):
         """forgets file in db, fixes symlinks, does not delete"""
         srd, sfn = vsplit(vrem)
         self.log("forgetting {}".format(vrem))
         if wark:
             self.log("found {} in db".format(wark))
-            self._relink(wark, ptop, vrem, None)
+            if self._relink(wark, ptop, vrem, None):
+                drop_tags = False
 
-            q = "delete from mt where w=?"
-            cur.execute(q, (wark[:16],))
-            self.db_rm(cur, srd, sfn)
+            if drop_tags:
+                q = "delete from mt where w=?"
+                cur.execute(q, (wark[:16],))
+                self.db_rm(cur, srd, sfn)
 
         reg = self.registry.get(ptop)
         if reg:
@@ -1581,7 +1583,7 @@ class Up2k(object):
                     self.log("found {} dupe: [{}] {}".format(wark, ptop, dvrem))
 
         if not dupes:
-            return
+            return 0
 
         full = {}
         links = {}
@@ -1617,6 +1619,8 @@ class Up2k(object):
                 pass
 
             self._symlink(dabs, alink, False)
+
+        return len(full) + len(links)
 
     def _get_wark(self, cj):
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
