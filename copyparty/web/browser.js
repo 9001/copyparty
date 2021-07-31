@@ -1627,12 +1627,12 @@ var fileman = (function () {
 		}
 
 		if (exists.length)
-			alert('these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + exists.join('\n'));
+			alert('these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + uricom_adec(exists).join('\n'));
 
 		if (!req.length)
 			return;
 
-		if (!confirm('paste these ' + req.length + ' items here?\n\n' + req.join('\n')))
+		if (!confirm('paste these ' + req.length + ' items here?\n\n' + uricom_adec(req).join('\n')))
 			return;
 
 		function paster() {
