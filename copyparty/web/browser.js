@@ -133,6 +133,7 @@ ebi('op_cfg').innerHTML = (
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
 	'		<a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>\n' +
+	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
 	'		<a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
 	'	</div>\n' +
@@ -2415,6 +2416,7 @@ var treectl = (function () {
 		prev_atop = null,
 		prev_winh = null,
 		dyn = bcfg_get('dyntree', true),
+		dots = bcfg_get('dotfiles', false),
 		treesz = icfg_get('treesz', 16);
 
 	treesz = Math.min(Math.max(treesz, 4), 50);
@@ -2533,7 +2535,7 @@ var treectl = (function () {
 		xhr.dst = dst;
 		xhr.rst = rst;
 		xhr.ts = Date.now();
-		xhr.open('GET', dst + '?tree=' + top, true);
+		xhr.open('GET', dst + '?tree=' + top + (dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvtree;
 		xhr.send();
 		enspin('#tree');
@@ -2637,7 +2639,7 @@ var treectl = (function () {
 		xhr.top = url;
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
-		xhr.open('GET', xhr.top + '?ls', true);
+		xhr.open('GET', xhr.top + '?ls' + (dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvls;
 		xhr.send();
 		if (hpush)
@@ -2774,6 +2776,13 @@ var treectl = (function () {
 		return ret;
 	}
 
+	function tdots(e) {
+		ev(e);
+		dots = !dots;
+		bcfg_set('dotfiles', dots);
+		treectl.goto(get_evpath());
+	}
+
 	function dyntree(e) {
 		ev(e);
 		dyn = !dyn;
@@ -2793,6 +2802,7 @@ var treectl = (function () {
 
 	ebi('entree').onclick = treectl.entree;
 	ebi('detree').onclick = treectl.detree;
+	ebi('dotfiles').onclick = tdots;
 	ebi('dyntree').onclick = dyntree;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
