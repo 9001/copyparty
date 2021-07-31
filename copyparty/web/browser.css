@@ -1081,6 +1081,9 @@ html.light #ggrid a:hover {
 	padding: 1em;
 	z-index: 765;
 }
+html.light #rui {
+	color: #fff;
+}
 #rui div+div {
 	margin-top: 1em;
 }
