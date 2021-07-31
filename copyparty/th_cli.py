@@ -26,6 +26,9 @@ class ThumbCli(object):
         if is_vid and self.args.no_vthumb:
             return None
 
+        if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg"]:
+            return os.path.join(ptop, rem)
+
         if fmt == "j" and self.args.th_no_jpg:
             fmt = "w"
 
