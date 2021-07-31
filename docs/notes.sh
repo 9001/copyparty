@@ -79,6 +79,10 @@ command -v gdate && date() { gdate "$@"; }; while true; do t=$(date +%s.%N); (ti
 # get all up2k search result URLs
 var t=[]; var b=document.location.href.split('#')[0].slice(0, -1); document.querySelectorAll('#u2tab .prog a').forEach((x) => {t.push(b+encodeURI(x.getAttribute("href")))}); console.log(t.join("\n"));
 
+# rename all selected songs to <leading-track-number> + <Title> + <extension>
+var sel=msel.getsel(), ci=find_file_col('Title')[0], re=[]; for (var a=0; a<sel.length; a++) { var url=sel[a].vp, tag=ebi(sel[a].id).closest('tr').querySelectorAll('td')[ci].textContent, name=uricom_dec(vsplit(url)[1])[0], m=/^([0-9]+[\. -]+)?.*(\.[^\.]+$)/.exec(name), name2=(m[1]||'')+tag+m[2], url2=vsplit(url)[0]+uricom_enc(name2,false); if (url!=url2) re.push([url, url2]); }
+console.log(JSON.stringify(re, null, '  '));
+function f() { if (!re.length) return treectl.goto(get_evpath()); var [u1,u2] = re.shift(); fetch(u1+'?move='+u2).then((rsp) => {if (rsp.ok) f(); }); }; f();
 
 ##
 ## bash oneliners
