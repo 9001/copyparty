@@ -399,9 +399,9 @@ function uricom_dec(txt) {
 
 
 function uricom_adec(arr) {
-    ret = [];
+    var ret = [];
     for (var a = 0; a < arr.length; a++)
-        ret[a] = uricom_dec(arr[a])[0];
+        ret.push(uricom_dec(arr[a])[0]);
 
     return ret;
 }
