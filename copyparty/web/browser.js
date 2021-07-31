@@ -1709,7 +1709,7 @@ var fileman = (function () {
 				r.tx(srcdir);
 				return;
 			}
-			toast.inf(0, 'pasting ' + (req.length + 1) + ' items\n\n' + vp);
+			toast.inf(0, 'pasting ' + (req.length + 1) + ' items\n\n' + uricom_dec(vp)[0]);
 
 			var dst = get_evpath() + vp.split('/').slice(-1)[0];
 

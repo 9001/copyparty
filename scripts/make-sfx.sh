@@ -268,7 +268,7 @@ zdir="$tmpdir/cpp-mksfx"
 mkdir -p "$zdir"
 echo a > "$zdir/$stamp"
 nf=$(ls -1 "$zdir"/arc.* | wc -l)
-[ $nf -ge 10 ] && [ ! $repack ] && use_zdir=1 || use_zdir=
+[ $nf -ge 2 ] && [ ! $repack ] && use_zdir=1 || use_zdir=
 
 [ $use_zdir ] || {
 	echo "$nf alts += 1"
