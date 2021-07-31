@@ -34,6 +34,7 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
+	sha1sum() { shasum "$@"; }
 	unexpand() { gunexpand "$@"; }
 	command -v grealpath >/dev/null &&
 		realpath() { grealpath "$@"; }
@@ -81,16 +82,23 @@ tmv() {
 	mv t "$1"
 }
 
+stamp=$(
+	for d in copyparty scripts; do
+		find $d -type f -printf '%TY-%Tm-%Td %TH:%TM:%TS %p\n'
+	done | sort | tail -n 1 | sha1sum | cut -c-16
+)
+
 rm -rf sfx/*
 mkdir -p sfx build
 cd sfx
 
-[ $repack ] && {
-	old="$(
-		printf '%s\n' "$TMPDIR" /tmp |
-		awk '/./ {print; exit}'
-	)/pe-copyparty"
+tmpdir="$(
+	printf '%s\n' "$TMPDIR" /tmp |
+	awk '/./ {print; exit}'
+)"
 
+[ $repack ] && {
+	old="$tmpdir/pe-copyparty"
 	echo "repack of files in $old"
 	cp -pR "$old/"*{dep-j2,copyparty} .
 }
@@ -172,12 +180,12 @@ mkdir -p ../dist
 sfx_out=../dist/copyparty-sfx
 
 echo cleanup
-find .. -name '*.pyc' -delete
-find .. -name __pycache__ -delete
+find -name '*.pyc' -delete
+find -name __pycache__ -delete
 
 # especially prevent osx from leaking your lan ip (wtf apple)
-find .. -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
-find .. -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
+find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
+find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
 
 echo use smol web deps
 rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
@@ -241,20 +249,42 @@ find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 	tmv "$f"
 done
 
-
 gzres() {
-command -v pigz &&
-	pk='pigz -11 -J 34 -I 100' ||
-	pk='gzip'
+	command -v pigz &&
+		pk='pigz -11 -J 34 -I 256' ||
+		pk='gzip'
 
-echo "$pk"
-find | grep -E '\.(js|css)$' | grep -vF /deps/ | while IFS= read -r f; do
-	echo -n .
-	$pk "$f"
-done
-echo
+	echo "$pk"
+	find | grep -E '\.(js|css)$' | grep -vF /deps/ | while IFS= read -r f; do
+		echo -n .
+		$pk "$f"
+	done
+	echo
 }
-gzres
+
+
+zdir="$tmpdir/cpp-mksfx"
+[ -e "$zdir/$stamp" ] || rm -rf "$zdir"
+mkdir -p "$zdir"
+echo a > "$zdir/$stamp"
+nf=$(ls -1 "$zdir"/arc.* | wc -l)
+[ $nf -ge 10 ] && [ ! $repack ] && use_zdir=1 || use_zdir=
+
+[ $use_zdir ] || {
+	echo "$nf alts += 1"
+	gzres
+	[ $repack ] ||
+		tar -cf "$zdir/arc.$(date +%s)" copyparty/web/*.gz
+}
+[ $use_zdir ] && {
+	arcs=("$zdir"/arc.*)
+	arc="${arcs[$RANDOM % ${#arcs[@]} ] }"
+	echo "using $arc"
+	tar -xf "$arc"
+	for f in copyparty/web/*.gz; do
+		rm "${f%.*}"
+	done
+}
 
 
 echo gen tarlist
