@@ -1496,13 +1496,13 @@ var fileman = (function () {
 
 		var vsp = vsplit(src),
 			base = vsp[0],
-			ofn = vsp[1];
+			ofn = uricom_dec(vsp[1])[0];
 
 		var fn = prompt('new filename:', ofn);
 		if (!fn || fn == ofn)
 			return toast.warn(1, 'rename aborted');
 
-		var dst = base + fn;
+		var dst = base + uricom_enc(fn, false);
 
 		function rename_cb() {
 			if (this.readyState != XMLHttpRequest.DONE)
@@ -1611,7 +1611,7 @@ var fileman = (function () {
 			links = QSA('#files tbody td:nth-child(2) a');
 
 		for (var a = 0, aa = links.length; a < aa; a++)
-			indir.push(links[a].getAttribute('name'));
+			indir.push(vsplit(links[a].getAttribute('href'))[1]);
 
 		for (var a = 0; a < r.clip.length; a++) {
 			var found = false;
@@ -3319,13 +3319,11 @@ var msel = (function () {
 			item.id = links[a].getAttribute('id');
 			item.sel = links[a].closest('tr').classList.contains('sel');
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
-			item.name = href.split('/').slice(-1);
 
 			r.all.push(item);
 			if (item.sel)
 				r.sel.push(item);
 
-			links[a].setAttribute('name', item.name);
 			links[a].closest('tr').setAttribute('tabindex', '0');
 		}
 	};
@@ -3365,13 +3363,13 @@ var msel = (function () {
 	};
 	ebi('selzip').onclick = function (e) {
 		ev(e);
-		var names = r.getsel(),
+		var sel = r.getsel(),
 			arg = ebi('selzip').getAttribute('fmt'),
 			frm = mknod('form'),
 			txt = [];
 
-		for (var a = 0; a < names.length; a++)
-			txt.push(names[a].name);
+		for (var a = 0; a < sel.length; a++)
+			txt.push(vsplit(sel[a].vp)[1]);
 
 		txt = txt.join('\n');
 
