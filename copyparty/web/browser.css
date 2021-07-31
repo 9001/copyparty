@@ -49,7 +49,7 @@ pre, code, tt {
 	transition: opacity 0.14s, height 0.14s, padding 0.14s;
 }
 #toast {
-	top: 1.4em;
+	bottom: 5em;
 	right: -1em;
 	line-height: 1.5em;
 	padding: 1em 1.3em;
