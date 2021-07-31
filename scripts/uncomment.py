@@ -65,9 +65,9 @@ def uncomment(fpath):
 
 
 def main():
-    print("uncommenting", end="")
+    print("uncommenting", end="", flush=True)
     for f in sys.argv[1:]:
-        print(".", end="")
+        print(".", end="", flush=True)
         uncomment(f)
 
     print("k")
