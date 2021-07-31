@@ -522,15 +522,14 @@ var mp = new MPlayer();
 makeSortable(ebi('files'), mp.read_order.bind(mp));
 
 
-function get_np() {
+function ft2dict(tr) {
 	var th = ebi('files').tHead.rows[0].cells,
-		tr = QS('#files tr.play').cells,
 		rv = [],
 		ra = [],
 		rt = {};
 
 	for (var a = 1, aa = th.length; a < aa; a++) {
-		var tv = tr[a].textContent,
+		var tv = tr.cells[a].textContent,
 			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').slice(-1)[0],
 			vis = th[a].className.indexOf('min') === -1;
 
@@ -541,6 +540,12 @@ function get_np() {
 		rt[tk] = tv;
 	}
 	return [rt, rv, ra];
+}
+
+
+function get_np() {
+	var tr = QS('#files tr.play');
+	return ft2dict(tr);
 };
 
 
@@ -1499,28 +1504,87 @@ var fileman = (function () {
 			base = vsp[0],
 			ofn = uricom_dec(vsp[1])[0];
 
-		var fn = prompt('new filename:', ofn);
-		if (!fn || fn == ofn)
-			return toast.warn(1, 'rename aborted');
-
-		var dst = base + uricom_enc(fn, false);
-
-		function rename_cb() {
-			if (this.readyState != XMLHttpRequest.DONE)
-				return;
-
-			if (this.status !== 200) {
-				var msg = this.responseText;
-				toast.err(9, 'rename failed:\n' + msg);
-				return;
-			}
-			toast.ok(2, 'rename OK');
-			treectl.goto(get_evpath());
+		var rui = ebi('rui');
+		if (!rui) {
+			rui = mknod('div');
+			rui.setAttribute('id', 'rui');
+			document.body.appendChild(rui);
 		}
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', src + '?move=' + dst, true);
-		xhr.onreadystatechange = rename_cb;
-		xhr.send();
+		var html = [
+			'<h1>rename file</h1>',
+			'<div><table>',
+			'<tr><td>old:</td><td><input type="text" id="rn_old" readonly /></td></tr>',
+			'<tr><td>new:</td><td><input type="text" id="rn_new" /></td></tr>',
+			'</table></div>',
+			'<div>',
+			'<button id="rn_dec">url-decode</button>',
+			'|',
+			'<button id="rn_reset">↺ reset</button>',
+			'<button id="rn_cancel">❌ cancel</button>',
+			'<button id="rn_apply">✅ apply rename</button>',
+			'</div>',
+			'<div><table>'
+		];
+
+		var vars = ft2dict(ebi(sel[0].id).closest('tr')),
+			keys = vars[1].concat(vars[2]);
+
+		vars = vars[0];
+		for (var a = 0; a < keys.length; a++)
+			html.push('<tr><td>' + esc(keys[a]) + '</td><td><input type="text" readonly value="' + esc(vars[keys[a]]) + '" /></td></tr>');
+
+		html.push('</table></div>');
+		rui.innerHTML = html.join('\n');
+		var iold = ebi('rn_old'),
+			inew = ebi('rn_new');
+
+		function rn_reset() {
+			inew.value = iold.value;
+			inew.focus();
+			inew.setSelectionRange(0, inew.value.lastIndexOf('.'), "forward");
+		}
+		function rn_cancel() {
+			rui.parentNode.removeChild(rui);
+		}
+
+		inew.onkeydown = function (e) {
+			if (e.key == 'Escape')
+				return rn_cancel();
+
+			if (e.key == 'Enter')
+				return rn_apply();
+		};
+		ebi('rn_cancel').onclick = rn_cancel;
+		ebi('rn_reset').onclick = rn_reset;
+		ebi('rn_apply').onclick = rn_apply;
+		ebi('rn_dec').onclick = function () {
+			inew.value = uricom_dec(inew.value)[0];
+		};
+
+		iold.value = ofn;
+		rn_reset();
+
+		function rn_apply() {
+			var dst = base + uricom_enc(inew.value, false);
+
+			function rename_cb() {
+				if (this.readyState != XMLHttpRequest.DONE)
+					return;
+
+				if (this.status !== 200) {
+					var msg = this.responseText;
+					toast.err(9, 'rename failed:\n' + msg);
+					return;
+				}
+				toast.ok(2, 'rename OK');
+				treectl.goto(get_evpath());
+				rn_cancel();
+			}
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', src + '?move=' + dst, true);
+			xhr.onreadystatechange = rename_cb;
+			xhr.send();
+		};
 	};
 
 	r.delete = function (e) {

@@ -1068,6 +1068,43 @@ html.light #ggrid a:hover {
 	margin: 0;
 	padding: 0;
 }
+#rui {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: calc(100% - 2em);
+	height: auto;
+	overflow: auto;
+	max-height: calc(100% - 2em);
+	border-bottom: .5em solid #999;
+	background: #333;
+	padding: 1em;
+	z-index: 765;
+}
+#rui div+div {
+	margin-top: 1em;
+}
+#rui table {
+	width: 100%;
+}
+#rui td {
+	padding: .2em .5em;
+}
+#rui td+td,
+#rui td input {
+	width: 100%;
+}
+#rui input[readonly] {
+	color: #fff;
+	background: #444;
+	border: 1px solid #777;
+	padding: .2em .25em;
+}
+#rui h1 {
+	margin: 0 0 .3em 0;
+	padding: 0;
+	font-size: 1.5em;
+}
 #pvol,
 #barbuf,
 #barpos,
