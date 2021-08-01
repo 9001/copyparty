@@ -434,7 +434,15 @@ class MTag(object):
             try:
                 v = getattr(md.info, attr)
             except:
-                continue
+                if k != "ac":
+                    continue
+
+                try:
+                    v = str(md.info).split(".")[1]
+                    if v.startswith("ogg"):
+                        v = v[3:]
+                except:
+                    continue
 
             if not v:
                 continue
