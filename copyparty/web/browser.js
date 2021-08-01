@@ -3040,6 +3040,21 @@ var filecols = (function () {
 			"hz": "sample rate"
 		};
 
+	if (JSON.stringify(def_hcols) != sread('hfilecols')) {
+		console.log("applying default hidden-cols");
+		jwrite('hfilecols', def_hcols);
+		for (var a = 0; a < def_hcols.length; a++) {
+			var t = def_hcols[a];
+			t = t.slice(0, 1).toUpperCase() + t.slice(1);
+			if (t.startsWith("."))
+				t = t.slice(1);
+
+			if (hidden.indexOf(t) == -1)
+				hidden.push(t);
+		}
+		jwrite("filecols", hidden);
+	}
+
 	var add_btns = function () {
 		var ths = QSA('#files th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {

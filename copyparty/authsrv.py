@@ -624,9 +624,11 @@ class AuthSrv(object):
                 if k1 in vol.flags:
                     vol.flags[k2] = True
 
-            # default tag-list if unset
+            # default tag cfgs if unset
             if "mte" not in vol.flags:
                 vol.flags["mte"] = self.args.mte
+            if "mth" not in vol.flags:
+                vol.flags["mth"] = self.args.mth
 
             # append parsers from argv to volume-flags
             self._read_volflag(vol.flags, "mtp", self.args.mtp, True)

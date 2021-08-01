@@ -1755,7 +1755,7 @@ class HttpCli(object):
             "acct": self.uname,
             "perms": json.dumps(perms),
             "taglist": [],
-            "tag_order": [],
+            "def_hcols": [],
             "have_up2k_idx": ("e2d" in vn.flags),
             "have_tags_idx": ("e2t" in vn.flags),
             "have_mv": (not self.args.no_mv),
@@ -1952,8 +1952,8 @@ class HttpCli(object):
         j2a["logues"] = logues
         j2a["taglist"] = taglist
 
-        if "mte" in vn.flags:
-            j2a["tag_order"] = json.dumps(vn.flags["mte"].split(","))
+        if "mth" in vn.flags:
+            j2a["def_hcols"] = vn.flags["mth"].split(",")
 
         if self.args.css_browser:
             j2a["css"] = self.args.css_browser

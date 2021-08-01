@@ -43,6 +43,7 @@ class Cfg(Namespace):
             nih=True,
             mtp=[],
             mte="a",
+            mth="",
             hist=None,
             no_hash=False,
             css_browser=None,
