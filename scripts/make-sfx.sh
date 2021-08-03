@@ -2,6 +2,7 @@
 set -e
 echo
 
+help() { exec cat <<'EOF'
 
 # optional args:
 #
@@ -26,6 +27,8 @@ echo
 #
 # `no-dd` saves ~2k by removing the mouse cursor
 
+EOF
+}
 
 # port install gnutar findutils gsed coreutils
 gtar=$(command -v gtar || command -v gnutar) || true
@@ -73,6 +76,7 @@ while [ ! -z "$1" ]; do
 		no-cm)  no_cm=1  ; ;;
 		no-sh)  do_sh=   ; ;;
 		no-py)  do_py=   ; ;;
+		*)      help     ; ;;
 	esac
 	shift
 done
@@ -204,19 +208,24 @@ done
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
 	echo h > copyparty/web/mde.html
 	f=copyparty/web/md.html
-	sed -r '/edit2">edit \(fancy/d' <$f >t && tmv "$f"
+	sed -r '/edit2">edit \(fancy/d' <$f >t
+	tmv "$f"
 }
 
 [ $no_fnt ] && {
 	rm -f copyparty/web/deps/scp.woff2
 	f=copyparty/web/md.css
-	sed -r '/scp\.woff2/d' <$f >t && tmv "$f"
+	gzip -d "$f"
+	sed -r '/scp\.woff2/d' <$f >t
+	tmv "$f"
 }
 
 [ $no_dd ] && {
 	rm -rf copyparty/web/dd
 	f=copyparty/web/browser.css
-	sed -r 's/(cursor: )url\([^)]+\), (pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: cursor/d' <$f >t && tmv "$f"
+	gzip -d "$f"
+	sed -r 's/(cursor: )url\([^)]+\), (pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: cursor/d' <$f >t
+	tmv "$f"
 }
 
 [ $repack ] ||
@@ -251,7 +260,7 @@ done
 
 gzres() {
 	command -v pigz &&
-		pk='pigz -11 -J 34 -I 256' ||
+		pk='pigz -11 -I 256' ||
 		pk='gzip'
 
 	echo "$pk"
