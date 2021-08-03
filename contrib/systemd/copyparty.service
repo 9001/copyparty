@@ -15,8 +15,11 @@
 #   https://user-images.githubusercontent.com/241032/126040249-cb535cc7-c599-4931-a796-a5d9af691bad.png
 #
 # enable line-buffering for realtime logging (slight performance cost):
-#   modify ExecStart and prefix it with `/bin/stdbuf -oL` like so:
-#   ExecStart=/bin/stdbuf -oL /usr/bin/python3 [...]
+#   modify ExecStart and prefix it with `/usr/bin/stdbuf -oL` like so:
+#   ExecStart=/usr/bin/stdbuf -oL /usr/bin/python3 [...]
+# but some systemd versions require this instead (higher performance cost):
+#   inside the [Service] block, add the following line:
+#   Environment=PYTHONUNBUFFERED=x
 
 [Unit]
 Description=copyparty file server
