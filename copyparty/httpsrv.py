@@ -174,24 +174,25 @@ class HttpSrv(object):
         now = time.time()
 
         if now - (self.tp_time or now) > 300:
+            m = "httpserver threadpool died: tpt {:.2f}, now {:.2f}, nthr {}, ncli {}"
+            self.log(self.name, m.format(self.tp_time, now, self.tp_nthr, self.ncli), 1)
+            self.tp_time = None
             self.tp_q = None
 
-        if self.tp_q:
-            self.tp_q.put((sck, addr))
-            with self.mutex:
-                self.ncli += 1
+        with self.mutex:
+            self.ncli += 1
+            if self.tp_q:
                 self.tp_time = self.tp_time or now
-                self.tp_ncli = max(self.tp_ncli, self.ncli + 1)
+                self.tp_ncli = max(self.tp_ncli, self.ncli)
                 if self.tp_nthr < self.ncli + 4:
                     self.start_threads(8)
-            return
+
+                self.tp_q.put((sck, addr))
+                return
 
         if not self.args.no_htp:
             m = "looks like the httpserver threadpool died; please make an issue on github and tell me the story of how you pulled that off, thanks and dog bless\n"
             self.log(self.name, m, 1)
-
-        with self.mutex:
-            self.ncli += 1
 
         thr = threading.Thread(
             target=self.thr_client,
