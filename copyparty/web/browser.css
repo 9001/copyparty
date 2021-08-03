@@ -22,9 +22,6 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
-body {
-	padding-bottom: 5em;
-}
 pre, code, tt {
 	font-family: monospace, monospace;
 }

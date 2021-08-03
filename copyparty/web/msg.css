@@ -16,9 +16,6 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
-body {
-	padding-bottom: 5em;
-}
 #box {
 	padding: .5em 1em;
 	background: #2c2c2c;
