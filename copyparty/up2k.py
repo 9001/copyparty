@@ -1422,8 +1422,8 @@ class Up2k(object):
         if not srem:
             raise Pebkac(400, "mv: cannot move a mountpoint")
 
-        st = bos.stat(sabs)
-        if stat.S_ISREG(st.st_mode):
+        st = bos.lstat(sabs)
+        if stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode):
             return self._mv_file(uname, svp, dvp)
 
         jail = svn.get_dbv(srem)[0]
