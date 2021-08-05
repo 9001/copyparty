@@ -1521,6 +1521,9 @@ function fmt_ren(re, md, fmt) {
 					if (!len || !chr)
 						throw 'invalid arguments to ' + fun;
 
+					if (!str.length)
+						ng += 1;
+
 					while (str.length < len)
 						str = chr + str;
 
@@ -1532,6 +1535,9 @@ function fmt_ren(re, md, fmt) {
 					var chr = dive()[1];
 					if (!len || !chr)
 						throw 'invalid arguments to ' + fun;
+
+					if (!str.length)
+						ng += 1;
 
 					while (str.length < len)
 						str += chr;
@@ -1606,9 +1612,16 @@ var fileman = (function () {
 			mkeys = vars[1].concat(vars[2]);
 
 			var md = vars[0];
-			for (var k in md)
-				if (md.hasOwnProperty(k) && k.startsWith('.'))
+			for (var k in md) {
+				if (!md.hasOwnProperty(k))
+					continue;
+
+				md[k.toLowerCase()] = md[k];
+				k = k.toLowerCase();
+
+				if (k.startsWith('.'))
 					md[k.slice(1)] = md[k];
+			}
 			md.t = md.ext;
 			md.date = md.ts;
 			md.size = md.sz;
@@ -1630,20 +1643,20 @@ var fileman = (function () {
 
 		var html = sel.length > 1 ? ['<div>'] : [
 			'<div>',
-			'<button class="rn_dec" n="0">url-decode</button>',
+			'<button class="rn_dec" n="0" tt="may fix some cases of broken filenames">url-decode</button>',
 			'//',
-			'<button class="rn_reset" n="0">↺ reset</button>'
+			'<button class="rn_reset" n="0" tt="reset modified filenames back to the original ones">↺ reset</button>'
 		];
 
 		html = html.concat([
-			'<button id="rn_cancel">❌ cancel</button>',
+			'<button id="rn_cancel" tt="abort and close this window">❌ cancel</button>',
 			'<button id="rn_apply">✅ apply rename</button>',
 			'<a id="rn_adv" class="tgl btn" href="#" tt="batch / metadata / pattern renaming">advanced</a>',
 			'<a id="rn_case" class="tgl btn" href="#" tt="case-sensitive regex">case</a>',
 			'</div>',
 			'<div id="rn_vadv"><table>',
-			'<tr><td>regex</td><td><input type="text" id="rn_re" /></td></tr>',
-			'<tr><td>format</td><td><input type="text" id="rn_fmt" /></td></tr>',
+			'<tr><td>regex</td><td><input type="text" id="rn_re" tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" /></td></tr>',
+			'<tr><td>format</td><td><input type="text" id="rn_fmt" tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" /></td></tr>',
 			'<tr><td>preset</td><td><select id="rn_pre"></select>',
 			'<button id="rn_pdel">❌ delete</button>',
 			'<button id="rn_pnew">💾 save as</button>',
@@ -1671,7 +1684,7 @@ var fileman = (function () {
 		html.push('</table></div>');
 
 		if (sel.length == 1) {
-			html.push('<div>tags for the selected file (read-only):<table>');
+			html.push('<div><p style="margin:.6em 0">tags for the selected file (read-only, just for reference):</p><table>');
 			for (var a = 0; a < mkeys.length; a++)
 				html.push('<tr><td>' + esc(mkeys[a]) + '</td><td><input type="text" readonly value="' + esc(f[0].md[mkeys[a]]) + '" /></td></tr>');
 
@@ -1745,7 +1758,11 @@ var fileman = (function () {
 			ipre = ebi('rn_pre'),
 			idel = ebi('rn_pdel'),
 			inew = ebi('rn_pnew'),
-			presets = jread("rn_pre", {});
+			defp = '$lpad((tn),2,0). [(artist) - ](title).(ext)';
+
+		var presets = {};
+		presets[defp] = ['', defp];
+		presets = jread("rn_pre", presets);
 
 		function spresets() {
 			var keys = Object.keys(presets), o;
@@ -1782,6 +1799,14 @@ var fileman = (function () {
 			ifmt.oninput();
 		};
 		spresets();
+
+		ire.onkeydown = ifmt.onkeydown = function (e) {
+			if (e.key == 'Escape')
+				return rn_cancel();
+
+			if (e.key == 'Enter')
+				return rn_apply();
+		};
 
 		ire.oninput = ifmt.oninput = function (e) {
 			var ptn = ire.value,
