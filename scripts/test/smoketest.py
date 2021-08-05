@@ -124,7 +124,7 @@ def tc1():
 
         arg = "{}:{}:{}".format(pd, ud, p, hp)
         if hp:
-            arg += ":chist=" + hp
+            arg += ":c,hist=" + hp
 
         args += ["-v", arg]
 

@@ -178,7 +178,7 @@ small collection of user feedback
   * this is an msys2 bug, the regular windows edition of python is fine
 
 * VirtualBox: sqlite throws `Disk I/O Error` when running in a VM and the up2k database is in a vboxsf
-  * use `--hist` or the `hist` volflag (`-v [...]:chist=/tmp/foo`) to place the db inside the vm instead
+  * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db inside the vm instead
 
 
 # accounts and volumes
@@ -457,9 +457,9 @@ through arguments:
 * `-e2tsr` deletes all existing tags, does a full reindex
 
 the same arguments can be set as volume flags, in addition to `d2d` and `d2t` for disabling:
-* `-v ~/music::r:ce2dsa:ce2tsr` does a full reindex of everything on startup
-* `-v ~/music::r:cd2d` disables **all** indexing, even if any `-e2*` are on
-* `-v ~/music::r:cd2t` disables all `-e2t*` (tags), does not affect `-e2d*`
+* `-v ~/music::r:c,e2dsa:c,e2tsr` does a full reindex of everything on startup
+* `-v ~/music::r:c,d2d` disables **all** indexing, even if any `-e2*` are on
+* `-v ~/music::r:c,d2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
 note:
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
@@ -478,7 +478,7 @@ if you set `--no-hash`, you can enable hashing for specific volumes using flag `
 copyparty creates a subfolder named `.hist` inside each volume where it stores the database, thumbnails, and some other stuff
 
 this can instead be kept in a single place using the `--hist` argument, or the `hist=` volume flag, or a mix of both:
-* `--hist ~/.cache/copyparty -v ~/music::r:chist=-` sets `~/.cache/copyparty` as the default place to put volume info, but `~/music` gets the regular `.hist` subfolder (`-` restores default behavior)
+* `--hist ~/.cache/copyparty -v ~/music::r:c,hist=-` sets `~/.cache/copyparty` as the default place to put volume info, but `~/music` gets the regular `.hist` subfolder (`-` restores default behavior)
 
 note:
 * markdown edits are always stored in a local `.hist` subdirectory
@@ -489,7 +489,7 @@ note:
 ## metadata from audio files
 
 `-mte` decides which tags to index and display in the browser (and also the display order), this can be changed per-volume:
-* `-v ~/music::r:cmte=title,artist` indexes and displays *title* followed by *artist*
+* `-v ~/music::r:c,mte=title,artist` indexes and displays *title* followed by *artist*
 
 if you add/remove a tag from `mte` you will need to run with `-e2tsr` once to rebuild the database, otherwise only new files will be affected
 
@@ -515,7 +515,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 * `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
-* `-v ~/music::r:cmtp=.bpm=~/bin/audio-bpm.py:cmtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
+* `-v ~/music::r:c,mtp=.bpm=~/bin/audio-bpm.py:c,mtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
 
 *but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` only do non-audio files, or `ad` do all files (d as in dontcare) 
 
