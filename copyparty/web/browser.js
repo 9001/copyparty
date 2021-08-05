@@ -1460,6 +1460,79 @@ function play_linked() {
 })();
 
 
+
+function fmt_ren(re, md, fmt) {
+	var ptr = 0;
+	function dive() {
+		var ret = '', ng = 0;
+		while (ptr < fmt.length) {
+			var ch = fmt[ptr++];
+
+			if (ch == '\\') {
+				ret += fmt[ptr++];
+				continue;
+			}
+
+			if (ch == ')' || ch == ']')
+				return [ng, ret];
+
+			if (ch == '$') {
+				ch = fmt[ptr++];
+				if (ch == '[') {
+					var r2 = dive();
+					if (r2[0] == 0)
+						ret += r2[1];
+				}
+				else if (ch == '(') {
+					var end = fmt.indexOf(')', ptr);
+					if (end < 0)
+						throw 'the $( was never closed: ' + fmt.slice(0, ptr);
+
+					var arg = fmt.slice(ptr, end), v = null;
+					ptr = end + 1;
+
+					if (arg != parseInt(arg))
+						v = md[arg];
+					else {
+						arg = parseInt(arg);
+						if (!re)
+							throw 'regex did not match';
+
+						if (arg >= re.length)
+							throw 'matching group ' + arg + ' exceeds ' + (re.length - 0);
+
+						v = re[arg];
+					}
+
+					if (v !== null && v !== undefined)
+						ret += v;
+					else
+						ng++;
+				}
+				else {
+					var end = fmt.indexOf('(', ptr);
+					if (end < 0)
+						throw 'no function name after the $ here: ' + fmt.slice(0, ptr);
+
+					var fun = fmt.slice(ptr - 1, end);
+					throw 'function not implemented: [' + fun + ']';
+				}
+				continue;
+			}
+
+			ret += ch;
+		}
+		return [ng, ret];
+	}
+	try {
+		return [true, dive()[1]];
+	}
+	catch (ex) {
+		return [false, ex];
+	}
+}
+
+
 var fileman = (function () {
 	var bren = ebi('fren'),
 		bdel = ebi('fdel'),
@@ -1493,16 +1566,32 @@ var fileman = (function () {
 			return toast.err(3, 'cannot rename:\nyou do not have “move” permission in this folder');
 
 		var sel = msel.getsel();
-		if (sel.length !== 1)
-			return toast.err(3, 'select exactly 1 item to rename');
+		if (!sel.length)
+			return toast.err(3, 'select at least one item to rename');
 
-		var src = sel[0].vp;
-		if (src.endsWith('/'))
-			src = src.slice(0, -1);
+		var f = [],
+			base = vsplit(sel[0].vp)[0],
+			mkeys;
 
-		var vsp = vsplit(src),
-			base = vsp[0],
-			ofn = uricom_dec(vsp[1])[0];
+		for (var a = 0; a < sel.length; a++) {
+			var vp = sel[a].vp;
+			if (vp.endsWith('/'))
+				vp = vp.slice(0, -1);
+
+			var vsp = vsplit(vp);
+			if (base != vsp[0])
+				return toast.err(0, 'bug:\n' + base + '\n' + vsp[0]);
+
+			var vars = ft2dict(ebi(sel[a].id).closest('tr'));
+			mkeys = vars[1].concat(vars[2]);
+
+			f.push({
+				"src": vp,
+				"ofn": uricom_dec(vsp[1])[0],
+				"md": vars[0],
+				"ok": true
+			});
+		}
 
 		var rui = ebi('rui');
 		if (!rui) {
@@ -1510,62 +1599,147 @@ var fileman = (function () {
 			rui.setAttribute('id', 'rui');
 			document.body.appendChild(rui);
 		}
-		var html = [
-			'<h1>rename file</h1>',
-			'<div><table>',
-			'<tr><td>old:</td><td><input type="text" id="rn_old" readonly /></td></tr>',
-			'<tr><td>new:</td><td><input type="text" id="rn_new" /></td></tr>',
-			'</table></div>',
+
+		var html = sel.length > 1 ? ['<div>'] : [
 			'<div>',
-			'<button id="rn_dec">url-decode</button>',
-			'|',
-			'<button id="rn_reset">↺ reset</button>',
-			'<button id="rn_cancel">❌ cancel</button>',
-			'<button id="rn_apply">✅ apply rename</button>',
-			'</div>',
-			'<div><table>'
+			'<button class="rn_dec" n="0">url-decode</button>',
+			'//',
+			'<button class="rn_reset" n="0">↺ reset</button>'
 		];
 
-		var vars = ft2dict(ebi(sel[0].id).closest('tr')),
-			keys = vars[1].concat(vars[2]);
+		html = html.concat([
+			'<button id="rn_cancel">❌ cancel</button>',
+			'<button id="rn_apply">✅ apply rename</button>',
+			'<a id="rn_adv" class="tgl btn" href="#" tt="batch / metadata / pattern renaming">advanced</a>',
+			'<a id="rn_case" class="tgl btn" href="#" tt="case-sensitive regex">case</a>',
+			'</div>',
+			'<div id="rn_vadv"><table>',
+			'<tr><td>regex</td><td><input type="text" id="rn_re" /></td></tr>',
+			'<tr><td>format</td><td><input type="text" id="rn_fmt" /></td></tr>',
+			'<tr><td>preset</td><td><select id="rn_pre"></select>',
+			'<button id="rn_pdel">❌ delete</button>',
+			'<button id="rn_pnew">💾 save as</button>',
+			'</td></tr>',
+			'</table></div>'
+		]);
 
-		vars = vars[0];
-		for (var a = 0; a < keys.length; a++)
-			html.push('<tr><td>' + esc(keys[a]) + '</td><td><input type="text" readonly value="' + esc(vars[keys[a]]) + '" /></td></tr>');
-
+		if (sel.length == 1)
+			html.push(
+				'<div><table id="rn_f">\n' +
+				'<tr><td>old:</td><td><input type="text" id="rn_old" n="0" readonly /></td></tr>\n' +
+				'<tr><td>new:</td><td><input type="text" id="rn_new" n="0" /></td></tr>');
+		else {
+			html.push(
+				'<div><table id="rn_f" class="m">' +
+				'<tr><td></td><td>new name</td><td>old name</td></tr>');
+			for (var a = 0; a < f.length; a++)
+				html.push(
+					'<tr><td>' +
+					'<button class="rn_dec" n="' + a + '">decode</button>',
+					'<button class="rn_reset" n="' + a + '">↺ reset</button></td>',
+					'<td><input type="text" id="rn_new" n="' + a + '" /></td>' +
+					'<td><input type="text" id="rn_old" n="' + a + '" readonly /></td></tr>');
+		}
 		html.push('</table></div>');
-		rui.innerHTML = html.join('\n');
-		var iold = ebi('rn_old'),
-			inew = ebi('rn_new');
 
-		function rn_reset() {
-			inew.value = iold.value;
-			inew.focus();
-			inew.setSelectionRange(0, inew.value.lastIndexOf('.'), "forward");
+		if (sel.length == 1) {
+			html.push('<div>tags for the selected file (read-only):<table>');
+			for (var a = 0; a < mkeys.length; a++)
+				html.push('<tr><td>' + esc(mkeys[a]) + '</td><td><input type="text" readonly value="' + esc(f[0].md[mkeys[a]]) + '" /></td></tr>');
+
+			html.push('</table></div>');
+		}
+
+		rui.innerHTML = html.join('\n');
+		for (var a = 0; a < f.length; a++) {
+			var k = '[n="' + a + '"]';
+			f[a].iold = QS('#rn_old' + k);
+			f[a].inew = QS('#rn_new' + k);
+			f[a].inew.value = f[a].iold.value = f[a].ofn;
+
+			(function (a) {
+				f[a].inew.onkeydown = function (e) {
+					f[a].ok = true;
+
+					if (e.key == 'Escape')
+						return rn_cancel();
+
+					if (e.key == 'Enter')
+						return rn_apply();
+				};
+				QS('.rn_dec' + k).onclick = function () {
+					f[a].inew.value = uricom_dec(f[a].inew.value)[0];
+				};
+				QS('.rn_reset' + k).onclick = function () {
+					rn_reset(a);
+				};
+			})(a);
+		}
+		rn_reset(0);
+		tt.att(rui);
+
+		var adv = bcfg_get('rn_adv', false),
+			cs = bcfg_get('rn_case', false);
+
+		function sadv() {
+			ebi('rn_vadv').style.display = ebi('rn_case').style.display = adv ? '' : 'none';
+		}
+		sadv();
+
+		function rn_reset(n) {
+			f[n].inew.value = f[n].iold.value = f[n].ofn;
+			f[n].inew.focus();
+			f[n].inew.setSelectionRange(0, f[n].inew.value.lastIndexOf('.'), "forward");
 		}
 		function rn_cancel() {
 			rui.parentNode.removeChild(rui);
 		}
 
-		inew.onkeydown = function (e) {
-			if (e.key == 'Escape')
-				return rn_cancel();
-
-			if (e.key == 'Enter')
-				return rn_apply();
-		};
 		ebi('rn_cancel').onclick = rn_cancel;
-		ebi('rn_reset').onclick = rn_reset;
 		ebi('rn_apply').onclick = rn_apply;
-		ebi('rn_dec').onclick = function () {
-			inew.value = uricom_dec(inew.value)[0];
+		ebi('rn_adv').onclick = function () {
+			adv = !adv;
+			bcfg_set('rn_adv', adv);
+			sadv();
+		};
+		ebi('rn_case').onclick = function () {
+			cs = !cs;
+			bcfg_set('rn_case', cs);
 		};
 
-		iold.value = ofn;
-		rn_reset();
+		var ire = ebi('rn_re'),
+			ifmt = ebi('rn_fmt'),
+			ipre = ebi('rn_pre'),
+			idel = ebi('rn_pdel'),
+			inew = ebi('rn_pnew');
+
+		ire.oninput = ifmt.oninput = function (e) {
+			var re = ire.value,
+				fmt = ifmt.value;
+
+			if (!fmt)
+				return;
+
+			try {
+				re = re ? new RegExp(re, cs ? 'i' : '') : null;
+			}
+			catch (ex) {
+				return toast.err(5, 'invalid regex:\n' + ex);
+			}
+			toast.hide();
+
+			for (var a = 0; a < f.length; a++) {
+				var m = re ? re.exec(f[a].ofn) : null,
+					ret = fmt_ren(m, f[a].md, fmt);
+
+				f[a].ok = ret[0];
+				f[a].inew.value = ret[1];
+			}
+		};
 
 		function rn_apply() {
-			var dst = base + uricom_enc(inew.value, false);
+			toast.inf(0, 'renaming ' + f.length + ' items\n\n' + f[0].ofn);
+			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
 				if (this.readyState != XMLHttpRequest.DONE)
@@ -1576,15 +1750,21 @@ var fileman = (function () {
 					toast.err(9, 'rename failed:\n' + msg);
 					return;
 				}
+
+				f.shift().inew.value = '( OK )';
+				if (f.length)
+					return rn_apply();
+
 				toast.ok(2, 'rename OK');
 				treectl.goto(get_evpath());
 				rn_cancel();
 			}
+
 			var xhr = new XMLHttpRequest();
-			xhr.open('GET', src + '?move=' + dst, true);
+			xhr.open('GET', f[0].src + '?move=' + dst, true);
 			xhr.onreadystatechange = rename_cb;
 			xhr.send();
-		};
+		}
 	};
 
 	r.delete = function (e) {

@@ -1086,13 +1086,23 @@ html.light #rui {
 }
 #rui table {
 	width: 100%;
+	border-collapse: collapse;
 }
-#rui td {
-	padding: .2em .5em;
+#rui td+td {
+	padding: .2em 0 .2em .5em;
+}
+#rn_vadv input {
+	font-family: monospace, monospace;
 }
 #rui td+td,
-#rui td input {
+#rui td input[type="text"] {
 	width: 100%;
+}
+#rn_f.m td:first-child {
+	white-space: nowrap;
+}
+#rn_f.m td+td {
+	width: 50%;
 }
 #rui input[readonly] {
 	color: #fff;
@@ -1109,6 +1119,7 @@ html.light #rui {
 #barbuf,
 #barpos,
 #u2conf label,
+#rui label,
 #ops {
 	-webkit-user-select: none;
 	-moz-user-select: none;
