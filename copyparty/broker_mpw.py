@@ -1,6 +1,5 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
-from copyparty.authsrv import AuthSrv
 
 import sys
 import signal
@@ -9,6 +8,7 @@ import threading
 from .broker_util import ExceptionalQueue
 from .httpsrv import HttpSrv
 from .util import FAKE_MP
+from copyparty.authsrv import AuthSrv
 
 
 class MpWorker(object):

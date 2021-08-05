@@ -24,6 +24,7 @@ from .__init__ import E, WINDOWS, VT100, PY2, unicode
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
 from .util import py_desc, align_tab, IMPLICATIONS
+from .authsrv import re_vol
 
 HAVE_SSL = True
 try:
@@ -326,7 +327,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")
     ap2.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
     ap2.add_argument("-e2dsa", action="store_true", help="scan all folders (for search), sets -e2ds")
-    ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume state")
+    ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
     ap2.add_argument("--no-hash", action="store_true", help="disable hashing during e2ds folder scans")
     ap2.add_argument("--re-int", metavar="SEC", type=int, default=30, help="disk rescan check interval")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval (0=off)")
@@ -398,10 +399,16 @@ def main(argv=None):
     nstrs = []
     anymod = False
     for ostr in al.v or []:
+        m = re_vol.match(ostr)
+        if not m:
+            # not our problem
+            nstrs.append(ostr)
+            continue
+
+        src, dst, perms = m.groups()
+        na = [src, dst]
         mod = False
-        oa = ostr.split(":")
-        na = oa[:2]
-        for opt in oa[2:]:
+        for opt in perms.split(":"):
             if re.match("c[^,]", opt):
                 mod = True
                 na.append("c," + opt[1:])

@@ -310,6 +310,12 @@ class VFS(object):
                 yield f
 
 
+if WINDOWS:
+    re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)$")
+else:
+    re_vol = re.compile(r"^([^:]*):([^:]*):(.*)$")
+
+
 class AuthSrv(object):
     """verifies users against given paths"""
 
@@ -318,11 +324,6 @@ class AuthSrv(object):
         self.log_func = log_func
         self.warn_anonwrite = warn_anonwrite
         self.line_ctr = 0
-
-        if WINDOWS:
-            self.re_vol = re.compile(r"^([a-zA-Z]:[\\/][^:]*|[^:]*):([^:]*):(.*)$")
-        else:
-            self.re_vol = re.compile(r"^([^:]*):([^:]*):(.*)$")
 
         self.mutex = threading.Lock()
         self.reload()
@@ -453,7 +454,7 @@ class AuthSrv(object):
             # list of src:dst:permset:permset:...
             # permset is <rwmd>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
-                m = self.re_vol.match(v_str)
+                m = re_vol.match(v_str)
                 if not m:
                     raise Exception("invalid -v argument: [{}]".format(v_str))
 
