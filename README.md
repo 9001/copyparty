@@ -121,31 +121,31 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ [accounts](#accounts-and-volumes)
 * upload
   * ☑ basic: plain multipart, ie6 support
-  * ☑ up2k: js, resumable, multithreaded
+  * ☑ [up2k](#uploading): js, resumable, multithreaded
   * ☑ stash: simple PUT filedropper
   * ☑ unpost: undo/delete accidental uploads
   * ☑ symlink/discard existing files (content-matching)
 * download
   * ☑ single files in browser
-  * ☑ folders as zip / tar files
+  * ☑ [folders as zip / tar files](#zip-downloads)
   * ☑ FUSE client (read-only)
 * browser
   * ☑ navpane (directory tree sidebar)
-  * ☑ file manager (cut/paste, delete, batch-rename)
+  * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
   * ☑ audio player (with OS media controls)
   * ☑ image gallery with webm player
-  * ☑ thumbnails
+  * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow
     * ☑ ...of videos using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
   * ☑ SPA (browse while uploading)
     * if you use the navpane to navigate, not folders in the file list
 * server indexing
-  * ☑ locate files by contents
+  * ☑ [locate files by contents](#file-search)
   * ☑ search by name/path/date/size
-  * ☑ search by ID3-tags etc.
+  * ☑ [search by ID3-tags etc.](#searching)
 * markdown
-  * ☑ viewer
+  * ☑ [viewer](#markdown-viewer)
   * ☑ editor (sure why not)
 
 
@@ -371,6 +371,8 @@ you can move files across browser tabs (cut in one tab, paste in another)
 
 
 ## batch rename
+
+![batch-rename-fs8](https://user-images.githubusercontent.com/241032/128434204-eb136680-3c07-4ec7-92e0-ae86af20c241.png)
 
 select some files and press F2 to bring up the rename UI
 
