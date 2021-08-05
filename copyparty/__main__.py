@@ -342,7 +342,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
-        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,res,.fps")
+        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,res,.fps,ahash,vhash")
     ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.)",
         default=".vq,.aq,vc,ac,res,.fps")
     ap2.add_argument("-mtp", metavar="M=[f,]bin", type=u, action="append", help="read tag M using bin")

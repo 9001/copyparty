@@ -4,6 +4,7 @@ some of these rely on libraries which are not MIT-compatible
 
 * [audio-bpm.py](./audio-bpm.py) detects the BPM of music using the BeatRoot Vamp Plugin; imports GPL2
 * [audio-key.py](./audio-key.py) detects the melodic key of music using the Mixxx fork of keyfinder; imports GPL3
+* [media-hash.py](./media-hash.py) generates checksums for audio and video streams; uses FFmpeg (LGPL or GPL)
 
 
 # dependencies
@@ -18,7 +19,10 @@ run [`install-deps.sh`](install-deps.sh) to build/install most dependencies requ
 
 # usage from copyparty
 
-`copyparty -e2dsa -e2ts -mtp key=f,audio-key.py -mtp .bpm=f,audio-bpm.py`
+`copyparty -e2dsa -e2ts` followed by any combination of these:
+* `-mtp key=f,audio-key.py`
+* `-mtp .bpm=f,audio-bpm.py`
+* `-mtp ahash,vhash=f,media-hash.py`
 
 * `f,` makes the detected value replace any existing values
 * the `.` in `.bpm` indicates numeric value
@@ -29,6 +33,9 @@ run [`install-deps.sh`](install-deps.sh) to build/install most dependencies requ
 ## usage with volume-flags
 
 instead of affecting all volumes, you can set the options for just one volume like so:
-```
-copyparty -v /mnt/nas/music:/music:r:cmtp=key=f,audio-key.py:cmtp=.bpm=f,audio-bpm.py:ce2dsa:ce2ts
-```
+
+`copyparty -v /mnt/nas/music:/music:r:c,e2dsa:c,e2ts` immediately followed by any combination of these:
+
+* `:c,mtp=key=f,audio-key.py`
+* `:c,mtp=.bpm=f,audio-bpm.py`
+* `:c,mtp=ahash,vhash=f,media-hash.py`

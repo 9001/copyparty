@@ -3319,6 +3319,8 @@ var filecols = (function () {
 			"q": "quality / bitrate",
 			"Ac": "audio codec",
 			"Vc": "video codec",
+			"Ahash": "audio checksum",
+			"Vhash": "video checksum",
 			"Res": "resolution",
 			"T": "filetype",
 			"aq": "audio quality / bitrate",
