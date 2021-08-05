@@ -1104,6 +1104,13 @@ html.light #rui {
 #rn_f.m td+td {
 	width: 50%;
 }
+#rn_f .err td {
+	background: #c00;
+}
+#rn_f .err input[readonly] {
+	background: #600;
+	color: #fc0;
+}
 #rui input[readonly] {
 	color: #fff;
 	background: #444;

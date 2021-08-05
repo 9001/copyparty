@@ -1476,51 +1476,44 @@ function fmt_ren(re, md, fmt) {
 			if (ch == ')' || ch == ']')
 				return [ng, ret];
 
-			if (ch == '$') {
-				ch = fmt[ptr++];
-				if (ch == '[') {
-					var r2 = dive();
-					if (r2[0] == 0)
-						ret += r2[1];
-				}
-				else if (ch == '(') {
-					var end = fmt.indexOf(')', ptr);
-					if (end < 0)
-						throw 'the $( was never closed: ' + fmt.slice(0, ptr);
-
-					var arg = fmt.slice(ptr, end), v = null;
-					ptr = end + 1;
-
-					if (arg != parseInt(arg))
-						v = md[arg];
-					else {
-						arg = parseInt(arg);
-						if (!re)
-							throw 'regex did not match';
-
-						if (arg >= re.length)
-							throw 'matching group ' + arg + ' exceeds ' + (re.length - 0);
-
-						v = re[arg];
-					}
-
-					if (v !== null && v !== undefined)
-						ret += v;
-					else
-						ng++;
-				}
-				else {
-					var end = fmt.indexOf('(', ptr);
-					if (end < 0)
-						throw 'no function name after the $ here: ' + fmt.slice(0, ptr);
-
-					var fun = fmt.slice(ptr - 1, end);
-					throw 'function not implemented: [' + fun + ']';
-				}
-				continue;
+			if (ch == '[') {
+				var r2 = dive();
+				if (r2[0] == 0)
+					ret += r2[1];
 			}
+			else if (ch == '(') {
+				var end = fmt.indexOf(')', ptr);
+				if (end < 0)
+					throw 'the $( was never closed: ' + fmt.slice(0, ptr);
 
-			ret += ch;
+				var arg = fmt.slice(ptr, end), v = null;
+				ptr = end + 1;
+
+				if (arg != parseInt(arg))
+					v = md[arg];
+				else {
+					arg = parseInt(arg);
+					if (arg >= re.length)
+						throw 'matching group ' + arg + ' exceeds ' + (re.length - 0);
+
+					v = re[arg];
+				}
+
+				if (v !== null && v !== undefined)
+					ret += v;
+				else
+					ng++;
+			}
+			else if (ch == '$') {
+				ch = fmt[ptr++];
+				var end = fmt.indexOf('(', ptr);
+				if (end < 0)
+					throw 'no function name after the $ here: ' + fmt.slice(0, ptr);
+
+				var fun = fmt.slice(ptr - 1, end);
+				throw 'function not implemented: "' + fun + '"';
+			}
+			else ret += ch;
 		}
 		return [ng, ret];
 	}
@@ -1584,6 +1577,14 @@ var fileman = (function () {
 
 			var vars = ft2dict(ebi(sel[a].id).closest('tr'));
 			mkeys = vars[1].concat(vars[2]);
+
+			var md = vars[0];
+			for (var k in md)
+				if (md.hasOwnProperty(k) && k.startsWith('.'))
+					md[k.slice(1)] = md[k];
+			md.t = md.ext;
+			md.date = md.ts;
+			md.size = md.sz;
 
 			f.push({
 				"src": vp,
@@ -1659,7 +1660,7 @@ var fileman = (function () {
 
 			(function (a) {
 				f[a].inew.onkeydown = function (e) {
-					f[a].ok = true;
+					rn_ok(a, true);
 
 					if (e.key == 'Escape')
 						return rn_cancel();
@@ -1685,6 +1686,11 @@ var fileman = (function () {
 			ebi('rn_vadv').style.display = ebi('rn_case').style.display = adv ? '' : 'none';
 		}
 		sadv();
+
+		function rn_ok(n, ok) {
+			f[n].ok = ok;
+			clmod(f[n].inew.closest('tr'), 'err', !ok);
+		}
 
 		function rn_reset(n) {
 			f[n].inew.value = f[n].iold.value = f[n].ofn;
@@ -1714,14 +1720,16 @@ var fileman = (function () {
 			inew = ebi('rn_pnew');
 
 		ire.oninput = ifmt.oninput = function (e) {
-			var re = ire.value,
-				fmt = ifmt.value;
+			var ptn = ire.value,
+				fmt = ifmt.value,
+				re = null;
 
 			if (!fmt)
 				return;
 
 			try {
-				re = re ? new RegExp(re, cs ? 'i' : '') : null;
+				if (ptn)
+					re = new RegExp(ptn, cs ? 'i' : '');
 			}
 			catch (ex) {
 				return toast.err(5, 'invalid regex:\n' + ex);
@@ -1730,14 +1738,32 @@ var fileman = (function () {
 
 			for (var a = 0; a < f.length; a++) {
 				var m = re ? re.exec(f[a].ofn) : null,
-					ret = fmt_ren(m, f[a].md, fmt);
+					ok, txt = '';
 
-				f[a].ok = ret[0];
-				f[a].inew.value = ret[1];
+				if (re && !m) {
+					txt = 'regex did not match';
+					ok = false;
+				}
+				else {
+					var ret = fmt_ren(m, f[a].md, fmt);
+					ok = ret[0];
+					txt = ret[1];
+				}
+				rn_ok(a, ok);
+				f[a].inew.value = (ok ? '' : 'ERROR: ') + txt;
 			}
 		};
 
 		function rn_apply() {
+			while (f.length && !f[0].ok)
+				f.shift();
+
+			if (!f.length) {
+				toast.ok(2, 'rename OK');
+				treectl.goto(get_evpath());
+				return rn_cancel();
+			}
+
 			toast.inf(0, 'renaming ' + f.length + ' items\n\n' + f[0].ofn);
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
@@ -1752,12 +1778,9 @@ var fileman = (function () {
 				}
 
 				f.shift().inew.value = '( OK )';
-				if (f.length)
-					return rn_apply();
+				return rn_apply();
 
-				toast.ok(2, 'rename OK');
-				treectl.goto(get_evpath());
-				rn_cancel();
+
 			}
 
 			var xhr = new XMLHttpRequest();
