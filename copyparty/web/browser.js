@@ -1463,17 +1463,18 @@ function play_linked() {
 
 function fmt_ren(re, md, fmt) {
 	var ptr = 0;
-	function dive() {
+	function dive(stop_ch) {
 		var ret = '', ng = 0;
 		while (ptr < fmt.length) {
-			var ch = fmt[ptr++];
+			var dbg = fmt.slice(ptr),
+				ch = fmt[ptr++];
 
 			if (ch == '\\') {
 				ret += fmt[ptr++];
 				continue;
 			}
 
-			if (ch == ')' || ch == ']')
+			if (ch == ')' || ch == ']' || ch == stop_ch)
 				return [ng, ret];
 
 			if (ch == '[') {
@@ -1484,7 +1485,7 @@ function fmt_ren(re, md, fmt) {
 			else if (ch == '(') {
 				var end = fmt.indexOf(')', ptr);
 				if (end < 0)
-					throw 'the $( was never closed: ' + fmt.slice(0, ptr);
+					throw 'the ( was never closed: ' + fmt.slice(0, ptr);
 
 				var arg = fmt.slice(ptr, end), v = null;
 				ptr = end + 1;
@@ -1511,7 +1512,33 @@ function fmt_ren(re, md, fmt) {
 					throw 'no function name after the $ here: ' + fmt.slice(0, ptr);
 
 				var fun = fmt.slice(ptr - 1, end);
-				throw 'function not implemented: "' + fun + '"';
+				ptr = end + 1;
+
+				if (fun == "lpad") {
+					var str = dive(',')[1];
+					var len = dive(',')[1];
+					var chr = dive()[1];
+					if (!len || !chr)
+						throw 'invalid arguments to ' + fun;
+
+					while (str.length < len)
+						str = chr + str;
+
+					ret += str;
+				}
+				else if (fun == "rpad") {
+					var str = dive(',')[1];
+					var len = dive(',')[1];
+					var chr = dive()[1];
+					if (!len || !chr)
+						throw 'invalid arguments to ' + fun;
+
+					while (str.length < len)
+						str += chr;
+
+					ret += str;
+				}
+				else throw 'function not implemented: "' + fun + '"';
 			}
 			else ret += ch;
 		}
@@ -1717,7 +1744,44 @@ var fileman = (function () {
 			ifmt = ebi('rn_fmt'),
 			ipre = ebi('rn_pre'),
 			idel = ebi('rn_pdel'),
-			inew = ebi('rn_pnew');
+			inew = ebi('rn_pnew'),
+			presets = jread("rn_pre", {});
+
+		function spresets() {
+			var keys = Object.keys(presets), o;
+			keys.sort();
+			ipre.innerHTML = '<option value=""></option>';
+			for (var a = 0; a < keys.length; a++) {
+				o = mknod('option');
+				o.setAttribute('value', keys[a]);
+				o.textContent = keys[a];
+				ipre.appendChild(o);
+			}
+		}
+		inew.onclick = function () {
+			var name = prompt('provide a name for your new preset', ifmt.value);
+			if (!name)
+				return toast.warn(3, 'aborted');
+
+			presets[name] = [ire.value, ifmt.value];
+			jwrite('rn_pre', presets);
+			spresets();
+			ipre.value = name;
+		};
+		idel.onclick = function () {
+			delete presets[ipre.value];
+			jwrite('rn_pre', presets);
+			spresets();
+		};
+		ipre.oninput = function () {
+			var cfg = presets[ipre.value];
+			if (cfg) {
+				ire.value = cfg[0];
+				ifmt.value = cfg[1];
+			}
+			ifmt.oninput();
+		};
+		spresets();
 
 		ire.oninput = ifmt.oninput = function (e) {
 			var ptn = ire.value,
@@ -1755,7 +1819,7 @@ var fileman = (function () {
 		};
 
 		function rn_apply() {
-			while (f.length && !f[0].ok)
+			while (f.length && (!f[0].ok || f[0].ofn == f[0].inew.value))
 				f.shift();
 
 			if (!f.length) {
@@ -1779,8 +1843,6 @@ var fileman = (function () {
 
 				f.shift().inew.value = '( OK )';
 				return rn_apply();
-
-
 			}
 
 			var xhr = new XMLHttpRequest();

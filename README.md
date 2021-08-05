@@ -387,8 +387,12 @@ in advanced mode,
 * `[case]` toggles case-sensitive regex
 * `regex` is the regex pattern to apply to the original filename; any files which don't match will be skipped
 * `format` is the new filename, taking values from regex capturing groups and/or from file tags
-  * very loosely based on foobar2000 syntax, no functions yet tho
+  * very loosely based on foobar2000 syntax
 * `presets` lets you save rename rules for later
+
+available functions:
+* `$lpad(text, length, pad_char)`
+* `$rpad(text, length, pad_char)`
 
 so,
 
@@ -407,6 +411,8 @@ or a mix of both since it doesn't have functions yet (for example to add leading
 * `regex` = ` - ([0-9]{2}) `
 * `format` = `(1). (artist) - (title).(ext)`
 * `output` = `07. meganeko - Sirius A.mp3`
+
+the metadata keys you can use in the format field are the ones in the file-browser table header (whatever is collected with `-mte` and `-mtp`)
 
 
 ## markdown viewer

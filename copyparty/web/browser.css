@@ -807,6 +807,7 @@ input.eq_gain {
 #wrap {
 	margin-top: 2em;
 	min-height: 90vh;
+	padding-bottom: 5em;
 }
 #tree {
 	display: none;
