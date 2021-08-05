@@ -404,10 +404,10 @@ you could use just regex to rename it:
 * `output` = `07. meganeko - Sirius A.mp3`
 
 or you could use just tags:
-* `format` = `(tn). (artist) - (title).(ext)`
+* `format` = `$lpad((tn),2,0). (artist) - (title).(ext)`
 * `output` = `7. meganeko - Sirius A.mp3`
 
-or a mix of both since it doesn't have functions yet (for example to add leading zeroes):
+or a mix of both:
 * `regex` = ` - ([0-9]{2}) `
 * `format` = `(1). (artist) - (title).(ext)`
 * `output` = `07. meganeko - Sirius A.mp3`
