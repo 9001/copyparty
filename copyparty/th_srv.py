@@ -205,8 +205,8 @@ class ThumbSrv(object):
                 try:
                     fun(abspath, tpath)
                 except:
-                    msg = "{} failed on {}\n{}"
-                    self.log(msg.format(fun.__name__, abspath, min_ex()), 3)
+                    msg = "{} could not create thumbnail of {}\n{}"
+                    self.log(msg.format(fun.__name__, abspath, min_ex()), "1;30")
                     with open(tpath, "wb") as _:
                         pass
 
@@ -286,8 +286,9 @@ class ThumbSrv(object):
         cmd += seek
         cmd += [
             b"-i", fsenc(abspath),
+            b"-map", b"0:v:0",
             b"-vf", scale,
-            b"-vframes", b"1",
+            b"-frames:v", b"1",
         ]
         # fmt: on
 
@@ -308,8 +309,9 @@ class ThumbSrv(object):
 
         ret, sout, serr = runcmd(cmd)
         if ret != 0:
-            msg = ["ff: {}".format(x) for x in serr.split("\n")]
-            self.log("FFmpeg failed:\n" + "\n".join(msg), c="1;30")
+            m = "FFmpeg failed (probably a corrupt video file):\n"
+            m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])
+            self.log(m, c="1;30")
             raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
     def poke(self, tdir):
