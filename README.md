@@ -16,11 +16,6 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [thumbnails](#thumbnails) // [md-viewer](#markdown-viewer) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [ie4](#browser-support)
 
 
-## breaking changes \o/
-
-this is the readme for v0.12 which has a different expression for volume permissions (`-v`); see [the v0.11.x readme](https://github.com/9001/copyparty/tree/15b59822112dda56cee576df30f331252fc62628#readme) for stuff regarding the [current stable release](https://github.com/9001/copyparty/releases/tag/v0.11.47)
-
-
 ## readme toc
 
 * top
@@ -400,18 +395,18 @@ so,
 say you have a file named [`meganeko - Eclipse - 07 Sirius A.mp3`](https://www.youtube.com/watch?v=-dtb0vDPruI) (absolutely fantastic album btw) and the tags are: `Album:Eclipse`, `Artist:meganeko`, `Title:Sirius A`, `tn:7`
 
 you could use just regex to rename it:
-`regex` = `(.*) - (.*) - ([0-9]{2}) (.*)`
-`format` = `(3). (1) - (4)`
-`output` = `07. meganeko - Sirius A.mp3`
+* `regex` = `(.*) - (.*) - ([0-9]{2}) (.*)`
+* `format` = `(3). (1) - (4)`
+* `output` = `07. meganeko - Sirius A.mp3`
 
 or you could use just tags:
-`format` = `(tn). (artist) - (title).(ext)`
-`output` = `7. meganeko - Sirius A.mp3`
+* `format` = `(tn). (artist) - (title).(ext)`
+* `output` = `7. meganeko - Sirius A.mp3`
 
 or a mix of both since it doesn't have functions yet (for example to add leading zeroes):
-`regex` = ` - ([0-9]{2}) `
-`format` = `(1). (artist) - (title).(ext)`
-`output` = `07. meganeko - Sirius A.mp3`
+* `regex` = ` - ([0-9]{2}) `
+* `format` = `(1). (artist) - (title).(ext)`
+* `output` = `07. meganeko - Sirius A.mp3`
 
 
 ## markdown viewer
