@@ -41,6 +41,7 @@ this is the readme for v0.12 which has a different expression for volume permiss
     * [uploading](#uploading)
         * [file-search](#file-search)
     * [file manager](#file-manager)
+    * [batch rename](#batch-rename)
     * [markdown viewer](#markdown-viewer)
     * [other tricks](#other-tricks)
 * [searching](#searching)
@@ -135,12 +136,13 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ FUSE client (read-only)
 * browser
   * ☑ navpane (directory tree sidebar)
+  * ☑ file manager (cut/paste, delete, batch-rename)
   * ☑ audio player (with OS media controls)
+  * ☑ image gallery with webm player
   * ☑ thumbnails
     * ☑ ...of images using Pillow
     * ☑ ...of videos using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
-  * ☑ image gallery with webm player
   * ☑ SPA (browse while uploading)
     * if you use the navpane to navigate, not folders in the file list
 * server indexing
@@ -371,6 +373,45 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 if you have the required permissions, you can cut/paste, rename, and delete files/folders
 
 you can move files across browser tabs (cut in one tab, paste in another)
+
+
+## batch rename
+
+select some files and press F2 to bring up the rename UI
+
+quick explanation of the buttons,  
+* `[✅ apply rename]` confirms and begins renaming
+* `[❌ cancel]` aborts and closes the rename window
+* `[↺ reset]` reverts any filename changes back to the original name
+* `[decode]` does a URL-decode on the filename, fixing stuff like `&amp;` and `%20`
+* `[advanced]` toggles advanced mode
+
+advanced mode: rename files based on rules to decide the new names, based on the original name (regex), or based on the tags collected from the file (artist/title/...), or a mix of both
+
+in advanced mode,  
+* `[case]` toggles case-sensitive regex
+* `regex` is the regex pattern to apply to the original filename; any files which don't match will be skipped
+* `format` is the new filename, taking values from regex capturing groups and/or from file tags
+  * very loosely based on foobar2000 syntax, no functions yet tho
+* `presets` lets you save rename rules for later
+
+so,
+
+say you have a file named [`meganeko - Eclipse - 07 Sirius A.mp3`](https://www.youtube.com/watch?v=-dtb0vDPruI) (absolutely fantastic album btw) and the tags are: `Album:Eclipse`, `Artist:meganeko`, `Title:Sirius A`, `tn:7`
+
+you could use just regex to rename it:
+`regex` = `(.*) - (.*) - ([0-9]{2}) (.*)`
+`format` = `(3). (1) - (4)`
+`output` = `07. meganeko - Sirius A.mp3`
+
+or you could use just tags:
+`format` = `(tn). (artist) - (title).(ext)`
+`output` = `7. meganeko - Sirius A.mp3`
+
+or a mix of both since it doesn't have functions yet (for example to add leading zeroes):
+`regex` = ` - ([0-9]{2}) `
+`format` = `(1). (artist) - (title).(ext)`
+`output` = `07. meganeko - Sirius A.mp3`
 
 
 ## markdown viewer
