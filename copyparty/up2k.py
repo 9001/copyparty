@@ -1424,7 +1424,8 @@ class Up2k(object):
 
         st = bos.lstat(sabs)
         if stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode):
-            return self._mv_file(uname, svp, dvp)
+            with self.mutex:
+                return self._mv_file(uname, svp, dvp)
 
         jail = svn.get_dbv(srem)[0]
         permsets = [[True, False, True]]
@@ -1449,7 +1450,8 @@ class Up2k(object):
                     raise Pebkac(500, "mv: bug at {}, top {}".format(svpf, svp))
 
                 dvpf = dvp + svpf[len(svp) :]
-                self._mv_file(uname, svpf, dvpf)
+                with self.mutex:
+                    self._mv_file(uname, svpf, dvpf)
 
         rmdirs(self.log_func, scandir, True, sabs)
         return "k"
@@ -1541,13 +1543,15 @@ class Up2k(object):
         self.log("forgetting {}".format(vrem))
         if wark:
             self.log("found {} in db".format(wark))
-            if self._relink(wark, ptop, vrem, None):
-                drop_tags = False
+            if drop_tags:
+                if self._relink(wark, ptop, vrem, None):
+                    drop_tags = False
 
             if drop_tags:
                 q = "delete from mt where w=?"
                 cur.execute(q, (wark[:16],))
-                self.db_rm(cur, srd, sfn)
+
+            self.db_rm(cur, srd, sfn)
 
         reg = self.registry.get(ptop)
         if reg:
@@ -1599,7 +1603,7 @@ class Up2k(object):
             # deleting final remaining full copy; swap it with a symlink
             slabs = list(sorted(links.keys()))[0]
             ptop, rem = links.pop(slabs)
-            self.log("linkswap [{}] and [{}]".format(sabs, dabs))
+            self.log("linkswap [{}] and [{}]".format(sabs, slabs))
             bos.unlink(slabs)
             bos.rename(sabs, slabs)
             self._symlink(slabs, sabs, False)
