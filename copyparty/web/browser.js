@@ -3687,6 +3687,16 @@ var msel = (function () {
 			return;
 
 		r.sel = [];
+		if (r.all && r.all.length) {
+			for (var a = 0; a < r.all.length; a++) {
+				var ao = r.all[a];
+				ao.sel = ebi(ao.id).closest('tr').classList.contains('sel');
+				if (ao.sel)
+					r.sel.push(ao);
+			}
+			return;
+		}
+
 		r.all = [];
 		var links = QSA('#files tbody td:nth-child(2) a:last-child'),
 			vbase = get_evpath();
@@ -3715,8 +3725,11 @@ var msel = (function () {
 		r.load();
 		return r.all;
 	};
-	r.selui = function () {
-		r.sel = r.all = null;
+	r.selui = function (reset) {
+		r.sel = null;
+		if (reset)
+			r.all = null;
+
 		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
 		thegrid.loadsel();
 		fileman.render();
@@ -3775,7 +3788,7 @@ var msel = (function () {
 		for (var a = 0, aa = tds.length; a < aa; a++) {
 			tds[a].onclick = r.seltgl;
 		}
-		r.selui();
+		r.selui(true);
 		arcfmt.render();
 		fileman.render();
 		ebi('selzip').style.display = ebi('unsearch') ? 'none' : '';
