@@ -814,17 +814,25 @@ function up2k_init(subtle) {
 
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
+                name = good_files[a][1],
+                fdir = '',
                 now = Date.now(),
-                lmod = fobj.lastModified || now;
+                lmod = fobj.lastModified || now,
+                ofs = name.lastIndexOf('/') + 1;
+
+            if (ofs) {
+                fdir = name.slice(0, ofs);
+                name = name.slice(ofs);
+            }
 
             var entry = {
                 "n": st.files.length,
                 "t0": now,
                 "fobj": fobj,
-                "name": good_files[a][1],
+                "name": name,
                 "size": fobj.size,
                 "lmod": lmod / 1000,
-                "purl": evpath,
+                "purl": fdir,
                 "done": false,
                 "hash": []
             },

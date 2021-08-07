@@ -627,12 +627,9 @@ class HttpCli(object):
             if self.vpath.endswith(k):
                 self.vpath = self.vpath[: -len(k)]
 
-        sub = None
         name = undot(body["name"])
         if "/" in name:
-            sub, name = name.rsplit("/", 1)
-            self.vpath = "/".join([self.vpath, sub]).strip("/")
-            body["name"] = name
+            raise Pebkac(400, "your client is old; press CTRL-SHIFT-R and try again")
 
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         dbv, vrem = vfs.get_dbv(rem)
@@ -643,7 +640,7 @@ class HttpCli(object):
         body["addr"] = self.ip
         body["vcfg"] = dbv.flags
 
-        if sub:
+        if rem:
             try:
                 dst = os.path.join(vfs.realpath, rem)
                 if not bos.path.isdir(dst):
@@ -663,9 +660,6 @@ class HttpCli(object):
 
         x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
         ret = x.get()
-        if sub:
-            ret["name"] = "/".join([sub, ret["name"]])
-
         ret = json.dumps(ret)
         self.log(ret)
         self.reply(ret.encode("utf-8"), mime="application/json")
