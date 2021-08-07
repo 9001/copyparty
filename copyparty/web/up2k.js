@@ -135,15 +135,16 @@ function up2k_flagbus() {
 
 
 function U2pvis(act, btns) {
-    this.act = act;
-    this.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
-    this.tab = [];
-    this.head = 0;
-    this.tail = -1;
-    this.wsz = 3;
+    var r = this;
+    r.act = act;
+    r.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
+    r.tab = [];
+    r.head = 0;
+    r.tail = -1;
+    r.wsz = 3;
 
-    this.addfile = function (entry, sz, draw) {
-        this.tab.push({
+    r.addfile = function (entry, sz, draw) {
+        r.tab.push({
             "hn": entry[0],
             "ht": entry[1],
             "hp": entry[2],
@@ -155,34 +156,34 @@ function U2pvis(act, btns) {
             "bd": 0,  // bytes done
             "bd0": 0  // upload start
         });
-        this.ctr["q"]++;
+        r.ctr["q"]++;
         if (!draw)
             return;
 
-        this.drawcard("q");
-        if (this.act == "q") {
-            this.addrow(this.tab.length - 1);
+        r.drawcard("q");
+        if (r.act == "q") {
+            r.addrow(r.tab.length - 1);
         }
-        if (this.act == "bz") {
-            this.bzw();
+        if (r.act == "bz") {
+            r.bzw();
         }
     };
 
-    this.is_act = function (card) {
-        if (this.act == "done")
+    r.is_act = function (card) {
+        if (r.act == "done")
             return card == "ok" || card == "ng";
 
-        return this.act == card;
+        return r.act == card;
     }
 
-    this.seth = function (nfile, field, html) {
-        var fo = this.tab[nfile];
+    r.seth = function (nfile, field, html) {
+        var fo = r.tab[nfile];
         field = ['hn', 'ht', 'hp'][field];
         if (fo[field] === html)
             return;
 
         fo[field] = html;
-        if (!this.is_act(fo.in))
+        if (!r.is_act(fo.in))
             return;
 
         var obj = ebi('f{0}{1}'.format(nfile, field.slice(1)));
@@ -193,26 +194,26 @@ function U2pvis(act, btns) {
         }
     };
 
-    this.setab = function (nfile, nblocks) {
+    r.setab = function (nfile, nblocks) {
         var t = [];
         for (var a = 0; a < nblocks; a++)
             t.push(0);
 
-        this.tab[nfile].cb = t;
+        r.tab[nfile].cb = t;
     };
 
-    this.setat = function (nfile, blocktab) {
-        this.tab[nfile].cb = blocktab;
+    r.setat = function (nfile, blocktab) {
+        r.tab[nfile].cb = blocktab;
 
         var bd = 0;
         for (var a = 0; a < blocktab.length; a++)
             bd += blocktab[a];
 
-        this.tab[nfile].bd = bd;
-        this.tab[nfile].bd0 = bd;
+        r.tab[nfile].bd = bd;
+        r.tab[nfile].bd0 = bd;
     };
 
-    this.perc = function (bd, bd0, sz, t0) {
+    r.perc = function (bd, bd0, sz, t0) {
         var td = Date.now() - t0,
             p = bd * 100.0 / sz,
             nb = bd - bd0,
@@ -222,15 +223,15 @@ function U2pvis(act, btns) {
         return [p, s2ms(eta), spd / (1024 * 1024)];
     };
 
-    this.hashed = function (fobj) {
-        var fo = this.tab[fobj.n],
+    r.hashed = function (fobj) {
+        var fo = r.tab[fobj.n],
             nb = fo.bt * (++fo.nh / fo.cb.length),
-            p = this.perc(nb, 0, fobj.size, fobj.t_hashing);
+            p = r.perc(nb, 0, fobj.size, fobj.t_hashing);
 
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
-        if (!this.is_act(fo.in))
+        if (!r.is_act(fo.in))
             return;
 
         var obj = ebi('f{0}p'.format(fobj.n)),
@@ -241,19 +242,19 @@ function U2pvis(act, btns) {
         obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
-    this.prog = function (fobj, nchunk, cbd) {
-        var fo = this.tab[fobj.n],
+    r.prog = function (fobj, nchunk, cbd) {
+        var fo = r.tab[fobj.n],
             delta = cbd - fo.cb[nchunk];
 
         fo.cb[nchunk] = cbd;
         fo.bd += delta;
 
-        var p = this.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
+        var p = r.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
             p[0].toFixed(2), p[1], p[2].toFixed(2)
         );
 
-        if (!this.is_act(fo.in))
+        if (!r.is_act(fo.in))
             return;
 
         var obj = ebi('f{0}p'.format(fobj.n)),
@@ -261,11 +262,11 @@ function U2pvis(act, btns) {
 
         if (!obj) { //} || true) {
             var msg = [
-                "act", this.act,
+                "act", r.act,
                 "in", fo.in,
-                "is_act", this.is_act(fo.in),
-                "head", this.head,
-                "tail", this.tail,
+                "is_act", r.is_act(fo.in),
+                "head", r.head,
+                "tail", r.tail,
                 "nfile", fobj.n,
                 "name", fobj.name,
                 "sz", fobj.size,
@@ -283,12 +284,12 @@ function U2pvis(act, btns) {
             for (var a = 0, aa = ds.length; a < aa; a++) {
                 var id = ds[a].parentNode.getAttribute('id').slice(1, -1);
                 console.log("dom %d/%d = [%s] in(%s) is_act(%s) %s",
-                    a, aa, id, this.tab[id].in, this.is_act(fo.in), ds[a].textContent);
+                    a, aa, id, r.tab[id].in, r.is_act(fo.in), ds[a].textContent);
             }
 
-            for (var a = 0, aa = this.tab.length; a < aa; a++)
-                if (this.is_act(this.tab[a].in))
-                    console.log("tab %d/%d = sz %s", a, aa, this.tab[a].bt);
+            for (var a = 0, aa = r.tab.length; a < aa; a++)
+                if (r.is_act(r.tab[a].in))
+                    console.log("tab %d/%d = sz %s", a, aa, r.tab[a].bt);
 
             throw new Error('see console');
         }
@@ -298,27 +299,27 @@ function U2pvis(act, btns) {
         obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
     };
 
-    this.move = function (nfile, newcat) {
-        var fo = this.tab[nfile],
+    r.move = function (nfile, newcat) {
+        var fo = r.tab[nfile],
             oldcat = fo.in,
-            bz_act = this.act == "bz";
+            bz_act = r.act == "bz";
 
         if (oldcat == newcat)
             return;
 
         fo.in = newcat;
-        this.ctr[oldcat]--;
-        this.ctr[newcat]++;
-        this.drawcard(oldcat);
-        this.drawcard(newcat);
-        if (this.is_act(newcat)) {
-            this.tail = Math.max(this.tail, nfile + 1);
+        r.ctr[oldcat]--;
+        r.ctr[newcat]++;
+        r.drawcard(oldcat);
+        r.drawcard(newcat);
+        if (r.is_act(newcat)) {
+            r.tail = Math.max(r.tail, nfile + 1);
             if (!ebi('f' + nfile))
-                this.addrow(nfile);
+                r.addrow(nfile);
         }
-        else if (this.is_act(oldcat)) {
-            while (this.head < Math.min(this.tab.length, this.tail) && this.precard[this.tab[this.head].in])
-                this.head++;
+        else if (r.is_act(oldcat)) {
+            while (r.head < Math.min(r.tab.length, r.tail) && r.precard[r.tab[r.head].in])
+                r.head++;
 
             if (!bz_act) {
                 var tr = ebi("f" + nfile);
@@ -328,10 +329,10 @@ function U2pvis(act, btns) {
         else return;
 
         if (bz_act)
-            this.bzw();
+            r.bzw();
     };
 
-    this.bzw = function () {
+    r.bzw = function () {
         var first = QS('#u2tab>tbody>tr:first-child');
         if (!first)
             return;
@@ -340,93 +341,93 @@ function U2pvis(act, btns) {
         first = parseInt(first.getAttribute('id').slice(1));
         last = parseInt(last.getAttribute('id').slice(1));
 
-        while (this.head - first > this.wsz) {
+        while (r.head - first > r.wsz) {
             var obj = ebi('f' + (first++));
             if (obj)
                 obj.parentNode.removeChild(obj);
         }
-        while (last - this.tail < this.wsz && last < this.tab.length - 2) {
+        while (last - r.tail < r.wsz && last < r.tab.length - 2) {
             var obj = ebi('f' + (++last));
             if (!obj)
-                this.addrow(last);
+                r.addrow(last);
         }
     };
 
-    this.drawcard = function (cat) {
+    r.drawcard = function (cat) {
         var cards = QSA('#u2cards>a>span');
 
         if (cat == "q") {
-            cards[4].innerHTML = this.ctr[cat];
+            cards[4].innerHTML = r.ctr[cat];
             return;
         }
         if (cat == "bz") {
-            cards[3].innerHTML = this.ctr[cat];
+            cards[3].innerHTML = r.ctr[cat];
             return;
         }
 
-        cards[2].innerHTML = this.ctr["ok"] + this.ctr["ng"];
+        cards[2].innerHTML = r.ctr["ok"] + r.ctr["ng"];
 
         if (cat == "ng") {
-            cards[1].innerHTML = this.ctr[cat];
+            cards[1].innerHTML = r.ctr[cat];
         }
         if (cat == "ok") {
-            cards[0].innerHTML = this.ctr[cat];
+            cards[0].innerHTML = r.ctr[cat];
         }
     };
 
-    this.changecard = function (card) {
-        this.act = card;
-        this.precard = has(["ok", "ng", "done"], this.act) ? {} : this.act == "bz" ? { "ok": 1, "ng": 1 } : { "ok": 1, "ng": 1, "bz": 1 };
-        this.postcard = has(["ok", "ng", "done"], this.act) ? { "bz": 1, "q": 1 } : this.act == "bz" ? { "q": 1 } : {};
-        this.head = -1;
-        this.tail = -1;
+    r.changecard = function (card) {
+        r.act = card;
+        r.precard = has(["ok", "ng", "done"], r.act) ? {} : r.act == "bz" ? { "ok": 1, "ng": 1 } : { "ok": 1, "ng": 1, "bz": 1 };
+        r.postcard = has(["ok", "ng", "done"], r.act) ? { "bz": 1, "q": 1 } : r.act == "bz" ? { "q": 1 } : {};
+        r.head = -1;
+        r.tail = -1;
         var html = [];
-        for (var a = 0; a < this.tab.length; a++) {
-            var rt = this.tab[a].in;
-            if (this.is_act(rt)) {
-                html.push(this.genrow(a, true));
+        for (var a = 0; a < r.tab.length; a++) {
+            var rt = r.tab[a].in;
+            if (r.is_act(rt)) {
+                html.push(r.genrow(a, true));
 
-                this.tail = a;
-                if (this.head == -1)
-                    this.head = a;
+                r.tail = a;
+                if (r.head == -1)
+                    r.head = a;
             }
         }
-        if (this.head == -1) {
-            for (var a = 0; a < this.tab.length; a++) {
-                var rt = this.tab[a].in;
-                if (this.precard[rt]) {
-                    this.head = a + 1;
-                    this.tail = a;
+        if (r.head == -1) {
+            for (var a = 0; a < r.tab.length; a++) {
+                var rt = r.tab[a].in;
+                if (r.precard[rt]) {
+                    r.head = a + 1;
+                    r.tail = a;
                 }
-                else if (this.postcard[rt]) {
-                    this.head = a;
-                    this.tail = a - 1;
+                else if (r.postcard[rt]) {
+                    r.head = a;
+                    r.tail = a - 1;
                     break;
                 }
             }
         }
 
-        if (this.head < 0)
-            this.head = 0;
+        if (r.head < 0)
+            r.head = 0;
 
         if (card == "bz") {
-            for (var a = this.head - 1; a >= this.head - this.wsz && a >= 0; a--) {
-                html.unshift(this.genrow(a, true).replace(/><td>/, "><td>a "));
+            for (var a = r.head - 1; a >= r.head - r.wsz && a >= 0; a--) {
+                html.unshift(r.genrow(a, true).replace(/><td>/, "><td>a "));
             }
-            for (var a = this.tail + 1; a <= this.tail + this.wsz && a < this.tab.length; a++) {
-                html.push(this.genrow(a, true).replace(/><td>/, "><td>b "));
+            for (var a = r.tail + 1; a <= r.tail + r.wsz && a < r.tab.length; a++) {
+                html.push(r.genrow(a, true).replace(/><td>/, "><td>b "));
             }
         }
         ebi('u2tab').tBodies[0].innerHTML = html.join('\n');
     };
 
-    this.genrow = function (nfile, as_html) {
-        var r = this.tab[nfile],
+    r.genrow = function (nfile, as_html) {
+        var row = r.tab[nfile],
             td1 = '<td id="f' + nfile,
             td = '</td>' + td1,
-            ret = td1 + 'n">' + r.hn +
-                td + 't">' + r.ht +
-                td + 'p" class="prog">' + r.hp + '</td>';
+            ret = td1 + 'n">' + row.hn +
+                td + 't">' + row.ht +
+                td + 'p" class="prog">' + row.hp + '</td>';
 
         if (as_html)
             return '<tr id="f' + nfile + '">' + ret + '</tr>';
@@ -437,26 +438,35 @@ function U2pvis(act, btns) {
         return obj;
     };
 
-    this.addrow = function (nfile) {
-        var tr = this.genrow(nfile);
+    r.addrow = function (nfile) {
+        var tr = r.genrow(nfile);
         ebi('u2tab').tBodies[0].appendChild(tr);
     };
 
-    var that = this;
     btns = QSA(btns + '>a[act]');
     for (var a = 0; a < btns.length; a++) {
         btns[a].onclick = function (e) {
             ev(e);
             var newtab = this.getAttribute('act');
-            for (var b = 0; b < btns.length; b++) {
-                btns[b].className = (
-                    btns[b].getAttribute('act') == newtab) ? 'act' : '';
+            function go() {
+                for (var b = 0; b < btns.length; b++) {
+                    btns[b].className = (
+                        btns[b].getAttribute('act') == newtab) ? 'act' : '';
+                }
+                r.changecard(newtab);
             }
-            that.changecard(newtab);
+            var nf = r.ctr[newtab];
+            if (nf === undefined)
+                nf = r.ctr["ok"] + r.ctr["ng"];
+
+            if (nf < 9000)
+                return go();
+
+            modal.confirm('about to show ' + nf + ' files\n\nthis may crash your browser, are you sure?', go, null);
         };
     }
 
-    this.changecard(this.act);
+    r.changecard(r.act);
 }
 
 
@@ -1554,7 +1564,7 @@ function up2k_init(subtle) {
 
     function onresize(e) {
         var bar = ebi('ops'),
-            wpx = innerWidth,
+            wpx = window.innerWidth,
             fpx = parseInt(getComputedStyle(bar)['font-size']),
             wem = wpx * 1.0 / fpx,
             wide = wem > 54,
