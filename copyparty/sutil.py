@@ -18,8 +18,7 @@ def errdesc(errors):
         tf_path = tf.name
         tf.write("\r\n".join(report).encode("utf-8", "replace"))
 
-    dt = datetime.utcfromtimestamp(time.time())
-    dt = dt.strftime("%Y-%m%d-%H%M%S")
+    dt = datetime.utcnow().strftime("%Y-%m%d-%H%M%S")
 
     bos.chmod(tf_path, 0o444)
     return {

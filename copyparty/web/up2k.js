@@ -1325,9 +1325,10 @@ function up2k_init(subtle) {
                     return;
                 }
 
-                if (response.name !== t.name) {
-                    // file exists; server renamed us
-                    console.log("server-rename [" + t.name + "] to [" + response.name + "]");
+                if (response.purl !== t.purl || response.name !== t.name) {
+                    // server renamed us (file exists / path restrictions)
+                    console.log("server-rename [" + t.purl + "] [" + t.name + "] to [" + response.purl + "] [" + response.name + "]");
+                    t.purl = response.purl;
                     t.name = response.name;
                     pvis.seth(t.n, 0, linksplit(t.purl + t.name).join(' '));
                 }
@@ -1456,7 +1457,7 @@ function up2k_init(subtle) {
         if (fsearch)
             req.srch = 1;
 
-        xhr.open('POST', t.purl + 'handshake.php', true);
+        xhr.open('POST', t.purl, true);
         xhr.responseType = 'text';
         xhr.send(JSON.stringify(req));
     }
@@ -1524,7 +1525,7 @@ function up2k_init(subtle) {
                 console.log('chunkpit onerror, retrying', t);
                 do_send();
             };
-            xhr.open('POST', t.purl + 'chunkpit.php', true);
+            xhr.open('POST', t.purl, true);
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');

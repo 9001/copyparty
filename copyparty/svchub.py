@@ -111,7 +111,7 @@ class SvcHub(object):
         thr.start()
 
     def _logname(self):
-        dt = datetime.utcfromtimestamp(time.time())
+        dt = datetime.utcnow()
         fn = self.args.lo
         for fs in "YmdHMS":
             fs = "%" + fs
@@ -244,8 +244,7 @@ class SvcHub(object):
             return
 
         with self.log_mutex:
-            ts = datetime.utcfromtimestamp(time.time())
-            ts = ts.strftime("%Y-%m%d-%H%M%S.%f")[:-3]
+            ts = datetime.utcnow().strftime("%Y-%m%d-%H%M%S.%f")[:-3]
             self.logf.write("@{} [{}] {}\n".format(ts, src, msg))
 
             now = time.time()
@@ -257,7 +256,7 @@ class SvcHub(object):
             self.logf.close()
             self._setup_logfile("")
 
-        dt = datetime.utcfromtimestamp(time.time())
+        dt = datetime.utcnow()
 
         # unix timestamp of next 00:00:00 (leap-seconds safe)
         day_now = dt.day

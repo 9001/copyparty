@@ -5,12 +5,23 @@ import re
 import os
 import sys
 import stat
+import time
 import base64
 import hashlib
 import threading
+from datetime import datetime
 
 from .__init__ import WINDOWS
-from .util import IMPLICATIONS, uncyg, undot, absreal, Pebkac, fsdec, fsenc, statdir
+from .util import (
+    IMPLICATIONS,
+    uncyg,
+    undot,
+    unhumanize,
+    absreal,
+    Pebkac,
+    fsenc,
+    statdir,
+)
 from .bos import bos
 
 
@@ -30,6 +41,154 @@ class AXS(object):
         )
 
 
+class Lim(object):
+    def __init__(self):
+        self.nups = {}  # num tracker
+        self.bups = {}  # byte tracker list
+        self.bupc = {}  # byte tracker cache
+
+        self.nosub = False  # disallow subdirectories
+
+        self.smin = None  # filesize min
+        self.smax = None  # filesize max
+
+        self.bwin = None  # bytes window
+        self.bmax = None  # bytes max
+        self.nwin = None  # num window
+        self.nmax = None  # num max
+
+        self.rotn = None  # rot num files
+        self.rotl = None  # rot depth
+        self.rotf = None  # rot datefmt
+        self.rot_re = None  # rotf check
+
+    def set_rotf(self, fmt):
+        self.rotf = fmt
+        r = re.escape(fmt).replace("%Y", "[0-9]{4}").replace("%j", "[0-9]{3}")
+        r = re.sub("%[mdHMSWU]", "[0-9]{2}", r)
+        self.rot_re = re.compile("(^|/)" + r + "$")
+
+    def all(self, ip, rem, sz, abspath):
+        self.chk_nup(ip)
+        self.chk_bup(ip)
+        self.chk_rem(rem)
+        if sz != -1:
+            self.chk_sz(sz)
+
+        ap2, vp2 = self.rot(abspath)
+        if abspath == ap2:
+            return ap2, rem
+
+        return ap2, ("{}/{}".format(rem, vp2) if rem else vp2)
+
+    def chk_sz(self, sz):
+        if self.smin is not None and sz < self.smin:
+            raise Pebkac(400, "file too small")
+
+        if self.smax is not None and sz > self.smax:
+            raise Pebkac(400, "file too big")
+
+    def chk_rem(self, rem):
+        if self.nosub and rem:
+            raise Pebkac(500, "no subdirectories allowed")
+
+    def rot(self, path):
+        if not self.rotf and not self.rotn:
+            return path, ""
+
+        if self.rotf:
+            path = path.rstrip("/\\")
+            if self.rot_re.search(path.replace("\\", "/")):
+                return path, ""
+
+            suf = datetime.utcnow().strftime(self.rotf)
+            if path:
+                path += "/"
+
+            return path + suf, suf
+
+        ret = self.dive(path, self.rotl)
+        if not ret:
+            raise Pebkac(500, "no available slots in volume")
+
+        d = ret[len(path) :].strip("/\\").replace("\\", "/")
+        return ret, d
+
+    def dive(self, path, lvs):
+        items = bos.listdir(path)
+
+        if not lvs:
+            # at leaf level
+            return None if len(items) >= self.rotn else ""
+
+        dirs = [int(x) for x in items if x and all(y in "1234567890" for y in x)]
+        dirs.sort()
+
+        if not dirs:
+            # no branches yet; make one
+            sub = os.path.join(path, "0")
+            bos.mkdir(sub)
+        else:
+            # try newest branch only
+            sub = os.path.join(path, str(dirs[-1]))
+
+        ret = self.dive(sub, lvs - 1)
+        if ret is not None:
+            return os.path.join(sub, ret)
+
+        if len(dirs) >= self.rotn:
+            # full branch or root
+            return None
+
+        # make a branch
+        sub = os.path.join(path, str(dirs[-1] + 1))
+        bos.mkdir(sub)
+        ret = self.dive(sub, lvs - 1)
+        if ret is None:
+            raise Pebkac(500, "rotation bug")
+
+        return os.path.join(sub, ret)
+
+    def nup(self, ip):
+        try:
+            self.nups[ip].append(time.time())
+        except:
+            self.nups[ip] = [time.time()]
+
+    def bup(self, ip, nbytes):
+        v = [time.time(), nbytes]
+        try:
+            self.bups[ip].append(v)
+            self.bupc[ip] += nbytes
+        except:
+            self.bups[ip] = [v]
+            self.bupc[ip] = nbytes
+
+    def chk_nup(self, ip):
+        if not self.nmax or ip not in self.nups:
+            return
+
+        nups = self.nups[ip]
+        cutoff = time.time() - self.nwin
+        while nups and nups[0] < cutoff:
+            nups.pop(0)
+
+        if len(nups) >= self.nmax:
+            raise Pebkac(429, "too many uploads")
+
+    def chk_bup(self, ip):
+        if not self.bmax or ip not in self.bups:
+            return
+
+        bups = self.bups[ip]
+        cutoff = time.time() - self.bwin
+        while bups and bups[0][0] < cutoff:
+            self.bupc[ip] -= bups.pop(0)[1]
+
+        if len(bups) >= self.bmax:
+            raise Pebkac(429, "ingress saturated")
+
+
 class VFS(object):
     """single level in the virtual fs"""
 
@@ -42,6 +201,7 @@ class VFS(object):
         self.nodes = {}  # child nodes
         self.histtab = None  # all realpath->histpath
         self.dbv = None  # closest full/non-jump parent
+        self.lim = None  # type: Lim  # upload limits; only set for dbv
 
         if realpath:
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
@@ -172,6 +332,7 @@ class VFS(object):
         return vn, rem
 
     def get_dbv(self, vrem):
+        # type: (str) -> tuple[VFS, str]
         dbv = self.dbv
         if not dbv:
             return self, vrem
@@ -603,6 +764,42 @@ class AuthSrv(object):
             self.log("\n\n".join(msg) + "\n", c=3)
 
         vfs.histtab = {v.realpath: v.histpath for v in vfs.all_vols.values()}
+
+        for vol in vfs.all_vols.values():
+            lim = Lim()
+            use = False
+
+            if vol.flags.get("nosub"):
+                use = True
+                lim.nosub = True
+
+            v = vol.flags.get("sz")
+            if v:
+                use = True
+                lim.smin, lim.smax = [unhumanize(x) for x in v.split("-")]
+
+            v = vol.flags.get("rotn")
+            if v:
+                use = True
+                lim.rotn, lim.rotl = [int(x) for x in v.split(",")]
+
+            v = vol.flags.get("rotf")
+            if v:
+                use = True
+                lim.set_rotf(v)
+
+            v = vol.flags.get("maxn")
+            if v:
+                use = True
+                lim.nmax, lim.nwin = [int(x) for x in v.split(",")]
+
+            v = vol.flags.get("maxb")
+            if v:
+                use = True
+                lim.bmax, lim.bwin = [unhumanize(x) for x in v.split(",")]
+
+            if use:
+                vol.lim = lim
 
         all_mte = {}
         errors = False

@@ -16,7 +16,7 @@ import calendar
 from .__init__ import E, PY2, WINDOWS, ANYWIN, unicode
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 from .bos import bos
-from .authsrv import AuthSrv
+from .authsrv import AuthSrv, Lim
 from .szip import StreamZip
 from .star import StreamTar
 
@@ -491,7 +491,11 @@ class HttpCli(object):
     def dump_to_file(self):
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
+        lim = vfs.get_dbv(rem)[0].lim
         fdir = os.path.join(vfs.realpath, rem)
+        if lim:
+            fdir, rem = lim.all(self.ip, rem, remains, fdir)
+            bos.makedirs(fdir)
 
         addr = self.ip.replace(":", ".")
         fn = "put-{:.6f}-{}.bin".format(time.time(), addr)
@@ -501,6 +505,15 @@ class HttpCli(object):
 
         with open(fsenc(path), "wb", 512 * 1024) as f:
             post_sz, _, sha_b64 = hashcopy(reader, f)
+
+        if lim:
+            lim.nup(self.ip)
+            lim.bup(self.ip, post_sz)
+            try:
+                lim.chk_sz(post_sz)
+            except:
+                bos.unlink(path)
+                raise
 
         if not self.args.nw:
             vfs, vrem = vfs.get_dbv(rem)
@@ -583,7 +596,7 @@ class HttpCli(object):
         try:
             remains = int(self.headers["content-length"])
         except:
-            raise Pebkac(400, "you must supply a content-length for JSON POST")
+            raise Pebkac(411)
 
         if remains > 1024 * 1024:
             raise Pebkac(413, "json 2big")
@@ -880,6 +893,11 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
+        lim = vfs.get_dbv(rem)[0].lim
+        fdir_base = os.path.join(vfs.realpath, rem)
+        if lim:
+            fdir_base, rem = lim.all(self.ip, rem, -1, fdir_base)
+
         files = []
         errmsg = ""
         t0 = time.time()
@@ -889,12 +907,9 @@ class HttpCli(object):
                     self.log("discarding incoming file without filename")
                     # fallthrough
 
+                fdir = fdir_base
+                fname = sanitize_fn(p_file, "", [".prologue.html", ".epilogue.html"])
                 if p_file and not nullwrite:
-                    fdir = os.path.join(vfs.realpath, rem)
-                    fname = sanitize_fn(
-                        p_file, "", [".prologue.html", ".epilogue.html"]
-                    )
-
                     if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")
 
@@ -905,27 +920,43 @@ class HttpCli(object):
                     fname = os.devnull
                     fdir = ""
 
+                if lim:
+                    lim.chk_bup(self.ip)
+                    lim.chk_nup(self.ip)
+                    if not nullwrite:
+                        bos.makedirs(fdir)
+
                 try:
                     with ren_open(fname, "wb", 512 * 1024, **open_args) as f:
                         f, fname = f["orz"]
-                        self.log("writing to {}/{}".format(fdir, fname))
+                        abspath = os.path.join(fdir, fname)
+                        self.log("writing to {}".format(abspath))
                         sz, sha512_hex, _ = hashcopy(p_data, f)
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
-                        files.append([sz, sha512_hex, p_file, fname])
-                        dbv, vrem = vfs.get_dbv(rem)
-                        self.conn.hsrv.broker.put(
-                            False,
-                            "up2k.hash_file",
-                            dbv.realpath,
-                            dbv.flags,
-                            vrem,
-                            fname,
-                            self.ip,
-                            time.time(),
-                        )
-                        self.conn.nbyte += sz
+                    if lim:
+                        lim.nup(self.ip)
+                        lim.bup(self.ip, sz)
+                        try:
+                            lim.chk_sz(sz)
+                        except:
+                            bos.unlink(abspath)
+                            raise
+
+                    files.append([sz, sha512_hex, p_file, fname])
+                    dbv, vrem = vfs.get_dbv(rem)
+                    self.conn.hsrv.broker.put(
+                        False,
+                        "up2k.hash_file",
+                        dbv.realpath,
+                        dbv.flags,
+                        vrem,
+                        fname,
+                        self.ip,
+                        time.time(),
+                    )
+                    self.conn.nbyte += sz
 
                 except Pebkac:
                     if fname != os.devnull:
@@ -1023,6 +1054,20 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
+        clen = int(self.headers.get("content-length", -1))
+        if clen == -1:
+            raise Pebkac(411)
+
+        rp, fn = vsplit(rem)
+        fp = os.path.join(vfs.realpath, rp)
+        lim = vfs.get_dbv(rem)[0].lim
+        if lim:
+            fp, rp = lim.all(self.ip, rp, clen, fp)
+            bos.makedirs(fp)
+
+        fp = os.path.join(fp, fn)
+        rem = "{}/{}".format(rp, fn).strip("/")
+
         if not rem.endswith(".md"):
             raise Pebkac(400, "only markdown pls")
 
@@ -1034,7 +1079,6 @@ class HttpCli(object):
             self.reply(response.encode("utf-8"))
             return True
 
-        fp = os.path.join(vfs.realpath, rem)
         srv_lastmod = srv_lastmod3 = -1
         try:
             st = bos.stat(fp)
@@ -1087,6 +1131,15 @@ class HttpCli(object):
 
         with open(fsenc(fp), "wb", 512 * 1024) as f:
             sz, sha512, _ = hashcopy(p_data, f)
+
+        if lim:
+            lim.nup(self.ip)
+            lim.bup(self.ip, sz)
+            try:
+                lim.chk_sz(sz)
+            except:
+                bos.unlink(fp)
+                raise
 
         new_lastmod = bos.stat(fp).st_mtime
         new_lastmod3 = int(new_lastmod * 1000)

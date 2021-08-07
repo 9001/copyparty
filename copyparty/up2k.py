@@ -1148,6 +1148,16 @@ class Up2k(object):
                             cur.connection.commit()
 
             if not job:
+                vfs = self.asrv.vfs.all_vols[cj["vtop"]]
+                if vfs.lim:
+                    ap1 = os.path.join(cj["ptop"], cj["prel"])
+                    ap2, cj["prel"] = vfs.lim.all(
+                        cj["addr"], cj["prel"], cj["size"], ap1
+                    )
+                    bos.makedirs(ap2)
+                    vfs.lim.nup(cj["addr"])
+                    vfs.lim.bup(cj["addr"], cj["size"])
+
                 job = {
                     "wark": wark,
                     "t0": now,
@@ -1178,8 +1188,11 @@ class Up2k(object):
 
                 self._new_upload(job)
 
+            purl = "/{}/".format("{}/{}".format(job["vtop"], job["prel"]).strip("/"))
+
             return {
                 "name": job["name"],
+                "purl": purl,
                 "size": job["size"],
                 "lmod": job["lmod"],
                 "hash": job["need"],

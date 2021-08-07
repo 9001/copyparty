@@ -77,6 +77,7 @@ HTTPCODE = {
     403: "Forbidden",
     404: "Not Found",
     405: "Method Not Allowed",
+    411: "Length Required",
     413: "Payload Too Large",
     416: "Requested Range Not Satisfiable",
     422: "Unprocessable Entity",
@@ -684,6 +685,17 @@ def humansize(sz, terse=False):
     return ret.replace("iB", "").replace(" ", "")
 
 
+def unhumanize(sz):
+    try:
+        return float(sz)
+    except:
+        pass
+
+    mul = sz[-1:].lower()
+    mul = {"k": 1024, "m": 1024 * 1024, "g": 1024 * 1024 * 1024}.get(mul, 1)
+    return float(sz[:-1]) * mul
+
+
 def get_spd(nbyte, t0, t=None):
     if t is None:
         t = time.time()
@@ -1065,7 +1077,7 @@ def statdir(logger, scandir, lstat, top):
 def rmdirs(logger, scandir, lstat, top):
     if not os.path.exists(fsenc(top)) or not os.path.isdir(fsenc(top)):
         top = os.path.dirname(top)
-    
+
     dirs = statdir(logger, scandir, lstat, top)
     dirs = [x[0] for x in dirs if stat.S_ISDIR(x[1].st_mode)]
     dirs = [os.path.join(top, x) for x in dirs]

@@ -467,12 +467,30 @@ note:
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
-you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `cdhash`, this has the following consequences:
+you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `:c,dhash`, this has the following consequences:
 * initial indexing is way faster, especially when the volume is on a network disk
 * makes it impossible to [file-search](#file-search)
 * if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
 
-if you set `--no-hash`, you can enable hashing for specific volumes using flag `cehash`
+if you set `--no-hash`, you can enable hashing for specific volumes using flag `:c,ehash`
+
+
+## upload rules (Coming Soon™)
+
+you can set upload rules using volume flags, some examples:
+
+* `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: b, k, m, g)
+* `:c,nosub` disallow uploading into subdirectories; goes well with `rotn` and `rotf`:
+* `:c,rotn=1000,2` moves uploads into subfolders, up to 1000 files in each folder before making a new one, two levels deep (must be at least 1)
+* `:c,rotf=%Y/%m/%d/%H` enforces files to be uploaded into a structure of subfolders according to that date format
+  * if someone uploads to `/foo/bar` the path would be rewritten to `/foo/bar/2021/08/06/23` for example
+  * but the actual date is not verified, just the structure, so the uploader can choose any values which conform to the format string
+    * just to avoid additional complexity in up2k which is enough of a mess already
+
+you can also set transaction limits which apply per-IP and per-volume, but these assume `-j 1` (default) otherwise the limits will be off, for example `-j 4` would allow anywhere between 1x and 4x the limits you set depending on which processing node the client gets routed to
+
+* `:c,maxn=250,3600` allows 250 files over 1 hour from each IP (tracked per-volume)
+* `:c,maxb=1g,300` allows 1 GiB total over 5 minutes from each IP (tracked per-volume)
 
 
 ## database location
