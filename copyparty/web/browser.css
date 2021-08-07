@@ -25,122 +25,6 @@ html, body {
 pre, code, tt {
 	font-family: monospace, monospace;
 }
-
-
-
-#tt, #toast {
-	position: fixed;
-	max-width: 34em;
-	background: #222;
-	border: 0 solid #777;
-	box-shadow: 0 .2em .5em #222;
-	border-radius: .4em;
-	z-index: 9001;
-}
-#tt {
-	overflow: hidden;
-	margin-top: 1em;
-	padding: 0 1.3em;
-	height: 0;
-	opacity: .1;
-	transition: opacity 0.14s, height 0.14s, padding 0.14s;
-}
-#toast {
-	bottom: 5em;
-	right: -1em;
-	line-height: 1.5em;
-	padding: 1em 1.3em;
-	border-width: .4em 0;
-	transform: translateX(100%);
-	transition:
-		transform .4s cubic-bezier(.2, 1.2, .5, 1),
-		right .4s cubic-bezier(.2, 1.2, .5, 1);
-	text-shadow: 1px 1px 0 #000;
-	color: #fff;
-}
-#toastc {
-	display: inline-block;
-	position: absolute;
-	overflow: hidden;
-	left: 0;
-	width: 0;
-	opacity: 0;
-	padding: .3em 0;
-	margin: -.3em 0 0 0;
-	line-height: 1.5em;
-	color: #000;
-	border: none;
-	outline: none;
-	text-shadow: none;
-	border-radius: .5em 0 0 .5em;
-	transition: left .3s, width .3s, padding .3s, opacity .3s;
-}
-#toast pre {
-	margin: 0;
-}
-#toast.vis {
-	right: 1.3em;
-	transform: unset;
-}
-#toast.vis #toastc {
-	left: -2em;
-	width: .4em;
-	padding: .3em .8em;
-	opacity: 1;
-}
-#toast.inf {
-	background: #07a;
-	border-color: #0be;
-}
-#toast.inf #toastc {
-	background: #0be;
-}
-#toast.ok {
-	background: #4a0;
-	border-color: #8e4;
-}
-#toast.ok #toastc {
-	background: #8e4;
-}
-#toast.warn {
-	background: #970;
-	border-color: #fc0;
-}
-#toast.warn #toastc {
-	background: #fc0;
-}
-#toast.err {
-	background: #900;
-	border-color: #d06;
-}
-#toast.err #toastc {
-	background: #d06;
-}
-#tt.b {
-	padding: 0 2em;
-	border-radius: .5em;
-	box-shadow: 0 .2em 1em #000;
-}
-#tt.show {
-	padding: 1em 1.3em;
-	border-width: .4em 0;
-	height: auto;
-	opacity: 1;
-}
-#tt.show.b {
-	padding: 1.5em 2em;
-	border-width: .5em 0;
-}
-#tt code {
-	background: #3c3c3c;
-	padding: .1em .3em;
-	border-top: 1px solid #777;
-	border-radius: .3em;
-	line-height: 1.7em;
-}
-#tt em {
-	color: #f6a;
-}
 #path,
 #path * {
 	font-size: 1em;
@@ -1075,6 +959,7 @@ html.light #ggrid a:hover {
 	overflow: auto;
 	max-height: calc(100% - 2em);
 	border-bottom: .5em solid #999;
+	box-shadow: 0 0 5em rgba(0,0,0,0.8);
 	background: #333;
 	padding: 1em;
 	z-index: 765;
@@ -1154,25 +1039,15 @@ html.light #rui {
 
 
 
+
+
+
+
+
 html.light {
 	color: #333;
 	background: #eee;
 	text-shadow: none;
-}
-html.light #tt {
-	background: #fff;
-	border-color: #888 #000 #777 #000;
-}
-html.light #tt,
-html.light #toast {
-	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
-}
-html.light #tt code {
-	background: #060;
-	color: #fff;
-}
-html.light #tt em {
-	color: #d38;
 }
 html.light #ops,
 html.light .opbox,
@@ -1390,6 +1265,30 @@ html.light #tree::-webkit-scrollbar {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* bbox */
+
 #bbox-overlay {
 	display: none;
 	opacity: 0;
@@ -1567,4 +1466,332 @@ html.light #bbox-overlay figcaption a {
 @keyframes bounce {
 	0%, 100% {transform: scale(0)}
 	50% {transform: scale(1)}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* upload.css */
+
+#op_up2k {
+	padding: 0 1em 1em 1em;
+}
+#u2form {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 2px;
+	height: 2px;
+	overflow: hidden;
+}
+#u2form input {
+	background: #444;
+	border: 0px solid #444;
+	outline: none;
+}
+#u2err.err {
+	color: #f87;
+	padding: .5em;
+}
+#u2err.msg {
+	color: #999;
+	padding: .5em;
+	font-size: .9em;
+}
+#u2btn {
+	color: #eee;
+	background: #555;
+	background: -moz-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
+	background: -webkit-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
+	background: linear-gradient(to bottom, #367 0%, #489 50%, #38788a 51%, #367 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#489', endColorstr='#38788a', GradientType=0);
+	text-decoration: none;
+	line-height: 1.3em;
+	border: 1px solid #222;
+	border-radius: .4em;
+	text-align: center;
+	font-size: 1.5em;
+	margin: .5em auto;
+	padding: .8em 0;
+	width: 16em;
+	cursor: pointer;
+	box-shadow: .4em .4em 0 #111;
+}
+#op_up2k.srch #u2btn {
+	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
+	text-shadow: 1px 1px 1px #fc6;
+	color: #333;
+}
+#u2conf #u2btn {
+	margin: -1.5em 0;
+	padding: .8em 0;
+	width: 100%;
+	max-width: 12em;
+	display: inline-block;
+}
+#u2conf #u2btn_cw {
+	text-align: right;
+}
+#u2notbtn {
+	display: none;
+	text-align: center;
+	background: #333;
+	padding-top: 1em;
+}
+#u2notbtn * {
+	line-height: 1.3em;
+}
+#u2tab {
+	margin: 3em auto;
+	width: calc(100% - 2em);
+	max-width: 100em;
+}
+#op_up2k.srch #u2tab {
+	max-width: none;
+}
+#u2tab td {
+	border: 1px solid #ccc;
+	border-width: 0 0px 1px 0;
+	padding: .1em .3em;
+}
+#u2tab td:nth-child(2) {
+	width: 5em;
+	white-space: nowrap;
+}
+#u2tab td:nth-child(3) {
+	width: 40%;
+}
+#op_up2k.srch td.prog {
+	font-family: sans-serif;
+	font-size: 1em;
+	width: auto;
+}
+#u2tab tbody tr:hover td {
+	background: #222;
+}
+#u2cards {
+	padding: 1em 0 .3em 1em;
+	margin: 1.5em auto -2.5em auto;
+	white-space: nowrap;
+	text-align: center;
+	overflow: hidden;
+}
+#u2cards.w {
+	width: 45em;
+	text-align: left;
+}
+#u2cards a {
+	padding: .2em 1em;
+	border: 1px solid #777;
+	border-width: 0 0 1px 0;
+	background: linear-gradient(to bottom, #333, #222);
+}
+#u2cards a:first-child {
+	border-radius: .4em 0 0 0;
+}
+#u2cards a:last-child {
+	border-radius: 0 .4em 0 0;
+}
+#u2cards a.act {
+	padding-bottom: .5em;
+	border-width: 1px 1px .1em 1px;
+	border-radius: .3em .3em 0 0;
+	margin-left: -1px;
+	background: linear-gradient(to bottom, #464, #333 80%);
+	box-shadow: 0 -.17em .67em #280;
+	border-color: #7c5 #583 #333 #583;
+	position: relative;
+	color: #fd7;
+}
+#u2cards span {
+	color: #fff;
+}
+#u2conf {
+	margin: 1em auto;
+	width: 30em;
+}
+#u2conf.has_btn {
+	width: 48em;
+}
+#u2conf * {
+	text-align: center;
+	line-height: 1em;
+	margin: 0;
+	padding: 0;
+	border: none;
+	outline: none;
+}
+#u2conf .txtbox {
+	width: 3em;
+	color: #fff;
+	background: #444;
+	border: 1px solid #777;
+	font-size: 1.2em;
+	padding: .15em 0;
+	height: 1.05em;
+}
+#u2conf .txtbox.err {
+	background: #922;
+}
+#u2conf a {
+	color: #fff;
+	background: #c38;
+	text-decoration: none;
+	border-radius: .1em;
+	font-size: 1.5em;
+	padding: .1em 0;
+	margin: 0 -1px;
+	width: 1.5em;
+	height: 1em;
+	display: inline-block;
+	position: relative;
+	bottom: -0.08em;
+}
+#u2conf input+a {
+	background: #d80;
+}
+#u2conf label {
+	font-size: 1.6em;
+	width: 2em;
+	height: 1em;
+	padding: .4em 0;
+	display: block;
+	border-radius: .25em;
+}
+#u2conf input[type="checkbox"] {
+	position: relative;
+	opacity: .02;
+	top: 2em;
+}
+#u2conf input[type="checkbox"]+label {
+	position: relative;
+	background: #603;
+	border-bottom: .2em solid #a16;
+	box-shadow: 0 .1em .3em #a00 inset;
+}
+#u2conf input[type="checkbox"]:checked+label {
+	background: #6a1;
+	border-bottom: .2em solid #efa;
+	box-shadow: 0 .1em .5em #0c0;
+}
+#u2conf input[type="checkbox"]+label:hover {
+	box-shadow: 0 .1em .3em #fb0;
+	border-color: #fb0;
+}
+#op_up2k.srch #u2conf td:nth-child(1)>*,
+#op_up2k.srch #u2conf td:nth-child(2)>*,
+#op_up2k.srch #u2conf td:nth-child(3)>* {
+	background: #777;
+	border-color: #ccc;
+	box-shadow: none;
+	opacity: .2;
+}
+#u2foot {
+	color: #fff;
+	font-style: italic;
+}
+#u2foot .warn {
+	font-size: 1.3em;
+	padding: .5em .8em;
+	margin: 1em -.6em;
+	color: #f74;
+	background: #322;
+	border: 1px solid #633;
+	border-width: .1em 0;
+	text-align: center;
+}
+#u2foot .warn span {
+	color: #f86;
+}
+html.light #u2foot .warn {
+	color: #b00;
+	background: #fca;
+	border-color: #f70;
+}
+html.light #u2foot .warn span {
+	color: #930;
+}
+#u2foot span {
+	color: #999;
+	font-size: .9em;
+	font-weight: normal;
+}
+#u2footfoot {
+	margin-bottom: -1em;
+}
+.prog {
+	font-family: monospace, monospace;
+}
+#u2tab a>span {
+	font-weight: bold;
+	font-style: italic;
+	color: #fff;
+	padding-left: .2em;
+}
+#u2cleanup {
+	float: right;
+	margin-bottom: -.3em;
+}
+.fsearch_explain {
+	padding-left: .7em;
+	font-size: 1.1em;
+	line-height: 0;
+}
+
+
+
+
+
+html.light #u2btn {
+	box-shadow: .4em .4em 0 #ccc;
+}
+html.light #u2cards span {
+	color: #000;
+}
+html.light #u2cards a {
+	background: linear-gradient(to bottom, #eee, #fff);
+}
+html.light #u2cards a.act {
+	color: #037;
+	background: inherit;
+	box-shadow: 0 -.17em .67em #0ad;
+	border-color: #09c #05a #eee #05a;
+}
+html.light #u2conf .txtbox {
+	background: #fff;
+	color: #444;
+}
+html.light #u2conf .txtbox.err {
+	background: #f96;
+	color: #300;
+}
+html.light #op_up2k.srch #u2btn {
+	border-color: #a80;
+}
+html.light #u2foot {
+	color: #000;
+}
+html.light #u2tab tbody tr:hover td {
+	background: #fff;
 }

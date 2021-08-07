@@ -326,26 +326,32 @@ function save(e) {
         return toast.inf(2, "no changes");
 
     var force = (save_cls.indexOf('force-save') >= 0);
-    if (force && !confirm('confirm that you wish to lose the changes made on the server since you opened this document'))
-        return toast.inf(3, 'aborted');
+    function save2() {
+        var txt = dom_src.value,
+            fd = new FormData();
 
-    var txt = dom_src.value;
+        fd.append("act", "tput");
+        fd.append("lastmod", (force ? -1 : last_modified));
+        fd.append("body", txt);
 
-    var fd = new FormData();
-    fd.append("act", "tput");
-    fd.append("lastmod", (force ? -1 : last_modified));
-    fd.append("body", txt);
+        var url = (document.location + '').split('?')[0];
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.responseType = 'text';
+        xhr.onreadystatechange = save_cb;
+        xhr.btn = save_btn;
+        xhr.txt = txt;
 
-    var url = (document.location + '').split('?')[0];
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', url, true);
-    xhr.responseType = 'text';
-    xhr.onreadystatechange = save_cb;
-    xhr.btn = save_btn;
-    xhr.txt = txt;
+        modpoll.skip_one = true;  // skip one iteration while we save
+        xhr.send(fd);
+    }
 
-    modpoll.skip_one = true;  // skip one iteration while we save
-    xhr.send(fd);
+    if (!force)
+        save2();
+    else
+        modal.confirm('confirm that you wish to lose the changes made on the server since you opened this document', save2, function () {
+            toast.inf(3, 'aborted');
+        });
 }
 
 function save_cb() {
@@ -353,14 +359,14 @@ function save_cb() {
         return;
 
     if (this.status !== 200)
-        return alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
+        return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 
     var r;
     try {
         r = JSON.parse(this.responseText);
     }
     catch (ex) {
-        return alert('Failed to parse reply from server:\n\n' + this.responseText);
+        return toast.err(0, 'Failed to parse reply from server:\n\n' + this.responseText);
     }
 
     if (!r.ok) {
@@ -375,12 +381,10 @@ function save_cb() {
                 r.lastmod + ' lastmod on the server now,',
                 r.now + ' server time now,\n',
             ];
-            alert(msg.join('\n'));
+            return toast.err(0, msg.join('\n'));
         }
-        else {
-            alert('Error! Save failed.  Maybe this JSON explains why:\n\n' + this.responseText);
-        }
-        return;
+        else
+            return toast.err(0, 'Error! Save failed.  Maybe this JSON explains why:\n\n' + this.responseText);
     }
 
     this.btn.classList.remove('force-save');
@@ -407,10 +411,8 @@ function savechk_cb() {
     if (this.readyState != XMLHttpRequest.DONE)
         return;
 
-    if (this.status !== 200) {
-        alert('Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
-        return;
-    }
+    if (this.status !== 200)
+        return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 
     var doc1 = this.txt.replace(/\r\n/g, "\n");
     var doc2 = this.responseText.replace(/\r\n/g, "\n");
@@ -423,12 +425,12 @@ function savechk_cb() {
             }, 100);
             return;
         }
-        alert(
+        modal.alert(
             'Error! The document on the server does not appear to have saved correctly (your editor contents and the server copy is not identical). Place the document on your clipboard for now and check the server logs for hints\n\n' +
             'Length: yours=' + doc1.length + ', server=' + doc2.length
         );
-        alert('yours, ' + doc1.length + ' byte:\n[' + doc1 + ']');
-        alert('server, ' + doc2.length + ' byte:\n[' + doc2 + ']');
+        modal.alert('yours, ' + doc1.length + ' byte:\n[' + doc1 + ']');
+        modal.alert('server, ' + doc2.length + ' byte:\n[' + doc2 + ']');
         return;
     }
 
@@ -865,12 +867,10 @@ function iter_uni(e) {
 function cfg_uni(e) {
     if (e) e.preventDefault();
 
-    var reply = prompt("unicode whitelist", esc_uni_whitelist);
-    if (reply === null)
-        return;
-
-    esc_uni_whitelist = reply;
-    js_uni_whitelist = eval('\'' + esc_uni_whitelist + '\'');
+    modal.prompt("unicode whitelist", esc_uni_whitelist, function (reply) {
+        esc_uni_whitelist = reply;
+        js_uni_whitelist = eval('\'' + esc_uni_whitelist + '\'');
+    }, null);
 }
 
 

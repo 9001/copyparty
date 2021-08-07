@@ -1,0 +1,196 @@
+#tt, #toast {
+	position: fixed;
+	max-width: 34em;
+	background: #222;
+	border: 0 solid #777;
+	box-shadow: 0 .2em .5em #222;
+	border-radius: .4em;
+	z-index: 9001;
+}
+#tt {
+	overflow: hidden;
+	margin-top: 1em;
+	padding: 0 1.3em;
+	height: 0;
+	opacity: .1;
+	transition: opacity 0.14s, height 0.14s, padding 0.14s;
+}
+#toast {
+	bottom: 5em;
+	right: -1em;
+	line-height: 1.5em;
+	padding: 1em 1.3em;
+	border-width: .4em 0;
+	transform: translateX(100%);
+	transition:
+		transform .4s cubic-bezier(.2, 1.2, .5, 1),
+		right .4s cubic-bezier(.2, 1.2, .5, 1);
+	text-shadow: 1px 1px 0 #000;
+	color: #fff;
+}
+#toastc {
+	display: inline-block;
+	position: absolute;
+	overflow: hidden;
+	left: 0;
+	width: 0;
+	opacity: 0;
+	padding: .3em 0;
+	margin: -.3em 0 0 0;
+	line-height: 1.5em;
+	color: #000;
+	border: none;
+	outline: none;
+	text-shadow: none;
+	border-radius: .5em 0 0 .5em;
+	transition: left .3s, width .3s, padding .3s, opacity .3s;
+}
+#toast pre {
+	margin: 0;
+}
+#toast.vis {
+	right: 1.3em;
+	transform: unset;
+}
+#toast.vis #toastc {
+	left: -2em;
+	width: .4em;
+	padding: .3em .8em;
+	opacity: 1;
+}
+#toast.inf {
+	background: #07a;
+	border-color: #0be;
+}
+#toast.inf #toastc {
+	background: #0be;
+}
+#toast.ok {
+	background: #4a0;
+	border-color: #8e4;
+}
+#toast.ok #toastc {
+	background: #8e4;
+}
+#toast.warn {
+	background: #970;
+	border-color: #fc0;
+}
+#toast.warn #toastc {
+	background: #fc0;
+}
+#toast.err {
+	background: #900;
+	border-color: #d06;
+}
+#toast.err #toastc {
+	background: #d06;
+}
+#tt.b {
+	padding: 0 2em;
+	border-radius: .5em;
+	box-shadow: 0 .2em 1em #000;
+}
+#tt.show {
+	padding: 1em 1.3em;
+	border-width: .4em 0;
+	height: auto;
+	opacity: 1;
+}
+#tt.show.b {
+	padding: 1.5em 2em;
+	border-width: .5em 0;
+}
+#tt code {
+	background: #3c3c3c;
+	padding: .1em .3em;
+	border-top: 1px solid #777;
+	border-radius: .3em;
+	line-height: 1.7em;
+}
+#tt em {
+	color: #f6a;
+}
+html.light #tt {
+	background: #fff;
+	border-color: #888 #000 #777 #000;
+}
+html.light #tt,
+html.light #toast {
+	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
+}
+html.light #tt code {
+	background: #060;
+	color: #fff;
+}
+html.light #tt em {
+	color: #d38;
+}
+#modal {
+	position: fixed;
+    overflow: auto;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9001;
+	background: rgba(64,64,64,0.6);
+}
+#modal>table {
+    width: 100%;
+    height: 100%;
+}
+#modal td {
+	text-align: center;
+}
+#modalc {
+	display: inline-block;
+	background: #f7f7f7;
+	color: #333;
+	text-shadow: none;
+	text-align: left;
+	margin: 3em;
+	padding: 1em 1.1em;
+	border-radius: .6em;
+    box-shadow: 0 .3em 3em rgba(0,0,0,0.5);
+}
+@media (min-width: 40em) {
+    #modalc {
+        min-width: 30em;
+    }
+}
+#modalb {
+	text-align: right;
+	padding-top: 1em;
+}
+#modalb a {
+	color: #000;
+	background: #ccc;
+	display: inline-block;
+	border-radius: .3em;
+	padding: .5em 1em;
+	outline: none;
+	border: none;
+}
+#modalb a:focus,
+#modalb a:hover {
+	background: #06d;
+	color: #fff;
+}
+#modalb a+a {
+	margin-left: .5em;
+}
+#modali {
+	display: block;
+	width: calc(100% - 1.25em);
+    margin: 1em -.1em 0 -.1em;
+	padding: .5em;
+	outline: none;
+	border: .25em solid #ccc;
+	border-radius: .4em;
+}
+#modali:focus {
+	border-color: #06d;
+}

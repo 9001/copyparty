@@ -460,12 +460,14 @@ function U2pvis(act, btns) {
 }
 
 
-function fsearch_explain(e) {
-    ev(e);
-    if (!has(perms, 'write'))
-        return alert('your access to this folder is Read-Only\n\n' + (acct == '*' ? 'you are currently not logged in' : 'you are currently logged in as ' + acct));
+function fsearch_explain(n) {
+    if (n)
+        return toast.inf(60, 'your access to this folder is Read-Only\n\n' + (acct == '*' ? 'you are currently not logged in' : 'you are currently logged in as "' + acct + '"'));
 
-    alert('you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and then refresh\n\nsorry');
+    if (bcfg_get('fsearch', false))
+        return toast.inf(60, 'you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and then refresh\n\nsorry');
+
+    return toast.inf(60, 'refresh the page and try again, it should work now');
 }
 
 
@@ -642,7 +644,7 @@ function up2k_init(subtle) {
         else files = e.target.files;
 
         if (!files || !files.length)
-            return alert('no files selected??');
+            return toast.err(0, 'no files selected??');
 
         more_one_file();
         var bad_files = [],
@@ -710,9 +712,9 @@ function up2k_init(subtle) {
                 for (var a = 0; a < Math.min(20, missing.length); a++)
                     msg.push(missing[a]);
 
-                alert(msg.join('\n-- '));
-                dirs = [];
-                pf = [];
+                return modal.alert(msg.join('\n-- '), function () {
+                    read_dirs(rd, [], [], good, bad, spins);
+                });
             }
             spins = 0;
         }
@@ -777,16 +779,22 @@ function up2k_init(subtle) {
             if (good_files.length - bad_files.length <= 1 && ANDROID)
                 msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
 
-            alert(msg);
+            return modal.alert(msg, function () {
+                gotallfiles(good_files, []);
+            });
         }
 
         var msg = ['upload these ' + good_files.length + ' files?'];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push(good_files[a][1]);
 
-        if (ask_up && !fsearch && !confirm(msg.join('\n')))
-            return;
+        if (ask_up && !fsearch)
+            return modal.confirm(msg.join('\n'), function () { up_them(good_files); }, null);
 
+        up_them(good_files);
+    }
+
+    function up_them(good_files) {
         var seen = {},
             evpath = get_evpath(),
             draw_each = good_files.length < 50;
@@ -1147,7 +1155,7 @@ function up2k_init(subtle) {
                     return tasker();
                 }
 
-                alert('y o u   b r o k e    i t\nfile: ' + t.name + '\nerror: ' + err);
+                toast.err(0, 'y o u   b r o k e    i t\nfile: ' + t.name + '\nerror: ' + err);
             };
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
@@ -1301,7 +1309,8 @@ function up2k_init(subtle) {
 
                     if (!response || !response.hits || !response.hits.length) {
                         smsg = '404';
-                        msg = 'not found on server <a href="#" onclick="fsearch_explain()" class="fsearch_explain">(explain)</a>';
+                        msg = ('not found on server <a href="#" onclick="fsearch_explain(' +
+                            (has(perms, 'write') ? '0' : '1') + ')" class="fsearch_explain">(explain)</a>');
                     }
                     else {
                         smsg = 'found';
@@ -1348,7 +1357,7 @@ function up2k_init(subtle) {
                 for (var a = 0; a < missing.length; a++) {
                     var idx = t.hash.indexOf(missing[a]);
                     if (idx < 0)
-                        return alert('wtf negative index for hash "{0}" in task:\n{1}'.format(
+                        return modal.alert('wtf negative index for hash "{0}" in task:\n{1}'.format(
                             missing[a], JSON.stringify(t)));
 
                     t.postlist.push(idx);
@@ -1437,7 +1446,7 @@ function up2k_init(subtle) {
                     tasker();
                     return;
                 }
-                alert("server broke; hs-err {0} on file [{1}]:\n".format(
+                toast.err(0, "server broke; hs-err {0} on file [{1}]:\n".format(
                     xhr.status, t.name) + (
                         (xhr.response && xhr.response.err) ||
                         (xhr.responseText && xhr.responseText) ||
@@ -1497,7 +1506,7 @@ function up2k_init(subtle) {
                 console.log("ignoring dupe-segment error", t);
             }
             else {
-                alert("server broke; cu-err {0} on file [{1}]:\n".format(
+                toast.err(0, "server broke; cu-err {0} on file [{1}]:\n".format(
                     xhr.status, t.name) + (txt || "no further information"));
                 return;
             }

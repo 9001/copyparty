@@ -8,146 +8,16 @@ html, body {
 	font-family: sans-serif;
 	line-height: 1.5em;
 }
-
-
-
-#tt, #toast {
-	position: fixed;
-	max-width: 34em;
-	background: #222;
-	border: 0 solid #777;
-	box-shadow: 0 .2em .5em #222;
-	border-radius: .4em;
-	z-index: 9001;
-}
-#tt {
-	overflow: hidden;
-	margin-top: 1em;
-	padding: 0 1.3em;
-	height: 0;
-	opacity: .1;
-	transition: opacity 0.14s, height 0.14s, padding 0.14s;
-}
-#toast {
-	top: 1.4em;
-	right: -1em;
-	line-height: 1.5em;
-	padding: 1em 1.3em;
-	border-width: .4em 0;
-	transform: translateX(100%);
-	transition:
-		transform .4s cubic-bezier(.2, 1.2, .5, 1),
-		right .4s cubic-bezier(.2, 1.2, .5, 1);
-	text-shadow: 1px 1px 0 #000;
-	color: #fff;
-}
-#toast pre {
-	margin: 0;
-}
-#toastc {
-	display: inline-block;
-	position: absolute;
-	overflow: hidden;
-	left: 0;
-	width: 0;
-	opacity: 0;
-	padding: .3em 0;
-	margin: -.3em 0 0 0;
-	line-height: 1.5em;
-	color: #000;
-	border: none;
-	outline: none;
-	text-shadow: none;
-	border-radius: .5em 0 0 .5em;
-	transition: left .3s, width .3s, padding .3s, opacity .3s;
-}
-#toast.vis {
-	right: 1.3em;
-	transform: unset;
-}
-#toast.vis #toastc {
-	left: -2em;
-	width: .4em;
-	padding: .3em .8em;
-	opacity: 1;
-}
-#toast.inf {
-	background: #07a;
-	border-color: #0be;
-}
-#toast.inf #toastc {
-	background: #0be;
-}
-#toast.ok {
-	background: #4a0;
-	border-color: #8e4;
-}
-#toast.ok #toastc {
-	background: #8e4;
-}
-#toast.warn {
-	background: #970;
-	border-color: #fc0;
-}
-#toast.warn #toastc {
-	background: #fc0;
-}
-#toast.err {
-	background: #900;
-	border-color: #d06;
-}
-#toast.err #toastc {
-	background: #d06;
-}
-#tt.b {
-	padding: 0 2em;
-	border-radius: .5em;
-	box-shadow: 0 .2em 1em #000;
-}
-#tt.show {
-	padding: 1em 1.3em;
-	border-width: .4em 0;
-	height: auto;
-	opacity: 1;
-}
-#tt.show.b {
-	padding: 1.5em 2em;
-	border-width: .5em 0;
-}
-#tt code {
-	background: #3c3c3c;
-	padding: .1em .3em;
-	border-top: 1px solid #777;
-	border-radius: .3em;
-	line-height: 1.7em;
-}
-#tt em {
-	color: #f6a;
-}
-html.light #tt {
-	background: #fff;
-	border-color: #888 #000 #777 #000;
-}
-html.light #tt,
-html.light #toast {
-	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
-}
-html.light #tt code {
-	background: #060;
-	color: #fff;
-}
-html.light #tt em {
-	color: #d38;
-}
-
-
-
 #mtw {
 	display: none;
 }
 #mw {
 	margin: 0 auto;
 	padding: 0 1.5em;
+}
+#toast {
+	bottom: auto;
+	top: 1.4em;
 }
 pre, code, a {
 	color: #480;

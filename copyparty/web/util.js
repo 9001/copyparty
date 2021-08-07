@@ -140,10 +140,10 @@ function import_js(url, cb) {
     var script = mknod('script');
     script.type = 'text/javascript';
     script.src = url;
-
-    script.onreadystatechange = cb;
     script.onload = cb;
-
+    script.onerror = function () {
+        toast.err(0, 'Failed to load module:\n' + url);
+    };
     head.appendChild(script);
 }
 
@@ -656,14 +656,24 @@ var tt = (function () {
 })();
 
 
+function lf2br(txt) {
+    var html = '', hp = txt.split(/(?=<.?pre>)/i);
+    for (var a = 0; a < hp.length; a++)
+        html += hp[a].startsWith('<pre>') ? hp[a] :
+            hp[a].replace(/<br ?.?>\n/g, '\n').replace(/\n<br ?.?>/g, '\n').replace(/\n/g, '<br />\n');
+
+    return html;
+}
+
+
 var toast = (function () {
     var r = {},
         te = null,
-        visible = false,
         obj = mknod('div');
 
     obj.setAttribute('id', 'toast');
-    document.body.appendChild(obj);;
+    document.body.appendChild(obj);
+    r.visible = false;
 
     r.hide = function (e) {
         ev(e);
@@ -677,12 +687,7 @@ var toast = (function () {
         if (ms)
             te = setTimeout(r.hide, ms * 1000);
 
-        var html = '', hp = txt.split(/(?=<.?pre>)/i);
-        for (var a = 0; a < hp.length; a++)
-            html += hp[a].startsWith('<pre>') ? hp[a] :
-                hp[a].replace(/<br ?.?>\n/g, '\n').replace(/\n<br ?.?>/g, '\n').replace(/\n/g, '<br />\n');
-
-        obj.innerHTML = '<a href="#" id="toastc">x</a>' + html;
+        obj.innerHTML = '<a href="#" id="toastc">x</a>' + lf2br(txt);
         obj.className = cl;
         ms += obj.offsetWidth;
         obj.className += ' vis';
@@ -702,6 +707,121 @@ var toast = (function () {
     r.err = function (ms, txt) {
         r.show('err', ms, txt);
     };
+
+    return r;
+})();
+
+
+var modal = (function () {
+    var r = {},
+        q = [],
+        o = null,
+        cb_ok = null,
+        cb_ng = null;
+
+    r.busy = false;
+
+    r.show = function (html) {
+        o = mknod('div');
+        o.setAttribute('id', 'modal');
+        o.innerHTML = '<table><tr><td><div id="modalc">' + html + '</div></td></tr></table>';
+        document.body.appendChild(o);
+        document.addEventListener('keydown', onkey);
+        r.busy = true;
+
+        var a = ebi('modal-ng');
+        if (a)
+            a.onclick = ng;
+
+        var a = ebi('modal-ok');
+        if (a) {
+            a.onclick = ok;
+            a.focus();
+        }
+
+        var a = ebi('modali');
+        if (a)
+            a.focus();
+    };
+
+    r.hide = function () {
+        o.parentNode.removeChild(o);
+        document.removeEventListener('keydown', onkey);
+        r.busy = false;
+        setTimeout(next, 50);
+    };
+    function ok(e) {
+        ev(e);
+        var v = ebi('modali');
+        v = v ? v.value : true;
+        r.hide();
+        if (cb_ok)
+            cb_ok(v);
+    }
+    function ng(e) {
+        ev(e);
+        r.hide();
+        if (cb_ng)
+            cb_ng(null);
+    }
+
+    function onkey(e) {
+        if (e.code == 'Enter') {
+            var a = ebi('modal-ng');
+            if (a && document.activeElement == a)
+                return ng();
+
+            return ok();
+        }
+
+        if (e.code == 'Escape')
+            return ng();
+    }
+
+    function next() {
+        if (!r.busy && q.length)
+            q.shift()();
+    }
+
+    r.alert = function (html, cb) {
+        q.push(function () {
+            _alert(lf2br(html), cb);
+        });
+        next();
+    };
+    function _alert(html, cb) {
+        cb_ok = cb_ng = cb;
+        html += '<div id="modalb"><a href="#" id="modal-ok">OK</a></div>';
+        r.show(html);
+    }
+
+    r.confirm = function (html, cok, cng) {
+        q.push(function () {
+            _confirm(lf2br(html), cok, cng);
+        });
+        next();
+    }
+    function _confirm(html, cok, cng) {
+        cb_ok = cok;
+        cb_ng = cng === undefined ? cok : null;
+        html += '<div id="modalb"><a href="#" id="modal-ok">OK</a><a href="#" id="modal-ng">Cancel</a></div>';
+        r.show(html);
+    }
+
+    r.prompt = function (html, v, cok, cng) {
+        q.push(function () {
+            _prompt(lf2br(html), v, cok, cng);
+        });
+        next();
+    }
+    function _prompt(html, v, cok, cng) {
+        cb_ok = cok;
+        cb_ng = cng === undefined ? cok : null;
+        html += '<input id="modali" type="text" /><div id="modalb"><a href="#" id="modal-ok">OK</a><a href="#" id="modal-ng">Cancel</a></div>';
+        r.show(html);
+
+        ebi('modali').value = v || '';
+    }
 
     return r;
 })();

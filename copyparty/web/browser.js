@@ -1283,11 +1283,12 @@ function play(tid, is_ev, seek, call_depth) {
 		}
 		else {
 			if (call_depth !== undefined)
-				return alert('failed to load ogv.js');
+				return toast.err(0, 'failed to load ogv.js:\ncannot play ogg/opus in this browser');
 
-			show_modal('<h1>loading ogv.js</h1><h2>thanks apple</h2>');
+			toast.inf(0, '<h1>loading ogv.js</h1><h2>thanks apple</h2>');
 
 			import_js('/.cpr/deps/ogv.js', function () {
+				toast.hide();
 				play(tid, false, seek, 1);
 			});
 
@@ -1383,7 +1384,7 @@ function evau_error(e) {
 
 	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0])[0] + '»';
 
-	alert(err);
+	toast.warn(15, err);
 }
 
 
@@ -1776,14 +1777,15 @@ var fileman = (function () {
 			}
 		}
 		inew.onclick = function () {
-			var name = prompt('provide a name for your new preset', ifmt.value);
-			if (!name)
-				return toast.warn(3, 'aborted');
+			modal.prompt('provide a name for your new preset', ifmt.value, function (name) {
+				if (!name)
+					return toast.warn(3, 'aborted');
 
-			presets[name] = [ire.value, ifmt.value];
-			jwrite('rn_pre', presets);
-			spresets();
-			ipre.value = name;
+				presets[name] = [ire.value, ifmt.value];
+				jwrite('rn_pre', presets);
+				spresets();
+				ipre.value = name;
+			});
 		};
 		idel.onclick = function () {
 			delete presets[ipre.value];
@@ -1891,12 +1893,6 @@ var fileman = (function () {
 		if (!sel.length)
 			return toast.err(3, 'select at least 1 item to delete');
 
-		if (!confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + vps.join('\n')))
-			return;
-
-		if (!confirm('Last chance! Delete?'))
-			return;
-
 		function deleter() {
 			var xhr = new XMLHttpRequest(),
 				vp = vps.shift();
@@ -1923,7 +1919,10 @@ var fileman = (function () {
 			}
 			deleter();
 		}
-		deleter();
+
+		modal.confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + vps.join('\n'), function () {
+			modal.confirm('Last chance! Delete?', deleter, null);
+		}, null);
 	};
 
 	r.cut = function (e) {
@@ -1981,12 +1980,9 @@ var fileman = (function () {
 		}
 
 		if (exists.length)
-			alert('these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + uricom_adec(exists).join('\n'));
+			toast.warn(30, 'these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + uricom_adec(exists).join('\n'));
 
 		if (!req.length)
-			return;
-
-		if (!confirm('paste these ' + req.length + ' items here?\n\n' + uricom_adec(req).join('\n')))
 			return;
 
 		function paster() {
@@ -2018,9 +2014,11 @@ var fileman = (function () {
 			}
 			paster();
 		}
-		paster();
 
-		jwrite('fman_clip', []);
+		modal.confirm('paste these ' + req.length + ' items here?\n\n' + uricom_adec(req).join('\n'), function () {
+			paster();
+			jwrite('fman_clip', []);
+		}, null);
 	};
 
 	r.bus.onmessage = function (e) {

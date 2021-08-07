@@ -185,7 +185,7 @@ function md_plug_err(ex, js) {
     errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
     errbox.textContent = msg;
     errbox.onclick = function () {
-        alert('' + ex.stack);
+        modal.alert('<pre>' + ex.stack + '</pre>');
     };
     if (o) {
         errbox.appendChild(o);
