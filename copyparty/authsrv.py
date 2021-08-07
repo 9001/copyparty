@@ -182,10 +182,12 @@ class Lim(object):
 
         bups = self.bups[ip]
         cutoff = time.time() - self.bwin
+        mark = self.bupc[ip]
         while bups and bups[0][0] < cutoff:
-            self.bupc[ip] -= bups.pop(0)[1]
+            mark -= bups.pop(0)[1]
 
-        if len(bups) >= self.bmax:
+        self.bupc[ip] = mark
+        if mark >= self.bmax:
             raise Pebkac(429, "ingress saturated")
 
 
