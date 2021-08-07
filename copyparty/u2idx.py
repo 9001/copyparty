@@ -88,7 +88,7 @@ class U2idx(object):
         is_date = False
         kw_key = ["(", ")", "and ", "or ", "not "]
         kw_val = ["==", "=", "!=", ">", ">=", "<", "<=", "like "]
-        ptn_mt = re.compile(r"^\.?[a-z]+$")
+        ptn_mt = re.compile(r"^\.?[a-z_-]+$")
         mt_ctr = 0
         mt_keycmp = "substr(up.w,1,16)"
         mt_keycmp2 = None
