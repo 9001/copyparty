@@ -1283,7 +1283,7 @@ function play(tid, is_ev, seek, call_depth) {
 		}
 		else {
 			if (call_depth !== undefined)
-				return toast.err(0, 'failed to load ogv.js:\ncannot play ogg/opus in this browser');
+				return toast.err(0, 'failed to load ogv.js:\ncannot play ogg/opus in this browser\n(try a non-apple device)');
 
 			toast.inf(0, '<h1>loading ogv.js</h1><h2>thanks apple</h2>');
 

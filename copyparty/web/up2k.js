@@ -97,13 +97,11 @@ function up2k_flagbus() {
         }
     };
     var do_take = function (now) {
-        //dbg('*', 'do_take');
         tx(now, "have");
         flag.owner = [flag.id, now];
         flag.ours = true;
     };
     var do_want = function (now) {
-        //dbg('*', 'do_want');
         tx(now, "want");
     };
     flag.take = function (now) {
@@ -260,7 +258,7 @@ function U2pvis(act, btns) {
         var obj = ebi('f{0}p'.format(fobj.n)),
             o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
 
-        if (!obj) { //} || true) {
+        if (!obj) {
             var msg = [
                 "act", r.act,
                 "in", fo.in,
@@ -482,7 +480,6 @@ function fsearch_explain(n) {
 
 
 function up2k_init(subtle) {
-    // show modal message
     function showmodal(msg) {
         ebi('u2notbtn').innerHTML = msg;
         ebi('u2btn').style.display = 'none';
@@ -490,7 +487,6 @@ function up2k_init(subtle) {
         ebi('u2conf').style.opacity = '0.5';
     }
 
-    // hide modal message
     function unmodal() {
         ebi('u2notbtn').style.display = 'none';
         ebi('u2btn').style.display = 'block';
@@ -507,7 +503,6 @@ function up2k_init(subtle) {
         // chrome<37 firefox<34 edge<12 opera<24 safari<7
         shame = 'your browser is impressively ancient';
 
-    // upload ui hidden by default, clicking the header shows it
     var got_deps = false;
     function init_deps() {
         if (!got_deps && !subtle && !window.asmCrypto) {
@@ -524,11 +519,9 @@ function up2k_init(subtle) {
         got_deps = true;
     }
 
-    // show uploader if the user only has write-access
     if (perms.length && !has(perms, 'read'))
         goto('up2k');
 
-    // shows or clears a message in the basic uploader ui
     function setmsg(msg, type) {
         if (msg !== undefined) {
             ebi('u2err').setAttribute('class', type);
@@ -546,13 +539,11 @@ function up2k_init(subtle) {
         }
     }
 
-    // switches to the basic uploader with msg as error message
     function un2k(msg) {
         setmsg(msg, 'err');
         return false;
     }
 
-    // handle user intent to use the basic uploader instead
     ebi('u2nope').onclick = function (e) {
         ev(e);
         setmsg(suggest_up2k, 'msg');
@@ -769,7 +760,6 @@ function up2k_init(subtle) {
                 }
                 ngot += 1;
             });
-            // console.log("ngot: " + ngot);
             if (!ngot) {
                 dirs.shift();
                 rd = null;

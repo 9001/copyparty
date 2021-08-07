@@ -39,9 +39,10 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [batch rename](#batch-rename)
     * [markdown viewer](#markdown-viewer)
     * [other tricks](#other-tricks)
-* [searching](#searching)
-    * [search configuration](#search-configuration)
-    * [database location](#database-location)
+    * [searching](#searching)
+* [server config](#server-config)
+    * [upload rules](#upload-rules)
+    * [database location](#database-location)upload rules
     * [metadata from audio files](#metadata-from-audio-files)
     * [file parser plugins](#file-parser-plugins)
     * [complete examples](#complete-examples)
@@ -431,7 +432,7 @@ the metadata keys you can use in the format field are the ones in the file-brows
 * if you are using media hotkeys to switch songs and are getting tired of seeing the OSD popup which Windows doesn't let you disable, consider https://ocv.me/dev/?media-osd-bgone.ps1
 
 
-# searching
+## searching
 
 ![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/115978060-6772bd80-a57d-11eb-81d3-174e869b72c3.png)
 
@@ -443,12 +444,12 @@ path/name queries are space-separated, AND'ed together, and words are negated wi
 * path: `shibayan -bossa` finds all files where one of the folders contain `shibayan` but filters out any results where `bossa` exists somewhere in the path
 * name: `demetori styx` gives you [good stuff](https://www.youtube.com/watch?v=zGh0g14ZJ8I&list=PL3A147BD151EE5218&index=9)
 
-add `-e2ts` to also scan/index tags from music files:
+add the argument `-e2ts` to also scan/index tags from music files, which brings us over to:
 
 
-## search configuration
+# server config
 
-searching relies on two databases, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`). Configuration can be done through arguments, volume flags, or a mix of both.
+file indexing relies on two databases, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`). Configuration can be done through arguments, volume flags, or a mix of both.
 
 through arguments:
 * `-e2d` enables file indexing on upload
@@ -475,7 +476,7 @@ you can choose to only index filename/path/size/last-modified (and not the hash 
 if you set `--no-hash`, you can enable hashing for specific volumes using flag `:c,ehash`
 
 
-## upload rules (Coming Soon™)
+## upload rules
 
 you can set upload rules using volume flags, some examples:
 
@@ -484,7 +485,7 @@ you can set upload rules using volume flags, some examples:
 * `:c,rotn=1000,2` moves uploads into subfolders, up to 1000 files in each folder before making a new one, two levels deep (must be at least 1)
 * `:c,rotf=%Y/%m/%d/%H` enforces files to be uploaded into a structure of subfolders according to that date format
   * if someone uploads to `/foo/bar` the path would be rewritten to `/foo/bar/2021/08/06/23` for example
-  * but the actual date is not verified, just the structure, so the uploader can choose any values which conform to the format string
+  * but the actual value is not verified, just the structure, so the uploader can choose any values which conform to the format string
     * just to avoid additional complexity in up2k which is enough of a mess already
 
 you can also set transaction limits which apply per-IP and per-volume, but these assume `-j 1` (default) otherwise the limits will be off, for example `-j 4` would allow anywhere between 1x and 4x the limits you set depending on which processing node the client gets routed to
