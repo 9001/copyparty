@@ -39,6 +39,7 @@ class Cfg(Namespace):
             no_scandir=False,
             no_sendfile=True,
             no_rescan=True,
+            re_maxage=0,
             ihead=False,
             nih=True,
             mtp=[],

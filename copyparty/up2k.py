@@ -176,20 +176,21 @@ class Up2k(object):
         return None
 
     def _sched_rescan(self):
-        maxage = self.args.re_maxage
         volage = {}
         while True:
             time.sleep(self.args.re_int)
             now = time.time()
-            vpaths = list(sorted(self.asrv.vfs.all_vols.keys()))
             with self.mutex:
-                if maxage:
-                    for vp in vpaths:
-                        if vp not in volage:
-                            volage[vp] = now
+                for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
+                    maxage = vol.flags.get("scan")
+                    if not maxage:
+                        continue
 
-                        if now - volage[vp] >= maxage:
-                            self.need_rescan[vp] = 1
+                    if vp not in volage:
+                        volage[vp] = now
+
+                    if now - volage[vp] >= maxage:
+                        self.need_rescan[vp] = 1
 
                 if not self.need_rescan:
                     continue

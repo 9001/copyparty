@@ -26,6 +26,7 @@ class Cfg(Namespace):
             "no_hash": False,
             "css_browser": None,
             "no_voldump": True,
+            "re_maxage": 0,
             "rproxy": 0,
         }
         ex.update(ex2)

@@ -807,6 +807,11 @@ class AuthSrv(object):
             if "pk" in vol.flags and "gz" not in vol.flags and "xz" not in vol.flags:
                 vol.flags["gz"] = False  # def.pk
 
+            if "scan" in vol.flags:
+                vol.flags["scan"] = int(vol.flags["scan"])
+            elif self.args.re_maxage:
+                vol.flags["scan"] = self.args.re_maxage
+
         all_mte = {}
         errors = False
         for vol in vfs.all_vols.values():
