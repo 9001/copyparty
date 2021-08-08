@@ -2,6 +2,7 @@
 
 import re
 import sys
+import gzip
 import json
 from datetime import datetime
 
@@ -14,20 +15,17 @@ example usage:
        :c,mtp=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-expires=bin/mtag/yt-ipr.py
        :c,mte=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-expires
 
-quick userscript to push them across:
-  console.log('a');
-  setTimeout(function() {
-    for (var scr of document.querySelectorAll('script[nonce]'))
-      if (scr.innerHTML.indexOf('manifest.googlevideo.com/api/manifest')>0)
-        fetch('https://127.0.0.1:3923/playerdata', {method:"PUT", body: scr.innerHTML});
-  }, 10*1000);
-
+see res/yt-ipr.user.js for the example userscript to go with this
 """
 
 
 def main():
-    with open(sys.argv[1], "r", encoding="utf-8") as f:
-        txt = f.read()
+    try:
+        with gzip.open(sys.argv[1], "rt", encoding="utf-8", errors="replace") as f:
+            txt = f.read()
+    except:
+        with open(sys.argv[1], "r", encoding="utf-8", errors="replace") as f:
+            txt = f.read()
 
     txt = "{" + txt.split("{", 1)[1]
 
