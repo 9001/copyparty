@@ -733,15 +733,10 @@ var modal = (function () {
         if (a)
             a.onclick = ng;
 
-        var a = ebi('modal-ok');
-        if (a) {
-            a.onclick = ok;
-            a.focus();
-        }
+        a = ebi('modal-ok');
+        a.onclick = ok;
 
-        var a = ebi('modali');
-        if (a)
-            a.focus();
+        (ebi('modali') || a).focus();
     };
 
     r.hide = function () {

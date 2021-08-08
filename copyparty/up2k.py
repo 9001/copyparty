@@ -1243,7 +1243,7 @@ class Up2k(object):
                     hops = len(ndst[nc:]) - 1
                     lsrc = "../" * hops + "/".join(lsrc)
             os.symlink(fsenc(lsrc), fsenc(ldst))
-        except (AttributeError, OSError) as ex:
+        except Exception as ex:
             self.log("cannot symlink; creating copy: " + repr(ex))
             shutil.copy2(fsenc(src), fsenc(dst))
 

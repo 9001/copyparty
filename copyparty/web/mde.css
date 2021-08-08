@@ -18,6 +18,10 @@ html, body {
 	background: #f7f7f7;
 	color: #333;
 }
+#toast {
+	bottom: auto;
+	top: 1.4em;
+}
 #mn {
 	font-weight: normal;
 	margin: 1.3em 0 .7em 1em;

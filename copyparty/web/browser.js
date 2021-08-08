@@ -1568,7 +1568,10 @@ var fileman = (function () {
 		r = {};
 
 	r.clip = null;
-	r.bus = new BroadcastChannel("fileman_bus");
+	try {
+		r.bus = new BroadcastChannel("fileman_bus");
+	}
+	catch (ex) { }
 
 	r.render = function () {
 		if (r.clip === null)
@@ -1920,7 +1923,7 @@ var fileman = (function () {
 			deleter();
 		}
 
-		modal.confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + vps.join('\n'), function () {
+		modal.confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + uricom_adec(vps).join('\n'), function () {
 			modal.confirm('Last chance! Delete?', deleter, null);
 		}, null);
 	};
@@ -1936,14 +1939,15 @@ var fileman = (function () {
 		if (!sel.length)
 			return toast.err(3, 'select at least 1 item to cut');
 
-		for (var a = 0; a < sel.length; a++) {
-			vps.push(sel[a].vp);
-			var cl = ebi(sel[a].id).closest('tr').classList,
-				inv = cl.contains('c1');
+		if (sel.length < 100)
+			for (var a = 0; a < sel.length; a++) {
+				vps.push(sel[a].vp);
+				var cl = ebi(sel[a].id).closest('tr').classList,
+					inv = cl.contains('c1');
 
-			cl.remove(inv ? 'c1' : 'c2');
-			cl.add(inv ? 'c2' : 'c1');
-		}
+				cl.remove(inv ? 'c1' : 'c2');
+				cl.add(inv ? 'c2' : 'c1');
+			}
 
 		toast.inf(1, 'cut ' + sel.length + ' items');
 		jwrite('fman_clip', vps);
@@ -2021,15 +2025,19 @@ var fileman = (function () {
 		}, null);
 	};
 
-	r.bus.onmessage = function (e) {
-		r.clip = null;
-		r.render();
-		var me = get_evpath();
-		if (e && e.data == me)
-			treectl.goto(e.data);
-	};
+	if (r.bus)
+		r.bus.onmessage = function (e) {
+			r.clip = null;
+			r.render();
+			var me = get_evpath();
+			if (e && e.data == me)
+				treectl.goto(e.data);
+		};
 
 	r.tx = function (msg) {
+		if (!r.bus)
+			return;
+
 		r.bus.postMessage(msg);
 		r.bus.onmessage();
 	};
