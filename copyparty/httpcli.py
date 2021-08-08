@@ -112,7 +112,7 @@ class HttpCli(object):
             self.http_ver = "HTTP/1.1"
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = False
-            self.loud_reply(unicode(ex), status=ex.code)
+            self.loud_reply(unicode(ex), status=ex.code, volsan=True)
             return self.keepalive
 
         # time.sleep(0.4)
@@ -224,19 +224,22 @@ class HttpCli(object):
             else:
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
-        except Pebkac as ex:
+        except Exception as ex:
+            pex = ex
+            if not hasattr(ex, "code"):
+                pex = Pebkac(500)
+
             try:
-                # self.log("pebkac at httpcli.run #2: " + repr(ex))
                 post = self.mode in ["POST", "PUT"] or "content-length" in self.headers
-                if not self._check_nonfatal(ex, post):
+                if not self._check_nonfatal(pex, post):
                     self.keepalive = False
 
-                self.log("{}\033[0m, {}".format(str(ex), self.vpath), 3)
+                self.log("{}\033[0m, {}".format(min_ex(), self.vpath), 3)
                 msg = "<pre>{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
                 if self.hint:
                     msg += "hint: {}\r\n".format(self.hint)
 
-                self.reply(msg.encode("utf-8", "replace"), status=ex.code)
+                self.reply(msg.encode("utf-8", "replace"), status=pex.code, volsan=True)
                 return self.keepalive
             except Pebkac:
                 return False
@@ -269,8 +272,12 @@ class HttpCli(object):
         except:
             raise Pebkac(400, "client d/c while replying headers")
 
-    def reply(self, body, status=200, mime=None, headers=None):
+    def reply(self, body, status=200, mime=None, headers=None, volsan=False):
         # TODO something to reply with user-supplied values safely
+
+        if volsan:
+            body = vol_san(self.asrv.vfs.all_vols.values(), body)
+
         self.send_headers(len(body), status, mime, headers)
 
         try:
@@ -1029,7 +1036,7 @@ class HttpCli(object):
                     raise
 
         except Pebkac as ex:
-            errmsg = unicode(ex)
+            errmsg = volsan(self.asrv.vfs.all_vols.values(), unicode(ex))
 
         td = max(0.1, time.time() - t0)
         sz_total = sum(x[0] for x in files)

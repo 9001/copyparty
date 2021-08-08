@@ -344,6 +344,15 @@ def log_thrs(log, ival, name):
         log(name, "\033[0m \033[33m".join(tv), 3)
 
 
+def vol_san(vols, txt):
+    for vol in vols:
+        txt = txt.replace(
+            vol.realpath.encode("utf-8"), vol.vpath.encode("utf-8")
+        )
+    
+    return txt
+
+
 def min_ex():
     et, ev, tb = sys.exc_info()
     tb = traceback.extract_tb(tb)
