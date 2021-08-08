@@ -9,11 +9,14 @@ from datetime import datetime
 """
 youtube initial player response
 
-example usage:
-  -v srv/playerdata:playerdata:w
-       :c,e2tsr:c,e2dsa
-       :c,mtp=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-expires=bin/mtag/yt-ipr.py
-       :c,mte=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-expires
+it's probably best to use this through a config file; see res/yt-ipr.conf
+
+but if you want to use plain arguments instead then:
+  -v srv/ytm:ytm:w:rw,ed
+       :c,e2ts:c,e2dsa
+       :c,sz=16k-1m:c,maxn=10,300:c,rotf=%Y-%m/%d-%H
+       :c,mtp=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-manifest,yt-expires=bin/mtag/yt-ipr.py
+       :c,mte=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-manifest,yt-expires
 
 see res/yt-ipr.user.js for the example userscript to go with this
 """
@@ -44,6 +47,12 @@ def main():
     et = datetime.utcfromtimestamp(int(et))
     et = et.strftime("%Y-%m-%d, %H:%M")
 
+    mf = []
+    if "dashManifestUrl" in sd:
+        mf.append("dash")
+    if "hlsManifestUrl" in sd:
+        mf.append("hls")
+
     r = {
         "yt-id": vd["videoId"],
         "yt-title": vd["title"],
@@ -52,10 +61,14 @@ def main():
         "yt-views": vd["viewCount"],
         "yt-private": vd["isPrivate"],
         # "yt-expires": sd["expiresInSeconds"],
+        "yt-manifest": ",".join(mf),
         "yt-expires": et,
     }
     print(json.dumps(r))
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except:
+        pass

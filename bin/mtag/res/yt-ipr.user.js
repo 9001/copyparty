@@ -7,23 +7,34 @@
 // ==/UserScript==
 
 function main() {
+    var server = 'https://127.0.0.1:3923/ytm',
+        interval = 60; // sec
+
     var sent = {};
-    function send(txt) {
-        if (sent[txt])
+    function send(txt, mf_url, desc) {
+        if (sent[mf_url])
             return;
 
-        fetch('https://127.0.0.1:3923/playerdata?_=' + Date.now(), { method: "PUT", body: txt });
-        console.log('[yt-ipr] yeet %d bytes', txt.length);
-        sent[txt] = 1;
+        fetch(server + '?_=' + Date.now(), { method: "PUT", body: txt });
+        console.log('[yt-ipr] yeet %d bytes, %s', txt.length, desc);
+        sent[mf_url] = 1;
     }
 
     function collect() {
-        setTimeout(collect, 60 * 1000);
-        var pd = document.querySelector('ytd-watch-flexy');
-        if (pd)
-            send(JSON.stringify(pd.playerData));
+        setTimeout(collect, interval * 1000);
+        try {
+            var pd = document.querySelector('ytd-watch-flexy').playerData,
+                mu = pd.streamingData.dashManifestUrl || pd.streamingData.hlsManifestUrl,
+                desc = pd.videoDetails.videoId + ', ' + pd.videoDetails.title;
+
+            if (mu.length)
+                send(JSON.stringify(pd), mu, desc);
+        }
+        catch (ex) {
+            console.log("[yt-ipr]", ex);
+        }
     }
-    setTimeout(collect, 5000);
+    collect();
 }
 
 var scr = document.createElement('script');
