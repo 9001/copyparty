@@ -7,7 +7,7 @@
 // ==/UserScript==
 
 function main() {
-    var server = 'https://127.0.0.1:3923/ytm',
+    var server = 'https://127.0.0.1:3923/ytm?pw=wark',
         interval = 60; // sec
 
     var sent = {};
@@ -15,7 +15,7 @@ function main() {
         if (sent[mf_url])
             return;
 
-        fetch(server + '?_=' + Date.now(), { method: "PUT", body: txt });
+        fetch(server + '&_=' + Date.now(), { method: "PUT", body: txt });
         console.log('[yt-pdh] yeet %d bytes, %s', txt.length, desc);
         sent[mf_url] = 1;
     }
