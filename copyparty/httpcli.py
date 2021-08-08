@@ -234,7 +234,9 @@ class HttpCli(object):
                 if not self._check_nonfatal(pex, post):
                     self.keepalive = False
 
-                self.log("{}\033[0m, {}".format(min_ex(), self.vpath), 3)
+                msg = str(ex) if pex == ex else min_ex()
+                self.log("{}\033[0m, {}".format(msg, self.vpath), 3)
+
                 msg = "<pre>{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
                 if self.hint:
                     msg += "hint: {}\r\n".format(self.hint)
