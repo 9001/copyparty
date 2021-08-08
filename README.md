@@ -494,6 +494,27 @@ you can also set transaction limits which apply per-IP and per-volume, but these
 * `:c,maxb=1g,300` allows 1 GiB total over 5 minutes from each IP (tracked per-volume)
 
 
+## compress uploads
+
+files can be autocompressed on upload, either on user-request (if config allows) or forced by server-config
+
+* volume flag `gz` allows gz compression
+* volume flag `xz` allows lzma compression
+* volume flag `pk` **forces** compression on all files
+* url parameter `pk` requests compression with server-default algorithm
+* url parameter `gz` or `xz` requests compression with a specific algorithm
+* url parameter `xz` requests xz compression
+
+things to note,
+* the `gz` and `xz` arguments take a single optional argument, the compression level (range 0 to 9)
+* the `pk` volume flag takes the optional argument `ALGORITHM,LEVEL` which will then be forced for all uploads, for example `gz,9` or `xz,0`
+* default compression is gzip level 9
+* all upload methods except up2k are supported
+* the files will be indexed after compression, so dupe-detection and file-search will not work as expected
+
+some examples,
+
+
 ## database location
 
 copyparty creates a subfolder named `.hist` inside each volume where it stores the database, thumbnails, and some other stuff
@@ -600,11 +621,11 @@ quick summary of more eccentric web-browsers trying to view a directory index:
   * `var xhr = new XMLHttpRequest(); xhr.open('POST', 'https://127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
 
 * curl/wget: upload some files (post=file, chunk=stdin)
-  * `post(){ curl -b cppwd=wark http://127.0.0.1:3923/ -F act=bput -F f=@"$1";}`  
+  * `post(){ curl -b cppwd=wark -F act=bput -F f=@"$1" http://127.0.0.1:3923/;}`  
     `post movie.mkv`
-  * `post(){ wget --header='Cookie: cppwd=wark' http://127.0.0.1:3923/?raw --post-file="$1" -O-;}`  
+  * `post(){ wget --header='Cookie: cppwd=wark' --post-file="$1" -O- http://127.0.0.1:3923/?raw;}`  
     `post movie.mkv`
-  * `chunk(){ curl -b cppwd=wark http://127.0.0.1:3923/ -T-;}`  
+  * `chunk(){ curl -b cppwd=wark -T- http://127.0.0.1:3923/;}`  
     `chunk <movie.mkv`
 
 * FUSE: mount a copyparty server as a local filesystem

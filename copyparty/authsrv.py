@@ -803,6 +803,10 @@ class AuthSrv(object):
             if use:
                 vol.lim = lim
 
+        for vol in vfs.all_vols.values():
+            if "pk" in vol.flags and "gz" not in vol.flags and "xz" not in vol.flags:
+                vol.flags["gz"] = False  # def.pk
+
         all_mte = {}
         errors = False
         for vol in vfs.all_vols.values():

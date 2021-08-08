@@ -13,6 +13,11 @@ import ctypes
 from datetime import datetime
 import calendar
 
+try:
+    import lzma
+except:
+    pass
+
 from .__init__ import E, PY2, WINDOWS, ANYWIN, unicode
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 from .bos import bos
@@ -179,6 +184,9 @@ class HttpCli(object):
             for kc, ku in [["cppwd", "pw"], ["b", "b"]]:
                 if kc in cookies and ku not in uparam:
                     uparam[ku] = cookies[kc]
+
+        if len(uparam) > 10 or len(cookies) > 50:
+            raise Pebkac(400, "u wot m8")
 
         self.uparam = uparam
         self.cookies = cookies
@@ -503,7 +511,59 @@ class HttpCli(object):
         if self.args.nw:
             path = os.devnull
 
-        with open(fsenc(path), "wb", 512 * 1024) as f:
+        open_f = open
+        open_a = [fsenc(path), "wb", 512 * 1024]
+        open_ka = {}
+
+        # user-request || config-force
+        if ("gz" in vfs.flags or "xz" in vfs.flags) and (
+            "pk" in vfs.flags
+            or "pk" in self.uparam
+            or "gz" in self.uparam
+            or "xz" in self.uparam
+        ):
+            fb = {"gz": 9, "xz": 0}  # default/fallback level
+            lv = {}  # selected level
+            alg = None  # selected algo (gz=preferred)
+
+            # user-prefs first
+            if "gz" in self.uparam or "pk" in self.uparam:  # def.pk
+                alg = "gz"
+            if "xz" in self.uparam:
+                alg = "xz"
+            if alg:
+                v = self.uparam.get(alg)
+                lv[alg] = fb[alg] if v is None else int(v)
+
+            if alg not in vfs.flags:
+                alg = "gz" if "gz" in vfs.flags else "xz"
+
+            # then server overrides
+            pk = vfs.flags.get("pk")
+            if pk is not None:
+                # config-forced on
+                alg = alg or "gz"  # def.pk
+                try:
+                    # config-forced opts
+                    alg, lv = pk.split(",")
+                    lv[alg] = int(lv)
+                except:
+                    pass
+
+            lv[alg] = lv.get(alg) or fb.get(alg)
+
+            self.log("compressing with {} level {}".format(alg, lv.get(alg)))
+            if alg == "gz":
+                open_f = gzip.GzipFile
+                open_a = [fsenc(path), "wb", lv[alg], None, 0x5FEE6600]  # 2021-01-01
+            elif alg == "xz":
+                open_f = lzma.open
+                open_a = [fsenc(path), "wb"]
+                open_ka = {"preset": lv[alg]}
+            else:
+                self.log("fallthrough? thats a bug", 1)
+
+        with open_f(*open_a, **open_ka) as f:
             post_sz, _, sha_b64 = hashcopy(reader, f)
 
         if lim:
