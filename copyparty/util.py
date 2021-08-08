@@ -58,6 +58,9 @@ except:
         return struct.unpack(f.decode("ascii"), *a, **ka)
 
 
+ansi_re = re.compile("\033\\[[^m]*m")
+
+
 surrogateescape.register_surrogateescape()
 FS_ENCODING = sys.getfilesystemencoding()
 if WINDOWS and PY2:

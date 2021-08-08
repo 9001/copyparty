@@ -23,7 +23,7 @@ from textwrap import dedent
 from .__init__ import E, WINDOWS, VT100, PY2, unicode
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
-from .util import py_desc, align_tab, IMPLICATIONS
+from .util import py_desc, align_tab, IMPLICATIONS, ansi_re
 from .authsrv import re_vol
 
 HAVE_SSL = True
@@ -67,8 +67,12 @@ class Dodge11874(RiceFormatter):
 def lprint(*a, **ka):
     global printed
 
-    printed += " ".join(unicode(x) for x in a) + ka.get("end", "\n")
-    print(*a, **ka)
+    txt = " ".join(unicode(x) for x in a) + ka.get("end", "\n")
+    printed += txt
+    if not VT100:
+        txt = ansi_re.sub("", txt)
+
+    print(txt, **ka)
 
 
 def warn(msg):
@@ -197,8 +201,14 @@ def run_argparse(argv, formatter):
         formatter_class=formatter,
         prog="copyparty",
         description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
-        epilog=dedent(
-            """
+    )
+
+    sects = [
+        [
+            "accounts",
+            "accounts and volumes",
+            dedent(
+                """
             -a takes username:password,
             -v takes src:dst:perm1:perm2:permN:cflag1:cflag2:cflagN:...
                where "perm" is "accesslevels,username1,username2,..."
@@ -210,11 +220,7 @@ def run_argparse(argv, formatter):
               "m" (move):   move files and folders; need "w" at destination
               "d" (delete): permanently delete files and folders
 
-            list of cflags:
-              "c,nodupe" rejects existing files (instead of symlinking them)
-              "c,e2d" sets -e2d (all -e2* args can be set using ce2* cflags)
-              "c,d2t" disables metadata collection, overrides -e2t*
-              "c,d2d" disables all database stuff, overrides -e2*
+            too many cflags to list here, see the other sections
 
             example:\033[35m
               -a ed:hunter2 -v .::r:rw,ed -v ../inc:dump:w:rw,ed:c,nodupe  \033[36m
@@ -231,29 +237,84 @@ def run_argparse(argv, formatter):
 
             consider the config file for more flexible account/volume management,
             including dynamic reload at runtime (and being more readable w)
+            """
+            ),
+        ],
+        [
+            "cflags",
+            "list of cflags",
+            dedent(
+                """
+            cflags are appended to volume definitions, for example,
+            to create a write-only volume with the \033[33mnodupe\033[0m and \033[32mnosub\033[0m flags:
+              \033[35m-v /mnt/inc:/inc:w\033[33m:c,nodupe\033[32m:c,nosub
 
+            \033[0muploads, general:
+              \033[36mnodupe\033[35m rejects existing files (instead of symlinking them)
+              \033[36mnosub\033[35m forces all uploads into the top folder of the vfs
+              \033[36mgz\033[35m allows server-side gzip of uploads with ?gz (also c,xz)
+              \033[36mpk\033[35m forces server-side compression, optional arg: xz,9
+            
+            \033[0mupload rules:
+              \033[36mmaxn=250,600\033[35m max 250 uploads over 15min
+              \033[36mmaxb=1g,300\033[35m max 1 GiB over 5min (suffixes: b, k, m, g)
+              \033[36msz=1k-3m\033[35m allow filesizes between 1 KiB and 3MiB
+            
+            \033[0mupload rotation:
+            (moves all uploads into the specified folder structure)
+              \033[36mrotn=100,3\033[35m 3 levels of subfolders with 100 entries in each
+              \033[36mrotf=%Y-%m/%d-%H\033[35m date-formatted organizing
+            
+            \033[0mdatabase, general:
+              \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* cflags)
+              \033[36md2t\033[35m disables metadata collection, overrides -e2t*
+              \033[36md2d\033[35m disables all database stuff, overrides -e2*
+              \033[36mdhash\033[35m disables file hashing on initial scans, also ehash
+              \033[36mhist=/tmp/cdb\033[35m puts thumbnails and indexes at that location
+            
+            \033[0mdatabase, audio tags:
+            "mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...
+              \033[36mmtp=.bpm=f,audio-bpm.py\033[35m uses the "audio-bpm.py" program to
+                generate ".bpm" tags from uploads (f = overwrite tags)
+              \033[36mmtp=ahash,vhash=media-hash.py\033[35m collects two tags at once
+            \033[0m"""
+            ),
+        ],
+        [
+            "urlform",
+            "",
+            dedent(
+                """
             values for --urlform:
-              "stash" dumps the data to file and returns length + checksum
-              "save,get" dumps to file and returns the page like a GET
-              "print,get" prints the data in the log and returns GET
+              \033[36mstash\033[35m dumps the data to file and returns length + checksum
+              \033[36msave,get\033[35m dumps to file and returns the page like a GET
+              \033[36mprint,get\033[35m prints the data in the log and returns GET
               (leave out the ",get" to return an error instead)
-
-            values for --ls:
-              "USR" is a user to browse as; * is anonymous, ** is all users
-              "VOL" is a single volume to scan, default is * (all vols)
-              "FLAG" is flags;
-                "v" in addition to realpaths, print usernames and vpaths
-                "ln" only prints symlinks leaving the volume mountpoint
-                "p" exits 1 if any such symlinks are found
-                "r" resumes startup after the listing
+            """
+            ),
+        ],
+        [
+            "ls",
+            "volume inspection",
+            dedent(
+                """
+            \033[35m--ls USR,VOL,FLAGS
+              \033[36mUSR\033[0m is a user to browse as; * is anonymous, ** is all users
+              \033[36mVOL\033[0m is a single volume to scan, default is * (all vols)
+              \033[36mFLAG\033[0m is flags;
+                \033[36mv\033[0m in addition to realpaths, print usernames and vpaths
+                \033[36mln\033[0m only prints symlinks leaving the volume mountpoint
+                \033[36mp\033[0m exits 1 if any such symlinks are found
+                \033[36mr\033[0m resumes startup after the listing
             examples:
               --ls '**'          # list all files which are possible to read
               --ls '**,*,ln'     # check for dangerous symlinks
               --ls '**,*,ln,p,r' # check, then start normally if safe
-            \033[0m
             """
-        ),
-    )
+            ),
+        ],
+    ]
+
     # fmt: off
     u = unicode
     ap2 = ap.add_argument_group('general options')
@@ -357,9 +418,21 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
     ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to Path every S second")
     ap2.add_argument("--log-thrs", metavar="SEC", type=float, help="list active threads every SEC")
-    
-    return ap.parse_args(args=argv[1:])
     # fmt: on
+
+    ap2 = ap.add_argument_group("help sections")
+    for k, h, _ in sects:
+        ap2.add_argument("--help-" + k, action="store_true", help=h)
+
+    ret = ap.parse_args(args=argv[1:])
+    for k, h, t in sects:
+        k2 = "help_" + k.replace("-", "_")
+        if vars(ret)[k2]:
+            lprint("# {} help page".format(k))
+            lprint(t + "\033[0m")
+            sys.exit(0)
+
+    return ret
 
 
 def main(argv=None):

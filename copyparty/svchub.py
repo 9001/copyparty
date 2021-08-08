@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 import calendar
 
 from .__init__ import E, PY2, WINDOWS, ANYWIN, MACOS, VT100, unicode
-from .util import mp, start_log_thrs, start_stackmon, min_ex
+from .util import mp, start_log_thrs, start_stackmon, min_ex, ansi_re
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
@@ -41,7 +41,6 @@ class SvcHub(object):
         self.stop_cond = threading.Condition()
         self.httpsrv_up = 0
 
-        self.ansi_re = re.compile("\033\\[[^m]*m")
         self.log_mutex = threading.Lock()
         self.next_day = 0
 
@@ -279,9 +278,9 @@ class SvcHub(object):
             if not VT100:
                 fmt = "{} {:21} {}\n"
                 if "\033" in msg:
-                    msg = self.ansi_re.sub("", msg)
+                    msg = ansi_re.sub("", msg)
                 if "\033" in src:
-                    src = self.ansi_re.sub("", src)
+                    src = ansi_re.sub("", src)
             elif c:
                 if isinstance(c, int):
                     msg = "\033[3{}m{}".format(c, msg)
