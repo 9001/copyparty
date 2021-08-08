@@ -923,7 +923,9 @@ function up2k_init(subtle) {
         }
         return handshakes_permitted() && 0 ==
             st.todo.handshake.length +
-            st.busy.handshake.length;
+            st.busy.handshake.length +
+            st.todo.upload.length +
+            st.busy.upload.length;
     }
 
     var tasker = (function () {
