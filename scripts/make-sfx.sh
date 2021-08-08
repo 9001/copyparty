@@ -239,7 +239,8 @@ awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/
 tmv "$f"
 
 # up2k goes from 28k to 22k laff
-echo entabbening
+awk 'BEGIN{gensub(//,"",1)}' </dev/null &&
+echo entabbening &&
 find | grep -E '\.css$' | while IFS= read -r f; do
 	awk '{
 		sub(/^[ \t]+/,"");
@@ -253,6 +254,7 @@ find | grep -E '\.css$' | while IFS= read -r f; do
 	' <$f | sed 's/;\}$/}/' >t
 	tmv "$f"
 done
+unexpand -h 2>/dev/null &&
 find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 	unexpand -t 4 --first-only <"$f" >t
 	tmv "$f"

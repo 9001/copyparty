@@ -61,3 +61,8 @@ cd /mnt/nas/music/.hist
 ~/src/copyparty/bin/dbtool.py -src up2k.*.v3 up2k.db -rm-mtp-flag -copy key
 ~/src/copyparty/bin/dbtool.py -src up2k.*.v3 up2k.db -rm-mtp-flag -copy .bpm -vac
 ```
+
+
+# [`prisonparty.sh`](prisonparty.sh)
+* run copyparty in a chroot, preventing any accidental file access
+* creates bindmounts for /bin, /lib, and so on, see `sysdirs=`
