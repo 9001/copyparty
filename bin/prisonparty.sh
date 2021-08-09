@@ -14,7 +14,7 @@ usage:
   ./prisonparty.sh <ROOTDIR> <UID> <GID> [VOLDIR [VOLDIR...]] -- copyparty-sfx.py [...]"
 
 example:
-  ./prisonparty.sh /var/jail 1000 1000 /mnt/nas/music -- copyparty-sfx.py -v /mnt/nas/music::rwmd"
+  ./prisonparty.sh /var/empty 1000 1000 /mnt/nas/music -- copyparty-sfx.py -v /mnt/nas/music::rwmd"
 
 EOF
 exit 1
