@@ -487,6 +487,7 @@ you can set upload rules using volume flags, some examples:
   * if someone uploads to `/foo/bar` the path would be rewritten to `/foo/bar/2021/08/06/23` for example
   * but the actual value is not verified, just the structure, so the uploader can choose any values which conform to the format string
     * just to avoid additional complexity in up2k which is enough of a mess already
+* `:c,lifetime=300` delete uploaded files when they become 5 minutes old
 
 you can also set transaction limits which apply per-IP and per-volume, but these assume `-j 1` (default) otherwise the limits will be off, for example `-j 4` would allow anywhere between 1x and 4x the limits you set depending on which processing node the client gets routed to
 

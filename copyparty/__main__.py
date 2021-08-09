@@ -210,9 +210,9 @@ def run_argparse(argv, formatter):
             dedent(
                 """
             -a takes username:password,
-            -v takes src:dst:perm1:perm2:permN:cflag1:cflag2:cflagN:...
+            -v takes src:dst:perm1:perm2:permN:volflag1:volflag2:volflagN:...
                where "perm" is "accesslevels,username1,username2,..."
-               and "cflag" is config flags to set on this volume
+               and "volflag" is config flags to set on this volume
             
             list of accesslevels:
               "r" (read):   list folder contents, download files
@@ -220,7 +220,7 @@ def run_argparse(argv, formatter):
               "m" (move):   move files and folders; need "w" at destination
               "d" (delete): permanently delete files and folders
 
-            too many cflags to list here, see the other sections
+            too many volflags to list here, see the other sections
 
             example:\033[35m
               -a ed:hunter2 -v .::r:rw,ed -v ../inc:dump:w:rw,ed:c,nodupe  \033[36m
@@ -241,11 +241,11 @@ def run_argparse(argv, formatter):
             ),
         ],
         [
-            "cflags",
-            "list of cflags",
+            "flags",
+            "list of volflags",
             dedent(
                 """
-            cflags are appended to volume definitions, for example,
+            volflags are appended to volume definitions, for example,
             to create a write-only volume with the \033[33mnodupe\033[0m and \033[32mnosub\033[0m flags:
               \033[35m-v /mnt/inc:/inc:w\033[33m:c,nodupe\033[32m:c,nosub
 
@@ -264,9 +264,10 @@ def run_argparse(argv, formatter):
             (moves all uploads into the specified folder structure)
               \033[36mrotn=100,3\033[35m 3 levels of subfolders with 100 entries in each
               \033[36mrotf=%Y-%m/%d-%H\033[35m date-formatted organizing
+              \033[36mlifetime=3600\033[35m uploads are deleted after 1 hour
             
             \033[0mdatabase, general:
-              \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* cflags)
+              \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* volflags)
               \033[36md2t\033[35m disables metadata collection, overrides -e2t*
               \033[36md2d\033[35m disables all database stuff, overrides -e2*
               \033[36mdhash\033[35m disables file hashing on initial scans, also ehash
@@ -354,6 +355,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-nih", action="store_true", help="no info hostname")
     ap2.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
+    ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (lifetime volflag)")
 
     ap2 = ap.add_argument_group('safety options')
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="scan all volumes; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
@@ -392,7 +394,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
     ap2.add_argument("--no-hash", action="store_true", help="disable hashing during e2ds folder scans")
     ap2.add_argument("--re-int", metavar="SEC", type=int, default=30, help="disk rescan check interval")
-    ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' cflag")
+    ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
     
     ap2 = ap.add_argument_group('metadata db options')

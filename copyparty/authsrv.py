@@ -25,6 +25,9 @@ from .util import (
 from .bos import bos
 
 
+LEELOO_DALLAS = "leeloo_dallas"
+
+
 class AXS(object):
     def __init__(self, uread=None, uwrite=None, umove=None, udel=None):
         self.uread = {} if uread is None else {k: 1 for k in uread}
@@ -327,7 +330,7 @@ class VFS(object):
             [will_move, c.umove, "move"],
             [will_del, c.udel, "delete"],
         ]:
-            if req and (uname not in d and "*" not in d):
+            if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
                 m = "you don't have {}-access for this location"
                 raise Pebkac(403, m.format(msg))
 
@@ -554,6 +557,9 @@ class AuthSrv(object):
 
     def _read_vol_str(self, lvl, uname, axs, flags):
         # type: (str, str, AXS, any) -> None
+        if lvl.strip("crwmd"):
+            raise Exception("invalid volume flag: {},{}".format(lvl, uname))
+
         if lvl == "c":
             cval = True
             if "=" in uname:
@@ -708,6 +714,9 @@ class AuthSrv(object):
                 c=1,
             )
             raise Exception("invalid config")
+
+        if LEELOO_DALLAS in all_users:
+            raise Exception("sorry, reserved username: " + LEELOO_DALLAS)
 
         promote = []
         demote = []

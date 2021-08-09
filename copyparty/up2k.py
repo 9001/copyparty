@@ -36,7 +36,7 @@ from .util import (
     min_ex,
 )
 from .bos import bos
-from .authsrv import AuthSrv
+from .authsrv import AuthSrv, LEELOO_DALLAS
 from .mtag import MTag, MParser
 
 try:
@@ -192,21 +192,55 @@ class Up2k(object):
                     if now - volage[vp] >= maxage:
                         self.need_rescan[vp] = 1
 
-                if not self.need_rescan:
-                    continue
-
                 vols = list(sorted(self.need_rescan.keys()))
                 self.need_rescan = {}
 
-            err = self.rescan(self.asrv.vfs.all_vols, vols)
-            if err:
-                for v in vols:
-                    self.need_rescan[v] = True
+            if vols:
+                err = self.rescan(self.asrv.vfs.all_vols, vols)
+                if err:
+                    for v in vols:
+                        self.need_rescan[v] = True
 
+                    continue
+
+                for v in vols:
+                    volage[v] = now
+
+            if self.args.no_lifetime:
                 continue
 
-            for v in vols:
-                volage[v] = now
+            for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
+                lifetime = vol.flags.get("lifetime")
+                if not lifetime:
+                    continue
+
+                cur = self.cur.get(vol.realpath)
+                if not cur:
+                    continue
+
+                nrm = 0
+                deadline = time.time() - int(lifetime)
+                q = "select rd, fn from up where at > 0 and at < ? limit 100"
+                while True:
+                    with self.mutex:
+                        hits = cur.execute(q, (deadline,)).fetchall()
+
+                    if not hits:
+                        break
+
+                    for rd, fn in hits:
+                        if rd.startswith("//") or fn.startswith("//"):
+                            rd, fn = s3dec(rd, fn)
+
+                        fvp = "{}/{}".format(rd, fn).strip("/")
+                        if vp:
+                            fvp = "{}/{}".format(vp, fvp)
+
+                        self._handle_rm(LEELOO_DALLAS, None, fvp)
+                        nrm += 1
+
+                if nrm:
+                    self.log("{} files graduated in {}".format(nrm, vp))
 
     def _vis_job_progress(self, job):
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
