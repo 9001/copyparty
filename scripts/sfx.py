@@ -364,7 +364,7 @@ def confirm(rv):
     except:
         pass
 
-    sys.exit(rv)
+    sys.exit(rv or 1)
 
 
 def run(tmp, j2):
