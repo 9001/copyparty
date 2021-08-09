@@ -8,11 +8,11 @@
 #
 # you may want to:
 #   change '/usr/bin/python' to another interpreter
-#   change '/mnt::a' to another location or permission-set
+#   change '/mnt::rw' to another location or permission-set
 
 name="$SVCNAME"
 command_background=true
 pidfile="/var/run/$SVCNAME.pid"
 
 command="/usr/bin/python /usr/local/bin/copyparty-sfx.py"
-command_args="-q -v /mnt::a"
+command_args="-q -v /mnt::rw"

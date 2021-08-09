@@ -6,7 +6,7 @@
 #
 # you may want to:
 #   change '/usr/bin/python' to another interpreter
-#   change '/mnt::a' to another location or permission-set
+#   change '/mnt::rw' to another location or permission-set
 #
 # with `Type=notify`, copyparty will signal systemd when it is ready to
 #   accept connections; correctly delaying units depending on copyparty.
@@ -27,7 +27,7 @@ Description=copyparty file server
 [Service]
 Type=notify
 SyslogIdentifier=copyparty
-ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -v /mnt::a
+ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -v /mnt::rw
 ExecStartPre=/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
 
 [Install]
