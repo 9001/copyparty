@@ -25,6 +25,28 @@ ANYWIN = WINDOWS or sys.platform in ["msys"]
 MACOS = platform.system() == "Darwin"
 
 
+def get_unix_home():
+    try:
+        v = os.environ["XDG_CONFIG_HOME"]
+        if not v:
+            raise Exception()
+        ret = os.path.normpath(v)
+        os.listdir(ret)
+        return ret
+    except:
+        pass
+
+    try:
+        v = os.path.expanduser("~/.config")
+        if v.startswith("~"):
+            raise Exception()
+        ret = os.path.normpath(v)
+        os.listdir(ret)
+        return ret
+    except:
+        return "/tmp"
+
+
 class EnvParams(object):
     def __init__(self):
         self.t0 = time.time()
@@ -37,10 +59,7 @@ class EnvParams(object):
         elif sys.platform == "darwin":
             self.cfg = os.path.expanduser("~/Library/Preferences/copyparty")
         else:
-            self.cfg = os.path.normpath(
-                os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-                + "/copyparty"
-            )
+            self.cfg = get_unix_home() + "/copyparty"
 
         self.cfg = self.cfg.replace("\\", "/")
         try:
