@@ -4,7 +4,7 @@ set -e
 # runs copyparty (or any other python script really) in a chroot
 #
 # assumption: these directories, and everything within, are owned by root
-sysdirs=(bin lib lib32 lib64 sbin usr)
+sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr )
 
 
 # error-handler
@@ -23,7 +23,7 @@ exit 1
 
 # read arguments
 trap help EXIT
-jail="$1"; shift
+jail="$(realpath "$1")"; shift
 uid="$1"; shift
 gid="$1"; shift
 
@@ -32,7 +32,7 @@ while true; do
 	v="$1"; shift
 	[ "$v" = -- ] && break  # end of volumes
 	[ "$#" -eq 0 ] && break  # invalid usage
-	vols+=("$v")
+	vols+=( "$(realpath "$v")" )
 done
 cpp="$1"; shift
 cpp="$(realpath "$cpp")"
@@ -56,27 +56,30 @@ vols+=("$cppdir" "$PWD")
 echo
 
 
-# resolve and remove trailing slash
-jail="$(realpath "$jail")"
+# remove any trailing slashes
 jail="${jail%/}"
+cppdir="${cppdir%/}"
 
 
 # bind-mount system directories and volumes
 printf '%s\n' "${sysdirs[@]}" "${vols[@]}" | LC_ALL=C sort |
 while IFS= read -r v; do
-	[ -e "/$v" ] || {
-		# printf '\033[1;31mfolder does not exist:\033[0m %s\n' "$v"
+	[ -e "$v" ] || {
+		# printf '\033[1;31mfolder does not exist:\033[0m %s\n' "/$v"
 		continue
 	}
-	mkdir -p "$jail/$v"
-	mount | grep -qF " on $jail/$v " ||
-		mount --bind /$v "$jail/$v"
+	i1=$(stat -c%D.%i "$v"      2>/dev/null || echo a)
+	i2=$(stat -c%D.%i "$jail$v" 2>/dev/null || echo b)
+	[ $i1 = $i2 ] && continue
+	
+	mkdir -p "$jail$v"
+	mount --bind "$v" "$jail$v"
 done
 
 
 # create a tmp
 mkdir -p "$jail/tmp"
-chown -R "$uid:$gid" "$jail/tmp"
+chmod 777 "$jail/tmp"
 
 
 # run copyparty
@@ -87,8 +90,8 @@ chown -R "$uid:$gid" "$jail/tmp"
 lsof "$jail" | grep -qF "$jail" &&
 	echo "chroot is in use, will not cleanup" ||
 {
-	mount | grep -F " on $jail" |
+	mount | grep -qF " on $jail" |
 	awk '{sub(/ type .*/,"");sub(/.* on /,"");print}' |
-	LC_ALL=C sort -r  | tr '\n' '\0' | xargs -r0 umount
+	LC_ALL=C sort -r  | tee /dev/stderr | tr '\n' '\0' | xargs -r0 umount
 }
 exit $rv
