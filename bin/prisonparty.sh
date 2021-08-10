@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# runs copyparty (or any other python script really) in a chroot
+# runs copyparty (or any other program really) in a chroot
 #
 # assumption: these directories, and everything within, are owned by root
 sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr )
@@ -34,6 +34,8 @@ while true; do
 	[ "$#" -eq 0 ] && break  # invalid usage
 	vols+=( "$(realpath "$v")" )
 done
+pybin="$1"; shift
+pybin="$(realpath "$pybin")"
 cpp="$1"; shift
 cpp="$(realpath "$cpp")"
 cppdir="$(dirname "$cpp")"
@@ -83,7 +85,7 @@ chmod 777 "$jail/tmp"
 
 
 # run copyparty
-/sbin/chroot --userspec=$uid:$gid "$jail" "$(which python3)" "$cpp" "$@" && rv=0 || rv=$?
+/sbin/chroot --userspec=$uid:$gid "$jail" "$pybin" "$cpp" "$@" && rv=0 || rv=$?
 
 
 # cleanup if not in use

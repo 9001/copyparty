@@ -1,0 +1,27 @@
+# this will start `/usr/local/bin/copyparty-sfx.py`
+# in a chroot, preventing accidental access elsewhere
+# and share '/mnt' with anonymous read+write
+#
+# installation:
+#   1) put copyparty-sfx.py and prisonparty.sh in /usr/local/bin
+#   2) cp -pv prisonparty.service /etc/systemd/system && systemctl enable --now prisonparty
+#
+# you may want to:
+#   change '/mnt::rw' to another location or permission-set
+#    (remember to change the '/mnt' chroot arg too)
+#
+# enable line-buffering for realtime logging (slight performance cost):
+#   inside the [Service] block, add the following line:
+#   Environment=PYTHONUNBUFFERED=x
+
+[Unit]
+Description=copyparty file server
+
+[Service]
+SyslogIdentifier=prisonparty
+WorkingDirectory=/usr/local/bin
+ExecStart=/bin/bash /usr/local/bin/prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt -- \
+  /usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -v /mnt::rw
+
+[Install]
+WantedBy=multi-user.target
