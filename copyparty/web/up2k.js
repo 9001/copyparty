@@ -929,21 +929,17 @@ function up2k_init(subtle) {
     }
 
     var tasker = (function () {
-        var tto = null,
-            running = false,
+        var running = false,
             was_busy = false;
 
         function defer() {
             running = false;
-            clearTimeout(tto);
-            tto = setTimeout(taskerd, 100);
         }
 
         function taskerd() {
             if (running)
                 return;
 
-            clearTimeout(tto);
             if (crashed)
                 return defer();
 
@@ -1034,7 +1030,7 @@ function up2k_init(subtle) {
                     return defer();
             }
         }
-        taskerd();
+        timer.add(taskerd, true);
         return taskerd;
     })();
 

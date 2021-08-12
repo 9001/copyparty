@@ -21,7 +21,6 @@ function main() {
     }
 
     function collect() {
-        setTimeout(collect, interval * 1000);
         try {
             var pd = document.querySelector('ytd-watch-flexy');
             if (!pd)
@@ -39,7 +38,7 @@ function main() {
             console.log("[yt-pdh]", ex);
         }
     }
-    collect();
+    setInterval(collect, interval * 1000);
 }
 
 var scr = document.createElement('script');

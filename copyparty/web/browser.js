@@ -921,14 +921,16 @@ function playpause(e) {
 var mpui = (function () {
 	var r = {},
 		nth = 0,
-		timeout = null,
 		preloaded = null;
 
 	r.progress_updater = function () {
-		clearTimeout(timeout);
+		timer.add(updater_impl, true);
+	};
 
+	function updater_impl() {
 		if (!mp.au) {
 			widget.paused(true);
+			timer.rm(updater_impl);
 			return;
 		}
 
@@ -970,9 +972,9 @@ var mpui = (function () {
 			}
 		}
 
-		if (!mp.au.paused)
-			timeout = setTimeout(r.progress_updater, 100);
-	};
+		if (mp.au.paused)
+			timer.rm(updater_impl);
+	}
 	r.progress_updater();
 	return r;
 })();
@@ -2822,7 +2824,7 @@ var treectl = (function () {
 	}
 
 	function onscroll() {
-		if (!entreed || treectl.hidden)
+		if (!entreed || treectl.hidden || document.visibilityState == 'hidden')
 			return;
 
 		var tree = ebi('tree'),
@@ -2858,12 +2860,7 @@ var treectl = (function () {
 			tree.style.height = treeh < 10 ? '' : treeh + 'px';
 		}
 	}
-
-	function periodic() {
-		onscroll();
-		setTimeout(periodic, document.visibilityState ? 100 : 5000);
-	}
-	periodic();
+	timer.add(onscroll, true);
 
 	function onresize(e) {
 		if (!entreed || treectl.hidden)

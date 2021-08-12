@@ -555,6 +555,39 @@ function hist_replace(url) {
 }
 
 
+var timer = (function () {
+    var r = {};
+    r.q = [];
+    r.last = 0;
+
+    r.add = function (fun, run) {
+        r.rm(fun);
+        r.q.push(fun);
+
+        if (run)
+            fun();
+    };
+
+    r.rm = function (fun) {
+        apop(r.q, fun);
+    };
+
+    function impl() {
+        if (Date.now() - r.last < 69)
+            return;
+
+        var q = r.q.slice(0);
+        for (var a = 0; a < q.length; a++)
+            q[a]();
+
+        r.last = Date.now();
+    }
+    setInterval(impl, 100);
+
+    return r;
+})();
+
+
 var tt = (function () {
     var r = {
         "tt": mknod("div"),
