@@ -2027,18 +2027,21 @@ var fileman = (function () {
 		}, null);
 	};
 
+	function onmsg(msg) {
+		r.clip = null;
+		r.render();
+		if (msg == get_evpath())
+			treectl.goto(msg);
+	}
+
 	if (r.bus)
 		r.bus.onmessage = function (e) {
-			r.clip = null;
-			r.render();
-			var me = get_evpath();
-			if (e && e.data == me)
-				treectl.goto(e.data);
+			onmsg(e ? e.data : 1)
 		};
 
 	r.tx = function (msg) {
 		if (!r.bus)
-			return;
+			return onmsg(msg);
 
 		r.bus.postMessage(msg);
 		r.bus.onmessage();
