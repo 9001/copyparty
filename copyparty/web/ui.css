@@ -146,6 +146,7 @@ html.light #tt em {
 	text-align: center;
 }
 #modalc {
+	position: relative;
 	display: inline-block;
 	background: #f7f7f7;
 	color: #333;
@@ -165,8 +166,11 @@ html.light #tt em {
     }
 }
 #modalb {
+	position: sticky;
 	text-align: right;
 	padding-top: 1em;
+	bottom: 0;
+	right: 0;
 }
 #modalb a {
 	color: #000;
