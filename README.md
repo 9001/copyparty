@@ -248,6 +248,7 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
 * when viewing images / playing videos:
   * `J/L, Left/Right` prev/next file
   * `Home/End` first/last file
+  * `S` toggle selection
   * `Esc` close viewer
   * videos:
     * `U/O` skip 10sec back/forward

@@ -22,7 +22,7 @@ window.baguetteBox = (function () {
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnVmode, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnSel, btnVmode, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -175,6 +175,7 @@ window.baguetteBox = (function () {
                 '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">&gt;</button>' +
                 '<div id="bbox-btns">' +
                 '<button id="bbox-help" type="button">?</button>' +
+                '<button id="bbox-tsel" type="button">sel</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
                 '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
                 '</div></div>'
@@ -187,6 +188,7 @@ window.baguetteBox = (function () {
         btnPrev = ebi('bbox-prev');
         btnNext = ebi('bbox-next');
         btnHelp = ebi('bbox-help');
+        btnSel = ebi('bbox-tsel');
         btnVmode = ebi('bbox-vmode');
         btnClose = ebi('bbox-close');
         bindEvents();
@@ -203,6 +205,7 @@ window.baguetteBox = (function () {
             ['right, L', 'next file'],
             ['home', 'first file'],
             ['end', 'last file'],
+            ['S', 'toggle file selection'],
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
             ['P', 'video: seek 10sec ahead'],
@@ -267,6 +270,8 @@ window.baguetteBox = (function () {
                     v.requestFullscreen();
             }
             catch (ex) { }
+        else if (k == "KeyS")
+            tglsel();
     }
 
     function setVmode() {
@@ -314,6 +319,40 @@ window.baguetteBox = (function () {
             tt.show.bind(this)();
     }
 
+    function tglsel() {
+        var thumb = currentGallery[currentIndex].imageElement,
+            name = vsplit(thumb.href)[1],
+            files = msel.getall();
+
+        for (var a = 0; a < files.length; a++)
+            if (vsplit(files[a].vp)[1] == name)
+                clmod(ebi(files[a].id).closest('tr'), 'sel', 't');
+
+        msel.selui();
+        selbg();
+    }
+
+    function selbg() {
+        var img = imagesElements[currentIndex].querySelector('img, video'),
+            thumb = currentGallery[currentIndex].imageElement,
+            name = vsplit(thumb.href)[1],
+            files = msel.getsel(),
+            sel = false;
+
+        for (var a = 0; a < files.length; a++)
+            if (vsplit(files[a].vp)[1] == name)
+                sel = true;
+
+        ebi('bbox-overlay').style.background = sel ?
+            'rgba(153,34,85,0.7)' : '';
+
+        img.style.boxShadow = sel ? '0 0 3em #f4a' : '';
+        img.style.borderRadius = sel ? '1em' : '';
+        btnSel.style.color = sel ? '#fff' : '';
+        btnSel.style.background = sel ? '#f59' : '';
+        btnSel.style.textShadow = sel ? '1px 1px 0 #937' : '';
+    }
+
     function keyUpHandler(e) {
         if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
             return;
@@ -348,6 +387,7 @@ window.baguetteBox = (function () {
         bind(btnClose, 'click', hideOverlay);
         bind(btnVmode, 'click', tglVmode);
         bind(btnHelp, 'click', halp);
+        bind(btnSel, 'click', tglsel);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -362,6 +402,7 @@ window.baguetteBox = (function () {
         unbind(btnClose, 'click', hideOverlay);
         unbind(btnVmode, 'click', tglVmode);
         unbind(btnHelp, 'click', halp);
+        unbind(btnSel, 'click', tglsel);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -679,6 +720,7 @@ window.baguetteBox = (function () {
             v.muted = vmute;
             v.loop = vloop;
         }
+        selbg();
         mp_ctl();
         setVmode();
     }
