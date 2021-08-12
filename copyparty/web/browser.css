@@ -1406,6 +1406,7 @@ html.light #bbox-overlay figcaption a {
 	font-size: 1.4em;
 	line-height: 1.4em;
 	vertical-align: top;
+	font-variant: small-caps;
 }
 #bbox-overlay button:focus,
 #bbox-overlay button:hover {

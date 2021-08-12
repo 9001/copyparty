@@ -349,8 +349,8 @@ window.baguetteBox = (function () {
         img.style.boxShadow = sel ? '0 0 3em #f4a' : '';
         img.style.borderRadius = sel ? '1em' : '';
         btnSel.style.color = sel ? '#fff' : '';
-        btnSel.style.background = sel ? '#f59' : '';
-        btnSel.style.textShadow = sel ? '1px 1px 0 #937' : '';
+        btnSel.style.background = sel ? '#d48' : '';
+        btnSel.style.textShadow = sel ? '1px 1px 0 #b38' : '';
     }
 
     function keyUpHandler(e) {
