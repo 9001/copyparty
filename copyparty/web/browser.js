@@ -1463,6 +1463,83 @@ function play_linked() {
 })();
 
 
+function sortfiles(nodes) {
+	var sopts = jread('fsort', [["href", 1, ""]]);
+
+	try {
+		var is_srch = false;
+		if (nodes[0]['rp']) {
+			is_srch = true;
+			for (var b = 0, bb = nodes.length; b < bb; b++)
+				nodes[b].ext = nodes[b].rp.split('.').pop();
+			for (var b = 0; b < sopts.length; b++)
+				if (sopts[b][0] == 'href')
+					sopts[b][0] = 'rp';
+		}
+		for (var a = sopts.length - 1; a >= 0; a--) {
+			var name = sopts[a][0], rev = sopts[a][1], typ = sopts[a][2];
+			if (!name)
+				continue;
+
+			if (name == 'ts')
+				typ = 'int';
+
+			if (name.indexOf('tags/') === 0) {
+				name = name.slice(5);
+				for (var b = 0, bb = nodes.length; b < bb; b++)
+					nodes[b]._sv = nodes[b].tags[name];
+			}
+			else {
+				for (var b = 0, bb = nodes.length; b < bb; b++) {
+					var v = nodes[b][name];
+
+					if ((v + '').indexOf('<a ') === 0)
+						v = v.split('>')[1];
+					else if (name == "href" && v) {
+						if (v.slice(-1) == '/')
+							v = '\t' + v;
+
+						v = uricom_dec(v)[0]
+					}
+
+					nodes[b]._sv = v;
+				}
+			}
+
+			var onodes = nodes.map(function (x) { return x; });
+			nodes.sort(function (n1, n2) {
+				var v1 = n1._sv,
+					v2 = n2._sv;
+
+				if (v1 === undefined) {
+					if (v2 === undefined) {
+						return onodes.indexOf(n1) - onodes.indexOf(n2);
+					}
+					return -1 * rev;
+				}
+				if (v2 === undefined) return 1 * rev;
+
+				var ret = rev * (typ == 'int' ? (v1 - v2) : (v1.localeCompare(v2)));
+				if (ret === 0)
+					ret = onodes.indexOf(n1) - onodes.indexOf(n2);
+
+				return ret;
+			});
+		}
+		for (var b = 0, bb = nodes.length; b < bb; b++) {
+			delete nodes[b]._sv;
+			if (is_srch)
+				delete nodes[b].ext;
+		}
+	}
+	catch (ex) {
+		console.log("failed to apply sort config: " + ex);
+		console.log("resetting fsort " + sread('fsort'))
+		localStorage.removeItem('fsort');
+	}
+	return nodes;
+}
+
 
 function fmt_ren(re, md, fmt) {
 	var ptr = 0;
