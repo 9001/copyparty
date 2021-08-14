@@ -353,11 +353,11 @@ window.baguetteBox = (function () {
         ebi('bbox-overlay').style.background = sel ?
             'rgba(153,34,85,0.7)' : '';
 
-        img.style.boxShadow = sel ? '0 0 3em #f4a' : '';
         img.style.borderRadius = sel ? '1em' : '';
         btnSel.style.color = sel ? '#fff' : '';
         btnSel.style.background = sel ? '#d48' : '';
         btnSel.style.textShadow = sel ? '1px 1px 0 #b38' : '';
+        btnSel.style.boxShadow = sel ? '.15em .15em 0 #502' : '';
     }
 
     function keyUpHandler(e) {
@@ -780,6 +780,12 @@ window.baguetteBox = (function () {
         selbg();
         mp_ctl();
         setVmode();
+
+        var prev = QS('.full-image.vis');
+        if (prev)
+            prev.classList.remove('vis');
+
+        vidimg().closest('div').classList.add('vis');
     }
 
     function preloadNext(index) {

@@ -1328,8 +1328,11 @@ html.light #tree::-webkit-scrollbar {
 	max-height: calc(100% - 1.4em);
 	margin-bottom: 1.4em;
 	vertical-align: middle;
-	box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 	transition: transform .2s, left .2s, top .2s, width .2s, height .2s;
+}
+.full-image.vis img,
+.full-image.vis video {
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 .full-image video {
 	background: #333;
