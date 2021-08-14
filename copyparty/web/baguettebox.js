@@ -22,7 +22,7 @@ window.baguetteBox = (function () {
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnSel, btnVmode, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnRotL, btnRotR, btnSel, btnVmode, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -175,6 +175,8 @@ window.baguetteBox = (function () {
                 '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">&gt;</button>' +
                 '<div id="bbox-btns">' +
                 '<button id="bbox-help" type="button">?</button>' +
+                '<button id="bbox-rotl" type="button">↶</button>' +
+                '<button id="bbox-rotr" type="button">↷</button>' +
                 '<button id="bbox-tsel" type="button">sel</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
                 '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
@@ -188,6 +190,8 @@ window.baguetteBox = (function () {
         btnPrev = ebi('bbox-prev');
         btnNext = ebi('bbox-next');
         btnHelp = ebi('bbox-help');
+        btnRotL = ebi('bbox-rotl');
+        btnRotR = ebi('bbox-rotr');
         btnSel = ebi('bbox-tsel');
         btnVmode = ebi('bbox-vmode');
         btnClose = ebi('bbox-close');
@@ -205,12 +209,13 @@ window.baguetteBox = (function () {
             ['right, L', 'next file'],
             ['home', 'first file'],
             ['end', 'last file'],
+            ['R', 'rotate (shift=ccw)'],
             ['S', 'toggle file selection'],
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
             ['P', 'video: seek 10sec ahead'],
             ['M', 'video: toggle mute'],
-            ['R', 'video: toggle loop'],
+            ['V', 'video: toggle loop'],
             ['C', 'video: toggle auto-next'],
             ['F', 'video: toggle fullscreen'],
         ],
@@ -252,7 +257,7 @@ window.baguetteBox = (function () {
             v.muted = vmute = !vmute;
             mp_ctl();
         }
-        else if (k == "KeyR" && v) {
+        else if (k == "KeyV" && v) {
             vloop = !vloop;
             vnext = vnext && !vloop;
             setVmode();
@@ -272,6 +277,8 @@ window.baguetteBox = (function () {
             catch (ex) { }
         else if (k == "KeyS")
             tglsel();
+        else if (k == "KeyR")
+            rotn(e.shiftKey ? -1 : 1);
     }
 
     function setVmode() {
@@ -284,7 +291,7 @@ window.baguetteBox = (function () {
         if (vloop) {
             lbl = 'Loop';
             msg += 'repeat it';
-            tts = '$NHotkey: R';
+            tts = '$NHotkey: V';
         }
         else if (vnext) {
             lbl = 'Cont';
@@ -333,7 +340,7 @@ window.baguetteBox = (function () {
     }
 
     function selbg() {
-        var img = imagesElements[currentIndex].querySelector('img, video'),
+        var img = vidimg(),
             thumb = currentGallery[currentIndex].imageElement,
             name = vsplit(thumb.href)[1],
             files = msel.getsel(),
@@ -387,6 +394,8 @@ window.baguetteBox = (function () {
         bind(btnClose, 'click', hideOverlay);
         bind(btnVmode, 'click', tglVmode);
         bind(btnHelp, 'click', halp);
+        bind(btnRotL, 'click', rotl);
+        bind(btnRotR, 'click', rotr);
         bind(btnSel, 'click', tglsel);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
@@ -402,6 +411,8 @@ window.baguetteBox = (function () {
         unbind(btnClose, 'click', hideOverlay);
         unbind(btnVmode, 'click', tglVmode);
         unbind(btnHelp, 'click', halp);
+        unbind(btnRotL, 'click', rotl);
+        unbind(btnRotR, 'click', rotr);
         unbind(btnSel, 'click', tglsel);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
@@ -658,8 +669,54 @@ window.baguetteBox = (function () {
         return true;
     }
 
+    function rotn(n) {
+        var el = vidimg(),
+            orot = parseInt(el.getAttribute('rot') || 0),
+            frot = orot + n * 90,
+            rot = frot,
+            iw = el.naturalWidth || el.videoWidth,
+            ih = el.naturalHeight || el.videoHeight,
+            magic = 4,  // idk, works in enough browsers
+            co = ebi('bbox-overlay'),
+            dl = el.closest('div').querySelector('figcaption a'),
+            vw = co.clientWidth,
+            vh = co.clientHeight - dl.offsetHeight + magic,
+            pmag = Math.min(1, Math.min(vw / ih, vh / iw)),
+            wmag = Math.min(1, Math.min(vw / iw, vh / ih));
+
+        while (rot < 0) rot += 360;
+        while (rot >= 360) rot -= 360;
+        var q = rot == 90 || rot == 270 ? 1 : 0,
+            mag = q ? pmag : wmag;
+
+        el.style.cssText = 'max-width:none; max-height:none; position:absolute; display:block; margin:0';
+        if (!orot) {
+            el.style.width = iw * wmag + 'px';
+            el.style.height = ih * wmag + 'px';
+            el.style.left = (vw - iw * wmag) / 2 + 'px';
+            el.style.top = (vh - ih * wmag) / 2 - magic + 'px';
+            q = el.offsetHeight;
+        }
+        el.style.width = iw * mag + 'px';
+        el.style.height = ih * mag + 'px';
+        el.style.left = (vw - iw * mag) / 2 + 'px';
+        el.style.top = (vh - ih * mag) / 2 - magic + 'px';
+        el.style.transform = 'rotate(' + frot + 'deg)';
+        el.setAttribute('rot', frot);
+    }
+    function rotl() {
+        rotn(-1);
+    }
+    function rotr() {
+        rotn(1);
+    }
+
     function vid() {
         return imagesElements[currentIndex].querySelector('video');
+    }
+
+    function vidimg() {
+        return imagesElements[currentIndex].querySelector('img, video');
     }
 
     function playvid(play) {

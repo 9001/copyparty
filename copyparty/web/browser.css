@@ -1329,6 +1329,7 @@ html.light #tree::-webkit-scrollbar {
 	margin-bottom: 1.4em;
 	vertical-align: middle;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+	transition: transform .2s, left .2s, top .2s, width .2s, height .2s;
 }
 .full-image video {
 	background: #333;
@@ -1341,6 +1342,7 @@ html.light #tree::-webkit-scrollbar {
 	text-align: center;
 	white-space: normal;
 	color: #ccc;
+	z-index: 1;
 }
 #bbox-overlay figcaption a {
 	background: rgba(0, 0, 0, 0.6);

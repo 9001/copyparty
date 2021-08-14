@@ -249,13 +249,14 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
   * `J/L, Left/Right` prev/next file
   * `Home/End` first/last file
   * `S` toggle selection
+  * `R` rotate clockwise (shift=ccw)
   * `Esc` close viewer
   * videos:
     * `U/O` skip 10sec back/forward
     * `P/K/Space` play/pause
     * `F` fullscreen
     * `C` continue playing next video
-    * `R` loop
+    * `V` loop
     * `M` mute
 * when the navpane is open:
   * `A/D` adjust tree width
