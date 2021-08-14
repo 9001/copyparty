@@ -775,3 +775,14 @@ var modal = (function () {
 
     return r;
 })();
+
+
+function winpopup(txt) {
+    fetch(get_evpath(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: 'msg=' + uricom_enc(Date.now() + ', ' + txt)
+    });
+}

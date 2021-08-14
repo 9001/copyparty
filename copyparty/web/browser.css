@@ -1294,7 +1294,7 @@ html.light #tree::-webkit-scrollbar {
 	opacity: 0;
 	position: fixed;
 	overflow: hidden;
-	touch-action: none;
+	touch-action: pinch-zoom;
 	top: 0;
 	left: 0;
 	width: 100%;

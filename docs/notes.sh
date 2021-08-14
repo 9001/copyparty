@@ -173,7 +173,7 @@ about:config >> devtools.debugger.prefs-schema-version = -1
 git pull; git reset --hard origin/HEAD && git log --format=format:"%H %ai %d" --decorate=full > ../revs && cat ../{util,browser,up2k}.js >../vr && cat ../revs | while read -r rev extra; do (git reset --hard $rev >/dev/null 2>/dev/null && dsz=$(cat copyparty/web/{util,browser,up2k}.js >../vg 2>/dev/null && diff -wNarU0 ../{vg,vr} | wc -c) && printf '%s %6s %s\n' "$rev" $dsz "$extra") </dev/null; done                
 
 # download all sfx versions
-curl https://api.github.com/repos/9001/copyparty/releases?per_page=100 | jq -r '.[] | .tag_name + " " + .name' | while read v t; do fn="copyparty $v $t.py"; [ -e $fn ] || curl https://github.com/9001/copyparty/releases/download/$v/copyparty-sfx.py -Lo "$fn"; done
+curl https://api.github.com/repos/9001/copyparty/releases?per_page=100 | jq -r '.[] | .tag_name + " " + .name' | tr -d '\r' | while read v t; do fn="copyparty $v $t.py"; [ -e "$fn" ] || curl https://github.com/9001/copyparty/releases/download/$v/copyparty-sfx.py -Lo "$fn"; done
 
 
 ##

@@ -49,7 +49,7 @@ window.baguetteBox = (function () {
     };
 
     var touchstartHandler = function (e) {
-        touch.count++;
+        touch.count = e.touches.length;
         if (touch.count > 1)
             touch.multitouch = true;
 
@@ -72,8 +72,11 @@ window.baguetteBox = (function () {
             hideOverlay();
         }
     };
-    var touchendHandler = function () {
+    var touchendHandler = function (e) {
         touch.count--;
+        if (e && e.touches)
+            touch.count = e.touches.length;
+
         if (touch.count <= 0)
             touch.multitouch = false;
 
