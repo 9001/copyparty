@@ -419,6 +419,7 @@ window.baguetteBox = (function () {
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
         unbind(overlay, 'touchend', touchendHandler);
         unbind(document, 'focus', trapFocusInsideOverlay, true);
+        timer.rm(rotn);
     }
 
     function prepareOverlay(gallery, userOptions) {
@@ -669,18 +670,31 @@ window.baguetteBox = (function () {
         return true;
     }
 
+    var prev_cw = 0, prev_ch = 0, unrot_timer = null;
     function rotn(n) {
         var el = vidimg(),
             orot = parseInt(el.getAttribute('rot') || 0),
-            frot = orot + n * 90,
-            rot = frot,
+            frot = orot + (n || 0) * 90;
+
+        if (!frot && !orot)
+            return;  // reflow noop
+
+        var co = ebi('bbox-overlay'),
+            cw = co.clientWidth,
+            ch = co.clientHeight;
+
+        if (!n && prev_cw === cw && prev_ch === ch)
+            return;  // reflow noop
+
+        prev_cw = cw;
+        prev_ch = ch;
+        var rot = frot,
             iw = el.naturalWidth || el.videoWidth,
             ih = el.naturalHeight || el.videoHeight,
             magic = 4,  // idk, works in enough browsers
-            co = ebi('bbox-overlay'),
             dl = el.closest('div').querySelector('figcaption a'),
-            vw = co.clientWidth,
-            vh = co.clientHeight - dl.offsetHeight + magic,
+            vw = cw,
+            vh = ch - dl.offsetHeight + magic,
             pmag = Math.min(1, Math.min(vw / ih, vh / iw)),
             wmag = Math.min(1, Math.min(vw / iw, vh / ih));
 
@@ -703,12 +717,34 @@ window.baguetteBox = (function () {
         el.style.top = (vh - ih * mag) / 2 - magic + 'px';
         el.style.transform = 'rotate(' + frot + 'deg)';
         el.setAttribute('rot', frot);
+        timer.add(rotn);
+        if (!rot) {
+            clearTimeout(unrot_timer);
+            unrot_timer = setTimeout(unrot, 300);
+        }
     }
     function rotl() {
         rotn(-1);
     }
     function rotr() {
         rotn(1);
+    }
+    function unrot() {
+        var el = vidimg(),
+            orot = el.getAttribute('rot'),
+            rot = parseInt(orot || 0);
+
+        while (rot < 0) rot += 360;
+        while (rot >= 360) rot -= 360;
+        if (rot || orot === null)
+            return;
+
+        el.classList.add('nt');
+        el.removeAttribute('rot');
+        el.removeAttribute("style");
+        rot = el.offsetHeight;
+        el.classList.remove('nt');
+        timer.rm(rotn);
     }
 
     function vid() {
@@ -781,11 +817,17 @@ window.baguetteBox = (function () {
         mp_ctl();
         setVmode();
 
+        var el = vidimg();
+        if (el.getAttribute('rot'))
+            timer.add(rotn);
+        else
+            timer.rm(rotn);
+
         var prev = QS('.full-image.vis');
         if (prev)
             prev.classList.remove('vis');
 
-        vidimg().closest('div').classList.add('vis');
+        el.closest('div').classList.add('vis');
     }
 
     function preloadNext(index) {

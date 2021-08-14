@@ -1328,7 +1328,11 @@ html.light #tree::-webkit-scrollbar {
 	max-height: calc(100% - 1.4em);
 	margin-bottom: 1.4em;
 	vertical-align: middle;
-	transition: transform .2s, left .2s, top .2s, width .2s, height .2s;
+	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
+}
+.full-image img.nt,
+.full-image video.nt {
+	transition: none;
 }
 .full-image.vis img,
 .full-image.vis video {

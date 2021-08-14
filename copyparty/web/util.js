@@ -494,7 +494,7 @@ var timer = (function () {
         apop(r.q, fun);
     };
 
-    function impl() {
+    function doevents() {
         if (Date.now() - r.last < 69)
             return;
 
@@ -504,7 +504,7 @@ var timer = (function () {
 
         r.last = Date.now();
     }
-    setInterval(impl, 100);
+    setInterval(doevents, 100);
 
     return r;
 })();
