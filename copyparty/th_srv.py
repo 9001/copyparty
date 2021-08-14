@@ -21,7 +21,7 @@ HAVE_AVIF = False
 HAVE_WEBP = False
 
 try:
-    from PIL import Image, ImageOps
+    from PIL import Image, ImageOps, ExifTags
 
     HAVE_PIL = True
     try:
@@ -105,7 +105,10 @@ class ThumbSrv(object):
         self.mutex = threading.Lock()
         self.busy = {}
         self.stopping = False
-        self.nthr = os.cpu_count() if hasattr(os, "cpu_count") else 4
+        self.nthr = self.args.th_mt
+        if not self.nthr:
+            self.nthr = os.cpu_count() if hasattr(os, "cpu_count") else 4
+
         self.q = Queue(self.nthr * 4)
         for n in range(self.nthr):
             t = threading.Thread(
@@ -221,21 +224,38 @@ class ThumbSrv(object):
         with self.mutex:
             self.nthr -= 1
 
+    def fancy_pillow(self, im):
+        # exif_transpose is expensive (loads full image + unconditional copy)
+        r = max(*self.res) * 2
+        im.thumbnail((r, r), resample=Image.LANCZOS)
+        try:
+            k = next(k for k, v in ExifTags.TAGS.items() if v == "Orientation")
+            exif = im.getexif()
+            rot = int(exif[k])
+            del exif[k]
+        except:
+            rot = 1
+
+        rots = {8: Image.ROTATE_90, 3: Image.ROTATE_180, 6: Image.ROTATE_270}
+        if rot in rots:
+            im = im.transpose(rots[rot])
+
+        if self.args.th_no_crop:
+            im.thumbnail(self.res, resample=Image.LANCZOS)
+        else:
+            iw, ih = im.size
+            dw, dh = self.res
+            res = (min(iw, dw), min(ih, dh))
+            im = ImageOps.fit(im, res, method=Image.LANCZOS)
+
+        return im
+
     def conv_pil(self, abspath, tpath):
         with Image.open(fsenc(abspath)) as im:
-            crop = not self.args.th_no_crop
-            res2 = self.res
-            if crop:
-                res2 = (res2[0] * 2, res2[1] * 2)
-
             try:
-                im.thumbnail(res2, resample=Image.LANCZOS)
-                if crop:
-                    iw, ih = im.size
-                    dw, dh = self.res
-                    res = (min(iw, dw), min(ih, dh))
-                    im = ImageOps.fit(im, res, method=Image.LANCZOS)
-            except:
+                im = self.fancy_pillow(im)
+            except Exception as ex:
+                self.log("fancy_pillow {}".format(ex), "1;30")
                 im.thumbnail(self.res)
 
             fmts = ["RGB", "L"]
@@ -289,6 +309,7 @@ class ThumbSrv(object):
             b"-map", b"0:v:0",
             b"-vf", scale,
             b"-frames:v", b"1",
+            b"-metadata:s:v:0", b"rotate=0",
         ]
         # fmt: on
 
@@ -306,6 +327,7 @@ class ThumbSrv(object):
             ]
 
         cmd += [fsenc(tpath)]
+        # self.log((b" ".join(cmd)).decode("utf-8"))
 
         ret, sout, serr = runcmd(cmd)
         if ret != 0:

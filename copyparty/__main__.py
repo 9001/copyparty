@@ -378,6 +378,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
     ap2.add_argument("--th-size", metavar="WxH", default="320x256", help="thumbnail res")
+    ap2.add_argument("--th-mt", metavar="CORES", type=int, default=0, help="max num cpu cores to use, 0=all")
     ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
