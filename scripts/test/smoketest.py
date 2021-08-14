@@ -108,6 +108,7 @@ def tc1():
     pdirs = [x.replace("\\", "/") for x in pdirs]
     udirs = [x.split("/", 2)[2] for x in pdirs]
     perms = [x.rstrip("j/")[-1] for x in pdirs]
+    perms = ["rw" if x == "a" else x for x in perms]
     for pd, ud, p in zip(pdirs, udirs, perms):
         if ud[-1] == "j":
             continue
@@ -147,14 +148,14 @@ def tc1():
         u = "{}{}/a.h264".format(ub, d)
         r = requests.get(u)
         ok = bool(r)
-        if ok != (p in ["a"]):
+        if ok != (p in ["rw"]):
             raise Exception("get {} with perm {} at {}".format(ok, p, u))
 
     # stat filesystem
     for d, p in zip(pdirs, perms):
         u = "{}/a.h264".format(d)
         ok = os.path.exists(u)
-        if ok != (p in ["a", "w"]):
+        if ok != (p in ["rw", "w"]):
             raise Exception("stat {} with perm {} at {}".format(ok, p, u))
 
     # GET thumbnail, vreify contents
@@ -162,7 +163,7 @@ def tc1():
         u = "{}{}/a.h264?th=j".format(ub, d)
         r = requests.get(u)
         ok = bool(r and r.content[:3] == b"\xff\xd8\xff")
-        if ok != (p in ["a"]):
+        if ok != (p in ["rw"]):
             raise Exception("thumb {} with perm {} at {}".format(ok, p, u))
 
     # check tags
@@ -179,10 +180,10 @@ def tc1():
         r_ok = bool(j)
         w_ok = bool(r_ok and j.get("files"))
 
-        if not r_ok or w_ok != (p in ["a"]):
+        if not r_ok or w_ok != (p in ["rw"]):
             raise Exception("ls {} with perm {} at {}".format(ok, p, u))
 
-        if (tag and p != "a") or (not tag and p == "a"):
+        if (tag and p != "rw") or (not tag and p == "rw"):
             raise Exception("tag {} with perm {} at {}".format(tag, p, u))
 
         if tag is not None and tag != "48x32":
