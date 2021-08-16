@@ -1658,7 +1658,7 @@ var fileman = (function () {
 			r.clip = jread('fman_clip', []);
 
 		var nsel = msel.getsel().length;
-		clmod(bren, 'en', nsel == 1);
+		clmod(bren, 'en', nsel);
 		clmod(bdel, 'en', nsel);
 		clmod(bcut, 'en', nsel);
 		clmod(bpst, 'en', r.clip && r.clip.length);
@@ -2019,17 +2019,21 @@ var fileman = (function () {
 		if (!sel.length)
 			return toast.err(3, 'select at least 1 item to cut');
 
-		if (sel.length < 100)
-			for (var a = 0; a < sel.length; a++) {
-				vps.push(sel[a].vp);
-				var cl = ebi(sel[a].id).closest('tr').classList,
-					inv = cl.contains('c1');
-
-				cl.remove(inv ? 'c1' : 'c2');
-				cl.add(inv ? 'c2' : 'c1');
+		var els = [];
+		for (var a = 0; a < sel.length; a++) {
+			vps.push(sel[a].vp);
+			if (sel.length < 100) {
+				els.push(ebi(sel[a].id).closest('tr'));
+				clmod(els[a], 'fcut');
 			}
+		}
 
-		toast.inf(1, 'cut ' + sel.length + ' items');
+		setTimeout(function () {
+			for (var a = 0; a < els.length; a++)
+				clmod(els[a], 'fcut', 1);
+		}, 1);
+
+		toast.inf(1.5, 'cut ' + sel.length + ' items');
 		jwrite('fman_clip', vps);
 		r.tx(1);
 	};
@@ -3157,7 +3161,13 @@ var treectl = (function () {
 		}
 		html.push('</tbody>');
 		html = html.join('\n');
-		ebi('files').innerHTML = html;
+		try {
+			ebi('files').innerHTML = html;
+		}
+		catch (ex) { //ie9
+			window.location.href = this.top;
+			return;
+		}
 
 		if (this.hpush)
 			hist_push(this.top);
@@ -3778,7 +3788,7 @@ var msel = (function () {
 		if (r.all && r.all.length) {
 			for (var a = 0; a < r.all.length; a++) {
 				var ao = r.all[a];
-				ao.sel = ebi(ao.id).closest('tr').classList.contains('sel');
+				ao.sel = clgot(ebi(ao.id).closest('tr'), 'sel');
 				if (ao.sel)
 					r.sel.push(ao);
 			}
@@ -3794,7 +3804,7 @@ var msel = (function () {
 				item = {};
 
 			item.id = links[a].getAttribute('id');
-			item.sel = links[a].closest('tr').classList.contains('sel');
+			item.sel = clgot(links[a].closest('tr'), 'sel');
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
 
 			r.all.push(item);

@@ -96,20 +96,16 @@ function md_changed(mde, on_srv) {
     var md_now = mde.value();
     var save_btn = QS('.editor-toolbar button.save');
 
-    if (md_now == window.md_saved)
-        save_btn.classList.add('disabled');
-    else
-        save_btn.classList.remove('disabled');
-
+    clmod(save_btn, 'disabled', md_now == window.md_saved);
     set_jumpto();
 }
 
 function save(mde) {
     var save_btn = QS('.editor-toolbar button.save');
-    if (save_btn.classList.contains('disabled'))
+    if (clgot(save_btn, 'disabled'))
         return toast.inf(2, 'no changes');
 
-    var force = save_btn.classList.contains('force-save');
+    var force = clgot(save_btn, 'force-save');
     function save2() {
         var txt = mde.value();
 
@@ -153,8 +149,8 @@ function save_cb() {
     }
 
     if (!r.ok) {
-        if (!this.btn.classList.contains('force-save')) {
-            this.btn.classList.add('force-save');
+        if (!clgot(this.btn, 'force-save')) {
+            clmod(this.btn, 'force-save', 1);
             var msg = [
                 'This file has been modified since you started editing it!\n',
                 'if you really want to overwrite, press save again.\n',
@@ -170,7 +166,7 @@ function save_cb() {
             return toast.err(0, 'Error! Save failed.  Maybe this JSON explains why:\n\n' + this.responseText);
     }
 
-    this.btn.classList.remove('force-save');
+    clmod(this.btn, 'force-save');
     //alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
 
     // download the saved doc from the server and compare

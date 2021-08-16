@@ -370,8 +370,8 @@ function save_cb() {
     }
 
     if (!r.ok) {
-        if (!this.btn.classList.contains('force-save')) {
-            this.btn.classList.add('force-save');
+        if (!clgot(this.btn, 'force-save')) {
+            clmod(this.btn, 'force-save', 1);
             var msg = [
                 'This file has been modified since you started editing it!\n',
                 'if you really want to overwrite, press save again.\n',
@@ -387,7 +387,7 @@ function save_cb() {
             return toast.err(0, 'Error! Save failed.  Maybe this JSON explains why:\n\n' + this.responseText);
     }
 
-    this.btn.classList.remove('force-save');
+    clmod(this.btn, 'force-save');
     //alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
 
     run_savechk(r.lastmod, this.txt, this.btn, 0);

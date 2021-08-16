@@ -123,11 +123,18 @@ if (!String.startsWith) {
         return this.substring(i, i + s.length) === s;
     };
 }
+if (!Element.prototype.matches) {
+    Element.prototype.matches =
+        Element.prototype.oMatchesSelector ||
+        Element.prototype.msMatchesSelector ||
+        Element.prototype.mozMatchesSelector ||
+        Element.prototype.webkitMatchesSelector;
+}
 if (!Element.prototype.closest) {
     Element.prototype.closest = function (s) {
         var el = this;
         do {
-            if (el.msMatchesSelector(s)) return el;
+            if (el.matches(s)) return el;
             el = el.parentElement || el.parentNode;
         } while (el !== null && el.nodeType === 1);
     }
@@ -170,12 +177,28 @@ function crc32(str) {
 }
 
 
-function clmod(obj, cls, add) {
+function clmod(el, cls, add) {
+    if (el.classList) {
+        if (add == 't')
+            add = el.classList.contains(cls) ? 0 : 1;
+
+        return el.classList[add ? 'add' : 'remove'](cls);
+    }
+
     var re = new RegExp('\\s*\\b' + cls + '\\s*\\b', 'g');
     if (add == 't')
-        add = !re.test(obj.className);
+        add = !re.test(el.className);
 
-    obj.className = obj.className.replace(re, ' ') + (add ? ' ' + cls : '');
+    el.className = el.className.replace(re, ' ') + (add ? ' ' + cls : '');
+}
+
+
+function clgot(el, cls) {
+    if (el.classList)
+        return el.classList.contains(cls);
+
+    var lst = (el.getAttribute('class') + '').split(/ /g);
+    return has(lst, cls);
 }
 
 

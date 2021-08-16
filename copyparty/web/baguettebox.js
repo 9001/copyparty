@@ -742,11 +742,11 @@ window.baguetteBox = (function () {
         if (rot || orot === null)
             return;
 
-        el.classList.add('nt');
+        clmod(el, 'nt', 1);
         el.removeAttribute('rot');
         el.removeAttribute("style");
         rot = el.offsetHeight;
-        el.classList.remove('nt');
+        clmod(el, 'nt');
         timer.rm(rotn);
     }
 
@@ -799,15 +799,21 @@ window.baguetteBox = (function () {
     }
 
     function updateOffset() {
-        var offset = -currentIndex * 100 + '%';
+        var offset = -currentIndex * 100 + '%',
+            xform = slider.style.perspective !== undefined;
+
         if (options.animation === 'fadeIn') {
             slider.style.opacity = 0;
             setTimeout(function () {
-                slider.style.transform = 'translate3d(' + offset + ',0,0)';
+                xform ?
+                    slider.style.transform = 'translate3d(' + offset + ',0,0)' :
+                    slider.style.left = offset;
                 slider.style.opacity = 1;
             }, 400);
         } else {
-            slider.style.transform = 'translate3d(' + offset + ',0,0)';
+            xform ?
+                slider.style.transform = 'translate3d(' + offset + ',0,0)' :
+                slider.style.left = offset;
         }
         playvid(false);
         var v = vid();
@@ -828,9 +834,9 @@ window.baguetteBox = (function () {
 
         var prev = QS('.full-image.vis');
         if (prev)
-            prev.classList.remove('vis');
+            clmod(prev, 'vis');
 
-        el.closest('div').classList.add('vis');
+        clmod(el.closest('div'), 'vis', 1);
     }
 
     function preloadNext(index) {

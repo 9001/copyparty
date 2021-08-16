@@ -417,17 +417,10 @@ html.light #ggrid a.sel {
 html.light #wfm a:not(.en) {
 	color: #c4a;
 }
-#files tbody tr.c1 td {
-	animation: fcut1 .5s ease-out;
+#files tbody tr.fcut td {
+	animation: fcut .5s ease-out;
 }
-#files tbody tr.c2 td {
-	animation: fcut2 .5s ease-out;
-}
-@keyframes fcut1 {
-	0% {opacity:0}
-	100% {opacity:1}
-}
-@keyframes fcut2 {
+@keyframes fcut {
 	0% {opacity:0}
 	100% {opacity:1}
 }
@@ -900,6 +893,7 @@ html.light #ghead {
 }
 #ggrid a {
 	display: inline-block;
+	width: 10em;
 	width: var(--grid-sz);
 	vertical-align: top;
 	overflow-wrap: break-word;
@@ -913,7 +907,9 @@ html.light #ghead {
 }
 #ggrid a img {
 	border-radius: .2em;
+	max-width: 10em;
 	max-width: var(--grid-sz);
+	max-height: 8em;
 	max-height: calc(var(--grid-sz)/1.25);
 	margin: 0 auto;
 	display: block;

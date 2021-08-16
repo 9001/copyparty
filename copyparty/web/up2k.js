@@ -1703,11 +1703,10 @@ function up2k_init(subtle) {
         catch (ex) { }
 
         try {
-            var fun = fsearch ? 'add' : 'remove',
-                ico = fsearch ? '🔎' : '🚀',
+            var ico = fsearch ? '🔎' : '🚀',
                 desc = fsearch ? 'Search' : 'Upload';
 
-            ebi('op_up2k').classList[fun]('srch');
+            clmod(ebi('op_up2k'), 'srch', fsearch);
             ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
         }
         catch (ex) { }

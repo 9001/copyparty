@@ -580,28 +580,32 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 `ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
 
-| feature         | ie6 | ie9 | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
-| --------------- | --- | --- | ---- | ---- | ----- | ---- | --- | ---- |
-| browse files    | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| basic uploader  | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| make directory  | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| send message    | yep | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| set sort order  |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| zip selection   |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| navpane         |  -  |  -  | `*1` | yep  | yep   | yep  | yep | yep  |
-| up2k            |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
-| markdown editor |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
-| markdown viewer |  -  |  -  | yep  | yep  | yep   | yep  | yep | yep  |
-| play mp3/m4a    |  -  | yep | yep  | yep  | yep   | yep  | yep | yep  |
-| play ogg/opus   |  -  |  -  |  -   |  -   | yep   | yep  | `*2` | yep |
-| thumbnail view  |  -  |  -  | -    | -    | yep   | yep  | yep | yep  |
-| image viewer    |  -  |  -  | -    | -    | yep   | yep  | yep | yep  |
-| **= feature =** | ie6 | ie9 | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| feature         | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| --------------- | --- | --- -| ---- | ---- | ----- | ---- | --- | ---- |
+| browse files    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| thumbnail view  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| basic uploader  | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| up2k            |  -  |  -   |  -   |  -   |  yep  | yep  | yep | yep  |
+| make directory  | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| send message    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| set sort order  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| zip selection   |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| file rename     |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| file cut/paste  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| navpane         |  -  | `*1` | `*2` | yep  |  yep  | yep  | yep | yep  |
+| image viewer    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| video player    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| markdown editor |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
+| markdown viewer |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
+| play mp3/m4a    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| play ogg/opus   |  -  |  -   |  -   |  -   |  yep  | yep  | `*3` | yep |
+| **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
 
 * internet explorer 6 to 8 behave the same
 * firefox 52 and chrome 49 are the last winxp versions
-* `*1` only public folders (login session is dropped) and no history / back-button
-* `*2` using a wasm decoder which can sometimes get stuck and consumes a bit more power
+* `*1` causes a full-page refresh on each navigation
+* `*2` only public folders (login session is dropped) and no history / back-button
+* `*3` using a wasm decoder which can sometimes get stuck and consumes a bit more power
 
 quick summary of more eccentric web-browsers trying to view a directory index:
 
@@ -613,6 +617,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **lynx** (2.8.9/macports) | can browse, login, upload/mkdir/msg |
 | **w3m** (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
 | **netsurf** (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
+| **opera** (11.60/winxp)   | OK: thumbnails, image-viewer, zip-selection, rename/cut/paste. NG: up2k, navpane, markdown, audio |
 | **ie4** and **netscape** 4.0  | can browse (text is yellow on white), upload with `?b=u` |
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 
