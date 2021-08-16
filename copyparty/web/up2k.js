@@ -511,7 +511,7 @@ function up2k_init(subtle) {
             import_js('/.cpr/deps/' + fn, unmodal);
 
             if (is_https)
-                ebi('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500kB/s at best';
+                ebi('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500 KiB/s at best';
             else
                 ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span style="color:#' +
                     (sha_js == 'ac' ? 'c84">(expecting 20' : '8a5">(but dont worry too much, expect 100') + ' MiB/s)</span>';
@@ -805,13 +805,13 @@ function up2k_init(subtle) {
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
                 name = good_files[a][1],
-                fdir = '',
+                fdir = get_evpath(),
                 now = Date.now(),
                 lmod = fobj.lastModified || now,
                 ofs = name.lastIndexOf('/') + 1;
 
             if (ofs) {
-                fdir = name.slice(0, ofs);
+                fdir += url_enc(name.slice(0, ofs));
                 name = name.slice(ofs);
             }
 
@@ -1263,7 +1263,7 @@ function up2k_init(subtle) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
         };
 
-        xhr.open('HEAD', t.purl + t.name, true);
+        xhr.open('HEAD', t.purl + uricom_enc(t.name), true);
         xhr.send();
     }
 
@@ -1340,12 +1340,13 @@ function up2k_init(subtle) {
                     return;
                 }
 
-                if (response.purl !== t.purl || response.name !== t.name) {
+                var rsp_purl = url_enc(response.purl);
+                if (rsp_purl !== t.purl || response.name !== t.name) {
                     // server renamed us (file exists / path restrictions)
-                    console.log("server-rename [" + t.purl + "] [" + t.name + "] to [" + response.purl + "] [" + response.name + "]");
-                    t.purl = response.purl;
+                    console.log("server-rename [" + t.purl + "] [" + t.name + "] to [" + rsp_purl + "] [" + response.name + "]");
+                    t.purl = rsp_purl;
                     t.name = response.name;
-                    pvis.seth(t.n, 0, linksplit(t.purl + t.name).join(' '));
+                    pvis.seth(t.n, 0, linksplit(uricom_dec(t.purl)[0] + t.name).join(' '));
                 }
 
                 var chunksize = get_chunksize(t.size),

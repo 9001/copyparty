@@ -585,14 +585,14 @@ copyparty can invoke external programs to collect additional metadata for files 
 | browse files    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | thumbnail view  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | basic uploader  | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
-| up2k            |  -  |  -   |  -   |  -   |  yep  | yep  | yep | yep  |
+| up2k            |  -  |  -   | `*1` | `*1` |  yep  | yep  | yep | yep  |
 | make directory  | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | send message    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | set sort order  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | zip selection   |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | file rename     |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | file cut/paste  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
-| navpane         |  -  | `*1` | `*2` | yep  |  yep  | yep  | yep | yep  |
+| navpane         |  -  | `*2` | yep  | yep  |  yep  | yep  | yep | yep  |
 | image viewer    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | video player    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | markdown editor |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
@@ -603,8 +603,8 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 * internet explorer 6 to 8 behave the same
 * firefox 52 and chrome 49 are the last winxp versions
-* `*1` causes a full-page refresh on each navigation
-* `*2` only public folders (login session is dropped) and no history / back-button
+* `*1` yes, but extremely slow (ie10: 1 MiB/s, ie11: 270 KiB/s)
+* `*2` causes a full-page refresh on each navigation
 * `*3` using a wasm decoder which can sometimes get stuck and consumes a bit more power
 
 quick summary of more eccentric web-browsers trying to view a directory index:

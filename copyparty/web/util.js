@@ -331,6 +331,16 @@ function uricom_enc(txt, do_fb_enc) {
     }
 }
 
+function url_enc(txt) {
+    var parts = txt.split('/'),
+        ret = [];
+
+    for (var a = 0; a < parts.length; a++)
+        ret.push(uricom_enc(parts[a]));
+
+    return ret.join('/');
+}
+
 
 function uricom_dec(txt) {
     try {
