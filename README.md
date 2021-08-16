@@ -35,6 +35,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [zip downloads](#zip-downloads)
     * [uploading](#uploading)
         * [file-search](#file-search)
+        * [unpost](#unpost)
     * [file manager](#file-manager)
     * [batch rename](#batch-rename)
     * [markdown viewer](#markdown-viewer)
@@ -124,7 +125,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
   * ☑ stash: simple PUT filedropper
-  * ☑ unpost: undo/delete accidental uploads
+  * ☑ [unpost](#unpost): undo/delete accidental uploads
   * ☑ symlink/discard existing files (content-matching)
 * download
   * ☑ single files in browser
@@ -208,14 +209,14 @@ example:
 
 # the browser
 
-![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/115978054-65106380-a57d-11eb-98f8-59e3dee73557.png)
+![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/129635359-d6dd9b07-8079-4020-ad77-2bfdb9ebd8d5.png)
 
 
 ## tabs
 
-* `[🔎]` search by size, date, path/name, mp3-tags ... see [searching](#searching)
-* `[🧯]` unpost: undo/delete accidental uploads
-* `[🚀]` and `[🎈]` are the uploaders, see [uploading](#uploading)
+* `[🔎]` [search](#searching) by size, date, path/name, mp3-tags ...
+* `[🧯]` [unpost](#unpost): undo/delete accidental uploads
+* `[🚀]` and `[🎈]` are the [uploaders](#uploading)
 * `[📂]` mkdir: create directories
 * `[📝]` new-md: create a new markdown document
 * `[📟]` send-msg: either to server-log or into textfiles if `--urlform save`
@@ -281,7 +282,7 @@ click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` tog
 
 ## thumbnails
 
-![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/120070302-10836b00-c08a-11eb-8eb4-82004a34c342.png)
+![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
 it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
 
@@ -309,7 +310,7 @@ the `zip` link next to folders can produce various types of zip/tar files using 
 
 you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
 
-![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/116008321-372a2e00-a614-11eb-9a4a-4a1fd9074224.png)
+![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/129635374-e5136e01-470a-49b1-a762-848e8a4c9cdc.png)
 
 ## uploading
 
@@ -317,7 +318,7 @@ two upload methods are available in the html client:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
 * `[🚀] up2k`, the fancy one
 
-you can undo/delete uploads using `[🧯] unpost` if the server is running with `-e2d`
+you can undo/delete uploads using `[🧯]` [unpost](#unpost)
 
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
@@ -331,7 +332,7 @@ up2k has several advantages:
 
 see [up2k](#up2k) for details on how it works
 
-![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/115978061-680b5400-a57d-11eb-9ef6-cbb5f60aeccc.png)
+![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/129635371-48fc54ca-fa91-48e3-9b1d-ba413e4b68cb.png)
 
 **protip:** you can avoid scaring away users with [docs/minimal-up2k.html](docs/minimal-up2k.html) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
 
@@ -352,7 +353,7 @@ and then theres the tabs below it,
 
 ### file-search
 
-![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/116008320-36919780-a614-11eb-803f-04162326a700.png)
+![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
 
 in the `[🚀 up2k]` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
 
@@ -364,6 +365,13 @@ adding the same file multiple times is blocked, so if you first search for a fil
 note that since up2k has to read the file twice, `[🎈 bup]` can be up to 2x faster in extreme cases (if your internet connection is faster than the read-speed of your HDD)
 
 up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
+
+
+### unpost
+
+![copyparty-unpost-fs8](https://user-images.githubusercontent.com/241032/129635368-3afa6634-c20f-418c-90dc-ec411f3b3897.png)
+
+you can undo/delete uploads within `--unpost` seconds (default 12 hours) if the server is running with `-e2d`
 
 
 ## file manager
@@ -436,7 +444,7 @@ the metadata keys you can use in the format field are the ones in the file-brows
 
 ## searching
 
-![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/115978060-6772bd80-a57d-11eb-81d3-174e869b72c3.png)
+![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/129635365-c0ff2a9f-0ee5-4fc3-8bb6-006033cf67b8.png)
 
 when started with `-e2dsa` copyparty will scan/index all your files. This avoids duplicates on upload, and also makes the volumes searchable through the web-ui:
 * make search queries by `size`/`date`/`directory-path`/`filename`, or...
