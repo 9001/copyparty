@@ -160,6 +160,7 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: A">+</a>\n' +
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: D">&ndash;</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
+	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">v</a>\n' +
 	'</div>\n' +
 	'<ul id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
@@ -2391,7 +2392,8 @@ var thegrid = (function () {
 })();
 
 
-function tree_scrollto() {
+function tree_scrollto(e) {
+	ev(e);
 	var act = QS('#treeul a.hl'),
 		ul = act ? act.offsetParent : null;
 
@@ -2851,7 +2853,7 @@ var treectl = (function () {
 	var treectl = {
 		"hidden": true,
 		"ls_cb": null,
-		"dir_cb": null
+		"dir_cb": tree_scrollto
 	},
 		entreed = false,
 		fixedpos = false,
@@ -3239,6 +3241,7 @@ var treectl = (function () {
 
 	ebi('entree').onclick = treectl.entree;
 	ebi('detree').onclick = treectl.detree;
+	ebi('visdir').onclick = tree_scrollto;
 	ebi('dotfiles').onclick = tdots;
 	ebi('dyntree').onclick = dyntree;
 	ebi('twig').onclick = scaletree;

@@ -709,6 +709,10 @@ input.eq_gain {
 	position: sticky;
 	z-index: 1;
 	top: 0;
+    height: 2.2em;
+    line-height: 2.2em;
+    border-bottom: 1px solid #555;
+    overflow: hidden;
 }
 #thx_ff {
 	padding: 5em 0;
@@ -1251,6 +1255,7 @@ html.light #files tr.sel a:hover {
 }
 html.light #treeh {
 	background: #eee;
+	border-color: #ddd;
 }
 html.light #tree {
 	scrollbar-color: #a70 #ddd;
