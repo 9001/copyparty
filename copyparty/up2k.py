@@ -1223,7 +1223,8 @@ class Up2k(object):
 
                 self._new_upload(job)
 
-            purl = "/{}/".format("{}/{}".format(job["vtop"], job["prel"]).strip("/"))
+            purl = "{}/{}".format(job["vtop"], job["prel"]).strip("/")
+            purl = "/{}/".format(purl) if purl else "/"
 
             return {
                 "name": job["name"],
