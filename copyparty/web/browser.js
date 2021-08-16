@@ -43,7 +43,7 @@ ebi('widget').innerHTML = (
 	' href="#" id="npirc" tt="copy irc-formatted track info">📋irc</a><a' +
 	' href="#" id="nptxt" tt="copy plaintext track info">📋txt</a>' +
 	'</span><a' +
-	'	href="#" id="wtgrid" tt="toggle grid/list view">田</a><a' +
+	'	href="#" id="wtgrid" tt="toggle grid/list view$NHotkey: G">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
