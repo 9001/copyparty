@@ -346,10 +346,8 @@ def log_thrs(log, ival, name):
 
 def vol_san(vols, txt):
     for vol in vols:
-        txt = txt.replace(
-            vol.realpath.encode("utf-8"), vol.vpath.encode("utf-8")
-        )
-    
+        txt = txt.replace(vol.realpath.encode("utf-8"), vol.vpath.encode("utf-8"))
+
     return txt
 
 

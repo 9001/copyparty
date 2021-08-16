@@ -956,10 +956,14 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
+        upload_vpath = self.vpath
         lim = vfs.get_dbv(rem)[0].lim
         fdir_base = os.path.join(vfs.realpath, rem)
         if lim:
             fdir_base, rem = lim.all(self.ip, rem, -1, fdir_base)
+            upload_vpath = "{}/{}".format(vfs.vpath, rem).strip("/")
+            if not nullwrite:
+                bos.makedirs(fdir_base)
 
         files = []
         errmsg = ""
@@ -986,8 +990,6 @@ class HttpCli(object):
                 if lim:
                     lim.chk_bup(self.ip)
                     lim.chk_nup(self.ip)
-                    if not nullwrite:
-                        bos.makedirs(fdir)
 
                 try:
                     with ren_open(fname, "wb", 512 * 1024, **open_args) as f:
@@ -1038,7 +1040,9 @@ class HttpCli(object):
                     raise
 
         except Pebkac as ex:
-            errmsg = volsan(self.asrv.vfs.all_vols.values(), unicode(ex))
+            errmsg = vol_san(
+                self.asrv.vfs.all_vols.values(), unicode(ex).encode("utf-8")
+            ).decode("utf-8")
 
         td = max(0.1, time.time() - t0)
         sz_total = sum(x[0] for x in files)
@@ -1058,7 +1062,7 @@ class HttpCli(object):
             errmsg = "ERROR: " + errmsg
 
         for sz, sha512, ofn, lfn in files:
-            vpath = (self.vpath + "/" if self.vpath else "") + lfn
+            vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
             msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a>\n'.format(
                 sha512[:56], sz, quotep(vpath), html_escape(ofn, crlf=True)
             )
