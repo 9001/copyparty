@@ -581,7 +581,7 @@ copyparty can invoke external programs to collect additional metadata for files 
 `ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
 
 | feature         | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
-| --------------- | --- | --- -| ---- | ---- | ----- | ---- | --- | ---- |
+| --------------- | --- | ---- | ---- | ---- | ----- | ---- | --- | ---- |
 | browse files    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | thumbnail view  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | basic uploader  | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
