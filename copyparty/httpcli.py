@@ -1699,7 +1699,7 @@ class HttpCli(object):
 
             q = "select sz, rd, fn, at from up where ip=? and at>?"
             for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
-                vp = "/" + "/".join([rd, fn]).strip("/")
+                vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
                 if filt and filt not in vp:
                     continue
 
