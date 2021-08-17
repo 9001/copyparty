@@ -27,6 +27,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
+* [accounts and volumes](#accounts-and-volumes)
 * [the browser](#the-browser)
     * [tabs](#tabs)
     * [hotkeys](#hotkeys)
@@ -43,7 +44,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [searching](#searching)
 * [server config](#server-config)
     * [upload rules](#upload-rules)
-    * [database location](#database-location)upload rules
+    * [compress uploads](#compress-uploads)
+    * [database location](#database-location)
     * [metadata from audio files](#metadata-from-audio-files)
     * [file parser plugins](#file-parser-plugins)
     * [complete examples](#complete-examples)
