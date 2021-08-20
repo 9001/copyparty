@@ -1782,7 +1782,7 @@ class HttpCli(object):
                     for fn in self.args.th_covers.split(","):
                         fp = os.path.join(abspath, fn)
                         if bos.path.exists(fp):
-                            vrem = "{}/{}".format(vrem.rstrip("/"), fn)
+                            vrem = "{}/{}".format(vrem.rstrip("/"), fn).strip("/")
                             is_dir = False
                             break
 
