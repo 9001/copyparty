@@ -19,52 +19,53 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 ## readme toc
 
 * top
-    * [quickstart](#quickstart)
-        * [on debian](#on-debian)
-    * [notes](#notes)
-    * [status](#status)
-    * [testimonials](#testimonials)
+    * [quickstart](#quickstart) - download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
+        * [on debian](#on-debian) - recommended additional steps on debian
+    * [notes](#notes) - general notes
+    * [status](#status) - summary: all planned features work! now please enjoy the bloatening
+    * [testimonials](#testimonials) - small collection of user feedback
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
-* [accounts and volumes](#accounts-and-volumes)
-* [the browser](#the-browser)
-    * [tabs](#tabs)
-    * [hotkeys](#hotkeys)
-    * [navpane](#navpane)
-    * [thumbnails](#thumbnails)
-    * [zip downloads](#zip-downloads)
-    * [uploading](#uploading)
-        * [file-search](#file-search)
-        * [unpost](#unpost)
-    * [file manager](#file-manager)
-    * [batch rename](#batch-rename)
-    * [markdown viewer](#markdown-viewer)
+* [accounts and volumes](#accounts-and-volumes) - per-folder permissions for specific users
+* [the browser](#the-browser) - accessing a copyparty server using a web-browser
+    * [tabs](#tabs) - the main tabs in the ui
+    * [hotkeys](#hotkeys) - the browser has the following hotkeys (always qwerty)
+    * [navpane](#navpane) - switching between breadcrumbs or navpane
+    * [thumbnails](#thumbnails) - press `g` to toggle image/video thumbnails instead of the file listing
+    * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
+    * [uploading](#uploading) - web-browsers can upload using `bup` and `up2k`
+        * [file-search](#file-search) - drop files/folders into up2k to see if they exist on the server
+        * [unpost](#unpost) - undo/delete accidental uploads
+    * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
+    * [batch rename](#batch-rename) - select some files and press F2 to bring up the rename UI
+    * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
-    * [searching](#searching)
+    * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config)
-    * [upload rules](#upload-rules)
-    * [compress uploads](#compress-uploads)
-    * [database location](#database-location)
-    * [metadata from audio files](#metadata-from-audio-files)
-    * [file parser plugins](#file-parser-plugins)
+    * [file indexing](#file-indexing)
+    * [upload rules](#upload-rules) - set upload rules using volume flags, some examples
+    * [compress uploads](#compress-uploads) - files can be autocompressed on upload
+    * [database location](#database-location) - can be stored in-volume (default) or elsewhere
+    * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
+    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
     * [complete examples](#complete-examples)
-* [browser support](#browser-support)
-* [client examples](#client-examples)
-* [up2k](#up2k)
-* [performance](#performance)
-* [dependencies](#dependencies)
-    * [optional dependencies](#optional-dependencies)
+* [browser support](#browser-support) - TLDR: yes
+* [client examples](#client-examples) - interact with copyparty using non-browser clients
+* [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
+* [performance](#performance) - defaults are good for most cases
+* [dependencies](#dependencies) - mandatory deps
+    * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
-* [sfx](#sfx)
-    * [sfx repack](#sfx-repack)
+* [sfx](#sfx) - there are two self-contained "binaries"
+    * [sfx repack](#sfx-repack) - reduce the size of an sfx by disabling features
 * [install on android](#install-on-android)
 * [building](#building)
     * [dev env setup](#dev-env-setup)
     * [just the sfx](#just-the-sfx)
     * [complete release](#complete-release)
-* [todo](#todo)
+* [todo](#todo) - roughly sorted by priority
     * [discarded ideas](#discarded-ideas)
 
 
@@ -89,7 +90,9 @@ you may also want these, especially on servers:
 
 ### on debian
 
-recommended steps to enable audio metadata and thumbnails (from images and videos):
+recommended additional steps on debian
+
+enable audio metadata and thumbnails (from images and videos):
 
 * as root, run the following:  
   `apt install python3 python3-pip python3-dev ffmpeg`
@@ -102,7 +105,7 @@ recommended steps to enable audio metadata and thumbnails (from images and video
 
 ## notes
 
-general:
+general notes:
 * paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
   * because no browsers currently implement the media-query to do this properly orz
 
@@ -187,6 +190,7 @@ small collection of user feedback
 
 # accounts and volumes
 
+per-folder permissions for specific users
 * `-a usr:pwd` adds account `usr` with password `pwd`
 * `-v .::r` adds current-folder `.` as the webroot, `r`eadable by anyone
   * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
@@ -211,11 +215,14 @@ example:
 
 # the browser
 
+accessing a copyparty server using a web-browser
+
 ![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/129635359-d6dd9b07-8079-4020-ad77-2bfdb9ebd8d5.png)
 
 
 ## tabs
 
+the main tabs in the ui
 * `[🔎]` [search](#searching) by size, date, path/name, mp3-tags ...
 * `[🧯]` [unpost](#unpost): undo/delete accidental uploads
 * `[🚀]` and `[🎈]` are the [uploaders](#uploading)
@@ -228,7 +235,7 @@ example:
 
 ## hotkeys
 
-the browser has the following hotkeys (assumes qwerty, ignores actual layout)
+the browser has the following hotkeys (always qwerty)
 * `B` toggle breadcrumbs / navpane
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
@@ -277,12 +284,16 @@ the browser has the following hotkeys (assumes qwerty, ignores actual layout)
 
 ## navpane
 
-by default there's a breadcrumbs path; you can replace this with a navpane (tree-browser sidebar thing) by clicking the `🌲` or pressing the `B` hotkey
+switching between breadcrumbs or navpane
+
+click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (default), or a navpane (tree-browser sidebar thing)
 
 click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
 
 
 ## thumbnails
+
+press `g` to toggle image/video thumbnails instead of the file listing
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
@@ -295,7 +306,9 @@ in the grid/thumbnail view, if the audio player panel is open, songs will start 
 
 ## zip downloads
 
-the `zip` link next to folders can produce various types of zip/tar files using these alternatives in the browser settings tab:
+download folders (or file selections) as `zip` or `tar` files
+
+select which type of archive you want in the browser settings tab:
 
 | name | url-suffix | description |
 |--|--|--|
@@ -314,9 +327,10 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 ![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/129635374-e5136e01-470a-49b1-a762-848e8a4c9cdc.png)
 
+
 ## uploading
 
-two upload methods are available in the html client:
+web-browsers can upload using `bup` and `up2k`:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
 * `[🚀] up2k`, the fancy one
 
@@ -342,7 +356,7 @@ the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
 * `[🏃]` analysis of other files should continue while one is uploading
 * `[💭]` ask for confirmation before files are added to the list
-* `[💤]` sync uploading between other copyparty tabs so only one is active
+* `[💤]` sync uploading between other copyparty browser-tabs so only one is active
 * `[🔎]` switch between upload and file-search mode
 
 and then theres the tabs below it,
@@ -353,11 +367,14 @@ and then theres the tabs below it,
   * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
+
 ### file-search
+
+drop files/folders into up2k to see if they exist on the server
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
 
-in the `[🚀 up2k]` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere already
+in the `[🚀 up2k]` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere
 
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else, this is no longer the case but now i've warmed up to the idea too much
@@ -371,23 +388,25 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 
 ### unpost
 
+undo/delete accidental uploads
+
 ![copyparty-unpost-fs8](https://user-images.githubusercontent.com/241032/129635368-3afa6634-c20f-418c-90dc-ec411f3b3897.png)
 
-you can undo/delete uploads within `--unpost` seconds (default 12 hours) if the server is running with `-e2d`
+you can unpost even if you don't have regular move/delete access, however only for files uploaded within the past `--unpost` seconds (default 12 hours) and the server must be running with `-e2d`
 
 
 ## file manager
 
-if you have the required permissions, you can cut/paste, rename, and delete files/folders
+cut/paste, rename, and delete files/folders (if you have permission)
 
 you can move files across browser tabs (cut in one tab, paste in another)
 
 
 ## batch rename
 
-![batch-rename-fs8](https://user-images.githubusercontent.com/241032/128434204-eb136680-3c07-4ec7-92e0-ae86af20c241.png)
-
 select some files and press F2 to bring up the rename UI
+
+![batch-rename-fs8](https://user-images.githubusercontent.com/241032/128434204-eb136680-3c07-4ec7-92e0-ae86af20c241.png)
 
 quick explanation of the buttons,  
 * `[✅ apply rename]` confirms and begins renaming
@@ -432,6 +451,8 @@ the metadata keys you can use in the format field are the ones in the file-brows
 
 ## markdown viewer
 
+and there are *two* editors
+
 ![copyparty-md-read-fs8](https://user-images.githubusercontent.com/241032/115978057-66419080-a57d-11eb-8539-d2be843991aa.png)
 
 * the document preview has a max-width which is the same as an A4 paper when printed
@@ -445,6 +466,8 @@ the metadata keys you can use in the format field are the ones in the file-brows
 
 
 ## searching
+
+search by size, date, path/name, mp3-tags, ...
 
 ![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/129635365-c0ff2a9f-0ee5-4fc3-8bb6-006033cf67b8.png)
 
@@ -460,6 +483,8 @@ add the argument `-e2ts` to also scan/index tags from music files, which brings 
 
 
 # server config
+
+## file indexing
 
 file indexing relies on two databases, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`). Configuration can be done through arguments, volume flags, or a mix of both.
 
@@ -490,7 +515,7 @@ if you set `--no-hash`, you can enable hashing for specific volumes using flag `
 
 ## upload rules
 
-you can set upload rules using volume flags, some examples:
+set upload rules using volume flags, some examples:
 
 * `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: b, k, m, g)
 * `:c,nosub` disallow uploading into subdirectories; goes well with `rotn` and `rotf`:
@@ -509,7 +534,9 @@ you can also set transaction limits which apply per-IP and per-volume, but these
 
 ## compress uploads
 
-files can be autocompressed on upload, either on user-request (if config allows) or forced by server-config
+files can be autocompressed on upload
+
+compression is either on user-request (if config allows) or forced by server-config
 
 * volume flag `gz` allows gz compression
 * volume flag `xz` allows lzma compression
@@ -530,6 +557,8 @@ some examples,
 
 ## database location
 
+can be stored in-volume (default) or elsewhere
+
 copyparty creates a subfolder named `.hist` inside each volume where it stores the database, thumbnails, and some other stuff
 
 this can instead be kept in a single place using the `--hist` argument, or the `hist=` volume flag, or a mix of both:
@@ -542,6 +571,8 @@ note:
 
 
 ## metadata from audio files
+
+set `-e2t` to index tags on upload
 
 `-mte` decides which tags to index and display in the browser (and also the display order), this can be changed per-volume:
 * `-v ~/music::r:c,mte=title,artist` indexes and displays *title* followed by *artist*
@@ -566,6 +597,8 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 ## file parser plugins
 
+provide custom parsers to index additional tags
+
 copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volume flag), there is a default timeout of 30sec
 
 * `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
@@ -585,6 +618,8 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 
 # browser support
+
+TLDR: yes
 
 ![copyparty-ie4-fs8](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png)
 
@@ -634,6 +669,8 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 
 # client examples
 
+interact with copyparty using non-browser clients
+
 * javascript: dump some state into a file (two separate examples)
   * `await fetch('https://127.0.0.1:3923/', {method:"PUT", body: JSON.stringify(foo)});`
   * `var xhr = new XMLHttpRequest(); xhr.open('POST', 'https://127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
@@ -676,7 +713,9 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
 
 # performance
 
-defaults are good for most cases, don't mind the `cannot efficiently use multiple CPU cores` message, it's very unlikely to be a problem
+defaults are good for most cases
+
+you can ignore the `cannot efficiently use multiple CPU cores` message, it's very unlikely to be a problem
 
 below are some tweaks roughly ordered by usefulness:
 
@@ -693,10 +732,13 @@ below are some tweaks roughly ordered by usefulness:
 
 # dependencies
 
+mandatory deps:
 * `jinja2` (is built into the SFX)
 
 
 ## optional dependencies
+
+install these to enable bonus features
 
 enable music tags:
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
@@ -730,7 +772,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 # sfx
 
-currently there are two self-contained "binaries":
+there are two self-contained "binaries":
 * [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) -- pure python, works everywhere, **recommended**
 * [copyparty-sfx.sh](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.sh) -- smaller, but only for linux and macos, kinda deprecated
 
@@ -740,6 +782,8 @@ pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `
 
 
 ## sfx repack
+
+reduce the size of an sfx by disabling features
 
 if you don't need all the features, you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except if you're on windows then you need msys2 or WSL)
 * `525k` size of original sfx.py as of v0.11.30
@@ -784,7 +828,7 @@ pip install black bandit pylint flake8  # vscode tooling
 
 ## just the sfx
 
-unless you need to modify something in the web-dependencies, it's faster to grab those from a previous release:
+grab the web-dependencies from a previous sfx (unless you need to modify something in those):
 
 ```sh
 rm -rf copyparty/web/deps
@@ -804,7 +848,7 @@ then build the sfx using any of the following examples:
 
 ## complete release
 
-also builds the sfx so disregard the sfx section above
+also builds the sfx so skip the sfx section above
 
 in the `scripts` folder:
 
