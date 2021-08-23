@@ -1428,7 +1428,11 @@ class Up2k(object):
         ptop = vn.realpath
         atop = vn.canonical(rem, False)
         adir, fn = os.path.split(atop)
-        st = bos.lstat(atop)
+        try:
+            st = bos.lstat(atop)
+        except:
+            raise Pebkac(400, "file not found on disk (already deleted?)")
+
         scandir = not self.args.no_scandir
         if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
             dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
