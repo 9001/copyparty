@@ -961,6 +961,27 @@ function up2k_init(subtle) {
 
                     window[(is_busy ? "add" : "remove") +
                         "EventListener"]("beforeunload", warn_uploader_busy);
+
+                    if (!is_busy) {
+                        var k = fsearch ? 'searches' : 'uploads',
+                            ks = fsearch ? 'Search' : 'Upload',
+                            tok = fsearch ? 'successful (found on server)' : 'completed successfully',
+                            tng = fsearch ? 'failed (NOT found on server)' : 'failed, sorry',
+                            ok = pvis.ctr["ok"],
+                            ng = pvis.ctr["ng"],
+                            t = ask_up ? 0 : 10;
+
+                        if (ok && ng)
+                            toast.warn(t, 'Finished, but some {0} failed:\n{1} {2},\n{3} {4}'.format(k, ok, tok, ng, tng));
+                        else if (ok > 1)
+                            toast.ok(t, 'All {1} {0} {2}'.format(k, ok, tok));
+                        else if (ok)
+                            toast.ok(t, '{0} {1}'.format(ks, tok));
+                        else if (ng > 1)
+                            toast.err(t, 'All {1} {0} {2}'.format(k, ng, tng));
+                        else if (ng)
+                            toast.err(t, '{0} {1}'.format(ks, tng));
+                    }
                 }
 
                 if (flag) {
