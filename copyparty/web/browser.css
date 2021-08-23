@@ -1764,6 +1764,26 @@ html.light #u2foot .warn span {
 .prog {
 	font-family: 'scp', monospace, monospace;
 }
+#u2tab span.inf,
+#u2tab span.ok,
+#u2tab span.err {
+	color: #fff;
+	padding: .22em;
+	border-radius: .2em;
+	border: 2px solid #f0f;
+}
+#u2tab span.inf {
+	background: #07a;
+	border-color: #0be;
+}
+#u2tab span.ok {
+	background: #380;
+	border-color: #8e4;
+}
+#u2tab span.err {
+	background: #900;
+	border-color: #d06;
+}
 #u2tab a>span {
 	font-weight: bold;
 	font-style: italic;

@@ -141,6 +141,15 @@ function U2pvis(act, btns) {
     r.tail = -1;
     r.wsz = 3;
 
+    var markup = {
+        '404': '<span class="err">404</span>',
+        'ERROR': '<span class="err">ERROR</span>',
+        'OS-error': '<span class="err">OS-error</span>',
+        'found': '<span class="inf">found</span>',
+        'YOLO': '<span class="inf">YOLO</span>',
+        'done': '<span class="ok">done</span>',
+    };
+
     r.addfile = function (entry, sz, draw) {
         r.tab.push({
             "hn": entry[0],
@@ -185,7 +194,7 @@ function U2pvis(act, btns) {
             return;
 
         var obj = ebi('f{0}{1}'.format(nfile, field.slice(1)));
-        obj.innerHTML = html;
+        obj.innerHTML = field == 'ht' ? (markup[html] || html) : html;
         if (field == 'hp') {
             obj.style.color = '';
             obj.style.background = '';
@@ -424,7 +433,7 @@ function U2pvis(act, btns) {
             td1 = '<td id="f' + nfile,
             td = '</td>' + td1,
             ret = td1 + 'n">' + row.hn +
-                td + 't">' + row.ht +
+                td + 't">' + (markup[row.ht] || row.ht) +
                 td + 'p" class="prog">' + row.hp + '</td>';
 
         if (as_html)
@@ -1396,7 +1405,7 @@ function up2k_init(subtle) {
                 pvis.prog(t, 0, cbd[0]);
 
                 var done = true,
-                    msg = '&#x1f3b7;&#x1f41b;';
+                    msg = 'done';
 
                 if (t.postlist.length) {
                     var arr = st.todo.upload,
