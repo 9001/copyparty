@@ -1,6 +1,10 @@
 :root {
 	--grid-sz: 10em;
 }
+@font-face {
+	font-family: 'scp';
+	src: local('Source Code Pro Regular'), local('SourceCodePro-Regular'), url(/.cpr/deps/scp.woff2) format('woff2');
+}
 * {
 	line-height: 1.2em;
 }
@@ -23,7 +27,7 @@ html, body {
 	padding: 0;
 }
 pre, code, tt {
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
 }
 #path,
 #path * {
@@ -113,7 +117,7 @@ a, #files tbody div a:last-child {
 	border-top: 1px solid #383838;
 }
 #files tbody td:nth-child(3) {
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
 	text-align: right;
 	padding-right: 1em;
 	white-space: nowrap;
@@ -723,8 +727,8 @@ input.eq_gain {
 }
 #treeul {
 	position: relative;
-	left: -1.7em;
-	width: calc(100% + 1.3em);
+	left: -2em;
+	width: calc(100% + 2em);
 }
 .btn {
 	padding: .2em .4em;
@@ -785,7 +789,9 @@ input.eq_gain {
 	color: #fff;
 }
 #treeul a:first-child {
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
+	font-size: 1.2em;
+	line-height: 0;
 }
 .dumb_loader_thing {
 	display: inline-block;
@@ -978,7 +984,7 @@ html.light #rui {
 	padding: .2em 0 .2em .5em;
 }
 #rn_vadv input {
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
 }
 #rui td+td,
 #rui td input[type="text"] {
@@ -1576,6 +1582,7 @@ html.light #bbox-overlay figcaption a {
 	line-height: 1.3em;
 }
 #u2tab {
+	border-collapse: collapse;
 	margin: 3em auto;
 	width: calc(100% - 2em);
 	max-width: 100em;
@@ -1586,7 +1593,7 @@ html.light #bbox-overlay figcaption a {
 #u2tab td {
 	border: 1px solid #ccc;
 	border-width: 0 0px 1px 0;
-	padding: .1em .3em;
+	padding: .2em .3em;
 }
 #u2tab td:nth-child(2) {
 	width: 5em;
@@ -1754,7 +1761,7 @@ html.light #u2foot .warn span {
 	margin-bottom: -1em;
 }
 .prog {
-	font-family: monospace, monospace;
+	font-family: 'scp', monospace, monospace;
 }
 #u2tab a>span {
 	font-weight: bold;
