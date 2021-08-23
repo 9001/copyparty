@@ -1013,6 +1013,8 @@ html.light #rui {
 #barpos,
 #u2conf label,
 #rui label,
+#modal-ok,
+#modal-ng,
 #ops {
 	-webkit-user-select: none;
 	-moz-user-select: none;

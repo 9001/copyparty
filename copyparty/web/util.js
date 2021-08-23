@@ -725,11 +725,15 @@ var modal = (function () {
         a.onclick = ok;
 
         (ebi('modali') || a).focus();
+        document.addEventListener('focus', onfocus);
+        timer.add(onfocus);
     };
 
     r.hide = function () {
-        o.parentNode.removeChild(o);
+        timer.rm(onfocus);
+        document.removeEventListener('focus', onfocus);
         document.removeEventListener('keydown', onkey);
+        o.parentNode.removeChild(o);
         r.busy = false;
         setTimeout(next, 50);
     };
@@ -746,6 +750,17 @@ var modal = (function () {
         r.hide();
         if (cb_ng)
             cb_ng(null);
+    }
+
+    function onfocus(e) {
+        var ctr = ebi('modalc');
+        if (!ctr || !ctr.contains || !document.activeElement || ctr.contains(document.activeElement))
+            return;
+
+        setTimeout(function () {
+            ebi('modal-ok').focus();
+        }, 20);
+        ev(e);
     }
 
     function onkey(e) {
