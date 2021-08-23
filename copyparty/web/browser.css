@@ -696,6 +696,7 @@ input.eq_gain {
 	left: 0;
 	bottom: 0;
 	top: 7em;
+	overflow-x: hidden;
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
 	overscroll-behavior-y: none;
