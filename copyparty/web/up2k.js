@@ -800,7 +800,7 @@ function up2k_init(subtle) {
             });
         }
 
-        var msg = ['{0} these {1} files?'.format(fsearch?'search':'upload', good_files.length)];
+        var msg = ['{0} these {1} files?'.format(fsearch ? 'search' : 'upload', good_files.length)];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push(good_files[a][1]);
 
@@ -1361,9 +1361,9 @@ function up2k_init(subtle) {
             st.bytes.hashed += t.size;
             st.bytes.finished += t.size;
             pvis.move(t.n, 'bz');
-            pvis.seth(t.n, 1, ok? 'YOLO':'404');
+            pvis.seth(t.n, 1, ok ? 'YOLO' : '404');
             pvis.seth(t.n, 2, "turbo'd");
-            pvis.move(t.n, ok? 'ok':'ng');
+            pvis.move(t.n, ok ? 'ok' : 'ng');
         };
         xhr.onload = function (e) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
@@ -1509,11 +1509,11 @@ function up2k_init(subtle) {
                 if (done) {
                     t.done = true;
                     st.bytes.finished += t.size - t.bytes_uploaded;
-                    var spd1 = t.size / ((t.t_hashed - t.t_hashing) / 1000.),
-                        spd2 = t.size / ((t.t_uploaded - t.t_uploading) / 1000.);
+                    var spd1 = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.),
+                        spd2 = (t.size / ((t.t_uploaded - t.t_uploading) / 1000.)) / (1024 * 1024.);
 
-                    pvis.seth(t.n, 2, 'hash {0}/s, up {1}/s'.format(
-                        humansize(spd1), isNaN(spd2) ? '--' : humansize(spd2)));
+                    pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
+                        f2f(spd1, 2), isNaN(spd2) ? '--' : f2f(spd2, 2)));
 
                     pvis.move(t.n, 'ok');
                 }
