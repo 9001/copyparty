@@ -800,7 +800,7 @@ function up2k_init(subtle) {
             });
         }
 
-        var msg = ['upload these ' + good_files.length + ' files?'];
+        var msg = ['{0} these {1} files?'.format(fsearch?'search':'upload', good_files.length)];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push(good_files[a][1]);
 
@@ -843,6 +843,9 @@ function up2k_init(subtle) {
                 "hash": []
             },
                 key = entry.name + '\n' + entry.size;
+
+            if (fsearch)
+                entry.srch = 1;
 
             if (seen[key])
                 continue;
@@ -1572,7 +1575,7 @@ function up2k_init(subtle) {
             "lmod": t.lmod,
             "hash": t.hash
         };
-        if (fsearch)
+        if (t.srch)
             req.srch = 1;
 
         xhr.open('POST', t.purl, true);
