@@ -903,6 +903,7 @@ function up2k_init(subtle) {
             td = (now - (etaref || now)) / 1000.0;
 
         etaref = now;
+        ebi('acc_info').innerHTML = st.time.busy.toFixed(1) + ' ' + (now / 1000).toFixed(1);
 
         if (!nhash)
             ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
@@ -920,23 +921,23 @@ function up2k_init(subtle) {
         var t = [];
         if (nhash) {
             st.time.hashing += td;
-            t.push(['u2etah', st.bytes.hashed, st.time.hashing]);
+            t.push(['u2etah', st.bytes.hashed, st.bytes.hashed, st.time.hashing]);
         }
         if (nsend) {
             st.time.uploading += td;
-            t.push(['u2etau', st.bytes.uploaded, st.time.uploading]);
+            t.push(['u2etau', st.bytes.uploaded, st.bytes.finished, st.time.uploading]);
         }
         if (nhash || nsend) {
             st.time.busy += td;
-            t.push(['u2etat', st.bytes.finished, st.time.busy]);
+            t.push(['u2etat', st.bytes.finished, st.bytes.finished, st.time.busy]);
         }
         for (var a = 0; a < t.length; a++) {
-            var rem = st.bytes.total - t[a][1],
-                bps = t[a][1] / t[a][2],
+            var rem = st.bytes.total - t[a][2],
+                bps = t[a][1] / t[a][3],
                 eta = Math.floor(rem / bps);
 
-            if (t[a][1] < 1024 || t[a][2] < 0.1) {
-                ebi(t[a][0]).innerHTML = '(nothing to do yet)';
+            if (t[a][1] < 1024 || t[a][3] < 0.1) {
+                ebi(t[a][0]).innerHTML = '(no uploads are queued yet)';
                 continue;
             }
 
@@ -1058,8 +1059,10 @@ function up2k_init(subtle) {
                         etafun();
                         timer.rm(etafun);
                     }
-                    else
+                    else {
                         timer.add(etafun);
+                        ebi('u2etas').style.textAlign = 'left';
+                    }
                 }
 
                 if (flag) {

@@ -103,9 +103,9 @@ ebi('op_up2k').innerHTML = (
 	'</div>\n' +
 
 	'<div id="u2etaw"><div id="u2etas"><div class="o">\n' +
-	'	hash: <span id="u2etah" tt="average &lt;em&gt;hashing&lt;/em&gt; speed, and estimated time until finish">(nothing to do yet)</span><br />\n' +
-	'	send: <span id="u2etau" tt="average &lt;em&gt;upload&lt;/em&gt; speed and estimated time until finish">(nothing to do yet)</span><br />\n' +
-	'	</div><span class="o">task: </span><span id="u2etat" tt="average &lt;em&gt;total&lt;/em&gt; speed and estimated time until finish">(nothing to do yet)</span>\n' +
+	'	hash: <span id="u2etah" tt="average &lt;em&gt;hashing&lt;/em&gt; speed, and estimated time until finish">(no uploads are queued yet)</span><br />\n' +
+	'	send: <span id="u2etau" tt="average &lt;em&gt;upload&lt;/em&gt; speed and estimated time until finish">(no uploads are queued yet)</span><br />\n' +
+	'	</div><span class="o">done: </span><span id="u2etat" tt="average &lt;em&gt;total&lt;/em&gt; speed and estimated time until finish">(no uploads are queued yet)</span>\n' +
 	'</div></div>\n' +
 
 	'<div id="u2cards">\n' +
