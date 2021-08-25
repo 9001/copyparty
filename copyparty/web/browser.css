@@ -530,24 +530,9 @@ html.light #wfm a:not(.en) {
 	box-shadow: 0 -.15em .2em #000 inset;
 	padding-bottom: .3em;
 }
-#ops i {
-	font-size: 1.5em;
-}
-#ops i:before {
-	content: 'x';
-	color: #282828;
-	text-shadow: 0 0 .08em #01a7e1;
-	position: relative;
-}
-#ops i:after {
-	content: 'x';
-	color: #282828;
-	text-shadow: 0 0 .08em #ff3f1a;
-	margin-left: -.35em;
-	font-size: 1.05em;
-}
 #ops,
-.opbox {
+.opbox,
+#u2etas {
 	border: 1px solid #3a3a3a;
 	box-shadow: 0 0 1em #222 inset;
 }
@@ -1060,7 +1045,8 @@ html.light {
 }
 html.light #ops,
 html.light .opbox,
-html.light #srch_form {
+html.light #srch_form,
+html.light #u2etas {
 	background: #f7f7f7;
 	box-shadow: 0 0 .3em #ddd;
 	border-color: #f7f7f7;
@@ -1564,7 +1550,7 @@ html.light #bbox-overlay figcaption a {
 	color: #333;
 }
 #u2conf #u2btn {
-	margin: -1.5em 0;
+	margin: -2.4em 0;
 	padding: .8em 0;
 	width: 100%;
 	max-width: 12em;
@@ -1611,16 +1597,37 @@ html.light #bbox-overlay figcaption a {
 #u2tab tbody tr:hover td {
 	background: #222;
 }
+#u2etas {
+	background: #333;
+	padding: .2em .5em;
+	border-radius: .5em;
+	border-width: .25em 0;
+	width: 20em;
+	text-align: left;
+	white-space: nowrap;
+	display: inline-block;
+	font-family: 'scp', monospace, monospace;
+}
+#u2etaw {
+	width: 21em;
+	font-size: .94em;
+	margin: 2.5em auto 1em auto;
+}
 #u2cards {
-	padding: 1em 0 .3em 1em;
-	margin: 1.5em auto -2.5em auto;
+	padding: 1em 1em .3em 1em;
+	margin: 0 auto -1.5em auto;
 	white-space: nowrap;
 	text-align: center;
 	overflow: hidden;
 }
 #u2cards.w {
-	width: 45em;
+	width: 44em;
 	text-align: left;
+}
+#u2etaw.w {
+	width: 52em;
+	text-align: right;
+	margin: 3em auto -3em auto;
 }
 #u2cards a {
 	padding: .2em 1em;

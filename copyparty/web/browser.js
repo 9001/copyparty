@@ -102,6 +102,11 @@ ebi('op_up2k').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 
+	'<div id="u2etaw"><div id="u2etas">\n' +
+	'	hash: <span id="u2etah" tt="average &lt;em&gt;hashing&lt;/em&gt; speed, and estimated time until finish">(nothing to do yet)</span><br />\n' +
+	'	send: <span id="u2etau" tt="average &lt;em&gt;upload&lt;/em&gt; speed and estimated time until finish">(nothing to do yet)</span>\n' +
+	'</div></div>\n' +
+
 	'<div id="u2cards">\n' +
 	'	<a href="#" act="ok" tt="completed successfully">ok <span>0</span></a><a\n' +
 	'	href="#" act="ng" tt="failed / rejected / not-found">ng <span>0</span></a><a\n' +

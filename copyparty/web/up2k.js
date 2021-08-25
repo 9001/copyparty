@@ -596,8 +596,14 @@ function up2k_init(subtle) {
             "upload": []
         },
         "bytes": {
+            "total": 0,
             "hashed": 0,
-            "uploaded": 0
+            "uploaded": 0,
+            "finished": 0
+        },
+        "time": {
+            "hashing": 0,
+            "uploading": 0
         }
     };
 
@@ -849,6 +855,7 @@ function up2k_init(subtle) {
                 ''
             ], fobj.size, draw_each);
 
+            st.bytes.total += fobj.size;
             st.files.push(entry);
             if (turbo)
                 push_t(st.todo.head, entry);
@@ -886,6 +893,54 @@ function up2k_init(subtle) {
         }
     }
     ebi('u2cleanup').onclick = u2cleanup;
+
+    var etaref = 0;
+    function etafun() {
+        var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,
+            nsend = st.busy.upload.length + st.todo.upload.length,
+            now = Date.now(),
+            td = (now - (etaref || now)) / 1000.0;
+
+        etaref = now;
+
+        if (!nhash)
+            ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
+
+        if (!nsend && !nhash)
+            ebi('u2etau').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.uploaded), pvis.ctr["ok"] + pvis.ctr["ng"]);
+
+        if (!parallel_uploads || !(nhash + nsend))
+            return;
+
+        var t = [];
+        if (nhash && (st.busy.hash.length || hashing_permitted())) {
+            st.time.hashing += td;
+            t.push(['u2etah', st.bytes.hashed, st.time.hashing]);
+        }
+        if (nsend) {
+            st.time.uploading += td;
+            t.push(['u2etau', st.bytes.uploaded, st.time.uploading]);
+        }
+        for (var a = 0; a < t.length; a++) {
+            var rem = st.bytes.total - t[a][1],
+                bps = t[a][1] / t[a][2],
+                eta = Math.floor(rem / bps);
+
+            if (t[a][1] < 1024 || t[a][2] < 0.1) {
+                ebi(t[a][0]).innerHTML = '(nothing to do yet)';
+                continue;
+            }
+
+            if (eta < 60 * 60 * 24)
+                try {
+                    eta = /.*(..:..:..).*/.exec(new Date(eta * 1000).toUTCString())[1];
+                }
+                catch (ex) { }
+
+            ebi(t[a][0]).innerHTML = '{0}, {1}/s, {2}'.format(
+                humansize(rem), humansize(bps, 1), eta);
+        }
+    }
 
     /////
     ////
@@ -926,7 +981,7 @@ function up2k_init(subtle) {
 
     function hashing_permitted() {
         if (multitask) {
-            var ahead = st.bytes.hashed - st.bytes.uploaded;
+            var ahead = st.bytes.hashed - st.bytes.finished;
             return ahead < 1024 * 1024 * 1024 * 4 &&
                 st.todo.handshake.length + st.busy.handshake.length < 16;
         }
@@ -990,7 +1045,12 @@ function up2k_init(subtle) {
                             toast.err(t, 'All {1} {0} {2}'.format(k, ng, tng));
                         else if (ng)
                             toast.err(t, '{0} {1}'.format(ks, tng));
+
+                        etafun();
+                        timer.rm(etafun);
                     }
+                    else
+                        timer.add(etafun);
                 }
 
                 if (flag) {
@@ -1131,7 +1191,6 @@ function up2k_init(subtle) {
     function exec_hash() {
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
-        st.bytes.hashed += t.size;
         t.bytes_uploaded = 0;
 
         var bpend = 0,
@@ -1157,6 +1216,7 @@ function up2k_init(subtle) {
                 cdr = t.size;
 
             bpend += cdr - car;
+            st.bytes.hashed += cdr - car;
 
             function orz(e) {
                 if (!min_filebuf && nch == 1) {
@@ -1187,7 +1247,7 @@ function up2k_init(subtle) {
                 if (handled) {
                     pvis.move(t.n, 'ng');
                     apop(st.busy.hash, t);
-                    st.bytes.uploaded += t.size;
+                    st.bytes.finished += t.size;
                     return tasker();
                 }
 
@@ -1284,7 +1344,7 @@ function up2k_init(subtle) {
 
             t.done = true;
             st.bytes.hashed += t.size;
-            st.bytes.uploaded += t.size;
+            st.bytes.finished += t.size;
             pvis.seth(t.n, 1, 'YOLO');
             pvis.seth(t.n, 2, "turbo'd");
             pvis.move(t.n, 'ok');
@@ -1364,7 +1424,7 @@ function up2k_init(subtle) {
                     pvis.seth(t.n, 1, smsg);
                     pvis.move(t.n, smsg == '404' ? 'ng' : 'ok');
                     apop(st.busy.handshake, t);
-                    st.bytes.uploaded += t.size;
+                    st.bytes.finished += t.size;
                     t.done = true;
                     tasker();
                     return;
@@ -1432,12 +1492,12 @@ function up2k_init(subtle) {
 
                 if (done) {
                     t.done = true;
-                    st.bytes.uploaded += t.size - t.bytes_uploaded;
-                    var spd1 = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.),
-                        spd2 = (t.size / ((t.t_uploaded - t.t_uploading) / 1000.)) / (1024 * 1024.);
+                    st.bytes.finished += t.size - t.bytes_uploaded;
+                    var spd1 = t.size / ((t.t_hashed - t.t_hashing) / 1000.),
+                        spd2 = t.size / ((t.t_uploaded - t.t_uploading) / 1000.);
 
-                    pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
-                        spd1.toFixed(2), spd2.toFixed(2)));
+                    pvis.seth(t.n, 2, 'hash {0}/s, up {1}/s'.format(
+                        humansize(spd1), isNaN(spd2) ? '--' : humansize(spd2)));
 
                     pvis.move(t.n, 'ok');
                 }
@@ -1465,7 +1525,7 @@ function up2k_init(subtle) {
                     return;
                 }
 
-                st.bytes.uploaded += t.size;
+                st.bytes.finished += t.size;
                 if (rsp.indexOf('partial upload exists') !== -1 ||
                     rsp.indexOf('file already exists') !== -1) {
                     err = rsp;
@@ -1536,6 +1596,7 @@ function up2k_init(subtle) {
             var txt = ((xhr.response && xhr.response.err) || xhr.responseText) + '';
             if (xhr.status == 200) {
                 pvis.prog(t, npart, cdr - car);
+                st.bytes.finished += cdr - car;
                 st.bytes.uploaded += cdr - car;
                 t.bytes_uploaded += cdr - car;
             }
@@ -1603,6 +1664,7 @@ function up2k_init(subtle) {
             parent.appendChild(btn);
             ebi('u2conf').setAttribute('class', wide ? 'has_btn' : '');
             ebi('u2cards').setAttribute('class', wide ? 'w' : '');
+            ebi('u2etaw').setAttribute('class', wide ? 'w' : '');
         }
     }
     window.addEventListener('resize', onresize);

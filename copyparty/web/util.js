@@ -401,6 +401,19 @@ function s2ms(s) {
 }
 
 
+function humansize(b, terse) {
+	var i=0, u=terse? ['B','K','M','G'] : ['B','KB','MB','GB'];
+	while (b >= 1000 && i<u.length) {
+		b /= 1024;
+		i += 1;
+	}
+	u = ' ' + u[i];
+	if (b>=100) return Math.floor(b) + u;
+	if (b>=10) return b.toFixed(1) + u;
+	return b.toFixed(2) + u;
+}
+
+
 function has(haystack, needle) {
     for (var a = 0; a < haystack.length; a++)
         if (haystack[a] == needle)
