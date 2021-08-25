@@ -27,7 +27,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
-* [accounts and volumes](#accounts-and-volumes) - per-folder permissions for specific users
+* [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
 * [the browser](#the-browser) - accessing a copyparty server using a web-browser
     * [tabs](#tabs) - the main tabs in the ui
     * [hotkeys](#hotkeys) - the browser has the following hotkeys (always qwerty)
@@ -59,7 +59,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - there are two self-contained "binaries"
-    * [sfx repack](#sfx-repack) - reduce the size of an sfx by disabling features
+    * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
 * [install on android](#install-on-android)
 * [building](#building)
     * [dev env setup](#dev-env-setup)
@@ -190,7 +190,7 @@ small collection of user feedback
 
 # accounts and volumes
 
-per-folder permissions for specific users
+per-folder, per-user permissions
 * `-a usr:pwd` adds account `usr` with password `pwd`
 * `-v .::r` adds current-folder `.` as the webroot, `r`eadable by anyone
   * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
@@ -783,7 +783,7 @@ pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `
 
 ## sfx repack
 
-reduce the size of an sfx by disabling features
+reduce the size of an sfx by removing features
 
 if you don't need all the features, you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except if you're on windows then you need msys2 or WSL)
 * `525k` size of original sfx.py as of v0.11.30
