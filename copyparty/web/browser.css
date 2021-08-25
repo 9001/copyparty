@@ -1602,11 +1602,20 @@ html.light #bbox-overlay figcaption a {
 	padding: .2em .5em;
 	border-radius: .5em;
 	border-width: .25em 0;
-	width: 20em;
+	width: 17em;
 	text-align: left;
 	white-space: nowrap;
 	display: inline-block;
 	font-family: 'scp', monospace, monospace;
+}
+#u2etas.o {
+	width: 20em;
+}
+#u2etas .o {
+	display: none;
+}
+#u2etas.o .o {
+	display: unset;
 }
 #u2etaw {
 	width: 21em;
@@ -1627,7 +1636,7 @@ html.light #bbox-overlay figcaption a {
 #u2etaw.w {
 	width: 52em;
 	text-align: right;
-	margin: 3em auto -3em auto;
+	margin: 3em auto -2.7em auto;
 }
 #u2cards a {
 	padding: .2em 1em;

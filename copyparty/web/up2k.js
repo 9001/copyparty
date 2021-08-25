@@ -603,7 +603,8 @@ function up2k_init(subtle) {
         },
         "time": {
             "hashing": 0,
-            "uploading": 0
+            "uploading": 0,
+            "busy": 0
         }
     };
 
@@ -907,19 +908,27 @@ function up2k_init(subtle) {
             ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
 
         if (!nsend && !nhash)
-            ebi('u2etau').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.uploaded), pvis.ctr["ok"] + pvis.ctr["ng"]);
+            ebi('u2etau').innerHTML = ebi('u2etat').innerHTML = (
+                'Done ({0}, {1} files)'.format(humansize(st.bytes.uploaded), pvis.ctr["ok"] + pvis.ctr["ng"]));
+
+        if (!st.busy.hash.length && !hashing_permitted())
+            nhash = 0;
 
         if (!parallel_uploads || !(nhash + nsend))
             return;
 
         var t = [];
-        if (nhash && (st.busy.hash.length || hashing_permitted())) {
+        if (nhash) {
             st.time.hashing += td;
             t.push(['u2etah', st.bytes.hashed, st.time.hashing]);
         }
         if (nsend) {
             st.time.uploading += td;
             t.push(['u2etau', st.bytes.uploaded, st.time.uploading]);
+        }
+        if (nhash || nsend) {
+            st.time.busy += td;
+            t.push(['u2etat', st.bytes.finished, st.time.busy]);
         }
         for (var a = 0; a < t.length; a++) {
             var rem = st.bytes.total - t[a][1],
@@ -1858,6 +1867,10 @@ function up2k_init(subtle) {
     var nodes = ebi('u2conf').getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--)
         nodes[a].addEventListener('touchend', nop, false);
+
+    ebi('u2etas').onclick = function () {
+        clmod(ebi('u2etas'), 'o', 't');
+    };
 
     set_fsearch();
     bumpthread({ "target": 1 });
