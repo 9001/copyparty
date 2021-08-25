@@ -401,16 +401,20 @@ function s2ms(s) {
 }
 
 
+function f2f(val, nd) {
+    // 10.toFixed(1) returns 10.00 for certain values of 10
+    val = (val * Math.pow(10, nd)).toFixed(0).split('.')[0];
+    return nd ? (val.slice(0, -nd) || '0') + '.' + val.slice(-nd) : val;
+}
+
+
 function humansize(b, terse) {
-	var i=0, u=terse? ['B','K','M','G'] : ['B','KB','MB','GB'];
-	while (b >= 1000 && i<u.length) {
-		b /= 1024;
-		i += 1;
-	}
-	u = ' ' + u[i];
-	if (b>=100) return Math.floor(b) + u;
-	if (b>=10) return b.toFixed(1) + u;
-	return b.toFixed(2) + u;
+    var i = 0, u = terse ? ['B', 'K', 'M', 'G'] : ['B', 'KB', 'MB', 'GB'];
+    while (b >= 1000 && i < u.length) {
+        b /= 1024;
+        i += 1;
+    }
+    return f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) + ' ' + u[i];
 }
 
 

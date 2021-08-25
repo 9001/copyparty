@@ -236,7 +236,7 @@ function U2pvis(act, btns) {
             p = r.perc(nb, 0, fobj.size, fobj.t_hashing);
 
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
-            p[0].toFixed(2), p[1], p[2].toFixed(2)
+            f2f(p[0], 2), p[1], f2f(p[2], 2)
         );
         if (!r.is_act(fo.in))
             return;
@@ -258,7 +258,7 @@ function U2pvis(act, btns) {
 
         var p = r.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
         fo.hp = '{0}%, {1}, {2} MB/s'.format(
-            p[0].toFixed(2), p[1], p[2].toFixed(2)
+            f2f(p[0], 2), p[1], f2f(p[2], 2)
         );
 
         if (!r.is_act(fo.in))
@@ -903,7 +903,7 @@ function up2k_init(subtle) {
             td = (now - (etaref || now)) / 1000.0;
 
         etaref = now;
-        ebi('acc_info').innerHTML = st.time.busy.toFixed(1) + ' ' + (now / 1000).toFixed(1);
+        ebi('acc_info').innerHTML = f2f(st.time.busy, 1) + ' ' + f2f(now / 1000, 1);
 
         if (!nhash)
             ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
