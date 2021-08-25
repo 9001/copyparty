@@ -1354,21 +1354,22 @@ function up2k_init(subtle) {
                 }
             }
             apop(st.busy.head, t);
-            if (!ok)
+            if (!ok && !t.srch)
                 return push_t(st.todo.hash, t);
 
             t.done = true;
             st.bytes.hashed += t.size;
             st.bytes.finished += t.size;
-            pvis.seth(t.n, 1, 'YOLO');
+            pvis.move(t.n, 'bz');
+            pvis.seth(t.n, 1, ok? 'YOLO':'404');
             pvis.seth(t.n, 2, "turbo'd");
-            pvis.move(t.n, 'ok');
+            pvis.move(t.n, ok? 'ok':'ng');
         };
         xhr.onload = function (e) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
         };
 
-        xhr.open('HEAD', t.purl + uricom_enc(t.name), true);
+        xhr.open('HEAD', t.purl + uricom_enc(t.name) + '?raw', true);
         xhr.send();
     }
 
