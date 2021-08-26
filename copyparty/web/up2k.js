@@ -918,7 +918,7 @@ function up2k_init(subtle) {
         if (!st.busy.hash.length && !hashing_permitted())
             nhash = 0;
 
-        if (!parallel_uploads || !(nhash + nsend))
+        if (!parallel_uploads || !(nhash + nsend) || (flag && flag.owner && !flag.ours))
             return;
 
         var t = [];
