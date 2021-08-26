@@ -898,7 +898,7 @@ function up2k_init(subtle) {
     }
     ebi('u2cleanup').onclick = u2cleanup;
 
-    var etaref = 0;
+    var etaref = 0, etaskip = 0;
     function etafun() {
         var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,
             nsend = st.busy.upload.length + st.todo.upload.length,
@@ -951,6 +951,9 @@ function up2k_init(subtle) {
                 continue;
             }
 
+            if (etaskip)
+                continue;
+
             if (eta < 60 * 60 * 24)
                 try {
                     eta = /.*(..:..:..).*/.exec(new Date(eta * 1000).toUTCString())[1];
@@ -960,6 +963,8 @@ function up2k_init(subtle) {
             ebi(t[a][0]).innerHTML = '{0}, {1}/s, {2}'.format(
                 humansize(rem), humansize(bps, 1), eta);
         }
+        if (++etaskip > 2)
+            etaskip = 0;
     }
 
     /////
