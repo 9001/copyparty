@@ -821,7 +821,7 @@ function up2k_init(subtle) {
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
                 name = good_files[a][1],
-                fdir = get_evpath(),
+                fdir = evpath,
                 now = Date.now(),
                 lmod = fobj.lastModified || now,
                 ofs = name.lastIndexOf('/') + 1;
@@ -925,14 +925,21 @@ function up2k_init(subtle) {
         if (nhash) {
             st.time.hashing += td;
             t.push(['u2etah', st.bytes.hashed, st.bytes.hashed, st.time.hashing]);
+            if (fsearch)
+                t.push(['u2etat', st.bytes.hashed, st.bytes.hashed, st.time.hashing]);
         }
         if (nsend) {
             st.time.uploading += td;
             t.push(['u2etau', st.bytes.uploaded, st.bytes.finished, st.time.uploading]);
         }
-        if (nhash || nsend) {
-            st.time.busy += td;
-            t.push(['u2etat', st.bytes.finished, st.bytes.finished, st.time.busy]);
+        if ((nhash || nsend) && !fsearch) {
+            if (!st.bytes.finished) {
+                ebi('u2etat').innerHTML = '(preparing to upload)';
+            }
+            else {
+                st.time.busy += td;
+                t.push(['u2etat', st.bytes.finished, st.bytes.finished, st.time.busy]);
+            }
         }
         for (var a = 0; a < t.length; a++) {
             var rem = st.bytes.total - t[a][2],
@@ -940,7 +947,7 @@ function up2k_init(subtle) {
                 eta = Math.floor(rem / bps);
 
             if (t[a][1] < 1024 || t[a][3] < 0.1) {
-                ebi(t[a][0]).innerHTML = '(no uploads are queued yet)';
+                ebi(t[a][0]).innerHTML = '(preparing to upload)';
                 continue;
             }
 
@@ -1065,7 +1072,7 @@ function up2k_init(subtle) {
                         timer.rm(etafun);
                     }
                     else {
-                        timer.add(etafun);
+                        timer.add(etafun, false);
                         ebi('u2etas').style.textAlign = 'left';
                     }
                     etafun();
