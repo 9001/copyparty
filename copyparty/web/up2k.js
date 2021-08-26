@@ -1771,7 +1771,7 @@ function up2k_init(subtle) {
 
     function draw_turbo() {
         var msgu = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
-            msgs = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search may give false-positives; see turbo-button tooltip</span></p>',
+            msgs = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search results can be incorrect; see turbo-button tooltip</span></p>',
             msg = fsearch ? msgs : msgu,
             omsg = fsearch ? msgu : msgs,
             html = ebi('u2foot').innerHTML,
