@@ -1851,6 +1851,9 @@ function up2k_init(subtle) {
             }
         }
         else if (!flag_en && flag) {
+            if (flag.ours)
+                flag.give();
+
             flag.ch.close();
             flag = false;
         }
