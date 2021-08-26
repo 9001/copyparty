@@ -1062,13 +1062,13 @@ function up2k_init(subtle) {
                         else if (ng)
                             toast.err(t, '{0} {1}'.format(ks, tng));
 
-                        etafun();
                         timer.rm(etafun);
                     }
                     else {
                         timer.add(etafun);
                         ebi('u2etas').style.textAlign = 'left';
                     }
+                    etafun();
                 }
 
                 if (flag) {
