@@ -993,6 +993,9 @@ function up2k_init(subtle) {
     }
 
     function hashing_permitted() {
+        if (!parallel_uploads)
+            return false;
+
         if (multitask) {
             var ahead = st.bytes.hashed - st.bytes.finished;
             return ahead < 1024 * 1024 * 1024 * 4 &&
