@@ -679,6 +679,7 @@ var toast = (function () {
     obj.setAttribute('id', 'toast');
     document.body.appendChild(obj);
     r.visible = false;
+    r.txt = null;
 
     r.hide = function (e) {
         ev(e);
@@ -698,6 +699,7 @@ var toast = (function () {
         obj.className += ' vis';
         ebi('toastc').onclick = r.hide;
         r.visible = true;
+        r.txt = txt;
     };
 
     r.ok = function (ms, txt) {
