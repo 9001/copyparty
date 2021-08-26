@@ -1360,7 +1360,7 @@ function play(tid, is_ev, seek, call_depth) {
 		return true;
 	}
 	catch (ex) {
-		toast.err(0, 'playback failed: ' + ex);
+		toast.err(0, esc('playback failed: ' + ex));
 	}
 	setclass(oid, 'play');
 	setTimeout(next_song, 500);
@@ -1394,7 +1394,7 @@ function evau_error(e) {
 
 	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0])[0] + '»';
 
-	toast.warn(15, err);
+	toast.warn(15, esc(err + ''));
 }
 
 
@@ -1697,7 +1697,7 @@ var fileman = (function () {
 
 			var vsp = vsplit(vp);
 			if (base != vsp[0])
-				return toast.err(0, 'bug:\n' + base + '\n' + vsp[0]);
+				return toast.err(0, esc('bug:\n' + base + '\n' + vsp[0]));
 
 			var vars = ft2dict(ebi(sel[a].id).closest('tr'));
 			mkeys = vars[1].concat(vars[2]);
@@ -1913,7 +1913,7 @@ var fileman = (function () {
 					re = new RegExp(ptn, cs ? 'i' : '');
 			}
 			catch (ex) {
-				return toast.err(5, 'invalid regex:\n' + ex);
+				return toast.err(5, esc('invalid regex:\n' + ex));
 			}
 			toast.hide();
 
@@ -1945,7 +1945,7 @@ var fileman = (function () {
 				return rn_cancel();
 			}
 
-			toast.inf(0, 'renaming ' + f.length + ' items\n\n' + f[0].ofn);
+			toast.inf(0, esc('renaming ' + f.length + ' items\n\n' + f[0].ofn));
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
@@ -1992,7 +1992,7 @@ var fileman = (function () {
 				treectl.goto(get_evpath());
 				return;
 			}
-			toast.inf(0, 'deleting ' + (vps.length + 1) + ' items\n\n' + vp);
+			toast.inf(0, esc('deleting ' + (vps.length + 1) + ' items\n\n' + vp));
 
 			xhr.open('GET', vp + '?delete', true);
 			xhr.onreadystatechange = delete_cb;
@@ -2075,7 +2075,7 @@ var fileman = (function () {
 		}
 
 		if (exists.length)
-			toast.warn(30, 'these ' + exists.length + ' items cannot be pasted here (names already exist):\n\n' + uricom_adec(exists).join('\n'));
+			toast.warn(30, 'these ' + exists.length + ' items cannot be pasted here (names already exist):<ul>' + uricom_adec(exists, true).join('') + '</ul>');
 
 		if (!req.length)
 			return;
@@ -2090,7 +2090,7 @@ var fileman = (function () {
 				r.tx(srcdir);
 				return;
 			}
-			toast.inf(0, 'pasting ' + (req.length + 1) + ' items\n\n' + uricom_dec(vp)[0]);
+			toast.inf(0, esc('pasting ' + (req.length + 1) + ' items\n\n' + uricom_dec(vp)[0]));
 
 			var dst = get_evpath() + vp.split('/').slice(-1)[0];
 

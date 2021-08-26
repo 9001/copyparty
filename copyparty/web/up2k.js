@@ -1277,7 +1277,7 @@ function up2k_init(subtle) {
                     return tasker();
                 }
 
-                toast.err(0, 'y o u   b r o k e    i t\nfile: ' + t.name + '\nerror: ' + err);
+                toast.err(0, 'y o u   b r o k e    i t\nfile: ' + esc(t.name + '') + '\nerror: ' + err);
             };
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
