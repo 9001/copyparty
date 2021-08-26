@@ -127,6 +127,7 @@ ebi('op_up2k').innerHTML = (
 	'	<tbody></tbody>\n' +
 	'</table>\n' +
 
+	'<p id="u2flagblock"><b>the files were added to the queue</b><br />however there is a busy up2k in another browser tab,<br />so waiting for that to finish first</p>\n' +
 	'<p id="u2foot"></p>\n' +
 	'<p id="u2footfoot" data-perm="write">( you can use the <a href="#" id="u2nope">basic uploader</a> if you don\'t need lastmod timestamps, resumable uploads, or progress bars )</p>'
 );

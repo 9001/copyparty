@@ -1081,6 +1081,7 @@ function up2k_init(subtle) {
                 if (flag) {
                     if (is_busy) {
                         flag.take(now);
+                        ebi('u2flagblock').style.display = flag.ours ? '' : 'block';
                         if (!flag.ours)
                             return defer();
                     }

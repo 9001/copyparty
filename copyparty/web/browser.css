@@ -1747,6 +1747,14 @@ html.light #bbox-overlay figcaption a {
 	box-shadow: none;
 	opacity: .2;
 }
+#u2flagblock {
+	display: none;
+	margin: 2em auto 4em auto;
+	padding: .5em;
+	max-width: 27em;
+	text-align: center;
+	border: .2em dashed rgba(128, 128, 128, 0.3);
+}
 #u2foot {
 	color: #fff;
 	font-style: italic;
