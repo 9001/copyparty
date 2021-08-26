@@ -165,6 +165,16 @@ html.light #tt em {
         min-width: 30em;
     }
 }
+#modalc li {
+	margin: 1em 0;
+}
+#modalc h6 {
+	font-size: 1.3em;
+	border-bottom: 1px solid #999;
+	margin: 0;
+	padding: .3em;
+	text-align: center;
+}
 #modalb {
 	position: sticky;
 	text-align: right;

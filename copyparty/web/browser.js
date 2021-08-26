@@ -2010,8 +2010,8 @@ var fileman = (function () {
 			deleter();
 		}
 
-		modal.confirm('===== DANGER =====\nDELETE these ' + vps.length + ' items?\n\n' + uricom_adec(vps).join('\n'), function () {
-			modal.confirm('Last chance! Delete?', deleter, null);
+		modal.confirm('<h6 style="color:#900">DANGER</h6>\n<b>DELETE these ' + vps.length + ' items?</b><ul>' + uricom_adec(vps, true).join('') + '</ul>', function () {
+			modal.confirm('<b>Last chance!</b> Delete?', deleter, null);
 		}, null);
 	};
 
@@ -2110,7 +2110,7 @@ var fileman = (function () {
 			paster();
 		}
 
-		modal.confirm('paste these ' + req.length + ' items here?\n\n' + uricom_adec(req).join('\n'), function () {
+		modal.confirm('paste these ' + req.length + ' items here?<ul>' + uricom_adec(req, true).join('') + '</ul>', function () {
 			paster();
 			jwrite('fman_clip', []);
 		}, null);

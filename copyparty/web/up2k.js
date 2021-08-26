@@ -725,11 +725,11 @@ function up2k_init(subtle) {
                     match = false;
 
             if (match) {
-                var msg = ['directory iterator got stuck on the following {0} items; good chance your browser is about to spinlock:'.format(missing.length)];
+                var msg = ['directory iterator got stuck on the following {0} items; good chance your browser is about to spinlock:<ul>'.format(missing.length)];
                 for (var a = 0; a < Math.min(20, missing.length); a++)
-                    msg.push(missing[a]);
+                    msg.push('<li>' + esc(missing[a]) + '</li>');
 
-                return modal.alert(msg.join('\n-- '), function () {
+                return modal.alert(msg.join('') + '</ul>', function () {
                     read_dirs(rd, [], [], good, bad, spins);
                 });
             }
@@ -800,12 +800,12 @@ function up2k_init(subtle) {
             });
         }
 
-        var msg = ['{0} these {1} files?'.format(fsearch ? 'search' : 'upload', good_files.length)];
+        var msg = ['{0} these {1} files?<ul>'.format(fsearch ? 'search' : 'upload', good_files.length)];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
-            msg.push(good_files[a][1]);
+            msg.push('<li>' + esc(good_files[a][1]) + '</li>');
 
         if (ask_up && !fsearch)
-            return modal.confirm(msg.join('\n'), function () { up_them(good_files); }, null);
+            return modal.confirm(msg.join('') + '</ul>', function () { up_them(good_files); }, null);
 
         up_them(good_files);
     }

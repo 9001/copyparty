@@ -353,10 +353,12 @@ function uricom_dec(txt) {
 }
 
 
-function uricom_adec(arr) {
+function uricom_adec(arr, li) {
     var ret = [];
-    for (var a = 0; a < arr.length; a++)
-        ret.push(uricom_dec(arr[a])[0]);
+    for (var a = 0; a < arr.length; a++) {
+        var txt = uricom_dec(arr[a])[0];
+        ret.push(li ? '<li>' + esc(txt) + '</li>' : txt);
+    }
 
     return ret;
 }
