@@ -19,7 +19,7 @@ import subprocess as sp  # nosec
 from datetime import datetime
 from collections import Counter
 
-from .__init__ import PY2, WINDOWS, ANYWIN
+from .__init__ import PY2, WINDOWS, ANYWIN, VT100
 from .stolen import surrogateescape
 
 FAKE_MP = False
@@ -58,7 +58,7 @@ except:
         return struct.unpack(f.decode("ascii"), *a, **ka)
 
 
-ansi_re = re.compile("\033\\[[^m]*m")
+ansi_re = re.compile("\033\\[[^mK]*[mK]")
 
 
 surrogateescape.register_surrogateescape()
@@ -207,17 +207,22 @@ class ProgressPrinter(threading.Thread):
 
     def run(self):
         msg = None
+        fmt = " {}\033[K\r" if VT100 else " {} $\r"
         while not self.end:
             time.sleep(0.1)
             if msg == self.msg or self.end:
                 continue
 
             msg = self.msg
-            uprint(" {}\033[K\r".format(msg))
+            uprint(fmt.format(msg))
             if PY2:
                 sys.stdout.flush()
 
-        print("\033[K", end="")
+        if VT100:
+            print("\033[K", end="")
+        elif msg:
+            print("------------------------")
+
         sys.stdout.flush()  # necessary on win10 even w/ stderr btw
 
 
