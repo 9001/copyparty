@@ -881,12 +881,12 @@ html.light #ghead {
 	position: relative;
 	top: 0;
 }
-@media (max-width: 40em) {
-	#ghead>span {
-		white-space: pre;
-		margin: 1em 0 0 .3em;
-		display: inline-block
-	}
+#ghsep {
+	white-space: pre;
+}
+#ghead>.sep {
+	margin: 1em 0 0 .3em;
+	display: inline-block
 }
 #ggrid {
 	padding-top: .5em;

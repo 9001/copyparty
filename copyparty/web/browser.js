@@ -2157,7 +2157,8 @@ var thegrid = (function () {
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
 		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a> &nbsp; chop: ' +
 		'<a href="#" class="btn" l="-1" tt="truncate filenames more (show less)">&ndash;</a> ' +
-		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a> &nbsp; <span>sort by: ' +
+		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a> &nbsp; ' +
+		'<span id="ghsep">sort by: ' +
 		'<a href="#" s="href">name</a>, ' +
 		'<a href="#" s="sz">size</a>, ' +
 		'<a href="#" s="ts">date</a>, ' +
@@ -2192,11 +2193,11 @@ var thegrid = (function () {
 			loadgrid();
 		}
 		else {
-			lfiles.style.display = '';
-			gfiles.style.display = 'none';
+			ungrid();
 		}
 		pbar.onresize();
 		vbar.onresize();
+		r.onresize();
 	};
 
 	var btnclick = function (e) {
@@ -2234,14 +2235,14 @@ var thegrid = (function () {
 
 	r.setvis = function (vis) {
 		(r.en ? gfiles : lfiles).style.display = vis ? '' : 'none';
-	}
+	};
 
 	r.setdirty = function () {
 		r.dirty = true;
 		if (r.en) {
 			loadgrid();
 		}
-	}
+	};
 
 	function setln(v) {
 		if (v) {
@@ -2249,6 +2250,7 @@ var thegrid = (function () {
 			if (r.ln < 1) r.ln = 1;
 			if (r.ln > 7) r.ln = v < 0 ? 7 : 99;
 			swrite('gridln', r.ln);
+			setTimeout(r.tippen, 20);
 		}
 		try {
 			document.documentElement.style.setProperty('--grid-ln', r.ln);
@@ -2261,6 +2263,7 @@ var thegrid = (function () {
 		if (v !== undefined) {
 			r.sz = clamp(v, 4, 40);
 			swrite('gridsz', r.sz);
+			setTimeout(r.tippen, 20);
 		}
 		try {
 			document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
@@ -2319,7 +2322,7 @@ var thegrid = (function () {
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
-				cl = tr.getAttribute('class');
+				cl = tr.getAttribute('class') || '';
 
 			if (ths[a].getAttribute('href').endsWith('/'))
 				cl += ' dir';
@@ -2331,6 +2334,50 @@ var thegrid = (function () {
 			uns.onclick = function () {
 				ebi('unsearch').click();
 			};
+	};
+
+	r.tippen = function () {
+		// var cs = window.getComputedStyle(el), fs = parseFloat(cs.lineHeight); console.log('%.2f  %.2f', (el.offsetHeight - parseFloat(cs.paddingTop))/fs, (el.scrollHeight - parseFloat(cs.paddingTop))/fs);
+		var els = QSA('#ggrid>a>span'),
+			aa = els.length;
+
+		if (!aa)
+			return;
+
+		var cs = window.getComputedStyle(els[0]),
+			fs = parseFloat(cs.lineHeight),
+			pad = parseFloat(cs.paddingTop),
+			pels = [],
+			todo = [];
+
+		for (var a = 0; a < aa; a++) {
+			var vis = Math.round((els[a].offsetHeight - pad) / fs),
+				all = Math.round((els[a].scrollHeight - pad) / fs),
+				par = els[a].parentNode;
+
+			pels.push(par);
+			todo.push(vis < all ? par.getAttribute('ttt') : null);
+		}
+
+		for (var a = 0; a < todo.length; a++) {
+			if (todo[a])
+				pels[a].setAttribute('tt', todo[a]);
+			else
+				pels[a].removeAttribute('tt');
+		}
+
+		tt.att(ebi('ggrid'));
+	};
+
+	r.onresize = function () {
+		var el = ebi('ghsep');
+		clmod(el, 'sep', el.offsetLeft < 64);
+	};
+
+	function ungrid() {
+		lfiles.style.display = '';
+		gfiles.style.display = 'none';
+		window.removeEventListener('resize', r.onresize);
 	}
 
 	function loadgrid() {
@@ -2339,6 +2386,7 @@ var thegrid = (function () {
 
 		lfiles.style.display = 'none';
 		gfiles.style.display = 'block';
+		window.addEventListener('resize', r.onresize);
 
 		if (!r.dirty)
 			return r.loadsel();
@@ -2382,7 +2430,7 @@ var thegrid = (function () {
 			}
 
 			html.push('<a href="' + href + '" ref="' + ref +
-				'"' + ac + ' tt="' + esc(name) + '"><img src="' +
+				'"' + ac + ' ttt="' + esc(name) + '"><img src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ebi('ggrid').innerHTML = html.join('\n');
@@ -2391,10 +2439,10 @@ var thegrid = (function () {
 		for (var a = 0, aa = ths.length; a < aa; a++)
 			ths[a].onclick = gclick;
 
-		tt.att(ebi('ggrid'));
 		r.dirty = false;
 		r.bagit();
 		r.loadsel();
+		setTimeout(r.tippen, 20);
 	}
 
 	r.bagit = function () {
@@ -2925,6 +2973,7 @@ var treectl = (function () {
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
 		onresize();
+		thegrid.onresize();
 	};
 
 	treectl.detree = function (e) {
@@ -2943,6 +2992,7 @@ var treectl = (function () {
 		ebi('wrap').style.marginLeft = '0';
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
+		thegrid.onresize();
 	}
 
 	function onscroll() {
