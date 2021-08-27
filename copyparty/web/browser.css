@@ -922,11 +922,18 @@ html.light #ghead {
 	margin: 0 auto;
 	display: block;
 }
-#ggrid span.dir:before {
+#ggrid>a.dir:before {
 	content: '📂';
-	line-height: 0;
+}
+#ggrid>a:before {
+	display: block;
+	position: absolute;
+	padding: .3em 0;
+	margin: -.4em;
+	text-shadow: 0 0 .1em #000;
+	background: linear-gradient(135deg,rgba(255,255,255,0) 50%,rgba(255,255,255,0.2));
+	border-radius: .3em;
 	font-size: 2em;
-	margin: -.7em .1em -.5em -.3em;
 }
 #ggrid a:hover {
 	background: #444;
