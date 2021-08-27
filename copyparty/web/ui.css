@@ -1,3 +1,6 @@
+html {
+	touch-action: manipulation;
+}
 #tt, #toast {
 	position: fixed;
 	max-width: 34em;

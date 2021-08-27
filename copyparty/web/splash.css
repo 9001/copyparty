@@ -3,6 +3,9 @@ html, body, #wrap {
 	background: #f7f7f7;
 	font-family: sans-serif;
 }
+html {
+	touch-action: manipulation;
+}
 #wrap {
 	max-width: 40em;
 	margin: 2em auto;

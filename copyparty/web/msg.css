@@ -11,6 +11,7 @@ html {
 	background: #333;
 	font-family: sans-serif;
 	text-shadow: 1px 1px 0px #000;
+	touch-action: manipulation;
 }
 html, body {
 	margin: 0;
