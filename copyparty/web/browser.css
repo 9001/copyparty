@@ -213,8 +213,8 @@ a, #files tbody div a:last-child {
 	color: #720;
 	text-shadow: 0 0 .3em #b80;
 }
-#ggrid a.play,
-html.light #ggrid a.play {
+#ggrid>a.play,
+html.light #ggrid>a.play {
 	color: #fff;
 	background: #750;
 	border-color: #c90;
@@ -222,36 +222,36 @@ html.light #ggrid a.play {
 	box-shadow: 0 .1em 1.2em #b83;
 }
 #files tbody tr.sel td,
-#ggrid a.sel,
-html.light #ggrid a.sel {
+#ggrid>a.sel,
+html.light #ggrid>a.sel {
 	color: #fff;
 	background: #925;
 	border-color: #c37;
 }
 #files tbody tr.sel:hover td,
 #files tbody tr.sel:focus td,
-#ggrid a.sel:hover,
-html.light #ggrid a.sel:hover {
+#ggrid>a.sel:hover,
+html.light #ggrid>a.sel:hover {
 	color: #fff;
 	background: #d39;
 	border-color: #d48;
 	text-shadow: 1px 1px 0 #804;
 }
-#ggrid a.sel,
-html.light #ggrid a.sel {
+#ggrid>a.sel,
+html.light #ggrid>a.sel {
 	border-top: 1px solid #d48;
 	box-shadow: 0 .1em 1.2em #b36;
 	transition: all 0.2s cubic-bezier(.2, 2.2, .5, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
 }
-#ggrid a.sel img,
-#ggrid a.play img {
+#ggrid>a.sel img,
+#ggrid>a.play img {
 	opacity: .7;
 	filter: contrast(130%) brightness(107%);
 }
-#ggrid a.sel img {
+#ggrid>a.sel img {
 	box-shadow: 0 0 1em #b36;
 }
-#ggrid a.play img {
+#ggrid>a.play img {
 	box-shadow: 0 0 1em #b83;
 }
 #files tr.sel a {
@@ -693,10 +693,10 @@ input.eq_gain {
 	position: sticky;
 	z-index: 1;
 	top: 0;
-    height: 2.2em;
-    line-height: 2.2em;
-    border-bottom: 1px solid #555;
-    overflow: hidden;
+	height: 2.2em;
+	line-height: 2.2em;
+	border-bottom: 1px solid #555;
+	overflow: hidden;
 }
 #thx_ff {
 	padding: 5em 0;
@@ -899,7 +899,7 @@ html.light #ghead {
 	-webkit-box-orient: vertical;
 	padding-top: .3em;
 }
-#ggrid a {
+#ggrid>a {
 	display: inline-block;
 	width: 10em;
 	width: var(--grid-sz);
@@ -913,7 +913,7 @@ html.light #ghead {
 	padding: .3em;
 	margin: .5em;
 }
-#ggrid a img {
+#ggrid>a img {
 	border-radius: .2em;
 	max-width: 10em;
 	max-width: var(--grid-sz);
@@ -935,17 +935,17 @@ html.light #ghead {
 	border-radius: .3em;
 	font-size: 2em;
 }
-#ggrid a:hover {
+#ggrid>a:hover {
 	background: #444;
 	border-color: #555;
 	color: #fd9;
 }
-html.light #ggrid a {
+html.light #ggrid>a {
 	background: #f7f7f7;
 	border-color: #ddd;
 	box-shadow: 0 .1em .2em #ddd;
 }
-html.light #ggrid a:hover {
+html.light #ggrid>a:hover {
 	background: #fff;
 	border-color: #ccc;
 	color: #015;
@@ -1324,11 +1324,11 @@ html.light #tree::-webkit-scrollbar {
 	opacity: 1;
 }
 .full-image {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
+	display: inline-block;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	text-align: center;
 }
 .full-image figure {
 	display: inline;
