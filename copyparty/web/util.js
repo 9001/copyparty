@@ -179,17 +179,26 @@ function crc32(str) {
 
 function clmod(el, cls, add) {
     if (el.classList) {
+        var have = el.classList.contains(cls);
         if (add == 't')
-            add = el.classList.contains(cls) ? 0 : 1;
+            add = !have;
 
-        return el.classList[add ? 'add' : 'remove'](cls);
+        if (add != have)
+            el.classList[add ? 'add' : 'remove'](cls);
+
+        return;
     }
 
-    var re = new RegExp('\\s*\\b' + cls + '\\s*\\b', 'g');
-    if (add == 't')
-        add = !re.test(el.className);
+    var re = new RegExp('\\s*\\b' + cls + '\\s*\\b', 'g'),
+        n1 = el.className;
 
-    el.className = el.className.replace(re, ' ') + (add ? ' ' + cls : '');
+    if (add == 't')
+        add = !re.test(n1);
+
+    var n2 = n1.replace(re, ' ') + (add ? ' ' + cls : '');
+
+    if (n1 != n2)
+        el.className = n2;
 }
 
 
