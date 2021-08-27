@@ -604,22 +604,32 @@ var tt = (function () {
         r.el = this;
         var pos = this.getBoundingClientRect(),
             dir = this.getAttribute('ttd') || '',
-            left = pos.left < window.innerWidth / 2,
             top = pos.top < window.innerHeight / 2,
             big = this.className.indexOf(' ttb') !== -1;
 
         if (dir.indexOf('u') + 1) top = false;
         if (dir.indexOf('d') + 1) top = true;
-        if (dir.indexOf('l') + 1) left = false;
-        if (dir.indexOf('r') + 1) left = true;
 
         clmod(r.tt, 'b', big);
+        r.tt.style.maxWidth = '';
+        r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
+        var tw = r.tt.offsetWidth,
+            x = pos.left + (pos.right - pos.left) / 2 - tw / 2;
+
+        if (x < 0)
+            x = 0;
+
+        if (x + tw > window.innerWidth) {
+            if (!x)
+                r.tt.style.maxWidth = window.innerWidth + 'px';
+            else
+                x = window.innerWidth - tw;
+        }
+
+        r.tt.style.left = x + 'px';
         r.tt.style.top = top ? pos.bottom + 'px' : 'auto';
         r.tt.style.bottom = top ? 'auto' : (window.innerHeight - pos.top) + 'px';
-        r.tt.style.left = left ? pos.left + 'px' : 'auto';
-        r.tt.style.right = left ? 'auto' : (window.innerWidth - pos.right) + 'px';
 
-        r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
         r.el.addEventListener('mouseleave', r.hide);
         clmod(r.tt, 'show', 1);
     };
