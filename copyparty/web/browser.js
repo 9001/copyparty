@@ -2153,12 +2153,11 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead">' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> &nbsp; zoom: ' +
+		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> <span>zoom: ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a> &nbsp; chop: ' +
+		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>chop: ' +
 		'<a href="#" class="btn" l="-1" tt="truncate filenames more (show less)">&ndash;</a> ' +
-		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a> &nbsp; ' +
-		'<span id="ghsep">sort by: ' +
+		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a></span> <span>sort by: ' +
 		'<a href="#" s="href">name</a>, ' +
 		'<a href="#" s="sz">size</a>, ' +
 		'<a href="#" s="ts">date</a>, ' +
@@ -2367,11 +2366,6 @@ var thegrid = (function () {
 		}
 
 		tt.att(ebi('ggrid'));
-	};
-
-	r.onresize = function () {
-		var el = ebi('ghsep');
-		clmod(el, 'sep', el.offsetLeft < 64);
 	};
 
 	function ungrid() {
@@ -2973,7 +2967,6 @@ var treectl = (function () {
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
 		onresize();
-		thegrid.onresize();
 	};
 
 	treectl.detree = function (e) {
@@ -2992,7 +2985,6 @@ var treectl = (function () {
 		ebi('wrap').style.marginLeft = '0';
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
-		thegrid.onresize();
 	}
 
 	function onscroll() {

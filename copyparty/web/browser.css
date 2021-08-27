@@ -868,7 +868,8 @@ input.eq_gain {
 	background: #3c3c3c;
 	border: 1px solid #444;
 	border-radius: .3em;
-	padding: .5em;
+	padding: .2em .5em;
+	line-height: 2.3em;
 	margin: 0 1.5em 1em .4em;
 	position: sticky;
 	top: -.3em;
@@ -881,12 +882,9 @@ html.light #ghead {
 	position: relative;
 	top: 0;
 }
-#ghsep {
+#ghead>span {
 	white-space: pre;
-}
-#ghead>.sep {
-	margin: 1em 0 0 .3em;
-	display: inline-block
+	padding-left: .3em;
 }
 #ggrid {
 	padding-top: .5em;
