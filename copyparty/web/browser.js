@@ -2153,14 +2153,16 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead">' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> &nbsp; zoom ' +
+		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> &nbsp; zoom: ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a> &nbsp; sort by: ' +
+		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a> &nbsp; chop: ' +
+		'<a href="#" class="btn" l="-1" tt="truncate filenames more (show less)">&ndash;</a> ' +
+		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a> &nbsp; <span>sort by: ' +
 		'<a href="#" s="href">name</a>, ' +
 		'<a href="#" s="sz">size</a>, ' +
 		'<a href="#" s="ts">date</a>, ' +
 		'<a href="#" s="ext">type</a>' +
-		'</div>' +
+		'</span></div>' +
 		'<div id="ggrid"></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
@@ -2169,7 +2171,8 @@ var thegrid = (function () {
 		'thumbs': bcfg_get('thumbs', true),
 		'en': bcfg_get('griden', false),
 		'sel': bcfg_get('gridsel', false),
-		'sz': fcfg_get('gridsz', 10),
+		'sz': clamp(fcfg_get('gridsz', 10), 4, 40),
+		'ln': clamp(icfg_get('gridln', 3), 1, 7),
 		'isdirty': true,
 		'bbox': null
 	};
@@ -2199,10 +2202,14 @@ var thegrid = (function () {
 	var btnclick = function (e) {
 		ev(e);
 		var s = this.getAttribute('s'),
-			z = this.getAttribute('z');
+			z = this.getAttribute('z'),
+			l = this.getAttribute('l');
 
 		if (z)
 			return setsz(z > 0 ? r.sz * z : r.sz / (-z));
+
+		if (l)
+			return setln(parseInt(l));
 
 		var t = lfiles.tHead.rows[0].cells;
 		for (var a = 0; a < t.length; a++)
@@ -2236,9 +2243,23 @@ var thegrid = (function () {
 		}
 	}
 
+	function setln(v) {
+		if (v) {
+			r.ln += v;
+			if (r.ln < 1) r.ln = 1;
+			if (r.ln > 7) r.ln = v < 0 ? 7 : 99;
+			swrite('gridln', r.ln);
+		}
+		try {
+			document.documentElement.style.setProperty('--grid-ln', r.ln);
+		}
+		catch (ex) { }
+	}
+	setln();
+
 	function setsz(v) {
 		if (v !== undefined) {
-			r.sz = v;
+			r.sz = clamp(v, 4, 40);
 			swrite('gridsz', r.sz);
 		}
 		try {
@@ -2297,8 +2318,13 @@ var thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			var tr = ebi(ths[a].getAttribute('ref')).closest('tr');
-			ths[a].setAttribute('class', tr.getAttribute('class'));
+			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
+				cl = tr.getAttribute('class');
+
+			if (ths[a].getAttribute('href').endsWith('/'))
+				cl += ' dir';
+
+			ths[a].setAttribute('class', cl);
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');
 		if (uns)
@@ -2322,6 +2348,7 @@ var thegrid = (function () {
 		for (var a = 0, aa = files.length; a < aa; a++) {
 			var ao = files[a],
 				href = esc(ao.getAttribute('href')),
+				name = uricom_dec(vsplit(href)[1])[0],
 				ref = ao.getAttribute('id'),
 				isdir = href.split('?')[0].slice(-1)[0] == '/',
 				ac = isdir ? ' class="dir"' : '',
@@ -2354,7 +2381,8 @@ var thegrid = (function () {
 				ihref = '/.cpr/ico/' + ihref.slice(0, -1);
 			}
 
-			html.push('<a href="' + href + '" ref="' + ref + '"><img src="' +
+			html.push('<a href="' + href + '" ref="' + ref +
+				'"' + ac + ' tt="' + esc(name) + '"><img src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ebi('ggrid').innerHTML = html.join('\n');
@@ -2363,6 +2391,7 @@ var thegrid = (function () {
 		for (var a = 0, aa = ths.length; a < aa; a++)
 			ths[a].onclick = gclick;
 
+		tt.att(ebi('ggrid'));
 		r.dirty = false;
 		r.bagit();
 		r.loadsel();

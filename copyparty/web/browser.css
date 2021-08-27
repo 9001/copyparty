@@ -1,5 +1,6 @@
 :root {
 	--grid-sz: 10em;
+	--grid-ln: 3;
 }
 @font-face {
 	font-family: 'scp';
@@ -880,8 +881,23 @@ html.light #ghead {
 	position: relative;
 	top: 0;
 }
+@media (max-width: 40em) {
+	#ghead>span {
+		white-space: pre;
+		margin: 1em 0 0 .3em;
+		display: inline-block
+	}
+}
 #ggrid {
 	padding-top: .5em;
+}
+#ggrid>a>span {
+	overflow: hidden;
+	display: block;
+	display: -webkit-box;
+	-webkit-line-clamp: var(--grid-ln);
+	-webkit-box-orient: vertical;
+	padding-top: .3em;
 }
 #ggrid a {
 	display: inline-block;
@@ -904,10 +920,6 @@ html.light #ghead {
 	max-height: 8em;
 	max-height: calc(var(--grid-sz)/1.25);
 	margin: 0 auto;
-	display: block;
-}
-#ggrid a span {
-	padding: .2em .3em;
 	display: block;
 }
 #ggrid span.dir:before {

@@ -420,6 +420,11 @@ function humansize(b, terse) {
 }
 
 
+function clamp(v, a, b) {
+    return Math.min(Math.max(v, a), b);
+}
+
+
 function has(haystack, needle) {
     for (var a = 0; a < haystack.length; a++)
         if (haystack[a] == needle)
