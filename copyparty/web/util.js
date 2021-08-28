@@ -592,6 +592,8 @@ var tt = (function () {
             r.skip = false;
             return;
         }
+        if (QS('body.bbox-open'))
+            return;
 
         var cfg = sread('tooltips');
         if (cfg !== null && cfg != '1')
@@ -612,18 +614,21 @@ var tt = (function () {
 
         clmod(r.tt, 'b', big);
         r.tt.style.maxWidth = '';
+        r.tt.style.left = '0';
+        r.tt.style.top = '0';
+
         r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
         var tw = r.tt.offsetWidth,
             x = pos.left + (pos.right - pos.left) / 2 - tw / 2;
 
         if (x < 0)
-            x = 0;
+            x = 8;
 
         if (x + tw > window.innerWidth) {
-            if (!x)
-                r.tt.style.maxWidth = window.innerWidth + 'px';
+            if (x <= 8)
+                r.tt.style.maxWidth = (window.innerWidth - 16) + 'px';
             else
-                x = window.innerWidth - tw;
+                x = window.innerWidth - tw - 8;
         }
 
         r.tt.style.left = x + 'px';
@@ -646,10 +651,10 @@ var tt = (function () {
             f2 = r.hide;
 
         r.show = function () {
-            setTimeout(f1.bind(this), 301);
+            setTimeout(f1.bind(this), 101);
         };
         r.hide = function () {
-            setTimeout(f2.bind(this), 301);
+            setTimeout(f2.bind(this), 101);
         };
     }
 

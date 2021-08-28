@@ -1890,10 +1890,6 @@ function up2k_init(subtle) {
     if (o)
         o.addEventListener('click', tgl_fsearch, false);
 
-    var nodes = ebi('u2conf').getElementsByTagName('a');
-    for (var a = nodes.length - 1; a >= 0; a--)
-        nodes[a].addEventListener('touchend', nop, false);
-
     ebi('u2etas').onclick = function () {
         clmod(ebi('u2etas'), 'o', 't');
     };

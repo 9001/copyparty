@@ -2221,7 +2221,7 @@ var thegrid = (function () {
 		r.setdirty();
 	};
 
-	var links = QSA('#ghead>a');
+	var links = QSA('#ghead a');
 	for (var a = 0; a < links.length; a++)
 		links[a].onclick = btnclick;
 
