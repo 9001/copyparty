@@ -126,6 +126,10 @@ e=6; s=10; d=~/dev/copyparty/srv/aus; n=1; p=0; e=$((e*60)); rm -rf $d; mkdir $d
 -v srv/aus:aus:r:ce2dsa:ce2ts:cmtp=fgsfds=bin/mtag/sleep.py
 sqlite3 .hist/up2k.db 'select * from mt where k="fgsfds" or k="t:mtp"' | tee /dev/stderr | wc -l
 
+# generate the sine meme
+for ((f=420;f<1200;f++)); do sz=$(ffmpeg -y -f lavfi -i sine=frequency=$f:duration=2 -vf volume=0.1 -ac 1 -ar 44100 -f s16le /dev/shm/a.wav 2>/dev/null; base64 -w0 </dev/shm/a.wav | gzip -c | wc -c); printf '%d %d\n' $f $sz; done | tee /dev/stderr | sort -nrk2,2
+ffmpeg -y -f lavfi -i sine=frequency=1050:duration=2 -vf volume=0.1 -ac 1 -ar 44100 /dev/shm/a.wav
+
 
 ##
 ## vscode
