@@ -399,6 +399,7 @@ function MPlayer() {
 	r.au_native2 = null;
 	r.au_ogvjs = null;
 	r.au_ogvjs2 = null;
+	r.loading = false;
 	r.tracks = {};
 	r.order = [];
 
@@ -680,7 +681,7 @@ var pbar = (function () {
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
 
-		if (!mp.au)
+		if (!mp.au || mp.loading)
 			return;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
@@ -702,25 +703,26 @@ var pbar = (function () {
 	r.drawpos = function () {
 		var bc = r.buf,
 			pc = r.pos,
-			pctx = pc.ctx;
+			pctx = pc.ctx,
+			apos, adur;
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp.au || isNaN(mp.au.duration) || isNaN(mp.au.currentTime))
+		if (!mp.au || mp.loading || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime))
 			return;  // not-init || unsupp-codec
 
-		var sm = bc.w * 1.0 / mp.au.duration;
+		var sm = bc.w * 1.0 / adur;
 
 		pctx.fillStyle = light ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
-		for (var p = 1, mins = mp.au.duration / 10; p <= mins; p++)
+		for (var p = 1, mins = adur / 10; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
 		pctx.fillStyle = light ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
-		for (var p = 1, mins = mp.au.duration / 60; p <= mins; p++)
+		for (var p = 1, mins = adur / 60; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
 		var w = 8,
-			x = sm * mp.au.currentTime;
+			x = sm * apos;
 
 		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
 		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, 8, pc.h);
@@ -731,8 +733,8 @@ var pbar = (function () {
 		pctx.font = '1em sans-serif';
 
 		var m = pctx.measureText.bind(pctx),
-			t1 = s2ms(mp.au.duration),
-			t2 = s2ms(mp.au.currentTime),
+			t1 = s2ms(adur),
+			t2 = s2ms(apos),
 			yt = pc.h / 3 * 2.1,
 			xt1 = pc.w - (m(t1).width + 12),
 			xt2 = x < pc.w / 2 ? (x + 12) : (Math.min(pc.w - m(t1 + ":88").width, x - 12) - m(t2).width);
@@ -965,7 +967,7 @@ var mpui = (function () {
 		}
 
 		// preload next song
-		if (mpl.preload && preloaded != mp.au.src) {
+		if (mpl.preload && !mp.loading && preloaded != mp.au.src) {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration;
 
@@ -1284,11 +1286,15 @@ function play(tid, is_ev, seek, call_depth) {
 			mp.au = mp.au_ogvjs;
 		}
 		else if (window['OGVPlayer']) {
+			mp.loading = true;
 			mp.au = mp.au_ogvjs = new OGVPlayer();
 			attempt_play = is_ev;
-			mp.au.addEventListener('error', evau_error, true);
-			mp.au.addEventListener('progress', pbar.drawpos);
-			mp.au.addEventListener('ended', next_song);
+			mp.au.onerror = evau_error;
+			mp.au.onprogress = pbar.drawpos;
+			mp.au.onended = next_song;
+			mp.au.onloadedmetadata = mp.au.onloadeddata = function () {
+				mp.loading = false;
+			};
 			widget.open();
 		}
 		else {
@@ -1308,18 +1314,26 @@ function play(tid, is_ev, seek, call_depth) {
 	else {
 		if (!mp.au_native) {
 			mp.au = mp.au_native = new Audio();
-			mp.au.addEventListener('error', evau_error, true);
-			mp.au.addEventListener('progress', pbar.drawpos);
-			mp.au.addEventListener('ended', next_song);
+			mp.au.onerror = evau_error;
+			mp.au.onprogress = pbar.drawpos;
+			mp.au.onended = next_song;
 			widget.open();
 		}
 		mp.au = mp.au_native;
+		mp.loading = false;
 	}
 
 	audio_eq.apply();
 
+	url += (url.indexOf('?') < 0 ? '?cache' : '&cache');
+	if (mp.au.src == url)
+		mp.au.currentTime = 0;
+	else {
+		mp.loading = mp.au == mp.au_ogvjs;
+		mp.au.src = url;
+	}
+
 	mp.au.tid = tid;
-	mp.au.src = url + (url.indexOf('?') < 0 ? '?cache' : '&cache');
 	mp.au.volume = mp.expvol(mp.vol);
 	var oid = 'a' + tid;
 	setclass(oid, 'play act');
@@ -1435,9 +1449,11 @@ function autoplay_blocked(seek) {
 	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function (e) {
 		unblocked(e);
-		// chrome 91 may permanently taint on a failed play()
-		// depending on win10 settings or something? idk
-		mp.au_native = mp.au_ogvjs = null;
+		if (mp.au !== mp.au_ogvjs)
+			// chrome 91 may permanently taint on a failed play()
+			// depending on win10 settings or something? idk
+			mp.au_native = null;
+
 		play(tid, true, seek);
 		mp.fade_in();
 	};
