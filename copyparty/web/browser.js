@@ -1317,6 +1317,10 @@ function play(tid, is_ev, seek, call_depth) {
 			import_js('/.cpr/deps/ogv.js', function () {
 				toast.hide();
 				play(tid, false, seek, 1);
+
+				var m = /.* Version\/([0-9]+)\.[0-9\.]+ Mobile\/[^ ]+ Safari\/[0-9\.]+$/.exec(navigator.userAgent);
+				if (m && parseInt(m[1]) < 14)
+					toast.err(0, 'because this is an apple device,\nsafari 14 or newer is required\n\nyou are using safari version ' + m[1] + ', so playback of ogg/vorbis/opus files will be buggy\n\nnote: every iOS browser is safari');
 			});
 
 			return;

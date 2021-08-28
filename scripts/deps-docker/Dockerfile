@@ -3,7 +3,7 @@ WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.7.0 \
         ver_marked=1.1.0 \
-        ver_ogvjs=1.8.0 \
+        ver_ogvjs=1.8.4 \
         ver_mde=2.14.0 \
         ver_codemirror=5.59.3 \
         ver_fontawesome=5.13.0 \
@@ -74,23 +74,16 @@ RUN     cd hash-wasm \
 # build ogvjs
 RUN     cd ogvjs-$ver_ogvjs \
         && cp -pv \
-            ogv.js \
             ogv-worker-audio.js \
             ogv-demuxer-ogg-wasm.js \
             ogv-demuxer-ogg-wasm.wasm \
-            ogv-demuxer-webm-wasm.js \
-            ogv-demuxer-webm-wasm.wasm \
             ogv-decoder-audio-opus-wasm.js \
             ogv-decoder-audio-opus-wasm.wasm \
             ogv-decoder-audio-vorbis-wasm.js \
             ogv-decoder-audio-vorbis-wasm.wasm \
-            /z/dist
-
-#            ogv-demuxer-ogg.js \
-#            ogv-demuxer-webm.js \
-#            ogv-decoder-audio-opus.js \
-#            ogv-decoder-audio-vorbis.js \
-#            dynamicaudio.swf \
+            /z/dist \
+        && cp -pv \
+            ogv-es2017.js /z/dist/ogv.js
 
 
 # build marked
