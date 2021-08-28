@@ -613,7 +613,6 @@ var tt = (function () {
         if (dir.indexOf('d') + 1) top = true;
 
         clmod(r.tt, 'b', big);
-        r.tt.style.maxWidth = '';
         r.tt.style.left = '0';
         r.tt.style.top = '0';
 
@@ -625,10 +624,7 @@ var tt = (function () {
             x = 8;
 
         if (x + tw >= window.innerWidth - 8) {
-            if (x <= 8)
-                r.tt.style.maxWidth = (window.innerWidth - 16) + 'px';
-            else
-                x = window.innerWidth - tw - 8;
+            x = window.innerWidth - tw - 8;
         }
 
         r.tt.style.left = x + 'px';
@@ -650,13 +646,23 @@ var tt = (function () {
 
     if (is_touch && IPHONE) {
         var f1 = r.show,
-            f2 = r.hide;
+            f2 = r.hide,
+            q = [];
+
+        // if an onclick-handler creates a new timer,
+        // iOS 13.1.2 delays the entire handler by up to 401ms,
+        // win by using a shared timer instead
+
+        timer.add(function () {
+            while (q.length && Date.now() >= q[0][0])
+                q.shift()[1]();
+        });
 
         r.show = function () {
-            setTimeout(f1.bind(this), 401);
+            q.push([Date.now() + 100, f1.bind(this)]);
         };
         r.hide = function () {
-            setTimeout(f2.bind(this), 401);
+            q.push([Date.now() + 100, f2.bind(this)]);
         };
     }
 

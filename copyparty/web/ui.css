@@ -13,6 +13,7 @@ html {
 	z-index: 9001;
 }
 #tt {
+	max-width: min(34em, calc(100% - 3.3em));
 	overflow: hidden;
 	margin: .7em 0;
 	padding: 0 1.3em;
