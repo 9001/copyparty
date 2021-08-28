@@ -1,36 +1,3 @@
-/* put filetype icons inline with text
-#ggrid>a>span:before,
-#ggrid>a>span.dir:before {
-	display: inline;
-	line-height: 0;
-	font-size: 1.7em;
-	margin: -.7em .1em -.5em -.6em;
-}
-*/
-
-
-/* move folder icons top-left */
-#ggrid>a>span.dir:before {
-	content: initial;
-}
-#ggrid>a[href$="/"]:before {
-	content: '📂';
-}
-
-
-/* put filetype icons top-left */
-#ggrid>a:before {
-    display: block;
-    position: absolute;
-	padding: .3em 0;
-    margin: -.4em;
-    text-shadow: 0 0 .1em #000;
-	background: linear-gradient(135deg,rgba(255,255,255,0) 50%,rgba(255,255,255,0.2));
-	border-radius: .3em;
-    font-size: 2em;
-}
-
-
 /* video */
 #ggrid>a:is(
 [href$=".mkv"i],
