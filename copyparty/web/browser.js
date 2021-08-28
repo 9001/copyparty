@@ -32,7 +32,7 @@ ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wfm"><a' +
 	' href="#" id="fren" tt="rename selected item$NHotkey: F2">✎<span>name</span></a><a' +
-	' href="#" id="fdel" tt="delete selected items$NHotkey: ctrl-K">⌫<span>delete</span></a><a' +
+	' href="#" id="fdel" tt="delete selected items$NHotkey: ctrl-K">⌫<span>del.</span></a><a' +
 	' href="#" id="fcut" tt="cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X">✂<span>cut</span></a><a' +
 	' href="#" id="fpst" tt="paste a previously cut/copied selection$NHotkey: ctrl-V">📋<span>paste</span></a>' +
 	'</span><span id="wzip"><a' +

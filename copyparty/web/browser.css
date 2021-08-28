@@ -317,7 +317,7 @@ html.light #ggrid>a.sel {
 }
 #widget {
 	position: fixed;
-	font-size: 1.5em;
+	font-size: 1.4em;
 	left: 0;
 	right: 0;
 	bottom: -6em;
@@ -343,10 +343,11 @@ html.light #ggrid>a.sel {
 	cursor: url(/.cpr/dd/4.png), pointer;
 	animation: cursor 500ms;
 	position: relative;
-	top: -.06em;
+	font-size: .9em;
+	top: -.04em;
 }
 #wtgrid {
-	font-size: .8em;
+	font-size: .75em;
 	top: -.12em;
 }
 #wtgrid:hover,
@@ -366,7 +367,8 @@ html.light #ggrid>a.sel {
 #wtoggle {
 	position: absolute;
 	white-space: nowrap;
-	top: -1.2em;
+	font-size: .8em;
+	top: -1em;
 	right: 0;
 	height: 1em;
 	font-size: 2em;
@@ -376,7 +378,7 @@ html.light #ggrid>a.sel {
 	background: #3c3c3c;
 	box-shadow: 0 0 .5em #222;
 	border-radius: .3em 0 0 0;
-	padding: .2em .2em;
+	padding: 0;
 	color: #fff;
 }
 #wzip, #wnp {
@@ -409,7 +411,7 @@ html.light #ggrid>a.sel {
 #wzip a {
 	font-size: .5em;
 	padding: 0 .3em;
-	margin: -.3em .2em;
+	margin: -.3em .1em;
 	position: relative;
 	display: inline-block;
 }
@@ -433,7 +435,7 @@ html.light #wfm a:not(.en) {
 }
 #wzip a {
 	font-size: .4em;
-	margin: -.3em .3em;
+	margin: -.3em .1em;
 }
 #wtoggle.sel #wzip #selzip {
 	top: -.6em;
@@ -1659,6 +1661,7 @@ html.light #bbox-overlay figcaption a {
 	white-space: nowrap;
 	text-align: center;
 	overflow: hidden;
+	min-width: 24em;
 }
 #u2cards.w {
 	width: 44em;
