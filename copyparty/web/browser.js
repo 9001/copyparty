@@ -2196,7 +2196,6 @@ var thegrid = (function () {
 		}
 		pbar.onresize();
 		vbar.onresize();
-		r.onresize();
 	};
 
 	var btnclick = function (e) {
@@ -2371,7 +2370,6 @@ var thegrid = (function () {
 	function ungrid() {
 		lfiles.style.display = '';
 		gfiles.style.display = 'none';
-		window.removeEventListener('resize', r.onresize);
 	}
 
 	function loadgrid() {
@@ -2380,7 +2378,6 @@ var thegrid = (function () {
 
 		lfiles.style.display = 'none';
 		gfiles.style.display = 'block';
-		window.addEventListener('resize', r.onresize);
 
 		if (!r.dirty)
 			return r.loadsel();
