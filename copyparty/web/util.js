@@ -624,7 +624,7 @@ var tt = (function () {
         if (x < 0)
             x = 8;
 
-        if (x + tw > window.innerWidth) {
+        if (x + tw >= window.innerWidth - 8) {
             if (x <= 8)
                 r.tt.style.maxWidth = (window.innerWidth - 16) + 'px';
             else
@@ -653,10 +653,10 @@ var tt = (function () {
             f2 = r.hide;
 
         r.show = function () {
-            setTimeout(f1.bind(this), 101);
+            setTimeout(f1.bind(this), 401);
         };
         r.hide = function () {
-            setTimeout(f2.bind(this), 101);
+            setTimeout(f2.bind(this), 401);
         };
     }
 
