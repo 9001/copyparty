@@ -636,11 +636,13 @@ var tt = (function () {
         r.tt.style.bottom = top ? 'auto' : (window.innerHeight - pos.top) + 'px';
 
         r.el.addEventListener('mouseleave', r.hide);
+        window.addEventListener('scroll', r.hide);
         clmod(r.tt, 'show', 1);
     };
 
     r.hide = function (e) {
         ev(e);
+        window.removeEventListener('scroll', r.hide);
         clmod(r.tt, 'show');
         if (r.el)
             r.el.removeEventListener('mouseleave', r.hide);
