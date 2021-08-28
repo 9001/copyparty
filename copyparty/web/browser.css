@@ -875,6 +875,7 @@ input.eq_gain {
 	margin: 0 1.5em 1em .4em;
 	position: sticky;
 	top: -.3em;
+	z-index: 1;
 }
 html.light #ghead {
 	background: #f7f7f7;

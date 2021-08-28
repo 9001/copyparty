@@ -2335,7 +2335,6 @@ var thegrid = (function () {
 	};
 
 	r.tippen = function () {
-		// var cs = window.getComputedStyle(el), fs = parseFloat(cs.lineHeight); console.log('%.2f  %.2f', (el.offsetHeight - parseFloat(cs.paddingTop))/fs, (el.scrollHeight - parseFloat(cs.paddingTop))/fs);
 		var els = QSA('#ggrid>a>span'),
 			aa = els.length;
 
