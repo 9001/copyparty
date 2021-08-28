@@ -223,7 +223,9 @@ html.light #ggrid>a.play {
 }
 #files tbody tr.sel td,
 #ggrid>a.sel,
-html.light #ggrid>a.sel {
+#ggrid>a[tt].sel,
+html.light #ggrid>a.sel,
+html.light #ggrid>a[tt].sel {
 	color: #fff;
 	background: #925;
 	border-color: #c37;
@@ -911,6 +913,9 @@ html.light #ghead {
 	padding: .3em;
 	margin: .5em;
 }
+#ggrid>a[tt] {
+	background: linear-gradient(135deg, #383838 95%, #555 95%);
+}
 #ggrid>a img {
 	border-radius: .2em;
 	max-width: 10em;
@@ -942,6 +947,9 @@ html.light #ggrid>a {
 	background: #f7f7f7;
 	border-color: #ddd;
 	box-shadow: 0 .1em .2em #ddd;
+}
+html.light #ggrid>a[tt] {
+	background: linear-gradient(135deg, #f7f7f7 95%, #ccc 95%);
 }
 html.light #ggrid>a:hover {
 	background: #fff;

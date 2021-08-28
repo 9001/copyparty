@@ -12,7 +12,7 @@ html {
 }
 #tt {
 	overflow: hidden;
-	margin-top: 1em;
+	margin: .7em 0;
 	padding: 0 1.3em;
 	height: 0;
 	opacity: .1;
