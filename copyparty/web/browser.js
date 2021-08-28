@@ -1019,6 +1019,21 @@ function need_ogv_for(url) {
 }
 
 
+function start_sinegen() {
+	var af = 'data:audio/wav;base64,UklGRlaxAgBXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAATElTVBoAAABJTkZPSVNGVA4AAABMYXZmNTguNzYuMTAwAGRhdGEQsQIAAAB',
+		body = 'iArcE8AYCCeEKggzaDeQOmA/0D/QPmQ/kDtsNggzhCgMJ8Qa4BGMCAQCe/Un7EPn+9h/1fvMm8hzxaPAM8AzwZ/Ac8SXyfvMf9f32D/lI+539//9';
+
+	while (af.length < 235304)
+		af += body;
+
+	var au = new Audio(af.slice(0, 235304));
+	au.onplay = au.pause.bind(au);
+	au.volume = 0.5;
+	au.play();
+	return au;
+}
+
+
 var audio_eq = (function () {
 	var r = {
 		"en": false,
@@ -1449,6 +1464,11 @@ function autoplay_blocked(seek) {
 			// chrome 91 may permanently taint on a failed play()
 			// depending on win10 settings or something? idk
 			mp.au_native = null;
+		else
+			// iOS browsers allow playing ogg/vorbis/opus in the background
+			// if there is an <audio> tag which at some point played audio
+			if (!mp.sinegen)
+				mp.sinegen = start_sinegen();
 
 		play(tid, true, seek);
 		mp.fade_in();
