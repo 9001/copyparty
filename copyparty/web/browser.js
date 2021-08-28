@@ -423,18 +423,14 @@ function MPlayer() {
 		}
 	}
 
-	r.vol = sread('vol');
-	if (r.vol !== null)
-		r.vol = parseFloat(r.vol);
-	else
-		r.vol = 0.5;
+	r.vol = clamp(fcfg_get('vol', 0.5), 0, 1);
 
 	r.expvol = function (v) {
 		return 0.5 * v + 0.5 * v * v;
 	};
 
 	r.setvol = function (vol) {
-		r.vol = Math.max(Math.min(vol, 1), 0);
+		r.vol = clamp(vol, 0, 1);
 		swrite('vol', vol);
 		r.stopfade(true);
 
@@ -2955,9 +2951,7 @@ var treectl = (function () {
 		prev_winh = null,
 		dyn = bcfg_get('dyntree', true),
 		dots = bcfg_get('dotfiles', false),
-		treesz = icfg_get('treesz', 16);
-
-	treesz = Math.min(Math.max(treesz, 4), 50);
+		treesz = clamp(icfg_get('treesz', 16), 4, 50);
 
 	treectl.entree = function (e) {
 		ev(e);
