@@ -430,6 +430,19 @@ function humansize(b, terse) {
 }
 
 
+function humantime(v) {
+    if (v >= 60 * 60 * 24)
+        return v;
+
+    try {
+        return /.*(..:..:..).*/.exec(new Date(v * 1000).toUTCString())[1];
+    }
+    catch (ex) {
+        return v;
+    }
+}
+
+
 function clamp(v, a, b) {
     return Math.min(Math.max(v, a), b);
 }

@@ -906,7 +906,7 @@ function up2k_init(subtle) {
             td = (now - (etaref || now)) / 1000.0;
 
         etaref = now;
-        //ebi('acc_info').innerHTML = f2f(st.time.busy, 1) + ' ' + f2f(now / 1000, 1);
+        //ebi('acc_info').innerHTML = humantime(st.time.busy) + ' ' + f2f(now / 1000, 1);
 
         if (!nhash)
             ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
@@ -954,14 +954,8 @@ function up2k_init(subtle) {
             if (etaskip)
                 continue;
 
-            if (eta < 60 * 60 * 24)
-                try {
-                    eta = /.*(..:..:..).*/.exec(new Date(eta * 1000).toUTCString())[1];
-                }
-                catch (ex) { }
-
             ebi(t[a][0]).innerHTML = '{0}, {1}/s, {2}'.format(
-                humansize(rem), humansize(bps, 1), eta);
+                humansize(rem), humansize(bps, 1), humantime(eta));
         }
         if (++etaskip > 2)
             etaskip = 0;
