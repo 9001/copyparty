@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (0, 13, 8)
+VERSION = (0, 13, 9)
 CODENAME = "future-proof"
 BUILD_DT = (2021, 8, 29)
 

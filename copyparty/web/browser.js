@@ -704,7 +704,7 @@ var pbar = (function () {
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp.au || mp.loading || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime))
+		if (!mp.au || mp.loading || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
 		var sm = bc.w * 1.0 / adur;
