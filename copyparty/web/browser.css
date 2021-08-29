@@ -204,6 +204,9 @@ a, #files tbody div a:last-child {
 	color: #f4c;
 	border-bottom: 1px solid rgba(255,68,204,0.6);
 }
+#repl {
+	padding: .33em;
+}
 #files tbody a.play {
 	color: #e70;
 	padding: .2em;

@@ -22,6 +22,15 @@ html, body {
 	bottom: auto;
 	top: 1.4em;
 }
+#repl {
+	position: absolute;
+	top: 0;
+	right: .5em;
+	border: none;
+	color: inherit;
+	background: none;
+	text-decoration: none;
+}
 #mn {
 	font-weight: normal;
 	margin: 1.3em 0 .7em 1em;

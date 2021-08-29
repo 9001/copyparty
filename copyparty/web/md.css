@@ -8,6 +8,14 @@ html, body {
 	font-family: sans-serif;
 	line-height: 1.5em;
 }
+#repl {
+	position: absolute;
+	top: 0;
+	right: .2em;
+	border: none;
+	color: inherit;
+	background: none;
+}
 #mtw {
 	display: none;
 }
@@ -505,6 +513,9 @@ blink {
 		text-decoration: none;
 		border-bottom: .07em solid #4ac;
 		padding: 0 .3em;
+	}
+	#repl {
+		display: none;
 	}
 	#toc>ul {
 		border-left: .1em solid #84c4dd;

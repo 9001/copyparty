@@ -892,3 +892,24 @@ function winpopup(txt) {
         body: 'msg=' + uricom_enc(Date.now() + ', ' + txt)
     });
 }
+
+
+function repl(e) {
+    ev(e);
+    modal.prompt('js repl (prefix with <code>,</code> to allow raise)', 'var v=Object.keys(localStorage); v.sort(); JSON.stringify(v)', function (cmd) {
+        if (!cmd)
+            return toast.inf(3, 'eval aborted');
+
+        if (cmd.startsWith(','))
+            return modal.alert(esc(eval(cmd.slice(1)) + ''))
+
+        try {
+            modal.alert(esc(eval(cmd) + ''));
+        }
+        catch (ex) {
+            modal.alert('<h6>exception</h6>' + esc(ex + ''));
+        }
+    });
+}
+if (ebi('repl'))
+    ebi('repl').onclick = repl;

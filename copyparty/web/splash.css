@@ -29,6 +29,11 @@ a {
 	border-radius: .2em;
 	padding: .2em .8em;
 }
+#repl {
+	background: none;
+	color: inherit;
+	padding: 0;
+}
 table {
 	border-collapse: collapse;
 }

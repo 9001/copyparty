@@ -107,6 +107,7 @@ html {
 	padding: 1.5em 2em;
 	border-width: .5em 0;
 }
+#modalc code,
 #tt code {
 	background: #3c3c3c;
 	padding: .1em .3em;
@@ -125,6 +126,7 @@ html.light #tt,
 html.light #toast {
 	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
+#modalc code,
 html.light #tt code {
 	background: #060;
 	color: #fff;
@@ -207,6 +209,8 @@ html.light #tt em {
 }
 #modali {
 	display: block;
+	background: #fff;
+	color: #000;
 	width: calc(100% - 1.25em);
     margin: 1em -.1em 0 -.1em;
 	padding: .5em;
