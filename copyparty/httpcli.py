@@ -873,7 +873,7 @@ class HttpCli(object):
         self.parser.drop()
 
         ck, msg = self.get_pwd_cookie(pwd)
-        html = self.j2("msg", h1=msg, h2='<a href="/">ack</a>', redir="/")
+        html = self.j2("msg", h1=msg, h2='<a href="/?h">ack</a>', redir="/?h")
         self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
         return True
 
