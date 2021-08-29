@@ -800,6 +800,12 @@ function up2k_init(subtle) {
             });
         }
 
+        good_files.sort(function (a, b) {
+            a = a[1];
+            b = b[1];
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+
         var msg = ['{0} these {1} files?<ul>'.format(fsearch ? 'search' : 'upload', good_files.length)];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push('<li>' + esc(good_files[a][1]) + '</li>');
