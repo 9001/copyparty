@@ -782,7 +782,13 @@ var modal = (function () {
         a = ebi('modal-ok');
         a.onclick = ok;
 
-        (ebi('modali') || a).focus();
+        var inp = ebi('modali');
+        (inp || a).focus();
+        if (inp)
+            setTimeout(function () {
+                inp.setSelectionRange(0, inp.value.length, "forward");
+            }, 0);
+
         document.addEventListener('focus', onfocus);
         timer.add(onfocus);
     };
