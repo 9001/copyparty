@@ -39,7 +39,8 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
     crashed = true;
     window.onerror = undefined;
-    var html = ['<h1>you hit a bug!</h1><p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code><br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)</p><p>',
+    var con = is_touch ? '' : '<br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)',
+        html = ['<h1>you hit a bug!</h1><p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code>' + con + '</p><p>',
         esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>'];
 
     try {
@@ -63,10 +64,10 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
             document.body.appendChild(exbox);
 
             var s = mknod('style');
-            s.innerHTML = '#exbox{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%} #exbox h1{margin:.5em 1em 0 0;padding:0} #exbox h3{border-top:1px solid #999;margin:1em 0 0 0} #exbox a{text-decoration:underline;color:#fc0} #exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} #exbox *{line-height:1.5em}';
+            s.innerHTML = '#exbox{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;overflow:auto;width:calc(100% - 2em)} #exbox h1{margin:.5em 1em 0 0;padding:0} #exbox h3{border-top:1px solid #999;margin:1em 0 0 0} #exbox a{text-decoration:underline;color:#fc0} #exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} #exbox,#exbox *{line-height:1.5em;overflow-wrap:break-word}';
             document.head.appendChild(s);
         }
-        exbox.innerHTML = html.join('\n');
+        exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/');
         exbox.style.display = 'block';
     }
     catch (e) {
