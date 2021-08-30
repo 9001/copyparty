@@ -1799,6 +1799,7 @@ var fileman = (function () {
 			'</table></div>'
 		]);
 
+		var cheap = f.length > 500;
 		if (sel.length == 1)
 			html.push(
 				'<div><table id="rn_f">\n' +
@@ -1811,8 +1812,9 @@ var fileman = (function () {
 			for (var a = 0; a < f.length; a++)
 				html.push(
 					'<tr><td>' +
-					'<button class="rn_dec" n="' + a + '">decode</button>',
-					'<button class="rn_reset" n="' + a + '">↺ reset</button></td>',
+					(cheap ? '</td>' :
+						'<button class="rn_dec" n="' + a + '">decode</button>' +
+						'<button class="rn_reset" n="' + a + '">↺ reset</button></td>') +
 					'<td><input type="text" id="rn_new" n="' + a + '" /></td>' +
 					'<td><input type="text" id="rn_old" n="' + a + '" readonly /></td></tr>');
 		}
@@ -1833,23 +1835,26 @@ var fileman = (function () {
 			f[a].inew = QS('#rn_new' + k);
 			f[a].inew.value = f[a].iold.value = f[a].ofn;
 
-			(function (a) {
-				f[a].inew.onkeydown = function (e) {
-					rn_ok(a, true);
+			if (!cheap)
+				(function (a) {
+					f[a].inew.onkeydown = function (e) {
+						rn_ok(a, true);
 
-					if (e.key == 'Escape')
-						return rn_cancel();
+						if (e.key == 'Escape')
+							return rn_cancel();
 
-					if (e.key == 'Enter')
-						return rn_apply();
-				};
-				QS('.rn_dec' + k).onclick = function () {
-					f[a].inew.value = uricom_dec(f[a].inew.value)[0];
-				};
-				QS('.rn_reset' + k).onclick = function () {
-					rn_reset(a);
-				};
-			})(a);
+						if (e.key == 'Enter')
+							return rn_apply();
+					};
+					QS('.rn_dec' + k).onclick = function (e) {
+						ev(e);
+						f[a].inew.value = uricom_dec(f[a].inew.value)[0];
+					};
+					QS('.rn_reset' + k).onclick = function (e) {
+						ev(e);
+						rn_reset(a);
+					};
+				})(a);
 		}
 		rn_reset(0);
 		tt.att(rui);
