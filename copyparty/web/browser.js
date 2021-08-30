@@ -284,7 +284,7 @@ var mpl = (function () {
 		r.os_ctl = !r.os_ctl && have_mctl;
 		bcfg_set('au_os_ctl', r.os_ctl);
 		if (!have_mctl)
-			toast.err(5, 'need firefox 82+ or chrome 73+');
+			toast.err(5, 'need firefox 82+ or chrome 73+\n(or iOS 15+ supposedly)');
 	};
 
 	ebi('au_osd_cv').onclick = function (e) {

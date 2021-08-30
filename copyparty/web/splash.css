@@ -30,6 +30,7 @@ a {
 	padding: .2em .8em;
 }
 #repl {
+	border: none;
 	background: none;
 	color: inherit;
 	padding: 0;

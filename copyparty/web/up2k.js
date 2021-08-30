@@ -1852,7 +1852,7 @@ function up2k_init(subtle) {
                 flag = up2k_flagbus();
             }
             catch (ex) {
-                console.log("flag error: " + ex.toString());
+                toast.err(5, "not supported on your browser:\n" + ex);
                 tgl_flag_en();
             }
         }
