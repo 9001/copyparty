@@ -40,8 +40,8 @@ ebi('widget').innerHTML = (
 	' href="#" id="selinv" tt="invert selection">sel.<br />inv.</a><a' +
 	' href="#" id="selzip" tt="download selection as archive">zip</a>' +
 	'</span><span id="wnp"><a' +
-	' href="#" id="npirc" tt="copy irc-formatted track info">📋irc</a><a' +
-	' href="#" id="nptxt" tt="copy plaintext track info">📋txt</a>' +
+	' href="#" id="npirc" tt="copy irc-formatted track info">📋<span>irc</span></a><a' +
+	' href="#" id="nptxt" tt="copy plaintext track info">📋<span>txt</span></a>' +
 	'</span><a' +
 	'	href="#" id="wtgrid" tt="toggle grid/list view$NHotkey: G">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
@@ -1718,7 +1718,7 @@ var fileman = (function () {
 		bcut.style.display = have_mv && has(perms, 'move') ? '' : 'none';
 		bpst.style.display = have_mv && has(perms, 'write') ? '' : 'none';
 		bpst.setAttribute('tt', 'paste ' + r.clip.length + ' items$NHotkey: ctrl-V');
-		ebi('wfm').style.display = QS('#wfm a.en:not([display])') ? '' : 'none';
+		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not([style])'));
 	};
 
 	r.rename = function (e) {

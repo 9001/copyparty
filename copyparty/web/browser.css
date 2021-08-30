@@ -343,17 +343,19 @@ html.light #ggrid>a.sel {
 }
 #wtgrid,
 #wtico {
-	cursor: url(/.cpr/dd/4.png), pointer;
-	animation: cursor 500ms;
 	position: relative;
 	font-size: .9em;
 	top: -.04em;
 }
 #wtgrid {
 	font-size: .75em;
+	padding: .1em;
 	top: -.12em;
 }
-#wtgrid:hover,
+#wtico {
+	cursor: url(/.cpr/dd/4.png), pointer;
+	animation: cursor 500ms;
+}
 #wtico:hover {
 	animation: cursor 500ms infinite;
 }
@@ -381,23 +383,25 @@ html.light #ggrid>a.sel {
 	background: #3c3c3c;
 	box-shadow: 0 0 .5em #222;
 	border-radius: .3em 0 0 0;
-	padding: 0;
+	padding: 0 0 0 .1em;
 	color: #fff;
 }
-#wzip, #wnp {
+#wfm, #wzip, #wnp {
 	display: none;
-	margin-right: .3em;
-	padding-right: .3em;
+}
+#wzip, #wnp {
+	margin-right: .2em;
+	padding-right: .2em;
 	border-right: .1em solid #555;
 }
-#wnp a {
-	position: relative;
-	font-size: .47em;
-	margin: 0 .1em;
-	top: -.4em;
+#wfm.act+#wzip,
+#wfm.act+#wzip+#wnp {
+	margin-left: .2em;
+	padding-left: .2em;
+	border-left: .1em solid #555;
 }
-#wnp a+a {
-	margin-left: .33em;
+#wfm.act {
+	display: inline-block;
 }
 #wtoggle,
 #wtoggle * {
@@ -411,6 +415,7 @@ html.light #ggrid>a.sel {
 	display: none;
 }
 #wfm a,
+#wnp a,
 #wzip a {
 	font-size: .5em;
 	padding: 0 .3em;
@@ -418,9 +423,13 @@ html.light #ggrid>a.sel {
 	position: relative;
 	display: inline-block;
 }
-#wfm span {
+#wfm span,
+#wnp span {
 	font-size: .6em;
 	display: block;
+}
+#wnp span {
+	font-size: .7em;
 }
 #wfm a:not(.en) {
 	opacity: .3;
