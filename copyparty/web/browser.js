@@ -1293,12 +1293,21 @@ function play(tid, is_ev, seek, call_depth) {
 
 	var url = mp.tracks[tid];
 	if (need_ogv_for(url)) {
+		var m = /.* Version\/([0-9]+)\.[0-9\.]+ Mobile\/[^ ]+ Safari\/[0-9\.]+$/.exec(navigator.userAgent),
+			safari = m ? parseInt(m[1]) : 99;
+
 		if (mp.au_ogvjs) {
 			mp.au = mp.au_ogvjs;
 		}
 		else if (window['OGVPlayer']) {
 			mp.loading = true;
-			mp.au = mp.au_ogvjs = new OGVPlayer();
+			try {
+				mp.au = mp.au_ogvjs = new OGVPlayer();
+			}
+			catch (ex) {
+				return toast.err(30, 'your browser cannot play ogg/vorbis/opus\n\n' + ex +
+					'\n\n<a href="#" onclick="new OGVPlayer();">click here</a> for a full crash report');
+			}
 			attempt_play = is_ev;
 			mp.au.onerror = evau_error;
 			mp.au.onprogress = pbar.drawpos;
@@ -1307,6 +1316,9 @@ function play(tid, is_ev, seek, call_depth) {
 				mp.loading = false;
 			};
 			widget.open();
+		}
+		else if (safari < 14) {
+			return toast.err(0, 'because this is an apple device,\nsafari 14 or newer is required to play ogg/vorbis/opus files\n\nyou are using safari ' + safari + '\n(every iOS browser is actually safari)');
 		}
 		else {
 			if (call_depth !== undefined)
@@ -1317,10 +1329,6 @@ function play(tid, is_ev, seek, call_depth) {
 			import_js('/.cpr/deps/ogv.js', function () {
 				toast.hide();
 				play(tid, false, seek, 1);
-
-				var m = /.* Version\/([0-9]+)\.[0-9\.]+ Mobile\/[^ ]+ Safari\/[0-9\.]+$/.exec(navigator.userAgent);
-				if (m && parseInt(m[1]) < 14)
-					toast.err(0, 'because this is an apple device,\nsafari 14 or newer is required\n\nyou are using safari version ' + m[1] + ', so playback of ogg/vorbis/opus files will be buggy\n\nnote: every iOS browser is safari');
 			});
 
 			return;
