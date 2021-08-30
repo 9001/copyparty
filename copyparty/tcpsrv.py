@@ -177,7 +177,7 @@ class TcpSrv(object):
             eps = self.ips_linux()
 
         if "0.0.0.0" not in listen_ips:
-            eps = {k: v for k, v in eps if k in listen_ips}
+            eps = {k: v for k, v in eps.items() if k in listen_ips}
 
         default_route = None
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
