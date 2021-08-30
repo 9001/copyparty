@@ -37,6 +37,7 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
+	shuf() { gshuf "$@"; }
 	sha1sum() { shasum "$@"; }
 	unexpand() { gunexpand "$@"; }
 	command -v grealpath >/dev/null &&
@@ -303,7 +304,7 @@ for d in copyparty dep-j2; do find $d -type f; done |
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 
-(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1) >list || true
+(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1 | shuf) >list || true
 
 echo creating tar
 args=(--owner=1000 --group=1000)
