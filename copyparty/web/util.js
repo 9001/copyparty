@@ -744,6 +744,7 @@ function lf2br(txt) {
 var toast = (function () {
     var r = {},
         te = null,
+        scrolling = false,
         obj = mknod('div');
 
     obj.setAttribute('id', 'toast');
@@ -751,8 +752,30 @@ var toast = (function () {
     r.visible = false;
     r.txt = null;
 
+    function scrollchk() {
+        if (scrolling)
+            return;
+
+        var tb = ebi('toastb'),
+            vis = tb.offsetHeight,
+            all = tb.scrollHeight;
+
+        if (8 + vis >= all)
+            return;
+
+        clmod(obj, 'scroll', 1);
+        scrolling = true;
+    }
+
+    function unscroll() {
+        timer.rm(scrollchk);
+        clmod(obj, 'scroll');
+        scrolling = false;
+    }
+
     r.hide = function (e) {
         ev(e);
+        unscroll();
         clearTimeout(te);
         clmod(obj, 'vis');
         r.visible = false;
@@ -763,11 +786,12 @@ var toast = (function () {
         if (ms)
             te = setTimeout(r.hide, ms * 1000);
 
-        obj.innerHTML = '<a href="#" id="toastc">x</a>' + lf2br(txt);
+        obj.innerHTML = '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         ms += obj.offsetWidth;
         obj.className += ' vis';
         ebi('toastc').onclick = r.hide;
+        timer.add(scrollchk);
         r.visible = true;
         r.txt = txt;
     };

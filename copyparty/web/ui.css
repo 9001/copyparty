@@ -52,13 +52,22 @@ html {
 	opacity: 0;
 	padding: .3em 0;
 	margin: -.3em 0 0 0;
-	line-height: 1.5em;
+	line-height: 1.3em;
 	color: #000;
 	border: none;
 	outline: none;
 	text-shadow: none;
 	border-radius: .5em 0 0 .5em;
 	transition: left .3s, width .3s, padding .3s, opacity .3s;
+}
+#toastb {
+	max-height: 70vh;
+	overflow-y: auto;
+}
+#toast.scroll #toastb {
+	overflow-y: scroll;
+	margin-right: -1.2em;
+	padding-right: .7em;
 }
 #toast pre {
 	margin: 0;
