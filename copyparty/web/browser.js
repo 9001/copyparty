@@ -2089,9 +2089,18 @@ var fileman = (function () {
 				clmod(els[a], 'fcut', 1);
 		}, 1);
 
-		toast.inf(1.5, 'cut ' + sel.length + ' items');
-		jwrite('fman_clip', vps);
-		r.tx(1);
+		try {
+			vps = JSON.stringify(vps);
+			if (vps.length > 1024 * 1024)
+				throw 'a';
+
+			swrite('fman_clip', vps);
+			r.tx(1);
+			toast.inf(1.5, 'cut ' + sel.length + ' items');
+		}
+		catch (ex) {
+			toast.warn(30, 'cut ' + sel.length + ' items\n\nbut: only <b>this</b> browser-tab can paste them\n(since the selection is so absolutely massive)');
+		}
 	};
 
 	r.paste = function (e) {
