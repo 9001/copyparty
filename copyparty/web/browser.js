@@ -1252,6 +1252,9 @@ function play(tid, is_ev, seek, call_depth) {
 	if (mp.order.length == 0)
 		return console.log('no audio found wait what');
 
+	if (crashed)
+		return;
+
 	mp.stopfade(true);
 
 	var tn = tid;
