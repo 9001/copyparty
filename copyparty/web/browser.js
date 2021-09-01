@@ -2700,10 +2700,10 @@ document.onkeydown = function (e) {
 			return ebi('gridsel').click();
 
 		if (k == 'KeyA')
-			return QSA('#ghead>a[z]')[0].click();
+			return QSA('#ghead a[z]')[0].click();
 
 		if (k == 'KeyD')
-			return QSA('#ghead>a[z]')[1].click();
+			return QSA('#ghead a[z]')[1].click();
 	}
 };
 
