@@ -1,4 +1,7 @@
-/* video */
+/* video, alternative 1:
+   top-left icon, just like the other formats
+=======================================================================
+
 #ggrid>a:is(
 [href$=".mkv"i],
 [href$=".mp4"i],
@@ -6,6 +9,40 @@
 ):before {
     content: '📺';
 }
+*/
+
+
+
+/* video, alternative 2:
+   play-icon in the middle of the thumbnail
+=======================================================================
+*/
+#ggrid>a:is(
+[href$=".mkv"i],
+[href$=".mp4"i],
+[href$=".webm"i],
+) {
+	position: relative;
+	overflow: hidden;
+}
+#ggrid>a:is(
+[href$=".mkv"i],
+[href$=".mp4"i],
+[href$=".webm"i],
+):before {
+    content: '▶';
+	opacity: .8;
+	margin: 0;
+	padding: 1em .5em 1em .7em;
+	border-radius: 9em;
+	line-height: 0;
+	color: #fff;
+	text-shadow: none;
+	background: rgba(0, 0, 0, 0.7);
+	left: calc(50% - 1em);
+	top: calc(50% - 1.4em);
+}
+
 
 
 /* audio */
@@ -19,6 +56,7 @@
 ):before {
     content: '🎵';
 }
+
 
 
 /* image */
