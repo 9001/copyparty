@@ -52,7 +52,16 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                         esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
         }
         ignexd[ekey] = true;
-        html.push('<h3>localStore</h3>' + esc(JSON.stringify(localStorage)));
+
+        var ls = jcp(localStorage);
+        if (ls.fman_clip)
+            ls.fman_clip = ls.fman_clip.length + ' items';
+
+        var lsk = Object.keys(ls);
+        lsk.sort();
+        html.push('<h3>localstore</h3>');
+        for (var a = 0; a < lsk.length; a++)
+            html.push(' <b>' + esc(lsk[a]) + '</b> <code>' + esc(ls[lsk[a]]) + '</code> ');
     }
     catch (e) { }
 
@@ -64,7 +73,15 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
             document.body.appendChild(exbox);
 
             var s = mknod('style');
-            s.innerHTML = '#exbox{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;overflow:auto;width:calc(100% - 2em)} #exbox h1{margin:.5em 1em 0 0;padding:0} #exbox h3{border-top:1px solid #999;margin:1em 0 0 0} #exbox a{text-decoration:underline;color:#fc0} #exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} #exbox,#exbox *{line-height:1.5em;overflow-wrap:break-word}';
+            s.innerHTML = (
+                '#exbox{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;overflow:auto;width:calc(100% - 2em)} ' +
+                '#exbox,#exbox *{line-height:1.5em;overflow-wrap:break-word} ' +
+                '#exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} ' +
+                '#exbox a{text-decoration:underline;color:#fc0} ' +
+                '#exbox h1{margin:.5em 1em 0 0;padding:0} ' +
+                '#exbox h3{border-top:1px solid #999;margin:1em 0 0 0} ' +
+                '#exbox b{color:#fff}'
+            );
             document.head.appendChild(s);
         }
         exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/');
