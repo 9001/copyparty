@@ -40,16 +40,36 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     crashed = true;
     window.onerror = undefined;
     var con = is_touch ? '' : '<br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)',
-        html = ['<h1>you hit a bug!</h1><p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p><p>please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code>' + con + '</p><p>',
-        esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>'];
+        html = [
+            '<h1>you hit a bug!</h1>',
+            '<p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p>',
+            '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code>' + con + '</p>',
+            '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>',
+            '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
+        ];
+
+    try {
+        var ua = '',
+            ad = navigator.userAgentData,
+            adb = ad.brands;
+
+        for (var a = 0; a < adb.length; a++)
+            if (adb[a].brand.indexOf('Not;A') < 0)
+                ua += adb[a].brand + '/' + adb[a].version + ', ';
+        ua += ad.platform;
+
+        html.push('<br /><b>UAD:</b> ' + esc(ua.slice(0, 100)));
+    }
+    catch (e) { }
+    html.push('</p>');
 
     try {
         if (error) {
             var find = ['desc', 'stack', 'trace'];
             for (var a = 0; a < find.length; a++)
                 if (String(error[find[a]]) !== 'undefined')
-                    html.push('<h3>' + find[a] + '</h3>' +
-                        esc(String(error[find[a]])).replace(/\n/g, '<br />\n'));
+                    html.push('<p class="b"><b>' + find[a] + ':</b><br />' +
+                        esc(String(error[find[a]])).replace(/\n/g, '<br />\n') + '</p>');
         }
         ignexd[ekey] = true;
 
@@ -59,9 +79,10 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
         var lsk = Object.keys(ls);
         lsk.sort();
-        html.push('<h3>localstore</h3>');
+        html.push('<p class="b">');
         for (var a = 0; a < lsk.length; a++)
             html.push(' <b>' + esc(lsk[a]) + '</b> <code>' + esc(ls[lsk[a]]) + '</code> ');
+        html.push('</p>');
     }
     catch (e) { }
 
@@ -79,7 +100,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                 '#exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} ' +
                 '#exbox a{text-decoration:underline;color:#fc0} ' +
                 '#exbox h1{margin:.5em 1em 0 0;padding:0} ' +
-                '#exbox h3{border-top:1px solid #999;margin:1em 0 0 0} ' +
+                '#exbox p.b{border-top:1px solid #999;margin:1em 0 0 0;font-size:1em} ' +
                 '#exbox b{color:#fff}'
             );
             document.head.appendChild(s);
