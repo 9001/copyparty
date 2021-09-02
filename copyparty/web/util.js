@@ -29,6 +29,35 @@ function esc(txt) {
         }[c];
     });
 }
+window.onunhandledrejection = function (e) {
+    console.log("REJ: " + e.reason);
+};
+try {
+    console.hist = [];
+    var hook = function (t) {
+        var orig = console[t].bind(console),
+            cfun = function () {
+                console.hist.push(Date.now() + ' ' + t + ' ' + Array.from(arguments).join(', '));
+                if (console.hist.length > 100)
+                    console.hist = console.hist.slice(50);
+
+                orig.apply(console, arguments);
+            };
+
+        console['std' + t] = orig;
+        console[t] = cfun;
+    };
+    hook('log');
+    console.log('log-capture ok');
+    hook('debug');
+    hook('warn');
+    hook('error');
+}
+catch (ex) {
+    if (console.stdlog)
+        console.log = console.stdlog;
+    console.log(ex);
+}
 var crashed = false, ignexd = {};
 function vis_exh(msg, url, lineNo, columnNo, error) {
     if ((msg + '').indexOf('ResizeObserver') !== -1)
@@ -55,7 +84,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
             adb = ad.brands;
 
         for (var a = 0; a < adb.length; a++)
-            if (adb[a].brand.indexOf('Not;A') < 0)
+            if (!/Not.*A.*Brand/.exec(adb[a].brand))
                 ua += adb[a].brand + '/' + adb[a].version + ', ';
         ua += ad.platform;
 
@@ -87,6 +116,13 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     }
     catch (e) { }
 
+    if (console.hist.length) {
+        html.push('<p class="b"><b>console:</b><ul><li>' + Date.now() + ' @</li>');
+        for (var a = console.hist.length - 1, aa = Math.max(0, console.hist.length - 10); a >= aa; a--)
+            html.push('<li>' + esc(console.hist[a]) + '</li>');
+        html.push('</ul>')
+    }
+
     try {
         var exbox = ebi('exbox');
         if (!exbox) {
@@ -102,11 +138,12 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                 '#exbox a{text-decoration:underline;color:#fc0} ' +
                 '#exbox h1{margin:.5em 1em 0 0;padding:0} ' +
                 '#exbox p.b{border-top:1px solid #999;margin:1em 0 0 0;font-size:1em} ' +
+                '#exbox ul, #exbox li {margin:0 0 0 .5em;padding:0} ' +
                 '#exbox b{color:#fff}'
             );
             document.head.appendChild(s);
         }
-        exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/');
+        exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js');
         exbox.style.display = 'block';
     }
     catch (e) {
