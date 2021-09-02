@@ -270,13 +270,14 @@ class ThumbSrv(object):
                 fmts += ["RGBA", "LA"]
                 args["method"] = 6
             else:
-                pass  # default q = 75
+                # default q = 75
+                args["progressive"] = True
 
             if im.mode not in fmts:
                 # print("conv {}".format(im.mode))
                 im = im.convert("RGB")
 
-            im.save(tpath, quality=40, method=6)
+            im.save(tpath, **args)
 
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
