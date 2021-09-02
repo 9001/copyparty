@@ -37,7 +37,7 @@ try {
     var hook = function (t) {
         var orig = console[t].bind(console),
             cfun = function () {
-                console.hist.push(Date.now() + ' ' + t + ' ' + Array.from(arguments).join(', '));
+                console.hist.push(Date.now() + ' ' + t + ': ' + Array.from(arguments).join(', '));
                 if (console.hist.length > 100)
                     console.hist = console.hist.slice(50);
 
@@ -69,14 +69,13 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
     crashed = true;
     window.onerror = undefined;
-    var con = is_touch ? '' : '<br />&nbsp; (and if you can, press F12 and include the "Console" tab in the screenshot too)',
-        html = [
-            '<h1>you hit a bug!</h1>',
-            '<p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p>',
-            '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code>' + con + '</p>',
-            '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>',
-            '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
-        ];
+    var html = [
+        '<h1>you hit a bug!</h1>',
+        '<p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p>',
+        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code></p>',
+        '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>',
+        '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
+    ];
 
     try {
         var ua = '',
@@ -118,7 +117,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
     if (console.hist.length) {
         html.push('<p class="b"><b>console:</b><ul><li>' + Date.now() + ' @</li>');
-        for (var a = console.hist.length - 1, aa = Math.max(0, console.hist.length - 10); a >= aa; a--)
+        for (var a = console.hist.length - 1, aa = Math.max(0, console.hist.length - 20); a >= aa; a--)
             html.push('<li>' + esc(console.hist[a]) + '</li>');
         html.push('</ul>')
     }
@@ -1064,7 +1063,7 @@ function repl_load() {
         getpres();
         ipre.value = val;
     };
-    ipre.oninput = function () {
+    ipre.oninput = ipre.onchange = function () {
         tb.value = last_repl = ipre.value;
     };
     tb.oninput = function () {
