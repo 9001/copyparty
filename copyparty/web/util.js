@@ -1023,9 +1023,67 @@ function winpopup(txt) {
 }
 
 
+var last_repl = null;
+function repl_load() {
+    var ipre = ebi('repl_pre'),
+        tb = ebi('modali');
+
+    function getpres() {
+        var o, ret = jread("repl_pre", []);
+        if (!ret.length)
+            ret = [
+                'var v=Object.keys(localStorage); v.sort(); JSON.stringify(v)',
+                'console.hist.slice(-10).join("\\n")'
+            ];
+
+        ipre.innerHTML = '<option value=""></option>';
+        for (var a = 0; a < ret.length; a++) {
+            o = mknod('option');
+            o.setAttribute('value', ret[a]);
+            o.textContent = ret[a];
+            ipre.appendChild(o);
+        }
+        last_repl = ipre.value = (last_repl || (ret.length ? ret.slice(-1)[0] : ''));
+        return ret;
+    }
+    ebi('repl_pdel').onclick = function (e) {
+        var val = ipre.value,
+            pres = getpres();
+
+        apop(pres, val);
+        jwrite('repl_pre', pres);
+        getpres();
+    };
+    ebi('repl_pnew').onclick = function (e) {
+        var val = tb.value,
+            pres = getpres();
+
+        apop(pres, ipre.value);
+        pres.push(val);
+        jwrite('repl_pre', pres);
+        getpres();
+        ipre.value = val;
+    };
+    ipre.oninput = function () {
+        tb.value = last_repl = ipre.value;
+    };
+    tb.oninput = function () {
+        last_repl = this.value;
+    };
+    getpres();
+    tb.value = last_repl;
+
+}
 function repl(e) {
     ev(e);
-    modal.prompt('js repl (prefix with <code>,</code> to allow raise)', 'var v=Object.keys(localStorage); v.sort(); JSON.stringify(v)', function (cmd) {
+    var html = [
+        '<p>js repl (prefix with <code>,</code> to allow raise)</p>',
+        '<p><select id="repl_pre"></select>',
+        ' &nbsp; <button id="repl_pdel">❌ del</button>',
+        ' &nbsp; <button id="repl_pnew">💾 SAVE</button></p>'
+    ];
+
+    modal.prompt(html.join(''), '', function (cmd) {
         if (!cmd)
             return toast.inf(3, 'eval aborted');
 
@@ -1038,7 +1096,7 @@ function repl(e) {
         catch (ex) {
             modal.alert('<h6>exception</h6>' + esc(ex + ''));
         }
-    });
+    }, undefined, repl_load);
 }
 if (ebi('repl'))
     ebi('repl').onclick = repl;

@@ -239,3 +239,6 @@ html.light #tt em {
 #modali:focus {
 	border-color: #06d;
 }
+#repl_pre {
+	max-width: 24em;
+}
