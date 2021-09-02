@@ -8,7 +8,8 @@ if (!window['console'])
 
 var is_touch = 'ontouchstart' in window,
     IPHONE = /iPhone|iPad|iPod/i.test(navigator.userAgent),
-    ANDROID = /android/i.test(navigator.userAgent);
+    ANDROID = /android/i.test(navigator.userAgent),
+    WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
 
 
 var ebi = document.getElementById.bind(document),
@@ -838,8 +839,12 @@ var modal = (function () {
     var r = {},
         q = [],
         o = null,
+        cb_up = null,
         cb_ok = null,
-        cb_ng = null;
+        cb_ng = null,
+        prim = '<a href="#" id="modal-ok">OK</a>',
+        sec = '<a href="#" id="modal-ng">Cancel</a>',
+        ok_cancel = WINDOWS ? prim + sec : sec + prim;
 
     r.busy = false;
 
@@ -942,7 +947,7 @@ var modal = (function () {
     function _confirm(html, cok, cng) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
-        html += '<div id="modalb"><a href="#" id="modal-ok">OK</a><a href="#" id="modal-ng">Cancel</a></div>';
+        html += '<div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
     }
 
@@ -955,7 +960,7 @@ var modal = (function () {
     function _prompt(html, v, cok, cng) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
-        html += '<input id="modali" type="text" /><div id="modalb"><a href="#" id="modal-ok">OK</a><a href="#" id="modal-ng">Cancel</a></div>';
+        html += '<input id="modali" type="text" /><div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
 
         ebi('modali').value = v || '';
