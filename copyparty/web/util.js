@@ -909,6 +909,8 @@ var modal = (function () {
 
         document.addEventListener('focus', onfocus);
         timer.add(onfocus);
+        if (cb_up)
+            setTimeout(cb_up, 1);
     };
 
     r.hide = function () {
@@ -963,40 +965,43 @@ var modal = (function () {
             q.shift()();
     }
 
-    r.alert = function (html, cb) {
+    r.alert = function (html, cb, fun) {
         q.push(function () {
-            _alert(lf2br(html), cb);
+            _alert(lf2br(html), cb, fun);
         });
         next();
     };
-    function _alert(html, cb) {
+    function _alert(html, cb, fun) {
         cb_ok = cb_ng = cb;
+        cb_up = fun;
         html += '<div id="modalb"><a href="#" id="modal-ok">OK</a></div>';
         r.show(html);
     }
 
-    r.confirm = function (html, cok, cng) {
+    r.confirm = function (html, cok, cng, fun) {
         q.push(function () {
-            _confirm(lf2br(html), cok, cng);
+            _confirm(lf2br(html), cok, cng, fun);
         });
         next();
     }
-    function _confirm(html, cok, cng) {
+    function _confirm(html, cok, cng, fun) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
+        cb_up = fun;
         html += '<div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
     }
 
-    r.prompt = function (html, v, cok, cng) {
+    r.prompt = function (html, v, cok, cng, fun) {
         q.push(function () {
-            _prompt(lf2br(html), v, cok, cng);
+            _prompt(lf2br(html), v, cok, cng, fun);
         });
         next();
     }
-    function _prompt(html, v, cok, cng) {
+    function _prompt(html, v, cok, cng, fun) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
+        cb_up = fun;
         html += '<input id="modali" type="text" /><div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
 
