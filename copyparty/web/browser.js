@@ -1788,7 +1788,7 @@ var fileman = (function () {
 
 		html = html.concat([
 			'<button id="rn_cancel" tt="abort and close this window">❌ cancel</button>',
-			'<button id="rn_apply">✅ apply rename</button>',
+			'<button id="rn_apply">✅ APPLY RENAME</button>',
 			'<a id="rn_adv" class="tgl btn" href="#" tt="batch / metadata / pattern renaming">advanced</a>',
 			'<a id="rn_case" class="tgl btn" href="#" tt="case-sensitive regex">case</a>',
 			'</div>',
