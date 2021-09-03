@@ -815,8 +815,6 @@ input.eq_gain {
 	width: 1em;
 	border-radius: .2em;
 	margin: -1.2em auto 0 auto;
-	top: 2em;
-	position: relative;
 	background: #444;
 }
 #files th span {

@@ -650,6 +650,9 @@ var timer = (function () {
     };
 
     function doevents() {
+        if (crashed)
+            return;
+
         if (Date.now() - r.last < 69)
             return;
 
@@ -695,6 +698,7 @@ var tt = (function () {
         r.el = this;
         var pos = this.getBoundingClientRect(),
             dir = this.getAttribute('ttd') || '',
+            margin = parseFloat(this.getAttribute('ttm') || 0),
             top = pos.top < window.innerHeight / 2,
             big = this.className.indexOf(' ttb') !== -1;
 
@@ -706,23 +710,22 @@ var tt = (function () {
         r.tt.style.top = '0';
 
         r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
-        var tw = r.tt.offsetWidth,
-            x = pos.left + (pos.right - pos.left) / 2 - tw / 2;
-
-        if (x < 0)
-            x = 8;
-
-        if (x + tw >= window.innerWidth - 8) {
-            x = window.innerWidth - tw - 8;
-        }
-
-        r.tt.style.left = x + 'px';
-        r.tt.style.top = top ? pos.bottom + 'px' : 'auto';
-        r.tt.style.bottom = top ? 'auto' : (window.innerHeight - pos.top) + 'px';
-
         r.el.addEventListener('mouseleave', r.hide);
         window.addEventListener('scroll', r.hide);
         clmod(r.tt, 'show', 1);
+
+        var tw = r.tt.offsetWidth,
+            x = pos.left + (pos.right - pos.left) / 2 - tw / 2;
+
+        if (x + tw >= window.innerWidth - 24)
+            x = window.innerWidth - tw - 24;
+
+        if (x < 0)
+            x = 12;
+
+        r.tt.style.left = x + 'px';
+        r.tt.style.top = top ? (margin + pos.bottom) + 'px' : 'auto';
+        r.tt.style.bottom = top ? 'auto' : (margin + window.innerHeight - pos.top) + 'px';
     };
 
     r.hide = function (e) {

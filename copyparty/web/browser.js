@@ -3587,6 +3587,7 @@ var filecols = (function () {
 			if (ttv) {
 				th.setAttribute("tt", ttv);
 				th.setAttribute("ttd", "u");
+				th.setAttribute("ttm", "12");
 			}
 		}
 	};
