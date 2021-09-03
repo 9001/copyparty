@@ -1074,7 +1074,9 @@ function repl_load() {
     };
     getpres();
     tb.value = last_repl;
-
+    setTimeout(function () {
+        tb.setSelectionRange(0, tb.value.length, "forward");
+    }, 10);
 }
 function repl(e) {
     ev(e);
