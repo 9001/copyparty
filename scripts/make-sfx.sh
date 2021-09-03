@@ -145,6 +145,7 @@ tmpdir="$(
 }
 
 ver=
+[ -z "$repack" ] &&
 git describe --tags >/dev/null 2>/dev/null && {
 	git_ver="$(git describe --tags)";  # v0.5.5-2-gb164aa0
 	ver="$(printf '%s\n' "$git_ver" | sed -r 's/^v//')";
