@@ -7,6 +7,7 @@ import gzip
 import time
 import copy
 import json
+import base64
 import string
 import socket
 import ctypes
@@ -192,7 +193,21 @@ class HttpCli(object):
         self.cookies = cookies
         self.vpath = unquotep(vpath)  # not query, so + means +
 
-        pwd = uparam.get("pw")
+        pwd = None
+        ba = self.headers.get("authorization")
+        if ba:
+            try:
+                ba = ba.split(" ")[1].encode("ascii")
+                ba = base64.b64decode(ba).decode("utf-8")
+                # try "pwd", "x:pwd", "pwd:x"
+                for ba in [ba] + ba.split(":", 1)[::-1]:
+                    if self.asrv.iacct.get(ba):
+                        pwd = ba
+                        break
+            except:
+                pass
+
+        pwd = uparam.get("pw") or pwd
         self.uname = self.asrv.iacct.get(pwd, "*")
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
