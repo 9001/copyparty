@@ -225,7 +225,7 @@ done
 	rm -rf copyparty/web/dd
 	f=copyparty/web/browser.css
 	gzip -d "$f"
-	sed -r 's/(cursor: )url\([^)]+\), (pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: cursor/d' <$f >t
+	sed -r 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: ?cursor/d' <$f >t
 	tmv "$f"
 }
 
