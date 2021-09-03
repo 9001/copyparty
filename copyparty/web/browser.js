@@ -1880,18 +1880,21 @@ var fileman = (function () {
 			f[n].inew.focus();
 			f[n].inew.setSelectionRange(0, f[n].inew.value.lastIndexOf('.'), "forward");
 		}
-		function rn_cancel() {
+		function rn_cancel(e) {
+			ev(e);
 			rui.parentNode.removeChild(rui);
 		}
 
 		ebi('rn_cancel').onclick = rn_cancel;
 		ebi('rn_apply').onclick = rn_apply;
-		ebi('rn_adv').onclick = function () {
+		ebi('rn_adv').onclick = function (e) {
+			ev(e);
 			adv = !adv;
 			bcfg_set('rn_adv', adv);
 			sadv();
 		};
-		ebi('rn_case').onclick = function () {
+		ebi('rn_case').onclick = function (e) {
+			ev(e);
 			cs = !cs;
 			bcfg_set('rn_case', cs);
 		};
@@ -1918,7 +1921,8 @@ var fileman = (function () {
 				ipre.appendChild(o);
 			}
 		}
-		inew.onclick = function () {
+		inew.onclick = function (e) {
+			ev(e);
 			modal.prompt('provide a name for your new preset', ifmt.value, function (name) {
 				if (!name)
 					return toast.warn(3, 'aborted');
@@ -1929,7 +1933,8 @@ var fileman = (function () {
 				ipre.value = name;
 			});
 		};
-		idel.onclick = function () {
+		idel.onclick = function (e) {
+			ev(e);
 			delete presets[ipre.value];
 			jwrite('rn_pre', presets);
 			spresets();
@@ -1987,7 +1992,8 @@ var fileman = (function () {
 			}
 		};
 
-		function rn_apply() {
+		function rn_apply(e) {
+			ev(e);
 			while (f.length && (!f[0].ok || f[0].ofn == f[0].inew.value))
 				f.shift();
 
@@ -2390,7 +2396,8 @@ var thegrid = (function () {
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');
 		if (uns)
-			uns.onclick = function () {
+			uns.onclick = function (e) {
+				ev(e);
 				ebi('unsearch').click();
 			};
 	};
@@ -4151,6 +4158,7 @@ var unpost = (function () {
 	}
 
 	ct.onclick = function (e) {
+		ev(e);
 		var tgt = e.target.closest('a[me]');
 		if (!tgt)
 			return;
@@ -4192,7 +4200,8 @@ var unpost = (function () {
 		tfilt = setTimeout(r.load, 250);
 	};
 
-	ebi('unpost_nofilt').onclick = function () {
+	ebi('unpost_nofilt').onclick = function (e) {
+		ev(e);
 		filt.value = '';
 		r.load();
 	};

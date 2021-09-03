@@ -1880,17 +1880,18 @@ function up2k_init(subtle) {
     };
 
     ebi('nthread').onkeydown = bumpthread2;
-    ebi('nthread').addEventListener('input', bumpthread, false);
-    ebi('multitask').addEventListener('click', tgl_multitask, false);
-    ebi('ask_up').addEventListener('click', tgl_ask_up, false);
-    ebi('flag_en').addEventListener('click', tgl_flag_en, false);
-    ebi('u2turbo').addEventListener('click', tgl_turbo, false);
-    ebi('u2tdate').addEventListener('click', tgl_datechk, false);
+    ebi('nthread').oninput = bumpthread;
+    ebi('multitask').onclick = tgl_multitask;
+    ebi('ask_up').onclick = tgl_ask_up;
+    ebi('flag_en').onclick = tgl_flag_en;
+    ebi('u2turbo').onclick = tgl_turbo;
+    ebi('u2tdate').onclick = tgl_datechk;
     var o = ebi('fsearch');
     if (o)
         o.addEventListener('click', tgl_fsearch, false);
 
-    ebi('u2etas').onclick = function () {
+    ebi('u2etas').onclick = function (e) {
+        ev(e);
         clmod(ebi('u2etas'), 'o', 't');
     };
 
