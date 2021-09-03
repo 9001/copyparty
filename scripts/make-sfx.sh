@@ -38,6 +38,7 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
 	shuf() { gshuf "$@"; }
+	nproc() { gnproc; }
 	sha1sum() { shasum "$@"; }
 	unexpand() { gunexpand "$@"; }
 	command -v grealpath >/dev/null &&
@@ -264,14 +265,27 @@ done
 
 gzres() {
 	command -v pigz &&
-		pk='pigz -11 -I 256' ||
+		pk='pigz -11 -I 2560' ||
 		pk='gzip'
 
-	echo "$pk"
-	find | grep -E '\.(js|css)$' | grep -vF /deps/ | while IFS= read -r f; do
+	np=$(nproc)
+	echo "$pk #$np"
+
+	while IFS=' ' read -r _ f; do
+		while true; do
+			na=$(ps auxwww | grep -F "$pk" | wc -l)
+			[ $na -le $np ] && break
+			sleep 0.2
+		done
 		echo -n .
-		$pk "$f"
-	done
+		$pk "$f" &
+	done < <(
+		find -printf '%s %p\n' |
+		grep -E '\.(js|css)$' |
+		grep -vF /deps/ |
+		sort -nr
+	)
+	wait
 	echo
 }
 
