@@ -54,7 +54,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
 * [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
-* [performance](#performance) - defaults are good for most cases, expect `8 GiB/s` download and `1 GiB/s` upload
+* [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
@@ -475,6 +475,8 @@ and there are *two* editors
 
 * if you are using media hotkeys to switch songs and are getting tired of seeing the OSD popup which Windows doesn't let you disable, consider https://ocv.me/dev/?media-osd-bgone.ps1
 
+* click the bottom-left `π` to open a javascript prompt for debugging
+
 
 ## searching
 
@@ -704,6 +706,8 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
     b512 <movie.mkv
 
+you can provide passwords using cookie 'cppwd=hunter2', as a url query `?pw=hunter2`, or with basic-authentication (either as the username or password)
+
 
 # up2k
 
@@ -736,7 +740,7 @@ hashwasm would solve the streaming issue but reduces hashing speed for sha512 (x
 
 # performance
 
-defaults are good for most cases, expect `8 GiB/s` download and `1 GiB/s` upload
+defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
 
 you can ignore the `cannot efficiently use multiple CPU cores` message, very unlikely to be a problem
 
