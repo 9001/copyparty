@@ -8,21 +8,21 @@
 
 turn your phone or raspi into a portable file server with resumable uploads/downloads using *any* web browser
 
-* server runs on anything with `py2.7` or `py3.3+`
+* server only needs `py2.7` or `py3.3+`, all dependencies optional
 * browse/upload with IE4 / netscape4.0 on win3.11 (heh)
 * *resumable* uploads need `firefox 34+` / `chrome 41+` / `safari 7+` for full speed
 * code standard: `black`
 
-📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [thumbnails](#thumbnails) // [md-viewer](#markdown-viewer) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [ie4](#browser-support)
+📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer) // [ie4](#browser-support)
 
 
 ## readme toc
 
 * top
-    * [quickstart](#quickstart) - download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
+    * **[quickstart](#quickstart)** - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
         * [on debian](#on-debian) - recommended additional steps on debian
     * [notes](#notes) - general notes
-    * [status](#status) - summary: all planned features work! now please enjoy the bloatening
+    * [status](#status) - feature summary
     * [testimonials](#testimonials) - small collection of user feedback
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
@@ -32,7 +32,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [tabs](#tabs) - the main tabs in the ui
     * [hotkeys](#hotkeys) - the browser has the following hotkeys (always qwerty)
     * [navpane](#navpane) - switching between breadcrumbs or navpane
-    * [thumbnails](#thumbnails) - press `g` to toggle image/video thumbnails instead of the file listing
+    * [thumbnails](#thumbnails) - press `g` to toggle grid-view instead of the file listing, and `t` to toggle icons/thumbnails
     * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
     * [uploading](#uploading) - web-browsers can upload using `bup` and `up2k`
         * [file-search](#file-search) - drop files/folders into up2k to see if they exist on the server
@@ -71,12 +71,12 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 ## quickstart
 
-download [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and you're all set!
+download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
 
-running the sfx without arguments (for example doubleclicking it on Windows) will give everyone full access to the current folder; see `-h` for help if you want [accounts and volumes](#accounts-and-volumes) etc
+running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; see `-h` for help if you want [accounts and volumes](#accounts-and-volumes) etc
 
 some recommended options:
-* `-e2dsa` enables general file indexing, see [search configuration](#search-configuration)
+* `-e2dsa` enables general [file indexing](#file-indexing)
 * `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies)
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
@@ -119,7 +119,7 @@ browser-specific:
 
 ## status
 
-summary: all planned features work! now please enjoy the bloatening
+feature summary
 
 * backend stuff
   * ☑ sanic multipart parser
@@ -137,7 +137,7 @@ summary: all planned features work! now please enjoy the bloatening
   * ☑ [folders as zip / tar files](#zip-downloads)
   * ☑ FUSE client (read-only)
 * browser
-  * ☑ navpane (directory tree sidebar)
+  * ☑ [navpane](#navpane) (directory tree sidebar)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
   * ☑ audio player (with OS media controls)
   * ☑ image gallery with webm player
@@ -168,12 +168,11 @@ small collection of user feedback
 * Windows: python 3.7 and older cannot read tags with FFprobe, so use Mutagen or upgrade
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * Windows: python 2.7 cannot handle filenames with mojibake
-* `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions
+* `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions (macos, some linux)
 
 ## general bugs
 
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
-* cannot mount something at `/d1/d2/d3` unless `d2` exists inside `d1`
 * probably more, pls let me know
 
 ## not my bugs
@@ -194,15 +193,16 @@ per-folder, per-user permissions
 * `-a usr:pwd` adds account `usr` with password `pwd`
 * `-v .::r` adds current-folder `.` as the webroot, `r`eadable by anyone
   * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
-  * when granting permissions to an account, the names are comma-separated: `-v .::r,usr1,usr2:rw,usr3,usr4`
+  * granting the same permissions to multiple accounts:  
+    `-v .::r,usr1,usr2:rw,usr3,usr4` = usr1/2 read-only, 3/4 read-write
 
 permissions:
 * `r` (read): browse folder contents, download files, download as zip/tar
-* `w` (write): upload files, move files *into* folder
-* `m` (move): move files/folders *from* folder
+* `w` (write): upload files, move files *into* this folder
+* `m` (move): move files/folders *from* this folder
 * `d` (delete): delete files/folders
 
-example:
+examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
 * make folder `/srv` the root of the filesystem, read-only by anyone: `-v /srv::r`
 * make folder `/mnt/music` available at `/music`, read-only for u1 and u2, read-write for u3: `-v /mnt/music:music:r,u1,u2:rw,u3`
@@ -236,14 +236,14 @@ the main tabs in the ui
 ## hotkeys
 
 the browser has the following hotkeys (always qwerty)
-* `B` toggle breadcrumbs / navpane
+* `B` toggle breadcrumbs / [navpane](#navpane)
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
-* `G` toggle list / grid view
+* `G` toggle list / [grid view](#thumbnails)
 * `T` toggle thumbnails / icons
 * `ctrl-X` cut selected files/folders
 * `ctrl-V` paste
-* `F2` rename selected file/folder
+* `F2` [rename](#batch-rename) selected file/folder
 * when a file/folder is selected (in not-grid-view):
   * `Up/Down` move cursor
   * shift+`Up/Down` select and move cursor
@@ -270,7 +270,7 @@ the browser has the following hotkeys (always qwerty)
     * `M` mute
 * when the navpane is open:
   * `A/D` adjust tree width
-* in the grid view:
+* in the [grid view](#thumbnails):
   * `S` toggle multiselect
   * shift+`A/D` zoom
 * in the markdown editor:
@@ -288,12 +288,14 @@ switching between breadcrumbs or navpane
 
 click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (default), or a navpane (tree-browser sidebar thing)
 
-click `[-]` and `[+]` (or hotkeys `A`/`D`) to adjust the size, and the `[a]` toggles if the tree should widen dynamically as you go deeper or stay fixed-size
+* `[-]` and `[+]` (or hotkeys `A`/`D`) adjust the size
+* `[v]` jumps to the currently open folder
+* `[a]` toggles automatic widening as you go deeper
 
 
 ## thumbnails
 
-press `g` to toggle image/video thumbnails instead of the file listing
+press `g` to toggle grid-view instead of the file listing, and `t` to toggle icons/thumbnails
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
@@ -308,7 +310,7 @@ in the grid/thumbnail view, if the audio player panel is open, songs will start 
 
 download folders (or file selections) as `zip` or `tar` files
 
-select which type of archive you want in the browser settings tab:
+select which type of archive you want in the `[⚙️] config` tab:
 
 | name | url-suffix | description |
 |--|--|--|
@@ -355,17 +357,21 @@ see [up2k](#up2k) for details on how it works
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
 * `[🏃]` analysis of other files should continue while one is uploading
-* `[💭]` ask for confirmation before files are added to the list
+* `[💭]` ask for confirmation before files are added to the queue
 * `[💤]` sync uploading between other copyparty browser-tabs so only one is active
-* `[🔎]` switch between upload and file-search mode
+* `[🔎]` switch between upload and [file-search](#file-search) mode
 
 and then theres the tabs below it,
-* `[ok]` is uploads which completed successfully
-* `[ng]` is the uploads which failed / got rejected (already exists, ...)
+* `[ok]` is the files which completed successfully
+* `[ng]` is the ones that failed / got rejected (already exists, ...)
 * `[done]` shows a combined list of `[ok]` and `[ng]`, chronological order
 * `[busy]` files which are currently hashing, pending-upload, or uploading
   * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
+
+note that since up2k has to read each file twice, `[🎈 bup]` can be up to 2x faster in some extreme cases (huge files combined with internet connection faster than the read-speed of your HDD)
+
+if you are resuming a massive upload and want to skip hashing the files which already finished, you can enable `turbo` in the `[⚙️] config` tab, but please read the tooltip on that button
 
 
 ### file-search
@@ -381,10 +387,6 @@ files go into `[ok]` if they exist (and you get a link to where it is), otherwis
 
 adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files (or just refresh the page)
 
-note that since up2k has to read the file twice, `[🎈 bup]` can be up to 2x faster in extreme cases (if your internet connection is faster than the read-speed of your HDD)
-
-up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
-
 
 ### unpost
 
@@ -399,12 +401,22 @@ you can unpost even if you don't have regular move/delete access, however only f
 
 cut/paste, rename, and delete files/folders (if you have permission)
 
+file selection: click somewhere on the line (not the link itsef), then:
+* `space` to toggle
+* `up/down` to move
+* `shift-up/down` to move-and-select
+* `ctrl-shift-up/down` to also scroll
+
+* cut: select some files and `ctrl-x`
+* paste: `ctrl-v` in another folder
+* rename: `F2`
+
 you can move files across browser tabs (cut in one tab, paste in another)
 
 
 ## batch rename
 
-select some files and press F2 to bring up the rename UI
+select some files and press `F2` to bring up the rename UI
 
 ![batch-rename-fs8](https://user-images.githubusercontent.com/241032/128434204-eb136680-3c07-4ec7-92e0-ae86af20c241.png)
 
@@ -486,15 +498,15 @@ add the argument `-e2ts` to also scan/index tags from music files, which brings 
 
 ## file indexing
 
-file indexing relies on two databases, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`). Configuration can be done through arguments, volume flags, or a mix of both.
+file indexing relies on two database tables, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`), stored in `.hist/up2k.db`. Configuration can be done through arguments, volume flags, or a mix of both.
 
 through arguments:
 * `-e2d` enables file indexing on upload
-* `-e2ds` scans writable folders for new files on startup
-* `-e2dsa` scans all mounted volumes (including readonly ones)
+* `-e2ds` also scans writable folders for new files on startup
+* `-e2dsa` also scans all mounted volumes (including readonly ones)
 * `-e2t` enables metadata indexing on upload
-* `-e2ts` scans for tags in all files that don't have tags yet
-* `-e2tsr` deletes all existing tags, does a full reindex
+* `-e2ts` also scans for tags in all files that don't have tags yet
+* `-e2tsr` also deletes all existing tags, doing a full reindex
 
 the same arguments can be set as volume flags, in addition to `d2d` and `d2t` for disabling:
 * `-v ~/music::r:c,e2dsa:c,e2tsr` does a full reindex of everything on startup
@@ -502,10 +514,11 @@ the same arguments can be set as volume flags, in addition to `d2d` and `d2t` fo
 * `-v ~/music::r:c,d2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
 note:
+* the parser currently can't handle `c,e2dsa,e2tsr` so you have to `c,e2dsa:c,e2tsr`
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
-you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `:c,dhash`, this has the following consequences:
+to save some time, you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `:c,dhash`, this has the following consequences:
 * initial indexing is way faster, especially when the volume is on a network disk
 * makes it impossible to [file-search](#file-search)
 * if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
@@ -557,7 +570,7 @@ some examples,
 
 ## database location
 
-can be stored in-volume (default) or elsewhere
+in-volume (`.hist/up2k.db`, default) or somewhere else
 
 copyparty creates a subfolder named `.hist` inside each volume where it stores the database, thumbnails, and some other stuff
 
@@ -579,7 +592,7 @@ set `-e2t` to index tags on upload
 
 if you add/remove a tag from `mte` you will need to run with `-e2tsr` once to rebuild the database, otherwise only new files will be affected
 
-but instead of using `-mte`, `-mth` is a better way to hide tags in the browser: these tags will not be displayed by default, but they still get indexed and become searchable, and users can choose to unhide them in the settings pane
+but instead of using `-mte`, `-mth` is a better way to hide tags in the browser: these tags will not be displayed by default, but they still get indexed and become searchable, and users can choose to unhide them in the `[⚙️] config` pane
 
 `-mtm` can be used to add or redefine a metadata mapping, say you have media files with `foo` and `bar` tags and you want them to display as `qux` in the browser (preferring `foo` if both are present), then do `-mtm qux=foo,bar` and now you can `-mte artist,title,qux`
 
@@ -647,10 +660,10 @@ TLDR: yes
 | **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
 
 * internet explorer 6 to 8 behave the same
-* firefox 52 and chrome 49 are the last winxp versions
-* `*1` yes, but extremely slow (ie10: 1 MiB/s, ie11: 270 KiB/s)
+* firefox 52 and chrome 49 are the final winxp versions
+* `*1` yes, but extremely slow (ie10: `1 MiB/s`, ie11: `270 KiB/s`)
 * `*2` causes a full-page refresh on each navigation
-* `*3` using a wasm decoder which can sometimes get stuck and consumes a bit more power
+* `*3` using a wasm decoder which consumes a bit more power
 
 quick summary of more eccentric web-browsers trying to view a directory index:
 
@@ -710,12 +723,25 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
   * server writes chunks into place based on the hash
 * client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
 
+up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
+
+
+## why chunk-hashes
+
+a single sha512 would be better right?
+
+this is due to `crypto.subtle` not providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
+
+as a result, the hashes are much less useful than they could have been (search the server by sha512, provide the sha512 in the response http headers, ...)
+
+hashwasm would solve the streaming issue but reduces hashing speed for sha512 (xxh128 does 6 GiB/s), and it would make old browsers and [iphones](https://bugs.webkit.org/show_bug.cgi?id=228552) unsupported
+
 
 # performance
 
-defaults are good for most cases
+defaults are good for most cases, expected speeds are `8 GiB/s` download and `1 GiB/s` up2k-upload with firefox
 
-you can ignore the `cannot efficiently use multiple CPU cores` message, it's very unlikely to be a problem
+you can ignore the `cannot efficiently use multiple CPU cores` message, very unlikely to be a problem
 
 below are some tweaks roughly ordered by usefulness:
 
@@ -744,17 +770,11 @@ enable music tags:
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
 * or `ffprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
-enable thumbnails of images:
-* `Pillow` (requires py2.7 or py3.5+)
-
-enable thumbnails of videos:
-* `ffmpeg` and `ffprobe` somewhere in `$PATH`
-
-enable thumbnails of HEIF pictures:
-* `pyheif-pillow-opener` (requires Linux or a C compiler)
-
-enable thumbnails of AVIF pictures:
-* `pillow-avif-plugin`
+enable [thumbnails](#thumbnails) of...
+* **images:** `Pillow` (requires py2.7 or py3.5+)
+* **videos:** `ffmpeg` and `ffprobe` somewhere in `$PATH`
+* **HEIF pictures:** `pyheif-pillow-opener` (requires Linux or a C compiler)
+* **AVIF pictures:** `pillow-avif-plugin`
 
 
 ## install recommended deps
@@ -791,8 +811,10 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 * `223k` after `./scripts/make-sfx.sh re no-ogv no-cm`
 
 the features you can opt to drop are
-* `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files
-* `cm`/easymde, the "fancy" markdown editor
+* `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files, saves ~192k
+* `cm`/easymde, the "fancy" markdown editor, saves ~92k
+* `no-fnt`, source-code-pro, the monospace font, saves ~9k
+* `no-dd`, the custom mouse cursor for the media player tray tab, saves ~2k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 
@@ -828,7 +850,7 @@ pip install black bandit pylint flake8  # vscode tooling
 
 ## just the sfx
 
-grab the web-dependencies from a previous sfx (unless you need to modify something in those):
+first grab the web-dependencies from a previous sfx (unless you need to modify something in those):
 
 ```sh
 rm -rf copyparty/web/deps
@@ -854,8 +876,8 @@ in the `scripts` folder:
 
 * run `make -C deps-docker` to build all dependencies
 * `git tag v1.2.3 && git push origin --tags`
-* create github release with `make-tgz-release.sh`
 * upload to pypi with `make-pypi-release.(sh|bat)`
+* create github release with `make-tgz-release.sh`
 * create sfx with `make-sfx.sh`
 
 

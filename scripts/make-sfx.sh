@@ -16,10 +16,10 @@ help() { exec cat <<'EOF'
 #
 # `no-sh` makes just the python sfx, skips the sh/unix sfx
 #
-# `no-ogv` saves ~500k by removing the opus/vorbis audio codecs
+# `no-ogv` saves ~192k by removing the opus/vorbis audio codecs
 #   (only affects apple devices; everything else has native support)
 #
-# `no-cm` saves ~90k by removing easymde/codemirror
+# `no-cm` saves ~92k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
 # `no-fnt` saves ~9k by removing the source-code-pro font
