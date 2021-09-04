@@ -30,30 +30,31 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
 * [the browser](#the-browser) - accessing a copyparty server using a web-browser
     * [tabs](#tabs) - the main tabs in the ui
-    * [hotkeys](#hotkeys) - the browser has the following hotkeys (always qwerty)
+    * [hotkeys](#hotkeys) - the browser has the following hotkeys
     * [navpane](#navpane) - switching between breadcrumbs or navpane
-    * [thumbnails](#thumbnails) - press `g` to toggle grid-view instead of the file listing, and `t` to toggle icons/thumbnails
+    * [thumbnails](#thumbnails) - press `g` to toggle grid-view instead of the file listing
     * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
     * [uploading](#uploading) - web-browsers can upload using `bup` and `up2k`
         * [file-search](#file-search) - drop files/folders into up2k to see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
-    * [batch rename](#batch-rename) - select some files and press F2 to bring up the rename UI
+    * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config)
     * [file indexing](#file-indexing)
-    * [upload rules](#upload-rules) - set upload rules using volume flags, some examples
+    * [upload rules](#upload-rules) - set upload rules using volume flags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
-    * [database location](#database-location) - can be stored in-volume (default) or elsewhere
+    * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
     * [complete examples](#complete-examples)
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
 * [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
-* [performance](#performance) - defaults are good for most cases
+    * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
+* [performance](#performance) - defaults are good for most cases, expect `8 GiB/s` download and `1 GiB/s` upload
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
@@ -90,9 +91,7 @@ you may also want these, especially on servers:
 
 ### on debian
 
-recommended additional steps on debian
-
-enable audio metadata and thumbnails (from images and videos):
+recommended additional steps on debian  which enable audio metadata and thumbnails (from images and videos):
 
 * as root, run the following:  
   `apt install python3 python3-pip python3-dev ffmpeg`
@@ -114,7 +113,7 @@ browser-specific:
 * Android-Chrome: increase "parallel uploads" for higher speed (android bug)
 * Android-Firefox: takes a while to select files (their fix for ☝️)
 * Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
-* Desktop-Firefox: may stop you from deleting folders you've uploaded until you visit `about:memory` and click `Minimize memory usage`
+* Desktop-Firefox: may stop you from deleting files you've uploaded until you visit `about:memory` and click `Minimize memory usage`
 
 
 ## status
@@ -235,7 +234,7 @@ the main tabs in the ui
 
 ## hotkeys
 
-the browser has the following hotkeys (always qwerty)
+the browser has the following hotkeys  (always qwerty)
 * `B` toggle breadcrumbs / [navpane](#navpane)
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
@@ -295,7 +294,7 @@ click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (
 
 ## thumbnails
 
-press `g` to toggle grid-view instead of the file listing, and `t` to toggle icons/thumbnails
+press `g` to toggle grid-view instead of the file listing,  and `t` toggles icons / thumbnails
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
@@ -528,7 +527,7 @@ if you set `--no-hash`, you can enable hashing for specific volumes using flag `
 
 ## upload rules
 
-set upload rules using volume flags, some examples:
+set upload rules using volume flags,  some examples:
 
 * `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: b, k, m, g)
 * `:c,nosub` disallow uploading into subdirectories; goes well with `rotn` and `rotf`:
@@ -547,9 +546,7 @@ you can also set transaction limits which apply per-IP and per-volume, but these
 
 ## compress uploads
 
-files can be autocompressed on upload
-
-compression is either on user-request (if config allows) or forced by server-config
+files can be autocompressed on upload,  either on user-request (if config allows) or forced by server-config
 
 * volume flag `gz` allows gz compression
 * volume flag `xz` allows lzma compression
@@ -728,7 +725,7 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 
 ## why chunk-hashes
 
-a single sha512 would be better right?
+a single sha512 would be better, right?
 
 this is due to `crypto.subtle` not providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
 
@@ -739,7 +736,7 @@ hashwasm would solve the streaming issue but reduces hashing speed for sha512 (x
 
 # performance
 
-defaults are good for most cases, expected speeds are `8 GiB/s` download and `1 GiB/s` up2k-upload with firefox
+defaults are good for most cases, expect `8 GiB/s` download and `1 GiB/s` upload
 
 you can ignore the `cannot efficiently use multiple CPU cores` message, very unlikely to be a problem
 
@@ -850,7 +847,7 @@ pip install black bandit pylint flake8  # vscode tooling
 
 ## just the sfx
 
-first grab the web-dependencies from a previous sfx (unless you need to modify something in those):
+first grab the web-dependencies from a previous sfx (assuming you don't need to modify something in those):
 
 ```sh
 rm -rf copyparty/web/deps
