@@ -912,6 +912,9 @@ function up2k_init(subtle) {
             td = (now - (etaref || now)) / 1000.0;
 
         etaref = now;
+        if (td > 1.2)
+            td = 0.05;
+
         //ebi('acc_info').innerHTML = humantime(st.time.busy) + ' ' + f2f(now / 1000, 1);
 
         if (!nhash)
