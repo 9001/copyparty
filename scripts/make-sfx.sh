@@ -178,7 +178,7 @@ git describe --tags >/dev/null 2>/dev/null && {
 
 [ -z "$ver" ] && 
 	ver="$(awk '/^VERSION *= \(/ {
-		gsub(/[^0-9,]/,""); gsub(/,/,"."); print; exit}' < copyparty/__version__.py)"
+		gsub(/[^0-9,a-g-]/,""); gsub(/,/,"."); print; exit}' < copyparty/__version__.py)"
 
 ts=$(date -u +%s)
 hts=$(date -u +%Y-%m%d-%H%M%S) # --date=@$ts (thx osx)
