@@ -842,14 +842,14 @@ var toast = (function () {
         r.visible = false;
     };
 
-    r.show = function (cl, ms, txt) {
+    r.show = function (cl, sec, txt) {
         clearTimeout(te);
-        if (ms)
-            te = setTimeout(r.hide, ms * 1000);
+        if (sec)
+            te = setTimeout(r.hide, sec * 1000);
 
         obj.innerHTML = '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
-        ms += obj.offsetWidth;
+        sec += obj.offsetWidth;
         obj.className += ' vis';
         ebi('toastc').onclick = r.hide;
         timer.add(scrollchk);
@@ -857,17 +857,17 @@ var toast = (function () {
         r.txt = txt;
     };
 
-    r.ok = function (ms, txt) {
-        r.show('ok', ms, txt);
+    r.ok = function (sec, txt) {
+        r.show('ok', sec, txt);
     };
-    r.inf = function (ms, txt) {
-        r.show('inf', ms, txt);
+    r.inf = function (sec, txt) {
+        r.show('inf', sec, txt);
     };
-    r.warn = function (ms, txt) {
-        r.show('warn', ms, txt);
+    r.warn = function (sec, txt) {
+        r.show('warn', sec, txt);
     };
-    r.err = function (ms, txt) {
-        r.show('err', ms, txt);
+    r.err = function (sec, txt) {
+        r.show('err', sec, txt);
     };
 
     return r;
