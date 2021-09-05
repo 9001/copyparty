@@ -173,6 +173,10 @@ a, #files tbody div a:last-child {
 #epi.logue {
 	margin: .8em 0;
 }
+.mdo,
+.mdo * {
+	line-height: 1.4em;
+}
 #srv_info {
 	color: #a73;
 	background: #333;
