@@ -1383,8 +1383,11 @@ function up2k_init(subtle) {
                 }
             }
             apop(st.busy.head, t);
-            if (!ok && !t.srch)
-                return push_t(st.todo.hash, t);
+            if (!ok && !t.srch) {
+                push_t(st.todo.hash, t);
+                tasker();
+                return;
+            }
 
             t.done = true;
             st.bytes.hashed += t.size;
@@ -1393,6 +1396,7 @@ function up2k_init(subtle) {
             pvis.seth(t.n, 1, ok ? 'YOLO' : '404');
             pvis.seth(t.n, 2, "turbo'd");
             pvis.move(t.n, ok ? 'ok' : 'ng');
+            tasker();
         };
         xhr.onload = function (e) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
