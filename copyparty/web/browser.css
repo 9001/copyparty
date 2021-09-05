@@ -1542,7 +1542,8 @@ html.light #bbox-overlay figcaption a {
 
 #op_up2k {
 	padding: 0 1em 1em 1em;
-	min-height: 60em;
+	min-height: 0;
+	transition: min-height .2s;
 }
 #u2form {
 	position: absolute;

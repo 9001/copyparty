@@ -904,7 +904,7 @@ function up2k_init(subtle) {
     }
     ebi('u2cleanup').onclick = u2cleanup;
 
-    var etaref = 0, etaskip = 0;
+    var etaref = 0, etaskip = 0, op_minh = 0;
     function etafun() {
         var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,
             nsend = st.busy.upload.length + st.todo.upload.length,
@@ -916,6 +916,15 @@ function up2k_init(subtle) {
             td = 0.05;
 
         //ebi('acc_info').innerHTML = humantime(st.time.busy) + ' ' + f2f(now / 1000, 1);
+
+        var op = ebi('op_up2k'),
+            uff = ebi('u2footfoot'),
+            minh = QS('#op_up2k.act') ? Math.max(op_minh, uff.offsetTop + uff.offsetHeight - op.offsetTop + 32) : 0;
+
+        if (minh > op_minh || !op_minh) {
+            op_minh = minh;
+            op.style.minHeight = op_minh + 'px';
+        }
 
         if (!nhash)
             ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
@@ -1078,6 +1087,7 @@ function up2k_init(subtle) {
                             toast.err(t, '{0} {1}'.format(ks, tng));
 
                         timer.rm(etafun);
+                        op_minh = 0;
                     }
                     else {
                         timer.add(etafun, false);
@@ -1903,7 +1913,7 @@ function up2k_init(subtle) {
     if (parallel_uploads < 1)
         bumpthread(1);
 
-    return { "init_deps": init_deps, "set_fsearch": set_fsearch }
+    return { "init_deps": init_deps, "set_fsearch": set_fsearch, "ui": pvis }
 }
 
 
