@@ -814,8 +814,8 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 the features you can opt to drop are
 * `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files, saves ~192k
 * `cm`/easymde, the "fancy" markdown editor, saves ~92k
-* `no-fnt`, source-code-pro, the monospace font, saves ~9k
-* `no-dd`, the custom mouse cursor for the media player tray tab, saves ~2k
+* `fnt`, source-code-pro, the monospace font, saves ~9k
+* `dd`, the custom mouse cursor for the media player tray tab, saves ~2k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 

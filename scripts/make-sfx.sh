@@ -217,7 +217,7 @@ done
 
 [ $no_fnt ] && {
 	rm -f copyparty/web/deps/scp.woff2
-	f=copyparty/web/md.css
+	f=copyparty/web/ui.css
 	gzip -d "$f"
 	sed -r '/scp\.woff2/d' <$f >t
 	tmv "$f"
