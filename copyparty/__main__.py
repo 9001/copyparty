@@ -355,12 +355,14 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-nih", action="store_true", help="no info hostname")
     ap2.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
-    ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (lifetime volflag)")
 
     ap2 = ap.add_argument_group('safety options')
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="scan all volumes; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
     ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt")
+    ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
+    ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to make something a dotfile")
+    ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
 
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")

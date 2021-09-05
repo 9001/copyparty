@@ -1520,6 +1520,14 @@ class Up2k(object):
         dabs = dvn.canonical(drem)
         drd, dfn = vsplit(drem)
 
+        n1 = svp.split('/')[-1]
+        n2 = dvp.split('/')[-1]
+        if n1.startswith('.') or n2.startswith('.'):
+            if self.args.no_dot_mv:
+                raise Pebkac(400, "moving dotfiles was disabled by server config")
+            elif self.args.no_dot_ren and n1 != n2:
+                raise Pebkac(400, "renaming dotfiles was disabled by server config")
+
         if bos.path.exists(dabs):
             raise Pebkac(400, "mv2: target file exists")
 
