@@ -127,6 +127,12 @@ var draw_md = (function () {
 })();
 
 
+// discard TOC callback, just regen editor scroll map
+img_load.callbacks = [function () {
+    map_pre = genmap(dom_pre, map_pre);
+}];
+
+
 // resize handler
 redraw = (function () {
     function onresize() {
@@ -136,7 +142,6 @@ redraw = (function () {
         dom_ref.style.width = getComputedStyle(dom_src).offsetWidth + 'px';
         map_src = genmap(dom_ref, map_src);
         map_pre = genmap(dom_pre, map_pre);
-        dbg(document.body.clientWidth + 'x' + document.body.clientHeight);
     }
     function setsbs() {
         dom_wrap.setAttribute('class', '');

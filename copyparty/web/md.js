@@ -73,6 +73,26 @@ function statify(obj) {
 })();
 
 
+// image load handler
+var img_load = (function () {
+    var r = {};
+    r.callbacks = [];
+
+    function fire() {
+        for (var a = 0; a < r.callbacks.length; a++)
+            r.callbacks[a]();
+    }
+
+    var timeout = null;
+    r.done = function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(fire, 500);
+    };
+
+    return r;
+})();
+
+
 // faster than replacing the entire html (chrome 1.8x, firefox 1.6x)
 function copydom(src, dst, lv) {
     var sc = src.childNodes,
@@ -356,6 +376,10 @@ function convert_markdown(md_text, dest_dom) {
 
     copydom(md_dom, dest_dom, 0);
 
+    var imgs = dest_dom.getElementsByTagName('img');
+    for (var a = 0, aa = imgs.length; a < aa; a++)
+        imgs[a].onload = img_load.done;
+
     if (ext && ext[0].render2)
         try {
             ext[0].render2(dest_dom);
@@ -490,6 +514,7 @@ function init_toc() {
 // "main" :p
 convert_markdown(dom_src.value, dom_pre);
 var toc = init_toc();
+img_load.callbacks = [toc.refresh];
 
 
 // scroll handler
