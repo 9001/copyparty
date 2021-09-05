@@ -23,7 +23,7 @@ help() { exec cat <<'EOF'
 #   (the fancy markdown editor)
 #
 # `no-fnt` saves ~9k by removing the source-code-pro font
-#   (browsers on MS-Windows look pretty bad without this)
+#   (browsers will try to use 'Consolas' instead)
 #
 # `no-dd` saves ~2k by removing the mouse cursor
 
@@ -218,15 +218,15 @@ done
 [ $no_fnt ] && {
 	rm -f copyparty/web/deps/scp.woff2
 	f=copyparty/web/ui.css
-	gzip -d "$f"
-	sed -r '/scp\.woff2/d' <$f >t
+	gzip -d "$f.gz" || true
+	sed -r "s/src:.*scp.*\)/src:local('Consolas')/" <$f >t
 	tmv "$f"
 }
 
 [ $no_dd ] && {
 	rm -rf copyparty/web/dd
 	f=copyparty/web/browser.css
-	gzip -d "$f"
+	gzip -d "$f.gz" || true
 	sed -r 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: ?cursor/d' <$f >t
 	tmv "$f"
 }
