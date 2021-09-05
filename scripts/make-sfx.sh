@@ -23,7 +23,7 @@ help() { exec cat <<'EOF'
 #   (the fancy markdown editor)
 #
 # `no-fnt` saves ~9k by removing the source-code-pro font
-#   (mainly used my the markdown viewer/editor)
+#   (browsers on MS-Windows look pretty bad without this)
 #
 # `no-dd` saves ~2k by removing the mouse cursor
 
@@ -240,6 +240,12 @@ find | grep -E '\.py$' |
 f=dep-j2/jinja2/constants.py
 awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
 tmv "$f"
+
+grep -rLE '^#[^a-z]*coding: utf-8' dep-j2 |
+while IFS= read -r f; do
+	(echo "# coding: utf-8"; cat "$f") >t
+	tmv "$f"
+done
 
 # up2k goes from 28k to 22k laff
 awk 'BEGIN{gensub(//,"",1)}' </dev/null &&

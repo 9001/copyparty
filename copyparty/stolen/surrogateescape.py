@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
 This is Victor Stinner's pure-Python implementation of PEP 383: the "surrogateescape" error
 handler of Python 3.
@@ -171,7 +173,7 @@ FS_ENCODING = sys.getfilesystemencoding()
 
 if WINDOWS and not PY3:
     # py2 thinks win* is mbcs, probably a bug? anyways this works
-    FS_ENCODING = 'utf-8'
+    FS_ENCODING = "utf-8"
 
 
 # normalize the filesystem encoding name.
