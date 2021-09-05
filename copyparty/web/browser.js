@@ -140,9 +140,10 @@ ebi('op_cfg').innerHTML = (
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
 	'		<a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>\n' +
-	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
 	'		<a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
+	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
+	'		<a id="ireadme" class="tgl btn" href="#" tt="show README.md in folder listings">📜 readme</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	(have_zip ? (
@@ -2999,7 +3000,8 @@ var treectl = (function () {
 	var treectl = {
 		"hidden": true,
 		"ls_cb": null,
-		"dir_cb": tree_scrollto
+		"dir_cb": tree_scrollto,
+		"ireadme": bcfg_get('ireadme', true)
 	},
 		entreed = false,
 		fixedpos = false,
@@ -3320,6 +3322,12 @@ var treectl = (function () {
 		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
 		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
 
+		clmod(ebi('epi'), 'mdo');
+		if (res.readme)
+			setTimeout(function () {
+				show_readme(res.readme);
+			}, 10);
+
 		document.title = '⇆🎉 ' + uricom_dec(document.location.pathname.slice(1, -1))[0];
 
 		filecols.set_style();
@@ -3372,6 +3380,12 @@ var treectl = (function () {
 		treectl.goto(get_evpath());
 	}
 
+	function treadme(e) {
+		ev(e);
+		treectl.ireadme = !treectl.ireadme;
+		bcfg_set('ireadme', treectl.ireadme);
+	}
+
 	function dyntree(e) {
 		ev(e);
 		dyn = !dyn;
@@ -3393,6 +3407,7 @@ var treectl = (function () {
 	ebi('detree').onclick = treectl.detree;
 	ebi('visdir').onclick = tree_scrollto;
 	ebi('dotfiles').onclick = tdots;
+	ebi('ireadme').onclick = treadme;
 	ebi('dyntree').onclick = dyntree;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
@@ -3823,6 +3838,7 @@ var light;
 
 	function freshen() {
 		clmod(document.documentElement, "light", light);
+		clmod(document.documentElement, "dark", !light);
 		pbar.drawbuf();
 		pbar.drawpos();
 		vbar.draw();
@@ -4034,6 +4050,51 @@ var msel = (function () {
 	}
 	return r;
 })();
+
+
+function show_readme(md, url, depth) {
+	if (!treectl.ireadme)
+		return;
+
+	var div = ebi('epi'),
+		errmsg = 'cannot show README.md:\n\n',
+		now = window.location.href.replace(/\/?[?#].*/, "");
+
+	url = url || now;
+	if (url != now)
+		return;
+
+	if (!window['marked']) {
+		if (depth)
+			return toast.warn(10, errmsg + 'failed to load marked.js')
+
+		return import_js('/.cpr/deps/marked.js', function () {
+			show_readme(md, url, 1);
+		});
+	}
+
+	try {
+		clmod(div, 'mdo', 1);
+		div.innerHTML = marked(md, {
+			headerPrefix: 'md-',
+			breaks: true,
+			gfm: true
+		});
+		var links = QSA('#epi a');
+		for (var a = 0, aa = links.length; a < aa; a++) {
+			var href = links[a].getAttribute('href');
+			if (!href.startsWith('#'))
+				continue;
+
+			links[a].setAttribute('href', '#md-' + href.slice(1));
+		}
+	}
+	catch (ex) {
+		toast.warn(10, errmsg + ex);
+	}
+}
+if (readme)
+	show_readme(readme);
 
 
 (function () {

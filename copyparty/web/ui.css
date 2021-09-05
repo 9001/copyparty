@@ -365,6 +365,7 @@ html.light #tt em {
 		overflow-wrap: break-word;
 		word-wrap: break-word; /*ie*/
 	}
+	html.light .mdo a,
 	.mdo a {
 		color: #fff;
 		background: #39b;

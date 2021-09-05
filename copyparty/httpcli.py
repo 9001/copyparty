@@ -1875,6 +1875,15 @@ class HttpCli(object):
                     with open(fsenc(fn), "rb") as f:
                         logues[n] = f.read().decode("utf-8")
 
+        readme = ""
+        if not self.args.no_readme and not logues[1]:
+            for fn in ["README.md", "readme.md"]:
+                fn = os.path.join(abspath, fn)
+                if bos.path.exists(fn):
+                    with open(fsenc(fn), "rb") as f:
+                        readme = f.read().decode("utf-8")
+                        break
+
         ls_ret = {
             "dirs": [],
             "files": [],
@@ -1883,6 +1892,7 @@ class HttpCli(object):
             "acct": self.uname,
             "perms": perms,
             "logues": logues,
+            "readme": readme,
         }
         j2a = {
             "vdir": quotep(self.vpath),
@@ -1901,6 +1911,7 @@ class HttpCli(object):
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "url_suf": url_suf,
             "logues": logues,
+            "readme": readme,
             "title": html_escape(self.vpath, crlf=True),
             "srv_info": srv_info,
         }

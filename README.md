@@ -477,6 +477,10 @@ and there are *two* editors
 
 * click the bottom-left `π` to open a javascript prompt for debugging
 
+* files named `.prologue.html` / `.epilogue.html` will be rendered before/after directory listings unless `--no-logues`
+
+* files named `README.md` / `readme.md` will be rendered after directory listings unless `--no-readme` (but `.epilogue.html` takes precedence)
+
 
 ## searching
 
@@ -757,6 +761,24 @@ below are some tweaks roughly ordered by usefulness:
   ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
 
 
+# security
+
+some notes on hardening
+
+on public copyparty instances with anonymous upload enabled:
+
+* users can upload html/css/js which will evaluate for other visitors in a few ways,
+  * unless `--no-readme` is set: by uploading/modifying a file named `readme.md`
+  * if `move` access is granted AND none of `--no-logues`, `--no-dot-mv`, `--no-dot-ren` is set: by uploading some .html file and renaming it to `.epilogue.html` (uploading it directly is blocked)
+
+
+## gotchas
+
+behavior that might be unexpected
+
+* users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
+
+
 # dependencies
 
 mandatory deps:
@@ -887,7 +909,6 @@ in the `scripts` folder:
 roughly sorted by priority
 
 * hls framework for Someone Else to drop code into :^)
-* readme.md as epilogue
 
 
 ## discarded ideas
