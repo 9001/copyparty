@@ -7,7 +7,7 @@ html, body {
 #repl {
 	position: absolute;
 	top: 0;
-	right: .2em;
+	right: .5em;
 	border: none;
 	color: inherit;
 	background: none;
@@ -23,122 +23,8 @@ html, body {
 	bottom: auto;
 	top: 1.4em;
 }
-pre, code, a {
-	color: #480;
-	background: #f7f7f7;
-	border: .07em solid #ddd;
-	border-radius: .2em;
-	padding: .1em .3em;
-	margin: 0 .1em;
-}
-code {
-	font-size: .96em;
-}
-pre, code, tt {
-	font-family: 'scp', monospace, monospace;
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-pre {
-	counter-reset: precode;
-}
-pre code {
-	counter-increment: precode;
-	display: inline-block;
-	margin: 0 -.3em;
-	padding: .4em .5em;
-	border: none;
-	border-bottom: 1px solid #cdc;
-	min-width: calc(100% - .6em);
-	line-height: 1.1em;
-}
-pre code:last-child {
-	border-bottom: none;
-}
-pre code::before {
-	content: counter(precode);
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	display: inline-block;
-	text-align: right;
-	font-size: .75em;
-	color: #48a;
-	width: 4em;
-	padding-right: 1.5em;
-	margin-left: -5.5em;
-}
-pre code:hover {
-	background: #fec;
-	color: #360;
-}
-h1, h2 {
-	line-height: 1.5em;
-}
-h1 {
-	font-size: 1.7em;
-	text-align: center;
-	border: 1em solid #777;
-	border-width: .05em 0;
-	margin: 3em 0;
-}
-h2 {
-	font-size: 1.5em;
-	font-weight: normal;
-	background: #f7f7f7;
-	border-top: .07em solid #fff;
-	border-bottom: .07em solid #bbb;
-	border-radius: .5em .5em 0 0;
-	padding-left: .4em;
-	margin-top: 3em;
-}
-h3 {
-	border-bottom: .1em solid #999;
-}
-h1 a, h3 a, h5 a,
-h2 a, h4 a, h6 a {
-	color: inherit;
-	display: block;
-	background: none;
-	border: none;
-	padding: 0;
-	margin: 0;
-}
-#mp ul,
-#mp ol {
-	border-left: .3em solid #ddd;
-}
-#m>ul,
-#m>ol {
-	border-color: #bbb;
-}
-#mp ul>li {
-	list-style-type: disc;
-}
-#mp ul>li,
-#mp ol>li {
-	margin: .7em 0;
-}
-strong {
-	color: #000;
-}
-p>em,
-li>em,
-td>em {
-	color: #c50;
-	padding: .1em;
-	border-bottom: .1em solid #bbb;
-}
-blockquote {
-	font-family: serif;
-	background: #f7f7f7;
-	border: .07em dashed #ccc;
-	padding: 0 2em;
-	margin: 1em 0;
-}
-small {
-	opacity: .8;
+a {
+	text-decoration: none;
 }
 #toc {
 	margin: 0 1em;
@@ -186,14 +72,6 @@ small {
 	color: #6b3;
 	text-shadow: .02em 0 0 #6b3;
 }
-table {
-	border-collapse: collapse;
-	margin: 1em 0;
-}
-th, td {
-	padding: .2em .5em;
-	border: .12em solid #aaa;
-}
 blink {
 	animation: blinker .7s cubic-bezier(.9, 0, .1, 1) infinite;
 }
@@ -205,6 +83,36 @@ blink {
 		opacity: 1;
 	}
 }
+
+
+.mdo pre {
+	counter-reset: precode;
+}
+.mdo pre code {
+	counter-increment: precode;
+	display: inline-block;
+	border: none;
+	border-bottom: 1px solid #cdc;
+	min-width: calc(100% - .6em);
+}
+.mdo pre code:last-child {
+	border-bottom: none;
+}
+.mdo pre code::before {
+	content: counter(precode);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	display: inline-block;
+	text-align: right;
+	font-size: .75em;
+	color: #48a;
+	width: 4em;
+	padding-right: 1.5em;
+	margin-left: -5.5em;
+}
+
 
 @media screen {
 	html, body {
@@ -222,34 +130,6 @@ blink {
 	#mp {
 		max-width: 52em;
 		margin-bottom: 6em;
-		word-break: break-word;
-		overflow-wrap: break-word;
-		word-wrap: break-word; /*ie*/
-	}
-	a {
-		color: #fff;
-		background: #39b;
-		text-decoration: none;
-		padding: 0 .3em;
-		border: none;
-		border-bottom: .07em solid #079;
-	}
-	h2 {
-		color: #fff;
-		background: #555;
-		margin-top: 2em;
-		border-bottom: .22em solid #999;
-		border-top: none;
-	}
-	h1 {
-		color: #fff;
-		background: #444;
-		font-weight: normal;
-		border-top: .4em solid #fb0;
-		border-bottom: .4em solid #777;
-		border-radius: 0 1em 0 1em;
-		margin: 3em 0 1em 0;
-		padding: .5em 0;
 	}
 	#mn {
 		padding: 1.3em 0 .7em 1em;
@@ -302,6 +182,8 @@ blink {
 		color: #444;
 		background: none;
 		text-decoration: underline;
+		margin: 0 .1em;
+		padding: 0 .3em;
 		border: none;
 	}
 	#mh a:hover {
@@ -349,55 +231,6 @@ blink {
 	}
 	html.dark #toc li {
 		border-width: 0;
-	}
-	html.dark #mp a {
-		background: #057;
-	}
-	html.dark #mp h1 a, html.dark #mp h4 a,
-	html.dark #mp h2 a, html.dark #mp h5 a,
-	html.dark #mp h3 a, html.dark #mp h6 a {
-		color: inherit;
-		background: none;
-	}
-	html.dark pre,
-	html.dark code {
-		color: #8c0;
-		background: #1a1a1a;
-		border: .07em solid #333;
-	}
-	html.dark #mp ul,
-	html.dark #mp ol {
-		border-color: #444;
-	}
-	html.dark #m>ul,
-	html.dark #m>ol {
-		border-color: #555;
-	}
-	html.dark strong {
-		color: #fff;
-	}
-	html.dark p>em,
-	html.dark li>em,
-	html.dark td>em {
-		color: #f94;
-		border-color: #666;
-	}
-	html.dark h1 {
-		background: #383838;
-		border-top: .4em solid #b80;
-		border-bottom: .4em solid #4c4c4c;
-	}
-	html.dark h2 {
-		background: #444;
-		border-bottom: .22em solid #555;
-	}
-	html.dark td,
-	html.dark th {
-		border-color: #444;
-	}
-	html.dark blockquote {
-		background: #282828;
-		border: .07em dashed #444;
 	}
 	html.dark #mn a:not(:last-child)::after {
 		border-color: rgba(255,255,255,0.3);
@@ -504,7 +337,7 @@ blink {
 		mso-footer-margin: .6in;
 		mso-paper-source: 0;
 	}
-	a {
+	.mdo a {
 		color: #079;
 		text-decoration: none;
 		border-bottom: .07em solid #4ac;
@@ -537,18 +370,20 @@ blink {
 	a[ctr]::before {
 		content: attr(ctr) '. ';
 	}
-	h1 {
+	.mdo h1 {
 		margin: 2em 0;
 	}
-	h2 {
+	.mdo h2 {
 		margin: 2em 0 0 0;
 	}
-	h1, h2, h3 {
+	.mdo h1,
+	.mdo h2,
+	.mdo h3 {
 		page-break-inside: avoid;
 	}
-	h1::after,
-	h2::after,
-	h3::after {
+	.mdo h1::after,
+	.mdo h2::after,
+	.mdo h3::after {
 		content: 'orz';
 		color: transparent;
 		display: block;
@@ -556,20 +391,20 @@ blink {
 		padding: 4em 0 0 0;
 		margin: 0 0 -5em 0;
 	}
-	p {
+	.mdo p {
 		page-break-inside: avoid;
 	}
-	table {
+	.mdo table {
 		page-break-inside: auto;
 	}
-	tr {
+	.mdo tr {
 		page-break-inside: avoid;
 		page-break-after: auto;
 	}
-	thead {
+	.mdo thead {
 		display: table-header-group;
 	}
-	tfoot {
+	.mdo tfoot {
 		display: table-footer-group;
 	}
 	#mp a.vis::after {
@@ -577,31 +412,32 @@ blink {
 		border-bottom: 1px solid #bbb;
 		color: #444;
 	}
-	blockquote {
+	.mdo blockquote {
 		border-color: #555;
 	}
-	code {
+	.mdo code {
 		border-color: #bbb;
 	}
-	pre, pre code {
+	.mdo pre,
+	.mdo pre code {
 		border-color: #999;
 	}
-	pre code::before {
+	.mdo pre code::before {
 		color: #058;
 	}
 
 
 	
-	html.dark a {
+	html.dark .mdo a {
 		color: #000;
 	}
-	html.dark pre,
-	html.dark code {
+	html.dark .mdo pre,
+	html.dark .mdo code {
 		color: #240;
 	}
-	html.dark p>em,
-	html.dark li>em,
-	html.dark td>em {
+	html.dark .mdo p>em,
+	html.dark .mdo li>em,
+	html.dark .mdo td>em {
 		color: #940;
 	}
 }
