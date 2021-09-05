@@ -24,23 +24,6 @@ var dbg = function () { };
 var md_plug = {};
 
 
-function hesc(txt) {
-    return txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-
-function cls(dom, name, add) {
-    var re = new RegExp('(^| )' + name + '( |$)');
-    var lst = (dom.getAttribute('class') + '').replace(re, "$1$2").replace(/  /, "");
-    dom.setAttribute('class', lst + (add ? ' ' + name : ''));
-}
-
-
-function statify(obj) {
-    return JSON.parse(JSON.stringify(obj));
-}
-
-
 // dodge browser issues
 (function () {
     var ua = navigator.userAgent;
@@ -65,7 +48,7 @@ function statify(obj) {
         if (a > 0)
             loc.push(n[a]);
 
-        var dec = hesc(uricom_dec(n[a])[0]);
+        var dec = esc(uricom_dec(n[a])[0]);
 
         nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
     }

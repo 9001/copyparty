@@ -98,7 +98,7 @@ var draw_md = (function () {
         var src = dom_src.value;
         convert_markdown(src, dom_pre);
 
-        var lines = hesc(src).replace(/\r/g, "").split('\n');
+        var lines = esc(src).replace(/\r/g, "").split('\n');
         nlines = lines.length;
         var html = [];
         for (var a = 0; a < lines.length; a++)
@@ -108,7 +108,7 @@ var draw_md = (function () {
         map_src = genmap(dom_ref, map_src);
         map_pre = genmap(dom_pre, map_pre);
 
-        cls(ebi('save'), 'disabled', src == server_md);
+        clmod(ebi('save'), 'disabled', src == server_md);
 
         var t1 = Date.now();
         delay = t1 - t0 > 100 ? 25 : 1;
@@ -1091,9 +1091,9 @@ action_stack = (function () {
         ref = newtxt;
         dbg('undos(%d) redos(%d)', hist.un.length, hist.re.length);
         if (hist.un.length > 0)
-            dbg(statify(hist.un.slice(-1)[0]));
+            dbg(jcp(hist.un.slice(-1)[0]));
         if (hist.re.length > 0)
-            dbg(statify(hist.re.slice(-1)[0]));
+            dbg(jcp(hist.re.slice(-1)[0]));
     }
 
     return {
