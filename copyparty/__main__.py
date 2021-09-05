@@ -355,6 +355,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-nih", action="store_true", help="no info hostname")
     ap2.add_argument("-nid", action="store_true", help="no info disk-usage")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
+    ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (lifetime volflag)")
 
     ap2 = ap.add_argument_group('safety options')

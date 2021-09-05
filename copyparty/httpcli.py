@@ -1868,11 +1868,12 @@ class HttpCli(object):
             tpl = "browser2"
 
         logues = ["", ""]
-        for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
-            fn = os.path.join(abspath, fn)
-            if bos.path.exists(fn):
-                with open(fsenc(fn), "rb") as f:
-                    logues[n] = f.read().decode("utf-8")
+        if not self.args.no_logues:
+            for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
+                fn = os.path.join(abspath, fn)
+                if bos.path.exists(fn):
+                    with open(fsenc(fn), "rb") as f:
+                        logues[n] = f.read().decode("utf-8")
 
         ls_ret = {
             "dirs": [],
