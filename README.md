@@ -55,6 +55,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
+* [security](#security) - some notes on hardening
+    * [gotchas](#gotchas) - behavior that might be unexpected
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
