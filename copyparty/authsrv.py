@@ -434,7 +434,11 @@ class VFS(object):
         f2a = os.sep + "dir.txt"
         f2b = "{0}.hist{0}".format(os.sep)
 
-        g = self.walk("", vrem, [], uname, [[True]], dots, scandir, False)
+        # if multiselect: add all items to archive root
+        # if single folder: the folder itself is the top-level item
+        folder = "" if flt else (vrem.split("/")[-1] or "top")
+
+        g = self.walk(folder, vrem, [], uname, [[True]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
             if flt:
                 files = [x for x in files if x[0] in flt]
