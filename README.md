@@ -910,7 +910,7 @@ in the `scripts` folder:
 
 roughly sorted by priority
 
-* hls framework for Someone Else to drop code into :^)
+* nothing! currently
 
 
 ## discarded ideas
@@ -938,3 +938,5 @@ roughly sorted by priority
 * indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m, 500k items before autoeviction
   * blank hashlist when up-ok to skip handshake
     * too many confusing side-effects
+* hls framework for Someone Else to drop code into :^)
+  * probably not, too much stuff to consider -- seeking, start at offset, task stitching (probably np-hard), conditional passthru, rate-control (especially multi-consumer), session keepalive, cache mgmt...
