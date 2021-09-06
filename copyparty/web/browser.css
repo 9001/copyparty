@@ -392,13 +392,14 @@ html.light #ggrid>a.sel {
 #wzip, #wnp {
 	margin-right: .2em;
 	padding-right: .2em;
-	border-right: .1em solid #555;
+	border: 1px solid #555;
+	border-width: 0 .1em 0 0;
 }
 #wfm.act+#wzip,
 #wfm.act+#wzip+#wnp {
 	margin-left: .2em;
 	padding-left: .2em;
-	border-left: .1em solid #555;
+	border-left-width: .1em;
 }
 #wfm.act {
 	display: inline-block;
