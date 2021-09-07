@@ -715,13 +715,12 @@ function up2k_init(subtle) {
         offdrag.bind(this)();
         var dz = (this && this.getAttribute('id'));
 
-        if ((dz == 'up_dz' && fsearch) || (dz == 'srch_dz' && !fsearch)) {
-            var err = this.getAttribute('err');
-            if (err)
-                return modal.alert('sorry, ' + err);
+        var err = this.getAttribute('err');
+        if (err)
+            return modal.alert('sorry, ' + err);
 
+        if ((dz == 'up_dz' && fsearch) || (dz == 'srch_dz' && !fsearch))
             tgl_fsearch();
-        }
 
         if (!QS('#op_up2k.act'))
             goto('up2k');
