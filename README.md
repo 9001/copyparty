@@ -35,8 +35,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [navpane](#navpane) - switching between breadcrumbs or navpane
     * [thumbnails](#thumbnails) - press `g` to toggle grid-view instead of the file listing
     * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
-    * [uploading](#uploading) - web-browsers can upload using `bup` and `up2k`
-        * [file-search](#file-search) - drop files/folders into up2k to see if they exist on the server
+    * [uploading](#uploading) - drag files/folders into the web-browser to upload
+        * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
@@ -339,11 +339,13 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 ## uploading
 
-web-browsers can upload using `bup` and `up2k`:
+drag files/folders into the web-browser to upload
+
+this initiates an upload using `up2k`; there are two uploaders available:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
 * `[🚀] up2k`, the fancy one
 
-you can undo/delete uploads using `[🧯]` [unpost](#unpost)
+you can also undo/delete uploads by using `[🧯]` [unpost](#unpost)
 
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
@@ -384,11 +386,11 @@ if you are resuming a massive upload and want to skip hashing the files which al
 
 ### file-search
 
-drop files/folders into up2k to see if they exist on the server
+dropping files into the browser also lets you see if they exist on the server
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
 
-open the `[🚀 up2k]` tab and drag/drop files into the browser; you will see two dropzones: `Upload` and `Search`
+when you drag/drop files into the browser, you will see two dropzones: `Upload` and `Search`
 
 > on a phone? toggle the `[🔎]` switch green before tapping the big yellow Search button to select your files
 

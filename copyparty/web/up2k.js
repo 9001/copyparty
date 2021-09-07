@@ -723,6 +723,9 @@ function up2k_init(subtle) {
             tgl_fsearch();
         }
 
+        if (!QS('#op_up2k.act'))
+            goto('up2k');
+
         var files,
             is_itemlist = false;
 
