@@ -72,7 +72,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     var html = [
         '<h1>you hit a bug!</h1>',
         '<p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a></p>',
-        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <code>ed/irc.rizon.net</code> or <code>ed#2644</code></p>',
+        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">github issue</a> or <code>ed#2644</code></p>',
         '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)) + '</p>',
         '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
     ];
@@ -142,7 +142,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
             );
             document.head.appendChild(s);
         }
-        exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js');
+        exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js').replace(/<ghi>/, 'https://github.com/9001/copyparty/issues/new?labels=bug&template=bug_report.md');
         exbox.style.display = 'block';
     }
     catch (e) {

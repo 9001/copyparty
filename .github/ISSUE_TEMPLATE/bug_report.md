@@ -7,7 +7,9 @@ assignees: '9001'
 
 ---
 
-all of the below are optional, consider them as inspiration, delete and rewrite at will
+NOTE:
+all of the below are optional, consider them as inspiration, delete and rewrite at will, thx md
+
 
 **Describe the bug**
 a description of what the bug is
