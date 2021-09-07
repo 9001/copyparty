@@ -505,7 +505,7 @@ class HttpCli(object):
             if "get" in opt:
                 return self.handle_get()
 
-            raise Pebkac(405, "POST({}) is disabled".format(ctype))
+            raise Pebkac(405, "POST({}) is disabled in server config".format(ctype))
 
         raise Pebkac(405, "don't know how to handle POST({})".format(ctype))
 
@@ -1614,7 +1614,7 @@ class HttpCli(object):
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_rescan:
-            raise Pebkac(403, "disabled by argv")
+            raise Pebkac(403, "the rescan feature is disabled in server config")
 
         vn, _ = self.asrv.vfs.get(self.vpath, self.uname, True, True)
 
@@ -1633,7 +1633,7 @@ class HttpCli(object):
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_stack:
-            raise Pebkac(403, "disabled by argv")
+            raise Pebkac(403, "the stackdump feature is disabled in server config")
 
         ret = "<pre>{}\n{}".format(time.time(), alltrace())
         self.reply(ret.encode("utf-8"))
@@ -1697,7 +1697,7 @@ class HttpCli(object):
 
     def tx_ups(self):
         if not self.args.unpost:
-            raise Pebkac(400, "the unpost feature was disabled by server config")
+            raise Pebkac(400, "the unpost feature is disabled in server config")
 
         filt = self.uparam.get("filter")
         lm = "ups [{}]".format(filt)
@@ -1735,7 +1735,7 @@ class HttpCli(object):
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_del:
-            raise Pebkac(403, "disabled by argv")
+            raise Pebkac(403, "the delete feature is disabled in server config")
 
         if not req:
             req = [self.vpath]
@@ -1748,7 +1748,7 @@ class HttpCli(object):
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_mv:
-            raise Pebkac(403, "disabled by argv")
+            raise Pebkac(403, "the rename/move feature is disabled in server config")
 
         # full path of new loc (incl filename)
         dst = self.uparam.get("move")

@@ -1405,7 +1405,7 @@ class Up2k(object):
         except:
             # unpost with missing permissions? try read+write and verify with db
             if not self.args.unpost:
-                raise Pebkac(400, "the unpost feature was disabled by server config")
+                raise Pebkac(400, "the unpost feature is disabled in server config")
 
             unpost = True
             permsets = [[True, True]]
@@ -1520,13 +1520,13 @@ class Up2k(object):
         dabs = dvn.canonical(drem)
         drd, dfn = vsplit(drem)
 
-        n1 = svp.split('/')[-1]
-        n2 = dvp.split('/')[-1]
-        if n1.startswith('.') or n2.startswith('.'):
+        n1 = svp.split("/")[-1]
+        n2 = dvp.split("/")[-1]
+        if n1.startswith(".") or n2.startswith("."):
             if self.args.no_dot_mv:
-                raise Pebkac(400, "moving dotfiles was disabled by server config")
+                raise Pebkac(400, "moving dotfiles is disabled in server config")
             elif self.args.no_dot_ren and n1 != n2:
-                raise Pebkac(400, "renaming dotfiles was disabled by server config")
+                raise Pebkac(400, "renaming dotfiles is disabled in server config")
 
         if bos.path.exists(dabs):
             raise Pebkac(400, "mv2: target file exists")
