@@ -39,6 +39,8 @@ class Cfg(Namespace):
             no_scandir=False,
             no_sendfile=True,
             no_rescan=True,
+            no_logues=False,
+            no_readme=False,
             re_maxage=0,
             ihead=False,
             nih=True,
@@ -151,6 +153,7 @@ class TestHttpCli(unittest.TestCase):
                     tar = tarfile.open(fileobj=io.BytesIO(b)).getnames()
                 except:
                     tar = []
+                tar = [x[4:] if x.startswith("top/") else x for x in tar]
                 tar = ["/".join([y for y in [top, durl, x] if y]) for x in tar]
                 tar = [[x] + self.can_rw(x) for x in tar]
                 tar_ok = [x[0] for x in tar if x[1]]

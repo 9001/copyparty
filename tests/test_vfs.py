@@ -26,6 +26,8 @@ class Cfg(Namespace):
             "no_hash": False,
             "css_browser": None,
             "no_voldump": True,
+            "no_logues": False,
+            "no_readme": False,
             "re_maxage": 0,
             "rproxy": 0,
         }
