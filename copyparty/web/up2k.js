@@ -633,20 +633,95 @@ function up2k_init(subtle) {
     function nav() {
         ebi('file' + fdom_ctr).click();
     }
-    ebi('u2btn').addEventListener('click', nav, false);
+    ebi('u2btn').onclick = nav;
 
+    var nenters = 0;
     function ondrag(e) {
-        e.stopPropagation();
-        e.preventDefault();
+        if (++nenters <= 0)
+            nenters = 1;
+
+        //console.log(nenters, Date.now(), 'enter', this, e.target);
+        if (onover.bind(this)(e))
+            return true;
+
+        var mup, up = QS('#up_zd');
+        var msr, sr = QS('#srch_zd');
+        if (!has(perms, 'write'))
+            mup = 'you do not have write-access to this folder';
+        if (!has(perms, 'read'))
+            msr = 'you do not have read-access to this folder';
+        if (!have_up2k_idx)
+            msr = 'file-search is not enabled in server config';
+
+        up.querySelector('span').textContent = mup || 'drop it here';
+        sr.querySelector('span').textContent = msr || 'drop it here';
+        clmod(up, 'err', mup);
+        clmod(sr, 'err', msr);
+        clmod(up, 'ok', !mup);
+        clmod(sr, 'ok', !msr);
+        ebi('up_dz').setAttribute('err', mup || '');
+        ebi('srch_dz').setAttribute('err', msr || '');
+    }
+    function onover(e) {
+        try {
+            var ok = false, dt = e.dataTransfer.types;
+            for (var a = 0; a < dt.length; a++)
+                if (dt[a] == 'Files')
+                    ok = true;
+
+            if (!ok)
+                return true;
+        }
+        catch (ex) { }
+
+        ev(e);
         e.dataTransfer.dropEffect = 'copy';
         e.dataTransfer.effectAllowed = 'copy';
+        clmod(ebi('drops'), 'vis', 1);
+        var v = this.getAttribute('v');
+        if (v)
+            clmod(ebi(v), 'hl', 1);
     }
-    ebi('u2btn').addEventListener('dragover', ondrag, false);
-    ebi('u2btn').addEventListener('dragenter', ondrag, false);
+    function offdrag(e) {
+        ev(e);
+
+        var v = this.getAttribute('v');
+        if (v)
+            clmod(ebi(v), 'hl');
+
+        if (--nenters <= 0) {
+            clmod(ebi('drops'), 'vis');
+            clmod(ebi('up_dz'), 'hl');
+            clmod(ebi('srch_dz'), 'hl');
+        }
+
+        //console.log(nenters, Date.now(), 'leave', this, e && e.target);
+    }
+    document.body.ondragenter = ondrag;
+    document.body.ondragleave = offdrag;
+
+    var drops = [ebi('up_dz'), ebi('srch_dz')];
+    for (var a = 0; a < 2; a++) {
+        drops[a].ondragenter = ondrag;
+        drops[a].ondragover = onover;
+        drops[a].ondragleave = offdrag;
+        drops[a].ondrop = gotfile;
+    }
+    ebi('drops').onclick = offdrag;  // old ff
 
     function gotfile(e) {
-        e.stopPropagation();
-        e.preventDefault();
+        ev(e);
+        nenters = 0;
+        offdrag.bind(this)();
+        var dz = (this && this.getAttribute('id'));
+
+        if ((dz == 'up_dz' && fsearch) || (dz == 'srch_dz' && !fsearch)) {
+            var err = this.getAttribute('err');
+            if (err)
+                return modal.alert('sorry, ' + err);
+
+            tgl_fsearch();
+        }
 
         var files,
             is_itemlist = false;
@@ -877,14 +952,13 @@ function up2k_init(subtle) {
             pvis.changecard(pvis.act);
         }
     }
-    ebi('u2btn').addEventListener('drop', gotfile, false);
 
     function more_one_file() {
         fdom_ctr++;
         var elm = mknod('div');
         elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" />'.format(fdom_ctr);
         ebi('u2form').appendChild(elm);
-        ebi('file' + fdom_ctr).addEventListener('change', gotfile, false);
+        ebi('file' + fdom_ctr).onchange = gotfile;
     }
     more_one_file();
 
@@ -1905,7 +1979,7 @@ function up2k_init(subtle) {
     ebi('u2tdate').onclick = tgl_datechk;
     var o = ebi('fsearch');
     if (o)
-        o.addEventListener('click', tgl_fsearch, false);
+        o.onclick = tgl_fsearch;
 
     ebi('u2etas').onclick = function (e) {
         ev(e);

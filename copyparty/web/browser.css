@@ -1546,6 +1546,86 @@ html.light #bbox-overlay figcaption a {
 	min-height: 0;
 	transition: min-height .2s;
 }
+#drops {
+	display: none;
+	z-index: 3;
+	background: rgba(48, 48, 48, 0.7);
+}
+#drops.vis,
+#drops .dropzone {
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+#drops .dropdesc {
+	position: fixed;
+	display: table;
+	left: 10%;
+	width: 78%;
+	height: 30%;
+	margin: 0;
+	font-size: 3em;
+	font-weight: bold;
+	text-shadow: .05em .05em .1em #000;
+	background: rgba(224, 224, 224, 0.2);
+	box-shadow: 0 0 0 #999;
+	border: .5em solid #999;
+	border-radius: .5em;
+	border-width: 1vw;
+	color: #fff;
+	transition: all 0.2s;
+}
+#drops .dropdesc.hl.ok {
+	border-color: #fff;
+	box-shadow: 0 0 1em #cf5;
+	background: rgba(24, 24, 24, 0.7);
+	left: 8%;
+	width: 82%;
+	height: 32%;
+	margin: -1vh 0;
+}
+#drops .dropdesc.hl.err {
+	background: rgba(224, 32, 65, 0.2);
+	box-shadow: 0 0 1em #f26;
+	border-color: #fab;
+}
+#drops .dropdesc>div {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+#drops .dropzone {
+	z-index: 80386;
+	height: 50%;
+}
+#drops #up_dz {
+	bottom: 50%;
+}
+#drops #srch_dz {
+	top: 50%;
+}
+#up_zd {
+	top: 12%;
+}
+#srch_zd {
+	bottom: 12%;
+}
+.dropdesc span {
+	color: #fff;
+	background: #490;
+	border-bottom: .3em solid #6d2;
+	text-shadow: 1px 1px 1px #000;
+	border-radius: .3em;
+	padding: .4em .8em;
+	font-size: .4em;
+}
+.dropdesc.err span {
+	background: #904;
+	border-color: #d26;
+}
 #u2form {
 	position: absolute;
 	top: 0;

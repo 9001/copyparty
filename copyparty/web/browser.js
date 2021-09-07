@@ -129,7 +129,14 @@ ebi('op_up2k').innerHTML = (
 
 	'<p id="u2flagblock"><b>the files were added to the queue</b><br />however there is a busy up2k in another browser tab,<br />so waiting for that to finish first</p>\n' +
 	'<p id="u2foot"></p>\n' +
-	'<p id="u2footfoot" data-perm="write">( you can use the <a href="#" id="u2nope">basic uploader</a> if you don\'t need lastmod timestamps, resumable uploads, or progress bars )</p>'
+	'<p id="u2footfoot" data-perm="write">( you can use the <a href="#" id="u2nope">basic uploader</a> if you don\'t need lastmod timestamps, resumable uploads, or progress bars )</p>\n' +
+
+	'<div id="drops">\n' +
+	'	<div class="dropdesc" id="up_zd"><div>🚀 Upload<br /><span></span></div></div>\n' +
+	'	<div class="dropdesc" id="srch_zd"><div>🔎 Search<br /><span></span></div></div>\n' +
+	'	<div class="dropzone" id="up_dz" v="up_zd"></div>\n' +
+	'	<div class="dropzone" id="srch_dz" v="srch_zd"></div>\n' +
+	'</div>'
 );
 
 
