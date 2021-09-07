@@ -725,6 +725,10 @@ var pbar = (function () {
 		for (var p = 1, mins = adur / 60; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
+		pctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
+		for (var p = 1, mins = adur / 600; p <= mins; p++)
+			pctx.fillRect(Math.floor(sm * p * 600), 0, 2, pc.h);
+
 		var w = 8,
 			x = sm * apos;
 
