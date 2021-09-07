@@ -61,7 +61,7 @@ rls_dir="$tmp/copyparty-$ver"
 mkdir "$rls_dir"
 
 echo ">>> export from git"
-git archive master | tar -xC "$rls_dir"
+git archive hovudstraum | tar -xC "$rls_dir"
 
 echo ">>> export untracked deps"
 tar -c copyparty/web/deps | tar -xC "$rls_dir"
@@ -122,5 +122,5 @@ echo "  $zip_path"
 echo "  $tgz_path"
 echo
 
-# function alr() { ls -alR copyparty-$1 | sed -r "s/copyparty-$1/copyparty/" | sed -r 's/[A-Z][a-z]{2} [0-9 ]{2} [0-9]{2}:[0-9]{2}//' > $1; }; for x in master rls src ; do alr $x; done
+# function alr() { ls -alR copyparty-$1 | sed -r "s/copyparty-$1/copyparty/" | sed -r 's/[A-Z][a-z]{2} [0-9 ]{2} [0-9]{2}:[0-9]{2}//' > $1; }; for x in hovudstraum rls src ; do alr $x; done
 

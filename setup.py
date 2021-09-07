@@ -61,7 +61,7 @@ class clean2(Command):
             pass
 
         nuke = []
-        for (dirpath, dirnames, filenames) in os.walk("."):
+        for (dirpath, _, filenames) in os.walk("."):
             for fn in filenames:
                 if (
                     fn.startswith("MANIFEST")
@@ -86,7 +86,7 @@ args = {
     "url": "https://github.com/9001/copyparty",
     "license": "MIT",
     "classifiers": [
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
@@ -101,6 +101,7 @@ args = {
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: Jython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Environment :: Console",
         "Environment :: No Input/Output (Daemon)",

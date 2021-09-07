@@ -22,7 +22,7 @@ dependencies:
 
 note:
   you probably want to run this on windows clients:
-  https://github.com/9001/copyparty/blob/master/contrib/explorer-nothumbs-nofoldertypes.reg
+  https://github.com/9001/copyparty/blob/hovudstraum/contrib/explorer-nothumbs-nofoldertypes.reg
 
 get server cert:
   awk '/-BEGIN CERTIFICATE-/ {a=1} a; /-END CERTIFICATE-/{exit}' <(openssl s_client -connect 127.0.0.1:3923 </dev/null 2>/dev/null) >cert.pem

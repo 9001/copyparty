@@ -616,7 +616,7 @@ but instead of using `-mte`, `-mth` is a better way to hide tags in the browser:
 
 tags that start with a `.` such as `.bpm` and `.dur`(ation) indicate numeric value
 
-see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copyparty/blob/master/copyparty/mtag.py) for the default mappings (should cover mp3,opus,flac,m4a,wav,aif,)
+see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copyparty/blob/hovudstraum/copyparty/mtag.py) for the default mappings (should cover mp3,opus,flac,m4a,wav,aif,)
 
 `--no-mutagen` disables Mutagen and uses FFprobe instead, which...
 * is about 20x slower than Mutagen

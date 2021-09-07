@@ -67,6 +67,7 @@ pybin=$(command -v python3 || command -v python) || {
 use_gz=
 do_sh=1
 do_py=1
+zopf=2560
 while [ ! -z "$1" ]; do
 	case $1 in
 		clean)  clean=1  ; ;;
@@ -78,6 +79,7 @@ while [ ! -z "$1" ]; do
 		no-cm)  no_cm=1  ; ;;
 		no-sh)  do_sh=   ; ;;
 		no-py)  do_py=   ; ;;
+		fast)   zopf=100 ; ;;
 		*)      help     ; ;;
 	esac
 	shift
@@ -136,7 +138,7 @@ tmpdir="$(
 	# msys2 tar is bad, make the best of it
 	echo collecting source
 	[ $clean ] && {
-		(cd .. && git archive master >tar) && tar -xf ../tar copyparty
+		(cd .. && git archive hovudstraum >tar) && tar -xf ../tar copyparty
 		(cd .. && tar -cf tar copyparty/web/deps) && tar -xf ../tar
 	}
 	[ $clean ] || {
@@ -271,7 +273,7 @@ done
 
 gzres() {
 	command -v pigz &&
-		pk='pigz -11 -I 2560' ||
+		pk="pigz -11 -I $zopf" ||
 		pk='gzip'
 
 	np=$(nproc)
