@@ -1455,12 +1455,14 @@ class Up2k(object):
                 self.log("rm {}\n  {}".format(vpath, abspath))
                 _ = dbv.get(volpath, uname, *permsets[0])
                 with self.mutex:
+                    cur = None
                     try:
                         ptop = dbv.realpath
                         cur, wark, _, _, _, _ = self._find_from_vpath(ptop, volpath)
                         self._forget_file(ptop, volpath, cur, wark, True)
                     finally:
-                        cur.connection.commit()
+                        if cur:
+                            cur.connection.commit()
 
                 bos.unlink(abspath)
 
@@ -1583,7 +1585,7 @@ class Up2k(object):
     def _find_from_vpath(self, ptop, vrem):
         cur = self.cur.get(ptop)
         if not cur:
-            return None, None
+            return [None] * 6
 
         rd, fn = vsplit(vrem)
         q = "select w, mt, sz, ip, at from up where rd=? and fn=? limit 1"
