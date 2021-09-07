@@ -20,6 +20,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 * top
     * **[quickstart](#quickstart)** - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
+        * [on servers](#on-servers) - you may also want these, especially on servers
         * [on debian](#on-debian) - recommended additional steps on debian
     * [notes](#notes) - general notes
     * [status](#status) - feature summary
@@ -86,8 +87,13 @@ some recommended options:
   * see [accounts and volumes](#accounts-and-volumes) for the syntax and other access levels (`r`ead, `w`rite, `m`ove, `d`elete)
 * `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access
 
+
+### on servers
+
 you may also want these, especially on servers:
+
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
+* [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for better https)
 
 
