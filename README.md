@@ -361,6 +361,7 @@ the up2k UI is the epitome of polished inutitive experiences:
 * `[💭]` ask for confirmation before files are added to the queue
 * `[💤]` sync uploading between other copyparty browser-tabs so only one is active
 * `[🔎]` switch between upload and [file-search](#file-search) mode
+  * ignore `[🔎]` if you add files by dragging them into the browser
 
 and then theres the tabs below it,
 * `[ok]` is the files which completed successfully
@@ -370,7 +371,7 @@ and then theres the tabs below it,
   * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
-note that since up2k has to read each file twice, `[🎈 bup]` can be up to 2x faster in some extreme cases (huge files combined with internet connection faster than the read-speed of your HDD)
+note that since up2k has to read each file twice, `[🎈 bup]` can *theoretically* be up to 2x faster in some extreme cases (files bigger than your ram, combined with an internet connection faster than the read-speed of your HDD)
 
 if you are resuming a massive upload and want to skip hashing the files which already finished, you can enable `turbo` in the `[⚙️] config` tab, but please read the tooltip on that button
 
@@ -381,7 +382,11 @@ drop files/folders into up2k to see if they exist on the server
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
 
-in the `[🚀 up2k]` tab, after toggling the `[🔎]` switch green, any files/folders you drop onto the dropzone will be hashed on the client-side. Each hash is sent to the server which checks if that file exists somewhere
+open the `[🚀 up2k]` tab and drag/drop files into the browser; you will see two dropzones: `Upload` and `Search`
+
+> on a phone? toggle the `[🔎]` switch green before tapping the big yellow Search button to select your files
+
+the files will be hashed on the client-side, and each hash is sent to the server, which checks if that file exists somewhere
 
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else, this is no longer the case but now i've warmed up to the idea too much
