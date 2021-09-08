@@ -199,6 +199,9 @@ ebi('tree').innerHTML = (
 
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
+	if (dest != 'unpost' && QS('#op_' + dest + '.act'))
+		dest = '';
+
 	swrite('opmode', dest || null);
 	if (ctrl(e))
 		return;
