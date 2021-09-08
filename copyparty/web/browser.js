@@ -9,7 +9,7 @@ function dbg(msg) {
 
 // toolbar
 ebi('ops').innerHTML = (
-	'<a href="#" data-dest="" tt="close submenu">---</a>\n' +
+	'<a href="#" data-dest="" tt="close submenu">--</a>\n' +
 	(have_up2k_idx ? (
 		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those.$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>\n' +
 		(have_del && have_unpost ? '<a href="#" data-dest="unpost" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
@@ -1068,7 +1068,7 @@ var audio_eq = (function () {
 
 	// some browsers have insane high-frequency boost
 	// (or rather the actual problem is Q but close enough)
-	var cali = (function () {
+	r.cali = (function () {
 		try {
 			var ac = new AudioContext(),
 				fi = ac.createBiquadFilter(),
@@ -1088,8 +1088,10 @@ var audio_eq = (function () {
 		catch (ex) {
 			return 0;
 		}
-	})(),
-		mp = cali < 1.05;
+	})();
+	console.log('eq cali: ' + r.cali);
+
+	var mp = r.cali < 1.05;
 
 	var cfg = [ // hz, q, g
 		[31.25 * 0.88, 0, 1.4],  // shelf
