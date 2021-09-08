@@ -1063,6 +1063,31 @@ var audio_eq = (function () {
 		"last_au": null
 	};
 
+	// some browsers have insane high-frequency boost
+	// (or rather the actual problem is Q but close enough)
+	var cali = (function () {
+		try {
+			var ac = new AudioContext(),
+				fi = ac.createBiquadFilter(),
+				freqs = new Float32Array(1),
+				mag = new Float32Array(1),
+				phase = new Float32Array(1);
+
+			freqs[0] = 14000;
+			fi.type = 'peaking';
+			fi.frequency.value = 18000;
+			fi.Q.value = 0.8;
+			fi.gain.value = 1;
+			fi.getFrequencyResponse(freqs, mag, phase);
+
+			return mag[0];  // 1.0407 good, 1.0563 bad
+		}
+		catch (ex) {
+			return 0;
+		}
+	})(),
+		mp = cali < 1.05;
+
 	var cfg = [ // hz, q, g
 		[31.25 * 0.88, 0, 1.4],  // shelf
 		[31.25 * 1.04, 0.7, 0.96],  // peak
@@ -1073,10 +1098,10 @@ var audio_eq = (function () {
 		[1000, 0.9, 1.1],
 		[2000, 0.9, 1.105],
 		[4000, 0.88, 1.05],
-		[8000 * 1.006, 0.73, 1.24],
-		[16000 * 0.89, 0.7, 1.26],  // peak
-		[16000 * 1.13, 0.82, 1.09],  // peak
-		[16000 * 1.205, 0, 1.9]  // shelf
+		[8000 * 1.006, 0.73, mp ? 1.24 : 1.2],
+		[16000 * 0.89, 0.7, mp ? 1.26 : 1.2],  // peak
+		[16000 * 1.13, 0.82, mp ? 1.09 : 0.75],  // peak
+		[16000 * 1.205, 0, mp ? 1.9 : 1.85]  // shelf
 	];
 
 	try {

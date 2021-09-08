@@ -3,6 +3,24 @@
 setTimeout(location.reload.bind(location), 700);
 document.documentElement.scrollLeft = 0;
 
+var cali = (function() {
+    var ac = new AudioContext(),
+        fi = ac.createBiquadFilter(),
+        freqs = new Float32Array(1),
+        mag = new Float32Array(1),
+        phase = new Float32Array(1);
+
+    freqs[0] = 14000;
+    fi.type = 'peaking';
+    fi.frequency.value = 18000;
+    fi.Q.value = 0.8;
+    fi.gain.value = 1;
+    fi.getFrequencyResponse(freqs, mag, phase);
+
+    return mag[0];  // 1.0407 good, 1.0563 bad
+})(),
+    mp = cali < 1.05;
+
 var can = document.createElement('canvas'),
     cc = can.getContext('2d'),
     w = 2048,
@@ -28,12 +46,12 @@ var cfg = [ // hz, q, g
     [1000, 0.9, 1.1],
     [2000, 0.9, 1.105],
     [4000, 0.88, 1.05],
-    [8000 * 1.006, 0.73, 1.24],
+    [8000 * 1.006, 0.73, mp ? 1.24 : 1.2],
     //[16000 * 1.00, 0.5, 1.75],  // peak.v1
     //[16000 * 1.19, 0, 1.8]  // shelf.v1
-    [16000 * 0.89, 0.7, 1.26],  // peak
-    [16000 * 1.13, 0.82, 1.09],  // peak
-    [16000 * 1.205, 0, 1.9]  // shelf
+    [16000 * 0.89, 0.7, mp ? 1.26 : 1.2],  // peak
+    [16000 * 1.13, 0.82, mp ? 1.09 : 0.75],  // peak
+    [16000 * 1.205, 0, mp ? 1.9 : 1.85]  // shelf
 ];
 
 var freqs = new Float32Array(22000),
