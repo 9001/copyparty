@@ -2834,14 +2834,15 @@ document.onkeydown = function (e) {
 
 		clearTimeout(defer_timeout);
 		defer_timeout = setTimeout(try_search, 2000);
-		try_search();
+		try_search(v);
 	}
 
-	function try_search() {
+	function try_search(v) {
 		if (Date.now() - search_in_progress > 30 * 1000) {
 			clearTimeout(defer_timeout);
 			clearTimeout(search_timeout);
-			search_timeout = setTimeout(do_search, 200);
+			search_timeout = setTimeout(do_search,
+				v && v.length < (is_touch ? 4 : 3) ? 600 : 200);
 		}
 	}
 
