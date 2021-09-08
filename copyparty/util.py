@@ -192,7 +192,7 @@ class _Unrecv(object):
     def recv_ex(self, nbytes):
         """read an exact number of bytes"""
         ret = self.recv(nbytes)
-        while len(ret) < nbytes:
+        while ret and len(ret) < nbytes:
             buf = self.recv(nbytes - len(ret))
             if not buf:
                 break
@@ -233,7 +233,7 @@ class _LUnrecv(object):
     def recv_ex(self, nbytes):
         """read an exact number of bytes"""
         ret = self.recv(nbytes)
-        while len(ret) < nbytes:
+        while ret and len(ret) < nbytes:
             buf = self.recv(nbytes - len(ret))
             if not buf:
                 break
