@@ -199,7 +199,7 @@ ebi('tree').innerHTML = (
 
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
-	if (dest != 'unpost' && QS('#op_' + dest + '.act'))
+	if (QS('#op_' + dest + '.act'))
 		dest = '';
 
 	swrite('opmode', dest || null);
@@ -4169,7 +4169,7 @@ function ev_row_tgl(e) {
 
 var unpost = (function () {
 	ebi('op_unpost').innerHTML = (
-		"you can delete your recent uploads below &ndash; click the fire-extinguisher icon to refresh" +
+		'you can delete your recent uploads below &ndash; <a id="unpost_refresh" href="#">refresh list</a>' +
 		'<p>optional filter:&nbsp; URL must contain <input type="text" id="unpost_filt" size="20" /><a id="unpost_nofilt" href="#">clear filter</a></p>' +
 		'<div id="unpost"></div>'
 	);
@@ -4312,6 +4312,11 @@ var unpost = (function () {
 		ev(e);
 		filt.value = '';
 		r.load();
+	};
+
+	ebi('unpost_refresh').onclick = function (e) {
+		ev(e);
+		goto('unpost');
 	};
 
 	return r;
