@@ -1,7 +1,7 @@
-FROM    alpine:3.13
+FROM    alpine:3.14
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
-        ver_hashwasm=4.7.0 \
+        ver_hashwasm=4.9.0 \
         ver_marked=1.1.0 \
         ver_ogvjs=1.8.4 \
         ver_mde=2.14.0 \
