@@ -17,7 +17,7 @@
                 "-mtp",
                 ".bpm=f,bin/mtag/audio-bpm.py",
                 "-aed:wark",
-                "-vsrv::r:aed:cnodupe",
+                "-vsrv::r:rw,ed:c,dupe",
                 "-vdist:dist:r"
             ]
         },
