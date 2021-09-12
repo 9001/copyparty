@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# ca-name and server-name
+# ca-name and server-fqdn
 ca_name="$1"
-srv_name="$2"
+srv_fqdn="$2"
 
-[ -z "$srv_name" ] && {
+[ -z "$srv_fqdn" ] && {
 	echo "need arg 1: ca name"
-	echo "need arg 2: server name"
+	echo "need arg 2: server fqdn"
 	echo "optional arg 3: if set, write cert into copyparty cfg"
 	exit 1
 }
@@ -32,15 +32,15 @@ EOF
 gen_srv() {
 	(tee /dev/stderr <<EOF
 {"key": {"algo":"rsa", "size":4096},
-"names": [{"O":"$ca_name - $srv_name"}]}
+"names": [{"O":"$ca_name - $srv_fqdn"}]}
 EOF
 	)|
 	cfssl gencert -ca ca.pem -ca-key ca.key \
-		-profile=www -hostname="$srv_name.$ca_name" - |
-	cfssljson -bare "$srv_name"
+		-profile=www -hostname="$srv_fqdn" - |
+	cfssljson -bare "$srv_fqdn"
 
-	mv "$srv_name-key.pem" "$srv_name.key"
-	rm "$srv_name.csr"
+	mv "$srv_fqdn-key.pem" "$srv_fqdn.key"
+	rm "$srv_fqdn.csr"
 }
 
 
@@ -58,13 +58,13 @@ show() {
 	awk '!o; {o=0} /[0-9a-f:]{16}/{o=1}'
 }
 show ca.pem
-show "$srv_name.pem"
+show "$srv_fqdn.pem"
 
 
 # write cert into copyparty config
 [ -z "$3" ] || {
 	mkdir -p ~/.config/copyparty
-	cat "$srv_name".{key,pem} ca.pem >~/.config/copyparty/cert.pem 
+	cat "$srv_fqdn".{key,pem} ca.pem >~/.config/copyparty/cert.pem 
 }
 
 
