@@ -25,6 +25,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [notes](#notes) - general notes
     * [status](#status) - feature summary
     * [testimonials](#testimonials) - small collection of user feedback
+* [motivations](#motivations) - project goals / philosophy
+    * [future plans](#future-plans) - some improvement ideas
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
@@ -168,6 +170,41 @@ feature summary
 small collection of user feedback
 
 `good enough`, `surprisingly correct`, `certified good software`, `just works`, `why`
+
+
+# motivations
+
+project goals / philosophy
+
+* inverse linux philosophy -- do all the things, and do an *okay* job
+  * quick drop-in service to get a lot of features in a pinch
+  * there are probably [better alternatives](https://github.com/awesome-selfhosted/awesome-selfhosted) if you have specific/long-term needs
+* run anywhere, support everything
+  * as many web-browsers and python versions as possible
+    * every browser should at least be able to browse, download, upload files
+    * be a good emergency solution for transferring stuff between ancient boxes
+  * minimal dependencies
+    * but optional dependencies adding bonus-features are ok
+    * everything being plaintext makes it possible to proofread for malicious code
+  * no preparations / setup necessary, just run the sfx (which is also plaintext)
+* adaptable, malleable, hackable
+  * no build steps; modify the js/python without needing node.js or anything like that
+
+
+## future plans
+
+some improvement ideas
+
+* the JS is a mess -- a preact rewrite would be nice
+  * preferably without build dependencies like webpack/babel/node.js, maybe a python thing to assemble js files into main.js
+  * good excuse to look at using virtual lists (browsers start to struggle when folders contain over 5000 files)
+* the UX is a mess -- a proper design would be nice
+  * very organic (much like the python/js), everything was an afterthought
+  * true for both the layout and the visual flair
+  * something like the tron board-room ui (or most other hollywood ones, like ironman) would be :100:
+* some of the python files are way too big
+  * `up2k.py` ended up doing all the file indexing / db management
+  * `httpcli.py` should be separated into modules in general
 
 
 # bugs
