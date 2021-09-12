@@ -8,6 +8,7 @@ srv_name="$2"
 [ -z "$srv_name" ] && {
 	echo "need arg 1: ca name"
 	echo "need arg 2: server name"
+	echo "optional arg 3: if set, write cert into copyparty cfg"
 	exit 1
 }
 
