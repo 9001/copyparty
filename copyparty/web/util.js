@@ -688,6 +688,14 @@ var tt = (function () {
     r.tt.setAttribute('id', 'tt');
     document.body.appendChild(r.tt);
 
+    var prev = null;
+    r.cshow = function () {
+        if (this !== prev)
+            r.show.bind(this)();
+
+        prev = this;
+    };
+
     r.show = function () {
         if (r.skip) {
             r.skip = false;
@@ -770,12 +778,13 @@ var tt = (function () {
     r.tt.onclick = r.hide;
 
     r.att = function (ctr) {
-        var _show = r.en ? r.show : null,
+        var _cshow = r.en ? r.cshow : null,
+            _show = r.en ? r.show : null,
             _hide = r.en ? r.hide : null,
             o = ctr.querySelectorAll('*[tt]');
 
         for (var a = o.length - 1; a >= 0; a--) {
-            o[a].onfocus = _show;
+            o[a].onfocus = _cshow;
             o[a].onblur = _hide;
             o[a].onmouseenter = _show;
             o[a].onmouseleave = _hide;
