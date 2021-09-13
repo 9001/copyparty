@@ -173,6 +173,9 @@ a, #files tbody div a:last-child {
 #epi.logue {
 	margin: .8em 0;
 }
+.mdo {
+	max-width: 52em;
+}
 .mdo,
 .mdo * {
 	line-height: 1.4em;
