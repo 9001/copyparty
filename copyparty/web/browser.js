@@ -278,24 +278,13 @@ var mpl = (function () {
 
 	var r = {
 		"pb_mode": sread('pb_mode') || 'loop-folder',
-		"preload": bcfg_get('au_preload', true),
-		"clip": bcfg_get('au_npclip', false),
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
-		"osd_cv": bcfg_get('au_osd_cv', true),
 	};
-
-	ebi('au_preload').onclick = function (e) {
-		ev(e);
-		r.preload = !r.preload;
-		bcfg_set('au_preload', r.preload);
-	};
-
-	ebi('au_npclip').onclick = function (e) {
-		ev(e);
-		r.clip = !r.clip;
-		bcfg_set('au_npclip', r.clip);
-		clmod(ebi('wtoggle'), 'np', r.clip && mp.au);
-	};
+	bcfg_bind(r, 'preload', 'au_preload', true);
+	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true);
+	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
+		clmod(ebi('wtoggle'), 'np', v && mp.au);
+	});
 
 	ebi('au_os_ctl').onclick = function (e) {
 		ev(e);
@@ -303,12 +292,6 @@ var mpl = (function () {
 		bcfg_set('au_os_ctl', r.os_ctl);
 		if (!have_mctl)
 			toast.err(5, 'need firefox 82+ or chrome 73+\n(or iOS 15+ supposedly)');
-	};
-
-	ebi('au_osd_cv').onclick = function (e) {
-		ev(e);
-		r.osd_cv = !r.osd_cv;
-		bcfg_set('au_osd_cv', r.osd_cv);
 	};
 
 	function draw_pb_mode() {
@@ -1283,13 +1266,7 @@ var audio_eq = (function () {
 		txt[a].onkeydown = eq_keydown;
 	}
 
-	r.en = bcfg_get('au_eq', false);
-	ebi('au_eq').onclick = function (e) {
-		ev(e);
-		r.en = !r.en;
-		bcfg_set('au_eq', r.en);
-		r.apply();
-	};
+	bcfg_bind(r, 'en', 'au_eq', false, r.apply);
 
 	r.draw();
 	return r;
@@ -1912,12 +1889,11 @@ var fileman = (function () {
 		rn_reset(0);
 		tt.att(rui);
 
-		var adv = bcfg_get('rn_adv', false),
-			cs = bcfg_get('rn_case', false);
-
 		function sadv() {
-			ebi('rn_vadv').style.display = ebi('rn_case').style.display = adv ? '' : 'none';
+			ebi('rn_vadv').style.display = ebi('rn_case').style.display = r.adv ? '' : 'none';
 		}
+		bcfg_bind(r, 'adv', 'rn_adv', false, sadv);
+		bcfg_bind(r, 'cs', 'rn_case', false);
 		sadv();
 
 		function rn_ok(n, ok) {
@@ -1937,17 +1913,6 @@ var fileman = (function () {
 
 		ebi('rn_cancel').onclick = rn_cancel;
 		ebi('rn_apply').onclick = rn_apply;
-		ebi('rn_adv').onclick = function (e) {
-			ev(e);
-			adv = !adv;
-			bcfg_set('rn_adv', adv);
-			sadv();
-		};
-		ebi('rn_case').onclick = function (e) {
-			ev(e);
-			cs = !cs;
-			bcfg_set('rn_case', cs);
-		};
 
 		var ire = ebi('rn_re'),
 			ifmt = ebi('rn_fmt'),
@@ -2017,7 +1982,7 @@ var fileman = (function () {
 
 			try {
 				if (ptn)
-					re = new RegExp(ptn, cs ? 'i' : '');
+					re = new RegExp(ptn, r.cs ? 'i' : '');
 			}
 			catch (ex) {
 				return toast.err(5, esc('invalid regex:\n' + ex));
@@ -2285,34 +2250,10 @@ var thegrid = (function () {
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 
 	var r = {
-		'thumbs': bcfg_get('thumbs', true),
-		'en': bcfg_get('griden', false),
-		'sel': bcfg_get('gridsel', false),
 		'sz': clamp(fcfg_get('gridsz', 10), 4, 40),
 		'ln': clamp(icfg_get('gridln', 3), 1, 7),
 		'isdirty': true,
 		'bbox': null
-	};
-
-	ebi('thumbs').onclick = function (e) {
-		ev(e);
-		r.thumbs = !r.thumbs;
-		bcfg_set('thumbs', r.thumbs);
-		r.setdirty();
-	};
-
-	ebi('griden').onclick = ebi('wtgrid').onclick = function (e) {
-		ev(e);
-		r.en = !r.en;
-		bcfg_set('griden', r.en);
-		if (r.en) {
-			loadgrid();
-		}
-		else {
-			ungrid();
-		}
-		pbar.onresize();
-		vbar.onresize();
 	};
 
 	var btnclick = function (e) {
@@ -2341,12 +2282,13 @@ var thegrid = (function () {
 	for (var a = 0; a < links.length; a++)
 		links[a].onclick = btnclick;
 
-	ebi('gridsel').onclick = function (e) {
-		ev(e);
-		r.sel = !r.sel;
-		bcfg_set('gridsel', r.sel);
-		r.loadsel();
-	};
+	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
+	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
+	bcfg_bind(r, 'en', 'griden', false, function (v) {
+		v ? loadgrid() : ungrid();
+		pbar.onresize();
+		vbar.onresize();
+	});
 
 	r.setvis = function (vis) {
 		(r.en ? gfiles : lfiles).style.display = vis ? '' : 'none';
@@ -3051,15 +2993,18 @@ var treectl = (function () {
 		"hidden": true,
 		"ls_cb": null,
 		"dir_cb": tree_scrollto,
-		"ireadme": bcfg_get('ireadme', true)
 	},
 		entreed = false,
 		fixedpos = false,
 		prev_atop = null,
 		prev_winh = null,
-		dyn = bcfg_get('dyntree', true),
-		dots = bcfg_get('dotfiles', false),
 		treesz = clamp(icfg_get('treesz', 16), 4, 50);
+
+	bcfg_bind(treectl, 'ireadme', 'ireadme', true);
+	bcfg_bind(treectl, 'dyn', 'dyntree', true, onresize);
+	bcfg_bind(treectl, 'dots', 'dotfiles', false, function (v) {
+		treectl.goto(get_evpath());
+	});
 
 	treectl.entree = function (e) {
 		ev(e);
@@ -3147,7 +3092,7 @@ var treectl = (function () {
 		var q = '#tree',
 			nq = 0;
 
-		while (dyn) {
+		while (treectl.dyn) {
 			nq++;
 			q += '>ul>li';
 			if (!QS(q))
@@ -3170,7 +3115,7 @@ var treectl = (function () {
 		xhr.dst = dst;
 		xhr.rst = rst;
 		xhr.ts = Date.now();
-		xhr.open('GET', dst + '?tree=' + top + (dots ? '&dots' : ''), true);
+		xhr.open('GET', dst + '?tree=' + top + (treectl.dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvtree;
 		xhr.send();
 		enspin('#tree');
@@ -3274,7 +3219,7 @@ var treectl = (function () {
 		xhr.top = url;
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
-		xhr.open('GET', xhr.top + '?ls' + (dots ? '&dots' : ''), true);
+		xhr.open('GET', xhr.top + '?ls' + (treectl.dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvls;
 		xhr.send();
 		if (hpush)
@@ -3423,26 +3368,6 @@ var treectl = (function () {
 		return ret;
 	}
 
-	function tdots(e) {
-		ev(e);
-		dots = !dots;
-		bcfg_set('dotfiles', dots);
-		treectl.goto(get_evpath());
-	}
-
-	function treadme(e) {
-		ev(e);
-		treectl.ireadme = !treectl.ireadme;
-		bcfg_set('ireadme', treectl.ireadme);
-	}
-
-	function dyntree(e) {
-		ev(e);
-		dyn = !dyn;
-		bcfg_set('dyntree', dyn);
-		onresize();
-	}
-
 	function scaletree(e) {
 		ev(e);
 		treesz += parseInt(this.getAttribute("step"));
@@ -3456,9 +3381,6 @@ var treectl = (function () {
 	ebi('entree').onclick = treectl.entree;
 	ebi('detree').onclick = treectl.detree;
 	ebi('visdir').onclick = tree_scrollto;
-	ebi('dotfiles').onclick = tdots;
-	ebi('ireadme').onclick = treadme;
-	ebi('dyntree').onclick = dyntree;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
 	if (sread('entreed') == 'tree')
@@ -3884,8 +3806,6 @@ function addcrc() {
 
 var light;
 (function () {
-	light = bcfg_get('lightmode', false);
-
 	function freshen() {
 		clmod(document.documentElement, "light", light);
 		clmod(document.documentElement, "dark", !light);
@@ -3894,12 +3814,7 @@ var light;
 		vbar.draw();
 	}
 
-	ebi('lightmode').onclick = function (e) {
-		ev(e);
-		light = !light;
-		bcfg_set('lightmode', light);
-		freshen();
-	};
+	bcfg_bind(window, 'light', 'lightmode', false, freshen);
 
 	freshen();
 })();

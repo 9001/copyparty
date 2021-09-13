@@ -572,14 +572,16 @@ function up2k_init(subtle) {
     }
 
     var parallel_uploads = icfg_get('nthread'),
-        multitask = bcfg_get('multitask', true),
-        ask_up = bcfg_get('ask_up', true),
-        flag_en = bcfg_get('flag_en', false),
-        fsearch = bcfg_get('fsearch', false),
-        turbo = bcfg_get('u2turbo', false),
-        datechk = bcfg_get('u2tdate', true),
+        uc = {},
         fdom_ctr = 0,
         min_filebuf = 0;
+
+    bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
+    bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
+    bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg, false);
+    bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
+    bcfg_bind(uc, 'turbo', 'u2turbo', false, draw_turbo, false);
+    bcfg_bind(uc, 'datechk', 'u2tdate', true, null, false);
 
     var st = {
         "files": [],
@@ -719,7 +721,7 @@ function up2k_init(subtle) {
         if (err)
             return modal.alert('sorry, ' + err);
 
-        if ((dz == 'up_dz' && fsearch) || (dz == 'srch_dz' && !fsearch))
+        if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
             tgl_fsearch();
 
         if (!QS('#op_up2k.act'))
@@ -883,11 +885,11 @@ function up2k_init(subtle) {
             return a < b ? -1 : a > b ? 1 : 0;
         });
 
-        var msg = ['{0} these {1} files?<ul>'.format(fsearch ? 'search' : 'upload', good_files.length)];
+        var msg = ['{0} these {1} files?<ul>'.format(uc.fsearch ? 'search' : 'upload', good_files.length)];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push('<li>' + esc(good_files[a][1]) + '</li>');
 
-        if (ask_up && !fsearch)
+        if (uc.ask_up && !uc.fsearch)
             return modal.confirm(msg.join('') + '</ul>', function () { up_them(good_files); }, null);
 
         up_them(good_files);
@@ -927,7 +929,7 @@ function up2k_init(subtle) {
             },
                 key = entry.name + '\n' + entry.size;
 
-            if (fsearch)
+            if (uc.fsearch)
                 entry.srch = 1;
 
             if (seen[key])
@@ -936,7 +938,7 @@ function up2k_init(subtle) {
             seen[key] = 1;
 
             pvis.addfile([
-                fsearch ? esc(entry.name) : linksplit(
+                uc.fsearch ? esc(entry.name) : linksplit(
                     uricom_dec(entry.purl)[0] + entry.name).join(' '),
                 '📐 hash',
                 ''
@@ -944,7 +946,7 @@ function up2k_init(subtle) {
 
             st.bytes.total += fobj.size;
             st.files.push(entry);
-            if (turbo)
+            if (uc.turbo)
                 push_t(st.todo.head, entry);
             else
                 push_t(st.todo.hash, entry);
@@ -1019,14 +1021,14 @@ function up2k_init(subtle) {
         if (nhash) {
             st.time.hashing += td;
             t.push(['u2etah', st.bytes.hashed, st.bytes.hashed, st.time.hashing]);
-            if (fsearch)
+            if (uc.fsearch)
                 t.push(['u2etat', st.bytes.hashed, st.bytes.hashed, st.time.hashing]);
         }
         if (nsend) {
             st.time.uploading += td;
             t.push(['u2etau', st.bytes.uploaded, st.bytes.finished, st.time.uploading]);
         }
-        if ((nhash || nsend) && !fsearch) {
+        if ((nhash || nsend) && !uc.fsearch) {
             if (!st.bytes.finished) {
                 ebi('u2etat').innerHTML = '(preparing to upload)';
             }
@@ -1084,7 +1086,7 @@ function up2k_init(subtle) {
                 if (st.files[n].t_uploading)
                     return false;
 
-        if ((multitask ? 1 : 0) <
+        if ((uc.multitask ? 1 : 0) <
             st.todo.upload.length +
             st.busy.upload.length)
             return false;
@@ -1096,7 +1098,7 @@ function up2k_init(subtle) {
         if (!parallel_uploads)
             return false;
 
-        if (multitask) {
+        if (uc.multitask) {
             var ahead = st.bytes.hashed - st.bytes.finished;
             return ahead < 1024 * 1024 * 1024 * 4 &&
                 st.todo.handshake.length + st.busy.handshake.length < 16;
@@ -1143,13 +1145,13 @@ function up2k_init(subtle) {
                         "EventListener"]("beforeunload", warn_uploader_busy);
 
                     if (!is_busy) {
-                        var k = fsearch ? 'searches' : 'uploads',
-                            ks = fsearch ? 'Search' : 'Upload',
-                            tok = fsearch ? 'successful (found on server)' : 'completed successfully',
-                            tng = fsearch ? 'failed (NOT found on server)' : 'failed, sorry',
+                        var k = uc.fsearch ? 'searches' : 'uploads',
+                            ks = uc.fsearch ? 'Search' : 'Upload',
+                            tok = uc.fsearch ? 'successful (found on server)' : 'completed successfully',
+                            tng = uc.fsearch ? 'failed (NOT found on server)' : 'failed, sorry',
                             ok = pvis.ctr["ok"],
                             ng = pvis.ctr["ng"],
-                            t = ask_up ? 0 : 10;
+                            t = uc.ask_up ? 0 : 10;
 
                         if (ok && ng)
                             toast.warn(t, 'Finished, but some {0} failed:\n{1} {2},\n{3} {4}'.format(k, ok, tok, ng, tng));
@@ -1453,7 +1455,7 @@ function up2k_init(subtle) {
                     srv_ts = xhr.getResponseHeader('Last-Modified');
 
                 ok = t.size == srv_sz;
-                if (ok && datechk) {
+                if (ok && uc.datechk) {
                     srv_ts = new Date(srv_ts) / 1000;
                     ok = Math.abs(srv_ts - t.lmod) < 2;
                 }
@@ -1850,42 +1852,21 @@ function up2k_init(subtle) {
         bumpthread({ "target": 1 })
     }
 
-    function tgl_multitask() {
-        multitask = !multitask;
-        bcfg_set('multitask', multitask);
-    }
-
-    function tgl_ask_up() {
-        ask_up = !ask_up;
-        bcfg_set('ask_up', ask_up);
-    }
-
     function tgl_fsearch() {
-        set_fsearch(!fsearch);
-    }
-
-    function tgl_turbo() {
-        turbo = !turbo;
-        bcfg_set('u2turbo', turbo);
-        draw_turbo();
-    }
-
-    function tgl_datechk() {
-        datechk = !datechk;
-        bcfg_set('u2tdate', datechk);
+        set_fsearch(!uc.fsearch);
     }
 
     function draw_turbo() {
         var msgu = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
             msgs = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search results can be incorrect; see turbo-button tooltip</span></p>',
-            msg = fsearch ? msgs : msgu,
-            omsg = fsearch ? msgu : msgs,
+            msg = uc.fsearch ? msgs : msgu,
+            omsg = uc.fsearch ? msgu : msgs,
             html = ebi('u2foot').innerHTML,
             ohtml = html;
 
-        if (turbo && html.indexOf(msg) === -1)
+        if (uc.turbo && html.indexOf(msg) === -1)
             html = html.replace(omsg, '') + msg;
-        else if (!turbo)
+        else if (!uc.turbo)
             html = html.replace(msgu, '').replace(msgs, '');
 
         if (html !== ohtml)
@@ -1911,8 +1892,8 @@ function up2k_init(subtle) {
         }
 
         if (new_state !== undefined) {
-            fsearch = new_state;
-            bcfg_set('fsearch', fsearch);
+            uc.fsearch = new_state;
+            bcfg_set('fsearch', uc.fsearch);
         }
 
         try {
@@ -1921,10 +1902,10 @@ function up2k_init(subtle) {
         catch (ex) { }
 
         try {
-            var ico = fsearch ? '🔎' : '🚀',
-                desc = fsearch ? 'Search' : 'Upload';
+            var ico = uc.fsearch ? '🔎' : '🚀',
+                desc = uc.fsearch ? 'Search' : 'Upload';
 
-            clmod(ebi('op_up2k'), 'srch', fsearch);
+            clmod(ebi('op_up2k'), 'srch', uc.fsearch);
             ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
         }
         catch (ex) { }
@@ -1933,14 +1914,8 @@ function up2k_init(subtle) {
         onresize();
     }
 
-    function tgl_flag_en() {
-        flag_en = !flag_en;
-        bcfg_set('flag_en', flag_en);
-        apply_flag_cfg();
-    }
-
     function apply_flag_cfg() {
-        if (flag_en && !flag) {
+        if (uc.flag_en && !flag) {
             try {
                 flag = up2k_flagbus();
             }
@@ -1949,7 +1924,7 @@ function up2k_init(subtle) {
                 tgl_flag_en();
             }
         }
-        else if (!flag_en && flag) {
+        else if (!uc.flag_en && flag) {
             if (flag.ours)
                 flag.give();
 
@@ -1974,14 +1949,6 @@ function up2k_init(subtle) {
 
     ebi('nthread').onkeydown = bumpthread2;
     ebi('nthread').oninput = bumpthread;
-    ebi('multitask').onclick = tgl_multitask;
-    ebi('ask_up').onclick = tgl_ask_up;
-    ebi('flag_en').onclick = tgl_flag_en;
-    ebi('u2turbo').onclick = tgl_turbo;
-    ebi('u2tdate').onclick = tgl_datechk;
-    var o = ebi('fsearch');
-    if (o)
-        o.onclick = tgl_fsearch;
 
     ebi('u2etas').onclick = function (e) {
         ev(e);

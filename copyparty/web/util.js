@@ -629,6 +629,24 @@ function bcfg_upd_ui(name, val) {
     }
 }
 
+function bcfg_bind(obj, oname, cname, defval, cb, un_ev) {
+    var v = bcfg_get(cname, defval),
+        el = ebi(cname);
+
+    obj[oname] = v;
+    if (el)
+        el.onclick = function (e) {
+            if (un_ev !== false)
+                ev(e);
+
+            obj[oname] = bcfg_set(cname, !obj[oname]);
+            if (cb)
+                cb(obj[oname]);
+        };
+
+    return v;
+}
+
 
 function hist_push(url) {
     console.log("h-push " + url);
