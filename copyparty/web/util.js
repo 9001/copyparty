@@ -30,7 +30,16 @@ function esc(txt) {
     });
 }
 window.onunhandledrejection = function (e) {
-    console.log("REJ: " + e.reason);
+    var err = e.reason;
+    try {
+        err += '\n' + e.reason.stack;
+    }
+    catch (e) { }
+    console.log("REJ: " + err);
+    try {
+        toast.warn(30, err);
+    }
+    catch (e) { }
 };
 try {
     console.hist = [];

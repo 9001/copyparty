@@ -1524,6 +1524,7 @@ function autoplay_blocked(seek) {
 	go.textContent = 'Play "' + fn + '"';
 	go.onclick = function (e) {
 		unblocked(e);
+		toast.hide();
 		if (mp.au !== mp.au_ogvjs)
 			// chrome 91 may permanently taint on a failed play()
 			// depending on win10 settings or something? idk
