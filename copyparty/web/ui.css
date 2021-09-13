@@ -246,6 +246,17 @@ html.light #tt em {
 #repl_pre {
 	max-width: 24em;
 }
+*:focus,
+#pctl *:focus,
+.btn:focus {
+	box-shadow: 0 .1em .2em #fc0 inset;
+	border-radius: .2em;
+}
+html.light *:focus,
+html.light #pctl *:focus,
+html.light .btn:focus {
+	box-shadow: 0 .1em .2em #037 inset;
+}
 
 
 
