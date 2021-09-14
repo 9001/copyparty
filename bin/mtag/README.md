@@ -6,6 +6,11 @@ some of these rely on libraries which are not MIT-compatible
 * [audio-key.py](./audio-key.py) detects the melodic key of music using the Mixxx fork of keyfinder; imports GPL3
 * [media-hash.py](./media-hash.py) generates checksums for audio and video streams; uses FFmpeg (LGPL or GPL)
 
+these do not have any problematic dependencies:
+
+* [exe.py](./exe.py) grabs metadata from .exe and .dll files (example for retrieving multiple tags with one parser)
+* [wget.py](./wget.py) lets you download files by POSTing URLs to copyparty
+
 
 # dependencies
 
