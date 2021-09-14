@@ -30,6 +30,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
+* [FAQ](#FAQ) - "frequently" asked questions
 * [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
 * [the browser](#the-browser) - accessing a copyparty server using a web-browser
     * [tabs](#tabs) - the main tabs in the ui
@@ -229,6 +230,17 @@ some improvement ideas
 
 * VirtualBox: sqlite throws `Disk I/O Error` when running in a VM and the up2k database is in a vboxsf
   * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db inside the vm instead
+
+
+# FAQ
+
+"frequently" asked questions
+
+* is it possible to block read-access to folders unless you know the exact URL for a particular file inside?
+  * no / not yet; current recommendation is to use nginx to provide the read-access, and only use copyparty for the other stuff (write-only or full read-access for other users)
+
+* can I make copyparty download a file to my server if I give it a URL?
+  * not officially, but there is a [terrible hack](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/wget.py) which makes it possible
 
 
 # accounts and volumes
@@ -724,8 +736,6 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 
 | browser | will it blend |
 | ------- | ------------- |
-| **safari** (14.0.3/macos) | is chrome with janky wasm, so playing opus can deadlock the javascript engine |
-| **safari** (14.0.1/iOS)   | same as macos, except it recovers from the deadlocks if you poke it a bit |
 | **links** (2.21/macports) | can browse, login, upload/mkdir/msg |
 | **lynx** (2.8.9/macports) | can browse, login, upload/mkdir/msg |
 | **w3m** (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
