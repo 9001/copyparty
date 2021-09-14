@@ -219,6 +219,7 @@ def run_argparse(argv, formatter):
               "w" (write):  upload files; need "r" to see the uploads
               "m" (move):   move files and folders; need "w" at destination
               "d" (delete): permanently delete files and folders
+              "g" (get):    download files, but cannot see folder contents
 
             too many volflags to list here, see the other sections
 
@@ -493,7 +494,7 @@ def main(argv=None):
             if re.match("c[^,]", opt):
                 mod = True
                 na.append("c," + opt[1:])
-            elif re.sub("^[rwmd]*", "", opt) and "," not in opt:
+            elif re.sub("^[rwmdg]*", "", opt) and "," not in opt:
                 mod = True
                 perm = opt[0]
                 if perm == "a":

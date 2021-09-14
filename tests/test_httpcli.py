@@ -98,7 +98,7 @@ class TestHttpCli(unittest.TestCase):
                 if not vol.startswith(top):
                     continue
 
-                mode = vol[-2].replace("a", "rwmd")
+                mode = vol[-2].replace("a", "rw")
                 usr = vol[-1]
                 if usr == "a":
                     usr = ""

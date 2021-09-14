@@ -29,17 +29,18 @@ LEELOO_DALLAS = "leeloo_dallas"
 
 
 class AXS(object):
-    def __init__(self, uread=None, uwrite=None, umove=None, udel=None):
+    def __init__(self, uread=None, uwrite=None, umove=None, udel=None, uget=None):
         self.uread = {} if uread is None else {k: 1 for k in uread}
         self.uwrite = {} if uwrite is None else {k: 1 for k in uwrite}
         self.umove = {} if umove is None else {k: 1 for k in umove}
         self.udel = {} if udel is None else {k: 1 for k in udel}
+        self.uget = {} if uget is None else {k: 1 for k in uget}
 
     def __repr__(self):
         return "AXS({})".format(
             ", ".join(
                 "{}={!r}".format(k, self.__dict__[k])
-                for k in "uread uwrite umove udel".split()
+                for k in "uread uwrite umove udel uget".split()
             )
         )
 
@@ -215,6 +216,7 @@ class VFS(object):
             self.awrite = {}
             self.amove = {}
             self.adel = {}
+            self.aget = {}
         else:
             self.histpath = None
             self.all_vols = None
@@ -222,6 +224,7 @@ class VFS(object):
             self.awrite = None
             self.amove = None
             self.adel = None
+            self.aget = None
 
     def __repr__(self):
         return "VFS({})".format(
@@ -308,7 +311,7 @@ class VFS(object):
 
     def can_access(self, vpath, uname):
         # type: (str, str) -> tuple[bool, bool, bool, bool]
-        """can Read,Write,Move,Delete"""
+        """can Read,Write,Move,Delete,Get"""
         vn, _ = self._find(vpath)
         c = vn.axs
         return [
@@ -316,10 +319,20 @@ class VFS(object):
             uname in c.uwrite or "*" in c.uwrite,
             uname in c.umove or "*" in c.umove,
             uname in c.udel or "*" in c.udel,
+            uname in c.uget or "*" in c.uget,
         ]
 
-    def get(self, vpath, uname, will_read, will_write, will_move=False, will_del=False):
-        # type: (str, str, bool, bool, bool, bool) -> tuple[VFS, str]
+    def get(
+        self,
+        vpath,
+        uname,
+        will_read,
+        will_write,
+        will_move=False,
+        will_del=False,
+        will_get=False,
+    ):
+        # type: (str, str, bool, bool, bool, bool, bool) -> tuple[VFS, str]
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         vn, rem = self._find(vpath)
         c = vn.axs
@@ -329,6 +342,7 @@ class VFS(object):
             [will_write, c.uwrite, "write"],
             [will_move, c.umove, "move"],
             [will_del, c.udel, "delete"],
+            [will_get, c.uget, "get"],
         ]:
             if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
                 m = "you don't have {}-access for this location"
@@ -368,7 +382,7 @@ class VFS(object):
             for name, vn2 in sorted(self.nodes.items()):
                 ok = False
                 axs = vn2.axs
-                axs = [axs.uread, axs.uwrite, axs.umove, axs.udel]
+                axs = [axs.uread, axs.uwrite, axs.umove, axs.udel, axs.uget]
                 for pset in permsets:
                     ok = True
                     for req, lst in zip(pset, axs):
@@ -561,7 +575,7 @@ class AuthSrv(object):
 
     def _read_vol_str(self, lvl, uname, axs, flags):
         # type: (str, str, AXS, any) -> None
-        if lvl.strip("crwmd"):
+        if lvl.strip("crwmdg"):
             raise Exception("invalid volume flag: {},{}".format(lvl, uname))
 
         if lvl == "c":
@@ -587,6 +601,9 @@ class AuthSrv(object):
 
             if "d" in lvl:
                 axs.udel[un] = 1
+
+            if "g" in lvl:
+                axs.uget[un] = 1
 
     def _read_volflag(self, flags, name, value, is_list):
         if name not in ["mtp"]:
@@ -625,7 +642,7 @@ class AuthSrv(object):
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is <rwmd>[,username][,username] or <c>,<flag>[=args]
+            # permset is <rwmdg>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
                 m = re_vol.match(v_str)
                 if not m:
@@ -692,20 +709,21 @@ class AuthSrv(object):
         vfs.all_vols = {}
         vfs.get_all_vols(vfs.all_vols)
 
-        for perm in "read write move del".split():
+        for perm in "read write move del get".split():
             axs_key = "u" + perm
             unames = ["*"] + list(acct.keys())
             umap = {x: [] for x in unames}
             for usr in unames:
                 for mp, vol in vfs.all_vols.items():
-                    if usr in getattr(vol.axs, axs_key):
+                    axs = getattr(vol.axs, axs_key)
+                    if usr in axs or "*" in axs:
                         umap[usr].append(mp)
             setattr(vfs, "a" + perm, umap)
 
         all_users = {}
         missing_users = {}
         for axs in daxs.values():
-            for d in [axs.uread, axs.uwrite, axs.umove, axs.udel]:
+            for d in [axs.uread, axs.uwrite, axs.umove, axs.udel, axs.uget]:
                 for usr in d.keys():
                     all_users[usr] = 1
                     if usr != "*" and usr not in acct:
@@ -930,6 +948,7 @@ class AuthSrv(object):
                 [" write", "uwrite"],
                 ["  move", "umove"],
                 ["delete", "udel"],
+                ["   get", "uget"],
             ]:
                 u = list(sorted(getattr(v.axs, attr).keys()))
                 u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
@@ -997,10 +1016,10 @@ class AuthSrv(object):
                 raise Exception("volume not found: " + v)
 
         self.log({"users": users, "vols": vols, "flags": flags})
-        m = "/{}: read({}) write({}) move({}) del({})"
+        m = "/{}: read({}) write({}) move({}) del({}) get({})"
         for k, v in self.vfs.all_vols.items():
             vc = v.axs
-            self.log(m.format(k, vc.uread, vc.uwrite, vc.umove, vc.udel))
+            self.log(m.format(k, vc.uread, vc.uwrite, vc.umove, vc.udel, vc.uget))
 
         flag_v = "v" in flags
         flag_ln = "ln" in flags
@@ -1014,7 +1033,7 @@ class AuthSrv(object):
             for u in users:
                 self.log("checking /{} as {}".format(v, u))
                 try:
-                    vn, _ = self.vfs.get(v, u, True, False, False, False)
+                    vn, _ = self.vfs.get(v, u, True, False, False, False, False)
                 except:
                     continue
 

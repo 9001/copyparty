@@ -257,6 +257,7 @@ permissions:
 * `w` (write): upload files, move files *into* this folder
 * `m` (move): move files/folders *from* this folder
 * `d` (delete): delete files/folders
+* `g` (get): only download files, cannot see folder contents or zip/tar
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`

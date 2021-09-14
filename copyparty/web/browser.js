@@ -227,9 +227,22 @@ function goto(dest) {
 		clmod(obj[a], 'act');
 
 	if (dest) {
-		var ui = ebi('op_' + dest);
+		var ui = ebi('op_' + dest),
+			lnk = QS('#ops>a[data-dest=' + dest + ']'),
+			nps = lnk.getAttribute('data-perm');
+
+		nps = nps && nps.length ? nps.split(' ') : [];
+
+		if (perms.length)
+			for (var a = 0; a < nps.length; a++)
+				if (!has(perms, nps[a]))
+					return;
+
+		if (!has(perms, 'read') && !has(perms, 'write') && (dest == 'up2k'))
+			return;
+
 		clmod(ui, 'act', true);
-		QS('#ops>a[data-dest=' + dest + ']').className += " act";
+		lnk.className += " act";
 
 		var fn = window['goto_' + dest];
 		if (fn)
@@ -3426,7 +3439,7 @@ function apply_perms(newperms) {
 
 	var axs = [],
 		aclass = '>',
-		chk = ['read', 'write', 'move', 'delete'];
+		chk = ['read', 'write', 'move', 'delete', 'get'];
 
 	for (var a = 0; a < chk.length; a++)
 		if (has(perms, chk[a]))
@@ -3480,7 +3493,7 @@ function apply_perms(newperms) {
 
 	ebi('widget').style.display = have_read ? '' : 'none';
 	thegrid.setvis(have_read);
-	if (!have_read)
+	if (!have_read && have_write)
 		goto('up2k');
 }
 

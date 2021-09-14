@@ -528,7 +528,7 @@ function up2k_init(subtle) {
         got_deps = true;
     }
 
-    if (perms.length && !has(perms, 'read'))
+    if (perms.length && !has(perms, 'read') && has(perms, 'write'))
         goto('up2k');
 
     function setmsg(msg, type) {

@@ -55,4 +55,5 @@
         "py27"
     ],
     "python.linting.enabled": true,
+    "python.pythonPath": "/usr/bin/python3"
 }

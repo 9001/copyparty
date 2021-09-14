@@ -213,6 +213,7 @@ class HttpCli(object):
         self.wvol = self.asrv.vfs.awrite[self.uname]
         self.mvol = self.asrv.vfs.amove[self.uname]
         self.dvol = self.asrv.vfs.adel[self.uname]
+        self.gvol = self.asrv.vfs.aget[self.uname]
 
         if pwd and "pw" in self.ouparam and pwd != cookies.get("cppwd"):
             self.out_headers["Set-Cookie"] = self.get_pwd_cookie(pwd)[0]
@@ -379,8 +380,8 @@ class HttpCli(object):
             return self.tx_file(static_path)
 
         x = self.asrv.vfs.can_access(self.vpath, self.uname)
-        self.can_read, self.can_write, self.can_move, self.can_delete = x
-        if not self.can_read and not self.can_write:
+        self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
+        if not self.can_read and not self.can_write and not self.can_get:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
                 raise Pebkac(404)
@@ -1784,13 +1785,13 @@ class HttpCli(object):
         except:
             raise Pebkac(404)
 
-        if self.can_read:
-            if rem.startswith(".hist/up2k.") or (
-                rem.endswith("/dir.txt") and rem.startswith(".hist/th/")
-            ):
-                raise Pebkac(403)
+        if rem.startswith(".hist/up2k.") or (
+            rem.endswith("/dir.txt") and rem.startswith(".hist/th/")
+        ):
+            raise Pebkac(403)
 
-            is_dir = stat.S_ISDIR(st.st_mode)
+        is_dir = stat.S_ISDIR(st.st_mode)
+        if self.can_read:
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
                 if is_dir:
@@ -1815,11 +1816,11 @@ class HttpCli(object):
 
                 return self.tx_ico(rem)
 
-            if not is_dir:
-                if abspath.endswith(".md") and "raw" not in self.uparam:
-                    return self.tx_md(abspath)
+        if not is_dir and (self.can_read or self.can_get):
+            if abspath.endswith(".md") and "raw" not in self.uparam:
+                return self.tx_md(abspath)
 
-                return self.tx_file(abspath)
+            return self.tx_file(abspath)
 
         srv_info = []
 
@@ -1859,6 +1860,8 @@ class HttpCli(object):
             perms.append("move")
         if self.can_delete:
             perms.append("delete")
+        if self.can_get:
+            perms.append("get")
 
         url_suf = self.urlq({}, [])
         is_ls = "ls" in self.uparam
@@ -1927,6 +1930,9 @@ class HttpCli(object):
 
             if not stat.S_ISDIR(st.st_mode):
                 raise Pebkac(404)
+
+            if "zip" in self.uparam or "tar" in self.uparam:
+                raise Pebkac(403)
 
             html = self.j2(tpl, **j2a)
             self.reply(html.encode("utf-8", "replace"), headers=NO_STORE)
