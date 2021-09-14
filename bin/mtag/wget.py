@@ -25,7 +25,7 @@ from urllib.parse import unquote_to_bytes as unquote
 
 
 def main():
-    fp = sys.argv[1]
+    fp = os.path.abspath(sys.argv[1])
     fdir = os.path.dirname(fp)
     fname = os.path.basename(fp)
     if not fname.startswith("put-") or not fname.endswith(".bin"):
@@ -65,6 +65,10 @@ def main():
 
     try:
         sp.check_call(cmd)
+
+        # OPTIONAL:
+        #   on success, delete the .bin file which contains the URL
+        os.unlink(fp)
     except:
         open("-- FAILED TO DONWLOAD " + name, "wb").close()
 
