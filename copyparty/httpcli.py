@@ -22,13 +22,12 @@ except:
 from .__init__ import E, PY2, WINDOWS, ANYWIN, unicode
 from .util import *  # noqa  # pylint: disable=unused-wildcard-import
 from .bos import bos
-from .authsrv import AuthSrv, Lim
+from .authsrv import AuthSrv
 from .szip import StreamZip
 from .star import StreamTar
 
 
 NO_CACHE = {"Cache-Control": "no-cache"}
-NO_STORE = {"Cache-Control": "no-store; max-age=0"}
 
 
 class HttpCli(object):
@@ -54,7 +53,10 @@ class HttpCli(object):
         self.bufsz = 1024 * 32
         self.hint = None
         self.absolute_urls = False
-        self.out_headers = {"Access-Control-Allow-Origin": "*"}
+        self.out_headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-store; max-age=0",
+        }
 
     def log(self, msg, c=0):
         ptn = self.asrv.re_pwd
@@ -352,8 +354,7 @@ class HttpCli(object):
         ).encode("utf-8", "replace")
 
         if use302:
-            h = {"Location": "/" + vpath, "Cache-Control": "no-cache"}
-            self.reply(html, status=302, headers=h)
+            self.reply(html, status=302, headers={"Location": "/" + vpath})
         else:
             self.reply(html, status=status)
 
@@ -1389,8 +1390,8 @@ class HttpCli(object):
         #
         # send reply
 
-        if not is_compressed and "cache" not in self.uparam:
-            self.out_headers.update(NO_CACHE)
+        if is_compressed or "cache" in self.uparam:
+            self.out_headers.pop("Cache-Control")
 
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(
@@ -1607,7 +1608,7 @@ class HttpCli(object):
             mtpq=vs["mtpq"],
             url_suf=suf,
         )
-        self.reply(html.encode("utf-8"), headers=NO_STORE)
+        self.reply(html.encode("utf-8"))
         return True
 
     def scanvol(self):
@@ -1921,11 +1922,7 @@ class HttpCli(object):
         if not self.can_read:
             if is_ls:
                 ret = json.dumps(ls_ret)
-                self.reply(
-                    ret.encode("utf-8", "replace"),
-                    mime="application/json",
-                    headers=NO_STORE,
-                )
+                self.reply(ret.encode("utf-8", "replace"), mime="application/json")
                 return True
 
             if not stat.S_ISDIR(st.st_mode):
@@ -1935,7 +1932,7 @@ class HttpCli(object):
                 raise Pebkac(403)
 
             html = self.j2(tpl, **j2a)
-            self.reply(html.encode("utf-8", "replace"), headers=NO_STORE)
+            self.reply(html.encode("utf-8", "replace"))
             return True
 
         for k in ["zip", "tar"]:
@@ -2094,11 +2091,7 @@ class HttpCli(object):
             ls_ret["files"] = files
             ls_ret["taglist"] = taglist
             ret = json.dumps(ls_ret)
-            self.reply(
-                ret.encode("utf-8", "replace"),
-                mime="application/json",
-                headers=NO_STORE,
-            )
+            self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
 
         j2a["files"] = dirs + files
@@ -2112,5 +2105,5 @@ class HttpCli(object):
             j2a["css"] = self.args.css_browser
 
         html = self.j2(tpl, **j2a)
-        self.reply(html.encode("utf-8", "replace"), headers=NO_STORE)
+        self.reply(html.encode("utf-8", "replace"))
         return True
