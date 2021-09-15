@@ -1845,6 +1845,9 @@ class HttpCli(object):
 
             return self.tx_file(abspath)
 
+        elif is_dir and not self.can_read and not self.can_write:
+            return self.tx_404()
+
         srv_info = []
 
         try:
