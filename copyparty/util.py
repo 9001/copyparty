@@ -1164,7 +1164,7 @@ def statdir(logger, scandir, lstat, top):
         logger(src, "{} @ {}".format(repr(ex), top), 1)
 
 
-def rmdirs(logger, scandir, lstat, top):
+def rmdirs(logger, scandir, lstat, top, depth):
     if not os.path.exists(fsenc(top)) or not os.path.isdir(fsenc(top)):
         top = os.path.dirname(top)
 
@@ -1174,15 +1174,16 @@ def rmdirs(logger, scandir, lstat, top):
     ok = []
     ng = []
     for d in dirs[::-1]:
-        a, b = rmdirs(logger, scandir, lstat, d)
+        a, b = rmdirs(logger, scandir, lstat, d, depth + 1)
         ok += a
         ng += b
 
-    try:
-        os.rmdir(fsenc(top))
-        ok.append(top)
-    except:
-        ng.append(top)
+    if depth:
+        try:
+            os.rmdir(fsenc(top))
+            ok.append(top)
+        except:
+            ng.append(top)
 
     return ok, ng
 
