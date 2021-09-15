@@ -41,9 +41,9 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 ##
 ## bad filenames
 
-dirs=("$HOME/vfs/ほげ" "$HOME/vfs/ほげ/ぴよ" "$HOME/vfs/$(printf \\xed\\x91)" "$HOME/vfs/$(printf \\xed\\x91/\\xed\\x92)")
+dirs=("./ほげ" "./ほげ/ぴよ" "./$(printf \\xed\\x91)" "./$(printf \\xed\\x91/\\xed\\x92)" './qw,er;ty%20as df?gh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh')
 mkdir -p "${dirs[@]}"
-for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qwe,rty;asd fgh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'; do echo "$dir" > "$dir/$fn.html"; done; done
+for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qw,er;ty%20as df?gh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'; do echo "$dir" > "$dir/$fn.html"; done; done
 # qw er+ty%20ui%%20op<as>df&gh&amp;jk#zx'cv"bn`m=qw*er^ty?ui@op,as.df-gh_jk
 
 ##

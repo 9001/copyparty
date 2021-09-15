@@ -12,7 +12,17 @@
 
 <body>
     <div id="wrap">
-        <p>hello {{ this.uname }}</p>
+        {%- if this.uname == '*' %}
+            <p>howdy stranger &nbsp; <small>(you're not logged in)</small></p>
+        {%- else %}
+            <p>welcome back, <strong>{{ this.uname }}</strong></p>
+        {%- endif %}
+
+        {%- if msg %}
+        <div id="msg">
+            {{ msg }}
+        </div>
+        {%- endif %}
 
         {%- if avol %}
         <h1>admin panel:</h1>
@@ -60,7 +70,7 @@
 
         <h1>login for more:</h1>
         <ul>
-            <form method="post" enctype="multipart/form-data" action="/">
+            <form method="post" enctype="multipart/form-data" action="/{{ qvpath }}">
                 <input type="hidden" name="act" value="login" />
                 <input type="password" name="cppwd" />
                 <input type="submit" value="Login" />

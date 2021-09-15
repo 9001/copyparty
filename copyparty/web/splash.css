@@ -55,6 +55,16 @@ table {
 .btns {
 	margin: 1em 0;
 }
+#msg {
+	margin: 3em 0;
+}
+#msg h1 {
+	margin-bottom: 0;
+}
+#msg h1 + p {
+	margin-top: .3em;
+	text-align: right;
+}
 
 
 html.dark,

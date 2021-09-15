@@ -385,7 +385,7 @@ class HttpCli(object):
         if not self.can_read and not self.can_write and not self.can_get:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
-                raise Pebkac(404)
+                return self.tx_404()
 
             self.uparam["h"] = False
 
@@ -889,8 +889,12 @@ class HttpCli(object):
         pwd = self.parser.require("cppwd", 64)
         self.parser.drop()
 
+        dst = "/?h"
+        if self.vpath:
+            dst = "/" + quotep(self.vpath)
+
         ck, msg = self.get_pwd_cookie(pwd)
-        html = self.j2("msg", h1=msg, h2='<a href="/?h">ack</a>', redir="/?h")
+        html = self.j2("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
         self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
         return True
 
@@ -1279,7 +1283,7 @@ class HttpCli(object):
                 break
 
         if not editions:
-            raise Pebkac(404)
+            return self.tx_404()
 
         #
         # if-modified
@@ -1598,6 +1602,7 @@ class HttpCli(object):
         html = self.j2(
             "splash",
             this=self,
+            qvpath=quotep(self.vpath),
             rvol=rvol,
             wvol=wvol,
             avol=avol,
@@ -1609,6 +1614,12 @@ class HttpCli(object):
             url_suf=suf,
         )
         self.reply(html.encode("utf-8"))
+        return True
+
+    def tx_404(self):
+        m = '<h1>404 not found</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+        html = self.j2("splash", this=self, qvpath=quotep(self.vpath), msg=m)
+        self.reply(html.encode("utf-8"), status=404)
         return True
 
     def scanvol(self):
@@ -1784,7 +1795,7 @@ class HttpCli(object):
         try:
             st = bos.stat(abspath)
         except:
-            raise Pebkac(404)
+            return self.tx_404()
 
         if rem.startswith(".hist/up2k.") or (
             rem.endswith("/dir.txt") and rem.startswith(".hist/th/")
@@ -1926,7 +1937,7 @@ class HttpCli(object):
                 return True
 
             if not stat.S_ISDIR(st.st_mode):
-                raise Pebkac(404)
+                return self.tx_404()
 
             if "zip" in self.uparam or "tar" in self.uparam:
                 raise Pebkac(403)
