@@ -1394,7 +1394,9 @@ class HttpCli(object):
         #
         # send reply
 
-        if is_compressed or "cache" in self.uparam:
+        if not is_compressed and "cache" not in self.uparam:
+            self.out_headers.update(NO_CACHE)
+        else:
             self.out_headers.pop("Cache-Control")
 
         self.out_headers["Accept-Ranges"] = "bytes"
@@ -1617,7 +1619,7 @@ class HttpCli(object):
         return True
 
     def tx_404(self):
-        m = '<h1>404 not found</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+        m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
         html = self.j2("splash", this=self, qvpath=quotep(self.vpath), msg=m)
         self.reply(html.encode("utf-8"), status=404)
         return True
@@ -1829,6 +1831,15 @@ class HttpCli(object):
                 return self.tx_ico(rem)
 
         if not is_dir and (self.can_read or self.can_get):
+            if not self.can_read and "fk" in vn.flags:
+                correct = gen_filekey(
+                    self.args.fk_salt, abspath, st.st_size, 0 if ANYWIN else st.st_ino
+                )[: vn.flags["fk"]]
+                got = self.uparam.get("k")
+                if got != correct:
+                    self.log("wrong filekey, want {}, got {}".format(correct, got))
+                    return self.tx_404()
+
             if abspath.endswith(".md") and "raw" not in self.uparam:
                 return self.tx_md(abspath)
 
@@ -1987,6 +1998,8 @@ class HttpCli(object):
             idx = self.conn.get_u2idx()
             icur = idx.get_cur(dbv.realpath)
 
+        add_fk = vn.flags.get("fk")
+
         dirs = []
         files = []
         for fn in vfs_ls:
@@ -2032,9 +2045,19 @@ class HttpCli(object):
             except:
                 ext = "%"
 
+            if add_fk:
+                href = "{}?k={}".format(
+                    quotep(href),
+                    gen_filekey(
+                        self.args.fk_salt, fspath, sz, 0 if ANYWIN else inf.st_ino
+                    )[:add_fk],
+                )
+            else:
+                href = quotep(href)
+
             item = {
                 "lead": margin,
-                "href": quotep(href),
+                "href": href,
                 "name": fn,
                 "sz": sz,
                 "ext": ext,

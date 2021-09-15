@@ -834,6 +834,11 @@ on public copyparty instances with anonymous upload enabled:
   * unless `--no-readme` is set: by uploading/modifying a file named `readme.md`
   * if `move` access is granted AND none of `--no-logues`, `--no-dot-mv`, `--no-dot-ren` is set: by uploading some .html file and renaming it to `.epilogue.html` (uploading it directly is blocked)
 
+other misc:
+
+* you can disable directory listings by giving accesslevel `g` instead of `r`, only accepting direct URLs to files
+  * combine this with volume-flag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
+
 
 ## gotchas
 

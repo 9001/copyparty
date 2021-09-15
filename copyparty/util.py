@@ -19,7 +19,7 @@ import subprocess as sp  # nosec
 from datetime import datetime
 from collections import Counter
 
-from .__init__ import PY2, WINDOWS, ANYWIN, VT100
+from .__init__ import PY2, WINDOWS, ANYWIN, VT100, unicode
 from .stolen import surrogateescape
 
 FAKE_MP = False
@@ -743,6 +743,14 @@ def read_header(sr):
             sr.unrecv(ret[ofs + 4 :])
 
         return ret[:ofs].decode("utf-8", "surrogateescape").lstrip("\r\n").split("\r\n")
+
+
+def gen_filekey(salt, fspath, fsize, inode):
+    return base64.urlsafe_b64encode(
+        hashlib.sha512(
+            "{} {} {} {}".format(salt, fspath, fsize, inode).encode("utf-8", "replace")
+        ).digest()
+    ).decode("ascii")
 
 
 def humansize(sz, terse=False):

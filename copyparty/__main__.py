@@ -104,7 +104,7 @@ def ensure_cert():
     cert_insec = os.path.join(E.mod, "res/insecure.pem")
     cert_cfg = os.path.join(E.cfg, "cert.pem")
     if not os.path.exists(cert_cfg):
-        shutil.copy2(cert_insec, cert_cfg)
+        shutil.copy(cert_insec, cert_cfg)
 
     try:
         if filecmp.cmp(cert_cfg, cert_insec):
@@ -203,6 +203,11 @@ def run_argparse(argv, formatter):
         description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
     )
 
+    try:
+        fk_salt = unicode(os.path.getmtime(os.path.join(E.cfg, "cert.pem")))
+    except:
+        fk_salt = "hunter2"
+
     sects = [
         [
             "accounts",
@@ -280,6 +285,10 @@ def run_argparse(argv, formatter):
               \033[36mmtp=.bpm=f,audio-bpm.py\033[35m uses the "audio-bpm.py" program to
                 generate ".bpm" tags from uploads (f = overwrite tags)
               \033[36mmtp=ahash,vhash=media-hash.py\033[35m collects two tags at once
+            
+            \033[0mothers:
+              \033[36mfk=8\033[35m generates per-file accesskeys,
+                which will then be required at the "g" accesslevel
             \033[0m"""
             ),
         ],
@@ -361,6 +370,7 @@ def run_argparse(argv, formatter):
     ap2 = ap.add_argument_group('safety options')
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="scan all volumes; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
     ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt")
+    ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt")
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to make something a dotfile")
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")

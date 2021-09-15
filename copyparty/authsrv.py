@@ -835,6 +835,11 @@ class AuthSrv(object):
                 vol.lim = lim
 
         for vol in vfs.all_vols.values():
+            fk = vol.flags.get("fk")
+            if fk:
+                vol.flags["fk"] = int(fk) if fk is not True else 8
+
+        for vol in vfs.all_vols.values():
             if "pk" in vol.flags and "gz" not in vol.flags and "xz" not in vol.flags:
                 vol.flags["gz"] = False  # def.pk
 
