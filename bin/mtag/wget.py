@@ -15,6 +15,11 @@ explained:
   do this on all uploads with the file extension "bin",
   t300 = 300 seconds timeout for each dwonload,
   ad = parse file regardless if FFmpeg thinks it is audio or not
+
+PS: this requires e2ts to be functional,
+  meaning you need to do at least one of these:
+   * apt install ffmpeg
+   * pip3 install mutagen
 """
 
 

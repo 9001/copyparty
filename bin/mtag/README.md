@@ -1,5 +1,7 @@
 standalone programs which take an audio file as argument
 
+**NOTE:** these all require `-e2ts` to be functional, meaning you need to do at least one of these: `apt install ffmpeg` or `pip3 install mutagen`
+
 some of these rely on libraries which are not MIT-compatible
 
 * [audio-bpm.py](./audio-bpm.py) detects the BPM of music using the BeatRoot Vamp Plugin; imports GPL2
