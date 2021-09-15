@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
@@ -8,7 +8,7 @@ import tokenize
 
 
 def uncomment(fpath):
-    """ modified https://stackoverflow.com/a/62074206 """
+    """modified https://stackoverflow.com/a/62074206"""
 
     with open(fpath, "rb") as f:
         orig = f.read().decode("utf-8")
