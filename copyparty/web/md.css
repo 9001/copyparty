@@ -212,6 +212,10 @@ blink {
 	#toolsbox a+a {
 		text-decoration: none;
 	}
+	#lno {
+		position: absolute;
+		right: 0;
+	}
 
 
 

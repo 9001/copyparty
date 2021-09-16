@@ -875,6 +875,40 @@ function cfg_uni(e) {
 }
 
 
+var set_lno = (function () {
+    var t = null,
+        pi = null,
+        pv = null,
+        lno = ebi('lno');
+
+    function poke() {
+        clearTimeout(t);
+        t = setTimeout(fire, 20);
+    }
+
+    function fire() {
+        try {
+            clearTimeout(t);
+
+            var i = dom_src.selectionStart;
+            if (i === pi)
+                return;
+
+            var v = 'L' + dom_src.value.slice(0, i).split('\n').length;
+            if (v != pv)
+                lno.innerHTML = v;
+
+            pi = i;
+            pv = v;
+        }
+        catch (e) { }
+    }
+
+    timer.add(fire);
+    return poke;
+})();
+
+
 // hotkeys / toolbar
 (function () {
     function keydown(ev) {
@@ -892,6 +926,8 @@ function cfg_uni(e) {
         }
         if (document.activeElement != dom_src)
             return true;
+
+        set_lno();
 
         if (ctrl(ev)) {
             if (ev.code == "KeyH" || kc == 72) {
