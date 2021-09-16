@@ -3333,9 +3333,7 @@ var treectl = (function () {
 
 		clmod(ebi('epi'), 'mdo');
 		if (res.readme)
-			setTimeout(function () {
-				show_readme(res.readme);
-			}, 10);
+			show_readme(res.readme);
 
 		document.title = '⇆🎉 ' + uricom_dec(document.location.pathname.slice(1, -1))[0];
 

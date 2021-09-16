@@ -230,44 +230,40 @@ redraw = (function () {
 
 // modification checker
 function Modpoll() {
-    this.skip_one = true;
-    this.disabled = false;
+    var r = {
+        skip_one: true,
+        disabled: false
+    };
 
-    this.periodic = function () {
-        var that = this;
-        setTimeout(function () {
-            that.periodic();
-        }, 1000 * md_opt.modpoll_freq);
-
+    r.periodic = function () {
         var skip = null;
 
         if (toast.visible)
             skip = 'toast';
 
-        else if (this.skip_one)
+        else if (r.skip_one)
             skip = 'saved';
 
-        else if (this.disabled)
+        else if (r.disabled)
             skip = 'disabled';
 
         if (skip) {
             console.log('modpoll skip, ' + skip);
-            this.skip_one = false;
+            r.skip_one = false;
             return;
         }
 
         console.log('modpoll...');
         var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
         var xhr = new XMLHttpRequest();
-        xhr.modpoll = this;
         xhr.open('GET', url, true);
         xhr.responseType = 'text';
-        xhr.onreadystatechange = this.cb;
+        xhr.onreadystatechange = r.cb;
         xhr.send();
-    }
+    };
 
-    this.cb = function () {
-        if (this.modpoll.disabled || this.modpoll.skip_one) {
+    r.cb = function () {
+        if (r.disabled || r.skip_one) {
             console.log('modpoll abort');
             return;
         }
@@ -288,7 +284,7 @@ function Modpoll() {
 
         if (server_ref != server_now) {
             console.log("modpoll diff |" + server_ref.length + "|, |" + server_now.length + "|");
-            this.modpoll.disabled = true;
+            r.disabled = true;
             var msg = [
                 "The document has changed on the server.",
                 "The changes will NOT be loaded into your editor automatically.",
@@ -302,12 +298,12 @@ function Modpoll() {
         }
 
         console.log('modpoll eq');
-    }
+    };
 
     if (md_opt.modpoll_freq > 0)
-        this.periodic();
+        setInterval(r.periodic, 1000 * md_opt.modpoll_freq);
 
-    return this;
+    return r;
 }
 var modpoll = new Modpoll();
 
