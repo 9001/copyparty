@@ -2302,6 +2302,7 @@ var thegrid = (function () {
 		pbar.onresize();
 		vbar.onresize();
 	});
+	ebi('wtgrid').onclick = ebi('griden').onclick;
 
 	r.setvis = function (vis) {
 		(r.en ? gfiles : lfiles).style.display = vis ? '' : 'none';
