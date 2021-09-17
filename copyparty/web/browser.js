@@ -179,10 +179,11 @@ ebi('op_cfg').innerHTML = (
 ebi('tree').innerHTML = (
 	'<div id="treeh">\n' +
 	'	<a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>\n' +
-	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: A">+</a>\n' +
-	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: D">&ndash;</a>\n' +
+	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
+	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
+	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
-	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">v</a>\n' +
+	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'</div>\n' +
 	'<ul id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
@@ -3019,6 +3020,11 @@ var treectl = (function () {
 	bcfg_bind(treectl, 'dots', 'dotfiles', false, function (v) {
 		treectl.goto(get_evpath());
 	});
+	setwrap(bcfg_bind(treectl, 'wtree', 'wraptree', true, setwrap));
+
+	function setwrap(v) {
+		clmod(ebi('tree'), 'nowrap', !v);
+	}
 
 	treectl.entree = function (e) {
 		ev(e);

@@ -791,6 +791,20 @@ input.eq_gain {
 	width: calc(100% - 2em);
 	line-height: 1em;
 }
+#tree.nowrap #treeul li {
+	min-height: 1.4em;
+}
+#tree.nowrap #treeul a+a {
+	white-space: nowrap;
+}
+#tree.nowrap #treeul a+a:hover {
+	background: rgba(34, 34, 34, 0.67);
+	position: fixed;
+}
+html.light #tree.nowrap #treeul a+a:hover {
+	background: rgba(255, 255, 255, 0.67);
+	color: #000;
+}
 #treeul a+a:hover {
 	background: #222;
 	color: #fff;
