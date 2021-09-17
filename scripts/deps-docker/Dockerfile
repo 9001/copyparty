@@ -2,10 +2,10 @@ FROM    alpine:3.14
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
-        ver_marked=1.1.0 \
+        ver_marked=3.0.4 \
         ver_ogvjs=1.8.4 \
-        ver_mde=2.14.0 \
-        ver_codemirror=5.59.3 \
+        ver_mde=2.15.0 \
+        ver_codemirror=5.62.3 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -113,7 +113,7 @@ RUN     cd CodeMirror-$ver_codemirror \
 COPY    easymde.patch /z/
 RUN     cd easy-markdown-editor-$ver_mde \
         && patch -p1 < /z/easymde.patch \
-        && sed -ri 's`https://registry.npmjs.org/marked/-/marked-0.8.2.tgz`file:/z/nodepkgs/marked`' package-lock.json \
+        && sed -ri 's`https://registry.npmjs.org/marked/-/marked-[0-9\.]+.tgz`file:/z/nodepkgs/marked`' package-lock.json \
         && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
         && sed -ri 's`("codemirror": ")[^"]+`\1file:/z/nodepkgs/codemirror`' ./package.json \
         && npm install

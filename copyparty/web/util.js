@@ -194,36 +194,40 @@ function ev(e) {
 
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
-if (!String.prototype.endsWith) {
+if (!String.prototype.endsWith)
     String.prototype.endsWith = function (search, this_len) {
         if (this_len === undefined || this_len > this.length) {
             this_len = this.length;
         }
         return this.substring(this_len - search.length, this_len) === search;
     };
-}
-if (!String.startsWith) {
+
+if (!String.startsWith)
     String.prototype.startsWith = function (s, i) {
         i = i > 0 ? i | 0 : 0;
         return this.substring(i, i + s.length) === s;
     };
-}
-if (!Element.prototype.matches) {
+
+if (!String.trimEnd)
+    String.prototype.trimEnd = String.prototype.trimRight = function () {
+        return this.replace(/[ \t\r\n]+$/m, '');
+    };
+
+if (!Element.prototype.matches)
     Element.prototype.matches =
         Element.prototype.oMatchesSelector ||
         Element.prototype.msMatchesSelector ||
         Element.prototype.mozMatchesSelector ||
         Element.prototype.webkitMatchesSelector;
-}
-if (!Element.prototype.closest) {
+
+if (!Element.prototype.closest)
     Element.prototype.closest = function (s) {
         var el = this;
         do {
             if (el.matches(s)) return el;
             el = el.parentElement || el.parentNode;
         } while (el !== null && el.nodeType === 1);
-    }
-}
+    };
 
 
 // https://stackoverflow.com/a/950146

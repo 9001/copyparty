@@ -140,12 +140,12 @@ a newline toplevel
 | a table | on the right |
 | second row | foo bar |
 
-||
+a||a
 --|:-:|-:
 a table | big text in this | aaakbfddd
 second row | centred | bbb
 
-||
+||||
 --|--|--
 foo
 

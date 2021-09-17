@@ -1,15 +1,15 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
-adds linetracking to marked.js v1.0.0 +git;
+adds linetracking to marked.js v3.0.4;
 add data-ln="%d" to most tags, %d is the source markdown line
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
-@@ -49,4 +49,5 @@ function mangle(text) {
+@@ -50,4 +50,5 @@ function mangle(text) {
  module.exports = class Lexer {
    constructor(options) {
 +    this.ln = 1;  // like most editors, start couting from 1
      this.tokens = [];
      this.tokens.links = Object.create(null);
-@@ -108,4 +109,15 @@ module.exports = class Lexer {
+@@ -127,4 +128,15 @@ module.exports = class Lexer {
    }
  
 +  set_ln(token, ln = this.ln) {
@@ -25,122 +25,123 @@ add data-ln="%d" to most tags, %d is the source markdown line
 +
    /**
     * Lexing
-@@ -113,10 +125,15 @@ module.exports = class Lexer {
-   blockTokens(src, tokens = [], top = true) {
-     src = src.replace(/^ +$/gm, '');
--    let token, i, l, lastToken;
-+    let token, i, l, lastToken, ln;
+@@ -134,7 +146,11 @@ module.exports = class Lexer {
+       src = src.replace(/^ +$/gm, '');
+     }
+-    let token, lastToken, cutSrc, lastParagraphClipped;
++    let token, lastToken, cutSrc, lastParagraphClipped, ln;
  
      while (src) {
 +      // this.ln will be bumped by recursive calls into this func;
 +      // reset the count and rely on the outermost token's raw only
 +      ln = this.ln;
 +
-       // newline
+       if (this.options.extensions
+         && this.options.extensions.block
+@@ -142,4 +158,5 @@ module.exports = class Lexer {
+           if (token = extTokenizer.call({ lexer: this }, src, tokens)) {
+             src = src.substring(token.raw.length);
++            this.set_ln(token, ln);
+             tokens.push(token);
+             return true;
+@@ -153,4 +170,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.space(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token); // is \n if not type
++        this.set_ln(token, ln); // is \n if not type
          if (token.type) {
            tokens.push(token);
-@@ -128,4 +145,5 @@ module.exports = class Lexer {
-       if (token = this.tokenizer.code(src, tokens)) {
+@@ -162,4 +180,5 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.code(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
-         if (token.type) {
-           tokens.push(token);
-@@ -141,4 +159,5 @@ module.exports = class Lexer {
++        this.set_ln(token, ln);
+         lastToken = tokens[tokens.length - 1];
+         // An indented code block cannot interrupt a paragraph.
+@@ -177,4 +196,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.fences(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
++        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -148,4 +167,5 @@ module.exports = class Lexer {
+@@ -184,4 +204,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.heading(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
++        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -155,4 +175,5 @@ module.exports = class Lexer {
-       if (token = this.tokenizer.nptable(src)) {
-         src = src.substring(token.raw.length);
-+        this.set_ln(token);
-         tokens.push(token);
-         continue;
-@@ -162,4 +183,5 @@ module.exports = class Lexer {
+@@ -191,4 +212,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.hr(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
++        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -170,4 +192,7 @@ module.exports = class Lexer {
+@@ -198,4 +220,5 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.blockquote(src)) {
          src = src.substring(token.raw.length);
-         token.tokens = this.blockTokens(token.text, [], top);
-+        // recursive call to blockTokens probably bumped this.ln,
-+        // token.raw is more reliable so reset this.ln and use that
 +        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -180,5 +205,9 @@ module.exports = class Lexer {
-         for (i = 0; i < l; i++) {
-           token.items[i].tokens = this.blockTokens(token.items[i].text, [], false);
-+          // list entries don't bump the linecounter, so let's
-+          this.ln++;
-         }
-+        // then reset like blockquote
+@@ -205,4 +228,5 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.list(src)) {
+         src = src.substring(token.raw.length);
 +        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -188,4 +217,5 @@ module.exports = class Lexer {
+@@ -212,4 +236,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.html(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
++        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -195,4 +225,5 @@ module.exports = class Lexer {
-       if (top && (token = this.tokenizer.def(src))) {
+@@ -219,4 +244,5 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.def(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
-         if (!this.tokens.links[token.tag]) {
-           this.tokens.links[token.tag] = {
-@@ -207,4 +238,5 @@ module.exports = class Lexer {
++        this.set_ln(token, ln);
+         lastToken = tokens[tokens.length - 1];
+         if (lastToken && (lastToken.type === 'paragraph' || lastToken.type === 'text')) {
+@@ -236,4 +262,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.table(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
++        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -214,4 +246,5 @@ module.exports = class Lexer {
+@@ -243,4 +270,5 @@ module.exports = class Lexer {
        if (token = this.tokenizer.lheading(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
++        this.set_ln(token, ln);
          tokens.push(token);
          continue;
-@@ -221,4 +254,5 @@ module.exports = class Lexer {
-       if (top && (token = this.tokenizer.paragraph(src))) {
+@@ -263,4 +291,5 @@ module.exports = class Lexer {
+       }
+       if (this.state.top && (token = this.tokenizer.paragraph(cutSrc))) {
++        this.set_ln(token, ln);
+         lastToken = tokens[tokens.length - 1];
+         if (lastParagraphClipped && lastToken.type === 'paragraph') {
+@@ -280,4 +309,6 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.text(src)) {
          src = src.substring(token.raw.length);
-+        this.set_ln(token);
-         tokens.push(token);
-         continue;
-@@ -228,4 +262,5 @@ module.exports = class Lexer {
-       if (token = this.tokenizer.text(src, tokens)) {
-         src = src.substring(token.raw.length);
-+        this.set_ln(token);
-         if (token.type) {
-           tokens.push(token);
-@@ -263,4 +298,7 @@ module.exports = class Lexer {
-     for (i = 0; i < l; i++) {
-       token = tokens[i];
-+      // this.ln is at EOF when inline() is invoked;
-+      // all this affects <br> tags only so no biggie if it breaks
-+      this.ln = token.ln || this.ln;
-       switch (token.type) {
-         case 'paragraph':
-@@ -386,4 +424,6 @@ module.exports = class Lexer {
++        this.set_ln(token, ln);
++        this.ln++;
+         lastToken = tokens[tokens.length - 1];
+         if (lastToken && lastToken.type === 'text') {
+@@ -355,4 +386,5 @@ module.exports = class Lexer {
+           if (token = extTokenizer.call({ lexer: this }, src, tokens)) {
+             src = src.substring(token.raw.length);
++            this.ln = token.ln || this.ln;
+             tokens.push(token);
+             return true;
+@@ -420,4 +452,6 @@ module.exports = class Lexer {
        if (token = this.tokenizer.br(src)) {
          src = src.substring(token.raw.length);
 +        // no need to reset (no more blockTokens anyways)
 +        token.ln = this.ln++;
          tokens.push(token);
          continue;
+@@ -462,4 +496,5 @@ module.exports = class Lexer {
+       if (token = this.tokenizer.inlineText(cutSrc, smartypants)) {
+         src = src.substring(token.raw.length);
++        this.ln = token.ln || this.ln;
+         if (token.raw.slice(-1) !== '_') { // Track prevChar before string of ____ started
+           prevChar = token.raw.slice(-1);
 diff --git a/src/Parser.js b/src/Parser.js
 --- a/src/Parser.js
 +++ b/src/Parser.js
@@ -150,17 +151,16 @@ diff --git a/src/Parser.js b/src/Parser.js
 +    this.ln = 0; // error indicator; should always be set >=1 from tokens
    }
  
-@@ -55,4 +56,9 @@ module.exports = class Parser {
+@@ -64,4 +65,8 @@ module.exports = class Parser {
      for (i = 0; i < l; i++) {
        token = tokens[i];
 +      // take line-numbers from tokens whenever possible
 +      // and update the renderer's html attribute with the new value
 +      this.ln = token.ln || this.ln;
 +      this.renderer.tag_ln(this.ln);
-+
-       switch (token.type) {
-         case 'space': {
-@@ -105,7 +111,10 @@ module.exports = class Parser {
+ 
+       // Run any renderer extensions
+@@ -124,7 +129,10 @@ module.exports = class Parser {
              }
  
 -            body += this.renderer.tablerow(cell);
@@ -173,7 +173,7 @@ diff --git a/src/Parser.js b/src/Parser.js
 +          out += this.renderer.tag_ln(token.ln).table(header, body);
            continue;
          }
-@@ -148,8 +157,12 @@ module.exports = class Parser {
+@@ -167,8 +175,12 @@ module.exports = class Parser {
  
              itemBody += this.parse(item.tokens, loose);
 -            body += this.renderer.listitem(itemBody, task, checked);
@@ -188,7 +188,7 @@ diff --git a/src/Parser.js b/src/Parser.js
 +          out += this.renderer.tag_ln(token.ln).list(body, ordered, start);
            continue;
          }
-@@ -160,5 +173,6 @@ module.exports = class Parser {
+@@ -179,5 +191,6 @@ module.exports = class Parser {
          }
          case 'paragraph': {
 -          out += this.renderer.paragraph(this.parseInline(token.tokens));
@@ -196,22 +196,14 @@ diff --git a/src/Parser.js b/src/Parser.js
 +          out += this.renderer.tag_ln(token.ln).paragraph(t);
            continue;
          }
-@@ -199,4 +213,6 @@ module.exports = class Parser {
-     for (i = 0; i < l; i++) {
+@@ -221,4 +234,7 @@ module.exports = class Parser {
        token = tokens[i];
+ 
 +      // another thing that only affects <br/> and other inlines
 +      this.ln = token.ln || this.ln;
-       switch (token.type) {
-         case 'escape': {
-@@ -229,5 +245,7 @@ module.exports = class Parser {
-         }
-         case 'br': {
--          out += renderer.br();
-+          // update the html attribute before writing each <br/>,
-+          // don't care about the others
-+          out += renderer.tag_ln(this.ln).br();
-           break;
-         }
++
+       // Run any renderer extensions
+       if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
 diff --git a/src/Renderer.js b/src/Renderer.js
 --- a/src/Renderer.js
 +++ b/src/Renderer.js
@@ -228,7 +220,7 @@ diff --git a/src/Renderer.js b/src/Renderer.js
 +  
    code(code, infostring, escaped) {
      const lang = (infostring || '').match(/\S*/)[0];
-@@ -24,10 +30,10 @@ module.exports = class Renderer {
+@@ -26,10 +32,10 @@ module.exports = class Renderer {
  
      if (!lang) {
 -      return '<pre><code>'
@@ -241,58 +233,69 @@ diff --git a/src/Renderer.js b/src/Renderer.js
 +    return '<pre' + this.ln + '><code class="'
        + this.options.langPrefix
        + escape(lang, true)
-@@ -38,5 +44,5 @@ module.exports = class Renderer {
+@@ -40,5 +46,5 @@ module.exports = class Renderer {
  
    blockquote(quote) {
 -    return '<blockquote>\n' + quote + '</blockquote>\n';
 +    return '<blockquote' + this.ln + '>\n' + quote + '</blockquote>\n';
    }
  
-@@ -49,4 +55,5 @@ module.exports = class Renderer {
+@@ -51,4 +57,5 @@ module.exports = class Renderer {
        return '<h'
          + level
 +        + this.ln
          + ' id="'
          + this.options.headerPrefix
-@@ -59,5 +66,5 @@ module.exports = class Renderer {
+@@ -61,5 +68,5 @@ module.exports = class Renderer {
      }
      // ignore IDs
 -    return '<h' + level + '>' + text + '</h' + level + '>\n';
 +    return '<h' + level + this.ln + '>' + text + '</h' + level + '>\n';
    }
  
-@@ -73,5 +80,5 @@ module.exports = class Renderer {
+@@ -75,5 +82,5 @@ module.exports = class Renderer {
  
    listitem(text) {
 -    return '<li>' + text + '</li>\n';
 +    return '<li' + this.ln + '>' + text + '</li>\n';
    }
  
-@@ -85,5 +92,5 @@ module.exports = class Renderer {
+@@ -87,5 +94,5 @@ module.exports = class Renderer {
  
    paragraph(text) {
 -    return '<p>' + text + '</p>\n';
 +    return '<p' + this.ln + '>' + text + '</p>\n';
    }
  
-@@ -100,5 +107,5 @@ module.exports = class Renderer {
+@@ -102,5 +109,5 @@ module.exports = class Renderer {
  
    tablerow(content) {
 -    return '<tr>\n' + content + '</tr>\n';
 +    return '<tr' + this.ln + '>\n' + content + '</tr>\n';
    }
  
-@@ -125,5 +132,5 @@ module.exports = class Renderer {
+@@ -127,5 +134,5 @@ module.exports = class Renderer {
  
    br() {
 -    return this.options.xhtml ? '<br/>' : '<br>';
 +    return this.options.xhtml ? '<br' + this.ln + '/>' : '<br' + this.ln + '>';
    }
  
-@@ -151,5 +158,5 @@ module.exports = class Renderer {
+@@ -153,5 +160,5 @@ module.exports = class Renderer {
      }
  
 -    let out = '<img src="' + href + '" alt="' + text + '"';
 +    let out = '<img' + this.ln + ' src="' + href + '" alt="' + text + '"';
      if (title) {
        out += ' title="' + title + '"';
+diff --git a/src/Tokenizer.js b/src/Tokenizer.js
+--- a/src/Tokenizer.js
++++ b/src/Tokenizer.js
+@@ -301,4 +301,7 @@ module.exports = class Tokenizer {
+       const l = list.items.length;
+ 
++      // each nested list gets +1 ahead; this hack makes every listgroup -1 but atleast it doesn't get infinitely bad
++      this.lexer.ln--;
++
+       // Item child tokens handled here at end because we needed to have the final item to trim it first
+       for (i = 0; i < l; i++) {

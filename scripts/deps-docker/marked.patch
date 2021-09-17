@@ -1,52 +1,52 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
-@@ -5,5 +5,5 @@ const { block, inline } = require('./rules.js');
+@@ -6,5 +6,5 @@ const { repeatString } = require('./helpers.js');
  /**
   * smartypants text replacement
 - */
 + *
  function smartypants(text) {
    return text
-@@ -26,5 +26,5 @@ function smartypants(text) {
+@@ -27,5 +27,5 @@ function smartypants(text) {
  /**
   * mangle email addresses
 - */
 + *
  function mangle(text) {
    let out = '',
-@@ -439,5 +439,5 @@ module.exports = class Lexer {
+@@ -465,5 +465,5 @@ module.exports = class Lexer {
  
        // autolink
 -      if (token = this.tokenizer.autolink(src, mangle)) {
 +      if (token = this.tokenizer.autolink(src)) {
          src = src.substring(token.raw.length);
          tokens.push(token);
-@@ -446,5 +446,5 @@ module.exports = class Lexer {
+@@ -472,5 +472,5 @@ module.exports = class Lexer {
  
        // url (gfm)
--      if (!inLink && (token = this.tokenizer.url(src, mangle))) {
-+      if (!inLink && (token = this.tokenizer.url(src))) {
+-      if (!this.state.inLink && (token = this.tokenizer.url(src, mangle))) {
++      if (!this.state.inLink && (token = this.tokenizer.url(src))) {
          src = src.substring(token.raw.length);
          tokens.push(token);
-@@ -453,5 +453,5 @@ module.exports = class Lexer {
- 
-       // text
--      if (token = this.tokenizer.inlineText(src, inRawBlock, smartypants)) {
-+      if (token = this.tokenizer.inlineText(src, inRawBlock)) {
+@@ -493,5 +493,5 @@ module.exports = class Lexer {
+         }
+       }
+-      if (token = this.tokenizer.inlineText(cutSrc, smartypants)) {
++      if (token = this.tokenizer.inlineText(cutSrc)) {
          src = src.substring(token.raw.length);
-         tokens.push(token);
+         this.ln = token.ln || this.ln;
 diff --git a/src/Renderer.js b/src/Renderer.js
 --- a/src/Renderer.js
 +++ b/src/Renderer.js
-@@ -140,5 +140,5 @@ module.exports = class Renderer {
+@@ -142,5 +142,5 @@ module.exports = class Renderer {
  
    link(href, title, text) {
 -    href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
 +    href = cleanUrl(this.options.baseUrl, href);
      if (href === null) {
        return text;
-@@ -153,5 +153,5 @@ module.exports = class Renderer {
+@@ -155,5 +155,5 @@ module.exports = class Renderer {
  
    image(href, title, text) {
 -    href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
@@ -56,22 +56,23 @@ diff --git a/src/Renderer.js b/src/Renderer.js
 diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 --- a/src/Tokenizer.js
 +++ b/src/Tokenizer.js
-@@ -287,11 +287,8 @@ module.exports = class Tokenizer {
-     if (cap) {
-       return {
--        type: this.options.sanitize
--          ? 'paragraph'
--          : 'html',
-+        type: 'html',
+@@ -321,14 +321,7 @@ module.exports = class Tokenizer {
+         type: 'html',
          raw: cap[0],
 -        pre: !this.options.sanitizer
 -          && (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
--        text: this.options.sanitize ? (this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0])) : cap[0]
-+        pre: cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style',
-+        text: cap[0]
++        pre: (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
+         text: cap[0]
        };
+-      if (this.options.sanitize) {
+-        token.type = 'paragraph';
+-        token.text = this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0]);
+-        token.tokens = [];
+-        this.lexer.inline(token.text, token.tokens);
+-      }
+       return token;
      }
-@@ -421,15 +418,9 @@ module.exports = class Tokenizer {
+@@ -477,15 +470,9 @@ module.exports = class Tokenizer {
  
        return {
 -        type: this.options.sanitize
@@ -79,8 +80,8 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 -          : 'html',
 +        type: 'html',
          raw: cap[0],
-         inLink,
-         inRawBlock,
+         inLink: this.lexer.state.inLink,
+         inRawBlock: this.lexer.state.inRawBlock,
 -        text: this.options.sanitize
 -          ? (this.options.sanitizer
 -            ? this.options.sanitizer(cap[0])
@@ -89,7 +90,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text: cap[0]
        };
      }
-@@ -550,10 +541,10 @@ module.exports = class Tokenizer {
+@@ -672,10 +659,10 @@ module.exports = class Tokenizer {
    }
  
 -  autolink(src, mangle) {
@@ -102,7 +103,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text = escape(cap[1]);
          href = 'mailto:' + text;
        } else {
-@@ -578,10 +569,10 @@ module.exports = class Tokenizer {
+@@ -700,10 +687,10 @@ module.exports = class Tokenizer {
    }
  
 -  url(src, mangle) {
@@ -115,15 +116,15 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text = escape(cap[0]);
          href = 'mailto:' + text;
        } else {
-@@ -615,12 +606,12 @@ module.exports = class Tokenizer {
+@@ -737,12 +724,12 @@ module.exports = class Tokenizer {
    }
  
--  inlineText(src, inRawBlock, smartypants) {
-+  inlineText(src, inRawBlock) {
+-  inlineText(src, smartypants) {
++  inlineText(src) {
      const cap = this.rules.inline.text.exec(src);
      if (cap) {
        let text;
-       if (inRawBlock) {
+       if (this.lexer.state.inRawBlock) {
 -        text = this.options.sanitize ? (this.options.sanitizer ? this.options.sanitizer(cap[0]) : escape(cap[0])) : cap[0];
 +        text = cap[0];
        } else {
@@ -134,7 +135,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 diff --git a/src/defaults.js b/src/defaults.js
 --- a/src/defaults.js
 +++ b/src/defaults.js
-@@ -8,12 +8,8 @@ function getDefaults() {
+@@ -9,12 +9,8 @@ function getDefaults() {
      highlight: null,
      langPrefix: 'language-',
 -    mangle: true,
@@ -170,7 +171,7 @@ diff --git a/src/helpers.js b/src/helpers.js
 +function cleanUrl(base, href) {
    if (base && !originIndependentUrl.test(href)) {
      href = resolveUrl(base, href);
-@@ -223,10 +210,4 @@ function findClosingBracket(str, b) {
+@@ -227,10 +214,4 @@ function findClosingBracket(str, b) {
  }
  
 -function checkSanitizeDeprecation(opt) {
@@ -179,14 +180,13 @@ diff --git a/src/helpers.js b/src/helpers.js
 -  }
 -}
 -
- module.exports = {
-   escape,
-@@ -239,5 +220,4 @@ module.exports = {
-   splitCells,
+ // copied from https://stackoverflow.com/a/5450113/806777
+ function repeatString(pattern, count) {
+@@ -260,5 +241,4 @@ module.exports = {
    rtrim,
--  findClosingBracket,
--  checkSanitizeDeprecation
-+  findClosingBracket
+   findClosingBracket,
+-  checkSanitizeDeprecation,
+   repeatString
  };
 diff --git a/src/marked.js b/src/marked.js
 --- a/src/marked.js
@@ -203,8 +203,14 @@ diff --git a/src/marked.js b/src/marked.js
 -  checkSanitizeDeprecation(opt);
  
    if (callback) {
-@@ -108,5 +106,5 @@ function marked(src, opt, callback) {
-     return Parser.parse(tokens, opt);
+@@ -302,5 +300,4 @@ marked.parseInline = function(src, opt) {
+ 
+   opt = merge({}, marked.defaults, opt || {});
+-  checkSanitizeDeprecation(opt);
+ 
+   try {
+@@ -311,5 +308,5 @@ marked.parseInline = function(src, opt) {
+     return Parser.parseInline(tokens, opt);
    } catch (e) {
 -    e.message += '\nPlease report this to https://github.com/markedjs/marked.';
 +    e.message += '\nmake issue @ https://github.com/9001/copyparty';
@@ -252,86 +258,87 @@ diff --git a/test/bench.js b/test/bench.js
 diff --git a/test/specs/run-spec.js b/test/specs/run-spec.js
 --- a/test/specs/run-spec.js
 +++ b/test/specs/run-spec.js
-@@ -22,8 +22,4 @@ function runSpecs(title, dir, showCompletionTable, options) {
+@@ -22,9 +22,4 @@ function runSpecs(title, dir, showCompletionTable, options) {
            }
  
 -          if (spec.options.sanitizer) {
 -            // eslint-disable-next-line no-eval
 -            spec.options.sanitizer = eval(spec.options.sanitizer);
 -          }
- 
+-
            (spec.only ? fit : (spec.skip ? xit : it))('should ' + passFail + example, async() => {
-@@ -53,3 +49,2 @@ runSpecs('Original', './original', false, { gfm: false, pedantic: true });
+             const before = process.hrtime();
+@@ -53,3 +48,2 @@ runSpecs('Original', './original', false, { gfm: false, pedantic: true });
  runSpecs('New', './new');
  runSpecs('ReDOS', './redos');
 -runSpecs('Security', './security', false, { silent: true }); // silent - do not show deprecation warning
 diff --git a/test/unit/Lexer-spec.js b/test/unit/Lexer-spec.js
 --- a/test/unit/Lexer-spec.js
 +++ b/test/unit/Lexer-spec.js
-@@ -465,5 +465,5 @@ a | b
+@@ -589,5 +589,5 @@ paragraph
      });
  
 -    it('sanitize', () => {
 +    /*it('sanitize', () => {
        expectTokens({
          md: '<div>html</div>',
-@@ -483,5 +483,5 @@ a | b
+@@ -607,5 +607,5 @@ paragraph
          ]
        });
 -    });
 +    });*/
    });
  
-@@ -587,5 +587,5 @@ a | b
+@@ -652,5 +652,5 @@ paragraph
        });
  
 -      it('html sanitize', () => {
 +      /*it('html sanitize', () => {
          expectInlineTokens({
            md: '<div>html</div>',
-@@ -597,5 +597,5 @@ a | b
+@@ -660,5 +660,5 @@ paragraph
            ]
          });
 -      });
 +      });*/
  
        it('link', () => {
-@@ -909,5 +909,5 @@ a | b
+@@ -971,5 +971,5 @@ paragraph
          });
  
 -        it('autolink mangle email', () => {
 +        /*it('autolink mangle email', () => {
            expectInlineTokens({
              md: '<test@example.com>',
-@@ -929,5 +929,5 @@ a | b
+@@ -991,5 +991,5 @@ paragraph
              ]
            });
 -        });
 +        });*/
  
          it('url', () => {
-@@ -966,5 +966,5 @@ a | b
+@@ -1028,5 +1028,5 @@ paragraph
          });
  
 -        it('url mangle email', () => {
 +        /*it('url mangle email', () => {
            expectInlineTokens({
              md: 'test@example.com',
-@@ -986,5 +986,5 @@ a | b
+@@ -1048,5 +1048,5 @@ paragraph
              ]
            });
 -        });
 +        });*/
        });
  
-@@ -1002,5 +1002,5 @@ a | b
+@@ -1064,5 +1064,5 @@ paragraph
        });
  
 -      describe('smartypants', () => {
 +      /*describe('smartypants', () => {
          it('single quotes', () => {
            expectInlineTokens({
-@@ -1072,5 +1072,5 @@ a | b
+@@ -1134,5 +1134,5 @@ paragraph
            });
          });
 -      });
