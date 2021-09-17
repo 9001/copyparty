@@ -771,6 +771,7 @@ var tt = (function () {
         ev(e);
         window.removeEventListener('scroll', r.hide);
         clmod(r.tt, 'show');
+        clmod(r.tt, 'b');
         if (r.el)
             r.el.removeEventListener('mouseleave', r.hide);
     };

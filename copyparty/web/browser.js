@@ -1592,7 +1592,7 @@ function sortfiles(nodes) {
 					if ((v + '').indexOf('<a ') === 0)
 						v = v.split('>')[1];
 					else if (name == "href" && v) {
-						if (v.slice(-1) == '/')
+						if (v.split('?')[0].slice(-1) == '/')
 							v = '\t' + v;
 
 						v = uricom_dec(v)[0]
@@ -3297,8 +3297,9 @@ var treectl = (function () {
 		nodes = sortfiles(nodes);
 		for (var a = 0; a < nodes.length; a++) {
 			var r = nodes[a],
-				hname = esc(uricom_dec(r.href)[0]),
-				sortv = (r.href.slice(-1) == '/' ? '\t' : '') + hname,
+				bhref = r.href.split('?')[0],
+				hname = esc(uricom_dec(bhref)[0]),
+				sortv = (bhref.slice(-1) == '/' ? '\t' : '') + hname,
 				ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +
 					'"><a href="' + top + r.href + '">' + hname + '</a>', r.sz];
 
