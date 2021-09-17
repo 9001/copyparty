@@ -28,6 +28,7 @@ def det(tf):
         "-hide_banner",
         "-v", "fatal",
         "-y", "-i", fsenc(sys.argv[1]),
+        "-map", "0:a:0",
         "-t", "300",
         "-sample_fmt", "s16",
         tf
