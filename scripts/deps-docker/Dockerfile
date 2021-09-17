@@ -116,6 +116,7 @@ RUN     cd easy-markdown-editor-$ver_mde \
         && sed -ri 's`https://registry.npmjs.org/marked/-/marked-[0-9\.]+.tgz`file:/z/nodepkgs/marked`' package-lock.json \
         && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
         && sed -ri 's`("codemirror": ")[^"]+`\1file:/z/nodepkgs/codemirror`' ./package.json \
+        && sed -ri 's`^var marked = require\(.marked/lib/marked.\);$`var marked = window.marked;`' src/js/easymde.js \
         && npm install
 
 COPY    easymde-ln.patch /z/
