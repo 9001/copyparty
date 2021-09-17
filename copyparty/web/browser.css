@@ -756,6 +756,9 @@ input.eq_gain {
 	color: #400;
 	text-shadow: none;
 }
+.tgl.btn.on:hover {
+	background: #fe8;
+}
 #detree {
 	padding: .3em .5em;
 	font-size: 1.5em;
@@ -1130,6 +1133,9 @@ html.light .tgl.btn.on {
 	background: #4a0;
 	color: #fff;
 }
+html.light .tgl.btn.on:hover {
+	background: #5c0;
+}
 html.light #srv_info {
 	color: #c83;
 	background: #eee;
@@ -1155,7 +1161,7 @@ html.light #treeul a.hl:hover {
 html.light #tree li {
 	border-color: #f7f7f7 #fff #ddd #fff;
 }
-html.light #tree a:hover {
+html.light #treeul a:hover {
 	background: #fff;
 }
 html.light #tree ul {
