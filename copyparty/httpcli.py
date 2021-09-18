@@ -1405,10 +1405,12 @@ class HttpCli(object):
         #
         # send reply
 
-        if not is_compressed and "cache" not in self.uparam:
-            self.out_headers.update(NO_CACHE)
+        if is_compressed:
+            self.out_headers["Cache-Control"] = "max-age=573"
+        elif "cache" in self.uparam:
+            self.out_headers["Cache-Control"] = "max-age=69"
         else:
-            self.out_headers.pop("Cache-Control")
+            self.out_headers.update(NO_CACHE)
 
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(
@@ -2154,7 +2156,7 @@ class HttpCli(object):
         for d in dirs:
             d["name"] += "/"
 
-        dirs.sort(key=itemgetter('name'))
+        dirs.sort(key=itemgetter("name"))
 
         j2a["files"] = dirs + files
         j2a["logues"] = logues
