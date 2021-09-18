@@ -1,5 +1,6 @@
 @font-face {
 	font-family: 'scp';
+	font-display: swap;
 	src: local('Source Code Pro Regular'), local('SourceCodePro-Regular'), url(/.cpr/deps/scp.woff2) format('woff2');
 }
 html {

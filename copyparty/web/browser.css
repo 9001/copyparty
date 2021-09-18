@@ -703,7 +703,6 @@ input.eq_gain {
 	left: 0;
 	bottom: 0;
 	top: 7em;
-	width: var(--nav-sz);
 	overflow-x: hidden;
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
