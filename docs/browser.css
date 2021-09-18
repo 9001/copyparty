@@ -17,6 +17,7 @@ html.light {
 html.light #files th {
     background: rgba(255, 255, 255, 0.9) !important;
 }
+html.light .logue,
 html.light #ops,
 html.light #treeul,
 html.light #files td {

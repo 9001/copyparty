@@ -838,6 +838,7 @@ class Up2k(object):
 
             cur.connection.commit()
             if n_done:
+                self.log("mtp: scanned {} files in {}".format(n_done, ptop), c=6)
                 cur.execute("vacuum")
 
             wcur.close()

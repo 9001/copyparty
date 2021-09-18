@@ -1671,6 +1671,9 @@ html.light #bbox-overlay figcaption a {
 	padding: .5em;
 	font-size: .9em;
 }
+html.light #u2err.err {
+	color: #f07;
+}
 #u2btn {
 	color: #eee;
 	background: #555;
