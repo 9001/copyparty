@@ -722,7 +722,7 @@ TLDR: yes
 | image viewer    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | video player    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | markdown editor |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
-| markdown viewer |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
+| markdown viewer |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | play mp3/m4a    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | play ogg/opus   |  -  |  -   |  -   |  -   |  yep  | yep  | `*3` | yep |
 | **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |

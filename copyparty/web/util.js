@@ -169,6 +169,9 @@ function ignex(all) {
 }
 
 
+function noop() { }
+
+
 function ctrl(e) {
     return e && (e.ctrlKey || e.metaKey);
 }

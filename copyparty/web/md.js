@@ -267,7 +267,14 @@ function convert_markdown(md_text, dest_dom) {
 
         throw ex;
     }
-    var md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
+    var md_dom = dest_dom;
+    try {
+        md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
+    }
+    catch (ex) {
+        md_dom.innerHTML = md_html;
+        window.copydom = noop;
+    }
 
     var nodes = md_dom.getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--) {
@@ -502,9 +509,11 @@ img_load.callbacks = [toc.refresh];
 
 // scroll handler
 var redraw = (function () {
-    var sbs = false;
+    var sbs = true;
     function onresize() {
-        sbs = window.matchMedia('(min-width: 64em)').matches;
+        if (window.matchMedia)
+            sbs = window.matchMedia('(min-width: 64em)').matches;
+
         var y = (dom_hbar.offsetTop + dom_hbar.offsetHeight) + 'px';
         if (sbs) {
             dom_toc.style.top = y;
