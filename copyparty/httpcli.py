@@ -1084,7 +1084,7 @@ class HttpCli(object):
             errmsg = "ERROR: " + errmsg
 
         for sz, sha512, ofn, lfn in files:
-            vsuf = ''
+            vsuf = ""
             if self.can_read and "fk" in vfs.flags:
                 vsuf = "?k=" + gen_filekey(
                     self.args.fk_salt,
@@ -1094,8 +1094,8 @@ class HttpCli(object):
                 )[: vfs.flags["fk"]]
 
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
-            msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a>\n'.format(
-                sha512[:56], sz, quotep(vpath) + vsuf, html_escape(ofn, crlf=True)
+            msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a> {}\n'.format(
+                sha512[:56], sz, quotep(vpath) + vsuf, html_escape(ofn, crlf=True), vsuf
             )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
@@ -1103,7 +1103,7 @@ class HttpCli(object):
                 "url": "{}://{}/{}".format(
                     "https" if self.tls else "http",
                     self.headers.get("host", "copyparty"),
-                    vpath + vsuf
+                    vpath + vsuf,
                 ),
                 "sha512": sha512[:56],
                 "sz": sz,

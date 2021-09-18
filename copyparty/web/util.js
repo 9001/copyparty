@@ -377,8 +377,16 @@ function makeSortable(table, cb) {
 
 
 function linksplit(rp) {
-    var ret = [];
-    var apath = '/';
+    var ret = [],
+        apath = '/',
+        q = null;
+
+    if (rp && rp.indexOf('?') + 1) {
+        q = rp.split('?', 2);
+        rp = q[0];
+        q = '?' + q[1];
+    }
+
     if (rp && rp.charAt(0) == '/')
         rp = rp.slice(1);
 
@@ -399,6 +407,9 @@ function linksplit(rp) {
             vlink = vlink.slice(0, -1) + '<span>/</span>';
             elink = elink.slice(0, -3) + '/';
         }
+
+        if (!rp && q)
+            elink += q;
 
         ret.push('<a href="' + apath + elink + '">' + vlink + '</a>');
         apath += elink;

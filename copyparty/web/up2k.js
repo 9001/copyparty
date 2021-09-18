@@ -1658,7 +1658,7 @@ function up2k_init(subtle) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
-                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2)).join(' ');
+                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' ');
                     }
                 }
                 if (err != "") {
