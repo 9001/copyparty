@@ -1,6 +1,7 @@
 :root {
 	--grid-sz: 10em;
 	--grid-ln: 3;
+	--nav-sz: 16em;
 }
 * {
 	line-height: 1.2em;
@@ -702,6 +703,7 @@ input.eq_gain {
 	left: 0;
 	bottom: 0;
 	top: 7em;
+	width: var(--nav-sz);
 	overflow-x: hidden;
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
@@ -796,13 +798,12 @@ input.eq_gain {
 }
 #tree.nowrap #treeul li {
 	min-height: 1.4em;
-}
-#tree.nowrap #treeul a+a {
 	white-space: nowrap;
 }
 #tree.nowrap #treeul a+a:hover {
 	background: rgba(34, 34, 34, 0.67);
-	position: fixed;
+	min-width: calc(var(--nav-sz) - 2em);
+	width: auto;
 }
 html.light #tree.nowrap #treeul a+a:hover {
 	background: rgba(255, 255, 255, 0.67);
@@ -898,6 +899,9 @@ html.light #tree.nowrap #treeul a+a:hover {
 #au_os_ctl.on+#au_osd_cv,
 #u2turbo.on+#u2tdate {
 	opacity: 1;
+}
+#wraptree.on+#hovertree {
+	display: none;
 }
 #ghead {
 	background: #3c3c3c;

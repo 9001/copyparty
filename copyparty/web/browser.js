@@ -184,6 +184,7 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
+	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +
 	'<ul id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
@@ -3013,6 +3014,7 @@ var treectl = (function () {
 		fixedpos = false,
 		prev_atop = null,
 		prev_winh = null,
+		mentered = null,
 		treesz = clamp(icfg_get('treesz', 16), 4, 50);
 
 	bcfg_bind(treectl, 'ireadme', 'ireadme', true);
@@ -3021,9 +3023,11 @@ var treectl = (function () {
 		treectl.goto(get_evpath());
 	});
 	setwrap(bcfg_bind(treectl, 'wtree', 'wraptree', true, setwrap));
+	bcfg_bind(treectl, 'htree', 'hovertree', true, reload_tree);
 
 	function setwrap(v) {
 		clmod(ebi('tree'), 'nowrap', !v);
+		reload_tree();
 	}
 
 	treectl.entree = function (e) {
@@ -3067,6 +3071,14 @@ var treectl = (function () {
 	}
 
 	function onscroll() {
+		if (mentered) {
+			mentered.style.position = '';
+			mentered = null;
+		}
+		onscroll2();
+	}
+
+	function onscroll2() {
 		if (!entreed || treectl.hidden || document.visibilityState == 'hidden')
 			return;
 
@@ -3103,7 +3115,7 @@ var treectl = (function () {
 			tree.style.height = treeh < 10 ? '' : treeh + 'px';
 		}
 	}
-	timer.add(onscroll, true);
+	timer.add(onscroll2, true);
 
 	function onresize(e) {
 		if (!entreed || treectl.hidden)
@@ -3118,9 +3130,14 @@ var treectl = (function () {
 			if (!QS(q))
 				break;
 		}
-		var w = treesz + nq;
-		ebi('tree').style.width = w + 'em';
-		ebi('wrap').style.marginLeft = w + 'em';
+		var w = (treesz + nq) + 'em';
+		try {
+			document.documentElement.style.setProperty('--nav-sz', w);
+		}
+		catch (ex) {
+			ebi('tree').style.width = w;
+		}
+		ebi('wrap').style.marginLeft = w;
 		onscroll();
 	}
 
@@ -3207,18 +3224,37 @@ var treectl = (function () {
 
 	function reload_tree() {
 		var cdir = get_evpath(),
-			links = QSA('#treeul a+a');
+			links = QSA('#treeul a+a'),
+			nowrap = QS('#tree.nowrap') && QS('#hovertree.on');
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			var href = links[a].getAttribute('href');
 			links[a].setAttribute('class', href == cdir ? 'hl' : '');
 			links[a].onclick = treego;
+			links[a].onmouseenter = nowrap ? menter : null;
+			links[a].onmouseleave = nowrap ? mleave : null;
 		}
 		links = QSA('#treeul li>a:first-child');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			links[a].setAttribute('dst', links[a].nextSibling.getAttribute('href'));
 			links[a].onclick = treegrow;
 		}
+	}
+
+	function menter(e) {
+		var p = this.offsetParent,
+			pp = p.offsetParent,
+			ppy = pp.offsetTop,
+			y = this.offsetTop + p.offsetTop + ppy - p.scrollTop - pp.scrollTop - (ppy ? document.documentElement.scrollTop : 0);
+
+		this.style.position = 'fixed';
+		this.style.top = y + 'px';
+		mentered = this;
+	}
+
+	function mleave(e) {
+		this.style.position = '';
+		mentered = null;
 	}
 
 	function treego(e) {
