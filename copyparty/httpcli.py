@@ -12,6 +12,7 @@ import string
 import socket
 import ctypes
 from datetime import datetime
+from operator import itemgetter
 import calendar
 
 try:
@@ -1533,8 +1534,9 @@ class HttpCli(object):
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)
 
-        if "edit" in self.uparam or "edit2" in self.uparam and not self.can_write:
-            return self.tx_404()
+        if not self.can_write:
+            if "edit" in self.uparam or "edit2" in self.uparam:
+                return self.tx_404()
 
         tpl = "mde" if "edit2" in self.uparam else "md"
         html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
@@ -2148,6 +2150,11 @@ class HttpCli(object):
             ret = json.dumps(ls_ret)
             self.reply(ret.encode("utf-8", "replace"), mime="application/json")
             return True
+
+        for d in dirs:
+            d["name"] += "/"
+
+        dirs.sort(key=itemgetter('name'))
 
         j2a["files"] = dirs + files
         j2a["logues"] = logues
