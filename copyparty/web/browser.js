@@ -3015,7 +3015,7 @@ var treectl = (function () {
 		prev_atop = null,
 		prev_winh = null,
 		mentered = null,
-		treesz = clamp(icfg_get('treesz', 16), 4, 50);
+		treesz = clamp(icfg_get('treesz', 16), 8, 50);
 
 	bcfg_bind(treectl, 'ireadme', 'ireadme', true);
 	bcfg_bind(treectl, 'dyn', 'dyntree', true, onresize);
@@ -3126,7 +3126,7 @@ var treectl = (function () {
 			return;
 
 		var q = '#tree',
-			nq = 0;
+			nq = -3;
 
 		while (treectl.dyn) {
 			nq++;
@@ -3134,7 +3134,7 @@ var treectl = (function () {
 			if (!QS(q))
 				break;
 		}
-		var w = (treesz + nq) + 'em';
+		var w = (treesz + Math.max(0, nq)) + 'em';
 		try {
 			document.documentElement.style.setProperty('--nav-sz', w);
 		}
@@ -3434,6 +3434,7 @@ var treectl = (function () {
 		if (isNaN(treesz))
 			treesz = 16;
 
+		treesz = clamp(treesz, 2, 120);
 		swrite('treesz', treesz);
 		onresize();
 	}
