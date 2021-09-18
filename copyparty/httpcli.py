@@ -230,6 +230,9 @@ class HttpCli(object):
 
         self.do_log = not self.conn.lf_url or not self.conn.lf_url.search(self.req)
 
+        x = self.asrv.vfs.can_access(self.vpath, self.uname)
+        self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
+
         try:
             if self.mode in ["GET", "HEAD"]:
                 return self.handle_get() and self.keepalive
@@ -380,8 +383,6 @@ class HttpCli(object):
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
-        x = self.asrv.vfs.can_access(self.vpath, self.uname)
-        self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
         if not self.can_read and not self.can_write and not self.can_get:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
@@ -1083,9 +1084,18 @@ class HttpCli(object):
             errmsg = "ERROR: " + errmsg
 
         for sz, sha512, ofn, lfn in files:
+            vsuf = ''
+            if self.can_read and "fk" in vfs.flags:
+                vsuf = "?k=" + gen_filekey(
+                    self.args.fk_salt,
+                    abspath,
+                    sz,
+                    0 if ANYWIN else bos.stat(os.path.join(vfs.realpath, lfn)).st_ino,
+                )[: vfs.flags["fk"]]
+
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
             msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a>\n'.format(
-                sha512[:56], sz, quotep(vpath), html_escape(ofn, crlf=True)
+                sha512[:56], sz, quotep(vpath) + vsuf, html_escape(ofn, crlf=True)
             )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
@@ -1093,13 +1103,13 @@ class HttpCli(object):
                 "url": "{}://{}/{}".format(
                     "https" if self.tls else "http",
                     self.headers.get("host", "copyparty"),
-                    vpath,
+                    vpath + vsuf
                 ),
                 "sha512": sha512[:56],
                 "sz": sz,
                 "fn": lfn,
                 "fn_orig": ofn,
-                "path": vpath,
+                "path": vpath + vsuf,
             }
             jmsg["files"].append(jpart)
 
