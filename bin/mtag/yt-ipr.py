@@ -17,7 +17,7 @@ it's probably best to use this through a config file; see res/yt-ipr.conf
 
 but if you want to use plain arguments instead then:
   -v srv/ytm:ytm:w:rw,ed
-       :c,e2ts:c,e2dsa
+       :c,e2ts,e2dsa
        :c,sz=16k-1m:c,maxn=10,300:c,rotf=%Y-%m/%d-%H
        :c,mtp=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-manifest,yt-expires=bin/mtag/yt-ipr.py
        :c,mte=yt-id,yt-title,yt-author,yt-channel,yt-views,yt-private,yt-manifest,yt-expires

@@ -6,7 +6,7 @@ application/x-www-form-urlencoded (for example using the
 message/pager function on the website)
 
 example copyparty config to use this:
-  --urlform save,get -vsrv/wget:wget:rwmd,ed:c,e2ts:c,mtp=title=ebin,t300,ad,bin/mtag/wget.py
+  --urlform save,get -vsrv/wget:wget:rwmd,ed:c,e2ts,mtp=title=ebin,t300,ad,bin/mtag/wget.py
 
 explained:
   for realpath srv/wget (served at /wget) with read-write-modify-delete for ed,

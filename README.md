@@ -583,12 +583,12 @@ through arguments:
 * `-e2tsr` also deletes all existing tags, doing a full reindex
 
 the same arguments can be set as volume flags, in addition to `d2d` and `d2t` for disabling:
-* `-v ~/music::r:c,e2dsa:c,e2tsr` does a full reindex of everything on startup
+* `-v ~/music::r:c,e2dsa,e2tsr` does a full reindex of everything on startup
 * `-v ~/music::r:c,d2d` disables **all** indexing, even if any `-e2*` are on
 * `-v ~/music::r:c,d2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 
 note:
-* the parser currently can't handle `c,e2dsa,e2tsr` so you have to `c,e2dsa:c,e2tsr`
+* the parser can finally handle `c,e2dsa,e2tsr` so you no longer have to `c,e2dsa:c,e2tsr`
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
@@ -746,7 +746,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **w3m** (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
 | **netsurf** (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
 | **opera** (11.60/winxp)   | OK: thumbnails, image-viewer, zip-selection, rename/cut/paste. NG: up2k, navpane, markdown, audio |
-| **ie4** and **netscape** 4.0  | can browse (text is yellow on white), upload with `?b=u` |
+| **ie4** and **netscape** 4.0  | can browse, upload with `?b=u` |
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 
 

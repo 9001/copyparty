@@ -579,9 +579,17 @@ class AuthSrv(object):
             raise Exception("invalid volume flag: {},{}".format(lvl, uname))
 
         if lvl == "c":
-            cval = True
-            if "=" in uname:
+            try:
+                # volume flag with arguments, possibly with a preceding list of bools
                 uname, cval = uname.split("=", 1)
+            except:
+                # just one or more bools
+                cval = True
+
+            while "," in uname:
+                # one or more bools before the final flag; eat them
+                n1, uname = uname.split(",", 1)
+                self._read_volflag(flags, n1, True, False)
 
             self._read_volflag(flags, uname, cval, False)
             return
