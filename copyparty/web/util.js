@@ -494,6 +494,11 @@ function get_vpath() {
 }
 
 
+function noq_href(el) {
+    return el.getAttribute('href').split('?')[0];
+}
+
+
 function get_pwd() {
     var pwd = ('; ' + document.cookie).split('; cppwd=');
     if (pwd.length < 2)

@@ -368,7 +368,7 @@ var mpl = (function () {
 
 			for (var a = 0, aa = files.length; a < aa; a++) {
 				if (/^(cover|folder)\.(jpe?g|png|gif)$/.test(files[a].textContent)) {
-					cover = files[a].getAttribute('href');
+					cover = noq_href(files[a]);
 					break;
 				}
 			}
@@ -427,7 +427,7 @@ function MPlayer() {
 			link = tds[1].getElementsByTagName('a');
 
 		link = link[link.length - 1];
-		var url = link.getAttribute('href'),
+		var url = noq_href(link),
 			m = re_audio.exec(url);
 
 		if (m) {
@@ -2157,7 +2157,7 @@ var fileman = (function () {
 			links = QSA('#files tbody td:nth-child(2) a');
 
 		for (var a = 0, aa = links.length; a < aa; a++)
-			indir.push(vsplit(links[a].getAttribute('href'))[1]);
+			indir.push(vsplit(noq_href(links[a]))[1]);
 
 		for (var a = 0; a < r.clip.length; a++) {
 			var found = false;
@@ -2350,7 +2350,7 @@ var thegrid = (function () {
 			return true;
 
 		var oth = ebi(this.getAttribute('ref')),
-			href = this.getAttribute('href'),
+			href = noq_href(this),
 			aplay = ebi('a' + oth.getAttribute('id')),
 			is_img = /\.(gif|jpe?g|png|webp|webm|mp4)(\?|$)/i.test(href),
 			in_tree = null,
@@ -2358,7 +2358,7 @@ var thegrid = (function () {
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if (/\/(\?|$)/.test(href)) {
+		if (href.endsWith('/')) {
 			var ta = QSA('#treeul a.hl+ul>li>a+a'),
 				txt = oth.textContent.slice(0, -1);
 
@@ -2397,7 +2397,7 @@ var thegrid = (function () {
 			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
 				cl = tr.getAttribute('class') || '';
 
-			if (ths[a].getAttribute('href').endsWith('/'))
+			if (noq_href(ths[a]).endsWith('/'))
 				cl += ' dir';
 
 			ths[a].setAttribute('class', cl);
@@ -2461,15 +2461,16 @@ var thegrid = (function () {
 		var files = QSA('#files>tbody>tr>td:nth-child(2) a[id]');
 		for (var a = 0, aa = files.length; a < aa; a++) {
 			var ao = files[a],
-				href = esc(ao.getAttribute('href')),
+				ohref = esc(ao.getAttribute('href')),
+				href = ohref.split('?')[0],
 				name = uricom_dec(vsplit(href)[1])[0],
 				ref = ao.getAttribute('id'),
-				isdir = href.split('?')[0].slice(-1)[0] == '/',
+				isdir = href.endsWith('/'),
 				ac = isdir ? ' class="dir"' : '',
 				ihref = href;
 
 			if (r.thumbs) {
-				ihref += (ihref.indexOf('?') === -1 ? '?' : '&') + 'th=' + (have_webp ? 'w' : 'j');
+				ihref += '?th=' + (have_webp ? 'w' : 'j');
 				if (href == "#")
 					ihref = '/.cpr/ico/⏏️';
 			}
@@ -2477,7 +2478,7 @@ var thegrid = (function () {
 				ihref = '/.cpr/ico/folder';
 			}
 			else {
-				var ar = href.split('?')[0].split('.');
+				var ar = href.split('.');
 				if (ar.length > 1)
 					ar = ar.slice(1);
 
@@ -2495,7 +2496,7 @@ var thegrid = (function () {
 				ihref = '/.cpr/ico/' + ihref.slice(0, -1);
 			}
 
-			html.push('<a href="' + href + '" ref="' + ref +
+			html.push('<a href="' + ohref + '" ref="' + ref +
 				'"' + ac + ' ttt="' + esc(name) + '"><img src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
@@ -3015,7 +3016,7 @@ var treectl = (function () {
 		prev_atop = null,
 		prev_winh = null,
 		mentered = null,
-		treesz = clamp(icfg_get('treesz', 16), 8, 50);
+		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
 	bcfg_bind(treectl, 'ireadme', 'ireadme', true);
 	bcfg_bind(treectl, 'dyn', 'dyntree', true, onresize);
@@ -3138,9 +3139,8 @@ var treectl = (function () {
 		try {
 			document.documentElement.style.setProperty('--nav-sz', w);
 		}
-		catch (ex) {
-			ebi('tree').style.width = w;
-		}
+		catch (ex) { }
+		ebi('tree').style.width = w;
 		ebi('wrap').style.marginLeft = w;
 		onscroll();
 	}
@@ -3983,7 +3983,7 @@ var msel = (function () {
 			vbase = get_evpath();
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = links[a].getAttribute('href').replace(/\/$/, ""),
+			var href = noq_href(links[a]).replace(/\/$/, ""),
 				item = {};
 
 			item.id = links[a].getAttribute('id');
@@ -4129,8 +4129,8 @@ if (readme)
 		for (var a = 0; a < tr.length; a++) {
 			var td = tr[a].cells[1],
 				ao = td.firstChild,
-				href = ao.getAttribute('href'),
-				isdir = href.split('?')[0].slice(-1)[0] == '/',
+				href = noq_href(ao),
+				isdir = href.endsWith('/'),
 				txt = ao.textContent;
 
 			td.setAttribute('sortv', (isdir ? '\t' : '') + txt);

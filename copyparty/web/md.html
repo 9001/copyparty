@@ -15,7 +15,7 @@
 		<a id="lightswitch" href="#">go dark</a>
 		<a id="navtoggle" href="#">hide nav</a>
 		{%- if edit %}
-			<a id="save" href="?edit" tt="Hotkey: ctrl-s">save</a>
+			<a id="save" href="{{ arg_base }}edit" tt="Hotkey: ctrl-s">save</a>
 			<a id="sbs" href="#" tt="editor and preview side by side">sbs</a>
 			<a id="nsbs" href="#" tt="switch between editor and preview$NHotkey: ctrl-e">editor</a>
 			<div id="toolsbox">
@@ -28,9 +28,9 @@
 			</div>
 			<span id="lno">L#</span>
 		{%- else %}
-			<a href="?edit" tt="good: higher performance$Ngood: same document width as viewer$Nbad: assumes you know markdown">edit (basic)</a>
-			<a href="?edit2" tt="not in-house so probably less buggy">edit (fancy)</a>
-			<a href="?raw">view raw</a>
+			<a href="{{ arg_base }}edit" tt="good: higher performance$Ngood: same document width as viewer$Nbad: assumes you know markdown">edit (basic)</a>
+			<a href="{{ arg_base }}edit2" tt="not in-house so probably less buggy">edit (fancy)</a>
+			<a href="{{ arg_base }}raw">view raw</a>
 		{%- endif %}
 	</div>
 	<div id="toc"></div>

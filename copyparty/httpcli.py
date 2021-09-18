@@ -1533,6 +1533,9 @@ class HttpCli(object):
     def tx_md(self, fs_path):
         logmsg = "{:4} {} ".format("", self.req)
 
+        if "edit" in self.uparam or "edit2" in self.uparam and not self.can_write:
+            return self.tx_404()
+
         tpl = "mde" if "edit2" in self.uparam else "md"
         html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
         template = self.j2(tpl)
@@ -1555,6 +1558,10 @@ class HttpCli(object):
         self.out_headers.update(NO_CACHE)
         status = 200 if do_send else 304
 
+        arg_base = "?"
+        if "k" in self.uparam:
+            arg_base = "?k={}&".format(self.uparam["k"])
+
         boundary = "\roll\tide"
         targs = {
             "edit": "edit" in self.uparam,
@@ -1564,6 +1571,7 @@ class HttpCli(object):
             "md_chk_rate": self.args.mcr,
             "md": boundary,
             "ts": self.conn.hsrv.cachebuster(),
+            "arg_base": arg_base,
         }
         html = template.render(**targs).encode("utf-8", "replace")
         html = html.split(boundary.encode("utf-8"))
