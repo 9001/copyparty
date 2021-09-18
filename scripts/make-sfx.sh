@@ -206,6 +206,15 @@ while IFS= read -r x; do
 	tmv "$x"
 done
 
+find copyparty | LC_ALL=C sort | sed 's/\.gz$//;s/$/,/' > have
+cat have | while IFS= read -r x; do
+	grep -qF -- "$x" ../scripts/sfx.ls || {
+		echo "unexpected file: $x"
+		exit 1
+	}
+done
+rm have
+
 [ $no_ogv ] &&
 	rm -rf copyparty/web/deps/{dynamicaudio,ogv}*
 

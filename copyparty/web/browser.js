@@ -3070,11 +3070,15 @@ var treectl = (function () {
 		window.removeEventListener('scroll', onscroll);
 	}
 
-	function onscroll() {
+	function unmenter() {
 		if (mentered) {
 			mentered.style.position = '';
 			mentered = null;
 		}
+	}
+
+	function onscroll() {
+		unmenter();
 		onscroll2();
 	}
 
@@ -3239,6 +3243,7 @@ var treectl = (function () {
 			links[a].setAttribute('dst', links[a].nextSibling.getAttribute('href'));
 			links[a].onclick = treegrow;
 		}
+		ebi('tree').onscroll = nowrap ? unmenter : null;
 	}
 
 	function menter(e) {
@@ -3247,8 +3252,8 @@ var treectl = (function () {
 			ppy = pp.offsetTop,
 			y = this.offsetTop + p.offsetTop + ppy - p.scrollTop - pp.scrollTop - (ppy ? document.documentElement.scrollTop : 0);
 
-		this.style.position = 'fixed';
 		this.style.top = y + 'px';
+		this.style.position = 'fixed';
 		mentered = this;
 	}
 

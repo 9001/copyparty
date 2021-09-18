@@ -237,7 +237,7 @@ some improvement ideas
 "frequently" asked questions
 
 * is it possible to block read-access to folders unless you know the exact URL for a particular file inside?
-  * no / not yet; current recommendation is to use nginx to provide the read-access, and only use copyparty for the other stuff (write-only or full read-access for other users)
+  * yes, using the [`g` permission](#accounts-and-volumes), see the examples there
 
 * can I make copyparty download a file to my server if I give it a URL?
   * not officially, but there is a [terrible hack](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/wget.py) which makes it possible
@@ -268,6 +268,10 @@ examples:
   * unauthorized users accessing the webroot can see that the `inc` folder exists, but cannot open it
   * `u1` can open the `inc` folder, but cannot see the contents, only upload new files to it
   * `u2` can browse it and move files *from* `/inc` into any folder where `u2` has write-access
+* make folder `/mnt/ss` available at `/i`, read-write for u1, get-only for everyone else, and enable accesskeys: `-v /mnt/ss:i:rw,u1:g:c,fk=4`
+  * `c,fk=4` sets the `fk` volume-flag to 4, meaning each file gets a 4-character accesskey
+  * `u1` can upload files, browse the folder, and see the generated accesskeys
+  * other users cannot browse the folder, but can access the files if they have the full file URL with the accesskey
 
 
 # the browser

@@ -4,7 +4,8 @@ set -e
 
 # install dependencies for audio-*.py
 #
-# linux: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} vamp-sdk-dev patchelf
+# linux/alpine: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} vamp-sdk-dev patchelf cmake
+# linux/debian: requires libav{codec,device,filter,format,resample,util}-dev {libfftw3,python3}-dev python3-{numpy,pip} vamp-{plugin-sdk,examples} patchelf cmake
 # win64: requires msys2-mingw64 environment
 # macos: requires macports
 #
