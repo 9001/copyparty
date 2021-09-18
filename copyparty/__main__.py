@@ -216,10 +216,10 @@ def run_argparse(argv, formatter):
                 """
             -a takes username:password,
             -v takes src:dst:perm1:perm2:permN:volflag1:volflag2:volflagN:...
-               where "perm" is "accesslevels,username1,username2,..."
+               where "perm" is "permissions,username1,username2,..."
                and "volflag" is config flags to set on this volume
             
-            list of accesslevels:
+            list of permissions:
               "r" (read):   list folder contents, download files
               "w" (write):  upload files; need "r" to see the uploads
               "m" (move):   move files and folders; need "w" at destination
@@ -288,7 +288,7 @@ def run_argparse(argv, formatter):
             
             \033[0mothers:
               \033[36mfk=8\033[35m generates per-file accesskeys,
-                which will then be required at the "g" accesslevel
+                which will then be required at the "g" permission
             \033[0m"""
             ),
         ],

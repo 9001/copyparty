@@ -87,7 +87,7 @@ some recommended options:
 * `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies)
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
-  * see [accounts and volumes](#accounts-and-volumes) for the syntax and other access levels (`r`ead, `w`rite, `m`ove, `d`elete)
+  * see [accounts and volumes](#accounts-and-volumes) for the syntax and other permissions (`r`ead, `w`rite, `m`ove, `d`elete, `g`et)
 * `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access
 
 
@@ -840,7 +840,7 @@ on public copyparty instances with anonymous upload enabled:
 
 other misc:
 
-* you can disable directory listings by giving accesslevel `g` instead of `r`, only accepting direct URLs to files
+* you can disable directory listings by giving permission `g` instead of `r`, only accepting direct URLs to files
   * combine this with volume-flag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
 
 
