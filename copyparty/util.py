@@ -508,8 +508,8 @@ class MultipartParser(object):
         self.log = log_func
         self.headers = http_headers
 
-        self.re_ctype = re.compile(r"^content-type: *([^;]+)", re.IGNORECASE)
-        self.re_cdisp = re.compile(r"^content-disposition: *([^;]+)", re.IGNORECASE)
+        self.re_ctype = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
+        self.re_cdisp = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
         self.re_cdisp_field = re.compile(
             r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
         )
@@ -708,7 +708,7 @@ class MultipartParser(object):
 def get_boundary(headers):
     # boundaries contain a-z A-Z 0-9 ' ( ) + _ , - . / : = ?
     # (whitespace allowed except as the last char)
-    ptn = r"^multipart/form-data; *(.*; *)?boundary=([^;]+)"
+    ptn = r"^multipart/form-data *; *(.*; *)?boundary=([^;]+)"
     ct = headers["content-type"]
     m = re.match(ptn, ct, re.IGNORECASE)
     if not m:
