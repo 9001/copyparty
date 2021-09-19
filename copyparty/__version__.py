@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 0, 4)
+VERSION = (1, 0, 5)
 CODENAME = "sufficient"
 BUILD_DT = (2021, 9, 19)
 
