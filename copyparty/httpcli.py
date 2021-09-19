@@ -1032,7 +1032,7 @@ class HttpCli(object):
                             bos.unlink(abspath)
                             raise
 
-                    files.append([sz, sha512_hex, p_file, fname])
+                    files.append([sz, sha512_hex, p_file, fname, abspath])
                     dbv, vrem = vfs.get_dbv(rem)
                     self.conn.hsrv.broker.put(
                         False,
@@ -1084,14 +1084,14 @@ class HttpCli(object):
             jmsg["error"] = errmsg
             errmsg = "ERROR: " + errmsg
 
-        for sz, sha512, ofn, lfn in files:
+        for sz, sha512, ofn, lfn, ap in files:
             vsuf = ""
             if self.can_read and "fk" in vfs.flags:
                 vsuf = "?k=" + gen_filekey(
                     self.args.fk_salt,
                     abspath,
                     sz,
-                    0 if ANYWIN else bos.stat(os.path.join(vfs.realpath, lfn)).st_ino,
+                    0 if ANYWIN or not ap else bos.stat(ap).st_ino,
                 )[: vfs.flags["fk"]]
 
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")

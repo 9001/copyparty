@@ -60,7 +60,7 @@ class Cpp(object):
                 pass
 
 
-def tc1():
+def tc1(vflags):
     ub = "http://127.0.0.1:4321/"
     td = os.path.join("srv", "smoketest")
     try:
@@ -100,17 +100,17 @@ def tc1():
     for d1 in ["r", "w", "a"]:
         pdirs.append("{}/{}".format(td, d1))
         pdirs.append("{}/{}/j".format(td, d1))
-        for d2 in ["r", "w", "a"]:
+        for d2 in ["r", "w", "a", "c"]:
             d = os.path.join(td, d1, "j", d2)
             pdirs.append(d)
             os.makedirs(d)
 
     pdirs = [x.replace("\\", "/") for x in pdirs]
     udirs = [x.split("/", 2)[2] for x in pdirs]
-    perms = [x.rstrip("j/")[-1] for x in pdirs]
+    perms = [x.rstrip("cj/")[-1] for x in pdirs]
     perms = ["rw" if x == "a" else x for x in perms]
     for pd, ud, p in zip(pdirs, udirs, perms):
-        if ud[-1] == "j":
+        if ud[-1] == "j" or ud[-1] == "c":
             continue
 
         hp = None
@@ -123,29 +123,37 @@ def tc1():
             hp = "-"
             hpaths[ud] = os.path.join(pd, ".hist")
 
-        arg = "{}:{}:{}".format(pd, ud, p, hp)
+        arg = "{}:{}:{}".format(pd, ud, p)
         if hp:
             arg += ":c,hist=" + hp
 
-        args += ["-v", arg]
+        args += ["-v", arg + vflags]
 
     # return
     cpp = Cpp(args)
     CPP.append(cpp)
     cpp.await_idle(ub, 3)
 
-    for d in udirs:
+    for d, p in zip(udirs, perms):
         vid = ovid + "\n{}".format(d).encode("utf-8")
-        try:
-            requests.post(ub + d, data={"act": "bput"}, files={"f": ("a.h264", vid)})
-        except:
-            pass
+        r = requests.post(
+            ub + d,
+            data={"act": "bput"},
+            files={"f": (d.replace("/", "") + ".h264", vid)},
+        )
+        c = r.status_code
+        if c == 200 and p not in ["w", "rw"]:
+            raise Exception("post {} with perm {} at {}".format(c, p, d))
+        elif c == 403 and p not in ["r"]:
+            raise Exception("post {} with perm {} at {}".format(c, p, d))
+        elif c not in [200, 403]:
+            raise Exception("post {} with perm {} at {}".format(c, p, d))
 
     cpp.clean()
 
     # GET permission
     for d, p in zip(udirs, perms):
-        u = "{}{}/a.h264".format(ub, d)
+        u = "{}{}/{}.h264".format(ub, d, d.replace("/", ""))
         r = requests.get(u)
         ok = bool(r)
         if ok != (p in ["rw"]):
@@ -153,14 +161,14 @@ def tc1():
 
     # stat filesystem
     for d, p in zip(pdirs, perms):
-        u = "{}/a.h264".format(d)
+        u = "{}/{}.h264".format(d, d.split("test/")[-1].replace("/", ""))
         ok = os.path.exists(u)
         if ok != (p in ["rw", "w"]):
             raise Exception("stat {} with perm {} at {}".format(ok, p, u))
 
     # GET thumbnail, vreify contents
     for d, p in zip(udirs, perms):
-        u = "{}{}/a.h264?th=j".format(ub, d)
+        u = "{}{}/{}.h264?th=j".format(ub, d, d.replace("/", ""))
         r = requests.get(u)
         ok = bool(r and r.content[:3] == b"\xff\xd8\xff")
         if ok != (p in ["rw"]):
@@ -192,9 +200,9 @@ def tc1():
     cpp.stop(True)
 
 
-def run(tc):
+def run(tc, *a):
     try:
-        tc()
+        tc(*a)
     finally:
         try:
             CPP[0].stop(False)
@@ -203,7 +211,8 @@ def run(tc):
 
 
 def main():
-    run(tc1)
+    run(tc1, "")
+    run(tc1, ":c,fk")
 
 
 if __name__ == "__main__":

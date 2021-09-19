@@ -375,7 +375,7 @@ def stackmon(fp, ival, suffix):
 
 
 def start_log_thrs(logger, ival, nid):
-    ival = int(ival)
+    ival = float(ival)
     tname = lname = "log-thrs"
     if nid:
         tname = "logthr-n{}-i{:x}".format(nid, os.getpid())

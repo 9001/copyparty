@@ -205,6 +205,8 @@ class SvcHub(object):
         if self.stopping:
             return
 
+        # start_log_thrs(print, 0.1, 1)
+
         self.stopping = True
         self.stop_req = True
         with self.stop_cond:
