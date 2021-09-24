@@ -1112,6 +1112,9 @@ class Up2k(object):
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
+                    if job and (dp_dir != cj["prel"] or dp_fn != cj["name"]):
+                        continue
+
                     dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
                     # relying on path.exists to return false on broken symlinks
                     if bos.path.exists(dp_abs):
@@ -1127,7 +1130,6 @@ class Up2k(object):
                             "hash": [],
                             "need": [],
                         }
-                        break
 
                 if job and wark in reg:
                     del reg[wark]
