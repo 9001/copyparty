@@ -1370,7 +1370,7 @@ function up2k_init(subtle) {
                     pvis.move(t.n, 'ng');
                     apop(st.busy.hash, t);
                     st.bytes.finished += t.size;
-                    return tasker();
+                    return;
                 }
 
                 toast.err(0, 'y o u   b r o k e    i t\nfile: ' + esc(t.name + '') + '\nerror: ' + err);
@@ -1446,7 +1446,6 @@ function up2k_init(subtle) {
             console.log('head onerror, retrying', t);
             apop(st.busy.head, t);
             st.todo.head.unshift(t);
-            tasker();
         };
         function orz(e) {
             var ok = false;
@@ -1511,7 +1510,6 @@ function up2k_init(subtle) {
             apop(st.busy.handshake, t);
             st.todo.handshake.unshift(t);
             t.keepalive = keepalive;
-            tasker();
         };
         function orz(e) {
             if (t.t_busied != me) {
@@ -1705,7 +1703,8 @@ function up2k_init(subtle) {
         st.busy.upload.push(upt);
 
         var npart = upt.npart,
-            t = st.files[upt.nfile];
+            t = st.files[upt.nfile],
+            tries = 0;
 
         if (!t.t_uploading)
             t.t_uploading = Date.now();
@@ -1756,8 +1755,9 @@ function up2k_init(subtle) {
                 if (crashed)
                     return;
 
-                console.log('chunkpit onerror, retrying', t);
-                do_send();
+                toast.err(9, "failed to upload a chunk,\n" + tries + " retries so far -- retrying in 10sec\n\n" + t.name);
+                console.log('chunkpit onerror,', ++tries, t);
+                setTimeout(do_send, 10 * 1000);
             };
             xhr.open('POST', t.purl, true);
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
