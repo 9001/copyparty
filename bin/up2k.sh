@@ -8,7 +8,7 @@ set -e
 ##
 ## config
 
-datalen=$((2*1024*1024*1024))
+datalen=$((128*1024*1024))
 target=127.0.0.1
 posturl=/inc
 passwd=wark
@@ -37,10 +37,10 @@ gendata() {
 # pipe a chunk, get the base64 checksum
 gethash() {
     printf $(
-        sha512sum | cut -c-64 |
+        sha512sum | cut -c-66 |
         sed -r 's/ .*//;s/(..)/\\x\1/g'
     ) |
-    base64 -w0 | cut -c-43 |
+    base64 -w0 | cut -c-44 |
     tr '+/' '-_'
 }
 
@@ -123,7 +123,7 @@ printf '\033[36m'
 {
     {
         cat <<EOF
-POST $posturl/handshake.php HTTP/1.1
+POST $posturl/ HTTP/1.1
 Connection: Close
 Cookie: cppwd=$passwd
 Content-Type: text/plain;charset=UTF-8
@@ -145,14 +145,16 @@ printf '\033[0m\nwark: %s\n' $wark
 ##
 ## wait for signal to continue
 
-w8=/dev/shm/$salt.w8
-touch $w8
+true || {
+    w8=/dev/shm/$salt.w8
+    touch $w8
 
-echo "ready;  rm -f $w8"
+    echo "ready;  rm -f $w8"
 
-while [ -e $w8 ]; do
-    sleep 0.2
-done
+    while [ -e $w8 ]; do
+        sleep 0.2
+    done
+}
 
 
 ##
@@ -175,7 +177,7 @@ while [ $remains -gt 0 ]; do
     
     {
         cat <<EOF
-POST $posturl/chunkpit.php HTTP/1.1
+POST $posturl/ HTTP/1.1
 Connection: Keep-Alive
 Cookie: cppwd=$passwd
 Content-Type: application/octet-stream
