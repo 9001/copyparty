@@ -19,7 +19,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 ## readme toc
 
 * top
-    * **[quickstart](#quickstart)** - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
+    * [quickstart](#quickstart) - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
         * [on servers](#on-servers) - you may also want these, especially on servers
         * [on debian](#on-debian) - recommended additional steps on debian
     * [notes](#notes) - general notes
@@ -61,6 +61,9 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
 * [security](#security) - some notes on hardening
     * [gotchas](#gotchas) - behavior that might be unexpected
+* [recovering from crashes](#recovering-from-crashes)
+    * [client crashes](#client-crashes)
+        * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
@@ -433,7 +436,7 @@ and then theres the tabs below it,
   * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
-note that since up2k has to read each file twice, `[🎈 bup]` can *theoretically* be up to 2x faster in some extreme cases (files bigger than your ram, combined with an internet connection faster than the read-speed of your HDD)
+note that since up2k has to read each file twice, `[🎈 bup]` can *theoretically* be up to 2x faster in some extreme cases (files bigger than your ram, combined with an internet connection faster than the read-speed of your HDD, or if you're uploading from a cuo2duo)
 
 if you are resuming a massive upload and want to skip hashing the files which already finished, you can enable `turbo` in the `[⚙️] config` tab, but please read the tooltip on that button
 
@@ -849,6 +852,26 @@ other misc:
 behavior that might be unexpected
 
 * users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
+
+
+# recovering from crashes
+
+## client crashes
+
+### frefox wsod
+
+firefox 87 can crash during uploads  -- the entire browser goes, including all other browser tabs, everything turns white
+
+however you can hit `F12` in the up2k tab and use the devtools to see how far you got in the uploads:
+
+* get a complete list of all uploads, organized by statuts (ok / no-good / busy / queued):  
+  `var tabs = { ok:[], ng:[], bz:[], q:[] }; for (var a of up2k.ui.tab) tabs[a.in].push(a); tabs`
+
+* list of filenames which failed:  
+  `​var ng = []; for (var a of up2k.ui.tab) if (a.in == 'ng') ng.push(a.hn.split('<a href=\"').slice(-1)[0].split('\">')[0]); ng`
+
+* send the list of filenames to copyparty for safekeeping:  
+  `await fetch('/inc', {method:'PUT', body:JSON.stringify(ng,null,1)})`
 
 
 # dependencies
