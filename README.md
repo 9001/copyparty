@@ -868,7 +868,7 @@ however you can hit `F12` in the up2k tab and use the devtools to see how far yo
   `var tabs = { ok:[], ng:[], bz:[], q:[] }; for (var a of up2k.ui.tab) tabs[a.in].push(a); tabs`
 
 * list of filenames which failed:  
-  `​var ng = []; for (var a of up2k.ui.tab) if (a.in == 'ng') ng.push(a.hn.split('<a href=\"').slice(-1)[0].split('\">')[0]); ng`
+  `​var ng = []; for (var a of up2k.ui.tab) if (a.in != 'ok') ng.push(a.hn.split('<a href=\"').slice(-1)[0].split('\">')[0]); ng`
 
 * send the list of filenames to copyparty for safekeeping:  
   `await fetch('/inc', {method:'PUT', body:JSON.stringify(ng,null,1)})`
