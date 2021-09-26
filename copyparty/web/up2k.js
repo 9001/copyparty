@@ -1081,11 +1081,6 @@ function up2k_init(subtle) {
             st.busy.handshake.length)
             return false;
 
-        if (st.busy.handshake.length)
-            for (var n = t.n - 1; n >= t.n - parallel_uploads && n >= 0; n--)
-                if (st.files[n].t_uploading)
-                    return false;
-
         if ((uc.multitask ? 1 : 0) <
             st.todo.upload.length +
             st.busy.upload.length)
@@ -1137,6 +1132,17 @@ function up2k_init(subtle) {
                         st.busy.hash.length +
                         st.busy.handshake.length +
                         st.busy.upload.length;
+
+                if (was_busy && !is_busy) {
+                    for (var a = 0; a < st.files.length; a++) {
+                        var t = st.files[a];
+                        if (t.want_recheck) {
+                            t.want_recheck = false;
+                            push_t(st.todo.handshake, t);
+                        }
+                    }
+                    is_busy = st.todo.handshake.length;
+                }
 
                 if (was_busy != is_busy) {
                     was_busy = is_busy;
@@ -1467,6 +1473,7 @@ function up2k_init(subtle) {
             }
 
             t.done = true;
+            t.fobj = null;
             st.bytes.hashed += t.size;
             st.bytes.finished += t.size;
             pvis.move(t.n, 'bz');
@@ -1551,6 +1558,7 @@ function up2k_init(subtle) {
                     apop(st.busy.handshake, t);
                     st.bytes.finished += t.size;
                     t.done = true;
+                    t.fobj = null;
                     tasker();
                     return;
                 }
@@ -1617,6 +1625,7 @@ function up2k_init(subtle) {
 
                 if (done) {
                     t.done = true;
+                    t.fobj = null;
                     st.bytes.finished += t.size - t.bytes_uploaded;
                     var spd1 = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.),
                         spd2 = (t.size / ((t.t_uploaded - t.t_uploading) / 1000.)) / (1024 * 1024.);
@@ -1651,12 +1660,18 @@ function up2k_init(subtle) {
                 }
 
                 st.bytes.finished += t.size;
-                if (rsp.indexOf('partial upload exists') !== -1 ||
-                    rsp.indexOf('file already exists') !== -1) {
+                var err_pend = rsp.indexOf('partial upload exists') + 1,
+                    err_dupe = rsp.indexOf('file already exists') + 1;
+
+                if (err_pend || err_dupe) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
                         err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' ');
+                    }
+                    if (!t.rechecks && err_pend) {
+                        t.rechecks = 0;
+                        t.want_recheck = true;
                     }
                 }
                 if (err != "") {
@@ -1755,7 +1770,7 @@ function up2k_init(subtle) {
                 if (crashed)
                     return;
 
-                toast.err(9, "failed to upload a chunk,\n" + tries + " retries so far -- retrying in 10sec\n\n" + t.name);
+                toast.err(9.98, "failed to upload a chunk,\n" + tries + " retries so far -- retrying in 10sec\n\n" + t.name);
                 console.log('chunkpit onerror,', ++tries, t);
                 setTimeout(do_send, 10 * 1000);
             };

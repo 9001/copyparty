@@ -66,6 +66,7 @@ class Up2k(object):
         self.n_tagq = 0
         self.volstate = {}
         self.need_rescan = {}
+        self.dupesched = {}
         self.registry = {}
         self.entags = {}
         self.flags = {}
@@ -1121,8 +1122,14 @@ class Up2k(object):
                         continue
 
                     dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
-                    # relying on path.exists to return false on broken symlinks
-                    if bos.path.exists(dp_abs):
+                    # relying on this to fail on broken symlinks
+                    try:
+                        sz = bos.path.getsize(dp_abs)
+                    except:
+                        sz = 0
+
+                    if sz:
+                        # self.log("--- " + wark + "  " + dp_abs + " found file", 4)
                         job = {
                             "name": dp_fn,
                             "prel": dp_dir,
@@ -1137,6 +1144,7 @@ class Up2k(object):
                         }
 
                 if job and wark in reg:
+                    # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
                     del reg[wark]
 
             if job or wark in reg:
@@ -1165,7 +1173,15 @@ class Up2k(object):
                         self.log("unfinished:\n  {0}\n  {1}".format(src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += "/" + vsrc + " "
+
+                        dupe = [cj["prel"], cj["name"]]
+                        try:
+                            self.dupesched[src].append(dupe)
+                        except:
+                            self.dupesched[src] = [dupe]
+
                         raise Pebkac(400, err)
+
                     elif "nodupe" in self.flags[job["ptop"]]:
                         self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
                         err = "upload rejected, file already exists:\n/" + vsrc + " "
@@ -1357,6 +1373,7 @@ class Up2k(object):
             except Exception as ex:
                 return "finish_upload, wark, " + repr(ex)
 
+            # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
             atomic_move(src, dst)
 
             if ANYWIN:
@@ -1366,8 +1383,27 @@ class Up2k(object):
             a = [job[x] for x in "ptop wark prel name lmod size addr".split()]
             a += [job.get("at") or time.time()]
             if self.idx_wark(*a):
+                # self.log("pop " + wark + "  " + dst + " finish_upload idx_wark", 4)
                 del self.registry[ptop][wark]
                 # in-memory registry is reserved for unfinished uploads
+
+            dupes = self.dupesched.pop(dst, [])
+            if not dupes:
+                return
+
+            cur = self.cur.get(ptop)
+            for rd, fn in dupes:
+                d2 = os.path.join(ptop, rd, fn)
+                if os.path.exists(d2):
+                    continue
+
+                self._symlink(dst, d2)
+                if cur:
+                    self.db_rm(cur, rd, fn)
+                    self.db_add(cur, wark, rd, fn, *a[-4:])
+
+            if cur:
+                cur.connection.commit()
 
     def idx_wark(self, ptop, wark, rd, fn, lmod, sz, ip, at):
         cur = self.cur.get(ptop)
