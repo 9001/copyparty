@@ -1639,7 +1639,7 @@ class Up2k(object):
                 wark = [
                     x
                     for x, y in reg.items()
-                    if fn in [y["name"], y.get("tnam")] and y["prel"] == vrem
+                    if sfn in [y["name"], y.get("tnam")] and y["prel"] == vrem
                 ]
 
             if wark and wark in reg:
