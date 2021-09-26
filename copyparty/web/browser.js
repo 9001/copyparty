@@ -4095,7 +4095,7 @@ var msel = (function () {
 	form.onsubmit = function (e) {
 		ev(e);
 		clmod(sf, 'vis', 1);
-		sf.textContent = 'creating "' + tb.value + '"...'
+		sf.textContent = 'creating "' + tb.value + '"...';
 
 		var fd = new FormData();
 		fd.append("act", "mkdir");
@@ -4126,10 +4126,57 @@ var msel = (function () {
 			return;
 		}
 
+		tb.value = '';
 		clmod(sf, 'vis');
 		sf.textContent = '';
-		tb.value = '';
 		treectl.goto(this.vp + uricom_enc(this.dn) + '/', true);
+	}
+})();
+
+
+(function () {
+	var form = QS('#op_msg>form'),
+		tb = QS('#op_msg input[name="msg"]'),
+		sf = mknod('div');
+
+	clmod(sf, 'msg', 1);
+	form.parentNode.appendChild(sf);
+
+	form.onsubmit = function (e) {
+		ev(e);
+		clmod(sf, 'vis', 1);
+		sf.textContent = 'sending...';
+
+		var xhr = new XMLHttpRequest(),
+			ct = 'application/x-www-form-urlencoded;charset=UTF-8';
+
+		xhr.msg = tb.value;
+		xhr.open('POST', get_evpath(), true);
+		xhr.responseType = 'text';
+		xhr.onreadystatechange = cb;
+		xhr.setRequestHeader('Content-Type', ct);
+		if (xhr.overrideMimeType)
+			xhr.overrideMimeType('Content-Type', ct);
+
+		xhr.send('msg=' + uricom_enc(xhr.msg));
+		return false;
+	};
+
+	function cb() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.status !== 200) {
+			sf.textContent = 'error: ' + this.responseText;
+			return;
+		}
+
+		tb.value = '';
+		clmod(sf, 'vis');
+		sf.textContent = 'sent: "' + this.msg + '"';
+		setTimeout(function () {
+			treectl.goto(get_evpath());
+		}, 100);
 	}
 })();
 
