@@ -32,9 +32,11 @@ class HttpConn(object):
         self.addr = addr
         self.hsrv = hsrv
 
+        self.mutex = hsrv.mutex
         self.args = hsrv.args
         self.asrv = hsrv.asrv
         self.cert_path = hsrv.cert_path
+        self.u2fh = hsrv.u2fh
 
         enth = HAVE_PIL and not self.args.no_thumb
         self.thumbcli = ThumbCli(hsrv.broker) if enth else None

@@ -27,7 +27,7 @@ except ImportError:
     sys.exit(1)
 
 from .__init__ import E, PY2, MACOS
-from .util import spack, min_ex, start_stackmon, start_log_thrs
+from .util import FHC, spack, min_ex, start_stackmon, start_log_thrs
 from .bos import bos
 from .httpconn import HttpConn
 
@@ -50,7 +50,10 @@ class HttpSrv(object):
         self.log = broker.log
         self.asrv = broker.asrv
 
-        self.name = "httpsrv" + ("-n{}-i{:x}".format(nid, os.getpid()) if nid else "")
+        nsuf = "-{}".format(nid) if nid else ""
+        nsuf2 = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
+
+        self.name = "hsrv" + nsuf2
         self.mutex = threading.Lock()
         self.stopping = False
 
@@ -59,6 +62,7 @@ class HttpSrv(object):
         self.tp_time = None  # latest worker collect
         self.tp_q = None if self.args.no_htp else queue.LifoQueue()
 
+        self.u2fh = FHC()
         self.srvs = []
         self.ncli = 0  # exact
         self.clients = {}  # laggy
@@ -82,17 +86,16 @@ class HttpSrv(object):
         if self.tp_q:
             self.start_threads(4)
 
-            name = "httpsrv-scaler" + ("-{}".format(nid) if nid else "")
-            t = threading.Thread(target=self.thr_scaler, name=name)
-            t.daemon = True
-            t.start()
-
         if nid:
             if self.args.stackmon:
                 start_stackmon(self.args.stackmon, nid)
 
             if self.args.log_thrs:
                 start_log_thrs(self.log, self.args.log_thrs, nid)
+
+        t = threading.Thread(target=self.periodic, name="hsrv-pt" + nsuf)
+        t.daemon = True
+        t.start()
 
     def start_threads(self, n):
         self.tp_nthr += n
@@ -115,13 +118,15 @@ class HttpSrv(object):
         for _ in range(n):
             self.tp_q.put(None)
 
-    def thr_scaler(self):
+    def periodic(self):
         while True:
-            time.sleep(2 if self.tp_ncli else 30)
+            time.sleep(2 if self.tp_ncli else 10)
             with self.mutex:
-                self.tp_ncli = max(self.ncli, self.tp_ncli - 2)
-                if self.tp_nthr > self.tp_ncli + 8:
-                    self.stop_threads(4)
+                self.u2fh.clean()
+                if self.tp_q:
+                    self.tp_ncli = max(self.ncli, self.tp_ncli - 2)
+                    if self.tp_nthr > self.tp_ncli + 8:
+                        self.stop_threads(4)
 
     def listen(self, sck, nlisteners):
         ip, port = sck.getsockname()

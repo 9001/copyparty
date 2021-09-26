@@ -39,6 +39,7 @@ class HttpCli(object):
     def __init__(self, conn):
         self.t0 = time.time()
         self.conn = conn
+        self.mutex = conn.mutex
         self.s = conn.s  # type: socket
         self.sr = conn.sr  # type: Unrecv
         self.ip = conn.addr[0]
@@ -47,6 +48,7 @@ class HttpCli(object):
         self.asrv = conn.asrv  # type: AuthSrv
         self.ico = conn.ico
         self.thumbcli = conn.thumbcli
+        self.u2fh = conn.u2fh
         self.log_func = conn.log_func
         self.log_src = conn.log_src
         self.tls = hasattr(self.s, "cipher")
@@ -835,7 +837,18 @@ class HttpCli(object):
 
         reader = read_socket(self.sr, remains)
 
-        with open(fsenc(path), "rb+", 512 * 1024) as f:
+        f = None
+        fpool = not self.args.no_fpool
+        if fpool:
+            with self.mutex:
+                try:
+                    f = self.u2fh.pop(path)
+                except:
+                    pass
+
+        f = f or open(fsenc(path), "rb+", 512 * 1024)
+
+        try:
             f.seek(cstart[0])
             post_sz, _, sha_b64 = hashcopy(reader, f)
 
@@ -865,22 +878,36 @@ class HttpCli(object):
                     ofs += len(buf)
 
                 self.log("clone {} done".format(cstart[0]))
+        finally:
+            if not fpool:
+                f.close()
+            else:
+                with self.mutex:
+                    self.u2fh.put(path, f)
 
         x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", ptop, wark, chash)
         x = x.get()
         try:
-            num_left, path = x
+            num_left, fin_path = x
         except:
             self.loud_reply(x, status=500)
             return False
 
-        if not ANYWIN and num_left == 0:
+        if not num_left and fpool:
+            with self.mutex:
+                self.u2fh.close(path)
+        
+        # windows cant rename open files
+        if ANYWIN and path != fin_path and not self.args.nw:
+            self.conn.hsrv.broker.put(True, "up2k.finish_upload", ptop, wark).get()
+
+        if not ANYWIN and not num_left:
             times = (int(time.time()), int(lastmod))
             self.log("no more chunks, setting times {}".format(times))
             try:
-                bos.utime(path, times)
+                bos.utime(fin_path, times)
             except:
-                self.log("failed to utime ({}, {})".format(path, times))
+                self.log("failed to utime ({}, {})".format(fin_path, times))
 
         spd = self._spd(post_sz)
         self.log("{} thank".format(spd))

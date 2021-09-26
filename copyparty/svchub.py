@@ -53,6 +53,17 @@ class SvcHub(object):
         if args.log_thrs:
             start_log_thrs(self.log, args.log_thrs, 0)
 
+        if not ANYWIN and not args.use_fpool:
+            args.no_fpool = True
+
+        if not args.no_fpool and args.j != 1:
+            m = "WARNING: --use-fpool combined with multithreading is untested and can probably cause undefined behavior"
+            if ANYWIN:
+                m = "windows cannot do multithreading without --no-fpool, so enabling that -- note that upload performance will suffer if you have microsoft defender \"real-time protection\" enabled, so you probably want to use -j 1 instead"
+                args.no_fpool = True
+            
+            self.log("root", m, c=3)
+
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log)
         if args.ls:

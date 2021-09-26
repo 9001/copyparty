@@ -1336,6 +1336,22 @@ class Up2k(object):
                 # del self.registry[ptop][wark]
                 return ret, dst
 
+        # windows cant rename open files
+        if not ANYWIN or src == dst:
+            self.finish_upload(ptop, wark)
+
+        return ret, dst
+
+    def finish_upload(self, ptop, wark):
+        with self.mutex:
+            try:
+                job = self.registry[ptop][wark]
+                pdir = os.path.join(job["ptop"], job["prel"])
+                src = os.path.join(pdir, job["tnam"])
+                dst = os.path.join(pdir, job["name"])
+            except Exception as ex:
+                return "finish_upload, wark, " + repr(ex)
+
             atomic_move(src, dst)
 
             if ANYWIN:
@@ -1347,8 +1363,6 @@ class Up2k(object):
             if self.idx_wark(*a):
                 del self.registry[ptop][wark]
                 # in-memory registry is reserved for unfinished uploads
-
-        return ret, dst
 
     def idx_wark(self, ptop, wark, rd, fn, lmod, sz, ip, at):
         cur = self.cur.get(ptop)

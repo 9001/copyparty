@@ -251,6 +251,55 @@ class _LUnrecv(object):
 Unrecv = _Unrecv
 
 
+class FHC(object):
+    class CE(object):
+        def __init__(self, fh):
+            self.ts = 0
+            self.fhs = [fh]
+
+    def __init__(self):
+        self.cache = {}
+
+    def close(self, path):
+        try:
+            ce = self.cache[path]
+        except:
+            return
+
+        for fh in ce.fhs:
+            fh.close()
+
+        del self.cache[path]
+
+    def clean(self):
+        if not self.cache:
+            return
+
+        keep = {}
+        now = time.time()
+        for path, ce in self.cache.items():
+            if now < ce.ts + 5:
+                keep[path] = ce
+            else:
+                for fh in ce.fhs:
+                    fh.close()
+
+        self.cache = keep
+
+    def pop(self, path):
+        return self.cache[path].fhs.pop()
+
+    def put(self, path, fh):
+        try:
+            ce = self.cache[path]
+            ce.fhs.append(fh)
+        except:
+            ce = self.CE(fh)
+            self.cache[path] = ce
+
+        ce.ts = time.time()
+
+
 class ProgressPrinter(threading.Thread):
     """
     periodically print progress info without linefeeds
