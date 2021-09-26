@@ -940,7 +940,12 @@ class Up2k(object):
 
     def _tag_file(self, write_cur, entags, wark, abspath, tags=None):
         if tags is None:
-            tags = self.mtag.get(abspath)
+            try:
+                tags = self.mtag.get(abspath)
+            except Exception as ex:
+                msg = "failed to read tags from {}:\n{}"
+                self.log(msg.format(abspath, ex), c=3)
+                return
 
         if entags:
             tags = {k: v for k, v in tags.items() if k in entags}
@@ -1880,11 +1885,16 @@ class Up2k(object):
 
             # self.log("\n  " + repr([ptop, rd, fn]))
             abspath = os.path.join(ptop, rd, fn)
-            tags = self.mtag.get(abspath)
-            ntags1 = len(tags)
-            parsers = self._get_parsers(ptop, tags, abspath)
-            if parsers:
-                tags.update(self.mtag.get_bin(parsers, abspath))
+            try:
+                tags = self.mtag.get(abspath)
+                ntags1 = len(tags)
+                parsers = self._get_parsers(ptop, tags, abspath)
+                if parsers:
+                    tags.update(self.mtag.get_bin(parsers, abspath))
+            except Exception as ex:
+                msg = "failed to read tags from {}:\n{}"
+                self.log(msg.format(abspath, ex), c=3)
+                continue
 
             with self.mutex:
                 cur = self.cur[ptop]
