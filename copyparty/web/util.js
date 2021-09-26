@@ -400,19 +400,17 @@ function linksplit(rp) {
             link = rp.slice(0, ofs + 1);
             rp = rp.slice(ofs + 1);
         }
-        var vlink = esc(link),
-            elink = uricom_enc(link);
+        var vlink = esc(uricom_dec(link)[0]);
 
         if (link.indexOf('/') !== -1) {
             vlink = vlink.slice(0, -1) + '<span>/</span>';
-            elink = elink.slice(0, -3) + '/';
         }
 
         if (!rp && q)
-            elink += q;
+            link += q;
 
-        ret.push('<a href="' + apath + elink + '">' + vlink + '</a>');
-        apath += elink;
+        ret.push('<a href="' + apath + link + '">' + vlink + '</a>');
+        apath += link;
     }
     return ret;
 }

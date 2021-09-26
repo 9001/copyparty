@@ -939,7 +939,7 @@ function up2k_init(subtle) {
 
             pvis.addfile([
                 uc.fsearch ? esc(entry.name) : linksplit(
-                    uricom_dec(entry.purl)[0] + entry.name).join(' '),
+                    entry.purl + uricom_enc(entry.name)).join(' '),
                 '📐 hash',
                 ''
             ], fobj.size, draw_each);
@@ -1137,6 +1137,7 @@ function up2k_init(subtle) {
                     for (var a = 0; a < st.files.length; a++) {
                         var t = st.files[a];
                         if (t.want_recheck) {
+                            t.rechecks++;
                             t.want_recheck = false;
                             push_t(st.todo.handshake, t);
                         }
@@ -1571,7 +1572,7 @@ function up2k_init(subtle) {
                     console.log("server-rename [" + t.purl + "] [" + t.name + "] to [" + rsp_purl + "] [" + response.name + "]");
                     t.purl = rsp_purl;
                     t.name = response.name;
-                    pvis.seth(t.n, 0, linksplit(uricom_dec(t.purl)[0] + t.name).join(' '));
+                    pvis.seth(t.n, 0, linksplit(t.purl + uricom_enc(t.name)).join(' '));
                 }
 
                 var chunksize = get_chunksize(t.size),

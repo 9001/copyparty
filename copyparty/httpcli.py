@@ -896,7 +896,7 @@ class HttpCli(object):
         if not num_left and fpool:
             with self.mutex:
                 self.u2fh.close(path)
-        
+
         # windows cant rename open files
         if ANYWIN and path != fin_path and not self.args.nw:
             self.conn.hsrv.broker.put(True, "up2k.finish_upload", ptop, wark).get()
@@ -1782,7 +1782,7 @@ class HttpCli(object):
                 if filt and filt not in vp:
                     continue
 
-                ret.append({"vp": vp, "sz": sz, "at": at})
+                ret.append({"vp": quotep(vp), "sz": sz, "at": at})
                 if len(ret) > 3000:
                     ret.sort(key=lambda x: x["at"], reverse=True)
                     ret = ret[:2000]

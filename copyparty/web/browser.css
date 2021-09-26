@@ -1964,7 +1964,8 @@ html.light #u2foot .warn span {
 	background: #900;
 	border-color: #d06;
 }
-#u2tab a>span {
+#u2tab a>span,
+#unpost a>span {
 	font-weight: bold;
 	font-style: italic;
 	color: #fff;

@@ -2954,7 +2954,7 @@ document.onkeydown = function (e) {
 			var r = res.hits[a],
 				ts = parseInt(r.ts),
 				sz = esc(r.sz + ''),
-				rp = esc(r.rp + ''),
+				rp = esc(uricom_dec(r.rp + '')[0]),
 				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').slice(-1)[0] : '%',
 				links = linksplit(r.rp + '');
 
@@ -4348,7 +4348,6 @@ var unpost = (function () {
 	}
 
 	ct.onclick = function (e) {
-		ev(e);
 		var tgt = e.target.closest('a[me]');
 		if (!tgt)
 			return;
@@ -4356,6 +4355,7 @@ var unpost = (function () {
 		if (!tgt.getAttribute('href'))
 			return;
 
+		ev(e);
 		var ame = tgt.getAttribute('me');
 		if (ame != r.me)
 			return toast.err(0, 'something broke, please try a refresh');

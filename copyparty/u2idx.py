@@ -8,7 +8,7 @@ import threading
 from datetime import datetime
 
 from .__init__ import ANYWIN, unicode
-from .util import absreal, s3dec, Pebkac, min_ex, gen_filekey
+from .util import absreal, s3dec, Pebkac, min_ex, gen_filekey, quotep
 from .bos import bos
 from .up2k import up2k_wark_from_hashlist
 
@@ -253,21 +253,23 @@ class U2idx(object):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
-                if fk:
+                if not fk:
+                    suf = ""
+                else:
                     try:
                         ap = absreal(os.path.join(ptop, rd, fn))
                         inf = bos.stat(ap)
                     except:
                         continue
 
-                    fn += (
+                    suf = (
                         "?k="
                         + gen_filekey(
                             self.args.fk_salt, ap, sz, 0 if ANYWIN else inf.st_ino
                         )[:fk]
                     )
 
-                rp = "/".join([x for x in [vtop, rd, fn] if x])
+                rp = quotep("/".join([x for x in [vtop, rd, fn] if x])) + suf
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp, "w": w[:16]})
 
             for hit in sret:

@@ -27,6 +27,7 @@ from .util import (
     sanitize_fn,
     ren_open,
     atomic_move,
+    quotep,
     vsplit,
     s3enc,
     s3dec,
@@ -1172,7 +1173,7 @@ class Up2k(object):
                     if job["need"]:
                         self.log("unfinished:\n  {0}\n  {1}".format(src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
-                        err += "/" + vsrc + " "
+                        err += "/" + quotep(vsrc) + " "
 
                         dupe = [cj["prel"], cj["name"]]
                         try:
@@ -1184,7 +1185,8 @@ class Up2k(object):
 
                     elif "nodupe" in self.flags[job["ptop"]]:
                         self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
-                        err = "upload rejected, file already exists:\n/" + vsrc + " "
+                        err = "upload rejected, file already exists:\n"
+                        err += "/" + quotep(vsrc) + " "
                         raise Pebkac(400, err)
                     else:
                         # symlink to the client-provided name,
