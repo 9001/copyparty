@@ -3612,7 +3612,7 @@ var filecols = (function () {
 			"pixfmt": "subsampling / pixel structure",
 			"resw": "horizontal resolution",
 			"resh": "veritcal resolution",
-			"acs": "audio channels",
+			"chs": "audio channels",
 			"hz": "sample rate"
 		};
 
