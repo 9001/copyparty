@@ -71,7 +71,7 @@ except:
     elif MACOS:
         libfuse = "install https://osxfuse.github.io/"
     else:
-        libfuse = "apt install libfuse\n    modprobe fuse"
+        libfuse = "apt install libfuse3-3\n    modprobe fuse"
 
     print(
         "\n  could not import fuse; these may help:"
@@ -393,15 +393,16 @@ class Gateway(object):
 
         rsp = json.loads(rsp.decode("utf-8"))
         ret = []
-        for is_dir, nodes in [[True, rsp["dirs"]], [False, rsp["files"]]]:
+        for statfun, nodes in [
+            [self.stat_dir, rsp["dirs"]],
+            [self.stat_file, rsp["files"]],
+        ]:
             for n in nodes:
-                fname = unquote(n["href"]).rstrip(b"/")
-                fname = fname.decode("wtf-8")
+                fname = unquote(n["href"].split("?")[0]).rstrip(b"/").decode("wtf-8")
                 if bad_good:
                     fname = enwin(fname)
 
-                fun = self.stat_dir if is_dir else self.stat_file
-                ret.append([fname, fun(n["ts"], n["sz"]), 0])
+                ret.append([fname, statfun(n["ts"], n["sz"]), 0])
 
         return ret
 
