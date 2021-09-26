@@ -70,10 +70,6 @@ ebi('op_up2k').innerHTML = (
 	'			<input type="checkbox" id="ask_up" />\n' +
 	'			<label for="ask_up" tt="ask for confirmation before upload starts">💭</label>\n' +
 	'		</td>\n' +
-	'		<td rowspan="2">\n' +
-	'			<input type="checkbox" id="flag_en" />\n' +
-	'			<label for="flag_en" tt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</label>\n' +
-	'		</td>\n' +
 	(have_up2k_idx ? (
 		'		<td data-perm="read" rowspan="2">\n' +
 		'			<input type="checkbox" id="fsearch" />\n' +
@@ -168,6 +164,8 @@ ebi('op_cfg').innerHTML = (
 	'	<div>\n' +
 	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them">turbo</a>\n' +
 	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished/corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards">date-chk</a>\n' +
+	'		<a id="flag_en" class="tgl btn" href="#" tt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</a>\n' +
+	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>key notation</h3><div id="key_notation"></div></div>\n' +

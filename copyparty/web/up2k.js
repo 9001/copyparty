@@ -578,7 +578,7 @@ function up2k_init(subtle) {
 
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
-    bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg, false);
+    bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
     bcfg_bind(uc, 'turbo', 'u2turbo', false, draw_turbo, false);
     bcfg_bind(uc, 'datechk', 'u2tdate', true, null, false);
@@ -1939,7 +1939,7 @@ function up2k_init(subtle) {
             }
             catch (ex) {
                 toast.err(5, "not supported on your browser:\n" + ex);
-                tgl_flag_en();
+                bcfg_set('flag_en', false);
             }
         }
         else if (!uc.flag_en && flag) {
