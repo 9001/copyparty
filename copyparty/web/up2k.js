@@ -1178,6 +1178,8 @@ function up2k_init(subtle) {
                         ebi('u2etas').style.textAlign = 'left';
                     }
                     etafun();
+                    if (pvis.act == 'bz')
+                        pvis.changecard('bz');
                 }
 
                 if (flag) {

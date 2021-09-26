@@ -1277,6 +1277,9 @@ class Up2k(object):
             return
 
         try:
+            if self.args.no_symlink:
+                raise Exception("disabled in config")
+
             lsrc = src
             ldst = dst
             fs1 = bos.stat(os.path.dirname(src)).st_dev
