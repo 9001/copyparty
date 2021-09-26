@@ -1561,6 +1561,9 @@ function play_linked() {
 
 
 function sortfiles(nodes) {
+	if (!nodes.length)
+		return nodes;
+
 	var sopts = jread('fsort', [["href", 1, ""]]);
 
 	try {
@@ -4075,6 +4078,59 @@ var msel = (function () {
 		ebi('selzip').style.display = ebi('unsearch') ? 'none' : '';
 	}
 	return r;
+})();
+
+
+(function () {
+	if (!window.FormData)
+		return;
+
+	var form = QS('#op_mkdir>form'),
+		tb = QS('#op_mkdir input[name="name"]'),
+		sf = mknod('div');
+
+	clmod(sf, 'msg', 1);
+	form.parentNode.appendChild(sf);
+
+	form.onsubmit = function (e) {
+		ev(e);
+		clmod(sf, 'vis', 1);
+		sf.textContent = 'creating "' + tb.value + '"...'
+
+		var fd = new FormData();
+		fd.append("act", "mkdir");
+		fd.append("name", tb.value);
+
+		var xhr = new XMLHttpRequest();
+		xhr.vp = get_evpath();
+		xhr.dn = tb.value;
+		xhr.open('POST', xhr.vp, true);
+		xhr.onreadystatechange = cb;
+		xhr.responseType = 'text';
+		xhr.send(fd);
+
+		return false;
+	};
+
+	function cb() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.vp !== get_evpath()) {
+			sf.textContent = 'aborted due to location change';
+			return;
+		}
+
+		if (this.status !== 200) {
+			sf.textContent = 'error: ' + this.responseText;
+			return;
+		}
+
+		clmod(sf, 'vis');
+		sf.textContent = '';
+		tb.value = '';
+		treectl.goto(this.vp + uricom_enc(this.dn) + '/', true);
+	}
 })();
 
 
