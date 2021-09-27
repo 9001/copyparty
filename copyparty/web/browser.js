@@ -3228,12 +3228,12 @@ var treectl = (function () {
 	}
 
 	function reload_tree() {
-		var cdir = get_evpath(),
+		var cdir = get_vpath(),
 			links = QSA('#treeul a+a'),
 			nowrap = QS('#tree.nowrap') && QS('#hovertree.on');
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = links[a].getAttribute('href');
+			var href = uricom_dec(links[a].getAttribute('href'))[0];
 			links[a].setAttribute('class', href == cdir ? 'hl' : '');
 			links[a].onclick = treego;
 			links[a].onmouseenter = nowrap ? menter : null;
