@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
 """
@@ -48,6 +48,8 @@ VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
 
 
 class File(object):
+    """an up2k upload task; represents a single file"""
+
     def __init__(self, top, rel, size, lmod):
         self.top = top
         self.rel = rel.replace(b"\\", b"/")
@@ -74,6 +76,8 @@ class File(object):
 
 
 class FileSlice(object):
+    """file-like object providing a fixed window into a file"""
+
     def __init__(self, file, cid):
         self.car, self.len = file.kchunks[cid]
         self.cdr = self.car + self.len
@@ -150,6 +154,7 @@ def walkdirs(tops):
 
 # from copyparty/util.py
 def humansize(sz, terse=False):
+    """picks a sensible unit for the given extent"""
     for unit in ["B", "KiB", "MiB", "GiB", "TiB"]:
         if sz < 1024:
             break
@@ -166,6 +171,7 @@ def humansize(sz, terse=False):
 
 # from copyparty/up2k.py
 def up2k_chunksize(filesize):
+    """gives The correct chunksize for up2k hashing"""
     chunksize = 1024 * 1024
     stepsize = 512 * 1024
     while True:
@@ -181,6 +187,8 @@ def up2k_chunksize(filesize):
 # mostly from copyparty/up2k.py
 def get_hashlist(file, pcb):
     # type: (File, any) -> None
+    """generates the up2k hashlist from file contents, inserts it into `file`"""
+
     chunk_sz = up2k_chunksize(file.size)
     file_rem = file.size
     file_ofs = 0
@@ -210,6 +218,8 @@ def get_hashlist(file, pcb):
 
 def handshake(url, file, pw, cert):
     # type: (str, File, any, any) -> List[str]
+    """performs a handshake with the server; reply is a list of chunks to upload"""
+
     req = {
         "hash": [x[0] for x in file.cids],
         "name": file.name,
@@ -246,6 +256,8 @@ def handshake(url, file, pw, cert):
 
 def upload(file, cid, pw, cert):
     # type: (File, str, any, any) -> None
+    """upload one specific chunk, `cid` (a chunk-hash)"""
+
     headers = {
         "X-Up2k-Hash": cid,
         "X-Up2k-Wark": file.wark,
@@ -270,6 +282,11 @@ class Daemon(threading.Thread):
 
 
 class Ctl(object):
+    """
+    this will be the coordinator which runs everything in parallel
+    (hashing, handshakes, uploads)  but right now it's p dumb
+    """
+
     def __init__(self, ar):
         self.ar = ar
         ar.url = ar.url.rstrip("/") + "/"
