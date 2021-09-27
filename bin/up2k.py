@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-09-27, v0.1, ed <irc.rizon.net>, MIT-Licensed
+2021-09-27, v0.2, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -45,6 +45,9 @@ if platform.system() == "Windows":
 
 VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
 # introduced in anniversary update
+
+
+req_ses = requests.Session()
 
 
 class File(object):
@@ -216,8 +219,8 @@ def get_hashlist(file, pcb):
     file.kchunks = {k: [v1, v2] for k, v1, v2 in ret}
 
 
-def handshake(url, file, pw, cert):
-    # type: (str, File, any, any) -> List[str]
+def handshake(req_ses, url, file, pw):
+    # type: (requests.Session, str, File, any) -> List[str]
     """performs a handshake with the server; reply is a list of chunks to upload"""
 
     req = {
@@ -235,7 +238,7 @@ def handshake(url, file, pw, cert):
     elif b"/" in file.rel:
         url += file.rel.rsplit(b"/", 1)[0].decode("utf-8", "replace")
 
-    r = requests.post(url, headers=headers, json=req, verify=cert)
+    r = req_ses.post(url, headers=headers, json=req)
     try:
         r = r.json()
     except:
@@ -254,8 +257,8 @@ def handshake(url, file, pw, cert):
     return r["hash"]
 
 
-def upload(file, cid, pw, cert):
-    # type: (File, str, any, any) -> None
+def upload(req_ses, file, cid, pw):
+    # type: (requests.Session, File, str, any) -> None
     """upload one specific chunk, `cid` (a chunk-hash)"""
 
     headers = {
@@ -268,9 +271,11 @@ def upload(file, cid, pw, cert):
 
     f = FileSlice(file, cid)
     try:
-        r = requests.post(file.url, headers=headers, data=f, verify=cert)
+        r = req_ses.post(file.url, headers=headers, data=f)
         if not r:
             raise Exception(repr(r))
+
+        _ = r.content
     finally:
         f.f.close()
 
@@ -304,11 +309,10 @@ class Ctl(object):
 
         print("found {} files, {}\n".format(nfiles, humansize(nbytes)))
 
-        cert = None
         if ar.td:
-            cert = False
+            req_ses.verify = False
         if ar.te:
-            cert = ar.te
+            req_ses.verify = ar.te
 
         self.filegen = walkdirs(ar.files)
         for nf, (top, rel, inf) in enumerate(self.filegen):
@@ -320,7 +324,7 @@ class Ctl(object):
 
             while True:
                 print("  hs...")
-                up = handshake(ar.url, file, ar.a, cert)
+                up = handshake(req_ses, ar.url, file, ar.a)
                 file.ucids = up
                 if not up:
                     break
@@ -329,7 +333,7 @@ class Ctl(object):
                 ncs = len(up)
                 for nc, cid in enumerate(up):
                     print("  {} up {}".format(ncs - nc, cid))
-                    upload(file, cid, ar.a, cert)
+                    upload(req_ses, file, cid, ar.a)
 
             print("  ok!")
 
