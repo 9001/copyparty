@@ -769,6 +769,10 @@ interact with copyparty using non-browser clients
   * `chunk(){ curl -b cppwd=wark -T- http://127.0.0.1:3923/;}`  
     `chunk <movie.mkv`
 
+* python: [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) is a command-line up2k client
+  * early beta, only does single-threaded uploads so far
+  * autoresume of broken uploads
+
 * FUSE: mount a copyparty server as a local filesystem
   * cross-platform python client available in [./bin/](bin/)
   * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
