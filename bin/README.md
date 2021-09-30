@@ -1,3 +1,9 @@
+# [`up2k.py`](up2k.py)
+* command-line up2k client
+* file uploads, file-search, autoresume of aborted/broken uploads
+* faster than browsers
+* early beta, if something breaks just restart it
+
 # [`copyparty-fuse.py`](copyparty-fuse.py)
 * mount a copyparty server as a local filesystem (read-only)
 * **supports Windows!** -- expect `194 MiB/s` sequential read
