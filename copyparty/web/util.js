@@ -905,6 +905,9 @@ var toast = (function () {
         if (sec)
             te = setTimeout(r.hide, sec * 1000);
 
+        if (txt.indexOf('<body>') + 1)
+            txt = txt.slice(0, txt.indexOf('<')) + ' [...]';
+
         obj.innerHTML = '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         sec += obj.offsetWidth;
