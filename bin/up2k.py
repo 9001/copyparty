@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-09-27, v0.2, ed <irc.rizon.net>, MIT-Licensed
+2021-09-30, v0.3, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -219,9 +219,13 @@ def get_hashlist(file, pcb):
     file.kchunks = {k: [v1, v2] for k, v1, v2 in ret}
 
 
-def handshake(req_ses, url, file, pw):
-    # type: (requests.Session, str, File, any) -> List[str]
-    """performs a handshake with the server; reply is a list of chunks to upload"""
+def handshake(req_ses, url, file, pw, search):
+    # type: (requests.Session, str, File, any, bool) -> List[str]
+    """
+    performs a handshake with the server; reply is:
+      if search, a list of search results
+      otherwise, a list of chunks to upload
+    """
 
     req = {
         "hash": [x[0] for x in file.cids],
@@ -229,6 +233,9 @@ def handshake(req_ses, url, file, pw):
         "lmod": file.lmod,
         "size": file.size,
     }
+    if search:
+        req["srch"] = 1
+
     headers = {"Content-Type": "text/plain"}  # wtf ed
     if pw:
         headers["Cookie"] = "=".join(["cppwd", pw])
@@ -243,6 +250,9 @@ def handshake(req_ses, url, file, pw):
         r = r.json()
     except:
         raise Exception(r.text)
+
+    if search:
+        return r["hits"]
 
     try:
         pre, url = url.split("://")
@@ -308,6 +318,8 @@ class Ctl(object):
             nbytes += inf.st_size
 
         print("found {} files, {}\n".format(nfiles, humansize(nbytes)))
+        self.nfiles = nfiles
+        self.nbytes = nbytes
 
         if ar.td:
             req_ses.verify = False
@@ -315,25 +327,40 @@ class Ctl(object):
             req_ses.verify = ar.te
 
         self.filegen = walkdirs(ar.files)
+        ar.safe = True
+        if ar.safe:
+            return self.safe()
+
+    def safe(self):
+        """minimal basic slow boring fallback codepath"""
+        search = self.ar.s
         for nf, (top, rel, inf) in enumerate(self.filegen):
             file = File(top, rel, inf.st_size, inf.st_mtime)
             upath = file.abs.decode("utf-8", "replace")
 
-            print("{} {}\n  hash...".format(nfiles - nf, upath))
+            print("{} {}\n  hash...".format(self.nfiles - nf, upath))
             get_hashlist(file, None)
 
             while True:
                 print("  hs...")
-                up = handshake(req_ses, ar.url, file, ar.a)
-                file.ucids = up
-                if not up:
+                hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
+                if search:
+                    if hs:
+                        for hit in hs:
+                            print("  found: {}{}".format(self.ar.url, hit["rp"]))
+                    else:
+                        print("  NOT found")
                     break
 
-                print("{} {}".format(nfiles - nf, upath))
-                ncs = len(up)
-                for nc, cid in enumerate(up):
+                file.ucids = hs
+                if not hs:
+                    break
+
+                print("{} {}".format(self.nfiles - nf, upath))
+                ncs = len(hs)
+                for nc, cid in enumerate(hs):
                     print("  {} up {}".format(ncs - nc, cid))
-                    upload(req_ses, file, cid, ar.a)
+                    upload(req_ses, file, cid, self.ar.a)
 
             print("  ok!")
 
@@ -348,8 +375,10 @@ def main():
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
     ap.add_argument("-a", metavar="PASSWORD", help="password")
+    ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
     ap.add_argument("-td", action="store_true", help="disable certificate check")
+    ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     # ap.add_argument("-j", type=int, default=2, help="parallel connections")
     # ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     # fmt: on
