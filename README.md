@@ -769,6 +769,10 @@ interact with copyparty using non-browser clients
   * `chunk(){ curl -b cppwd=wark -T- http://127.0.0.1:3923/;}`  
     `chunk <movie.mkv`
 
+* bash: when curl and wget is not available or too boring
+  * `(printf 'PUT /junk?pw=wark HTTP/1.1\r\n\r\n'; cat movie.mkv) | nc 127.0.0.1 3923`
+  * `(printf 'PUT / HTTP/1.1\r\n\r\n'; cat movie.mkv) >/dev/tcp/127.0.0.1/3923`
+
 * python: [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) is a command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
   * file uploads, file-search, autoresume of aborted/broken uploads
   * see [./bin/README.md#up2kpy](bin/README.md#up2kpy)
