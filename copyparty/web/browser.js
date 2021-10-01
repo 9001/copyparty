@@ -4452,6 +4452,9 @@ function reload_browser(not_mp) {
 		makeSortable(ebi('files'), mp.read_order.bind(mp));
 	}
 
+	for (var a = 0; a < 2; a++)
+		clmod(ebi(a ? 'pro' : 'epi'), 'hidden', ebi('unsearch'));
+
 	if (window['up2k'])
 		up2k.set_fsearch();
 

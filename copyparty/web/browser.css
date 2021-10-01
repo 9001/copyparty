@@ -165,6 +165,7 @@ a, #files tbody div a:last-child {
 .logue {
 	padding: .2em 1.5em;
 }
+.logue.hidden,
 .logue:empty {
 	display: none;
 }
