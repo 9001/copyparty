@@ -389,7 +389,7 @@ class HttpCli(object):
         if not self.can_read and not self.can_write and not self.can_get:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
-                return self.tx_404()
+                return self.tx_404(True)
 
             self.uparam["h"] = False
 
@@ -1565,7 +1565,7 @@ class HttpCli(object):
 
         if not self.can_write:
             if "edit" in self.uparam or "edit2" in self.uparam:
-                return self.tx_404()
+                return self.tx_404(True)
 
         tpl = "mde" if "edit2" in self.uparam else "md"
         html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
@@ -1667,8 +1667,14 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"))
         return True
 
-    def tx_404(self):
-        m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+    def tx_404(self, is_403=False):
+        if self.args.vague_403:
+            m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+        elif is_403:
+            m = '<h1>403 forbiddena &nbsp;~┻━┻</h1><p>you\'ll have to log in or <a href="/?h">go home</a></p>'
+        else:
+            m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p><a href="/?h">go home</a></p>'
+
         html = self.j2("splash", this=self, qvpath=quotep(self.vpath), msg=m)
         self.reply(html.encode("utf-8"), status=404)
         return True
@@ -1895,7 +1901,7 @@ class HttpCli(object):
             return self.tx_file(abspath)
 
         elif is_dir and not self.can_read and not self.can_write:
-            return self.tx_404()
+            return self.tx_404(True)
 
         srv_info = []
 
@@ -2000,7 +2006,7 @@ class HttpCli(object):
                 return True
 
             if not stat.S_ISDIR(st.st_mode):
-                return self.tx_404()
+                return self.tx_404(True)
 
             if "zip" in self.uparam or "tar" in self.uparam:
                 raise Pebkac(403)
