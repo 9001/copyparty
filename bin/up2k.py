@@ -200,8 +200,8 @@ class CTermsize(object):
             eprint("\033[s\033[r\033[u")
         else:
             self.g = 1 + self.h - margin
-            m = "{}\033[{}A".format("\n" * margin, margin)
-            eprint("{}\033[s\033[1;{}r\033[u".format(m, self.g - 1))
+            m = "{0}\033[{1}A".format("\n" * margin, margin)
+            eprint("{0}\033[s\033[1;{1}r\033[u".format(m, self.g - 1))
 
 
 ss = CTermsize()
@@ -236,7 +236,7 @@ def walkdirs(tops):
             for ap, inf in walkdir(top):
                 yield top, ap[len(top) + 1 :], inf
         else:
-            sep = "{}".format(os.sep).encode("ascii")
+            sep = "{0}".format(os.sep).encode("ascii")
             d, n = top.rsplit(sep, 1)
             yield d, n, os.stat(top)
 
@@ -305,7 +305,9 @@ def get_hashlist(file, pcb):
                 pcb(file, file_ofs)
 
     file.cids = ret
-    file.kchunks = {k: [v1, v2] for k, v1, v2 in ret}
+    file.kchunks = {}
+    for k, v1, v2 in ret:
+        file.kchunks[k] = [v1, v2]
 
 
 def handshake(req_ses, url, file, pw, search):
@@ -407,7 +409,7 @@ class Ctl(object):
         if "://" not in ar.url:
             ar.url = "http://" + ar.url
 
-        eprint("\nscanning {} locations\n".format(len(ar.files)))
+        eprint("\nscanning {0} locations\n".format(len(ar.files)))
 
         nfiles = 0
         nbytes = 0
@@ -415,7 +417,7 @@ class Ctl(object):
             nfiles += 1
             nbytes += inf.st_size
 
-        eprint("found {} files, {}\n\n".format(nfiles, humansize(nbytes)))
+        eprint("found {0} files, {1}\n\n".format(nfiles, humansize(nbytes)))
         self.nfiles = nfiles
         self.nbytes = nbytes
 
@@ -437,7 +439,7 @@ class Ctl(object):
             file = File(top, rel, inf.st_size, inf.st_mtime)
             upath = file.abs.decode("utf-8", "replace")
 
-            print("{} {}\n  hash...".format(self.nfiles - nf, upath))
+            print("{0} {1}\n  hash...".format(self.nfiles - nf, upath))
             get_hashlist(file, None)
 
             while True:
@@ -446,7 +448,7 @@ class Ctl(object):
                 if search:
                     if hs:
                         for hit in hs:
-                            print("  found: {}{}".format(self.ar.url, hit["rp"]))
+                            print("  found: {0}{1}".format(self.ar.url, hit["rp"]))
                     else:
                         print("  NOT found")
                     break
@@ -455,10 +457,10 @@ class Ctl(object):
                 if not hs:
                     break
 
-                print("{} {}".format(self.nfiles - nf, upath))
+                print("{0} {1}".format(self.nfiles - nf, upath))
                 ncs = len(hs)
                 for nc, cid in enumerate(hs):
-                    print("  {} up {}".format(ncs - nc, cid))
+                    print("  {0} up {1}".format(ncs - nc, cid))
                     upload(req_ses, file, cid, self.ar.a)
 
             print("  ok!")
@@ -512,15 +514,15 @@ class Ctl(object):
 
             if VT100:
                 maxlen = ss.w - len(str(self.nfiles)) - 14
-                txt = "\033[s\033[{}H".format(ss.g)
+                txt = "\033[s\033[{0}H".format(ss.g)
                 for y, k, st, f in [
                     [0, "hash", self.st_hash, self.hash_f],
                     [1, "send", self.st_up, self.up_f],
                 ]:
-                    txt += "\033[{}H{}:".format(ss.g + y, k)
+                    txt += "\033[{0}H{1}:".format(ss.g + y, k)
                     file, arg = st
                     if not file:
-                        txt += " {}\033[K".format(arg)
+                        txt += " {0}\033[K".format(arg)
                     else:
                         if y:
                             p = 100 * file.up_b / file.size
@@ -529,12 +531,12 @@ class Ctl(object):
 
                         name = file.abs.decode("utf-8", "replace")[-maxlen:]
                         if "/" in name:
-                            name = "\033[36m{}\033[0m/{}".format(*name.rsplit("/", 1))
+                            name = "\033[36m{0}\033[0m/{1}".format(*name.rsplit("/", 1))
 
-                        m = "{:6.1f}% {} {}\033[K"
+                        m = "{0:6.1f}% {1} {2}\033[K"
                         txt += m.format(p, self.nfiles - f, name)
 
-                txt += "\033[{}H ".format(ss.g + 2)
+                txt += "\033[{0}H ".format(ss.g + 2)
             else:
                 txt = " "
 
@@ -551,8 +553,8 @@ class Ctl(object):
             left = humansize(self.nbytes - self.up_b)
             tail = "\033[K\033[u" if VT100 else "\r"
 
-            m = "eta: {} @ {}/s, {} left".format(eta, spd, left)
-            eprint(txt + "\033]0;{}\033\\\r{}{}".format(m, m, tail))
+            m = "eta: {0} @ {1}/s, {2} left".format(eta, spd, left)
+            eprint(txt + "\033]0;{0}\033\\\r{1}{2}".format(m, m, tail))
 
     def cleanup_vt100(self):
         ss.scroll_region(None)
@@ -624,10 +626,10 @@ class Ctl(object):
             if search:
                 if hs:
                     for hit in hs:
-                        m = "found: {}\n  {}{}\n"
+                        m = "found: {0}\n  {1}{2}\n"
                         print(m.format(upath, self.ar.url, hit["rp"]), end="")
                 else:
-                    print("NOT found: {}\n".format(upath), end="")
+                    print("NOT found: {0}\n".format(upath), end="")
 
                 with self.mutex:
                     self.up_f += 1
@@ -657,7 +659,7 @@ class Ctl(object):
                 self.handshaker_busy -= 1
 
             if not hs:
-                print("uploaded {}".format(upath))
+                print("uploaded {0}".format(upath))
             for cid in hs:
                 self.q_upload.put([file, cid])
 
