@@ -1,5 +1,5 @@
 # [`up2k.py`](up2k.py)
-* command-line up2k client
+* command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
 * file uploads, file-search, autoresume of aborted/broken uploads
 * faster than browsers
 * early beta, if something breaks just restart it
