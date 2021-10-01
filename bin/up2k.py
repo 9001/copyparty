@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-09-30, v0.5, ed <irc.rizon.net>, MIT-Licensed
+2021-09-30, v0.6, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -26,6 +26,7 @@ import argparse
 import platform
 import threading
 import requests
+import datetime
 
 
 # from copyparty/__init__.py
@@ -40,12 +41,7 @@ else:
 
     unicode = str
 
-WINDOWS = False
-if platform.system() == "Windows":
-    WINDOWS = [int(x) for x in platform.version().split(".")]
-
-VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
-# introduced in anniversary update
+VT100 = platform.system() != "Windows"
 
 
 req_ses = requests.Session()
@@ -76,7 +72,7 @@ class File(object):
         self.up_b = 0  # type: int
         self.up_c = 0  # type: int
 
-        # m = "size({}) lmod({}) top({}) rel({}) abs({}) name({})"
+        # m = "size({}) lmod({}) top({}) rel({}) abs({}) name({})\n"
         # eprint(m.format(self.size, self.lmod, self.top, self.rel, self.abs, self.name))
 
 
@@ -127,6 +123,7 @@ class FileSlice(object):
 
 def eprint(*a, **ka):
     ka["file"] = sys.stderr
+    ka["end"] = ""
     if not PY2:
         ka["flush"] = True
 
@@ -204,7 +201,7 @@ class CTermsize(object):
         else:
             self.g = 1 + self.h - margin
             m = "{}\033[{}A".format("\n" * margin, margin)
-            eprint("{}\033[s\033[1;{}r\033[u".format(m, self.g - 1), end="")
+            eprint("{}\033[s\033[1;{}r\033[u".format(m, self.g - 1))
 
 
 ss = CTermsize()
@@ -224,7 +221,7 @@ def statdir(top):
 
 def walkdir(top):
     """recursive statdir"""
-    for ap, inf in statdir(top):
+    for ap, inf in sorted(statdir(top)):
         if stat.S_ISDIR(inf.st_mode):
             for x in walkdir(ap):
                 yield x
@@ -337,7 +334,14 @@ def handshake(req_ses, url, file, pw, search):
     elif b"/" in file.rel:
         url += file.rel.rsplit(b"/", 1)[0].decode("utf-8", "replace")
 
-    r = req_ses.post(url, headers=headers, json=req)
+    while True:
+        try:
+            r = req_ses.post(url, headers=headers, json=req)
+            break
+        except:
+            eprint("handshake failed, retry...\n")
+            time.sleep(1)
+
     try:
         r = r.json()
     except:
@@ -396,12 +400,14 @@ class Ctl(object):
 
     def __init__(self, ar):
         self.ar = ar
-        ar.url = ar.url.rstrip("/") + "/"
         ar.files = [
             os.path.abspath(os.path.realpath(x.encode("utf-8"))) for x in ar.files
         ]
+        ar.url = ar.url.rstrip("/") + "/"
+        if "://" not in ar.url:
+            ar.url = "http://" + ar.url
 
-        eprint("\nscanning {} locations".format(len(ar.files)))
+        eprint("\nscanning {} locations\n".format(len(ar.files)))
 
         nfiles = 0
         nbytes = 0
@@ -409,7 +415,7 @@ class Ctl(object):
             nfiles += 1
             nbytes += inf.st_size
 
-        eprint("found {} files, {}\n".format(nfiles, humansize(nbytes)))
+        eprint("found {} files, {}\n\n".format(nfiles, humansize(nbytes)))
         self.nfiles = nfiles
         self.nbytes = nbytes
 
@@ -464,32 +470,33 @@ class Ctl(object):
         self.up_f = 0
         self.up_c = 0
         self.up_b = 0
+        self.up_br = 0
         self.hasher_busy = 1
         self.handshaker_busy = 0
         self.uploader_busy = 0
+
+        self.t0 = time.time()
+        self.t0_up = None
+        self.spd = None
 
         self.mutex = threading.Lock()
         self.q_handshake = Queue()  # type: Queue[File]
         self.q_recheck = Queue()  # type: Queue[File]  # partial upload exists [...]
         self.q_upload = Queue()  # type: Queue[tuple[File, str]]
 
-        self.cb_hasher = self._cb_hasher_basic
-        self.cb_uploader = self._cb_uploader_basic
         self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
         self.st_up = [None, "(idle, starting...)"]  # type: tuple[File, int]
         if VT100:
-            self.cb_hasher = self._cb_hasher_vt100
-            self.cb_uploader = self._cb_uploader_vt100
             atexit.register(self.cleanup_vt100)
             ss.scroll_region(3)
-            # eprint("\033[s\033[{}Hhello from g\033[u".format(ss.g))
 
         Daemon(target=self.hasher).start()
         for _ in range(self.ar.j):
             Daemon(target=self.handshaker).start()
             Daemon(target=self.uploader).start()
 
-        while True:
+        idles = 0
+        while idles < 3:
             time.sleep(0.07)
             with self.mutex:
                 if (
@@ -499,14 +506,16 @@ class Ctl(object):
                     and not self.handshaker_busy
                     and not self.uploader_busy
                 ):
-                    break
+                    idles += 1
+                else:
+                    idles = 0
 
             if VT100:
                 maxlen = ss.w - len(str(self.nfiles)) - 14
                 txt = "\033[s\033[{}H".format(ss.g)
-                for y, k, st, f, c, b in [
-                    [0, "hash", self.st_hash, self.hash_f, self.hash_c, self.hash_b],
-                    [1, "send", self.st_up, self.up_f, self.up_c, self.up_b],
+                for y, k, st, f in [
+                    [0, "hash", self.st_hash, self.hash_f],
+                    [1, "send", self.st_up, self.up_f],
                 ]:
                     txt += "\033[{}H{}:".format(ss.g + y, k)
                     file, arg = st
@@ -519,30 +528,41 @@ class Ctl(object):
                             p = 100 * arg / file.size
 
                         name = file.abs.decode("utf-8", "replace")[-maxlen:]
+                        if "/" in name:
+                            name = "\033[36m{}\033[0m/{}".format(*name.rsplit("/", 1))
 
                         m = "{:6.1f}% {} {}\033[K"
                         txt += m.format(p, self.nfiles - f, name)
 
-                eprint(txt + "\033[u", end="")
+                txt += "\033[{}H ".format(ss.g + 2)
+            else:
+                txt = " "
+
+            if not self.up_br:
+                spd = self.hash_b / (time.time() - self.t0)
+                eta = (self.nbytes - self.hash_b) / (spd + 1)
+            else:
+                spd = self.up_br / (time.time() - self.t0_up)
+                spd = self.spd = (self.spd or spd) * 0.9 + spd * 0.1
+                eta = (self.nbytes - self.up_b) / (spd + 1)
+
+            spd = humansize(spd)
+            eta = str(datetime.timedelta(seconds=int(eta)))
+            left = humansize(self.nbytes - self.up_b)
+            tail = "\033[K\033[u" if VT100 else "\r"
+
+            m = "eta: {} @ {}/s, {} left".format(eta, spd, left)
+            eprint(txt + "\033]0;{}\033\\\r{}{}".format(m, m, tail))
 
     def cleanup_vt100(self):
         ss.scroll_region(None)
-        eprint("\033[J", end="")
+        eprint("\033[J\033]0;\033\\")
 
-    def _cb_hasher_basic(self, file, ofs):
-        eprint(".", end="")
-
-    def _cb_uploader_basic(self, file, cid):
-        eprint("*", end="")
-
-    def _cb_hasher_vt100(self, file, ofs):
+    def cb_hasher(self, file, ofs):
         self.st_hash = [file, ofs]
 
-    def _cb_uploader_vt100(self, file, cid):
-        self.st_up = [file, cid]
-
     def hasher(self):
-        for nf, (top, rel, inf) in enumerate(self.filegen):
+        for top, rel, inf in self.filegen:
             file = File(top, rel, inf.st_size, inf.st_mtime)
             while True:
                 with self.mutex:
@@ -561,10 +581,6 @@ class Ctl(object):
                         break
 
                 time.sleep(0.05)
-
-            if not VT100:
-                upath = file.abs.decode("utf-8", "replace")
-                eprint("\n{:6d} hash {}\n".format(self.nfiles - nf, upath), end="")
 
             get_hashlist(file, self.cb_hasher)
             with self.mutex:
@@ -595,8 +611,6 @@ class Ctl(object):
                 self.handshaker_busy += 1
 
             upath = file.abs.decode("utf-8", "replace")
-            if not VT100:
-                eprint("\n  handshake {}\n".format(upath), end="")
 
             try:
                 hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
@@ -642,7 +656,7 @@ class Ctl(object):
                 file.ucids = hs
                 self.handshaker_busy -= 1
 
-            if not hs and VT100:
+            if not hs:
                 print("uploaded {}".format(upath))
             for cid in hs:
                 self.q_upload.put([file, cid])
@@ -656,9 +670,14 @@ class Ctl(object):
 
             with self.mutex:
                 self.uploader_busy += 1
+                self.t0_up = self.t0_up or time.time()
 
             file, cid = task
-            upload(req_ses, file, cid, self.ar.a)
+            try:
+                upload(req_ses, file, cid, self.ar.a)
+            except:
+                eprint("upload failed, retry...\n")
+                pass  # handshake will fix it
 
             with self.mutex:
                 sz = file.kchunks[cid][1]
@@ -666,18 +685,18 @@ class Ctl(object):
                 if not file.ucids:
                     self.q_handshake.put(file)
 
+                self.st_up = [file, cid]
                 file.up_b += sz
                 self.up_b += sz
+                self.up_br += sz
                 file.up_c += 1
                 self.up_c += 1
                 self.uploader_busy -= 1
 
-            self.cb_uploader(file, cid)
-
 
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
-    if WINDOWS:
+    if not VT100:
         os.system("rem")  # enables colors
 
     # fmt: off
