@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-09-30, v0.4, ed <irc.rizon.net>, MIT-Licensed
+2021-09-30, v0.5, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -18,6 +18,8 @@ import sys
 import stat
 import math
 import time
+import atexit
+import signal
 import base64
 import hashlib
 import argparse
@@ -131,6 +133,81 @@ def eprint(*a, **ka):
     print(*a, **ka)
     if PY2:
         sys.stderr.flush()
+
+
+def termsize():
+    import os
+
+    env = os.environ
+
+    def ioctl_GWINSZ(fd):
+        try:
+            import fcntl, termios, struct, os
+
+            cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
+        except:
+            return
+        return cr
+
+    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+    if not cr:
+        try:
+            fd = os.open(os.ctermid(), os.O_RDONLY)
+            cr = ioctl_GWINSZ(fd)
+            os.close(fd)
+        except:
+            pass
+    if not cr:
+        try:
+            cr = (env["LINES"], env["COLUMNS"])
+        except:
+            cr = (25, 80)
+    return int(cr[1]), int(cr[0])
+
+
+class CTermsize(object):
+    def __init__(self):
+        self.ev = False
+        self.margin = None
+        self.g = None
+        self.w, self.h = termsize()
+
+        try:
+            signal.signal(signal.SIGWINCH, self.ev_sig)
+        except:
+            return
+
+        thr = threading.Thread(target=self.worker)
+        thr.daemon = True
+        thr.start()
+
+    def worker(self):
+        while True:
+            time.sleep(0.5)
+            if not self.ev:
+                continue
+
+            self.ev = False
+            self.w, self.h = termsize()
+
+            if self.margin is not None:
+                self.scroll_region(self.margin)
+
+    def ev_sig(self, *a, **ka):
+        self.ev = True
+
+    def scroll_region(self, margin):
+        self.margin = margin
+        if margin is None:
+            self.g = None
+            eprint("\033[s\033[r\033[u")
+        else:
+            self.g = 1 + self.h - margin
+            m = "{}\033[{}A".format("\n" * margin, margin)
+            eprint("{}\033[s\033[1;{}r\033[u".format(m, self.g - 1), end="")
+
+
+ss = CTermsize()
 
 
 def statdir(top):
@@ -396,13 +473,24 @@ class Ctl(object):
         self.q_recheck = Queue()  # type: Queue[File]  # partial upload exists [...]
         self.q_upload = Queue()  # type: Queue[tuple[File, str]]
 
+        self.cb_hasher = self._cb_hasher_basic
+        self.cb_uploader = self._cb_uploader_basic
+        self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
+        self.st_up = [None, "(idle, starting...)"]  # type: tuple[File, int]
+        if VT100:
+            self.cb_hasher = self._cb_hasher_vt100
+            self.cb_uploader = self._cb_uploader_vt100
+            atexit.register(self.cleanup_vt100)
+            ss.scroll_region(3)
+            # eprint("\033[s\033[{}Hhello from g\033[u".format(ss.g))
+
         Daemon(target=self.hasher).start()
         for _ in range(self.ar.j):
             Daemon(target=self.handshaker).start()
             Daemon(target=self.uploader).start()
 
         while True:
-            time.sleep(0.1)
+            time.sleep(0.07)
             with self.mutex:
                 if (
                     self.q_handshake.empty()
@@ -413,13 +501,49 @@ class Ctl(object):
                 ):
                     break
 
-    def cb_hasher(self, file, ofs):
+            if VT100:
+                maxlen = ss.w - len(str(self.nfiles)) - 14
+                txt = "\033[s\033[{}H".format(ss.g)
+                for y, k, st, f, c, b in [
+                    [0, "hash", self.st_hash, self.hash_f, self.hash_c, self.hash_b],
+                    [1, "send", self.st_up, self.up_f, self.up_c, self.up_b],
+                ]:
+                    txt += "\033[{}H{}:".format(ss.g + y, k)
+                    file, arg = st
+                    if not file:
+                        txt += " {}\033[K".format(arg)
+                    else:
+                        if y:
+                            p = 100 * file.up_b / file.size
+                        else:
+                            p = 100 * arg / file.size
+
+                        name = file.abs.decode("utf-8", "replace")[-maxlen:]
+
+                        m = "{:6.1f}% {} {}\033[K"
+                        txt += m.format(p, self.nfiles - f, name)
+
+                eprint(txt + "\033[u", end="")
+
+    def cleanup_vt100(self):
+        ss.scroll_region(None)
+        eprint("\033[J", end="")
+
+    def _cb_hasher_basic(self, file, ofs):
         eprint(".", end="")
+
+    def _cb_uploader_basic(self, file, cid):
+        eprint("*", end="")
+
+    def _cb_hasher_vt100(self, file, ofs):
+        self.st_hash = [file, ofs]
+
+    def _cb_uploader_vt100(self, file, cid):
+        self.st_up = [file, cid]
 
     def hasher(self):
         for nf, (top, rel, inf) in enumerate(self.filegen):
             file = File(top, rel, inf.st_size, inf.st_mtime)
-            upath = file.abs.decode("utf-8", "replace")
             while True:
                 with self.mutex:
                     if (
@@ -438,7 +562,10 @@ class Ctl(object):
 
                 time.sleep(0.05)
 
-            eprint("\n{:6d} hash {}\n".format(self.nfiles - nf, upath), end="")
+            if not VT100:
+                upath = file.abs.decode("utf-8", "replace")
+                eprint("\n{:6d} hash {}\n".format(self.nfiles - nf, upath), end="")
+
             get_hashlist(file, self.cb_hasher)
             with self.mutex:
                 self.hash_f += 1
@@ -448,6 +575,7 @@ class Ctl(object):
             self.q_handshake.put(file)
 
         self.hasher_busy = 0
+        self.st_hash = [None, "(finished)"]
 
     def handshaker(self):
         search = self.ar.s
@@ -467,7 +595,8 @@ class Ctl(object):
                 self.handshaker_busy += 1
 
             upath = file.abs.decode("utf-8", "replace")
-            eprint("\n  handshake {}\n".format(upath), end="")
+            if not VT100:
+                eprint("\n  handshake {}\n".format(upath), end="")
 
             try:
                 hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
@@ -481,9 +610,10 @@ class Ctl(object):
             if search:
                 if hs:
                     for hit in hs:
-                        eprint("     found: {}{}".format(self.ar.url, hit["rp"]))
+                        m = "found: {}\n  {}{}\n"
+                        print(m.format(upath, self.ar.url, hit["rp"]), end="")
                 else:
-                    eprint("  NOT found {}".format(upath))
+                    print("NOT found: {}\n".format(upath), end="")
 
                 with self.mutex:
                     self.up_f += 1
@@ -500,7 +630,7 @@ class Ctl(object):
                     self.up_c += len(file.cids) - file.up_c
                     self.up_b += file.size - file.up_b
 
-                if hs and self.up_c:
+                if hs and file.up_c:
                     # some chunks failed
                     self.up_c -= len(hs)
                     file.up_c -= len(hs)
@@ -512,6 +642,8 @@ class Ctl(object):
                 file.ucids = hs
                 self.handshaker_busy -= 1
 
+            if not hs and VT100:
+                print("uploaded {}".format(upath))
             for cid in hs:
                 self.q_upload.put([file, cid])
 
@@ -519,9 +651,9 @@ class Ctl(object):
         while True:
             task = self.q_upload.get()
             if not task:
+                self.st_up = [None, "(finished)"]
                 break
 
-            eprint("*", end="")
             with self.mutex:
                 self.uploader_busy += 1
 
@@ -539,6 +671,8 @@ class Ctl(object):
                 file.up_c += 1
                 self.up_c += 1
                 self.uploader_busy -= 1
+
+            self.cb_uploader(file, cid)
 
 
 def main():
