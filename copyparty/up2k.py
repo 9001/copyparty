@@ -1362,53 +1362,56 @@ class Up2k(object):
                 # del self.registry[ptop][wark]
                 return ret, dst
 
-        # windows cant rename open files
-        if not ANYWIN or src == dst:
-            self.finish_upload(ptop, wark)
+            # windows cant rename open files
+            if not ANYWIN or src == dst:
+                self._finish_upload(ptop, wark)
 
         return ret, dst
 
     def finish_upload(self, ptop, wark):
         with self.mutex:
-            try:
-                job = self.registry[ptop][wark]
-                pdir = os.path.join(job["ptop"], job["prel"])
-                src = os.path.join(pdir, job["tnam"])
-                dst = os.path.join(pdir, job["name"])
-            except Exception as ex:
-                return "finish_upload, wark, " + repr(ex)
+            self._finish_upload(ptop, wark)
 
-            # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
-            atomic_move(src, dst)
+    def _finish_upload(self, ptop, wark):
+        try:
+            job = self.registry[ptop][wark]
+            pdir = os.path.join(job["ptop"], job["prel"])
+            src = os.path.join(pdir, job["tnam"])
+            dst = os.path.join(pdir, job["name"])
+        except Exception as ex:
+            return "finish_upload, wark, " + repr(ex)
 
-            if ANYWIN:
-                a = [dst, job["size"], (int(time.time()), int(job["lmod"]))]
-                self.lastmod_q.put(a)
+        # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
+        atomic_move(src, dst)
 
-            a = [job[x] for x in "ptop wark prel name lmod size addr".split()]
-            a += [job.get("at") or time.time()]
-            if self.idx_wark(*a):
-                # self.log("pop " + wark + "  " + dst + " finish_upload idx_wark", 4)
-                del self.registry[ptop][wark]
-                # in-memory registry is reserved for unfinished uploads
+        if ANYWIN:
+            a = [dst, job["size"], (int(time.time()), int(job["lmod"]))]
+            self.lastmod_q.put(a)
 
-            dupes = self.dupesched.pop(dst, [])
-            if not dupes:
-                return
+        a = [job[x] for x in "ptop wark prel name lmod size addr".split()]
+        a += [job.get("at") or time.time()]
+        if self.idx_wark(*a):
+            # self.log("pop " + wark + "  " + dst + " finish_upload idx_wark", 4)
+            del self.registry[ptop][wark]
+            # in-memory registry is reserved for unfinished uploads
 
-            cur = self.cur.get(ptop)
-            for rd, fn in dupes:
-                d2 = os.path.join(ptop, rd, fn)
-                if os.path.exists(d2):
-                    continue
+        dupes = self.dupesched.pop(dst, [])
+        if not dupes:
+            return
 
-                self._symlink(dst, d2)
-                if cur:
-                    self.db_rm(cur, rd, fn)
-                    self.db_add(cur, wark, rd, fn, *a[-4:])
+        cur = self.cur.get(ptop)
+        for rd, fn in dupes:
+            d2 = os.path.join(ptop, rd, fn)
+            if os.path.exists(d2):
+                continue
 
+            self._symlink(dst, d2)
             if cur:
-                cur.connection.commit()
+                self.db_rm(cur, rd, fn)
+                self.db_add(cur, wark, rd, fn, *a[-4:])
+
+        if cur:
+            cur.connection.commit()
 
     def idx_wark(self, ptop, wark, rd, fn, lmod, sz, ip, at):
         cur = self.cur.get(ptop)
@@ -1768,7 +1771,13 @@ class Up2k(object):
         except:
             cj["lmod"] = int(time.time())
 
-        wark = up2k_wark_from_hashlist(self.salt, cj["size"], cj["hash"])
+        if cj["hash"]:
+            wark = up2k_wark_from_hashlist(self.salt, cj["size"], cj["hash"])
+        else:
+            wark = up2k_wark_from_metadata(
+                self.salt, cj["size"], cj["lmod"], cj["prel"], cj["name"]
+            )
+
         return wark
 
     def _hashlist_from_file(self, path):
@@ -1811,6 +1820,8 @@ class Up2k(object):
 
         if self.args.nw:
             job["tnam"] = tnam
+            if not job["hash"]:
+                del self.registry[job["ptop"]][job["wark"]]
             return
 
         suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
@@ -1827,8 +1838,12 @@ class Up2k(object):
                 except:
                     self.log("could not sparse [{}]".format(fp), 3)
 
-            f.seek(job["size"] - 1)
-            f.write(b"e")
+            if job["hash"]:
+                f.seek(job["size"] - 1)
+                f.write(b"e")
+
+        if not job["hash"]:
+            self._finish_upload(job["ptop"], job["wark"])
 
     def _lastmodder(self):
         while True:

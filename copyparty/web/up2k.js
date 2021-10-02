@@ -744,11 +744,14 @@ function up2k_init(subtle) {
 
         more_one_file();
         var bad_files = [],
+            nil_files = [],
             good_files = [],
             dirs = [];
 
         for (var a = 0; a < files.length; a++) {
-            var fobj = files[a];
+            var fobj = files[a],
+                dst = good_files;
+
             if (is_itemlist) {
                 if (fobj.kind !== 'file')
                     continue;
@@ -765,16 +768,15 @@ function up2k_init(subtle) {
             }
             try {
                 if (fobj.size < 1)
-                    throw 1;
+                    dst = nil_files;
             }
             catch (ex) {
-                bad_files.push(fobj.name);
-                continue;
+                dst = bad_files;
             }
-            good_files.push([fobj, fobj.name]);
+            dst.push([fobj, fobj.name]);
         }
         if (dirs) {
-            return read_dirs(null, [], dirs, good_files, bad_files);
+            return read_dirs(null, [], dirs, good_files, nil_files, bad_files);
         }
     }
 
@@ -788,7 +790,7 @@ function up2k_init(subtle) {
     }
 
     var rd_missing_ref = [];
-    function read_dirs(rd, pf, dirs, good, bad, spins) {
+    function read_dirs(rd, pf, dirs, good, nil, bad, spins) {
         spins = spins || 0;
         if (++spins == 5)
             rd_missing_ref = rd_flatten(pf, dirs);
@@ -809,7 +811,7 @@ function up2k_init(subtle) {
                     msg.push('<li>' + esc(missing[a]) + '</li>');
 
                 return modal.alert(msg.join('') + '</ul>', function () {
-                    read_dirs(rd, [], [], good, bad, spins);
+                    read_dirs(rd, [], [], good, nil, bad, spins);
                 });
             }
             spins = 0;
@@ -817,11 +819,11 @@ function up2k_init(subtle) {
 
         if (!dirs.length) {
             if (!pf.length)
-                return gotallfiles(good, bad);
+                return gotallfiles(good, nil, bad);
 
             console.log("retry pf, " + pf.length);
             setTimeout(function () {
-                read_dirs(rd, pf, dirs, good, bad, spins);
+                read_dirs(rd, pf, dirs, good, nil, bad, spins);
             }, 50);
             return;
         }
@@ -843,14 +845,15 @@ function up2k_init(subtle) {
                     pf.push(name);
                     dn.file(function (fobj) {
                         apop(pf, name);
+                        var dst = good;
                         try {
-                            if (fobj.size > 0) {
-                                good.push([fobj, name]);
-                                return;
-                            }
+                            if (fobj.size < 1)
+                                dst = nil;
                         }
-                        catch (ex) { }
-                        bad.push(name);
+                        catch (ex) {
+                            dst = bad;
+                        }
+                        dst.push([fobj, name]);
                     });
                 }
                 ngot += 1;
@@ -859,23 +862,33 @@ function up2k_init(subtle) {
                 dirs.shift();
                 rd = null;
             }
-            return read_dirs(rd, pf, dirs, good, bad, spins);
+            return read_dirs(rd, pf, dirs, good, nil, bad, spins);
         });
     }
 
-    function gotallfiles(good_files, bad_files) {
+    function gotallfiles(good_files, nil_files, bad_files) {
+        var ntot = good_files.concat(nil_files, bad_files).length;
         if (bad_files.length) {
-            var ntot = bad_files.length + good_files.length,
-                msg = 'These {0} files (of {1} total) were skipped because they are empty:\n'.format(bad_files.length, ntot);
-
+            var msg = 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n'.format(bad_files.length, ntot);
             for (var a = 0, aa = Math.min(20, bad_files.length); a < aa; a++)
-                msg += '-- ' + bad_files[a] + '\n';
+                msg += '-- ' + bad_files[a][1] + '\n';
 
-            if (good_files.length - bad_files.length <= 1 && ANDROID)
-                msg += '\nFirefox-Android has a bug which prevents selecting multiple files. Try selecting one file at a time. For more info, see firefox bug 1456557';
-
+            msg += '\nMaybe it works better if you select just one file';
             return modal.alert(msg, function () {
-                gotallfiles(good_files, []);
+                gotallfiles(good_files, nil_files, []);
+            });
+        }
+
+        if (nil_files.length) {
+            var msg = 'These {0} files (of {1} total) are blank/empty; upload them anyways?\n'.format(nil_files.length, ntot);
+            for (var a = 0, aa = Math.min(20, nil_files.length); a < aa; a++)
+                msg += '-- ' + nil_files[a][1] + '\n';
+
+            msg += '\nMaybe it works better if you select just one file';
+            return modal.confirm(msg, function () {
+                gotallfiles(good_files.concat(nil_files), [], []);
+            }, function () {
+                gotallfiles(good_files, [], []);
             });
         }
 
@@ -921,7 +934,7 @@ function up2k_init(subtle) {
                 "t0": now,
                 "fobj": fobj,
                 "name": name,
-                "size": fobj.size,
+                "size": fobj.size || 0,
                 "lmod": lmod / 1000,
                 "purl": fdir,
                 "done": false,
@@ -946,7 +959,9 @@ function up2k_init(subtle) {
 
             st.bytes.total += fobj.size;
             st.files.push(entry);
-            if (uc.turbo)
+            if (!entry.size)
+                push_t(st.todo.handshake, entry);
+            else if (uc.turbo)
                 push_t(st.todo.head, entry);
             else
                 push_t(st.todo.hash, entry);

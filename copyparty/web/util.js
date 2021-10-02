@@ -1049,7 +1049,7 @@ var modal = (function () {
     }
     function _confirm(html, cok, cng, fun) {
         cb_ok = cok;
-        cb_ng = cng === undefined ? cok : null;
+        cb_ng = cng === undefined ? cok : cng;
         cb_up = fun;
         html += '<div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
