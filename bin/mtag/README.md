@@ -10,6 +10,7 @@ some of these rely on libraries which are not MIT-compatible
 
 these do not have any problematic dependencies:
 
+* [cksum.py](./cksum.py) computes various checksums
 * [exe.py](./exe.py) grabs metadata from .exe and .dll files (example for retrieving multiple tags with one parser)
 * [wget.py](./wget.py) lets you download files by POSTing URLs to copyparty
 

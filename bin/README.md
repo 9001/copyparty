@@ -4,6 +4,8 @@
 * faster than browsers
 * early beta, if something breaks just restart it
 
+
+
 # [`copyparty-fuse.py`](copyparty-fuse.py)
 * mount a copyparty server as a local filesystem (read-only)
 * **supports Windows!** -- expect `194 MiB/s` sequential read
@@ -53,6 +55,7 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 * copyparty can Popen programs like these during file indexing to collect additional metadata
 
 
+
 # [`dbtool.py`](dbtool.py)
 upgrade utility which can show db info and help transfer data between databases, for example when a new version of copyparty is incompatible with the old DB and automatically rebuilds the DB from scratch, but you have some really expensive `-mtp` parsers and want to copy over the tags from the old db
 
@@ -67,6 +70,7 @@ cd /mnt/nas/music/.hist
 ~/src/copyparty/bin/dbtool.py -src up2k.*.v3 up2k.db -rm-mtp-flag -copy key
 ~/src/copyparty/bin/dbtool.py -src up2k.*.v3 up2k.db -rm-mtp-flag -copy .bpm -vac
 ```
+
 
 
 # [`prisonparty.sh`](prisonparty.sh)
