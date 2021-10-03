@@ -356,7 +356,7 @@ class VFS(object):
         if not dbv:
             return self, vrem
 
-        vrem = [self.vpath[len(dbv.vpath) + 1 :], vrem]
+        vrem = [self.vpath[len(dbv.vpath) :].lstrip("/"), vrem]
         vrem = "/".join([x for x in vrem if x])
         return dbv, vrem
 
@@ -880,6 +880,10 @@ class AuthSrv(object):
             # default tag cfgs if unset
             if "mte" not in vol.flags:
                 vol.flags["mte"] = self.args.mte
+            elif vol.flags["mte"].startswith("+"):
+                vol.flags["mte"] = ",".join(
+                    x for x in [self.args.mte, vol.flags["mte"][1:]] if x
+                )
             if "mth" not in vol.flags:
                 vol.flags["mth"] = self.args.mth
 
