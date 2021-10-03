@@ -3,6 +3,7 @@ import sys
 import time
 import shutil
 import jinja2
+import threading
 import tempfile
 import platform
 import subprocess as sp
@@ -28,7 +29,7 @@ if MACOS:
     # 25% faster; until any tests do symlink stuff
 
 
-from copyparty.util import Unrecv
+from copyparty.util import Unrecv, FHC
 
 
 def runcmd(argv):
@@ -132,6 +133,8 @@ class VHttpConn(object):
         self.log_src = "a"
         self.lf_url = None
         self.hsrv = VHttpSrv()
+        self.u2fh = FHC()
+        self.mutex = threading.Lock()
         self.nreq = 0
         self.nbyte = 0
         self.ico = None
