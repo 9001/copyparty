@@ -512,9 +512,13 @@ function up2k_init(subtle) {
         // chrome<37 firefox<34 edge<12 opera<24 safari<7
         shame = 'your browser is impressively ancient';
 
-    var got_deps = false;
+    function got_deps() {
+        return subtle || window.asmCrypto || window.hashwasm;
+    }
+
+    var loading_deps = false;
     function init_deps() {
-        if (!got_deps && !subtle && !window.asmCrypto) {
+        if (!loading_deps && !got_deps()) {
             var fn = 'sha512.' + sha_js + '.js';
             showmodal('<h1>loading ' + fn + '</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
             import_js('/.cpr/deps/' + fn, unmodal);
@@ -525,7 +529,7 @@ function up2k_init(subtle) {
                 ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span style="color:#' +
                     (sha_js == 'ac' ? 'c84">(expecting 20' : '8a5">(but dont worry too much, expect 100') + ' MiB/s)</span>';
         }
-        got_deps = true;
+        loading_deps = true;
     }
 
     if (perms.length && !has(perms, 'read') && has(perms, 'write'))
@@ -1132,7 +1136,7 @@ function up2k_init(subtle) {
             if (running)
                 return;
 
-            if (crashed)
+            if (crashed || !got_deps())
                 return defer();
 
             running = true;
