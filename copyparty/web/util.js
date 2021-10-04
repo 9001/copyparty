@@ -247,7 +247,9 @@ function import_js(url, cb) {
     script.src = url;
     script.onload = cb;
     script.onerror = function () {
-        toast.err(0, 'Failed to load module:\n' + url);
+        var m = 'Failed to load module:\n' + url;
+        console.log(m);
+        toast.err(0, m);
     };
     head.appendChild(script);
 }

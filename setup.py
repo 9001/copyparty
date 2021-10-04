@@ -114,7 +114,7 @@ args = {
     "install_requires": ["jinja2"],
     "extras_require": {"thumbnails": ["Pillow"], "audiotags": ["mutagen"]},
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
-    "scripts": ["bin/copyparty-fuse.py"],
+    "scripts": ["bin/copyparty-fuse.py", "bin/up2k.py"],
     "cmdclass": {"clean2": clean2},
 }
 

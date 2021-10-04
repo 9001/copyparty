@@ -20,3 +20,7 @@ sfx/
 # derived
 copyparty/web/deps/
 srv/
+
+# state/logs
+up.*.txt
+.hist/

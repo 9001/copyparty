@@ -3,11 +3,11 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-09-30, v0.6, ed <irc.rizon.net>, MIT-Licensed
+2021-10-04, v0.7, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
-- supports python 2.7 and 3.3 through 3.10
+- supports python 2.6, 2.7, and 3.3 through 3.10
 
 - almost zero error-handling
 - but if something breaks just try again and it'll autoresume

@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 0, 7)
+VERSION = (1, 0, 8)
 CODENAME = "sufficient"
-BUILD_DT = (2021, 9, 26)
+BUILD_DT = (2021, 10, 4)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)
