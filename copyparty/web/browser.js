@@ -731,6 +731,12 @@ var pbar = (function () {
 		for (var p = 1, mins = adur / 60; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
+		pctx.font = '.5em sans-serif';
+		pctx.fillStyle = light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
+		for (var p = 1, mins = adur / 60; p <= mins; p++) {
+			pctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
+		}
+
 		pctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
 		for (var p = 1, mins = adur / 600; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 600), 0, 2, pc.h);
