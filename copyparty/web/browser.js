@@ -1353,7 +1353,7 @@ function play(tid, is_ev, seek, call_depth) {
 				mp.au = mp.au_ogvjs = new OGVPlayer();
 			}
 			catch (ex) {
-				return toast.err(30, 'your browser cannot play ogg/vorbis/opus\n\n' + ex +
+				return toast.err(30, 'your browser cannot play ogg/vorbis/opus\n\n' + basenames(ex) +
 					'\n\n<a href="#" onclick="new OGVPlayer();">click here</a> for a full crash report');
 			}
 			attempt_play = is_ev;
@@ -1445,7 +1445,7 @@ function play(tid, is_ev, seek, call_depth) {
 		return true;
 	}
 	catch (ex) {
-		toast.err(0, esc('playback failed: ' + ex));
+		toast.err(0, esc('playback failed: ' + basenames(ex)));
 	}
 	setclass(oid, 'play');
 	setTimeout(next_song, 500);
@@ -1479,7 +1479,7 @@ function evau_error(e) {
 
 	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0])[0] + '»';
 
-	toast.warn(15, esc(err + ''));
+	toast.warn(15, esc(basenames(err)));
 }
 
 

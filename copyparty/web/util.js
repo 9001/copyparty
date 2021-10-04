@@ -29,18 +29,24 @@ function esc(txt) {
         }[c];
     });
 }
-window.onunhandledrejection = function (e) {
-    var err = e.reason;
-    try {
-        err += '\n' + e.reason.stack;
-    }
-    catch (e) { }
-    console.log("REJ: " + err);
-    try {
-        toast.warn(30, err);
-    }
-    catch (e) { }
-};
+function basenames(txt) {
+    return (txt + '').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js');
+}
+if ((document.location + '').indexOf(',rej,') + 1)
+    window.onunhandledrejection = function (e) {
+        var err = e.reason;
+        try {
+            err += '\n' + e.reason.stack;
+        }
+        catch (e) { }
+        err = basenames(err);
+        console.log("REJ: " + err);
+        try {
+            toast.warn(30, err);
+        }
+        catch (e) { }
+    };
+
 try {
     console.hist = [];
     var hook = function (t) {
@@ -151,7 +157,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
             );
             document.head.appendChild(s);
         }
-        exbox.innerHTML = html.join('\n').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js').replace(/<ghi>/, 'https://github.com/9001/copyparty/issues/new?labels=bug&template=bug_report.md');
+        exbox.innerHTML = basenames(html.join('\n')).replace(/<ghi>/, 'https://github.com/9001/copyparty/issues/new?labels=bug&template=bug_report.md');
         exbox.style.display = 'block';
     }
     catch (e) {

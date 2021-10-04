@@ -1953,7 +1953,7 @@ function up2k_init(subtle) {
                 flag = up2k_flagbus();
             }
             catch (ex) {
-                toast.err(5, "not supported on your browser:\n" + ex);
+                toast.err(5, "not supported on your browser:\n" + esc(basenames(ex)));
                 bcfg_set('flag_en', false);
             }
         }
