@@ -133,8 +133,8 @@ ebi('op_up2k').innerHTML = (
 	var o = mknod('div');
 	o.innerHTML = (
 		'<div id="drops">\n' +
-		'	<div class="dropdesc" id="up_zd"><div>🚀 Upload<br /><span></span></div></div>\n' +
-		'	<div class="dropdesc" id="srch_zd"><div>🔎 Search<br /><span></span></div></div>\n' +
+		'	<div class="dropdesc" id="up_zd"><div>🚀 Upload<br /><span></span><div>🚀</div><div>🚀</div></div></div>\n' +
+		'	<div class="dropdesc" id="srch_zd"><div>🔎 Search<br /><span></span><div>🔎</div><div>🔎</div></div></div>\n' +
 		'	<div class="dropzone" id="up_dz" v="up_zd"></div>\n' +
 		'	<div class="dropzone" id="srch_dz" v="srch_zd"></div>\n' +
 		'</div>'

@@ -1603,7 +1603,7 @@ html.light #bbox-overlay figcaption a {
 	border-radius: .5em;
 	border-width: 1vw;
 	color: #fff;
-	transition: all 0.2s;
+	transition: all 0.12s;
 }
 #drops .dropdesc.hl.ok {
 	border-color: #fff;
@@ -1623,6 +1623,16 @@ html.light #bbox-overlay figcaption a {
 	display: table-cell;
 	vertical-align: middle;
 	text-align: center;
+}
+#drops .dropdesc>div>div {
+	position: absolute;
+	top: 40%;
+	top: calc(50% - .5em);
+	left: -.8em;
+}
+#drops .dropdesc>div>div+div {
+	left: auto;
+	right: -.8em;
 }
 #drops .dropzone {
 	z-index: 80386;
