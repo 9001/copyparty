@@ -258,6 +258,16 @@ html.light #pctl *:focus,
 html.light .btn:focus {
 	box-shadow: 0 .1em .2em #037 inset;
 }
+input[type="text"]:focus,
+input:not([type]):focus,
+textarea:focus {
+	box-shadow: 0 .1em .3em #fc0, 0 -.1em .3em #fc0;
+}
+html.light input[type="text"]:focus,
+html.light input:not([type]):focus,
+html.light textarea:focus {
+	box-shadow: 0 .1em .3em #037, 0 -.1em .3em #037;
+}
 
 
 
