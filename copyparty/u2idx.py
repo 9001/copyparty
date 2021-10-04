@@ -6,6 +6,7 @@ import os
 import time
 import threading
 from datetime import datetime
+from operator import itemgetter
 
 from .__init__ import ANYWIN, unicode
 from .util import absreal, s3dec, Pebkac, min_ex, gen_filekey, quotep
@@ -292,8 +293,12 @@ class U2idx(object):
         # undupe hits from multiple metadata keys
         if len(ret) > 1:
             ret = [ret[0]] + [
-                y for x, y in zip(ret[:-1], ret[1:]) if x["rp"] != y["rp"]
+                y
+                for x, y in zip(ret[:-1], ret[1:])
+                if x["rp"].split("?")[0] != y["rp"].split("?")[0]
             ]
+
+        ret.sort(key=itemgetter("rp"))
 
         return ret, list(taglist.keys())
 

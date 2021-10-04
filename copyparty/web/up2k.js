@@ -1560,15 +1560,18 @@ function up2k_init(subtle) {
                     }
                     else {
                         smsg = 'found';
-                        var hit = response.hits[0],
-                            msg = linksplit(hit.rp).join(''),
-                            tr = unix2iso(hit.ts),
-                            tu = unix2iso(t.lmod),
-                            diff = parseInt(t.lmod) - parseInt(hit.ts),
-                            cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
-                            sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;
+                        var msg = [];
+                        for (var a = 0, aa = Math.min(20, response.hits.length); a < aa; a++) {
+                            var hit = response.hits[a],
+                                tr = unix2iso(hit.ts),
+                                tu = unix2iso(t.lmod),
+                                diff = parseInt(t.lmod) - parseInt(hit.ts),
+                                cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
+                                sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;
 
-                        msg += '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</span></span>';
+                            msg.push(linksplit(hit.rp).join('') + '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</small></span>');
+                        }
+                        msg = msg.join('<br />\n');
                     }
                     pvis.seth(t.n, 2, msg);
                     pvis.seth(t.n, 1, smsg);
