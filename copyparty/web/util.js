@@ -583,14 +583,22 @@ function jcp(obj) {
 
 
 function sread(key) {
-    return localStorage.getItem(key);
+    try {
+        return localStorage.getItem(key);
+    }
+    catch (e) {
+        return null;
+    }
 }
 
 function swrite(key, val) {
-    if (val === undefined || val === null)
-        localStorage.removeItem(key);
-    else
-        localStorage.setItem(key, val);
+    try {
+        if (val === undefined || val === null)
+            localStorage.removeItem(key);
+        else
+            localStorage.setItem(key, val);
+    }
+    catch (e) { }
 }
 
 function jread(key, fb) {
