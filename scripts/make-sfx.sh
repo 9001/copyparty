@@ -238,7 +238,7 @@ rm have
 	rm -rf copyparty/web/dd
 	f=copyparty/web/browser.css
 	gzip -d "$f.gz" || true
-	sed -r 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; /[0-9]+% \{cursor:/d; /animation: ?cursor/d' <$f >t
+	sed -r 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; s/[0-9]+% \{cursor:[^}]+\}//; s/animation: ?cursor[^};]+//' <$f >t
 	tmv "$f"
 }
 
@@ -271,7 +271,7 @@ find | grep -E '\.css$' | while IFS= read -r f; do
 	}
 	!/\}$/ {printf "%s",$0;next}
 	1
-	' <$f | sed 's/;\}$/}/' >t
+	' <$f | sed -r 's/;\}$/}/; /\{\}$/d' >t
 	tmv "$f"
 done
 unexpand -h 2>/dev/null &&
