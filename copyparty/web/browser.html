@@ -135,6 +135,8 @@
 			have_unpost = {{ have_unpost|tojson }},
 			have_zip = {{ have_zip|tojson }},
 			readme = {{ readme|tojson }};
+
+		document.documentElement.setAttribute("class", localStorage.lightmode == 1 ? "light" : "dark");
 	</script>
 	<script src="/.cpr/util.js?_={{ ts }}"></script>
 	<script src="/.cpr/browser.js?_={{ ts }}"></script>
