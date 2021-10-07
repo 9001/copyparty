@@ -135,13 +135,13 @@ var md_opt = {
 
 (function () {
     var l = localStorage,
-		drk = l.getItem('lightmode') != 1,
+		drk = l.lightmode != 1,
 		btn = document.getElementById("lightswitch"),
 		f = function (e) {
 if (e) { e.preventDefault(); drk = !drk; }
 document.documentElement.setAttribute("class", drk? "dark":"light");
 btn.innerHTML = "go " + (drk ? "light":"dark");
-l.setItem('lightmode', drk? 0:1);
+l.lightmode = drk? 0:1;
     	};
 	
 	btn.onclick = f;
