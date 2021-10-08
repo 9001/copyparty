@@ -1127,9 +1127,10 @@ class HttpCli(object):
             )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
+            is_https = (self.headers.get("x-forwarded-proto") == "https" or self.tls)
             jpart = {
                 "url": "{}://{}/{}".format(
-                    "https" if self.tls else "http",
+                    "https" if is_https else "http",
                     self.headers.get("host", "copyparty"),
                     vpath + vsuf,
                 ),
