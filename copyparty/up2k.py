@@ -503,7 +503,7 @@ class Up2k(object):
             self.log(m.format(seen[-1], rcdir, cdir), 3)
             return 0
 
-        seen = seen + [cdir]
+        seen = seen + [rcdir]
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histpath = self.asrv.vfs.histtab[top]
         ret = 0
