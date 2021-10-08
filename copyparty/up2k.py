@@ -29,6 +29,8 @@ from .util import (
     atomic_move,
     quotep,
     vsplit,
+    w8b64enc,
+    w8b64dec,
     s3enc,
     s3dec,
     rmdirs,
@@ -479,11 +481,18 @@ class Up2k(object):
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
 
-            n_add = self._build_dir(dbw, top, set(excl), top, nohash, [])
-            n_rm = self._drop_lost(dbw[0], top)
+            n_add = n_rm = 0
+            try:
+                n_add = self._build_dir(dbw, top, set(excl), top, nohash, [])
+                n_rm = self._drop_lost(dbw[0], top)
+            except:
+                m = "failed to index volume [{}]:\n{}"
+                self.log(m.format(top, min_ex()), c=1)
+
             if dbw[1]:
                 self.log("commit {} new files".format(dbw[1]))
-                dbw[0].connection.commit()
+
+            dbw[0].connection.commit()
 
             return True, n_add or n_rm or do_vac
 
@@ -498,6 +507,7 @@ class Up2k(object):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histpath = self.asrv.vfs.histtab[top]
         ret = 0
+        seen_files = {}
         g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
         for iname, inf in sorted(g):
             abspath = os.path.join(cdir, iname)
@@ -507,9 +517,14 @@ class Up2k(object):
                 if abspath in excl or abspath == histpath:
                     continue
                 # self.log(" dir: {}".format(abspath))
-                ret += self._build_dir(dbw, top, excl, abspath, nohash, seen)
+                try:
+                    ret += self._build_dir(dbw, top, excl, abspath, nohash, seen)
+                except:
+                    m = "failed to index subdir [{}]:\n{}"
+                    self.log(m.format(abspath, min_ex()), c=1)
             else:
                 # self.log("file: {}".format(abspath))
+                seen_files[iname] = 1
                 rp = abspath[len(top) + 1 :]
                 if WINDOWS:
                     rp = rp.replace("\\", "/").strip("/")
@@ -568,34 +583,65 @@ class Up2k(object):
                     dbw[0].connection.commit()
                     dbw[1] = 0
                     dbw[2] = time.time()
+
+        # drop missing files
+        rd = cdir[len(top) + 1 :].strip("/")
+        if WINDOWS:
+            rd = rd.replace("\\", "/").strip("/")
+
+        q = "select fn from up where rd = ?"
+        try:
+            c = dbw[0].execute(q, (rd,))
+        except:
+            c = dbw[0].execute(q, ("//" + w8b64enc(rd),))
+
+        hits = [w8b64dec(x[2:]) if x.startswith("//") else x for (x,) in c]
+        rm_files = [x for x in hits if x not in seen_files]
+        n_rm = len(rm_files)
+        for fn in rm_files:
+            self.db_rm(dbw[0], rd, fn)
+
+        if n_rm:
+            self.log("forgot {} deleted files".format(n_rm))
+
         return ret
 
     def _drop_lost(self, cur, top):
         rm = []
+        n_rm = 0
         nchecked = 0
-        nfiles = next(cur.execute("select count(w) from up"))[0]
-        c = cur.execute("select rd, fn from up")
-        for drd, dfn in c:
+        # `_build_dir` did all the files, now do dirs
+        ndirs = next(cur.execute("select count(distinct rd) from up"))[0]
+        c = cur.execute("select distinct rd from up order by rd desc")
+        for (drd,) in c:
             nchecked += 1
-            if drd.startswith("//") or dfn.startswith("//"):
-                drd, dfn = s3dec(drd, dfn)
+            if drd.startswith("//"):
+                rd = w8b64dec(drd[2:])
+            else:
+                rd = drd
 
-            abspath = os.path.join(top, drd, dfn)
-            # almost zero overhead dw
-            self.pp.msg = "b{} {}".format(nfiles - nchecked, abspath)
+            abspath = os.path.join(top, rd)
+            self.pp.msg = "b{} {}".format(ndirs - nchecked, abspath)
             try:
-                if not bos.path.exists(abspath):
-                    rm.append([drd, dfn])
-            except Exception as ex:
-                self.log("stat-rm: {} @ [{}]".format(repr(ex), abspath))
+                if os.path.isdir(abspath):
+                    continue
+            except:
+                pass
 
-        if rm:
-            self.log("forgetting {} deleted files".format(len(rm)))
-            for rd, fn in rm:
-                # self.log("{} / {}".format(rd, fn))
-                self.db_rm(cur, rd, fn)
+            rm.append(drd)
 
-        return len(rm)
+        if not rm:
+            return 0
+
+        q = "select count(w) from up where rd = ?"
+        for rd in rm:
+            n_rm += next(cur.execute(q, (rd,)))[0]
+
+        self.log("forgetting {} deleted dirs, {} files".format(len(rm), n_rm))
+        for rd in rm:
+            cur.execute("delete from up where rd = ?", (rd,))
+
+        return n_rm
 
     def _build_tags_index(self, vol):
         ptop = vol.realpath
