@@ -9,7 +9,7 @@ import subprocess as sp
 to edit this file, use HxD or "vim -b"
   (there is compressed stuff at the end)
 
-run me with any version of python, i will unpack and run copyparty
+run me with python 2.7 or 3.3+ to unpack and run copyparty
 
 there's zero binaries! just plaintext python scripts all the way down
   so you can easily unpack the archive and inspect it for shady stuff
