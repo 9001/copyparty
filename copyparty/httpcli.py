@@ -94,6 +94,7 @@ class HttpCli(object):
     def run(self):
         """returns true if connection can be reused"""
         self.keepalive = False
+        self.is_https = False
         self.headers = {}
         self.hint = None
         try:
@@ -131,6 +132,7 @@ class HttpCli(object):
 
         v = self.headers.get("connection", "").lower()
         self.keepalive = not v.startswith("close") and self.http_ver != "HTTP/1.0"
+        self.is_https = (self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls)
 
         n = self.args.rproxy
         if n:
@@ -1127,10 +1129,9 @@ class HttpCli(object):
             )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
-            is_https = (self.headers.get("x-forwarded-proto") == "https" or self.tls)
             jpart = {
                 "url": "{}://{}/{}".format(
-                    "https" if is_https else "http",
+                    "https" if self.is_https else "http",
                     self.headers.get("host", "copyparty"),
                     vpath + vsuf,
                 ),
