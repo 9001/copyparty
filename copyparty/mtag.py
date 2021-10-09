@@ -471,7 +471,10 @@ class MTag(object):
         ret = {}
         for tagname, mp in parsers.items():
             try:
-                cmd = [sys.executable, mp.bin, abspath]
+                cmd = [mp.bin, abspath]
+                if mp.bin.endswith(".py"):
+                    cmd = [sys.executable] + cmd
+
                 args = {"env": env, "timeout": mp.timeout}
 
                 if WINDOWS:

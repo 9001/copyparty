@@ -53,6 +53,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
+    * [upload events](#upload-events) - trigger a script/program on each upload
     * [complete examples](#complete-examples)
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
@@ -697,6 +698,25 @@ copyparty can invoke external programs to collect additional metadata for files 
 
 * `-mtp ext=an,~/bin/file-ext.py` runs `~/bin/file-ext.py` to get the `ext` tag only if file is not audio (`an`)
 * `-mtp arch,built,ver,orig=an,eexe,edll,~/bin/exe.py` runs `~/bin/exe.py` to get properties about windows-binaries only if file is not audio (`an`) and file extension is exe or dll
+
+
+## upload events
+
+trigger a script/program on each upload  like so:
+
+```
+-v /mnt/inc:inc:w:c,mte=+a1:c,mtp=a1=ad,/usr/bin/notify-send
+```
+
+so filesystem location `/mnt/inc` shared at `/inc`, write-only for everyone, appending `a1` to the list of tags to index, and using `/usr/bin/notify-send` to "provide" that tag
+
+that'll run the command `notify-send` with the path to the uploaded file as the first and only argument (so on linux it'll show a notification on-screen)
+
+note that it will only trigger on new unique files, not dupes
+
+and it will occupy the parsing threads, so fork anything expensive, or if you want to intentionally queue/singlethread you can combine it with `--no-mtag-mt`
+
+if this becomes popular maybe there should be a less janky way to do it actually
 
 
 ## complete examples
