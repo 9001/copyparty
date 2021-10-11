@@ -10,13 +10,17 @@ import json
 import base64
 import string
 import socket
-import ctypes
 from datetime import datetime
 from operator import itemgetter
 import calendar
 
 try:
     import lzma
+except:
+    pass
+
+try:
+    import ctypes
 except:
     pass
 
@@ -1917,11 +1921,14 @@ class HttpCli(object):
             # some fuses misbehave
             if not self.args.nid:
                 if WINDOWS:
-                    bfree = ctypes.c_ulonglong(0)
-                    ctypes.windll.kernel32.GetDiskFreeSpaceExW(
-                        ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
-                    )
-                    srv_info.append(humansize(bfree.value) + " free")
+                    try:
+                        bfree = ctypes.c_ulonglong(0)
+                        ctypes.windll.kernel32.GetDiskFreeSpaceExW(
+                            ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
+                        )
+                        srv_info.append(humansize(bfree.value) + " free")
+                    except:
+                        pass
                 else:
                     sv = os.statvfs(fsenc(abspath))
                     free = humansize(sv.f_frsize * sv.f_bfree, True)
