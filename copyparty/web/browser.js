@@ -168,6 +168,15 @@ ebi('op_cfg').innerHTML = (
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
+	'<div>\n' +
+	'	<h3>favicon <span id="ico1">🎉</span></h3>\n' +
+	'	<div>\n' +
+	'		<input type="text" id="icot" style="width:1.3em" value="" tt="favicon text (blank and refresh to disable)" />' +
+	'		<input type="text" id="icof" style="width:2em" value="" tt="foreground color" />' +
+	'		<input type="text" id="icob" style="width:2em" value="" tt="background color" />' +
+	'		</td>\n' +
+	'	</div>\n' +
+	'</div>\n' +
 	'<div><h3>key notation</h3><div id="key_notation"></div></div>\n' +
 	'<div class="fill"><h3>hidden columns</h3><div id="hcols"></div></div>'
 );

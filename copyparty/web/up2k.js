@@ -2012,6 +2012,15 @@ function warn_uploader_busy(e) {
 
 
 tt.init();
+favico.init();
+ebi('ico1').onclick = function () {
+    var a = favico.txt == this.textContent;
+    swrite('icot', a ? 'c' : this.textContent);
+    swrite('icof', a ? null : '000');
+    swrite('icob', a ? null : '');
+    favico.init();
+};
+
 
 if (QS('#op_up2k.act'))
     goto_up2k();

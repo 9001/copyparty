@@ -629,6 +629,9 @@ input.eq_gain {
 	margin-top: .5em;
 	padding: 1.3em .3em;
 }
+#ico1 {
+	cursor: pointer;
+}
 
 
 
@@ -1076,7 +1079,8 @@ a.btn,
 #rui label,
 #modal-ok,
 #modal-ng,
-#ops {
+#ops,
+#ico1 {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;

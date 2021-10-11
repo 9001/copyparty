@@ -621,11 +621,24 @@ function icfg_get(name, defval) {
 }
 
 function fcfg_get(name, defval) {
-    var o = ebi(name);
+    var o = ebi(name),
+        val = parseFloat(sread(name));
 
-    var val = parseFloat(sread(name));
     if (isNaN(val))
         return parseFloat(o ? o.value : defval);
+
+    if (o)
+        o.value = val;
+
+    return val;
+}
+
+function scfg_get(name, defval) {
+    var o = ebi(name),
+        val = sread(name);
+
+    if (val === null)
+        val = defval;
 
     if (o)
         o.value = val;
@@ -677,6 +690,21 @@ function bcfg_bind(obj, oname, cname, defval, cb, un_ev) {
                 ev(e);
 
             obj[oname] = bcfg_set(cname, !obj[oname]);
+            if (cb)
+                cb(obj[oname]);
+        };
+
+    return v;
+}
+
+function scfg_bind(obj, oname, cname, defval, cb) {
+    var v = scfg_get(cname, defval),
+        el = ebi(cname);
+
+    obj[oname] = v;
+    if (el)
+        el.oninput = function (e) {
+            swrite(cname, obj[oname] = this.value);
             if (cb)
                 cb(obj[oname]);
         };
@@ -849,16 +877,7 @@ var tt = (function () {
     }
 
     r.init = function () {
-        var ttb = ebi('tooltips');
-        if (ttb) {
-            ttb.onclick = function (e) {
-                ev(e);
-                r.en = !r.en;
-                bcfg_set('tooltips', r.en);
-                r.init();
-            };
-            r.en = bcfg_get('tooltips', true)
-        }
+        bcfg_bind(r, 'en', 'tooltips', r.en, r.init);
         r.att(document);
     };
 
@@ -1181,3 +1200,54 @@ function repl(e) {
 }
 if (ebi('repl'))
     ebi('repl').onclick = repl;
+
+
+var favico = (function () {
+    var r = {};
+    r.en = true;
+
+    function gx(txt) {
+        return (
+            '<?xml version="1.0" encoding="UTF-8"?>\n' +
+            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g>\n' +
+            (r.bg ? '<rect width="100%" height="100%" rx="16" fill="#' + r.bg + '" />\n' : '') +
+            '<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"' +
+            ' font-family="sans-serif" font-weight="bold" font-size="64px"' +
+            ' fill="#' + r.fg + '">' + txt + '</text></g></svg>'
+        );
+    }
+
+    r.upd = function () {
+        var i = QS('link[rel="icon"]'), b64;
+        if (!r.txt)
+            return;
+
+        try {
+            b64 = btoa(gx(r.txt));
+        }
+        catch (ex) {
+            b64 = encodeURIComponent(r.txt).replace(/%([0-9A-F]{2})/g,
+                function x(m, v) { return String.fromCharCode('0x' + v); });
+
+            b64 = btoa(gx(unescape(encodeURIComponent(r.txt))));
+        }
+
+        if (!i) {
+            i = mknod('link');
+            i.rel = 'icon';
+            document.head.appendChild(i);
+        }
+        i.href = 'data:image/svg+xml;base64,' + b64;
+    };
+
+    r.init = function () {
+        clearTimeout(r.to);
+        scfg_bind(r, 'txt', 'icot', '', r.upd);
+        scfg_bind(r, 'fg', 'icof', 'fc5', r.upd);
+        scfg_bind(r, 'bg', 'icob', '333', r.upd);
+        r.upd();
+    };
+
+    r.to = setTimeout(r.init, 100);
+    return r;
+})();
