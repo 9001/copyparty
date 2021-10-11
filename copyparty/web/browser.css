@@ -871,8 +871,8 @@ html.light #tree.nowrap #treeul a+a:hover {
 .opwide>div {
 	display: inline-block;
 	vertical-align: top;
-	border-left: .2em solid #4c4c4c;
-	margin-left: .5em;
+	border-left: .4em solid #4c4c4c;
+	margin: .7em 0 .7em .5em;
 	padding-left: .5em;
 }
 .opwide>div.fill {
@@ -880,6 +880,10 @@ html.light #tree.nowrap #treeul a+a:hover {
 }
 .opwide>div>div>a {
 	line-height: 2em;
+}
+.opwide>div>h3 {
+	margin: 0 .4em;
+	padding: 0;
 }
 #op_cfg>div>div>span {
 	display: inline-block;
