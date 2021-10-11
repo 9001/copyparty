@@ -25,14 +25,14 @@ def lstat(p):
 def makedirs(name, mode=0o755, exist_ok=True):
     bname = fsenc(name)
     try:
-        os.makedirs(bname, mode=mode)
+        os.makedirs(bname, mode)
     except:
         if not exist_ok or not os.path.isdir(bname):
             raise
 
 
 def mkdir(p, mode=0o755):
-    return os.mkdir(fsenc(p), mode=mode)
+    return os.mkdir(fsenc(p), mode)
 
 
 def rename(src, dst):
