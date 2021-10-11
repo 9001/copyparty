@@ -466,7 +466,8 @@ class Up2k(object):
     def _build_file_index(self, vol, all_vols):
         do_vac = False
         top = vol.realpath
-        nohash = "dhash" in vol.flags
+        rei = vol.flags.get("noidx")
+        reh = vol.flags.get("nohash")
         with self.mutex:
             cur, _ = self.register_vpath(top, vol.flags)
 
@@ -483,7 +484,7 @@ class Up2k(object):
 
             n_add = n_rm = 0
             try:
-                n_add = self._build_dir(dbw, top, set(excl), top, nohash, [])
+                n_add = self._build_dir(dbw, top, set(excl), top, rei, reh, [])
                 n_rm = self._drop_lost(dbw[0], top)
             except:
                 m = "failed to index volume [{}]:\n{}"
@@ -496,7 +497,7 @@ class Up2k(object):
 
             return True, n_add or n_rm or do_vac
 
-    def _build_dir(self, dbw, top, excl, cdir, nohash, seen):
+    def _build_dir(self, dbw, top, excl, cdir, rei, reh, seen):
         rcdir = absreal(cdir)  # a bit expensive but worth
         if rcdir in seen:
             m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
@@ -511,6 +512,10 @@ class Up2k(object):
         g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
         for iname, inf in sorted(g):
             abspath = os.path.join(cdir, iname)
+            if rei and rei.search(abspath):
+                continue
+
+            nohash = reh.search(abspath) if reh else False
             lmod = int(inf.st_mtime)
             sz = inf.st_size
             if stat.S_ISDIR(inf.st_mode):
@@ -518,7 +523,7 @@ class Up2k(object):
                     continue
                 # self.log(" dir: {}".format(abspath))
                 try:
-                    ret += self._build_dir(dbw, top, excl, abspath, nohash, seen)
+                    ret += self._build_dir(dbw, top, excl, abspath, rei, reh, seen)
                 except:
                     m = "failed to index subdir [{}]:\n{}"
                     self.log(m.format(abspath, min_ex()), c=1)

@@ -865,9 +865,14 @@ class AuthSrv(object):
             if self.args.e2d or "e2ds" in vol.flags:
                 vol.flags["e2d"] = True
 
-            if self.args.no_hash:
-                if "ehash" not in vol.flags:
-                    vol.flags["dhash"] = True
+            for ga, vf in [["no_hash", "nohash"], ["no_idx", "noidx"]]:
+                if vf in vol.flags:
+                    ptn = vol.flags.pop(vf)
+                else:
+                    ptn = getattr(self.args, ga)
+
+                if ptn:
+                    vol.flags[vf] = re.compile(ptn)
 
             for k in ["e2t", "e2ts", "e2tsr"]:
                 if getattr(self.args, k):

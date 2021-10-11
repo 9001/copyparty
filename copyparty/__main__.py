@@ -276,7 +276,8 @@ def run_argparse(argv, formatter):
               \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* volflags)
               \033[36md2t\033[35m disables metadata collection, overrides -e2t*
               \033[36md2d\033[35m disables all database stuff, overrides -e2*
-              \033[36mdhash\033[35m disables file hashing on initial scans, also ehash
+              \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
+              \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
               \033[36mhist=/tmp/cdb\033[35m puts thumbnails and indexes at that location
               \033[36mscan=60\033[35m scan for new files every 60sec, same as --re-maxage
             
@@ -412,7 +413,8 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
     ap2.add_argument("-e2dsa", action="store_true", help="scan all folders (for search), sets -e2ds")
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
-    ap2.add_argument("--no-hash", action="store_true", help="disable hashing during e2ds folder scans")
+    ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching paths during e2ds folder scans")
+    ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
     ap2.add_argument("--re-int", metavar="SEC", type=int, default=30, help="disk rescan check interval")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")

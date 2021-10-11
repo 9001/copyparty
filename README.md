@@ -596,12 +596,14 @@ note:
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
-to save some time, you can choose to only index filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash` or the volume-flag `:c,dhash`, this has the following consequences:
+to save some time, you can provide a regex pattern for filepaths to only index by filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash \.iso$` or the volume-flag `:c,nohash=\.iso$`, this has the following consequences:
 * initial indexing is way faster, especially when the volume is on a network disk
 * makes it impossible to [file-search](#file-search)
 * if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
 
-if you set `--no-hash`, you can enable hashing for specific volumes using flag `:c,ehash`
+similarly, you can fully ignore files/folders using `--no-idx [...]` and `:c,noidx=\.iso$`
+
+if you set `--no-hash [...]` globally, you can enable hashing for specific volumes using flag `:c,nohash=`
 
 
 ## upload rules
@@ -851,7 +853,7 @@ below are some tweaks roughly ordered by usefulness:
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
 * `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
-* `--no-hash` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
+* `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
   * huge amount of short-lived connections
   * really heavy traffic (downloads/uploads)
