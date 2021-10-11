@@ -3154,7 +3154,7 @@ var treectl = (function () {
 
 	treectl.goto = function (url, push) {
 		get_tree("", url, true);
-		reqls(url, push);
+		reqls(url, push, true);
 	}
 
 	function get_tree(top, dst, rst) {
@@ -3282,7 +3282,7 @@ var treectl = (function () {
 		reqls(this.getAttribute('href'), true);
 	}
 
-	function reqls(url, hpush) {
+	function reqls(url, hpush, no_tree) {
 		var xhr = new XMLHttpRequest();
 		xhr.top = url;
 		xhr.hpush = hpush;
@@ -3290,7 +3290,7 @@ var treectl = (function () {
 		xhr.open('GET', xhr.top + '?ls' + (treectl.dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvls;
 		xhr.send();
-		if (hpush)
+		if (hpush && !no_tree)
 			get_tree('.', xhr.top);
 
 		enspin(thegrid.en ? '#gfiles' : '#files');
