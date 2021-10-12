@@ -726,6 +726,7 @@ class AuthSrv(object):
                     axs = getattr(vol.axs, axs_key)
                     if usr in axs or "*" in axs:
                         umap[usr].append(mp)
+                umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
 
         all_users = {}
