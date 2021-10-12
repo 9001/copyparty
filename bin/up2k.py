@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-10-04, v0.7, ed <irc.rizon.net>, MIT-Licensed
+2021-10-12, v0.8, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -232,9 +232,13 @@ def walkdir(top):
 def walkdirs(tops):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
     for top in tops:
+        stop = top
+        if top[-1:] == os.sep:
+            stop = os.path.dirname(top.rstrip(os.sep))
+
         if os.path.isdir(top):
             for ap, inf in walkdir(top):
-                yield top, ap[len(top) + 1 :], inf
+                yield stop, ap[len(stop) + 1 :], inf
         else:
             sep = "{0}".format(os.sep).encode("ascii")
             d, n = top.rsplit(sep, 1)
@@ -403,7 +407,9 @@ class Ctl(object):
     def __init__(self, ar):
         self.ar = ar
         ar.files = [
-            os.path.abspath(os.path.realpath(x.encode("utf-8"))) for x in ar.files
+            os.path.abspath(os.path.realpath(x.encode("utf-8")))
+            + (x[-1:] if x[-1:] == os.sep else "").encode("utf-8")
+            for x in ar.files
         ]
         ar.url = ar.url.rstrip("/") + "/"
         if "://" not in ar.url:
@@ -696,13 +702,23 @@ class Ctl(object):
                 self.uploader_busy -= 1
 
 
+class APF(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
+    pass
+
+
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if not VT100:
         os.system("rem")  # enables colors
 
     # fmt: off
-    ap = app = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    ap = app = argparse.ArgumentParser(formatter_class=APF, epilog="""
+NOTE:
+source file/folder selection uses rsync syntax, meaning that:
+  "foo" uploads the entire folder to URL/foo/
+  "foo/" uploads the CONTENTS of the folder into URL/
+""")
+
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
     ap.add_argument("-a", metavar="PASSWORD", help="password")
