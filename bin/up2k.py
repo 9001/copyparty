@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-10-12, v0.8, ed <irc.rizon.net>, MIT-Licensed
+2021-10-12, v0.9, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -33,11 +33,15 @@ import datetime
 PY2 = sys.version_info[0] == 2
 if PY2:
     from Queue import Queue
+    from urllib import unquote
+    from urllib import quote
 
     sys.dont_write_bytecode = True
     bytes = str
 else:
     from queue import Queue
+    from urllib.parse import unquote_to_bytes as unquote
+    from urllib.parse import quote_from_bytes as quote
 
     unicode = str
 
@@ -231,18 +235,27 @@ def walkdir(top):
 
 def walkdirs(tops):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
+    sep = "{0}".format(os.sep).encode("ascii")
     for top in tops:
         stop = top
-        if top[-1:] == os.sep:
-            stop = os.path.dirname(top.rstrip(os.sep))
+        if top[-1:] == sep:
+            stop = os.path.dirname(top.rstrip(sep))
 
         if os.path.isdir(top):
             for ap, inf in walkdir(top):
-                yield stop, ap[len(stop) + 1 :], inf
+                yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
-            sep = "{0}".format(os.sep).encode("ascii")
             d, n = top.rsplit(sep, 1)
             yield d, n, os.stat(top)
+
+
+# mostly from copyparty/util.py
+def quotep(btxt):
+    quot1 = quote(btxt, safe=b"/")
+    if not PY2:
+        quot1 = quot1.encode("ascii")
+
+    return quot1.replace(b" ", b"+")
 
 
 # from copyparty/util.py
@@ -338,7 +351,7 @@ def handshake(req_ses, url, file, pw, search):
     if file.url:
         url = file.url
     elif b"/" in file.rel:
-        url += file.rel.rsplit(b"/", 1)[0].decode("utf-8", "replace")
+        url += quotep(file.rel.rsplit(b"/", 1)[0]).decode("utf-8", "replace")
 
     while True:
         try:
@@ -448,13 +461,14 @@ class Ctl(object):
             print("{0} {1}\n  hash...".format(self.nfiles - nf, upath))
             get_hashlist(file, None)
 
+            burl = self.ar.url[:8] + self.ar.url[8:].split("/")[0] + "/"
             while True:
                 print("  hs...")
                 hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
                 if search:
                     if hs:
                         for hit in hs:
-                            print("  found: {0}{1}".format(self.ar.url, hit["rp"]))
+                            print("  found: {0}{1}".format(burl, hit["rp"]))
                     else:
                         print("  NOT found")
                     break
@@ -570,7 +584,36 @@ class Ctl(object):
         self.st_hash = [file, ofs]
 
     def hasher(self):
+        prd = None
+        ls = {}
         for top, rel, inf in self.filegen:
+            if self.ar.z:
+                rd = os.path.dirname(rel)
+                if prd != rd:
+                    prd = rd
+                    headers = {}
+                    if self.ar.a:
+                        headers["Cookie"] = "=".join(["cppwd", self.ar.a])
+
+                    ls = {}
+                    try:
+                        print("      ls ~{0}".format(rd.decode("utf-8", "replace")))
+                        r = req_ses.get(
+                            self.ar.url.encode("utf-8") + quotep(rd) + b"?ls",
+                            headers=headers,
+                        )
+                        for f in r.json()["files"]:
+                            rfn = f["href"].split("?")[0].encode("utf-8", "replace")
+                            ls[unquote(rfn)] = f
+                    except:
+                        print("   mkdir ~{0}".format(rd.decode("utf-8", "replace")))
+
+                rf = ls.get(os.path.basename(rel), None)
+                if rf and rf["sz"] == inf.st_size and abs(rf["ts"] - inf.st_mtime) <= 1:
+                    self.nfiles -= 1
+                    self.nbytes -= inf.st_size
+                    continue
+
             file = File(top, rel, inf.st_size, inf.st_mtime)
             while True:
                 with self.mutex:
@@ -604,6 +647,7 @@ class Ctl(object):
     def handshaker(self):
         search = self.ar.s
         q = self.q_handshake
+        burl = self.ar.url[:8] + self.ar.url[8:].split("/")[0] + "/"
         while True:
             file = q.get()
             if not file:
@@ -633,7 +677,7 @@ class Ctl(object):
                 if hs:
                     for hit in hs:
                         m = "found: {0}\n  {1}{2}\n"
-                        print(m.format(upath, self.ar.url, hit["rp"]), end="")
+                        print(m.format(upath, burl, hit["rp"]), end="")
                 else:
                     print("NOT found: {0}\n".format(upath), end="")
 
@@ -665,7 +709,8 @@ class Ctl(object):
                 self.handshaker_busy -= 1
 
             if not hs:
-                print("uploaded {0}".format(upath))
+                kw = "uploaded" if file.up_b else "   found"
+                print("{0} {1}".format(kw, upath))
             for cid in hs:
                 self.q_upload.put([file, cid])
 
@@ -727,6 +772,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
+    ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
     ap = app.add_argument_group("tls")
     ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
     ap.add_argument("-td", action="store_true", help="disable certificate check")
