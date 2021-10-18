@@ -1191,6 +1191,9 @@ def sendfile_kern(lower, upper, f, s):
 
 
 def statdir(logger, scandir, lstat, top):
+    if lstat and ANYWIN:
+        lstat = False
+
     if lstat and not os.supports_follow_symlinks:
         scandir = False
 
