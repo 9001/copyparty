@@ -1492,44 +1492,14 @@ function evau_error(e) {
 }
 
 
-// show a fullscreen message
-function show_modal(html) {
-	var body = document.body || document.getElementsByTagName('body')[0],
-		div = mknod('div');
-
-	div.setAttribute('id', 'blocked');
-	div.innerHTML = html;
-	unblocked();
-	body.appendChild(div);
-}
-
-
-// hide fullscreen message
-function unblocked(e) {
-	ev(e);
-	var dom = ebi('blocked');
-	if (dom)
-		dom.parentNode.removeChild(dom);
-}
-
-
 // show ui to manually start playback of a linked song
 function autoplay_blocked(seek) {
-	show_modal(
-		'<div id="blk_play"><a href="#" id="blk_go"></a></div>' +
-		'<div id="blk_abrt"><a href="#" id="blk_na">Cancel<br />(show file list)</a></div>');
-
-	var go = ebi('blk_go'),
-		na = ebi('blk_na'),
-		tid = mp.au.tid,
+	var tid = mp.au.tid,
 		fn = mp.tracks[tid].split(/\//).pop();
 
 	fn = uricom_dec(fn.replace(/\+/g, ' '))[0];
 
-	go.textContent = 'Play "' + fn + '"';
-	go.onclick = function (e) {
-		unblocked(e);
-		toast.hide();
+	modal.confirm('<h6>play this audio file?</h6>\n«' + esc(fn) + '»', function () {
 		if (mp.au !== mp.au_ogvjs)
 			// chrome 91 may permanently taint on a failed play()
 			// depending on win10 settings or something? idk
@@ -1542,8 +1512,7 @@ function autoplay_blocked(seek) {
 
 		play(tid, true, seek);
 		mp.fade_in();
-	};
-	na.onclick = unblocked;
+	}, null);
 }
 
 

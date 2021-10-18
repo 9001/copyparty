@@ -289,40 +289,6 @@ html.light #ggrid>a.sel {
 #files tr:focus+tr td {
 	border-top: 1px solid transparent;
 }
-#blocked {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: #333;
-	font-size: 2.5em;
-	z-index: 99;
-}
-#blk_play,
-#blk_abrt {
-	position: fixed;
-	display: table;
-	width: 80%;
-}
-#blk_play {
-	height: 60%;
-	left: 10%;
-	top: 5%;
-}
-#blk_abrt {
-	height: 25%;
-	left: 10%;
-	bottom: 5%;
-}
-#blk_play a,
-#blk_abrt a {
-	display: table-cell;
-	vertical-align: middle;
-	text-align: center;
-	background: #444;
-	border-radius: 2em;
-}
 #widget {
 	position: fixed;
 	font-size: 1.4em;
@@ -1239,14 +1205,6 @@ html.light tr.play a {
 }
 html.light #files th:hover .cfg {
 	background: #ccc;
-}
-html.light #blocked {
-	background: #eee;
-}
-html.light #blk_play a,
-html.light #blk_abrt a {
-	background: #fff;
-	box-shadow: 0 .2em .4em #ddd;
 }
 html.light #widget a {
 	color: #06a;
