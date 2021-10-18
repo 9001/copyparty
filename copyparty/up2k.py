@@ -1518,6 +1518,7 @@ class Up2k(object):
         try:
             permsets = [[True, False, False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+            vn, rem = vn.get_dbv(rem)
             unpost = False
         except:
             # unpost with missing permissions? try read+write and verify with db
@@ -1527,6 +1528,7 @@ class Up2k(object):
             unpost = True
             permsets = [[True, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
+            vn, rem = vn.get_dbv(rem)
             _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
 
             m = "you cannot delete this: "
