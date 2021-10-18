@@ -1162,6 +1162,11 @@ function up2k_init(subtle) {
                         }
                     }
                     is_busy = st.todo.handshake.length;
+                    try {
+                        if (!is_busy && !uc.fsearch && !msel.getsel().length && (!mp.au || mp.au.paused))
+                            treectl.goto(get_evpath());
+                    }
+                    catch (ex) { }
                 }
 
                 if (was_busy != is_busy) {
