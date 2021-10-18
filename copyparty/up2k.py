@@ -1318,7 +1318,7 @@ class Up2k(object):
 
         # TODO broker which avoid this race and
         # provides a new filename if taken (same as bup)
-        suffix = ".{:.6f}-{}".format(ts, ip)
+        suffix = "-{:.6f}-{}".format(ts, ip.replace(":", "."))
         with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as f:
             return f["orz"][1]
 
@@ -1877,7 +1877,8 @@ class Up2k(object):
                 del self.registry[job["ptop"]][job["wark"]]
             return
 
-        suffix = ".{:.6f}-{}".format(job["t0"], job["addr"])
+        dip = job["addr"].replace(":", ".")
+        suffix = "-{:.6f}-{}".format(job["t0"], dip)
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as f:
             f, job["tnam"] = f["orz"]
             if (

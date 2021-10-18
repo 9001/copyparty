@@ -1050,7 +1050,7 @@ class HttpCli(object):
                     if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")
 
-                    suffix = ".{:.6f}-{}".format(time.time(), self.ip)
+                    suffix = "-{:.6f}-{}".format(time.time(), self.dip)
                     open_args = {"fdir": fdir, "suffix": suffix}
                 else:
                     open_args = {}
