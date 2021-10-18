@@ -38,6 +38,7 @@ class SvcHub(object):
         self.stop_req = False
         self.stopping = False
         self.stop_cond = threading.Condition()
+        self.retcode = 0
         self.httpsrv_up = 0
 
         self.log_mutex = threading.Lock()
@@ -59,9 +60,9 @@ class SvcHub(object):
         if not args.no_fpool and args.j != 1:
             m = "WARNING: --use-fpool combined with multithreading is untested and can probably cause undefined behavior"
             if ANYWIN:
-                m = "windows cannot do multithreading without --no-fpool, so enabling that -- note that upload performance will suffer if you have microsoft defender \"real-time protection\" enabled, so you probably want to use -j 1 instead"
+                m = 'windows cannot do multithreading without --no-fpool, so enabling that -- note that upload performance will suffer if you have microsoft defender "real-time protection" enabled, so you probably want to use -j 1 instead'
                 args.no_fpool = True
-            
+
             self.log("root", m, c=3)
 
         # initiate all services to manage
@@ -98,14 +99,23 @@ class SvcHub(object):
 
     def thr_httpsrv_up(self):
         time.sleep(5)
-        failed = self.broker.num_workers - self.httpsrv_up
+        expected = self.broker.num_workers * self.tcpsrv.nsrv
+        failed = expected - self.httpsrv_up
         if not failed:
             return
 
         m = "{}/{} workers failed to start"
-        m = m.format(failed, self.broker.num_workers)
+        m = m.format(failed, expected)
         self.log("root", m, 1)
-        os._exit(1)
+
+        if self.args.ign_ebind_all:
+            return
+
+        if self.args.ign_ebind and self.tcpsrv.srv:
+            return
+
+        self.retcode = 1
+        os.kill(os.getpid(), signal.SIGTERM)
 
     def cb_httpsrv_up(self):
         self.httpsrv_up += 1
@@ -242,7 +252,7 @@ class SvcHub(object):
                         print("waiting for thumbsrv (10sec)...")
 
             print("nailed it", end="")
-            ret = 0
+            ret = self.retcode
         finally:
             print("\033[0m")
             if self.logf:

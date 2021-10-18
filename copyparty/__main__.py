@@ -381,6 +381,10 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme.md into directory listings")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
 
+    ap2 = ap.add_argument_group('yolo options')
+    ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
+    ap2.add_argument("--ign-ebind-all", action="store_true", help="continue running even if it's impossible to receive connections at all")
+
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")
     ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")

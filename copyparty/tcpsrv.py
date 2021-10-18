@@ -42,9 +42,21 @@ class TcpSrv(object):
                 self.log("tcpsrv", m)
 
         self.srv = []
+        self.nsrv = 0
         for ip in self.args.i:
             for port in self.args.p:
-                self.srv.append(self._listen(ip, port))
+                self.nsrv += 1
+                try:
+                    self._listen(ip, port)
+                except Exception as ex:
+                    if self.args.ign_ebind or self.args.ign_ebind_all:
+                        m = "could not listen on {}:{}: {}"
+                        self.log("tcpsrv", m.format(ip, port, ex), c=1)
+                    else:
+                        raise
+
+        if not self.srv and not self.args.ign_ebind_all:
+            raise Exception("could not listen on any of the given interfaces")
 
     def _listen(self, ip, port):
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,7 +64,7 @@ class TcpSrv(object):
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         try:
             srv.bind((ip, port))
-            return srv
+            self.srv.append(srv)
         except (OSError, socket.error) as ex:
             if ex.errno in [98, 48]:
                 e = "\033[1;31mport {} is busy on interface {}\033[0m".format(port, ip)
