@@ -545,9 +545,8 @@ class HttpCli(object):
 
         bos.makedirs(fdir)
 
-        open_f = open
+        open_ka = {"fun": open}
         open_a = ["wb", 512 * 1024]
-        open_ka = {}
 
         # user-request || config-force
         if ("gz" in vfs.flags or "xz" in vfs.flags) and (
@@ -588,28 +587,24 @@ class HttpCli(object):
 
             self.log("compressing with {} level {}".format(alg, lv.get(alg)))
             if alg == "gz":
-                open_f = gzip.GzipFile
+                open_ka["fun"] = gzip.GzipFile
                 open_a = ["wb", lv[alg], None, 0x5FEE6600]  # 2021-01-01
             elif alg == "xz":
-                open_f = lzma.open
+                open_ka = {"fun": lzma.open, "preset": lv[alg]}
                 open_a = ["wb"]
-                open_ka = {"preset": lv[alg]}
             else:
                 self.log("fallthrough? thats a bug", 1)
 
-        params = {
-            "suffix": "-{:.6f}-{}".format(time.time(), self.dip),
-            "fdir": fdir,
-            "fun": open_f,
-        }
-        params.update(open_ka)
-
+        suffix = "-{:.6f}-{}".format(time.time(), self.dip)
+        params = {"suffix": suffix, "fdir": fdir}
         if self.args.nw:
             params = {}
             fn = os.devnull
 
+        params.update(open_ka)
+
         if not fn:
-            fn = "put" + params["suffix"]
+            fn = "put" + suffix
 
         with ren_open(fn, *open_a, **params) as f:
             f, fn = f["orz"]
