@@ -478,11 +478,12 @@ def min_ex():
 
 @contextlib.contextmanager
 def ren_open(fname, *args, **kwargs):
+    fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
 
     if fname == os.devnull:
-        with open(fname, *args, **kwargs) as f:
+        with fun(fname, *args, **kwargs) as f:
             yield {"orz": [f, fname]}
             return
 
@@ -516,7 +517,7 @@ def ren_open(fname, *args, **kwargs):
                 fname += suffix
                 ext += suffix
 
-            with open(fsenc(fpath), *args, **kwargs) as f:
+            with fun(fsenc(fpath), *args, **kwargs) as f:
                 if b64:
                     fp2 = "fn-trunc.{}.txt".format(b64)
                     fp2 = os.path.join(fdir, fp2)

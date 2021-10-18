@@ -59,7 +59,7 @@ class HttpCli(object):
 
         self.bufsz = 1024 * 32
         self.hint = None
-        self.absolute_urls = False
+        self.trailing_slash = True
         self.out_headers = {
             "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store; max-age=0",
@@ -154,6 +154,8 @@ class HttpCli(object):
 
                 self.log_src = self.conn.set_rproxy(self.ip)
 
+        self.dip = self.ip.replace(":", ".")
+
         if self.args.ihead:
             keys = self.args.ihead
             if "*" in keys:
@@ -170,15 +172,11 @@ class HttpCli(object):
         # split req into vpath + uparam
         uparam = {}
         if "?" not in self.req:
-            if not self.req.endswith("/"):
-                self.absolute_urls = True
-
+            self.trailing_slash = self.req.endswith("/")
             vpath = undot(self.req)
         else:
             vpath, arglist = self.req.split("?", 1)
-            if not vpath.endswith("/"):
-                self.absolute_urls = True
-
+            self.trailing_slash = vpath.endswith("/")
             vpath = undot(vpath)
             for k in arglist.split("&"):
                 if "=" in k:
@@ -472,12 +470,12 @@ class HttpCli(object):
             except:
                 raise Pebkac(400, "client d/c before 100 continue")
 
+        if "raw" in self.uparam:
+            return self.handle_stash()
+
         ctype = self.headers.get("content-type", "").lower()
         if not ctype:
             raise Pebkac(400, "you can't post without a content-type header")
-
-        if "raw" in self.uparam:
-            return self.handle_stash()
 
         if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
@@ -539,16 +537,16 @@ class HttpCli(object):
         fdir = os.path.join(vfs.realpath, rem)
         if lim:
             fdir, rem = lim.all(self.ip, rem, remains, fdir)
-            bos.makedirs(fdir)
 
-        addr = self.ip.replace(":", ".")
-        fn = "put-{:.6f}-{}.bin".format(time.time(), addr)
-        path = os.path.join(fdir, fn)
-        if self.args.nw:
-            path = os.devnull
+        fn = None
+        if rem and not self.trailing_slash and not bos.path.isdir(fdir):
+            fdir, fn = os.path.split(fdir)
+            rem, _ = vsplit(rem)
+
+        bos.makedirs(fdir)
 
         open_f = open
-        open_a = [fsenc(path), "wb", 512 * 1024]
+        open_a = ["wb", 512 * 1024]
         open_ka = {}
 
         # user-request || config-force
@@ -591,15 +589,31 @@ class HttpCli(object):
             self.log("compressing with {} level {}".format(alg, lv.get(alg)))
             if alg == "gz":
                 open_f = gzip.GzipFile
-                open_a = [fsenc(path), "wb", lv[alg], None, 0x5FEE6600]  # 2021-01-01
+                open_a = ["wb", lv[alg], None, 0x5FEE6600]  # 2021-01-01
             elif alg == "xz":
                 open_f = lzma.open
-                open_a = [fsenc(path), "wb"]
+                open_a = ["wb"]
                 open_ka = {"preset": lv[alg]}
             else:
                 self.log("fallthrough? thats a bug", 1)
 
-        with open_f(*open_a, **open_ka) as f:
+        params = {
+            "suffix": "-{:.6f}-{}".format(time.time(), self.dip),
+            "fdir": fdir,
+            "fun": open_f,
+        }
+        params.update(open_ka)
+
+        if self.args.nw:
+            params = {}
+            fn = os.devnull
+
+        if not fn:
+            fn = "put" + params["suffix"]
+
+        with ren_open(fn, *open_a, **params) as f:
+            f, fn = f["orz"]
+            path = os.path.join(fdir, fn)
             post_sz, _, sha_b64 = hashcopy(reader, f)
 
         if lim:
@@ -2072,7 +2086,7 @@ class HttpCli(object):
         for fn in vfs_ls:
             base = ""
             href = fn
-            if not is_ls and self.absolute_urls and vpath:
+            if not is_ls and not self.trailing_slash and vpath:
                 base = "/" + vpath + "/"
                 href = base + fn
 
