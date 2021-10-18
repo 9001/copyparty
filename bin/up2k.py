@@ -125,15 +125,28 @@ class FileSlice(object):
         return ret
 
 
+_print = print
+
+
 def eprint(*a, **ka):
     ka["file"] = sys.stderr
     ka["end"] = ""
     if not PY2:
         ka["flush"] = True
 
-    print(*a, **ka)
-    if PY2:
+    _print(*a, **ka)
+    if PY2 or not VT100:
         sys.stderr.flush()
+
+
+def flushing_print(*a, **ka):
+    _print(*a, **ka)
+    if "flush" not in ka:
+        sys.stdout.flush()
+
+
+if not VT100:
+    print = flushing_print
 
 
 def termsize():
