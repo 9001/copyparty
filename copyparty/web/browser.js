@@ -1439,12 +1439,7 @@ function play(tid, is_ev, seek, call_depth) {
 		if (!seek) {
 			var o = ebi(oid);
 			o.setAttribute('id', 'thx_js');
-			if (window.history && history.replaceState) {
-				hist_replace(document.location.pathname + '#' + oid);
-			}
-			else {
-				document.location.hash = oid;
-			}
+			sethash(oid);
 			o.setAttribute('id', oid);
 		}
 
@@ -1516,9 +1511,12 @@ function autoplay_blocked(seek) {
 }
 
 
-function play_linked() {
+function eval_hash() {
 	var v = location.hash;
-	if (v && v.indexOf('#af-') === 0) {
+	if (!v)
+		return;
+
+	if (v.indexOf('#af-') === 0) {
 		var id = v.slice(2).split('&');
 		if (id[0].length != 10)
 			return;
@@ -1531,6 +1529,13 @@ function play_linked() {
 			return play(id[0]);
 
 		return play(id[0], false, parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0));
+	}
+
+	if (v.indexOf('#q=') === 0) {
+		goto('search');
+		var i = ebi('q_raw');
+		i.value = uricom_dec(v.slice(3))[0];
+		return i.oninput();
 	}
 };
 
@@ -2725,28 +2730,28 @@ document.onkeydown = function (e) {
 (function () {
 	var sconf = [
 		["size",
-			["szl", "sz_min", "minimum MiB", ""],
-			["szu", "sz_max", "maximum MiB", ""]
+			["szl", "sz_min", "minimum MiB", "16"],
+			["szu", "sz_max", "maximum MiB", "16"]
 		],
 		["date",
-			["dtl", "dt_min", "min. iso8601", ""],
-			["dtu", "dt_max", "max. iso8601", ""]
+			["dtl", "dt_min", "min. iso8601", "16"],
+			["dtu", "dt_max", "max. iso8601", "16"]
 		],
 		["path",
-			["path", "path", "path contains &nbsp; (space-separated)", "46"]
+			["path", "path", "path contains &nbsp; (space-separated)", "34"]
 		],
 		["name",
-			["name", "name", "name contains &nbsp; (negate with -nope)", "46"]
+			["name", "name", "name contains &nbsp; (negate with -nope)", "34"]
 		]
 	];
 	var oldcfg = [];
 
 	if (QS('#srch_form.tags')) {
 		sconf.push(["tags",
-			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "46"]
+			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "34"]
 		]);
 		sconf.push(["adv.",
-			["adv", "adv", "key>=1A&nbsp; key<=2B&nbsp; .bpm>165", "46"]
+			["adv", "adv", "key>=1A&nbsp; key<=2B&nbsp; .bpm>165", "34"]
 		]);
 	}
 
@@ -2763,8 +2768,8 @@ document.onkeydown = function (e) {
 			html.push(
 				'<td colspan="' + csp + '"><input id="' + hn + 'c" type="checkbox">\n' +
 				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
-				'<br /><input id="' + hn + 'v" type="text" size="' + sconf[a][b][3] +
-				'" name="' + sconf[a][b][1] + '" /></td>');
+				'<br /><input id="' + hn + 'v" type="text" style="width:' + sconf[a][b][3] +
+				'em" name="' + sconf[a][b][1] + '" /></td>');
 			if (csp == 2)
 				break;
 		}
@@ -2976,6 +2981,7 @@ document.onkeydown = function (e) {
 		reload_browser();
 		filecols.set_style(['File Name']);
 
+		sethash('q=' + uricom_enc(this.q_raw));
 		ebi('unsearch').onclick = unsearch;
 	}
 
@@ -2985,6 +2991,7 @@ document.onkeydown = function (e) {
 		ebi('files').innerHTML = orig_html;
 		ebi('files').removeAttribute('q_raw');
 		orig_html = null;
+		sethash('');
 		reload_browser();
 	}
 })();
@@ -4447,4 +4454,4 @@ function reload_browser(not_mp) {
 }
 reload_browser(true);
 mukey.render();
-play_linked();
+setTimeout(eval_hash, 1);

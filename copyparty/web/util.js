@@ -723,6 +723,15 @@ function hist_replace(url) {
     history.replaceState(url, url, url);
 }
 
+function sethash(hv) {
+    if (window.history && history.replaceState) {
+        hist_replace(document.location.pathname + '#' + hv);
+    }
+    else {
+        document.location.hash = hv;
+    }
+}
+
 
 var timer = (function () {
     var r = {};
