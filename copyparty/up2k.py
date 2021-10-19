@@ -530,7 +530,7 @@ class Up2k(object):
             else:
                 # self.log("file: {}".format(abspath))
                 seen_files[iname] = 1
-                rp = abspath[len(top) + 1 :]
+                rp = abspath[len(top) :].lstrip("/")
                 if WINDOWS:
                     rp = rp.replace("\\", "/").strip("/")
 
