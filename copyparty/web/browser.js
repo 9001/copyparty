@@ -593,6 +593,7 @@ var widget = (function () {
 		if (r.is_open)
 			return false;
 
+		clmod(document.documentElement, 'np_open', 1);
 		widget.className = 'open';
 		r.is_open = true;
 		return true;
@@ -601,6 +602,7 @@ var widget = (function () {
 		if (!r.is_open)
 			return false;
 
+		clmod(document.documentElement, 'np_open');
 		widget.className = '';
 		r.is_open = false;
 		return true;
@@ -2362,7 +2364,7 @@ var thegrid = (function () {
 
 		if (r.sel) {
 			td.click();
-			this.setAttribute('class', tr.getAttribute('class'));
+			clmod(this, 'sel', clgot(tr, 'sel'));
 		}
 		else if (widget.is_open && aplay)
 			aplay.click();
@@ -2936,7 +2938,7 @@ document.onkeydown = function (e) {
 
 		var html = mk_files_header(tagord);
 		html.push('<tbody>');
-		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch">! close search results</a></td></tr>');
+		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch"><big style="font-weight:bold">[❌] close search results</big></a></td></tr>');
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
 				ts = parseInt(r.ts),
@@ -3051,14 +3053,14 @@ var treectl = (function () {
 		swrite('entreed', 'na');
 
 		treectl.hide();
-		ebi('path').style.display = 'inline-block';
+		ebi('path').style.display = '';
 	}
 
 	treectl.hide = function () {
 		treectl.hidden = true;
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'none';
-		ebi('wrap').style.marginLeft = '0';
+		ebi('wrap').style.marginLeft = '';
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
 	}
@@ -3109,7 +3111,7 @@ var treectl = (function () {
 				treeh = winh - atop;
 
 			tree.style.top = top + 'px';
-			tree.style.height = treeh < 10 ? '' : treeh + 'px';
+			tree.style.height = treeh < 10 ? '' : Math.floor(treeh - 2) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
@@ -3127,13 +3129,16 @@ var treectl = (function () {
 			if (!QS(q))
 				break;
 		}
-		var w = (treesz + Math.max(0, nq)) + 'em';
+		var iw = (treesz + Math.max(0, nq)),
+			w = iw + 'em',
+			w2 = (iw + 2) + 'em';
+
 		try {
 			document.documentElement.style.setProperty('--nav-sz', w);
 		}
 		catch (ex) { }
 		ebi('tree').style.width = w;
-		ebi('wrap').style.marginLeft = w;
+		ebi('wrap').style.marginLeft = w2;
 		onscroll();
 	}
 
