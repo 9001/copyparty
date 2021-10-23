@@ -9,6 +9,7 @@ buildenv/
 build/
 dist/
 sfx/
+py2/
 .venv/
 
 # ide

@@ -61,28 +61,29 @@ ebi('op_up2k').innerHTML = (
 
 	'<table id="u2conf">\n' +
 	'	<tr>\n' +
-	'		<td><br />parallel uploads:</td>\n' +
-	'		<td rowspan="2">\n' +
+	'		<td class="c"><br />parallel uploads:</td>\n' +
+	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="multitask" />\n' +
 	'			<label for="multitask" tt="continue hashing other files while uploading">🏃</label>\n' +
 	'		</td>\n' +
-	'		<td rowspan="2">\n' +
+	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="ask_up" />\n' +
 	'			<label for="ask_up" tt="ask for confirmation before upload starts">💭</label>\n' +
 	'		</td>\n' +
 	(have_up2k_idx ? (
-		'		<td data-perm="read" rowspan="2">\n' +
+		'		<td class="c" data-perm="read" rowspan="2">\n' +
 		'			<input type="checkbox" id="fsearch" />\n' +
 		'			<label for="fsearch" tt="don\'t actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>\n' +
 		'		</td>\n'
 	) : '') +
 	'		<td data-perm="read" rowspan="2" id="u2btn_cw"></td>\n' +
+	'		<td data-perm="read" rowspan="2" id="u2c3w"></td>\n' +
 	'	</tr>\n' +
 	'	<tr>\n' +
-	'		<td>\n' +
-	'			<a href="#" id="nthread_sub">&ndash;</a><input\n' +
+	'		<td class="c">\n' +
+	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
 	'				class="txtbox" id="nthread" value="2" tt="pause uploads by setting it to 0"/><a\n' +
-	'				href="#" id="nthread_add">+</a><br />&nbsp;\n' +
+	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +
 	'		</td>\n' +
 	'	</tr>\n' +
 	'</table>\n' +
@@ -98,6 +99,8 @@ ebi('op_up2k').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 
+	'<div id="u2c3t">\n' +
+
 	'<div id="u2etaw"><div id="u2etas"><div class="o">\n' +
 	'	hash: <span id="u2etah" tt="average &lt;em&gt;hashing&lt;/em&gt; speed, and estimated time until finish">(no uploads are queued yet)</span><br />\n' +
 	'	send: <span id="u2etau" tt="average &lt;em&gt;upload&lt;/em&gt; speed and estimated time until finish">(no uploads are queued yet)</span><br />\n' +
@@ -110,6 +113,8 @@ ebi('op_up2k').innerHTML = (
 	'	href="#" act="done" tt="ok and ng combined">done <span>0</span></a><a\n' +
 	'	href="#" act="bz" tt="hashing or uploading" class="act">busy <span>0</span></a><a\n' +
 	'	href="#" act="q" tt="idle, pending">que <span>0</span></a>\n' +
+	'</div>\n' +
+
 	'</div>\n' +
 
 	'<table id="u2tab">\n' +

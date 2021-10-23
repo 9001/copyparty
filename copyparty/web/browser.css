@@ -16,7 +16,6 @@ html,body,tr,th,td,#files,a {
 }
 html {
 	color: #ccc;
-	background: #222;
 	font-family: sans-serif;
 	text-shadow: 1px 1px 0px #000;
 }
@@ -86,7 +85,6 @@ a, #files tbody div a:last-child {
 #files thead th {
 	padding: 0 .3em .3em .3em;
 	border-bottom: 1px solid #444;
-	background: #222;
 	cursor: pointer;
 }
 #files td {
@@ -97,9 +95,6 @@ a, #files tbody div a:last-child {
 #files td+td+td {
 	max-width: 30em;
 	overflow: hidden;
-}
-#files tr:nth-child(2n+1) td {
-	background: #282828;
 }
 #files tbody td:nth-child(3) {
 	font-family: 'scp', monospace, monospace;
@@ -168,7 +163,6 @@ a, #files tbody div a:last-child {
 }
 #srv_info {
 	color: #a73;
-	background: #222;
 	position: absolute;
 	font-size: .8em;
  	top: .5em;
@@ -291,7 +285,6 @@ html.light #ggrid>a.sel {
 	z-index: 10;
 	width: 100%;
 	height: 100%;
-	background: #333;
 }
 #wtgrid,
 #wtico {
@@ -332,7 +325,6 @@ html.light #ggrid>a.sel {
 	line-height: 1em;
 	text-align: center;
 	text-shadow: none;
-	background: #333;
 	box-shadow: 0 0 .5em #222;
 	border-radius: .3em 0 0 0;
 	padding: 0 0 0 .1em;
@@ -500,15 +492,6 @@ html.light #wfm a:not(.en) {
 	box-shadow: 0 -.15em .2em #000 inset;
 	padding-bottom: .3em;
 }
-#ops,
-.opbox,
-#path ,
-#srch_form,
-#ghead {
-	background: #282828;
-	border: 1px solid #333;
-	box-shadow: 0 0 .3em #111;
-}
 #ops {
 	margin: 1.7em 1.5em 0 1.5em;
 	padding: .3em .6em;
@@ -519,18 +502,18 @@ html.light #wfm a:not(.en) {
 .opbox {
 	margin: 1.5em 0 0 0;
 	padding: .5em;
-	border-radius: 0 1em 1em 0;
+	border-radius: 0 .3em .3em 0;
 	border-width: 1px 1px 1px 0;
 	max-width: 41em;
+	max-width: min(41em, calc(100% - 2.6em));
 }
 .opbox input {
 	margin: .5em;
 }
 .opview input[type=text] {
-	background: #383838;
 	color: #fff;
 	border: none;
-	box-shadow: 0 0 .3em #222;
+	box-shadow: 0 0 .3em #181818;
 	border-bottom: 1px solid #fc5;
 	border-radius: .2em;
 	padding: .2em .3em;
@@ -555,6 +538,9 @@ input[type="radio"]:checked+label {
 }
 html.light input[type="radio"]:checked+label {
 	color: #07c;
+}
+.opview input.i {
+	width: calc(100% - 16.2em);
 }
 input.eq_gain {
 	width: 3em;
@@ -657,10 +643,8 @@ input.eq_gain {
 	scrollbar-color: #eb0 #333;
 	border: 1px solid #333;
 	box-shadow: 0 0 1em #181818;
-	background: #282828;
 }
 #treeh {
-	background: #282828;
 	position: sticky;
 	z-index: 1;
 	top: 0;
@@ -694,7 +678,6 @@ input.eq_gain {
 .btn {
 	padding: .2em .4em;
 	font-size: 1.2em;
-	background: #373737;
 	border-radius: .3em;
 	margin: .2em;
 	white-space: pre;
@@ -752,7 +735,7 @@ input.eq_gain {
 	white-space: nowrap;
 }
 #tree.nowrap #treeul a+a:hover {
-	background: rgba(34, 34, 34, 0.67);
+	background: rgba(16, 16, 16, 0.67);
 	min-width: calc(var(--nav-sz) - 2em);
 	width: auto;
 }
@@ -761,7 +744,7 @@ html.light #tree.nowrap #treeul a+a:hover {
 	color: #000;
 }
 #treeul a+a:hover {
-	background: #222;
+	background: #181818;
 	color: #fff;
 }
 #treeul a:first-child {
@@ -897,16 +880,9 @@ html.light #ghead {
 	width: var(--grid-sz);
 	vertical-align: top;
 	overflow-wrap: break-word;
-	background: #2c2c2c;
-	border: 1px solid #383838;
-	border-top: 1px solid #444;
-	box-shadow: 0 .1em .2em #181818;
 	border-radius: .3em;
 	padding: .3em;
 	margin: .5em;
-}
-#ggrid>a[tt] {
-	background: linear-gradient(135deg, #2c2c2c 95%, #444 95%);
 }
 #ggrid>a img {
 	border-radius: .2em;
@@ -930,25 +906,6 @@ html.light #ghead {
 	border-radius: .3em;
 	font-size: 2em;
 }
-#ggrid>a:hover {
-	background: #383838;
-	border-color: #555;
-	color: #fd9;
-}
-html.light #ggrid>a {
-	background: #f7f7f7;
-	border-color: #ddd;
-	box-shadow: 0 .1em .2em #ddd;
-}
-html.light #ggrid>a[tt] {
-	background: linear-gradient(135deg, #f7f7f7 95%, #ccc 95%);
-}
-html.light #ggrid>a:hover {
-	background: #fff;
-	border-color: #ccc;
-	color: #015;
-	box-shadow: 0 .1em .5em #aaa;
-}
 #op_unpost {
 	padding: 1em;
 }
@@ -969,7 +926,6 @@ html.light #ggrid>a:hover {
 	max-height: calc(100% - 2em);
 	border-bottom: .5em solid #999;
 	box-shadow: 0 0 5em rgba(0,0,0,0.8);
-	background: #222;
 	padding: 1em;
 	z-index: 765;
 }
@@ -1053,6 +1009,76 @@ a.btn,
 
 
 
+
+
+
+
+
+html,
+#rui,
+#files thead th,
+#bbox-halp,
+#u2notbtn,
+#srv_info {
+	background: #222;
+}
+#ops,
+.opbox,
+#path,
+#srch_form,
+#ghead {
+	background: #2b2b2b;
+	border: 1px solid #333;
+	box-shadow: 0 0 .3em #111;
+}
+#files tr:nth-child(2n+1) td {
+	background: #282828;
+}
+#tree,
+#treeh {
+	background: #2b2b2b;
+}
+#wtoggle,
+#widgeti {
+	background: #333;
+}
+.btn,
+.opview input[type=text] {
+	background: #383838;
+}
+
+
+
+
+
+#ggrid>a {
+	background: #2c2c2c;
+	border: 1px solid #383838;
+	border-top: 1px solid #444;
+	box-shadow: 0 .1em .2em #181818;
+}
+#ggrid>a[tt] {
+	background: linear-gradient(135deg, #2c2c2c 95%, #444 95%);
+}
+#ggrid>a:hover {
+	background: #383838;
+	border-color: #555;
+	color: #fd9;
+}
+html.light #ggrid>a {
+	background: #f7f7f7;
+	border-color: #ddd;
+	box-shadow: 0 .1em .2em #ddd;
+}
+html.light #ggrid>a[tt] {
+	background: linear-gradient(135deg, #f7f7f7 95%, #ccc 95%);
+}
+html.light #ggrid>a:hover {
+	background: #fff;
+	border-color: #ccc;
+	color: #015;
+	box-shadow: 0 .1em .5em #aaa;
+}
 
 
 
@@ -1445,7 +1471,6 @@ html.light #bbox-overlay figcaption a {
 }
 #bbox-halp {
 	color: #fff;
-	background: #222;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -1653,6 +1678,10 @@ html.light #u2err.err {
 	cursor: pointer;
 	box-shadow: .4em .4em 0 #111;
 }
+#u2conf.ww #u2btn {
+	font-size: 1.3em;
+	margin-right: .5em;
+}
 #op_up2k.srch #u2btn {
 	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
 	text-shadow: 1px 1px 1px #fc6;
@@ -1671,7 +1700,6 @@ html.light #u2err.err {
 #u2notbtn {
 	display: none;
 	text-align: center;
-	background: #222;
 	padding-top: 1em;
 }
 #u2notbtn * {
@@ -1704,7 +1732,7 @@ html.light #u2err.err {
 	width: auto;
 }
 #u2tab tbody tr:hover td {
-	background: #222;
+	background: #333;
 }
 #u2etas {
 	background: #1c1c1c;
@@ -1748,10 +1776,16 @@ html.light #u2err.err {
 	width: 44em;
 	text-align: left;
 }
+#u2cards.ww {
+	display: inline-block;
+}
 #u2etaw.w {
 	width: 52em;
 	text-align: right;
 	margin: 3em auto -2.7em auto;
+}
+#u2etaw.ww {
+	margin: 0 2em 1em 2em;
 }
 #u2cards a {
 	padding: .2em 1em;
@@ -1783,10 +1817,17 @@ html.light #u2err.err {
 	margin: 1em auto;
 	width: 30em;
 }
-#u2conf.has_btn {
+#u2conf.w {
 	width: 48em;
 }
-#u2conf * {
+#u2conf.ww {
+	width: 74em;
+}
+#u2conf.ww #u2c3w {
+	width: 29em;
+}
+#u2conf .c,
+#u2conf .c * {
 	text-align: center;
 	line-height: 1em;
 	margin: 0;
@@ -1806,7 +1847,7 @@ html.light #u2err.err {
 #u2conf .txtbox.err {
 	background: #922;
 }
-#u2conf a {
+#u2conf a.b {
 	color: #fff;
 	background: #c38;
 	text-decoration: none;
@@ -1820,10 +1861,10 @@ html.light #u2err.err {
 	position: relative;
 	bottom: -0.08em;
 }
-#u2conf input+a {
+#u2conf input+a.b {
 	background: #d80;
 }
-#u2conf label {
+#u2conf .c label {
 	font-size: 1.6em;
 	width: 2em;
 	height: 1em;

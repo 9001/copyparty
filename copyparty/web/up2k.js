@@ -1827,16 +1827,27 @@ function up2k_init(subtle) {
             wpx = window.innerWidth,
             fpx = parseInt(getComputedStyle(bar)['font-size']),
             wem = wpx * 1.0 / fpx,
-            wide = wem > 54,
+            wide = wem > 54 ? 'w' : '',
             parent = ebi(wide && has(perms, 'write') ? 'u2btn_cw' : 'u2btn_ct'),
             btn = ebi('u2btn');
 
         //console.log([wpx, fpx, wem]);
         if (btn.parentNode !== parent) {
             parent.appendChild(btn);
-            ebi('u2conf').setAttribute('class', wide ? 'has_btn' : '');
-            ebi('u2cards').setAttribute('class', wide ? 'w' : '');
-            ebi('u2etaw').setAttribute('class', wide ? 'w' : '');
+            ebi('u2conf').setAttribute('class', wide);
+            ebi('u2cards').setAttribute('class', wide);
+            ebi('u2etaw').setAttribute('class', wide);
+        }
+
+        wide = wem > 78 ? 'ww' : wide;
+        parent = ebi(wide == 'ww' ? 'u2c3w' : 'u2c3t');
+        var its = [ebi('u2etaw'), ebi('u2cards')];
+        if (its[0].parentNode !== parent) {
+            ebi('u2conf').setAttribute('class', wide);
+            for (var a = 0; a < 2; a++) {
+                parent.appendChild(its[a]);
+                its[a].setAttribute('class', wide);
+            }
         }
     }
     window.addEventListener('resize', onresize);
@@ -1849,8 +1860,9 @@ function up2k_init(subtle) {
         setTimeout(onresize, 500);
     }
 
-    var o = QSA('#u2conf *[tt]');
+    var o = QSA('#u2conf .c *[tt]');
     for (var a = o.length - 1; a >= 0; a--) {
+        console.log(o[a]);
         o[a].parentNode.getElementsByTagName('input')[0].setAttribute('tt', o[a].getAttribute('tt'));
     }
     tt.att(QS('#u2conf'));
