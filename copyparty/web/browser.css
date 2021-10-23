@@ -1281,6 +1281,7 @@ html.light #files a:hover,
 html.light #files tr.sel a:hover {
 	color: #000;
 	background: #fff;
+	text-decoration: underline;
 }
 html.light #treeh {
 	background: #f7f7f7;

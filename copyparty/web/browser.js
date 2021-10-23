@@ -2351,17 +2351,8 @@ var thegrid = (function () {
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if (href.endsWith('/')) {
-			var ta = QSA('#treeul a.hl+ul>li>a+a'),
-				txt = oth.textContent.slice(0, -1);
-
-			for (var a = 0, aa = ta.length; a < aa; a++) {
-				if (ta[a].textContent == txt) {
-					in_tree = ta[a];
-					break;
-				}
-			}
-		}
+		if (href.endsWith('/'))
+			in_tree = treectl.find(oth.textContent.slice(0, -1));
 
 		if (r.sel) {
 			td.click();
@@ -3159,10 +3150,17 @@ var treectl = (function () {
 		onscroll();
 	}
 
+	treectl.find = function (txt) {
+		var ta = QSA('#treeul a.hl+ul>li>a+a');
+		for (var a = 0, aa = ta.length; a < aa; a++)
+			if (ta[a].textContent == txt)
+				return ta[a];
+	};
+
 	treectl.goto = function (url, push) {
 		get_tree("", url, true);
 		reqls(url, push, true);
-	}
+	};
 
 	function get_tree(top, dst, rst) {
 		var xhr = new XMLHttpRequest();
@@ -4418,6 +4416,20 @@ var unpost = (function () {
 
 function goto_unpost(e) {
 	unpost.load();
+}
+
+
+ebi('files').onclick = function (e) {
+	var tgt = e.target.closest('a[id]');
+	if (!tgt || tgt.getAttribute('id').indexOf('f-') !== 0 || !tgt.textContent.endsWith('/'))
+		return;
+
+	var el = treectl.find(tgt.textContent.slice(0, -1));
+	if (!el)
+		return;
+
+	ev(e);
+	el.click();
 }
 
 
