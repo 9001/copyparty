@@ -530,14 +530,9 @@ html.light .opview input[type="text"].err {
 input[type="checkbox"]+label {
 	color: #f5a;
 }
+input[type="radio"]:checked+label,
 input[type="checkbox"]:checked+label {
 	color: #fc5;
-}
-input[type="radio"]:checked+label {
-	color: #fc0;
-}
-html.light input[type="radio"]:checked+label {
-	color: #07c;
 }
 .opview input.i {
 	width: calc(100% - 16.2em);
@@ -1244,6 +1239,10 @@ html.light #files tr.sel a.play.act {
 }
 html.light input[type="checkbox"] + label {
 	color: #333;
+}
+html.light input[type="radio"]:checked + label,
+html.light input[type="checkbox"]:checked + label {
+	color: #07c; 
 }
 html.light .opwide>div {
 	border-color: #ccc;
