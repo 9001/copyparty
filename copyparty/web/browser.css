@@ -860,6 +860,7 @@ html.light #ghead {
 }
 #ggrid {
 	padding-top: .5em;
+	margin: 0 -.5em;
 }
 #ggrid>a>span {
 	overflow: hidden;
