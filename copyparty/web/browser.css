@@ -706,8 +706,8 @@ input.eq_gain {
 #tree li {
 	margin-left: 1em;
 	list-style: none;
-	border-top: 1px solid #373737;
-	border-bottom: 1px solid #181818;
+	border-top: 1px solid #444;
+	border-bottom: 1px solid #111;
 }
 #tree li:last-child {
 	border-bottom: none;
@@ -1012,6 +1012,7 @@ a.btn,
 
 html,
 #rui,
+#files td,
 #files thead th,
 #bbox-halp,
 #u2notbtn,
