@@ -2488,9 +2488,11 @@ var thegrid = (function () {
 				}
 				ihref = '/.cpr/ico/' + ihref.slice(0, -1);
 			}
+			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i';
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
-				'"' + ac + ' ttt="' + esc(name) + '"><img src="' +
+				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +
+				(r.sz / 1.25) + 'em" onload="th_onload(this)" src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ebi('ggrid').innerHTML = html.join('\n');
@@ -2547,6 +2549,11 @@ var thegrid = (function () {
 
 	return r;
 })();
+
+
+function th_onload(el) {
+	el.style.height = '';
+}
 
 
 function tree_scrollto(e) {

@@ -274,6 +274,15 @@ class HttpCli(object):
             except Pebkac:
                 return False
 
+    def permit_caching(self):
+        cache = self.uparam.get("cache")
+        if cache is None:
+            self.out_headers.update(NO_CACHE)
+            return
+
+        n = "604800" if cache == "i" else cache or "69"
+        self.out_headers["Cache-Control"] = "max-age=" + n
+
     def send_headers(self, length, status=200, mime=None, headers=None):
         response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
 
@@ -1449,10 +1458,8 @@ class HttpCli(object):
 
         if is_compressed:
             self.out_headers["Cache-Control"] = "max-age=573"
-        elif "cache" in self.uparam:
-            self.out_headers["Cache-Control"] = "max-age=69"
         else:
-            self.out_headers.update(NO_CACHE)
+            self.permit_caching()
 
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(
@@ -1548,6 +1555,7 @@ class HttpCli(object):
         return True
 
     def tx_ico(self, ext, exact=False):
+        self.permit_caching()
         if ext.endswith("/"):
             ext = "folder"
             exact = True
