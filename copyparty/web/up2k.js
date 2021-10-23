@@ -1828,7 +1828,8 @@ function up2k_init(subtle) {
             fpx = parseInt(getComputedStyle(bar)['font-size']),
             wem = wpx * 1.0 / fpx,
             wide = wem > 54 ? 'w' : '',
-            parent = ebi(wide && has(perms, 'write') ? 'u2btn_cw' : 'u2btn_ct'),
+            write = has(perms, 'write'),
+            parent = ebi(wide && write ? 'u2btn_cw' : 'u2btn_ct'),
             btn = ebi('u2btn');
 
         //console.log([wpx, fpx, wem]);
@@ -1840,7 +1841,7 @@ function up2k_init(subtle) {
         }
 
         wide = wem > 78 ? 'ww' : wide;
-        parent = ebi(wide == 'ww' ? 'u2c3w' : 'u2c3t');
+        parent = ebi(wide == 'ww' && write ? 'u2c3w' : 'u2c3t');
         var its = [ebi('u2etaw'), ebi('u2cards')];
         if (its[0].parentNode !== parent) {
             ebi('u2conf').setAttribute('class', wide);
