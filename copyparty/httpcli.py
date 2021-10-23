@@ -2216,6 +2216,9 @@ class HttpCli(object):
         if "mth" in vn.flags:
             j2a["def_hcols"] = vn.flags["mth"].split(",")
 
+        if self.args.js_browser:
+            j2a["js"] = self.args.js_browser
+
         if self.args.css_browser:
             j2a["css"] = self.args.css_browser
 

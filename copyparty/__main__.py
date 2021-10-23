@@ -437,7 +437,8 @@ def run_argparse(argv, formatter):
         default=".vq,.aq,vc,ac,res,.fps")
     ap2.add_argument("-mtp", metavar="M=[f,]bin", type=u, action="append", help="read tag M using bin")
 
-    ap2 = ap.add_argument_group('appearance options')
+    ap2 = ap.add_argument_group('ui options')
+    ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
     ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
 
     ap2 = ap.add_argument_group('debug options')

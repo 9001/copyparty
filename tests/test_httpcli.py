@@ -50,6 +50,7 @@ class Cfg(Namespace):
             hist=None,
             no_idx=None,
             no_hash=None,
+            js_browser=None,
             css_browser=None,
             **{k: False for k in "e2d e2ds e2dsa e2t e2ts e2tsr".split()}
         )

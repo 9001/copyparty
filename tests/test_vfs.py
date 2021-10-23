@@ -25,6 +25,7 @@ class Cfg(Namespace):
             "hist": None,
             "no_idx": None,
             "no_hash": None,
+            "js_browser": None,
             "css_browser": None,
             "no_voldump": True,
             "no_logues": False,

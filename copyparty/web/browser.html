@@ -141,6 +141,9 @@
 	<script src="/.cpr/util.js?_={{ ts }}"></script>
 	<script src="/.cpr/browser.js?_={{ ts }}"></script>
 	<script src="/.cpr/up2k.js?_={{ ts }}"></script>
+	{%- if js %}
+	<script src="{{ js }}?_={{ ts }}"></script>
+	{%- endif %}
 </body>
 
 </html>
