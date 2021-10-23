@@ -268,14 +268,19 @@ function goto(dest) {
 }
 
 
-var have_webp = null;
+var have_webp = sread('have_webp');
 (function () {
+	if (have_webp !== null)
+		return;
+
 	var img = new Image();
 	img.onload = function () {
 		have_webp = img.width > 0 && img.height > 0;
+		swrite('have_webp', 'ya');
 	};
 	img.onerror = function () {
 		have_webp = false;
+		swrite('have_webp', '');
 	};
 	img.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
 })();
