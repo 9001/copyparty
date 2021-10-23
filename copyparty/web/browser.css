@@ -154,6 +154,21 @@ a, #files tbody div a:last-child {
 #epi.logue {
 	margin: .8em 0;
 }
+#epi.logue.mdo:before {
+	content: 'README.md';
+	text-align: center;
+	display: block;
+	margin-top: -1.5em;
+}
+#epi.logue.mdo {
+	border-top: 1px solid #555;
+	margin-top: 2.5em;
+}
+.mdo>h1:first-child,
+.mdo>h2:first-child,
+.mdo>h3:first-child {
+	margin-top: 1.5rem;
+}
 .mdo {
 	max-width: 52em;
 }
