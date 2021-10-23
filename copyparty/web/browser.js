@@ -2289,15 +2289,6 @@ var thegrid = (function () {
 	for (var a = 0; a < links.length; a++)
 		links[a].onclick = btnclick;
 
-	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
-	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
-	bcfg_bind(r, 'en', 'griden', false, function (v) {
-		v ? loadgrid() : ungrid();
-		pbar.onresize();
-		vbar.onresize();
-	});
-	ebi('wtgrid').onclick = ebi('griden').onclick;
-
 	r.setvis = function (vis) {
 		(r.en ? gfiles : lfiles).style.display = vis ? '' : 'none';
 	};
@@ -2526,6 +2517,15 @@ var thegrid = (function () {
 			}
 		})[0];
 	};
+
+	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
+	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
+	bcfg_bind(r, 'en', 'griden', false, function (v) {
+		v ? loadgrid() : ungrid();
+		pbar.onresize();
+		vbar.onresize();
+	});
+	ebi('wtgrid').onclick = ebi('griden').onclick;
 
 	setTimeout(function () {
 		import_js('/.cpr/baguettebox.js', r.bagit);
