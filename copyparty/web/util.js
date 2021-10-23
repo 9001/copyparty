@@ -146,7 +146,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
             var s = mknod('style');
             s.innerHTML = (
-                '#exbox{background:#333;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;overflow:auto;width:calc(100% - 2em)} ' +
+                '#exbox{background:#222;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;overflow:auto;width:calc(100% - 2em)} ' +
                 '#exbox,#exbox *{line-height:1.5em;overflow-wrap:break-word} ' +
                 '#exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} ' +
                 '#exbox a{text-decoration:underline;color:#fc0} ' +
@@ -1253,7 +1253,7 @@ var favico = (function () {
         clearTimeout(r.to);
         scfg_bind(r, 'txt', 'icot', '', r.upd);
         scfg_bind(r, 'fg', 'icof', 'fc5', r.upd);
-        scfg_bind(r, 'bg', 'icob', '333', r.upd);
+        scfg_bind(r, 'bg', 'icob', '222', r.upd);
         r.upd();
     };
 

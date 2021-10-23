@@ -246,7 +246,7 @@ function U2pvis(act, btns) {
 
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
-        obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
+        obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #222 ' + o3 + '%, #222 99%, #555)';
     };
 
     r.prog = function (fobj, nchunk, cbd) {
@@ -303,7 +303,7 @@ function U2pvis(act, btns) {
 
         obj.innerHTML = fo.hp;
         obj.style.color = '#fff';
-        obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #333 ' + o3 + '%, #333 99%, #777)';
+        obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #222 ' + o3 + '%, #222 99%, #555)';
     };
 
     r.move = function (nfile, newcat) {

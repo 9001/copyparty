@@ -969,7 +969,7 @@ html.light #ggrid>a:hover {
 	max-height: calc(100% - 2em);
 	border-bottom: .5em solid #999;
 	box-shadow: 0 0 5em rgba(0,0,0,0.8);
-	background: #333;
+	background: #222;
 	padding: 1em;
 	z-index: 765;
 }
@@ -1349,7 +1349,7 @@ html.light #tree::-webkit-scrollbar {
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 .full-image video {
-	background: #333;
+	background: #222;
 }
 .full-image figcaption {
 	display: block;
@@ -1445,7 +1445,7 @@ html.light #bbox-overlay figcaption a {
 }
 #bbox-halp {
 	color: #fff;
-	background: #333;
+	background: #222;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -1671,7 +1671,7 @@ html.light #u2err.err {
 #u2notbtn {
 	display: none;
 	text-align: center;
-	background: #333;
+	background: #222;
 	padding-top: 1em;
 }
 #u2notbtn * {
