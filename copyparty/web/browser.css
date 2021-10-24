@@ -793,17 +793,17 @@ html.light #tree.nowrap #treeul a+a:hover {
 #files td:nth-child(2n) {
 	color: #f5a;
 }
-#files tr.play td,
-#files tr.play div a {
+#files tbody tr.play td,
+#files tbody tr.play div a {
 	background: #fc4;
 	border-color: transparent;
 	color: #400;
 	text-shadow: none;
 }
-#files tr.play a {
+#files tbody tr.play a {
 	color: inherit;
 }
-#files tr.play a:hover {
+#files tbody tr.play a:hover {
 	color: #300;
 	background: #fea;
 }
@@ -1306,14 +1306,14 @@ html.light #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
 	background: #f7f7f7;
-	scrollbar-color: #a70 #ddd;
+	scrollbar-color: #490 #ddd;
 }
 html.light #tree::-webkit-scrollbar-track,
 html.light #tree::-webkit-scrollbar {
 	background: #ddd;
 }
-#tree::-webkit-scrollbar-thumb {
-	background: #da0;
+html.light #tree::-webkit-scrollbar-thumb {
+	background: #490;
 }
 
 
