@@ -715,12 +715,14 @@ function scfg_bind(obj, oname, cname, defval, cb) {
 
 function hist_push(url) {
     console.log("h-push " + url);
-    history.pushState(url, url, url);
+    if (window.history && history.pushState)
+        history.pushState(url, url, url);
 }
 
 function hist_replace(url) {
     console.log("h-repl " + url);
-    history.replaceState(url, url, url);
+    if (window.history && history.replaceState)
+        history.replaceState(url, url, url);
 }
 
 function sethash(hv) {

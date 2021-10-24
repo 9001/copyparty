@@ -1863,7 +1863,6 @@ function up2k_init(subtle) {
 
     var o = QSA('#u2conf .c *[tt]');
     for (var a = o.length - 1; a >= 0; a--) {
-        console.log(o[a]);
         o[a].parentNode.getElementsByTagName('input')[0].setAttribute('tt', o[a].getAttribute('tt'));
     }
     tt.att(QS('#u2conf'));

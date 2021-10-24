@@ -286,6 +286,24 @@ var have_webp = sread('have_webp');
 })();
 
 
+function set_files_html(html) {
+	var files = ebi('files');
+	try {
+		files.innerHTML = html;
+		return files;
+	}
+	catch (e) {
+		var par = files.parentNode;
+		par.removeChild(files);
+		files = mknod('div');
+		files.innerHTML = '<table id="files">' + html + '</table>';
+		par.insertBefore(files.childNodes[0], ebi('epi'));
+		files = ebi('files');
+		return files;
+	}
+}
+
+
 var mpl = (function () {
 	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
 
@@ -1053,8 +1071,8 @@ var need_ogv = true;
 try {
 	need_ogv = new Audio().canPlayType('audio/ogg; codecs=opus') !== 'probably';
 
-	if (/ Edge\//.exec(navigator.userAgent + ''))
-		need_ogv = true;
+	if (document.documentMode)
+		need_ogv = false;  // ie8-11
 }
 catch (ex) { }
 
@@ -2983,7 +3001,7 @@ document.onkeydown = function (e) {
 			orig_url = get_evpath();
 		}
 
-		ofiles.innerHTML = html.join('\n');
+		ofiles = set_files_html(html.join('\n'));
 		ofiles.setAttribute("ts", this.ts);
 		ofiles.setAttribute("q_raw", this.q_raw);
 		set_vq();
@@ -2998,7 +3016,7 @@ document.onkeydown = function (e) {
 	function unsearch(e) {
 		ev(e);
 		treectl.show();
-		ebi('files').innerHTML = orig_html;
+		set_files_html(orig_html);
 		ebi('files').removeAttribute('q_raw');
 		orig_html = null;
 		sethash('');
@@ -3372,13 +3390,7 @@ var treectl = (function () {
 		}
 		html.push('</tbody>');
 		html = html.join('\n');
-		try {
-			ebi('files').innerHTML = html;
-		}
-		catch (ex) { //ie9
-			window.location.href = this.top;
-			return;
-		}
+		set_files_html(html);
 
 		if (this.hpush)
 			hist_push(this.top);
@@ -3468,10 +3480,7 @@ var treectl = (function () {
 		treectl.goto(url.pathname);
 	};
 
-	if (window.history && history.pushState) {
-		hist_replace(get_evpath() + window.location.hash);
-	}
-
+	hist_replace(get_evpath() + window.location.hash);
 	treectl.onscroll = onscroll;
 	return treectl;
 })();
