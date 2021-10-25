@@ -1057,15 +1057,22 @@ var modal = (function () {
     }
 
     function onkey(e) {
-        if (e.code == 'Enter') {
-            var a = ebi('modal-ng');
-            if (a && document.activeElement == a)
+        var k = e.code,
+            eok = ebi('modal-ok'),
+            eng = ebi('modal-ng'),
+            ae = document.activeElement;
+
+        if (k == 'Space' && ae && (ae === eok || ae === eng))
+            k = 'Enter';
+
+        if (k == 'Enter') {
+            if (ae && ae == eng)
                 return ng();
 
             return ok();
         }
 
-        if (e.code == 'Escape')
+        if (k == 'Escape')
             return ng();
     }
 
