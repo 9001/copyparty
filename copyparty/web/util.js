@@ -1149,6 +1149,7 @@ function repl_load() {
         if (!ret.length)
             ret = [
                 'var v=Object.keys(localStorage); v.sort(); JSON.stringify(v)',
+                "for (var a of QSA('#files a[id]')) a.setAttribute('download','')",
                 'console.hist.slice(-10).join("\\n")'
             ];
 
