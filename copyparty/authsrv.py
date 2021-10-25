@@ -526,6 +526,24 @@ class AuthSrv(object):
 
         yield prev, True
 
+    def _map_volume(self, src, dst, mount, daxs, mflags):
+        if dst in mount:
+            m = "multiple filesystem-paths mounted at [/{}]:\n  [{}]\n  [{}]"
+            self.log(m.format(dst, mount[dst], src), c=1)
+            raise Exception("invalid config")
+
+        if src in mount.values():
+            m = "warning: filesystem-path [{}] mounted in multiple locations:"
+            m = m.format(src)
+            for v in [k for k, v in mount.items() if v == src] + [dst]:
+                m += "\n  /{}".format(v)
+
+            self.log(m, c=3)
+
+        mount[dst] = src
+        daxs[dst] = AXS()
+        mflags[dst] = {}
+
     def _parse_config_file(self, fd, acct, daxs, mflags, mount):
         # type: (any, str, dict[str, AXS], any, str) -> None
         vol_src = None
@@ -556,9 +574,7 @@ class AuthSrv(object):
                 # cfg files override arguments and previous files
                 vol_src = bos.path.abspath(vol_src)
                 vol_dst = vol_dst.strip("/")
-                mount[vol_dst] = vol_src
-                daxs[vol_dst] = AXS()
-                mflags[vol_dst] = {}
+                self._map_volume(vol_src, vol_dst, mount, daxs, mflags)
                 continue
 
             try:
@@ -663,9 +679,7 @@ class AuthSrv(object):
                 # print("\n".join([src, dst, perms]))
                 src = bos.path.abspath(src)
                 dst = dst.strip("/")
-                mount[dst] = src
-                daxs[dst] = AXS()
-                mflags[dst] = {}
+                self._map_volume(src, dst, mount, daxs, mflags)
 
                 for x in perms.split(":"):
                     lvl, uname = x.split(",", 1) if "," in x else [x, ""]
