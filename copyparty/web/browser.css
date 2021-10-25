@@ -1696,8 +1696,9 @@ html.light #u2err.err {
 	box-shadow: .4em .4em 0 #111;
 }
 #u2conf.ww #u2btn {
-	font-size: 1.3em;
-	margin-right: .5em;
+	line-height: 1em;
+	padding: .5em 0;
+	margin: -1.5em .5em -3em 0;
 }
 #op_up2k.srch #u2btn {
 	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
@@ -1705,8 +1706,9 @@ html.light #u2err.err {
 	color: #333;
 }
 #u2conf #u2btn {
-	margin: -2.4em 0;
-	padding: .8em 0;
+	padding: .6em 0;
+	margin: -2em 0;
+	font-size: 1.25em;
 	width: 100%;
 	max-width: 12em;
 	display: inline-block;
@@ -1829,6 +1831,11 @@ html.light #u2err.err {
 }
 #u2cards span {
 	color: #fff;
+}
+#u2cards > a:nth-child(4) > span {
+	display: inline-block;
+	text-align: center;
+	min-width: 1.3em;
 }
 #u2conf {
 	margin: 1em auto;
