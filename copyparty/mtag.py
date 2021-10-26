@@ -413,6 +413,9 @@ class MTag(object):
         return r1
 
     def get_mutagen(self, abspath):
+        if not bos.path.isfile(abspath):
+            return {}
+
         import mutagen
 
         try:
@@ -458,10 +461,16 @@ class MTag(object):
         return self.normalize_tags(ret, md)
 
     def get_ffprobe(self, abspath):
+        if not bos.path.isfile(abspath):
+            return {}
+
         ret, md = ffprobe(abspath)
         return self.normalize_tags(ret, md)
 
     def get_bin(self, parsers, abspath):
+        if not bos.path.isfile(abspath):
+            return {}
+
         pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         pypath = [str(pypath)] + [str(x) for x in sys.path if x]
         pypath = str(os.pathsep.join(pypath))

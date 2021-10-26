@@ -998,7 +998,10 @@ class Up2k(object):
             except Exception as ex:
                 msg = "failed to read tags from {}:\n{}"
                 self.log(msg.format(abspath, ex), c=3)
-                return
+                return 0
+
+        if not bos.path.isfile(abspath):
+            return 0
 
         if entags:
             tags = {k: v for k, v in tags.items() if k in entags}

@@ -21,6 +21,10 @@ def getsize(p):
     return os.path.getsize(fsenc(p))
 
 
+def isfile(p):
+    return os.path.isfile(fsenc(p))
+
+
 def isdir(p):
     return os.path.isdir(fsenc(p))
 
