@@ -3429,7 +3429,7 @@ var treectl = (function () {
 		}
 		delete res['a'];
 		var keys = Object.keys(res);
-		keys.sort();
+		keys.sort(function (a, b) { return a.localeCompare(b); });
 		for (var a = 0; a < keys.length; a++) {
 			var kk = keys[a],
 				ks = kk.slice(1),
