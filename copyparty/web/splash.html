@@ -12,11 +12,12 @@
 
 <body>
     <div id="wrap">
-        <a href="/?h" style="float:right">refresh</a>
+        <a href="/?h" class="refresh">refresh</a>
 
         {%- if this.uname == '*' %}
             <p>howdy stranger &nbsp; <small>(you're not logged in)</small></p>
         {%- else %}
+            <a href="/?pw=x" class="logout">logout</a>
             <p>welcome back, <strong>{{ this.uname }}</strong></p>
         {%- endif %}
 

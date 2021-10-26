@@ -25,9 +25,19 @@ a {
 	color: #047;
 	background: #fff;
 	text-decoration: none;
-	border-bottom: 1px solid #aaa;
+	border-bottom: 1px solid #8ab;
 	border-radius: .2em;
 	padding: .2em .8em;
+}
+.refresh,
+.logout {
+	float: right;
+	margin-top: -.2em;
+}
+.logout {
+	color: #c04;
+	border-color: #c7a;
+	margin-right: .5em;
 }
 #repl {
 	border: none;
@@ -80,6 +90,10 @@ html.dark a {
 	color: #fff;
 	background: #057;
 	border-color: #37a;
+}
+html.dark .logout {
+	background: #804;
+	border-color: #c28;
 }
 html.dark input {
 	color: #fff;
