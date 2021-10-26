@@ -1856,6 +1856,58 @@ class HttpCli(object):
         )
         self.loud_reply(x.get())
 
+    def tx_ls(self, ls):
+        dirs = ls["dirs"]
+        files = ls["files"]
+        arg = self.uparam["ls"]
+        if arg in ["v", "t", "txt"]:
+            try:
+                biggest = max(ls["files"], key=itemgetter("sz"))["sz"]
+            except:
+                biggest = 0
+
+            if arg == "v":
+                fmt = "\033[0;7;36m{{}}\033[0;35m{{:{}}}\033[0m {{}}"
+                f2 = "".join(
+                    "{}{{}}".format(x)
+                    for x in [
+                        "\033[7m",
+                        "\033[27m",
+                        "",
+                        "\033[0;1;7m",
+                        "\033[27m",
+                        "\033[7m",
+                    ]
+                )
+                for lst in [dirs, files]:
+                    for x in lst:
+                        a = x["dt"].replace("-", " ").replace(":", " ").split(" ")
+                        x["dt"] = f2.format(*list(a))
+            else:
+                fmt = "{{}}  {{:{}}}  {{}}"
+
+            fmt = fmt.format(len(str(biggest)))
+            ret = [
+                "# {}: {}".format(x, ls[x])
+                for x in ["acct", "perms", "srvinf"]
+                if x in ls
+            ]
+            ret += [
+                fmt.format(x["dt"], x["sz"], x["name"])
+                for y in [dirs, files]
+                for x in y
+            ]
+            ret = "\n".join(ret)
+            mime = "text/plain; encoding=utf-8"
+        else:
+            [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
+
+            ret = json.dumps(ls)
+            mime = "application/json"
+
+        self.reply(ret.encode("utf-8", "replace"), mime=mime)
+        return True
+
     def tx_browser(self):
         vpath = ""
         vpnodes = [["", "/"]]
@@ -2027,9 +2079,7 @@ class HttpCli(object):
         }
         if not self.can_read:
             if is_ls:
-                ret = json.dumps(ls_ret)
-                self.reply(ret.encode("utf-8", "replace"), mime="application/json")
-                return True
+                return self.tx_ls(ls_ret)
 
             if not stat.S_ISDIR(st.st_mode):
                 return self.tx_404(True)
@@ -2204,13 +2254,10 @@ class HttpCli(object):
                 f["tags"] = {}
 
         if is_ls:
-            [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
             ls_ret["dirs"] = dirs
             ls_ret["files"] = files
             ls_ret["taglist"] = taglist
-            ret = json.dumps(ls_ret)
-            self.reply(ret.encode("utf-8", "replace"), mime="application/json")
-            return True
+            return self.tx_ls(ls_ret)
 
         for d in dirs:
             d["name"] += "/"
