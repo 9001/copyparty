@@ -131,9 +131,11 @@ class Up2k(object):
             thr.start()
 
             if self.mtag:
-                thr = threading.Thread(target=self._tagger, name="up2k-tagger")
-                thr.daemon = True
-                thr.start()
+                for n in range(max(1, self.args.mtag_mt)):
+                    name = "tagger-{}".format(n)
+                    thr = threading.Thread(target=self._tagger, name=name)
+                    thr.daemon = True
+                    thr.start()
 
                 thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-init")
                 thr.daemon = True
@@ -700,7 +702,7 @@ class Up2k(object):
                 return n_add, n_rm, False
 
             mpool = False
-            if self.mtag.prefer_mt and not self.args.no_mtag_mt:
+            if self.mtag.prefer_mt and self.args.mtag_mt > 1:
                 mpool = self._start_mpool()
 
             conn = sqlite3.connect(db_path, timeout=15)
@@ -933,9 +935,7 @@ class Up2k(object):
     def _start_mpool(self):
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
         # both do crazy runahead so lets reinvent another wheel
-        nw = os.cpu_count() if hasattr(os, "cpu_count") else 4
-        if self.args.no_mtag_mt:
-            nw = 1
+        nw = max(1, self.args.mtag_mt)
 
         if self.pending_tags is None:
             self.log("using {}x {}".format(nw, self.mtag.backend))

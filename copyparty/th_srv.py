@@ -105,9 +105,7 @@ class ThumbSrv(object):
         self.mutex = threading.Lock()
         self.busy = {}
         self.stopping = False
-        self.nthr = self.args.th_mt
-        if not self.nthr:
-            self.nthr = os.cpu_count() if hasattr(os, "cpu_count") else 4
+        self.nthr = max(1, self.args.th_mt)
 
         self.q = Queue(self.nthr * 4)
         for n in range(self.nthr):
@@ -130,7 +128,7 @@ class ThumbSrv(object):
             self.log(msg, c=3)
 
         if self.args.th_clean:
-            t = threading.Thread(target=self.cleaner, name="thumb-cleaner")
+            t = threading.Thread(target=self.cleaner, name="thumb.cln")
             t.daemon = True
             t.start()
 

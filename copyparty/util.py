@@ -445,7 +445,7 @@ def log_thrs(log, ival, name):
         tv = [x.name for x in threading.enumerate()]
         tv = [
             x.split("-")[0]
-            if x.startswith("httpconn-") or x.startswith("thumb-")
+            if x.split("-")[0] in ["httpconn", "thumb", "tagger"]
             else "listen"
             if "-listen-" in x
             else x

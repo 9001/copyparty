@@ -208,6 +208,8 @@ def run_argparse(argv, formatter):
     except:
         fk_salt = "hunter2"
 
+    cores = os.cpu_count() if hasattr(os, "cpu_count") else 4
+
     sects = [
         [
             "accounts",
@@ -333,7 +335,7 @@ def run_argparse(argv, formatter):
     ap2 = ap.add_argument_group('general options')
     ap2.add_argument("-c", metavar="PATH", type=u, action="append", help="add config file")
     ap2.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
-    ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores")
+    ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores, 0=all")
     ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, USER:PASS; example [ed:wark")
     ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, SRC:DST:FLAG; example [.::r], [/mnt/nas/music:/music:r:aed")
     ap2.add_argument("-ed", action="store_true", help="enable ?dots")
@@ -402,7 +404,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
     ap2.add_argument("--th-size", metavar="WxH", default="320x256", help="thumbnail res")
-    ap2.add_argument("--th-mt", metavar="CORES", type=int, default=0, help="max num cpu cores to use, 0=all")
+    ap2.add_argument("--th-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for generating thumbnails")
     ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
@@ -428,8 +430,8 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-e2ts", action="store_true", help="enable metadata scanner, sets -e2t")
     ap2.add_argument("-e2tsr", action="store_true", help="rescan all metadata, sets -e2ts")
     ap2.add_argument("--no-mutagen", action="store_true", help="use FFprobe for tags instead")
-    ap2.add_argument("--no-mtag-mt", action="store_true", help="disable tag-read parallelism")
     ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader")
+    ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for tag scanning")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
         default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,res,.fps,ahash,vhash")

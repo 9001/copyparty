@@ -546,6 +546,8 @@ and there are *two* editors
 
 * you can link a particular timestamp in an audio file by adding it to the URL, such as `&20` / `&20s` / `&1m20` / `&t=1:20` after the `.../#af-c8960dab`
 
+* get a plaintext file listing by adding `?ls=t` to a URL, or a compact colored one with `?ls=v` (for unix terminals)
+
 * if you are using media hotkeys to switch songs and are getting tired of seeing the OSD popup which Windows doesn't let you disable, consider https://ocv.me/dev/?media-osd-bgone.ps1
 
 * click the bottom-left `π` to open a javascript prompt for debugging
@@ -716,7 +718,7 @@ that'll run the command `notify-send` with the path to the uploaded file as the 
 
 note that it will only trigger on new unique files, not dupes
 
-and it will occupy the parsing threads, so fork anything expensive, or if you want to intentionally queue/singlethread you can combine it with `--no-mtag-mt`
+and it will occupy the parsing threads, so fork anything expensive, or if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
 
 if this becomes popular maybe there should be a less janky way to do it actually
 
