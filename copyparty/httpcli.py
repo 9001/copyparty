@@ -1867,26 +1867,32 @@ class HttpCli(object):
                 biggest = 0
 
             if arg == "v":
-                fmt = "\033[0;7;36m{{}}\033[0;35m{{:{}}}\033[0m {{}}"
+                fmt = "\033[0;7;36m{{}} {{:>{}}}\033[0m {{}}"
+                nfmt = "{}"
+                biggest = 0
                 f2 = "".join(
                     "{}{{}}".format(x)
                     for x in [
                         "\033[7m",
                         "\033[27m",
                         "",
-                        "\033[0;1;7m",
-                        "\033[27m",
-                        "\033[7m",
+                        "\033[0;1m",
+                        "\033[0;36m",
+                        "\033[0m",
                     ]
                 )
+                ctab = {"B": 6, "K": 5, "M": 1, "G": 3}
                 for lst in [dirs, files]:
                     for x in lst:
                         a = x["dt"].replace("-", " ").replace(":", " ").split(" ")
                         x["dt"] = f2.format(*list(a))
+                        sz = humansize(x["sz"], True)
+                        x["sz"] = "\033[0;3{}m{:>5}".format(ctab.get(sz[-1:], 0), sz)
             else:
-                fmt = "{{}}  {{:{}}}  {{}}"
+                fmt = "{{}}  {{:{},}}  {{}}"
+                nfmt = "{:,}"
 
-            fmt = fmt.format(len(str(biggest)))
+            fmt = fmt.format(len(nfmt.format(biggest)))
             ret = [
                 "# {}: {}".format(x, ls[x])
                 for x in ["acct", "perms", "srvinf"]
