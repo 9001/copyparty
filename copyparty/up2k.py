@@ -242,7 +242,7 @@ class Up2k(object):
                         if vp:
                             fvp = "{}/{}".format(vp, fvp)
 
-                        self._handle_rm(LEELOO_DALLAS, None, fvp, True)
+                        self._handle_rm(LEELOO_DALLAS, None, fvp)
                         nrm += 1
 
                 if nrm:
@@ -1504,7 +1504,7 @@ class Up2k(object):
         ok = {}
         ng = {}
         for vp in vpaths:
-            a, b, c = self._handle_rm(uname, ip, vp, False)
+            a, b, c = self._handle_rm(uname, ip, vp)
             n_files += a
             for k in b:
                 ok[k] = 1
@@ -1517,7 +1517,7 @@ class Up2k(object):
 
         return "deleted {} files (and {}/{} folders)".format(n_files, ok, ok + ng)
 
-    def _handle_rm(self, uname, ip, vpath, rm_topdir):
+    def _handle_rm(self, uname, ip, vpath):
         try:
             permsets = [[True, False, False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
@@ -1588,7 +1588,7 @@ class Up2k(object):
 
                 bos.unlink(abspath)
 
-        rm = rmdirs(self.log_func, scandir, True, atop, 1 if rm_topdir else 0)
+        rm = rmdirs(self.log_func, scandir, True, atop, 1)
         return n_files, rm[0], rm[1]
 
     def handle_mv(self, uname, svp, dvp):
