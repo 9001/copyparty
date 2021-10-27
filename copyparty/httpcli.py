@@ -2182,6 +2182,8 @@ class HttpCli(object):
 
             try:
                 ext = "---" if is_dir else fn.rsplit(".", 1)[1]
+                if len(ext) > 16:
+                    ext = ext[:16]
             except:
                 ext = "%"
 
