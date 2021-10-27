@@ -63,6 +63,7 @@ class Up2k(object):
 
         # state
         self.mutex = threading.Lock()
+        self.rescan_cond = threading.Condition()
         self.hashq = Queue()
         self.tagq = Queue()
         self.n_hashq = 0
@@ -183,9 +184,19 @@ class Up2k(object):
 
     def _sched_rescan(self):
         volage = {}
+        cooldown = 0
+        timeout = time.time() + 3
         while True:
-            time.sleep(self.args.re_int)
+            timeout = max(timeout, cooldown)
+            wait = max(0.1, timeout + 0.1 - time.time())
+            with self.rescan_cond:
+                self.rescan_cond.wait(wait)
+
             now = time.time()
+            if now < cooldown:
+                continue
+
+            timeout = now + 9001
             with self.mutex:
                 for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
                     maxage = vol.flags.get("scan")
@@ -195,13 +206,17 @@ class Up2k(object):
                     if vp not in volage:
                         volage[vp] = now
 
-                    if now - volage[vp] >= maxage:
+                    deadline = volage[vp] + maxage
+                    if deadline <= now:
                         self.need_rescan[vp] = 1
+
+                    timeout = min(timeout, deadline)
 
                 vols = list(sorted(self.need_rescan.keys()))
                 self.need_rescan = {}
 
             if vols:
+                cooldown = now + 10
                 err = self.rescan(self.asrv.vfs.all_vols, vols)
                 if err:
                     for v in vols:
@@ -224,8 +239,11 @@ class Up2k(object):
                 if not cur:
                     continue
 
+                lifetime = int(lifetime)
+                timeout = min(timeout, now + lifetime)
+
                 nrm = 0
-                deadline = time.time() - int(lifetime)
+                deadline = time.time() - lifetime
                 q = "select rd, fn from up where at > 0 and at < ? limit 100"
                 while True:
                     with self.mutex:
@@ -247,6 +265,16 @@ class Up2k(object):
 
                 if nrm:
                     self.log("{} files graduated in {}".format(nrm, vp))
+
+                if timeout < 10:
+                    continue
+
+                q = "select at from up where at > 0 order by at limit 1"
+                with self.mutex:
+                    hits = cur.execute(q).fetchone()
+
+                if hits:
+                    timeout = min(timeout, now + lifetime - (now - hits[0]))
 
     def _vis_job_progress(self, job):
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
@@ -1667,6 +1695,9 @@ class Up2k(object):
             # folders are too scary, schedule rescan of both vols
             self.need_rescan[svn.vpath] = 1
             self.need_rescan[dvn.vpath] = 1
+            with self.rescan_cond:
+                self.rescan_cond.notify_all()
+
             return "k"
 
         c1, w, ftime, fsize, ip, at = self._find_from_vpath(svn.realpath, srem)

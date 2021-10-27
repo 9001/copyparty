@@ -421,7 +421,6 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
     ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching paths during e2ds folder scans")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
-    ap2.add_argument("--re-int", metavar="SEC", type=int, default=30, help="disk rescan check interval")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
     
