@@ -50,10 +50,9 @@ class HttpSrv(object):
         self.log = broker.log
         self.asrv = broker.asrv
 
-        nsuf = "-{}".format(nid) if nid else ""
-        nsuf2 = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
+        nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
 
-        self.name = "hsrv" + nsuf2
+        self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()
         self.stopping = False
 
@@ -61,6 +60,7 @@ class HttpSrv(object):
         self.tp_ncli = 0  # fading
         self.tp_time = None  # latest worker collect
         self.tp_q = None if self.args.no_htp else queue.LifoQueue()
+        self.t_periodic = None
 
         self.u2fh = FHC()
         self.srvs = []
@@ -93,10 +93,6 @@ class HttpSrv(object):
             if self.args.log_thrs:
                 start_log_thrs(self.log, self.args.log_thrs, nid)
 
-        t = threading.Thread(target=self.periodic, name="hsrv-pt" + nsuf)
-        t.daemon = True
-        t.start()
-
     def start_threads(self, n):
         self.tp_nthr += n
         if self.args.log_htp:
@@ -120,13 +116,17 @@ class HttpSrv(object):
 
     def periodic(self):
         while True:
-            time.sleep(2 if self.tp_ncli else 10)
+            time.sleep(2 if self.tp_ncli or self.ncli else 10)
             with self.mutex:
                 self.u2fh.clean()
                 if self.tp_q:
                     self.tp_ncli = max(self.ncli, self.tp_ncli - 2)
                     if self.tp_nthr > self.tp_ncli + 8:
                         self.stop_threads(4)
+
+                if not self.ncli and not self.u2fh.cache and self.tp_nthr <= 8:
+                    self.t_periodic = None
+                    return
 
     def listen(self, sck, nlisteners):
         ip, port = sck.getsockname()
@@ -186,6 +186,16 @@ class HttpSrv(object):
 
         with self.mutex:
             self.ncli += 1
+            if not self.t_periodic:
+                name = "hsrv-pt"
+                if self.nid:
+                    name += "-{}".format(self.nid)
+
+                t = threading.Thread(target=self.periodic, name=name)
+                self.t_periodic = t
+                t.daemon = True
+                t.start()
+
             if self.tp_q:
                 self.tp_time = self.tp_time or now
                 self.tp_ncli = max(self.tp_ncli, self.ncli)
