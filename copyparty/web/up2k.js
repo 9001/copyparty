@@ -992,6 +992,7 @@ function up2k_init(subtle) {
                 "lmod": lmod / 1000,
                 "purl": fdir,
                 "done": false,
+                "bytes_uploaded": 0,
                 "hash": []
             },
                 key = entry.name + '\n' + entry.size;
@@ -1400,7 +1401,6 @@ function up2k_init(subtle) {
     function exec_hash() {
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
-        t.bytes_uploaded = 0;
 
         var bpend = 0,
             nchunk = 0,
