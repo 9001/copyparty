@@ -1781,6 +1781,7 @@ html.light #u2err.err {
 	display: none;
 }
 #u2etas.o .o {
+	display: inherit;
 	display: unset;
 }
 #u2etaw {

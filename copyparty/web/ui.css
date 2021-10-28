@@ -79,7 +79,8 @@ html {
 }
 #toast.vis {
 	right: 1.3em;
-	transform: unset;
+	transform: inherit;
+	transform: initial;
 }
 #toast.vis #toastc {
 	left: -2em;

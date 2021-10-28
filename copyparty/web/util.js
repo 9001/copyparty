@@ -71,7 +71,7 @@ try {
 catch (ex) {
     if (console.stdlog)
         console.log = console.stdlog;
-    console.log(ex);
+    console.log('console capture failed', ex);
 }
 var crashed = false, ignexd = {};
 function vis_exh(msg, url, lineNo, columnNo, error) {
