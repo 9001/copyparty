@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-10-12, v0.9, ed <irc.rizon.net>, MIT-Licensed
+2021-10-29, v0.10, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -250,9 +250,10 @@ def walkdirs(tops):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
     sep = "{0}".format(os.sep).encode("ascii")
     for top in tops:
-        stop = top
         if top[-1:] == sep:
-            stop = os.path.dirname(top.rstrip(sep))
+            stop = top.rstrip(sep)
+        else:
+            stop = os.path.dirname(top)
 
         if os.path.isdir(top):
             for ap, inf in walkdir(top):
