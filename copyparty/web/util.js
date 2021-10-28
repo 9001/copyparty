@@ -1221,28 +1221,31 @@ if (ebi('repl'))
     ebi('repl').onclick = repl;
 
 
+var svg_decl = '<?xml version="1.0" encoding="UTF-8"?>\n';
+
+
 var favico = (function () {
     var r = {};
     r.en = true;
+    r.tag = null;
 
     function gx(txt) {
-        return (
-            '<?xml version="1.0" encoding="UTF-8"?>\n' +
-            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g>\n' +
+        return (svg_decl +
+            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
             (r.bg ? '<rect width="100%" height="100%" rx="16" fill="#' + r.bg + '" />\n' : '') +
             '<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"' +
             ' font-family="sans-serif" font-weight="bold" font-size="64px"' +
-            ' fill="#' + r.fg + '">' + txt + '</text></g></svg>'
+            ' fill="#' + r.fg + '">' + txt + '</text></svg>'
         );
     }
 
-    r.upd = function () {
-        var i = QS('link[rel="icon"]'), b64;
+    r.upd = function (svg) {
         if (!r.txt)
             return;
 
+        var b64;
         try {
-            b64 = btoa(gx(r.txt));
+            b64 = btoa(svg ? svg_decl + svg : gx(r.txt));
         }
         catch (ex) {
             b64 = encodeURIComponent(r.txt).replace(/%([0-9A-F]{2})/g,
@@ -1251,12 +1254,12 @@ var favico = (function () {
             b64 = btoa(gx(unescape(encodeURIComponent(r.txt))));
         }
 
-        if (!i) {
-            i = mknod('link');
-            i.rel = 'icon';
-            document.head.appendChild(i);
+        if (!r.tag) {
+            r.tag = mknod('link');
+            r.tag.rel = 'icon';
+            document.head.appendChild(r.tag);
         }
-        i.href = 'data:image/svg+xml;base64,' + b64;
+        r.tag.href = 'data:image/svg+xml;base64,' + b64;
     };
 
     r.init = function () {

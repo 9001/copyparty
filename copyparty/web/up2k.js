@@ -477,6 +477,52 @@ function U2pvis(act, btns) {
 }
 
 
+function Donut(st) {
+    var r = this,
+        el = null,
+        o = 20 * 2 * Math.PI,
+        optab = QS('#ops a[data-dest="up2k"]');
+
+    optab.setAttribute('ico', optab.textContent);
+
+    function svg(v) {
+        var ico = v !== undefined,
+            bg = ico ? '#333' : 'transparent';
+
+        return (
+            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
+            (ico ? '<rect width="100%" height="100%" rx="32" fill="#333" />\n' :
+                '<circle stroke="white" stroke-width="6" r="3" cx="32" cy="32" />\n') +
+            '<circle class="donut" stroke="white" fill="' + bg +
+            '" stroke-dashoffset="' + (ico ? v : o) + '" stroke-dasharray="' + o + ' ' + o +
+            '" transform="rotate(270 32 32)" stroke-width="12" r="20" cx="32" cy="32" /></svg>'
+        );
+    }
+
+    r.on = function (ya) {
+        r.fc = 99;
+        r.base = st.bytes.finished;
+        optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
+        el = QS('#ops a .donut');
+        if (!ya)
+            favico.upd();
+    };
+    r.do = function () {
+        if (!el)
+            return;
+
+        var t = st.bytes.total - r.base,
+            v = st.bytes.finished - r.base,
+            ofs = el.style.strokeDashoffset = o - o * v / t;
+
+        if (favico.txt && ++r.fc > 4) {
+            favico.upd(svg(ofs));
+            r.fc = 0;
+        }
+    };
+}
+
+
 function fsearch_explain(n) {
     if (n)
         return toast.inf(60, 'your access to this folder is Read-Only\n\n' + (acct == '*' ? 'you are currently not logged in' : 'you are currently logged in as "' + acct + '"'));
@@ -623,7 +669,8 @@ function up2k_init(subtle) {
             });
     }
 
-    var pvis = new U2pvis("bz", '#u2cards');
+    var pvis = new U2pvis("bz", '#u2cards'),
+        donut = new Donut(st);
 
     var bobslice = null;
     if (window.File)
@@ -1175,6 +1222,8 @@ function up2k_init(subtle) {
                     window[(is_busy ? "add" : "remove") +
                         "EventListener"]("beforeunload", warn_uploader_busy);
 
+                    donut.on(is_busy);
+
                     if (!is_busy) {
                         var k = uc.fsearch ? 'searches' : 'uploads',
                             ks = uc.fsearch ? 'Search' : 'Upload',
@@ -1196,9 +1245,11 @@ function up2k_init(subtle) {
                             toast.err(t, '{0} {1}'.format(ks, tng));
 
                         timer.rm(etafun);
+                        timer.rm(donut.do);
                         op_minh = 0;
                     }
                     else {
+                        timer.add(donut.do);
                         timer.add(etafun, false);
                         ebi('u2etas').style.textAlign = 'left';
                     }

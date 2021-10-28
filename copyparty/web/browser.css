@@ -507,6 +507,11 @@ html.light #wfm a:not(.en) {
 	box-shadow: 0 -.15em .2em #000 inset;
 	padding-bottom: .3em;
 }
+#ops a svg {
+	width: 1.75em;
+	height: 1.75em;
+	margin: -.5em -.3em;
+}
 #ops {
 	margin: 1.7em 1.5em 0 1.5em;
 	padding: .3em .6em;
@@ -1116,6 +1121,9 @@ html.light #ops a.act {
 	background: #fff;
 	border-color: #07a;
 	padding-top: .4em;
+}
+html.light #ops svg circle {
+	stroke: black;
 }
 html.light #op_cfg h3 {
 	border-color: #ccc;
