@@ -847,8 +847,6 @@ hashwasm would solve the streaming issue but reduces hashing speed for sha512 (x
 
 defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
 
-you can ignore the `cannot efficiently use multiple CPU cores` message, very unlikely to be a problem
-
 below are some tweaks roughly ordered by usefulness:
 
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file

@@ -3274,6 +3274,7 @@ var treectl = (function () {
 			links[a].onclick = treegrow;
 		}
 		ebi('tree').onscroll = nowrap ? unmenter : null;
+		tree_scrollto();
 	}
 
 	function menter(e) {
