@@ -21,6 +21,29 @@ class TcpSrv(object):
 
         self.stopping = False
 
+        self.srv = []
+        self.nsrv = 0
+        ok = {}
+        for ip in self.args.i:
+            ok[ip] = []
+            for port in self.args.p:
+                self.nsrv += 1
+                try:
+                    self._listen(ip, port)
+                    ok[ip].append(port)
+                except Exception as ex:
+                    if self.args.ign_ebind or self.args.ign_ebind_all:
+                        m = "could not listen on {}:{}: {}"
+                        self.log("tcpsrv", m.format(ip, port, ex), c=3)
+                    else:
+                        raise
+
+        if not self.srv and not self.args.ign_ebind_all:
+            raise Exception("could not listen on any of the given interfaces")
+
+        if self.nsrv != len(self.srv):
+            self.log("tcpsrv", "")
+
         ip = "127.0.0.1"
         eps = {ip: "local only"}
         nonlocals = [x for x in self.args.i if x != ip]
@@ -34,29 +57,15 @@ class TcpSrv(object):
         m = "available @ http://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             for port in sorted(self.args.p):
+                if port not in ok.get(ip, ok.get("0.0.0.0", [])):
+                    continue
+
                 msgs.append(m.format(ip, port, desc))
 
         if msgs:
             msgs[-1] += "\n"
             for m in msgs:
                 self.log("tcpsrv", m)
-
-        self.srv = []
-        self.nsrv = 0
-        for ip in self.args.i:
-            for port in self.args.p:
-                self.nsrv += 1
-                try:
-                    self._listen(ip, port)
-                except Exception as ex:
-                    if self.args.ign_ebind or self.args.ign_ebind_all:
-                        m = "could not listen on {}:{}: {}"
-                        self.log("tcpsrv", m.format(ip, port, ex), c=1)
-                    else:
-                        raise
-
-        if not self.srv and not self.args.ign_ebind_all:
-            raise Exception("could not listen on any of the given interfaces")
 
     def _listen(self, ip, port):
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
