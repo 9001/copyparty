@@ -104,15 +104,15 @@ class SvcHub(object):
         if not failed:
             return
 
-        m = "{}/{} workers failed to start"
-        m = m.format(failed, expected)
-        self.log("root", m, 1)
-
         if self.args.ign_ebind_all:
             return
 
         if self.args.ign_ebind and self.tcpsrv.srv:
             return
+
+        m = "{}/{} workers failed to start"
+        m = m.format(failed, expected)
+        self.log("root", m, 1)
 
         self.retcode = 1
         os.kill(os.getpid(), signal.SIGTERM)

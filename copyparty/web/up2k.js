@@ -501,7 +501,7 @@ function Donut(uc, st) {
 
         if (r.eta) {
             if (r.eta < 10) {
-                fg = '#f4b';
+                fg = '#fa0';
                 fsz = 72;
             }
             rc = 8;

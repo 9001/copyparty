@@ -1000,7 +1000,7 @@ class AuthSrv(object):
             v, _ = vfs.get("/", "*", False, True)
             if self.warn_anonwrite and os.getcwd() == v.realpath:
                 self.warn_anonwrite = False
-                msg = "anyone can read/write the current directory: {}"
+                msg = "anyone can read/write the current directory: {}\n"
                 self.log(msg.format(v.realpath), c=1)
         except Pebkac:
             self.warn_anonwrite = True

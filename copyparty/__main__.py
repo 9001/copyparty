@@ -20,7 +20,7 @@ import threading
 import traceback
 from textwrap import dedent
 
-from .__init__ import E, WINDOWS, VT100, PY2, unicode
+from .__init__ import E, WINDOWS, ANYWIN, VT100, PY2, unicode
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
 from .util import py_desc, align_tab, IMPLICATIONS, ansi_re
@@ -494,6 +494,12 @@ def main(argv=None):
         lprint(msg.format(dk, nk))
         argv[idx] = nk
         time.sleep(2)
+
+    try:
+        if len(argv) == 1 and (ANYWIN or not os.geteuid()):
+            argv.extend(["-p80,443,3923", "--ign-ebind"])
+    except:
+        pass
 
     try:
         al = run_argparse(argv, RiceFormatter)
