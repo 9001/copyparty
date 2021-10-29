@@ -92,7 +92,6 @@ class SvcHub(object):
         if self.check_mp_enable():
             from .broker_mp import BrokerMp as Broker
         else:
-            self.log("root", "cannot efficiently use multiple CPU cores")
             from .broker_thr import BrokerThr as Broker
 
         self.broker = Broker(self)
@@ -122,6 +121,7 @@ class SvcHub(object):
         if self.httpsrv_up != self.broker.num_workers:
             return
 
+        time.sleep(0.1)  # purely cosmetic dw
         self.log("root", "workers OK\n")
         self.up2k.init_vols()
 
@@ -349,10 +349,11 @@ class SvcHub(object):
 
     def check_mp_enable(self):
         if self.args.j == 1:
-            self.log("root", "multiprocessing disabled by argument -j 1;")
+            self.log("svchub", "multiprocessing disabled by argument -j 1")
             return False
 
         if mp.cpu_count() <= 1:
+            self.log("svchub", "only one CPU detected; multiprocessing disabled")
             return False
 
         try:
@@ -367,6 +368,7 @@ class SvcHub(object):
             return True
         else:
             self.log("svchub", err)
+            self.log("svchub", "cannot efficiently use multiple CPU cores")
             return False
 
     def sd_notify(self):

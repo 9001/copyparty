@@ -146,7 +146,12 @@ class HttpSrv(object):
         fno = srv_sck.fileno()
         msg = "subscribed @ {}:{}  f{}".format(ip, port, fno)
         self.log(self.name, msg)
-        self.broker.put(False, "cb_httpsrv_up")
+
+        def fun():
+            self.broker.put(False, "cb_httpsrv_up")
+
+        threading.Thread(target=fun).start()
+
         while not self.stopping:
             if self.args.log_conn:
                 self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="1;30")
