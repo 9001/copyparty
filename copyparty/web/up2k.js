@@ -213,14 +213,14 @@ function U2pvis(act, btns) {
     };
 
     r.setat = function (nfile, blocktab) {
-        r.tab[nfile].cb = blocktab;
+        var fo = r.tab[nfile], bd = 0;
 
-        var bd = 0;
         for (var a = 0; a < blocktab.length; a++)
             bd += blocktab[a];
 
-        r.tab[nfile].bd = bd;
-        r.tab[nfile].bd0 = bd;
+        fo.bd = bd;
+        fo.bd0 = bd;
+        fo.cb = blocktab;
     };
 
     r.perc = function (bd, bd0, sz, t0) {
@@ -480,9 +480,10 @@ function U2pvis(act, btns) {
 }
 
 
-function Donut(st) {
+function Donut(uc, st) {
     var r = this,
         el = null,
+        psvg = null,
         o = 20 * 2 * Math.PI,
         optab = QS('#ops a[data-dest="up2k"]');
 
@@ -491,22 +492,27 @@ function Donut(st) {
     function svg(v) {
         var ico = v !== undefined,
             bg = ico ? '#333' : 'transparent',
-            fg, fsz;
+            fg = '#fff',
+            fsz = 52,
+            rc = 32;
 
-        if (r.eta && r.eta > 99)
+        if (r.eta && (r.eta > 99 || (uc.fsearch ? st.time.hashing : st.time.uploading) < 20))
             r.eta = null;
 
         if (r.eta) {
-            fg = r.eta > 10 ? '#fff' : '#fa0';
-            fsz = ico && r.eta < 10 ? 64 : 56;
+            if (r.eta < 10) {
+                fg = '#f4b';
+                fsz = 72;
+            }
+            rc = 8;
         }
 
         return (
             '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
-            (ico ? '<rect width="100%" height="100%" rx="32" fill="#333" />\n' :
+            (ico ? '<rect width="100%" height="100%" rx="' + rc + '" fill="#333" />\n' :
                 '<circle stroke="white" stroke-width="6" r="3" cx="32" cy="32" />\n') +
             (r.eta ? (
-                '<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"' +
+                '<text x="55%" y="58%" dominant-baseline="middle" text-anchor="middle"' +
                 ' font-family="sans-serif" font-weight="bold" font-size="' + fsz + 'px"' +
                 ' fill="' + fg + '">' + r.eta + '</text></svg>'
             ) : (
@@ -517,10 +523,14 @@ function Donut(st) {
         );
     }
 
+    function pos() {
+        return uc.fsearch ? Math.max(st.bytes.hashed, st.bytes.finished) : st.bytes.finished;
+    }
+
     r.on = function (ya) {
         r.fc = 99;
         r.eta = null;
-        r.base = st.bytes.finished;
+        r.base = pos();
         optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
         el = QS('#ops a .donut');
         if (!ya)
@@ -531,11 +541,19 @@ function Donut(st) {
             return;
 
         var t = st.bytes.total - r.base,
-            v = st.bytes.finished - r.base,
+            v = pos() - r.base,
             ofs = el.style.strokeDashoffset = o - o * v / t;
 
-        if (favico.txt && ++r.fc > 4) {
-            favico.upd('', svg(ofs));
+        if (favico.txt) {
+            if (++r.fc < 10 && r.eta && r.eta > 99)
+                return;
+
+            var s = svg(ofs);
+            if (s == psvg || (r.eta === null && r.fc < 10))
+                return;
+
+            favico.upd('', s);
+            psvg = s;
             r.fc = 0;
         }
     };
@@ -689,7 +707,7 @@ function up2k_init(subtle) {
     }
 
     var pvis = new U2pvis("bz", '#u2cards'),
-        donut = new Donut(st);
+        donut = new Donut(uc, st);
 
     var bobslice = null;
     if (window.File)
