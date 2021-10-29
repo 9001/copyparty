@@ -1239,7 +1239,7 @@ var favico = (function () {
         );
     }
 
-    r.upd = function (svg) {
+    r.upd = function (txt, svg) {
         if (!r.txt)
             return;
 

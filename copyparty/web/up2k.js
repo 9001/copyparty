@@ -490,21 +490,36 @@ function Donut(st) {
 
     function svg(v) {
         var ico = v !== undefined,
-            bg = ico ? '#' + r.bg : 'transparent';
+            bg = ico ? '#333' : 'transparent',
+            fg, fsz;
+
+        if (r.eta && r.eta > 99)
+            r.eta = null;
+
+        if (r.eta) {
+            fg = r.eta > 10 ? '#fff' : '#fa0';
+            fsz = ico && r.eta < 10 ? 64 : 56;
+        }
 
         return (
             '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
             (ico ? '<rect width="100%" height="100%" rx="32" fill="#333" />\n' :
                 '<circle stroke="white" stroke-width="6" r="3" cx="32" cy="32" />\n') +
-            '<circle class="donut" stroke="white" fill="' + bg +
-            '" stroke-dashoffset="' + (ico ? v : o) + '" stroke-dasharray="' + o + ' ' + o +
-            '" transform="rotate(270 32 32)" stroke-width="12" r="20" cx="32" cy="32" /></svg>'
+            (r.eta ? (
+                '<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"' +
+                ' font-family="sans-serif" font-weight="bold" font-size="' + fsz + 'px"' +
+                ' fill="' + fg + '">' + r.eta + '</text></svg>'
+            ) : (
+                '<circle class="donut" stroke="white" fill="' + bg +
+                '" stroke-dashoffset="' + (ico ? v : o) + '" stroke-dasharray="' + o + ' ' + o +
+                '" transform="rotate(270 32 32)" stroke-width="12" r="20" cx="32" cy="32" /></svg>'
+            ))
         );
     }
 
     r.on = function (ya) {
         r.fc = 99;
-        r.bg = '333';
+        r.eta = null;
         r.base = st.bytes.finished;
         optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
         el = QS('#ops a .donut');
@@ -520,7 +535,7 @@ function Donut(st) {
             ofs = el.style.strokeDashoffset = o - o * v / t;
 
         if (favico.txt && ++r.fc > 4) {
-            favico.upd(svg(ofs));
+            favico.upd('', svg(ofs));
             r.fc = 0;
         }
     };
@@ -1118,9 +1133,7 @@ function up2k_init(subtle) {
                 continue;
             }
 
-            if (a == t.length - 1)
-                donut.bg = eta < 10 ? 'da0' : eta < 30 ? '380' : eta < 60 ? '048' : '333';
-
+            donut.eta = eta;
             if (etaskip)
                 continue;
 
