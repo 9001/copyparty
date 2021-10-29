@@ -490,7 +490,7 @@ function Donut(st) {
 
     function svg(v) {
         var ico = v !== undefined,
-            bg = ico ? '#333' : 'transparent';
+            bg = ico ? '#' + r.bg : 'transparent';
 
         return (
             '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
@@ -504,6 +504,7 @@ function Donut(st) {
 
     r.on = function (ya) {
         r.fc = 99;
+        r.bg = '333';
         r.base = st.bytes.finished;
         optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
         el = QS('#ops a .donut');
@@ -1116,6 +1117,9 @@ function up2k_init(subtle) {
                 ebi(t[a][0]).innerHTML = '(preparing to upload)';
                 continue;
             }
+
+            if (a == t.length - 1)
+                donut.bg = eta < 10 ? 'da0' : eta < 30 ? '380' : eta < 60 ? '048' : '333';
 
             if (etaskip)
                 continue;
