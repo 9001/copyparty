@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-10-29, v0.10, ed <irc.rizon.net>, MIT-Licensed
+2021-10-31, v0.11, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -455,6 +455,7 @@ class Ctl(object):
         self.nbytes = nbytes
 
         if ar.td:
+            requests.packages.urllib3.disable_warnings()
             req_ses.verify = False
         if ar.te:
             req_ses.verify = ar.te
