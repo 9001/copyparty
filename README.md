@@ -66,6 +66,11 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
         * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
+* [HTTP API](#HTTP-API)
+    * [read](#read)
+    * [write](#write)
+    * [admin](#admin)
+    * [general](#general)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
@@ -421,6 +426,8 @@ see [up2k](#up2k) for details on how it works
 ![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/129635371-48fc54ca-fa91-48e3-9b1d-ba413e4b68cb.png)
 
 **protip:** you can avoid scaring away users with [docs/minimal-up2k.html](docs/minimal-up2k.html) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
+
+**protip:** if you enable `favicon` in the `[⚙️] settings` tab (by typing something into the textbox), the icon in the browser tab will indicate upload progress
 
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
@@ -872,7 +879,7 @@ when uploading files,
 
 * if you're cpu-bottlenecked, or the browser is maxing a cpu core:
   * up to 30% faster uploads if you hide the upload status list by switching away from the `[🚀]` up2k ui-tab (or closing it)
-    * switching to another browser-tab also works but that makes firefox stop updating the favicon
+    * switching to another browser-tab also works, the favicon will update every 10 seconds in that case
   * unlikely to be a problem, but can happen when uploding many small files, or your internet is too fast, or PC too slow
 
 
@@ -917,6 +924,78 @@ however you can hit `F12` in the up2k tab and use the devtools to see how far yo
 
 * send the list of filenames to copyparty for safekeeping:  
   `await fetch('/inc', {method:'PUT', body:JSON.stringify(ng,null,1)})`
+
+
+# HTTP API
+
+* table-column `params` = URL parameters; `?foo=bar&qux=...`
+* table-column `body` = POST payload
+* method `jPOST` = json post
+* method `mPOST` = multipart post
+* method `uPOST` = url-encoded post
+* `FILE` = conventional HTTP file upload entry (rfc1867 et al, filename in `Content-Disposition`)
+
+authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
+
+## read
+
+| method | params | result |
+|--|--|--|
+| GET | `?ls` | list files/folders at URL as JSON |
+| GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
+| GET | `?ls=t` | list files/folders at URL as plaintext |
+| GET | `?ls=v` | list files/folders at URL, terminal-formatted |
+| GET | `?b` | list files/folders at URL as simplified HTML |
+| GET | `?tree=.` | list one level of subdirectories inside URL |
+| GET | `?tree` | list one level of subdirectories for each level until URL |
+| GET | `?tar` | download everything below URL as a tar file |
+| GET | `?zip=utf-8` | download everything below URL as a zip file |
+| GET | `?ups` | show recent uploads from your IP |
+| GET | `?ups&filter=f` | ...where URL contains `f` |
+| GET | `?raw` | get markdown file at URL as plaintext |
+| GET | `?th` | get image/video at URL as thumbnail |
+
+| method | body | result |
+|--|--|--|
+| jPOST | `{"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
+
+| method | params | body | result |
+|--|--|--|--|
+| jPOST | `?tar` | `["foo","bar"]` | download folders `foo` and `bar` inside URL as a tar file |
+
+## write
+
+| method | params | result |
+|--|--|--|
+| GET | `?move=/foo/bar` | move/rename the file/folder at URL to /foo/bar |
+
+| method | params | body | result |
+|--|--|--|--|
+| PUT | | (binary data) | upload into file at URL |
+| PUT | `?gz` | (binary data) | compress with gzip and write into file at URL |
+| PUT | `?xz` | (binary data) | compress with xz and write into file at URL |
+| mPOST | | `act=bput`, `f=FILE` | upload `FILE` into the folder at URL |
+| mPOST | `?j` | `act=bput`, `f=FILE` | ...and reply with json |
+| mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
+| GET | `?delete` | | delete URL recursively |
+| jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |
+| uPOST | | `msg=foo` | send message `foo` into server log |
+| mPOST | | `act=tput`, `body=TEXT` | overwrite markdown document at URL |
+
+server behavior of `msg` can be reconfigured with `--urlform`
+
+## admin
+
+| method | params | result |
+|--|--|--|
+| GET | `?scan` | initiate a rescan of the volume which provides URL |
+| GET | `?stack` | show a stacktrace of all threads |
+
+## general
+
+| method | params | result |
+|--|--|--|
+| GET | `?pw=x` | logout |
 
 
 # dependencies
