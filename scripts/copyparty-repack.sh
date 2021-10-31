@@ -10,14 +10,40 @@ set -e
 #  (and those are usually linux so bash is good inaff)
 #   (but that said this even has macos support)
 #
-# bundle will look like:
-# -rwxr-xr-x  0 ed ed  183808 Nov 19 00:43 copyparty
-# -rw-r--r--  0 ed ed  491318 Nov 19 00:40 copyparty-extras/copyparty-0.5.4.tar.gz
-# -rwxr-xr-x  0 ed ed   30254 Nov 17 23:58 copyparty-extras/copyparty-fuse.py
-# -rwxr-xr-x  0 ed ed  481403 Nov 19 00:40 copyparty-extras/sfx-full/copyparty-sfx.sh
-# -rwxr-xr-x  0 ed ed  506043 Nov 19 00:40 copyparty-extras/sfx-full/copyparty-sfx.py
-# -rwxr-xr-x  0 ed ed  167699 Nov 19 00:43 copyparty-extras/sfx-lite/copyparty-sfx.sh
-# -rwxr-xr-x  0 ed ed  183808 Nov 19 00:43 copyparty-extras/sfx-lite/copyparty-sfx.py
+# output summary (filesizes and contents):
+#
+# 535672  copyparty-extras/sfx-full/copyparty-sfx.sh
+# 550760  copyparty-extras/sfx-full/copyparty-sfx.py
+#           `- original unmodified sfx from github
+#
+# 572923  copyparty-extras/sfx-full/copyparty-sfx-gz.py
+#           `- unmodified but recompressed from bzip2 to gzip
+#
+# 341792  copyparty-extras/sfx-ent/copyparty-sfx.sh
+# 353975  copyparty-extras/sfx-ent/copyparty-sfx.py
+# 376934  copyparty-extras/sfx-ent/copyparty-sfx-gz.py
+#           `- removed iOS ogg/opus/vorbis audio decoder,
+#              removed the audio tray mouse cursor,
+#              "enterprise edition"
+#
+# 259288  copyparty-extras/sfx-lite/copyparty-sfx.sh
+# 270004  copyparty-extras/sfx-lite/copyparty-sfx.py
+# 293159  copyparty-extras/sfx-lite/copyparty-sfx-gz.py
+#           `- also removed the codemirror markdown editor,
+#              only essential features remaining
+#
+# 646297  copyparty-extras/copyparty-1.0.14.tar.gz
+#   4823  copyparty-extras/copyparty-repack.sh
+#           `- source files from github
+#
+#  23663  copyparty-extras/up2k.py
+#           `- standalone utility to upload or search for files
+#
+#  32280  copyparty-extras/copyparty-fuse.py
+#           `- standalone to mount a URL as a local read-only filesystem
+#
+# 270004  copyparty
+#           `- minimal binary, same as sfx-lite/copyparty-sfx.py
 
 
 command -v gnutar && tar() { gnutar "$@"; }
@@ -54,6 +80,7 @@ cache="$od/.copyparty-repack.cache"
 		# fallback to awk (sorry)
 		awk -F\" '/"browser_download_url".*(\.tar\.gz|-sfx\.)/ {print$4}'
 	) |
+	grep -E '(sfx\.(sh|py)|tar\.gz)$' |
 	tee /dev/stderr |
 	tr -d '\r' | tr '\n' '\0' |
 	xargs -0 bash -c 'dl_files "$@"' _
@@ -64,7 +91,7 @@ cache="$od/.copyparty-repack.cache"
 
 # move src into copyparty-extras/,
 # move sfx into copyparty-extras/sfx-full/
-mkdir -p copyparty-extras/sfx-{full,lite}
+mkdir -p copyparty-extras/sfx-{full,ent,lite}
 mv copyparty-sfx.* copyparty-extras/sfx-full/
 mv copyparty-*.tar.gz copyparty-extras/
 
@@ -112,14 +139,17 @@ repack() {
 }
 
 repack sfx-full "re gz no-sh"
-repack sfx-lite "re no-ogv no-cm"
-repack sfx-lite "re no-ogv no-cm gz no-sh"
+repack sfx-ent  "re no-dd no-ogv"
+repack sfx-ent  "re no-dd no-ogv gz no-sh"
+repack sfx-lite "re no-dd no-ogv no-cm"
+repack sfx-lite "re no-dd no-ogv no-cm gz no-sh"
 
 
-# move fuse client into copyparty-extras/,
+# move fuse and up2k clients into copyparty-extras/,
 # copy lite-sfx.py to ./copyparty,
 # delete extracted source code
 ( cd copyparty-extras/
+mv copyparty-*/bin/up2k.py .
 mv copyparty-*/bin/copyparty-fuse.py .
 cp -pv sfx-lite/copyparty-sfx.py ../copyparty
 rm -rf copyparty-{0..9}*.*.*{0..9}
