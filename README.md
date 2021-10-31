@@ -60,6 +60,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
+    * [client-side](#client-side) - when uploading files
 * [security](#security) - some notes on hardening
     * [gotchas](#gotchas) - behavior that might be unexpected
 * [recovering from crashes](#recovering-from-crashes)
@@ -858,6 +859,21 @@ below are some tweaks roughly ordered by usefulness:
   * really heavy traffic (downloads/uploads)
   
   ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
+
+
+## client-side
+
+when uploading files,
+
+* chrome is recommended, at least compared to firefox:
+  * up to 90% faster when hashing, especially on SSDs
+  * up to 40% faster when uploading over extremely fast internets
+  * but [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) can be 40% faster than chrome again
+
+* if you're cpu-bottlenecked, or the browser is maxing a cpu core:
+  * up to 30% faster uploads if you hide the upload status list by switching away from the `[🚀]` up2k ui-tab (or closing it)
+    * switching to another browser-tab also works but that makes firefox stop updating the favicon
+  * unlikely to be a problem, but can happen when uploding many small files, or your internet is too fast, or PC too slow
 
 
 # security

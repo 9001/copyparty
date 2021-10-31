@@ -39,6 +39,13 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 
 
 ##
+## time between first and last upload
+
+python3 -um copyparty -nw -v srv::rw -i 127.0.0.1 2>&1 | tee log 
+cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} !a{a=t;sa=s} {b=t;sb=s} END {print b-a,sa,sb}'
+
+
+##
 ## bad filenames
 
 dirs=("./ほげ" "./ほげ/ぴよ" "./$(printf \\xed\\x91)" "./$(printf \\xed\\x91/\\xed\\x92)" './qw,er;ty%20as df?gh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh')
