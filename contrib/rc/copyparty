@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# PROVIDE: copyparty
+# REQUIRE: networking
+# KEYWORD:
+
+. /etc/rc.subr
+
+name="copyparty"
+rcvar="copyparty_enable"
+copyparty_user="copyparty"
+copyparty_args="-e2dsa -v /storage:/storage:r" # change as you see fit
+copyparty_command="/usr/local/bin/python3.8 /usr/local/copyparty/copyparty-sfx.py ${copyparty_args}"
+pidfile="/var/run/copyparty/${name}.pid"
+command="/usr/sbin/daemon"
+command_args="-P ${pidfile} -r -f ${copyparty_command}"
+
+stop_postcmd="copyparty_shutdown"
+
+copyparty_shutdown()
+{
+        if [ -e "${pidfile}" ]; then
+                echo "Stopping supervising daemon."
+                kill -s TERM `cat ${pidfile}`
+        fi
+}
+
+load_rc_config $name
+: ${copyparty_enable:=no}
+
+run_rc_command "$1"
