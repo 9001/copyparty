@@ -30,6 +30,7 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 # OS integration
 init-scripts to start copyparty as a service
 * [`systemd/copyparty.service`](systemd/copyparty.service) runs the sfx normally
+* [`rc/copyparty`](rc/copyparty) runs sfx normally on freebsd, create a `copyparty` user
 * [`systemd/prisonparty.service`](systemd/prisonparty.service) runs the sfx in a chroot
 * [`openrc/copyparty`](openrc/copyparty)
 
