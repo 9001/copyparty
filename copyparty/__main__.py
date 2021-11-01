@@ -402,6 +402,7 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('thumbnail options')
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails")
+    ap2.add_argument("--no-athumb", action="store_true", help="disable audio thumbnails (spectrograms)")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
     ap2.add_argument("--th-size", metavar="WxH", default="320x256", help="thumbnail res")
     ap2.add_argument("--th-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for generating thumbnails")
@@ -409,6 +410,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
     ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg for video thumbs")
+    ap2.add_argument("--th-ff-swr", action="store_true", help="use swresample instead of soxr for audio thumbs")
     ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown")
     ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval; 0=disabled")
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age")

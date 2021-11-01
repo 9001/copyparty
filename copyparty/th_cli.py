@@ -4,7 +4,7 @@ from __future__ import print_function, unicode_literals
 import os
 
 from .util import Cooldown
-from .th_srv import thumb_path, THUMBABLE, FMT_FF
+from .th_srv import thumb_path, THUMBABLE, FMT_FFV, FMT_FFA
 from .bos import bos
 
 
@@ -22,8 +22,12 @@ class ThumbCli(object):
         if ext not in THUMBABLE:
             return None
 
-        is_vid = ext in FMT_FF
+        is_vid = ext in FMT_FFV
         if is_vid and self.args.no_vthumb:
+            return None
+
+        is_au = ext in FMT_FFA
+        if is_au and self.args.no_athumb:
             return None
 
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg"]:
@@ -33,7 +37,7 @@ class ThumbCli(object):
             fmt = "w"
 
         if fmt == "w":
-            if self.args.th_no_webp or (is_vid and self.args.th_ff_jpg):
+            if self.args.th_no_webp or ((is_vid or is_au) and self.args.th_ff_jpg):
                 fmt = "j"
 
         histpath = self.asrv.vfs.histtab[ptop]

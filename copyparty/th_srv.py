@@ -50,7 +50,8 @@ except:
 # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 # ffmpeg -formats
 FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
-FMT_FF = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc mts h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
+FMT_FFV = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc mts h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
+FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma wav aif aiff au amr gsm ape tak tta wv"
 
 if HAVE_HEIF:
     FMT_PIL += " heif heifs heic heics"
@@ -58,7 +59,9 @@ if HAVE_HEIF:
 if HAVE_AVIF:
     FMT_PIL += " avif avifs"
 
-FMT_PIL, FMT_FF = [{x: True for x in y.split(" ") if x} for y in [FMT_PIL, FMT_FF]]
+FMT_PIL, FMT_FFV, FMT_FFA = [
+    {x: True for x in y.split(" ") if x} for y in [FMT_PIL, FMT_FFV, FMT_FFA]
+]
 
 
 THUMBABLE = {}
@@ -67,7 +70,8 @@ if HAVE_PIL:
     THUMBABLE.update(FMT_PIL)
 
 if HAVE_FFMPEG and HAVE_FFPROBE:
-    THUMBABLE.update(FMT_FF)
+    THUMBABLE.update(FMT_FFV)
+    THUMBABLE.update(FMT_FFA)
 
 
 def thumb_path(histpath, rem, mtime, fmt):
@@ -115,7 +119,8 @@ class ThumbSrv(object):
             t.daemon = True
             t.start()
 
-        if not self.args.no_vthumb and (not HAVE_FFMPEG or not HAVE_FFPROBE):
+        want_ff = not self.args.no_vthumb or not self.args.no_athumb
+        if want_ff and (not HAVE_FFMPEG or not HAVE_FFPROBE):
             missing = []
             if not HAVE_FFMPEG:
                 missing.append("FFmpeg")
@@ -123,7 +128,7 @@ class ThumbSrv(object):
             if not HAVE_FFPROBE:
                 missing.append("FFprobe")
 
-            msg = "cannot create video thumbnails because some of the required programs are not available: "
+            msg = "cannot create audio/video thumbnails because some of the required programs are not available: "
             msg += ", ".join(missing)
             self.log(msg, c=3)
 
@@ -199,8 +204,10 @@ class ThumbSrv(object):
             if not bos.path.exists(tpath):
                 if ext in FMT_PIL:
                     fun = self.conv_pil
-                elif ext in FMT_FF:
+                elif ext in FMT_FFV:
                     fun = self.conv_ffmpeg
+                elif ext in FMT_FFA:
+                    fun = self.conv_spec
 
             if fun:
                 try:
@@ -326,14 +333,53 @@ class ThumbSrv(object):
             ]
 
         cmd += [fsenc(tpath)]
-        # self.log((b" ".join(cmd)).decode("utf-8"))
+        self._run_ff(cmd)
 
+    def _run_ff(self, cmd):
+        # self.log((b" ".join(cmd)).decode("utf-8"))
         ret, sout, serr = runcmd(cmd)
         if ret != 0:
             m = "FFmpeg failed (probably a corrupt video file):\n"
             m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])
             self.log(m, c="1;30")
             raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
+
+    def conv_spec(self, abspath, tpath):
+        ret, _ = ffprobe(abspath)
+
+        if "ac" not in ret:
+            raise Exception("not audio")
+
+        fc = "[0:a:0]aresample=48000{},showspectrumpic=s=640x512,crop=780:544:70:50[o]"
+        fc = fc.format("" if self.args.th_ff_swr else ":resampler=soxr")
+
+        # fmt: off
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-v", b"error",
+            b"-hide_banner",
+            b"-i", fsenc(abspath),
+            b"-filter_complex", fc.encode("utf-8"),
+            b"-map", b"[o]"
+        ]
+        # fmt: on
+
+        if tpath.endswith(".jpg"):
+            cmd += [
+                b"-q:v",
+                b"6",  # default=??
+            ]
+        else:
+            cmd += [
+                b"-q:v",
+                b"50",  # default=75
+                b"-compression_level:v",
+                b"6",  # default=4, 0=fast, 6=max
+            ]
+
+        cmd += [fsenc(tpath)]
+        self._run_ff(cmd)
 
     def poke(self, tdir):
         if not self.poke_cd.poke(tdir):
