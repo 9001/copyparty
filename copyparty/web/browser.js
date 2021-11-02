@@ -470,7 +470,7 @@ var mpl = (function () {
 
 
 var re_au_native = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i,
-	re_au_all = /\.(aac|m4a|ogg|opus|flac|alac|mp3|mp2|ac3|dts|wma|ra|wav|aif|aiff|au|amr|gsm|ape|tak|tta|wv)$/i;
+	re_au_all = /\.(aac|m4a|ogg|opus|flac|alac|mp3|mp2|ac3|dts|wma|ra|wav|aif|aiff|au|alaw|ulaw|mulaw|amr|gsm|ape|tak|tta|wv)$/i;
 
 
 // extract songs + add play column
@@ -486,7 +486,7 @@ function MPlayer() {
 	r.tracks = {};
 	r.order = [];
 
-	var re_audio = mpl.ac_oth ? re_au_all : re_au_native,
+	var re_audio = have_acode && mpl.ac_oth ? re_au_all : re_au_native,
 		trs = QSA('#files tbody tr');
 
 	for (var a = 0, aa = trs.length; a < aa; a++) {

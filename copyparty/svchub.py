@@ -18,6 +18,7 @@ from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
 from .th_srv import ThumbSrv, HAVE_PIL, HAVE_WEBP
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 
 
 class SvcHub(object):
@@ -87,6 +88,11 @@ class SvcHub(object):
                 self.log(
                     "thumb", msg.format(" " * 37, os.path.basename(sys.executable)), c=3
                 )
+
+        if not args.no_acode and (not HAVE_FFMPEG or not HAVE_FFPROBE):
+            msg = "setting --no-acode because either FFmpeg or FFprobe is not available"
+            self.log("thumb", msg, c=6)
+            args.no_acode = True
 
         # decide which worker impl to use
         if self.check_mp_enable():
