@@ -51,7 +51,7 @@ except:
 # ffmpeg -formats
 FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
 FMT_FFV = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc mts h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
-FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma wav aif aiff au amr gsm ape tak tta wv"
+FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma ra wav aif aiff au amr gsm ape tak tta wv"
 
 if HAVE_HEIF:
     FMT_PIL += " heif heifs heic heics"
@@ -90,9 +90,10 @@ def thumb_path(histpath, rem, mtime, fmt):
     h = hashlib.sha512(fsenc(fn)).digest()
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
-    return "{}/th/{}/{}.{:x}.{}".format(
-        histpath, rd, fn, int(mtime), "webp" if fmt == "w" else "jpg"
-    )
+    if fmt != "opus":
+        fmt = "webp" if fmt == "w" else "jpg"
+
+    return "{}/th/{}/{}.{:x}.{}".format(histpath, rd, fn, int(mtime), fmt)
 
 
 class ThumbSrv(object):
@@ -207,7 +208,10 @@ class ThumbSrv(object):
                 elif ext in FMT_FFV:
                     fun = self.conv_ffmpeg
                 elif ext in FMT_FFA:
-                    fun = self.conv_spec
+                    if tpath.endswith(".opus"):
+                        fun = self.conv_opus
+                    else:
+                        fun = self.conv_spec
 
             if fun:
                 try:
@@ -346,7 +350,6 @@ class ThumbSrv(object):
 
     def conv_spec(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
-
         if "ac" not in ret:
             raise Exception("not audio")
 
@@ -379,6 +382,30 @@ class ThumbSrv(object):
             ]
 
         cmd += [fsenc(tpath)]
+        self._run_ff(cmd)
+
+    def conv_opus(self, abspath, tpath):
+        if self.args.no_acode:
+            raise Exception("disabled in server config")
+
+        ret, _ = ffprobe(abspath)
+        if "ac" not in ret:
+            raise Exception("not audio")
+
+        # fmt: off
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-v", b"error",
+            b"-hide_banner",
+            b"-i", fsenc(abspath),
+            b"-map", b"0:a:0",
+            b"-c:a", b"libopus",
+            b"-b:a", b"128k",
+            fsenc(tpath)
+        ]
+        # fmt: on
+
         self._run_ff(cmd)
 
     def poke(self, tdir):

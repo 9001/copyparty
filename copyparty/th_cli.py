@@ -26,8 +26,16 @@ class ThumbCli(object):
         if is_vid and self.args.no_vthumb:
             return None
 
+        want_opus = fmt == "opus"
         is_au = ext in FMT_FFA
-        if is_au and self.args.no_athumb:
+        if is_au:
+            if want_opus:
+                if self.args.no_acode:
+                    return None
+            else:
+                if self.args.no_athumb:
+                    return None
+        elif want_opus:
             return None
 
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg"]:

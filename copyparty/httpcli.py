@@ -2072,6 +2072,7 @@ class HttpCli(object):
             "def_hcols": [],
             "have_up2k_idx": ("e2d" in vn.flags),
             "have_tags_idx": ("e2t" in vn.flags),
+            "have_acode": (not self.args.no_acode),
             "have_mv": (not self.args.no_mv),
             "have_del": (not self.args.no_del),
             "have_zip": (not self.args.no_zip),

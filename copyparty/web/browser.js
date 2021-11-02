@@ -320,6 +320,14 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" tt="load the next folder and continue">📂 next-folder</a>' +
 		'</div></div>' +
 
+		(have_acode ? (
+			'<div><h3>transcode</h3><div>' +
+			'<a href="#" id="ac_flac" class="tgl btn" tt="convert flac to opus">flac</a>' +
+			'<a href="#" id="ac_aac" class="tgl btn" tt="convert aac/m4a to opus">aac</a>' +
+			'<a href="#" id="ac_oth" class="tgl btn" tt="convert all others (not mp3) to opus">oth</a>' +
+			'</div></div>'
+		) : '') +
+
 		'<div><h3>tint</h3><div>' +
 		'<input type="text" id="pb_tint" size="3" value="0" tt="background level (0-100) on the seekbar$Nto make buffering less distracting" />' +
 		'</div></div>' +
@@ -335,6 +343,9 @@ var mpl = (function () {
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
 	});
+	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
+	bcfg_bind(r, 'ac_aac', 'ac_aac', false);
+	bcfg_bind(r, 'ac_oth', 'ac_oth', true, reload_mp);
 
 	ebi('au_os_ctl').onclick = function (e) {
 		ev(e);
@@ -372,6 +383,23 @@ var mpl = (function () {
 		set_tint();
 	};
 	set_tint();
+
+	r.acode = function (url) {
+		var c = true;
+		if (!have_acode)
+			c = false;
+		else if (/\.flac$/i.exec(url))
+			c = r.ac_flac;
+		else if (/\.(aac|m4a)$/i.exec(url))
+			c = r.ac_aac;
+		else if (re_au_native.exec(url))
+			c = false;
+
+		if (!c)
+			return url;
+
+		return url + (url.indexOf('?') < 0 ? '?' : '&') + 'th=opus';
+	};
 
 	r.pp = function () {
 		if (!r.os_ctl)
@@ -441,6 +469,10 @@ var mpl = (function () {
 })();
 
 
+var re_au_native = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i,
+	re_au_all = /\.(aac|m4a|ogg|opus|flac|alac|mp3|mp2|ac3|dts|wma|ra|wav|aif|aiff|au|amr|gsm|ape|tak|tta|wv)$/i;
+
+
 // extract songs + add play column
 function MPlayer() {
 	var r = this;
@@ -454,7 +486,7 @@ function MPlayer() {
 	r.tracks = {};
 	r.order = [];
 
-	var re_audio = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i,
+	var re_audio = mpl.ac_oth ? re_au_all : re_au_native,
 		trs = QSA('#files tbody tr');
 
 	for (var a = 0, aa = trs.length; a < aa; a++) {
@@ -552,6 +584,7 @@ function MPlayer() {
 
 	r.preload = function (url) {
 		var au = null;
+		url = mpl.acode(url);
 		if (need_ogv_for(url)) {
 			au = mp.au_ogvjs2;
 			if (!au && window['OGVPlayer']) {
@@ -1033,7 +1066,7 @@ var mpui = (function () {
 			if (pos > 0 && pos > len - 10) {
 				preloaded = mp.au.src;
 				try {
-					mp.preload(ebi(mp.order[mp.order.indexOf(mp.au.tid) + 1]).href);
+					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]]);
 				}
 				catch (ex) {
 					console.log("preload failed", ex);
@@ -1078,7 +1111,7 @@ catch (ex) { }
 
 
 function need_ogv_for(url) {
-	return need_ogv && /\.(ogg|opus)$/i.test(url);
+	return need_ogv && /\.(ogg|opus)|\?th=opus/i.test(url);
 }
 
 
@@ -1378,7 +1411,7 @@ function play(tid, is_ev, seek, call_depth) {
 	// ogv.js breaks on .play() unless directly user-triggered
 	var attempt_play = true;
 
-	var url = mp.tracks[tid];
+	var url = mpl.acode(mp.tracks[tid]);
 	if (need_ogv_for(url)) {
 		var m = /.* Version\/([0-9]+)\.[0-9\.]+ Mobile\/[^ ]+ Safari\/[0-9\.]+$/.exec(navigator.userAgent),
 			safari = m ? parseInt(m[1]) : 99;
@@ -1435,7 +1468,7 @@ function play(tid, is_ev, seek, call_depth) {
 
 	audio_eq.apply();
 
-	url += (url.indexOf('?') < 0 ? '?cache' : '&cache');
+	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache';
 	if (mp.au.src == url)
 		mp.au.currentTime = 0;
 	else {
@@ -4450,6 +4483,10 @@ function reload_mp() {
 	}
 	mpl.stop();
 	widget.close();
+	var plays = QSA('tr>td:first-child>a.play');
+	for (var a = plays.length - 1; a >= 0; a--)
+		plays[a].parentNode.innerHTML = '-';
+
 	mp = new MPlayer();
 	setTimeout(pbar.onresize, 1);
 }

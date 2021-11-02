@@ -416,6 +416,9 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age")
     ap2.add_argument("--th-covers", metavar="N,N", type=u, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat for")
 
+    ap2 = ap.add_argument_group('transcoding options')
+    ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
+
     ap2 = ap.add_argument_group('general db options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")
     ap2.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
