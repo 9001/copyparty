@@ -1862,7 +1862,7 @@ class HttpCli(object):
         arg = self.uparam["ls"]
         if arg in ["v", "t", "txt"]:
             try:
-                biggest = max(ls["files"], key=itemgetter("sz"))["sz"]
+                biggest = max(ls["files"] + ls["dirs"], key=itemgetter("sz"))["sz"]
             except:
                 biggest = 0
 
