@@ -418,6 +418,7 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('transcoding options')
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
+    ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete transcode output after SEC seconds")
 
     ap2 = ap.add_argument_group('general db options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database")

@@ -89,10 +89,17 @@ class SvcHub(object):
                     "thumb", msg.format(" " * 37, os.path.basename(sys.executable)), c=3
                 )
 
+        if not args.no_acode and args.no_thumb:
+            msg = "setting --no-acode because --no-thumb (sorry)"
+            self.log("thumb", msg, c=6)
+            args.no_acode = True
+
         if not args.no_acode and (not HAVE_FFMPEG or not HAVE_FFPROBE):
             msg = "setting --no-acode because either FFmpeg or FFprobe is not available"
             self.log("thumb", msg, c=6)
             args.no_acode = True
+
+        args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)
 
         # decide which worker impl to use
         if self.check_mp_enable():

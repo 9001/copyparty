@@ -10,7 +10,7 @@ import threading
 import subprocess as sp
 
 from .__init__ import PY2, unicode
-from .util import fsenc, vsplit, runcmd, Queue, Cooldown, BytesIO, min_ex
+from .util import fsenc, vsplit, statdir, runcmd, Queue, Cooldown, BytesIO, min_ex
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 
@@ -90,10 +90,13 @@ def thumb_path(histpath, rem, mtime, fmt):
     h = hashlib.sha512(fsenc(fn)).digest()
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
-    if fmt != "opus":
+    if fmt == "opus":
+        cat = "ac"
+    else:
         fmt = "webp" if fmt == "w" else "jpg"
+        cat = "th"
 
-    return "{}/th/{}/{}.{:x}.{}".format(histpath, rd, fn, int(mtime), fmt)
+    return "{}/{}/{}/{}.{:x}.{}".format(histpath, cat, rd, fn, int(mtime), fmt)
 
 
 class ThumbSrv(object):
@@ -187,6 +190,7 @@ class ThumbSrv(object):
         try:
             st = bos.stat(tpath)
             if st.st_size:
+                self.poke(tpath)
                 return tpath
         except:
             pass
@@ -414,10 +418,9 @@ class ThumbSrv(object):
 
         ts = int(time.time())
         try:
-            p1 = os.path.dirname(tdir)
-            p2 = os.path.dirname(p1)
-            for dp in [tdir, p1, p2]:
-                bos.utime(dp, (ts, ts))
+            for _ in range(4):
+                bos.utime(tdir, (ts, ts))
+                tdir = os.path.dirname(tdir)
         except:
             pass
 
@@ -437,25 +440,36 @@ class ThumbSrv(object):
             self.log("\033[Jcln ok; rm {} dirs".format(ndirs))
 
     def clean(self, histpath):
-        thumbpath = os.path.join(histpath, "th")
+        ret = 0
+        for cat in ["th", "ac"]:
+            ret += self._clean(histpath, cat, None)
+
+        return ret
+
+    def _clean(self, histpath, cat, thumbpath):
+        if not thumbpath:
+            thumbpath = os.path.join(histpath, cat)
+
         # self.log("cln {}".format(thumbpath))
-        maxage = self.args.th_maxage
+        exts = ["jpg", "webp"] if cat == "th" else ["opus"]
+        maxage = getattr(self.args, cat + "_maxage")
         now = time.time()
         prev_b64 = None
         prev_fp = None
         try:
-            ents = bos.listdir(thumbpath)
+            ents = statdir(self.log, not self.args.no_scandir, False, thumbpath)
+            ents = sorted(list(ents))
         except:
             return 0
 
         ndirs = 0
-        for f in sorted(ents):
+        for f, inf in ents:
             fp = os.path.join(thumbpath, f)
             cmp = fp.lower().replace("\\", "/")
 
             # "top" or b64 prefix/full (a folder)
             if len(f) <= 3 or len(f) == 24:
-                age = now - bos.path.getmtime(fp)
+                age = now - inf.st_mtime
                 if age > maxage:
                     with self.mutex:
                         safe = True
@@ -469,16 +483,15 @@ class ThumbSrv(object):
                             self.log("rm -rf [{}]".format(fp))
                             shutil.rmtree(fp, ignore_errors=True)
                 else:
-                    ndirs += self.clean(fp)
+                    self._clean(histpath, cat, fp)
+
                 continue
 
             # thumb file
             try:
                 b64, ts, ext = f.split(".")
-                if len(b64) != 24 or len(ts) != 8 or ext not in ["jpg", "webp"]:
+                if len(b64) != 24 or len(ts) != 8 or ext not in exts:
                     raise Exception()
-
-                ts = int(ts, 16)
             except:
                 if f != "dir.txt":
                     self.log("foreign file in thumbs dir: [{}]".format(fp), 1)
@@ -488,6 +501,10 @@ class ThumbSrv(object):
             if b64 == prev_b64:
                 self.log("rm replaced [{}]".format(fp))
                 bos.unlink(prev_fp)
+
+            if cat != "th" and inf.st_mtime + maxage < now:
+                self.log("rm expired [{}]".format(fp))
+                bos.unlink(fp)
 
             prev_b64 = b64
             prev_fp = fp

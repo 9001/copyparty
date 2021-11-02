@@ -65,6 +65,11 @@ class ThumbCli(object):
             if self.cooldown.poke(tdir):
                 self.broker.put(False, "thumbsrv.poke", tdir)
 
+            if want_opus:
+                # audio files expire individually
+                if self.cooldown.poke(tpath):
+                    self.broker.put(False, "thumbsrv.poke", tpath)
+
             return ret
 
         x = self.broker.put(True, "thumbsrv.get", ptop, rem, mtime, fmt)
