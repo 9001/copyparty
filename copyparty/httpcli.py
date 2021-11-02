@@ -1911,7 +1911,7 @@ class HttpCli(object):
             ret = json.dumps(ls)
             mime = "application/json"
 
-        self.reply(ret.encode("utf-8", "replace"), mime=mime)
+        self.reply(ret.encode("utf-8", "replace") + b"\n", mime=mime)
         return True
 
     def tx_browser(self):
