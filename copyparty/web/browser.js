@@ -2825,7 +2825,13 @@ function th_onload(el) {
 
 function tree_scrollto(e) {
 	ev(e);
-	var act = QS('#tree a.hl'),
+	tree_scrolltoo('#treeul a.hl');
+	tree_scrolltoo('#docul a.hl');
+}
+
+
+function tree_scrolltoo(q) {
+	var act = QS(q),
 		ul = act ? act.offsetParent : null;
 
 	if (!ul)
@@ -3367,6 +3373,7 @@ var treectl = (function () {
 		ebi('docul').style.display = ya ? '' : 'none';
 		ebi('treeul').style.display = ya ? 'none' : '';
 		clmod(ebi('filetree'), 'on', ya);
+		tree_scrollto();
 	};
 	ebi('filetree').onclick = function (e) {
 		ev(e);
