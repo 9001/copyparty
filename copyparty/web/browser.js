@@ -366,7 +366,7 @@ var mpl = (function () {
 
 	function set_pb_mode(e) {
 		ev(e);
-		r.pb_mode = this.textContent.split(' ').slice(-1)[0];
+		r.pb_mode = this.textContent.split(' ').pop();
 		swrite('pb_mode', r.pb_mode);
 		draw_pb_mode();
 	}
@@ -416,7 +416,7 @@ var mpl = (function () {
 			fns = np.file.split(' - '),
 			artist = (np.circle ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
 			tags = {
-				title: np.title || fns.slice(-1)[0]
+				title: np.title || fns.pop()
 			};
 
 		if (artist)
@@ -619,7 +619,7 @@ function ft2dict(tr) {
 
 	for (var a = 1, aa = th.length; a < aa; a++) {
 		var tv = tr.cells[a].textContent,
-			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').slice(-1)[0],
+			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop(),
 			vis = th[a].className.indexOf('min') === -1;
 
 		if (!tv)
@@ -1544,7 +1544,7 @@ function evau_error(e) {
 	if (eplaya.error.message)
 		err += '\n\n' + eplaya.error.message;
 
-	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').slice(-1)[0])[0] + '»';
+	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop())[0] + '»';
 
 	toast.warn(15, esc(basenames(err)));
 }
@@ -2242,7 +2242,7 @@ var fileman = (function () {
 			}
 			toast.inf(0, esc('pasting ' + (req.length + 1) + ' items\n\n' + uricom_dec(vp)[0]));
 
-			var dst = get_evpath() + vp.split('/').slice(-1)[0];
+			var dst = get_evpath() + vp.split('/').pop();
 
 			xhr.open('GET', vp + '?move=' + dst, true);
 			xhr.onreadystatechange = paste_cb;
@@ -2359,7 +2359,7 @@ var showfile = (function () {
 		var links = msel.getall();
 		for (var a = 0; a < links.length; a++) {
 			var link = links[a],
-				fn = link.vp.split('/').slice(-1)[0],
+				fn = link.vp.split('/').pop(),
 				lang = r.getlang(fn);
 
 			if (!lang)
@@ -2406,7 +2406,7 @@ var showfile = (function () {
 		var url = doc[0],
 			lnh = doc[1],
 			txt = doc[2],
-			name = url.split('/').slice(-1)[0],
+			name = url.split('/').pop(),
 			lang = r.getlang(name),
 			is_md = lang == 'md';
 
@@ -2450,7 +2450,7 @@ var showfile = (function () {
 
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
-		hfun(get_evpath() + '?doc=' + url.split('/').slice(-1)[0]);
+		hfun(get_evpath() + '?doc=' + url.split('/').pop());
 
 		qsr('#docul');
 		qsr('#docname');
@@ -2779,7 +2779,7 @@ var thegrid = (function () {
 
 				return '<a download href="' + h +
 					'">' + (idx + 1) + ' / ' + r.bbox.length + ' -- ' +
-					esc(uricom_dec(h.split('/').slice(-1)[0])[0]) + '</a>';
+					esc(uricom_dec(h.split('/').pop())[0]) + '</a>';
 			}
 		})[0];
 	};
@@ -3218,7 +3218,7 @@ document.onkeydown = function (e) {
 				ts = parseInt(r.ts),
 				sz = esc(r.sz + ''),
 				rp = esc(uricom_dec(r.rp + '')[0]),
-				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').slice(-1)[0] : '%',
+				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').pop() : '%',
 				links = linksplit(r.rp + '');
 
 			if (ext.length > 8)
