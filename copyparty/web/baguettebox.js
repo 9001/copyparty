@@ -530,9 +530,7 @@ window.baguetteBox = (function () {
             if (options.bodyClass && document.body.classList)
                 document.body.classList.remove(options.bodyClass);
 
-            var h = ebi('bbox-halp');
-            if (h)
-                h.parentNode.removeChild(h);
+            qsr('#bbox-halp');
 
             if (options.afterHide)
                 options.afterHide();
@@ -590,8 +588,7 @@ window.baguetteBox = (function () {
 
         image.addEventListener(is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
-            var spinner = QS('#baguette-img-' + index + ' .bbox-spinner');
-            figure.removeChild(spinner);
+            qsr('#baguette-img-' + index + ' .bbox-spinner');
             if (!options.async && callback)
                 callback();
         });

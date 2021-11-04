@@ -18,6 +18,15 @@ var ebi = document.getElementById.bind(document),
     mknod = document.createElement.bind(document);
 
 
+function qsr(sel) {
+    var el = QS(sel);
+    if (el)
+        el.parentNode.removeChild(el);
+
+    return el;
+}
+
+
 // error handler for mobile devices
 function esc(txt) {
     return txt.replace(/[&"<>]/g, function (c) {

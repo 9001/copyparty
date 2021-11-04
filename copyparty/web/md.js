@@ -164,10 +164,7 @@ function copydom(src, dst, lv) {
 
 
 function md_plug_err(ex, js) {
-    var errbox = ebi('md_errbox');
-    if (errbox)
-        errbox.parentNode.removeChild(errbox);
-
+    qsr('#md_errbox');
     if (!ex)
         return;
 
@@ -183,7 +180,7 @@ function md_plug_err(ex, js) {
             o.textContent = lns[ln - 1];
         }
     }
-    errbox = mknod('div');
+    var errbox = mknod('div');
     errbox.setAttribute('id', 'md_errbox');
     errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
     errbox.textContent = msg;
@@ -381,8 +378,7 @@ function convert_markdown(md_text, dest_dom) {
 
 
 function init_toc() {
-    var loader = ebi('ml');
-    loader.parentNode.removeChild(loader);
+    qsr('#ml');
 
     var anchors = [];  // list of toc entries, complex objects
     var anchor = null; // current toc node

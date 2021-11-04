@@ -65,8 +65,7 @@ var mde = (function () {
     mde.codemirror.on("change", function () {
         md_changed(mde);
     });
-    var loader = ebi('ml');
-    loader.parentNode.removeChild(loader);
+    qsr('#ml');
     return mde;
 })();
 

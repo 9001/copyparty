@@ -1600,7 +1600,7 @@ function eval_hash() {
 		i.value = uricom_dec(v.slice(3))[0];
 		return i.oninput();
 	}
-};
+}
 
 
 (function () {
@@ -1649,7 +1649,7 @@ function sortfiles(nodes) {
 						if (v.split('?')[0].slice(-1) == '/')
 							v = '\t' + v;
 
-						v = uricom_dec(v)[0]
+						v = uricom_dec(v)[0];
 					}
 
 					nodes[b]._sv = v;
@@ -4109,10 +4109,7 @@ var msel = (function () {
 			'<textarea name="files" id="ziptxt"></textarea>';
 		frm.style.display = 'none';
 
-		var oldform = QS('#widgeti>form');
-		if (oldform)
-			oldform.parentNode.removeChild(oldform);
-
+		qsr('#widgeti>form');
 		ebi('widgeti').appendChild(frm);
 		var obj = ebi('ziptxt');
 		obj.value = txt;

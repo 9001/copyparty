@@ -332,8 +332,7 @@ function U2pvis(act, btns) {
                 r.head++;
 
             if (!bz_act) {
-                var tr = ebi("f" + nfile);
-                tr.parentNode.removeChild(tr);
+                qsr("#f" + nfile);
             }
         }
         else return;
@@ -352,9 +351,7 @@ function U2pvis(act, btns) {
         last = parseInt(last.getAttribute('id').slice(1));
 
         while (r.head - first > r.wsz) {
-            var obj = ebi('f' + (first++));
-            if (obj)
-                obj.parentNode.removeChild(obj);
+            qsr('#f' + (first++));
         }
         while (last - r.tail < r.wsz && last < r.tab.length - 2) {
             var obj = ebi('f' + (++last));
@@ -1075,11 +1072,9 @@ function up2k_init(subtle) {
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a];
             if (t.done && t.name) {
-                var tr = ebi('f' + t.n);
-                if (!tr)
+                if (!qsr('#f' + t.n))
                     continue;
 
-                tr.parentNode.removeChild(tr);
                 t.name = undefined;
             }
         }
