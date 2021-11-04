@@ -29,7 +29,8 @@ set -e
 # 259288  copyparty-extras/sfx-lite/copyparty-sfx.sh
 # 270004  copyparty-extras/sfx-lite/copyparty-sfx.py
 # 293159  copyparty-extras/sfx-lite/copyparty-sfx-gz.py
-#           `- also removed the codemirror markdown editor,
+#           `- also removed the codemirror markdown editor
+#              and the text-viewer syntax hilighting,
 #              only essential features remaining
 #
 # 646297  copyparty-extras/copyparty-1.0.14.tar.gz
@@ -141,8 +142,8 @@ repack() {
 repack sfx-full "re gz no-sh"
 repack sfx-ent  "re no-dd no-ogv"
 repack sfx-ent  "re no-dd no-ogv gz no-sh"
-repack sfx-lite "re no-dd no-ogv no-cm"
-repack sfx-lite "re no-dd no-ogv no-cm gz no-sh"
+repack sfx-lite "re no-dd no-ogv no-cm no-hl"
+repack sfx-lite "re no-dd no-ogv no-cm no-hl gz no-sh"
 
 
 # move fuse and up2k clients into copyparty-extras/,

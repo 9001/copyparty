@@ -142,6 +142,7 @@
 			have_unpost = {{ have_unpost|tojson }},
 			have_zip = {{ have_zip|tojson }},
 			txt_ext = "{{ txt_ext }}",
+			{% if no_prism %}no_prism = 1,{% endif %}
 			readme = {{ readme|tojson }};
 
 		document.documentElement.setAttribute("class", localStorage.lightmode == 1 ? "light" : "dark");

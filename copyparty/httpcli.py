@@ -2281,6 +2281,9 @@ class HttpCli(object):
 
             j2a["doc"] = doc
 
+        if not self.conn.hsrv.prism:
+            j2a["no_prism"] = True
+
         for d in dirs:
             d["name"] += "/"
 
@@ -2289,7 +2292,7 @@ class HttpCli(object):
         j2a["files"] = dirs + files
         j2a["logues"] = logues
         j2a["taglist"] = taglist
-        j2a["txt_ext"] = self.args.textfiles.replace(',', ' ')
+        j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
 
         if "mth" in vn.flags:
             j2a["def_hcols"] = vn.flags["mth"].split(",")

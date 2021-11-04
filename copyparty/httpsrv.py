@@ -76,6 +76,7 @@ class HttpSrv(object):
             x: env.get_template(x + ".html")
             for x in ["splash", "browser", "browser2", "msg", "md", "mde"]
         }
+        self.prism = os.path.exists(os.path.join(E.mod, "web", "deps", "prism.js.gz"))
 
         cert_path = os.path.join(E.cfg, "cert.pem")
         if bos.path.exists(cert_path):

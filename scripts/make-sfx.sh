@@ -22,6 +22,8 @@ help() { exec cat <<'EOF'
 # `no-cm` saves ~92k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
+# `no-hl` saves ~41k by removing syntax hilighting in the text viewer
+#
 # `no-fnt` saves ~9k by removing the source-code-pro font
 #   (browsers will try to use 'Consolas' instead)
 #
@@ -75,6 +77,7 @@ while [ ! -z "$1" ]; do
 		gz)     use_gz=1 ; ;;
 		no-ogv) no_ogv=1 ; ;;
 		no-fnt) no_fnt=1 ; ;;
+		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
 		no-sh)  do_sh=   ; ;;
@@ -225,6 +228,9 @@ rm have
 	sed -r '/edit2">edit \(fancy/d' <$f >t
 	tmv "$f"
 }
+
+[ $no_hl ] &&
+	rm -rf copyparty/web/deps/prism*
 
 [ $no_fnt ] && {
 	rm -f copyparty/web/deps/scp.woff2

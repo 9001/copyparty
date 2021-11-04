@@ -2336,6 +2336,9 @@ var showfile = (function () {
 		em = [r.sname(window.location.search), window.location.hash, em.textContent];
 
 	r.setstyle = function () {
+		if (window['no_prism'])
+			return;
+
 		qsr('#prism_css');
 		var el = mknod('link');
 		el.rel = 'stylesheet';
@@ -2438,11 +2441,13 @@ var showfile = (function () {
 		else {
 			el.textContent = txt;
 			el.innerHTML = '<code>' + el.innerHTML + '</code>';
-			el.setAttribute('class', 'prism linkable-line-numbers line-numbers language-' + lang);
-			if (!defer)
-				fun(el.firstChild);
-			else
-				import_js('/.cpr/deps/prism.js', function () { fun(); });
+			if (!window['no_prism']) {
+				el.setAttribute('class', 'prism linkable-line-numbers line-numbers language-' + lang);
+				if (!defer)
+					fun(el.firstChild);
+				else
+					import_js('/.cpr/deps/prism.js', function () { fun(); });
+			}
 		}
 
 		wr.appendChild(el);
