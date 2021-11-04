@@ -205,6 +205,9 @@ a, #files tbody div a:last-child {
 	padding: .33em;
 }
 #files a.doc {
+	color: #666;
+}
+#files a.doc.bri {
 	color: #f5a;
 }
 #files tbody a.play {
@@ -1004,7 +1007,7 @@ html.light #rui {
 }
 #docul li.bn {
 	text-align: center;
-	padding: .5em 0;
+	padding: .5em;
 }
 #doc.prism {
 	padding-left: 3em;
@@ -1266,6 +1269,9 @@ html.light #files tbody a.play.act {
 	color: #90c;
 }
 html.light #files a.doc {
+	color: #bbb;
+}
+html.light #files a.doc.bri {
 	color: #d38;
 }
 html.light #files tr.play td {

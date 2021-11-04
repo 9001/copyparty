@@ -194,10 +194,12 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
 	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
+	'	<a href="#" class="tgl btn" id="filetree" tt="toggle folder-tree / textfiles$NHotkey: V">📜</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +
+	'<ul id="docul"></ul>\n' +
 	'<ul id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
@@ -2370,12 +2372,14 @@ var showfile = (function () {
 
 			r.files.push({ 'id': link.id, 'name': fn });
 
-			if (lang == 'md')
+			var td = ebi(link.id).closest('tr').getElementsByTagName('td')[0];
+
+			if (lang == 'md' && td.textContent != '-')
 				continue;
 
-			ebi(link.id).closest('tr').getElementsByTagName('td')[0].innerHTML =
-				'<a href="#" class="doc" hl="' + link.id + '">-txt-</a>';
+			td.innerHTML = '<a href="#" class="doc bri" hl="' + link.id + '">-txt-</a>';
 		}
+		r.mktree();
 		if (em) {
 			render(em);
 			em = null;
@@ -2417,11 +2421,9 @@ var showfile = (function () {
 		ebi('dldoc').setAttribute('href', url);
 
 		var wr = ebi('bdoc'),
-			nav = ebi('treeul'),
 			defer = !Prism.highlightElement;
 
 		var fun = function (el) {
-			console.log('fun fun fun fun');
 			try {
 				if (lnh.slice(0, 5) == '#doc.')
 					sethash(lnh.slice(1));
@@ -2456,47 +2458,50 @@ var showfile = (function () {
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
 		hfun(get_evpath() + '?doc=' + url.split('/').pop());
-		tree_scrollto();
 
-		qsr('#docul');
 		qsr('#docname');
 		el = mknod('span');
 		el.textContent = name;
 		el.setAttribute('id', 'docname');
 		ebi('path').appendChild(el);
 
-		if (!nav)
-			return;
+		r.updtree();
+		treectl.textmode(true);
+		tree_scrollto();
+	}
 
+	r.mktree = function () {
 		var html = ['<li class="bn">list of textfiles in<br />' + esc(get_vpath()) + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="#" hl="' + file.id +
-				(file.name == name ? '" class="hl' : '') +
 				'">' + esc(uricom_dec(file.name)[0]) + '</a>');
 		}
+		ebi('docul').innerHTML = html.join('\n');
+	};
 
-		el = mknod('ul');
-		el.innerHTML = html.join('\n');
-		el.setAttribute('id', 'docul');
-		nav.style.display = 'none';
-		nav.parentNode.insertBefore(el, nav);
-		el.onclick = ebi('files').onclick;
-	}
+	r.updtree = function () {
+		var fn = QS('#path span:last-child'),
+			lis = QSA('#docul li a');
+
+		fn = fn ? fn.textContent : '';
+		for (var a = 0, aa = lis.length; a < aa; a++)
+			clmod(lis[a], 'hl', lis[a].textContent == fn);
+	};
 
 	var bdoc = ebi('bdoc');
 	bdoc.setAttribute('class', 'line-numbers');
 	bdoc.innerHTML = (
 		'<div id="hdoc" class="ghead">\n' +
-		'<a href="#" class="btn" id="xdoc">close</a>\n' +
-		'<a href="#" class="btn" id="dldoc">download</a>\n' +
-		'<a href="#" class="btn" id="prevdoc">prev</a>\n' +
-		'<a href="#" class="btn" id="nextdoc">next</a>\n' +
+		'<a href="#" class="btn" id="xdoc" tt="return to folder view">close</a>\n' +
+		'<a href="#" class="btn" id="dldoc" tt="download this file">download</a>\n' +
+		'<a href="#" class="btn" id="prevdoc" tt="show previous document$NHotkey: i">prev</a>\n' +
+		'<a href="#" class="btn" id="nextdoc" tt="show next document$NHotkey: K">next</a>\n' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
 		thegrid.setvis(true);
-	}
+	};
 	ebi('dldoc').setAttribute('download', '');
 	ebi('prevdoc').onclick = function () { tree_neigh(-1); };
 	ebi('nextdoc').onclick = function () { tree_neigh(1); };
@@ -2575,7 +2580,7 @@ var thegrid = (function () {
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
 		qsr('#docname');
-		qsr('#docul');
+		treectl.textmode(false);
 	};
 
 	r.setdirty = function () {
@@ -2984,6 +2989,9 @@ document.onkeydown = function (e) {
 	if (k == 'KeyT')
 		return ebi('thumbs').click();
 
+	if (k == 'KeyV')
+		return ebi('filetree').click();
+
 	if (k == 'F2')
 		return fileman.rename();
 
@@ -3352,6 +3360,18 @@ var treectl = (function () {
 		}
 	}
 
+	treectl.textmode = function (ya) {
+		treectl.texts = ya;
+		ebi('docul').style.display = ya ? '' : 'none';
+		ebi('treeul').style.display = ya ? 'none' : '';
+		clmod(ebi('filetree'), 'on', ya);
+	};
+	ebi('filetree').onclick = function (e) {
+		ev(e);
+		treectl.textmode(!treectl.texts);
+	};
+	treectl.textmode(false);
+
 	function onscroll() {
 		unmenter();
 		onscroll2();
@@ -3528,7 +3548,6 @@ var treectl = (function () {
 			links[a].onclick = treegrow;
 		}
 		ebi('tree').onscroll = nowrap ? unmenter : null;
-		tree_scrollto();
 	}
 
 	function menter(e) {
@@ -3558,6 +3577,8 @@ var treectl = (function () {
 			return;
 		}
 		reqls(this.getAttribute('href'), true);
+		treectl.dir_cb = tree_scrollto;
+		thegrid.setvis(true);
 	}
 
 	function reqls(url, hpush, no_tree) {
@@ -3628,13 +3649,15 @@ var treectl = (function () {
 				fname = uricom_dec(bhref)[0],
 				hname = esc(fname),
 				sortv = (bhref.slice(-1) == '/' ? '\t' : '') + hname,
-				id = 'f-' + ('00000000' + crc32(fname)).slice(-8);
+				id = 'f-' + ('00000000' + crc32(fname)).slice(-8),
+				lang = showfile.getlang(fname);
 
-			if (showfile.getlang(fname)) {
+			if (lang)
 				showfile.files.push({ 'id': id, 'name': fname });
-				if (r.lead == '-')
-					r.lead = '<a href="#" class="doc" hl="' + id + '" name="' + hname + '">-txt-</a>';
-			}
+
+			if (r.lead == '-')
+				r.lead = '<a href="#" class="doc' + (lang ? ' bri' : '') +
+					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
 			var ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +
 				'"><a href="' + top + r.href + '" id="' + id + '">' + hname + '</a>', r.sz];
@@ -3675,9 +3698,11 @@ var treectl = (function () {
 		document.title = '⇆🎉 ' + uricom_dec(document.location.pathname.slice(1, -1))[0];
 
 		filecols.set_style();
+		showfile.mktree();
 		mukey.render();
 		reload_tree();
 		reload_browser();
+		tree_scrollto();
 
 		var fun = treectl.ls_cb;
 		if (fun) {
@@ -4702,7 +4727,7 @@ function goto_unpost(e) {
 }
 
 
-ebi('files').onclick = function (e) {
+ebi('files').onclick = ebi('docul').onclick = function (e) {
 	var tgt = e.target.closest('a[id]');
 	if (tgt && tgt.getAttribute('id').indexOf('f-') === 0 && tgt.textContent.endsWith('/')) {
 		var el = treectl.find(tgt.textContent.slice(0, -1));
