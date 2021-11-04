@@ -2374,7 +2374,7 @@ var showfile = (function () {
 				continue;
 
 			ebi(link.id).closest('tr').getElementsByTagName('td')[0].innerHTML =
-				'<a href="#" hl="' + link.id + '">-txt-</a>';
+				'<a href="#" class="doc" hl="' + link.id + '">-txt-</a>';
 		}
 		if (em) {
 			render(em);
@@ -2456,6 +2456,7 @@ var showfile = (function () {
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
 		hfun(get_evpath() + '?doc=' + url.split('/').pop());
+		tree_scrollto();
 
 		qsr('#docul');
 		qsr('#docname');
@@ -3632,7 +3633,7 @@ var treectl = (function () {
 			if (showfile.getlang(fname)) {
 				showfile.files.push({ 'id': id, 'name': fname });
 				if (r.lead == '-')
-					r.lead = '<a href="#" hl="' + id + '" name="' + hname + '">-txt-</a>';
+					r.lead = '<a href="#" class="doc" hl="' + id + '" name="' + hname + '">-txt-</a>';
 			}
 
 			var ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +

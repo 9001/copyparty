@@ -204,6 +204,9 @@ a, #files tbody div a:last-child {
 #repl {
 	padding: .33em;
 }
+#files a.doc {
+	color: #f5a;
+}
 #files tbody a.play {
 	color: #e70;
 	padding: .2em;
@@ -744,7 +747,7 @@ input.eq_gain {
 	width: calc(100% - 2em);
 	line-height: 1em;
 }
-#tree.nowrap #tree li {
+#tree.nowrap li {
 	min-height: 1.4em;
 	white-space: nowrap;
 }
@@ -995,6 +998,9 @@ html.light #rui {
 	overflow: visible;
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
+}
+#docul {
+	position: relative;
 }
 #docul li.bn {
 	text-align: center;
@@ -1258,6 +1264,9 @@ html.light #files tbody a.play {
 }
 html.light #files tbody a.play.act {
 	color: #90c;
+}
+html.light #files a.doc {
+	color: #d38;
 }
 html.light #files tr.play td {
 	background: #fc5;
