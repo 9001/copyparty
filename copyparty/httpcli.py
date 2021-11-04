@@ -298,7 +298,7 @@ class HttpCli(object):
 
         # default to utf8 html if no content-type is set
         if not mime:
-            mime = self.out_headers.get("Content-Type", "text/html; charset=UTF-8")
+            mime = self.out_headers.get("Content-Type", "text/html; charset=utf-8")
 
         self.out_headers["Content-Type"] = mime
 
@@ -1462,7 +1462,7 @@ class HttpCli(object):
             self.permit_caching()
 
         if "txt" in self.uparam:
-            mime = "text/plain; charset={}".format(self.uparam["txt"] or "UTF-8")
+            mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
         else:
             mime = guess_mime(req_path)
 
@@ -1905,7 +1905,7 @@ class HttpCli(object):
                 for x in y
             ]
             ret = "\n".join(ret)
-            mime = "text/plain; charset=UTF-8"
+            mime = "text/plain; charset=utf-8"
         else:
             [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
 

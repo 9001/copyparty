@@ -100,7 +100,7 @@ IMPLICATIONS = [
 
 
 MIMES = {
-    "md": "text/plain; charset=UTF-8",
+    "md": "text/plain; charset=utf-8",
     "opus": "audio/ogg; codecs=opus",
     "webp": "image/webp",
 }
@@ -1284,7 +1284,7 @@ def guess_mime(url, fallback="application/octet-stream"):
 
     if ";" not in ret:
         if ret.startswith("text/") or ret.endswith("/javascript"):
-            ret += "; charset=UTF-8"
+            ret += "; charset=utf-8"
 
     return ret
 
