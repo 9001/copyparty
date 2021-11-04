@@ -2344,7 +2344,7 @@ var showfile = (function () {
 		return document.location.search.indexOf('doc=') + 1;
 	};
 
-	function getlang(fn) {
+	r.getlang = function (fn) {
 		fn = fn.toLowerCase();
 		var ext = fn.slice(fn.lastIndexOf('.'));
 		return r.map[ext] || r.nmap[fn];
@@ -2356,7 +2356,7 @@ var showfile = (function () {
 		for (var a = 0; a < links.length; a++) {
 			var link = links[a],
 				fn = link.vp.split('/').slice(-1)[0],
-				lang = getlang(fn);
+				lang = r.getlang(fn);
 
 			if (!lang)
 				continue;
@@ -2402,7 +2402,7 @@ var showfile = (function () {
 			lnh = doc[1],
 			txt = doc[2],
 			name = url.split('/').slice(-1)[0],
-			lang = getlang(name),
+			lang = r.getlang(name),
 			is_md = lang == 'md';
 
 		ebi('files').style.display = ebi('gfiles').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
@@ -3607,15 +3607,25 @@ var treectl = (function () {
 			nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist);
 
+		showfile.files = [];
 		html.push('<tbody>');
 		nodes = sortfiles(nodes);
 		for (var a = 0; a < nodes.length; a++) {
 			var r = nodes[a],
 				bhref = r.href.split('?')[0],
-				hname = esc(uricom_dec(bhref)[0]),
+				fname = uricom_dec(bhref)[0],
+				hname = esc(fname),
 				sortv = (bhref.slice(-1) == '/' ? '\t' : '') + hname,
-				ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +
-					'"><a href="' + top + r.href + '">' + hname + '</a>', r.sz];
+				id = 'f-' + ('00000000' + crc32(fname)).slice(-8);
+
+			if (showfile.getlang(fname)) {
+				showfile.files.push({ 'id': id, 'name': fname });
+				if (r.lead == '-')
+					r.lead = '<a href="#" hl="' + id + '" name="' + hname + '">-txt-</a>';
+			}
+
+			var ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +
+				'"><a href="' + top + r.href + '" id="' + id + '">' + hname + '</a>', r.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
@@ -4750,8 +4760,8 @@ function reload_browser(not_mp) {
 
 	thegrid.setdirty();
 	msel.render();
-	showfile.addlinks();
 }
 reload_browser(true);
+showfile.addlinks();
 mukey.render();
 setTimeout(eval_hash, 1);
