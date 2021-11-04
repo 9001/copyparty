@@ -2326,10 +2326,14 @@ var showfile = (function () {
 	for (var a = 0; a < x.length; a++)
 		r.map["." + x[a]] = x[a];
 
+	r.sname = function (srch) {
+		return srch.split(/[?&]doc=/)[1].split('&')[0];
+	};
+
 	window.Prism = { 'manual': true };
 	var em = QS('#bdoc>pre');
 	if (em)
-		em = [window.location.search.split(/[?&]doc=/)[1].split('&')[0], window.location.hash, em.textContent];
+		em = [r.sname(window.location.search), window.location.hash, em.textContent];
 
 	r.setstyle = function () {
 		qsr('#prism_css');
@@ -2375,9 +2379,10 @@ var showfile = (function () {
 		}
 	};
 
-	r.show = function (url) {
+	r.show = function (url, no_push) {
 		var xhr = new XMLHttpRequest();
 		xhr.url = url;
+		xhr.no_push = no_push;
 		xhr.ts = Date.now();
 		xhr.open('GET', url.split('?')[0] + '?raw', true);
 		xhr.onreadystatechange = load_cb;
@@ -2393,10 +2398,10 @@ var showfile = (function () {
 			return;
 		}
 
-		render([this.url, '', this.responseText]);
+		render([this.url, '', this.responseText], this.no_push);
 	}
 
-	function render(doc) {
+	function render(doc, no_push) {
 		r.q = null;
 		var url = doc[0],
 			lnh = doc[1],
@@ -2444,7 +2449,8 @@ var showfile = (function () {
 		wr.style.display = '';
 
 		document.documentElement.scrollTop = 0;
-		hist_push('?doc=' + url.split('/').slice(-1)[0]);
+		var hfun = no_push ? hist_replace : hist_push;
+		hfun(get_evpath() + '?doc=' + url.split('/').slice(-1)[0]);
 
 		qsr('#docul');
 		qsr('#docname');
@@ -3732,6 +3738,11 @@ var treectl = (function () {
 			return;
 
 		var url = new URL(e.state, "https://" + document.location.host);
+		var hbase = url.pathname;
+		var cbase = document.location.pathname;
+		if (url.search.indexOf('doc=') + 1 && hbase == cbase)
+			return showfile.show(hbase + showfile.sname(url.search), true);
+
 		treectl.goto(url.pathname);
 	};
 
