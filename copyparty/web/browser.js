@@ -907,7 +907,7 @@ var vbar = (function () {
 		if (e.button === 0)
 			can.onmousemove = null;
 	};
-	if (window.Touch) {
+	if (is_touch) {
 		can.ontouchstart = mousedown;
 		can.ontouchmove = mousemove;
 	}
@@ -3502,7 +3502,9 @@ var treectl = (function () {
 	ebi('visdir').onclick = tree_scrollto;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
-	if (sread('entreed') == 'tree')
+
+	var cs = sread('entreed');
+	if ((is_touch && cs == 'tree') || (!is_touch && cs != 'na'))
 		treectl.entree();
 
 	window.onpopstate = function (e) {
