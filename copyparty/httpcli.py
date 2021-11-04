@@ -1461,12 +1461,13 @@ class HttpCli(object):
         else:
             self.permit_caching()
 
+        if "txt" in self.uparam:
+            mime = "text/plain; charset={}".format(self.uparam["txt"] or "UTF-8")
+        else:
+            mime = guess_mime(req_path)
+
         self.out_headers["Accept-Ranges"] = "bytes"
-        self.send_headers(
-            length=upper - lower,
-            status=status,
-            mime=guess_mime(req_path),
-        )
+        self.send_headers(length=upper - lower, status=status, mime=mime)
 
         logmsg += unicode(status) + logtail
 
@@ -1904,7 +1905,7 @@ class HttpCli(object):
                 for x in y
             ]
             ret = "\n".join(ret)
-            mime = "text/plain; encoding=utf-8"
+            mime = "text/plain; charset=UTF-8"
         else:
             [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
 
