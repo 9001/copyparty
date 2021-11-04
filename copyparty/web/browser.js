@@ -2308,6 +2308,7 @@ var showfile = (function () {
 		'.hpp': 'cpp',
 		'.htm': 'html',
 		'.hxx': 'cpp',
+		'.patch': 'diff',
 		'.ps1': 'powershell',
 		'.psm1': 'powershell',
 		'.pl': 'perl',
@@ -2323,7 +2324,7 @@ var showfile = (function () {
 		'cmakelists.txt': 'cmake',
 		'dockerfile': 'docker'
 	};
-	var x = txt_ext + ' c cpp cs css diff go html ini java js json jsx kt kts less latex lisp lua makefile md py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml';
+	var x = txt_ext + ' c cfg conf cpp cs css diff go html ini java js json jsx kt kts less latex lisp lua makefile md py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
 		r.map["." + x[a]] = x[a];
@@ -2461,7 +2462,7 @@ var showfile = (function () {
 
 		qsr('#docname');
 		el = mknod('span');
-		el.textContent = name;
+		el.textContent = uricom_dec(name)[0];
 		el.setAttribute('id', 'docname');
 		ebi('path').appendChild(el);
 
@@ -2493,10 +2494,10 @@ var showfile = (function () {
 	bdoc.setAttribute('class', 'line-numbers');
 	bdoc.innerHTML = (
 		'<div id="hdoc" class="ghead">\n' +
-		'<a href="#" class="btn" id="xdoc" tt="return to folder view">close</a>\n' +
-		'<a href="#" class="btn" id="dldoc" tt="download this file">download</a>\n' +
-		'<a href="#" class="btn" id="prevdoc" tt="show previous document$NHotkey: i">prev</a>\n' +
-		'<a href="#" class="btn" id="nextdoc" tt="show next document$NHotkey: K">next</a>\n' +
+		'<a href="#" class="btn" id="xdoc" tt="return to folder view$NHotkey: M">❌ close</a>\n' +
+		'<a href="#" class="btn" id="dldoc" tt="download this file">💾 download</a>\n' +
+		'<a href="#" class="btn" id="prevdoc" tt="show previous document$NHotkey: i">⬆ prev</a>\n' +
+		'<a href="#" class="btn" id="nextdoc" tt="show next document$NHotkey: K">⬇ next</a>\n' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
