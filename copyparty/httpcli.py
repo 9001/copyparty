@@ -2268,6 +2268,19 @@ class HttpCli(object):
             ls_ret["taglist"] = taglist
             return self.tx_ls(ls_ret)
 
+        doc = self.uparam.get("doc") if self.can_read else None
+        if doc:
+            doc = unquotep(doc.replace("+", " "))
+            j2a["docname"] = doc
+            if next((x for x in files if x["name"] == doc), None):
+                with open(os.path.join(abspath, doc), "rb") as f:
+                    doc = f.read().decode("utf-8", "replace")
+            else:
+                self.log("doc 404: [{}]".format(doc), c=6)
+                doc = "( textfile not found )"
+
+            j2a["doc"] = doc
+
         for d in dirs:
             d["name"] += "/"
 
@@ -2276,6 +2289,7 @@ class HttpCli(object):
         j2a["files"] = dirs + files
         j2a["logues"] = logues
         j2a["taglist"] = taglist
+        j2a["txt_ext"] = self.args.textfiles.replace(',', ' ')
 
         if "mth" in vn.flags:
             j2a["def_hcols"] = vn.flags["mth"].split(",")

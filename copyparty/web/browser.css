@@ -23,7 +23,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
-pre, code, tt {
+pre, code, tt, #doc, #doc code {
 	font-family: 'scp', monospace, monospace;
 }
 #path,
@@ -31,9 +31,8 @@ pre, code, tt {
 	font-size: 1em;
 }
 #path {
-	color: #aca;
+	color: #ccc;
 	text-shadow: 1px 1px 0 #000;
-	font-variant: small-caps;
 	font-weight: normal;
 	display: inline-block;
 	padding: .35em .5em .2em .5em;
@@ -732,12 +731,12 @@ input.eq_gain {
 #tree li:last-child {
 	border-bottom: none;
 }
-#treeul a.hl {
+#tree ul a.hl {
 	color: #400;
 	background: #fc4;
 	text-shadow: none;
 }
-#treeul a {
+#tree ul a {
 	border-radius: .3em;
 	display: inline-block;
 }
@@ -745,7 +744,7 @@ input.eq_gain {
 	width: calc(100% - 2em);
 	line-height: 1em;
 }
-#tree.nowrap #treeul li {
+#tree.nowrap #tree li {
 	min-height: 1.4em;
 	white-space: nowrap;
 }
@@ -758,6 +757,7 @@ html.light #tree.nowrap #treeul a+a:hover {
 	background: rgba(255, 255, 255, 0.67);
 	color: #000;
 }
+#docul a:hover,
 #treeul a+a:hover {
 	background: #181818;
 	color: #fff;
@@ -857,30 +857,31 @@ html.light #tree.nowrap #treeul a+a:hover {
 #wraptree.on+#hovertree {
 	display: none;
 }
-#ghead {
+.ghead {
 	border-radius: .3em;
 	padding: .2em .5em;
 	line-height: 2.3em;
-	margin-bottom: 1em;
+	margin-bottom: 1.5em;
+}
+#ghead {
 	position: sticky;
 	top: -.3em;
 	z-index: 1;
 }
-html.light #ghead {
+html.light .ghead {
 	background: #f7f7f7;
 	border-color: #ddd;
 }
-#ghead .btn {
+.ghead .btn {
 	position: relative;
 	top: 0;
 }
-#ghead>span {
+.ghead>span {
 	white-space: pre;
 	padding-left: .3em;
 }
 #ggrid {
-	padding-top: .5em;
-	margin: 0 -.5em;
+	margin: -.2em -.5em;
 }
 #ggrid>a>span {
 	overflow: hidden;
@@ -989,6 +990,45 @@ html.light #rui {
 	padding: 0;
 	font-size: 1.5em;
 }
+#doc {
+	background: none;
+	overflow: visible;
+	margin: -1em 0 .5em 0;
+	padding: 1em 0 1em 0;
+}
+#docul li.bn {
+	text-align: center;
+	padding: .5em 0;
+}
+#doc.prism {
+	padding-left: 3em;
+}
+#doc code {
+	background: none;
+	box-shadow: none;
+	z-index: 1;
+}
+#doc.mdo {
+	white-space: normal;
+}
+#doc.prism * {
+	line-height: 1.5em;
+}
+#doc .line-highlight {
+	border-radius: .3em;
+	box-shadow: 0 0 .5em #333;
+	background: linear-gradient(90deg, #111, #222);
+}
+html.light #doc .line-highlight {
+	box-shadow: 0 0 .5em #ccc;
+	background: linear-gradient(90deg, #fff, #eee);
+}
+#docul li {
+	margin: 0;
+}
+#tree #docul a {
+	display: block;
+}
 #pvol,
 #barbuf,
 #barpos,
@@ -1043,7 +1083,7 @@ html,
 .opbox,
 #path,
 #srch_form,
-#ghead {
+.ghead {
 	background: #2b2b2b;
 	border: 1px solid #333;
 	box-shadow: 0 0 .3em #111;
@@ -1110,11 +1150,14 @@ html.light #ops,
 html.light .opbox,
 html.light #path,
 html.light #srch_form,
-html.light #ghead,
+html.light .ghead,
 html.light #u2etas {
 	background: #f7f7f7;
 	box-shadow: 0 0 .3em #ccc;
 	border-color: #f7f7f7;
+}
+html.light #wrap.doc {
+	background: #f7f7f7;
 }
 html.light #ops a.act {
 	box-shadow: 0 .2em .2em #ccc;
@@ -1158,17 +1201,17 @@ html.light #treeul a+a {
 	background: inherit;
 	color: #06a;
 }
-html.light #treeul a.hl {
+html.light #tree ul a.hl {
 	background: #07a;
 	color: #fff;
 }
-html.light #treeul a.hl:hover {
+html.light #tree ul a.hl:hover {
 	background: #059;
 }
 html.light #tree li {
 	border-color: #f7f7f7 #fff #ddd #fff;
 }
-html.light #treeul a:hover {
+html.light #tree ul a:hover {
 	background: #fff;
 }
 html.light #tree ul {
@@ -1283,6 +1326,7 @@ html.light #files td div span {
 	color: #000;
 }
 html.light #path {
+	color: #777;
 	background: #f7f7f7;
 	text-shadow: none;
 	box-shadow: 0 0 .3em #bbb;
@@ -1300,6 +1344,7 @@ html.light #path a:hover {
 html.light #files tbody div a {
 	color: #d38;
 }
+html.light #docul a:hover,
 html.light #files a:hover,
 html.light #files tr.sel a:hover {
 	color: #000;

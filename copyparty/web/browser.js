@@ -2295,6 +2295,204 @@ var fileman = (function () {
 })();
 
 
+var showfile = (function () {
+	var r = {};
+	r.map = {
+		'.ahk': 'autohotkey',
+		'.bas': 'basic',
+		'.bat': 'batch',
+		'.cxx': 'cpp',
+		'.h': 'c',
+		'.hpp': 'cpp',
+		'.htm': 'html',
+		'.hxx': 'cpp',
+		'.ps1': 'powershell',
+		'.psm1': 'powershell',
+		'.pl': 'perl',
+		'.rs': 'rust',
+		'.sh': 'bash',
+		'.service': 'systemd',
+		'.vb': 'vbnet',
+		'.v': 'verilog',
+		'.vh': 'verilog',
+		'.yml': 'yaml'
+	};
+	r.nmap = {
+		'cmakelists.txt': 'cmake',
+		'dockerfile': 'docker'
+	};
+	var x = txt_ext + ' c cpp cs css diff go html ini java js json jsx kt kts less latex lisp lua makefile md py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml';
+	x = x.split(/ +/g);
+	for (var a = 0; a < x.length; a++)
+		r.map["." + x[a]] = x[a];
+
+	window.Prism = { 'manual': true };
+	var em = QS('#bdoc>pre');
+	if (em)
+		em = [window.location.search.split(/[?&]doc=/)[1].split('&')[0], window.location.hash, em.textContent];
+
+	r.setstyle = function () {
+		qsr('#prism_css');
+		var el = mknod('link');
+		el.rel = 'stylesheet';
+		el.href = '/.cpr/deps/prism' + (light ? '' : 'd') + '.css';
+		el.setAttribute('id', 'prism_css');
+		document.head.appendChild(el);
+	};
+
+	r.active = function () {
+		return document.location.search.indexOf('doc=') + 1;
+	};
+
+	function getlang(fn) {
+		fn = fn.toLowerCase();
+		var ext = fn.slice(fn.lastIndexOf('.'));
+		return r.map[ext] || r.nmap[fn];
+	}
+
+	r.addlinks = function () {
+		r.files = [];
+		var links = msel.getall();
+		for (var a = 0; a < links.length; a++) {
+			var link = links[a],
+				fn = link.vp.split('/').slice(-1)[0],
+				lang = getlang(fn);
+
+			if (!lang)
+				continue;
+
+			r.files.push({ 'id': link.id, 'name': fn });
+
+			if (lang == 'md')
+				continue;
+
+			ebi(link.id).closest('tr').getElementsByTagName('td')[0].innerHTML =
+				'<a href="#" hl="' + link.id + '">-txt-</a>';
+		}
+		if (em) {
+			render(em);
+			em = null;
+		}
+	};
+
+	r.show = function (url) {
+		var xhr = new XMLHttpRequest();
+		xhr.url = url;
+		xhr.ts = Date.now();
+		xhr.open('GET', url.split('?')[0] + '?raw', true);
+		xhr.onreadystatechange = load_cb;
+		xhr.send();
+	};
+
+	function load_cb() {
+		if (this.readyState != XMLHttpRequest.DONE)
+			return;
+
+		if (this.status !== 200) {
+			toast.err(0, "recvtree, http " + this.status + ": " + this.responseText);
+			return;
+		}
+
+		render([this.url, '', this.responseText]);
+	}
+
+	function render(doc) {
+		r.q = null;
+		var url = doc[0],
+			lnh = doc[1],
+			txt = doc[2],
+			name = url.split('/').slice(-1)[0],
+			lang = getlang(name),
+			is_md = lang == 'md';
+
+		ebi('files').style.display = ebi('gfiles').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
+		ebi('dldoc').setAttribute('href', url);
+
+		var wr = ebi('bdoc'),
+			nav = ebi('treeul'),
+			defer = !Prism.highlightElement;
+
+		var fun = function (el) {
+			console.log('fun fun fun fun');
+			try {
+				if (lnh.slice(0, 5) == '#doc.')
+					sethash(lnh.slice(1));
+
+				Prism.highlightElement(el || QS('#doc>code'));
+			}
+			catch (ex) { }
+		}
+
+		qsr('#doc');
+		var el = mknod('pre');
+		el.setAttribute('id', 'doc');
+		clmod(ebi('wrap'), 'doc', !is_md);
+		if (is_md) {
+			show_md(txt, name, el);
+		}
+		else {
+			el.textContent = txt;
+			el.innerHTML = '<code>' + el.innerHTML + '</code>';
+			el.setAttribute('class', 'prism linkable-line-numbers line-numbers language-' + lang);
+			if (!defer)
+				fun(el.firstChild);
+			else
+				import_js('/.cpr/deps/prism.js', function () { fun(); });
+		}
+
+		wr.appendChild(el);
+		wr.style.display = '';
+
+		document.documentElement.scrollTop = 0;
+		hist_push('?doc=' + url.split('/').slice(-1)[0]);
+
+		qsr('#docul');
+		qsr('#docname');
+		el = mknod('span');
+		el.textContent = name;
+		el.setAttribute('id', 'docname');
+		ebi('path').appendChild(el);
+
+		if (!nav)
+			return;
+
+		var html = ['<li class="bn">list of textfiles in<br />' + esc(get_vpath()) + '</li>'];
+		for (var a = 0; a < r.files.length; a++) {
+			var file = r.files[a];
+			html.push('<li><a href="#" hl="' + file.id +
+				(file.name == name ? '" class="hl' : '') +
+				'">' + esc(uricom_dec(file.name)[0]) + '</a>');
+		}
+
+		el = mknod('ul');
+		el.innerHTML = html.join('\n');
+		el.setAttribute('id', 'docul');
+		nav.style.display = 'none';
+		nav.parentNode.insertBefore(el, nav);
+		el.onclick = ebi('files').onclick;
+	}
+
+	var bdoc = ebi('bdoc');
+	bdoc.setAttribute('class', 'line-numbers');
+	bdoc.innerHTML = (
+		'<div id="hdoc" class="ghead">\n' +
+		'<a href="#" class="btn" id="xdoc">close</a>\n' +
+		'<a href="#" class="btn" id="dldoc">download</a>\n' +
+		'<a href="#" class="btn" id="prevdoc">prev</a>\n' +
+		'<a href="#" class="btn" id="nextdoc">next</a>\n' +
+		'</div>'
+	);
+	ebi('xdoc').onclick = function () {
+		thegrid.setvis(true);
+	}
+	ebi('dldoc').setAttribute('download', '');
+	ebi('prevdoc').onclick = function () { tree_neigh(-1); };
+	ebi('nextdoc').onclick = function () { tree_neigh(1); };
+
+	return r;
+})();
+
+
 var thegrid = (function () {
 	var lfiles = ebi('files'),
 		gfiles = mknod('div');
@@ -2302,7 +2500,7 @@ var thegrid = (function () {
 	gfiles.setAttribute('id', 'gfiles');
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
-		'<div id="ghead">' +
+		'<div id="ghead" class="ghead">' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> <span>zoom: ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
 		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>chop: ' +
@@ -2350,8 +2548,22 @@ var thegrid = (function () {
 	for (var a = 0; a < links.length; a++)
 		links[a].onclick = btnclick;
 
-	r.setvis = function (vis) {
-		(r.en ? gfiles : lfiles).style.display = vis ? '' : 'none';
+	r.setvis = function (force) {
+		if (showfile.active()) {
+			if (!force)
+				return;
+
+			hist_push(get_evpath());
+		}
+
+		var vis = has(perms, "read");
+		gfiles.style.display = vis && r.en ? '' : 'none';
+		lfiles.style.display = vis && !r.en ? '' : 'none';
+		ebi('pro').style.display = ebi('epi').style.display = ebi('treeul').style.display = '';
+		ebi('bdoc').style.display = 'none';
+		clmod(ebi('wrap'), 'doc');
+		qsr('#docname');
+		qsr('#docul');
 	};
 
 	r.setdirty = function () {
@@ -2359,6 +2571,7 @@ var thegrid = (function () {
 		if (r.en) {
 			loadgrid();
 		}
+		r.setvis();
 	};
 
 	function setln(v) {
@@ -2477,18 +2690,11 @@ var thegrid = (function () {
 		tt.att(ebi('ggrid'));
 	};
 
-	function ungrid() {
-		lfiles.style.display = '';
-		gfiles.style.display = 'none';
-	}
-
 	function loadgrid() {
 		if (have_webp === null)
 			return setTimeout(loadgrid, 50);
 
-		lfiles.style.display = 'none';
-		gfiles.style.display = 'block';
-
+		r.setvis();
 		if (!r.dirty)
 			return r.loadsel();
 
@@ -2575,7 +2781,7 @@ var thegrid = (function () {
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
 	bcfg_bind(r, 'en', 'griden', false, function (v) {
-		v ? loadgrid() : ungrid();
+		v ? loadgrid() : r.setvis(true);
 		pbar.onresize();
 		vbar.onresize();
 	});
@@ -2600,7 +2806,7 @@ function th_onload(el) {
 
 function tree_scrollto(e) {
 	ev(e);
-	var act = QS('#treeul a.hl'),
+	var act = QS('#tree a.hl'),
 		ul = act ? act.offsetParent : null;
 
 	if (!ul)
@@ -2620,7 +2826,7 @@ function tree_scrollto(e) {
 
 
 function tree_neigh(n) {
-	var links = QSA('#treeul li>a+a');
+	var links = QSA(showfile.active() ? '#docul li>a' : '#treeul li>a+a');
 	if (!links.length) {
 		treectl.dir_cb = function () {
 			tree_neigh(n);
@@ -2650,6 +2856,9 @@ function tree_neigh(n) {
 
 
 function tree_up() {
+	if (showfile.active())
+		return thegrid.setvis(true);
+
 	var act = QS('#treeul a.hl');
 	if (!act) {
 		treectl.dir_cb = tree_up;
@@ -3426,7 +3635,7 @@ var treectl = (function () {
 		html = html.join('\n');
 		set_files_html(html);
 
-		if (this.hpush)
+		if (this.hpush && !showfile.active())
 			hist_push(this.top);
 
 		acct = res.acct;
@@ -3597,7 +3806,7 @@ function apply_perms(newperms) {
 		up2k.set_fsearch();
 
 	ebi('widget').style.display = have_read ? '' : 'none';
-	thegrid.setvis(have_read);
+	thegrid.setvis();
 	if (!have_read && have_write)
 		goto('up2k');
 }
@@ -3930,6 +4139,7 @@ var light;
 		pbar.drawbuf();
 		pbar.drawpos();
 		vbar.draw();
+		showfile.setstyle();
 	}
 
 	bcfg_bind(window, 'light', 'lightmode', false, freshen);
@@ -4232,13 +4442,9 @@ var msel = (function () {
 })();
 
 
-function show_readme(md, url, depth) {
-	if (!treectl.ireadme)
-		return;
-
-	var div = ebi('epi'),
-		errmsg = 'cannot show README.md:\n\n',
-		now = window.location.href.replace(/\/?[?#].*/, "");
+function show_md(md, name, div, url, depth) {
+	var errmsg = 'cannot show ' + name + ':\n\n',
+		now = get_evpath();
 
 	url = url || now;
 	if (url != now)
@@ -4249,7 +4455,7 @@ function show_readme(md, url, depth) {
 			return toast.warn(10, errmsg + 'failed to load marked.js')
 
 		return import_js('/.cpr/deps/marked.js', function () {
-			show_readme(md, url, 1);
+			show_md(md, name, div, url, 1);
 		});
 	}
 
@@ -4272,6 +4478,14 @@ function show_readme(md, url, depth) {
 	catch (ex) {
 		toast.warn(10, errmsg + ex);
 	}
+}
+
+
+function show_readme(md) {
+	if (!treectl.ireadme)
+		return;
+
+	show_md(md, 'README.md', ebi('epi'));
 }
 if (readme)
 	show_readme(readme);
@@ -4463,15 +4677,20 @@ function goto_unpost(e) {
 
 ebi('files').onclick = function (e) {
 	var tgt = e.target.closest('a[id]');
-	if (!tgt || tgt.getAttribute('id').indexOf('f-') !== 0 || !tgt.textContent.endsWith('/'))
-		return;
+	if (tgt && tgt.getAttribute('id').indexOf('f-') === 0 && tgt.textContent.endsWith('/')) {
+		var el = treectl.find(tgt.textContent.slice(0, -1));
+		if (!el)
+			return;
 
-	var el = treectl.find(tgt.textContent.slice(0, -1));
-	if (!el)
-		return;
+		el.click();
+		return ev(e);
+	}
 
-	ev(e);
-	el.click();
+	tgt = e.target.closest('a[hl]');
+	if (tgt) {
+		showfile.show(noq_href(ebi(tgt.getAttribute('hl'))), tgt.getAttribute('lang'));
+		return ev(e);
+	}
 }
 
 
@@ -4531,6 +4750,7 @@ function reload_browser(not_mp) {
 
 	thegrid.setdirty();
 	msel.render();
+	showfile.addlinks();
 }
 reload_browser(true);
 mukey.render();

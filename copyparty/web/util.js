@@ -736,7 +736,7 @@ function hist_replace(url) {
 
 function sethash(hv) {
     if (window.history && history.replaceState) {
-        hist_replace(document.location.pathname + '#' + hv);
+        hist_replace(document.location.pathname + document.location.search + '#' + hv);
     }
     else {
         document.location.hash = hv;

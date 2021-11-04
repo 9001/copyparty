@@ -76,6 +76,12 @@
 
 <div id="wrap">
 
+	{%- if doc %}
+	<div id="bdoc"><pre>{{ doc|e }}</pre></div>
+	{%- else %}
+	<div id="bdoc"></div>
+	{%- endif %}
+
 	<div id="pro" class="logue">{{ logues[0] }}</div>
 
 	<table id="files">
@@ -135,6 +141,7 @@
 			have_del = {{ have_del|tojson }},
 			have_unpost = {{ have_unpost|tojson }},
 			have_zip = {{ have_zip|tojson }},
+			txt_ext = "{{ txt_ext }}",
 			readme = {{ readme|tojson }};
 
 		document.documentElement.setAttribute("class", localStorage.lightmode == 1 ? "light" : "dark");

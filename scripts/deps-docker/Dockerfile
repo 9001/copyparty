@@ -45,6 +45,12 @@ RUN     mkdir -p /z/dist/no-pk \
         && tar -xf zopfli.tgz
 
 
+# todo
+# https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js
+# https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css
+# https://prismjs.com/download.html#themes=prism-funky&languages=markup+css+clike+javascript+autohotkey+bash+basic+batch+c+csharp+cpp+cmake+diff+docker+go+ini+java+json+kotlin+latex+less+lisp+lua+makefile+objectivec+perl+powershell+python+r+jsx+ruby+rust+sass+scss+sql+swift+systemd+toml+typescript+vbnet+verilog+vhdl+yaml&plugins=line-highlight+line-numbers+autolinker
+
+
 # build fonttools (which needs zopfli)
 RUN     tar -xf zopfli.tgz \
         && cd zopfli* \

@@ -447,6 +447,7 @@ def run_argparse(argv, formatter):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
     ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
+    ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
 
     ap2 = ap.add_argument_group('debug options')
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
