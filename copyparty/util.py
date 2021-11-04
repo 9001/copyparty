@@ -1280,7 +1280,14 @@ def guess_mime(url, fallback="application/octet-stream"):
     except:
         return fallback
 
-    ret = MIMES.get(ext) or mimetypes.guess_type(url)[0] or fallback
+    ret = MIMES.get(ext)
+
+    if not ret:
+        x = mimetypes.guess_type(url)
+        ret = "application/{}".format(x[1]) if x[1] else x[0]
+
+    if not ret:
+        ret = fallback
 
     if ";" not in ret:
         if ret.startswith("text/") or ret.endswith("/javascript"):
