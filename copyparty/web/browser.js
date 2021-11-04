@@ -2580,7 +2580,8 @@ var thegrid = (function () {
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
 		qsr('#docname');
-		treectl.textmode(false);
+		if (window['treectl'])
+			treectl.textmode(false);
 	};
 
 	r.setdirty = function () {

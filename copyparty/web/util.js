@@ -172,7 +172,6 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     catch (e) {
         document.body.innerHTML = html.join('\n');
     }
-    throw 'fatal_err';
 }
 function ignex(all) {
     var o = ebi('exbox');
