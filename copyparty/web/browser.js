@@ -199,7 +199,7 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +
-	'<ul class="ntree" id="docul"></ul>\n' +
+	'<ul id="docul"></ul>\n' +
 	'<ul class="ntree" id="treepar"></ul>\n' +
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
@@ -3571,11 +3571,18 @@ var treectl = (function () {
 			act = null;
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = uricom_dec(links[a].getAttribute('href'))[0];
-			if (href == cdir)
-				act = links[a];
+			var href = uricom_dec(links[a].getAttribute('href'))[0],
+				cl = '';
 
-			links[a].setAttribute('class', href == cdir ? 'hl' : '');
+			if (href == cdir) {
+				act = links[a];
+				cl = 'hl';
+			}
+			else if (cdir.startsWith(href)) {
+				cl = 'par';
+			}
+
+			links[a].setAttribute('class', cl);
 			links[a].onclick = treego;
 			links[a].onmouseenter = nowrap ? menter : null;
 			links[a].onmouseleave = nowrap ? mleave : null;

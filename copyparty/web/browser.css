@@ -750,6 +750,9 @@ input.eq_gain {
 	background: #fc4;
 	text-shadow: none;
 }
+#tree ul a.par {
+	color: #fff;
+}
 #tree ul a {
 	border-radius: .3em;
 	display: inline-block;
@@ -772,7 +775,7 @@ html.light #tree.nowrap .ntree a+a:hover {
 	color: #000;
 }
 #docul a:hover,
-.ntree a+a:hover {
+#tree .ntree a+a:hover {
 	background: #181818;
 	color: #fff;
 }
@@ -1222,6 +1225,9 @@ html.light .ntree a+a {
 html.light #tree ul a.hl {
 	background: #07a;
 	color: #fff;
+}
+html.light #tree ul a.par {
+	color: #000;
 }
 html.light #tree ul a.hl:hover {
 	background: #059;
