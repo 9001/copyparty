@@ -194,8 +194,9 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
 	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
-	'	<a href="#" class="tgl btn" id="filetree" tt="toggle folder-tree / textfiles$NHotkey: V">📜</a>\n' +
+	'	<a href="#" class="tgl btn" id="filetree" tt="toggle folder-tree / textfiles$NHotkey: V">📃</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
+	'	<a href="#" class="tgl btn" id="parpane" tt="show parent folders in a docked pane at the top">▀</a>\n' +
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +
@@ -2578,7 +2579,7 @@ var thegrid = (function () {
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
-		ebi('pro').style.display = ebi('epi').style.display = ebi('treeul').style.display = '';
+		ebi('pro').style.display = ebi('epi').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
 		qsr('#docname');
@@ -3316,6 +3317,7 @@ var treectl = (function () {
 		r.goto(get_evpath());
 	});
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
+	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', true, reload_tree);
 
 	function setwrap(v) {
@@ -3374,7 +3376,7 @@ var treectl = (function () {
 	r.textmode = function (ya) {
 		r.texts = ya;
 		ebi('docul').style.display = ya ? '' : 'none';
-		ebi('treeul').style.display = ya ? 'none' : '';
+		ebi('treeul').style.display = ebi('treepar').style.display = ya ? 'none' : '';
 		clmod(ebi('filetree'), 'on', ya);
 		tree_scrollto();
 	};
@@ -3400,7 +3402,8 @@ var treectl = (function () {
 			parp = ebi('treepar'),
 			y = tree.scrollTop;
 
-		if (!r.pdir.length || y > r.pdir.slice(-1)[0][0] || y < r.pdir[0][0]) {
+
+		if (!r.parpane || !r.pdir.length || y > r.pdir.slice(-1)[0][0] || y < r.pdir[0][0]) {
 			parp.style.display = 'none';
 			r.pdirh = null;
 		}
