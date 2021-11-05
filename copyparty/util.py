@@ -100,10 +100,24 @@ IMPLICATIONS = [
 
 
 MIMES = {
-    "md": "text/plain; charset=utf-8",
+    "md": "text/plain",
+    "txt": "text/plain",
+    "js": "text/javascript",
     "opus": "audio/ogg; codecs=opus",
-    "webp": "image/webp",
+    "mp3": "audio/mpeg",
+    "m4a": "audio/mp4",
+    "jpg": "image/jpeg",
 }
+for ln in """text css html csv
+application json wasm xml pdf rtf zip
+image webp jpeg png gif bmp
+audio aac ogg wav
+video webm mp4 mpeg
+font woff woff2 otf ttf
+""".splitlines():
+    k, vs = ln.split(" ", 1)
+    for v in vs.strip().split():
+        MIMES[v] = "{}/{}".format(k, v)
 
 
 REKOBO_KEY = {
