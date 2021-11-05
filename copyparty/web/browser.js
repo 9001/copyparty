@@ -199,8 +199,9 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +
-	'<ul id="docul"></ul>\n' +
-	'<ul id="treeul"></ul>\n' +
+	'<ul class="ntree" id="docul"></ul>\n' +
+	'<ul class="ntree" id="treepar"></ul>\n' +
+	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
 
@@ -3296,10 +3297,11 @@ document.onkeydown = function (e) {
 
 
 var treectl = (function () {
-	var treectl = {
+	var r = {
 		"hidden": true,
 		"ls_cb": null,
 		"dir_cb": tree_scrollto,
+		"pdir": []
 	},
 		entreed = false,
 		fixedpos = false,
@@ -3308,30 +3310,30 @@ var treectl = (function () {
 		mentered = null,
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
-	bcfg_bind(treectl, 'ireadme', 'ireadme', true);
-	bcfg_bind(treectl, 'dyn', 'dyntree', true, onresize);
-	bcfg_bind(treectl, 'dots', 'dotfiles', false, function (v) {
-		treectl.goto(get_evpath());
+	bcfg_bind(r, 'ireadme', 'ireadme', true);
+	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
+	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
+		r.goto(get_evpath());
 	});
-	setwrap(bcfg_bind(treectl, 'wtree', 'wraptree', true, setwrap));
-	bcfg_bind(treectl, 'htree', 'hovertree', true, reload_tree);
+	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
+	bcfg_bind(r, 'htree', 'hovertree', true, reload_tree);
 
 	function setwrap(v) {
 		clmod(ebi('tree'), 'nowrap', !v);
 		reload_tree();
 	}
 
-	treectl.entree = function (e) {
+	r.entree = function (e) {
 		ev(e);
 		entreed = true;
 		swrite('entreed', 'tree');
 
 		get_tree("", get_evpath(), true);
-		treectl.show();
+		r.show();
 	}
 
-	treectl.show = function () {
-		treectl.hidden = false;
+	r.show = function () {
+		r.hidden = false;
 		if (!entreed) {
 			ebi('path').style.display = 'inline-block';
 			return;
@@ -3343,17 +3345,17 @@ var treectl = (function () {
 		onresize();
 	};
 
-	treectl.detree = function (e) {
+	r.detree = function (e) {
 		ev(e);
 		entreed = false;
 		swrite('entreed', 'na');
 
-		treectl.hide();
+		r.hide();
 		ebi('path').style.display = '';
 	}
 
-	treectl.hide = function () {
-		treectl.hidden = true;
+	r.hide = function () {
+		r.hidden = true;
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'none';
 		ebi('wrap').style.marginLeft = '';
@@ -3368,8 +3370,8 @@ var treectl = (function () {
 		}
 	}
 
-	treectl.textmode = function (ya) {
-		treectl.texts = ya;
+	r.textmode = function (ya) {
+		r.texts = ya;
 		ebi('docul').style.display = ya ? '' : 'none';
 		ebi('treeul').style.display = ya ? 'none' : '';
 		clmod(ebi('filetree'), 'on', ya);
@@ -3377,9 +3379,9 @@ var treectl = (function () {
 	};
 	ebi('filetree').onclick = function (e) {
 		ev(e);
-		treectl.textmode(!treectl.texts);
+		r.textmode(!r.texts);
 	};
-	treectl.textmode(false);
+	r.textmode(false);
 
 	function onscroll() {
 		unmenter();
@@ -3387,13 +3389,35 @@ var treectl = (function () {
 	}
 
 	function onscroll2() {
-		if (!entreed || treectl.hidden || document.visibilityState == 'hidden')
+		if (!entreed || r.hidden || document.visibilityState == 'hidden')
 			return;
 
 		var tree = ebi('tree'),
 			wrap = ebi('wrap'),
 			atop = wrap.getBoundingClientRect().top,
-			winh = window.innerHeight;
+			winh = window.innerHeight,
+			parp = ebi('treepar'),
+			y = tree.scrollTop;
+
+		if (!r.pdir.length || y > r.pdir.slice(-1)[0][0] || y < r.pdir[0][0]) {
+			parp.style.display = 'none';
+		}
+		else {
+			var h1 = [], h2 = [];
+			for (var a = 0; a < r.pdir.length; a++) {
+				if (r.pdir[a][0] > y)
+					break;
+
+				h1.push('<li>' + r.pdir[a][1].previousSibling.outerHTML + r.pdir[a][1].outerHTML + '<ul>');
+				h2.push('</ul></li>');
+			}
+			h1 = h1.join('\n') + h2.join('\n');
+			if (h1 != r.pdirh) {
+				r.pdirh = h1;
+				parp.innerHTML = h1;
+				parp.style.display = '';
+			}
+		}
 
 		if (atop === prev_atop && winh === prev_winh)
 			return;
@@ -3426,13 +3450,13 @@ var treectl = (function () {
 	timer.add(onscroll2, true);
 
 	function onresize(e) {
-		if (!entreed || treectl.hidden)
+		if (!entreed || r.hidden)
 			return;
 
 		var q = '#tree',
 			nq = -3;
 
-		while (treectl.dyn) {
+		while (r.dyn) {
 			nq++;
 			q += '>ul>li';
 			if (!QS(q))
@@ -3451,14 +3475,14 @@ var treectl = (function () {
 		onscroll();
 	}
 
-	treectl.find = function (txt) {
+	r.find = function (txt) {
 		var ta = QSA('#treeul a.hl+ul>li>a+a');
 		for (var a = 0, aa = ta.length; a < aa; a++)
 			if (ta[a].textContent == txt)
 				return ta[a];
 	};
 
-	treectl.goto = function (url, push) {
+	r.goto = function (url, push) {
 		get_tree("", url, true);
 		reqls(url, push, true);
 	};
@@ -3469,7 +3493,7 @@ var treectl = (function () {
 		xhr.dst = dst;
 		xhr.rst = rst;
 		xhr.ts = Date.now();
-		xhr.open('GET', dst + '?tree=' + top + (treectl.dots ? '&dots' : ''), true);
+		xhr.open('GET', dst + '?tree=' + top + (r.dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvtree;
 		xhr.send();
 		enspin('#tree');
@@ -3527,9 +3551,9 @@ var treectl = (function () {
 		reload_tree();
 		onresize();
 
-		var fun = treectl.dir_cb;
+		var fun = r.dir_cb;
 		if (fun) {
-			treectl.dir_cb = null;
+			r.dir_cb = null;
 			try {
 				fun();
 			}
@@ -3542,10 +3566,14 @@ var treectl = (function () {
 	function reload_tree() {
 		var cdir = get_vpath(),
 			links = QSA('#treeul a+a'),
-			nowrap = QS('#tree.nowrap') && QS('#hovertree.on');
+			nowrap = QS('#tree.nowrap') && QS('#hovertree.on'),
+			act = null;
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			var href = uricom_dec(links[a].getAttribute('href'))[0];
+			if (href == cdir)
+				act = links[a];
+
 			links[a].setAttribute('class', href == cdir ? 'hl' : '');
 			links[a].onclick = treego;
 			links[a].onmouseenter = nowrap ? menter : null;
@@ -3557,6 +3585,27 @@ var treectl = (function () {
 			links[a].onclick = treegrow;
 		}
 		ebi('tree').onscroll = nowrap ? unmenter : null;
+		r.pdir = [];
+		try {
+			while (act) {
+				r.pdir.unshift([-1, act]);
+				act = act.parentNode.parentNode.closest('li').querySelector('a:first-child+a');
+			}
+		}
+		catch (ex) { }
+		// r.pdir.shift();
+		compy();
+	}
+
+	function compy() {
+		for (var a = 0; a < r.pdir.length; a++)
+			r.pdir[a][0] = r.pdir[a][1].offsetTop;
+
+		var ofs = 0;
+		for (var a = 0; a < r.pdir.length - 1; a++) {
+			ofs += r.pdir[a][1].offsetHeight + 1;
+			r.pdir[a + 1][0] -= ofs;
+		}
 	}
 
 	function menter(e) {
@@ -3586,7 +3635,7 @@ var treectl = (function () {
 			return;
 		}
 		reqls(this.getAttribute('href'), true);
-		treectl.dir_cb = tree_scrollto;
+		r.dir_cb = tree_scrollto;
 		thegrid.setvis(true);
 	}
 
@@ -3595,7 +3644,7 @@ var treectl = (function () {
 		xhr.top = url;
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
-		xhr.open('GET', xhr.top + '?ls' + (treectl.dots ? '&dots' : ''), true);
+		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : ''), true);
 		xhr.onreadystatechange = recvls;
 		xhr.send();
 		if (hpush && !no_tree)
@@ -3653,8 +3702,8 @@ var treectl = (function () {
 		html.push('<tbody>');
 		nodes = sortfiles(nodes);
 		for (var a = 0; a < nodes.length; a++) {
-			var r = nodes[a],
-				bhref = r.href.split('?')[0],
+			var tn = nodes[a],
+				bhref = tn.href.split('?')[0],
 				fname = uricom_dec(bhref)[0],
 				hname = esc(fname),
 				sortv = (bhref.slice(-1) == '/' ? '\t' : '') + hname,
@@ -3664,16 +3713,16 @@ var treectl = (function () {
 			if (lang)
 				showfile.files.push({ 'id': id, 'name': fname });
 
-			if (r.lead == '-')
-				r.lead = '<a href="#" class="doc' + (lang ? ' bri' : '') +
+			if (tn.lead == '-')
+				tn.lead = '<a href="#" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var ln = ['<tr><td>' + r.lead + '</td><td sortv="' + sortv +
-				'"><a href="' + top + r.href + '" id="' + id + '">' + hname + '</a>', r.sz];
+			var ln = ['<tr><td>' + tn.lead + '</td><td sortv="' + sortv +
+				'"><a href="' + top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
-					v = (r.tags || {})[k] || "";
+					v = (tn.tags || {})[k] || "";
 
 				if (k == ".dur") {
 					var sv = v ? s2ms(v) : "";
@@ -3682,7 +3731,7 @@ var treectl = (function () {
 				}
 				ln.push(v);
 			}
-			ln = ln.concat([r.ext, unix2iso(r.ts)]).join('</td><td>');
+			ln = ln.concat([tn.ext, unix2iso(tn.ts)]).join('</td><td>');
 			html.push(ln + '</td></tr>');
 		}
 		html.push('</tbody>');
@@ -3713,9 +3762,9 @@ var treectl = (function () {
 		reload_browser();
 		tree_scrollto();
 
-		var fun = treectl.ls_cb;
+		var fun = r.ls_cb;
 		if (fun) {
-			treectl.ls_cb = null;
+			r.ls_cb = null;
 			fun();
 		}
 	}
@@ -3762,15 +3811,15 @@ var treectl = (function () {
 		onresize();
 	}
 
-	ebi('entree').onclick = treectl.entree;
-	ebi('detree').onclick = treectl.detree;
+	ebi('entree').onclick = r.entree;
+	ebi('detree').onclick = r.detree;
 	ebi('visdir').onclick = tree_scrollto;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
 
 	var cs = sread('entreed');
 	if ((is_touch && cs == 'tree') || (!is_touch && cs != 'na'))
-		treectl.entree();
+		r.entree();
 
 	window.onpopstate = function (e) {
 		console.log("h-pop " + e.state);
@@ -3783,12 +3832,12 @@ var treectl = (function () {
 		if (url.search.indexOf('doc=') + 1 && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);
 
-		treectl.goto(url.pathname);
+		r.goto(url.pathname);
 	};
 
 	hist_replace(get_evpath() + window.location.hash);
-	treectl.onscroll = onscroll;
-	return treectl;
+	r.onscroll = onscroll;
+	return r;
 })();
 
 

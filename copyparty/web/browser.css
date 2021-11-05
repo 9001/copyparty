@@ -664,14 +664,23 @@ input.eq_gain {
 	border: 1px solid #333;
 	box-shadow: 0 0 1em #181818;
 }
+#treeh,
+#treepar {
+	z-index: 1;
+	border-bottom: 1px solid #111;
+}
 #treeh {
 	position: sticky;
-	z-index: 1;
 	top: 0;
 	height: 2.2em;
 	line-height: 2.2em;
-	border-bottom: 1px solid #111;
 	overflow: hidden;
+}
+#tree #treepar {
+	position: fixed;
+	margin-top: -3px;
+	margin-left: -2em;
+	width: calc(var(--nav-sz) + 1em);
 }
 #tree, #treeh {
 	border-radius: 0 .3em 0 0;
@@ -746,7 +755,7 @@ input.eq_gain {
 	border-radius: .3em;
 	display: inline-block;
 }
-#treeul a+a {
+.ntree a+a {
 	width: calc(100% - 2em);
 	line-height: 1em;
 }
@@ -754,21 +763,21 @@ input.eq_gain {
 	min-height: 1.4em;
 	white-space: nowrap;
 }
-#tree.nowrap #treeul a+a:hover {
+#tree.nowrap .ntree a+a:hover {
 	background: rgba(16, 16, 16, 0.67);
 	min-width: calc(var(--nav-sz) - 2em);
 	width: auto;
 }
-html.light #tree.nowrap #treeul a+a:hover {
+html.light #tree.nowrap .ntree a+a:hover {
 	background: rgba(255, 255, 255, 0.67);
 	color: #000;
 }
 #docul a:hover,
-#treeul a+a:hover {
+.ntree a+a:hover {
 	background: #181818;
 	color: #fff;
 }
-#treeul a:first-child {
+.ntree a:first-child {
 	font-family: 'scp', monospace, monospace;
 	font-size: 1.2em;
 	line-height: 0;
@@ -1101,7 +1110,8 @@ html,
 	background: #282828;
 }
 #tree,
-#treeh {
+#treeh,
+#treepar {
 	background: #2b2b2b;
 }
 #wtoggle,
@@ -1206,7 +1216,7 @@ html.light #acc_info {
 html.light #srv_info span {
 	color: #777;
 }
-html.light #treeul a+a {
+html.light .ntree a+a {
 	background: inherit;
 	color: #06a;
 }
@@ -1366,7 +1376,8 @@ html.light #files tr.sel a:hover {
 	background: #fff;
 	text-decoration: underline;
 }
-html.light #treeh {
+html.light #treeh,
+html.light #treepar {
 	background: #f7f7f7;
 	border-color: #ddd;
 }
