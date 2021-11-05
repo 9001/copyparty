@@ -3405,19 +3405,24 @@ var treectl = (function () {
 			r.pdirh = null;
 		}
 		else {
-			var h1 = [], h2 = [];
+			var h1 = [], h2 = [], els = [];
 			for (var a = 0; a < r.pdir.length; a++) {
 				if (r.pdir[a][0] > y)
 					break;
 
-				h1.push('<li>' + r.pdir[a][1].previousSibling.outerHTML + r.pdir[a][1].outerHTML + '<ul>');
+				var e2 = r.pdir[a][1], e1 = e2.previousSibling;
+				h1.push('<li>' + e1.outerHTML + e2.outerHTML + '<ul>');
 				h2.push('</ul></li>');
+				els.push([e1, e2]);
 			}
 			h1 = h1.join('\n') + h2.join('\n');
 			if (h1 != r.pdirh) {
 				r.pdirh = h1;
 				parp.innerHTML = h1;
 				parp.style.display = '';
+				var els = QSA('#treepar a');
+				for (var a = 0, aa = els.length; a < aa; a++)
+					els[a].onclick = bad_proxy;
 			}
 		}
 
@@ -3602,8 +3607,8 @@ var treectl = (function () {
 			}
 		}
 		catch (ex) { }
-		// r.pdir.shift();
-		compy();
+		r.pdir.shift();
+		r.pdirw = -1;
 	}
 
 	function compy() {
@@ -3631,6 +3636,18 @@ var treectl = (function () {
 	function mleave(e) {
 		this.style.position = '';
 		mentered = null;
+	}
+
+	function bad_proxy(e) {
+		ev(e);
+		var dst = this.getAttribute('dst'),
+			k = dst ? 'dst' : 'href',
+			v = dst ? dst : this.getAttribute('href'),
+			els = QSA('#treeul a');
+
+		for (var a = 0, aa = els.length; a < aa; a++)
+			if (els[a].getAttribute(k) === v)
+				return els[a].click();
 	}
 
 	function treego(e) {
