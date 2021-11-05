@@ -3322,6 +3322,7 @@ var treectl = (function () {
 		clmod(ebi('tree'), 'nowrap', !v);
 		reload_tree();
 	}
+	setwrap(r.wtree);
 
 	r.entree = function (e) {
 		ev(e);
