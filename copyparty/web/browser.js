@@ -3401,6 +3401,7 @@ var treectl = (function () {
 
 		if (!r.pdir.length || y > r.pdir.slice(-1)[0][0] || y < r.pdir[0][0]) {
 			parp.style.display = 'none';
+			r.pdirh = null;
 		}
 		else {
 			var h1 = [], h2 = [];

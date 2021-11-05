@@ -664,23 +664,22 @@ input.eq_gain {
 	border: 1px solid #333;
 	box-shadow: 0 0 1em #181818;
 }
-#treeh,
-#treepar {
-	z-index: 1;
-	border-bottom: 1px solid #111;
-}
 #treeh {
 	position: sticky;
+	z-index: 1;
 	top: 0;
 	height: 2.2em;
 	line-height: 2.2em;
+	border-bottom: 1px solid #111;
 	overflow: hidden;
 }
 #tree #treepar {
+	z-index: 1;
 	position: fixed;
 	margin-top: -3px;
 	margin-left: -2em;
-	width: calc(var(--nav-sz) + 1em);
+	width: calc(var(--nav-sz) + 0.5em);
+	border-bottom: 1px solid #444;
 }
 #tree, #treeh {
 	border-radius: 0 .3em 0 0;
@@ -1227,7 +1226,8 @@ html.light #tree ul a.hl {
 html.light #tree ul a.hl:hover {
 	background: #059;
 }
-html.light #tree li {
+html.light #tree li,
+html.light #tree #treepar {
 	border-color: #f7f7f7 #fff #ddd #fff;
 }
 html.light #tree ul a:hover {
