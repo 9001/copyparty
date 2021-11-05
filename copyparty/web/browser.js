@@ -3397,11 +3397,20 @@ var treectl = (function () {
 
 		var tree = ebi('tree'),
 			wrap = ebi('wrap'),
+			wraptop = null,
 			atop = wrap.getBoundingClientRect().top,
 			winh = window.innerHeight,
 			parp = ebi('treepar'),
-			y = tree.scrollTop;
+			y = tree.scrollTop,
+			w = tree.offsetWidth;
 
+		if (atop !== prev_atop || winh !== prev_winh)
+			wraptop = Math.floor(wrap.offsetTop);
+
+		if (r.parpane && r.pdir.length && w != r.pdirw) {
+			r.pdirw = w;
+			compy();
+		}
 
 		if (!r.parpane || !r.pdir.length || y > r.pdir.slice(-1)[0][0] || y < r.pdir[0][0]) {
 			parp.style.display = 'none';
@@ -3427,9 +3436,16 @@ var treectl = (function () {
 				for (var a = 0, aa = els.length; a < aa; a++)
 					els[a].onclick = bad_proxy;
 			}
+			y = ebi('treeh').offsetHeight;
+			if (!fixedpos)
+				y += tree.offsetTop - document.documentElement.scrollTop;
+
+			y = (y - 3) + 'px';
+			if (parp.style.top != y)
+				parp.style.top = y;
 		}
 
-		if (atop === prev_atop && winh === prev_winh)
+		if (wraptop === null)
 			return;
 
 		prev_atop = atop;
@@ -3450,7 +3466,7 @@ var treectl = (function () {
 			tree.style.top = Math.max(0, parseInt(atop)) + 'px';
 		}
 		else {
-			var top = Math.max(0, parseInt(wrap.offsetTop)),
+			var top = Math.max(0, wraptop),
 				treeh = winh - atop;
 
 			tree.style.top = top + 'px';

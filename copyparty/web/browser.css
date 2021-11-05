@@ -673,13 +673,13 @@ input.eq_gain {
 	border-bottom: 1px solid #111;
 	overflow: hidden;
 }
-#tree #treepar {
+#treepar {
 	z-index: 1;
 	position: fixed;
-	margin-top: -3px;
-	margin-left: -2em;
-	width: calc(var(--nav-sz) + 0.5em);
+	left: -.75em;
+	width: calc(var(--nav-sz) - 0.5em);
 	border-bottom: 1px solid #444;
+	overflow: hidden;
 }
 #tree, #treeh {
 	border-radius: 0 .3em 0 0;
