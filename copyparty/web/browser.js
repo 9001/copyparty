@@ -2436,6 +2436,9 @@ var showfile = (function () {
 			catch (ex) { }
 		}
 
+		if (txt.length > 1024 * 256)
+			fun = function (el) { };
+
 		qsr('#doc');
 		var el = mknod('pre');
 		el.setAttribute('id', 'doc');
