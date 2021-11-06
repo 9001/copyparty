@@ -113,6 +113,7 @@ class VSock(object):
 class VHttpSrv(object):
     def __init__(self):
         self.broker = NullBroker()
+        self.prism = None
 
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
