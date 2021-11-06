@@ -29,7 +29,7 @@ class MpWorker(object):
         # we inherited signal_handler from parent,
         # replace it with something harmless
         if not FAKE_MP:
-            for sig in [signal.SIGINT, signal.SIGTERM]:
+            for sig in [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]:
                 signal.signal(sig, self.signal_handler)
 
         # starting to look like a good idea
@@ -68,6 +68,10 @@ class MpWorker(object):
                 self.logw("ok bye")
                 sys.exit(0)
                 return
+
+            elif dest == "reload":
+                self.logw("mpw reloading")
+                self.asrv.reload()
 
             elif dest == "listen":
                 self.httpsrv.listen(args[0], args[1])

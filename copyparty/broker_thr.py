@@ -21,10 +21,13 @@ class BrokerThr(object):
 
         # instantiate all services here (TODO: inheritance?)
         self.httpsrv = HttpSrv(self, None)
+        self.reload = self.noop
 
     def shutdown(self):
         # self.log("broker", "shutting down")
         self.httpsrv.shutdown()
+
+    def noop(self):
         pass
 
     def put(self, want_retval, dest, *args):

@@ -37,7 +37,9 @@ class SvcHub(object):
         self.argv = argv
         self.logf = None
         self.stop_req = False
+        self.reload_req = False
         self.stopping = False
+        self.reloading = False
         self.stop_cond = threading.Condition()
         self.retcode = 0
         self.httpsrv_up = 0
@@ -195,7 +197,11 @@ class SvcHub(object):
         thr.daemon = True
         thr.start()
 
-        for sig in [signal.SIGINT, signal.SIGTERM]:
+        sigs = [signal.SIGINT, signal.SIGTERM]
+        if not ANYWIN:
+            sigs.append(signal.SIGUSR1)
+
+        for sig in sigs:
             signal.signal(sig, self.signal_handler)
 
         # macos hangs after shutdown on sigterm with while-sleep,
@@ -219,10 +225,27 @@ class SvcHub(object):
         else:
             self.stop_thr()
 
+    def reload(self):
+        self.reloading = True
+        t = threading.Thread(target=self._reload)
+        t.daemon = True
+        t.start()
+
+    def _reload(self):
+        self.log("root", "reload scheduled")
+        with self.up2k.mutex:
+            self.asrv.reload()
+            self.broker.reload()
+
+        self.reloading = False
+
     def stop_thr(self):
         while not self.stop_req:
             with self.stop_cond:
                 self.stop_cond.wait(9001)
+
+            if self.reload_req and not self.reloading:
+                self.reload()
 
         self.shutdown()
 
@@ -230,7 +253,11 @@ class SvcHub(object):
         if self.stopping:
             return
 
-        self.stop_req = True
+        if sig == signal.SIGUSR1:
+            self.reload_req = True
+        else:
+            self.stop_req = True
+
         with self.stop_cond:
             self.stop_cond.notify_all()
 

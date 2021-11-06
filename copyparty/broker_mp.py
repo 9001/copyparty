@@ -62,6 +62,11 @@ class BrokerMp(object):
 
             procs.pop()
 
+    def reload(self):
+        self.log("broker", "forwarding reload event")
+        for _, proc in enumerate(self.procs):
+            proc.q_pend.put([0, "reload", []])
+
     def collector(self, proc):
         """receive message from hub in other process"""
         while True:
