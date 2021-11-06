@@ -2002,7 +2002,10 @@ class Up2k(object):
 
     def _snap_reg(self, ptop, reg):
         now = time.time()
-        histpath = self.asrv.vfs.histtab[ptop]
+        histpath = self.asrv.vfs.histtab.get(ptop)
+        if not histpath:
+            return
+
         rm = [x for x in reg.values() if now - x["poke"] > self.snap_discard_interval]
         if rm:
             m = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
