@@ -196,7 +196,7 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
 	'	<a href="#" class="tgl btn" id="filetree" tt="toggle folder-tree / textfiles$NHotkey: V">📃</a>\n' +
 	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
-	'	<a href="#" class="tgl btn" id="parpane" tt="show parent folders in a docked pane at the top">▀</a>\n' +
+	'	<a href="#" class="tgl btn" id="parpane" tt="show parent folders in a docked pane at the top">📌</a>\n' +
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +
@@ -2901,7 +2901,7 @@ function tree_up() {
 
 document.onkeydown = function (e) {
 	var ae = document.activeElement, aet = '';
-	if (ae && ae != document.body)
+	if (ae && ae != document.body && ae.tagName != 'PRE')
 		aet = ae.nodeName.toLowerCase();
 
 	if (e.altKey || e.isComposing)
@@ -3412,8 +3412,8 @@ var treectl = (function () {
 			compy();
 		}
 
-		if (!r.parpane || !r.pdir.length || y > r.pdir.slice(-1)[0][0] || y < r.pdir[0][0]) {
-			parp.style.display = 'none';
+		if (!r.parpane || !r.pdir.length || y >= r.pdir.slice(-1)[0][0] || y <= r.pdir[0][0]) {
+			clmod(parp, 'off', 1);
 			r.pdirh = null;
 		}
 		else {
@@ -3431,7 +3431,7 @@ var treectl = (function () {
 			if (h1 != r.pdirh) {
 				r.pdirh = h1;
 				parp.innerHTML = h1;
-				parp.style.display = '';
+				clmod(parp, 'off');
 				var els = QSA('#treepar a');
 				for (var a = 0, aa = els.length; a < aa; a++)
 					els[a].onclick = bad_proxy;

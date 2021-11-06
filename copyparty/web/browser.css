@@ -23,7 +23,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
-pre, code, tt, #doc, #doc code {
+pre, code, tt, #doc, #doc>code {
 	font-family: 'scp', monospace, monospace;
 }
 #path,
@@ -681,6 +681,9 @@ input.eq_gain {
 	border-bottom: 1px solid #444;
 	overflow: hidden;
 }
+#treepar.off {
+	display: none;
+}
 #tree, #treeh {
 	border-radius: 0 .3em 0 0;
 }
@@ -1023,13 +1026,14 @@ html.light #rui {
 #doc.prism {
 	padding-left: 3em;
 }
-#doc code {
+#doc>code {
 	background: none;
 	box-shadow: none;
 	z-index: 1;
 }
 #doc.mdo {
 	white-space: normal;
+	font-family: sans-serif;
 }
 #doc.prism * {
 	line-height: 1.5em;

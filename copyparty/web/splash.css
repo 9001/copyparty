@@ -52,6 +52,7 @@ table {
 .vols th {
 	padding: .3em .6em;
 	text-align: left;
+	white-space: nowrap;
 }
 .num {
 	border-right: 1px solid #bbb;
