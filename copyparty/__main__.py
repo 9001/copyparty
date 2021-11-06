@@ -521,7 +521,7 @@ def main(argv=None):
             supp = args_from_cfg(v)
             argv.extend(supp)
 
-    deprecated = [["-e2s", "-e2ds"]]
+    deprecated = []
     for dk, nk in deprecated:
         try:
             idx = argv.index(dk)
