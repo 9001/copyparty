@@ -1067,7 +1067,7 @@ var mpui = (function () {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration;
 
-			if (pos > 0 && pos > len - 10) {
+			if (pos > 0 && pos > len - 20) {
 				preloaded = mp.au.src;
 				try {
 					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]]);
