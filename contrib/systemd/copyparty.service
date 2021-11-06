@@ -20,11 +20,8 @@
 #   python disabling line-buffering, so messages are out-of-order:
 #   https://user-images.githubusercontent.com/241032/126040249-cb535cc7-c599-4931-a796-a5d9af691bad.png
 #
-# enable line-buffering for realtime logging (slight performance cost):
-#   modify ExecStart and prefix it with `/usr/bin/stdbuf -oL` like so:
-#   ExecStart=/usr/bin/stdbuf -oL /usr/bin/python3 [...]
-# but some systemd versions require this instead (higher performance cost):
-#   inside the [Service] block, add the following line:
+# if you remove -q to enable logging, you may also want to remove the
+#   following line to enable buffering (slightly better performance):
 #   Environment=PYTHONUNBUFFERED=x
 
 [Unit]
@@ -33,8 +30,10 @@ Description=copyparty file server
 [Service]
 Type=notify
 SyslogIdentifier=copyparty
-ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -p 80,443,3923 -v /mnt::rw
+Environment=PYTHONUNBUFFERED=x
+ExecReload=/bin/kill -s USR1 $MAINPID
 ExecStartPre=/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
+ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -p 80,443,3923 -v /mnt::rw
 
 [Install]
 WantedBy=multi-user.target
