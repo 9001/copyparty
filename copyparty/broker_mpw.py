@@ -70,8 +70,9 @@ class MpWorker(object):
                 return
 
             elif dest == "reload":
-                self.logw("mpw reloading")
+                self.logw("mpw.asrv reloading")
                 self.asrv.reload()
+                self.logw("mpw.asrv reloaded")
 
             elif dest == "listen":
                 self.httpsrv.listen(args[0], args[1])

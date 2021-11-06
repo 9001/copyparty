@@ -67,7 +67,11 @@ class U2idx(object):
         if cur:
             return cur
 
-        histpath = self.asrv.vfs.histtab[ptop]
+        histpath = self.asrv.vfs.histtab.get(ptop)
+        if not histpath:
+            self.log("no histpath for [{}]".format(ptop))
+            return None
+
         db_path = os.path.join(histpath, "up2k.db")
         if not bos.path.exists(db_path):
             return None

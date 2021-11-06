@@ -154,7 +154,11 @@ class ThumbSrv(object):
             return not self.nthr
 
     def get(self, ptop, rem, mtime, fmt):
-        histpath = self.asrv.vfs.histtab[ptop]
+        histpath = self.asrv.vfs.histtab.get(ptop)
+        if not histpath:
+            self.log("no histpath for [{}]".format(ptop))
+            return None
+
         tpath = thumb_path(histpath, rem, mtime, fmt)
         abspath = os.path.join(ptop, rem)
         cond = threading.Condition(self.mutex)

@@ -68,6 +68,7 @@ class Up2k(object):
         self.tagq = Queue()
         self.n_hashq = 0
         self.n_tagq = 0
+        self.gid = 0
         self.volstate = {}
         self.need_rescan = {}
         self.dupesched = {}
@@ -113,6 +114,12 @@ class Up2k(object):
         t = threading.Thread(target=self.deferred_init, name="up2k-deferred-init")
         t.daemon = True
         t.start()
+
+    def reload(self):
+        self.gid += 1
+        self.log("reload #{} initiated".format(self.gid))
+        all_vols = self.asrv.vfs.all_vols
+        self.rescan(all_vols, list(all_vols.keys()), True)
 
     def deferred_init(self):
         all_vols = self.asrv.vfs.all_vols
@@ -168,15 +175,15 @@ class Up2k(object):
         }
         return json.dumps(ret, indent=4)
 
-    def rescan(self, all_vols, scan_vols):
-        if hasattr(self, "pp"):
+    def rescan(self, all_vols, scan_vols, wait):
+        if not wait and hasattr(self, "pp"):
             return "cannot initiate; scan is already in progress"
 
         args = (all_vols, scan_vols)
         t = threading.Thread(
             target=self.init_indexes,
             args=args,
-            name="up2k-rescan-{}".format(scan_vols[0]),
+            name="up2k-rescan-{}".format(scan_vols[0] if scan_vols else "all"),
         )
         t.daemon = True
         t.start()
@@ -194,6 +201,10 @@ class Up2k(object):
 
             now = time.time()
             if now < cooldown:
+                continue
+
+            if hasattr(self, "pp"):
+                cooldown = now + 5
                 continue
 
             timeout = now + 9001
@@ -217,7 +228,7 @@ class Up2k(object):
 
             if vols:
                 cooldown = now + 10
-                err = self.rescan(self.asrv.vfs.all_vols, vols)
+                err = self.rescan(self.asrv.vfs.all_vols, vols, False)
                 if err:
                     for v in vols:
                         self.need_rescan[v] = True
@@ -299,6 +310,16 @@ class Up2k(object):
         return True, ret
 
     def init_indexes(self, all_vols, scan_vols=None):
+        gid = self.gid
+        while hasattr(self, "pp") and gid == self.gid:
+            time.sleep(0.1)
+
+        if gid != self.gid:
+            return
+
+        if gid:
+            self.log("reload #{} running".format(self.gid))
+
         self.pp = ProgressPrinter()
         vols = all_vols.values()
         t0 = time.time()
@@ -429,7 +450,11 @@ class Up2k(object):
         return have_e2d
 
     def register_vpath(self, ptop, flags):
-        histpath = self.asrv.vfs.histtab[ptop]
+        histpath = self.asrv.vfs.histtab.get(ptop)
+        if not histpath:
+            self.log("no histpath for [{}]".format(ptop))
+            return None
+
         db_path = os.path.join(histpath, "up2k.db")
         if ptop in self.registry:
             try:
@@ -797,10 +822,11 @@ class Up2k(object):
         return ret
 
     def _run_all_mtp(self):
+        gid = self.gid
         t0 = time.time()
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
-                self._run_one_mtp(ptop)
+                self._run_one_mtp(ptop, gid)
 
         td = time.time() - t0
         msg = "mtp finished in {:.2f} sec ({})"
@@ -811,7 +837,10 @@ class Up2k(object):
             if "OFFLINE" not in self.volstate[k]:
                 self.volstate[k] = "online, idle"
 
-    def _run_one_mtp(self, ptop):
+    def _run_one_mtp(self, ptop, gid):
+        if gid != self.gid:
+            return
+
         entags = self.entags[ptop]
 
         parsers = {}
@@ -844,6 +873,9 @@ class Up2k(object):
         in_progress = {}
         while True:
             with self.mutex:
+                if gid != self.gid:
+                    break
+
                 q = "select w from mt where k = 't:mtp' limit ?"
                 warks = cur.execute(q, (batch_sz,)).fetchall()
                 warks = [x[0] for x in warks]
@@ -1960,7 +1992,8 @@ class Up2k(object):
         self.snap_prev = {}
         while True:
             time.sleep(self.snap_persist_interval)
-            self.do_snapshot()
+            if not hasattr(self, "pp"):
+                self.do_snapshot()
 
     def do_snapshot(self):
         with self.mutex:

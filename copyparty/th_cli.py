@@ -9,13 +9,17 @@ from .bos import bos
 
 
 class ThumbCli(object):
-    def __init__(self, broker):
-        self.broker = broker
-        self.args = broker.args
-        self.asrv = broker.asrv
+    def __init__(self, hsrv):
+        self.broker = hsrv.broker
+        self.log_func = hsrv.log
+        self.args = hsrv.args
+        self.asrv = hsrv.asrv
 
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
+
+    def log(self, msg, c=0):
+        self.log_func("thumbcli", msg, c)
 
     def get(self, ptop, rem, mtime, fmt):
         ext = rem.rsplit(".")[-1].lower()
@@ -48,7 +52,11 @@ class ThumbCli(object):
             if self.args.th_no_webp or ((is_vid or is_au) and self.args.th_ff_jpg):
                 fmt = "j"
 
-        histpath = self.asrv.vfs.histtab[ptop]
+        histpath = self.asrv.vfs.histtab.get(ptop)
+        if not histpath:
+            self.log("no histpath for [{}]".format(ptop))
+            return None
+
         tpath = thumb_path(histpath, rem, mtime, fmt)
         ret = None
         try:

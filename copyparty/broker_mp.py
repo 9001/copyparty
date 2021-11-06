@@ -63,7 +63,7 @@ class BrokerMp(object):
             procs.pop()
 
     def reload(self):
-        self.log("broker", "forwarding reload event")
+        self.log("broker", "reloading")
         for _, proc in enumerate(self.procs):
             proc.q_pend.put([0, "reload", []])
 

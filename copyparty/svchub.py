@@ -235,6 +235,7 @@ class SvcHub(object):
         self.log("root", "reload scheduled")
         with self.up2k.mutex:
             self.asrv.reload()
+            self.up2k.reload()
             self.broker.reload()
 
         self.reloading = False
@@ -244,8 +245,10 @@ class SvcHub(object):
             with self.stop_cond:
                 self.stop_cond.wait(9001)
 
-            if self.reload_req and not self.reloading:
-                self.reload()
+            if self.reload_req:
+                self.reload_req = False
+                if not self.reloading:
+                    self.reload()
 
         self.shutdown()
 
