@@ -2439,6 +2439,7 @@ var showfile = (function () {
 		qsr('#doc');
 		var el = mknod('pre');
 		el.setAttribute('id', 'doc');
+		el.setAttribute('tabindex', '0');
 		clmod(ebi('wrap'), 'doc', !is_md);
 		if (is_md) {
 			show_md(txt, name, el);
@@ -2901,7 +2902,7 @@ function tree_up() {
 
 document.onkeydown = function (e) {
 	var ae = document.activeElement, aet = '';
-	if (ae && ae != document.body && ae.tagName != 'PRE')
+	if (ae && ae != document.body)
 		aet = ae.nodeName.toLowerCase();
 
 	if (e.altKey || e.isComposing)
@@ -2945,7 +2946,19 @@ document.onkeydown = function (e) {
 		}
 	}
 
-	if (aet && aet != 'a' && aet != 'tr')
+	if (ae.closest('pre')) {
+		if (k == 'KeyA' && ctrl(e)) {
+			var sel = document.getSelection(),
+				ran = document.createRange();
+
+			sel.removeAllRanges();
+			ran.selectNode(ae.closest('pre'));
+			sel.addRange(ran);
+			return ev(e);
+		}
+	}
+
+	if (aet && aet != 'a' && aet != 'tr' && aet != 'pre')
 		return;
 
 	if (ctrl(e)) {
@@ -4621,14 +4634,17 @@ function show_md(md, name, div, url, depth) {
 			breaks: true,
 			gfm: true
 		});
-		var links = QSA('#epi a');
-		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = links[a].getAttribute('href');
+		var els = QSA('#epi a');
+		for (var a = 0, aa = els.length; a < aa; a++) {
+			var href = els[a].getAttribute('href');
 			if (!href.startsWith('#'))
 				continue;
 
-			links[a].setAttribute('href', '#md-' + href.slice(1));
+			els[a].setAttribute('href', '#md-' + href.slice(1));
 		}
+		els = QSA('pre');
+		for (var a = 0, aa = els.length; a < aa; a++)
+			els[a].setAttribute('tabindex', '0');
 	}
 	catch (ex) {
 		toast.warn(10, errmsg + ex);
