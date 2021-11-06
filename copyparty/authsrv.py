@@ -613,7 +613,7 @@ class AuthSrv(object):
         if uname == "":
             uname = "*"
 
-        for un in uname.split(","):
+        for un in uname.replace(",", " ").strip().split():
             if "r" in lvl:
                 axs.uread[un] = 1
 
