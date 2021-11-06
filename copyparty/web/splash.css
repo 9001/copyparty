@@ -29,15 +29,17 @@ a {
 	border-radius: .2em;
 	padding: .2em .8em;
 }
+a+a {
+	margin-left: .5em;
+}
 .refresh,
 .logout {
 	float: right;
-	margin-top: -.2em;
+	margin: -.2em 0 0 .5em;
 }
 .logout {
 	color: #c04;
 	border-color: #c7a;
-	margin-right: .5em;
 }
 #repl {
 	border: none;

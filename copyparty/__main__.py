@@ -423,6 +423,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--lf-url", metavar="RE", type=u, default=r"^/\.cpr/|\?th=[wj]$", help="dont log URLs matching")
 
     ap2 = ap.add_argument_group('admin panel options')
+    ap2.add_argument("--no-reload", action="store_true", help="disable ?reload=cfg (reload users/volumes/volflags from config file)")
     ap2.add_argument("--no-rescan", action="store_true", help="disable ?scan (volume reindexing)")
     ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks)")
 

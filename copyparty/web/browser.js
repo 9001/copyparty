@@ -195,8 +195,8 @@ ebi('tree').innerHTML = (
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
 	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
 	'	<a href="#" class="tgl btn" id="filetree" tt="toggle folder-tree / textfiles$NHotkey: V">📃</a>\n' +
-	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
 	'	<a href="#" class="tgl btn" id="parpane" tt="show parent folders in a docked pane at the top">📌</a>\n' +
+	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
 	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
 	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
 	'</div>\n' +

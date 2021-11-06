@@ -419,6 +419,9 @@ class HttpCli(object):
             return self.scanvol()
 
         if not self.vpath:
+            if "reload" in self.uparam:
+                return self.handle_reload()
+
             if "stack" in self.uparam:
                 return self.tx_stack()
 
@@ -1723,6 +1726,20 @@ class HttpCli(object):
             return ""
 
         raise Pebkac(500, x)
+
+    def handle_reload(self):
+        act = self.uparam.get("reload")
+        if act != "cfg":
+            raise Pebkac(400, "only config files ('cfg') can be reloaded rn")
+
+        if not [x for x in self.wvol if x in self.rvol]:
+            raise Pebkac(403, "not allowed for user " + self.uname)
+
+        if self.args.no_reload:
+            raise Pebkac(403, "the reload feature is disabled in server config")
+
+        x = self.conn.hsrv.broker.put(True, "reload")
+        return self.redirect("", "?h", x.get(), "return to", False)
 
     def tx_stack(self):
         if not [x for x in self.wvol if x in self.rvol]:

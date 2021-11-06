@@ -49,7 +49,8 @@
             </table>
         </td></tr></table>
         <div class="btns">
-            <a href="/?stack">dump stack</a>
+            <a href="/?stack" tt="shows the state of all active threads">dump stack</a>
+            <a href="/?reload=cfg" tt="reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes">reload cfg</a>
         </div>
         {%- endif %}
 
@@ -88,5 +89,6 @@ if (localStorage.lightmode != 1)
 
 </script>
 <script src="/.cpr/util.js?_={{ ts }}"></script>
+<script>tt.init();</script>
 </body>
 </html>

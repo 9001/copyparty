@@ -226,10 +226,14 @@ class SvcHub(object):
             self.stop_thr()
 
     def reload(self):
+        if self.reloading:
+            return "cannot reload; already in progress"
+
         self.reloading = True
         t = threading.Thread(target=self._reload)
         t.daemon = True
         t.start()
+        return "reload initiated"
 
     def _reload(self):
         self.log("root", "reload scheduled")
@@ -247,8 +251,7 @@ class SvcHub(object):
 
             if self.reload_req:
                 self.reload_req = False
-                if not self.reloading:
-                    self.reload()
+                self.reload()
 
         self.shutdown()
 
