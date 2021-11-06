@@ -748,6 +748,11 @@ input.eq_gain {
 #tree li:last-child {
 	border-bottom: none;
 }
+#tree ul a.sel {
+	background: #111;
+	box-shadow: -.8em 0 0 #c37 inset;
+	color: #fff;
+}
 #tree ul a.hl {
 	color: #400;
 	background: #fc4;
@@ -1052,6 +1057,10 @@ html.light #doc .line-highlight {
 }
 #tree #docul a {
 	display: block;
+}
+#seldoc.sel {
+	color: #fff;
+	background: #925;
 }
 #pvol,
 #barbuf,

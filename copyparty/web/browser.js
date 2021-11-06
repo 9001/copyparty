@@ -2489,11 +2489,34 @@ var showfile = (function () {
 
 	r.updtree = function () {
 		var fn = QS('#path span:last-child'),
-			lis = QSA('#docul li a');
+			lis = QSA('#docul li a'),
+			sels = msel.getsel(),
+			actsel = false;
 
 		fn = fn ? fn.textContent : '';
-		for (var a = 0, aa = lis.length; a < aa; a++)
-			clmod(lis[a], 'hl', lis[a].textContent == fn);
+		for (var a = 0, aa = lis.length; a < aa; a++) {
+			var lin = lis[a].textContent,
+				sel = false;
+
+			for (var b = 0; b < sels.length; b++)
+				if (vsplit(sels[b].vp)[1] == lin)
+					sel = true;
+
+			clmod(lis[a], 'hl', lin == fn);
+			clmod(lis[a], 'sel', sel);
+			if (lin == fn && sel)
+				actsel = true;
+		}
+		clmod(ebi('seldoc'), 'sel', actsel);
+	};
+
+	r.tglsel = function () {
+		var fn = ebi('docname').textContent;
+		for (var a = 0; a < r.files.length; a++)
+			if (r.files[a].name == fn)
+				clmod(ebi(r.files[a].id).closest('tr'), 'sel', 't');
+
+		msel.selui();
 	};
 
 	var bdoc = ebi('bdoc');
@@ -2504,6 +2527,7 @@ var showfile = (function () {
 		'<a href="#" class="btn" id="dldoc" tt="download this file">💾 download</a>\n' +
 		'<a href="#" class="btn" id="prevdoc" tt="show previous document$NHotkey: i">⬆ prev</a>\n' +
 		'<a href="#" class="btn" id="nextdoc" tt="show next document$NHotkey: K">⬇ next</a>\n' +
+		'<a href="#" class="btn" id="seldoc" tt="file is selected$NHotkey: S">sel</a>\n' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
@@ -2512,6 +2536,7 @@ var showfile = (function () {
 	ebi('dldoc').setAttribute('download', '');
 	ebi('prevdoc').onclick = function () { tree_neigh(-1); };
 	ebi('nextdoc').onclick = function () { tree_neigh(1); };
+	ebi('seldoc').onclick = r.tglsel;
 
 	return r;
 })();
@@ -2867,7 +2892,7 @@ function tree_neigh(n) {
 	}
 	var act = -1;
 	for (var a = 0, aa = links.length; a < aa; a++) {
-		if (links[a].getAttribute('class') == 'hl') {
+		if (clgot(links[a], 'hl')) {
 			act = a;
 			break;
 		}
@@ -3038,6 +3063,11 @@ document.onkeydown = function (e) {
 
 		if (k == 'KeyD')
 			return QSA('#ghead a[z]')[1].click();
+	}
+
+	if (showfile.active()) {
+		if (k == 'KeyS')
+			showfile.tglsel();
 	}
 };
 
@@ -4455,6 +4485,7 @@ var msel = (function () {
 		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
 		thegrid.loadsel();
 		fileman.render();
+		showfile.updtree();
 	}
 	r.seltgl = function (e) {
 		ev(e);

@@ -331,7 +331,7 @@ window.baguetteBox = (function () {
 
     function tglsel() {
         var thumb = currentGallery[currentIndex].imageElement,
-            name = vsplit(thumb.href)[1],
+            name = vsplit(thumb.href)[1].split('?')[0],
             files = msel.getall();
 
         for (var a = 0; a < files.length; a++)
@@ -345,7 +345,7 @@ window.baguetteBox = (function () {
     function selbg() {
         var img = vidimg(),
             thumb = currentGallery[currentIndex].imageElement,
-            name = vsplit(thumb.href)[1],
+            name = vsplit(thumb.href)[1].split('?')[0],
             files = msel.getsel(),
             sel = false;
 
