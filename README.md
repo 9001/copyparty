@@ -46,7 +46,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
-* [server config](#server-config)
+* [server config](#server-config) - using arguments or config files, or a mix of both
     * [file indexing](#file-indexing)
     * [upload rules](#upload-rules) - set upload rules using volume flags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
@@ -159,7 +159,7 @@ feature summary
 * browser
   * ☑ [navpane](#navpane) (directory tree sidebar)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
-  * ☑ audio player (with OS media controls)
+  * ☑ audio player (with OS media controls and opus transcoding)
   * ☑ image gallery with webm player
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow
@@ -224,6 +224,7 @@ some improvement ideas
 * Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
 * Windows: python 2.7 cannot handle filenames with mojibake
 * `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions (macos, some linux)
+* `--th-ff-swr` may fix audio thumbnails on some FFmpeg versions
 
 ## general bugs
 
@@ -310,6 +311,7 @@ the browser has the following hotkeys  (always qwerty)
 * `B` toggle breadcrumbs / [navpane](#navpane)
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
+* `V` toggle folders / textfiles in the navpane
 * `G` toggle list / [grid view](#thumbnails)
 * `T` toggle thumbnails / icons
 * `ctrl-X` cut selected files/folders
@@ -321,6 +323,10 @@ the browser has the following hotkeys  (always qwerty)
   * ctrl+`Up/Down` move cursor and scroll viewport
   * `Space` toggle file selection
   * `Ctrl-A` toggle select all
+* when a textfile is open:
+  * `I/K` prev/next textfile
+  * `S` toggle selection of open file
+  * `M` close textfile
 * when playing audio:
   * `J/L` prev/next song
   * `U/O` skip 10sec back/forward
@@ -371,6 +377,8 @@ press `g` to toggle grid-view instead of the file listing,  and `t` toggles icon
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
 it does static images with Pillow and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
+
+audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
 
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
 
@@ -583,6 +591,10 @@ add the argument `-e2ts` to also scan/index tags from music files, which brings 
 
 
 # server config
+
+using arguments or config files, or a mix of both:
+* config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf)
+
 
 ## file indexing
 
@@ -952,8 +964,12 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?zip=utf-8` | download everything below URL as a zip file |
 | GET | `?ups` | show recent uploads from your IP |
 | GET | `?ups&filter=f` | ...where URL contains `f` |
+| GET | `?mime=foo` | specify return mimetype `foo` |
 | GET | `?raw` | get markdown file at URL as plaintext |
+| GET | `?txt` | get file at URL as plaintext |
+| GET | `?txt=iso-8859-1` | ...with specific charset |
 | GET | `?th` | get image/video at URL as thumbnail |
+| GET | `?th=opus` | convert audio file to 128kbps opus |
 
 | method | body | result |
 |--|--|--|
@@ -988,6 +1004,7 @@ server behavior of `msg` can be reconfigured with `--urlform`
 
 | method | params | result |
 |--|--|--|
+| GET | `?reload=cfg` | reload config files and rescan volumes |
 | GET | `?scan` | initiate a rescan of the volume which provides URL |
 | GET | `?stack` | show a stacktrace of all threads |
 
@@ -1014,7 +1031,7 @@ enable music tags:
 
 enable [thumbnails](#thumbnails) of...
 * **images:** `Pillow` (requires py2.7 or py3.5+)
-* **videos:** `ffmpeg` and `ffprobe` somewhere in `$PATH`
+* **videos/audio:** `ffmpeg` and `ffprobe` somewhere in `$PATH`
 * **HEIF pictures:** `pyheif-pillow-opener` (requires Linux or a C compiler)
 * **AVIF pictures:** `pillow-avif-plugin`
 
@@ -1055,6 +1072,7 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 the features you can opt to drop are
 * `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files, saves ~192k
 * `cm`/easymde, the "fancy" markdown editor, saves ~92k
+* `hl`, prism, the syntax hilighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
 * `dd`, the custom mouse cursor for the media player tray tab, saves ~2k
 

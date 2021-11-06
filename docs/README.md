@@ -29,7 +29,7 @@ point `--css-browser` to one of these by URL:
 * notes on using rclone as a fuse client/server
 
 ## [`example.conf`](example.conf)
-* example config file for `-c` (supports accounts, volumes, and volume-flags)
+* example config file for `-c`
 
 
 
