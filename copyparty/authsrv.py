@@ -546,6 +546,7 @@ class AuthSrv(object):
 
     def _parse_config_file(self, fd, acct, daxs, mflags, mount):
         # type: (any, str, dict[str, AXS], any, str) -> None
+        skip = False
         vol_src = None
         vol_dst = None
         self.line_ctr = 0
@@ -555,6 +556,11 @@ class AuthSrv(object):
                 vol_src = None
                 vol_dst = None
 
+            if skip:
+                if not ln:
+                    skip = False
+                continue
+
             if not ln or ln.startswith("#"):
                 continue
 
@@ -562,6 +568,8 @@ class AuthSrv(object):
                 if ln.startswith("u "):
                     u, p = ln[2:].split(":", 1)
                     acct[u] = p
+                elif ln.startswith("-"):
+                    skip = True  # argv
                 else:
                     vol_src = ln
                 continue

@@ -186,6 +186,32 @@ def configure_ssl_ciphers(al):
         sys.exit(0)
 
 
+def args_from_cfg(cfg_path):
+    ret = []
+    skip = False
+    with open(cfg_path, "rb") as f:
+        for ln in [x.decode("utf-8").strip() for x in f]:
+            if not ln:
+                skip = False
+                continue
+
+            if ln.startswith("#"):
+                continue
+
+            if not ln.startswith("-"):
+                continue
+
+            if skip:
+                continue
+
+            try:
+                ret.extend(ln.split(" ", 1))
+            except:
+                ret.append(ln)
+
+    return ret
+
+
 def sighandler(sig=None, frame=None):
     msg = [""] * 5
     for th in threading.enumerate():
@@ -489,6 +515,11 @@ def main(argv=None):
     ensure_locale()
     if HAVE_SSL:
         ensure_cert()
+
+    for k, v in zip(argv, argv[1:]):
+        if k == "-c":
+            supp = args_from_cfg(v)
+            argv.extend(supp)
 
     deprecated = [["-e2s", "-e2ds"]]
     for dk, nk in deprecated:
