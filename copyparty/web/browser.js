@@ -2859,7 +2859,7 @@ function tree_neigh(n) {
 		treectl.dir_cb = function () {
 			tree_neigh(n);
 		};
-		treectl.entree();
+		treectl.entree(null, true);
 		return;
 	}
 	var act = -1;
@@ -2890,7 +2890,7 @@ function tree_up() {
 	var act = QS('#treeul a.hl');
 	if (!act) {
 		treectl.dir_cb = tree_up;
-		treectl.entree();
+		treectl.entree(null, true);
 		return;
 	}
 	if (act.previousSibling.textContent == '-')
@@ -3339,10 +3339,11 @@ var treectl = (function () {
 	}
 	setwrap(r.wtree);
 
-	r.entree = function (e) {
+	r.entree = function (e, nostore) {
 		ev(e);
 		entreed = true;
-		swrite('entreed', 'tree');
+		if (!nostore)
+			swrite('entreed', 'tree');
 
 		get_tree("", get_evpath(), true);
 		r.show();
@@ -3875,9 +3876,11 @@ var treectl = (function () {
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
 
-	var cs = sread('entreed');
-	if ((is_touch && cs == 'tree') || (!is_touch && cs != 'na'))
-		r.entree();
+	var cs = sread('entreed'),
+		vw = window.innerWidth / parseFloat(getComputedStyle(document.body)['font-size']);
+
+	if (cs == 'tree' || (cs != 'na' && vw >= 60))
+		r.entree(null, true);
 
 	window.onpopstate = function (e) {
 		console.log("h-pop " + e.state);
