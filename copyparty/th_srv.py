@@ -362,7 +362,13 @@ class ThumbSrv(object):
             raise Exception("not audio")
 
         fc = "[0:a:0]aresample=48000{},showspectrumpic=s=640x512,crop=780:544:70:50[o]"
-        fc = fc.format("" if self.args.th_ff_swr else ":resampler=soxr")
+
+        if self.args.th_ff_swr:
+            fco = ":filter_size=128:cutoff=0.877"
+        else:
+            fco = ":resampler=soxr"
+
+        fc = fc.format(fco)
 
         # fmt: off
         cmd = [
