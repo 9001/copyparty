@@ -314,6 +314,7 @@ var mpl = (function () {
 	ebi('op_player').innerHTML = (
 		'<div><h3>switches</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="start loading the next song near the end for gapless playback">preload</a>' +
+		'<a href="#" class="tgl btn" id="au_fullpre" tt="try to preload the entire song;$N✔️ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably">full</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np clip</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="os integration (media hotkeys / osd)">os-ctl</a>' +
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="show album cover in osd">osd-cv</a>' +
@@ -343,6 +344,7 @@ var mpl = (function () {
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 	};
 	bcfg_bind(r, 'preload', 'au_preload', true);
+	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
 	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
@@ -587,8 +589,25 @@ function MPlayer() {
 	}
 
 	r.preload = function (url) {
-		var au = null;
 		url = mpl.acode(url);
+		url += url.indexOf('?') < 0 ? '?cache' : '&cache';
+		if (mpl.fullpre)
+			return fetch(url).then(function (x) {
+				var rd = x.body.getReader(), n = 0;
+				function drop(x) {
+					if (x && x.value && x.value.length)
+						n += x.value.length;
+
+					if (n >= 128 * 1024 * 1024)
+						return console.log('aborting preload at 128 MiB');
+
+					if (!x || !x.done)
+						return rd.read().then(drop);
+				}
+				drop();
+			});
+
+		var au = null;
 		if (need_ogv_for(url)) {
 			au = mp.au_ogvjs2;
 			if (!au && window['OGVPlayer']) {
@@ -604,9 +623,8 @@ function MPlayer() {
 				r.au_native2 = au;
 			}
 		}
-		if (au) {
-			au.src = url + (url.indexOf('?') < 0 ? '?cache' : '&cache');
-		}
+		if (au)
+			au.src = url;
 	};
 }
 
@@ -1067,7 +1085,7 @@ var mpui = (function () {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration;
 
-			if (pos > 0 && pos > len - 20) {
+			if (pos > 0 && pos > len - (mpl.fullpre ? 40 : 20)) {
 				preloaded = mp.au.src;
 				try {
 					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]]);
