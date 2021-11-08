@@ -1065,13 +1065,14 @@ pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `
 reduce the size of an sfx by removing features
 
 if you don't need all the features, you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except if you're on windows then you need msys2 or WSL)
-* `525k` size of original sfx.py as of v0.11.30
-* `315k` after `./scripts/make-sfx.sh re no-ogv`
-* `223k` after `./scripts/make-sfx.sh re no-ogv no-cm`
+* `584k` size of original sfx.py as of v1.1.0
+* `392k` after `./scripts/make-sfx.sh re no-ogv`
+* `310k` after `./scripts/make-sfx.sh re no-ogv no-cm`
+* `269k` after `./scripts/make-sfx.sh re no-ogv no-cm no-hl`
 
 the features you can opt to drop are
 * `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files, saves ~192k
-* `cm`/easymde, the "fancy" markdown editor, saves ~92k
+* `cm`/easymde, the "fancy" markdown editor, saves ~82k
 * `hl`, prism, the syntax hilighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
 * `dd`, the custom mouse cursor for the media player tray tab, saves ~2k

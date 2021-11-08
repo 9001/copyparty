@@ -19,7 +19,7 @@ help() { exec cat <<'EOF'
 # `no-ogv` saves ~192k by removing the opus/vorbis audio codecs
 #   (only affects apple devices; everything else has native support)
 #
-# `no-cm` saves ~92k by removing easymde/codemirror
+# `no-cm` saves ~82k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
 # `no-hl` saves ~41k by removing syntax hilighting in the text viewer
