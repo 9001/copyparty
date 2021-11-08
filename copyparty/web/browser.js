@@ -1808,7 +1808,7 @@ var fileman = (function () {
 
 	r.render = function () {
 		if (r.clip === null)
-			r.clip = jread('fman_clip', []);
+			r.clip = jread('fman_clip', []).slice(1);
 
 		var nsel = msel.getsel().length;
 		clmod(bren, 'en', nsel);
@@ -2169,7 +2169,7 @@ var fileman = (function () {
 			vps = [];
 
 		if (!sel.length)
-			return toast.err(3, 'select at least 1 item to cut');
+			toast.err(3, 'select at least 1 item to cut');
 
 		var els = [];
 		for (var a = 0; a < sel.length; a++) {
@@ -2186,13 +2186,15 @@ var fileman = (function () {
 		}, 1);
 
 		try {
-			vps = JSON.stringify(vps);
+			var stamp = Date.now();
+			vps = JSON.stringify([stamp].concat(vps));
 			if (vps.length > 1024 * 1024)
 				throw 'a';
 
 			swrite('fman_clip', vps);
-			r.tx(1);
-			toast.inf(1.5, 'cut ' + sel.length + ' items');
+			r.tx(stamp);
+			if (sel.length)
+				toast.inf(1.5, 'cut ' + sel.length + ' items');
 		}
 		catch (ex) {
 			toast.warn(30, 'cut ' + sel.length + ' items\n\nbut: only <b>this</b> browser-tab can paste them\n(since the selection is so absolutely massive)');
@@ -2266,15 +2268,28 @@ var fileman = (function () {
 
 		modal.confirm('paste these ' + req.length + ' items here?<ul>' + uricom_adec(req, true).join('') + '</ul>', function () {
 			paster();
-			jwrite('fman_clip', []);
+			jwrite('fman_clip', [Date.now()]);
 		}, null);
 	};
 
 	function onmsg(msg) {
 		r.clip = null;
-		r.render();
-		if (msg == get_evpath())
-			treectl.goto(msg);
+		var n = parseInt('' + msg), tries = 0;
+		var fun = function () {
+			if (n == msg && n > 1 && r.clip === null) {
+				var fc = jread('fman_clip', []);
+				if (!fc || !fc.length || fc[0] != n) {
+					if (++tries > 10)
+						return modal.alert('failed to read clipboard from other browser tab');
+
+					return setTimeout(fun, 100);
+				}
+			}
+			r.render();
+			if (msg == get_evpath())
+				treectl.goto(msg);
+		};
+		fun();
 	}
 
 	if (r.bus)
