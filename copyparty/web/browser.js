@@ -588,10 +588,10 @@ function MPlayer() {
 			setTimeout(fader, 10);
 	}
 
-	r.preload = function (url) {
+	r.preload = function (url, full) {
 		url = mpl.acode(url);
 		url += url.indexOf('?') < 0 ? '?cache' : '&cache';
-		if (mpl.fullpre)
+		if (full)
 			return fetch(url).then(function (x) {
 				var rd = x.body.getReader(), n = 0;
 				function drop(x) {
@@ -1045,7 +1045,8 @@ function playpause(e) {
 var mpui = (function () {
 	var r = {},
 		nth = 0,
-		preloaded = null;
+		preloaded = null,
+		fpreloaded = null;
 
 	r.progress_updater = function () {
 		timer.add(updater_impl, true);
@@ -1083,17 +1084,26 @@ var mpui = (function () {
 		// preload next song
 		if (mpl.preload && !mp.loading && preloaded != mp.au.src) {
 			var pos = mp.au.currentTime,
-				len = mp.au.duration;
+				len = mp.au.duration,
+				rem = pos > 0 ? len - pos : 999,
+				full = null;
 
-			if (pos > 0 && pos > len - (mpl.fullpre ? 40 : 20)) {
-				preloaded = mp.au.src;
+			if (rem < (mpl.fullpre ? 7 : 20)) {
+				preloaded = fpreloaded = mp.au.src;
+				full = false;
+			}
+			else if (rem < 40 && mpl.fullpre && fpreloaded != mp.au.src) {
+				fpreloaded = mp.au.src;
+				full = true;
+			}
+
+			if (full !== null)
 				try {
-					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]]);
+					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]], full);
 				}
 				catch (ex) {
 					console.log("preload failed", ex);
 				}
-			}
 		}
 
 		if (mp.au.paused)
