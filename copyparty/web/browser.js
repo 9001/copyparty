@@ -2511,6 +2511,7 @@ var showfile = (function () {
 
 		wr.appendChild(el);
 		wr.style.display = '';
+		set_tabindex();
 
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
@@ -4736,18 +4737,23 @@ function show_md(md, name, div, url, depth) {
 		var els = QSA('#epi a');
 		for (var a = 0, aa = els.length; a < aa; a++) {
 			var href = els[a].getAttribute('href');
-			if (!href.startsWith('#'))
+			if (!href.startsWith('#') || href.startsWith('#md-'))
 				continue;
 
 			els[a].setAttribute('href', '#md-' + href.slice(1));
 		}
-		els = QSA('pre');
-		for (var a = 0, aa = els.length; a < aa; a++)
-			els[a].setAttribute('tabindex', '0');
+		set_tabindex();
 	}
 	catch (ex) {
 		toast.warn(10, errmsg + ex);
 	}
+}
+
+
+function set_tabindex() {
+	var els = QSA('pre');
+	for (var a = 0, aa = els.length; a < aa; a++)
+		els[a].setAttribute('tabindex', '0');
 }
 
 
