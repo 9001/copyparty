@@ -122,7 +122,7 @@ ebi('op_up2k').innerHTML = (
 	'		<tr>\n' +
 	'			<td>filename</td>\n' +
 	'			<td>status</td>\n' +
-	'			<td>progress<a href="#" id="u2cleanup" tt="remove completed uploads$N(makes it possible to upload a file after searching for it)">cleanup</a></td>\n' +
+	'			<td>progress</td>\n' +
 	'		</tr>\n' +
 	'	</thead>\n' +
 	'	<tbody></tbody>\n' +

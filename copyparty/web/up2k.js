@@ -669,6 +669,7 @@ function up2k_init(subtle) {
 
     var st = {
         "files": [],
+        "seen": {},
         "todo": {
             "head": [],
             "hash": [],
@@ -994,12 +995,8 @@ function up2k_init(subtle) {
     }
 
     function up_them(good_files) {
-        var seen = {},
-            evpath = get_evpath(),
+        var evpath = get_evpath(),
             draw_each = good_files.length < 50;
-
-        for (var a = 0; a < st.files.length; a++)
-            seen[st.files[a].name + '\n' + st.files[a].size] = 1;
 
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
@@ -1026,15 +1023,20 @@ function up2k_init(subtle) {
                 "bytes_uploaded": 0,
                 "hash": []
             },
-                key = entry.name + '\n' + entry.size;
+                key = name + '\n' + entry.size + '\n' + lmod + '\n' + uc.fsearch;
 
             if (uc.fsearch)
                 entry.srch = 1;
 
-            if (seen[key])
-                continue;
+            try {
+                if (st.seen[fdir][key])
+                    continue;
+            }
+            catch (ex) {
+                st.seen[fdir] = {};
+            }
 
-            seen[key] = 1;
+            st.seen[fdir][key] = 1;
 
             pvis.addfile([
                 uc.fsearch ? esc(entry.name) : linksplit(
@@ -1066,20 +1068,6 @@ function up2k_init(subtle) {
         ebi('file' + fdom_ctr).onchange = gotfile;
     }
     more_one_file();
-
-    function u2cleanup(e) {
-        ev(e);
-        for (var a = 0; a < st.files.length; a++) {
-            var t = st.files[a];
-            if (t.done && t.name) {
-                if (!qsr('#f' + t.n))
-                    continue;
-
-                t.name = undefined;
-            }
-        }
-    }
-    ebi('u2cleanup').onclick = u2cleanup;
 
     var etaref = 0, etaskip = 0, op_minh = 0;
     function etafun() {
