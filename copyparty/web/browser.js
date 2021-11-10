@@ -1620,7 +1620,7 @@ function eval_hash() {
 
 	if (v.indexOf('#af-') === 0) {
 		var id = v.slice(2).split('&');
-		if (id[0].length != 10)
+		if (id[0].length < 10)
 			return;
 
 		if (id.length == 1)
@@ -3838,7 +3838,8 @@ var treectl = (function () {
 
 		var top = this.top,
 			nodes = res.dirs.concat(res.files),
-			html = mk_files_header(res.taglist);
+			html = mk_files_header(res.taglist),
+			seen = {};
 
 		showfile.files = [];
 		html.push('<tbody>');
@@ -3851,6 +3852,10 @@ var treectl = (function () {
 				sortv = (bhref.slice(-1) == '/' ? '\t' : '') + hname,
 				id = 'f-' + ('00000000' + crc32(fname)).slice(-8),
 				lang = showfile.getlang(fname);
+
+			while (seen[id])
+				id += 'a';
+			seen[id] = 1;
 
 			if (lang)
 				showfile.files.push({ 'id': id, 'name': fname });
@@ -4376,12 +4381,19 @@ function addcrc() {
 		'#files>tbody>tr>td:first-child+td>' + (
 			ebi('unsearch') ? 'div>a:last-child' : 'a'));
 
-	for (var a = 0, aa = links.length; a < aa; a++)
-		if (!links[a].getAttribute('id')) {
+	var seen = {};  // ejyefs ev69gg y9j8sg .opus
+	for (var a = 0, aa = links.length; a < aa; a++) {
+		var id = links[a].getAttribute('id');
+		if (!id) {
 			var crc = crc32(links[a].textContent || links[a].innerText);
-			crc = ('00000000' + crc).slice(-8);
-			links[a].setAttribute('id', 'f-' + crc);
+			id = 'f-' + ('00000000' + crc).slice(-8);
+			while (seen[id])
+				id += 'a';
+
+			links[a].setAttribute('id', id);
 		}
+		seen[id] = 1;
+	}
 }
 
 
