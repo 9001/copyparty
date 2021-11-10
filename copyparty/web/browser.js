@@ -591,15 +591,21 @@ function MPlayer() {
 	r.preload = function (url, full) {
 		url = mpl.acode(url);
 		url += url.indexOf('?') < 0 ? '?cache' : '&cache';
+		mpl.preload_url = full ? url : null;
 		if (full)
 			return fetch(url).then(function (x) {
 				var rd = x.body.getReader(), n = 0;
 				function drop(x) {
+					if (mpl.preload_url !== url) {
+						console.log('xhr-preload abandoned at ' + n + ' bytes for ' + url);
+						return rd.cancel();
+					}
+
 					if (x && x.value && x.value.length)
 						n += x.value.length;
 
 					if (n >= 128 * 1024 * 1024)
-						return console.log('aborting preload at 128 MiB');
+						return console.log('interrupting preload at 128 MiB for ' + url);
 
 					if (!x || !x.done)
 						return rd.read().then(drop);
@@ -1404,6 +1410,7 @@ function play(tid, is_ev, seek, call_depth) {
 	if (crashed)
 		return;
 
+	mpl.preload_url = null;
 	mp.stopfade(true);
 
 	var tn = tid;
@@ -4957,6 +4964,7 @@ function reload_mp() {
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
+	mpl.preload_url = null;
 	setTimeout(pbar.onresize, 1);
 }
 
