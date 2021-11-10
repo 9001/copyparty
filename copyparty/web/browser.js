@@ -2933,7 +2933,7 @@ function tree_scrolltoo(q) {
 
 
 function tree_neigh(n) {
-	var links = QSA(showfile.active() ? '#docul li>a' : '#treeul li>a+a');
+	var links = QSA(showfile.active() || treectl.texts ? '#docul li>a' : '#treeul li>a+a');
 	if (!links.length) {
 		treectl.dir_cb = function () {
 			tree_neigh(n);
@@ -2948,7 +2948,7 @@ function tree_neigh(n) {
 			break;
 		}
 	}
-	if (act == -1)
+	if (act == -1 && !treectl.texts)
 		return;
 
 	act += n;
