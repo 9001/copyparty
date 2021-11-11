@@ -2703,10 +2703,21 @@ var thegrid = (function () {
 	}
 	setsz();
 
-	function gclick(e) {
+	function gclick1(e) {
 		if (ctrl(e))
 			return true;
 
+		return gclick.bind(this)(e, false);
+	}
+
+	function gclick2(e) {
+		if (ctrl(e) || !r.sel)
+			return true;
+
+		return gclick.bind(this)(e, true);
+	}
+
+	function gclick(e, dbl) {
 		var oth = ebi(this.getAttribute('ref')),
 			href = noq_href(this),
 			aplay = ebi('a' + oth.getAttribute('id')),
@@ -2719,7 +2730,7 @@ var thegrid = (function () {
 		if (href.endsWith('/'))
 			in_tree = treectl.find(oth.textContent.slice(0, -1));
 
-		if (r.sel) {
+		if (r.sel && !dbl) {
 			td.click();
 			clmod(this, 'sel', clgot(tr, 'sel'));
 		}
@@ -2732,7 +2743,16 @@ var thegrid = (function () {
 		else if (!is_img && have_sel)
 			window.open(href, '_blank');
 
-		else return true;
+		else {
+			if (!dbl)
+				return true;
+
+			setTimeout(function () {
+				r.sel = true;
+			}, 1);
+			r.sel = false;
+			this.click();
+		}
 		ev(e);
 	}
 
@@ -2847,8 +2867,10 @@ var thegrid = (function () {
 		ebi('ggrid').innerHTML = html.join('\n');
 
 		var ths = QSA('#ggrid>a');
-		for (var a = 0, aa = ths.length; a < aa; a++)
-			ths[a].onclick = gclick;
+		for (var a = 0, aa = ths.length; a < aa; a++) {
+			ths[a].ondblclick = gclick2;
+			ths[a].onclick = gclick1;
+		}
 
 		r.dirty = false;
 		r.bagit();
