@@ -471,6 +471,19 @@ var mpl = (function () {
 		navigator.mediaSession.playbackState = "paused";
 	};
 
+	r.unbuffer = function (url) {
+		for (var a = 0; a < 2; a++) {
+			var au = a ? mp.au_native2 : mp.au_ogvjs2;
+			if (au && (!url || au.src == url)) {
+				au.src = '';
+				au.load();
+			}
+		}
+
+		if (!url)
+			mpl.preload_url = null;
+	}
+
 	return r;
 })();
 
@@ -592,23 +605,26 @@ function MPlayer() {
 		url = mpl.acode(url);
 		url += url.indexOf('?') < 0 ? '?cache' : '&cache';
 		mpl.preload_url = full ? url : null;
+		var t0 = Date.now();
 		if (full)
 			return fetch(url).then(function (x) {
 				var rd = x.body.getReader(), n = 0;
+				function spd() {
+					return humansize(n / ((Date.now() + 1 - t0) / 1000)) + '/s';
+				}
 				function drop(x) {
-					if (mpl.preload_url !== url) {
-						console.log('xhr-preload abandoned at ' + n + ' bytes for ' + url);
-						return rd.cancel();
-					}
+					if (x && x.done)
+						return console.log('xhr-preload finished, ' + spd());
 
 					if (x && x.value && x.value.length)
 						n += x.value.length;
 
-					if (n >= 128 * 1024 * 1024)
-						return console.log('interrupting preload at 128 MiB for ' + url);
+					if (mpl.preload_url !== url || n >= 128 * 1024 * 1024) {
+						console.log('xhr-preload aborted at ' + Math.floor(n / 1024) + ' KiB, ' + spd() + ' for ' + url);
+						return rd.cancel();
+					}
 
-					if (!x || !x.done)
-						return rd.read().then(drop);
+					return rd.read().then(drop);
 				}
 				drop();
 			});
@@ -1514,6 +1530,10 @@ function play(tid, is_ev, seek, call_depth) {
 		mp.loading = mp.au == mp.au_ogvjs;
 		mp.au.src = url;
 	}
+
+	setTimeout(function () {
+		mpl.unbuffer(url);
+	}, 500);
 
 	mp.au.tid = tid;
 	mp.au.volume = mp.expvol(mp.vol);
@@ -5003,8 +5023,8 @@ function reload_mp() {
 	for (var a = plays.length - 1; a >= 0; a--)
 		plays[a].parentNode.innerHTML = '-';
 
+	mpl.unbuffer();
 	mp = new MPlayer();
-	mpl.preload_url = null;
 	setTimeout(pbar.onresize, 1);
 }
 
