@@ -562,9 +562,9 @@ function fsearch_explain(n) {
         return toast.inf(60, 'your access to this folder is Read-Only\n\n' + (acct == '*' ? 'you are currently not logged in' : 'you are currently logged in as "' + acct + '"'));
 
     if (bcfg_get('fsearch', false))
-        return toast.inf(60, 'you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and then refresh\n\nsorry');
+        return toast.inf(60, 'you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and try uploading again\n\nsorry');
 
-    return toast.inf(60, 'refresh the page and try again, it should work now');
+    return toast.inf(60, 'try again, it should work now');
 }
 
 

@@ -256,7 +256,10 @@ some improvement ideas
 
 # accounts and volumes
 
-per-folder, per-user permissions
+per-folder, per-user permissions  - if your setup is getting complex, consider making a [config file](./docs/example.conf) instead of using arguments
+* much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if logged in as admin)
+
+configuring accounts/volumes with arguments:
 * `-a usr:pwd` adds account `usr` with password `pwd`
 * `-v .::r` adds current-folder `.` as the webroot, `r`eadable by anyone
   * the syntax is `-v src:dst:perm:perm:...` so local-path, url-path, and one or more permissions to set
@@ -473,8 +476,6 @@ the files will be hashed on the client-side, and each hash is sent to the server
 files go into `[ok]` if they exist (and you get a link to where it is), otherwise they land in `[ng]`
 * the main reason filesearch is combined with the uploader is cause the code was too spaghetti to separate it out somewhere else, this is no longer the case but now i've warmed up to the idea too much
 
-adding the same file multiple times is blocked, so if you first search for a file and then decide to upload it, you have to click the `[cleanup]` button to discard `[done]` files (or just refresh the page)
-
 
 ### unpost
 
@@ -594,6 +595,8 @@ add the argument `-e2ts` to also scan/index tags from music files, which brings 
 
 using arguments or config files, or a mix of both:
 * config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf)
+* `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
+  * or click the `[reload cfg]` button in the control-panel when logged in as admin 
 
 
 ## file indexing
@@ -632,7 +635,7 @@ if you set `--no-hash [...]` globally, you can enable hashing for specific volum
 
 set upload rules using volume flags,  some examples:
 
-* `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: b, k, m, g)
+* `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: `b`, `k`, `m`, `g`)
 * `:c,nosub` disallow uploading into subdirectories; goes well with `rotn` and `rotf`:
 * `:c,rotn=1000,2` moves uploads into subfolders, up to 1000 files in each folder before making a new one, two levels deep (must be at least 1)
 * `:c,rotf=%Y/%m/%d/%H` enforces files to be uploaded into a structure of subfolders according to that date format
@@ -801,8 +804,8 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 interact with copyparty using non-browser clients
 
 * javascript: dump some state into a file (two separate examples)
-  * `await fetch('https://127.0.0.1:3923/', {method:"PUT", body: JSON.stringify(foo)});`
-  * `var xhr = new XMLHttpRequest(); xhr.open('POST', 'https://127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
+  * `await fetch('//127.0.0.1:3923/', {method:"PUT", body: JSON.stringify(foo)});`
+  * `var xhr = new XMLHttpRequest(); xhr.open('POST', '//127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
 
 * curl/wget: upload some files (post=file, chunk=stdin)
   * `post(){ curl -b cppwd=wark -F act=bput -F f=@"$1" http://127.0.0.1:3923/;}`  

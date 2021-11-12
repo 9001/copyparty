@@ -37,7 +37,8 @@ a+a {
 	float: right;
 	margin: -.2em 0 0 .5em;
 }
-.logout {
+.logout,
+.btns a {
 	color: #c04;
 	border-color: #c7a;
 }
@@ -94,7 +95,8 @@ html.dark a {
 	background: #057;
 	border-color: #37a;
 }
-html.dark .logout {
+html.dark .logout,
+html.dark .btns a {
 	background: #804;
 	border-color: #c28;
 }
