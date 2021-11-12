@@ -602,10 +602,10 @@ function MPlayer() {
 
 	r.preload = function (url, full) {
 		url = mpl.acode(url);
-		url += url.indexOf('?') < 0 ? '?cache' : '&cache';
+		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
 		mpl.preload_url = full ? url : null;
 		var t0 = Date.now();
-		if (full)
+		if (full && !need_ogv_for(url))
 			return fetch(url).then(function (x) {
 				var rd = x.body.getReader(), n = 0;
 				function spd() {
@@ -1108,7 +1108,7 @@ var mpui = (function () {
 				rem = pos > 0 ? len - pos : 999,
 				full = null;
 
-			if (rem < (mpl.fullpre ? 7 : 20)) {
+			if (rem < (is_touch && IPHONE ? 34 : (mpl.fullpre ? 7 : 20))) {
 				preloaded = fpreloaded = mp.au.src;
 				full = false;
 			}
@@ -1534,7 +1534,7 @@ function play(tid, is_ev, seek, call_depth) {
 
 	audio_eq.apply();
 
-	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache';
+	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
 
 	if (mp.au_ogvjs2 && mp.au_ogvjs2.src === url) {
 		mp.au = mp.au_ogvjs2;
