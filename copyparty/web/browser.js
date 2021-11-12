@@ -11,9 +11,9 @@ function dbg(msg) {
 ebi('ops').innerHTML = (
 	'<a href="#" data-dest="" tt="close submenu">--</a>\n' +
 	(have_up2k_idx ? (
-		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those.$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>\n' +
+		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>\n' +
 		(have_del && have_unpost ? '<a href="#" data-dest="unpost" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
-		'<a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode and drag files onto the search button to see if they exist somewhere on the server">🚀</a>\n'
+		'<a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server">🚀</a>\n'
 	) : (
 		'<a href="#" data-perm="write" data-dest="up2k" tt="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>\n'
 	)) +
@@ -245,8 +245,7 @@ function goto(dest) {
 		clmod(obj[a], 'act');
 
 	if (dest) {
-		var ui = ebi('op_' + dest),
-			lnk = QS('#ops>a[data-dest=' + dest + ']'),
+		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
 			nps = lnk.getAttribute('data-perm');
 
 		nps = nps && nps.length ? nps.split(' ') : [];
@@ -259,8 +258,8 @@ function goto(dest) {
 		if (!has(perms, 'read') && !has(perms, 'write') && (dest == 'up2k'))
 			return;
 
-		clmod(ui, 'act', true);
-		lnk.className += " act";
+		clmod(ebi('op_' + dest), 'act', 1);
+		clmod(lnk, 'act', 1);
 
 		var fn = window['goto_' + dest];
 		if (fn)
@@ -334,7 +333,7 @@ var mpl = (function () {
 		) : '') +
 
 		'<div><h3>tint</h3><div>' +
-		'<input type="text" id="pb_tint" size="3" value="0" tt="background level (0-100) on the seekbar$Nto make buffering less distracting" />' +
+		'<input type="text" id="pb_tint" style="width:2.4em" value="0" tt="background level (0-100) on the seekbar$Nto make buffering less distracting" />' +
 		'</div></div>' +
 
 		'<div><h3>audio equalizer</h3><div id="audio_eq"></div></div>');
@@ -1147,11 +1146,6 @@ function ev_play(e) {
 }
 
 
-function setclass(id, clas) {
-	ebi(id).setAttribute('class', clas);
-}
-
-
 var need_ogv = true;
 try {
 	need_ogv = new Audio().canPlayType('audio/ogg; codecs=opus') !== 'probably';
@@ -1261,11 +1255,14 @@ var audio_eq = (function () {
 		if (!Ctx)
 			bcfg_set('au_eq', false);
 
-		if (!Ctx || !mp.au || mp.au === mp.au_ogvjs)
+		if (!Ctx || !mp.au)
 			return;
 
 		if (!r.en && !mp.ac)
 			return;
+
+		if (mp.au === mp.au_ogvjs)
+			return toast.warn(10, "apple devices can't equalize ogg/opus audio");
 
 		if (mp.ac) {
 			for (var a = 0; a < r.filters.length; a++)
@@ -1477,7 +1474,7 @@ function play(tid, is_ev, seek, call_depth) {
 
 	if (mp.au) {
 		mp.au.pause();
-		setclass('a' + mp.au.tid, 'play');
+		clmod(ebi('a' + mp.au.tid), 'act');
 	}
 
 	// ogv.js breaks on .play() unless directly user-triggered
@@ -1556,13 +1553,13 @@ function play(tid, is_ev, seek, call_depth) {
 
 	mp.au.tid = tid;
 	mp.au.volume = mp.expvol(mp.vol);
-	var oid = 'a' + tid;
-	setclass(oid, 'play act');
-	var trs = ebi('files').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-	for (var a = 0, aa = trs.length; a < aa; a++) {
+	var trs = QSA('#files tr.play');
+	for (var a = 0, aa = trs.length; a < aa; a++)
 		clmod(trs[a], 'play');
-	}
-	ebi(oid).parentElement.parentElement.className += ' play';
+
+	var oid = 'a' + tid;
+	clmod(ebi(oid), 'act', 1);
+	clmod(ebi(oid).closest('tr'), 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	if (window.thegrid)
 		thegrid.loadsel();
@@ -1592,7 +1589,7 @@ function play(tid, is_ev, seek, call_depth) {
 	catch (ex) {
 		toast.err(0, esc('playback failed: ' + basenames(ex)));
 	}
-	setclass(oid, 'play');
+	clmod(ebi(oid), 'act');
 	setTimeout(next_song, 500);
 }
 
@@ -1648,7 +1645,11 @@ function autoplay_blocked(seek) {
 
 		play(tid, true, seek);
 		mp.fade_in();
-	}, null);
+	}, function () {
+		sethash('');
+		clmod(QS('#files tr.play'), 'play');
+		return reload_mp();
+	});
 }
 
 
@@ -3047,15 +3048,18 @@ document.onkeydown = function (e) {
 	if (QS('#bbox-overlay.visible') || modal.busy)
 		return;
 
-	var k = e.code + '',
-		pos = -1,
-		n,
+	var k = e.code + '', pos = -1, n,
 		ae = document.activeElement,
 		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
 
 	if (k == 'Escape') {
+		ae && ae.blur();
+
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
+
+		if (QS('#unsearch'))
+			return QS('#unsearch').click();
 
 		if (widget.is_open)
 			return widget.close();
@@ -3202,28 +3206,28 @@ document.onkeydown = function (e) {
 (function () {
 	var sconf = [
 		["size",
-			["szl", "sz_min", "minimum MiB", "16"],
-			["szu", "sz_max", "maximum MiB", "16"]
+			["szl", "sz_min", "minimum MiB", "14"],
+			["szu", "sz_max", "maximum MiB", "14"]
 		],
 		["date",
-			["dtl", "dt_min", "min. iso8601", "16"],
-			["dtu", "dt_max", "max. iso8601", "16"]
+			["dtl", "dt_min", "min. iso8601", "14"],
+			["dtu", "dt_max", "max. iso8601", "14"]
 		],
 		["path",
-			["path", "path", "path contains &nbsp; (space-separated)", "34"]
+			["path", "path", "path contains &nbsp; (space-separated)", "30"]
 		],
 		["name",
-			["name", "name", "name contains &nbsp; (negate with -nope)", "34"]
+			["name", "name", "name contains &nbsp; (negate with -nope)", "30"]
 		]
 	];
 	var oldcfg = [];
 
 	if (QS('#srch_form.tags')) {
 		sconf.push(["tags",
-			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "34"]
+			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "30"]
 		]);
 		sconf.push(["adv.",
-			["adv", "adv", "key>=1A&nbsp; key<=2B&nbsp; .bpm>165", "34"]
+			["adv", "adv", "key>=1A&nbsp; key<=2B&nbsp; .bpm>165", "30"]
 		]);
 	}
 

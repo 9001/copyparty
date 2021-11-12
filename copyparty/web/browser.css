@@ -559,6 +559,11 @@ input[type="radio"]:checked+label,
 input[type="checkbox"]:checked+label {
 	color: #fc5;
 }
+.opwide div>span>input+label {
+	padding: .3em 0 .3em .3em;
+	margin: 0 0 0 -.3em;
+	cursor: pointer;
+}
 .opview input.i {
 	width: calc(100% - 16.2em);
 }

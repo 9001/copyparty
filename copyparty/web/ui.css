@@ -133,7 +133,8 @@ html {
 }
 #modalc code,
 #tt code {
-	background: #3c3c3c;
+	color: #eee;
+	background: #444;
 	padding: .1em .3em;
 	border-top: 1px solid #777;
 	border-radius: .3em;
