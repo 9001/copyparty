@@ -501,7 +501,6 @@ function MPlayer() {
 	r.au_native2 = null;
 	r.au_ogvjs = null;
 	r.au_ogvjs2 = null;
-	r.loading = false;
 	r.tracks = {};
 	r.order = [];
 
@@ -632,21 +631,20 @@ function MPlayer() {
 		var au = null;
 		if (need_ogv_for(url)) {
 			au = mp.au_ogvjs2;
-			if (!au && window['OGVPlayer']) {
-				au = new OGVPlayer();
-				au.preload = "auto";
-				r.au_ogvjs2 = au;
-			}
+			if (!au && window['OGVPlayer'])
+				au = r.au_ogvjs2 = new OGVPlayer();
+
+			au.mdng = true;
+			bind_ogvjs();
 		} else {
 			au = mp.au_native2;
-			if (!au) {
-				au = new Audio();
-				au.preload = "auto";
-				r.au_native2 = au;
-			}
+			if (!au)
+				au = r.au_native2 = new Audio();
 		}
-		if (au)
+		if (au) {
+			au.preload = "auto";
 			au.src = url;
+		}
 	};
 }
 
@@ -807,7 +805,7 @@ var pbar = (function () {
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
 
-		if (!mp.au || mp.loading)
+		if (!mp.au || mp.au.mdng)
 			return;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
@@ -834,7 +832,7 @@ var pbar = (function () {
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp.au || mp.loading || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
+		if (!mp.au || mp.au.mdng || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
 		var sm = bc.w * 1.0 / adur;
@@ -1104,7 +1102,7 @@ var mpui = (function () {
 		}
 
 		// preload next song
-		if (mpl.preload && !mp.loading && preloaded != mp.au.src) {
+		if (mpl.preload && !mp.au.mdng && preloaded != mp.au.src) {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration,
 				rem = pos > 0 ? len - pos : 999,
@@ -1263,7 +1261,7 @@ var audio_eq = (function () {
 		if (!Ctx)
 			bcfg_set('au_eq', false);
 
-		if (!Ctx || !mp.au)
+		if (!Ctx || !mp.au || mp.au === mp.au_ogvjs)
 			return;
 
 		if (!r.en && !mp.ac)
@@ -1418,6 +1416,25 @@ var audio_eq = (function () {
 })();
 
 
+function bind_ogvjs() {
+	var a1 = mp.au_ogvjs,
+		a2 = mp.au_ogvjs2;
+
+	if (a2) {
+		a2.onerror = a2.onprogress = a2.onended = null;
+		a2.onloadedmetadata = a2.onloadeddata = function () {
+			a2.mdng = false;
+		};
+	}
+
+	a1.onerror = evau_error;
+	a1.onprogress = pbar.drawpos;
+	a1.onended = next_song;
+	a1.onloadedmetadata = a1.onloadeddata = function () {
+		a1.mdng = false;
+	};
+}
+
 // plays the tid'th audio file on the page
 function play(tid, is_ev, seek, call_depth) {
 	if (mp.order.length == 0)
@@ -1475,7 +1492,6 @@ function play(tid, is_ev, seek, call_depth) {
 			mp.au = mp.au_ogvjs;
 		}
 		else if (window['OGVPlayer']) {
-			mp.loading = true;
 			try {
 				mp.au = mp.au_ogvjs = new OGVPlayer();
 			}
@@ -1484,12 +1500,8 @@ function play(tid, is_ev, seek, call_depth) {
 					'\n\n<a href="#" onclick="new OGVPlayer();">click here</a> for a full crash report');
 			}
 			attempt_play = is_ev;
-			mp.au.onerror = evau_error;
-			mp.au.onprogress = pbar.drawpos;
-			mp.au.onended = next_song;
-			mp.au.onloadedmetadata = mp.au.onloadeddata = function () {
-				mp.loading = false;
-			};
+			mp.au.mdng = true;
+			bind_ogvjs();
 			widget.open();
 		}
 		else if (safari < 14) {
@@ -1518,16 +1530,23 @@ function play(tid, is_ev, seek, call_depth) {
 			widget.open();
 		}
 		mp.au = mp.au_native;
-		mp.loading = false;
 	}
 
 	audio_eq.apply();
 
 	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache';
+
+	if (mp.au_ogvjs2 && mp.au_ogvjs2.src === url) {
+		mp.au = mp.au_ogvjs2;
+		mp.au_ogvjs2 = mp.au_ogvjs;
+		mp.au_ogvjs = mp.au;
+		bind_ogvjs();
+	}
+
 	if (mp.au.src == url)
 		mp.au.currentTime = 0;
 	else {
-		mp.loading = mp.au == mp.au_ogvjs;
+		mp.au.mdng = mp.au == mp.au_ogvjs;
 		mp.au.src = url;
 	}
 
