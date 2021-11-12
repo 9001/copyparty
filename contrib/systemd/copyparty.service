@@ -12,7 +12,6 @@
 #   change '/mnt::rw' to another location or permission-set
 #   remove '-p 80,443,3923' to only listen on port 3923
 #   add '-i 127.0.0.1' to only allow local connections
-#   add '--use-fpool' if uploading into nfs locations
 #
 # with `Type=notify`, copyparty will signal systemd when it is ready to
 #   accept connections; correctly delaying units depending on copyparty.

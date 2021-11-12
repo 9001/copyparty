@@ -57,8 +57,10 @@ class SvcHub(object):
         if args.log_thrs:
             start_log_thrs(self.log, args.log_thrs, 0)
 
-        if not ANYWIN and not args.use_fpool:
+        if not args.use_fpool and args.j != 1:
             args.no_fpool = True
+            m = "multithreading enabled with -j {}, so disabling fpool -- this can reduce upload performance on some filesystems"
+            self.log("root", m.format(args.j))
 
         if not args.no_fpool and args.j != 1:
             m = "WARNING: --use-fpool combined with multithreading is untested and can probably cause undefined behavior"
