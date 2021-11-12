@@ -1484,10 +1484,10 @@ class HttpCli(object):
 
         ret = True
         with open_func(*open_args) as f:
-            if use_sendfile:
-                remains = sendfile_kern(lower, upper, f, self.s)
-            else:
-                remains = sendfile_py(lower, upper, f, self.s)
+            sendfun = sendfile_kern if use_sendfile else sendfile_py
+            remains = sendfun(
+                lower, upper, f, self.s, self.args.s_wr_sz, self.args.s_wr_slp
+            )
 
         if remains > 0:
             logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"

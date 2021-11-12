@@ -1164,12 +1164,14 @@ def hashcopy(fin, fout):
     return tlen, hashobj.hexdigest(), digest_b64
 
 
-def sendfile_py(lower, upper, f, s):
+def sendfile_py(lower, upper, f, s, bufsz, slp):
     remains = upper - lower
     f.seek(lower)
     while remains > 0:
-        # time.sleep(0.01)
-        buf = f.read(min(1024 * 32, remains))
+        if slp:
+            time.sleep(slp)
+
+        buf = f.read(min(bufsz, remains))
         if not buf:
             return remains
 
@@ -1182,7 +1184,7 @@ def sendfile_py(lower, upper, f, s):
     return 0
 
 
-def sendfile_kern(lower, upper, f, s):
+def sendfile_kern(lower, upper, f, s, bufsz, slp):
     out_fd = s.fileno()
     in_fd = f.fileno()
     ofs = lower
