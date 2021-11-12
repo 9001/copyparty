@@ -2640,7 +2640,7 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$NHotkey: S">multiselect</a> <span>zoom: ' +
+		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file/folder to open it&lt;/em&gt;$N$NHotkey: S">multiselect</a> <span>zoom: ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
 		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>chop: ' +
 		'<a href="#" class="btn" l="-1" tt="truncate filenames more (show less)">&ndash;</a> ' +
@@ -3041,17 +3041,31 @@ function tree_up() {
 
 
 document.onkeydown = function (e) {
-	var ae = document.activeElement, aet = '';
-	if (ae && ae != document.body)
-		aet = ae.nodeName.toLowerCase();
-
 	if (e.altKey || e.isComposing)
 		return;
 
-	if (QS('#bbox-overlay.visible'))
+	if (QS('#bbox-overlay.visible') || modal.busy)
 		return;
 
-	var k = e.code + '', pos = -1, n;
+	var k = e.code + '',
+		pos = -1,
+		n,
+		ae = document.activeElement,
+		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
+
+	if (k == 'Escape') {
+		if (QS('.opview.act'))
+			return QS('#ops>a').click();
+
+		if (widget.is_open)
+			return widget.close();
+
+		if (!treectl.hidden)
+			return treectl.detree();
+
+		if (thegrid.en)
+			return ebi('griden').click();
+	}
 
 	if (aet == 'tr' && ae.closest('#files')) {
 		var d = '';

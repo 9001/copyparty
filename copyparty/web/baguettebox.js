@@ -237,7 +237,7 @@ window.baguetteBox = (function () {
     }
 
     function keyDownHandler(e) {
-        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing || modal.busy)
             return;
 
         var k = e.code + '', v = vid();
