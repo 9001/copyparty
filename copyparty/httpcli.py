@@ -126,7 +126,8 @@ class HttpCli(object):
             self.loud_reply(unicode(ex), status=ex.code, volsan=True)
             return self.keepalive
 
-        # time.sleep(0.4)
+        if self.args.rsp_slp:
+            time.sleep(self.args.rsp_slp)
 
         # normalize incoming headers to lowercase;
         # outgoing headers however are Correct-Case
