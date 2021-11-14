@@ -286,6 +286,9 @@ function crc32(str) {
 
 
 function clmod(el, cls, add) {
+    if (!el)
+        return;
+
     if (el.classList) {
         var have = el.classList.contains(cls);
         if (add == 't')
@@ -311,6 +314,9 @@ function clmod(el, cls, add) {
 
 
 function clgot(el, cls) {
+    if (!el)
+        return;
+
     if (el.classList)
         return el.classList.contains(cls);
 

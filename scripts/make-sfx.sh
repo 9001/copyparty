@@ -16,9 +16,6 @@ help() { exec cat <<'EOF'
 #
 # `no-sh` makes just the python sfx, skips the sh/unix sfx
 #
-# `no-ogv` saves ~192k by removing the opus/vorbis audio codecs
-#   (only affects apple devices; everything else has native support)
-#
 # `no-cm` saves ~82k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
@@ -75,7 +72,6 @@ while [ ! -z "$1" ]; do
 		clean)  clean=1  ; ;;
 		re)     repack=1 ; ;;
 		gz)     use_gz=1 ; ;;
-		no-ogv) no_ogv=1 ; ;;
 		no-fnt) no_fnt=1 ; ;;
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
@@ -217,9 +213,6 @@ cat have | while IFS= read -r x; do
 	}
 done
 rm have
-
-[ $no_ogv ] &&
-	rm -rf copyparty/web/deps/{dynamicaudio,ogv}*
 
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*

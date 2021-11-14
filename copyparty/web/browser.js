@@ -397,13 +397,15 @@ var mpl = (function () {
 			c = r.ac_flac;
 		else if (/\.(aac|m4a)$/i.exec(url))
 			c = r.ac_aac;
+		else if (/\.opus$/i.exec(url) && !can_ogg)
+			c = true;
 		else if (re_au_native.exec(url))
 			c = false;
 
 		if (!c)
 			return url;
 
-		return url + (url.indexOf('?') < 0 ? '?' : '&') + 'th=opus';
+		return url + (url.indexOf('?') < 0 ? '?' : '&') + 'th=' + (can_ogg ? 'opus' : 'caf');
 	};
 
 	r.pp = function () {
@@ -471,14 +473,10 @@ var mpl = (function () {
 	};
 
 	r.unbuffer = function (url) {
-		for (var a = 0; a < 2; a++) {
-			var au = a ? mp.au_native2 : mp.au_ogvjs2;
-			if (au && (!url || au.src == url)) {
-				au.src = '';
-				au.load();
-			}
+		if (mp.au2 && (!url || mp.au2.src == url)) {
+			mp.au2.src = '';
+			mp.au2.load();
 		}
-
 		if (!url)
 			mpl.preload_url = null;
 	}
@@ -487,7 +485,18 @@ var mpl = (function () {
 })();
 
 
-var re_au_native = /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i,
+var can_ogg = true;
+try {
+	can_ogg = new Audio().canPlayType('audio/ogg; codecs=opus') === 'probably';
+
+	if (document.documentMode)
+		can_ogg = true;  // ie8-11
+}
+catch (ex) { }
+
+
+var re_au_native = can_ogg ? /\.(opus|ogg|m4a|aac|mp3|wav|flac)$/i :
+	have_acode ? /\.(opus|m4a|aac|mp3|wav|flac)$/i : /\.(m4a|aac|mp3|wav|flac)$/i,
 	re_au_all = /\.(aac|m4a|ogg|opus|flac|alac|mp3|mp2|ac3|dts|wma|ra|wav|aif|aiff|au|alaw|ulaw|mulaw|amr|gsm|ape|tak|tta|wv)$/i;
 
 
@@ -496,10 +505,8 @@ function MPlayer() {
 	var r = this;
 	r.id = Date.now();
 	r.au = null;
-	r.au_native = null;
-	r.au_native2 = null;
-	r.au_ogvjs = null;
-	r.au_ogvjs2 = null;
+	r.au = null;
+	r.au2 = new Audio();
 	r.tracks = {};
 	r.order = [];
 
@@ -604,7 +611,7 @@ function MPlayer() {
 		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
 		mpl.preload_url = full ? url : null;
 		var t0 = Date.now();
-		if (full && !need_ogv_for(url))
+		if (full)
 			return fetch(url).then(function (x) {
 				var rd = x.body.getReader(), n = 0;
 				function spd() {
@@ -627,23 +634,8 @@ function MPlayer() {
 				drop();
 			});
 
-		var au = null;
-		if (need_ogv_for(url)) {
-			au = mp.au_ogvjs2;
-			if (!au && window['OGVPlayer'])
-				au = r.au_ogvjs2 = new OGVPlayer();
-
-			au.mdng = true;
-			bind_ogvjs();
-		} else {
-			au = mp.au_native2;
-			if (!au)
-				au = r.au_native2 = new Audio();
-		}
-		if (au) {
-			au.preload = "auto";
-			au.src = url;
-		}
+		mp.au2.preload = "auto";
+		mp.au2.src = url;
 	};
 }
 
@@ -804,7 +796,7 @@ var pbar = (function () {
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
 
-		if (!mp.au || mp.au.mdng)
+		if (!mp.au)
 			return;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
@@ -831,7 +823,7 @@ var pbar = (function () {
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp.au || mp.au.mdng || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
+		if (!mp.au || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
 		var sm = bc.w * 1.0 / adur;
@@ -1101,7 +1093,7 @@ var mpui = (function () {
 		}
 
 		// preload next song
-		if (mpl.preload && !mp.au.mdng && preloaded != mp.au.src) {
+		if (mpl.preload && preloaded != mp.au.src) {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration,
 				rem = pos > 0 ? len - pos : 999,
@@ -1143,36 +1135,6 @@ function ev_play(e) {
 		mp.fade_in();
 
 	return false;
-}
-
-
-var need_ogv = true;
-try {
-	need_ogv = new Audio().canPlayType('audio/ogg; codecs=opus') !== 'probably';
-
-	if (document.documentMode)
-		need_ogv = false;  // ie8-11
-}
-catch (ex) { }
-
-
-function need_ogv_for(url) {
-	return need_ogv && /\.(ogg|opus)|\?th=opus/i.test(url);
-}
-
-
-function start_sinegen() {
-	var af = 'data:audio/wav;base64,UklGRlaxAgBXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAATElTVBoAAABJTkZPSVNGVA4AAABMYXZmNTguNzYuMTAwAGRhdGEQsQIAAAB',
-		body = 'iArcE8AYCCeEKggzaDeQOmA/0D/QPmQ/kDtsNggzhCgMJ8Qa4BGMCAQCe/Un7EPn+9h/1fvMm8hzxaPAM8AzwZ/Ac8SXyfvMf9f32D/lI+539//9';
-
-	while (af.length < 235304)
-		af += body;
-
-	var au = new Audio(af.slice(0, 235304));
-	au.onplay = au.pause.bind(au);
-	au.volume = 0.5;
-	au.play();
-	return au;
 }
 
 
@@ -1260,9 +1222,6 @@ var audio_eq = (function () {
 
 		if (!r.en && !mp.ac)
 			return;
-
-		if (mp.au === mp.au_ogvjs)
-			return toast.warn(10, "apple devices can't equalize ogg/opus audio");
 
 		if (mp.ac) {
 			for (var a = 0; a < r.filters.length; a++)
@@ -1413,25 +1372,6 @@ var audio_eq = (function () {
 })();
 
 
-function bind_ogvjs() {
-	var a1 = mp.au_ogvjs,
-		a2 = mp.au_ogvjs2;
-
-	if (a2) {
-		a2.onerror = a2.onprogress = a2.onended = null;
-		a2.onloadedmetadata = a2.onloadeddata = function () {
-			a2.mdng = false;
-		};
-	}
-
-	a1.onerror = evau_error;
-	a1.onprogress = pbar.drawpos;
-	a1.onended = next_song;
-	a1.onloadedmetadata = a1.onloadeddata = function () {
-		a1.mdng = false;
-	};
-}
-
 // plays the tid'th audio file on the page
 function play(tid, is_ev, seek, call_depth) {
 	if (mp.order.length == 0)
@@ -1477,73 +1417,22 @@ function play(tid, is_ev, seek, call_depth) {
 		clmod(ebi('a' + mp.au.tid), 'act');
 	}
 
-	// ogv.js breaks on .play() unless directly user-triggered
-	var attempt_play = true;
-
 	var url = mpl.acode(mp.tracks[tid]);
-	if (need_ogv_for(url)) {
-		var m = /.* Version\/([0-9]+)\.[0-9\.]+ Mobile\/[^ ]+ Safari\/[0-9\.]+$/.exec(navigator.userAgent),
-			safari = m ? parseInt(m[1]) : 99;
-
-		if (mp.au_ogvjs) {
-			mp.au = mp.au_ogvjs;
-		}
-		else if (window['OGVPlayer']) {
-			try {
-				mp.au = mp.au_ogvjs = new OGVPlayer();
-			}
-			catch (ex) {
-				return toast.err(30, 'your browser cannot play ogg/vorbis/opus\n\n' + basenames(ex) +
-					'\n\n<a href="#" onclick="new OGVPlayer();">click here</a> for a full crash report');
-			}
-			attempt_play = is_ev;
-			mp.au.mdng = true;
-			bind_ogvjs();
-			widget.open();
-		}
-		else if (safari < 14) {
-			return toast.err(0, 'because this is an apple device,\nsafari 14 or newer is required to play ogg/vorbis/opus files\n\nyou are using safari ' + safari + '\n(every iOS browser is actually safari)');
-		}
-		else {
-			if (call_depth !== undefined)
-				return toast.err(0, 'failed to load ogv.js:\ncannot play ogg/opus in this browser\n(try a non-apple device)');
-
-			toast.inf(0, '<h1>loading ogv.js</h1><h2>thanks apple</h2>');
-
-			import_js('/.cpr/deps/ogv.js', function () {
-				toast.hide();
-				play(tid, false, seek, 1);
-			});
-
-			return;
-		}
-	}
-	else {
-		if (!mp.au_native) {
-			mp.au = mp.au_native = new Audio();
-			mp.au.onerror = evau_error;
-			mp.au.onprogress = pbar.drawpos;
-			mp.au.onended = next_song;
-			widget.open();
-		}
-		mp.au = mp.au_native;
+	if (!mp.au) {
+		mp.au = new Audio();
+		mp.au.onerror = evau_error;
+		mp.au.onprogress = pbar.drawpos;
+		mp.au.onended = next_song;
+		widget.open();
 	}
 
 	audio_eq.apply();
 
 	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
 
-	if (mp.au_ogvjs2 && mp.au_ogvjs2.src === url) {
-		mp.au = mp.au_ogvjs2;
-		mp.au_ogvjs2 = mp.au_ogvjs;
-		mp.au_ogvjs = mp.au;
-		bind_ogvjs();
-	}
-
 	if (mp.au.src == url)
 		mp.au.currentTime = 0;
 	else {
-		mp.au.mdng = mp.au == mp.au_ogvjs;
 		mp.au.src = url;
 	}
 
@@ -1565,9 +1454,7 @@ function play(tid, is_ev, seek, call_depth) {
 		thegrid.loadsel();
 
 	try {
-		if (attempt_play)
-			mp.au.play();
-
+		mp.au.play();
 		if (mp.au.paused)
 			autoplay_blocked(seek);
 		else if (seek) {
@@ -1633,15 +1520,9 @@ function autoplay_blocked(seek) {
 	fn = uricom_dec(fn.replace(/\+/g, ' '))[0];
 
 	modal.confirm('<h6>play this audio file?</h6>\n«' + esc(fn) + '»', function () {
-		if (mp.au !== mp.au_ogvjs)
-			// chrome 91 may permanently taint on a failed play()
-			// depending on win10 settings or something? idk
-			mp.au_native = null;
-		else
-			// iOS browsers allow playing ogg/vorbis/opus in the background
-			// if there is an <audio> tag which at some point played audio
-			if (!mp.sinegen)
-				mp.sinegen = start_sinegen();
+		// chrome 91 may permanently taint on a failed play()
+		// depending on win10 settings or something? idk
+		mp.au = null;
 
 		play(tid, true, seek);
 		mp.fade_in();

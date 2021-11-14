@@ -90,7 +90,7 @@ def thumb_path(histpath, rem, mtime, fmt):
     h = hashlib.sha512(fsenc(fn)).digest()
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
-    if fmt == "opus":
+    if fmt in ("opus", "caf"):
         cat = "ac"
     else:
         fmt = "webp" if fmt == "w" else "jpg"
@@ -216,7 +216,7 @@ class ThumbSrv(object):
                 elif ext in FMT_FFV:
                     fun = self.conv_ffmpeg
                 elif ext in FMT_FFA:
-                    if tpath.endswith(".opus"):
+                    if tpath.endswith(".opus") or tpath.endswith(".caf"):
                         fun = self.conv_opus
                     else:
                         fun = self.conv_spec
@@ -406,21 +406,45 @@ class ThumbSrv(object):
         if "ac" not in ret:
             raise Exception("not audio")
 
-        # fmt: off
-        cmd = [
-            b"ffmpeg",
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", fsenc(abspath),
-            b"-map", b"0:a:0",
-            b"-c:a", b"libopus",
-            b"-b:a", b"128k",
-            fsenc(tpath)
-        ]
-        # fmt: on
+        src_opus = abspath.lower().endswith(".opus") or ret["ac"][1] == "opus"
+        want_caf = tpath.endswith(".caf")
+        tmp_opus = tpath
+        if want_caf:
+            tmp_opus = tpath.rsplit(".", 1)[0] + ".opus"
 
-        self._run_ff(cmd)
+        if not want_caf or (not src_opus and not bos.path.isfile(tmp_opus)):
+            # fmt: off
+            cmd = [
+                b"ffmpeg",
+                b"-nostdin",
+                b"-v", b"error",
+                b"-hide_banner",
+                b"-i", fsenc(abspath),
+                b"-map_metadata", b"-1",
+                b"-map", b"0:a:0",
+                b"-c:a", b"libopus",
+                b"-b:a", b"128k",
+                fsenc(tmp_opus)
+            ]
+            # fmt: on
+            self._run_ff(cmd)
+
+        if want_caf:
+            # fmt: off
+            cmd = [
+                b"ffmpeg",
+                b"-nostdin",
+                b"-v", b"error",
+                b"-hide_banner",
+                b"-i", fsenc(abspath if src_opus else tmp_opus),
+                b"-map_metadata", b"-1",
+                b"-map", b"0:a:0",
+                b"-c:a", b"copy",
+                b"-f", b"caf",
+                fsenc(tpath)
+            ]
+            # fmt: on
+            self._run_ff(cmd)
 
     def poke(self, tdir):
         if not self.poke_cd.poke(tdir):
@@ -461,7 +485,7 @@ class ThumbSrv(object):
             thumbpath = os.path.join(histpath, cat)
 
         # self.log("cln {}".format(thumbpath))
-        exts = ["jpg", "webp"] if cat == "th" else ["opus"]
+        exts = ["jpg", "webp"] if cat == "th" else ["opus", "caf"]
         maxage = getattr(self.args, cat + "_maxage")
         now = time.time()
         prev_b64 = None

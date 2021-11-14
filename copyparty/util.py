@@ -104,6 +104,7 @@ MIMES = {
     "txt": "text/plain",
     "js": "text/javascript",
     "opus": "audio/ogg; codecs=opus",
+    "caf": "audio/x-caf",
     "mp3": "audio/mpeg",
     "m4a": "audio/mp4",
     "jpg": "image/jpeg",

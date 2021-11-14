@@ -30,7 +30,7 @@ class ThumbCli(object):
         if is_vid and self.args.no_vthumb:
             return None
 
-        want_opus = fmt == "opus"
+        want_opus = fmt in ("opus", "caf")
         is_au = ext in FMT_FFA
         if is_au:
             if want_opus:

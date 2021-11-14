@@ -3,7 +3,6 @@ WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
         ver_marked=3.0.4 \
-        ver_ogvjs=1.8.4 \
         ver_mde=2.15.0 \
         ver_codemirror=5.62.3 \
         ver_fontawesome=5.13.0 \
@@ -15,7 +14,6 @@ ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
 RUN     mkdir -p /z/dist/no-pk \
         && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
         && apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev brotli py3-brotli \
-        && wget https://github.com/brion/ogv.js/releases/download/$ver_ogvjs/ogvjs-$ver_ogvjs.zip -O ogvjs.zip \
         && wget https://github.com/openpgpjs/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
         && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
@@ -23,7 +21,6 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
         && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
-        && unzip ogvjs.zip \
         && (mkdir hash-wasm \
             && cd hash-wasm \
             && unzip ../hash-wasm.zip) \
@@ -75,21 +72,6 @@ RUN     cd asmcrypto.js-$ver_asmcrypto \
 # build hash-wasm
 RUN     cd hash-wasm \
         && mv sha512.umd.min.js /z/dist/sha512.hw.js
-
-
-# build ogvjs
-RUN     cd ogvjs-$ver_ogvjs \
-        && cp -pv \
-            ogv-worker-audio.js \
-            ogv-demuxer-ogg-wasm.js \
-            ogv-demuxer-ogg-wasm.wasm \
-            ogv-decoder-audio-opus-wasm.js \
-            ogv-decoder-audio-opus-wasm.wasm \
-            ogv-decoder-audio-vorbis-wasm.js \
-            ogv-decoder-audio-vorbis-wasm.wasm \
-            /z/dist \
-        && cp -pv \
-            ogv-es2017.js /z/dist/ogv.js
 
 
 # build marked
