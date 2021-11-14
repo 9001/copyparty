@@ -307,6 +307,9 @@ function set_files_html(html) {
 }
 
 
+var ACtx = window.AudioContext || window.webkitAudioContext;
+
+
 var mpl = (function () {
 	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
 
@@ -473,8 +476,8 @@ var mpl = (function () {
 	};
 
 	r.unbuffer = function (url) {
-		if (mp.au2 && (!url || mp.au2.src == url)) {
-			mp.au2.src = '';
+		if (mp.au2 && (!url || mp.au2.rsrc == url)) {
+			mp.au2.src = mp.au2.rsrc = '';
 			mp.au2.load();
 		}
 		if (!url)
@@ -506,7 +509,7 @@ function MPlayer() {
 	r.id = Date.now();
 	r.au = null;
 	r.au = null;
-	r.au2 = new Audio();
+	r.au2 = null;
 	r.tracks = {};
 	r.order = [];
 
@@ -635,7 +638,7 @@ function MPlayer() {
 			});
 
 		mp.au2.preload = "auto";
-		mp.au2.src = url;
+		mp.au2.src = mp.au2.rsrc = url;
 	};
 }
 
@@ -1093,18 +1096,18 @@ var mpui = (function () {
 		}
 
 		// preload next song
-		if (mpl.preload && preloaded != mp.au.src) {
+		if (mpl.preload && preloaded != mp.au.rsrc) {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration,
 				rem = pos > 0 ? len - pos : 999,
 				full = null;
 
-			if (rem < (is_touch && IPHONE ? 34 : (mpl.fullpre ? 7 : 20))) {
-				preloaded = fpreloaded = mp.au.src;
+			if (rem < (mpl.fullpre && !(is_touch && IPHONE)) ? 7 : 20) {
+				preloaded = fpreloaded = mp.au.rsrc;
 				full = false;
 			}
-			else if (rem < 40 && mpl.fullpre && fpreloaded != mp.au.src) {
-				fpreloaded = mp.au.src;
+			else if (rem < 40 && mpl.fullpre && fpreloaded != mp.au.rsrc) {
+				fpreloaded = mp.au.rsrc;
 				full = true;
 			}
 
@@ -1213,11 +1216,10 @@ var audio_eq = (function () {
 	r.apply = function () {
 		r.draw();
 
-		var Ctx = window.AudioContext || window.webkitAudioContext;
-		if (!Ctx)
+		if (!ACtx)
 			bcfg_set('au_eq', false);
 
-		if (!Ctx || !mp.au)
+		if (!ACtx || !mp.au)
 			return;
 
 		if (!r.en && !mp.ac)
@@ -1235,7 +1237,7 @@ var audio_eq = (function () {
 				mp.ac.close();
 
 			r.last_au = mp.au;
-			mp.ac = new Ctx();
+			mp.ac = new ACtx();
 			mp.acs = mp.ac.createMediaElementSource(mp.au);
 		}
 
@@ -1416,25 +1418,25 @@ function play(tid, is_ev, seek, call_depth) {
 		mp.au.pause();
 		clmod(ebi('a' + mp.au.tid), 'act');
 	}
-
-	var url = mpl.acode(mp.tracks[tid]);
-	if (!mp.au) {
+	else {
 		mp.au = new Audio();
+		mp.au2 = new Audio();
+		mp.dummyctx = new ACtx();  // reduces .play() latency somehow
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onended = next_song;
 		widget.open();
 	}
 
-	audio_eq.apply();
-
+	var url = mpl.acode(mp.tracks[tid]);
 	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
 
-	if (mp.au.src == url)
+	if (mp.au.rsrc == url)
 		mp.au.currentTime = 0;
-	else {
-		mp.au.src = url;
-	}
+	else
+		mp.au.src = mp.au.rsrc = url;
+
+	audio_eq.apply();
 
 	setTimeout(function () {
 		mpl.unbuffer(url);
