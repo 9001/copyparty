@@ -1843,7 +1843,8 @@ function up2k_init(subtle) {
                 st.bytes.uploaded += cdr - car;
                 t.bytes_uploaded += cdr - car;
             }
-            else if (txt.indexOf('already got that') !== -1) {
+            else if (txt.indexOf('already got that') + 1 ||
+                txt.indexOf('already being written') + 1) {
                 console.log("ignoring dupe-segment error", t);
             }
             else {
@@ -1851,6 +1852,9 @@ function up2k_init(subtle) {
                     xhr.status, t.name) + (txt || "no further information"));
                 return;
             }
+            orz2(xhr);
+        }
+        function orz2(xhr) {
             apop(st.busy.upload, upt);
             apop(t.postlist, npart);
             if (!t.postlist.length) {
@@ -1872,9 +1876,11 @@ function up2k_init(subtle) {
                 if (crashed)
                     return;
 
-                toast.err(9.98, "failed to upload a chunk,\n" + tries + " retries so far -- retrying in 10sec\n\n" + t.name);
+                if (!toast.visible)
+                    toast.warn(9.98, "failed to upload a chunk;\nprobably harmless, continuing\n\n" + t.name);
+
                 console.log('chunkpit onerror,', ++tries, t);
-                setTimeout(do_send, 10 * 1000);
+                orz2(xhr);
             };
             xhr.open('POST', t.purl, true);
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);

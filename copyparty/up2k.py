@@ -494,6 +494,7 @@ class Up2k(object):
                 if bos.path.exists(path):
                     reg[k] = job
                     job["poke"] = time.time()
+                    job["busy"] = {}
                 else:
                     self.log("ign deleted file in snap: [{}]".format(path))
 
@@ -1256,6 +1257,7 @@ class Up2k(object):
                             "at": at,
                             "hash": [],
                             "need": [],
+                            "busy": {},
                         }
 
                 if job and wark in reg:
@@ -1338,6 +1340,7 @@ class Up2k(object):
                     "t0": now,
                     "hash": deepcopy(cj["hash"]),
                     "need": [],
+                    "busy": {},
                 }
                 # client-provided, sanitized by _get_wark: name, size, lmod
                 for k in [
@@ -1444,6 +1447,11 @@ class Up2k(object):
             if not nchunk:
                 raise Pebkac(400, "unknown chunk")
 
+            if wark in job["busy"]:
+                raise Pebkac(400, "that chunk is already being written to")
+
+            job["busy"][wark] = 1
+
         job["poke"] = time.time()
 
         chunksize = up2k_chunksize(job["size"])
@@ -1452,6 +1460,14 @@ class Up2k(object):
         path = os.path.join(job["ptop"], job["prel"], job["tnam"])
 
         return [chunksize, ofs, path, job["lmod"]]
+
+    def release_chunk(self, ptop, wark, chash):
+        with self.mutex:
+            job = self.registry[ptop].get(wark)
+            if job:
+                job["busy"].pop(wark, None)
+
+        return [True]
 
     def confirm_chunk(self, ptop, wark, chash):
         with self.mutex:
@@ -1462,6 +1478,8 @@ class Up2k(object):
                 dst = os.path.join(pdir, job["name"])
             except Exception as ex:
                 return "confirm_chunk, wark, " + repr(ex)
+
+            job["busy"].pop(wark, None)
 
             try:
                 job["need"].remove(chash)

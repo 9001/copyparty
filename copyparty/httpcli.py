@@ -855,63 +855,67 @@ class HttpCli(object):
         response = x.get()
         chunksize, cstart, path, lastmod = response
 
-        if self.args.nw:
-            path = os.devnull
-
-        if remains > chunksize:
-            raise Pebkac(400, "your chunk is too big to fit")
-
-        self.log("writing {} #{} @{} len {}".format(path, chash, cstart, remains))
-
-        reader = read_socket(self.sr, remains)
-
-        f = None
-        fpool = not self.args.no_fpool
-        if fpool:
-            with self.mutex:
-                try:
-                    f = self.u2fh.pop(path)
-                except:
-                    pass
-
-        f = f or open(fsenc(path), "rb+", 512 * 1024)
-
         try:
-            f.seek(cstart[0])
-            post_sz, _, sha_b64 = hashcopy(reader, f)
+            if self.args.nw:
+                path = os.devnull
 
-            if sha_b64 != chash:
-                raise Pebkac(
-                    400,
-                    "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}".format(
-                        post_sz, chash, sha_b64
-                    ),
-                )
+            if remains > chunksize:
+                raise Pebkac(400, "your chunk is too big to fit")
 
-            if len(cstart) > 1 and path != os.devnull:
-                self.log(
-                    "clone {} to {}".format(
-                        cstart[0], " & ".join(unicode(x) for x in cstart[1:])
-                    )
-                )
-                ofs = 0
-                while ofs < chunksize:
-                    bufsz = min(chunksize - ofs, 4 * 1024 * 1024)
-                    f.seek(cstart[0] + ofs)
-                    buf = f.read(bufsz)
-                    for wofs in cstart[1:]:
-                        f.seek(wofs + ofs)
-                        f.write(buf)
+            self.log("writing {} #{} @{} len {}".format(path, chash, cstart, remains))
 
-                    ofs += len(buf)
+            reader = read_socket(self.sr, remains)
 
-                self.log("clone {} done".format(cstart[0]))
-        finally:
-            if not fpool:
-                f.close()
-            else:
+            f = None
+            fpool = not self.args.no_fpool
+            if fpool:
                 with self.mutex:
-                    self.u2fh.put(path, f)
+                    try:
+                        f = self.u2fh.pop(path)
+                    except:
+                        pass
+
+            f = f or open(fsenc(path), "rb+", 512 * 1024)
+
+            try:
+                f.seek(cstart[0])
+                post_sz, _, sha_b64 = hashcopy(reader, f)
+
+                if sha_b64 != chash:
+                    raise Pebkac(
+                        400,
+                        "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}".format(
+                            post_sz, chash, sha_b64
+                        ),
+                    )
+
+                if len(cstart) > 1 and path != os.devnull:
+                    self.log(
+                        "clone {} to {}".format(
+                            cstart[0], " & ".join(unicode(x) for x in cstart[1:])
+                        )
+                    )
+                    ofs = 0
+                    while ofs < chunksize:
+                        bufsz = min(chunksize - ofs, 4 * 1024 * 1024)
+                        f.seek(cstart[0] + ofs)
+                        buf = f.read(bufsz)
+                        for wofs in cstart[1:]:
+                            f.seek(wofs + ofs)
+                            f.write(buf)
+
+                        ofs += len(buf)
+
+                    self.log("clone {} done".format(cstart[0]))
+            finally:
+                if not fpool:
+                    f.close()
+                else:
+                    with self.mutex:
+                        self.u2fh.put(path, f)
+        finally:
+            x = self.conn.hsrv.broker.put(True, "up2k.release_chunk", ptop, wark, chash)
+            x.get()  # block client until released
 
         x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", ptop, wark, chash)
         x = x.get()
