@@ -357,6 +357,8 @@ var mpl = (function () {
 	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
 	bcfg_bind(r, 'ac_aac', 'ac_aac', false);
 	bcfg_bind(r, 'ac_oth', 'ac_oth', true, reload_mp);
+	if (!have_acode)
+		r.ac_flac = r.ac_aac = r.ac_oth = false;
 
 	if (IPHONE) {
 		ebi('au_fullpre').style.display = 'none';
@@ -1519,6 +1521,15 @@ function evau_error(e) {
 			break;
 		case eplaya.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
 			err = "Your browser does not understand this audio format";
+			if (/\.(aac|m4a)(\?|$)/i.exec(eplaya.rsrc) && !mpl.ac_aac) {
+				try {
+					ebi('ac_aac').click();
+					QS('a.play.act').click();
+					toast.warn(10, 'your browser cannot play aac/m4a files;\ntranscoding to opus is now enabled');
+					return;
+				}
+				catch (ex) { }
+			}
 			break;
 		default:
 			err = 'Unknown Errol';
