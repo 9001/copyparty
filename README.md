@@ -78,6 +78,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [sfx](#sfx) - there are two self-contained "binaries"
     * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
 * [install on android](#install-on-android)
+* [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
 * [building](#building)
     * [dev env setup](#dev-env-setup)
     * [just the sfx](#just-the-sfx)
@@ -161,9 +162,11 @@ feature summary
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
   * ☑ audio player (with OS media controls and opus transcoding)
   * ☑ image gallery with webm player
+  * ☑ textfile browser with syntax hilighting
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow
     * ☑ ...of videos using FFmpeg
+    * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
   * ☑ SPA (browse while uploading)
     * if you use the navpane to navigate, not folders in the file list
@@ -232,6 +235,8 @@ some improvement ideas
 * probably more, pls let me know
 
 ## not my bugs
+
+* iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
 
 * Windows: folders cannot be accessed if the name ends with `.`
   * python or windows bug
@@ -784,7 +789,7 @@ TLDR: yes
 * internet explorer 6 to 8 behave the same
 * firefox 52 and chrome 49 are the final winxp versions
 * `*1` yes, but extremely slow (ie10: `1 MiB/s`, ie11: `270 KiB/s`)
-* `*3` using a wasm decoder which consumes a bit more power
+* `*3` iOS 11 and newer, opus only, and requires FFmpeg on the server
 
 quick summary of more eccentric web-browsers trying to view a directory index:
 
@@ -973,6 +978,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?txt=iso-8859-1` | ...with specific charset |
 | GET | `?th` | get image/video at URL as thumbnail |
 | GET | `?th=opus` | convert audio file to 128kbps opus |
+| GET | `?th=caf` | ...in the iOS-proprietary container |
 
 | method | body | result |
 |--|--|--|
@@ -1068,13 +1074,11 @@ pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `
 reduce the size of an sfx by removing features
 
 if you don't need all the features, you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except if you're on windows then you need msys2 or WSL)
-* `584k` size of original sfx.py as of v1.1.0
-* `392k` after `./scripts/make-sfx.sh re no-ogv`
-* `310k` after `./scripts/make-sfx.sh re no-ogv no-cm`
-* `269k` after `./scripts/make-sfx.sh re no-ogv no-cm no-hl`
+* `393k` size of original sfx.py as of v1.1.3
+* `310k` after `./scripts/make-sfx.sh re no-cm`
+* `269k` after `./scripts/make-sfx.sh re no-cm no-hl`
 
 the features you can opt to drop are
-* `ogv`.js, the opus/vorbis decoder which is needed by apple devices to play foss audio files, saves ~192k
 * `cm`/easymde, the "fancy" markdown editor, saves ~82k
 * `hl`, prism, the syntax hilighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
@@ -1082,7 +1086,7 @@ the features you can opt to drop are
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 
-**note:** you can also just download and run [scripts/copyparty-repack.sh](scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a `no-ogv no-cm` repack; works on linux/macos (and windows with msys2 or WSL)
+**note:** you can also just download and run [scripts/copyparty-repack.sh](scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a few repacks; works on linux/macos (and windows with msys2 or WSL)
 
 
 # install on android
@@ -1094,6 +1098,16 @@ echo $?
 ```
 
 after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux
+
+
+# reporting bugs
+
+ideas for context to include in bug reports
+
+if something broke during an upload (replacing FILENAME with a part of the filename that broke):
+```
+journalctl -aS '48 hour ago' -u copyparty | grep -C10 FILENAME | tee bug.log
+```
 
 
 # building
