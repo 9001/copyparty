@@ -237,6 +237,8 @@ some improvement ideas
 ## not my bugs
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
+  * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
+    * "future" because `AudioContext` is broken in the current iOS version (15.1), maybe one day...
 
 * Windows: folders cannot be accessed if the name ends with `.`
   * python or windows bug
