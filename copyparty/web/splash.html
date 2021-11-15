@@ -72,6 +72,16 @@
         </ul>
         {%- endif %}
 
+        <h1 id="cc">client config:</h1>
+        <ul>
+            {% if k304 %}
+            <li><a href="/?k304=n" class="r">disable k304</a> (currently enabled)
+            {%- else %}
+            <li><a href="/?k304=y">enable k304</a> (currently disabled)
+            {% endif %}
+            <blockquote>enabling this will disconnect your client on every HTTP 304, which can prevent some buggy browsers/proxies from getting stuck (suddenly not being able to load pages), <em>but</em> it will also make things slower in general</blockquote></li>
+        </ul>
+
         <h1>login for more:</h1>
         <ul>
             <form method="post" enctype="multipart/form-data" action="/{{ qvpath }}">

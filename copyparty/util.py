@@ -822,6 +822,17 @@ def gen_filekey(salt, fspath, fsize, inode):
     ).decode("ascii")
 
 
+def gencookie(k, v, dur):
+    v = v.replace(";", "")
+    if dur:
+        dt = datetime.utcfromtimestamp(time.time() + dur)
+        exp = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+    else:
+        exp = "Fri, 15 Aug 1997 01:00:00 GMT"
+
+    return "{}={}; Path=/; Expires={}; SameSite=Lax".format(k, v, exp)
+
+
 def humansize(sz, terse=False):
     for unit in ["B", "KiB", "MiB", "GiB", "TiB"]:
         if sz < 1024:

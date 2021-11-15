@@ -38,7 +38,8 @@ a+a {
 	margin: -.2em 0 0 .5em;
 }
 .logout,
-.btns a {
+.btns a,
+a.r {
 	color: #c04;
 	border-color: #c7a;
 }
@@ -79,6 +80,11 @@ table {
 	margin-top: .3em;
 	text-align: right;
 }
+blockquote {
+	margin: 0 0 0 .6em;
+	padding: .7em 1em;
+	border-left: .3em solid rgba(128,128,128,0.5);
+}
 
 
 html.dark,
@@ -96,7 +102,8 @@ html.dark a {
 	border-color: #37a;
 }
 html.dark .logout,
-html.dark .btns a {
+html.dark .btns a,
+html.dark a.r {
 	background: #804;
 	border-color: #c28;
 }

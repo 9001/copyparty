@@ -228,8 +228,8 @@ class HttpCli(object):
         if pwd and "pw" in self.ouparam and pwd != cookies.get("cppwd"):
             self.out_headers["Set-Cookie"] = self.get_pwd_cookie(pwd)[0]
 
-        ua = self.headers.get("user-agent", "")
-        self.is_rclone = ua.startswith("rclone/")
+        self.ua = self.headers.get("user-agent", "")
+        self.is_rclone = self.ua.startswith("rclone/")
         if self.is_rclone:
             uparam["raw"] = False
             uparam["dots"] = False
@@ -284,11 +284,18 @@ class HttpCli(object):
         n = "604800" if cache == "i" else cache or "69"
         self.out_headers["Cache-Control"] = "max-age=" + n
 
+    def k304(self):
+        k304 = self.cookies.get("k304", "")
+        return k304 == "y" or ("; Trident/" in self.ua and not k304)
+
     def send_headers(self, length, status=200, mime=None, headers=None):
         response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
 
         if length is not None:
             response.append("Content-Length: " + unicode(length))
+
+        if status == 304 and self.k304():
+            self.keepalive = False
 
         # close if unknown length, otherwise take client's preference
         response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
@@ -431,6 +438,9 @@ class HttpCli(object):
 
             if "h" in self.uparam:
                 return self.tx_mounts()
+
+            if "k304" in self.uparam:
+                return self.set_k304()
 
         # conditional redirect to single volumes
         if self.vpath == "" and not self.ouparam:
@@ -962,15 +972,13 @@ class HttpCli(object):
     def get_pwd_cookie(self, pwd):
         if pwd in self.asrv.iacct:
             msg = "login ok"
-            dt = datetime.utcfromtimestamp(time.time() + 60 * 60 * 24 * 365)
-            exp = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            dur = 60 * 60 * 24 * 365
         else:
             msg = "naw dude"
             pwd = "x"  # nosec
-            exp = "Fri, 15 Aug 1997 01:00:00 GMT"
+            dur = None
 
-        ck = "cppwd={}; Path=/; Expires={}; SameSite=Lax".format(pwd, exp)
-        return [ck, msg]
+        return [gencookie("cppwd", pwd, dur), msg]
 
     def handle_mkdir(self):
         new_dir = self.parser.require("name", 512)
@@ -1383,8 +1391,7 @@ class HttpCli(object):
             if "gzip" not in supported_editions:
                 decompress = True
             else:
-                ua = self.headers.get("user-agent", "")
-                if re.match(r"MSIE [4-6]\.", ua) and " SV1" not in ua:
+                if re.match(r"MSIE [4-6]\.", self.ua) and " SV1" not in self.ua:
                     decompress = True
 
             if not decompress:
@@ -1697,9 +1704,15 @@ class HttpCli(object):
             tagq=vs["tagq"],
             mtpq=vs["mtpq"],
             url_suf=suf,
+            k304=self.k304(),
         )
         self.reply(html.encode("utf-8"))
         return True
+
+    def set_k304(self):
+        ck = gencookie("k304", self.uparam["k304"], 60 * 60 * 24 * 365)
+        self.out_headers["Set-Cookie"] = ck
+        self.redirect("", "?h#cc")
 
     def tx_404(self, is_403=False):
         if self.args.vague_403:
