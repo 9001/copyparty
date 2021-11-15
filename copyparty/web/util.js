@@ -286,17 +286,18 @@ function crc32(str) {
 
 function clmod(el, cls, add) {
     if (!el)
-        return;
+        return false;
 
     if (el.classList) {
         var have = el.classList.contains(cls);
         if (add == 't')
             add = !have;
 
-        if (add != have)
-            el.classList[add ? 'add' : 'remove'](cls);
+        if (!add == !have)
+            return false;
 
-        return;
+        el.classList[add ? 'add' : 'remove'](cls);
+        return true;
     }
 
     var re = new RegExp('\\s*\\b' + cls + '\\s*\\b', 'g'),
@@ -307,8 +308,11 @@ function clmod(el, cls, add) {
 
     var n2 = n1.replace(re, ' ') + (add ? ' ' + cls : '');
 
-    if (n1 != n2)
-        el.className = n2;
+    if (!n1 == !n2)
+        return false;
+
+    el.className = n2;
+    return true;
 }
 
 
@@ -789,7 +793,8 @@ var tt = (function () {
         "tt": mknod("div"),
         "en": true,
         "el": null,
-        "skip": false
+        "skip": false,
+        "lvis": 0
     };
 
     r.tt.setAttribute('id', 'tt');
@@ -803,7 +808,17 @@ var tt = (function () {
         prev = this;
     };
 
+    var tev;
+    r.dshow = function () {
+        clearTimeout(tev);
+        if (Date.now() - r.lvis < 400)
+            return r.show.bind(this)();
+
+        tev = setTimeout(r.show.bind(this), 700);
+    };
+
     r.show = function () {
+        clearTimeout(tev);
         if (r.skip) {
             r.skip = false;
             return;
@@ -854,9 +869,13 @@ var tt = (function () {
 
     r.hide = function (e) {
         ev(e);
+        clearTimeout(tev);
         window.removeEventListener('scroll', r.hide);
-        clmod(r.tt, 'show');
+
         clmod(r.tt, 'b');
+        if (clmod(r.tt, 'show'))
+            r.lvis = Date.now();
+
         if (r.el)
             r.el.removeEventListener('mouseleave', r.hide);
     };
@@ -887,14 +906,14 @@ var tt = (function () {
 
     r.att = function (ctr) {
         var _cshow = r.en ? r.cshow : null,
-            _show = r.en ? r.show : null,
+            _dshow = r.en ? r.dshow : null,
             _hide = r.en ? r.hide : null,
             o = ctr.querySelectorAll('*[tt]');
 
         for (var a = o.length - 1; a >= 0; a--) {
             o[a].onfocus = _cshow;
             o[a].onblur = _hide;
-            o[a].onmouseenter = _show;
+            o[a].onmouseenter = _dshow;
             o[a].onmouseleave = _hide;
         }
         r.hide();
