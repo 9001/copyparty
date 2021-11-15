@@ -1225,6 +1225,22 @@ var audio_eq = (function () {
 		QS('input.eq_gain[band="amp"]').value = r.amp;
 	};
 
+	r.stop = function () {
+		if (r.filters.length)
+			for (var a = 0; a < r.filters.length; a++)
+				r.filters[a].disconnect();
+
+		r.filters = [];
+
+		if (!mp)
+			return;
+
+		if (mp.acs)
+			mp.acs.disconnect();
+
+		mp.acs = null;
+	};
+
 	r.apply = function () {
 		r.draw();
 
@@ -1234,16 +1250,7 @@ var audio_eq = (function () {
 		if (!actx || !mp.au || (!r.en && !mp.acs))
 			return;
 
-		if (mp.acs) {
-			for (var a = 0; a < r.filters.length; a++)
-				r.filters[a].disconnect();
-
-			r.filters = [];
-			mp.acs.disconnect();
-			mp.acs = null;
-		}
-
-
+		r.stop();
 		mp.au.id = mp.au.id || Date.now();
 		mp.acs = r.acst[mp.au.id] = r.acst[mp.au.id] || actx.createMediaElementSource(mp.au);
 
@@ -4946,6 +4953,7 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 function reload_mp() {
 	if (mp && mp.au) {
+		audio_eq.stop();
 		mp.au.pause();
 		mp.au = null;
 	}

@@ -1447,10 +1447,13 @@ class Up2k(object):
             if not nchunk:
                 raise Pebkac(400, "unknown chunk")
 
-            if wark in job["busy"]:
-                raise Pebkac(400, "that chunk is already being written to")
+            if chash in job["busy"]:
+                nh = len(job["hash"])
+                idx = job["hash"].index(chash)
+                m = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
+                raise Pebkac(400, m.format(wark, chash, idx, nh, job["name"]))
 
-            job["busy"][wark] = 1
+            job["busy"][chash] = 1
 
         job["poke"] = time.time()
 
@@ -1465,7 +1468,7 @@ class Up2k(object):
         with self.mutex:
             job = self.registry[ptop].get(wark)
             if job:
-                job["busy"].pop(wark, None)
+                job["busy"].pop(chash, None)
 
         return [True]
 
@@ -1479,7 +1482,7 @@ class Up2k(object):
             except Exception as ex:
                 return "confirm_chunk, wark, " + repr(ex)
 
-            job["busy"].pop(wark, None)
+            job["busy"].pop(chash, None)
 
             try:
                 job["need"].remove(chash)
