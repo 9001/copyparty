@@ -319,7 +319,8 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="try to preload the entire song;$N✔️ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably">full</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np clip</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="os integration (media hotkeys / osd)">os-ctl</a>' +
-		'<a href="#" class="tgl btn" id="au_osd_cv" tt="show album cover in osd">osd-cv</a>' +
+		'<a href="#" class="tgl btn" id="au_os_seek" tt="allow seeking through os integration">seek</a>' +
+		'<a href="#" class="tgl btn" id="au_osd_cv" tt="show album cover in osd">art</a>' +
 		'</div></div>' +
 
 		'<div><h3>playback mode</h3><div id="pb_mode">' +
@@ -347,7 +348,8 @@ var mpl = (function () {
 	};
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
-	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true);
+	bcfg_bind(r, 'os_seek', 'au_os_seek', !IPHONE, announce);
+	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true, announce);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
 	});
@@ -360,7 +362,7 @@ var mpl = (function () {
 		r.os_ctl = !r.os_ctl && have_mctl;
 		bcfg_set('au_os_ctl', r.os_ctl);
 		if (!have_mctl)
-			toast.err(5, 'need firefox 82+ or chrome 73+\n(or iOS 15+ supposedly)');
+			toast.err(5, 'need firefox 82+ or chrome 73+ or iOS 15+');
 	};
 
 	function draw_pb_mode() {
@@ -418,7 +420,7 @@ var mpl = (function () {
 		navigator.mediaSession.playbackState = mp.au && !mp.au.paused ? "playing" : "paused";
 	};
 
-	r.announce = function () {
+	function announce() {
 		if (!r.os_ctl)
 			return;
 
@@ -460,12 +462,13 @@ var mpl = (function () {
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', playpause);
 		navigator.mediaSession.setActionHandler('pause', playpause);
-		navigator.mediaSession.setActionHandler('seekbackward', function () { seek_au_rel(-10); });
-		navigator.mediaSession.setActionHandler('seekforward', function () { seek_au_rel(10); });
+		navigator.mediaSession.setActionHandler('seekbackward', r.os_seek ? function () { seek_au_rel(-10); } : null);
+		navigator.mediaSession.setActionHandler('seekforward', r.os_seek ? function () { seek_au_rel(10); } : null);
 		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
 		navigator.mediaSession.setActionHandler('nexttrack', next_song);
 		r.pp();
-	};
+	}
+	r.announce = announce;
 
 	r.stop = function () {
 		if (!r.os_ctl || !navigator.mediaSession.metadata)

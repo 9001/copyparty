@@ -7,8 +7,7 @@ if (!window['console'])
 
 
 var is_touch = 'ontouchstart' in window,
-    IPHONE = /iPhone|iPad|iPod/i.test(navigator.userAgent),
-    ANDROID = /android/i.test(navigator.userAgent),
+    IPHONE = is_touch && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
 
 
@@ -862,7 +861,7 @@ var tt = (function () {
             r.el.removeEventListener('mouseleave', r.hide);
     };
 
-    if (is_touch && IPHONE) {
+    if (IPHONE) {
         var f1 = r.show,
             f2 = r.hide,
             q = [];

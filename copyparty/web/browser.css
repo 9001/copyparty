@@ -876,13 +876,15 @@ html.light #tree.nowrap .ntree a+a:hover {
 }
 #thumbs,
 #au_fullpre,
+#au_os_seek,
 #au_osd_cv,
 #u2tdate {
 	opacity: .3;
 }
 #griden.on+#thumbs,
 #au_preload.on+#au_fullpre,
-#au_os_ctl.on+#au_osd_cv,
+#au_os_ctl.on+#au_os_seek,
+#au_os_ctl.on+#au_os_seek+#au_osd_cv,
 #u2turbo.on+#u2tdate {
 	opacity: 1;
 }
