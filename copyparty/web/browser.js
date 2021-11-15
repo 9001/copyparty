@@ -1261,12 +1261,14 @@ var audio_eq = (function () {
 			return;
 		}
 
-		var max = 0;
-		for (var a = 0; a < r.gains.length; a++)
-			if (max < r.gains[a])
-				max = r.gains[a];
+		var min, max;
+		min = max = r.gains[0];
+		for (var a = 1; a < r.gains.length; a++) {
+			min = Math.min(min, r.gains[a]);
+			max = Math.max(max, r.gains[a]);
+		}
 
-		var gains = []
+		var gains = [];
 		for (var a = 0; a < r.gains.length; a++)
 			gains.push(r.gains[a] - max);
 
@@ -1275,7 +1277,7 @@ var audio_eq = (function () {
 		gains.push(t);
 		gains.unshift(gains[0]);
 
-		for (var a = 0; a < cfg.length; a++) {
+		for (var a = 0; a < cfg.length && min != max; a++) {
 			var fi = actx.createBiquadFilter();
 			fi.frequency.value = cfg[a][0];
 			fi.gain.value = cfg[a][2] * gains[a];
