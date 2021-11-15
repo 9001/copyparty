@@ -307,7 +307,8 @@ function set_files_html(html) {
 }
 
 
-var ACtx = window.AudioContext || window.webkitAudioContext;
+var ACtx = window.AudioContext || window.webkitAudioContext,
+	actx = ACtx && new ACtx();
 
 
 var mpl = (function () {
@@ -324,8 +325,8 @@ var mpl = (function () {
 		'</div></div>' +
 
 		'<div><h3>playback mode</h3><div id="pb_mode">' +
-		'<a href="#" class="tgl btn" tt="loop the open folder">🔁 loop-folder</a>' +
-		'<a href="#" class="tgl btn" tt="load the next folder and continue">📂 next-folder</a>' +
+		'<a href="#" class="tgl btn" tt="loop the open folder">🔁 loop</a>' +
+		'<a href="#" class="tgl btn" tt="load the next folder and continue">📂 next</a>' +
 		'</div></div>' +
 
 		(have_acode ? (
@@ -343,7 +344,7 @@ var mpl = (function () {
 		'<div><h3>audio equalizer</h3><div id="audio_eq"></div></div>');
 
 	var r = {
-		"pb_mode": sread('pb_mode') || 'loop-folder',
+		"pb_mode": (sread('pb_mode') || 'loop').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 	};
 	bcfg_bind(r, 'preload', 'au_preload', true);
@@ -356,6 +357,11 @@ var mpl = (function () {
 	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
 	bcfg_bind(r, 'ac_aac', 'ac_aac', false);
 	bcfg_bind(r, 'ac_oth', 'ac_oth', true, reload_mp);
+
+	if (IPHONE) {
+		ebi('au_fullpre').style.display = 'none';
+		r.fullpre = false;
+	}
 
 	ebi('au_os_ctl').onclick = function (e) {
 		ev(e);
@@ -536,7 +542,7 @@ function MPlayer() {
 		}
 	}
 
-	r.vol = clamp(fcfg_get('vol', 0.5), 0, 1);
+	r.vol = clamp(fcfg_get('vol', IPHONE ? 1 : 0.5), 0, 1);
 
 	r.expvol = function (v) {
 		return 0.5 * v + 0.5 * v * v;
@@ -1102,10 +1108,10 @@ var mpui = (function () {
 		if (mpl.preload && preloaded != mp.au.rsrc) {
 			var pos = mp.au.currentTime,
 				len = mp.au.duration,
-				rem = pos > 0 ? len - pos : 999,
+				rem = pos > 1 ? len - pos : 999,
 				full = null;
 
-			if (rem < (mpl.fullpre && !(is_touch && IPHONE)) ? 7 : 20) {
+			if (rem < (mpl.fullpre ? 7 : 20)) {
 				preloaded = fpreloaded = mp.au.rsrc;
 				full = false;
 			}
@@ -1151,15 +1157,18 @@ var audio_eq = (function () {
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"filters": [],
 		"amp": 0,
-		"last_au": null
+		"last_au": null,
+		"acst": {}
 	};
+
+	if (!actx)
+		ebi('audio_eq').parentNode.style.display = 'none';
 
 	// some browsers have insane high-frequency boost
 	// (or rather the actual problem is Q but close enough)
 	r.cali = (function () {
 		try {
-			var ac = new AudioContext(),
-				fi = ac.createBiquadFilter(),
+			var fi = actx.createBiquadFilter(),
 				freqs = new Float32Array(1),
 				mag = new Float32Array(1),
 				phase = new Float32Array(1);
@@ -1219,35 +1228,27 @@ var audio_eq = (function () {
 	r.apply = function () {
 		r.draw();
 
-		if (!ACtx)
+		if (!actx)
 			bcfg_set('au_eq', false);
 
-		if (!ACtx || !mp.au)
+		if (!actx || !mp.au || (!r.en && !mp.acs))
 			return;
 
-		if (!r.en && !mp.ac)
-			return;
-
-		if (mp.ac) {
+		if (mp.acs) {
 			for (var a = 0; a < r.filters.length; a++)
 				r.filters[a].disconnect();
 
+			r.filters = [];
 			mp.acs.disconnect();
+			mp.acs = null;
 		}
 
-		if (!mp.ac || mp.au != r.last_au) {
-			if (mp.ac)
-				mp.ac.close();
 
-			r.last_au = mp.au;
-			mp.ac = new ACtx();
-			mp.acs = mp.ac.createMediaElementSource(mp.au);
-		}
-
-		r.filters = [];
+		mp.au.id = mp.au.id || Date.now();
+		mp.acs = r.acst[mp.au.id] = r.acst[mp.au.id] || actx.createMediaElementSource(mp.au);
 
 		if (!r.en) {
-			mp.acs.connect(mp.ac.destination);
+			mp.acs.connect(actx.destination);
 			return;
 		}
 
@@ -1266,7 +1267,7 @@ var audio_eq = (function () {
 		gains.unshift(gains[0]);
 
 		for (var a = 0; a < cfg.length; a++) {
-			var fi = mp.ac.createBiquadFilter();
+			var fi = actx.createBiquadFilter();
 			fi.frequency.value = cfg[a][0];
 			fi.gain.value = cfg[a][2] * gains[a];
 			fi.Q.value = cfg[a][1];
@@ -1275,12 +1276,12 @@ var audio_eq = (function () {
 		}
 
 		// pregain, keep first in chain
-		fi = mp.ac.createGain();
+		fi = actx.createGain();
 		fi.gain.value = r.amp + 0.94;  // +.137 dB measured; now -.25 dB and almost bitperfect
 		r.filters.push(fi);
 
 		for (var a = r.filters.length - 1; a >= 0; a--)
-			r.filters[a].connect(a > 0 ? r.filters[a - 1] : mp.ac.destination);
+			r.filters[a].connect(a > 0 ? r.filters[a - 1] : actx.destination);
 
 		mp.acs.connect(r.filters[r.filters.length - 1]);
 	}
@@ -1396,20 +1397,20 @@ function play(tid, is_ev, seek, call_depth) {
 	}
 
 	if (tn >= mp.order.length) {
-		if (mpl.pb_mode == 'loop-folder') {
+		if (mpl.pb_mode == 'loop') {
 			tn = 0;
 		}
-		else if (mpl.pb_mode == 'next-folder') {
+		else if (mpl.pb_mode == 'next') {
 			treectl.ls_cb = next_song;
 			return tree_neigh(1);
 		}
 	}
 
 	if (tn < 0) {
-		if (mpl.pb_mode == 'loop-folder') {
+		if (mpl.pb_mode == 'loop') {
 			tn = mp.order.length - 1;
 		}
-		else if (mpl.pb_mode == 'next-folder') {
+		else if (mpl.pb_mode == 'next') {
 			treectl.ls_cb = prev_song;
 			return tree_neigh(-1);
 		}
@@ -1424,7 +1425,6 @@ function play(tid, is_ev, seek, call_depth) {
 	else {
 		mp.au = new Audio();
 		mp.au2 = new Audio();
-		mp.dummyctx = new ACtx();  // reduces .play() latency somehow
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onended = next_song;
@@ -1436,6 +1436,15 @@ function play(tid, is_ev, seek, call_depth) {
 
 	if (mp.au.rsrc == url)
 		mp.au.currentTime = 0;
+	else if (mp.au2.rsrc == url) {
+		var t = mp.au;
+		mp.au = mp.au2;
+		mp.au2 = t;
+		t.onerror = t.onprogress = t.onended = null;
+		mp.au.onerror = evau_error;
+		mp.au.onprogress = pbar.drawpos;
+		mp.au.onended = next_song;
+	}
 	else
 		mp.au.src = mp.au.rsrc = url;
 
@@ -4948,6 +4957,7 @@ function reload_mp() {
 
 	mpl.unbuffer();
 	mp = new MPlayer();
+	audio_eq.acst = {};
 	setTimeout(pbar.onresize, 1);
 }
 
