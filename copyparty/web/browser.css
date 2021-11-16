@@ -44,8 +44,9 @@ pre, code, tt, #doc, #doc>code {
 	margin-left: -.7em;
 }
 #files {
-	border-spacing: 0;
 	z-index: 1;
+	top: -.3em;
+	border-spacing: 0;
 	position: relative;
 }
 #files tbody a {
@@ -72,7 +73,7 @@ a, #files tbody div a:last-child {
 }
 #files thead {
 	position: sticky;
-	top: 0;
+	top: -1px;
 }
 #files thead a {
 	color: #999;
@@ -82,7 +83,7 @@ a, #files tbody div a:last-child {
 	background: #1c1c1c;
 }
 #files thead th {
-	padding: 0 .3em .3em .3em;
+	padding: .3em;
 	border-bottom: 1px solid #444;
 	cursor: pointer;
 }
