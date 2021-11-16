@@ -349,7 +349,7 @@ class ThumbSrv(object):
 
     def _run_ff(self, cmd):
         # self.log((b" ".join(cmd)).decode("utf-8"))
-        ret, sout, serr = runcmd(cmd)
+        ret, sout, serr = runcmd(cmd, timeout=self.args.th_convt)
         if ret != 0:
             m = "FFmpeg failed (probably a corrupt video file):\n"
             m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])

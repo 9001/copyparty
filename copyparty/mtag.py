@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 
 from .__init__ import PY2, WINDOWS, unicode
-from .util import fsenc, fsdec, uncyg, REKOBO_LKEY
+from .util import fsenc, fsdec, uncyg, runcmd, REKOBO_LKEY
 from .bos import bos
 
 
@@ -73,7 +73,7 @@ class MParser(object):
             raise Exception()
 
 
-def ffprobe(abspath):
+def ffprobe(abspath, timeout=10):
     cmd = [
         b"ffprobe",
         b"-hide_banner",
@@ -82,10 +82,8 @@ def ffprobe(abspath):
         b"--",
         fsenc(abspath),
     ]
-    p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
-    r = p.communicate()
-    txt = r[0].decode("utf-8", "replace")
-    return parse_ffprobe(txt)
+    rc = runcmd(cmd, timeout=timeout)
+    return parse_ffprobe(rc[1])
 
 
 def parse_ffprobe(txt):

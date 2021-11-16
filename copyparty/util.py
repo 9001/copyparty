@@ -1324,9 +1324,17 @@ def guess_mime(url, fallback="application/octet-stream"):
     return ret
 
 
-def runcmd(argv):
+def runcmd(argv, timeout=None):
     p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
-    stdout, stderr = p.communicate()
+    if not timeout or PY2:
+        stdout, stderr = p.communicate()
+    else:
+        try:
+            stdout, stderr = p.communicate(timeout=timeout)
+        except sp.TimeoutExpired:
+            p.kill()
+            stdout, stderr = p.communicate()
+
     stdout = stdout.decode("utf-8", "replace")
     stderr = stderr.decode("utf-8", "replace")
     return [p.returncode, stdout, stderr]
