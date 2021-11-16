@@ -376,6 +376,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even if copyparty thinks you're better off without")
     ap2.add_argument("--no-symlink", action="store_true", help="duplicate file contents instead")
+    ap2.add_argument("--reg-cap", metavar="N", type=int, default=9000, help="max number of uploads to keep in memory when running without -e2d")
 
     ap2 = ap.add_argument_group('network options')
     ap2.add_argument("-i", metavar="IP", type=u, default="0.0.0.0", help="ip to bind (comma-sep.)")
@@ -520,7 +521,7 @@ def main(argv=None):
     if HAVE_SSL:
         ensure_cert()
 
-    for k, v in zip(argv, argv[1:]):
+    for k, v in zip(argv[1:], argv[2:]):
         if k == "-c":
             supp = args_from_cfg(v)
             argv.extend(supp)
