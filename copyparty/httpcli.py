@@ -794,6 +794,10 @@ class HttpCli(object):
         return True
 
     def handle_search(self, body):
+        idx = self.conn.get_u2idx()
+        if not hasattr(idx, "p_end"):
+            raise Pebkac(500, "sqlite3 is not available on the server; cannot search")
+
         vols = []
         seen = {}
         for vtop in self.rvol:
@@ -805,7 +809,6 @@ class HttpCli(object):
             seen[vfs] = True
             vols.append([vfs.vpath, vfs.realpath, vfs.flags])
 
-        idx = self.conn.get_u2idx()
         t0 = time.time()
         if idx.p_end:
             penalty = 0.7
@@ -1830,13 +1833,16 @@ class HttpCli(object):
         if not self.args.unpost:
             raise Pebkac(400, "the unpost feature is disabled in server config")
 
+        idx = self.conn.get_u2idx()
+        if not hasattr(idx, "p_end"):
+            raise Pebkac(500, "sqlite3 is not available on the server; cannot unpost")
+
         filt = self.uparam.get("filter")
         lm = "ups [{}]".format(filt)
         self.log(lm)
 
         ret = []
         t0 = time.time()
-        idx = self.conn.get_u2idx()
         lim = time.time() - self.args.unpost
         for vol in self.asrv.vfs.all_vols.values():
             cur = idx.get_cur(vol.realpath)
