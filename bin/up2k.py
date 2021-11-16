@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-10-31, v0.11, ed <irc.rizon.net>, MIT-Licensed
+2021-11-16, v0.12, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -224,29 +224,47 @@ class CTermsize(object):
 ss = CTermsize()
 
 
-def statdir(top):
+def _scd(err, top):
     """non-recursive listing of directory contents, along with stat() info"""
-    if hasattr(os, "scandir"):
-        with os.scandir(top) as dh:
-            for fh in dh:
-                yield [os.path.join(top, fh.name), fh.stat()]
-    else:
-        for name in os.listdir(top):
-            abspath = os.path.join(top, name)
+    with os.scandir(top) as dh:
+        for fh in dh:
+            abspath = os.path.join(top, fh.name)
+            try:
+                yield [abspath, fh.stat()]
+            except:
+                err.append(abspath)
+
+
+def _lsd(err, top):
+    """non-recursive listing of directory contents, along with stat() info"""
+    for name in os.listdir(top):
+        abspath = os.path.join(top, name)
+        try:
             yield [abspath, os.stat(abspath)]
+        except:
+            err.append(abspath)
 
 
-def walkdir(top):
+if hasattr(os, "scandir"):
+    statdir = _scd
+else:
+    statdir = _lsd
+
+
+def walkdir(err, top):
     """recursive statdir"""
-    for ap, inf in sorted(statdir(top)):
+    for ap, inf in sorted(statdir(err, top)):
         if stat.S_ISDIR(inf.st_mode):
-            for x in walkdir(ap):
-                yield x
+            try:
+                for x in walkdir(err, ap):
+                    yield x
+            except:
+                err.append(ap)
         else:
             yield ap, inf
 
 
-def walkdirs(tops):
+def walkdirs(err, tops):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
     sep = "{0}".format(os.sep).encode("ascii")
     for top in tops:
@@ -256,7 +274,7 @@ def walkdirs(tops):
             stop = os.path.dirname(top)
 
         if os.path.isdir(top):
-            for ap, inf in walkdir(top):
+            for ap, inf in walkdir(err, top):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
             d, n = top.rsplit(sep, 1)
@@ -446,9 +464,20 @@ class Ctl(object):
 
         nfiles = 0
         nbytes = 0
-        for _, _, inf in walkdirs(ar.files):
+        err = []
+        for _, _, inf in walkdirs(err, ar.files):
             nfiles += 1
             nbytes += inf.st_size
+
+        if err:
+            eprint("\n# failed to access {} paths:\n".format(len(err)))
+            for x in err:
+                eprint(x.decode("utf-8", "replace") + "\n")
+
+            eprint("^ failed to access those {} paths ^\n\n".format(len(err)))
+            if not ar.ok:
+                eprint("aborting because --ok is not set\n")
+                return
 
         eprint("found {0} files, {1}\n\n".format(nfiles, humansize(nbytes)))
         self.nfiles = nfiles
@@ -460,7 +489,7 @@ class Ctl(object):
         if ar.te:
             req_ses.verify = ar.te
 
-        self.filegen = walkdirs(ar.files)
+        self.filegen = walkdirs([], ar.files)
         if ar.safe:
             self.safe()
         else:
@@ -783,6 +812,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
     ap.add_argument("-a", metavar="PASSWORD", help="password")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
+    ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap = app.add_argument_group("performance tweaks")
     ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
