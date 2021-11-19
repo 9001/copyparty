@@ -81,6 +81,12 @@ command -v gdate && date() { gdate "$@"; }; while true; do t=$(date +%s.%N); (ti
 
 
 ##
+## track an up2k upload and print all chunks in file-order
+
+grep '"name": "2021-07-18 02-17-59.mkv"' fug.log | head -n 1 | sed -r 's/.*"hash": \[//; s/\].*//' | tr '"' '\n' | grep -E '^[a-zA-Z0-9_-]{44}$' | while IFS= read -r cid; do cat -n fug.log | grep -vF '"purl": "' | grep -- "$cid"; echo; done | stdbuf -oL tr '\t' ' ' | while IFS=' ' read -r ln _ _ _ _ _ ts ip port msg; do [ -z "$msg" ] && echo && continue; printf '%6s [%s] [%s] %s\n' $ln "$ts" "$ip $port" "$msg"; read -r ln _ _ _ _ _ ts ip port msg < <(cat -n fug.log | tail -n +$((ln+1)) | grep -F "$ip $port" | head -n 1); printf '%6s [%s] [%s] %s\n' $ln "$ts" "$ip $port" "$msg"; done
+
+
+##
 ## js oneliners
 
 # get all up2k search result URLs
