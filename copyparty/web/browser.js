@@ -434,7 +434,7 @@ var mpl = (function () {
 
 		var np = get_np()[0],
 			fns = np.file.split(' - '),
-			artist = (np.circle ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
+			artist = (np.circle && np.circle != np.artist ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
 			tags = {
 				title: np.title || fns.pop()
 			};
@@ -1502,7 +1502,7 @@ function play(tid, is_ev, seek, call_depth) {
 		toast.err(0, esc('playback failed: ' + basenames(ex)));
 	}
 	clmod(ebi(oid), 'act');
-	setTimeout(next_song, 500);
+	setTimeout(next_song, 5000);
 }
 
 
@@ -3466,11 +3466,13 @@ var treectl = (function () {
 	}
 
 	r.textmode = function (ya) {
+		var chg = !r.texts != !ya;
 		r.texts = ya;
 		ebi('docul').style.display = ya ? '' : 'none';
 		ebi('treeul').style.display = ebi('treepar').style.display = ya ? 'none' : '';
 		clmod(ebi('filetree'), 'on', ya);
-		tree_scrollto();
+		if (chg)
+			tree_scrollto();
 	};
 	ebi('filetree').onclick = function (e) {
 		ev(e);
