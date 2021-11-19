@@ -1211,15 +1211,16 @@ function up2k_init(subtle) {
             running = true;
             while (true) {
                 var now = Date.now(),
-                    is_busy = 0 !=
-                        st.todo.head.length +
-                        st.todo.hash.length +
-                        st.todo.handshake.length +
-                        st.todo.upload.length +
-                        st.busy.head.length +
-                        st.busy.hash.length +
-                        st.busy.handshake.length +
-                        st.busy.upload.length;
+                    oldest_active = Math.min(  // gzip take the wheel
+                        st.todo.head.length ? st.todo.head[0].n : st.files.length,
+                        st.todo.hash.length ? st.todo.hash[0].n : st.files.length,
+                        st.todo.upload.length ? st.todo.upload[0].nfile : st.files.length,
+                        st.todo.handshake.length ? st.todo.handshake[0].n : st.files.length,
+                        st.busy.head.length ? st.busy.head[0].n : st.files.length,
+                        st.busy.hash.length ? st.busy.hash[0].n : st.files.length,
+                        st.busy.upload.length ? st.busy.upload[0].nfile : st.files.length,
+                        st.busy.handshake.length ? st.busy.handshake[0].n : st.files.length),
+                    is_busy = oldest_active < st.files.length;
 
                 if (was_busy && !is_busy) {
                     for (var a = 0; a < st.files.length; a++) {
@@ -1320,7 +1321,8 @@ function up2k_init(subtle) {
                 }
 
                 if (st.todo.head.length &&
-                    st.busy.head.length < parallel_uploads) {
+                    st.busy.head.length < parallel_uploads &&
+                    (!is_busy || st.todo.head[0].n - oldest_active < parallel_uploads * 2)) {
                     exec_head();
                     mou_ikkai = true;
                 }
