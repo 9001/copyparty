@@ -117,7 +117,7 @@ ebi('op_up2k').innerHTML = (
 
 	'</div>\n' +
 
-	'<table id="u2tab">\n' +
+	'<div id="u2tabw"><table id="u2tab">\n' +
 	'	<thead>\n' +
 	'		<tr>\n' +
 	'			<td>filename</td>\n' +
@@ -126,7 +126,7 @@ ebi('op_up2k').innerHTML = (
 	'		</tr>\n' +
 	'	</thead>\n' +
 	'	<tbody></tbody>\n' +
-	'</table>\n' +
+	'</table></div>\n' +
 
 	'<p id="u2flagblock"><b>the files were added to the queue</b><br />however there is a busy up2k in another browser tab,<br />so waiting for that to finish first</p>\n' +
 	'<p id="u2foot"></p>\n' +

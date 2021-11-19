@@ -1666,8 +1666,6 @@ html.light #bbox-overlay figcaption a {
 
 #op_up2k {
 	padding: 0 1em 1em 1em;
-	min-height: 0;
-	transition: min-height .2s;
 }
 #drops {
 	display: none;
@@ -1832,13 +1830,17 @@ html.light #u2err.err {
 #u2notbtn * {
 	line-height: 1.3em;
 }
+#u2tabw {
+	min-height: 0;
+	transition: min-height .2s;
+	margin: 3em auto;
+}
 #u2tab {
 	border-collapse: collapse;
-	margin: 3em auto;
 	width: calc(100% - 2em);
 	max-width: 100em;
 }
-#op_up2k.srch #u2tab {
+#op_up2k.srch #u2tabf {
 	max-width: none;
 }
 #u2tab td {

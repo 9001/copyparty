@@ -1069,7 +1069,7 @@ function up2k_init(subtle) {
     }
     more_one_file();
 
-    var etaref = 0, etaskip = 0, op_minh = 0;
+    var etaref = 0, etaskip = 0, utw_minh = 0;
     function etafun() {
         var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,
             nsend = st.busy.upload.length + st.todo.upload.length,
@@ -1082,13 +1082,10 @@ function up2k_init(subtle) {
 
         //ebi('acc_info').innerHTML = humantime(st.time.busy) + ' ' + f2f(now / 1000, 1);
 
-        var op = ebi('op_up2k'),
-            uff = ebi('u2footfoot'),
-            minh = QS('#op_up2k.act') ? Math.max(op_minh, uff.offsetTop + uff.offsetHeight - op.offsetTop + 32) : 0;
-
-        if (minh > op_minh || !op_minh) {
-            op_minh = minh;
-            op.style.minHeight = op_minh + 'px';
+        var minh = QS('#op_up2k.act') && st.is_busy ? Math.max(utw_minh, ebi('u2tab').offsetHeight + 32) : 0;
+        if (utw_minh < minh || !utw_minh) {
+            utw_minh = minh;
+            ebi('u2tabw').style.minHeight = utw_minh + 'px';
         }
 
         if (!nhash)
@@ -1240,7 +1237,7 @@ function up2k_init(subtle) {
                 }
 
                 if (was_busy != is_busy) {
-                    was_busy = is_busy;
+                    st.is_busy = was_busy = is_busy;
 
                     window[(is_busy ? "add" : "remove") +
                         "EventListener"]("beforeunload", warn_uploader_busy);
@@ -1269,7 +1266,7 @@ function up2k_init(subtle) {
 
                         timer.rm(etafun);
                         timer.rm(donut.do);
-                        op_minh = 0;
+                        utw_minh = 0;
                     }
                     else {
                         timer.add(donut.do);
