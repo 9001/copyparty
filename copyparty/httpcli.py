@@ -601,8 +601,8 @@ class HttpCli(object):
                 alg = alg or "gz"  # def.pk
                 try:
                     # config-forced opts
-                    alg, lv = pk.split(",")
-                    lv[alg] = int(lv)
+                    alg, nlv = pk.split(",")
+                    lv[alg] = int(nlv)
                 except:
                     pass
 
