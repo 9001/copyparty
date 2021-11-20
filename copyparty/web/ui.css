@@ -120,7 +120,8 @@ html {
 	color: #fff;
 	background: #111;
 	font-size: .9em;
-	padding: 0 .3em;
+	padding: 0 .26em;
+	line-height: .97em;
 	border-radius: 1em;
 	position: absolute;
 	display: none;

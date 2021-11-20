@@ -2977,6 +2977,9 @@ document.onkeydown = function (e) {
 		if (widget.is_open)
 			return widget.close();
 
+		if (showfile.active())
+			return thegrid.setvis(true);
+
 		if (!treectl.hidden)
 			return treectl.detree();
 
