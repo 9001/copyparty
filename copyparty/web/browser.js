@@ -1343,7 +1343,7 @@ var audio_eq = (function () {
 	}
 
 	var html = ['<table><tr><td rowspan="4">',
-		'<a id="au_eq" class="tgl btn" href="#" tt="enables the equalizer and gain control;$Nboost 0 = unmodified 100% volume">enable</a></td>'],
+		'<a id="au_eq" class="tgl btn" href="#" tt="enables the equalizer and gain control;$Nboost 0 = unmodified 100% volume$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero if you care about that">enable</a></td>'],
 		h2 = [], h3 = [], h4 = [];
 
 	var vs = [];
