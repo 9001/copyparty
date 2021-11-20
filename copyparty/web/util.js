@@ -180,6 +180,7 @@ function ignex(all) {
     if (!all)
         window.onerror = vis_exh;
 }
+window.onerror = vis_exh;
 
 
 function noop() { }
@@ -791,14 +792,18 @@ var timer = (function () {
 var tt = (function () {
     var r = {
         "tt": mknod("div"),
+        "th": mknod("div"),
         "en": true,
         "el": null,
         "skip": false,
         "lvis": 0
     };
 
+    r.th.innerHTML = '?';
     r.tt.setAttribute('id', 'tt');
+    r.th.setAttribute('id', 'tth');
     document.body.appendChild(r.tt);
+    document.body.appendChild(r.th);
 
     var prev = null;
     r.cshow = function () {
@@ -809,12 +814,32 @@ var tt = (function () {
     };
 
     var tev;
-    r.dshow = function () {
+    r.dshow = function (e) {
         clearTimeout(tev);
+        if (!r.getmsg(this))
+            return;
+
         if (Date.now() - r.lvis < 400)
             return r.show.bind(this)();
 
-        tev = setTimeout(r.show.bind(this), 700);
+        tev = setTimeout(r.show.bind(this), 800);
+        if (is_touch)
+            return;
+
+        this.addEventListener('mousemove', r.move);
+        clmod(r.th, 'act', 1);
+        r.move(e);
+    };
+
+    r.getmsg = function (el) {
+        if (QS('body.bbox-open'))
+            return;
+
+        var cfg = sread('tooltips');
+        if (cfg !== null && cfg != '1')
+            return;
+
+        return el.getAttribute('tt');
     };
 
     r.show = function () {
@@ -823,14 +848,7 @@ var tt = (function () {
             r.skip = false;
             return;
         }
-        if (QS('body.bbox-open'))
-            return;
-
-        var cfg = sread('tooltips');
-        if (cfg !== null && cfg != '1')
-            return;
-
-        var msg = this.getAttribute('tt');
+        var msg = r.getmsg(this);
         if (!msg)
             return;
 
@@ -844,6 +862,7 @@ var tt = (function () {
         if (dir.indexOf('u') + 1) top = false;
         if (dir.indexOf('d') + 1) top = true;
 
+        clmod(r.th, 'act');
         clmod(r.tt, 'b', big);
         r.tt.style.left = '0';
         r.tt.style.top = '0';
@@ -873,11 +892,20 @@ var tt = (function () {
         window.removeEventListener('scroll', r.hide);
 
         clmod(r.tt, 'b');
+        clmod(r.th, 'act');
         if (clmod(r.tt, 'show'))
             r.lvis = Date.now();
 
         if (r.el)
             r.el.removeEventListener('mouseleave', r.hide);
+
+        if (e && e.target)
+            e.target.removeEventListener('mousemove', r.move);
+    };
+
+    r.move = function (e) {
+        r.th.style.left = (e.pageX + 12) + 'px';
+        r.th.style.top = (e.pageY + 12) + 'px';
     };
 
     if (IPHONE) {

@@ -1,7 +1,5 @@
 "use strict";
 
-window.onerror = vis_exh;
-
 function dbg(msg) {
 	ebi('path').innerHTML = msg;
 }

@@ -116,6 +116,18 @@ html {
 #toast.err #toastc {
 	background: #d06;
 }
+#tth {
+	color: #fff;
+	background: #111;
+	font-size: .9em;
+	padding: 0 .3em;
+	border-radius: 1em;
+	position: absolute;
+	display: none;
+}
+#tth.act {
+	display: block;
+}
 #tt.b {
 	padding: 0 2em;
 	border-radius: .5em;
@@ -158,6 +170,10 @@ html.light #tt code {
 }
 html.light #tt em {
 	color: #d38;
+}
+html.light #tth {
+	color: #000;
+	background: #fff;
 }
 #modal {
 	position: fixed;
