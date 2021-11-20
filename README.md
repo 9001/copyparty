@@ -52,7 +52,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
-    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
+    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
     * [upload events](#upload-events) - trigger a script/program on each upload
     * [complete examples](#complete-examples)
 * [browser support](#browser-support) - TLDR: yes
@@ -721,7 +721,7 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 ## file parser plugins
 
-provide custom parsers to index additional tags
+provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
 
 copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volume flag), there is a default timeout of 30sec
 
