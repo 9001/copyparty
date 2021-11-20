@@ -516,7 +516,7 @@ class HttpCli(object):
                 return self.handle_stash()
 
             if "save" in opt:
-                post_sz, _, _, path = self.dump_to_file()
+                post_sz, _, _, _, path = self.dump_to_file()
                 self.log("urlform: {} bytes, {}".format(post_sz, path))
             elif "print" in opt:
                 reader, _ = self.get_body_reader()
@@ -632,7 +632,7 @@ class HttpCli(object):
         with ren_open(fn, *open_a, **params) as f:
             f, fn = f["orz"]
             path = os.path.join(fdir, fn)
-            post_sz, _, sha_b64 = hashcopy(reader, f)
+            post_sz, sha_hex, sha_b64 = hashcopy(reader, f)
 
         if lim:
             lim.nup(self.ip)
@@ -656,13 +656,14 @@ class HttpCli(object):
                 time.time(),
             )
 
-        return post_sz, sha_b64, remains, path
+        return post_sz, sha_hex, sha_b64, remains, path
 
     def handle_stash(self):
-        post_sz, sha_b64, remains, path = self.dump_to_file()
+        post_sz, sha_hex, sha_b64, remains, path = self.dump_to_file()
         spd = self._spd(post_sz)
         self.log("{} wrote {}/{} bytes to {}".format(spd, post_sz, remains, path))
-        self.reply("{}\n{}\n".format(post_sz, sha_b64).encode("utf-8"))
+        m = "{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56])
+        self.reply(m.encode("utf-8"))
         return True
 
     def _spd(self, nbytes, add=True):
@@ -895,12 +896,8 @@ class HttpCli(object):
                 post_sz, _, sha_b64 = hashcopy(reader, f)
 
                 if sha_b64 != chash:
-                    raise Pebkac(
-                        400,
-                        "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}".format(
-                            post_sz, chash, sha_b64
-                        ),
-                    )
+                    m = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
+                    raise Pebkac(400, m.format(post_sz, chash, sha_b64))
 
                 if len(cstart) > 1 and path != os.devnull:
                     self.log(
@@ -1089,7 +1086,7 @@ class HttpCli(object):
                         f, fname = f["orz"]
                         abspath = os.path.join(fdir, fname)
                         self.log("writing to {}".format(abspath))
-                        sz, sha512_hex, _ = hashcopy(p_data, f)
+                        sz, sha_hex, sha_b64 = hashcopy(p_data, f)
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
@@ -1102,7 +1099,7 @@ class HttpCli(object):
                             bos.unlink(abspath)
                             raise
 
-                    files.append([sz, sha512_hex, p_file, fname, abspath])
+                    files.append([sz, sha_hex, sha_b64, p_file, fname, abspath])
                     dbv, vrem = vfs.get_dbv(rem)
                     self.conn.hsrv.broker.put(
                         False,
@@ -1154,7 +1151,7 @@ class HttpCli(object):
             jmsg["error"] = errmsg
             errmsg = "ERROR: " + errmsg
 
-        for sz, sha512, ofn, lfn, ap in files:
+        for sz, sha_hex, sha_b64, ofn, lfn, ap in files:
             vsuf = ""
             if self.can_read and "fk" in vfs.flags:
                 vsuf = "?k=" + gen_filekey(
@@ -1165,8 +1162,13 @@ class HttpCli(object):
                 )[: vfs.flags["fk"]]
 
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
-            msg += 'sha512: {} // {} bytes // <a href="/{}">{}</a> {}\n'.format(
-                sha512[:56], sz, quotep(vpath) + vsuf, html_escape(ofn, crlf=True), vsuf
+            msg += 'sha512: {} // {} // {} bytes // <a href="/{}">{}</a> {}\n'.format(
+                sha_hex[:56],
+                sha_b64,
+                sz,
+                quotep(vpath) + vsuf,
+                html_escape(ofn, crlf=True),
+                vsuf,
             )
             # truncated SHA-512 prevents length extension attacks;
             # using SHA-512/224, optionally SHA-512/256 = :64
@@ -1176,7 +1178,8 @@ class HttpCli(object):
                     self.headers.get("host", "copyparty"),
                     vpath + vsuf,
                 ),
-                "sha512": sha512[:56],
+                "sha512": sha_hex[:56],
+                "sha_b64": sha_b64,
                 "sz": sz,
                 "fn": lfn,
                 "fn_orig": ofn,
