@@ -13,7 +13,7 @@ try:
 except:
 
     def fsenc(p):
-        return p
+        return p.encode("utf-8")
 
 
 """
@@ -24,13 +24,13 @@ dep: ffmpeg
 def det():
     # fmt: off
     cmd = [
-        "ffmpeg",
-        "-nostdin",
-        "-hide_banner",
-        "-v", "fatal",
-        "-i", fsenc(sys.argv[1]),
-        "-f", "framemd5",
-        "-"
+        b"ffmpeg",
+        b"-nostdin",
+        b"-hide_banner",
+        b"-v", b"fatal",
+        b"-i", fsenc(sys.argv[1]),
+        b"-f", b"framemd5",
+        b"-"
     ]
     # fmt: on
 

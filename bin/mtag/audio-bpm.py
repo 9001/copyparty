@@ -19,18 +19,18 @@ dep: ffmpeg
 def det(tf):
     # fmt: off
     sp.check_call([
-        "ffmpeg",
-        "-nostdin",
-        "-hide_banner",
-        "-v", "fatal",
-        "-ss", "13",
-        "-y", "-i", fsenc(sys.argv[1]),
-        "-map", "0:a:0",
-        "-ac", "1",
-        "-ar", "22050",
-        "-t", "300",
-        "-f", "f32le",
-        tf
+        b"ffmpeg",
+        b"-nostdin",
+        b"-hide_banner",
+        b"-v", b"fatal",
+        b"-ss", b"13",
+        b"-y", b"-i", fsenc(sys.argv[1]),
+        b"-map", b"0:a:0",
+        b"-ac", b"1",
+        b"-ar", b"22050",
+        b"-t", b"300",
+        b"-f", b"f32le",
+        fsenc(tf)
     ])
     # fmt: on
 
