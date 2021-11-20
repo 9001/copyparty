@@ -6,6 +6,7 @@ some of these rely on libraries which are not MIT-compatible
 
 * [audio-bpm.py](./audio-bpm.py) detects the BPM of music using the BeatRoot Vamp Plugin; imports GPL2
 * [audio-key.py](./audio-key.py) detects the melodic key of music using the Mixxx fork of keyfinder; imports GPL3
+* [image-noexif.py](./image-noexif.py) removes exif tags from images; is GPLv1 or artistic-license
 * [media-hash.py](./media-hash.py) generates checksums for audio and video streams; uses FFmpeg (LGPL or GPL)
 
 these do not have any problematic dependencies:
