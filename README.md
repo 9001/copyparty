@@ -677,6 +677,12 @@ things to note,
 * the files will be indexed after compression, so dupe-detection and file-search will not work as expected
 
 some examples,
+* `-v inc:inc:w:c,pk=xz,0`  
+  folder named inc, shared at inc, write-only for everyone, forces xz compression at level 0
+* `-v inc:inc:w:c,pk`  
+  same write-only inc, but forces gz compression (default) instead of xz
+* `-v inc:inc:w:c,gz`  
+  allows (but does not force) gz compression if client uploads to `/inc?pk` or `/inc?gz` or `/inc?gz=4`
 
 
 ## database location
