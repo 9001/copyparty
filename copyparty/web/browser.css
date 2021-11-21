@@ -1833,12 +1833,13 @@ html.light #u2err.err {
 #u2tabw {
 	min-height: 0;
 	transition: min-height .2s;
-	margin: 3em auto;
+	margin: 3em 0;
 }
 #u2tab {
 	border-collapse: collapse;
 	width: calc(100% - 2em);
 	max-width: 100em;
+	margin: 0 auto;
 }
 #op_up2k.srch #u2tabf {
 	max-width: none;
