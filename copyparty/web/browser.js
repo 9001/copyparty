@@ -3234,7 +3234,34 @@ document.onkeydown = function (e) {
 			for (var b = 1; b < sconf[a].length; b++) {
 				var k = sconf[a][b][0],
 					chk = 'srch_' + k + 'c',
-					tvs = ebi('srch_' + k + 'v').value.split(/ +/g);
+					vs = ebi('srch_' + k + 'v').value,
+					tvs = [];
+
+				if (k == 'name')
+					console.log('a');
+				while (vs) {
+					vs = vs.trim();
+					if (!vs)
+						break;
+
+					var v = '';
+					if (vs.startsWith('"')) {
+						var vp = vs.slice(1).split(/"(.*)/);
+						v = vp[0];
+						vs = vp[1] || '';
+						while (v.endsWith('\\')) {
+							vp = vs.split(/"(.*)/);
+							v = v.slice(0, -1) + '"' + vp[0];
+							vs = vp[1] || '';
+						}
+					}
+					else {
+						var vp = vs.split(/ +(.*)/);
+						v = vp[0].replace(/\\"/g, '"');
+						vs = vp[1] || '';
+					}
+					tvs.push(v);
+				}
 
 				if (!ebi(chk).checked)
 					continue;
@@ -3275,6 +3302,10 @@ document.onkeydown = function (e) {
 						}
 						else {
 							tv += '*';
+						}
+
+						if (tv.indexOf(' ') + 1) {
+							tv = '"' + tv + '"';
 						}
 
 						q += k + not + 'like ' + tv;
