@@ -3365,7 +3365,7 @@ document.onkeydown = function (e) {
 				ts = parseInt(r.ts),
 				sz = esc(r.sz + ''),
 				rp = esc(uricom_dec(r.rp + '')[0]),
-				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').pop() : '%',
+				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').pop().split('?')[0] : '%',
 				links = linksplit(r.rp + '');
 
 			if (ext.length > 8)
