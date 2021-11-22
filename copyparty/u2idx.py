@@ -117,7 +117,17 @@ class U2idx(object):
             if ok:
                 continue
 
-            v, uq = (uq + " ").split(" ", 1)
+            if uq.startswith('"'):
+                v, uq = uq[1:].split('"', 1)
+                while v.endswith("\\"):
+                    v2, uq = uq.split('"', 1)
+                    v = v[:-1] + '"' + v2
+                v2, uq = (uq + " ").split(" ", 1)
+                v += v2
+            else:
+                v, uq = (uq + " ").split(" ", 1)
+                v = v.replace('\\"', '"')
+
             if is_key:
                 is_key = False
 
