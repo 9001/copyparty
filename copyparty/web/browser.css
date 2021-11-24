@@ -295,6 +295,8 @@ html.light #ggrid>a.sel {
 	width: 100%;
 	z-index: 3;
 	touch-action: none;
+}
+#widget.anim {
 	transition: bottom 0.15s;
 }
 #widget.open {

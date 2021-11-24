@@ -693,24 +693,19 @@ var widget = (function () {
 		touchmode = false,
 		was_paused = true;
 
-	r.is_open = false;
-
 	r.open = function () {
-		if (r.is_open)
-			return false;
-
-		clmod(document.documentElement, 'np_open', 1);
-		widget.className = 'open';
-		r.is_open = true;
-		return true;
+		return r.set(true);
 	};
 	r.close = function () {
-		if (!r.is_open)
+		return r.set(false);
+	};
+	r.set = function (is_open) {
+		if (r.is_open == is_open)
 			return false;
 
-		clmod(document.documentElement, 'np_open');
-		widget.className = '';
-		r.is_open = false;
+		clmod(document.documentElement, 'np_open', is_open);
+		widget.className = is_open ? 'open' : '';
+		bcfg_set('au_open', r.is_open = is_open);
 		return true;
 	};
 	r.toggle = function (e) {
@@ -757,6 +752,10 @@ var widget = (function () {
 			document.body.removeChild(o);
 		}, 500);
 	};
+	r.set(sread('au_open') == 1);
+	setTimeout(function () {
+		clmod(ebi('widget'), 'anim', 1);
+	}, 10);
 	return r;
 })();
 
@@ -5005,7 +5004,6 @@ function reload_mp() {
 		mp.au = null;
 	}
 	mpl.stop();
-	widget.close();
 	var plays = QSA('tr>td:first-child>a.play');
 	for (var a = plays.length - 1; a >= 0; a--)
 		plays[a].parentNode.innerHTML = '-';
