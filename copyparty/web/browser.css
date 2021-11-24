@@ -950,6 +950,12 @@ html.light .ghead {
 #ggrid>a.dir:before {
 	content: '📂';
 }
+#ggrid>a.au:before {
+	content: '💾';
+}
+html.np_open #ggrid>a.au:before {
+	content: '▶';
+}
 #ggrid>a:before {
 	display: block;
 	position: absolute;

@@ -539,6 +539,7 @@ function MPlayer() {
 			r.tracks[tid] = url;
 			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">play</a></td>';
 			ebi('a' + tid).onclick = ev_play;
+			clmod(trs[a], 'au', 1);
 		}
 	}
 
