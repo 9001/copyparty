@@ -728,7 +728,6 @@ function up2k_init(subtle) {
         if (++nenters <= 0)
             nenters = 1;
 
-        //console.log(nenters, Date.now(), 'enter', this, e.target);
         if (onover.bind(this)(e))
             return true;
 
@@ -749,6 +748,11 @@ function up2k_init(subtle) {
         clmod(sr, 'ok', !msr);
         ebi('up_dz').setAttribute('err', mup || '');
         ebi('srch_dz').setAttribute('err', msr || '');
+    }
+    function onoverb(e) {
+        // zones are alive; disable cuo2duo branch
+        document.body.ondragover = document.body.ondrop = null;
+        return onover.bind(this)(e);
     }
     function onover(e) {
         try {
@@ -781,17 +785,20 @@ function up2k_init(subtle) {
             clmod(ebi('drops'), 'vis');
             clmod(ebi('up_dz'), 'hl');
             clmod(ebi('srch_dz'), 'hl');
+            // cuo2duo:
+            document.body.ondragover = onover;
+            document.body.ondrop = gotfile;
         }
-
-        //console.log(nenters, Date.now(), 'leave', this, e && e.target);
     }
     document.body.ondragenter = ondrag;
     document.body.ondragleave = offdrag;
+    document.body.ondragover = onover;
+    document.body.ondrop = gotfile;
 
     var drops = [ebi('up_dz'), ebi('srch_dz')];
     for (var a = 0; a < 2; a++) {
         drops[a].ondragenter = ondrag;
-        drops[a].ondragover = onover;
+        drops[a].ondragover = onoverb;
         drops[a].ondragleave = offdrag;
         drops[a].ondrop = gotfile;
     }
@@ -801,7 +808,10 @@ function up2k_init(subtle) {
         ev(e);
         nenters = 0;
         offdrag.bind(this)();
-        var dz = (this && this.getAttribute('id'));
+        var dz = this && this.getAttribute('id');
+        if (!dz && e && e.clientY)
+            // cuo2duo fallback
+            dz = e.clientY < window.innerHeight / 2 ? 'up_dz' : 'srch_dz';
 
         var err = this.getAttribute('err');
         if (err)
