@@ -23,7 +23,7 @@ from textwrap import dedent
 from .__init__ import E, WINDOWS, ANYWIN, VT100, PY2, unicode
 from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
 from .svchub import SvcHub
-from .util import py_desc, align_tab, IMPLICATIONS, ansi_re
+from .util import py_desc, align_tab, IMPLICATIONS, ansi_re, min_ex
 from .authsrv import re_vol
 
 HAVE_SSL = True
@@ -222,6 +222,54 @@ def sighandler(sig=None, frame=None):
     print("\n".join(msg))
 
 
+def disable_quickedit():
+    import ctypes
+    import atexit
+    from ctypes import wintypes
+
+    def ecb(ok, fun, args):
+        if not ok:
+            err = ctypes.get_last_error()
+            if err:
+                raise ctypes.WinError(err)
+        return args
+
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    if PY2:
+        wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
+
+    k32.GetStdHandle.errcheck = ecb
+    k32.GetConsoleMode.errcheck = ecb
+    k32.SetConsoleMode.errcheck = ecb
+    k32.GetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.LPDWORD)
+    k32.SetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.DWORD)
+
+    def cmode(out, mode=None):
+        h = k32.GetStdHandle(-11 if out else -10)
+        if mode:
+            return k32.SetConsoleMode(h, mode)
+
+        mode = wintypes.DWORD()
+        k32.GetConsoleMode(h, ctypes.byref(mode))
+        return mode.value
+
+    # disable quickedit
+    mode = orig_in = cmode(False)
+    quickedit = 0x40
+    extended = 0x80
+    mask = quickedit + extended
+    if mode & mask != extended:
+        atexit.register(cmode, False, orig_in)
+        cmode(False, mode & ~mask | extended)
+
+    # enable colors in case the os.system("rem") trick ever stops working
+    if VT100:
+        mode = orig_out = cmode(True)
+        if mode & 4 != 4:
+            atexit.register(cmode, True, orig_out)
+            cmode(True, mode | 4)
+
+
 def run_argparse(argv, formatter):
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
@@ -396,6 +444,7 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('opt-outs')
     ap2.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
+    ap2.add_argument("--keep-qem", action="store_true", help="do not disable quick-edit-mode on windows")
     ap2.add_argument("--no-del", action="store_true", help="disable delete operations")
     ap2.add_argument("--no-mv", action="store_true", help="disable move/rename operations")
     ap2.add_argument("-nih", action="store_true", help="no info hostname")
@@ -549,6 +598,12 @@ def main(argv=None):
         al = run_argparse(argv, RiceFormatter)
     except AssertionError:
         al = run_argparse(argv, Dodge11874)
+
+    if WINDOWS and not al.keep_qem:
+        try:
+            disable_quickedit()
+        except:
+            print("\nfailed to disable quick-edit-mode:\n" + min_ex() + "\n")
 
     nstrs = []
     anymod = False
