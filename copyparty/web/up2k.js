@@ -760,6 +760,8 @@ function up2k_init(subtle) {
             for (var a = 0; a < dt.length; a++)
                 if (dt[a] == 'Files')
                     ok = true;
+                else if (dt[a] == 'text/uri-list')
+                    return true;
 
             if (!ok)
                 return true;
