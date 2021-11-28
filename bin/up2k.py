@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-11-16, v0.12, ed <irc.rizon.net>, MIT-Licensed
+2021-11-28, v0.13, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -390,7 +390,7 @@ def handshake(req_ses, url, file, pw, search):
             r = req_ses.post(url, headers=headers, json=req)
             break
         except:
-            eprint("handshake failed, retry...\n")
+            eprint("handshake failed, retrying: {0}\n".format(file.name))
             time.sleep(1)
 
     try:
@@ -470,11 +470,11 @@ class Ctl(object):
             nbytes += inf.st_size
 
         if err:
-            eprint("\n# failed to access {} paths:\n".format(len(err)))
+            eprint("\n# failed to access {0} paths:\n".format(len(err)))
             for x in err:
                 eprint(x.decode("utf-8", "replace") + "\n")
 
-            eprint("^ failed to access those {} paths ^\n\n".format(len(err)))
+            eprint("^ failed to access those {0} paths ^\n\n".format(len(err)))
             if not ar.ok:
                 eprint("aborting because --ok is not set\n")
                 return
@@ -505,7 +505,7 @@ class Ctl(object):
             print("{0} {1}\n  hash...".format(self.nfiles - nf, upath))
             get_hashlist(file, None)
 
-            burl = self.ar.url[:8] + self.ar.url[8:].split("/")[0] + "/"
+            burl = self.ar.url[:12] + self.ar.url[8:].split("/")[0] + "/"
             while True:
                 print("  hs...")
                 hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
@@ -773,7 +773,7 @@ class Ctl(object):
             try:
                 upload(req_ses, file, cid, self.ar.a)
             except:
-                eprint("upload failed, retry...\n")
+                eprint("upload failed, retrying: {0} #{1}\n".format(file.name, cid[:8]))
                 pass  # handshake will fix it
 
             with self.mutex:
