@@ -525,13 +525,15 @@ function Donut(uc, st) {
     }
 
     r.on = function (ya) {
-        r.fc = 99;
+        r.fc = r.tc = 99;
         r.eta = null;
         r.base = pos();
         optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
         el = QS('#ops a .donut');
-        if (!ya)
+        if (!ya) {
             favico.upd();
+            wintitle();
+        }
     };
     r.do = function () {
         if (!el)
@@ -540,6 +542,11 @@ function Donut(uc, st) {
         var t = st.bytes.total - r.base,
             v = pos() - r.base,
             ofs = el.style.strokeDashoffset = o - o * v / t;
+
+        if (++r.tc >= 10) {
+            wintitle(f2f(v * 100 / t, 1) + '%, ' + r.eta + 's, ', true);
+            r.tc = 0;
+        }
 
         if (favico.txt) {
             if (++r.fc < 10 && r.eta && r.eta > 99)

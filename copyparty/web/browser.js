@@ -3929,8 +3929,7 @@ var treectl = (function () {
 		if (res.readme)
 			show_readme(res.readme);
 
-		document.title = '⇆🎉 ' + uricom_dec(document.location.pathname.slice(1, -1))[0];
-
+		wintitle();
 		filecols.set_style();
 		showfile.mktree();
 		mukey.render();
@@ -4976,6 +4975,11 @@ var unpost = (function () {
 
 function goto_unpost(e) {
 	unpost.load();
+}
+
+
+function wintitle(txt) {
+	document.title = (txt ? txt : '') + get_vpath().slice(1, -1).split('/').pop();
 }
 
 
