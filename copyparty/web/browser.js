@@ -9,7 +9,7 @@ function dbg(msg) {
 ebi('ops').innerHTML = (
 	'<a href="#" data-dest="" tt="close submenu">--</a>\n' +
 	(have_up2k_idx ? (
-		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = must start with yana and have the opus extension">🔎</a>\n' +
+		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with yana and be an opus file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»">🔎</a>\n' +
 		(have_del && have_unpost ? '<a href="#" data-dest="unpost" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
 		'<a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server">🚀</a>\n'
 	) : (

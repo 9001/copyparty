@@ -193,6 +193,11 @@ git pull; git reset --hard origin/HEAD && git log --format=format:"%H %ai %d" --
 # download all sfx versions
 curl https://api.github.com/repos/9001/copyparty/releases?per_page=100 | jq -r '.[] | .tag_name + " " + .name' | tr -d '\r' | while read v t; do fn="$(printf '%s\n' "copyparty $v $t.py" | tr / -)"; [ -e "$fn" ] || curl https://github.com/9001/copyparty/releases/download/$v/copyparty-sfx.py -Lo "$fn"; done
 
+# push to multiple git remotes
+git config -l | grep '^remote'
+git remote add all git@github.com:9001/copyparty.git
+git remote set-url --add --push all git@gitlab.com:9001/copyparty.git
+git remote set-url --add --push all git@github.com:9001/copyparty.git
 
 ##
 ## http 206

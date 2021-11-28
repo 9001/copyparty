@@ -240,6 +240,8 @@ html.light #ggrid>a[tt].sel {
 #files tbody tr.sel:hover td,
 #files tbody tr.sel:focus td,
 #ggrid>a.sel:hover,
+#ggrid>a.sel:focus,
+html.light #ggrid>a.sel:focus,
 html.light #ggrid>a.sel:hover {
 	color: #fff;
 	background: #d39;
@@ -965,6 +967,12 @@ html.np_open #ggrid>a.au:before {
 	background: linear-gradient(135deg,rgba(255,255,255,0) 50%,rgba(255,255,255,0.2));
 	border-radius: .3em;
 	font-size: 2em;
+	transition: font-size .15s, margin .15s;
+}
+#ggrid>a:focus:before,
+#ggrid>a:hover:before {
+	font-size: 2.5em;
+	margin: -.2em;
 }
 #op_unpost {
 	padding: 1em;
@@ -1169,6 +1177,7 @@ html,
 #ggrid>a[tt] {
 	background: linear-gradient(135deg, #2c2c2c 95%, #444 95%);
 }
+#ggrid>a:focus,
 #ggrid>a:hover {
 	background: #383838;
 	border-color: #555;
@@ -1182,6 +1191,7 @@ html.light #ggrid>a {
 html.light #ggrid>a[tt] {
 	background: linear-gradient(135deg, #f7f7f7 95%, #ccc 95%);
 }
+html.light #ggrid>a:focus,
 html.light #ggrid>a:hover {
 	background: #fff;
 	border-color: #ccc;
