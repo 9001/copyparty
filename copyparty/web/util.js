@@ -329,14 +329,45 @@ function clgot(el, cls) {
 }
 
 
+function showsort(tab) {
+    var v, vn, v1, v2, th = tab.tHead,
+        sopts = jread('fsort', [["href", 1, ""]]);
+
+    th && (th = th.rows[0]) && (th = th.cells);
+
+    for (var a = sopts.length - 1; a >= 0; a--) {
+        if (!sopts[a][0])
+            continue;
+
+        v2 = v1;
+        v1 = sopts[a];
+    }
+
+    v = [v1, v2];
+    vn = [v1 ? v1[0] : '', v2 ? v2[0] : ''];
+
+    var ga = QSA('#ghead a[s]');
+    for (var a = 0; a < ga.length; a++)
+        ga[a].className = '';
+
+    for (var a = 0; a < th.length; a++) {
+        var n = vn.indexOf(th[a].getAttribute('name')),
+            cl = n < 0 ? ' ' : ' s' + n + (v[n][1] > 0 ? ' ' : 'r ');
+
+        th[a].className = th[a].className.replace(/ *s[01]r? */, ' ') + cl;
+        if (n + 1) {
+            ga = QS('#ghead a[s="' + vn[n] + '"]');
+            if (ga)
+                ga.className = cl;
+        }
+    }
+}
 function sortTable(table, col, cb) {
     var tb = table.tBodies[0],
         th = table.tHead.rows[0].cells,
         tr = Array.prototype.slice.call(tb.rows, 0),
-        i, reverse = th[col].className.indexOf('sort1') !== -1 ? -1 : 1;
-    for (var a = 0, thl = th.length; a < thl; a++)
-        th[a].className = th[a].className.replace(/ *sort-?1 */, " ");
-    th[col].className += ' sort' + reverse;
+        i, reverse = /s0[^r]/.exec(th[col].className + ' ') ? -1 : 1;
+
     var stype = th[col].getAttribute('sort');
     try {
         var nrules = [], rules = jread("fsort", []);
@@ -354,6 +385,7 @@ function sortTable(table, col, cb) {
                 break;
         }
         jwrite("fsort", nrules);
+        try { showsort(table); } catch (ex) { }
     }
     catch (ex) {
         console.log("failed to persist sort rules, resetting: " + ex);

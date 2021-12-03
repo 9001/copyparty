@@ -3907,7 +3907,7 @@ var treectl = (function () {
 				id = 'f-' + ('00000000' + crc32(fname)).slice(-8),
 				lang = showfile.getlang(fname);
 
-			while (seen[id])
+			while (seen[id])  // ejyefs ev69gg y9j8sg .opus
 				id += 'a';
 			seen[id] = 1;
 
@@ -4424,27 +4424,6 @@ var mukey = (function () {
 		"render": try_render
 	};
 })();
-
-
-function addcrc() {
-	var links = QSA(
-		'#files>tbody>tr>td:first-child+td>' + (
-			ebi('unsearch') ? 'div>a:last-child' : 'a'));
-
-	var seen = {};  // ejyefs ev69gg y9j8sg .opus
-	for (var a = 0, aa = links.length; a < aa; a++) {
-		var id = links[a].getAttribute('id');
-		if (!id) {
-			var crc = crc32(links[a].textContent || links[a].innerText);
-			id = 'f-' + ('00000000' + crc).slice(-8);
-			while (seen[id])
-				id += 'a';
-
-			links[a].setAttribute('id', id);
-		}
-		seen[id] = 1;
-	}
-}
 
 
 var light;
@@ -5046,7 +5025,8 @@ function reload_browser() {
 	filecols.set_style();
 
 	var parts = get_evpath().split('/'),
-		rm = QSA('#path>a+a+a');
+		rm = QSA('#path>a+a+a'),
+		ftab = ebi('files');
 
 	for (a = rm.length - 1; a >= 0; a--)
 		rm[a].parentNode.removeChild(rm[a]);
@@ -5068,9 +5048,9 @@ function reload_browser() {
 		oo[a].textContent = hsz;
 	}
 
-	addcrc();
 	reload_mp();
-	makeSortable(ebi('files'), mp.read_order.bind(mp));
+	try { showsort(ftab); } catch (ex) { }
+	makeSortable(ftab, mp.read_order.bind(mp));
 
 	for (var a = 0; a < 2; a++)
 		clmod(ebi(a ? 'pro' : 'epi'), 'hidden', ebi('unsearch'));

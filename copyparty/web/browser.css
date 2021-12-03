@@ -79,6 +79,25 @@ a, #files tbody div a:last-child {
 	color: #999;
 	font-weight: normal;
 }
+.s0:after,
+.s1:after {
+	content: '⌄';
+}
+.s0r:after,
+.s1r:after {
+	content: '⌃';
+}
+.s0:after,
+.s0r:after {
+	color: #fb0;
+}
+.s1:after,
+.s1r:after {
+	color: #d09;
+}
+#files thead th:after {
+	margin-right: -.8em;
+}
 #files tbody tr:hover td {
 	background: #1c1c1c;
 }
@@ -1042,7 +1061,6 @@ html.light #rui {
 	font-size: 1.5em;
 }
 #doc {
-	background: none;
 	overflow: visible;
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
@@ -1130,6 +1148,7 @@ a.btn,
 
 
 html,
+#doc,
 #rui,
 #files td,
 #files thead th,
@@ -1211,6 +1230,7 @@ html.light {
 html.light #ops,
 html.light .opbox,
 html.light #path,
+html.light #doc,
 html.light #srch_form,
 html.light .ghead,
 html.light #u2etas {
@@ -1287,6 +1307,14 @@ html.light a,
 html.light #ops a,
 html.light #files tbody div a:last-child {
 	color: #06a;
+}
+html.light .s0:after,
+html.light .s0r:after {
+	color: #059;
+}
+html.light .s1:after,
+html.light .s1r:after {
+	color: #f5d;
 }
 html.light #files thead th {
 	background: #eaeaea;
