@@ -285,7 +285,7 @@ class HttpCli(object):
         self.out_headers["Cache-Control"] = "max-age=" + n
 
     def k304(self):
-        k304 = self.cookies.get("k304", "")
+        k304 = self.cookies.get("k304")
         return k304 == "y" or ("; Trident/" in self.ua and not k304)
 
     def send_headers(self, length, status=200, mime=None, headers=None):
@@ -438,6 +438,9 @@ class HttpCli(object):
 
             if "k304" in self.uparam:
                 return self.set_k304()
+
+            if "am_js" in self.uparam:
+                return self.set_am_js()
 
             if "h" in self.uparam:
                 return self.tx_mounts()
@@ -1720,6 +1723,11 @@ class HttpCli(object):
         self.out_headers["Set-Cookie"] = ck
         self.redirect("", "?h#cc")
 
+    def set_am_js(self):
+        ck = gencookie("js", "y", 60 * 60 * 24 * 365)
+        self.out_headers["Set-Cookie"] = ck
+        self.reply(b"promoted\n")
+
     def tx_404(self, is_403=False):
         if self.args.vague_403:
             m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
@@ -2336,7 +2344,13 @@ class HttpCli(object):
 
         dirs.sort(key=itemgetter("name"))
 
-        j2a["files"] = dirs + files
+        if self.cookies.get("js"):
+            j2a["ls0"] = {"dirs": dirs, "files": files, "taglist": taglist}
+            j2a["files"] = []
+        else:
+            j2a["ls0"] = None
+            j2a["files"] = dirs + files
+
         j2a["logues"] = logues
         j2a["taglist"] = taglist
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")

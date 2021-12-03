@@ -306,7 +306,9 @@ function set_files_html(html) {
 
 
 var ACtx = window.AudioContext || window.webkitAudioContext,
-	actx = ACtx && new ACtx();
+	actx = ACtx && new ACtx(),
+	hash0 = location.hash,
+	mp;
 
 
 var mpl = (function () {
@@ -652,14 +654,11 @@ function MPlayer() {
 	};
 }
 
-addcrc();
-var mp = new MPlayer();
-makeSortable(ebi('files'), mp.read_order.bind(mp));
-
 
 function ft2dict(tr) {
 	var th = ebi('files').tHead.rows[0].cells,
 		rv = [],
+		rh = [],
 		ra = [],
 		rt = {};
 
@@ -671,10 +670,11 @@ function ft2dict(tr) {
 		if (!tv)
 			continue;
 
-		(vis ? rv : ra).push(tk);
+		(vis ? rv : rh).push(tk);
+		ra.push(tk);
 		rt[tk] = tv;
 	}
-	return [rt, rv, ra];
+	return [rt, rv, rh, ra];
 }
 
 
@@ -808,7 +808,7 @@ var pbar = (function () {
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
 
-		if (!mp.au)
+		if (!mp || !mp.au)
 			return;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
@@ -835,7 +835,7 @@ var pbar = (function () {
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp.au || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
+		if (!mp || !mp.au || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
 		var sm = bc.w * 1.0 / adur;
@@ -906,6 +906,9 @@ var vbar = (function () {
 	}
 
 	r.draw = function () {
+		if (!mp)
+			return;
+
 		var gh = h + '' + light;
 		if (gradh != gh) {
 			gradh = gh;
@@ -1132,7 +1135,6 @@ var mpui = (function () {
 		if (mp.au.paused)
 			timer.rm(updater_impl);
 	}
-	r.progress_updater();
 	return r;
 })();
 
@@ -1567,7 +1569,8 @@ function autoplay_blocked(seek) {
 
 
 function eval_hash() {
-	var v = location.hash;
+	var v = hash0;
+	hash0 = null;
 	if (!v)
 		return;
 
@@ -2867,10 +2870,6 @@ var thegrid = (function () {
 		import_js('/.cpr/baguettebox.js', r.bagit);
 	}, 1);
 
-	if (r.en) {
-		loadgrid();
-	}
-
 	return r;
 })();
 
@@ -3865,8 +3864,34 @@ var treectl = (function () {
 
 		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
 
-		var top = this.top,
-			nodes = res.dirs.concat(res.files),
+		if (this.hpush && !showfile.active())
+			hist_push(this.top);
+
+		r.gentab(this.top, res);
+
+		acct = res.acct;
+		apply_perms(res.perms);
+		despin('#files');
+		despin('#gfiles');
+
+		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
+		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
+
+		clmod(ebi('epi'), 'mdo');
+		if (res.readme)
+			show_readme(res.readme);
+
+		wintitle();
+		var fun = r.ls_cb;
+		if (fun) {
+			r.ls_cb = null;
+			fun();
+		}
+		eval_hash();
+	}
+
+	r.gentab = function (top, res) {
+		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
 			seen = {};
 
@@ -3914,35 +3939,32 @@ var treectl = (function () {
 		html = html.join('\n');
 		set_files_html(html);
 
-		if (this.hpush && !showfile.active())
-			hist_push(this.top);
-
-		acct = res.acct;
-		apply_perms(res.perms);
-		despin('#files');
-		despin('#gfiles');
-
-		ebi('pro').innerHTML = res.logues ? res.logues[0] || "" : "";
-		ebi('epi').innerHTML = res.logues ? res.logues[1] || "" : "";
-
-		clmod(ebi('epi'), 'mdo');
-		if (res.readme)
-			show_readme(res.readme);
-
-		wintitle();
 		filecols.set_style();
 		showfile.mktree();
 		mukey.render();
 		reload_tree();
 		reload_browser();
 		tree_scrollto();
-
-		var fun = r.ls_cb;
-		if (fun) {
-			r.ls_cb = null;
-			fun();
-		}
 	}
+
+	r.hydrate = function () {
+		if (ls0 === null) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', '/?am_js', true);
+			xhr.send();
+
+			return reqls(get_evpath(), false, true);
+		}
+
+		r.gentab(get_evpath(), ls0);
+		reload_browser();
+		pbar.onresize();
+		vbar.onresize();
+		mukey.render();
+		showfile.addlinks();
+		thegrid.setdirty();
+		setTimeout(eval_hash, 1);
+	};
 
 	function parsetree(res, top) {
 		var ret = '';
@@ -5007,20 +5029,20 @@ function reload_mp() {
 		audio_eq.stop();
 		mp.au.pause();
 		mp.au = null;
+		mpl.unbuffer();
 	}
 	mpl.stop();
 	var plays = QSA('tr>td:first-child>a.play');
 	for (var a = plays.length - 1; a >= 0; a--)
 		plays[a].parentNode.innerHTML = '-';
 
-	mpl.unbuffer();
 	mp = new MPlayer();
 	audio_eq.acst = {};
 	setTimeout(pbar.onresize, 1);
 }
 
 
-function reload_browser(not_mp) {
+function reload_browser() {
 	filecols.set_style();
 
 	var parts = get_evpath().split('/'),
@@ -5046,11 +5068,9 @@ function reload_browser(not_mp) {
 		oo[a].textContent = hsz;
 	}
 
-	if (!not_mp) {
-		addcrc();
-		reload_mp();
-		makeSortable(ebi('files'), mp.read_order.bind(mp));
-	}
+	addcrc();
+	reload_mp();
+	makeSortable(ebi('files'), mp.read_order.bind(mp));
 
 	for (var a = 0; a < 2; a++)
 		clmod(ebi(a ? 'pro' : 'epi'), 'hidden', ebi('unsearch'));
@@ -5061,7 +5081,4 @@ function reload_browser(not_mp) {
 	thegrid.setdirty();
 	msel.render();
 }
-reload_browser(true);
-showfile.addlinks();
-mukey.render();
-setTimeout(eval_hash, 1);
+treectl.hydrate();
