@@ -157,6 +157,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="show README.md in folder listings">📜 readme</a>\n' +
+	'		<a id="spafiles" class="tgl btn" href="#" tt="speedboost when not using the navpane;$Nturn it off if things arent loading somehow">spa</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	(have_zip ? (
@@ -1494,7 +1495,8 @@ function play(tid, is_ev, seek, call_depth) {
 		}
 
 		mpui.progress_updater();
-		pbar.drawbuf();
+		pbar.onresize();
+		vbar.onresize();
 		mpl.announce();
 		return true;
 	}
@@ -3433,6 +3435,7 @@ var treectl = (function () {
 		mentered = null,
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
+	bcfg_bind(r, 'spa', 'spafiles', true);
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
@@ -3636,7 +3639,7 @@ var treectl = (function () {
 
 	r.goto = function (url, push) {
 		get_tree("", url, true);
-		reqls(url, push, true);
+		r.reqls(url, push, true);
 	};
 
 	function get_tree(top, dst, rst) {
@@ -3805,12 +3808,12 @@ var treectl = (function () {
 			treegrow.call(this.previousSibling, e);
 			return;
 		}
-		reqls(this.getAttribute('href'), true);
+		r.reqls(this.getAttribute('href'), true);
 		r.dir_cb = tree_scrollto;
 		thegrid.setvis(true);
 	}
 
-	function reqls(url, hpush, no_tree) {
+	r.reqls = function (url, hpush, no_tree) {
 		var xhr = new XMLHttpRequest();
 		xhr.top = url;
 		xhr.hpush = hpush;
@@ -3954,7 +3957,7 @@ var treectl = (function () {
 			xhr.open('GET', '/?am_js', true);
 			xhr.send();
 
-			return reqls(get_evpath(), false, true);
+			return r.reqls(get_evpath(), false, true);
 		}
 
 		r.gentab(get_evpath(), ls0);
@@ -4985,15 +4988,29 @@ function wintitle(txt) {
 }
 
 
+ebi('path').onclick = function (e) {
+	var a = e.target.closest('a[href]');
+	if (!treectl.spa || !a || !(a = a.getAttribute('href') + '') || !a.endsWith('/'))
+		return;
+
+	treectl.reqls(a, true, true);
+	return ev(e);
+};
+
+
 ebi('files').onclick = ebi('docul').onclick = function (e) {
 	var tgt = e.target.closest('a[id]');
 	if (tgt && tgt.getAttribute('id').indexOf('f-') === 0 && tgt.textContent.endsWith('/')) {
 		var el = treectl.find(tgt.textContent.slice(0, -1));
-		if (!el)
-			return;
-
-		el.click();
-		return ev(e);
+		if (el) {
+			el.click();
+			return ev(e);
+		}
+		if (treectl.spa) {
+			treectl.reqls(tgt.getAttribute('href'), true, true);
+			return ev(e);
+		}
+		return;
 	}
 
 	tgt = e.target.closest('a[hl]');
@@ -5001,7 +5018,7 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 		showfile.show(noq_href(ebi(tgt.getAttribute('hl'))), tgt.getAttribute('lang'));
 		return ev(e);
 	}
-}
+};
 
 
 function reload_mp() {
