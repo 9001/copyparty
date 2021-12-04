@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import os
-from ..util import fsenc, fsdec
+from ..util import fsenc, fsdec, SYMTIME
 from . import path
 
 
@@ -55,5 +55,8 @@ def unlink(p):
     return os.unlink(fsenc(p))
 
 
-def utime(p, times=None):
-    return os.utime(fsenc(p), times)
+def utime(p, times=None, follow_symlinks=True):
+    if SYMTIME:
+        return os.utime(fsenc(p), times, follow_symlinks=follow_symlinks)
+    else:
+        return os.utime(fsenc(p), times)

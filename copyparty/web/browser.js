@@ -2562,9 +2562,9 @@ var thegrid = (function () {
 		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>chop: ' +
 		'<a href="#" class="btn" l="-1" tt="truncate filenames more (show less)">&ndash;</a> ' +
 		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a></span> <span>sort by: ' +
-		'<a href="#" s="href">name</a>, ' +
-		'<a href="#" s="sz">size</a>, ' +
-		'<a href="#" s="ts">date</a>, ' +
+		'<a href="#" s="href">name</a> ' +
+		'<a href="#" s="sz">size</a> ' +
+		'<a href="#" s="ts">date</a> ' +
 		'<a href="#" s="ext">type</a>' +
 		'</span></div>' +
 		'<div id="ggrid"></div>'

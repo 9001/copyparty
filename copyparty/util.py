@@ -67,8 +67,9 @@ if WINDOWS and PY2:
     FS_ENCODING = "utf-8"
 
 
-HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
+SYMTIME = sys.version_info >= (3, 6) and os.supports_follow_symlinks
 
+HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
 HTTPCODE = {
     200: "OK",

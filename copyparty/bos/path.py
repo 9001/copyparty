@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import os
-from ..util import fsenc, fsdec
+from ..util import fsenc, fsdec, SYMTIME
 
 
 def abspath(p):
@@ -13,8 +13,11 @@ def exists(p):
     return os.path.exists(fsenc(p))
 
 
-def getmtime(p):
-    return os.path.getmtime(fsenc(p))
+def getmtime(p, follow_symlinks=True):
+    if not follow_symlinks and SYMTIME:
+        return os.lstat(fsenc(p)).st_mtime
+    else:
+        return os.path.getmtime(fsenc(p))
 
 
 def getsize(p):

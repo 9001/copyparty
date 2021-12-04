@@ -21,6 +21,7 @@ from .util import (
     Pebkac,
     Queue,
     ProgressPrinter,
+    SYMTIME,
     fsdec,
     fsenc,
     absreal,
@@ -1307,7 +1308,7 @@ class Up2k(object):
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += "/" + quotep(vsrc) + " "
 
-                        dupe = [cj["prel"], cj["name"]]
+                        dupe = [cj["prel"], cj["name"], cj["lmod"]]
                         try:
                             self.dupesched[src].append(dupe)
                         except:
@@ -1332,7 +1333,7 @@ class Up2k(object):
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
                             bos.unlink(dst)  # TODO ed pls
-                            self._symlink(src, dst)
+                            self._symlink(src, dst, lmod=cj["lmod"])
 
                         if cur:
                             a = [cj[x] for x in "prel name lmod size addr".split()]
@@ -1404,13 +1405,14 @@ class Up2k(object):
         with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as f:
             return f["orz"][1]
 
-    def _symlink(self, src, dst, verbose=True):
+    def _symlink(self, src, dst, verbose=True, lmod=None):
         if verbose:
             self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
 
         if self.args.nw:
             return
 
+        linked = False
         try:
             if self.args.no_symlink:
                 raise Exception("disabled in config")
@@ -1441,9 +1443,17 @@ class Up2k(object):
                     hops = len(ndst[nc:]) - 1
                     lsrc = "../" * hops + "/".join(lsrc)
             os.symlink(fsenc(lsrc), fsenc(ldst))
+            linked = True
         except Exception as ex:
             self.log("cannot symlink; creating copy: " + repr(ex))
             shutil.copy2(fsenc(src), fsenc(dst))
+
+        if lmod and (not linked or SYMTIME):
+            times = (int(time.time()), int(lmod))
+            if ANYWIN:
+                self.lastmod_q.put([dst, 0, times])
+            else:
+                bos.utime(dst, times, False)
 
     def handle_chunk(self, ptop, wark, chash):
         with self.mutex:
@@ -1551,12 +1561,12 @@ class Up2k(object):
             return
 
         cur = self.cur.get(ptop)
-        for rd, fn in dupes:
+        for rd, fn, lmod in dupes:
             d2 = os.path.join(ptop, rd, fn)
             if os.path.exists(d2):
                 continue
 
-            self._symlink(dst, d2)
+            self._symlink(dst, d2, lmod=lmod)
             if cur:
                 self.db_rm(cur, rd, fn)
                 self.db_add(cur, wark, rd, fn, *a[-4:])
@@ -1773,8 +1783,9 @@ class Up2k(object):
             dlabs = absreal(sabs)
             m = "moving symlink from [{}] to [{}], target [{}]"
             self.log(m.format(sabs, dabs, dlabs))
-            os.unlink(sabs)
-            self._symlink(dlabs, dabs, False)
+            mt = bos.path.getmtime(sabs, False)
+            bos.unlink(sabs)
+            self._symlink(dlabs, dabs, False, lmod=mt)
 
             # folders are too scary, schedule rescan of both vols
             self.need_rescan[svn.vpath] = 1
@@ -1904,25 +1915,30 @@ class Up2k(object):
             slabs = list(sorted(links.keys()))[0]
             ptop, rem = links.pop(slabs)
             self.log("linkswap [{}] and [{}]".format(sabs, slabs))
+            mt = bos.path.getmtime(slabs, False)
             bos.unlink(slabs)
             bos.rename(sabs, slabs)
+            bos.utime(slabs, (int(time.time()), int(mt)), False)
             self._symlink(slabs, sabs, False)
             full[slabs] = [ptop, rem]
+            sabs = slabs
 
         if not dabs:
             dabs = list(sorted(full.keys()))[0]
 
         for alink in links.keys():
+            lmod = None
             try:
                 if alink != sabs and absreal(alink) != sabs:
                     continue
 
                 self.log("relinking [{}] to [{}]".format(alink, dabs))
+                lmod = bos.path.getmtime(alink, False)
                 bos.unlink(alink)
             except:
                 pass
 
-            self._symlink(dabs, alink, False)
+            self._symlink(dabs, alink, False, lmod=lmod)
 
         return len(full) + len(links)
 
@@ -2028,7 +2044,7 @@ class Up2k(object):
             for path, sz, times in ready:
                 self.log("lmod: setting times {} on {}".format(times, path))
                 try:
-                    bos.utime(path, times)
+                    bos.utime(path, times, False)
                 except:
                     self.log("lmod: failed to utime ({}, {})".format(path, times))
 

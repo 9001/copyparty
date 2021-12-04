@@ -82,10 +82,12 @@ a, #files tbody div a:last-child {
 .s0:after,
 .s1:after {
 	content: '⌄';
+	margin-left: -.1em;
 }
 .s0r:after,
 .s1r:after {
 	content: '⌃';
+	margin-left: -.1em;
 }
 .s0:after,
 .s0r:after {
@@ -96,7 +98,7 @@ a, #files tbody div a:last-child {
 	color: #d09;
 }
 #files thead th:after {
-	margin-right: -.8em;
+	margin-right: -.7em;
 }
 #files tbody tr:hover td {
 	background: #1c1c1c;
