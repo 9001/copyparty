@@ -2680,13 +2680,11 @@ var thegrid = (function () {
 			href = noq_href(this),
 			aplay = ebi('a' + oth.getAttribute('id')),
 			is_img = /\.(gif|jpe?g|png|webp|webm|mp4)(\?|$)/i.test(href),
-			in_tree = null,
+			is_dir = href.endsWith('/'),
+			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),
 			have_sel = QS('#files tr.sel'),
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
-
-		if (href.endsWith('/'))
-			in_tree = treectl.find(oth.textContent.slice(0, -1));
 
 		if (r.sel && !dbl) {
 			td.click();
@@ -2697,6 +2695,9 @@ var thegrid = (function () {
 
 		else if (in_tree && !have_sel)
 			in_tree.click();
+
+		else if (is_dir && !have_sel && treectl.spa)
+			treectl.reqls(href, true, true);
 
 		else if (!is_img && have_sel)
 			window.open(href, '_blank');
