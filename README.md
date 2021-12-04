@@ -169,7 +169,6 @@ feature summary
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
   * ☑ SPA (browse while uploading)
-    * if you use the navpane to navigate, not folders in the file list
 * server indexing
   * ☑ [locate files by contents](#file-search)
   * ☑ search by name/path/date/size
@@ -325,6 +324,7 @@ the browser has the following hotkeys  (always qwerty)
 * `V` toggle folders / textfiles in the navpane
 * `G` toggle list / [grid view](#thumbnails)
 * `T` toggle thumbnails / icons
+* `ESC` close various things
 * `ctrl-X` cut selected files/folders
 * `ctrl-V` paste
 * `F2` [rename](#batch-rename) selected file/folder
@@ -376,9 +376,13 @@ switching between breadcrumbs or navpane
 
 click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (default), or a navpane (tree-browser sidebar thing)
 
-* `[-]` and `[+]` (or hotkeys `A`/`D`) adjust the size
-* `[v]` jumps to the currently open folder
+* `[+]` and `[-]` (or hotkeys `A`/`D`) adjust the size
+* `[🎯]` jumps to the currently open folder
+* `[📃]` toggles between showing folders and textfiles
+* `[📌]` shows the name of all parent folders in a docked panel
 * `[a]` toggles automatic widening as you go deeper
+* `[↵]` toggles wordwrap
+* `[👀]` show full name on hover (if wordwrap is off)
 
 
 ## thumbnails
@@ -394,6 +398,7 @@ audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
 
 in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
+* indicated by the audio files having the ▶ icon instead of 💾
 
 
 ## zip downloads
@@ -850,7 +855,7 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
     b512 <movie.mkv
 
-you can provide passwords using cookie 'cppwd=hunter2', as a url query `?pw=hunter2`, or with basic-authentication (either as the username or password)
+you can provide passwords using cookie `cppwd=hunter2`, as a url query `?pw=hunter2`, or with basic-authentication (either as the username or password)
 
 
 # up2k

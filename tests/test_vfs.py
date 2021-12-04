@@ -31,6 +31,9 @@ class Cfg(Namespace):
             "no_voldump": True,
             "re_maxage": 0,
             "rproxy": 0,
+            "rsp_slp": 0,
+            "s_wr_slp": 0,
+            "s_wr_sz": 512 * 1024,
         }
         ex.update(ex2)
         super(Cfg, self).__init__(a=a or [], v=v or [], c=c, **ex)
