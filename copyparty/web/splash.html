@@ -75,11 +75,13 @@
         <h1 id="cc">client config:</h1>
         <ul>
             {% if k304 %}
-            <li><a href="/?k304=n" class="r">disable k304</a> (currently enabled)
+            <li><a href="/?k304=n">disable k304</a> (currently enabled)
             {%- else %}
-            <li><a href="/?k304=y">enable k304</a> (currently disabled)
+            <li><a href="/?k304=y" class="r">enable k304</a> (currently disabled)
             {% endif %}
             <blockquote>enabling this will disconnect your client on every HTTP 304, which can prevent some buggy browsers/proxies from getting stuck (suddenly not being able to load pages), <em>but</em> it will also make things slower in general</blockquote></li>
+            
+            <li><a href="/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
         </ul>
 
         <h1>login for more:</h1>

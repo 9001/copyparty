@@ -81,9 +81,10 @@ table {
 	text-align: right;
 }
 blockquote {
-	margin: 0 0 0 .6em;
-	padding: .7em 1em;
+	margin: 0 0 1.6em .6em;
+	padding: .7em 1em 0 1em;
 	border-left: .3em solid rgba(128,128,128,0.5);
+	border-radius: 0 0 0 .25em;
 }
 
 

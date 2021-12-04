@@ -3613,6 +3613,7 @@ var treectl = (function () {
 			if (!QS(q))
 				break;
 		}
+		nq = Math.max(nq, get_evpath().split('/').length - 2);
 		var iw = (treesz + Math.max(0, nq)),
 			w = iw + 'em',
 			w2 = (iw + 2) + 'em';

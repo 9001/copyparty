@@ -60,6 +60,7 @@ class HttpCli(object):
         self.bufsz = 1024 * 32
         self.hint = None
         self.trailing_slash = True
+        self.out_headerlist = []
         self.out_headers = {
             "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store; max-age=0",
@@ -226,7 +227,7 @@ class HttpCli(object):
         self.gvol = self.asrv.vfs.aget[self.uname]
 
         if pwd and "pw" in self.ouparam and pwd != cookies.get("cppwd"):
-            self.out_headers["Set-Cookie"] = self.get_pwd_cookie(pwd)[0]
+            self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(pwd)[0]))
 
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
@@ -310,7 +311,7 @@ class HttpCli(object):
 
         self.out_headers["Content-Type"] = mime
 
-        for k, v in self.out_headers.items():
+        for k, v in list(self.out_headers.items()) + self.out_headerlist:
             response.append("{}: {}".format(k, v))
 
         try:
@@ -441,6 +442,9 @@ class HttpCli(object):
 
             if "am_js" in self.uparam:
                 return self.set_am_js()
+
+            if "reset" in self.uparam:
+                return self.set_cfg_reset()
 
             if "h" in self.uparam:
                 return self.tx_mounts()
@@ -1720,13 +1724,20 @@ class HttpCli(object):
 
     def set_k304(self):
         ck = gencookie("k304", self.uparam["k304"], 60 * 60 * 24 * 365)
-        self.out_headers["Set-Cookie"] = ck
+        self.out_headerlist.append(("Set-Cookie", ck))
         self.redirect("", "?h#cc")
 
     def set_am_js(self):
-        ck = gencookie("js", "y", 60 * 60 * 24 * 365)
-        self.out_headers["Set-Cookie"] = ck
+        v = "n" if self.uparam["am_js"] == "n" else "y"
+        ck = gencookie("js", v, 60 * 60 * 24 * 365)
+        self.out_headerlist.append(("Set-Cookie", ck))
         self.reply(b"promoted\n")
+
+    def set_cfg_reset(self):
+        for k in ("k304", "js", "cppwd"):
+            self.out_headerlist.append(("Set-Cookie", gencookie(k, "x", None)))
+
+        self.redirect("", "?h#cc")
 
     def tx_404(self, is_403=False):
         if self.args.vague_403:
@@ -2121,6 +2132,7 @@ class HttpCli(object):
             "vdir": quotep(self.vpath),
             "vpnodes": vpnodes,
             "files": [],
+            "ls0": None,
             "acct": self.uname,
             "perms": json.dumps(perms),
             "taglist": [],
@@ -2344,11 +2356,10 @@ class HttpCli(object):
 
         dirs.sort(key=itemgetter("name"))
 
-        if self.cookies.get("js"):
+        if self.cookies.get("js") == "y":
             j2a["ls0"] = {"dirs": dirs, "files": files, "taglist": taglist}
             j2a["files"] = []
         else:
-            j2a["ls0"] = None
             j2a["files"] = dirs + files
 
         j2a["logues"] = logues
