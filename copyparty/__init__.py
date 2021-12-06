@@ -29,12 +29,16 @@ def get_unixdir():
     paths = [
         (os.environ.get, "XDG_CONFIG_HOME"),
         (os.path.expanduser, "~/.config"),
+        (os.environ.get, "TMPDIR"),
+        (os.environ.get, "TEMP"),
+        (os.environ.get, "TMP"),
         (unicode, "/tmp"),
     ]
     for chk in [os.listdir, os.mkdir]:
         for pf, pa in paths:
             try:
                 p = pf(pa)
+                # print(chk.__name__, p, pa)
                 if not p or p.startswith("~"):
                     continue
 
