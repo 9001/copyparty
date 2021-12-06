@@ -926,6 +926,14 @@ class AuthSrv(object):
                 vol.flags["d2t"] = True
                 vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
 
+            # d2ds drops all onboot scans for a volume
+            for grp, rm in [["d2ds", "e2ds"], ["d2ts", "e2ts"]]:
+                if not vol.flags.get(grp, False):
+                    continue
+
+                vol.flags["d2ts"] = True
+                vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
+
             # mt* needs e2t so drop those too
             for grp, rm in [["e2t", "mt"]]:
                 if vol.flags.get(grp, False):

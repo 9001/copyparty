@@ -350,6 +350,8 @@ def run_argparse(argv, formatter):
             
             \033[0mdatabase, general:
               \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* volflags)
+              \033[36md2ts\033[35m disables metadata collection for existing files
+              \033[36md2ds\033[35m disables onboot indexing, overrides -e2ds*
               \033[36md2t\033[35m disables metadata collection, overrides -e2t*
               \033[36md2d\033[35m disables all database stuff, overrides -e2*
               \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
