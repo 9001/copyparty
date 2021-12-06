@@ -25,26 +25,30 @@ ANYWIN = WINDOWS or sys.platform in ["msys"]
 MACOS = platform.system() == "Darwin"
 
 
-def get_unix_home():
-    try:
-        v = os.environ["XDG_CONFIG_HOME"]
-        if not v:
-            raise Exception()
-        ret = os.path.normpath(v)
-        os.listdir(ret)
-        return ret
-    except:
-        pass
+def get_unixdir():
+    paths = [
+        (os.environ.get, "XDG_CONFIG_HOME"),
+        (os.path.expanduser, "~/.config"),
+        (unicode, "/tmp"),
+    ]
+    for chk in [os.listdir, os.mkdir]:
+        for pf, pa in paths:
+            try:
+                p = pf(pa)
+                if not p or p.startswith("~"):
+                    continue
 
-    try:
-        v = os.path.expanduser("~/.config")
-        if v.startswith("~"):
-            raise Exception()
-        ret = os.path.normpath(v)
-        os.listdir(ret)
-        return ret
-    except:
-        return "/tmp"
+                p = os.path.normpath(p)
+                chk(p)
+                p = os.path.join(p, "copyparty")
+                if not os.path.isdir(p):
+                    os.mkdir(p)
+
+                return p
+            except:
+                pass
+
+    raise Exception("could not find a writable path for config")
 
 
 class EnvParams(object):
@@ -59,7 +63,7 @@ class EnvParams(object):
         elif sys.platform == "darwin":
             self.cfg = os.path.expanduser("~/Library/Preferences/copyparty")
         else:
-            self.cfg = get_unix_home() + "/copyparty"
+            self.cfg = get_unixdir()
 
         self.cfg = self.cfg.replace("\\", "/")
         try:
