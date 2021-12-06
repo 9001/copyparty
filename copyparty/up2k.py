@@ -1308,11 +1308,14 @@ class Up2k(object):
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += "/" + quotep(vsrc) + " "
 
-                        dupe = [cj["prel"], cj["name"], cj["lmod"]]
-                        try:
-                            self.dupesched[src].append(dupe)
-                        except:
-                            self.dupesched[src] = [dupe]
+                        # registry is size-constrained + can only contain one unique wark;
+                        # let want_recheck trigger symlink (if still in reg) or reupload
+                        if cur:
+                            dupe = [cj["prel"], cj["name"], cj["lmod"]]
+                            try:
+                                self.dupesched[src].append(dupe)
+                            except:
+                                self.dupesched[src] = [dupe]
 
                         raise Pebkac(400, err)
 
