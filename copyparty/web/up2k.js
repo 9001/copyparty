@@ -2038,7 +2038,7 @@ function up2k_init(subtle) {
                 new_state = true;
                 fixed = true;
             }
-            if (!has(perms, 'read')) {
+            if (!has(perms, 'read') || !have_up2k_idx) {
                 new_state = false;
                 fixed = true;
             }

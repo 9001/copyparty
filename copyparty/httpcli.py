@@ -2125,6 +2125,7 @@ class HttpCli(object):
             "taglist": [],
             "srvinf": srv_info,
             "acct": self.uname,
+            "idx": ("e2d" in vn.flags),
             "perms": perms,
             "logues": logues,
             "readme": readme,

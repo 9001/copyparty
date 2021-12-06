@@ -8,13 +8,9 @@ function dbg(msg) {
 // toolbar
 ebi('ops').innerHTML = (
 	'<a href="#" data-dest="" tt="close submenu">--</a>\n' +
-	(have_up2k_idx ? (
-		'<a href="#" data-perm="read" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with yana and be an opus file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»">🔎</a>\n' +
-		(have_del && have_unpost ? '<a href="#" data-dest="unpost" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
-		'<a href="#" data-dest="up2k" tt="up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server">🚀</a>\n'
-	) : (
-		'<a href="#" data-perm="write" data-dest="up2k" tt="up2k: upload files with resume support (close your browser and drop the same files in later)">🚀</a>\n'
-	)) +
+	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with yana and be an opus file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»">🔎</a>\n' +
+	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
+	'<a href="#" data-dest="up2k">🚀</a>\n' +
 	'<a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>\n' +
 	'<a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>\n' +
 	'<a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>\n' +
@@ -68,12 +64,10 @@ ebi('op_up2k').innerHTML = (
 	'			<input type="checkbox" id="ask_up" />\n' +
 	'			<label for="ask_up" tt="ask for confirmation before upload starts">💭</label>\n' +
 	'		</td>\n' +
-	(have_up2k_idx ? (
-		'		<td class="c" data-perm="read" rowspan="2">\n' +
-		'			<input type="checkbox" id="fsearch" />\n' +
-		'			<label for="fsearch" tt="don\'t actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>\n' +
-		'		</td>\n'
-	) : '') +
+	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
+	'			<input type="checkbox" id="fsearch" />\n' +
+	'			<label for="fsearch" tt="don\'t actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>\n' +
+	'		</td>\n' +
 	'		<td data-perm="read" rowspan="2" id="u2btn_cw"></td>\n' +
 	'		<td data-perm="read" rowspan="2" id="u2c3w"></td>\n' +
 	'	</tr>\n' +
@@ -1934,10 +1928,6 @@ var fileman = (function () {
 				(function (a) {
 					f[a].inew.onkeydown = function (e) {
 						rn_ok(a, true);
-
-						if (e.key == 'Escape')
-							return rn_cancel();
-
 						if (e.key == 'Enter')
 							return rn_apply();
 					};
@@ -2970,6 +2960,9 @@ document.onkeydown = function (e) {
 	if (k == 'Escape') {
 		ae && ae.blur();
 
+		if (ebi('rn_cancel'))
+			return ebi('rn_cancel').click();
+
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
 
@@ -3875,6 +3868,7 @@ var treectl = (function () {
 		r.gentab(this.top, res);
 
 		acct = res.acct;
+		have_up2k_idx = res.idx;
 		apply_perms(res.perms);
 		despin('#files');
 		despin('#gfiles');
@@ -4065,6 +4059,17 @@ function despin(sel) {
 function apply_perms(newperms) {
 	perms = newperms || [];
 
+	var a = QS('#ops a[data-dest="up2k"]');
+	if (have_up2k_idx) {
+		a.removeAttribute('data-perm');
+		a.setAttribute('tt', 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server');
+	}
+	else {
+		a.setAttribute('data-perm', 'write');
+		a.setAttribute('tt', 'up2k: upload files with resume support (close your browser and drop the same files in later)');
+	}
+	tt.att(QS('#ops'));
+
 	var axs = [],
 		aclass = '>',
 		chk = ['read', 'write', 'move', 'delete', 'get'];
@@ -4093,6 +4098,12 @@ function apply_perms(newperms) {
 		}
 		o[a].style.display = display;
 	}
+
+	var o = QSA('#ops>a[data-dep], #u2conf td[data-dep]');
+	for (var a = 0; a < o.length; a++)
+		o[a].style.display = (
+			o[a].getAttribute('data-dep') != 'idx' || have_up2k_idx
+		) ? '' : 'none';
 
 	var act = QS('#ops>a.act');
 	if (act && act.style.display === 'none')
