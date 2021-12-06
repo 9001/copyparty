@@ -2096,6 +2096,7 @@ class HttpCli(object):
 
         url_suf = self.urlq({}, [])
         is_ls = "ls" in self.uparam
+        is_js = self.cookies.get("js") == "y"
 
         tpl = "browser"
         if "b" in self.uparam:
@@ -2213,7 +2214,7 @@ class HttpCli(object):
         for fn in vfs_ls:
             base = ""
             href = fn
-            if not is_ls and not self.trailing_slash and vpath:
+            if not is_ls and not is_js and not self.trailing_slash and vpath:
                 base = "/" + vpath + "/"
                 href = base + fn
 
@@ -2356,7 +2357,7 @@ class HttpCli(object):
 
         dirs.sort(key=itemgetter("name"))
 
-        if self.cookies.get("js") == "y":
+        if is_js:
             j2a["ls0"] = {"dirs": dirs, "files": files, "taglist": taglist}
             j2a["files"] = []
         else:
