@@ -92,6 +92,7 @@ class HttpCli(object):
         tpl = self.conn.hsrv.j2[name]
         if ka:
             ka["ts"] = self.conn.hsrv.cachebuster()
+            ka["svcname"] = self.args.doctitle
             return tpl.render(**ka)
 
         return tpl
