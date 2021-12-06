@@ -39,20 +39,14 @@ var md_plug = {};
 
 // add navbar
 (function () {
-    var n = document.location + '';
-    n = n.substr(n.indexOf('//') + 2).split('?')[0].split('/');
-    n[0] = 'top';
-    var loc = [];
-    var nav = [];
-    for (var a = 0; a < n.length; a++) {
-        if (a > 0)
-            loc.push(n[a]);
-
-        var dec = esc(uricom_dec(n[a])[0]);
-
-        nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
+    var parts = get_evpath().split('/'), link = '', o;
+    for (var a = 0; a < parts.length - 1; a++) {
+        link += parts[a] + '/';
+        o = mknod('a');
+        o.setAttribute('href', link);
+        o.textContent = uricom_dec(parts[a])[0] || 'top';
+        dom_nav.appendChild(o);
     }
-    dom_nav.innerHTML = nav.join('');
 })();
 
 

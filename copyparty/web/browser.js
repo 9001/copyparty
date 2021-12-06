@@ -5045,15 +5045,15 @@ function reload_browser() {
 
 	var parts = get_evpath().split('/'),
 		rm = QSA('#path>a+a+a'),
-		ftab = ebi('files');
+		ftab = ebi('files'),
+		link = '/', o;
 
 	for (a = rm.length - 1; a >= 0; a--)
 		rm[a].parentNode.removeChild(rm[a]);
 
-	var link = '/';
 	for (var a = 1; a < parts.length - 1; a++) {
 		link += parts[a] + '/';
-		var o = mknod('a');
+		o = mknod('a');
 		o.setAttribute('href', link);
 		o.textContent = uricom_dec(parts[a])[0];
 		ebi('path').appendChild(o);
