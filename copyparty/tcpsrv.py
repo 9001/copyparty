@@ -2,9 +2,10 @@
 from __future__ import print_function, unicode_literals
 
 import re
+import sys
 import socket
 
-from .__init__ import MACOS, ANYWIN
+from .__init__ import MACOS, ANYWIN, unicode
 from .util import chkcmd
 
 
@@ -54,6 +55,8 @@ class TcpSrv(object):
                     eps[x] = "external"
 
         msgs = []
+        title_tab = {}
+        title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
         m = "available @ http://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             for port in sorted(self.args.p):
@@ -62,10 +65,35 @@ class TcpSrv(object):
 
                 msgs.append(m.format(ip, port, desc))
 
+                if not self.args.wintitle:
+                    continue
+
+                if port in [80, 443]:
+                    ep = ip
+                else:
+                    ep = "{}:{}".format(ip, port)
+
+                hits = []
+                if "pub" in title_vars and "external" in unicode(desc):
+                    hits.append(("pub", ep))
+
+                for var in title_vars:
+                    if var.startswith("ip-") and ep.startswith(var[3:]):
+                        hits.append((var, ep))
+
+                for tk, tv in hits:
+                    try:
+                        title_tab[tk] += " and {}".format(tv)
+                    except:
+                        title_tab[tk] = tv
+
         if msgs:
             msgs[-1] += "\n"
             for m in msgs:
                 self.log("tcpsrv", m)
+
+        if self.args.wintitle:
+            self._set_wintitle(title_tab)
 
     def _listen(self, ip, port):
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -232,3 +260,17 @@ class TcpSrv(object):
                     eps[default_route] = desc
 
         return eps
+
+    def _set_wintitle(self, vars):
+        if "pub" not in vars:
+            vars["pub"] = "Local-Only"
+
+        title = ""
+        for p in self.args.wintitle.split(" "):
+            if p.startswith("$"):
+                p = vars.get(p[1:], "(None)")
+
+            title += "{} ".format(p)
+
+        print("\033]0;{}\033\\".format(title), file=sys.stderr, end="")
+        sys.stderr.flush()

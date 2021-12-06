@@ -418,6 +418,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-emp", action="store_true", help="enable markdown plugins")
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-forms; examples: [stash], [save,get]")
+    ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="window title, for example '$ip-10.1.2.' or '$ip-'")
 
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
@@ -607,6 +608,9 @@ def main(argv=None):
             disable_quickedit()
         except:
             print("\nfailed to disable quick-edit-mode:\n" + min_ex() + "\n")
+
+    if not VT100:
+        al.wintitle = ""
 
     nstrs = []
     anymod = False

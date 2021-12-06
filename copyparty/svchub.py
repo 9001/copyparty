@@ -302,6 +302,10 @@ class SvcHub(object):
             print("nailed it", end="")
             ret = self.retcode
         finally:
+            if self.args.wintitle:
+                print("\033]0;\033\\", file=sys.stderr, end="")
+                sys.stderr.flush()
+
             print("\033[0m")
             if self.logf:
                 self.logf.close()
