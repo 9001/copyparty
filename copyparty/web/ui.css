@@ -354,6 +354,13 @@ html.light textarea:focus {
 }
 .mdo ul,
 .mdo ol {
+	padding-left: 1em;
+}
+.mdo ul ul,
+.mdo ul ol,
+.mdo ol ul,
+.mdo ol ol {
+	padding-left: 2em;
 	border-left: .3em solid #ddd;
 }
 .mdo ul>li,
