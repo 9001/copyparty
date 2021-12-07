@@ -434,7 +434,7 @@ function makeSortable(table, cb) {
 }
 
 
-function linksplit(rp) {
+function linksplit(rp, id) {
     var ret = [],
         apath = '/',
         q = null;
@@ -464,8 +464,13 @@ function linksplit(rp) {
             vlink = vlink.slice(0, -1) + '<span>/</span>';
         }
 
-        if (!rp && q)
-            link += q;
+        if (!rp) {
+            if (q)
+                link += q;
+
+            if (id)
+                link += '" id="' + id;
+        }
 
         ret.push('<a href="' + apath + link + '">' + vlink + '</a>');
         apath += link;

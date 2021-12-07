@@ -1481,7 +1481,7 @@ function play(tid, is_ev, seek, call_depth) {
 			seek_au_sec(seek);
 		}
 
-		if (!seek) {
+		if (!seek && !ebi('unsearch')) {
 			var o = ebi(oid);
 			o.setAttribute('id', 'thx_js');
 			sethash(oid);
@@ -2966,9 +2966,6 @@ document.onkeydown = function (e) {
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
 
-		if (QS('#unsearch'))
-			return QS('#unsearch').click();
-
 		if (widget.is_open)
 			return widget.close();
 
@@ -2977,6 +2974,9 @@ document.onkeydown = function (e) {
 
 		if (!treectl.hidden)
 			return treectl.detree();
+
+		if (QS('#unsearch'))
+			return QS('#unsearch').click();
 
 		if (thegrid.en)
 			return ebi('griden').click();
@@ -3352,7 +3352,7 @@ document.onkeydown = function (e) {
 
 		treectl.hide();
 
-		var html = mk_files_header(tagord);
+		var html = mk_files_header(tagord), seen = {};
 		html.push('<tbody>');
 		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch"><big style="font-weight:bold">[❌] close search results</big></a></td></tr>');
 		for (var a = 0; a < res.hits.length; a++) {
@@ -3361,13 +3361,18 @@ document.onkeydown = function (e) {
 				sz = esc(r.sz + ''),
 				rp = esc(uricom_dec(r.rp + '')[0]),
 				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').pop().split('?')[0] : '%',
-				links = linksplit(r.rp + '');
+				id = 'f-' + ('00000000' + crc32(rp)).slice(-8);
+
+			while (seen[id])
+				id += 'a';
+			seen[id] = 1;
 
 			if (ext.length > 8)
 				ext = '%';
 
-			links = links.join('');
-			var nodes = ['<tr><td>-</td><td><div>' + links + '</div>', sz];
+			var links = linksplit(r.rp + '', id).join(''),
+				nodes = ['<tr><td>-</td><td><div>' + links + '</div>', sz];
+
 			for (var b = 0; b < tagord.length; b++) {
 				var k = tagord[b],
 					v = r.tags[k] || "";
