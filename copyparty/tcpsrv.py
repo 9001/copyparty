@@ -83,9 +83,9 @@ class TcpSrv(object):
 
                 for tk, tv in hits:
                     try:
-                        title_tab[tk] += " and {}".format(tv)
+                        title_tab[tk][tv] = 1
                     except:
-                        title_tab[tk] = tv
+                        title_tab[tk] = {tv: 1}
 
         if msgs:
             msgs[-1] += "\n"
@@ -263,12 +263,21 @@ class TcpSrv(object):
 
     def _set_wintitle(self, vars):
         if "pub" not in vars:
-            vars["pub"] = "Local-Only"
+            vars["pub"] = {"Local-Only": 1}
+
+        vars2 = {}
+        for k, eps in vars.items():
+            vars2[k] = {
+                ep: 1
+                for ep in eps.keys()
+                if ":" not in ep or ep.split(":")[0] not in eps
+            }
 
         title = ""
+        vars = vars2
         for p in self.args.wintitle.split(" "):
             if p.startswith("$"):
-                p = vars.get(p[1:], "(None)")
+                p = " and ".join(sorted(vars.get(p[1:], {"(None)": 1}).keys()))
 
             title += "{} ".format(p)
 
