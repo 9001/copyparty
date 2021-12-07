@@ -51,6 +51,7 @@ class Cfg(Namespace):
             mte="a",
             mth="",
             textfiles="",
+            doctitle="",
             hist=None,
             no_idx=None,
             no_hash=None,

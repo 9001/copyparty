@@ -23,6 +23,7 @@ class Cfg(Namespace):
             "mtp": [],
             "mte": "a",
             "mth": "",
+            "doctitle": "",
             "hist": None,
             "no_idx": None,
             "no_hash": None,
