@@ -86,8 +86,6 @@ function have() {
 	python -c "import $1; $1; $1.__version__"
 }
 
-mv copyparty/web/deps/marked.full.js.gz srv/ || true
-
 . buildenv/bin/activate
 have setuptools
 have wheel

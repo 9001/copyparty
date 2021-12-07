@@ -35,8 +35,6 @@ ver="$1"
 	exit 1
 }
 
-mv copyparty/web/deps/marked.full.js.gz srv/ || true
-
 mkdir -p dist
 zip_path="$(pwd)/dist/copyparty-$ver.zip"
 tgz_path="$(pwd)/dist/copyparty-$ver.tar.gz"

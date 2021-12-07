@@ -1,10 +1,10 @@
-FROM    alpine:3.14
+FROM    alpine:3.15
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
-        ver_marked=3.0.4 \
+        ver_marked=4.0.6 \
         ver_mde=2.15.0 \
-        ver_codemirror=5.62.3 \
+        ver_codemirror=5.64.0 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -82,7 +82,6 @@ RUN     cd marked-$ver_marked \
         && patch -p1 < /z/marked.patch \
         && npm run build \
         && cp -pv marked.min.js /z/dist/marked.js \
-        && cp -pv lib/marked.js /z/dist/marked.full.js \
         && mkdir -p /z/nodepkgs \
         && ln -s $(pwd) /z/nodepkgs/marked
 #        && npm run test \
@@ -98,8 +97,10 @@ RUN     cd CodeMirror-$ver_codemirror \
 
 
 # build easymde
+COPY    easymde-marked6.patch /z/
 COPY    easymde.patch /z/
 RUN     cd easy-markdown-editor-$ver_mde \
+        && patch -p1 < /z/easymde-marked6.patch \
         && patch -p1 < /z/easymde.patch \
         && sed -ri 's`https://registry.npmjs.org/marked/-/marked-[0-9\.]+.tgz`file:/z/nodepkgs/marked`' package-lock.json \
         && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \

@@ -4773,7 +4773,7 @@ function show_md(md, name, div, url, depth) {
 
 	try {
 		clmod(div, 'mdo', 1);
-		div.innerHTML = marked(md, {
+		div.innerHTML = marked.parse(md, {
 			headerPrefix: 'md-',
 			breaks: true,
 			gfm: true

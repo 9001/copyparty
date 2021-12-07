@@ -1,0 +1,12 @@
+diff --git a/src/js/easymde.js b/src/js/easymde.js
+--- a/src/js/easymde.js
++++ b/src/js/easymde.js
+@@ -1962,7 +1962,7 @@ EasyMDE.prototype.markdown = function (text) {
+         marked.setOptions(markedOptions);
+ 
+         // Convert the markdown to HTML
+-        var htmlText = marked(text);
++        var htmlText = marked.parse(text);
+ 
+         // Sanitize HTML
+         if (this.options.renderingConfig && typeof this.options.renderingConfig.sanitizerFunction === 'function') {

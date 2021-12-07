@@ -40,8 +40,8 @@ var md_plug = {};
 // add navbar
 (function () {
     var parts = get_evpath().split('/'), link = '', o;
-    for (var a = 0; a < parts.length - 1; a++) {
-        link += parts[a] + '/';
+    for (var a = 0, aa = parts.length - 2; a <= aa; a++) {
+        link += parts[a] + (a < aa ? '/' : '');
         o = mknod('a');
         o.setAttribute('href', link);
         o.textContent = uricom_dec(parts[a])[0] || 'top';
@@ -250,7 +250,7 @@ function convert_markdown(md_text, dest_dom) {
         Object.assign(marked_opts, ext[0]);
 
     try {
-        var md_html = marked(md_text, marked_opts);
+        var md_html = marked.parse(md_text, marked_opts);
     }
     catch (ex) {
         if (ext)

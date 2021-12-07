@@ -1,7 +1,7 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
-@@ -6,5 +6,5 @@ const { repeatString } = require('./helpers.js');
+@@ -6,5 +6,5 @@ import { repeatString } from './helpers.js';
  /**
   * smartypants text replacement
 - */
@@ -15,21 +15,21 @@ diff --git a/src/Lexer.js b/src/Lexer.js
 + *
  function mangle(text) {
    let out = '',
-@@ -465,5 +465,5 @@ module.exports = class Lexer {
+@@ -466,5 +466,5 @@ export class Lexer {
  
        // autolink
 -      if (token = this.tokenizer.autolink(src, mangle)) {
 +      if (token = this.tokenizer.autolink(src)) {
          src = src.substring(token.raw.length);
          tokens.push(token);
-@@ -472,5 +472,5 @@ module.exports = class Lexer {
+@@ -473,5 +473,5 @@ export class Lexer {
  
        // url (gfm)
 -      if (!this.state.inLink && (token = this.tokenizer.url(src, mangle))) {
 +      if (!this.state.inLink && (token = this.tokenizer.url(src))) {
          src = src.substring(token.raw.length);
          tokens.push(token);
-@@ -493,5 +493,5 @@ module.exports = class Lexer {
+@@ -494,5 +494,5 @@ export class Lexer {
          }
        }
 -      if (token = this.tokenizer.inlineText(cutSrc, smartypants)) {
@@ -39,14 +39,14 @@ diff --git a/src/Lexer.js b/src/Lexer.js
 diff --git a/src/Renderer.js b/src/Renderer.js
 --- a/src/Renderer.js
 +++ b/src/Renderer.js
-@@ -142,5 +142,5 @@ module.exports = class Renderer {
+@@ -142,5 +142,5 @@ export class Renderer {
  
    link(href, title, text) {
 -    href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
 +    href = cleanUrl(this.options.baseUrl, href);
      if (href === null) {
        return text;
-@@ -155,5 +155,5 @@ module.exports = class Renderer {
+@@ -155,5 +155,5 @@ export class Renderer {
  
    image(href, title, text) {
 -    href = cleanUrl(this.options.sanitize, this.options.baseUrl, href);
@@ -56,7 +56,7 @@ diff --git a/src/Renderer.js b/src/Renderer.js
 diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 --- a/src/Tokenizer.js
 +++ b/src/Tokenizer.js
-@@ -321,14 +321,7 @@ module.exports = class Tokenizer {
+@@ -320,14 +320,7 @@ export class Tokenizer {
          type: 'html',
          raw: cap[0],
 -        pre: !this.options.sanitizer
@@ -72,7 +72,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 -      }
        return token;
      }
-@@ -477,15 +470,9 @@ module.exports = class Tokenizer {
+@@ -476,15 +469,9 @@ export class Tokenizer {
  
        return {
 -        type: this.options.sanitize
@@ -90,7 +90,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text: cap[0]
        };
      }
-@@ -672,10 +659,10 @@ module.exports = class Tokenizer {
+@@ -671,10 +658,10 @@ export class Tokenizer {
    }
  
 -  autolink(src, mangle) {
@@ -103,7 +103,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text = escape(cap[1]);
          href = 'mailto:' + text;
        } else {
-@@ -700,10 +687,10 @@ module.exports = class Tokenizer {
+@@ -699,10 +686,10 @@ export class Tokenizer {
    }
  
 -  url(src, mangle) {
@@ -116,7 +116,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text = escape(cap[0]);
          href = 'mailto:' + text;
        } else {
-@@ -737,12 +724,12 @@ module.exports = class Tokenizer {
+@@ -736,12 +723,12 @@ export class Tokenizer {
    }
  
 -  inlineText(src, smartypants) {
@@ -135,7 +135,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 diff --git a/src/defaults.js b/src/defaults.js
 --- a/src/defaults.js
 +++ b/src/defaults.js
-@@ -9,12 +9,8 @@ function getDefaults() {
+@@ -9,12 +9,8 @@ export function getDefaults() {
      highlight: null,
      langPrefix: 'language-',
 -    mangle: true,
@@ -151,10 +151,10 @@ diff --git a/src/defaults.js b/src/defaults.js
 diff --git a/src/helpers.js b/src/helpers.js
 --- a/src/helpers.js
 +++ b/src/helpers.js
-@@ -64,18 +64,5 @@ function edit(regex, opt) {
+@@ -64,18 +64,5 @@ export function edit(regex, opt) {
  const nonWordAndColonTest = /[^\w:]/g;
  const originIndependentUrl = /^$|^[a-z][a-z0-9+.-]*:|^[?#]/i;
--function cleanUrl(sanitize, base, href) {
+-export function cleanUrl(sanitize, base, href) {
 -  if (sanitize) {
 -    let prot;
 -    try {
@@ -168,36 +168,30 @@ diff --git a/src/helpers.js b/src/helpers.js
 -      return null;
 -    }
 -  }
-+function cleanUrl(base, href) {
++export function cleanUrl(base, href) {
    if (base && !originIndependentUrl.test(href)) {
      href = resolveUrl(base, href);
-@@ -227,10 +214,4 @@ function findClosingBracket(str, b) {
+@@ -227,10 +214,4 @@ export function findClosingBracket(str, b) {
  }
  
--function checkSanitizeDeprecation(opt) {
+-export function checkSanitizeDeprecation(opt) {
 -  if (opt && opt.sanitize && !opt.silent) {
 -    console.warn('marked(): sanitize and sanitizer parameters are deprecated since version 0.7.0, should not be used and will be removed in the future. Read more here: https://marked.js.org/#/USING_ADVANCED.md#options');
 -  }
 -}
 -
  // copied from https://stackoverflow.com/a/5450113/806777
- function repeatString(pattern, count) {
-@@ -260,5 +241,4 @@ module.exports = {
-   rtrim,
-   findClosingBracket,
--  checkSanitizeDeprecation,
-   repeatString
- };
+ export function repeatString(pattern, count) {
 diff --git a/src/marked.js b/src/marked.js
 --- a/src/marked.js
 +++ b/src/marked.js
-@@ -7,5 +7,4 @@ const Slugger = require('./Slugger.js');
- const {
+@@ -7,5 +7,4 @@ import { Slugger } from './Slugger.js';
+ import {
    merge,
 -  checkSanitizeDeprecation,
    escape
- } = require('./helpers.js');
-@@ -35,5 +34,4 @@ function marked(src, opt, callback) {
+ } from './helpers.js';
+@@ -35,5 +34,4 @@ export function marked(src, opt, callback) {
  
    opt = merge({}, marked.defaults, opt || {});
 -  checkSanitizeDeprecation(opt);
@@ -219,37 +213,37 @@ diff --git a/src/marked.js b/src/marked.js
 diff --git a/test/bench.js b/test/bench.js
 --- a/test/bench.js
 +++ b/test/bench.js
-@@ -33,5 +33,4 @@ async function runBench(options) {
+@@ -37,5 +37,4 @@ export async function runBench(options) {
      breaks: false,
      pedantic: false,
 -    sanitize: false,
      smartLists: false
    });
-@@ -45,5 +44,4 @@ async function runBench(options) {
+@@ -49,5 +48,4 @@ export async function runBench(options) {
      breaks: false,
      pedantic: false,
 -    sanitize: false,
      smartLists: false
    });
-@@ -58,5 +56,4 @@ async function runBench(options) {
+@@ -62,5 +60,4 @@ export async function runBench(options) {
      breaks: false,
      pedantic: false,
 -    sanitize: false,
      smartLists: false
    });
-@@ -70,5 +67,4 @@ async function runBench(options) {
+@@ -74,5 +71,4 @@ export async function runBench(options) {
      breaks: false,
      pedantic: false,
 -    sanitize: false,
      smartLists: false
    });
-@@ -83,5 +79,4 @@ async function runBench(options) {
+@@ -87,5 +83,4 @@ export async function runBench(options) {
      breaks: false,
      pedantic: true,
 -    sanitize: false,
      smartLists: false
    });
-@@ -95,5 +90,4 @@ async function runBench(options) {
+@@ -99,5 +94,4 @@ export async function runBench(options) {
      breaks: false,
      pedantic: true,
 -    sanitize: false,
@@ -258,7 +252,7 @@ diff --git a/test/bench.js b/test/bench.js
 diff --git a/test/specs/run-spec.js b/test/specs/run-spec.js
 --- a/test/specs/run-spec.js
 +++ b/test/specs/run-spec.js
-@@ -22,9 +22,4 @@ function runSpecs(title, dir, showCompletionTable, options) {
+@@ -25,9 +25,4 @@ function runSpecs(title, dir, showCompletionTable, options) {
            }
  
 -          if (spec.options.sanitizer) {
@@ -268,77 +262,77 @@ diff --git a/test/specs/run-spec.js b/test/specs/run-spec.js
 -
            (spec.only ? fit : (spec.skip ? xit : it))('should ' + passFail + example, async() => {
              const before = process.hrtime();
-@@ -53,3 +48,2 @@ runSpecs('Original', './original', false, { gfm: false, pedantic: true });
+@@ -56,3 +51,2 @@ runSpecs('Original', './original', false, { gfm: false, pedantic: true });
  runSpecs('New', './new');
  runSpecs('ReDOS', './redos');
 -runSpecs('Security', './security', false, { silent: true }); // silent - do not show deprecation warning
 diff --git a/test/unit/Lexer-spec.js b/test/unit/Lexer-spec.js
 --- a/test/unit/Lexer-spec.js
 +++ b/test/unit/Lexer-spec.js
-@@ -589,5 +589,5 @@ paragraph
+@@ -635,5 +635,5 @@ paragraph
      });
  
 -    it('sanitize', () => {
 +    /*it('sanitize', () => {
        expectTokens({
          md: '<div>html</div>',
-@@ -607,5 +607,5 @@ paragraph
+@@ -653,5 +653,5 @@ paragraph
          ]
        });
 -    });
 +    });*/
    });
  
-@@ -652,5 +652,5 @@ paragraph
+@@ -698,5 +698,5 @@ paragraph
        });
  
 -      it('html sanitize', () => {
 +      /*it('html sanitize', () => {
          expectInlineTokens({
            md: '<div>html</div>',
-@@ -660,5 +660,5 @@ paragraph
+@@ -706,5 +706,5 @@ paragraph
            ]
          });
 -      });
 +      });*/
  
        it('link', () => {
-@@ -971,5 +971,5 @@ paragraph
+@@ -1017,5 +1017,5 @@ paragraph
          });
  
 -        it('autolink mangle email', () => {
 +        /*it('autolink mangle email', () => {
            expectInlineTokens({
              md: '<test@example.com>',
-@@ -991,5 +991,5 @@ paragraph
+@@ -1037,5 +1037,5 @@ paragraph
              ]
            });
 -        });
 +        });*/
  
          it('url', () => {
-@@ -1028,5 +1028,5 @@ paragraph
+@@ -1074,5 +1074,5 @@ paragraph
          });
  
 -        it('url mangle email', () => {
 +        /*it('url mangle email', () => {
            expectInlineTokens({
              md: 'test@example.com',
-@@ -1048,5 +1048,5 @@ paragraph
+@@ -1094,5 +1094,5 @@ paragraph
              ]
            });
 -        });
 +        });*/
        });
  
-@@ -1064,5 +1064,5 @@ paragraph
+@@ -1110,5 +1110,5 @@ paragraph
        });
  
 -      describe('smartypants', () => {
 +      /*describe('smartypants', () => {
          it('single quotes', () => {
            expectInlineTokens({
-@@ -1134,5 +1134,5 @@ paragraph
+@@ -1180,5 +1180,5 @@ paragraph
            });
          });
 -      });
