@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 1, 6)
+VERSION = (1, 1, 7)
 CODENAME = "opus"
 BUILD_DT = (2021, 12, 7)
 

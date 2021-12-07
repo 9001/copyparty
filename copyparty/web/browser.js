@@ -3442,7 +3442,7 @@ var treectl = (function () {
 	});
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
 	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
-	bcfg_bind(r, 'htree', 'hovertree', true, reload_tree);
+	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);
 
 	function setwrap(v) {
 		clmod(ebi('tree'), 'nowrap', !v);
