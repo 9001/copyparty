@@ -1101,7 +1101,7 @@ html.light #doc .line-highlight {
 #docul li {
 	margin: 0;
 }
-#tree #docul a {
+#tree #docul li+li a {
 	display: block;
 }
 #seldoc.sel {
@@ -1424,6 +1424,7 @@ html.light .opview input[type="text"] {
 	border-color: #38d;
 }
 html.light #u2tab a>span,
+html.light #docul .bn a>span,
 html.light #files td div span {
 	color: #000;
 }
@@ -2149,6 +2150,7 @@ html.light #u2foot .warn span {
 	border-color: #d06;
 }
 #u2tab a>span,
+#docul .bn a>span,
 #unpost a>span {
 	font-weight: bold;
 	font-style: italic;

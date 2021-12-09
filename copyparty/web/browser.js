@@ -2477,7 +2477,7 @@ var showfile = (function () {
 	}
 
 	r.mktree = function () {
-		var html = ['<li class="bn">list of textfiles in<br />' + esc(get_vpath()) + '</li>'];
+		var html = ['<li class="bn">list of textfiles in<br />' + linksplit(get_vpath()).join('') + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="#" hl="' + file.id +
@@ -5010,6 +5010,7 @@ ebi('path').onclick = function (e) {
 	if (!treectl.spa || !a || !(a = a.getAttribute('href') + '') || !a.endsWith('/'))
 		return;
 
+	thegrid.setvis(true);
 	treectl.reqls(a, true, true);
 	return ev(e);
 };
@@ -5033,6 +5034,13 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 	tgt = e.target.closest('a[hl]');
 	if (tgt) {
 		showfile.show(noq_href(ebi(tgt.getAttribute('hl'))), tgt.getAttribute('lang'));
+		return ev(e);
+	}
+
+	tgt = e.target.closest('a');
+	if (tgt && tgt.closest('li.bn')) {
+		thegrid.setvis(true);
+		treectl.goto(tgt.getAttribute('href'), true);
 		return ev(e);
 	}
 };
