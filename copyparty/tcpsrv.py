@@ -77,6 +77,9 @@ class TcpSrv(object):
                 if "pub" in title_vars and "external" in unicode(desc):
                     hits.append(("pub", ep))
 
+                if "pub" in title_vars or "all" in title_vars:
+                    hits.append(("all", ep))
+
                 for var in title_vars:
                     if var.startswith("ip-") and ep.startswith(var[3:]):
                         hits.append((var, ep))
@@ -262,8 +265,8 @@ class TcpSrv(object):
         return eps
 
     def _set_wintitle(self, vars):
-        if "pub" not in vars:
-            vars["pub"] = {"Local-Only": 1}
+        vars["all"] = vars.get("all", {"Local-Only": 1})
+        vars["pub"] = vars.get("pub", vars["all"])
 
         vars2 = {}
         for k, eps in vars.items():

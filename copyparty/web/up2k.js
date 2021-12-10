@@ -1485,7 +1485,8 @@ function up2k_init(subtle) {
                     err.indexOf('NotFoundError') !== -1  // macos-firefox permissions
                 ) {
                     pvis.seth(t.n, 1, 'OS-error');
-                    pvis.seth(t.n, 2, err);
+                    pvis.seth(t.n, 2, err + ' @ ' + car);
+                    console.log('OS-error', reader.error, '@', car);
                     handled = true;
                 }
 
@@ -2113,7 +2114,7 @@ function up2k_init(subtle) {
     if (parallel_uploads < 1)
         bumpthread(1);
 
-    return { "init_deps": init_deps, "set_fsearch": set_fsearch, "ui": pvis }
+    return { "init_deps": init_deps, "set_fsearch": set_fsearch, "ui": pvis, "st": st, "uc": uc }
 }
 
 

@@ -1367,6 +1367,9 @@ class HttpCli(object):
             try:
                 fs_path = req_path + ext
                 st = bos.stat(fs_path)
+                if stat.S_ISDIR(st.st_mode):
+                    continue
+
                 file_ts = max(file_ts, st.st_mtime)
                 editions[ext or "plain"] = [fs_path, st.st_size]
             except:
@@ -1958,6 +1961,13 @@ class HttpCli(object):
             else:
                 fmt = "{{}}  {{:{},}}  {{}}"
                 nfmt = "{:,}"
+
+            for x in dirs:
+                n = x["name"] + "/"
+                if arg == "v":
+                    n = "\033[94m" + n
+
+                x["name"] = n
 
             fmt = fmt.format(len(nfmt.format(biggest)))
             ret = [
