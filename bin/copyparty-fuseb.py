@@ -11,14 +11,18 @@ import re
 import os
 import sys
 import time
+import json
 import stat
 import errno
 import struct
+import codecs
+import platform
 import threading
 import http.client  # py2: httplib
 import urllib.parse
 from datetime import datetime
 from urllib.parse import quote_from_bytes as quote
+from urllib.parse import unquote_to_bytes as unquote
 
 try:
     import fuse
@@ -38,7 +42,7 @@ except:
 mount a copyparty server (local or remote) as a filesystem
 
 usage:
-  python ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /mnt/nas
+  python ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas
 
 dependencies:
   sudo apk add fuse-dev python3-dev
@@ -48,6 +52,10 @@ fork of copyparty-fuse.py based on fuse-python which
   appears to be more compliant than fusepy? since this works with samba
     (probably just my garbage code tbh)
 """
+
+
+WINDOWS = sys.platform == "win32"
+MACOS = platform.system() == "Darwin"
 
 
 def threadless_log(msg):
@@ -93,6 +101,41 @@ def html_dec(txt):
     )
 
 
+def register_wtf8():
+    def wtf8_enc(text):
+        return str(text).encode("utf-8", "surrogateescape"), len(text)
+
+    def wtf8_dec(binary):
+        return bytes(binary).decode("utf-8", "surrogateescape"), len(binary)
+
+    def wtf8_search(encoding_name):
+        return codecs.CodecInfo(wtf8_enc, wtf8_dec, name="wtf-8")
+
+    codecs.register(wtf8_search)
+
+
+bad_good = {}
+good_bad = {}
+
+
+def enwin(txt):
+    return "".join([bad_good.get(x, x) for x in txt])
+
+    for bad, good in bad_good.items():
+        txt = txt.replace(bad, good)
+
+    return txt
+
+
+def dewin(txt):
+    return "".join([good_bad.get(x, x) for x in txt])
+
+    for bad, good in bad_good.items():
+        txt = txt.replace(good, bad)
+
+    return txt
+
+
 class CacheNode(object):
     def __init__(self, tag, data):
         self.tag = tag
@@ -115,8 +158,9 @@ class Stat(fuse.Stat):
 
 
 class Gateway(object):
-    def __init__(self, base_url):
+    def __init__(self, base_url, pw):
         self.base_url = base_url
+        self.pw = pw
 
         ui = urllib.parse.urlparse(base_url)
         self.web_root = ui.path.strip("/")
@@ -135,8 +179,7 @@ class Gateway(object):
         self.conns = {}
 
     def quotep(self, path):
-        # TODO: mojibake support
-        path = path.encode("utf-8", "ignore")
+        path = path.encode("wtf-8")
         return quote(path, safe="/")
 
     def getconn(self, tid=None):
@@ -159,20 +202,29 @@ class Gateway(object):
         except:
             pass
 
-    def sendreq(self, *args, **kwargs):
+    def sendreq(self, *args, **ka):
         tid = get_tid()
+        if self.pw:
+            ck = "cppwd=" + self.pw
+            try:
+                ka["headers"]["Cookie"] = ck
+            except:
+                ka["headers"] = {"Cookie": ck}
         try:
             c = self.getconn(tid)
-            c.request(*list(args), **kwargs)
+            c.request(*list(args), **ka)
             return c.getresponse()
         except:
             self.closeconn(tid)
             c = self.getconn(tid)
-            c.request(*list(args), **kwargs)
+            c.request(*list(args), **ka)
             return c.getresponse()
 
     def listdir(self, path):
-        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots"
+        if bad_good:
+            path = dewin(path)
+
+        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots&ls"
         r = self.sendreq("GET", web_path)
         if r.status != 200:
             self.closeconn()
@@ -182,9 +234,12 @@ class Gateway(object):
                 )
             )
 
-        return self.parse_html(r)
+        return self.parse_jls(r)
 
     def download_file_range(self, path, ofs1, ofs2):
+        if bad_good:
+            path = dewin(path)
+
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
         log("downloading {}".format(hdr_range))
@@ -200,40 +255,27 @@ class Gateway(object):
 
         return r.read()
 
-    def parse_html(self, datasrc):
-        ret = []
-        remainder = b""
-        ptn = re.compile(
-            r"^<tr><td>(-|DIR)</td><td><a [^>]+>([^<]+)</a></td><td>([^<]+)</td><td>([^<]+)</td></tr>$"
-        )
-
+    def parse_jls(self, datasrc):
+        rsp = b""
         while True:
-            buf = remainder + datasrc.read(4096)
-            # print('[{}]'.format(buf.decode('utf-8')))
+            buf = datasrc.read(1024 * 32)
             if not buf:
                 break
 
-            remainder = b""
-            endpos = buf.rfind(b"\n")
-            if endpos >= 0:
-                remainder = buf[endpos + 1 :]
-                buf = buf[:endpos]
+            rsp += buf
 
-            lines = buf.decode("utf-8").split("\n")
-            for line in lines:
-                m = ptn.match(line)
-                if not m:
-                    # print(line)
-                    continue
+        rsp = json.loads(rsp.decode("utf-8"))
+        ret = []
+        for statfun, nodes in [
+            [self.stat_dir, rsp["dirs"]],
+            [self.stat_file, rsp["files"]],
+        ]:
+            for n in nodes:
+                fname = unquote(n["href"].split("?")[0]).rstrip(b"/").decode("wtf-8")
+                if bad_good:
+                    fname = enwin(fname)
 
-                ftype, fname, fsize, fdate = m.groups()
-                fname = html_dec(fname)
-                ts = datetime.strptime(fdate, "%Y-%m-%d %H:%M:%S").timestamp()
-                sz = int(fsize)
-                if ftype == "-":
-                    ret.append([fname, self.stat_file(ts, sz), 0])
-                else:
-                    ret.append([fname, self.stat_dir(ts, sz), 0])
+                ret.append([fname, statfun(n["ts"], n["sz"]), 0])
 
         return ret
 
@@ -262,6 +304,7 @@ class CPPF(Fuse):
         Fuse.__init__(self, *args, **kwargs)
 
         self.url = None
+        self.pw = None
 
         self.dircache = []
         self.dircache_mtx = threading.Lock()
@@ -271,7 +314,7 @@ class CPPF(Fuse):
 
     def init2(self):
         # TODO figure out how python-fuse wanted this to go
-        self.gw = Gateway(self.url)  # .decode('utf-8'))
+        self.gw = Gateway(self.url, self.pw)  # .decode('utf-8'))
         info("up")
 
     def clean_dircache(self):
@@ -536,6 +579,8 @@ class CPPF(Fuse):
 
     def getattr(self, path):
         log("getattr [{}]".format(path))
+        if WINDOWS:
+            path = enwin(path)  # windows occasionally decodes f0xx to xx
 
         path = path.strip("/")
         try:
@@ -568,9 +613,25 @@ class CPPF(Fuse):
 
 def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
+    register_wtf8()
+    if WINDOWS:
+        os.system("rem")
+
+        for ch in '<>:"\\|?*':
+            # microsoft maps illegal characters to f0xx
+            # (e000 to f8ff is basic-plane private-use)
+            bad_good[ch] = chr(ord(ch) + 0xF000)
+
+        for n in range(0, 0x100):
+            # map surrogateescape to another private-use area
+            bad_good[chr(n + 0xDC00)] = chr(n + 0xF100)
+
+        for k, v in bad_good.items():
+            good_bad[v] = k
 
     server = CPPF()
     server.parser.add_option(mountopt="url", metavar="BASE_URL", default=None)
+    server.parser.add_option(mountopt="pw", metavar="PASSWORD", default=None)
     server.parse(values=server, errex=1)
     if not server.url or not str(server.url).startswith("http"):
         print("\nerror:")
@@ -578,7 +639,7 @@ def main():
         print("  need argument: mount-path")
         print("example:")
         print(
-            "  ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,url=http://192.168.1.69:3923 /mnt/nas"
+            "  ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas"
         )
         sys.exit(1)
 
