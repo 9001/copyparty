@@ -418,7 +418,8 @@ class MTag(object):
 
         try:
             md = mutagen.File(fsenc(abspath), easy=True)
-            x = md.info.length
+            if not md.info.length and not md.info.codec:
+                raise Exception()
         except Exception as ex:
             return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
