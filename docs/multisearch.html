@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="utf-8">
+	<title>multisearch</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <style>
+
+html, body {
+    margin: 0;
+    padding: 0;
+    color: #ddd;
+    background: #222;
+    font-family: sans-serif;
+}
+body {
+    padding: 1em;
+}
+a {
+    color: #fc5;
+}
+ul {
+    line-height: 1.5em;
+}
+code {
+    color: #fc5;
+    border: 1px solid #444;
+    padding: .1em .2em;
+    font-family: sans-serif, sans-serif;
+}
+#src {
+    display: block;
+    width: calc(100% - 1em);
+    padding: .5em;
+    margin: 0;
+}
+td {
+    padding-left: 1em;
+}
+.hit,
+.miss {
+    font-weight: bold;
+    padding-left: 0;
+    padding-top: 1em;
+}
+.hit {color: #af0;}
+.miss {color: #f0c;}
+.hit:before {content: '✅';}
+.miss:before {content: '❌';}
+
+</style></head><body>
+    <ul>
+        <li>paste a list of filenames (youtube rips) below and hit search</li>
+        <li>it will grab the youtube-id from the filenames and search for each id</li>
+        <li>filenames must be like <code>-YTID.webm</code> (youtube-dl style) or <code>[YTID].webm</code> (ytdlp style)</li>
+    </ul>
+    <textarea id="src"></textarea>
+    <button id="go">search</button>
+    <div id="res"></div>
+    <script>
+
+var ebi = document.getElementById.bind(document);
+function esc(txt) {
+    return txt.replace(/[&"<>]/g, function (c) {
+        return {
+            '&': '&amp;',
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;'
+        }[c];
+    });
+}
+
+ebi('go').onclick = async function() {
+    var queries = [];
+    for (var ln of ebi('src').value.split(/\n/g)) {
+        // filter the list of input files,
+        // only keeping youtube videos,
+        // meaning the filename ends with either
+        //   [YOUTUBEID].EXTENSION or
+        //   -YOUTUBEID.EXTENSION
+        var m = /[[-]([0-9a-zA-Z_-]{11})\]?\.(mp4|webm|mkv)$/.exec(ln);
+        if (!m || !(m = m[1]))
+            continue;
+
+        // create a search query for each line: name like *youtubeid*
+        queries.push([ln, `name like *${m}*`]);
+    }
+
+    var a = 0, html = ['<table>'], hits = [], misses = [];
+    for (var [fn, q] of queries) {
+        var r = await fetch('/?srch', {
+            method: 'POST',
+            body: JSON.stringify({'q': q})
+        });
+        r = await r.json();
+        
+        var cl, tab2;
+        if (r.hits.length) {
+            tab2 = hits;
+            cl = 'hit';
+        }
+        else {
+            tab2 = misses;
+            cl = 'miss';
+        }
+        var h = `<tr><td class="${cl}" colspan="9">${esc(fn)}</td></tr>`;
+        tab2.push(h);
+        html.push(h);
+        for (var h of r.hits) {
+            var link = `<a href="/${h.rp}">${esc(decodeURIComponent(h.rp))}</a>`;
+            html.push(`<tr><td>${h.sz}</td><td>${link}</td></tr>`);
+        }
+        ebi('res').innerHTML = `searching, ${++a} / ${queries.length} done, ${hits.length} hits, ${misses.length} miss`;
+    }
+    html.push('<tr><td><h1>hits:</h1></td></tr>');
+    html = html.concat(hits);
+
+    html.push('<tr><td><h1>miss:</h1></td></tr>');
+    html = html.concat(misses);
+
+    html.push('</table>');
+    ebi('res').innerHTML = html.join('\n');
+};
+
+</script></body></html>

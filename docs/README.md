@@ -23,6 +23,15 @@ point `--css-browser` to one of these by URL:
 
 
 
+# utilities
+
+## [`multisearch.html`](multisearch.html)
+* takes a list of filenames of youtube rips, grabs the youtube-id of each file, and does a search on the server for those
+* use it by putting it somewhere on the server and opening it as an html page
+* also serves as an extendable template for other specific search behaviors
+
+
+
 # other stuff
 
 ## [`rclone.md`](rclone.md)
