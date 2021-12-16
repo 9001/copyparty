@@ -1520,6 +1520,7 @@ class HttpCli(object):
 
         if remains > 0:
             logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"
+            self.keepalive = False
 
         spd = self._spd((upper - lower) - remains)
         if self.do_log:
