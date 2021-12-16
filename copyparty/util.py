@@ -1177,7 +1177,7 @@ def hashcopy(fin, fout):
     return tlen, hashobj.hexdigest(), digest_b64
 
 
-def sendfile_py(lower, upper, f, s, bufsz, slp):
+def sendfile_py(log, lower, upper, f, s, bufsz, slp):
     remains = upper - lower
     f.seek(lower)
     while remains > 0:
@@ -1197,17 +1197,24 @@ def sendfile_py(lower, upper, f, s, bufsz, slp):
     return 0
 
 
-def sendfile_kern(lower, upper, f, s, bufsz, slp):
+def sendfile_kern(log, lower, upper, f, s, bufsz, slp):
     out_fd = s.fileno()
     in_fd = f.fileno()
     ofs = lower
+    stuck = None
     while ofs < upper:
+        stuck = stuck or time.time()
         try:
             req = min(2 ** 30, upper - ofs)
             select.select([], [out_fd], [], 10)
             n = os.sendfile(out_fd, in_fd, ofs, req)
+            stuck = None
         except Exception as ex:
-            # print("sendfile: " + repr(ex))
+            d = time.time() - stuck
+            log("sendfile stuck for {:.3f} sec: {!r}".format(d, ex))
+            if d < 3600 and ex.errno == 11:  # eagain
+                continue
+
             n = 0
 
         if n <= 0:

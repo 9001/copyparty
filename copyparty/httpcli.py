@@ -1515,7 +1515,7 @@ class HttpCli(object):
         with open_func(*open_args) as f:
             sendfun = sendfile_kern if use_sendfile else sendfile_py
             remains = sendfun(
-                lower, upper, f, self.s, self.args.s_wr_sz, self.args.s_wr_slp
+                self.log, lower, upper, f, self.s, self.args.s_wr_sz, self.args.s_wr_slp
             )
 
         if remains > 0:
