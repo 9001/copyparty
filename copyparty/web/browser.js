@@ -1802,17 +1802,19 @@ var fileman = (function () {
 		clmod(bdel, 'en', nsel);
 		clmod(bcut, 'en', nsel);
 		clmod(bpst, 'en', r.clip && r.clip.length);
-		bren.style.display = have_mv && has(perms, 'write') && has(perms, 'move') ? '' : 'none';
-		bdel.style.display = have_del && has(perms, 'delete') ? '' : 'none';
-		bcut.style.display = have_mv && has(perms, 'move') ? '' : 'none';
-		bpst.style.display = have_mv && has(perms, 'write') ? '' : 'none';
+
+		clmod(bren, 'hide', !(have_mv && has(perms, 'write') && has(perms, 'move')));
+		clmod(bdel, 'hide', !(have_del && has(perms, 'delete')));
+		clmod(bcut, 'hide', !(have_mv && has(perms, 'move')));
+		clmod(bpst, 'hide', !(have_mv && has(perms, 'write')));
+		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
+
 		bpst.setAttribute('tt', 'paste ' + r.clip.length + ' items$NHotkey: ctrl-V');
-		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not([style])'));
 	};
 
 	r.rename = function (e) {
 		ev(e);
-		if (bren.style.display)
+		if (clgot(bren, 'hide'))
 			return toast.err(3, 'cannot rename:\nyou do not have “move” permission in this folder');
 
 		var sel = msel.getsel();
@@ -2099,7 +2101,7 @@ var fileman = (function () {
 
 	r.delete = function (e) {
 		ev(e);
-		if (bdel.style.display)
+		if (clgot(bdel, 'hide'))
 			return toast.err(3, 'cannot delete:\nyou do not have “delete” permission in this folder');
 
 		var sel = msel.getsel(),
@@ -2145,7 +2147,7 @@ var fileman = (function () {
 
 	r.cut = function (e) {
 		ev(e);
-		if (bcut.style.display)
+		if (clgot(bcut, 'hide'))
 			return toast.err(3, 'cannot cut:\nyou do not have “move” permission in this folder');
 
 		var sel = msel.getsel(),
@@ -2186,7 +2188,7 @@ var fileman = (function () {
 
 	r.paste = function (e) {
 		ev(e);
-		if (bpst.style.display)
+		if (clgot(bpst, 'hide'))
 			return toast.err(3, 'cannot paste:\nyou do not have “write” permission in this folder');
 
 		if (!r.clip.length)
@@ -3871,10 +3873,6 @@ var treectl = (function () {
 			hist_push(this.top);
 
 		r.gentab(this.top, res);
-
-		acct = res.acct;
-		have_up2k_idx = res.idx;
-		apply_perms(res.perms);
 		despin('#files');
 		despin('#gfiles');
 
@@ -3949,6 +3947,12 @@ var treectl = (function () {
 		reload_tree();
 		reload_browser();
 		tree_scrollto();
+		if (res.acct) {
+			acct = res.acct;
+			have_up2k_idx = res.idx;
+			apply_perms(res.perms);
+			fileman.render();
+		}
 	}
 
 	r.hydrate = function () {

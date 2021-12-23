@@ -426,6 +426,9 @@ html.light #ggrid>a.sel {
 	opacity: .3;
 	color: #f6c;
 }
+#wfm a.hide {
+	display: none;
+}
 html.light #wfm a:not(.en) {
 	color: #c4a;
 }
