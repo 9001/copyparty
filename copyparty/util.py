@@ -1097,7 +1097,8 @@ def read_socket(sr, total_size):
 
         buf = sr.recv(bufsz)
         if not buf:
-            raise Pebkac(400, "client d/c during binary post")
+            m = "client d/c during binary post after {} bytes, {} bytes remaining"
+            raise Pebkac(400, m.format(total_size - remains, remains))
 
         remains -= len(buf)
         yield buf

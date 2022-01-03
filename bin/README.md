@@ -5,6 +5,11 @@
 * if something breaks just restart it
 
 
+# [`partyjournal.py`](partyjournal.py)
+produces a chronological list of all uploads by collecting info from up2k databases and the filesystem
+* outputs a standalone html file
+* optional mapping from IP-addresses to nicknames
+
 
 # [`copyparty-fuse.py`](copyparty-fuse.py)
 * mount a copyparty server as a local filesystem (read-only)

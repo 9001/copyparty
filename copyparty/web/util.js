@@ -86,6 +86,9 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if ((msg + '').indexOf('ResizeObserver') !== -1)
         return;  // chrome issue 809574 (benign, from <video>)
 
+    if ((msg + '').indexOf('l2d.js') !== -1)
+        return;  // `t` undefined in tapEvent -> hitTestSimpleCustom
+
     var ekey = url + '\n' + lineNo + '\n' + msg;
     if (ignexd[ekey] || crashed)
         return;

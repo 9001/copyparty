@@ -1,3 +1,6 @@
+### [`plugins/`](plugins/)
+* example extensions
+
 ### [`copyparty.bat`](copyparty.bat)
 * launches copyparty with no arguments (anon read+write within same folder)
 * intended for windows machines with no python.exe in PATH
