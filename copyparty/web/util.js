@@ -222,15 +222,15 @@ if (!String.prototype.endsWith)
         return this.substring(this_len - search.length, this_len) === search;
     };
 
-if (!String.startsWith)
+if (!String.prototype.startsWith)
     String.prototype.startsWith = function (s, i) {
         i = i > 0 ? i | 0 : 0;
         return this.substring(i, i + s.length) === s;
     };
 
-if (!String.trimEnd)
+if (!String.prototype.trimEnd)
     String.prototype.trimEnd = String.prototype.trimRight = function () {
-        return this.replace(/[ \t\r\n]+$/m, '');
+        return this.replace(/[ \t\r\n]+$/, '');
     };
 
 if (!Element.prototype.matches)

@@ -85,13 +85,13 @@ function copydom(src, dst, lv) {
 
     var rpl = [];
     for (var a = sc.length - 1; a >= 0; a--) {
-        var st = sc[a].tagName,
-            dt = dc[a].tagName;
+        var st = sc[a].tagName || sc[a].nodeType,
+            dt = dc[a].tagName || dc[a].nodeType;
 
         if (st !== dt) {
             dbg("replace L%d (%d/%d) type %s/%s", lv, a, sc.length, st, dt);
-            rpl.push(a);
-            continue;
+            dst.innerHTML = src.innerHTML;
+            return;
         }
 
         var sa = sc[a].attributes || [],
@@ -140,8 +140,11 @@ function copydom(src, dst, lv) {
     // repl is reversed; build top-down
     var nbytes = 0;
     for (var a = rpl.length - 1; a >= 0; a--) {
-        var html = sc[rpl[a]].outerHTML;
-        dc[rpl[a]].outerHTML = html;
+        var i = rpl[a],
+            prop = sc[i].nodeType == 1 ? 'outerHTML' : 'nodeValue';
+
+        var html = sc[i][prop];
+        dc[i][prop] = html;
         nbytes += html.length;
     }
     if (nbytes > 0)
