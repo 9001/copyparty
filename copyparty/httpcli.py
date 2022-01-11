@@ -524,7 +524,7 @@ class HttpCli(object):
                 return self.handle_stash()
 
             if "save" in opt:
-                post_sz, _, _, _, path = self.dump_to_file()
+                post_sz, _, _, _, path, _ = self.dump_to_file()
                 self.log("urlform: {} bytes, {}".format(post_sz, path))
             elif "print" in opt:
                 reader, _ = self.get_body_reader()
@@ -651,26 +651,45 @@ class HttpCli(object):
                 bos.unlink(path)
                 raise
 
-        if not self.args.nw:
-            vfs, vrem = vfs.get_dbv(rem)
-            self.conn.hsrv.broker.put(
-                False,
-                "up2k.hash_file",
-                vfs.realpath,
-                vfs.flags,
-                vrem,
-                fn,
-                self.ip,
-                time.time(),
-            )
+        if self.args.nw:
+            return post_sz, sha_hex, sha_b64, remains, path, ""
 
-        return post_sz, sha_hex, sha_b64, remains, path
+        vfs, rem = vfs.get_dbv(rem)
+        self.conn.hsrv.broker.put(
+            False,
+            "up2k.hash_file",
+            vfs.realpath,
+            vfs.flags,
+            rem,
+            fn,
+            self.ip,
+            time.time(),
+        )
+
+        if self.can_read and "fk" in vfs.flags:
+            vsuf = "?k=" + gen_filekey(
+                self.args.fk_salt,
+                path,
+                post_sz,
+                0 if ANYWIN else bos.stat(path).st_ino,
+            )[: vfs.flags["fk"]]
+
+        vpath = "/".join([x for x in [vfs.vpath, rem, fn] if x])
+        vpath = quotep(vpath)
+
+        url = "{}://{}/{}".format(
+            "https" if self.is_https else "http",
+            self.headers.get("host") or "{}:{}".format(*list(self.s.getsockname())),
+            vpath + vsuf,
+        )
+
+        return post_sz, sha_hex, sha_b64, remains, path, url
 
     def handle_stash(self):
-        post_sz, sha_hex, sha_b64, remains, path = self.dump_to_file()
+        post_sz, sha_hex, sha_b64, remains, path, url = self.dump_to_file()
         spd = self._spd(post_sz)
         self.log("{} wrote {}/{} bytes to {}".format(spd, post_sz, remains, path))
-        m = "{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56])
+        m = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
         self.reply(m.encode("utf-8"))
         return True
 
@@ -1170,11 +1189,12 @@ class HttpCli(object):
                 )[: vfs.flags["fk"]]
 
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
+            rel_url = quotep(vpath) + vsuf
             msg += 'sha512: {} // {} // {} bytes // <a href="/{}">{}</a> {}\n'.format(
                 sha_hex[:56],
                 sha_b64,
                 sz,
-                quotep(vpath) + vsuf,
+                rel_url,
                 html_escape(ofn, crlf=True),
                 vsuf,
             )
@@ -1183,15 +1203,16 @@ class HttpCli(object):
             jpart = {
                 "url": "{}://{}/{}".format(
                     "https" if self.is_https else "http",
-                    self.headers.get("host", "copyparty"),
-                    vpath + vsuf,
+                    self.headers.get("host")
+                    or "{}:{}".format(*list(self.s.getsockname())),
+                    rel_url,
                 ),
                 "sha512": sha_hex[:56],
                 "sha_b64": sha_b64,
                 "sz": sz,
                 "fn": lfn,
                 "fn_orig": ofn,
-                "path": vpath + vsuf,
+                "path": rel_url,
             }
             jmsg["files"].append(jpart)
 
