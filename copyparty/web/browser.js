@@ -204,6 +204,9 @@ ebi('tree').innerHTML = (
 	var ops = QSA('#ops>a');
 	for (var a = 0; a < ops.length; a++) {
 		ops[a].onclick = opclick;
+		var v = ops[a].getAttribute('data-dest');
+		if (v)
+			ops[a].href = '#v=' + v;
 	}
 })();
 
@@ -1590,6 +1593,11 @@ function eval_hash() {
 		var i = ebi('q_raw');
 		i.value = uricom_dec(v.slice(3))[0];
 		return i.oninput();
+	}
+
+	if (v.indexOf('#v=') === 0) {
+		goto(v.slice(3));
+		return;
 	}
 }
 
