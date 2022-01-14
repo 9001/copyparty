@@ -4,7 +4,7 @@
 //
 // FEATURES:
 // * adds an onscreen keyboard for operating a media center remotely,
-//    relies on https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/meadup.js
+//    relies on https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/very-bad-idea.py
 // * adds an interactive anime girl (if you can find the dependencies)
 
 var hambagas = [
@@ -495,7 +495,7 @@ function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
     var remaining = 3;
     for (var a of ['pio', 'l2d', 'fireworks']) {
         import_js(`/bad-memes/${a}.js`, function () {
-            if (remaining-- > 1)
+            if (remaining --> 1)
                 return;
 
             o = mknod('script');

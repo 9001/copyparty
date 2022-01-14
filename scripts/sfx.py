@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # coding: latin-1
 from __future__ import print_function, unicode_literals
-
 import re, os, sys, time, shutil, signal, threading, tarfile, hashlib, platform, tempfile, traceback
 import subprocess as sp
+
 
 """
 to edit this file, use HxD or "vim -b"
@@ -19,6 +19,7 @@ the archive data is attached after the b"\n# eof\n" archive marker,
   b"\n#r" decodes to b"\r"
   b"\n# " decodes to b""
 """
+
 
 # set by make-sfx.sh
 VER = None
