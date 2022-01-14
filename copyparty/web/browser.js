@@ -5097,7 +5097,10 @@ function reload_browser() {
 
 	reload_mp();
 	try { showsort(ftab); } catch (ex) { }
-	makeSortable(ftab, mp.read_order.bind(mp));
+	makeSortable(ftab, function () {
+		thegrid.setdirty();
+		mp.read_order();
+	});
 
 	for (var a = 0; a < 2; a++)
 		clmod(ebi(a ? 'pro' : 'epi'), 'hidden', ebi('unsearch'));
