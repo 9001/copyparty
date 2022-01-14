@@ -2,7 +2,7 @@ FROM    alpine:3.15
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
-        ver_marked=4.0.6 \
+        ver_marked=4.0.10 \
         ver_mde=2.15.0 \
         ver_codemirror=5.64.0 \
         ver_fontawesome=5.13.0 \
