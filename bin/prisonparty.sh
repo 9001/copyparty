@@ -11,10 +11,16 @@ sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr )
 help() { cat <<'EOF'
 
 usage:
-  ./prisonparty.sh <ROOTDIR> <UID> <GID> [VOLDIR [VOLDIR...]] -- copyparty-sfx.py [...]"
+  ./prisonparty.sh <ROOTDIR> <UID> <GID> [VOLDIR [VOLDIR...]] -- python3 copyparty-sfx.py [...]"
 
 example:
-  ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- copyparty-sfx.py -v /mnt/nas/music::rwmd"
+  ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 copyparty-sfx.py -v /mnt/nas/music::rwmd"
+
+example for running straight from source (instead of using an sfx):
+  PYTHONPATH=$PWD ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 -um copyparty -v /mnt/nas/music::rwmd"
+
+note that if you have python modules installed as --user (such as bpm/key detectors),
+  you should add /home/foo/.local as a VOLDIR
 
 EOF
 exit 1
@@ -35,10 +41,20 @@ while true; do
 	vols+=( "$(realpath "$v")" )
 done
 pybin="$1"; shift
-pybin="$(realpath "$pybin")"
+pybin="$(command -v "$pybin")"
+pyarg=
+while true; do
+	v="$1"
+	[ "${v:0:1}" = - ] || break
+	pyarg="$pyarg $v"
+	shift
+done
 cpp="$1"; shift
-cpp="$(realpath "$cpp")"
-cppdir="$(dirname "$cpp")"
+[ -d "$cpp" ] && cppdir="$PWD" || {
+	# sfx, not module
+	cpp="$(realpath "$cpp")"
+	cppdir="$(dirname "$cpp")"
+}
 trap - EXIT
 
 
@@ -60,11 +76,10 @@ echo
 
 # remove any trailing slashes
 jail="${jail%/}"
-cppdir="${cppdir%/}"
 
 
 # bind-mount system directories and volumes
-printf '%s\n' "${sysdirs[@]}" "${vols[@]}" | LC_ALL=C sort |
+printf '%s\n' "${sysdirs[@]}" "${vols[@]}" | sed -r 's`/$``' | LC_ALL=C sort | uniq |
 while IFS= read -r v; do
 	[ -e "$v" ] || {
 		# printf '\033[1;31mfolder does not exist:\033[0m %s\n' "/$v"
@@ -72,11 +87,27 @@ while IFS= read -r v; do
 	}
 	i1=$(stat -c%D.%i "$v"      2>/dev/null || echo a)
 	i2=$(stat -c%D.%i "$jail$v" 2>/dev/null || echo b)
+	# echo "v [$v] i1 [$i1] i2 [$i2]"
 	[ $i1 = $i2 ] && continue
 	
 	mkdir -p "$jail$v"
 	mount --bind "$v" "$jail$v"
 done
+
+
+cln() {
+	rv=$?
+	# cleanup if not in use
+	lsof "$jail" | grep -qF "$jail" &&
+		echo "chroot is in use, will not cleanup" ||
+	{
+		mount | grep -F " on $jail" |
+		awk '{sub(/ type .*/,"");sub(/.* on /,"");print}' |
+		LC_ALL=C sort -r  | tee /dev/stderr | tr '\n' '\0' | xargs -r0 umount
+	}
+	exit $rv
+}
+trap cln EXIT
 
 
 # create a tmp
@@ -85,15 +116,11 @@ chmod 777 "$jail/tmp"
 
 
 # run copyparty
-/sbin/chroot --userspec=$uid:$gid "$jail" "$pybin" "$cpp" "$@" && rv=0 || rv=$?
+export HOME=$(getent passwd $uid | cut -d: -f6)
+export USER=$(getent passwd $uid | cut -d: -f1)
+export LOGNAME="$USER"
+#echo "pybin [$pybin]"
+#echo "pyarg [$pyarg]"
+#echo "cpp [$cpp]"
+chroot --userspec=$uid:$gid "$jail" "$pybin" $pyarg "$cpp" "$@"
 
-
-# cleanup if not in use
-lsof "$jail" | grep -qF "$jail" &&
-	echo "chroot is in use, will not cleanup" ||
-{
-	mount | grep -qF " on $jail" |
-	awk '{sub(/ type .*/,"");sub(/.* on /,"");print}' |
-	LC_ALL=C sort -r  | tee /dev/stderr | tr '\n' '\0' | xargs -r0 umount
-}
-exit $rv
