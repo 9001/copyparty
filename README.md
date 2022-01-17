@@ -20,7 +20,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 <a href="https://f-droid.org/packages/me.ocv.partyup/"><img src="https://ocv.me/fdroid.png" alt="Get it on F-Droid" height="50" /> '' <img src="https://img.shields.io/f-droid/v/me.ocv.partyup.svg" alt="f-droid version info" /></a> '' <a href="https://github.com/9001/party-up"><img src="https://img.shields.io/github/release/9001/party-up.svg?logo=github" alt="github version info" /></a>
 
-(basic upload client, nothing fancy yet)
+(the app is **NOT** the full copyparty server! just a basic upload client, nothing fancy yet)
 
 
 ## readme toc
