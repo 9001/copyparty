@@ -4,7 +4,7 @@ set -e
 
 # install dependencies for audio-*.py
 #
-# linux/alpine: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} vamp-sdk-dev patchelf cmake
+# linux/alpine: requires {python3,ffmpeg,fftw}-dev py3-{wheel,pip} py3-numpy{,-dev} patchelf cmake
 # linux/debian: requires libav{codec,device,filter,format,resample,util}-dev {libfftw3,python3}-dev python3-{numpy,pip} vamp-{plugin-sdk,examples} patchelf cmake
 # win64: requires msys2-mingw64 environment
 # macos: requires macports
@@ -101,8 +101,11 @@ export -f dl_files
 
 
 github_tarball() {
+	rm -rf g
+	mkdir g
+	cd g
 	dl_text "$1" |
-	tee json |
+	tee ../json |
 	(
 		# prefer jq if available
 		jq -r '.tarball_url' ||
@@ -111,8 +114,11 @@ github_tarball() {
 		awk -F\" '/"tarball_url": "/ {print$4}'
 	) |
 	tee /dev/stderr |
+	head -n 1 |
 	tr -d '\r' | tr '\n' '\0' |
 	xargs -0 bash -c 'dl_files "$@"' _
+	mv * ../tgz
+	cd ..
 }
 
 
@@ -127,6 +133,7 @@ gitlab_tarball() {
 		tr \" '\n' | grep -E '\.tar\.gz$' | head -n 1
 	) |
 	tee /dev/stderr |
+	head -n 1 |
 	tr -d '\r' | tr '\n' '\0' |
 	tee links |
 	xargs -0 bash -c 'dl_files "$@"' _
@@ -138,10 +145,17 @@ install_keyfinder() {
 	#   use msys2 in mingw-w64 mode
 	#   pacman -S --needed mingw-w64-x86_64-{ffmpeg,python}
 	
-	github_tarball https://api.github.com/repos/mixxxdj/libkeyfinder/releases/latest
+	[ -e $HOME/pe/keyfinder ] && {
+		echo found a keyfinder build in ~/pe, skipping
+		return
+	}
 
-	tar -xf mixxxdj-libkeyfinder-*
-	rm -- *.tar.gz
+	cd "$td"
+	github_tarball https://api.github.com/repos/mixxxdj/libkeyfinder/releases/latest
+	ls -al
+
+	tar -xf tgz
+	rm tgz
 	cd mixxxdj-libkeyfinder*
 	
 	h="$HOME"
@@ -208,6 +222,22 @@ install_vamp() {
 	
 	$pybin -m pip install --user vamp
 
+	cd "$td"
+	echo '#include <vamp-sdk/Plugin.h>' | gcc -x c -c -o /dev/null - || [ -e ~/pe/vamp-sdk ] || {
+		printf '\033[33mcould not find the vamp-sdk, building from source\033[0m\n'
+		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/2588/vamp-plugin-sdk-2.9.0.tar.gz)
+		sha512sum -c <(
+			echo "7ef7f837d19a08048b059e0da408373a7964ced452b290fae40b85d6d70ca9000bcfb3302cd0b4dc76cf2a848528456f78c1ce1ee0c402228d812bd347b6983b  -"
+		) <vamp-plugin-sdk-2.9.0.tar.gz
+		tar -xf vamp-plugin-sdk-2.9.0.tar.gz
+		rm -- *.tar.gz
+		ls -al
+		cd vamp-plugin-sdk-*
+		./configure --prefix=$HOME/pe/vamp-sdk
+		make -j1 install
+	}
+
+	cd "$td"
 	have_beatroot || {
 		printf '\033[33mcould not find the vamp beatroot plugin, building from source\033[0m\n'
 		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/885/beatroot-vamp-v1.0.tar.gz)
@@ -215,8 +245,11 @@ install_vamp() {
 			echo "1f444d1d58ccf565c0adfe99f1a1aa62789e19f5071e46857e2adfbc9d453037bc1c4dcb039b02c16240e9b97f444aaff3afb625c86aa2470233e711f55b6874  -"
 		) <beatroot-vamp-v1.0.tar.gz
 		tar -xf beatroot-vamp-v1.0.tar.gz 
+		rm -- *.tar.gz
 		cd beatroot-vamp-v1.0
-		make -f Makefile.linux -j4
+		[ -e ~/pe/vamp-sdk ] &&
+			sed -ri 's`^(CFLAGS :=.*)`\1 -I'$HOME'/pe/vamp-sdk/include`' Makefile.linux
+		make -f Makefile.linux -j4 LDFLAGS=-L$HOME/pe/vamp-sdk/lib
 		# /home/ed/vamp /home/ed/.vamp /usr/local/lib/vamp
 		mkdir ~/vamp
 		cp -pv beatroot-vamp.* ~/vamp/
@@ -230,6 +263,7 @@ install_vamp() {
 
 # not in use because it kinda segfaults, also no windows support
 install_soundtouch() {
+	cd "$td"
 	gitlab_tarball https://gitlab.com/api/v4/projects/soundtouch%2Fsoundtouch/releases
 	
 	tar -xvf soundtouch-*
