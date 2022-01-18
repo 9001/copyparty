@@ -109,6 +109,9 @@ class VSock(object):
         self._reply += buf
         return len(buf)
 
+    def getsockname(self):
+        return ("a", 1)
+
 
 class VHttpSrv(object):
     def __init__(self):
