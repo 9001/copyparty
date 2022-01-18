@@ -666,6 +666,7 @@ class HttpCli(object):
             time.time(),
         )
 
+        vsuf = ""
         if self.can_read and "fk" in vfs.flags:
             vsuf = "?k=" + gen_filekey(
                 self.args.fk_salt,
