@@ -3025,7 +3025,7 @@ document.onkeydown = function (e) {
 		}
 	}
 
-	if (ae.closest('pre')) {
+	if (ae && ae.closest('pre')) {
 		if (k == 'KeyA' && ctrl(e)) {
 			var sel = document.getSelection(),
 				ran = document.createRange();
