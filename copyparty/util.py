@@ -1164,13 +1164,15 @@ def yieldfile(fn):
             yield buf
 
 
-def hashcopy(fin, fout):
+def hashcopy(fin, fout, slp=0):
     hashobj = hashlib.sha512()
     tlen = 0
     for buf in fin:
         tlen += len(buf)
         hashobj.update(buf)
         fout.write(buf)
+        if slp:
+            time.sleep(slp)
 
     digest = hashobj.digest()[:33]
     digest_b64 = base64.urlsafe_b64encode(digest).decode("utf-8")

@@ -640,7 +640,7 @@ class HttpCli(object):
         with ren_open(fn, *open_a, **params) as f:
             f, fn = f["orz"]
             path = os.path.join(fdir, fn)
-            post_sz, sha_hex, sha_b64 = hashcopy(reader, f)
+            post_sz, sha_hex, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
 
         if lim:
             lim.nup(self.ip)
@@ -689,7 +689,8 @@ class HttpCli(object):
     def handle_stash(self):
         post_sz, sha_hex, sha_b64, remains, path, url = self.dump_to_file()
         spd = self._spd(post_sz)
-        self.log("{} wrote {}/{} bytes to {}".format(spd, post_sz, remains, path))
+        m = "{} wrote {}/{} bytes to {}  # {}"
+        self.log(m.format(spd, post_sz, remains, path, sha_b64[:28]))  # 21
         m = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
         self.reply(m.encode("utf-8"))
         return True
@@ -921,7 +922,7 @@ class HttpCli(object):
 
             try:
                 f.seek(cstart[0])
-                post_sz, _, sha_b64 = hashcopy(reader, f)
+                post_sz, _, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
 
                 if sha_b64 != chash:
                     m = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
@@ -1114,7 +1115,7 @@ class HttpCli(object):
                         f, fname = f["orz"]
                         abspath = os.path.join(fdir, fname)
                         self.log("writing to {}".format(abspath))
-                        sz, sha_hex, sha_b64 = hashcopy(p_data, f)
+                        sz, sha_hex, sha_b64 = hashcopy(p_data, f, self.args.s_wr_slp)
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
@@ -1332,7 +1333,7 @@ class HttpCli(object):
             raise Pebkac(400, "expected body, got {}".format(p_field))
 
         with open(fsenc(fp), "wb", 512 * 1024) as f:
-            sz, sha512, _ = hashcopy(p_data, f)
+            sz, sha512, _ = hashcopy(p_data, f, self.args.s_wr_slp)
 
         if lim:
             lim.nup(self.ip)
