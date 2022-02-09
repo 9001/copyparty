@@ -1,6 +1,6 @@
-diff -NarU2 codemirror-5.59.3-orig/mode/gfm/gfm.js codemirror-5.59.3/mode/gfm/gfm.js
---- codemirror-5.59.3-orig/mode/gfm/gfm.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/mode/gfm/gfm.js	2021-02-21 20:42:02.166174775 +0000
+diff -wNarU2 codemirror-5.65.1-orig/mode/gfm/gfm.js codemirror-5.65.1/mode/gfm/gfm.js
+--- codemirror-5.65.1-orig/mode/gfm/gfm.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/mode/gfm/gfm.js	2022-02-09 22:50:18.145862052 +0100
 @@ -97,5 +97,5 @@
          }
        }
@@ -15,9 +15,9 @@ diff -NarU2 codemirror-5.59.3-orig/mode/gfm/gfm.js codemirror-5.59.3/mode/gfm/gf
 +      }*/
        stream.next();
        return null;
-diff -NarU2 codemirror-5.59.3-orig/mode/meta.js codemirror-5.59.3/mode/meta.js
---- codemirror-5.59.3-orig/mode/meta.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/mode/meta.js	2021-02-21 20:42:54.798742821 +0000
+diff -wNarU2 codemirror-5.65.1-orig/mode/meta.js codemirror-5.65.1/mode/meta.js
+--- codemirror-5.65.1-orig/mode/meta.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/mode/meta.js	2022-02-09 22:50:18.145862052 +0100
 @@ -13,4 +13,5 @@
  
    CodeMirror.modeInfo = [
@@ -62,10 +62,10 @@ diff -NarU2 codemirror-5.59.3-orig/mode/meta.js codemirror-5.59.3/mode/meta.js
 +    */
    ];
    // Ensure all modes have a mime property for backwards compatibility
-diff -NarU2 codemirror-5.59.3-orig/src/display/selection.js codemirror-5.59.3/src/display/selection.js
---- codemirror-5.59.3-orig/src/display/selection.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/display/selection.js	2021-02-21 20:44:14.860894328 +0000
-@@ -84,29 +84,21 @@
+diff -wNarU2 codemirror-5.65.1-orig/src/display/selection.js codemirror-5.65.1/src/display/selection.js
+--- codemirror-5.65.1-orig/src/display/selection.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/display/selection.js	2022-02-09 22:50:18.145862052 +0100
+@@ -96,29 +96,21 @@
      let order = getOrder(lineObj, doc.direction)
      iterateBidiSections(order, fromArg || 0, toArg == null ? lineLen : toArg, (from, to, dir, i) => {
 -      let ltr = dir == "ltr"
@@ -105,24 +105,24 @@ diff -NarU2 codemirror-5.59.3-orig/src/display/selection.js codemirror-5.59.3/sr
 +          botRight = openEnd && last ? rightSide : toPos.right
          add(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom)
          if (fromPos.bottom < toPos.top) add(leftSide, fromPos.bottom, null, toPos.top)
-diff -NarU2 codemirror-5.59.3-orig/src/input/ContentEditableInput.js codemirror-5.59.3/src/input/ContentEditableInput.js
---- codemirror-5.59.3-orig/src/input/ContentEditableInput.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/input/ContentEditableInput.js	2021-02-21 20:44:33.273953867 +0000
-@@ -399,4 +399,5 @@
+diff -wNarU2 codemirror-5.65.1-orig/src/input/ContentEditableInput.js codemirror-5.65.1/src/input/ContentEditableInput.js
+--- codemirror-5.65.1-orig/src/input/ContentEditableInput.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/input/ContentEditableInput.js	2022-02-09 22:50:18.145862052 +0100
+@@ -400,4 +400,5 @@
    let info = mapFromLineView(view, line, pos.line)
  
 +  /*
    let order = getOrder(line, cm.doc.direction), side = "left"
    if (order) {
-@@ -404,4 +405,5 @@
+@@ -405,4 +406,5 @@
      side = partPos % 2 ? "right" : "left"
    }
 +  */
    let result = nodeAndOffsetInLineMap(info.map, pos.ch, side)
    result.offset = result.collapse == "right" ? result.end : result.start
-diff -NarU2 codemirror-5.59.3-orig/src/input/movement.js codemirror-5.59.3/src/input/movement.js
---- codemirror-5.59.3-orig/src/input/movement.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/input/movement.js	2021-02-21 20:45:12.763093671 +0000
+diff -wNarU2 codemirror-5.65.1-orig/src/input/movement.js codemirror-5.65.1/src/input/movement.js
+--- codemirror-5.65.1-orig/src/input/movement.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/input/movement.js	2022-02-09 22:50:18.145862052 +0100
 @@ -15,4 +15,5 @@
  
  export function endOfLine(visually, cm, lineObj, lineNo, dir) {
@@ -146,9 +146,16 @@ diff -NarU2 codemirror-5.59.3-orig/src/input/movement.js codemirror-5.59.3/src/i
    return null
 +  */
  }
-diff -NarU2 codemirror-5.59.3-orig/src/line/line_data.js codemirror-5.59.3/src/line/line_data.js
---- codemirror-5.59.3-orig/src/line/line_data.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/line/line_data.js	2021-02-21 20:45:36.472549599 +0000
+diff -wNarU2 codemirror-5.65.1-orig/src/line/line_data.js codemirror-5.65.1/src/line/line_data.js
+--- codemirror-5.65.1-orig/src/line/line_data.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/line/line_data.js	2022-02-09 22:54:11.542722046 +0100
+@@ -3,5 +3,5 @@
+ import { elt, eltP, joinClasses } from "../util/dom.js"
+ import { eventMixin, signal } from "../util/event.js"
+-import { hasBadBidiRects, zeroWidthElement } from "../util/feature_detection.js"
++import { zeroWidthElement } from "../util/feature_detection.js"
+ import { lst, spaceStr } from "../util/misc.js"
+ 
 @@ -79,6 +79,6 @@
      // Optionally wire in some hacks into the token-rendering
      // algorithm, to deal with browser quirks.
@@ -158,10 +165,10 @@ diff -NarU2 codemirror-5.59.3-orig/src/line/line_data.js codemirror-5.59.3/src/l
 +    //  builder.addToken = buildTokenBadBidi(builder.addToken, order)
      builder.map = []
      let allowFrontierUpdate = lineView != cm.display.externalMeasured && lineNo(line)
-diff -NarU2 codemirror-5.59.3-orig/src/measurement/position_measurement.js codemirror-5.59.3/src/measurement/position_measurement.js
---- codemirror-5.59.3-orig/src/measurement/position_measurement.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/measurement/position_measurement.js	2021-02-21 20:50:52.372945293 +0000
-@@ -380,5 +380,6 @@
+diff -wNarU2 codemirror-5.65.1-orig/src/measurement/position_measurement.js codemirror-5.65.1/src/measurement/position_measurement.js
+--- codemirror-5.65.1-orig/src/measurement/position_measurement.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/measurement/position_measurement.js	2022-02-09 22:50:18.145862052 +0100
+@@ -382,5 +382,6 @@
      sticky = "after"
    }
 -  if (!order) return get(sticky == "before" ? ch - 1 : ch, sticky == "before")
@@ -169,39 +176,39 @@ diff -NarU2 codemirror-5.59.3-orig/src/measurement/position_measurement.js codem
 +  /*
  
    function getBidi(ch, partPos, invert) {
-@@ -391,4 +392,5 @@
+@@ -393,4 +394,5 @@
    if (other != null) val.other = getBidi(ch, other, sticky != "before")
    return val
 +  */
  }
  
-@@ -468,4 +470,5 @@
+@@ -470,4 +472,5 @@
    let begin = 0, end = lineObj.text.length, ltr = true
  
 +  /*
    let order = getOrder(lineObj, cm.doc.direction)
    // If the line isn't plain left-to-right text, first figure out
-@@ -482,4 +485,5 @@
+@@ -484,4 +487,5 @@
      end = ltr ? part.to : part.from - 1
    }
 +  */
  
    // A binary search to find the first character whose bounding box
-@@ -526,4 +530,5 @@
+@@ -528,4 +532,5 @@
  }
  
 +/*
  function coordsBidiPart(cm, lineObj, lineNo, preparedMeasure, order, x, y) {
    // Bidi parts are sorted left-to-right, and in a non-line-wrapping
-@@ -580,4 +585,5 @@
+@@ -582,4 +587,5 @@
    return part
  }
 +*/
  
  let measureText
-diff -NarU2 codemirror-5.59.3-orig/src/util/bidi.js codemirror-5.59.3/src/util/bidi.js
---- codemirror-5.59.3-orig/src/util/bidi.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/util/bidi.js	2021-02-21 20:52:18.168092225 +0000
+diff -wNarU2 codemirror-5.65.1-orig/src/util/bidi.js codemirror-5.65.1/src/util/bidi.js
+--- codemirror-5.65.1-orig/src/util/bidi.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/util/bidi.js	2022-02-09 22:50:18.145862052 +0100
 @@ -4,5 +4,5 @@
  
  export function iterateBidiSections(order, from, to, f) {
@@ -259,9 +266,9 @@ diff -NarU2 codemirror-5.59.3-orig/src/util/bidi.js codemirror-5.59.3/src/util/b
 -  return order
 +  return false;
  }
-diff -NarU2 codemirror-5.59.3-orig/src/util/feature_detection.js codemirror-5.59.3/src/util/feature_detection.js
---- codemirror-5.59.3-orig/src/util/feature_detection.js	2021-02-20 21:24:57.000000000 +0000
-+++ codemirror-5.59.3/src/util/feature_detection.js	2021-02-21 20:49:22.191269270 +0000
+diff -wNarU2 codemirror-5.65.1-orig/src/util/feature_detection.js codemirror-5.65.1/src/util/feature_detection.js
+--- codemirror-5.65.1-orig/src/util/feature_detection.js	2022-01-20 13:06:23.000000000 +0100
++++ codemirror-5.65.1/src/util/feature_detection.js	2022-02-09 22:50:18.145862052 +0100
 @@ -25,4 +25,5 @@
  }
  

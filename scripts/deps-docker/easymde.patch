@@ -1,52 +1,52 @@
-diff -NarU2 easy-markdown-editor-2.14.0-orig/gulpfile.js easy-markdown-editor-2.14.0/gulpfile.js
---- easy-markdown-editor-2.14.0-orig/gulpfile.js	2021-02-14 12:11:48.000000000 +0000
-+++ easy-markdown-editor-2.14.0/gulpfile.js	2021-02-21 20:55:37.134701007 +0000
+diff -wNarU2 easy-markdown-editor-2.16.1-orig/gulpfile.js easy-markdown-editor-2.16.1/gulpfile.js
+--- easy-markdown-editor-2.16.1-orig/gulpfile.js	2022-01-14 23:27:44.000000000 +0100
++++ easy-markdown-editor-2.16.1/gulpfile.js	2022-02-09 23:06:01.694592535 +0100
 @@ -25,5 +25,4 @@
      './node_modules/codemirror/lib/codemirror.css',
      './src/css/*.css',
 -    './node_modules/codemirror-spell-checker/src/css/spell-checker.css',
  ];
  
-diff -NarU2 easy-markdown-editor-2.14.0-orig/package.json easy-markdown-editor-2.14.0/package.json
---- easy-markdown-editor-2.14.0-orig/package.json	2021-02-14 12:11:48.000000000 +0000
-+++ easy-markdown-editor-2.14.0/package.json	2021-02-21 20:55:47.761190082 +0000
-@@ -21,5 +21,4 @@
-     "dependencies": {
-         "codemirror": "^5.59.2",
+diff -wNarU2 easy-markdown-editor-2.16.1-orig/package.json easy-markdown-editor-2.16.1/package.json
+--- easy-markdown-editor-2.16.1-orig/package.json	2022-01-14 23:27:44.000000000 +0100
++++ easy-markdown-editor-2.16.1/package.json	2022-02-09 23:06:24.778501888 +0100
+@@ -23,5 +23,4 @@
+         "@types/marked": "^4.0.1",
+         "codemirror": "^5.63.1",
 -        "codemirror-spell-checker": "1.1.2",
-         "marked": "^2.0.0"
+         "marked": "^4.0.10"
      },
-diff -NarU2 easy-markdown-editor-2.14.0-orig/src/js/easymde.js easy-markdown-editor-2.14.0/src/js/easymde.js
---- easy-markdown-editor-2.14.0-orig/src/js/easymde.js	2021-02-14 12:11:48.000000000 +0000
-+++ easy-markdown-editor-2.14.0/src/js/easymde.js	2021-02-21 20:57:09.143171536 +0000
+diff -wNarU2 easy-markdown-editor-2.16.1-orig/src/js/easymde.js easy-markdown-editor-2.16.1/src/js/easymde.js
+--- easy-markdown-editor-2.16.1-orig/src/js/easymde.js	2022-01-14 23:27:44.000000000 +0100
++++ easy-markdown-editor-2.16.1/src/js/easymde.js	2022-02-09 23:07:21.203131415 +0100
 @@ -12,5 +12,4 @@
  require('codemirror/mode/gfm/gfm.js');
  require('codemirror/mode/xml/xml.js');
 -var CodeMirrorSpellChecker = require('codemirror-spell-checker');
- var marked = require('marked/lib/marked');
+ var marked = require('marked').marked;
  
-@@ -1762,9 +1761,4 @@
+@@ -1816,9 +1815,4 @@
          options.autosave.uniqueId = options.autosave.unique_id;
  
 -    // If overlay mode is specified and combine is not provided, default it to true
 -    if (options.overlayMode && options.overlayMode.combine === undefined) {
--      options.overlayMode.combine = true;
+-        options.overlayMode.combine = true;
 -    }
 -
      // Update this options
      this.options = options;
-@@ -2003,28 +1997,7 @@
+@@ -2057,34 +2051,7 @@
      var mode, backdrop;
  
 -    // CodeMirror overlay mode
 -    if (options.overlayMode) {
--      CodeMirror.defineMode('overlay-mode', function(config) {
--        return CodeMirror.overlayMode(CodeMirror.getMode(config, options.spellChecker !== false ? 'spell-checker' : 'gfm'), options.overlayMode.mode, options.overlayMode.combine);
--      });
+-        CodeMirror.defineMode('overlay-mode', function (config) {
+-            return CodeMirror.overlayMode(CodeMirror.getMode(config, options.spellChecker !== false ? 'spell-checker' : 'gfm'), options.overlayMode.mode, options.overlayMode.combine);
+-        });
 -
--      mode = 'overlay-mode';
--      backdrop = options.parsingConfig;
--      backdrop.gitHubSpice = false;
+-        mode = 'overlay-mode';
+-        backdrop = options.parsingConfig;
+-        backdrop.gitHubSpice = false;
 -    } else {
          mode = options.parsingConfig;
          mode.name = 'gfm';
@@ -58,31 +58,35 @@ diff -NarU2 easy-markdown-editor-2.14.0-orig/src/js/easymde.js easy-markdown-edi
 -        backdrop.name = 'gfm';
 -        backdrop.gitHubSpice = false;
 -
--        CodeMirrorSpellChecker({
--            codeMirrorInstance: CodeMirror,
--        });
+-        if (typeof options.spellChecker === 'function') {
+-            options.spellChecker({
+-                codeMirrorInstance: CodeMirror,
+-            });
+-        } else {
+-            CodeMirrorSpellChecker({
+-                codeMirrorInstance: CodeMirror,
+-            });
+-        }
 -    }
  
      // eslint-disable-next-line no-unused-vars
-diff -NarU2 easy-markdown-editor-2.14.0-orig/types/easymde.d.ts easy-markdown-editor-2.14.0/types/easymde.d.ts
---- easy-markdown-editor-2.14.0-orig/types/easymde.d.ts	2021-02-14 12:11:48.000000000 +0000
-+++ easy-markdown-editor-2.14.0/types/easymde.d.ts	2021-02-21 20:57:42.492620979 +0000
-@@ -160,9 +160,4 @@
+diff -wNarU2 easy-markdown-editor-2.16.1-orig/types/easymde.d.ts easy-markdown-editor-2.16.1/types/easymde.d.ts
+--- easy-markdown-editor-2.16.1-orig/types/easymde.d.ts	2022-01-14 23:27:44.000000000 +0100
++++ easy-markdown-editor-2.16.1/types/easymde.d.ts	2022-02-09 23:07:55.427605243 +0100
+@@ -167,9 +167,4 @@
      }
  
 -    interface OverlayModeOptions {
--      mode: CodeMirror.Mode<any>
--      combine?: boolean
+-        mode: CodeMirror.Mode<any>;
+-        combine?: boolean;
 -    }
 -
-     interface Options {
-         autoDownloadFontAwesome?: boolean;
-@@ -214,7 +209,5 @@
+     interface SpellCheckerOptions {
+         codeMirrorInstance: CodeMirror.Editor;
+@@ -229,6 +224,4 @@
+         syncSideBySidePreviewScroll?: boolean;
  
-         promptTexts?: PromptTexts;
--        syncSideBySidePreviewScroll?: boolean;
+-        overlayMode?: OverlayModeOptions;
 -
--        overlayMode?: OverlayModeOptions
-+        syncSideBySidePreviewScroll?: boolean
+         direction?: 'ltr' | 'rtl';
      }
- }

@@ -2,9 +2,9 @@ FROM    alpine:3.15
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
-        ver_marked=4.0.10 \
-        ver_mde=2.15.0 \
-        ver_codemirror=5.64.0 \
+        ver_marked=4.0.12 \
+        ver_mde=2.16.1 \
+        ver_codemirror=5.65.1 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -97,15 +97,14 @@ RUN     cd CodeMirror-$ver_codemirror \
 
 
 # build easymde
-COPY    easymde-marked6.patch /z/
 COPY    easymde.patch /z/
 RUN     cd easy-markdown-editor-$ver_mde \
-        && patch -p1 < /z/easymde-marked6.patch \
         && patch -p1 < /z/easymde.patch \
         && sed -ri 's`https://registry.npmjs.org/marked/-/marked-[0-9\.]+.tgz`file:/z/nodepkgs/marked`' package-lock.json \
+        && sed -ri 's`https://registry.npmjs.org/codemirror/-/codemirror-[0-9\.]+.tgz`file:/z/nodepkgs/codemirror`' package-lock.json \
         && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
         && sed -ri 's`("codemirror": ")[^"]+`\1file:/z/nodepkgs/codemirror`' ./package.json \
-        && sed -ri 's`^var marked = require\(.marked/lib/marked.\);$`var marked = window.marked;`' src/js/easymde.js \
+        && sed -ri 's`^var marked = require\(.marked.\).marked;$`var marked = window.marked;`' src/js/easymde.js \
         && npm install
 
 COPY    easymde-ln.patch /z/
