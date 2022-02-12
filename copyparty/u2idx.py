@@ -139,7 +139,8 @@ class U2idx(object):
                     is_date = True
 
                 elif v == "path":
-                    v = "up.rd"
+                    v = "trim(?||up.rd,'/')"
+                    va.append("\nrd")
 
                 elif v == "name":
                     v = "up.fn"
@@ -237,13 +238,13 @@ class U2idx(object):
         thr.start()
 
         if not uq or not uv:
-            q = "select * from up"
-            v = ()
+            uq = "select * from up"
+            uv = ()
         else:
-            q = "select up.* from up " + uq
-            v = tuple(uv)
+            uq = "select up.* from up " + uq
+            uv = tuple(uv)
 
-        self.log("qs: {!r} {!r}".format(q, v))
+        self.log("qs: {!r} {!r}".format(uq, uv))
 
         ret = []
         lim = 1000
@@ -255,9 +256,17 @@ class U2idx(object):
 
             self.active_cur = cur
 
+            vuv = []
+            for v in uv:
+                if v == "\nrd":
+                    v = vtop + "/"
+
+                vuv.append(v)
+            vuv = tuple(vuv)
+
             sret = []
             fk = flags.get("fk")
-            c = cur.execute(q, v)
+            c = cur.execute(uq, vuv)
             for hit in c:
                 w, ts, sz, rd, fn, ip, at = hit
                 lim -= 1
