@@ -2374,7 +2374,7 @@ class HttpCli(object):
 
         doc = self.uparam.get("doc") if self.can_read else None
         if doc:
-            doc = unquotep(doc.replace("+", " "))
+            doc = unquotep(doc.replace("+", " ").split("?")[0])
             j2a["docname"] = doc
             if next((x for x in files if x["name"] == doc), None):
                 with open(os.path.join(abspath, doc), "rb") as f:

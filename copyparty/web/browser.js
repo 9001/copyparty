@@ -2389,6 +2389,7 @@ var showfile = (function () {
 				continue;
 
 			td.innerHTML = '<a href="#" class="doc bri" hl="' + link.id + '">-txt-</a>';
+			td.getElementsByTagName('a')[0].setAttribute('href', '?doc=' + fn);
 		}
 		r.mktree();
 		if (em) {
@@ -3361,6 +3362,7 @@ document.onkeydown = function (e) {
 			return;
 
 		treectl.hide();
+		thegrid.setvis(true);
 
 		var html = mk_files_header(tagord), seen = {};
 		html.push('<tbody>');
@@ -3925,7 +3927,7 @@ var treectl = (function () {
 				showfile.files.push({ 'id': id, 'name': fname });
 
 			if (tn.lead == '-')
-				tn.lead = '<a href="#" class="doc' + (lang ? ' bri' : '') +
+				tn.lead = '<a href="?doc=' + tn.href + '" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
 			var ln = ['<tr><td>' + tn.lead + '</td><td sortv="' + sortv +
@@ -5029,6 +5031,9 @@ ebi('path').onclick = function (e) {
 
 
 ebi('files').onclick = ebi('docul').onclick = function (e) {
+	if (ctrl(e))
+		return true;
+
 	var tgt = e.target.closest('a[id]');
 	if (tgt && tgt.getAttribute('id').indexOf('f-') === 0 && tgt.textContent.endsWith('/')) {
 		var el = treectl.find(tgt.textContent.slice(0, -1));
