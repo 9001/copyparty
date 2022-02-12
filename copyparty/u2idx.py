@@ -247,7 +247,7 @@ class U2idx(object):
         self.log("qs: {!r} {!r}".format(uq, uv))
 
         ret = []
-        lim = 1000
+        lim = int(self.args.srch_hits)
         taglist = {}
         for (vtop, ptop, flags) in vols:
             cur = self.get_cur(ptop)
