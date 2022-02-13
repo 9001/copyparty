@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import sys
 import stat
 import time
 import logging
@@ -14,6 +15,7 @@ from pyftpdlib.servers import FTPServer
 from pyftpdlib.ioloop import IOLoop
 from pyftpdlib.log import config_logging
 
+from .__init__ import E
 from .util import Pebkac, fsenc, exclude_dotfiles
 from .bos import bos
 from .authsrv import AuthSrv
@@ -275,30 +277,67 @@ class FtpHandler(FTPHandler):
         )
 
 
+try:
+    from pyftpdlib.handlers import TLS_FTPHandler
+
+    class SftpHandler(FtpHandler, TLS_FTPHandler):
+        pass
+
+except:
+    pass
+
+
 class Ftpd(object):
     def __init__(self, hub):
         self.hub = hub
         self.args = hub.args
 
-        h = FtpHandler
-        h.hub = hub
-        h.args = hub.args
-        h.authorizer = FtpAuth()
-        h.authorizer.hub = hub
+        hs = []
+        if self.args.ftp:
+            hs.append([FtpHandler, self.args.ftp])
+        if self.args.ftps:
+            try:
+                h = SftpHandler
+            except:
+                m = "\nftps requires pyopenssl;\nplease run the following:\n\n  {} -m pip install --user pyopenssl\n"
+                print(m.format(sys.executable))
+                sys.exit(1)
 
-        if self.args.ftp_r:
-            p1, p2 = [int(x) for x in self.args.ftp_r.split("-")]
-            h.passive_ports = list(range(p1, p2 + 1))
+            h.certfile = os.path.join(E.cfg, "cert.pem")
+            h.tls_control_required = True
+            h.tls_data_required = True
 
-        if self.args.ftp_nat:
-            h.masquerade_address = self.args.ftp_nat
+            hs.append([h, self.args.ftps])
+
+        for h in hs:
+            h, lp = h
+            h.hub = hub
+            h.args = hub.args
+            h.authorizer = FtpAuth()
+            h.authorizer.hub = hub
+
+            if self.args.ftp_pr:
+                p1, p2 = [int(x) for x in self.args.ftp_pr.split("-")]
+                if self.args.ftp and self.args.ftps:
+                    # divide port range in half
+                    d = int((p2 - p1) / 2)
+                    if lp == self.args.ftp:
+                        p2 = p1 + d
+                    else:
+                        p1 += d + 1
+
+                h.passive_ports = list(range(p1, p2 + 1))
+
+            if self.args.ftp_nat:
+                h.masquerade_address = self.args.ftp_nat
 
         if self.args.ftp_dbg:
             config_logging(level=logging.DEBUG)
 
         ioloop = IOLoop()
         for ip in self.args.i:
-            FTPServer((ip, int(self.args.ftp)), h, ioloop)
+            for h, lp in hs:
+                FTPServer((ip, int(lp)), h, ioloop)
 
         t = threading.Thread(target=ioloop.loop)
         t.daemon = True

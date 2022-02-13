@@ -54,6 +54,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
+    * [ftp-server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [file indexing](#file-indexing)
     * [upload rules](#upload-rules) - set upload rules using volume flags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
@@ -626,12 +627,13 @@ using arguments or config files, or a mix of both:
 
 ## ftp-server
 
-an FTP server can be started using `--ftp 3921` (or any other port)
+an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit TLS (ftpes)
 
 * based on [pyftpdlib](https://github.com/giampaolo/pyftpdlib)
 * needs a dedicated port (cannot share with the HTTP/HTTPS API)
-* runs in active mode by default, you probably want `--ftp-r`
-* uploads are not resumable
+* uploads are not resumable -- delete and restart if necessary
+* runs in active mode by default, you probably want `--ftp-pr 12000-13000`
+  * if you enable both `ftp` and `ftps`, the port-range will be divided in half
 
 
 ## file indexing

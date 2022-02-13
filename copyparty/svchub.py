@@ -105,9 +105,9 @@ class SvcHub(object):
 
         args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)
 
-        if args.ftp:
+        if args.ftp or args.ftps:
             from .ftpd import Ftpd
-            
+
             self.ftpd = Ftpd(self)
 
         # decide which worker impl to use
