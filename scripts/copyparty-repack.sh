@@ -12,21 +12,18 @@ set -e
 #
 # output summary (filesizes and contents):
 #
-# 535672  copyparty-extras/sfx-full/copyparty-sfx.sh
 # 550760  copyparty-extras/sfx-full/copyparty-sfx.py
 #           `- original unmodified sfx from github
 #
 # 572923  copyparty-extras/sfx-full/copyparty-sfx-gz.py
 #           `- unmodified but recompressed from bzip2 to gzip
 #
-# 341792  copyparty-extras/sfx-ent/copyparty-sfx.sh
 # 353975  copyparty-extras/sfx-ent/copyparty-sfx.py
 # 376934  copyparty-extras/sfx-ent/copyparty-sfx-gz.py
 #           `- removed iOS ogg/opus/vorbis audio decoder,
 #              removed the audio tray mouse cursor,
 #              "enterprise edition"
 #
-# 259288  copyparty-extras/sfx-lite/copyparty-sfx.sh
 # 270004  copyparty-extras/sfx-lite/copyparty-sfx.py
 # 293159  copyparty-extras/sfx-lite/copyparty-sfx-gz.py
 #           `- also removed the codemirror markdown editor
@@ -81,7 +78,7 @@ cache="$od/.copyparty-repack.cache"
 		# fallback to awk (sorry)
 		awk -F\" '/"browser_download_url".*(\.tar\.gz|-sfx\.)/ {print$4}'
 	) |
-	grep -E '(sfx\.(sh|py)|tar\.gz)$' |
+	grep -E '(sfx\.py|tar\.gz)$' |
 	tee /dev/stderr |
 	tr -d '\r' | tr '\n' '\0' |
 	xargs -0 bash -c 'dl_files "$@"' _
@@ -139,11 +136,11 @@ repack() {
 	)
 }
 
-repack sfx-full "re gz no-sh"
+repack sfx-full "re gz"
 repack sfx-ent  "re no-dd"
-repack sfx-ent  "re no-dd gz no-sh"
+repack sfx-ent  "re no-dd gz"
 repack sfx-lite "re no-dd no-cm no-hl"
-repack sfx-lite "re no-dd no-cm no-hl gz no-sh"
+repack sfx-lite "re no-dd no-cm no-hl gz"
 
 
 # move fuse and up2k clients into copyparty-extras/,

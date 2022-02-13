@@ -19,19 +19,13 @@ rm -rf ../dist
 ./make-tgz-release.sh $v
 
 rm -f ../dist/copyparty-sfx.*
-./make-sfx.sh no-sh
-../dist/copyparty-sfx.py -h
+f=../dist/copyparty-sfx.py
+./make-sfx.sh
+$f -h
 
-ar=
 while true; do
-    for ((a=0; a<100; a++)); do
-        for f in ../dist/copyparty-sfx.{py,sh}; do
-            [ -e $f ] || continue;
-            mv $f $f.$(wc -c <$f | awk '{print$1}')
-        done
-        ./make-sfx.sh re $ar
-    done
-    ar=no-sh
+    mv $f $f.$(wc -c <$f | awk '{print$1}')
+    ./make-sfx.sh re $ar
 done
 
 # git tag -d v$v; git push --delete origin v$v

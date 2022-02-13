@@ -83,7 +83,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
-* [sfx](#sfx) - there are two self-contained "binaries"
+* [sfx](#sfx) - the self-contained "binary"
     * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
@@ -1075,6 +1075,10 @@ mandatory deps:
 
 install these to enable bonus features
 
+enable ftp-server:
+* for just plaintext FTP, `pyftpdlib` (is built into the SFX)
+* with TLS encryption, `pyftpdlib pyopenssl`
+
 enable music tags:
 * either `mutagen` (fast, pure-python, skips a few tags, makes copyparty GPL? idk)
 * or `ffprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
@@ -1101,13 +1105,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 # sfx
 
-there are two self-contained "binaries":
-* [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) -- pure python, works everywhere, **recommended**
-* [copyparty-sfx.sh](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.sh) -- smaller, but only for linux and macos, kinda deprecated
-
-launch either of them (**use sfx.py on systemd**) and it'll unpack and run copyparty, assuming you have python installed of course
-
-pls note that `copyparty-sfx.sh` will fail if you rename `copyparty-sfx.py` to `copyparty.py` and keep it in the same folder because `sys.path` is funky
+the self-contained "binary"  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
 
 
 ## sfx repack
@@ -1182,8 +1180,8 @@ mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/deps/
 then build the sfx using any of the following examples:
 
 ```sh
-./scripts/make-sfx.sh  # both python and sh editions
-./scripts/make-sfx.sh no-sh gz  # just python with gzip
+./scripts/make-sfx.sh           # regular edition
+./scripts/make-sfx.sh gz no-cm  # gzip-compressed + no fancy markdown editor
 ```
 
 
