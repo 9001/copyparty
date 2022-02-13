@@ -147,7 +147,8 @@ class FtpFs(AbstractedFS):
                 return []
 
             # return list of volumes
-            return [x.split("/")[0] for x in self.hub.asrv.vfs.all_vols.keys()]
+            r = {x.split("/")[0]: 1 for x in self.hub.asrv.vfs.all_vols.keys()}
+            return list(sorted(list(r.keys())))
 
     def rmdir(self, path):
         ap = self.rv2a(path, d=True)
