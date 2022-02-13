@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import os
 import stat
+import time
 import logging
 import threading
 from typing import TYPE_CHECKING
@@ -55,7 +56,7 @@ class FtpAuth(DummyAuthorizer):
         return "elradfmwMT"
 
     def get_msg_login(self, username):
-        return "sup"
+        return "sup {}".format(username)
 
     def get_msg_quit(self, username):
         return "cya"
@@ -64,10 +65,10 @@ class FtpAuth(DummyAuthorizer):
 class FtpFs(AbstractedFS):
     def __init__(self, root, cmd_channel):
         self.h = self.cmd_channel = cmd_channel  # type: FTPHandler
-        self.asrv = cmd_channel.asrv  # type: AuthSrv
+        self.hub = cmd_channel.hub  # type: SvcHub
         self.args = cmd_channel.args
 
-        self.uname = self.asrv.iacct.get(cmd_channel.password, "*")
+        self.uname = self.hub.asrv.iacct.get(cmd_channel.password, "*")
 
         self.cwd = "/"  # pyftpdlib convention of leading slash
         self.root = "/var/lib/empty"
@@ -76,8 +77,8 @@ class FtpFs(AbstractedFS):
 
     def v2a(self, vpath, r=False, w=False, m=False, d=False):
         try:
-            vpath = vpath.lstrip("/")
-            vfs, rem = self.asrv.vfs.get(vpath, self.uname, r, w, m, d)
+            vpath = vpath.replace("\\", "/").lstrip("/")
+            vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             return os.path.join(vfs.realpath, rem)
         except Pebkac as ex:
             raise FilesystemError(str(ex))
@@ -94,18 +95,25 @@ class FtpFs(AbstractedFS):
         return fspath
 
     def validpath(self, path):
-        # other funcs handle permission checking implicitly
+        if "/.hist/" in path:
+            if "/up2k." in path or path.endswith("/dir.txt"):
+                raise FilesystemError("access to this file is forbidden")
+
         return True
 
     def open(self, filename, mode):
-        ap = self.rv2a(filename, "r" in mode, "w" in mode)
-        if "w" in mode and bos.path.exists(ap):
+        r = "r" in mode
+        w = "w" in mode or "a" in mode or "+" in mode
+
+        ap = self.rv2a(filename, r, w)
+        if w and bos.path.exists(ap):
             raise FilesystemError("cannot open existing file for writing")
 
+        self.validpath(ap)
         return open(fsenc(ap), mode)
 
     def chdir(self, path):
-        self.cwd = os.path.join(self.cwd, path)
+        self.cwd = join(self.cwd, path)
 
     def mkdir(self, path):
         ap = self.rv2a(path, w=True)
@@ -113,8 +121,8 @@ class FtpFs(AbstractedFS):
 
     def listdir(self, path):
         try:
-            vpath = os.path.join(self.cwd, path).lstrip("/")
-            vfs, rem = self.asrv.vfs.get(vpath, self.uname, True, False)
+            vpath = join(self.cwd, path).lstrip("/")
+            vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, True, False)
 
             fsroot, vfs_ls, vfs_virt = vfs.ls(
                 rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
@@ -136,8 +144,18 @@ class FtpFs(AbstractedFS):
         bos.rmdir(ap)
 
     def remove(self, path):
-        ap = self.rv2a(path, d=True)
-        bos.unlink(ap)
+        if self.args.no_del:
+            raise Pebkac(403, "the delete feature is disabled in server config")
+
+        vp = join(self.cwd, path).lstrip("/")
+        x = self.hub.broker.put(
+            True, "up2k.handle_rm", self.uname, self.h.remote_ip, [vp]
+        )
+
+        try:
+            x.get()
+        except Exception as ex:
+            raise FilesystemError(str(ex))
 
     def rename(self, src, dst):
         raise NotImplementedError()
@@ -186,8 +204,7 @@ class FtpFs(AbstractedFS):
         return bos.path.getmtime(ap)
 
     def realpath(self, path):
-        ap = self.rv2a(path)
-        return bos.path.isdir(ap)
+        return path
 
     def lexists(self, path):
         ap = self.rv2a(path)
@@ -200,15 +217,56 @@ class FtpFs(AbstractedFS):
         return "root"
 
 
+class FtpHandler(FTPHandler):
+    abstracted_fs = FtpFs
+
+    def __init__(self, conn, server, ioloop=None):
+        super(FtpHandler, self).__init__(conn, server, ioloop)
+
+        # abspath->vpath mapping to resolve log_transfer paths
+        self.vfs_map = {}
+
+    def ftp_STOR(self, file, mode="w"):
+        vp = join(self.fs.cwd, file).lstrip("/")
+        ap = self.fs.v2a(vp)
+        self.vfs_map[ap] = vp
+        # print("ftp_STOR: {} {} => {}".format(vp, mode, ap))
+        ret = FTPHandler.ftp_STOR(self, file, mode)
+        # print("ftp_STOR: {} {} OK".format(vp, mode))
+        return ret
+
+    def log_transfer(self, cmd, filename, receive, completed, elapsed, bytes):
+        ap = filename.decode("utf-8", "replace")
+        vp = self.vfs_map.pop(ap, None)
+        # print("xfer_end: {} => {}".format(ap, vp))
+        if vp:
+            vp, fn = os.path.split(vp)
+            vfs, rem = self.hub.asrv.vfs.get(vp, self.username, False, True)
+            vfs, rem = vfs.get_dbv(rem)
+            self.hub.broker.put(
+                False,
+                "up2k.hash_file",
+                vfs.realpath,
+                vfs.flags,
+                rem,
+                fn,
+                self.remote_ip,
+                time.time(),
+            )
+
+        return FTPHandler.log_transfer(
+            self, cmd, filename, receive, completed, elapsed, bytes
+        )
+
+
 class Ftpd(object):
     def __init__(self, hub):
         self.hub = hub
         self.args = hub.args
 
-        h = FTPHandler
-        h.asrv = hub.asrv
+        h = FtpHandler
+        h.hub = hub
         h.args = hub.args
-        h.abstracted_fs = FtpFs
         h.authorizer = FtpAuth()
         h.authorizer.hub = hub
 
@@ -219,7 +277,7 @@ class Ftpd(object):
         if self.args.ftp_nat:
             h.masquerade_address = self.args.ftp_nat
 
-        if self.args.ftp_debug:
+        if self.args.ftp_dbg:
             config_logging(level=logging.DEBUG)
 
         ioloop = IOLoop()
@@ -229,3 +287,8 @@ class Ftpd(object):
         t = threading.Thread(target=ioloop.loop)
         t.daemon = True
         t.start()
+
+
+def join(p1, p2):
+    w = os.path.join(p1, p2.replace("\\", "/"))
+    return os.path.normpath(w).replace("\\", "/")

@@ -2234,10 +2234,6 @@ class HttpCli(object):
         if not self.args.ed or "dots" not in self.uparam:
             vfs_ls = exclude_dotfiles(vfs_ls)
 
-        hidden = []
-        if rem == ".hist":
-            hidden = ["up2k."]
-
         icur = None
         if "e2t" in vn.flags:
             idx = self.conn.get_u2idx()
@@ -2256,8 +2252,6 @@ class HttpCli(object):
 
             if fn in vfs_virt:
                 fspath = vfs_virt[fn].realpath
-            elif hidden and any(fn.startswith(x) for x in hidden):
-                continue
             else:
                 fspath = fsroot + "/" + fn
 

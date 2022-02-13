@@ -394,6 +394,13 @@ class VFS(object):
                 if ok:
                     virt_vis[name] = vn2
 
+        if ".hist" in abspath:
+            p = abspath.replace("\\", "/") if WINDOWS else abspath
+            if p.endswith("/.hist"):
+                real = [x for x in real if not x[0].startswith("up2k.")]
+            elif "/.hist/th/" in p:
+                real = [x for x in real if not x[0].endswith("dir.txt")]
+
         return [abspath, real, virt_vis]
 
     def walk(self, rel, rem, seen, uname, permsets, dots, scandir, lstat):
@@ -444,10 +451,6 @@ class VFS(object):
         if flt:
             flt = {k: True for k in flt}
 
-        f1 = "{0}.hist{0}up2k.".format(os.sep)
-        f2a = os.sep + "dir.txt"
-        f2b = "{0}.hist{0}".format(os.sep)
-
         # if multiselect: add all items to archive root
         # if single folder: the folder itself is the top-level item
         folder = "" if flt else (vrem.split("/")[-1] or "top")
@@ -482,13 +485,6 @@ class VFS(object):
                 rm = [k for k in vd.keys() if k.startswith(".")]
                 for x in rm:
                     del vd[x]
-
-            # up2k filetring based on actual abspath
-            files = [
-                x
-                for x in files
-                if f1 not in x[1] and (not x[1].endswith(f2a) or f2b not in x[1])
-            ]
 
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
                 yield f

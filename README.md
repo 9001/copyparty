@@ -626,11 +626,12 @@ using arguments or config files, or a mix of both:
 
 ## ftp-server
 
-an FTP server can be started using `--ftp 2121` (or any other port)
+an FTP server can be started using `--ftp 3921` (or any other port)
 
 * based on [pyftpdlib](https://github.com/giampaolo/pyftpdlib)
 * needs a dedicated port (cannot share with the HTTP/HTTPS API)
 * runs in active mode by default, you probably want `--ftp-r`
+* uploads are not resumable
 
 
 ## file indexing

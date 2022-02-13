@@ -446,8 +446,8 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets")
 
     ap2 = ap.add_argument_group('FTP options')
-    ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT")
-    ap2.add_argument("--ftp-debug", action="store_true", help="enable debug logging")
+    ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT, for example 3921")
+    ap2.add_argument("--ftp-dbg", action="store_true", help="enable debug logging")
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
     ap2.add_argument("--ftp-r", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example 12000-13000")
 
