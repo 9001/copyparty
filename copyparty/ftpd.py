@@ -18,11 +18,9 @@ from pyftpdlib.log import config_logging
 from .__init__ import E
 from .util import Pebkac, fsenc, exclude_dotfiles
 from .bos import bos
-from .authsrv import AuthSrv
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
-    from .authsrv import AuthSrv
 
 
 class FtpAuth(DummyAuthorizer):
@@ -82,6 +80,9 @@ class FtpFs(AbstractedFS):
         try:
             vpath = vpath.replace("\\", "/").lstrip("/")
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
+            if not vfs.realpath:
+                raise FilesystemError("no filesystem mounted at this path")
+
             return os.path.join(vfs.realpath, rem)
         except Pebkac as ex:
             raise FilesystemError(str(ex))
@@ -125,8 +126,8 @@ class FtpFs(AbstractedFS):
         bos.mkdir(ap)
 
     def listdir(self, path):
+        vpath = join(self.cwd, path).lstrip("/")
         try:
-            vpath = join(self.cwd, path).lstrip("/")
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, True, False)
 
             fsroot, vfs_ls, vfs_virt = vfs.ls(
@@ -141,8 +142,12 @@ class FtpFs(AbstractedFS):
             vfs_ls.sort()
             return vfs_ls
         except Exception as ex:
-            # display write-only folders as empty
-            return []
+            if vpath:
+                # display write-only folders as empty
+                return []
+
+            # return list of volumes
+            return [x.split("/")[0] for x in self.hub.asrv.vfs.all_vols.keys()]
 
     def rmdir(self, path):
         ap = self.rv2a(path, d=True)
@@ -210,8 +215,11 @@ class FtpFs(AbstractedFS):
         return bos.path.islink(ap)
 
     def isdir(self, path):
-        st = self.stat(path)
-        return stat.S_ISDIR(st.st_mode)
+        try:
+            st = self.stat(path)
+            return stat.S_ISDIR(st.st_mode)
+        except:
+            return True
 
     def getsize(self, path):
         ap = self.rv2a(path)

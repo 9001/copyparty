@@ -634,6 +634,7 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 * uploads are not resumable -- delete and restart if necessary
 * runs in active mode by default, you probably want `--ftp-pr 12000-13000`
   * if you enable both `ftp` and `ftps`, the port-range will be divided in half
+  * some older software (filezilla on debian-stable) cannot passive-mode with TLS
 
 
 ## file indexing
