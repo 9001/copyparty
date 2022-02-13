@@ -36,5 +36,9 @@ def islink(p):
     return os.path.islink(fsenc(p))
 
 
+def lexists(p):
+    return os.path.lexists(fsenc(p))
+
+
 def realpath(p):
     return fsdec(os.path.realpath(fsenc(p)))

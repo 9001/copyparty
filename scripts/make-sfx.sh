@@ -107,7 +107,7 @@ tmpdir="$(
 [ $repack ] && {
 	old="$tmpdir/pe-copyparty"
 	echo "repack of files in $old"
-	cp -pR "$old/"*{dep-j2,copyparty} .
+	cp -pR "$old/"*{dep-j2,dep-ftp,copyparty} .
 }
 
 [ $repack ] || {
@@ -133,6 +133,19 @@ tmpdir="$(
 
 	mkdir dep-j2/
 	mv {markupsafe,jinja2} dep-j2/
+
+	echo collecting pyftpdlib
+	f="../build/pyftpdlib-1.5.6.tar.gz"
+	[ -e "$f" ] ||
+		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.6.tar.gz;
+		wget -O$f "$url" || curl -L "$url" >$f)
+
+	tar -zxf $f
+	mv pyftpdlib-release-*/pyftpdlib .
+	rm -rf pyftpdlib-release-* pyftpdlib/test
+
+	mkdir dep-ftp/
+	mv pyftpdlib dep-ftp/
 
 	# msys2 tar is bad, make the best of it
 	echo collecting source
@@ -331,7 +344,7 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 
 
 echo gen tarlist
-for d in copyparty dep-j2; do find $d -type f; done |
+for d in copyparty dep-j2 dep-ftp; do find $d -type f; done |
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 

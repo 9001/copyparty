@@ -18,10 +18,6 @@ def listdir(p="."):
     return [fsdec(x) for x in os.listdir(fsenc(p))]
 
 
-def lstat(p):
-    return os.lstat(fsenc(p))
-
-
 def makedirs(name, mode=0o755, exist_ok=True):
     bname = fsenc(name)
     try:
@@ -60,3 +56,12 @@ def utime(p, times=None, follow_symlinks=True):
         return os.utime(fsenc(p), times, follow_symlinks=follow_symlinks)
     else:
         return os.utime(fsenc(p), times)
+
+
+if hasattr(os, "lstat"):
+
+    def lstat(p):
+        return os.lstat(fsenc(p))
+
+else:
+    lstat = stat

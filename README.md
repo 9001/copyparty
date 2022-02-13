@@ -154,6 +154,7 @@ feature summary
   * ☑ multiprocessing (actual multithreading)
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
+  * ☑ [ftp-server](#ftp-server)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
@@ -237,6 +238,8 @@ some improvement ideas
 
 ## general bugs
 
+* Windows: if the up2k db is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
+  * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
 * probably more, pls let me know
 
@@ -619,6 +622,15 @@ using arguments or config files, or a mix of both:
 * config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf)
 * `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
   * or click the `[reload cfg]` button in the control-panel when logged in as admin 
+
+
+## ftp-server
+
+an FTP server can be started using `--ftp 2121` (or any other port)
+
+* based on [pyftpdlib](https://github.com/giampaolo/pyftpdlib)
+* needs a dedicated port (cannot share with the HTTP/HTTPS API)
+* runs in active mode by default, you probably want `--ftp-r`
 
 
 ## file indexing

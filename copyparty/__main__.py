@@ -445,6 +445,12 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets")
 
+    ap2 = ap.add_argument_group('FTP options')
+    ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT")
+    ap2.add_argument("--ftp-debug", action="store_true", help="enable debug logging")
+    ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
+    ap2.add_argument("--ftp-r", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example 12000-13000")
+
     ap2 = ap.add_argument_group('opt-outs')
     ap2.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
     ap2.add_argument("--keep-qem", action="store_true", help="do not disable quick-edit-mode on windows")

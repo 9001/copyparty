@@ -112,7 +112,11 @@ args = {
     "data_files": data_files,
     "packages": find_packages(),
     "install_requires": ["jinja2"],
-    "extras_require": {"thumbnails": ["Pillow"], "audiotags": ["mutagen"]},
+    "extras_require": {
+        "thumbnails": ["Pillow"],
+        "audiotags": ["mutagen"],
+        "ftpd": ["pyftpdlib"],
+    },
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
     "scripts": ["bin/copyparty-fuse.py", "bin/up2k.py"],
     "cmdclass": {"clean2": clean2},

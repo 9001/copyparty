@@ -387,7 +387,7 @@ def run(tmp, j2):
     t.daemon = True
     t.start()
 
-    ld = [tmp, os.path.join(tmp, "dep-j2")]
+    ld = [os.path.join(tmp, x) for x in ["", "dep-ftp", "dep-j2"]]
     if j2:
         del ld[-1]
 
