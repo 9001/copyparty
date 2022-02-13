@@ -368,8 +368,9 @@ def confirm(rv):
     sys.exit(rv or 1)
 
 
-def run(tmp, j2):
+def run(tmp, j2, ftp):
     msg("jinja2:", j2 or "bundled")
+    msg("pyftpd:", ftp or "bundled")
     msg("sfxdir:", tmp)
     msg()
 
@@ -387,9 +388,8 @@ def run(tmp, j2):
     t.daemon = True
     t.start()
 
-    ld = [os.path.join(tmp, x) for x in ["", "dep-ftp", "dep-j2"]]
-    if j2:
-        del ld[-1]
+    ld = (("", ""), (j2, "dep-j2"), (ftp, "dep-ftp"))
+    ld = [os.path.join(tmp, b) for a, b in ld if not a]
 
     if any([re.match(r"^-.*j[0-9]", x) for x in sys.argv]):
         run_s(ld)
@@ -462,7 +462,12 @@ def main():
         j2 = None
 
     try:
-        run(tmp, j2)
+        from pyftpdlib.__init__ import __ver__ as ftp
+    except:
+        ftp = None
+
+    try:
+        run(tmp, j2, ftp)
     except SystemExit as ex:
         c = ex.code
         if c not in [0, -15]:
