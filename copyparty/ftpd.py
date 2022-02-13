@@ -74,6 +74,7 @@ class FtpFs(AbstractedFS):
         self.root = "/var/lib/empty"
 
         self.listdirinfo = self.listdir
+        self.chdir(".")
 
     def v2a(self, vpath, r=False, w=False, m=False, d=False):
         try:
@@ -114,6 +115,8 @@ class FtpFs(AbstractedFS):
 
     def chdir(self, path):
         self.cwd = join(self.cwd, path)
+        x = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.username)
+        self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
 
     def mkdir(self, path):
         ap = self.rv2a(path, w=True)
@@ -145,7 +148,7 @@ class FtpFs(AbstractedFS):
 
     def remove(self, path):
         if self.args.no_del:
-            raise Pebkac(403, "the delete feature is disabled in server config")
+            raise FilesystemError("the delete feature is disabled in server config")
 
         vp = join(self.cwd, path).lstrip("/")
         x = self.hub.broker.put(
@@ -158,7 +161,20 @@ class FtpFs(AbstractedFS):
             raise FilesystemError(str(ex))
 
     def rename(self, src, dst):
-        raise NotImplementedError()
+        if not self.can_move:
+            raise FilesystemError("not allowed for user " + self.h.username)
+
+        if self.args.no_mv:
+            m = "the rename/move feature is disabled in server config"
+            raise FilesystemError(m)
+
+        svp = join(self.cwd, src).lstrip("/")
+        dvp = join(self.cwd, dst).lstrip("/")
+        x = self.hub.broker.put(True, "up2k.handle_mv", self.uname, svp, dvp)
+        try:
+            x.get()
+        except Exception as ex:
+            raise FilesystemError(str(ex))
 
     def chmod(self, path, mode):
         pass
