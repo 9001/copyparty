@@ -122,5 +122,7 @@ export LOGNAME="$USER"
 #echo "pybin [$pybin]"
 #echo "pyarg [$pyarg]"
 #echo "cpp [$cpp]"
-chroot --userspec=$uid:$gid "$jail" "$pybin" $pyarg "$cpp" "$@"
-
+chroot --userspec=$uid:$gid "$jail" "$pybin" $pyarg "$cpp" "$@" &
+p=$!
+trap 'kill $p' INT TERM
+wait
