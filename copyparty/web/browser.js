@@ -3290,10 +3290,10 @@ document.onkeydown = function (e) {
 					}
 
 					if (k == 'path' || k == 'name' || k == 'tags') {
-						var not = ' ';
+						var not = '';
 						if (tv.slice(0, 1) == '-') {
 							tv = tv.slice(1);
-							not = ' not ';
+							not = 'not ';
 						}
 
 						if (tv.slice(0, 1) == '^') {
@@ -3314,7 +3314,7 @@ document.onkeydown = function (e) {
 							tv = '"' + tv + '"';
 						}
 
-						q += k + not + 'like ' + tv;
+						q += not + k + ' like ' + tv;
 					}
 				}
 			}

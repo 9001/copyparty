@@ -51,11 +51,11 @@ class U2idx(object):
         fhash = body["hash"]
         wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
 
-        uq = "where substr(w,1,16) = ? and w = ?"
+        uq = "substr(w,1,16) = ? and w = ?"
         uv = [wark[:16], wark]
 
         try:
-            return self.run_query(vols, uq, uv)[0]
+            return self.run_query(vols, uq, uv, True, False)[0]
         except:
             raise Pebkac(500, min_ex())
 
@@ -87,17 +87,16 @@ class U2idx(object):
 
         q = ""
         va = []
-        joins = ""
+        have_up = False  # query has up.* operands
+        have_mt = False
         is_key = True
         is_size = False
         is_date = False
+        field_end = ""  # closing parenthesis or whatever
         kw_key = ["(", ")", "and ", "or ", "not "]
         kw_val = ["==", "=", "!=", ">", ">=", "<", "<=", "like "]
         ptn_mt = re.compile(r"^\.?[a-z_-]+$")
-        mt_ctr = 0
-        mt_keycmp = "substr(up.w,1,16)"
-        mt_keycmp2 = None
-        ptn_lc = re.compile(r" (mt[0-9]+\.v) ([=<!>]+) \? $")
+        ptn_lc = re.compile(r" (mt\.v) ([=<!>]+) \? \) $")
         ptn_lcv = re.compile(r"[a-zA-Z]")
 
         while True:
@@ -133,29 +132,31 @@ class U2idx(object):
                 if v == "size":
                     v = "up.sz"
                     is_size = True
+                    have_up = True
 
                 elif v == "date":
                     v = "up.mt"
                     is_date = True
+                    have_up = True
 
                 elif v == "path":
                     v = "trim(?||up.rd,'/')"
                     va.append("\nrd")
+                    have_up = True
 
                 elif v == "name":
                     v = "up.fn"
+                    have_up = True
 
                 elif v == "tags" or ptn_mt.match(v):
-                    mt_ctr += 1
-                    mt_keycmp2 = "mt{}.w".format(mt_ctr)
-                    joins += "inner join mt mt{} on {} = {} ".format(
-                        mt_ctr, mt_keycmp, mt_keycmp2
-                    )
-                    mt_keycmp = mt_keycmp2
+                    have_mt = True
+                    field_end = ") "
                     if v == "tags":
-                        v = "mt{0}.v".format(mt_ctr)
+                        vq = "mt.v"
                     else:
-                        v = "+mt{0}.k = '{1}' and mt{0}.v".format(mt_ctr, v)
+                        vq = "+mt.k = '{}' and mt.v".format(v)
+
+                    v = "exists(select 1 from mt where mt.w = mtw and " + vq
 
                 else:
                     raise Pebkac(400, "invalid key [" + v + "]")
@@ -201,6 +202,10 @@ class U2idx(object):
             va.append(v)
             is_key = True
 
+            if field_end:
+                q += field_end
+                field_end = ""
+
             # lowercase tag searches
             m = ptn_lc.search(q)
             if not m or not ptn_lcv.search(unicode(v)):
@@ -212,16 +217,16 @@ class U2idx(object):
 
             field, oper = m.groups()
             if oper in ["=", "=="]:
-                q += " {} like ? ".format(field)
+                q += " {} like ? ) ".format(field)
             else:
-                q += " lower({}) {} ? ".format(field, oper)
+                q += " lower({}) {} ? ) ".format(field, oper)
 
         try:
-            return self.run_query(vols, joins + "where " + q, va)
+            return self.run_query(vols, q, va, have_up, have_mt)
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
-    def run_query(self, vols, uq, uv):
+    def run_query(self, vols, uq, uv, have_up, have_mt):
         done_flag = []
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
@@ -240,8 +245,11 @@ class U2idx(object):
         if not uq or not uv:
             uq = "select * from up"
             uv = ()
+        elif have_mt:
+            uq = "select up.*, substr(up.w,1,16) mtw from up where " + uq
+            uv = tuple(uv)
         else:
-            uq = "select up.* from up " + uq
+            uq = "select up.* from up where " + uq
             uv = tuple(uv)
 
         self.log("qs: {!r} {!r}".format(uq, uv))
@@ -268,7 +276,7 @@ class U2idx(object):
             fk = flags.get("fk")
             c = cur.execute(uq, vuv)
             for hit in c:
-                w, ts, sz, rd, fn, ip, at = hit
+                w, ts, sz, rd, fn, ip, at = hit[:7]
                 lim -= 1
                 if lim <= 0:
                     break
