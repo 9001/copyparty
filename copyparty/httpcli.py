@@ -1732,6 +1732,31 @@ class HttpCli(object):
             vstate = {}
             vs = {"scanning": None, "hashq": None, "tagq": None, "mtpq": None}
 
+        if self.uparam.get("ls") in ["v", "t", "txt"]:
+            if self.uname == "*":
+                txt = "howdy stranger (you're not logged in)"
+            else:
+                txt = "welcome back {}".format(self.uname)
+
+            if vstate:
+                txt += "\nstatus:"
+                for k in ["scanning", "hashq", "tagq", "mtpq"]:
+                    txt += " {}({})".format(k, vs[k])
+
+            if rvol:
+                txt += "\nyou can browse:"
+                for v in rvol:
+                    txt += "\n  " + v
+
+            if wvol:
+                txt += "\nyou can upload to:"
+                for v in wvol:
+                    txt += "\n  " + v
+
+            txt = txt.encode("utf-8", "replace") + b"\n"
+            self.reply(txt, mime="text/plain; charset=utf-8")
+            return True
+
         html = self.j2(
             "splash",
             this=self,
