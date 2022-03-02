@@ -29,3 +29,10 @@ pyftsubset "$orig_woff" --unicodes-file=/z/icon.list --no-ignore-missing-unicode
 
 # scp is easier, just want basic latin
 pyftsubset /z/scp.woff2 --unicodes="20-7e,ab,b7,bb,2022" --no-ignore-missing-unicodes --flavor=woff2 --output-file=/z/dist/no-pk/scp.woff2 --verbose
+
+exit 0
+
+# kinda works but ruins hinting on windows, just use the old version of the font which has correct baseline
+python3 shiftbase.py /z/dist/no-pk/scp.woff2
+cd /z/dist/no-pk/
+mv scp.woff2.woff2 scp.woff2

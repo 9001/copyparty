@@ -4,13 +4,13 @@ ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
         ver_marked=4.0.12 \
         ver_mde=2.16.1 \
-        ver_codemirror=5.65.1 \
+        ver_codemirror=5.65.2 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
 
 # download;
-# the scp url is latin from https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap
+# the scp url is regular latin from https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap
 RUN     mkdir -p /z/dist/no-pk \
         && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
         && apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev brotli py3-brotli \
@@ -118,6 +118,7 @@ RUN     cd easy-markdown-editor-$ver_mde \
 # build fontawesome and scp
 COPY    mini-fa.sh /z
 COPY    mini-fa.css /z
+COPY    shiftbase.py /z
 RUN     /bin/ash /z/mini-fa.sh
 
 
