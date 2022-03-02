@@ -51,7 +51,8 @@ pre, code, tt, #doc, #doc>code {
 }
 #files tbody a {
 	display: block;
-	padding: .3em 0;
+	padding: .5em 0;
+	margin: -.3em 0;
 	scroll-margin-top: 45vh;
 }
 #files tr {
@@ -110,7 +111,7 @@ a, #files tbody div a:last-child {
 }
 #files td {
 	margin: 0;
-	padding: .1em .5em;
+	padding: .3em .5em;
 	border-left: 1px solid #3c3c3c;
 }
 #files td+td+td {
@@ -234,8 +235,8 @@ a, #files tbody div a:last-child {
 }
 #files tbody a.play {
 	color: #e70;
-	padding: .2em;
-	margin: -.2em;
+	padding: .3em;
+	margin: -.3em;
 }
 #files tbody a.play.act {
 	color: #720;
