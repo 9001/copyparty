@@ -3220,7 +3220,7 @@ document.onkeydown = function (e) {
 			clearTimeout(defer_timeout);
 			clearTimeout(search_timeout);
 			search_timeout = setTimeout(do_search,
-				v && v.length < (is_touch ? 4 : 3) ? 600 : 200);
+				v && v.length < (is_touch ? 4 : 3) ? 1000 : 500);
 		}
 	}
 
