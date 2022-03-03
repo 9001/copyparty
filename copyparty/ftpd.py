@@ -7,9 +7,8 @@ import stat
 import time
 import logging
 import threading
-from typing import TYPE_CHECKING
 
-from .__init__ import E
+from .__init__ import E, PY2
 from .util import Pebkac, fsenc, exclude_dotfiles
 from .bos import bos
 
@@ -28,8 +27,13 @@ from pyftpdlib.servers import FTPServer
 from pyftpdlib.log import config_logging
 
 
-if TYPE_CHECKING:
-    from .svchub import SvcHub
+try:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from .svchub import SvcHub
+except ImportError:
+    pass
 
 
 class FtpAuth(DummyAuthorizer):
@@ -257,7 +261,10 @@ class FtpHandler(FTPHandler):
     abstracted_fs = FtpFs
 
     def __init__(self, conn, server, ioloop=None):
-        super(FtpHandler, self).__init__(conn, server, ioloop)
+        if PY2:
+            FTPHandler.__init__(self, conn, server, ioloop)
+        else:
+            super(FtpHandler, self).__init__(conn, server, ioloop)
 
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map = {}
