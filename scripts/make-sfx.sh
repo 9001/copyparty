@@ -141,6 +141,14 @@ tmpdir="$(
 	mkdir dep-ftp/
 	mv pyftpdlib dep-ftp/
 
+	echo collecting asyncore, asynchat
+	for n in asyncore.py asynchat.py; do
+		f=../build/$n
+		[ -e "$f" ] ||
+			(url=https://raw.githubusercontent.com/python/cpython/c4d45ee670c09d4f6da709df072ec80cb7dfad22/Lib/$n;
+			wget -O$f "$url" || curl -L "$url" >$f)
+	done
+
 	# msys2 tar is bad, make the best of it
 	echo collecting source
 	[ $clean ] && {
@@ -151,6 +159,12 @@ tmpdir="$(
 		(cd .. && tar -cf tar copyparty) && tar -xf ../tar
 	}
 	rm -f ../tar
+
+	# insert asynchat
+	mkdir copyparty/vend
+	for n in asyncore.py asynchat.py; do
+		awk 'NR<4||NR>27;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' ../build/$n >copyparty/vend/$n
+	done
 }
 
 ver=

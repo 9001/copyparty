@@ -8,16 +8,25 @@ import time
 import logging
 import threading
 from typing import TYPE_CHECKING
-from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
-from pyftpdlib.filesystems import AbstractedFS, FilesystemError
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
-from pyftpdlib.ioloop import IOLoop
-from pyftpdlib.log import config_logging
 
 from .__init__ import E
 from .util import Pebkac, fsenc, exclude_dotfiles
 from .bos import bos
+
+try:
+    from pyftpdlib.ioloop import IOLoop
+except ImportError:
+    p = os.path.join(E.mod, "vend")
+    print("loading asynchat from " + p)
+    sys.path.append(p)
+    from pyftpdlib.ioloop import IOLoop
+
+from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
+from pyftpdlib.filesystems import AbstractedFS, FilesystemError
+from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.servers import FTPServer
+from pyftpdlib.log import config_logging
+
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
