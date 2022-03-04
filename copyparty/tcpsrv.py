@@ -57,13 +57,19 @@ class TcpSrv(object):
         msgs = []
         title_tab = {}
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
-        m = "available @ http://{}:{}/  (\033[33m{}\033[0m)"
+        m = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             for port in sorted(self.args.p):
                 if port not in ok.get(ip, ok.get("0.0.0.0", [])):
                     continue
 
-                msgs.append(m.format(ip, port, desc))
+                proto = " http"
+                if self.args.http_only:
+                    pass
+                elif self.args.https_only or port == 443:
+                    proto = "https"
+
+                msgs.append(m.format(proto, ip, port, desc))
 
                 if not self.args.wintitle:
                     continue
@@ -144,10 +150,15 @@ class TcpSrv(object):
             return eps
 
         r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
+        ri = re.compile(r"^\s*[0-9]+\s*:.*")
+        up = False
         for ln in txt.split("\n"):
+            if ri.match(ln):
+                up = "UP" in re.split("[>,< ]", ln)
+
             try:
                 ip, dev = r.match(ln.rstrip()).groups()
-                eps[ip] = dev
+                eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
             except:
                 pass
 
@@ -177,6 +188,7 @@ class TcpSrv(object):
 
     def ips_windows_ipconfig(self):
         eps = {}
+        offs = {}
         try:
             txt, _ = chkcmd(["ipconfig"])
         except:
@@ -184,18 +196,29 @@ class TcpSrv(object):
 
         rdev = re.compile(r"(^[^ ].*):$")
         rip = re.compile(r"^ +IPv?4? [^:]+: *([0-9\.]{7,15})$")
+        roff = re.compile(r".*: Media disconnected$")
         dev = None
         for ln in txt.replace("\r", "").split("\n"):
             m = rdev.match(ln)
             if m:
+                if dev and dev not in eps.values():
+                    offs[dev] = 1
+
                 dev = m.group(1).split(" adapter ", 1)[-1]
+
+            if dev and roff.match(ln):
+                offs[dev] = 1
+                dev = None
 
             m = rip.match(ln)
             if m and dev:
                 eps[m.group(1)] = dev
                 dev = None
 
-        return eps
+        if dev and dev not in eps.values():
+            offs[dev] = 1
+
+        return eps, offs
 
     def ips_windows_netsh(self):
         eps = {}
@@ -215,7 +238,6 @@ class TcpSrv(object):
             m = rip.match(ln)
             if m and dev:
                 eps[m.group(1)] = dev
-                dev = None
 
         return eps
 
@@ -223,8 +245,11 @@ class TcpSrv(object):
         if MACOS:
             eps = self.ips_macos()
         elif ANYWIN:
-            eps = self.ips_windows_ipconfig()  # sees more interfaces
+            eps, off = self.ips_windows_ipconfig()  # sees more interfaces + link state
             eps.update(self.ips_windows_netsh())  # has better names
+            for k, v in eps.items():
+                if v in off:
+                    eps[k] += ", \033[31mLINK-DOWN"
         else:
             eps = self.ips_linux()
 
