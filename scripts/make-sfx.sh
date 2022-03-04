@@ -266,7 +266,7 @@ rm have
 find | grep -E '\.py$' |
   grep -vE '__version__' |
   tr '\n' '\0' |
-  xargs -0 $pybin ../scripts/uncomment.py
+  xargs -0 "$pybin" ../scripts/uncomment.py
 
 f=dep-j2/jinja2/constants.py
 awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
@@ -386,7 +386,7 @@ suf=
 	suf=-gz
 }
 
-$pybin $py --sfx-make tar.bz2 $ver $ts
+"$pybin" $py --sfx-make tar.bz2 $ver $ts
 mv sfx.out $sfx_out$suf.py
 
 exts+=($suf.py)

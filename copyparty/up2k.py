@@ -1137,9 +1137,9 @@ class Up2k(object):
             m = "database is version {}, this copyparty only supports versions <= {}"
             raise Exception(m.format(ver, DB_VER))
 
-        msg = "creating new DB (old is bad); backup: {}"
+        msg = "creating new DB (old is bad); backup: "
         if ver:
-            msg = "creating new DB (too old to upgrade); backup: {}"
+            msg = "creating new DB (too old to upgrade); backup: "
 
         cur = self._backup_db(db_path, cur, ver, msg)
         db = cur.connection

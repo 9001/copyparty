@@ -362,7 +362,7 @@ class SvcHub(object):
                     src = ansi_re.sub("", src)
             elif c:
                 if isinstance(c, int):
-                    msg = "\033[3{}m{}".format(c, msg)
+                    msg = "\033[3{}m{}\033[0m".format(c, msg)
                 elif "\033" not in c:
                     msg = "\033[{}m{}\033[0m".format(c, msg)
                 else:
