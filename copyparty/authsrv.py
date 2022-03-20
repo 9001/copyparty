@@ -14,6 +14,7 @@ from datetime import datetime
 from .__init__ import WINDOWS
 from .util import (
     IMPLICATIONS,
+    META_NOBOTS,
     uncyg,
     undot,
     unhumanize,
@@ -860,6 +861,19 @@ class AuthSrv(object):
 
             if use:
                 vol.lim = lim
+
+        if self.args.no_robots:
+            for vol in vfs.all_vols.values():
+                # volflag "robots" overrides global "norobots", allowing indexing by search engines for this vol
+                if not vol.flags.get("robots"):
+                    vol.flags["norobots"] = True
+
+        for vol in vfs.all_vols.values():
+            h = [vol.flags.get("html_head", self.args.html_head)]
+            if vol.flags.get("norobots"):
+                h.insert(0, META_NOBOTS)
+
+            vol.flags["html_head"] = "\n".join([x for x in h if x])
 
         for vol in vfs.all_vols.values():
             fk = vol.flags.get("fk")

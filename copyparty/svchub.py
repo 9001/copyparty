@@ -70,10 +70,6 @@ class SvcHub(object):
 
             self.log("root", m, c=3)
 
-        if args.no_robots:
-            h = ['<meta name="robots" content="noindex, nofollow">', args.html_head]
-            args.html_head = "\n\t".join([x for x in h if x])
-
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log)
         if args.ls:

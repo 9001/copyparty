@@ -65,8 +65,11 @@ class HttpCli(object):
             "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store; max-age=0",
         }
+        h = self.args.html_head
         if self.args.no_robots:
+            h = META_NOBOTS + (("\n" + h) if h else "")
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
+        self.html_head = h
 
     def log(self, msg, c=0):
         ptn = self.asrv.re_pwd
@@ -95,7 +98,7 @@ class HttpCli(object):
         if ka:
             ka["ts"] = self.conn.hsrv.cachebuster()
             ka["svcname"] = self.args.doctitle
-            ka["html_head"] = self.args.html_head
+            ka["html_head"] = self.html_head
             return tpl.render(**ka)
 
         return tpl
@@ -1680,13 +1683,15 @@ class HttpCli(object):
 
         boundary = "\roll\tide"
         targs = {
+            "ts": self.conn.hsrv.cachebuster(),
+            "svcname": self.args.doctitle,
+            "html_head": self.html_head,
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
             "md_plug": "true" if self.args.emp else "false",
             "md_chk_rate": self.args.mcr,
             "md": boundary,
-            "ts": self.conn.hsrv.cachebuster(),
             "arg_base": arg_base,
         }
         html = template.render(**targs).encode("utf-8", "replace")
@@ -2068,6 +2073,12 @@ class HttpCli(object):
             rem.endswith("/dir.txt") and rem.startswith(".hist/th/")
         ):
             raise Pebkac(403)
+
+        self.html_head = vn.flags.get("html_head", "")
+        if vn.flags.get("norobots"):
+            self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
+        else:
+            self.out_headers.pop("X-Robots-Tag", None)
 
         is_dir = stat.S_ISDIR(st.st_mode)
         if self.can_read:

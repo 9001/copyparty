@@ -71,6 +71,8 @@ SYMTIME = sys.version_info >= (3, 6) and os.supports_follow_symlinks
 
 HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
+META_NOBOTS = '<meta name="robots" content="noindex, nofollow">'
+
 HTTPCODE = {
     200: "OK",
     204: "No Content",
