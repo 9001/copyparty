@@ -2156,7 +2156,7 @@ class HttpCli(object):
 
         url_suf = self.urlq({}, [])
         is_ls = "ls" in self.uparam
-        is_js = self.cookies.get("js") == "y"
+        is_js = self.args.force_js or self.cookies.get("js") == "y"
 
         tpl = "browser"
         if "b" in self.uparam:
