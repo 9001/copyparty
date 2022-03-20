@@ -65,6 +65,8 @@ class HttpCli(object):
             "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store; max-age=0",
         }
+        if self.args.no_robots:
+            self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
 
     def log(self, msg, c=0):
         ptn = self.asrv.re_pwd
@@ -93,6 +95,7 @@ class HttpCli(object):
         if ka:
             ka["ts"] = self.conn.hsrv.cachebuster()
             ka["svcname"] = self.args.doctitle
+            ka["html_head"] = self.args.html_head
             return tpl.render(**ka)
 
         return tpl

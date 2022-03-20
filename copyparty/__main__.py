@@ -472,6 +472,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme.md into directory listings")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
     ap2.add_argument("--force-js", action="store_true", help="don't send HTML folder listings, force clients to use the embedded json instead")
+    ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything")
 
     ap2 = ap.add_argument_group('yolo options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
@@ -540,6 +541,7 @@ def run_argparse(argv, formatter):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
     ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
+    ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages")
     ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty", help="title / service-name to show in html documents")
 
