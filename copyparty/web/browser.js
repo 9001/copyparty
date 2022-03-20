@@ -2472,6 +2472,7 @@ var showfile = (function () {
 		wr.style.display = '';
 		set_tabindex();
 
+		wintitle(name + ' \u2014 ');
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
 		hfun(get_evpath() + '?doc=' + url.split('/').pop());
@@ -2613,6 +2614,7 @@ var thegrid = (function () {
 				return;
 
 			hist_push(get_evpath());
+			wintitle();
 		}
 
 		var vis = has(perms, "read");
