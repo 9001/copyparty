@@ -37,7 +37,7 @@ pre, code, tt, #doc, #doc>code {
 	display: inline-block;
 	padding: .35em .5em .2em .5em;
 	border-radius: 0 .3em .3em 0;
-	margin: 1.3em 0 0 0;
+	margin: 1.3em 0 -.2em 0;
 	font-size: 1.4em;
 }
 #path #entree {

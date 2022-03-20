@@ -17,13 +17,14 @@ from copyparty import util
 
 class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
-        ex = "nw e2d e2ds e2dsa e2t e2ts e2tsr no_logues no_readme no_acode"
+        ex = "nw e2d e2ds e2dsa e2t e2ts e2tsr no_logues no_readme no_acode force_js no_robots"
         ex = {k: False for k in ex.split()}
         ex2 = {
             "mtp": [],
             "mte": "a",
             "mth": "",
             "doctitle": "",
+            "html_head": "",
             "hist": None,
             "no_idx": None,
             "no_hash": None,

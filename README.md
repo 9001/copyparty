@@ -62,6 +62,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
     * [upload events](#upload-events) - trigger a script/program on each upload
+    * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [complete examples](#complete-examples)
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
@@ -790,6 +791,17 @@ note that it will only trigger on new unique files, not dupes
 and it will occupy the parsing threads, so fork anything expensive, or if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
 
 if this becomes popular maybe there should be a less janky way to do it actually
+
+
+## hiding from google
+
+tell search engines you dont wanna be indexed,  either using the good old [robots.txt](https://www.robotstxt.org/robotstxt.html) or through copyparty settings:
+
+* `--no-robots` adds HTTP (`X-Robots-Tag`) and HTML (`<meta>`) headers with `noindex, nofollow` globally
+* volume-flag `[...]:c,norobots` does the same thing for that single volume
+* volume-flag `[...]:c,robots` ALLOWS search-engine crawling for that volume, even if `--no-robots` is set globally
+
+also, `--force-js` disables the plain HTML folder listing, making things harder to parse for search engines
 
 
 ## complete examples

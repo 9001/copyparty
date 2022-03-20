@@ -2426,6 +2426,7 @@ var showfile = (function () {
 			lnh = doc[1],
 			txt = doc[2],
 			name = url.split('/').pop(),
+			tname = uricom_dec(name)[0],
 			lang = r.getlang(name),
 			is_md = lang == 'md';
 
@@ -2472,14 +2473,14 @@ var showfile = (function () {
 		wr.style.display = '';
 		set_tabindex();
 
-		wintitle(name + ' \u2014 ');
+		wintitle(tname + ' \u2014 ');
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
 		hfun(get_evpath() + '?doc=' + url.split('/').pop());
 
 		qsr('#docname');
 		el = mknod('span');
-		el.textContent = uricom_dec(name)[0];
+		el.textContent = tname;
 		el.setAttribute('id', 'docname');
 		ebi('path').appendChild(el);
 

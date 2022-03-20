@@ -4,19 +4,22 @@ set -e
 cd ~/dev/copyparty/scripts
 
 v=$1
-printf '%s\n' "$v" | grep -qE '^[0-9\.]+$' || exit 1
-grep -E "(${v//./, })" ../copyparty/__version__.py || exit 1
 
-git push all
-git tag v$v
-git push all --tags
+[ "$v" = sfx ] || {
+    printf '%s\n' "$v" | grep -qE '^[0-9\.]+$' || exit 1
+    grep -E "(${v//./, })" ../copyparty/__version__.py || exit 1
 
-rm -rf ../dist
+    git push all
+    git tag v$v
+    git push all --tags
 
-./make-pypi-release.sh u
-(cd .. && python3 ./setup.py clean2)
+    rm -rf ../dist
 
-./make-tgz-release.sh $v
+    ./make-pypi-release.sh u
+    (cd .. && python3 ./setup.py clean2)
+
+    ./make-tgz-release.sh $v
+}
 
 rm -f ../dist/copyparty-sfx.*
 f=../dist/copyparty-sfx.py

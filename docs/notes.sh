@@ -4,6 +4,12 @@ exit 1
 
 
 ##
+## add index.html banners
+
+find -name index.html | sed -r 's/index.html$//' | while IFS= read -r dir; do f="$dir/.prologue.html"; [ -e "$f" ] || echo '<h1><a href="index.html">open index.html</a></h1>' >"$f"; done
+
+
+##
 ## delete all partial uploads
 ##  (supports linux/macos, probably windows+msys2)
 
@@ -94,6 +100,7 @@ var t=[]; var b=document.location.href.split('#')[0].slice(0, -1); document.quer
 
 # debug md-editor line tracking
 var s=mknod('style');s.innerHTML='*[data-ln]:before {content:attr(data-ln)!important;color:#f0c;background:#000;position:absolute;left:-1.5em;font-size:1rem}';document.head.appendChild(s);
+
 
 ##
 ## bash oneliners
@@ -198,6 +205,7 @@ git config -l | grep '^remote'
 git remote add all git@github.com:9001/copyparty.git
 git remote set-url --add --push all git@gitlab.com:9001/copyparty.git
 git remote set-url --add --push all git@github.com:9001/copyparty.git
+
 
 ##
 ## http 206
