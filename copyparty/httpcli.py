@@ -2175,6 +2175,7 @@ class HttpCli(object):
         tpl = "browser"
         if "b" in self.uparam:
             tpl = "browser2"
+            is_js = False
 
         logues = ["", ""]
         if not self.args.no_logues:
