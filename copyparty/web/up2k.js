@@ -1173,7 +1173,7 @@ function up2k_init(subtle) {
         var t = st.todo.handshake[0],
             cd = t.cooldown;
 
-        if (cd && cd - Date.now() > 0)
+        if (cd && cd > Date.now())
             return false;
 
         // keepalive or verify
@@ -1369,6 +1369,14 @@ function up2k_init(subtle) {
         timer.add(taskerd, true);
         return taskerd;
     })();
+
+    function chill(t) {
+        var now = Date.now();
+        if ((t.coolmul || 0) < 2 || now - t.cooldown < t.coolmul * 700)
+            t.coolmul = Math.min((t.coolmul || 0.5) * 2, 32);
+
+        t.cooldown = Math.max(t.cooldown || 1, Date.now() + t.coolmul * 1000);
+    }
 
     /////
     ////
@@ -1756,8 +1764,12 @@ function up2k_init(subtle) {
 
                     pvis.move(t.n, 'ok');
                 }
-                else t.t_uploaded = undefined;
+                else {
+                    if (t.t_uploaded)
+                        chill(t);
 
+                    t.t_uploaded = undefined;
+                }
                 tasker();
             }
             else {
@@ -1869,7 +1881,8 @@ function up2k_init(subtle) {
             else {
                 toast.err(0, "server broke; cu-err {0} on file [{1}]:\n".format(
                     xhr.status, t.name) + (txt || "no further information"));
-                return;
+
+                chill(t);
             }
             orz2(xhr);
         }
