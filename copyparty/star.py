@@ -5,7 +5,7 @@ import tarfile
 import threading
 
 from .sutil import errdesc
-from .util import Queue, fsenc
+from .util import Queue, fsenc, min_ex
 from .bos import bos
 
 
@@ -88,8 +88,9 @@ class StreamTar(object):
 
             try:
                 self.ser(f)
-            except Exception as ex:
-                errors.append([f["vp"], repr(ex)])
+            except Exception:
+                ex = min_ex(5, True).replace("\n", "\n-- ")
+                errors.append([f["vp"], ex])
 
         if errors:
             self.errf, txt = errdesc(errors)

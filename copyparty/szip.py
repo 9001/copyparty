@@ -1,13 +1,12 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
 import time
 import zlib
 from datetime import datetime
 
 from .sutil import errdesc
-from .util import yieldfile, sanitize_fn, spack, sunpack
+from .util import yieldfile, sanitize_fn, spack, sunpack, min_ex
 from .bos import bos
 
 
@@ -36,7 +35,10 @@ def unixtime2dos(ts):
 
     bd = ((dy - 1980) << 9) + (dm << 5) + dd
     bt = (th << 11) + (tm << 5) + ts // 2
-    return spack(b"<HH", bt, bd)
+    try:
+        return spack(b"<HH", bt, bd)
+    except:
+        return b"\x00\x00\x21\x00"
 
 
 def gen_fdesc(sz, crc32, z64):
@@ -244,8 +246,9 @@ class StreamZip(object):
             try:
                 for x in self.ser(f):
                     yield x
-            except Exception as ex:
-                errors.append([f["vp"], repr(ex)])
+            except Exception:
+                ex = min_ex(5, True).replace("\n", "\n-- ")
+                errors.append([f["vp"], ex])
 
         if errors:
             errf, txt = errdesc(errors)

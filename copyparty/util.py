@@ -485,13 +485,13 @@ def vol_san(vols, txt):
     return txt
 
 
-def min_ex():
+def min_ex(max_lines=8, reverse=False):
     et, ev, tb = sys.exc_info()
     tb = traceback.extract_tb(tb)
     fmt = "{} @ {} <{}>: {}"
     ex = [fmt.format(fp.split(os.sep)[-1], ln, fun, txt) for fp, ln, fun, txt in tb]
     ex.append("[{}] {}".format(et.__name__, ev))
-    return "\n".join(ex[-8:])
+    return "\n".join(ex[-max_lines:][:: -1 if reverse else 1])
 
 
 @contextlib.contextmanager
