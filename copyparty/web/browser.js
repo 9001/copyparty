@@ -427,7 +427,7 @@ var mpl = (function () {
 	};
 
 	function announce() {
-		if (!r.os_ctl)
+		if (!r.os_ctl || !mp.au)
 			return;
 
 		var np = get_np()[0],
