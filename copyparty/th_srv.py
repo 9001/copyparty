@@ -51,7 +51,7 @@ except:
 # ffmpeg -formats
 FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
 FMT_FFV = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc mts h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
-FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma ra wav aif aiff au alaw ulaw mulaw amr gsm ape tak tta wv"
+FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma ra wav aif aiff au alaw ulaw mulaw amr gsm ape tak tta wv mpc"
 
 if HAVE_HEIF:
     FMT_PIL += " heif heifs heic heics"
