@@ -22,6 +22,8 @@
 # if you remove -q to enable logging, you may also want to remove the
 #   following line to enable buffering (slightly better performance):
 #   Environment=PYTHONUNBUFFERED=x
+#
+# keep ExecStartPre before ExecStart, at least on rhel8
 
 [Unit]
 Description=copyparty file server
