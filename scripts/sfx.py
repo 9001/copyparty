@@ -342,14 +342,15 @@ def get_payload():
 
 
 def utime(top):
+    # avoid cleaners
     i = 0
     files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
-    while WINDOWS:
+    while WINDOWS or os.path.exists("/etc/systemd"):
         t = int(time.time())
         if i:
             msg("utime {}, {}".format(i, t))
 
-        for f in files:
+        for f in [top] + files:
             os.utime(f, (t, t))
 
         i += 1
@@ -373,16 +374,6 @@ def run(tmp, j2, ftp):
     msg("pyftpd:", ftp or "bundled")
     msg("sfxdir:", tmp)
     msg()
-
-    # block systemd-tmpfiles-clean.timer
-    try:
-        import fcntl
-
-        fd = os.open(tmp, os.O_RDONLY)
-        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except Exception as ex:
-        if not WINDOWS:
-            msg("\033[31mflock:{!r}\033[0m".format(ex))
 
     t = threading.Thread(target=utime, args=(tmp,))
     t.daemon = True
