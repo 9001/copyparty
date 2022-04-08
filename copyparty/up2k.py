@@ -470,9 +470,11 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[1;30m{}"
+        fx = set(("html_head",))
         a = [
             (ft if v is True else ff if v is False else fv).format(k, str(v))
             for k, v in flags.items()
+            if k not in fx
         ]
         if a:
             vpath = "?"
