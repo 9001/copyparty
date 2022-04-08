@@ -2314,10 +2314,12 @@ var showfile = (function () {
 		'.bas': 'basic',
 		'.bat': 'batch',
 		'.cxx': 'cpp',
+		'.diz': 'ans',
 		'.h': 'c',
 		'.hpp': 'cpp',
 		'.htm': 'html',
 		'.hxx': 'cpp',
+		'.log': 'ans',
 		'.patch': 'diff',
 		'.ps1': 'powershell',
 		'.psm1': 'powershell',
@@ -2334,7 +2336,7 @@ var showfile = (function () {
 		'cmakelists.txt': 'cmake',
 		'dockerfile': 'docker'
 	};
-	var x = txt_ext + ' c cfg conf cpp cs css diff go html ini java js json jsx kt kts less latex lisp lua makefile md py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml';
+	var x = txt_ext + ' ans c cfg conf cpp cs css diff go html ini java js json jsx kt kts latex less lisp lua makefile md py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
 		r.map["." + x[a]] = x[a];
@@ -2441,7 +2443,10 @@ var showfile = (function () {
 				if (lnh.slice(0, 5) == '#doc.')
 					sethash(lnh.slice(1));
 
-				Prism.highlightElement(el || QS('#doc>code'));
+				el = el || QS('#doc>code');
+				Prism.highlightElement(el);
+				if (el.getAttribute('class') == 'language-ans')
+					r.ansify(el);
 			}
 			catch (ex) { }
 		}
@@ -2488,6 +2493,66 @@ var showfile = (function () {
 		treectl.textmode(true);
 		tree_scrollto();
 	}
+
+	r.ansify = function (el) {
+		var ctab = (light ?
+			//'bfbfbf c90f42 8eb91c fda200 00a0fd a40991 59c2b4 2d2d2d 9f9f9f a43856 66811c b57400 005a8e 531c80 0f6360 000000' :
+			'bfbfbf d30253 497600 b96900 006fbb a50097 288276 2d2d2d 9f9f9f 943b55 3a5600 7f4f00 00507d 683794 004343 000000' :
+			'404040 f03669 b8e346 ffa402 02a2ff f65be3 3da698 d2d2d2 606060 c75b79 c8e37e ffbe4a 71cbff b67fe3 9cf0ed ffffff').split(/ /g),
+			src = el.innerHTML.split(/\x1b\[/g),
+			out = ['<span>'], fg = 7, bg = null, bfg = 0, bbg = 0, inv = 0, bold = 0;
+
+		for (var a = 0; a < src.length; a++) {
+			var m = /^([0-9;]+)m/.exec(src[a]);
+			if (!m) {
+				if (a || src[a])
+					out.push('\x1b[' + src[a]);
+
+				continue;
+			}
+
+			var cs = m[1].split(/;/g),
+				txt = src[a].slice(m[1].length + 1);
+
+			for (var b = 0; b < cs.length; b++) {
+				var c = parseInt(cs[b]);
+				if (c == 0) {
+					fg = 7;
+					bg = null;
+					bfg = bbg = bold = inv = 0;
+				}
+				if (c == 1) bfg = bold = 1;
+				if (c == 7) inv = 1;
+				if (c == 22) bfg = bold = 0;
+				if (c == 27) inv = 0;
+				if (c >= 30 && c <= 37) fg = c - 30;
+				if (c >= 40 && c <= 47) bg = c - 40;
+				if (c >= 90 && c <= 97) {
+					fg = c - 90;
+					bfg = 1;
+				}
+				if (c >= 100 && c <= 107) {
+					bg = c - 100;
+					bbg = 1;
+				}
+			}
+
+			var cfg = fg, cbg = bg;
+			if (inv) {
+				cbg = fg;
+				cfg = bg || 0;
+			}
+
+			var s = '</span><span style="color:#' + ctab[cfg + bfg * 8];
+			if (cbg !== null)
+				s += ';background:#' + ctab[cbg + bbg * 8];
+			if (bold)
+				s += ';font-weight:bold';
+
+			out.push(s + '">' + txt);
+		}
+		el.innerHTML = out.join('');
+	};
 
 	r.mktree = function () {
 		var html = ['<li class="bn">list of textfiles in<br />' + linksplit(get_vpath()).join('') + '</li>'];
