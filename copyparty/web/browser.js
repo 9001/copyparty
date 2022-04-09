@@ -747,13 +747,25 @@ var widget = (function () {
 		o.style.cssText = 'position:fixed;top:45%;left:48%;padding:1em;z-index:9';
 		o.value = m;
 		document.body.appendChild(o);
-		o.focus();
-		o.select();
-		document.execCommand("copy");
-		o.value = 'copied to clipboard ';
-		setTimeout(function () {
-			document.body.removeChild(o);
-		}, 500);
+
+		var cln = function () {
+			o.value = 'copied to clipboard ';
+			setTimeout(function () {
+				document.body.removeChild(o);
+			}, 500);
+		};
+		var fb = function () {
+			console.log('fb');
+			o.focus();
+			o.select();
+			document.execCommand("copy");
+			cln();
+		};
+		try {
+			// https only
+			navigator.clipboard.writeText(m).then(cln, fb);
+		}
+		catch (ex) { fb(); }
 	};
 	r.set(sread('au_open') == 1);
 	setTimeout(function () {
