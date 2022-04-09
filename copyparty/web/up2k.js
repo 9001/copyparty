@@ -1933,6 +1933,7 @@ function up2k_init(subtle) {
     //
 
     function onresize(e) {
+        // 10x faster than matchMedia('(min-width
         var bar = ebi('ops'),
             wpx = window.innerWidth,
             fpx = parseInt(getComputedStyle(bar)['font-size']),
@@ -1942,7 +1943,6 @@ function up2k_init(subtle) {
             parent = ebi(wide && write ? 'u2btn_cw' : 'u2btn_ct'),
             btn = ebi('u2btn');
 
-        //console.log([wpx, fpx, wem]);
         if (btn.parentNode !== parent) {
             parent.appendChild(btn);
             ebi('u2conf').setAttribute('class', wide);

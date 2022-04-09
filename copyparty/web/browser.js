@@ -703,8 +703,12 @@ var widget = (function () {
 			return false;
 
 		clmod(document.documentElement, 'np_open', is_open);
-		widget.className = is_open ? 'open' : '';
+		clmod(widget, 'open', is_open);
 		bcfg_set('au_open', r.is_open = is_open);
+		if (window.vbar) {
+			pbar.onresize();
+			vbar.onresize();
+		}
 		return true;
 	};
 	r.toggle = function (e) {
@@ -753,7 +757,7 @@ var widget = (function () {
 	};
 	r.set(sread('au_open') == 1);
 	setTimeout(function () {
-		clmod(ebi('widget'), 'anim', 1);
+		clmod(widget, 'anim', 1);
 	}, 10);
 	return r;
 })();
@@ -794,6 +798,9 @@ var pbar = (function () {
 		grad;
 
 	r.onresize = function () {
+		if (!widget.is_open && r.buf)
+			return;
+
 		r.buf = canvas_cfg(ebi('barbuf'));
 		r.pos = canvas_cfg(ebi('barpos'));
 		r.drawbuf();
@@ -895,6 +902,9 @@ var vbar = (function () {
 		can, ctx, w, h, grad1, grad2;
 
 	r.onresize = function () {
+		if (!widget.is_open && r.can)
+			return;
+
 		r.can = canvas_cfg(ebi('pvol'));
 		can = r.can.can;
 		ctx = r.can.ctx;
