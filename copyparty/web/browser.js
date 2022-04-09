@@ -2496,7 +2496,6 @@ var showfile = (function () {
 
 	r.ansify = function (el) {
 		var ctab = (light ?
-			//'bfbfbf c90f42 8eb91c fda200 00a0fd a40991 59c2b4 2d2d2d 9f9f9f a43856 66811c b57400 005a8e 531c80 0f6360 000000' :
 			'bfbfbf d30253 497600 b96900 006fbb a50097 288276 2d2d2d 9f9f9f 943b55 3a5600 7f4f00 00507d 683794 004343 000000' :
 			'404040 f03669 b8e346 ffa402 02a2ff f65be3 3da698 d2d2d2 606060 c75b79 c8e37e ffbe4a 71cbff b67fe3 9cf0ed ffffff').split(/ /g),
 			src = el.innerHTML.split(/\x1b\[/g),
@@ -3677,7 +3676,7 @@ var treectl = (function () {
 				treeh = winh - atop;
 
 			tree.style.top = top + 'px';
-			tree.style.height = treeh < 10 ? '' : Math.floor(treeh - 2) + 'px';
+			tree.style.height = treeh < 10 ? '' : Math.floor(treeh - 1) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
