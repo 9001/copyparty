@@ -741,10 +741,10 @@ class AuthSrv(object):
             unames = ["*"] + list(acct.keys())
             umap = {x: [] for x in unames}
             for usr in unames:
-                for mp, vol in vfs.all_vols.items():
+                for vp, vol in vfs.all_vols.items():
                     axs = getattr(vol.axs, axs_key)
                     if usr in axs or "*" in axs:
-                        umap[usr].append(mp)
+                        umap[usr].append(vp)
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
 

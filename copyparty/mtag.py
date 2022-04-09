@@ -477,13 +477,13 @@ class MTag(object):
         env["PYTHONPATH"] = pypath
 
         ret = {}
-        for tagname, mp in parsers.items():
+        for tagname, parser in parsers.items():
             try:
-                cmd = [mp.bin, abspath]
-                if mp.bin.endswith(".py"):
+                cmd = [parser.bin, abspath]
+                if parser.bin.endswith(".py"):
                     cmd = [sys.executable] + cmd
 
-                args = {"env": env, "timeout": mp.timeout}
+                args = {"env": env, "timeout": parser.timeout}
 
                 if WINDOWS:
                     args["creationflags"] = 0x4000
