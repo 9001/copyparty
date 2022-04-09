@@ -2,6 +2,12 @@
 	--grid-sz: 10em;
 	--grid-ln: 3;
 	--nav-sz: 16em;
+	--fg: #ccc;
+	--bg: #222;
+}
+html.light {
+	--fg: #333;
+	--bg: #eaeaea;
 }
 * {
 	line-height: 1.2em;
@@ -1300,7 +1306,7 @@ html.light #tree ul a.hl:hover {
 	background: #059;
 }
 html.light #tree li,
-html.light #tree #treepar {
+html.light #treepar {
 	border-color: #f7f7f7 #fff #ddd #fff;
 }
 html.light #tree ul a:hover {
@@ -1365,11 +1371,11 @@ html.light #files a.doc {
 html.light #files a.doc.bri {
 	color: #d38;
 }
-html.light #files tr.play td {
+html.light #files tbody tr.play td {
 	background: #fc5;
 	border-color: #eb1;
 }
-html.light #files tr:hover td {
+html.light #files tbody tr:hover td {
 	background: #fff;
 }
 html.light tr.play a {

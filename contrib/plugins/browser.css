@@ -1,30 +1,130 @@
-html {
-    background: #222 url('/wp/wallhaven-mdjrqy.jpg') center / cover no-repeat fixed;
+#ops,
+#ops a.act,
+#tree,
+#pctl a,
+#treeh,
+#u2cards a,
+#u2cards a.act,
+html.light #ops,
+html.light #ops a.act,
+html.light #tree,
+html.light #ggrid>a,
+html.light #u2cards a,
+html.light #u2cards a.act {
+    background: transparent;
+    box-shadow: none;
 }
-#files th {
-    background: rgba(32, 32, 32, 0.9) !important;
+#tree,
+#files td,
+#files tr:nth-child(2n+1) td,
+.opbox h3,
+#u2conf .txtbox,
+html.light #files tbody td,
+html.light #files tbody tr td:last-child,
+html.light #files tr:nth-child(2n+1) td {
+    background: transparent;
+    border: none;
+}
+#path,
+#ghead,
+#ggrid>a,
+html.light #path {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+#treeh,
+#treepar,
+#ghead,
+#u2etas,
+html.light #treeh,
+html.light #treepar {
+    background: var(--bg);
 }
 #ops,
-#tree,
+#u2cards a,
+#u2tab td,
+html.light #ops {
+    border-color: rgba(128,128,128,0.5);
+}
+
+
+
+#path {
+    margin-bottom: .5em;
+}
+#ghead {
+    padding: .2em 0;
+}
+#ops,
+html.light #ops {
+    border-width: 1px 0 0 0;
+}
+#ops a.act,
+html.light #ops a.act {
+    box-shadow: 0 0 1px rgba(128,128,128,0.8) inset;
+    padding-top: .25em;
+}
+.btn,
+html.light .btn {
+    background: transparent;
+    box-shadow: 0 0 1px #999, 0 0 1px #999;
+    border-radius: .2em;
+}
+#tree li {
+    border-width: 1px 0 0 0;
+}
+html.light #tree li {
+    border-width: 0 0 1px 0;
+}
+#treepar,
+html.light #treepar {
+    border-width: 0 0 .3em 0;
+    border-color: #999;
+}
 #files td {
-    background: rgba(32, 32, 32, 0.3) !important;
+    box-shadow: 0 -1px 0 rgba(255,255,255,.1) inset;
 }
-
-
-html.light {
-    background: #eee url('/wp/wallhaven-dpxl6l.png') center / cover no-repeat fixed;
-}
-html.light #files th {
-    background: rgba(255, 255, 255, 0.9) !important;
-}
-html.light .logue,
-html.light #ops,
-html.light #tree,
 html.light #files td {
-    background: rgba(248, 248, 248, 0.8) !important;
+    box-shadow: 0 -1px 0 rgba(0,0,0,.1) inset;
+}
+#files tbody tr td:last-child {
+    border: none;
+}
+#u2cards a.act,
+html.light #u2cards a.act {
+    font-weight: bold;
+}
+#barpos,
+#barbuf,
+#pvol {
+    box-shadow: 0 0 1px rgba(128,128,128,0.5);
+    border-radius: .2em;
+    background: none;
+}
+#wtoggle {
+    border-radius: .1em 0 0 0;
+}
+#u2btn,
+#op_up2k.srch #u2btn,
+html.light #u2btn {
+    background: transparent;
+    text-shadow: none;
+    box-shadow: none;
+    color: inherit;
+}
+#u2btn {
+    border: 2px solid #08a;
+}
+#op_up2k.srch #u2btn {
+    border-color: #b90;
 }
 
 
-#files * {
-    background: transparent !important;
+
+html {
+    background: var(--bg) url('/wp/wallhaven-mdjrqy.jpg') center / cover no-repeat fixed;
+}
+html.light {
+    background: var(--bg) url('/wp/wallhaven-lqqoxq.jpg') center / cover no-repeat fixed;
 }

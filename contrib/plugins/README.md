@@ -14,7 +14,7 @@ save one of these as `.epilogue.html` inside a folder to customize it:
 ## example browser-css
 point `--css-browser` to one of these by URL:
 
-* [`browser.css`](browser.css) changes the background
+* [`browser.css`](browser.css) is a flat / minimal theme
 * [`browser-icons.css`](browser-icons.css) adds filetype icons
 
 
