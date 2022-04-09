@@ -17,12 +17,11 @@ window.baguetteBox = (function () {
             titleTag: false,
             async: false,
             preload: 2,
-            animation: 'slideIn',
             afterShow: null,
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnRotL, btnRotR, btnSel, btnVmode, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnVmode, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -30,6 +29,7 @@ window.baguetteBox = (function () {
         touchFlag = false,  // busy
         re_i = /.+\.(gif|jpe?g|png|webp)(\?|$)/i,
         re_v = /.+\.(webm|mp4)(\?|$)/i,
+        anims = ['slideIn', 'fadeIn', 'none'],
         data = {},  // all galleries
         imagesElements = [],
         documentLastFocus = null,
@@ -178,6 +178,7 @@ window.baguetteBox = (function () {
                 '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">&gt;</button>' +
                 '<div id="bbox-btns">' +
                 '<button id="bbox-help" type="button">?</button>' +
+                '<button id="bbox-anim" type="button" tt="a">-</button>' +
                 '<button id="bbox-rotl" type="button">↶</button>' +
                 '<button id="bbox-rotr" type="button">↷</button>' +
                 '<button id="bbox-tsel" type="button">sel</button>' +
@@ -193,6 +194,7 @@ window.baguetteBox = (function () {
         btnPrev = ebi('bbox-prev');
         btnNext = ebi('bbox-next');
         btnHelp = ebi('bbox-help');
+        btnAnim = ebi('bbox-anim');
         btnRotL = ebi('bbox-rotl');
         btnRotR = ebi('bbox-rotr');
         btnSel = ebi('bbox-tsel');
@@ -282,6 +284,16 @@ window.baguetteBox = (function () {
             tglsel();
         else if (k == "KeyR")
             rotn(e.shiftKey ? -1 : 1);
+    }
+
+    function anim() {
+        var i = (anims.indexOf(options.animation) + 1) % anims.length,
+            o = options;
+        swrite('ganim', anims[i]);
+        options = {};
+        setOptions(o);
+        if (tt.en)
+            tt.show.bind(this)();
     }
 
     function setVmode() {
@@ -397,6 +409,7 @@ window.baguetteBox = (function () {
         bind(btnClose, 'click', hideOverlay);
         bind(btnVmode, 'click', tglVmode);
         bind(btnHelp, 'click', halp);
+        bind(btnAnim, 'click', anim);
         bind(btnRotL, 'click', rotl);
         bind(btnRotR, 'click', rotr);
         bind(btnSel, 'click', tglsel);
@@ -414,6 +427,7 @@ window.baguetteBox = (function () {
         unbind(btnClose, 'click', hideOverlay);
         unbind(btnVmode, 'click', tglVmode);
         unbind(btnHelp, 'click', halp);
+        unbind(btnAnim, 'click', anim);
         unbind(btnRotL, 'click', rotl);
         unbind(btnRotR, 'click', rotr);
         unbind(btnSel, 'click', tglsel);
@@ -459,7 +473,12 @@ window.baguetteBox = (function () {
             if (typeof newOptions[item] !== 'undefined')
                 options[item] = newOptions[item];
         }
-        slider.style.transition = (options.animation === 'fadeIn' ? 'opacity .4s ease' :
+
+        var an = options.animation = sread('ganim') || anims[ANIM ? 0 : 2];
+        btnAnim.textContent = ['⇄', '⮺', '⚡'][anims.indexOf(an)];
+        btnAnim.setAttribute('tt', 'animation: ' + an);
+
+        slider.style.transition = (options.animation === 'fadeIn' ? 'opacity .3s ease' :
             options.animation === 'slideIn' ? '' : 'none');
 
         if (options.buttons === 'auto' && ('ontouchstart' in window || currentGallery.length === 1))
@@ -806,7 +825,7 @@ window.baguetteBox = (function () {
                     slider.style.transform = 'translate3d(' + offset + ',0,0)' :
                     slider.style.left = offset;
                 slider.style.opacity = 1;
-            }, 400);
+            }, 100);
         } else {
             xform ?
                 slider.style.transform = 'translate3d(' + offset + ',0,0)' :

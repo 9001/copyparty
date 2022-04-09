@@ -332,6 +332,16 @@ function clgot(el, cls) {
 }
 
 
+var ANIM = true;
+if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    mq.onchange = function () {
+        ANIM = !mq.matches;
+    };
+    ANIM = !mq.matches;
+}
+
+
 function showsort(tab) {
     var v, vn, v1, v2, th = tab.tHead,
         sopts = jread('fsort', [["href", 1, ""]]);
@@ -872,7 +882,7 @@ var tt = (function () {
     };
 
     r.getmsg = function (el) {
-        if (QS('body.bbox-open'))
+        if (IPHONE && QS('body.bbox-open'))
             return;
 
         var cfg = sread('tooltips');
