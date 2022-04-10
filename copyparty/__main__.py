@@ -513,7 +513,7 @@ def run_argparse(argv, formatter):
     # https://github.com/libvips/libvips
     # ffmpeg -formats
     ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="bmp,dib,gif,icns,ico,jpg,jpeg,jp2,jpx,pcx,png,pbm,pgm,ppm,pnm,sgi,tga,tif,tiff,webp,xbm,dds,xpm,heif,heifs,heic,heics,avif,avifs", help="image formats to decode using pillow")
-    ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="jpg,jpeg,jp2,jpx,jxl,tif,tiff,png,webp,heic,avif,fit,fits,fts,exr,pdf,svg,hdr,ppm,pgm,pfm,gif,nii,dzi", help="image formats to decode using pyvips")
+    ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="jpg,jpeg,jp2,jpx,jxl,tif,tiff,png,webp,heic,avif,fit,fits,fts,exr,svg,hdr,ppm,pgm,pfm,gif,nii,dzi", help="image formats to decode using pyvips")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="av1,asf,avi,flv,m4v,mkv,mjpeg,mjpg,mpg,mpeg,mpg2,mpeg2,h264,avc,mts,h265,hevc,mov,3gp,mp4,ts,mpegts,nut,ogv,ogm,rm,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,m4a,ogg,opus,flac,alac,mp3,mp2,ac3,dts,wma,ra,wav,aif,aiff,au,alaw,ulaw,mulaw,amr,gsm,ape,tak,tta,wv,mpc", help="audio formats to decode using ffmpeg")
 
