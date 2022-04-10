@@ -4,7 +4,7 @@ from __future__ import print_function, unicode_literals
 import os
 
 from .util import Cooldown
-from .th_srv import thumb_path, THUMBABLE, FMT_FFV, FMT_FFA
+from .th_srv import thumb_path, THUMBABLE, FMT_FFV, FMT_FFA, HAVE_WEBP
 from .bos import bos
 
 
@@ -17,6 +17,9 @@ class ThumbCli(object):
 
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
+
+        d = next((x for x in self.args.th_dec if x in ("vips", "pil")), None)
+        self.can_webp = HAVE_WEBP or d == "vips"
 
     def log(self, msg, c=0):
         self.log_func("thumbcli", msg, c)
@@ -42,6 +45,8 @@ class ThumbCli(object):
         elif want_opus:
             return None
 
+        is_img = not is_vid and not is_au
+
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg"]:
             return os.path.join(ptop, rem)
 
@@ -49,7 +54,11 @@ class ThumbCli(object):
             fmt = "w"
 
         if fmt == "w":
-            if self.args.th_no_webp or ((is_vid or is_au) and self.args.th_ff_jpg):
+            if (
+                self.args.th_no_webp
+                or (is_img and not self.can_webp)
+                or (not is_img and self.args.th_ff_jpg)
+            ):
                 fmt = "j"
 
         histpath = self.asrv.vfs.histtab.get(ptop)

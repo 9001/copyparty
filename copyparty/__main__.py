@@ -500,6 +500,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for generating thumbnails")
     ap2.add_argument("--th-convt", metavar="SEC", type=int, default=60, help="conversion timeout in seconds")
     ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image")
+    ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="decoders, in order of preference")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
     ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg for video thumbs")

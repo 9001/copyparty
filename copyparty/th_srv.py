@@ -47,9 +47,18 @@ try:
 except:
     pass
 
+try:
+    import pyvips
+
+    HAVE_VIPS = True
+except:
+    HAVE_VIPS = False
+
 # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
+# https://github.com/libvips/libvips
 # ffmpeg -formats
 FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
+FMT_VIPS = "jpg jpeg jp2 jpx jxl tif tiff png webp heic avif fit fits fts exr pdf svg hdr ppm pgm pfm gif nii dzi"
 FMT_FFV = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc mts h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
 FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma ra wav aif aiff au alaw ulaw mulaw amr gsm ape tak tta wv mpc"
 
@@ -59,8 +68,8 @@ if HAVE_HEIF:
 if HAVE_AVIF:
     FMT_PIL += " avif avifs"
 
-FMT_PIL, FMT_FFV, FMT_FFA = [
-    {x: True for x in y.split(" ") if x} for y in [FMT_PIL, FMT_FFV, FMT_FFA]
+FMT_PIL, FMT_VIPS, FMT_FFV, FMT_FFA = [
+    {x: True for x in y.split(" ") if x} for y in [FMT_PIL, FMT_VIPS, FMT_FFV, FMT_FFA]
 ]
 
 
@@ -72,6 +81,9 @@ if HAVE_PIL:
 if HAVE_FFMPEG and HAVE_FFPROBE:
     THUMBABLE.update(FMT_FFV)
     THUMBABLE.update(FMT_FFA)
+
+if HAVE_VIPS:
+    THUMBABLE.update(FMT_VIPS)
 
 
 def thumb_path(histpath, rem, mtime, fmt):
@@ -101,6 +113,8 @@ def thumb_path(histpath, rem, mtime, fmt):
 
 class ThumbSrv(object):
     def __init__(self, hub):
+        global THUMBABLE
+
         self.hub = hub
         self.asrv = hub.asrv
         self.args = hub.args
@@ -140,6 +154,18 @@ class ThumbSrv(object):
             t = threading.Thread(target=self.cleaner, name="thumb.cln")
             t.daemon = True
             t.start()
+
+        THUMBABLE = {}
+
+        if "pil" in self.args.th_dec:
+            THUMBABLE.update(FMT_PIL)
+
+        if "vips" in self.args.th_dec:
+            THUMBABLE.update(FMT_VIPS)
+
+        if "ff" in self.args.th_dec:
+            THUMBABLE.update(FMT_FFV)
+            THUMBABLE.update(FMT_FFA)
 
     def log(self, msg, c=0):
         self.log_func("thumb", msg, c)
@@ -211,15 +237,20 @@ class ThumbSrv(object):
             ext = abspath.split(".")[-1].lower()
             fun = None
             if not bos.path.exists(tpath):
-                if ext in FMT_PIL:
-                    fun = self.conv_pil
-                elif ext in FMT_FFV:
-                    fun = self.conv_ffmpeg
-                elif ext in FMT_FFA:
-                    if tpath.endswith(".opus") or tpath.endswith(".caf"):
-                        fun = self.conv_opus
-                    else:
-                        fun = self.conv_spec
+                for lib in self.args.th_dec:
+                    if fun:
+                        break
+                    elif lib == "pil" and ext in FMT_PIL:
+                        fun = self.conv_pil
+                    elif lib == "vips" and ext in FMT_VIPS:
+                        fun = self.conv_vips
+                    elif lib == "ff" and ext in FMT_FFV:
+                        fun = self.conv_ffmpeg
+                    elif lib == "ff" and ext in FMT_FFA:
+                        if tpath.endswith(".opus") or tpath.endswith(".caf"):
+                            fun = self.conv_opus
+                        else:
+                            fun = self.conv_spec
 
             if fun:
                 try:
@@ -296,6 +327,24 @@ class ThumbSrv(object):
 
             im.save(tpath, **args)
 
+    def conv_vips(self, abspath, tpath):
+        crops = ["centre", "none"]
+        if self.args.th_no_crop:
+            crops = ["none"]
+
+        w, h = self.res
+        kw = {"height": h, "size": "down", "intent": "relative"}
+
+        for c in crops:
+            try:
+                kw["crop"] = c
+                img = pyvips.Image.thumbnail(abspath, w, **kw)
+                break
+            except:
+                pass
+
+        img.write_to_file(tpath, Q=40)
+
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
 
@@ -350,11 +399,24 @@ class ThumbSrv(object):
     def _run_ff(self, cmd):
         # self.log((b" ".join(cmd)).decode("utf-8"))
         ret, sout, serr = runcmd(cmd, timeout=self.args.th_convt)
-        if ret != 0:
-            m = "FFmpeg failed (probably a corrupt video file):\n"
-            m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])
-            self.log(m, c="1;30")
-            raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
+        if not ret:
+            return
+
+        c = "1;30"
+        m = "FFmpeg failed (probably a corrupt video file):\n"
+        if cmd[-1].endswith(b".webp") and (
+            "Error selecting an encoder" in serr
+            or "Automatic encoder selection failed" in serr
+            or "Default encoder for format webp" in serr
+            or "Please choose an encoder manually" in serr
+        ):
+            self.args.th_ff_jpg = True
+            m = "FFmpeg failed because it was compiled without libwebp; enabling --th_ff_jpg to force jpeg output:\n"
+            c = 1
+
+        m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])
+        self.log(m, c=c)
+        raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
     def conv_spec(self, abspath, tpath):
         ret, _ = ffprobe(abspath)

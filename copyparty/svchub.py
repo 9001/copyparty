@@ -17,7 +17,7 @@ from .util import mp, start_log_thrs, start_stackmon, min_ex, ansi_re
 from .authsrv import AuthSrv
 from .tcpsrv import TcpSrv
 from .up2k import Up2k
-from .th_srv import ThumbSrv, HAVE_PIL, HAVE_WEBP
+from .th_srv import ThumbSrv, HAVE_PIL, HAVE_VIPS, HAVE_WEBP
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 
 
@@ -78,20 +78,32 @@ class SvcHub(object):
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
+        decs = {k: 1 for k in self.args.th_dec.split(",")}
+        if not HAVE_VIPS:
+            decs.pop("vips", None)
+        if not HAVE_PIL:
+            decs.pop("pil", None)
+        if not HAVE_FFMPEG or not HAVE_FFPROBE:
+            decs.pop("ff", None)
+
+        self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
         if not args.no_thumb:
-            if HAVE_PIL:
+            m = "decoder preference: {}".format(", ".join(self.args.th_dec))
+            self.log("thumb", m)
+            if "vips" in self.args.th_dec:
+                self.thumbsrv = ThumbSrv(self)
+            elif "pil" in self.args.th_dec:
                 if not HAVE_WEBP:
-                    args.th_no_webp = True
-                    msg = "setting --th-no-webp because either libwebp is not available or your Pillow is too old"
+                    msg = "disabling webp thumbnails because either libwebp is not available or your Pillow is too old"
                     self.log("thumb", msg, c=3)
 
+                self.log("thumb", "using pillow")
                 self.thumbsrv = ThumbSrv(self)
             else:
-                msg = "need Pillow to create thumbnails; for example:\n{}{} -m pip install --user Pillow\n"
-                self.log(
-                    "thumb", msg.format(" " * 37, os.path.basename(sys.executable)), c=3
-                )
+                msg = "need Pillow and/or pyvips to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n"
+                msg = msg.format(" " * 37, os.path.basename(sys.executable))
+                self.log("thumb", msg, c=3)
 
         if not args.no_acode and args.no_thumb:
             msg = "setting --no-acode because --no-thumb (sorry)"

@@ -17,7 +17,7 @@ from .util import Unrecv
 from .httpcli import HttpCli
 from .u2idx import U2idx
 from .th_cli import ThumbCli
-from .th_srv import HAVE_PIL
+from .th_srv import HAVE_PIL, HAVE_VIPS
 from .ico import Ico
 
 
@@ -38,7 +38,7 @@ class HttpConn(object):
         self.cert_path = hsrv.cert_path
         self.u2fh = hsrv.u2fh
 
-        enth = HAVE_PIL and not self.args.no_thumb
+        enth = (HAVE_PIL or HAVE_VIPS) and not self.args.no_thumb
         self.thumbcli = ThumbCli(hsrv) if enth else None
         self.ico = Ico(self.args)
 

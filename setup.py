@@ -114,9 +114,10 @@ args = {
     "install_requires": ["jinja2"],
     "extras_require": {
         "thumbnails": ["Pillow"],
+        "thumbnails2": ["pyvips"],
         "audiotags": ["mutagen"],
         "ftpd": ["pyftpdlib"],
-        "ftps": ["pyopenssl"],
+        "ftps": ["pyftpdlib", "pyopenssl"],
     },
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
     "scripts": ["bin/copyparty-fuse.py", "bin/up2k.py"],
