@@ -4,7 +4,7 @@ from __future__ import print_function, unicode_literals
 import os
 
 from .util import Cooldown
-from .th_srv import thumb_path, THUMBABLE, FMT_FFV, FMT_FFA, HAVE_WEBP
+from .th_srv import thumb_path, HAVE_WEBP
 from .bos import bos
 
 
@@ -18,6 +18,13 @@ class ThumbCli(object):
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
 
+        c = hsrv.th_cfg
+        self.thumbable = c["thumbable"]
+        self.fmt_pil = c["pil"]
+        self.fmt_vips = c["vips"]
+        self.fmt_ffv = c["ffv"]
+        self.fmt_ffa = c["ffa"]
+
         d = next((x for x in self.args.th_dec if x in ("vips", "pil")), None)
         self.can_webp = HAVE_WEBP or d == "vips"
 
@@ -26,15 +33,15 @@ class ThumbCli(object):
 
     def get(self, ptop, rem, mtime, fmt):
         ext = rem.rsplit(".")[-1].lower()
-        if ext not in THUMBABLE:
+        if ext not in self.thumbable:
             return None
 
-        is_vid = ext in FMT_FFV
+        is_vid = ext in self.fmt_ffv
         if is_vid and self.args.no_vthumb:
             return None
 
         want_opus = fmt in ("opus", "caf")
-        is_au = ext in FMT_FFA
+        is_au = ext in self.fmt_ffa
         if is_au:
             if want_opus:
                 if self.args.no_acode:

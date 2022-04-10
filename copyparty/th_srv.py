@@ -54,37 +54,6 @@ try:
 except:
     HAVE_VIPS = False
 
-# https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-# https://github.com/libvips/libvips
-# ffmpeg -formats
-FMT_PIL = "bmp dib gif icns ico jpg jpeg jp2 jpx pcx png pbm pgm ppm pnm sgi tga tif tiff webp xbm dds xpm"
-FMT_VIPS = "jpg jpeg jp2 jpx jxl tif tiff png webp heic avif fit fits fts exr pdf svg hdr ppm pgm pfm gif nii dzi"
-FMT_FFV = "av1 asf avi flv m4v mkv mjpeg mjpg mpg mpeg mpg2 mpeg2 h264 avc mts h265 hevc mov 3gp mp4 ts mpegts nut ogv ogm rm vob webm wmv"
-FMT_FFA = "aac m4a ogg opus flac alac mp3 mp2 ac3 dts wma ra wav aif aiff au alaw ulaw mulaw amr gsm ape tak tta wv mpc"
-
-if HAVE_HEIF:
-    FMT_PIL += " heif heifs heic heics"
-
-if HAVE_AVIF:
-    FMT_PIL += " avif avifs"
-
-FMT_PIL, FMT_VIPS, FMT_FFV, FMT_FFA = [
-    {x: True for x in y.split(" ") if x} for y in [FMT_PIL, FMT_VIPS, FMT_FFV, FMT_FFA]
-]
-
-
-THUMBABLE = {}
-
-if HAVE_PIL:
-    THUMBABLE.update(FMT_PIL)
-
-if HAVE_FFMPEG and HAVE_FFPROBE:
-    THUMBABLE.update(FMT_FFV)
-    THUMBABLE.update(FMT_FFA)
-
-if HAVE_VIPS:
-    THUMBABLE.update(FMT_VIPS)
-
 
 def thumb_path(histpath, rem, mtime, fmt):
     # base16 = 16 = 256
@@ -113,8 +82,6 @@ def thumb_path(histpath, rem, mtime, fmt):
 
 class ThumbSrv(object):
     def __init__(self, hub):
-        global THUMBABLE
-
         self.hub = hub
         self.asrv = hub.asrv
         self.args = hub.args
@@ -155,17 +122,30 @@ class ThumbSrv(object):
             t.daemon = True
             t.start()
 
-        THUMBABLE = {}
+        self.fmt_pil = {x: True for x in self.args.th_r_pil.split(",")}
+        self.fmt_vips = {x: True for x in self.args.th_r_vips.split(",")}
+        self.fmt_ffv = {x: True for x in self.args.th_r_ffv.split(",")}
+        self.fmt_ffa = {x: True for x in self.args.th_r_ffa.split(",")}
+
+        if not HAVE_HEIF:
+            for f in "heif heifs heic heics".split(" "):
+                self.fmt_pil.pop(f, None)
+
+        if not HAVE_AVIF:
+            for f in "avif avifs".split(" "):
+                self.fmt_pil.pop(f, None)
+
+        self.thumbable = {}
 
         if "pil" in self.args.th_dec:
-            THUMBABLE.update(FMT_PIL)
+            self.thumbable.update(self.fmt_pil)
 
         if "vips" in self.args.th_dec:
-            THUMBABLE.update(FMT_VIPS)
+            self.thumbable.update(self.fmt_vips)
 
         if "ff" in self.args.th_dec:
-            THUMBABLE.update(FMT_FFV)
-            THUMBABLE.update(FMT_FFA)
+            self.thumbable.update(self.fmt_ffv)
+            self.thumbable.update(self.fmt_ffa)
 
     def log(self, msg, c=0):
         self.log_func("thumb", msg, c)
@@ -227,6 +207,15 @@ class ThumbSrv(object):
 
         return None
 
+    def getcfg(self):
+        return {
+            "thumbable": self.thumbable,
+            "pil": self.fmt_pil,
+            "vips": self.fmt_vips,
+            "ffv": self.fmt_ffv,
+            "ffa": self.fmt_ffa,
+        }
+
     def worker(self):
         while not self.stopping:
             task = self.q.get()
@@ -240,13 +229,13 @@ class ThumbSrv(object):
                 for lib in self.args.th_dec:
                     if fun:
                         break
-                    elif lib == "pil" and ext in FMT_PIL:
+                    elif lib == "pil" and ext in self.fmt_pil:
                         fun = self.conv_pil
-                    elif lib == "vips" and ext in FMT_VIPS:
+                    elif lib == "vips" and ext in self.fmt_vips:
                         fun = self.conv_vips
-                    elif lib == "ff" and ext in FMT_FFV:
+                    elif lib == "ff" and ext in self.fmt_ffv:
                         fun = self.conv_ffmpeg
-                    elif lib == "ff" and ext in FMT_FFA:
+                    elif lib == "ff" and ext in self.fmt_ffa:
                         if tpath.endswith(".opus") or tpath.endswith(".caf"):
                             fun = self.conv_opus
                         else:
