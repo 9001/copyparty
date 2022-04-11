@@ -122,10 +122,16 @@ class ThumbSrv(object):
             t.daemon = True
             t.start()
 
-        self.fmt_pil = {x: True for x in self.args.th_r_pil.split(",")}
-        self.fmt_vips = {x: True for x in self.args.th_r_vips.split(",")}
-        self.fmt_ffv = {x: True for x in self.args.th_r_ffv.split(",")}
-        self.fmt_ffa = {x: True for x in self.args.th_r_ffa.split(",")}
+        self.fmt_pil, self.fmt_vips, self.fmt_ffi, self.fmt_ffv, self.fmt_ffa = [
+            {x: True for x in y.split(",")}
+            for y in [
+                self.args.th_r_pil,
+                self.args.th_r_vips,
+                self.args.th_r_ffi,
+                self.args.th_r_ffv,
+                self.args.th_r_ffa,
+            ]
+        ]
 
         if not HAVE_HEIF:
             for f in "heif heifs heic heics".split(" "):
@@ -144,8 +150,8 @@ class ThumbSrv(object):
             self.thumbable.update(self.fmt_vips)
 
         if "ff" in self.args.th_dec:
-            self.thumbable.update(self.fmt_ffv)
-            self.thumbable.update(self.fmt_ffa)
+            for t in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
+                self.thumbable.update(t)
 
     def log(self, msg, c=0):
         self.log_func("thumb", msg, c)
@@ -212,6 +218,7 @@ class ThumbSrv(object):
             "thumbable": self.thumbable,
             "pil": self.fmt_pil,
             "vips": self.fmt_vips,
+            "ffi": self.fmt_ffi,
             "ffv": self.fmt_ffv,
             "ffa": self.fmt_ffa,
         }
@@ -233,7 +240,7 @@ class ThumbSrv(object):
                         fun = self.conv_pil
                     elif lib == "vips" and ext in self.fmt_vips:
                         fun = self.conv_vips
-                    elif lib == "ff" and ext in self.fmt_ffv:
+                    elif lib == "ff" and ext in self.fmt_ffi or ext in self.fmt_ffv:
                         fun = self.conv_ffmpeg
                     elif lib == "ff" and ext in self.fmt_ffa:
                         if tpath.endswith(".opus") or tpath.endswith(".caf"):
@@ -337,8 +344,8 @@ class ThumbSrv(object):
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
 
-        ext = abspath.rsplit(".")[-1]
-        if ext in ["h264", "h265"]:
+        ext = abspath.rsplit(".")[-1].lower()
+        if ext in ["h264", "h265"] or ext in self.fmt_ffi:
             seek = []
         else:
             dur = ret[".dur"][1] if ".dur" in ret else 4
@@ -393,7 +400,7 @@ class ThumbSrv(object):
 
         c = "1;30"
         m = "FFmpeg failed (probably a corrupt video file):\n"
-        if cmd[-1].endswith(b".webp") and (
+        if cmd[-1].lower().endswith(b".webp") and (
             "Error selecting an encoder" in serr
             or "Automatic encoder selection failed" in serr
             or "Default encoder for format webp" in serr

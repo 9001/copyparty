@@ -18,13 +18,19 @@ class ThumbCli(object):
         # cache on both sides for less broker spam
         self.cooldown = Cooldown(self.args.th_poke)
 
-        c = hsrv.th_cfg
+        try:
+            c = hsrv.th_cfg
+        except:
+            c = {k: {} for k in ["thumbable", "pil", "vips", "ffi", "ffv", "ffa"]}
+
         self.thumbable = c["thumbable"]
         self.fmt_pil = c["pil"]
         self.fmt_vips = c["vips"]
+        self.fmt_ffi = c["ffi"]
         self.fmt_ffv = c["ffv"]
         self.fmt_ffa = c["ffa"]
 
+        # defer args.th_ff_jpg, can change at runtime
         d = next((x for x in self.args.th_dec if x in ("vips", "pil")), None)
         self.can_webp = HAVE_WEBP or d == "vips"
 
@@ -54,6 +60,8 @@ class ThumbCli(object):
 
         is_img = not is_vid and not is_au
 
+        preferred = self.args.th_dec[0] if self.args.th_dec else ""
+
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg"]:
             return os.path.join(ptop, rem)
 
@@ -64,7 +72,7 @@ class ThumbCli(object):
             if (
                 self.args.th_no_webp
                 or (is_img and not self.can_webp)
-                or (not is_img and self.args.th_ff_jpg)
+                or (self.args.th_ff_jpg and (not is_img or preferred == "ff"))
             ):
                 fmt = "j"
 
@@ -74,15 +82,23 @@ class ThumbCli(object):
             return None
 
         tpath = thumb_path(histpath, rem, mtime, fmt)
+        tpaths = [tpath]
+        if fmt == "w":
+            # also check for jpg (maybe webp is unavailable)
+            tpaths.append(tpath.rsplit(".", 1)[0] + ".jpg")
+
         ret = None
-        try:
-            st = bos.stat(tpath)
-            if st.st_size:
-                ret = tpath
-            else:
-                return None
-        except:
-            pass
+        abort = False
+        for tp in tpaths:
+            try:
+                st = bos.stat(tp)
+                if st.st_size:
+                    ret = tpath = tp
+                    fmt = ret.rsplit(".")[1]
+                else:
+                    abort = True
+            except:
+                pass
 
         if ret:
             tdir = os.path.dirname(tpath)
@@ -95,6 +111,9 @@ class ThumbCli(object):
                     self.broker.put(False, "thumbsrv.poke", tpath)
 
             return ret
+
+        if abort:
+            return None
 
         x = self.broker.put(True, "thumbsrv.get", ptop, rem, mtime, fmt)
         return x.get()

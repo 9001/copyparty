@@ -511,9 +511,10 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-covers", metavar="N,N", type=u, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat for")
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
     # https://github.com/libvips/libvips
-    # ffmpeg -formats
+    # ffmpeg -hide_banner -demuxers | awk '/^ D  /{print$2}' | while IFS= read -r x; do ffmpeg -hide_banner -h demuxer=$x; done | grep -E '^Demuxer |extensions:'
     ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="bmp,dib,gif,icns,ico,jpg,jpeg,jp2,jpx,pcx,png,pbm,pgm,ppm,pnm,sgi,tga,tif,tiff,webp,xbm,dds,xpm,heif,heifs,heic,heics,avif,avifs", help="image formats to decode using pillow")
-    ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="jpg,jpeg,jp2,jpx,jxl,tif,tiff,png,webp,heic,avif,fit,fits,fts,exr,svg,hdr,ppm,pgm,pfm,gif,nii,dzi", help="image formats to decode using pyvips")
+    ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="jpg,jpeg,jp2,jpx,jxl,tif,tiff,png,webp,heic,avif,fit,fits,fts,exr,svg,hdr,ppm,pgm,pfm,gif,nii", help="image formats to decode using pyvips")
+    ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,dds,dib,fit,fits,fts,gif,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="av1,asf,avi,flv,m4v,mkv,mjpeg,mjpg,mpg,mpeg,mpg2,mpeg2,h264,avc,mts,h265,hevc,mov,3gp,mp4,ts,mpegts,nut,ogv,ogm,rm,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,m4a,ogg,opus,flac,alac,mp3,mp2,ac3,dts,wma,ra,wav,aif,aiff,au,alaw,ulaw,mulaw,amr,gsm,ape,tak,tta,wv,mpc", help="audio formats to decode using ffmpeg")
 

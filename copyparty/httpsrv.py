@@ -70,8 +70,11 @@ class HttpSrv(object):
         self.cb_ts = 0
         self.cb_v = 0
 
-        x = self.broker.put(True, "thumbsrv.getcfg")
-        self.th_cfg = x.get()
+        try:
+            x = self.broker.put(True, "thumbsrv.getcfg")
+            self.th_cfg = x.get()
+        except:
+            pass
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))

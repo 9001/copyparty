@@ -91,17 +91,15 @@ class SvcHub(object):
         if not args.no_thumb:
             m = "decoder preference: {}".format(", ".join(self.args.th_dec))
             self.log("thumb", m)
-            if "vips" in self.args.th_dec:
-                self.thumbsrv = ThumbSrv(self)
-            elif "pil" in self.args.th_dec:
-                if not HAVE_WEBP:
-                    msg = "disabling webp thumbnails because either libwebp is not available or your Pillow is too old"
-                    self.log("thumb", msg, c=3)
 
-                self.log("thumb", "using pillow")
+            if "pil" in self.args.th_dec and not HAVE_WEBP:
+                msg = "disabling webp thumbnails because either libwebp is not available or your Pillow is too old"
+                self.log("thumb", msg, c=3)
+
+            if self.args.th_dec:
                 self.thumbsrv = ThumbSrv(self)
             else:
-                msg = "need Pillow and/or pyvips to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n"
+                msg = "need either Pillow, pyvips, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
                 msg = msg.format(" " * 37, os.path.basename(sys.executable))
                 self.log("thumb", msg, c=3)
 

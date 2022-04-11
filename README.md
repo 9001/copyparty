@@ -174,7 +174,7 @@ feature summary
   * ☑ image gallery with webm player
   * ☑ textfile browser with syntax hilighting
   * ☑ [thumbnails](#thumbnails)
-    * ☑ ...of images using Pillow and/or pyvips
+    * ☑ ...of images using Pillow, pyvips, or FFmpeg
     * ☑ ...of videos using FFmpeg
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
@@ -403,7 +403,8 @@ press `g` to toggle grid-view instead of the file listing,  and `t` toggles icon
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
-it does static images with Pillow and/or pyvips, and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
+it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
+* pyvips is 3x faster than Pillow, Pillow is 3x faster than FFmpeg
 
 audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
 
@@ -1096,11 +1097,11 @@ enable music tags:
 * or `ffprobe` (20x slower, more accurate, possibly dangerous depending on your distro and users)
 
 enable [thumbnails](#thumbnails) of...
-* **images:** `Pillow` and/or `pyvips` (requires py2.7 or py3.5+)
+* **images:** `Pillow` and/or `pyvips` and/or `ffmpeg` (requires py2.7 or py3.5+)
 * **videos/audio:** `ffmpeg` and `ffprobe` somewhere in `$PATH`
-* **HEIF pictures:** `pyvips` or `pyheif-pillow-opener` (requires Linux or a C compiler)
-* **AVIF pictures:** `pyvips` or `pillow-avif-plugin`
-* **JPEG XL pictures:** `pyvips`
+* **HEIF pictures:** `pyvips` or `ffmpeg` or `pyheif-pillow-opener` (requires Linux or a C compiler)
+* **AVIF pictures:** `pyvips` or `ffmpeg` or `pillow-avif-plugin`
+* **JPEG XL pictures:** `pyvips` or `ffmpeg`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
 
