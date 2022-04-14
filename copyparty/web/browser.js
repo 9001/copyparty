@@ -4116,6 +4116,7 @@ var treectl = (function () {
 	}
 
 	r.hydrate = function () {
+		qsr('#bbsw');
 		if (ls0 === null) {
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', '/?am_js', true);
@@ -4639,6 +4640,8 @@ var settheme = (function () {
 		var btns = QSA('#themes a');
 		for (var a = 0; a < themes; a++)
 			btns[a].onclick = settheme;
+
+		bcfg_set('light', light);
 	}
 
 	function settheme(e) {
