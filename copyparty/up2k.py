@@ -596,6 +596,9 @@ class Up2k(object):
             if stat.S_ISDIR(inf.st_mode):
                 if abspath in excl or abspath == histpath:
                     continue
+                if iname == ".th" and bos.path.isdir(os.path.join(abspath, "top")):
+                    # abandoned or foreign, skip
+                    continue
                 # self.log(" dir: {}".format(abspath))
                 try:
                     ret += self._build_dir(dbw, top, excl, abspath, rei, reh, seen)
