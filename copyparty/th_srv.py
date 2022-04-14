@@ -407,7 +407,14 @@ class ThumbSrv(object):
             or "Please choose an encoder manually" in serr
         ):
             self.args.th_ff_jpg = True
-            m = "FFmpeg failed because it was compiled without libwebp; enabling --th_ff_jpg to force jpeg output:\n"
+            m = "FFmpeg failed because it was compiled without libwebp; enabling --th-ff-jpg to force jpeg output:\n"
+            c = 1
+
+        if (
+            "Requested resampling engine is unavailable" in serr
+            or "output pad on Parsed_aresample_" in serr
+        ):
+            m = "FFmpeg failed because it was compiled without libsox; you must set --th-ff-swr to force swr resampling:\n"
             c = 1
 
         m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])
