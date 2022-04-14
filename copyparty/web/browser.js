@@ -58,7 +58,7 @@ ebi('op_up2k').innerHTML = (
 	'		<td class="c"><br />parallel uploads:</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label for="multitask" tt="continue hashing other files while uploading">🏃</label>\n' +
+	'			<label for="multitask" tt="continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck">🏃</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="ask_up" />\n' +
@@ -74,7 +74,7 @@ ebi('op_up2k').innerHTML = (
 	'	<tr>\n' +
 	'		<td class="c">\n' +
 	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
-	'				class="txtbox" id="nthread" value="2" tt="pause uploads by setting it to 0"/><a\n' +
+	'				class="txtbox" id="nthread" value="2" tt="pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck"/><a\n' +
 	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +
 	'		</td>\n' +
 	'	</tr>\n' +
@@ -1593,25 +1593,62 @@ function autoplay_blocked(seek) {
 }
 
 
+function scan_hash(v) {
+	if (!v)
+		return null;
+
+	var m = /^#([ag])(f-[0-9a-f]{8,16})(&.+)?/.exec(v + '');
+	if (!m)
+		return null;
+
+	var mtype = m[1],
+		id = m[2],
+		ts = null;
+
+	if (m.length > 3) {
+		m = /^&[Tt=0]*([0-9]+[Mm:])?0*([0-9]+)[Ss]?$/.exec(m[3]);
+		if (m) {
+			ts = parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0);
+		}
+	}
+
+	return [mtype, id, ts];
+}
+
+
 function eval_hash() {
 	var v = hash0;
 	hash0 = null;
 	if (!v)
 		return;
 
-	if (v.indexOf('#af-') === 0) {
-		var id = v.slice(2).split('&');
-		if (id[0].length < 10)
-			return;
+	var media = scan_hash(v);
+	if (media) {
+		var mtype = media[0],
+			id = media[1],
+			ts = media[2];
 
-		if (id.length == 1)
-			return play(id[0]);
+		if (mtype == 'a') {
+			if (!ts)
+				return play(id);
 
-		var m = /^[Tt=0]*([0-9]+[Mm:])?0*([0-9]+)[Ss]?$/.exec(id[1]);
-		if (!m)
-			return play(id[0]);
+			return play(id, false, ts);
+		}
 
-		return play(id[0], false, parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0));
+		if (mtype == 'g') {
+			if (!thegrid.en)
+				ebi('griden').click();
+
+			var t = setInterval(function () {
+				if (!thegrid.bbox)
+					return;
+
+				clearInterval(t);
+				var im = QS('#ggrid a[ref="' + id + '"]');
+				im.click();
+				im.scrollIntoView();
+			}, 50);
+		}
 	}
 
 	if (v.indexOf('#q=') === 0) {
@@ -2950,6 +2987,9 @@ var thegrid = (function () {
 				return '<a download href="' + h +
 					'">' + (idx + 1) + ' / ' + r.bbox.length + ' -- ' +
 					esc(uricom_dec(h.split('/').pop())[0]) + '</a>';
+			},
+			onChange: function (i) {
+				sethash('g' + r.bbox[i].imageElement.getAttribute('ref'));
 			}
 		})[0];
 	};
@@ -2962,10 +3002,6 @@ var thegrid = (function () {
 		vbar.onresize();
 	});
 	ebi('wtgrid').onclick = ebi('griden').onclick;
-
-	setTimeout(function () {
-		import_js('/.cpr/baguettebox.js', r.bagit);
-	}, 1);
 
 	return r;
 })();
@@ -4045,18 +4081,38 @@ var treectl = (function () {
 		html = html.join('\n');
 		set_files_html(html);
 
-		filecols.set_style();
-		showfile.mktree();
-		mukey.render();
-		reload_tree();
-		reload_browser();
-		tree_scrollto();
-		if (res.acct) {
-			acct = res.acct;
-			have_up2k_idx = res.idx;
-			apply_perms(res.perms);
-			fileman.render();
+		function asdf() {
+			filecols.set_style();
+			showfile.mktree();
+			mukey.render();
+			reload_tree();
+			reload_browser();
+			tree_scrollto();
+			if (res.acct) {
+				acct = res.acct;
+				have_up2k_idx = res.idx;
+				apply_perms(res.perms);
+				fileman.render();
+			}
 		}
+
+		var m = scan_hash(hash0),
+			url = null;
+
+		if (m) {
+			url = ebi(m[1]);
+			if (url) {
+				url = url.href;
+				var mt = m[0] == 'a' ? 'audio' : /\.(webm|mkv)($|\?)/i.exec(url) ? 'video' : 'image'
+				if (mt == 'image') {
+					url += url.indexOf('?') < 0 ? '?cache' : '&cache';
+					console.log(url);
+					new Image().src = url;
+				}
+			}
+		}
+
+		if (url) setTimeout(asdf, 1); else asdf();
 	}
 
 	r.hydrate = function () {
@@ -4069,12 +4125,9 @@ var treectl = (function () {
 		}
 
 		r.gentab(get_evpath(), ls0);
-		reload_browser();
 		pbar.onresize();
 		vbar.onresize();
-		mukey.render();
 		showfile.addlinks();
-		thegrid.setdirty();
 		setTimeout(eval_hash, 1);
 	};
 
@@ -4173,14 +4226,16 @@ function apply_perms(newperms) {
 	perms = newperms || [];
 
 	var a = QS('#ops a[data-dest="up2k"]');
+	var suf = 'multithreaded, and file timestamps are preserved, but it uses more CPU than the basic uploader';
 	if (have_up2k_idx) {
 		a.removeAttribute('data-perm');
-		a.setAttribute('tt', 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server');
+		a.setAttribute('tt', 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server$N$Nuploads are resumable, ' + suf);
 	}
 	else {
 		a.setAttribute('data-perm', 'write');
-		a.setAttribute('tt', 'up2k: upload files with resume support (close your browser and drop the same files in later)');
+		a.setAttribute('tt', 'up2k: upload files with resume support (close your browser and drop the same files in later)$N$N' + suf);
 	}
+	a.style.display = '';
 	tt.att(QS('#ops'));
 
 	var axs = [],

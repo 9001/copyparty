@@ -539,6 +539,7 @@ window.baguetteBox = (function () {
         if (overlay.style.display === 'none')
             return;
 
+        sethash('');
         unbind(document, 'keydown', keyDownHandler);
         unbind(document, 'keyup', keyUpHandler);
         unbind(document, 'fullscreenchange', onFSC);
