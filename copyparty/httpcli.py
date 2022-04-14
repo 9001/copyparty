@@ -2097,9 +2097,7 @@ class HttpCli(object):
 
                 thp = None
                 if self.thumbcli:
-                    thp = self.thumbcli.get(
-                        dbv.realpath, vrem, int(st.st_mtime), th_fmt
-                    )
+                    thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
 
                 if thp:
                     return self.tx_file(thp)

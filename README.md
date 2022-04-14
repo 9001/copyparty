@@ -405,6 +405,7 @@ press `g` to toggle grid-view instead of the file listing,  and `t` toggles icon
 
 it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
 * pyvips is 3x faster than Pillow, Pillow is 3x faster than FFmpeg
+* disable thumbnails for specific volumes with volflag `dthumb` for all, or `dvthumb` / `dathumb` / `dithumb` for video/audio/images only
 
 audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
 

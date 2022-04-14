@@ -876,6 +876,17 @@ class AuthSrv(object):
             vol.flags["html_head"] = "\n".join([x for x in h if x])
 
         for vol in vfs.all_vols.values():
+            if self.args.no_vthumb:
+                vol.flags["dvthumb"] = True
+            if self.args.no_athumb:
+                vol.flags["dathumb"] = True
+            if self.args.no_thumb or vol.flags.get("dthumb", False):
+                vol.flags["dthumb"] = True
+                vol.flags["dvthumb"] = True
+                vol.flags["dathumb"] = True
+                vol.flags["dithumb"] = True
+
+        for vol in vfs.all_vols.values():
             fk = vol.flags.get("fk")
             if fk:
                 vol.flags["fk"] = int(fk) if fk is not True else 8

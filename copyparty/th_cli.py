@@ -37,13 +37,14 @@ class ThumbCli(object):
     def log(self, msg, c=0):
         self.log_func("thumbcli", msg, c)
 
-    def get(self, ptop, rem, mtime, fmt):
+    def get(self, dbv, rem, mtime, fmt):
+        ptop = dbv.realpath
         ext = rem.rsplit(".")[-1].lower()
-        if ext not in self.thumbable:
+        if ext not in self.thumbable or "dthumb" in dbv.flags:
             return None
 
         is_vid = ext in self.fmt_ffv
-        if is_vid and self.args.no_vthumb:
+        if is_vid and "dvthumb" in dbv.flags:
             return None
 
         want_opus = fmt in ("opus", "caf")
@@ -53,12 +54,14 @@ class ThumbCli(object):
                 if self.args.no_acode:
                     return None
             else:
-                if self.args.no_athumb:
+                if "dathumb" in dbv.flags:
                     return None
         elif want_opus:
             return None
 
         is_img = not is_vid and not is_au
+        if is_img and "dithumb" in dbv.flags:
+            return None
 
         preferred = self.args.th_dec[0] if self.args.th_dec else ""
 
