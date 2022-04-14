@@ -7,16 +7,16 @@ function dbg(msg) {
 
 // toolbar
 ebi('ops').innerHTML = (
-	'<a href="#" data-dest="" tt="close submenu">--</a>\n' +
-	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with yana and be an opus file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»">🔎</a>\n' +
-	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="unpost: delete your recent uploads">🧯</a>\n' : '') +
-	'<a href="#" data-dest="up2k">🚀</a>\n' +
-	'<a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>\n' +
-	'<a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>\n' +
-	'<a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>\n' +
-	'<a href="#" data-perm="write" data-dest="msg" tt="msg: send a message to the server log">📟</a>\n' +
-	'<a href="#" data-dest="player" tt="media player options">🎺</a>\n' +
-	'<a href="#" data-dest="cfg" tt="configuration options">⚙️</a>\n' +
+	'<a href="#" data-dest="" tt="close submenu">--</a>' +
+	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with yana and be an opus file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»">🔎</a>' +
+	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="unpost: delete your recent uploads">🧯</a>' : '') +
+	'<a href="#" data-dest="up2k">🚀</a>' +
+	'<a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>' +
+	'<a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>' +
+	'<a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>' +
+	'<a href="#" data-perm="write" data-dest="msg" tt="msg: send a message to the server log">📟</a>' +
+	'<a href="#" data-dest="player" tt="media player options">🎺</a>' +
+	'<a href="#" data-dest="cfg" tt="configuration options">⚙️</a>' +
 	'<div id="opdesc"></div>'
 );
 
@@ -84,10 +84,9 @@ ebi('op_up2k').innerHTML = (
 
 	'<div id="u2btn_ct">\n' +
 	'	<div id="u2btn">\n' +
-	'		<span id="u2bm"></span><br />\n' +
-	'		drag/drop files<br />\n' +
-	'		and folders here<br />\n' +
-	'		(or click me)\n' +
+	'		<span id="u2bm"></span>\n' +
+	'		drop files / folders<br />\n' +
+	'		here (or click me)\n' +
 	'	</div>\n' +
 	'</div>\n' +
 
@@ -121,8 +120,7 @@ ebi('op_up2k').innerHTML = (
 	'</table></div>\n' +
 
 	'<p id="u2flagblock"><b>the files were added to the queue</b><br />however there is a busy up2k in another browser tab,<br />so waiting for that to finish first</p>\n' +
-	'<p id="u2foot"></p>\n' +
-	'<p id="u2footfoot" data-perm="write">( you can use the <a href="#" id="u2nope">basic uploader</a> if you don\'t need lastmod timestamps, resumable uploads, or progress bars )</p>'
+	'<p id="u2foot"></p>'
 );
 
 
@@ -146,12 +144,16 @@ ebi('op_cfg').innerHTML = (
 	'	<h3>switches</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
-	'		<a id="lightmode" class="tgl btn" href="#">☀️ lightmode</a>\n' +
 	'		<a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="show README.md in folder listings">📜 readme</a>\n' +
 	'		<a id="spafiles" class="tgl btn" href="#" tt="speedboost when not using the navpane;$Nturn it off if things arent loading somehow">spa</a>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+	'<div>\n' +
+	'	<h3>themes</h3>\n' +
+	'	<div id="themes">\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	(have_zip ? (
@@ -261,6 +263,8 @@ function goto(dest) {
 		if (fn)
 			fn();
 	}
+
+	clmod(document.documentElement, 'op_open', dest);
 
 	if (window['treectl'])
 		treectl.onscroll();
@@ -3698,7 +3702,7 @@ var treectl = (function () {
 				treeh = winh - atop;
 
 			tree.style.top = top + 'px';
-			tree.style.height = treeh < 10 ? '' : Math.floor(treeh - 1) + 'px';
+			tree.style.height = treeh < 10 ? '' : Math.floor(treeh) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
@@ -3966,7 +3970,8 @@ var treectl = (function () {
 			return;
 		}
 
-		ebi('srv_info').innerHTML = '<span>' + res.srvinf + '</span>';
+		srvinf = res.srvinf;
+		ebi('srv_info').innerHTML = ebi('srv_info2').innerHTML = '<span>' + res.srvinf + '</span>';
 
 		if (this.hpush && !showfile.active())
 			hist_push(this.top);
@@ -4192,10 +4197,11 @@ function apply_perms(newperms) {
 		axs += '-Only';
 	}
 
-	ebi('acc_info').innerHTML = '<span' + aclass + axs + ' access</span>' + (acct != '*' ?
-		'<a href="/?pw=x">Logout ' + acct + '</a>' : '<a href="/?h">Login</a>');
+	ebi('acc_info').innerHTML = '<span id="srv_info2"><span>' + srvinf +
+		'</span></span><span' + aclass + axs + ' access</span>' + (acct != '*' ?
+			'<a href="/?pw=x">Logout ' + acct + '</a>' : '<a href="/?h">Login</a>');
 
-	var o = QSA('#ops>a[data-perm], #u2footfoot');
+	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
 		var display = '';
 		var needed = o[a].getAttribute('data-perm').split(' ');
@@ -4550,20 +4556,49 @@ var mukey = (function () {
 })();
 
 
-var light;
-(function () {
+var light, theme;
+var settheme = (function () {
+	var ax = 'abcdefghijklmnopqrstuvwx';
+
+	theme = sread('theme') || 'a';
+	if (!/^[a-x][yz]/.exec(theme))
+		theme = dtheme;
+
+	light = !!(theme.indexOf('y') + 1);
+
 	function freshen() {
-		clmod(document.documentElement, "light", light);
-		clmod(document.documentElement, "dark", !light);
+		var cl = document.documentElement.getAttribute('class');
+		cl = cl.replace(/\b(light|dark|[a-z]{1,2})\b/g, '').replace(/ +/g, ' ');
+		document.documentElement.setAttribute('class', cl + ' ' + theme + ' ');
+
 		pbar.drawbuf();
 		pbar.drawpos();
 		vbar.draw();
 		showfile.setstyle();
+
+		var html = [], itheme = ax.indexOf(theme.charAt(0)) * 2 + (light ? 1 : 0);
+		for (var a = 0; a < themes; a++)
+			html.push('<a href="#" class="btn tgl' + (a == itheme ? ' on' : '') + '">' + a + '</a>');
+
+		ebi('themes').innerHTML = html.join('');
+		var btns = QSA('#themes a');
+		for (var a = 0; a < themes; a++)
+			btns[a].onclick = settheme;
 	}
 
-	bcfg_bind(window, 'light', 'lightmode', false, freshen);
+	function settheme(e) {
+		var i = e;
+		try { ev(e); i = e.target.textContent; } catch (ex) { }
+		light = i % 2 == 1;
+		var c = ax.charAt(Math.floor(i / 2)),
+			l = light ? 'y' : 'z';
+		theme = c + l + ' ' + c + ' ' + l + ' ' + (light ? 'light ' : 'dark ');
+		swrite('theme', theme);
+		freshen();
+	}
 
 	freshen();
+	return settheme;
 })();
 
 

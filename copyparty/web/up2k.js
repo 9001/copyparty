@@ -644,12 +644,6 @@ function up2k_init(subtle) {
         return false;
     }
 
-    ebi('u2nope').onclick = function (e) {
-        ev(e);
-        setmsg(suggest_up2k, 'msg');
-        goto('bup');
-    };
-
     setmsg(suggest_up2k, 'msg');
 
     if (!String.prototype.format) {
@@ -1476,7 +1470,6 @@ function up2k_init(subtle) {
                     min_filebuf = 1;
                     var td = Date.now() - t0;
                     if (td > 50) {
-                        ebi('u2foot').innerHTML += "<p>excessive filereader latency (" + td + " ms), increasing readahead</p>";
                         min_filebuf = 32 * 1024 * 1024;
                     }
                 }
@@ -2070,10 +2063,10 @@ function up2k_init(subtle) {
 
         try {
             var ico = uc.fsearch ? '🔎' : '🚀',
-                desc = uc.fsearch ? 'Search' : 'Upload';
+                desc = uc.fsearch ? 'S E A R C H' : 'U P L O A D';
 
             clmod(ebi('op_up2k'), 'srch', uc.fsearch);
-            ebi('u2bm').innerHTML = ico + ' <sup>' + desc + '</sup>';
+            ebi('u2bm').innerHTML = ico + '&nbsp; <sup>' + desc + '</sup>';
         }
         catch (ex) { }
 

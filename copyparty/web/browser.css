@@ -3,10 +3,12 @@
 	--grid-ln: 3;
 	--nav-sz: 16em;
 	--fg: #ccc;
+	--fg2: #fff;
 	--bg: #222;
 }
-html.light {
+html.y {
 	--fg: #333;
+	--fg2: #000;
 	--bg: #eaeaea;
 }
 * {
@@ -42,7 +44,6 @@ pre, code, tt, #doc, #doc>code {
 	font-weight: normal;
 	display: inline-block;
 	padding: .35em .5em .2em .5em;
-	border-radius: 0 .3em .3em 0;
 	margin: 1.3em 0 -.2em 0;
 	font-size: 1.4em;
 }
@@ -107,8 +108,10 @@ a, #files tbody div a:last-child {
 #files thead th:after {
 	margin-right: -.7em;
 }
-#files tbody tr:hover td {
+#files tbody tr:hover td,
+#files tbody tr:hover td+td {
 	background: #1c1c1c;
+	box-shadow: 0 1px 0 #444 inset, 0 -1px 0 #444 inset;
 }
 #files thead th {
 	padding: .3em;
@@ -118,11 +121,28 @@ a, #files tbody div a:last-child {
 #files td {
 	margin: 0;
 	padding: .3em .5em;
-	border-left: 1px solid #3c3c3c;
 }
 #files td+td+td {
 	max-width: 30em;
 	overflow: hidden;
+}
+#files td+td {
+    box-shadow: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(255,255,255,0.02) inset, 0 -1px 0 rgba(255,255,255,0.02) inset;
+}
+#files tr:nth-child(2n+1) td+td {
+    box-shadow: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(0,0,0,0.2) inset, 0 -1px 0 rgba(0,0,0,0.2) inset;
+}
+html.y #files td+td {
+    box-shadow: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(255,255,255,0.5) inset, 0 -1px 0 rgba(255,255,255,0.5) inset;
+}
+html.y #files tr:nth-child(2n+1) td+td {
+    box-shadow: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(0,0,0,0.02) inset, 0 -1px 0 rgba(0,0,0,0.02) inset;
+}
+#files td:first-child {
+	border-radius: .25em 0 0 .25em;
+}
+#files td:last-child {
+	border-radius: 0 .25em .25em 0;
 }
 #files tbody td:nth-child(3) {
 	font-family: 'scp', monospace, monospace;
@@ -134,12 +154,8 @@ a, #files tbody div a:last-child {
 	color: #888;
 	text-align: center;
 }
-#files tbody tr:last-child td {
-	border-bottom: 1px solid #444;
-}
 #files tbody tr td:last-child {
 	white-space: nowrap;
-	border-right: 1px solid #3c3c3c;
 }
 #files thead th[style] {
 	width: auto !important;
@@ -204,26 +220,35 @@ a, #files tbody div a:last-child {
 .mdo * {
 	line-height: 1.4em;
 }
-#srv_info {
+#srv_info,
+#srv_info2,
+#acc_info {
 	color: #a73;
+}
+#srv_info {
 	position: absolute;
 	font-size: .8em;
  	top: .5em;
 	left: 2em;
 	padding-right: .5em;
 }
-#srv_info span {
+#srv_info span,
+#srv_info2 span {
 	color: #aaa;
+}
+#srv_info2 {
+	display: none;
 }
 #acc_info {
 	position: absolute;
+	white-space: nowrap;
 	font-size: .81em;
 	top: .5em;
 	right: 2em;
-	color: #999;
+	color: #aaa;
 }
-#acc_info span {
-	color: #999;
+#acc_info > span:not([id]) {
+	color: #aaa;
 	margin-right: .6em;
 }
 #acc_info span.warn {
@@ -248,36 +273,38 @@ a, #files tbody div a:last-child {
 	color: #720;
 	text-shadow: 0 0 .3em #b80;
 }
-#ggrid>a.play,
-html.light #ggrid>a.play {
+html.z #ggrid>a.play,
+html.z #ggrid>a[tt].play,
+html.y #ggrid>a.play,
+html.y #ggrid>a[tt].play {
 	color: #fff;
 	background: #750;
 	border-color: #c90;
 	border-top: 1px solid #da4;
 	box-shadow: 0 .1em 1.2em #b83;
 }
-#files tbody tr.sel td,
-#ggrid>a.sel,
-#ggrid>a[tt].sel,
-html.light #ggrid>a.sel,
-html.light #ggrid>a[tt].sel {
+html.z #files tbody tr.sel td,
+html.z #ggrid>a.sel,
+html.z #ggrid>a[tt].sel,
+html.y #ggrid>a.sel,
+html.y #ggrid>a[tt].sel {
 	color: #fff;
 	background: #925;
 	border-color: #c37;
 }
-#files tbody tr.sel:hover td,
-#files tbody tr.sel:focus td,
-#ggrid>a.sel:hover,
-#ggrid>a.sel:focus,
-html.light #ggrid>a.sel:focus,
-html.light #ggrid>a.sel:hover {
+html.z #files tbody tr.sel:hover td,
+html.z #files tbody tr.sel:focus td,
+html.z #ggrid>a.sel:hover,
+html.z #ggrid>a.sel:focus,
+html.y #ggrid>a.sel:focus,
+html.y #ggrid>a.sel:hover {
 	color: #fff;
 	background: #d39;
 	border-color: #d48;
 	text-shadow: 1px 1px 0 #804;
 }
-#ggrid>a.sel,
-html.light #ggrid>a.sel {
+html.z #ggrid>a.sel,
+html.y #ggrid>a.sel {
 	border-top: 1px solid #d48;
 	box-shadow: 0 .1em 1.2em #b36;
 	transition: all 0.2s cubic-bezier(.2, 2.2, .5, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
@@ -293,6 +320,10 @@ html.light #ggrid>a.sel {
 #ggrid>a.play img {
 	box-shadow: 0 0 1em #b83;
 }
+#ggrid a {
+	scroll-margin-top: 25vh;
+	scroll-margin-bottom: 20vh;
+}
 #files tr.sel a {
 	color: #fff;
 }
@@ -307,12 +338,12 @@ html.light #ggrid>a.sel {
 	outline: none;
 	position: relative;
 }
-#files tr:focus td {
+#files tr:focus td+td {
 	background: #111;
-	border-color: #fc0 #111 #fc0 #111;
 	box-shadow: 0 .2em 0 #fc0, 0 -.2em 0 #fc0;
 }
 #files tr:focus td:first-child {
+	background: #111;
 	box-shadow: -.2em .2em 0 #fc0, -.2em -.2em 0 #fc0;
 }
 #widget {
@@ -436,7 +467,7 @@ html.light #ggrid>a.sel {
 #wfm a.hide {
 	display: none;
 }
-html.light #wfm a:not(.en) {
+html.y #wfm a:not(.en) {
 	color: #c4a;
 }
 #files tbody tr.fcut td {
@@ -477,15 +508,12 @@ html.light #wfm a:not(.en) {
 	left: 1em;
 }
 #pctl a {
-	background: rgba(0,0,0,0.1);
 	display: inline-block;
 	font-size: 1.25em;
 	width: 1.3em;
 	height: 1.2em;
 	text-align: center;
-	margin-right: .5em;
 	border-radius: .3em;
-	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
 }
 #pvol {
 	position: absolute;
@@ -506,6 +534,11 @@ html.light #wfm a:not(.en) {
 		height: 1.6em;
 		bottom: auto;
 	}
+	html.b #barpos,
+	html.b #barbuf {
+		width: calc(100% - 19.5em);
+		left: 8.5em;
+	}
 	#widget {
 		bottom: -3.2em;
 		height: 3.2em;
@@ -525,6 +558,11 @@ html.light #wfm a:not(.en) {
 		margin-top: 1em;
 	}
 }
+@media (max-width: 54em) {
+	html.b #ops {
+		margin-top: 1.7em;
+	}
+}
 
 
 
@@ -536,8 +574,9 @@ html.light #wfm a:not(.en) {
 }
 #ops a {
 	color: #fc5;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 	font-size: 1.5em;
-	padding: .25em .3em;
+	padding: .25em .4em;
 	margin: 0;
 	outline: none;
 }
@@ -545,8 +584,6 @@ html.light #wfm a:not(.en) {
 	background: #281838;
 	border-radius: 0 0 .2em .2em;
 	border-bottom: .3em solid #d90;
-	box-shadow: 0 -.15em .2em #000 inset;
-	padding-bottom: .3em;
 }
 #ops a svg {
 	width: 1.75em;
@@ -554,14 +591,10 @@ html.light #wfm a:not(.en) {
 	margin: -.5em -.3em;
 }
 #ops {
-	margin: 1.7em 1.5em 0 1.5em;
 	padding: .3em .6em;
-	border-radius: .3em;
-	border-width: 1px 0;
 	white-space: nowrap;
 }
 .opbox {
-	margin: 1.5em 0 0 0;
 	padding: .5em;
 	border-radius: 0 .3em .3em 0;
 	border-width: 1px 1px 1px 0;
@@ -580,7 +613,7 @@ html.light #wfm a:not(.en) {
 	padding: .2em .3em;
 }
 .opview input.err,
-html.light .opview input[type="text"].err {
+html.y .opview input[type="text"].err {
 	color: #fff;
 	background: #a20;
 	border-color: #f00;
@@ -702,8 +735,7 @@ input.eq_gain {
 	-ms-scroll-chaining: none;
 	overscroll-behavior-y: none;
 	scrollbar-color: #eb0 #333;
-	border: 1px solid #333;
-	box-shadow: 0 0 1em #181818;
+	box-shadow: 0 0 1em #181818, 0 -1px 0 rgba(128,128,128,0.3);
 }
 #treeh {
 	position: sticky;
@@ -724,9 +756,6 @@ input.eq_gain {
 }
 #treepar.off {
 	display: none;
-}
-#tree, #treeh {
-	border-radius: 0 .3em 0 0;
 }
 .np_open #thx_ff {
 	padding: 4.5em 0;
@@ -750,7 +779,6 @@ input.eq_gain {
 .btn {
 	padding: .2em .4em;
 	font-size: 1.2em;
-	border-radius: .3em;
 	margin: .2em;
 	white-space: pre;
 	position: relative;
@@ -783,11 +811,7 @@ input.eq_gain {
 #tree li {
 	margin-left: 1em;
 	list-style: none;
-	border-top: 1px solid #444;
-	border-bottom: 1px solid #111;
-}
-#tree li:last-child {
-	border-bottom: none;
+	border-top: 1px solid #555;
 }
 #tree ul a.sel {
 	background: #111;
@@ -819,7 +843,7 @@ input.eq_gain {
 	min-width: calc(var(--nav-sz) - 2em);
 	width: auto;
 }
-html.light #tree.nowrap .ntree a+a:hover {
+html.y #tree.nowrap .ntree a+a:hover {
 	background: rgba(255, 255, 255, 0.67);
 	color: #000;
 }
@@ -865,9 +889,9 @@ html.light #tree.nowrap .ntree a+a:hover {
 	color: #f5a;
 }
 #files tbody tr.play td,
+#files tbody tr.play td+td,
 #files tbody tr.play div a {
 	background: #fc4;
-	border-color: transparent;
 	color: #400;
 	text-shadow: none;
 }
@@ -908,7 +932,6 @@ html.light #tree.nowrap .ntree a+a:hover {
 .opbox h3 {
 	margin: .8em 0 0 .6em;
 	padding: 0;
-	border-bottom: 1px solid #555;
 }
 #thumbs,
 #au_fullpre,
@@ -938,8 +961,8 @@ html.light #tree.nowrap .ntree a+a:hover {
 	top: -.3em;
 	z-index: 1;
 }
-html.light .ghead {
-	background: #f7f7f7;
+html.y .ghead {
+	background: #eaeaea;
 	border-color: #ddd;
 }
 .ghead .btn {
@@ -1028,7 +1051,7 @@ html.np_open #ggrid>a.au:before {
 	padding: 1em;
 	z-index: 765;
 }
-html.light #rui {
+html.y #rui {
 	color: #fff;
 }
 #rui div+div {
@@ -1104,9 +1127,9 @@ html.light #rui {
 	box-shadow: 0 0 .5em #333;
 	background: linear-gradient(90deg, #111, #222);
 }
-html.light #doc .line-highlight {
+html.y #doc .line-highlight {
 	box-shadow: 0 0 .5em #ccc;
-	background: linear-gradient(90deg, #fff, #eee);
+	background: linear-gradient(90deg, #fff, #eaeaea);
 }
 #docul li {
 	margin: 0;
@@ -1169,22 +1192,8 @@ html,
 #srv_info {
 	background: #222;
 }
-#ops,
-.opbox,
-#path,
-#srch_form,
-.ghead {
-	background: #2b2b2b;
-	border: 1px solid #333;
-	box-shadow: 0 0 .3em #111;
-}
-#files tr:nth-child(2n+1) td {
+#files tr:nth-child(2n) td {
 	background: #282828;
-}
-#tree,
-#treeh,
-#treepar {
-	background: #2b2b2b;
 }
 #wtoggle,
 #widgeti {
@@ -1199,31 +1208,29 @@ html,
 
 
 
-#ggrid>a {
-	background: #2c2c2c;
-	border: 1px solid #383838;
-	border-top: 1px solid #444;
-	box-shadow: 0 .1em .2em #181818;
-}
-#ggrid>a[tt] {
+html.az #ggrid>a[tt] {
 	background: linear-gradient(135deg, #2c2c2c 95%, #444 95%);
 }
-#ggrid>a:focus,
-#ggrid>a:hover {
+html.bz #ggrid>a[tt] {
+	background: linear-gradient(135deg, #222 95%, #555 95%);
+}
+html.z #ggrid>a:focus,
+html.z #ggrid>a:hover {
 	background: #383838;
 	border-color: #555;
 	color: #fd9;
 }
-html.light #ggrid>a {
-	background: #f7f7f7;
-	border-color: #ddd;
-	box-shadow: 0 .1em .2em #ddd;
+html.y #ggrid>a {
+	border-color: #eaeaea;
 }
-html.light #ggrid>a[tt] {
+html.y #ggrid>a[tt] {
 	background: linear-gradient(135deg, #f7f7f7 95%, #ccc 95%);
 }
-html.light #ggrid>a:focus,
-html.light #ggrid>a:hover {
+html.by #ggrid>a[tt] {
+	background: linear-gradient(135deg, #eaeaea 95%, #aaa 95%);
+}
+html.y #ggrid>a:focus,
+html.y #ggrid>a:hover {
 	background: #fff;
 	border-color: #ccc;
 	color: #015;
@@ -1234,252 +1241,232 @@ html.light #ggrid>a:hover {
 
 
 
-html.light {
+html.y {
 	color: #333;
 	background: #eaeaea;
 	text-shadow: none;
 }
-html.light #ops,
-html.light .opbox,
-html.light #path,
-html.light #doc,
-html.light #srch_form,
-html.light .ghead,
-html.light #u2etas {
+html.y #doc {
 	background: #f7f7f7;
 	box-shadow: 0 0 .3em #ccc;
 	border-color: #f7f7f7;
 }
-html.light #wrap.doc {
+html.y #wrap.doc {
 	background: #f7f7f7;
 }
-html.light #ops a.act {
-	box-shadow: 0 .2em .2em #ccc;
+html.y #ops a.act {
 	background: #fff;
 	border-color: #07a;
 	padding-top: .4em;
 }
-html.light #ops svg circle {
+html.y #ops svg circle {
 	stroke: black;
 }
-html.light #op_cfg h3 {
+html.y #op_cfg h3 {
 	border-color: #ccc;
 }
-html.light .btn {
-	color: #666;
-	background: #ddd;
-	box-shadow: none;
-}
-html.light .btn:hover {
+html.y .btn:hover {
 	background: #caf;
 }
-html.light .tgl.btn.on {
+html.y .tgl.btn.on {
 	background: #4a0;
 	color: #fff;
 }
-html.light .tgl.btn.on:hover {
+html.y .tgl.btn.on:hover {
 	background: #5c0;
 }
-html.light #srv_info {
+html.y #srv_info {
 	color: #c83;
-	background: #eee;
+	background: #eaeaea;
 }
-html.light #srv_info,
-html.light #acc_info {
+html.y #srv_info,
+html.y #acc_info {
 	text-shadow: 1px 1px 0 #fff;
 }
-html.light #srv_info span {
+html.y #srv_info span,
+html.y #acc_info span {
 	color: #777;
 }
-html.light #tree .ntree a+a {
+html.y #tree .ntree a+a {
 	background: inherit;
 	color: #06a;
 }
-html.light #tree ul a.hl {
+html.y #tree ul a.hl {
 	background: #07a;
 	color: #fff;
 }
-html.light #tree ul a.par {
+html.y #tree ul a.par {
 	color: #000;
 }
-html.light #tree ul a.hl:hover {
+html.y #tree ul a.hl:hover {
 	background: #059;
 }
-html.light #tree li,
-html.light #treepar {
-	border-color: #f7f7f7 #fff #ddd #fff;
+html.y #treeh,
+html.y #tree li {
+	border-color: #bbb;
 }
-html.light #tree ul a:hover {
+html.y #tree ul a:hover {
 	background: #fff;
 }
-html.light #tree ul {
+html.y #tree ul {
 	border-color: #ccc;
 }
-html.light a,
-html.light #ops a,
-html.light #files tbody div a:last-child {
+html.y a,
+html.y #ops a,
+html.y #files tbody div a:last-child {
 	color: #06a;
 }
-html.light .s0:after,
-html.light .s0r:after {
+html.y .s0:after,
+html.y .s0r:after {
 	color: #059;
 }
-html.light .s1:after,
-html.light .s1r:after {
+html.y .s1:after,
+html.y .s1r:after {
 	color: #f5d;
 }
-html.light #files thead th {
+html.y #files thead th {
 	background: #eaeaea;
 	border-color: #ccc;
 }
-html.light #files tbody td {
-	background: #eee;
-	border-color: #ccc;
+html.y #files tbody td {
+	background: #eaeaea;
 }
-html.light #files tr:nth-child(2n+1) td {
-	background: #f7f7f7;
+html.y #files tr:nth-child(2n) td {
+	background: #f2f2f2;
 }
-html.light #files tbody tr:last-child td {
-	border-bottom: 1px solid #ccc;
-}
-html.light #files tr:focus td {
+html.y #files tr:focus td+td {
 	background: #fff;
-	border-color: #c37;
 	box-shadow: 0 .2em 0 #e80 , 0 -.2em 0 #e80;
 }
-html.light #files tr:focus td:first-child {
+html.y #files tr:focus td:first-child {
+	background: #fff;
 	box-shadow: -.2em .2em 0 #e80, -.2em -.2em 0 #e80;
 }
-html.light #files tr.sel td {
+html.y #files tr.sel td {
 	background: #925;
 }
-html.light #files td:nth-child(2n) {
+html.y #files td:nth-child(2n) {
 	color: #d38;
 }
-html.light #files tr.play td:nth-child(2n) {
+html.y #files tr.play td:nth-child(2n) {
 	color: #c16;
 }
-html.light #files tbody a.play {
+html.y #files tbody a.play {
 	color: #c0f;
 }
-html.light #files tbody a.play.act {
+html.y #files tbody a.play.act {
 	color: #90c;
 }
-html.light #files a.doc {
+html.y #files a.doc {
 	color: #bbb;
 }
-html.light #files a.doc.bri {
+html.y #files a.doc.bri {
 	color: #d38;
 }
-html.light #files tbody tr.play td {
+html.y #files tbody tr.play td {
 	background: #fc5;
-	border-color: #eb1;
 }
-html.light #files tbody tr:hover td {
+html.y #files tbody tr:hover td,
+html.y #files tbody tr:hover td+td {
 	background: #fff;
+	box-shadow: 0 1px 0 #ccc inset, 0 -1px 0 #ccc inset;
 }
-html.light tr.play a {
+html.y tr.play a {
 	color: #406;
 }
-html.light #files th:hover .cfg {
+html.y #files th:hover .cfg {
 	background: #ccc;
 }
-html.light #widget a {
+html.y #widget a {
 	color: #06a;
 }
-html.light #wtoggle,
-html.light #widgeti {
-	background: #eee;
+html.y #wtoggle,
+html.y #widgeti {
+	background: #eaeaea;
 }
-html.light #wtoggle {
+html.y #wtoggle {
 	box-shadow: 0 0 .5em #bbb;
 }
-html.light #widget.open {
+html.y #widget.open {
 	border-top: .2em solid #f7f7f7;
 }
-html.light #wzip,
-html.light #wnp {
+html.y #wzip,
+html.y #wnp {
 	border-color: #ccc;
 }
-html.light #barbuf {
+html.y #barbuf {
 	background: none;
 }
-html.light #files tr.sel:hover td,
-html.light #files tr.sel:focus td {
+html.y #files tr.sel:hover td,
+html.y #files tr.sel:focus td {
 	background: #c37;
 }
-html.light #files tr.sel td {
+html.y #files tr.sel td {
 	color: #fff;
 }
-html.light #files tr.sel a {
+html.y #files tr.sel a {
 	color: #fff;
 }
-html.light #files tr.sel a.play.act {
+html.y #files tr.sel a.play.act {
 	color: #fb0;
 }
-html.light input[type="checkbox"] + label {
+html.y input[type="checkbox"] + label {
 	color: #333;
 }
-html.light input[type="radio"]:checked + label,
-html.light input[type="checkbox"]:checked + label {
+html.y input[type="radio"]:checked + label,
+html.y input[type="checkbox"]:checked + label {
 	color: #07c; 
 }
-html.light .opwide>div {
+html.y .opwide>div {
 	border-color: #ccc;
 }
-html.light .opview input[type="text"] {
+html.y .opview input[type="text"] {
 	background: #fff;
 	color: #333;
 	box-shadow: 0 0 2px #888;
 	border-color: #38d;
 }
-html.light #u2tab a>span,
-html.light #docul .bn a>span,
-html.light #files td div span {
+html.y #u2tab a>span,
+html.y #docul .bn a>span,
+html.y #files td div span {
 	color: #000;
 }
-html.light #path {
+html.y #path {
 	color: #777;
-	background: #f7f7f7;
 	text-shadow: none;
-	box-shadow: 0 0 .3em #bbb;
 }
-html.light #path a:not(:last-child)::after {
+html.y #path a:not(:last-child)::after {
 	border-color: #ccc;
 	background: none;
 	border-width: .1em .1em 0 0;
 	margin: -.2em .3em -.2em -.3em;
 }
-html.light #path a:hover {
+html.y #path a:hover {
 	background: none;
 	color: #90d;
 }
-html.light #files tbody div a {
+html.y #files tbody div a {
 	color: #d38;
 }
-html.light #docul a:hover,
-html.light #files a:hover,
-html.light #files tr.sel a:hover {
+html.y #docul a:hover,
+html.y #files a:hover,
+html.y #files tr.sel a:hover {
 	color: #000;
 	background: #fff;
 	text-decoration: underline;
 }
-html.light #treeh,
-html.light #treepar {
-	background: #f7f7f7;
-	border-color: #ddd;
+html.y #treeh,
+html.y #treepar {
+	background: #eaeaea;
 }
-html.light #tree {
-	border-color: #ddd;
-	box-shadow: 0 0 1em #ddd;
-	background: #f7f7f7;
+html.y #tree {
 	scrollbar-color: #490 #ddd;
 }
-html.light #tree::-webkit-scrollbar-track,
-html.light #tree::-webkit-scrollbar {
+html.y #tree::-webkit-scrollbar-track,
+html.y #tree::-webkit-scrollbar {
 	background: #ddd;
 }
-html.light #tree::-webkit-scrollbar-thumb {
+html.y #tree::-webkit-scrollbar-thumb {
 	background: #490;
 }
 
@@ -1576,7 +1563,7 @@ html.light #tree::-webkit-scrollbar-thumb {
 	border-radius: .4em;
 	padding: .3em .6em;
 }
-html.light #bbox-overlay figcaption a {
+html.y #bbox-overlay figcaption a {
 	color: #0bf;
 }
 .full-image:before {
@@ -1838,19 +1825,12 @@ html.light #bbox-overlay figcaption a {
 	padding: .5em;
 	font-size: .9em;
 }
-html.light #u2err.err {
+html.y #u2err.err {
 	color: #f07;
 }
 #u2btn {
-	color: #eee;
-	background: #555;
-	background: -moz-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
-	background: -webkit-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
-	background: linear-gradient(to bottom, #367 0%, #489 50%, #38788a 51%, #367 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#489', endColorstr='#38788a', GradientType=0);
-	text-decoration: none;
 	line-height: 1.3em;
-	border: 1px solid #222;
+	border: .15em dashed #999;
 	border-radius: .4em;
 	text-align: center;
 	font-size: 1.5em;
@@ -1858,20 +1838,14 @@ html.light #u2err.err {
 	padding: .8em 0;
 	width: 16em;
 	cursor: pointer;
-	box-shadow: .4em .4em 0 #111;
 }
 #u2conf.ww #u2btn {
 	line-height: 1em;
 	padding: .5em 0;
-	margin: -1.5em .5em -3em 0;
-}
-#op_up2k.srch #u2btn {
-	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
-	text-shadow: 1px 1px 1px #fc6;
-	color: #333;
+	margin: -2em 1em -3em 0;
 }
 #u2conf #u2btn {
-	padding: .6em 0;
+	padding: .4em 0;
 	margin: -2em 0;
 	font-size: 1.25em;
 	width: 100%;
@@ -1880,6 +1854,12 @@ html.light #u2err.err {
 }
 #u2conf #u2btn_cw {
 	text-align: right;
+}
+#u2bm {
+	display: block;
+}
+#u2bm sup {
+    font-weight: bold;
 }
 #u2notbtn {
 	display: none;
@@ -1892,7 +1872,7 @@ html.light #u2err.err {
 #u2tabw {
 	min-height: 0;
 	transition: min-height .2s;
-	margin: 3em 0;
+	margin: 2em 0;
 }
 #u2tab {
 	border-collapse: collapse;
@@ -1904,7 +1884,7 @@ html.light #u2err.err {
 	max-width: none;
 }
 #u2tab td {
-	border: 1px solid #ccc;
+	border: 1px solid rgba(128,128,128,0.8);
 	border-width: 0 0px 1px 0;
 	padding: .2em .3em;
 }
@@ -1924,13 +1904,9 @@ html.light #u2err.err {
 	background: #333;
 }
 #u2etas {
-	background: #1c1c1c;
-	border: 1px solid #282828;
-	border-width: .1em 0;
 	padding: .2em .5em;
-	border-radius: .5em;
-	border-width: .25em 0;
 	width: 17em;
+	cursor: pointer;
 	text-align: center;
 	white-space: nowrap;
 	display: inline-block;
@@ -1956,7 +1932,7 @@ html.light #u2err.err {
 }
 #u2cards {
 	padding: 1em 1em .3em 1em;
-	margin: 0 auto -1.5em auto;
+	margin: 0 auto;
 	white-space: nowrap;
 	text-align: center;
 	overflow: hidden;
@@ -1972,16 +1948,16 @@ html.light #u2err.err {
 #u2etaw.w {
 	width: 52em;
 	text-align: right;
-	margin: 3em auto -2.7em auto;
+	margin: 2em auto -2.7em auto;
 }
 #u2etaw.ww {
-	margin: 0 2em 1em 2em;
+	margin: -1em 2em 1em 1em;
 }
 #u2cards a {
 	padding: .2em 1em;
-	border: 1px solid #777;
+	border: 1px solid rgba(128,128,128,0.8);
 	border-width: 0 0 1px 0;
-	background: linear-gradient(to bottom, #222, #2b2b2b);
+	background: linear-gradient(to bottom, #222, #282828);
 }
 #u2cards a:first-child {
 	border-radius: .4em 0 0 0;
@@ -2056,9 +2032,6 @@ html.light #u2err.err {
 	position: relative;
 	bottom: -0.08em;
 }
-#u2conf input+a.b {
-	background: #d80;
-}
 #u2conf .c label {
 	font-size: 1.6em;
 	width: 2em;
@@ -2072,20 +2045,10 @@ html.light #u2err.err {
 	opacity: .02;
 	top: 2em;
 }
-#u2conf input[type="checkbox"]+label {
-	position: relative;
-	background: #603;
-	border-bottom: .2em solid #a16;
-	box-shadow: 0 .1em .3em #a00 inset;
-}
+#u2conf input[type="checkbox"]+label,
 #u2conf input[type="checkbox"]:checked+label {
-	background: #6a1;
-	border-bottom: .2em solid #efa;
-	box-shadow: 0 .1em .5em #0c0;
-}
-#u2conf input[type="checkbox"]+label:hover {
-	box-shadow: 0 .1em .3em #fb0;
-	border-color: #fb0;
+	position: relative;
+	text-shadow: 1px 1px 1px #000, 1px -1px 1px #000, -1px -1px 1px #000, -1px 1px 1px #000;
 }
 #op_up2k.srch #u2conf td:nth-child(1)>*,
 #op_up2k.srch #u2conf td:nth-child(2)>*,
@@ -2106,6 +2069,9 @@ html.light #u2err.err {
 #u2foot {
 	color: #fff;
 	font-style: italic;
+	text-align: center;
+	font-size: .9em;
+	margin: 1em 0;
 }
 #u2foot .warn {
 	font-size: 1.3em;
@@ -2120,21 +2086,18 @@ html.light #u2err.err {
 #u2foot .warn span {
 	color: #f86;
 }
-html.light #u2foot .warn {
+html.y #u2foot .warn {
 	color: #b00;
 	background: #fca;
 	border-color: #f70;
 }
-html.light #u2foot .warn span {
+html.y #u2foot .warn span {
 	color: #930;
 }
 #u2foot span {
 	color: #999;
 	font-size: .9em;
 	font-weight: normal;
-}
-#u2footfoot {
-	margin-bottom: -1em;
 }
 .prog {
 	font-family: 'scp', monospace, monospace;
@@ -2177,35 +2140,364 @@ html.light #u2foot .warn span {
 
 
 
-html.light #u2btn {
-	box-shadow: .4em .4em 0 #ccc;
-}
-html.light #u2cards span {
+html.y #u2cards span {
 	color: #000;
 }
-html.light #u2cards a {
-	background: linear-gradient(to bottom, #eee, #fff);
+html.y #u2cards a {
+	background: linear-gradient(to bottom, #eaeaea, #f7f7f7);
 }
-html.light #u2cards a.act {
-	color: #037;
+html.y #u2cards a.act {
+	color: #000;
 	background: inherit;
-	box-shadow: 0 -.17em .67em #0ad;
-	border-color: #09c #05a #eee #05a;
+	box-shadow: 0 -.1em .2em #fff;
+	border-color: #999 #aaa #eaeaea #aaa;
 }
-html.light #u2conf .txtbox {
-	background: #fff;
+html.y #u2conf .txtbox {
 	color: #444;
 }
-html.light #u2conf .txtbox.err {
+html.y #u2conf .txtbox.err {
 	background: #f96;
 	color: #300;
 }
-html.light #op_up2k.srch #u2btn {
-	border-color: #a80;
+html.y #op_up2k.srch #u2btn {
+	border-color: #b90;
 }
-html.light #u2foot {
+html.y #u2foot {
 	color: #000;
 }
-html.light #u2tab tbody tr:hover td {
+html.y #u2tab tbody tr:hover td {
 	background: #fff;
+}
+
+
+
+
+
+
+
+html.a #path {
+	border-radius: 0 .3em .3em 0;
+}
+html.a #pctl a {
+	background: rgba(0,0,0,0.1);
+	margin-right: .5em;
+	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
+}
+html.a #ops a.act {
+	box-shadow: 0 -.15em .2em #000 inset;
+	padding-bottom: .3em;
+}
+html.a #ops {
+	margin: 1.7em 1.5em 0 1.5em;
+	border-radius: .3em;
+	border-width: 1px 0;
+}
+html.a .opbox {
+	margin: 1.5em 0 0 0;
+}
+html.a #tree,
+html.a #treeh {
+	border-radius: 0 .3em 0 0;
+}
+html.a .btn {
+	border-radius: .3em;
+}
+html.a #tree li {
+	border-top: 1px solid #444;
+	border-bottom: 1px solid #111;
+}
+html.a #tree li:last-child {
+	border-bottom: none;
+}
+html.a .opbox h3 {
+	border-bottom: 1px solid #555;
+}
+html.a #ops,
+html.a .opbox,
+html.a #path,
+html.a #srch_form,
+html.a .ghead {
+	background: #2b2b2b;
+	border: 1px solid #333;
+	box-shadow: 0 0 .3em #111;
+}
+html.a #tree,
+html.a #treeh,
+html.a #treepar {
+	background: #2b2b2b;
+}
+html.a #ggrid>a {
+	background: #2c2c2c;
+	border: 1px solid #383838;
+	border-top: 1px solid #444;
+	box-shadow: 0 .1em .2em #181818;
+}
+html.a #u2btn {
+	color: #eee;
+	background: #555;
+	background: -moz-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
+	background: -webkit-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
+	background: linear-gradient(to bottom, #367 0%, #489 50%, #38788a 51%, #367 100%);
+	box-shadow: .4em .4em 0 #111;
+	border: 1px solid #222;
+}
+html.ay #u2btn {
+	box-shadow: .4em .4em 0 #ccc;
+}
+html.a #u2conf.ww #u2btn {
+	margin: -2em .5em -3em 0;
+	padding: .9em 0;
+}
+html.a #op_up2k.srch #u2btn {
+	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
+	text-shadow: 1px 1px 1px #fc6;
+	color: #333;
+}
+html.a #u2conf #u2btn {
+	padding: .6em 0;
+	margin-top: -2.6em;
+}
+html.a #u2etas {
+	background: #1c1c1c;
+	border: 1px solid #282828;
+	border-width: .1em 0;
+	border-radius: .5em;
+	border-width: .25em 0;
+}
+html.a #u2cards {
+	margin: 0 auto -1em auto;
+}
+html.ay #u2cards a {
+	background: linear-gradient(to bottom, #eee, #fff);
+}
+html.ay #u2cards a.act {
+	color: #037;
+	box-shadow: 0 -.17em .67em #0ad;
+	border-color: #09c #05a #eee #05a;
+}
+html.a #u2conf input+a.b {
+	background: #d80;
+}
+html.ay #u2conf .txtbox {
+	background: #fff;
+}
+html.a #u2conf input[type="checkbox"]+label {
+	position: relative;
+	background: #603;
+	border-bottom: .2em solid #a16;
+	box-shadow: 0 .1em .3em #a00 inset;
+}
+html.a #u2conf input[type="checkbox"]:checked+label {
+	background: #6a1;
+	border-bottom: .2em solid #efa;
+	box-shadow: 0 .1em .5em #0c0;
+}
+html.a #u2conf input[type="checkbox"]+label:hover {
+	box-shadow: 0 .1em .3em #fb0;
+	border-color: #fb0;
+}
+html.a #u2foot:empty {
+	margin-bottom: -1em;
+}
+html.ay #ops,
+html.ay .opbox,
+html.ay #path,
+html.ay #doc,
+html.ay #srch_form,
+html.ay .ghead,
+html.ay #u2etas {
+	background: #f7f7f7;
+	box-shadow: 0 0 .3em #ccc;
+	border-color: #f7f7f7;
+}
+html.ay #ggrid>a {
+	background: #f7f7f7;
+	border-color: #ddd;
+	box-shadow: 0 .1em .2em #ddd;
+}
+html.ay #ops a.act {
+	box-shadow: 0 .2em .2em #ccc;
+}
+html.ay .btn {
+	color: #666;
+	background: #ddd;
+	box-shadow: none;
+}
+html.ay #tree li,
+html.ay #treepar {
+	border-color: #f7f7f7 #fff #ddd #fff;
+}
+html.ay #path {
+	background: #f7f7f7;
+	box-shadow: 0 0 .3em #bbb;
+}
+html.ay #treeh,
+html.ay #treepar {
+	background: #f7f7f7;
+	border-color: #ddd;
+}
+html.ay #tree {
+	border-color: #ddd;
+	box-shadow: 0 0 1em #ddd;
+	background: #f7f7f7;
+}
+
+
+
+
+
+html.b #path {
+	margin: 1.3em 0;
+}
+html.b.op_open #path {
+	margin-top: .2em;
+}
+html.b #srv_info {
+	display: none;
+}
+html.b #srv_info2 {
+	display: inline-block;
+}
+html.b #srv_info2:after {
+	content: '//';
+	margin: 0 .4em;
+}
+html.b #acc_info {
+	right: .5em;
+}
+html.b #wtoggle {
+	border-radius: .1em 0 0 0;
+}
+html.b #barpos,
+html.b #barbuf,
+html.b #pvol {
+	border-radius: .2em;
+	background: none;
+}
+html.b #barpos {
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+}
+html.by #barpos {
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
+}
+html.b #ops {
+	position: relative;
+	z-index: 2;
+}
+html.b #ops a {
+	background: var(--bg);
+}
+html.b #ops a.act {
+	background: rgba(255,255,255,0.06);
+}
+html.b .opview {
+	margin: 1em 0;
+}
+html.b #srch_q {
+	margin: .2em 0 0 1.6em;
+}
+html.b #srch_q:empty {
+	margin-bottom: -1em;
+}
+html.b #wrap {
+	margin-top: .3em;
+}
+html.b #tree {
+	box-shadow: 0 -1px 0 rgba(128,128,128,0.4);
+}
+html.b #treeh {
+	border-bottom: 1px solid #555;
+}
+html.b #treepar {
+	border-bottom: .2em solid #999;
+}
+html.b #treeul>li:first-child {
+	border-top: none;
+}
+html.b .btn {
+	top: -.1em;
+}
+html.by #u2conf a.b,
+html.by .btn {
+	color: #555;
+}
+html.b #u2conf input[type="checkbox"]+label:hover,
+html.b #u2conf a.b:hover,
+html.b .btn:hover {
+	background: #805;
+	color: #fff;
+}
+html.b #u2conf input[type="checkbox"]:checked+label {
+	color: #400;
+	background: #fc4;
+}
+html.b #u2conf input[type="checkbox"]:checked+label:hover {
+	background: #fe8;
+}
+html.bz .ghead {
+	background: #222;
+	padding: .2em 0;
+}
+html.b #rui input[readonly] {
+	background: #333;
+}
+html.bz #treeh,
+html.bz #treepar {
+	background: #222;
+}
+html.b .btn,
+html.b #u2conf input[type="checkbox"]+label,
+html.b .opview input[type=text] {
+	background: rgba(128,128,128,0.15);
+	border-radius: .2em;
+}
+html.bz #ggrid>a {
+	border: 1px solid #222;
+	border-top: 1px solid #333;
+}
+html.by #ggrid>a {
+	border-color: #eaeaea;
+}
+html.by #u2conf input[type="checkbox"]+label:hover,
+html.by #u2conf a.b:hover {
+	background: #caf;
+}
+html.by #u2conf input[type="checkbox"]:checked+label {
+	background: #4a0;
+	color: #fff;
+}
+html.by #treeh,
+html.by #tree li {
+	border-color: #bbb;
+}
+html.b #op_up2k.srch sup {
+    color: #fc0;
+}
+html.by #u2btn sup {
+    color: #06b;
+}
+html.by #op_up2k.srch sup {
+    color: #b70;
+}
+html.bz #u2cards a {
+	background: linear-gradient(to bottom, #222, #2b2b2b);
+}
+html.bz #u2cards a.act {
+	box-shadow: 0 -.1em .2em #181818;
+	background: #222;
+	color: #fff;
+}
+html.b #u2conf {
+	margin: 2em auto 0 auto;
+}
+html.b #u2conf .txtbox {
+	background: transparent;
+	border: none;
+}
+html.b #u2conf a.b {
+	background: rgba(128,128,128,0.15);
+	border-radius: .2em;
+}
+html.by #u2cards a.act {
+	border-width: 2px;
 }

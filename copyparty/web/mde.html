@@ -34,11 +34,11 @@ var md_opt = {
 
 var lightswitch = (function () {
 	var l = localStorage,
-		drk = l.lightmode != 1,
+		drk = l.light != 1,
 		f = function (e) {
 if (e) drk = !drk;
 document.documentElement.setAttribute("class", drk? "dark":"light");
-l.lightmode = drk? 0:1;
+l.light = drk? 0:1;
 		};
 	f();
 	return f;

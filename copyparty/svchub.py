@@ -70,6 +70,10 @@ class SvcHub(object):
 
             self.log("root", m, c=3)
 
+        bri = "zy"[args.theme % 2 :][:1]
+        ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
+        args.theme = "{0}{1} {0} {1}".format(ch, bri)
+
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log)
         if args.ls:

@@ -134,6 +134,9 @@
 	<script>
 		var acct = "{{ acct }}",
 			perms = {{ perms }},
+			themes = {{ themes }},
+			dtheme = "{{ dtheme }}",
+			srvinf = "{{ srv_info }}",
 			def_hcols = {{ def_hcols|tojson }},
 			have_up2k_idx = {{ have_up2k_idx|tojson }},
 			have_tags_idx = {{ have_tags_idx|tojson }},
@@ -147,7 +150,7 @@
 			readme = {{ readme|tojson }},
 			ls0 = {{ ls0|tojson }};
 
-		document.documentElement.setAttribute("class", localStorage.lightmode == 1 ? "light" : "dark");
+		document.documentElement.setAttribute("class", localStorage.theme || dtheme);
 	</script>
 	<script src="/.cpr/util.js?_={{ ts }}"></script>
 	<script src="/.cpr/browser.js?_={{ ts }}"></script>

@@ -2149,12 +2149,11 @@ class HttpCli(object):
                     free = humansize(sv.f_frsize * sv.f_bfree, True)
                     total = humansize(sv.f_frsize * sv.f_blocks, True)
 
-                    srv_info.append(free + " free")
-                    srv_info.append(total)
+                    srv_info.append("{} free of {}".format(free, total))
         except:
             pass
 
-        srv_info = "</span> /// <span>".join(srv_info)
+        srv_info = "</span> // <span>".join(srv_info)
 
         perms = []
         if self.can_read:
@@ -2227,6 +2226,8 @@ class HttpCli(object):
             "readme": readme,
             "title": html_escape(self.vpath, crlf=True),
             "srv_info": srv_info,
+            "dtheme": self.args.theme,
+            "themes": self.args.themes,
         }
         if not self.can_read:
             if is_ls:
