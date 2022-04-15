@@ -84,24 +84,24 @@ html .editor-toolbar>button.save.force-save {
 
 
 /* darkmode */
-html.dark .mdo,
-html.dark .CodeMirror {
+html.z .mdo,
+html.z .CodeMirror {
 	border-color: #222;
 }
-html.dark,
-html.dark body,
-html.dark .CodeMirror {
+html.z,
+html.z body,
+html.z .CodeMirror {
 	background: #222;
 	color: #ccc;
 }
-html.dark .CodeMirror-cursor {
+html.z .CodeMirror-cursor {
 	border-color: #fff;
 }
-html.dark .CodeMirror-selected {
+html.z .CodeMirror-selected {
 	box-shadow: 0 0 1px #0cf inset;
 }
-html.dark .CodeMirror-selected,
-html.dark .CodeMirror-selectedtext {
+html.z .CodeMirror-selected,
+html.z .CodeMirror-selectedtext {
 	border-radius: .1em;
 	background: #246;
 	color: #fff;
@@ -109,37 +109,37 @@ html.dark .CodeMirror-selectedtext {
 
 
 
-html.dark #mn a {
+html.z #mn a {
 	color: #ccc;
 }
-html.dark #mn a:not(:last-child):after {
+html.z #mn a:not(:last-child):after {
 	border-color: rgba(255,255,255,0.3);
 }
-html.dark .editor-toolbar {
+html.z .editor-toolbar {
 	border-color: #2c2c2c;
 	background: #1c1c1c;
 }
-html.dark .editor-toolbar>i.separator {
+html.z .editor-toolbar>i.separator {
 	border-left: 1px solid #444;
 	border-right: 1px solid #111;
 }
-html.dark .editor-toolbar>button {
+html.z .editor-toolbar>button {
 	margin-left: -1px; border: 1px solid rgba(255,255,255,0.1);
 	color: #aaa;
 }
 
 
 
-html.dark .editor-toolbar>button:hover {
+html.z .editor-toolbar>button:hover {
 	color: #333;
 }
-html.dark .editor-toolbar>button.active {
+html.z .editor-toolbar>button.active {
 	color: #333;
 	border-color: #ec1;
 	background: #c90;
 }
-html.dark .editor-toolbar::after,
-html.dark .editor-toolbar::before {
+html.z .editor-toolbar::after,
+html.z .editor-toolbar::before {
 	background: none;
 }
 
@@ -150,6 +150,6 @@ html.dark .editor-toolbar::before {
 	padding: 1em;
 	background: #f7f7f7;
 }
-html.dark .mdo {
+html.z .mdo {
 	background: #1c1c1c;
 }

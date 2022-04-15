@@ -61,7 +61,7 @@
 	position: relative;
 	scrollbar-color: #eb0 #f7f7f7;
 }
-html.dark #mt {
+html.z #mt {
 	color: #eee;
 	background: #222;
 	border: 1px solid #777;
@@ -77,7 +77,7 @@ html.dark #mt {
 	background: #f97;
 	border-radius: .15em;
 }
-html.dark #save.force-save {
+html.z #save.force-save {
 	color: #fca;
 	background: #720;
 }
@@ -102,7 +102,7 @@ html.dark #save.force-save {
 #helpclose {
 	display: block;
 }
-html.dark #helpbox {
+html.z #helpbox {
 	box-shadow: 0 .5em 2em #444;
 	background: #222;
 	border: 1px solid #079;

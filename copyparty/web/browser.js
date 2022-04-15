@@ -4650,7 +4650,7 @@ var settheme = (function () {
 		light = i % 2 == 1;
 		var c = ax.charAt(Math.floor(i / 2)),
 			l = light ? 'y' : 'z';
-		theme = c + l + ' ' + c + ' ' + l + ' ' + (light ? 'light ' : 'dark ');
+		theme = c + l + ' ' + c + ' ' + l;
 		swrite('theme', theme);
 		freshen();
 	}

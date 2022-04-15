@@ -157,23 +157,23 @@ html {
 #tt em {
 	color: #f6a;
 }
-html.light #tt {
+html.y #tt {
 	background: #fff;
 	border-color: #888 #000 #777 #000;
 }
-html.light #tt,
-html.light #toast {
+html.y #tt,
+html.y #toast {
 	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
 #modalc code,
-html.light #tt code {
+html.y #tt code {
 	background: #060;
 	color: #fff;
 }
-html.light #tt em {
+html.y #tt em {
 	color: #d38;
 }
-html.light #tth {
+html.y #tth {
 	color: #000;
 	background: #fff;
 }
@@ -273,9 +273,9 @@ html.light #tth {
 	box-shadow: 0 .1em .2em #fc0 inset;
 	border-radius: .2em;
 }
-html.light *:focus,
-html.light #pctl *:focus,
-html.light .btn:focus {
+html.y *:focus,
+html.y #pctl *:focus,
+html.y .btn:focus {
 	box-shadow: 0 .1em .2em #037 inset;
 }
 input[type="text"]:focus,
@@ -283,9 +283,9 @@ input:not([type]):focus,
 textarea:focus {
 	box-shadow: 0 .1em .3em #fc0, 0 -.1em .3em #fc0;
 }
-html.light input[type="text"]:focus,
-html.light input:not([type]):focus,
-html.light textarea:focus {
+html.y input[type="text"]:focus,
+html.y input:not([type]):focus,
+html.y textarea:focus {
 	box-shadow: 0 .1em .3em #037, 0 -.1em .3em #037;
 }
 
@@ -414,7 +414,7 @@ html.light textarea:focus {
 		overflow-wrap: break-word;
 		word-wrap: break-word; /*ie*/
 	}
-	html.light .mdo a,
+	html.y .mdo a,
 	.mdo a {
 		color: #fff;
 		background: #39b;
@@ -443,48 +443,48 @@ html.light textarea:focus {
 
 
 
-	html.dark .mdo a {
+	html.z .mdo a {
 		background: #057;
 	}
-	html.dark .mdo h1 a, html.dark .mdo h4 a,
-	html.dark .mdo h2 a, html.dark .mdo h5 a,
-	html.dark .mdo h3 a, html.dark .mdo h6 a {
+	html.z .mdo h1 a, html.z .mdo h4 a,
+	html.z .mdo h2 a, html.z .mdo h5 a,
+	html.z .mdo h3 a, html.z .mdo h6 a {
 		color: inherit;
 		background: none;
 	}
-	html.dark .mdo pre,
-	html.dark .mdo code {
+	html.z .mdo pre,
+	html.z .mdo code {
 		color: #8c0;
 		background: #1a1a1a;
 		border: .07em solid #333;
 	}
-	html.dark .mdo ul,
-	html.dark .mdo ol {
+	html.z .mdo ul,
+	html.z .mdo ol {
 		border-color: #444;
 	}
-	html.dark .mdo strong {
+	html.z .mdo strong {
 		color: #fff;
 	}
-	html.dark .mdo p>em,
-	html.dark .mdo li>em,
-	html.dark .mdo td>em {
+	html.z .mdo p>em,
+	html.z .mdo li>em,
+	html.z .mdo td>em {
 		color: #f94;
 		border-color: #666;
 	}
-	html.dark .mdo h1 {
+	html.z .mdo h1 {
 		background: #383838;
 		border-top: .4em solid #b80;
 		border-bottom: .4em solid #4c4c4c;
 	}
-	html.dark .mdo h2 {
+	html.z .mdo h2 {
 		background: #444;
 		border-bottom: .22em solid #555;
 	}
-	html.dark .mdo td,
-	html.dark .mdo th {
+	html.z .mdo td,
+	html.z .mdo th {
 		border-color: #444;
 	}
-	html.dark .mdo blockquote {
+	html.z .mdo blockquote {
 		background: #282828;
 		border: .07em dashed #444;
 	}

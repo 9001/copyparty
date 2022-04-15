@@ -88,27 +88,27 @@ blockquote {
 }
 
 
-html.dark,
-html.dark body,
-html.dark #wrap {
+html.z,
+html.z body,
+html.z #wrap {
 	background: #222;
 	color: #ccc;
 }
-html.dark h1 {
+html.z h1 {
 	border-color: #777;
 }
-html.dark a {
+html.z a {
 	color: #fff;
 	background: #057;
 	border-color: #37a;
 }
-html.dark .logout,
-html.dark .btns a,
-html.dark a.r {
+html.z .logout,
+html.z .btns a,
+html.z a.r {
 	background: #804;
 	border-color: #c28;
 }
-html.dark input {
+html.z input {
 	color: #fff;
 	background: #626;
 	border: 1px solid #c2c;
@@ -117,6 +117,6 @@ html.dark input {
 	padding: .5em .7em;
 	margin: 0 .5em 0 0;
 }
-html.dark .num {
+html.z .num {
 	border-color: #777;
 }

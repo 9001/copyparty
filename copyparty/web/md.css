@@ -219,48 +219,48 @@ blink {
 
 
 
-	html.dark,
-	html.dark body {
+	html.z,
+	html.z body {
 		background: #222;
 		color: #ccc;
 	}
-	html.dark #toc a {
+	html.z #toc a {
 		color: #ccc;
 		border-left: .4em solid #444;
 		border-bottom: .1em solid #333;
 	}
-	html.dark #toc a.act {
+	html.z #toc a.act {
 		color: #fff;
 		border-left: .4em solid #3ad;
 	}
-	html.dark #toc li {
+	html.z #toc li {
 		border-width: 0;
 	}
-	html.dark #mn a:not(:last-child)::after {
+	html.z #mn a:not(:last-child)::after {
 		border-color: rgba(255,255,255,0.3);
 	}
-	html.dark #mn a {
+	html.z #mn a {
 		color: #ccc;
 	}
-	html.dark #mn {
+	html.z #mn {
 		border-bottom: 1px solid #333;
 	}
-	html.dark #mn,
-	html.dark #mh {
+	html.z #mn,
+	html.z #mh {
 		background: #222;
 	}
-	html.dark #mh a {
+	html.z #mh a {
 		color: #ccc;
 		background: none;
 	}
-	html.dark #mh a:hover {
+	html.z #mh a:hover {
 		background: #333;
 		color: #fff;
 	}
-	html.dark #toolsbox {
+	html.z #toolsbox {
 		background: #222;
 	}
-	html.dark #toolsbox.open {
+	html.z #toolsbox.open {
 		box-shadow: 0 .2em .2em #069;
 		border-radius: 0 0 .4em .4em;
 	}
@@ -308,23 +308,23 @@ blink {
 
 
 	
-	html.dark #toc {
+	html.z #toc {
 		background: #282828;
 		border-top: 1px solid #2c2c2c;
 		box-shadow: 0 0 1em #181818;
 	}
-	html.dark #toc,
-	html.dark #mw {
+	html.z #toc,
+	html.z #mw {
 		scrollbar-color: #b80 #282828;
 	}
-	html.dark #toc::-webkit-scrollbar-track {
+	html.z #toc::-webkit-scrollbar-track {
 		background: #282828;
 	}
-	html.dark #toc::-webkit-scrollbar {
+	html.z #toc::-webkit-scrollbar {
 		background: #282828;
 		width: .8em;
 	}
-	html.dark #toc::-webkit-scrollbar-thumb {
+	html.z #toc::-webkit-scrollbar-thumb {
 		background: #b80;
 	}
 }
@@ -432,16 +432,16 @@ blink {
 
 
 	
-	html.dark .mdo a {
+	html.z .mdo a {
 		color: #000;
 	}
-	html.dark .mdo pre,
-	html.dark .mdo code {
+	html.z .mdo pre,
+	html.z .mdo code {
 		color: #240;
 	}
-	html.dark .mdo p>em,
-	html.dark .mdo li>em,
-	html.dark .mdo td>em {
+	html.z .mdo p>em,
+	html.z .mdo li>em,
+	html.z .mdo td>em {
 		color: #940;
 	}
 }
