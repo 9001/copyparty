@@ -794,6 +794,7 @@ input.eq_gain {
 }
 .tgl.btn.on:hover {
 	background: #fe8;
+	color: #400;
 }
 #detree {
 	padding: .3em .5em;
@@ -1275,6 +1276,12 @@ html.y .tgl.btn.on {
 html.y .tgl.btn.on:hover {
 	background: #5c0;
 }
+html.by .tgl.btn.on {
+	background: #04a;
+}
+html.by .tgl.btn.on:hover {
+	background: #05c;
+}
 html.y #srv_info {
 	color: #c83;
 	background: #eaeaea;
@@ -1462,12 +1469,18 @@ html.y #treepar {
 html.y #tree {
 	scrollbar-color: #490 #ddd;
 }
+html.by #tree {
+	scrollbar-color: #049 #ddd;
+}
 html.y #tree::-webkit-scrollbar-track,
 html.y #tree::-webkit-scrollbar {
 	background: #ddd;
 }
 html.y #tree::-webkit-scrollbar-thumb {
 	background: #490;
+}
+html.by #tree::-webkit-scrollbar-thumb {
+	background: #049;
 }
 
 
@@ -1821,9 +1834,12 @@ html.y #bbox-overlay figcaption a {
 	padding: .5em;
 }
 #u2err.msg {
-	color: #999;
+	color: #aaa;
 	padding: .5em;
 	font-size: .9em;
+}
+html.y #u2err.msg {
+	color: #555;
 }
 html.y #u2err.err {
 	color: #f07;
