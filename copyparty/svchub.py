@@ -74,6 +74,9 @@ class SvcHub(object):
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
 
+        if not args.hardlink and args.never_symlink:
+            args.no_dedup = True
+
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log)
         if args.ls:

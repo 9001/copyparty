@@ -1240,6 +1240,11 @@ class Up2k(object):
         wark = self._get_wark(cj)
         now = time.time()
         job = None
+        try:
+            dev = bos.stat(os.path.join(cj["ptop"], cj["prel"])).st_dev
+        except:
+            dev = 0
+
         with self.mutex:
             cur = self.cur.get(cj["ptop"])
             reg = self.registry[cj["ptop"]]
@@ -1251,37 +1256,42 @@ class Up2k(object):
                     q = r"select * from up where substr(w,1,16) = ? and w = ?"
                     argv = (wark[:16], wark)
 
+                alts = []
                 cur = cur.execute(q, argv)
                 for _, dtime, dsize, dp_dir, dp_fn, ip, at in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
-                    if job and (dp_dir != cj["prel"] or dp_fn != cj["name"]):
+                    dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
+                    try:
+                        st = bos.stat(dp_abs)
+                        if stat.S_ISLNK(st.st_mode):
+                            # broken symlink
+                            raise Exception()
+                    except:
                         continue
 
-                    dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
-                    # relying on this to fail on broken symlinks
-                    try:
-                        sz = bos.path.getsize(dp_abs)
-                    except:
-                        sz = 0
+                    j = {
+                        "name": dp_fn,
+                        "prel": dp_dir,
+                        "vtop": cj["vtop"],
+                        "ptop": cj["ptop"],
+                        "size": dsize,
+                        "lmod": dtime,
+                        "addr": ip,
+                        "at": at,
+                        "hash": [],
+                        "need": [],
+                        "busy": {},
+                    }
+                    score = (
+                        (3 if st.st_dev == dev else 0)
+                        + (2 if dp_dir == cj["prel"] else 0)
+                        + (1 if dp_fn == cj["name"] else 0)
+                    )
+                    alts.append([score, -len(alts), j])
 
-                    if sz:
-                        # self.log("--- " + wark + "  " + dp_abs + " found file", 4)
-                        job = {
-                            "name": dp_fn,
-                            "prel": dp_dir,
-                            "vtop": cj["vtop"],
-                            "ptop": cj["ptop"],
-                            "size": dsize,
-                            "lmod": dtime,
-                            "addr": ip,
-                            "at": at,
-                            "hash": [],
-                            "need": [],
-                            "busy": {},
-                        }
-
+                job = sorted(alts, reverse=True)[0][2] if alts else None
                 if job and wark in reg:
                     # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
                     del reg[wark]
@@ -1422,14 +1432,14 @@ class Up2k(object):
 
         linked = False
         try:
-            if self.args.no_symlink:
+            if self.args.no_dedup:
                 raise Exception("disabled in config")
 
             lsrc = src
             ldst = dst
             fs1 = bos.stat(os.path.dirname(src)).st_dev
             fs2 = bos.stat(os.path.dirname(dst)).st_dev
-            if fs1 == 0:
+            if fs1 == 0 or fs2 == 0:
                 # py2 on winxp or other unsupported combination
                 raise OSError()
             elif fs1 == fs2:
@@ -1450,10 +1460,21 @@ class Up2k(object):
                     lsrc = nsrc[nc:]
                     hops = len(ndst[nc:]) - 1
                     lsrc = "../" * hops + "/".join(lsrc)
-            os.symlink(fsenc(lsrc), fsenc(ldst))
-            linked = True
+
+            try:
+                if self.args.hardlink:
+                    os.link(fsenc(src), fsenc(dst))
+                    linked = True
+            except Exception as ex:
+                self.log("cannot hardlink: " + repr(ex))
+                if self.args.never_symlink:
+                    raise Exception("symlink-fallback disabled in cfg")
+
+            if not linked:
+                os.symlink(fsenc(lsrc), fsenc(ldst))
+                linked = True
         except Exception as ex:
-            self.log("cannot symlink; creating copy: " + repr(ex))
+            self.log("cannot link; creating copy: " + repr(ex))
             shutil.copy2(fsenc(src), fsenc(dst))
 
         if lmod and (not linked or SYMTIME):

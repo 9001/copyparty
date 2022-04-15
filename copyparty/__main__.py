@@ -426,7 +426,9 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--unpost", metavar="SEC", type=int, default=3600*12, help="grace period where uploads can be deleted by the uploader, even without delete permissions; 0=disabled")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even if copyparty thinks you're better off without")
-    ap2.add_argument("--no-symlink", action="store_true", help="duplicate file contents instead")
+    ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (same filesystem)")
+    ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made")
+    ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=9000, help="max number of uploads to keep in memory when running without -e2d")
 
     ap2 = ap.add_argument_group('network options')
