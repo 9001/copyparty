@@ -2075,7 +2075,8 @@ class Up2k(object):
                 try:
                     bos.utime(path, times, False)
                 except:
-                    self.log("lmod: failed to utime ({}, {})".format(path, times))
+                    m = "lmod: failed to utime ({}, {}):\n{}"
+                    self.log(m.format(path, times, min_ex()))
 
                 if self.args.sparse and self.args.sparse * 1024 * 1024 <= sz:
                     try:

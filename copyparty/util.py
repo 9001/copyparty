@@ -67,7 +67,7 @@ if WINDOWS and PY2:
     FS_ENCODING = "utf-8"
 
 
-SYMTIME = sys.version_info >= (3, 6) and os.supports_follow_symlinks
+SYMTIME = sys.version_info >= (3, 6) and os.utime in os.supports_follow_symlinks
 
 HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
@@ -1235,7 +1235,7 @@ def statdir(logger, scandir, lstat, top):
     if lstat and ANYWIN:
         lstat = False
 
-    if lstat and not os.supports_follow_symlinks:
+    if lstat and (PY2 or os.stat not in os.supports_follow_symlinks):
         scandir = False
 
     try:
