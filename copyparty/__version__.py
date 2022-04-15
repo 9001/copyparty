@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 2, 5)
+VERSION = (1, 2, 6)
 CODENAME = "ftp btw"
 BUILD_DT = (2022, 4, 15)
 
