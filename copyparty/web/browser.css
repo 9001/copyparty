@@ -1286,13 +1286,9 @@ html.y #srv_info {
 	color: #c83;
 	background: #eaeaea;
 }
-html.y #srv_info,
-html.y #acc_info {
-	text-shadow: 1px 1px 0 #fff;
-}
 html.y #srv_info span,
 html.y #acc_info span {
-	color: #777;
+	color: #666;
 }
 html.y #tree .ntree a+a {
 	background: inherit;
