@@ -135,7 +135,7 @@ function up2k_flagbus() {
 }
 
 
-function U2pvis(act, btns) {
+function U2pvis(act, btns, uc) {
     var r = this;
     r.act = act;
     r.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
@@ -425,7 +425,9 @@ function U2pvis(act, btns) {
                 html.push(r.genrow(a, true).replace(/><td>/, "><td>b "));
             }
         }
-        ebi('u2tab').tBodies[0].innerHTML = html.join('\n');
+        var el = ebi('u2tab');
+        el.tBodies[0].innerHTML = html.join('\n');
+        el.className = (uc.fsearch ? 'srch ' : 'up ') + r.act;
     };
 
     r.genrow = function (nfile, as_html) {
@@ -705,7 +707,7 @@ function up2k_init(subtle) {
             });
     }
 
-    var pvis = new U2pvis("bz", '#u2cards'),
+    var pvis = new U2pvis("bz", '#u2cards', uc),
         donut = new Donut(uc, st);
 
     var bobslice = null;
@@ -2067,6 +2069,8 @@ function up2k_init(subtle) {
             ebi('u2bm').innerHTML = ico + '&nbsp; <sup>' + desc + '</sup>';
         }
         catch (ex) { }
+
+        ebi('u2tab').className = (uc.fsearch ? 'srch ' : 'up ') + pvis.act;
 
         draw_turbo();
         onresize();
