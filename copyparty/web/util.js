@@ -327,7 +327,7 @@ function clgot(el, cls) {
     if (el.classList)
         return el.classList.contains(cls);
 
-    var lst = (el.getAttribute('class') + '').split(/ /g);
+    var lst = (el.className + '').split(/ /g);
     return has(lst, cls);
 }
 

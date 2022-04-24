@@ -2508,7 +2508,7 @@ var showfile = (function () {
 
 				el = el || QS('#doc>code');
 				Prism.highlightElement(el);
-				if (el.getAttribute('class') == 'language-ans')
+				if (el.className == 'language-ans')
 					r.ansify(el);
 			}
 			catch (ex) { }
@@ -2529,7 +2529,7 @@ var showfile = (function () {
 			el.textContent = txt;
 			el.innerHTML = '<code>' + el.innerHTML + '</code>';
 			if (!window['no_prism']) {
-				el.setAttribute('class', 'prism linkable-line-numbers line-numbers language-' + lang);
+				el.className = 'prism linkable-line-numbers line-numbers language-' + lang;
 				if (!defer)
 					fun(el.firstChild);
 				else
@@ -2659,7 +2659,7 @@ var showfile = (function () {
 	};
 
 	var bdoc = ebi('bdoc');
-	bdoc.setAttribute('class', 'line-numbers');
+	bdoc.className = 'line-numbers';
 	bdoc.innerHTML = (
 		'<div id="hdoc" class="ghead">\n' +
 		'<a href="#" class="btn" id="xdoc" tt="return to folder view$NHotkey: M">❌ close</a>\n' +
@@ -2854,12 +2854,12 @@ var thegrid = (function () {
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
-				cl = tr.getAttribute('class') || '';
+				cl = tr.className || '';
 
 			if (noq_href(ths[a]).endsWith('/'))
 				cl += ' dir';
 
-			ths[a].setAttribute('class', cl);
+			ths[a].className = cl;
 		}
 		var uns = QS('#ggrid a[ref="unsearch"]');
 		if (uns)
@@ -3876,7 +3876,7 @@ var treectl = (function () {
 				cl = 'par';
 			}
 
-			links[a].setAttribute('class', cl);
+			links[a].className = cl;
 			links[a].onclick = treego;
 			links[a].onmouseenter = nowrap ? menter : null;
 			links[a].onmouseleave = nowrap ? mleave : null;
@@ -3943,7 +3943,7 @@ var treectl = (function () {
 			return true;
 
 		ev(e);
-		if (this.getAttribute('class') == 'hl' &&
+		if (this.className == 'hl' &&
 			this.previousSibling.textContent == '-') {
 			treegrow.call(this.previousSibling, e);
 			return;
@@ -4209,7 +4209,7 @@ var treectl = (function () {
 function enspin(sel) {
 	despin(sel);
 	var d = mknod('div');
-	d.setAttribute('class', 'dumb_loader_thing');
+	d.className = 'dumb_loader_thing';
 	d.innerHTML = '🌲';
 	var tgt = QS(sel);
 	tgt.insertBefore(d, tgt.childNodes[0]);
@@ -4315,7 +4315,7 @@ function find_file_col(txt) {
 	for (var a = 0; a < tds.length; a++) {
 		var spans = tds[a].getElementsByTagName('span');
 		if (spans.length && spans[0].textContent == txt) {
-			min = (tds[a].getAttribute('class') || '').indexOf('min') !== -1;
+			min = (tds[a].className || '').indexOf('min') !== -1;
 			i = a;
 			break;
 		}
@@ -4461,7 +4461,7 @@ var filecols = (function () {
 				tds = QSA('#files>tbody>tr>td:nth-child(' + (a + 1) + ')');
 
 			for (var b = 0, bb = tds.length; b < bb; b++)
-				tds[b].setAttribute('class', cls);
+				tds[b].className = cls;
 		}
 		if (window['tt']) {
 			tt.att(ebi('hcols'));
@@ -4623,9 +4623,9 @@ var settheme = (function () {
 	light = !!(theme.indexOf('y') + 1);
 
 	function freshen() {
-		var cl = document.documentElement.getAttribute('class');
+		var cl = document.documentElement.className;
 		cl = cl.replace(/\b(light|dark|[a-z]{1,2})\b/g, '').replace(/ +/g, ' ');
-		document.documentElement.setAttribute('class', cl + ' ' + theme + ' ');
+		document.documentElement.className = cl + ' ' + theme + ' ';
 
 		pbar.drawbuf();
 		pbar.drawpos();

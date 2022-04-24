@@ -278,7 +278,7 @@ function convert_markdown(md_text, dest_dom) {
         if (!txt)
             nodes[a].textContent = href;
         else if (href !== txt)
-            nodes[a].setAttribute('class', 'vis');
+            nodes[a].className = 'vis';
     }
 
     // todo-lists (should probably be a marked extension)
@@ -294,7 +294,7 @@ function convert_markdown(md_text, dest_dom) {
         var clas = done ? 'done' : 'pend';
         var char = done ? 'Y' : 'N';
 
-        dom_li.setAttribute('class', 'task-list-item');
+        dom_li.className = 'task-list-item';
         dom_li.style.listStyleType = 'none';
         var html = dom_li.innerHTML;
         dom_li.innerHTML =
@@ -468,11 +468,11 @@ function init_toc() {
             for (var a = 0; a < anchors.length; a++) {
                 if (anchors[a].active) {
                     anchors[a].active = false;
-                    links[a].setAttribute('class', '');
+                    links[a].className = '';
                 }
             }
             anchors[hit].active = true;
-            links[hit].setAttribute('class', 'act');
+            links[hit].className = 'act';
         }
 
         var pane_height = parseInt(getComputedStyle(dom_toc).height);

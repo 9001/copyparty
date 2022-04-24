@@ -624,11 +624,11 @@ function up2k_init(subtle) {
 
     function setmsg(msg, type) {
         if (msg !== undefined) {
-            ebi('u2err').setAttribute('class', type);
+            ebi('u2err').className = type;
             ebi('u2err').innerHTML = msg;
         }
         else {
-            ebi('u2err').setAttribute('class', '');
+            ebi('u2err').className = '';
             ebi('u2err').innerHTML = '';
         }
         if (msg == suggest_up2k) {
@@ -1938,19 +1938,17 @@ function up2k_init(subtle) {
 
         if (btn.parentNode !== parent) {
             parent.appendChild(btn);
-            ebi('u2conf').setAttribute('class', wide);
-            ebi('u2cards').setAttribute('class', wide);
-            ebi('u2etaw').setAttribute('class', wide);
+            ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
         }
 
         wide = write && wem > 78 ? 'ww' : wide;
         parent = ebi(wide == 'ww' && write ? 'u2c3w' : 'u2c3t');
         var its = [ebi('u2etaw'), ebi('u2cards')];
         if (its[0].parentNode !== parent) {
-            ebi('u2conf').setAttribute('class', wide);
+            ebi('u2conf').className = wide;
             for (var a = 0; a < 2; a++) {
                 parent.appendChild(its[a]);
-                its[a].setAttribute('class', wide);
+                its[a].className = wide;
             }
         }
     }

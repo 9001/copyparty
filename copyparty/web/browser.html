@@ -151,7 +151,7 @@
 			readme = {{ readme|tojson }},
 			ls0 = {{ ls0|tojson }};
 
-		document.documentElement.setAttribute("class", localStorage.theme || dtheme);
+		document.documentElement.className = localStorage.theme || dtheme;
 	</script>
 	<script src="/.cpr/util.js?_={{ ts }}"></script>
 	<script src="/.cpr/baguettebox.js?_={{ ts }}"></script>

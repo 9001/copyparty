@@ -144,16 +144,16 @@ redraw = (function () {
         map_pre = genmap(dom_pre, map_pre);
     }
     function setsbs() {
-        dom_wrap.setAttribute('class', '');
-        dom_swrap.setAttribute('class', '');
+        dom_wrap.className = '';
+        dom_swrap.className = '';
         onresize();
     }
     function modetoggle() {
         var mode = dom_nsbs.innerHTML;
         dom_nsbs.innerHTML = mode == 'editor' ? 'preview' : 'editor';
         mode += ' single';
-        dom_wrap.setAttribute('class', mode);
-        dom_swrap.setAttribute('class', mode);
+        dom_wrap.className = mode;
+        dom_swrap.className = mode;
         onresize();
     }
 
@@ -309,7 +309,7 @@ var modpoll = new Modpoll();
 
 
 window.onbeforeunload = function (e) {
-    if ((ebi("save").getAttribute('class') + '').indexOf('disabled') >= 0)
+    if ((ebi("save").className + '').indexOf('disabled') >= 0)
         return; //nice (todo)
 
     e.preventDefault(); //ff
@@ -321,7 +321,7 @@ window.onbeforeunload = function (e) {
 function save(e) {
     if (e) e.preventDefault();
     var save_btn = ebi("save"),
-        save_cls = save_btn.getAttribute('class') + '';
+        save_cls = save_btn.className + '';
 
     if (save_cls.indexOf('disabled') >= 0)
         return toast.inf(2, "no changes");
@@ -678,7 +678,7 @@ function reLastIndexOf(txt, ptn, end) {
 // table formatter
 function fmt_table(e) {
     if (e) e.preventDefault();
-    //dom_tbox.setAttribute('class', '');
+    //dom_tbox.className = '';
 
     var txt = dom_src.value,
         ofs = dom_src.selectionStart,
@@ -829,7 +829,7 @@ function fmt_table(e) {
 // show unicode
 function mark_uni(e) {
     if (e) e.preventDefault();
-    dom_tbox.setAttribute('class', '');
+    dom_tbox.className = '';
 
     var txt = dom_src.value,
         ptn = new RegExp('([^' + js_uni_whitelist + ']+)', 'g'),
@@ -989,14 +989,14 @@ var set_lno = (function () {
 
 ebi('tools').onclick = function (e) {
     if (e) e.preventDefault();
-    var is_open = dom_tbox.getAttribute('class') != 'open';
-    dom_tbox.setAttribute('class', is_open ? 'open' : '');
+    var is_open = dom_tbox.className != 'open';
+    dom_tbox.className = is_open ? 'open' : '';
 };
 
 
 ebi('help').onclick = function (e) {
     if (e) e.preventDefault();
-    dom_tbox.setAttribute('class', '');
+    dom_tbox.className = '';
 
     var dom = ebi('helpbox');
     var dtxt = dom.getElementsByTagName('textarea');

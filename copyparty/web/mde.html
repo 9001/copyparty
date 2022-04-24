@@ -37,7 +37,7 @@ var lightswitch = (function () {
 		drk = l.light != 1,
 		f = function (e) {
 if (e) drk = !drk;
-document.documentElement.setAttribute("class", drk? "z":"y");
+document.documentElement.className = drk? "z":"y";
 l.light = drk? 0:1;
 		};
 	f();
