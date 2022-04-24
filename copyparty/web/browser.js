@@ -3318,7 +3318,7 @@ document.onkeydown = function (e) {
 	function srch_msg(err, txt) {
 		var o = ebi('srch_q');
 		o.textContent = txt;
-		o.style.color = err ? '#f09' : '#c90';
+		clmod(o, 'err', err);
 	}
 
 	var search_timeout,
