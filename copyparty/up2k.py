@@ -1574,9 +1574,15 @@ class Up2k(object):
         # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
         atomic_move(src, dst)
 
+        times = (int(time.time()), int(job["lmod"]))
         if ANYWIN:
-            a = [dst, job["size"], (int(time.time()), int(job["lmod"]))]
+            a = [dst, job["size"], times]
             self.lastmod_q.put(a)
+        elif not job["hash"]:
+            try:
+                bos.utime(dst, times)
+            except:
+                pass
 
         a = [job[x] for x in "ptop wark prel name lmod size addr".split()]
         a += [job.get("at") or time.time()]

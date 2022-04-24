@@ -1330,6 +1330,7 @@ html.y .s1r:after {
 html.y #files thead th {
 	background: #eaeaea;
 	border-color: #ccc;
+	box-shadow: 0 -1px 0 #aaa inset;
 }
 html.y #files tbody td {
 	background: #eaeaea;

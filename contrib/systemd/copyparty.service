@@ -12,6 +12,8 @@
 #   change '/mnt::rw' to another location or permission-set
 #   remove '-p 80,443,3923' to only listen on port 3923
 #   add '-i 127.0.0.1' to only allow local connections
+#   add '-e2dsa' to enable filesystem scanning + indexing
+#   add '-e2ts' to enable metadata indexing
 #
 # with `Type=notify`, copyparty will signal systemd when it is ready to
 #   accept connections; correctly delaying units depending on copyparty.
@@ -34,7 +36,7 @@ SyslogIdentifier=copyparty
 Environment=PYTHONUNBUFFERED=x
 ExecReload=/bin/kill -s USR1 $MAINPID
 ExecStartPre=/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
-ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -p 80,443,3923 -v /mnt::rw
+ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -p 80,443,3923 -e2d -v /mnt::rw
 
 [Install]
 WantedBy=multi-user.target
