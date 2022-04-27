@@ -349,8 +349,11 @@ class HttpCli(object):
         return body
 
     def loud_reply(self, body, *args, **kwargs):
+        if not kwargs.get("mime"):
+            kwargs["mime"] = "text/plain; charset=utf-8"
+
         self.log(body.rstrip())
-        self.reply(b"<pre>" + body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
+        self.reply(body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
 
     def urlq(self, add, rm):
         """
