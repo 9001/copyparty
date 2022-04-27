@@ -16,6 +16,7 @@
 	--bg-u2: #2b2b2b;
 	--bg-u1: #282828;
 	--bg: #222;
+	--bgg: #222;
 	--bg-d1: #1c1c1c;
 	--bg-d2: #181818;
 	--bg-d3: #111;
@@ -120,6 +121,7 @@ html.y {
 	--bg-d2: #fff;
 	--bg-d1: #fff;
 	--bg: #eaeaea;
+	--bgg: #eaeaea;
 	--bg-u1: #fff;
 	--bg-u2: #f7f7f7;
 	--bg-u3: #eaeaea;
@@ -239,6 +241,53 @@ html.by {
 	--u2-tab-1-b2: #aaa;
 	--u2-b-fg: #444;
 }
+html.c {
+	font-weight: bold;
+	--fg: #fff;
+	--fg-weak: #5df;
+	--bg-u5: #409;
+	--bg-u2: linear-gradient(-35deg, #fd7233, #cd27a0, #5d47a5 49.5%, #16e9fb 50%, #3b6cc8 50.4%, #0e51ac);
+	--bg: #37235d;
+	--bgg: var(--bg-u2);
+	--bg-u3: var(--bg-u2);
+	
+	--a: #f9dc22;
+	--a-gray: #0ae;
+
+	--tab-alt: #6ef;
+	--row-alt: rgba(180,0,255,0.3);
+
+	--btn-fg: #fff;
+	--btn-bg: #9019bf;
+	--btn-h-bg: #a039ff;
+	--chk-fg: #d90;
+
+	--op-aa-bg: #f9dd22;
+	--u2-o-1-bg: #4cf;
+
+	--srv-1: #ea0;
+}
+html.cy {
+	--fg: #fff;
+	--fg-weak: #fff;
+	--bg: #ff0;
+	--bgg: #ff0;
+	--bg-u2: #f00;
+
+	--a: #fff;
+
+	--tab-alt: #f00;
+	--row-alt: #fff;
+	--btn-bg: #000;
+	--btn-1-bg: #fff;
+	--btn-1-fg: #000;
+	--chk-fg: #fd0;
+	--srv-1: #f00;
+	--op-aa-bg: #fff;
+
+	--u2-o-bg: #ff0;
+	--u2-o-1-bg: #f00;
+}
 * {
 	line-height: 1.2em;
 }
@@ -252,7 +301,7 @@ html,body,tr,th,td,#files,a {
 }
 html {
 	color: var(--fg);
-	background: var(--bg);
+	background: var(--bgg);
 	font-family: sans-serif;
 	text-shadow: 1px 1px 0px var(--bg-max);
 }
@@ -360,7 +409,6 @@ html.y #files thead th {
 #files td {
 	margin: 0;
 	padding: .3em .5em;
-	background: var(--bg);
 }
 #files tr:nth-child(2n) td {
 	background: var(--row-alt);
@@ -640,14 +688,15 @@ html.np_open #ggrid>a.au:before {
 	scroll-margin-top: 25vh;
 	scroll-margin-bottom: 20vh;
 }
-#files tr.sel a {
-	color: var(--fg-max);
-}
+#files tr.sel a,
 #files tr.sel a.play {
-	color: var(--a);
+	color: var(--fg2-max);
+}
+#files tr.sel a:hover {
+	color: var(--fg-max);
+	text-shadow: none;
 }
 #files tr.sel a.play.act {
-	color: var(--fg2-max);
 	text-shadow: 0 0 1px var(--fg2-max);
 }
 #files tr:focus {
@@ -1117,8 +1166,13 @@ input.eq_gain {
 	position: relative;
 	top: -.2em;
 }
+html.c .btn,
 html.a .btn {
 	border-radius: .2em;
+}
+html.c .btn {
+	box-shadow: 0 .1em .6em rgba(255,0,185,0.5);
+	border-bottom: .2em solid #709;
 }
 .btn:hover {
 	background: var(--btn-h-bg);
@@ -1127,6 +1181,10 @@ html.a .btn {
 	background: var(--btn-1-bg);
 	color: var(--btn-1-fg);
 	text-shadow: none;
+}
+html.c .tgl.btn.on {
+	box-shadow: 0 .1em .8em rgba(255,205,0,0.9);
+	border-bottom: .2em solid #e90;
 }
 .tgl.btn.on:hover {
 	background: var(--btn-1h-bg);
@@ -1329,9 +1387,6 @@ html.y #tree.nowrap .ntree a+a:hover {
 	box-shadow: 0 0 5em rgba(0,0,0,0.8);
 	padding: 1em;
 	z-index: 765;
-}
-html.y #rui {
-	color: var(--bg-max);
 }
 #rui div+div {
 	margin-top: 1em;
@@ -2145,36 +2200,51 @@ html.b #u2conf a.b:hover {
 
 
 
+html.c #path,
 html.a #path {
 	border-radius: 0 .3em .3em 0;
 }
+html.c #pctl a,
 html.a #pctl a {
 	background: rgba(0,0,0,0.1);
 	margin-right: .5em;
 	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
 }
+html.c #ops,
 html.a #ops {
 	margin: 1.7em 1.5em 0 1.5em;
 	border-radius: .3em;
 	border-width: 1px 0;
 }
+html.c .opbox,
 html.a .opbox {
 	margin: 1.5em 0 0 0;
 }
+html.c #tree,
+html.c #treeh,
 html.a #tree,
 html.a #treeh {
 	border-radius: 0 .3em 0 0;
 }
+html.c #tree li,
 html.a #tree li {
 	border-top: 1px solid var(--bg-u5);
 	border-bottom: 1px solid var(--bg-d3);
 }
+html.c #tree li:last-child,
 html.a #tree li:last-child {
 	border-bottom: none;
 }
+html.c .opbox h3,
 html.a .opbox h3 {
 	border-bottom: 1px solid var(--bg-u5);
 }
+html.c #ops,
+html.c .opbox,
+html.c #path,
+html.c #srch_form,
+html.c .ghead,
+
 html.a #ops,
 html.a .opbox,
 html.a #path,
@@ -2184,11 +2254,16 @@ html.a .ghead {
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 .3em var(--bg-d3);
 }
+html.c #tree,
+html.c #treeh,
+html.c #treepar,
+
 html.a #tree,
 html.a #treeh,
 html.a #treepar {
 	background: var(--bg-u2);
 }
+html.c #u2btn,
 html.a #u2btn {
 	color: #eee;
 	background: var(--bg-u5);
@@ -2201,19 +2276,23 @@ html.a #u2btn {
 html.ay #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
 }
+html.c #u2conf.ww #u2btn,
 html.a #u2conf.ww #u2btn {
 	margin: -2em .5em -3em 0;
 	padding: .9em 0;
 }
+html.c #op_up2k.srch #u2btn,
 html.a #op_up2k.srch #u2btn {
 	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
 	text-shadow: 1px 1px 1px #fc6;
 	color: #333;
 }
+html.c #u2conf #u2btn,
 html.a #u2conf #u2btn {
 	padding: .6em 0;
 	margin-top: -2.6em;
 }
+html.c #u2etas,
 html.a #u2etas {
 	background: var(--bg-d1);
 	border: 1px solid var(--bg-u1);
@@ -2221,12 +2300,14 @@ html.a #u2etas {
 	border-radius: .5em;
 	border-width: .25em 0;
 }
+html.c #u2cards,
 html.a #u2cards {
 	margin: 0 auto -1em auto;
 }
 html.a #u2conf input+a.b {
 	background: var(--u2-b2-bg);
 }
+html.c #u2foot:empty,
 html.a #u2foot:empty {
 	margin-bottom: -1em;
 }
@@ -2335,9 +2416,6 @@ html.bz .ghead {
 	background: var(--bg);
 	padding: .2em 0;
 }
-html.b #rui input[readonly] {
-	background: #333;
-}
 html.by #treeh,
 html.by #tree li {
 	border-color: #bbb;
@@ -2365,4 +2443,20 @@ html.b #u2conf a.b {
 }
 html.by #u2cards a.act {
 	border-width: 2px;
+}
+
+
+
+
+
+html.cy #wrap {
+	color: #000;
+}
+html.cy .mdo a {
+	background: #f00;
+}
+html.cy #op_up2k,
+html.cy #files,
+html.cy #files a {
+	color: #000;
 }

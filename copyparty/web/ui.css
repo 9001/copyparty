@@ -158,6 +158,7 @@ html {
 	color: #f6a;
 }
 html.y #tt {
+	color: #333;
 	background: #fff;
 	border-color: #888 #000 #777 #000;
 }

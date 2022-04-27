@@ -551,7 +551,7 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
-    ap2.add_argument("--themes", metavar="NUM", type=int, default=4, help="number of themes installed")
+    ap2.add_argument("--themes", metavar="NUM", type=int, default=6, help="number of themes installed")
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
     ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
     ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages")

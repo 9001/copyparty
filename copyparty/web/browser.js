@@ -4630,9 +4630,12 @@ var settheme = (function () {
 		vbar.draw();
 		showfile.setstyle();
 
-		var html = [], itheme = ax.indexOf(theme.charAt(0)) * 2 + (light ? 1 : 0);
+		var html = [], itheme = ax.indexOf(theme.charAt(0)) * 2 + (light ? 1 : 0),
+			names = ['classic dark', 'classic light', 'flat dark', 'flat light', 'vice', 'hotdog stand'];
+
 		for (var a = 0; a < themes; a++)
-			html.push('<a href="#" class="btn tgl' + (a == itheme ? ' on' : '') + '">' + a + '</a>');
+			html.push('<a href="#" class="btn tgl' + (a == itheme ? ' on' : '') +
+				'" tt="' + (names[a] || 'custom') + '">' + a + '</a>');
 
 		ebi('themes').innerHTML = html.join('');
 		var btns = QSA('#themes a');
@@ -4640,6 +4643,7 @@ var settheme = (function () {
 			btns[a].onclick = settheme;
 
 		bcfg_set('light', light);
+		tt.att(ebi('themes'));
 	}
 
 	function settheme(e) {
