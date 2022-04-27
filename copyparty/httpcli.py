@@ -121,6 +121,12 @@ class HttpCli(object):
 
             try:
                 self.mode, self.req, self.http_ver = headerlines[0].split(" ")
+
+                # normalize incoming headers to lowercase;
+                # outgoing headers however are Correct-Case
+                for header_line in headerlines[1:]:
+                    k, v = header_line.split(":", 1)
+                    self.headers[k.lower()] = v.strip()
             except:
                 msg = " ]\n#[ ".join(headerlines)
                 raise Pebkac(400, "bad headers:\n#[ " + msg + " ]")
@@ -136,12 +142,6 @@ class HttpCli(object):
 
         if self.args.rsp_slp:
             time.sleep(self.args.rsp_slp)
-
-        # normalize incoming headers to lowercase;
-        # outgoing headers however are Correct-Case
-        for header_line in headerlines[1:]:
-            k, v = header_line.split(":", 1)
-            self.headers[k.lower()] = v.strip()
 
         v = self.headers.get("connection", "").lower()
         self.keepalive = not v.startswith("close") and self.http_ver != "HTTP/1.0"
