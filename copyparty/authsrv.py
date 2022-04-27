@@ -11,12 +11,13 @@ import hashlib
 import threading
 from datetime import datetime
 
-from .__init__ import WINDOWS
+from .__init__ import ANYWIN, WINDOWS
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
     uncyg,
     undot,
+    relchk,
     unhumanize,
     absreal,
     Pebkac,
@@ -335,6 +336,12 @@ class VFS(object):
     ):
         # type: (str, str, bool, bool, bool, bool, bool) -> tuple[VFS, str]
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
+        if ANYWIN:
+            mod = relchk(vpath)
+            if mod:
+                self.log("vfs", "invalid relpath [{}]".format(vpath))
+                raise Pebkac(404)
+
         vn, rem = self._find(vpath)
         c = vn.axs
 

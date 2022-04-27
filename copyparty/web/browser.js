@@ -4903,7 +4903,10 @@ var msel = (function () {
 		tb.value = '';
 		clmod(sf, 'vis');
 		sf.textContent = '';
-		treectl.goto(this.vp + uricom_enc(this.dn) + '/', true);
+
+		var dn = this.getResponseHeader('X-New-Dir');
+		dn = dn || uricom_enc(this.dn);
+		treectl.goto(this.vp + dn + '/', true);
 	}
 })();
 

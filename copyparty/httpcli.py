@@ -210,6 +210,11 @@ class HttpCli(object):
         self.uparam = uparam
         self.cookies = cookies
         self.vpath = unquotep(vpath)  # not query, so + means +
+        if ANYWIN:
+            mod = relchk(self.vpath)
+            if mod:
+                self.log("invalid relpath [{}]".format(self.vpath))
+                return self.tx_404() and self.keepalive
 
         pwd = None
         ba = self.headers.get("authorization")
@@ -1046,6 +1051,7 @@ class HttpCli(object):
                 raise Pebkac(500, min_ex())
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
+        self.out_headers["X-New-Dir"] = quotep(sanitized)
         self.redirect(vpath)
         return True
 

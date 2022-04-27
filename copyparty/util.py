@@ -912,6 +912,9 @@ def sanitize_fn(fn, ok, bad):
     if "/" not in ok:
         fn = fn.replace("\\", "/").split("/")[-1]
 
+    if fn.lower() in bad:
+        fn = "_" + fn
+
     if ANYWIN:
         remap = [
             ["<", "＜"],
@@ -927,14 +930,21 @@ def sanitize_fn(fn, ok, bad):
         for a, b in [x for x in remap if x[0] not in ok]:
             fn = fn.replace(a, b)
 
-        bad.extend(["con", "prn", "aux", "nul"])
+        bad = ["con", "prn", "aux", "nul"]
         for n in range(1, 10):
             bad += "com{0} lpt{0}".format(n).split(" ")
 
-    if fn.lower() in bad:
-        fn = "_" + fn
+        if fn.lower().split(".")[0] in bad:
+            fn = "_" + fn
 
     return fn.strip()
+
+
+def relchk(rp):
+    if ANYWIN:
+        p = re.sub(r'[\\:*?"<>|]', "", rp)
+        if p != rp:
+            return p
 
 
 def absreal(fpath):
