@@ -1414,7 +1414,7 @@ var audio_eq = (function () {
 
 
 // plays the tid'th audio file on the page
-function play(tid, is_ev, seek, call_depth) {
+function play(tid, is_ev, seek) {
 	if (mp.order.length == 0)
 		return console.log('no audio found wait what');
 
@@ -3372,8 +3372,6 @@ document.onkeydown = function (e) {
 					vs = ebi('srch_' + k + 'v').value,
 					tvs = [];
 
-				if (k == 'name')
-					console.log('a');
 				while (vs) {
 					vs = vs.trim();
 					if (!vs)
@@ -4029,7 +4027,6 @@ var treectl = (function () {
 			r.ls_cb = null;
 			fun();
 		}
-		eval_hash();
 	}
 
 	r.gentab = function (top, res) {
@@ -4094,6 +4091,7 @@ var treectl = (function () {
 				apply_perms(res.perms);
 				fileman.render();
 			}
+			setTimeout(eval_hash, 1);
 		}
 
 		var m = scan_hash(hash0),
