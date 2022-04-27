@@ -89,6 +89,9 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if ((msg + '').indexOf('l2d.js') !== -1)
         return;  // `t` undefined in tapEvent -> hitTestSimpleCustom
 
+    if (!/\.js($|\?)/.exec('' + url))
+        return;  // chrome debugger
+
     var ekey = url + '\n' + lineNo + '\n' + msg;
     if (ignexd[ekey] || crashed)
         return;
