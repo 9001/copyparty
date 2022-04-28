@@ -210,11 +210,14 @@ class HttpCli(object):
         self.uparam = uparam
         self.cookies = cookies
         self.vpath = unquotep(vpath)  # not query, so + means +
+
+        ok = "\x00" not in self.vpath
         if ANYWIN:
-            mod = relchk(self.vpath)
-            if mod:
-                self.log("invalid relpath [{}]".format(self.vpath))
-                return self.tx_404() and self.keepalive
+            ok = ok and not relchk(self.vpath)
+
+        if not ok:
+            self.log("invalid relpath [{}]".format(self.vpath))
+            return self.tx_404() and self.keepalive
 
         pwd = None
         ba = self.headers.get("authorization")

@@ -942,9 +942,12 @@ def sanitize_fn(fn, ok, bad):
 
 def relchk(rp):
     if ANYWIN:
+        if "\n" in rp or "\r" in rp:
+            return "x\nx"
+
         p = re.sub(r'[\\:*?"<>|]', "", rp)
         if p != rp:
-            return p
+            return "[{}]".format(p)
 
 
 def absreal(fpath):
