@@ -3319,6 +3319,7 @@ document.onkeydown = function (e) {
 	var o = QSA('#op_search input');
 	for (var a = 0; a < o.length; a++) {
 		o[a].oninput = ev_search_input;
+		o[a].onkeydown = ev_search_keydown;
 	}
 
 	function srch_msg(err, txt) {
@@ -3349,6 +3350,11 @@ document.onkeydown = function (e) {
 		clearTimeout(defer_timeout);
 		defer_timeout = setTimeout(try_search, 2000);
 		try_search(v);
+	}
+
+	function ev_search_keydown(e) {
+		if (e.key == 'Enter')
+			do_search();
 	}
 
 	function try_search(v) {
