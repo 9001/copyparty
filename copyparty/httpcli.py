@@ -2448,6 +2448,7 @@ class HttpCli(object):
         j2a["logues"] = logues
         j2a["taglist"] = taglist
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
+        j2a["turbolvl"] = self.args.turbo
 
         if "mth" in vn.flags:
             j2a["def_hcols"] = vn.flags["mth"].split(",")

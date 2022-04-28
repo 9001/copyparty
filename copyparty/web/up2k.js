@@ -667,8 +667,8 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
     bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
-    bcfg_bind(uc, 'turbo', 'u2turbo', false, draw_turbo, false);
-    bcfg_bind(uc, 'datechk', 'u2tdate', true, null, false);
+    bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo, false);
+    bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
 
     var st = {
         "files": [],
@@ -2024,9 +2024,12 @@ function up2k_init(subtle) {
             html = ebi('u2foot').innerHTML,
             ohtml = html;
 
-        if (uc.turbo && html.indexOf(msg) === -1)
+        if (turbolvl || !uc.turbo)
+            msg = null;
+
+        if (msg && html.indexOf(msg) === -1)
             html = html.replace(omsg, '') + msg;
-        else if (!uc.turbo)
+        else if (!msg)
             html = html.replace(msgu, '').replace(msgs, '');
 
         if (html !== ohtml)
