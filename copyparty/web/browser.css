@@ -249,13 +249,14 @@ html.c {
 	--bg-u2: linear-gradient(-35deg, #fd7233, #cd27a0, #5d47a5 49.5%, #16e9fb 50%, #3b6cc8 50.4%, #0e51ac);
 	--bg: #37235d;
 	--bgg: var(--bg-u2);
-	--bg-u3: var(--bg-u2);
+	--bg-u3: #407;
 	
 	--a: #f9dc22;
 	--a-gray: #0ae;
 
 	--tab-alt: #6ef;
 	--row-alt: rgba(180,0,255,0.3);
+	--scroll: #ff0;
 
 	--btn-fg: #fff;
 	--btn-bg: #9019bf;
@@ -273,15 +274,23 @@ html.cy {
 	--bg: #ff0;
 	--bgg: #ff0;
 	--bg-u2: #f00;
+	--bg-u3: #f00;
+	--bg-u5: #000;
+	--bg-d3: #f77;
+	--bg-d2: #ff0;
 
 	--a: #fff;
 
 	--tab-alt: #f00;
 	--row-alt: #fff;
+	--scroll: #fff;
+
 	--btn-bg: #000;
-	--btn-1-bg: #fff;
+	--btn-fg: #ff0;
+	--btn-1-bg: #ff0;
 	--btn-1-fg: #000;
 	--chk-fg: #fd0;
+	
 	--srv-1: #f00;
 	--op-aa-bg: #fff;
 
@@ -1170,7 +1179,7 @@ html.c .btn,
 html.a .btn {
 	border-radius: .2em;
 }
-html.c .btn {
+html.ca .btn {
 	box-shadow: 0 .1em .6em rgba(255,0,185,0.5);
 	border-bottom: .2em solid #709;
 }
@@ -1182,7 +1191,7 @@ html.c .btn {
 	color: var(--btn-1-fg);
 	text-shadow: none;
 }
-html.c .tgl.btn.on {
+html.ca .tgl.btn.on {
 	box-shadow: 0 .1em .8em rgba(255,205,0,0.9);
 	border-bottom: .2em solid #e90;
 }
