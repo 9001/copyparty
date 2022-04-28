@@ -460,6 +460,9 @@ html.y #files tr:nth-child(2n+1) td+td {
 #files thead th[style] {
 	width: auto !important;
 }
+#files .srch_hdr a {
+	display: inline;
+}
 #path a {
 	margin: 0 0 0 -.2em;
 	padding: 0 0 0 .4em;

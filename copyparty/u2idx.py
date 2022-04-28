@@ -55,7 +55,7 @@ class U2idx(object):
         uv = [wark[:16], wark]
 
         try:
-            return self.run_query(vols, uq, uv, True, False)[0]
+            return self.run_query(vols, uq, uv, True, False, 99999)[0]
         except:
             raise Pebkac(500, min_ex())
 
@@ -80,7 +80,7 @@ class U2idx(object):
         self.cur[ptop] = cur
         return cur
 
-    def search(self, vols, uq):
+    def search(self, vols, uq, lim):
         """search by query params"""
         if not HAVE_SQLITE3:
             return []
@@ -222,11 +222,11 @@ class U2idx(object):
                 q += " lower({}) {} ? ) ".format(field, oper)
 
         try:
-            return self.run_query(vols, q, va, have_up, have_mt)
+            return self.run_query(vols, q, va, have_up, have_mt, lim)
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
-    def run_query(self, vols, uq, uv, have_up, have_mt):
+    def run_query(self, vols, uq, uv, have_up, have_mt, lim):
         done_flag = []
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
@@ -255,7 +255,7 @@ class U2idx(object):
         self.log("qs: {!r} {!r}".format(uq, uv))
 
         ret = []
-        lim = int(self.args.srch_hits)
+        lim = min(lim, int(self.args.srch_hits))
         taglist = {}
         for (vtop, ptop, flags) in vols:
             cur = self.get_cur(ptop)
@@ -278,7 +278,7 @@ class U2idx(object):
             for hit in c:
                 w, ts, sz, rd, fn, ip, at = hit[:7]
                 lim -= 1
-                if lim <= 0:
+                if lim < 0:
                     break
 
                 if rd.startswith("//") or fn.startswith("//"):

@@ -2861,12 +2861,17 @@ var thegrid = (function () {
 
 			ths[a].className = cl;
 		}
-		var uns = QS('#ggrid a[ref="unsearch"]');
-		if (uns)
-			uns.onclick = function (e) {
-				ev(e);
-				ebi('unsearch').click();
-			};
+
+		var sp = ['unsearch', 'moar'];
+		for (var a = 0; a < sp.length; a++)
+			(function (a) {
+				var o = QS('#ggrid a[ref="' + sp[a] + '"]');
+				if (o)
+					o.onclick = function (e) {
+						ev(e);
+						ebi(sp[a]).click();
+					};
+			})(a);
 	};
 
 	r.tippen = function () {
@@ -3284,7 +3289,8 @@ document.onkeydown = function (e) {
 
 	var trs = [],
 		orig_url = null,
-		orig_html = null;
+		orig_html = null,
+		cap = 125;
 
 	for (var a = 0; a < sconf.length; a++) {
 		var html = ['<tr><td><br />' + sconf[a][0] + '</td>'];
@@ -3338,6 +3344,7 @@ document.onkeydown = function (e) {
 			encode_query();
 
 		set_vq();
+		cap = 125;
 
 		clearTimeout(defer_timeout);
 		defer_timeout = setTimeout(try_search, 2000);
@@ -3460,7 +3467,7 @@ document.onkeydown = function (e) {
 		xhr.onreadystatechange = xhr_search_results;
 		xhr.ts = Date.now();
 		xhr.q_raw = ebi('q_raw').value;
-		xhr.send(JSON.stringify({ "q": xhr.q_raw }));
+		xhr.send(JSON.stringify({ "q": xhr.q_raw, "n": cap }));
 	}
 
 	function xhr_search_results() {
@@ -3493,7 +3500,9 @@ document.onkeydown = function (e) {
 
 		var html = mk_files_header(tagord), seen = {};
 		html.push('<tbody>');
-		html.push('<tr><td>-</td><td colspan="42"><a href="#" id="unsearch"><big style="font-weight:bold">[❌] close search results</big></a></td></tr>');
+		html.push('<tr class="srch_hdr"><td>-</td><td><a href="#" id="unsearch"><big style="font-weight:bold">[❌] close search results</big></a> -- showing ' +
+			res.hits.length + ' hits' + (res.hits.length == cap ? ' -- <a href="#" id="moar">load more</a>' : '') + '</td></tr>');
+
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
 				ts = parseInt(r.ts),
@@ -3545,6 +3554,9 @@ document.onkeydown = function (e) {
 
 		sethash('q=' + uricom_enc(this.q_raw));
 		ebi('unsearch').onclick = unsearch;
+		var m = ebi('moar');
+		if (m)
+			m.onclick = moar;
 	}
 
 	function unsearch(e) {
@@ -3555,6 +3567,12 @@ document.onkeydown = function (e) {
 		orig_html = null;
 		sethash('');
 		reload_browser();
+	}
+
+	function moar(e) {
+		ev(e);
+		cap *= 2;
+		do_search();
 	}
 })();
 

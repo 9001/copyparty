@@ -875,8 +875,9 @@ class HttpCli(object):
         else:
             # search by query params
             q = body["q"]
-            self.log("qj: " + q)
-            hits, taglist = idx.search(vols, q)
+            n = body.get("n", self.args.srch_hits)
+            self.log("qj: {} |{}|".format(q, n))
+            hits, taglist = idx.search(vols, q, n)
             msg = len(hits)
 
         idx.p_end = time.time()

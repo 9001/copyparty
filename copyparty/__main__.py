@@ -533,7 +533,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
-    ap2.add_argument("--srch-hits", metavar="N", type=int, default=1000, help="max search results")
+    ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results")
     
     ap2 = ap.add_argument_group('metadata db options')
     ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing")
