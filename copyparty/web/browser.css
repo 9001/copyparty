@@ -1443,9 +1443,11 @@ html.y #tree.nowrap .ntree a+a:hover {
 	background: var(--bg);
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
+	border-radius: .3em;
 }
 html.y #doc {
 	box-shadow: 0 0 .3em var(--bg-u5);
+	background: #f7f7f7;
 }
 #docul {
 	position: relative;
