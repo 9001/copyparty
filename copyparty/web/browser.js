@@ -452,7 +452,7 @@ var mpl = (function () {
 				cover = null;
 
 			for (var a = 0, aa = files.length; a < aa; a++) {
-				if (/^(cover|folder)\.(jpe?g|png|gif)$/.test(files[a].textContent)) {
+				if (/^(cover|folder)\.(jpe?g|png|gif)$/i.test(files[a].textContent)) {
 					cover = noq_href(files[a]);
 					break;
 				}
