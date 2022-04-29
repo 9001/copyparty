@@ -99,7 +99,10 @@
 	--g-f-b1: var(--bg-u5);
 	--g-f-fg: var(--a-hil);
 	--g-sh: rgba(0,0,0,0.3);
-	
+
+	--f-sh1: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(255,255,255,0.02) inset, 0 -1px 0 rgba(255,255,255,0.02) inset;
+	--f-sh2: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(0,0,0,0.2) inset, 0 -1px 0 rgba(0,0,0,0.2) inset;
+
 	--f-play-bg: #fc5;
 	--f-play-fg: #000;
 	--f-sel-sh: #fc0;
@@ -139,9 +142,9 @@ html.y {
 
 	--scroll: #490;
 
-	--a: #06a;
-	--a-b: #07a;
-	--a-hil: #036;
+	--a: #07a;
+	--a-b: #08b;
+	--a-hil: #058;
 	--a-gray: #bbb;
 	--a-dark: #c0f;
 
@@ -179,6 +182,9 @@ html.y {
 	--g-f-bg: var(--bg-u4);
 	--g-f-b1: var(--bg-u5);
 	--g-sh: rgba(0,0,0,0.07);
+
+	--f-sh1: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(255,255,255,0.5) inset, 0 -1px 0 rgba(255,255,255,0.5) inset;
+	--f-sh2: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(0,0,0,0.02) inset, 0 -1px 0 rgba(0,0,0,0.02) inset;
 
 	--f-sel-sh: #e80;
 
@@ -233,7 +239,7 @@ html.bz {
 	--u2-tab-1-bg: var(--bg);
 }
 html.by {
-	--scroll: #049;
+	--scroll: var(--a);
 
 	--btn-1-bg: var(--a);
 	--btn-1h-bg: var(--a-hil);
@@ -437,16 +443,10 @@ html.y #files thead th {
 	overflow: hidden;
 }
 #files td+td {
-    box-shadow: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(255,255,255,0.02) inset, 0 -1px 0 rgba(255,255,255,0.02) inset;
+    box-shadow: var(--f-sh1);
 }
 #files tr:nth-child(2n+1) td+td {
-    box-shadow: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(0,0,0,0.2) inset, 0 -1px 0 rgba(0,0,0,0.2) inset;
-}
-html.y #files td+td {
-    box-shadow: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(255,255,255,0.5) inset, 0 -1px 0 rgba(255,255,255,0.5) inset;
-}
-html.y #files tr:nth-child(2n+1) td+td {
-    box-shadow: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(0,0,0,0.02) inset, 0 -1px 0 rgba(0,0,0,0.02) inset;
+    box-shadow: var(--f-sh2);
 }
 #files td:first-child {
 	border-radius: .25em 0 0 .25em;
@@ -2381,7 +2381,7 @@ html.ay #tree {
 
 
 html.b #path {
-	margin: 1.3em 0 1.4em 0;
+	margin: .3em 0;
 	line-height: 1.7em;
 }
 html.b.op_open #path {
@@ -2436,28 +2436,34 @@ html.b #srch_q:empty {
 html.b #op_up2k {
 	margin-top: 3em;
 }
-html.b #wrap {
-	margin-top: 2em;
-}
 html.b #tree {
 	box-shadow: 0 -1px 0 rgba(128,128,128,0.4);
-}
-html.b #treepar {
-	border-bottom: .2em solid #999;
-}
-html.b .btn {
-	top: -.1em;
-}
-html.bz .ghead {
-	background: var(--bg);
-	padding: .2em 0;
 }
 html.b #treeh,
 html.b #tree li {
 	border: none;
 }
 html.b .ntree a {
-	padding: .4em .2em;
+	padding: .6em .2em;
+}
+html.b #treepar {
+	border-bottom: .2em solid #999;
+}
+html.b #wrap {
+	margin-top: 2em;
+}
+html.bz .ghead {
+	background: var(--bg);
+	padding: .2em 0;
+}
+html.b #files td {
+	padding: .5em .7em;
+}
+html.b #ggrid>a {
+	margin: .8em;
+}
+html.b .btn {
+	top: -.1em;
 }
 html.b #op_up2k.srch sup {
     color: #fc0;
