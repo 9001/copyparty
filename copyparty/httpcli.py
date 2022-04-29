@@ -2239,6 +2239,7 @@ class HttpCli(object):
             "srv_info": srv_info,
             "dtheme": self.args.theme,
             "themes": self.args.themes,
+            "turbolvl": self.args.turbo,
         }
         if not self.can_read:
             if is_ls:
@@ -2448,7 +2449,6 @@ class HttpCli(object):
         j2a["logues"] = logues
         j2a["taglist"] = taglist
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
-        j2a["turbolvl"] = self.args.turbo
 
         if "mth" in vn.flags:
             j2a["def_hcols"] = vn.flags["mth"].split(",")

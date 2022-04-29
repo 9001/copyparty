@@ -17,7 +17,7 @@ from copyparty import util
 
 class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
-        ex = "nw e2d e2ds e2dsa e2t e2ts e2tsr no_logues no_readme no_acode force_js no_robots"
+        ex = "nw e2d e2ds e2dsa e2t e2ts e2tsr no_logues no_readme no_acode force_js no_robots no_thumb no_athumb no_vthumb"
         ex = {k: False for k in ex.split()}
         ex2 = {
             "mtp": [],
@@ -36,6 +36,9 @@ class Cfg(Namespace):
             "rsp_slp": 0,
             "s_wr_slp": 0,
             "s_wr_sz": 512 * 1024,
+            "theme": 0,
+            "themes": 0,
+            "turbo": 0,
         }
         ex.update(ex2)
         super(Cfg, self).__init__(a=a or [], v=v or [], c=c, **ex)

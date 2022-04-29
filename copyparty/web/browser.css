@@ -1,4 +1,6 @@
 :root {
+	color-scheme: dark;
+	
 	--grid-sz: 10em;
 	--grid-ln: 3;
 	--nav-sz: 16em;
@@ -113,6 +115,8 @@
 	--err-ts: #500;
 }
 html.y {
+	color-scheme: light;
+	
 	--fg: #333;
 	--fg-max: #000;
 	--fg-weak: #555;
@@ -275,11 +279,13 @@ html.cy {
 	--bgg: #ff0;
 	--bg-u2: #f00;
 	--bg-u3: #f00;
-	--bg-u5: #000;
+	--bg-u5: #999;
 	--bg-d3: #f77;
 	--bg-d2: #ff0;
 
 	--a: #fff;
+	--a-hil: #fff;
+	--a-h-bg: #000;
 
 	--tab-alt: #f00;
 	--row-alt: #fff;
@@ -366,6 +372,10 @@ a, #files tbody div a:last-child {
 	color: var(--a);
 	padding: .2em;
 	text-decoration: none;
+}
+a:hover {
+	color: var(--a-hil);
+	background: var(--a-h-bg);
 }
 #files a:hover {
 	color: var(--fg-max);
@@ -1123,8 +1133,11 @@ input.eq_gain {
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
 	overscroll-behavior-y: none;
-	scrollbar-color: var(--scroll) var(--bg-u3);
 	box-shadow: 0 0 1em var(--bg-d2), 0 -1px 0 rgba(128,128,128,0.3);
+}
+#tree,
+html {
+	scrollbar-color: var(--scroll) var(--bg-u3);
 }
 #treeh {
 	position: sticky;
@@ -2395,6 +2408,7 @@ html.by #barpos {
 html.b #ops {
 	position: relative;
 	z-index: 2;
+	max-width: calc(100% - 10em);
 }
 html.b #ops a {
 	background: var(--bg);
@@ -2414,14 +2428,8 @@ html.b #wrap {
 html.b #tree {
 	box-shadow: 0 -1px 0 rgba(128,128,128,0.4);
 }
-html.b #treeh {
-	border-bottom: 1px solid var(--bg-u5);
-}
 html.b #treepar {
 	border-bottom: .2em solid #999;
-}
-html.b #treeul>li:first-child {
-	border-top: none;
 }
 html.b .btn {
 	top: -.1em;
@@ -2430,9 +2438,12 @@ html.bz .ghead {
 	background: var(--bg);
 	padding: .2em 0;
 }
-html.by #treeh,
-html.by #tree li {
-	border-color: #bbb;
+html.b #treeh,
+html.b #tree li {
+	border: none;
+}
+html.b .ntree a {
+	padding: .4em .2em;
 }
 html.b #op_up2k.srch sup {
     color: #fc0;
@@ -2471,6 +2482,7 @@ html.cy .mdo a {
 }
 html.cy #op_up2k,
 html.cy #files,
-html.cy #files a {
+html.cy #files a,
+html.cy #files tbody div a:last-child {
 	color: #000;
 }

@@ -291,9 +291,9 @@ def run_argparse(argv, formatter):
             dedent(
                 """
             -a takes username:password,
-            -v takes src:dst:perm1:perm2:permN:volflag1:volflag2:volflagN:...
-               where "perm" is "permissions,username1,username2,..."
-               and "volflag" is config flags to set on this volume
+            -v takes src:dst:\033[33mperm\033[0m1:\033[33mperm\033[0m2:\033[33mperm\033[0mN:\033[32mvolflag\033[0m1:\033[32mvolflag\033[0m2:\033[32mvolflag\033[0mN:...
+                * "\033[33mperm\033[0m" is "permissions,username1,username2,..."
+                * "\033[32mvolflag\033[0m" is config flags to set on this volume
             
             list of permissions:
               "r" (read):   list folder contents, download files
@@ -365,6 +365,17 @@ def run_argparse(argv, formatter):
                 generate ".bpm" tags from uploads (f = overwrite tags)
               \033[36mmtp=ahash,vhash=media-hash.py\033[35m collects two tags at once
             
+            \033[0mthumbnails:
+              \033[36mdthumb\033[35m disables all thumbnails
+              \033[36mdvthumb\033[35m disables video thumbnails
+              \033[36mdathumb\033[35m disables audio thumbnails (spectrograms)
+              \033[36mdithumb\033[35m disables image thumbnails
+            
+            \033[0mclient and ux:
+              \033[36mhtml_head=TXT\033[35m includes TXT in the <head>
+              \033[36mrobots\033[35m allows indexing by search engines (default)
+              \033[36mnorobots\033[35m kindly asks search engines to leave
+            
             \033[0mothers:
               \033[36mfk=8\033[35m generates per-file accesskeys,
                 which will then be required at the "g" permission
@@ -373,7 +384,7 @@ def run_argparse(argv, formatter):
         ],
         [
             "urlform",
-            "",
+            "how to handle url-form POSTs",
             dedent(
                 """
             values for --urlform:
@@ -412,41 +423,41 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-c", metavar="PATH", type=u, action="append", help="add config file")
     ap2.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
     ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores, 0=all")
-    ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, USER:PASS; example [ed:wark")
-    ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, SRC:DST:FLAG; example [.::r], [/mnt/nas/music:/music:r:aed")
-    ap2.add_argument("-ed", action="store_true", help="enable ?dots")
-    ap2.add_argument("-emp", action="store_true", help="enable markdown plugins")
+    ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, USER:PASS; example [ed:wark]")
+    ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, SRC:DST:FLAG; examples [.::r], [/mnt/nas/music:/music:r:aed]")
+    ap2.add_argument("-ed", action="store_true", help="enable the ?dots url parameter / client option which allows clients to see dotfiles / hidden files")
+    ap2.add_argument("-emp", action="store_true", help="enable markdown plugins -- neat but dangerous, big XSS risk")
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
-    ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-forms; examples: [stash], [save,get]")
+    ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see --help-urlform")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="window title, for example '$ip-10.1.2.' or '$ip-'")
 
     ap2 = ap.add_argument_group('upload options')
-    ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads")
-    ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="up2k min.size threshold (mswin-only)")
+    ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
+    ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--unpost", metavar="SEC", type=int, default=3600*12, help="grace period where uploads can be deleted by the uploader, even without delete permissions; 0=disabled")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload")
-    ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even if copyparty thinks you're better off without")
-    ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (same filesystem)")
+    ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even if copyparty thinks you're better off without -- probably useful on nfs and cow filesystems (zfs, btrfs)")
+    ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem)")
     ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made")
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=9000, help="max number of uploads to keep in memory when running without -e2d")
-    ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client;  0 = off and warn if enabled,  1 = off,  2 = on,  3 = on and disable datecheck")
+    ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; 0 = off and warn if enabled, 1 = off, 2 = on, 3 = on and disable datecheck")
 
     ap2 = ap.add_argument_group('network options')
     ap2.add_argument("-i", metavar="IP", type=u, default="0.0.0.0", help="ip to bind (comma-sep.)")
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range)")
     ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to keep; 0 = tcp, 1 = origin (first x-fwd), 2 = cloudflare, 3 = nginx, -1 = closest proxy")
     ap2.add_argument("--s-wr-sz", metavar="B", type=int, default=256*1024, help="socket write size in bytes")
-    ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0, help="socket write delay in seconds")
-    ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0, help="response delay in seconds")
+    ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0, help="debug: socket write delay in seconds")
+    ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0, help="debug: response delay in seconds")
 
     ap2 = ap.add_argument_group('SSL/TLS options')
-    ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls")
-    ap2.add_argument("--https-only", action="store_true", help="disable plaintext")
+    ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
+    ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
     ap2.add_argument("--ssl-ver", metavar="LIST", type=u, help="set allowed ssl/tls versions; [help] shows available versions; default is what your python version considers safe")
     ap2.add_argument("--ciphers", metavar="LIST", type=u, help="set allowed ssl/tls ciphers; [help] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
-    ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets")
+    ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets for later decryption in wireshark")
 
     ap2 = ap.add_argument_group('FTP options')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT, for example 3921")
@@ -456,25 +467,25 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example 12000-13000")
 
     ap2 = ap.add_argument_group('opt-outs')
-    ap2.add_argument("-nw", action="store_true", help="disable writes (benchmark)")
+    ap2.add_argument("-nw", action="store_true", help="never write anything to disk (debug/benchmark)")
     ap2.add_argument("--keep-qem", action="store_true", help="do not disable quick-edit-mode on windows (it is disabled to avoid accidental text selection which will deadlock copyparty)")
     ap2.add_argument("--no-del", action="store_true", help="disable delete operations")
     ap2.add_argument("--no-mv", action="store_true", help="disable move/rename operations")
-    ap2.add_argument("-nih", action="store_true", help="no info hostname")
-    ap2.add_argument("-nid", action="store_true", help="no info disk-usage")
+    ap2.add_argument("-nih", action="store_true", help="no info hostname -- don't show in UI")
+    ap2.add_argument("-nid", action="store_true", help="no info disk-usage -- don't show in UI")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (lifetime volflag)")
 
     ap2 = ap.add_argument_group('safety options')
-    ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="scan all volumes; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
-    ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt")
-    ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt")
+    ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="do a sanity/safety check of all volumes on startup; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
+    ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt; used to generate unpredictable internal identifiers for uploads -- doesn't really matter")
+    ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files -- this one DOES matter")
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to make something a dotfile")
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
     ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme.md into directory listings")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
-    ap2.add_argument("--force-js", action="store_true", help="don't send HTML folder listings, force clients to use the embedded json instead")
+    ap2.add_argument("--force-js", action="store_true", help="don't send HTML folder listings, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore --no-robots")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything")
 
     ap2 = ap.add_argument_group('yolo options')
@@ -485,8 +496,8 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-q", action="store_true", help="quiet")
     ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
     ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
-    ap2.add_argument("--log-conn", action="store_true", help="print tcp-server msgs")
-    ap2.add_argument("--log-htp", action="store_true", help="print http-server threadpool scaling")
+    ap2.add_argument("--log-conn", action="store_true", help="debug: print tcp-server msgs")
+    ap2.add_argument("--log-htp", action="store_true", help="debug: print http-server threadpool scaling")
     ap2.add_argument("--ihead", metavar="HEADER", type=u, action='append', help="dump incoming header")
     ap2.add_argument("--lf-url", metavar="RE", type=u, default=r"^/\.cpr/|\?th=[wj]$", help="dont log URLs matching")
 
@@ -506,12 +517,12 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="image decoders, in order of preference")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
-    ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg for video thumbs")
+    ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg output for video thumbs")
     ap2.add_argument("--th-ff-swr", action="store_true", help="use swresample instead of soxr for audio thumbs")
     ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown -- avoids doing keepalive pokes (updating the mtime) on thumbnail folders more often than SEC seconds")
     ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval; 0=disabled")
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age -- folders which haven't been poked for longer than --th-poke seconds will get deleted every --th-clean seconds")
-    ap2.add_argument("--th-covers", metavar="N,N", type=u, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat for")
+    ap2.add_argument("--th-covers", metavar="N,N", type=u, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat/look for")
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
     # https://github.com/libvips/libvips
     # ffmpeg -hide_banner -demuxers | awk '/^ D  /{print$2}' | while IFS= read -r x; do ffmpeg -hide_banner -h demuxer=$x; done | grep -E '^Demuxer |extensions:'
@@ -523,32 +534,32 @@ def run_argparse(argv, formatter):
 
     ap2 = ap.add_argument_group('transcoding options')
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
-    ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete transcode output after SEC seconds")
+    ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after SEC seconds")
 
     ap2 = ap.add_argument_group('general db options')
-    ap2.add_argument("-e2d", action="store_true", help="enable up2k database")
-    ap2.add_argument("-e2ds", action="store_true", help="enable up2k db-scanner, sets -e2d")
-    ap2.add_argument("-e2dsa", action="store_true", help="scan all folders (for search), sets -e2ds")
+    ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplocation")
+    ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets -e2d")
+    ap2.add_argument("-e2dsa", action="store_true", help="scans all folders on startup; sets -e2ds")
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
     ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching paths during e2ds folder scans")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
-    ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline")
-    ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results")
+    ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline -- terminate searches running for more than SEC seconds")
+    ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results to allow clients to fetch; 125 results will be shown initially")
     
     ap2 = ap.add_argument_group('metadata db options')
-    ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing")
-    ap2.add_argument("-e2ts", action="store_true", help="enable metadata scanner, sets -e2t")
-    ap2.add_argument("-e2tsr", action="store_true", help="rescan all metadata, sets -e2ts")
-    ap2.add_argument("--no-mutagen", action="store_true", help="use FFprobe for tags instead")
-    ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader")
+    ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing; makes it possible to search for artist/title/codec/resolution/...")
+    ap2.add_argument("-e2ts", action="store_true", help="scan existing files on startup; sets -e2t")
+    ap2.add_argument("-e2tsr", action="store_true", help="delete all metadata from DB and do a full rescan; sets -e2ts")
+    ap2.add_argument("--no-mutagen", action="store_true", help="use FFprobe for tags instead; will catch more tags")
+    ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader; is probably safer")
     ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for tag scanning")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
         default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,res,.fps,ahash,vhash")
     ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.)",
         default=".vq,.aq,vc,ac,res,.fps")
-    ap2.add_argument("-mtp", metavar="M=[f,]bin", type=u, action="append", help="read tag M using bin")
+    ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag M using program BIN to parse the file")
 
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
@@ -560,9 +571,9 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty", help="title / service-name to show in html documents")
 
     ap2 = ap.add_argument_group('debug options')
-    ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile")
-    ap2.add_argument("--no-scandir", action="store_true", help="disable scandir")
-    ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing")
+    ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile; instead using a traditional file read loop")
+    ap2.add_argument("--no-scandir", action="store_true", help="disable scandir; instead using listdir + stat on each file")
+    ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing before starting the httpd")
     ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
     ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to Path every S second")
     ap2.add_argument("--log-thrs", metavar="SEC", type=float, help="list active threads every SEC")
