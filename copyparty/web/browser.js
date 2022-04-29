@@ -5104,7 +5104,7 @@ var unpost = (function () {
 				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>file</td></tr></thead><tbody>");
 			}
 			else
-				html.push("<p>sike! no uploads " + (filt.value ? 'matching that filter' : '') + " are sufficiently recent</p>");
+				html.push("sike! no uploads " + (filt.value ? 'matching that filter' : '') + " are sufficiently recent");
 
 			var mods = [1000, 100, 10];
 			for (var a = 0; a < res.length; a++) {

@@ -63,6 +63,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
     * [upload events](#upload-events) - trigger a script/program on each upload
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
+    * [themes](#themes)
     * [complete examples](#complete-examples)
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
@@ -246,6 +247,8 @@ some improvement ideas
 * probably more, pls let me know
 
 ## not my bugs
+
+* [Chrome issue 1317069](https://bugs.chromium.org/p/chromium/issues/detail?id=1317069) -- if you try to upload a folder which contains symlinks by dragging it into the browser, the symlinked files will not get uploaded
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
@@ -808,22 +811,23 @@ also, `--force-js` disables the plain HTML folder listing, making things harder 
 
 ## themes
 
-you can add your own themes  by modifying `browser.css` or providing your own css to `--css-browser`
+you can add your own themes  by modifying `browser.css` or providing your own css to `--css-browser`, then telling copyparty they exist by increasing `--themes`
 
-<table><tr><td><a href="https://user-images.githubusercontent.com/241032/165864907-17e2ac7d-319d-4f25-8718-2f376f614b51.png"><img src="https://user-images.githubusercontent.com/241032/165865708-00395793-98d9-4cf2-a5c7-a4c6c37e737c.png"></a></td><td><a href="https://user-images.githubusercontent.com/241032/165864904-c5b67ddd-f383-4b9e-9f5a-a3bde183d256.png"><img src="https://user-images.githubusercontent.com/241032/165865713-8a65d8e4-1483-4848-a726-4100b769fd79.png"></a></td><td><a href="https://user-images.githubusercontent.com/241032/165864901-db13a429-a5da-496d-8bc6-ce838547f69d.png"><img src="https://user-images.githubusercontent.com/241032/165865715-54fdbbe6-03a5-4a15-aa66-6f7906a0d345.png"></a></td></tr><tr><td><a href="https://user-images.githubusercontent.com/241032/165864905-692682eb-6fb4-4d40-b6fe-27d2c7d3e2a7.png"><img src="https://user-images.githubusercontent.com/241032/165865711-9f71d949-74c2-4194-8b40-2fb338f204a3.png"></a></td><td><a href="https://user-images.githubusercontent.com/241032/165864903-7fba1cb9-036b-4f11-90d5-28b7c0724353.png"><img src="https://user-images.githubusercontent.com/241032/165865714-c8d88212-b009-4087-973c-0bb2ebad084d.png"></a></td><td><a href="https://user-images.githubusercontent.com/241032/165864898-10ce7052-a117-4fcf-845b-b56c91687908.png"><img src="https://user-images.githubusercontent.com/241032/165865720-3f29ff23-faba-427b-b9e6-bd1cdd8e27be.png"></a></td></tr></table>
-
-currently there is four themes,
-* classic dark/light
-* flat dark/light
-* vice
-* [hotdog stand](https://blog.codinghorror.com/a-tribute-to-the-windows-31-hot-dog-stand-color-scheme/)
+<table><tr><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864907-17e2ac7d-319d-4f25-8718-2f376f614b51.png"><img src="https://user-images.githubusercontent.com/241032/165867551-fceb35dd-38f0-42bb-bef3-25ba651ca69b.png"></a>
+0. classic dark</td><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864904-c5b67ddd-f383-4b9e-9f5a-a3bde183d256.png"><img src="https://user-images.githubusercontent.com/241032/165867556-077b6068-2488-4fae-bf88-1fce40e719bc.png"></a>
+2. flat dark</td><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864901-db13a429-a5da-496d-8bc6-ce838547f69d.png"><img src="https://user-images.githubusercontent.com/241032/165867560-aa834aef-58dc-4abe-baef-7e562b647945.png"></a>
+4. vice</td></tr><tr><td align="center"><a href="https://user-images.githubusercontent.com/241032/165864905-692682eb-6fb4-4d40-b6fe-27d2c7d3e2a7.png"><img src="https://user-images.githubusercontent.com/241032/165867555-080b73b6-6d85-41bb-a7c6-ad277c608365.png"></a>
+1. classic light</td><td align="center"><a href="https://user-images.githubusercontent.com/241032/165864903-7fba1cb9-036b-4f11-90d5-28b7c0724353.png"><img src="https://user-images.githubusercontent.com/241032/165867557-b5cc0010-d880-48b1-8156-9c84f7bbc521.png"></a>
+3. flat light
+</td><td align="center"><a href="https://user-images.githubusercontent.com/241032/165864898-10ce7052-a117-4fcf-845b-b56c91687908.png"><img src="https://user-images.githubusercontent.com/241032/165867562-f3003d45-dd2a-4564-8aae-fed44c1ae064.png"></a>
+5. <a href="https://blog.codinghorror.com/a-tribute-to-the-windows-31-hot-dog-stand-color-scheme/">hotdog stand</a></td></tr></table>
 
 the classname of the HTML tag is set according to the selected theme, which is used to set colors as css variables ++
 
 * each theme *generally* has a dark theme (even numbers) and a light theme (odd numbers), showing in pairs
 * the first theme (theme 0 and 1) is `html.a`, second theme (2 and 3) is `html.b`
 * if a light theme is selected, `html.y` is set, otherwise `html.z` is
-* additionally, if the dark edition of the 2nd theme is selected, `html.bz` is set
+* so if the dark edition of the 2nd theme is selected, you use any of `html.b`, `html.z`, `html.bz` to specify rules
 
 see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where the color variables are set, and there's layout-specific stuff near the bottom
 

@@ -485,7 +485,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
     ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme.md into directory listings")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
-    ap2.add_argument("--force-js", action="store_true", help="don't send HTML folder listings, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore --no-robots")
+    ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore --no-robots")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything")
 
     ap2 = ap.add_argument_group('yolo options')

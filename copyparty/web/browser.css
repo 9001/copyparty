@@ -927,8 +927,8 @@ html.y #widget.open {
 	}
 	html.b #barpos,
 	html.b #barbuf {
-		width: calc(100% - 19.5em);
-		left: 8.5em;
+		width: calc(100% - 19em);
+		left: 8em;
 	}
 	#widget {
 		bottom: -3.2em;
@@ -936,6 +936,12 @@ html.y #widget.open {
 	}
 	#pvol {
 		max-width: 9em;
+	}
+	html.b #ops {
+		padding-left: 1.7em;
+	}
+	html.b #path {
+		padding-left: 1.3em;
 	}
 }
 @media (max-width: 35em) {
@@ -2237,6 +2243,9 @@ html.a #pctl a {
 	margin-right: .5em;
 	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
 }
+html.b #pctl {
+	left: .5em;
+}
 html.c #ops,
 html.a #ops {
 	margin: 1.7em 1.5em 0 1.5em;
@@ -2372,7 +2381,8 @@ html.ay #tree {
 
 
 html.b #path {
-	margin: 1.3em 0;
+	margin: 1.3em 0 1.4em 0;
+	line-height: 1.7em;
 }
 html.b.op_open #path {
 	margin-top: .2em;
@@ -2406,9 +2416,10 @@ html.by #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
 }
 html.b #ops {
+	max-width: 1em;
+	margin-bottom: 2em;
 	position: relative;
 	z-index: 2;
-	max-width: calc(100% - 10em);
 }
 html.b #ops a {
 	background: var(--bg);
@@ -2422,8 +2433,11 @@ html.b #srch_q {
 html.b #srch_q:empty {
 	margin-bottom: -1em;
 }
+html.b #op_up2k {
+	margin-top: 3em;
+}
 html.b #wrap {
-	margin-top: .3em;
+	margin-top: 2em;
 }
 html.b #tree {
 	box-shadow: 0 -1px 0 rgba(128,128,128,0.4);
