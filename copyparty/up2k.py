@@ -781,6 +781,7 @@ class Up2k(object):
             if self.mtag.prefer_mt and self.args.mtag_mt > 1:
                 mpool = self._start_mpool()
 
+            # TODO blocks writes to registry cursor; do chunks instead
             conn = sqlite3.connect(db_path, timeout=15)
             cur = conn.cursor()
             c2 = conn.cursor()
@@ -806,8 +807,8 @@ class Up2k(object):
                     n_tags = self._tag_file(c3, *args)
                 else:
                     mpool.put(["mtag"] + args)
-                    with self.mutex:
-                        n_tags = len(self._flush_mpool(c3))
+                    # not registry cursor; do not self.mutex:
+                    n_tags = len(self._flush_mpool(c3))
 
                 n_add += n_tags
                 n_buf += n_tags
@@ -829,9 +830,6 @@ class Up2k(object):
             c2.close()
             cur.close()
             conn.close()
-
-        with self.mutex:
-            gcur.connection.commit()
 
         return n_add, n_rm, True
 
