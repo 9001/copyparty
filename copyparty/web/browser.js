@@ -3863,7 +3863,6 @@ var treectl = (function () {
 		QS('#treeul>li>a+a').textContent = '[root]';
 		despin('#tree');
 		reload_tree();
-		onresize();
 
 		var fun = r.dir_cb;
 		if (fun) {
@@ -3916,6 +3915,7 @@ var treectl = (function () {
 		catch (ex) { }
 		r.pdir.shift();
 		r.pdirw = -1;
+		onresize();
 	}
 
 	function compy() {
