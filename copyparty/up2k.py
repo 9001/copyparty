@@ -95,7 +95,7 @@ class Up2k(object):
 
         if ANYWIN:
             # usually fails to set lastmod too quickly
-            self.lastmod_q = Queue()
+            self.lastmod_q = []
             thr = threading.Thread(target=self._lastmodder, name="up2k-lastmod")
             thr.daemon = True
             thr.start()
@@ -583,9 +583,11 @@ class Up2k(object):
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         histpath = self.asrv.vfs.histtab[top]
         ret = 0
-        seen_files = {}
+        seen_files = {}  # != inames; files-only for dropcheck
         g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
-        for iname, inf in sorted(g):
+        g = sorted(g)
+        inames = {x[0]: 1 for x in g}
+        for iname, inf in g:
             abspath = os.path.join(cdir, iname)
             if rei and rei.search(abspath):
                 continue
@@ -611,6 +613,17 @@ class Up2k(object):
                 rp = abspath[len(top) :].lstrip("/")
                 if WINDOWS:
                     rp = rp.replace("\\", "/").strip("/")
+
+                if rp.endswith(".PARTIAL") and time.time() - lmod < 60:
+                    # rescan during upload
+                    continue
+
+                if not sz and (
+                    "{}.PARTIAL".format(iname) in inames
+                    or ".{}.PARTIAL".format(iname) in inames
+                ):
+                    # placeholder for unfinished upload
+                    continue
 
                 rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
                 sql = "select w, mt, sz from up where rd = ? and fn = ?"
@@ -1109,7 +1122,8 @@ class Up2k(object):
         return ret
 
     def _orz(self, db_path):
-        return sqlite3.connect(db_path, check_same_thread=False).cursor()
+        timeout = int(max(self.args.srch_time, 5) * 1.2)
+        return sqlite3.connect(db_path, timeout, check_same_thread=False).cursor()
         # x.set_trace_callback(trace)
 
     def _open_db(self, db_path):
@@ -1478,7 +1492,7 @@ class Up2k(object):
         if lmod and (not linked or SYMTIME):
             times = (int(time.time()), int(lmod))
             if ANYWIN:
-                self.lastmod_q.put([dst, 0, times])
+                self.lastmod_q.append([dst, 0, times])
             else:
                 bos.utime(dst, times, False)
 
@@ -1575,7 +1589,7 @@ class Up2k(object):
         times = (int(time.time()), int(job["lmod"]))
         if ANYWIN:
             a = [dst, job["size"], times]
-            self.lastmod_q.put(a)
+            self.lastmod_q.append(a)
         elif not job["hash"]:
             try:
                 bos.utime(dst, times)
@@ -2068,9 +2082,8 @@ class Up2k(object):
 
     def _lastmodder(self):
         while True:
-            ready = []
-            while not self.lastmod_q.empty():
-                ready.append(self.lastmod_q.get())
+            ready = self.lastmod_q
+            self.lastmod_q = []
 
             # self.log("lmod: got {}".format(len(ready)))
             time.sleep(5)
