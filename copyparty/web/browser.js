@@ -666,7 +666,7 @@ function ft2dict(tr) {
 
 	for (var a = 1, aa = th.length; a < aa; a++) {
 		var tv = tr.cells[a].textContent,
-			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop(),
+			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
 			vis = th[a].className.indexOf('min') === -1;
 
 		if (!tv)
@@ -1912,9 +1912,6 @@ var fileman = (function () {
 			for (var k in md) {
 				if (!md.hasOwnProperty(k))
 					continue;
-
-				md[k.toLowerCase()] = md[k];
-				k = k.toLowerCase();
 
 				if (k.startsWith('.'))
 					md[k.slice(1)] = md[k];
