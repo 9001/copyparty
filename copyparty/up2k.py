@@ -554,12 +554,16 @@ class Up2k(object):
                 for d in all_vols
                 if d != vol and (d.vpath.startswith(vol.vpath + "/") or not vol.vpath)
             ]
+            excl += [absreal(x) for x in excl]
+            excl += list(self.asrv.vfs.histtab.values())
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
 
+            excl = set(excl)
+            rtop = absreal(top)
             n_add = n_rm = 0
             try:
-                n_add = self._build_dir(dbw, top, set(excl), top, rei, reh, [])
+                n_add = self._build_dir(dbw, top, excl, top, rtop, rei, reh, [])
                 n_rm = self._drop_lost(dbw[0], top)
             except:
                 m = "failed to index volume [{}]:\n{}"
@@ -572,8 +576,7 @@ class Up2k(object):
 
             return True, n_add or n_rm or do_vac
 
-    def _build_dir(self, dbw, top, excl, cdir, rei, reh, seen):
-        rcdir = absreal(cdir)  # a bit expensive but worth
+    def _build_dir(self, dbw, top, excl, cdir, rcdir, rei, reh, seen):
         if rcdir in seen:
             m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
             self.log(m.format(seen[-1], rcdir, cdir), 3)
@@ -581,7 +584,6 @@ class Up2k(object):
 
         seen = seen + [rcdir]
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
-        histpath = self.asrv.vfs.histtab[top]
         ret = 0
         seen_files = {}  # != inames; files-only for dropcheck
         g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
@@ -596,14 +598,15 @@ class Up2k(object):
             lmod = int(inf.st_mtime)
             sz = inf.st_size
             if stat.S_ISDIR(inf.st_mode):
-                if abspath in excl or abspath == histpath:
+                rap = absreal(abspath)
+                if abspath in excl or rap in excl:
                     continue
                 if iname == ".th" and bos.path.isdir(os.path.join(abspath, "top")):
                     # abandoned or foreign, skip
                     continue
                 # self.log(" dir: {}".format(abspath))
                 try:
-                    ret += self._build_dir(dbw, top, excl, abspath, rei, reh, seen)
+                    ret += self._build_dir(dbw, top, excl, abspath, rap, rei, reh, seen)
                 except:
                     m = "failed to index subdir [{}]:\n{}"
                     self.log(m.format(abspath, min_ex()), c=1)
