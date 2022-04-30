@@ -1007,7 +1007,7 @@ class HttpCli(object):
         pwd = self.parser.require("cppwd", 64)
         self.parser.drop()
 
-        dst = "/?h"
+        dst = "/"
         if self.vpath:
             dst = "/" + quotep(self.vpath)
 
