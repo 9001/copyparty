@@ -1,0 +1,23 @@
+# systemd service which generates a new TLS certificate on each boot,
+# that way the one-year expiry time won't cause any issues --
+# just have everyone trust the ca.pem once every 10 years
+#
+# assumptions/placeholder values:
+#  * this script and copyparty runs as user "cpp"
+#  * copyparty repo is at ~cpp/dev/copyparty
+#  * CA is named partylan
+#  * server IPs = 10.1.2.3 and 192.168.123.1
+#  * server hostname = party.lan
+
+[Unit]
+Description=copyparty certificate generator
+Before=copyparty.service
+
+[Service]
+User=cpp
+Type=oneshot
+SyslogIdentifier=cpp-cert
+ExecStart=/bin/bash -c 'cd ~/dev/copyparty/contrib && ./cfssl.sh partylan 10.1.2.3,192.168.123.1,party.lan y'
+
+[Install]
+WantedBy=multi-user.target

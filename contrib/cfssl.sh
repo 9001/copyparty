@@ -7,7 +7,7 @@ srv_fqdn="$2"
 
 [ -z "$srv_fqdn" ] && {
 	echo "need arg 1: ca name"
-	echo "need arg 2: server fqdn"
+	echo "need arg 2: server fqdn and/or IPs, comma-separated"
 	echo "optional arg 3: if set, write cert into copyparty cfg"
 	exit 1
 }
