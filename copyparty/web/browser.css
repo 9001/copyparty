@@ -916,53 +916,6 @@ html.y #widget.open {
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
 }
-@media (min-width: 70em) {
-	#barpos,
-	#barbuf {
-		width: calc(100% - 21em);
-		left: 9.8em;
-		top: .7em;
-		height: 1.6em;
-		bottom: auto;
-	}
-	html.b #barpos,
-	html.b #barbuf {
-		width: calc(100% - 19em);
-		left: 8em;
-	}
-	#widget {
-		bottom: -3.2em;
-		height: 3.2em;
-	}
-	#pvol {
-		max-width: 9em;
-	}
-	html.b #ops {
-		padding-left: 1.7em;
-	}
-	html.b #path {
-		padding-left: 1.3em;
-	}
-}
-@media (max-width: 35em) {
-	#ops>a[data-dest="new_md"],
-	#ops>a[data-dest="msg"] {
-		display: none;
-	}
-	#op_mkdir.act+div,
-	#op_mkdir.act+div+div {
-		display: block;
-		margin-top: 1em;
-	}
-}
-@media (max-width: 54em) {
-	html.b #ops {
-		margin-top: 1.7em;
-	}
-}
-
-
-
 .opview {
 	display: none;
 }
@@ -2054,6 +2007,7 @@ html.y #bbox-overlay figcaption a {
 }
 #u2cards span {
 	color: var(--fg-max);
+	font-family: 'scp', monospace;
 }
 #u2cards > a:nth-child(4) > span {
 	display: inline-block;
@@ -2417,7 +2371,7 @@ html.by #barpos {
 }
 html.b #ops {
 	max-width: 1em;
-	margin-bottom: 2em;
+	margin-bottom: 1.7em;
 	position: relative;
 	z-index: 2;
 }
@@ -2505,4 +2459,55 @@ html.cy #files,
 html.cy #files a,
 html.cy #files tbody div a:last-child {
 	color: #000;
+}
+
+
+
+
+@media (min-width: 70em) {
+	#barpos,
+	#barbuf {
+		width: calc(100% - 21em);
+		left: 9.8em;
+		top: .7em;
+		height: 1.6em;
+		bottom: auto;
+	}
+	html.b #barpos,
+	html.b #barbuf {
+		width: calc(100% - 19em);
+		left: 8em;
+	}
+	#widget {
+		bottom: -3.2em;
+		height: 3.2em;
+	}
+	#pvol {
+		max-width: 9em;
+	}
+	html.b #ops {
+		padding-left: 1.7em;
+	}
+	html.b .opview {
+		margin: 1em;
+	}
+	html.b #path {
+		padding-left: 1.3em;
+	}
+}
+@media (max-width: 35em) {
+	#ops>a[data-dest="new_md"],
+	#ops>a[data-dest="msg"] {
+		display: none;
+	}
+	#op_mkdir.act+div,
+	#op_mkdir.act+div+div {
+		display: block;
+		margin-top: 1em;
+	}
+}
+@media (max-width: 54em) {
+	html.b #ops {
+		margin-top: 1.7em;
+	}
 }

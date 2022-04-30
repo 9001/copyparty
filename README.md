@@ -811,7 +811,7 @@ also, `--force-js` disables the plain HTML folder listing, making things harder 
 
 ## themes
 
-you can add your own themes  by modifying `browser.css` or providing your own css to `--css-browser`, then telling copyparty they exist by increasing `--themes`
+you can change the default theme with `--theme 2`, and add your own themes by modifying `browser.css` or providing your own css to `--css-browser`, then telling copyparty they exist by increasing `--themes`
 
 <table><tr><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864907-17e2ac7d-319d-4f25-8718-2f376f614b51.png"><img src="https://user-images.githubusercontent.com/241032/165867551-fceb35dd-38f0-42bb-bef3-25ba651ca69b.png"></a>
 0. classic dark</td><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864904-c5b67ddd-f383-4b9e-9f5a-a3bde183d256.png"><img src="https://user-images.githubusercontent.com/241032/165867556-077b6068-2488-4fae-bf88-1fce40e719bc.png"></a>
