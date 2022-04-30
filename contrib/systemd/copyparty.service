@@ -2,10 +2,11 @@
 # and share '/mnt' with anonymous read+write
 #
 # installation:
-#   cp -pv copyparty.service /etc/systemd/system && systemctl enable --now copyparty
+#   cp -pv copyparty.service /etc/systemd/system
 #   restorecon -vr /etc/systemd/system/copyparty.service
 #   firewall-cmd --permanent --add-port={80,443,3923}/tcp
 #   firewall-cmd --reload
+#   systemctl daemon-reload && systemctl enable --now copyparty
 #
 # you may want to:
 #   change "User=cpp" and "/home/cpp/" to another user
@@ -24,8 +25,8 @@
 #   python disabling line-buffering, so messages are out-of-order:
 #   https://user-images.githubusercontent.com/241032/126040249-cb535cc7-c599-4931-a796-a5d9af691bad.png
 #
-# if you remove -q to enable logging, you may also want to remove the
-#   following line to enable buffering (slightly better performance):
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
 #   Environment=PYTHONUNBUFFERED=x
 #
 # keep ExecStartPre before ExecStart, at least on rhel8

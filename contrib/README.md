@@ -29,6 +29,7 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 ### [`cfssl.sh`](cfssl.sh)
 * creates CA and server certificates using cfssl
 * give a 3rd argument to install it to your copyparty config
+* systemd service at [`systemd/cfssl.service`](systemd/cfssl.service)
 
 # OS integration
 init-scripts to start copyparty as a service
