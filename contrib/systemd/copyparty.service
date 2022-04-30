@@ -8,9 +8,12 @@
 #   firewall-cmd --reload
 #
 # you may want to:
+#   change "User=cpp" and "/home/cpp/" to another user
+#   remove the nft lines to only listen on port 3923
+# and in the ExecStart= line:
 #   change '/usr/bin/python3' to another interpreter
 #   change '/mnt::rw' to another location or permission-set
-#   remove '-p 80,443,3923' to only listen on port 3923
+#   add '-q' to disable logging on busy servers
 #   add '-i 127.0.0.1' to only allow local connections
 #   add '-e2dsa' to enable filesystem scanning + indexing
 #   add '-e2ts' to enable metadata indexing
@@ -35,8 +38,23 @@ Type=notify
 SyslogIdentifier=copyparty
 Environment=PYTHONUNBUFFERED=x
 ExecReload=/bin/kill -s USR1 $MAINPID
-ExecStartPre=/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
-ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -p 80,443,3923 -e2d -v /mnt::rw
+
+# user to run as + where the TLS certificate is (if any)
+User=cpp
+Environment=XDG_CONFIG_HOME=/home/cpp/.config
+
+# setup forwarding from ports 80 and 443 to port 3923
+ExecStartPre=+/bin/bash -c 'nft -n -a list table nat | awk "/ to :3923 /{print\$NF}" | xargs -rL1 nft delete rule nat prerouting handle; true'
+ExecStartPre=+nft add table ip nat
+ExecStartPre=+nft -- add chain ip nat prerouting { type nat hook prerouting priority -100 \; }
+ExecStartPre=+nft add rule ip nat prerouting tcp dport 80 redirect to :3923
+ExecStartPre=+nft add rule ip nat prerouting tcp dport 443 redirect to :3923
+
+# stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
+ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
+
+# copyparty settings
+ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -e2d -v /mnt::rw
 
 [Install]
 WantedBy=multi-user.target
