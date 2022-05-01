@@ -1762,7 +1762,7 @@ html.y #bbox-overlay figcaption a {
 	text-shadow: .05em .05em .1em var(--bg-max);
 	background: rgba(224, 224, 224, 0.2);
 	box-shadow: 0 0 0 #999;
-	border: .5em solid #999;
+	border: .5em solid #888;
 	border-radius: .5em;
 	border-width: 1vw;
 	color: #fff;
@@ -1796,6 +1796,13 @@ html.y #bbox-overlay figcaption a {
 #drops .dropdesc>div>div+div {
 	left: auto;
 	right: -.8em;
+}
+#drops .dropdesc b {
+	position: relative;
+	font-size: .6em;
+	top: -.25em;
+	margin: 0 .8em;
+	margin: 0 1.25vw;
 }
 #drops .dropzone {
 	z-index: 80386;
