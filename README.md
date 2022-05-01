@@ -881,7 +881,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **w3m** (0.5.3/macports)  | can browse, login, upload at 100kB/s, mkdir/msg |
 | **netsurf** (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
 | **opera** (11.60/winxp)   | OK: thumbnails, image-viewer, zip-selection, rename/cut/paste. NG: up2k, navpane, markdown, audio |
-| **ie4** and **netscape** 4.0  | can browse, upload with `?b=u` |
+| **ie4** and **netscape** 4.0  | can browse, upload with `?b=u`, auth with `&pw=wark` |
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 
 

@@ -45,7 +45,9 @@
 <tr><td></td><td><a href="../{{ url_suf }}">parent folder</a></td><td>-</td><td>-</td></tr>
 
 {%- for f in files %}
-<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}{{ url_suf }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td><td>{{ f.dt }}</td></tr>
+<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}{{
+	'&' + url_suf[1:] if url_suf[:1] == '?' and '?' in f.href else url_suf
+	}}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td><td>{{ f.dt }}</td></tr>
 {%- endfor %}
 
 		</tbody>

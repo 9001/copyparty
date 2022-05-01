@@ -2178,7 +2178,7 @@ class HttpCli(object):
         if self.can_get:
             perms.append("get")
 
-        url_suf = self.urlq({}, [])
+        url_suf = self.urlq({}, ["k"])
         is_ls = "ls" in self.uparam
         is_js = self.args.force_js or self.cookies.get("js") == "y"
 
