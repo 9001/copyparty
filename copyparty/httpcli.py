@@ -1025,7 +1025,11 @@ class HttpCli(object):
             pwd = "x"  # nosec
             dur = None
 
-        return [gencookie("cppwd", pwd, dur), msg]
+        r = gencookie("cppwd", pwd, dur)
+        if self.headers.get("user-agent", "").startswith("Mozilla/4."):
+            r = r.rsplit(" ", 1)[0]
+
+        return [r, msg]
 
     def handle_mkdir(self):
         new_dir = self.parser.require("name", 512)
