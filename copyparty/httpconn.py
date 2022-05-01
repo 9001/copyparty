@@ -46,6 +46,7 @@ class HttpConn(object):
         self.stopping = False
         self.nreq = 0
         self.nbyte = 0
+        self.pwd_cookie_upd = 0
         self.u2idx = None
         self.log_func = hsrv.log
         self.lf_url = re.compile(self.args.lf_url) if self.args.lf_url else None

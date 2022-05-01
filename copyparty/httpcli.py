@@ -143,6 +143,10 @@ class HttpCli(object):
         if self.args.rsp_slp:
             time.sleep(self.args.rsp_slp)
 
+        self.ua = self.headers.get("user-agent", "")
+        self.is_rclone = self.ua.startswith("rclone/")
+        self.is_ancient = self.ua.startswith("Mozilla/4.")
+
         v = self.headers.get("connection", "").lower()
         self.keepalive = not v.startswith("close") and self.http_ver != "HTTP/1.0"
         self.is_https = (self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls)
@@ -241,11 +245,12 @@ class HttpCli(object):
         self.dvol = self.asrv.vfs.adel[self.uname]
         self.gvol = self.asrv.vfs.aget[self.uname]
 
-        if pwd and "pw" in self.ouparam and pwd != cookies.get("cppwd"):
+        # resend auth cookie if more than 1/3 of the lifetime has passed
+        # (rate-limited to prevent thrashing browser state, not for performance)
+        if pwd and self.conn.pwd_cookie_upd < self.t0 - 20 * 60 * self.args.logout:
             self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(pwd)[0]))
+            self.conn.pwd_cookie_upd = self.t0
 
-        self.ua = self.headers.get("user-agent", "")
-        self.is_rclone = self.ua.startswith("rclone/")
         if self.is_rclone:
             uparam["raw"] = False
             uparam["dots"] = False
@@ -1007,9 +1012,15 @@ class HttpCli(object):
         pwd = self.parser.require("cppwd", 64)
         self.parser.drop()
 
+        self.out_headerlist = [
+            x
+            for x in self.out_headerlist
+            if x[0] != "Set-Cookie" or "cppwd=" not in x[1]
+        ]
+
         dst = "/"
         if self.vpath:
-            dst = "/" + quotep(self.vpath)
+            dst += quotep(self.vpath)
 
         ck, msg = self.get_pwd_cookie(pwd)
         html = self.j2("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
@@ -1019,14 +1030,14 @@ class HttpCli(object):
     def get_pwd_cookie(self, pwd):
         if pwd in self.asrv.iacct:
             msg = "login ok"
-            dur = 60 * 60 * 24 * 365
+            dur = int(60 * 60 * self.args.logout)
         else:
             msg = "naw dude"
             pwd = "x"  # nosec
             dur = None
 
         r = gencookie("cppwd", pwd, dur)
-        if self.headers.get("user-agent", "").startswith("Mozilla/4."):
+        if self.is_ancient:
             r = r.rsplit(" ", 1)[0]
 
         return [r, msg]
@@ -1818,15 +1829,17 @@ class HttpCli(object):
         self.redirect("", "?h#cc")
 
     def tx_404(self, is_403=False):
+        rc = 404
         if self.args.vague_403:
             m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
         elif is_403:
             m = '<h1>403 forbiddena &nbsp;~┻━┻</h1><p>you\'ll have to log in or <a href="/?h">go home</a></p>'
+            rc = 403
         else:
             m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p><a href="/?h">go home</a></p>'
 
         html = self.j2("splash", this=self, qvpath=quotep(self.vpath), msg=m)
-        self.reply(html.encode("utf-8"), status=404)
+        self.reply(html.encode("utf-8"), status=rc)
         return True
 
     def scanvol(self):

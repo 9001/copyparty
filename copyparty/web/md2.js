@@ -255,7 +255,7 @@ function Modpoll() {
 
         console.log('modpoll...');
         var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
-        var xhr = new XMLHttpRequest();
+        var xhr = new XHR();
         xhr.open('GET', url, true);
         xhr.responseType = 'text';
         xhr.onreadystatechange = r.cb;
@@ -268,7 +268,7 @@ function Modpoll() {
             return;
         }
 
-        if (this.readyState != XMLHttpRequest.DONE)
+        if (this.readyState != XHR.DONE)
             return;
 
         if (this.status !== 200) {
@@ -336,7 +336,7 @@ function save(e) {
         fd.append("body", txt);
 
         var url = (document.location + '').split('?')[0];
-        var xhr = new XMLHttpRequest();
+        var xhr = new XHR();
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
         xhr.onreadystatechange = save_cb;
@@ -356,7 +356,7 @@ function save(e) {
 }
 
 function save_cb() {
-    if (this.readyState != XMLHttpRequest.DONE)
+    if (this.readyState != XHR.DONE)
         return;
 
     if (this.status !== 200)
@@ -397,7 +397,7 @@ function save_cb() {
 function run_savechk(lastmod, txt, btn, ntry) {
     // download the saved doc from the server and compare
     var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
-    var xhr = new XMLHttpRequest();
+    var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
     xhr.onreadystatechange = savechk_cb;
@@ -409,7 +409,7 @@ function run_savechk(lastmod, txt, btn, ntry) {
 }
 
 function savechk_cb() {
-    if (this.readyState != XMLHttpRequest.DONE)
+    if (this.readyState != XHR.DONE)
         return;
 
     if (this.status !== 200)

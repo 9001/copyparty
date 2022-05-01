@@ -3,6 +3,7 @@
 function dbg(msg) {
 	ebi('path').innerHTML = msg;
 }
+var XHR = XMLHttpRequest;
 
 
 // toolbar
@@ -1562,12 +1563,37 @@ function evau_error(e) {
 			err = 'Unknown Errol';
 			break;
 	}
-	if (eplaya.error.message)
-		err += '\n\n' + eplaya.error.message;
+	var em = '' + eplaya.error.message,
+		mfile = '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop())[0] + '»',
+		e404 = 'Could not play audio; error 404: File not found.',
+		e403 = 'Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out';
 
-	err += '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop())[0] + '»';
+	if (em)
+		err += '\n\n' + em;
 
-	toast.warn(15, esc(basenames(err)));
+	if (em.startsWith('403: '))
+		err = e403;
+
+	if (em.startsWith('404: '))
+		err = e404;
+
+	toast.warn(15, esc(basenames(err + mfile)));
+
+	if (em.startsWith('MEDIA_ELEMENT_ERROR:')) {
+		// chromish for 40x
+		var xhr = new XHR();
+		xhr.open('HEAD', eplaya.src, true);
+		xhr.onreadystatechange = function () {
+			if (this.readyState != XHR.DONE || this.status < 400)
+				return;
+
+			err = this.status == 403 ? e403 : this.status == 404 ? e404 :
+				'Could not play audio; server error ' + this.status;
+
+			toast.warn(15, esc(basenames(err + mfile)));
+		};
+		xhr.send();
+	}
 }
 
 
@@ -2147,7 +2173,7 @@ var fileman = (function () {
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
-				if (this.readyState != XMLHttpRequest.DONE)
+				if (this.readyState != XHR.DONE)
 					return;
 
 				if (this.status !== 200) {
@@ -2160,7 +2186,7 @@ var fileman = (function () {
 				return rn_apply();
 			}
 
-			var xhr = new XMLHttpRequest();
+			var xhr = new XHR();
 			xhr.open('GET', f[0].src + '?move=' + dst, true);
 			xhr.onreadystatechange = rename_cb;
 			xhr.send();
@@ -2182,7 +2208,7 @@ var fileman = (function () {
 			return toast.err(3, 'select at least 1 item to delete');
 
 		function deleter() {
-			var xhr = new XMLHttpRequest(),
+			var xhr = new XHR(),
 				vp = vps.shift();
 
 			if (!vp) {
@@ -2197,7 +2223,7 @@ var fileman = (function () {
 			xhr.send();
 		}
 		function delete_cb() {
-			if (this.readyState != XMLHttpRequest.DONE)
+			if (this.readyState != XHR.DONE)
 				return;
 
 			if (this.status !== 200) {
@@ -2290,7 +2316,7 @@ var fileman = (function () {
 			return;
 
 		function paster() {
-			var xhr = new XMLHttpRequest(),
+			var xhr = new XHR(),
 				vp = req.shift();
 
 			if (!vp) {
@@ -2308,7 +2334,7 @@ var fileman = (function () {
 			xhr.send();
 		}
 		function paste_cb() {
-			if (this.readyState != XMLHttpRequest.DONE)
+			if (this.readyState != XHR.DONE)
 				return;
 
 			if (this.status !== 200) {
@@ -2461,7 +2487,7 @@ var showfile = (function () {
 	};
 
 	r.show = function (url, no_push) {
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.url = url;
 		xhr.no_push = no_push;
 		xhr.ts = Date.now();
@@ -2471,13 +2497,11 @@ var showfile = (function () {
 	};
 
 	function load_cb() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
 
-		if (this.status !== 200) {
-			toast.err(0, "recvtree, http " + this.status + ": " + this.responseText);
+		if (!xhrchk(this, "could not load textfile:\n\nerror ", "404, file not found"))
 			return;
-		}
 
 		render([this.url, '', this.responseText], this.no_push);
 	}
@@ -3464,7 +3488,7 @@ document.onkeydown = function (e) {
 		srch_msg(false, "searching...");
 		clearTimeout(search_timeout);
 
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.open('POST', '/?srch', true);
 		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onreadystatechange = xhr_search_results;
@@ -3474,7 +3498,7 @@ document.onkeydown = function (e) {
 	}
 
 	function xhr_search_results() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
 
 		if (this.status !== 200) {
@@ -3802,7 +3826,7 @@ var treectl = (function () {
 	};
 
 	function get_tree(top, dst, rst) {
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.top = top;
 		xhr.dst = dst;
 		xhr.rst = rst;
@@ -3814,13 +3838,11 @@ var treectl = (function () {
 	}
 
 	function recvtree() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
 
-		if (this.status !== 200) {
-			toast.err(0, "recvtree, http " + this.status + ": " + this.responseText);
+		if (!xhrchk(this, "could not list subfolders:\n\nerror ", "404, folder not found"))
 			return;
-		}
 
 		var cur = ebi('treeul').getAttribute('ts');
 		if (cur && parseInt(cur) > this.ts) {
@@ -3973,7 +3995,7 @@ var treectl = (function () {
 	}
 
 	r.reqls = function (url, hpush, no_tree) {
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.top = url;
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
@@ -4002,13 +4024,11 @@ var treectl = (function () {
 	}
 
 	function recvls() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
 
-		if (this.status !== 200) {
-			toast.err(0, "recvls, http " + this.status + ": " + this.responseText);
+		if (!xhrchk(this, "could not list files in folder:\n\nerror ", "404, folder not found"))
 			return;
-		}
 
 		var cur = ebi('files').getAttribute('ts');
 		if (cur && parseInt(cur) > this.ts) {
@@ -4137,7 +4157,7 @@ var treectl = (function () {
 	r.hydrate = function () {
 		qsr('#bbsw');
 		if (ls0 === null) {
-			var xhr = new XMLHttpRequest();
+			var xhr = new XHR();
 			xhr.open('GET', '/?am_js', true);
 			xhr.send();
 
@@ -4898,7 +4918,7 @@ var msel = (function () {
 		fd.append("act", "mkdir");
 		fd.append("name", tb.value);
 
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.vp = get_evpath();
 		xhr.dn = tb.value;
 		xhr.open('POST', xhr.vp, true);
@@ -4910,13 +4930,15 @@ var msel = (function () {
 	};
 
 	function cb() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
 
 		if (this.vp !== get_evpath()) {
 			sf.textContent = 'aborted due to location change';
 			return;
 		}
+
+		xhrchk(this, "could not create subfolder:\n\nerror ", "404, parent folder not found");
 
 		if (this.status !== 200) {
 			sf.textContent = 'error: ' + this.responseText;
@@ -4947,7 +4969,7 @@ var msel = (function () {
 		clmod(sf, 'vis', 1);
 		sf.textContent = 'sending...';
 
-		var xhr = new XMLHttpRequest(),
+		var xhr = new XHR(),
 			ct = 'application/x-www-form-urlencoded;charset=UTF-8';
 
 		xhr.msg = tb.value;
@@ -4963,8 +4985,10 @@ var msel = (function () {
 	};
 
 	function cb() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
+
+		xhrchk(this, "could not send message:\n\nerror ", "404, parent folder not found");
 
 		if (this.status !== 200) {
 			sf.textContent = 'error: ' + this.responseText;
@@ -5080,15 +5104,11 @@ var unpost = (function () {
 			html = [];
 
 		function unpost_load_cb() {
-			if (this.readyState != XMLHttpRequest.DONE)
+			if (this.readyState != XHR.DONE)
 				return;
 
-			if (this.status !== 200) {
-				var msg = this.responseText;
-				toast.err(9, 'unpost-load failed:\n' + msg);
-				ebi('op_unpost').innerHTML = html.join('\n');
-				return;
-			}
+			if (!xhrchk(this, "unpost-load failed:\n\nerror ", "404, file not found??"))
+				return ebi('op_unpost').innerHTML = 'failed to load unpost list from server';
 
 			var res = JSON.parse(this.responseText);
 			if (res.length) {
@@ -5128,7 +5148,7 @@ var unpost = (function () {
 		if (filt.value)
 			q += '&filter=' + uricom_enc(filt.value, true);
 
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.open('GET', q, true);
 		xhr.onreadystatechange = unpost_load_cb;
 		xhr.send();
@@ -5137,7 +5157,7 @@ var unpost = (function () {
 	};
 
 	function unpost_delete_cb() {
-		if (this.readyState != XMLHttpRequest.DONE)
+		if (this.readyState != XHR.DONE)
 			return;
 
 		if (this.status !== 200) {
@@ -5188,7 +5208,7 @@ var unpost = (function () {
 
 		toast.inf(0, "deleting " + req.length + " files...");
 
-		var xhr = new XMLHttpRequest();
+		var xhr = new XHR();
 		xhr.n = n;
 		xhr.n2 = n2;
 		xhr.open('POST', '/?delete', true);

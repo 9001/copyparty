@@ -14,7 +14,8 @@ var is_touch = 'ontouchstart' in window,
 var ebi = document.getElementById.bind(document),
     QS = document.querySelector.bind(document),
     QSA = document.querySelectorAll.bind(document),
-    mknod = document.createElement.bind(document);
+    mknod = document.createElement.bind(document),
+    XHR = XMLHttpRequest;
 
 
 function qsr(sel) {
@@ -1386,3 +1387,17 @@ var favico = (function () {
     r.to = setTimeout(r.init, 100);
     return r;
 })();
+
+
+function xhrchk(xhr, prefix, e404) {
+    if (xhr.status < 400 && xhr.status >= 200)
+        return true;
+
+    if (xhr.status == 403)
+        return toast.err(0, prefix + "403, access denied\n\ntry pressing F5, maybe you got logged out");
+
+    if (xhr.status == 404)
+        return toast.err(0, prefix + e404);
+
+    return toast.err(0, prefix + xhr.status + ": " + xhr.responseText);
+}

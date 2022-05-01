@@ -114,7 +114,7 @@ function save(mde) {
         fd.append("body", txt);
 
         var url = (document.location + '').split('?')[0];
-        var xhr = new XMLHttpRequest();
+        var xhr = new XHR();
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
         xhr.onreadystatechange = save_cb;
@@ -133,7 +133,7 @@ function save(mde) {
 }
 
 function save_cb() {
-    if (this.readyState != XMLHttpRequest.DONE)
+    if (this.readyState != XHR.DONE)
         return;
 
     if (this.status !== 200)
@@ -170,7 +170,7 @@ function save_cb() {
 
     // download the saved doc from the server and compare
     var url = (document.location + '').split('?')[0] + '?raw';
-    var xhr = new XMLHttpRequest();
+    var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
     xhr.onreadystatechange = save_chk;
@@ -182,7 +182,7 @@ function save_cb() {
 }
 
 function save_chk() {
-    if (this.readyState != XMLHttpRequest.DONE)
+    if (this.readyState != XHR.DONE)
         return;
 
     if (this.status !== 200)

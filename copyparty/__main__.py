@@ -487,6 +487,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore --no-robots")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything")
+    ap2.add_argument("--logout", metavar="H", type=float, default="8086", help="logout clients after H hours of inactivity (0.0028=10sec, 0.1=6min, 24=day, 168=week, 720=month, 8760=year)")
 
     ap2 = ap.add_argument_group('yolo options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
