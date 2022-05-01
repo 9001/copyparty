@@ -245,11 +245,8 @@ class HttpCli(object):
         self.dvol = self.asrv.vfs.adel[self.uname]
         self.gvol = self.asrv.vfs.aget[self.uname]
 
-        # resend auth cookie if more than 1/3 of the lifetime has passed
-        # (rate-limited to prevent thrashing browser state, not for performance)
-        if pwd and self.conn.pwd_cookie_upd < self.t0 - 20 * 60 * self.args.logout:
+        if pwd:
             self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(pwd)[0]))
-            self.conn.pwd_cookie_upd = self.t0
 
         if self.is_rclone:
             uparam["raw"] = False
