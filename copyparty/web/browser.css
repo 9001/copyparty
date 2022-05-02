@@ -66,6 +66,7 @@
 	--u2-ok-b1: #8e4;
 	--u2-err-bg: #900;
 	--u2-err-b1: #d06;
+	--ud-b1: #888;
 	
 	--sort-1: #fb0;
 	--sort-2: #d09;
@@ -100,8 +101,9 @@
 	--g-f-fg: var(--a-hil);
 	--g-sh: rgba(0,0,0,0.3);
 
-	--f-sh1: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(255,255,255,0.02) inset, 0 -1px 0 rgba(255,255,255,0.02) inset;
-	--f-sh2: 1px 0 0 0 rgba(128,128,128,0.4) inset, 0 1px 0 rgba(0,0,0,0.2) inset, 0 -1px 0 rgba(0,0,0,0.2) inset;
+	--f-sh1: 0.33;
+	--f-sh2: 0.02;
+	--f-sh3: 0.2;
 
 	--f-play-bg: #fc5;
 	--f-play-fg: #000;
@@ -162,6 +164,7 @@ html.y {
 	--u2-tab-1-b2: #05a;
 	--u2-tab-1-fg: var(--fg-max);
 	--u2-tab-1-bg: inherit;
+	--ud-b1: #bbb;
 
 	--sort-1: #059;
 	--sort-2: #f5d;
@@ -183,8 +186,9 @@ html.y {
 	--g-f-b1: var(--bg-u5);
 	--g-sh: rgba(0,0,0,0.07);
 
-	--f-sh1: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(255,255,255,0.5) inset, 0 -1px 0 rgba(255,255,255,0.5) inset;
-	--f-sh2: 1px 0 0 0 rgba(128,128,128,0.3) inset, 0 1px 0 rgba(0,0,0,0.02) inset, 0 -1px 0 rgba(0,0,0,0.02) inset;
+	--f-sh1: 0.3;
+	--f-sh2: 0.5;
+	--f-sh3: 0.02;
 
 	--f-sel-sh: #e80;
 
@@ -232,6 +236,8 @@ html.b {
 	--u2-o-h-bg: var(--btn-h-bg);
 	--u2-o-1-bg: var(--a);
 	--u2-o-1h-bg: var(--a-hil);
+
+	--f-sh1: 0.1;
 }
 html.bz {
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u2));
@@ -443,10 +449,10 @@ html.y #files thead th {
 	overflow: hidden;
 }
 #files td+td {
-    box-shadow: var(--f-sh1);
+	box-shadow: 1px 0 0 0 rgba(128,128,128,var(--f-sh1)) inset, 0 1px 0 rgba(255,255,255,var(--f-sh2)) inset, 0 -1px 0 rgba(255,255,255,var(--f-sh2)) inset;
 }
 #files tr:nth-child(2n+1) td+td {
-    box-shadow: var(--f-sh2);
+	box-shadow: 1px 0 0 0 rgba(128,128,128,var(--f-sh1)) inset, 0 1px 0 rgba(0,0,0,var(--f-sh3)) inset, 0 -1px 0 rgba(0,0,0,var(--f-sh3)) inset;
 }
 #files td:first-child {
 	border-radius: .25em 0 0 .25em;
@@ -1742,7 +1748,7 @@ html.y #bbox-overlay figcaption a {
 	background: rgba(48, 48, 48, 0.7);
 }
 #drops.vis,
-#drops .dropzone {
+.dropzone {
 	display: block;
 	position: fixed;
 	top: 0;
@@ -1750,68 +1756,72 @@ html.y #bbox-overlay figcaption a {
 	right: 0;
 	bottom: 0;
 }
-#drops .dropdesc {
+.dropdesc {
 	position: fixed;
 	display: table;
 	left: 10%;
 	width: 78%;
-	height: 30%;
+	height: 26%;
 	margin: 0;
 	font-size: 3em;
 	font-weight: bold;
-	text-shadow: .05em .05em .1em var(--bg-max);
+	text-shadow: .05em .05em .1em #333;
 	background: rgba(224, 224, 224, 0.2);
 	box-shadow: 0 0 0 #999;
-	border: .5em solid #888;
+	border: .5em solid var(--ud-b1);
 	border-radius: .5em;
 	border-width: 1vw;
 	color: #fff;
 	transition: all 0.12s;
 }
-#drops .dropdesc.hl.ok {
+.dropdesc.hl.ok {
 	border-color: #fff;
-	box-shadow: 0 0 1em #cf5;
+	box-shadow: 0 0 1em .4em #cf5, 0 0 1em #000 inset;
 	background: rgba(24, 24, 24, 0.7);
 	left: 8%;
 	width: 82%;
 	height: 32%;
-	margin: -1vh 0;
+	margin: -3vh 0;
 }
-#drops .dropdesc.hl.err {
+.dropdesc.hl.err {
 	background: rgba(224, 32, 65, 0.2);
-	box-shadow: 0 0 1em #f26;
+	box-shadow: 0 0 1em .4em #f26;
 	border-color: #fab;
 }
-#drops .dropdesc>div {
+.dropdesc>div {
 	display: table-cell;
 	vertical-align: middle;
 	text-align: center;
 }
-#drops .dropdesc>div>div {
+.dropdesc>div>div {
 	position: absolute;
 	top: 40%;
 	top: calc(50% - .5em);
 	left: -.8em;
 }
-#drops .dropdesc>div>div+div {
+.dropdesc>div>div+div {
 	left: auto;
 	right: -.8em;
 }
-#drops .dropdesc b {
+.dropdesc b {
 	position: relative;
 	font-size: .6em;
+	font-size: 2.5vw;
 	top: -.25em;
 	margin: 0 .8em;
 	margin: 0 1.25vw;
 }
-#drops .dropzone {
+.dropdesc.hl b {
+	border-bottom: .1em solid #fff;
+}
+.dropzone {
 	z-index: 80386;
 	height: 50%;
 }
-#drops #up_dz {
+#up_dz {
 	bottom: 50%;
 }
-#drops #srch_dz {
+#srch_dz {
 	top: 50%;
 }
 #up_zd {
@@ -1824,7 +1834,7 @@ html.y #bbox-overlay figcaption a {
 	color: #fff;
 	background: #490;
 	border-bottom: .3em solid #6d2;
-	text-shadow: 1px 1px 1px var(--bg-max);
+	text-shadow: 1px 1px 1px #000;
 	border-radius: .3em;
 	padding: .4em .8em;
 	font-size: .4em;
@@ -2152,7 +2162,7 @@ html.b #u2conf a.b:hover {
 #u2tab span.inf,
 #u2tab span.ok,
 #u2tab span.err {
-	color: var(--fg-max);
+	color: #fff;
 	padding: .22em;
 	border-radius: .2em;
 	border: 2px solid #f0f;
