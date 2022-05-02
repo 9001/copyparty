@@ -417,8 +417,15 @@ class ThumbSrv(object):
             m = "FFmpeg failed because it was compiled without libsox; you must set --th-ff-swr to force swr resampling:\n"
             c = 1
 
-        m += "\n".join(["ff: {}".format(x) for x in serr.split("\n")])
-        self.log(m, c=c)
+        lines = serr.strip("\n").split("\n")
+        if len(lines) > 50:
+            lines = lines[:25] + ["[...]"] + lines[-25:]
+
+        txt = "\n".join(["ff: " + str(x) for x in lines])
+        if len(txt) > 5000:
+            txt = txt[:2500] + "...\nff: [...]\nff: ..." + txt[-2500:]
+
+        self.log(m + txt, c=c)
         raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
     def conv_spec(self, abspath, tpath):
