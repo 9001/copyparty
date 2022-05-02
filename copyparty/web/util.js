@@ -1186,6 +1186,9 @@ var modal = (function () {
             return ok();
         }
 
+        if ((k == 'ArrowLeft' || k == 'ArrowRight') && eng && (ae == eok || ae == eng))
+            return (ae == eok ? eng : eok).focus() || ev(e);
+
         if (k == 'Escape')
             return ng();
     }
