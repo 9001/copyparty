@@ -11,6 +11,7 @@ html {
 	max-width: 34em;
 	max-width: min(34em, 90%);
 	max-width: min(34em, calc(100% - 7em));
+	color: #ddd;
 	background: #333;
 	border: 0 solid #777;
 	box-shadow: 0 .2em .5em #111;

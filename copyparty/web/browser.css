@@ -431,11 +431,11 @@ a:hover {
 #files thead th {
 	padding: .3em;
 	background: var(--bg);
-	border-bottom: 1px solid var(--bg-u5);
+	border-bottom: 1px solid rgba(128,128,128,0.7);
 	cursor: pointer;
 }
 html.y #files thead th {
-	box-shadow: 0 -1px 0 rgba(0,0,0,0.33) inset;
+	box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
 #files td {
 	margin: 0;
@@ -674,6 +674,7 @@ html.np_open #ggrid>a.au:before {
 #ggrid>a.play,
 #ggrid>a[tt].play {
 	color: var(--g-sel-fg);
+	background: #fc0;
 	background: var(--g-play-bg);
 	border-color: var(--g-play-b1);
 	border-top: 1px solid var(--g-play-b2);
@@ -683,6 +684,7 @@ html.np_open #ggrid>a.au:before {
 #ggrid>a.sel,
 #ggrid>a[tt].sel {
 	color: var(--g-sel-fg);
+	background: #f3c;
 	background: var(--g-sel-bg);
 	border-color: var(--g-sel-b1);
 }
@@ -812,6 +814,7 @@ html.y #widget.open {
 }
 #wtoggle,
 #widgeti {
+	background: #fff;
 	background: var(--bg-u3);
 }
 #wfm, #wzip, #wnp {
@@ -937,7 +940,9 @@ html.y #widget.open {
 	outline: none;
 }
 #ops a.act {
+	color: #fff;
 	color: var(--op-aa-fg);
+	background: #000;
 	background: var(--op-aa-bg);
 	border-radius: 0 0 .2em .2em;
 	border-bottom: .3em solid var(--a-b);
@@ -970,7 +975,8 @@ html.y #ops svg circle {
 	background: var(--btn-bg);
 	border: none;
 	box-shadow: 0 0 2px var(--txt-sh);
-	border-bottom: 1px solid var(--a);
+	border-bottom: 1px solid #999;
+	border-color: var(--a);
 	border-radius: .2em;
 	padding: .2em .3em;
 }
@@ -987,6 +993,7 @@ input[type="checkbox"]+label {
 }
 input[type="radio"]:checked+label,
 input[type="checkbox"]:checked+label {
+	color: #0e0;
 	color: var(--a);
 }
 .opwide div>span>input+label {
@@ -1147,6 +1154,7 @@ html {
 }
 .btn {
 	color: var(--btn-fg);
+	background: #eee;
 	background: var(--btn-bg);
 	border-radius: .3em;
 	padding: .2em .4em;
@@ -1168,7 +1176,9 @@ html.ca .btn {
 	background: var(--btn-h-bg);
 }
 .tgl.btn.on {
+	background: #000;
 	background: var(--btn-1-bg);
+	color: #fff;
 	color: var(--btn-1-fg);
 	text-shadow: none;
 }
@@ -1199,8 +1209,10 @@ html.ca .tgl.btn.on {
 	border-top: 1px solid var(--bg-u5);
 }
 #tree ul a.sel {
+	background: #000;
 	background: var(--bg-d3);
 	box-shadow: -.8em 0 0 var(--g-sel-b1) inset;
+	color: #fff;
 	color: var(--fg-max);
 }
 #tree ul a.hl {
@@ -1276,6 +1288,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #files tbody tr.play td,
 #files tbody tr.play td+td,
 #files tbody tr.play div a {
+	background: #fc0;
 	background: var(--f-play-bg);
 	color: var(--f-play-fg);
 	text-shadow: none;
