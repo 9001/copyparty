@@ -1104,6 +1104,7 @@ var mpui = (function () {
 		fpreloaded = null;
 
 	r.progress_updater = function () {
+		//console.trace();
 		timer.add(updater_impl, true);
 	};
 
@@ -1467,6 +1468,7 @@ function play(tid, is_ev, seek) {
 		mp.au2 = new Audio();
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
+		mp.au.onplaying = mpui.progress_updater;
 		mp.au.onended = next_song;
 		widget.open();
 	}
@@ -1483,6 +1485,7 @@ function play(tid, is_ev, seek) {
 		t.onerror = t.onprogress = t.onended = null;
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
+		mp.au.onplaying = mpui.progress_updater;
 		mp.au.onended = next_song;
 	}
 	else
