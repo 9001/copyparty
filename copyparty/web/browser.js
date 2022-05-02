@@ -613,6 +613,10 @@ function MPlayer() {
 			r.fvol = 0;
 			r.au.pause();
 			mpl.pp();
+
+			var t = mp.au.currentTime - 0.8;
+			if (isFinite(t))
+				mp.au.currentTime = Math.max(t, 0);
 		}
 		else if (r.fvol > r.vol)
 			r.fvol = r.vol;
