@@ -597,6 +597,21 @@ html.y #path a:hover {
 	padding: .3em;
 	margin: -.3em;
 }
+#files tbody tr.play td,
+#files tbody tr.play td+td,
+#files tbody tr.play div a {
+	background: #fc0;
+	background: var(--f-play-bg);
+	color: var(--f-play-fg);
+	text-shadow: none;
+}
+#files tbody tr.play a {
+	color: inherit;
+}
+#files tbody tr.play a:hover {
+	color: var(--btn-1-fg);
+	background: var(--btn-1h-bg);
+}
 #ggrid {
 	margin: -.2em -.5em;
 }
@@ -737,7 +752,7 @@ html.np_open #ggrid>a.au:before {
 	background: var(--bg-d3);
 	box-shadow: 0 .2em 0 var(--f-sel-sh), 0 -.2em 0 var(--f-sel-sh);
 }
-#files tr:focus td:first-child {
+#files tr:focus:not(.play):not(.sel) td:first-child {
 	background: var(--bg-d3);
 	box-shadow: -.2em .2em 0 var(--f-sel-sh), -.2em -.2em 0 var(--f-sel-sh);
 }
@@ -1284,21 +1299,6 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 #files td:nth-child(2n) {
 	color: var(--tab-alt);
-}
-#files tbody tr.play td,
-#files tbody tr.play td+td,
-#files tbody tr.play div a {
-	background: #fc0;
-	background: var(--f-play-bg);
-	color: var(--f-play-fg);
-	text-shadow: none;
-}
-#files tbody tr.play a {
-	color: inherit;
-}
-#files tbody tr.play a:hover {
-	color: var(--btn-1-fg);
-	background: var(--btn-1h-bg);
 }
 .opwide,
 #op_unpost,
