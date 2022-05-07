@@ -101,6 +101,11 @@ document.documentElement.className = localStorage.light == 1 ? "y" : "z";
 
 </script>
 <script src="/.cpr/util.js?_={{ ts }}"></script>
-<script>tt.init();</script>
+<script>
+    tt.init();
+    {%- if this.uname == '*' %}
+        QS('input[name="cppwd"]').focus();
+    {%- endif %}
+</script>
 </body>
 </html>
