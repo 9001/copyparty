@@ -284,10 +284,11 @@ class HttpCli(object):
                 msg = str(ex) if pex == ex else min_ex()
                 self.log("{}\033[0m, {}".format(msg, self.vpath), 3)
 
-                msg = "<pre>{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
+                msg = "{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
                 if self.hint:
                     msg += "hint: {}\r\n".format(self.hint)
 
+                msg = "<pre>" + html_escape(msg)
                 self.reply(msg.encode("utf-8", "replace"), status=pex.code, volsan=True)
                 return self.keepalive
             except Pebkac:
@@ -1879,7 +1880,7 @@ class HttpCli(object):
         if self.args.no_stack:
             raise Pebkac(403, "the stackdump feature is disabled in server config")
 
-        ret = "<pre>{}\n{}".format(time.time(), alltrace())
+        ret = "<pre>{}\n{}".format(time.time(), html_escape(alltrace()))
         self.reply(ret.encode("utf-8"))
 
     def tx_tree(self):

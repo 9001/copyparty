@@ -1402,5 +1402,6 @@ function xhrchk(xhr, prefix, e404) {
     if (xhr.status == 404)
         return toast.err(0, prefix + e404);
 
-    return toast.err(0, prefix + xhr.status + ": " + xhr.responseText);
+    return toast.err(0, prefix + xhr.status + ": " + (
+        (xhr.response && xhr.response.err) || xhr.responseText));
 }

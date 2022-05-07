@@ -1811,11 +1811,8 @@ function up2k_init(subtle) {
                     tasker();
                     return;
                 }
-                toast.err(0, "server broke; hs-err {0} on file [{1}]:\n".format(
-                    xhr.status, t.name) + (
-                        (xhr.response && xhr.response.err) ||
-                        (xhr.responseText && xhr.responseText) ||
-                        "no further information"));
+                err = t.t_uploading ? "finalize upload" : t.srch ? "perform search" : "initiate upload";
+                xhrchk(xhr, "server rejected the request to " + err + ";\n\nfile: " + t.name + "\n\nerror ", "404, target folder not found");
             }
         }
         xhr.onload = function (e) {
@@ -1874,8 +1871,7 @@ function up2k_init(subtle) {
                 console.log("ignoring dupe-segment error", t);
             }
             else {
-                toast.err(0, "server broke; cu-err {0} on file [{1}]:\n".format(
-                    xhr.status, t.name) + (txt || "no further information"));
+                xhrchk(xhr, "server rejected upload (chunk {0} of {1});\n\nfile: {2}\n\nerror ".format(npart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)");
 
                 chill(t);
             }
@@ -1904,7 +1900,7 @@ function up2k_init(subtle) {
                     return;
 
                 if (!toast.visible)
-                    toast.warn(9.98, "failed to upload a chunk;\nprobably harmless, continuing\n\n" + t.name);
+                    toast.warn(9.98, "failed to upload chunk {0} of {1};\nprobably harmless, continuing\n\nfile: {2}".format(npart, Math.ceil(t.size / chunksize), t.name));
 
                 console.log('chunkpit onerror,', ++tries, t);
                 orz2(xhr);
