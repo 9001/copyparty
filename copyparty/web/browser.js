@@ -149,7 +149,6 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="show README.md in folder listings">📜 readme</a>\n' +
-	'		<a id="spafiles" class="tgl btn" href="#" tt="speedboost when not using the navpane;$Nturn it off if things arent loading somehow">spa</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -2855,7 +2854,7 @@ var thegrid = (function () {
 		else if (in_tree && !have_sel)
 			in_tree.click();
 
-		else if (is_dir && !have_sel && treectl.spa)
+		else if (is_dir && !have_sel)
 			treectl.reqls(href, true, true);
 
 		else if (!is_img && have_sel)
@@ -3625,7 +3624,6 @@ var treectl = (function () {
 		mentered = null,
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
-	bcfg_bind(r, 'spa', 'spafiles', true);
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
@@ -5256,7 +5254,7 @@ function wintitle(txt) {
 
 ebi('path').onclick = function (e) {
 	var a = e.target.closest('a[href]');
-	if (!treectl.spa || !a || !(a = a.getAttribute('href') + '') || !a.endsWith('/'))
+	if (!a || !(a = a.getAttribute('href') + '') || !a.endsWith('/'))
 		return;
 
 	thegrid.setvis(true);
@@ -5276,11 +5274,8 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 			el.click();
 			return ev(e);
 		}
-		if (treectl.spa) {
-			treectl.reqls(tgt.getAttribute('href'), true, true);
-			return ev(e);
-		}
-		return;
+		treectl.reqls(tgt.getAttribute('href'), true, true);
+		return ev(e);
 	}
 
 	tgt = e.target.closest('a[hl]');
