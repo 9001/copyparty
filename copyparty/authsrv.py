@@ -411,7 +411,7 @@ class VFS(object):
 
         return [abspath, real, virt_vis]
 
-    def walk(self, rel, rem, seen, uname, permsets, dots, scandir, lstat):
+    def walk(self, rel, rem, seen, uname, permsets, dots, scandir, lstat, subvols=True):
         """
         recursively yields from ./rem;
         rel is a unix-style user-defined vpath (not vfs-related)
@@ -444,8 +444,13 @@ class VFS(object):
 
             wrel = (rel + "/" + rdir).lstrip("/")
             wrem = (rem + "/" + rdir).lstrip("/")
-            for x in self.walk(wrel, wrem, seen, uname, permsets, dots, scandir, lstat):
+            for x in self.walk(
+                wrel, wrem, seen, uname, permsets, dots, scandir, lstat, subvols
+            ):
                 yield x
+
+        if not subvols:
+            return
 
         for n, vfs in sorted(vfs_virt.items()):
             if not dots and n.startswith("."):
@@ -1107,7 +1112,7 @@ class AuthSrv(object):
         flag_p = "p" in flags
         flag_r = "r" in flags
 
-        n_bads = 0
+        bads = []
         for v in vols:
             v = v[1:]
             vtop = "/{}/".format(v) if v else "/"
@@ -1119,10 +1124,19 @@ class AuthSrv(object):
                     continue
 
                 atop = vn.realpath
+                safeabs = atop + os.sep
                 g = vn.walk(
-                    vn.vpath, "", [], u, [[True]], True, not self.args.no_scandir, False
+                    vn.vpath,
+                    "",
+                    [],
+                    u,
+                    [[True]],
+                    True,
+                    not self.args.no_scandir,
+                    False,
+                    False,
                 )
-                for _, _, vpath, apath, files, _, _ in g:
+                for _, _, vpath, apath, files, dirs, _ in g:
                     fnames = [n[0] for n in files]
                     vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
                     vpaths = [vtop + x for x in vpaths]
@@ -1130,8 +1144,10 @@ class AuthSrv(object):
                     files = [[vpath + "/", apath + os.sep]] + list(zip(vpaths, apaths))
 
                     if flag_ln:
-                        files = [x for x in files if not x[1].startswith(atop + os.sep)]
-                        n_bads += len(files)
+                        files = [x for x in files if not x[1].startswith(safeabs)]
+                        if files:
+                            dirs[:] = []  # stop recursion
+                            bads.append(files[0][0])
 
                     if not files:
                         continue
@@ -1141,12 +1157,15 @@ class AuthSrv(object):
                             for vp, ap in files
                         ]
                     else:
-                        msg = ["user {}: {} =>".format(u, files[0][0])]
+                        msg = ["user {}, vol {}: {} =>".format(u, vtop, files[0][0])]
                         msg += [x[1] for x in files]
 
                     self.log("\n".join(msg))
 
-                if n_bads and flag_p:
+                if bads:
+                    self.log("\n  ".join(["found symlinks leaving volume:"] + bads))
+
+                if bads and flag_p:
                     raise Exception("found symlink leaving volume, and strict is set")
 
         if not flag_r:
