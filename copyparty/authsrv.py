@@ -1133,16 +1133,18 @@ class AuthSrv(object):
                         files = [x for x in files if not x[1].startswith(atop + os.sep)]
                         n_bads += len(files)
 
-                    if flag_v:
-                        msg = [
+                    if not files:
+                        continue
+                    elif flag_v:
+                        msg = [""] + [
                             '# user "{}", vpath "{}"\n{}'.format(u, vp, ap)
                             for vp, ap in files
                         ]
                     else:
-                        msg = [x[1] for x in files]
+                        msg = ["user {}: {} =>".format(u, files[0][0])]
+                        msg += [x[1] for x in files]
 
-                    if msg:
-                        self.log("\n" + "\n".join(msg))
+                    self.log("\n".join(msg))
 
                 if n_bads and flag_p:
                     raise Exception("found symlink leaving volume, and strict is set")
