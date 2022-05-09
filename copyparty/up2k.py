@@ -610,6 +610,8 @@ class Up2k(object):
                 except:
                     m = "failed to index subdir [{}]:\n{}"
                     self.log(m.format(abspath, min_ex()), c=1)
+            elif not stat.S_ISREG(inf.st_mode):
+                self.log("skip type-{:x} file [{}]".format(inf.st_mode, abspath))
             else:
                 # self.log("file: {}".format(abspath))
                 seen_files[iname] = 1
