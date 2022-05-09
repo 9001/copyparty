@@ -164,7 +164,7 @@ ebi('op_cfg').innerHTML = (
 	'	<div>\n' +
 	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them">turbo</a>\n' +
 	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished/corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards">date-chk</a>\n' +
-	'		<a id="flag_en" class="tgl btn" href="#" tt="ensure only one tab is uploading at a time $N (other tabs must have this enabled too)">💤</a>\n' +
+	'		<a id="flag_en" class="tgl btn" href="#" tt="ensure only one tab is uploading at a time $N -- other tabs must have this enabled too $N -- only affects tabs on the same domain">💤</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -319,8 +319,8 @@ var mpl = (function () {
 	ebi('op_player').innerHTML = (
 		'<div><h3>switches</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="start loading the next song near the end for gapless playback">preload</a>' +
-		'<a href="#" class="tgl btn" id="au_fullpre" tt="try to preload the entire song;$N✔️ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably">full</a>' +
-		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np clip</a>' +
+		'<a href="#" class="tgl btn" id="au_fullpre" tt="try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably">full</a>' +
+		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="os integration (media hotkeys / osd)">os-ctl</a>' +
 		'<a href="#" class="tgl btn" id="au_os_seek" tt="allow seeking through os integration">seek</a>' +
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="show album cover in osd">art</a>' +

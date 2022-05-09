@@ -143,6 +143,9 @@ class SvcHub(object):
             return
 
         if self.args.ign_ebind_all:
+            if not self.tcpsrv.srv:
+                for _ in range(self.broker.num_workers):
+                    self.broker.put(False, "cb_httpsrv_up")
             return
 
         if self.args.ign_ebind and self.tcpsrv.srv:
