@@ -1175,11 +1175,15 @@ for the `re`pack to work, first run one of the sfx'es once to unpack it
 
 install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
 ```sh
-apt update && apt -y full-upgrade && termux-setup-storage && apt -y install python && python -m ensurepip && python -m pip install -U copyparty
+apt update && apt -y full-upgrade && apt update && termux-setup-storage && apt -y install python && python -m ensurepip && python -m pip install --user -U copyparty
 echo $?
 ```
 
 after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux
+
+if you want thumbnails, `apt -y install ffmpeg`
+
+* or if you want to use vips instead, `apt -y install libvips && python -m pip install --user -U wheel && python -m pip install --user -U pyvips && (cd /data/data/com.termux/files/usr/lib/; ln -s libgobject-2.0.so{,.0}; ln -s libvips.so{,.42})`
 
 
 # reporting bugs

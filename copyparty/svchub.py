@@ -136,7 +136,7 @@ class SvcHub(object):
         self.broker = Broker(self)
 
     def thr_httpsrv_up(self):
-        time.sleep(5)
+        time.sleep(1 if self.args.ign_ebind_all else 5)
         expected = self.broker.num_workers * self.tcpsrv.nsrv
         failed = expected - self.httpsrv_up
         if not failed:
