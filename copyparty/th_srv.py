@@ -343,6 +343,8 @@ class ThumbSrv(object):
 
     def conv_ffmpeg(self, abspath, tpath):
         ret, _ = ffprobe(abspath)
+        if not ret:
+            return
 
         ext = abspath.rsplit(".")[-1].lower()
         if ext in ["h264", "h265"] or ext in self.fmt_ffi:

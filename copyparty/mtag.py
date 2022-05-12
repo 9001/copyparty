@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 
 from .__init__ import PY2, WINDOWS, unicode
-from .util import fsenc, fsdec, uncyg, runcmd, REKOBO_LKEY
+from .util import fsenc, fsdec, uncyg, runcmd, retchk, REKOBO_LKEY
 from .bos import bos
 
 
@@ -82,8 +82,9 @@ def ffprobe(abspath, timeout=10):
         b"--",
         fsenc(abspath),
     ]
-    rc = runcmd(cmd, timeout=timeout)
-    return parse_ffprobe(rc[1])
+    rc, so, se = runcmd(cmd, timeout=timeout)
+    retchk(rc, cmd, se)
+    return parse_ffprobe(so)
 
 
 def parse_ffprobe(txt):
@@ -491,12 +492,14 @@ class MTag(object):
                     cmd = ["nice"] + cmd
 
                 cmd = [fsenc(x) for x in cmd]
-                v = sp.check_output(cmd, **args).strip()
+                rc, v, err = runcmd(cmd, **args)
+                retchk(rc, cmd, err, self.log, 5)
+                v = v.strip()
                 if not v:
                     continue
 
                 if "," not in tagname:
-                    ret[tagname] = v.decode("utf-8")
+                    ret[tagname] = v
                 else:
                     v = json.loads(v)
                     for tag in tagname.split(","):

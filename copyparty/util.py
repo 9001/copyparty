@@ -9,6 +9,7 @@ import time
 import base64
 import select
 import struct
+import signal
 import hashlib
 import platform
 import traceback
@@ -1350,8 +1351,8 @@ def guess_mime(url, fallback="application/octet-stream"):
     return ret
 
 
-def runcmd(argv, timeout=None):
-    p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE)
+def runcmd(argv, timeout=None, **ka):
+    p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE, **ka)
     if not timeout or PY2:
         stdout, stderr = p.communicate()
     else:
@@ -1366,9 +1367,10 @@ def runcmd(argv, timeout=None):
     return [p.returncode, stdout, stderr]
 
 
-def chkcmd(argv):
-    ok, sout, serr = runcmd(argv)
+def chkcmd(argv, **ka):
+    ok, sout, serr = runcmd(argv, **ka)
     if ok != 0:
+        retchk(ok, argv, serr)
         raise Exception(serr)
 
     return sout, serr
@@ -1383,6 +1385,46 @@ def mchkcmd(argv, timeout=10):
 
     if rv:
         raise sp.CalledProcessError(rv, (argv[0], b"...", argv[-1]))
+
+
+def retchk(rc, cmd, serr, logger=None, color=None):
+    if rc < 0:
+        rc = 128 - rc
+
+    if rc < 126:
+        return
+
+    s = None
+    if rc > 128:
+        try:
+            s = str(signal.Signals(rc - 128))
+        except:
+            pass
+    elif rc == 126:
+        s = "invalid program"
+    elif rc == 127:
+        s = "program not found"
+    else:
+        s = "invalid retcode"
+
+    if s:
+        m = "{} <{}>".format(rc, s)
+    else:
+        m = str(rc)
+
+    try:
+        c = " ".join([fsdec(x) for x in cmd])
+    except:
+        c = str(cmd)
+
+    m = "error {} from [{}]".format(m, c)
+    if serr:
+        m += "\n" + serr
+
+    if logger:
+        logger(m, color)
+    else:
+        raise Exception(m)
 
 
 def gzip_orig_sz(fn):

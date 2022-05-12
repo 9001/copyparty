@@ -39,6 +39,7 @@ class Cfg(Namespace):
             "theme": 0,
             "themes": 0,
             "turbo": 0,
+            "logout": 573,
         }
         ex.update(ex2)
         super(Cfg, self).__init__(a=a or [], v=v or [], c=c, **ex)

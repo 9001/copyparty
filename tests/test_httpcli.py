@@ -59,6 +59,7 @@ class Cfg(Namespace):
             theme=0,
             themes=0,
             turbo=0,
+            logout=573,
             hist=None,
             no_idx=None,
             no_hash=None,
