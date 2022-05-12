@@ -328,7 +328,7 @@ class U2idx(object):
                 w = hit["w"]
                 del hit["w"]
                 tags = {}
-                q2 = "select k, v from mt where w = ? and k != 'x'"
+                q2 = "select k, v from mt where w = ? and +k != 'x'"
                 for k, v2 in cur.execute(q2, (w,)):
                     taglist[k] = True
                     tags[k] = v2

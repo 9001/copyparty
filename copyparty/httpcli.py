@@ -2413,7 +2413,7 @@ class HttpCli(object):
                 continue
 
             w = r[0][:16]
-            q = "select k, v from mt where w = ? and k != 'x'"
+            q = "select k, v from mt where w = ? and +k != 'x'"
             try:
                 for k, v in icur.execute(q, (w,)):
                     taglist[k] = True

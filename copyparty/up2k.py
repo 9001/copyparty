@@ -949,7 +949,7 @@ class Up2k(object):
                     n_done += 1
 
                 for w in to_delete.keys():
-                    q = "delete from mt where w = ? and k = 't:mtp'"
+                    q = "delete from mt where w = ? and +k = 't:mtp'"
                     cur.execute(q, (w,))
 
                 to_delete = {}
@@ -987,7 +987,7 @@ class Up2k(object):
         with self.mutex:
             done = self._flush_mpool(wcur)
             for w in done:
-                q = "delete from mt where w = ? and k = 't:mtp'"
+                q = "delete from mt where w = ? and +k = 't:mtp'"
                 cur.execute(q, (w,))
 
             cur.connection.commit()
@@ -1115,7 +1115,7 @@ class Up2k(object):
 
         for k in tags.keys():
             q = "delete from mt where w = ? and ({})".format(
-                " or ".join(["k = ?"] * len(tags))
+                " or ".join(["+k = ?"] * len(tags))
             )
             args = [wark[:16]] + list(tags.keys())
             write_cur.execute(q, tuple(args))
