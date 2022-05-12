@@ -41,6 +41,7 @@
 	--btn-h-bg: #805;
 	--btn-1-fg: #400;
 	--btn-1-bg: var(--a);
+	--btn-1h-fg: var(--btn-1-fg);
 	--btn-1h-bg: #fe8;
 	--chk-fg: var(--tab-alt);
 	--txt-sh: var(--bg-d2);
@@ -104,6 +105,7 @@
 	--f-sh1: 0.33;
 	--f-sh2: 0.02;
 	--f-sh3: 0.2;
+	--f-h-b1: rgba(128,128,128,0.7);
 
 	--f-play-bg: #fc5;
 	--f-play-fg: #000;
@@ -240,9 +242,35 @@ html.b {
 	--f-sh1: 0.1;
 }
 html.bz {
-	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u2));
+	--fg: #bbd;
+	--bg-u5: #3b3f58;
+	--bg-u4: #1e2130;
+	--bg-u3: #1e2130;
+	--bg-u1: #1e2130;
+	--bg: #11121d;
+	--bgg: #11121d;
+	--bg-d1: #232536;
+	--bg-d2: #34384e;
+	--bg-d3: #34384e;
+
+	--row-alt: rgba(139, 150, 205, 0.06);
+	
+	--btn-bg: #202231;
+	--btn-h-bg: #2d2f45;
+	--btn-1-bg: #ba2959;
+	--btn-1-fg: #fff;
+	--btn-1h-fg: #000;
+
 	--u2-tab-1-fg: var(--fg-max);
 	--u2-tab-1-bg: var(--bg);
+
+	--srv-1: #79b;
+	
+	--g-sel-bg: #ba2959;
+	--g-fsel-bg: #e6336e;
+
+	--f-h-b1: #34384e;
+	--mp-sh: #11121d;
 }
 html.by {
 	--scroll: var(--a);
@@ -431,7 +459,7 @@ a:hover {
 #files thead th {
 	padding: .3em;
 	background: var(--bg);
-	border-bottom: 1px solid rgba(128,128,128,0.7);
+	border-bottom: 1px solid var(--f-h-b1);
 	cursor: pointer;
 }
 html.y #files thead th {
@@ -609,7 +637,7 @@ html.y #path a:hover {
 	color: inherit;
 }
 #files tbody tr.play a:hover {
-	color: var(--btn-1-fg);
+	color: var(--btn-1h-fg);
 	background: var(--btn-1h-bg);
 }
 #ggrid {
@@ -1203,7 +1231,7 @@ html.ca .tgl.btn.on {
 }
 .tgl.btn.on:hover {
 	background: var(--btn-1h-bg);
-	color: var(--btn-1-fg);
+	color: var(--btn-1h-fg);
 }
 #detree {
 	padding: .3em .5em;
@@ -1818,14 +1846,18 @@ html.y #bbox-overlay figcaption a {
 }
 .dropdesc b {
 	position: relative;
-	font-size: .6em;
-	font-size: 2.5vw;
+	font-size: .5em;
+	font-size: 2vw;
 	top: -.25em;
+	top: -.2vw;
 	margin: 0 .8em;
 	margin: 0 1.25vw;
+	transition: font-size 0.12s;
 }
 .dropdesc.hl b {
 	border-bottom: .1em solid #fff;
+	font-size: .6em;
+	font-size: 2.5vw;
 }
 .dropzone {
 	z-index: 80386;
@@ -2423,6 +2455,9 @@ html.b #op_up2k {
 html.b #tree {
 	box-shadow: 0 -1px 0 rgba(128,128,128,0.4);
 }
+html.bz #tree {
+	box-shadow: 0 -1px 0 var(--bg-d3);
+}
 html.b #treeh,
 html.b #tree li {
 	border: none;
@@ -2431,7 +2466,7 @@ html.b .ntree a {
 	padding: .6em .2em;
 }
 html.b #treepar {
-	border-bottom: .2em solid #999;
+	border-bottom: .2em solid var(--f-h-b1);
 }
 html.b #wrap {
 	margin-top: 2em;
