@@ -1085,18 +1085,20 @@ class Up2k(object):
                 if parser == "mtag":
                     parser = self.mtag.backend
 
-                msg = "{} failed to read tags from {}:\n{}"
-                self.log(msg.format(parser, abspath, ex), c=3)
+                self._log_tag_err(parser, abspath, ex)
 
             q.task_done()
+
+    def _log_tag_err(self, parser, abspath, ex):
+        msg = "{} failed to read tags from {}:\n{}".format(parser, abspath, ex)
+        self.log(msg.lstrip(), c=1 if "<Signals.SIG" in msg else 3)
 
     def _tag_file(self, write_cur, entags, wark, abspath, tags=None):
         if tags is None:
             try:
                 tags = self.mtag.get(abspath)
             except Exception as ex:
-                msg = "failed to read tags from {}:\n{}"
-                self.log(msg.format(abspath, ex), c=3)
+                self._log_tag_err("", abspath, ex)
                 return 0
 
         if not bos.path.isfile(abspath):
@@ -2193,8 +2195,7 @@ class Up2k(object):
                 if parsers:
                     tags.update(self.mtag.get_bin(parsers, abspath))
             except Exception as ex:
-                msg = "failed to read tags from {}:\n{}"
-                self.log(msg.format(abspath, ex), c=3)
+                self._log_tag_err("", abspath, ex)
                 continue
 
             with self.mutex:

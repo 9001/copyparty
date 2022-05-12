@@ -253,7 +253,9 @@ class ThumbSrv(object):
                     fun(abspath, tpath)
                 except:
                     msg = "{} could not create thumbnail of {}\n{}"
-                    self.log(msg.format(fun.__name__, abspath, min_ex()), "1;30")
+                    msg = msg.format(fun.__name__, abspath, min_ex())
+                    c = 1 if "<Signals.SIG" in msg else "1;30"
+                    self.log(msg, c)
                     with open(tpath, "wb") as _:
                         pass
 
