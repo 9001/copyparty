@@ -258,7 +258,7 @@ function Modpoll() {
         var xhr = new XHR();
         xhr.open('GET', url, true);
         xhr.responseType = 'text';
-        xhr.onreadystatechange = r.cb;
+        xhr.onload = xhr.onerror = r.cb;
         xhr.send();
     };
 
@@ -267,9 +267,6 @@ function Modpoll() {
             console.log('modpoll abort');
             return;
         }
-
-        if (this.readyState != XHR.DONE)
-            return;
 
         if (this.status !== 200) {
             console.log('modpoll err ' + this.status + ": " + this.responseText);
@@ -339,7 +336,7 @@ function save(e) {
         var xhr = new XHR();
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
-        xhr.onreadystatechange = save_cb;
+        xhr.onload = xhr.onerror = save_cb;
         xhr.btn = save_btn;
         xhr.txt = txt;
 
@@ -356,9 +353,6 @@ function save(e) {
 }
 
 function save_cb() {
-    if (this.readyState != XHR.DONE)
-        return;
-
     if (this.status !== 200)
         return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 
@@ -400,7 +394,7 @@ function run_savechk(lastmod, txt, btn, ntry) {
     var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
-    xhr.onreadystatechange = savechk_cb;
+    xhr.onload = xhr.onerror = savechk_cb;
     xhr.lastmod = lastmod;
     xhr.txt = txt;
     xhr.btn = btn;
@@ -409,9 +403,6 @@ function run_savechk(lastmod, txt, btn, ntry) {
 }
 
 function savechk_cb() {
-    if (this.readyState != XHR.DONE)
-        return;
-
     if (this.status !== 200)
         return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 

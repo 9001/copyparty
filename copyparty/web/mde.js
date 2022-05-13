@@ -117,7 +117,7 @@ function save(mde) {
         var xhr = new XHR();
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
-        xhr.onreadystatechange = save_cb;
+        xhr.onload = xhr.onerror = save_cb;
         xhr.btn = save_btn;
         xhr.mde = mde;
         xhr.txt = txt;
@@ -133,9 +133,6 @@ function save(mde) {
 }
 
 function save_cb() {
-    if (this.readyState != XHR.DONE)
-        return;
-
     if (this.status !== 200)
         return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 
@@ -173,7 +170,7 @@ function save_cb() {
     var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
-    xhr.onreadystatechange = save_chk;
+    xhr.onload = xhr.onerror = save_chk;
     xhr.btn = this.save_btn;
     xhr.mde = this.mde;
     xhr.txt = this.txt;
@@ -182,9 +179,6 @@ function save_cb() {
 }
 
 function save_chk() {
-    if (this.readyState != XHR.DONE)
-        return;
-
     if (this.status !== 200)
         return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
 

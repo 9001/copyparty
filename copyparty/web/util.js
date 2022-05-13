@@ -316,7 +316,7 @@ function clmod(el, cls, add) {
 
     var n2 = n1.replace(re, ' ') + (add ? ' ' + cls : '');
 
-    if (!n1 == !n2)
+    if (n1 == n2)
         return false;
 
     el.className = n2;

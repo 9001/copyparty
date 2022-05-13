@@ -260,6 +260,7 @@ html.bz {
 	--btn-1-bg: #ba2959;
 	--btn-1-fg: #fff;
 	--btn-1h-fg: #000;
+	--txt-sh: a;
 
 	--u2-tab-1-fg: var(--fg-max);
 	--u2-tab-1-bg: var(--bg);

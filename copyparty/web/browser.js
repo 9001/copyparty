@@ -1589,8 +1589,8 @@ function evau_error(e) {
 		// chromish for 40x
 		var xhr = new XHR();
 		xhr.open('HEAD', eplaya.src, true);
-		xhr.onreadystatechange = function () {
-			if (this.readyState != XHR.DONE || this.status < 400)
+		xhr.onload = xhr.onerror = function () {
+			if (this.status < 400)
 				return;
 
 			err = this.status == 403 ? e403 : this.status == 404 ? e404 :
@@ -2179,9 +2179,6 @@ var fileman = (function () {
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
-				if (this.readyState != XHR.DONE)
-					return;
-
 				if (this.status !== 200) {
 					var msg = this.responseText;
 					toast.err(9, 'rename failed:\n' + msg);
@@ -2194,7 +2191,7 @@ var fileman = (function () {
 
 			var xhr = new XHR();
 			xhr.open('GET', f[0].src + '?move=' + dst, true);
-			xhr.onreadystatechange = rename_cb;
+			xhr.onload = xhr.onerror = rename_cb;
 			xhr.send();
 		}
 	};
@@ -2225,13 +2222,10 @@ var fileman = (function () {
 			toast.inf(0, esc('deleting ' + (vps.length + 1) + ' items\n\n' + vp));
 
 			xhr.open('GET', vp + '?delete', true);
-			xhr.onreadystatechange = delete_cb;
+			xhr.onload = xhr.onerror = delete_cb;
 			xhr.send();
 		}
 		function delete_cb() {
-			if (this.readyState != XHR.DONE)
-				return;
-
 			if (this.status !== 200) {
 				var msg = this.responseText;
 				toast.err(9, 'delete failed:\n' + msg);
@@ -2336,13 +2330,10 @@ var fileman = (function () {
 			var dst = get_evpath() + vp.split('/').pop();
 
 			xhr.open('GET', vp + '?move=' + dst, true);
-			xhr.onreadystatechange = paste_cb;
+			xhr.onload = xhr.onerror = paste_cb;
 			xhr.send();
 		}
 		function paste_cb() {
-			if (this.readyState != XHR.DONE)
-				return;
-
 			if (this.status !== 200) {
 				var msg = this.responseText;
 				toast.err(9, 'paste failed:\n' + msg);
@@ -2508,7 +2499,7 @@ var showfile = (function () {
 		xhr.ts = Date.now();
 		xhr.open('GET', url.split('?')[0] + '?raw', true);
 		xhr.onprogress = loading;
-		xhr.onloadend = load_cb;
+		xhr.onload = xhr.onerror = load_cb;
 		xhr.send();
 	};
 
@@ -2774,7 +2765,7 @@ var thegrid = (function () {
 		if (l)
 			return setln(parseInt(l));
 
-		var t = lfiles.tHead.rows[0].cells;
+		var t = ebi('files').tHead.rows[0].cells;
 		for (var a = 0; a < t.length; a++)
 			if (t[a].getAttribute('name') == s) {
 				t[a].click();
@@ -2796,6 +2787,9 @@ var thegrid = (function () {
 			hist_push(get_evpath());
 			wintitle();
 		}
+
+		lfiles = ebi('files');
+		gfiles = ebi('gfiles');
 
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
@@ -3522,16 +3516,13 @@ document.onkeydown = function (e) {
 		var xhr = new XHR();
 		xhr.open('POST', '/?srch', true);
 		xhr.setRequestHeader('Content-Type', 'text/plain');
-		xhr.onreadystatechange = xhr_search_results;
+		xhr.onload = xhr.onerror = xhr_search_results;
 		xhr.ts = Date.now();
 		xhr.q_raw = ebi('q_raw').value;
 		xhr.send(JSON.stringify({ "q": xhr.q_raw, "n": cap }));
 	}
 
 	function xhr_search_results() {
-		if (this.readyState != XHR.DONE)
-			return;
-
 		if (this.status !== 200) {
 			var msg = this.responseText;
 			if (msg.indexOf('<pre>') === 0)
@@ -3862,15 +3853,12 @@ var treectl = (function () {
 		xhr.rst = rst;
 		xhr.ts = Date.now();
 		xhr.open('GET', dst + '?tree=' + top + (r.dots ? '&dots' : ''), true);
-		xhr.onreadystatechange = recvtree;
+		xhr.onload = xhr.onerror = recvtree;
 		xhr.send();
 		enspin('#tree');
 	}
 
 	function recvtree() {
-		if (this.readyState != XHR.DONE)
-			return;
-
 		if (!xhrchk(this, "could not list subfolders:\n\nerror ", "404, folder not found"))
 			return;
 
@@ -4030,7 +4018,7 @@ var treectl = (function () {
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
 		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : ''), true);
-		xhr.onreadystatechange = recvls;
+		xhr.onload = xhr.onerror = recvls;
 		xhr.send();
 		if (hpush && !no_tree)
 			get_tree('.', xhr.top);
@@ -4054,9 +4042,6 @@ var treectl = (function () {
 	}
 
 	function recvls() {
-		if (this.readyState != XHR.DONE)
-			return;
-
 		if (!xhrchk(this, "could not list files in folder:\n\nerror ", "404, folder not found"))
 			return;
 
@@ -4703,7 +4688,7 @@ var settheme = (function () {
 		showfile.setstyle();
 
 		var html = [], itheme = ax.indexOf(theme.charAt(0)) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'flat dark', 'flat light', 'vice', 'hotdog stand'];
+			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<a href="#" class="btn tgl' + (a == itheme ? ' on' : '') +
@@ -4958,7 +4943,7 @@ var msel = (function () {
 		xhr.vp = get_evpath();
 		xhr.dn = tb.value;
 		xhr.open('POST', xhr.vp, true);
-		xhr.onreadystatechange = cb;
+		xhr.onload = xhr.onerror = cb;
 		xhr.responseType = 'text';
 		xhr.send(fd);
 
@@ -4966,9 +4951,6 @@ var msel = (function () {
 	};
 
 	function cb() {
-		if (this.readyState != XHR.DONE)
-			return;
-
 		if (this.vp !== get_evpath()) {
 			sf.textContent = 'aborted due to location change';
 			return;
@@ -5011,7 +4993,7 @@ var msel = (function () {
 		xhr.msg = tb.value;
 		xhr.open('POST', get_evpath(), true);
 		xhr.responseType = 'text';
-		xhr.onreadystatechange = cb;
+		xhr.onload = xhr.onerror = cb;
 		xhr.setRequestHeader('Content-Type', ct);
 		if (xhr.overrideMimeType)
 			xhr.overrideMimeType('Content-Type', ct);
@@ -5021,9 +5003,6 @@ var msel = (function () {
 	};
 
 	function cb() {
-		if (this.readyState != XHR.DONE)
-			return;
-
 		xhrchk(this, "could not send message:\n\nerror ", "404, parent folder not found");
 
 		if (this.status !== 200) {
@@ -5140,9 +5119,6 @@ var unpost = (function () {
 			html = [];
 
 		function unpost_load_cb() {
-			if (this.readyState != XHR.DONE)
-				return;
-
 			if (!xhrchk(this, "unpost-load failed:\n\nerror ", "404, file not found??"))
 				return ebi('op_unpost').innerHTML = 'failed to load unpost list from server';
 
@@ -5186,16 +5162,13 @@ var unpost = (function () {
 
 		var xhr = new XHR();
 		xhr.open('GET', q, true);
-		xhr.onreadystatechange = unpost_load_cb;
+		xhr.onload = xhr.onerror = unpost_load_cb;
 		xhr.send();
 
 		ct.innerHTML = "<p><em>loading your recent uploads...</em></p>";
 	};
 
 	function unpost_delete_cb() {
-		if (this.readyState != XHR.DONE)
-			return;
-
 		if (this.status !== 200) {
 			var msg = this.responseText;
 			toast.err(9, 'unpost-delete failed:\n' + msg);
@@ -5248,7 +5221,7 @@ var unpost = (function () {
 		xhr.n = n;
 		xhr.n2 = n2;
 		xhr.open('POST', '/?delete', true);
-		xhr.onreadystatechange = unpost_delete_cb;
+		xhr.onload = xhr.onerror = unpost_delete_cb;
 		xhr.send(JSON.stringify(req));
 	};
 
