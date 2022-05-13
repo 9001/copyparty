@@ -2438,14 +2438,19 @@ class HttpCli(object):
         if doc:
             doc = unquotep(doc.replace("+", " ").split("?")[0])
             j2a["docname"] = doc
+            doctxt = None
             if next((x for x in files if x["name"] == doc), None):
-                with open(os.path.join(abspath, doc), "rb") as f:
-                    doc = f.read().decode("utf-8", "replace")
+                docpath = os.path.join(abspath, doc)
+                sz = bos.path.getsize(docpath)
+                if sz < 1024 * self.args.txt_max:
+                    with open(docpath, "rb") as f:
+                        doctxt = f.read().decode("utf-8", "replace")
             else:
                 self.log("doc 404: [{}]".format(doc), c=6)
-                doc = "( textfile not found )"
+                doctxt = "( textfile not found )"
 
-            j2a["doc"] = doc
+            if doctxt is not None:
+                j2a["doc"] = doctxt
 
         if not self.conn.hsrv.prism:
             j2a["no_prism"] = True

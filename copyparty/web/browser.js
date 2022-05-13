@@ -2441,6 +2441,14 @@ var showfile = (function () {
 	var em = QS('#bdoc>pre');
 	if (em)
 		em = [r.sname(window.location.search), window.location.hash, em.textContent];
+	else {
+		var m = /[?&]doc=([^&]+)/.exec(window.location.search);
+		if (m) {
+			setTimeout(function () {
+				r.show(uricom_dec(m[1])[0], true);
+			}, 1);
+		}
+	}
 
 	r.setstyle = function () {
 		if (window['no_prism'])
@@ -4166,6 +4174,7 @@ var treectl = (function () {
 			xhr.open('GET', '/?am_js', true);
 			xhr.send();
 
+			r.ls_cb = showfile.addlinks;
 			return r.reqls(get_evpath(), false, true);
 		}
 
