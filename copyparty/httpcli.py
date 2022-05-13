@@ -2443,7 +2443,7 @@ class HttpCli(object):
                 docpath = os.path.join(abspath, doc)
                 sz = bos.path.getsize(docpath)
                 if sz < 1024 * self.args.txt_max:
-                    with open(docpath, "rb") as f:
+                    with open(fsenc(docpath), "rb") as f:
                         doctxt = f.read().decode("utf-8", "replace")
             else:
                 self.log("doc 404: [{}]".format(doc), c=6)
