@@ -2503,16 +2503,33 @@ var showfile = (function () {
 	r.show = function (url, no_push) {
 		var xhr = new XHR();
 		xhr.url = url;
+		xhr.fname = uricom_dec(url.split('/').pop())[0];
 		xhr.no_push = no_push;
 		xhr.ts = Date.now();
 		xhr.open('GET', url.split('?')[0] + '?raw', true);
-		xhr.onreadystatechange = load_cb;
+		xhr.onprogress = loading;
+		xhr.onloadend = load_cb;
 		xhr.send();
 	};
 
-	function load_cb() {
-		if (this.readyState != XHR.DONE)
+	function loading(e) {
+		if (e.total < 1024 * 256)
 			return;
+
+		var m = 'Loading text document:\n\n' + esc(this.fname) + '\n\n' +
+			f2f(e.loaded / 1024 / 1024, 1) + ' of ' +
+			f2f(e.total / 1024 / 1024, 1) + ' MiB loaded';
+
+		if (!this.toasted) {
+			this.toasted = 1;
+			return toast.inf(573, m);
+		}
+		ebi('toastb').innerHTML = lf2br(m);
+	}
+
+	function load_cb(e) {
+		if (this.toasted)
+			toast.hide();
 
 		if (!xhrchk(this, "could not load textfile:\n\nerror ", "404, file not found"))
 			return;
