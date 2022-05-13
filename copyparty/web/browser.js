@@ -4816,6 +4816,7 @@ var msel = (function () {
 
 		r.all = [];
 		var links = QSA('#files tbody td:nth-child(2) a:last-child'),
+			is_srch = !!ebi('unsearch'),
 			vbase = get_evpath();
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
@@ -4830,7 +4831,8 @@ var msel = (function () {
 			if (item.sel)
 				r.sel.push(item);
 
-			links[a].closest('tr').setAttribute('tabindex', '0');
+			if (!is_srch)
+				links[a].closest('tr').setAttribute('tabindex', '0');
 		}
 	};
 
@@ -4899,14 +4901,17 @@ var msel = (function () {
 		frm.submit();
 	};
 	r.render = function () {
-		var tds = QSA('#files tbody td+td+td');
-		for (var a = 0, aa = tds.length; a < aa; a++) {
-			tds[a].onclick = r.seltgl;
-		}
+		var tds = QSA('#files tbody td+td+td'),
+			is_srch = !!ebi('unsearch');
+
+		if (!is_srch)
+			for (var a = 0, aa = tds.length; a < aa; a++)
+				tds[a].onclick = r.seltgl;
+
 		r.selui(true);
 		arcfmt.render();
 		fileman.render();
-		ebi('selzip').style.display = ebi('unsearch') ? 'none' : '';
+		ebi('selzip').style.display = is_srch ? 'none' : '';
 	}
 	return r;
 })();
