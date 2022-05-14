@@ -8,7 +8,10 @@ import sqlite3
 import argparse
 
 DB_VER1 = 3
-DB_VER2 = 4
+DB_VER2 = 5
+
+BY_PATH = None
+NC = None
 
 
 def die(msg):
@@ -57,8 +60,13 @@ def compare(n1, d1, n2, d2, verbose):
         if rd.split("/", 1)[0] == ".hist":
             continue
 
-        q = "select w from up where rd = ? and fn = ?"
-        hit = d2.execute(q, (rd, fn)).fetchone()
+        if BY_PATH:
+            q = "select w from up where rd = ? and fn = ?"
+            hit = d2.execute(q, (rd, fn)).fetchone()
+        else:
+            q = "select w from up where substr(w,1,16) = ? and +w = ?"
+            hit = d2.execute(q, (w1[:16], w1)).fetchone()
+
         if not hit:
             miss += 1
             if verbose:
@@ -70,27 +78,32 @@ def compare(n1, d1, n2, d2, verbose):
     n = 0
     miss = {}
     nmiss = 0
-    for w1, k, v in d1.execute("select * from mt"):
+    for w1s, k, v in d1.execute("select * from mt"):
 
         n += 1
         if n % 100_000 == 0:
             m = f"\033[36mchecked {n:,} of {nt:,} tags in {n1} against {n2}, so far {nmiss} missing tags\033[0m"
             print(m)
 
-        q = "select rd, fn from up where substr(w,1,16) = ?"
-        rd, fn = d1.execute(q, (w1,)).fetchone()
+        q = "select w, rd, fn from up where substr(w,1,16) = ?"
+        w1, rd, fn = d1.execute(q, (w1s,)).fetchone()
         if rd.split("/", 1)[0] == ".hist":
             continue
 
-        q = "select substr(w,1,16) from up where rd = ? and fn = ?"
-        w2 = d2.execute(q, (rd, fn)).fetchone()
+        if BY_PATH:
+            q = "select w from up where rd = ? and fn = ?"
+            w2 = d2.execute(q, (rd, fn)).fetchone()
+        else:
+            q = "select w from up where substr(w,1,16) = ? and +w = ?"
+            w2 = d2.execute(q, (w1s, w1)).fetchone()
+
         if w2:
             w2 = w2[0]
 
         v2 = None
         if w2:
             v2 = d2.execute(
-                "select v from mt where w = ? and +k = ?", (w2, k)
+                "select v from mt where w = ? and +k = ?", (w2[:16], k)
             ).fetchone()
             if v2:
                 v2 = v2[0]
@@ -124,7 +137,7 @@ def compare(n1, d1, n2, d2, verbose):
 
     for k, v in sorted(miss.items()):
         if v:
-            print(f"{n1} has {v:6} more {k:<6} tags than {n2}")
+            print(f"{n1} has {v:7} more {k:<7} tags than {n2}")
 
     print(f"in total, {nmiss} missing tags in {n2}\n")
 
@@ -132,47 +145,75 @@ def compare(n1, d1, n2, d2, verbose):
 def copy_mtp(d1, d2, tag, rm):
     nt = next(d1.execute("select count(w) from mt where k = ?", (tag,)))[0]
     n = 0
-    ndone = 0
-    for w1, k, v in d1.execute("select * from mt where k = ?", (tag,)):
+    ncopy = 0
+    nskip = 0
+    for w1s, k, v in d1.execute("select * from mt where k = ?", (tag,)):
         n += 1
         if n % 25_000 == 0:
-            m = f"\033[36m{n:,} of {nt:,} tags checked, so far {ndone} copied\033[0m"
+            m = f"\033[36m{n:,} of {nt:,} tags checked, so far {ncopy} copied, {nskip} skipped\033[0m"
             print(m)
 
-        q = "select rd, fn from up where substr(w,1,16) = ?"
-        rd, fn = d1.execute(q, (w1,)).fetchone()
+        q = "select w, rd, fn from up where substr(w,1,16) = ?"
+        w1, rd, fn = d1.execute(q, (w1s,)).fetchone()
         if rd.split("/", 1)[0] == ".hist":
             continue
 
-        q = "select substr(w,1,16) from up where rd = ? and fn = ?"
-        w2 = d2.execute(q, (rd, fn)).fetchone()
+        if BY_PATH:
+            q = "select w from up where rd = ? and fn = ?"
+            w2 = d2.execute(q, (rd, fn)).fetchone()
+        else:
+            q = "select w from up where substr(w,1,16) = ? and +w = ?"
+            w2 = d2.execute(q, (w1s, w1)).fetchone()
+
         if not w2:
             continue
 
-        w2 = w2[0]
-        hit = d2.execute("select v from mt where w = ? and +k = ?", (w2, k)).fetchone()
+        w2s = w2[0][:16]
+        hit = d2.execute("select v from mt where w = ? and +k = ?", (w2s, k)).fetchone()
         if hit:
             hit = hit[0]
 
         if hit != v:
-            ndone += 1
-            if hit is not None:
-                d2.execute("delete from mt where w = ? and +k = ?", (w2, k))
+            if NC and hit is not None:
+                nskip += 1
+                continue
 
-            d2.execute("insert into mt values (?,?,?)", (w2, k, v))
+            ncopy += 1
+            if hit is not None:
+                d2.execute("delete from mt where w = ? and +k = ?", (w2s, k))
+
+            d2.execute("insert into mt values (?,?,?)", (w2s, k, v))
             if rm:
-                d2.execute("delete from mt where w = ? and +k = 't:mtp'", (w2,))
+                d2.execute("delete from mt where w = ? and +k = 't:mtp'", (w2s,))
 
     d2.commit()
-    print(f"copied {ndone} {tag} tags over")
+    print(f"copied {ncopy} {tag} tags over, skipped {nskip}")
+
+
+def examples():
+    print(
+        """
+# clearing the journal
+./dbtool.py up2k.db
+
+# copy tags ".bpm" and "key" from old.db to up2k.db, and remove the mtp flag from matching files (so copyparty won't run any mtps on it)
+./dbtool.py -ls up2k.db
+./dbtool.py -src old.db up2k.db -cmp
+./dbtool.py -src old.v3 up2k.db -rm-mtp-flag -copy key
+./dbtool.py -src old.v3 up2k.db -rm-mtp-flag -copy .bpm -vac
+
+"""
+    )
 
 
 def main():
+    global NC, BY_PATH
     os.system("")
     print()
 
     ap = argparse.ArgumentParser()
     ap.add_argument("db", help="database to work on")
+    ap.add_argument("-h2", action="store_true", help="show examples")
     ap.add_argument("-src", metavar="DB", type=str, help="database to copy from")
 
     ap2 = ap.add_argument_group("informational / read-only stuff")
@@ -185,11 +226,29 @@ def main():
     ap2.add_argument(
         "-rm-mtp-flag",
         action="store_true",
-        help="when an mtp tag is copied over, also mark that as done, so copyparty won't run mtp on it",
+        help="when an mtp tag is copied over, also mark that file as done, so copyparty won't run any mtps on those files",
     )
     ap2.add_argument("-vac", action="store_true", help="optimize DB")
 
+    ap2 = ap.add_argument_group("behavior modifiers")
+    ap2.add_argument(
+        "-nc",
+        action="store_true",
+        help="no-clobber; don't replace/overwrite existing tags",
+    )
+    ap2.add_argument(
+        "-by-path",
+        action="store_true",
+        help="match files based on location rather than warks (content-hash), use this if the databases have different wark salts",
+    )
+
     ar = ap.parse_args()
+    if ar.h2:
+        examples()
+        return
+
+    NC = ar.nc
+    BY_PATH = ar.by_path
 
     for v in [ar.db, ar.src]:
         if v and not os.path.exists(v):
