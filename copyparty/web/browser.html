@@ -68,7 +68,7 @@
 	<div id="op_cfg" class="opview opbox opwide"></div>
 	
 	<h1 id="path">
-		<a href="#" id="entree" tt="show navpane (directory tree sidebar)$NHotkey: B">🌲</a>
+		<a href="#" id="entree">🌲</a>
 		{%- for n in vpnodes %}
 		<a href="/{{ n[0] }}">{{ n[1] }}</a>
 		{%- endfor %}
@@ -120,7 +120,7 @@
 	
 	<div id="epi" class="logue">{{ logues[1] }}</div>
 
-	<h2><a href="/?h">control-panel</a></h2>
+	<h2><a href="/?h" id="goh">control-panel</a></h2>
 	
 	<a href="#" id="repl">π</a>
 
@@ -138,6 +138,7 @@
 			themes = {{ themes }},
 			dtheme = "{{ dtheme }}",
 			srvinf = "{{ srv_info }}",
+			lang = "{{ lang }}",
 			def_hcols = {{ def_hcols|tojson }},
 			have_up2k_idx = {{ have_up2k_idx|tojson }},
 			have_tags_idx = {{ have_tags_idx|tojson }},

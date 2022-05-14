@@ -592,14 +592,7 @@ function up2k_init(subtle) {
         ebi('u2notbtn').innerHTML = '';
     }
 
-    var suggest_up2k = 'this is the basic uploader; <a href="#" id="u2yea">up2k</a> is better';
-
-    var shame = 'your browser <a href="https://www.chromium.org/blink/webcrypto">disables sha512</a> unless you <a href="' + (window.location + '').replace(':', 's:') + '">use https</a>',
-        is_https = (window.location + '').indexOf('https:') === 0;
-
-    if (is_https)
-        // chrome<37 firefox<34 edge<12 opera<24 safari<7
-        shame = 'your browser is impressively ancient';
+    var suggest_up2k = L.u_su2k;
 
     function got_deps() {
         return subtle || window.asmCrypto || window.hashwasm;
@@ -608,15 +601,18 @@ function up2k_init(subtle) {
     var loading_deps = false;
     function init_deps() {
         if (!loading_deps && !got_deps()) {
-            var fn = 'sha512.' + sha_js + '.js';
-            showmodal('<h1>loading ' + fn + '</h1><h2>since ' + shame + '</h2><h4>thanks chrome</h4>');
+            var fn = 'sha512.' + sha_js + '.js',
+                m = L.u_https1 + ' <a href="' + (window.location + '').replace(':', 's:') + '">' + L.u_https2 + '</a> ' + L.u_https3;
+
+            showmodal('<h1>loading ' + fn + '</h1>');
             import_js('/.cpr/deps/' + fn, unmodal);
 
-            if (is_https)
-                ebi('u2foot').innerHTML = shame + ' so <em>this</em> uploader will do like 500 KiB/s at best';
-            else
-                ebi('u2foot').innerHTML = 'seems like ' + shame + ' so do that if you want more performance <span style="color:#' +
-                    (sha_js == 'ac' ? 'c84">(expecting 20' : '8a5">(but dont worry too much, expect 100') + ' MiB/s)</span>';
+            if (is_https) {
+                // chrome<37 firefox<34 edge<12 opera<24 safari<7
+                m = L.u_ancient;
+                setmsg('');
+            }
+            ebi('u2foot').innerHTML = '<big>' + m + '</big>';
         }
         loading_deps = true;
     }
@@ -647,16 +643,6 @@ function up2k_init(subtle) {
     }
 
     setmsg(suggest_up2k, 'msg');
-
-    if (!String.prototype.format) {
-        String.prototype.format = function () {
-            var args = arguments;
-            return this.replace(/{(\d+)}/g, function (match, number) {
-                return typeof args[number] != 'undefined' ?
-                    args[number] : match;
-            });
-        };
-    }
 
     var parallel_uploads = icfg_get('nthread'),
         uc = {},
@@ -715,7 +701,7 @@ function up2k_init(subtle) {
         bobslice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
 
     if (!bobslice || !window.FileReader || !window.FileList)
-        return un2k("this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1");
+        return un2k(L.u_ever);
 
     var flag = false;
     apply_flag_cfg();
@@ -737,14 +723,14 @@ function up2k_init(subtle) {
         var mup, up = QS('#up_zd');
         var msr, sr = QS('#srch_zd');
         if (!has(perms, 'write'))
-            mup = 'you do not have write-access to this folder';
+            mup = L.u_ewrite;
         if (!has(perms, 'read'))
-            msr = 'you do not have read-access to this folder';
+            msr = L.u_eread;
         if (!have_up2k_idx)
-            msr = 'file-search is not enabled in server config';
+            msr = L.u_enoi;
 
-        up.querySelector('span').textContent = mup || 'drop it here';
-        sr.querySelector('span').textContent = msr || 'drop it here';
+        up.querySelector('span').textContent = mup || L.udt_drop;
+        sr.querySelector('span').textContent = msr || L.udt_drop;
         clmod(up, 'err', mup);
         clmod(sr, 'err', msr);
         clmod(up, 'ok', !mup);
@@ -970,22 +956,22 @@ function up2k_init(subtle) {
     function gotallfiles(good_files, nil_files, bad_files) {
         var ntot = good_files.concat(nil_files, bad_files).length;
         if (bad_files.length) {
-            var msg = 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n'.format(bad_files.length, ntot);
+            var msg = L.u_badf.format(bad_files.length, ntot);
             for (var a = 0, aa = Math.min(20, bad_files.length); a < aa; a++)
                 msg += '-- ' + bad_files[a][1] + '\n';
 
-            msg += '\nMaybe it works better if you select just one file';
+            msg += L.u_just1;
             return modal.alert(msg, function () {
                 gotallfiles(good_files, nil_files, []);
             });
         }
 
         if (nil_files.length) {
-            var msg = 'These {0} files (of {1} total) are blank/empty; upload them anyways?\n'.format(nil_files.length, ntot);
+            var msg = L.u_blankf.format(nil_files.length, ntot);
             for (var a = 0, aa = Math.min(20, nil_files.length); a < aa; a++)
                 msg += '-- ' + nil_files[a][1] + '\n';
 
-            msg += '\nMaybe it works better if you select just one file';
+            msg += L.u_just1;
             return modal.confirm(msg, function () {
                 gotallfiles(good_files.concat(nil_files), [], []);
             }, function () {
@@ -999,7 +985,7 @@ function up2k_init(subtle) {
             return a < b ? -1 : a > b ? 1 : 0;
         });
 
-        var msg = ['{0} these {1} files?<ul>'.format(uc.fsearch ? 'search' : 'upload', good_files.length)];
+        var msg = [(uc.fsearch ? L.u_asks : L.u_asku).format(good_files.length) + '<ul>'];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push('<li>' + esc(good_files[a][1]) + '</li>');
 
@@ -1056,7 +1042,7 @@ function up2k_init(subtle) {
             pvis.addfile([
                 uc.fsearch ? esc(entry.name) : linksplit(
                     entry.purl + uricom_enc(entry.name)).join(' '),
-                '📐 hash',
+                '📐 ' + L.u_hashing,
                 ''
             ], fobj.size, draw_each);
 
@@ -1104,11 +1090,11 @@ function up2k_init(subtle) {
         }
 
         if (!nhash)
-            ebi('u2etah').innerHTML = 'Done ({0}, {1} files)'.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
+            ebi('u2etah').innerHTML = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
 
         if (!nsend && !nhash)
             ebi('u2etau').innerHTML = ebi('u2etat').innerHTML = (
-                'Done ({0}, {1} files)'.format(humansize(st.bytes.uploaded), pvis.ctr["ok"] + pvis.ctr["ng"]));
+                L.u_etadone.format(humansize(st.bytes.uploaded), pvis.ctr["ok"] + pvis.ctr["ng"]));
 
         if (!st.busy.hash.length && !hashing_permitted())
             nhash = 0;
@@ -1129,7 +1115,7 @@ function up2k_init(subtle) {
         }
         if ((nhash || nsend) && !uc.fsearch) {
             if (!st.bytes.finished) {
-                ebi('u2etat').innerHTML = '(preparing to upload)';
+                ebi('u2etat').innerHTML = L.u_etaprep;
             }
             else {
                 st.time.busy += td;
@@ -1142,7 +1128,7 @@ function up2k_init(subtle) {
                 eta = Math.floor(rem / bps);
 
             if (t[a][1] < 1024 || t[a][3] < 0.1) {
-                ebi(t[a][0]).innerHTML = '(preparing to upload)';
+                ebi(t[a][0]).innerHTML = L.u_etaprep;
                 continue;
             }
 
@@ -1530,7 +1516,7 @@ function up2k_init(subtle) {
 
                 t.t_hashed = Date.now();
 
-                pvis.seth(t.n, 2, 'hashing done');
+                pvis.seth(t.n, 2, L.u_hashdone);
                 pvis.seth(t.n, 1, '📦 wait');
                 apop(st.busy.hash, t);
                 st.todo.handshake.push(t);
@@ -1734,7 +1720,7 @@ function up2k_init(subtle) {
                             'npart': t.postlist[a]
                         });
 
-                    msg = 'uploading';
+                    msg = L.u_upping;
                     done = false;
 
                     if (sort)
@@ -1811,8 +1797,8 @@ function up2k_init(subtle) {
                     tasker();
                     return;
                 }
-                err = t.t_uploading ? "finalize upload" : t.srch ? "perform search" : "initiate upload";
-                xhrchk(xhr, "server rejected the request to " + err + ";\n\nfile: " + t.name + "\n\nerror ", "404, target folder not found");
+                err = t.t_uploading ? L.u_ehsfin : t.srch ? L.u_ehssrch : L.u_ehsinit;
+                xhrchk(xhr, err + ";\n\nfile: " + t.name + "\n\nerror ", "404, target folder not found");
             }
         }
         xhr.onload = function (e) {
@@ -1871,7 +1857,7 @@ function up2k_init(subtle) {
                 console.log("ignoring dupe-segment error", t);
             }
             else {
-                xhrchk(xhr, "server rejected upload (chunk {0} of {1});\n\nfile: {2}\n\nerror ".format(npart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)");
+                xhrchk(xhr, L.u_cuerr2.format(npart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)");
 
                 chill(t);
             }
@@ -1900,7 +1886,7 @@ function up2k_init(subtle) {
                     return;
 
                 if (!toast.visible)
-                    toast.warn(9.98, "failed to upload chunk {0} of {1};\nprobably harmless, continuing\n\nfile: {2}".format(npart, Math.ceil(t.size / chunksize), t.name));
+                    toast.warn(9.98, L.u_cuerr.format(npart, Math.ceil(t.size / chunksize), t.name));
 
                 console.log('chunkpit onerror,', ++tries, t);
                 orz2(xhr);
@@ -2062,7 +2048,7 @@ function up2k_init(subtle) {
 
         try {
             var ico = uc.fsearch ? '🔎' : '🚀',
-                desc = uc.fsearch ? 'S E A R C H' : 'U P L O A D';
+                desc = uc.fsearch ? L.ul_btns : L.ul_btnu;
 
             clmod(ebi('op_up2k'), 'srch', uc.fsearch);
             ebi('u2bm').innerHTML = ico + '&nbsp; <sup>' + desc + '</sup>';

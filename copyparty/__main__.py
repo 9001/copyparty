@@ -563,6 +563,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag M using program BIN to parse the file")
 
     ap2 = ap.add_argument_group('ui options')
+    ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=6, help="number of themes installed")
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")

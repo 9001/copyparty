@@ -1,23 +1,582 @@
 "use strict";
 
-function dbg(msg) {
-	ebi('path').innerHTML = msg;
-}
 var XHR = XMLHttpRequest;
+var Ls = {
+	"eng": {
+		"tt": "English",
+
+		"cols": {
+			"c": "action buttons",
+			"dur": "duration",
+			"q": "quality / bitrate",
+			"Ac": "audio codec",
+			"Vc": "video codec",
+			"Ahash": "audio checksum",
+			"Vhash": "video checksum",
+			"Res": "resolution",
+			"T": "filetype",
+			"aq": "audio quality / bitrate",
+			"vq": "video quality / bitrate",
+			"pixfmt": "subsampling / pixel structure",
+			"resw": "horizontal resolution",
+			"resh": "veritcal resolution",
+			"chs": "audio channels",
+			"hz": "sample rate"
+		},
+
+		"goh": "control-panel",
+		"ot_close": "close submenu",
+		"ot_search": "search for files by attributes, path / name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both «foo» and «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain «foo» but not «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with «yana» and be an «opus» file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»",
+		"ot_unpost": "unpost: delete your recent uploads",
+		"ot_bup": "bup: basic uploader, even supports netscape 4.0",
+		"ot_mkdir": "mkdir: create a new directory",
+		"ot_md": "new-md: create a new markdown document",
+		"ot_msg": "msg: send a message to the server log",
+		"ot_mp": "media player options",
+		"ot_cfg": "configuration options",
+		"ot_u2i": 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server$N$Nuploads are resumable, multithreaded, and file timestamps are preserved, but it uses more CPU than the basic uploader',
+		"ot_u2w": 'up2k: upload files with resume support (close your browser and drop the same files in later)$N$Nmultithreaded, and file timestamps are preserved, but it uses more CPU than the basic uploader',
+
+		"wt_ren": "rename selected items$NHotkey: F2",
+		"wt_del": "delete selected items$NHotkey: ctrl-K",
+		"wt_cut": "cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X",
+		"wt_pst": "paste a previously cut / copied selection$NHotkey: ctrl-V",
+		"wt_selall": "select all files$NHotkey: ctrl-A (when file focused)",
+		"wt_selinv": "invert selection",
+		"wt_selzip": "download selection as archive",
+		"wt_npirc": "copy irc-formatted track info",
+		"wt_nptxt": "copy plaintext track info",
+		"wt_grid": "toggle grid / list view$NHotkey: G",
+		"wt_prev": "previous track$NHotkey: J",
+		"wt_play": "play / pause$NHotkey: P",
+		"wt_next": "next track$NHotkey: L",
+
+		"ul_par": "parallel uploads:",
+		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
+		"ut_ask": "ask for confirmation before upload starts",
+		"ut_srch": "don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)",
+		"ut_par": "pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck",
+		"ul_btn": "drop files / folders<br />here (or click me)",
+		"ul_btnu": "U P L O A D",
+		"ul_btns": "S E A R C H",
+
+		"ul_hash": "hash",
+		"ul_send": "send",
+		"ul_done": "done",
+		"ul_idle1": "no uploads are queued yet",
+		"ut_etah": "average &lt;em&gt;hashing&lt;/em&gt; speed, and estimated time until finish",
+		"ut_etau": "average &lt;em&gt;upload&lt;/em&gt; speed and estimated time until finish",
+		"ut_etat": "average &lt;em&gt;total&lt;/em&gt; speed and estimated time until finish",
+
+		"uct_ok": "completed successfully",
+		"uct_ng": "failed / rejected / not-found",
+		"uct_done": "ok and ng combined",
+		"uct_bz": "hashing or uploading",
+		"uct_q": "idle, pending",
+
+		"utl_name": "filename",
+		"utl_stat": "status",
+		"utl_prog": "progress",
+
+		"ul_flagblk": "the files were added to the queue</b><br />however there is a busy up2k in another browser tab,<br />so waiting for that to finish first",
+
+		"udt_up": "Upload",
+		"udt_srch": "Search",
+		"udt_drop": "drop it here",
+
+		"cl_opts": "switches",
+		"cl_themes": "theme",
+		"cl_langs": "language",
+		"cl_ziptype": "folder download",
+		"cl_uopts": "up2k switches",
+		"cl_favico": "favicon",
+		"cl_keytype": "key notation",
+		"cl_hiddenc": "hidden columns",
+
+		"ct_thumb": "in icon view, toggle icons or thumbnails$NHotkey: T",
+		"ct_dots": "show hidden files (if server permits)",
+		"ct_readme": "show README.md in folder listings",
+
+		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them",
+
+		"cut_datechk": "has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished / corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards",
+
+		"cut_flag": "ensure only one tab is uploading at a time $N -- other tabs must have this enabled too $N -- only affects tabs on the same domain",
+
+		"cft_text": "favicon text (blank and refresh to disable)",
+		"cft_fg": "foreground color",
+		"cft_bg": "background color",
+
+		"tt_entree": "show navpane (directory tree sidebar)$NHotkey: B",
+		"tt_detree": "show breadcrumbs$NHotkey: B",
+		"tt_visdir": "scroll to selected folder",
+		"tt_ftree": "toggle folder-tree / textfiles$NHotkey: V",
+		"tt_pdock": "show parent folders in a docked pane at the top",
+		"tt_dynt": "autogrow as tree expands",
+		"tt_wrap": "word wrap",
+		"tt_hover": "reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )",
+
+		"ml_pmode": "playback mode",
+		"ml_tcode": "transcode",
+		"ml_tint": "tint",
+		"ml_eq": "audio equalizer",
+
+		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
+		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
+		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
+		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
+		"mt_oseek": "allow seeking through os integration\">seek",
+		"mt_oscv": "show album cover in osd\">art",
+		"mt_mloop": "loop the open folder\">🔁 loop",
+		"mt_mnext": "load the next folder and continue\">📂 next",
+		"mt_cflac": "convert flac to opus\">flac",
+		"mt_caac": "convert aac / m4a to opus\">aac",
+		"mt_coth": "convert all others (not mp3) to opus\">oth",
+		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
+		"mt_eq": "enables the equalizer and gain control;$Nboost 0 = unmodified 100% volume$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero if you care about that",
+
+		"mb_play": "play",
+		"mm_hashplay": "play this audio file?",
+		"mp_breq": "need firefox 82+ or chrome 73+ or iOS 15+",
+		"mm_opusen": "your browser cannot play aac / m4a files;\ntranscoding to opus is now enabled",
+		"mm_playerr": "playback failed: ",
+		"mm_eabrt": "The playback attempt was cancelled",
+		"mm_enet": "Your internet connection is wonky",
+		"mm_edec": "This file is supposedly corrupted??",
+		"mm_esupp": "Your browser does not understand this audio format",
+		"mm_eunk": "Unknown Errol",
+		"mm_e404": "Could not play audio; error 404: File not found.",
+		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
+		"mm_e5xx": "Could not play audio; server error ",
+
+		"ft_paste": "paste {0} items$NHotkey: ctrl-V",
+		"fr_eperm": 'cannot rename:\nyou do not have “move” permission in this folder',
+		"fd_eperm": 'cannot delete:\nyou do not have “delete” permission in this folder',
+		"fc_eperm": 'cannot cut:\nyou do not have “move” permission in this folder',
+		"fp_eperm": 'cannot paste:\nyou do not have “write” permission in this folder',
+		"fr_emore": "select at least one item to rename",
+		"fd_emore": "select at least one item to delete",
+		"fc_emore": "select at least one item to cut",
+
+		"frt_dec": "may fix some cases of broken filenames\">url-decode",
+		"frt_rst": "reset modified filenames back to the original ones\">↺ reset",
+		"frt_abrt": "abort and close this window\">❌ cancel",
+		"frb_apply": "APPLY RENAME",
+		"fr_adv": "batch / metadata / pattern renaming\">advanced",
+		"fr_case": "case-sensitive regex\">case",
+		"fr_pdel": "delete",
+		"fr_pnew": "save as",
+		"fr_pname": "provide a name for your new preset",
+		"fr_aborted": "aborted",
+		"fr_lold": "old name",
+		"fr_lnew": "new name",
+		"fr_tags": "tags for the selected files (read-only, just for reference):",
+		"fr_busy": "renaming {0} items...\n\n{1}",
+		"fr_efail": "rename failed:\n",
+
+		"fd_ok": "delete OK",
+		"fd_err": "delete failed:\n",
+		"fd_busy": "deleting {0} items...\n\n{1}",
+		"fd_warn1": "DELETE these {0} items?",
+		"fd_warn2": "<b>Last chance!</b> No way to undo. Delete?",
+
+		"fc_ok": "cut {0} items",
+		"fc_warn": 'cut {0} items\n\nbut: only <b>this</b> browser-tab can paste them\n(since the selection is so absolutely massive)',
+
+		"fp_ecut": "first cut some files / folders to paste / move\n\nnote: you can cut / paste across different browser tabs",
+		"fp_ename": "these {0} items cannot be moved here (names already exist):",
+		"fp_ok": "move OK",
+		"fp_busy": "moving {0} items...\n\n{1}",
+		"fp_err": "move failed:\n",
+		"fp_confirm": "move these {0} items here?",
+		"fp_etab": 'failed to read clipboard from other browser tab',
+
+		"tv_load": "Loading text document:\n\n{0}\n\n{1}% ({2} of {3} MiB loaded)",
+		"tv_xe1": "could not load textfile:\n\nerror ",
+		"tv_xe2": "404, file not found",
+		"tv_lst": "list of textfiles in",
+		"tvt_close": "return to folder view$NHotkey: M\">❌ close",
+		"tvt_dl": "download this file\">💾 download",
+		"tvt_prev": "show previous document$NHotkey: i\">⬆ prev",
+		"tvt_next": "show next document$NHotkey: K\">⬇ next",
+		"tvt_sel": "select file &nbsp; ( for cut / delete / ... )$NHotkey: S\">sel",
+
+		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
+		"gt_zoom": "zoom",
+		"gt_chop": "chop",
+		"gt_sort": "sort by",
+		"gt_name": "name",
+		"gt_sz": "size",
+		"gt_ts": "date",
+		"gt_ext": "type",
+		"gt_c1": "truncate filenames more (show less)",
+		"gt_c2": "truncate filenames less (show more)",
+
+		"sm_prev": "search results below are from a previous query:\n  ",
+		"sl_close": "close search results",
+		"sl_hits": "showing {0} hits",
+		"sl_moar": "load more",
+
+		"md_eshow": "cannot show ",
+
+		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
+		"tl_xe1": "could not list subfolders:\n\nerror ",
+		"tl_xe2": "404: Folder not found",
+		"fl_xe1": "could not list files in folder:\n\nerror ",
+		"fl_xe2": "404: Folder not found",
+		"fd_xe1": "could not create subfolder:\n\nerror ",
+		"fd_xe2": "404: Parent folder not found",
+		"fsm_xe1": "could not send message:\n\nerror ",
+		"fsm_xe2": "404: Parent folder not found",
+		"fu_xe1": "failed to load unpost list from server:\n\nerror ",
+		"fu_xe2": "404: File not found??",
+
+		"fz_tar": "plain gnutar file (linux / mac)",
+		"fz_zip8": "zip with utf8 filenames (maybe wonky on windows 7 and older)",
+		"fz_zipd": "zip with traditional cp437 filenames, for really old software",
+		"fz_zipc": "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)",
+
+		"un_m1": "you can delete your recent uploads below",
+		"un_upd": "refresh list",
+		"un_flt": "optional filter:&nbsp; URL must contain",
+		"un_fclr": "clear filter",
+		"un_derr": 'unpost-delete failed:\n',
+		"un_f5": 'something broke, please try a refresh or hit F5',
+		"un_max": "showing first 2000 files (use the filter)",
+		"un_avail": "{0} uploads can be deleted",
+		"un_m2": "sorted by upload time &ndash; most recent first:",
+		"un_no1": "sike! no uploads are sufficiently recent",
+		"un_no2": "sike! no uploads matching that filter are sufficiently recent",
+		"un_next": "delete the next {0} files below",
+		"un_del": "delete",
+		"un_m3": "loading your recent uploads...",
+		"un_busy": "deleting {0} files...",
+
+		"u_https1": "you should",
+		"u_https2": "switch to https",
+		"u_https3": "for much better performance",
+		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
+		"u_ever": "this is the basic uploader; up2k needs at least<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'this is the basic uploader; <a href="#" id="u2yea">up2k</a> is better',
+		"u_ewrite": 'you do not have write-access to this folder',
+		"u_eread": 'you do not have read-access to this folder',
+		"u_enoi": 'file-search is not enabled in server config',
+		"u_badf": 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n\n',
+		"u_blankf": 'These {0} files (of {1} total) are blank / empty; upload them anyways?\n\n',
+		"u_just1": '\nMaybe it works better if you select just one file',
+		"u_asku": 'upload these {0} files?',
+		'u_asks': 'search for these {0} files?',
+		"u_etadone": 'Done ({0}, {1} files)',
+		"u_etaprep": '(preparing to upload)',
+		"u_hashdone": 'hashing done',
+		"u_hashing": 'hash',
+		"u_upping": 'uploading',
+		"u_cuerr": "failed to upload chunk {0} of {1};\nprobably harmless, continuing\n\nfile: {2}",
+		"u_cuerr2": "server rejected upload (chunk {0} of {1});\n\nfile: {2}\n\nerror ",
+		"u_ehsfin": "server rejected the request to finalize upload",
+		"u_ehssrch": "server rejected the request to perform search",
+		"u_ehsinit": "server rejected the request to initiate upload",
+
+		"lang_set": "refresh now to make the change take effect?",
+	},
+	"nor": {
+		"tt": "Norsk",
+
+		"cols": {
+			"c": "handlingsknapper",
+			"dur": "varighet",
+			"q": "kvalitet / bitrate",
+			"Ac": "lyd-format",
+			"Vc": "video-format",
+			"Ahash": "lyd-kontrollsum",
+			"Vhash": "video-kontrollsum",
+			"Res": "oppløsning",
+			"T": "filtype",
+			"aq": "lydkvalitet / bitrate",
+			"vq": "videokvalitet / bitrate",
+			"pixfmt": "fargekoding / detaljenivå",
+			"resw": "horisontal oppløsning",
+			"resh": "vertikal oppløsning",
+			"chs": "lydkanaler",
+			"hz": "lyd-oppløsning"
+		},
+
+		"goh": "kontrollpanel",
+		"ot_close": "lukk verktøy",
+		"ot_search": "søk etter filer ved å angi filnavn, mappenavn, tid, størrelse, eller metadata som sangtittel / artist / osv.$N$N&lt;code&gt;foo bar&lt;/code&gt; = inneholder både «foo» og «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = inneholder «foo» men ikke «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = starter med «yana», filtype «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = «try unite» eksakt",
+		"ot_unpost": "unpost: slett filer som du nylig har lastet opp; «angre-knappen»",
+		"ot_bup": "bup: tradisjonell / primitiv filopplastning,$N$Nfungerer i omtrent samtlige nettlesere",
+		"ot_mkdir": "mkdir: lag en ny mappe",
+		"ot_md": "new-md: lag et nytt markdown-dokument",
+		"ot_msg": "msg: send en beskjed til serverloggen",
+		"ot_mp": "musikkspiller-instillinger",
+		"ot_cfg": "andre innstillinger",
+		"ot_u2i": 'up2k: last opp filer (hvis du har skrivetilgang) eller bytt til søkemodus for å sjekke om filene finnes et-eller-annet sted på serveren$N$Nopplastninger kan gjenopptas etter avbrudd, skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn den primitive opplasteren bup',
+		"ot_u2w": 'up2k: filopplastning med støtte for å gjenoppta avbrutte opplastninger -- steng ned nettleseren og dra de samme filene inn i nettleseren igjen for å plukke opp igjen der du slapp$N$Nopplastninger skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn den primitive opplasteren "bup"',
+
+		"wt_ren": "gi nye navn til de valgte filene$NSnarvei: F2",
+		"wt_del": "slett de valgte filene$NSnarvei: ctrl-K",
+		"wt_cut": "klipp ut de valgte filene &lt;small&gt;(for å lime inn et annet sted)&lt;/small&gt;$NSnarvei: ctrl-X",
+		"wt_pst": "lim inn filer (som tidligere ble klippet ut et annet sted)$NSnarvei: ctrl-V",
+		"wt_selall": "velg alle filer$NSnarvei: ctrl-A (mens fokus er på en fil)",
+		"wt_selinv": "inverter utvalg",
+		"wt_selzip": "last ned de valgte filene som et arkiv",
+		"wt_npirc": "kopier sang-info (irc-formattert)",
+		"wt_nptxt": "kopier sang-info",
+		"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
+		"wt_prev": "forrige sang$NSnarvei: J",
+		"wt_play": "play / pause$NSnarvei: P",
+		"wt_next": "neste sang$NSnarvei: L",
+
+		"ul_par": "samtidige handl.:",
+		"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
+		"ut_ask": "bekreft filutvalg før opplastning starter",
+		"ut_srch": "utfør søk istedenfor å laste opp --$Nleter igjennom alle mappene du har lov til å se",
+		"ut_par": "sett til 0 for å midlertidig stanse opplastning$N$Nhøye verdier (4 eller 8) kan gi bedre ytelse,$Nspesielt på trege internettlinjer$N$Nbør ikke være høyere enn 1 på LAN$Neller hvis serveren sin harddisk er treg",
+		"ul_btn": "slipp filer / mapper<br />her (eller klikk meg)",
+		"ul_btnu": "L A S T &nbsp; O P P",
+		"ul_btns": "F I L S Ø K",
+
+		"ul_hash": "befar",
+		"ul_send": "&nbsp;send",
+		"ul_done": "total",
+		"ul_idle1": "ingen handlinger i køen",
+		"ut_etah": "snitthastighet for &lt;em&gt;befaring&lt;/em&gt; samt gjenstående tid",
+		"ut_etau": "snitthastighet for &lt;em&gt;opplastning&lt;/em&gt; samt gjenstående tid",
+		"ut_etat": "&lt;em&gt;total&lt;/em&gt; snitthastighet og gjenstående tid",
+
+		"uct_ok": "fullført uten problemer",
+		"uct_ng": "fullført under tvil (duplikat, ikke funnet, ...)",
+		"uct_done": "fullført (enten &lt;em&gt;ok&lt;/em&gt; eller &lt;em&gt;ng&lt;/em&gt;)",
+		"uct_bz": "aktive handlinger (befaring / opplastning)",
+		"uct_q": "køen",
+
+		"utl_name": "filnavn",
+		"utl_stat": "status",
+		"utl_prog": "progresjon",
+
+		"ul_flagblk": "filene har blitt lagt i køen</b><br />men det er en annen nettleserfane som holder på med befaring eller opplastning akkurat nå,<br />så venter til den er ferdig først",
+
+		"udt_up": "Last opp",
+		"udt_srch": "Søk",
+		"udt_drop": "Slipp filene her",
+
+		"cl_opts": "brytere",
+		"cl_themes": "utseende",
+		"cl_langs": "språk",
+		"cl_ziptype": "nedlastning av mapper",
+		"cl_uopts": "up2k-brytere",
+		"cl_favico": "favicon",
+		"cl_keytype": "notasjon for musikalsk dur",
+		"cl_hiddenc": "skjulte kolonner",
+
+		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
+		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
+		"ct_readme": "vis README.md nedenfor filene",
+
+		"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres",
+
+		"cut_datechk": "har ingen effekt dersom turbo er avslått$N$Ngjør turbo bittelitt tryggere ved å sjekke datostemplingen på filene (i tillegg til filstørrelse)$N$N<em>burde</em> oppdage og gjenoppta de fleste ufullstendige opplastninger, men er <em>ikke</em> en fullverdig erstatning for å deaktivere turbo og gjøre en skikkelig sjekk",
+
+		"cut_flag": "samkjører nettleserfaner slik at bare én $N kan holde på med befaring / opplastning $N -- andre faner må også ha denne skrudd på $N -- fungerer kun innenfor samme domene",
+
+		"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
+		"cft_fg": "farge",
+		"cft_bg": "bakgrunnsfarge",
+
+		"tt_entree": "bytt til mappehierarki$NSnarvei: B",
+		"tt_detree": "bytt til tradisjonell sti-visning$NSnarvei: B",
+		"tt_visdir": "bla ned til den åpne mappen",
+		"tt_ftree": "bytt mellom filstruktur og tekstfiler$NSnarvei: V",
+		"tt_pdock": "vis de overordnede mappene i et panel",
+		"tt_dynt": "øk bredden på panelet ettersom treet utvider seg",
+		"tt_wrap": "linjebryting",
+		"tt_hover": "vis hele mappenavnet når musepekeren treffer mappen$N( gjør dessverre at scrollhjulet fusker dersom musepekeren ikke befinner seg i grøfta )",
+
+		"ml_pmode": "spillemodus",
+		"ml_tcode": "konvertering",
+		"ml_tint": "tint",
+		"ml_eq": "audio equalizer / tonekontroll",
+
+		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
+		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
+		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
+		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
+		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
+		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
+		"mt_mloop": "repeter hele mappen\">🔁 repeter",
+		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
+		"mt_cflac": "konverter flac-filer til opus\">flac",
+		"mt_caac": "konverter aac / m4a-filer til to opus\">aac",
+		"mt_coth": "konverter alt annet (men ikke mp3) til opus\">andre",
+		"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjør oppdateringer mindre distraherende",
+		"mt_eq": "aktiver tonekontroll og forsterker;$Nboost 0 = normal volumskala$N$Nreduserer også dødtid imellom sangfiler",
+
+		"mb_play": "lytt",
+		"mm_hashplay": "spill denne sangen?",
+		"mp_breq": "krever firefox 82+, chrome 73+, eller iOS 15+",
+		"mm_opusen": "nettleseren din forstår ikke aac / m4a;\nkonvertering til opus er nå aktivert",
+		"mm_playerr": "avspilling feilet: ",
+		"mm_eabrt": "Avspillingsforespørselen ble avbrutt",
+		"mm_enet": "Nettet ditt er ustabilt",
+		"mm_edec": "Noe er galt med musikkfilen",
+		"mm_esupp": "Nettleseren din forstår ikke filtypen",
+		"mm_eunk": "Ukjent feil",
+		"mm_e404": "Avspilling feilet: Fil ikke funnet.",
+		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
+		"mm_e5xx": "Avspilling feilet: ",
+
+		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
+		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
+		"fd_eperm": 'kan ikke slette:\ndu har ikke “delete”-rettigheten i denne mappen',
+		"fc_eperm": 'kan ikke klippe ut:\ndu har ikke “move”-rettigheten i denne mappen',
+		"fp_eperm": 'kan ikke lime inn:\ndu har ikke "write"-rettigheten i denne mappen',
+		"fr_emore": "velg minst én fil som skal få nytt navn",
+		"fd_emore": "velg minst én fil som skal slettes",
+		"fc_emore": "velg minst én fil som skal klippes ut",
+
+		"frt_dec": "kan korrigere visse ødelagte filnavn\">url-decode",
+		"frt_rst": "nullstiller endringer (tilbake til de originale filnavnene)\">↺ reset",
+		"frt_abrt": "avbryt og lukk dette vinduet\">❌ avbryt",
+		"frb_apply": "IVERKSETT",
+		"fr_adv": "automasjon basert på metadata<br />og / eller mønster (regulære uttrykk)\">avansert",
+		"fr_case": "versalfølsomme uttrykk\">Aa",
+		"fr_pdel": "slett",
+		"fr_pnew": "lagre som",
+		"fr_pname": "gi innstillingene dine et navn",
+		"fr_aborted": "avbrutt",
+		"fr_lold": "gammelt navn",
+		"fr_lnew": "nytt navn",
+		"fr_tags": "metadata for de valgte filene (kun for referanse):",
+		"fr_busy": "endrer navn på {0} filer...\n\n{1}",
+		"fr_efail": "endring av navn feilet:\n",
+
+		"fd_ok": "sletting OK",
+		"fd_err": "sletting feilet:\n",
+		"fd_busy": "sletter {0} filer...\n\n{1}",
+		"fd_warn1": "SLETT disse {0} filene?",
+		"fd_warn2": "<b>Siste sjanse!</b> Dette kan ikke angres. Slett?",
+
+		"fc_ok": "klippet ut {0} filer",
+		"fc_warn": 'klippet ut {0} filer\n\nmen: kun <b>denne</b> nettleserfanen har mulighet til å lime dem inn et annet sted, siden antallet filer er helt hinsides',
+
+		"fp_ecut": "du må klippe ut noen filer / mapper først\n\nmerk: du kan gjerne jobbe på kryss av nettleserfaner; klippe ut i én fane, lime inn i en annen",
+		"fp_ename": "disse {0} filene kan ikke flyttes til målmappen fordi det allerede finnes filer med samme navn:",
+		"fp_ok": "flytting OK",
+		"fp_busy": "flytter {0} filer...\n\n{1}",
+		"fp_err": "flytting feilet:\n",
+		"fp_confirm": "flytt disse {0} filene hit?",
+		"fp_etab": 'kunne ikke lese listen med filer ifra den andre nettleserfanen',
+
+		"tv_load": "Laster inn tekstfil:\n\n{0}\n\n{1}% ({2} av {3} MiB lastet ned)",
+		"tv_xe1": "kunne ikke laste tekstfil:\n\nfeil ",
+		"tv_xe2": "404, Fil ikke funnet",
+		"tv_lst": "tekstfiler i mappen",
+		"tvt_close": "gå tilbake til mappen$NSnarvei: M\">❌ close",
+		"tvt_dl": "last ned denne filen\">💾 last ned",
+		"tvt_prev": "vis forrige dokument$NSnarvei: i\">⬆ prev",
+		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ next",
+		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">sel",
+
+		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
+		"gt_zoom": "zoom",
+		"gt_chop": "trim",
+		"gt_sort": "sorter",
+		"gt_name": "navn",
+		"gt_sz": "størr.",
+		"gt_ts": "dato",
+		"gt_ext": "type",
+		"gt_c1": "reduser maks-lengde på filnavn",
+		"gt_c2": "øk maks-lengde på filnavn",
+
+		"sm_prev": "søkeresultatene er fra et tidligere søk:\n  ",
+		"sl_close": "lukk søkeresultater",
+		"sl_hits": "viser {0} treff",
+		"sl_moar": "hent flere",
+
+		"md_eshow": "kan ikke vise ",
+
+		"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
+		"tl_xe1": "kunne ikke hente undermapper:\n\nfeil ",
+		"tl_xe2": "404: Mappen finnes ikke",
+		"fl_xe1": "kunne ikke hente filer i mappen:\n\nfeil ",
+		"fl_xe2": "404: Mappen finnes ikke",
+		"fd_xe1": "kan ikke opprette ny mappe:\n\nfeil ",
+		"fd_xe2": "404: Den overordnede mappen finnes ikke",
+		"fsm_xe1": "kunne ikke sende melding:\n\nfeil ",
+		"fsm_xe2": "404: Den overordnede mappen finnes ikke",
+		"fu_xe1": "kunne ikke hente listen med nylig opplastede filer ifra serveren:\n\nfeil ",
+		"fu_xe2": "404: Filen finnes ikke??",
+
+		"fz_tar": "ukomprimert gnu-tar arkiv, for linux og mac",
+		"fz_zip8": "zip med filnavn i utf8 (noe problematisk på windows 7 og eldre)",
+		"fz_zipd": "zip med filnavn i cp437, for høggamle maskiner",
+		"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",
+
+		"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp",
+		"un_upd": "oppdater listen",
+		"un_flt": "valgfritt filter:&nbsp; filnavn / filsti må inneholde",
+		"un_fclr": "nullstill filter",
+		"un_derr": 'unpost-sletting feilet:\n',
+		"un_f5": 'noe gikk galt, prøv å oppdatere listen eller trykk F5',
+		"un_max": "viser de første 2000 filene (bruk filteret for å innsnevre)",
+		"un_avail": "{0} filer kan slettes",
+		"un_m2": "sortert etter opplastningstid &ndash; nyeste først:",
+		"un_no1": "men nei, her var det jaggu ingenting",
+		"un_no2": "men nei, her var det jaggu ingenting som passer overens med filteret",
+		"un_next": "slett de neste {0} filene nedenfor",
+		"un_del": "slett",
+		"un_m3": "henter listen med nylig opplastede filer...",
+		"un_busy": "sletter {0} filer...",
+
+		"u_https1": "du burde",
+		"u_https2": "bytte til https",
+		"u_https3": "for mye høyere hastighet",
+		"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
+		"u_ever": "dette er den primitive opplasteren; up2k krever minst:<br />chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'dette er den primitive opplasteren; <a href="#" id="u2yea">up2k</a> er bedre',
+		"u_ewrite": 'du har ikke skrivetilgang i denne mappen',
+		"u_eread": 'du har ikke lesetilgang i denne mappen',
+		"u_enoi": 'filsøk er deaktivert i serverkonfigurasjonen',
+		"u_badf": 'Disse {0} filene (av totalt {1}) kan ikke leses, kanskje pga rettighetsproblemer i filsystemet på datamaskinen din:\n\n',
+		"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhold; ønsker du å laste dem opp uansett?\n\n',
+		"u_just1": '\nFunker kanskje bedre hvis du bare tar én fil om gangen',
+		"u_asku": 'Laste opp disse {0} filene?',
+		'u_asks': 'Søk etter disse {0} filene?',
+		"u_etadone": 'Ferdig ({0}, {1} filer)',
+		"u_etaprep": '(forbereder opplastning)',
+		"u_hashdone": 'befaring ferdig',
+		"u_hashing": 'les',
+		"u_upping": 'sender',
+		"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert harmløst, fortsetter\n\nfil: {2}",
+		"u_cuerr2": "server nektet opplastningen (del {0} of {1});\n\nfile: {2}\n\nerror ",
+		"u_ehsfin": "server nektet forespørselen om å ferdigstille filen",
+		"u_ehssrch": "server nektet forespørselen om å utføre søk",
+		"u_ehsinit": "server nektet forespørselen om å begynne en ny opplastning",
+
+		"lang_set": "siden må lastes på nytt for at endringen skal tre i kraft -- passer det nå?",
+	},
+};
+var L = Ls[sread("lang") || lang];
+if (Ls.eng && L != Ls.eng) {
+	for (var k in Ls.eng)
+		if (Ls.eng.hasOwnProperty(k) && !L[k])
+			L[k] = Ls.eng[k];
+}
 
 
 // toolbar
 ebi('ops').innerHTML = (
-	'<a href="#" data-dest="" tt="close submenu">--</a>' +
-	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="search for files by attributes, path/name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both foo and bar,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain foo but not bar,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with yana and be an opus file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»">🔎</a>' +
-	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="unpost: delete your recent uploads">🧯</a>' : '') +
+	'<a href="#" data-dest="" tt="' + L.ot_close + '">--</a>' +
+	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
+	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" data-dest="up2k">🚀</a>' +
-	'<a href="#" data-perm="write" data-dest="bup" tt="bup: basic uploader, even supports netscape 4.0">🎈</a>' +
-	'<a href="#" data-perm="write" data-dest="mkdir" tt="mkdir: create a new directory">📂</a>' +
-	'<a href="#" data-perm="read write" data-dest="new_md" tt="new-md: create a new markdown document">📝</a>' +
-	'<a href="#" data-perm="write" data-dest="msg" tt="msg: send a message to the server log">📟</a>' +
-	'<a href="#" data-dest="player" tt="media player options">🎺</a>' +
-	'<a href="#" data-dest="cfg" tt="configuration options">⚙️</a>' +
+	'<a href="#" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
+	'<a href="#" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
+	'<a href="#" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '">📝</a>' +
+	'<a href="#" data-perm="write" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
+	'<a href="#" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
+	'<a href="#" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
 	'<div id="opdesc"></div>'
 );
 
@@ -26,23 +585,23 @@ ebi('ops').innerHTML = (
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wfm"><a' +
-	' href="#" id="fren" tt="rename selected item$NHotkey: F2">✎<span>name</span></a><a' +
-	' href="#" id="fdel" tt="delete selected items$NHotkey: ctrl-K">⌫<span>del.</span></a><a' +
-	' href="#" id="fcut" tt="cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X">✂<span>cut</span></a><a' +
-	' href="#" id="fpst" tt="paste a previously cut/copied selection$NHotkey: ctrl-V">📋<span>paste</span></a>' +
+	' href="#" id="fren" tt="' + L.wt_ren + '">✎<span>name</span></a><a' +
+	' href="#" id="fdel" tt="' + L.wt_del + '">⌫<span>del.</span></a><a' +
+	' href="#" id="fcut" tt="' + L.wt_cut + '">✂<span>cut</span></a><a' +
+	' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
 	'</span><span id="wzip"><a' +
-	' href="#" id="selall" tt="select all files$NHotkey: ctrl-A (when file focused)">sel.<br />all</a><a' +
-	' href="#" id="selinv" tt="invert selection">sel.<br />inv.</a><a' +
-	' href="#" id="selzip" tt="download selection as archive">zip</a>' +
+	' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
+	' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
+	' href="#" id="selzip" tt="' + L.wt_selzip + '">zip</a>' +
 	'</span><span id="wnp"><a' +
-	' href="#" id="npirc" tt="copy irc-formatted track info">📋<span>irc</span></a><a' +
-	' href="#" id="nptxt" tt="copy plaintext track info">📋<span>txt</span></a>' +
+	' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
+	' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
 	'</span><a' +
-	'	href="#" id="wtgrid" tt="toggle grid/list view$NHotkey: G">田</a><a' +
+	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
-	'	<div id="pctl"><a href="#" id="bprev" tt="previous track$NHotkey: J">⏮</a><a href="#" id="bplay" tt="play/pause$NHotkey: P">▶</a><a href="#" id="bnext" tt="next track$NHotkey: L">⏭</a></div>' +
+	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '">⏮</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">⏭</a></div>' +
 	'	<canvas id="pvol" width="288" height="38"></canvas>' +
 	'	<canvas id="barpos"></canvas>' +
 	'	<canvas id="barbuf"></canvas>' +
@@ -56,18 +615,18 @@ ebi('op_up2k').innerHTML = (
 
 	'<table id="u2conf">\n' +
 	'	<tr>\n' +
-	'		<td class="c"><br />parallel uploads:</td>\n' +
+	'		<td class="c"><br />' + L.ul_par + '</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label for="multitask" tt="continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck">🏃</label>\n' +
+	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="ask_up" />\n' +
-	'			<label for="ask_up" tt="ask for confirmation before upload starts">💭</label>\n' +
+	'			<label for="ask_up" tt="' + L.ut_ask + '">💭</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
 	'			<input type="checkbox" id="fsearch" />\n' +
-	'			<label for="fsearch" tt="don\'t actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)">🔎</label>\n' +
+	'			<label for="fsearch" tt="' + L.ut_srch + '">🔎</label>\n' +
 	'		</td>\n' +
 	'		<td data-perm="read" rowspan="2" id="u2btn_cw"></td>\n' +
 	'		<td data-perm="read" rowspan="2" id="u2c3w"></td>\n' +
@@ -75,7 +634,7 @@ ebi('op_up2k').innerHTML = (
 	'	<tr>\n' +
 	'		<td class="c">\n' +
 	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
-	'				class="txtbox" id="nthread" value="2" tt="pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck"/><a\n' +
+	'				class="txtbox" id="nthread" value="2" tt="' + L.ut_par + '"/><a\n' +
 	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +
 	'		</td>\n' +
 	'	</tr>\n' +
@@ -85,26 +644,25 @@ ebi('op_up2k').innerHTML = (
 
 	'<div id="u2btn_ct">\n' +
 	'	<div id="u2btn">\n' +
-	'		<span id="u2bm"></span>\n' +
-	'		drop files / folders<br />\n' +
-	'		here (or click me)\n' +
+	'		<span id="u2bm"></span>\n' + L.ul_btn +
 	'	</div>\n' +
 	'</div>\n' +
 
 	'<div id="u2c3t">\n' +
 
 	'<div id="u2etaw"><div id="u2etas"><div class="o">\n' +
-	'	hash: <span id="u2etah" tt="average &lt;em&gt;hashing&lt;/em&gt; speed, and estimated time until finish">(no uploads are queued yet)</span><br />\n' +
-	'	send: <span id="u2etau" tt="average &lt;em&gt;upload&lt;/em&gt; speed and estimated time until finish">(no uploads are queued yet)</span><br />\n' +
-	'	</div><span class="o">done: </span><span id="u2etat" tt="average &lt;em&gt;total&lt;/em&gt; speed and estimated time until finish">(no uploads are queued yet)</span>\n' +
+	L.ul_hash + ': <span id="u2etah" tt="' + L.ut_etah + '">(' + L.ul_idle1 + ')</span><br />\n' +
+	L.ul_send + ': <span id="u2etau" tt="' + L.ut_etau + '">(' + L.ul_idle1 + ')</span><br />\n' +
+	'	</div><span class="o">' +
+	L.ul_done + ': </span><span id="u2etat" tt="' + L.ut_etat + '">(' + L.ul_idle1 + ')</span>\n' +
 	'</div></div>\n' +
 
 	'<div id="u2cards">\n' +
-	'	<a href="#" act="ok" tt="completed successfully">ok <span>0</span></a><a\n' +
-	'	href="#" act="ng" tt="failed / rejected / not-found">ng <span>0</span></a><a\n' +
-	'	href="#" act="done" tt="ok and ng combined">done <span>0</span></a><a\n' +
-	'	href="#" act="bz" tt="hashing or uploading" class="act">busy <span>0</span></a><a\n' +
-	'	href="#" act="q" tt="idle, pending">que <span>0</span></a>\n' +
+	'	<a href="#" act="ok" tt="' + L.uct_ok + '">ok <span>0</span></a><a\n' +
+	'	href="#" act="ng" tt="' + L.uct_ng + '">ng <span>0</span></a><a\n' +
+	'	href="#" act="done" tt="' + L.uct_done + '">done <span>0</span></a><a\n' +
+	'	href="#" act="bz" tt="' + L.uct_bz + '" class="act">busy <span>0</span></a><a\n' +
+	'	href="#" act="q" tt="' + L.uct_q + '">que <span>0</span></a>\n' +
 	'</div>\n' +
 
 	'</div>\n' +
@@ -112,15 +670,15 @@ ebi('op_up2k').innerHTML = (
 	'<div id="u2tabw"><table id="u2tab">\n' +
 	'	<thead>\n' +
 	'		<tr>\n' +
-	'			<td>filename</td>\n' +
-	'			<td>status</td>\n' +
-	'			<td>progress</td>\n' +
+	'			<td>' + L.utl_name + '</td>\n' +
+	'			<td>' + L.utl_stat + '</td>\n' +
+	'			<td>' + L.utl_prog + '</td>\n' +
 	'		</tr>\n' +
 	'	</thead>\n' +
 	'	<tbody></tbody>\n' +
 	'</table></div>\n' +
 
-	'<p id="u2flagblock"><b>the files were added to the queue</b><br />however there is a busy up2k in another browser tab,<br />so waiting for that to finish first</p>\n' +
+	'<p id="u2flagblock"><b>' + L.ul_flagblk + '</p>\n' +
 	'<p id="u2foot"></p>'
 );
 
@@ -129,8 +687,8 @@ ebi('op_up2k').innerHTML = (
 	var o = mknod('div');
 	o.innerHTML = (
 		'<div id="drops">\n' +
-		'	<div class="dropdesc" id="up_zd"><div>🚀 Upload<br /><span></span><div>🚀<b>Upload</b></div><div><b>Upload</b>🚀</div></div></div>\n' +
-		'	<div class="dropdesc" id="srch_zd"><div>🔎 Search<br /><span></span><div>🔎<b>Search</b></div><div><b>Search</b>🔎</div></div></div>\n' +
+		'	<div class="dropdesc" id="up_zd"><div>🚀 ' + L.udt_up + '<br /><span></span><div>🚀<b>' + L.udt_up + '</b></div><div><b>' + L.udt_up + '</b>🚀</div></div></div>\n' +
+		'	<div class="dropdesc" id="srch_zd"><div>🔎 ' + L.udt_srch + '<br /><span></span><div>🔎<b>' + L.udt_srch + '</b></div><div><b>' + L.udt_srch + '</b>🔎</div></div></div>\n' +
 		'	<div class="dropzone" id="up_dz" v="up_zd"></div>\n' +
 		'	<div class="dropzone" id="srch_dz" v="srch_zd"></div>\n' +
 		'</div>'
@@ -142,64 +700,71 @@ ebi('op_up2k').innerHTML = (
 // config panel
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
-	'	<h3>switches</h3>\n' +
+	'	<h3>' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
-	'		<a id="griden" class="tgl btn" href="#" tt="toggle icons or list-view$NHotkey: G">田 the grid</a>\n' +
-	'		<a id="thumbs" class="tgl btn" href="#" tt="in icon view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs</a>\n' +
-	'		<a id="dotfiles" class="tgl btn" href="#" tt="show hidden files (if server permits)">dotfiles</a>\n' +
-	'		<a id="ireadme" class="tgl btn" href="#" tt="show README.md in folder listings">📜 readme</a>\n' +
+	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
+	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
+	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
+	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>themes</h3>\n' +
+	'	<h3>' + L.cl_themes + '</h3>\n' +
 	'	<div id="themes">\n' +
 	'	</div>\n' +
 	'</div>\n' +
+	'<div>\n' +
+	'	<h3>' + L.cl_langs + '</h3>\n' +
+	'	<div id="langs">\n' +
+	'	</div>\n' +
+	'</div>\n' +
 	(have_zip ? (
-		'<div><h3>folder download</h3><div id="arc_fmt"></div></div>\n'
+		'<div><h3>' + L.cl_ziptype + '</h3><div id="arc_fmt"></div></div>\n'
 	) : '') +
 	'<div>\n' +
-	'	<h3>up2k switches</h3>\n' +
+	'	<h3>' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them">turbo</a>\n' +
-	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished/corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards">date-chk</a>\n' +
-	'		<a id="flag_en" class="tgl btn" href="#" tt="ensure only one tab is uploading at a time $N -- other tabs must have this enabled too $N -- only affects tabs on the same domain">💤</a>\n' +
+	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '">turbo</a>\n' +
+	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '">date-chk</a>\n' +
+	'		<a id="flag_en" class="tgl btn" href="#" tt="' + L.cut_flag + '">💤</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>favicon <span id="ico1">🎉</span></h3>\n' +
+	'	<h3>' + L.cl_favico + ' <span id="ico1">🎉</span></h3>\n' +
 	'	<div>\n' +
-	'		<input type="text" id="icot" style="width:1.3em" value="" tt="favicon text (blank and refresh to disable)" />' +
-	'		<input type="text" id="icof" style="width:2em" value="" tt="foreground color" />' +
-	'		<input type="text" id="icob" style="width:2em" value="" tt="background color" />' +
+	'		<input type="text" id="icot" style="width:1.3em" value="" tt="' + L.cft_text + '" />' +
+	'		<input type="text" id="icof" style="width:2em" value="" tt="' + L.cft_fg + '" />' +
+	'		<input type="text" id="icob" style="width:2em" value="" tt="' + L.cft_bg + '" />' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
-	'<div><h3>key notation</h3><div id="key_notation"></div></div>\n' +
-	'<div class="fill"><h3>hidden columns</h3><div id="hcols"></div></div>'
+	'<div><h3>' + L.cl_keytype + '</h3><div id="key_notation"></div></div>\n' +
+	'<div class="fill"><h3>' + L.cl_hiddenc + '</h3><div id="hcols"></div></div>'
 );
 
 
 // navpane
 ebi('tree').innerHTML = (
 	'<div id="treeh">\n' +
-	'	<a href="#" id="detree" tt="show breadcrumbs$NHotkey: B">🍞...</a>\n' +
+	'	<a href="#" id="detree" tt="' + L.tt_detree + '">🍞...</a>\n' +
 	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
-	'	<a href="#" class="btn" id="visdir" tt="scroll to selected folder">🎯</a>\n' +
-	'	<a href="#" class="tgl btn" id="filetree" tt="toggle folder-tree / textfiles$NHotkey: V">📃</a>\n' +
-	'	<a href="#" class="tgl btn" id="parpane" tt="show parent folders in a docked pane at the top">📌</a>\n' +
-	'	<a href="#" class="tgl btn" id="dyntree" tt="autogrow as tree expands">a</a>\n' +
-	'	<a href="#" class="tgl btn" id="wraptree" tt="word wrap">↵</a>\n' +
-	'	<a href="#" class="tgl btn" id="hovertree" tt="reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )">👀</a>\n' +
+	'	<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
+	'	<a href="#" class="tgl btn" id="filetree" tt="' + L.tt_ftree + '">📃</a>\n' +
+	'	<a href="#" class="tgl btn" id="parpane" tt="' + L.tt_pdock + '">📌</a>\n' +
+	'	<a href="#" class="tgl btn" id="dyntree" tt="' + L.tt_dynt + '">a</a>\n' +
+	'	<a href="#" class="tgl btn" id="wraptree" tt="' + L.tt_wrap + '">↵</a>\n' +
+	'	<a href="#" class="tgl btn" id="hovertree" tt="' + L.tt_hover + '">👀</a>\n' +
 	'</div>\n' +
 	'<ul id="docul"></ul>\n' +
 	'<ul class="ntree" id="treepar"></ul>\n' +
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
+ebi('entree').setAttribute('tt', L.tt_entree);
+ebi('goh').textContent = L.goh;
 
 
 (function () {
@@ -317,33 +882,33 @@ var mpl = (function () {
 	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
 
 	ebi('op_player').innerHTML = (
-		'<div><h3>switches</h3><div>' +
-		'<a href="#" class="tgl btn" id="au_preload" tt="start loading the next song near the end for gapless playback">preload</a>' +
-		'<a href="#" class="tgl btn" id="au_fullpre" tt="try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably">full</a>' +
-		'<a href="#" class="tgl btn" id="au_npclip" tt="show buttons for clipboarding the currently playing song">/np</a>' +
-		'<a href="#" class="tgl btn" id="au_os_ctl" tt="os integration (media hotkeys / osd)">os-ctl</a>' +
-		'<a href="#" class="tgl btn" id="au_os_seek" tt="allow seeking through os integration">seek</a>' +
-		'<a href="#" class="tgl btn" id="au_osd_cv" tt="show album cover in osd">art</a>' +
+		'<div><h3>' + L.cl_opts + '</h3><div>' +
+		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
+		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
+		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
+		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
+		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
+		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
 		'</div></div>' +
 
-		'<div><h3>playback mode</h3><div id="pb_mode">' +
-		'<a href="#" class="tgl btn" tt="loop the open folder">🔁 loop</a>' +
-		'<a href="#" class="tgl btn" tt="load the next folder and continue">📂 next</a>' +
+		'<div><h3>' + L.ml_pmode + '</h3><div id="pb_mode">' +
+		'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '</a>' +
+		'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
 		'</div></div>' +
 
 		(have_acode ? (
-			'<div><h3>transcode</h3><div>' +
-			'<a href="#" id="ac_flac" class="tgl btn" tt="convert flac to opus">flac</a>' +
-			'<a href="#" id="ac_aac" class="tgl btn" tt="convert aac/m4a to opus">aac</a>' +
-			'<a href="#" id="ac_oth" class="tgl btn" tt="convert all others (not mp3) to opus">oth</a>' +
+			'<div><h3>' + L.ml_tcode + '</h3><div>' +
+			'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
+			'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
+			'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
 			'</div></div>'
 		) : '') +
 
-		'<div><h3>tint</h3><div>' +
-		'<input type="text" id="pb_tint" style="width:2.4em" value="0" tt="background level (0-100) on the seekbar$Nto make buffering less distracting" />' +
+		'<div><h3>' + L.ml_tint + '</h3><div>' +
+		'<input type="text" id="pb_tint" style="width:2.4em" value="0" tt="' + L.mt_tint + '" />' +
 		'</div></div>' +
 
-		'<div><h3>audio equalizer</h3><div id="audio_eq"></div></div>');
+		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>');
 
 	var r = {
 		"pb_mode": (sread('pb_mode') || 'loop').split('-')[0],
@@ -372,13 +937,13 @@ var mpl = (function () {
 		r.os_ctl = !r.os_ctl && have_mctl;
 		bcfg_set('au_os_ctl', r.os_ctl);
 		if (!have_mctl)
-			toast.err(5, 'need firefox 82+ or chrome 73+ or iOS 15+');
+			toast.err(5, L.mp_breq);
 	};
 
 	function draw_pb_mode() {
 		var btns = QSA('#pb_mode>a');
 		for (var a = 0, aa = btns.length; a < aa; a++) {
-			clmod(btns[a], 'on', btns[a].textContent.indexOf(r.pb_mode) != -1);
+			clmod(btns[a], 'on', btns[a].getAttribute("m") == r.pb_mode);
 			btns[a].onclick = set_pb_mode;
 		}
 	}
@@ -386,7 +951,7 @@ var mpl = (function () {
 
 	function set_pb_mode(e) {
 		ev(e);
-		r.pb_mode = this.textContent.split(' ').pop();
+		r.pb_mode = this.getAttribute('m');
 		swrite('pb_mode', r.pb_mode);
 		draw_pb_mode();
 	}
@@ -541,7 +1106,7 @@ function MPlayer() {
 			var tid = link.getAttribute('id');
 			r.order.push(tid);
 			r.tracks[tid] = url;
-			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">play</a></td>';
+			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + L.mb_play + '</a></td>';
 			ebi('a' + tid).onclick = ev_play;
 			clmod(trs[a], 'au', 1);
 		}
@@ -1374,7 +1939,7 @@ var audio_eq = (function () {
 	}
 
 	var html = ['<table><tr><td rowspan="4">',
-		'<a id="au_eq" class="tgl btn" href="#" tt="enables the equalizer and gain control;$Nboost 0 = unmodified 100% volume$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero if you care about that">enable</a></td>'],
+		'<a id="au_eq" class="tgl btn" href="#" tt="' + L.mt_eq + '">enable</a></td>'],
 		h2 = [], h3 = [], h4 = [];
 
 	var vs = [];
@@ -1531,7 +2096,7 @@ function play(tid, is_ev, seek) {
 		return true;
 	}
 	catch (ex) {
-		toast.err(0, esc('playback failed: ' + basenames(ex)));
+		toast.err(0, esc(L.mm_playerr + basenames(ex)));
 	}
 	clmod(ebi(oid), 'act');
 	setTimeout(next_song, 5000);
@@ -1545,34 +2110,34 @@ function evau_error(e) {
 
 	switch (eplaya.error.code) {
 		case eplaya.error.MEDIA_ERR_ABORTED:
-			err = "You aborted the playback attempt (how tho)";
+			err = L.mm_eabrt;
 			break;
 		case eplaya.error.MEDIA_ERR_NETWORK:
-			err = "Your internet connection is wonky";
+			err = L.mm_enet;
 			break;
 		case eplaya.error.MEDIA_ERR_DECODE:
-			err = "This file is supposedly corrupted??";
+			err = L.mm_edec;
 			break;
 		case eplaya.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-			err = "Your browser does not understand this audio format";
+			err = L.mm_esupp;
 			if (/\.(aac|m4a)(\?|$)/i.exec(eplaya.rsrc) && !mpl.ac_aac) {
 				try {
 					ebi('ac_aac').click();
 					QS('a.play.act').click();
-					toast.warn(10, 'your browser cannot play aac/m4a files;\ntranscoding to opus is now enabled');
+					toast.warn(10, L.mm_opusen);
 					return;
 				}
 				catch (ex) { }
 			}
 			break;
 		default:
-			err = 'Unknown Errol';
+			err = L.mm_eunk;
 			break;
 	}
 	var em = '' + eplaya.error.message,
 		mfile = '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop())[0] + '»',
-		e404 = 'Could not play audio; error 404: File not found.',
-		e403 = 'Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out';
+		e404 = L.mm_e404,
+		e403 = L.mm_e403;
 
 	if (em)
 		err += '\n\n' + em;
@@ -1594,7 +2159,7 @@ function evau_error(e) {
 				return;
 
 			err = this.status == 403 ? e403 : this.status == 404 ? e404 :
-				'Could not play audio; server error ' + this.status;
+				L.mm_e5xx + this.status;
 
 			toast.warn(15, esc(basenames(err + mfile)));
 		};
@@ -1610,7 +2175,7 @@ function autoplay_blocked(seek) {
 
 	fn = uricom_dec(fn.replace(/\+/g, ' '))[0];
 
-	modal.confirm('<h6>play this audio file?</h6>\n«' + esc(fn) + '»', function () {
+	modal.confirm('<h6>' + L.mm_hashplay + '</h6>\n«' + esc(fn) + '»', function () {
 		// chrome 91 may permanently taint on a failed play()
 		// depending on win10 settings or something? idk
 		mp.au = null;
@@ -1912,17 +2477,17 @@ var fileman = (function () {
 		clmod(bpst, 'hide', !(have_mv && has(perms, 'write')));
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
 
-		bpst.setAttribute('tt', 'paste ' + r.clip.length + ' items$NHotkey: ctrl-V');
+		bpst.setAttribute('tt', L.ft_paste.format(r.clip.length));
 	};
 
 	r.rename = function (e) {
 		ev(e);
 		if (clgot(bren, 'hide'))
-			return toast.err(3, 'cannot rename:\nyou do not have “move” permission in this folder');
+			return toast.err(3, L.fr_eperm);
 
 		var sel = msel.getsel();
 		if (!sel.length)
-			return toast.err(3, 'select at least one item to rename');
+			return toast.err(3, L.fr_emore);
 
 		var f = [],
 			base = vsplit(sel[0].vp)[0],
@@ -1969,23 +2534,23 @@ var fileman = (function () {
 
 		var html = sel.length > 1 ? ['<div>'] : [
 			'<div>',
-			'<button class="rn_dec" n="0" tt="may fix some cases of broken filenames">url-decode</button>',
+			'<button class="rn_dec" n="0" tt="' + L.frt_dec + '</button>',
 			'//',
-			'<button class="rn_reset" n="0" tt="reset modified filenames back to the original ones">↺ reset</button>'
+			'<button class="rn_reset" n="0" tt="' + L.frt_rst + '</button>'
 		];
 
 		html = html.concat([
-			'<button id="rn_cancel" tt="abort and close this window">❌ cancel</button>',
-			'<button id="rn_apply">✅ APPLY RENAME</button>',
-			'<a id="rn_adv" class="tgl btn" href="#" tt="batch / metadata / pattern renaming">advanced</a>',
-			'<a id="rn_case" class="tgl btn" href="#" tt="case-sensitive regex">case</a>',
+			'<button id="rn_cancel" tt="' + L.frt_abrt + '</button>',
+			'<button id="rn_apply">✅ ' + L.frb_apply + '</button>',
+			'<a id="rn_adv" class="tgl btn" href="#" tt="' + L.fr_adv + '</a>',
+			'<a id="rn_case" class="tgl btn" href="#" tt="' + L.fr_case + '</a>',
 			'</div>',
 			'<div id="rn_vadv"><table>',
 			'<tr><td>regex</td><td><input type="text" id="rn_re" tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" /></td></tr>',
 			'<tr><td>format</td><td><input type="text" id="rn_fmt" tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" /></td></tr>',
 			'<tr><td>preset</td><td><select id="rn_pre"></select>',
-			'<button id="rn_pdel">❌ delete</button>',
-			'<button id="rn_pnew">💾 save as</button>',
+			'<button id="rn_pdel">❌ ' + L.fr_pdel + '</button>',
+			'<button id="rn_pnew">💾 ' + L.fr_pnew + '</button>',
 			'</td></tr>',
 			'</table></div>'
 		]);
@@ -1999,7 +2564,7 @@ var fileman = (function () {
 		else {
 			html.push(
 				'<div><table id="rn_f" class="m">' +
-				'<tr><td></td><td>new name</td><td>old name</td></tr>');
+				'<tr><td></td><td>' + L.fr_lnew + '</td><td>' + L.fr_lold + '</td></tr>');
 			for (var a = 0; a < f.length; a++)
 				html.push(
 					'<tr><td>' +
@@ -2012,7 +2577,7 @@ var fileman = (function () {
 		html.push('</table></div>');
 
 		if (sel.length == 1) {
-			html.push('<div><p style="margin:.6em 0">tags for the selected file (read-only, just for reference):</p><table>');
+			html.push('<div><p style="margin:.6em 0">' + L.fr_tags + '</p><table>');
 			for (var a = 0; a < mkeys.length; a++)
 				html.push('<tr><td>' + esc(mkeys[a]) + '</td><td><input type="text" readonly value="' + esc(f[0].md[mkeys[a]]) + '" /></td></tr>');
 
@@ -2095,9 +2660,9 @@ var fileman = (function () {
 		}
 		inew.onclick = function (e) {
 			ev(e);
-			modal.prompt('provide a name for your new preset', ifmt.value, function (name) {
+			modal.prompt(L.fr_pname, ifmt.value, function (name) {
 				if (!name)
-					return toast.warn(3, 'aborted');
+					return toast.warn(3, L.fr_aborted);
 
 				presets[name] = [ire.value, ifmt.value];
 				jwrite('rn_pre', presets);
@@ -2175,13 +2740,13 @@ var fileman = (function () {
 				return rn_cancel();
 			}
 
-			toast.inf(0, esc('renaming ' + f.length + ' items\n\n' + f[0].ofn));
+			toast.show('inf r', 0, esc(L.fr_busy.format(f.length, f[0].ofn)));
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
 				if (this.status !== 200) {
 					var msg = this.responseText;
-					toast.err(9, 'rename failed:\n' + msg);
+					toast.err(9, L.fr_efail + msg);
 					return;
 				}
 
@@ -2199,7 +2764,7 @@ var fileman = (function () {
 	r.delete = function (e) {
 		ev(e);
 		if (clgot(bdel, 'hide'))
-			return toast.err(3, 'cannot delete:\nyou do not have “delete” permission in this folder');
+			return toast.err(3, L.fd_eperm);
 
 		var sel = msel.getsel(),
 			vps = [];
@@ -2208,18 +2773,18 @@ var fileman = (function () {
 			vps.push(sel[a].vp);
 
 		if (!sel.length)
-			return toast.err(3, 'select at least 1 item to delete');
+			return toast.err(3, L.fd_emore);
 
 		function deleter() {
 			var xhr = new XHR(),
 				vp = vps.shift();
 
 			if (!vp) {
-				toast.ok(2, 'delete OK');
+				toast.ok(2, L.fd_ok);
 				treectl.goto(get_evpath());
 				return;
 			}
-			toast.inf(0, esc('deleting ' + (vps.length + 1) + ' items\n\n' + vp));
+			toast.show('inf r', 0, esc(L.fd_busy.format(vps.length + 1, vp)), 'r');
 
 			xhr.open('GET', vp + '?delete', true);
 			xhr.onload = xhr.onerror = delete_cb;
@@ -2228,27 +2793,27 @@ var fileman = (function () {
 		function delete_cb() {
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.err(9, 'delete failed:\n' + msg);
+				toast.err(9, L.fd_err + msg);
 				return;
 			}
 			deleter();
 		}
 
-		modal.confirm('<h6 style="color:#900">DANGER</h6>\n<b>DELETE these ' + vps.length + ' items?</b><ul>' + uricom_adec(vps, true).join('') + '</ul>', function () {
-			modal.confirm('<b>Last chance!</b> Delete?', deleter, null);
+		modal.confirm('<h6 style="color:#900">DANGER</h6>\n<b>' + L.fd_warn1.format(vps.length) + '</b><ul>' + uricom_adec(vps, true).join('') + '</ul>', function () {
+			modal.confirm(L.fd_warn2, deleter, null);
 		}, null);
 	};
 
 	r.cut = function (e) {
 		ev(e);
 		if (clgot(bcut, 'hide'))
-			return toast.err(3, 'cannot cut:\nyou do not have “move” permission in this folder');
+			return toast.err(3, L.fc_eperm);
 
 		var sel = msel.getsel(),
 			vps = [];
 
 		if (!sel.length)
-			toast.err(3, 'select at least 1 item to cut');
+			toast.err(3, L.fc_emore);
 
 		var els = [];
 		for (var a = 0; a < sel.length; a++) {
@@ -2273,20 +2838,20 @@ var fileman = (function () {
 			swrite('fman_clip', vps);
 			r.tx(stamp);
 			if (sel.length)
-				toast.inf(1.5, 'cut ' + sel.length + ' items');
+				toast.inf(1.5, L.fc_ok.format(sel.length));
 		}
 		catch (ex) {
-			toast.warn(30, 'cut ' + sel.length + ' items\n\nbut: only <b>this</b> browser-tab can paste them\n(since the selection is so absolutely massive)');
+			toast.warn(30, L.fc_warn.format(sel.length));
 		}
 	};
 
 	r.paste = function (e) {
 		ev(e);
 		if (clgot(bpst, 'hide'))
-			return toast.err(3, 'cannot paste:\nyou do not have “write” permission in this folder');
+			return toast.err(3, L.fp_eperm);
 
 		if (!r.clip.length)
-			return toast.err(5, 'first cut some files/folders to paste\n\nnote: you can cut/paste across different browser tabs');
+			return toast.err(5, L.fp_ecut);
 
 		var req = [],
 			exists = [],
@@ -2310,7 +2875,7 @@ var fileman = (function () {
 		}
 
 		if (exists.length)
-			toast.warn(30, 'these ' + exists.length + ' items cannot be pasted here (names already exist):<ul>' + uricom_adec(exists, true).join('') + '</ul>');
+			toast.warn(30, L.fp_ename.format(exists.length) + '<ul>' + uricom_adec(exists, true).join('') + '</ul>');
 
 		if (!req.length)
 			return;
@@ -2320,12 +2885,12 @@ var fileman = (function () {
 				vp = req.shift();
 
 			if (!vp) {
-				toast.ok(2, 'paste OK');
+				toast.ok(2, L.fp_ok);
 				treectl.goto(get_evpath());
 				r.tx(srcdir);
 				return;
 			}
-			toast.inf(0, esc('pasting ' + (req.length + 1) + ' items\n\n' + uricom_dec(vp)[0]));
+			toast.show('inf r', 0, esc(L.fp_busy.format(req.length + 1, uricom_dec(vp)[0])));
 
 			var dst = get_evpath() + vp.split('/').pop();
 
@@ -2336,13 +2901,13 @@ var fileman = (function () {
 		function paste_cb() {
 			if (this.status !== 200) {
 				var msg = this.responseText;
-				toast.err(9, 'paste failed:\n' + msg);
+				toast.err(9, L.fp_err + msg);
 				return;
 			}
 			paster();
 		}
 
-		modal.confirm('paste these ' + req.length + ' items here?<ul>' + uricom_adec(req, true).join('') + '</ul>', function () {
+		modal.confirm(L.fp_confirm.format(req.length) + '<ul>' + uricom_adec(req, true).join('') + '</ul>', function () {
 			paster();
 			jwrite('fman_clip', [Date.now()]);
 		}, null);
@@ -2356,7 +2921,7 @@ var fileman = (function () {
 				var fc = jread('fman_clip', []);
 				if (!fc || !fc.length || fc[0] != n) {
 					if (++tries > 10)
-						return modal.alert('failed to read clipboard from other browser tab');
+						return modal.alert(L.fp_etab);
 
 					return setTimeout(fun, 100);
 				}
@@ -2507,9 +3072,11 @@ var showfile = (function () {
 		if (e.total < 1024 * 256)
 			return;
 
-		var m = 'Loading text document:\n\n' + esc(this.fname) + '\n\n' +
-			f2f(e.loaded / 1024 / 1024, 1) + ' of ' +
-			f2f(e.total / 1024 / 1024, 1) + ' MiB loaded';
+		var m = L.tv_load.format(
+			esc(this.fname),
+			f2f(e.loaded * 100 / e.total, 1),
+			f2f(e.loaded / 1024 / 1024, 1),
+			f2f(e.total / 1024 / 1024, 1))
 
 		if (!this.toasted) {
 			this.toasted = 1;
@@ -2522,7 +3089,7 @@ var showfile = (function () {
 		if (this.toasted)
 			toast.hide();
 
-		if (!xhrchk(this, "could not load textfile:\n\nerror ", "404, file not found"))
+		if (!xhrchk(this, L.tv_xe1, L.tv_xe2))
 			return;
 
 		render([this.url, '', this.responseText], this.no_push);
@@ -2660,7 +3227,7 @@ var showfile = (function () {
 	};
 
 	r.mktree = function () {
-		var html = ['<li class="bn">list of textfiles in<br />' + linksplit(get_vpath()).join('') + '</li>'];
+		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('') + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="#" hl="' + file.id +
@@ -2705,11 +3272,11 @@ var showfile = (function () {
 	bdoc.className = 'line-numbers';
 	bdoc.innerHTML = (
 		'<div id="hdoc" class="ghead">\n' +
-		'<a href="#" class="btn" id="xdoc" tt="return to folder view$NHotkey: M">❌ close</a>\n' +
-		'<a href="#" class="btn" id="dldoc" tt="download this file">💾 download</a>\n' +
-		'<a href="#" class="btn" id="prevdoc" tt="show previous document$NHotkey: i">⬆ prev</a>\n' +
-		'<a href="#" class="btn" id="nextdoc" tt="show next document$NHotkey: K">⬇ next</a>\n' +
-		'<a href="#" class="btn" id="seldoc" tt="file is selected$NHotkey: S">sel</a>\n' +
+		'<a href="#" class="btn" id="xdoc" tt="' + L.tvt_close + '</a>\n' +
+		'<a href="#" class="btn" id="dldoc" tt="' + L.tvt_dl + '</a>\n' +
+		'<a href="#" class="btn" id="prevdoc" tt="' + L.tvt_prev + '</a>\n' +
+		'<a href="#" class="btn" id="nextdoc" tt="' + L.tvt_next + '</a>\n' +
+		'<a href="#" class="btn" id="seldoc" tt="' + L.tvt_sel + '</a>\n' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
@@ -2732,15 +3299,15 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file/folder to open it&lt;/em&gt;$N$NHotkey: S">multiselect</a> <span>zoom: ' +
+		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> <span>' + L.gt_zoom + ': ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>chop: ' +
-		'<a href="#" class="btn" l="-1" tt="truncate filenames more (show less)">&ndash;</a> ' +
-		'<a href="#" class="btn" l="1" tt="truncate filenames less (show more)">+</a></span> <span>sort by: ' +
-		'<a href="#" s="href">name</a> ' +
-		'<a href="#" s="sz">size</a> ' +
-		'<a href="#" s="ts">date</a> ' +
-		'<a href="#" s="ext">type</a>' +
+		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
+		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
+		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span>' + L.gt_sort + ': ' +
+		'<a href="#" s="href">' + L.gt_name + '</a> ' +
+		'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
+		'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
+		'<a href="#" s="ext">' + L.gt_ext + '</a>' +
 		'</span></div>' +
 		'<div id="ggrid"></div>'
 	);
@@ -3006,6 +3573,13 @@ var thegrid = (function () {
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ebi('ggrid').innerHTML = html.join('\n');
+
+		var srch = ebi('unsearch'),
+			gsel = ebi('gridsel');
+
+		gsel.style.display = srch ? 'none' : '';
+		if (srch && r.sel)
+			gsel.click();
 
 		var ths = QSA('#ggrid>a');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
@@ -3419,7 +3993,7 @@ document.onkeydown = function (e) {
 		var q = ebi('q_raw').value,
 			vq = ebi('files').getAttribute('q_raw');
 
-		srch_msg(false, (q == vq) ? '' : 'search results below are from a previous query:\n  ' + (vq ? vq : '(*)'));
+		srch_msg(false, (q == vq) ? '' : L.sm_prev + (vq ? vq : '(*)'));
 	}
 
 	function encode_query() {
@@ -3549,8 +4123,7 @@ document.onkeydown = function (e) {
 
 		var html = mk_files_header(tagord), seen = {};
 		html.push('<tbody>');
-		html.push('<tr class="srch_hdr"><td>-</td><td><a href="#" id="unsearch"><big style="font-weight:bold">[❌] close search results</big></a> -- showing ' +
-			res.hits.length + ' hits' + (res.hits.length == cap ? ' -- <a href="#" id="moar">load more</a>' : '') + '</td></tr>');
+		html.push('<tr class="srch_hdr"><td>-</td><td><a href="#" id="unsearch"><big style="font-weight:bold">[❌] ' + L.sl_close + '</big></a> -- ' + L.sl_hits.format(res.hits.length) + (res.hits.length == cap ? ' -- <a href="#" id="moar">' + L.sl_moar + '</a>' : '') + '</td></tr>');
 
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
@@ -3859,7 +4432,7 @@ var treectl = (function () {
 	}
 
 	function recvtree() {
-		if (!xhrchk(this, "could not list subfolders:\n\nerror ", "404, folder not found"))
+		if (!xhrchk(this, L.tl_xe1, L.tl_xe2))
 			return;
 
 		var cur = ebi('treeul').getAttribute('ts');
@@ -4042,7 +4615,7 @@ var treectl = (function () {
 	}
 
 	function recvls() {
-		if (!xhrchk(this, "could not list files in folder:\n\nerror ", "404, folder not found"))
+		if (!xhrchk(this, L.fl_xe1, L.fl_xe2))
 			return;
 
 		var cur = ebi('files').getAttribute('ts');
@@ -4282,14 +4855,13 @@ function apply_perms(newperms) {
 	perms = newperms || [];
 
 	var a = QS('#ops a[data-dest="up2k"]');
-	var suf = 'multithreaded, and file timestamps are preserved, but it uses more CPU than the basic uploader';
 	if (have_up2k_idx) {
 		a.removeAttribute('data-perm');
-		a.setAttribute('tt', 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server$N$Nuploads are resumable, ' + suf);
+		a.setAttribute('tt', L.ot_u2i);
 	}
 	else {
 		a.setAttribute('data-perm', 'write');
-		a.setAttribute('tt', 'up2k: upload files with resume support (close your browser and drop the same files in later)$N$N' + suf);
+		a.setAttribute('tt', L.ot_u2w);
 	}
 	a.style.display = '';
 	tt.att(QS('#ops'));
@@ -4412,25 +4984,7 @@ function mk_files_header(taglist) {
 
 
 var filecols = (function () {
-	var hidden = jread('filecols', []),
-		tts = {
-			"c": "action buttons",
-			"dur": "duration",
-			"q": "quality / bitrate",
-			"Ac": "audio codec",
-			"Vc": "video codec",
-			"Ahash": "audio checksum",
-			"Vhash": "video checksum",
-			"Res": "resolution",
-			"T": "filetype",
-			"aq": "audio quality / bitrate",
-			"vq": "video quality / bitrate",
-			"pixfmt": "subsampling / pixel structure",
-			"resw": "horizontal resolution",
-			"resh": "veritcal resolution",
-			"chs": "audio channels",
-			"hz": "sample rate"
-		};
+	var hidden = jread('filecols', []);
 
 	if (JSON.stringify(def_hcols) != sread('hfilecols')) {
 		console.log("applying default hidden-cols");
@@ -4451,7 +5005,7 @@ var filecols = (function () {
 		var ths = QSA('#files th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var th = ths[a].parentElement,
-				ttv = tts[ths[a].textContent];
+				ttv = L.cols[ths[a].textContent];
 
 			th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + ths[a].outerHTML;
 			th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
@@ -4482,7 +5036,7 @@ var filecols = (function () {
 			hcols = ebi('hcols');
 
 		for (var a = 0; a < hidden.length; a++) {
-			var ttv = tts[hidden[a]],
+			var ttv = L.cols[hidden[a]],
 				tta = ttv ? ' tt="' + ttv + '">' : '>';
 
 			html.push('<a href="#" class="btn"' + tta + esc(hidden[a]) + '</a>');
@@ -4719,16 +5273,43 @@ var settheme = (function () {
 })();
 
 
+(function () {
+	function freshen() {
+		lang = sread("lang") || lang;
+		var html = [];
+		for (var k in Ls)
+			if (Ls.hasOwnProperty(k))
+				html.push('<a href="#" class="btn tgl' + (k == lang ? ' on' : '') +
+					'" tt="' + Ls[k].tt + '">' + k + '</a>');
+
+		ebi('langs').innerHTML = html.join('');
+		var btns = QSA('#langs a');
+		for (var a = 0, aa = btns.length; a < aa; a++)
+			btns[a].onclick = setlang;
+	}
+
+	function setlang(e) {
+		ev(e);
+		L = Ls[this.textContent];
+		swrite("lang", this.textContent);
+		freshen();
+		modal.confirm(L.lang_set, location.reload.bind(location), null);
+	};
+
+	freshen();
+})();
+
+
 var arcfmt = (function () {
 	if (!ebi('arc_fmt'))
 		return { "render": function () { } };
 
 	var html = [],
 		fmts = [
-			["tar", "tar", "plain gnutar file"],
-			["zip", "zip=utf8", "zip with utf8 filenames (maybe wonky on windows 7 and older)"],
-			["zip_dos", "zip", "zip with traditional cp437 filenames, for really old software"],
-			["zip_crc", "zip=crc", "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)"]
+			["tar", "tar", L.fz_tar],
+			["zip", "zip=utf8", L.fz_zip8],
+			["zip_dos", "zip", L.fz_zipd],
+			["zip_crc", "zip=crc", L.fz_zipc]
 		];
 
 	for (var a = 0; a < fmts.length; a++) {
@@ -4956,7 +5537,7 @@ var msel = (function () {
 			return;
 		}
 
-		xhrchk(this, "could not create subfolder:\n\nerror ", "404, parent folder not found");
+		xhrchk(this, L.fd_xe1, L.fd_xe2);
 
 		if (this.status !== 200) {
 			sf.textContent = 'error: ' + this.responseText;
@@ -5003,7 +5584,7 @@ var msel = (function () {
 	};
 
 	function cb() {
-		xhrchk(this, "could not send message:\n\nerror ", "404, parent folder not found");
+		xhrchk(this, L.fsm_xe1, L.fsm_xe2);
 
 		if (this.status !== 200) {
 			sf.textContent = 'error: ' + this.responseText;
@@ -5021,7 +5602,7 @@ var msel = (function () {
 
 
 function show_md(md, name, div, url, depth) {
-	var errmsg = 'cannot show ' + name + ':\n\n',
+	var errmsg = L.md_eshow + name + ':\n\n',
 		now = get_evpath();
 
 	url = url || now;
@@ -5102,8 +5683,8 @@ function ev_row_tgl(e) {
 
 var unpost = (function () {
 	ebi('op_unpost').innerHTML = (
-		'you can delete your recent uploads below &ndash; <a id="unpost_refresh" href="#">refresh list</a>' +
-		'<p>optional filter:&nbsp; URL must contain <input type="text" id="unpost_filt" size="20" /><a id="unpost_nofilt" href="#">clear filter</a></p>' +
+		L.un_m1 + ' &ndash; <a id="unpost_refresh" href="#">' + L.un_upd + '</a>' +
+		'<p>' + L.un_flt + ' <input type="text" id="unpost_filt" size="20" /><a id="unpost_nofilt" href="#">' + L.un_fclr + '</a></p>' +
 		'<div id="unpost"></div>'
 	);
 
@@ -5119,21 +5700,21 @@ var unpost = (function () {
 			html = [];
 
 		function unpost_load_cb() {
-			if (!xhrchk(this, "unpost-load failed:\n\nerror ", "404, file not found??"))
-				return ebi('op_unpost').innerHTML = 'failed to load unpost list from server';
+			if (!xhrchk(this, L.fu_xe1, L.fu_xe2))
+				return ebi('op_unpost').innerHTML = L.fu_xe1;
 
 			var res = JSON.parse(this.responseText);
 			if (res.length) {
 				if (res.length == 2000)
-					html.push("<p>showing first 2000 files (use the filter)");
+					html.push("<p>" + L.un_max);
 				else
-					html.push("<p>" + res.length + " uploads can be deleted");
+					html.push("<p>" + L.un_avail.format(res.length));
 
-				html.push(" &ndash; sorted by upload time &ndash; most recent first:</p>");
+				html.push(" &ndash; " + L.un_m2 + "</p>");
 				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>file</td></tr></thead><tbody>");
 			}
 			else
-				html.push("sike! no uploads " + (filt.value ? 'matching that filter' : '') + " are sufficiently recent");
+				html.push(filt.value ? L.un_no2 : L.un_no1);
 
 			var mods = [1000, 100, 10];
 			for (var a = 0; a < res.length; a++) {
@@ -5142,9 +5723,9 @@ var unpost = (function () {
 						html.push(
 							'<tr><td></td><td colspan="3" style="padding:.5em">' +
 							'<a me="' + me + '" class="n' + a + '" n2="' + (a + mods[b]) +
-							'" href="#">delete the next ' + Math.min(mods[b], res.length - a) + ' files below</a></td></tr>');
+							'" href="#">' + L.un_next.format(Math.min(mods[b], res.length - a)) + '</a></td></tr>');
 				html.push(
-					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">delete</a></td>' +
+					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + L.un_del + '</a></td>' +
 					'<td>' + unix2iso(res[a].at) + '</td>' +
 					'<td>' + res[a].sz + '</td>' +
 					'<td>' + linksplit(res[a].vp).join(' ') + '</td></tr>');
@@ -5165,13 +5746,13 @@ var unpost = (function () {
 		xhr.onload = xhr.onerror = unpost_load_cb;
 		xhr.send();
 
-		ct.innerHTML = "<p><em>loading your recent uploads...</em></p>";
+		ct.innerHTML = "<p><em>" + L.un_m3 + "</em></p>";
 	};
 
 	function unpost_delete_cb() {
 		if (this.status !== 200) {
 			var msg = this.responseText;
-			toast.err(9, 'unpost-delete failed:\n' + msg);
+			toast.err(9, L.un_derr + msg);
 			return;
 		}
 
@@ -5199,7 +5780,7 @@ var unpost = (function () {
 		ev(e);
 		var ame = tgt.getAttribute('me');
 		if (ame != r.me)
-			return toast.err(0, 'something broke, please try a refresh');
+			return toast.err(0, L.un_f5);
 
 		var n = parseInt(tgt.className.slice(1)),
 			n2 = parseInt(tgt.getAttribute('n2') || n + 1),
@@ -5215,7 +5796,7 @@ var unpost = (function () {
 			links[a].innerHTML = '[busy]';
 		}
 
-		toast.inf(0, "deleting " + req.length + " files...");
+		toast.show('inf r', 0, L.un_busy.format(req.length));
 
 		var xhr = new XHR();
 		xhr.n = n;

@@ -1839,26 +1839,28 @@ html.y #bbox-overlay figcaption a {
 	position: absolute;
 	top: 40%;
 	top: calc(50% - .5em);
+	top: calc(50% - 1.2vw);
 	left: -.8em;
+	transition: top 0.12s;
 }
 .dropdesc>div>div+div {
 	left: auto;
 	right: -.8em;
 }
 .dropdesc b {
-	position: relative;
 	font-size: .5em;
 	font-size: 2vw;
-	top: -.25em;
-	top: -.2vw;
 	margin: 0 .8em;
 	margin: 0 1.25vw;
 	transition: font-size 0.12s;
 }
-.dropdesc.hl b {
+.dropdesc.hl.ok b {
 	border-bottom: .1em solid #fff;
 	font-size: .6em;
 	font-size: 2.5vw;
+}
+.dropdesc.hl.ok>div>div {
+	top: calc(50% - 1.7vw);
 }
 .dropzone {
 	z-index: 80386;

@@ -7,6 +7,7 @@ if (!window['console'])
 
 
 var is_touch = 'ontouchstart' in window,
+    is_https = (window.location + '').indexOf('https:') === 0,
     IPHONE = is_touch && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
 
@@ -253,6 +254,14 @@ if (!Element.prototype.closest)
         } while (el !== null && el.nodeType === 1);
     };
 
+if (!String.prototype.format)
+    String.prototype.format = function () {
+        var args = arguments;
+        return this.replace(/{(\d+)}/g, function (match, number) {
+            return typeof args[number] != 'undefined' ?
+                args[number] : match;
+        });
+    };
 
 // https://stackoverflow.com/a/950146
 function import_js(url, cb) {
@@ -1397,7 +1406,7 @@ function xhrchk(xhr, prefix, e404) {
         return true;
 
     if (xhr.status == 403)
-        return toast.err(0, prefix + "403, access denied\n\ntry pressing F5, maybe you got logged out");
+        return toast.err(0, prefix + (window.L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"));
 
     if (xhr.status == 404)
         return toast.err(0, prefix + e404);

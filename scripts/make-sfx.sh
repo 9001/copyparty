@@ -14,6 +14,9 @@ help() { exec cat <<'EOF'
 #
 # `gz` creates a gzip-compressed python sfx instead of bzip2
 #
+# `lang` limits which languages/translations to include,
+#   for example `lang eng` or `lang eng|nor`
+#
 # `no-cm` saves ~82k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
@@ -61,6 +64,7 @@ pybin=$(command -v python3 || command -v python) || {
 	exit 1
 }
 
+langs=
 use_gz=
 zopf=2560
 while [ ! -z "$1" ]; do
@@ -73,6 +77,7 @@ while [ ! -z "$1" ]; do
 		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
 		fast)   zopf=100 ; ;;
+		lang)   shift;langs="$1"; ;;
 		*)      help     ; ;;
 	esac
 	shift
@@ -259,6 +264,13 @@ rm have
 	f=copyparty/web/browser.css
 	gzip -d "$f.gz" || true
 	sed -r 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; s/[0-9]+% \{cursor:[^}]+\}//; s/animation: ?cursor[^};]+//' <$f >t
+	tmv "$f"
+}
+
+[ $langs ] && {
+	f=copyparty/web/browser.js
+	gzip -d "$f.gz" || true
+	awk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' <$f >t
 	tmv "$f"
 }
 

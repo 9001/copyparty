@@ -75,6 +75,9 @@ html {
 	margin-right: -1.2em;
 	padding-right: .7em;
 }
+#toast.r #toastb {
+	text-align: right;
+}
 #toast pre {
 	margin: 0;
 }
