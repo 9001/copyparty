@@ -30,7 +30,7 @@ def dostime2unix(buf):
 
 
 def unixtime2dos(ts):
-    tt = time.gmtime(ts)
+    tt = time.gmtime(ts + 1)
     dy, dm, dd, th, tm, ts = list(tt)[:6]
 
     bd = ((dy - 1980) << 9) + (dm << 5) + dd
@@ -76,7 +76,7 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
         # 4b magic, 2b min-ver
         ret = b"\x50\x4b\x03\x04" + req_ver
     else:
-        # 4b magic, 2b spec-ver, 2b min-ver
+        # 4b magic, 2b spec-ver (1b compat, 1b os (00 dos, 03 unix)), 2b min-ver
         ret = b"\x50\x4b\x01\x02\x1e\x03" + req_ver
 
     ret += b"\x00" if pre_crc else b"\x08"  # streaming
@@ -95,22 +95,33 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     fn = sanitize_fn(fn, "/", [])
     bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
+    # add ntfs and unix extrafields for utc, add z64 if requested
     z64_len = len(z64v) * 8 + 4 if z64v else 0
-    ret += spack(b"<HH", len(bfn), z64_len)
+    ret += spack(b"<HH", len(bfn), 0x24 + 0x10 + z64_len)
 
     if h_pos is not None:
         # 2b comment, 2b diskno
         ret += b"\x00" * 4
 
         # 2b internal.attr, 4b external.attr
-        # infozip-macos: 0100 0000 a481 file:644
-        # infozip-macos: 0100 0100 0080 file:000
-        ret += b"\x01\x00\x00\x00\xa4\x81"
+        # infozip-macos: 0100 0000 a481 (spec-ver 1e03) file:644
+        # infozip-macos: 0100 0100 0080 (spec-ver 1e03) file:000
+        #     win10-zip: 0000 2000 0000 (spec-ver xx00) FILE_ATTRIBUTE_ARCHIVE
+        ret += b"\x00\x00\x00\x00\xa4\x81"  # unx
+        # ret += b"\x00\x00\x20\x00\x00\x00"  # fat
 
         # 4b local-header-ofs
         ret += spack(b"<L", min(h_pos, 0xFFFFFFFF))
 
     ret += bfn
+
+    # ntfs: type 0a, size 20, rsvd, attr1, len 18, mtime, atime, ctime
+    # b"\xa3\x2f\x82\x41\x55\x68\xd8\x01"  1652616838.798941100  ~5.861518  132970904387989411  ~58615181
+    nt = int((lastmod + 11644473600) * 10000000)
+    ret += spack(b"<HHLHHQQQ", 0xA, 0x20, 0, 1, 0x18, nt, nt, nt)
+
+    # unix: type 0d, size 0c, atime, mtime, uid, gid
+    ret += spack(b"<HHLLHH", 0xD, 0xC, int(lastmod), int(lastmod), 1000, 1000)
 
     if z64v:
         ret += spack(b"<HH" + b"Q" * len(z64v), 1, len(z64v) * 8, *z64v)
@@ -205,7 +216,7 @@ class StreamZip(object):
         st = f["st"]
 
         sz = st.st_size
-        ts = st.st_mtime + 1
+        ts = st.st_mtime
 
         crc = None
         if self.pre_crc:
