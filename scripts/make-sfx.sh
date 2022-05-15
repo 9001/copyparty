@@ -267,12 +267,12 @@ rm have
 	tmv "$f"
 }
 
-[ $langs ] && {
-	f=copyparty/web/browser.js
-	gzip -d "$f.gz" || true
-	awk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' <$f >t
-	tmv "$f"
-}
+[ $langs ] &&
+	for f in copyparty/web/{browser.js,splash.js}; do
+		gzip -d "$f.gz" || true
+		awk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' <$f >t
+		tmv "$f"
+	done
 
 [ $repack ] ||
 find | grep -E '\.py$' |

@@ -2,49 +2,49 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>{{ svcname }}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta charset="utf-8">
+	<title>{{ svcname }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
 	{{ html_head }}
-    <link rel="stylesheet" media="screen" href="/.cpr/msg.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="/.cpr/msg.css?_={{ ts }}">
 </head>
 
 <body>
-    <div id="box">
-        
-        {%- if h1 %}
-        <h1>{{ h1 }}</h1>
-        {%- endif %}
-        
-        {%- if h2 %}
-        <h2>{{ h2 }}</h2>
-        {%- endif %}
-        
-        {%- if p %}
-        <p>{{ p }}</p>
-        {%- endif %}
+	<div id="box">
 
-        {%- if pre %}
-        <pre>{{ pre }}</pre>
-        {%- endif %}
+		{%- if h1 %}
+		<h1>{{ h1 }}</h1>
+		{%- endif %}
 
-        {%- if html %}
-        {{ html }}
-        {%- endif %}
+		{%- if h2 %}
+		<h2>{{ h2 }}</h2>
+		{%- endif %}
 
-        {%- if click %}
-        <script>document.getElementsByTagName("a")[0].click()</script>
-        {%- endif %}
-    </div>
+		{%- if p %}
+		<p>{{ p }}</p>
+		{%- endif %}
 
-    {%- if redir %}
-    <script>
-        setTimeout(function() {
-            window.location.replace("{{ redir }}");
-        }, 1000);
-    </script>
-    {%- endif %}
+		{%- if pre %}
+		<pre>{{ pre }}</pre>
+		{%- endif %}
+
+		{%- if html %}
+		{{ html }}
+		{%- endif %}
+
+		{%- if click %}
+		<script>document.getElementsByTagName("a")[0].click()</script>
+		{%- endif %}
+	</div>
+
+	{%- if redir %}
+	<script>
+		setTimeout(function() {
+			window.location.replace("{{ redir }}");
+		}, 1000);
+	</script>
+	{%- endif %}
 </body>
 
 </html>

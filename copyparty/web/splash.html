@@ -2,110 +2,105 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>{{ svcname }}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta charset="utf-8">
+	<title>{{ svcname }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
 {{ html_head }}
-    <link rel="stylesheet" media="screen" href="/.cpr/splash.css?_={{ ts }}">
-    <link rel="stylesheet" media="screen" href="/.cpr/ui.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="/.cpr/splash.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="/.cpr/ui.css?_={{ ts }}">
 </head>
 
 <body>
-    <div id="wrap">
-        <a href="/?h" class="refresh">refresh</a>
+	<div id="wrap">
+		<a id="a" href="/?h" class="refresh">refresh</a>
 
-        {%- if this.uname == '*' %}
-            <p>howdy stranger &nbsp; <small>(you're not logged in)</small></p>
-        {%- else %}
-            <a href="/?pw=x" class="logout">logout</a>
-            <p>welcome back, <strong>{{ this.uname }}</strong></p>
-        {%- endif %}
+		{%- if this.uname == '*' %}
+			<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
+		{%- else %}
+			<a id="c" href="/?pw=x" class="logout">logout</a>
+			<p><span id="m">welcome back,</span> <strong>{{ this.uname }}</strong></p>
+		{%- endif %}
 
-        {%- if msg %}
-        <div id="msg">
-            {{ msg }}
-        </div>
-        {%- endif %}
+		{%- if msg %}
+		<div id="msg">
+			{{ msg }}
+		</div>
+		{%- endif %}
 
-        {%- if avol %}
-        <h1>admin panel:</h1>
-        <table><tr><td> <!-- hehehe -->
-            <table class="num">
-                <tr><td>scanning</td><td>{{ scanning }}</td></tr>
-                <tr><td>hash-q</td><td>{{ hashq }}</td></tr>
-                <tr><td>tag-q</td><td>{{ tagq }}</td></tr>
-                <tr><td>mtp-q</td><td>{{ mtpq }}</td></tr>
-            </table>
-        </td><td>
-            <table class="vols">
-                <thead><tr><th>vol</th><th>action</th><th>status</th></tr></thead>
-                <tbody>
-                    {% for mp in avol %}
-                    {%- if mp in vstate and vstate[mp] %}
-                    <tr><td><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a href="{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
-                    {%- endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </td></tr></table>
-        <div class="btns">
-            <a href="/?stack" tt="shows the state of all active threads">dump stack</a>
-            <a href="/?reload=cfg" tt="reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes">reload cfg</a>
-        </div>
-        {%- endif %}
+		{%- if avol %}
+		<h1>admin panel:</h1>
+		<table><tr><td> <!-- hehehe -->
+			<table class="num">
+				<tr><td>scanning</td><td>{{ scanning }}</td></tr>
+				<tr><td>hash-q</td><td>{{ hashq }}</td></tr>
+				<tr><td>tag-q</td><td>{{ tagq }}</td></tr>
+				<tr><td>mtp-q</td><td>{{ mtpq }}</td></tr>
+			</table>
+		</td><td>
+			<table class="vols">
+				<thead><tr><th>vol</th><th>action</th><th>status</th></tr></thead>
+				<tbody>
+					{% for mp in avol %}
+					{%- if mp in vstate and vstate[mp] %}
+					<tr><td><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a class="s" href="{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
+					{%- endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</td></tr></table>
+		<div class="btns">
+			<a id="d" href="/?stack" tt="shows the state of all active threads">dump stack</a>
+			<a id="e" href="/?reload=cfg" tt="reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes">reload cfg</a>
+		</div>
+		{%- endif %}
 
-        {%- if rvol %}
-        <h1>you can browse these:</h1>
-        <ul>
-            {% for mp in rvol %}
-            <li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
-            {% endfor %}
-        </ul>
-        {%- endif %}
+		{%- if rvol %}
+		<h1 id="f">you can browse:</h1>
+		<ul>
+			{% for mp in rvol %}
+			<li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
+			{% endfor %}
+		</ul>
+		{%- endif %}
 
-        {%- if wvol %}
-        <h1>you can upload to:</h1>
-        <ul>
-            {% for mp in wvol %}
-            <li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
-            {% endfor %}
-        </ul>
-        {%- endif %}
+		{%- if wvol %}
+		<h1 id="g">you can upload to:</h1>
+		<ul>
+			{% for mp in wvol %}
+			<li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
+			{% endfor %}
+		</ul>
+		{%- endif %}
 
-        <h1 id="cc">client config:</h1>
-        <ul>
-            {% if k304 %}
-            <li><a href="/?k304=n">disable k304</a> (currently enabled)
-            {%- else %}
-            <li><a href="/?k304=y" class="r">enable k304</a> (currently disabled)
-            {% endif %}
-            <blockquote>enabling this will disconnect your client on every HTTP 304, which can prevent some buggy browsers/proxies from getting stuck (suddenly not being able to load pages), <em>but</em> it will also make things slower in general</blockquote></li>
-            
-            <li><a href="/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
-        </ul>
+		<h1 id="cc">client config:</h1>
+		<ul>
+			{% if k304 %}
+			<li><a id="h" href="/?k304=n">disable k304</a> (currently enabled)
+			{%- else %}
+			<li><a id="i" href="/?k304=y" class="r">enable k304</a> (currently disabled)
+			{% endif %}
+			<blockquote id="j">enabling this will disconnect your client on every HTTP 304, which can prevent some buggy browsers/proxies from getting stuck (suddenly not being able to load pages), <em>but</em> it will also make things slower in general</blockquote></li>
+			
+			<li><a id="k" href="/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
+		</ul>
 
-        <h1>login for more:</h1>
-        <ul>
-            <form method="post" enctype="multipart/form-data" action="/{{ qvpath }}">
-                <input type="hidden" name="act" value="login" />
-                <input type="password" name="cppwd" />
-                <input type="submit" value="Login" />
-            </form>
-        </ul>
-    </div>
+		<h1 id="l">login for more:</h1>
+		<ul>
+			<form method="post" enctype="multipart/form-data" action="/{{ qvpath }}">
+				<input type="hidden" name="act" value="login" />
+				<input type="password" name="cppwd" />
+				<input type="submit" value="Login" />
+			</form>
+		</ul>
+	</div>
 	<a href="#" id="repl">π</a>
-    <script>
+	<script>
 
-document.documentElement.className = localStorage.light == 1 ? "y" : "z";
+document.documentElement.className=localStorage.theme||"{{ this.args.theme }}";
 
 </script>
 <script src="/.cpr/util.js?_={{ ts }}"></script>
-<script>
-    tt.init();
-    {%- if this.uname == '*' %}
-        QS('input[name="cppwd"]').focus();
-    {%- endif %}
-</script>
+<script src="/.cpr/splash.js?_={{ ts }}"></script>
 </body>
 </html>

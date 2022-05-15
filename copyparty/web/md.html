@@ -135,7 +135,7 @@ var md_opt = {
 };
 
 (function () {
-    var l = localStorage,
+	var l = localStorage,
 		drk = l.light != 1,
 		btn = document.getElementById("lightswitch"),
 		f = function (e) {
@@ -143,14 +143,14 @@ if (e) { e.preventDefault(); drk = !drk; }
 document.documentElement.className = drk? "z":"y";
 btn.innerHTML = "go " + (drk ? "light":"dark");
 l.light = drk? 0:1;
-    	};
+		};
 	
 	btn.onclick = f;
 	f();
 })();
 
 	</script>
-    <script src="/.cpr/util.js?_={{ ts }}"></script>
+	<script src="/.cpr/util.js?_={{ ts }}"></script>
 	<script src="/.cpr/deps/marked.js?_={{ ts }}"></script>
 	<script src="/.cpr/md.js?_={{ ts }}"></script>
 	{%- if edit %}

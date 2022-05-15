@@ -1,4 +1,4 @@
-html, body, #wrap {
+html {
 	color: #333;
 	background: #f7f7f7;
 	font-family: sans-serif;
@@ -38,7 +38,6 @@ a+a {
 	margin: -.2em 0 0 .5em;
 }
 .logout,
-.btns a,
 a.r {
 	color: #c04;
 	border-color: #c7a;
@@ -88,9 +87,7 @@ blockquote {
 }
 
 
-html.z,
-html.z body,
-html.z #wrap {
+html.z {
 	background: #222;
 	color: #ccc;
 }
@@ -103,7 +100,6 @@ html.z a {
 	border-color: #37a;
 }
 html.z .logout,
-html.z .btns a,
 html.z a.r {
 	background: #804;
 	border-color: #c28;
@@ -119,4 +115,10 @@ html.z input {
 }
 html.z .num {
 	border-color: #777;
+}
+
+
+html.bz {
+	color: #bbd;
+	background: #11121d;
 }

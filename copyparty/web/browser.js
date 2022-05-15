@@ -25,8 +25,10 @@ var Ls = {
 		},
 
 		"goh": "control-panel",
+		"logout": "Logout ",
+		"access": " access",
 		"ot_close": "close submenu",
-		"ot_search": "search for files by attributes, path / name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both «foo» and «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain «foo» but not «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with «yana» and be an «opus» file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»",
+		"ot_search": "search for files by attributes, path / name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both «foo» and «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain «foo» but not «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with «yana» and be an «opus» file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N&lt;code&gt;2009-12-31&lt;/code&gt; or &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 		"ot_unpost": "unpost: delete your recent uploads",
 		"ot_bup": "bup: basic uploader, even supports netscape 4.0",
 		"ot_mkdir": "mkdir: create a new directory",
@@ -36,6 +38,10 @@ var Ls = {
 		"ot_cfg": "configuration options",
 		"ot_u2i": 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server$N$Nuploads are resumable, multithreaded, and file timestamps are preserved, but it uses more CPU than the basic uploader',
 		"ot_u2w": 'up2k: upload files with resume support (close your browser and drop the same files in later)$N$Nmultithreaded, and file timestamps are preserved, but it uses more CPU than the basic uploader',
+
+		"ab_mkdir": "make directory",
+		"ab_mkdoc": "new markdown doc",
+		"ab_msg": "send msg to srv log",
 
 		"wt_ren": "rename selected items$NHotkey: F2",
 		"wt_del": "delete selected items$NHotkey: ctrl-K",
@@ -217,6 +223,21 @@ var Ls = {
 		"sl_hits": "showing {0} hits",
 		"sl_moar": "load more",
 
+		"s_sz": "size",
+		"s_dt": "date",
+		"s_rd": "path",
+		"s_fn": "name",
+		"s_ta": "tags",
+		"s_ad": "adv.",
+		"s_s1": "minimum MiB",
+		"s_s2": "maximum MiB",
+		"s_d1": "min. iso8601",
+		"s_d2": "max. iso8601",
+		"s_r1": "path contains &nbsp; (space-separated)",
+		"s_f1": "name contains &nbsp; (negate with -nope)",
+		"s_t1": "tags contains &nbsp; (^=start, end=$)",
+		"s_a1": "key>=1A&nbsp; key<=2B&nbsp; .bpm>165",
+
 		"md_eshow": "cannot show ",
 
 		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
@@ -302,8 +323,10 @@ var Ls = {
 		},
 
 		"goh": "kontrollpanel",
+		"logout": "Logg ut ",
+		"access": " tilgang",
 		"ot_close": "lukk verktøy",
-		"ot_search": "søk etter filer ved å angi filnavn, mappenavn, tid, størrelse, eller metadata som sangtittel / artist / osv.$N$N&lt;code&gt;foo bar&lt;/code&gt; = inneholder både «foo» og «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = inneholder «foo» men ikke «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = starter med «yana», filtype «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = «try unite» eksakt",
+		"ot_search": "søk etter filer ved å angi filnavn, mappenavn, tid, størrelse, eller metadata som sangtittel / artist / osv.$N$N&lt;code&gt;foo bar&lt;/code&gt; = inneholder både «foo» og «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = inneholder «foo» men ikke «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = starter med «yana», filtype «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = «try unite» eksakt$N$Ndatoformat er iso-8601, så f.eks.$N&lt;code&gt;2009-12-31&lt;/code&gt; eller &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 		"ot_unpost": "unpost: slett filer som du nylig har lastet opp; «angre-knappen»",
 		"ot_bup": "bup: tradisjonell / primitiv filopplastning,$N$Nfungerer i omtrent samtlige nettlesere",
 		"ot_mkdir": "mkdir: lag en ny mappe",
@@ -313,6 +336,10 @@ var Ls = {
 		"ot_cfg": "andre innstillinger",
 		"ot_u2i": 'up2k: last opp filer (hvis du har skrivetilgang) eller bytt til søkemodus for å sjekke om filene finnes et-eller-annet sted på serveren$N$Nopplastninger kan gjenopptas etter avbrudd, skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn den primitive opplasteren bup',
 		"ot_u2w": 'up2k: filopplastning med støtte for å gjenoppta avbrutte opplastninger -- steng ned nettleseren og dra de samme filene inn i nettleseren igjen for å plukke opp igjen der du slapp$N$Nopplastninger skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn den primitive opplasteren "bup"',
+
+		"ab_mkdir": "lag mappe",
+		"ab_mkdoc": "nytt dokument",
+		"ab_msg": "send melding",
 
 		"wt_ren": "gi nye navn til de valgte filene$NSnarvei: F2",
 		"wt_del": "slett de valgte filene$NSnarvei: ctrl-K",
@@ -396,7 +423,7 @@ var Ls = {
 		"ml_pmode": "spillemodus",
 		"ml_tcode": "konvertering",
 		"ml_tint": "tint",
-		"ml_eq": "audio equalizer / tonekontroll",
+		"ml_eq": "audio equalizer (tonejustering)",
 
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
@@ -404,7 +431,7 @@ var Ls = {
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
-		"mt_mloop": "repeter hele mappen\">🔁 repeter",
+		"mt_mloop": "repeter hele mappen\">🔁 gjenta",
 		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
 		"mt_cflac": "konverter flac-filer til opus\">flac",
 		"mt_caac": "konverter aac / m4a-filer til to opus\">aac",
@@ -494,6 +521,21 @@ var Ls = {
 		"sl_hits": "viser {0} treff",
 		"sl_moar": "hent flere",
 
+		"s_sz": "størr.",
+		"s_dt": "dato",
+		"s_rd": "sti",
+		"s_fn": "navn",
+		"s_ta": "meta",
+		"s_ad": "avns.",
+		"s_s1": "større enn ↓ MiB",
+		"s_s2": "mindre enn ↓ MiB",
+		"s_d1": "nyere enn &lt;dato&gt;",
+		"s_d2": "eldre enn",
+		"s_r1": "mappenavn inneholder",
+		"s_f1": "filnavn inneholder",
+		"s_t1": "sang-info inneholder",
+		"s_a1": "key>=1A&nbsp; key<=2B&nbsp; .bpm>165",
+
 		"md_eshow": "kan ikke vise ",
 
 		"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
@@ -560,7 +602,7 @@ var Ls = {
 var L = Ls[sread("lang") || lang];
 if (Ls.eng && L != Ls.eng) {
 	for (var k in Ls.eng)
-		if (Ls.eng.hasOwnProperty(k) && !L[k])
+		if (!L[k])
 			L[k] = Ls.eng[k];
 }
 
@@ -765,6 +807,9 @@ ebi('tree').innerHTML = (
 );
 ebi('entree').setAttribute('tt', L.tt_entree);
 ebi('goh').textContent = L.goh;
+QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
+QS('#op_new_md input[type="submit"]').value = L.ab_mkdoc;
+QS('#op_msg input[type="submit"]').value = L.ab_msg;
 
 
 (function () {
@@ -3881,29 +3926,35 @@ document.onkeydown = function (e) {
 // search
 (function () {
 	var sconf = [
-		["size",
-			["szl", "sz_min", "minimum MiB", "14"],
-			["szu", "sz_max", "maximum MiB", "14"]
+		[
+			L.s_sz,
+			["szl", "sz_min", L.s_s1, "14"],
+			["szu", "sz_max", L.s_s2, "14"]
 		],
-		["date",
-			["dtl", "dt_min", "min. iso8601", "14"],
-			["dtu", "dt_max", "max. iso8601", "14"]
+		[
+			L.s_dt,
+			["dtl", "dt_min", L.s_d1, "14"],
+			["dtu", "dt_max", L.s_d2, "14"]
 		],
-		["path",
-			["path", "path", "path contains &nbsp; (space-separated)", "30"]
+		[
+			L.s_rd,
+			["path", "path", L.s_r1, "30"]
 		],
-		["name",
-			["name", "name", "name contains &nbsp; (negate with -nope)", "30"]
+		[
+			L.s_fn,
+			["name", "name", L.s_f1, "30"]
 		]
 	];
 	var oldcfg = [];
 
 	if (QS('#srch_form.tags')) {
-		sconf.push(["tags",
-			["tags", "tags", "tags contains &nbsp; (^=start, end=$)", "30"]
+		sconf.push([
+			L.s_ta,
+			["tags", "tags", L.s_t1, "30"]
 		]);
-		sconf.push(["adv.",
-			["adv", "adv", "key>=1A&nbsp; key<=2B&nbsp; .bpm>165", "30"]
+		sconf.push([
+			L.s_ad,
+			["adv", "adv", L.s_a1, "30"]
 		]);
 	}
 
@@ -4881,8 +4932,8 @@ function apply_perms(newperms) {
 	}
 
 	ebi('acc_info').innerHTML = '<span id="srv_info2"><span>' + srvinf +
-		'</span></span><span' + aclass + axs + ' access</span>' + (acct != '*' ?
-			'<a href="/?pw=x">Logout ' + acct + '</a>' : '<a href="/?h">Login</a>');
+		'</span></span><span' + aclass + axs + L.access + '</span>' + (acct != '*' ?
+			'<a href="/?pw=x">' + L.logout + acct + '</a>' : '<a href="/?h">Login</a>');
 
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {

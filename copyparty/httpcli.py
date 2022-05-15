@@ -1829,12 +1829,12 @@ class HttpCli(object):
     def tx_404(self, is_403=False):
         rc = 404
         if self.args.vague_403:
-            m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p>or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+            m = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
         elif is_403:
-            m = '<h1>403 forbiddena &nbsp;~┻━┻</h1><p>you\'ll have to log in or <a href="/?h">go home</a></p>'
+            m = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="/?h">go home</a></p>'
             rc = 403
         else:
-            m = '<h1>404 not found &nbsp;┐( ´ -`)┌</h1><p><a href="/?h">go home</a></p>'
+            m = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="/?h">go home</a></p>'
 
         html = self.j2("splash", this=self, qvpath=quotep(self.vpath), msg=m)
         self.reply(html.encode("utf-8"), status=rc)
