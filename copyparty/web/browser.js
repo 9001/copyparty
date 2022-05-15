@@ -4056,6 +4056,9 @@ document.onkeydown = function (e) {
 					vs = ebi('srch_' + k + 'v').value,
 					tvs = [];
 
+				if (a == 1)
+					vs = vs.trim().replace(/ +/, 'T');
+
 				while (vs) {
 					vs = vs.trim();
 					if (!vs)

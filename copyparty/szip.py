@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import time
 import zlib
-from datetime import datetime
+import calendar
 
 from .sutil import errdesc
 from .util import yieldfile, sanitize_fn, spack, sunpack, min_ex
@@ -25,8 +25,8 @@ def dostime2unix(buf):
     tf = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}"
     iso = tf.format(*tt)
 
-    dt = datetime.strptime(iso, "%Y-%m-%d %H:%M:%S")
-    return int(dt.timestamp())
+    dt = time.strptime(iso, "%Y-%m-%d %H:%M:%S")
+    return int(calendar.timegm(dt))
 
 
 def unixtime2dos(ts):

@@ -4,8 +4,8 @@ from __future__ import print_function, unicode_literals
 import re
 import os
 import time
+import calendar
 import threading
-from datetime import datetime
 from operator import itemgetter
 
 from .__init__ import ANYWIN, unicode
@@ -190,18 +190,17 @@ class U2idx(object):
 
             if is_date:
                 is_date = False
-                v = v.upper().rstrip("Z").replace(",", " ").replace("T", " ")
-                while "  " in v:
-                    v = v.replace("  ", " ")
-
+                v = re.sub(r"[tzTZ, ]+", " ", v).strip()
                 for fmt in [
                     "%Y-%m-%d %H:%M:%S",
                     "%Y-%m-%d %H:%M",
                     "%Y-%m-%d %H",
                     "%Y-%m-%d",
+                    "%Y-%m",
+                    "%Y",
                 ]:
                     try:
-                        v = datetime.strptime(v, fmt).timestamp()
+                        v = calendar.timegm(time.strptime(v, fmt))
                         break
                     except:
                         pass

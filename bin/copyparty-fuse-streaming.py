@@ -42,6 +42,7 @@ import threading
 import traceback
 import http.client  # py2: httplib
 import urllib.parse
+import calendar
 from datetime import datetime
 from urllib.parse import quote_from_bytes as quote
 from urllib.parse import unquote_to_bytes as unquote
@@ -495,7 +496,7 @@ class Gateway(object):
                 ts = 60 * 60 * 24 * 2
                 try:
                     sz = int(fsize)
-                    ts = datetime.strptime(fdate, "%Y-%m-%d %H:%M:%S").timestamp()
+                    ts = calendar.timegm(time.strptime(fdate, "%Y-%m-%d %H:%M:%S"))
                 except:
                     info("bad HTML or OS [{}] [{}]".format(fdate, fsize))
                     # python cannot strptime(1959-01-01) on windows
