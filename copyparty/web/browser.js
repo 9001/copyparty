@@ -4688,7 +4688,10 @@ var treectl = (function () {
 		}
 
 		srvinf = res.srvinf;
-		ebi('srv_info').innerHTML = ebi('srv_info2').innerHTML = '<span>' + res.srvinf + '</span>';
+		try {
+			ebi('srv_info').innerHTML = ebi('srv_info2').innerHTML = '<span>' + res.srvinf + '</span>';
+		}
+		catch (ex) { }
 
 		if (this.hpush && !showfile.active())
 			hist_push(this.top);

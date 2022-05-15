@@ -95,9 +95,9 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     fn = sanitize_fn(fn, "/", [])
     bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
-    # add ntfs and unix extrafields for utc, add z64 if requested
+    # add ntfs (0x24) and/or unix (0x10) extrafields for utc, add z64 if requested
     z64_len = len(z64v) * 8 + 4 if z64v else 0
-    ret += spack(b"<HH", len(bfn), 0x24 + 0x10 + z64_len)
+    ret += spack(b"<HH", len(bfn), 0x10 + z64_len)
 
     if h_pos is not None:
         # 2b comment, 2b diskno
@@ -117,8 +117,8 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
 
     # ntfs: type 0a, size 20, rsvd, attr1, len 18, mtime, atime, ctime
     # b"\xa3\x2f\x82\x41\x55\x68\xd8\x01"  1652616838.798941100  ~5.861518  132970904387989411  ~58615181
-    nt = int((lastmod + 11644473600) * 10000000)
-    ret += spack(b"<HHLHHQQQ", 0xA, 0x20, 0, 1, 0x18, nt, nt, nt)
+    # nt = int((lastmod + 11644473600) * 10000000)
+    # ret += spack(b"<HHLHHQQQ", 0xA, 0x20, 0, 1, 0x18, nt, nt, nt)
 
     # unix: type 0d, size 0c, atime, mtime, uid, gid
     ret += spack(b"<HHLLHH", 0xD, 0xC, int(lastmod), int(lastmod), 1000, 1000)
