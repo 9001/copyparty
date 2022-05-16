@@ -298,7 +298,7 @@ var Ls = {
 		"u_ehssrch": "server rejected the request to perform search",
 		"u_ehsinit": "server rejected the request to initiate upload",
 
-		"lang_set": "refresh now to make the change take effect?",
+		"lang_set": "refresh to make the change take effect?",
 	},
 	"nor": {
 		"tt": "Norsk",
@@ -596,7 +596,7 @@ var Ls = {
 		"u_ehssrch": "server nektet forespørselen om å utføre søk",
 		"u_ehsinit": "server nektet forespørselen om å begynne en ny opplastning",
 
-		"lang_set": "siden må lastes på nytt for at endringen skal tre i kraft -- passer det nå?",
+		"lang_set": "passer det å laste siden på nytt?",
 	},
 };
 var L = Ls[sread("lang") || lang];

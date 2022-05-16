@@ -5,7 +5,7 @@ var Ls = {
 		"c1": "logg ut",
 		"d1": "tilstand",
 		"d2": "vis tilstanden til alle tråder",
-		"e1": "les cfg",
+		"e1": "last innst.",
 		"e2": "leser inn konfigurasjonsfiler på nytt$N(kontoer, volumer, volumbrytere)$Nog kartlegger alle e2ds-volumer",
 		"f1": "du kan betrakte:",
 		"g1": "du kan laste opp til:",
@@ -22,6 +22,7 @@ var Ls = {
 		"q1": 'du må logge inn eller <a href="/?h">gå hjem</a>',
 		"r1": "gå hjem",
 		".s1": "kartlegg",
+		"t1": "handling",
 	}
 },
 	d = Ls[sread("lang") || "{{ this.args.lang }}"];

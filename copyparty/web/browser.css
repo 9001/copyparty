@@ -1,6 +1,6 @@
 :root {
 	color-scheme: dark;
-	
+
 	--grid-sz: 10em;
 	--grid-ln: 3;
 	--nav-sz: 16em;
@@ -8,8 +8,8 @@
 	--fg: #ccc;
 	--fg-max: #fff;
 	--fg2-max: #fff;
-	--fg-weak: #aaa;
-	
+	--fg-weak: #bbb;
+
 	--bg-u7: #555;
 	--bg-u6: #4c4c4c;
 	--bg-u5: #444;
@@ -18,17 +18,17 @@
 	--bg-u2: #2b2b2b;
 	--bg-u1: #282828;
 	--bg: #222;
-	--bgg: #222;
+	--bgg: var(--bg);
 	--bg-d1: #1c1c1c;
 	--bg-d2: #181818;
 	--bg-d3: #111;
 	--bg-max: #000;
-	
+
 	--tab-alt: #f5a;
 	--row-alt: #282828;
-	
+
 	--scroll: #eb0;
-	
+
 	--a: #fc5;
 	--a-b: #c90;
 	--a-hil: #fd9;
@@ -45,9 +45,11 @@
 	--btn-1h-bg: #fe8;
 	--chk-fg: var(--tab-alt);
 	--txt-sh: var(--bg-d2);
+	--txt-bg: var(--btn-bg);
 
 	--op-aa-fg: var(--a);
 	--op-aa-bg: var(--bg-d2);
+	--op-a-sh: rgba(0,0,0,0.5);
 
 	--u2-btn-b1: #999;
 	--u2-sbtn-b1: #999;
@@ -68,22 +70,22 @@
 	--u2-err-bg: #900;
 	--u2-err-b1: #d06;
 	--ud-b1: #888;
-	
+
 	--sort-1: #fb0;
 	--sort-2: #d09;
-	
+
 	--srv-1: #aaa;
 	--srv-2: #a73;
 	--srv-3: #f4c;
 	--srv-3b: rgba(255,68,204,0.6);
-	
+
 	--tree-bg: #2b2b2b;
-	
+
 	--g-play-bg: #750;
 	--g-play-b1: #c90;
 	--g-play-b2: #da4;
 	--g-play-sh: #b83;
-	
+
 	--g-sel-fg: #fff;
 	--g-sel-bg: #925;
 	--g-sel-b1: #c37;
@@ -111,11 +113,11 @@
 	--f-play-fg: #000;
 	--f-sel-sh: #fc0;
 	--f-gray: #999;
-	
+
 	--fm-off: #f6c;
 	--mp-sh: var(--bg-d3);
 	--mp-b-bg: rgba(0,0,0,0.2);
-	
+
 	--err-fg: #fff;
 	--err-bg: #a20;
 	--err-b1: #f00;
@@ -123,8 +125,8 @@
 }
 html.y {
 	color-scheme: light;
-	
-	--fg: #333;
+
+	--fg: #222;
 	--fg-max: #000;
 	--fg-weak: #555;
 
@@ -132,7 +134,6 @@ html.y {
 	--bg-d2: #fff;
 	--bg-d1: #fff;
 	--bg: #eaeaea;
-	--bgg: #eaeaea;
 	--bg-u1: #fff;
 	--bg-u2: #f7f7f7;
 	--bg-u3: #eaeaea;
@@ -141,12 +142,12 @@ html.y {
 	--bg-u6: #ddd;
 	--bg-max: #fff;
 
-	--tab-alt: #d38;
+	--tab-alt: #d08;
 	--row-alt: #f2f2f2;
 
 	--scroll: #490;
 
-	--a: #07a;
+	--a: #06a;
 	--a-b: #08b;
 	--a-hil: #058;
 	--a-gray: #bbb;
@@ -158,7 +159,10 @@ html.y {
 	--btn-1-bg: #4a0;
 	--btn-1h-bg: #5c0;
 	--chk-fg: var(--fg);
-	--txt-sh: #888;
+	--txt-sh: #aaa;
+	--txt-bg: rgba(255,255,255,0.6);
+
+	--op-a-sh: #fff;
 
 	--u2-txt-bg: var(--bg-max);
 	--u2-tab-1-sh: #0ad;
@@ -170,8 +174,8 @@ html.y {
 
 	--sort-1: #059;
 	--sort-2: #f5d;
-	
-	--srv-1: #666;
+
+	--srv-1: #555;
 	--srv-2: #c83;
 	--srv-3: #c0a;
 	--srv-3b: rgba(255,68,204,0.6);
@@ -197,6 +201,8 @@ html.y {
 	--fm-off: #c4a;
 	--mp-sh: #bbb;
 	--mp-b-bg: transparent;
+
+	text-shadow: none;
 }
 html.a {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
@@ -218,13 +224,13 @@ html.ay {
 }
 html.b {
 	--tree-bg: var(--bg);
-	
+
 	--g-bg: var(--bg);
 	--g-b1: var(--bg);
 	--g-b2: var(--bg);
 	--g-g1: var(--bg);
 	--g-sh: rgba(0,0,0,0);
-	
+
 	--btn-h-fg: #fff;
 
 	--op-aa-bg: rgba(255,255,255,0.06);
@@ -242,19 +248,19 @@ html.b {
 	--f-sh1: 0.1;
 }
 html.bz {
-	--fg: #bbd;
+	--fg: #cce;
+	--fg-weak: #bbd;
 	--bg-u5: #3b3f58;
 	--bg-u4: #1e2130;
 	--bg-u3: #1e2130;
 	--bg-u1: #1e2130;
 	--bg: #11121d;
-	--bgg: #11121d;
 	--bg-d1: #232536;
 	--bg-d2: #34384e;
 	--bg-d3: #34384e;
 
 	--row-alt: rgba(139, 150, 205, 0.06);
-	
+
 	--btn-bg: #202231;
 	--btn-h-bg: #2d2f45;
 	--btn-1-bg: #ba2959;
@@ -266,7 +272,7 @@ html.bz {
 	--u2-tab-1-bg: var(--bg);
 
 	--srv-1: #79b;
-	
+
 	--g-sel-bg: #ba2959;
 	--g-fsel-bg: #e6336e;
 
@@ -274,9 +280,13 @@ html.bz {
 	--mp-sh: #11121d;
 }
 html.by {
+	--bg: #f2f2f2;
+
+	--row-alt: #f9f9f9;
+
 	--scroll: var(--a);
 
-	--btn-1-bg: var(--a);
+	--btn-1-bg: #07a;
 	--btn-1h-bg: var(--a-hil);
 
 	--op-aa-bg: #fff;
@@ -289,13 +299,12 @@ html.by {
 html.c {
 	font-weight: bold;
 	--fg: #fff;
-	--fg-weak: #5df;
+	--fg-weak: #cef;
 	--bg-u5: #409;
 	--bg-u2: linear-gradient(-35deg, #fd7233, #cd27a0, #5d47a5 49.5%, #16e9fb 50%, #3b6cc8 50.4%, #0e51ac);
 	--bg: #37235d;
-	--bgg: var(--bg-u2);
 	--bg-u3: #407;
-	
+
 	--a: #f9dc22;
 	--a-gray: #0ae;
 
@@ -313,11 +322,13 @@ html.c {
 
 	--srv-1: #ea0;
 }
+html.cz {
+	--bgg: var(--bg-u2);
+}
 html.cy {
 	--fg: #fff;
 	--fg-weak: #fff;
 	--bg: #ff0;
-	--bgg: #ff0;
 	--bg-u2: #f00;
 	--bg-u3: #f00;
 	--bg-u5: #999;
@@ -337,7 +348,7 @@ html.cy {
 	--btn-1-bg: #ff0;
 	--btn-1-fg: #000;
 	--chk-fg: #fd0;
-	
+
 	--srv-1: #f00;
 	--op-aa-bg: #fff;
 
@@ -360,9 +371,6 @@ html {
 	background: var(--bgg);
 	font-family: sans-serif;
 	text-shadow: 1px 1px 0px var(--bg-max);
-}
-html.y {
-	text-shadow: none;
 }
 html, body {
 	margin: 0;
@@ -581,11 +589,15 @@ html.y #path a:hover {
 #acc_info {
 	color: var(--srv-2);
 	background: var(--bg);
+	white-space: nowrap;
 }
-#srv_info {
+#srv_info,
+#acc_info {
 	position: absolute;
 	font-size: .8em;
- 	top: .5em;
+	top: .5em;
+}
+#srv_info {
 	left: 2em;
 	padding-right: .5em;
 }
@@ -598,10 +610,6 @@ html.y #path a:hover {
 	display: none;
 }
 #acc_info {
-	position: absolute;
-	white-space: nowrap;
-	font-size: .81em;
-	top: .5em;
 	right: 2em;
 }
 #acc_info > span:not([id]) {
@@ -977,7 +985,7 @@ html.y #widget.open {
 }
 #ops a {
 	color: var(--a);
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+	text-shadow: 1px 1px 1px var(--op-a-sh);
 	font-size: 1.5em;
 	padding: .25em .4em;
 	margin: 0;
@@ -1016,7 +1024,7 @@ html.y #ops svg circle {
 }
 .opview input[type=text] {
 	color: var(--fg);
-	background: var(--btn-bg);
+	background: var(--txt-bg);
 	border: none;
 	box-shadow: 0 0 2px var(--txt-sh);
 	border-bottom: 1px solid #999;
@@ -1076,7 +1084,6 @@ input.eq_gain {
 
 
 #srch_form {
-	margin-bottom: 0;
 	padding: 0 .5em .5em 0;
 }
 #srch_form table {
@@ -1349,6 +1356,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	line-height: 2em;
 }
 .opwide>div>h3 {
+	color: var(--fg-weak);
 	margin: 0 .4em;
 	padding: 0;
 }
@@ -1674,7 +1682,7 @@ html.y #bbox-overlay figcaption a {
 	top: calc(50% - 30px);
 	width: 44px;
 	height: 60px;
-} 
+}
 .bbox-btn {
 	position: fixed;
 }
@@ -2280,6 +2288,11 @@ html.c #treeh,
 html.a #tree,
 html.a #treeh {
 	border-radius: 0 .3em 0 0;
+	background: var(--bg-u2);
+}
+html.c #treepar,
+html.a #treepar {
+	background: var(--bg-u2);
 }
 html.c #tree li,
 html.a #tree li {
@@ -2308,15 +2321,6 @@ html.a .ghead {
 	background: var(--bg-u2);
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 .3em var(--bg-d3);
-}
-html.c #tree,
-html.c #treeh,
-html.c #treepar,
-
-html.a #tree,
-html.a #treeh,
-html.a #treepar {
-	background: var(--bg-u2);
 }
 html.c #u2btn,
 html.a #u2btn {
