@@ -80,7 +80,7 @@
 			{%- else %}
 			<li><a id="i" href="/?k304=y" class="r">enable k304</a> (currently disabled)
 			{% endif %}
-			<blockquote id="j">enabling this will disconnect your client on every HTTP 304, which can prevent some buggy browsers/proxies from getting stuck (suddenly not being able to load pages), <em>but</em> it will also make things slower in general</blockquote></li>
+			<blockquote id="j">enabling this will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general</blockquote></li>
 			
 			<li><a id="k" href="/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
 		</ul>
