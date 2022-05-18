@@ -25,7 +25,7 @@ var Ls = {
 		"t1": "handling",
 	}
 },
-	d = Ls[sread("lang") || "{{ this.args.lang }}"];
+	d = Ls[sread("lang") || lang];
 
 for (var k in (d || {})) {
 	var f = k.slice(-1),
