@@ -471,7 +471,7 @@ function linksplit(rp, id) {
         q = '?' + q[1];
     }
 
-    if (rp && rp.charAt(0) == '/')
+    if (rp && rp[0] == '/')
         rp = rp.slice(1);
 
     while (rp) {

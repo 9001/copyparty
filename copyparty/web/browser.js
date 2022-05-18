@@ -5298,7 +5298,7 @@ var settheme = (function () {
 		vbar.draw();
 		showfile.setstyle();
 
-		var html = [], itheme = ax.indexOf(theme.charAt(0)) * 2 + (light ? 1 : 0),
+		var html = [], itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
 			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand'];
 
 		for (var a = 0; a < themes; a++)
@@ -5318,7 +5318,7 @@ var settheme = (function () {
 		var i = e;
 		try { ev(e); i = e.target.textContent; } catch (ex) { }
 		light = i % 2 == 1;
-		var c = ax.charAt(Math.floor(i / 2)),
+		var c = ax[Math.floor(i / 2)],
 			l = light ? 'y' : 'z';
 		theme = c + l + ' ' + c + ' ' + l;
 		swrite('theme', theme);

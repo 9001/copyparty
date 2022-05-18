@@ -35,8 +35,8 @@ window.baguetteBox = (function () {
         documentLastFocus = null,
         isFullscreen = false,
         vmute = false,
-        vloop = false,
-        vnext = false,
+        vloop = sread('vmode') == 'L',
+        vnext = sread('vmode') == 'C',
         resume_mp = false;
 
     var onFSC = function (e) {
@@ -320,6 +320,7 @@ window.baguetteBox = (function () {
         btnVmode.setAttribute('aria-label', msg);
         btnVmode.setAttribute('tt', msg + tts);
         btnVmode.textContent = lbl;
+        swrite('vmode', lbl[0]);
 
         v.loop = vloop
         if (vloop && v.paused)
