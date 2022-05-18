@@ -142,7 +142,7 @@ html.y {
 	--bg-u6: #ddd;
 	--bg-max: #fff;
 
-	--tab-alt: #d08;
+	--tab-alt: #c07;
 	--row-alt: #f2f2f2;
 
 	--scroll: #490;
@@ -1200,7 +1200,7 @@ html {
 }
 #treeul {
 	position: relative;
-	left: -2em;
+	left: -2.2em;
 	width: calc(100% + 2em);
 }
 .btn {
@@ -1253,9 +1253,10 @@ html.ca .tgl.btn.on {
 }
 #tree ul {
 	border-left: .2em solid var(--bg-u5);
+	margin-left: .44em;
 }
 #tree li {
-	margin-left: 1em;
+	margin-left: .6em;
 	list-style: none;
 	border-top: 1px solid var(--bg-u5);
 }
@@ -1279,7 +1280,7 @@ html.ca .tgl.btn.on {
 	display: inline-block;
 }
 .ntree a+a {
-	width: calc(100% - 2em);
+	width: calc(100% - 2.2em);
 	line-height: 1em;
 }
 #tree.nowrap li {
