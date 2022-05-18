@@ -3714,6 +3714,7 @@ function tree_neigh(n) {
 	if (!links.length) {
 		treectl.dir_cb = function () {
 			tree_neigh(n);
+			treectl.detree();
 		};
 		treectl.entree(null, true);
 		return;
