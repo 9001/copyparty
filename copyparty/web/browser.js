@@ -155,6 +155,9 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 
+		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
+		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
+
 		"ft_paste": "paste {0} items$NHotkey: ctrl-V",
 		"fr_eperm": 'cannot rename:\nyou do not have “move” permission in this folder',
 		"fd_eperm": 'cannot delete:\nyou do not have “delete” permission in this folder',
@@ -452,6 +455,9 @@ var Ls = {
 		"mm_e404": "Avspilling feilet: Fil ikke funnet.",
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
+
+		"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
+		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
 
 		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
 		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
@@ -5141,8 +5147,15 @@ var filecols = (function () {
 		var ofs = hidden.indexOf(name);
 		if (ofs !== -1)
 			hidden.splice(ofs, 1);
-		else
+		else {
+			if (!sread("chide_ok")) {
+				return modal.confirm(L.f_chide.format(name), function () {
+					swrite("chide_ok", 1);
+					toggle(name);
+				}, null);
+			}
 			hidden.push(name);
+		}
 
 		jwrite("filecols", hidden);
 		set_style();
@@ -5923,7 +5936,16 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 	tgt = e.target.closest('a[hl]');
 	if (tgt) {
-		showfile.show(noq_href(ebi(tgt.getAttribute('hl'))), tgt.getAttribute('lang'));
+		var fun = function () {
+			showfile.show(noq_href(ebi(tgt.getAttribute('hl'))), tgt.getAttribute('lang'));
+		}, szs = ft2dict(tgt.closest('tr'))[0].sz,
+			sz = parseInt(szs.replace(/[, ]/g, ''));
+
+		if (sz < 1024 * 1024)
+			fun();
+		else
+			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, null);
+
 		return ev(e);
 	}
 
