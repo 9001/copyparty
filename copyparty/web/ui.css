@@ -166,6 +166,10 @@ html.y #tt {
 	background: #fff;
 	border-color: #888 #000 #777 #000;
 }
+html.bz #tt {
+	background: #202231;
+	border-color: #3b3f58;
+}
 html.y #tt,
 html.y #toast {
 	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
@@ -481,9 +485,19 @@ html.y textarea:focus {
 		border-top: .4em solid #b80;
 		border-bottom: .4em solid #4c4c4c;
 	}
+	html.bz .mdo h1 {
+		background: #202231;
+		border: 1px solid #2d2f45;
+		border-width: 0 0 .4em 0;
+	}
 	html.z .mdo h2 {
 		background: #444;
 		border-bottom: .22em solid #555;
+	}
+	html.bz .mdo h2,
+	html.bz .mdo h3 {
+		background: transparent;
+		border-color: #3b3f58;
 	}
 	html.z .mdo td,
 	html.z .mdo th {

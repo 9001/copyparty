@@ -37,7 +37,7 @@
 
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-h-fg: var(--a);
+	--btn-h-fg: var(--a-hil);
 	--btn-h-bg: #805;
 	--btn-1-fg: #400;
 	--btn-1-bg: var(--a);
@@ -154,6 +154,7 @@ html.y {
 	--a-dark: #c0f;
 
 	--btn-fg: #555;
+	--btn-h-fg: #222;
 	--btn-h-bg: #caf;
 	--btn-1-fg: #fff;
 	--btn-1-bg: #4a0;
@@ -230,8 +231,6 @@ html.b {
 	--g-b2: var(--bg);
 	--g-g1: var(--bg);
 	--g-sh: rgba(0,0,0,0);
-
-	--btn-h-fg: #fff;
 
 	--op-aa-bg: rgba(255,255,255,0.06);
 
@@ -345,6 +344,7 @@ html.cy {
 
 	--btn-bg: #000;
 	--btn-fg: #ff0;
+	--btn-h-fg: #fff;
 	--btn-1-bg: #ff0;
 	--btn-1-fg: #000;
 	--chk-fg: #fd0;
@@ -1224,6 +1224,7 @@ html.ca .btn {
 	border-bottom: .2em solid #709;
 }
 .btn:hover {
+	color: var(--btn-h-fg);
 	background: var(--btn-h-bg);
 }
 .tgl.btn.on {
