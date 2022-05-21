@@ -568,12 +568,12 @@ function Donut(uc, st) {
 
 function fsearch_explain(n) {
     if (n)
-        return toast.inf(60, 'your access to this folder is Read-Only\n\n' + (acct == '*' ? 'you are currently not logged in' : 'you are currently logged in as "' + acct + '"'));
+        return toast.inf(60, L.ue_ro + (acct == '*' ? L.ue_nl : L.ue_la).format(acct));
 
     if (bcfg_get('fsearch', false))
-        return toast.inf(60, 'you are currently in file-search mode\n\nswitch to upload-mode by clicking the green magnifying glass (next to the big yellow search button), and try uploading again\n\nsorry');
+        return toast.inf(60, L.ue_sr);
 
-    return toast.inf(60, 'try again, it should work now');
+    return toast.inf(60, L.ue_ta);
 }
 
 
@@ -985,12 +985,15 @@ function up2k_init(subtle) {
             return a < b ? -1 : a > b ? 1 : 0;
         });
 
-        var msg = [(uc.fsearch ? L.u_asks : L.u_asku).format(good_files.length) + '<ul>'];
+        var msg = [L.u_asku.format(good_files.length, esc(get_vpath())) + '<ul>'];
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push('<li>' + esc(good_files[a][1]) + '</li>');
 
         if (uc.ask_up && !uc.fsearch)
-            return modal.confirm(msg.join('') + '</ul>', function () { up_them(good_files); }, null);
+            return modal.confirm(msg.join('') + '</ul>', function () {
+                up_them(good_files);
+                toast.inf(15, L.u_unpt);
+            }, null);
 
         up_them(good_files);
     }
@@ -1644,8 +1647,8 @@ function up2k_init(subtle) {
 
                     if (!response || !response.hits || !response.hits.length) {
                         smsg = '404';
-                        msg = ('not found on server <a href="#" onclick="fsearch_explain(' +
-                            (has(perms, 'write') ? '0' : '1') + ')" class="fsearch_explain">(explain)</a>');
+                        msg = (L.u_s404 + ' <a href="#" onclick="fsearch_explain(' +
+                            (has(perms, 'write') ? '0' : '1') + ')" class="fsearch_explain">(' + L.u_expl + ')</a>');
                     }
                     else {
                         smsg = 'found';
@@ -1999,10 +2002,8 @@ function up2k_init(subtle) {
     }
 
     function draw_turbo() {
-        var msgu = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
-            msgs = '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search results can be incorrect; see turbo-button tooltip</span></p>',
-            msg = uc.fsearch ? msgs : msgu,
-            omsg = uc.fsearch ? msgu : msgs,
+        var msg = uc.fsearch ? L.u_ts : L.u_tu,
+            omsg = uc.fsearch ? L.u_tu : L.u_ts,
             html = ebi('u2foot').innerHTML,
             ohtml = html;
 
@@ -2012,7 +2013,7 @@ function up2k_init(subtle) {
         if (msg && html.indexOf(msg) === -1)
             html = html.replace(omsg, '') + msg;
         else if (!msg)
-            html = html.replace(msgu, '').replace(msgs, '');
+            html = html.replace(L.u_tu, '').replace(L.u_ts, '');
 
         if (html !== ohtml)
             ebi('u2foot').innerHTML = html;

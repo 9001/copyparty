@@ -174,10 +174,14 @@ html.y #tt,
 html.y #toast {
 	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
-#modalc code,
 html.y #tt code {
 	background: #060;
 	color: #fff;
+}
+#modalc code {
+	color: #060;
+	background: transparent;
+	border: 1px solid #ccc;
 }
 html.y #tt em {
 	color: #d38;
