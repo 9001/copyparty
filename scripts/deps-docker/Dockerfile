@@ -2,9 +2,9 @@ FROM    alpine:3.15
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
-        ver_marked=4.0.12 \
+        ver_marked=4.0.16 \
         ver_mde=2.16.1 \
-        ver_codemirror=5.65.3 \
+        ver_codemirror=5.65.4 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -43,8 +43,6 @@ RUN     mkdir -p /z/dist/no-pk \
 
 
 # todo
-# https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js
-# https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/styles/default.min.css
 # https://prismjs.com/download.html#themes=prism-funky&languages=markup+css+clike+javascript+autohotkey+bash+basic+batch+c+csharp+cpp+cmake+diff+docker+go+ini+java+json+kotlin+latex+less+lisp+lua+makefile+objectivec+perl+powershell+python+r+jsx+ruby+rust+sass+scss+sql+swift+systemd+toml+typescript+vbnet+verilog+vhdl+yaml&plugins=line-highlight+line-numbers+autolinker
 
 
