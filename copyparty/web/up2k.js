@@ -1249,24 +1249,21 @@ function up2k_init(subtle) {
                     donut.on(is_busy);
 
                     if (!is_busy) {
-                        var k = uc.fsearch ? 'searches' : 'uploads',
-                            ks = uc.fsearch ? 'Search' : 'Upload',
-                            tok = uc.fsearch ? 'successful (found on server)' : 'completed successfully',
-                            tng = uc.fsearch ? 'failed (NOT found on server)' : 'failed, sorry',
+                        var sr = uc.fsearch,
                             ok = pvis.ctr["ok"],
                             ng = pvis.ctr["ng"],
                             t = uc.ask_up ? 0 : 10;
 
                         if (ok && ng)
-                            toast.warn(t, 'Finished, but some {0} failed:\n{1} {2},\n{3} {4}'.format(k, ok, tok, ng, tng));
+                            toast.warn(t, (sr ? L.ur_sm : L.ur_um).format(ok, ng));
                         else if (ok > 1)
-                            toast.ok(t, 'All {1} {0} {2}'.format(k, ok, tok));
+                            toast.ok(t, (sr ? L.ur_aso : L.ur_auo).format(ok));
                         else if (ok)
-                            toast.ok(t, '{0} {1}'.format(ks, tok));
+                            toast.ok(t, sr ? L.ur_1so : L.ur_1uo);
                         else if (ng > 1)
-                            toast.err(t, 'All {1} {0} {2}'.format(k, ng, tng));
+                            toast.err(t, (sr ? L.ur_asn : L.ur_aun).format(ng));
                         else if (ng)
-                            toast.err(t, '{0} {1}'.format(ks, tng));
+                            toast.err(t, sr ? L.ur_1sn : L.ur_1un);
 
                         timer.rm(etafun);
                         timer.rm(donut.do);
