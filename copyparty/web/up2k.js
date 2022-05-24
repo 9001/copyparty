@@ -587,8 +587,8 @@ function up2k_init(subtle) {
 
     function unmodal() {
         ebi('u2notbtn').style.display = 'none';
-        ebi('u2btn').style.display = 'block';
         ebi('u2conf').style.opacity = '1';
+        ebi('u2btn').style.display = '';
         ebi('u2notbtn').innerHTML = '';
     }
 

@@ -43,6 +43,9 @@ var Ls = {
 		"ab_mkdoc": "new markdown doc",
 		"ab_msg": "send msg to srv log",
 
+		"ay_path": "jump to folders",
+		"ay_files": "jump to files",
+
 		"wt_ren": "rename selected items$NHotkey: F2",
 		"wt_del": "delete selected items$NHotkey: ctrl-K",
 		"wt_cut": "cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X",
@@ -362,6 +365,9 @@ var Ls = {
 		"ab_mkdir": "lag mappe",
 		"ab_mkdoc": "nytt dokument",
 		"ab_msg": "send melding",
+
+		"ay_path": "hopp til mapper",
+		"ay_files": "hopp til filer",
 
 		"wt_ren": "gi nye navn til de valgte filene$NSnarvei: F2",
 		"wt_del": "slett de valgte filene$NSnarvei: ctrl-K",
@@ -2352,6 +2358,22 @@ function eval_hash() {
 
 
 (function () {
+	for (var a = 0; a < 2; a++)
+		(function (a) {
+			var d = mknod('a');
+			d.setAttribute('href', '#');
+			d.setAttribute('class', 'ayjump');
+			d.innerHTML = a ? L.ay_path : L.ay_files;
+			document.body.insertBefore(d, ebi('ops'));
+			d.onclick = function (e) {
+				ev(e);
+				if (a)
+					QS(treectl.hidden ? '#path a:nth-last-child(2)' : '#treeul a.hl').focus();
+				else
+					QS(thegrid.en ? '#ggrid a' : '#files tbody a').focus();
+			};
+		})(a);
+
 	var d = mknod('div');
 	d.setAttribute('id', 'acc_info');
 	document.body.insertBefore(d, ebi('ops'));

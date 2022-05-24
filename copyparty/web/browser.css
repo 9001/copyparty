@@ -379,6 +379,19 @@ html, body {
 pre, code, tt, #doc, #doc>code {
 	font-family: 'scp', monospace, monospace;
 }
+.ayjump {
+	position: fixed;
+	z-index: 80386;
+	top: .5em;
+	left: .5em;
+	padding: .5em .7em;
+	background: var(--bg);
+	opacity: 0;
+}
+.ayjump:focus {
+	opacity: 1;
+	outline: none;
+}
 #path,
 #path * {
 	font-size: 1em;
