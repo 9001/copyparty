@@ -381,16 +381,24 @@ pre, code, tt, #doc, #doc>code {
 }
 .ayjump {
 	position: fixed;
+	overflow: hidden;
+	width: 0;
+	height: 0;
+}
+html .ayjump:focus {
 	z-index: 80386;
+	color: #fff;
+	color: var(--a-hil);
+	background: #069;
+	background: var(--bg-u2);
+	border: .2em solid var(--a);
+	box-shadow: none;
+	outline: none;
+	width: auto;
+	height: auto;
 	top: .5em;
 	left: .5em;
 	padding: .5em .7em;
-	background: var(--bg);
-	opacity: 0;
-}
-.ayjump:focus {
-	opacity: 1;
-	outline: none;
 }
 #path,
 #path * {

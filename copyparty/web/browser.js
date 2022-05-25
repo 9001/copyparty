@@ -43,8 +43,8 @@ var Ls = {
 		"ab_mkdoc": "new markdown doc",
 		"ab_msg": "send msg to srv log",
 
-		"ay_path": "jump to folders",
-		"ay_files": "jump to files",
+		"ay_path": "skip to folders",
+		"ay_files": "skip to files",
 
 		"wt_ren": "rename selected items$NHotkey: F2",
 		"wt_del": "delete selected items$NHotkey: ctrl-K",
@@ -366,8 +366,8 @@ var Ls = {
 		"ab_mkdoc": "nytt dokument",
 		"ab_msg": "send melding",
 
-		"ay_path": "hopp til mapper",
-		"ay_files": "hopp til filer",
+		"ay_path": "gå videre til mapper",
+		"ay_files": "gå videre til filer",
 
 		"wt_ren": "gi nye navn til de valgte filene$NSnarvei: F2",
 		"wt_del": "slett de valgte filene$NSnarvei: ctrl-K",
