@@ -1197,7 +1197,7 @@ html {
 	z-index: 1;
 	position: fixed;
 	background: var(--tree-bg);
-	left: -.75em;
+	left: -.98em;
 	width: calc(var(--nav-sz) - 0.5em);
 	border-bottom: 1px solid var(--bg-u5);
 	overflow: hidden;
@@ -2492,10 +2492,14 @@ html.b #treeh,
 html.b #tree li {
 	border: none;
 }
+html.b #tree li {
+	margin-left: .8em;
+}
 html.b .ntree a {
 	padding: .6em .2em;
 }
 html.b #treepar {
+	margin-left: .62em;
 	border-bottom: .2em solid var(--f-h-b1);
 }
 html.b #wrap {
