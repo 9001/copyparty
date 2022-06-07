@@ -88,7 +88,7 @@ class StreamTar(object):
 
             try:
                 self.ser(f)
-            except Exception:
+            except:
                 ex = min_ex(5, True).replace("\n", "\n-- ")
                 errors.append([f["vp"], ex])
 

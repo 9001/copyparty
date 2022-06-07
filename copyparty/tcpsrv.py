@@ -297,7 +297,6 @@ class TcpSrv(object):
         ]:
             try:
                 s.connect((ip, 1))
-                # raise OSError(13, "a")
                 default_route = s.getsockname()[0]
                 break
             except (OSError, socket.error) as ex:
@@ -318,23 +317,23 @@ class TcpSrv(object):
 
         return eps
 
-    def _set_wintitle(self, vars):
-        vars["all"] = vars.get("all", {"Local-Only": 1})
-        vars["pub"] = vars.get("pub", vars["all"])
+    def _set_wintitle(self, vs):
+        vs["all"] = vs.get("all", {"Local-Only": 1})
+        vs["pub"] = vs.get("pub", vs["all"])
 
-        vars2 = {}
-        for k, eps in vars.items():
-            vars2[k] = {
+        vs2 = {}
+        for k, eps in vs.items():
+            vs2[k] = {
                 ep: 1
                 for ep in eps.keys()
                 if ":" not in ep or ep.split(":")[0] not in eps
             }
 
         title = ""
-        vars = vars2
+        vs = vs2
         for p in self.args.wintitle.split(" "):
             if p.startswith("$"):
-                p = " and ".join(sorted(vars.get(p[1:], {"(None)": 1}).keys()))
+                p = " and ".join(sorted(vs.get(p[1:], {"(None)": 1}).keys()))
 
             title += "{} ".format(p)
 

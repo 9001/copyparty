@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 
 from .__init__ import PY2, WINDOWS, unicode
-from .util import fsenc, fsdec, uncyg, runcmd, retchk, REKOBO_LKEY
+from .util import fsenc, uncyg, runcmd, retchk, REKOBO_LKEY
 from .bos import bos
 
 
@@ -91,7 +91,7 @@ def parse_ffprobe(txt):
     """ffprobe -show_format -show_streams"""
     streams = []
     fmt = {}
-    g = None
+    g = {}
     for ln in [x.rstrip("\r") for x in txt.split("\n")]:
         try:
             k, v = ln.split("=", 1)
@@ -421,7 +421,7 @@ class MTag(object):
             md = mutagen.File(fsenc(abspath), easy=True)
             if not md.info.length and not md.info.codec:
                 raise Exception()
-        except Exception as ex:
+        except:
             return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
         sz = bos.path.getsize(abspath)

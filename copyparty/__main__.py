@@ -45,13 +45,13 @@ class RiceFormatter(argparse.HelpFormatter):
         if not VT100:
             fmt = " (default: %(default)s)"
 
-        help = action.help
+        ret = action.help
         if "%(default)" not in action.help:
             if action.default is not argparse.SUPPRESS:
                 defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
                 if action.option_strings or action.nargs in defaulting_nargs:
-                    help += fmt
-        return help
+                    ret += fmt
+        return ret
 
     def _fill_text(self, text, width, indent):
         """same as RawDescriptionHelpFormatter(HelpFormatter)"""
@@ -157,7 +157,7 @@ def configure_ssl_ver(al):
 
     for k in ["ssl_flags_en", "ssl_flags_de"]:
         num = getattr(al, k)
-        lprint("{}: {:8x} ({})".format(k, num, num))
+        lprint("{0}: {1:8x} ({1})".format(k, num))
 
     # think i need that beer now
 
@@ -294,7 +294,7 @@ def run_argparse(argv, formatter):
             -v takes src:dst:\033[33mperm\033[0m1:\033[33mperm\033[0m2:\033[33mperm\033[0mN:\033[32mvolflag\033[0m1:\033[32mvolflag\033[0m2:\033[32mvolflag\033[0mN:...
                 * "\033[33mperm\033[0m" is "permissions,username1,username2,..."
                 * "\033[32mvolflag\033[0m" is config flags to set on this volume
-            
+
             list of permissions:
               "r" (read):   list folder contents, download files
               "w" (write):  upload files; need "r" to see the uploads
@@ -313,7 +313,7 @@ def run_argparse(argv, formatter):
                * w (write-only) for everyone
                * rw (read+write) for ed
                * reject duplicate files  \033[0m
-            
+
             if no accounts or volumes are configured,
             current folder will be read/write for everyone
 
@@ -336,18 +336,18 @@ def run_argparse(argv, formatter):
               \033[36mnosub\033[35m forces all uploads into the top folder of the vfs
               \033[36mgz\033[35m allows server-side gzip of uploads with ?gz (also c,xz)
               \033[36mpk\033[35m forces server-side compression, optional arg: xz,9
-            
+
             \033[0mupload rules:
               \033[36mmaxn=250,600\033[35m max 250 uploads over 15min
               \033[36mmaxb=1g,300\033[35m max 1 GiB over 5min (suffixes: b, k, m, g)
               \033[36msz=1k-3m\033[35m allow filesizes between 1 KiB and 3MiB
-            
+
             \033[0mupload rotation:
             (moves all uploads into the specified folder structure)
               \033[36mrotn=100,3\033[35m 3 levels of subfolders with 100 entries in each
               \033[36mrotf=%Y-%m/%d-%H\033[35m date-formatted organizing
               \033[36mlifetime=3600\033[35m uploads are deleted after 1 hour
-            
+
             \033[0mdatabase, general:
               \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* volflags)
               \033[36md2ts\033[35m disables metadata collection for existing files
@@ -358,24 +358,24 @@ def run_argparse(argv, formatter):
               \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
               \033[36mhist=/tmp/cdb\033[35m puts thumbnails and indexes at that location
               \033[36mscan=60\033[35m scan for new files every 60sec, same as --re-maxage
-            
+
             \033[0mdatabase, audio tags:
             "mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...
               \033[36mmtp=.bpm=f,audio-bpm.py\033[35m uses the "audio-bpm.py" program to
                 generate ".bpm" tags from uploads (f = overwrite tags)
               \033[36mmtp=ahash,vhash=media-hash.py\033[35m collects two tags at once
-            
+
             \033[0mthumbnails:
               \033[36mdthumb\033[35m disables all thumbnails
               \033[36mdvthumb\033[35m disables video thumbnails
               \033[36mdathumb\033[35m disables audio thumbnails (spectrograms)
               \033[36mdithumb\033[35m disables image thumbnails
-            
+
             \033[0mclient and ux:
               \033[36mhtml_head=TXT\033[35m includes TXT in the <head>
               \033[36mrobots\033[35m allows indexing by search engines (default)
               \033[36mnorobots\033[35m kindly asks search engines to leave
-            
+
             \033[0mothers:
               \033[36mfk=8\033[35m generates per-file accesskeys,
                 which will then be required at the "g" permission
@@ -547,7 +547,7 @@ def run_argparse(argv, formatter):
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline -- terminate searches running for more than SEC seconds")
     ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results to allow clients to fetch; 125 results will be shown initially")
-    
+
     ap2 = ap.add_argument_group('metadata db options')
     ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing; makes it possible to search for artist/title/codec/resolution/...")
     ap2.add_argument("-e2ts", action="store_true", help="scan existing files on startup; sets -e2t")

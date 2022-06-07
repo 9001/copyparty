@@ -1003,7 +1003,7 @@ class AuthSrv(object):
                     if a == b:
                         local = False
 
-            for mtp in local_only_mtp.keys():
+            for mtp in local_only_mtp:
                 if mtp not in local_mte:
                     m = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volume-flags)'
                     self.log(m.format(vol.vpath, mtp), 1)
@@ -1090,7 +1090,7 @@ class AuthSrv(object):
                 raise Exception("user not found: " + u)
 
         if vols == "*":
-            vols = ["/" + x for x in self.vfs.all_vols.keys()]
+            vols = ["/" + x for x in self.vfs.all_vols]
         else:
             vols = [vols]
 

@@ -11,7 +11,6 @@ class ExceptionalQueue(Queue, object):
     def get(self, block=True, timeout=None):
         rv = super(ExceptionalQueue, self).get(block, timeout)
 
-        # TODO: how expensive is this?
         if isinstance(rv, list):
             if rv[0] == "exception":
                 if rv[1] == "pebkac":

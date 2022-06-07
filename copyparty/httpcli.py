@@ -532,7 +532,6 @@ class HttpCli(object):
             return self.handle_post_multipart()
 
         if "text/plain" in ctype or "application/xml" in ctype:
-            # TODO this will be intredasting
             return self.handle_post_json()
 
         if "application/octet-stream" in ctype:

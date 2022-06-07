@@ -6,7 +6,14 @@ import sys
 import stat
 import time
 import logging
+import argparse
 import threading
+
+from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
+from pyftpdlib.filesystems import AbstractedFS, FilesystemError
+from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.servers import FTPServer
+from pyftpdlib.log import config_logging
 
 from .__init__ import E, PY2
 from .util import Pebkac, fsenc, exclude_dotfiles
@@ -19,12 +26,6 @@ except ImportError:
     print("loading asynchat from " + p)
     sys.path.append(p)
     from pyftpdlib.ioloop import IOLoop
-
-from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
-from pyftpdlib.filesystems import AbstractedFS, FilesystemError
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
-from pyftpdlib.log import config_logging
 
 
 try:
@@ -154,7 +155,7 @@ class FtpFs(AbstractedFS):
 
             vfs_ls.sort()
             return vfs_ls
-        except Exception as ex:
+        except:
             if vpath:
                 # display write-only folders as empty
                 return []
@@ -266,6 +267,9 @@ class FtpHandler(FTPHandler):
         else:
             super(FtpHandler, self).__init__(conn, server, ioloop)
 
+        self.hub = None  # type: SvcHub
+        self.args = None  # type: argparse.Namespace
+
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map = {}
 
@@ -278,7 +282,7 @@ class FtpHandler(FTPHandler):
         # print("ftp_STOR: {} {} OK".format(vp, mode))
         return ret
 
-    def log_transfer(self, cmd, filename, receive, completed, elapsed, bytes):
+    def log_transfer(self, cmd, filename, receive, completed, elapsed, nbytes):
         ap = filename.decode("utf-8", "replace")
         vp = self.vfs_map.pop(ap, None)
         # print("xfer_end: {} => {}".format(ap, vp))
@@ -298,7 +302,7 @@ class FtpHandler(FTPHandler):
             )
 
         return FTPHandler.log_transfer(
-            self, cmd, filename, receive, completed, elapsed, bytes
+            self, cmd, filename, receive, completed, elapsed, nbytes
         )
 
 

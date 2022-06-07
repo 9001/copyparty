@@ -8,7 +8,7 @@ import threading
 from .broker_util import ExceptionalQueue
 from .httpsrv import HttpSrv
 from .util import FAKE_MP
-from copyparty.authsrv import AuthSrv
+from .authsrv import AuthSrv
 
 
 class MpWorker(object):

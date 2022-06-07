@@ -25,8 +25,9 @@ import hashlib
 import argparse
 import platform
 import threading
-import requests
 import datetime
+
+import requests
 
 
 # from copyparty/__init__.py
@@ -150,13 +151,11 @@ if not VT100:
 
 
 def termsize():
-    import os
-
     env = os.environ
 
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct, os
+            import fcntl, termios, struct
 
             cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
         except:
@@ -360,7 +359,7 @@ def get_hashlist(file, pcb):
 
 
 def handshake(req_ses, url, file, pw, search):
-    # type: (requests.Session, str, File, any, bool) -> List[str]
+    # type: (requests.Session, str, File, any, bool) -> list[str]
     """
     performs a handshake with the server; reply is:
       if search, a list of search results
@@ -491,11 +490,34 @@ class Ctl(object):
 
         self.filegen = walkdirs([], ar.files)
         if ar.safe:
-            self.safe()
+            self._safe()
         else:
-            self.fancy()
+            self.hash_f = 0
+            self.hash_c = 0
+            self.hash_b = 0
+            self.up_f = 0
+            self.up_c = 0
+            self.up_b = 0
+            self.up_br = 0
+            self.hasher_busy = 1
+            self.handshaker_busy = 0
+            self.uploader_busy = 0
 
-    def safe(self):
+            self.t0 = time.time()
+            self.t0_up = None
+            self.spd = None
+
+            self.mutex = threading.Lock()
+            self.q_handshake = Queue()  # type: Queue[File]
+            self.q_recheck = Queue()  # type: Queue[File]  # partial upload exists [...]
+            self.q_upload = Queue()  # type: Queue[tuple[File, str]]
+
+            self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
+            self.st_up = [None, "(idle, starting...)"]  # type: tuple[File, int]
+
+            self._fancy()
+
+    def _safe(self):
         """minimal basic slow boring fallback codepath"""
         search = self.ar.s
         for nf, (top, rel, inf) in enumerate(self.filegen):
@@ -529,29 +551,7 @@ class Ctl(object):
 
             print("  ok!")
 
-    def fancy(self):
-        self.hash_f = 0
-        self.hash_c = 0
-        self.hash_b = 0
-        self.up_f = 0
-        self.up_c = 0
-        self.up_b = 0
-        self.up_br = 0
-        self.hasher_busy = 1
-        self.handshaker_busy = 0
-        self.uploader_busy = 0
-
-        self.t0 = time.time()
-        self.t0_up = None
-        self.spd = None
-
-        self.mutex = threading.Lock()
-        self.q_handshake = Queue()  # type: Queue[File]
-        self.q_recheck = Queue()  # type: Queue[File]  # partial upload exists [...]
-        self.q_upload = Queue()  # type: Queue[tuple[File, str]]
-
-        self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
-        self.st_up = [None, "(idle, starting...)"]  # type: tuple[File, int]
+    def _fancy(self):
         if VT100:
             atexit.register(self.cleanup_vt100)
             ss.scroll_region(3)
@@ -619,7 +619,7 @@ class Ctl(object):
             tail = "\033[K\033[u" if VT100 else "\r"
 
             m = "{0} eta @ {1}/s, {2}, {3}# left".format(eta, spd, sleft, nleft)
-            eprint(txt + "\033]0;{0}\033\\\r{1}{2}".format(m, m, tail))
+            eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(m, tail))
 
     def cleanup_vt100(self):
         ss.scroll_region(None)
