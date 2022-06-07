@@ -10,6 +10,7 @@ import base64
 import select
 import struct
 import signal
+import socket
 import hashlib
 import platform
 import traceback
@@ -188,13 +189,18 @@ class Cooldown(object):
             return ret
 
 
+class UnrecvEOF(OSError):
+    pass
+
+
 class _Unrecv(object):
     """
     undo any number of socket recv ops
     """
 
-    def __init__(self, s):
-        self.s = s
+    def __init__(self, s, log):
+        self.s = s  # type: socket.socket
+        self.log = log
         self.buf = b""
 
     def recv(self, nbytes):
@@ -203,20 +209,27 @@ class _Unrecv(object):
             self.buf = self.buf[nbytes:]
             return ret
 
-        try:
-            return self.s.recv(nbytes)
-        except:
-            return b""
+        ret = self.s.recv(nbytes)
+        if not ret:
+            raise UnrecvEOF("client stopped sending data")
 
-    def recv_ex(self, nbytes):
+        return ret
+
+    def recv_ex(self, nbytes, raise_on_trunc=True):
         """read an exact number of bytes"""
-        ret = self.recv(nbytes)
-        while ret and len(ret) < nbytes:
-            buf = self.recv(nbytes - len(ret))
-            if not buf:
-                break
+        ret = b""
+        try:
+            while nbytes > len(ret):
+                ret += self.recv(nbytes - len(ret))
+        except OSError:
+            m = "client only sent {} of {} expected bytes".format(len(ret), nbytes)
+            if len(ret) <= 16:
+                m += "; got {!r}".format(ret)
 
-            ret += buf
+            if raise_on_trunc:
+                raise UnrecvEOF(5, m)
+            elif self.log:
+                self.log(m, 3)
 
         return ret
 
@@ -229,42 +242,55 @@ class _LUnrecv(object):
     with expensive debug logging
     """
 
-    def __init__(self, s):
+    def __init__(self, s, log):
         self.s = s
+        self.log = log
         self.buf = b""
 
     def recv(self, nbytes):
         if self.buf:
             ret = self.buf[:nbytes]
             self.buf = self.buf[nbytes:]
-            m = "\033[0;7mur:pop:\033[0;1;32m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m\n"
-            print(m.format(ret, self.buf), end="")
+            m = "\033[0;7mur:pop:\033[0;1;32m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m"
+            self.log(m.format(ret, self.buf))
             return ret
 
-        try:
-            ret = self.s.recv(nbytes)
-            m = "\033[0;7mur:recv\033[0;1;33m {}\033[0m\n"
-            print(m.format(ret), end="")
-            return ret
-        except:
-            return b""
+        ret = self.s.recv(nbytes)
+        m = "\033[0;7mur:recv\033[0;1;33m {}\033[0m"
+        self.log(m.format(ret))
+        if not ret:
+            raise UnrecvEOF("client stopped sending data")
 
-    def recv_ex(self, nbytes):
+        return ret
+
+    def recv_ex(self, nbytes, raise_on_trunc=True):
         """read an exact number of bytes"""
-        ret = self.recv(nbytes)
-        while ret and len(ret) < nbytes:
-            buf = self.recv(nbytes - len(ret))
-            if not buf:
-                break
+        try:
+            ret = self.recv(nbytes)
+            err = False
+        except:
+            ret = b""
+            err = True
 
-            ret += buf
+        while not err and len(ret) < nbytes:
+            try:
+                ret += self.recv(nbytes - len(ret))
+            except OSError:
+                err = True
+
+        if err:
+            m = "client only sent {} of {} expected bytes".format(len(ret), nbytes)
+            if raise_on_trunc:
+                raise UnrecvEOF(m)
+            elif self.log:
+                self.log(m, 3)
 
         return ret
 
     def unrecv(self, buf):
         self.buf = buf + self.buf
-        m = "\033[0;7mur:push\033[0;1;31m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m\n"
-        print(m.format(buf, self.buf), end="")
+        m = "\033[0;7mur:push\033[0;1;31m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m"
+        self.log(m.format(buf, self.buf))
 
 
 Unrecv = _Unrecv
@@ -577,7 +603,7 @@ def ren_open(fname, *args, **kwargs):
 
 class MultipartParser(object):
     def __init__(self, log_func, sr, http_headers):
-        self.sr = sr
+        self.sr = sr  # type: Unrecv
         self.log = log_func
         self.headers = http_headers
 
@@ -670,8 +696,9 @@ class MultipartParser(object):
         blen = len(self.boundary)
         bufsz = 32 * 1024
         while True:
-            buf = self.sr.recv(bufsz)
-            if not buf:
+            try:
+                buf = self.sr.recv(bufsz)
+            except:
                 # abort: client disconnected
                 raise Pebkac(400, "client d/c during multipart post")
 
@@ -704,12 +731,11 @@ class MultipartParser(object):
                     yield buf[:-n]
                     return
 
-                buf2 = self.sr.recv(bufsz)
-                if not buf2:
+                try:
+                    buf += self.sr.recv(bufsz)
+                except:
                     # abort: client disconnected
                     raise Pebkac(400, "client d/c during multipart post")
-
-                buf += buf2
 
             yield buf
 
@@ -723,11 +749,11 @@ class MultipartParser(object):
             fieldname, filename = self._read_header()
             yield [fieldname, filename, self._read_data()]
 
-            tail = self.sr.recv_ex(2)
+            tail = self.sr.recv_ex(2, False)
 
             if tail == b"--":
                 # EOF indicated by this immediately after final boundary
-                tail = self.sr.recv_ex(2)
+                tail = self.sr.recv_ex(2, False)
                 run = False
 
             if tail != b"\r\n":
@@ -793,8 +819,9 @@ def get_boundary(headers):
 def read_header(sr):
     ret = b""
     while True:
-        buf = sr.recv(1024)
-        if not buf:
+        try:
+            ret += sr.recv(1024)
+        except:
             if not ret:
                 return None
 
@@ -804,7 +831,6 @@ def read_header(sr):
                 + ret.decode("utf-8", "replace"),
             )
 
-        ret += buf
         ofs = ret.find(b"\r\n\r\n")
         if ofs < 0:
             if len(ret) > 1024 * 64:
@@ -1111,8 +1137,9 @@ def read_socket(sr, total_size):
         if bufsz > remains:
             bufsz = remains
 
-        buf = sr.recv(bufsz)
-        if not buf:
+        try:
+            buf = sr.recv(bufsz)
+        except OSError:
             m = "client d/c during binary post after {} bytes, {} bytes remaining"
             raise Pebkac(400, m.format(total_size - remains, remains))
 
@@ -1121,25 +1148,25 @@ def read_socket(sr, total_size):
 
 
 def read_socket_unbounded(sr):
-    while True:
-        buf = sr.recv(32 * 1024)
-        if not buf:
-            return
-
-        yield buf
+    try:
+        while True:
+            yield sr.recv(32 * 1024)
+    except:
+        return
 
 
 def read_socket_chunked(sr, log=None):
-    err = "expected chunk length, got [{}] |{}| instead"
+    err = "upload aborted: expected chunk length, got [{}] |{}| instead"
     while True:
         buf = b""
         while b"\r" not in buf:
-            rbuf = sr.recv(2)
-            if not rbuf or len(buf) > 16:
+            try:
+                buf += sr.recv(2)
+                if len(buf) > 16:
+                    raise Exception()
+            except:
                 err = err.format(buf.decode("utf-8", "replace"), len(buf))
                 raise Pebkac(400, err)
-
-            buf += rbuf
 
         if not buf.endswith(b"\n"):
             sr.recv(1)
@@ -1151,7 +1178,7 @@ def read_socket_chunked(sr, log=None):
             raise Pebkac(400, err)
 
         if chunklen == 0:
-            x = sr.recv_ex(2)
+            x = sr.recv_ex(2, False)
             if x == b"\r\n":
                 return
 
@@ -1164,7 +1191,7 @@ def read_socket_chunked(sr, log=None):
         for chunk in read_socket(sr, chunklen):
             yield chunk
 
-        x = sr.recv_ex(2)
+        x = sr.recv_ex(2, False)
         if x != b"\r\n":
             m = "protocol error in chunk separator: want b'\\r\\n', got {!r}"
             raise Pebkac(400, m.format(x))

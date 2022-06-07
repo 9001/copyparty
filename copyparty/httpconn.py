@@ -30,6 +30,7 @@ class HttpConn(object):
 
     def __init__(self, sck, addr, hsrv):
         self.s = sck
+        self.sr = None  # Type: Unrecv
         self.addr = addr
         self.hsrv = hsrv
 
@@ -95,7 +96,7 @@ class HttpConn(object):
             except AttributeError:
                 # jython does not support msg_peek; forget about https
                 method = self.s.recv(4)
-                self.sr = Unrecv(self.s)
+                self.sr = Unrecv(self.s, self.log)
                 self.sr.buf = method
 
                 # jython used to do this, they stopped since it's broken
@@ -182,7 +183,7 @@ class HttpConn(object):
                 return
 
         if not self.sr:
-            self.sr = Unrecv(self.s)
+            self.sr = Unrecv(self.s, self.log)
 
         while not self.stopping:
             self.nreq += 1

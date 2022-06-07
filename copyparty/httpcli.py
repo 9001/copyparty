@@ -784,9 +784,10 @@ class HttpCli(object):
         if "charset" in ctype:
             enc = ctype.split("charset")[1].strip(" =").split(";")[0].strip()
 
-        json_buf = b""
-        while len(json_buf) < remains:
-            json_buf += self.sr.recv(32 * 1024)
+        try:
+            json_buf = self.sr.recv_ex(remains)
+        except UnrecvEOF:
+            raise Pebkac(422, "client disconnected while posting JSON")
 
         self.log("decoding {} bytes of {} json".format(len(json_buf), enc))
         try:
@@ -1201,7 +1202,7 @@ class HttpCli(object):
 
         status = "OK"
         if errmsg:
-            self.log(errmsg)
+            self.log(errmsg, 3)
             status = "ERROR"
 
         msg = "{} // {} bytes // {:.3f} MiB/s\n".format(status, sz_total, spd)

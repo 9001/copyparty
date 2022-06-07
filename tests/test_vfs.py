@@ -36,6 +36,7 @@ class Cfg(Namespace):
             "rsp_slp": 0,
             "s_wr_slp": 0,
             "s_wr_sz": 512 * 1024,
+            "lang": "eng",
             "theme": 0,
             "themes": 0,
             "turbo": 0,

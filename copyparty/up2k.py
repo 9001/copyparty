@@ -1460,7 +1460,7 @@ class Up2k(object):
             fs2 = bos.stat(os.path.dirname(dst)).st_dev
             if fs1 == 0 or fs2 == 0:
                 # py2 on winxp or other unsupported combination
-                raise OSError()
+                raise OSError(38, "filesystem does not have st_dev")
             elif fs1 == fs2:
                 # same fs; make symlink as relative as possible
                 v = []

@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2021-11-28, v0.13, ed <irc.rizon.net>, MIT-Licensed
+2022-06-07, v0.14, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -614,10 +614,11 @@ class Ctl(object):
 
             spd = humansize(spd)
             eta = str(datetime.timedelta(seconds=int(eta)))
-            left = humansize(self.nbytes - self.up_b)
+            sleft = humansize(self.nbytes - self.up_b)
+            nleft = self.nfiles - self.up_f
             tail = "\033[K\033[u" if VT100 else "\r"
 
-            m = "eta: {0} @ {1}/s, {2} left".format(eta, spd, left)
+            m = "{0} eta @ {1}/s, {2}, {3}# left".format(eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{1}{2}".format(m, m, tail))
 
     def cleanup_vt100(self):

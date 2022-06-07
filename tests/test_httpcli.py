@@ -56,6 +56,7 @@ class Cfg(Namespace):
             textfiles="",
             doctitle="",
             html_head="",
+            lang="eng",
             theme=0,
             themes=0,
             turbo=0,
