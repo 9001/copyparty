@@ -21,16 +21,16 @@ import subprocess as sp  # nosec
 from datetime import datetime
 from collections import Counter
 
-from .__init__ import PY2, WINDOWS, ANYWIN, VT100, unicode
+from .__init__ import PY2, WINDOWS, ANYWIN, VT100
 from .stolen import surrogateescape
 
 FAKE_MP = False
 
 try:
     if FAKE_MP:
-        import multiprocessing.dummy as mp  # noqa: F401
+        import multiprocessing.dummy as mp  # noqa: F401  # pylint: disable=unused-import
     else:
-        import multiprocessing as mp  # noqa: F401
+        import multiprocessing as mp  # noqa: F401  # pylint: disable=unused-import
 except ImportError:
     # support jython
     mp = None
@@ -38,13 +38,13 @@ except ImportError:
 if not PY2:
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
-    from queue import Queue
-    from io import BytesIO
+    from queue import Queue  # pylint: disable=unused-import
+    from io import BytesIO  # pylint: disable=unused-import
 else:
     from urllib import unquote  # pylint: disable=no-name-in-module
     from urllib import quote  # pylint: disable=no-name-in-module
     from Queue import Queue  # pylint: disable=import-error,no-name-in-module
-    from StringIO import StringIO as BytesIO
+    from StringIO import StringIO as BytesIO  # pylint: disable=unused-import
 
 
 try:
@@ -114,16 +114,22 @@ MIMES = {
     "m4a": "audio/mp4",
     "jpg": "image/jpeg",
 }
-for ln in """text css html csv
+
+
+def _add_mimes():
+    for ln in """text css html csv
 application json wasm xml pdf rtf zip
 image webp jpeg png gif bmp
 audio aac ogg wav
 video webm mp4 mpeg
 font woff woff2 otf ttf
 """.splitlines():
-    k, vs = ln.split(" ", 1)
-    for v in vs.strip().split():
-        MIMES[v] = "{}/{}".format(k, v)
+        k, vs = ln.split(" ", 1)
+        for v in vs.strip().split():
+            MIMES[v] = "{}/{}".format(k, v)
+
+
+_add_mimes()
 
 
 REKOBO_KEY = {
@@ -175,8 +181,8 @@ class Cooldown(object):
             now = time.time()
 
             ret = False
-            v = self.hist.get(key, 0)
-            if now - v > self.maxage:
+            pv = self.hist.get(key, 0)
+            if now - pv > self.maxage:
                 self.hist[key] = now
                 ret = True
 
@@ -395,7 +401,7 @@ def nuprint(msg):
 def rice_tid():
     tid = threading.current_thread().ident
     c = sunpack(b"B" * 5, spack(b">Q", tid)[-5:])
-    return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c) + "\033[0m"
+    return "".join("\033[1;37;48;5;{0}m{0:02x}".format(x) for x in c) + "\033[0m"
 
 
 def trace(*args, **kwargs):
@@ -615,6 +621,9 @@ class MultipartParser(object):
         self.re_cdisp_file = re.compile(
             r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
         )
+
+        self.boundary = None
+        self.gen = None
 
     def _read_header(self):
         """
@@ -1101,17 +1110,17 @@ def s3enc(mem_cur, rd, fn):
             ret.append(v)
         except:
             ret.append("//" + w8b64enc(v))
-            # self.log("mojien/{} [{}] {}".format(k, v, ret[-1][2:]))
+            # self.log("mojien [{}] {}".format(v, ret[-1][2:]))
 
     return tuple(ret)
 
 
 def s3dec(rd, fn):
     ret = []
-    for k, v in [["d", rd], ["f", fn]]:
+    for v in [rd, fn]:
         if v.startswith("//"):
             ret.append(w8b64dec(v[2:]))
-            # self.log("mojide/{} [{}] {}".format(k, ret[-1], v[2:]))
+            # self.log("mojide [{}] {}".format(ret[-1], v[2:]))
         else:
             ret.append(v)
 

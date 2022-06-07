@@ -22,7 +22,6 @@ from .util import (
     Queue,
     ProgressPrinter,
     SYMTIME,
-    fsdec,
     fsenc,
     absreal,
     sanitize_fn,
@@ -948,7 +947,7 @@ class Up2k(object):
                     in_progress.pop(w)
                     n_done += 1
 
-                for w in to_delete.keys():
+                for w in to_delete:
                     q = "delete from mt where w = ? and +k = 't:mtp'"
                     cur.execute(q, (w,))
 

@@ -38,6 +38,8 @@ class U2idx(object):
             self.log("your python does not have sqlite3; searching will be disabled")
             return
 
+        self.active_id = None
+        self.active_cur = None
         self.cur = {}
         self.mem_cur = sqlite3.connect(":memory:")
         self.mem_cur.execute(r"create table a (b text)")

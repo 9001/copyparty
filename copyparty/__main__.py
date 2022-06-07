@@ -32,7 +32,7 @@ try:
 except:
     HAVE_SSL = False
 
-printed = ""
+printed = []
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -65,10 +65,8 @@ class Dodge11874(RiceFormatter):
 
 
 def lprint(*a, **ka):
-    global printed
-
     txt = " ".join(unicode(x) for x in a) + ka.get("end", "\n")
-    printed += txt
+    printed.append(txt)
     if not VT100:
         txt = ansi_re.sub("", txt)
 
@@ -722,7 +720,7 @@ def main(argv=None):
 
     # signal.signal(signal.SIGINT, sighandler)
 
-    SvcHub(al, argv, printed).run()
+    SvcHub(al, argv, "".join(printed)).run()
 
 
 if __name__ == "__main__":

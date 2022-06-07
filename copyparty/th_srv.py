@@ -9,7 +9,6 @@ import hashlib
 import threading
 import subprocess as sp
 
-from .__init__ import PY2, unicode
 from .util import fsenc, vsplit, statdir, runcmd, Queue, Cooldown, BytesIO, min_ex
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
@@ -39,7 +38,7 @@ try:
         pass
 
     try:
-        import pillow_avif
+        import pillow_avif  # noqa: F401  # pylint: disable=unused-import
 
         HAVE_AVIF = True
     except:
@@ -398,7 +397,7 @@ class ThumbSrv(object):
 
     def _run_ff(self, cmd):
         # self.log((b" ".join(cmd)).decode("utf-8"))
-        ret, sout, serr = runcmd(cmd, timeout=self.args.th_convt)
+        ret, _, serr = runcmd(cmd, timeout=self.args.th_convt)
         if not ret:
             return
 
@@ -583,7 +582,7 @@ class ThumbSrv(object):
                 if age > maxage:
                     with self.mutex:
                         safe = True
-                        for k in self.busy.keys():
+                        for k in self.busy:
                             if k.lower().replace("\\", "/").startswith(cmp):
                                 safe = False
                                 break

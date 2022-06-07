@@ -160,15 +160,15 @@ class TcpSrv(object):
                 continue
 
             if ln == ln.lstrip():
-                dev = re.split(r'[: ]', ln)[0]
+                dev = re.split(r"[: ]", ln)[0]
 
-            if "UP" in re.split(r'[<>, \t]', ln):
+            if "UP" in re.split(r"[<>, \t]", ln):
                 up = True
-            
-            m = re.match(r'^\s+inet\s+([^ ]+)', ln)
+
+            m = re.match(r"^\s+inet\s+([^ ]+)", ln)
             if m:
                 ip = m.group(1)
-        
+
         return eps
 
     def ips_linux(self):
