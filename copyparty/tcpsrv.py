@@ -142,16 +142,45 @@ class TcpSrv(object):
 
         self.log("tcpsrv", "ok bye")
 
-    def ips_linux(self):
+    def ips_linux_ifconfig(self):
+        # for termux
+        try:
+            txt, _ = chkcmd(["ifconfig"])
+        except:
+            return {}
+
         eps = {}
+        dev = None
+        ip = None
+        up = None
+        for ln in (txt + "\n").split("\n"):
+            if not ln.strip() and dev and ip:
+                eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
+                dev = ip = up = None
+                continue
+
+            if ln == ln.lstrip():
+                dev = re.split(r'[: ]', ln)[0]
+
+            if "UP" in re.split(r'[<>, \t]', ln):
+                up = True
+            
+            m = re.match(r'^\s+inet\s+([^ ]+)', ln)
+            if m:
+                ip = m.group(1)
+        
+        return eps
+
+    def ips_linux(self):
         try:
             txt, _ = chkcmd(["ip", "addr"])
         except:
-            return eps
+            return self.ips_linux_ifconfig()
 
         r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
         ri = re.compile(r"^\s*[0-9]+\s*:.*")
         up = False
+        eps = {}
         for ln in txt.split("\n"):
             if ri.match(ln):
                 up = "UP" in re.split("[>,< ]", ln)
