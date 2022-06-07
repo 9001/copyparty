@@ -3288,9 +3288,10 @@ var showfile = (function () {
 		for (var a = 0; a < src.length; a++) {
 			var m = /^([0-9;]+)m/.exec(src[a]);
 			if (!m) {
-				if (a || src[a])
-					out.push('\x1b[' + src[a]);
+				if (a)
+					out.push('\x1b[');
 
+				out.push(src[a]);
 				continue;
 			}
 
