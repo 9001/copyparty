@@ -2128,7 +2128,11 @@ class Up2k(object):
         if not histpath:
             return
 
-        rm = [x for x in reg.values() if now - x["poke"] > self.snap_discard_interval]
+        rm = [
+            x
+            for x in reg.values()
+            if x["need"] and now - x["poke"] > self.snap_discard_interval
+        ]
         if rm:
             m = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
             vis = [self._vis_job_progress(x) for x in rm]
