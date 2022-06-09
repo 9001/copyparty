@@ -493,7 +493,7 @@ class MTag(object):
 
                 cmd = [fsenc(x) for x in cmd]
                 rc, v, err = runcmd(cmd, **args)
-                retchk(rc, cmd, err, self.log, 5)
+                retchk(rc, cmd, err, self.log, 5, self.args.mtag_v)
                 v = v.strip()
                 if not v:
                     continue

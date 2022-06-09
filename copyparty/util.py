@@ -1423,11 +1423,11 @@ def mchkcmd(argv, timeout=10):
         raise sp.CalledProcessError(rv, (argv[0], b"...", argv[-1]))
 
 
-def retchk(rc, cmd, serr, logger=None, color=None):
+def retchk(rc, cmd, serr, logger=None, color=None, verbose=False):
     if rc < 0:
         rc = 128 - rc
 
-    if rc < 126:
+    if not rc or rc < 126 and not verbose:
         return
 
     s = None
@@ -1440,6 +1440,8 @@ def retchk(rc, cmd, serr, logger=None, color=None):
         s = "invalid program"
     elif rc == 127:
         s = "program not found"
+    elif verbose:
+        s = "unknown"
     else:
         s = "invalid retcode"
 
