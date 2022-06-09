@@ -1700,6 +1700,14 @@ function prev_song(e) {
 
 	return song_skip(-1);
 }
+function dl_song() {
+	if (!mp || !mp.au)
+		return;
+
+	var url = mp.tracks[mp.au.tid];
+	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+	dl_file(url);
+}
 
 
 function playpause(e) {
@@ -3942,6 +3950,9 @@ document.onkeydown = function (e) {
 	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
 	if (n !== 0)
 		return seek_au_rel(n) || true;
+
+	if (k == 'KeyY')
+		return dl_song();
 
 	n = k == 'KeyI' ? -1 : k == 'KeyK' ? 1 : 0;
 	if (n !== 0)

@@ -815,6 +815,14 @@ function sethash(hv) {
     }
 }
 
+function dl_file(url) {
+    console.log('DL [%s]', url);
+    var o = mknod('a');
+    o.setAttribute('href', url);
+    o.setAttribute('download', '');
+    o.click();
+}
+
 
 var timer = (function () {
     var r = {};

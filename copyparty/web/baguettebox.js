@@ -284,6 +284,8 @@ window.baguetteBox = (function () {
             tglsel();
         else if (k == "KeyR")
             rotn(e.shiftKey ? -1 : 1);
+        else if (k == "KeyY")
+            dlpic();
     }
 
     function anim() {
@@ -342,17 +344,27 @@ window.baguetteBox = (function () {
             tt.show.bind(this)();
     }
 
-    function tglsel() {
+    function findfile() {
         var thumb = currentGallery[currentIndex].imageElement,
             name = vsplit(thumb.href)[1].split('?')[0],
             files = msel.getall();
 
         for (var a = 0; a < files.length; a++)
             if (vsplit(files[a].vp)[1] == name)
-                clmod(ebi(files[a].id).closest('tr'), 'sel', 't');
+                return [name, a, files, ebi(files[a].id)];
+    }
 
+    function tglsel() {
+        var o = findfile()[3];
+        clmod(o.closest('tr'), 'sel', 't');
         msel.selui();
         selbg();
+    }
+
+    function dlpic() {
+        var url = findfile()[3].href;
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache';
+        dl_file(url);
     }
 
     function selbg() {
