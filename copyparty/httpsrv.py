@@ -70,12 +70,6 @@ class HttpSrv(object):
         self.cb_ts = 0
         self.cb_v = 0
 
-        try:
-            x = self.broker.put(True, "thumbsrv.getcfg")
-            self.th_cfg = x.get()
-        except:
-            pass
-
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
         self.j2 = {
@@ -99,6 +93,18 @@ class HttpSrv(object):
 
             if self.args.log_thrs:
                 start_log_thrs(self.log, self.args.log_thrs, nid)
+
+        self.th_cfg = {}  # type: dict[str, Any]
+        t = threading.Thread(target=self.post_init)
+        t.daemon = True
+        t.start()
+
+    def post_init(self):
+        try:
+            x = self.broker.put(True, "thumbsrv.getcfg")
+            self.th_cfg = x.get()
+        except:
+            pass
 
     def start_threads(self, n):
         self.tp_nthr += n

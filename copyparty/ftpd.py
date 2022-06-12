@@ -173,12 +173,8 @@ class FtpFs(AbstractedFS):
             raise FilesystemError("the delete feature is disabled in server config")
 
         vp = join(self.cwd, path).lstrip("/")
-        x = self.hub.broker.put(
-            True, "up2k.handle_rm", self.uname, self.h.remote_ip, [vp]
-        )
-
         try:
-            x.get()
+            self.hub.up2k.handle_rm(self.uname, self.h.remote_ip, [vp])
         except Exception as ex:
             raise FilesystemError(str(ex))
 
@@ -192,9 +188,8 @@ class FtpFs(AbstractedFS):
 
         svp = join(self.cwd, src).lstrip("/")
         dvp = join(self.cwd, dst).lstrip("/")
-        x = self.hub.broker.put(True, "up2k.handle_mv", self.uname, svp, dvp)
         try:
-            x.get()
+            self.hub.up2k.handle_mv(self.uname, svp, dvp)
         except Exception as ex:
             raise FilesystemError(str(ex))
 
@@ -260,15 +255,17 @@ class FtpFs(AbstractedFS):
 
 class FtpHandler(FTPHandler):
     abstracted_fs = FtpFs
+    hub = None  # type: SvcHub
+    args = None  # type: argparse.Namespace
 
     def __init__(self, conn, server, ioloop=None):
+        self.hub = FtpHandler.hub  # type: SvcHub
+        self.args = FtpHandler.args  # type: argparse.Namespace
+
         if PY2:
             FTPHandler.__init__(self, conn, server, ioloop)
         else:
             super(FtpHandler, self).__init__(conn, server, ioloop)
-
-        self.hub = None  # type: SvcHub
-        self.args = None  # type: argparse.Namespace
 
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map = {}
@@ -282,7 +279,7 @@ class FtpHandler(FTPHandler):
         # print("ftp_STOR: {} {} OK".format(vp, mode))
         return ret
 
-    def log_transfer(self, cmd, filename, receive, completed, elapsed, nbytes):
+    def log_transfer(self, cmd, filename, receive, completed, elapsed, bytes):
         ap = filename.decode("utf-8", "replace")
         vp = self.vfs_map.pop(ap, None)
         # print("xfer_end: {} => {}".format(ap, vp))
@@ -290,9 +287,7 @@ class FtpHandler(FTPHandler):
             vp, fn = os.path.split(vp)
             vfs, rem = self.hub.asrv.vfs.get(vp, self.username, False, True)
             vfs, rem = vfs.get_dbv(rem)
-            self.hub.broker.put(
-                False,
-                "up2k.hash_file",
+            self.hub.up2k.hash_file(
                 vfs.realpath,
                 vfs.flags,
                 rem,
@@ -302,7 +297,7 @@ class FtpHandler(FTPHandler):
             )
 
         return FTPHandler.log_transfer(
-            self, cmd, filename, receive, completed, elapsed, nbytes
+            self, cmd, filename, receive, completed, elapsed, bytes
         )
 
 
