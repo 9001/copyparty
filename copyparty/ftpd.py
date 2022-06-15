@@ -1,23 +1,23 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
-import sys
-import stat
-import time
-import logging
 import argparse
+import logging
+import os
+import stat
+import sys
 import threading
+import time
 
-from pyftpdlib.authorizers import DummyAuthorizer, AuthenticationFailed
+from pyftpdlib.authorizers import AuthenticationFailed, DummyAuthorizer
 from pyftpdlib.filesystems import AbstractedFS, FilesystemError
 from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
 from pyftpdlib.log import config_logging
+from pyftpdlib.servers import FTPServer
 
-from .__init__ import E, PY2
-from .util import Pebkac, fsenc, exclude_dotfiles
+from .__init__ import PY2, TYPE_CHECKING, E
 from .bos import bos
+from .util import Pebkac, exclude_dotfiles, fsenc
 
 try:
     from pyftpdlib.ioloop import IOLoop
@@ -28,58 +28,63 @@ except ImportError:
     from pyftpdlib.ioloop import IOLoop
 
 
-try:
-    from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .svchub import SvcHub
 
-    if TYPE_CHECKING:
-        from .svchub import SvcHub
-except ImportError:
+try:
+    import typing
+    from typing import Any, Optional
+except:
     pass
 
 
 class FtpAuth(DummyAuthorizer):
-    def __init__(self):
+    def __init__(self, hub: "SvcHub") -> None:
         super(FtpAuth, self).__init__()
-        self.hub = None  # type: SvcHub
+        self.hub = hub
 
-    def validate_authentication(self, username, password, handler):
+    def validate_authentication(
+        self, username: str, password: str, handler: Any
+    ) -> None:
         asrv = self.hub.asrv
         if username == "anonymous":
             password = ""
 
         uname = "*"
         if password:
-            uname = asrv.iacct.get(password, None)
+            uname = asrv.iacct.get(password, "")
 
         handler.username = uname
 
         if password and not uname:
             raise AuthenticationFailed("Authentication failed.")
 
-    def get_home_dir(self, username):
+    def get_home_dir(self, username: str) -> str:
         return "/"
 
-    def has_user(self, username):
+    def has_user(self, username: str) -> bool:
         asrv = self.hub.asrv
         return username in asrv.acct
 
-    def has_perm(self, username, perm, path=None):
+    def has_perm(self, username: str, perm: int, path: Optional[str] = None) -> bool:
         return True  # handled at filesystem layer
 
-    def get_perms(self, username):
+    def get_perms(self, username: str) -> str:
         return "elradfmwMT"
 
-    def get_msg_login(self, username):
+    def get_msg_login(self, username: str) -> str:
         return "sup {}".format(username)
 
-    def get_msg_quit(self, username):
+    def get_msg_quit(self, username: str) -> str:
         return "cya"
 
 
 class FtpFs(AbstractedFS):
-    def __init__(self, root, cmd_channel):
+    def __init__(
+        self, root: str, cmd_channel: Any
+    ) -> None:  # pylint: disable=super-init-not-called
         self.h = self.cmd_channel = cmd_channel  # type: FTPHandler
-        self.hub = cmd_channel.hub  # type: SvcHub
+        self.hub: "SvcHub" = cmd_channel.hub
         self.args = cmd_channel.args
 
         self.uname = self.hub.asrv.iacct.get(cmd_channel.password, "*")
@@ -90,7 +95,14 @@ class FtpFs(AbstractedFS):
         self.listdirinfo = self.listdir
         self.chdir(".")
 
-    def v2a(self, vpath, r=False, w=False, m=False, d=False):
+    def v2a(
+        self,
+        vpath: str,
+        r: bool = False,
+        w: bool = False,
+        m: bool = False,
+        d: bool = False,
+    ) -> str:
         try:
             vpath = vpath.replace("\\", "/").lstrip("/")
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
@@ -101,25 +113,32 @@ class FtpFs(AbstractedFS):
         except Pebkac as ex:
             raise FilesystemError(str(ex))
 
-    def rv2a(self, vpath, r=False, w=False, m=False, d=False):
+    def rv2a(
+        self,
+        vpath: str,
+        r: bool = False,
+        w: bool = False,
+        m: bool = False,
+        d: bool = False,
+    ) -> str:
         return self.v2a(os.path.join(self.cwd, vpath), r, w, m, d)
 
-    def ftp2fs(self, ftppath):
+    def ftp2fs(self, ftppath: str) -> str:
         # return self.v2a(ftppath)
         return ftppath  # self.cwd must be vpath
 
-    def fs2ftp(self, fspath):
+    def fs2ftp(self, fspath: str) -> str:
         # raise NotImplementedError()
         return fspath
 
-    def validpath(self, path):
+    def validpath(self, path: str) -> bool:
         if "/.hist/" in path:
             if "/up2k." in path or path.endswith("/dir.txt"):
                 raise FilesystemError("access to this file is forbidden")
 
         return True
 
-    def open(self, filename, mode):
+    def open(self, filename: str, mode: str) -> typing.IO[Any]:
         r = "r" in mode
         w = "w" in mode or "a" in mode or "+" in mode
 
@@ -130,24 +149,24 @@ class FtpFs(AbstractedFS):
         self.validpath(ap)
         return open(fsenc(ap), mode)
 
-    def chdir(self, path):
+    def chdir(self, path: str) -> None:
         self.cwd = join(self.cwd, path)
         x = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.username)
         self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
 
-    def mkdir(self, path):
+    def mkdir(self, path: str) -> None:
         ap = self.rv2a(path, w=True)
         bos.mkdir(ap)
 
-    def listdir(self, path):
+    def listdir(self, path: str) -> list[str]:
         vpath = join(self.cwd, path).lstrip("/")
         try:
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, True, False)
 
-            fsroot, vfs_ls, vfs_virt = vfs.ls(
+            fsroot, vfs_ls1, vfs_virt = vfs.ls(
                 rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
             )
-            vfs_ls = [x[0] for x in vfs_ls]
+            vfs_ls = [x[0] for x in vfs_ls1]
             vfs_ls.extend(vfs_virt.keys())
 
             if not self.args.ed:
@@ -164,11 +183,11 @@ class FtpFs(AbstractedFS):
             r = {x.split("/")[0]: 1 for x in self.hub.asrv.vfs.all_vols.keys()}
             return list(sorted(list(r.keys())))
 
-    def rmdir(self, path):
+    def rmdir(self, path: str) -> None:
         ap = self.rv2a(path, d=True)
         bos.rmdir(ap)
 
-    def remove(self, path):
+    def remove(self, path: str) -> None:
         if self.args.no_del:
             raise FilesystemError("the delete feature is disabled in server config")
 
@@ -178,13 +197,13 @@ class FtpFs(AbstractedFS):
         except Exception as ex:
             raise FilesystemError(str(ex))
 
-    def rename(self, src, dst):
+    def rename(self, src: str, dst: str) -> None:
         if not self.can_move:
             raise FilesystemError("not allowed for user " + self.h.username)
 
         if self.args.no_mv:
-            m = "the rename/move feature is disabled in server config"
-            raise FilesystemError(m)
+            t = "the rename/move feature is disabled in server config"
+            raise FilesystemError(t)
 
         svp = join(self.cwd, src).lstrip("/")
         dvp = join(self.cwd, dst).lstrip("/")
@@ -193,10 +212,10 @@ class FtpFs(AbstractedFS):
         except Exception as ex:
             raise FilesystemError(str(ex))
 
-    def chmod(self, path, mode):
+    def chmod(self, path: str, mode: str) -> None:
         pass
 
-    def stat(self, path):
+    def stat(self, path: str) -> os.stat_result:
         try:
             ap = self.rv2a(path, r=True)
             return bos.stat(ap)
@@ -208,59 +227,59 @@ class FtpFs(AbstractedFS):
 
             return st
 
-    def utime(self, path, timeval):
+    def utime(self, path: str, timeval: float) -> None:
         ap = self.rv2a(path, w=True)
         return bos.utime(ap, (timeval, timeval))
 
-    def lstat(self, path):
+    def lstat(self, path: str) -> os.stat_result:
         ap = self.rv2a(path)
         return bos.lstat(ap)
 
-    def isfile(self, path):
+    def isfile(self, path: str) -> bool:
         st = self.stat(path)
         return stat.S_ISREG(st.st_mode)
 
-    def islink(self, path):
+    def islink(self, path: str) -> bool:
         ap = self.rv2a(path)
         return bos.path.islink(ap)
 
-    def isdir(self, path):
+    def isdir(self, path: str) -> bool:
         try:
             st = self.stat(path)
             return stat.S_ISDIR(st.st_mode)
         except:
             return True
 
-    def getsize(self, path):
+    def getsize(self, path: str) -> int:
         ap = self.rv2a(path)
         return bos.path.getsize(ap)
 
-    def getmtime(self, path):
+    def getmtime(self, path: str) -> float:
         ap = self.rv2a(path)
         return bos.path.getmtime(ap)
 
-    def realpath(self, path):
+    def realpath(self, path: str) -> str:
         return path
 
-    def lexists(self, path):
+    def lexists(self, path: str) -> bool:
         ap = self.rv2a(path)
         return bos.path.lexists(ap)
 
-    def get_user_by_uid(self, uid):
+    def get_user_by_uid(self, uid: int) -> str:
         return "root"
 
-    def get_group_by_uid(self, gid):
+    def get_group_by_uid(self, gid: int) -> str:
         return "root"
 
 
 class FtpHandler(FTPHandler):
     abstracted_fs = FtpFs
-    hub = None  # type: SvcHub
-    args = None  # type: argparse.Namespace
+    hub: "SvcHub" = None
+    args: argparse.Namespace = None
 
-    def __init__(self, conn, server, ioloop=None):
-        self.hub = FtpHandler.hub  # type: SvcHub
-        self.args = FtpHandler.args  # type: argparse.Namespace
+    def __init__(self, conn: Any, server: Any, ioloop: Any = None) -> None:
+        self.hub: "SvcHub" = FtpHandler.hub
+        self.args: argparse.Namespace = FtpHandler.args
 
         if PY2:
             FTPHandler.__init__(self, conn, server, ioloop)
@@ -268,9 +287,10 @@ class FtpHandler(FTPHandler):
             super(FtpHandler, self).__init__(conn, server, ioloop)
 
         # abspath->vpath mapping to resolve log_transfer paths
-        self.vfs_map = {}
+        self.vfs_map: dict[str, str] = {}
 
-    def ftp_STOR(self, file, mode="w"):
+    def ftp_STOR(self, file: str, mode: str = "w") -> Any:
+        # Optional[str]
         vp = join(self.fs.cwd, file).lstrip("/")
         ap = self.fs.v2a(vp)
         self.vfs_map[ap] = vp
@@ -279,7 +299,16 @@ class FtpHandler(FTPHandler):
         # print("ftp_STOR: {} {} OK".format(vp, mode))
         return ret
 
-    def log_transfer(self, cmd, filename, receive, completed, elapsed, bytes):
+    def log_transfer(
+        self,
+        cmd: str,
+        filename: bytes,
+        receive: bool,
+        completed: bool,
+        elapsed: float,
+        bytes: int,
+    ) -> Any:
+        # None
         ap = filename.decode("utf-8", "replace")
         vp = self.vfs_map.pop(ap, None)
         # print("xfer_end: {} => {}".format(ap, vp))
@@ -312,7 +341,7 @@ except:
 
 
 class Ftpd(object):
-    def __init__(self, hub):
+    def __init__(self, hub: "SvcHub") -> None:
         self.hub = hub
         self.args = hub.args
 
@@ -321,24 +350,23 @@ class Ftpd(object):
             hs.append([FtpHandler, self.args.ftp])
         if self.args.ftps:
             try:
-                h = SftpHandler
+                h1 = SftpHandler
             except:
-                m = "\nftps requires pyopenssl;\nplease run the following:\n\n  {} -m pip install --user pyopenssl\n"
-                print(m.format(sys.executable))
+                t = "\nftps requires pyopenssl;\nplease run the following:\n\n  {} -m pip install --user pyopenssl\n"
+                print(t.format(sys.executable))
                 sys.exit(1)
 
-            h.certfile = os.path.join(E.cfg, "cert.pem")
-            h.tls_control_required = True
-            h.tls_data_required = True
+            h1.certfile = os.path.join(E.cfg, "cert.pem")
+            h1.tls_control_required = True
+            h1.tls_data_required = True
 
-            hs.append([h, self.args.ftps])
+            hs.append([h1, self.args.ftps])
 
-        for h in hs:
-            h, lp = h
-            h.hub = hub
-            h.args = hub.args
-            h.authorizer = FtpAuth()
-            h.authorizer.hub = hub
+        for h_lp in hs:
+            h2, lp = h_lp
+            h2.hub = hub
+            h2.args = hub.args
+            h2.authorizer = FtpAuth(hub)
 
             if self.args.ftp_pr:
                 p1, p2 = [int(x) for x in self.args.ftp_pr.split("-")]
@@ -350,10 +378,10 @@ class Ftpd(object):
                     else:
                         p1 += d + 1
 
-                h.passive_ports = list(range(p1, p2 + 1))
+                h2.passive_ports = list(range(p1, p2 + 1))
 
             if self.args.ftp_nat:
-                h.masquerade_address = self.args.ftp_nat
+                h2.masquerade_address = self.args.ftp_nat
 
         if self.args.ftp_dbg:
             config_logging(level=logging.DEBUG)
@@ -363,11 +391,11 @@ class Ftpd(object):
             for h, lp in hs:
                 FTPServer((ip, int(lp)), h, ioloop)
 
-        t = threading.Thread(target=ioloop.loop)
-        t.daemon = True
-        t.start()
+        thr = threading.Thread(target=ioloop.loop)
+        thr.daemon = True
+        thr.start()
 
 
-def join(p1, p2):
+def join(p1: str, p2: str) -> str:
     w = os.path.join(p1, p2.replace("\\", "/"))
     return os.path.normpath(w).replace("\\", "/")

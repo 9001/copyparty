@@ -85,7 +85,7 @@ class TestVFS(unittest.TestCase):
         pass
 
     def assertAxs(self, dct, lst):
-        t1 = list(sorted(dct.keys()))
+        t1 = list(sorted(dct))
         t2 = list(sorted(lst))
         self.assertEqual(t1, t2)
 
@@ -208,10 +208,10 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(n.realpath, os.path.join(td, "a"))
         self.assertAxs(n.axs.uread, ["*"])
         self.assertAxs(n.axs.uwrite, [])
-        self.assertEqual(vfs.can_access("/", "*"), [False, False, False, False, False])
-        self.assertEqual(vfs.can_access("/", "k"), [True, True, False, False, False])
-        self.assertEqual(vfs.can_access("/a", "*"), [True, False, False, False, False])
-        self.assertEqual(vfs.can_access("/a", "k"), [True, False, False, False, False])
+        self.assertEqual(vfs.can_access("/", "*"), (False, False, False, False, False))
+        self.assertEqual(vfs.can_access("/", "k"), (True, True, False, False, False))
+        self.assertEqual(vfs.can_access("/a", "*"), (True, False, False, False, False))
+        self.assertEqual(vfs.can_access("/a", "k"), (True, False, False, False, False))
 
         # breadth-first construction
         vfs = AuthSrv(
@@ -279,7 +279,7 @@ class TestVFS(unittest.TestCase):
         n = au.vfs
         # root was not defined, so PWD with no access to anyone
         self.assertEqual(n.vpath, "")
-        self.assertEqual(n.realpath, None)
+        self.assertEqual(n.realpath, "")
         self.assertAxs(n.axs.uread, [])
         self.assertAxs(n.axs.uwrite, [])
         self.assertEqual(len(n.nodes), 1)

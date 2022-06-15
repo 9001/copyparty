@@ -1,21 +1,30 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import platform
-import time
-import sys
 import os
+import platform
+import sys
+import time
+
+try:
+    from collections.abc import Callable
+
+    from typing import TYPE_CHECKING, Any
+except:
+    TYPE_CHECKING = False
 
 PY2 = sys.version_info[0] == 2
 if PY2:
     sys.dont_write_bytecode = True
-    unicode = unicode
+    unicode = unicode  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
 else:
     unicode = str
 
-WINDOWS = False
-if platform.system() == "Windows":
-    WINDOWS = [int(x) for x in platform.version().split(".")]
+WINDOWS: Any = (
+    [int(x) for x in platform.version().split(".")]
+    if platform.system() == "Windows"
+    else False
+)
 
 VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
 # introduced in anniversary update
@@ -25,8 +34,8 @@ ANYWIN = WINDOWS or sys.platform in ["msys"]
 MACOS = platform.system() == "Darwin"
 
 
-def get_unixdir():
-    paths = [
+def get_unixdir() -> str:
+    paths: list[tuple[Callable[..., str], str]] = [
         (os.environ.get, "XDG_CONFIG_HOME"),
         (os.path.expanduser, "~/.config"),
         (os.environ.get, "TMPDIR"),
@@ -43,7 +52,7 @@ def get_unixdir():
                     continue
 
                 p = os.path.normpath(p)
-                chk(p)
+                chk(p)  # type: ignore
                 p = os.path.join(p, "copyparty")
                 if not os.path.isdir(p):
                     os.mkdir(p)
@@ -56,7 +65,7 @@ def get_unixdir():
 
 
 class EnvParams(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self.t0 = time.time()
         self.mod = os.path.dirname(os.path.realpath(__file__))
         if self.mod.endswith("__init__"):

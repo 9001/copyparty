@@ -12,23 +12,28 @@ Original source: misc/python/surrogateescape.py in https://bitbucket.org/haypo/m
 
 # This code is released under the Python license and the BSD 2-clause license
 
-import platform
 import codecs
+import platform
 import sys
 
 PY3 = sys.version_info[0] > 2
 WINDOWS = platform.system() == "Windows"
 FS_ERRORS = "surrogateescape"
 
+try:
+    from typing import Any
+except:
+    pass
 
-def u(text):
+
+def u(text: Any) -> str:
     if PY3:
         return text
     else:
         return text.decode("unicode_escape")
 
 
-def b(data):
+def b(data: Any) -> bytes:
     if PY3:
         return data.encode("latin1")
     else:
@@ -43,7 +48,7 @@ else:
     bytes_chr = chr
 
 
-def surrogateescape_handler(exc):
+def surrogateescape_handler(exc: Any) -> tuple[str, int]:
     """
     Pure Python implementation of the PEP 383: the "surrogateescape" error
     handler of Python 3. Undecodable bytes will be replaced by a Unicode
@@ -74,7 +79,7 @@ class NotASurrogateError(Exception):
     pass
 
 
-def replace_surrogate_encode(mystring):
+def replace_surrogate_encode(mystring: str) -> str:
     """
     Returns a (unicode) string, not the more logical bytes, because the codecs
     register_error functionality expects this.
@@ -100,7 +105,7 @@ def replace_surrogate_encode(mystring):
     return str().join(decoded)
 
 
-def replace_surrogate_decode(mybytes):
+def replace_surrogate_decode(mybytes: bytes) -> str:
     """
     Returns a (unicode) string
     """
@@ -121,7 +126,7 @@ def replace_surrogate_decode(mybytes):
     return str().join(decoded)
 
 
-def encodefilename(fn):
+def encodefilename(fn: str) -> bytes:
     if FS_ENCODING == "ascii":
         # ASCII encoder of Python 2 expects that the error handler returns a
         # Unicode string encodable to ASCII, whereas our surrogateescape error
@@ -161,7 +166,7 @@ def encodefilename(fn):
         return fn.encode(FS_ENCODING, FS_ERRORS)
 
 
-def decodefilename(fn):
+def decodefilename(fn: bytes) -> str:
     return fn.decode(FS_ENCODING, FS_ERRORS)
 
 
@@ -181,7 +186,7 @@ if WINDOWS and not PY3:
 FS_ENCODING = codecs.lookup(FS_ENCODING).name
 
 
-def register_surrogateescape():
+def register_surrogateescape() -> None:
     """
     Registers the surrogateescape error handler on Python 2 (only)
     """

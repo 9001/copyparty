@@ -8,35 +8,42 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
-import re
-import os
-import sys
-import time
-import shutil
+import argparse
 import filecmp
 import locale
-import argparse
+import os
+import re
+import shutil
+import sys
 import threading
+import time
 import traceback
 from textwrap import dedent
 
-from .__init__ import E, WINDOWS, ANYWIN, VT100, PY2, unicode
-from .__version__ import S_VERSION, S_BUILD_DT, CODENAME
-from .svchub import SvcHub
-from .util import py_desc, align_tab, IMPLICATIONS, ansi_re, min_ex
+from .__init__ import ANYWIN, PY2, VT100, WINDOWS, E, unicode
+from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import re_vol
+from .svchub import SvcHub
+from .util import IMPLICATIONS, align_tab, ansi_re, min_ex, py_desc
 
-HAVE_SSL = True
 try:
+    from types import FrameType
+
+    from typing import Any, Optional
+except:
+    pass
+
+try:
+    HAVE_SSL = True
     import ssl
 except:
     HAVE_SSL = False
 
-printed = []
+printed: list[str] = []
 
 
 class RiceFormatter(argparse.HelpFormatter):
-    def _get_help_string(self, action):
+    def _get_help_string(self, action: argparse.Action) -> str:
         """
         same as ArgumentDefaultsHelpFormatter(HelpFormatter)
         except the help += [...] line now has colors
@@ -45,27 +52,27 @@ class RiceFormatter(argparse.HelpFormatter):
         if not VT100:
             fmt = " (default: %(default)s)"
 
-        ret = action.help
-        if "%(default)" not in action.help:
+        ret = str(action.help)
+        if "%(default)" not in ret:
             if action.default is not argparse.SUPPRESS:
                 defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
                 if action.option_strings or action.nargs in defaulting_nargs:
                     ret += fmt
         return ret
 
-    def _fill_text(self, text, width, indent):
+    def _fill_text(self, text: str, width: int, indent: str) -> str:
         """same as RawDescriptionHelpFormatter(HelpFormatter)"""
         return "".join(indent + line + "\n" for line in text.splitlines())
 
 
 class Dodge11874(RiceFormatter):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs["width"] = 9003
         super(Dodge11874, self).__init__(*args, **kwargs)
 
 
-def lprint(*a, **ka):
-    txt = " ".join(unicode(x) for x in a) + ka.get("end", "\n")
+def lprint(*a: Any, **ka: Any) -> None:
+    txt: str = " ".join(unicode(x) for x in a) + ka.get("end", "\n")
     printed.append(txt)
     if not VT100:
         txt = ansi_re.sub("", txt)
@@ -73,11 +80,11 @@ def lprint(*a, **ka):
     print(txt, **ka)
 
 
-def warn(msg):
+def warn(msg: str) -> None:
     lprint("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
 
 
-def ensure_locale():
+def ensure_locale() -> None:
     for x in [
         "en_US.UTF-8",
         "English_United States.UTF8",
@@ -91,7 +98,7 @@ def ensure_locale():
             continue
 
 
-def ensure_cert():
+def ensure_cert() -> None:
     """
     the default cert (and the entire TLS support) is only here to enable the
     crypto.subtle javascript API, which is necessary due to the webkit guys
@@ -117,8 +124,8 @@ def ensure_cert():
     # printf 'NO\n.\n.\n.\n.\ncopyparty-insecure\n.\n' | faketime '2000-01-01 00:00:00' openssl req -x509 -sha256 -newkey rsa:2048 -keyout insecure.pem -out insecure.pem -days $((($(printf %d 0x7fffffff)-$(date +%s --date=2000-01-01T00:00:00Z))/(60*60*24))) -nodes && ls -al insecure.pem && openssl x509 -in insecure.pem -text -noout
 
 
-def configure_ssl_ver(al):
-    def terse_sslver(txt):
+def configure_ssl_ver(al: argparse.Namespace) -> None:
+    def terse_sslver(txt: str) -> str:
         txt = txt.lower()
         for c in ["_", "v", "."]:
             txt = txt.replace(c, "")
@@ -133,8 +140,8 @@ def configure_ssl_ver(al):
     flags = [k for k in ssl.__dict__ if ptn.match(k)]
     # SSLv2 SSLv3 TLSv1 TLSv1_1 TLSv1_2 TLSv1_3
     if "help" in sslver:
-        avail = [terse_sslver(x[6:]) for x in flags]
-        avail = " ".join(sorted(avail) + ["all"])
+        avail1 = [terse_sslver(x[6:]) for x in flags]
+        avail = " ".join(sorted(avail1) + ["all"])
         lprint("\navailable ssl/tls versions:\n  " + avail)
         sys.exit(0)
 
@@ -160,7 +167,7 @@ def configure_ssl_ver(al):
     # think i need that beer now
 
 
-def configure_ssl_ciphers(al):
+def configure_ssl_ciphers(al: argparse.Namespace) -> None:
     ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     if al.ssl_ver:
         ctx.options &= ~al.ssl_flags_en
@@ -184,8 +191,8 @@ def configure_ssl_ciphers(al):
         sys.exit(0)
 
 
-def args_from_cfg(cfg_path):
-    ret = []
+def args_from_cfg(cfg_path: str) -> list[str]:
+    ret: list[str] = []
     skip = False
     with open(cfg_path, "rb") as f:
         for ln in [x.decode("utf-8").strip() for x in f]:
@@ -210,29 +217,30 @@ def args_from_cfg(cfg_path):
     return ret
 
 
-def sighandler(sig=None, frame=None):
+def sighandler(sig: Optional[int] = None, frame: Optional[FrameType] = None) -> None:
     msg = [""] * 5
     for th in threading.enumerate():
+        stk = sys._current_frames()[th.ident]  # type: ignore
         msg.append(str(th))
-        msg.extend(traceback.format_stack(sys._current_frames()[th.ident]))
+        msg.extend(traceback.format_stack(stk))
 
     msg.append("\n")
     print("\n".join(msg))
 
 
-def disable_quickedit():
-    import ctypes
+def disable_quickedit() -> None:
     import atexit
+    import ctypes
     from ctypes import wintypes
 
-    def ecb(ok, fun, args):
+    def ecb(ok: bool, fun: Any, args: list[Any]) -> list[Any]:
         if not ok:
-            err = ctypes.get_last_error()
+            err: int = ctypes.get_last_error()  # type: ignore
             if err:
-                raise ctypes.WinError(err)
+                raise ctypes.WinError(err)  # type: ignore
         return args
 
-    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore
     if PY2:
         wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
 
@@ -242,14 +250,14 @@ def disable_quickedit():
     k32.GetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.LPDWORD)
     k32.SetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.DWORD)
 
-    def cmode(out, mode=None):
+    def cmode(out: bool, mode: Optional[int] = None) -> int:
         h = k32.GetStdHandle(-11 if out else -10)
         if mode:
-            return k32.SetConsoleMode(h, mode)
+            return k32.SetConsoleMode(h, mode)  # type: ignore
 
-        mode = wintypes.DWORD()
-        k32.GetConsoleMode(h, ctypes.byref(mode))
-        return mode.value
+        cmode = wintypes.DWORD()
+        k32.GetConsoleMode(h, ctypes.byref(cmode))
+        return cmode.value
 
     # disable quickedit
     mode = orig_in = cmode(False)
@@ -268,7 +276,7 @@ def disable_quickedit():
             cmode(True, mode | 4)
 
 
-def run_argparse(argv, formatter):
+def run_argparse(argv: list[str], formatter: Any) -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
         prog="copyparty",
@@ -596,7 +604,7 @@ def run_argparse(argv, formatter):
     return ret
 
 
-def main(argv=None):
+def main(argv: Optional[list[str]] = None) -> None:
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
         os.system("rem")  # enables colors
@@ -618,7 +626,7 @@ def main(argv=None):
             supp = args_from_cfg(v)
             argv.extend(supp)
 
-    deprecated = []
+    deprecated: list[tuple[str, str]] = []
     for dk, nk in deprecated:
         try:
             idx = argv.index(dk)
@@ -650,7 +658,7 @@ def main(argv=None):
     if not VT100:
         al.wintitle = ""
 
-    nstrs = []
+    nstrs: list[str] = []
     anymod = False
     for ostr in al.v or []:
         m = re_vol.match(ostr)

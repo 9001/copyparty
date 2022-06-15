@@ -1,28 +1,28 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import hashlib
+import argparse  # typechk
 import colorsys
+import hashlib
 
 from .__init__ import PY2
 
 
 class Ico(object):
-    def __init__(self, args):
+    def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
 
-    def get(self, ext, as_thumb):
+    def get(self, ext: str, as_thumb: bool) -> tuple[str, bytes]:
         """placeholder to make thumbnails not break"""
 
-        h = hashlib.md5(ext.encode("utf-8")).digest()[:2]
+        zb = hashlib.md5(ext.encode("utf-8")).digest()[:2]
         if PY2:
-            h = [ord(x) for x in h]
+            zb = [ord(x) for x in zb]
 
-        c1 = colorsys.hsv_to_rgb(h[0] / 256.0, 1, 0.3)
-        c2 = colorsys.hsv_to_rgb(h[0] / 256.0, 1, 1)
-        c = list(c1) + list(c2)
-        c = [int(x * 255) for x in c]
-        c = "".join(["{:02x}".format(x) for x in c])
+        c1 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 0.3)
+        c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 1)
+        ci = [int(x * 255) for x in list(c1) + list(c2)]
+        c = "".join(["{:02x}".format(x) for x in ci])
 
         h = 30
         if not self.args.th_no_crop and as_thumb:
@@ -37,6 +37,6 @@ class Ico(object):
   fill="#{}" font-family="monospace" font-size="14px" style="letter-spacing:.5px">{}</text>
 </g></svg>
 """
-        svg = svg.format(h, c[:6], c[6:], ext).encode("utf-8")
+        svg = svg.format(h, c[:6], c[6:], ext)
 
-        return ["image/svg+xml", svg]
+        return "image/svg+xml", svg.encode("utf-8")

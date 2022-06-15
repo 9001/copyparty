@@ -1,16 +1,23 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import calendar
 import time
 import zlib
-import calendar
 
-from .sutil import errdesc
-from .util import yieldfile, sanitize_fn, spack, sunpack, min_ex
 from .bos import bos
+from .sutil import StreamArc, errdesc
+from .util import min_ex, sanitize_fn, spack, sunpack, yieldfile
+
+try:
+    from typing import Any, Generator, Optional
+
+    from .util import NamedLogger
+except:
+    pass
 
 
-def dostime2unix(buf):
+def dostime2unix(buf: bytes) -> int:
     t, d = sunpack(b"<HH", buf)
 
     ts = (t & 0x1F) * 2
@@ -29,7 +36,7 @@ def dostime2unix(buf):
     return int(calendar.timegm(dt))
 
 
-def unixtime2dos(ts):
+def unixtime2dos(ts: int) -> bytes:
     tt = time.gmtime(ts + 1)
     dy, dm, dd, th, tm, ts = list(tt)[:6]
 
@@ -41,14 +48,22 @@ def unixtime2dos(ts):
         return b"\x00\x00\x21\x00"
 
 
-def gen_fdesc(sz, crc32, z64):
+def gen_fdesc(sz: int, crc32: int, z64: bool) -> bytes:
     ret = b"\x50\x4b\x07\x08"
     fmt = b"<LQQ" if z64 else b"<LLL"
     ret += spack(fmt, crc32, sz, sz)
     return ret
 
 
-def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
+def gen_hdr(
+    h_pos: Optional[int],
+    fn: str,
+    sz: int,
+    lastmod: int,
+    utf8: bool,
+    icrc32: int,
+    pre_crc: bool,
+) -> bytes:
     """
     does regular file headers
     and the central directory meme if h_pos is set
@@ -67,8 +82,8 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     # confusingly this doesn't bump if h_pos
     req_ver = b"\x2d\x00" if z64 else b"\x0a\x00"
 
-    if crc32:
-        crc32 = spack(b"<L", crc32)
+    if icrc32:
+        crc32 = spack(b"<L", icrc32)
     else:
         crc32 = b"\x00" * 4
 
@@ -129,7 +144,9 @@ def gen_hdr(h_pos, fn, sz, lastmod, utf8, crc32, pre_crc):
     return ret
 
 
-def gen_ecdr(items, cdir_pos, cdir_end):
+def gen_ecdr(
+    items: list[tuple[str, int, int, int, int]], cdir_pos: int, cdir_end: int
+) -> tuple[bytes, bool]:
     """
     summary of all file headers,
     usually the zipfile footer unless something clamps
@@ -154,10 +171,12 @@ def gen_ecdr(items, cdir_pos, cdir_end):
     # 2b comment length
     ret += b"\x00\x00"
 
-    return [ret, need_64]
+    return ret, need_64
 
 
-def gen_ecdr64(items, cdir_pos, cdir_end):
+def gen_ecdr64(
+    items: list[tuple[str, int, int, int, int]], cdir_pos: int, cdir_end: int
+) -> bytes:
     """
     z64 end of central directory
     added when numfiles or a headerptr clamps
@@ -181,7 +200,7 @@ def gen_ecdr64(items, cdir_pos, cdir_end):
     return ret
 
 
-def gen_ecdr64_loc(ecdr64_pos):
+def gen_ecdr64_loc(ecdr64_pos: int) -> bytes:
     """
     z64 end of central directory locator
     points to ecdr64
@@ -196,21 +215,27 @@ def gen_ecdr64_loc(ecdr64_pos):
     return ret
 
 
-class StreamZip(object):
-    def __init__(self, log, fgen, utf8=False, pre_crc=False):
-        self.log = log
-        self.fgen = fgen
+class StreamZip(StreamArc):
+    def __init__(
+        self,
+        log: NamedLogger,
+        fgen: Generator[dict[str, Any], None, None],
+        utf8: bool = False,
+        pre_crc: bool = False,
+    ) -> None:
+        super(StreamZip, self).__init__(log, fgen)
+
         self.utf8 = utf8
         self.pre_crc = pre_crc
 
         self.pos = 0
-        self.items = []
+        self.items: list[tuple[str, int, int, int, int]] = []
 
-    def _ct(self, buf):
+    def _ct(self, buf: bytes) -> bytes:
         self.pos += len(buf)
         return buf
 
-    def ser(self, f):
+    def ser(self, f: dict[str, Any]) -> Generator[bytes, None, None]:
         name = f["vp"]
         src = f["ap"]
         st = f["st"]
@@ -218,9 +243,8 @@ class StreamZip(object):
         sz = st.st_size
         ts = st.st_mtime
 
-        crc = None
+        crc = 0
         if self.pre_crc:
-            crc = 0
             for buf in yieldfile(src):
                 crc = zlib.crc32(buf, crc)
 
@@ -230,7 +254,6 @@ class StreamZip(object):
         buf = gen_hdr(None, name, sz, ts, self.utf8, crc, self.pre_crc)
         yield self._ct(buf)
 
-        crc = crc or 0
         for buf in yieldfile(src):
             if not self.pre_crc:
                 crc = zlib.crc32(buf, crc)
@@ -239,7 +262,7 @@ class StreamZip(object):
 
         crc &= 0xFFFFFFFF
 
-        self.items.append([name, sz, ts, crc, h_pos])
+        self.items.append((name, sz, ts, crc, h_pos))
 
         z64 = sz >= 4 * 1024 * 1024 * 1024
 
@@ -247,11 +270,11 @@ class StreamZip(object):
             buf = gen_fdesc(sz, crc, z64)
             yield self._ct(buf)
 
-    def gen(self):
+    def gen(self) -> Generator[bytes, None, None]:
         errors = []
         for f in self.fgen:
             if "err" in f:
-                errors.append([f["vp"], f["err"]])
+                errors.append((f["vp"], f["err"]))
                 continue
 
             try:
@@ -259,7 +282,7 @@ class StreamZip(object):
                     yield x
             except:
                 ex = min_ex(5, True).replace("\n", "\n-- ")
-                errors.append([f["vp"], ex])
+                errors.append((f["vp"], ex))
 
         if errors:
             errf, txt = errdesc(errors)

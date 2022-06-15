@@ -76,7 +76,7 @@ while [ ! -z "$1" ]; do
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
-		fast)   zopf=100 ; ;;
+		fast)   zopf=    ; ;;
 		lang)   shift;langs="$1"; ;;
 		*)      help     ; ;;
 	esac
@@ -106,7 +106,7 @@ tmpdir="$(
 [ $repack ] && {
 	old="$tmpdir/pe-copyparty"
 	echo "repack of files in $old"
-	cp -pR "$old/"*{dep-j2,dep-ftp,copyparty} .
+	cp -pR "$old/"*{j2,ftp,copyparty} .
 }
 
 [ $repack ] || {
@@ -130,8 +130,8 @@ tmpdir="$(
 	mv MarkupSafe-*/src/markupsafe .
 	rm -rf MarkupSafe-* markupsafe/_speedups.c
 
-	mkdir dep-j2/
-	mv {markupsafe,jinja2} dep-j2/
+	mkdir j2/
+	mv {markupsafe,jinja2} j2/
 
 	echo collecting pyftpdlib
 	f="../build/pyftpdlib-1.5.6.tar.gz"
@@ -143,8 +143,8 @@ tmpdir="$(
 	mv pyftpdlib-release-*/pyftpdlib .
 	rm -rf pyftpdlib-release-* pyftpdlib/test
 
-	mkdir dep-ftp/
-	mv pyftpdlib dep-ftp/
+	mkdir ftp/
+	mv pyftpdlib ftp/
 
 	echo collecting asyncore, asynchat
 	for n in asyncore.py asynchat.py; do
@@ -153,6 +153,24 @@ tmpdir="$(
 			(url=https://raw.githubusercontent.com/python/cpython/c4d45ee670c09d4f6da709df072ec80cb7dfad22/Lib/$n;
 			wget -O$f "$url" || curl -L "$url" >$f)
 	done
+
+    # enable this to dynamically remove type hints at startup,
+    # in case a future python version can use them for performance
+	true || (
+		echo collecting strip-hints
+		f=../build/strip-hints-0.1.10.tar.gz
+		[ -e $f ] ||
+			(url=https://files.pythonhosted.org/packages/9c/d4/312ddce71ee10f7e0ab762afc027e07a918f1c0e1be5b0069db5b0e7542d/strip-hints-0.1.10.tar.gz;
+			wget -O$f "$url" || curl -L "$url" >$f)
+
+		tar -zxf $f
+		mv strip-hints-0.1.10/src/strip_hints .
+		rm -rf strip-hints-* strip_hints/import_hooks*
+		sed -ri 's/[a-z].* as import_hooks$/"""a"""/' strip_hints/*.py
+
+		cp -pR ../scripts/strip_hints/ .
+	)
+	cp -pR ../scripts/py2/ .
 
 	# msys2 tar is bad, make the best of it
 	echo collecting source
@@ -170,6 +188,9 @@ tmpdir="$(
 	for n in asyncore.py asynchat.py; do
 		awk 'NR<4||NR>27;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' ../build/$n >copyparty/vend/$n
 	done
+
+	# remove type hints before build instead
+	(cd copyparty; python3 ../../scripts/strip_hints/a.py; rm uh)
 }
 
 ver=
@@ -274,17 +295,23 @@ rm have
 		tmv "$f"
 	done
 
-[ $repack ] ||
-find | grep -E '\.py$' |
-  grep -vE '__version__' |
-  tr '\n' '\0' |
-  xargs -0 "$pybin" ../scripts/uncomment.py
+[ $repack ] || {
+	# uncomment
+	find | grep -E '\.py$' |
+		grep -vE '__version__' |
+		tr '\n' '\0' |
+		xargs -0 "$pybin" ../scripts/uncomment.py
 
-f=dep-j2/jinja2/constants.py
+	# py2-compat
+	#find | grep -E '\.py$' | while IFS= read -r x; do
+	#	sed -ri '/: TypeAlias = /d' "$x"; done
+}
+
+f=j2/jinja2/constants.py
 awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
 tmv "$f"
 
-grep -rLE '^#[^a-z]*coding: utf-8' dep-j2 |
+grep -rLE '^#[^a-z]*coding: utf-8' j2 |
 while IFS= read -r f; do
 	(echo "# coding: utf-8"; cat "$f") >t
 	tmv "$f"
@@ -313,7 +340,7 @@ find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 done
 
 gzres() {
-	command -v pigz &&
+	command -v pigz && [ $zopf ] &&
 		pk="pigz -11 -I $zopf" ||
 		pk='gzip'
 
@@ -354,7 +381,8 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 }
 [ $use_zdir ] && {
 	arcs=("$zdir"/arc.*)
-	arc="${arcs[$RANDOM % ${#arcs[@]} ] }"
+	n=$(( $RANDOM % ${#arcs[@]} ))
+	arc="${arcs[n]}"
 	echo "using $arc"
 	tar -xf "$arc"
 	for f in copyparty/web/*.gz; do
@@ -364,7 +392,7 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 
 
 echo gen tarlist
-for d in copyparty dep-j2 dep-ftp; do find $d -type f; done |
+for d in copyparty j2 ftp py2; do find $d -type f; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 

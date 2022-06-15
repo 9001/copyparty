@@ -72,6 +72,8 @@ def tc1(vflags):
     for _ in range(10):
         try:
             os.mkdir(td)
+            if os.path.exists(td):
+                break
         except:
             time.sleep(0.1)  # win10
 

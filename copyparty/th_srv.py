@@ -1,18 +1,28 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
-import time
-import shutil
 import base64
 import hashlib
-import threading
+import os
+import shutil
 import subprocess as sp
+import threading
+import time
 
-from .util import fsenc, vsplit, statdir, runcmd, Queue, Cooldown, BytesIO, min_ex
+from queue import Queue
+
+from .__init__ import TYPE_CHECKING
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
+from .util import BytesIO, Cooldown, fsenc, min_ex, runcmd, statdir, vsplit
 
+try:
+    from typing import Optional, Union
+except:
+    pass
+
+if TYPE_CHECKING:
+    from .svchub import SvcHub
 
 HAVE_PIL = False
 HAVE_HEIF = False
@@ -20,7 +30,7 @@ HAVE_AVIF = False
 HAVE_WEBP = False
 
 try:
-    from PIL import Image, ImageOps, ExifTags
+    from PIL import ExifTags, Image, ImageOps
 
     HAVE_PIL = True
     try:
@@ -47,14 +57,13 @@ except:
     pass
 
 try:
-    import pyvips
-
     HAVE_VIPS = True
+    import pyvips
 except:
     HAVE_VIPS = False
 
 
-def thumb_path(histpath, rem, mtime, fmt):
+def thumb_path(histpath: str, rem: str, mtime: float, fmt: str) -> str:
     # base16 = 16 = 256
     # b64-lc = 38 = 1444
     # base64 = 64 = 4096
@@ -80,7 +89,7 @@ def thumb_path(histpath, rem, mtime, fmt):
 
 
 class ThumbSrv(object):
-    def __init__(self, hub):
+    def __init__(self, hub: "SvcHub") -> None:
         self.hub = hub
         self.asrv = hub.asrv
         self.args = hub.args
@@ -91,17 +100,17 @@ class ThumbSrv(object):
         self.poke_cd = Cooldown(self.args.th_poke)
 
         self.mutex = threading.Lock()
-        self.busy = {}
+        self.busy: dict[str, list[threading.Condition]] = {}
         self.stopping = False
         self.nthr = max(1, self.args.th_mt)
 
-        self.q = Queue(self.nthr * 4)
+        self.q: Queue[Optional[tuple[str, str]]] = Queue(self.nthr * 4)
         for n in range(self.nthr):
-            t = threading.Thread(
+            thr = threading.Thread(
                 target=self.worker, name="thumb-{}-{}".format(n, self.nthr)
             )
-            t.daemon = True
-            t.start()
+            thr.daemon = True
+            thr.start()
 
         want_ff = not self.args.no_vthumb or not self.args.no_athumb
         if want_ff and (not HAVE_FFMPEG or not HAVE_FFPROBE):
@@ -122,7 +131,7 @@ class ThumbSrv(object):
             t.start()
 
         self.fmt_pil, self.fmt_vips, self.fmt_ffi, self.fmt_ffv, self.fmt_ffa = [
-            {x: True for x in y.split(",")}
+            set(y.split(","))
             for y in [
                 self.args.th_r_pil,
                 self.args.th_r_vips,
@@ -134,37 +143,37 @@ class ThumbSrv(object):
 
         if not HAVE_HEIF:
             for f in "heif heifs heic heics".split(" "):
-                self.fmt_pil.pop(f, None)
+                self.fmt_pil.discard(f)
 
         if not HAVE_AVIF:
             for f in "avif avifs".split(" "):
-                self.fmt_pil.pop(f, None)
+                self.fmt_pil.discard(f)
 
-        self.thumbable = {}
+        self.thumbable: set[str] = set()
 
         if "pil" in self.args.th_dec:
-            self.thumbable.update(self.fmt_pil)
+            self.thumbable |= self.fmt_pil
 
         if "vips" in self.args.th_dec:
-            self.thumbable.update(self.fmt_vips)
+            self.thumbable |= self.fmt_vips
 
         if "ff" in self.args.th_dec:
-            for t in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
-                self.thumbable.update(t)
+            for zss in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
+                self.thumbable |= zss
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("thumb", msg, c)
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         self.stopping = True
         for _ in range(self.nthr):
             self.q.put(None)
 
-    def stopped(self):
+    def stopped(self) -> bool:
         with self.mutex:
             return not self.nthr
 
-    def get(self, ptop, rem, mtime, fmt):
+    def get(self, ptop: str, rem: str, mtime: float, fmt: str) -> Optional[str]:
         histpath = self.asrv.vfs.histtab.get(ptop)
         if not histpath:
             self.log("no histpath for [{}]".format(ptop))
@@ -191,7 +200,7 @@ class ThumbSrv(object):
                 do_conv = True
 
         if do_conv:
-            self.q.put([abspath, tpath])
+            self.q.put((abspath, tpath))
             self.log("conv {} \033[0m{}".format(tpath, abspath), c=6)
 
         while not self.stopping:
@@ -212,7 +221,7 @@ class ThumbSrv(object):
 
         return None
 
-    def getcfg(self):
+    def getcfg(self) -> dict[str, set[str]]:
         return {
             "thumbable": self.thumbable,
             "pil": self.fmt_pil,
@@ -222,7 +231,7 @@ class ThumbSrv(object):
             "ffa": self.fmt_ffa,
         }
 
-    def worker(self):
+    def worker(self) -> None:
         while not self.stopping:
             task = self.q.get()
             if not task:
@@ -253,7 +262,7 @@ class ThumbSrv(object):
                 except:
                     msg = "{} could not create thumbnail of {}\n{}"
                     msg = msg.format(fun.__name__, abspath, min_ex())
-                    c = 1 if "<Signals.SIG" in msg else "1;30"
+                    c: Union[str, int] = 1 if "<Signals.SIG" in msg else "1;30"
                     self.log(msg, c)
                     with open(tpath, "wb") as _:
                         pass
@@ -269,7 +278,7 @@ class ThumbSrv(object):
         with self.mutex:
             self.nthr -= 1
 
-    def fancy_pillow(self, im):
+    def fancy_pillow(self, im: "Image.Image") -> "Image.Image":
         # exif_transpose is expensive (loads full image + unconditional copy)
         r = max(*self.res) * 2
         im.thumbnail((r, r), resample=Image.LANCZOS)
@@ -295,7 +304,7 @@ class ThumbSrv(object):
 
         return im
 
-    def conv_pil(self, abspath, tpath):
+    def conv_pil(self, abspath: str, tpath: str) -> None:
         with Image.open(fsenc(abspath)) as im:
             try:
                 im = self.fancy_pillow(im)
@@ -324,7 +333,7 @@ class ThumbSrv(object):
 
             im.save(tpath, **args)
 
-    def conv_vips(self, abspath, tpath):
+    def conv_vips(self, abspath: str, tpath: str) -> None:
         crops = ["centre", "none"]
         if self.args.th_no_crop:
             crops = ["none"]
@@ -342,18 +351,17 @@ class ThumbSrv(object):
 
         img.write_to_file(tpath, Q=40)
 
-    def conv_ffmpeg(self, abspath, tpath):
+    def conv_ffmpeg(self, abspath: str, tpath: str) -> None:
         ret, _ = ffprobe(abspath)
         if not ret:
             return
 
         ext = abspath.rsplit(".")[-1].lower()
         if ext in ["h264", "h265"] or ext in self.fmt_ffi:
-            seek = []
+            seek: list[bytes] = []
         else:
             dur = ret[".dur"][1] if ".dur" in ret else 4
-            seek = "{:.0f}".format(dur / 3)
-            seek = [b"-ss", seek.encode("utf-8")]
+            seek = [b"-ss", "{:.0f}".format(dur / 3).encode("utf-8")]
 
         scale = "scale={0}:{1}:force_original_aspect_ratio="
         if self.args.th_no_crop:
@@ -361,7 +369,7 @@ class ThumbSrv(object):
         else:
             scale += "increase,crop={0}:{1},setsar=1:1"
 
-        scale = scale.format(*list(self.res)).encode("utf-8")
+        bscale = scale.format(*list(self.res)).encode("utf-8")
         # fmt: off
         cmd = [
             b"ffmpeg",
@@ -373,7 +381,7 @@ class ThumbSrv(object):
         cmd += [
             b"-i", fsenc(abspath),
             b"-map", b"0:v:0",
-            b"-vf", scale,
+            b"-vf", bscale,
             b"-frames:v", b"1",
             b"-metadata:s:v:0", b"rotate=0",
         ]
@@ -395,14 +403,14 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd)
 
-    def _run_ff(self, cmd):
+    def _run_ff(self, cmd: list[bytes]) -> None:
         # self.log((b" ".join(cmd)).decode("utf-8"))
         ret, _, serr = runcmd(cmd, timeout=self.args.th_convt)
         if not ret:
             return
 
-        c = "1;30"
-        m = "FFmpeg failed (probably a corrupt video file):\n"
+        c: Union[str, int] = "1;30"
+        t = "FFmpeg failed (probably a corrupt video file):\n"
         if cmd[-1].lower().endswith(b".webp") and (
             "Error selecting an encoder" in serr
             or "Automatic encoder selection failed" in serr
@@ -410,14 +418,14 @@ class ThumbSrv(object):
             or "Please choose an encoder manually" in serr
         ):
             self.args.th_ff_jpg = True
-            m = "FFmpeg failed because it was compiled without libwebp; enabling --th-ff-jpg to force jpeg output:\n"
+            t = "FFmpeg failed because it was compiled without libwebp; enabling --th-ff-jpg to force jpeg output:\n"
             c = 1
 
         if (
             "Requested resampling engine is unavailable" in serr
             or "output pad on Parsed_aresample_" in serr
         ):
-            m = "FFmpeg failed because it was compiled without libsox; you must set --th-ff-swr to force swr resampling:\n"
+            t = "FFmpeg failed because it was compiled without libsox; you must set --th-ff-swr to force swr resampling:\n"
             c = 1
 
         lines = serr.strip("\n").split("\n")
@@ -428,10 +436,10 @@ class ThumbSrv(object):
         if len(txt) > 5000:
             txt = txt[:2500] + "...\nff: [...]\nff: ..." + txt[-2500:]
 
-        self.log(m + txt, c=c)
+        self.log(t + txt, c=c)
         raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
-    def conv_spec(self, abspath, tpath):
+    def conv_spec(self, abspath: str, tpath: str) -> None:
         ret, _ = ffprobe(abspath)
         if "ac" not in ret:
             raise Exception("not audio")
@@ -473,7 +481,7 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd)
 
-    def conv_opus(self, abspath, tpath):
+    def conv_opus(self, abspath: str, tpath: str) -> None:
         if self.args.no_acode:
             raise Exception("disabled in server config")
 
@@ -521,7 +529,7 @@ class ThumbSrv(object):
             # fmt: on
             self._run_ff(cmd)
 
-    def poke(self, tdir):
+    def poke(self, tdir: str) -> None:
         if not self.poke_cd.poke(tdir):
             return
 
@@ -533,7 +541,7 @@ class ThumbSrv(object):
         except:
             pass
 
-    def cleaner(self):
+    def cleaner(self) -> None:
         interval = self.args.th_clean
         while True:
             time.sleep(interval)
@@ -548,14 +556,14 @@ class ThumbSrv(object):
 
             self.log("\033[Jcln ok; rm {} dirs".format(ndirs))
 
-    def clean(self, histpath):
+    def clean(self, histpath: str) -> int:
         ret = 0
         for cat in ["th", "ac"]:
-            ret += self._clean(histpath, cat, None)
+            ret += self._clean(histpath, cat, "")
 
         return ret
 
-    def _clean(self, histpath, cat, thumbpath):
+    def _clean(self, histpath: str, cat: str, thumbpath: str) -> int:
         if not thumbpath:
             thumbpath = os.path.join(histpath, cat)
 
@@ -564,10 +572,10 @@ class ThumbSrv(object):
         maxage = getattr(self.args, cat + "_maxage")
         now = time.time()
         prev_b64 = None
-        prev_fp = None
+        prev_fp = ""
         try:
-            ents = statdir(self.log, not self.args.no_scandir, False, thumbpath)
-            ents = sorted(list(ents))
+            t1 = statdir(self.log_func, not self.args.no_scandir, False, thumbpath)
+            ents = sorted(list(t1))
         except:
             return 0
 

@@ -43,7 +43,6 @@ PS: this requires e2ts to be functional,
 
 import os
 import sys
-import time
 import filecmp
 import subprocess as sp
 

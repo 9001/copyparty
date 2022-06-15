@@ -379,8 +379,19 @@ def run(tmp, j2, ftp):
     t.daemon = True
     t.start()
 
-    ld = (("", ""), (j2, "dep-j2"), (ftp, "dep-ftp"))
+    ld = (("", ""), (j2, "j2"), (ftp, "ftp"), (not PY2, "py2"))
     ld = [os.path.join(tmp, b) for a, b in ld if not a]
+
+    # skip 1
+    # enable this to dynamically remove type hints at startup,
+    # in case a future python version can use them for performance
+    if sys.version_info < (3, 10) and False:
+        sys.path.insert(0, ld[0])
+
+        from strip_hints.a import uh
+
+        uh(tmp + "/copyparty")
+    # skip 0
 
     if any([re.match(r"^-.*j[0-9]", x) for x in sys.argv]):
         run_s(ld)

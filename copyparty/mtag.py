@@ -1,18 +1,26 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
-import sys
+import argparse
 import json
+import os
 import shutil
 import subprocess as sp
+import sys
 
 from .__init__ import PY2, WINDOWS, unicode
-from .util import fsenc, uncyg, runcmd, retchk, REKOBO_LKEY
 from .bos import bos
+from .util import REKOBO_LKEY, fsenc, retchk, runcmd, uncyg
+
+try:
+    from typing import Any, Union
+
+    from .util import RootLogger
+except:
+    pass
 
 
-def have_ff(cmd):
+def have_ff(cmd: str) -> bool:
     if PY2:
         print("# checking {}".format(cmd))
         cmd = (cmd + " -version").encode("ascii").split(b" ")
@@ -30,7 +38,7 @@ HAVE_FFPROBE = have_ff("ffprobe")
 
 
 class MParser(object):
-    def __init__(self, cmdline):
+    def __init__(self, cmdline: str) -> None:
         self.tag, args = cmdline.split("=", 1)
         self.tags = self.tag.split(",")
 
@@ -73,7 +81,9 @@ class MParser(object):
             raise Exception()
 
 
-def ffprobe(abspath, timeout=10):
+def ffprobe(
+    abspath: str, timeout: int = 10
+) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]]]:
     cmd = [
         b"ffprobe",
         b"-hide_banner",
@@ -87,15 +97,15 @@ def ffprobe(abspath, timeout=10):
     return parse_ffprobe(so)
 
 
-def parse_ffprobe(txt):
+def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]]]:
     """ffprobe -show_format -show_streams"""
     streams = []
     fmt = {}
     g = {}
     for ln in [x.rstrip("\r") for x in txt.split("\n")]:
         try:
-            k, v = ln.split("=", 1)
-            g[k] = v
+            sk, sv = ln.split("=", 1)
+            g[sk] = sv
             continue
         except:
             pass
@@ -109,8 +119,8 @@ def parse_ffprobe(txt):
             fmt = g
 
     streams = [fmt] + streams
-    ret = {}  # processed
-    md = {}  # raw tags
+    ret: dict[str, Any] = {}  # processed
+    md: dict[str, list[Any]] = {}  # raw tags
 
     is_audio = fmt.get("format_name") in ["mp3", "ogg", "flac", "wav"]
     if fmt.get("filename", "").split(".")[-1].lower() in ["m4a", "aac"]:
@@ -161,43 +171,43 @@ def parse_ffprobe(txt):
             kvm = [["duration", ".dur"], ["bit_rate", ".q"]]
 
         for sk, rk in kvm:
-            v = strm.get(sk)
-            if v is None:
+            v1 = strm.get(sk)
+            if v1 is None:
                 continue
 
             if rk.startswith("."):
                 try:
-                    v = float(v)
+                    zf = float(v1)
                     v2 = ret.get(rk)
-                    if v2 is None or v > v2:
-                        ret[rk] = v
+                    if v2 is None or zf > v2:
+                        ret[rk] = zf
                 except:
                     # sqlite doesnt care but the code below does
-                    if v not in ["N/A"]:
-                        ret[rk] = v
+                    if v1 not in ["N/A"]:
+                        ret[rk] = v1
             else:
-                ret[rk] = v
+                ret[rk] = v1
 
     if ret.get("vc") == "ansi":  # shellscript
         return {}, {}
 
     for strm in streams:
-        for k, v in strm.items():
-            if not k.startswith("TAG:"):
+        for sk, sv in strm.items():
+            if not sk.startswith("TAG:"):
                 continue
 
-            k = k[4:].strip()
-            v = v.strip()
-            if k and v and k not in md:
-                md[k] = [v]
+            sk = sk[4:].strip()
+            sv = sv.strip()
+            if sk and sv and sk not in md:
+                md[sk] = [sv]
 
-    for k in [".q", ".vq", ".aq"]:
-        if k in ret:
-            ret[k] /= 1000  # bit_rate=320000
+    for sk in [".q", ".vq", ".aq"]:
+        if sk in ret:
+            ret[sk] /= 1000  # bit_rate=320000
 
-    for k in [".q", ".vq", ".aq", ".resw", ".resh"]:
-        if k in ret:
-            ret[k] = int(ret[k])
+    for sk in [".q", ".vq", ".aq", ".resw", ".resh"]:
+        if sk in ret:
+            ret[sk] = int(ret[sk])
 
     if ".fps" in ret:
         fps = ret[".fps"]
@@ -219,13 +229,13 @@ def parse_ffprobe(txt):
     if ".resw" in ret and ".resh" in ret:
         ret["res"] = "{}x{}".format(ret[".resw"], ret[".resh"])
 
-    ret = {k: [0, v] for k, v in ret.items()}
+    zd = {k: (0, v) for k, v in ret.items()}
 
-    return ret, md
+    return zd, md
 
 
 class MTag(object):
-    def __init__(self, log_func, args):
+    def __init__(self, log_func: RootLogger, args: argparse.Namespace) -> None:
         self.log_func = log_func
         self.args = args
         self.usable = True
@@ -242,7 +252,7 @@ class MTag(object):
         if self.backend == "mutagen":
             self.get = self.get_mutagen
             try:
-                import mutagen
+                import mutagen  # noqa: F401  # pylint: disable=unused-import,import-outside-toplevel
             except:
                 self.log("could not load Mutagen, trying FFprobe instead", c=3)
                 self.backend = "ffprobe"
@@ -339,31 +349,33 @@ class MTag(object):
         }
         # self.get = self.compare
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("mtag", msg, c)
 
-    def normalize_tags(self, ret, md):
-        for k, v in dict(md).items():
-            if not v:
+    def normalize_tags(
+        self, parser_output: dict[str, tuple[int, Any]], md: dict[str, list[Any]]
+    ) -> dict[str, Union[str, float]]:
+        for sk, tv in dict(md).items():
+            if not tv:
                 continue
 
-            k = k.lower().split("::")[0].strip()
-            mk = self.rmap.get(k)
-            if not mk:
+            sk = sk.lower().split("::")[0].strip()
+            key_mapping = self.rmap.get(sk)
+            if not key_mapping:
                 continue
 
-            pref, mk = mk
-            if mk not in ret or ret[mk][0] > pref:
-                ret[mk] = [pref, v[0]]
+            priority, alias = key_mapping
+            if alias not in parser_output or parser_output[alias][0] > priority:
+                parser_output[alias] = (priority, tv[0])
 
-        # take first value
-        ret = {k: unicode(v[1]).strip() for k, v in ret.items()}
+        # take first value (lowest priority / most preferred)
+        ret = {sk: unicode(tv[1]).strip() for sk, tv in parser_output.items()}
 
         # track 3/7 => track 3
-        for k, v in ret.items():
-            if k[0] == ".":
-                v = v.split("/")[0].strip().lstrip("0")
-                ret[k] = v or 0
+        for sk, tv in ret.items():
+            if sk[0] == ".":
+                sv = str(tv).split("/")[0].strip().lstrip("0")
+                ret[sk] = sv or 0
 
         # normalize key notation to rkeobo
         okey = ret.get("key")
@@ -373,7 +385,7 @@ class MTag(object):
 
         return ret
 
-    def compare(self, abspath):
+    def compare(self, abspath: str) -> dict[str, Union[str, float]]:
         if abspath.endswith(".au"):
             return {}
 
@@ -411,7 +423,7 @@ class MTag(object):
 
         return r1
 
-    def get_mutagen(self, abspath):
+    def get_mutagen(self, abspath: str) -> dict[str, Union[str, float]]:
         if not bos.path.isfile(abspath):
             return {}
 
@@ -425,7 +437,7 @@ class MTag(object):
             return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
         sz = bos.path.getsize(abspath)
-        ret = {".q": [0, int((sz / md.info.length) / 128)]}
+        ret = {".q": (0, int((sz / md.info.length) / 128))}
 
         for attr, k, norm in [
             ["codec", "ac", unicode],
@@ -456,24 +468,24 @@ class MTag(object):
             if k == "ac" and v.startswith("mp4a.40."):
                 v = "aac"
 
-            ret[k] = [0, norm(v)]
+            ret[k] = (0, norm(v))
 
         return self.normalize_tags(ret, md)
 
-    def get_ffprobe(self, abspath):
+    def get_ffprobe(self, abspath: str) -> dict[str, Union[str, float]]:
         if not bos.path.isfile(abspath):
             return {}
 
         ret, md = ffprobe(abspath)
         return self.normalize_tags(ret, md)
 
-    def get_bin(self, parsers, abspath):
+    def get_bin(self, parsers: dict[str, MParser], abspath: str) -> dict[str, Any]:
         if not bos.path.isfile(abspath):
             return {}
 
         pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-        pypath = [str(pypath)] + [str(x) for x in sys.path if x]
-        pypath = str(os.pathsep.join(pypath))
+        zsl = [str(pypath)] + [str(x) for x in sys.path if x]
+        pypath = str(os.pathsep.join(zsl))
         env = os.environ.copy()
         env["PYTHONPATH"] = pypath
 
@@ -491,9 +503,9 @@ class MTag(object):
                 else:
                     cmd = ["nice"] + cmd
 
-                cmd = [fsenc(x) for x in cmd]
-                rc, v, err = runcmd(cmd, **args)
-                retchk(rc, cmd, err, self.log, 5, self.args.mtag_v)
+                bcmd = [fsenc(x) for x in cmd]
+                rc, v, err = runcmd(bcmd, **args)  # type: ignore
+                retchk(rc, bcmd, err, self.log, 5, self.args.mtag_v)
                 v = v.strip()
                 if not v:
                     continue
@@ -501,10 +513,10 @@ class MTag(object):
                 if "," not in tagname:
                     ret[tagname] = v
                 else:
-                    v = json.loads(v)
+                    zj = json.loads(v)
                     for tag in tagname.split(","):
-                        if tag and tag in v:
-                            ret[tag] = v[tag]
+                        if tag and tag in zj:
+                            ret[tag] = zj[tag]
             except:
                 pass
 

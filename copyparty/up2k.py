@@ -1,60 +1,83 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re
-import os
-import time
-import math
-import json
-import gzip
-import stat
-import shutil
 import base64
+import gzip
 import hashlib
-import threading
-import traceback
+import json
+import math
+import os
+import re
+import shutil
+import stat
 import subprocess as sp
+import threading
+import time
+import traceback
 from copy import deepcopy
 
-from .__init__ import WINDOWS, ANYWIN, PY2
-from .util import (
-    Pebkac,
-    Queue,
-    ProgressPrinter,
-    SYMTIME,
-    fsenc,
-    absreal,
-    sanitize_fn,
-    ren_open,
-    atomic_move,
-    quotep,
-    vsplit,
-    w8b64enc,
-    w8b64dec,
-    s3enc,
-    s3dec,
-    rmdirs,
-    statdir,
-    s2hms,
-    min_ex,
-)
-from .bos import bos
-from .authsrv import AuthSrv, LEELOO_DALLAS
-from .mtag import MTag, MParser
+from queue import Queue
 
-try:
-    HAVE_SQLITE3 = True
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
+from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
+from .bos import bos
+from .mtag import MParser, MTag
+from .util import (
+    HAVE_SQLITE3,
+    SYMTIME,
+    Pebkac,
+    ProgressPrinter,
+    absreal,
+    atomic_move,
+    fsenc,
+    min_ex,
+    quotep,
+    ren_open,
+    rmdirs,
+    s2hms,
+    s3dec,
+    s3enc,
+    sanitize_fn,
+    statdir,
+    vsplit,
+    w8b64dec,
+    w8b64enc,
+)
+
+if HAVE_SQLITE3:
     import sqlite3
-except:
-    HAVE_SQLITE3 = False
 
 DB_VER = 5
 
+try:
+    from typing import Any, Optional, Pattern, Union
+except:
+    pass
+
+if TYPE_CHECKING:
+    from .svchub import SvcHub
+
+
+class Dbw(object):
+    def __init__(self, c: "sqlite3.Cursor", n: int, t: float) -> None:
+        self.c = c
+        self.n = n
+        self.t = t
+
+
+class Mpqe(object):
+    def __init__(self, mtp: dict[str, MParser], entags: set[str], w: str, abspath: str):
+        # mtp empty = mtag
+        self.mtp = mtp
+        self.entags = entags
+        self.w = w
+        self.abspath = abspath
+
 
 class Up2k(object):
-    def __init__(self, hub):
+    def __init__(self, hub: "SvcHub") -> None:
         self.hub = hub
-        self.asrv = hub.asrv  # type: AuthSrv
+        self.asrv: AuthSrv = hub.asrv
         self.args = hub.args
         self.log_func = hub.log
 
@@ -62,25 +85,32 @@ class Up2k(object):
         self.salt = self.args.salt
 
         # state
+        self.gid = 0
         self.mutex = threading.Lock()
+        self.pp: Optional[ProgressPrinter] = None
         self.rescan_cond = threading.Condition()
-        self.hashq = Queue()
-        self.tagq = Queue()
+        self.need_rescan: set[str] = set()
+
+        self.registry: dict[str, dict[str, dict[str, Any]]] = {}
+        self.flags: dict[str, dict[str, Any]] = {}
+        self.droppable: dict[str, list[str]] = {}
+        self.volstate: dict[str, str] = {}
+        self.dupesched: dict[str, list[tuple[str, str, float]]] = {}
+        self.snap_persist_interval = 300  # persist unfinished index every 5 min
+        self.snap_discard_interval = 21600  # drop unfinished after 6 hours inactivity
+        self.snap_prev: dict[str, Optional[tuple[int, float]]] = {}
+
+        self.mtag: Optional[MTag] = None
+        self.entags: dict[str, set[str]] = {}
+        self.mtp_parsers: dict[str, dict[str, MParser]] = {}
+        self.pending_tags: list[tuple[set[str], str, str, dict[str, Any]]] = []
+        self.hashq: Queue[tuple[str, str, str, str, float]] = Queue()
+        self.tagq: Queue[tuple[str, str, str, str]] = Queue()
         self.n_hashq = 0
         self.n_tagq = 0
-        self.gid = 0
-        self.volstate = {}
-        self.need_rescan = {}
-        self.dupesched = {}
-        self.registry = {}
-        self.droppable = {}
-        self.entags = {}
-        self.flags = {}
-        self.cur = {}
-        self.mtag = None
-        self.pending_tags = None
-        self.mtp_parsers = {}
+        self.mpool_used = False
 
+        self.cur: dict[str, "sqlite3.Cursor"] = {}
         self.mem_cur = None
         self.sqlite_ver = None
         self.no_expr_idx = False
@@ -94,7 +124,7 @@ class Up2k(object):
 
         if ANYWIN:
             # usually fails to set lastmod too quickly
-            self.lastmod_q = []
+            self.lastmod_q: list[tuple[str, int, tuple[int, int]]] = []
             thr = threading.Thread(target=self._lastmodder, name="up2k-lastmod")
             thr.daemon = True
             thr.start()
@@ -108,7 +138,7 @@ class Up2k(object):
         if self.args.no_fastboot:
             self.deferred_init()
 
-    def init_vols(self):
+    def init_vols(self) -> None:
         if self.args.no_fastboot:
             return
 
@@ -116,15 +146,15 @@ class Up2k(object):
         t.daemon = True
         t.start()
 
-    def reload(self):
+    def reload(self) -> None:
         self.gid += 1
         self.log("reload #{} initiated".format(self.gid))
         all_vols = self.asrv.vfs.all_vols
         self.rescan(all_vols, list(all_vols.keys()), True)
 
-    def deferred_init(self):
+    def deferred_init(self) -> None:
         all_vols = self.asrv.vfs.all_vols
-        have_e2d = self.init_indexes(all_vols)
+        have_e2d = self.init_indexes(all_vols, [])
 
         thr = threading.Thread(target=self._snapshot, name="up2k-snapshot")
         thr.daemon = True
@@ -150,11 +180,11 @@ class Up2k(object):
                 thr.daemon = True
                 thr.start()
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("up2k", msg + "\033[K", c)
 
-    def get_state(self):
-        mtpq = 0
+    def get_state(self) -> str:
+        mtpq: Union[int, str] = 0
         q = "select count(w) from mt where k = 't:mtp'"
         got_lock = False if PY2 else self.mutex.acquire(timeout=0.5)
         if got_lock:
@@ -165,19 +195,19 @@ class Up2k(object):
                     pass
             self.mutex.release()
         else:
-            mtpq = "?"
+            mtpq = "(?)"
 
         ret = {
             "volstate": self.volstate,
-            "scanning": hasattr(self, "pp"),
+            "scanning": bool(self.pp),
             "hashq": self.n_hashq,
             "tagq": self.n_tagq,
             "mtpq": mtpq,
         }
         return json.dumps(ret, indent=4)
 
-    def rescan(self, all_vols, scan_vols, wait):
-        if not wait and hasattr(self, "pp"):
+    def rescan(self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool) -> str:
+        if not wait and self.pp:
             return "cannot initiate; scan is already in progress"
 
         args = (all_vols, scan_vols)
@@ -188,11 +218,11 @@ class Up2k(object):
         )
         t.daemon = True
         t.start()
-        return None
+        return ""
 
-    def _sched_rescan(self):
+    def _sched_rescan(self) -> None:
         volage = {}
-        cooldown = 0
+        cooldown = 0.0
         timeout = time.time() + 3
         while True:
             timeout = max(timeout, cooldown)
@@ -204,7 +234,7 @@ class Up2k(object):
             if now < cooldown:
                 continue
 
-            if hasattr(self, "pp"):
+            if self.pp:
                 cooldown = now + 5
                 continue
 
@@ -220,19 +250,19 @@ class Up2k(object):
 
                     deadline = volage[vp] + maxage
                     if deadline <= now:
-                        self.need_rescan[vp] = 1
+                        self.need_rescan.add(vp)
 
                     timeout = min(timeout, deadline)
 
-                vols = list(sorted(self.need_rescan.keys()))
-                self.need_rescan = {}
+                vols = list(sorted(self.need_rescan))
+                self.need_rescan.clear()
 
             if vols:
                 cooldown = now + 10
                 err = self.rescan(self.asrv.vfs.all_vols, vols, False)
                 if err:
                     for v in vols:
-                        self.need_rescan[v] = True
+                        self.need_rescan.add(v)
 
                     continue
 
@@ -272,7 +302,7 @@ class Up2k(object):
                         if vp:
                             fvp = "{}/{}".format(vp, fvp)
 
-                        self._handle_rm(LEELOO_DALLAS, None, fvp)
+                        self._handle_rm(LEELOO_DALLAS, "", fvp)
                         nrm += 1
 
                 if nrm:
@@ -288,12 +318,12 @@ class Up2k(object):
                 if hits:
                     timeout = min(timeout, now + lifetime - (now - hits[0]))
 
-    def _vis_job_progress(self, job):
+    def _vis_job_progress(self, job: dict[str, Any]) -> str:
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
         path = os.path.join(job["ptop"], job["prel"], job["name"])
         return "{:5.1f}% {}".format(perc, path)
 
-    def _vis_reg_progress(self, reg):
+    def _vis_reg_progress(self, reg: dict[str, dict[str, Any]]) -> list[str]:
         ret = []
         for _, job in reg.items():
             if job["need"]:
@@ -301,7 +331,7 @@ class Up2k(object):
 
         return ret
 
-    def _expr_idx_filter(self, flags):
+    def _expr_idx_filter(self, flags: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
         if not self.no_expr_idx:
             return False, flags
 
@@ -311,19 +341,19 @@ class Up2k(object):
 
         return True, ret
 
-    def init_indexes(self, all_vols, scan_vols=None):
+    def init_indexes(self, all_vols: dict[str, VFS], scan_vols: list[str]) -> bool:
         gid = self.gid
-        while hasattr(self, "pp") and gid == self.gid:
+        while self.pp and gid == self.gid:
             time.sleep(0.1)
 
         if gid != self.gid:
-            return
+            return False
 
         if gid:
             self.log("reload #{} running".format(self.gid))
 
         self.pp = ProgressPrinter()
-        vols = all_vols.values()
+        vols = list(all_vols.values())
         t0 = time.time()
         have_e2d = False
 
@@ -377,9 +407,9 @@ class Up2k(object):
 
         # e2ds(a) volumes first
         for vol in vols:
-            en = {}
+            en: set[str] = set()
             if "mte" in vol.flags:
-                en = {k: True for k in vol.flags["mte"].split(",")}
+                en = set(vol.flags["mte"].split(","))
 
             self.entags[vol.realpath] = en
 
@@ -393,11 +423,11 @@ class Up2k(object):
                     need_vac[vol] = True
 
             if "e2ts" not in vol.flags:
-                m = "online, idle"
+                t = "online, idle"
             else:
-                m = "online (tags pending)"
+                t = "online (tags pending)"
 
-            self.volstate[vol.vpath] = m
+            self.volstate[vol.vpath] = t
 
         # open the rest + do any e2ts(a)
         needed_mutagen = False
@@ -405,9 +435,9 @@ class Up2k(object):
             if "e2ts" not in vol.flags:
                 continue
 
-            m = "online (reading tags)"
-            self.volstate[vol.vpath] = m
-            self.log("{} [{}]".format(m, vol.realpath))
+            t = "online (reading tags)"
+            self.volstate[vol.vpath] = t
+            self.log("{} [{}]".format(t, vol.realpath))
 
             nadd, nrm, success = self._build_tags_index(vol)
             if not success:
@@ -419,7 +449,9 @@ class Up2k(object):
             self.volstate[vol.vpath] = "online (mtp soon)"
 
         for vol in need_vac:
-            cur, _ = self.register_vpath(vol.realpath, vol.flags)
+            reg = self.register_vpath(vol.realpath, vol.flags)
+            assert reg
+            cur, _ = reg
             with self.mutex:
                 cur.connection.commit()
                 cur.execute("vacuum")
@@ -435,23 +467,25 @@ class Up2k(object):
 
         thr = None
         if self.mtag:
-            m = "online (running mtp)"
+            t = "online (running mtp)"
             if scan_vols:
                 thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-scan")
                 thr.daemon = True
         else:
-            del self.pp
-            m = "online, idle"
+            self.pp = None
+            t = "online, idle"
 
         for vol in vols:
-            self.volstate[vol.vpath] = m
+            self.volstate[vol.vpath] = t
 
         if thr:
             thr.start()
 
         return have_e2d
 
-    def register_vpath(self, ptop, flags):
+    def register_vpath(
+        self, ptop: str, flags: dict[str, Any]
+    ) -> Optional[tuple["sqlite3.Cursor", str]]:
         histpath = self.asrv.vfs.histtab.get(ptop)
         if not histpath:
             self.log("no histpath for [{}]".format(ptop))
@@ -460,7 +494,7 @@ class Up2k(object):
         db_path = os.path.join(histpath, "up2k.db")
         if ptop in self.registry:
             try:
-                return [self.cur[ptop], db_path]
+                return self.cur[ptop], db_path
             except:
                 return None
 
@@ -514,14 +548,14 @@ class Up2k(object):
             else:
                 drp = [x for x in drp if x in reg]
 
-            m = "loaded snap {} |{}| ({})".format(path, len(reg.keys()), len(drp or []))
-            m = [m] + self._vis_reg_progress(reg)
-            self.log("\n".join(m))
+            t = "loaded snap {} |{}| ({})".format(path, len(reg.keys()), len(drp or []))
+            ta = [t] + self._vis_reg_progress(reg)
+            self.log("\n".join(ta))
 
         self.flags[ptop] = flags
         self.registry[ptop] = reg
         self.droppable[ptop] = drp or []
-        self.regdrop(ptop, None)
+        self.regdrop(ptop, "")
         if not HAVE_SQLITE3 or "e2d" not in flags or "d2d" in flags:
             return None
 
@@ -530,23 +564,25 @@ class Up2k(object):
         try:
             cur = self._open_db(db_path)
             self.cur[ptop] = cur
-            return [cur, db_path]
+            return cur, db_path
         except:
             msg = "cannot use database at [{}]:\n{}"
             self.log(msg.format(ptop, traceback.format_exc()))
 
         return None
 
-    def _build_file_index(self, vol, all_vols):
+    def _build_file_index(self, vol: VFS, all_vols: list[VFS]) -> tuple[bool, bool]:
         do_vac = False
         top = vol.realpath
         rei = vol.flags.get("noidx")
         reh = vol.flags.get("nohash")
         with self.mutex:
-            cur, _ = self.register_vpath(top, vol.flags)
+            reg = self.register_vpath(top, vol.flags)
+            assert reg and self.pp
+            cur, _ = reg
 
-            dbw = [cur, 0, time.time()]
-            self.pp.n = next(dbw[0].execute("select count(w) from up"))[0]
+            db = Dbw(cur, 0, time.time())
+            self.pp.n = next(db.c.execute("select count(w) from up"))[0]
 
             excl = [
                 vol.realpath + "/" + d.vpath[len(vol.vpath) :].lstrip("/")
@@ -558,37 +594,47 @@ class Up2k(object):
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
 
-            excl = set(excl)
             rtop = absreal(top)
             n_add = n_rm = 0
             try:
-                n_add = self._build_dir(dbw, top, excl, top, rtop, rei, reh, [])
-                n_rm = self._drop_lost(dbw[0], top)
+                n_add = self._build_dir(db, top, set(excl), top, rtop, rei, reh, [])
+                n_rm = self._drop_lost(db.c, top)
             except:
-                m = "failed to index volume [{}]:\n{}"
-                self.log(m.format(top, min_ex()), c=1)
+                t = "failed to index volume [{}]:\n{}"
+                self.log(t.format(top, min_ex()), c=1)
 
-            if dbw[1]:
-                self.log("commit {} new files".format(dbw[1]))
+            if db.n:
+                self.log("commit {} new files".format(db.n))
 
-            dbw[0].connection.commit()
+            db.c.connection.commit()
 
-            return True, n_add or n_rm or do_vac
+            return True, bool(n_add or n_rm or do_vac)
 
-    def _build_dir(self, dbw, top, excl, cdir, rcdir, rei, reh, seen):
+    def _build_dir(
+        self,
+        db: Dbw,
+        top: str,
+        excl: set[str],
+        cdir: str,
+        rcdir: str,
+        rei: Optional[Pattern[str]],
+        reh: Optional[Pattern[str]],
+        seen: list[str],
+    ) -> int:
         if rcdir in seen:
-            m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
-            self.log(m.format(seen[-1], rcdir, cdir), 3)
+            t = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
+            self.log(t.format(seen[-1], rcdir, cdir), 3)
             return 0
 
         seen = seen + [rcdir]
+        assert self.pp and self.mem_cur
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
         ret = 0
         seen_files = {}  # != inames; files-only for dropcheck
         g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
-        g = sorted(g)
-        inames = {x[0]: 1 for x in g}
-        for iname, inf in g:
+        gl = sorted(g)
+        inames = {x[0]: 1 for x in gl}
+        for iname, inf in gl:
             abspath = os.path.join(cdir, iname)
             if rei and rei.search(abspath):
                 continue
@@ -605,10 +651,10 @@ class Up2k(object):
                     continue
                 # self.log(" dir: {}".format(abspath))
                 try:
-                    ret += self._build_dir(dbw, top, excl, abspath, rap, rei, reh, seen)
+                    ret += self._build_dir(db, top, excl, abspath, rap, rei, reh, seen)
                 except:
-                    m = "failed to index subdir [{}]:\n{}"
-                    self.log(m.format(abspath, min_ex()), c=1)
+                    t = "failed to index subdir [{}]:\n{}"
+                    self.log(t.format(abspath, min_ex()), c=1)
             elif not stat.S_ISREG(inf.st_mode):
                 self.log("skip type-{:x} file [{}]".format(inf.st_mode, abspath))
             else:
@@ -632,31 +678,31 @@ class Up2k(object):
                 rd, fn = rp.rsplit("/", 1) if "/" in rp else ["", rp]
                 sql = "select w, mt, sz from up where rd = ? and fn = ?"
                 try:
-                    c = dbw[0].execute(sql, (rd, fn))
+                    c = db.c.execute(sql, (rd, fn))
                 except:
-                    c = dbw[0].execute(sql, s3enc(self.mem_cur, rd, fn))
+                    c = db.c.execute(sql, s3enc(self.mem_cur, rd, fn))
 
                 in_db = list(c.fetchall())
                 if in_db:
                     self.pp.n -= 1
                     dw, dts, dsz = in_db[0]
                     if len(in_db) > 1:
-                        m = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
+                        t = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
                         rep_db = "\n".join([repr(x) for x in in_db])
-                        self.log(m.format(top, rp, len(in_db), rep_db))
+                        self.log(t.format(top, rp, len(in_db), rep_db))
                         dts = -1
 
                     if dts == lmod and dsz == sz and (nohash or dw[0] != "#"):
                         continue
 
-                    m = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
+                    t = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
                         top, rp, dts, lmod, dsz, sz
                     )
-                    self.log(m)
-                    self.db_rm(dbw[0], rd, fn)
+                    self.log(t)
+                    self.db_rm(db.c, rd, fn)
                     ret += 1
-                    dbw[1] += 1
-                    in_db = None
+                    db.n += 1
+                    in_db = []
 
                 self.pp.msg = "a{} {}".format(self.pp.n, abspath)
 
@@ -674,15 +720,15 @@ class Up2k(object):
 
                     wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
 
-                self.db_add(dbw[0], wark, rd, fn, lmod, sz, "", 0)
-                dbw[1] += 1
+                self.db_add(db.c, wark, rd, fn, lmod, sz, "", 0)
+                db.n += 1
                 ret += 1
-                td = time.time() - dbw[2]
-                if dbw[1] >= 4096 or td >= 60:
-                    self.log("commit {} new files".format(dbw[1]))
-                    dbw[0].connection.commit()
-                    dbw[1] = 0
-                    dbw[2] = time.time()
+                td = time.time() - db.t
+                if db.n >= 4096 or td >= 60:
+                    self.log("commit {} new files".format(db.n))
+                    db.c.connection.commit()
+                    db.n = 0
+                    db.t = time.time()
 
         # drop missing files
         rd = cdir[len(top) + 1 :].strip("/")
@@ -691,25 +737,26 @@ class Up2k(object):
 
         q = "select fn from up where rd = ?"
         try:
-            c = dbw[0].execute(q, (rd,))
+            c = db.c.execute(q, (rd,))
         except:
-            c = dbw[0].execute(q, ("//" + w8b64enc(rd),))
+            c = db.c.execute(q, ("//" + w8b64enc(rd),))
 
         hits = [w8b64dec(x[2:]) if x.startswith("//") else x for (x,) in c]
         rm_files = [x for x in hits if x not in seen_files]
         n_rm = len(rm_files)
         for fn in rm_files:
-            self.db_rm(dbw[0], rd, fn)
+            self.db_rm(db.c, rd, fn)
 
         if n_rm:
             self.log("forgot {} deleted files".format(n_rm))
 
         return ret
 
-    def _drop_lost(self, cur, top):
+    def _drop_lost(self, cur: "sqlite3.Cursor", top: str) -> int:
         rm = []
         n_rm = 0
         nchecked = 0
+        assert self.pp
         # `_build_dir` did all the files, now do dirs
         ndirs = next(cur.execute("select count(distinct rd) from up"))[0]
         c = cur.execute("select distinct rd from up order by rd desc")
@@ -743,13 +790,16 @@ class Up2k(object):
 
         return n_rm
 
-    def _build_tags_index(self, vol):
+    def _build_tags_index(self, vol: VFS) -> tuple[int, int, bool]:
         ptop = vol.realpath
         with self.mutex:
-            _, db_path = self.register_vpath(ptop, vol.flags)
-            entags = self.entags[ptop]
-            flags = self.flags[ptop]
-            cur = self.cur[ptop]
+            reg = self.register_vpath(ptop, vol.flags)
+
+        assert reg and self.pp and self.mtag
+        _, db_path = reg
+        entags = self.entags[ptop]
+        flags = self.flags[ptop]
+        cur = self.cur[ptop]
 
         n_add = 0
         n_rm = 0
@@ -794,7 +844,8 @@ class Up2k(object):
             if not self.mtag:
                 return n_add, n_rm, False
 
-            mpool = False
+            mpool: Optional[Queue[Mpqe]] = None
+
             if self.mtag.prefer_mt and self.args.mtag_mt > 1:
                 mpool = self._start_mpool()
 
@@ -819,11 +870,10 @@ class Up2k(object):
 
                 abspath = os.path.join(ptop, rd, fn)
                 self.pp.msg = "c{} {}".format(n_left, abspath)
-                args = [entags, w, abspath]
                 if not mpool:
-                    n_tags = self._tag_file(c3, *args)
+                    n_tags = self._tag_file(c3, entags, w, abspath)
                 else:
-                    mpool.put(["mtag"] + args)
+                    mpool.put(Mpqe({}, entags, w, abspath))
                     # not registry cursor; do not self.mutex:
                     n_tags = len(self._flush_mpool(c3))
 
@@ -850,7 +900,7 @@ class Up2k(object):
 
         return n_add, n_rm, True
 
-    def _flush_mpool(self, wcur):
+    def _flush_mpool(self, wcur: "sqlite3.Cursor") -> list[str]:
         ret = []
         for x in self.pending_tags:
             self._tag_file(wcur, *x)
@@ -859,7 +909,7 @@ class Up2k(object):
         self.pending_tags = []
         return ret
 
-    def _run_all_mtp(self):
+    def _run_all_mtp(self) -> None:
         gid = self.gid
         t0 = time.time()
         for ptop, flags in self.flags.items():
@@ -870,12 +920,12 @@ class Up2k(object):
         msg = "mtp finished in {:.2f} sec ({})"
         self.log(msg.format(td, s2hms(td, True)))
 
-        del self.pp
+        self.pp = None
         for k in list(self.volstate.keys()):
             if "OFFLINE" not in self.volstate[k]:
                 self.volstate[k] = "online, idle"
 
-    def _run_one_mtp(self, ptop, gid):
+    def _run_one_mtp(self, ptop: str, gid: int) -> None:
         if gid != self.gid:
             return
 
@@ -915,8 +965,8 @@ class Up2k(object):
                     break
 
                 q = "select w from mt where k = 't:mtp' limit ?"
-                warks = cur.execute(q, (batch_sz,)).fetchall()
-                warks = [x[0] for x in warks]
+                zq = cur.execute(q, (batch_sz,)).fetchall()
+                warks = [str(x[0]) for x in zq]
                 jobs = []
                 for w in warks:
                     q = "select rd, fn from up where substr(w,1,16)=? limit 1"
@@ -925,8 +975,8 @@ class Up2k(object):
                     abspath = os.path.join(ptop, rd, fn)
 
                     q = "select k from mt where w = ?"
-                    have = cur.execute(q, (w,)).fetchall()
-                    have = [x[0] for x in have]
+                    zq2 = cur.execute(q, (w,)).fetchall()
+                    have: dict[str, Union[str, float]] = {x[0]: 1 for x in zq2}
 
                     parsers = self._get_parsers(ptop, have, abspath)
                     if not parsers:
@@ -937,7 +987,7 @@ class Up2k(object):
                     if w in in_progress:
                         continue
 
-                    jobs.append([parsers, None, w, abspath])
+                    jobs.append(Mpqe(parsers, set(), w, abspath))
                     in_progress[w] = True
 
             with self.mutex:
@@ -997,7 +1047,9 @@ class Up2k(object):
             wcur.close()
             cur.close()
 
-    def _get_parsers(self, ptop, have, abspath):
+    def _get_parsers(
+        self, ptop: str, have: dict[str, Union[str, float]], abspath: str
+    ) -> dict[str, MParser]:
         try:
             all_parsers = self.mtp_parsers[ptop]
         except:
@@ -1030,16 +1082,16 @@ class Up2k(object):
         parsers = {k: v for k, v in parsers.items() if v.force or k not in have}
         return parsers
 
-    def _start_mpool(self):
+    def _start_mpool(self) -> Queue[Mpqe]:
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
         # both do crazy runahead so lets reinvent another wheel
         nw = max(1, self.args.mtag_mt)
-
-        if self.pending_tags is None:
+        assert self.mtag
+        if not self.mpool_used:
+            self.mpool_used = True
             self.log("using {}x {}".format(nw, self.mtag.backend))
-            self.pending_tags = []
 
-        mpool = Queue(nw)
+        mpool: Queue[Mpqe] = Queue(nw)
         for _ in range(nw):
             thr = threading.Thread(
                 target=self._tag_thr, args=(mpool,), name="up2k-mpool"
@@ -1049,50 +1101,55 @@ class Up2k(object):
 
         return mpool
 
-    def _stop_mpool(self, mpool):
+    def _stop_mpool(self, mpool: Queue[Mpqe]) -> None:
         if not mpool:
             return
 
         for _ in range(mpool.maxsize):
-            mpool.put(None)
+            mpool.put(Mpqe({}, set(), "", ""))
 
         mpool.join()
 
-    def _tag_thr(self, q):
+    def _tag_thr(self, q: Queue[Mpqe]) -> None:
+        assert self.mtag
         while True:
-            task = q.get()
-            if not task:
+            qe = q.get()
+            if not qe.w:
                 q.task_done()
                 return
 
             try:
-                parser, entags, wark, abspath = task
-                if parser == "mtag":
-                    tags = self.mtag.get(abspath)
+                if not qe.mtp:
+                    tags = self.mtag.get(qe.abspath)
                 else:
-                    tags = self.mtag.get_bin(parser, abspath)
+                    tags = self.mtag.get_bin(qe.mtp, qe.abspath)
                     vtags = [
                         "\033[36m{} \033[33m{}".format(k, v) for k, v in tags.items()
                     ]
                     if vtags:
-                        self.log("{}\033[0m [{}]".format(" ".join(vtags), abspath))
+                        self.log("{}\033[0m [{}]".format(" ".join(vtags), qe.abspath))
 
                 with self.mutex:
-                    self.pending_tags.append([entags, wark, abspath, tags])
+                    self.pending_tags.append((qe.entags, qe.w, qe.abspath, tags))
             except:
                 ex = traceback.format_exc()
-                if parser == "mtag":
-                    parser = self.mtag.backend
-
-                self._log_tag_err(parser, abspath, ex)
+                self._log_tag_err(qe.mtp or self.mtag.backend, qe.abspath, ex)
 
             q.task_done()
 
-    def _log_tag_err(self, parser, abspath, ex):
+    def _log_tag_err(self, parser: Any, abspath: str, ex: Any) -> None:
         msg = "{} failed to read tags from {}:\n{}".format(parser, abspath, ex)
         self.log(msg.lstrip(), c=1 if "<Signals.SIG" in msg else 3)
 
-    def _tag_file(self, write_cur, entags, wark, abspath, tags=None):
+    def _tag_file(
+        self,
+        write_cur: "sqlite3.Cursor",
+        entags: set[str],
+        wark: str,
+        abspath: str,
+        tags: Optional[dict[str, Union[str, float]]] = None,
+    ) -> int:
+        assert self.mtag
         if tags is None:
             try:
                 tags = self.mtag.get(abspath)
@@ -1127,12 +1184,12 @@ class Up2k(object):
 
         return ret
 
-    def _orz(self, db_path):
+    def _orz(self, db_path: str) -> "sqlite3.Cursor":
         timeout = int(max(self.args.srch_time, 5) * 1.2)
         return sqlite3.connect(db_path, timeout, check_same_thread=False).cursor()
         # x.set_trace_callback(trace)
 
-    def _open_db(self, db_path):
+    def _open_db(self, db_path: str) -> "sqlite3.Cursor":
         existed = bos.path.exists(db_path)
         cur = self._orz(db_path)
         ver = self._read_ver(cur)
@@ -1141,8 +1198,8 @@ class Up2k(object):
 
         if ver == 4:
             try:
-                m = "creating backup before upgrade: "
-                cur = self._backup_db(db_path, cur, ver, m)
+                t = "creating backup before upgrade: "
+                cur = self._backup_db(db_path, cur, ver, t)
                 self._upgrade_v4(cur)
                 ver = 5
             except:
@@ -1157,8 +1214,8 @@ class Up2k(object):
                 self.log("WARN: could not list files; DB corrupt?\n" + min_ex())
 
         if (ver or 0) > DB_VER:
-            m = "database is version {}, this copyparty only supports versions <= {}"
-            raise Exception(m.format(ver, DB_VER))
+            t = "database is version {}, this copyparty only supports versions <= {}"
+            raise Exception(t.format(ver, DB_VER))
 
         msg = "creating new DB (old is bad); backup: "
         if ver:
@@ -1171,7 +1228,9 @@ class Up2k(object):
         bos.unlink(db_path)
         return self._create_db(db_path, None)
 
-    def _backup_db(self, db_path, cur, ver, msg):
+    def _backup_db(
+        self, db_path: str, cur: "sqlite3.Cursor", ver: Optional[int], msg: str
+    ) -> "sqlite3.Cursor":
         bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
         self.log(msg + bak)
         try:
@@ -1180,8 +1239,8 @@ class Up2k(object):
                 cur.connection.backup(c2)
             return cur
         except:
-            m = "native sqlite3 backup failed; using fallback method:\n"
-            self.log(m + min_ex())
+            t = "native sqlite3 backup failed; using fallback method:\n"
+            self.log(t + min_ex())
         finally:
             c2.close()
 
@@ -1192,7 +1251,7 @@ class Up2k(object):
         shutil.copy2(fsenc(db_path), fsenc(bak))
         return self._orz(db_path)
 
-    def _read_ver(self, cur):
+    def _read_ver(self, cur: "sqlite3.Cursor") -> Optional[int]:
         for tab in ["ki", "kv"]:
             try:
                 c = cur.execute(r"select v from {} where k = 'sver'".format(tab))
@@ -1202,8 +1261,11 @@ class Up2k(object):
             rows = c.fetchall()
             if rows:
                 return int(rows[0][0])
+        return None
 
-    def _create_db(self, db_path, cur):
+    def _create_db(
+        self, db_path: str, cur: Optional["sqlite3.Cursor"]
+    ) -> "sqlite3.Cursor":
         """
         collision in 2^(n/2) files where n = bits (6 bits/ch)
           10*6/2 = 2^30 =       1'073'741'824, 24.1mb idx  1<<(3*10)
@@ -1236,7 +1298,7 @@ class Up2k(object):
         self.log("created DB at {}".format(db_path))
         return cur
 
-    def _upgrade_v4(self, cur):
+    def _upgrade_v4(self, cur: "sqlite3.Cursor") -> None:
         for cmd in [
             r"alter table up add column ip text",
             r"alter table up add column at int",
@@ -1247,7 +1309,7 @@ class Up2k(object):
 
         cur.connection.commit()
 
-    def handle_json(self, cj):
+    def handle_json(self, cj: dict[str, Any]) -> dict[str, Any]:
         with self.mutex:
             if not self.register_vpath(cj["ptop"], cj["vcfg"]):
                 if cj["ptop"] not in self.registry:
@@ -1269,13 +1331,13 @@ class Up2k(object):
             if cur:
                 if self.no_expr_idx:
                     q = r"select * from up where w = ?"
-                    argv = (wark,)
+                    argv = [wark]
                 else:
                     q = r"select * from up where substr(w,1,16) = ? and w = ?"
-                    argv = (wark[:16], wark)
+                    argv = [wark[:16], wark]
 
-                alts = []
-                cur = cur.execute(q, argv)
+                alts: list[tuple[int, int, dict[str, Any]]] = []
+                cur = cur.execute(q, tuple(argv))
                 for _, dtime, dsize, dp_dir, dp_fn, ip, at in cur:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
@@ -1307,7 +1369,7 @@ class Up2k(object):
                         + (2 if dp_dir == cj["prel"] else 0)
                         + (1 if dp_fn == cj["name"] else 0)
                     )
-                    alts.append([score, -len(alts), j])
+                    alts.append((score, -len(alts), j))
 
                 job = sorted(alts, reverse=True)[0][2] if alts else None
                 if job and wark in reg:
@@ -1344,7 +1406,7 @@ class Up2k(object):
                         # registry is size-constrained + can only contain one unique wark;
                         # let want_recheck trigger symlink (if still in reg) or reupload
                         if cur:
-                            dupe = [cj["prel"], cj["name"], cj["lmod"]]
+                            dupe = (cj["prel"], cj["name"], cj["lmod"])
                             try:
                                 self.dupesched[src].append(dupe)
                             except:
@@ -1431,17 +1493,19 @@ class Up2k(object):
                 "wark": wark,
             }
 
-    def _untaken(self, fdir, fname, ts, ip):
+    def _untaken(self, fdir: str, fname: str, ts: float, ip: str) -> str:
         if self.args.nw:
             return fname
 
         # TODO broker which avoid this race and
         # provides a new filename if taken (same as bup)
         suffix = "-{:.6f}-{}".format(ts, ip.replace(":", "."))
-        with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as f:
-            return f["orz"][1]
+        with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
+            return zfw["orz"][1]
 
-    def _symlink(self, src, dst, verbose=True, lmod=None):
+    def _symlink(
+        self, src: str, dst: str, verbose: bool = True, lmod: float = 0
+    ) -> None:
         if verbose:
             self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
 
@@ -1475,9 +1539,9 @@ class Up2k(object):
                         break
                     nc += 1
                 if nc > 1:
-                    lsrc = nsrc[nc:]
+                    zsl = nsrc[nc:]
                     hops = len(ndst[nc:]) - 1
-                    lsrc = "../" * hops + "/".join(lsrc)
+                    lsrc = "../" * hops + "/".join(zsl)
 
             try:
                 if self.args.hardlink:
@@ -1498,11 +1562,13 @@ class Up2k(object):
         if lmod and (not linked or SYMTIME):
             times = (int(time.time()), int(lmod))
             if ANYWIN:
-                self.lastmod_q.append([dst, 0, times])
+                self.lastmod_q.append((dst, 0, times))
             else:
                 bos.utime(dst, times, False)
 
-    def handle_chunk(self, ptop, wark, chash):
+    def handle_chunk(
+        self, ptop: str, wark: str, chash: str
+    ) -> tuple[int, list[int], str, float]:
         with self.mutex:
             job = self.registry[ptop].get(wark)
             if not job:
@@ -1523,8 +1589,8 @@ class Up2k(object):
             if chash in job["busy"]:
                 nh = len(job["hash"])
                 idx = job["hash"].index(chash)
-                m = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
-                raise Pebkac(400, m.format(wark, chash, idx, nh, job["name"]))
+                t = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
+                raise Pebkac(400, t.format(wark, chash, idx, nh, job["name"]))
 
             job["busy"][chash] = 1
 
@@ -1535,17 +1601,17 @@ class Up2k(object):
 
         path = os.path.join(job["ptop"], job["prel"], job["tnam"])
 
-        return [chunksize, ofs, path, job["lmod"]]
+        return chunksize, ofs, path, job["lmod"]
 
-    def release_chunk(self, ptop, wark, chash):
+    def release_chunk(self, ptop: str, wark: str, chash: str) -> bool:
         with self.mutex:
             job = self.registry[ptop].get(wark)
             if job:
                 job["busy"].pop(chash, None)
 
-        return [True]
+        return True
 
-    def confirm_chunk(self, ptop, wark, chash):
+    def confirm_chunk(self, ptop: str, wark: str, chash: str) -> tuple[int, str]:
         with self.mutex:
             try:
                 job = self.registry[ptop][wark]
@@ -1553,14 +1619,14 @@ class Up2k(object):
                 src = os.path.join(pdir, job["tnam"])
                 dst = os.path.join(pdir, job["name"])
             except Exception as ex:
-                return "confirm_chunk, wark, " + repr(ex)
+                return "confirm_chunk, wark, " + repr(ex)  # type: ignore
 
             job["busy"].pop(chash, None)
 
             try:
                 job["need"].remove(chash)
             except Exception as ex:
-                return "confirm_chunk, chash, " + repr(ex)
+                return "confirm_chunk, chash, " + repr(ex)  # type: ignore
 
             ret = len(job["need"])
             if ret > 0:
@@ -1576,35 +1642,35 @@ class Up2k(object):
 
         return ret, dst
 
-    def finish_upload(self, ptop, wark):
+    def finish_upload(self, ptop: str, wark: str) -> None:
         with self.mutex:
             self._finish_upload(ptop, wark)
 
-    def _finish_upload(self, ptop, wark):
+    def _finish_upload(self, ptop: str, wark: str) -> None:
         try:
             job = self.registry[ptop][wark]
             pdir = os.path.join(job["ptop"], job["prel"])
             src = os.path.join(pdir, job["tnam"])
             dst = os.path.join(pdir, job["name"])
         except Exception as ex:
-            return "finish_upload, wark, " + repr(ex)
+            raise Pebkac(500, "finish_upload, wark, " + repr(ex))
 
         # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
         atomic_move(src, dst)
 
         times = (int(time.time()), int(job["lmod"]))
         if ANYWIN:
-            a = [dst, job["size"], times]
-            self.lastmod_q.append(a)
+            z1 = (dst, job["size"], times)
+            self.lastmod_q.append(z1)
         elif not job["hash"]:
             try:
                 bos.utime(dst, times)
             except:
                 pass
 
-        a = [job[x] for x in "ptop wark prel name lmod size addr".split()]
-        a += [job.get("at") or time.time()]
-        if self.idx_wark(*a):
+        z2 = [job[x] for x in "ptop wark prel name lmod size addr".split()]
+        z2 += [job.get("at") or time.time()]
+        if self.idx_wark(*z2):
             del self.registry[ptop][wark]
         else:
             self.regdrop(ptop, wark)
@@ -1622,27 +1688,37 @@ class Up2k(object):
             self._symlink(dst, d2, lmod=lmod)
             if cur:
                 self.db_rm(cur, rd, fn)
-                self.db_add(cur, wark, rd, fn, *a[-4:])
+                self.db_add(cur, wark, rd, fn, *z2[-4:])
 
         if cur:
             cur.connection.commit()
 
-    def regdrop(self, ptop, wark):
-        t = self.droppable[ptop]
+    def regdrop(self, ptop: str, wark: str) -> None:
+        olds = self.droppable[ptop]
         if wark:
-            t.append(wark)
+            olds.append(wark)
 
-        if len(t) <= self.args.reg_cap:
+        if len(olds) <= self.args.reg_cap:
             return
 
-        n = len(t) - int(self.args.reg_cap / 2)
-        m = "up2k-registry [{}] has {} droppables; discarding {}"
-        self.log(m.format(ptop, len(t), n))
-        for k in t[:n]:
+        n = len(olds) - int(self.args.reg_cap / 2)
+        t = "up2k-registry [{}] has {} droppables; discarding {}"
+        self.log(t.format(ptop, len(olds), n))
+        for k in olds[:n]:
             self.registry[ptop].pop(k, None)
-        self.droppable[ptop] = t[n:]
+        self.droppable[ptop] = olds[n:]
 
-    def idx_wark(self, ptop, wark, rd, fn, lmod, sz, ip, at):
+    def idx_wark(
+        self,
+        ptop: str,
+        wark: str,
+        rd: str,
+        fn: str,
+        lmod: float,
+        sz: int,
+        ip: str,
+        at: float,
+    ) -> bool:
         cur = self.cur.get(ptop)
         if not cur:
             return False
@@ -1652,29 +1728,41 @@ class Up2k(object):
         cur.connection.commit()
 
         if "e2t" in self.flags[ptop]:
-            self.tagq.put([ptop, wark, rd, fn])
+            self.tagq.put((ptop, wark, rd, fn))
             self.n_tagq += 1
 
         return True
 
-    def db_rm(self, db, rd, fn):
+    def db_rm(self, db: "sqlite3.Cursor", rd: str, fn: str) -> None:
         sql = "delete from up where rd = ? and fn = ?"
         try:
             db.execute(sql, (rd, fn))
         except:
+            assert self.mem_cur
             db.execute(sql, s3enc(self.mem_cur, rd, fn))
 
-    def db_add(self, db, wark, rd, fn, ts, sz, ip, at):
+    def db_add(
+        self,
+        db: "sqlite3.Cursor",
+        wark: str,
+        rd: str,
+        fn: str,
+        ts: float,
+        sz: int,
+        ip: str,
+        at: float,
+    ) -> None:
         sql = "insert into up values (?,?,?,?,?,?,?)"
         v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
         try:
             db.execute(sql, v)
         except:
+            assert self.mem_cur
             rd, fn = s3enc(self.mem_cur, rd, fn)
             v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
             db.execute(sql, v)
 
-    def handle_rm(self, uname, ip, vpaths):
+    def handle_rm(self, uname: str, ip: str, vpaths: list[str]) -> str:
         n_files = 0
         ok = {}
         ng = {}
@@ -1687,12 +1775,14 @@ class Up2k(object):
                 ng[k] = 1
 
         ng = {k: 1 for k in ng if k not in ok}
-        ok = len(ok)
-        ng = len(ng)
+        iok = len(ok)
+        ing = len(ng)
 
-        return "deleted {} files (and {}/{} folders)".format(n_files, ok, ok + ng)
+        return "deleted {} files (and {}/{} folders)".format(n_files, iok, iok + ing)
 
-    def _handle_rm(self, uname, ip, vpath):
+    def _handle_rm(
+        self, uname: str, ip: str, vpath: str
+    ) -> tuple[int, list[str], list[str]]:
         try:
             permsets = [[True, False, False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
@@ -1709,18 +1799,18 @@ class Up2k(object):
             vn, rem = vn.get_dbv(rem)
             _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
 
-            m = "you cannot delete this: "
+            t = "you cannot delete this: "
             if not dip:
-                m += "file not found"
+                t += "file not found"
             elif dip != ip:
-                m += "not uploaded by (You)"
+                t += "not uploaded by (You)"
             elif dat < time.time() - self.args.unpost:
-                m += "uploaded too long ago"
+                t += "uploaded too long ago"
             else:
-                m = None
+                t = ""
 
-            if m:
-                raise Pebkac(400, m)
+            if t:
+                raise Pebkac(400, t)
 
         ptop = vn.realpath
         atop = vn.canonical(rem, False)
@@ -1731,16 +1821,19 @@ class Up2k(object):
             raise Pebkac(400, "file not found on disk (already deleted?)")
 
         scandir = not self.args.no_scandir
-        if stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
+        if stat.S_ISDIR(st.st_mode):
+            g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
+            if unpost:
+                raise Pebkac(400, "cannot unpost folders")
+        elif stat.S_ISLNK(st.st_mode) or stat.S_ISREG(st.st_mode):
             dbv, vrem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             dbv, vrem = dbv.get_dbv(vrem)
             voldir = vsplit(vrem)[0]
             vpath_dir = vsplit(vpath)[0]
-            g = [[dbv, voldir, vpath_dir, adir, [[fn, 0]], [], []]]
+            g = [(dbv, voldir, vpath_dir, adir, [(fn, 0)], [], {})]  # type: ignore
         else:
-            g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
-            if unpost:
-                raise Pebkac(400, "cannot unpost folders")
+            self.log("rm: skip type-{:x} file [{}]".format(st.st_mode, atop))
+            return 0, [], []
 
         n_files = 0
         for dbv, vrem, _, adir, files, rd, vd in g:
@@ -1766,7 +1859,7 @@ class Up2k(object):
         rm = rmdirs(self.log_func, scandir, True, atop, 1)
         return n_files, rm[0], rm[1]
 
-    def handle_mv(self, uname, svp, dvp):
+    def handle_mv(self, uname: str, svp: str, dvp: str) -> str:
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
         svn, srem = svn.get_dbv(srem)
         sabs = svn.canonical(srem, False)
@@ -1808,7 +1901,7 @@ class Up2k(object):
         rmdirs(self.log_func, scandir, True, sabs, 1)
         return "k"
 
-    def _mv_file(self, uname, svp, dvp):
+    def _mv_file(self, uname: str, svp: str, dvp: str) -> str:
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
         svn, srem = svn.get_dbv(srem)
 
@@ -1834,29 +1927,33 @@ class Up2k(object):
 
         if bos.path.islink(sabs):
             dlabs = absreal(sabs)
-            m = "moving symlink from [{}] to [{}], target [{}]"
-            self.log(m.format(sabs, dabs, dlabs))
+            t = "moving symlink from [{}] to [{}], target [{}]"
+            self.log(t.format(sabs, dabs, dlabs))
             mt = bos.path.getmtime(sabs, False)
             bos.unlink(sabs)
             self._symlink(dlabs, dabs, False, lmod=mt)
 
             # folders are too scary, schedule rescan of both vols
-            self.need_rescan[svn.vpath] = 1
-            self.need_rescan[dvn.vpath] = 1
+            self.need_rescan.add(svn.vpath)
+            self.need_rescan.add(dvn.vpath)
             with self.rescan_cond:
                 self.rescan_cond.notify_all()
 
             return "k"
 
-        c1, w, ftime, fsize, ip, at = self._find_from_vpath(svn.realpath, srem)
+        c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(svn.realpath, srem)
         c2 = self.cur.get(dvn.realpath)
 
-        if ftime is None:
+        if ftime_ is None:
             st = bos.stat(sabs)
             ftime = st.st_mtime
             fsize = st.st_size
+        else:
+            ftime = ftime_
+            fsize = fsize_ or 0
 
         if w:
+            assert c1
             if c2 and c2 != c1:
                 self._copy_tags(c1, c2, w)
 
@@ -1865,7 +1962,7 @@ class Up2k(object):
             c1.connection.commit()
 
             if c2:
-                self.db_add(c2, w, drd, dfn, ftime, fsize, ip, at)
+                self.db_add(c2, w, drd, dfn, ftime, fsize, ip or "", at or 0)
                 c2.connection.commit()
         else:
             self.log("not found in src db: [{}]".format(svp))
@@ -1873,7 +1970,9 @@ class Up2k(object):
         bos.rename(sabs, dabs)
         return "k"
 
-    def _copy_tags(self, csrc, cdst, wark):
+    def _copy_tags(
+        self, csrc: "sqlite3.Cursor", cdst: "sqlite3.Cursor", wark: str
+    ) -> None:
         """copy all tags for wark from src-db to dst-db"""
         w = wark[:16]
 
@@ -1883,16 +1982,26 @@ class Up2k(object):
         for _, k, v in csrc.execute("select * from mt where w=?", (w,)):
             cdst.execute("insert into mt values(?,?,?)", (w, k, v))
 
-    def _find_from_vpath(self, ptop, vrem):
+    def _find_from_vpath(
+        self, ptop: str, vrem: str
+    ) -> tuple[
+        Optional["sqlite3.Cursor"],
+        Optional[str],
+        Optional[int],
+        Optional[int],
+        Optional[str],
+        Optional[int],
+    ]:
         cur = self.cur.get(ptop)
         if not cur:
-            return [None] * 6
+            return None, None, None, None, None, None
 
         rd, fn = vsplit(vrem)
         q = "select w, mt, sz, ip, at from up where rd=? and fn=? limit 1"
         try:
             c = cur.execute(q, (rd, fn))
         except:
+            assert self.mem_cur
             c = cur.execute(q, s3enc(self.mem_cur, rd, fn))
 
         hit = c.fetchone()
@@ -1901,14 +2010,21 @@ class Up2k(object):
             return cur, wark, ftime, fsize, ip, at
         return cur, None, None, None, None, None
 
-    def _forget_file(self, ptop, vrem, cur, wark, drop_tags):
+    def _forget_file(
+        self,
+        ptop: str,
+        vrem: str,
+        cur: Optional["sqlite3.Cursor"],
+        wark: Optional[str],
+        drop_tags: bool,
+    ) -> None:
         """forgets file in db, fixes symlinks, does not delete"""
         srd, sfn = vsplit(vrem)
         self.log("forgetting {}".format(vrem))
-        if wark:
+        if wark and cur:
             self.log("found {} in db".format(wark))
             if drop_tags:
-                if self._relink(wark, ptop, vrem, None):
+                if self._relink(wark, ptop, vrem, ""):
                     drop_tags = False
 
             if drop_tags:
@@ -1919,20 +2035,24 @@ class Up2k(object):
 
         reg = self.registry.get(ptop)
         if reg:
-            if not wark:
-                wark = [
+            vdir = vsplit(vrem)[0]
+            wark = wark or next(
+                (
                     x
                     for x, y in reg.items()
-                    if sfn in [y["name"], y.get("tnam")] and y["prel"] == vrem
-                ]
-
-            if wark and wark in reg:
-                m = "forgetting partial upload {} ({})"
-                p = self._vis_job_progress(wark)
-                self.log(m.format(wark, p))
+                    if sfn in [y["name"], y.get("tnam")] and y["prel"] == vdir
+                ),
+                "",
+            )
+            job = reg.get(wark) if wark else None
+            if job:
+                t = "forgetting partial upload {} ({})"
+                p = self._vis_job_progress(job)
+                self.log(t.format(wark, p))
+                assert wark
                 del reg[wark]
 
-    def _relink(self, wark, sptop, srem, dabs):
+    def _relink(self, wark: str, sptop: str, srem: str, dabs: str) -> int:
         """
         update symlinks from file at svn/srem to dabs (rename),
         or to first remaining full if no dabs (delete)
@@ -1953,13 +2073,13 @@ class Up2k(object):
         if not dupes:
             return 0
 
-        full = {}
-        links = {}
+        full: dict[str, tuple[str, str]] = {}
+        links: dict[str, tuple[str, str]] = {}
         for ptop, vp in dupes:
             ap = os.path.join(ptop, vp)
             try:
                 d = links if bos.path.islink(ap) else full
-                d[ap] = [ptop, vp]
+                d[ap] = (ptop, vp)
             except:
                 self.log("relink: not found: [{}]".format(ap))
 
@@ -1973,13 +2093,13 @@ class Up2k(object):
             bos.rename(sabs, slabs)
             bos.utime(slabs, (int(time.time()), int(mt)), False)
             self._symlink(slabs, sabs, False)
-            full[slabs] = [ptop, rem]
+            full[slabs] = (ptop, rem)
             sabs = slabs
 
         if not dabs:
             dabs = list(sorted(full.keys()))[0]
 
-        for alink in links.keys():
+        for alink in links:
             lmod = None
             try:
                 if alink != sabs and absreal(alink) != sabs:
@@ -1991,11 +2111,11 @@ class Up2k(object):
             except:
                 pass
 
-            self._symlink(dabs, alink, False, lmod=lmod)
+            self._symlink(dabs, alink, False, lmod=lmod or 0)
 
         return len(full) + len(links)
 
-    def _get_wark(self, cj):
+    def _get_wark(self, cj: dict[str, Any]) -> str:
         if len(cj["name"]) > 1024 or len(cj["hash"]) > 512 * 1024:  # 16TiB
             raise Pebkac(400, "name or numchunks not according to spec")
 
@@ -2020,15 +2140,14 @@ class Up2k(object):
 
         return wark
 
-    def _hashlist_from_file(self, path):
-        pp = self.pp if hasattr(self, "pp") else None
+    def _hashlist_from_file(self, path: str) -> list[str]:
         fsz = bos.path.getsize(path)
         csz = up2k_chunksize(fsz)
         ret = []
         with open(fsenc(path), "rb", 512 * 1024) as f:
             while fsz > 0:
-                if pp:
-                    pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
+                if self.pp:
+                    self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
 
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
@@ -2047,7 +2166,7 @@ class Up2k(object):
 
         return ret
 
-    def _new_upload(self, job):
+    def _new_upload(self, job: dict[str, Any]) -> None:
         self.registry[job["ptop"]][job["wark"]] = job
         pdir = os.path.join(job["ptop"], job["prel"])
         job["name"] = self._untaken(pdir, job["name"], job["t0"], job["addr"])
@@ -2066,8 +2185,8 @@ class Up2k(object):
 
         dip = job["addr"].replace(":", ".")
         suffix = "-{:.6f}-{}".format(job["t0"], dip)
-        with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as f:
-            f, job["tnam"] = f["orz"]
+        with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
+            f, job["tnam"] = zfw["orz"]
             if (
                 ANYWIN
                 and self.args.sparse
@@ -2086,7 +2205,7 @@ class Up2k(object):
         if not job["hash"]:
             self._finish_upload(job["ptop"], job["wark"])
 
-    def _lastmodder(self):
+    def _lastmodder(self) -> None:
         while True:
             ready = self.lastmod_q
             self.lastmod_q = []
@@ -2098,8 +2217,8 @@ class Up2k(object):
                 try:
                     bos.utime(path, times, False)
                 except:
-                    m = "lmod: failed to utime ({}, {}):\n{}"
-                    self.log(m.format(path, times, min_ex()))
+                    t = "lmod: failed to utime ({}, {}):\n{}"
+                    self.log(t.format(path, times, min_ex()))
 
                 if self.args.sparse and self.args.sparse * 1024 * 1024 <= sz:
                     try:
@@ -2107,21 +2226,22 @@ class Up2k(object):
                     except:
                         self.log("could not unsparse [{}]".format(path), 3)
 
-    def _snapshot(self):
-        self.snap_persist_interval = 300  # persist unfinished index every 5 min
-        self.snap_discard_interval = 21600  # drop unfinished after 6 hours inactivity
-        self.snap_prev = {}
+    def _snapshot(self) -> None:
+        slp = self.snap_persist_interval
         while True:
-            time.sleep(self.snap_persist_interval)
-            if not hasattr(self, "pp"):
+            time.sleep(slp)
+            if self.pp:
+                slp = 5
+            else:
+                slp = self.snap_persist_interval
                 self.do_snapshot()
 
-    def do_snapshot(self):
+    def do_snapshot(self) -> None:
         with self.mutex:
             for k, reg in self.registry.items():
                 self._snap_reg(k, reg)
 
-    def _snap_reg(self, ptop, reg):
+    def _snap_reg(self, ptop: str, reg: dict[str, dict[str, Any]]) -> None:
         now = time.time()
         histpath = self.asrv.vfs.histtab.get(ptop)
         if not histpath:
@@ -2133,9 +2253,9 @@ class Up2k(object):
             if x["need"] and now - x["poke"] > self.snap_discard_interval
         ]
         if rm:
-            m = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
+            t = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
             vis = [self._vis_job_progress(x) for x in rm]
-            self.log("\n".join([m] + vis))
+            self.log("\n".join([t] + vis))
             for job in rm:
                 del reg[job["wark"]]
                 try:
@@ -2159,8 +2279,8 @@ class Up2k(object):
                     bos.unlink(path)
             return
 
-        newest = max(x["poke"] for _, x in reg.items()) if reg else 0
-        etag = [len(reg), newest]
+        newest = float(max(x["poke"] for _, x in reg.items()) if reg else 0)
+        etag = (len(reg), newest)
         if etag == self.snap_prev.get(ptop):
             return
 
@@ -2177,10 +2297,11 @@ class Up2k(object):
         self.log("snap: {} |{}|".format(path, len(reg.keys())))
         self.snap_prev[ptop] = etag
 
-    def _tagger(self):
+    def _tagger(self) -> None:
         with self.mutex:
             self.n_tagq += 1
 
+        assert self.mtag
         while True:
             with self.mutex:
                 self.n_tagq -= 1
@@ -2218,7 +2339,7 @@ class Up2k(object):
 
             self.log("tagged {} ({}+{})".format(abspath, ntags1, len(tags) - ntags1))
 
-    def _hasher(self):
+    def _hasher(self) -> None:
         with self.mutex:
             self.n_hashq += 1
 
@@ -2240,20 +2361,21 @@ class Up2k(object):
             with self.mutex:
                 self.idx_wark(ptop, wark, rd, fn, inf.st_mtime, inf.st_size, ip, at)
 
-    def hash_file(self, ptop, flags, rd, fn, ip, at):
+    def hash_file(
+        self, ptop: str, flags: dict[str, Any], rd: str, fn: str, ip: str, at: float
+    ) -> None:
         with self.mutex:
             self.register_vpath(ptop, flags)
-            self.hashq.put([ptop, rd, fn, ip, at])
+            self.hashq.put((ptop, rd, fn, ip, at))
             self.n_hashq += 1
         # self.log("hashq {} push {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
 
-    def shutdown(self):
-        if hasattr(self, "snap_prev"):
-            self.log("writing snapshot")
-            self.do_snapshot()
+    def shutdown(self) -> None:
+        self.log("writing snapshot")
+        self.do_snapshot()
 
 
-def up2k_chunksize(filesize):
+def up2k_chunksize(filesize: int) -> int:
     chunksize = 1024 * 1024
     stepsize = 512 * 1024
     while True:
@@ -2266,18 +2388,17 @@ def up2k_chunksize(filesize):
             stepsize *= mul
 
 
-def up2k_wark_from_hashlist(salt, filesize, hashes):
+def up2k_wark_from_hashlist(salt: str, filesize: int, hashes: list[str]) -> str:
     """server-reproducible file identifier, independent of name or location"""
-    ident = [salt, str(filesize)]
-    ident.extend(hashes)
-    ident = "\n".join(ident)
+    values = [salt, str(filesize)] + hashes
+    vstr = "\n".join(values)
 
-    wark = hashlib.sha512(ident.encode("utf-8")).digest()[:33]
+    wark = hashlib.sha512(vstr.encode("utf-8")).digest()[:33]
     wark = base64.urlsafe_b64encode(wark)
     return wark.decode("ascii")
 
 
-def up2k_wark_from_metadata(salt, sz, lastmod, rd, fn):
+def up2k_wark_from_metadata(salt: str, sz: int, lastmod: int, rd: str, fn: str) -> str:
     ret = fsenc("{}\n{}\n{}\n{}\n{}".format(salt, lastmod, sz, rd, fn))
     ret = base64.urlsafe_b64encode(hashlib.sha512(ret).digest())
     return "#{}".format(ret.decode("ascii"))[:44]

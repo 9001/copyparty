@@ -58,13 +58,13 @@ class CState(threading.Thread):
                         remotes.append("?")
                         remotes_ok = False
 
-            m = []
+            ta = []
             for conn, remote in zip(self.cs, remotes):
                 stage = len(conn.st)
-                m.append(f"\033[3{colors[stage]}m{remote}")
+                ta.append(f"\033[3{colors[stage]}m{remote}")
 
-            m = " ".join(m)
-            print(f"{m}\033[0m\n\033[A", end="")
+            t = " ".join(ta)
+            print(f"{t}\033[0m\n\033[A", end="")
 
 
 def allget(cs, urls):

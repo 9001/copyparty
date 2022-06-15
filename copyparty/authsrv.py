@@ -1,44 +1,68 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re
-import os
-import sys
-import stat
-import time
+import argparse
 import base64
 import hashlib
+import os
+import re
+import stat
+import sys
 import threading
+import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, WINDOWS
+from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
+from .bos import bos
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
+    Pebkac,
+    absreal,
+    fsenc,
+    relchk,
+    statdir,
     uncyg,
     undot,
-    relchk,
     unhumanize,
-    absreal,
-    Pebkac,
-    fsenc,
-    statdir,
 )
-from .bos import bos
+
+try:
+    from collections.abc import Iterable
+
+    import typing
+    from typing import Any, Generator, Optional, Union
+
+    from .util import RootLogger
+except:
+    pass
+
+if TYPE_CHECKING:
+    pass
+    # Vflags: TypeAlias = dict[str, str | bool | float | list[str]]
+    # Vflags: TypeAlias = dict[str, Any]
+    # Mflags: TypeAlias = dict[str, Vflags]
 
 
 LEELOO_DALLAS = "leeloo_dallas"
 
 
 class AXS(object):
-    def __init__(self, uread=None, uwrite=None, umove=None, udel=None, uget=None):
-        self.uread = {} if uread is None else {k: 1 for k in uread}
-        self.uwrite = {} if uwrite is None else {k: 1 for k in uwrite}
-        self.umove = {} if umove is None else {k: 1 for k in umove}
-        self.udel = {} if udel is None else {k: 1 for k in udel}
-        self.uget = {} if uget is None else {k: 1 for k in uget}
+    def __init__(
+        self,
+        uread: Optional[Union[list[str], set[str]]] = None,
+        uwrite: Optional[Union[list[str], set[str]]] = None,
+        umove: Optional[Union[list[str], set[str]]] = None,
+        udel: Optional[Union[list[str], set[str]]] = None,
+        uget: Optional[Union[list[str], set[str]]] = None,
+    ) -> None:
+        self.uread: set[str] = set(uread or [])
+        self.uwrite: set[str] = set(uwrite or [])
+        self.umove: set[str] = set(umove or [])
+        self.udel: set[str] = set(udel or [])
+        self.uget: set[str] = set(uget or [])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "AXS({})".format(
             ", ".join(
                 "{}={!r}".format(k, self.__dict__[k])
@@ -48,33 +72,33 @@ class AXS(object):
 
 
 class Lim(object):
-    def __init__(self):
-        self.nups = {}  # num tracker
-        self.bups = {}  # byte tracker list
-        self.bupc = {}  # byte tracker cache
+    def __init__(self) -> None:
+        self.nups: dict[str, list[float]] = {}  # num tracker
+        self.bups: dict[str, list[tuple[float, int]]] = {}  # byte tracker list
+        self.bupc: dict[str, int] = {}  # byte tracker cache
 
         self.nosub = False  # disallow subdirectories
 
-        self.smin = None  # filesize min
-        self.smax = None  # filesize max
+        self.smin = -1  # filesize min
+        self.smax = -1  # filesize max
 
-        self.bwin = None  # bytes window
-        self.bmax = None  # bytes max
-        self.nwin = None  # num window
-        self.nmax = None  # num max
+        self.bwin = 0  # bytes window
+        self.bmax = 0  # bytes max
+        self.nwin = 0  # num window
+        self.nmax = 0  # num max
 
-        self.rotn = None  # rot num files
-        self.rotl = None  # rot depth
-        self.rotf = None  # rot datefmt
-        self.rot_re = None  # rotf check
+        self.rotn = 0  # rot num files
+        self.rotl = 0  # rot depth
+        self.rotf = ""  # rot datefmt
+        self.rot_re = re.compile("")  # rotf check
 
-    def set_rotf(self, fmt):
+    def set_rotf(self, fmt: str) -> None:
         self.rotf = fmt
         r = re.escape(fmt).replace("%Y", "[0-9]{4}").replace("%j", "[0-9]{3}")
         r = re.sub("%[mdHMSWU]", "[0-9]{2}", r)
         self.rot_re = re.compile("(^|/)" + r + "$")
 
-    def all(self, ip, rem, sz, abspath):
+    def all(self, ip: str, rem: str, sz: float, abspath: str) -> tuple[str, str]:
         self.chk_nup(ip)
         self.chk_bup(ip)
         self.chk_rem(rem)
@@ -87,18 +111,18 @@ class Lim(object):
 
         return ap2, ("{}/{}".format(rem, vp2) if rem else vp2)
 
-    def chk_sz(self, sz):
-        if self.smin is not None and sz < self.smin:
+    def chk_sz(self, sz: float) -> None:
+        if self.smin != -1 and sz < self.smin:
             raise Pebkac(400, "file too small")
 
-        if self.smax is not None and sz > self.smax:
+        if self.smax != -1 and sz > self.smax:
             raise Pebkac(400, "file too big")
 
-    def chk_rem(self, rem):
+    def chk_rem(self, rem: str) -> None:
         if self.nosub and rem:
             raise Pebkac(500, "no subdirectories allowed")
 
-    def rot(self, path):
+    def rot(self, path: str) -> tuple[str, str]:
         if not self.rotf and not self.rotn:
             return path, ""
 
@@ -120,7 +144,7 @@ class Lim(object):
         d = ret[len(path) :].strip("/\\").replace("\\", "/")
         return ret, d
 
-    def dive(self, path, lvs):
+    def dive(self, path: str, lvs: int) -> Optional[str]:
         items = bos.listdir(path)
 
         if not lvs:
@@ -155,14 +179,14 @@ class Lim(object):
 
         return os.path.join(sub, ret)
 
-    def nup(self, ip):
+    def nup(self, ip: str) -> None:
         try:
             self.nups[ip].append(time.time())
         except:
             self.nups[ip] = [time.time()]
 
-    def bup(self, ip, nbytes):
-        v = [time.time(), nbytes]
+    def bup(self, ip: str, nbytes: int) -> None:
+        v = (time.time(), nbytes)
         try:
             self.bups[ip].append(v)
             self.bupc[ip] += nbytes
@@ -170,7 +194,7 @@ class Lim(object):
             self.bups[ip] = [v]
             self.bupc[ip] = nbytes
 
-    def chk_nup(self, ip):
+    def chk_nup(self, ip: str) -> None:
         if not self.nmax or ip not in self.nups:
             return
 
@@ -182,7 +206,7 @@ class Lim(object):
         if len(nups) >= self.nmax:
             raise Pebkac(429, "too many uploads")
 
-    def chk_bup(self, ip):
+    def chk_bup(self, ip: str) -> None:
         if not self.bmax or ip not in self.bups:
             return
 
@@ -200,35 +224,37 @@ class Lim(object):
 class VFS(object):
     """single level in the virtual fs"""
 
-    def __init__(self, log, realpath, vpath, axs, flags):
+    def __init__(
+        self,
+        log: Optional[RootLogger],
+        realpath: str,
+        vpath: str,
+        axs: AXS,
+        flags: dict[str, Any],
+    ) -> None:
         self.log = log
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
-        self.axs = axs  # type: AXS
+        self.axs = axs
         self.flags = flags  # config options
-        self.nodes = {}  # child nodes
-        self.histtab = None  # all realpath->histpath
-        self.dbv = None  # closest full/non-jump parent
-        self.lim = None  # type: Lim  # upload limits; only set for dbv
+        self.nodes: dict[str, VFS] = {}  # child nodes
+        self.histtab: dict[str, str] = {}  # all realpath->histpath
+        self.dbv: Optional[VFS] = None  # closest full/non-jump parent
+        self.lim: Optional[Lim] = None  # upload limits; only set for dbv
+        self.aread: dict[str, list[str]] = {}
+        self.awrite: dict[str, list[str]] = {}
+        self.amove: dict[str, list[str]] = {}
+        self.adel: dict[str, list[str]] = {}
+        self.aget: dict[str, list[str]] = {}
 
         if realpath:
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
             self.all_vols = {vpath: self}  # flattened recursive
-            self.aread = {}
-            self.awrite = {}
-            self.amove = {}
-            self.adel = {}
-            self.aget = {}
         else:
-            self.histpath = None
-            self.all_vols = None
-            self.aread = None
-            self.awrite = None
-            self.amove = None
-            self.adel = None
-            self.aget = None
+            self.histpath = ""
+            self.all_vols = {}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "VFS({})".format(
             ", ".join(
                 "{}={!r}".format(k, self.__dict__[k])
@@ -236,14 +262,14 @@ class VFS(object):
             )
         )
 
-    def get_all_vols(self, outdict):
+    def get_all_vols(self, outdict: dict[str, "VFS"]) -> None:
         if self.realpath:
             outdict[self.vpath] = self
 
         for v in self.nodes.values():
             v.get_all_vols(outdict)
 
-    def add(self, src, dst):
+    def add(self, src: str, dst: str) -> "VFS":
         """get existing, or add new path to the vfs"""
         assert not src.endswith("/")  # nosec
         assert not dst.endswith("/")  # nosec
@@ -257,7 +283,7 @@ class VFS(object):
 
             vn = VFS(
                 self.log,
-                os.path.join(self.realpath, name) if self.realpath else None,
+                os.path.join(self.realpath, name) if self.realpath else "",
                 "{}/{}".format(self.vpath, name).lstrip("/"),
                 self.axs,
                 self._copy_flags(name),
@@ -277,7 +303,7 @@ class VFS(object):
         self.nodes[dst] = vn
         return vn
 
-    def _copy_flags(self, name):
+    def _copy_flags(self, name: str) -> dict[str, Any]:
         flags = {k: v for k, v in self.flags.items()}
         hist = flags.get("hist")
         if hist and hist != "-":
@@ -285,20 +311,20 @@ class VFS(object):
 
         return flags
 
-    def bubble_flags(self):
+    def bubble_flags(self) -> None:
         if self.dbv:
             for k, v in self.dbv.flags.items():
                 if k not in ["hist"]:
                     self.flags[k] = v
 
-        for v in self.nodes.values():
-            v.bubble_flags()
+        for n in self.nodes.values():
+            n.bubble_flags()
 
-    def _find(self, vpath):
+    def _find(self, vpath: str) -> tuple["VFS", str]:
         """return [vfs,remainder]"""
         vpath = undot(vpath)
         if vpath == "":
-            return [self, ""]
+            return self, ""
 
         if "/" in vpath:
             name, rem = vpath.split("/", 1)
@@ -309,66 +335,64 @@ class VFS(object):
         if name in self.nodes:
             return self.nodes[name]._find(rem)
 
-        return [self, vpath]
+        return self, vpath
 
-    def can_access(self, vpath, uname):
-        # type: (str, str) -> tuple[bool, bool, bool, bool]
+    def can_access(self, vpath: str, uname: str) -> tuple[bool, bool, bool, bool, bool]:
         """can Read,Write,Move,Delete,Get"""
         vn, _ = self._find(vpath)
         c = vn.axs
-        return [
+        return (
             uname in c.uread or "*" in c.uread,
             uname in c.uwrite or "*" in c.uwrite,
             uname in c.umove or "*" in c.umove,
             uname in c.udel or "*" in c.udel,
             uname in c.uget or "*" in c.uget,
-        ]
+        )
 
     def get(
         self,
-        vpath,
-        uname,
-        will_read,
-        will_write,
-        will_move=False,
-        will_del=False,
-        will_get=False,
-    ):
-        # type: (str, str, bool, bool, bool, bool, bool) -> tuple[VFS, str]
+        vpath: str,
+        uname: str,
+        will_read: bool,
+        will_write: bool,
+        will_move: bool = False,
+        will_del: bool = False,
+        will_get: bool = False,
+    ) -> tuple["VFS", str]:
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         if ANYWIN:
             mod = relchk(vpath)
             if mod:
-                self.log("vfs", "invalid relpath [{}]".format(vpath))
+                if self.log:
+                    self.log("vfs", "invalid relpath [{}]".format(vpath))
                 raise Pebkac(404)
 
         vn, rem = self._find(vpath)
-        c = vn.axs
+        c: AXS = vn.axs
 
         for req, d, msg in [
-            [will_read, c.uread, "read"],
-            [will_write, c.uwrite, "write"],
-            [will_move, c.umove, "move"],
-            [will_del, c.udel, "delete"],
-            [will_get, c.uget, "get"],
+            (will_read, c.uread, "read"),
+            (will_write, c.uwrite, "write"),
+            (will_move, c.umove, "move"),
+            (will_del, c.udel, "delete"),
+            (will_get, c.uget, "get"),
         ]:
             if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
-                m = "you don't have {}-access for this location"
-                raise Pebkac(403, m.format(msg))
+                t = "you don't have {}-access for this location"
+                raise Pebkac(403, t.format(msg))
 
         return vn, rem
 
-    def get_dbv(self, vrem):
-        # type: (str) -> tuple[VFS, str]
+    def get_dbv(self, vrem: str) -> tuple["VFS", str]:
         dbv = self.dbv
         if not dbv:
             return self, vrem
 
-        vrem = [self.vpath[len(dbv.vpath) :].lstrip("/"), vrem]
-        vrem = "/".join([x for x in vrem if x])
+        tv = [self.vpath[len(dbv.vpath) :].lstrip("/"), vrem]
+        vrem = "/".join([x for x in tv if x])
         return dbv, vrem
 
-    def canonical(self, rem, resolve=True):
+    def canonical(self, rem: str, resolve: bool = True) -> str:
         """returns the canonical path (fully-resolved absolute fs path)"""
         rp = self.realpath
         if rem:
@@ -376,8 +400,14 @@ class VFS(object):
 
         return absreal(rp) if resolve else rp
 
-    def ls(self, rem, uname, scandir, permsets, lstat=False):
-        # type: (str, str, bool, list[list[bool]], bool) -> tuple[str, str, dict[str, VFS]]
+    def ls(
+        self,
+        rem: str,
+        uname: str,
+        scandir: bool,
+        permsets: list[list[bool]],
+        lstat: bool = False,
+    ) -> tuple[str, list[tuple[str, os.stat_result]], dict[str, "VFS"]]:
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
@@ -389,8 +419,8 @@ class VFS(object):
 
             for name, vn2 in sorted(self.nodes.items()):
                 ok = False
-                axs = vn2.axs
-                axs = [axs.uread, axs.uwrite, axs.umove, axs.udel, axs.uget]
+                zx = vn2.axs
+                axs = [zx.uread, zx.uwrite, zx.umove, zx.udel, zx.uget]
                 for pset in permsets:
                     ok = True
                     for req, lst in zip(pset, axs):
@@ -409,9 +439,32 @@ class VFS(object):
             elif "/.hist/th/" in p:
                 real = [x for x in real if not x[0].endswith("dir.txt")]
 
-        return [abspath, real, virt_vis]
+        return abspath, real, virt_vis
 
-    def walk(self, rel, rem, seen, uname, permsets, dots, scandir, lstat, subvols=True):
+    def walk(
+        self,
+        rel: str,
+        rem: str,
+        seen: list[str],
+        uname: str,
+        permsets: list[list[bool]],
+        dots: bool,
+        scandir: bool,
+        lstat: bool,
+        subvols: bool = True,
+    ) -> Generator[
+        tuple[
+            "VFS",
+            str,
+            str,
+            str,
+            list[tuple[str, os.stat_result]],
+            list[tuple[str, os.stat_result]],
+            dict[str, "VFS"],
+        ],
+        None,
+        None,
+    ]:
         """
         recursively yields from ./rem;
         rel is a unix-style user-defined vpath (not vfs-related)
@@ -425,8 +478,9 @@ class VFS(object):
             and (not fsroot.startswith(seen[-1]) or fsroot == seen[-1])
             and fsroot in seen
         ):
-            m = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}/{}"
-            self.log("vfs.walk", m.format(seen[-1], fsroot, self.vpath, rem), 3)
+            if self.log:
+                t = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}/{}"
+                self.log("vfs.walk", t.format(seen[-1], fsroot, self.vpath, rem), 3)
             return
 
         seen = seen[:] + [fsroot]
@@ -460,9 +514,9 @@ class VFS(object):
             for x in vfs.walk(wrel, "", seen, uname, permsets, dots, scandir, lstat):
                 yield x
 
-    def zipgen(self, vrem, flt, uname, dots, scandir):
-        if flt:
-            flt = {k: True for k in flt}
+    def zipgen(
+        self, vrem: str, flt: set[str], uname: str, dots: bool, scandir: bool
+    ) -> Generator[dict[str, Any], None, None]:
 
         # if multiselect: add all items to archive root
         # if single folder: the folder itself is the top-level item
@@ -473,33 +527,33 @@ class VFS(object):
             if flt:
                 files = [x for x in files if x[0] in flt]
 
-                rm = [x for x in rd if x[0] not in flt]
-                [rd.remove(x) for x in rm]
+                rm1 = [x for x in rd if x[0] not in flt]
+                _ = [rd.remove(x) for x in rm1]  # type: ignore
 
-                rm = [x for x in vd.keys() if x not in flt]
-                [vd.pop(x) for x in rm]
+                rm2 = [x for x in vd.keys() if x not in flt]
+                _ = [vd.pop(x) for x in rm2]
 
-                flt = None
+                flt = set()
 
             # print(repr([vpath, apath, [x[0] for x in files]]))
             fnames = [n[0] for n in files]
             vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
             apaths = [os.path.join(apath, n) for n in fnames]
-            files = list(zip(vpaths, apaths, files))
+            ret = list(zip(vpaths, apaths, files))
 
             if not dots:
                 # dotfile filtering based on vpath (intended visibility)
-                files = [x for x in files if "/." not in "/" + x[0]]
+                ret = [x for x in ret if "/." not in "/" + x[0]]
 
-                rm = [x for x in rd if x[0].startswith(".")]
-                for x in rm:
-                    rd.remove(x)
+                zel = [ze for ze in rd if ze[0].startswith(".")]
+                for ze in zel:
+                    rd.remove(ze)
 
-                rm = [k for k in vd.keys() if k.startswith(".")]
-                for x in rm:
-                    del vd[x]
+                zsl = [zs for zs in vd.keys() if zs.startswith(".")]
+                for zs in zsl:
+                    del vd[zs]
 
-            for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in files]:
+            for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in ret]:
                 yield f
 
 
@@ -512,7 +566,12 @@ else:
 class AuthSrv(object):
     """verifies users against given paths"""
 
-    def __init__(self, args, log_func, warn_anonwrite=True):
+    def __init__(
+        self,
+        args: argparse.Namespace,
+        log_func: Optional[RootLogger],
+        warn_anonwrite: bool = True,
+    ) -> None:
         self.args = args
         self.log_func = log_func
         self.warn_anonwrite = warn_anonwrite
@@ -521,11 +580,11 @@ class AuthSrv(object):
         self.mutex = threading.Lock()
         self.reload()
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         if self.log_func:
             self.log_func("auth", msg, c)
 
-    def laggy_iter(self, iterable):
+    def laggy_iter(self, iterable: Iterable[Any]) -> Generator[Any, None, None]:
         """returns [value,isFinalValue]"""
         it = iter(iterable)
         prev = next(it)
@@ -535,26 +594,39 @@ class AuthSrv(object):
 
         yield prev, True
 
-    def _map_volume(self, src, dst, mount, daxs, mflags):
+    def _map_volume(
+        self,
+        src: str,
+        dst: str,
+        mount: dict[str, str],
+        daxs: dict[str, AXS],
+        mflags: dict[str, dict[str, Any]],
+    ) -> None:
         if dst in mount:
-            m = "multiple filesystem-paths mounted at [/{}]:\n  [{}]\n  [{}]"
-            self.log(m.format(dst, mount[dst], src), c=1)
+            t = "multiple filesystem-paths mounted at [/{}]:\n  [{}]\n  [{}]"
+            self.log(t.format(dst, mount[dst], src), c=1)
             raise Exception("invalid config")
 
         if src in mount.values():
-            m = "warning: filesystem-path [{}] mounted in multiple locations:"
-            m = m.format(src)
+            t = "warning: filesystem-path [{}] mounted in multiple locations:"
+            t = t.format(src)
             for v in [k for k, v in mount.items() if v == src] + [dst]:
-                m += "\n  /{}".format(v)
+                t += "\n  /{}".format(v)
 
-            self.log(m, c=3)
+            self.log(t, c=3)
 
         mount[dst] = src
         daxs[dst] = AXS()
         mflags[dst] = {}
 
-    def _parse_config_file(self, fd, acct, daxs, mflags, mount):
-        # type: (any, str, dict[str, AXS], any, str) -> None
+    def _parse_config_file(
+        self,
+        fd: typing.BinaryIO,
+        acct: dict[str, str],
+        daxs: dict[str, AXS],
+        mflags: dict[str, dict[str, Any]],
+        mount: dict[str, str],
+    ) -> None:
         skip = False
         vol_src = None
         vol_dst = None
@@ -601,23 +673,25 @@ class AuthSrv(object):
                 uname = "*"
 
             if lvl == "a":
-                m = "WARNING (config-file): permission flag 'a' is deprecated; please use 'rw' instead"
-                self.log(m, 1)
+                t = "WARNING (config-file): permission flag 'a' is deprecated; please use 'rw' instead"
+                self.log(t, 1)
 
             self._read_vol_str(lvl, uname, daxs[vol_dst], mflags[vol_dst])
 
-    def _read_vol_str(self, lvl, uname, axs, flags):
-        # type: (str, str, AXS, any) -> None
+    def _read_vol_str(
+        self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
+    ) -> None:
         if lvl.strip("crwmdg"):
             raise Exception("invalid volume flag: {},{}".format(lvl, uname))
 
         if lvl == "c":
+            cval: Union[bool, str] = True
             try:
                 # volume flag with arguments, possibly with a preceding list of bools
                 uname, cval = uname.split("=", 1)
             except:
                 # just one or more bools
-                cval = True
+                pass
 
             while "," in uname:
                 # one or more bools before the final flag; eat them
@@ -631,34 +705,38 @@ class AuthSrv(object):
             uname = "*"
 
         for un in uname.replace(",", " ").strip().split():
-            if "r" in lvl:
-                axs.uread[un] = 1
+            for ch, al in [
+                ("r", axs.uread),
+                ("w", axs.uwrite),
+                ("m", axs.umove),
+                ("d", axs.udel),
+                ("g", axs.uget),
+            ]:
+                if ch in lvl:
+                    al.add(un)
 
-            if "w" in lvl:
-                axs.uwrite[un] = 1
-
-            if "m" in lvl:
-                axs.umove[un] = 1
-
-            if "d" in lvl:
-                axs.udel[un] = 1
-
-            if "g" in lvl:
-                axs.uget[un] = 1
-
-    def _read_volflag(self, flags, name, value, is_list):
+    def _read_volflag(
+        self,
+        flags: dict[str, Any],
+        name: str,
+        value: Union[str, bool, list[str]],
+        is_list: bool,
+    ) -> None:
         if name not in ["mtp"]:
             flags[name] = value
             return
 
-        if not is_list:
-            value = [value]
-        elif not value:
+        vals = flags.get(name, [])
+        if not value:
             return
+        elif is_list:
+            vals += value
+        else:
+            vals += [value]
 
-        flags[name] = flags.get(name, []) + value
+        flags[name] = vals
 
-    def reload(self):
+    def reload(self) -> None:
         """
         construct a flat list of mountpoints and usernames
         first from the commandline arguments
@@ -666,10 +744,10 @@ class AuthSrv(object):
         before finally building the VFS
         """
 
-        acct = {}  # username:password
-        daxs = {}  # type: dict[str, AXS]
-        mflags = {}  # mountpoint:[flag]
-        mount = {}  # dst:src (mountpoint:realpath)
+        acct: dict[str, str] = {}  # username:password
+        daxs: dict[str, AXS] = {}
+        mflags: dict[str, dict[str, Any]] = {}  # moutpoint:flags
+        mount: dict[str, str] = {}  # dst:src (mountpoint:realpath)
 
         if self.args.a:
             # list of username:password
@@ -678,8 +756,8 @@ class AuthSrv(object):
                     u, p = x.split(":", 1)
                     acct[u] = p
                 except:
-                    m = '\n  invalid value "{}" for argument -a, must be username:password'
-                    raise Exception(m.format(x))
+                    t = '\n  invalid value "{}" for argument -a, must be username:password'
+                    raise Exception(t.format(x))
 
         if self.args.v:
             # list of src:dst:permset:permset:...
@@ -708,8 +786,8 @@ class AuthSrv(object):
                     try:
                         self._parse_config_file(f, acct, daxs, mflags, mount)
                     except:
-                        m = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
-                        self.log(m.format(cfg_fn, self.line_ctr), 1)
+                        t = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
+                        self.log(t.format(cfg_fn, self.line_ctr), 1)
                         raise
 
         # case-insensitive; normalize
@@ -726,7 +804,7 @@ class AuthSrv(object):
             vfs = VFS(self.log_func, bos.path.abspath("."), "", axs, {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(self.log_func, None, "", AXS(), {})
+            vfs = VFS(self.log_func, "", "", AXS(), {})
             vfs.flags["d2d"] = True
 
         maxdepth = 0
@@ -740,10 +818,10 @@ class AuthSrv(object):
                 vfs = VFS(self.log_func, mount[dst], dst, daxs[dst], mflags[dst])
                 continue
 
-            v = vfs.add(mount[dst], dst)
-            v.axs = daxs[dst]
-            v.flags = mflags[dst]
-            v.dbv = None
+            zv = vfs.add(mount[dst], dst)
+            zv.axs = daxs[dst]
+            zv.flags = mflags[dst]
+            zv.dbv = None
 
         vfs.all_vols = {}
         vfs.get_all_vols(vfs.all_vols)
@@ -751,11 +829,11 @@ class AuthSrv(object):
         for perm in "read write move del get".split():
             axs_key = "u" + perm
             unames = ["*"] + list(acct.keys())
-            umap = {x: [] for x in unames}
+            umap: dict[str, list[str]] = {x: [] for x in unames}
             for usr in unames:
                 for vp, vol in vfs.all_vols.items():
-                    axs = getattr(vol.axs, axs_key)
-                    if usr in axs or "*" in axs:
+                    zx = getattr(vol.axs, axs_key)
+                    if usr in zx or "*" in zx:
                         umap[usr].append(vp)
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
@@ -764,7 +842,7 @@ class AuthSrv(object):
         missing_users = {}
         for axs in daxs.values():
             for d in [axs.uread, axs.uwrite, axs.umove, axs.udel, axs.uget]:
-                for usr in d.keys():
+                for usr in d:
                     all_users[usr] = 1
                     if usr != "*" and usr not in acct:
                         missing_users[usr] = 1
@@ -783,8 +861,8 @@ class AuthSrv(object):
         promote = []
         demote = []
         for vol in vfs.all_vols.values():
-            hid = hashlib.sha512(fsenc(vol.realpath)).digest()
-            hid = base64.b32encode(hid).decode("ascii").lower()
+            zb = hashlib.sha512(fsenc(vol.realpath)).digest()
+            hid = base64.b32encode(zb).decode("ascii").lower()
             vflag = vol.flags.get("hist")
             if vflag == "-":
                 pass
@@ -822,21 +900,21 @@ class AuthSrv(object):
                     demote.append(vol)
 
         # discard jump-vols
-        for v in demote:
-            vfs.all_vols.pop(v.vpath)
+        for zv in demote:
+            vfs.all_vols.pop(zv.vpath)
 
         if promote:
-            msg = [
+            ta = [
                 "\n  the following jump-volumes were generated to assist the vfs.\n  As they contain a database (probably from v0.11.11 or older),\n  they are promoted to full volumes:"
             ]
             for vol in promote:
-                msg.append(
+                ta.append(
                     "  /{}  ({})  ({})".format(vol.vpath, vol.realpath, vol.histpath)
                 )
 
-            self.log("\n\n".join(msg) + "\n", c=3)
+            self.log("\n\n".join(ta) + "\n", c=3)
 
-        vfs.histtab = {v.realpath: v.histpath for v in vfs.all_vols.values()}
+        vfs.histtab = {zv.realpath: zv.histpath for zv in vfs.all_vols.values()}
 
         for vol in vfs.all_vols.values():
             lim = Lim()
@@ -846,30 +924,30 @@ class AuthSrv(object):
                 use = True
                 lim.nosub = True
 
-            v = vol.flags.get("sz")
-            if v:
+            zs = vol.flags.get("sz")
+            if zs:
                 use = True
-                lim.smin, lim.smax = [unhumanize(x) for x in v.split("-")]
+                lim.smin, lim.smax = [unhumanize(x) for x in zs.split("-")]
 
-            v = vol.flags.get("rotn")
-            if v:
+            zs = vol.flags.get("rotn")
+            if zs:
                 use = True
-                lim.rotn, lim.rotl = [int(x) for x in v.split(",")]
+                lim.rotn, lim.rotl = [int(x) for x in zs.split(",")]
 
-            v = vol.flags.get("rotf")
-            if v:
+            zs = vol.flags.get("rotf")
+            if zs:
                 use = True
-                lim.set_rotf(v)
+                lim.set_rotf(zs)
 
-            v = vol.flags.get("maxn")
-            if v:
+            zs = vol.flags.get("maxn")
+            if zs:
                 use = True
-                lim.nmax, lim.nwin = [int(x) for x in v.split(",")]
+                lim.nmax, lim.nwin = [int(x) for x in zs.split(",")]
 
-            v = vol.flags.get("maxb")
-            if v:
+            zs = vol.flags.get("maxb")
+            if zs:
                 use = True
-                lim.bmax, lim.bwin = [unhumanize(x) for x in v.split(",")]
+                lim.bmax, lim.bwin = [unhumanize(x) for x in zs.split(",")]
 
             if use:
                 vol.lim = lim
@@ -1005,8 +1083,8 @@ class AuthSrv(object):
 
             for mtp in local_only_mtp:
                 if mtp not in local_mte:
-                    m = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volume-flags)'
-                    self.log(m.format(vol.vpath, mtp), 1)
+                    t = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volume-flags)'
+                    self.log(t.format(vol.vpath, mtp), 1)
                     errors = True
 
         tags = self.args.mtp or []
@@ -1014,8 +1092,8 @@ class AuthSrv(object):
         tags = [y for x in tags for y in x.split(",")]
         for mtp in tags:
             if mtp not in all_mte:
-                m = 'metadata tag "{}" is defined by "-mtm" or "-mtp", but is not used by "-mte" (or by any "cmte" volume-flag)'
-                self.log(m.format(mtp), 1)
+                t = 'metadata tag "{}" is defined by "-mtm" or "-mtp", but is not used by "-mte" (or by any "cmte" volume-flag)'
+                self.log(t.format(mtp), 1)
                 errors = True
 
         if errors:
@@ -1023,12 +1101,12 @@ class AuthSrv(object):
 
         vfs.bubble_flags()
 
-        m = "volumes and permissions:\n"
-        for v in vfs.all_vols.values():
+        t = "volumes and permissions:\n"
+        for zv in vfs.all_vols.values():
             if not self.warn_anonwrite:
                 break
 
-            m += '\n\033[36m"/{}"  \033[33m{}\033[0m'.format(v.vpath, v.realpath)
+            t += '\n\033[36m"/{}"  \033[33m{}\033[0m'.format(zv.vpath, zv.realpath)
             for txt, attr in [
                 ["  read", "uread"],
                 [" write", "uwrite"],
@@ -1036,21 +1114,21 @@ class AuthSrv(object):
                 ["delete", "udel"],
                 ["   get", "uget"],
             ]:
-                u = list(sorted(getattr(v.axs, attr).keys()))
+                u = list(sorted(getattr(zv.axs, attr)))
                 u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
                 u = u if u else "\033[36m--none--\033[0m"
-                m += "\n|  {}:  {}".format(txt, u)
-            m += "\n"
+                t += "\n|  {}:  {}".format(txt, u)
+            t += "\n"
 
         if self.warn_anonwrite and not self.args.no_voldump:
-            self.log(m)
+            self.log(t)
 
         try:
-            v, _ = vfs.get("/", "*", False, True)
-            if self.warn_anonwrite and os.getcwd() == v.realpath:
+            zv, _ = vfs.get("/", "*", False, True)
+            if self.warn_anonwrite and os.getcwd() == zv.realpath:
                 self.warn_anonwrite = False
-                msg = "anyone can read/write the current directory: {}\n"
-                self.log(msg.format(v.realpath), c=1)
+                t = "anyone can read/write the current directory: {}\n"
+                self.log(t.format(zv.realpath), c=1)
         except Pebkac:
             self.warn_anonwrite = True
 
@@ -1064,19 +1142,19 @@ class AuthSrv(object):
             if pwds:
                 self.re_pwd = re.compile("=(" + "|".join(pwds) + ")([]&; ]|$)")
 
-    def dbg_ls(self):
+    def dbg_ls(self) -> None:
         users = self.args.ls
-        vols = "*"
-        flags = []
+        vol = "*"
+        flags: list[str] = []
 
         try:
-            users, vols = users.split(",", 1)
+            users, vol = users.split(",", 1)
         except:
             pass
 
         try:
-            vols, flags = vols.split(",", 1)
-            flags = flags.split(",")
+            vol, zf = vol.split(",", 1)
+            flags = zf.split(",")
         except:
             pass
 
@@ -1089,23 +1167,23 @@ class AuthSrv(object):
             if u not in self.acct and u != "*":
                 raise Exception("user not found: " + u)
 
-        if vols == "*":
+        if vol == "*":
             vols = ["/" + x for x in self.vfs.all_vols]
         else:
-            vols = [vols]
+            vols = [vol]
 
-        for v in vols:
-            if not v.startswith("/"):
+        for zs in vols:
+            if not zs.startswith("/"):
                 raise Exception("volumes must start with /")
 
-            if v[1:] not in self.vfs.all_vols:
-                raise Exception("volume not found: " + v)
+            if zs[1:] not in self.vfs.all_vols:
+                raise Exception("volume not found: " + zs)
 
-        self.log({"users": users, "vols": vols, "flags": flags})
-        m = "/{}: read({}) write({}) move({}) del({}) get({})"
-        for k, v in self.vfs.all_vols.items():
-            vc = v.axs
-            self.log(m.format(k, vc.uread, vc.uwrite, vc.umove, vc.udel, vc.uget))
+        self.log(str({"users": users, "vols": vols, "flags": flags}))
+        t = "/{}: read({}) write({}) move({}) del({}) get({})"
+        for k, zv in self.vfs.all_vols.items():
+            vc = zv.axs
+            self.log(t.format(k, vc.uread, vc.uwrite, vc.umove, vc.udel, vc.uget))
 
         flag_v = "v" in flags
         flag_ln = "ln" in flags
@@ -1136,12 +1214,14 @@ class AuthSrv(object):
                     False,
                     False,
                 )
-                for _, _, vpath, apath, files, dirs, _ in g:
-                    fnames = [n[0] for n in files]
-                    vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
-                    vpaths = [vtop + x for x in vpaths]
+                for _, _, vpath, apath, files1, dirs, _ in g:
+                    fnames = [n[0] for n in files1]
+                    zsl = [vpath + "/" + n for n in fnames] if vpath else fnames
+                    vpaths = [vtop + x for x in zsl]
                     apaths = [os.path.join(apath, n) for n in fnames]
-                    files = [[vpath + "/", apath + os.sep]] + list(zip(vpaths, apaths))
+                    files = [(vpath + "/", apath + os.sep)] + list(
+                        [(zs1, zs2) for zs1, zs2 in zip(vpaths, apaths)]
+                    )
 
                     if flag_ln:
                         files = [x for x in files if not x[1].startswith(safeabs)]
@@ -1152,21 +1232,23 @@ class AuthSrv(object):
                     if not files:
                         continue
                     elif flag_v:
-                        msg = [""] + [
+                        ta = [""] + [
                             '# user "{}", vpath "{}"\n{}'.format(u, vp, ap)
                             for vp, ap in files
                         ]
                     else:
-                        msg = ["user {}, vol {}: {} =>".format(u, vtop, files[0][0])]
-                        msg += [x[1] for x in files]
+                        ta = ["user {}, vol {}: {} =>".format(u, vtop, files[0][0])]
+                        ta += [x[1] for x in files]
 
-                    self.log("\n".join(msg))
+                    self.log("\n".join(ta))
 
                 if bads:
                     self.log("\n  ".join(["found symlinks leaving volume:"] + bads))
 
                 if bads and flag_p:
-                    raise Exception("found symlink leaving volume, and strict is set")
+                    raise Exception(
+                        "\033[31m\n  [--ls] found a safety issue and prevented startup:\n    found symlinks leaving volume, and strict is set\n\033[0m"
+                    )
 
         if not flag_r:
             sys.exit(0)

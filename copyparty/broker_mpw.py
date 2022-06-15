@@ -1,20 +1,38 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import sys
+import argparse
 import signal
+import sys
 import threading
 
-from .broker_util import ExceptionalQueue
+import queue
+
+from .authsrv import AuthSrv
+from .broker_util import BrokerCli, ExceptionalQueue
 from .httpsrv import HttpSrv
 from .util import FAKE_MP
-from .authsrv import AuthSrv
+
+try:
+    from types import FrameType
+
+    from typing import Any, Optional, Union
+except:
+    pass
 
 
-class MpWorker(object):
+class MpWorker(BrokerCli):
     """one single mp instance"""
 
-    def __init__(self, q_pend, q_yield, args, n):
+    def __init__(
+        self,
+        q_pend: queue.Queue[tuple[int, str, list[Any]]],
+        q_yield: queue.Queue[tuple[int, str, list[Any]]],
+        args: argparse.Namespace,
+        n: int,
+    ) -> None:
+        super(MpWorker, self).__init__()
+
         self.q_pend = q_pend
         self.q_yield = q_yield
         self.args = args
@@ -22,7 +40,7 @@ class MpWorker(object):
 
         self.log = self._log_disabled if args.q and not args.lo else self._log_enabled
 
-        self.retpend = {}
+        self.retpend: dict[int, Any] = {}
         self.retpend_mutex = threading.Lock()
         self.mutex = threading.Lock()
 
@@ -45,20 +63,20 @@ class MpWorker(object):
         thr.start()
         thr.join()
 
-    def signal_handler(self, sig, frame):
+    def signal_handler(self, sig: Optional[int], frame: Optional[FrameType]) -> None:
         # print('k')
         pass
 
-    def _log_enabled(self, src, msg, c=0):
-        self.q_yield.put([0, "log", [src, msg, c]])
+    def _log_enabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
+        self.q_yield.put((0, "log", [src, msg, c]))
 
-    def _log_disabled(self, src, msg, c=0):
+    def _log_disabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
         pass
 
-    def logw(self, msg, c=0):
+    def logw(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log("mp{}".format(self.n), msg, c)
 
-    def main(self):
+    def main(self) -> None:
         while True:
             retq_id, dest, args = self.q_pend.get()
 
@@ -87,15 +105,14 @@ class MpWorker(object):
             else:
                 raise Exception("what is " + str(dest))
 
-    def put(self, want_retval, dest, *args):
-        if want_retval:
-            retq = ExceptionalQueue(1)
-            retq_id = id(retq)
-            with self.retpend_mutex:
-                self.retpend[retq_id] = retq
-        else:
-            retq = None
-            retq_id = 0
+    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+        retq = ExceptionalQueue(1)
+        retq_id = id(retq)
+        with self.retpend_mutex:
+            self.retpend[retq_id] = retq
 
-        self.q_yield.put([retq_id, dest, args])
+        self.q_yield.put((retq_id, dest, list(args)))
         return retq
+
+    def say(self, dest: str, *args: Any) -> None:
+        self.q_yield.put((0, dest, list(args)))

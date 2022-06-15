@@ -4,7 +4,7 @@
 # installation:
 #   cp -pv copyparty.service /etc/systemd/system
 #   restorecon -vr /etc/systemd/system/copyparty.service
-#   firewall-cmd --permanent --add-port={80,443,3923}/tcp
+#   firewall-cmd --permanent --add-port={80,443,3923}/tcp  # --zone=libvirt
 #   firewall-cmd --reload
 #   systemctl daemon-reload && systemctl enable --now copyparty
 #

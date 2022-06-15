@@ -1200,15 +1200,18 @@ journalctl -aS '48 hour ago' -u copyparty | grep -C10 FILENAME | tee bug.log
 
 ## dev env setup
 
-mostly optional; if you need a working env for vscode or similar
+you need python 3.9 or newer due to type hints
+
+the rest is mostly optional; if you need a working env for vscode or similar
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-pip install jinja2  # mandatory
+pip install jinja2 strip_hints  # MANDATORY
 pip install mutagen  # audio metadata
+pip install pyftpdlib  # ftp server
 pip install Pillow pyheif-pillow-opener pillow-avif-plugin  # thumbnails
-pip install black==21.12b0 bandit pylint flake8  # vscode tooling
+pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscode tooling
 ```
 
 

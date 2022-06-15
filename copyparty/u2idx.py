@@ -1,34 +1,37 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re
-import os
-import time
 import calendar
+import os
+import re
 import threading
+import time
 from operator import itemgetter
 
-from .__init__ import ANYWIN, unicode
-from .util import absreal, s3dec, Pebkac, min_ex, gen_filekey, quotep
+from .__init__ import ANYWIN, TYPE_CHECKING, unicode
 from .bos import bos
 from .up2k import up2k_wark_from_hashlist
+from .util import HAVE_SQLITE3, Pebkac, absreal, gen_filekey, min_ex, quotep, s3dec
 
-
-try:
-    HAVE_SQLITE3 = True
+if HAVE_SQLITE3:
     import sqlite3
-except:
-    HAVE_SQLITE3 = False
-
 
 try:
     from pathlib import Path
 except:
     pass
 
+try:
+    from typing import Any, Optional, Union
+except:
+    pass
+
+if TYPE_CHECKING:
+    from .httpconn import HttpConn
+
 
 class U2idx(object):
-    def __init__(self, conn):
+    def __init__(self, conn: "HttpConn") -> None:
         self.log_func = conn.log_func
         self.asrv = conn.asrv
         self.args = conn.args
@@ -38,19 +41,21 @@ class U2idx(object):
             self.log("your python does not have sqlite3; searching will be disabled")
             return
 
-        self.active_id = None
-        self.active_cur = None
-        self.cur = {}
-        self.mem_cur = sqlite3.connect(":memory:")
+        self.active_id = ""
+        self.active_cur: Optional["sqlite3.Cursor"] = None
+        self.cur: dict[str, "sqlite3.Cursor"] = {}
+        self.mem_cur = sqlite3.connect(":memory:").cursor()
         self.mem_cur.execute(r"create table a (b text)")
 
-        self.p_end = None
-        self.p_dur = 0
+        self.p_end = 0.0
+        self.p_dur = 0.0
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("u2idx", msg, c)
 
-    def fsearch(self, vols, body):
+    def fsearch(
+        self, vols: list[tuple[str, str, dict[str, Any]]], body: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """search by up2k hashlist"""
         if not HAVE_SQLITE3:
             return []
@@ -60,14 +65,14 @@ class U2idx(object):
         wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
 
         uq = "substr(w,1,16) = ? and w = ?"
-        uv = [wark[:16], wark]
+        uv: list[Union[str, int]] = [wark[:16], wark]
 
         try:
             return self.run_query(vols, uq, uv, True, False, 99999)[0]
         except:
             raise Pebkac(500, min_ex())
 
-    def get_cur(self, ptop):
+    def get_cur(self, ptop: str) -> Optional["sqlite3.Cursor"]:
         if not HAVE_SQLITE3:
             return None
 
@@ -103,13 +108,16 @@ class U2idx(object):
         self.cur[ptop] = cur
         return cur
 
-    def search(self, vols, uq, lim):
+    def search(
+        self, vols: list[tuple[str, str, dict[str, Any]]], uq: str, lim: int
+    ) -> tuple[list[dict[str, Any]], list[str]]:
         """search by query params"""
         if not HAVE_SQLITE3:
-            return []
+            return [], []
 
         q = ""
-        va = []
+        v: Union[str, int] = ""
+        va: list[Union[str, int]] = []
         have_up = False  # query has up.* operands
         have_mt = False
         is_key = True
@@ -202,7 +210,7 @@ class U2idx(object):
                     "%Y",
                 ]:
                     try:
-                        v = calendar.timegm(time.strptime(v, fmt))
+                        v = calendar.timegm(time.strptime(str(v), fmt))
                         break
                     except:
                         pass
@@ -230,11 +238,12 @@ class U2idx(object):
 
             # lowercase tag searches
             m = ptn_lc.search(q)
-            if not m or not ptn_lcv.search(unicode(v)):
+            zs = unicode(v)
+            if not m or not ptn_lcv.search(zs):
                 continue
 
             va.pop()
-            va.append(v.lower())
+            va.append(zs.lower())
             q = q[: m.start()]
 
             field, oper = m.groups()
@@ -248,8 +257,16 @@ class U2idx(object):
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
-    def run_query(self, vols, uq, uv, have_up, have_mt, lim):
-        done_flag = []
+    def run_query(
+        self,
+        vols: list[tuple[str, str, dict[str, Any]]],
+        uq: str,
+        uv: list[Union[str, int]],
+        have_up: bool,
+        have_mt: bool,
+        lim: int,
+    ) -> tuple[list[dict[str, Any]], list[str]]:
+        done_flag: list[bool] = []
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
         )
@@ -266,13 +283,11 @@ class U2idx(object):
 
         if not uq or not uv:
             uq = "select * from up"
-            uv = ()
+            uv = []
         elif have_mt:
             uq = "select up.*, substr(up.w,1,16) mtw from up where " + uq
-            uv = tuple(uv)
         else:
             uq = "select up.* from up where " + uq
-            uv = tuple(uv)
 
         self.log("qs: {!r} {!r}".format(uq, uv))
 
@@ -292,11 +307,10 @@ class U2idx(object):
                     v = vtop + "/"
 
                 vuv.append(v)
-            vuv = tuple(vuv)
 
             sret = []
             fk = flags.get("fk")
-            c = cur.execute(uq, vuv)
+            c = cur.execute(uq, tuple(vuv))
             for hit in c:
                 w, ts, sz, rd, fn, ip, at = hit[:7]
                 lim -= 1
@@ -340,7 +354,7 @@ class U2idx(object):
             # print("[{}] {}".format(ptop, sret))
 
         done_flag.append(True)
-        self.active_id = None
+        self.active_id = ""
 
         # undupe hits from multiple metadata keys
         if len(ret) > 1:
@@ -354,11 +368,12 @@ class U2idx(object):
 
         return ret, list(taglist.keys())
 
-    def terminator(self, identifier, done_flag):
+    def terminator(self, identifier: str, done_flag: list[bool]) -> None:
         for _ in range(self.timeout):
             time.sleep(1)
             if done_flag:
                 return
 
         if identifier == self.active_id:
+            assert self.active_cur
             self.active_cur.connection.interrupt()

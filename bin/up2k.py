@@ -77,15 +77,15 @@ class File(object):
         self.up_b = 0  # type: int
         self.up_c = 0  # type: int
 
-        # m = "size({}) lmod({}) top({}) rel({}) abs({}) name({})\n"
-        # eprint(m.format(self.size, self.lmod, self.top, self.rel, self.abs, self.name))
+        # t = "size({}) lmod({}) top({}) rel({}) abs({}) name({})\n"
+        # eprint(t.format(self.size, self.lmod, self.top, self.rel, self.abs, self.name))
 
 
 class FileSlice(object):
     """file-like object providing a fixed window into a file"""
 
     def __init__(self, file, cid):
-        # type: (File, str) -> FileSlice
+        # type: (File, str) -> None
 
         self.car, self.len = file.kchunks[cid]
         self.cdr = self.car + self.len
@@ -216,8 +216,8 @@ class CTermsize(object):
             eprint("\033[s\033[r\033[u")
         else:
             self.g = 1 + self.h - margin
-            m = "{0}\033[{1}A".format("\n" * margin, margin)
-            eprint("{0}\033[s\033[1;{1}r\033[u".format(m, self.g - 1))
+            t = "{0}\033[{1}A".format("\n" * margin, margin)
+            eprint("{0}\033[s\033[1;{1}r\033[u".format(t, self.g - 1))
 
 
 ss = CTermsize()
@@ -597,8 +597,8 @@ class Ctl(object):
                         if "/" in name:
                             name = "\033[36m{0}\033[0m/{1}".format(*name.rsplit("/", 1))
 
-                        m = "{0:6.1f}% {1} {2}\033[K"
-                        txt += m.format(p, self.nfiles - f, name)
+                        t = "{0:6.1f}% {1} {2}\033[K"
+                        txt += t.format(p, self.nfiles - f, name)
 
                 txt += "\033[{0}H ".format(ss.g + 2)
             else:
@@ -618,8 +618,8 @@ class Ctl(object):
             nleft = self.nfiles - self.up_f
             tail = "\033[K\033[u" if VT100 else "\r"
 
-            m = "{0} eta @ {1}/s, {2}, {3}# left".format(eta, spd, sleft, nleft)
-            eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(m, tail))
+            t = "{0} eta @ {1}/s, {2}, {3}# left".format(eta, spd, sleft, nleft)
+            eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
 
     def cleanup_vt100(self):
         ss.scroll_region(None)
@@ -721,8 +721,8 @@ class Ctl(object):
             if search:
                 if hs:
                     for hit in hs:
-                        m = "found: {0}\n  {1}{2}\n"
-                        print(m.format(upath, burl, hit["rp"]), end="")
+                        t = "found: {0}\n  {1}{2}\n"
+                        print(t.format(upath, burl, hit["rp"]), end="")
                 else:
                     print("NOT found: {0}\n".format(upath), end="")
 

@@ -90,7 +90,10 @@ def get_ramdisk():
 
 
 class NullBroker(object):
-    def put(*args):
+    def say(*args):
+        pass
+
+    def ask(*args):
         pass
 
 

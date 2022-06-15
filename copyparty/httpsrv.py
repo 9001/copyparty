@@ -1,13 +1,15 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
-import sys
-import time
-import math
 import base64
+import math
+import os
 import socket
+import sys
 import threading
+import time
+
+import queue
 
 try:
     import jinja2
@@ -26,15 +28,18 @@ except ImportError:
     )
     sys.exit(1)
 
-from .__init__ import E, PY2, MACOS
-from .util import FHC, spack, min_ex, start_stackmon, start_log_thrs
+from .__init__ import MACOS, TYPE_CHECKING, E
 from .bos import bos
 from .httpconn import HttpConn
+from .util import FHC, min_ex, spack, start_log_thrs, start_stackmon
 
-if PY2:
-    import Queue as queue
-else:
-    import queue
+if TYPE_CHECKING:
+    from .broker_util import BrokerCli
+
+try:
+    from typing import Any, Optional
+except:
+    pass
 
 
 class HttpSrv(object):
@@ -43,7 +48,7 @@ class HttpSrv(object):
     relying on MpSrv for performance (HttpSrv is just plain threads)
     """
 
-    def __init__(self, broker, nid):
+    def __init__(self, broker: "BrokerCli", nid: Optional[int]) -> None:
         self.broker = broker
         self.nid = nid
         self.args = broker.args
@@ -58,17 +63,19 @@ class HttpSrv(object):
 
         self.tp_nthr = 0  # actual
         self.tp_ncli = 0  # fading
-        self.tp_time = None  # latest worker collect
-        self.tp_q = None if self.args.no_htp else queue.LifoQueue()
-        self.t_periodic = None
+        self.tp_time = 0.0  # latest worker collect
+        self.tp_q: Optional[queue.LifoQueue[Any]] = (
+            None if self.args.no_htp else queue.LifoQueue()
+        )
+        self.t_periodic: Optional[threading.Thread] = None
 
         self.u2fh = FHC()
-        self.srvs = []
+        self.srvs: list[socket.socket] = []
         self.ncli = 0  # exact
-        self.clients = {}  # laggy
+        self.clients: set[HttpConn] = set()  # laggy
         self.nclimax = 0
-        self.cb_ts = 0
-        self.cb_v = 0
+        self.cb_ts = 0.0
+        self.cb_v = ""
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
@@ -82,7 +89,7 @@ class HttpSrv(object):
         if bos.path.exists(cert_path):
             self.cert_path = cert_path
         else:
-            self.cert_path = None
+            self.cert_path = ""
 
         if self.tp_q:
             self.start_threads(4)
@@ -94,19 +101,19 @@ class HttpSrv(object):
             if self.args.log_thrs:
                 start_log_thrs(self.log, self.args.log_thrs, nid)
 
-        self.th_cfg = {}  # type: dict[str, Any]
+        self.th_cfg: dict[str, Any] = {}
         t = threading.Thread(target=self.post_init)
         t.daemon = True
         t.start()
 
-    def post_init(self):
+    def post_init(self) -> None:
         try:
-            x = self.broker.put(True, "thumbsrv.getcfg")
+            x = self.broker.ask("thumbsrv.getcfg")
             self.th_cfg = x.get()
         except:
             pass
 
-    def start_threads(self, n):
+    def start_threads(self, n: int) -> None:
         self.tp_nthr += n
         if self.args.log_htp:
             self.log(self.name, "workers += {} = {}".format(n, self.tp_nthr), 6)
@@ -119,15 +126,16 @@ class HttpSrv(object):
             thr.daemon = True
             thr.start()
 
-    def stop_threads(self, n):
+    def stop_threads(self, n: int) -> None:
         self.tp_nthr -= n
         if self.args.log_htp:
             self.log(self.name, "workers -= {} = {}".format(n, self.tp_nthr), 6)
 
+        assert self.tp_q
         for _ in range(n):
             self.tp_q.put(None)
 
-    def periodic(self):
+    def periodic(self) -> None:
         while True:
             time.sleep(2 if self.tp_ncli or self.ncli else 10)
             with self.mutex:
@@ -141,7 +149,7 @@ class HttpSrv(object):
                     self.t_periodic = None
                     return
 
-    def listen(self, sck, nlisteners):
+    def listen(self, sck: socket.socket, nlisteners: int) -> None:
         ip, port = sck.getsockname()
         self.srvs.append(sck)
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
@@ -153,15 +161,15 @@ class HttpSrv(object):
         t.daemon = True
         t.start()
 
-    def thr_listen(self, srv_sck):
+    def thr_listen(self, srv_sck: socket.socket) -> None:
         """listens on a shared tcp server"""
         ip, port = srv_sck.getsockname()
         fno = srv_sck.fileno()
         msg = "subscribed @ {}:{}  f{}".format(ip, port, fno)
         self.log(self.name, msg)
 
-        def fun():
-            self.broker.put(False, "cb_httpsrv_up")
+        def fun() -> None:
+            self.broker.say("cb_httpsrv_up")
 
         threading.Thread(target=fun).start()
 
@@ -185,21 +193,21 @@ class HttpSrv(object):
                 continue
 
             if self.args.log_conn:
-                m = "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
+                t = "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
                     "-" * 3, ip, port % 8, port
                 )
-                self.log("%s %s" % addr, m, c="1;30")
+                self.log("%s %s" % addr, t, c="1;30")
 
             self.accept(sck, addr)
 
-    def accept(self, sck, addr):
+    def accept(self, sck: socket.socket, addr: tuple[str, int]) -> None:
         """takes an incoming tcp connection and creates a thread to handle it"""
         now = time.time()
 
         if now - (self.tp_time or now) > 300:
-            m = "httpserver threadpool died: tpt {:.2f}, now {:.2f}, nthr {}, ncli {}"
-            self.log(self.name, m.format(self.tp_time, now, self.tp_nthr, self.ncli), 1)
-            self.tp_time = None
+            t = "httpserver threadpool died: tpt {:.2f}, now {:.2f}, nthr {}, ncli {}"
+            self.log(self.name, t.format(self.tp_time, now, self.tp_nthr, self.ncli), 1)
+            self.tp_time = 0
             self.tp_q = None
 
         with self.mutex:
@@ -209,10 +217,10 @@ class HttpSrv(object):
                 if self.nid:
                     name += "-{}".format(self.nid)
 
-                t = threading.Thread(target=self.periodic, name=name)
-                self.t_periodic = t
-                t.daemon = True
-                t.start()
+                thr = threading.Thread(target=self.periodic, name=name)
+                self.t_periodic = thr
+                thr.daemon = True
+                thr.start()
 
             if self.tp_q:
                 self.tp_time = self.tp_time or now
@@ -224,8 +232,8 @@ class HttpSrv(object):
                 return
 
         if not self.args.no_htp:
-            m = "looks like the httpserver threadpool died; please make an issue on github and tell me the story of how you pulled that off, thanks and dog bless\n"
-            self.log(self.name, m, 1)
+            t = "looks like the httpserver threadpool died; please make an issue on github and tell me the story of how you pulled that off, thanks and dog bless\n"
+            self.log(self.name, t, 1)
 
         thr = threading.Thread(
             target=self.thr_client,
@@ -235,14 +243,15 @@ class HttpSrv(object):
         thr.daemon = True
         thr.start()
 
-    def thr_poolw(self):
+    def thr_poolw(self) -> None:
+        assert self.tp_q
         while True:
             task = self.tp_q.get()
             if not task:
                 break
 
             with self.mutex:
-                self.tp_time = None
+                self.tp_time = 0
 
             try:
                 sck, addr = task
@@ -255,7 +264,7 @@ class HttpSrv(object):
             except:
                 self.log(self.name, "thr_client: " + min_ex(), 3)
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         self.stopping = True
         for srv in self.srvs:
             try:
@@ -263,7 +272,7 @@ class HttpSrv(object):
             except:
                 pass
 
-        clients = list(self.clients.keys())
+        clients = list(self.clients)
         for cli in clients:
             try:
                 cli.shutdown()
@@ -279,13 +288,13 @@ class HttpSrv(object):
 
         self.log(self.name, "ok bye")
 
-    def thr_client(self, sck, addr):
+    def thr_client(self, sck: socket.socket, addr: tuple[str, int]) -> None:
         """thread managing one tcp client"""
         sck.settimeout(120)
 
         cli = HttpConn(sck, addr, self)
         with self.mutex:
-            self.clients[cli] = 0
+            self.clients.add(cli)
 
         fno = sck.fileno()
         try:
@@ -328,10 +337,10 @@ class HttpSrv(object):
                     raise
             finally:
                 with self.mutex:
-                    del self.clients[cli]
+                    self.clients.remove(cli)
                     self.ncli -= 1
 
-    def cachebuster(self):
+    def cachebuster(self) -> str:
         if time.time() - self.cb_ts < 1:
             return self.cb_v
 

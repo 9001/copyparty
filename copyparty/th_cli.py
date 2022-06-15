@@ -3,13 +3,23 @@ from __future__ import print_function, unicode_literals
 
 import os
 
-from .util import Cooldown
-from .th_srv import thumb_path, HAVE_WEBP
+from .__init__ import TYPE_CHECKING
+from .authsrv import VFS
 from .bos import bos
+from .th_srv import HAVE_WEBP, thumb_path
+from .util import Cooldown
+
+try:
+    from typing import Optional, Union
+except:
+    pass
+
+if TYPE_CHECKING:
+    from .httpsrv import HttpSrv
 
 
 class ThumbCli(object):
-    def __init__(self, hsrv):
+    def __init__(self, hsrv: "HttpSrv") -> None:
         self.broker = hsrv.broker
         self.log_func = hsrv.log
         self.args = hsrv.args
@@ -34,10 +44,10 @@ class ThumbCli(object):
         d = next((x for x in self.args.th_dec if x in ("vips", "pil")), None)
         self.can_webp = HAVE_WEBP or d == "vips"
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("thumbcli", msg, c)
 
-    def get(self, dbv, rem, mtime, fmt):
+    def get(self, dbv: VFS, rem: str, mtime: float, fmt: str) -> Optional[str]:
         ptop = dbv.realpath
         ext = rem.rsplit(".")[-1].lower()
         if ext not in self.thumbable or "dthumb" in dbv.flags:
@@ -106,17 +116,17 @@ class ThumbCli(object):
         if ret:
             tdir = os.path.dirname(tpath)
             if self.cooldown.poke(tdir):
-                self.broker.put(False, "thumbsrv.poke", tdir)
+                self.broker.say("thumbsrv.poke", tdir)
 
             if want_opus:
                 # audio files expire individually
                 if self.cooldown.poke(tpath):
-                    self.broker.put(False, "thumbsrv.poke", tpath)
+                    self.broker.say("thumbsrv.poke", tpath)
 
             return ret
 
         if abort:
             return None
 
-        x = self.broker.put(True, "thumbsrv.get", ptop, rem, mtime, fmt)
-        return x.get()
+        x = self.broker.ask("thumbsrv.get", ptop, rem, mtime, fmt)
+        return x.get()  # type: ignore

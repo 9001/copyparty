@@ -3,14 +3,25 @@ from __future__ import print_function, unicode_literals
 
 import threading
 
+from .__init__ import TYPE_CHECKING
+from .broker_util import BrokerCli, ExceptionalQueue, try_exec
 from .httpsrv import HttpSrv
-from .broker_util import ExceptionalQueue, try_exec
+
+if TYPE_CHECKING:
+    from .svchub import SvcHub
+
+try:
+    from typing import Any
+except:
+    pass
 
 
-class BrokerThr(object):
+class BrokerThr(BrokerCli):
     """external api; behaves like BrokerMP but using plain threads"""
 
-    def __init__(self, hub):
+    def __init__(self, hub: "SvcHub") -> None:
+        super(BrokerThr, self).__init__()
+
         self.hub = hub
         self.log = hub.log
         self.args = hub.args
@@ -23,29 +34,35 @@ class BrokerThr(object):
         self.httpsrv = HttpSrv(self, None)
         self.reload = self.noop
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         # self.log("broker", "shutting down")
         self.httpsrv.shutdown()
 
-    def noop(self):
+    def noop(self) -> None:
         pass
 
-    def put(self, want_retval, dest, *args):
+    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+
+        # new ipc invoking managed service in hub
+        obj = self.hub
+        for node in dest.split("."):
+            obj = getattr(obj, node)
+
+        rv = try_exec(True, obj, *args)
+
+        # pretend we're broker_mp
+        retq = ExceptionalQueue(1)
+        retq.put(rv)
+        return retq
+
+    def say(self, dest: str, *args: Any) -> None:
         if dest == "listen":
             self.httpsrv.listen(args[0], 1)
+            return
 
-        else:
-            # new ipc invoking managed service in hub
-            obj = self.hub
-            for node in dest.split("."):
-                obj = getattr(obj, node)
+        # new ipc invoking managed service in hub
+        obj = self.hub
+        for node in dest.split("."):
+            obj = getattr(obj, node)
 
-            # TODO will deadlock if dest performs another ipc
-            rv = try_exec(want_retval, obj, *args)
-            if not want_retval:
-                return
-
-            # pretend we're broker_mp
-            retq = ExceptionalQueue(1)
-            retq.put(rv)
-            return retq
+        try_exec(False, obj, *args)

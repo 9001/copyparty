@@ -90,6 +90,15 @@ function have() {
 have setuptools
 have wheel
 have twine
+
+# remove type hints to support python < 3.9
+rm -rf build/pypi
+mkdir -p build/pypi
+cp -pR setup.py README.md LICENSE copyparty tests bin scripts/strip_hints build/pypi/
+cd build/pypi
+tar --strip-components=2 -xf ../strip-hints-0.1.10.tar.gz strip-hints-0.1.10/src/strip_hints
+python3 -c 'from strip_hints.a import uh; uh("copyparty")'
+
 ./setup.py clean2
 ./setup.py sdist bdist_wheel --universal
 

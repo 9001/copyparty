@@ -1,41 +1,51 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import argparse
+import calendar
 import os
-import sys
-import time
 import shlex
-import string
 import signal
 import socket
+import string
+import sys
 import threading
+import time
 from datetime import datetime, timedelta
-import calendar
 
-from .__init__ import E, PY2, WINDOWS, ANYWIN, MACOS, VT100, unicode
-from .util import mp, start_log_thrs, start_stackmon, min_ex, ansi_re
+try:
+    from types import FrameType
+
+    import typing
+    from typing import Optional, Union
+except:
+    pass
+
+from .__init__ import ANYWIN, MACOS, PY2, VT100, WINDOWS, E, unicode
 from .authsrv import AuthSrv
-from .tcpsrv import TcpSrv
-from .up2k import Up2k
-from .th_srv import ThumbSrv, HAVE_PIL, HAVE_VIPS, HAVE_WEBP
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
+from .tcpsrv import TcpSrv
+from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
+from .up2k import Up2k
+from .util import ansi_re, min_ex, mp, start_log_thrs, start_stackmon
 
 
 class SvcHub(object):
     """
     Hosts all services which cannot be parallelized due to reliance on monolithic resources.
     Creates a Broker which does most of the heavy stuff; hosted services can use this to perform work:
-        hub.broker.put(want_reply, destination, args_list).
+        hub.broker.<say|ask>(destination, args_list).
 
     Either BrokerThr (plain threads) or BrokerMP (multiprocessing) is used depending on configuration.
     Nothing is returned synchronously; if you want any value returned from the call,
     put() can return a queue (if want_reply=True) which has a blocking get() with the response.
     """
 
-    def __init__(self, args, argv, printed):
+    def __init__(self, args: argparse.Namespace, argv: list[str], printed: str) -> None:
         self.args = args
         self.argv = argv
-        self.logf = None
+        self.logf: Optional[typing.TextIO] = None
+        self.logf_base_fn = ""
         self.stop_req = False
         self.reload_req = False
         self.stopping = False
@@ -59,16 +69,16 @@ class SvcHub(object):
 
         if not args.use_fpool and args.j != 1:
             args.no_fpool = True
-            m = "multithreading enabled with -j {}, so disabling fpool -- this can reduce upload performance on some filesystems"
-            self.log("root", m.format(args.j))
+            t = "multithreading enabled with -j {}, so disabling fpool -- this can reduce upload performance on some filesystems"
+            self.log("root", t.format(args.j))
 
         if not args.no_fpool and args.j != 1:
-            m = "WARNING: --use-fpool combined with multithreading is untested and can probably cause undefined behavior"
+            t = "WARNING: --use-fpool combined with multithreading is untested and can probably cause undefined behavior"
             if ANYWIN:
-                m = 'windows cannot do multithreading without --no-fpool, so enabling that -- note that upload performance will suffer if you have microsoft defender "real-time protection" enabled, so you probably want to use -j 1 instead'
+                t = 'windows cannot do multithreading without --no-fpool, so enabling that -- note that upload performance will suffer if you have microsoft defender "real-time protection" enabled, so you probably want to use -j 1 instead'
                 args.no_fpool = True
 
-            self.log("root", m, c=3)
+            self.log("root", t, c=3)
 
         bri = "zy"[args.theme % 2 :][:1]
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
@@ -96,8 +106,8 @@ class SvcHub(object):
         self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
         if not args.no_thumb:
-            m = "decoder preference: {}".format(", ".join(self.args.th_dec))
-            self.log("thumb", m)
+            t = "decoder preference: {}".format(", ".join(self.args.th_dec))
+            self.log("thumb", t)
 
             if "pil" in self.args.th_dec and not HAVE_WEBP:
                 msg = "disabling webp thumbnails because either libwebp is not available or your Pillow is too old"
@@ -131,11 +141,11 @@ class SvcHub(object):
         if self.check_mp_enable():
             from .broker_mp import BrokerMp as Broker
         else:
-            from .broker_thr import BrokerThr as Broker
+            from .broker_thr import BrokerThr as Broker  # type: ignore
 
         self.broker = Broker(self)
 
-    def thr_httpsrv_up(self):
+    def thr_httpsrv_up(self) -> None:
         time.sleep(1 if self.args.ign_ebind_all else 5)
         expected = self.broker.num_workers * self.tcpsrv.nsrv
         failed = expected - self.httpsrv_up
@@ -145,20 +155,20 @@ class SvcHub(object):
         if self.args.ign_ebind_all:
             if not self.tcpsrv.srv:
                 for _ in range(self.broker.num_workers):
-                    self.broker.put(False, "cb_httpsrv_up")
+                    self.broker.say("cb_httpsrv_up")
             return
 
         if self.args.ign_ebind and self.tcpsrv.srv:
             return
 
-        m = "{}/{} workers failed to start"
-        m = m.format(failed, expected)
-        self.log("root", m, 1)
+        t = "{}/{} workers failed to start"
+        t = t.format(failed, expected)
+        self.log("root", t, 1)
 
         self.retcode = 1
         os.kill(os.getpid(), signal.SIGTERM)
 
-    def cb_httpsrv_up(self):
+    def cb_httpsrv_up(self) -> None:
         self.httpsrv_up += 1
         if self.httpsrv_up != self.broker.num_workers:
             return
@@ -171,9 +181,9 @@ class SvcHub(object):
         thr.daemon = True
         thr.start()
 
-    def _logname(self):
+    def _logname(self) -> str:
         dt = datetime.utcnow()
-        fn = self.args.lo
+        fn = str(self.args.lo)
         for fs in "YmdHMS":
             fs = "%" + fs
             if fs in fn:
@@ -181,7 +191,7 @@ class SvcHub(object):
 
         return fn
 
-    def _setup_logfile(self, printed):
+    def _setup_logfile(self, printed: str) -> None:
         base_fn = fn = sel_fn = self._logname()
         if fn != self.args.lo:
             ctr = 0
@@ -203,8 +213,6 @@ class SvcHub(object):
 
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
 
-        lh.base_fn = base_fn
-
         argv = [sys.executable] + self.argv
         if hasattr(shlex, "quote"):
             argv = [shlex.quote(x) for x in argv]
@@ -215,9 +223,10 @@ class SvcHub(object):
         printed += msg
         lh.write("t0: {:.3f}\nargv: {}\n\n{}".format(E.t0, " ".join(argv), printed))
         self.logf = lh
+        self.logf_base_fn = base_fn
         print(msg, end="")
 
-    def run(self):
+    def run(self) -> None:
         self.tcpsrv.run()
 
         thr = threading.Thread(target=self.thr_httpsrv_up)
@@ -252,7 +261,7 @@ class SvcHub(object):
         else:
             self.stop_thr()
 
-    def reload(self):
+    def reload(self) -> str:
         if self.reloading:
             return "cannot reload; already in progress"
 
@@ -262,7 +271,7 @@ class SvcHub(object):
         t.start()
         return "reload initiated"
 
-    def _reload(self):
+    def _reload(self) -> None:
         self.log("root", "reload scheduled")
         with self.up2k.mutex:
             self.asrv.reload()
@@ -271,7 +280,7 @@ class SvcHub(object):
 
         self.reloading = False
 
-    def stop_thr(self):
+    def stop_thr(self) -> None:
         while not self.stop_req:
             with self.stop_cond:
                 self.stop_cond.wait(9001)
@@ -282,7 +291,7 @@ class SvcHub(object):
 
         self.shutdown()
 
-    def signal_handler(self, sig, frame):
+    def signal_handler(self, sig: int, frame: Optional[FrameType]) -> None:
         if self.stopping:
             return
 
@@ -294,7 +303,7 @@ class SvcHub(object):
         with self.stop_cond:
             self.stop_cond.notify_all()
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         if self.stopping:
             return
 
@@ -337,7 +346,7 @@ class SvcHub(object):
 
             sys.exit(ret)
 
-    def _log_disabled(self, src, msg, c=0):
+    def _log_disabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
         if not self.logf:
             return
 
@@ -349,8 +358,8 @@ class SvcHub(object):
             if now >= self.next_day:
                 self._set_next_day()
 
-    def _set_next_day(self):
-        if self.next_day and self.logf and self.logf.base_fn != self._logname():
+    def _set_next_day(self) -> None:
+        if self.next_day and self.logf and self.logf_base_fn != self._logname():
             self.logf.close()
             self._setup_logfile("")
 
@@ -364,7 +373,7 @@ class SvcHub(object):
         dt = dt.replace(hour=0, minute=0, second=0)
         self.next_day = calendar.timegm(dt.utctimetuple())
 
-    def _log_enabled(self, src, msg, c=0):
+    def _log_enabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
         """handles logging from all components"""
         with self.log_mutex:
             now = time.time()
@@ -401,7 +410,7 @@ class SvcHub(object):
             if self.logf:
                 self.logf.write(msg)
 
-    def check_mp_support(self):
+    def check_mp_support(self) -> str:
         vmin = sys.version_info[1]
         if WINDOWS:
             msg = "need python 3.3 or newer for multiprocessing;"
@@ -415,16 +424,16 @@ class SvcHub(object):
                 return msg
 
         try:
-            x = mp.Queue(1)
-            x.put(["foo", "bar"])
+            x: mp.Queue[tuple[str, str]] = mp.Queue(1)
+            x.put(("foo", "bar"))
             if x.get()[0] != "foo":
                 raise Exception()
         except:
             return "multiprocessing is not supported on your platform;"
 
-        return None
+        return ""
 
-    def check_mp_enable(self):
+    def check_mp_enable(self) -> bool:
         if self.args.j == 1:
             return False
 
@@ -447,18 +456,18 @@ class SvcHub(object):
             self.log("svchub", "cannot efficiently use multiple CPU cores")
             return False
 
-    def sd_notify(self):
+    def sd_notify(self) -> None:
         try:
-            addr = os.getenv("NOTIFY_SOCKET")
-            if not addr:
+            zb = os.getenv("NOTIFY_SOCKET")
+            if not zb:
                 return
 
-            addr = unicode(addr)
+            addr = unicode(zb)
             if addr.startswith("@"):
                 addr = "\0" + addr[1:]
 
-            m = "".join(x for x in addr if x in string.printable)
-            self.log("sd_notify", m)
+            t = "".join(x for x in addr if x in string.printable)
+            self.log("sd_notify", t)
 
             sck = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
             sck.connect(addr)

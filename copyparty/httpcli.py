@@ -1,18 +1,23 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
-import stat
-import gzip
-import time
-import copy
-import json
+import argparse  # typechk
 import base64
-import string
+import calendar
+import copy
+import gzip
+import json
+import os
+import re
 import socket
+import stat
+import string
+import threading  # typechk
+import time
 from datetime import datetime
 from operator import itemgetter
-import calendar
+
+import jinja2  # typechk
 
 try:
     import lzma
@@ -24,13 +29,62 @@ try:
 except:
     pass
 
-from .__init__ import E, PY2, WINDOWS, ANYWIN, unicode
-from .util import *  # noqa  # pylint: disable=unused-wildcard-import
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS, E, unicode
+from .authsrv import VFS  # typechk
 from .bos import bos
-from .authsrv import AuthSrv
-from .szip import StreamZip
 from .star import StreamTar
+from .sutil import StreamArc  # typechk
+from .szip import StreamZip
+from .util import (
+    HTTP_TS_FMT,
+    HTTPCODE,
+    META_NOBOTS,
+    MultipartParser,
+    Pebkac,
+    UnrecvEOF,
+    alltrace,
+    exclude_dotfiles,
+    fsenc,
+    gen_filekey,
+    gencookie,
+    get_spd,
+    guess_mime,
+    gzip_orig_sz,
+    hashcopy,
+    html_bescape,
+    html_escape,
+    http_ts,
+    humansize,
+    min_ex,
+    quotep,
+    read_header,
+    read_socket,
+    read_socket_chunked,
+    read_socket_unbounded,
+    relchk,
+    ren_open,
+    s3enc,
+    sanitize_fn,
+    sendfile_kern,
+    sendfile_py,
+    undot,
+    unescape_cookie,
+    unquote,
+    unquotep,
+    vol_san,
+    vsplit,
+    yieldfile,
+)
 
+try:
+    from typing import Any, Generator, Match, Optional, Pattern, Type, Union
+except:
+    pass
+
+if TYPE_CHECKING:
+    from .httpconn import HttpConn
+
+_ = (argparse, threading)
 
 NO_CACHE = {"Cache-Control": "no-cache"}
 
@@ -40,27 +94,60 @@ class HttpCli(object):
     Spawned by HttpConn to process one http transaction
     """
 
-    def __init__(self, conn):
+    def __init__(self, conn: "HttpConn") -> None:
+        assert conn.sr
+
         self.t0 = time.time()
         self.conn = conn
-        self.mutex = conn.mutex
-        self.s = conn.s  # type: socket
-        self.sr = conn.sr  # type: Unrecv
+        self.mutex = conn.mutex  # mypy404
+        self.s = conn.s
+        self.sr = conn.sr
         self.ip = conn.addr[0]
-        self.addr = conn.addr  # type: tuple[str, int]
-        self.args = conn.args
-        self.asrv = conn.asrv  # type: AuthSrv
-        self.ico = conn.ico
-        self.thumbcli = conn.thumbcli
-        self.u2fh = conn.u2fh
-        self.log_func = conn.log_func
-        self.log_src = conn.log_src
-        self.tls = hasattr(self.s, "cipher")
+        self.addr: tuple[str, int] = conn.addr
+        self.args = conn.args  # mypy404
+        self.asrv = conn.asrv  # mypy404
+        self.ico = conn.ico  # mypy404
+        self.thumbcli = conn.thumbcli  # mypy404
+        self.u2fh = conn.u2fh  # mypy404
+        self.log_func = conn.log_func  # mypy404
+        self.log_src = conn.log_src  # mypy404
+        self.tls: bool = hasattr(self.s, "cipher")
+
+        # placeholders; assigned by run()
+        self.keepalive = False
+        self.is_https = False
+        self.headers: dict[str, str] = {}
+        self.mode = " "
+        self.req = " "
+        self.http_ver = " "
+        self.ua = " "
+        self.is_rclone = False
+        self.is_ancient = False
+        self.dip = " "
+        self.ouparam: dict[str, str] = {}
+        self.uparam: dict[str, str] = {}
+        self.cookies: dict[str, str] = {}
+        self.vpath = " "
+        self.uname = " "
+        self.rvol = [" "]
+        self.wvol = [" "]
+        self.mvol = [" "]
+        self.dvol = [" "]
+        self.gvol = [" "]
+        self.do_log = True
+        self.can_read = False
+        self.can_write = False
+        self.can_move = False
+        self.can_delete = False
+        self.can_get = False
+        # post
+        self.parser: Optional[MultipartParser] = None
+        # end placeholders
 
         self.bufsz = 1024 * 32
-        self.hint = None
+        self.hint = ""
         self.trailing_slash = True
-        self.out_headerlist = []
+        self.out_headerlist: list[tuple[str, str]] = []
         self.out_headers = {
             "Access-Control-Allow-Origin": "*",
             "Cache-Control": "no-store; max-age=0",
@@ -71,44 +158,44 @@ class HttpCli(object):
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
         self.html_head = h
 
-    def log(self, msg, c=0):
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
         ptn = self.asrv.re_pwd
         if ptn and ptn.search(msg):
             msg = ptn.sub(self.unpwd, msg)
 
         self.log_func(self.log_src, msg, c)
 
-    def unpwd(self, m):
+    def unpwd(self, m: Match[str]) -> str:
         a, b = m.groups()
         return "=\033[7m {} \033[27m{}".format(self.asrv.iacct[a], b)
 
-    def _check_nonfatal(self, ex, post):
+    def _check_nonfatal(self, ex: Pebkac, post: bool) -> bool:
         if post:
             return ex.code < 300
 
         return ex.code < 400 or ex.code in [404, 429]
 
-    def _assert_safe_rem(self, rem):
+    def _assert_safe_rem(self, rem: str) -> None:
         # sanity check to prevent any disasters
         if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
             raise Exception("that was close")
 
-    def j2(self, name, **ka):
+    def j2s(self, name: str, **ka: Any) -> str:
         tpl = self.conn.hsrv.j2[name]
-        if ka:
-            ka["ts"] = self.conn.hsrv.cachebuster()
-            ka["svcname"] = self.args.doctitle
-            ka["html_head"] = self.html_head
-            return tpl.render(**ka)
+        ka["ts"] = self.conn.hsrv.cachebuster()
+        ka["svcname"] = self.args.doctitle
+        ka["html_head"] = self.html_head
+        return tpl.render(**ka)  # type: ignore
 
-        return tpl
+    def j2j(self, name: str) -> jinja2.Template:
+        return self.conn.hsrv.j2[name]
 
-    def run(self):
+    def run(self) -> bool:
         """returns true if connection can be reused"""
         self.keepalive = False
         self.is_https = False
         self.headers = {}
-        self.hint = None
+        self.hint = ""
         try:
             headerlines = read_header(self.sr)
             if not headerlines:
@@ -125,8 +212,8 @@ class HttpCli(object):
                 # normalize incoming headers to lowercase;
                 # outgoing headers however are Correct-Case
                 for header_line in headerlines[1:]:
-                    k, v = header_line.split(":", 1)
-                    self.headers[k.lower()] = v.strip()
+                    k, zs = header_line.split(":", 1)
+                    self.headers[k.lower()] = zs.strip()
             except:
                 msg = " ]\n#[ ".join(headerlines)
                 raise Pebkac(400, "bad headers:\n#[ " + msg + " ]")
@@ -147,23 +234,26 @@ class HttpCli(object):
         self.is_rclone = self.ua.startswith("rclone/")
         self.is_ancient = self.ua.startswith("Mozilla/4.")
 
-        v = self.headers.get("connection", "").lower()
-        self.keepalive = not v.startswith("close") and self.http_ver != "HTTP/1.0"
-        self.is_https = (self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls)
+        zs = self.headers.get("connection", "").lower()
+        self.keepalive = not zs.startswith("close") and self.http_ver != "HTTP/1.0"
+        self.is_https = (
+            self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
+        )
 
         n = self.args.rproxy
         if n:
-            v = self.headers.get("x-forwarded-for")
-            if v and self.conn.addr[0] in ["127.0.0.1", "::1"]:
+            zso = self.headers.get("x-forwarded-for")
+            if zso and self.conn.addr[0] in ["127.0.0.1", "::1"]:
                 if n > 0:
                     n -= 1
 
-                vs = v.split(",")
+                zsl = zso.split(",")
                 try:
-                    self.ip = vs[n].strip()
+                    self.ip = zsl[n].strip()
                 except:
-                    self.ip = vs[0].strip()
-                    self.log("rproxy={} oob x-fwd {}".format(self.args.rproxy, v), c=3)
+                    self.ip = zsl[0].strip()
+                    t = "rproxy={} oob x-fwd {}"
+                    self.log(t.format(self.args.rproxy, zso), c=3)
 
                 self.log_src = self.conn.set_rproxy(self.ip)
 
@@ -175,9 +265,9 @@ class HttpCli(object):
                 keys = list(sorted(self.headers.keys()))
 
             for k in keys:
-                v = self.headers.get(k)
-                if v is not None:
-                    self.log("[H] {}: \033[33m[{}]".format(k, v), 6)
+                zso = self.headers.get(k)
+                if zso is not None:
+                    self.log("[H] {}: \033[33m[{}]".format(k, zso), 6)
 
         if "&" in self.req and "?" not in self.req:
             self.hint = "did you mean '?' instead of '&'"
@@ -193,20 +283,22 @@ class HttpCli(object):
             vpath = undot(vpath)
             for k in arglist.split("&"):
                 if "=" in k:
-                    k, v = k.split("=", 1)
-                    uparam[k.lower()] = v.strip()
+                    k, zs = k.split("=", 1)
+                    uparam[k.lower()] = zs.strip()
                 else:
-                    uparam[k.lower()] = False
+                    uparam[k.lower()] = ""
 
-        self.ouparam = {k: v for k, v in uparam.items()}
+        self.ouparam = {k: zs for k, zs in uparam.items()}
 
-        cookies = self.headers.get("cookie") or {}
-        if cookies:
-            cookies = [x.split("=", 1) for x in cookies.split(";") if "=" in x]
-            cookies = {k.strip(): unescape_cookie(v) for k, v in cookies}
+        zso = self.headers.get("cookie")
+        if zso:
+            zsll = [x.split("=", 1) for x in zso.split(";") if "=" in x]
+            cookies = {k.strip(): unescape_cookie(zs) for k, zs in zsll}
             for kc, ku in [["cppwd", "pw"], ["b", "b"]]:
                 if kc in cookies and ku not in uparam:
                     uparam[ku] = cookies[kc]
+        else:
+            cookies = {}
 
         if len(uparam) > 10 or len(cookies) > 50:
             raise Pebkac(400, "u wot m8")
@@ -223,22 +315,22 @@ class HttpCli(object):
             self.log("invalid relpath [{}]".format(self.vpath))
             return self.tx_404() and self.keepalive
 
-        pwd = None
-        ba = self.headers.get("authorization")
-        if ba:
+        pwd = ""
+        zso = self.headers.get("authorization")
+        if zso:
             try:
-                ba = ba.split(" ")[1].encode("ascii")
-                ba = base64.b64decode(ba).decode("utf-8")
+                zb = zso.split(" ")[1].encode("ascii")
+                zs = base64.b64decode(zb).decode("utf-8")
                 # try "pwd", "x:pwd", "pwd:x"
-                for ba in [ba] + ba.split(":", 1)[::-1]:
-                    if self.asrv.iacct.get(ba):
-                        pwd = ba
+                for zs in [zs] + zs.split(":", 1)[::-1]:
+                    if self.asrv.iacct.get(zs):
+                        pwd = zs
                         break
             except:
                 pass
 
         pwd = uparam.get("pw") or pwd
-        self.uname = self.asrv.iacct.get(pwd, "*")
+        self.uname = self.asrv.iacct.get(pwd) or "*"
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
         self.mvol = self.asrv.vfs.amove[self.uname]
@@ -249,12 +341,13 @@ class HttpCli(object):
             self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(pwd)[0]))
 
         if self.is_rclone:
-            uparam["raw"] = False
-            uparam["dots"] = False
-            uparam["b"] = False
-            cookies["b"] = False
+            uparam["raw"] = ""
+            uparam["dots"] = ""
+            uparam["b"] = ""
+            cookies["b"] = ""
 
-        self.do_log = not self.conn.lf_url or not self.conn.lf_url.search(self.req)
+        ptn: Optional[Pattern[str]] = self.conn.lf_url  # mypy404
+        self.do_log = not ptn or not ptn.search(self.req)
 
         x = self.asrv.vfs.can_access(self.vpath, self.uname)
         self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
@@ -272,9 +365,10 @@ class HttpCli(object):
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
         except Exception as ex:
-            pex = ex
             if not hasattr(ex, "code"):
                 pex = Pebkac(500)
+            else:
+                pex = ex  # type: ignore
 
             try:
                 post = self.mode in ["POST", "PUT"] or "content-length" in self.headers
@@ -294,7 +388,7 @@ class HttpCli(object):
             except Pebkac:
                 return False
 
-    def permit_caching(self):
+    def permit_caching(self) -> None:
         cache = self.uparam.get("cache")
         if cache is None:
             self.out_headers.update(NO_CACHE)
@@ -303,11 +397,17 @@ class HttpCli(object):
         n = "604800" if cache == "i" else cache or "69"
         self.out_headers["Cache-Control"] = "max-age=" + n
 
-    def k304(self):
+    def k304(self) -> bool:
         k304 = self.cookies.get("k304")
         return k304 == "y" or ("; Trident/" in self.ua and not k304)
 
-    def send_headers(self, length, status=200, mime=None, headers=None):
+    def send_headers(
+        self,
+        length: Optional[int],
+        status: int = 200,
+        mime: Optional[str] = None,
+        headers: Optional[dict[str, str]] = None,
+    ) -> None:
         response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
 
         if length is not None:
@@ -327,10 +427,11 @@ class HttpCli(object):
         if not mime:
             mime = self.out_headers.get("Content-Type", "text/html; charset=utf-8")
 
+        assert mime
         self.out_headers["Content-Type"] = mime
 
-        for k, v in list(self.out_headers.items()) + self.out_headerlist:
-            response.append("{}: {}".format(k, v))
+        for k, zs in list(self.out_headers.items()) + self.out_headerlist:
+            response.append("{}: {}".format(k, zs))
 
         try:
             # best practice to separate headers and body into different packets
@@ -338,11 +439,19 @@ class HttpCli(object):
         except:
             raise Pebkac(400, "client d/c while replying headers")
 
-    def reply(self, body, status=200, mime=None, headers=None, volsan=False):
+    def reply(
+        self,
+        body: bytes,
+        status: int = 200,
+        mime: Optional[str] = None,
+        headers: Optional[dict[str, str]] = None,
+        volsan: bool = False,
+    ) -> bytes:
         # TODO something to reply with user-supplied values safely
 
         if volsan:
-            body = vol_san(self.asrv.vfs.all_vols.values(), body)
+            vols = list(self.asrv.vfs.all_vols.values())
+            body = vol_san(vols, body)
 
         self.send_headers(len(body), status, mime, headers)
 
@@ -354,17 +463,19 @@ class HttpCli(object):
 
         return body
 
-    def loud_reply(self, body, *args, **kwargs):
+    def loud_reply(self, body: str, *args: Any, **kwargs: Any) -> None:
         if not kwargs.get("mime"):
             kwargs["mime"] = "text/plain; charset=utf-8"
 
         self.log(body.rstrip())
         self.reply(body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
 
-    def urlq(self, add, rm):
+    def urlq(self, add: dict[str, str], rm: list[str]) -> str:
         """
         generates url query based on uparam (b, pw, all others)
         removing anything in rm, adding pairs in add
+
+        also list faster than set until ~20 items
         """
 
         if self.is_rclone:
@@ -372,28 +483,28 @@ class HttpCli(object):
 
         cmap = {"pw": "cppwd"}
         kv = {
-            k: v
-            for k, v in self.uparam.items()
-            if k not in rm and self.cookies.get(cmap.get(k, k)) != v
+            k: zs
+            for k, zs in self.uparam.items()
+            if k not in rm and self.cookies.get(cmap.get(k, k)) != zs
         }
         kv.update(add)
         if not kv:
             return ""
 
-        r = ["{}={}".format(k, quotep(v)) if v else k for k, v in kv.items()]
+        r = ["{}={}".format(k, quotep(zs)) if zs else k for k, zs in kv.items()]
         return "?" + "&amp;".join(r)
 
     def redirect(
         self,
-        vpath,
-        suf="",
-        msg="aight",
-        flavor="go to",
-        click=True,
-        status=200,
-        use302=False,
-    ):
-        html = self.j2(
+        vpath: str,
+        suf: str = "",
+        msg: str = "aight",
+        flavor: str = "go to",
+        click: bool = True,
+        status: int = 200,
+        use302: bool = False,
+    ) -> bool:
+        html = self.j2s(
             "msg",
             h2='<a href="/{}">{} /{}</a>'.format(
                 quotep(vpath) + suf, flavor, html_escape(vpath, crlf=True) + suf
@@ -407,7 +518,9 @@ class HttpCli(object):
         else:
             self.reply(html, status=status)
 
-    def handle_get(self):
+        return True
+
+    def handle_get(self) -> bool:
         if self.do_log:
             logmsg = "{:4} {}".format(self.mode, self.req)
 
@@ -434,13 +547,13 @@ class HttpCli(object):
                 self.log("inaccessible: [{}]".format(self.vpath))
                 return self.tx_404(True)
 
-            self.uparam["h"] = False
+            self.uparam["h"] = ""
 
         if "tree" in self.uparam:
             return self.tx_tree()
 
         if "delete" in self.uparam:
-            return self.handle_rm()
+            return self.handle_rm([])
 
         if "move" in self.uparam:
             return self.handle_mv()
@@ -486,7 +599,7 @@ class HttpCli(object):
 
         return self.tx_browser()
 
-    def handle_options(self):
+    def handle_options(self) -> bool:
         if self.do_log:
             self.log("OPTIONS " + self.req)
 
@@ -501,7 +614,7 @@ class HttpCli(object):
         )
         return True
 
-    def handle_put(self):
+    def handle_put(self) -> bool:
         self.log("PUT " + self.req)
 
         if self.headers.get("expect", "").lower() == "100-continue":
@@ -512,7 +625,7 @@ class HttpCli(object):
 
         return self.handle_stash()
 
-    def handle_post(self):
+    def handle_post(self) -> bool:
         self.log("POST " + self.req)
 
         if self.headers.get("expect", "").lower() == "100-continue":
@@ -549,16 +662,16 @@ class HttpCli(object):
                 reader, _ = self.get_body_reader()
                 for buf in reader:
                     orig = buf.decode("utf-8", "replace")
-                    m = "urlform_raw {} @ {}\n  {}\n"
-                    self.log(m.format(len(orig), self.vpath, orig))
+                    t = "urlform_raw {} @ {}\n  {}\n"
+                    self.log(t.format(len(orig), self.vpath, orig))
                     try:
-                        plain = unquote(buf.replace(b"+", b" "))
-                        plain = plain.decode("utf-8", "replace")
+                        zb = unquote(buf.replace(b"+", b" "))
+                        plain = zb.decode("utf-8", "replace")
                         if buf.startswith(b"msg="):
                             plain = plain[4:]
 
-                        m = "urlform_dec {} @ {}\n  {}\n"
-                        self.log(m.format(len(plain), self.vpath, plain))
+                        t = "urlform_dec {} @ {}\n  {}\n"
+                        self.log(t.format(len(plain), self.vpath, plain))
                     except Exception as ex:
                         self.log(repr(ex))
 
@@ -569,7 +682,7 @@ class HttpCli(object):
 
         raise Pebkac(405, "don't know how to handle POST({})".format(ctype))
 
-    def get_body_reader(self):
+    def get_body_reader(self) -> tuple[Generator[bytes, None, None], int]:
         if "chunked" in self.headers.get("transfer-encoding", "").lower():
             return read_socket_chunked(self.sr), -1
 
@@ -580,7 +693,8 @@ class HttpCli(object):
         else:
             return read_socket(self.sr, remains), remains
 
-    def dump_to_file(self):
+    def dump_to_file(self) -> tuple[int, str, str, int, str, str]:
+        # post_sz, sha_hex, sha_b64, remains, path, url
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         lim = vfs.get_dbv(rem)[0].lim
@@ -595,7 +709,7 @@ class HttpCli(object):
 
         bos.makedirs(fdir)
 
-        open_ka = {"fun": open}
+        open_ka: dict[str, Any] = {"fun": open}
         open_a = ["wb", 512 * 1024]
 
         # user-request || config-force
@@ -607,7 +721,7 @@ class HttpCli(object):
         ):
             fb = {"gz": 9, "xz": 0}  # default/fallback level
             lv = {}  # selected level
-            alg = None  # selected algo (gz=preferred)
+            alg = ""  # selected algo (gz=preferred)
 
             # user-prefs first
             if "gz" in self.uparam or "pk" in self.uparam:  # def.pk
@@ -615,8 +729,8 @@ class HttpCli(object):
             if "xz" in self.uparam:
                 alg = "xz"
             if alg:
-                v = self.uparam.get(alg)
-                lv[alg] = fb[alg] if v is None else int(v)
+                zso = self.uparam.get(alg)
+                lv[alg] = fb[alg] if zso is None else int(zso)
 
             if alg not in vfs.flags:
                 alg = "gz" if "gz" in vfs.flags else "xz"
@@ -633,7 +747,7 @@ class HttpCli(object):
                 except:
                     pass
 
-            lv[alg] = lv.get(alg) or fb.get(alg)
+            lv[alg] = lv.get(alg) or fb.get(alg) or 0
 
             self.log("compressing with {} level {}".format(alg, lv.get(alg)))
             if alg == "gz":
@@ -656,8 +770,8 @@ class HttpCli(object):
         if not fn:
             fn = "put" + suffix
 
-        with ren_open(fn, *open_a, **params) as f:
-            f, fn = f["orz"]
+        with ren_open(fn, *open_a, **params) as zfw:
+            f, fn = zfw["orz"]
             path = os.path.join(fdir, fn)
             post_sz, sha_hex, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
 
@@ -674,8 +788,7 @@ class HttpCli(object):
             return post_sz, sha_hex, sha_b64, remains, path, ""
 
         vfs, rem = vfs.get_dbv(rem)
-        self.conn.hsrv.broker.put(
-            False,
+        self.conn.hsrv.broker.say(
             "up2k.hash_file",
             vfs.realpath,
             vfs.flags,
@@ -705,16 +818,16 @@ class HttpCli(object):
 
         return post_sz, sha_hex, sha_b64, remains, path, url
 
-    def handle_stash(self):
+    def handle_stash(self) -> bool:
         post_sz, sha_hex, sha_b64, remains, path, url = self.dump_to_file()
         spd = self._spd(post_sz)
-        m = "{} wrote {}/{} bytes to {}  # {}"
-        self.log(m.format(spd, post_sz, remains, path, sha_b64[:28]))  # 21
-        m = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
-        self.reply(m.encode("utf-8"))
+        t = "{} wrote {}/{} bytes to {}  # {}"
+        self.log(t.format(spd, post_sz, remains, path, sha_b64[:28]))  # 21
+        t = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
+        self.reply(t.encode("utf-8"))
         return True
 
-    def _spd(self, nbytes, add=True):
+    def _spd(self, nbytes: int, add: bool = True) -> str:
         if add:
             self.conn.nbyte += nbytes
 
@@ -722,7 +835,7 @@ class HttpCli(object):
         spd2 = get_spd(self.conn.nbyte, self.conn.t0)
         return "{} {} n{}".format(spd1, spd2, self.conn.nreq)
 
-    def handle_post_multipart(self):
+    def handle_post_multipart(self) -> bool:
         self.parser = MultipartParser(self.log, self.sr, self.headers)
         self.parser.parse()
 
@@ -749,7 +862,8 @@ class HttpCli(object):
 
         raise Pebkac(422, 'invalid action "{}"'.format(act))
 
-    def handle_zip_post(self):
+    def handle_zip_post(self) -> bool:
+        assert self.parser
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
             if v is not None:
@@ -759,17 +873,17 @@ class HttpCli(object):
             raise Pebkac(422, "need zip or tar keyword")
 
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
-        items = self.parser.require("files", 1024 * 1024)
-        if not items:
+        zs = self.parser.require("files", 1024 * 1024)
+        if not zs:
             raise Pebkac(422, "need files list")
 
-        items = items.replace("\r", "").split("\n")
+        items = zs.replace("\r", "").split("\n")
         items = [unquotep(x) for x in items if items]
 
         self.parser.drop()
         return self.tx_zip(k, v, vn, rem, items, self.args.ed)
 
-    def handle_post_json(self):
+    def handle_post_json(self) -> bool:
         try:
             remains = int(self.headers["content-length"])
         except:
@@ -836,14 +950,14 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        x = self.conn.hsrv.broker.put(True, "up2k.handle_json", body)
+        x = self.conn.hsrv.broker.ask("up2k.handle_json", body)
         ret = x.get()
         ret = json.dumps(ret)
         self.log(ret)
         self.reply(ret.encode("utf-8"), mime="application/json")
         return True
 
-    def handle_search(self, body):
+    def handle_search(self, body: dict[str, Any]) -> bool:
         idx = self.conn.get_u2idx()
         if not hasattr(idx, "p_end"):
             raise Pebkac(500, "sqlite3 is not available on the server; cannot search")
@@ -857,15 +971,15 @@ class HttpCli(object):
                 continue
 
             seen[vfs] = True
-            vols.append([vfs.vpath, vfs.realpath, vfs.flags])
+            vols.append((vfs.vpath, vfs.realpath, vfs.flags))
 
         t0 = time.time()
         if idx.p_end:
             penalty = 0.7
             t_idle = t0 - idx.p_end
             if idx.p_dur > 0.7 and t_idle < penalty:
-                m = "rate-limit {:.1f} sec, cost {:.2f}, idle {:.2f}"
-                raise Pebkac(429, m.format(penalty, idx.p_dur, t_idle))
+                t = "rate-limit {:.1f} sec, cost {:.2f}, idle {:.2f}"
+                raise Pebkac(429, t.format(penalty, idx.p_dur, t_idle))
 
         if "srch" in body:
             # search by up2k hashlist
@@ -873,8 +987,8 @@ class HttpCli(object):
             vbody["hash"] = len(vbody["hash"])
             self.log("qj: " + repr(vbody))
             hits = idx.fsearch(vols, body)
-            msg = repr(hits)
-            taglist = {}
+            msg: Any = repr(hits)
+            taglist: list[str] = []
         else:
             # search by query params
             q = body["q"]
@@ -900,7 +1014,7 @@ class HttpCli(object):
         self.reply(r, mime="application/json")
         return True
 
-    def handle_post_binary(self):
+    def handle_post_binary(self) -> bool:
         try:
             remains = int(self.headers["content-length"])
         except:
@@ -915,7 +1029,7 @@ class HttpCli(object):
         vfs, _ = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         ptop = (vfs.dbv or vfs).realpath
 
-        x = self.conn.hsrv.broker.put(True, "up2k.handle_chunk", ptop, wark, chash)
+        x = self.conn.hsrv.broker.ask("up2k.handle_chunk", ptop, wark, chash)
         response = x.get()
         chunksize, cstart, path, lastmod = response
 
@@ -946,8 +1060,8 @@ class HttpCli(object):
                 post_sz, _, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
 
                 if sha_b64 != chash:
-                    m = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
-                    raise Pebkac(400, m.format(post_sz, chash, sha_b64))
+                    t = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
+                    raise Pebkac(400, t.format(post_sz, chash, sha_b64))
 
                 if len(cstart) > 1 and path != os.devnull:
                     self.log(
@@ -974,15 +1088,15 @@ class HttpCli(object):
                     with self.mutex:
                         self.u2fh.put(path, f)
         finally:
-            x = self.conn.hsrv.broker.put(True, "up2k.release_chunk", ptop, wark, chash)
+            x = self.conn.hsrv.broker.ask("up2k.release_chunk", ptop, wark, chash)
             x.get()  # block client until released
 
-        x = self.conn.hsrv.broker.put(True, "up2k.confirm_chunk", ptop, wark, chash)
-        x = x.get()
+        x = self.conn.hsrv.broker.ask("up2k.confirm_chunk", ptop, wark, chash)
+        ztis = x.get()
         try:
-            num_left, fin_path = x
+            num_left, fin_path = ztis
         except:
-            self.loud_reply(x, status=500)
+            self.loud_reply(ztis, status=500)
             return False
 
         if not num_left and fpool:
@@ -991,7 +1105,7 @@ class HttpCli(object):
 
         # windows cant rename open files
         if ANYWIN and path != fin_path and not self.args.nw:
-            self.conn.hsrv.broker.put(True, "up2k.finish_upload", ptop, wark).get()
+            self.conn.hsrv.broker.ask("up2k.finish_upload", ptop, wark).get()
 
         if not ANYWIN and not num_left:
             times = (int(time.time()), int(lastmod))
@@ -1006,7 +1120,8 @@ class HttpCli(object):
         self.reply(b"thank")
         return True
 
-    def handle_login(self):
+    def handle_login(self) -> bool:
+        assert self.parser
         pwd = self.parser.require("cppwd", 64)
         self.parser.drop()
 
@@ -1021,11 +1136,11 @@ class HttpCli(object):
             dst += quotep(self.vpath)
 
         ck, msg = self.get_pwd_cookie(pwd)
-        html = self.j2("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
+        html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
         self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
         return True
 
-    def get_pwd_cookie(self, pwd):
+    def get_pwd_cookie(self, pwd: str) -> tuple[str, str]:
         if pwd in self.asrv.iacct:
             msg = "login ok"
             dur = int(60 * 60 * self.args.logout)
@@ -1038,9 +1153,10 @@ class HttpCli(object):
         if self.is_ancient:
             r = r.rsplit(" ", 1)[0]
 
-        return [r, msg]
+        return r, msg
 
-    def handle_mkdir(self):
+    def handle_mkdir(self) -> bool:
+        assert self.parser
         new_dir = self.parser.require("name", 512)
         self.parser.drop()
 
@@ -1075,7 +1191,8 @@ class HttpCli(object):
         self.redirect(vpath)
         return True
 
-    def handle_new_md(self):
+    def handle_new_md(self) -> bool:
+        assert self.parser
         new_file = self.parser.require("name", 512)
         self.parser.drop()
 
@@ -1102,7 +1219,8 @@ class HttpCli(object):
         self.redirect(vpath, "?edit")
         return True
 
-    def handle_plain_upload(self):
+    def handle_plain_upload(self) -> bool:
+        assert self.parser
         nullwrite = self.args.nw
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
@@ -1116,17 +1234,21 @@ class HttpCli(object):
             if not nullwrite:
                 bos.makedirs(fdir_base)
 
-        files = []
+        files: list[tuple[int, str, str, str, str, str]] = []
+        # sz, sha_hex, sha_b64, p_file, fname, abspath
         errmsg = ""
         t0 = time.time()
         try:
+            assert self.parser.gen
             for nfile, (p_field, p_file, p_data) in enumerate(self.parser.gen):
                 if not p_file:
                     self.log("discarding incoming file without filename")
                     # fallthrough
 
                 fdir = fdir_base
-                fname = sanitize_fn(p_file, "", [".prologue.html", ".epilogue.html"])
+                fname = sanitize_fn(
+                    p_file or "", "", [".prologue.html", ".epilogue.html"]
+                )
                 if p_file and not nullwrite:
                     if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")
@@ -1143,8 +1265,8 @@ class HttpCli(object):
                     lim.chk_nup(self.ip)
 
                 try:
-                    with ren_open(fname, "wb", 512 * 1024, **open_args) as f:
-                        f, fname = f["orz"]
+                    with ren_open(fname, "wb", 512 * 1024, **open_args) as zfw:
+                        f, fname = zfw["orz"]
                         abspath = os.path.join(fdir, fname)
                         self.log("writing to {}".format(abspath))
                         sz, sha_hex, sha_b64 = hashcopy(p_data, f, self.args.s_wr_slp)
@@ -1158,12 +1280,14 @@ class HttpCli(object):
                             lim.chk_sz(sz)
                         except:
                             bos.unlink(abspath)
+                            fname = os.devnull
                             raise
 
-                    files.append([sz, sha_hex, sha_b64, p_file, fname, abspath])
+                    files.append(
+                        (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
+                    )
                     dbv, vrem = vfs.get_dbv(rem)
-                    self.conn.hsrv.broker.put(
-                        False,
+                    self.conn.hsrv.broker.say(
                         "up2k.hash_file",
                         dbv.realpath,
                         dbv.flags,
@@ -1192,7 +1316,7 @@ class HttpCli(object):
 
         except Pebkac as ex:
             errmsg = vol_san(
-                self.asrv.vfs.all_vols.values(), unicode(ex).encode("utf-8")
+                list(self.asrv.vfs.all_vols.values()), unicode(ex).encode("utf-8")
             ).decode("utf-8")
 
         td = max(0.1, time.time() - t0)
@@ -1205,7 +1329,12 @@ class HttpCli(object):
             status = "ERROR"
 
         msg = "{} // {} bytes // {:.3f} MiB/s\n".format(status, sz_total, spd)
-        jmsg = {"status": status, "sz": sz_total, "mbps": round(spd, 3), "files": []}
+        jmsg: dict[str, Any] = {
+            "status": status,
+            "sz": sz_total,
+            "mbps": round(spd, 3),
+            "files": [],
+        }
 
         if errmsg:
             msg += errmsg + "\n"
@@ -1260,17 +1389,17 @@ class HttpCli(object):
                 ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
                 f.write(ft.encode("utf-8"))
 
-        status = 400 if errmsg else 200
+        sc = 400 if errmsg else 200
         if "j" in self.uparam:
             jtxt = json.dumps(jmsg, indent=2, sort_keys=True).encode("utf-8", "replace")
-            self.reply(jtxt, mime="application/json", status=status)
+            self.reply(jtxt, mime="application/json", status=sc)
         else:
             self.redirect(
                 self.vpath,
                 msg=msg,
                 flavor="return to",
                 click=False,
-                status=status,
+                status=sc,
             )
 
         if errmsg:
@@ -1279,7 +1408,8 @@ class HttpCli(object):
         self.parser.drop()
         return True
 
-    def handle_text_upload(self):
+    def handle_text_upload(self) -> bool:
+        assert self.parser
         try:
             cli_lastmod3 = int(self.parser.require("lastmod", 16))
         except:
@@ -1314,7 +1444,8 @@ class HttpCli(object):
             self.reply(response.encode("utf-8"))
             return True
 
-        srv_lastmod = srv_lastmod3 = -1
+        srv_lastmod = -1.0
+        srv_lastmod3 = -1
         try:
             st = bos.stat(fp)
             srv_lastmod = st.st_mtime
@@ -1329,7 +1460,7 @@ class HttpCli(object):
             if not same_lastmod:
                 # some filesystems/transports limit precision to 1sec, hopefully floored
                 same_lastmod = (
-                    srv_lastmod == int(srv_lastmod)
+                    srv_lastmod == int(cli_lastmod3 / 1000)
                     and cli_lastmod3 > srv_lastmod3
                     and cli_lastmod3 - srv_lastmod3 < 1000
                 )
@@ -1360,6 +1491,7 @@ class HttpCli(object):
                 pass
             bos.rename(fp, os.path.join(mdir, ".hist", mfile2))
 
+        assert self.parser.gen
         p_field, _, p_data = next(self.parser.gen)
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
@@ -1388,7 +1520,7 @@ class HttpCli(object):
         self.reply(response.encode("utf-8"))
         return True
 
-    def _chk_lastmod(self, file_ts):
+    def _chk_lastmod(self, file_ts: int) -> tuple[str, bool]:
         file_lastmod = http_ts(file_ts)
         cli_lastmod = self.headers.get("if-modified-since")
         if cli_lastmod:
@@ -1408,7 +1540,7 @@ class HttpCli(object):
 
         return file_lastmod, True
 
-    def tx_file(self, req_path):
+    def tx_file(self, req_path: str) -> bool:
         status = 200
         logmsg = "{:4} {} ".format("", self.req)
         logtail = ""
@@ -1417,7 +1549,7 @@ class HttpCli(object):
         # if request is for foo.js, check if we have foo.js.{gz,br}
 
         file_ts = 0
-        editions = {}
+        editions: dict[str, tuple[str, int]] = {}
         for ext in ["", ".gz", ".br"]:
             try:
                 fs_path = req_path + ext
@@ -1425,8 +1557,8 @@ class HttpCli(object):
                 if stat.S_ISDIR(st.st_mode):
                     continue
 
-                file_ts = max(file_ts, st.st_mtime)
-                editions[ext or "plain"] = [fs_path, st.st_size]
+                file_ts = max(file_ts, int(st.st_mtime))
+                editions[ext or "plain"] = (fs_path, st.st_size)
             except:
                 pass
             if not self.vpath.startswith(".cpr/"):
@@ -1526,8 +1658,8 @@ class HttpCli(object):
 
         use_sendfile = False
         if decompress:
-            open_func = gzip.open
-            open_args = [fsenc(fs_path), "rb"]
+            open_func: Any = gzip.open
+            open_args: list[Any] = [fsenc(fs_path), "rb"]
             # Content-Length := original file size
             upper = gzip_orig_sz(fs_path)
         else:
@@ -1551,7 +1683,7 @@ class HttpCli(object):
         if "txt" in self.uparam:
             mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
         elif "mime" in self.uparam:
-            mime = self.uparam.get("mime")
+            mime = str(self.uparam.get("mime"))
         else:
             mime = guess_mime(req_path)
 
@@ -1583,19 +1715,18 @@ class HttpCli(object):
 
         return ret
 
-    def tx_zip(self, fmt, uarg, vn, rem, items, dots):
+    def tx_zip(
+        self, fmt: str, uarg: str, vn: VFS, rem: str, items: list[str], dots: bool
+    ) -> bool:
         if self.args.no_zip:
             raise Pebkac(400, "not enabled")
 
         logmsg = "{:4} {} ".format("", self.req)
         self.keepalive = False
 
-        if not uarg:
-            uarg = ""
-
         if fmt == "tar":
             mime = "application/x-tar"
-            packer = StreamTar
+            packer: Type[StreamArc] = StreamTar
         else:
             mime = "application/zip"
             packer = StreamZip
@@ -1609,24 +1740,25 @@ class HttpCli(object):
         safe = (string.ascii_letters + string.digits).replace("%", "")
         afn = "".join([x if x in safe.replace('"', "") else "_" for x in fn])
         bascii = unicode(safe).encode("utf-8")
-        ufn = fn.encode("utf-8", "xmlcharrefreplace")
-        if PY2:
-            ufn = [unicode(x) if x in bascii else "%{:02x}".format(ord(x)) for x in ufn]
-        else:
-            ufn = [
+        zb = fn.encode("utf-8", "xmlcharrefreplace")
+        if not PY2:
+            zbl = [
                 chr(x).encode("utf-8")
                 if x in bascii
                 else "%{:02x}".format(x).encode("ascii")
-                for x in ufn
+                for x in zb
             ]
-        ufn = b"".join(ufn).decode("ascii")
+        else:
+            zbl = [unicode(x) if x in bascii else "%{:02x}".format(ord(x)) for x in zb]
+
+        ufn = b"".join(zbl).decode("ascii")
 
         cdis = "attachment; filename=\"{}.{}\"; filename*=UTF-8''{}.{}"
         cdis = cdis.format(afn, fmt, ufn, fmt)
         self.log(cdis)
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
-        fgen = vn.zipgen(rem, items, self.uname, dots, not self.args.no_scandir)
+        fgen = vn.zipgen(rem, set(items), self.uname, dots, not self.args.no_scandir)
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         bgen = packer(self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg)
         bsent = 0
@@ -1645,7 +1777,7 @@ class HttpCli(object):
         self.log("{},  {}".format(logmsg, spd))
         return True
 
-    def tx_ico(self, ext, exact=False):
+    def tx_ico(self, ext: str, exact: bool = False) -> bool:
         self.permit_caching()
         if ext.endswith("/"):
             ext = "folder"
@@ -1674,7 +1806,7 @@ class HttpCli(object):
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 
-    def tx_md(self, fs_path):
+    def tx_md(self, fs_path: str) -> bool:
         logmsg = "{:4} {} ".format("", self.req)
 
         if not self.can_write:
@@ -1683,7 +1815,7 @@ class HttpCli(object):
 
         tpl = "mde" if "edit2" in self.uparam else "md"
         html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
-        template = self.j2(tpl)
+        template = self.j2j(tpl)
 
         st = bos.stat(fs_path)
         ts_md = st.st_mtime
@@ -1694,7 +1826,7 @@ class HttpCli(object):
         sz_md = 0
         for buf in yieldfile(fs_path):
             sz_md += len(buf)
-            for c, v in [[b"&", 4], [b"<", 3], [b">", 3]]:
+            for c, v in [(b"&", 4), (b"<", 3), (b">", 3)]:
                 sz_md += (len(buf) - len(buf.replace(c, b""))) * v
 
         file_ts = max(ts_md, ts_html, E.t0)
@@ -1720,8 +1852,8 @@ class HttpCli(object):
             "md": boundary,
             "arg_base": arg_base,
         }
-        html = template.render(**targs).encode("utf-8", "replace")
-        html = html.split(boundary.encode("utf-8"))
+        zs = template.render(**targs).encode("utf-8", "replace")
+        html = zs.split(boundary.encode("utf-8"))
         if len(html) != 2:
             raise Exception("boundary appears in " + html_path)
 
@@ -1750,7 +1882,7 @@ class HttpCli(object):
 
         return True
 
-    def tx_mounts(self):
+    def tx_mounts(self) -> bool:
         suf = self.urlq({}, ["h"])
         avol = [x for x in self.wvol if x in self.rvol]
         rvol, wvol, avol = [
@@ -1759,7 +1891,7 @@ class HttpCli(object):
         ]
 
         if avol and not self.args.no_rescan:
-            x = self.conn.hsrv.broker.put(True, "up2k.get_state")
+            x = self.conn.hsrv.broker.ask("up2k.get_state")
             vs = json.loads(x.get())
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
         else:
@@ -1787,11 +1919,11 @@ class HttpCli(object):
                 for v in wvol:
                     txt += "\n  " + v
 
-            txt = txt.encode("utf-8", "replace") + b"\n"
-            self.reply(txt, mime="text/plain; charset=utf-8")
+            zb = txt.encode("utf-8", "replace") + b"\n"
+            self.reply(zb, mime="text/plain; charset=utf-8")
             return True
 
-        html = self.j2(
+        html = self.j2s(
             "splash",
             this=self,
             qvpath=quotep(self.vpath),
@@ -1809,38 +1941,41 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"))
         return True
 
-    def set_k304(self):
+    def set_k304(self) -> bool:
         ck = gencookie("k304", self.uparam["k304"], 60 * 60 * 24 * 365)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.redirect("", "?h#cc")
+        return True
 
-    def set_am_js(self):
+    def set_am_js(self) -> bool:
         v = "n" if self.uparam["am_js"] == "n" else "y"
         ck = gencookie("js", v, 60 * 60 * 24 * 365)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.reply(b"promoted\n")
+        return True
 
-    def set_cfg_reset(self):
+    def set_cfg_reset(self) -> bool:
         for k in ("k304", "js", "cppwd"):
             self.out_headerlist.append(("Set-Cookie", gencookie(k, "x", None)))
 
         self.redirect("", "?h#cc")
+        return True
 
-    def tx_404(self, is_403=False):
+    def tx_404(self, is_403: bool = False) -> bool:
         rc = 404
         if self.args.vague_403:
-            m = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
         elif is_403:
-            m = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="/?h">go home</a></p>'
+            t = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="/?h">go home</a></p>'
             rc = 403
         else:
-            m = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="/?h">go home</a></p>'
+            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="/?h">go home</a></p>'
 
-        html = self.j2("splash", this=self, qvpath=quotep(self.vpath), msg=m)
+        html = self.j2s("splash", this=self, qvpath=quotep(self.vpath), msg=t)
         self.reply(html.encode("utf-8"), status=rc)
         return True
 
-    def scanvol(self):
+    def scanvol(self) -> bool:
         if not self.can_read or not self.can_write:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
@@ -1851,15 +1986,15 @@ class HttpCli(object):
 
         args = [self.asrv.vfs.all_vols, [vn.vpath], False]
 
-        x = self.conn.hsrv.broker.put(True, "up2k.rescan", *args)
-        x = x.get()
-        if not x:
+        x = self.conn.hsrv.broker.ask("up2k.rescan", *args)
+        err = x.get()
+        if not err:
             self.redirect("", "?h")
-            return ""
+            return True
 
-        raise Pebkac(500, x)
+        raise Pebkac(500, err)
 
-    def handle_reload(self):
+    def handle_reload(self) -> bool:
         act = self.uparam.get("reload")
         if act != "cfg":
             raise Pebkac(400, "only config files ('cfg') can be reloaded rn")
@@ -1870,10 +2005,10 @@ class HttpCli(object):
         if self.args.no_reload:
             raise Pebkac(403, "the reload feature is disabled in server config")
 
-        x = self.conn.hsrv.broker.put(True, "reload")
+        x = self.conn.hsrv.broker.ask("reload")
         return self.redirect("", "?h", x.get(), "return to", False)
 
-    def tx_stack(self):
+    def tx_stack(self) -> bool:
         if not [x for x in self.wvol if x in self.rvol]:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
@@ -1882,8 +2017,9 @@ class HttpCli(object):
 
         ret = "<pre>{}\n{}".format(time.time(), html_escape(alltrace()))
         self.reply(ret.encode("utf-8"))
+        return True
 
-    def tx_tree(self):
+    def tx_tree(self) -> bool:
         top = self.uparam["tree"] or ""
         dst = self.vpath
         if top in [".", ".."]:
@@ -1898,12 +2034,12 @@ class HttpCli(object):
             dst = dst[len(top) + 1 :]
 
         ret = self.gen_tree(top, dst)
-        ret = json.dumps(ret)
-        self.reply(ret.encode("utf-8"), mime="application/json")
+        zs = json.dumps(ret)
+        self.reply(zs.encode("utf-8"), mime="application/json")
         return True
 
-    def gen_tree(self, top, target):
-        ret = {}
+    def gen_tree(self, top: str, target: str) -> dict[str, Any]:
+        ret: dict[str, Any] = {}
         excl = None
         if target:
             excl, target = (target.split("/", 1) + [""])[:2]
@@ -1921,26 +2057,26 @@ class HttpCli(object):
             for v in self.rvol:
                 d1, d2 = v.rsplit("/", 1) if "/" in v else ["", v]
                 if d1 == top:
-                    vfs_virt[d2] = 0
+                    vfs_virt[d2] = vn  # typechk, value never read
 
         dirs = []
 
-        vfs_ls = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+        dirnames = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 
         if not self.args.ed or "dots" not in self.uparam:
-            vfs_ls = exclude_dotfiles(vfs_ls)
+            dirnames = exclude_dotfiles(dirnames)
 
-        for fn in [x for x in vfs_ls if x != excl]:
+        for fn in [x for x in dirnames if x != excl]:
             dirs.append(quotep(fn))
 
-        for x in vfs_virt.keys():
+        for x in vfs_virt:
             if x != excl:
                 dirs.append(x)
 
         ret["a"] = dirs
         return ret
 
-    def tx_ups(self):
+    def tx_ups(self) -> bool:
         if not self.args.unpost:
             raise Pebkac(400, "the unpost feature is disabled in server config")
 
@@ -1952,7 +2088,7 @@ class HttpCli(object):
         lm = "ups [{}]".format(filt)
         self.log(lm)
 
-        ret = []
+        ret: list[dict[str, Any]] = []
         t0 = time.time()
         lim = time.time() - self.args.unpost
         for vol in self.asrv.vfs.all_vols.values():
@@ -1968,17 +2104,18 @@ class HttpCli(object):
 
                 ret.append({"vp": quotep(vp), "sz": sz, "at": at})
                 if len(ret) > 3000:
-                    ret.sort(key=lambda x: x["at"], reverse=True)
+                    ret.sort(key=lambda x: x["at"], reverse=True)  # type: ignore
                     ret = ret[:2000]
 
-        ret.sort(key=lambda x: x["at"], reverse=True)
+        ret.sort(key=lambda x: x["at"], reverse=True)  # type: ignore
         ret = ret[:2000]
 
         jtxt = json.dumps(ret, indent=2, sort_keys=True).encode("utf-8", "replace")
         self.log("{} #{} {:.2f}sec".format(lm, len(ret), time.time() - t0))
         self.reply(jtxt, mime="application/json")
+        return True
 
-    def handle_rm(self, req=None):
+    def handle_rm(self, req: list[str]) -> bool:
         if not req and not self.can_delete:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
@@ -1988,10 +2125,11 @@ class HttpCli(object):
         if not req:
             req = [self.vpath]
 
-        x = self.conn.hsrv.broker.put(True, "up2k.handle_rm", self.uname, self.ip, req)
+        x = self.conn.hsrv.broker.ask("up2k.handle_rm", self.uname, self.ip, req)
         self.loud_reply(x.get())
+        return True
 
-    def handle_mv(self):
+    def handle_mv(self) -> bool:
         if not self.can_move:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
@@ -2006,12 +2144,11 @@ class HttpCli(object):
         # x-www-form-urlencoded (url query part) uses
         # either + or %20 for 0x20 so handle both
         dst = unquotep(dst.replace("+", " "))
-        x = self.conn.hsrv.broker.put(
-            True, "up2k.handle_mv", self.uname, self.vpath, dst
-        )
+        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, self.vpath, dst)
         self.loud_reply(x.get())
+        return True
 
-    def tx_ls(self, ls):
+    def tx_ls(self, ls: dict[str, Any]) -> bool:
         dirs = ls["dirs"]
         files = ls["files"]
         arg = self.uparam["ls"]
@@ -2055,17 +2192,17 @@ class HttpCli(object):
                 x["name"] = n
 
             fmt = fmt.format(len(nfmt.format(biggest)))
-            ret = [
+            retl = [
                 "# {}: {}".format(x, ls[x])
                 for x in ["acct", "perms", "srvinf"]
                 if x in ls
             ]
-            ret += [
+            retl += [
                 fmt.format(x["dt"], x["sz"], x["name"])
                 for y in [dirs, files]
                 for x in y
             ]
-            ret = "\n".join(ret)
+            ret = "\n".join(retl)
             mime = "text/plain; charset=utf-8"
         else:
             [x.pop(k) for k in ["name", "dt"] for y in [dirs, files] for x in y]
@@ -2076,7 +2213,7 @@ class HttpCli(object):
         self.reply(ret.encode("utf-8", "replace") + b"\n", mime=mime)
         return True
 
-    def tx_browser(self):
+    def tx_browser(self) -> bool:
         vpath = ""
         vpnodes = [["", "/"]]
         if self.vpath:
@@ -2164,7 +2301,7 @@ class HttpCli(object):
                 if WINDOWS:
                     try:
                         bfree = ctypes.c_ulonglong(0)
-                        ctypes.windll.kernel32.GetDiskFreeSpaceExW(
+                        ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
                             ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
                         )
                         srv_info.append(humansize(bfree.value) + " free")
@@ -2179,7 +2316,7 @@ class HttpCli(object):
         except:
             pass
 
-        srv_info = "</span> // <span>".join(srv_info)
+        srv_infot = "</span> // <span>".join(srv_info)
 
         perms = []
         if self.can_read:
@@ -2223,7 +2360,7 @@ class HttpCli(object):
             "dirs": [],
             "files": [],
             "taglist": [],
-            "srvinf": srv_info,
+            "srvinf": srv_infot,
             "acct": self.uname,
             "idx": ("e2d" in vn.flags),
             "perms": perms,
@@ -2251,7 +2388,7 @@ class HttpCli(object):
             "logues": logues,
             "readme": readme,
             "title": html_escape(self.vpath, crlf=True),
-            "srv_info": srv_info,
+            "srv_info": srv_infot,
             "lang": self.args.lang,
             "dtheme": self.args.theme,
             "themes": self.args.themes,
@@ -2267,7 +2404,7 @@ class HttpCli(object):
             if "zip" in self.uparam or "tar" in self.uparam:
                 raise Pebkac(403)
 
-            html = self.j2(tpl, **j2a)
+            html = self.j2s(tpl, **j2a)
             self.reply(html.encode("utf-8", "replace"))
             return True
 
@@ -2280,11 +2417,12 @@ class HttpCli(object):
             rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
         )
         stats = {k: v for k, v in vfs_ls}
-        vfs_ls = [x[0] for x in vfs_ls]
-        vfs_ls.extend(vfs_virt.keys())
+        ls_names = [x[0] for x in vfs_ls]
+        ls_names.extend(list(vfs_virt.keys()))
 
         # check for old versions of files,
-        hist = {}  # [num-backups, most-recent, hist-path]
+        # [num-backups, most-recent, hist-path]
+        hist: dict[str, tuple[int, float, str]] = {}
         histdir = os.path.join(fsroot, ".hist")
         ptn = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[^\.]+)$")
         try:
@@ -2294,14 +2432,14 @@ class HttpCli(object):
                     continue
 
                 fn = m.group(1) + m.group(3)
-                n, ts, _ = hist.get(fn, [0, 0, ""])
-                hist[fn] = [n + 1, max(ts, float(m.group(2))), hfn]
+                n, ts, _ = hist.get(fn, (0, 0, ""))
+                hist[fn] = (n + 1, max(ts, float(m.group(2))), hfn)
         except:
             pass
 
         # show dotfiles if permitted and requested
         if not self.args.ed or "dots" not in self.uparam:
-            vfs_ls = exclude_dotfiles(vfs_ls)
+            ls_names = exclude_dotfiles(ls_names)
 
         icur = None
         if "e2t" in vn.flags:
@@ -2312,7 +2450,7 @@ class HttpCli(object):
 
         dirs = []
         files = []
-        for fn in vfs_ls:
+        for fn in ls_names:
             base = ""
             href = fn
             if not is_ls and not is_js and not self.trailing_slash and vpath:
@@ -2339,14 +2477,14 @@ class HttpCli(object):
                     margin = '<a href="{}?zip">zip</a>'.format(quotep(href))
             elif fn in hist:
                 margin = '<a href="{}.hist/{}">#{}</a>'.format(
-                    base, html_escape(hist[fn][2], quote=True, crlf=True), hist[fn][0]
+                    base, html_escape(hist[fn][2], quot=True, crlf=True), hist[fn][0]
                 )
             else:
                 margin = "-"
 
             sz = inf.st_size
-            dt = datetime.utcfromtimestamp(inf.st_mtime)
-            dt = dt.strftime("%Y-%m-%d %H:%M:%S")
+            zd = datetime.utcfromtimestamp(inf.st_mtime)
+            dt = zd.strftime("%Y-%m-%d %H:%M:%S")
 
             try:
                 ext = "---" if is_dir else fn.rsplit(".", 1)[1]
@@ -2380,11 +2518,11 @@ class HttpCli(object):
                 files.append(item)
                 item["rd"] = rem
 
-        taglist = {}
-        for f in files:
-            fn = f["name"]
-            rd = f["rd"]
-            del f["rd"]
+        tagset: set[str] = set()
+        for fe in files:
+            fn = fe["name"]
+            rd = fe["rd"]
+            del fe["rd"]
             if not icur:
                 break
 
@@ -2403,12 +2541,12 @@ class HttpCli(object):
                     args = s3enc(idx.mem_cur, rd, fn)
                     r = icur.execute(q, args).fetchone()
                 except:
-                    m = "tag list error, {}/{}\n{}"
-                    self.log(m.format(rd, fn, min_ex()))
+                    t = "tag list error, {}/{}\n{}"
+                    self.log(t.format(rd, fn, min_ex()))
                     break
 
-            tags = {}
-            f["tags"] = tags
+            tags: dict[str, Any] = {}
+            fe["tags"] = tags
 
             if not r:
                 continue
@@ -2417,17 +2555,19 @@ class HttpCli(object):
             q = "select k, v from mt where w = ? and +k != 'x'"
             try:
                 for k, v in icur.execute(q, (w,)):
-                    taglist[k] = True
+                    tagset.add(k)
                     tags[k] = v
             except:
-                m = "tag read error, {}/{} [{}]:\n{}"
-                self.log(m.format(rd, fn, w, min_ex()))
+                t = "tag read error, {}/{} [{}]:\n{}"
+                self.log(t.format(rd, fn, w, min_ex()))
                 break
 
         if icur:
-            taglist = [k for k in vn.flags.get("mte", "").split(",") if k in taglist]
-            for f in dirs:
-                f["tags"] = {}
+            taglist = [k for k in vn.flags.get("mte", "").split(",") if k in tagset]
+            for fe in dirs:
+                fe["tags"] = {}
+        else:
+            taglist = list(tagset)
 
         if is_ls:
             ls_ret["dirs"] = dirs
@@ -2480,6 +2620,6 @@ class HttpCli(object):
         if self.args.css_browser:
             j2a["css"] = self.args.css_browser
 
-        html = self.j2(tpl, **j2a)
+        html = self.j2s(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))
         return True

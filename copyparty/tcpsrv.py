@@ -2,11 +2,14 @@
 from __future__ import print_function, unicode_literals
 
 import re
-import sys
 import socket
+import sys
 
-from .__init__ import MACOS, ANYWIN, unicode
+from .__init__ import ANYWIN, MACOS, TYPE_CHECKING, unicode
 from .util import chkcmd
+
+if TYPE_CHECKING:
+    from .svchub import SvcHub
 
 
 class TcpSrv(object):
@@ -15,16 +18,16 @@ class TcpSrv(object):
     which then uses the least busy HttpSrv to handle it
     """
 
-    def __init__(self, hub):
+    def __init__(self, hub: "SvcHub"):
         self.hub = hub
         self.args = hub.args
         self.log = hub.log
 
         self.stopping = False
 
-        self.srv = []
+        self.srv: list[socket.socket] = []
         self.nsrv = 0
-        ok = {}
+        ok: dict[str, list[int]] = {}
         for ip in self.args.i:
             ok[ip] = []
             for port in self.args.p:
@@ -34,8 +37,8 @@ class TcpSrv(object):
                     ok[ip].append(port)
                 except Exception as ex:
                     if self.args.ign_ebind or self.args.ign_ebind_all:
-                        m = "could not listen on {}:{}: {}"
-                        self.log("tcpsrv", m.format(ip, port, ex), c=3)
+                        t = "could not listen on {}:{}: {}"
+                        self.log("tcpsrv", t.format(ip, port, ex), c=3)
                     else:
                         raise
 
@@ -55,9 +58,9 @@ class TcpSrv(object):
                     eps[x] = "external"
 
         msgs = []
-        title_tab = {}
+        title_tab: dict[str, dict[str, int]] = {}
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
-        m = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
+        t = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             for port in sorted(self.args.p):
                 if port not in ok.get(ip, ok.get("0.0.0.0", [])):
@@ -69,7 +72,7 @@ class TcpSrv(object):
                 elif self.args.https_only or port == 443:
                     proto = "https"
 
-                msgs.append(m.format(proto, ip, port, desc))
+                msgs.append(t.format(proto, ip, port, desc))
 
                 if not self.args.wintitle:
                     continue
@@ -98,13 +101,13 @@ class TcpSrv(object):
 
         if msgs:
             msgs[-1] += "\n"
-            for m in msgs:
-                self.log("tcpsrv", m)
+            for t in msgs:
+                self.log("tcpsrv", t)
 
         if self.args.wintitle:
             self._set_wintitle(title_tab)
 
-    def _listen(self, ip, port):
+    def _listen(self, ip: str, port: int) -> None:
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -120,7 +123,7 @@ class TcpSrv(object):
                 raise
             raise Exception(e)
 
-    def run(self):
+    def run(self) -> None:
         for srv in self.srv:
             srv.listen(self.args.nc)
             ip, port = srv.getsockname()
@@ -130,9 +133,9 @@ class TcpSrv(object):
             if self.args.q:
                 print(msg)
 
-            self.hub.broker.put(False, "listen", srv)
+            self.hub.broker.say("listen", srv)
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         self.stopping = True
         try:
             for srv in self.srv:
@@ -142,14 +145,14 @@ class TcpSrv(object):
 
         self.log("tcpsrv", "ok bye")
 
-    def ips_linux_ifconfig(self):
+    def ips_linux_ifconfig(self) -> dict[str, str]:
         # for termux
         try:
             txt, _ = chkcmd(["ifconfig"])
         except:
             return {}
 
-        eps = {}
+        eps: dict[str, str] = {}
         dev = None
         ip = None
         up = None
@@ -171,7 +174,7 @@ class TcpSrv(object):
 
         return eps
 
-    def ips_linux(self):
+    def ips_linux(self) -> dict[str, str]:
         try:
             txt, _ = chkcmd(["ip", "addr"])
         except:
@@ -180,21 +183,21 @@ class TcpSrv(object):
         r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
         ri = re.compile(r"^\s*[0-9]+\s*:.*")
         up = False
-        eps = {}
+        eps: dict[str, str] = {}
         for ln in txt.split("\n"):
             if ri.match(ln):
                 up = "UP" in re.split("[>,< ]", ln)
 
             try:
-                ip, dev = r.match(ln.rstrip()).groups()
+                ip, dev = r.match(ln.rstrip()).groups()  # type: ignore
                 eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
             except:
                 pass
 
         return eps
 
-    def ips_macos(self):
-        eps = {}
+    def ips_macos(self) -> dict[str, str]:
+        eps: dict[str, str] = {}
         try:
             txt, _ = chkcmd(["ifconfig"])
         except:
@@ -202,7 +205,7 @@ class TcpSrv(object):
 
         rdev = re.compile(r"^([^ ]+):")
         rip = re.compile(r"^\tinet ([0-9\.]+) ")
-        dev = None
+        dev = "UNKNOWN"
         for ln in txt.split("\n"):
             m = rdev.match(ln)
             if m:
@@ -211,17 +214,17 @@ class TcpSrv(object):
             m = rip.match(ln)
             if m:
                 eps[m.group(1)] = dev
-                dev = None
+                dev = "UNKNOWN"
 
         return eps
 
-    def ips_windows_ipconfig(self):
-        eps = {}
-        offs = {}
+    def ips_windows_ipconfig(self) -> tuple[dict[str, str], set[str]]:
+        eps: dict[str, str] = {}
+        offs: set[str] = set()
         try:
             txt, _ = chkcmd(["ipconfig"])
         except:
-            return eps
+            return eps, offs
 
         rdev = re.compile(r"(^[^ ].*):$")
         rip = re.compile(r"^ +IPv?4? [^:]+: *([0-9\.]{7,15})$")
@@ -231,12 +234,12 @@ class TcpSrv(object):
             m = rdev.match(ln)
             if m:
                 if dev and dev not in eps.values():
-                    offs[dev] = 1
+                    offs.add(dev)
 
                 dev = m.group(1).split(" adapter ", 1)[-1]
 
             if dev and roff.match(ln):
-                offs[dev] = 1
+                offs.add(dev)
                 dev = None
 
             m = rip.match(ln)
@@ -245,12 +248,12 @@ class TcpSrv(object):
                 dev = None
 
         if dev and dev not in eps.values():
-            offs[dev] = 1
+            offs.add(dev)
 
         return eps, offs
 
-    def ips_windows_netsh(self):
-        eps = {}
+    def ips_windows_netsh(self) -> dict[str, str]:
+        eps: dict[str, str] = {}
         try:
             txt, _ = chkcmd("netsh interface ip show address".split())
         except:
@@ -270,7 +273,7 @@ class TcpSrv(object):
 
         return eps
 
-    def detect_interfaces(self, listen_ips):
+    def detect_interfaces(self, listen_ips: list[str]) -> dict[str, str]:
         if MACOS:
             eps = self.ips_macos()
         elif ANYWIN:
@@ -317,7 +320,7 @@ class TcpSrv(object):
 
         return eps
 
-    def _set_wintitle(self, vs):
+    def _set_wintitle(self, vs: dict[str, dict[str, int]]) -> None:
         vs["all"] = vs.get("all", {"Local-Only": 1})
         vs["pub"] = vs.get("pub", vs["all"])
 

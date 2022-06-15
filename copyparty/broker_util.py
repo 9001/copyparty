@@ -1,14 +1,28 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-
+import argparse
 import traceback
 
-from .util import Pebkac, Queue
+from queue import Queue
+
+from .__init__ import TYPE_CHECKING
+from .authsrv import AuthSrv
+from .util import Pebkac
+
+try:
+    from typing import Any, Optional, Union
+
+    from .util import RootLogger
+except:
+    pass
+
+if TYPE_CHECKING:
+    from .httpsrv import HttpSrv
 
 
 class ExceptionalQueue(Queue, object):
-    def get(self, block=True, timeout=None):
+    def get(self, block: bool = True, timeout: Optional[float] = None) -> Any:
         rv = super(ExceptionalQueue, self).get(block, timeout)
 
         if isinstance(rv, list):
@@ -21,7 +35,26 @@ class ExceptionalQueue(Queue, object):
         return rv
 
 
-def try_exec(want_retval, func, *args):
+class BrokerCli(object):
+    """
+    helps mypy understand httpsrv.broker but still fails a few levels deeper,
+    for example resolving httpconn.* in httpcli -- see lines tagged #mypy404
+    """
+
+    def __init__(self) -> None:
+        self.log: RootLogger = None
+        self.args: argparse.Namespace = None
+        self.asrv: AuthSrv = None
+        self.httpsrv: "HttpSrv" = None
+
+    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+        return ExceptionalQueue(1)
+
+    def say(self, dest: str, *args: Any) -> None:
+        pass
+
+
+def try_exec(want_retval: Union[bool, int], func: Any, *args: list[Any]) -> Any:
     try:
         return func(*args)
 

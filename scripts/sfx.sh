@@ -47,7 +47,7 @@ grep -E '/(python|pypy)[0-9\.-]*$' >$dir/pys || true
 	printf '\033[1;30mlooking for jinja2 in [%s]\033[0m\n' "$_py" >&2
 	$_py -c 'import jinja2' 2>/dev/null || continue
 	printf '%s\n' "$_py"
-	mv $dir/{,x.}dep-j2
+	mv $dir/{,x.}j2
 	break
 done)"
 
