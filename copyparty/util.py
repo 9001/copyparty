@@ -1270,11 +1270,15 @@ def hashcopy(
     fin: Union[typing.BinaryIO, Generator[bytes, None, None]],
     fout: Union[typing.BinaryIO, typing.IO[Any]],
     slp: int = 0,
+    max_sz: int = 0,
 ) -> tuple[int, str, str]:
     hashobj = hashlib.sha512()
     tlen = 0
     for buf in fin:
         tlen += len(buf)
+        if max_sz and tlen > max_sz:
+            continue
+
         hashobj.update(buf)
         fout.write(buf)
         if slp:

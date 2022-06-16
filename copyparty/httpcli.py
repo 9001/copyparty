@@ -43,6 +43,7 @@ from .util import (
     Pebkac,
     UnrecvEOF,
     alltrace,
+    atomic_move,
     exclude_dotfiles,
     fsenc,
     gen_filekey,
@@ -1257,9 +1258,19 @@ class HttpCli(object):
 
                     suffix = "-{:.6f}-{}".format(time.time(), self.dip)
                     open_args = {"fdir": fdir, "suffix": suffix}
+
+                    # reserve destination filename
+                    with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
+                        fname = zfw["orz"][1]
+
+                    tnam = fname + ".PARTIAL"
+                    if self.args.dotpart:
+                        tnam = "." + tnam
+
+                    abspath = os.path.join(fdir, fname)
                 else:
                     open_args = {}
-                    fname = os.devnull
+                    tnam = fname = os.devnull
                     fdir = ""
 
                 if lim:
@@ -1267,11 +1278,14 @@ class HttpCli(object):
                     lim.chk_nup(self.ip)
 
                 try:
-                    with ren_open(fname, "wb", 512 * 1024, **open_args) as zfw:
-                        f, fname = zfw["orz"]
-                        abspath = os.path.join(fdir, fname)
-                        self.log("writing to {}".format(abspath))
-                        sz, sha_hex, sha_b64 = hashcopy(p_data, f, self.args.s_wr_slp)
+                    max_sz = lim.smax if lim else 0
+                    with ren_open(tnam, "wb", 512 * 1024, **open_args) as zfw:
+                        f, tnam = zfw["orz"]
+                        tabspath = os.path.join(fdir, tnam)
+                        self.log("writing to {}".format(tabspath))
+                        sz, sha_hex, sha_b64 = hashcopy(
+                            p_data, f, self.args.s_wr_slp, max_sz
+                        )
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
 
@@ -1280,11 +1294,15 @@ class HttpCli(object):
                         lim.bup(self.ip, sz)
                         try:
                             lim.chk_sz(sz)
+                            lim.chk_bup(self.ip)
+                            lim.chk_nup(self.ip)
                         except:
+                            bos.unlink(tabspath)
                             bos.unlink(abspath)
                             fname = os.devnull
                             raise
 
+                    atomic_move(tabspath, abspath)
                     files.append(
                         (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
                     )
@@ -1301,19 +1319,7 @@ class HttpCli(object):
                     self.conn.nbyte += sz
 
                 except Pebkac:
-                    if fname != os.devnull:
-                        fp = os.path.join(fdir, fname)
-                        fp2 = fp
-                        if self.args.dotpart:
-                            fp2 = os.path.join(fdir, "." + fname)
-
-                        suffix = ".PARTIAL"
-                        try:
-                            bos.rename(fp, fp2 + suffix)
-                        except:
-                            fp2 = fp2[: -len(suffix) - 1]
-                            bos.rename(fp, fp2 + suffix)
-
+                    self.parser.drop()
                     raise
 
         except Pebkac as ex:
