@@ -101,6 +101,7 @@ var Ls = {
 		"cl_favico": "favicon",
 		"cl_keytype": "key notation",
 		"cl_hiddenc": "hidden columns",
+		"cl_reset": "(reset)",
 
 		"ct_thumb": "in icon view, toggle icons or thumbnails$NHotkey: T",
 		"ct_dots": "show hidden files (if server permits)",
@@ -424,6 +425,7 @@ var Ls = {
 		"cl_favico": "favicon",
 		"cl_keytype": "notasjon for musikalsk dur",
 		"cl_hiddenc": "skjulte kolonner",
+		"cl_reset": "(nullstill)",
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
@@ -833,7 +835,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div id="key_notation"></div></div>\n' +
-	'<div class="fill"><h3>' + L.cl_hiddenc + '</h3><div id="hcols"></div></div>'
+	'<div class="fill"><h3>' + L.cl_hiddenc + ' <a href="#" id="hcolsr">' + L.cl_reset + '</h3><div id="hcols"></div></div>'
 );
 
 
@@ -5135,21 +5137,6 @@ function mk_files_header(taglist) {
 var filecols = (function () {
 	var hidden = jread('filecols', []);
 
-	if (JSON.stringify(def_hcols) != sread('hfilecols')) {
-		console.log("applying default hidden-cols");
-		jwrite('hfilecols', def_hcols);
-		for (var a = 0; a < def_hcols.length; a++) {
-			var t = def_hcols[a];
-			t = t.slice(0, 1).toUpperCase() + t.slice(1);
-			if (t.startsWith("."))
-				t = t.slice(1);
-
-			if (hidden.indexOf(t) == -1)
-				hidden.push(t);
-		}
-		jwrite("filecols", hidden);
-	}
-
 	var add_btns = function () {
 		var ths = QSA('#files th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
@@ -5226,7 +5213,6 @@ var filecols = (function () {
 			tt.att(QS('#files thead'));
 		}
 	};
-	set_style();
 
 	var toggle = function (name) {
 		var ofs = hidden.indexOf(name);
@@ -5246,6 +5232,31 @@ var filecols = (function () {
 		set_style();
 	};
 
+	ebi('hcolsr').onclick = function (e) {
+		ev(e);
+		reset(true);
+	};
+
+	function reset(force) {
+		if (force || JSON.stringify(def_hcols) != sread('hfilecols')) {
+			console.log("applying default hidden-cols");
+			hidden = [];
+			jwrite('hfilecols', def_hcols);
+			for (var a = 0; a < def_hcols.length; a++) {
+				var t = def_hcols[a];
+				t = t.slice(0, 1).toUpperCase() + t.slice(1);
+				if (t.startsWith("."))
+					t = t.slice(1);
+
+				if (hidden.indexOf(t) == -1)
+					hidden.push(t);
+			}
+			jwrite("filecols", hidden);
+		}
+		set_style();
+	}
+	reset();
+
 	try {
 		var ci = find_file_col('dur'),
 			i = ci[0],
@@ -5263,6 +5274,7 @@ var filecols = (function () {
 		"add_btns": add_btns,
 		"set_style": set_style,
 		"toggle": toggle,
+		"reset": reset
 	};
 })();
 
