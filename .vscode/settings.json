@@ -23,7 +23,6 @@
         "terminal.ansiBrightWhite": "#ffffff",
     },
     "python.testing.pytestEnabled": false,
-    "python.testing.nosetestsEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
         "-v",
@@ -35,16 +34,38 @@
     "python.linting.pylintEnabled": true,
     "python.linting.flake8Enabled": true,
     "python.linting.banditEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": [
+        "--ignore-missing-imports",
+        "--follow-imports=silent",
+        "--show-column-numbers",
+        "--strict"
+    ],
     "python.linting.flake8Args": [
         "--max-line-length=120",
-        "--ignore=E722,F405,E203,W503,W293,E402",
+        "--ignore=E722,F405,E203,W503,W293,E402,E501,E128",
     ],
     "python.linting.banditArgs": [
         "--ignore=B104"
     ],
+    "python.linting.pylintArgs": [
+        "--disable=missing-module-docstring",
+        "--disable=missing-class-docstring",
+        "--disable=missing-function-docstring",
+        "--disable=wrong-import-position",
+        "--disable=raise-missing-from",
+        "--disable=bare-except",
+        "--disable=invalid-name",
+        "--disable=line-too-long",
+        "--disable=consider-using-f-string"
+    ],
+    // python3 -m isort --py=27 --profile=black copyparty/
     "python.formatting.provider": "black",
     "editor.formatOnSave": true,
     "[html]": {
+        "editor.formatOnSave": false,
+    },
+    "[css]": {
         "editor.formatOnSave": false,
     },
     "files.associations": {

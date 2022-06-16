@@ -21,8 +21,8 @@ from queue import Queue
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
 from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
 from .bos import bos
-from .mtag import MParser, MTag
 from .fsutil import Fstab
+from .mtag import MParser, MTag
 from .util import (
     HAVE_SQLITE3,
     SYMTIME,

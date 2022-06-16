@@ -2,12 +2,12 @@
 from __future__ import print_function, unicode_literals
 
 import ctypes
-import time
 import re
+import time
 
 from .__init__ import ANYWIN, MACOS
-from .util import min_ex, chkcmd
-from .authsrv import VFS, AXS
+from .authsrv import AXS, VFS
+from .util import chkcmd, min_ex
 
 try:
     from typing import Optional, Union
@@ -117,7 +117,7 @@ class Fstab(object):
     def get_w32(self, path: str):
         # list mountpoints: fsutil fsinfo drives
 
-        from ctypes.wintypes import LPCWSTR, LPWSTR, DWORD, LPDWORD, BOOL, MAX_PATH
+        from ctypes.wintypes import BOOL, DWORD, LPCWSTR, LPDWORD, LPWSTR, MAX_PATH
 
         def echk(rc, fun, args):
             if not rc:

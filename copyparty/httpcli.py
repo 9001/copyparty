@@ -2065,7 +2065,7 @@ class HttpCli(object):
             for v in self.rvol:
                 d1, d2 = v.rsplit("/", 1) if "/" in v else ["", v]
                 if d1 == top:
-                    vfs_virt[d2] = vn  # typechk, value never read
+                    vfs_virt[d2] = self.asrv.vfs  # typechk, value never read
 
         dirs = []
 

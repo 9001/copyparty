@@ -1697,7 +1697,9 @@ def termsize() -> tuple[int, int]:
 
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct
+            import fcntl
+            import struct
+            import termios
 
             cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
         except:

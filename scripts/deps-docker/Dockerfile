@@ -1,10 +1,10 @@
-FROM    alpine:3.15
+FROM    alpine:3.16
 WORKDIR /z
 ENV     ver_asmcrypto=5b994303a9d3e27e0915f72a10b6c2c51535a4dc \
         ver_hashwasm=4.9.0 \
-        ver_marked=4.0.16 \
+        ver_marked=4.0.17 \
         ver_mde=2.16.1 \
-        ver_codemirror=5.65.4 \
+        ver_codemirror=5.65.5 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
 
@@ -32,7 +32,7 @@ RUN     mkdir -p /z/dist/no-pk \
             && npm install \
             && npm i grunt uglify-js -g ) \
         && (tar -xf codemirror.tgz \
-            && cd CodeMirror-$ver_codemirror \
+            && cd codemirror5-$ver_codemirror \
             && npm install ) \
         && (tar -xf mde.tgz \
             && cd easy-markdown-editor* \
@@ -87,7 +87,7 @@ RUN     cd marked-$ver_marked \
 
 # build codemirror
 COPY    codemirror.patch /z/
-RUN     cd CodeMirror-$ver_codemirror \
+RUN     cd codemirror5-$ver_codemirror \
         && patch -p1 < /z/codemirror.patch \
         && sed -ri '/^var urlRE = /d' mode/gfm/gfm.js \
         && npm run build \

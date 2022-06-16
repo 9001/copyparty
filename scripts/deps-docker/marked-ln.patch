@@ -1,5 +1,5 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
-adds linetracking to marked.js v4.0.6;
+adds linetracking to marked.js v4.0.17;
 add data-ln="%d" to most tags, %d is the source markdown line
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
