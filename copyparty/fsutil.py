@@ -6,11 +6,13 @@ import time
 import re
 
 from .__init__ import ANYWIN, MACOS
-from .util import RootLogger, min_ex, chkcmd
+from .util import min_ex, chkcmd
 from .authsrv import VFS, AXS
 
 try:
     from typing import Optional, Union
+
+    from .util import RootLogger
 except:
     pass
 

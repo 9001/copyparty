@@ -97,6 +97,8 @@ class HttpConn(object):
         self.log_func(self.log_src, msg, c)
 
     def get_u2idx(self) -> U2idx:
+        # one u2idx per tcp connection;
+        # sqlite3 fully parallelizes under python threads
         if not self.u2idx:
             self.u2idx = U2idx(self)
 

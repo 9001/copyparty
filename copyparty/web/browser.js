@@ -3827,6 +3827,7 @@ function tree_neigh(n) {
 
 	treectl.dir_cb = tree_scrollto;
 	links[act].click();
+	links[act].focus();
 }
 
 
@@ -4638,7 +4639,7 @@ var treectl = (function () {
 	}
 
 	function reload_tree() {
-		var cdir = get_vpath(),
+		var cdir = r.nextdir || get_vpath(),
 			links = QSA('#treeul a+a'),
 			nowrap = QS('#tree.nowrap') && QS('#hovertree.on'),
 			act = null;
@@ -4744,6 +4745,7 @@ var treectl = (function () {
 		if (hpush && !no_tree)
 			get_tree('.', xhr.top);
 
+		r.nextdir = xhr.top;
 		enspin(thegrid.en ? '#gfiles' : '#files');
 	}
 
@@ -4766,6 +4768,7 @@ var treectl = (function () {
 		if (!xhrchk(this, L.fl_xe1, L.fl_xe2))
 			return;
 
+		r.nextdir = null;
 		var cur = ebi('files').getAttribute('ts');
 		if (cur && parseInt(cur) > this.ts) {
 			console.log("reject ls");

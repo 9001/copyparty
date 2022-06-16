@@ -1545,7 +1545,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	padding: 0 1.2em 0 0;
 	font-size: 4em;
 	opacity: 0;
-	animation: 1s linear .05s infinite forwards spin, .2s ease .05s 1 forwards fadein;
+	animation: 1s linear .15s infinite forwards spin, .2s ease .15s 1 forwards fadein;
 	position: absolute;
 	z-index: 9;
 }
