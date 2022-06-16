@@ -882,6 +882,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **netsurf** (3.10/arch)   | is basically ie6 with much better css (javascript has almost no effect) | 
 | **opera** (11.60/winxp)   | OK: thumbnails, image-viewer, zip-selection, rename/cut/paste. NG: up2k, navpane, markdown, audio |
 | **ie4** and **netscape** 4.0  | can browse, upload with `?b=u`, auth with `&pw=wark` |
+| **ncsa mosaic** 2.7       | does not get a pass, [pic1](https://user-images.githubusercontent.com/241032/174189227-ae816026-cf6f-4be5-a26e-1b3b072c1b2f.png) - [pic2](https://user-images.githubusercontent.com/241032/174189225-5651c059-5152-46e9-ac26-7e98e497901b.png) |
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 
 
