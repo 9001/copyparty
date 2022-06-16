@@ -622,7 +622,7 @@ var Ls = {
 		"u_hashing": 'les',
 		"u_upping": 'sender',
 		"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert harmløst, fortsetter\n\nfil: {2}",
-		"u_cuerr2": "server nektet opplastningen (del {0} of {1});\n\nfile: {2}\n\nerror ",
+		"u_cuerr2": "server nektet opplastningen (del {0} av {1});\n\nfile: {2}\n\nerror ",
 		"u_ehsfin": "server nektet forespørselen om å ferdigstille filen",
 		"u_ehssrch": "server nektet forespørselen om å utføre søk",
 		"u_ehsinit": "server nektet forespørselen om å begynne en ny opplastning",
@@ -4983,22 +4983,17 @@ var treectl = (function () {
 })();
 
 
-var enspin_timer = null;
 function enspin(sel) {
-	clearTimeout(enspin_timer);
-	enspin_timer = setTimeout(function () {
-		despin(sel);
-		var d = mknod('div');
-		d.className = 'dumb_loader_thing';
-		d.innerHTML = '🌲';
-		var tgt = QS(sel);
-		tgt.insertBefore(d, tgt.childNodes[0]);
-	}, 50);
+	despin(sel);
+	var d = mknod('div');
+	d.className = 'dumb_loader_thing';
+	d.innerHTML = '🌲';
+	var tgt = QS(sel);
+	tgt.insertBefore(d, tgt.childNodes[0]);
 }
 
 
 function despin(sel) {
-	clearTimeout(enspin_timer);
 	var o = QSA(sel + '>.dumb_loader_thing');
 	for (var a = o.length - 1; a >= 0; a--)
 		o[a].parentNode.removeChild(o[a]);

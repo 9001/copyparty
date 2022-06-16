@@ -3,11 +3,11 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-06-07, v0.14, ed <irc.rizon.net>, MIT-Licensed
+2022-06-16, v0.15, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
-- supports python 2.6, 2.7, and 3.3 through 3.10
+- supports python 2.6, 2.7, and 3.3 through 3.11
 
 - almost zero error-handling
 - but if something breaks just try again and it'll autoresume
@@ -410,7 +410,7 @@ def handshake(req_ses, url, file, pw, search):
     file.name = r["name"]
     file.wark = r["wark"]
 
-    return r["hash"]
+    return r["hash"], r["sprs"]
 
 
 def upload(req_ses, file, cid, pw):
@@ -502,6 +502,7 @@ class Ctl(object):
             self.hasher_busy = 1
             self.handshaker_busy = 0
             self.uploader_busy = 0
+            self.serialized = False
 
             self.t0 = time.time()
             self.t0_up = None
@@ -530,7 +531,7 @@ class Ctl(object):
             burl = self.ar.url[:12] + self.ar.url[8:].split("/")[0] + "/"
             while True:
                 print("  hs...")
-                hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
+                hs, _ = handshake(req_ses, self.ar.url, file, self.ar.a, search)
                 if search:
                     if hs:
                         for hit in hs:
@@ -710,7 +711,7 @@ class Ctl(object):
             upath = file.abs.decode("utf-8", "replace")
 
             try:
-                hs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
+                hs, sprs = handshake(req_ses, self.ar.url, file, self.ar.a, search)
             except Exception as ex:
                 if q == self.q_handshake and "<pre>partial upload exists" in str(ex):
                     self.q_recheck.put(file)
@@ -735,6 +736,12 @@ class Ctl(object):
                 continue
 
             with self.mutex:
+                if not sprs and not self.serialized:
+                    t = "server filesystem does not support sparse files; serializing uploads\n"
+                    eprint(t)
+                    self.serialized = True
+                    for _ in range(self.ar.j - 1):
+                        self.q_upload.put(None)
                 if not hs:
                     # all chunks done
                     self.up_f += 1

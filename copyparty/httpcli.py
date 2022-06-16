@@ -1031,7 +1031,7 @@ class HttpCli(object):
 
         x = self.conn.hsrv.broker.ask("up2k.handle_chunk", ptop, wark, chash)
         response = x.get()
-        chunksize, cstart, path, lastmod = response
+        chunksize, cstart, path, lastmod, sprs = response
 
         try:
             if self.args.nw:
@@ -1045,7 +1045,7 @@ class HttpCli(object):
             reader = read_socket(self.sr, remains)
 
             f = None
-            fpool = not self.args.no_fpool
+            fpool = not self.args.no_fpool and (not ANYWIN or sprs)
             if fpool:
                 with self.mutex:
                     try:

@@ -1332,7 +1332,8 @@ function up2k_init(subtle) {
                 }
 
                 if (st.todo.upload.length &&
-                    st.busy.upload.length < parallel_uploads) {
+                    st.busy.upload.length < parallel_uploads &&
+                    can_upload_next()) {
                     exec_upload();
                     mou_ikkai = true;
                 }
@@ -1673,6 +1674,8 @@ function up2k_init(subtle) {
                     return;
                 }
 
+                t.sprs = response.sprs;
+
                 var rsp_purl = url_enc(response.purl);
                 if (rsp_purl !== t.purl || response.name !== t.name) {
                     // server renamed us (file exists / path restrictions)
@@ -1823,6 +1826,20 @@ function up2k_init(subtle) {
     ////
     ///   upload
     //
+
+    function can_upload_next() {
+        var upt = st.todo.upload[0],
+            upf = st.files[upt.nfile];
+
+        if (upf.sprs)
+            return true;
+
+        for (var a = 0, aa = st.busy.upload.length; a < aa; a++)
+            if (st.busy.upload[a].nfile == upt.nfile)
+                return false;
+
+        return true;
+    }
 
     function exec_upload() {
         var upt = st.todo.upload.shift();

@@ -29,7 +29,7 @@ WINDOWS: Any = (
 VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
 # introduced in anniversary update
 
-ANYWIN = WINDOWS or sys.platform in ["msys"]
+ANYWIN = WINDOWS or sys.platform in ["msys", "cygwin"]
 
 MACOS = platform.system() == "Darwin"
 

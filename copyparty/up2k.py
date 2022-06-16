@@ -22,6 +22,7 @@ from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
 from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
 from .bos import bos
 from .mtag import MParser, MTag
+from .fsutil import Fstab
 from .util import (
     HAVE_SQLITE3,
     SYMTIME,
@@ -81,10 +82,9 @@ class Up2k(object):
         self.args = hub.args
         self.log_func = hub.log
 
-        # config
         self.salt = self.args.salt
+        self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
 
-        # state
         self.gid = 0
         self.mutex = threading.Lock()
         self.pp: Optional[ProgressPrinter] = None
@@ -121,19 +121,17 @@ class Up2k(object):
             self.sqlite_ver = tuple([int(x) for x in sqlite3.sqlite_version.split(".")])
             if self.sqlite_ver < (3, 9):
                 self.no_expr_idx = True
+        else:
+            self.log("could not initialize sqlite3, will use in-memory registry only")
 
         if ANYWIN:
             # usually fails to set lastmod too quickly
-            self.lastmod_q: list[tuple[str, int, tuple[int, int]]] = []
+            self.lastmod_q: list[tuple[str, int, tuple[int, int], bool]] = []
             thr = threading.Thread(target=self._lastmodder, name="up2k-lastmod")
             thr.daemon = True
             thr.start()
 
-        # static
-        self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
-
-        if not HAVE_SQLITE3:
-            self.log("could not initialize sqlite3, will use in-memory registry only")
+        self.fstab = Fstab(self.log_func)
 
         if self.args.no_fastboot:
             self.deferred_init()
@@ -1320,10 +1318,15 @@ class Up2k(object):
         wark = self._get_wark(cj)
         now = time.time()
         job = None
+        pdir = os.path.join(cj["ptop"], cj["prel"])
         try:
-            dev = bos.stat(os.path.join(cj["ptop"], cj["prel"])).st_dev
+            dev = bos.stat(pdir).st_dev
         except:
             dev = 0
+
+        # check if filesystem supports sparse files;
+        # refuse out-of-order / multithreaded uploading if sprs False
+        sprs = self.fstab.get(pdir) not in self.fstab.no_sparse
 
         with self.mutex:
             cur = self.cur.get(cj["ptop"])
@@ -1356,6 +1359,7 @@ class Up2k(object):
                         "prel": dp_dir,
                         "vtop": cj["vtop"],
                         "ptop": cj["ptop"],
+                        "sprs": sprs,
                         "size": dsize,
                         "lmod": dtime,
                         "addr": ip,
@@ -1453,6 +1457,7 @@ class Up2k(object):
                 job = {
                     "wark": wark,
                     "t0": now,
+                    "sprs": sprs,
                     "hash": deepcopy(cj["hash"]),
                     "need": [],
                     "busy": {},
@@ -1489,6 +1494,7 @@ class Up2k(object):
                 "purl": purl,
                 "size": job["size"],
                 "lmod": job["lmod"],
+                "sprs": sprs,
                 "hash": job["need"],
                 "wark": wark,
             }
@@ -1562,13 +1568,13 @@ class Up2k(object):
         if lmod and (not linked or SYMTIME):
             times = (int(time.time()), int(lmod))
             if ANYWIN:
-                self.lastmod_q.append((dst, 0, times))
+                self.lastmod_q.append((dst, 0, times, False))
             else:
                 bos.utime(dst, times, False)
 
     def handle_chunk(
         self, ptop: str, wark: str, chash: str
-    ) -> tuple[int, list[int], str, float]:
+    ) -> tuple[int, list[int], str, float, bool]:
         with self.mutex:
             job = self.registry[ptop].get(wark)
             if not job:
@@ -1592,16 +1598,23 @@ class Up2k(object):
                 t = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
                 raise Pebkac(400, t.format(wark, chash, idx, nh, job["name"]))
 
+            path = os.path.join(job["ptop"], job["prel"], job["tnam"])
+
+            chunksize = up2k_chunksize(job["size"])
+            ofs = [chunksize * x for x in nchunk]
+
+            if not job["sprs"]:
+                cur_sz = bos.path.getsize(path)
+                if ofs[0] > cur_sz:
+                    t = "please upload sequentially using one thread;\nserver filesystem does not support sparse files.\n  file: {}\n  chunk: {}\n  cofs: {}\n  flen: {}"
+                    t = t.format(job["name"], nchunk[0], ofs[0], cur_sz)
+                    raise Pebkac(400, t)
+
             job["busy"][chash] = 1
 
         job["poke"] = time.time()
 
-        chunksize = up2k_chunksize(job["size"])
-        ofs = [chunksize * x for x in nchunk]
-
-        path = os.path.join(job["ptop"], job["prel"], job["tnam"])
-
-        return chunksize, ofs, path, job["lmod"]
+        return chunksize, ofs, path, job["lmod"], job["sprs"]
 
     def release_chunk(self, ptop: str, wark: str, chash: str) -> bool:
         with self.mutex:
@@ -1660,7 +1673,7 @@ class Up2k(object):
 
         times = (int(time.time()), int(job["lmod"]))
         if ANYWIN:
-            z1 = (dst, job["size"], times)
+            z1 = (dst, job["size"], times, job["sprs"])
             self.lastmod_q.append(z1)
         elif not job["hash"]:
             try:
@@ -2189,6 +2202,7 @@ class Up2k(object):
             f, job["tnam"] = zfw["orz"]
             if (
                 ANYWIN
+                and job["sprs"]
                 and self.args.sparse
                 and self.args.sparse * 1024 * 1024 <= job["size"]
             ):
@@ -2198,7 +2212,7 @@ class Up2k(object):
                 except:
                     self.log("could not sparse [{}]".format(fp), 3)
 
-            if job["hash"]:
+            if job["hash"] and job["sprs"]:
                 f.seek(job["size"] - 1)
                 f.write(b"e")
 
@@ -2212,7 +2226,7 @@ class Up2k(object):
 
             # self.log("lmod: got {}".format(len(ready)))
             time.sleep(5)
-            for path, sz, times in ready:
+            for path, sz, times, sparse in ready:
                 self.log("lmod: setting times {} on {}".format(times, path))
                 try:
                     bos.utime(path, times, False)
@@ -2220,7 +2234,7 @@ class Up2k(object):
                     t = "lmod: failed to utime ({}, {}):\n{}"
                     self.log(t.format(path, times, min_ex()))
 
-                if self.args.sparse and self.args.sparse * 1024 * 1024 <= sz:
+                if sparse and self.args.sparse and self.args.sparse * 1024 * 1024 <= sz:
                     try:
                         sp.check_call(["fsutil", "sparse", "setflag", path, "0"])
                     except:
