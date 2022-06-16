@@ -1497,11 +1497,15 @@ var pbar = (function () {
 			return;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
-			gk = bc.h + '' + light;
+			gk = bc.h + '' + light,
+			dz = themen == 'dz',
+			dy = themen == 'dy';
 
 		if (gradh != gk) {
 			gradh = gk;
-			grad = glossy_grad(bc, 85, [35, 40, 37, 35], light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
+			grad = glossy_grad(bc, dz ? 120 : 85,
+				dy ? [0, 0, 0, 0] : [35, 40, 37, 35],
+				dy ? [20, 24, 22, 20] : light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
 		}
 		bctx.fillStyle = grad;
 		for (var a = 0; a < mp.au.buffered.length; a++) {
@@ -1523,18 +1527,20 @@ var pbar = (function () {
 		if (!mp || !mp.au || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
-		var sm = bc.w * 1.0 / adur;
+		var sm = bc.w * 1.0 / adur,
+			dz = themen == 'dz',
+			dy = themen == 'dy';
 
-		pctx.fillStyle = light ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
+		pctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
 		for (var p = 1, mins = adur / 10; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
-		pctx.fillStyle = light ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
+		pctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
 		for (var p = 1, mins = adur / 60; p <= mins; p++)
 			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
 		pctx.font = '.5em sans-serif';
-		pctx.fillStyle = light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
+		pctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
 		for (var p = 1, mins = adur / 60; p <= mins; p++) {
 			pctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
 		}
@@ -1597,11 +1603,18 @@ var vbar = (function () {
 		if (!mp)
 			return;
 
-		var gh = h + '' + light;
+		var gh = h + '' + light,
+			dz = themen == 'dz',
+			dy = themen == 'dy';
+
 		if (gradh != gh) {
 			gradh = gh;
-			grad1 = glossy_grad(r.can, 50, light ? [50, 55, 52, 48] : [45, 52, 47, 43], light ? [54, 60, 52, 47] : [42, 51, 47, 42]);
-			grad2 = glossy_grad(r.can, 205, [10, 15, 13, 10], [16, 20, 18, 16]);
+			grad1 = glossy_grad(r.can, dz ? 120 : 50,
+				dy ? [0, 0, 0, 0] : light ? [50, 55, 52, 48] : [45, 52, 47, 43],
+				dy ? [20, 24, 22, 20] : light ? [54, 60, 52, 47] : [42, 51, 47, 42]);
+			grad2 = glossy_grad(r.can, dz ? 120 : 205,
+				dz ? [100, 100, 100, 100] : dy ? [0, 0, 0, 0] : [10, 15, 13, 10],
+				dz ? [10, 14, 12, 10] : dy ? [90, 90, 90, 90] : [16, 20, 18, 16]);
 		}
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
@@ -5369,7 +5382,7 @@ var mukey = (function () {
 })();
 
 
-var light, theme;
+var light, theme, themen;
 var settheme = (function () {
 	var ax = 'abcdefghijklmnopqrstuvwx';
 
@@ -5377,6 +5390,7 @@ var settheme = (function () {
 	if (!/^[a-x][yz]/.exec(theme))
 		theme = dtheme;
 
+	themen = theme.split(/ /)[0];
 	light = !!(theme.indexOf('y') + 1);
 
 	function freshen() {
@@ -5390,7 +5404,7 @@ var settheme = (function () {
 		showfile.setstyle();
 
 		var html = [], itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand'];
+			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<a href="#" class="btn tgl' + (a == itheme ? ' on' : '') +
@@ -5412,6 +5426,7 @@ var settheme = (function () {
 		var c = ax[Math.floor(i / 2)],
 			l = light ? 'y' : 'z';
 		theme = c + l + ' ' + c + ' ' + l;
+		themen = c + l;
 		swrite('theme', theme);
 		freshen();
 	}

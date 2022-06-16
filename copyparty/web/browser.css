@@ -355,6 +355,205 @@ html.cy {
 	--u2-o-bg: #ff0;
 	--u2-o-1-bg: #f00;
 }
+html.dz {
+	--fg: #4d4;
+	--fg-max: #fff;
+	--fg2-max: #fff;
+	--fg-weak: #2a2;
+
+	--bg-u7: #020;
+	--bg-u6: #020;
+	--bg-u5: #050;
+	--bg-u4: #020;
+	--bg-u3: #020;
+	--bg-u2: #020;
+	--bg-u1: #020;
+	--bg: #010;
+	--bgg: var(--bg);
+	--bg-d1: #000;
+	--bg-d2: #000;
+	--bg-d3: #000;
+	--bg-max: #000;
+
+	--tab-alt: #6f6;
+	--row-alt: #030;
+
+	--scroll: #0f0;
+
+	--a: #9f9;
+	--a-b: #fff;
+	--a-hil: #fff;
+	--a-dark: #afa;
+	--a-gray: #2a2;
+
+	--btn-fg: var(--a);
+	--btn-bg: rgba(64,128,64,0.15);
+	--btn-h-fg: var(--a-hil);
+	--btn-h-bg: #050;
+	--btn-1-fg: #000;
+	--btn-1-bg: #4f4;
+	--btn-1h-fg: var(--btn-1-fg);
+	--btn-1h-bg: #3f3;
+	--chk-fg: var(--tab-alt);
+	--txt-sh: var(--bg-d2);
+	--txt-bg: var(--btn-bg);
+
+	--op-aa-fg: var(--a);
+	--op-aa-bg: var(--bg-d2);
+	--op-a-sh: rgba(0,0,0,0.5);
+
+	--u2-btn-b1: #999;
+	--u2-sbtn-b1: #999;
+	--u2-txt-bg: var(--bg-u5);
+	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
+	--u2-tab-1-fg: #fff;
+	--u2-tab-1-bg: linear-gradient(to bottom, var(#353), var(--bg) 80%);
+	--u2-tab-1-b1: #7c5;
+	--u2-tab-1-b2: #583;
+	--u2-tab-1-sh: #280;
+	--u2-b-fg: #fff;
+	--u2-b1-bg: #c38;
+	--u2-b2-bg: #d80;
+	--u2-inf-bg: #07a;
+	--u2-inf-b1: #0be;
+	--u2-ok-bg: #380;
+	--u2-ok-b1: #8e4;
+	--u2-err-bg: #900;
+	--u2-err-b1: #d06;
+	--ud-b1: #888;
+
+	--sort-1: #fff;
+	--sort-2: #3f3;
+
+	--srv-1: #3e3;
+	--srv-2: #1a1;
+	--srv-3: #0f0;
+	--srv-3b: #070;
+
+	--tree-bg: #010;
+
+	--g-play-bg: #750;
+	--g-play-b1: #c90;
+	--g-play-b2: #da4;
+	--g-play-sh: #b83;
+
+	--g-sel-fg: #fff;
+	--g-sel-bg: #925;
+	--g-sel-b1: #c37;
+	--g-sel-sh: #b36;
+	--g-fsel-bg: #d39;
+	--g-fsel-b1: #d48;
+	--g-fsel-ts: #804;
+	--g-fg: var(--a-hil);
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u4);
+	--g-b2: var(--bg-u5);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-f-fg: var(--a-hil);
+	--g-sh: rgba(0,0,0,0.3);
+
+	--f-sh1: 0.33;
+	--f-sh2: 0.02;
+	--f-sh3: 0.2;
+	--f-h-b1: rgba(128,128,128,0.7);
+
+	--f-play-bg: #fc5;
+	--f-play-fg: #000;
+	--f-sel-sh: #fc0;
+	--f-gray: #999;
+
+	--fm-off: #f6c;
+	--mp-sh: var(--bg-d3);
+	--mp-b-bg: rgba(0,0,0,0.2);
+
+	--err-fg: #fff;
+	--err-bg: #a20;
+	--err-b1: #f00;
+	--err-ts: #500;
+
+	text-shadow: none;
+}
+html.dy {
+	--fg: #000;
+	--fg-max: #000;
+	--fg-weak: #000;
+
+	--bg-d3: #fff;
+	--bg-d2: #fff;
+	--bg-d1: #fff;
+	--bg: #fff;
+	--bg-u1: #fff;
+	--bg-u2: #fff;
+	--bg-u3: #fff;
+	--bg-u4: #fff;
+	--bg-u5: #fff;
+	--bg-u6: #fff;
+	--bg-max: #fff;
+
+	--tab-alt: #000;
+	--row-alt: #eee;
+
+	--scroll: #000;
+
+	--a: #000;
+	--a-b: #000;
+	--a-hil: #000;
+	--a-gray: #000;
+	--a-dark: #000;
+
+	--btn-fg: #000;
+	--btn-h-fg: #000;
+	--btn-h-bg: #fff;
+	--btn-1-fg: #fff;
+	--btn-1-bg: #000;
+	--btn-1h-bg: #555;
+	--chk-fg: a;
+	--txt-sh: a;
+	--txt-bg: a;
+
+	--op-a-sh: a;
+
+	--u2-txt-bg: a;
+	--u2-tab-1-sh: a;
+	--u2-tab-1-b1: a;
+	--u2-tab-1-b2: a;
+	--u2-tab-1-fg: a;
+	--u2-tab-1-bg: a;
+	--ud-b1: a;
+
+	--sort-1: a;
+	--sort-2: a;
+
+	--srv-1: a;
+	--srv-2: a;
+	--srv-3: a;
+	--srv-3b: a;
+
+	--tree-bg: #fff;
+
+	--g-fg: a;
+	--g-bg: a;
+	--g-b1: a;
+	--g-b2: a;
+	--g-g1: a;
+	--g-g2: a;
+	--g-f-bg: a;
+	--g-f-b1: a;
+	--g-sh: a;
+
+	--f-sh1: a;
+	--f-sh2: a;
+	--f-sh3: a;
+
+	--f-sel-sh: #000;
+
+	--fm-off: a;
+	--mp-sh: a;
+	--mp-b-bg: #fff;
+}
 * {
 	line-height: 1.2em;
 }
@@ -1243,9 +1442,15 @@ html.c .btn,
 html.a .btn {
 	border-radius: .2em;
 }
-html.ca .btn {
+html.cz .btn {
 	box-shadow: 0 .1em .6em rgba(255,0,185,0.5);
 	border-bottom: .2em solid #709;
+}
+html.dz .btn {
+	box-shadow: 0 0 0 .1em #080 inset;
+}
+html.dz .tgl.btn.on {
+	box-shadow: 0 0 0 .1em var(--btn-1-bg) inset;
 }
 .btn:hover {
 	color: var(--btn-h-fg);
@@ -1258,7 +1463,7 @@ html.ca .btn {
 	color: var(--btn-1-fg);
 	text-shadow: none;
 }
-html.ca .tgl.btn.on {
+html.cz .tgl.btn.on {
 	box-shadow: 0 .1em .8em rgba(255,205,0,0.9);
 	border-bottom: .2em solid #e90;
 }
@@ -2294,9 +2499,11 @@ html.a #pctl a {
 	margin-right: .5em;
 	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
 }
+html.d #pctl,
 html.b #pctl {
 	left: .5em;
 }
+html.d #ops,
 html.c #ops,
 html.a #ops {
 	margin: 1.7em 1.5em 0 1.5em;
@@ -2450,6 +2657,9 @@ html.b #acc_info {
 html.b #wtoggle {
 	border-radius: .1em 0 0 0;
 }
+html.d #barpos,
+html.d #barbuf,
+html.d #pvol,
 html.b #barpos,
 html.b #barbuf,
 html.b #pvol {
@@ -2573,7 +2783,9 @@ html.cy #files tbody div a:last-child {
 		height: 1.6em;
 		bottom: auto;
 	}
+	html.d #barpos,
 	html.b #barpos,
+	html.d #barbuf,
 	html.b #barbuf {
 		width: calc(100% - 19em);
 		left: 8em;
@@ -2585,12 +2797,15 @@ html.cy #files tbody div a:last-child {
 	#pvol {
 		max-width: 9em;
 	}
+	html.d #ops,
 	html.b #ops {
 		padding-left: 1.7em;
 	}
+	html.d .opview,
 	html.b .opview {
 		margin: 1em;
 	}
+	html.d #path,
 	html.b #path {
 		padding-left: 1.3em;
 	}
