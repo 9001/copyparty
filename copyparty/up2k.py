@@ -1980,7 +1980,22 @@ class Up2k(object):
         else:
             self.log("not found in src db: [{}]".format(svp))
 
-        bos.rename(sabs, dabs)
+        try:
+            atomic_move(sabs, dabs)
+        except OSError as ex:
+            if ex.errno != 18:
+                raise
+
+            self.log("cross-device move:\n  {}\n  {}".format(sabs, dabs))
+            b1, b2 = fsenc(sabs), fsenc(dabs)
+            try:
+                shutil.copy2(b1, b2)
+            except:
+                os.unlink(b2)
+                raise
+
+            os.unlink(b1)
+
         return "k"
 
     def _copy_tags(
