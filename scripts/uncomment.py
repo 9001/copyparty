@@ -3,6 +3,7 @@
 from __future__ import print_function, unicode_literals
 
 import io
+import os
 import sys
 import tokenize
 
@@ -10,6 +11,7 @@ import tokenize
 def uncomment(fpath):
     """modified https://stackoverflow.com/a/62074206"""
 
+    print(".", end="", flush=True)
     with open(fpath, "rb") as f:
         orig = f.read().decode("utf-8")
 
@@ -66,9 +68,15 @@ def uncomment(fpath):
 
 def main():
     print("uncommenting", end="", flush=True)
-    for f in sys.argv[1:]:
-        print(".", end="", flush=True)
-        uncomment(f)
+    try:
+        import multiprocessing as mp
+
+        with mp.Pool(os.cpu_count()) as pool:
+            pool.map(uncomment, sys.argv[1:])
+    except Exception as ex:
+        print("\nnon-mp fallback due to {}\n".format(ex))
+        for f in sys.argv[1:]:
+            uncomment(f)
 
     print("k")
 

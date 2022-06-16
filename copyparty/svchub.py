@@ -57,6 +57,29 @@ class SvcHub(object):
         self.log_mutex = threading.Lock()
         self.next_day = 0
 
+        if args.sss or args.s >= 3:
+            args.ss = True
+            args.lo = args.lo or "cpp-%Y-%m%d-%H%M%S.txt.xz"
+            args.ls = args.ls or "**,*,ln,p,r"
+
+        if args.ss or args.s >= 2:
+            args.s = True
+            args.no_dot_mv = True
+            args.no_dot_ren = True
+            args.unpost = 0
+            args.no_del = True
+            args.no_mv = True
+            args.hardlink = True
+            args.vague_403 = True
+            args.nih = True
+
+        if args.s:
+            args.dotpart = True
+            args.no_thumb = True
+            args.no_mtag_ff = True
+            args.no_robots = True
+            args.force_js = True
+
         self.log = self._log_disabled if args.q else self._log_enabled
         if args.lo:
             self._setup_logfile(printed)

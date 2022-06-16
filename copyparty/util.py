@@ -1608,6 +1608,116 @@ def align_tab(lines: list[str]) -> list[str]:
     return ["".join(x.ljust(y + 2) for x, y in zip(row, lens)) for row in rows]
 
 
+def visual_length(txt: str) -> int:
+    # from r0c
+    eoc = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    clen = 0
+    pend = None
+    counting = True
+    for ch in txt:
+
+        # escape sequences can never contain ESC;
+        # treat pend as regular text if so
+        if ch == "\033" and pend:
+            clen += len(pend)
+            counting = True
+            pend = None
+
+        if not counting:
+            if ch in eoc:
+                counting = True
+        else:
+            if pend:
+                pend += ch
+                if pend.startswith("\033["):
+                    counting = False
+                else:
+                    clen += len(pend)
+                    counting = True
+                pend = None
+            else:
+                if ch == "\033":
+                    pend = "{0}".format(ch)
+                else:
+                    co = ord(ch)
+                    # the safe parts of latin1 and cp437 (no greek stuff)
+                    if (
+                        co < 0x100  # ascii + lower half of latin1
+                        or (co >= 0x2500 and co <= 0x25A0)  # box drawings
+                        or (co >= 0x2800 and co <= 0x28FF)  # braille
+                    ):
+                        clen += 1
+                    else:
+                        # assume moonrunes or other double-width
+                        clen += 2
+    return clen
+
+
+def wrap(txt: str, maxlen: int, maxlen2: int) -> list[str]:
+    # from r0c
+    words = re.sub(r"([, ])", r"\1\n", txt.rstrip()).split("\n")
+    pad = maxlen - maxlen2
+    ret = []
+    for word in words:
+        if len(word) * 2 < maxlen or visual_length(word) < maxlen:
+            ret.append(word)
+        else:
+            while visual_length(word) >= maxlen:
+                ret.append(word[: maxlen - 1] + "-")
+                word = word[maxlen - 1 :]
+            if word:
+                ret.append(word)
+
+    words = ret
+    ret = []
+    ln = ""
+    spent = 0
+    for word in words:
+        wl = visual_length(word)
+        if spent + wl > maxlen:
+            ret.append(ln)
+            maxlen = maxlen2
+            spent = 0
+            ln = " " * pad
+        ln += word
+        spent += wl
+    if ln:
+        ret.append(ln)
+
+    return ret
+
+
+def termsize() -> tuple[int, int]:
+    # from hashwalk
+    env = os.environ
+
+    def ioctl_GWINSZ(fd):
+        try:
+            import fcntl, termios, struct
+
+            cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
+        except:
+            return
+        return cr
+
+    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+    if not cr:
+        try:
+            fd = os.open(os.ctermid(), os.O_RDONLY)
+            cr = ioctl_GWINSZ(fd)
+            os.close(fd)
+        except:
+            pass
+
+    if not cr:
+        try:
+            cr = (env["LINES"], env["COLUMNS"])
+        except:
+            cr = (25, 80)
+
+    return int(cr[1]), int(cr[0])
+
+
 class Pebkac(Exception):
     def __init__(self, code: int, msg: Optional[str] = None) -> None:
         super(Pebkac, self).__init__(msg or HTTPCODE[code])

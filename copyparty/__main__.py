@@ -24,7 +24,7 @@ from .__init__ import ANYWIN, PY2, VT100, WINDOWS, E, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import re_vol
 from .svchub import SvcHub
-from .util import IMPLICATIONS, align_tab, ansi_re, min_ex, py_desc
+from .util import IMPLICATIONS, align_tab, ansi_re, min_ex, py_desc, termsize, wrap
 
 try:
     from types import FrameType
@@ -43,6 +43,12 @@ printed: list[str] = []
 
 
 class RiceFormatter(argparse.HelpFormatter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        if PY2:
+            kwargs["width"] = termsize()[0]
+
+        super(RiceFormatter, self).__init__(*args, **kwargs)
+
     def _get_help_string(self, action: argparse.Action) -> str:
         """
         same as ArgumentDefaultsHelpFormatter(HelpFormatter)
@@ -52,7 +58,7 @@ class RiceFormatter(argparse.HelpFormatter):
         if not VT100:
             fmt = " (default: %(default)s)"
 
-        ret = str(action.help)
+        ret = unicode(action.help)
         if "%(default)" not in ret:
             if action.default is not argparse.SUPPRESS:
                 defaulting_nargs = [argparse.OPTIONAL, argparse.ZERO_OR_MORE]
@@ -64,11 +70,40 @@ class RiceFormatter(argparse.HelpFormatter):
         """same as RawDescriptionHelpFormatter(HelpFormatter)"""
         return "".join(indent + line + "\n" for line in text.splitlines())
 
+    def __add_whitespace(self, idx: int, iWSpace: int, text: str) -> str:
+        return (" " * iWSpace) + text if idx else text
+
+    def _split_lines(self, text: str, width: int) -> list[str]:
+        # https://stackoverflow.com/a/35925919
+        textRows = text.splitlines()
+        ptn = re.compile(r"\s*[0-9\-]{0,}\.?\s*")
+        for idx, line in enumerate(textRows):
+            search = ptn.search(line)
+            if not line.strip():
+                textRows[idx] = " "
+            elif search:
+                lWSpace = search.end()
+                lines = [
+                    self.__add_whitespace(i, lWSpace, x)
+                    for i, x in enumerate(wrap(line, width, width - 1))
+                ]
+                textRows[idx] = lines
+
+        return [item for sublist in textRows for item in sublist]
+
 
 class Dodge11874(RiceFormatter):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs["width"] = 9003
         super(Dodge11874, self).__init__(*args, **kwargs)
+
+
+class BasicDodge11874(
+    argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter
+):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        kwargs["width"] = 9003
+        super(BasicDodge11874, self).__init__(*args, **kwargs)
 
 
 def lprint(*a: Any, **ka: Any) -> None:
@@ -483,6 +518,9 @@ def run_argparse(argv: list[str], formatter: Any) -> argparse.Namespace:
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (lifetime volflag)")
 
     ap2 = ap.add_argument_group('safety options')
+    ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
+    ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, 404 on 403.\n └─Alias of\033[32m -s --no-dot-mv --no-dot-ren --unpost=0 --no-del --no-mv --hardlink --vague-403 -nih")
+    ap2.add_argument("-sss", action="store_true", help="further increase safety: Enable logging to disk, scan for dangerous symlinks.\n └─Alias of\033[32m -ss -lo=cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz --ls=**,*,ln,p,r")
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="do a sanity/safety check of all volumes on startup; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
     ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt; used to generate unpredictable internal identifiers for uploads -- doesn't really matter")
     ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files -- this one DOES matter")
@@ -644,16 +682,21 @@ def main(argv: Optional[list[str]] = None) -> None:
     except:
         pass
 
-    try:
-        al = run_argparse(argv, RiceFormatter)
-    except AssertionError:
-        al = run_argparse(argv, Dodge11874)
+    for fmtr in [RiceFormatter, Dodge11874, BasicDodge11874]:
+        try:
+            al = run_argparse(argv, fmtr)
+        except SystemExit:
+            raise
+        except:
+            lprint("\n[ {} ]:\n{}\n".format(fmtr, min_ex()))
+
+    assert al
 
     if WINDOWS and not al.keep_qem:
         try:
             disable_quickedit()
         except:
-            print("\nfailed to disable quick-edit-mode:\n" + min_ex() + "\n")
+            lprint("\nfailed to disable quick-edit-mode:\n" + min_ex() + "\n")
 
     if not VT100:
         al.wintitle = ""
