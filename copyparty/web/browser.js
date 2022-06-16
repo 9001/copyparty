@@ -78,7 +78,7 @@ var Ls = {
 		"ut_etat": "average &lt;em&gt;total&lt;/em&gt; speed and estimated time until finish",
 
 		"uct_ok": "completed successfully",
-		"uct_ng": "failed / rejected / not-found",
+		"uct_ng": "no-good: failed / rejected / not-found",
 		"uct_done": "ok and ng combined",
 		"uct_bz": "hashing or uploading",
 		"uct_q": "idle, pending",
@@ -735,7 +735,7 @@ ebi('op_up2k').innerHTML = (
 	'<div id="u2notbtn"></div>\n' +
 
 	'<div id="u2btn_ct">\n' +
-	'	<div id="u2btn">\n' +
+	'	<div id="u2btn" tabindex="0">\n' +
 	'		<span id="u2bm"></span>\n' + L.ul_btn +
 	'	</div>\n' +
 	'</div>\n' +
@@ -4970,17 +4970,22 @@ var treectl = (function () {
 })();
 
 
+var enspin_timer = null;
 function enspin(sel) {
-	despin(sel);
-	var d = mknod('div');
-	d.className = 'dumb_loader_thing';
-	d.innerHTML = '🌲';
-	var tgt = QS(sel);
-	tgt.insertBefore(d, tgt.childNodes[0]);
+	clearTimeout(enspin_timer);
+	enspin_timer = setTimeout(function () {
+		despin(sel);
+		var d = mknod('div');
+		d.className = 'dumb_loader_thing';
+		d.innerHTML = '🌲';
+		var tgt = QS(sel);
+		tgt.insertBefore(d, tgt.childNodes[0]);
+	}, 50);
 }
 
 
 function despin(sel) {
+	clearTimeout(enspin_timer);
 	var o = QSA(sel + '>.dumb_loader_thing');
 	for (var a = o.length - 1; a >= 0; a--)
 		o[a].parentNode.removeChild(o[a]);
@@ -5436,7 +5441,7 @@ var settheme = (function () {
 		L = Ls[this.textContent];
 		swrite("lang", this.textContent);
 		freshen();
-		modal.confirm(L.lang_set, location.reload.bind(location), null);
+		modal.confirm(Ls.eng.lang_set + "\n\n" + Ls.nor.lang_set, location.reload.bind(location), null);
 	};
 
 	freshen();

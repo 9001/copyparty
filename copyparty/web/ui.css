@@ -281,15 +281,19 @@ html.y #tth {
 	max-width: 24em;
 }
 *:focus,
+*:focus+label,
 #pctl *:focus,
 .btn:focus {
 	box-shadow: 0 .1em .2em #fc0 inset;
+	outline: #fc0 solid .1em;
 	border-radius: .2em;
 }
 html.y *:focus,
+html.y *:focus+label,
 html.y #pctl *:focus,
 html.y .btn:focus {
 	box-shadow: 0 .1em .2em #037 inset;
+	outline: #037 solid .1em;
 }
 input[type="text"]:focus,
 input:not([type]):focus,

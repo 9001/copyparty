@@ -1067,7 +1067,7 @@ function up2k_init(subtle) {
     function more_one_file() {
         fdom_ctr++;
         var elm = mknod('div');
-        elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" />'.format(fdom_ctr);
+        elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" tabindex="-1" />'.format(fdom_ctr);
         ebi('u2form').appendChild(elm);
         ebi('file' + fdom_ctr).onchange = gotfile;
     }

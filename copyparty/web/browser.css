@@ -869,6 +869,10 @@ html.y #widget.open {
 @keyframes spin {
 	100% {transform: rotate(360deg)}
 }
+@keyframes fadein {
+	0% {opacity: 0}
+	100% {opacity: 1}
+}
 #wtoggle {
 	position: absolute;
 	white-space: nowrap;
@@ -1010,7 +1014,6 @@ html.y #widget.open {
 	font-size: 1.5em;
 	padding: .25em .4em;
 	margin: 0;
-	outline: none;
 }
 #ops a.act {
 	color: #fff;
@@ -1333,7 +1336,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	margin: 1em .3em 1em 1em;
 	padding: 0 1.2em 0 0;
 	font-size: 4em;
-	animation: spin 1s linear infinite;
+	animation: spin 1s linear infinite, fadein .2s ease;
 	position: absolute;
 	z-index: 9;
 }
@@ -1933,7 +1936,6 @@ html.y #bbox-overlay figcaption a {
 #u2form input {
 	background: var(--bg-u5);
 	border: 0px solid var(--bg-u5);
-	outline: none;
 }
 #u2err.err {
 	color: var(--a-dark);
@@ -2130,7 +2132,6 @@ html.y #bbox-overlay figcaption a {
 	margin: 0;
 	padding: 0;
 	border: none;
-	outline: none;
 }
 #u2conf .txtbox {
 	width: 3em;
