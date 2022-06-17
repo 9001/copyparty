@@ -13,6 +13,9 @@
 
 # other stuff
 
+## [`changelog.md`](changelog.md)
+* occasionally grabbed from github release notes
+
 ## [`rclone.md`](rclone.md)
 * notes on using rclone as a fuse client/server
 

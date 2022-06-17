@@ -200,6 +200,9 @@ git pull; git reset --hard origin/HEAD && git log --format=format:"%H %ai %d" --
 # download all sfx versions
 curl https://api.github.com/repos/9001/copyparty/releases?per_page=100 | jq -r '.[] | .tag_name + " " + .name' | tr -d '\r' | while read v t; do fn="$(printf '%s\n' "copyparty $v $t.py" | tr / -)"; [ -e "$fn" ] || curl https://github.com/9001/copyparty/releases/download/$v/copyparty-sfx.py -Lo "$fn"; done
 
+# convert releasenotes to changelog
+curl https://api.github.com/repos/9001/copyparty/releases?per_page=100 | jq -r '.[] | "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  \n# \(.created_at)  `\(.tag_name)`  \(.name)\n\n\(.body)\n\n\n"' | sed -r 's/^# ([0-9]{4}-)([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z /# \1\2\3-\4\5 /' > changelog.md
+
 # push to multiple git remotes
 git config -l | grep '^remote'
 git remote add all git@github.com:9001/copyparty.git
