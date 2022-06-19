@@ -1048,7 +1048,7 @@ class HttpCli(object):
             reader = read_socket(self.sr, remains)
 
             f = None
-            fpool = not self.args.no_fpool and (not ANYWIN or sprs)
+            fpool = not self.args.no_fpool and sprs
             if fpool:
                 with self.mutex:
                     try:

@@ -21,25 +21,6 @@ class Fstab(object):
     def __init__(self, log: RootLogger):
         self.log_func = log
 
-        self.no_sparse = set(
-            [
-                "fuse",  # termux-sdcard
-                "vfat",  # linux-efi
-                "fat32",
-                "fat16",
-                "fat12",
-                "fat-32",
-                "fat-16",
-                "fat-12",
-                "fat 32",
-                "fat 16",
-                "fat 12",
-                "exfat",
-                "ex-fat",
-                "ex fat",
-                "hpfs",  # macos
-            ]
-        )
         self.tab: Optional[VFS] = None
         self.cache: dict[str, str] = {}
         self.age = 0.0

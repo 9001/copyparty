@@ -132,6 +132,7 @@ class Up2k(object):
             thr.start()
 
         self.fstab = Fstab(self.log_func)
+        self.no_sparse = re.compile(self.args.thickfs)
 
         if self.args.no_fastboot:
             self.deferred_init()
@@ -1326,7 +1327,7 @@ class Up2k(object):
 
         # check if filesystem supports sparse files;
         # refuse out-of-order / multithreaded uploading if sprs False
-        sprs = self.fstab.get(pdir) not in self.fstab.no_sparse
+        sprs = not self.no_sparse.match(self.fstab.get(pdir))
 
         with self.mutex:
             cur = self.cur.get(cj["ptop"])
@@ -1359,7 +1360,7 @@ class Up2k(object):
                         "prel": dp_dir,
                         "vtop": cj["vtop"],
                         "ptop": cj["ptop"],
-                        "sprs": sprs,
+                        "sprs": sprs,  # dontcare; finished anyways
                         "size": dsize,
                         "lmod": dtime,
                         "addr": ip,
@@ -1494,7 +1495,7 @@ class Up2k(object):
                 "purl": purl,
                 "size": job["size"],
                 "lmod": job["lmod"],
-                "sprs": sprs,
+                "sprs": job.get("sprs", sprs),
                 "hash": job["need"],
                 "wark": wark,
             }
@@ -2213,6 +2214,7 @@ class Up2k(object):
 
         dip = job["addr"].replace(":", ".")
         suffix = "-{:.6f}-{}".format(job["t0"], dip)
+        t0 = time.time()
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
             f, job["tnam"] = zfw["orz"]
             if (
@@ -2230,6 +2232,12 @@ class Up2k(object):
             if job["hash"] and job["sprs"]:
                 f.seek(job["size"] - 1)
                 f.write(b"e")
+
+        td = time.time() - t0
+        if td > 3 and not ANYWIN:
+            t = "WARNING: filesystem [{}] at [{}] probably does support sparse files; adjust the list in --thickfs and maybe create a github issue (please mention the filesystem + any related info about your setup if you do)"
+            fs = self.fstab.get(pdir)
+            self.log(t.format(fs, pdir), 1)
 
         if not job["hash"]:
             self._finish_upload(job["ptop"], job["wark"])

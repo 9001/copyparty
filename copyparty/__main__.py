@@ -474,14 +474,15 @@ def run_argparse(argv: list[str], formatter: Any) -> argparse.Namespace:
 
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
-    ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--unpost", metavar="SEC", type=int, default=3600*12, help="grace period where uploads can be deleted by the uploader, even without delete permissions; 0=disabled")
+    ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without -e2d; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even if copyparty thinks you're better off without -- probably useful on nfs and cow filesystems (zfs, btrfs)")
     ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem)")
     ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made")
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
-    ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without -e2d; roughly 1 MiB RAM per 600")
+    ap2.add_argument("--thickfs", metavar="REGEX", type=u, default="fat|vfat|ex.?fat|hpfs|fuse", help="filesystems which dont support sparse files")
+    ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; 0 = off and warn if enabled, 1 = off, 2 = on, 3 = on and disable datecheck")
 
     ap2 = ap.add_argument_group('network options')
