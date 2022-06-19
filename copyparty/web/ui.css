@@ -380,10 +380,12 @@ html.y textarea:focus {
 	padding-left: 2em;
 	border-left: .3em solid #ddd;
 }
-.mdo ul>li,
-.mdo ol>li {
+.mdo ul>li {
 	margin: .7em 0;
 	list-style-type: disc;
+}
+.mdo ol>li {
+	margin: .7em 0 .7em 2em;
 }
 .mdo strong {
 	color: #000;
