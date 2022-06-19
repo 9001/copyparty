@@ -358,11 +358,13 @@ the browser has the following hotkeys  (always qwerty)
   * `U/O` skip 10sec back/forward
   * `0..9` jump to 0%..90%
   * `P` play/pause (also starts playing the folder)
+  * `Y` download file
 * when viewing images / playing videos:
   * `J/L, Left/Right` prev/next file
   * `Home/End` first/last file
   * `S` toggle selection
   * `R` rotate clockwise (shift=ccw)
+  * `Y` download file
   * `Esc` close viewer
   * videos:
     * `U/O` skip 10sec back/forward
@@ -989,13 +991,25 @@ when uploading files,
 
 some notes on hardening
 
-on public copyparty instances with anonymous upload enabled:
+* option `-s` is a shortcut to set the following options:
+  * `--no-thumb` disables thumbnails and audio transcoding to stop copyparty from running `FFmpeg`/`Pillow`/`VIPS` on uploaded files, which is a [good idea](https://www.cvedetails.com/vulnerability-list.php?vendor_id=3611) if anonymous upload is enabled
+  * `--no-mtag-ff` uses `mutagen` to grab music tags instead of `FFmpeg`, which is safer and faster but less accurate
+  * `--dotpart` hides uploads from directory listings while they're still incoming
+  * `--no-robots` and `--force-js` makes life harder for crawlers, see [hiding from google](#hiding-from-google)
 
-* users can upload html/css/js which will evaluate for other visitors in a few ways,
-  * unless `--no-readme` is set: by uploading/modifying a file named `readme.md`
-  * if `move` access is granted AND none of `--no-logues`, `--no-dot-mv`, `--no-dot-ren` is set: by uploading some .html file and renaming it to `.epilogue.html` (uploading it directly is blocked)
+* option `-ss` is a shortcut for the above plus:
+  * `--no-logues` and `--no-readme` disables support for readme's and prologues / epilogues in directory listings, which otherwise lets people upload arbitrary `<script>` tags
+  * `--unpost 0`, `--no-del`, `--no-mv` disables all move/delete support
+  * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
+    * however note if you edit one file it will also affect the other copies
+  * `--vague-403` returns a "404 not found" instead of "403 forbidden" which is a common enterprise meme
+  * `--nih` removes the server hostname from directory listings
 
-other misc:
+* option `-sss` is a shortcut for the above plus:
+  * `-lo cpp-%Y-%m%d-%H%M%S.txt.xz` enables logging to disk
+  * `-ls **,*,ln,p,r` does a scan on startup for any dangerous symlinks
+
+other misc notes:
 
 * you can disable directory listings by giving permission `g` instead of `r`, only accepting direct URLs to files
   * combine this with volume-flag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404

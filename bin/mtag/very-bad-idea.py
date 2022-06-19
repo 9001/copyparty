@@ -63,7 +63,7 @@ set -e
 EOF
 chmod 755 /usr/local/bin/chromium-browser
 
-# start the server  (note: replace `-v.::rw:` with `-v.::r:` to disallow retrieving uploaded stuff)
+# start the server  (note: replace `-v.::rw:` with `-v.::w:` to disallow retrieving uploaded stuff)
 cd ~/Downloads; python3 copyparty-sfx.py --urlform save,get -v.::rw:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,very-bad-idea.py
 
 """

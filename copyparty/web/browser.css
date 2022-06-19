@@ -371,7 +371,7 @@ html.dz {
 	--bg: #010;
 	--bgg: var(--bg);
 	--bg-d1: #000;
-	--bg-d2: #000;
+	--bg-d2: #020;
 	--bg-d3: #000;
 	--bg-max: #000;
 
@@ -381,8 +381,8 @@ html.dz {
 	--scroll: #0f0;
 
 	--a: #9f9;
-	--a-b: #fff;
-	--a-hil: #fff;
+	--a-b: #cfc;
+	--a-hil: #cfc;
 	--a-dark: #afa;
 	--a-gray: #2a2;
 
@@ -458,7 +458,7 @@ html.dz {
 	--f-sh1: 0.33;
 	--f-sh2: 0.02;
 	--f-sh3: 0.2;
-	--f-h-b1: rgba(128,128,128,0.7);
+	--f-h-b1: #3b3;
 
 	--f-play-bg: #fc5;
 	--f-play-fg: #000;
@@ -2773,6 +2773,17 @@ html.cy #files,
 html.cy #files a,
 html.cy #files tbody div a:last-child {
 	color: #000;
+}
+
+
+
+
+
+html.dz * {
+	border-radius: 0 !important;
+}
+html.d #treepar {
+	border-bottom: .2em solid var(--f-h-b1);
 }
 
 

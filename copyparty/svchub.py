@@ -64,8 +64,8 @@ class SvcHub(object):
 
         if args.ss or args.s >= 2:
             args.s = True
-            args.no_dot_mv = True
-            args.no_dot_ren = True
+            args.no_logues = True
+            args.no_readme = True
             args.unpost = 0
             args.no_del = True
             args.no_mv = True
