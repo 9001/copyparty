@@ -1364,7 +1364,7 @@ var md_plug_err = function (ex, js) {
         console.log(ex, js);
 };
 function load_md_plug(md_text, plug_type) {
-    if (!md_emp)
+    if (!have_emp)
         return md_text;
 
     var find = '\n```copyparty_' + plug_type + '\n';

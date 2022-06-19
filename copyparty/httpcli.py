@@ -1855,7 +1855,7 @@ class HttpCli(object):
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
-            "md_emp": "true" if self.args.emp else "false",
+            "have_emp": self.args.emp,
             "md_chk_rate": self.args.mcr,
             "md": boundary,
             "arg_base": arg_base,
@@ -2384,6 +2384,7 @@ class HttpCli(object):
             "perms": json.dumps(perms),
             "taglist": [],
             "def_hcols": [],
+            "have_emp": self.args.emp,
             "have_up2k_idx": ("e2d" in vn.flags),
             "have_tags_idx": ("e2t" in vn.flags),
             "have_acode": (not self.args.no_acode),
@@ -2617,7 +2618,6 @@ class HttpCli(object):
 
         j2a["logues"] = logues
         j2a["taglist"] = taglist
-        j2a["md_emp"] = self.args.emp
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
 
         if "mth" in vn.flags:
