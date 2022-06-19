@@ -1855,7 +1855,7 @@ class HttpCli(object):
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
-            "md_plug": "true" if self.args.emp else "false",
+            "md_emp": "true" if self.args.emp else "false",
             "md_chk_rate": self.args.mcr,
             "md": boundary,
             "arg_base": arg_base,
@@ -2617,6 +2617,7 @@ class HttpCli(object):
 
         j2a["logues"] = logues
         j2a["taglist"] = taglist
+        j2a["md_emp"] = self.args.emp
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
 
         if "mth" in vn.flags:

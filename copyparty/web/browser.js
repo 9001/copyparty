@@ -5793,13 +5793,34 @@ function show_md(md, name, div, url, depth) {
 		});
 	}
 
+	md_plug = {}
+	md = load_md_plug(md, 'pre');
+	md = load_md_plug(md, 'post');
+
+	var marked_opts = {
+		headerPrefix: 'md-',
+		breaks: true,
+		gfm: true
+	};
+	var ext = md_plug.pre;
+	if (ext)
+		Object.assign(marked_opts, ext[0]);
+
 	try {
 		clmod(div, 'mdo', 1);
-		div.innerHTML = marked.parse(md, {
-			headerPrefix: 'md-',
-			breaks: true,
-			gfm: true
-		});
+		div.innerHTML = marked.parse(md, marked_opts);
+
+		ext = md_plug.post;
+		ext = ext ? [ext[0].render, ext[0].render2] : [];
+		for (var a = 0; a < ext.length; a++)
+			if (ext[a])
+				try {
+					ext[a](div);
+				}
+				catch (ex) {
+					console.log(ex);
+				}
+
 		var els = QSA('#epi a');
 		for (var a = 0, aa = els.length; a < aa; a++) {
 			var href = els[a].getAttribute('href');

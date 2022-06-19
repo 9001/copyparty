@@ -713,6 +713,7 @@ html.y #files thead th {
 }
 #files td:first-child {
 	border-radius: .25em 0 0 .25em;
+	white-space: nowrap;
 }
 #files td:last-child {
 	border-radius: 0 .25em .25em 0;

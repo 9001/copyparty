@@ -25,10 +25,11 @@
 	<a href="#" id="repl">π</a>
 	<script>
 
-var last_modified = {{ lastmod }};
+var last_modified = {{ lastmod }},
+	md_emp = {{ md_emp }};
+
 var md_opt = {
 	link_md_as_html: false,
-	allow_plugins: {{ md_plug }},
 	modpoll_freq: {{ md_chk_rate }}
 };
 

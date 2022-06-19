@@ -20,10 +20,6 @@ var dbg = function () { };
 // dbg = console.log
 
 
-// plugins
-var md_plug = {};
-
-
 // dodge browser issues
 (function () {
     var ua = navigator.userAgent;
@@ -160,7 +156,7 @@ function copydom(src, dst, lv) {
 }
 
 
-function md_plug_err(ex, js) {
+md_plug_err = function (ex, js) {
     qsr('#md_errbox');
     if (!ex)
         return;
@@ -197,50 +193,12 @@ function md_plug_err(ex, js) {
 }
 
 
-function load_plug(md_text, plug_type) {
-    if (!md_opt.allow_plugins)
-        return md_text;
-
-    var find = '\n```copyparty_' + plug_type + '\n';
-    var ofs = md_text.indexOf(find);
-    if (ofs === -1)
-        return md_text;
-
-    var ofs2 = md_text.indexOf('\n```', ofs + 1);
-    if (ofs2 == -1)
-        return md_text;
-
-    var js = md_text.slice(ofs + find.length, ofs2 + 1);
-    var md = md_text.slice(0, ofs + 1) + md_text.slice(ofs2 + 4);
-
-    var old_plug = md_plug[plug_type];
-    if (!old_plug || old_plug[1] != js) {
-        js = 'const x = { ' + js + ' }; x;';
-        try {
-            var x = eval(js);
-        }
-        catch (ex) {
-            md_plug[plug_type] = null;
-            md_plug_err(ex, js);
-            return md;
-        }
-        if (x['ctor']) {
-            x['ctor']();
-            delete x['ctor'];
-        }
-        md_plug[plug_type] = [x, js];
-    }
-
-    return md;
-}
-
-
 function convert_markdown(md_text, dest_dom) {
     md_text = md_text.replace(/\r/g, '');
 
     md_plug_err(null);
-    md_text = load_plug(md_text, 'pre');
-    md_text = load_plug(md_text, 'post');
+    md_text = load_md_plug(md_text, 'pre');
+    md_text = load_md_plug(md_text, 'post');
 
     var marked_opts = {
         //headerPrefix: 'h-',
@@ -248,7 +206,7 @@ function convert_markdown(md_text, dest_dom) {
         gfm: true
     };
 
-    var ext = md_plug['pre'];
+    var ext = md_plug.pre;
     if (ext)
         Object.assign(marked_opts, ext[0]);
 
@@ -349,7 +307,7 @@ function convert_markdown(md_text, dest_dom) {
         el.innerHTML = '<a href="#' + id + '">' + el.innerHTML + '</a>';
     }
 
-    ext = md_plug['post'];
+    ext = md_plug.post;
     if (ext && ext[0].render)
         try {
             ext[0].render(md_dom);
