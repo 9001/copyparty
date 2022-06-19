@@ -6064,9 +6064,11 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 	tgt = e.target.closest('a[hl]');
 	if (tgt) {
-		var fun = function () {
-			showfile.show(noq_href(ebi(tgt.getAttribute('hl'))), tgt.getAttribute('lang'));
-		}, szs = ft2dict(tgt.closest('tr'))[0].sz,
+		var a = ebi(tgt.getAttribute('hl')),
+			fun = function () {
+				showfile.show(noq_href(a), tgt.getAttribute('lang'));
+			},
+			szs = ft2dict(a.closest('tr'))[0].sz,
 			sz = parseInt(szs.replace(/[, ]/g, ''));
 
 		if (sz < 1024 * 1024)
