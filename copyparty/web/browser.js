@@ -1008,7 +1008,7 @@ var mpl = (function () {
 		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>');
 
 	var r = {
-		"pb_mode": (sread('pb_mode') || 'loop').split('-')[0],
+		"pb_mode": (sread('pb_mode') || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 	};
 	bcfg_bind(r, 'preload', 'au_preload', true);
