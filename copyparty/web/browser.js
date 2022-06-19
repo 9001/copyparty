@@ -2644,6 +2644,8 @@ var fileman = (function () {
 				if (!md.hasOwnProperty(k))
 					continue;
 
+				md[k] = (md[k] + '').replace(/[\/\\]/g, '-');
+
 				if (k.startsWith('.'))
 					md[k.slice(1)] = md[k];
 			}
