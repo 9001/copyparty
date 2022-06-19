@@ -1842,6 +1842,7 @@ a.btn,
 .full-image img,
 .full-image video {
 	display: inline-block;
+	outline: none;
 	width: auto;
 	height: auto;
 	max-width: 100%;

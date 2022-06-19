@@ -128,7 +128,7 @@ write markdown (most html is 🙆 too)
 	<script>
 
 var last_modified = {{ lastmod }},
-	have_emp = {{ have_emp }};
+	have_emp = {{ have_emp|tojson }};
 
 var md_opt = {
 	link_md_as_html: false,
