@@ -6013,6 +6013,9 @@ function wintitle(txt) {
 
 
 ebi('path').onclick = function (e) {
+	if (ctrl(e))
+		return true;
+
 	var a = e.target.closest('a[href]');
 	if (!a || !(a = a.getAttribute('href') + '') || !a.endsWith('/'))
 		return;
