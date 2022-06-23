@@ -132,7 +132,6 @@ class Up2k(object):
             thr.start()
 
         self.fstab = Fstab(self.log_func)
-        self.no_sparse = re.compile(self.args.thickfs)
 
         if self.args.no_fastboot:
             self.deferred_init()
@@ -1327,7 +1326,7 @@ class Up2k(object):
 
         # check if filesystem supports sparse files;
         # refuse out-of-order / multithreaded uploading if sprs False
-        sprs = not self.no_sparse.match(self.fstab.get(pdir))
+        sprs = self.fstab.get(pdir) != "ng"
 
         with self.mutex:
             cur = self.cur.get(cj["ptop"])
@@ -2214,30 +2213,48 @@ class Up2k(object):
 
         dip = job["addr"].replace(":", ".")
         suffix = "-{:.6f}-{}".format(job["t0"], dip)
-        t0 = time.time()
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
             f, job["tnam"] = zfw["orz"]
+            abspath = os.path.join(pdir, job["tnam"])
+            sprs = job["sprs"]
+            sz = job["size"]
+            relabel = False
             if (
                 ANYWIN
-                and job["sprs"]
+                and sprs
                 and self.args.sparse
-                and self.args.sparse * 1024 * 1024 <= job["size"]
+                and self.args.sparse * 1024 * 1024 <= sz
             ):
-                fp = os.path.join(pdir, job["tnam"])
                 try:
-                    sp.check_call(["fsutil", "sparse", "setflag", fp])
+                    sp.check_call(["fsutil", "sparse", "setflag", abspath])
                 except:
-                    self.log("could not sparse [{}]".format(fp), 3)
+                    self.log("could not sparse [{}]".format(abspath), 3)
+                    relabel = True
+                    sprs = False
 
-            if job["hash"] and job["sprs"]:
-                f.seek(job["size"] - 1)
+            if not ANYWIN and sprs and sz > 1024 * 1024:
+                fs = self.fstab.get(pdir)
+                if fs != "ok":
+                    relabel = True
+                    f.seek(1024 * 1024 - 1)
+                    f.write(b"e")
+                    f.flush()
+                    try:
+                        nblk = bos.stat(abspath).st_blocks
+                        sprs = nblk < 2048
+                    except:
+                        sprs = False
+
+            if relabel:
+                t = "sparse files {} on {} filesystem at {}"
+                nv = "ok" if sprs else "ng"
+                self.log(t.format(nv, self.fstab.get(pdir), pdir))
+                self.fstab.relabel(pdir, nv)
+                job["sprs"] = sprs
+
+            if job["hash"] and sprs:
+                f.seek(sz - 1)
                 f.write(b"e")
-
-        td = time.time() - t0
-        if td > 3 and not ANYWIN:
-            t = "WARNING: filesystem [{}] at [{}] probably does support sparse files; adjust the list in --thickfs and maybe create a github issue (please mention the filesystem + any related info about your setup if you do)"
-            fs = self.fstab.get(pdir)
-            self.log(t.format(fs, pdir), 1)
 
         if not job["hash"]:
             self._finish_upload(job["ptop"], job["wark"])

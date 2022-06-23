@@ -29,7 +29,7 @@ class Fstab(object):
         self.log_func("fstab", msg + "\033[K", c)
 
     def get(self, path: str):
-        if time.time() - self.age > 600 or len(self.cache) > 9000:
+        if len(self.cache) > 9000:
             self.age = time.time()
             self.tab = None
             self.cache = {}
@@ -88,6 +88,16 @@ class Fstab(object):
             tab.add(fs, path.lstrip("/"))
 
         self.tab = tab
+
+    def relabel(self, path: str, nval: str):
+        ptn = re.compile(r"^[^\\/]*")
+        vn, _ = self.tab._find(path)
+        visit = [vn]
+        while visit:
+            vn = visit.pop()
+            vn.realpath = ptn.sub(nval, vn.realpath)
+            visit.extend(list(vn.nodes.values()))
+        self.cache = {}
 
     def get_unix(self, path: str):
         if not self.tab:
