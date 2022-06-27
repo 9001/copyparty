@@ -1705,16 +1705,16 @@ def termsize() -> tuple[int, int]:
     # from hashwalk
     env = os.environ
 
-    def ioctl_GWINSZ(fd):
+    def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:
         try:
             import fcntl
             import struct
             import termios
 
-            cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
+            cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"1234"))
+            return int(cr[1]), int(cr[0])
         except:
-            return
-        return cr
+            return None
 
     cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
     if not cr:
@@ -1725,13 +1725,13 @@ def termsize() -> tuple[int, int]:
         except:
             pass
 
-    if not cr:
-        try:
-            cr = (env["LINES"], env["COLUMNS"])
-        except:
-            cr = (25, 80)
+    if cr:
+        return cr
 
-    return int(cr[1]), int(cr[0])
+    try:
+        return int(env["COLUMNS"]), int(env["LINES"])
+    except:
+        return 80, 25
 
 
 class Pebkac(Exception):

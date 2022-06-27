@@ -10,7 +10,7 @@ from .authsrv import AXS, VFS
 from .util import chkcmd, min_ex
 
 try:
-    from typing import Optional, Union
+    from typing import Any, Optional, Union
 
     from .util import RootLogger
 except:
@@ -28,7 +28,7 @@ class Fstab(object):
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("fstab", msg + "\033[K", c)
 
-    def get(self, path: str):
+    def get(self, path: str) -> str:
         if len(self.cache) > 9000:
             self.age = time.time()
             self.tab = None
@@ -64,7 +64,7 @@ class Fstab(object):
         self.log("found {} at {}".format(fs, path))
         return fs
 
-    def build_tab(self):
+    def build_tab(self) -> None:
         self.log("building tab")
 
         sptn = r"^.*? on (.*) type ([^ ]+) \(.*"
@@ -79,7 +79,8 @@ class Fstab(object):
             if not m:
                 continue
 
-            tab1.append(m.groups())
+            zs1, zs2 = m.groups()
+            tab1.append((str(zs1), str(zs2)))
 
         tab1.sort(key=lambda x: (len(x[0]), x[0]))
         path1, fs1 = tab1[0]
@@ -89,7 +90,8 @@ class Fstab(object):
 
         self.tab = tab
 
-    def relabel(self, path: str, nval: str):
+    def relabel(self, path: str, nval: str) -> None:
+        assert self.tab
         ptn = re.compile(r"^[^\\/]*")
         vn, _ = self.tab._find(path)
         visit = [vn]
@@ -99,18 +101,19 @@ class Fstab(object):
             visit.extend(list(vn.nodes.values()))
         self.cache = {}
 
-    def get_unix(self, path: str):
+    def get_unix(self, path: str) -> str:
         if not self.tab:
             self.build_tab()
 
+        assert self.tab
         return self.tab._find(path)[0].realpath.split("/")[0]
 
-    def get_w32(self, path: str):
+    def get_w32(self, path: str) -> str:
         # list mountpoints: fsutil fsinfo drives
 
         from ctypes.wintypes import BOOL, DWORD, LPCWSTR, LPDWORD, LPWSTR, MAX_PATH
 
-        def echk(rc, fun, args):
+        def echk(rc: int, fun: Any, args: Any) -> None:
             if not rc:
                 raise ctypes.WinError(ctypes.get_last_error())
             return None
