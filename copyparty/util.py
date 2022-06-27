@@ -589,6 +589,7 @@ def ren_open(
         ext = bname[ofs:] + ext
         bname = bname[:ofs]
 
+    asciified = False
     b64 = ""
     while True:
         try:
@@ -614,11 +615,20 @@ def ren_open(
 
         except OSError as ex_:
             ex = ex_
+
+            if ex.errno == 22 and not asciified:
+                asciified = True
+                bname, fname = [
+                    zs.encode("ascii", "replace").decode("ascii").replace("?", "_")
+                    for zs in [bname, fname]
+                ]
+                continue
+
             if ex.errno not in [36, 63] and (not WINDOWS or ex.errno != 22):
                 raise
 
         if not b64:
-            zs = (bname + ext).encode("utf-8", "replace")
+            zs = (orig_name + "\n" + suffix).encode("utf-8", "replace")
             zs = hashlib.sha512(zs).digest()[:12]
             b64 = base64.urlsafe_b64encode(zs).decode("utf-8")
 
