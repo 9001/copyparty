@@ -2403,6 +2403,16 @@ class HttpCli(object):
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
         }
+
+        if self.args.js_browser:
+            j2a["js"] = self.args.js_browser
+
+        if self.args.css_browser:
+            j2a["css"] = self.args.css_browser
+
+        if not self.conn.hsrv.prism:
+            j2a["no_prism"] = True
+
         if not self.can_read:
             if is_ls:
                 return self.tx_ls(ls_ret)
@@ -2602,9 +2612,6 @@ class HttpCli(object):
             if doctxt is not None:
                 j2a["doc"] = doctxt
 
-        if not self.conn.hsrv.prism:
-            j2a["no_prism"] = True
-
         for d in dirs:
             d["name"] += "/"
 
@@ -2616,18 +2623,11 @@ class HttpCli(object):
         else:
             j2a["files"] = dirs + files
 
-        j2a["logues"] = logues
         j2a["taglist"] = taglist
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
 
         if "mth" in vn.flags:
             j2a["def_hcols"] = vn.flags["mth"].split(",")
-
-        if self.args.js_browser:
-            j2a["js"] = self.args.js_browser
-
-        if self.args.css_browser:
-            j2a["css"] = self.args.css_browser
 
         html = self.j2s(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))
