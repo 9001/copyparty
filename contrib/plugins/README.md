@@ -11,6 +11,13 @@ save one of these as `.epilogue.html` inside a folder to customize it:
 
 
 
+## example browser-js
+point `--js-browser` to one of these by URL:
+
+* [`minimal-up2k.js`](minimal-up2k.js) is similar to the above `minimal-up2k.html` except it applies globally to all write-only folders
+
+
+
 ## example browser-css
 point `--css-browser` to one of these by URL:
 
