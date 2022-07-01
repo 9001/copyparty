@@ -1062,6 +1062,7 @@ function up2k_init(subtle) {
             pvis.drawcard("q");
             pvis.changecard(pvis.act);
         }
+        ebi('u2tabw').className = 'ye';
     }
 
     function more_one_file() {

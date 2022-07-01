@@ -41,6 +41,11 @@ var u2min = `
   border: none !important;
 }
 #wrap {margin-left:2em !important}
+.logue {
+  border: none !important;
+  margin: 2em auto !important;
+}
+.logue:before {content:'' !important}
 
 </style>
 

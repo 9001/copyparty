@@ -238,6 +238,7 @@ html.b {
 	--u2-txt-bg: transparent;
 	--u2-tab-1-sh: var(--bg);
 	--u2-b1-bg: rgba(128,128,128,0.15);
+	--u2-b2-bg: var(--u2-b1-bg);
 
 	--u2-o-bg: var(--btn-bg);
 	--u2-o-h-bg: var(--btn-h-bg);
@@ -352,6 +353,8 @@ html.cy {
 	--srv-1: #f00;
 	--op-aa-bg: #fff;
 
+	--u2-b1-bg: #f00;
+	--u2-b2-bg: #f00;
 	--u2-o-bg: #ff0;
 	--u2-o-1-bg: #f00;
 }
@@ -412,8 +415,8 @@ html.dz {
 	--u2-tab-1-b2: #583;
 	--u2-tab-1-sh: #280;
 	--u2-b-fg: #fff;
-	--u2-b1-bg: #c38;
-	--u2-b2-bg: #d80;
+	--u2-b1-bg: #3a3;
+	--u2-b2-bg: #3a3;
 	--u2-inf-bg: #07a;
 	--u2-inf-b1: #0be;
 	--u2-ok-bg: #380;
@@ -522,6 +525,8 @@ html.dy {
 	--u2-tab-1-b2: a;
 	--u2-tab-1-fg: a;
 	--u2-tab-1-bg: a;
+	--u2-b1-bg: #000;
+	--u2-b2-bg: #000;
 	--ud-b1: a;
 
 	--sort-1: a;
@@ -2207,6 +2212,9 @@ html.y #bbox-overlay figcaption a {
 	transition: min-height .2s;
 	margin: 2em 0;
 }
+#u2tabw.na>table {
+	display: none;
+}
 #u2tab {
 	border-collapse: collapse;
 	width: calc(100% - 2em);
@@ -2370,6 +2378,9 @@ html.y #bbox-overlay figcaption a {
 	display: inline-block;
 	position: relative;
 	bottom: -0.08em;
+}
+#u2conf input+a.b {
+	background: var(--u2-b2-bg);
 }
 html.b #u2conf a.b:hover {
 	background: var(--btn-h-bg);
@@ -2599,9 +2610,6 @@ html.a #u2etas {
 html.c #u2cards,
 html.a #u2cards {
 	margin: 0 auto -1em auto;
-}
-html.a #u2conf input+a.b {
-	background: var(--u2-b2-bg);
 }
 html.c #u2foot:empty,
 html.a #u2foot:empty {

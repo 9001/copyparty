@@ -761,7 +761,7 @@ ebi('op_up2k').innerHTML = (
 
 	'</div>\n' +
 
-	'<div id="u2tabw"><table id="u2tab">\n' +
+	'<div id="u2tabw" class="na"><table id="u2tab">\n' +
 	'	<thead>\n' +
 	'		<tr>\n' +
 	'			<td>' + L.utl_name + '</td>\n' +
