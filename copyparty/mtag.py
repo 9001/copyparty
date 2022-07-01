@@ -213,7 +213,10 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
         fps = ret[".fps"]
         if "/" in fps:
             fa, fb = fps.split("/")
-            fps = int(fa) * 1.0 / int(fb)
+            try:
+                fps = int(fa) * 1.0 / int(fb)
+            except:
+                fps = 9001
 
         if fps < 1000 and fmt.get("format_name") not in ["image2", "png_pipe"]:
             ret[".fps"] = round(fps, 3)
