@@ -967,6 +967,9 @@ class Up2k(object):
                 warks = [str(x[0]) for x in zq]
                 jobs = []
                 for w in warks:
+                    if w in in_progress:
+                        continue
+
                     q = "select rd, fn from up where substr(w,1,16)=? limit 1"
                     rd, fn = cur.execute(q, (w,)).fetchone()
                     rd, fn = s3dec(rd, fn)
@@ -980,9 +983,6 @@ class Up2k(object):
                     if not parsers:
                         to_delete[w] = True
                         n_left -= 1
-                        continue
-
-                    if w in in_progress:
                         continue
 
                     jobs.append(Mpqe(parsers, set(), w, abspath))
