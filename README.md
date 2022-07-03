@@ -770,16 +770,19 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
 
-copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volume flag), there is a default timeout of 30sec
+copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volume flag), there is a default timeout of 30sec, and only files which contain audio get analyzed by default (see ay/an/ad below)
 
 * `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
 * `-v ~/music::r:c,mtp=.bpm=~/bin/audio-bpm.py:c,mtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
 
-*but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` only do non-audio files, or `ad` do all files (d as in dontcare) 
+*but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` only do non-audio files, or `ad` do all files (d as in dontcare)
 
+* "audio file" also means videos btw, as long as there is an audio stream
 * `-mtp ext=an,~/bin/file-ext.py` runs `~/bin/file-ext.py` to get the `ext` tag only if file is not audio (`an`)
 * `-mtp arch,built,ver,orig=an,eexe,edll,~/bin/exe.py` runs `~/bin/exe.py` to get properties about windows-binaries only if file is not audio (`an`) and file extension is exe or dll
+
+if something doesn't work, try `--mtag-v` for verbose error messages
 
 
 ## upload events
