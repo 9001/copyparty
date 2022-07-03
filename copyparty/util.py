@@ -1498,20 +1498,17 @@ def guess_mime(url: str, fallback: str = "application/octet-stream") -> str:
 def getalive(pids: list[int], pgid: int) -> list[int]:
     alive = []
     for pid in pids:
-        if pgid:
-            try:
+        try:
+            if pgid:
                 # check if still one of ours
                 if os.getpgid(pid) == pgid:
                     alive.append(pid)
-            except:
-                pass
-        else:
-            try:
+            else:
                 # windows doesn't have pgroups; assume
                 psutil.Process(pid)
                 alive.append(pid)
-            except:
-                pass
+        except:
+            pass
 
     return alive
 
@@ -1550,9 +1547,6 @@ def killtree(root: int) -> None:
         # windows gets minimal effort sorry
         os.kill(pid, signal.SIGTERM)
         return
-
-    if not pids:
-        return  # yay
 
     for n in range(10):
         time.sleep(0.1)
