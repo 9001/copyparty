@@ -1455,6 +1455,7 @@ var favico = (function () {
 })();
 
 
+var cf_ddos_t = 0;
 function xhrchk(xhr, prefix, e404) {
     if (xhr.status < 400 && xhr.status >= 200)
         return true;
@@ -1465,6 +1466,24 @@ function xhrchk(xhr, prefix, e404) {
     if (xhr.status == 404)
         return toast.err(0, prefix + e404);
 
-    return toast.err(0, prefix + xhr.status + ": " + (
-        (xhr.response && xhr.response.err) || xhr.responseText));
+    var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
+        fun = toast.err;
+
+    if (xhr.status == 503 && /\bDDoS [Pp]rotection|>Just a moment|#cf-bubbles|Checking your browser/.test(errtxt)) {
+        var now = Date.now(), td = now - cf_ddos_t;
+        if (td < 15000)
+            return;
+
+        cf_ddos_t = now;
+        errtxt = 'Cloudflare DDoS protection kicked in\n\n<strong>trying to fix it...</strong>';
+        fun = toast.warn;
+
+        qsr('#cf_frame');
+        var fr = mknod('iframe');
+        fr.src = '/?cf_challenge';
+        fr.setAttribute('id', 'cf_frame');
+        document.body.appendChild(fr);
+    }
+
+    return fun(0, prefix + xhr.status + ": " + errtxt);
 }

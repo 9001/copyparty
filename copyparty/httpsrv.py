@@ -81,7 +81,7 @@ class HttpSrv(object):
         env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
         self.j2 = {
             x: env.get_template(x + ".html")
-            for x in ["splash", "browser", "browser2", "msg", "md", "mde"]
+            for x in ["splash", "browser", "browser2", "msg", "md", "mde", "cf"]
         }
         self.prism = os.path.exists(os.path.join(E.mod, "web", "deps", "prism.js.gz"))
 

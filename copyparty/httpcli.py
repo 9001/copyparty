@@ -545,6 +545,10 @@ class HttpCli(object):
             static_path = os.path.join(E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
+        if "cf_challenge" in self.uparam:
+            self.reply(self.j2s("cf").encode("utf-8", "replace"))
+            return True
+
         if not self.can_read and not self.can_write and not self.can_get:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
@@ -910,6 +914,9 @@ class HttpCli(object):
             body = json.loads(json_buf.decode(enc, "replace"))
         except:
             raise Pebkac(422, "you POSTed invalid json")
+
+        # self.reply(b" DDoS Protection ", 503)
+        # return True
 
         if "srch" in self.uparam or "srch" in body:
             return self.handle_search(body)

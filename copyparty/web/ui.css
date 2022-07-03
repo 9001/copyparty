@@ -190,6 +190,18 @@ html.y #tth {
 	color: #000;
 	background: #fff;
 }
+#cf_frame {
+	position: fixed;
+	z-index: 573;
+	top: 3em;
+	left: 50%;
+	width: 40em;
+	height: 30em;
+	margin-left: -20.2em;
+	border-radius: .4em;
+	border: .4em solid var(--fg);
+	box-shadow: 0 2em 4em 1em var(--bg-max);
+}
 #modal {
 	position: fixed;
     overflow: auto;

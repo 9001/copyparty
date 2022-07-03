@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>{{ svcname }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+</head>
+
+<body>
+	<div id="box" style="opacity: 0; font-family: sans-serif">
+		<h3>please press F5 to reload the page</h3>
+		<p>sorry for the inconvenience</p>
+	</div>
+
+	<script>
+		setTimeout(function() {
+			document.getElementById('box').style.opacity = 1;
+		}, 500);
+
+		parent.toast.ok(30, parent.L.cf_ok);
+		parent.qsr('#cf_frame');
+	</script>
+</body>
+
+</html>
