@@ -599,8 +599,8 @@ var Ls = {
 		"un_max": "viser de første 2000 filene (bruk filteret for å innsnevre)",
 		"un_avail": "{0} filer kan slettes",
 		"un_m2": "sortert etter opplastningstid &ndash; nyeste først:",
-		"un_no1": "men nei, her var det jaggu ingenting",
-		"un_no2": "men nei, her var det jaggu ingenting som passer overens med filteret",
+		"un_no1": "men nei, her var det jaggu ikkeno som slettes kan",
+		"un_no2": "men nei, her var det jaggu ingenting som passet overens med filteret",
 		"un_next": "slett de neste {0} filene nedenfor",
 		"un_del": "slett",
 		"un_m3": "henter listen med nylig opplastede filer...",
@@ -5912,7 +5912,7 @@ var unpost = (function () {
 				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>file</td></tr></thead><tbody>");
 			}
 			else
-				html.push(filt.value ? L.un_no2 : L.un_no1);
+				html.push('-- <em>' + (filt.value ? L.un_no2 : L.un_no1) + '</em>');
 
 			var mods = [1000, 100, 10];
 			for (var a = 0; a < res.length; a++) {
