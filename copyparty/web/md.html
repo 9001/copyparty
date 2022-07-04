@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head>
 	<meta charset="utf-8">
-	<title>📝🎉 {{ title }}</title>
+	<title>📝 {{ title }}</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=0.7">
 {{ html_head }}
@@ -128,7 +128,8 @@ write markdown (most html is 🙆 too)
 	<script>
 
 var last_modified = {{ lastmod }},
-	have_emp = {{ have_emp|tojson }};
+	have_emp = {{ have_emp|tojson }},
+	dfavico = "{{ favico }}";
 
 var md_opt = {
 	link_md_as_html: false,

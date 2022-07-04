@@ -1427,12 +1427,24 @@ var favico = (function () {
         var b64;
         try {
             b64 = btoa(svg ? svg_decl + svg : gx(r.txt));
+            //console.log('f1');
         }
-        catch (ex) {
-            b64 = encodeURIComponent(r.txt).replace(/%([0-9A-F]{2})/g,
-                function x(m, v) { return String.fromCharCode('0x' + v); });
-
-            b64 = btoa(gx(unescape(encodeURIComponent(r.txt))));
+        catch (e1) {
+            try {
+                b64 = btoa(gx(encodeURIComponent(r.txt).replace(/%([0-9A-F]{2})/g,
+                    function x(m, v) { return String.fromCharCode('0x' + v); })));
+                //console.log('f2');
+            }
+            catch (e2) {
+                try {
+                    b64 = btoa(gx(unescape(encodeURIComponent(r.txt))));
+                    //console.log('f3');
+                }
+                catch (e3) {
+                    //console.log('fe');
+                    return;
+                }
+            }
         }
 
         if (!r.tag) {
@@ -1445,9 +1457,13 @@ var favico = (function () {
 
     r.init = function () {
         clearTimeout(r.to);
-        scfg_bind(r, 'txt', 'icot', '', r.upd);
-        scfg_bind(r, 'fg', 'icof', 'fc5', r.upd);
-        scfg_bind(r, 'bg', 'icob', '222', r.upd);
+        var dv = (window.dfavico || '').trim().split(/ +/),
+            fg = dv.length < 2 ? 'fc5' : dv[1].toLowerCase() == 'none' ? '' : dv[1],
+            bg = dv.length < 3 ? '222' : dv[2].toLowerCase() == 'none' ? '' : dv[2];
+
+        scfg_bind(r, 'txt', 'icot', dv[0], r.upd);
+        scfg_bind(r, 'fg', 'icof', fg, r.upd);
+        scfg_bind(r, 'bg', 'icob', bg, r.upd);
         r.upd();
     };
 

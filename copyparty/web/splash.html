@@ -97,7 +97,9 @@
 	<a href="#" id="repl">π</a>
 	<script>
 
-var lang="{{ this.args.lang }}";
+var lang="{{ lang }}",
+	dfavico="{{ favico }}";
+
 document.documentElement.className=localStorage.theme||"{{ this.args.theme }}";
 
 </script>

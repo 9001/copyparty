@@ -184,6 +184,8 @@ class HttpCli(object):
     def j2s(self, name: str, **ka: Any) -> str:
         tpl = self.conn.hsrv.j2[name]
         ka["ts"] = self.conn.hsrv.cachebuster()
+        ka["lang"] = self.args.lang
+        ka["favico"] = self.args.favico
         ka["svcname"] = self.args.doctitle
         ka["html_head"] = self.html_head
         return tpl.render(**ka)  # type: ignore
@@ -1862,6 +1864,8 @@ class HttpCli(object):
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
+            "lang": self.args.lang,
+            "favico": self.args.favico,
             "have_emp": self.args.emp,
             "md_chk_rate": self.args.mcr,
             "md": boundary,
@@ -2406,7 +2410,6 @@ class HttpCli(object):
             "readme": readme,
             "title": html_escape(self.vpath, crlf=True),
             "srv_info": srv_infot,
-            "lang": self.args.lang,
             "dtheme": self.args.theme,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,

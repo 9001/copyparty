@@ -2139,8 +2139,8 @@ favico.init();
 ebi('ico1').onclick = function () {
     var a = favico.txt == this.textContent;
     swrite('icot', a ? 'c' : this.textContent);
-    swrite('icof', a ? null : '000');
-    swrite('icob', a ? null : '');
+    swrite('icof', a ? 'fc5' : '000');
+    swrite('icob', a ? '222' : '');
     favico.init();
 };
 

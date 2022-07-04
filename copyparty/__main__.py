@@ -311,7 +311,7 @@ def disable_quickedit() -> None:
             cmode(True, mode | 4)
 
 
-def run_argparse(argv: list[str], formatter: Any) -> argparse.Namespace:
+def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
         prog="copyparty",
@@ -611,6 +611,7 @@ def run_argparse(argv: list[str], formatter: Any) -> argparse.Namespace:
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")
+    ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="favicon text [ foreground [ background ] ], set blank to disable")
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
     ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
     ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages")
@@ -682,12 +683,14 @@ def main(argv: Optional[list[str]] = None) -> None:
     except:
         pass
 
-    for fmtr in [RiceFormatter, Dodge11874, BasicDodge11874]:
+    retry = False
+    for fmtr in [RiceFormatter, RiceFormatter, Dodge11874, BasicDodge11874]:
         try:
-            al = run_argparse(argv, fmtr)
+            al = run_argparse(argv, fmtr, retry)
         except SystemExit:
             raise
         except:
+            retry = True
             lprint("\n[ {} ]:\n{}\n".format(fmtr, min_ex()))
 
     assert al
