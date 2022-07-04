@@ -6,7 +6,8 @@ if (!window['console'])
     };
 
 
-var is_touch = 'ontouchstart' in window,
+var wah = '',
+    is_touch = 'ontouchstart' in window,
     is_https = (window.location + '').indexOf('https:') === 0,
     IPHONE = is_touch && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
@@ -1455,7 +1456,7 @@ var favico = (function () {
 })();
 
 
-var cf_ddos_t = 0;
+var cf_cha_t = 0;
 function xhrchk(xhr, prefix, e404) {
     if (xhr.status < 400 && xhr.status >= 200)
         return true;
@@ -1469,13 +1470,13 @@ function xhrchk(xhr, prefix, e404) {
     var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
         fun = toast.err;
 
-    if (xhr.status == 503 && /\bDDoS [Pp]rotection|>Just a moment|#cf-bubbles|Checking your browser/.test(errtxt)) {
-        var now = Date.now(), td = now - cf_ddos_t;
+    if (xhr.status == 503 && /\bDD(?:wah){0}[o]S [Pp]rote[c]tion|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser/.test(errtxt)) {
+        var now = Date.now(), td = now - cf_cha_t;
         if (td < 15000)
             return;
 
-        cf_ddos_t = now;
-        errtxt = 'Cloudflare DDoS protection kicked in\n\n<strong>trying to fix it...</strong>';
+        cf_cha_t = now;
+        errtxt = 'Cloudflare DD' + wah + 'oS protection kicked in\n\n<strong>trying to fix it...</strong>';
         fun = toast.warn;
 
         qsr('#cf_frame');

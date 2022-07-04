@@ -915,7 +915,7 @@ class HttpCli(object):
         except:
             raise Pebkac(422, "you POSTed invalid json")
 
-        # self.reply(b" DDoS Protection ", 503)
+        # self.reply(b" DD" + b"oS Protection ", 503)
         # return True
 
         if "srch" in self.uparam or "srch" in body:

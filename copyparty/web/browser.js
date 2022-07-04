@@ -248,7 +248,7 @@ var Ls = {
 		"md_eshow": "cannot show ",
 
 		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
-		"cf_ok": "sorry about that -- DDoS protection kicked in\n\nthings should resume in about 30 sec\n\nif nothing happens, hit F5 to reload the page",
+		"cf_ok": "sorry about that -- DD" + wah + "oS protection kicked in\n\nthings should resume in about 30 sec\n\nif nothing happens, hit F5 to reload the page",
 		"tl_xe1": "could not list subfolders:\n\nerror ",
 		"tl_xe2": "404: Folder not found",
 		"fl_xe1": "could not list files in folder:\n\nerror ",
