@@ -16,7 +16,7 @@ goes without saying, but this is HELLA DANGEROUS,
   GIVES RCE TO ANYONE WHO HAVE UPLOAD PERMISSIONS
 
 example copyparty config to use this:
-  --urlform save,get -v.::w:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,bin/mtag/very-bad-idea.py
+  --urlform save,get -v.::w:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,bin/mtag/very-bad-idea.py
 
 recommended deps:
   apt install xdotool libnotify-bin
@@ -64,7 +64,7 @@ EOF
 chmod 755 /usr/local/bin/chromium-browser
 
 # start the server  (note: replace `-v.::rw:` with `-v.::w:` to disallow retrieving uploaded stuff)
-cd ~/Downloads; python3 copyparty-sfx.py --urlform save,get -v.::rw:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,very-bad-idea.py
+cd ~/Downloads; python3 copyparty-sfx.py --urlform save,get -v.::rw:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,very-bad-idea.py
 
 """
 

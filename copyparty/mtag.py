@@ -10,7 +10,7 @@ import sys
 
 from .__init__ import PY2, WINDOWS, unicode
 from .bos import bos
-from .util import REKOBO_LKEY, fsenc, retchk, runcmd, uncyg
+from .util import REKOBO_LKEY, fsenc, retchk, runcmd, uncyg, min_ex
 
 try:
     from typing import Any, Union
@@ -44,6 +44,7 @@ class MParser(object):
 
         self.timeout = 30
         self.force = False
+        self.kill = "t"  # tree; all children recursively
         self.audio = "y"
         self.ext = []
 
@@ -64,6 +65,10 @@ class MParser(object):
 
             if arg.startswith("a"):
                 self.audio = arg[1:]  # [r]equire [n]ot [d]ontcare
+                continue
+
+            if arg.startswith("k"):
+                self.kill = arg[1:]  # [t]ree [m]ain [n]one
                 continue
 
             if arg == "f":
@@ -499,7 +504,7 @@ class MTag(object):
                 if parser.bin.endswith(".py"):
                     cmd = [sys.executable] + cmd
 
-                args = {"env": env, "timeout": parser.timeout}
+                args = {"env": env, "timeout": parser.timeout, "kill": parser.kill}
 
                 if WINDOWS:
                     args["creationflags"] = 0x4000
@@ -521,6 +526,8 @@ class MTag(object):
                         if tag and tag in zj:
                             ret[tag] = zj[tag]
             except:
-                pass
+                if self.args.mtag_v:
+                    t = "mtag error: tagname {}, parser {}, file {} => {}"
+                    self.log(t.format(tagname, parser.bin, abspath, min_ex()))
 
         return ret

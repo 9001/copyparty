@@ -1565,6 +1565,7 @@ def killtree(root: int) -> None:
 def runcmd(
     argv: Union[list[bytes], list[str]], timeout: Optional[int] = None, **ka: Any
 ) -> tuple[int, str, str]:
+    kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
     p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE, **ka)
     if not timeout or PY2:
         stdout, stderr = p.communicate()
@@ -1572,12 +1573,27 @@ def runcmd(
         try:
             stdout, stderr = p.communicate(timeout=timeout)
         except sp.TimeoutExpired:
-            killtree(p.pid)
-            stdout, stderr = p.communicate()
+            if kill == "n":
+                return -18, "", ""  # SIGCONT; leave it be
+            elif kill == "m":
+                p.kill()
+            else:
+                killtree(p.pid)
+
+            try:
+                stdout, stderr = p.communicate(timeout=1)
+            except:
+                stdout = b""
+                stderr = b""
 
     stdout = stdout.decode("utf-8", "replace")
     stderr = stderr.decode("utf-8", "replace")
-    return p.returncode, stdout, stderr
+
+    rc = p.returncode
+    if rc is None:
+        rc = -14  # SIGALRM; failed to kill
+
+    return rc, stdout, stderr
 
 
 def chkcmd(argv: Union[list[bytes], list[str]], **ka: Any) -> tuple[str, str]:
