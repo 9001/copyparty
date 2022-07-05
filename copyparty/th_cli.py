@@ -128,5 +128,8 @@ class ThumbCli(object):
         if abort:
             return None
 
+        if not bos.path.getsize(os.path.join(ptop, rem)):
+            return None
+
         x = self.broker.ask("thumbsrv.get", ptop, rem, mtime, fmt)
         return x.get()  # type: ignore
