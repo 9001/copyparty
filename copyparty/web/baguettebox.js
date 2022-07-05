@@ -39,6 +39,7 @@ window.baguetteBox = (function () {
         vnext = sread('vmode') == 'C',
         loopA = null,
         loopB = null,
+        url_ts = null,
         resume_mp = false;
 
     var onFSC = function (e) {
@@ -555,9 +556,10 @@ window.baguetteBox = (function () {
                 options.afterShow();
         }, 50);
 
-        if (options.onChange)
+        if (options.onChange && !url_ts)
             options.onChange(currentIndex, imagesElements.length);
 
+        url_ts = null;
         documentLastFocus = document.activeElement;
         btnClose.focus();
         isOverlayVisible = true;
@@ -852,10 +854,13 @@ window.baguetteBox = (function () {
         var t = v.currentTime;
         if (side == 1) loopA = t;
         if (side == 2) loopB = t;
-        toast.inf(5, 'Loop' + (side == 1 ? 'A' : 'B') + ': ' + f2f(t, 2));
+        if (side)
+            toast.inf(5, 'Loop' + (side == 1 ? 'A' : 'B') + ': ' + f2f(t, 2));
 
-        if (loopB !== null)
+        if (loopB !== null) {
             timer.add(loopchk);
+            sethash(window.location.hash.slice(1).split('&')[0] + '&t=' + (loopA || 0) + '-' + loopB);
+        }
     }
 
     function loopchk() {
@@ -867,6 +872,10 @@ window.baguetteBox = (function () {
             return;
 
         v.currentTime = loopA || 0;
+    }
+
+    function urltime(txt) {
+        url_ts = txt;
     }
 
     function mp_ctl() {
@@ -911,6 +920,15 @@ window.baguetteBox = (function () {
             playvid(true);
             v.muted = vmute;
             v.loop = vloop;
+            if (url_ts) {
+                var seek = ('' + url_ts).split('-');
+                v.currentTime = seek[0];
+                if (seek.length > 1) {
+                    loopA = parseFloat(seek[0]);
+                    loopB = parseFloat(seek[1]);
+                    setloop();
+                }
+            }
         }
         selbg();
         mp_ctl();
@@ -986,6 +1004,7 @@ window.baguetteBox = (function () {
         showNext: showNextImage,
         showPrevious: showPreviousImage,
         relseek: relseek,
+        urltime: urltime,
         playpause: playpause,
         hide: hideOverlay,
         destroy: destroyPlugin

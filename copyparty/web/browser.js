@@ -2323,9 +2323,13 @@ function scan_hash(v) {
 		ts = null;
 
 	if (m.length > 3) {
-		m = /^&[Tt=0]*([0-9]+[Mm:])?0*([0-9]+)[Ss]?$/.exec(m[3]);
-		if (m) {
-			ts = parseInt(m[1] || 0) * 60 + parseInt(m[2] || 0);
+		var tm = /^&[Tt=0]*([0-9]+[Mm:])?0*([0-9]+)[Ss]?$/.exec(m[3]);
+		if (tm) {
+			ts = parseInt(tm[1] || 0) * 60 + parseInt(tm[2] || 0);
+		}
+		tm = /^&[Tt=0]*([0-9\.]+)-([0-9\.]+)$/.exec(m[3]);
+		if (tm) {
+			ts = '' + tm[1] + '-' + tm[2];
 		}
 	}
 
@@ -2361,6 +2365,7 @@ function eval_hash() {
 					return;
 
 				clearInterval(t);
+				baguetteBox.urltime(ts);
 				var im = QS('#ggrid a[ref="' + id + '"]');
 				im.click();
 				im.scrollIntoView();
