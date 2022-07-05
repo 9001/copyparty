@@ -849,7 +849,7 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 ## complete examples
 
 * read-only music server  
-  `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts --no-robots --force-js`
+  `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts --no-robots --force-js --theme 2`
   
   * ...with bpm and key scanning  
     `-mtp .bpm=f,audio-bpm.py -mtp key=f,audio-key.py`
