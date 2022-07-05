@@ -202,7 +202,6 @@ window.baguetteBox = (function () {
         btnFull = ebi('bbox-full');
         btnVmode = ebi('bbox-vmode');
         btnClose = ebi('bbox-close');
-        bindEvents();
     }
 
     function halp() {
@@ -882,7 +881,17 @@ window.baguetteBox = (function () {
         else
             timer.rm(rotn);
 
-        el.onclick = function () {
+        el.onclick = function (e) {
+            var rc = e.target.getBoundingClientRect(),
+                x = e.clientX - rc.left,
+                fx = x / (rc.right - rc.left);
+
+            if (fx < 0.3)
+                return showPreviousImage();
+
+            if (fx > 0.7)
+                return showNextImage();
+
             clmod(ebi('bbox-btns'), 'off', 't');
             clmod(btnPrev, 'off', 't');
             clmod(btnNext, 'off', 't');
@@ -924,7 +933,6 @@ window.baguetteBox = (function () {
     function destroyPlugin() {
         unbindEvents();
         clearCachedData();
-        unbindEvents();
         document.getElementsByTagName('body')[0].removeChild(ebi('bbox-overlay'));
         data = {};
         currentGallery = [];
