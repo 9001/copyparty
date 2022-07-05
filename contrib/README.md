@@ -22,6 +22,9 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 * `URL`: full URL to the root folder (with trailing slash) followed by `$regex:1|1$`
 * `pw`: password (remove `Parameters` if anon-write)
 
+### [`media-osd-bgone.ps1`](media-osd-bgone.ps1)
+* disables the [windows OSD popup](https://user-images.githubusercontent.com/241032/122821375-0e08df80-d2dd-11eb-9fd9-184e8aacf1d0.png) (the thing on the left) which appears every time you hit media hotkeys to adjust volume or change song while playing music with the copyparty web-ui, or most other audio players really
+
 ### [`explorer-nothumbs-nofoldertypes.reg`](explorer-nothumbs-nofoldertypes.reg)
 * disables thumbnails and folder-type detection in windows explorer
 * makes it way faster (especially for slow/networked locations (such as copyparty-fuse))

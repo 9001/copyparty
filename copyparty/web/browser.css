@@ -1981,7 +1981,7 @@ html.y #bbox-overlay figcaption a {
 #bbox-halp td {
 	padding: .2em .5em;
 }
-#bbox-halp td:first-child {
+#bbox-halp td:first-child:not([colspan]) {
 	text-align: right;
 }
 .bbox-spinner {

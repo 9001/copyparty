@@ -227,6 +227,7 @@ window.baguetteBox = (function () {
             ['M', 'video: toggle mute'],
             ['V', 'video: toggle loop'],
             ['C', 'video: toggle auto-next'],
+            ['<code>[</code>, <code>]</code>', 'video: loop start / end'],
         ],
             d = mknod('table'),
             html = ['<tbody>'];
@@ -234,6 +235,8 @@ window.baguetteBox = (function () {
         for (var a = 0; a < list.length; a++)
             html.push('<tr><td>' + list[a][0] + '</td><td>' + list[a][1] + '</td></tr>');
 
+        html.push('<tr><td colspan="2">tap middle of img to hide btns</td></tr>');
+        html.push('<tr><td colspan="2">tap left/right sides for prev/next</td></tr>');
         d.innerHTML = html.join('\n') + '</tbody>';
         d.setAttribute('id', 'bbox-halp');
         d.onclick = function () {

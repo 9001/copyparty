@@ -102,7 +102,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 
 download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
 
-running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; see `-h` for help if you want [accounts and volumes](#accounts-and-volumes) etc
+running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
@@ -110,7 +110,7 @@ some recommended options:
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
   * see [accounts and volumes](#accounts-and-volumes) for the syntax and other permissions (`r`ead, `w`rite, `m`ove, `d`elete, `g`et)
-* `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access
+* `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access (see `--help-ls`)
 
 
 ### on servers
@@ -168,7 +168,7 @@ feature summary
 * download
   * ☑ single files in browser
   * ☑ [folders as zip / tar files](#zip-downloads)
-  * ☑ FUSE client (read-only)
+  * ☑ [FUSE client](https://github.com/9001/copyparty/tree/hovudstraum/bin#copyparty-fusepy) (read-only)
 * browser
   * ☑ [navpane](#navpane) (directory tree sidebar)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
@@ -204,6 +204,7 @@ project goals / philosophy
 * inverse linux philosophy -- do all the things, and do an *okay* job
   * quick drop-in service to get a lot of features in a pinch
   * there are probably [better alternatives](https://github.com/awesome-selfhosted/awesome-selfhosted) if you have specific/long-term needs
+    * but the resumable multithreaded uploads are p slick ngl
 * run anywhere, support everything
   * as many web-browsers and python versions as possible
     * every browser should at least be able to browse, download, upload files
@@ -242,7 +243,7 @@ some improvement ideas
 
 ## general bugs
 
-* Windows: if the up2k db is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
+* Windows: if the `up2k.db` (filesystem index) is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
   * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
 * probably more, pls let me know
@@ -274,13 +275,15 @@ some improvement ideas
   * you can also do this with linux filesystem permissions; `chmod 111 music` will make it possible to access files and folders inside the `music` folder but not list the immediate contents -- also works with other software, not just copyparty
 
 * can I make copyparty download a file to my server if I give it a URL?
-  * not officially, but there is a [terrible hack](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/wget.py) which makes it possible
+  * not really, but there is a [terrible hack](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/wget.py) which makes it possible
 
 
 # accounts and volumes
 
 per-folder, per-user permissions  - if your setup is getting complex, consider making a [config file](./docs/example.conf) instead of using arguments
 * much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if logged in as admin)
+
+a quick summary can be seen using `--help-accounts`
 
 configuring accounts/volumes with arguments:
 * `-a usr:pwd` adds account `usr` with password `pwd`
@@ -338,7 +341,7 @@ the browser has the following hotkeys  (always qwerty)
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
 * `V` toggle folders / textfiles in the navpane
-* `G` toggle list / [grid view](#thumbnails)
+* `G` toggle list / [grid view](#thumbnails) -- same as `田` bottom-right
 * `T` toggle thumbnails / icons
 * `ESC` close various things
 * `ctrl-X` cut selected files/folders
@@ -363,6 +366,7 @@ the browser has the following hotkeys  (always qwerty)
 * when viewing images / playing videos:
   * `J/L, Left/Right` prev/next file
   * `Home/End` first/last file
+  * `F` toggle fullscreen
   * `S` toggle selection
   * `R` rotate clockwise (shift=ccw)
   * `Y` download file
@@ -370,10 +374,11 @@ the browser has the following hotkeys  (always qwerty)
   * videos:
     * `U/O` skip 10sec back/forward
     * `P/K/Space` play/pause
-    * `F` fullscreen
-    * `C` continue playing next video
-    * `V` loop
     * `M` mute
+    * `C` continue playing next video
+    * `V` loop entire file
+    * `[` loop range (start)
+    * `]` loop range (end)
 * when the navpane is open:
   * `A/D` adjust tree width
 * in the [grid view](#thumbnails):
@@ -405,7 +410,7 @@ click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (
 
 ## thumbnails
 
-press `g` to toggle grid-view instead of the file listing,  and `t` toggles icons / thumbnails
+press `g` or `田` to toggle grid-view instead of the file listing  and `t` toggles icons / thumbnails
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
@@ -447,13 +452,13 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 ## uploading
 
-drag files/folders into the web-browser to upload
+drag files/folders into the web-browser to upload  (or use the [command-line uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy))
 
 this initiates an upload using `up2k`; there are two uploaders available:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
-* `[🚀] up2k`, the fancy one
+* `[🚀] up2k`, the good / fancy one
 
-you can also undo/delete uploads by using `[🧯]` [unpost](#unpost)
+NB: you can undo/delete your own uploads with `[🧯]` [unpost](#unpost)
 
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)
@@ -465,7 +470,7 @@ up2k has several advantages:
 * much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
 * the last-modified timestamp of the file is preserved
 
-see [up2k](#up2k) for details on how it works
+see [up2k](#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
 
 ![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/129635371-48fc54ca-fa91-48e3-9b1d-ba413e4b68cb.png)
 
@@ -477,7 +482,6 @@ the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
 * `[🏃]` analysis of other files should continue while one is uploading
 * `[💭]` ask for confirmation before files are added to the queue
-* `[💤]` sync uploading between other copyparty browser-tabs so only one is active
 * `[🔎]` switch between upload and [file-search](#file-search) mode
   * ignore `[🔎]` if you add files by dragging them into the browser
 
@@ -489,7 +493,7 @@ and then theres the tabs below it,
   * plus up to 3 entries each from `[done]` and `[que]` for context
 * `[que]` is all the files that are still queued
 
-note that since up2k has to read each file twice, `[🎈 bup]` can *theoretically* be up to 2x faster in some extreme cases (files bigger than your ram, combined with an internet connection faster than the read-speed of your HDD, or if you're uploading from a cuo2duo)
+note that since up2k has to read each file twice, `[🎈] bup` can *theoretically* be up to 2x faster in some extreme cases (files bigger than your ram, combined with an internet connection faster than the read-speed of your HDD, or if you're uploading from a cuo2duo)
 
 if you are resuming a massive upload and want to skip hashing the files which already finished, you can enable `turbo` in the `[⚙️] config` tab, but please read the tooltip on that button
 
@@ -600,7 +604,7 @@ and there are *two* editors
 
 * get a plaintext file listing by adding `?ls=t` to a URL, or a compact colored one with `?ls=v` (for unix terminals)
 
-* if you are using media hotkeys to switch songs and are getting tired of seeing the OSD popup which Windows doesn't let you disable, consider https://ocv.me/dev/?media-osd-bgone.ps1
+* if you are using media hotkeys to switch songs and are getting tired of seeing the OSD popup which Windows doesn't let you disable, consider [./contrib/media-osd-bgone.ps1](contrib/#media-osd-bgoneps1)
 
 * click the bottom-left `π` to open a javascript prompt for debugging
 
@@ -623,7 +627,9 @@ path/name queries are space-separated, AND'ed together, and words are negated wi
 * path: `shibayan -bossa` finds all files where one of the folders contain `shibayan` but filters out any results where `bossa` exists somewhere in the path
 * name: `demetori styx` gives you [good stuff](https://www.youtube.com/watch?v=zGh0g14ZJ8I&list=PL3A147BD151EE5218&index=9)
 
-add the argument `-e2ts` to also scan/index tags from music files, which brings us over to:
+the `raw` field allows for more complex stuff such as `( tags like *nhato* or tags like *taishi* ) and ( not tags like *nhato* or not tags like *taishi* )` which finds all songs by either nhato or taishi, excluding collabs (terrible example, why would you do that)
+
+for the above example to work, add the commandline argument `-e2ts` to also scan/index tags from music files, which brings us over to:
 
 
 # server config
@@ -776,11 +782,13 @@ copyparty can invoke external programs to collect additional metadata for files 
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
 * `-v ~/music::r:c,mtp=.bpm=~/bin/audio-bpm.py:c,mtp=key=f,t5,~/bin/audio-key.py` both as a per-volume config wow this is getting ugly
 
-*but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files, `an` only do non-audio files, or `ad` do all files (d as in dontcare)
+*but wait, there's more!* `-mtp` can be used for non-audio files as well using the `a` flag: `ay` only do audio files (default), `an` only do non-audio files, or `ad` do all files (d as in dontcare)
 
 * "audio file" also means videos btw, as long as there is an audio stream
 * `-mtp ext=an,~/bin/file-ext.py` runs `~/bin/file-ext.py` to get the `ext` tag only if file is not audio (`an`)
 * `-mtp arch,built,ver,orig=an,eexe,edll,~/bin/exe.py` runs `~/bin/exe.py` to get properties about windows-binaries only if file is not audio (`an`) and file extension is exe or dll
+
+you can control how the parser is killed if it times out with option `kt` killing the entire process tree (default), `km` just the main process, or `kn` let it continue running until copyparty is terminated
 
 if something doesn't work, try `--mtag-v` for verbose error messages
 
@@ -790,10 +798,10 @@ if something doesn't work, try `--mtag-v` for verbose error messages
 trigger a script/program on each upload  like so:
 
 ```
--v /mnt/inc:inc:w:c,mte=+a1:c,mtp=a1=ad,/usr/bin/notify-send
+-v /mnt/inc:inc:w:c,mte=+x1:c,mtp=x1=ad,kn,/usr/bin/notify-send
 ```
 
-so filesystem location `/mnt/inc` shared at `/inc`, write-only for everyone, appending `a1` to the list of tags to index, and using `/usr/bin/notify-send` to "provide" that tag
+so filesystem location `/mnt/inc` shared at `/inc`, write-only for everyone, appending `x1` to the list of tags to index (`mte`), and using `/usr/bin/notify-send` to "provide" tag `x1` for any filetype (`ad`) with kill-on-timeout disabled (`kn`)
 
 that'll run the command `notify-send` with the path to the uploaded file as the first and only argument (so on linux it'll show a notification on-screen)
 
@@ -952,11 +960,13 @@ up2k has saved a few uploads from becoming corrupted in-transfer already; caught
 
 a single sha512 would be better, right?
 
-this is due to `crypto.subtle` not providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
+this is due to `crypto.subtle` [not yet](https://github.com/w3c/webcrypto/issues/73) providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
 
 as a result, the hashes are much less useful than they could have been (search the server by sha512, provide the sha512 in the response http headers, ...)
 
 hashwasm would solve the streaming issue but reduces hashing speed for sha512 (xxh128 does 6 GiB/s), and it would make old browsers and [iphones](https://bugs.webkit.org/show_bug.cgi?id=228552) unsupported
+
+* blake2 might be a better choice since xxh is non-cryptographic, but that gets ~15 MiB/s on slower androids
 
 
 # performance
@@ -1261,10 +1271,7 @@ also builds the sfx so skip the sfx section above
 in the `scripts` folder:
 
 * run `make -C deps-docker` to build all dependencies
-* `git tag v1.2.3 && git push origin --tags`
-* upload to pypi with `make-pypi-release.(sh|bat)`
-* create github release with `make-tgz-release.sh`
-* create sfx with `make-sfx.sh`
+* run `./rls.sh 1.2.3` which uploads to pypi + creates github release + sfx
 
 
 # todo
@@ -1291,7 +1298,7 @@ roughly sorted by priority
 * up2k partials ui
   * feels like there isn't much point
 * cache sha512 chunks on client
-  * too dangerous
+  * too dangerous -- overtaken by turbo mode
 * comment field
   * nah
 * look into android thumbnail cache file format
