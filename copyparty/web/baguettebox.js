@@ -37,6 +37,8 @@ window.baguetteBox = (function () {
         vmute = false,
         vloop = sread('vmode') == 'L',
         vnext = sread('vmode') == 'C',
+        loopA = null,
+        loopB = null,
         resume_mp = false;
 
     var onFSC = function (e) {
@@ -281,6 +283,10 @@ window.baguetteBox = (function () {
             rotn(e.shiftKey ? -1 : 1);
         else if (k == "KeyY")
             dlpic();
+        else if (k == "BracketLeft")
+            setloop(1);
+        else if (k == "BracketRight")
+            setloop(2);
     }
 
     function anim() {
@@ -808,8 +814,18 @@ window.baguetteBox = (function () {
     }
 
     function playvid(play) {
-        if (vid())
-            vid()[play ? 'play' : 'pause']();
+        if (!play) {
+            timer.rm(loopchk);
+            loopA = loopB = null;
+        }
+
+        var v = vid();
+        if (!v)
+            return;
+
+        v[play ? 'play' : 'pause']();
+        if (play && loopA !== null && v.currentTime < loopA)
+            v.currentTime = loopA;
     }
 
     function playpause() {
@@ -826,6 +842,31 @@ window.baguetteBox = (function () {
     function vidEnd() {
         if (this == vid() && vnext)
             showNextImage();
+    }
+
+    function setloop(side) {
+        var v = vid();
+        if (!v)
+            return;
+
+        var t = v.currentTime;
+        if (side == 1) loopA = t;
+        if (side == 2) loopB = t;
+        toast.inf(5, 'Loop' + (side == 1 ? 'A' : 'B') + ': ' + f2f(t, 2));
+
+        if (loopB !== null)
+            timer.add(loopchk);
+    }
+
+    function loopchk() {
+        if (loopB === null)
+            return;
+
+        var v = vid();
+        if (!v || v.paused || v.currentTime < loopB)
+            return;
+
+        v.currentTime = loopA || 0;
     }
 
     function mp_ctl() {
