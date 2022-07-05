@@ -1,4 +1,49 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0627-2057  `v1.3.3`  sdcardfs
+
+* **new:** read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## bugfixes
+* **upload:** downgrade filenames to ascii if the server filesystem requires it
+  * **android fix:** external sdcard seems to be UCS-2 which can't into emojis
+* **upload:** accurate detection of support for sparse files
+  * now based on filesystem behavior rather than a list of known filesystems
+    * **android fix:** all storage is `sdcardfs` so the list wasn't good enough
+* **ux:** custom css/js did not apply to write-only folders
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0619-2331  `v1.3.2`  think im out of titles
+
+* **new:** read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* new option `--thickfs` to modify the list of filesystems that dont support sparse files
+  * default should catch most usual cases but I probably missed some
+* detect and warn if filesystem was expected to support sparse files yet doesn't
+
+## bugfixes
+* nonsparse: ensure chunks are flushed on linux as well
+* switching between documents
+* ctrl-clicking a breadcrumb entry didn't open a new tab as expected
+* renaming files based on artist/title/etc tags would create subdirectories if tags contained `/`
+  * not dangerous -- the server correctly prevented any path traversals -- just unexpected
+* markdown stuff
+  * numbered lists appeared as bullet-lists
+  * don't crash if a plugin sets a buggy timer
+  * plugins didn't run when viewing `README.md` inline
+
+## other changes
+* in the `-ss` safety preset, replace `no-dot-mv, no-dot-ren` with `no-logues, no-readme`
+* audio player continues into the next folder by default
+
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0616-1956  `v1.3.1`  types
 
 * latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)

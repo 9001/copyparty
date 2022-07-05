@@ -17,7 +17,7 @@ except:
 
 """
 calculates various checksums for uploads,
-usage: -mtp crc32,md5,sha1,sha256b=bin/mtag/cksum.py
+usage: -mtp crc32,md5,sha1,sha256b=ad,bin/mtag/cksum.py
 """
 
 

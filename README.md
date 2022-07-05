@@ -44,7 +44,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [tabs](#tabs) - the main tabs in the ui
     * [hotkeys](#hotkeys) - the browser has the following hotkeys
     * [navpane](#navpane) - switching between breadcrumbs or navpane
-    * [thumbnails](#thumbnails) - press `g` to toggle grid-view instead of the file listing
+    * [thumbnails](#thumbnails) - press `g` or `田` to toggle grid-view instead of the file listing
     * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
     * [uploading](#uploading) - drag files/folders into the web-browser to upload
         * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
@@ -848,8 +848,17 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 
 ## complete examples
 
-* read-only music server with bpm and key scanning  
-  `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts -mtp .bpm=f,audio-bpm.py -mtp key=f,audio-key.py`
+* read-only music server  
+  `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts --no-robots --force-js`
+  
+  * ...with bpm and key scanning  
+    `-mtp .bpm=f,audio-bpm.py -mtp key=f,audio-key.py`
+  
+  * ...with a read-write folder for `kevin` whose password is `okgo`  
+    `-a kevin:okgo -v /mnt/nas/inc:/inc:rw,kevin`
+  
+  * ...with logging to disk  
+    `-lo log/cpp-%Y-%m%d-%H%M%S.txt.xz`
 
 
 # browser support

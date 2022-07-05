@@ -10,7 +10,7 @@ import sys
 
 from .__init__ import PY2, WINDOWS, unicode
 from .bos import bos
-from .util import REKOBO_LKEY, fsenc, retchk, runcmd, uncyg, min_ex
+from .util import REKOBO_LKEY, fsenc, min_ex, retchk, runcmd, uncyg
 
 try:
     from typing import Any, Union
