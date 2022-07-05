@@ -416,6 +416,9 @@ window.baguetteBox = (function () {
     var nonPassiveEvent = passiveSupp ? { passive: true } : null;
 
     function bindEvents() {
+        bind(document, 'keydown', keyDownHandler);
+        bind(document, 'keyup', keyUpHandler);
+        bind(document, 'fullscreenchange', onFSC);
         bind(overlay, 'click', overlayClickHandler);
         bind(btnPrev, 'click', showPreviousImage);
         bind(btnNext, 'click', showNextImage);
@@ -434,6 +437,9 @@ window.baguetteBox = (function () {
     }
 
     function unbindEvents() {
+        unbind(document, 'keydown', keyDownHandler);
+        unbind(document, 'keyup', keyUpHandler);
+        unbind(document, 'fullscreenchange', onFSC);
         unbind(overlay, 'click', overlayClickHandler);
         unbind(btnPrev, 'click', showPreviousImage);
         unbind(btnNext, 'click', showNextImage);
@@ -508,9 +514,7 @@ window.baguetteBox = (function () {
         if (overlay.style.display === 'block')
             return;
 
-        bind(document, 'keydown', keyDownHandler);
-        bind(document, 'keyup', keyUpHandler);
-        bind(document, 'fullscreenchange', onFSC);
+        bindEvents();
         currentIndex = chosenImageIndex;
         touch = {
             count: 0,
@@ -553,9 +557,7 @@ window.baguetteBox = (function () {
             return;
 
         sethash('');
-        unbind(document, 'keydown', keyDownHandler);
-        unbind(document, 'keyup', keyUpHandler);
-        unbind(document, 'fullscreenchange', onFSC);
+        unbindEvents();
         // Fade out and hide the overlay
         overlay.className = '';
         setTimeout(function () {
@@ -898,8 +900,7 @@ window.baguetteBox = (function () {
     function destroyPlugin() {
         unbindEvents();
         clearCachedData();
-        unbind(document, 'keydown', keyDownHandler);
-        unbind(document, 'keyup', keyUpHandler);
+        unbindEvents();
         document.getElementsByTagName('body')[0].removeChild(ebi('bbox-overlay'));
         data = {};
         currentGallery = [];
