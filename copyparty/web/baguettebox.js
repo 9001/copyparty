@@ -21,7 +21,7 @@ window.baguetteBox = (function () {
             afterHide: null,
             onChange: null,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnVmode, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnVmode, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -182,6 +182,7 @@ window.baguetteBox = (function () {
                 '<button id="bbox-rotl" type="button">↶</button>' +
                 '<button id="bbox-rotr" type="button">↷</button>' +
                 '<button id="bbox-tsel" type="button">sel</button>' +
+                '<button id="bbox-full" type="button">⛶</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
                 '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
                 '</div></div>'
@@ -198,6 +199,7 @@ window.baguetteBox = (function () {
         btnRotL = ebi('bbox-rotl');
         btnRotR = ebi('bbox-rotr');
         btnSel = ebi('bbox-tsel');
+        btnFull = ebi('bbox-full');
         btnVmode = ebi('bbox-vmode');
         btnClose = ebi('bbox-close');
         bindEvents();
@@ -215,6 +217,7 @@ window.baguetteBox = (function () {
             ['home', 'first file'],
             ['end', 'last file'],
             ['R', 'rotate (shift=ccw)'],
+            ['F', 'toggle fullscreen'],
             ['S', 'toggle file selection'],
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
@@ -222,7 +225,6 @@ window.baguetteBox = (function () {
             ['M', 'video: toggle mute'],
             ['V', 'video: toggle loop'],
             ['C', 'video: toggle auto-next'],
-            ['F', 'video: toggle fullscreen'],
         ],
             d = mknod('table'),
             html = ['<tbody>'];
@@ -273,13 +275,7 @@ window.baguetteBox = (function () {
             setVmode();
         }
         else if (k == "KeyF")
-            try {
-                if (isFullscreen)
-                    document.exitFullscreen();
-                else
-                    v.requestFullscreen();
-            }
-            catch (ex) { }
+            tglfull();
         else if (k == "KeyS")
             tglsel();
         else if (k == "KeyR")
@@ -352,6 +348,16 @@ window.baguetteBox = (function () {
         for (var a = 0; a < files.length; a++)
             if (vsplit(files[a].vp)[1] == name)
                 return [name, a, files, ebi(files[a].id)];
+    }
+
+    function tglfull() {
+        try {
+            if (isFullscreen)
+                document.exitFullscreen();
+            else
+                (vid() || ebi('bbox-overlay')).requestFullscreen();
+        }
+        catch (ex) { alert(ex); }
     }
 
     function tglsel() {
@@ -429,6 +435,7 @@ window.baguetteBox = (function () {
         bind(btnRotL, 'click', rotl);
         bind(btnRotR, 'click', rotr);
         bind(btnSel, 'click', tglsel);
+        bind(btnFull, 'click', tglfull);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -450,6 +457,7 @@ window.baguetteBox = (function () {
         unbind(btnRotL, 'click', rotl);
         unbind(btnRotR, 'click', rotr);
         unbind(btnSel, 'click', tglsel);
+        unbind(btnFull, 'click', tglfull);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -558,6 +566,12 @@ window.baguetteBox = (function () {
 
         sethash('');
         unbindEvents();
+        try {
+            document.exitFullscreen();
+            isFullscreen = false;
+        }
+        catch (ex) { }
+
         // Fade out and hide the overlay
         overlay.className = '';
         setTimeout(function () {
