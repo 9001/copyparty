@@ -1928,6 +1928,15 @@ html.y #bbox-overlay figcaption a {
 .bbox-btn {
 	position: fixed;
 }
+.bbox-btn,
+#bbox-btns {
+    opacity: 1;
+	animation: opacity .2s infinite ease-in-out;
+}
+.bbox-btn.off,
+#bbox-btns.off {
+    opacity: 0;
+}
 #bbox-overlay button {
 	cursor: pointer;
 	outline: none;

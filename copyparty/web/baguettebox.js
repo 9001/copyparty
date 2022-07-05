@@ -534,6 +534,10 @@ window.baguetteBox = (function () {
             preloadPrev(currentIndex);
         });
 
+        clmod(ebi('bbox-btns'), 'off');
+        clmod(btnPrev, 'off');
+        clmod(btnNext, 'off');
+
         updateOffset();
         overlay.style.display = 'block';
         // Fade in overlay
@@ -877,6 +881,12 @@ window.baguetteBox = (function () {
             timer.add(rotn);
         else
             timer.rm(rotn);
+
+        el.onclick = function () {
+            clmod(ebi('bbox-btns'), 'off', 't');
+            clmod(btnPrev, 'off', 't');
+            clmod(btnNext, 'off', 't');
+        };
 
         var prev = QS('.full-image.vis');
         if (prev)
