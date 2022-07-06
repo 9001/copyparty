@@ -24,51 +24,34 @@ def hdr(query):
 
 class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
+        ka = {}
+
+        ex = "e2d e2ds e2dsa e2t e2ts e2tsr ed emp force_js ihead no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nw"
+        ka.update(**{k: False for k in ex.split()})
+
+        ex = "nih no_rescan no_sendfile no_voldump"
+        ka.update(**{k: True for k in ex.split()})
+
+        ex = "css_browser hist js_browser no_hash no_idx"
+        ka.update(**{k: None for k in ex.split()})
+
+        ex = "re_maxage rproxy rsp_slp s_wr_slp theme themes turbo"
+        ka.update(**{k: 0 for k in ex.split()})
+
+        ex = "doctitle favico html_head mth textfiles"
+        ka.update(**{k: "" for k in ex.split()})
+
         super(Cfg, self).__init__(
             a=a or [],
             v=v or [],
             c=c,
-            rproxy=0,
-            rsp_slp=0,
-            s_wr_slp=0,
             s_wr_sz=512 * 1024,
-            ed=False,
-            nw=False,
             unpost=600,
-            no_mv=False,
-            no_del=False,
-            no_zip=False,
-            no_thumb=False,
-            no_athumb=False,
-            no_vthumb=False,
-            no_voldump=True,
-            no_scandir=False,
-            no_sendfile=True,
-            no_rescan=True,
-            no_logues=False,
-            no_readme=False,
-            re_maxage=0,
-            ihead=False,
-            nih=True,
             mtp=[],
             mte="a",
-            mth="",
-            textfiles="",
-            doctitle="",
-            html_head="",
             lang="eng",
-            theme=0,
-            themes=0,
-            turbo=0,
             logout=573,
-            hist=None,
-            no_idx=None,
-            no_hash=None,
-            force_js=False,
-            no_robots=False,
-            js_browser=None,
-            css_browser=None,
-            **{k: False for k in "e2d e2ds e2dsa e2t e2ts e2tsr no_acode".split()}
+            **ka
         )
 
 
