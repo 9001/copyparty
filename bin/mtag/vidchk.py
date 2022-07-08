@@ -4,16 +4,28 @@ import json
 import sys
 import subprocess as sp
 
-from copyparty.util import fsenc
+try:
+    from copyparty.util import fsenc
+except:
+
+    def fsenc(p):
+        return p.encode("utf-8")
+
 
 _ = r"""
 inspects video files for errors and such
-usage: -mtp vidchk=t600,ay,p,bin/mtag/vidchk.py
 
+usage:
+  -mtp vidchk=t600,ay,p,bin/mtag/vidchk.py
+
+explained:
 t600: timeout 10min
   ay: only process files which contain audio (including video with audio)
    p: set priority 1 (lowest priority after initial ffprobe/mutagen for base tags),
        makes copyparty feed base tags into this script as json
+
+if you wanna use this script standalone / separately from copyparty,
+provide the video resolution on stdin as json:  {"res":"1920x1080"}
 """
 
 

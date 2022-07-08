@@ -504,7 +504,7 @@ class MTag(object):
         env = os.environ.copy()
         env["PYTHONPATH"] = pypath
 
-        ret = {}
+        ret: dict[str, Any] = {}
         for tagname, parser in sorted(parsers.items(), key=lambda x: (x[1].pri, x[0])):
             try:
                 cmd = [parser.bin, abspath]
@@ -514,7 +514,9 @@ class MTag(object):
                 args = {"env": env, "timeout": parser.timeout, "kill": parser.kill}
 
                 if parser.pri:
-                    args["sin"] = json.dumps(oth_tags).encode("utf-8", "replace")
+                    zd = oth_tags.copy()
+                    zd.update(ret)
+                    args["sin"] = json.dumps(zd).encode("utf-8", "replace")
 
                 if WINDOWS:
                     args["creationflags"] = 0x4000
