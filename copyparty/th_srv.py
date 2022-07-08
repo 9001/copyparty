@@ -559,14 +559,15 @@ class ThumbSrv(object):
     def clean(self, histpath: str) -> int:
         ret = 0
         for cat in ["th", "ac"]:
-            ret += self._clean(histpath, cat, "")
+            top = os.path.join(histpath, cat)
+            if not bos.path.isdir(top):
+                continue
+
+            ret += self._clean(cat, top)
 
         return ret
 
-    def _clean(self, histpath: str, cat: str, thumbpath: str) -> int:
-        if not thumbpath:
-            thumbpath = os.path.join(histpath, cat)
-
+    def _clean(self, cat: str, thumbpath: str) -> int:
         # self.log("cln {}".format(thumbpath))
         exts = ["jpg", "webp"] if cat == "th" else ["opus", "caf"]
         maxage = getattr(self.args, cat + "_maxage")
@@ -600,7 +601,7 @@ class ThumbSrv(object):
                             self.log("rm -rf [{}]".format(fp))
                             shutil.rmtree(fp, ignore_errors=True)
                 else:
-                    self._clean(histpath, cat, fp)
+                    ndirs += self._clean(cat, fp)
 
                 continue
 
