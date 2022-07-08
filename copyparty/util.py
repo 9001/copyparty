@@ -1566,12 +1566,17 @@ def runcmd(
     argv: Union[list[bytes], list[str]], timeout: Optional[int] = None, **ka: Any
 ) -> tuple[int, str, str]:
     kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
+
+    sin = ka.pop("sin", None)
+    if sin:
+        ka["stdin"] = sp.PIPE
+
     p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE, **ka)
     if not timeout or PY2:
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(sin)
     else:
         try:
-            stdout, stderr = p.communicate(timeout=timeout)
+            stdout, stderr = p.communicate(sin, timeout=timeout)
         except sp.TimeoutExpired:
             if kill == "n":
                 return -18, "", ""  # SIGCONT; leave it be

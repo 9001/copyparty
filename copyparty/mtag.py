@@ -46,6 +46,7 @@ class MParser(object):
         self.force = False
         self.kill = "t"  # tree; all children recursively
         self.audio = "y"
+        self.pri = 0  # priority; higher = later
         self.ext = []
 
         while True:
@@ -81,6 +82,10 @@ class MParser(object):
 
             if arg.startswith("e"):
                 self.ext.append(arg[1:])
+                continue
+
+            if arg.startswith("p"):
+                self.pri = int(arg[1:] or "1")
                 continue
 
             raise Exception()
@@ -487,7 +492,9 @@ class MTag(object):
         ret, md = ffprobe(abspath)
         return self.normalize_tags(ret, md)
 
-    def get_bin(self, parsers: dict[str, MParser], abspath: str) -> dict[str, Any]:
+    def get_bin(
+        self, parsers: dict[str, MParser], abspath: str, oth_tags: dict[str, Any]
+    ) -> dict[str, Any]:
         if not bos.path.isfile(abspath):
             return {}
 
@@ -498,13 +505,16 @@ class MTag(object):
         env["PYTHONPATH"] = pypath
 
         ret = {}
-        for tagname, parser in parsers.items():
+        for tagname, parser in sorted(parsers.items(), key=lambda x: (x[1].pri, x[0])):
             try:
                 cmd = [parser.bin, abspath]
                 if parser.bin.endswith(".py"):
                     cmd = [sys.executable] + cmd
 
                 args = {"env": env, "timeout": parser.timeout, "kill": parser.kill}
+
+                if parser.pri:
+                    args["sin"] = json.dumps(oth_tags).encode("utf-8", "replace")
 
                 if WINDOWS:
                     args["creationflags"] = 0x4000

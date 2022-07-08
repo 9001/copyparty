@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
+import json
 import sys
 import subprocess as sp
 
 from copyparty.util import fsenc
-from copyparty.mtag import ffprobe
 
-
-"""
+_ = r"""
 inspects video files for errors and such
-usage: -mtp vidchk=t600,ay,bin/mtag/vidchk.py
+usage: -mtp vidchk=t600,ay,p,bin/mtag/vidchk.py
+
+t600: timeout 10min
+  ay: only process files which contain audio (including video with audio)
+   p: set priority 1 (lowest priority after initial ffprobe/mutagen for base tags),
+       makes copyparty feed base tags into this script as json
 """
 
 
@@ -19,17 +23,18 @@ FAST = True  # parse entire file at container level
 
 def main():
     fp = sys.argv[1]
-    md, _ = ffprobe(fp)
+    zb = sys.stdin.buffer.read()
+    zs = zb.decode("utf-8", "replace")
+    md = json.loads(zs)
 
     try:
-        w = int(md[".resw"][1])
-        h = int(md[".resh"][1])
+        w, h = [int(x) for x in md["res"].split("x")]
         if not w + h:
             raise Exception()
     except:
         return "could not determine resolution"
 
-    if min(w, h) < 720:
+    if min(w, h) < 1080:
         return "resolution too small"
 
     zs = (

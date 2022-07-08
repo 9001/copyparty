@@ -67,12 +67,20 @@ class Dbw(object):
 
 
 class Mpqe(object):
-    def __init__(self, mtp: dict[str, MParser], entags: set[str], w: str, abspath: str):
+    def __init__(
+        self,
+        mtp: dict[str, MParser],
+        entags: set[str],
+        w: str,
+        abspath: str,
+        oth_tags: dict[str, Any],
+    ):
         # mtp empty = mtag
         self.mtp = mtp
         self.entags = entags
         self.w = w
         self.abspath = abspath
+        self.oth_tags = oth_tags
 
 
 class Up2k(object):
@@ -872,7 +880,7 @@ class Up2k(object):
                 if not mpool:
                     n_tags = self._tag_file(c3, entags, w, abspath)
                 else:
-                    mpool.put(Mpqe({}, entags, w, abspath))
+                    mpool.put(Mpqe({}, entags, w, abspath, {}))
                     # not registry cursor; do not self.mutex:
                     n_tags = len(self._flush_mpool(c3))
 
@@ -978,8 +986,8 @@ class Up2k(object):
                     abspath = os.path.join(ptop, rd, fn)
 
                     q = "select k from mt where w = ?"
-                    zq2 = cur.execute(q, (w,)).fetchall()
-                    have: dict[str, Union[str, float]] = {x[0]: 1 for x in zq2}
+                    zq = cur.execute(q, (w,)).fetchall()
+                    have: dict[str, Union[str, float]] = {x[0]: 1 for x in zq}
 
                     did_nothing = False
                     parsers = self._get_parsers(ptop, have, abspath)
@@ -988,7 +996,14 @@ class Up2k(object):
                         n_left -= 1
                         continue
 
-                    jobs.append(Mpqe(parsers, set(), w, abspath))
+                    if next((x for x in parsers.values() if x.pri), None):
+                        q = "select k, v from mt where w = ?"
+                        zq2 = cur.execute(q, (w,)).fetchall()
+                        oth_tags = {str(k): v for k, v in zq2}
+                    else:
+                        oth_tags = {}
+
+                    jobs.append(Mpqe(parsers, set(), w, abspath, oth_tags))
                     in_progress[w] = True
 
             with self.mutex:
@@ -1112,7 +1127,7 @@ class Up2k(object):
             return
 
         for _ in range(mpool.maxsize):
-            mpool.put(Mpqe({}, set(), "", ""))
+            mpool.put(Mpqe({}, set(), "", "", {}))
 
         mpool.join()
 
@@ -1128,7 +1143,7 @@ class Up2k(object):
                 if not qe.mtp:
                     tags = self.mtag.get(qe.abspath)
                 else:
-                    tags = self.mtag.get_bin(qe.mtp, qe.abspath)
+                    tags = self.mtag.get_bin(qe.mtp, qe.abspath, qe.oth_tags)
                     vtags = [
                         "\033[36m{} \033[33m{}".format(k, v) for k, v in tags.items()
                     ]
@@ -2383,7 +2398,7 @@ class Up2k(object):
                 ntags1 = len(tags)
                 parsers = self._get_parsers(ptop, tags, abspath)
                 if parsers:
-                    tags.update(self.mtag.get_bin(parsers, abspath))
+                    tags.update(self.mtag.get_bin(parsers, abspath, tags))
             except Exception as ex:
                 self._log_tag_err("", abspath, ex)
                 continue
