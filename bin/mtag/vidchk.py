@@ -71,8 +71,8 @@ def main():
     except:
         return "could not determine resolution"
 
-    # grab streams/format metadata + the final keyframe (and the next 2 seconds of frames after it)
-    zs = "ffprobe -hide_banner -v warning -of json -show_streams -show_format -show_packets -show_data_hash crc32 -read_intervals 999999%+2"
+    # grab streams/format metadata + 2 seconds of frames at the start and end
+    zs = "ffprobe -hide_banner -v warning -of json -show_streams -show_format -show_packets -show_data_hash crc32 -read_intervals %+2,999999%+2"
     cmd = zs.encode("ascii").split(b" ") + [fsenc(fp)]
     p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
     so, se = p.communicate()
