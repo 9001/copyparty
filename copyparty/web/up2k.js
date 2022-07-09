@@ -15,6 +15,7 @@ function goto_up2k() {
 // chrome requires https to use crypto.subtle,
 // usually it's undefined but some chromes throw on invoke
 var up2k = null,
+    up2k_hooks = [],
     sha_js = window.WebAssembly ? 'hw' : 'ac',  // ff53,c57,sa11
     m = 'will use ' + sha_js + ' instead of native sha512 due to';
 
@@ -578,6 +579,12 @@ function fsearch_explain(n) {
 
 
 function up2k_init(subtle) {
+    var r = {
+        "init_deps": init_deps,
+        "set_fsearch": set_fsearch,
+        "gotallfiles": [gotallfiles]  // hooks
+    };
+
     function showmodal(msg) {
         ebi('u2notbtn').innerHTML = msg;
         ebi('u2btn').style.display = 'none';
@@ -695,6 +702,10 @@ function up2k_init(subtle) {
 
     var pvis = new U2pvis("bz", '#u2cards', uc),
         donut = new Donut(uc, st);
+
+    r.ui = pvis;
+    r.st = st;
+    r.uc = uc;
 
     var bobslice = null;
     if (window.File)
@@ -906,7 +917,8 @@ function up2k_init(subtle) {
 
         if (!dirs.length) {
             if (!pf.length)
-                return gotallfiles(good, nil, bad);
+                // call first hook, pass list of remaining hooks to call
+                return r.gotallfiles[0](good, nil, bad, r.gotallfiles.slice(1));
 
             console.log("retry pf, " + pf.length);
             setTimeout(function () {
@@ -2123,7 +2135,12 @@ function up2k_init(subtle) {
     if (parallel_uploads < 1)
         bumpthread(1);
 
-    return { "init_deps": init_deps, "set_fsearch": set_fsearch, "ui": pvis, "st": st, "uc": uc }
+    setTimeout(function () {
+        for (var a = 0; a < up2k_hooks.length; a++)
+            up2k_hooks[a]();
+    }, 1);
+
+    return r;
 }
 
 
