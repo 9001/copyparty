@@ -1,6 +1,8 @@
 // way more specific example --
 // assumes all files dropped into the uploader have a youtube-id somewhere in the filename,
 // locates the youtube-ids and passes them to an API which returns a list of IDS which should be uploaded
+//
+// assumes copyparty is behind nginx as /ytq is a standalone service which must be rproxied in place
 
 function up2k_namefilter(good_files, nil_files, bad_files, hooks) {
     var filenames = [],

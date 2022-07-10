@@ -35,6 +35,7 @@ from .util import (
     quotep,
     ren_open,
     rmdirs,
+    rmdirs_up,
     s2hms,
     s3dec,
     s3enc,
@@ -1857,11 +1858,12 @@ class Up2k(object):
         adir, fn = os.path.split(atop)
         try:
             st = bos.lstat(atop)
+            is_dir = stat.S_ISDIR(st.st_mode)
         except:
             raise Pebkac(400, "file not found on disk (already deleted?)")
 
         scandir = not self.args.no_scandir
-        if stat.S_ISDIR(st.st_mode):
+        if is_dir:
             g = vn.walk("", rem, [], uname, permsets, True, scandir, True)
             if unpost:
                 raise Pebkac(400, "cannot unpost folders")
@@ -1896,8 +1898,14 @@ class Up2k(object):
 
                 bos.unlink(abspath)
 
-        rm = rmdirs(self.log_func, scandir, True, atop, 1)
-        return n_files, rm[0], rm[1]
+        ok: list[str] = []
+        ng: list[str] = []
+        if is_dir:
+            ok, ng = rmdirs(self.log_func, scandir, True, atop, 1)
+
+        ok2, ng2 = rmdirs_up(os.path.dirname(atop))
+
+        return n_files, ok + ok2, ng + ng2
 
     def handle_mv(self, uname: str, svp: str, dvp: str) -> str:
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
@@ -1939,6 +1947,7 @@ class Up2k(object):
                     self._mv_file(uname, svpf, dvpf)
 
         rmdirs(self.log_func, scandir, True, sabs, 1)
+        rmdirs_up(os.path.dirname(sabs))
         return "k"
 
     def _mv_file(self, uname: str, svp: str, dvp: str) -> str:

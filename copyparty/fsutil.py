@@ -2,8 +2,8 @@
 from __future__ import print_function, unicode_literals
 
 import ctypes
-import re
 import os
+import re
 import time
 
 from .__init__ import ANYWIN, MACOS

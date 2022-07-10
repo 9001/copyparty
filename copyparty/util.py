@@ -1422,7 +1422,8 @@ def statdir(
 def rmdirs(
     logger: RootLogger, scandir: bool, lstat: bool, top: str, depth: int
 ) -> tuple[list[str], list[str]]:
-    if not os.path.exists(fsenc(top)) or not os.path.isdir(fsenc(top)):
+    """rmdir all descendants, then self"""
+    if not os.path.isdir(fsenc(top)):
         top = os.path.dirname(top)
         depth -= 1
 
@@ -1444,6 +1445,21 @@ def rmdirs(
             ng.append(top)
 
     return ok, ng
+
+
+def rmdirs_up(top: str) -> tuple[list[str], list[str]]:
+    """rmdir on self, then all parents"""
+    try:
+        os.rmdir(fsenc(top))
+    except:
+        return [], [top]
+
+    par = os.path.dirname(top)
+    if not par:
+        return [top], []
+
+    ok, ng = rmdirs_up(par)
+    return [top] + ok, ng
 
 
 def unescape_cookie(orig: str) -> str:
@@ -1802,7 +1818,6 @@ def termsize() -> tuple[int, int]:
     def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:
         try:
             import fcntl
-            import struct
             import termios
 
             cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"1234"))
