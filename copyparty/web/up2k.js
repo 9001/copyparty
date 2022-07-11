@@ -966,6 +966,9 @@ function up2k_init(subtle) {
     }
 
     function gotallfiles(good_files, nil_files, bad_files) {
+        if (uc.fsearch && !uc.turbo)
+            nil_files = [];
+
         var ntot = good_files.concat(nil_files, bad_files).length;
         if (bad_files.length) {
             var msg = L.u_badf.format(bad_files.length, ntot);

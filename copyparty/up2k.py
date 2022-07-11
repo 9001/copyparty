@@ -2231,8 +2231,11 @@ class Up2k(object):
         return ret
 
     def _new_upload(self, job: dict[str, Any]) -> None:
-        self.registry[job["ptop"]][job["wark"]] = job
         pdir = os.path.join(job["ptop"], job["prel"])
+        if not job["size"] and bos.path.isfile(os.path.join(pdir, job["name"])):
+            return
+
+        self.registry[job["ptop"]][job["wark"]] = job
         job["name"] = self._untaken(pdir, job["name"], job["t0"], job["addr"])
         # if len(job["name"].split(".")) > 8:
         #    raise Exception("aaa")
