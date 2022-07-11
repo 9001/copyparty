@@ -275,7 +275,7 @@ def disable_quickedit() -> None:
                 raise ctypes.WinError(err)  # type: ignore
         return args
 
-    k32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore
+    k32 = ctypes.WinDLL(str("kernel32"), use_last_error=True)  # type: ignore
     if PY2:
         wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
 
