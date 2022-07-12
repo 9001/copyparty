@@ -964,6 +964,12 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
 
 up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
 
+regarding the frequent server log message during uploads;  
+`6.0M 106M/s 2.77G 102.9M/s n948 thank 4/0/3/1 10042/7198`
+* this chunk was `6 MiB`, uploaded at `106 MiB/s`
+* on this http connection, `2.77 GiB` transferred, `102.9 MiB/s` average, `948` chunks handled
+* client says `4` uploads OK, `0` failed, `3` busy, `1` queued, `10042 MiB` total size, `7198 MiB` left
+
 
 ## why chunk-hashes
 

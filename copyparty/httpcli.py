@@ -1127,8 +1127,10 @@ class HttpCli(object):
             except:
                 self.log("failed to utime ({}, {})".format(fin_path, times))
 
+        cinf = self.headers.get("x-up2k-stat", "")
+
         spd = self._spd(post_sz)
-        self.log("{} thank".format(spd))
+        self.log("{} thank {}".format(spd, cinf))
         self.reply(b"thank")
         return True
 

@@ -1924,7 +1924,10 @@ function up2k_init(subtle) {
             tasker();
         }
         function do_send() {
-            var xhr = new XMLHttpRequest();
+            var xhr = new XMLHttpRequest(),
+                bfin = Math.floor(st.bytes.finished / 1024 / 1024),
+                btot = Math.floor(st.bytes.total / 1024 / 1024);
+
             xhr.upload.onprogress = function (xev) {
                 pvis.prog(t, npart, xev.loaded);
             };
@@ -1944,6 +1947,8 @@ function up2k_init(subtle) {
             xhr.open('POST', t.purl, true);
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
+            xhr.setRequestHeader("X-Up2k-Stat", "{0}/{1}/{2}/{3} {4}/{5}".format(
+                pvis.ctr.ok, pvis.ctr.ng, pvis.ctr.bz, pvis.ctr.q, btot, btot - bfin));
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             if (xhr.overrideMimeType)
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
