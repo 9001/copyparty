@@ -654,7 +654,8 @@ function up2k_init(subtle) {
     var parallel_uploads = icfg_get('nthread'),
         uc = {},
         fdom_ctr = 0,
-        min_filebuf = 0;
+        min_filebuf = 0,
+        biggest_file = 0;
 
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
@@ -1047,6 +1048,9 @@ function up2k_init(subtle) {
             if (uc.fsearch)
                 entry.srch = 1;
 
+            if (biggest_file < entry.size)
+                biggest_file = entry.size;
+
             try {
                 if (st.seen[fdir][key])
                     continue;
@@ -1199,9 +1203,11 @@ function up2k_init(subtle) {
             return false;
 
         if (uc.multitask) {
-            var ahead = st.bytes.hashed - st.bytes.finished;
-            return ahead < 1024 * 1024 * 1024 * 4 &&
-                st.todo.handshake.length + st.busy.handshake.length < 16;
+            var ahead = st.bytes.hashed - st.bytes.finished,
+                nmax = ahead < biggest_file / 8 ? 32 : 16;
+
+            return ahead < biggest_file &&
+                st.todo.handshake.length + st.busy.handshake.length < nmax;
         }
         return handshakes_permitted() && 0 ==
             st.todo.handshake.length +
