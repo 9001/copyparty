@@ -95,6 +95,7 @@ class Up2k(object):
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
 
         self.gid = 0
+        self.stop = False
         self.mutex = threading.Lock()
         self.pp: Optional[ProgressPrinter] = None
         self.rescan_cond = threading.Condition()
@@ -415,6 +416,9 @@ class Up2k(object):
 
         # e2ds(a) volumes first
         for vol in vols:
+            if self.stop:
+                break
+
             en: set[str] = set()
             if "mte" in vol.flags:
                 en = set(vol.flags["mte"].split(","))
@@ -440,6 +444,9 @@ class Up2k(object):
         # open the rest + do any e2ts(a)
         needed_mutagen = False
         for vol in vols:
+            if self.stop:
+                break
+
             if "e2ts" not in vol.flags:
                 continue
 
@@ -463,6 +470,9 @@ class Up2k(object):
             with self.mutex:
                 cur.connection.commit()
                 cur.execute("vacuum")
+
+        if self.stop:
+            return False
 
         self.pp.end = True
 
@@ -645,6 +655,9 @@ class Up2k(object):
         gl = sorted(g)
         inames = {x[0]: 1 for x in gl}
         for iname, inf in gl:
+            if self.stop:
+                return -1
+
             abspath = os.path.join(cdir, iname)
             if rei and rei.search(abspath):
                 continue
@@ -739,6 +752,9 @@ class Up2k(object):
                     db.c.connection.commit()
                     db.n = 0
                     db.t = time.time()
+
+        if self.stop:
+            return -1
 
         # drop missing files
         rd = cdir[len(top) + 1 :].strip("/")
@@ -866,6 +882,9 @@ class Up2k(object):
             c3 = conn.cursor()
             n_left = cur.execute("select count(w) from up").fetchone()[0]
             for w, rd, fn in cur.execute("select w, rd, fn from up order by rd, fn"):
+                if self.stop:
+                    return -1, -1, False
+
                 n_left -= 1
                 q = "select w from mt where w = ?"
                 if c2.execute(q, (w[:16],)).fetchone():
@@ -2466,6 +2485,7 @@ class Up2k(object):
         # self.log("hashq {} push {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
 
     def shutdown(self) -> None:
+        self.stop = True
         self.log("writing snapshot")
         self.do_snapshot()
 
