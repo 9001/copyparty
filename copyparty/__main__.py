@@ -394,6 +394,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
               \033[36md2ts\033[35m disables metadata collection for existing files
               \033[36md2ds\033[35m disables onboot indexing, overrides -e2ds*
               \033[36md2t\033[35m disables metadata collection, overrides -e2t*
+              \033[36md2v\033[35m disables file verification, overrides -e2v*
               \033[36md2d\033[35m disables all database stuff, overrides -e2*
               \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
               \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
@@ -586,6 +587,9 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplocation")
     ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets -e2d")
     ap2.add_argument("-e2dsa", action="store_true", help="scans all folders on startup; sets -e2ds")
+    ap2.add_argument("-e2v", action="store_true", help="verify file integrity; rehash all files and compare with db")
+    ap2.add_argument("-e2vu", action="store_true", help="on hash mismatch: update the database with the new hash")
+    ap2.add_argument("-e2vp", action="store_true", help="on hash mismatch: panic and quit copyparty")
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
     ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching paths during e2ds folder scans")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")

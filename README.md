@@ -663,8 +663,11 @@ through arguments:
 * `-e2t` enables metadata indexing on upload
 * `-e2ts` also scans for tags in all files that don't have tags yet
 * `-e2tsr` also deletes all existing tags, doing a full reindex
+* `-e2v` verfies file integrity at startup, comparing hashes from the db
+* `-e2vu` patches the database with the new hashes from the filesystem
+* `-e2vp` panics and kills copyparty instead
 
-the same arguments can be set as volume flags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts` for disabling:
+the same arguments can be set as volume flags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts`, `d2v` for disabling:
 * `-v ~/music::r:c,e2dsa,e2tsr` does a full reindex of everything on startup
 * `-v ~/music::r:c,d2d` disables **all** indexing, even if any `-e2*` are on
 * `-v ~/music::r:c,d2t` disables all `-e2t*` (tags), does not affect `-e2d*`

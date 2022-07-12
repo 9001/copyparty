@@ -9,6 +9,7 @@ import math
 import os
 import re
 import shutil
+import signal
 import stat
 import subprocess as sp
 import threading
@@ -434,10 +435,36 @@ class Up2k(object):
                 if vac:
                     need_vac[vol] = True
 
-            if "e2ts" not in vol.flags:
-                t = "online, idle"
-            else:
+            if "e2v" in vol.flags:
+                t = "online (integrity-check pending)"
+            elif "e2ts" in vol.flags:
                 t = "online (tags pending)"
+            else:
+                t = "online, idle"
+
+            self.volstate[vol.vpath] = t
+
+        # file contents verification
+        for vol in vols:
+            if self.stop:
+                break
+
+            if "e2v" not in vol.flags:
+                continue
+
+            t = "online (verifying integrity)"
+            self.volstate[vol.vpath] = t
+            self.log("{} [{}]".format(t, vol.realpath))
+
+            nmod = self._verify_integrity(vol)
+            if nmod:
+                self.log("modified {} entries in the db".format(nmod), 3)
+                need_vac[vol] = True
+
+            if "e2ts" in vol.flags:
+                t = "online (tags pending)"
+            else:
+                t = "online, idle"
 
             self.volstate[vol.vpath] = t
 
@@ -736,7 +763,9 @@ class Up2k(object):
                         self.log("file: {}".format(abspath))
 
                     try:
-                        hashes = self._hashlist_from_file(abspath)
+                        hashes = self._hashlist_from_file(
+                            abspath, "a{}, ".format(self.pp.n)
+                        )
                     except Exception as ex:
                         self.log("hash: {} @ [{}]".format(repr(ex), abspath))
                         continue
@@ -815,6 +844,106 @@ class Up2k(object):
             cur.execute("delete from up where rd = ?", (rd,))
 
         return n_rm
+
+    def _verify_integrity(self, vol: VFS) -> int:
+        """expensive; blocks database access until finished"""
+        ptop = vol.realpath
+        assert self.pp and self.mtag
+
+        cur = self.cur[ptop]
+        rei = vol.flags.get("noidx")
+        reh = vol.flags.get("nohash")
+        e2vu = "e2vu" in vol.flags
+        e2vp = "e2vp" in vol.flags
+
+        excl = [
+            d[len(vol.vpath) :].lstrip("/")
+            for d in self.asrv.vfs.all_vols
+            if d != vol.vpath and (d.startswith(vol.vpath + "/") or not vol.vpath)
+        ]
+        qexa: list[str] = []
+        pexa: list[str] = []
+        for vpath in excl:
+            qexa.append("up.rd != ? and not up.rd like ?||'%'")
+            pexa.extend([vpath, vpath])
+
+        pex = tuple(pexa)
+        qex = " and ".join(qexa)
+        if qex:
+            qex = " where " + qex
+
+        rewark: list[tuple[str, str, str, int, int]] = []
+
+        with self.mutex:
+            b_left = 0
+            n_left = 0
+            q = "select sz from up" + qex
+            for (sz,) in cur.execute(q, pex):
+                b_left += sz  # sum() can overflow according to docs
+                n_left += 1
+
+            q = "select w, mt, sz, rd, fn from up" + qex
+            for w, mt, sz, drd, dfn in cur.execute(q, pex):
+                if self.stop:
+                    return -1
+
+                n_left -= 1
+                b_left -= sz
+                if drd.startswith("//") or dfn.startswith("//"):
+                    rd, fn = s3dec(drd, dfn)
+                else:
+                    rd = drd
+                    fn = dfn
+
+                abspath = os.path.join(ptop, rd, fn)
+                if rei and rei.search(abspath):
+                    continue
+
+                nohash = reh.search(abspath) if reh else False
+
+                pf = "v{}, {:.0f}+".format(n_left, b_left / 1024 / 1024)
+                self.pp.msg = pf + abspath
+
+                st = bos.stat(abspath)
+                sz2 = st.st_size
+                mt2 = int(st.st_mtime)
+
+                if nohash:
+                    w2 = up2k_wark_from_metadata(self.salt, sz2, mt2, rd, fn)
+                else:
+                    if sz2 > 1024 * 1024 * 32:
+                        self.log("file: {}".format(abspath))
+
+                    try:
+                        hashes = self._hashlist_from_file(abspath, pf)
+                    except Exception as ex:
+                        self.log("hash: {} @ [{}]".format(repr(ex), abspath))
+                        continue
+
+                    w2 = up2k_wark_from_hashlist(self.salt, sz2, hashes)
+
+                if w == w2:
+                    continue
+
+                rewark.append((drd, dfn, w2, sz2, mt2))
+
+                t = "hash mismatch: {}\n  db: {} ({} byte, {})\n  fs: {} ({} byte, {})"
+                t = t.format(abspath, w, sz, mt, w2, sz2, mt2)
+                self.log(t, 1)
+
+            if e2vp and rewark:
+                self.hub.retcode = 1
+                os.kill(os.getpid(), signal.SIGTERM)
+                raise Exception("{} files have incorrect hashes".format(len(rewark)))
+
+            if not e2vu:
+                return 0
+
+            for rd, fn, w, sz, mt in rewark:
+                q = "update up set w = ?, sz = ?, mt = ? where rd = ? and fn = ? limit 1"
+                cur.execute(q, (w, sz, int(mt), rd, fn))
+
+        return len(rewark)
 
     def _build_tags_index(self, vol: VFS) -> tuple[int, int, bool]:
         ptop = vol.realpath
@@ -2225,14 +2354,15 @@ class Up2k(object):
 
         return wark
 
-    def _hashlist_from_file(self, path: str) -> list[str]:
+    def _hashlist_from_file(self, path: str, prefix: str = "") -> list[str]:
         fsz = bos.path.getsize(path)
         csz = up2k_chunksize(fsz)
         ret = []
         with open(fsenc(path), "rb", 512 * 1024) as f:
             while fsz > 0:
                 if self.pp:
-                    self.pp.msg = "{} MB, {}".format(int(fsz / 1024 / 1024), path)
+                    mb = int(fsz / 1024 / 1024)
+                    self.pp.msg = "{}{} MB, {}".format(prefix, mb, path)
 
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)

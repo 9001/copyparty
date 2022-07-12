@@ -1008,7 +1008,7 @@ class AuthSrv(object):
                 if ptn:
                     vol.flags[vf] = re.compile(ptn)
 
-            for k in ["e2t", "e2ts", "e2tsr"]:
+            for k in ["e2t", "e2ts", "e2tsr", "e2v", "e2vu", "e2vp"]:
                 if getattr(self.args, k):
                     vol.flags[k] = True
 
@@ -1030,7 +1030,7 @@ class AuthSrv(object):
             self._read_volflag(vol.flags, "mtp", self.args.mtp, True)
 
             # d2d drops all database features for a volume
-            for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"]]:
+            for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"], ["d2d", "e2v"]]:
                 if not vol.flags.get(grp, False):
                     continue
 
@@ -1048,6 +1048,12 @@ class AuthSrv(object):
             # mt* needs e2t so drop those too
             for grp, rm in [["e2t", "mt"]]:
                 if vol.flags.get(grp, False):
+                    continue
+
+                vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
+
+            for grp, rm in [["d2v", "e2v"]]:
+                if not vol.flags.get(grp, False):
                     continue
 
                 vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
