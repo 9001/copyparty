@@ -15,6 +15,8 @@ save one of these as `.epilogue.html` inside a folder to customize it:
 point `--js-browser` to one of these by URL:
 
 * [`minimal-up2k.js`](minimal-up2k.js) is similar to the above `minimal-up2k.html` except it applies globally to all write-only folders
+* [`up2k-hooks.js`](up2k-hooks.js) lets you specify a ruleset for files to skip uploading
+  * [`up2k-hook-ytid.js`](up2k-hook-ytid.js) is a more specific example checking youtube-IDs against some API
 
 
 

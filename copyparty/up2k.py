@@ -526,7 +526,9 @@ class Up2k(object):
             if vpath:
                 vpath += "/"
 
-            self.log("/{} {}".format(vpath, " ".join(sorted(a))), "35")
+            zs = " ".join(sorted(a))
+            zs = zs.replace("30mre.compile(", "30m(")  # nohash
+            self.log("/{} {}".format(vpath, zs), "35")
 
         reg = {}
         drp = None

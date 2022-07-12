@@ -1,6 +1,6 @@
 // way more specific example --
 // assumes all files dropped into the uploader have a youtube-id somewhere in the filename,
-// locates the youtube-ids and passes them to an API which returns a list of IDS which should be uploaded
+// locates the youtube-ids and passes them to an API which returns a list of IDs which should be uploaded
 //
 // assumes copyparty is behind nginx as /ytq is a standalone service which must be rproxied in place
 
