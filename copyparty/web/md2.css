@@ -36,6 +36,11 @@
 	width: 55em;
 	width: min(55em, calc(100% - 2em));
 }
+#mtw.single.editor,
+#mw.single.editor {
+	width: calc(100% - 1em);
+	left: .5em;
+}
 
 
 #mp {

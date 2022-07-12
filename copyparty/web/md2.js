@@ -509,6 +509,19 @@ function setsel(s) {
 }
 
 
+// cut/copy current line
+function md_cut() {
+    var s = linebounds();
+    if (s.car != s.cdr)
+        return;
+
+    dom_src.setSelectionRange(s.n1, s.n2 + 1, 'forward');
+    setTimeout(function () {
+        dom_src.setSelectionRange(s.n1, s.n1, 'forward');
+    }, 1);
+}
+
+
 // indent/dedent
 function md_indent(dedent) {
     var s = getsel(),
@@ -954,6 +967,10 @@ var set_lno = (function () {
             if (up || dn) {
                 md_p_jump(dn);
                 return false;
+            }
+            if (ev.code == "KeyX" || ev.code == "KeyC") {
+                md_cut();
+                return true; //sic
             }
         }
         else {
