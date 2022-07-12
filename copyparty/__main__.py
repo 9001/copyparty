@@ -483,6 +483,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
     ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; 0 = off and warn if enabled, 1 = off, 2 = on, 3 = on and disable datecheck")
+    ap2.add_argument("--u2sort", metavar="TXT", type=u, default="s", help="upload order; s=smallest-first, n=alphabetical, fs=force-s, fn=force-n -- alphabetical is a bit slower on fiber/LAN but makes it easier to eyeball if everything went fine")
 
     ap2 = ap.add_argument_group('network options')
     ap2.add_argument("-i", metavar="IP", type=u, default="0.0.0.0", help="ip to bind (comma-sep.)")
@@ -754,6 +755,12 @@ def main(argv: Optional[list[str]] = None) -> None:
             al.p = [int(x) for x in al.p.split(",")]
     except:
         raise Exception("invalid value for -p")
+
+    for arg, kname, okays in [["--u2sort", "u2sort", "s n fs fn"]]:
+        val = unicode(getattr(al, kname))
+        if val not in okays.split():
+            zs = "argument {} cannot be '{}'; try one of these: {}"
+            raise Exception(zs.format(arg, val, okays))
 
     if HAVE_SSL:
         if al.ssl_ver:

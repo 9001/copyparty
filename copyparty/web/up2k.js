@@ -663,6 +663,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo, false);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
+    bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort, false);
 
     var st = {
         "files": [],
@@ -1018,6 +1019,13 @@ function up2k_init(subtle) {
         var evpath = get_evpath(),
             draw_each = good_files.length < 50;
 
+        if (!uc.az)
+            good_files.sort(function (a, b) {
+                a = a[0].size;
+                b = b[0].size;
+                return a < b ? -1 : a > b ? 1 : 0;
+            });
+
         for (var a = 0; a < good_files.length; a++) {
             var fobj = good_files[a][0],
                 name = good_files[a][1],
@@ -1066,9 +1074,9 @@ function up2k_init(subtle) {
                     entry.purl + uricom_enc(entry.name)).join(' '),
                 '📐 ' + L.u_hashing,
                 ''
-            ], fobj.size, draw_each);
+            ], entry.size, draw_each);
 
-            st.bytes.total += fobj.size;
+            st.bytes.total += entry.size;
             st.files.push(entry);
             if (!entry.size)
                 push_t(st.todo.handshake, entry);
@@ -1203,6 +1211,9 @@ function up2k_init(subtle) {
             return false;
 
         if (uc.multitask) {
+            if (!uc.az)
+                return st.todo.handshake.length + st.busy.handshake.length < 2;
+
             var ahead = st.bytes.hashed - st.bytes.finished,
                 nmax = ahead < biggest_file / 8 ? 32 : 16;
 
@@ -2115,6 +2126,14 @@ function up2k_init(subtle) {
             flag.ch.close();
             flag = false;
         }
+    }
+
+    function set_u2sort() {
+        if (u2sort.indexOf('f') < 0)
+            return;
+
+        bcfg_set('u2sort', uc.az = u2sort.indexOf('n') + 1);
+        localStorage.removeItem('u2sort');
     }
 
     function nop(e) {

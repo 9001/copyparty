@@ -2413,6 +2413,7 @@ class HttpCli(object):
             "dtheme": self.args.theme,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
+            "u2sort": self.args.u2sort,
         }
 
         if self.args.js_browser:

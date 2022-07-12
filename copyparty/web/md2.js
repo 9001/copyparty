@@ -510,14 +510,15 @@ function setsel(s) {
 
 
 // cut/copy current line
-function md_cut() {
+function md_cut(cut) {
     var s = linebounds();
     if (s.car != s.cdr)
         return;
 
     dom_src.setSelectionRange(s.n1, s.n2 + 1, 'forward');
     setTimeout(function () {
-        dom_src.setSelectionRange(s.n1, s.n1, 'forward');
+        var i = cut ? s.n1 : s.car;
+        dom_src.setSelectionRange(i, i, 'forward');
     }, 1);
 }
 
@@ -969,7 +970,7 @@ var set_lno = (function () {
                 return false;
             }
             if (ev.code == "KeyX" || ev.code == "KeyC") {
-                md_cut();
+                md_cut(ev.code == "KeyX");
                 return true; //sic
             }
         }
