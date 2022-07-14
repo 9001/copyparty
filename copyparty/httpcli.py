@@ -1130,7 +1130,7 @@ class HttpCli(object):
         cinf = self.headers.get("x-up2k-stat", "")
 
         spd = self._spd(post_sz)
-        self.log("{} thank {}".format(spd, cinf))
+        self.log("{:70} thank {}".format(spd, cinf))
         self.reply(b"thank")
         return True
 

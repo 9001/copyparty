@@ -63,6 +63,7 @@ var Ls = {
 		"ul_par": "parallel uploads:",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
 		"ut_ask": "ask for confirmation before upload starts",
+		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
 		"ut_srch": "don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)",
 		"ut_par": "pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck",
 		"ul_btn": "drop files / folders<br>here (or click me)",
@@ -390,6 +391,7 @@ var Ls = {
 		"ul_par": "samtidige handl.:",
 		"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
 		"ut_ask": "bekreft filutvalg før opplastning starter",
+		"ut_pot": "forbedre ytelsen på trege enheter ved å$Nforenkle brukergrensesnittet",
 		"ut_srch": "utfør søk istedenfor å laste opp --$Nleter igjennom alle mappene du har lov til å se",
 		"ut_par": "sett til 0 for å midlertidig stanse opplastning$N$Nhøye verdier (4 eller 8) kan gi bedre ytelse,$Nspesielt på trege internettlinjer$N$Nbør ikke være høyere enn 1 på LAN$Neller hvis serveren sin harddisk er treg",
 		"ul_btn": "slipp filer / mapper<br>her (eller klikk meg)",
@@ -721,6 +723,10 @@ ebi('op_up2k').innerHTML = (
 	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
+	'			<input type="checkbox" id="potato" />\n' +
+	'			<label for="potato" tt="' + L.ut_pot + '">🥔</label>\n' +
+	'		</td>\n' +
+	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="ask_up" />\n' +
 	'			<label for="ask_up" tt="' + L.ut_ask + '">💭</label>\n' +
 	'		</td>\n' +
@@ -776,7 +782,7 @@ ebi('op_up2k').innerHTML = (
 	'		</tr>\n' +
 	'	</thead>\n' +
 	'	<tbody></tbody>\n' +
-	'</table></div>\n' +
+	'</table><div id="u2mu"></div></div>\n' +
 
 	'<p id="u2flagblock"><b>' + L.ul_flagblk + '</p>\n' +
 	'<p id="u2foot"></p>'

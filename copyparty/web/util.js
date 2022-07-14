@@ -1186,7 +1186,8 @@ var modal = (function () {
             return;
 
         setTimeout(function () {
-            ebi('modal-ok').focus();
+            if (ctr = ebi('modal-ok'))
+                ctr.focus();
         }, 20);
         ev(e);
     }

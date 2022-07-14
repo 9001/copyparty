@@ -22,13 +22,16 @@ v=$1
 }
 
 rm -f ../dist/copyparty-sfx.*
+shift
+./make-sfx.sh "$@"
 f=../dist/copyparty-sfx.py
-./make-sfx.sh
-$f -h
+[ -e $f ] || 
+    f=../dist/copyparty-sfx-gz.py
 
+$f -h
 while true; do
     mv $f $f.$(wc -c <$f | awk '{print$1}')
-    ./make-sfx.sh re $ar
+    ./make-sfx.sh re "$@"
 done
 
 # git tag -d v$v; git push --delete origin v$v

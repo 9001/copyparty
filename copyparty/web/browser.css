@@ -2216,6 +2216,10 @@ html.y #bbox-overlay figcaption a {
 #u2notbtn * {
 	line-height: 1.3em;
 }
+#u2mu div {
+	height: 1.2em;
+	overflow: hidden;
+}
 #u2tabw {
 	min-height: 0;
 	transition: min-height .2s;
@@ -2225,6 +2229,7 @@ html.y #bbox-overlay figcaption a {
 	display: none;
 }
 #u2tab {
+	table-layout: fixed;
 	border-collapse: collapse;
 	width: calc(100% - 2em);
 	max-width: 100em;
@@ -2348,7 +2353,7 @@ html.y #bbox-overlay figcaption a {
 	width: 48em;
 }
 #u2conf.ww {
-	width: 74em;
+	width: 78em;
 }
 #u2conf.ww #u2c3w {
 	width: 29em;

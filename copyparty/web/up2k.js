@@ -144,6 +144,7 @@ function U2pvis(act, btns, uc) {
     r.head = 0;
     r.tail = -1;
     r.wsz = 3;
+    r.npotato = 99;
 
     var markup = {
         '404': '<span class="err">404</span>',
@@ -181,6 +182,9 @@ function U2pvis(act, btns, uc) {
     };
 
     r.is_act = function (card) {
+        if (uc.potato && !uc.fsearch)
+            return false;
+
         if (r.act == "done")
             return card == "ok" || card == "ng";
 
@@ -361,6 +365,38 @@ function U2pvis(act, btns, uc) {
         }
     };
 
+    r.potato = function () {
+        QS('#u2cards a[act="bz"]').click();
+        timer[uc.potato ? "add" : "rm"](draw_potato);
+    };
+
+    function draw_potato() {
+        if (++r.npotato < 2)
+            return;
+
+        r.npotato = 0;
+        var html = [
+            "<p>files: &nbsp; <b>{0}</b> finished, &nbsp; <b>{1}</b> failed, &nbsp; <b>{2}</b> busy, &nbsp; <b>{3}</b> queued</p>".format(r.ctr.ok, r.ctr.ng, r.ctr.bz, r.ctr.q),
+        ];
+
+        while (r.head < r.tab.length && has(["ok", "ng"], r.tab[r.head].in))
+            r.head++;
+
+        var act = null;
+        if (r.head < r.tab.length)
+            act = r.tab[r.head];
+
+        if (act)
+            html.push("<p>file {0} of {1} : &nbsp; {2} &nbsp; <code>{3}</code></p>\n<div>{4}</div>".format(r.head + 1, r.tab.length, act.ht, act.hp, act.hn));
+
+        html = html.join('\n');
+        if (r.hpotato == html)
+            return;
+
+        r.hpotato = html;
+        ebi('u2mu').innerHTML = html;
+    }
+
     r.drawcard = function (cat) {
         var cards = QSA('#u2cards>a>span');
 
@@ -477,6 +513,7 @@ function U2pvis(act, btns, uc) {
     }
 
     r.changecard(r.act);
+    r.potato();
 }
 
 
@@ -528,7 +565,7 @@ function Donut(uc, st) {
     }
 
     r.on = function (ya) {
-        r.fc = r.tc = 99;
+        r.fc = r.tc = r.dc = 99;
         r.eta = null;
         r.base = pos();
         optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
@@ -544,10 +581,16 @@ function Donut(uc, st) {
 
         var t = st.bytes.total - r.base,
             v = pos() - r.base,
-            ofs = el.style.strokeDashoffset = o - o * v / t;
+            ofs = o - o * v / t;
+
+        if (!uc.potato || ++r.dc >= 2) {
+            el.style.strokeDashoffset = ofs;
+            r.dc = 0;
+        }
 
         if (++r.tc >= 10) {
-            wintitle(f2f(v * 100 / t, 1) + '%, ' + r.eta + 's, ', true);
+            wintitle("{0}%, {1}s, #{2}, ".format(
+                f2f(v * 100 / t, 1), r.eta, st.files.length - st.nfile.upload), true);
             r.tc = 0;
         }
 
@@ -658,6 +701,7 @@ function up2k_init(subtle) {
         biggest_file = 0;
 
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
+    bcfg_bind(uc, 'potato', 'potato', false, set_potato, false);
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
     bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
@@ -667,6 +711,10 @@ function up2k_init(subtle) {
 
     var st = {
         "files": [],
+        "nfile": {
+            "hash": 0,
+            "upload": 0
+        },
         "seen": {},
         "todo": {
             "head": [],
@@ -1461,6 +1509,7 @@ function up2k_init(subtle) {
     function exec_hash() {
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
+        st.nfile.hash = t.n;
 
         var bpend = 0,
             nchunk = 0,
@@ -1877,6 +1926,7 @@ function up2k_init(subtle) {
     function exec_upload() {
         var upt = st.todo.upload.shift();
         st.busy.upload.push(upt);
+        st.nfile.upload = upt.nfile;
 
         var npart = upt.npart,
             t = st.files[upt.nfile],
@@ -1980,7 +2030,7 @@ function up2k_init(subtle) {
             ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
         }
 
-        wide = write && wem > 78 ? 'ww' : wide;
+        wide = write && wem > 82 ? 'ww' : wide;
         parent = ebi(wide == 'ww' && write ? 'u2c3w' : 'u2c3t');
         var its = [ebi('u2etaw'), ebi('u2cards')];
         if (its[0].parentNode !== parent) {
@@ -2072,6 +2122,11 @@ function up2k_init(subtle) {
     }
     draw_turbo();
 
+    function set_potato() {
+        pvis.potato();
+        set_fsearch();
+    }
+
     function set_fsearch(new_state) {
         var fixed = false;
 
@@ -2109,6 +2164,10 @@ function up2k_init(subtle) {
         catch (ex) { }
 
         ebi('u2tab').className = (uc.fsearch ? 'srch ' : 'up ') + pvis.act;
+
+        var potato = uc.potato && !uc.fsearch;
+        ebi('u2cards').style.display = ebi('u2tab').style.display = potato ? 'none' : '';
+        ebi('u2mu').style.display = potato ? '' : 'none';
 
         draw_turbo();
         onresize();
