@@ -229,7 +229,7 @@ window.baguetteBox = (function () {
             ['C', 'video: toggle auto-next'],
             ['<code>[</code>, <code>]</code>', 'video: loop start / end'],
         ],
-            d = mknod('table'),
+            d = mknod('table', 'bbox-halp'),
             html = ['<tbody>'];
 
         for (var a = 0; a < list.length; a++)
@@ -238,7 +238,6 @@ window.baguetteBox = (function () {
         html.push('<tr><td colspan="2">tap middle of img to hide btns</td></tr>');
         html.push('<tr><td colspan="2">tap left/right sides for prev/next</td></tr>');
         d.innerHTML = html.join('\n') + '</tbody>';
-        d.setAttribute('id', 'bbox-halp');
         d.onclick = function () {
             overlay.removeChild(d);
         };
@@ -487,9 +486,8 @@ window.baguetteBox = (function () {
         var imagesFiguresIds = [];
         var imagesCaptionsIds = [];
         for (var i = 0, fullImage; i < gallery.length; i++) {
-            fullImage = mknod('div');
+            fullImage = mknod('div', 'baguette-img-' + i);
             fullImage.className = 'full-image';
-            fullImage.id = 'baguette-img-' + i;
             imagesElements.push(fullImage);
 
             imagesFiguresIds.push('bbox-figure-' + i);
@@ -631,16 +629,14 @@ window.baguetteBox = (function () {
         if (is_vid && index != currentIndex)
             return;  // no preload
 
-        var figure = mknod('figure');
-        figure.id = 'bbox-figure-' + index;
+        var figure = mknod('figure', 'bbox-figure-' + index);
         figure.innerHTML = '<div class="bbox-spinner">' +
             '<div class="bbox-double-bounce1"></div>' +
             '<div class="bbox-double-bounce2"></div>' +
             '</div>';
 
         if (options.captions && imageCaption) {
-            var figcaption = mknod('figcaption');
-            figcaption.id = 'bbox-figcaption-' + index;
+            var figcaption = mknod('figcaption', 'bbox-figcaption-' + index);
             figcaption.innerHTML = imageCaption;
             figure.appendChild(figcaption);
         }

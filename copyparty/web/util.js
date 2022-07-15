@@ -16,8 +16,16 @@ var wah = '',
 var ebi = document.getElementById.bind(document),
     QS = document.querySelector.bind(document),
     QSA = document.querySelectorAll.bind(document),
-    mknod = document.createElement.bind(document),
     XHR = XMLHttpRequest;
+
+
+function mknod(et, eid) {
+    var ret = document.createElement(et);
+    if (eid)
+        ret.id = eid;
+
+    return ret;
+}
 
 
 function qsr(sel) {
@@ -160,8 +168,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     try {
         var exbox = ebi('exbox');
         if (!exbox) {
-            exbox = mknod('div');
-            exbox.setAttribute('id', 'exbox');
+            exbox = mknod('div', 'exbox');
             document.body.appendChild(exbox);
 
             var s = mknod('style');
@@ -219,6 +226,11 @@ function ev(e) {
 
     e.returnValue = false;
     return e;
+}
+
+
+function noope(e) {
+    ev(e);
 }
 
 
@@ -866,8 +878,8 @@ var timer = (function () {
 
 var tt = (function () {
     var r = {
-        "tt": mknod("div"),
-        "th": mknod("div"),
+        "tt": mknod("div", 'tt'),
+        "th": mknod("div", 'tth'),
         "en": true,
         "el": null,
         "skip": false,
@@ -875,8 +887,6 @@ var tt = (function () {
     };
 
     r.th.innerHTML = '?';
-    r.tt.setAttribute('id', 'tt');
-    r.th.setAttribute('id', 'tth');
     document.body.appendChild(r.tt);
     document.body.appendChild(r.th);
 
@@ -1045,9 +1055,8 @@ var toast = (function () {
     var r = {},
         te = null,
         scrolling = false,
-        obj = mknod('div');
+        obj = mknod('div', 'toast');
 
-    obj.setAttribute('id', 'toast');
     document.body.appendChild(obj);
     r.visible = false;
     r.txt = null;
@@ -1130,8 +1139,7 @@ var modal = (function () {
     r.busy = false;
 
     r.show = function (html) {
-        o = mknod('div');
-        o.setAttribute('id', 'modal');
+        o = mknod('div', 'modal');
         o.innerHTML = '<table><tr><td><div id="modalc">' + html + '</div></td></tr></table>';
         document.body.appendChild(o);
         document.addEventListener('keydown', onkey);
@@ -1497,9 +1505,8 @@ function xhrchk(xhr, prefix, e404) {
         fun = toast.warn;
 
         qsr('#cf_frame');
-        var fr = mknod('iframe');
+        var fr = mknod('iframe', 'cf_frame');
         fr.src = '/?cf_challenge';
-        fr.setAttribute('id', 'cf_frame');
         document.body.appendChild(fr);
     }
 

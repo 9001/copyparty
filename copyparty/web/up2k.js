@@ -478,8 +478,7 @@ function U2pvis(act, btns, uc) {
         if (as_html)
             return '<tr id="f' + nfile + '">' + ret + '</tr>';
 
-        var obj = mknod('tr');
-        obj.setAttribute('id', 'f' + nfile);
+        var obj = mknod('tr', 'f' + nfile);
         obj.innerHTML = ret;
         return obj;
     };
@@ -2198,11 +2197,6 @@ function up2k_init(subtle) {
 
         bcfg_set('u2sort', uc.az = u2sort.indexOf('n') + 1);
         localStorage.removeItem('u2sort');
-    }
-
-    function nop(e) {
-        ev(e);
-        this.click();
     }
 
     ebi('nthread_add').onclick = function (e) {

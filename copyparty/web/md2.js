@@ -16,8 +16,7 @@ var dom_sbs = ebi('sbs');
 var dom_nsbs = ebi('nsbs');
 var dom_tbox = ebi('toolsbox');
 var dom_ref = (function () {
-    var d = mknod('div');
-    d.setAttribute('id', 'mtr');
+    var d = mknod('div', 'mtr');
     dom_swrap.appendChild(d);
     d = ebi('mtr');
     // hide behind the textarea (offsetTop is not computed if display:none)

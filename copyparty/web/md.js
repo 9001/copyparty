@@ -173,8 +173,7 @@ md_plug_err = function (ex, js) {
             o.textContent = lns[ln - 1];
         }
     }
-    var errbox = mknod('div');
-    errbox.setAttribute('id', 'md_errbox');
+    var errbox = mknod('div', 'md_errbox');
     errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
     errbox.textContent = msg;
     errbox.onclick = function () {

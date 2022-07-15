@@ -13,8 +13,7 @@ audio_eq.apply = function () {
 
     var can = ebi('fft_can');
     if (!can) {
-        can = mknod('canvas');
-        can.setAttribute('id', 'fft_can');
+        can = mknod('canvas', 'fft_can');
         can.style.cssText = 'position:absolute;left:0;bottom:5em;width:' + w + 'px;height:' + h + 'px;z-index:9001';
         document.body.appendChild(can);
         can.width = w;

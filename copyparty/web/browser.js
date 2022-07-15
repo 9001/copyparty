@@ -2415,8 +2415,7 @@ function eval_hash() {
 			};
 		})(a);
 
-	var d = mknod('div');
-	d.setAttribute('id', 'acc_info');
+	var d = mknod('div', 'acc_info');
 	document.body.insertBefore(d, ebi('ops'));
 })();
 
@@ -2681,8 +2680,7 @@ var fileman = (function () {
 
 		var rui = ebi('rui');
 		if (!rui) {
-			rui = mknod('div');
-			rui.setAttribute('id', 'rui');
+			rui = mknod('div', 'rui');
 			document.body.appendChild(rui);
 		}
 
@@ -3165,10 +3163,9 @@ var showfile = (function () {
 			return;
 
 		qsr('#prism_css');
-		var el = mknod('link');
+		var el = mknod('link', 'prism_css');
 		el.rel = 'stylesheet';
 		el.href = '/.cpr/deps/prism' + (light ? '' : 'd') + '.css';
-		el.setAttribute('id', 'prism_css');
 		document.head.appendChild(el);
 	};
 
@@ -3282,8 +3279,7 @@ var showfile = (function () {
 			fun = function (el) { };
 
 		qsr('#doc');
-		var el = mknod('pre');
-		el.setAttribute('id', 'doc');
+		var el = mknod('pre', 'doc');
 		el.setAttribute('tabindex', '0');
 		clmod(ebi('wrap'), 'doc', !is_md);
 		if (is_md) {
@@ -3311,9 +3307,8 @@ var showfile = (function () {
 		hfun(get_evpath() + '?doc=' + url.split('/').pop());
 
 		qsr('#docname');
-		el = mknod('span');
+		el = mknod('span', 'docname');
 		el.textContent = tname;
-		el.setAttribute('id', 'docname');
 		ebi('path').appendChild(el);
 
 		r.updtree();
@@ -3448,9 +3443,8 @@ var showfile = (function () {
 
 var thegrid = (function () {
 	var lfiles = ebi('files'),
-		gfiles = mknod('div');
+		gfiles = mknod('div', 'gfiles');
 
-	gfiles.setAttribute('id', 'gfiles');
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
