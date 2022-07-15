@@ -364,11 +364,12 @@ def utime(top):
 def confirm(rv):
     msg()
     msg("retcode", rv if rv else traceback.format_exc())
-    msg("*** hit enter to exit ***")
-    try:
-        raw_input() if PY2 else input()
-    except:
-        pass
+    if WINDOWS:
+        msg("*** hit enter to exit ***")
+        try:
+            raw_input() if PY2 else input()
+        except:
+            pass
 
     sys.exit(rv or 1)
 
