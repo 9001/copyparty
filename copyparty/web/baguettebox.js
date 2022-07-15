@@ -939,6 +939,7 @@ window.baguetteBox = (function () {
         else
             timer.rm(rotn);
 
+        var ctime = 0;
         el.onclick = function (e) {
             var rc = e.target.getBoundingClientRect(),
                 x = e.clientX - rc.left,
@@ -953,6 +954,11 @@ window.baguetteBox = (function () {
             clmod(ebi('bbox-btns'), 'off', 't');
             clmod(btnPrev, 'off', 't');
             clmod(btnNext, 'off', 't');
+
+            if (Date.now() - ctime <= 500)
+                tglfull();
+
+            ctime = Date.now();
         };
 
         var prev = QS('.full-image.vis');
