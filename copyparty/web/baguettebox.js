@@ -940,7 +940,7 @@ window.baguetteBox = (function () {
             timer.rm(rotn);
 
         var ctime = 0;
-        el.onclick = function (e) {
+        el.onclick = v ? null : function (e) {
             var rc = e.target.getBoundingClientRect(),
                 x = e.clientX - rc.left,
                 fx = x / (rc.right - rc.left);
