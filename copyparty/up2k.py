@@ -2515,6 +2515,9 @@ class Up2k(object):
                 except:
                     pass
 
+        if self.args.nw:
+            return
+
         path = os.path.join(histpath, "up2k.snap")
         if not reg:
             if ptop not in self.snap_prev or self.snap_prev[ptop] is not None:

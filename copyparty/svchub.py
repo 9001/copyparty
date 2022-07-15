@@ -358,6 +358,9 @@ class SvcHub(object):
 
             print("nailed it", end="")
             ret = self.retcode
+        except:
+            print("\033[31m[ error during shutdown ]\n{}\033[0m".format(min_ex()))
+            raise
         finally:
             if self.args.wintitle:
                 print("\033]0;\033\\", file=sys.stderr, end="")

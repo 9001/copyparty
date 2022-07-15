@@ -136,7 +136,7 @@ function up2k_flagbus() {
 }
 
 
-function U2pvis(act, btns, uc) {
+function U2pvis(act, btns, uc, st) {
     var r = this;
     r.act = act;
     r.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
@@ -145,6 +145,8 @@ function U2pvis(act, btns, uc) {
     r.tail = -1;
     r.wsz = 3;
     r.npotato = 99;
+    r.modn = 0;
+    r.modv = 0;
 
     var markup = {
         '404': '<span class="err">404</span>',
@@ -347,7 +349,10 @@ function U2pvis(act, btns, uc) {
     };
 
     r.bzw = function () {
-        var first = QS('#u2tab>tbody>tr:first-child');
+        var mod = 0,
+            t0 = Date.now(),
+            first = QS('#u2tab>tbody>tr:first-child');
+
         if (!first)
             return;
 
@@ -357,17 +362,67 @@ function U2pvis(act, btns, uc) {
 
         while (r.head - first > r.wsz) {
             qsr('#f' + (first++));
+            mod++;
         }
-        while (last - r.tail < r.wsz && last < r.tab.length - 2) {
+        while (last - r.tail < r.wsz && last < r.tab.length - 1) {
             var obj = ebi('f' + (++last));
-            if (!obj)
+            if (!obj) {
                 r.addrow(last);
+                mod++;
+            }
+        }
+        if (mod && r.modn < 200 && ebi('repl').offsetTop) {
+            if (++r.modn >= 10)
+                r.modv += Date.now() - t0;
+
+            if (r.modn >= 200) {
+                var d = r.modv / (r.modn - 10);
+                console.log('bzw:', d, ', tab:' + r.tab.length);
+
+                if (d >= 1.5 && r.tab.length >= 1000 && st.bytes.total / r.tab.length < 1024 * 1024 * 4)
+                    r.go_potato();
+            }
         }
     };
 
+    r.potatolabels = function () {
+        var ode = ebi('u2depotato'),
+            oen = ebi('u2enpotato');
+
+        if (!ode)
+            return;
+
+        ode.style.display = uc.potato ? '' : 'none';
+        oen.style.display = uc.potato ? 'none' : '';
+    }
+
     r.potato = function () {
+        ebi('u2tabw').style.minHeight = '';
         QS('#u2cards a[act="bz"]').click();
         timer[uc.potato ? "add" : "rm"](draw_potato);
+        r.potatolabels();
+    };
+
+    r.go_potato = function () {
+        r.go_potato = noop;
+        var ode = mknod('div', 'u2depotato'),
+            oen = mknod('div', 'u2enpotato'),
+            u2f = ebi('u2foot'),
+            btn = ebi('potato');
+
+        ode.innerHTML = L.u_depot;
+        oen.innerHTML = L.u_enpot;
+
+        if (sread('potato') === null) {
+            btn.click();
+            toast.inf(30, L.u_gotpot);
+            localStorage.removeItem('potato');
+        }
+
+        u2f.appendChild(ode);
+        u2f.appendChild(oen);
+        ode.onclick = oen.onclick = btn.onclick;
+        r.potatolabels();
     };
 
     function draw_potato() {
@@ -582,7 +637,7 @@ function Donut(uc, st) {
             v = pos() - r.base,
             ofs = o - o * v / t;
 
-        if (!uc.potato || ++r.dc >= 2) {
+        if (!uc.potato || ++r.dc >= 4) {
             el.style.strokeDashoffset = ofs;
             r.dc = 0;
         }
@@ -661,7 +716,10 @@ function up2k_init(subtle) {
                 m = L.u_ancient;
                 setmsg('');
             }
-            ebi('u2foot').innerHTML = '<big>' + m + '</big>';
+            qsr('#u2depmsg');
+            var o = mknod('div', 'u2depmsg');
+            o.innerHTML = m;
+            ebi('u2foot').appendChild(o);
         }
         loading_deps = true;
     }
@@ -737,7 +795,9 @@ function up2k_init(subtle) {
             "hashing": 0,
             "uploading": 0,
             "busy": 0
-        }
+        },
+        "modv": 0,
+        "modn": 0
     };
 
     function push_t(arr, t) {
@@ -749,7 +809,7 @@ function up2k_init(subtle) {
             });
     }
 
-    var pvis = new U2pvis("bz", '#u2cards', uc),
+    var pvis = new U2pvis("bz", '#u2cards', uc, st),
         donut = new Donut(uc, st);
 
     r.ui = pvis;
@@ -1148,7 +1208,7 @@ function up2k_init(subtle) {
     }
     more_one_file();
 
-    var etaref = 0, etaskip = 0, utw_minh = 0;
+    var etaref = 0, etaskip = 0, utw_minh = 0, utw_read = 0;
     function etafun() {
         var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,
             nsend = st.busy.upload.length + st.todo.upload.length,
@@ -1160,6 +1220,11 @@ function up2k_init(subtle) {
             td = 0.05;
 
         //ebi('acc_info').innerHTML = humantime(st.time.busy) + ' ' + f2f(now / 1000, 1);
+
+        if (++utw_read >= 20) {
+            utw_read = 0;
+            utw_minh = parseInt(ebi('u2tabw').style.minHeight || '0');
+        }
 
         var minh = QS('#op_up2k.act') && st.is_busy ? Math.max(utw_minh, ebi('u2tab').offsetHeight + 32) : 0;
         if (utw_minh < minh || !utw_minh) {
@@ -1423,6 +1488,20 @@ function up2k_init(subtle) {
                     !st.busy.hash.length) {
                     exec_hash();
                     mou_ikkai = true;
+                }
+
+                if (is_busy && st.modn < 100) {
+                    var t0 = Date.now() + (ebi('repl').offsetTop ? 0 : 0);
+
+                    if (++st.modn >= 10)
+                        st.modv += Date.now() - t0;
+
+                    if (st.modn >= 100) {
+                        var d = st.modv / (st.modn - 10);
+                        console.log('tsk:', d);
+                        if (d >= 1.2)
+                            pvis.go_potato();
+                    }
                 }
 
                 if (!mou_ikkai || crashed)
@@ -2103,21 +2182,19 @@ function up2k_init(subtle) {
     }
 
     function draw_turbo() {
-        var msg = uc.fsearch ? L.u_ts : L.u_tu,
-            omsg = uc.fsearch ? L.u_tu : L.u_ts,
-            html = ebi('u2foot').innerHTML,
-            ohtml = html;
+        var msg = (turbolvl || !uc.turbo) ? null : uc.fsearch ? L.u_ts : L.u_tu,
+            html = ebi('u2foot').innerHTML;
 
-        if (turbolvl || !uc.turbo)
-            msg = null;
+        if (msg && html.indexOf(msg) + 1)
+            return;
 
-        if (msg && html.indexOf(msg) === -1)
-            html = html.replace(omsg, '') + msg;
-        else if (!msg)
-            html = html.replace(L.u_tu, '').replace(L.u_ts, '');
+        qsr('#u2turbomsg');
+        if (!msg)
+            return;
 
-        if (html !== ohtml)
-            ebi('u2foot').innerHTML = html;
+        var o = mknod('div', 'u2turbomsg');
+        o.innerHTML = msg;
+        ebi('u2foot').appendChild(o);
     }
     draw_turbo();
 

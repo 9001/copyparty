@@ -18,7 +18,7 @@ var u2min = `
 <style>
 
 #ops, #path, #tree, #files, #epi+div+h2,
-#u2conf td.c+.c, #u2cards, #u2foot, #srch_dz, #srch_zd {
+#u2conf td.c+.c, #u2cards, #srch_dz, #srch_zd {
   display: none !important;
 }
 #u2conf {margin:5em auto 0 auto !important}

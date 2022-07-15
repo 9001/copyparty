@@ -48,10 +48,10 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 ## time between first and last upload
 
 python3 -um copyparty -nw -v srv::rw -i 127.0.0.1 2>&1 | tee log 
-cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} !a{a=t;sa=s} {b=t;sb=s} END {print b-a,sa,sb}'
+cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} t<p{t+=86400} !a{a=t;sa=s} {b=t;sb=s} END {print b-a,sa,sb}'
 
 # or if the client youre measuring dies for ~15sec every once ina while and you wanna filter those out,
-cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} !p{a=t;p=t;r=0;next} t-p>1{printf "%.3f += %.3f - %.3f  (%.3f)  # %.3f -> %.3f\n",r,p,a,p-a,p,t;r+=p-a;a=t} {p=t} END {print r+p-a}'
+cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} t<p{t+=86400} !p{a=t;p=t;r=0;next} t-p>1{printf "%.3f += %.3f - %.3f  (%.3f)  # %.3f -> %.3f\n",r,p,a,p-a,p,t;r+=p-a;a=t} {p=t} END {print r+p-a}'
 
 
 ##

@@ -288,6 +288,9 @@ var Ls = {
 		"u_https2": "switch to https",
 		"u_https3": "for much better performance",
 		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
+		"u_enpot": 'switch to <a href="#">potato UI</a> (may improve upload speed)',
+		"u_depot": 'switch to <a href="#">fancy UI</a> (may reduce upload speed)',
+		"u_gotpot": 'switching to the potato UI for improved upload speed,\n\nfeel free to disagree and switch back!',
 		"u_ever": "this is the basic uploader; up2k needs at least<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": 'this is the basic uploader; <a href="#" id="u2yea">up2k</a> is better',
 		"u_ewrite": 'you do not have write-access to this folder',
@@ -616,6 +619,9 @@ var Ls = {
 		"u_https2": "bytte til https",
 		"u_https3": "for mye høyere hastighet",
 		"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
+		"u_enpot": 'bytt til <a href="#">enkelt UI</a> (gir sannsynlig raskere opplastning)',
+		"u_depot": 'bytt til <a href="#">snæsent UI</a> (gir sannsynlig tregere opplastning)',
+		"u_gotpot": 'byttet til et enklere UI for å laste opp raskere,\n\ndu kan gjerne bytte tilbake altså!',
 		"u_ever": "dette er den primitive opplasteren; up2k krever minst:<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": 'dette er den primitive opplasteren; <a href="#" id="u2yea">up2k</a> er bedre',
 		"u_ewrite": 'du har ikke skrivetilgang i denne mappen',
@@ -785,7 +791,7 @@ ebi('op_up2k').innerHTML = (
 	'</table><div id="u2mu"></div></div>\n' +
 
 	'<p id="u2flagblock"><b>' + L.ul_flagblk + '</p>\n' +
-	'<p id="u2foot"></p>'
+	'<div id="u2foot"></div>'
 );
 
 

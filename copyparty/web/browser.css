@@ -2454,11 +2454,11 @@ html.b #u2conf a.b:hover {
 	color: var(--fg-max);
 	font-style: italic;
 	text-align: center;
-	font-size: .9em;
-	margin: 1em 0;
+	font-size: 1.2em;
+	margin: .8em 0;
 }
 #u2foot .warn {
-	font-size: 1.3em;
+	font-size: 1.2em;
 	padding: .5em .8em;
 	margin: 1em -.6em;
 	border-width: .1em 0;
@@ -2471,6 +2471,9 @@ html.b #u2conf a.b:hover {
 	color: #999;
 	font-size: .9em;
 	font-weight: normal;
+}
+#u2foot>*+* {
+	margin-top: 1.5em;
 }
 .prog {
 	font-family: 'scp', monospace, monospace;
