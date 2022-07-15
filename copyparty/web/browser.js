@@ -2206,6 +2206,12 @@ function play(tid, is_ev, seek) {
 		thegrid.loadsel();
 
 	try {
+		if (actx.state == 'suspended')
+			actx.resume();
+	}
+	catch (ex) { }
+
+	try {
 		mp.au.play();
 		if (mp.au.paused)
 			autoplay_blocked(seek);
