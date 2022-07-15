@@ -1625,7 +1625,7 @@ function up2k_init(subtle) {
                 hash_calc(nch, e.target.result);
             }
             reader.onload = function (e) {
-                try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
+                try { orz(e); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
             };
             reader.onerror = function () {
                 var err = reader.error + '';
@@ -1658,7 +1658,7 @@ function up2k_init(subtle) {
         var hash_calc = function (nch, buf) {
             while (segm_next());
 
-            var hash_done = function (hashbuf) {
+            var orz = function (hashbuf) {
                 var hslice = new Uint8Array(hashbuf).subarray(0, 33),
                     b64str = buf2b64(hslice);
 
@@ -1682,6 +1682,10 @@ function up2k_init(subtle) {
                 apop(st.busy.hash, t);
                 st.todo.handshake.push(t);
                 tasker();
+            };
+
+            var hash_done = function (hashbuf) {
+                try { orz(hashbuf); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
             };
 
             if (subtle)
@@ -1751,7 +1755,7 @@ function up2k_init(subtle) {
             tasker();
         };
         xhr.onload = function (e) {
-            try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
+            try { orz(e); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
         };
 
         xhr.open('HEAD', t.purl + uricom_enc(t.name) + '?raw', true);
@@ -1965,7 +1969,7 @@ function up2k_init(subtle) {
             }
         }
         xhr.onload = function (e) {
-            try { orz(e); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
+            try { orz(e); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
         };
 
         var req = {
@@ -2060,7 +2064,7 @@ function up2k_init(subtle) {
                 pvis.prog(t, npart, xev.loaded);
             };
             xhr.onload = function (xev) {
-                try { orz(xhr); } catch (ex) { vis_exh(ex + '', '', '', '', ex); }
+                try { orz(xhr); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
             };
             xhr.onerror = function (xev) {
                 if (crashed)
