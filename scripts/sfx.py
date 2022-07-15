@@ -224,11 +224,15 @@ def unpack():
     """unpacks the tar yielded by `data`"""
     name = "pe-copyparty"
     tag = "v" + str(STAMP)
-    withpid = "{}.{}".format(name, os.getpid())
     top = tempfile.gettempdir()
     opj = os.path.join
     final = opj(top, name)
-    mine = opj(top, withpid)
+    for suf in range(0, 9001):
+        withpid = "{}.{}.{}".format(name, os.getpid(), suf)
+        mine = opj(top, withpid)
+        if not os.path.exists(mine):
+            break
+
     tar = opj(mine, "tar")
 
     try:
