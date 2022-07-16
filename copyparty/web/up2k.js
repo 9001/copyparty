@@ -141,6 +141,7 @@ function U2pvis(act, btns, uc, st) {
     r.act = act;
     r.ctr = { "ok": 0, "ng": 0, "bz": 0, "q": 0 };
     r.tab = [];
+    r.hq = {};
     r.head = 0;
     r.tail = -1;
     r.wsz = 3;
@@ -203,11 +204,14 @@ function U2pvis(act, btns, uc, st) {
         if (!r.is_act(fo.in))
             return;
 
-        var obj = ebi('f{0}{1}'.format(nfile, field.slice(1)));
+        var k = 'f{0}{1}'.format(nfile, field.slice(1)),
+            obj = ebi(k);
+
         obj.innerHTML = field == 'ht' ? (markup[html] || html) : html;
         if (field == 'hp') {
             obj.style.color = '';
             obj.style.background = '';
+            delete r.hq[nfile];
         }
     };
 
@@ -251,12 +255,9 @@ function U2pvis(act, btns, uc, st) {
         if (!r.is_act(fo.in))
             return;
 
-        var obj = ebi('f{0}p'.format(fobj.n)),
-            o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
+        var o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
 
-        obj.innerHTML = fo.hp;
-        obj.style.color = '#fff';
-        obj.style.background = 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #222 ' + o3 + '%, #222 99%, #555)';
+        r.hq[fobj.n] = [fo.hp, '#fff', 'linear-gradient(90deg, #025, #06a ' + o1 + '%, #09d ' + o2 + '%, #222 ' + o3 + '%, #222 99%, #555)'];
     };
 
     r.prog = function (fobj, nchunk, cbd) {
@@ -311,9 +312,7 @@ function U2pvis(act, btns, uc, st) {
             throw new Error('see console');
         }
 
-        obj.innerHTML = fo.hp;
-        obj.style.color = '#fff';
-        obj.style.background = 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #222 ' + o3 + '%, #222 99%, #555)';
+        r.hq[fobj.n] = [fo.hp, '#fff', 'linear-gradient(90deg, #050, #270 ' + o1 + '%, #4b0 ' + o2 + '%, #222 ' + o3 + '%, #222 99%, #555)'];
     };
 
     r.move = function (nfile, newcat) {
@@ -400,6 +399,7 @@ function U2pvis(act, btns, uc, st) {
         ebi('u2tabw').style.minHeight = '';
         QS('#u2cards a[act="bz"]').click();
         timer[uc.potato ? "add" : "rm"](draw_potato);
+        timer[uc.potato ? "rm" : "add"](apply_html);
         r.potatolabels();
     };
 
@@ -450,6 +450,30 @@ function U2pvis(act, btns, uc, st) {
 
         r.hpotato = html;
         ebi('u2mu').innerHTML = html;
+    }
+
+    function apply_html() {
+        var oq = {}, n = 0;
+        for (var k in r.hq) {
+            var o = ebi('f{0}p'.format(k));
+            if (!o)
+                continue;
+
+            oq[k] = o;
+            n++;
+        }
+        if (!n)
+            return;
+
+        for (var k in oq) {
+            var o = oq[k],
+                v = r.hq[k];
+
+            o.innerHTML = v[0];
+            o.style.color = v[1];
+            o.style.background = v[2];
+        }
+        r.hq = {};
     }
 
     r.drawcard = function (cat) {
@@ -928,6 +952,8 @@ function up2k_init(subtle) {
         if (err)
             return modal.alert('sorry, ' + err);
 
+        toast.inf(0, 'Scanning files...');
+
         if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
             tgl_fsearch();
 
@@ -1075,6 +1101,9 @@ function up2k_init(subtle) {
     }
 
     function gotallfiles(good_files, nil_files, bad_files) {
+        if (toast.txt == 'Scanning files...')
+            toast.hide();
+
         if (uc.fsearch && !uc.turbo)
             nil_files = [];
 
