@@ -393,7 +393,7 @@ function U2pvis(act, btns, uc, st) {
                 // efficiency estimates;
                 // ir: 5=16% 4=50%,30% 27=100%
                 // ipu: 2.7=16% 2=30% 1.6=50% 1.8=100% (ng for big files)
-                if (ir <= 9 && r.tab.length >= 1000 && r.tab[Math.floor(r.tab.length / 3)].bt <= 1024 * 1024 * 4)
+                if (ipu >= 1.5 && ir <= 9 && r.tab.length >= 1000 && r.tab[Math.floor(r.tab.length / 3)].bt <= 1024 * 1024 * 4)
                     r.go_potato();
             }
         }
@@ -1279,11 +1279,11 @@ function up2k_init(subtle) {
         }
 
         if (!nhash)
-            ebi('u2etah').innerHTML = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr["ok"] + pvis.ctr["ng"]);
+            ebi('u2etah').innerHTML = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr.ok + pvis.ctr.ng);
 
         if (!nsend && !nhash)
             ebi('u2etau').innerHTML = ebi('u2etat').innerHTML = (
-                L.u_etadone.format(humansize(st.bytes.uploaded), pvis.ctr["ok"] + pvis.ctr["ng"]));
+                L.u_etadone.format(humansize(st.bytes.uploaded), pvis.ctr.ok + pvis.ctr.ng));
 
         if (!st.busy.hash.length && !hashing_permitted())
             nhash = 0;
@@ -1431,25 +1431,7 @@ function up2k_init(subtle) {
                     donut.on(is_busy);
 
                     if (!is_busy) {
-                        var sr = uc.fsearch,
-                            ok = pvis.ctr["ok"],
-                            ng = pvis.ctr["ng"],
-                            t = uc.ask_up ? 0 : 10;
-
-                        if (ok && ng)
-                            toast.warn(t, (sr ? L.ur_sm : L.ur_um).format(ok, ng));
-                        else if (ok > 1)
-                            toast.ok(t, (sr ? L.ur_aso : L.ur_auo).format(ok));
-                        else if (ok)
-                            toast.ok(t, sr ? L.ur_1so : L.ur_1uo);
-                        else if (ng > 1)
-                            toast.err(t, (sr ? L.ur_asn : L.ur_aun).format(ng));
-                        else if (ng)
-                            toast.err(t, sr ? L.ur_1sn : L.ur_1un);
-
-                        timer.rm(etafun);
-                        timer.rm(donut.do);
-                        utw_minh = 0;
+                        uptoast();
                     }
                     else {
                         timer.add(donut.do);
@@ -1547,7 +1529,7 @@ function up2k_init(subtle) {
                         // efficiency estimates;
                         // ir: 8=16% 11=60% 16=90% 24=100%
                         // ipu: 1=40% .8=60% .3=100%
-                        if (ir <= 15)
+                        if (ipu >= 0.5 && ir <= 15)
                             pvis.go_potato();
                     }
                 }
@@ -1559,6 +1541,30 @@ function up2k_init(subtle) {
         timer.add(taskerd, true);
         return taskerd;
     })();
+
+    function uptoast() {
+        var sr = uc.fsearch,
+            ok = pvis.ctr.ok,
+            ng = pvis.ctr.ng,
+            t = uc.ask_up ? 0 : 10;
+
+        console.log('toast', ok, ng);
+
+        if (ok && ng)
+            toast.warn(t, (sr ? L.ur_sm : L.ur_um).format(ok, ng));
+        else if (ok > 1)
+            toast.ok(t, (sr ? L.ur_aso : L.ur_auo).format(ok));
+        else if (ok)
+            toast.ok(t, sr ? L.ur_1so : L.ur_1uo);
+        else if (ng > 1)
+            toast.err(t, (sr ? L.ur_asn : L.ur_aun).format(ng));
+        else if (ng)
+            toast.err(t, sr ? L.ur_1sn : L.ur_1un);
+
+        timer.rm(etafun);
+        timer.rm(donut.do);
+        utw_minh = 0;
+    }
 
     function chill(t) {
         var now = Date.now();
@@ -1959,6 +1965,8 @@ function up2k_init(subtle) {
                         f2f(spd1, 2), isNaN(spd2) ? '--' : f2f(spd2, 2)));
 
                     pvis.move(t.n, 'ok');
+                    if (!pvis.ctr.bz && !pvis.ctr.q)
+                        uptoast();
                 }
                 else {
                     if (t.t_uploaded)

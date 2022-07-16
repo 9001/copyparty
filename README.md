@@ -481,6 +481,7 @@ see [up2k](#up2k) for details on how it works, or watch a [demo video](https://a
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
 * `[🏃]` analysis of other files should continue while one is uploading
+* `[🥔]` shows a simpler UI for faster uploads from slow devices
 * `[💭]` ask for confirmation before files are added to the queue
 * `[🔎]` switch between upload and [file-search](#file-search) mode
   * ignore `[🔎]` if you add files by dragging them into the browser
