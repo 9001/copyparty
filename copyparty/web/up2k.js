@@ -148,6 +148,7 @@ function U2pvis(act, btns, uc, st) {
     r.npotato = 99;
     r.modn = 0;
     r.modv = 0;
+    r.mod0 = null;
 
     var markup = {
         '404': '<span class="err">404</span>',
@@ -371,14 +372,24 @@ function U2pvis(act, btns, uc, st) {
             }
         }
         if (mod && r.modn < 200 && ebi('repl').offsetTop) {
-            if (++r.modn >= 10)
+            if (++r.modn >= 10) {
+                if (r.modn == 10)
+                    r.mod0 = Date.now();
+
                 r.modv += Date.now() - t0;
+            }
 
             if (r.modn >= 200) {
-                var d = r.modv / (r.modn - 10);
-                console.log('bzw:', d, ', tab:' + r.tab.length);
+                var n = r.modn - 10,
+                    ipu = r.modv / n,
+                    spu = (Date.now() - r.mod0) / n,
+                    ir = spu / ipu;
 
-                if (d >= 1.5 && r.tab.length >= 1000 && st.bytes.total / r.tab.length < 1024 * 1024 * 4)
+                console.log('bzw:', f2f(ipu, 2), ' spu:', f2f(spu, 2), ' ir:', f2f(ir, 2), ' tab:', r.tab.length);
+                // efficiency estimates;
+                // ir: 5=16% 4=50%,30% 27=100%
+                // ipu: 2.7=16% 2=30% 1.6=50% 1.8=100% (ng for big files)
+                if (ir <= 9 && r.tab.length >= 1000 && r.tab[Math.floor(r.tab.length / 3)].bt <= 1024 * 1024 * 4)
                     r.go_potato();
             }
         }
@@ -820,8 +831,9 @@ function up2k_init(subtle) {
             "uploading": 0,
             "busy": 0
         },
+        "modn": 0,
         "modv": 0,
-        "modn": 0
+        "mod0": null
     };
 
     function push_t(arr, t) {
@@ -1522,13 +1534,24 @@ function up2k_init(subtle) {
                 if (is_busy && st.modn < 100) {
                     var t0 = Date.now() + (ebi('repl').offsetTop ? 0 : 0);
 
-                    if (++st.modn >= 10)
+                    if (++st.modn >= 10) {
+                        if (st.modn == 10)
+                            st.mod0 = Date.now();
+
                         st.modv += Date.now() - t0;
+                    }
 
                     if (st.modn >= 100) {
-                        var d = st.modv / (st.modn - 10);
-                        console.log('tsk:', d);
-                        if (d >= 1.2)
+                        var n = st.modn - 10,
+                            ipu = st.modv / n,
+                            spu = (Date.now() - st.mod0) / n,
+                            ir = spu / ipu;
+
+                        console.log('tsk:', f2f(ipu, 2), ' spu:', f2f(spu, 2), ' ir:', f2f(ir, 2));
+                        // efficiency estimates;
+                        // ir: 8=16% 11=60% 16=90% 24=100%
+                        // ipu: 1=40% .8=60% .3=100%
+                        if (ir <= 15)
                             pvis.go_potato();
                     }
                 }
