@@ -327,6 +327,10 @@ function U2pvis(act, btns, uc, st) {
         fo.in = newcat;
         r.ctr[oldcat]--;
         r.ctr[newcat]++;
+
+        while (st.car < r.tab.length && has(['ok', 'ng'], r.tab[st.car].in))
+            st.car++;
+
         r.drawcard(oldcat);
         r.drawcard(newcat);
         if (r.is_act(newcat)) {
@@ -831,6 +835,7 @@ function up2k_init(subtle) {
             "uploading": 0,
             "busy": 0
         },
+        "car": 0,
         "modn": 0,
         "modv": 0,
         "mod0": null
@@ -1398,16 +1403,7 @@ function up2k_init(subtle) {
             running = true;
             while (true) {
                 var now = Date.now(),
-                    oldest_active = Math.min(  // gzip take the wheel
-                        st.todo.head.length ? st.todo.head[0].n : st.files.length,
-                        st.todo.hash.length ? st.todo.hash[0].n : st.files.length,
-                        st.todo.upload.length ? st.todo.upload[0].nfile : st.files.length,
-                        st.todo.handshake.length ? st.todo.handshake[0].n : st.files.length,
-                        st.busy.head.length ? st.busy.head[0].n : st.files.length,
-                        st.busy.hash.length ? st.busy.hash[0].n : st.files.length,
-                        st.busy.upload.length ? st.busy.upload[0].nfile : st.files.length,
-                        st.busy.handshake.length ? st.busy.handshake[0].n : st.files.length),
-                    is_busy = oldest_active < st.files.length;
+                    is_busy = st.car < st.files.length;
 
                 if (was_busy && !is_busy) {
                     for (var a = 0; a < st.files.length; a++) {
@@ -1506,7 +1502,7 @@ function up2k_init(subtle) {
 
                 if (st.todo.head.length &&
                     st.busy.head.length < parallel_uploads &&
-                    (!is_busy || st.todo.head[0].n - oldest_active < parallel_uploads * 2)) {
+                    (!is_busy || st.todo.head[0].n - st.car < parallel_uploads * 2)) {
                     exec_head();
                     mou_ikkai = true;
                 }
