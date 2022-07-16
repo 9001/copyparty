@@ -2244,6 +2244,7 @@ html.y #bbox-overlay figcaption a {
 	max-width: none;
 }
 #u2tab td {
+	word-wrap: break-word;
 	border: 1px solid rgba(128,128,128,0.8);
 	border-width: 0 0px 1px 0;
 	padding: .2em .3em;
@@ -2258,7 +2259,19 @@ html.y #bbox-overlay figcaption a {
 #u2tab.up.ok td:nth-child(3),
 #u2tab.up.bz td:nth-child(3),
 #u2tab.up.q  td:nth-child(3) {
-	width: 19em;
+	width: 18em;
+}
+@media (max-width: 65em) {
+	#u2tab {
+		font-size: .9em;
+	}
+}
+@media (max-width: 50em) {
+	#u2tab.up.ok td:nth-child(3),
+	#u2tab.up.bz td:nth-child(3),
+	#u2tab.up.q  td:nth-child(3) {
+		width: 16em;
+	}
 }
 #op_up2k.srch td.prog {
 	font-family: sans-serif;

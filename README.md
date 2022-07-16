@@ -1238,10 +1238,14 @@ if you want thumbnails, `apt -y install ffmpeg`
 
 ideas for context to include in bug reports
 
+in general, commandline arguments (and config file if any)
+
 if something broke during an upload (replacing FILENAME with a part of the filename that broke):
 ```
 journalctl -aS '48 hour ago' -u copyparty | grep -C10 FILENAME | tee bug.log
 ```
+
+if there's a wall of base64 in the log (thread stacks) then please include that, especially if you run into something freezing up or getting stuck, for example `OperationalError('database is locked')` -- alternatively you can visit `/?stack` to see the stacks live, so http://127.0.0.1:3923/?stack for example
 
 
 # building

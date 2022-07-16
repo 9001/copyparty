@@ -2,7 +2,9 @@
 from __future__ import print_function, unicode_literals
 
 import argparse
+import base64
 import calendar
+import gzip
 import os
 import shlex
 import signal
@@ -27,7 +29,7 @@ from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
 from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
 from .up2k import Up2k
-from .util import ansi_re, min_ex, mp, start_log_thrs, start_stackmon
+from .util import ansi_re, min_ex, mp, start_log_thrs, start_stackmon, alltrace
 
 
 class SvcHub(object):
@@ -56,6 +58,7 @@ class SvcHub(object):
 
         self.log_mutex = threading.Lock()
         self.next_day = 0
+        self.tstack = 0.0
 
         if args.sss or args.s >= 3:
             args.ss = True
@@ -500,3 +503,15 @@ class SvcHub(object):
             sck.sendall(b"READY=1")
         except:
             self.log("sd_notify", min_ex())
+
+    def log_stacks(self) -> None:
+        td = time.time() - self.tstack
+        if td < 300:
+            self.log("stacks", "cooldown {}".format(td))
+            return
+
+        self.tstack = time.time()
+        zb = alltrace().encode("utf-8", "replace")
+        zb = gzip.compress(zb)
+        zs = base64.b64encode(zb).decode("ascii")
+        self.log("stacks", zs)

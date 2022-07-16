@@ -380,12 +380,17 @@ class HttpCli(object):
                 if not self._check_nonfatal(pex, post):
                     self.keepalive = False
 
-                msg = str(ex) if pex == ex else min_ex()
+                em = str(ex)
+                msg = em if pex == ex else min_ex()
                 self.log("{}\033[0m, {}".format(msg, self.vpath), 3)
 
-                msg = "{}\r\nURL: {}\r\n".format(str(ex), self.vpath)
+                msg = "{}\r\nURL: {}\r\n".format(em, self.vpath)
                 if self.hint:
                     msg += "hint: {}\r\n".format(self.hint)
+
+                if "database is locked" in em:
+                    self.conn.hsrv.broker.say("log_stacks")
+                    msg += "hint: important info in the server log\r\n"
 
                 msg = "<pre>" + html_escape(msg)
                 self.reply(msg.encode("utf-8", "replace"), status=pex.code, volsan=True)

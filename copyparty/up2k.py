@@ -98,6 +98,7 @@ class Up2k(object):
         self.gid = 0
         self.stop = False
         self.mutex = threading.Lock()
+        self.blocked: Optional[str] = None
         self.pp: Optional[ProgressPrinter] = None
         self.rescan_cond = threading.Condition()
         self.need_rescan: set[str] = set()
@@ -192,6 +193,14 @@ class Up2k(object):
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("up2k", msg + "\033[K", c)
+
+    def _block(self, why: str) -> None:
+        self.blocked = why
+        self.log("uploads are temporarily blocked due to " + why, 3)
+
+    def _unblock(self) -> None:
+        self.blocked = None
+        self.log("uploads are now possible", 2)
 
     def get_state(self) -> str:
         mtpq: Union[int, str] = 0
@@ -416,6 +425,9 @@ class Up2k(object):
                 self.mtag = None
 
         # e2ds(a) volumes first
+        if next((zv for zv in vols if "e2ds" in zv.flags), None):
+            self._block("indexing")
+
         for vol in vols:
             if self.stop:
                 break
@@ -445,6 +457,9 @@ class Up2k(object):
             self.volstate[vol.vpath] = t
 
         # file contents verification
+        if next((zv for zv in vols if "e2v" in zv.flags), None):
+            self._block("integrity verification")
+
         for vol in vols:
             if self.stop:
                 break
@@ -467,6 +482,9 @@ class Up2k(object):
                 t = "online, idle"
 
             self.volstate[vol.vpath] = t
+
+        if self.blocked:
+            self._unblock()
 
         # open the rest + do any e2ts(a)
         needed_mutagen = False
@@ -1485,11 +1503,24 @@ class Up2k(object):
 
         cur.connection.commit()
 
+    def _job_volchk(self, cj: dict[str, Any]) -> None:
+        if not self.register_vpath(cj["ptop"], cj["vcfg"]):
+            if cj["ptop"] not in self.registry:
+                raise Pebkac(410, "location unavailable")
+
     def handle_json(self, cj: dict[str, Any]) -> dict[str, Any]:
-        with self.mutex:
-            if not self.register_vpath(cj["ptop"], cj["vcfg"]):
-                if cj["ptop"] not in self.registry:
-                    raise Pebkac(410, "location unavailable")
+        try:
+            # bit expensive; 3.9=10x 3.11=2x
+            if self.mutex.acquire(timeout=10):
+                self._job_volchk(cj)
+                self.mutex.release()
+            else:
+                t = "cannot receive uploads right now;\nserver busy with {}.\nPlease wait; the client will retry..."
+                raise Pebkac(503, t.format(self.blocked or "[unknown]"))
+        except TypeError:
+            # py2
+            with self.mutex:
+                self._job_volchk(cj)
 
         cj["name"] = sanitize_fn(cj["name"], "", [".prologue.html", ".epilogue.html"])
         cj["poke"] = time.time()

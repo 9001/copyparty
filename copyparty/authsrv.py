@@ -1107,6 +1107,7 @@ class AuthSrv(object):
 
         vfs.bubble_flags()
 
+        e2vs = []
         t = "volumes and permissions:\n"
         for zv in vfs.all_vols.values():
             if not self.warn_anonwrite:
@@ -1124,7 +1125,15 @@ class AuthSrv(object):
                 u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
                 u = u if u else "\033[36m--none--\033[0m"
                 t += "\n|  {}:  {}".format(txt, u)
+
+            if "e2v" in zv.flags and zv.axs.uwrite:
+                e2vs.append(zv.vpath or "/")
+
             t += "\n"
+
+        if e2vs:
+            t += "\n\033[33me2v enabled for the following volumes;\nuploads will be blocked until scan has finished:\n  \033[0m"
+            t += "  ".join(e2vs) + "\n"
 
         if self.warn_anonwrite and not self.args.no_voldump:
             self.log(t)
@@ -1133,7 +1142,7 @@ class AuthSrv(object):
             zv, _ = vfs.get("/", "*", False, True)
             if self.warn_anonwrite and os.getcwd() == zv.realpath:
                 self.warn_anonwrite = False
-                t = "anyone can read/write the current directory: {}\n"
+                t = "anyone can write to the current directory: {}\n"
                 self.log(t.format(zv.realpath), c=1)
         except Pebkac:
             self.warn_anonwrite = True
