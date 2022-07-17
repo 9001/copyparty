@@ -62,7 +62,7 @@ class HttpConn(object):
         self.nreq: int = 0  # mypy404
         self.nbyte: int = 0  # mypy404
         self.u2idx: Optional[U2idx] = None
-        self.log_func: Util.RootLogger = hsrv.log  # mypy404
+        self.log_func: "Util.RootLogger" = hsrv.log  # mypy404
         self.log_src: str = "httpconn"  # mypy404
         self.lf_url: Optional[Pattern[str]] = (
             re.compile(self.args.lf_url) if self.args.lf_url else None

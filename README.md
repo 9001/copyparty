@@ -695,6 +695,7 @@ if you set `--no-hash [...]` globally, you can enable hashing for specific volum
 set upload rules using volume flags,  some examples:
 
 * `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: `b`, `k`, `m`, `g`)
+* `:c,df=4g` block uploads if there would be less than 4 GiB free disk space afterwards
 * `:c,nosub` disallow uploading into subdirectories; goes well with `rotn` and `rotf`:
 * `:c,rotn=1000,2` moves uploads into subfolders, up to 1000 files in each folder before making a new one, two levels deep (must be at least 1)
 * `:c,rotf=%Y/%m/%d/%H` enforces files to be uploaded into a structure of subfolders according to that date format

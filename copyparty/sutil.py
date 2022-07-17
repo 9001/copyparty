@@ -17,7 +17,7 @@ except:
 class StreamArc(object):
     def __init__(
         self,
-        log: NamedLogger,
+        log: "NamedLogger",
         fgen: Generator[dict[str, Any], None, None],
         **kwargs: Any
     ):

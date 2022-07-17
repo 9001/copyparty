@@ -248,7 +248,7 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
 
 
 class MTag(object):
-    def __init__(self, log_func: RootLogger, args: argparse.Namespace) -> None:
+    def __init__(self, log_func: "RootLogger", args: argparse.Namespace) -> None:
         self.log_func = log_func
         self.args = args
         self.usable = True

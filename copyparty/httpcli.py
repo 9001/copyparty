@@ -24,12 +24,7 @@ try:
 except:
     pass
 
-try:
-    import ctypes
-except:
-    pass
-
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS, E, unicode
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E, unicode
 from .authsrv import VFS  # typechk
 from .bos import bos
 from .star import StreamTar
@@ -48,6 +43,7 @@ from .util import (
     fsenc,
     gen_filekey,
     gencookie,
+    get_df,
     get_spd,
     guess_mime,
     gzip_orig_sz,
@@ -1294,7 +1290,12 @@ class HttpCli(object):
                     lim.chk_nup(self.ip)
 
                 try:
-                    max_sz = lim.smax if lim else 0
+                    max_sz = 0
+                    if lim:
+                        v1 = lim.smax
+                        v2 = lim.dfv - lim.dfl
+                        max_sz = min(v1, v2) if v1 and v2 else v1 or v2
+
                     with ren_open(tnam, "wb", 512 * 1024, **open_args) as zfw:
                         f, tnam = zfw["orz"]
                         tabspath = os.path.join(fdir, tnam)
@@ -1309,6 +1310,7 @@ class HttpCli(object):
                         lim.nup(self.ip)
                         lim.bup(self.ip, sz)
                         try:
+                            lim.chk_df(tabspath, sz, True)
                             lim.chk_sz(sz)
                             lim.chk_bup(self.ip)
                             lim.chk_nup(self.ip)
@@ -2322,26 +2324,14 @@ class HttpCli(object):
         except:
             self.log("#wow #whoa")
 
-        try:
-            # some fuses misbehave
-            if not self.args.nid:
-                if WINDOWS:
-                    try:
-                        bfree = ctypes.c_ulonglong(0)
-                        ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
-                            ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
-                        )
-                        srv_info.append(humansize(bfree.value) + " free")
-                    except:
-                        pass
-                else:
-                    sv = os.statvfs(fsenc(abspath))
-                    free = humansize(sv.f_frsize * sv.f_bfree, True)
-                    total = humansize(sv.f_frsize * sv.f_blocks, True)
-
-                    srv_info.append("{} free of {}".format(free, total))
-        except:
-            pass
+        if not self.args.nid:
+            free, total = get_df(abspath)
+            if total is not None:
+                h1 = humansize(free or 0)
+                h2 = humansize(total)
+                srv_info.append("{} free of {}".format(h1, h2))
+            elif free is not None:
+                srv_info.append(humansize(free, True) + " free")
 
         srv_infot = "</span> // <span>".join(srv_info)
 

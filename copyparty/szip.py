@@ -218,7 +218,7 @@ def gen_ecdr64_loc(ecdr64_pos: int) -> bytes:
 class StreamZip(StreamArc):
     def __init__(
         self,
-        log: NamedLogger,
+        log: "NamedLogger",
         fgen: Generator[dict[str, Any], None, None],
         utf8: bool = False,
         pre_crc: bool = False,

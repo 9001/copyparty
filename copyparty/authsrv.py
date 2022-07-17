@@ -20,6 +20,8 @@ from .util import (
     Pebkac,
     absreal,
     fsenc,
+    get_df,
+    humansize,
     relchk,
     statdir,
     uncyg,
@@ -72,15 +74,23 @@ class AXS(object):
 
 
 class Lim(object):
-    def __init__(self) -> None:
+    def __init__(self, log_func: Optional["RootLogger"]) -> None:
+        self.log_func = log_func
+
+        self.reg: Optional[dict[str, dict[str, Any]]] = None  # up2k registry
+
         self.nups: dict[str, list[float]] = {}  # num tracker
         self.bups: dict[str, list[tuple[float, int]]] = {}  # byte tracker list
         self.bupc: dict[str, int] = {}  # byte tracker cache
 
         self.nosub = False  # disallow subdirectories
 
-        self.smin = -1  # filesize min
-        self.smax = -1  # filesize max
+        self.dfl = 0  # free disk space limit
+        self.dft = 0  # last-measured time
+        self.dfv: Optional[int] = 0  # currently free
+
+        self.smin = 0  # filesize min
+        self.smax = 0  # filesize max
 
         self.bwin = 0  # bytes window
         self.bmax = 0  # bytes max
@@ -92,18 +102,34 @@ class Lim(object):
         self.rotf = ""  # rot datefmt
         self.rot_re = re.compile("")  # rotf check
 
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
+        if self.log_func:
+            self.log_func("up-lim", msg, c)
+
     def set_rotf(self, fmt: str) -> None:
         self.rotf = fmt
         r = re.escape(fmt).replace("%Y", "[0-9]{4}").replace("%j", "[0-9]{3}")
         r = re.sub("%[mdHMSWU]", "[0-9]{2}", r)
         self.rot_re = re.compile("(^|/)" + r + "$")
 
-    def all(self, ip: str, rem: str, sz: float, abspath: str) -> tuple[str, str]:
+    def all(
+        self,
+        ip: str,
+        rem: str,
+        sz: int,
+        abspath: str,
+        reg: Optional[dict[str, dict[str, Any]]] = None,
+    ) -> tuple[str, str]:
+        if reg is not None and self.reg is None:
+            self.reg = reg
+            self.dft = 0
+
         self.chk_nup(ip)
         self.chk_bup(ip)
         self.chk_rem(rem)
         if sz != -1:
             self.chk_sz(sz)
+            self.chk_df(abspath, sz)  # side effects; keep last-ish
 
         ap2, vp2 = self.rot(abspath)
         if abspath == ap2:
@@ -111,12 +137,32 @@ class Lim(object):
 
         return ap2, ("{}/{}".format(rem, vp2) if rem else vp2)
 
-    def chk_sz(self, sz: float) -> None:
-        if self.smin != -1 and sz < self.smin:
+    def chk_sz(self, sz: int) -> None:
+        if sz < self.smin:
             raise Pebkac(400, "file too small")
 
-        if self.smax != -1 and sz > self.smax:
+        if self.smax and sz > self.smax:
             raise Pebkac(400, "file too big")
+
+    def chk_df(self, abspath: str, sz: int, already_written: bool = False) -> None:
+        if not self.dfl:
+            return
+
+        if self.dft < time.time():
+            self.dft = int(time.time()) + 300
+            self.dfv = get_df(abspath)[0]
+            for j in list(self.reg.values()) if self.reg else []:
+                self.dfv -= int(j["size"] / len(j["hash"]) * len(j["need"]))
+
+            if already_written:
+                sz = 0
+
+        if self.dfv - sz < self.dfl:
+            self.dft = min(self.dft, int(time.time()) + 10)
+            t = "server HDD is full; {} free, need {}"
+            raise Pebkac(500, t.format(humansize(self.dfv - self.dfl), humansize(sz)))
+
+        self.dfv -= int(sz)
 
     def chk_rem(self, rem: str) -> None:
         if self.nosub and rem:
@@ -226,7 +272,7 @@ class VFS(object):
 
     def __init__(
         self,
-        log: Optional[RootLogger],
+        log: Optional["RootLogger"],
         realpath: str,
         vpath: str,
         axs: AXS,
@@ -569,7 +615,7 @@ class AuthSrv(object):
     def __init__(
         self,
         args: argparse.Namespace,
-        log_func: Optional[RootLogger],
+        log_func: Optional["RootLogger"],
         warn_anonwrite: bool = True,
     ) -> None:
         self.args = args
@@ -917,12 +963,19 @@ class AuthSrv(object):
         vfs.histtab = {zv.realpath: zv.histpath for zv in vfs.all_vols.values()}
 
         for vol in vfs.all_vols.values():
-            lim = Lim()
+            lim = Lim(self.log_func)
             use = False
 
             if vol.flags.get("nosub"):
                 use = True
                 lim.nosub = True
+
+            zs = vol.flags.get("df") or (
+                "{}g".format(self.args.df) if self.args.df else ""
+            )
+            if zs:
+                use = True
+                lim.dfl = unhumanize(zs)
 
             zs = vol.flags.get("sz")
             if zs:
@@ -1126,7 +1179,7 @@ class AuthSrv(object):
                 u = u if u else "\033[36m--none--\033[0m"
                 t += "\n|  {}:  {}".format(txt, u)
 
-            if "e2v" in zv.flags and zv.axs.uwrite:
+            if "e2v" in zv.flags:
                 e2vs.append(zv.vpath or "/")
 
             t += "\n"

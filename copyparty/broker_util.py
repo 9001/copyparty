@@ -42,7 +42,7 @@ class BrokerCli(object):
     """
 
     def __init__(self) -> None:
-        self.log: RootLogger = None
+        self.log: "RootLogger" = None
         self.args: argparse.Namespace = None
         self.asrv: AuthSrv = None
         self.httpsrv: "HttpSrv" = None

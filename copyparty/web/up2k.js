@@ -2011,6 +2011,9 @@ function up2k_init(subtle) {
                         t.want_recheck = true;
                     }
                 }
+                if (rsp.indexOf('server HDD is full') + 1)
+                    return toast.err(0, L.u_ehsdf + "\n\n" + rsp.replace(/.*; /, ''));
+
                 if (err != "") {
                     pvis.seth(t.n, 1, "ERROR");
                     pvis.seth(t.n, 2, err);

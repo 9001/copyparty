@@ -25,6 +25,11 @@ from .__init__ import ANYWIN, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .stolen import surrogateescape
 
 try:
+    import ctypes
+except:
+    pass
+
+try:
     HAVE_SQLITE3 = True
     import sqlite3  # pylint: disable=unused-import  # typechk
 except:
@@ -243,7 +248,7 @@ class _Unrecv(object):
     undo any number of socket recv ops
     """
 
-    def __init__(self, s: socket.socket, log: Optional[NamedLogger]) -> None:
+    def __init__(self, s: socket.socket, log: Optional["NamedLogger"]) -> None:
         self.s = s
         self.log = log
         self.buf: bytes = b""
@@ -287,7 +292,7 @@ class _LUnrecv(object):
     with expensive debug logging
     """
 
-    def __init__(self, s: socket.socket, log: Optional[NamedLogger]) -> None:
+    def __init__(self, s: socket.socket, log: Optional["NamedLogger"]) -> None:
         self.s = s
         self.log = log
         self.buf = b""
@@ -662,7 +667,9 @@ def ren_open(
 
 
 class MultipartParser(object):
-    def __init__(self, log_func: NamedLogger, sr: Unrecv, http_headers: dict[str, str]):
+    def __init__(
+        self, log_func: "NamedLogger", sr: Unrecv, http_headers: dict[str, str]
+    ):
         self.sr = sr
         self.log = log_func
         self.headers = http_headers
@@ -1207,6 +1214,24 @@ def atomic_move(usrc: str, udst: str) -> None:
         os.rename(src, dst)
 
 
+def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:
+    try:
+        # some fuses misbehave
+        if ANYWIN:
+            bfree = ctypes.c_ulonglong(0)
+            ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
+                ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
+            )
+            return (bfree.value, None)
+        else:
+            sv = os.statvfs(fsenc(abspath))
+            free = sv.f_frsize * sv.f_bfree
+            total = sv.f_frsize * sv.f_blocks
+            return (free, total)
+    except:
+        return (None, None)
+
+
 def read_socket(sr: Unrecv, total_size: int) -> Generator[bytes, None, None]:
     remains = total_size
     while remains > 0:
@@ -1233,7 +1258,7 @@ def read_socket_unbounded(sr: Unrecv) -> Generator[bytes, None, None]:
 
 
 def read_socket_chunked(
-    sr: Unrecv, log: Optional[NamedLogger] = None
+    sr: Unrecv, log: Optional["NamedLogger"] = None
 ) -> Generator[bytes, None, None]:
     err = "upload aborted: expected chunk length, got [{}] |{}| instead"
     while True:
@@ -1311,7 +1336,7 @@ def hashcopy(
 
 
 def sendfile_py(
-    log: NamedLogger,
+    log: "NamedLogger",
     lower: int,
     upper: int,
     f: typing.BinaryIO,
@@ -1339,7 +1364,7 @@ def sendfile_py(
 
 
 def sendfile_kern(
-    log: NamedLogger,
+    log: "NamedLogger",
     lower: int,
     upper: int,
     f: typing.BinaryIO,
@@ -1380,7 +1405,7 @@ def sendfile_kern(
 
 
 def statdir(
-    logger: Optional[RootLogger], scandir: bool, lstat: bool, top: str
+    logger: Optional["RootLogger"], scandir: bool, lstat: bool, top: str
 ) -> Generator[tuple[str, os.stat_result], None, None]:
     if lstat and ANYWIN:
         lstat = False
@@ -1423,7 +1448,7 @@ def statdir(
 
 
 def rmdirs(
-    logger: RootLogger, scandir: bool, lstat: bool, top: str, depth: int
+    logger: "RootLogger", scandir: bool, lstat: bool, top: str, depth: int
 ) -> tuple[list[str], list[str]]:
     """rmdir all descendants, then self"""
     if not os.path.isdir(fsenc(top)):
@@ -1644,7 +1669,7 @@ def retchk(
     rc: int,
     cmd: Union[list[bytes], list[str]],
     serr: str,
-    logger: Optional[NamedLogger] = None,
+    logger: Optional["NamedLogger"] = None,
     color: Union[int, str] = 0,
     verbose: bool = False,
 ) -> None:

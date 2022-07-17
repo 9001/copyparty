@@ -382,6 +382,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
               \033[36mmaxn=250,600\033[35m max 250 uploads over 15min
               \033[36mmaxb=1g,300\033[35m max 1 GiB over 5min (suffixes: b, k, m, g)
               \033[36msz=1k-3m\033[35m allow filesizes between 1 KiB and 3MiB
+              \033[36mdf=1g\033[35m ensure 1 GiB free disk space
 
             \033[0mupload rotation:
             (moves all uploads into the specified folder structure)
@@ -482,6 +483,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem)")
     ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made")
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
+    ap2.add_argument("--df", metavar="GiB", type=float, default=0, help="ensure GiB free disk space by rejecting upload requests")
     ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; 0 = off and warn if enabled, 1 = off, 2 = on, 3 = on and disable datecheck")
     ap2.add_argument("--u2sort", metavar="TXT", type=u, default="s", help="upload order; s=smallest-first, n=alphabetical, fs=force-s, fn=force-n -- alphabetical is a bit slower on fiber/LAN but makes it easier to eyeball if everything went fine")

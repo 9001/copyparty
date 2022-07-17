@@ -196,7 +196,7 @@ class Up2k(object):
 
     def _block(self, why: str) -> None:
         self.blocked = why
-        self.log("uploads are temporarily blocked due to " + why, 3)
+        self.log("uploads temporarily blocked due to " + why, 3)
 
     def _unblock(self) -> None:
         self.blocked = None
@@ -1657,7 +1657,7 @@ class Up2k(object):
                 if vfs.lim:
                     ap1 = os.path.join(cj["ptop"], cj["prel"])
                     ap2, cj["prel"] = vfs.lim.all(
-                        cj["addr"], cj["prel"], cj["size"], ap1
+                        cj["addr"], cj["prel"], cj["size"], ap1, reg
                     )
                     bos.makedirs(ap2)
                     vfs.lim.nup(cj["addr"])

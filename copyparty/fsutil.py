@@ -1,7 +1,11 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import ctypes
+try:
+    import ctypes
+except:
+    pass
+
 import os
 import re
 import time
@@ -19,7 +23,7 @@ except:
 
 
 class Fstab(object):
-    def __init__(self, log: RootLogger):
+    def __init__(self, log: "RootLogger"):
         self.log_func = log
 
         self.trusted = False
@@ -136,7 +140,7 @@ class Fstab(object):
 
     def get_w32(self, path: str) -> str:
         # list mountpoints: fsutil fsinfo drives
-
+        assert ctypes
         from ctypes.wintypes import BOOL, DWORD, LPCWSTR, LPDWORD, LPWSTR, MAX_PATH
 
         def echk(rc: int, fun: Any, args: Any) -> None:
