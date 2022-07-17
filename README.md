@@ -373,6 +373,7 @@ the browser has the following hotkeys  (always qwerty)
   * `Esc` close viewer
   * videos:
     * `U/O` skip 10sec back/forward
+    * `0..9` jump to 0%..90%
     * `P/K/Space` play/pause
     * `M` mute
     * `C` continue playing next video

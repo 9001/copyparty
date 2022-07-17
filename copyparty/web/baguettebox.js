@@ -224,6 +224,7 @@ window.baguetteBox = (function () {
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
             ['P', 'video: seek 10sec ahead'],
+            ['0..9', 'video: seek 0%..90%'],
             ['M', 'video: toggle mute'],
             ['V', 'video: toggle loop'],
             ['C', 'video: toggle auto-next'],
@@ -248,7 +249,7 @@ window.baguetteBox = (function () {
         if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing || modal.busy)
             return;
 
-        var k = e.code + '', v = vid();
+        var k = e.code + '', v = vid(), pos = -1;
 
         if (k == "ArrowLeft" || k == "KeyJ")
             showPreviousImage();
@@ -264,6 +265,8 @@ window.baguetteBox = (function () {
             playpause();
         else if (k == "KeyU" || k == "KeyO")
             relseek(k == "KeyU" ? -10 : 10);
+        else if (k.indexOf('Digit') === 0)
+            vid().currentTime = vid().duration * parseInt(k.slice(-1)) * 0.1;
         else if (k == "KeyM" && v) {
             v.muted = vmute = !vmute;
             mp_ctl();
