@@ -146,7 +146,7 @@ var Ls = {
 		"mt_caac": "convert aac / m4a to opus\">aac",
 		"mt_coth": "convert all others (not mp3) to opus\">oth",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
-		"mt_eq": "enables the equalizer and gain control;$Nboost 0 = unmodified 100% volume$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero if you care about that",
+		"mt_eq": "enables the equalizer and gain control;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100% volume (unmodified)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (unmodified)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% left-right crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
@@ -478,7 +478,7 @@ var Ls = {
 		"mt_caac": "konverter aac / m4a-filer til to opus\">aac",
 		"mt_coth": "konverter alt annet (men ikke mp3) til opus\">andre",
 		"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjør oppdateringer mindre distraherende",
-		"mt_eq": "aktiver tonekontroll og forsterker;$Nboost 0 = normal volumskala$N$Nreduserer også dødtid imellom sangfiler",
+		"mt_eq": "aktiver tonekontroll og forsterker;$N$Nboost &lt;code&gt;0&lt;/code&gt; = normal volumskala$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = normal stereo$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% blanding venstre-høyre$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = instrumental :^)$N$Nreduserer også dødtid imellom sangfiler",
 
 		"mb_play": "lytt",
 		"mm_hashplay": "spill denne sangen?",
@@ -1892,6 +1892,7 @@ var audio_eq = (function () {
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"filters": [],
 		"amp": 0,
+		"chw": 1,
 		"last_au": null,
 		"acst": {}
 	};
@@ -1943,6 +1944,7 @@ var audio_eq = (function () {
 
 	try {
 		r.amp = fcfg_get('au_eq_amp', r.amp);
+		r.chw = fcfg_get('au_eq_chw', r.chw);
 		var gains = jread('au_eq_gain', r.gains);
 		if (r.gains.length == gains.length)
 			r.gains = gains;
@@ -1952,12 +1954,14 @@ var audio_eq = (function () {
 	r.draw = function () {
 		jwrite('au_eq_gain', r.gains);
 		swrite('au_eq_amp', r.amp);
+		swrite('au_eq_chw', r.chw);
 
 		var txt = QSA('input.eq_gain');
 		for (var a = 0; a < r.bands.length; a++)
 			txt[a].value = r.gains[a];
 
 		QS('input.eq_gain[band="amp"]').value = r.amp;
+		QS('input.eq_gain[band="chw"]').value = r.chw;
 	};
 
 	r.stop = function () {
@@ -2027,16 +2031,47 @@ var audio_eq = (function () {
 		for (var a = r.filters.length - 1; a >= 0; a--)
 			r.filters[a].connect(a > 0 ? r.filters[a - 1] : actx.destination);
 
+		if (Math.round(r.chw * 25) != 25) {
+			var split = actx.createChannelSplitter(2),
+				merge = actx.createChannelMerger(2),
+				lg1 = actx.createGain(),
+				lg2 = actx.createGain(),
+				rg1 = actx.createGain(),
+				rg2 = actx.createGain(),
+				vg1 = 1 - (1 - r.chw) / 2,
+				vg2 = 1 - vg1;
+
+			console.log('chw', vg1, vg2);
+
+			merge.connect(r.filters[r.filters.length - 1]);
+			lg1.gain.value = rg2.gain.value = vg1;
+			lg2.gain.value = rg1.gain.value = vg2;
+			lg1.connect(merge, 0, 0);
+			rg1.connect(merge, 0, 0);
+			lg2.connect(merge, 0, 1);
+			rg2.connect(merge, 0, 1);
+
+			split.connect(lg1, 0);
+			split.connect(lg2, 0);
+			split.connect(rg1, 1);
+			split.connect(rg2, 1);
+			r.filters.push(split);
+			mp.acs.channelCountMode = 'explicit';
+		}
+
 		mp.acs.connect(r.filters[r.filters.length - 1]);
 	}
 
 	function eq_step(e) {
 		ev(e);
-		var band = parseInt(this.getAttribute('band')),
+		var sb = this.getAttribute('band'),
+			band = parseInt(sb),
 			step = parseFloat(this.getAttribute('step'));
 
-		if (isNaN(band))
+		if (sb == 'amp')
 			r.amp = Math.round((r.amp + step * 0.2) * 100) / 100;
+		else if (sb == 'chw')
+			r.chw = Math.round((r.chw + step * 0.2) * 100) / 100;
 		else
 			r.gains[band] += step;
 
@@ -2046,15 +2081,18 @@ var audio_eq = (function () {
 	function adj_band(that, step) {
 		var err = false;
 		try {
-			var band = parseInt(that.getAttribute('band')),
+			var sb = that.getAttribute('band'),
+				band = parseInt(sb),
 				vs = that.value,
 				v = parseFloat(vs);
 
 			if (isNaN(v) || v + '' != vs)
 				throw new Error('inval band');
 
-			if (isNaN(band))
+			if (sb == 'amp')
 				r.amp = Math.round((v + step * 0.2) * 100) / 100;
+			else if (sb == 'chw')
+				r.chw = Math.round((v + step * 0.2) * 100) / 100;
 			else
 				r.gains[band] = v + step;
 
@@ -2091,6 +2129,7 @@ var audio_eq = (function () {
 		vs.push([a, hz, r.gains[a]]);
 	}
 	vs.push(["amp", "boost", r.amp]);
+	vs.push(["chw", "width", r.chw]);
 
 	for (var a = 0; a < vs.length; a++) {
 		var b = vs[a][0];
