@@ -2464,7 +2464,7 @@ function eval_hash() {
 				if (a)
 					QS(treectl.hidden ? '#path a:nth-last-child(2)' : '#treeul a.hl').focus();
 				else
-					QS(thegrid.en ? '#ggrid a' : '#files tbody a').focus();
+					QS(thegrid.en ? '#ggrid a' : '#files tbody tr[tabindex]').focus();
 			};
 		})(a);
 
