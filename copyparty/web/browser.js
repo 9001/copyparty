@@ -3996,6 +3996,9 @@ document.onkeydown = function (e) {
 		}
 	}
 
+	if (k == 'Enter' && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
+		return ev(e) && ae.click() || true;
+
 	if (aet && aet != 'a' && aet != 'tr' && aet != 'pre')
 		return;
 

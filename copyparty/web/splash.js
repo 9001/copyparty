@@ -40,5 +40,6 @@ for (var k in (d || {})) {
 }
 
 tt.init();
-if (!ebi('c'))
-	QS('input[name="cppwd"]').focus();
+var o = QS('input[name="cppwd"]');
+if (!ebi('c') && o.offsetTop + o.offsetHeight < window.innerHeight)
+	o.focus();
