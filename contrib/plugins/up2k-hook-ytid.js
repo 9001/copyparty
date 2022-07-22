@@ -55,13 +55,25 @@ function up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                 nothing_to_do = false;
         }
 
-        if (nothing_to_do)
-            return modal.alert('Good news -- turns out we already have all those videos.\n\nBut thank you for checking in!');
-        else if (n_skip)
-            toast.inf(0, `skipped ${n_skip} files which already exist on the server`);
+        function upload_filtered() {
+            if (nothing_to_do)
+                return modal.alert('Good news -- turns out we already have all those.\n\nBut thank you for checking in!');
 
-        [good_files, nil_files, bad_files] = new_lists;
-        hooks[0](good_files, nil_files, bad_files, hooks.slice(1));
+            [good_files, nil_files, bad_files] = new_lists;
+            hooks[0](good_files, nil_files, bad_files, hooks.slice(1));
+        }
+
+        function upload_all() {
+            hooks[0](good_files, nil_files, bad_files, hooks.slice(1));
+        }
+
+        var msg = `you added ${good_files.length} files; ${n_skip} of them were skipped --\neither because we already have them,\nor because there is no youtube-ID in your filename.\n\n<code>OK</code> / <code>Enter</code> = continue uploading the ${new_lists[0].length} files we definitely need\n\n<code>Cancel</code> / <code>ESC</code> = override the filter; upload ALL the files you added`;
+
+        if (!n_skip)
+            upload_filtered();
+        else
+            modal.confirm(msg, upload_filtered, upload_all);
+
     };
     xhr.send(Array.from(yt_ids).join('\n'));
 }
