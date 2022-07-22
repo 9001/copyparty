@@ -11,13 +11,13 @@ sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr )
 help() { cat <<'EOF'
 
 usage:
-  ./prisonparty.sh <ROOTDIR> <UID> <GID> [VOLDIR [VOLDIR...]] -- python3 copyparty-sfx.py [...]"
+  ./prisonparty.sh <ROOTDIR> <UID> <GID> [VOLDIR [VOLDIR...]] -- python3 copyparty-sfx.py [...]
 
 example:
-  ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 copyparty-sfx.py -v /mnt/nas/music::rwmd"
+  ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 copyparty-sfx.py -v /mnt/nas/music::rwmd
 
 example for running straight from source (instead of using an sfx):
-  PYTHONPATH=$PWD ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 -um copyparty -v /mnt/nas/music::rwmd"
+  PYTHONPATH=$PWD ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 -um copyparty -v /mnt/nas/music::rwmd
 
 note that if you have python modules installed as --user (such as bpm/key detectors),
   you should add /home/foo/.local as a VOLDIR

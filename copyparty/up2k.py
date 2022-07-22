@@ -31,6 +31,7 @@ from .util import (
     ProgressPrinter,
     absreal,
     atomic_move,
+    djoin,
     fsenc,
     min_ex,
     quotep,
@@ -1527,7 +1528,7 @@ class Up2k(object):
         wark = self._get_wark(cj)
         now = time.time()
         job = None
-        pdir = os.path.join(cj["ptop"], cj["prel"])
+        pdir = djoin(cj["ptop"], cj["prel"])
         try:
             dev = bos.stat(pdir).st_dev
         except:
@@ -1639,7 +1640,7 @@ class Up2k(object):
                         for k in ["ptop", "vtop", "prel"]:
                             job[k] = cj[k]
 
-                        pdir = os.path.join(cj["ptop"], cj["prel"])
+                        pdir = djoin(cj["ptop"], cj["prel"])
                         job["name"] = self._untaken(pdir, cj["name"], now, cj["addr"])
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
@@ -1655,7 +1656,7 @@ class Up2k(object):
             if not job:
                 vfs = self.asrv.vfs.all_vols[cj["vtop"]]
                 if vfs.lim:
-                    ap1 = os.path.join(cj["ptop"], cj["prel"])
+                    ap1 = djoin(cj["ptop"], cj["prel"])
                     ap2, cj["prel"] = vfs.lim.all(
                         cj["addr"], cj["prel"], cj["size"], ap1, reg
                     )
@@ -2413,7 +2414,7 @@ class Up2k(object):
         return ret
 
     def _new_upload(self, job: dict[str, Any]) -> None:
-        pdir = os.path.join(job["ptop"], job["prel"])
+        pdir = djoin(job["ptop"], job["prel"])
         if not job["size"] and bos.path.isfile(os.path.join(pdir, job["name"])):
             return
 

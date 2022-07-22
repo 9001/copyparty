@@ -989,6 +989,11 @@ def s2hms(s: float, optional_h: bool = False) -> str:
     return "{}:{:02}:{:02}".format(h, m, s)
 
 
+def djoin(*paths: str) -> str:
+    """joins without adding a trailing slash on blank args"""
+    return os.path.join(*[x for x in paths if x])
+
+
 def uncyg(path: str) -> str:
     if len(path) < 2 or not path.startswith("/"):
         return path
