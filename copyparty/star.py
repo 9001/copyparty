@@ -65,17 +65,19 @@ class StreamTar(StreamArc):
         w.start()
 
     def gen(self) -> Generator[Optional[bytes], None, None]:
-        while True:
-            buf = self.qfile.q.get()
-            if not buf:
-                break
+        try:
+            while True:
+                buf = self.qfile.q.get()
+                if not buf:
+                    break
 
-            self.co += len(buf)
-            yield buf
+                self.co += len(buf)
+                yield buf
 
-        yield None
-        if self.errf:
-            bos.unlink(self.errf["ap"])
+            yield None
+        finally:
+            if self.errf:
+                bos.unlink(self.errf["ap"])
 
     def ser(self, f: dict[str, Any]) -> None:
         name = f["vp"]

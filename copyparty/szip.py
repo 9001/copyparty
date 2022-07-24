@@ -272,41 +272,44 @@ class StreamZip(StreamArc):
 
     def gen(self) -> Generator[bytes, None, None]:
         errors = []
-        for f in self.fgen:
-            if "err" in f:
-                errors.append((f["vp"], f["err"]))
-                continue
+        try:
+            for f in self.fgen:
+                if "err" in f:
+                    errors.append((f["vp"], f["err"]))
+                    continue
 
-            try:
-                for x in self.ser(f):
+                try:
+                    for x in self.ser(f):
+                        yield x
+                except GeneratorExit:
+                    raise
+                except:
+                    ex = min_ex(5, True).replace("\n", "\n-- ")
+                    errors.append((f["vp"], ex))
+
+            if errors:
+                errf, txt = errdesc(errors)
+                self.log("\n".join(([repr(errf)] + txt[1:])))
+                for x in self.ser(errf):
                     yield x
-            except:
-                ex = min_ex(5, True).replace("\n", "\n-- ")
-                errors.append((f["vp"], ex))
 
-        if errors:
-            errf, txt = errdesc(errors)
-            self.log("\n".join(([repr(errf)] + txt[1:])))
-            for x in self.ser(errf):
-                yield x
+            cdir_pos = self.pos
+            for name, sz, ts, crc, h_pos in self.items:
+                buf = gen_hdr(h_pos, name, sz, ts, self.utf8, crc, self.pre_crc)
+                yield self._ct(buf)
+            cdir_end = self.pos
 
-        cdir_pos = self.pos
-        for name, sz, ts, crc, h_pos in self.items:
-            buf = gen_hdr(h_pos, name, sz, ts, self.utf8, crc, self.pre_crc)
-            yield self._ct(buf)
-        cdir_end = self.pos
+            _, need_64 = gen_ecdr(self.items, cdir_pos, cdir_end)
+            if need_64:
+                ecdir64_pos = self.pos
+                buf = gen_ecdr64(self.items, cdir_pos, cdir_end)
+                yield self._ct(buf)
 
-        _, need_64 = gen_ecdr(self.items, cdir_pos, cdir_end)
-        if need_64:
-            ecdir64_pos = self.pos
-            buf = gen_ecdr64(self.items, cdir_pos, cdir_end)
-            yield self._ct(buf)
+                buf = gen_ecdr64_loc(ecdir64_pos)
+                yield self._ct(buf)
 
-            buf = gen_ecdr64_loc(ecdir64_pos)
-            yield self._ct(buf)
-
-        ecdr, _ = gen_ecdr(self.items, cdir_pos, cdir_end)
-        yield self._ct(ecdr)
-
-        if errors:
-            bos.unlink(errf["ap"])
+            ecdr, _ = gen_ecdr(self.items, cdir_pos, cdir_end)
+            yield self._ct(ecdr)
+        finally:
+            if errors:
+                bos.unlink(errf["ap"])
