@@ -437,8 +437,10 @@ class MTag(object):
         return r1
 
     def get_mutagen(self, abspath: str) -> dict[str, Union[str, float]]:
+        ret: dict[str, Union[str, float]] = {}
+
         if not bos.path.isfile(abspath):
-            return {}
+            return ret
 
         import mutagen
 
@@ -450,7 +452,10 @@ class MTag(object):
             return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
         sz = bos.path.getsize(abspath)
-        ret = {".q": (0, int((sz / md.info.length) / 128))}
+        try:
+            ret = {".q": (0, int((sz / md.info.length) / 128))}
+        except:
+            pass
 
         for attr, k, norm in [
             ["codec", "ac", unicode],
