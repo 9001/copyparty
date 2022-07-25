@@ -32,6 +32,7 @@ from .util import (
     absreal,
     atomic_move,
     djoin,
+    db_ex_chk,
     fsenc,
     min_ex,
     quotep,
@@ -645,7 +646,7 @@ class Up2k(object):
         with self.mutex:
             reg = self.register_vpath(top, vol.flags)
             assert reg and self.pp
-            cur, _ = reg
+            cur, db_path = reg
 
             db = Dbw(cur, 0, time.time())
             self.pp.n = next(db.c.execute("select count(w) from up"))[0]
@@ -665,7 +666,8 @@ class Up2k(object):
             try:
                 n_add = self._build_dir(db, top, set(excl), top, rtop, rei, reh, [])
                 n_rm = self._drop_lost(db.c, top)
-            except:
+            except Exception as ex:
+                db_ex_chk(self.log, ex, db_path)
                 t = "failed to index volume [{}]:\n{}"
                 self.log(t.format(top, min_ex()), c=1)
 
@@ -1946,9 +1948,13 @@ class Up2k(object):
         if not cur:
             return False
 
-        self.db_rm(cur, rd, fn)
-        self.db_add(cur, wark, rd, fn, lmod, sz, ip, at)
-        cur.connection.commit()
+        try:
+            self.db_rm(cur, rd, fn)
+            self.db_add(cur, wark, rd, fn, lmod, sz, ip, at)
+            cur.connection.commit()
+        except Exception as ex:
+            db_ex_chk(self.log, ex, self.register_vpath(ptop, {})[1])
+            raise
 
         if "e2t" in self.flags[ptop]:
             self.tagq.put((ptop, wark, rd, fn))

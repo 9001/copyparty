@@ -1207,6 +1207,20 @@ def s3dec(rd: str, fn: str) -> tuple[str, str]:
     return ret[0], ret[1]
 
 
+def db_ex_chk(log: "NamedLogger", ex: Exception, db_path: str) -> None:
+    if str(ex) != "database is locked":
+        return False
+
+    try:
+        rc, so, se = runcmd([b"lsof", fsenc(db_path)])
+        zs = (so.strip() + "\n" + se.strip()).strip()
+        log("lsof {} = {}\n{}".format(db_path, rc, zs), 3)
+    except:
+        pass
+
+    return True
+
+
 def atomic_move(usrc: str, udst: str) -> None:
     src = fsenc(usrc)
     dst = fsenc(udst)
