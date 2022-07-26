@@ -87,7 +87,7 @@ class Lim(object):
 
         self.dfl = 0  # free disk space limit
         self.dft = 0  # last-measured time
-        self.dfv: Optional[int] = 0  # currently free
+        self.dfv = 0  # currently free
 
         self.smin = 0  # filesize min
         self.smax = 0  # filesize max
@@ -150,7 +150,7 @@ class Lim(object):
 
         if self.dft < time.time():
             self.dft = int(time.time()) + 300
-            self.dfv = get_df(abspath)[0]
+            self.dfv = get_df(abspath)[0] or 0
             for j in list(self.reg.values()) if self.reg else []:
                 self.dfv -= int(j["size"] / len(j["hash"]) * len(j["need"]))
 

@@ -437,10 +437,10 @@ class MTag(object):
         return r1
 
     def get_mutagen(self, abspath: str) -> dict[str, Union[str, float]]:
-        ret: dict[str, Union[str, float]] = {}
+        ret: dict[str, tuple[int, Any]] = {}
 
         if not bos.path.isfile(abspath):
-            return ret
+            return {}
 
         import mutagen
 
@@ -453,7 +453,7 @@ class MTag(object):
 
         sz = bos.path.getsize(abspath)
         try:
-            ret = {".q": (0, int((sz / md.info.length) / 128))}
+            ret[".q"] = (0, int((sz / md.info.length) / 128))
         except:
             pass
 

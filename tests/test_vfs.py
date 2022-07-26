@@ -8,42 +8,12 @@ import shutil
 import tempfile
 import unittest
 from textwrap import dedent
-from argparse import Namespace
 
 from tests import util as tu
+from tests.util import Cfg
+
 from copyparty.authsrv import AuthSrv, VFS
 from copyparty import util
-
-
-class Cfg(Namespace):
-    def __init__(self, a=None, v=None, c=None):
-        ex = "nw e2d e2ds e2dsa e2t e2ts e2tsr no_logues no_readme no_acode force_js no_robots no_thumb no_athumb no_vthumb"
-        ex = {k: False for k in ex.split()}
-        ex2 = {
-            "mtp": [],
-            "mte": "a",
-            "mth": "",
-            "doctitle": "",
-            "html_head": "",
-            "hist": None,
-            "no_idx": None,
-            "no_hash": None,
-            "js_browser": None,
-            "css_browser": None,
-            "no_voldump": True,
-            "re_maxage": 0,
-            "rproxy": 0,
-            "rsp_slp": 0,
-            "s_wr_slp": 0,
-            "s_wr_sz": 512 * 1024,
-            "lang": "eng",
-            "theme": 0,
-            "themes": 0,
-            "turbo": 0,
-            "logout": 573,
-        }
-        ex.update(ex2)
-        super(Cfg, self).__init__(a=a or [], v=v or [], c=c, **ex)
 
 
 class TestVFS(unittest.TestCase):

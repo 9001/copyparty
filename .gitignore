@@ -8,8 +8,9 @@ copyparty.egg-info/
 buildenv/
 build/
 dist/
-sfx/
 py2/
+sfx/
+unt/
 .venv/
 
 # ide

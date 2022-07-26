@@ -7,6 +7,7 @@ import threading
 import tempfile
 import platform
 import subprocess as sp
+from argparse import Namespace
 
 
 WINDOWS = platform.system() == "Windows"
@@ -87,6 +88,40 @@ def get_ramdisk():
         os.mkdir(ret)
     finally:
         return subdir(ret)
+
+
+class Cfg(Namespace):
+    def __init__(self, a=None, v=None, c=None):
+        ka = {}
+
+        ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js ihead no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
+        ka.update(**{k: False for k in ex.split()})
+
+        ex = "no_rescan no_sendfile no_voldump"
+        ka.update(**{k: True for k in ex.split()})
+
+        ex = "css_browser hist js_browser no_hash no_idx"
+        ka.update(**{k: None for k in ex.split()})
+
+        ex = "re_maxage rproxy rsp_slp s_wr_slp theme themes turbo df"
+        ka.update(**{k: 0 for k in ex.split()})
+
+        ex = "doctitle favico html_head mth textfiles"
+        ka.update(**{k: "" for k in ex.split()})
+
+        super(Cfg, self).__init__(
+            a=a or [],
+            v=v or [],
+            c=c,
+            s_wr_sz=512 * 1024,
+            unpost=600,
+            u2sort="s",
+            mtp=[],
+            mte="a",
+            lang="eng",
+            logout=573,
+            **ka
+        )
 
 
 class NullBroker(object):

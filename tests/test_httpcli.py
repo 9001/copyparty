@@ -10,9 +10,10 @@ import pprint
 import tarfile
 import tempfile
 import unittest
-from argparse import Namespace
 
 from tests import util as tu
+from tests.util import Cfg
+
 from copyparty.authsrv import AuthSrv
 from copyparty.httpcli import HttpCli
 
@@ -20,39 +21,6 @@ from copyparty.httpcli import HttpCli
 def hdr(query):
     h = "GET /{} HTTP/1.1\r\nCookie: cppwd=o\r\nConnection: close\r\n\r\n"
     return h.format(query).encode("utf-8")
-
-
-class Cfg(Namespace):
-    def __init__(self, a=None, v=None, c=None):
-        ka = {}
-
-        ex = "e2d e2ds e2dsa e2t e2ts e2tsr ed emp force_js ihead no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nw"
-        ka.update(**{k: False for k in ex.split()})
-
-        ex = "nih no_rescan no_sendfile no_voldump"
-        ka.update(**{k: True for k in ex.split()})
-
-        ex = "css_browser hist js_browser no_hash no_idx"
-        ka.update(**{k: None for k in ex.split()})
-
-        ex = "re_maxage rproxy rsp_slp s_wr_slp theme themes turbo"
-        ka.update(**{k: 0 for k in ex.split()})
-
-        ex = "doctitle favico html_head mth textfiles"
-        ka.update(**{k: "" for k in ex.split()})
-
-        super(Cfg, self).__init__(
-            a=a or [],
-            v=v or [],
-            c=c,
-            s_wr_sz=512 * 1024,
-            unpost=600,
-            mtp=[],
-            mte="a",
-            lang="eng",
-            logout=573,
-            **ka
-        )
 
 
 class TestHttpCli(unittest.TestCase):
