@@ -1196,15 +1196,10 @@ def s3enc(mem_cur: "sqlite3.Cursor", rd: str, fn: str) -> tuple[str, str]:
 
 
 def s3dec(rd: str, fn: str) -> tuple[str, str]:
-    ret = []
-    for v in [rd, fn]:
-        if v.startswith("//"):
-            ret.append(w8b64dec(v[2:]))
-            # self.log("mojide [{}] {}".format(ret[-1], v[2:]))
-        else:
-            ret.append(v)
-
-    return ret[0], ret[1]
+    return (
+        w8b64dec(rd[2:]) if rd.startswith("//") else rd,
+        w8b64dec(fn[2:]) if fn.startswith("//") else fn,
+    )
 
 
 def db_ex_chk(log: "NamedLogger", ex: Exception, db_path: str) -> None:
