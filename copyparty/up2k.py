@@ -132,7 +132,7 @@ class Up2k(object):
         self.mem_cur = None
         self.sqlite_ver = None
         self.no_expr_idx = False
-        self.timeout = int(max(self.args.srch_time, 5) * 1.2)
+        self.timeout = int(max(self.args.srch_time, 5) * 1.2) + 1
         self.spools: set[tempfile.SpooledTemporaryFile[bytes]] = set()
         if HAVE_SQLITE3:
             # mojibake detector
@@ -1178,6 +1178,7 @@ class Up2k(object):
         params: tuple[Any, ...],
         flt: int,
     ) -> tuple[tempfile.SpooledTemporaryFile[bytes], int]:
+        """mutex me"""
         n = 0
         c2 = cur.connection.cursor()
         tf = tempfile.SpooledTemporaryFile(1024 * 1024 * 8, "w+b", prefix="cpp-tq-")
