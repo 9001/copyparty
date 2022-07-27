@@ -659,6 +659,8 @@ function clamp(v, a, b) {
 
 
 function has(haystack, needle) {
+    try { return haystack.includes(needle); } catch (ex) { }
+
     for (var a = 0; a < haystack.length; a++)
         if (haystack[a] == needle)
             return true;

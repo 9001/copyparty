@@ -205,7 +205,7 @@ function U2pvis(act, btns, uc, st) {
         if (!r.is_act(fo.in))
             return;
 
-        var k = 'f{0}{1}'.format(nfile, field.slice(1)),
+        var k = 'f' + nfile + '' + field.slice(1),
             obj = ebi(k);
 
         obj.innerHTML = field == 'ht' ? (markup[html] || html) : html;
@@ -250,9 +250,7 @@ function U2pvis(act, btns, uc, st) {
             nb = fo.bt * (++fo.nh / fo.cb.length),
             p = r.perc(nb, 0, fobj.size, fobj.t_hashing);
 
-        fo.hp = '{0}%, {1}, {2} MB/s'.format(
-            f2f(p[0], 2), p[1], f2f(p[2], 2)
-        );
+        fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MB/s';
         if (!r.is_act(fo.in))
             return;
 
@@ -269,14 +267,12 @@ function U2pvis(act, btns, uc, st) {
         fo.bd += delta;
 
         var p = r.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
-        fo.hp = '{0}%, {1}, {2} MB/s'.format(
-            f2f(p[0], 2), p[1], f2f(p[2], 2)
-        );
+        fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MB/s';
 
         if (!r.is_act(fo.in))
             return;
 
-        var obj = ebi('f{0}p'.format(fobj.n)),
+        var obj = ebi('f' + fobj.n + 'p'),
             o1 = p[0] - 2, o2 = p[0] - 0.1, o3 = p[0];
 
         if (!obj) {
@@ -446,8 +442,8 @@ function U2pvis(act, btns, uc, st) {
 
         r.npotato = 0;
         var html = [
-            "<p>files: &nbsp; <b>{0}</b> finished, &nbsp; <b>{1}</b> failed, &nbsp; <b>{2}</b> busy, &nbsp; <b>{3}</b> queued</p>".format(r.ctr.ok, r.ctr.ng, r.ctr.bz, r.ctr.q),
-        ];
+            "<p>files: &nbsp; <b>{0}</b> finished, &nbsp; <b>{1}</b> failed, &nbsp; <b>{2}</b> busy, &nbsp; <b>{3}</b> queued</p>".format(
+                r.ctr.ok, r.ctr.ng, r.ctr.bz, r.ctr.q)];
 
         while (r.head < r.tab.length && has(["ok", "ng"], r.tab[r.head].in))
             r.head++;
@@ -457,7 +453,8 @@ function U2pvis(act, btns, uc, st) {
             act = r.tab[r.head];
 
         if (act)
-            html.push("<p>file {0} of {1} : &nbsp; {2} &nbsp; <code>{3}</code></p>\n<div>{4}</div>".format(r.head + 1, r.tab.length, act.ht, act.hp, act.hn));
+            html.push("<p>file {0} of {1} : &nbsp; {2} &nbsp; <code>{3}</code></p>\n<div>{4}</div>".format(
+                r.head + 1, r.tab.length, act.ht, act.hp, act.hn));
 
         html = html.join('\n');
         if (r.hpotato == html)
@@ -470,7 +467,7 @@ function U2pvis(act, btns, uc, st) {
     function apply_html() {
         var oq = {}, n = 0;
         for (var k in r.hq) {
-            var o = ebi('f{0}p'.format(k));
+            var o = ebi('f' + k + 'p');
             if (!o)
                 continue;
 
@@ -1283,12 +1280,21 @@ function up2k_init(subtle) {
             ebi('u2tabw').style.minHeight = utw_minh + 'px';
         }
 
-        if (!nhash)
-            ebi('u2etah').innerHTML = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr.ok + pvis.ctr.ng);
+        if (!nhash) {
+            var h = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr.ok + pvis.ctr.ng);
+            if (st.eta.h !== h)
+                st.eta.h = ebi('u2etah').innerHTML = h;
+        }
 
-        if (!nsend && !nhash)
-            ebi('u2etau').innerHTML = ebi('u2etat').innerHTML = (
-                L.u_etadone.format(humansize(st.bytes.uploaded), pvis.ctr.ok + pvis.ctr.ng));
+        if (!nsend && !nhash) {
+            var h = L.u_etadone.format(humansize(st.bytes.uploaded), pvis.ctr.ok + pvis.ctr.ng);
+
+            if (st.eta.u !== h)
+                st.eta.u = ebi('u2etau').innerHTML = h;
+
+            if (st.eta.t !== h)
+                st.eta.t = ebi('u2etat').innerHTML = h;
+        }
 
         if (!st.busy.hash.length && !hashing_permitted())
             nhash = 0;
