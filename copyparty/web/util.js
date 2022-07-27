@@ -642,7 +642,7 @@ function humansize(b, terse) {
 
 function humantime(v) {
     if (v >= 60 * 60 * 24)
-        return v;
+        return shumantime(v);
 
     try {
         return /.*(..:..:..).*/.exec(new Date(v * 1000).toUTCString())[1];
@@ -660,17 +660,18 @@ function shumantime(v) {
         return f2f(v, 1) + 's';
 
     v = parseInt(v);
-    var st = [[60 * 60 * 24, 'd'], [60 * 60, 'h'], [60, 'm']];
+    var st = [[60 * 60 * 24, 60 * 60, 'd'], [60 * 60, 60, 'h'], [60, 1, 'm']];
 
     for (var a = 0; a < st.length; a++) {
-        var mod = st[a][0],
-            ch = st[a][1];
+        var m1 = st[a][0],
+            m2 = st[a][1],
+            ch = st[a][2];
 
-        if (v < mod)
+        if (v < m1)
             continue;
 
-        var v1 = parseInt(v / mod),
-            v2 = ('0' + parseInt(v % mod)).slice(-2);
+        var v1 = parseInt(v / m1),
+            v2 = ('0' + parseInt((v % m1) / m2)).slice(-2);
 
         return v1 + ch + (v1 >= 10 ? '' : v2);
     }

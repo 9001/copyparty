@@ -679,8 +679,8 @@ function Donut(uc, st) {
         }
 
         if (++r.tc >= 10) {
-            wintitle("{0}%, {1}s, #{2}, ".format(
-                f2f(v * 100 / t, 1), r.eta, st.files.length - st.nfile.upload), true);
+            wintitle("{0}%, {1}, #{2}, ".format(
+                f2f(v * 100 / t, 1), shumantime(r.eta), st.files.length - st.nfile.upload), true);
             r.tc = 0;
         }
 
