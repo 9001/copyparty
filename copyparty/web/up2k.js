@@ -921,8 +921,14 @@ function up2k_init(subtle) {
         catch (ex) { }
 
         ev(e);
-        e.dataTransfer.dropEffect = 'copy';
-        e.dataTransfer.effectAllowed = 'copy';
+        try {
+            e.dataTransfer.dropEffect = 'copy';
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+        catch (ex) {
+            document.body.ondragenter = document.body.ondragleave = document.body.ondragover = null;
+            return modal.alert('your browser does not support drag-and-drop uploading');
+        }
         clmod(ebi('drops'), 'vis', 1);
         var v = this.getAttribute('v');
         if (v)
@@ -1367,6 +1373,10 @@ function up2k_init(subtle) {
 
         if (parallel_uploads <
             st.busy.handshake.length)
+            return false;
+
+        if (t.n - st.car > 8)
+            // prevent runahead from a stuck upload (slow server hdd)
             return false;
 
         if ((uc.multitask ? 1 : 0) <

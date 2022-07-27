@@ -261,8 +261,11 @@ class HttpSrv(object):
                 )
                 self.thr_client(sck, addr)
                 me.name = self.name + "-poolw"
-            except:
-                self.log(self.name, "thr_client: " + min_ex(), 3)
+            except Exception as ex:
+                if str(ex).startswith("client d/c "):
+                    self.log(self.name, "thr_client: " + str(ex), 6)
+                else:
+                    self.log(self.name, "thr_client: " + min_ex(), 3)
 
     def shutdown(self) -> None:
         self.stopping = True

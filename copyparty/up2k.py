@@ -952,7 +952,7 @@ class Up2k(object):
     def _verify_integrity(self, vol: VFS) -> int:
         """expensive; blocks database access until finished"""
         ptop = vol.realpath
-        assert self.pp and self.mtag
+        assert self.pp
 
         cur = self.cur[ptop]
         rei = vol.flags.get("noidx")
@@ -1068,8 +1068,7 @@ class Up2k(object):
         with self.mutex:
             reg = self.register_vpath(ptop, vol.flags)
 
-        assert reg and self.pp and self.mtag
-        _, db_path = reg
+        assert reg and self.pp
         entags = self.entags[ptop]
         flags = self.flags[ptop]
         cur = self.cur[ptop]
