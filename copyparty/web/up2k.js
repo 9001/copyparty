@@ -835,6 +835,11 @@ function up2k_init(subtle) {
             "uploading": 0,
             "busy": 0
         },
+        "eta": {
+            "h": "",
+            "u": "",
+            "t": ""
+        },
         "car": 0,
         "modn": 0,
         "modv": 0,
@@ -1314,19 +1319,21 @@ function up2k_init(subtle) {
         for (var a = 0; a < t.length; a++) {
             var rem = st.bytes.total - t[a][2],
                 bps = t[a][1] / t[a][3],
+                hid = t[a][0],
+                eid = hid.slice(-1),
                 eta = Math.floor(rem / bps);
 
             if (t[a][1] < 1024 || t[a][3] < 0.1) {
-                ebi(t[a][0]).innerHTML = L.u_etaprep;
+                ebi(hid).innerHTML = L.u_etaprep;
                 continue;
             }
 
             donut.eta = eta;
-            if (etaskip)
-                continue;
-
-            ebi(t[a][0]).innerHTML = '{0}, {1}/s, {2}'.format(
+            st.eta[eid] = '{0}, {1}/s, {2}'.format(
                 humansize(rem), humansize(bps, 1), humantime(eta));
+
+            if (!etaskip)
+                ebi(hid).innerHTML = st.eta[eid];
         }
         if (++etaskip > 2)
             etaskip = 0;
@@ -2138,8 +2145,9 @@ function up2k_init(subtle) {
             xhr.open('POST', t.purl, true);
             xhr.setRequestHeader("X-Up2k-Hash", t.hash[npart]);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
-            xhr.setRequestHeader("X-Up2k-Stat", "{0}/{1}/{2}/{3} {4}/{5}".format(
-                pvis.ctr.ok, pvis.ctr.ng, pvis.ctr.bz, pvis.ctr.q, btot, btot - bfin));
+            xhr.setRequestHeader("X-Up2k-Stat", "{0}/{1}/{2}/{3} {4}/{5} {6}".format(
+                pvis.ctr.ok, pvis.ctr.ng, pvis.ctr.bz, pvis.ctr.q, btot, btot - bfin,
+                st.eta.t.split(' ').pop()));
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             if (xhr.overrideMimeType)
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
