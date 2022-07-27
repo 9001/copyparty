@@ -107,6 +107,7 @@ class Up2k(object):
         self.pp: Optional[ProgressPrinter] = None
         self.rescan_cond = threading.Condition()
         self.need_rescan: set[str] = set()
+        self.db_act = 0.0
 
         self.registry: dict[str, dict[str, dict[str, Any]]] = {}
         self.flags: dict[str, dict[str, Any]] = {}
@@ -262,10 +263,15 @@ class Up2k(object):
                 continue
 
             if self.pp:
-                cooldown = now + 5
+                cooldown = now + 1
                 continue
 
-            timeout = now + 9001
+            if self.args.no_lifetime:
+                timeout = now + 9001
+            else:
+                # important; not deferred by db_act
+                timeout = self._check_lifetimes()
+
             with self.mutex:
                 for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
                     maxage = vol.flags.get("scan")
@@ -281,6 +287,20 @@ class Up2k(object):
 
                     timeout = min(timeout, deadline)
 
+            if self.db_act > now - self.args.db_act:
+                # recent db activity; defer volume rescan
+                act_timeout = self.db_act + self.args.db_act
+                if self.need_rescan:
+                    timeout = now
+
+                if timeout < act_timeout:
+                    timeout = act_timeout
+                    t = "volume rescan deferred {:.1f} sec, due to database activity"
+                    self.log(t.format(timeout - now))
+
+                continue
+
+            with self.mutex:
                 vols = list(sorted(self.need_rescan))
                 self.need_rescan.clear()
 
@@ -296,9 +316,10 @@ class Up2k(object):
                 for v in vols:
                     volage[v] = now
 
-            if self.args.no_lifetime:
-                continue
-
+    def _check_lifetimes(self) -> float:
+        now = time.time()
+        timeout = now + 9001
+        if now:  # diff-golf
             for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
                 lifetime = vol.flags.get("lifetime")
                 if not lifetime:
@@ -344,6 +365,8 @@ class Up2k(object):
 
                 if hits:
                     timeout = min(timeout, now + lifetime - (now - hits[0]))
+
+        return timeout
 
     def _vis_job_progress(self, job: dict[str, Any]) -> str:
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
@@ -1117,6 +1140,7 @@ class Up2k(object):
     ) -> int:
         assert self.pp and self.mtag
 
+        flags = self.flags[ptop]
         mpool: Optional[Queue[Mpqe]] = None
         if self.mtag.prefer_mt and self.args.mtag_mt > 1:
             mpool = self._start_mpool()
@@ -1139,6 +1163,11 @@ class Up2k(object):
 
             if rd.startswith("//") or fn.startswith("//"):
                 rd, fn = s3dec(rd, fn)
+
+            if "mtp" in flags:
+                q = "insert into mt values (?,'t:mtp','a')"
+                with self.mutex:
+                    cur.execute(q, (w[:16],))
 
             abspath = os.path.join(ptop, rd, fn)
             self.pp.msg = "c{} {}".format(nq, abspath)
@@ -1670,9 +1699,8 @@ class Up2k(object):
                 self._job_volchk(cj)
 
         cj["name"] = sanitize_fn(cj["name"], "", [".prologue.html", ".epilogue.html"])
-        cj["poke"] = time.time()
+        cj["poke"] = now = self.db_act = time.time()
         wark = self._get_wark(cj)
-        now = time.time()
         job = None
         pdir = djoin(cj["ptop"], cj["prel"])
         try:
@@ -1932,6 +1960,7 @@ class Up2k(object):
         self, ptop: str, wark: str, chash: str
     ) -> tuple[int, list[int], str, float, bool]:
         with self.mutex:
+            self.db_act = time.time()
             job = self.registry[ptop].get(wark)
             if not job:
                 known = " ".join([x for x in self.registry[ptop].keys()])
@@ -1982,6 +2011,7 @@ class Up2k(object):
 
     def confirm_chunk(self, ptop: str, wark: str, chash: str) -> tuple[int, str]:
         with self.mutex:
+            self.db_act = time.time()
             try:
                 job = self.registry[ptop][wark]
                 pdir = os.path.join(job["ptop"], job["prel"])
@@ -2016,6 +2046,7 @@ class Up2k(object):
             self._finish_upload(ptop, wark)
 
     def _finish_upload(self, ptop: str, wark: str) -> None:
+        self.db_act = time.time()
         try:
             job = self.registry[ptop][wark]
             pdir = os.path.join(job["ptop"], job["prel"])
@@ -2158,6 +2189,7 @@ class Up2k(object):
     def _handle_rm(
         self, uname: str, ip: str, vpath: str
     ) -> tuple[int, list[str], list[str]]:
+        self.db_act = time.time()
         try:
             permsets = [[True, False, False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
@@ -2242,6 +2274,7 @@ class Up2k(object):
         return n_files, ok + ok2, ng + ng2
 
     def handle_mv(self, uname: str, svp: str, dvp: str) -> str:
+        self.db_act = time.time()
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
         svn, srem = svn.get_dbv(srem)
         sabs = svn.canonical(srem, False)

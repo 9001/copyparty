@@ -57,6 +57,8 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * [server config](#server-config) - using arguments or config files, or a mix of both
     * [ftp-server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [file indexing](#file-indexing)
+        * [exclude-patterns](#exclude-patterns)
+        * [periodic rescan](#periodic-rescan) - filesystem monitoring;
     * [upload rules](#upload-rules) - set upload rules using volume flags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
@@ -681,6 +683,8 @@ note:
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
+### exclude-patterns
+
 to save some time, you can provide a regex pattern for filepaths to only index by filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash \.iso$` or the volume-flag `:c,nohash=\.iso$`, this has the following consequences:
 * initial indexing is way faster, especially when the volume is on a network disk
 * makes it impossible to [file-search](#file-search)
@@ -689,6 +693,14 @@ to save some time, you can provide a regex pattern for filepaths to only index b
 similarly, you can fully ignore files/folders using `--no-idx [...]` and `:c,noidx=\.iso$`
 
 if you set `--no-hash [...]` globally, you can enable hashing for specific volumes using flag `:c,nohash=`
+
+### periodic rescan
+
+filesystem monitoring;  if copyparty is not the only software doing stuff on your filesystem, you may want to enable periodic rescans to keep the index up to date
+
+argument `--re-maxage 60` will rescan all volumes every 60 sec, same as volflag `:c,scan=60` to specify it per-volume
+
+uploads are disabled while a rescan is happening, so rescans will be delayed by `--db-act` (default 10 sec) when there is write-activity going on (uploads, renames, ...)
 
 
 ## upload rules
