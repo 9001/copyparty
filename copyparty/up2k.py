@@ -231,6 +231,7 @@ class Up2k(object):
             "hashq": self.n_hashq,
             "tagq": self.n_tagq,
             "mtpq": mtpq,
+            "dbwt": min(1000 * 24 * 60 * 60 - 1, int(time.time() - self.db_act)),
         }
         return json.dumps(ret, indent=4)
 

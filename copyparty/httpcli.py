@@ -1924,7 +1924,13 @@ class HttpCli(object):
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
         else:
             vstate = {}
-            vs = {"scanning": None, "hashq": None, "tagq": None, "mtpq": None}
+            vs = {
+                "scanning": None,
+                "hashq": None,
+                "tagq": None,
+                "mtpq": None,
+                "dbwt": None,
+            }
 
         if self.uparam.get("ls") in ["v", "t", "txt"]:
             if self.uname == "*":
@@ -1934,7 +1940,7 @@ class HttpCli(object):
 
             if vstate:
                 txt += "\nstatus:"
-                for k in ["scanning", "hashq", "tagq", "mtpq"]:
+                for k in ["scanning", "hashq", "tagq", "mtpq", "dbwt"]:
                     txt += " {}({})".format(k, vs[k])
 
             if rvol:
@@ -1963,6 +1969,7 @@ class HttpCli(object):
             hashq=vs["hashq"],
             tagq=vs["tagq"],
             mtpq=vs["mtpq"],
+            dbwt=vs["dbwt"],
             url_suf=suf,
             k304=self.k304(),
         )

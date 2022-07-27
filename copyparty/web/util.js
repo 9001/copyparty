@@ -653,6 +653,30 @@ function humantime(v) {
 }
 
 
+function shumantime(v) {
+    if (v < 10)
+        return f2f(v, 2) + 's';
+    if (v < 60)
+        return f2f(v, 1) + 's';
+
+    v = parseInt(v);
+    var st = [[60 * 60 * 24, 'd'], [60 * 60, 'h'], [60, 'm']];
+
+    for (var a = 0; a < st.length; a++) {
+        var mod = st[a][0],
+            ch = st[a][1];
+
+        if (v < mod)
+            continue;
+
+        var v1 = parseInt(v / mod),
+            v2 = ('0' + parseInt(v % mod)).slice(-2);
+
+        return v1 + ch + (v1 >= 10 ? '' : v2);
+    }
+}
+
+
 function clamp(v, a, b) {
     return Math.min(Math.max(v, a), b);
 }
