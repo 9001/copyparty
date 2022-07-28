@@ -145,13 +145,11 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
     xhr.setRequestHeader('Content-Type', 'text/plain');
     xhr.onload = xhr.onerror = function () {
         if (this.status != 200)
-            return toast.err(0, `sorry, database query failed; _; \n\nplease let us know so we can look at it, thx!!\n\nerror ${this.status}: ${(this.response && this.response.err) || this.responseText} `);
+            return toast.err(0, `sorry, database query failed ;_;\n\nplease let us know so we can look at it, thx!!\n\nerror ${this.status}: ${(this.response && this.response.err) || this.responseText}`);
 
         process_id_list(this.responseText);
     };
     xhr.send(Array.from(yt_ids).join('\n'));
-
-    setTimeout(function () { process_id_list('Nf-nN1wF5Xo\n'); }, 500);
 
     function process_id_list(txt) {
         var wanted_ids = new Set(txt.trim().split('\n')),
@@ -197,7 +195,7 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         }
 
         var n_skip = good_files.length - wanted_files.size,
-            msg = `you added ${good_files.length} files; ${n_skip} of them were skipped --\neither because we already have them,\nor because there is no youtube-ID in your filename.\n\n<code>OK</code> / <code>Enter</code> = continue uploading just the ${wanted_files.size} files we definitely need\n\n<code>Cancel</code> / <code>ESC</code> = override the filter; upload ALL the files you added`;
+            msg = `you added ${good_files.length} files; ${good_files.length == n_skip ? 'all' : n_skip} of them were skipped --\neither because we already have them,\nor because there is no youtube-ID in your filenames.\n\n<code>OK</code> / <code>Enter</code> = continue uploading just the ${wanted_files.size} files we definitely need\n\n<code>Cancel</code> / <code>ESC</code> = override the filter; upload ALL the files you added`;
 
         if (!n_skip)
             upload_filtered();
