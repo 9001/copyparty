@@ -1,16 +1,12 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-try:
-    import ctypes
-except:
-    pass
-
 import os
 import re
 import time
 
 from .__init__ import ANYWIN, MACOS
+from .bos import bos
 from .authsrv import AXS, VFS
 from .util import chkcmd, min_ex
 
@@ -44,13 +40,9 @@ class Fstab(object):
         msg = "failed to determine filesystem at [{}]; assuming {}\n{}"
 
         if ANYWIN:
-            fs = "vfat"  # can smb do sparse files? gonna guess no
+            fs = "vfat"
             try:
-                # good enough
-                disk = path.split(":", 1)[0]
-                disk = "{}:\\".format(disk).lower()
-                assert len(disk) == 3
-                path = disk
+                path = self._winpath(path)
             except:
                 self.log(msg.format(path, fs, min_ex()), 3)
                 return fs
@@ -70,6 +62,15 @@ class Fstab(object):
         self.cache[path] = fs
         self.log("found {} at {}".format(fs, path))
         return fs
+
+    def _winpath(self, path: str) -> str:
+        # try to combine volume-label + st_dev (vsn)
+        path = path.replace("/", "\\")
+        vid = path.split(":", 1)[0].strip("\\").split("\\", 1)[0]
+        try:
+            return "{}*{}".format(vid, bos.stat(path).st_dev)
+        except:
+            return vid
 
     def build_fallback(self) -> None:
         self.tab = VFS(self.log_func, "idk", "/", AXS(), {})
@@ -104,6 +105,9 @@ class Fstab(object):
     def relabel(self, path: str, nval: str) -> None:
         assert self.tab
         self.cache = {}
+        if ANYWIN:
+            path = self._winpath(path)
+
         path = path.lstrip("/")
         ptn = re.compile(r"^[^\\/]*")
         vn, rem = self.tab._find(path)
@@ -142,46 +146,9 @@ class Fstab(object):
             return "idk"
 
     def get_w32(self, path: str) -> str:
-        # list mountpoints: fsutil fsinfo drives
-        assert ctypes
-        from ctypes.wintypes import BOOL, DWORD, LPCWSTR, LPDWORD, LPWSTR, MAX_PATH
-
         if not self.tab:
             self.build_fallback()
 
-        def echk(rc: int, fun: Any, args: Any) -> None:
-            if not rc:
-                raise ctypes.WinError(ctypes.get_last_error())
-            return None
-
-        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        k32.GetVolumeInformationW.errcheck = echk
-        k32.GetVolumeInformationW.restype = BOOL
-        k32.GetVolumeInformationW.argtypes = (
-            LPCWSTR,
-            LPWSTR,
-            DWORD,
-            LPDWORD,
-            LPDWORD,
-            LPDWORD,
-            LPWSTR,
-            DWORD,
-        )
-
-        bvolname = ctypes.create_unicode_buffer(MAX_PATH + 1)
-        bfstype = ctypes.create_unicode_buffer(MAX_PATH + 1)
-        serial = DWORD()
-        max_name_len = DWORD()
-        fs_flags = DWORD()
-
-        k32.GetVolumeInformationW(
-            path,
-            bvolname,
-            ctypes.sizeof(bvolname),
-            ctypes.byref(serial),
-            ctypes.byref(max_name_len),
-            ctypes.byref(fs_flags),
-            bfstype,
-            ctypes.sizeof(bfstype),
-        )
-        return bfstype.value
+        assert self.tab
+        ret = self.tab._find(path)[0]
+        return ret.realpath
