@@ -1870,7 +1870,11 @@ class Up2k(object):
                         job["need"].append(k)
                         lut[k] = 1
 
-                self._new_upload(job)
+                try:
+                    self._new_upload(job)
+                except:
+                    self.registry[job["ptop"]].pop(job["wark"], None)
+                    raise
 
             purl = "{}/{}".format(job["vtop"], job["prel"]).strip("/")
             purl = "/{}/".format(purl) if purl else "/"
