@@ -2000,6 +2000,9 @@ function up2k_init(subtle) {
                 tasker();
             }
             else {
+                pvis.seth(t.n, 1, "ERROR");
+                pvis.seth(t.n, 2, L.u_ehstmp);
+
                 var err = "",
                     rsp = (xhr.responseText + ''),
                     ofs = rsp.lastIndexOf('\nURL: ');
