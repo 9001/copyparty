@@ -1232,7 +1232,11 @@ class Up2k(object):
         return tf, n
 
     def _unspool(self, tf: tempfile.SpooledTemporaryFile[bytes]) -> None:
-        self.spools.remove(tf)
+        try:
+            self.spools.remove(tf)
+        except:
+            return
+
         try:
             tf.close()
         except Exception as ex:
