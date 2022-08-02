@@ -634,6 +634,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
     ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to Path every S second")
     ap2.add_argument("--log-thrs", metavar="SEC", type=float, help="list active threads every SEC")
+    ap2.add_argument("--log-fk", metavar="REGEX", type=u, default="", help="log filekey params for files where path matches REGEX; '.' (a single dot) = all files")
     # fmt: on
 
     ap2 = ap.add_argument_group("help sections")

@@ -6,6 +6,7 @@ import base64
 import calendar
 import gzip
 import os
+import re
 import shlex
 import signal
 import socket
@@ -112,6 +113,9 @@ class SvcHub(object):
 
         if not args.hardlink and args.never_symlink:
             args.no_dedup = True
+
+        if args.log_fk:
+            args.log_fk = re.compile(args.log_fk)
 
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log)

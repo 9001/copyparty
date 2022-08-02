@@ -42,6 +42,7 @@ from .util import (
     exclude_dotfiles,
     fsenc,
     gen_filekey,
+    gen_filekey_dbg,
     gencookie,
     get_df,
     get_spd,
@@ -108,6 +109,7 @@ class HttpCli(object):
         self.u2fh = conn.u2fh  # mypy404
         self.log_func = conn.log_func  # mypy404
         self.log_src = conn.log_src  # mypy404
+        self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
         self.tls: bool = hasattr(self.s, "cipher")
 
         # placeholders; assigned by run()
@@ -176,6 +178,9 @@ class HttpCli(object):
         # sanity check to prevent any disasters
         if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
             raise Exception("that was close")
+
+    def _gen_fk(self, salt: str, fspath: str, fsize: int, inode: int) -> str:
+        return gen_filekey_dbg(salt, fspath, fsize, inode, self.log, self.args.log_fk)
 
     def j2s(self, name: str, **ka: Any) -> str:
         tpl = self.conn.hsrv.j2[name]
@@ -711,7 +716,7 @@ class HttpCli(object):
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         lim = vfs.get_dbv(rem)[0].lim
-        fdir = os.path.join(vfs.realpath, rem)
+        fdir = vfs.canonical(rem)
         if lim:
             fdir, rem = lim.all(self.ip, rem, remains, fdir)
 
@@ -813,7 +818,7 @@ class HttpCli(object):
 
         vsuf = ""
         if self.can_read and "fk" in vfs.flags:
-            vsuf = "?k=" + gen_filekey(
+            vsuf = "?k=" + self.gen_fk(
                 self.args.fk_salt,
                 path,
                 post_sz,
@@ -950,7 +955,7 @@ class HttpCli(object):
 
         if rem:
             try:
-                dst = os.path.join(vfs.realpath, rem)
+                dst = vfs.canonical(rem)
                 if not bos.path.isdir(dst):
                     bos.makedirs(dst)
             except OSError as ex:
@@ -1185,7 +1190,7 @@ class HttpCli(object):
         sanitized = sanitize_fn(new_dir, "", [])
 
         if not nullwrite:
-            fdir = os.path.join(vfs.realpath, rem)
+            fdir = vfs.canonical(rem)
             fn = os.path.join(fdir, sanitized)
 
             if not bos.path.isdir(fdir):
@@ -1224,7 +1229,7 @@ class HttpCli(object):
         sanitized = sanitize_fn(new_file, "", [])
 
         if not nullwrite:
-            fdir = os.path.join(vfs.realpath, rem)
+            fdir = vfs.canonical(rem)
             fn = os.path.join(fdir, sanitized)
 
             if bos.path.exists(fn):
@@ -1245,7 +1250,7 @@ class HttpCli(object):
 
         upload_vpath = self.vpath
         lim = vfs.get_dbv(rem)[0].lim
-        fdir_base = os.path.join(vfs.realpath, rem)
+        fdir_base = vfs.canonical(rem)
         if lim:
             fdir_base, rem = lim.all(self.ip, rem, -1, fdir_base)
             upload_vpath = "{}/{}".format(vfs.vpath, rem).strip("/")
@@ -1286,7 +1291,7 @@ class HttpCli(object):
                 else:
                     open_args = {}
                     tnam = fname = os.devnull
-                    fdir = ""
+                    fdir = abspath = ""
 
                 if lim:
                     lim.chk_bup(self.ip)
@@ -1318,12 +1323,15 @@ class HttpCli(object):
                             lim.chk_bup(self.ip)
                             lim.chk_nup(self.ip)
                         except:
-                            bos.unlink(tabspath)
-                            bos.unlink(abspath)
+                            if not nullwrite:
+                                bos.unlink(tabspath)
+                                bos.unlink(abspath)
                             fname = os.devnull
                             raise
 
-                    atomic_move(tabspath, abspath)
+                    if not nullwrite:
+                        atomic_move(tabspath, abspath)
+
                     files.append(
                         (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
                     )
@@ -1373,9 +1381,9 @@ class HttpCli(object):
         for sz, sha_hex, sha_b64, ofn, lfn, ap in files:
             vsuf = ""
             if self.can_read and "fk" in vfs.flags:
-                vsuf = "?k=" + gen_filekey(
+                vsuf = "?k=" + self.gen_fk(
                     self.args.fk_salt,
-                    abspath,
+                    ap,
                     sz,
                     0 if ANYWIN or not ap else bos.stat(ap).st_ino,
                 )[: vfs.flags["fk"]]
@@ -1453,7 +1461,7 @@ class HttpCli(object):
             raise Pebkac(411)
 
         rp, fn = vsplit(rem)
-        fp = os.path.join(vfs.realpath, rp)
+        fp = vfs.canonical(rp)
         lim = vfs.get_dbv(rem)[0].lim
         if lim:
             fp, rp = lim.all(self.ip, rp, clen, fp)
@@ -2310,7 +2318,7 @@ class HttpCli(object):
 
         if not is_dir and (self.can_read or self.can_get):
             if not self.can_read and "fk" in vn.flags:
-                correct = gen_filekey(
+                correct = self.gen_fk(
                     self.args.fk_salt, abspath, st.st_size, 0 if ANYWIN else st.st_ino
                 )[: vn.flags["fk"]]
                 got = self.uparam.get("k")
@@ -2534,7 +2542,7 @@ class HttpCli(object):
             if add_fk:
                 href = "{}?k={}".format(
                     quotep(href),
-                    gen_filekey(
+                    self.gen_fk(
                         self.args.fk_salt, fspath, sz, 0 if ANYWIN else inf.st_ino
                     )[:add_fk],
                 )

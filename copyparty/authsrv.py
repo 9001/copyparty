@@ -707,7 +707,7 @@ class AuthSrv(object):
                     raise Exception('invalid mountpoint "{}"'.format(vol_dst))
 
                 # cfg files override arguments and previous files
-                vol_src = bos.path.abspath(vol_src)
+                vol_src = absreal(vol_src)
                 vol_dst = vol_dst.strip("/")
                 self._map_volume(vol_src, vol_dst, mount, daxs, mflags)
                 continue
@@ -818,7 +818,7 @@ class AuthSrv(object):
                     src = uncyg(src)
 
                 # print("\n".join([src, dst, perms]))
-                src = bos.path.abspath(src)
+                src = absreal(src)
                 dst = dst.strip("/")
                 self._map_volume(src, dst, mount, daxs, mflags)
 
@@ -847,7 +847,7 @@ class AuthSrv(object):
         if not mount:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
-            vfs = VFS(self.log_func, bos.path.abspath("."), "", axs, {})
+            vfs = VFS(self.log_func, absreal("."), "", axs, {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             vfs = VFS(self.log_func, "", "", AXS(), {})
@@ -1029,10 +1029,15 @@ class AuthSrv(object):
                 vol.flags["dathumb"] = True
                 vol.flags["dithumb"] = True
 
+        have_fk = False
         for vol in vfs.all_vols.values():
             fk = vol.flags.get("fk")
             if fk:
                 vol.flags["fk"] = int(fk) if fk is not True else 8
+                have_fk = True
+
+        if have_fk and re.match("^[0-9\.]+$", self.args.fk_salt):
+            self.log("filekey salt: {}".format(self.args.fk_salt))
 
         for vol in vfs.all_vols.values():
             if "pk" in vol.flags and "gz" not in vol.flags and "xz" not in vol.flags:

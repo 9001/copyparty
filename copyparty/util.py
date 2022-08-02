@@ -46,7 +46,7 @@ try:
     from collections.abc import Callable, Iterable
 
     import typing
-    from typing import Any, Generator, Optional, Protocol, Union
+    from typing import Any, Generator, Optional, Pattern, Protocol, Union
 
     class RootLogger(Protocol):
         def __call__(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
@@ -930,6 +930,24 @@ def gen_filekey(salt: str, fspath: str, fsize: int, inode: int) -> str:
             "{} {} {} {}".format(salt, fspath, fsize, inode).encode("utf-8", "replace")
         ).digest()
     ).decode("ascii")
+
+
+def gen_filekey_dbg(
+    salt: str,
+    fspath: str,
+    fsize: int,
+    inode: int,
+    log: "NamedLogger",
+    log_ptn: Optional[Pattern[str]],
+) -> str:
+    ret = gen_filekey(salt, fspath, fsize, inode)
+
+    assert log_ptn
+    if log_ptn.search(fspath):
+        t = "fk({}) salt({}) size({}) inode({}) fspath({})"
+        log(t.format(ret[:8], salt, fsize, inode, fspath))
+
+    return ret
 
 
 def gencookie(k: str, v: str, dur: Optional[int]) -> str:

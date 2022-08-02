@@ -106,7 +106,7 @@ class Cfg(Namespace):
         ex = "re_maxage rproxy rsp_slp s_wr_slp theme themes turbo df"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "doctitle favico html_head mth textfiles"
+        ex = "doctitle favico html_head mth textfiles log_fk"
         ka.update(**{k: "" for k in ex.split()})
 
         super(Cfg, self).__init__(
