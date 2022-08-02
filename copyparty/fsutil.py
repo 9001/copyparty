@@ -71,6 +71,10 @@ class Fstab(object):
         self.log("found {} at {}".format(fs, path))
         return fs
 
+    def build_fallback(self) -> None:
+        self.tab = VFS(self.log_func, "idk", "/", AXS(), {})
+        self.trusted = False
+
     def build_tab(self) -> None:
         self.log("building tab")
 
@@ -128,8 +132,7 @@ class Fstab(object):
             except:
                 # prisonparty or other restrictive environment
                 self.log("failed to build tab:\n{}".format(min_ex()), 3)
-                self.tab = VFS(self.log_func, "idk", "/", AXS(), {})
-                self.trusted = False
+                self.build_fallback()
 
         assert self.tab
         ret = self.tab._find(path)[0]
@@ -142,6 +145,9 @@ class Fstab(object):
         # list mountpoints: fsutil fsinfo drives
         assert ctypes
         from ctypes.wintypes import BOOL, DWORD, LPCWSTR, LPDWORD, LPWSTR, MAX_PATH
+
+        if not self.tab:
+            self.build_fallback()
 
         def echk(rc: int, fun: Any, args: Any) -> None:
             if not rc:
