@@ -7,6 +7,7 @@ if (!window['console'])
 
 
 var wah = '',
+    HALFMAX = 8192 * 8192 * 8192 * 8192,
     is_touch = 'ontouchstart' in window,
     is_https = (window.location + '').indexOf('https:') === 0,
     IPHONE = is_touch && /iPhone|iPad|iPod/i.test(navigator.userAgent),
@@ -459,6 +460,16 @@ function sortTable(table, col, cb) {
         }
         return reverse * (a.localeCompare(b));
     });
+    if (sread('dir1st') !== '0') {
+        var r1 = [], r2 = [];
+        for (var i = 0; i < tr.length; i++) {
+            var cell = tr[vl[i][1]].cells[1],
+                href = cell.getAttribute('sortv') || cell.textContent.trim();
+
+            (href.split('?')[0].slice(-1) == '/' ? r1 : r2).push(vl[i]);
+        }
+        vl = r1.concat(r2);
+    }
     for (i = 0; i < tr.length; ++i) tb.appendChild(tr[vl[i][1]]);
     if (cb) cb();
 }

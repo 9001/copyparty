@@ -106,6 +106,7 @@ var Ls = {
 
 		"ct_thumb": "in icon view, toggle icons or thumbnails$NHotkey: T",
 		"ct_dots": "show hidden files (if server permits)",
+		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
 
 		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them",
@@ -439,6 +440,7 @@ var Ls = {
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
+		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
 
 		"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres",
@@ -822,6 +824,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
+	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">↑ dirs</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -2479,7 +2482,8 @@ function sortfiles(nodes) {
 	if (!nodes.length)
 		return nodes;
 
-	var sopts = jread('fsort', [["href", 1, ""]]);
+	var sopts = jread('fsort', [["href", 1, ""]]),
+		dir1st = sread('dir1st') !== '0';
 
 	try {
 		var is_srch = false;
@@ -2510,14 +2514,10 @@ function sortfiles(nodes) {
 
 					if ((v + '').indexOf('<a ') === 0)
 						v = v.split('>')[1];
-					else if (name == "href" && v) {
-						if (v.split('?')[0].slice(-1) == '/')
-							v = '\t' + v;
-
+					else if (name == "href" && v)
 						v = uricom_dec(v)[0];
-					}
 
-					nodes[b]._sv = v;
+					nodes[b]._sv = v
 				}
 			}
 
@@ -2545,6 +2545,13 @@ function sortfiles(nodes) {
 			delete nodes[b]._sv;
 			if (is_srch)
 				delete nodes[b].ext;
+		}
+		if (dir1st) {
+			var r1 = [], r2 = [];
+			for (var b = 0, bb = nodes.length; b < bb; b++)
+				(nodes[b].href.split('?')[0].slice(-1) == '/' ? r1 : r2).push(nodes[b]);
+
+			nodes = r1.concat(r2);
 		}
 	}
 	catch (ex) {
@@ -4439,6 +4446,9 @@ var treectl = (function () {
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
 		r.goto(get_evpath());
 	});
+	bcfg_bind(r, 'dir1st', 'dir1st', true, function (v) {
+		treectl.gentab(get_evpath(), treectl.lsc);
+	});
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
 	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);
@@ -4885,6 +4895,7 @@ var treectl = (function () {
 	}
 
 	r.gentab = function (top, res) {
+		r.lsc = res;
 		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
 			seen = {};
@@ -4897,7 +4908,6 @@ var treectl = (function () {
 				bhref = tn.href.split('?')[0],
 				fname = uricom_dec(bhref)[0],
 				hname = esc(fname),
-				sortv = (bhref.slice(-1) == '/' ? '\t' : '') + hname,
 				id = 'f-' + ('00000000' + crc32(fname)).slice(-8),
 				lang = showfile.getlang(fname);
 
@@ -4912,8 +4922,8 @@ var treectl = (function () {
 				tn.lead = '<a href="?doc=' + tn.href + '" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var ln = ['<tr><td>' + tn.lead + '</td><td sortv="' + sortv +
-				'"><a href="' + top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
+			var ln = ['<tr><td>' + tn.lead + '</td><td><a href="' +
+				top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
