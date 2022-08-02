@@ -259,7 +259,7 @@ html.bz {
 	--bg-d2: #34384e;
 	--bg-d3: #34384e;
 
-	--row-alt: rgba(139, 150, 205, 0.06);
+	--row-alt: #181a27;
 
 	--btn-bg: #202231;
 	--btn-h-bg: #2d2f45;
@@ -309,7 +309,7 @@ html.c {
 	--a-gray: #0ae;
 
 	--tab-alt: #6ef;
-	--row-alt: rgba(180,0,255,0.3);
+	--row-alt: #47237d;
 	--scroll: #ff0;
 
 	--btn-fg: #fff;
@@ -707,6 +707,7 @@ html.y #files thead th {
 #files td {
 	margin: 0;
 	padding: .3em .5em;
+	background: var(--bg);
 }
 #files tr:nth-child(2n) td {
 	background: var(--row-alt);
