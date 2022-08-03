@@ -5,13 +5,14 @@ __pycache__/
 MANIFEST.in
 MANIFEST
 copyparty.egg-info/
-buildenv/
-build/
-dist/
-py2/
-sfx/
-unt/
 .venv/
+
+/buildenv/
+/build/
+/dist/
+/py2/
+/sfx/
+/unt/
 
 # ide
 *.sublime-workspace
