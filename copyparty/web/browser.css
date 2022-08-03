@@ -544,6 +544,9 @@ html.dy {
 
 	--tree-bg: #fff;
 
+	--g-sel-bg: #000;
+	--g-fsel-bg: #444;
+	--g-fsel-ts: #000;
 	--g-fg: a;
 	--g-bg: a;
 	--g-b1: a;
@@ -1595,9 +1598,6 @@ html.y #tree.nowrap .ntree a+a:hover {
 	border-left: .4em solid var(--bg-u5);
 	margin: .7em 0 .7em .5em;
 	padding-left: .5em;
-}
-.opwide>div.fill {
-	display: block;
 }
 .opwide>div>div>a {
 	line-height: 2em;

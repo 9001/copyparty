@@ -861,7 +861,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div id="key_notation"></div></div>\n' +
-	'<div class="fill"><h3>' + L.cl_hiddenc + ' <a href="#" id="hcolsr">' + L.cl_reset + '</h3><div id="hcols"></div></div>'
+	'<div><h3>' + L.cl_hiddenc + ' <a href="#" id="hcolsr">' + L.cl_reset + '</h3><div id="hcols"></div></div>'
 );
 
 
