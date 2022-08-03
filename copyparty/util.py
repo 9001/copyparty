@@ -84,8 +84,6 @@ else:
     from urllib import quote  # pylint: disable=no-name-in-module
     from urllib import unquote  # pylint: disable=no-name-in-module
 
-_: Any = (mp, BytesIO, quote, unquote)
-__all__ = ["mp", "BytesIO", "quote", "unquote"]
 
 try:
     struct.unpack(b">i", b"idgi")
@@ -256,6 +254,10 @@ except:
 VERSIONS = "copyparty v{} ({})\n{}\n   sqlite v{} | jinja v{} | pyftpd v{}".format(
     S_VERSION, S_BUILD_DT, py_desc(), SQLITE_VER, JINJA_VER, PYFTPD_VER
 )
+
+
+_: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER)
+__all__ = ["mp", "BytesIO", "quote", "unquote", "SQLITE_VER", "JINJA_VER", "PYFTPD_VER"]
 
 
 class Cooldown(object):

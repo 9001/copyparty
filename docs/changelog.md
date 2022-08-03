@@ -1,4 +1,134 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0727-1407  `v1.3.8`  more async
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* new arg `--df 4` and volflag `:c,df=4g` to guarantee 4 GiB free disk space by rejecting uploads
+* some features no longer block new uploads while they're processing
+  * `-e2v` file integrity checker
+  * `-e2ts` initial tag scanner
+  * hopefully fixes a [deadlock](https://www.youtube.com/watch?v=DkKoMveT_jo&t=3s) someone ran into (but probably doesn't)
+    * (the "deadlock" link is an addictive demoscene banger -- the actual issue is #10)
+* reduced the impact of some features which still do
+  * defer `--re-maxage` reindexing if there was a write (upload/rename/...) recently
+    * `--db-act` sets minimum idle period before reindex can start (default 10sec)
+* bbox / image-viewer: add video hotkeys 0..9 to seek 0%..90%
+* audio-player: add audio crossfeed (left-right channel mixer / vocal isolation)
+* splashpage (`/?h`) shows time since the most recent write
+
+## bugfixes
+* a11y:
+  * enter-key should always trigger onclick
+  * only focus password box if in-bounds
+  * improve skip-to-files
+* prisonparty: volume labeling in root folders
+* other minor stuff
+  * forget deleted shadowed files from the db
+  * be less noisy if a client disconnects mid-reply
+  * up2k.js less eager to thrash slow server HDDs
+
+## other changes
+* show client's upload ETA in server log
+* dump stacks and issue `lsof` on the db if a transaction is stuck
+  * will hopefully help if there's any more deadlocks
+* [up2k-hook-ytid](https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/up2k-hook-ytid.js) (the overengineered up2k.js plugin example) now has an mp4/webm/mkv metadata parser
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0716-1848  `v1.3.7`  faster
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* `up2k.js`: **improved upload speeds!**
+  * **...when there's many small files** (or the browser is slow)
+    * add [potato mode](https://user-images.githubusercontent.com/241032/179336639-8ecc01ea-2662-4cb6-8048-5be3ad599f33.png) -- lightweight UI for faster uploads from slow boxes
+    * enables automatically if it detects a cpu bottleneck (not very accurate)
+  * **...on really fast connections (LAN / fiber)**
+    * batch progress updates to reduce repaints
+  * **...when there is a mix of big and small files**
+    * sort the uploads by size, smallest first, for optimal cpu/network usage
+      * can be overridden to alphabetical order in the settings tab
+      * new arg `--u2sort` changes the default + overrides the override button
+    * improve upload pacing when alphabetical order is enabled
+      * mainly affecting single files that are 300 GiB + 
+* `up2k.js`: add [up2k hooks](https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/up2k-hooks.js)
+  * specify *client-side* rules to reject files as they are dropped into the browser
+  * not a hard-reject since people can use [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) and whatnot, more like a hint
+* `up2k.py`: add file integrity checker
+  * new arg `-e2v` to scan volumes and verify file checksums on startup
+  * `-e2vu` updates the db on mismatch, `-e2vp` panics
+  * uploads are blocked while the scan is running -- might get fixed at some point
+    * for now it prints a warning
+* bbox / image-viewer: doubletap a picture to enter fullscreen mode
+* md-editor: `ctrl-c/x` affects current line if no selection, and `ctrl-e` is fullscreen
+* tag-parser plugins:
+  * add support for passing metadata from one mtp to another (parser dependencies)
+    * the `p` flag in [vidchk](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/vidchk.py) usage makes it run after the base parser, eating its output
+  * add [rclone uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/rclone-upload.py) which optionally and by default depends on vidchk
+
+## bugfixes
+* sfx would crash if it got the same PID as recently (for example across two reboots)
+* audio equalizer on recent chromes
+  * still can't figure out why chrome sometimes drops the mediasession
+* bbox: don't attach click events to videos
+* up2k.py:
+  * more sensible behavior w/ blank files
+  * avoid some extra directory scans when deleting files
+  * faster shutdown on `ctrl-c` during volume indexing
+* warning from the thumbnail cleaner if the volume has no thumbnails
+* `>fixing py2 support` `>2022`
+
+## other changes
+* up2k.js:
+  * sends a summary of the upload queue to [the server log](https://github.com/9001/copyparty#up2k)
+  * shows a toast while loading huge filedrops to indicate it's still alive
+* sfx: disable guru meditation unless running on windows
+  * avoids hanging systemd on certain crashes
+* logs the state of all threads if sqlite hits a timeout
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0706-0029  `v1.3.5`  sup cloudflare
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* detect + recover from cloudflare ddos-protection memes during upload
+  * while carefully avoiding any mention of "DDoS" in the JS because enterprise firewalls do not enjoy that
+* new option `--favico` to specify a default favicon
+  * set to `🎉` by default, which also enables the fancy upload progress donut 👌
+* baguettebox (image/video viewer):
+  * toolbar button `⛶` to enter fullscreen mode (same as hotkey `F`)
+  * tap middle of screen to show/hide toolbar
+  * tap left/right-side of pics to navigate prev/next
+  * hotkeys `[` and `]` to set A-B loop in videos
+    * and [URL parameters](https://a.ocv.me/pub/demo/pics-vids/#gf-e2e482ae&t=4.2-6) for that + [initial seekpoint](https://a.ocv.me/pub/demo/pics-vids/#gf-c04bb0f6&t=26s) (same as the audio player)
+
+## bugfixes
+* when a tag-parser hits the timeout, `pkill` all its descendants too
+  * and a [new mtp flag](https://github.com/9001/copyparty/#file-parser-plugins) to override that; `kt` (kill tree, default), `km` (kill main, old default), `kn` (kill none)
+* cpu-wasting spin while waiting for the final handful of files to finish tag-scraping
+* detection of sparse-files support inside [prisonparty](https://github.com/9001/copyparty/tree/hovudstraum/bin#prisonpartysh) and other strict jails
+* baguettebox (image/video viewer):
+  * crash on swipe during close
+* didn't reset terminal color at the end of `?ls=v`
+* don't try to thumbnail empty files (harmless but dumb)
+
+## other changes
+* ux improvements
+  * hide the uploads table until something happens
+* bump codemirror to 5.65.6
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0627-2057  `v1.3.3`  sdcardfs
 
 * **new:** read-only demo server at https://a.ocv.me/pub/demo/

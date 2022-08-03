@@ -1036,7 +1036,7 @@ class AuthSrv(object):
                 vol.flags["fk"] = int(fk) if fk is not True else 8
                 have_fk = True
 
-        if have_fk and re.match("^[0-9\.]+$", self.args.fk_salt):
+        if have_fk and re.match(r"^[0-9\.]+$", self.args.fk_salt):
             self.log("filekey salt: {}".format(self.args.fk_salt))
 
         for vol in vfs.all_vols.values():

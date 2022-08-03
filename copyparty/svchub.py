@@ -20,7 +20,7 @@ try:
     from types import FrameType
 
     import typing
-    from typing import Optional, Union
+    from typing import Any, Optional, Union
 except:
     pass
 
@@ -467,7 +467,7 @@ class SvcHub(object):
             if self.logf:
                 self.logf.write(msg)
 
-    def pr(self, *a, **ka):
+    def pr(self, *a: Any, **ka: Any) -> None:
         with self.log_mutex:
             print(*a, **ka)
 

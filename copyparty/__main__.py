@@ -675,7 +675,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     if argv is None:
         argv = sys.argv
 
-    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite v{} | jinja2 v{} | pyftpd v{}\n\033[0m\n'
+    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite v{} | jinja2 v{} | pyftpd v{}\n\033[0m'
     f = f.format(
         S_VERSION,
         CODENAME,

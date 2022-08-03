@@ -824,7 +824,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
-	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">↑ dirs</a>\n' +
+	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +

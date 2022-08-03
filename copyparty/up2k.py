@@ -32,8 +32,8 @@ from .util import (
     ProgressPrinter,
     absreal,
     atomic_move,
-    djoin,
     db_ex_chk,
+    djoin,
     fsenc,
     min_ex,
     quotep,
@@ -143,7 +143,8 @@ class Up2k(object):
             if self.sqlite_ver < (3, 9):
                 self.no_expr_idx = True
         else:
-            self.log("could not initialize sqlite3, will use in-memory registry only")
+            t = "could not initialize sqlite3, will use in-memory registry only"
+            self.log(t, 3)
 
         if ANYWIN:
             # usually fails to set lastmod too quickly
