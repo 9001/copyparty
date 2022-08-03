@@ -50,10 +50,12 @@ class SvcHub(object):
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
         self.stop_req = False
-        self.reload_req = False
         self.stopping = False
+        self.stopped = False
+        self.reload_req = False
         self.reloading = False
         self.stop_cond = threading.Condition()
+        self.nsigs = 3
         self.retcode = 0
         self.httpsrv_up = 0
 
@@ -287,7 +289,9 @@ class SvcHub(object):
                 pass
 
             self.shutdown()
-            thr.join()
+            # cant join; eats signals on win10
+            while not self.stopped:
+                time.sleep(0.1)
         else:
             self.stop_thr()
 
@@ -323,9 +327,22 @@ class SvcHub(object):
 
     def signal_handler(self, sig: int, frame: Optional[FrameType]) -> None:
         if self.stopping:
-            return
+            if self.nsigs <= 0:
+                try:
+                    threading.Thread(target=self.pr, args=("OMBO BREAKER",)).start()
+                    time.sleep(0.1)
+                except:
+                    pass
 
-        if sig == signal.SIGUSR1:
+                if ANYWIN:
+                    os.system("taskkill /f /pid {}".format(os.getpid()))
+                else:
+                    os.kill(os.getpid(), signal.SIGKILL)
+            else:
+                self.nsigs -= 1
+                return
+
+        if not ANYWIN and sig == signal.SIGUSR1:
             self.reload_req = True
         else:
             self.stop_req = True
@@ -346,9 +363,7 @@ class SvcHub(object):
 
         ret = 1
         try:
-            with self.log_mutex:
-                print("OPYTHAT")
-
+            self.pr("OPYTHAT")
             self.tcpsrv.shutdown()
             self.broker.shutdown()
             self.up2k.shutdown()
@@ -361,22 +376,23 @@ class SvcHub(object):
                         break
 
                     if n == 3:
-                        print("waiting for thumbsrv (10sec)...")
+                        self.pr("waiting for thumbsrv (10sec)...")
 
-            print("nailed it", end="")
+            self.pr("nailed it", end="")
             ret = self.retcode
         except:
-            print("\033[31m[ error during shutdown ]\n{}\033[0m".format(min_ex()))
+            self.pr("\033[31m[ error during shutdown ]\n{}\033[0m".format(min_ex()))
             raise
         finally:
             if self.args.wintitle:
                 print("\033]0;\033\\", file=sys.stderr, end="")
                 sys.stderr.flush()
 
-            print("\033[0m")
+            self.pr("\033[0m")
             if self.logf:
                 self.logf.close()
 
+            self.stopped = True
             sys.exit(ret)
 
     def _log_disabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
@@ -442,6 +458,10 @@ class SvcHub(object):
 
             if self.logf:
                 self.logf.write(msg)
+
+    def pr(self, *a, **ka):
+        with self.log_mutex:
+            print(*a, **ka)
 
     def check_mp_support(self) -> str:
         vmin = sys.version_info[1]
