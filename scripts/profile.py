@@ -8,7 +8,7 @@ cmd = sys.argv[1]
 if cmd == "cpp":
     from copyparty.__main__ import main
 
-    argv = ["__main__", "-v", "srv::r", "-v", "../../yt:yt:r"]
+    argv = ["__main__", "-vsrv::r:c,e2ds,e2ts"]
     main(argv=argv)
 
 elif cmd == "test":
@@ -29,6 +29,6 @@ else:
 #
 # python -m vmprof -o prof --lines ./scripts/profile.py test
 
-# linux: ~/.local/bin/vmprofshow prof tree | grep -vF '[1m  0.'
-# macos: ~/Library/Python/3.9/bin/vmprofshow prof tree | grep -vF '[1m  0.'
+# linux: ~/.local/bin/vmprofshow prof tree | awk '$2>1{n=5} !n{next} 1;{n--} !n{print""}'
+# macos: ~/Library/Python/3.9/bin/vmprofshow prof tree
 #   win: %appdata%\..\Roaming\Python\Python39\Scripts\vmprofshow.exe prof tree

@@ -1193,19 +1193,19 @@ class Up2k(object):
 
             w = bw[:-1].decode("ascii")
 
-            q = "select rd, fn from up where w = ?"
-            try:
-                rd, fn = cur.execute(q, (w,)).fetchone()
-            except:
-                # file modified/deleted since spooling
-                continue
+            with self.mutex:
+                try:
+                    q = "select rd, fn from up where substr(w,1,16)=? and +w=?"
+                    rd, fn = cur.execute(q, (w[:16], w)).fetchone()
+                except:
+                    # file modified/deleted since spooling
+                    continue
 
-            if rd.startswith("//") or fn.startswith("//"):
-                rd, fn = s3dec(rd, fn)
+                if rd.startswith("//") or fn.startswith("//"):
+                    rd, fn = s3dec(rd, fn)
 
-            if "mtp" in flags:
-                q = "insert into mt values (?,'t:mtp','a')"
-                with self.mutex:
+                if "mtp" in flags:
+                    q = "insert into mt values (?,'t:mtp','a')"
                     cur.execute(q, (w[:16],))
 
             abspath = os.path.join(ptop, rd, fn)
@@ -1219,6 +1219,7 @@ class Up2k(object):
 
             n_add += n_tags
             n_buf += n_tags
+            nq -= 1
 
             td = time.time() - last_write
             if n_buf >= 4096 or td >= max(1, self.timeout - 1):
