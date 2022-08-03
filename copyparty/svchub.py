@@ -30,7 +30,15 @@ from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
 from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
 from .up2k import Up2k
-from .util import ansi_re, min_ex, mp, start_log_thrs, start_stackmon, alltrace
+from .util import (
+    VERSIONS,
+    alltrace,
+    ansi_re,
+    min_ex,
+    mp,
+    start_log_thrs,
+    start_stackmon,
+)
 
 
 class SvcHub(object):
@@ -535,7 +543,8 @@ class SvcHub(object):
             return
 
         self.tstack = time.time()
-        zb = alltrace().encode("utf-8", "replace")
+        zs = "{}\n{}".format(VERSIONS, alltrace())
+        zb = zs.encode("utf-8", "replace")
         zb = gzip.compress(zb)
         zs = base64.b64encode(zb).decode("ascii")
         self.log("stacks", zs)

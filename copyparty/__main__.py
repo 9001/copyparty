@@ -24,7 +24,18 @@ from .__init__ import ANYWIN, PY2, VT100, WINDOWS, E, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import re_vol
 from .svchub import SvcHub
-from .util import IMPLICATIONS, align_tab, ansi_re, min_ex, py_desc, termsize, wrap
+from .util import (
+    IMPLICATIONS,
+    JINJA_VER,
+    PYFTPD_VER,
+    SQLITE_VER,
+    align_tab,
+    ansi_re,
+    min_ex,
+    py_desc,
+    termsize,
+    wrap,
+)
 
 try:
     from types import FrameType
@@ -664,10 +675,17 @@ def main(argv: Optional[list[str]] = None) -> None:
     if argv is None:
         argv = sys.argv
 
-    desc = py_desc().replace("[", "\033[1;30m[")
-
-    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0m\n'
-    lprint(f.format(S_VERSION, CODENAME, S_BUILD_DT, desc))
+    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite v{} | jinja2 v{} | pyftpd v{}\n\033[0m\n'
+    f = f.format(
+        S_VERSION,
+        CODENAME,
+        S_BUILD_DT,
+        py_desc().replace("[", "\033[1;30m["),
+        SQLITE_VER,
+        JINJA_VER,
+        PYFTPD_VER,
+    )
+    lprint(f)
 
     ensure_locale()
     if HAVE_SSL:

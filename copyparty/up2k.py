@@ -715,9 +715,10 @@ class Up2k(object):
                 )
                 n_rm = self._drop_lost(db.c, top, excl)
             except Exception as ex:
-                db_ex_chk(self.log, ex, db_path)
                 t = "failed to index volume [{}]:\n{}"
                 self.log(t.format(top, min_ex()), c=1)
+                if db_ex_chk(self.log, ex, db_path):
+                    self.hub.log_stacks()
 
             if db.n:
                 self.log("commit {} new files".format(db.n))

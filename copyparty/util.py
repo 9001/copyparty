@@ -22,6 +22,7 @@ from collections import Counter
 from datetime import datetime
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, VT100, WINDOWS
+from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
 try:
@@ -211,6 +212,50 @@ REKOBO_KEY = {
 }
 
 REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
+
+
+def py_desc() -> str:
+    interp = platform.python_implementation()
+    py_ver = ".".join([str(x) for x in sys.version_info])
+    ofs = py_ver.find(".final.")
+    if ofs > 0:
+        py_ver = py_ver[:ofs]
+
+    try:
+        bitness = struct.calcsize(b"P") * 8
+    except:
+        bitness = struct.calcsize("P") * 8
+
+    host_os = platform.system()
+    compiler = platform.python_compiler()
+
+    m = re.search(r"([0-9]+\.[0-9\.]+)", platform.version())
+    os_ver = m.group(1) if m else ""
+
+    return "{:>9} v{} on {}{} {} [{}]".format(
+        interp, py_ver, host_os, bitness, os_ver, compiler
+    )
+
+
+try:
+    from sqlite3 import sqlite_version as SQLITE_VER
+except:
+    SQLITE_VER = "(None)"
+
+try:
+    from jinja2 import __version__ as JINJA_VER
+except:
+    JINJA_VER = "(None)"
+
+try:
+    from pyftpdlib.__init__ import __ver__ as PYFTPD_VER
+except:
+    PYFTPD_VER = "(None)"
+
+
+VERSIONS = "copyparty v{} ({})\n{}\n   sqlite v{} | jinja v{} | pyftpd v{}".format(
+    S_VERSION, S_BUILD_DT, py_desc(), SQLITE_VER, JINJA_VER, PYFTPD_VER
+)
 
 
 class Cooldown(object):
@@ -1757,29 +1802,6 @@ def gzip_orig_sz(fn: str) -> int:
         f.seek(-4, 2)
         rv = f.read(4)
         return sunpack(b"I", rv)[0]  # type: ignore
-
-
-def py_desc() -> str:
-    interp = platform.python_implementation()
-    py_ver = ".".join([str(x) for x in sys.version_info])
-    ofs = py_ver.find(".final.")
-    if ofs > 0:
-        py_ver = py_ver[:ofs]
-
-    try:
-        bitness = struct.calcsize(b"P") * 8
-    except:
-        bitness = struct.calcsize("P") * 8
-
-    host_os = platform.system()
-    compiler = platform.python_compiler()
-
-    m = re.search(r"([0-9]+\.[0-9\.]+)", platform.version())
-    os_ver = m.group(1) if m else ""
-
-    return "{:>9} v{} on {}{} {} [{}]".format(
-        interp, py_ver, host_os, bitness, os_ver, compiler
-    )
 
 
 def align_tab(lines: list[str]) -> list[str]:
