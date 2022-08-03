@@ -699,18 +699,12 @@ window.baguetteBox = (function () {
             showOverlay(index);
             return true;
         }
-        if (index < 0) {
-            if (options.animation)
-                bounceAnimation('left');
 
-            return false;
-        }
-        if (index >= imagesElements.length) {
-            if (options.animation)
-                bounceAnimation('right');
+        if (index < 0)
+            return bounceAnimation('left');
 
-            return false;
-        }
+        if (index >= imagesElements.length)
+            return bounceAnimation('right');
 
         var v = vid();
         if (v) {
@@ -893,10 +887,11 @@ window.baguetteBox = (function () {
     }
 
     function bounceAnimation(direction) {
-        slider.className = 'bounce-from-' + direction;
+        slider.className = options.animation == 'slideIn' ? 'bounce-from-' + direction : 'eog';
         setTimeout(function () {
             slider.className = '';
-        }, 400);
+        }, 300);
+        return false;
     }
 
     function updateOffset() {

@@ -1909,10 +1909,13 @@ html.y #bbox-overlay figcaption a {
 	transition: left .2s ease, transform .2s ease;
 }
 .bounce-from-right {
-	animation: bounceFromRight .4s ease-out;
+	animation: bounceFromRight .3s ease-out;
 }
 .bounce-from-left {
-	animation: bounceFromLeft .4s ease-out;
+	animation: bounceFromLeft .3s ease-out;
+}
+.eog {
+	animation: eog .2s;
 }
 @keyframes bounceFromRight {
 	0% {margin-left: 0}
@@ -1923,6 +1926,9 @@ html.y #bbox-overlay figcaption a {
 	0% {margin-left: 0}
 	50% {margin-left: 30px}
 	100% {margin-left: 0}
+}
+@keyframes eog {
+	0% {filter: brightness(1.5)}
 }
 #bbox-next,
 #bbox-prev {
