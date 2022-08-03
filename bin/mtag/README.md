@@ -42,7 +42,7 @@ run [`install-deps.sh`](install-deps.sh) to build/install most dependencies requ
 * `mtp` modules will not run if a file has existing tags in the db, so clear out the tags with `-e2tsr` the first time you launch with new `mtp` options
 
 
-## usage with volume-flags
+## usage with volflags
 
 instead of affecting all volumes, you can set the options for just one volume like so:
 

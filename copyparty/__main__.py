@@ -397,10 +397,12 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
               \033[36md2t\033[35m disables metadata collection, overrides -e2t*
               \033[36md2v\033[35m disables file verification, overrides -e2v*
               \033[36md2d\033[35m disables all database stuff, overrides -e2*
-              \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
-              \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
               \033[36mhist=/tmp/cdb\033[35m puts thumbnails and indexes at that location
               \033[36mscan=60\033[35m scan for new files every 60sec, same as --re-maxage
+              \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
+              \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
+              \033[36mxdev\033[35m do not descend into other filesystems
+              \033[36mxvol\033[35m skip symlinks leaving the volume root
 
             \033[0mdatabase, audio tags:
             "mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...
@@ -595,6 +597,8 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs)")
     ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching paths during e2ds folder scans")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
+    ap2.add_argument("--xdev", action="store_true", help="do not descend into other filesystems (symlink or bind-mount to another HDD, ...)")
+    ap2.add_argument("--xvol", action="store_true", help="skip symlinks leaving the volume root")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--db-act", metavar="SEC", type=float, default=10, help="defer any scheduled volume reindexing until SEC seconds after last db write (uploads, renames, ...)")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline -- terminate searches running for more than SEC seconds")

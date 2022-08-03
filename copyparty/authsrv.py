@@ -728,12 +728,12 @@ class AuthSrv(object):
         self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
     ) -> None:
         if lvl.strip("crwmdg"):
-            raise Exception("invalid volume flag: {},{}".format(lvl, uname))
+            raise Exception("invalid volflag: {},{}".format(lvl, uname))
 
         if lvl == "c":
             cval: Union[bool, str] = True
             try:
-                # volume flag with arguments, possibly with a preceding list of bools
+                # volflag with arguments, possibly with a preceding list of bools
                 uname, cval = uname.split("=", 1)
             except:
                 # just one or more bools
@@ -1066,7 +1066,7 @@ class AuthSrv(object):
                 if ptn:
                     vol.flags[vf] = re.compile(ptn)
 
-            for k in ["e2t", "e2ts", "e2tsr", "e2v", "e2vu", "e2vp"]:
+            for k in ["e2t", "e2ts", "e2tsr", "e2v", "e2vu", "e2vp", "xdev", "xvol"]:
                 if getattr(self.args, k):
                     vol.flags[k] = True
 
@@ -1084,7 +1084,7 @@ class AuthSrv(object):
             if "mth" not in vol.flags:
                 vol.flags["mth"] = self.args.mth
 
-            # append parsers from argv to volume-flags
+            # append parsers from argv to volflags
             self._read_volflag(vol.flags, "mtp", self.args.mtp, True)
 
             # d2d drops all database features for a volume
@@ -1147,7 +1147,7 @@ class AuthSrv(object):
 
             for mtp in local_only_mtp:
                 if mtp not in local_mte:
-                    t = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volume-flags)'
+                    t = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volflags)'
                     self.log(t.format(vol.vpath, mtp), 1)
                     errors = True
 
@@ -1156,7 +1156,7 @@ class AuthSrv(object):
         tags = [y for x in tags for y in x.split(",")]
         for mtp in tags:
             if mtp not in all_mte:
-                t = 'metadata tag "{}" is defined by "-mtm" or "-mtp", but is not used by "-mte" (or by any "cmte" volume-flag)'
+                t = 'metadata tag "{}" is defined by "-mtm" or "-mtp", but is not used by "-mte" (or by any "cmte" volflag)'
                 self.log(t.format(mtp), 1)
                 errors = True
 

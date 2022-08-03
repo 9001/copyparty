@@ -56,10 +56,11 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
     * [ftp-server](#ftp-server) - an FTP server can be started using `--ftp 3921`
-    * [file indexing](#file-indexing)
-        * [exclude-patterns](#exclude-patterns)
-        * [periodic rescan](#periodic-rescan) - filesystem monitoring;
-    * [upload rules](#upload-rules) - set upload rules using volume flags
+    * [file indexing](#file-indexing) - enables dedup and music search ++
+        * [exclude-patterns](#exclude-patterns) - to save some time
+        * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
+        * [periodic rescan](#periodic-rescan) - filesystem monitoring
+    * [upload rules](#upload-rules) - set upload rules using volflags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
@@ -311,7 +312,7 @@ examples:
   * `u1` can open the `inc` folder, but cannot see the contents, only upload new files to it
   * `u2` can browse it and move files *from* `/inc` into any folder where `u2` has write-access
 * make folder `/mnt/ss` available at `/i`, read-write for u1, get-only for everyone else, and enable accesskeys: `-v /mnt/ss:i:rw,u1:g:c,fk=4`
-  * `c,fk=4` sets the `fk` volume-flag to 4, meaning each file gets a 4-character accesskey
+  * `c,fk=4` sets the `fk` volflag to 4, meaning each file gets a 4-character accesskey
   * `u1` can upload files, browse the folder, and see the generated accesskeys
   * other users cannot browse the folder, but can access the files if they have the full file URL with the accesskey
 
@@ -658,7 +659,9 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 
 ## file indexing
 
-file indexing relies on two database tables, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`), stored in `.hist/up2k.db`. Configuration can be done through arguments, volume flags, or a mix of both.
+enables dedup and music search ++
+
+file indexing relies on two database tables, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`), stored in `.hist/up2k.db`. Configuration can be done through arguments, volflags, or a mix of both.
 
 through arguments:
 * `-e2d` enables file indexing on upload
@@ -671,7 +674,7 @@ through arguments:
 * `-e2vu` patches the database with the new hashes from the filesystem
 * `-e2vp` panics and kills copyparty instead
 
-the same arguments can be set as volume flags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts`, `d2v` for disabling:
+the same arguments can be set as volflags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts`, `d2v` for disabling:
 * `-v ~/music::r:c,e2dsa,e2tsr` does a full reindex of everything on startup
 * `-v ~/music::r:c,d2d` disables **all** indexing, even if any `-e2*` are on
 * `-v ~/music::r:c,d2t` disables all `-e2t*` (tags), does not affect `-e2d*`
@@ -685,7 +688,7 @@ note:
 
 ### exclude-patterns
 
-to save some time, you can provide a regex pattern for filepaths to only index by filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash \.iso$` or the volume-flag `:c,nohash=\.iso$`, this has the following consequences:
+to save some time,  you can provide a regex pattern for filepaths to only index by filename/path/size/last-modified (and not the hash of the file contents) by setting `--no-hash \.iso$` or the volflag `:c,nohash=\.iso$`, this has the following consequences:
 * initial indexing is way faster, especially when the volume is on a network disk
 * makes it impossible to [file-search](#file-search)
 * if someone uploads the same file contents, the upload will not be detected as a dupe, so it will not get symlinked or rejected
@@ -693,6 +696,14 @@ to save some time, you can provide a regex pattern for filepaths to only index b
 similarly, you can fully ignore files/folders using `--no-idx [...]` and `:c,noidx=\.iso$`
 
 if you set `--no-hash [...]` globally, you can enable hashing for specific volumes using flag `:c,nohash=`
+
+### filesystem guards
+
+avoid traversing into other filesystems  using `--xdev` / volflag `:c,xdev`, skipping any symlinks or bind-mounts to another HDD for example
+
+and/or you can `--xvol` / `:c,xvol` to ignore all symlinks leaving the volume's top directory, but still allow bind-mounts pointing elsewhere
+
+**NB: only affects the indexer** -- users can still access anything inside a volume, unless shadowed by another volume
 
 ### periodic rescan
 
@@ -705,7 +716,7 @@ uploads are disabled while a rescan is happening, so rescans will be delayed by 
 
 ## upload rules
 
-set upload rules using volume flags,  some examples:
+set upload rules using volflags,  some examples:
 
 * `:c,sz=1k-3m` sets allowed filesize between 1 KiB and 3 MiB inclusive (suffixes: `b`, `k`, `m`, `g`)
 * `:c,df=4g` block uploads if there would be less than 4 GiB free disk space afterwards
@@ -727,16 +738,16 @@ you can also set transaction limits which apply per-IP and per-volume, but these
 
 files can be autocompressed on upload,  either on user-request (if config allows) or forced by server-config
 
-* volume flag `gz` allows gz compression
-* volume flag `xz` allows lzma compression
-* volume flag `pk` **forces** compression on all files
+* volflag `gz` allows gz compression
+* volflag `xz` allows lzma compression
+* volflag `pk` **forces** compression on all files
 * url parameter `pk` requests compression with server-default algorithm
 * url parameter `gz` or `xz` requests compression with a specific algorithm
 * url parameter `xz` requests xz compression
 
 things to note,
 * the `gz` and `xz` arguments take a single optional argument, the compression level (range 0 to 9)
-* the `pk` volume flag takes the optional argument `ALGORITHM,LEVEL` which will then be forced for all uploads, for example `gz,9` or `xz,0`
+* the `pk` volflag takes the optional argument `ALGORITHM,LEVEL` which will then be forced for all uploads, for example `gz,9` or `xz,0`
 * default compression is gzip level 9
 * all upload methods except up2k are supported
 * the files will be indexed after compression, so dupe-detection and file-search will not work as expected
@@ -756,7 +767,7 @@ in-volume (`.hist/up2k.db`, default) or somewhere else
 
 copyparty creates a subfolder named `.hist` inside each volume where it stores the database, thumbnails, and some other stuff
 
-this can instead be kept in a single place using the `--hist` argument, or the `hist=` volume flag, or a mix of both:
+this can instead be kept in a single place using the `--hist` argument, or the `hist=` volflag, or a mix of both:
 * `--hist ~/.cache/copyparty -v ~/music::r:c,hist=-` sets `~/.cache/copyparty` as the default place to put volume info, but `~/music` gets the regular `.hist` subfolder (`-` restores default behavior)
 
 note:
@@ -794,7 +805,7 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
 
-copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volume flag), there is a default timeout of 30sec, and only files which contain audio get analyzed by default (see ay/an/ad below)
+copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volflag), there is a default timeout of 30sec, and only files which contain audio get analyzed by default (see ay/an/ad below)
 
 * `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
@@ -835,8 +846,8 @@ if this becomes popular maybe there should be a less janky way to do it actually
 tell search engines you dont wanna be indexed,  either using the good old [robots.txt](https://www.robotstxt.org/robotstxt.html) or through copyparty settings:
 
 * `--no-robots` adds HTTP (`X-Robots-Tag`) and HTML (`<meta>`) headers with `noindex, nofollow` globally
-* volume-flag `[...]:c,norobots` does the same thing for that single volume
-* volume-flag `[...]:c,robots` ALLOWS search-engine crawling for that volume, even if `--no-robots` is set globally
+* volflag `[...]:c,norobots` does the same thing for that single volume
+* volflag `[...]:c,robots` ALLOWS search-engine crawling for that volume, even if `--no-robots` is set globally
 
 also, `--force-js` disables the plain HTML folder listing, making things harder to parse for search engines
 
@@ -1059,7 +1070,7 @@ some notes on hardening
 other misc notes:
 
 * you can disable directory listings by giving permission `g` instead of `r`, only accepting direct URLs to files
-  * combine this with volume-flag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
+  * combine this with volflag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
 
 
 ## gotchas

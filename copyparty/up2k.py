@@ -672,6 +672,11 @@ class Up2k(object):
         top = vol.realpath
         rei = vol.flags.get("noidx")
         reh = vol.flags.get("nohash")
+
+        dev = 0
+        if vol.flags.get("xdev"):
+            dev = bos.stat(top).st_dev
+
         with self.mutex:
             reg = self.register_vpath(top, vol.flags)
             assert reg and self.pp
@@ -689,11 +694,25 @@ class Up2k(object):
             excl += list(self.asrv.vfs.histtab.values())
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
+            else:
+                # ~/.wine/dosdevices/z:/ and such
+                excl += ["/dev", "/proc", "/run", "/sys"]
 
             rtop = absreal(top)
             n_add = n_rm = 0
             try:
-                n_add = self._build_dir(db, top, set(excl), top, rtop, rei, reh, [])
+                n_add = self._build_dir(
+                    db,
+                    top,
+                    set(excl),
+                    top,
+                    rtop,
+                    rei,
+                    reh,
+                    [],
+                    dev,
+                    bool(vol.flags.get("xvol")),
+                )
                 n_rm = self._drop_lost(db.c, top, excl)
             except Exception as ex:
                 db_ex_chk(self.log, ex, db_path)
@@ -717,7 +736,13 @@ class Up2k(object):
         rei: Optional[Pattern[str]],
         reh: Optional[Pattern[str]],
         seen: list[str],
+        dev: int,
+        xvol: bool,
     ) -> int:
+        if xvol and not rcdir.startswith(top):
+            self.log("skip xvol: [{}] -> [{}]".format(top, rcdir), 6)
+            return 0
+
         if rcdir in seen:
             t = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
             self.log(t.format(seen[-1], rcdir, cdir), 3)
@@ -750,6 +775,9 @@ class Up2k(object):
             sz = inf.st_size
             if stat.S_ISDIR(inf.st_mode):
                 rap = absreal(abspath)
+                if dev and inf.st_dev != dev:
+                    self.log("skip xdev {}->{}: {}".format(dev, inf.st_dev, abspath), 6)
+                    continue
                 if abspath in excl or rap in excl:
                     unreg.append(rp)
                     continue
@@ -758,7 +786,9 @@ class Up2k(object):
                     continue
                 # self.log(" dir: {}".format(abspath))
                 try:
-                    ret += self._build_dir(db, top, excl, abspath, rap, rei, reh, seen)
+                    ret += self._build_dir(
+                        db, top, excl, abspath, rap, rei, reh, seen, dev, xvol
+                    )
                 except:
                     t = "failed to index subdir [{}]:\n{}"
                     self.log(t.format(abspath, min_ex()), c=1)
@@ -1109,7 +1139,7 @@ class Up2k(object):
         with self.mutex:
             cur.connection.commit()
 
-        # bail if a volume flag disables indexing
+        # bail if a volflag disables indexing
         if "d2t" in flags or "d2d" in flags:
             return 0, n_rm, True
 
