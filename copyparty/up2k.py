@@ -209,7 +209,8 @@ class Up2k(object):
     def _unblock(self) -> None:
         if self.blocked is not None:
             self.blocked = None
-            self.log("uploads are now possible", 2)
+            if not self.stop:
+                self.log("uploads are now possible", 2)
 
     def get_state(self) -> str:
         mtpq: Union[int, str] = 0
@@ -822,6 +823,9 @@ class Up2k(object):
                         self.log("hash: {} @ [{}]".format(repr(ex), abspath))
                         continue
 
+                    if not hashes:
+                        return -1
+
                     wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
 
                 self.db_add(db.c, wark, rd, fn, lmod, sz, "", 0)
@@ -1034,6 +1038,9 @@ class Up2k(object):
                     except Exception as ex:
                         self.log("hash: {} @ [{}]".format(repr(ex), abspath))
                         continue
+
+                    if not hashes:
+                        return -1
 
                     w2 = up2k_wark_from_hashlist(self.salt, sz2, hashes)
 
@@ -2587,6 +2594,9 @@ class Up2k(object):
         ret = []
         with open(fsenc(path), "rb", 512 * 1024) as f:
             while fsz > 0:
+                if self.stop:
+                    return []
+
                 if self.pp:
                     mb = int(fsz / 1024 / 1024)
                     self.pp.msg = "{}{} MB, {}".format(prefix, mb, path)
@@ -2831,6 +2841,9 @@ class Up2k(object):
             self.log("hashing " + abspath)
             inf = bos.stat(abspath)
             hashes = self._hashlist_from_file(abspath)
+            if not hashes:
+                return
+
             wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
             with self.mutex:
                 self.idx_wark(ptop, wark, rd, fn, inf.st_mtime, inf.st_size, ip, at)

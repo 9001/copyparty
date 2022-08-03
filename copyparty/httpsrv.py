@@ -165,7 +165,7 @@ class HttpSrv(object):
         """listens on a shared tcp server"""
         ip, port = srv_sck.getsockname()
         fno = srv_sck.fileno()
-        msg = "subscribed @ {}:{}  f{}".format(ip, port, fno)
+        msg = "subscribed @ {}:{}  f{} p{}".format(ip, port, fno, os.getpid())
         self.log(self.name, msg)
 
         def fun() -> None:

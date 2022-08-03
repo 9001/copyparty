@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import os
 import re
 import socket
 import sys
@@ -128,7 +129,7 @@ class TcpSrv(object):
             srv.listen(self.args.nc)
             ip, port = srv.getsockname()
             fno = srv.fileno()
-            msg = "listening @ {}:{}  f{}".format(ip, port, fno)
+            msg = "listening @ {}:{}  f{} p{}".format(ip, port, fno, os.getpid())
             self.log("tcpsrv", msg)
             if self.args.q:
                 print(msg)
