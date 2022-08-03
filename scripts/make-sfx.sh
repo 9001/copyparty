@@ -26,6 +26,11 @@ help() { exec cat <<'EOF'
 #   (browsers will try to use 'Consolas' instead)
 #
 # `no-dd` saves ~2k by removing the mouse cursor
+#
+# ---------------------------------------------------------------------
+#
+# if you are on windows, you can use msys2:
+#   PATH=/c/Users/$USER/AppData/Local/Programs/Python/Python310:"$PATH" ./make-sfx.sh fast
 
 EOF
 }
@@ -190,7 +195,7 @@ tmpdir="$(
 	done
 
 	# remove type hints before build instead
-	(cd copyparty; python3 ../../scripts/strip_hints/a.py; rm uh)
+	(cd copyparty; "$pybin" ../../scripts/strip_hints/a.py; rm uh)
 }
 
 ver=
