@@ -17,6 +17,7 @@ from .bos import bos
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
+    SQLITE_VER,
     Pebkac,
     absreal,
     fsenc,
@@ -1165,7 +1166,7 @@ class AuthSrv(object):
 
         vfs.bubble_flags()
 
-        e2vs = []
+        have_e2d = False
         t = "volumes and permissions:\n"
         for zv in vfs.all_vols.values():
             if not self.warn_anonwrite:
@@ -1184,24 +1185,27 @@ class AuthSrv(object):
                 u = u if u else "\033[36m--none--\033[0m"
                 t += "\n|  {}:  {}".format(txt, u)
 
-            if "e2v" in zv.flags:
-                e2vs.append(zv.vpath or "/")
+            if "e2d" in zv.flags:
+                have_e2d = True
 
             t += "\n"
 
-        if e2vs:
-            t += "\n\033[33me2v enabled for the following volumes;\nuploads will be blocked until scan has finished:\n  \033[0m"
-            t += "  ".join(e2vs) + "\n"
+        if self.warn_anonwrite:
+            if not self.args.no_voldump:
+                self.log(t)
 
-        if self.warn_anonwrite and not self.args.no_voldump:
-            self.log(t)
+            if have_e2d:
+                t = self.chk_sqlite_threadsafe()
+                if t:
+                    self.log("\n\033[{}\033[0m\n".format(t))
 
         try:
             zv, _ = vfs.get("/", "*", False, True)
             if self.warn_anonwrite and os.getcwd() == zv.realpath:
-                self.warn_anonwrite = False
                 t = "anyone can write to the current directory: {}\n"
                 self.log(t.format(zv.realpath), c=1)
+
+            self.warn_anonwrite = False
         except Pebkac:
             self.warn_anonwrite = True
 
@@ -1214,6 +1218,23 @@ class AuthSrv(object):
             pwds = [re.escape(x) for x in self.iacct.keys()]
             if pwds:
                 self.re_pwd = re.compile("=(" + "|".join(pwds) + ")([]&; ]|$)")
+
+    def chk_sqlite_threadsafe(self) -> str:
+        v = SQLITE_VER[-1:]
+
+        if v == "1":
+            # threadsafe (linux, windows)
+            return ""
+
+        if v == "2":
+            # module safe, connections unsafe (macos)
+            return "33m  your sqlite3 was compiled with reduced thread-safety;\n   database features (-e2d, -e2t) SHOULD be fine\n    but MAY cause database-corruption and crashes"
+
+        if v == "0":
+            # everything unsafe
+            return "31m  your sqlite3 was compiled WITHOUT thread-safety!\n   database features (-e2d, -e2t) will PROBABLY cause crashes!"
+
+        return "36m  cannot verify sqlite3 thread-safety; strange but probably fine"
 
     def dbg_ls(self) -> None:
         users = self.args.ls

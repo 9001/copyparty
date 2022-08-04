@@ -235,8 +235,26 @@ def py_desc() -> str:
     )
 
 
+def _sqlite_ver() -> str:
+    try:
+        co = sqlite3.connect(":memory:")
+        cur = co.cursor()
+        try:
+            vs = cur.execute("select * from pragma_compile_options").fetchall()
+        except:
+            vs = cur.execute("pragma compile_options").fetchall()
+
+        v = next(x[0].split("=")[1] for x in vs if x[0].startswith("THREADSAFE="))
+        cur.close()
+        co.close()
+    except:
+        v = "W"
+
+    return "{}*{}".format(sqlite3.sqlite_version, v)
+
+
 try:
-    from sqlite3 import sqlite_version as SQLITE_VER
+    SQLITE_VER = _sqlite_ver()
 except:
     SQLITE_VER = "(None)"
 

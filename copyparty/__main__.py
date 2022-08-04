@@ -118,12 +118,13 @@ class BasicDodge11874(
 
 
 def lprint(*a: Any, **ka: Any) -> None:
-    txt: str = " ".join(unicode(x) for x in a) + ka.get("end", "\n")
+    eol = ka.pop("end", "\n")
+    txt: str = " ".join(unicode(x) for x in a) + eol
     printed.append(txt)
     if not VT100:
         txt = ansi_re.sub("", txt)
 
-    print(txt, **ka)
+    print(txt, end="", **ka)
 
 
 def warn(msg: str) -> None:
@@ -138,7 +139,7 @@ def ensure_locale() -> None:
     ]:
         try:
             locale.setlocale(locale.LC_ALL, x)
-            lprint("Locale:", x)
+            lprint("Locale: {}\n".format(x))
             break
         except:
             continue

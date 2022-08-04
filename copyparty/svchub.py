@@ -146,8 +146,8 @@ class SvcHub(object):
         self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
         if not args.no_thumb:
-            t = "decoder preference: {}".format(", ".join(self.args.th_dec))
-            self.log("thumb", t)
+            t = ", ".join(self.args.th_dec) or "(None available)"
+            self.log("thumb", "decoder preference: {}".format(t))
 
             if "pil" in self.args.th_dec and not HAVE_WEBP:
                 msg = "disabling webp thumbnails because either libwebp is not available or your Pillow is too old"
