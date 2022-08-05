@@ -41,12 +41,14 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         textdec = new TextDecoder('latin1'),
         md_ptn = new TextEncoder().encode('youtube.com/watch?v='),
         file_ids = [],  // all IDs found for each good_files
+        md_only = [],  // `${id} ${fn}` where ID was only found in metadata
         mofs = 0,
         mnchk = 0,
         mfile = '';
 
     for (var a = 0; a < good_files.length; a++) {
         var [fobj, name] = good_files[a],
+            cname = name,  // will clobber
             sz = fobj.size,
             ids = [],
             id_ok = false,
@@ -57,23 +59,23 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
 
         // look for ID in filename; reduce the
         // metadata-scan intensity if the id looks safe
-        m = /[\[(-]([\w-]{11})[\])]?\.(?:mp4|webm|mkv)$/i.exec(name);
+        m = /[\[(-]([\w-]{11})[\])]?\.(?:mp4|webm|mkv|flv|opus|ogg|mp3|m4a|aac)$/i.exec(name);
         id_ok = !!m;
 
         while (true) {
             // fuzzy catch-all;
             // some ytdl fork did %(title)-%(id).%(ext) ...
-            m = /(?:^|[^\w])([\w-]{11})(?:$|[^\w-])/.exec(name);
+            m = /(?:^|[^\w])([\w-]{11})(?:$|[^\w-])/.exec(cname);
             if (!m)
                 break;
 
-            name = name.replace(m[1], '');
+            cname = cname.replace(m[1], '');
             yt_ids.add(m[1]);
             ids.push(m[1]);
         }
 
         // look for IDs in video metadata,
-        if (/\.(mp4|webm|mkv)$/i.exec(name)) {
+        if (/\.(mp4|webm|mkv|flv|opus|ogg|mp3|m4a|aac)$/i.exec(name)) {
             toast.show('inf r', 0, `analyzing file ${a + 1} / ${good_files.length} :\n${name}\n\nhave analysed ${++mnchk} files in ${(Date.now() - t0) / 1000} seconds, ${humantime((good_files.length - (a + 1)) * (((Date.now() - t0) / 1000) / mnchk))} remaining,\n\nbiggest offset so far is ${mofs}, in this file:\n\n${mfile}`);
 
             // check first and last 128 MiB;
@@ -108,8 +110,10 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
 
                         console.log(`found ${m} @${bofs}, ${name} `);
                         yt_ids.add(m);
-                        if (!has(ids, m))
+                        if (!has(ids, m)) {
                             ids.push(m);
+                            md_only.push(`${m} ${name}`);
+                        }
 
                         // bail after next iteration
                         chunk = nchunks - 1;
@@ -128,6 +132,13 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         }
     }
 
+    if (md_only.length)
+        console.log('recovered the following youtube-IDs by inspecting metadata:\n\n' + md_only.join('\n'));
+    else if (yt_ids.size)
+        console.log('did not discover any additional youtube-IDs by inspecting metadata; all the IDs also existed in the filenames');
+    else
+        console.log('failed to find any youtube-IDs at all, sorry');
+
     if (false) {
         var msg = `finished analysing ${mnchk} files in ${(Date.now() - t0) / 1000} seconds,\n\nbiggest offset was ${mofs} in this file:\n\n${mfile}`,
             mfun = function () { toast.ok(0, msg); };
@@ -138,7 +149,7 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         return hooks[0]([], [], [], hooks.slice(1));
     }
 
-    toast.inf(5, `running query for ${yt_ids.size} videos...`);
+    toast.inf(5, `running query for ${yt_ids.size} youtube-IDs...`);
 
     var xhr = new XHR();
     xhr.open('POST', '/ytq', true);
@@ -162,7 +173,7 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                 if (wanted_ids.has(file_ids[a][b])) {
                     wanted_files.add(good_files[a]);
 
-                    var m = /(.*)\.(mp4|webm|mkv)$/i.exec(name);
+                    var m = /(.*)\.(mp4|webm|mkv|flv|opus|ogg|mp3|m4a|aac)$/i.exec(name);
                     if (m)
                         wanted_names.add(m[1]);
 
