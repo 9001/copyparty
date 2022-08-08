@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-06-16, v0.15, ed <irc.rizon.net>, MIT-Licensed
+2022-08-08, v0.16, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -388,8 +388,9 @@ def handshake(req_ses, url, file, pw, search):
         try:
             r = req_ses.post(url, headers=headers, json=req)
             break
-        except:
-            eprint("handshake failed, retrying: {0}\n".format(file.name))
+        except Exception as ex:
+            em = str(ex).split("SSLError(")[-1]
+            eprint("handshake failed, retrying: {0}\n  {1}\n\n".format(file.name, em))
             time.sleep(1)
 
     try:
