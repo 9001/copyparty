@@ -16,6 +16,7 @@ function goto_up2k() {
 // usually it's undefined but some chromes throw on invoke
 var up2k = null,
     up2k_hooks = [],
+    hws = [],
     sha_js = window.WebAssembly ? 'hw' : 'ac',  // ff53,c57,sa11
     m = 'will use ' + sha_js + ' instead of native sha512 due to';
 
@@ -718,6 +719,13 @@ function up2k_init(subtle) {
         "gotallfiles": [gotallfiles]  // hooks
     };
 
+    if (window.WebAssembly) {
+        for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
+            hws.push(new Worker('/.cpr/w.hash.js'));
+
+        console.log(hws.length + " hashers ready");
+    }
+
     function showmodal(msg) {
         ebi('u2notbtn').innerHTML = msg;
         ebi('u2btn').style.display = 'none';
@@ -790,7 +798,6 @@ function up2k_init(subtle) {
     var parallel_uploads = icfg_get('nthread'),
         uc = {},
         fdom_ctr = 0,
-        min_filebuf = 0,
         biggest_file = 0;
 
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
@@ -801,6 +808,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo, false);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort, false);
+    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly, set_hashw, false);
 
     var st = {
         "files": [],
@@ -1288,8 +1296,12 @@ function up2k_init(subtle) {
 
         if (!nhash) {
             var h = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr.ok + pvis.ctr.ng);
-            if (st.eta.h !== h)
+            if (st.eta.h !== h) {
                 st.eta.h = ebi('u2etah').innerHTML = h;
+                console.log('{0} hash, {1} up'.format(
+                    f2f(st.time.hashing, 2),
+                    f2f(st.time.uploading, 2)));
+            }
         }
 
         if (!nsend && !nhash) {
@@ -1665,6 +1677,7 @@ function up2k_init(subtle) {
         var t = st.todo.hash.shift();
         st.busy.hash.push(t);
         st.nfile.hash = t.n;
+        t.t_hashing = Date.now();
 
         var bpend = 0,
             nchunk = 0,
@@ -1675,30 +1688,23 @@ function up2k_init(subtle) {
         pvis.setab(t.n, nchunks);
         pvis.move(t.n, 'bz');
 
+        if (hws.length && uc.hashw)
+            return wexec_hash(t, chunksize, nchunks);
+
         var segm_next = function () {
-            if (nchunk >= nchunks || (bpend > chunksize && bpend >= min_filebuf))
+            if (nchunk >= nchunks || bpend)
                 return false;
 
             var reader = new FileReader(),
                 nch = nchunk++,
                 car = nch * chunksize,
-                cdr = car + chunksize,
-                t0 = Date.now();
+                cdr = Math.min(chunksize + car, t.size);
 
-            if (cdr >= t.size)
-                cdr = t.size;
-
-            bpend += cdr - car;
             st.bytes.hashed += cdr - car;
 
             function orz(e) {
-                if (!min_filebuf && nch == 1) {
-                    min_filebuf = 1;
-                    var td = Date.now() - t0;
-                    if (td > 50) {
-                        min_filebuf = 32 * 1024 * 1024;
-                    }
-                }
+                bpend--;
+                segm_next();
                 hash_calc(nch, e.target.result);
             }
             reader.onload = function (e) {
@@ -1726,6 +1732,7 @@ function up2k_init(subtle) {
 
                 toast.err(0, 'y o u   b r o k e    i t\nfile: ' + esc(t.name + '') + '\nerror: ' + err);
             };
+            bpend++;
             reader.readAsArrayBuffer(
                 bobslice.call(t.fobj, car, cdr));
 
@@ -1733,8 +1740,6 @@ function up2k_init(subtle) {
         };
 
         var hash_calc = function (nch, buf) {
-            while (segm_next());
-
             var orz = function (hashbuf) {
                 var hslice = new Uint8Array(hashbuf).subarray(0, 33),
                     b64str = buf2b64(hslice);
@@ -1742,15 +1747,12 @@ function up2k_init(subtle) {
                 hashtab[nch] = b64str;
                 t.hash.push(nch);
                 pvis.hashed(t);
-
-                bpend -= buf.byteLength;
-                if (t.hash.length < nchunks) {
+                if (t.hash.length < nchunks)
                     return segm_next();
-                }
+
                 t.hash = [];
-                for (var a = 0; a < nchunks; a++) {
+                for (var a = 0; a < nchunks; a++)
                     t.hash.push(hashtab[a]);
-                }
 
                 t.t_hashed = Date.now();
 
@@ -1782,9 +1784,104 @@ function up2k_init(subtle) {
                 }
             }, 1);
         };
-
-        t.t_hashing = Date.now();
         segm_next();
+    }
+
+    function wexec_hash(t, chunksize, nchunks) {
+        var nchunk = 0,
+            reading = 0,
+            max_readers = 1, //uc.multitask ? 2 : 1,
+            free = [],
+            busy = {},
+            nbusy = 0,
+            hashtab = {},
+            mem = (is_touch ? 128 : 256) * 1024 * 1024;
+
+        for (var a = 0; a < hws.length; a++) {
+            var w = hws[a];
+            free.push(w);
+            w.onmessage = onmsg;
+            mem -= chunksize;
+            if (mem <= 0)
+                break;
+        }
+
+        function go_next() {
+            if (reading >= max_readers || !free.length || nchunk >= nchunks)
+                return;
+
+            var w = free.pop(),
+                car = nchunk * chunksize,
+                cdr = Math.min(chunksize + car, t.size);
+
+            //console.log('[P ] %d read bgin (%d reading, %d busy)', nchunk, reading + 1, nbusy + 1);
+            w.postMessage([nchunk, t.fobj, car, cdr]);
+            busy[nchunk] = w;
+            nbusy++;
+            reading++;
+            nchunk++;
+        }
+
+        function onmsg(d) {
+            d = d.data;
+            var k = d[0];
+
+            if (k == "panic")
+                return vis_exh(d[1], 'up2k.js', '', '', d[1]);
+
+            if (k == "fail") {
+                pvis.seth(t.n, 1, d[1]);
+                pvis.seth(t.n, 2, d[2]);
+                console.log(d[1], d[2]);
+
+                pvis.move(t.n, 'ng');
+                apop(st.busy.hash, t);
+                st.bytes.finished += t.size;
+                return;
+            }
+
+            if (k == "ferr")
+                return toast.err(0, 'y o u   b r o k e    i t\nfile: ' + esc(t.name + '') + '\nerror: ' + d[1]);
+
+            if (k == "read") {
+                reading--;
+                //console.log('[P ] %d read DONE (%d reading, %d busy)', d[1], reading, nbusy);
+                return go_next();
+            }
+
+            if (k == "done") {
+                var nchunk = d[1],
+                    hslice = d[2],
+                    sz = d[3];
+
+                free.push(busy[nchunk]);
+                delete busy[nchunk];
+                nbusy--;
+
+                //console.log('[P ] %d HASH DONE (%d reading, %d busy)', nchunk, reading, nbusy);
+
+                hashtab[nchunk] = buf2b64(hslice);
+                st.bytes.hashed += sz;
+                t.hash.push(nchunk);
+                pvis.hashed(t);
+
+                if (t.hash.length < nchunks)
+                    return nbusy < 2 && go_next();
+
+                t.hash = [];
+                for (var a = 0; a < nchunks; a++)
+                    t.hash.push(hashtab[a]);
+
+                t.t_hashed = Date.now();
+
+                pvis.seth(t.n, 2, L.u_hashdone);
+                pvis.seth(t.n, 1, '📦 wait');
+                apop(st.busy.hash, t);
+                st.todo.handshake.push(t);
+                tasker();
+            }
+        }
+        go_next();
     }
 
     /////
@@ -2364,6 +2461,13 @@ function up2k_init(subtle) {
 
         bcfg_set('u2sort', uc.az = u2sort.indexOf('n') + 1);
         localStorage.removeItem('u2sort');
+    }
+
+    function set_hashw() {
+        if (!window.WebAssembly) {
+            bcfg_set('hashw', false);
+            toast.err(10, L.u_nowork);
+        }
     }
 
     ebi('nthread_add').onclick = function (e) {

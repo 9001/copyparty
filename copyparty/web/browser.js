@@ -117,6 +117,8 @@ var Ls = {
 
 		"cut_az": "upload files in alphabetical order, rather than smallest-file-first$N$Nalphabetical order can make it easier to eyeball if something went wrong on the server, but it makes uploading slightly slower on fiber / LAN",
 
+		"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$N35% faster https, 450% faster http",
+
 		"cft_text": "favicon text (blank and refresh to disable)",
 		"cft_fg": "foreground color",
 		"cft_bg": "background color",
@@ -289,6 +291,7 @@ var Ls = {
 		"u_https2": "switch to https",
 		"u_https3": "for much better performance",
 		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
+		"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
 		"u_enpot": 'switch to <a href="#">potato UI</a> (may improve upload speed)',
 		"u_depot": 'switch to <a href="#">fancy UI</a> (may reduce upload speed)',
 		"u_gotpot": 'switching to the potato UI for improved upload speed,\n\nfeel free to disagree and switch back!',
@@ -450,6 +453,8 @@ var Ls = {
 		"cut_flag": "samkjører nettleserfaner slik at bare én $N kan holde på med befaring / opplastning $N -- andre faner må også ha denne skrudd på $N -- fungerer kun innenfor samme domene",
 
 		"cut_az": "last opp filer i alfabetisk rekkefølge, istedenfor minste-fil-først$N$Nalfabetisk kan gjøre det lettere å anslå om alt gikk bra, men er bittelitt tregere på fiber / LAN",
+
+		"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$N35% raskere https, 450% raskere http",
 
 		"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
 		"cft_fg": "farge",
@@ -623,6 +628,7 @@ var Ls = {
 		"u_https2": "bytte til https",
 		"u_https3": "for mye høyere hastighet",
 		"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
+		"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
 		"u_enpot": 'bytt til <a href="#">enkelt UI</a> (gir sannsynlig raskere opplastning)',
 		"u_depot": 'bytt til <a href="#">snæsent UI</a> (gir sannsynlig tregere opplastning)',
 		"u_gotpot": 'byttet til et enklere UI for å laste opp raskere,\n\ndu kan gjerne bytte tilbake altså!',
@@ -844,6 +850,7 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
+	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '">mt</a>\n' +
 	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '">turbo</a>\n' +
 	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '">date-chk</a>\n' +
 	'		<a id="flag_en" class="tgl btn" href="#" tt="' + L.cut_flag + '">💤</a>\n' +
