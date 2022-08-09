@@ -1533,13 +1533,13 @@ function xhrchk(xhr, prefix, e404) {
     var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
         fun = toast.err;
 
-    if (xhr.status == 503 && /\bDD(?:wah){0}[o]S [Pp]rote[c]tion|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser/.test(errtxt)) {
+    if (xhr.status == 503 && /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser/.test(errtxt)) {
         var now = Date.now(), td = now - cf_cha_t;
         if (td < 15000)
             return;
 
         cf_cha_t = now;
-        errtxt = 'Cloudflare DD' + wah + 'oS protection kicked in\n\n<strong>trying to fix it...</strong>';
+        errtxt = 'Clou' + wah + 'dflare protection kicked in\n\n<strong>trying to fix it...</strong>';
         fun = toast.warn;
 
         qsr('#cf_frame');
