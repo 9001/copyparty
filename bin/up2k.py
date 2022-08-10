@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-08-08, v0.16, ed <irc.rizon.net>, MIT-Licensed
+2022-08-10, v0.17, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -22,12 +22,29 @@ import atexit
 import signal
 import base64
 import hashlib
-import argparse
 import platform
 import threading
 import datetime
 
-import requests
+try:
+    import argparse
+except:
+    m = "\n  ERROR: need 'argparse'; download it here:\n   https://github.com/ThomasWaldmann/argparse/raw/master/argparse.py\n"
+    print(m)
+    raise
+
+try:
+    import requests
+except:
+    if sys.version_info > (2, 7):
+        m = "\n  ERROR: need 'requests'; run this:\n   python -m pip install --user requests\n"
+    else:
+        m = "requests/2.18.4 urllib3/1.23 chardet/3.0.4 certifi/2020.4.5.1 idna/2.7"
+        m = ["   https://pypi.org/project/" + x + "/#files" for x in m.split()]
+        m = "\n  ERROR: need these:\n" + "\n".join(m) + "\n"
+
+    print(m)
+    raise
 
 
 # from copyparty/__init__.py
@@ -124,6 +141,89 @@ class FileSlice(object):
         ret = self.f.read(sz)
         self.ofs += len(ret)
         return ret
+
+
+class MTHash(object):
+    def __init__(self, cores):
+        self.f = None
+        self.sz = 0
+        self.csz = 0
+        self.omutex = threading.Lock()
+        self.imutex = threading.Lock()
+        self.work_q = Queue()
+        self.done_q = Queue()
+        self.thrs = []
+        for _ in range(cores):
+            t = threading.Thread(target=self.worker)
+            t.daemon = True
+            t.start()
+            self.thrs.append(t)
+
+    def hash(self, f, fsz, chunksz, pcb=None, pcb_opaque=None):
+        with self.omutex:
+            self.f = f
+            self.sz = fsz
+            self.csz = chunksz
+
+            chunks = {}
+            nchunks = int(math.ceil(fsz / chunksz))
+            for nch in range(nchunks):
+                self.work_q.put(nch)
+
+            ex = ""
+            for nch in range(nchunks):
+                qe = self.done_q.get()
+                try:
+                    nch, dig, ofs, csz = qe
+                    chunks[nch] = [dig, ofs, csz]
+                except:
+                    ex = ex or qe
+
+                if pcb:
+                    pcb(pcb_opaque, chunksz * nch)
+
+            if ex:
+                raise Exception(ex)
+
+            ret = []
+            for n in range(nchunks):
+                ret.append(chunks[n])
+
+            self.f = None
+            self.csz = 0
+            self.sz = 0
+            return ret
+
+    def worker(self):
+        while True:
+            ofs = self.work_q.get()
+            try:
+                v = self.hash_at(ofs)
+            except Exception as ex:
+                v = str(ex)
+
+            self.done_q.put(v)
+
+    def hash_at(self, nch):
+        f = self.f
+        ofs = ofs0 = nch * self.csz
+        hashobj = hashlib.sha512()
+        chunk_sz = chunk_rem = min(self.csz, self.sz - ofs)
+        while chunk_rem > 0:
+            with self.imutex:
+                f.seek(ofs)
+                buf = f.read(min(chunk_rem, 1024 * 1024 * 12))
+
+            if not buf:
+                raise Exception("EOF at " + str(ofs))
+
+            hashobj.update(buf)
+            chunk_rem -= len(buf)
+            ofs += len(buf)
+
+        digest = hashobj.digest()[:33]
+        digest = base64.urlsafe_b64encode(digest).decode("utf-8")
+        return nch, digest, ofs0, chunk_sz
 
 
 _print = print
@@ -322,8 +422,8 @@ def up2k_chunksize(filesize):
 
 
 # mostly from copyparty/up2k.py
-def get_hashlist(file, pcb):
-    # type: (File, any) -> None
+def get_hashlist(file, pcb, mth):
+    # type: (File, any, any) -> None
     """generates the up2k hashlist from file contents, inserts it into `file`"""
 
     chunk_sz = up2k_chunksize(file.size)
@@ -331,7 +431,12 @@ def get_hashlist(file, pcb):
     file_ofs = 0
     ret = []
     with open(file.abs, "rb", 512 * 1024) as f:
+        if mth and file.size >= 1024 * 512:
+            ret = mth.hash(f, file.size, chunk_sz, pcb, file)
+            file_rem = 0
+
         while file_rem > 0:
+            # same as `hash_at` except for `imutex` / bufsz
             hashobj = hashlib.sha512()
             chunk_sz = chunk_rem = min(chunk_sz, file_rem)
             while chunk_rem > 0:
@@ -399,7 +504,7 @@ def handshake(req_ses, url, file, pw, search):
         raise Exception(r.text)
 
     if search:
-        return r["hits"]
+        return r["hits"], False
 
     try:
         pre, url = url.split("://")
@@ -517,6 +622,8 @@ class Ctl(object):
             self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
             self.st_up = [None, "(idle, starting...)"]  # type: tuple[File, int]
 
+            self.mth = MTHash(ar.J) if ar.J > 1 else None
+
             self._fancy()
 
     def _safe(self):
@@ -527,7 +634,7 @@ class Ctl(object):
             upath = file.abs.decode("utf-8", "replace")
 
             print("{0} {1}\n  hash...".format(self.nfiles - nf, upath))
-            get_hashlist(file, None)
+            get_hashlist(file, None, None)
 
             burl = self.ar.url[:12] + self.ar.url[8:].split("/")[0] + "/"
             while True:
@@ -680,7 +787,7 @@ class Ctl(object):
 
                 time.sleep(0.05)
 
-            get_hashlist(file, self.cb_hasher)
+            get_hashlist(file, self.cb_hasher, self.mth)
             with self.mutex:
                 self.hash_f += 1
                 self.hash_c += len(file.cids)
@@ -809,6 +916,9 @@ def main():
     if not VT100:
         os.system("rem")  # enables colors
 
+    cores = os.cpu_count() if hasattr(os, "cpu_count") else 4
+    hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
+
     # fmt: off
     ap = app = argparse.ArgumentParser(formatter_class=APF, epilog="""
 NOTE:
@@ -824,6 +934,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap = app.add_argument_group("performance tweaks")
     ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
+    ap.add_argument("-J", type=int, metavar="THREADS", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")

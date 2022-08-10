@@ -28,6 +28,7 @@ from .mtag import MParser, MTag
 from .util import (
     HAVE_SQLITE3,
     SYMTIME,
+    MTHash,
     Pebkac,
     ProgressPrinter,
     absreal,
@@ -154,6 +155,11 @@ class Up2k(object):
             thr.start()
 
         self.fstab = Fstab(self.log_func)
+
+        if self.args.hash_mt < 2:
+            self.mth: Optional[MTHash] = None
+        else:
+            self.mth = MTHash(self.args.hash_mt)
 
         if self.args.no_fastboot:
             self.deferred_init()
@@ -841,7 +847,7 @@ class Up2k(object):
 
                 self.pp.msg = "a{} {}".format(self.pp.n, abspath)
 
-                if nohash:
+                if nohash or not sz:
                     wark = up2k_wark_from_metadata(self.salt, sz, lmod, rd, fn)
                 else:
                     if sz > 1024 * 1024:
@@ -1059,7 +1065,7 @@ class Up2k(object):
                 sz2 = st.st_size
                 mt2 = int(st.st_mtime)
 
-                if nohash:
+                if nohash or not sz2:
                     w2 = up2k_wark_from_metadata(self.salt, sz2, mt2, rd, fn)
                 else:
                     if sz2 > 1024 * 1024 * 32:
@@ -2625,14 +2631,21 @@ class Up2k(object):
         fsz = bos.path.getsize(path)
         csz = up2k_chunksize(fsz)
         ret = []
+        suffix = " MB, {}".format(path)
         with open(fsenc(path), "rb", 512 * 1024) as f:
+            if self.mth and fsz >= 1024 * 512:
+                tlt = self.mth.hash(f, fsz, csz, self.pp, prefix, suffix)
+                ret = [x[0] for x in tlt]
+                fsz = 0
+
             while fsz > 0:
+                # same as `hash_at` except for `imutex` / bufsz
                 if self.stop:
                     return []
 
                 if self.pp:
                     mb = int(fsz / 1024 / 1024)
-                    self.pp.msg = "{}{} MB, {}".format(prefix, mb, path)
+                    self.pp.msg = prefix + str(mb) + suffix
 
                 hashobj = hashlib.sha512()
                 rem = min(csz, fsz)
@@ -2873,11 +2886,17 @@ class Up2k(object):
             abspath = os.path.join(ptop, rd, fn)
             self.log("hashing " + abspath)
             inf = bos.stat(abspath)
-            hashes = self._hashlist_from_file(abspath)
-            if not hashes:
-                return
+            if not inf.st_size:
+                wark = up2k_wark_from_metadata(
+                    self.salt, inf.st_size, int(inf.st_mtime), rd, fn
+                )
+            else:
+                hashes = self._hashlist_from_file(abspath)
+                if not hashes:
+                    return
 
-            wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
+                wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
+
             with self.mutex:
                 self.idx_wark(ptop, wark, rd, fn, inf.st_mtime, inf.st_size, ip, at)
 
@@ -2892,6 +2911,9 @@ class Up2k(object):
 
     def shutdown(self) -> None:
         self.stop = True
+
+        if self.mth:
+            self.mth.stop = True
 
         for x in list(self.spools):
             self._unspool(x)

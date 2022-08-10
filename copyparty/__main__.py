@@ -336,6 +336,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
         fk_salt = "hunter2"
 
     cores = os.cpu_count() if hasattr(os, "cpu_count") else 4
+    hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
     sects = [
         [
@@ -611,6 +612,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
     ap2.add_argument("--xdev", action="store_true", help="do not descend into other filesystems (symlink or bind-mount to another HDD, ...)")
     ap2.add_argument("--xvol", action="store_true", help="skip symlinks leaving the volume root")
+    ap2.add_argument("--hash-mt", metavar="CORES", type=int, default=hcores, help="num cpu cores to use for file hashing; set 0 or 1 for single-core hashing")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--db-act", metavar="SEC", type=float, default=10, help="defer any scheduled volume reindexing until SEC seconds after last db write (uploads, renames, ...)")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline -- terminate searches running for more than SEC seconds")
