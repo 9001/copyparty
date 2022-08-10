@@ -8,10 +8,25 @@ if (!window['console'])
 
 var wah = '',
     HALFMAX = 8192 * 8192 * 8192 * 8192,
-    is_touch = 'ontouchstart' in window,
-    is_https = (window.location + '').indexOf('https:') === 0,
-    IPHONE = is_touch && /iPhone|iPad|iPod/i.test(navigator.userAgent),
+    HTTPS = (window.location + '').indexOf('https:') === 0,
+    TOUCH = 'ontouchstart' in window,
+    MOBILE = TOUCH,
+    CHROME = !!window.chrome,
+    IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
+
+
+try {
+    if (navigator.userAgentData.mobile)
+        MOBILE = true;
+
+    if (navigator.userAgentData.platform == 'Windows')
+        WINDOWS = true;
+
+    if (navigator.userAgentData.brands.some(function (d) { return d.brand == 'Chromium' }))
+        CHROME = true;
+}
+catch (ex) { }
 
 
 var ebi = document.getElementById.bind(document),
@@ -946,7 +961,7 @@ var tt = (function () {
             return r.show.bind(this)();
 
         tev = setTimeout(r.show.bind(this), 800);
-        if (is_touch)
+        if (TOUCH)
             return;
 
         this.addEventListener('mousemove', r.move);

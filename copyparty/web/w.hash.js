@@ -25,12 +25,13 @@ function load_fb() {
 
 onmessage = (d) => {
     var [nchunk, fobj, car, cdr] = d.data,
+        t0 = Date.now(),
         reader = new FileReader();
 
     reader.onload = function (e) {
         try {
             //console.log('[ w] %d HASH bgin', nchunk);
-            postMessage(["read", nchunk]);
+            postMessage(["read", nchunk, cdr - car, Date.now() - t0]);
             hash_calc(e.target.result);
         }
         catch (ex) {

@@ -117,7 +117,7 @@ var Ls = {
 
 		"cut_az": "upload files in alphabetical order, rather than smallest-file-first$N$Nalphabetical order can make it easier to eyeball if something went wrong on the server, but it makes uploading slightly slower on fiber / LAN",
 
-		"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$N35% faster https, 450% faster http",
+		"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$N30% faster https, 4.5x faster http,$Nand 5.3x faster on android phones",
 
 		"cft_text": "favicon text (blank and refresh to disable)",
 		"cft_fg": "foreground color",
@@ -289,7 +289,7 @@ var Ls = {
 
 		"u_https1": "you should",
 		"u_https2": "switch to https",
-		"u_https3": "for much better performance",
+		"u_https3": "for better performance",
 		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
 		"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
 		"u_enpot": 'switch to <a href="#">potato UI</a> (may improve upload speed)',
@@ -454,7 +454,7 @@ var Ls = {
 
 		"cut_az": "last opp filer i alfabetisk rekkefølge, istedenfor minste-fil-først$N$Nalfabetisk kan gjøre det lettere å anslå om alt gikk bra, men er bittelitt tregere på fiber / LAN",
 
-		"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$N35% raskere https, 450% raskere http",
+		"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$N30% raskere https, 4.5x raskere http,$Nog 5.3x raskere på android-telefoner",
 
 		"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
 		"cft_fg": "farge",
@@ -626,7 +626,7 @@ var Ls = {
 
 		"u_https1": "du burde",
 		"u_https2": "bytte til https",
-		"u_https3": "for mye høyere hastighet",
+		"u_https3": "for høyere hastighet",
 		"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
 		"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
 		"u_enpot": 'bytt til <a href="#">enkelt UI</a> (gir sannsynlig raskere opplastning)',
@@ -921,7 +921,7 @@ function opclick(e) {
 	goto(dest);
 
 	var input = QS('.opview.act input:not([type="hidden"])')
-	if (input && !is_touch) {
+	if (input && !TOUCH) {
 		tt.skip = true;
 		input.focus();
 	}
@@ -1691,7 +1691,7 @@ var vbar = (function () {
 		if (e.button === 0)
 			can.onmousemove = null;
 	};
-	if (is_touch) {
+	if (TOUCH) {
 		can.ontouchstart = mousedown;
 		can.ontouchmove = mousemove;
 	}
@@ -1796,7 +1796,7 @@ function playpause(e) {
 		seek_au_mul(x * 1.0 / rect.width);
 	};
 
-	if (!is_touch)
+	if (!TOUCH)
 		bar.onwheel = function (e) {
 			var dist = Math.sign(e.deltaY) * 10;
 			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
@@ -1836,7 +1836,7 @@ var mpui = (function () {
 		if (++nth > 69) {
 			// android-chrome breaks aspect ratio with unannounced viewport changes
 			nth = 0;
-			if (is_touch) {
+			if (MOBILE) {
 				nth = 1;
 				pbar.onresize();
 				vbar.onresize();
@@ -4214,7 +4214,7 @@ document.onkeydown = function (e) {
 			clearTimeout(defer_timeout);
 			clearTimeout(search_timeout);
 			search_timeout = setTimeout(do_search,
-				v && v.length < (is_touch ? 4 : 3) ? 1000 : 500);
+				v && v.length < (MOBILE ? 4 : 3) ? 1000 : 500);
 		}
 	}
 

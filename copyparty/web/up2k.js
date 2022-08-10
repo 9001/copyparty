@@ -755,7 +755,7 @@ function up2k_init(subtle) {
             showmodal('<h1>loading ' + fn + '</h1>');
             import_js('/.cpr/deps/' + fn, unmodal);
 
-            if (is_https) {
+            if (HTTPS) {
                 // chrome<37 firefox<34 edge<12 opera<24 safari<7
                 m = L.u_ancient;
                 setmsg('');
@@ -846,6 +846,7 @@ function up2k_init(subtle) {
             "t": ""
         },
         "car": 0,
+        "slow_io": null,
         "modn": 0,
         "modv": 0,
         "mod0": null
@@ -1298,9 +1299,10 @@ function up2k_init(subtle) {
             var h = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr.ok + pvis.ctr.ng);
             if (st.eta.h !== h) {
                 st.eta.h = ebi('u2etah').innerHTML = h;
-                console.log('{0} hash, {1} up'.format(
-                    f2f(st.time.hashing, 2),
-                    f2f(st.time.uploading, 2)));
+                console.log('{0} hash, {1} up, {2} busy'.format(
+                    f2f(st.time.hashing, 1),
+                    f2f(st.time.uploading, 1),
+                    f2f(st.time.busy, 1)));
             }
         }
 
@@ -1688,7 +1690,7 @@ function up2k_init(subtle) {
         pvis.setab(t.n, nchunks);
         pvis.move(t.n, 'bz');
 
-        if (hws.length && uc.hashw)
+        if (nchunks > 1 && hws.length && uc.hashw)
             return wexec_hash(t, chunksize, nchunks);
 
         var segm_next = function () {
@@ -1790,12 +1792,13 @@ function up2k_init(subtle) {
     function wexec_hash(t, chunksize, nchunks) {
         var nchunk = 0,
             reading = 0,
-            max_readers = 1, //uc.multitask ? 2 : 1,
+            max_readers = 1,
+            opt_readers = 2,
             free = [],
             busy = {},
             nbusy = 0,
             hashtab = {},
-            mem = (is_touch ? 128 : 256) * 1024 * 1024;
+            mem = (MOBILE ? 128 : 256) * 1024 * 1024;
 
         for (var a = 0; a < hws.length; a++) {
             var w = hws[a];
@@ -1807,6 +1810,11 @@ function up2k_init(subtle) {
         }
 
         function go_next() {
+            if (st.slow_io && uc.multitask)
+                // android-chrome filereader latency is ridiculous but scales linearly
+                // (unlike every other platform which instead suffers on parallel reads...)
+                max_readers = opt_readers = free.length;
+
             if (reading >= max_readers || !free.length || nchunk >= nchunks)
                 return;
 
@@ -1845,6 +1853,11 @@ function up2k_init(subtle) {
 
             if (k == "read") {
                 reading--;
+                if (MOBILE && CHROME && st.slow_io === null && d[1] == 1 && d[2] > 1024 * 512) {
+                    var spd = Math.floor(d[2] / d[3]);
+                    st.slow_io = spd < 40 * 1024;
+                    console.log('spd {0}, slow: {1}'.format(spd, st.slow_io));
+                }
                 //console.log('[P ] %d read DONE (%d reading, %d busy)', d[1], reading, nbusy);
                 return go_next();
             }
@@ -1866,7 +1879,7 @@ function up2k_init(subtle) {
                 pvis.hashed(t);
 
                 if (t.hash.length < nchunks)
-                    return nbusy < 2 && go_next();
+                    return nbusy < opt_readers && go_next();
 
                 t.hash = [];
                 for (var a = 0; a < nchunks; a++)
@@ -2309,7 +2322,7 @@ function up2k_init(subtle) {
     window.addEventListener('resize', onresize);
     onresize();
 
-    if (is_touch) {
+    if (MOBILE) {
         // android-chrome wobbles for a bit; firefox / iOS-safari are OK
         setTimeout(onresize, 20);
         setTimeout(onresize, 100);
