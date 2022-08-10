@@ -269,7 +269,7 @@ class SvcHub(object):
     def run(self) -> None:
         self.tcpsrv.run()
 
-        thr = threading.Thread(target=self.thr_httpsrv_up)
+        thr = threading.Thread(target=self.thr_httpsrv_up, name="sig-hsrv-up2")
         thr.daemon = True
         thr.start()
 
@@ -308,7 +308,7 @@ class SvcHub(object):
             return "cannot reload; already in progress"
 
         self.reloading = True
-        t = threading.Thread(target=self._reload)
+        t = threading.Thread(target=self._reload, name="reloading")
         t.daemon = True
         t.start()
         return "reload initiated"

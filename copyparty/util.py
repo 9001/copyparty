@@ -509,8 +509,8 @@ class MTHash(object):
         self.work_q: Queue[int] = Queue()
         self.done_q: Queue[tuple[int, str, int, int]] = Queue()
         self.thrs = []
-        for _ in range(cores):
-            t = threading.Thread(target=self.worker)
+        for n in range(cores):
+            t = threading.Thread(target=self.worker, name="mth-" + str(n))
             t.daemon = True
             t.start()
             self.thrs.append(t)
@@ -1390,7 +1390,7 @@ def db_ex_chk(log: "NamedLogger", ex: Exception, db_path: str) -> bool:
     if str(ex) != "database is locked":
         return False
 
-    thr = threading.Thread(target=lsof, args=(log, db_path))
+    thr = threading.Thread(target=lsof, args=(log, db_path), name="dbex")
     thr.daemon = True
     thr.start()
 

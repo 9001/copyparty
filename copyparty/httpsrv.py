@@ -102,7 +102,7 @@ class HttpSrv(object):
                 start_log_thrs(self.log, self.args.log_thrs, nid)
 
         self.th_cfg: dict[str, Any] = {}
-        t = threading.Thread(target=self.post_init)
+        t = threading.Thread(target=self.post_init, name="hsrv-init2")
         t.daemon = True
         t.start()
 
@@ -171,7 +171,7 @@ class HttpSrv(object):
         def fun() -> None:
             self.broker.say("cb_httpsrv_up")
 
-        threading.Thread(target=fun).start()
+        threading.Thread(target=fun, name="sig-hsrv-up1").start()
 
         while not self.stopping:
             if self.args.log_conn:

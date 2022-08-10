@@ -391,7 +391,7 @@ class Ftpd(object):
             for h, lp in hs:
                 FTPServer((ip, int(lp)), h, ioloop)
 
-        thr = threading.Thread(target=ioloop.loop)
+        thr = threading.Thread(target=ioloop.loop, name="ftp")
         thr.daemon = True
         thr.start()
 

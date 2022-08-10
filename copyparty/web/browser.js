@@ -4652,9 +4652,9 @@ var treectl = (function () {
 				return ta[a];
 	};
 
-	r.goto = function (url, push) {
+	r.goto = function (url, push, back) {
 		get_tree("", url, true);
-		r.reqls(url, push, true);
+		r.reqls(url, push, true, back);
 	};
 
 	function get_tree(top, dst, rst) {
@@ -4823,9 +4823,10 @@ var treectl = (function () {
 		thegrid.setvis(true);
 	}
 
-	r.reqls = function (url, hpush, no_tree) {
+	r.reqls = function (url, hpush, no_tree, back) {
 		var xhr = new XHR();
 		xhr.top = url;
+		xhr.back = back
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
 		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : ''), true);
@@ -4892,6 +4893,12 @@ var treectl = (function () {
 		clmod(ebi('epi'), 'mdo');
 		if (res.readme)
 			show_readme(res.readme);
+
+		if (this.hpush && !this.back) {
+			var ofs = ebi('wrap').offsetTop;
+			if (document.documentElement.scrollTop > ofs)
+				document.documentElement.scrollTop = ofs;
+		}
 
 		wintitle();
 		var fun = r.ls_cb;
@@ -5068,7 +5075,7 @@ var treectl = (function () {
 		if (url.search.indexOf('doc=') + 1 && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);
 
-		r.goto(url.pathname);
+		r.goto(url.pathname, false, true);
 	};
 
 	hist_replace(get_evpath() + window.location.hash);
