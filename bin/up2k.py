@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-08-10, v0.17, ed <irc.rizon.net>, MIT-Licensed
+2022-08-13, v0.18, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -330,8 +330,8 @@ def _scd(err, top):
             abspath = os.path.join(top, fh.name)
             try:
                 yield [abspath, fh.stat()]
-            except:
-                err.append(abspath)
+            except Exception as ex:
+                err.append((abspath, str(ex)))
 
 
 def _lsd(err, top):
@@ -340,8 +340,8 @@ def _lsd(err, top):
         abspath = os.path.join(top, name)
         try:
             yield [abspath, os.stat(abspath)]
-        except:
-            err.append(abspath)
+        except Exception as ex:
+            err.append((abspath, str(ex)))
 
 
 if hasattr(os, "scandir"):
@@ -350,15 +350,20 @@ else:
     statdir = _lsd
 
 
-def walkdir(err, top):
+def walkdir(err, top, seen):
     """recursive statdir"""
+    atop = os.path.abspath(os.path.realpath(top))
+    if atop in seen:
+        return err.append((top, "recursive-symlink"))
+
+    seen = seen[:] + [atop]
     for ap, inf in sorted(statdir(err, top)):
         if stat.S_ISDIR(inf.st_mode):
             try:
-                for x in walkdir(err, ap):
+                for x in walkdir(err, ap, seen):
                     yield x
-            except:
-                err.append(ap)
+            except Exception as ex:
+                err.append((ap, str(ex)))
         else:
             yield ap, inf
 
@@ -373,7 +378,7 @@ def walkdirs(err, tops):
             stop = os.path.dirname(top)
 
         if os.path.isdir(top):
-            for ap, inf in walkdir(err, top):
+            for ap, inf in walkdir(err, top, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
             d, n = top.rsplit(sep, 1)
@@ -576,12 +581,19 @@ class Ctl(object):
 
         if err:
             eprint("\n# failed to access {0} paths:\n".format(len(err)))
-            for x in err:
-                eprint(x.decode("utf-8", "replace") + "\n")
+            for ap, msg in err:
+                if ar.v:
+                    eprint("{0}\n `-{1}\n\n".format(ap.decode("utf-8", "replace"), msg))
+                else:
+                    eprint(ap.decode("utf-8", "replace") + "\n")
 
             eprint("^ failed to access those {0} paths ^\n\n".format(len(err)))
+
+            if not ar.v:
+                eprint("hint: set -v for detailed error messages\n")
+
             if not ar.ok:
-                eprint("aborting because --ok is not set\n")
+                eprint("hint: aborting because --ok is not set\n")
                 return
 
         eprint("found {0} files, {1}\n\n".format(nfiles, humansize(nbytes)))
@@ -929,6 +941,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
+    ap.add_argument("-v", action="store_true", help="verbose")
     ap.add_argument("-a", metavar="PASSWORD", help="password")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
