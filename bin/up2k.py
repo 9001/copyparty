@@ -354,7 +354,8 @@ def walkdir(err, top, seen):
     """recursive statdir"""
     atop = os.path.abspath(os.path.realpath(top))
     if atop in seen:
-        return err.append((top, "recursive-symlink"))
+        err.append((top, "recursive-symlink"))
+        return
 
     seen = seen[:] + [atop]
     for ap, inf in sorted(statdir(err, top)):

@@ -1810,7 +1810,7 @@ class Up2k(object):
         ]:
             cur.execute(cmd)
 
-        cur.connection.commit()
+        self._add_dhash_tab(cur)
         self.log("created DB at {}".format(db_path))
         return cur
 
@@ -1830,6 +1830,7 @@ class Up2k(object):
         for cmd in [
             r"create table dh (d text, h text)",
             r"create index dh_d on dh(d)",
+            r"insert into kv values ('tagscan',1)",
         ]:
             cur.execute(cmd)
 

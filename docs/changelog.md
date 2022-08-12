@@ -1,4 +1,65 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0810-2135  `v1.3.11`  webworkers
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* multithreaded file hashing! **300%** average speed increase
+  * when uploading files through the browser client, based on web-workers
+    * `4.5x` faster on http from a laptop -- `146` -> `670` MiB/s
+    * ` 30%` faster on https from a laptop -- `552` -> `716` MiB/s
+    * `4.2x` faster on http from android -- `13.5` -> `57.1` MiB/s
+    * `5.3x` faster on https from android -- `13.8` -> `73.3` MiB/s
+    * can be disabled using the `mt` togglebtn in the settings pane, for example if your phone runs out of memory (it eats ~250 MiB extra RAM)
+  * `2.3x` faster [u2cli](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy) (cmd-line client) -- `398` -> `930` MiB/s
+  * `2.4x` faster filesystem indexing on the server
+  * thx to @kipukun for the webworker suggestion!
+
+## bugfixes
+* ux: reset scroll when navigating into a new folder
+* u2cli: better errormsg if the server's tls certificate got rejected
+* js: more futureproof cloudflare-challenge detection (they got a new one recently)
+
+## other changes
+* print warning if the python interpreter was built with an unsafe sqlite
+* u2cli: add helpful messages on how to make it run on python 2.6
+
+**trivia:** due to a [chrome bug](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210), http can sometimes be faster than https now ¯\\\_(ツ)\_/¯
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0803-2340  `v1.3.10`  folders first
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* faster
+  * tag scanner
+  * on windows: uploading to fat32 or smb
+* toggle-button to sort folders before files (default-on)
+  * almost the same as before, but now also when sorting by size / date
+* repeatedly hit `ctrl-c` to force-quit if everything dies
+* new file-indexing guards
+  * `--xdev` / volflag `:c,xdev` stops if it hits another filesystem (bindmount/symlink)
+  * `--xvol` / volflag `:c,xvol` does not follow symlinks pointing outside the volume
+  * only affects file indexing -- does NOT prevent access!
+
+## bugfixes
+* forget uploads that failed to initialize (allows retry in another folder)
+* wrong filekeys in upload response if volume path contained a symlink
+* faster shutdown on `ctrl-c` while hashing huge files
+* ux: fix navpane covering files on horizontal scroll
+
+## other changes
+* include version info in the base64 crash-message
+* ux: make upload errors more visible on mobile
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0727-1407  `v1.3.8`  more async
 
 * read-only demo server at https://a.ocv.me/pub/demo/

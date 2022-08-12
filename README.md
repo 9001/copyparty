@@ -249,11 +249,17 @@ some improvement ideas
 * Windows: if the `up2k.db` (filesystem index) is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
   * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
+* [the database can get stuck](https://github.com/9001/copyparty/issues/10)
+  * has only happened once but that is once too many
+  * luckily not dangerous for file integrity and doesn't really stop uploads or anything like that
+  * but would really appreciate some logs if anyone ever runs into it again
 * probably more, pls let me know
 
 ## not my bugs
 
 * [Chrome issue 1317069](https://bugs.chromium.org/p/chromium/issues/detail?id=1317069) -- if you try to upload a folder which contains symlinks by dragging it into the browser, the symlinked files will not get uploaded
+
+* [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive)
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
@@ -1008,6 +1014,10 @@ this is due to `crypto.subtle` [not yet](https://github.com/w3c/webcrypto/issues
 
 as a result, the hashes are much less useful than they could have been (search the server by sha512, provide the sha512 in the response http headers, ...)
 
+however it allows for hashing multiple chunks in parallel, greatly increasing upload speed from fast storage (NVMe, raid-0 and such)
+
+* both the [browser uploader](#uploading) and the [commandline one](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) does this now, allowing for fast uploading even from plaintext http
+
 hashwasm would solve the streaming issue but reduces hashing speed for sha512 (xxh128 does 6 GiB/s), and it would make old browsers and [iphones](https://bugs.webkit.org/show_bug.cgi?id=228552) unsupported
 
 * blake2 might be a better choice since xxh is non-cryptographic, but that gets ~15 MiB/s on slower androids
@@ -1041,6 +1051,7 @@ when uploading files,
 
 * if you're cpu-bottlenecked, or the browser is maxing a cpu core:
   * up to 30% faster uploads if you hide the upload status list by switching away from the `[🚀]` up2k ui-tab (or closing it)
+    * optionally you can switch to the lightweight potato ui by clicking the `[🥔]`
     * switching to another browser-tab also works, the favicon will update every 10 seconds in that case
   * unlikely to be a problem, but can happen when uploding many small files, or your internet is too fast, or PC too slow
 
