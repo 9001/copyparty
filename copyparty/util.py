@@ -1327,6 +1327,10 @@ def vsplit(vpath: str) -> tuple[str, str]:
     return vpath.rsplit("/", 1)  # type: ignore
 
 
+def vjoin(rd: str, fn: str) -> str:
+    return rd + "/" + fn if rd else fn
+
+
 def w8dec(txt: bytes) -> str:
     """decodes filesystem-bytes to wtf8"""
     if PY2:
