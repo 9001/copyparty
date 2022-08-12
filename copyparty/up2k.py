@@ -833,7 +833,7 @@ class Up2k(object):
                         self.log(t.format(top, rp, len(in_db), rep_db))
                         dts = -1
 
-                    if dts == lmod and dsz == sz and (nohash or dw[0] != "#"):
+                    if dts == lmod and dsz == sz and (nohash or dw[0] != "#" or not sz):
                         continue
 
                     t = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
