@@ -402,8 +402,8 @@ sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 
 for n in {1..50}; do
-	(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1 | shuf) >list || true
-	s=$(md5sum list | cut -c-16)
+	(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1 | (shuf||gshuf) ) >list || true
+	s=$( (sha1sum||shasum) < list | cut -c-16)
 	grep -q $s "$zdir/h" && continue
 	echo $s >> "$zdir/h"
 	break

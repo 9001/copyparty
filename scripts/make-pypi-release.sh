@@ -14,10 +14,6 @@ gtar=$(command -v gtar || command -v gnutar) || true
 		realpath() { grealpath "$@"; }
 }
 
-which md5sum 2>/dev/null >/dev/null &&
-	md5sum=md5sum ||
-	md5sum="md5 -r"
-
 mode="$1"
 
 [ -z "$mode" ] &&

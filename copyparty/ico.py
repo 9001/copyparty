@@ -15,7 +15,7 @@ class Ico(object):
     def get(self, ext: str, as_thumb: bool) -> tuple[str, bytes]:
         """placeholder to make thumbnails not break"""
 
-        zb = hashlib.md5(ext.encode("utf-8")).digest()[:2]
+        zb = hashlib.sha1(ext.encode("utf-8")).digest()[2:4]
         if PY2:
             zb = [ord(x) for x in zb]
 

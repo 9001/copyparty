@@ -213,11 +213,11 @@ def yieldfile(fn):
 
 
 def hashfile(fn):
-    h = hashlib.md5()
+    h = hashlib.sha1()
     for block in yieldfile(fn):
         h.update(block)
 
-    return h.hexdigest()
+    return h.hexdigest()[:24]
 
 
 def unpack():
