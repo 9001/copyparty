@@ -552,9 +552,10 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything")
     ap2.add_argument("--logout", metavar="H", type=float, default="8086", help="logout clients after H hours of inactivity (0.0028=10sec, 0.1=6min, 24=day, 168=week, 720=month, 8760=year)")
 
-    ap2 = ap.add_argument_group('yolo options')
+    ap2 = ap.add_argument_group('shutdown options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
     ap2.add_argument("--ign-ebind-all", action="store_true", help="continue running even if it's impossible to receive connections at all")
+    ap2.add_argument("--exit", metavar="WHEN", type=u, default="", help="shutdown after WHEN has finished; for example 'idx' will do volume indexing + metadata analysis")
 
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")

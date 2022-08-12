@@ -206,6 +206,9 @@ class SvcHub(object):
         self.log("root", t, 1)
 
         self.retcode = 1
+        self.sigterm()
+
+    def sigterm(self) -> None:
         os.kill(os.getpid(), signal.SIGTERM)
 
     def cb_httpsrv_up(self) -> None:

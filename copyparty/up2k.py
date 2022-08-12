@@ -182,6 +182,9 @@ class Up2k(object):
         all_vols = self.asrv.vfs.all_vols
         have_e2d = self.init_indexes(all_vols, [])
 
+        if not self.pp and self.args.exit == "idx":
+            return self.hub.sigterm()
+
         thr = threading.Thread(target=self._snapshot, name="up2k-snapshot")
         thr.daemon = True
         thr.start()
@@ -571,7 +574,6 @@ class Up2k(object):
             t = "online (running mtp)"
             if scan_vols:
                 thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-scan")
-                thr.daemon = True
         else:
             self.pp = None
             t = "online, idle"
@@ -580,6 +582,7 @@ class Up2k(object):
             self.volstate[vol.vpath] = t
 
         if thr:
+            thr.daemon = True
             thr.start()
 
         return have_e2d
@@ -1312,6 +1315,9 @@ class Up2k(object):
         for k in list(self.volstate.keys()):
             if "OFFLINE" not in self.volstate[k]:
                 self.volstate[k] = "online, idle"
+
+        if self.args.exit == "idx":
+            self.hub.sigterm()
 
     def _run_one_mtp(self, ptop: str, gid: int) -> None:
         if gid != self.gid:
