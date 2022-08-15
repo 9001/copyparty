@@ -125,7 +125,7 @@ class Up2k(object):
         self.mtp_parsers: dict[str, dict[str, MParser]] = {}
         self.pending_tags: list[tuple[set[str], str, str, dict[str, Any]]] = []
         self.hashq: Queue[tuple[str, str, str, str, float]] = Queue()
-        self.tagq: Queue[tuple[str, str, str, str]] = Queue()
+        self.tagq: Queue[tuple[str, str, str, str, str, float]] = Queue()
         self.tag_event = threading.Condition()
         self.n_hashq = 0
         self.n_tagq = 0
@@ -1288,8 +1288,8 @@ class Up2k(object):
 
             with self.mutex:
                 try:
-                    q = "select rd, fn from up where substr(w,1,16)=? and +w=?"
-                    rd, fn = cur.execute(q, (w[:16], w)).fetchone()
+                    q = "select rd, fn, ip, at from up where substr(w,1,16)=? and +w=?"
+                    rd, fn, ip, at = cur.execute(q, (w[:16], w)).fetchone()
                 except:
                     # file modified/deleted since spooling
                     continue
@@ -1304,9 +1304,14 @@ class Up2k(object):
             abspath = os.path.join(ptop, rd, fn)
             self.pp.msg = "c{} {}".format(nq, abspath)
             if not mpool:
-                n_tags = self._tagscan_file(cur, entags, w, abspath)
+                n_tags = self._tagscan_file(cur, entags, w, abspath, ip, at)
             else:
-                mpool.put(Mpqe({}, entags, w, abspath, {}))
+                if ip:
+                    oth_tags = {"up_ip": ip, "up_at": at}
+                else:
+                    oth_tags = {}
+
+                mpool.put(Mpqe({}, entags, w, abspath, oth_tags))
                 with self.mutex:
                     n_tags = len(self._flush_mpool(cur))
 
@@ -1449,8 +1454,8 @@ class Up2k(object):
                     if w in in_progress:
                         continue
 
-                    q = "select rd, fn from up where substr(w,1,16)=? limit 1"
-                    rd, fn = cur.execute(q, (w,)).fetchone()
+                    q = "select rd, fn, ip, at from up where substr(w,1,16)=? limit 1"
+                    rd, fn, ip, at = cur.execute(q, (w,)).fetchone()
                     rd, fn = s3dec(rd, fn)
                     abspath = os.path.join(ptop, rd, fn)
 
@@ -1471,6 +1476,10 @@ class Up2k(object):
                         oth_tags = {str(k): v for k, v in zq2}
                     else:
                         oth_tags = {}
+
+                    if ip:
+                        oth_tags["up_ip"] = ip
+                        oth_tags["up_at"] = at
 
                     jobs.append(Mpqe(parsers, set(), w, abspath, oth_tags))
                     in_progress[w] = True
@@ -1641,6 +1650,8 @@ class Up2k(object):
         entags: set[str],
         wark: str,
         abspath: str,
+        ip: str,
+        at: float
     ) -> int:
         """will mutex"""
         assert self.mtag
@@ -1654,6 +1665,10 @@ class Up2k(object):
             self._log_tag_err("", abspath, ex)
             return 0
 
+        if ip:
+            tags["up_ip"] = ip
+            tags["up_at"] = at
+        
         with self.mutex:
             return self._tag_file(write_cur, entags, wark, abspath, tags)
 
@@ -2295,7 +2310,7 @@ class Up2k(object):
             raise
 
         if "e2t" in self.flags[ptop]:
-            self.tagq.put((ptop, wark, rd, fn))
+            self.tagq.put((ptop, wark, rd, fn, ip, at))
             self.n_tagq += 1
 
         return True
@@ -2941,7 +2956,7 @@ class Up2k(object):
             with self.mutex:
                 self.n_tagq -= 1
 
-            ptop, wark, rd, fn = self.tagq.get()
+            ptop, wark, rd, fn, ip, at = self.tagq.get()
             if "e2t" not in self.flags[ptop]:
                 continue
 
@@ -2952,6 +2967,8 @@ class Up2k(object):
                 ntags1 = len(tags)
                 parsers = self._get_parsers(ptop, tags, abspath)
                 if parsers:
+                    tags["up_ip"] = ip
+                    tags["up_at"] = at
                     tags.update(self.mtag.get_bin(parsers, abspath, tags))
             except Exception as ex:
                 self._log_tag_err("", abspath, ex)

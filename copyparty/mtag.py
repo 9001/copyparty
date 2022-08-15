@@ -313,7 +313,6 @@ class MTag(object):
                 "tope",
             ],
             "title": ["title", "tit2", "\u00a9nam"],
-            "comment": ["comment"],
             "circle": [
                 "album-artist",
                 "tpe2",
