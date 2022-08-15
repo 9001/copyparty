@@ -335,7 +335,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     except:
         fk_salt = "hunter2"
 
-    cores = os.cpu_count() if hasattr(os, "cpu_count") else 4
+    cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 4
     hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
     sects = [

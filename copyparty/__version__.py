@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 3, 13)
+VERSION = (1, 3, 14)
 CODENAME = "god dag"
 BUILD_DT = (2022, 8, 15)
 
