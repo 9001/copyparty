@@ -69,6 +69,9 @@ pybin=$(command -v python3 || command -v python) || {
 	exit 1
 }
 
+[ $CSN ] ||
+	CSN=sfx
+
 langs=
 use_gz=
 zopf=2560
@@ -99,9 +102,9 @@ stamp=$(
 	done | sort | tail -n 1 | sha1sum | cut -c-16
 )
 
-rm -rf sfx/*
-mkdir -p sfx build
-cd sfx
+rm -rf $CSN/*
+mkdir -p $CSN build
+cd $CSN
 
 tmpdir="$(
 	printf '%s\n' "$TMPDIR" /tmp |
@@ -237,7 +240,7 @@ ts=$(date -u +%s)
 hts=$(date -u +%Y-%m%d-%H%M%S) # --date=@$ts (thx osx)
 
 mkdir -p ../dist
-sfx_out=../dist/copyparty-sfx
+sfx_out=../dist/copyparty-$CSN
 
 echo cleanup
 find -name '*.pyc' -delete
@@ -371,7 +374,7 @@ gzres() {
 }
 
 
-zdir="$tmpdir/cpp-mksfx"
+zdir="$tmpdir/cpp-mk$CSN"
 [ -e "$zdir/$stamp" ] || rm -rf "$zdir"
 mkdir -p "$zdir"
 echo a > "$zdir/$stamp"
@@ -423,7 +426,7 @@ pe=bz2
 
 echo compressing tar
 # detect best level; bzip2 -7 is usually better than -9
-for n in {2..9}; do cp tar t.$n; $pc  -$n t.$n & done; wait; mv -v $(ls -1S t.*.$pe | tail -n 1) tar.bz2
+for n in {2..9}; do cp tar t.$n; nice $pc  -$n t.$n & done; wait; mv -v $(ls -1S t.*.$pe | tail -n 1) tar.bz2
 rm t.* || true
 exts=()
 

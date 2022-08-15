@@ -1,4 +1,27 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0812-2258  `v1.3.12`  quickboot
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+*but wait, there's more!*   not only do you get the [multithreaded file hashing](https://github.com/9001/copyparty/releases/tag/v1.3.11) but also --
+* faster bootup and volume reindexing when `-e2ds` (file indexing) is enabled
+  * `3x` faster is probably the average on most instances; more files per folder = faster
+  * `9x` faster on a 36 TiB zfs music/media nas with `-e2ts` (metadata indexing), dropping from 46sec to 5sec
+  * and `34x` on another zfs box, 63sec -> 1.8sec
+  * new arg `--no-dhash` disables the speedhax in case it's buggy (skipping files or audio tags)
+* add option `--exit idx` to abort and shutdown after volume indexing has finished
+
+## bugfixes
+* [u2cli](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy): detect and skip uploading from recursive symlinks
+* stop reindexing empty files on startup
+* support fips-compliant cpython builds
+  * replaces md5 with sha1, changing the filetype-associated colors in the gallery view
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0810-2135  `v1.3.11`  webworkers
 
 * read-only demo server at https://a.ocv.me/pub/demo/
