@@ -51,6 +51,8 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
             cname = name,  // will clobber
             sz = fobj.size,
             ids = [],
+            fn_ids = [],
+            md_ids = [],
             id_ok = false,
             m;
 
@@ -71,7 +73,7 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
 
             cname = cname.replace(m[1], '');
             yt_ids.add(m[1]);
-            ids.push(m[1]);
+            fn_ids.unshift(m[1]);
         }
 
         // look for IDs in video metadata,
@@ -110,10 +112,13 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
 
                         console.log(`found ${m} @${bofs}, ${name} `);
                         yt_ids.add(m);
-                        if (!has(ids, m)) {
-                            ids.push(m);
+                        if (!has(fn_ids, m) && !has(md_ids, m)) {
+                            md_ids.push(m);
                             md_only.push(`${m} ${name}`);
                         }
+                        else
+                            // id appears several times; make it preferred
+                            md_ids.unshift(m);
 
                         // bail after next iteration
                         chunk = nchunks - 1;
@@ -130,6 +135,13 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                 }
             }
         }
+
+        for (var yi of md_ids)
+            ids.push(yi);
+
+        for (var yi of fn_ids)
+            if (!has(ids, yi))
+                ids.push(yi);
     }
 
     if (md_only.length)
@@ -164,6 +176,7 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
 
     function process_id_list(txt) {
         var wanted_ids = new Set(txt.trim().split('\n')),
+            name_id = {},
             wanted_names = new Set(),  // basenames with a wanted ID
             wanted_files = new Set();  // filedrops
 
@@ -174,8 +187,11 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                     wanted_files.add(good_files[a]);
 
                     var m = /(.*)\.(mp4|webm|mkv|flv|opus|ogg|mp3|m4a|aac)$/i.exec(name);
-                    if (m)
-                        wanted_names.add(m[1]);
+                    if (!m)
+                        continue;
+
+                    wanted_names.add(m[1]);
+                    name_id[m[1]] = file_ids[a][b];
 
                     break;
                 }
@@ -189,6 +205,9 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                 name = name.replace(/\.[^\.]+$/, '');
                 if (wanted_names.has(name)) {
                     wanted_files.add(good_files[a]);
+
+                    var subdir = `${name_id[name]}-${Date.now()}-${a}`;
+                    good_files[a][1] = subdir + '/' + good_files[a][1].split(/\//g).pop();
                     break;
                 }
             }
