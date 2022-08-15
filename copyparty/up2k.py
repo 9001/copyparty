@@ -775,7 +775,7 @@ class Up2k(object):
         assert self.pp and self.mem_cur
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
 
-        rd = cdir[len(top) + 1 :].strip("/")
+        rd = cdir[len(top) :].strip("/")
         if WINDOWS:
             rd = rd.replace("\\", "/").strip("/")
 
