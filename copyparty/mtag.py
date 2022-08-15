@@ -178,7 +178,7 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
             ]
 
         if typ == "format":
-            kvm = [["duration", ".dur"], ["bit_rate", ".q"]]
+            kvm = [["duration", ".dur"], ["bit_rate", ".q"], ["format_name", "fmt"]]
 
         for sk, rk in kvm:
             v1 = strm.get(sk)
@@ -238,6 +238,9 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
             del ret[".dur"]
             if ".q" in ret:
                 del ret[".q"]
+
+    if "fmt" in ret:
+        ret["fmt"] = ret["fmt"].split(",")[0]
 
     if ".resw" in ret and ".resh" in ret:
         ret["res"] = "{}x{}".format(ret[".resw"], ret[".resh"])
@@ -310,6 +313,7 @@ class MTag(object):
                 "tope",
             ],
             "title": ["title", "tit2", "\u00a9nam"],
+            "comment": ["comment"],
             "circle": [
                 "album-artist",
                 "tpe2",

@@ -47,8 +47,8 @@ CONDITIONAL_UPLOAD = True
 
 
 def main():
+    fp = sys.argv[1]
     if CONDITIONAL_UPLOAD:
-        fp = sys.argv[1]
         zb = sys.stdin.buffer.read()
         zs = zb.decode("utf-8", "replace")
         md = json.loads(zs)

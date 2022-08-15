@@ -97,7 +97,7 @@ def main():
     zs = (
         "ffmpeg -y -hide_banner -nostdin -v warning"
         + " -err_detect +crccheck+bitstream+buffer+careful+compliant+aggressive+explode"
-        " -xerror -i"
+        + " -xerror -i"
     )
 
     cmd = zs.encode("ascii").split(b" ") + [fsenc(fp)]
