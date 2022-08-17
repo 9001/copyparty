@@ -1,4 +1,21 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0815-1825  `v1.3.14`  fix windows db
+
+after two exciting releases, time for something boring
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* upload-info (ip and timestamp) is provided to `mtp` tagparser plugins as json
+* tagscanner will index `fmt` (file-format / container type) by default
+  * and `description` can be enabled in `-mte`
+
+## bugfixes
+* [v1.3.12](https://github.com/9001/copyparty/releases/tag/v1.3.12) broke file-indexing on windows if an entire HDD was mounted as a volume
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0812-2258  `v1.3.12`  quickboot
 
 * read-only demo server at https://a.ocv.me/pub/demo/
