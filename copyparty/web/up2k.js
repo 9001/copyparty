@@ -847,6 +847,7 @@ function up2k_init(subtle) {
         },
         "car": 0,
         "slow_io": null,
+        "oserr": false,
         "modn": 0,
         "modv": 0,
         "mod0": null
@@ -1365,6 +1366,14 @@ function up2k_init(subtle) {
             etaskip = 0;
     }
 
+    function got_oserr() {
+        if (!hws.length || !uc.hashw || st.oserr)
+            return;
+
+        st.oserr = true;
+        modal.alert(L.u_emtleak);
+    }
+
     /////
     ////
     ///   actuator
@@ -1723,6 +1732,7 @@ function up2k_init(subtle) {
                     pvis.seth(t.n, 2, err + ' @ ' + car);
                     console.log('OS-error', reader.error, '@', car);
                     handled = true;
+                    got_oserr();
                 }
 
                 if (handled) {
@@ -1841,6 +1851,8 @@ function up2k_init(subtle) {
                 pvis.seth(t.n, 1, d[1]);
                 pvis.seth(t.n, 2, d[2]);
                 console.log(d[1], d[2]);
+                if (d[1] == 'OS-error')
+                    got_oserr();
 
                 pvis.move(t.n, 'ng');
                 apop(st.busy.hash, t);

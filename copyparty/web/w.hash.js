@@ -48,6 +48,7 @@ onmessage = (d) => {
         }
     };
     reader.onerror = function () {
+        busy = false;
         var err = reader.error + '';
 
         if (err.indexOf('NotReadableError') !== -1 || // win10-chrome defender
