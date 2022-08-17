@@ -8,7 +8,7 @@ function hex2u8(txt) {
 
 var subtle = null;
 try {
-    subtle = crypto.subtle || crypto.webkitSubtle;
+    subtle = crypto.subtle;
     subtle.digest('SHA-512', new Uint8Array(1)).then(
         function (x) { },
         function (x) { load_fb(); }
@@ -23,10 +23,19 @@ function load_fb() {
 }
 
 
+var reader = null,
+    busy = false;
+
+
 onmessage = (d) => {
-    var [nchunk, fobj, car, cdr] = d.data,
-        t0 = Date.now(),
+    if (busy)
+        return postMessage(["panic", 'worker got another task while busy']);
+
+    if (!reader)
         reader = new FileReader();
+
+    var [nchunk, fobj, car, cdr] = d.data,
+        t0 = Date.now();
 
     reader.onload = function (e) {
         try {
@@ -49,12 +58,14 @@ onmessage = (d) => {
         postMessage(["ferr", err]);
     };
     //console.log('[ w] %d read bgin', nchunk);
+    busy = true;
     reader.readAsArrayBuffer(
         File.prototype.slice.call(fobj, car, cdr));
 
 
     var hash_calc = function (buf) {
         var hash_done = function (hashbuf) {
+            busy = false;
             try {
                 var hslice = new Uint8Array(hashbuf).subarray(0, 33);
                 //console.log('[ w] %d HASH DONE', nchunk);
