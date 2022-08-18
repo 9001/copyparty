@@ -251,6 +251,9 @@ html.y #tth {
 	padding: .3em;
 	text-align: center;
 }
+#modalc a {
+	color: #07b;
+}
 #modalb {
 	position: sticky;
 	text-align: right;

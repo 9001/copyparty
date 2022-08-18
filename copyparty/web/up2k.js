@@ -808,7 +808,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo, false);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort, false);
-    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly, set_hashw, false);
+    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!HTTPS || !CHROME || MOBILE), set_hashw, false);
 
     var st = {
         "files": [],
@@ -1371,7 +1371,8 @@ function up2k_init(subtle) {
             return;
 
         st.oserr = true;
-        modal.alert(L.u_emtleak);
+        var msg = HTTPS ? L.u_emtleak3 : L.u_emtleak2.format((window.location + '').replace(':', 's:'));
+        modal.alert(L.u_emtleak1 + msg + L.u_emtleak4);
     }
 
     /////

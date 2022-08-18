@@ -41,6 +41,7 @@ onmessage = (d) => {
     reader.onload = function (e) {
         try {
             // chrome gc forgets the filereader output; remind it
+            // (for some chromes, also necessary for subtle)
             gc1 = e.target.result;
             gc2 = new Uint8Array(gc1, 0, 1);
             gc3 = new Uint8Array(gc1, gc1.byteLength - 1);
@@ -95,6 +96,7 @@ onmessage = (d) => {
         if (subtle)
             subtle.digest('SHA-512', buf).then(hash_done);
         else {
+            // note: lifting u8buf counterproductive for the chrome gc bug
             var u8buf = new Uint8Array(buf);
             hashwasm.sha512(u8buf).then(function (v) {
                 hash_done(hex2u8(v))
