@@ -24,6 +24,7 @@ function load_fb() {
 
 
 var reader = null,
+    gc1, gc2, gc3,
     busy = false;
 
 
@@ -39,9 +40,14 @@ onmessage = (d) => {
 
     reader.onload = function (e) {
         try {
+            // chrome gc forgets the filereader output; remind it
+            gc1 = e.target.result;
+            gc2 = new Uint8Array(gc1, 0, 1);
+            gc3 = new Uint8Array(gc1, gc1.byteLength - 1);
+
             //console.log('[ w] %d HASH bgin', nchunk);
             postMessage(["read", nchunk, cdr - car, Date.now() - t0]);
-            hash_calc(e.target.result);
+            hash_calc(gc1);
         }
         catch (ex) {
             postMessage(["panic", ex + '']);
@@ -66,6 +72,11 @@ onmessage = (d) => {
 
     var hash_calc = function (buf) {
         var hash_done = function (hashbuf) {
+            // stop gc from attempting to free early
+            if (!gc1 || !gc2 || !gc3)
+                return console.log('torch went out');
+
+            gc1 = gc2 = gc3 = null;
             busy = false;
             try {
                 var hslice = new Uint8Array(hashbuf).subarray(0, 33);
@@ -76,6 +87,10 @@ onmessage = (d) => {
                 postMessage(["panic", ex + '']);
             }
         };
+
+        // stop gc from attempting to free early
+        if (!gc1 || !gc2 || !gc3)
+            console.log('torch went out');
 
         if (subtle)
             subtle.digest('SHA-512', buf).then(hash_done);
