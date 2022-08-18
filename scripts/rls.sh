@@ -3,7 +3,11 @@ set -e
 
 parallel=2
 
-cd ~/dev/copyparty/scripts
+[ -e make-sfx.sh ] || cd scripts
+[ -e make-sfx.sh ] && [ -e deps-docker ] || {
+    echo cd into the scripts folder first
+    exit 1
+}
 
 v=$1
 
@@ -36,10 +40,14 @@ $f.py -h >/dev/null
     printf '\033[%s' s 2r H "0;1;37;44mbruteforcing sfx size -- press enter to terminate" K u "7m $* " K $'27m\n'
     trap "rm -f .sfx-run; printf '\033[%s' s r u" INT TERM EXIT
     touch .sfx-run
+    min=99999999
     for ((a=0; a<$parallel; a++)); do
         while [ -e .sfx-run ]; do
             CSN=sfx$a ./make-sfx.sh re "$@"
-            mv $f$a.py $f.$(wc -c <$f$a.py | awk '{print$1}').py
+            sz=$(wc -c <$f$a.py | awk '{print$1}')
+            [ $sz -ge $min ] && continue
+            mv $f$a.py $f.py.$sz
+            min=$sz
         done &
     done
     read

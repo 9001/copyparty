@@ -11,7 +11,7 @@ copyparty.egg-info/
 /build/
 /dist/
 /py2/
-/sfx/
+/sfx*
 /unt/
 /log/
 

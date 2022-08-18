@@ -1,4 +1,22 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0817-2302  `v1.3.15`  pls let me stop finding chrome bugs
+
+two browser-bugs in two hours, man i just wanna play horizon
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## bugfixes
+* chrome randomly running out of memory while hashing files and `mt` is enabled
+  * the gc suddenly gives up collecting the filereaders
+  * fixed by reusing a pool of readers instead
+* chrome failing to gc Any Buffers At All while hashing files and `mt` is enabled on plaintext http
+  * this one's funkier, they've repeatedly fixed and broke it like 6 times between chrome 84 and 106
+  * looks like it just forgets about everything that's passed into wasm
+  * no way around it, just show a popup explaining how to disable multithreaded hashing
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0815-1825  `v1.3.14`  fix windows db
 
 after two exciting releases, time for something boring
