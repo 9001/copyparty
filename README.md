@@ -259,7 +259,11 @@ some improvement ideas
 
 * [Chrome issue 1317069](https://bugs.chromium.org/p/chromium/issues/detail?id=1317069) -- if you try to upload a folder which contains symlinks by dragging it into the browser, the symlinked files will not get uploaded
 
-* [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive)
+* [Chrome issue 1354816](https://bugs.chromium.org/p/chromium/issues/detail?id=1354816) -- chrome may eat all RAM uploading over plaintext http with `mt` enabled
+
+  * more amusingly, [Chrome issue 1354800](https://bugs.chromium.org/p/chromium/issues/detail?id=1354800) -- chrome may eat all RAM uploading in general (altho you probably won't run into this one)
+
+* [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive and likely to run into the above gc bugs)
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
