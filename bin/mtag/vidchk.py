@@ -36,7 +36,10 @@ FAST = True  # parse entire file at container level
 
 
 # warnings to ignore
-harmless = re.compile("^Unsupported codec with id ")
+harmless = re.compile(
+    r"Unsupported codec with id |Could not find codec parameters.*Attachment:|analyzeduration"
+    + r"|timescale not set"
+)
 
 
 def wfilter(lines):
@@ -91,7 +94,7 @@ def main():
     if err:
         return err
 
-    if min(w, h) < 1080:
+    if min(w, h) < 720:
         return "resolution too small"
 
     zs = (

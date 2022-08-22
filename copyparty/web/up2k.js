@@ -1043,9 +1043,7 @@ function up2k_init(subtle) {
             }
             dst.push([fobj, fobj.name]);
         }
-        if (dirs) {
-            return read_dirs(null, [], dirs, good_files, nil_files, bad_files);
-        }
+        return read_dirs(null, [], dirs, good_files, nil_files, bad_files);
     }
 
     function rd_flatten(pf, dirs) {
