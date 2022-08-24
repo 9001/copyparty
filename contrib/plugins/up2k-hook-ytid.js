@@ -44,7 +44,11 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         md_only = [],  // `${id} ${fn}` where ID was only found in metadata
         mofs = 0,
         mnchk = 0,
-        mfile = '';
+        mfile = '',
+        myid = localStorage.getItem('ytid_t0');
+
+    if (!myid)
+        localStorage.setItem('ytid_t0', myid = Date.now());
 
     for (var a = 0; a < good_files.length; a++) {
         var [fobj, name] = good_files[a],
@@ -177,7 +181,6 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
     function process_id_list(txt) {
         var wanted_ids = new Set(txt.trim().split('\n')),
             name_id = {},
-            now = Date.now(),
             wanted_names = new Set(),  // basenames with a wanted ID
             wanted_files = new Set();  // filedrops
 
@@ -207,7 +210,7 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                 if (wanted_names.has(name)) {
                     wanted_files.add(good_files[a]);
 
-                    var subdir = `${name_id[name]}-${now}`;
+                    var subdir = `${name_id[name]}-${myid}`;
                     good_files[a][1] = subdir + '/' + good_files[a][1].split(/\//g).pop();
                     break;
                 }

@@ -2,6 +2,7 @@
 
 import json
 import re
+import os
 import sys
 import subprocess as sp
 
@@ -43,10 +44,14 @@ harmless = re.compile(
 
 
 def wfilter(lines):
-    return [x for x in lines if not harmless.search(x)]
+    return [x for x in lines if x.strip() and not harmless.search(x)]
 
 
-def errchk(so, se, rc):
+def errchk(so, se, rc, dbg):
+    if dbg:
+        with open(dbg, "wb") as f:
+            f.write(b"so:\n" + so + b"\nse:\n" + se + b"\n")
+
     if rc:
         err = (so + se).decode("utf-8", "replace").split("\n", 1)
         err = wfilter(err) or err
@@ -66,6 +71,11 @@ def main():
     zb = sys.stdin.buffer.read()
     zs = zb.decode("utf-8", "replace")
     md = json.loads(zs)
+
+    fdir = os.path.dirname(os.path.realpath(fp))
+    flag = os.path.join(fdir, ".processed")
+    if os.path.exists(flag):
+        return "already processed"
 
     try:
         w, h = [int(x) for x in md["res"].split("x")]
@@ -90,7 +100,7 @@ def main():
     with open(fsenc(f"{fp}.ff.json"), "wb") as f:
         f.write(so)
 
-    err = errchk(so, se, p.returncode)
+    err = errchk(so, se, p.returncode, f"{fp}.vidchk")
     if err:
         return err
 
@@ -114,7 +124,7 @@ def main():
 
     p = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE)
     so, se = p.communicate()
-    return errchk(so, se, p.returncode)
+    return errchk(so, se, p.returncode, f"{fp}.vidchk")
 
 
 if __name__ == "__main__":
