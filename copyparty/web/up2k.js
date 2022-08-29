@@ -2106,7 +2106,7 @@ function up2k_init(subtle) {
                         spd2 = (t.size / ((t.t_uploaded - t.t_uploading) / 1000.)) / (1024 * 1024.);
 
                     pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
-                        f2f(spd1, 2), isNaN(spd2) ? '--' : f2f(spd2, 2)));
+                        f2f(spd1, 2), !isNum(spd2) ? '--' : f2f(spd2, 2)));
 
                     pvis.move(t.n, 'ok');
                     if (!pvis.ctr.bz && !pvis.ctr.q)

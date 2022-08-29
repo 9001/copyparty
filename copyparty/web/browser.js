@@ -1287,7 +1287,7 @@ function MPlayer() {
 	r.ftimer = null;
 	r.fade_in = function () {
 		r.fvol = 0;
-		r.fdir = 0.025;
+		r.fdir = 0.025 * r.vol * (CHROME ? 1.5 : 1);
 		if (r.au) {
 			r.ftid = r.au.tid;
 			r.au.play();
@@ -1297,7 +1297,7 @@ function MPlayer() {
 	};
 	r.fade_out = function () {
 		r.fvol = r.vol;
-		r.fdir = -0.05;
+		r.fdir = -0.05 * r.vol * (CHROME ? 2 : 1);
 		r.ftid = r.au.tid;
 		fader();
 	};
@@ -1312,14 +1312,14 @@ function MPlayer() {
 			return;
 
 		var done = true;
-		r.fvol += r.fdir;
+		r.fvol += r.fdir / (r.fdir < 0 && r.fvol < r.vol / 4 ? 2 : 1);
 		if (r.fvol < 0) {
 			r.fvol = 0;
 			r.au.pause();
 			mpl.pp();
 
 			var t = mp.au.currentTime - 0.8;
-			if (isFinite(t))
+			if (isNum(t))
 				mp.au.currentTime = Math.max(t, 0);
 		}
 		else if (r.fvol > r.vol)
@@ -1569,7 +1569,7 @@ var pbar = (function () {
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp || !mp.au || isNaN(adur = mp.au.duration) || isNaN(apos = mp.au.currentTime) || apos < 0 || adur < apos)
+		if (!mp || !mp.au || !isNum(adur = mp.au.duration) || !isNum(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
 		var sm = bc.w * 1.0 / adur,
@@ -1724,7 +1724,7 @@ function seek_au_sec(seek) {
 		return;
 
 	console.log('seek: ' + seek);
-	if (!isFinite(seek))
+	if (!isNum(seek))
 		return;
 
 	mp.au.currentTime = seek;
@@ -2108,7 +2108,7 @@ var audio_eq = (function () {
 				vs = that.value,
 				v = parseFloat(vs);
 
-			if (isNaN(v) || v + '' != vs)
+			if (!isNum(v) || v + '' != vs)
 				throw new Error('inval band');
 
 			if (sb == 'amp')
@@ -2251,6 +2251,9 @@ function play(tid, is_ev, seek) {
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onplaying = mpui.progress_updater;
 		mp.au.onended = next_song;
+		t = mp.au.currentTime;
+		if (isNum(t) && t > 0.1)
+			mp.au.currentTime = 0;
 	}
 	else
 		mp.au.src = mp.au.rsrc = url;
@@ -5054,7 +5057,7 @@ var treectl = (function () {
 	function scaletree(e) {
 		ev(e);
 		treesz += parseInt(this.getAttribute("step"));
-		if (isNaN(treesz))
+		if (!isNum(treesz))
 			treesz = 16;
 
 		treesz = clamp(treesz, 2, 120);

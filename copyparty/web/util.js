@@ -108,7 +108,7 @@ catch (ex) {
         console.log = console.stdlog;
     console.log('console capture failed', ex);
 }
-var crashed = false, ignexd = {};
+var crashed = false, ignexd = {}, evalex_fatal = false;
 function vis_exh(msg, url, lineNo, columnNo, error) {
     if ((msg + '').indexOf('ResizeObserver') + 1)
         return;  // chrome issue 809574 (benign, from <video>)
@@ -119,7 +119,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if (!/\.js($|\?)/.exec('' + url))
         return;  // chrome debugger
 
-    if ((url + '').indexOf(' > eval') + 1)
+    if ((url + '').indexOf(' > eval') + 1 && !evalex_fatal)
         return;  // md timer
 
     var ekey = url + '\n' + lineNo + '\n' + msg;
@@ -647,6 +647,14 @@ function s2ms(s) {
     var m = Math.floor(s / 60);
     return m + ":" + ("0" + (s - m * 60)).slice(-2);
 }
+
+
+var isNum = function (v) {
+    var n = parseFloat(v);
+    return !isNaN(v - n) && n === v;
+};
+if (window.Number)
+    isNum = Number.isFinite;
 
 
 function f2f(val, nd) {
@@ -1406,8 +1414,10 @@ function repl(e) {
         if (!cmd)
             return toast.inf(3, 'eval aborted');
 
-        if (cmd.startsWith(','))
-            return modal.alert(esc(eval(cmd.slice(1)) + ''))
+        if (cmd.startsWith(',')) {
+            evalex_fatal = true;
+            return modal.alert(esc(eval(cmd.slice(1)) + ''));
+        }
 
         try {
             modal.alert(esc(eval(cmd) + ''));
