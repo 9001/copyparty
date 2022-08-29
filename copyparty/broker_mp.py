@@ -6,7 +6,7 @@ import time
 
 import queue
 
-from .__init__ import TYPE_CHECKING
+from .__init__ import TYPE_CHECKING, CORES
 from .broker_mpw import MpWorker
 from .broker_util import try_exec
 from .util import mp
@@ -44,7 +44,7 @@ class BrokerMp(object):
         self.procs = []
         self.mutex = threading.Lock()
 
-        self.num_workers = self.args.j or mp.cpu_count()
+        self.num_workers = self.args.j or CORES
         self.log("broker", "booting {} subprocesses".format(self.num_workers))
         for n in range(1, self.num_workers + 1):
             q_pend: queue.Queue[tuple[int, str, list[Any]]] = mp.Queue(1)

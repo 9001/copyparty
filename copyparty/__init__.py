@@ -33,6 +33,11 @@ ANYWIN = WINDOWS or sys.platform in ["msys", "cygwin"]
 
 MACOS = platform.system() == "Darwin"
 
+try:
+    CORES = len(os.sched_getaffinity(0))
+except:
+    CORES = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 2
+
 
 def get_unixdir() -> str:
     paths: list[tuple[Callable[..., str], str]] = [

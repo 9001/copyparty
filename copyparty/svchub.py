@@ -501,7 +501,10 @@ class SvcHub(object):
         if self.args.j == 1:
             return False
 
-        if mp.cpu_count() <= 1:
+        try:
+            if mp.cpu_count() <= 1:
+                raise Exception()
+        except:
             self.log("svchub", "only one CPU detected; multiprocessing disabled")
             return False
 

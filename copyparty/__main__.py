@@ -20,7 +20,7 @@ import time
 import traceback
 from textwrap import dedent
 
-from .__init__ import ANYWIN, PY2, VT100, WINDOWS, E, unicode
+from .__init__ import ANYWIN, PY2, VT100, WINDOWS, E, unicode, CORES
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import re_vol
 from .svchub import SvcHub
@@ -335,8 +335,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     except:
         fk_salt = "hunter2"
 
-    cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 4
-    hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
+    hcores = min(CORES, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
     sects = [
         [
@@ -576,7 +575,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-athumb", action="store_true", help="disable audio thumbnails (spectrograms)")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails")
     ap2.add_argument("--th-size", metavar="WxH", default="320x256", help="thumbnail res")
-    ap2.add_argument("--th-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for generating thumbnails")
+    ap2.add_argument("--th-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for generating thumbnails")
     ap2.add_argument("--th-convt", metavar="SEC", type=int, default=60, help="conversion timeout in seconds")
     ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image")
     ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="image decoders, in order of preference")
@@ -626,7 +625,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("-e2tsr", action="store_true", help="delete all metadata from DB and do a full rescan; sets -e2ts")
     ap2.add_argument("--no-mutagen", action="store_true", help="use FFprobe for tags instead; will catch more tags")
     ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader; is probably safer")
-    ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=cores, help="num cpu cores to use for tag scanning")
+    ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for tag scanning")
     ap2.add_argument("--mtag-v", action="store_true", help="verbose tag scanning; print errors from mtp subprocesses and such")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",

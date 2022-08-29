@@ -929,7 +929,7 @@ def main():
     if not VT100:
         os.system("rem")  # enables colors
 
-    cores = os.cpu_count() if hasattr(os, "cpu_count") else 4
+    cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 2
     hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
     # fmt: off
