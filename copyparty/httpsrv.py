@@ -31,7 +31,7 @@ except ImportError:
 from .__init__ import MACOS, TYPE_CHECKING, E
 from .bos import bos
 from .httpconn import HttpConn
-from .util import FHC, min_ex, spack, start_log_thrs, start_stackmon
+from .util import FHC, min_ex, shut_socket, spack, start_log_thrs, start_stackmon
 
 if TYPE_CHECKING:
     from .broker_util import BrokerCli
@@ -54,6 +54,9 @@ class HttpSrv(object):
         self.args = broker.args
         self.log = broker.log
         self.asrv = broker.asrv
+
+        # redefine in case of multiprocessing
+        socket.setdefaulttimeout(120)
 
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
 
@@ -293,8 +296,6 @@ class HttpSrv(object):
 
     def thr_client(self, sck: socket.socket, addr: tuple[str, int]) -> None:
         """thread managing one tcp client"""
-        sck.settimeout(120)
-
         cli = HttpConn(sck, addr, self)
         with self.mutex:
             self.clients.add(cli)
@@ -321,8 +322,7 @@ class HttpSrv(object):
 
             try:
                 fno = sck.fileno()
-                sck.shutdown(socket.SHUT_RDWR)
-                sck.close()
+                shut_socket(cli.log, sck)
             except (OSError, socket.error) as ex:
                 if not MACOS:
                     self.log(

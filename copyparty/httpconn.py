@@ -23,6 +23,7 @@ from .mtag import HAVE_FFMPEG
 from .th_cli import ThumbCli
 from .th_srv import HAVE_PIL, HAVE_VIPS
 from .u2idx import U2idx
+from .util import shut_socket
 
 try:
     from typing import Optional, Pattern, Union
@@ -72,8 +73,7 @@ class HttpConn(object):
     def shutdown(self) -> None:
         self.stopping = True
         try:
-            self.s.shutdown(socket.SHUT_RDWR)
-            self.s.close()
+            shut_socket(self.log, self.s, 1)
         except:
             pass
 

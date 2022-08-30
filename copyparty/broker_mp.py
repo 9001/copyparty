@@ -6,7 +6,7 @@ import time
 
 import queue
 
-from .__init__ import TYPE_CHECKING, CORES
+from .__init__ import CORES, TYPE_CHECKING
 from .broker_mpw import MpWorker
 from .broker_util import try_exec
 from .util import mp

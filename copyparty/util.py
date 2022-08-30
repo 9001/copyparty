@@ -24,12 +24,14 @@ from datetime import datetime
 
 from queue import Queue
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, VT100, WINDOWS
+from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
 try:
     import ctypes
+    import fcntl
+    import termios
 except:
     pass
 
@@ -1440,6 +1442,48 @@ def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:
         return (None, None)
 
 
+if not ANYWIN and not MACOS:
+
+    def siocoutq(sck: socket.socket) -> int:
+        # SIOCOUTQ^sockios.h == TIOCOUTQ^ioctl.h
+        try:
+            zb = fcntl.ioctl(sck.fileno(), termios.TIOCOUTQ, b"AAAA")
+            return sunpack(b"I", zb)[0]  # type: ignore
+        except:
+            return 1
+
+else:
+    # macos: getsockopt(fd, SOL_SOCKET, SO_NWRITE, ...)
+    # windows: TcpConnectionEstatsSendBuff
+
+    def siocoutq(sck: socket.socket) -> int:
+        return 1
+
+
+def shut_socket(log: "NamedLogger", sck: socket.socket, timeout: int = 3) -> None:
+    t0 = time.time()
+    try:
+        sck.settimeout(timeout)
+        sck.shutdown(socket.SHUT_WR)
+        try:
+            while time.time() - t0 < timeout:
+                if not siocoutq(sck):
+                    # kernel says tx queue empty, we good
+                    break
+
+                # on windows in particular, drain rx until client shuts
+                if not sck.recv(32 * 1024):
+                    break
+        except:
+            pass
+    finally:
+        td = time.time() - t0
+        if td >= 1:
+            log("shut() in {:.3f} sec".format(td), "1;30")
+
+        sck.close()
+
+
 def read_socket(sr: Unrecv, total_size: int) -> Generator[bytes, None, None]:
     remains = total_size
     while remains > 0:
@@ -2030,10 +2074,7 @@ def termsize() -> tuple[int, int]:
 
     def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:
         try:
-            import fcntl
-            import termios
-
-            cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"1234"))
+            cr = sunpack(b"hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"AAAA"))
             return int(cr[1]), int(cr[0])
         except:
             return None

@@ -20,7 +20,7 @@ import time
 import traceback
 from textwrap import dedent
 
-from .__init__ import ANYWIN, PY2, VT100, WINDOWS, E, unicode, CORES
+from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import re_vol
 from .svchub import SvcHub

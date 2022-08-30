@@ -24,8 +24,10 @@ class TcpSrv(object):
         self.args = hub.args
         self.log = hub.log
 
-        self.stopping = False
+        # mp-safe since issue6056
+        socket.setdefaulttimeout(120)
 
+        self.stopping = False
         self.srv: list[socket.socket] = []
         self.nsrv = 0
         ok: dict[str, list[int]] = {}
@@ -112,6 +114,7 @@ class TcpSrv(object):
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        srv.settimeout(None)  # < does not inherit, ^ does
         try:
             srv.bind((ip, port))
             self.srv.append(srv)
