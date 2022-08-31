@@ -278,12 +278,12 @@ class HttpSrv(object):
             except:
                 pass
 
+        thrs = []
         clients = list(self.clients)
         for cli in clients:
-            try:
-                cli.shutdown()
-            except:
-                pass
+            t = threading.Thread(target=cli.shutdown)
+            thrs.append(t)
+            t.start()
 
         if self.tp_q:
             self.stop_threads(self.tp_nthr)
@@ -291,6 +291,9 @@ class HttpSrv(object):
                 time.sleep(0.05)
                 if self.tp_q.empty():
                     break
+
+        for t in thrs:
+            t.join()
 
         self.log(self.name, "ok bye")
 
