@@ -778,15 +778,16 @@ class HttpCli(object):
                 self.log("fallthrough? thats a bug", 1)
 
         suffix = "-{:.6f}-{}".format(time.time(), self.dip)
+        if not fn:
+            suffix += ".bin"
+            fn = "put" + suffix
+
         params = {"suffix": suffix, "fdir": fdir}
         if self.args.nw:
             params = {}
             fn = os.devnull
 
         params.update(open_ka)
-
-        if not fn:
-            fn = "put" + suffix
 
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
