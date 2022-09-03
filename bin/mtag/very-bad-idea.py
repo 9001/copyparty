@@ -16,7 +16,7 @@ goes without saying, but this is HELLA DANGEROUS,
   GIVES RCE TO ANYONE WHO HAVE UPLOAD PERMISSIONS
 
 example copyparty config to use this:
-  --urlform save,get -v.::w:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,bin/mtag/very-bad-idea.py
+  --urlform save,get -v.::w:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,c0,bin/mtag/very-bad-idea.py
 
 recommended deps:
   apt install xdotool libnotify-bin

@@ -826,8 +826,11 @@ copyparty can invoke external programs to collect additional metadata for files 
 * "audio file" also means videos btw, as long as there is an audio stream
 * `-mtp ext=an,~/bin/file-ext.py` runs `~/bin/file-ext.py` to get the `ext` tag only if file is not audio (`an`)
 * `-mtp arch,built,ver,orig=an,eexe,edll,~/bin/exe.py` runs `~/bin/exe.py` to get properties about windows-binaries only if file is not audio (`an`) and file extension is exe or dll
-
-you can control how the parser is killed if it times out with option `kt` killing the entire process tree (default), `km` just the main process, or `kn` let it continue running until copyparty is terminated
+* if you want to daisychain parsers, use the `p` flag to set processing order
+  * `-mtp foo=p1,~/a.py` runs before `-mtp foo=p2,~/b.py` and will forward all the tags detected so far as json to the stdin of b.py
+* option `c0` disables capturing of stdout/stderr, so copyparty will not receive any tags from the process at all -- instead the invoked program is free to print whatever to the console, just using copyparty as a launcher
+  * `c1` captures stdout only, `c2` only stderr, and `c3` (default) captures both
+* you can control how the parser is killed if it times out with option `kt` killing the entire process tree (default), `km` just the main process, or `kn` let it continue running until copyparty is terminated
 
 if something doesn't work, try `--mtag-v` for verbose error messages
 
@@ -846,7 +849,7 @@ that'll run the command `notify-send` with the path to the uploaded file as the 
 
 note that it will only trigger on new unique files, not dupes
 
-and it will occupy the parsing threads, so fork anything expensive, or if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
+and it will occupy the parsing threads, so fork anything expensive (or set `kn` to have copyparty fork it for you) -- otoh if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
 
 if this becomes popular maybe there should be a less janky way to do it actually
 

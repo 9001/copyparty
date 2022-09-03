@@ -45,6 +45,7 @@ class MParser(object):
         self.timeout = 30
         self.force = False
         self.kill = "t"  # tree; all children recursively
+        self.capture = 3  # outputs to consume
         self.audio = "y"
         self.pri = 0  # priority; higher = later
         self.ext = []
@@ -70,6 +71,10 @@ class MParser(object):
 
             if arg.startswith("k"):
                 self.kill = arg[1:]  # [t]ree [m]ain [n]one
+                continue
+
+            if arg.startswith("c"):
+                self.capture = int(arg[1:])  # 0=none 1=stdout 2=stderr 3=both
                 continue
 
             if arg == "f":
@@ -519,7 +524,12 @@ class MTag(object):
                 if parser.bin.endswith(".py"):
                     cmd = [sys.executable] + cmd
 
-                args = {"env": env, "timeout": parser.timeout, "kill": parser.kill}
+                args = {
+                    "env": env,
+                    "timeout": parser.timeout,
+                    "kill": parser.kill,
+                    "capture": parser.capture,
+                }
 
                 if parser.pri:
                     zd = oth_tags.copy()

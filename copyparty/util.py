@@ -1862,12 +1862,16 @@ def runcmd(
     argv: Union[list[bytes], list[str]], timeout: Optional[int] = None, **ka: Any
 ) -> tuple[int, str, str]:
     kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
+    capture = ka.pop("capture", 3)  # 0=none 1=stdout 2=stderr 3=both
 
     sin = ka.pop("sin", None)
     if sin:
         ka["stdin"] = sp.PIPE
 
-    p = sp.Popen(argv, stdout=sp.PIPE, stderr=sp.PIPE, **ka)
+    cout = sp.PIPE if capture in [1, 3] else None
+    cerr = sp.PIPE if capture in [2, 3] else None
+
+    p = sp.Popen(argv, stdout=cout, stderr=cerr, **ka)
     if not timeout or PY2:
         stdout, stderr = p.communicate(sin)
     else:
@@ -1887,8 +1891,8 @@ def runcmd(
                 stdout = b""
                 stderr = b""
 
-    stdout = stdout.decode("utf-8", "replace")
-    stderr = stderr.decode("utf-8", "replace")
+    stdout = stdout.decode("utf-8", "replace") if cout else b""
+    stderr = stderr.decode("utf-8", "replace") if cerr else b""
 
     rc = p.returncode
     if rc is None:
