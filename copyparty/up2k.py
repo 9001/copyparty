@@ -1424,6 +1424,10 @@ class Up2k(object):
                 if tag in parser.tags:
                     parsers[parser.tag] = parser
 
+        if self.args.mtag_vv:
+            t = "parsers for {}: \033[0m{}"
+            self.log(t.format(ptop, list(parsers.keys())), "1;30")
+
         self.mtp_parsers[ptop] = parsers
 
         q = "select count(w) from mt where k = 't:mtp'"
@@ -1552,6 +1556,8 @@ class Up2k(object):
         try:
             all_parsers = self.mtp_parsers[ptop]
         except:
+            if self.args.mtag_vv:
+                self.log("no mtp defined for {}".format(ptop), "1;30")
             return {}
 
         entags = self.entags[ptop]
@@ -1561,9 +1567,15 @@ class Up2k(object):
                 if "ac" in have or ".aq" in have:
                     # is audio, require non-audio?
                     if v.audio == "n":
+                        if self.args.mtag_vv:
+                            t = "skip mtp {}; is no-audio, have audio"
+                            self.log(t.format(k), "1;30")
                         continue
                 # is not audio, require audio?
                 elif v.audio == "y":
+                    if self.args.mtag_vv:
+                        t = "skip mtp {}; is audio, have no-audio"
+                        self.log(t.format(k), "1;30")
                     continue
 
             if v.ext:
@@ -1574,6 +1586,9 @@ class Up2k(object):
                         break
 
                 if not match:
+                    if self.args.mtag_vv:
+                        t = "skip mtp {}; need file-ext {}, have {}"
+                        self.log(t.format(k, v.ext, abspath.rsplit(".")[-1]), "1;30")
                     continue
 
             parsers[k] = v
@@ -1619,8 +1634,16 @@ class Up2k(object):
 
             try:
                 if not qe.mtp:
+                    if self.args.mtag_vv:
+                        t = "tag-thr: {}({})"
+                        self.log(t.format(self.mtag.backend, qe.abspath), "1;30")
+
                     tags = self.mtag.get(qe.abspath)
                 else:
+                    if self.args.mtag_vv:
+                        t = "tag-thr: {}({})"
+                        self.log(t.format(list(qe.mtp.keys()), qe.abspath), "1;30")
+
                     tags = self.mtag.get_bin(qe.mtp, qe.abspath, qe.oth_tags)
                     vtags = [
                         "\033[36m{} \033[33m{}".format(k, v) for k, v in tags.items()
@@ -1651,7 +1674,7 @@ class Up2k(object):
         wark: str,
         abspath: str,
         ip: str,
-        at: float
+        at: float,
     ) -> int:
         """will mutex"""
         assert self.mtag
@@ -1668,7 +1691,7 @@ class Up2k(object):
         if ip:
             tags["up_ip"] = ip
             tags["up_at"] = at
-        
+
         with self.mutex:
             return self._tag_file(write_cur, entags, wark, abspath, tags)
 
@@ -2966,6 +2989,12 @@ class Up2k(object):
                 tags = self.mtag.get(abspath)
                 ntags1 = len(tags)
                 parsers = self._get_parsers(ptop, tags, abspath)
+                if self.args.mtag_vv:
+                    t = "parsers({}): {}\n{} {} tags: {}".format(
+                        ptop, list(parsers.keys()), ntags1, self.mtag.backend, tags
+                    )
+                    self.log(t)
+
                 if parsers:
                     tags["up_ip"] = ip
                     tags["up_at"] = at
