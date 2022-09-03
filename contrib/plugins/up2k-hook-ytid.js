@@ -14,6 +14,8 @@ function up2k_namefilter(good_files, nil_files, bad_files, hooks) {
     a_up2k_namefilter(good_files, nil_files, bad_files, hooks).then(() => { });
 }
 
+// ebi('op_up2k').appendChild(mknod('input','unick'));
+
 function bstrpos(buf, ptn) {
     var ofs = 0,
         ch0 = ptn[0],
@@ -165,6 +167,16 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         setTimeout(mfun, 200);
 
         return hooks[0]([], [], [], hooks.slice(1));
+    }
+
+    var el = ebi('unick'), unick = el ? el.value : '';
+    if (unick) {
+        console.log(`sending uploader nickname [${unick}]`);
+        fetch(document.location, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: 'msg=' + encodeURIComponent(unick)
+        });
     }
 
     toast.inf(5, `running query for ${yt_ids.size} youtube-IDs...`);
