@@ -91,6 +91,8 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
                 aspan = id_ok ? 128 : 512;  // MiB
 
             aspan = parseInt(Math.min(sz / 2, aspan * 1024 * 1024) / chunksz) * chunksz;
+            if (!aspan)
+                aspan = Math.min(sz, chunksz);
 
             for (var side = 0; side < 2; side++) {
                 var ofs = side ? Math.max(0, sz - aspan) : 0,
