@@ -195,20 +195,29 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
     function process_id_list(txt) {
         var wanted_ids = new Set(txt.trim().split('\n')),
             name_id = {},
-            wanted_names = new Set(),  // basenames with a wanted ID
+            wanted_names = new Set(),  // basenames with a wanted ID -- not including relpath
+            wanted_names_scoped = {},  // basenames with a wanted ID -> list of dirs to search under
             wanted_files = new Set();  // filedrops
 
         for (var a = 0; a < good_files.length; a++) {
             var name = good_files[a][1];
             for (var b = 0; b < file_ids[a].length; b++)
                 if (wanted_ids.has(file_ids[a][b])) {
-                    wanted_files.add(good_files[a]);
+                    // let the next stage handle this to prevent dupes
+                    //wanted_files.add(good_files[a]);
 
                     var m = /(.*)\.(mp4|webm|mkv|flv|opus|ogg|mp3|m4a|aac)$/i.exec(name);
                     if (!m)
                         continue;
 
-                    wanted_names.add(m[1]);
+                    var [rd, fn] = vsplit(m[1]);
+
+                    if (fn in wanted_names_scoped)
+                        wanted_names_scoped[fn].push(rd);
+                    else
+                        wanted_names_scoped[fn] = [rd];
+
+                    wanted_names.add(fn);
                     name_id[m[1]] = file_ids[a][b];
 
                     break;
@@ -218,16 +227,35 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
         // add all files with the same basename as each explicitly wanted file
         // (infojson/chatlog/etc when ID was discovered from metadata)
         for (var a = 0; a < good_files.length; a++) {
-            var name = good_files[a][1];
+            var [rd, name] = vsplit(good_files[a][1]);
             for (var b = 0; b < 3; b++) {
                 name = name.replace(/\.[^\.]+$/, '');
-                if (wanted_names.has(name)) {
-                    wanted_files.add(good_files[a]);
+                if (!wanted_names.has(name))
+                    continue;
 
-                    var subdir = `${name_id[name]}-${myid}`;
-                    good_files[a][1] = subdir + '/' + good_files[a][1].split(/\//g).pop();
+                var vid_fp = false;
+                for (var c of wanted_names_scoped[name])
+                    if (rd.startsWith(c))
+                        vid_fp = c + name;
+
+                if (!vid_fp)
+                    continue;
+
+                var subdir = name_id[vid_fp];
+                subdir = `v${subdir.slice(0, 1)}/${subdir}-${myid}`;
+                var newpath = subdir + '/' + good_files[a][1].split(/\//g).pop();
+
+                // check if this file is a dupe
+                for (var c of good_files)
+                    if (c[1] == newpath)
+                        newpath = null;
+
+                if (!newpath)
                     break;
-                }
+
+                good_files[a][1] = newpath;
+                wanted_files.add(good_files[a]);
+                break;
             }
         }
 
@@ -255,3 +283,15 @@ async function a_up2k_namefilter(good_files, nil_files, bad_files, hooks) {
 up2k_hooks.push(function () {
     up2k.gotallfiles.unshift(up2k_namefilter);
 });
+
+// persist/restore nickname field if present
+setInterval(function () {
+    var o = ebi('unick');
+    if (!o || document.activeElement == o)
+        return;
+
+    o.oninput = function () {
+        localStorage.setItem('unick', o.value);
+    };
+    o.value = localStorage.getItem('unick') || '';
+}, 1000);
