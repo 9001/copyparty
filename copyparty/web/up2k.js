@@ -719,12 +719,10 @@ function up2k_init(subtle) {
         "gotallfiles": [gotallfiles]  // hooks
     };
 
-    if (window.WebAssembly) {
-        for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
-            hws.push(new Worker('/.cpr/w.hash.js'));
-
-        console.log(hws.length + " hashers ready");
-    }
+    setTimeout(function () {
+        if (window.WebAssembly && !hws.length)
+            fetch('/.cpr/w.hash.js' + CB);
+    }, 1000);
 
     function showmodal(msg) {
         ebi('u2notbtn').innerHTML = msg;
@@ -1187,6 +1185,13 @@ function up2k_init(subtle) {
     function up_them(good_files) {
         var evpath = get_evpath(),
             draw_each = good_files.length < 50;
+
+        if (window.WebAssembly && !hws.length) {
+            for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
+                hws.push(new Worker('/.cpr/w.hash.js' + CB));
+
+            console.log(hws.length + " hashers");
+        }
 
         if (!uc.az)
             good_files.sort(function (a, b) {

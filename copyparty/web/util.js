@@ -7,6 +7,7 @@ if (!window['console'])
 
 
 var wah = '',
+    CB = '?_=' + Date.now(),
     HALFMAX = 8192 * 8192 * 8192 * 8192,
     HTTPS = (window.location + '').indexOf('https:') === 0,
     TOUCH = 'ontouchstart' in window,
@@ -15,8 +16,9 @@ var wah = '',
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
 
-
 try {
+    CB = '?' + document.currentScript.src.split('?').pop();
+
     if (navigator.userAgentData.mobile)
         MOBILE = true;
 

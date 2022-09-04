@@ -408,7 +408,7 @@ class HttpCli(object):
             self.out_headers.update(NO_CACHE)
             return
 
-        n = "604800" if cache == "i" else cache or "69"
+        n = "604869" if cache == "i" else cache or "69"
         self.out_headers["Cache-Control"] = "max-age=" + n
 
     def k304(self) -> bool:
@@ -1714,7 +1714,7 @@ class HttpCli(object):
         # send reply
 
         if is_compressed:
-            self.out_headers["Cache-Control"] = "max-age=573"
+            self.out_headers["Cache-Control"] = "max-age=604869"
         else:
             self.permit_caching()
 
