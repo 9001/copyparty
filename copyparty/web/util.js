@@ -1545,7 +1545,7 @@ var favico = (function () {
 
 
 var cf_cha_t = 0;
-function xhrchk(xhr, prefix, e404) {
+function xhrchk(xhr, prefix, e404, lvl) {
     if (xhr.status < 400 && xhr.status >= 200)
         return true;
 
@@ -1556,7 +1556,7 @@ function xhrchk(xhr, prefix, e404) {
         return toast.err(0, prefix + e404);
 
     var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
-        fun = toast.err;
+        fun = toast[lvl || 'err'];
 
     if (xhr.status == 503 && /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser/.test(errtxt)) {
         var now = Date.now(), td = now - cf_cha_t;
