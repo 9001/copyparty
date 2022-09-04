@@ -352,7 +352,7 @@ class ThumbSrv(object):
         img.write_to_file(tpath, Q=40)
 
     def conv_ffmpeg(self, abspath: str, tpath: str) -> None:
-        ret, _ = ffprobe(abspath)
+        ret, _ = ffprobe(abspath, int(self.args.th_convt / 2))
         if not ret:
             return
 
@@ -440,7 +440,7 @@ class ThumbSrv(object):
         raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
     def conv_spec(self, abspath: str, tpath: str) -> None:
-        ret, _ = ffprobe(abspath)
+        ret, _ = ffprobe(abspath, int(self.args.th_convt / 2))
         if "ac" not in ret:
             raise Exception("not audio")
 
@@ -485,7 +485,7 @@ class ThumbSrv(object):
         if self.args.no_acode:
             raise Exception("disabled in server config")
 
-        ret, _ = ffprobe(abspath)
+        ret, _ = ffprobe(abspath, int(self.args.th_convt / 2))
         if "ac" not in ret:
             raise Exception("not audio")
 

@@ -616,7 +616,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--hash-mt", metavar="CORES", type=int, default=hcores, help="num cpu cores to use for file hashing; set 0 or 1 for single-core hashing")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="disk rescan volume interval, 0=off, can be set per-volume with the 'scan' volflag")
     ap2.add_argument("--db-act", metavar="SEC", type=float, default=10, help="defer any scheduled volume reindexing until SEC seconds after last db write (uploads, renames, ...)")
-    ap2.add_argument("--srch-time", metavar="SEC", type=int, default=30, help="search deadline -- terminate searches running for more than SEC seconds")
+    ap2.add_argument("--srch-time", metavar="SEC", type=int, default=45, help="search deadline -- terminate searches running for more than SEC seconds")
     ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results to allow clients to fetch; 125 results will be shown initially")
 
     ap2 = ap.add_argument_group('metadata db options')
@@ -625,6 +625,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("-e2tsr", action="store_true", help="delete all metadata from DB and do a full rescan; sets -e2ts")
     ap2.add_argument("--no-mutagen", action="store_true", help="use FFprobe for tags instead; will catch more tags")
     ap2.add_argument("--no-mtag-ff", action="store_true", help="never use FFprobe as tag reader; is probably safer")
+    ap2.add_argument("--mtag-to", metavar="SEC", type=int, default=60, help="timeout for ffprobe tag-scan")
     ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for tag scanning")
     ap2.add_argument("--mtag-v", action="store_true", help="verbose tag scanning; print errors from mtp subprocesses and such")
     ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings")

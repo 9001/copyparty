@@ -1405,7 +1405,7 @@ def db_ex_chk(log: "NamedLogger", ex: Exception, db_path: str) -> bool:
 
 def lsof(log: "NamedLogger", abspath: str) -> None:
     try:
-        rc, so, se = runcmd([b"lsof", b"-R", fsenc(abspath)], timeout=5)
+        rc, so, se = runcmd([b"lsof", b"-R", fsenc(abspath)], timeout=45)
         zs = (so.strip() + "\n" + se.strip()).strip()
         log("lsof {} = {}\n{}".format(abspath, rc, zs), 3)
     except:

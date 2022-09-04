@@ -135,7 +135,7 @@ class Up2k(object):
         self.mem_cur = None
         self.sqlite_ver = None
         self.no_expr_idx = False
-        self.timeout = int(max(self.args.srch_time, 5) * 1.2) + 1
+        self.timeout = int(max(self.args.srch_time, 50) * 1.2) + 1
         self.spools: set[tempfile.SpooledTemporaryFile[bytes]] = set()
         if HAVE_SQLITE3:
             # mojibake detector
@@ -1320,7 +1320,7 @@ class Up2k(object):
             nq -= 1
 
             td = time.time() - last_write
-            if n_buf >= 4096 or td >= max(1, self.timeout - 1):
+            if n_buf >= 4096 or td >= self.timeout / 2:
                 self.log("commit {} new tags".format(n_buf))
                 with self.mutex:
                     cur.connection.commit()

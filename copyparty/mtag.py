@@ -42,7 +42,7 @@ class MParser(object):
         self.tag, args = cmdline.split("=", 1)
         self.tags = self.tag.split(",")
 
-        self.timeout = 30
+        self.timeout = 60
         self.force = False
         self.kill = "t"  # tree; all children recursively
         self.capture = 3  # outputs to consume
@@ -97,7 +97,7 @@ class MParser(object):
 
 
 def ffprobe(
-    abspath: str, timeout: int = 10
+    abspath: str, timeout: int = 60
 ) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]]]:
     cmd = [
         b"ffprobe",
@@ -502,7 +502,7 @@ class MTag(object):
         if not bos.path.isfile(abspath):
             return {}
 
-        ret, md = ffprobe(abspath)
+        ret, md = ffprobe(abspath, self.args.mtag_to)
         return self.normalize_tags(ret, md)
 
     def get_bin(

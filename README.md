@@ -810,12 +810,14 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 * avoids pulling any GPL code into copyparty
 * more importantly runs FFprobe on incoming files which is bad if your FFmpeg has a cve
 
+`--mtag-to` sets the tag-scan timeout; very high default (60 sec) to cater for zfs and other randomly-freezing filesystems. Lower values like 10 are usually safe, allowing for faster processing of tricky files
+
 
 ## file parser plugins
 
 provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
 
-copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volflag), there is a default timeout of 30sec, and only files which contain audio get analyzed by default (see ay/an/ad below)
+copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volflag), there is a default timeout of 60sec, and only files which contain audio get analyzed by default (see ay/an/ad below)
 
 * `-mtp .bpm=~/bin/audio-bpm.py` will execute `~/bin/audio-bpm.py` with the audio file as argument 1 to provide the `.bpm` tag, if that does not exist in the audio metadata
 * `-mtp key=f,t5,~/bin/audio-key.py` uses `~/bin/audio-key.py` to get the `key` tag, replacing any existing metadata tag (`f,`), aborting if it takes longer than 5sec (`t5,`)
