@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-08-13, v0.18, ed <irc.rizon.net>, MIT-Licensed
+2022-09-05, v0.19, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -35,16 +35,16 @@ except:
 
 try:
     import requests
-except:
+except ImportError:
     if sys.version_info > (2, 7):
-        m = "\n  ERROR: need 'requests'; run this:\n   python -m pip install --user requests\n"
+        m = "\nERROR: need 'requests'; please run this command:\n {0} -m pip install --user requests\n"
     else:
         m = "requests/2.18.4 urllib3/1.23 chardet/3.0.4 certifi/2020.4.5.1 idna/2.7"
         m = ["   https://pypi.org/project/" + x + "/#files" for x in m.split()]
         m = "\n  ERROR: need these:\n" + "\n".join(m) + "\n"
 
-    print(m)
-    raise
+    print(m.format(sys.executable))
+    sys.exit(1)
 
 
 # from copyparty/__init__.py
@@ -344,7 +344,7 @@ def _lsd(err, top):
             err.append((abspath, str(ex)))
 
 
-if hasattr(os, "scandir"):
+if hasattr(os, "scandir") and sys.version_info > (3, 6):
     statdir = _scd
 else:
     statdir = _lsd
