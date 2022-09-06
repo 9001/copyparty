@@ -267,6 +267,9 @@ function U2pvis(act, btns, uc, st) {
         fo.cb[nchunk] = cbd;
         fo.bd += delta;
 
+        if (!fo.bd)
+            return;
+
         var p = r.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
         fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MB/s';
 
@@ -2093,7 +2096,7 @@ function up2k_init(subtle) {
                             'npart': t.postlist[a]
                         });
 
-                    msg = L.u_upping;
+                    msg = null;
                     done = false;
 
                     if (sort)
@@ -2103,7 +2106,10 @@ function up2k_init(subtle) {
                                     a.npart < b.npart ? -1 : 1;
                         });
                 }
-                pvis.seth(t.n, 1, msg);
+
+                if (msg)
+                    pvis.seth(t.n, 1, msg);
+
                 apop(st.busy.handshake, t);
 
                 if (done) {
@@ -2207,7 +2213,14 @@ function up2k_init(subtle) {
 
     function can_upload_next() {
         var upt = st.todo.upload[0],
-            upf = st.files[upt.nfile];
+            upf = st.files[upt.nfile],
+            now = Date.now();
+
+        for (var a = 0, aa = st.busy.handshake.length; a < aa; a++) {
+            var hs = st.busy.handshake[a];
+            if (hs.n < upt.nfile && hs.t_busied > now - 10 * 1000 && !st.files[hs.n].bytes_uploaded)
+                return false;  // handshake race; wait for lexically first
+        }
 
         if (upf.sprs)
             return true;
