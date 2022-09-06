@@ -667,12 +667,13 @@ function f2f(val, nd) {
 
 
 function humansize(b, terse) {
-    var i = 0, u = terse ? ['B', 'K', 'M', 'G'] : ['B', 'KB', 'MB', 'GB'];
-    while (b >= 1000 && i < u.length) {
+    var i = 0, u = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    while (b >= 1000 && i < u.length - 1) {
         b /= 1024;
         i += 1;
     }
-    return f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) + ' ' + u[i];
+    return (f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) +
+        ' ' + (terse ? u[i].charAt(0) : u[i]));
 }
 
 
