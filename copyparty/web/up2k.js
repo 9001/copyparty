@@ -2005,6 +2005,9 @@ function up2k_init(subtle) {
                     return;
                 }
 
+                if (toast.tag === t)
+                    toast.ok(5, L.u_fixed);
+
                 var response = JSON.parse(xhr.responseText);
                 if (!response.name) {
                     var msg = '',
@@ -2127,7 +2130,7 @@ function up2k_init(subtle) {
             }
             else {
                 pvis.seth(t.n, 1, "ERROR");
-                pvis.seth(t.n, 2, L.u_ehstmp);
+                pvis.seth(t.n, 2, L.u_ehstmp, t);
 
                 var err = "",
                     rsp = (xhr.responseText + ''),
@@ -2176,7 +2179,7 @@ function up2k_init(subtle) {
                     return;
                 }
                 err = t.t_uploading ? L.u_ehsfin : t.srch ? L.u_ehssrch : L.u_ehsinit;
-                xhrchk(xhr, err + "\n\nfile: " + t.name + "\n\nerror ", "404, target folder not found", "warn");
+                xhrchk(xhr, err + "\n\nfile: " + t.name + "\n\nerror ", "404, target folder not found", "warn", t);
             }
         }
         xhr.onload = function (e) {
@@ -2250,7 +2253,7 @@ function up2k_init(subtle) {
                 console.log("ignoring dupe-segment error", t);
             }
             else {
-                xhrchk(xhr, L.u_cuerr2.format(npart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)", "warn");
+                xhrchk(xhr, L.u_cuerr2.format(npart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)", "warn", t);
 
                 chill(t);
             }
@@ -2282,7 +2285,7 @@ function up2k_init(subtle) {
                     return;
 
                 if (!toast.visible)
-                    toast.warn(9.98, L.u_cuerr.format(npart, Math.ceil(t.size / chunksize), t.name));
+                    toast.warn(9.98, L.u_cuerr.format(npart, Math.ceil(t.size / chunksize), t.name), t);
 
                 console.log('chunkpit onerror,', ++tries, t);
                 orz2(xhr);

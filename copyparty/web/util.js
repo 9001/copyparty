@@ -1124,6 +1124,7 @@ var toast = (function () {
     document.body.appendChild(obj);
     r.visible = false;
     r.txt = null;
+    r.tag = obj;  // filler value (null is scary)
 
     function scrollchk() {
         if (scrolling)
@@ -1152,9 +1153,10 @@ var toast = (function () {
         clearTimeout(te);
         clmod(obj, 'vis');
         r.visible = false;
+        r.tag = obj;
     };
 
-    r.show = function (cl, sec, txt) {
+    r.show = function (cl, sec, txt, tag) {
         clearTimeout(te);
         if (sec)
             te = setTimeout(r.hide, sec * 1000);
@@ -1170,19 +1172,20 @@ var toast = (function () {
         timer.add(scrollchk);
         r.visible = true;
         r.txt = txt;
+        r.tag = tag;
     };
 
-    r.ok = function (sec, txt) {
-        r.show('ok', sec, txt);
+    r.ok = function (sec, txt, tag) {
+        r.show('ok', sec, txt, tag);
     };
-    r.inf = function (sec, txt) {
-        r.show('inf', sec, txt);
+    r.inf = function (sec, txt, tag) {
+        r.show('inf', sec, txt, tag);
     };
-    r.warn = function (sec, txt) {
-        r.show('warn', sec, txt);
+    r.warn = function (sec, txt, tag) {
+        r.show('warn', sec, txt, tag);
     };
-    r.err = function (sec, txt) {
-        r.show('err', sec, txt);
+    r.err = function (sec, txt, tag) {
+        r.show('err', sec, txt, tag);
     };
 
     return r;
@@ -1548,15 +1551,15 @@ var favico = (function () {
 
 
 var cf_cha_t = 0;
-function xhrchk(xhr, prefix, e404, lvl) {
+function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status < 400 && xhr.status >= 200)
         return true;
 
     if (xhr.status == 403)
-        return toast.err(0, prefix + (window.L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"));
+        return toast.err(0, prefix + (window.L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"), tag);
 
     if (xhr.status == 404)
-        return toast.err(0, prefix + e404);
+        return toast.err(0, prefix + e404, tag);
 
     var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
         fun = toast[lvl || 'err'];
@@ -1576,5 +1579,5 @@ function xhrchk(xhr, prefix, e404, lvl) {
         document.body.appendChild(fr);
     }
 
-    return fun(0, prefix + xhr.status + ": " + errtxt);
+    return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
