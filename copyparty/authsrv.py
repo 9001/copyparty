@@ -1071,6 +1071,10 @@ class AuthSrv(object):
                 if getattr(self.args, k):
                     vol.flags[k] = True
 
+            for ga, vf in [["no_forget", "noforget"]]:
+                if getattr(self.args, ga):
+                    vol.flags[vf] = True
+
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
                     vol.flags[k2] = True

@@ -413,6 +413,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
               \033[36mscan=60\033[35m scan for new files every 60sec, same as --re-maxage
               \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
               \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
+              \033[36mnoforget$\033[35m don't forget files when deleted from disk
               \033[36mxdev\033[35m do not descend into other filesystems
               \033[36mxvol\033[35m skip symlinks leaving the volume root
 
@@ -611,6 +612,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching paths during e2ds folder scans")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans")
     ap2.add_argument("--no-dhash", action="store_true", help="disable rescan acceleration; do full database integrity check -- makes the db ~5%% smaller and bootup/rescans 3~10x slower")
+    ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice")
     ap2.add_argument("--xdev", action="store_true", help="do not descend into other filesystems (symlink or bind-mount to another HDD, ...)")
     ap2.add_argument("--xvol", action="store_true", help="skip symlinks leaving the volume root")
     ap2.add_argument("--hash-mt", metavar="CORES", type=int, default=hcores, help="num cpu cores to use for file hashing; set 0 or 1 for single-core hashing")

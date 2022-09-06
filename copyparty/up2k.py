@@ -683,6 +683,7 @@ class Up2k(object):
         top = vol.realpath
         rei = vol.flags.get("noidx")
         reh = vol.flags.get("nohash")
+        n4g = bool(vol.flags.get("noforget"))
 
         dev = 0
         if vol.flags.get("xdev"):
@@ -720,11 +721,13 @@ class Up2k(object):
                     rtop,
                     rei,
                     reh,
+                    n4g,
                     [],
                     dev,
                     bool(vol.flags.get("xvol")),
                 )
-                n_rm = self._drop_lost(db.c, top, excl)
+                if not n4g:
+                    n_rm = self._drop_lost(db.c, top, excl)
             except Exception as ex:
                 t = "failed to index volume [{}]:\n{}"
                 self.log(t.format(top, min_ex()), c=1)
@@ -754,6 +757,7 @@ class Up2k(object):
         rcdir: str,
         rei: Optional[Pattern[str]],
         reh: Optional[Pattern[str]],
+        n4g: bool,
         seen: list[str],
         dev: int,
         xvol: bool,
@@ -809,7 +813,7 @@ class Up2k(object):
                 # self.log(" dir: {}".format(abspath))
                 try:
                     ret += self._build_dir(
-                        db, top, excl, abspath, rap, rei, reh, seen, dev, xvol
+                        db, top, excl, abspath, rap, rei, reh, n4g, seen, dev, xvol
                     )
                 except:
                     t = "failed to index subdir [{}]:\n{}"
@@ -952,6 +956,9 @@ class Up2k(object):
                 q = "delete from up where (rd = ? or rd like ?||'%') and at == 0"
                 db.c.execute(q, (erd, erd + "/"))
                 ret += n
+
+        if n4g:
+            return ret
 
         # drop missing files
         q = "select fn from up where rd = ?"
@@ -1910,6 +1917,8 @@ class Up2k(object):
         with self.mutex:
             cur = self.cur.get(cj["ptop"])
             reg = self.registry[cj["ptop"]]
+            vfs = self.asrv.vfs.all_vols[cj["vtop"]]
+            n4g = vfs.flags.get("noforget")
             if cur:
                 if self.no_expr_idx:
                     q = r"select * from up where w = ?"
@@ -1931,7 +1940,10 @@ class Up2k(object):
                             # broken symlink
                             raise Exception()
                     except:
-                        continue
+                        if n4g:
+                            st = os.stat_result((0, -1, -1, 0, 0, 0, 0, 0, 0, 0))
+                        else:
+                            continue
 
                     j = {
                         "name": dp_fn,
@@ -1972,7 +1984,7 @@ class Up2k(object):
                                 break
                         except:
                             # missing; restart
-                            if not self.args.nw:
+                            if not self.args.nw and not n4g:
                                 job = None
                             break
                 else:
@@ -2023,7 +2035,6 @@ class Up2k(object):
                             cur.connection.commit()
 
             if not job:
-                vfs = self.asrv.vfs.all_vols[cj["vtop"]]
                 if vfs.lim:
                     ap1 = djoin(cj["ptop"], cj["prel"])
                     ap2, cj["prel"] = vfs.lim.all(
