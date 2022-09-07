@@ -2178,7 +2178,6 @@ function up2k_init(subtle) {
                     return;
                 }
 
-                st.bytes.finished += t.size;
                 var err_pend = rsp.indexOf('partial upload exists') + 1,
                     err_dupe = rsp.indexOf('file already exists') + 1;
 
@@ -2197,6 +2196,9 @@ function up2k_init(subtle) {
                     return toast.err(0, L.u_ehsdf + "\n\n" + rsp.replace(/.*; /, ''));
 
                 if (err != "") {
+                    if (!t.t_uploading)
+                        st.bytes.finished += t.size;
+
                     pvis.seth(t.n, 1, "ERROR");
                     pvis.seth(t.n, 2, err);
                     pvis.move(t.n, 'ng');

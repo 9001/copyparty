@@ -967,7 +967,7 @@ var tt = (function () {
         prev = this;
     };
 
-    var tev;
+    var tev, vh;
     r.dshow = function (e) {
         clearTimeout(tev);
         if (!r.getmsg(this))
@@ -980,6 +980,7 @@ var tt = (function () {
         if (TOUCH)
             return;
 
+        vh = window.innerHeight;
         this.addEventListener('mousemove', r.move);
         clmod(r.th, 'act', 1);
         r.move(e);
@@ -1058,8 +1059,9 @@ var tt = (function () {
     };
 
     r.move = function (e) {
+        var sy = e.clientY + 128 > vh ? -1 : 1;
         r.th.style.left = (e.pageX + 12) + 'px';
-        r.th.style.top = (e.pageY + 12) + 'px';
+        r.th.style.top = (e.pageY + 12 * sy) + 'px';
     };
 
     if (IPHONE) {
