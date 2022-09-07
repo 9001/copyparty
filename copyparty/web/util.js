@@ -876,14 +876,18 @@ function scfg_bind(obj, oname, cname, defval, cb) {
 
 function hist_push(url) {
     console.log("h-push " + url);
-    if (window.history && history.pushState)
+    try {
         history.pushState(url, url, url);
+    }
+    catch (ex) { }
 }
 
 function hist_replace(url) {
     console.log("h-repl " + url);
-    if (window.history && history.replaceState)
+    try {
         history.replaceState(url, url, url);
+    }
+    catch (ex) { }  // ff "The operation is insecure." on rapid switches
 }
 
 function sethash(hv) {
