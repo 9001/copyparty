@@ -278,6 +278,9 @@ some improvement ideas
 * VirtualBox: sqlite throws `Disk I/O Error` when running in a VM and the up2k database is in a vboxsf
   * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db inside the vm instead
 
+* Ubuntu: dragging files from certain folders into firefox or chrome is impossible
+  * due to snap security policies -- see `snap connections firefox` for the allowlist, `removable-media` permits all of `/mnt` and `/media` apparently
+
 
 # FAQ
 

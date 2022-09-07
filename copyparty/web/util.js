@@ -13,6 +13,7 @@ var wah = '',
     TOUCH = 'ontouchstart' in window,
     MOBILE = TOUCH,
     CHROME = !!window.chrome,
+    FIREFOX = ('netscape' in window) && / rv:/.test(navigator.userAgent),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
 

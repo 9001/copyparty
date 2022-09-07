@@ -1177,7 +1177,12 @@ function up2k_init(subtle) {
             return a < b ? -1 : a > b ? 1 : 0;
         });
 
-        var msg = [L.u_asku.format(good_files.length, esc(get_vpath())) + '<ul>'];
+        var msg = [];
+
+        if (FIREFOX && good_files.length > 5000)
+            msg.push(L.u_ff_many);
+
+        msg.push(L.u_asku.format(good_files.length, esc(get_vpath())) + '<ul>');
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
             msg.push('<li>' + esc(good_files[a][1]) + '</li>');
 
