@@ -2026,7 +2026,11 @@ class Up2k(object):
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
                             bos.unlink(dst)  # TODO ed pls
-                            self._symlink(src, dst, lmod=cj["lmod"])
+                            try:
+                                self._symlink(src, dst, lmod=cj["lmod"])
+                            except:
+                                if not n4g:
+                                    raise
 
                         if cur:
                             a = [cj[x] for x in "prel name lmod size addr".split()]
