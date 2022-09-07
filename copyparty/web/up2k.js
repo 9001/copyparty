@@ -809,7 +809,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo, false);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort, false);
-    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!HTTPS || !CHROME || MOBILE), set_hashw, false);
+    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE), set_hashw, false);
 
     var st = {
         "files": [],
@@ -882,6 +882,7 @@ function up2k_init(subtle) {
     set_fsearch();
 
     function nav() {
+        start_actx();
         ebi('file' + fdom_ctr).click();
     }
     ebi('u2btn').onclick = nav;
@@ -1044,6 +1045,7 @@ function up2k_init(subtle) {
             }
             dst.push([fobj, fobj.name]);
         }
+        start_actx();  // good enough for chrome; not firefox
         return read_dirs(null, [], dirs, good_files, nil_files, bad_files);
     }
 
@@ -1149,6 +1151,7 @@ function up2k_init(subtle) {
 
             msg += L.u_just1;
             return modal.alert(msg, function () {
+                start_actx();
                 gotallfiles(good_files, nil_files, []);
             });
         }
@@ -1160,8 +1163,10 @@ function up2k_init(subtle) {
 
             msg += L.u_just1;
             return modal.confirm(msg, function () {
+                start_actx();
                 gotallfiles(good_files.concat(nil_files), [], []);
             }, function () {
+                start_actx();
                 gotallfiles(good_files, [], []);
             });
         }
@@ -1178,14 +1183,16 @@ function up2k_init(subtle) {
 
         if (uc.ask_up && !uc.fsearch)
             return modal.confirm(msg.join('') + '</ul>', function () {
+                start_actx();
                 up_them(good_files);
-                toast.inf(15, L.u_unpt);
+                toast.inf(15, L.u_unpt, L.u_unpt);
             }, null);
 
         up_them(good_files);
     }
 
     function up_them(good_files) {
+        start_actx();
         var evpath = get_evpath(),
             draw_each = good_files.length < 50;
 
@@ -1267,6 +1274,13 @@ function up2k_init(subtle) {
             pvis.changecard(pvis.act);
         }
         ebi('u2tabw').className = 'ye';
+
+        setTimeout(function () {
+            if (!actx || actx.state != 'suspended' || toast.tag == L.u_unpt)
+                return;
+
+            toast.warn(30, "<div onclick=\"start_actx();toast.inf(3,'thanks!')\">please click this text to<br />unlock full upload speed</div>");
+        }, 500);
     }
 
     function more_one_file() {
@@ -1485,6 +1499,7 @@ function up2k_init(subtle) {
 
                     if (!is_busy) {
                         uptoast();
+                        //throw console.hist.join('\n');
                     }
                     else {
                         timer.add(donut.do);
@@ -1706,7 +1721,8 @@ function up2k_init(subtle) {
         pvis.setab(t.n, nchunks);
         pvis.move(t.n, 'bz');
 
-        if (nchunks > 1 && hws.length && uc.hashw)
+        if (hws.length && uc.hashw && (nchunks > 1 || document.visibilityState == 'hidden'))
+            // resolving subtle.digest w/o worker takes 1sec on blur if the actx hack breaks
             return wexec_hash(t, chunksize, nchunks);
 
         var segm_next = function () {

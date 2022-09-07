@@ -1013,7 +1013,6 @@ function set_files_html(html) {
 
 
 var ACtx = window.AudioContext || window.webkitAudioContext,
-	actx = ACtx && new ACtx(),
 	hash0 = location.hash,
 	mp;
 
@@ -1907,8 +1906,36 @@ function ev_play(e) {
 }
 
 
-var audio_eq = (function () {
-	var r = {
+var actx = null,
+	audio_eq = null;
+
+function start_actx() {
+	// bonus: speedhack for unfocused file hashing (removes 1sec delay on subtle.digest resolves)
+	if (!actx) {
+		if (!ACtx)
+			return;
+
+		actx = new ACtx();
+		console.log('actx created');
+	}
+	try {
+		if (actx.state == 'suspended') {
+			actx.resume();
+			setTimeout(function () {
+				console.log('actx is ' + actx.state);
+			}, 500);
+		}
+	}
+	catch (ex) {
+		console.log('actx start failed; ' + ex);
+	}
+}
+
+function create_eq() {
+	if (audio_eq)
+		return start_actx();
+
+	var r = audio_eq = {
 		"en": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
@@ -1919,6 +1946,7 @@ var audio_eq = (function () {
 		"acst": {}
 	};
 
+	start_actx();
 	if (!actx)
 		ebi('audio_eq').parentNode.style.display = 'none';
 
@@ -2179,8 +2207,7 @@ var audio_eq = (function () {
 	bcfg_bind(r, 'en', 'au_eq', false, r.apply);
 
 	r.draw();
-	return r;
-})();
+}
 
 
 // plays the tid'th audio file on the page
@@ -2258,6 +2285,7 @@ function play(tid, is_ev, seek) {
 	else
 		mp.au.src = mp.au.rsrc = url;
 
+	create_eq();
 	audio_eq.apply();
 
 	setTimeout(function () {
@@ -2276,12 +2304,6 @@ function play(tid, is_ev, seek) {
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	if (window.thegrid)
 		thegrid.loadsel();
-
-	try {
-		if (actx.state == 'suspended')
-			actx.resume();
-	}
-	catch (ex) { }
 
 	try {
 		mp.au.play();
@@ -6197,7 +6219,9 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 function reload_mp() {
 	if (mp && mp.au) {
-		audio_eq.stop();
+		if (audio_eq)
+			audio_eq.stop();
+
 		mp.au.pause();
 		mp.au = null;
 		mpl.unbuffer();
@@ -6208,7 +6232,9 @@ function reload_mp() {
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
-	audio_eq.acst = {};
+	if (audio_eq)
+		audio_eq.acst = {};
+
 	setTimeout(pbar.onresize, 1);
 }
 
