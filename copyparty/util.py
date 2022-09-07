@@ -1462,6 +1462,11 @@ else:
 
 def shut_socket(log: "NamedLogger", sck: socket.socket, timeout: int = 3) -> None:
     t0 = time.time()
+    fd = sck.fileno()
+    if fd == -1:
+        sck.close()
+        return
+
     try:
         sck.settimeout(timeout)
         sck.shutdown(socket.SHUT_WR)
@@ -1474,12 +1479,14 @@ def shut_socket(log: "NamedLogger", sck: socket.socket, timeout: int = 3) -> Non
                 # on windows in particular, drain rx until client shuts
                 if not sck.recv(32 * 1024):
                     break
+
+            sck.shutdown(socket.SHUT_RDWR)
         except:
             pass
     finally:
         td = time.time() - t0
         if td >= 1:
-            log("shut() in {:.3f} sec".format(td), "1;30")
+            log("shut({}) in {:.3f} sec".format(fd, td), "1;30")
 
         sck.close()
 

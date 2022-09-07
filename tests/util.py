@@ -100,7 +100,7 @@ class Cfg(Namespace):
         ex = "no_rescan no_sendfile no_voldump"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "css_browser hist js_browser no_hash no_idx"
+        ex = "css_browser hist js_browser no_hash no_idx no_forget"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "re_maxage rproxy rsp_slp s_wr_slp theme themes turbo df"
