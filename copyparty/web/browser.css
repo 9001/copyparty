@@ -664,7 +664,7 @@ a:hover {
 	background: var(--bg-d3);
 	text-decoration: underline;
 }
-#files thead {
+#files thead th {
 	position: sticky;
 	top: -1px;
 }
