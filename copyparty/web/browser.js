@@ -1908,8 +1908,7 @@ function ev_play(e) {
 }
 
 
-var actx = null,
-	audio_eq = null;
+var actx = null;
 
 function start_actx() {
 	// bonus: speedhack for unfocused file hashing (removes 1sec delay on subtle.digest resolves)
@@ -1933,11 +1932,8 @@ function start_actx() {
 	}
 }
 
-function create_eq() {
-	if (audio_eq)
-		return start_actx();
-
-	var r = audio_eq = {
+var audio_eq = (function () {
+	var r = {
 		"en": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
@@ -1948,51 +1944,59 @@ function create_eq() {
 		"acst": {}
 	};
 
-	start_actx();
-	if (!actx)
+	if (!ACtx)
 		ebi('audio_eq').parentNode.style.display = 'none';
 
-	// some browsers have insane high-frequency boost
-	// (or rather the actual problem is Q but close enough)
-	r.cali = (function () {
-		try {
-			var fi = actx.createBiquadFilter(),
-				freqs = new Float32Array(1),
-				mag = new Float32Array(1),
-				phase = new Float32Array(1);
+	r.init = function () {
+		start_actx();
+		if (r.cfg)
+			return;
 
-			freqs[0] = 14000;
-			fi.type = 'peaking';
-			fi.frequency.value = 18000;
-			fi.Q.value = 0.8;
-			fi.gain.value = 1;
-			fi.getFrequencyResponse(freqs, mag, phase);
+		if (!actx)
+			ebi('audio_eq').parentNode.style.display = 'none';
 
-			return mag[0];  // 1.0407 good, 1.0563 bad
-		}
-		catch (ex) {
-			return 0;
-		}
-	})();
-	console.log('eq cali: ' + r.cali);
+		// some browsers have insane high-frequency boost
+		// (or rather the actual problem is Q but close enough)
+		r.cali = (function () {
+			try {
+				var fi = actx.createBiquadFilter(),
+					freqs = new Float32Array(1),
+					mag = new Float32Array(1),
+					phase = new Float32Array(1);
 
-	var e1 = r.cali < 1.05;
+				freqs[0] = 14000;
+				fi.type = 'peaking';
+				fi.frequency.value = 18000;
+				fi.Q.value = 0.8;
+				fi.gain.value = 1;
+				fi.getFrequencyResponse(freqs, mag, phase);
 
-	var cfg = [ // hz, q, g
-		[31.25 * 0.88, 0, 1.4],  // shelf
-		[31.25 * 1.04, 0.7, 0.96],  // peak
-		[62.5, 0.7, 1],
-		[125, 0.8, 1],
-		[250, 0.9, 1.03],
-		[500, 0.9, 1.1],
-		[1000, 0.9, 1.1],
-		[2000, 0.9, 1.105],
-		[4000, 0.88, 1.05],
-		[8000 * 1.006, 0.73, e1 ? 1.24 : 1.2],
-		[16000 * 0.89, 0.7, e1 ? 1.26 : 1.2],  // peak
-		[16000 * 1.13, 0.82, e1 ? 1.09 : 0.75],  // peak
-		[16000 * 1.205, 0, e1 ? 1.9 : 1.85]  // shelf
-	];
+				return mag[0];  // 1.0407 good, 1.0563 bad
+			}
+			catch (ex) {
+				return 0;
+			}
+		})();
+		console.log('eq cali: ' + r.cali);
+
+		var e1 = r.cali < 1.05;
+
+		r.cfg = [ // hz, q, g
+			[31.25 * 0.88, 0, 1.4],  // shelf
+			[31.25 * 1.04, 0.7, 0.96],  // peak
+			[62.5, 0.7, 1],
+			[125, 0.8, 1],
+			[250, 0.9, 1.03],
+			[500, 0.9, 1.1],
+			[1000, 0.9, 1.1],
+			[2000, 0.9, 1.105],
+			[4000, 0.88, 1.05],
+			[8000 * 1.006, 0.73, e1 ? 1.24 : 1.2],
+			[16000 * 0.89, 0.7, e1 ? 1.26 : 1.2],  // peak
+			[16000 * 1.13, 0.82, e1 ? 1.09 : 0.75],  // peak
+			[16000 * 1.205, 0, e1 ? 1.9 : 1.85]  // shelf
+		];
+	};
 
 	try {
 		r.amp = fcfg_get('au_eq_amp', r.amp);
@@ -2033,6 +2037,7 @@ function create_eq() {
 	};
 
 	r.apply = function () {
+		r.init();
 		r.draw();
 
 		if (!actx)
@@ -2066,12 +2071,12 @@ function create_eq() {
 		gains.push(t);
 		gains.unshift(gains[0]);
 
-		for (var a = 0; a < cfg.length && min != max; a++) {
-			var fi = actx.createBiquadFilter();
-			fi.frequency.value = cfg[a][0];
-			fi.gain.value = cfg[a][2] * gains[a];
-			fi.Q.value = cfg[a][1];
-			fi.type = a == 0 ? 'lowshelf' : a == cfg.length - 1 ? 'highshelf' : 'peaking';
+		for (var a = 0; a < r.cfg.length && min != max; a++) {
+			var fi = actx.createBiquadFilter(), c = r.cfg[a];
+			fi.frequency.value = c[0];
+			fi.gain.value = c[2] * gains[a];
+			fi.Q.value = c[1];
+			fi.type = a == 0 ? 'lowshelf' : a == r.cfg.length - 1 ? 'highshelf' : 'peaking';
 			r.filters.push(fi);
 		}
 
@@ -2209,7 +2214,8 @@ function create_eq() {
 	bcfg_bind(r, 'en', 'au_eq', false, r.apply);
 
 	r.draw();
-}
+	return r;
+})();
 
 
 // plays the tid'th audio file on the page
@@ -2287,7 +2293,6 @@ function play(tid, is_ev, seek) {
 	else
 		mp.au.src = mp.au.rsrc = url;
 
-	create_eq();
 	audio_eq.apply();
 
 	setTimeout(function () {
