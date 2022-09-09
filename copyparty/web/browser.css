@@ -2898,7 +2898,18 @@ html.d #treepar {
 		display: grid;
 		margin: unset;
 		padding: unset;
-		grid-template-columns: repeat(auto-fit,calc(var(--grid-sz) + 1.7em));
+		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
+		gap: 1em;
+	}
+
+	#ggrid > a {
+    	margin: unset;
+    	padding: unset;
+  	}
+
+  	#ggrid>a>span {
+		text-align: center;
+		padding: 0.2em;
 	}
 }
