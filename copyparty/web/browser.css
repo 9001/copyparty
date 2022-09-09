@@ -2898,7 +2898,7 @@ html.d #treepar {
 		display: grid;
 		margin: unset;
 		padding: unset;
-		grid-template-columns: repeat(auto-fit,225px);
+		grid-template-columns: repeat(auto-fit,calc(var(--grid-sz) + 1.7em));
 		justify-content: center;
 	}
 }
