@@ -2893,3 +2893,12 @@ html.d #treepar {
 		margin-top: 1.7em;
 	}
 }
+@supports (display: grid) {
+	#ggrid {
+		display: grid;
+		margin: unset;
+		padding: unset;
+		grid-template-columns: repeat(auto-fit,225px);
+		justify-content: center;
+	}
+}
