@@ -12,6 +12,8 @@ help() { exec cat <<'EOF'
 # `re` does a repack of an sfx which you already executed once
 #   (grabs files from the sfx-created tempdir), overrides `clean`
 #
+# `ox` builds a pyoxidizer exe instead of py
+#
 # `gz` creates a gzip-compressed python sfx instead of bzip2
 #
 # `lang` limits which languages/translations to include,
@@ -56,6 +58,10 @@ gtar=$(command -v gtar || command -v gnutar) || true
 gawk=$(command -v gawk || command -v gnuawk || command -v awk)
 awk() { $gawk "$@"; }
 
+targs=(--owner=1000 --group=1000)
+[ "$OSTYPE" = msys ] &&
+	targs=()
+
 pybin=$(command -v python3 || command -v python) || {
 	echo need python
 	exit 1
@@ -79,12 +85,14 @@ while [ ! -z "$1" ]; do
 	case $1 in
 		clean)  clean=1  ; ;;
 		re)     repack=1 ; ;;
+		ox)     use_ox=1 ; ;;
 		gz)     use_gz=1 ; ;;
 		no-fnt) no_fnt=1 ; ;;
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
 		fast)   zopf=    ; ;;
+		ultra)  ultra=1  ; ;;
 		lang)   shift;langs="$1"; ;;
 		*)      help     ; ;;
 	esac
@@ -162,8 +170,8 @@ tmpdir="$(
 			wget -O$f "$url" || curl -L "$url" >$f)
 	done
 
-    # enable this to dynamically remove type hints at startup,
-    # in case a future python version can use them for performance
+	# enable this to dynamically remove type hints at startup,
+	# in case a future python version can use them for performance
 	true || (
 		echo collecting strip-hints
 		f=../build/strip-hints-0.1.10.tar.gz
@@ -303,8 +311,8 @@ rm have
 		tmv "$f"
 	done
 
-[ $repack ] || {
-	# uncomment
+[ ! $repack ] && [ ! $use_ox ] && {
+	# uncomment; oxidized drops 45 KiB but becomes undebuggable
 	find | grep -E '\.py$' |
 		grep -vE '__version__' |
 		tr '\n' '\0' |
@@ -348,9 +356,9 @@ find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 done
 
 gzres() {
-	command -v pigz && [ $zopf ] &&
-		pk="pigz -11 -I $zopf" ||
-		pk='gzip'
+	[ $zopf ] && command -v zopfli && pk="zopfli --i$zopf"
+	[ $zopf ] && command -v pigz && pk="pigz -11 -I $zopf"
+	[ -z "$pk" ] && pk='gzip'
 
 	np=$(nproc)
 	echo "$pk #$np"
@@ -399,6 +407,32 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 }
 
 
+[ $use_ox ] && {
+	tgt=x86_64-pc-windows-msvc
+	tgt=i686-pc-windows-msvc  # 2M smaller (770k after upx)
+	bdir=build/$tgt/release/install/copyparty
+
+	t="res web"
+	cp -pv ../$bdir/COPYING.txt copyparty/ &&
+		t="$t COPYING.txt" ||
+		echo "copying.txt 404 pls rebuild"
+
+	mv ftp/* j2/* copyparty/vend/* .
+	rm -rf ftp j2 py2 copyparty/vend
+	(cd copyparty; tar -cvf z.tar $t; rm -rf $t)
+	cd ..
+	pyoxidizer build --release --target-triple $tgt
+	mv $bdir/copyparty.exe dist/
+	cp -pv "$(cygpath 'C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Redist\MSVC\14.16.27012\x86\Microsoft.VC141.CRT\vcruntime140.dll')" dist/
+	dist/copyparty.exe --version
+	cp -pv dist/copyparty{,.orig}.exe
+	[ $ultra ] && a="--best --lzma" || a=-1
+	/bin/time -f %es upx $a dist/copyparty.exe >/dev/null
+	ls -al dist/copyparty{,.orig}.exe
+	exit 0
+}
+
+
 echo gen tarlist
 for d in copyparty j2 ftp py2; do find $d -type f; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
@@ -414,11 +448,7 @@ done
 [ $n -eq 50 ] && exit
 
 echo creating tar
-args=(--owner=1000 --group=1000)
-[ "$OSTYPE" = msys ] &&
-	args=()
-
-tar -cf tar "${args[@]}" --numeric-owner -T list
+tar -cf tar "${targs[@]}" --numeric-owner -T list
 
 pc=bzip2
 pe=bz2

@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 import sys
 
-from .__init__ import PY2, WINDOWS, unicode
+from .__init__ import E, PY2, WINDOWS, unicode
 from .bos import bos
 from .util import REKOBO_LKEY, fsenc, min_ex, retchk, runcmd, uncyg
 
@@ -511,11 +511,15 @@ class MTag(object):
         if not bos.path.isfile(abspath):
             return {}
 
-        pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-        zsl = [str(pypath)] + [str(x) for x in sys.path if x]
-        pypath = str(os.pathsep.join(zsl))
         env = os.environ.copy()
-        env["PYTHONPATH"] = pypath
+        try:
+            pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+            zsl = [str(pypath)] + [str(x) for x in sys.path if x]
+            pypath = str(os.pathsep.join(zsl))
+            env["PYTHONPATH"] = pypath
+        except:
+            if not E.ox:
+                raise
 
         ret: dict[str, Any] = {}
         for tagname, parser in sorted(parsers.items(), key=lambda x: (x[1].pri, x[0])):

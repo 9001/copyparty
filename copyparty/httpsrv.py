@@ -28,7 +28,7 @@ except ImportError:
     )
     sys.exit(1)
 
-from .__init__ import MACOS, TYPE_CHECKING, E
+from .__init__ import MACOS, TYPE_CHECKING, EnvParams
 from .bos import bos
 from .httpconn import HttpConn
 from .util import FHC, min_ex, shut_socket, spack, start_log_thrs, start_stackmon
@@ -52,6 +52,7 @@ class HttpSrv(object):
         self.broker = broker
         self.nid = nid
         self.args = broker.args
+        self.E: EnvParams = self.args.E
         self.log = broker.log
         self.asrv = broker.asrv
 
@@ -81,14 +82,15 @@ class HttpSrv(object):
         self.cb_v = ""
 
         env = jinja2.Environment()
-        env.loader = jinja2.FileSystemLoader(os.path.join(E.mod, "web"))
+        env.loader = jinja2.FileSystemLoader(os.path.join(self.E.mod, "web"))
         self.j2 = {
             x: env.get_template(x + ".html")
             for x in ["splash", "browser", "browser2", "msg", "md", "mde", "cf"]
         }
-        self.prism = os.path.exists(os.path.join(E.mod, "web", "deps", "prism.js.gz"))
+        zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
+        self.prism = os.path.exists(zs)
 
-        cert_path = os.path.join(E.cfg, "cert.pem")
+        cert_path = os.path.join(self.E.cfg, "cert.pem")
         if bos.path.exists(cert_path):
             self.cert_path = cert_path
         else:
@@ -354,9 +356,9 @@ class HttpSrv(object):
             if time.time() - self.cb_ts < 1:
                 return self.cb_v
 
-            v = E.t0
+            v = self.E.t0
             try:
-                with os.scandir(os.path.join(E.mod, "web")) as dh:
+                with os.scandir(os.path.join(self.E.mod, "web")) as dh:
                     for fh in dh:
                         inf = fh.stat()
                         v = max(v, inf.st_mtime)

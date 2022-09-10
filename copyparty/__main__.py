@@ -41,6 +41,7 @@ try:
     from types import FrameType
 
     from typing import Any, Optional
+    from collections.abc import Callable
 except:
     pass
 
@@ -129,6 +130,79 @@ def lprint(*a: Any, **ka: Any) -> None:
 
 def warn(msg: str) -> None:
     lprint("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
+
+
+def init_E() -> None:
+    # __init__ runs 18 times when oxidized; do expensive stuff here
+
+    def get_unixdir() -> str:
+        paths: list[tuple[Callable[..., str], str]] = [
+            (os.environ.get, "XDG_CONFIG_HOME"),
+            (os.path.expanduser, "~/.config"),
+            (os.environ.get, "TMPDIR"),
+            (os.environ.get, "TEMP"),
+            (os.environ.get, "TMP"),
+            (unicode, "/tmp"),
+        ]
+        for chk in [os.listdir, os.mkdir]:
+            for pf, pa in paths:
+                try:
+                    p = pf(pa)
+                    # print(chk.__name__, p, pa)
+                    if not p or p.startswith("~"):
+                        continue
+
+                    p = os.path.normpath(p)
+                    chk(p)  # type: ignore
+                    p = os.path.join(p, "copyparty")
+                    if not os.path.isdir(p):
+                        os.mkdir(p)
+
+                    return p
+                except:
+                    pass
+
+        raise Exception("could not find a writable path for config")
+
+    def _unpack() -> str:
+        import atexit
+        import tarfile
+        import tempfile
+        from importlib.resources import open_binary
+
+        td = tempfile.TemporaryDirectory(prefix="")
+        atexit.register(td.cleanup)
+        tdn = td.name
+
+        with open_binary("copyparty", "z.tar") as tgz:
+            with tarfile.open(fileobj=tgz) as tf:
+                tf.extractall(tdn)
+
+        return tdn
+
+    try:
+        E.mod = os.path.dirname(os.path.realpath(__file__))
+        if E.mod.endswith("__init__"):
+            E.mod = os.path.dirname(E.mod)
+    except:
+        if not E.ox:
+            raise
+
+        E.mod = _unpack()
+
+    if sys.platform == "win32":
+        E.cfg = os.path.normpath(os.environ["APPDATA"] + "/copyparty")
+    elif sys.platform == "darwin":
+        E.cfg = os.path.expanduser("~/Library/Preferences/copyparty")
+    else:
+        E.cfg = get_unixdir()
+
+    E.cfg = E.cfg.replace("\\", "/")
+    try:
+        os.makedirs(E.cfg)
+    except:
+        if not os.path.isdir(E.cfg):
+            raise
 
 
 def ensure_locale() -> None:
@@ -323,6 +397,21 @@ def disable_quickedit() -> None:
             cmode(True, mode | 4)
 
 
+def showlic() -> None:
+    p = os.path.join(E.mod, "COPYING.txt")
+    if not os.path.exists(p):
+        print("no relevant license info to display")
+        return
+
+    t = " licenses are only relevant to this EXE edition of copyparty, as they are a result of packaging by pyoxidizer"
+
+    print("the below" + t + ":\n")
+    with open(p, "rb") as f:
+        print(f.read().decode("utf-8", "replace"))
+
+    print("\nthe above" + t)
+
+
 def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
@@ -488,6 +577,9 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see --help-urlform")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="window title, for example '$ip-10.1.2.' or '$ip-'")
+    if E.ox:
+        ap2.add_argument("--license", action="store_true", help="show licenses and exit")
+    ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
@@ -680,6 +772,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     if WINDOWS:
         os.system("rem")  # enables colors
 
+    init_E()
     if argv is None:
         argv = sys.argv
 
@@ -694,6 +787,13 @@ def main(argv: Optional[list[str]] = None) -> None:
         PYFTPD_VER,
     )
     lprint(f)
+
+    if "--version" in argv:
+        sys.exit(0)
+
+    if "--license" in argv and E.ox:
+        showlic()
+        sys.exit(0)
 
     ensure_locale()
     if HAVE_SSL:
@@ -733,6 +833,7 @@ def main(argv: Optional[list[str]] = None) -> None:
             lprint("\n[ {} ]:\n{}\n".format(fmtr, min_ex()))
 
     assert al
+    al.E = E  # __init__ is not shared when oxidized
 
     if WINDOWS and not al.keep_qem:
         try:

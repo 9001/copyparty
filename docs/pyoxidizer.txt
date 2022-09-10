@@ -1,0 +1,52 @@
+pyoxidizer doesn't crosscompile yet so need to build in a windows vm,
+luckily possible to do mostly airgapped (https-proxy for crates)
+
+none of this is version-specific but doing absolute links just in case
+(only exception is py3.8 which is the final win7 ver)
+
+# deps (download on linux host):
+https://www.python.org/ftp/python/3.10.7/python-3.10.7-amd64.exe
+https://github.com/indygreg/PyOxidizer/releases/download/pyoxidizer%2F0.22.0/pyoxidizer-0.22.0-x86_64-pc-windows-msvc.zip
+https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip
+https://static.rust-lang.org/dist/rust-1.61.0-x86_64-pc-windows-msvc.msi
+https://github.com/indygreg/python-build-standalone/releases/download/20220528/cpython-3.8.13%2B20220528-i686-pc-windows-msvc-static-noopt-full.tar.zst
+
+# need cl.exe, prefer 2017 -- download on linux host:
+https://visualstudio.microsoft.com/downloads/?q=build+tools
+https://docs.microsoft.com/en-us/visualstudio/releases/2022/release-history#release-dates-and-build-numbers
+https://aka.ms/vs/15/release/vs_buildtools.exe  # 2017
+https://aka.ms/vs/16/release/vs_buildtools.exe  # 2019
+https://aka.ms/vs/17/release/vs_buildtools.exe  # 2022
+https://docs.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2017
+
+# use disposable w10 vm to prep offline installer; xfer to linux host with firefox to copyparty
+vs_buildtools-2017.exe --add Microsoft.VisualStudio.Workload.MSBuildTools --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.17763 --layout c:\msbt2017 --lang en-us
+
+# need two proxies on host; s5s or ssh for msys2(socks5), and tinyproxy for rust(http)
+UP=- python3 socks5server.py 192.168.123.1 4321
+ssh -vND 192.168.123.1:4321 localhost
+git clone https://github.com/tinyproxy/tinyproxy.git
+  ./autogen.sh
+  ./configure --prefix=/home/ed/pe/tinyproxy
+  make -j24 install
+  printf '%s\n' >cfg "Port 4380" "Listen 192.168.123.1"
+  ./tinyproxy -dccfg
+
+https://github.com/msys2/msys2-installer/releases/download/2022-09-04/msys2-x86_64-20220904.exe
+export all_proxy=socks5h://192.168.123.1:4321
+# if chat dies after auth (2 messages) it probably failed dns, note the h in socks5h to tunnel dns
+pacman -Syuu
+pacman -S git patch mingw64/mingw-w64-x86_64-zopfli
+cd /c && curl -k https://192.168.123.1:3923/ro/ox/msbt2017/?tar | tar -xv
+
+first install certs from msbt/certificates then admin-cmd `vs_buildtools.exe --noweb`,
+default selection (vc++2017-v15.9-v14.16, vc++redist, vc++bt-core) += win10sdk (for io.h)
+
+install rust without documentation, python 3.10, put upx and pyoxidizer into ~/bin,
+[cmd.exe] python -m pip install --user -U wheel-0.37.1.tar.gz strip-hints-0.1.10.tar.gz
+p=192.168.123.1:4380; export https_proxy=$p; export http_proxy=$p
+
+# and with all of the one-time-setup out of the way,
+mkdir /c/d; cd /c/d && curl -k https://192.168.123.1:3923/cpp/gb?pw=wark > gb && git clone gb copyparty
+cd /c/d/copyparty/ && curl -k https://192.168.123.1:3923/cpp/patch?pw=wark | patch -p1
+cd /c/d/copyparty/scripts && CARGO_HTTP_CHECK_REVOKE=false PATH=/c/Users/$USER/AppData/Local/Programs/Python/Python310:/c/Users/$USER/bin:"$(cygpath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Tools\MSVC\14.16.27023\bin\Hostx86\x86"):$PATH"  ./make-sfx.sh ox ultra

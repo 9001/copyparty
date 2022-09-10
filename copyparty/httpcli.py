@@ -24,7 +24,7 @@ try:
 except:
     pass
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E, unicode
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, EnvParams, unicode
 from .authsrv import VFS  # typechk
 from .bos import bos
 from .star import StreamTar
@@ -103,6 +103,7 @@ class HttpCli(object):
         self.ip = conn.addr[0]
         self.addr: tuple[str, int] = conn.addr
         self.args = conn.args  # mypy404
+        self.E: EnvParams = self.args.E
         self.asrv = conn.asrv  # mypy404
         self.ico = conn.ico  # mypy404
         self.thumbcli = conn.thumbcli  # mypy404
@@ -553,7 +554,7 @@ class HttpCli(object):
             if self.vpath.startswith(".cpr/ico/"):
                 return self.tx_ico(self.vpath.split("/")[-1], exact=True)
 
-            static_path = os.path.join(E.mod, "web/", self.vpath[5:])
+            static_path = os.path.join(self.E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
         if "cf_challenge" in self.uparam:
@@ -1839,7 +1840,7 @@ class HttpCli(object):
 
         mime, ico = self.ico.get(ext, not exact)
 
-        dt = datetime.utcfromtimestamp(E.t0)
+        dt = datetime.utcfromtimestamp(self.E.t0)
         lm = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
@@ -1852,7 +1853,7 @@ class HttpCli(object):
                 return self.tx_404(True)
 
         tpl = "mde" if "edit2" in self.uparam else "md"
-        html_path = os.path.join(E.mod, "web", "{}.html".format(tpl))
+        html_path = os.path.join(self.E.mod, "web", "{}.html".format(tpl))
         template = self.j2j(tpl)
 
         st = bos.stat(fs_path)
@@ -1867,7 +1868,7 @@ class HttpCli(object):
             for c, v in [(b"&", 4), (b"<", 3), (b">", 3)]:
                 sz_md += (len(buf) - len(buf.replace(c, b""))) * v
 
-        file_ts = max(ts_md, ts_html, E.t0)
+        file_ts = max(ts_md, ts_html, self.E.t0)
         file_lastmod, do_send = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
         self.out_headers.update(NO_CACHE)

@@ -24,7 +24,7 @@ try:
 except:
     pass
 
-from .__init__ import ANYWIN, MACOS, PY2, VT100, WINDOWS, E, unicode
+from .__init__ import ANYWIN, MACOS, PY2, VT100, WINDOWS, EnvParams, unicode
 from .authsrv import AuthSrv
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
@@ -55,6 +55,7 @@ class SvcHub(object):
     def __init__(self, args: argparse.Namespace, argv: list[str], printed: str) -> None:
         self.args = args
         self.argv = argv
+        self.E: EnvParams = args.E
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
         self.stop_req = False
@@ -264,7 +265,7 @@ class SvcHub(object):
 
         msg = "[+] opened logfile [{}]\n".format(fn)
         printed += msg
-        lh.write("t0: {:.3f}\nargv: {}\n\n{}".format(E.t0, " ".join(argv), printed))
+        lh.write("t0: {:.3f}\nargv: {}\n\n{}".format(self.E.t0, " ".join(argv), printed))
         self.logf = lh
         self.logf_base_fn = base_fn
         print(msg, end="")

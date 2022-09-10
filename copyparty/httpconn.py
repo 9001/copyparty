@@ -15,7 +15,7 @@ except:
     HAVE_SSL = False
 
 from . import util as Util
-from .__init__ import TYPE_CHECKING, E
+from .__init__ import TYPE_CHECKING, EnvParams
 from .authsrv import AuthSrv  # typechk
 from .httpcli import HttpCli
 from .ico import Ico
@@ -50,6 +50,7 @@ class HttpConn(object):
 
         self.mutex: threading.Lock = hsrv.mutex  # mypy404
         self.args: argparse.Namespace = hsrv.args  # mypy404
+        self.E: EnvParams = self.args.E
         self.asrv: AuthSrv = hsrv.asrv  # mypy404
         self.cert_path = hsrv.cert_path
         self.u2fh: Util.FHC = hsrv.u2fh  # mypy404
@@ -91,7 +92,7 @@ class HttpConn(object):
         return self.log_src
 
     def respath(self, res_name: str) -> str:
-        return os.path.join(E.mod, "web", res_name)
+        return os.path.join(self.E.mod, "web", res_name)
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func(self.log_src, msg, c)
