@@ -1421,12 +1421,16 @@ class HttpCli(object):
         vspd = self._spd(sz_total, False)
         self.log("{} {}".format(vspd, msg))
 
-        if not nullwrite:
-            log_fn = "up.{:.6f}.txt".format(t0)
-            with open(log_fn, "wb") as f:
-                ft = "{}:{}".format(self.ip, self.addr[1])
-                ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
-                f.write(ft.encode("utf-8"))
+        suf = ""
+        if not nullwrite and self.args.write_uplog:
+            try:
+                log_fn = "up.{:.6f}.txt".format(t0)
+                with open(log_fn, "wb") as f:
+                    ft = "{}:{}".format(self.ip, self.addr[1])
+                    ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
+                    f.write(ft.encode("utf-8"))
+            except Exception as ex:
+                suf = "\nfailed to write the upload report: {}".format(ex)
 
         sc = 400 if errmsg else 200
         if "j" in self.uparam:
@@ -1435,7 +1439,7 @@ class HttpCli(object):
         else:
             self.redirect(
                 self.vpath,
-                msg=msg,
+                msg=msg + suf,
                 flavor="return to",
                 click=False,
                 status=sc,
