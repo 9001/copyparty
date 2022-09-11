@@ -32,6 +32,7 @@ from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
 from .up2k import Up2k
 from .util import (
     VERSIONS,
+    HMaccas,
     alltrace,
     ansi_re,
     min_ex,
@@ -71,6 +72,8 @@ class SvcHub(object):
         self.log_mutex = threading.Lock()
         self.next_day = 0
         self.tstack = 0.0
+
+        self.iphash = HMaccas(os.path.join(self.E.cfg, "iphash"), 8)
 
         if args.sss or args.s >= 3:
             args.ss = True

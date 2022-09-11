@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import base64
 import contextlib
 import hashlib
+import hmac
 import math
 import mimetypes
 import os
@@ -595,6 +596,33 @@ class MTHash(object):
         bdig = hashobj.digest()[:33]
         udig = base64.urlsafe_b64encode(bdig).decode("utf-8")
         return nch, udig, ofs0, chunk_sz
+
+
+class HMaccas(object):
+    def __init__(self, keypath: str, retlen: int) -> None:
+        self.retlen = retlen
+        self.cache: dict[bytes, str] = {}
+        try:
+            with open(keypath, "rb") as f:
+                self.key = f.read()
+                if len(self.key) != 64:
+                    raise Exception()
+        except:
+            self.key = os.urandom(64)
+            with open(keypath, "wb") as f:
+                f.write(self.key)
+
+    def b(self, msg: bytes) -> str:
+        try:
+            return self.cache[msg]
+        except:
+            zb = hmac.new(self.key, msg, hashlib.sha512).digest()
+            zs = base64.urlsafe_b64encode(zb)[: self.retlen].decode("utf-8")
+            self.cache[msg] = zs
+            return zs
+
+    def s(self, msg: str) -> str:
+        return self.b(msg.encode("utf-8", "replace"))
 
 
 def uprint(msg: str) -> None:

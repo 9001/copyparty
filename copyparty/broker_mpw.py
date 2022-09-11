@@ -6,12 +6,13 @@ import signal
 import sys
 import threading
 
+import os
 import queue
 
 from .authsrv import AuthSrv
 from .broker_util import BrokerCli, ExceptionalQueue
 from .httpsrv import HttpSrv
-from .util import FAKE_MP
+from .util import FAKE_MP, HMaccas
 
 try:
     from types import FrameType
@@ -54,6 +55,7 @@ class MpWorker(BrokerCli):
         self.asrv = AuthSrv(args, None, False)
 
         # instantiate all services here (TODO: inheritance?)
+        self.iphash = HMaccas(os.path.join(self.args.E.cfg, "iphash"), 8)
         self.httpsrv = HttpSrv(self, n)
 
         # on winxp and some other platforms,

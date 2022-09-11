@@ -123,7 +123,6 @@ class HttpCli(object):
         self.ua = " "
         self.is_rclone = False
         self.is_ancient = False
-        self.dip = " "
         self.ouparam: dict[str, str] = {}
         self.uparam: dict[str, str] = {}
         self.cookies: dict[str, str] = {}
@@ -264,8 +263,6 @@ class HttpCli(object):
 
                 self.log_src = self.conn.set_rproxy(self.ip)
 
-        self.dip = self.ip.replace(":", ".")
-
         if self.args.ihead:
             keys = self.args.ihead
             if "*" in keys:
@@ -402,6 +399,12 @@ class HttpCli(object):
                 return self.keepalive
             except Pebkac:
                 return False
+
+    def dip(self) -> str:
+        if self.args.plain_ip:
+            return self.ip.replace(":", ".")
+        else:
+            return self.conn.iphash.s(self.ip)
 
     def permit_caching(self) -> None:
         cache = self.uparam.get("cache")
@@ -778,7 +781,7 @@ class HttpCli(object):
             else:
                 self.log("fallthrough? thats a bug", 1)
 
-        suffix = "-{:.6f}-{}".format(time.time(), self.dip)
+        suffix = "-{:.6f}-{}".format(time.time(), self.dip())
         if not fn:
             suffix += ".bin"
             fn = "put" + suffix
@@ -1262,6 +1265,7 @@ class HttpCli(object):
         files: list[tuple[int, str, str, str, str, str]] = []
         # sz, sha_hex, sha_b64, p_file, fname, abspath
         errmsg = ""
+        dip = self.dip()
         t0 = time.time()
         try:
             assert self.parser.gen
@@ -1278,7 +1282,7 @@ class HttpCli(object):
                     if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")
 
-                    suffix = "-{:.6f}-{}".format(time.time(), self.dip)
+                    suffix = "-{:.6f}-{}".format(time.time(), dip)
                     open_args = {"fdir": fdir, "suffix": suffix}
 
                     # reserve destination filename

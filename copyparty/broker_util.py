@@ -8,7 +8,7 @@ from queue import Queue
 
 from .__init__ import TYPE_CHECKING
 from .authsrv import AuthSrv
-from .util import Pebkac
+from .util import Pebkac, HMaccas
 
 try:
     from typing import Any, Optional, Union
@@ -46,6 +46,7 @@ class BrokerCli(object):
         self.args: argparse.Namespace = None
         self.asrv: AuthSrv = None
         self.httpsrv: "HttpSrv" = None
+        self.iphash: HMaccas = None
 
     def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
         return ExceptionalQueue(1)

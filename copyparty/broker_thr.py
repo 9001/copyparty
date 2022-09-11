@@ -1,11 +1,13 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import os
 import threading
 
 from .__init__ import TYPE_CHECKING
 from .broker_util import BrokerCli, ExceptionalQueue, try_exec
 from .httpsrv import HttpSrv
+from .util import HMaccas
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -31,6 +33,7 @@ class BrokerThr(BrokerCli):
         self.num_workers = 1
 
         # instantiate all services here (TODO: inheritance?)
+        self.iphash = HMaccas(os.path.join(self.args.E.cfg, "iphash"), 8)
         self.httpsrv = HttpSrv(self, None)
         self.reload = self.noop
 

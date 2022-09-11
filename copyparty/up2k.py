@@ -2101,9 +2101,12 @@ class Up2k(object):
         if self.args.nw:
             return fname
 
-        # TODO broker which avoid this race and
-        # provides a new filename if taken (same as bup)
-        suffix = "-{:.6f}-{}".format(ts, ip.replace(":", "."))
+        if self.args.plain_ip:
+            dip = ip.replace(":", ".")
+        else:
+            dip = self.hub.iphash.s(ip)
+
+        suffix = "-{:.6f}-{}".format(ts, dip)
         with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
             return zfw["orz"][1]
 
@@ -2842,7 +2845,11 @@ class Up2k(object):
                 del self.registry[job["ptop"]][job["wark"]]
             return
 
-        dip = job["addr"].replace(":", ".")
+        if self.args.plain_ip:
+            dip = job["addr"].replace(":", ".")
+        else:
+            dip = self.hub.iphash.s(job["addr"])
+
         suffix = "-{:.6f}-{}".format(job["t0"], dip)
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
             f, job["tnam"] = zfw["orz"]

@@ -583,6 +583,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
 
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
+    ap2.add_argument("--plain-ip", action="store_true", help="when avoiding filename collisions by appending the uploader's ip to the filename: append the plaintext ip instead of salting and hashing the ip")
     ap2.add_argument("--unpost", metavar="SEC", type=int, default=3600*12, help="grace period where uploads can be deleted by the uploader, even without delete permissions; 0=disabled")
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without -e2d; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload")

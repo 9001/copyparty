@@ -23,7 +23,7 @@ from .mtag import HAVE_FFMPEG
 from .th_cli import ThumbCli
 from .th_srv import HAVE_PIL, HAVE_VIPS
 from .u2idx import U2idx
-from .util import shut_socket
+from .util import HMaccas, shut_socket
 
 try:
     from typing import Optional, Pattern, Union
@@ -54,6 +54,7 @@ class HttpConn(object):
         self.asrv: AuthSrv = hsrv.asrv  # mypy404
         self.cert_path = hsrv.cert_path
         self.u2fh: Util.FHC = hsrv.u2fh  # mypy404
+        self.iphash: HMaccas = hsrv.broker.iphash
 
         enth = (HAVE_PIL or HAVE_VIPS or HAVE_FFMPEG) and not self.args.no_thumb
         self.thumbcli: Optional[ThumbCli] = ThumbCli(hsrv) if enth else None  # mypy404
