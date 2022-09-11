@@ -3629,6 +3629,8 @@ var thegrid = (function () {
 		qsr('#docname');
 		if (window['treectl'])
 			treectl.textmode(false);
+
+		aligngriditems();
 	};
 
 	r.setdirty = function () {
@@ -4487,6 +4489,21 @@ document.onkeydown = function (e) {
 	}
 })();
 
+function aligngriditems() {
+	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
+	var gridsz = getComputedStyle(document.getElementsByTagName('html')[0]).getPropertyValue('--grid-sz').slice(0, -2);
+	var gridwidth = ebi('ggrid').clientWidth;
+	var griditemcount = ebi('ggrid').children.length;
+	var totalgapwidth = em2px * griditemcount;
+	
+	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
+		ebi('ggrid').style.justifyContent = 'left';
+	} else if (localStorage.getItem('entreed') == 'na') {
+		ebi('ggrid').style.justifyContent = 'center';
+	} else if (localStorage.getItem('entreed') == 'tree') {
+		ebi('ggrid').style.justifyContent = 'space-between';
+	}
+}
 
 var treectl = (function () {
 	var r = {
@@ -4536,14 +4553,13 @@ var treectl = (function () {
 			ebi('path').style.display = 'inline-block';
 			return;
 		}
-		if (entreed) {
-			ebi('ggrid').style.justifyContent = 'space-between';
-		}
+
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'block';
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
 		onresize();
+		aligngriditems();
 	};
 
 	r.detree = function (e) {
@@ -4557,14 +4573,12 @@ var treectl = (function () {
 
 	r.hide = function () {
 		r.hidden = true;
-		if (!entreed) {
-			ebi('ggrid').style.justifyContent = 'center';
-		}
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'none';
 		ebi('wrap').style.marginLeft = '';
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
+		aligngriditems();
 	}
 
 	function unmenter() {
@@ -4679,6 +4693,8 @@ var treectl = (function () {
 	timer.add(onscroll2, true);
 
 	function onresize(e) {
+		aligngriditems();
+	
 		if (!entreed || r.hidden)
 			return;
 
