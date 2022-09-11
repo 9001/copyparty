@@ -2896,7 +2896,7 @@ html.d #treepar {
 @supports (display: grid) {
 	#ggrid {
 		display: grid;
-		margin: unset;
+		margin: 0em 0.25em;
 		padding: unset;
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
