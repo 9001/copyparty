@@ -1846,7 +1846,9 @@ class HttpCli(object):
         if len(ext) > 11:
             ext = "⋯" + ext[-9:]
 
-        mime, ico = self.ico.get(ext, not exact)
+        # chrome cannot handle more than ~2000 unique SVGs
+        chrome = " rv:" not in self.ua
+        mime, ico = self.ico.get(ext, not exact, chrome)
 
         dt = datetime.utcfromtimestamp(self.E.t0)
         lm = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")

@@ -3787,8 +3787,11 @@ var thegrid = (function () {
 		if (!r.dirty)
 			return r.loadsel();
 
-		var html = [];
-		var files = QSA('#files>tbody>tr>td:nth-child(2) a[id]');
+		var html = [],
+			svgs = new Set(),
+			max_svgs = CHROME ? 500 : 5000,
+			files = QSA('#files>tbody>tr>td:nth-child(2) a[id]');
+
 		for (var a = 0, aa = files.length; a < aa; a++) {
 			var ao = files[a],
 				ohref = esc(ao.getAttribute('href')),
@@ -3823,7 +3826,14 @@ var thegrid = (function () {
 				if (!ihref) {
 					ihref = 'unk.';
 				}
-				ihref = '/.cpr/ico/' + ihref.slice(0, -1);
+				var ext = ihref.slice(0, -1);
+				if (!svgs.has(ext)) {
+					if (svgs.size < max_svgs)
+						svgs.add(ext);
+					else
+						ext = "unk";
+				}
+				ihref = '/.cpr/ico/' + ext;
 			}
 			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i';
 
