@@ -4524,6 +4524,9 @@ var treectl = (function () {
 			ebi('path').style.display = 'inline-block';
 			return;
 		}
+		if (entreed) {
+			ebi('ggrid').style.justifyContent = 'space-between';
+		}
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'block';
 		window.addEventListener('scroll', onscroll);
@@ -4542,6 +4545,9 @@ var treectl = (function () {
 
 	r.hide = function () {
 		r.hidden = true;
+		if (!entreed) {
+			ebi('ggrid').style.justifyContent = 'center';
+		}
 		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'none';
 		ebi('wrap').style.marginLeft = '';
