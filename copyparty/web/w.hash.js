@@ -51,6 +51,7 @@ onmessage = (d) => {
             hash_calc(gc1);
         }
         catch (ex) {
+            busy = false;
             postMessage(["panic", ex + '']);
         }
     };

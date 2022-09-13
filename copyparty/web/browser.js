@@ -318,6 +318,8 @@ var Ls = {
 		"u_ehsfin": "server rejected the request to finalize upload; retrying...",
 		"u_ehssrch": "server rejected the request to perform search; retrying...",
 		"u_ehsinit": "server rejected the request to initiate upload; retrying...",
+		"u_eneths": "network error while performing upload handshake; retrying...",
+		"u_enethd": "network error while testing target existence; retrying...",
 		"u_ehsdf": "server ran out of disk space!\n\nwill keep retrying, in case someone\nfrees up enough space to continue",
 		"u_emtleak1": "it looks like your webbrowser may have a memory leak;\nplease",
 		"u_emtleak2": ' <a href="{0}">switch to https (recommended)</a> or ',
@@ -662,6 +664,8 @@ var Ls = {
 		"u_ehsfin": "server nektet forespørselen om å ferdigstille filen; prøver igjen...",
 		"u_ehssrch": "server nektet forespørselen om å utføre søk; prøver igjen...",
 		"u_ehsinit": "server nektet forespørselen om å begynne en ny opplastning; prøver igjen...",
+		"u_eneths": "et problem med nettverket gjorde at avtale om opplastning ikke kunne inngås; prøver igjen...",
+		"u_enethd": "et problem med nettverket gjorde at filsjekk ikke kunne utføres; prøver igjen...",
 		"u_ehsdf": "serveren er full!\n\nprøver igjen regelmessig,\ni tilfelle noen rydder litt...",
 		"u_emtleak1": "uff, det er mulig at nettleseren din har en minnelekkasje...\nForeslår",
 		"u_emtleak2": ' helst at du <a href="{0}">bytter til https</a>, eller ',
@@ -4495,7 +4499,7 @@ function aligngriditems() {
 	var gridwidth = ebi('ggrid').clientWidth;
 	var griditemcount = ebi('ggrid').children.length;
 	var totalgapwidth = em2px * griditemcount;
-	
+
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
 		ebi('ggrid').style.justifyContent = 'left';
 	} else if (localStorage.getItem('entreed') == 'na') {
@@ -4694,7 +4698,7 @@ var treectl = (function () {
 
 	function onresize(e) {
 		aligngriditems();
-	
+
 		if (!entreed || r.hidden)
 			return;
 

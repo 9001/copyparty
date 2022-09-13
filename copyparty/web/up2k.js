@@ -1179,7 +1179,7 @@ function up2k_init(subtle) {
 
         var msg = [];
 
-        if (FIREFOX && good_files.length > 5000)
+        if (FIREFOX && good_files.length > 3000)
             msg.push(L.u_ff_many);
 
         msg.push(L.u_asku.format(good_files.length, esc(get_vpath())) + '<ul>');
@@ -1948,7 +1948,10 @@ function up2k_init(subtle) {
 
         var xhr = new XMLHttpRequest();
         xhr.onerror = function () {
-            console.log('head onerror, retrying', t);
+            console.log('head onerror, retrying', t.name, t);
+            if (!toast.visible)
+                toast.warn(9.98, L.u_enethd + "\n\nfile: " + t.name, t);
+
             apop(st.busy.head, t);
             st.todo.head.unshift(t);
         };
@@ -2004,22 +2007,25 @@ function up2k_init(subtle) {
         t.t_busied = me;
 
         if (keepalive)
-            console.log("sending keepalive handshake", t);
+            console.log("sending keepalive handshake", t.name, t);
 
         var xhr = new XMLHttpRequest();
         xhr.onerror = function () {
             if (t.t_busied != me) {
-                console.log('zombie handshake onerror,', t);
+                console.log('zombie handshake onerror,', t.name, t);
                 return;
             }
-            console.log('handshake onerror, retrying', t);
+            if (!toast.visible)
+                toast.warn(9.98, L.u_eneths + "\n\nfile: " + t.name, t);
+
+            console.log('handshake onerror, retrying', t.name, t);
             apop(st.busy.handshake, t);
             st.todo.handshake.unshift(t);
             t.keepalive = keepalive;
         };
         function orz(e) {
             if (t.t_busied != me) {
-                console.log('zombie handshake onload,', t);
+                console.log('zombie handshake onload,', t.name, t);
                 return;
             }
             if (xhr.status == 200) {
@@ -2286,7 +2292,7 @@ function up2k_init(subtle) {
             }
             else if (txt.indexOf('already got that') + 1 ||
                 txt.indexOf('already being written') + 1) {
-                console.log("ignoring dupe-segment error", t);
+                console.log("ignoring dupe-segment error", t.name, t);
             }
             else {
                 xhrchk(xhr, L.u_cuerr2.format(npart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)", "warn", t);
@@ -2323,7 +2329,7 @@ function up2k_init(subtle) {
                 if (!toast.visible)
                     toast.warn(9.98, L.u_cuerr.format(npart, Math.ceil(t.size / chunksize), t.name), t);
 
-                console.log('chunkpit onerror,', ++tries, t);
+                console.log('chunkpit onerror,', ++tries, t.name, t);
                 orz2(xhr);
             };
             xhr.open('POST', t.purl, true);
