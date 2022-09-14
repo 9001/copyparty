@@ -104,7 +104,7 @@ def main():
     if err:
         return err
 
-    if min(w, h) < 720:
+    if max(w, h) < 1280 and min(w, h) < 720:
         return "resolution too small"
 
     zs = (

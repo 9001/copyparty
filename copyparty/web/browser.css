@@ -88,10 +88,10 @@
 
 	--g-sel-fg: #fff;
 	--g-sel-bg: #925;
-	--g-sel-b1: #c37;
+	--g-sel-b1: #e39;
 	--g-sel-sh: #b36;
 	--g-fsel-bg: #d39;
-	--g-fsel-b1: #d48;
+	--g-fsel-b1: #f4a;
 	--g-fsel-ts: #804;
 	--g-fg: var(--a-hil);
 	--g-bg: var(--bg-u2);
@@ -1261,7 +1261,9 @@ html.y #ops svg circle {
 	max-width: min(41em, calc(100% - 2.6em));
 }
 .opbox input {
+	position: relative;
 	margin: .5em;
+	top: -.3em;
 }
 .opview input[type=text] {
 	color: var(--fg);
@@ -1454,7 +1456,7 @@ html {
 	margin: .2em;
 	white-space: pre;
 	position: relative;
-	top: -.2em;
+	top: -.12em;
 }
 html.c .btn,
 html.a .btn {
@@ -2901,6 +2903,11 @@ html.d #treepar {
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
 		gap: 1em;
+	}
+
+	html.b #ggrid {
+		padding: 0 2em 2em 0;
+		gap: .5em 3em;
 	}
 
 	#ggrid > a {

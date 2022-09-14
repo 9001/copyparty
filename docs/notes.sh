@@ -55,6 +55,11 @@ cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+
 
 
 ##
+## find uploads blocked by slow i/o or maybe deadlocks
+awk '/^.\+. opened logfile/{print;next} {sub(/.$/,"")} !/^..36m[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3} /{next} !/0m(POST|writing) /{next} {c=0;p=$3} /0mPOST/{c=1} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");s=60*(60*$1+$2)+$3} c{t[p]=s;next} {d=s-t[p]} d>10{print $0 "  # " d}'
+
+
+##
 ## bad filenames
 
 dirs=("./ほげ" "./ほげ/ぴよ" "./$(printf \\xed\\x91)" "./$(printf \\xed\\x91/\\xed\\x92)" './qw,er;ty%20as df?gh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh')

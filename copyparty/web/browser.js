@@ -325,7 +325,8 @@ var Ls = {
 		"u_emtleak2": ' <a href="{0}">switch to https (recommended)</a> or ',
 		"u_emtleak3": ' ',
 		"u_emtleak4": "try the following:\n<ul><li>hit <code>F5</code> to refresh the page</li><li>then disable the &nbsp;<code>mt</code>&nbsp; button in the &nbsp;<code>⚙️ settings</code></li><li>and try that upload again</li></ul>Uploads will be a bit slower, but oh well.\nSorry for the trouble !",
-		"u_emtleakc": "\n\nPS: chrome v107 has a bugfix for this",
+		"u_emtleakc": '\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816">has a bugfix</a> for this',
+		"u_emtleakf": '\n\nPS: firefox v106 <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">should have a bugfix</a> for this',
 		"u_s404": "not found on server",
 		"u_expl": "explain",
 		"u_tu": '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
@@ -671,7 +672,8 @@ var Ls = {
 		"u_emtleak2": ' helst at du <a href="{0}">bytter til https</a>, eller ',
 		"u_emtleak3": ' at du ',
 		"u_emtleak4": "prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru av &nbsp;<code>mt</code>&nbsp; bryteren under &nbsp;<code>⚙️ innstillinger</code></li><li>og forsøk den samme opplastningen igjen</li></ul>Opplastning vil gå litt tregere, men det får så være.\nBeklager bryderiet !",
-		"u_emtleakc": "\n\nPS: feilen skal være fikset i chrome v107",
+		"u_emtleakc": '\n\nPS: feilen <a href="<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816">skal være fikset</a> i chrome v107',
+		"u_emtleakf": '\n\nPS: feilen <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">skal være fikset</a> i firefox v106',
 		"u_s404": "ikke funnet på serveren",
 		"u_expl": "forklar",
 		"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrutte opplastninger vil muligens ikke oppdages og gjenopptas; hold musepekeren over turbo-knappen for mer info</span></p>',
@@ -3265,7 +3267,7 @@ var showfile = (function () {
 	window.Prism = { 'manual': true };
 	var em = QS('#bdoc>pre');
 	if (em)
-		em = [r.sname(window.location.search), window.location.hash, em.textContent];
+		em = [r.sname(window.location.search), location.hash, em.textContent];
 	else {
 		var m = /[?&]doc=([^&]+)/.exec(window.location.search);
 		if (m) {
@@ -4508,6 +4510,7 @@ function aligngriditems() {
 		ebi('ggrid').style.justifyContent = 'space-between';
 	}
 }
+window.addEventListener('resize', aligngriditems);
 
 var treectl = (function () {
 	var r = {
@@ -4697,8 +4700,6 @@ var treectl = (function () {
 	timer.add(onscroll2, true);
 
 	function onresize(e) {
-		aligngriditems();
-
 		if (!entreed || r.hidden)
 			return;
 
@@ -5038,7 +5039,6 @@ var treectl = (function () {
 		set_files_html(html);
 
 		function asdf() {
-			filecols.set_style();
 			showfile.mktree();
 			mukey.render();
 			reload_tree();
@@ -5158,7 +5158,7 @@ var treectl = (function () {
 		r.goto(url.pathname, false, true);
 	};
 
-	hist_replace(get_evpath() + window.location.hash);
+	hist_replace(get_evpath() + location.hash);
 	r.onscroll = onscroll;
 	return r;
 })();
@@ -5317,7 +5317,7 @@ var filecols = (function () {
 	var hidden = jread('filecols', []);
 
 	var add_btns = function () {
-		var ths = QSA('#files th>span');
+		var ths = QSA('#files>thead th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var th = ths[a].parentElement,
 				ttv = L.cols[ths[a].textContent];
@@ -5363,7 +5363,7 @@ var filecols = (function () {
 		add_btns();
 
 		var ohidden = [],
-			ths = QSA('#files th'),
+			ths = QSA('#files>thead th'),
 			ncols = ths.length;
 
 		for (var a = 0; a < ncols; a++) {
@@ -5389,7 +5389,7 @@ var filecols = (function () {
 		}
 		if (window['tt']) {
 			tt.att(ebi('hcols'));
-			tt.att(QS('#files thead'));
+			tt.att(QS('#files>thead'));
 		}
 	};
 
