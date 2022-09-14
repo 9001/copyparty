@@ -707,12 +707,43 @@ def start_stackmon(arg_str: str, nid: int) -> None:
 
 def stackmon(fp: str, ival: float, suffix: str) -> None:
     ctr = 0
+    fp0 = fp
     while True:
         ctr += 1
+        fp = fp0
         time.sleep(ival)
         st = "{}, {}\n{}".format(ctr, time.time(), alltrace())
+        buf = st.encode("utf-8", "replace")
+
+        if fp.endswith(".gz"):
+            import gzip
+
+            # 2459b 2304b 2241b 2202b 2194b 2191b lv3..8
+            # 0.06s 0.08s 0.11s 0.13s 0.16s 0.19s
+            buf = gzip.compress(buf, compresslevel=6)
+
+        elif fp.endswith(".xz"):
+            import lzma
+
+            # 2276b 2216b 2200b 2192b 2168b lv0..4
+            # 0.04s 0.10s 0.22s 0.41s 0.70s
+            buf = lzma.compress(buf, preset=0)
+
+        if "%" in fp:
+            dt = datetime.utcnow()
+            for fs in "YmdHMS":
+                fs = "%" + fs
+                if fs in fp:
+                    fp = fp.replace(fs, dt.strftime(fs))
+
+        if "/" in fp:
+            try:
+                os.makedirs(fp.rsplit("/", 1)[0])
+            except:
+                pass
+
         with open(fp + suffix, "wb") as f:
-            f.write(st.encode("utf-8", "replace"))
+            f.write(buf)
 
 
 def start_log_thrs(
