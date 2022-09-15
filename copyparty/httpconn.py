@@ -191,11 +191,7 @@ class HttpConn(object):
             except Exception as ex:
                 em = str(ex)
 
-                if "ALERT_BAD_CERTIFICATE" in em:
-                    # firefox-linux if there is no exception yet
-                    self.log("client rejected our certificate (nice)")
-
-                elif "ALERT_CERTIFICATE_UNKNOWN" in em:
+                if "ALERT_CERTIFICATE_UNKNOWN" in em:
                     # android-chrome keeps doing this
                     pass
 

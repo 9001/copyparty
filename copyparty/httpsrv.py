@@ -155,6 +155,12 @@ class HttpSrv(object):
                     return
 
     def listen(self, sck: socket.socket, nlisteners: int) -> None:
+        if self.args.j != 1:
+            # lost in the pickle; redefine
+            sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            sck.settimeout(None)  # < does not inherit, ^ does
+
         ip, port = sck.getsockname()
         self.srvs.append(sck)
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
