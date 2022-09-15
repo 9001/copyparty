@@ -395,7 +395,7 @@ function init_toc() {
 
     // collect vertical position of all toc items (headers in document)
     function freshen_offsets() {
-        var top = window.pageYOffset || document.documentElement.scrollTop;
+        var top = yscroll();
         for (var a = anchors.length - 1; a >= 0; a--) {
             var y = top + anchors[a].elm.getBoundingClientRect().top;
             y = Math.round(y * 10.0) / 10;
@@ -411,7 +411,7 @@ function init_toc() {
         if (anchors.length == 0)
             return;
 
-        var ptop = window.pageYOffset || document.documentElement.scrollTop;
+        var ptop = yscroll();
         var hit = anchors.length - 1;
         for (var a = 0; a < anchors.length; a++) {
             if (anchors[a].y >= ptop - 8) {  //???

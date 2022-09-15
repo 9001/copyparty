@@ -390,6 +390,21 @@ if (window.matchMedia) {
 }
 
 
+function yscroll() {
+    if (document.documentElement.scrollTop) {
+        return (window.yscroll = function () {
+            return document.documentElement.scrollTop;
+        })();
+    }
+    if (window.pageYOffset) {
+        return (window.yscroll = function () {
+            return window.pageYOffset;
+        })();
+    }
+    return 0;
+}
+
+
 function showsort(tab) {
     var v, vn, v1, v2, th = tab.tHead,
         sopts = jread('fsort', [["href", 1, ""]]);

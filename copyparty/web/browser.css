@@ -1583,10 +1583,25 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 #files>thead>tr>th.min,
 #files td.min {
-		display: none;
+	display: none;
 }
 #files td:nth-child(2n) {
 	color: var(--tab-alt);
+}
+#plazy {
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+#blazy {
+	text-align: center;
+	font-size: 1.2em;
+	margin: 1em 0;
+}
+#blazy code,
+#blazy a {
+	font-size: 1.1em;
+	padding: 0 .2em;
 }
 .opwide,
 #op_unpost,

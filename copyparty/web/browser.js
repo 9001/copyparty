@@ -101,6 +101,7 @@ var Ls = {
 		"cl_ziptype": "folder download",
 		"cl_uopts": "up2k switches",
 		"cl_favico": "favicon",
+		"cl_bigdir": "big dirs",
 		"cl_keytype": "key notation",
 		"cl_hiddenc": "hidden columns",
 		"cl_reset": "(reset)",
@@ -123,6 +124,9 @@ var Ls = {
 		"cft_text": "favicon text (blank and refresh to disable)",
 		"cft_fg": "foreground color",
 		"cft_bg": "background color",
+
+		"cdt_lim": "max number of files to show in a folder",
+		"cdt_ask": "when scrolling to the bottom,$Ninstead of loading more files,$Nask what to do",
 
 		"tt_entree": "show navpane (directory tree sidebar)$NHotkey: B",
 		"tt_detree": "show breadcrumbs$NHotkey: B",
@@ -168,6 +172,8 @@ var Ls = {
 
 		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
+		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
+		"fbd_all": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_all">show all</a></div>',
 
 		"ft_paste": "paste {0} items$NHotkey: ctrl-V",
 		"fr_eperm": 'cannot rename:\nyou do not have “move” permission in this folder',
@@ -448,6 +454,7 @@ var Ls = {
 		"cl_ziptype": "nedlastning av mapper",
 		"cl_uopts": "up2k-brytere",
 		"cl_favico": "favicon",
+		"cl_bigdir": "store mapper",
 		"cl_keytype": "notasjon for musikalsk dur",
 		"cl_hiddenc": "skjulte kolonner",
 		"cl_reset": "(nullstill)",
@@ -470,6 +477,9 @@ var Ls = {
 		"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
 		"cft_fg": "farge",
 		"cft_bg": "bakgrunnsfarge",
+
+		"cdt_lim": "maks antall filer å vise per mappe",
+		"cdt_ask": "vis knapper for å laste flere filer nederst på siden istedenfor å gradvis laste mer av mappen når man scroller ned",
 
 		"tt_entree": "bytt til mappehierarki$NSnarvei: B",
 		"tt_detree": "bytt til tradisjonell sti-visning$NSnarvei: B",
@@ -515,6 +525,8 @@ var Ls = {
 
 		"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
+		"fbd_more": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
+		"fbd_all": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
 
 		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
 		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
@@ -827,6 +839,9 @@ ebi('op_up2k').innerHTML = (
 );
 
 
+ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
+
+
 (function () {
 	var o = mknod('div');
 	o.innerHTML = (
@@ -884,6 +899,14 @@ ebi('op_cfg').innerHTML = (
 	'		<input type="text" id="icot" style="width:1.3em" value="" tt="' + L.cft_text + '" />' +
 	'		<input type="text" id="icof" style="width:2em" value="" tt="' + L.cft_fg + '" />' +
 	'		<input type="text" id="icob" style="width:2em" value="" tt="' + L.cft_bg + '" />' +
+	'		</td>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+	'<div>\n' +
+	'	<h3>' + L.cl_bigdir + '</h3>\n' +
+	'	<div>\n' +
+	'		<input type="text" id="bd_lim" value="250" style="width:4em" tt="' + L.cdt_lim + '" />' +
+	'		<a id="bd_ask" class="tgl btn" href="#" tt="' + L.cdt_ask + '">ask</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -1015,7 +1038,7 @@ function set_files_html(html) {
 		par.removeChild(files);
 		files = mknod('div');
 		files.innerHTML = '<table id="files">' + html + '</table>';
-		par.insertBefore(files.childNodes[0], ebi('epi'));
+		par.insertBefore(files.childNodes[0], ebi('lazy'));
 		files = ebi('files');
 		return files;
 	}
@@ -3375,7 +3398,7 @@ var showfile = (function () {
 			lang = r.getlang(name),
 			is_md = lang == 'md';
 
-		ebi('files').style.display = ebi('gfiles').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
+		ebi('files').style.display = ebi('gfiles').style.display = ebi('lazy').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
 		ebi('dldoc').setAttribute('href', url);
 
 		var wr = ebi('bdoc'),
@@ -3629,7 +3652,7 @@ var thegrid = (function () {
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
-		ebi('pro').style.display = ebi('epi').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
+		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
 		qsr('#docname');
@@ -4496,6 +4519,9 @@ document.onkeydown = function (e) {
 })();
 
 function aligngriditems() {
+	if (!window.treectl)
+		return;
+
 	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
 	var gridsz = getComputedStyle(document.getElementsByTagName('html')[0]).getPropertyValue('--grid-sz').slice(0, -2);
 	var gridwidth = ebi('ggrid').clientWidth;
@@ -4504,10 +4530,8 @@ function aligngriditems() {
 
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
 		ebi('ggrid').style.justifyContent = 'left';
-	} else if (localStorage.getItem('entreed') == 'na') {
-		ebi('ggrid').style.justifyContent = 'center';
-	} else if (localStorage.getItem('entreed') == 'tree') {
-		ebi('ggrid').style.justifyContent = 'space-between';
+	} else {
+		ebi('ggrid').style.justifyContent = treectl.hidden ? 'center' : 'space-between';
 	}
 }
 window.addEventListener('resize', aligngriditems);
@@ -4537,6 +4561,13 @@ var treectl = (function () {
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
 	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);
+	bcfg_bind(r, 'ask', 'bd_ask', false);
+	ebi('bd_lim').value = r.lim = icfg_get('bd_lim');
+	ebi('bd_lim').oninput = function (e) {
+		var n = parseInt(this.value);
+		swrite('bd_lim', r.lim = (isNum(n) ? n : 0) || 1000);
+	};
+	r.nvis = r.lim;
 
 	function setwrap(v) {
 		clmod(ebi('tree'), 'nowrap', !v);
@@ -4662,7 +4693,7 @@ var treectl = (function () {
 			}
 			y = ebi('treeh').offsetHeight;
 			if (!fixedpos)
-				y += tree.offsetTop - document.documentElement.scrollTop;
+				y += tree.offsetTop - yscroll();
 
 			y = (y - 3) + 'px';
 			if (parp.style.top != y)
@@ -4916,8 +4947,10 @@ var treectl = (function () {
 		if (hpush && !no_tree)
 			get_tree('.', xhr.top);
 
+		r.nvis = r.lim;
 		r.nextdir = xhr.top;
 		enspin(thegrid.en ? '#gfiles' : '#files');
+		window.removeEventListener('scroll', r.tscroll);
 	}
 
 	function treegrow(e) {
@@ -4955,6 +4988,10 @@ var treectl = (function () {
 			return;
 		}
 
+		for (var a = 0; a < res.files.length; a++)
+			if (res.files[a].tags === undefined)
+				res.files[a].tags = {};
+
 		srvinf = res.srvinf;
 		try {
 			ebi('srv_info').innerHTML = ebi('srv_info2').innerHTML = '<span>' + res.srvinf + '</span>';
@@ -4990,14 +5027,32 @@ var treectl = (function () {
 	}
 
 	r.gentab = function (top, res) {
-		r.lsc = res;
 		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
+			sel = r.lsc === res ? msel.getsel() : [],
+			plain = [],
 			seen = {};
+
+		r.lsc = res;
+		nodes = sortfiles(nodes);
+		window.removeEventListener('scroll', r.tscroll);
+		r.trunc = nodes.length > r.nvis && location.hash.length < 2;
+		if (r.trunc) {
+			for (var a = r.lim; a < nodes.length; a++) {
+				var tn = nodes[a],
+					tns = Object.keys(tn.tags);
+
+				plain.push(uricom_dec(tn.href.split('?')[0]));
+
+				for (var b = 0; b < tns.length; b++)
+					if (has(res.taglist, tns[b]))
+						plain.push(tn.tags[tns[b]]);
+			}
+			nodes = nodes.slice(0, r.nvis);
+		}
 
 		showfile.files = [];
 		html.push('<tbody>');
-		nodes = sortfiles(nodes);
 		for (var a = 0; a < nodes.length; a++) {
 			var tn = nodes[a],
 				bhref = tn.href.split('?')[0],
@@ -5037,6 +5092,13 @@ var treectl = (function () {
 		html.push('</tbody>');
 		html = html.join('\n');
 		set_files_html(html);
+		if (r.trunc) {
+			r.setlazy(plain);
+			if (!r.ask) {
+				window.addEventListener('scroll', r.tscroll);
+				setTimeout(r.tscroll, 100);
+			}
+		}
 
 		function asdf() {
 			showfile.mktree();
@@ -5050,6 +5112,9 @@ var treectl = (function () {
 				apply_perms(res.perms);
 				fileman.render();
 			}
+			if (sel.length)
+				msel.loadsel(sel);
+
 			setTimeout(eval_hash, 1);
 		}
 
@@ -5088,6 +5153,65 @@ var treectl = (function () {
 		vbar.onresize();
 		showfile.addlinks();
 		setTimeout(eval_hash, 1);
+	};
+
+	r.setlazy = function (plain) {
+		var html = ['<div id="plazy">', esc(plain.join(' ')), '</div>'],
+			all = r.lsc.files.length + r.lsc.dirs.length,
+			nxt = r.nvis * 4;
+
+		if (r.ask)
+			html.push((nxt >= all ? L.fbd_all : L.fbd_more).format(r.nvis, all, nxt));
+
+		ebi('lazy').innerHTML = html.join('\n');
+
+		try {
+			ebi('bd_all').onclick = function (e) {
+				ev(e);
+				r.showmore(all);
+			};
+			ebi('bd_more').onclick = function (e) {
+				ev(e);
+				r.showmore(nxt);
+			};
+		}
+		catch (ex) { }
+	};
+
+	r.showmore = function (n) {
+		window.removeEventListener('scroll', r.tscroll);
+		console.log('nvis {0} -> {1}'.format(r.nvis, n));
+		r.nvis = n;
+		ebi('lazy').innerHTML = '';
+		ebi('wrap').style.opacity = 0.4;
+		setTimeout(function () {
+			r.gentab(get_evpath(), r.lsc);
+			ebi('wrap').style.opacity = 'unset';
+		}, 1);
+	};
+
+	r.tscroll = function () {
+		var el = r.trunc ? ebi('plazy') : null;
+		if (!el || ebi('lazy').style.display || ebi('unsearch'))
+			return;
+
+		var sy = yscroll() + window.innerHeight,
+			ty = el.offsetTop;
+
+		if (sy <= ty)
+			return;
+
+		window.removeEventListener('scroll', r.tscroll);
+
+		var all = r.lsc.files.length + r.lsc.dirs.length;
+		if (r.nvis * 16 <= all) {
+			console.log("{0} ({1} * 16) <= {2}".format(r.nvis * 16, r.nvis, all));
+			r.showmore(r.nvis * 4);
+		}
+		else {
+			console.log("{0} ({1} * 16) > {2}".format(r.nvis * 16, r.nvis, all));
+			r.showmore(all);
+		}
 	};
 
 	function parsetree(res, top) {
@@ -5768,6 +5892,21 @@ var msel = (function () {
 		}
 	};
 
+	r.loadsel = function (sel) {
+		r.sel = [];
+		r.load();
+
+		var vsel = new Set();
+		for (var a = 0; a < sel.length; a++)
+			vsel.add(sel[a].vp);
+
+		for (var a = 0; a < r.all.length; a++)
+			if (vsel.has(r.all[a].vp))
+				clmod(ebi(r.all[a].id).closest('tr'), 'sel', 1);
+
+		r.selui();
+	};
+
 	r.getsel = function () {
 		r.load();
 		return r.sel;
@@ -6318,8 +6457,9 @@ function reload_browser() {
 		mp.read_order();
 	});
 
-	for (var a = 0; a < 2; a++)
-		clmod(ebi(a ? 'pro' : 'epi'), 'hidden', ebi('unsearch'));
+	var ns = ['pro', 'epi', 'lazy']
+	for (var a = 0; a < ns.length; a++)
+		clmod(ebi(ns[a]), 'hidden', ebi('unsearch'));
 
 	if (window['up2k'])
 		up2k.set_fsearch();
