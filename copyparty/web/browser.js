@@ -5040,7 +5040,7 @@ var treectl = (function () {
 		if (r.trunc) {
 			for (var a = r.lim; a < nodes.length; a++) {
 				var tn = nodes[a],
-					tns = Object.keys(tn.tags);
+					tns = Object.keys(tn.tags || {});
 
 				plain.push(uricom_dec(tn.href.split('?')[0]));
 

@@ -1267,9 +1267,7 @@ function up2k_init(subtle) {
 
             st.bytes.total += entry.size;
             st.files.push(entry);
-            if (!entry.size)
-                push_t(st.todo.handshake, entry);
-            else if (uc.turbo)
+            if (uc.turbo)
                 push_t(st.todo.head, entry);
             else
                 push_t(st.todo.hash, entry);
@@ -1713,6 +1711,9 @@ function up2k_init(subtle) {
 
     function exec_hash() {
         var t = st.todo.hash.shift();
+        if (!t.size)
+            return st.todo.handshake.push(t);
+
         st.busy.hash.push(t);
         st.nfile.hash = t.n;
         t.t_hashing = Date.now();
