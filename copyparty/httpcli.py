@@ -69,6 +69,7 @@ from .util import (
     unescape_cookie,
     unquote,
     unquotep,
+    vjoin,
     vol_san,
     vsplit,
     yieldfile,
@@ -2330,8 +2331,9 @@ class HttpCli(object):
 
         if not is_dir and (self.can_read or self.can_get):
             if not self.can_read and "fk" in vn.flags:
+                vabs = vjoin(vn.realpath, rem)
                 correct = self.gen_fk(
-                    self.args.fk_salt, abspath, st.st_size, 0 if ANYWIN else st.st_ino
+                    self.args.fk_salt, vabs, st.st_size, 0 if ANYWIN else st.st_ino
                 )[: vn.flags["fk"]]
                 got = self.uparam.get("k")
                 if got != correct:
