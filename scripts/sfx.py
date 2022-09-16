@@ -222,7 +222,12 @@ def hashfile(fn):
 
 def unpack():
     """unpacks the tar yielded by `data`"""
-    name = "pe-copyparty"
+    name = "pe-copyparty."
+    try:
+        name += str(os.geteuid())
+    except:
+        pass
+
     tag = "v" + str(STAMP)
     top = tempfile.gettempdir()
     opj = os.path.join
