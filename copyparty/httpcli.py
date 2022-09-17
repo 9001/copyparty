@@ -794,6 +794,27 @@ class HttpCli(object):
 
         params.update(open_ka)
 
+        srnd = self.uparam.get("rand", self.headers.get("rand", ""))
+        if srnd and not self.args.nw:
+            ok = False
+            rnd = int(srnd)
+            try:
+                ext = "." + fn.rsplit(".", 1)[1]
+            except:
+                ext = ""
+
+            for extra in range(16):
+                for _ in range(16):
+                    if ok:
+                        break
+
+                    nc = rnd + extra
+                    nb = int((6 + 6 * nc) / 8)
+                    zb = os.urandom(nb)
+                    zb = base64.urlsafe_b64encode(zb)
+                    fn = zb[:nc].decode("utf-8") + ext
+                    ok = not bos.path.exists(os.path.join(fdir, fn))
+
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
             path = os.path.join(fdir, fn)
@@ -847,7 +868,15 @@ class HttpCli(object):
         spd = self._spd(post_sz)
         t = "{} wrote {}/{} bytes to {}  # {}"
         self.log(t.format(spd, post_sz, remains, path, sha_b64[:28]))  # 21
-        t = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
+
+        ac = self.uparam.get(
+            "want", self.headers.get("accept", "").lower().split(";")[-1]
+        )
+        if ac == "url":
+            t = url
+        else:
+            t = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
+
         self.reply(t.encode("utf-8"))
         return True
 

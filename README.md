@@ -1184,6 +1184,13 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | uPOST | | `msg=foo` | send message `foo` into server log |
 | mPOST | | `act=tput`, `body=TEXT` | overwrite markdown document at URL |
 
+upload modifiers:
+
+| http-header | url-param | effect |
+|--|--|--|
+| `Accept: url` | `want=url` | return just the file URL |
+| `Rand: 4` | `rand=4` | generate random filename with 4 characters |
+
 server behavior of `msg` can be reconfigured with `--urlform`
 
 ## admin
