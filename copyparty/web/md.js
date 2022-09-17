@@ -40,7 +40,7 @@ var dbg = function () { };
         link += parts[a] + (a < aa ? '/' : '');
         o = mknod('a');
         o.setAttribute('href', link);
-        o.textContent = uricom_dec(parts[a])[0] || 'top';
+        o.textContent = uricom_dec(parts[a]) || 'top';
         dom_nav.appendChild(o);
     }
 })();

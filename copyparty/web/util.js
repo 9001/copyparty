@@ -544,7 +544,7 @@ function linksplit(rp, id) {
             link = rp.slice(0, ofs + 1);
             rp = rp.slice(ofs + 1);
         }
-        var vlink = esc(uricom_dec(link)[0]);
+        var vlink = esc(uricom_dec(link));
 
         if (link.indexOf('/') !== -1) {
             vlink = vlink.slice(0, -1) + '<span>/</span>';
@@ -603,6 +603,17 @@ function url_enc(txt) {
 
 function uricom_dec(txt) {
     try {
+        return decodeURIComponent(txt);
+    }
+    catch (ex) {
+        console.log("ucd-err [" + txt + "]");
+        return txt;
+    }
+}
+
+
+function uricom_sdec(txt) {
+    try {
         return [decodeURIComponent(txt), true];
     }
     catch (ex) {
@@ -637,7 +648,7 @@ function get_evpath() {
 
 
 function get_vpath() {
-    return uricom_dec(get_evpath())[0];
+    return uricom_dec(get_evpath());
 }
 
 

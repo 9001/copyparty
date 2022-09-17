@@ -2404,7 +2404,7 @@ function evau_error(e) {
 			break;
 	}
 	var em = '' + eplaya.error.message,
-		mfile = '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop())[0] + '»',
+		mfile = '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop()) + '»',
 		e404 = L.mm_e404,
 		e403 = L.mm_e403;
 
@@ -2442,7 +2442,7 @@ function autoplay_blocked(seek) {
 	var tid = mp.au.tid,
 		fn = mp.tracks[tid].split(/\//).pop();
 
-	fn = uricom_dec(fn.replace(/\+/g, ' '))[0];
+	fn = uricom_dec(fn.replace(/\+/g, ' '));
 
 	modal.confirm('<h6>' + L.mm_hashplay + '</h6>\n«' + esc(fn) + '»', function () {
 		// chrome 91 may permanently taint on a failed play()
@@ -2525,7 +2525,7 @@ function eval_hash() {
 	if (v.indexOf('#q=') === 0) {
 		goto('search');
 		var i = ebi('q_raw');
-		i.value = uricom_dec(v.slice(3))[0];
+		i.value = uricom_dec(v.slice(3));
 		return i.oninput();
 	}
 
@@ -2595,7 +2595,7 @@ function sortfiles(nodes) {
 					if ((v + '').indexOf('<a ') === 0)
 						v = v.split('>')[1];
 					else if (name == "href" && v)
-						v = uricom_dec(v)[0];
+						v = uricom_dec(v);
 
 					nodes[b]._sv = v
 				}
@@ -2814,7 +2814,7 @@ var fileman = (function () {
 
 			f.push({
 				"src": vp,
-				"ofn": uricom_dec(vsp[1])[0],
+				"ofn": uricom_dec(vsp[1]),
 				"md": vars[0],
 				"ok": true
 			});
@@ -2894,7 +2894,7 @@ var fileman = (function () {
 					};
 					QS('.rn_dec' + k).onclick = function (e) {
 						ev(e);
-						f[a].inew.value = uricom_dec(f[a].inew.value)[0];
+						f[a].inew.value = uricom_dec(f[a].inew.value);
 					};
 					QS('.rn_reset' + k).onclick = function (e) {
 						ev(e);
@@ -3184,7 +3184,7 @@ var fileman = (function () {
 				r.tx(srcdir);
 				return;
 			}
-			toast.show('inf r', 0, esc(L.fp_busy.format(req.length + 1, uricom_dec(vp)[0])));
+			toast.show('inf r', 0, esc(L.fp_busy.format(req.length + 1, uricom_dec(vp))));
 
 			var dst = get_evpath() + vp.split('/').pop();
 
@@ -3295,7 +3295,7 @@ var showfile = (function () {
 		var m = /[?&]doc=([^&]+)/.exec(window.location.search);
 		if (m) {
 			setTimeout(function () {
-				r.show(uricom_dec(m[1])[0], true);
+				r.show(uricom_dec(m[1]), true);
 			}, 1);
 		}
 	}
@@ -3352,7 +3352,7 @@ var showfile = (function () {
 	r.show = function (url, no_push) {
 		var xhr = new XHR();
 		xhr.url = url;
-		xhr.fname = uricom_dec(url.split('/').pop())[0];
+		xhr.fname = uricom_dec(url.split('/').pop());
 		xhr.no_push = no_push;
 		xhr.ts = Date.now();
 		xhr.open('GET', url.split('?')[0] + '?raw', true);
@@ -3394,7 +3394,7 @@ var showfile = (function () {
 			lnh = doc[1],
 			txt = doc[2],
 			name = url.split('/').pop(),
-			tname = uricom_dec(name)[0],
+			tname = uricom_dec(name),
 			lang = r.getlang(name),
 			is_md = lang == 'md';
 
@@ -3523,7 +3523,7 @@ var showfile = (function () {
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="#" hl="' + file.id +
-				'">' + esc(uricom_dec(file.name)[0]) + '</a>');
+				'">' + esc(uricom_dec(file.name)) + '</a>');
 		}
 		ebi('docul').innerHTML = html.join('\n');
 	};
@@ -3829,7 +3829,7 @@ var thegrid = (function () {
 			var ao = files[a],
 				ohref = esc(ao.getAttribute('href')),
 				href = ohref.split('?')[0],
-				name = uricom_dec(vsplit(href)[1])[0],
+				name = uricom_dec(vsplit(href)[1]),
 				ref = ao.getAttribute('id'),
 				isdir = href.endsWith('/'),
 				ac = isdir ? ' class="dir"' : '',
@@ -3914,7 +3914,7 @@ var thegrid = (function () {
 
 				return '<a download href="' + h +
 					'">' + (idx + 1) + ' / ' + r.bbox.length + ' -- ' +
-					esc(uricom_dec(h.split('/').pop())[0]) + '</a>';
+					esc(uricom_dec(h.split('/').pop())) + '</a>';
 			},
 			onChange: function (i) {
 				sethash('g' + r.bbox[i].imageElement.getAttribute('ref'));
@@ -4449,7 +4449,7 @@ document.onkeydown = function (e) {
 			var r = res.hits[a],
 				ts = parseInt(r.ts),
 				sz = esc(r.sz + ''),
-				rp = esc(uricom_dec(r.rp + '')[0]),
+				rp = esc(uricom_dec(r.rp + '')),
 				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').pop().split('?')[0] : '%',
 				id = 'f-' + ('00000000' + crc32(rp)).slice(-8);
 
@@ -4793,7 +4793,7 @@ var treectl = (function () {
 		ebi('treeul').setAttribute('ts', this.ts);
 
 		var top = this.top == '.' ? this.dst : this.top,
-			name = uricom_dec(top.split('/').slice(-2)[0])[0],
+			name = uricom_dec(top.split('/').slice(-2)[0]),
 			rtop = top.replace(/^\/+/, ""),
 			res;
 
@@ -4846,7 +4846,7 @@ var treectl = (function () {
 			act = null;
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = uricom_dec(links[a].getAttribute('href'))[0],
+			var href = uricom_dec(links[a].getAttribute('href')),
 				cl = '';
 
 			if (href == cdir) {
@@ -5056,7 +5056,7 @@ var treectl = (function () {
 		for (var a = 0; a < nodes.length; a++) {
 			var tn = nodes[a],
 				bhref = tn.href.split('?')[0],
-				fname = uricom_dec(bhref)[0],
+				fname = uricom_dec(bhref),
 				hname = esc(fname),
 				id = 'f-' + ('00000000' + crc32(fname)).slice(-8),
 				lang = showfile.getlang(fname);
@@ -5227,7 +5227,7 @@ var treectl = (function () {
 		for (var a = 0; a < keys.length; a++) {
 			var kk = keys[a],
 				ks = kk.slice(1),
-				k = uricom_dec(ks),
+				k = uricom_sdec(ks),
 				hek = esc(k[0]),
 				uek = k[1] ? uricom_enc(k[0], true) : k[0],
 				url = '/' + (top ? top + uek : uek) + '/',
@@ -6439,7 +6439,7 @@ function reload_browser() {
 		link += parts[a] + '/';
 		o = mknod('a');
 		o.setAttribute('href', link);
-		o.textContent = uricom_dec(parts[a])[0];
+		o.textContent = uricom_dec(parts[a]);
 		ebi('path').appendChild(o);
 	}
 
