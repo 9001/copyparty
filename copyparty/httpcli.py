@@ -2634,8 +2634,7 @@ class HttpCli(object):
                     break
 
             fe["tags"] = {k: v for k, v in r}
-
-        _ = [tagset.add(k) for fe in files for k in fe["tags"]]
+            _ = [tagset.add(k) for k in fe["tags"]]
 
         if icur:
             taglist = [k for k in vn.flags.get("mte", "").split(",") if k in tagset]
