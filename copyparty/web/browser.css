@@ -2400,6 +2400,9 @@ html.y #bbox-overlay figcaption a {
 #u2conf.ww #u2c3w {
 	width: 29em;
 }
+#u2conf.ww #u2c3w.s {
+	width: 39em;
+}
 #u2conf .c,
 #u2conf .c * {
 	text-align: center;

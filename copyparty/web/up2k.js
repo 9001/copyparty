@@ -2360,9 +2360,8 @@ function up2k_init(subtle) {
             wpx = window.innerWidth,
             fpx = parseInt(getComputedStyle(bar)['font-size']),
             wem = wpx * 1.0 / fpx,
-            write = has(perms, 'write'),
-            wide = write && wem > 54 ? 'w' : '',
-            parent = ebi(wide && write ? 'u2btn_cw' : 'u2btn_ct'),
+            wide = wem > 54 ? 'w' : '',
+            parent = ebi(wide ? 'u2btn_cw' : 'u2btn_ct'),
             btn = ebi('u2btn');
 
         if (btn.parentNode !== parent) {
@@ -2370,8 +2369,8 @@ function up2k_init(subtle) {
             ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
         }
 
-        wide = write && wem > 82 ? 'ww' : wide;
-        parent = ebi(wide == 'ww' && write ? 'u2c3w' : 'u2c3t');
+        wide = wem > 82 ? 'ww' : wide;
+        parent = ebi(wide == 'ww' ? 'u2c3w' : 'u2c3t');
         var its = [ebi('u2etaw'), ebi('u2cards')];
         if (its[0].parentNode !== parent) {
             ebi('u2conf').className = wide;
@@ -2466,13 +2465,14 @@ function up2k_init(subtle) {
     }
 
     function set_fsearch(new_state) {
-        var fixed = false;
+        var fixed = false,
+            can_write = false;
 
         if (!ebi('fsearch')) {
             new_state = false;
         }
         else if (perms.length) {
-            if (!has(perms, 'write')) {
+            if (!(can_write = has(perms, 'write'))) {
                 new_state = true;
                 fixed = true;
             }
@@ -2488,6 +2488,7 @@ function up2k_init(subtle) {
         }
 
         try {
+            clmod(ebi('u2c3w'), 's', !can_write);
             QS('label[for="fsearch"]').style.display = QS('#fsearch').style.display = fixed ? 'none' : '';
         }
         catch (ex) { }
