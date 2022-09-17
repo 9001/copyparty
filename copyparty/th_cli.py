@@ -75,7 +75,7 @@ class ThumbCli(object):
 
         preferred = self.args.th_dec[0] if self.args.th_dec else ""
 
-        if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg"]:
+        if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg", "png"]:
             return os.path.join(ptop, rem)
 
         if fmt == "j" and self.args.th_no_jpg:

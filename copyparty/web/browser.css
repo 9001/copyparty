@@ -246,6 +246,7 @@ html.b {
 	--u2-o-1h-bg: var(--a-hil);
 
 	--f-sh1: 0.1;
+	--mp-b-bg: transparent;
 }
 html.bz {
 	--fg: #cce;
@@ -278,6 +279,7 @@ html.bz {
 
 	--f-h-b1: #34384e;
 	--mp-sh: #11121d;
+	/*--mp-b-bg: #2c3044;*/
 }
 html.by {
 	--bg: #f2f2f2;
@@ -321,6 +323,7 @@ html.c {
 	--u2-o-1-bg: #4cf;
 
 	--srv-1: #ea0;
+	--mp-b-bg: transparent;
 }
 html.cz {
 	--bgg: var(--bg-u2);
@@ -470,7 +473,6 @@ html.dz {
 
 	--fm-off: #f6c;
 	--mp-sh: var(--bg-d3);
-	--mp-b-bg: rgba(0,0,0,0.2);
 
 	--err-fg: #fff;
 	--err-bg: #a20;
@@ -2741,7 +2743,6 @@ html.b #barpos,
 html.b #barbuf,
 html.b #pvol {
 	border-radius: .2em;
-	background: none;
 }
 html.b #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.4);

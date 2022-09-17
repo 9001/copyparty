@@ -14,7 +14,7 @@ from queue import Queue
 from .__init__ import TYPE_CHECKING
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
-from .util import BytesIO, Cooldown, fsenc, min_ex, runcmd, statdir, vsplit
+from .util import BytesIO, Cooldown, Pebkac, fsenc, min_ex, runcmd, statdir, vsplit
 
 try:
     from typing import Optional, Union
@@ -82,7 +82,7 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str) -> str:
     if fmt in ("opus", "caf"):
         cat = "ac"
     else:
-        fmt = "webp" if fmt == "w" else "jpg"
+        fmt = "webp" if fmt == "w" else "png" if fmt == "p" else "jpg"
         cat = "th"
 
     return "{}/{}/{}/{}.{:x}.{}".format(histpath, cat, rd, fn, int(mtime), fmt)
@@ -239,6 +239,7 @@ class ThumbSrv(object):
 
             abspath, tpath = task
             ext = abspath.split(".")[-1].lower()
+            png_ok = False
             fun = None
             if not bos.path.exists(tpath):
                 for lib in self.args.th_dec:
@@ -253,8 +254,14 @@ class ThumbSrv(object):
                     elif lib == "ff" and ext in self.fmt_ffa:
                         if tpath.endswith(".opus") or tpath.endswith(".caf"):
                             fun = self.conv_opus
+                        elif tpath.endswith(".png"):
+                            fun = self.conv_waves
+                            png_ok = True
                         else:
                             fun = self.conv_spec
+
+            if not png_ok and tpath.endswith(".png"):
+                raise Pebkac(400, "png only allowed for waveforms")
 
             if fun:
                 try:
@@ -439,6 +446,37 @@ class ThumbSrv(object):
         self.log(t + txt, c=c)
         raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
+    def conv_waves(self, abspath: str, tpath: str) -> None:
+        ret, _ = ffprobe(abspath, int(self.args.th_convt / 2))
+        if "ac" not in ret:
+            raise Exception("not audio")
+
+        flt = (
+            b"[0:a:0]"
+            b"compand=.3|.3:1|1:-90/-60|-60/-40|-40/-30|-20/-20:6:0:-90:0.2"
+            b",volume=2"
+            b",showwavespic=s=2048x64:colors=white"
+            b",convolution=1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:0 -1 0 -1 5 -1 0 -1 0"  # idk what im doing but it looks ok
+            b",unsharp=7:7:5"
+            b"[o]"
+        )
+
+        # fmt: off
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-v", b"error",
+            b"-hide_banner",
+            b"-i", fsenc(abspath),
+            b"-filter_complex", flt,
+            b"-map", b"[o]",
+            b"-frames:v", b"1",
+        ]
+        # fmt: on
+
+        cmd += [fsenc(tpath)]
+        self._run_ff(cmd)
+
     def conv_spec(self, abspath: str, tpath: str) -> None:
         ret, _ = ffprobe(abspath, int(self.args.th_convt / 2))
         if "ac" not in ret:
@@ -462,6 +500,7 @@ class ThumbSrv(object):
             b"-i", fsenc(abspath),
             b"-filter_complex", fc.encode("utf-8"),
             b"-map", b"[o]"
+            b"-frames:v", b"1",
         ]
         # fmt: on
 

@@ -144,6 +144,7 @@ var Ls = {
 
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
+		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
 		"mt_oseek": "allow seeking through os integration\">seek",
@@ -497,6 +498,7 @@ var Ls = {
 
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
+		"mt_waves": "waveform seekbar:$Nvis volumkart i avspillingsindikatoren\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
@@ -1057,6 +1059,7 @@ var mpl = (function () {
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
+		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
@@ -1088,6 +1091,9 @@ var mpl = (function () {
 	};
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
+	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
+		if (!v) pbar.unwave();
+	});
 	bcfg_bind(r, 'os_seek', 'au_os_seek', !IPHONE, announce);
 	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true, announce);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
@@ -1369,6 +1375,12 @@ function MPlayer() {
 		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
 		mpl.preload_url = full ? url : null;
 		var t0 = Date.now();
+
+		if (mpl.waves)
+			fetch(url + '&th=p').then(function (x) {
+				x.body.getReader().read();
+			});
+
 		if (full)
 			return fetch(url).then(function (x) {
 				var rd = x.body.getReader(), n = 0;
@@ -1562,6 +1574,20 @@ var pbar = (function () {
 		r.pos = canvas_cfg(ebi('barpos'));
 		r.drawbuf();
 		r.drawpos();
+	};
+
+	r.loadwaves = function (url) {
+		r.wurl = url;
+		var img = new Image();
+		img.onload = function () {
+			r.wimg = img;
+			r.onresize();
+		};
+		img.src = url;
+	};
+
+	r.unwave = function () {
+		r.wurl = r.wimg = null;
 	}
 
 	r.drawbuf = function () {
@@ -1590,6 +1616,13 @@ var pbar = (function () {
 				x2 = sm * mp.au.buffered.end(a);
 
 			bctx.fillRect(x1, 0, x2 - x1, bc.h);
+		}
+		if (r.wimg) {
+			bctx.globalAlpha = 0.6;
+			bctx.filter = light ? '' : 'invert(1)';
+			bctx.drawImage(r.wimg, 0, 0, bc.w, bc.h);
+			bctx.filter = 'invert(0)';
+			bctx.globalAlpha = 1;
 		}
 	};
 
@@ -2357,6 +2390,10 @@ function play(tid, is_ev, seek) {
 			sethash(oid);
 			o.setAttribute('id', oid);
 		}
+
+		pbar.unwave();
+		if (mpl.waves)
+			pbar.loadwaves(url + '&th=p');
 
 		mpui.progress_updater();
 		pbar.onresize();
