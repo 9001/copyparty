@@ -2613,43 +2613,29 @@ class HttpCli(object):
             rd = fe["rd"]
             del fe["rd"]
             if not icur:
-                break
+                continue
 
             if vn != dbv:
                 _, rd = vn.get_dbv(rd)
 
-            q = "select w from up where rd = ? and fn = ?"
-            r = None
+            q = "select mt.k, mt.v from up inner join mt on mt.w = substr(up.w,1,16) where up.rd = ? and up.fn = ? and +mt.k != 'x'"
             try:
-                r = icur.execute(q, (rd, fn)).fetchone()
+                r = icur.execute(q, (rd, fn))
             except Exception as ex:
                 if "database is locked" in str(ex):
                     break
 
                 try:
                     args = s3enc(idx.mem_cur, rd, fn)
-                    r = icur.execute(q, args).fetchone()
+                    r = icur.execute(q, args)
                 except:
-                    t = "tag list error, {}/{}\n{}"
+                    t = "tag read error, {}/{}\n{}"
                     self.log(t.format(rd, fn, min_ex()))
                     break
 
-            tags: dict[str, Any] = {}
-            fe["tags"] = tags
+            fe["tags"] = {k: v for k, v in r}
 
-            if not r:
-                continue
-
-            w = r[0][:16]
-            q = "select k, v from mt where w = ? and +k != 'x'"
-            try:
-                for k, v in icur.execute(q, (w,)):
-                    tagset.add(k)
-                    tags[k] = v
-            except:
-                t = "tag read error, {}/{} [{}]:\n{}"
-                self.log(t.format(rd, fn, w, min_ex()))
-                break
+        _ = [tagset.add(k) for fe in files for k in fe["tags"]]
 
         if icur:
             taglist = [k for k in vn.flags.get("mte", "").split(",") if k in tagset]
