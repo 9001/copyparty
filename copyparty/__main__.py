@@ -20,7 +20,7 @@ import time
 import traceback
 from textwrap import dedent
 
-from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, unicode
+from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import re_vol
 from .svchub import SvcHub
@@ -132,7 +132,7 @@ def warn(msg: str) -> None:
     lprint("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
 
 
-def init_E() -> None:
+def init_E(E: EnvParams) -> None:
     # __init__ runs 18 times when oxidized; do expensive stuff here
 
     def get_unixdir() -> str:
@@ -774,7 +774,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     if WINDOWS:
         os.system("rem")  # enables colors
 
-    init_E()
+    init_E(E)
     if argv is None:
         argv = sys.argv
 

@@ -30,7 +30,11 @@ if MACOS:
     # 25% faster; until any tests do symlink stuff
 
 
+from copyparty.__init__ import E
+from copyparty.__main__ import init_E
 from copyparty.util import Unrecv, FHC
+
+init_E(E)
 
 
 def runcmd(argv):
@@ -97,7 +101,7 @@ class Cfg(Namespace):
         ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp xdev xvol ed emp force_js ihead no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "no_rescan no_sendfile no_voldump"
+        ex = "no_rescan no_sendfile no_voldump plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
         ex = "css_browser hist js_browser no_hash no_idx no_forget"
@@ -113,6 +117,7 @@ class Cfg(Namespace):
             a=a or [],
             v=v or [],
             c=c,
+            E=E,
             s_wr_sz=512 * 1024,
             unpost=600,
             u2sort="s",

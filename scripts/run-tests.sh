@@ -17,8 +17,10 @@ for py in python{2,3}; do
     pids+=($!)
 done
 
-python3 ../scripts/test/smoketest.py &
-pids+=($!)
+[ "$1" ] || {
+    python3 ../scripts/test/smoketest.py &
+    pids+=($!)
+}
 
 for pid in ${pids[@]}; do
     wait $pid
