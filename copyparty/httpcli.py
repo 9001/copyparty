@@ -796,24 +796,7 @@ class HttpCli(object):
 
         srnd = self.uparam.get("rand", self.headers.get("rand", ""))
         if srnd and not self.args.nw:
-            ok = False
-            rnd = int(srnd)
-            try:
-                ext = "." + fn.rsplit(".", 1)[1]
-            except:
-                ext = ""
-
-            for extra in range(16):
-                for _ in range(16):
-                    if ok:
-                        break
-
-                    nc = rnd + extra
-                    nb = int((6 + 6 * nc) / 8)
-                    zb = os.urandom(nb)
-                    zb = base64.urlsafe_b64encode(zb)
-                    fn = zb[:nc].decode("utf-8") + ext
-                    ok = not bos.path.exists(os.path.join(fdir, fn))
+            fn = self.rand_name(fdir, fn, int(srnd))
 
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
@@ -879,6 +862,27 @@ class HttpCli(object):
 
         self.reply(t.encode("utf-8"))
         return True
+
+    def rand_name(self, fdir: str, fn: str, rnd: int):
+        ok = False
+        try:
+            ext = "." + fn.rsplit(".", 1)[1]
+        except:
+            ext = ""
+
+        for extra in range(16):
+            for _ in range(16):
+                if ok:
+                    break
+
+                nc = rnd + extra
+                nb = int((6 + 6 * nc) / 8)
+                zb = os.urandom(nb)
+                zb = base64.urlsafe_b64encode(zb)
+                fn = zb[:nc].decode("utf-8") + ext
+                ok = not bos.path.exists(os.path.join(fdir, fn))
+
+        return fn
 
     def _spd(self, nbytes: int, add: bool = True) -> str:
         if add:
@@ -1292,6 +1296,13 @@ class HttpCli(object):
             if not nullwrite:
                 bos.makedirs(fdir_base)
 
+        srnd = self.uparam.get("rand", self.headers.get("rand", ""))
+        rnd = int(srnd) if srnd and not nullwrite else 0
+        ac = self.uparam.get(
+            "want", self.headers.get("accept", "").lower().split(";")[-1]
+        )
+        want_url = ac == "url"
+
         files: list[tuple[int, str, str, str, str, str]] = []
         # sz, sha_hex, sha_b64, p_file, fname, abspath
         errmsg = ""
@@ -1309,6 +1320,9 @@ class HttpCli(object):
                     p_file or "", "", [".prologue.html", ".epilogue.html"]
                 )
                 if p_file and not nullwrite:
+                    if rnd:
+                        fname = self.rand_name(fdir, fname, rnd)
+
                     if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")
 
@@ -1467,7 +1481,13 @@ class HttpCli(object):
                 suf = "\nfailed to write the upload report: {}".format(ex)
 
         sc = 400 if errmsg else 200
-        if "j" in self.uparam:
+        if want_url:
+            msg = "\n".join([x["url"] for x in jmsg["files"]])
+            if errmsg:
+                msg += "\n" + errmsg
+
+            self.reply(msg.encode("utf-8", "replace"), status=sc)
+        elif "j" in self.uparam:
             jtxt = json.dumps(jmsg, indent=2, sort_keys=True).encode("utf-8", "replace")
             self.reply(jtxt, mime="application/json", status=sc)
         else:
