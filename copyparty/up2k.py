@@ -2133,13 +2133,9 @@ class Up2k(object):
                 raise OSError(38, "filesystem does not have st_dev")
             elif fs1 == fs2:
                 # same fs; make symlink as relative as possible
-                v = []
-                for p in [src, dst]:
-                    if WINDOWS:
-                        p = p.replace("\\", "/")
-                    v.append(p.split("/"))
-
-                nsrc, ndst = v
+                spl = r"[\\/]" if WINDOWS else "/"
+                nsrc = re.split(spl, src)
+                ndst = re.split(spl, dst)
                 nc = 0
                 for a, b in zip(nsrc, ndst):
                     if a != b:
@@ -2149,6 +2145,10 @@ class Up2k(object):
                     zsl = nsrc[nc:]
                     hops = len(ndst[nc:]) - 1
                     lsrc = "../" * hops + "/".join(zsl)
+
+            if WINDOWS:
+                lsrc = lsrc.replace("/", "\\")
+                ldst = ldst.replace("/", "\\")
 
             try:
                 if self.args.hardlink:

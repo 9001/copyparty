@@ -749,7 +749,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir; instead using listdir + stat on each file")
     ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing before starting the httpd")
     ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
-    ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to Path every S second, for example --stackmon=./st/%Y-%m/%d/%H%M.xz,60")
+    ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to Path every S second, for example --stackmon=./st/%%Y-%%m/%%d/%%H%%M.xz,60")
     ap2.add_argument("--log-thrs", metavar="SEC", type=float, help="list active threads every SEC")
     ap2.add_argument("--log-fk", metavar="REGEX", type=u, default="", help="log filekey params for files where path matches REGEX; '.' (a single dot) = all files")
     # fmt: on
