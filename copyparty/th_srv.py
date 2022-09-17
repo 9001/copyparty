@@ -456,9 +456,7 @@ class ThumbSrv(object):
             b"compand=.3|.3:1|1:-90/-60|-60/-40|-40/-30|-20/-20:6:0:-90:0.2"
             b",volume=2"
             b",showwavespic=s=2048x64:colors=white"
-            b",convolution=1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:0 -1 0 -1 5 -1 0 -1 0"  # idk what im doing but it looks ok
-            b",unsharp=7:7:5"
-            b"[o]"
+            b",convolution=1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 -1 1 -1 5 -1 1 -1 1"  # idk what im doing but it looks ok
         )
 
         # fmt: off
@@ -469,7 +467,6 @@ class ThumbSrv(object):
             b"-hide_banner",
             b"-i", fsenc(abspath),
             b"-filter_complex", flt,
-            b"-map", b"[o]",
             b"-frames:v", b"1",
         ]
         # fmt: on
