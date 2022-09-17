@@ -1592,6 +1592,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	width: 1px;
 	height: 1px;
 	overflow: hidden;
+	white-space: nowrap;
 }
 #blazy {
 	text-align: center;

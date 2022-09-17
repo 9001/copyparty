@@ -5184,6 +5184,7 @@ var treectl = (function () {
 		r.nvis = n;
 		ebi('lazy').innerHTML = '';
 		ebi('wrap').style.opacity = 0.4;
+		document.documentElement.scrollLeft = 0;
 		setTimeout(function () {
 			r.gentab(get_evpath(), r.lsc);
 			ebi('wrap').style.opacity = 'unset';
