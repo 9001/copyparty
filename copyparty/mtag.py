@@ -262,11 +262,7 @@ class MTag(object):
         self.usable = True
         self.prefer_mt = not args.no_mtag_ff
         self.backend = "ffprobe" if args.no_mutagen else "mutagen"
-        self.can_ffprobe = (
-            HAVE_FFPROBE
-            and not args.no_mtag_ff
-            and (not WINDOWS or sys.version_info >= (3, 8))
-        )
+        self.can_ffprobe = HAVE_FFPROBE and not args.no_mtag_ff
         mappings = args.mtm
         or_ffprobe = " or FFprobe"
 
@@ -289,11 +285,6 @@ class MTag(object):
             elif args.no_mtag_ff:
                 msg = "found FFprobe but it was disabled by --no-mtag-ff"
                 self.log(msg, c=3)
-
-            elif WINDOWS and sys.version_info < (3, 8):
-                or_ffprobe = " or python >= 3.8"
-                msg = "found FFprobe but your python is too old; need 3.8 or newer"
-                self.log(msg, c=1)
 
         if not self.usable:
             msg = "need Mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"

@@ -625,6 +625,17 @@ class HMaccas(object):
         return self.b(msg.encode("utf-8", "replace"))
 
 
+if WINDOWS and sys.version_info < (3, 8):
+    _popen = sp.Popen
+
+    def _spopen(c, *a, **ka):
+        enc = sys.getfilesystemencoding()
+        c = [x.decode(enc, "replace") if hasattr(x, "decode") else x for x in c]
+        return _popen(c, *a, **ka)
+
+    sp.Popen = _spopen
+
+
 def uprint(msg: str) -> None:
     try:
         print(msg, end="")
