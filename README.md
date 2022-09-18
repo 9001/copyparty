@@ -972,7 +972,9 @@ interact with copyparty using non-browser clients
   * `var xhr = new XMLHttpRequest(); xhr.open('POST', '//127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
 
 * curl/wget: upload some files (post=file, chunk=stdin)
-  * `post(){ curl -b cppwd=wark -F act=bput -F f=@"$1" http://127.0.0.1:3923/;}`  
+  * `post(){ curl -F act=bput -F f=@"$1" http://127.0.0.1:3923/?pw=wark;}`  
+    `post movie.mkv`
+  * `post(){ curl -b cppwd=wark -H rand:8 -T "$1" http://127.0.0.1:3923/;}`  
     `post movie.mkv`
   * `post(){ wget --header='Cookie: cppwd=wark' --post-file="$1" -O- http://127.0.0.1:3923/?raw;}`  
     `post movie.mkv`
@@ -998,7 +1000,9 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
     b512 <movie.mkv
 
-you can provide passwords using cookie `cppwd=hunter2`, as a url query `?pw=hunter2`, or with basic-authentication (either as the username or password)
+you can provide passwords using cookie `cppwd=hunter2`, as a url-param `?pw=hunter2`, or with basic-authentication (either as the username or password)
+
+NOTE: curl will not send the original filename if you use `-T` combined with url-params! Also, make sure to always leave a trailing slash in URLs unless you want to override the filename
 
 
 # up2k

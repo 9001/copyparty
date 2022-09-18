@@ -496,7 +496,7 @@ class ThumbSrv(object):
             b"-hide_banner",
             b"-i", fsenc(abspath),
             b"-filter_complex", fc.encode("utf-8"),
-            b"-map", b"[o]"
+            b"-map", b"[o]",
             b"-frames:v", b"1",
         ]
         # fmt: on

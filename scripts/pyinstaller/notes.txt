@@ -1,0 +1,58 @@
+run ./build.sh in git-bash to build + upload the exe
+
+
+## ============================================================
+## first-time setup on a stock win7x32sp1 vm:
+## 
+
+download + install git:
+http://192.168.123.1:3923/ro/pyi/Git-2.37.3-32-bit.exe
+
+<git-bash>
+dl() { curl -fkLOC- "$1"; }
+cd ~/Downloads &&
+dl https://192.168.123.1:3923/ro/pyi/upx-3.96-win32.zip &&
+dl https://192.168.123.1:3923/ro/pyi/KB2533623/Windows6.1-KB2533623-x86.msu &&
+dl https://192.168.123.1:3923/ro/pyi/python-3.7.9.exe &&
+dl https://192.168.123.1:3923/ro/pyi/pip-22.2.2-py3-none-any.whl &&
+dl https://192.168.123.1:3923/ro/pyi/altgraph-0.17.2-py2.py3-none-any.whl &&
+dl https://192.168.123.1:3923/ro/pyi/future-0.18.2.tar.gz &&
+dl https://192.168.123.1:3923/ro/pyi/importlib_metadata-4.12.0-py3-none-any.whl &&
+dl https://192.168.123.1:3923/ro/pyi/pefile-2022.5.30.tar.gz &&
+dl https://192.168.123.1:3923/ro/pyi/pyinstaller-5.4.1-py3-none-win32.whl &&
+dl https://192.168.123.1:3923/ro/pyi/pyinstaller_hooks_contrib-2022.10-py2.py3-none-any.whl &&
+dl https://192.168.123.1:3923/ro/pyi/pywin32_ctypes-0.2.0-py2.py3-none-any.whl &&
+dl https://192.168.123.1:3923/ro/pyi/typing_extensions-4.3.0-py3-none-any.whl &&
+dl https://192.168.123.1:3923/ro/pyi/zipp-3.8.1-py3-none-any.whl &&
+echo ok
+
+manually install:
+  windows6.1-kb2533623-x86.msu + reboot
+  python-3.7.9.exe
+
+<git-bash>
+cd ~/Downloads &&
+unzip -j upx-3.96-win32.zip upx-3.96-win32/upx.exe &&
+python -m ensurepip &&
+python -m pip install --user -U pip-22.2.2-py3-none-any.whl &&
+python -m pip install --user -U pyinstaller-5.4.1-py3-none-win32.whl pefile-2022.5.30.tar.gz pywin32_ctypes-0.2.0-py2.py3-none-any.whl pyinstaller_hooks_contrib-2022.10-py2.py3-none-any.whl altgraph-0.17.2-py2.py3-none-any.whl future-0.18.2.tar.gz importlib_metadata-4.12.0-py3-none-any.whl typing_extensions-4.3.0-py3-none-any.whl zipp-3.8.1-py3-none-any.whl &&
+echo ok
+# python -m pip install --user -U Pillow-9.2.0-cp37-cp37m-win32.whl
+# sed -ri 's/, bestopt, /]+bestopt+[/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
+# sed -ri 's/(^\s+bestopt = ).*/\1["--best","--lzma","--ultra-brute"]/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
+
+
+## ============================================================
+## notes
+##
+
+size   t-unpack  virustotal                     cmnt
+8059k  0m0.375s  5/70 generic-only, sandbox-ok  no-upx
+7095k  0m0.563s  4/70 generic-only, sandbox-ok  standard-upx
+6958k  0m0.578s  7/70 generic-only, sandbox-ok  upx+upx
+
+use python 3.7 since 3.8 onwards requires KB2533623 on target
+
+generate loader.rc template:
+%appdata%\python\python37\scripts\pyi-grab_version C:\Users\ed\AppData\Local\Programs\Python\Python37\python.exe
+

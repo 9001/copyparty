@@ -172,7 +172,7 @@ tmpdir="$(
 
 	echo collecting python-magic
 	v=0.4.27
-	f=python-magic-$v.tar.gz
+	f="../build/python-magic-$v.tar.gz"
 	[ -e "$f" ] ||
 		(url=https://files.pythonhosted.org/packages/da/db/0b3e28ac047452d079d375ec6798bf76a036a08182dbb39ed38116a49130/python-magic-0.4.27.tar.gz;
 		wget -O$f "$url" || curl -L "$url" >$f)
