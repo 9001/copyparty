@@ -1190,6 +1190,9 @@ upload modifiers:
 |--|--|--|
 | `Accept: url` | `want=url` | return just the file URL |
 | `Rand: 4` | `rand=4` | generate random filename with 4 characters |
+| `Life: 30` | `life=30` | delete file after 30 seconds |
+
+`life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
 
 server behavior of `msg` can be reconfigured with `--urlform`
 

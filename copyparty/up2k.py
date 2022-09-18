@@ -265,21 +265,28 @@ class Up2k(object):
 
     def _sched_rescan(self) -> None:
         volage = {}
-        cooldown = 0.0
-        timeout = time.time() + 3
+        cooldown = timeout = time.time() + 3.0
         while True:
+            now = time.time()
             timeout = max(timeout, cooldown)
-            wait = max(0.1, timeout + 0.1 - time.time())
+            wait = timeout - time.time()
+            # self.log("SR in {:.2f}".format(wait), 5)
             with self.rescan_cond:
                 self.rescan_cond.wait(wait)
 
             now = time.time()
             if now < cooldown:
+                # self.log("SR: cd - now = {:.2f}".format(cooldown - now), 5)
+                timeout = cooldown  # wakeup means stuff to do, forget timeout
                 continue
 
             if self.pp:
+                # self.log("SR: pp; cd := 1", 5)
                 cooldown = now + 1
                 continue
+
+            cooldown = now + 5
+            # self.log("SR", 5)
 
             if self.args.no_lifetime:
                 timeout = now + 9001
@@ -302,7 +309,7 @@ class Up2k(object):
 
                     timeout = min(timeout, deadline)
 
-            if self.db_act > now - self.args.db_act:
+            if self.db_act > now - self.args.db_act and self.need_rescan:
                 # recent db activity; defer volume rescan
                 act_timeout = self.db_act + self.args.db_act
                 if self.need_rescan:
@@ -3072,6 +3079,10 @@ class Up2k(object):
 
             with self.mutex:
                 self.idx_wark(ptop, wark, rd, fn, inf.st_mtime, inf.st_size, ip, at)
+
+            if at and time.time() - at > 30:
+                with self.rescan_cond:
+                    self.rescan_cond.notify_all()
 
     def hash_file(
         self, ptop: str, flags: dict[str, Any], rd: str, fn: str, ip: str, at: float

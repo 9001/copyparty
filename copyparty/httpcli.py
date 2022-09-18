@@ -720,6 +720,7 @@ class HttpCli(object):
         # post_sz, sha_hex, sha_b64, remains, path, url
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
+        rnd, want_url, lifetime = self.upload_flags(vfs)
         lim = vfs.get_dbv(rem)[0].lim
         fdir = vfs.canonical(rem)
         if lim:
@@ -794,9 +795,8 @@ class HttpCli(object):
 
         params.update(open_ka)
 
-        srnd = self.uparam.get("rand", self.headers.get("rand", ""))
-        if srnd and not self.args.nw:
-            fn = self.rand_name(fdir, fn, int(srnd))
+        if rnd and not self.args.nw:
+            fn = self.rand_name(fdir, fn, rnd)
 
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
@@ -823,7 +823,7 @@ class HttpCli(object):
             rem,
             fn,
             self.ip,
-            time.time(),
+            time.time() - lifetime,
         )
 
         vsuf = ""
@@ -863,7 +863,7 @@ class HttpCli(object):
         self.reply(t.encode("utf-8"))
         return True
 
-    def rand_name(self, fdir: str, fn: str, rnd: int):
+    def rand_name(self, fdir: str, fn: str, rnd: int) -> str:
         ok = False
         try:
             ext = "." + fn.rsplit(".", 1)[1]
@@ -1281,6 +1281,22 @@ class HttpCli(object):
         self.redirect(vpath, "?edit")
         return True
 
+    def upload_flags(self, vfs: VFS) -> tuple[int, bool, int]:
+        srnd = self.uparam.get("rand", self.headers.get("rand", ""))
+        rnd = int(srnd) if srnd and not self.args.nw else 0
+        ac = self.uparam.get(
+            "want", self.headers.get("accept", "").lower().split(";")[-1]
+        )
+        want_url = ac == "url"
+        zs = self.uparam.get("life", self.headers.get("life", ""))
+        if zs:
+            vlife = int(vfs.flags.get("lifetime") or 0)
+            lifetime = max(0, int(vlife - int(zs)))
+        else:
+            lifetime = 0
+
+        return rnd, want_url, lifetime
+
     def handle_plain_upload(self) -> bool:
         assert self.parser
         nullwrite = self.args.nw
@@ -1296,12 +1312,7 @@ class HttpCli(object):
             if not nullwrite:
                 bos.makedirs(fdir_base)
 
-        srnd = self.uparam.get("rand", self.headers.get("rand", ""))
-        rnd = int(srnd) if srnd and not nullwrite else 0
-        ac = self.uparam.get(
-            "want", self.headers.get("accept", "").lower().split(";")[-1]
-        )
-        want_url = ac == "url"
+        rnd, want_url, lifetime = self.upload_flags(vfs)
 
         files: list[tuple[int, str, str, str, str, str]] = []
         # sz, sha_hex, sha_b64, p_file, fname, abspath
@@ -1393,7 +1404,7 @@ class HttpCli(object):
                         vrem,
                         fname,
                         self.ip,
-                        time.time(),
+                        time.time() - lifetime,
                     )
                     self.conn.nbyte += sz
 
