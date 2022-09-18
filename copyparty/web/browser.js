@@ -1670,12 +1670,14 @@ var pbar = (function () {
 		pctx.strokeStyle = 'rgba(24,56,0,0.4)';
 		pctx.font = '1em sans-serif';
 
-		var m = pctx.measureText.bind(pctx),
-			t1 = s2ms(adur),
+		var t1 = s2ms(adur),
 			t2 = s2ms(apos),
+			m1 = pctx.measureText(t1),
+			m1b = pctx.measureText(t1 + ":88"),
+			m2 = pctx.measureText(t2),
 			yt = pc.h / 3 * 2.1,
-			xt1 = pc.w - (m(t1).width + 12),
-			xt2 = x < pc.w / 2 ? (x + 12) : (Math.min(pc.w - m(t1 + ":88").width, x - 12) - m(t2).width);
+			xt1 = pc.w - (m1.width + 12),
+			xt2 = x < m1.width * 1.4 ? (x + 12) : (Math.min(pc.w - m1b.width, x - 12) - m2.width);
 
 		pctx.strokeText(t1, xt1 + 1, yt + 1);
 		pctx.strokeText(t2, xt2 + 1, yt + 1);
