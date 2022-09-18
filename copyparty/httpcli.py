@@ -784,7 +784,8 @@ class HttpCli(object):
                 self.log("fallthrough? thats a bug", 1)
 
         suffix = "-{:.6f}-{}".format(time.time(), self.dip())
-        if not fn:
+        nameless = not fn
+        if nameless:
             suffix += ".bin"
             fn = "put" + suffix
 
@@ -814,6 +815,28 @@ class HttpCli(object):
 
         if self.args.nw:
             return post_sz, sha_hex, sha_b64, remains, path, ""
+
+        if nameless and "magic" in vfs.flags:
+            try:
+                ext = self.conn.hsrv.magician.ext(path)
+            except Exception as ex:
+                self.log("filetype detection failed for [{}]: {}".format(path, ex), 6)
+                ext = None
+
+            if ext:
+                if rnd:
+                    fn2 = self.rand_name(fdir, "a." + ext, rnd)
+                else:
+                    fn2 = fn.rsplit(".", 1)[0] + "." + ext
+
+                params["suffix"] = suffix[:-4]
+                with ren_open(fn, *open_a, **params) as zfw:
+                    f, fn = zfw["orz"]
+
+                path2 = os.path.join(fdir, fn2)
+                atomic_move(path, path2)
+                fn = fn2
+                path = path2
 
         vfs, rem = vfs.get_dbv(rem)
         self.conn.hsrv.broker.say(

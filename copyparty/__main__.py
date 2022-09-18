@@ -476,6 +476,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
             \033[0muploads, general:
               \033[36mnodupe\033[35m rejects existing files (instead of symlinking them)
               \033[36mnosub\033[35m forces all uploads into the top folder of the vfs
+              \033[36mmagic$\033[35m enables filetype detection for nameless uploads
               \033[36mgz\033[35m allows server-side gzip of uploads with ?gz (also c,xz)
               \033[36mpk\033[35m forces server-side compression, optional arg: xz,9
 
@@ -591,6 +592,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem)")
     ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made")
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
+    ap2.add_argument("--magic", action="store_true", help="enable filetype detection on nameless uploads")
     ap2.add_argument("--df", metavar="GiB", type=float, default=0, help="ensure GiB free disk space by rejecting upload requests")
     ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; 0 = off and warn if enabled, 1 = off, 2 = on, 3 = on and disable datecheck")

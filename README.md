@@ -62,6 +62,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
         * [periodic rescan](#periodic-rescan) - filesystem monitoring
     * [upload rules](#upload-rules) - set upload rules using volflags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
+    * [other flags](#other-flags)
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
@@ -263,6 +264,8 @@ some improvement ideas
   * more amusingly, [Chrome issue 1354800](https://bugs.chromium.org/p/chromium/issues/detail?id=1354800) -- chrome may eat all RAM uploading in general (altho you probably won't run into this one)
 
 * [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive and likely to run into the above gc bugs)
+
+* [Firefox issue 1790500](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500) -- sometimes forgets to close filedescriptors during upload so the browser can crash after ~4000 files
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
@@ -773,6 +776,11 @@ some examples,
   allows (but does not force) gz compression if client uploads to `/inc?pk` or `/inc?gz` or `/inc?gz=4`
 
 
+## other flags
+
+* `:c,magic` enables filetype detection for nameless uploads, same as `--magic`
+
+
 ## database location
 
 in-volume (`.hist/up2k.db`, default) or somewhere else
@@ -1191,9 +1199,9 @@ upload modifiers:
 | `Rand: 4` | `rand=4` | generate random filename with 4 characters |
 | `Life: 30` | `life=30` | delete file after 30 seconds |
 
-`life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
+* `life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
 
-server behavior of `msg` can be reconfigured with `--urlform`
+* server behavior of `msg` can be reconfigured with `--urlform`
 
 ## admin
 

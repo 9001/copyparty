@@ -69,6 +69,7 @@ except:
 if TYPE_CHECKING:
     from .authsrv import VFS
 
+    import magic
 
 FAKE_MP = False
 
@@ -154,22 +155,18 @@ IMPLICATIONS = [
 
 
 MIMES = {
-    "md": "text/plain",
-    "txt": "text/plain",
-    "js": "text/javascript",
     "opus": "audio/ogg; codecs=opus",
-    "caf": "audio/x-caf",
-    "mp3": "audio/mpeg",
-    "m4a": "audio/mp4",
-    "jpg": "image/jpeg",
 }
 
 
 def _add_mimes() -> None:
+    # `mimetypes` is woefully unpopulated on windows
+    # but will be used as fallback on linux
+
     for ln in """text css html csv
-application json wasm xml pdf rtf zip
-image webp jpeg png gif bmp
-audio aac ogg wav
+application json wasm xml pdf rtf zip jar fits wasm
+image webp jpeg png gif bmp jxl jp2 jxs jxr tiff bpg heic heif avif
+audio aac ogg wav flac ape amr
 video webm mp4 mpeg
 font woff woff2 otf ttf
 """.splitlines():
@@ -177,8 +174,33 @@ font woff woff2 otf ttf
         for v in vs.strip().split():
             MIMES[v] = "{}/{}".format(k, v)
 
+    for ln in """text md=plain txt=plain js=javascript
+application 7z=x-7z-compressed tar=x-tar bz2=x-bzip2 gz=gzip rar=x-rar-compressed zst=zstd xz=x-xz lz=lzip cpio=x-cpio
+application exe=vnd.microsoft.portable-executable msi=x-ms-installer cab=vnd.ms-cab-compressed rpm=x-rpm crx=x-chrome-extension
+application epub=epub+zip mobi=x-mobipocket-ebook lit=x-ms-reader rss=rss+xml atom=atom+xml torrent=x-bittorrent
+application p7s=pkcs7-signature dcm=dicom shx=vnd.shx shp=vnd.shp dbf=x-dbf gml=gml+xml gpx=gpx+xml amf=x-amf
+application swf=x-shockwave-flash m3u=vnd.apple.mpegurl db3=vnd.sqlite3 sqlite=vnd.sqlite3
+image jpg=jpeg xpm=x-xpixmap psd=vnd.adobe.photoshop jpf=jpx tif=tiff ico=x-icon djvu=vnd.djvu
+image heic=heic-sequence heif=heif-sequence hdr=vnd.radiance svg=svg+xml
+audio caf=x-caf mp3=mpeg m4a=mp4 mid=midi mpc=musepack aif=aiff au=basic qcp=qcelp
+video mkv=x-matroska mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
+video asf=x-ms-asf flv=x-flv 3gp=3gpp 3g2=3gpp2 rmvb=vnd.rn-realmedia-vbr
+font ttc=collection
+""".splitlines():
+        k, ems = ln.split(" ", 1)
+        for em in ems.strip().split():
+            ext, mime = em.split("=")
+            MIMES[ext] = "{}/{}".format(k, mime)
+
 
 _add_mimes()
+
+
+EXTS: dict[str, str] = {v: k for k, v in MIMES.items()}
+
+EXTS["vnd.mozilla.apng"] = "png"
+
+MAGIC_MAP = {"jpeg": "jpg"}
 
 
 REKOBO_KEY = {
@@ -623,6 +645,50 @@ class HMaccas(object):
 
     def s(self, msg: str) -> str:
         return self.b(msg.encode("utf-8", "replace"))
+
+
+class Magician(object):
+    def __init__(self) -> None:
+        self.bad_magic = False
+        self.mutex = threading.Lock()
+        self.magic: Optional["magic.Magic"] = None
+
+    def ext(self, fpath: str) -> str:
+        import magic
+
+        try:
+            if self.bad_magic:
+                raise Exception()
+
+            if not self.magic:
+                try:
+                    with self.mutex:
+                        if not self.magic:
+                            self.magic = magic.Magic(uncompress=False, extension=True)
+                except:
+                    self.bad_magic = True
+                    raise
+
+            with self.mutex:
+                ret = self.magic.from_file(fpath)
+        except:
+            ret = "?"
+
+        ret = ret.split("/")[0]
+        ret = MAGIC_MAP.get(ret, ret)
+        if "?" not in ret:
+            return ret
+
+        mime = magic.from_file(fpath, mime=True)
+        mime = re.split("[; ]", mime, 1)[0]
+        ret = EXTS.get(mime)
+
+        if not ret:
+            mg = mimetypes.guess_extension(mime)
+            if mg:
+                return mg[1:]
+            else:
+                raise Exception()
 
 
 if WINDOWS and sys.version_info < (3, 8):

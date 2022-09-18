@@ -31,7 +31,15 @@ except ImportError:
 from .__init__ import MACOS, TYPE_CHECKING, EnvParams
 from .bos import bos
 from .httpconn import HttpConn
-from .util import FHC, min_ex, shut_socket, spack, start_log_thrs, start_stackmon
+from .util import (
+    FHC,
+    Magician,
+    min_ex,
+    shut_socket,
+    spack,
+    start_log_thrs,
+    start_stackmon,
+)
 
 if TYPE_CHECKING:
     from .broker_util import BrokerCli
@@ -60,6 +68,7 @@ class HttpSrv(object):
         socket.setdefaulttimeout(120)
 
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
+        self.magician = Magician()
 
         self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()

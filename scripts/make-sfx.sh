@@ -170,6 +170,23 @@ tmpdir="$(
 			wget -O$f "$url" || curl -L "$url" >$f)
 	done
 
+	echo collecting python-magic
+	v=0.4.27
+	f=python-magic-$v.tar.gz
+	[ -e "$f" ] ||
+		(url=https://files.pythonhosted.org/packages/da/db/0b3e28ac047452d079d375ec6798bf76a036a08182dbb39ed38116a49130/python-magic-0.4.27.tar.gz;
+		wget -O$f "$url" || curl -L "$url" >$f)
+
+	tar -zxf $f
+	mkdir magic
+	mv python-magic-*/magic .
+	rm -rf python-magic-*
+	rm magic/compat.py
+	f=magic/__init__.py
+	awk '/^def _add_compat/{o=1} !o; /^_add_compat/{o=0}' <$f >t
+	tmv "$f"
+	mv magic ftp/  # doesn't provide a version label anyways
+
 	# enable this to dynamically remove type hints at startup,
 	# in case a future python version can use them for performance
 	true || (
@@ -326,6 +343,7 @@ rm have
 f=j2/jinja2/constants.py
 awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
 tmv "$f"
+rm -f j2/jinja2/async*
 
 grep -rLE '^#[^a-z]*coding: utf-8' j2 |
 while IFS= read -r f; do
