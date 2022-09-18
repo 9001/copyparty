@@ -2511,9 +2511,9 @@ function scan_hash(v) {
 		ts = null;
 
 	if (m.length > 3) {
-		var tm = /^&[Tt=0]*([0-9]+[Mm:])?0*([0-9]+)[Ss]?$/.exec(m[3]);
+		var tm = /^&[Tt=0]*([0-9]+[Mm:])?0*([0-9\.]+)[Ss]?$/.exec(m[3]);
 		if (tm) {
-			ts = parseInt(tm[1] || 0) * 60 + parseInt(tm[2] || 0);
+			ts = parseInt(tm[1] || 0) * 60 + parseFloat(tm[2] || 0);
 		}
 		tm = /^&[Tt=0]*([0-9\.]+)-([0-9\.]+)$/.exec(m[3]);
 		if (tm) {
