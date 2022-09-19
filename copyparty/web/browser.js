@@ -5042,7 +5042,7 @@ var treectl = (function () {
 		if (this.hpush && !showfile.active())
 			hist_push(this.top);
 
-		if (!this.back) {
+		if (!this.back && treectl.entreed) {
 			var dirs = [];
 			for (var a = 0; a < res.dirs.length; a++)
 				dirs.push(res.dirs[a].href.split('/')[0].split('?')[0]);
