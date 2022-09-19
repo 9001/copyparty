@@ -25,6 +25,12 @@ var Ls = {
 			"hz": "sample rate"
 		},
 
+		"ht_s": "second!s",
+		"ht_m": "minute!s",
+		"ht_h": "hour!s",
+		"ht_d": "day!s",
+		"ht_and": " and ",
+
 		"goh": "control-panel",
 		"logout": "Logout ",
 		"access": " access",
@@ -311,7 +317,8 @@ var Ls = {
 		"u_badf": 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n\n',
 		"u_blankf": 'These {0} files (of {1} total) are blank / empty; upload them anyways?\n\n',
 		"u_just1": '\nMaybe it works better if you select just one file',
-		"u_ff_many": "This amount of files <em>may</em> cause Firefox to skip some files, or crash.\nPlease try again with fewer files (or use Chrome) if that happens.\n\n",
+		"u_ff_many": "This amount of files <em>may</em> cause Firefox to skip some files, or crash.\nPlease try again with fewer files (or use Chrome) if that happens.",
+		"u_up_life": "This upload will be deleted from the server\n{0} after it completes",
 		"u_asku": 'upload these {0} files to <code>{1}</code>',
 		"u_unpt": "you can undo / delete this upload using the top-left 🧯",
 		"u_etadone": 'Done ({0}, {1} files)',
@@ -338,6 +345,11 @@ var Ls = {
 		"u_expl": "explain",
 		"u_tu": '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
 		"u_ts": '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search results can be incorrect; see turbo-button tooltip</span></p>',
+		"u_life_cfg": 'autodelete after <input id="lifem" p="60" /> min (or <input id="lifeh" p="3600" /> hours)',
+		"u_life_est": 'upload will be deleted <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'this folder enforces a\nmax lifetime of {0}',
+		"u_unp_ok": 'unpost is allowed for {0}',
+		"u_unp_ng": 'unpost will NOT be allowed',
 		"ue_ro": 'your access to this folder is Read-Only\n\n',
 		"ue_nl": 'you are currently not logged in',
 		"ue_la": 'you are currently logged in as "{0}"',
@@ -378,6 +390,12 @@ var Ls = {
 			"chs": "lydkanaler",
 			"hz": "lyd-oppløsning"
 		},
+
+		"ht_s": "sekund!er",
+		"ht_m": "minutt!er",
+		"ht_h": "time!r",
+		"ht_d": "dag!er",
+		"ht_and": " og ",
 
 		"goh": "kontrollpanel",
 		"logout": "Logg ut ",
@@ -665,7 +683,8 @@ var Ls = {
 		"u_badf": 'Disse {0} filene (av totalt {1}) kan ikke leses, kanskje pga rettighetsproblemer i filsystemet på datamaskinen din:\n\n',
 		"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhold; ønsker du å laste dem opp uansett?\n\n',
 		"u_just1": '\nFunker kanskje bedre hvis du bare tar én fil om gangen',
-		"u_ff_many": "Det var mange filer! Mulig at Firefox kommer til å krasje, eller\nhoppe over et par av dem. Smart å ha Chrome på lur i tilfelle.\n\n",
+		"u_ff_many": "Det var mange filer! Mulig at Firefox kommer til å krasje, eller\nhoppe over et par av dem. Smart å ha Chrome på lur i tilfelle.",
+		"u_up_life": "Filene slettes fra serveren {0}\netter at opplastningen er fullført",
 		"u_asku": 'Laste opp disse {0} filene til <code>{1}</code>',
 		"u_unpt": "Du kan angre / slette opplastningen med 🧯 oppe til venstre",
 		"u_etadone": 'Ferdig ({0}, {1} filer)',
@@ -692,6 +711,11 @@ var Ls = {
 		"u_expl": "forklar",
 		"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrutte opplastninger vil muligens ikke oppdages og gjenopptas; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_ts": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;søkeresultater kan være feil; hold musepekeren over turbo-knappen for mer info</span></p>',
+		"u_life_cfg": 'slett opplastning etter <input id="lifem" p="60" /> min (eller <input id="lifeh" p="3600" /> timer)',
+		"u_life_est": 'opplastningen slettes <span id="lifew" tt="lokal tid">---</span>',
+		"u_life_max": 'denne mappen tillater ikke å \noppbevare filer i mer enn {0}',
+		"u_unp_ok": 'opplastning kan angres i {0}',
+		"u_unp_ng": 'opplastning kan IKKE angres',
 		"ue_ro": 'du har ikke skrivetilgang i denne mappen\n\n',
 		"ue_nl": 'du er ikke logget inn',
 		"ue_la": 'du er logget inn som "{0}"',
@@ -837,6 +861,7 @@ ebi('op_up2k').innerHTML = (
 	'</table><div id="u2mu"></div></div>\n' +
 
 	'<p id="u2flagblock"><b>' + L.ul_flagblk + '</p>\n' +
+	'<div id="u2life"></div>' +
 	'<div id="u2foot"></div>'
 );
 
@@ -4646,6 +4671,7 @@ var treectl = (function () {
 
 		r.hide();
 		ebi('path').style.display = '';
+		ebi('treeul').innerHTML = '';
 	}
 
 	r.hide = function () {
@@ -4865,10 +4891,18 @@ var treectl = (function () {
 				}
 			}
 		}
-		QS('#treeul>li>a+a').textContent = '[root]';
 		despin('#tree');
-		reload_tree();
 
+		try {
+			QS('#treeul>li>a+a').textContent = '[root]';
+		}
+		catch (ex) {
+			console.log('got no root yet');
+			r.dir_cb = null;
+			return;
+		}
+
+		reload_tree();
 		var fun = r.dir_cb;
 		if (fun) {
 			r.dir_cb = null;
@@ -5042,7 +5076,7 @@ var treectl = (function () {
 		if (this.hpush && !showfile.active())
 			hist_push(this.top);
 
-		if (!this.back && treectl.entreed) {
+		if (!this.back && !treectl.hidden) {
 			var dirs = [];
 			for (var a = 0; a < res.dirs.length; a++)
 				dirs.push(res.dirs[a].href.split('/')[0].split('?')[0]);
@@ -5159,6 +5193,7 @@ var treectl = (function () {
 			if (res.acct) {
 				acct = res.acct;
 				have_up2k_idx = res.idx;
+				lifetime = res.lifetime;
 				apply_perms(res.perms);
 				fileman.render();
 			}
@@ -6348,7 +6383,7 @@ var unpost = (function () {
 
 		for (var a = n; a < n2; a++)
 			if (QS('#op_unpost a.n' + a))
-				req.push(uricom_dec(r.files[a].vp)[0]);
+				req.push(uricom_dec(r.files[a].vp));
 
 		var links = QSA('#op_unpost a.n' + n);
 		for (var a = 0, aa = links.length; a < aa; a++) {

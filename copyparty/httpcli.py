@@ -1313,7 +1313,7 @@ class HttpCli(object):
         want_url = ac == "url"
         zs = self.uparam.get("life", self.headers.get("life", ""))
         if zs:
-            vlife = int(vfs.flags.get("lifetime") or 0)
+            vlife = vfs.flags.get("lifetime") or 0
             lifetime = max(0, int(vlife - int(zs)))
         else:
             lifetime = 0
@@ -2495,6 +2495,7 @@ class HttpCli(object):
             "srvinf": srv_infot,
             "acct": self.uname,
             "idx": ("e2d" in vn.flags),
+            "lifetime": vn.flags.get("lifetime") or 0,
             "perms": perms,
             "logues": logues,
             "readme": readme,
@@ -2506,6 +2507,7 @@ class HttpCli(object):
             "ls0": None,
             "acct": self.uname,
             "perms": json.dumps(perms),
+            "lifetime": ls_ret["lifetime"],
             "taglist": [],
             "def_hcols": [],
             "have_emp": self.args.emp,
@@ -2515,7 +2517,7 @@ class HttpCli(object):
             "have_mv": (not self.args.no_mv),
             "have_del": (not self.args.no_del),
             "have_zip": (not self.args.no_zip),
-            "have_unpost": (self.args.unpost > 0),
+            "have_unpost": int(self.args.unpost),
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "url_suf": url_suf,
             "logues": logues,

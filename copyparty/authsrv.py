@@ -1121,6 +1121,16 @@ class AuthSrv(object):
 
                 vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
 
+            ints = ["lifetime"]
+            for k in list(vol.flags):
+                if k in ints:
+                    vol.flags[k] = int(vol.flags[k])
+
+            if "lifetime" in vol.flags and "e2d" not in vol.flags:
+                t = 'removing lifetime config from volume "/{}" because e2d is disabled'
+                self.log(t.format(vol.vpath), 1)
+                del vol.flags["lifetime"]
+
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
             local_only_mtp = {}

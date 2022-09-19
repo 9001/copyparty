@@ -2498,12 +2498,33 @@ html.b #u2conf a.b:hover {
 	text-align: center;
 	border: .2em dashed rgba(128, 128, 128, 0.3);
 }
-#u2foot {
+#u2foot,
+#u2life {
 	color: var(--fg-max);
-	font-style: italic;
 	text-align: center;
-	font-size: 1.2em;
 	margin: .8em 0;
+}
+#u2life {
+	margin: 2.5em 0;
+	line-height: 1.5em;
+}
+#u2life div {
+	display: inline-block;
+	white-space: nowrap;
+	margin: 0 2em;
+}
+#u2life div:first-child {
+	margin-bottom: .2em;
+}
+#u2life small {
+	opacity: .6;
+}
+#lifew {
+	border-bottom: 1px dotted var(--fg-max);
+}
+#u2foot {
+	font-size: 1.2em;
+	font-style: italic;
 }
 #u2foot .warn {
 	font-size: 1.2em;
@@ -2522,6 +2543,10 @@ html.b #u2conf a.b:hover {
 }
 #u2foot>*+* {
 	margin-top: 1.5em;
+}
+#u2life input {
+	width: 4em;
+	text-align: right;
 }
 .prog {
 	font-family: 'scp', monospace, monospace;

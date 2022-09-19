@@ -6,11 +6,11 @@ this is the EXE edition of copyparty, compatible with Windows7-SP1
 and later. To make this possible, the EXE was compiled with Python
 3.7.9, which is EOL and does not receive security patches anymore.
 
-it is strongly recommended to use the python sfx instead:
+if possible, for performance and security reasons, please use this instead:
 https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
 """
 
-print(v.replace("\n", "\n░▌ ")[1:] + "\n")
+print(v.replace("\n", "\n▒▌ ")[1:] + "\n")
 
 
 import re

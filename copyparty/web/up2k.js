@@ -1179,8 +1179,11 @@ function up2k_init(subtle) {
 
         var msg = [];
 
+        if (lifetime)
+            msg.push('<b>' + L.u_up_life.format(lhumantime(st.lifetime || lifetime)) + '</b>\n\n');
+
         if (FIREFOX && good_files.length > 3000)
-            msg.push(L.u_ff_many);
+            msg.push(L.u_ff_many + "\n\n");
 
         msg.push(L.u_asku.format(good_files.length, esc(get_vpath())) + '<ul>');
         for (var a = 0, aa = Math.min(20, good_files.length); a < aa; a++)
@@ -2226,6 +2229,7 @@ function up2k_init(subtle) {
             "name": t.name,
             "size": t.size,
             "lmod": t.lmod,
+            "life": st.lifetime,
             "hash": t.hash
         };
         if (t.srch)
@@ -2459,6 +2463,69 @@ function up2k_init(subtle) {
     }
     draw_turbo();
 
+    function draw_life() {
+        var el = ebi('u2life');
+        if (!lifetime) {
+            el.style.display = 'none';
+            el.innerHTML = '';
+            st.lifetime = 0;
+            return;
+        }
+        el.style.display = uc.fsearch ? 'none' : '';
+        el.innerHTML = '<div>' + L.u_life_cfg + '</div><div>' + L.u_life_est + '</div><div id="undor"></div>';
+        set_life(Math.min(lifetime, icfg_get('lifetime', lifetime)));
+        ebi('lifem').oninput = ebi('lifeh').oninput = mod_life;
+        tt.att(ebi('u2life'));
+    }
+    draw_life();
+
+    function mod_life(e) {
+        var el = e.target,
+            pow = parseInt(el.getAttribute('p')),
+            v = parseInt(el.value);
+
+        if (!isNum(v))
+            return;
+
+        if (toast.tag == mod_life)
+            toast.hide();
+
+        v *= pow;
+        if (v > lifetime) {
+            v = lifetime;
+            toast.warn(20, L.u_life_max.format(lhumantime(lifetime)), mod_life);
+        }
+
+        swrite('lifetime', v);
+        set_life(v);
+    }
+
+    function set_life(v) {
+        //ebi('lifes').value = v;
+        ebi('lifem').value = parseInt(v / 60);
+        ebi('lifeh').value = parseInt(v / 3600);
+
+        var undo = have_unpost - (v || lifetime);
+        ebi('undor').innerHTML = undo <= 0 ?
+            L.u_unp_ng : L.u_unp_ok.format(lhumantime(undo));
+
+        st.lifetime = v;
+        rel_life();
+    }
+
+    function rel_life() {
+        if (!lifetime)
+            return;
+
+        try {
+            ebi('lifew').innerHTML = unix2iso((st.lifetime || lifetime) +
+                Date.now() / 1000 - new Date().getTimezoneOffset() * 60
+            ).replace(' ', ', ').slice(0, -3);
+        }
+        catch (ex) { }
+    }
+    setInterval(rel_life, 9000);
+
     function set_potato() {
         pvis.potato();
         set_fsearch();
@@ -2509,6 +2576,7 @@ function up2k_init(subtle) {
         ebi('u2mu').style.display = potato ? '' : 'none';
 
         draw_turbo();
+        draw_life();
         onresize();
     }
 

@@ -351,11 +351,9 @@ class Up2k(object):
                 if not cur:
                     continue
 
-                lifetime = int(lifetime)
-                timeout = min(timeout, now + lifetime)
-
                 nrm = 0
                 deadline = time.time() - lifetime
+                timeout = min(timeout, now + lifetime)
                 q = "select rd, fn from up where at > 0 and at < ? limit 100"
                 while True:
                     with self.mutex:
@@ -1960,6 +1958,7 @@ class Up2k(object):
                         "sprs": sprs,  # dontcare; finished anyways
                         "size": dsize,
                         "lmod": dtime,
+                        "life": cj.get("life"),
                         "addr": ip,
                         "at": at,
                         "hash": [],
@@ -2072,6 +2071,7 @@ class Up2k(object):
                     "name",
                     "size",
                     "lmod",
+                    "life",
                     "poke",
                 ]:
                     job[k] = cj[k]
@@ -2293,11 +2293,29 @@ class Up2k(object):
                 pass
 
         z2 = [job[x] for x in "ptop wark prel name lmod size addr".split()]
-        z2 += [job.get("at") or time.time()]
+        upt = job.get("at") or time.time()
+        wake_sr = False
+        try:
+            flt = job["life"]
+            vfs = self.asrv.vfs.all_vols[job["vtop"]]
+            vlt = vfs.flags["lifetime"]
+            if vlt and flt < vlt:
+                upt -= vlt - flt
+                wake_sr = True
+                t = "using client lifetime; at={:.0f} ({}-{})"
+                self.log(t.format(upt, vlt, flt))
+        except:
+            pass
+
+        z2 += [upt]
         if self.idx_wark(*z2):
             del self.registry[ptop][wark]
         else:
             self.regdrop(ptop, wark)
+
+        if wake_sr:
+            with self.rescan_cond:
+                self.rescan_cond.notify_all()
 
         dupes = self.dupesched.pop(dst, [])
         if not dupes:

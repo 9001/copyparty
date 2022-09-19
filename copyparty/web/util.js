@@ -626,7 +626,7 @@ function uricom_sdec(txt) {
 function uricom_adec(arr, li) {
     var ret = [];
     for (var a = 0; a < arr.length; a++) {
-        var txt = uricom_dec(arr[a])[0];
+        var txt = uricom_dec(arr[a]);
         ret.push(li ? '<li>' + esc(txt) + '</li>' : txt);
     }
 
@@ -682,7 +682,7 @@ var isNum = function (v) {
     var n = parseFloat(v);
     return !isNaN(v - n) && n === v;
 };
-if (window.Number)
+if (window.Number && Number.isFinite)
     isNum = Number.isFinite;
 
 
@@ -717,7 +717,7 @@ function humantime(v) {
 }
 
 
-function shumantime(v) {
+function shumantime(v, long) {
     if (v < 10)
         return f2f(v, 2) + 's';
     if (v < 60)
@@ -737,8 +737,24 @@ function shumantime(v) {
         var v1 = parseInt(v / m1),
             v2 = ('0' + parseInt((v % m1) / m2)).slice(-2);
 
-        return v1 + ch + (v1 >= 10 ? '' : v2);
+        return v1 + ch + (v1 >= 10 || v2 == '00' ? '' : v2 + (
+            long && a < st.length - 1 ? st[a + 1][2] : ''));
     }
+}
+
+
+function lhumantime(v) {
+    var t = shumantime(v, 1),
+        tp = t.replace(/([a-z])/g, " $1 ").split(/ /g).slice(0, -1);
+
+    if (!window.L || tp.length < 2 || tp[1].indexOf('$') + 1)
+        return t;
+
+    var ret = '';
+    for (var a = 0; a < tp.length; a += 2)
+        ret += tp[a] + ' ' + L['ht_' + tp[a + 1]].replace(tp[a] == 1 ? /!.*/ : /!/, '') + L.ht_and;
+
+    return ret.slice(0, -L.ht_and.length);
 }
 
 
@@ -812,7 +828,7 @@ function fcfg_get(name, defval) {
     var o = ebi(name),
         val = parseFloat(sread(name));
 
-    if (isNaN(val))
+    if (!isNum(val))
         return parseFloat(o ? o.value : defval);
 
     if (o)
@@ -1068,7 +1084,7 @@ var tt = (function () {
     };
 
     r.hide = function (e) {
-        ev(e);
+        //ev(e);  // eats checkbox-label clicks
         clearTimeout(tev);
         window.removeEventListener('scroll', r.hide);
 

@@ -49,6 +49,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [uploading](#uploading) - drag files/folders into the web-browser to upload
         * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
+        * [self-destruct](#self-destruct) - uploads can be given a lifetime
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
@@ -168,6 +169,7 @@ feature summary
   * ☑ [up2k](#uploading): js, resumable, multithreaded
   * ☑ stash: simple PUT filedropper
   * ☑ [unpost](#unpost): undo/delete accidental uploads
+  * ☑ [self-destruct](#self-destruct) (specified server-side or client-side)
   * ☑ symlink/discard existing files (content-matching)
 * download
   * ☑ single files in browser
@@ -541,6 +543,17 @@ undo/delete accidental uploads
 ![copyparty-unpost-fs8](https://user-images.githubusercontent.com/241032/129635368-3afa6634-c20f-418c-90dc-ec411f3b3897.png)
 
 you can unpost even if you don't have regular move/delete access, however only for files uploaded within the past `--unpost` seconds (default 12 hours) and the server must be running with `-e2d`
+
+
+### self-destruct
+
+uploads can be given a lifetime,  afer which they expire / self-destruct
+
+the feature must be enabled per-volume with the `lifetime` [upload rule](#upload-rules) which sets the upper limit for how long a file gets to stay on the server
+
+clients can specify a shorter expiration time using the [up2k ui](#uploading) -- the relevant options become visible upon navigating into a folder with `lifetimes` enabled -- or by using the `life` [upload modifier](#write)
+
+specifying a custom expiration time client-side will affect the timespan in which unposts are permitted, so keep an eye on the estimates in the up2k ui
 
 
 ## file manager
