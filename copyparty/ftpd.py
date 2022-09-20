@@ -56,7 +56,9 @@ class FtpAuth(DummyAuthorizer):
 
         handler.username = uname
 
-        if password and not uname:
+        if (password and not uname) or not (
+            asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)
+        ):
             raise AuthenticationFailed("Authentication failed.")
 
     def get_home_dir(self, username: str) -> str:
