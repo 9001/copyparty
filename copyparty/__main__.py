@@ -398,18 +398,13 @@ def disable_quickedit() -> None:
 
 
 def showlic() -> None:
-    p = os.path.join(E.mod, "COPYING.txt")
+    p = os.path.join(E.mod, "res", "COPYING.txt")
     if not os.path.exists(p):
         print("no relevant license info to display")
         return
 
-    t = " licenses are only relevant to this EXE edition of copyparty, as they are a result of packaging by pyoxidizer"
-
-    print("the below" + t + ":\n")
     with open(p, "rb") as f:
         print(f.read().decode("utf-8", "replace"))
-
-    print("\nthe above" + t)
 
 
 def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Namespace:
@@ -578,8 +573,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see --help-urlform")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="window title, for example '$ip-10.1.2.' or '$ip-'")
-    if E.ox:
-        ap2.add_argument("--license", action="store_true", help="show licenses and exit")
+    ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
     ap2 = ap.add_argument_group('upload options')
@@ -795,7 +789,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     if "--version" in argv:
         sys.exit(0)
 
-    if "--license" in argv and E.ox:
+    if "--license" in argv:
         showlic()
         sys.exit(0)
 

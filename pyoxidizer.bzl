@@ -29,6 +29,7 @@ def make_exe():
             "jinja2",
             "markupsafe",
             "pyftpdlib",
+            "python-magic",
         ]
     ))
     return exe

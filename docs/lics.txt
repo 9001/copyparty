@@ -1,0 +1,63 @@
+--- server-side --- software ---
+
+https://github.com/9001/copyparty/
+C: 2019 ed
+L: MIT
+
+https://github.com/pallets/jinja/
+C: 2007 Pallets
+L: BSD 3-Clause 
+
+https://github.com/pallets/markupsafe/
+C: 2010 Pallets
+L: BSD 3-Clause 
+
+https://github.com/giampaolo/pyftpdlib/
+C: 2007 Giampaolo Rodola'
+L: MIT
+
+https://github.com/python/cpython/blob/3.10/Lib/asyncore.py
+C: 1996 Sam Rushing
+L: ISC
+
+https://github.com/ahupp/python-magic/
+C: 2001-2014 Adam Hupp
+L: MIT
+
+--- client-side --- software ---
+
+https://github.com/Daninet/hash-wasm/
+C: 2020 Dani Biró
+L: MIT
+
+https://github.com/openpgpjs/asmcrypto.js/
+C: 2013 Artem S Vybornov
+L: MIT
+
+https://github.com/feimosi/baguetteBox.js/
+C: 2017 Marek Grzybek
+L: MIT
+
+https://github.com/markedjs/marked/
+C: 2018+, MarkedJS
+C: 2011-2018, Christopher Jeffrey (https://github.com/chjj/)
+L: MIT
+
+https://github.com/codemirror/codemirror5/
+C: 2017 Marijn Haverbeke <marijnh@gmail.com> and others
+L: MIT
+
+https://github.com/Ionaru/easy-markdown-editor/
+C: 2015 Sparksuite, Inc.
+C: 2017 Jeroen Akkerman.
+L: MIT
+
+--- client-side --- fonts ---
+
+https://github.com/adobe-fonts/source-code-pro/
+C: 2010-2019 Adobe
+L: SIL OFL 1.1
+
+https://github.com/FortAwesome/Font-Awesome/
+C: 2022 Fonticons, Inc.
+L: SIL OFL 1.1
