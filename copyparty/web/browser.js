@@ -4591,6 +4591,8 @@ function aligngriditems() {
 	var gridwidth = ebi('ggrid').clientWidth;
 	var griditemcount = ebi('ggrid').children.length;
 	var totalgapwidth = em2px * griditemcount;
+	if (/b/.test(themen + ''))
+		totalgapwidth *= 2.8;
 
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
 		ebi('ggrid').style.justifyContent = 'left';
@@ -4671,7 +4673,6 @@ var treectl = (function () {
 
 		r.hide();
 		ebi('path').style.display = '';
-		ebi('treeul').innerHTML = '';
 	}
 
 	r.hide = function () {
