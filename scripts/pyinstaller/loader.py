@@ -17,10 +17,23 @@ import re
 import os
 import sys
 import shutil
+import traceback
 import subprocess as sp
 
 
-def meicln(mod, pids):
+def confirm(rv):
+    print()
+    print("retcode", rv if rv else traceback.format_exc())
+    print("*** hit enter to exit ***")
+    try:
+        input()
+    except:
+        pass
+
+    sys.exit(rv or 1)
+
+
+def meicln(mod):
     pdir, mine = os.path.split(mod)
     dirs = os.listdir(pdir)
     dirs = [x for x in dirs if x.startswith("_MEI") and x != mine]
@@ -61,7 +74,7 @@ def meichk():
 
     mod = os.path.dirname(os.path.realpath(__file__))
     if os.path.basename(mod).startswith("_MEI") and len(pids) == 2:
-        meicln(mod, pids)
+        meicln(mod)
 
 
 meichk()
@@ -69,4 +82,13 @@ meichk()
 
 from copyparty.__main__ import main
 
-main()
+try:
+    main()
+except SystemExit as ex:
+    c = ex.code
+    if c not in [0, -15]:
+        confirm(ex.code)
+except KeyboardInterrupt:
+    pass
+except:
+    confirm(0)
