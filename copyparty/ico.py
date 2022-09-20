@@ -45,7 +45,7 @@ class Ico(object):
                 pb = ImageDraw.Draw(img)
                 tw, th = pb.textsize(ext)
                 pb.text(((w - tw) // 2, (h - th) // 2), ext, fill="#" + c[6:])
-                img = img.resize((w * 3, h * 3), Image.Resampling.NEAREST)
+                img = img.resize((w * 3, h * 3), Image.NEAREST)
 
                 buf = BytesIO()
                 img.save(buf, format="PNG", compress_level=1)

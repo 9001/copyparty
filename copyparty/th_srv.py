@@ -266,13 +266,14 @@ class ThumbSrv(object):
             if fun:
                 try:
                     fun(abspath, tpath)
-                except:
+                except Exception as ex:
                     msg = "{} could not create thumbnail of {}\n{}"
                     msg = msg.format(fun.__name__, abspath, min_ex())
                     c: Union[str, int] = 1 if "<Signals.SIG" in msg else "1;30"
                     self.log(msg, c)
-                    with open(tpath, "wb") as _:
-                        pass
+                    if getattr(ex, "returncode", 0) != 321:
+                        with open(tpath, "wb") as _:
+                            pass
 
             with self.mutex:
                 subs = self.busy[tpath]
@@ -418,21 +419,30 @@ class ThumbSrv(object):
 
         c: Union[str, int] = "1;30"
         t = "FFmpeg failed (probably a corrupt video file):\n"
-        if cmd[-1].lower().endswith(b".webp") and (
-            "Error selecting an encoder" in serr
-            or "Automatic encoder selection failed" in serr
-            or "Default encoder for format webp" in serr
-            or "Please choose an encoder manually" in serr
+        if (
+            (not self.args.th_ff_jpg or time.time() - int(self.args.th_ff_jpg) < 60)
+            and cmd[-1].lower().endswith(b".webp")
+            and (
+                "Error selecting an encoder" in serr
+                or "Automatic encoder selection failed" in serr
+                or "Default encoder for format webp" in serr
+                or "Please choose an encoder manually" in serr
+            )
         ):
-            self.args.th_ff_jpg = True
+            self.args.th_ff_jpg = time.time()
             t = "FFmpeg failed because it was compiled without libwebp; enabling --th-ff-jpg to force jpeg output:\n"
+            ret = 321
             c = 1
 
         if (
+            not self.args.th_ff_swr or time.time() - int(self.args.th_ff_swr) < 60
+        ) and (
             "Requested resampling engine is unavailable" in serr
             or "output pad on Parsed_aresample_" in serr
         ):
-            t = "FFmpeg failed because it was compiled without libsox; you must set --th-ff-swr to force swr resampling:\n"
+            self.args.th_ff_swr = time.time()
+            t = "FFmpeg failed because it was compiled without libsox; enabling --th-ff-swr to force swr resampling:\n"
+            ret = 321
             c = 1
 
         lines = serr.strip("\n").split("\n")
