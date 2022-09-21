@@ -1,0 +1,13 @@
+apt install subversion ragel curl texinfo ed bison flex cvs yasm automake libtool cmake git make pkg-config pax nasm gperf autogen bzip2 autoconf-archive p7zip-full meson clang libtool-bin ed python-is-python3
+
+git clone https://github.com/rdp/ffmpeg-windows-build-helpers
+# commit 3d88e2b6aedfbb5b8fed19dd24621e5dd7fc5519 (HEAD -> master, origin/master, origin/HEAD)
+# Merge: b0bd70c 9905dd7
+# Author: Roger Pack <rogerpack2005@gmail.com>
+# Date:   Fri Aug 19 23:36:35 2022 -0600
+
+cd ffmpeg-windows-build-helpers/
+vim cross_compile_ffmpeg.sh
+(cd ./sandbox/win32/ffmpeg_git_xp_compat_lgpl/ ; git reset --hard ; git clean -fx )
+./cross_compile_ffmpeg.sh
+for f in sandbox/win32/ffmpeg_git_xp_compat_lgpl/ff{mpeg,probe}.exe; do upx --best --ultra-brute -k $f; mv $f ~/dev; done 
