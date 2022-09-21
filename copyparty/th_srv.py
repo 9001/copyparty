@@ -274,6 +274,12 @@ class ThumbSrv(object):
                     if getattr(ex, "returncode", 0) != 321:
                         with open(tpath, "wb") as _:
                             pass
+                    else:
+                        # ffmpeg may spawn empty files on windows
+                        try:
+                            os.unlink(tpath)
+                        except:
+                            pass
 
             with self.mutex:
                 subs = self.busy[tpath]
