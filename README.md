@@ -1108,6 +1108,8 @@ some notes on hardening
   * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
     * however note if you edit one file it will also affect the other copies
   * `--vague-403` returns a "404 not found" instead of "403 forbidden" which is a common enterprise meme
+  * `--ban-404=50,60,1440` ban client for 1440min (24h) if they hit 50 404's in 60min
+    * **NB:** will ban anyone who enables up2k turbo
   * `--nih` removes the server hostname from directory listings
 
 * option `-sss` is a shortcut for the above plus:

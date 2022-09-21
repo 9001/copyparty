@@ -37,6 +37,11 @@ except:
     pass
 
 try:
+    from ipaddress import IPv6Address
+except:
+    pass
+
+try:
     HAVE_SQLITE3 = True
     import sqlite3  # pylint: disable=unused-import  # typechk
 except:
@@ -689,6 +694,78 @@ class Magician(object):
                 return mg[1:]
             else:
                 raise Exception()
+
+
+class Garda(object):
+    """ban clients for repeated offenses"""
+
+    def __init__(self, cfg: str) -> None:
+        try:
+            a, b, c = cfg.strip().split(",")
+            self.lim = int(a)
+            self.win = int(b) * 60
+            self.pen = int(c) * 60
+        except:
+            self.lim = self.win = self.pen = 0
+
+        self.ct: dict[str, list[int]] = {}
+        self.prev: dict[str, str] = {}
+        self.last_cln = 0
+
+    def cln(self, ip: str) -> None:
+        n = 0
+        ok = int(time.time() - self.win)
+        for v in self.ct[ip]:
+            if v < ok:
+                n += 1
+            else:
+                break
+        if n:
+            te = self.ct[ip][n:]
+            if te:
+                self.ct[ip] = te
+            else:
+                del self.ct[ip]
+                try:
+                    del self.prev[ip]
+                except:
+                    pass
+
+    def allcln(self) -> None:
+        for k in list(self.ct):
+            self.cln(k)
+
+        self.last_cln = int(time.time())
+
+    def bonk(self, ip: str, prev: str) -> tuple[int, str]:
+        if not self.lim:
+            return 0, ip
+
+        if ":" in ip and not PY2:
+            # assume /64 clients; drop 4 groups
+            ip = IPv6Address(ip).exploded[:-20]
+
+        if prev:
+            if self.prev.get(ip) == prev:
+                return 0, ip
+
+            self.prev[ip] = prev
+
+        now = int(time.time())
+        try:
+            self.ct[ip].append(now)
+        except:
+            self.ct[ip] = [now]
+
+        if now - self.last_cln > 300:
+            self.allcln()
+        else:
+            self.cln(ip)
+
+        if len(self.ct[ip]) >= self.lim:
+            return now + self.pen, ip
+        else:
+            return 0, ip
 
 
 if WINDOWS and sys.version_info < (3, 8):

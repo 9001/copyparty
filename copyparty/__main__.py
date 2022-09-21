@@ -628,7 +628,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
 
     ap2 = ap.add_argument_group('safety options')
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
-    ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, 404 on 403.\n └─Alias of\033[32m -s --no-dot-mv --no-dot-ren --unpost=0 --no-del --no-mv --hardlink --vague-403 -nih")
+    ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --no-dot-mv --no-dot-ren --unpost=0 --no-del --no-mv --hardlink --vague-403 --ban-404=50,60,1440 -nih")
     ap2.add_argument("-sss", action="store_true", help="further increase safety: Enable logging to disk, scan for dangerous symlinks.\n └─Alias of\033[32m -ss -lo=cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz --ls=**,*,ln,p,r")
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="do a sanity/safety check of all volumes on startup; arguments USER,VOL,FLAGS; example [**,*,ln,p,r]")
     ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt; used to generate unpredictable internal identifiers for uploads -- doesn't really matter")
@@ -641,6 +641,8 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore --no-robots")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything")
     ap2.add_argument("--logout", metavar="H", type=float, default="8086", help="logout clients after H hours of inactivity (0.0028=10sec, 0.1=6min, 24=day, 168=week, 720=month, 8760=year)")
+    ap2.add_argument("--ban-pw", metavar="N,W,B", type=u, default="9,60,1440", help="more than N wrong passwords in W minutes = ban for B minutes (disable with \"no\")")
+    ap2.add_argument("--ban-404", metavar="N,W,B", type=u, default="no", help="hitting more than N 404's in W minutes = ban for B minutes (disabled by default since turbo-up2k counts as 404s)")
 
     ap2 = ap.add_argument_group('shutdown options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")

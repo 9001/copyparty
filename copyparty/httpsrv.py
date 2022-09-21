@@ -33,6 +33,7 @@ from .bos import bos
 from .httpconn import HttpConn
 from .util import (
     FHC,
+    Garda,
     Magician,
     min_ex,
     shut_socket,
@@ -69,6 +70,9 @@ class HttpSrv(object):
 
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
+        self.bans: dict[str, int] = {}
+        self.gpwd = Garda(self.args.ban_pw)
+        self.g404 = Garda(self.args.ban_404)
 
         self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()

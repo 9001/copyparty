@@ -24,6 +24,11 @@ try:
 except:
     pass
 
+try:
+    from ipaddress import IPv6Address
+except:
+    pass
+
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, EnvParams, unicode
 from .authsrv import VFS  # typechk
 from .bos import bos
@@ -111,6 +116,7 @@ class HttpCli(object):
         self.u2fh = conn.u2fh  # mypy404
         self.log_func = conn.log_func  # mypy404
         self.log_src = conn.log_src  # mypy404
+        self.bans = conn.hsrv.bans
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
         self.tls: bool = hasattr(self.s, "cipher")
 
@@ -263,6 +269,21 @@ class HttpCli(object):
                     self.log(t.format(self.args.rproxy, zso), c=3)
 
                 self.log_src = self.conn.set_rproxy(self.ip)
+
+        if self.bans:
+            ip = self.ip
+            if ":" in ip and not PY2:
+                ip = IPv6Address(ip).exploded[:-20]
+
+            if ip in self.bans:
+                ban = self.bans[ip] - time.time()
+                if ban < 0:
+                    self.log("client unbanned", 3)
+                    del self.bans[ip]
+                else:
+                    self.log("banned for {:.0f} sec".format(ban), 6)
+                    self.reply(b"thank you for playing", 403)
+                    return False
 
         if self.args.ihead:
             keys = self.args.ihead
@@ -466,7 +487,13 @@ class HttpCli(object):
         headers: Optional[dict[str, str]] = None,
         volsan: bool = False,
     ) -> bytes:
-        # TODO something to reply with user-supplied values safely
+        if status == 404:
+            g = self.conn.hsrv.g404
+            if g.lim:
+                bonk, ip = g.bonk(self.ip, self.vpath)
+                if bonk:
+                    self.log("client banned: 404s", 1)
+                    self.conn.hsrv.bans[ip] = bonk
 
         if volsan:
             vols = list(self.asrv.vfs.all_vols.values())
@@ -1230,6 +1257,14 @@ class HttpCli(object):
             msg = "login ok"
             dur = int(60 * 60 * self.args.logout)
         else:
+            self.log("invalid password: {}".format(pwd), 3)
+            g = self.conn.hsrv.gpwd
+            if g.lim:
+                bonk, ip = g.bonk(self.ip, pwd)
+                if bonk:
+                    self.log("client banned: invalid passwords", 1)
+                    self.conn.hsrv.bans[ip] = bonk
+
             msg = "naw dude"
             pwd = "x"  # nosec
             dur = None
