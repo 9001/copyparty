@@ -615,6 +615,9 @@ function Donut(uc, st) {
     var r = this,
         el = null,
         psvg = null,
+        tenstrobe = null,
+        tstrober = null,
+        strobes = [],
         o = 20 * 2 * Math.PI,
         optab = QS('#ops a[data-dest="up2k"]');
 
@@ -664,11 +667,15 @@ function Donut(uc, st) {
         r.base = pos();
         optab.innerHTML = ya ? svg() : optab.getAttribute('ico');
         el = QS('#ops a .donut');
+        clearTimeout(tenstrobe);
         if (!ya) {
             favico.upd();
             wintitle();
+            if (document.visibilityState == 'hidden')
+                tenstrobe = setTimeout(enstrobe, 500); //debounce
         }
     };
+
     r.do = function () {
         if (!el)
             return;
@@ -701,6 +708,22 @@ function Donut(uc, st) {
             r.fc = 0;
         }
     };
+
+    function enstrobe() {
+        strobes = ['████████████████', '________________', '████████████████'];
+        tstrober = setInterval(strobe, 300);
+
+        // firefox may forget that filedrops are user-gestures so it can skip this:
+        if (uc.upnag && window.Notification && Notification.permission == 'granted')
+            new Notification(uc.nagtxt);
+    }
+
+    function strobe() {
+        var txt = strobes.pop();
+        wintitle(txt);
+        if (!txt)
+            clearInterval(tstrober);
+    }
 }
 
 
@@ -810,6 +833,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort, false);
     bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE), set_hashw, false);
+    bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag, false);
 
     var st = {
         "files": [],
@@ -1625,15 +1649,15 @@ function up2k_init(subtle) {
         console.log('toast', ok, ng);
 
         if (ok && ng)
-            toast.warn(t, (sr ? L.ur_sm : L.ur_um).format(ok, ng));
+            toast.warn(t, uc.nagtxt = (sr ? L.ur_sm : L.ur_um).format(ok, ng));
         else if (ok > 1)
-            toast.ok(t, (sr ? L.ur_aso : L.ur_auo).format(ok));
+            toast.ok(t, uc.nagtxt = (sr ? L.ur_aso : L.ur_auo).format(ok));
         else if (ok)
-            toast.ok(t, sr ? L.ur_1so : L.ur_1uo);
+            toast.ok(t, uc.nagtxt = sr ? L.ur_1so : L.ur_1uo);
         else if (ng > 1)
-            toast.err(t, (sr ? L.ur_asn : L.ur_aun).format(ng));
+            toast.err(t, uc.nagtxt = (sr ? L.ur_asn : L.ur_aun).format(ng));
         else if (ng)
-            toast.err(t, sr ? L.ur_1sn : L.ur_1un);
+            toast.err(t, uc.nagtxt = sr ? L.ur_1sn : L.ur_1un);
 
         timer.rm(etafun);
         timer.rm(donut.do);
@@ -2612,6 +2636,15 @@ function up2k_init(subtle) {
             bcfg_set('hashw', false);
             toast.err(10, L.u_nowork);
         }
+    }
+
+    function set_upnag(en) {
+        if (!window.Notification) {
+            bcfg_set('upnag', false);
+            toast.err(10, "https only");
+        }
+        if (en && Notification.permission == 'default')
+            Notification.requestPermission();
     }
 
     ebi('nthread_add').onclick = function (e) {
