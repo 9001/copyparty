@@ -2328,7 +2328,7 @@ function play(tid, is_ev, seek) {
 	}
 
 	if (tn >= mp.order.length) {
-		if (mpl.pb_mode == 'loop') {
+		if (mpl.pb_mode == 'loop' || ebi('unsearch')) {
 			tn = 0;
 		}
 		else if (mpl.pb_mode == 'next') {
