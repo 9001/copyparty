@@ -1265,6 +1265,8 @@ html.y #ops svg circle {
 .opbox input {
 	position: relative;
 	margin: .5em;
+}
+#op_cfg input[type=text] {
 	top: -.3em;
 }
 .opview input[type=text] {

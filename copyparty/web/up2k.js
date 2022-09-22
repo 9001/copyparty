@@ -713,6 +713,9 @@ function Donut(uc, st) {
         strobes = ['████████████████', '________________', '████████████████'];
         tstrober = setInterval(strobe, 300);
 
+        if (uc.upsfx && actx && actx.state != 'suspended')
+            sfx();
+
         // firefox may forget that filedrops are user-gestures so it can skip this:
         if (uc.upnag && window.Notification && Notification.permission == 'granted')
             new Notification(uc.nagtxt);
@@ -723,6 +726,35 @@ function Donut(uc, st) {
         wintitle(txt);
         if (!txt)
             clearInterval(tstrober);
+    }
+
+    function sfx() {
+        var osc = actx.createOscillator(),
+            gain = actx.createGain(),
+            gg = gain.gain,
+            ft = [660, 880, 440, 660, 880],
+            ofs = 0;
+
+        osc.connect(gain);
+        gain.connect(actx.destination);
+        var ct = actx.currentTime + 0.03;
+
+        osc.type = 'triangle';
+        while (ft.length)
+            osc.frequency.setTargetAtTime(
+                ft.shift(), ct + (ofs += 0.05), 0.001);
+
+        gg.value = 0.15;
+        gg.setTargetAtTime(0.8, ct, 0.01);
+        gg.setTargetAtTime(0.3, ct + 0.13, 0.01);
+        gg.setTargetAtTime(0, ct + ofs + 0.05, 0.02);
+
+        osc.start();
+        setTimeout(function () {
+            osc.stop();
+            osc.disconnect();
+            gain.disconnect();
+        }, 500);
     }
 }
 
@@ -827,13 +859,15 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
     bcfg_bind(uc, 'potato', 'potato', false, set_potato, false);
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
-    bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
-    bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo, false);
-    bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null, false);
-    bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort, false);
-    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE), set_hashw, false);
-    bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag, false);
+
+    bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
+    bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo);
+    bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null);
+    bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort);
+    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE), set_hashw);
+    bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
+    bcfg_bind(uc, 'upsfx', 'upsfx', false);
 
     var st = {
         "files": [],
@@ -2647,7 +2681,7 @@ function up2k_init(subtle) {
                 nopenag();
         }
 
-        if (!window.Notification)
+        if (!window.Notification || !HTTPS)
             return nopenag();
 
         if (en && Notification.permission == 'default')
