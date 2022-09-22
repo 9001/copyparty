@@ -1248,9 +1248,16 @@ var modal = (function () {
         cb_up = null,
         cb_ok = null,
         cb_ng = null,
-        prim = '<a href="#" id="modal-ok">OK</a>',
-        sec = '<a href="#" id="modal-ng">Cancel</a>',
+        tok, tng, prim, sec, ok_cancel;
+
+    r.load = function () {
+        tok = (window.L && L.m_ok) || 'OK';
+        tng = (window.L && L.m_ng) || 'Cancel';
+        prim = '<a href="#" id="modal-ok">' + tok + '</a>';
+        sec = '<a href="#" id="modal-ng">' + tng + '</a>';
         ok_cancel = WINDOWS ? prim + sec : sec + prim;
+    };
+    r.load();
 
     r.busy = false;
 
@@ -1357,17 +1364,17 @@ var modal = (function () {
         r.show(html);
     }
 
-    r.confirm = function (html, cok, cng, fun) {
+    r.confirm = function (html, cok, cng, fun, btns) {
         q.push(function () {
-            _confirm(lf2br(html), cok, cng, fun);
+            _confirm(lf2br(html), cok, cng, fun, btns);
         });
         next();
     }
-    function _confirm(html, cok, cng, fun) {
+    function _confirm(html, cok, cng, fun, btns) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : cng;
         cb_up = fun;
-        html += '<div id="modalb">' + ok_cancel + '</div>';
+        html += '<div id="modalb">' + (btns || ok_cancel) + '</div>';
         r.show(html);
     }
 

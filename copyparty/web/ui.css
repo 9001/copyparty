@@ -236,6 +236,10 @@ html.y #tth {
 	max-height: 30em;
 	overflow: auto;
 }
+#modalc td {
+	text-align: unset;
+	padding: .2em;
+}
 @media (min-width: 40em) {
     #modalc {
         min-width: 30em;

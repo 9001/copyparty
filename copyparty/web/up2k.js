@@ -941,7 +941,16 @@ function up2k_init(subtle) {
 
     function nav() {
         start_actx();
-        ebi('file' + fdom_ctr).click();
+
+        // too buggy on chrome <= 72
+        var m = / Chrome\/([0-9]+)\./.exec(navigator.userAgent);
+        if (m && parseInt(m[1]) < 73)
+            return ebi('file' + fdom_ctr).click();
+
+        modal.confirm(L.u_nav_m,
+            function () { ebi('file' + fdom_ctr).click(); },
+            function () { ebi('dir' + fdom_ctr).click(); },
+            null, L.u_nav_b);
     }
     ebi('u2btn').onclick = nav;
 
@@ -1033,6 +1042,28 @@ function up2k_init(subtle) {
         drops[a].ondrop = gotfile;
     }
     ebi('drops').onclick = offdrag;  // old ff
+
+    function gotdir(e) {
+        ev(e);
+        var good_files = [],
+            nil_files = [],
+            bad_files = [];
+
+        for (var a = 0, aa = e.target.files.length; a < aa; a++) {
+            var fobj = e.target.files[a],
+                dst = good_files;
+
+            try {
+                if (fobj.size < 1)
+                    dst = nil_files;
+            }
+            catch (ex) {
+                dst = bad_files;
+            }
+            dst.push([fobj, fobj.webkitRelativePath]);
+        }
+        return read_dirs(null, [], [], good_files, nil_files, bad_files);
+    }
 
     function gotfile(e) {
         ev(e);
@@ -1350,9 +1381,13 @@ function up2k_init(subtle) {
     function more_one_file() {
         fdom_ctr++;
         var elm = mknod('div');
-        elm.innerHTML = '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" tabindex="-1" />'.format(fdom_ctr);
+        elm.innerHTML = (
+            '<input id="file{0}" type="file" name="file{0}[]" multiple="multiple" tabindex="-1" />' +
+            '<input id="dir{0}" type="file" name="dir{0}[]" multiple="multiple" tabindex="-1" webkitdirectory />'
+        ).format(fdom_ctr);
         ebi('u2form').appendChild(elm);
         ebi('file' + fdom_ctr).onchange = gotfile;
+        ebi('dir' + fdom_ctr).onchange = gotdir;
     }
     more_one_file();
 

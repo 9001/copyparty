@@ -25,6 +25,9 @@ var Ls = {
 			"hz": "sample rate"
 		},
 
+		"m_ok": "OK",
+		"m_ng": "Cancel",
+
 		"ht_s": "second!s",
 		"ht_m": "minute!s",
 		"ht_h": "hour!s",
@@ -100,6 +103,9 @@ var Ls = {
 		"udt_up": "Upload",
 		"udt_srch": "Search",
 		"udt_drop": "drop it here",
+
+		"u_nav_m": '<h6>aight, what do you have?</h6><code>Enter</code> = Files (one or more)\n<code>ESC</code> = One folder (including subfolders)',
+		"u_nav_b": '<a href="#" id="modal-ok">Files</a><a href="#" id="modal-ng">One folder</a>',
 
 		"cl_opts": "switches",
 		"cl_themes": "theme",
@@ -394,6 +400,9 @@ var Ls = {
 			"hz": "lyd-oppløsning"
 		},
 
+		"m_ok": "OK",
+		"m_ng": "Avbryt",
+
 		"ht_s": "sekund!er",
 		"ht_m": "minutt!er",
 		"ht_h": "time!r",
@@ -469,6 +478,9 @@ var Ls = {
 		"udt_up": "Last opp",
 		"udt_srch": "Søk",
 		"udt_drop": "Slipp filene her",
+
+		"u_nav_m": '<h6>hva har du?</h6><code>Enter</code> = Filer (én eller flere)\n<code>ESC</code> = Én mappe (inkludert undermapper)',
+		"u_nav_b": '<a href="#" id="modal-ok">Filer</a><a href="#" id="modal-ng">Én mappe</a>',
 
 		"cl_opts": "brytere",
 		"cl_themes": "utseende",
@@ -747,6 +759,7 @@ if (Ls.eng && L != Ls.eng) {
 		if (!L[k])
 			L[k] = Ls.eng[k];
 }
+modal.load();
 
 
 // toolbar
