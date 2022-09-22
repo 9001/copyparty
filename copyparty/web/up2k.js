@@ -2573,10 +2573,8 @@ function up2k_init(subtle) {
             }
         }
 
-        if (new_state !== undefined) {
-            uc.fsearch = new_state;
-            bcfg_set('fsearch', uc.fsearch);
-        }
+        if (new_state !== undefined)
+            bcfg_set('fsearch', uc.fsearch = new_state);
 
         try {
             clmod(ebi('u2c3w'), 's', !can_write);
@@ -2611,7 +2609,7 @@ function up2k_init(subtle) {
             }
             catch (ex) {
                 toast.err(5, "not supported on your browser:\n" + esc(basenames(ex)));
-                bcfg_set('flag_en', false);
+                bcfg_set('flag_en', uc.flag_en = false);
             }
         }
         else if (!uc.flag_en && flag) {
@@ -2633,19 +2631,31 @@ function up2k_init(subtle) {
 
     function set_hashw() {
         if (!window.WebAssembly) {
-            bcfg_set('hashw', false);
+            bcfg_set('hashw', uc.hashw = false);
             toast.err(10, L.u_nowork);
         }
     }
 
     function set_upnag(en) {
-        if (!window.Notification) {
-            bcfg_set('upnag', false);
+        function nopenag() {
+            bcfg_set('upnag', uc.upnag = false);
             toast.err(10, "https only");
         }
+
+        function chknag() {
+            if (Notification.permission != 'granted')
+                nopenag();
+        }
+
+        if (!window.Notification)
+            return nopenag();
+
         if (en && Notification.permission == 'default')
-            Notification.requestPermission();
+            Notification.requestPermission().then(chknag, chknag);
     }
+
+    if (uc.upnag && !window.Notification || Notification.permission != 'granted')
+        bcfg_set('upnag', uc.upnag = false);
 
     ebi('nthread_add').onclick = function (e) {
         ev(e);
