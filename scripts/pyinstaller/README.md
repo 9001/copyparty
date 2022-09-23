@@ -5,3 +5,8 @@ requires a win7 vm which has never been connected to the internet and a host-onl
 first-time setup steps in notes.txt
 
 run build.sh in the vm to fetch src + compile + push a new exe to the linux host for manual publishing
+
+
+## ffmpeg
+
+built with [ffmpeg-windows-build-helpers](https://github.com/rdp/ffmpeg-windows-build-helpers) and [this patch](./ffmpeg.patch) using [these steps](./ffmpeg.txt)
