@@ -3342,11 +3342,16 @@ var showfile = (function () {
 		'.bat': 'batch',
 		'.cxx': 'cpp',
 		'.diz': 'ans',
+		'.ex': 'elixir',
+		'.exs': 'elixir',
+		'.frag': 'glsl',
 		'.h': 'c',
 		'.hpp': 'cpp',
 		'.htm': 'html',
 		'.hxx': 'cpp',
 		'.log': 'ans',
+		'.m': 'matlab',
+		'.moon': 'moonscript',
 		'.patch': 'diff',
 		'.ps1': 'powershell',
 		'.psm1': 'powershell',
@@ -3356,6 +3361,7 @@ var showfile = (function () {
 		'.service': 'systemd',
 		'.vb': 'vbnet',
 		'.v': 'verilog',
+		'.vert': 'glsl',
 		'.vh': 'verilog',
 		'.yml': 'yaml'
 	};
@@ -3363,7 +3369,7 @@ var showfile = (function () {
 		'cmakelists.txt': 'cmake',
 		'dockerfile': 'docker'
 	};
-	var x = txt_ext + ' ans c cfg conf cpp cs css diff go html ini java js json jsx kt kts latex less lisp lua makefile md py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml';
+	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nim py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
 		r.map["." + x[a]] = x[a];
