@@ -4608,7 +4608,11 @@ function aligngriditems() {
 		return;
 
 	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
-	var gridsz = getComputedStyle(document.getElementsByTagName('html')[0]).getPropertyValue('--grid-sz').slice(0, -2);
+	var gridsz = 10;
+	try {
+		gridsz = getComputedStyle(document.documentElement).getPropertyValue('--grid-sz').slice(0, -2);
+	}
+	catch (ex) { }
 	var gridwidth = ebi('ggrid').clientWidth;
 	var griditemcount = ebi('ggrid').children.length;
 	var totalgapwidth = em2px * griditemcount;

@@ -68,8 +68,7 @@ onmessage = (d) => {
     };
     //console.log('[ w] %d read bgin', nchunk);
     busy = true;
-    reader.readAsArrayBuffer(
-        File.prototype.slice.call(fobj, car, cdr));
+    reader.readAsArrayBuffer(fobj.slice(car, cdr));
 
 
     var hash_calc = function (buf) {

@@ -928,11 +928,7 @@ function up2k_init(subtle) {
     r.st = st;
     r.uc = uc;
 
-    var bobslice = null;
-    if (window.File)
-        bobslice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
-
-    if (!bobslice || !window.FileReader || !window.FileList)
+    if (!window.File || !File.prototype.slice || !window.FileReader || !window.FileList)
         return un2k(L.u_ever);
 
     var flag = false;
@@ -1051,17 +1047,25 @@ function up2k_init(subtle) {
 
         for (var a = 0, aa = e.target.files.length; a < aa; a++) {
             var fobj = e.target.files[a],
+                name = fobj.webkitRelativePath,
                 dst = good_files;
 
             try {
+                if (!name)
+                    throw 1;
+
                 if (fobj.size < 1)
                     dst = nil_files;
             }
             catch (ex) {
                 dst = bad_files;
             }
-            dst.push([fobj, fobj.webkitRelativePath]);
+            dst.push([fobj, name]);
         }
+
+        if (!good_files.length && bad_files.length)
+            return toast.err(30, "that's not a folder!\n\nyour browser is too old,\nplease try dragdrop instead");
+
         return read_dirs(null, [], [], good_files, nil_files, bad_files);
     }
 
@@ -1870,8 +1874,7 @@ function up2k_init(subtle) {
                 toast.err(0, 'y o u   b r o k e    i t\nfile: ' + esc(t.name + '') + '\nerror: ' + err);
             };
             bpend++;
-            reader.readAsArrayBuffer(
-                bobslice.call(t.fobj, car, cdr));
+            reader.readAsArrayBuffer(t.fobj.slice(car, cdr));
 
             return true;
         };
@@ -2441,7 +2444,7 @@ function up2k_init(subtle) {
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
 
             xhr.responseType = 'text';
-            xhr.send(bobslice.call(t.fobj, car, cdr));
+            xhr.send(t.fobj.slice(car, cdr));
         }
         do_send();
     }
@@ -2723,7 +2726,7 @@ function up2k_init(subtle) {
             Notification.requestPermission().then(chknag, chknag);
     }
 
-    if (uc.upnag && !window.Notification || Notification.permission != 'granted')
+    if (uc.upnag && (!window.Notification || Notification.permission != 'granted'))
         bcfg_set('upnag', uc.upnag = false);
 
     ebi('nthread_add').onclick = function (e) {
