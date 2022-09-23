@@ -98,7 +98,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp xdev xvol ed emp force_js ihead no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
+        ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp xdev xvol ed emp force_js ihead magic no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "no_rescan no_sendfile no_voldump plain_ip"
@@ -160,6 +160,7 @@ class VHttpSrv(object):
     def __init__(self):
         self.broker = NullBroker()
         self.prism = None
+        self.bans = {}
 
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
