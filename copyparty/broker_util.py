@@ -8,7 +8,7 @@ from queue import Queue
 
 from .__init__ import TYPE_CHECKING
 from .authsrv import AuthSrv
-from .util import Pebkac, HMaccas
+from .util import HMaccas, Pebkac
 
 try:
     from typing import Any, Optional, Union

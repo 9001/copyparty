@@ -2,11 +2,11 @@
 from __future__ import print_function, unicode_literals
 
 import argparse
+import os
 import signal
 import sys
 import threading
 
-import os
 import queue
 
 from .authsrv import AuthSrv

@@ -72,9 +72,9 @@ except:
     pass
 
 if TYPE_CHECKING:
-    from .authsrv import VFS
-
     import magic
+
+    from .authsrv import VFS
 
 FAKE_MP = False
 

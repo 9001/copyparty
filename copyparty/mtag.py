@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 import sys
 
-from .__init__ import E, PY2, WINDOWS, unicode
+from .__init__ import PY2, WINDOWS, E, unicode
 from .bos import bos
 from .util import REKOBO_LKEY, fsenc, min_ex, retchk, runcmd, uncyg
 

@@ -1,4 +1,24 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0818-1724  `v1.3.16`  gc kiting
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## bugfixes
+* found a janky workaround for [the remaining chrome wasm gc bug](https://bugs.chromium.org/p/chromium/issues/detail?id=1354816)
+  * worker-global typedarray holding on to the first and last byte of the filereader output while wasm chews on it
+  * overhead is small enough, slows down firefox by 2~3%
+  * seems to work on many chrome versions but no guarantees
+    * still OOM's some 93 and 97 betas, probably way more 
+
+## other changes
+* disable `mt` by default on https-desktop-chrome
+  * avoids the gc bug entirely (except for plaintext-http and phones)
+  * chrome [doesn't parallelize](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) `crypto.subtle.digest` anyways
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0817-2302  `v1.3.15`  pls let me stop finding chrome bugs
 
 two browser-bugs in two hours, man i just wanna play horizon

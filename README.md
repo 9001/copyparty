@@ -333,12 +333,14 @@ examples:
   * `u1` can upload files, browse the folder, and see the generated accesskeys
   * other users cannot browse the folder, but can access the files if they have the full file URL with the accesskey
 
+anyone trying to bruteforce a password gets banned according to `--ban-pw`; default is 24h ban for 9 failed attempts in 1 hour
+
 
 # the browser
 
 accessing a copyparty server using a web-browser
 
-![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/129635359-d6dd9b07-8079-4020-ad77-2bfdb9ebd8d5.png)
+![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/192042695-522b3ec7-6845-494a-abdb-d1c0d0e23801.png)
 
 
 ## tabs
@@ -497,7 +499,7 @@ see [up2k](#up2k) for details on how it works, or watch a [demo video](https://a
 
 **protip:** you can avoid scaring away users with [contrib/plugins/minimal-up2k.html](contrib/plugins/minimal-up2k.html) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
 
-**protip:** if you enable `favicon` in the `[⚙️] settings` tab (by typing something into the textbox), the icon in the browser tab will indicate upload progress
+**protip:** if you enable `favicon` in the `[⚙️] settings` tab (by typing something into the textbox), the icon in the browser tab will indicate upload progress -- also, the `[🔔]` and/or `[🔊]` switches enable visible and/or audible notifications on upload completion
 
 the up2k UI is the epitome of polished inutitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
@@ -713,6 +715,7 @@ note:
 * the parser can finally handle `c,e2dsa,e2tsr` so you no longer have to `c,e2dsa:c,e2tsr`
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
+* deduplication is possible on windows if you run copyparty as administrator (not saying you should!)
 
 ### exclude-patterns
 

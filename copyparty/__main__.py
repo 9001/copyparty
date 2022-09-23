@@ -38,10 +38,10 @@ from .util import (
 )
 
 try:
+    from collections.abc import Callable
     from types import FrameType
 
     from typing import Any, Optional
-    from collections.abc import Callable
 except:
     pass
 
