@@ -686,14 +686,16 @@ class Magician(object):
 
         mime = magic.from_file(fpath, mime=True)
         mime = re.split("[; ]", mime, 1)[0]
-        ret = EXTS.get(mime)
+        try:
+            return EXTS[mime]
+        except:
+            pass
 
-        if not ret:
-            mg = mimetypes.guess_extension(mime)
-            if mg:
-                return mg[1:]
-            else:
-                raise Exception()
+        mg = mimetypes.guess_extension(mime)
+        if mg:
+            return mg[1:]
+        else:
+            raise Exception()
 
 
 class Garda(object):

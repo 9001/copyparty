@@ -471,7 +471,7 @@ var Ls = {
 
 		"utl_name": "filnavn",
 		"utl_stat": "status",
-		"utl_prog": "progresjon",
+		"utl_prog": "fremdrift",
 
 		"ul_flagblk": "filene har blitt lagt i køen</b><br>men det er en annen nettleserfane som holder på med befaring eller opplastning akkurat nå,<br>så venter til den er ferdig først",
 
@@ -5039,7 +5039,7 @@ var treectl = (function () {
 
 	r.reqls = function (url, hpush, back) {
 		var xhr = new XHR();
-		xhr.top = url;
+		xhr.top = url.split('?')[0];
 		xhr.back = back
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
@@ -5102,7 +5102,7 @@ var treectl = (function () {
 		if (this.hpush && !showfile.active())
 			hist_push(this.top);
 
-		if (!this.back && !treectl.hidden) {
+		if (!this.back) {
 			var dirs = [];
 			for (var a = 0; a < res.dirs.length; a++)
 				dirs.push(res.dirs[a].href.split('/')[0].split('?')[0]);

@@ -42,10 +42,7 @@ class EnvParams(object):
         self.t0 = time.time()
         self.mod = None
         self.cfg = None
-        try:
-            self.ox = sys.oxidized
-        except:
-            self.ox = False
+        self.ox = getattr(sys, "oxidized", None)
 
 
 E = EnvParams()

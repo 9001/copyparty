@@ -120,7 +120,7 @@ tmpdir="$(
 )"
 
 [ $repack ] && {
-	old="$tmpdir/pe-copyparty"
+	old="$tmpdir/pe-copyparty.$(id -u)"
 	echo "repack of files in $old"
 	cp -pR "$old/"*{py2,j2,ftp,copyparty} .
 }

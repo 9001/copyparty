@@ -235,7 +235,7 @@ function ev(e) {
         return;
 
     if (e.preventDefault)
-        e.preventDefault()
+        e.preventDefault();
 
     if (e.stopPropagation)
         e.stopPropagation();

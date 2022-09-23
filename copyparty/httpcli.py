@@ -822,6 +822,7 @@ class HttpCli(object):
             fn = os.devnull
 
         params.update(open_ka)
+        assert fn
 
         if rnd and not self.args.nw:
             fn = self.rand_name(fdir, fn, rnd)

@@ -2811,6 +2811,7 @@ html.b #tree li {
 html.b #tree li {
 	margin-left: .8em;
 }
+html.b #docul a,
 html.b .ntree a {
 	padding: .6em .2em;
 }
