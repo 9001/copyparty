@@ -1958,13 +1958,16 @@ class Up2k(object):
                         "sprs": sprs,  # dontcare; finished anyways
                         "size": dsize,
                         "lmod": dtime,
-                        "life": cj.get("life"),
                         "addr": ip,
                         "at": at,
                         "hash": [],
                         "need": [],
                         "busy": {},
                     }
+                    for k in ["life"]:
+                        if k in cj:
+                            j[k] = cj[k]
+
                     score = (
                         (3 if st.st_dev == dev else 0)
                         + (2 if dp_dir == cj["prel"] else 0)
@@ -2071,10 +2074,13 @@ class Up2k(object):
                     "name",
                     "size",
                     "lmod",
-                    "life",
                     "poke",
                 ]:
                     job[k] = cj[k]
+
+                for k in ["life"]:
+                    if k in cj:
+                        job[k] = cj[k]
 
                 # one chunk may occur multiple times in a file;
                 # filter to unique values for the list of missing chunks
