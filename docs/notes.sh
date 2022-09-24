@@ -144,6 +144,31 @@ sqlite3 -readonly up2k.db.key-full 'select w, v from mt where k = "key" order by
 
 
 ##
+## tracking bitflips
+
+l=log.tmux-1662316902  # your logfile (tmux-capture or decompressed -lo)
+
+# grab handshakes to a smaller logfile
+tr -d '\r' <$l | awk '/^.\[36m....-..-...\[0m.?$/{d=substr($0,6,10)} !d{next} /"purl": "/{t=substr($1,6);sub(/[^ ]+ /,"");sub(/ .\[34m[0-9]+ /," ");printf("%s %s %s %s\n",d,t,ip,$0)}' | while read d t ip f; do u=$(date +%s --date="${d}T${t}Z"); printf '%s\n' "$u $ip $f"; done > handshakes
+
+# quick list of affected files
+grep 'your chunk got corrupted somehow' -A1 $l | tr -d '\r' | grep -E '^[a-zA-Z0-9_-]{44}$' | sort | uniq | while IFS= read -r x; do grep -F "$x" handshakes | head -c 200; echo; done | sed -r 's/.*"name": "//' | sort | uniq -cw20
+
+# find all cases of corrupt chunks and print their respective handshakes (if any),
+# timestamps are when the corrupted chunk was received (and also the order they are displayed),
+# first checksum is the expected value from the handshake, second is what got uploaded
+awk <$l '/^.\[36m....-..-...\[0m.?$/{d=substr($0,6,10)} /your chunk got corrupted somehow/{n=2;t=substr($1,6);next} !n{next} {n--;sub(/\r$/,"")} n{a=$0;next} {sub(/.\[0m,.*/,"");printf "%s %s %s %s\n",d,t,a,$0}' |
+while read d t h1 h2; do printf '%s %s\n' $d $t; (
+printf '  %s [%s]\n' $h1 "$(grep -F $h1 <handshakes | head -n 1)"
+printf '  %s [%s]\n' $h2 "$(grep -F $h2 <handshakes | head -n 1)"
+) | sed 's/, "sprs":.*//'; done | less -R
+
+# notes; TODO clean up and put in the readme maybe --
+# quickest way to drop the bad files (if a client generated bad hashes for the initial handshake) is shutting down copyparty and moving aside the unfinished file (both the .PARTIAL and the empty placeholder)
+# BUT the clients will immediately re-handshake the upload with the same bitflipped hashes, so the uploaders have to refresh their browsers before you do that,
+# so maybe just ask them to refresh and do nothing for 6 hours so the timeout kicks in, which deletes the placeholders/name-reservations and you can then manually delete the .PARTIALs at some point later
+
+##
 ## media
 
 # split track into test files
