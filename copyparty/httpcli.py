@@ -710,7 +710,13 @@ class HttpCli(object):
                 self.log("urlform: {} bytes, {}".format(post_sz, path))
             elif "print" in opt:
                 reader, _ = self.get_body_reader()
-                for buf in reader:
+                buf = b""
+                for rbuf in reader:
+                    buf += rbuf
+                    if len(buf) > 32768:
+                        break
+
+                if buf:
                     orig = buf.decode("utf-8", "replace")
                     t = "urlform_raw {} @ {}\n  {}\n"
                     self.log(t.format(len(orig), self.vpath, orig))
