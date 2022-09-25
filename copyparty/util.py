@@ -1022,7 +1022,7 @@ def ren_open(
                 ]
                 continue
 
-            if ex.errno not in [36, 63] and (not WINDOWS or ex.errno != 22):
+            if ex.errno not in [36, 63, 95] and (not WINDOWS or ex.errno != 22):
                 raise
 
         if not b64:
