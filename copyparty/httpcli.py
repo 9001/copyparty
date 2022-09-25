@@ -713,7 +713,7 @@ class HttpCli(object):
                 buf = b""
                 for rbuf in reader:
                     buf += rbuf
-                    if len(buf) > 32768:
+                    if not rbuf or len(buf) >= 32768:
                         break
 
                 if buf:

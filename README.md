@@ -1036,7 +1036,9 @@ quick outline of the up2k protocol, see [uploading](#uploading) for the web-clie
   * server writes chunks into place based on the hash
 * client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
 
-up2k has saved a few uploads from becoming corrupted in-transfer already; caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
+up2k has saved a few uploads from becoming corrupted in-transfer already;
+* caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
+* also stopped someone from uploading because their ram was bad
 
 regarding the frequent server log message during uploads;  
 `6.0M 106M/s 2.77G 102.9M/s n948 thank 4/0/3/1 10042/7198 00:01:09`

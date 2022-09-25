@@ -1,4 +1,106 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0924-1245  `v1.4.1`  fix api compat
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+# bugfixes
+* [v1.4.0](https://github.com/9001/copyparty/releases/tag/v1.4.0) accidentally required all clients to use the new up2k.js to continue uploading; support the old js too
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0923-2053  `v1.4.0`  mostly reliable
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* huge folders are lazily rendered for a massive speedup, #11
+  * also reduces the number of `?tree` requests; helps a tiny bit on server load
+* [selfdestruct timer](https://github.com/9001/copyparty#self-destruct) on uploaded files -- see link for howto and side-effects
+* ban clients trying to bruteforce passwords
+  * arg `--ban-pw`, default `9,60,1440`, bans for 1440min after 9 wrong passwords in 60min
+  * clients repeatedly trying the same password (due to a bug or whatever) are not counted
+  * does a `/64` range-ban for IPv6 offenders
+  * arg `--ban-404`, disabled by default, bans for excessive 404s / directory-scanning
+    * but that breaks up2k turbo-mode and probably some other eccentric usecases
+* waveform seekbar [(screenshot)](https://user-images.githubusercontent.com/241032/192042695-522b3ec7-6845-494a-abdb-d1c0d0e23801.png)
+* the up2k upload button can do folders recursively now
+  * but only a single folder can be selected at a time, making drag-drop the obvious choice still
+* gridview is now less jank, #12
+* togglebuttons for desktop-notifications and audio-jingle when upload completes
+* stop exposing uploader IPs when avoiding filename collisions
+  * IPs are now HMAC'ed with urandom stored at `~/.config/copyparty/iphash`
+* stop crashing chrome; generate PNGs rather than SVGs for filetype icons
+* terminate connections with SHUT_WR and flush with siocoutq
+  * makes buggy enterprise proxies behave less buggy
+  * do a read-spin on windows for almost the same effect
+* improved upload scheduling
+  * unfortunately removes the `0.0%, NaN:aN, N.aN MB/s` easteregg
+* arg `--magic` enables filetype detection on nameless uploads based on libmagic
+* mtp modifiers to let tagparsers keep their stdout/stderr instead of capturing
+  * `c0` disables all capturing, `c1` captures stdout only, `c2` only stderr, and `c3` (default) captures both
+* arg `--write-uplog` enables the old default of writing upload reports on POSTs
+  * kinda pointless and was causing issues in prisonparty
+* [upload modifiers](https://github.com/9001/copyparty#write) for terse replies and to randomize filenames
+* other optimizations
+  * 30% faster tag collection on directory listings
+  * 8x faster rendering of huge tagsets
+* new mtps [guestbook](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/guestbook.py) and [guestbook-read](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/guestbook-read.py), for example for comment-fields on uploads
+* arg `--stackmon` now takes dateformat filenames to produce multiple files
+* arg `--mtag-vv` to debug tagparser configs
+* arg `--version` shows copyparty version and exits
+* arg `--license` shows a list of embedded dependencies + their licenses
+* arg `--no-forget` and volflag `:c,noforget` keeps deleted files in the up2k db/index
+  * useful if you're shuffling uploads to s3/gdrive/etc and still want deduplication
+
+## bugfixes
+* upload deduplication using symlinks on windows
+* increase timeouts to run better on servers with extremely overloaded HDDs
+  * arg `--mtag-to` (default 60 sec, was 10) can be reduced for faster tag scanning
+* incorrect filekeys for files symlinked into another volume
+* playback could start mid-song if skipping back and forth between songs
+* use affinity mask to determine how many CPU cores are available
+* restore .bin-suffix for nameless PUT/POSTs (disappeared in v1.0.11)
+* fix glitch in uploader-UI when upload queue is bigger than 1 TiB
+* avoid a firefox race-condition accessing the navigation history
+* sfx tmpdir keepalive when flipflopping between unix users
+* reject anon ftp if anon has no read/write
+* improved autocorrect for poor ffmpeg builds
+* patch popen on older pythons so collecting tags on windows is always possible
+* misc ui/ux fixes
+  * filesearch layout in read-only folders
+  * more comfy fadein/fadeout on play/pause
+  * total-ETA going crazy when an overloaded server drops requests
+  * stop trying to play into the next folder while in search results
+  * improve warnings/errors in the uploader ui
+    * some errors which should have been warnings are now warnings
+    * autohide warnings/errors when they are remedied
+  * delay starting the audiocontext until necessary
+    * reduces cpu-load by 0.2% and fixes chrome claiming the tab is playing audio
+
+# copyparty.exe
+
+now introducing [copyparty.exe](https://github.com/9001/copyparty/releases/download/v1.4.0/copyparty.exe)!   only suitable for the rainiest of days ™
+
+[first thing you'll see](https://user-images.githubusercontent.com/241032/192070274-bfe0bfef-2293-40fc-8852-fcf4f7a90043.png) when you run it is a warning to **«please use the [python-sfx](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) instead»**,
+* `copyparty.exe` was compiled using 32bit python3.7 to support windows7, meaning it won't receive any security patches
+* `copyparty-sfx.py` uses your system libraries instead so it'll stay safe for much longer while also having better performance
+
+so the exe might be super useful in a pinch on a secluded LAN but otherwise *Absolutely Not Recommended*
+
+you can download [ffmpeg](https://ocv.me/stuff/bin/ffmpeg.exe) and [ffprobe](https://ocv.me/stuff/bin/ffprobe.exe) into the same folder if you want multimedia-info, audio-transcoding or thumbnails/spectrograms/waveforms -- those binaries were [built](https://github.com/9001/copyparty/tree/hovudstraum/scripts/pyinstaller#ffmpeg) with just enough features to cover what copyparty wants, but much like copyparty.exe itself (so due to security reasons) it is strongly recommended to instead grab a [recent official build](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) every once in a while
+
+## and finally some good news
+
+* the chrome memory leak will be [fixed in v107](https://bugs.chromium.org/p/chromium/issues/detail?id=1354816)
+* and firefox may fix the crash in [v106 or so](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500)
+* and the release title / this season's codename stems from a cpp instance recently being slammed with terabytes of uploads running on a struggling server mostly without breaking a sweat 👍
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0818-1724  `v1.3.16`  gc kiting
 
 * read-only demo server at https://a.ocv.me/pub/demo/
