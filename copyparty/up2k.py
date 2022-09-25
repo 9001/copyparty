@@ -2975,8 +2975,18 @@ class Up2k(object):
             for x in reg.values()
             if x["need"] and now - x["poke"] > self.snap_discard_interval
         ]
-        if rm:
-            t = "dropping {} abandoned uploads in {}".format(len(rm), ptop)
+
+        lost = [
+            x
+            for x in reg.values()
+            if x["need"]
+            and not bos.path.exists(os.path.join(x["ptop"], x["prel"], x["name"]))
+        ]
+
+        if rm or lost:
+            t = "dropping {} abandoned, {} deleted uploads in {}"
+            t = t.format(len(rm), len(lost), ptop)
+            rm.extend(lost)
             vis = [self._vis_job_progress(x) for x in rm]
             self.log("\n".join([t] + vis))
             for job in rm:
@@ -2986,7 +2996,10 @@ class Up2k(object):
                     path = os.path.join(job["ptop"], job["prel"], job["name"])
                     if bos.path.getsize(path) == 0:
                         bos.unlink(path)
+                except:
+                    pass
 
+                try:
                     if len(job["hash"]) == len(job["need"]):
                         # PARTIAL is empty, delete that too
                         path = os.path.join(job["ptop"], job["prel"], job["tnam"])
