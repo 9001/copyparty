@@ -480,17 +480,10 @@ class SvcHub(object):
             print(*a, **ka)
 
     def check_mp_support(self) -> str:
-        vmin = sys.version_info[1]
-        if WINDOWS:
-            msg = "need python 3.3 or newer for multiprocessing;"
-            if PY2 or vmin < 3:
-                return msg
-        elif MACOS:
+        if MACOS:
             return "multiprocessing is wonky on mac osx;"
-        else:
-            msg = "need python 3.3+ for multiprocessing;"
-            if PY2 or vmin < 3:
-                return msg
+        elif sys.version_info < (3, 3):
+            return "need python 3.3 or newer for multiprocessing;"
 
         try:
             x: mp.Queue[tuple[str, str]] = mp.Queue(1)

@@ -27,7 +27,7 @@ SIZE = None
 CKSUM = None
 STAMP = None
 
-PY2 = sys.version_info[0] == 2
+PY2 = sys.version_info < (3,)
 WINDOWS = sys.platform in ["win32", "msys"]
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))

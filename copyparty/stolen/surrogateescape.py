@@ -16,7 +16,7 @@ import codecs
 import platform
 import sys
 
-PY3 = sys.version_info[0] > 2
+PY3 = sys.version_info > (3,)
 WINDOWS = platform.system() == "Windows"
 FS_ERRORS = "surrogateescape"
 
@@ -24,20 +24,6 @@ try:
     from typing import Any
 except:
     pass
-
-
-def u(text: Any) -> str:
-    if PY3:
-        return text
-    else:
-        return text.decode("unicode_escape")
-
-
-def b(data: Any) -> bytes:
-    if PY3:
-        return data.encode("latin1")
-    else:
-        return data
 
 
 if PY3:
@@ -171,9 +157,6 @@ def decodefilename(fn: bytes) -> str:
 
 
 FS_ENCODING = sys.getfilesystemencoding()
-# FS_ENCODING = "ascii"; fn = b("[abc\xff]"); encoded = u("[abc\udcff]")
-# FS_ENCODING = 'cp932'; fn = b('[abc\x81\x00]'); encoded = u('[abc\udc81\x00]')
-# FS_ENCODING = 'UTF-8'; fn = b('[abc\xff]'); encoded = u('[abc\udcff]')
 
 
 if WINDOWS and not PY3:

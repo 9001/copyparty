@@ -120,7 +120,7 @@ else:
     FS_ENCODING = sys.getfilesystemencoding()
 
 
-SYMTIME = sys.version_info >= (3, 6) and os.utime in os.supports_follow_symlinks
+SYMTIME = sys.version_info > (3, 6) and os.utime in os.supports_follow_symlinks
 
 HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 

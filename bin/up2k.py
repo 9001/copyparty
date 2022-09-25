@@ -48,7 +48,7 @@ except ImportError:
 
 
 # from copyparty/__init__.py
-PY2 = sys.version_info[0] == 2
+PY2 = sys.version_info < (3,)
 if PY2:
     from Queue import Queue
     from urllib import unquote

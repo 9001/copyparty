@@ -11,7 +11,7 @@ try:
 except:
     TYPE_CHECKING = False
 
-PY2 = sys.version_info[0] == 2
+PY2 = sys.version_info < (3,)
 if PY2:
     sys.dont_write_bytecode = True
     unicode = unicode  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
