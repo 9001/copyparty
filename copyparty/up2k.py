@@ -45,6 +45,7 @@ from .util import (
     s3dec,
     s3enc,
     sanitize_fn,
+    spack,
     statdir,
     vjoin,
     vsplit,
@@ -689,10 +690,8 @@ class Up2k(object):
         rei = vol.flags.get("noidx")
         reh = vol.flags.get("nohash")
         n4g = bool(vol.flags.get("noforget"))
-
-        dev = 0
-        if vol.flags.get("xdev"):
-            dev = bos.stat(top).st_dev
+        cst = bos.stat(top)
+        dev = cst.st_dev if vol.flags.get("xdev") else 0
 
         with self.mutex:
             reg = self.register_vpath(top, vol.flags)
@@ -728,6 +727,7 @@ class Up2k(object):
                     reh,
                     n4g,
                     [],
+                    cst,
                     dev,
                     bool(vol.flags.get("xvol")),
                 )
@@ -764,6 +764,7 @@ class Up2k(object):
         reh: Optional[Pattern[str]],
         n4g: bool,
         seen: list[str],
+        cst: os.stat_result,
         dev: int,
         xvol: bool,
     ) -> int:
@@ -818,7 +819,7 @@ class Up2k(object):
                 # self.log(" dir: {}".format(abspath))
                 try:
                     ret += self._build_dir(
-                        db, top, excl, abspath, rap, rei, reh, n4g, seen, dev, xvol
+                        db, top, excl, abspath, rap, rei, reh, n4g, seen, inf, dev, xvol
                     )
                 except:
                     t = "failed to index subdir [{}]:\n{}"
@@ -851,6 +852,7 @@ class Up2k(object):
                 zh = hashlib.sha1()
                 _ = [zh.update(str(x).encode("utf-8", "replace")) for x in files]
 
+            zh.update(spack(b"<d", cst.st_mtime))
             dhash = base64.urlsafe_b64encode(zh.digest()[:12]).decode("ascii")
             sql = "select d from dh where d = ? and h = ?"
             try:
@@ -941,25 +943,25 @@ class Up2k(object):
             return -1
 
         # drop shadowed folders
-        for rd in unreg:
+        for sh_rd in unreg:
             n = 0
             q = "select count(w) from up where (rd = ? or rd like ?||'%') and at == 0"
-            for erd in [rd, "//" + w8b64enc(rd)]:
+            for sh_erd in [sh_rd, "//" + w8b64enc(sh_rd)]:
                 try:
-                    n = db.c.execute(q, (erd, erd + "/")).fetchone()[0]
+                    n = db.c.execute(q, (sh_erd, sh_erd + "/")).fetchone()[0]
                     break
                 except:
                     pass
 
             if n:
                 t = "forgetting {} shadowed autoindexed files in [{}] > [{}]"
-                self.log(t.format(n, top, rd))
+                self.log(t.format(n, top, sh_rd))
 
                 q = "delete from dh where (d = ? or d like ?||'%')"
-                db.c.execute(q, (erd, erd + "/"))
+                db.c.execute(q, (sh_erd, sh_erd + "/"))
 
                 q = "delete from up where (rd = ? or rd like ?||'%') and at == 0"
-                db.c.execute(q, (erd, erd + "/"))
+                db.c.execute(q, (sh_erd, sh_erd + "/"))
                 ret += n
 
         if n4g:
@@ -1924,6 +1926,7 @@ class Up2k(object):
             reg = self.registry[cj["ptop"]]
             vfs = self.asrv.vfs.all_vols[cj["vtop"]]
             n4g = vfs.flags.get("noforget")
+            lost: list[tuple[str, str]] = []
             if cur:
                 if self.no_expr_idx:
                     q = r"select * from up where w = ?"
@@ -1948,6 +1951,7 @@ class Up2k(object):
                         if n4g:
                             st = os.stat_result((0, -1, -1, 0, 0, 0, 0, 0, 0, 0))
                         else:
+                            lost.append((dp_dir, dp_fn))
                             continue
 
                     j = {
@@ -1979,6 +1983,12 @@ class Up2k(object):
                 if job and wark in reg:
                     # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
                     del reg[wark]
+
+                if lost:
+                    for dp_dir, dp_fn in lost:
+                        self.db_rm(cur, dp_dir, dp_fn)
+
+                    cur.connection.commit()
 
             if job or wark in reg:
                 job = job or reg[wark]
