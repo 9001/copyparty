@@ -1786,7 +1786,7 @@ def yieldfile(fn: str) -> Generator[bytes, None, None]:
 
 
 def hashcopy(
-    fin: Union[typing.BinaryIO, Generator[bytes, None, None]],
+    fin: Generator[bytes, None, None],
     fout: Union[typing.BinaryIO, typing.IO[Any]],
     slp: int = 0,
     max_sz: int = 0,

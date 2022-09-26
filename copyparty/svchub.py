@@ -24,7 +24,7 @@ try:
 except:
     pass
 
-from .__init__ import ANYWIN, MACOS, PY2, VT100, WINDOWS, EnvParams, unicode
+from .__init__ import ANYWIN, MACOS, VT100, EnvParams, unicode
 from .authsrv import AuthSrv
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv

@@ -750,6 +750,9 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to Path every S second, for example --stackmon=./st/%%Y-%%m/%%d/%%H%%M.xz,60")
     ap2.add_argument("--log-thrs", metavar="SEC", type=float, help="list active threads every SEC")
     ap2.add_argument("--log-fk", metavar="REGEX", type=u, default="", help="log filekey params for files where path matches REGEX; '.' (a single dot) = all files")
+    ap2.add_argument("--bak-flips", action="store_true", help="[up2k] if a client uploads a bitflipped/corrupted chunk, store a copy according to --bf-nc and --bf-dir")
+    ap2.add_argument("--bf-nc", metavar="NUM", type=int, default=200, help="bak-flips: stop if there's more than NUM files at --kf-dir already; default: 6.3 GiB max (200*32M)")
+    ap2.add_argument("--bf-dir", metavar="PATH", type=u, default="bf", help="bak-flips: store corrupted chunks at PATH; default: folder named 'bf' wherever copyparty was started")
     # fmt: on
 
     ap2 = ap.add_argument_group("help sections")

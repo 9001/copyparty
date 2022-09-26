@@ -82,6 +82,7 @@ from .util import (
 
 try:
     from typing import Any, Generator, Match, Optional, Pattern, Type, Union
+    import typing
 except:
     pass
 
@@ -920,6 +921,38 @@ class HttpCli(object):
         self.reply(t.encode("utf-8"))
         return True
 
+    def bakflip(self, f: typing.BinaryIO, ofs: int, sz: int, sha: str) -> None:
+        if not self.args.bak_flips or self.args.nw:
+            return
+
+        sdir = self.args.bf_dir
+        fp = os.path.join(sdir, sha)
+        if bos.path.exists(fp):
+            return self.log("no bakflip; have it", 6)
+
+        if not bos.path.isdir(sdir):
+            bos.makedirs(sdir)
+
+        if len(bos.listdir(sdir)) >= self.args.bf_nc:
+            return self.log("no bakflip; too many", 3)
+
+        nrem = sz
+        f.seek(ofs)
+        with open(fp, "wb") as fo:
+            while nrem:
+                buf = f.read(min(nrem, 512 * 1024))
+                if not buf:
+                    break
+
+                nrem -= len(buf)
+                fo.write(buf)
+
+        if nrem:
+            self.log("bakflip truncated; {} remains".format(nrem), 1)
+            atomic_move(fp, fp + ".trunc")
+        else:
+            self.log("bakflip ok", 2)
+
     def rand_name(self, fdir: str, fn: str, rnd: int) -> str:
         ok = False
         try:
@@ -1177,6 +1210,11 @@ class HttpCli(object):
                 post_sz, _, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
 
                 if sha_b64 != chash:
+                    try:
+                        self.bakflip(f, cstart[0], post_sz, sha_b64)
+                    except:
+                        self.log("bakflip failed: " + min_ex())
+
                     t = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
                     raise Pebkac(400, t.format(post_sz, chash, sha_b64))
 
