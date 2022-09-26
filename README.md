@@ -1074,6 +1074,7 @@ below are some tweaks roughly ordered by usefulness:
 * `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
+* `--no-htp --hash-mt=0 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
 * `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
   * huge amount of short-lived connections
   * really heavy traffic (downloads/uploads)

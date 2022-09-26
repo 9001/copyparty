@@ -224,7 +224,6 @@ tmpdir="$(
 
 	# remove type hints before build instead
 	(cd copyparty; "$pybin" ../../scripts/strip_hints/a.py; rm uh)
-}
 
 f=../build/mit.txt
 [ -e $f ] ||
@@ -265,6 +264,8 @@ while IFS= read -r x; do
 	p=$(( (80-n)/2 ))
 	printf "%${p}s\033[07m%s\033[0m\n" "" "$x"
 done > copyparty/res/COPYING.txt
+
+}
 
 ver=
 [ -z "$repack" ] &&

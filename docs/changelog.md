@@ -1,4 +1,22 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0925-1236  `v1.4.2`  fuhgeddaboudit
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* forget incoming uploads by deleting the name-reservation
+  * (the zerobyte file with the actual filename, not the .PARTIAL)
+  * can take 5min to kick in
+
+## bugfixes
+* zfs on ubuntu 20.04 would reject files with big unicode names such as `148. Профессор Лебединский, Виктор Бондарюк, Дмитрий Нагиев - Я её хой (Я танцую пьяный на столе) (feat. Виктор Бондарюк & Дмитрий Нагиев).mp3`
+  * usually not a problem since copyparty truncates names to fit filesystem limits, except zfs uses a nonstandard errorcode
+* in the "print-message-to-serverlog" feature, a unicode message larger than one tcp-frame could decode incorrectly
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0924-1245  `v1.4.1`  fix api compat
 
 * read-only demo server at https://a.ocv.me/pub/demo/
