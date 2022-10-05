@@ -928,7 +928,7 @@ function up2k_init(subtle) {
     r.st = st;
     r.uc = uc;
 
-    if (!window.File || !File.prototype.slice || !window.FileReader || !window.FileList)
+    if (!window.File || !window.FileReader || !window.FileList || !File.prototype || !File.prototype.slice)
         return un2k(L.u_ever);
 
     var flag = false;

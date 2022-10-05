@@ -1052,7 +1052,7 @@ function goto(dest) {
 
 	clmod(document.documentElement, 'op_open', dest);
 
-	if (window['treectl'])
+	if (treectl)
 		treectl.onscroll();
 }
 
@@ -1508,7 +1508,7 @@ var widget = (function () {
 		clmod(document.documentElement, 'np_open', is_open);
 		clmod(widget, 'open', is_open);
 		bcfg_set('au_open', r.is_open = is_open);
-		if (window.vbar) {
+		if (vbar) {
 			pbar.onresize();
 			vbar.onresize();
 		}
@@ -2421,7 +2421,7 @@ function play(tid, is_ev, seek) {
 	clmod(ebi(oid), 'act', 1);
 	clmod(ebi(oid).closest('tr'), 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
-	if (window.thegrid)
+	if (thegrid)
 		thegrid.loadsel();
 
 	try {
@@ -3392,7 +3392,7 @@ var showfile = (function () {
 	}
 
 	r.setstyle = function () {
-		if (window['no_prism'])
+		if (window.no_prism)
 			return;
 
 		qsr('#prism_css');
@@ -3521,7 +3521,7 @@ var showfile = (function () {
 		else {
 			el.textContent = txt;
 			el.innerHTML = '<code>' + el.innerHTML + '</code>';
-			if (!window['no_prism']) {
+			if (!window.no_prism) {
 				el.className = 'prism linkable-line-numbers line-numbers language-' + lang;
 				if (!defer)
 					fun(el.firstChild);
@@ -3747,7 +3747,7 @@ var thegrid = (function () {
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
 		qsr('#docname');
-		if (window['treectl'])
+		if (treectl)
 			treectl.textmode(false);
 
 		aligngriditems();
@@ -4610,7 +4610,7 @@ document.onkeydown = function (e) {
 })();
 
 function aligngriditems() {
-	if (!window.treectl)
+	if (!treectl)
 		return;
 
 	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
@@ -5496,7 +5496,7 @@ function apply_perms(newperms) {
 				'table-cell' : 'none';
 	}
 
-	if (window['up2k'])
+	if (up2k)
 		up2k.set_fsearch();
 
 	ebi('widget').style.display = have_read ? '' : 'none';
@@ -5629,7 +5629,7 @@ var filecols = (function () {
 			for (var b = 0, bb = tds.length; b < bb; b++)
 				tds[b].className = cls;
 		}
-		if (window['tt']) {
+		if (tt) {
 			tt.att(ebi('hcols'));
 			tt.att(QS('#files>thead'));
 		}
@@ -6215,7 +6215,7 @@ function show_md(md, name, div, url, depth) {
 	if (url != now)
 		return;
 
-	if (!window['marked']) {
+	if (!marked) {
 		if (depth)
 			return toast.warn(10, errmsg + 'failed to load marked.js')
 
@@ -6579,7 +6579,7 @@ function reload_browser() {
 	for (var a = 0; a < ns.length; a++)
 		clmod(ebi(ns[a]), 'hidden', ebi('unsearch'));
 
-	if (window['up2k'])
+	if (up2k)
 		up2k.set_fsearch();
 
 	thegrid.setdirty();

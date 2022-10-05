@@ -1,12 +1,13 @@
 "use strict";
 
-if (!window['console'])
-    window['console'] = {
+if (!window.console || !console.log)
+    window.console = {
         "log": function (msg) { }
     };
 
 
 var wah = '',
+    L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,
     CB = '?_=' + Date.now(),
     HALFMAX = 8192 * 8192 * 8192 * 8192,
     HTTPS = (window.location + '').indexOf('https:') === 0,
@@ -16,6 +17,15 @@ var wah = '',
     FIREFOX = ('netscape' in window) && / rv:/.test(navigator.userAgent),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
+
+if (!window.WebAssembly || !WebAssembly.Memory)
+    window.WebAssembly = false;
+
+if (!window.Notification || !Notification.permission)
+    window.Notification = false;
+
+if (!window.FormData)
+    window.FormData = false;
 
 try {
     CB = '?' + document.currentScript.src.split('?').pop();
@@ -381,13 +391,14 @@ function clgot(el, cls) {
 
 
 var ANIM = true;
-if (window.matchMedia) {
+try {
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     mq.onchange = function () {
         ANIM = !mq.matches;
     };
     ANIM = !mq.matches;
 }
+catch (ex) { }
 
 
 function yscroll() {
@@ -747,7 +758,7 @@ function lhumantime(v) {
     var t = shumantime(v, 1),
         tp = t.replace(/([a-z])/g, " $1 ").split(/ /g).slice(0, -1);
 
-    if (!window.L || tp.length < 2 || tp[1].indexOf('$') + 1)
+    if (!L || tp.length < 2 || tp[1].indexOf('$') + 1)
         return t;
 
     var ret = '';
@@ -1251,8 +1262,8 @@ var modal = (function () {
         tok, tng, prim, sec, ok_cancel;
 
     r.load = function () {
-        tok = (window.L && L.m_ok) || 'OK';
-        tng = (window.L && L.m_ng) || 'Cancel';
+        tok = (L && L.m_ok) || 'OK';
+        tng = (L && L.m_ng) || 'Cancel';
         prim = '<a href="#" id="modal-ok">' + tok + '</a>';
         sec = '<a href="#" id="modal-ng">' + tng + '</a>';
         ok_cancel = WINDOWS ? prim + sec : sec + prim;
@@ -1612,7 +1623,7 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
         return true;
 
     if (xhr.status == 403)
-        return toast.err(0, prefix + (window.L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"), tag);
+        return toast.err(0, prefix + (L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"), tag);
 
     if (xhr.status == 404)
         return toast.err(0, prefix + e404, tag);
