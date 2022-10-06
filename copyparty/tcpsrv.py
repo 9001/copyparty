@@ -8,7 +8,7 @@ import sys
 
 from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, unicode
 from .stolen.qrcodegen import QrCode
-from .util import chkcmd, sunpack
+from .util import chkcmd, sunpack, termsize
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -391,7 +391,18 @@ class TcpSrv(object):
         if PY2:
             btxt = sunpack(b"B" * len(btxt), btxt)
 
-        qr = QrCode.encode_binary(btxt).render()
+        pad = self.args.qr_pad
+        zoom = self.args.qr_zoom
+        qrc = QrCode.encode_binary(btxt)
+        if zoom == 0:
+            try:
+                tw, th = termsize()
+                tsz = min(tw // 2, th)
+                zoom = 1 if qrc.size + pad * 2 >= tsz else 2
+            except:
+                zoom = 1
+
+        qr = qrc.render(zoom, pad)
         if not VT100:
             return "{}\n{}".format(txt, qr)
 
