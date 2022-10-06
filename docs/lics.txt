@@ -16,6 +16,10 @@ https://github.com/giampaolo/pyftpdlib/
 C: 2007 Giampaolo Rodola'
 L: MIT
 
+https://github.com/nayuki/QR-Code-generator
+C: Project Nayuki
+L: MIT
+
 https://github.com/python/cpython/blob/3.10/Lib/asyncore.py
 C: 1996 Sam Rushing
 L: ISC

@@ -9,6 +9,7 @@ import threading
 
 import queue
 
+from .__init__ import ANYWIN
 from .authsrv import AuthSrv
 from .broker_util import BrokerCli, ExceptionalQueue
 from .httpsrv import HttpSrv
@@ -48,7 +49,11 @@ class MpWorker(BrokerCli):
         # we inherited signal_handler from parent,
         # replace it with something harmless
         if not FAKE_MP:
-            for sig in [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]:
+            sigs = [signal.SIGINT, signal.SIGTERM]
+            if not ANYWIN:
+                sigs.append(signal.SIGUSR1)
+
+            for sig in sigs:
                 signal.signal(sig, self.signal_handler)
 
         # starting to look like a good idea

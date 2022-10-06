@@ -580,6 +580,15 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
+    ap2 = ap.add_argument_group('qr options')
+    ap2.add_argument("--qr", action="store_true", help="show http:// QR-code on startup")
+    ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
+    ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m] (also enables --qr if not --qrs)")
+    ap2.add_argument("--qr-ip", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX")
+    ap2.add_argument("--qr-fg", metavar="COLOR", type=int, default=16, help="foreground")
+    ap2.add_argument("--qr-bg", metavar="COLOR", type=int, default=229, help="background (white=255)")
+    ap2.add_argument("--qr-pad", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more)")
+
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
     ap2.add_argument("--plain-ip", action="store_true", help="when avoiding filename collisions by appending the uploader's ip to the filename: append the plaintext ip instead of salting and hashing the ip")
@@ -824,8 +833,10 @@ def main(argv: Optional[list[str]] = None) -> None:
         time.sleep(2)
 
     try:
-        if len(argv) == 1 and (ANYWIN or not os.geteuid()):
-            argv.extend(["-p80,443,3923", "--ign-ebind"])
+        if len(argv) == 1:
+            argv.extend(["--qr"])
+            if ANYWIN or not os.geteuid():
+                argv.extend(["-p80,443,3923", "--ign-ebind"])
     except:
         pass
 
@@ -907,6 +918,9 @@ def main(argv: Optional[list[str]] = None) -> None:
         if val not in okays.split():
             zs = "argument {} cannot be '{}'; try one of these: {}"
             raise Exception(zs.format(arg, val, okays))
+
+    if al.qrl and not al.qrs:
+        al.qr = True
 
     if HAVE_SSL:
         if al.ssl_ver:

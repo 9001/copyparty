@@ -6,8 +6,9 @@ import re
 import socket
 import sys
 
-from .__init__ import ANYWIN, MACOS, TYPE_CHECKING, unicode
-from .util import chkcmd
+from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, unicode
+from .stolen.qrcodegen import QrCode
+from .util import chkcmd, sunpack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -30,6 +31,7 @@ class TcpSrv(object):
         self.stopping = False
         self.srv: list[socket.socket] = []
         self.nsrv = 0
+        self.qr = ""
         ok: dict[str, list[int]] = {}
         for ip in self.args.i:
             ok[ip] = []
@@ -60,6 +62,8 @@ class TcpSrv(object):
                 for x in nonlocals:
                     eps[x] = "external"
 
+        qr1 = {}
+        qr2 = {}
         msgs = []
         title_tab: dict[str, dict[str, int]] = {}
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
@@ -77,6 +81,13 @@ class TcpSrv(object):
 
                 msgs.append(t.format(proto, ip, port, desc))
 
+                is_ext = "external" in unicode(desc)
+                qrt = qr1 if is_ext else qr2
+                try:
+                    qrt[ip].append(port)
+                except:
+                    qrt[ip] = [port]
+
                 if not self.args.wintitle:
                     continue
 
@@ -86,7 +97,7 @@ class TcpSrv(object):
                     ep = "{}:{}".format(ip, port)
 
                 hits = []
-                if "pub" in title_vars and "external" in unicode(desc):
+                if "pub" in title_vars and is_ext:
                     hits.append(("pub", ep))
 
                 if "pub" in title_vars or "all" in title_vars:
@@ -109,6 +120,9 @@ class TcpSrv(object):
 
         if self.args.wintitle:
             self._set_wintitle(title_tab)
+
+        if self.args.qr or self.args.qrs:
+            self.qr = self._qr(qr1, qr2)
 
     def _listen(self, ip: str, port: int) -> None:
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -346,3 +360,41 @@ class TcpSrv(object):
 
         print("\033]0;{}\033\\".format(title), file=sys.stderr, end="")
         sys.stderr.flush()
+
+    def _qr(self, t1: dict[str, list[int]], t2: dict[str, list[int]]) -> str:
+        ip = None
+        for ip in list(t1) + list(t2):
+            if ip.startswith(self.args.qr_ip):
+                break
+            ip = ""
+
+        if not ip:
+            # maybe /bin/ip is missing or smth
+            ip = self.args.qr_ip
+
+        if not ip:
+            return ""
+
+        if self.args.http_only:
+            https = ""
+        elif self.args.https_only:
+            https = "s"
+        else:
+            https = "s" if self.args.qrs else ""
+
+        ports = t1.get(ip, t2.get(ip, []))
+        dport = 443 if https else 80
+        port = "" if dport in ports or not ports else ":{}".format(ports[0])
+        txt = "http{}://{}{}/{}".format(https, ip, port, self.args.qrl)
+
+        btxt = txt.encode("utf-8")
+        if PY2:
+            btxt = sunpack(b"B" * len(btxt), btxt)
+
+        qr = QrCode.encode_binary(btxt).render()
+        if not VT100:
+            return "{}\n{}".format(txt, qr)
+
+        qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
+        t = "{} \033[0;38;5;{};48;5;{}m\033[J\n{}\033[999G\033[0m\033[J"
+        return t.format(txt, self.args.qr_fg, self.args.qr_bg, qr)

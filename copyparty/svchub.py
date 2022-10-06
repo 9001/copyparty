@@ -222,7 +222,11 @@ class SvcHub(object):
             return
 
         time.sleep(0.1)  # purely cosmetic dw
-        self.log("root", "workers OK\n")
+        if self.tcpsrv.qr:
+            self.log("qr-code", self.tcpsrv.qr)
+        else:
+            self.log("root", "workers OK\n")
+
         self.up2k.init_vols()
 
         thr = threading.Thread(target=self.sd_notify, name="sd-notify")
@@ -269,7 +273,8 @@ class SvcHub(object):
 
         msg = "[+] opened logfile [{}]\n".format(fn)
         printed += msg
-        lh.write("t0: {:.3f}\nargv: {}\n\n{}".format(self.E.t0, " ".join(argv), printed))
+        t = "t0: {:.3f}\nargv: {}\n\n{}"
+        lh.write(t.format(self.E.t0, " ".join(argv), printed))
         self.logf = lh
         self.logf_base_fn = base_fn
         print(msg, end="")

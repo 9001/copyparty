@@ -81,8 +81,8 @@ from .util import (
 )
 
 try:
-    from typing import Any, Generator, Match, Optional, Pattern, Type, Union
     import typing
+    from typing import Any, Generator, Match, Optional, Pattern, Type, Union
 except:
     pass
 
