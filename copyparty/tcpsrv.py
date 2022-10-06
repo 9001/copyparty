@@ -391,6 +391,8 @@ class TcpSrv(object):
         if PY2:
             btxt = sunpack(b"B" * len(btxt), btxt)
 
+        fg = self.args.qr_fg
+        bg = self.args.qr_bg
         pad = self.args.qr_pad
         zoom = self.args.qr_zoom
         qrc = QrCode.encode_binary(btxt)
@@ -406,6 +408,13 @@ class TcpSrv(object):
         if not VT100:
             return "{}\n{}".format(txt, qr)
 
+        def ansify(m: re.Match) -> str:
+            t = "\033[40;48;5;{}m{}\033[47;48;5;{}m"
+            return t.format(fg, " " * len(m.group(1)), bg)
+
+        if zoom > 1:
+            qr = re.sub("(█+)", ansify, qr)
+
         qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
         t = "{} \033[0;38;5;{};48;5;{}m\033[J\n{}\033[999G\033[0m\033[J"
-        return t.format(txt, self.args.qr_fg, self.args.qr_bg, qr)
+        return t.format(txt, fg, bg, qr)
