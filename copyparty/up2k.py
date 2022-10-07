@@ -2315,7 +2315,7 @@ class Up2k(object):
             flt = job["life"]
             vfs = self.asrv.vfs.all_vols[job["vtop"]]
             vlt = vfs.flags["lifetime"]
-            if vlt and flt < vlt:
+            if vlt and flt > 1 and flt < vlt:
                 upt -= vlt - flt
                 wake_sr = True
                 t = "using client lifetime; at={:.0f} ({}-{})"

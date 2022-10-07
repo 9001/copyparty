@@ -246,12 +246,18 @@ window.baguetteBox = (function () {
     }
 
     function keyDownHandler(e) {
-        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing || modal.busy)
+        if (anymod(e, true) || modal.busy)
             return;
 
         var k = e.code + '', v = vid(), pos = -1;
 
-        if (k == "ArrowLeft" || k == "KeyJ")
+        if (k == "BracketLeft")
+            setloop(1);
+        else if (k == "BracketRight")
+            setloop(2);
+        else if (e.shiftKey)
+            return;
+        else if (k == "ArrowLeft" || k == "KeyJ")
             showPreviousImage();
         else if (k == "ArrowRight" || k == "KeyL")
             showNextImage();
@@ -289,10 +295,6 @@ window.baguetteBox = (function () {
             rotn(e.shiftKey ? -1 : 1);
         else if (k == "KeyY")
             dlpic();
-        else if (k == "BracketLeft")
-            setloop(1);
-        else if (k == "BracketRight")
-            setloop(2);
     }
 
     function anim() {
@@ -406,7 +408,7 @@ window.baguetteBox = (function () {
     }
 
     function keyUpHandler(e) {
-        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+        if (anymod(e))
             return;
 
         var k = e.code + '';

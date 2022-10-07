@@ -2497,7 +2497,7 @@ function up2k_init(subtle) {
     tt.att(QS('#u2conf'));
 
     function bumpthread2(e) {
-        if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing)
+        if (anymod(e))
             return;
 
         if (e.code == 'ArrowUp')
@@ -2571,6 +2571,7 @@ function up2k_init(subtle) {
         el.innerHTML = '<div>' + L.u_life_cfg + '</div><div>' + L.u_life_est + '</div><div id="undor"></div>';
         set_life(Math.min(lifetime, icfg_get('lifetime', lifetime)));
         ebi('lifem').oninput = ebi('lifeh').oninput = mod_life;
+        ebi('lifem').onkeydown = ebi('lifeh').onkeydown = kd_life;
         tt.att(ebi('u2life'));
     }
     draw_life();
@@ -2596,12 +2597,23 @@ function up2k_init(subtle) {
         set_life(v);
     }
 
+    function kd_life(e) {
+        var el = e.target,
+            d = e.code == 'ArrowUp' ? 1 : e.code == 'ArrowDown' ? -1 : 0;
+
+        if (anymod(e) || !d)
+            return;
+
+        el.value = parseInt(el.value) + d;
+        mod_life(e);
+    }
+
     function set_life(v) {
         //ebi('lifes').value = v;
         ebi('lifem').value = parseInt(v / 60);
         ebi('lifeh').value = parseInt(v / 3600);
 
-        var undo = have_unpost - (v || lifetime);
+        var undo = have_unpost - (v ? lifetime - v : 0);
         ebi('undor').innerHTML = undo <= 0 ?
             L.u_unp_ng : L.u_unp_ok.format(lhumantime(undo));
 

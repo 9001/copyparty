@@ -239,6 +239,11 @@ function ctrl(e) {
 }
 
 
+function anymod(e, shift_ok) {
+    return e && (e.ctrlKey || e.altKey || e.metaKey || e.isComposing || (!shift_ok && e.shiftKey));
+}
+
+
 function ev(e) {
     e = e || window.event;
     if (!e)
