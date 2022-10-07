@@ -6415,7 +6415,7 @@ var unpost = (function () {
 
 		for (var a = n; a < n2; a++)
 			if (QS('#op_unpost a.n' + a))
-				req.push(uricom_dec(r.files[a].vp));
+				req.push(uricom_dec(r.files[a].vp.split('?')[0]));
 
 		var links = QSA('#op_unpost a.n' + n);
 		for (var a = 0, aa = links.length; a < aa; a++) {

@@ -2321,10 +2321,17 @@ class HttpCli(object):
         ret: list[dict[str, Any]] = []
         t0 = time.time()
         lim = time.time() - self.args.unpost
+        fk_vols = {
+            vol: vol.flags["fk"]
+            for vp, vol in self.asrv.vfs.all_vols.items()
+            if "fk" in vol.flags and (vp in self.rvol or vp in self.upvol)
+        }
         for vol in self.asrv.vfs.all_vols.values():
             cur = idx.get_cur(vol.realpath)
             if not cur:
                 continue
+
+            nfk = fk_vols.get(vol, 0)
 
             q = "select sz, rd, fn, at from up where ip=? and at>?"
             for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
@@ -2332,14 +2339,38 @@ class HttpCli(object):
                 if filt and filt not in vp:
                     continue
 
-                ret.append({"vp": quotep(vp), "sz": sz, "at": at})
+                rv = {"vp": quotep(vp), "sz": sz, "at": at, "nfk": nfk}
+                if nfk:
+                    rv["ap"] = vol.canonical(vjoin(rd, fn))
+
+                ret.append(rv)
                 if len(ret) > 3000:
                     ret.sort(key=lambda x: x["at"], reverse=True)  # type: ignore
                     ret = ret[:2000]
 
         ret.sort(key=lambda x: x["at"], reverse=True)  # type: ignore
-        ret = ret[:2000]
+        n = 0
+        for rv in ret[:11000]:
+            nfk = rv.pop("nfk")
+            if not nfk:
+                continue
 
+            ap = rv.pop("ap")
+            try:
+                st = bos.stat(ap)
+            except:
+                continue
+
+            fk = self.gen_fk(
+                self.args.fk_salt, ap, st.st_size, 0 if ANYWIN else st.st_ino
+            )
+            rv["vp"] += "?k=" + fk[:nfk]
+
+            n += 1
+            if n > 2000:
+                break
+
+        ret = ret[:2000]
         jtxt = json.dumps(ret, indent=2, sort_keys=True).encode("utf-8", "replace")
         self.log("{} #{} {:.2f}sec".format(lm, len(ret), time.time() - t0))
         self.reply(jtxt, mime="application/json")
