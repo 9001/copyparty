@@ -879,7 +879,7 @@ def main(argv: Optional[list[str]] = None) -> None:
             if re.match("c[^,]", opt):
                 mod = True
                 na.append("c," + opt[1:])
-            elif re.sub("^[rwmdg]*", "", opt) and "," not in opt:
+            elif re.sub("^[rwmdgG]*", "", opt) and "," not in opt:
                 mod = True
                 perm = opt[0]
                 if perm == "a":

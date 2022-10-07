@@ -147,6 +147,7 @@ class HttpCli(object):
         self.can_move = False
         self.can_delete = False
         self.can_get = False
+        self.can_upget = False
         # post
         self.parser: Optional[MultipartParser] = None
         # end placeholders
@@ -363,6 +364,7 @@ class HttpCli(object):
         self.mvol = self.asrv.vfs.amove[self.uname]
         self.dvol = self.asrv.vfs.adel[self.uname]
         self.gvol = self.asrv.vfs.aget[self.uname]
+        self.upvol = self.asrv.vfs.apget[self.uname]
 
         if pwd:
             self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(pwd)[0]))
@@ -376,8 +378,14 @@ class HttpCli(object):
         ptn: Optional[Pattern[str]] = self.conn.lf_url  # mypy404
         self.do_log = not ptn or not ptn.search(self.req)
 
-        x = self.asrv.vfs.can_access(self.vpath, self.uname)
-        self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
+        (
+            self.can_read,
+            self.can_write,
+            self.can_move,
+            self.can_delete,
+            self.can_get,
+            self.can_upget,
+        ) = self.asrv.vfs.can_access(self.vpath, self.uname)
 
         try:
             if self.mode in ["GET", "HEAD"]:
@@ -885,7 +893,7 @@ class HttpCli(object):
         )
 
         vsuf = ""
-        if self.can_read and "fk" in vfs.flags:
+        if (self.can_read or self.can_upget) and "fk" in vfs.flags:
             vsuf = "?k=" + self.gen_fk(
                 self.args.fk_salt,
                 path,
@@ -1544,7 +1552,7 @@ class HttpCli(object):
 
         for sz, sha_hex, sha_b64, ofn, lfn, ap in files:
             vsuf = ""
-            if self.can_read and "fk" in vfs.flags:
+            if (self.can_read or self.can_upget) and "fk" in vfs.flags:
                 vsuf = "?k=" + self.gen_fk(
                     self.args.fk_salt,
                     ap,
@@ -2494,9 +2502,8 @@ class HttpCli(object):
 
         if not is_dir and (self.can_read or self.can_get):
             if not self.can_read and "fk" in vn.flags:
-                vabs = vjoin(vn.realpath, rem)
                 correct = self.gen_fk(
-                    self.args.fk_salt, vabs, st.st_size, 0 if ANYWIN else st.st_ino
+                    self.args.fk_salt, abspath, st.st_size, 0 if ANYWIN else st.st_ino
                 )[: vn.flags["fk"]]
                 got = self.uparam.get("k")
                 if got != correct:
@@ -2541,6 +2548,8 @@ class HttpCli(object):
             perms.append("delete")
         if self.can_get:
             perms.append("get")
+        if self.can_upget:
+            perms.append("upget")
 
         url_suf = self.urlq({}, ["k"])
         is_ls = "ls" in self.uparam

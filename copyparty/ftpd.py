@@ -94,6 +94,9 @@ class FtpFs(AbstractedFS):
         self.cwd = "/"  # pyftpdlib convention of leading slash
         self.root = "/var/lib/empty"
 
+        self.can_read = self.can_write = self.can_move = False
+        self.can_delete = self.can_get = self.can_upget = False
+
         self.listdirinfo = self.listdir
         self.chdir(".")
 
@@ -153,8 +156,14 @@ class FtpFs(AbstractedFS):
 
     def chdir(self, path: str) -> None:
         self.cwd = join(self.cwd, path)
-        x = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.username)
-        self.can_read, self.can_write, self.can_move, self.can_delete, self.can_get = x
+        (
+            self.can_read,
+            self.can_write,
+            self.can_move,
+            self.can_delete,
+            self.can_get,
+            self.can_upget,
+        ) = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.username)
 
     def mkdir(self, path: str) -> None:
         ap = self.rv2a(path, w=True)
