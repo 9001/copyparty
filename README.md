@@ -66,7 +66,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [other flags](#other-flags)
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
-    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
+    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
     * [upload events](#upload-events) - trigger a script/program on each upload
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
@@ -93,7 +93,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary"
     * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
-    * [copyparty.exe](#copyparty.exe)
+    * [copyparty.exe](#copypartyexe)
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
 * [building](#building)
@@ -846,7 +846,7 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 
 ## file parser plugins
 
-provide custom parsers to index additional tags, also see [./bin/mtag/README.md](./bin/mtag/README.md)
+provide custom parsers to index additional tags,  also see [./bin/mtag/README.md](./bin/mtag/README.md)
 
 copyparty can invoke external programs to collect additional metadata for files using `mtp` (either as argument or volflag), there is a default timeout of 60sec, and only files which contain audio get analyzed by default (see ay/an/ad below)
 
@@ -1317,7 +1317,7 @@ for the `re`pack to work, first run one of the sfx'es once to unpack it
 
 ## copyparty.exe
 
-![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/194704813-3b5244e9-79ae-4ccc-b303-6e20ced44865.png)
+![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/194707422-cb7f66c9-41a2-4cb9-8dbc-2ab866cd4338.png)
 
 [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) can be convenient on old machines where installing python is problematic, however is **not recommended** and should be considered a last resort -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
 
