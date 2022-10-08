@@ -643,6 +643,9 @@ class HMaccas(object):
         try:
             return self.cache[msg]
         except:
+            if len(self.cache) > 9000:
+                self.cache = {}
+
             zb = hmac.new(self.key, msg, hashlib.sha512).digest()
             zs = base64.urlsafe_b64encode(zb)[: self.retlen].decode("utf-8")
             self.cache[msg] = zs

@@ -4658,7 +4658,7 @@ var treectl = (function () {
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
 	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);
-	bcfg_bind(r, 'ask', 'bd_ask', false);
+	bcfg_bind(r, 'ask', 'bd_ask', MOBILE);
 	ebi('bd_lim').value = r.lim = icfg_get('bd_lim');
 	ebi('bd_lim').oninput = function (e) {
 		var n = parseInt(this.value);
