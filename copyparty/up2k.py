@@ -371,7 +371,7 @@ class Up2k(object):
                         if vp:
                             fvp = "{}/{}".format(vp, fvp)
 
-                        self._handle_rm(LEELOO_DALLAS, "", fvp)
+                        self._handle_rm(LEELOO_DALLAS, "", fvp, [])
                         nrm += 1
 
                 if nrm:
@@ -2426,12 +2426,16 @@ class Up2k(object):
             v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
             db.execute(sql, v)
 
-    def handle_rm(self, uname: str, ip: str, vpaths: list[str]) -> str:
+    def handle_rm(self, uname: str, ip: str, vpaths: list[str], lim: list[int]) -> str:
         n_files = 0
         ok = {}
         ng = {}
         for vp in vpaths:
-            a, b, c = self._handle_rm(uname, ip, vp)
+            if lim and lim[0] <= 0:
+                self.log("hit delete limit of {} files".format(lim[1]), 3)
+                break
+
+            a, b, c = self._handle_rm(uname, ip, vp, lim)
             n_files += a
             for k in b:
                 ok[k] = 1
@@ -2445,7 +2449,7 @@ class Up2k(object):
         return "deleted {} files (and {}/{} folders)".format(n_files, iok, iok + ing)
 
     def _handle_rm(
-        self, uname: str, ip: str, vpath: str
+        self, uname: str, ip: str, vpath: str, lim: list[int]
     ) -> tuple[int, list[str], list[str]]:
         self.db_act = time.time()
         try:
@@ -2504,6 +2508,12 @@ class Up2k(object):
         n_files = 0
         for dbv, vrem, _, adir, files, rd, vd in g:
             for fn in [x[0] for x in files]:
+                if lim:
+                    lim[0] -= 1
+                    if lim[0] < 0:
+                        self.log("hit delete limit of {} files".format(lim[1]), 3)
+                        break
+
                 n_files += 1
                 abspath = os.path.join(adir, fn)
                 volpath = "{}/{}".format(vrem, fn).strip("/")

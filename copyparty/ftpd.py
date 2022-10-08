@@ -204,7 +204,7 @@ class FtpFs(AbstractedFS):
 
         vp = join(self.cwd, path).lstrip("/")
         try:
-            self.hub.up2k.handle_rm(self.uname, self.h.remote_ip, [vp])
+            self.hub.up2k.handle_rm(self.uname, self.h.remote_ip, [vp], [])
         except Exception as ex:
             raise FilesystemError(str(ex))
 

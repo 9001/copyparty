@@ -2386,7 +2386,10 @@ class HttpCli(object):
         if not req:
             req = [self.vpath]
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_rm", self.uname, self.ip, req)
+        nlim = int(self.uparam.get("lim") or 0)
+        lim = [nlim, nlim] if nlim else []
+
+        x = self.conn.hsrv.broker.ask("up2k.handle_rm", self.uname, self.ip, req, lim)
         self.loud_reply(x.get())
         return True
 
