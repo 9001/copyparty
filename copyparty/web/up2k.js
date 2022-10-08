@@ -938,15 +938,19 @@ function up2k_init(subtle) {
     function nav() {
         start_actx();
 
+        var uf = function () { ebi('file' + fdom_ctr).click(); },
+            ud = function () { ebi('dir' + fdom_ctr).click(); };
+
         // too buggy on chrome <= 72
         var m = / Chrome\/([0-9]+)\./.exec(navigator.userAgent);
         if (m && parseInt(m[1]) < 73)
-            return ebi('file' + fdom_ctr).click();
+            return uf();
 
-        modal.confirm(L.u_nav_m,
-            function () { ebi('file' + fdom_ctr).click(); },
-            function () { ebi('dir' + fdom_ctr).click(); },
-            null, L.u_nav_b);
+        // phones dont support folder upload
+        if (MOBILE)
+            return uf();
+
+        modal.confirm(L.u_nav_m, uf, ud, null, L.u_nav_b);
     }
     ebi('u2btn').onclick = nav;
 
