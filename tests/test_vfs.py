@@ -178,10 +178,13 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(n.realpath, os.path.join(td, "a"))
         self.assertAxs(n.axs.uread, ["*"])
         self.assertAxs(n.axs.uwrite, [])
-        self.assertEqual(vfs.can_access("/", "*"), (False, False, False, False, False))
-        self.assertEqual(vfs.can_access("/", "k"), (True, True, False, False, False))
-        self.assertEqual(vfs.can_access("/a", "*"), (True, False, False, False, False))
-        self.assertEqual(vfs.can_access("/a", "k"), (True, False, False, False, False))
+        perm_na = (False, False, False, False, False, False)
+        perm_rw = (True, True, False, False, False, False)
+        perm_ro = (True, False, False, False, False, False)
+        self.assertEqual(vfs.can_access("/", "*"), perm_na)
+        self.assertEqual(vfs.can_access("/", "k"), perm_rw)
+        self.assertEqual(vfs.can_access("/a", "*"), perm_ro)
+        self.assertEqual(vfs.can_access("/a", "k"), perm_ro)
 
         # breadth-first construction
         vfs = AuthSrv(

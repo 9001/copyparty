@@ -93,6 +93,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary"
     * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
+    * [copyparty.exe](#copyparty.exe)
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
 * [building](#building)
@@ -105,7 +106,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 
 ## quickstart
 
-download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
+download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!  if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 
 running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
@@ -114,7 +115,7 @@ some recommended options:
 * `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies)
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
-  * see [accounts and volumes](#accounts-and-volumes) for the syntax and other permissions (`r`ead, `w`rite, `m`ove, `d`elete, `g`et)
+  * see [accounts and volumes](#accounts-and-volumes) for the syntax and other permissions (`r`ead, `w`rite, `m`ove, `d`elete, `g`et, up`G`et)
 * `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access (see `--help-ls`)
 
 
@@ -164,6 +165,7 @@ feature summary
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
   * ☑ [ftp-server](#ftp-server)
+  * ☑ [qr-code](https://user-images.githubusercontent.com/241032/194706154-57f50367-7877-4be9-a759-5b782530ff64.png) for quick access
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
@@ -318,6 +320,7 @@ permissions:
 * `m` (move): move files/folders *from* this folder
 * `d` (delete): delete files/folders
 * `g` (get): only download files, cannot see folder contents or zip/tar
+* `G` (upget): same as `g` except uploaders get to see their own accesskeys (see `fk` in examples below)
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
@@ -332,6 +335,8 @@ examples:
   * `c,fk=4` sets the `fk` volflag to 4, meaning each file gets a 4-character accesskey
   * `u1` can upload files, browse the folder, and see the generated accesskeys
   * other users cannot browse the folder, but can access the files if they have the full file URL with the accesskey
+  * replacing the `g` permission with `wg` would let anonymous users upload files, but not see the required accesskey to access it
+  * replacing the `g` permission with `wG` would let anonymous users upload files, receiving a working direct link in return
 
 anyone trying to bruteforce a password gets banned according to `--ban-pw`; default is 24h ban for 9 failed attempts in 1 hour
 
@@ -1126,6 +1131,7 @@ other misc notes:
 
 * you can disable directory listings by giving permission `g` instead of `r`, only accepting direct URLs to files
   * combine this with volflag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
+  * permissions `wG` lets users upload files and receive their own accesskeys, still without being able to see other uploads
 
 
 ## gotchas
@@ -1309,6 +1315,19 @@ for the `re`pack to work, first run one of the sfx'es once to unpack it
 **note:** you can also just download and run [scripts/copyparty-repack.sh](scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a few repacks; works on linux/macos (and windows with msys2 or WSL)
 
 
+## copyparty.exe
+
+![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/194704813-3b5244e9-79ae-4ccc-b303-6e20ced44865.png)
+
+[copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) can be convenient on old machines where installing python is problematic, however is **not recommended** and should be considered a last resort -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
+
+the exe is compatible with 32bit windows7, which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and will definitely become a security hazard at some point
+
+meanwhile [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) instead relies on your system python which gives better performance and will stay safe as long as you keep your python install up-to-date
+
+then again, if you are already into downloading shady binaries from the internet, you may also want my [minimal builds](./scripts/pyinstaller#ffmpeg) of [ffmpeg](https://ocv.me/stuff/bin/ffmpeg.exe) and [ffprobe](https://ocv.me/stuff/bin/ffprobe.exe) which enables copyparty to extract multimedia-info, do audio-transcoding, and thumbnails/spectrograms/waveforms, however it's much better to instead grab a [recent official build](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) every once ina while if you can afford the size
+
+
 # install on android
 
 install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
@@ -1317,7 +1336,7 @@ apt update && apt -y full-upgrade && apt update && termux-setup-storage && apt -
 echo $?
 ```
 
-after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux
+after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux -- and if you run it with `--qr` you'll get a [neat qr-code](https://user-images.githubusercontent.com/241032/194706154-57f50367-7877-4be9-a759-5b782530ff64.png) pointing to your external ip
 
 if you want thumbnails, `apt -y install ffmpeg`
 
