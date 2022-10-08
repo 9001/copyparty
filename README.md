@@ -320,7 +320,7 @@ permissions:
 * `m` (move): move files/folders *from* this folder
 * `d` (delete): delete files/folders
 * `g` (get): only download files, cannot see folder contents or zip/tar
-* `G` (upget): same as `g` except uploaders get to see their own accesskeys (see `fk` in examples below)
+* `G` (upget): same as `g` except uploaders get to see their own filekeys (see `fk` in examples below)
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
@@ -331,11 +331,11 @@ examples:
   * unauthorized users accessing the webroot can see that the `inc` folder exists, but cannot open it
   * `u1` can open the `inc` folder, but cannot see the contents, only upload new files to it
   * `u2` can browse it and move files *from* `/inc` into any folder where `u2` has write-access
-* make folder `/mnt/ss` available at `/i`, read-write for u1, get-only for everyone else, and enable accesskeys: `-v /mnt/ss:i:rw,u1:g:c,fk=4`
-  * `c,fk=4` sets the `fk` volflag to 4, meaning each file gets a 4-character accesskey
-  * `u1` can upload files, browse the folder, and see the generated accesskeys
-  * other users cannot browse the folder, but can access the files if they have the full file URL with the accesskey
-  * replacing the `g` permission with `wg` would let anonymous users upload files, but not see the required accesskey to access it
+* make folder `/mnt/ss` available at `/i`, read-write for u1, get-only for everyone else, and enable filekeys: `-v /mnt/ss:i:rw,u1:g:c,fk=4`
+  * `c,fk=4` sets the `fk` (filekey) volflag to 4, meaning each file gets a 4-character accesskey
+  * `u1` can upload files, browse the folder, and see the generated filekeys
+  * other users cannot browse the folder, but can access the files if they have the full file URL with the filekey
+  * replacing the `g` permission with `wg` would let anonymous users upload files, but not see the required filekey to access it
   * replacing the `g` permission with `wG` would let anonymous users upload files, receiving a working direct link in return
 
 anyone trying to bruteforce a password gets banned according to `--ban-pw`; default is 24h ban for 9 failed attempts in 1 hour
@@ -1130,8 +1130,8 @@ some notes on hardening
 other misc notes:
 
 * you can disable directory listings by giving permission `g` instead of `r`, only accepting direct URLs to files
-  * combine this with volflag `c,fk` to generate per-file accesskeys; users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
-  * permissions `wG` lets users upload files and receive their own accesskeys, still without being able to see other uploads
+  * combine this with volflag `c,fk` to generate filekeys (per-file accesskeys); users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
+  * permissions `wG` lets users upload files and receive their own filekeys, still without being able to see other uploads
 
 
 ## gotchas

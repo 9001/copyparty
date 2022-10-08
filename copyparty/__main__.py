@@ -442,6 +442,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
               "m" (move):   move files and folders; need "w" at destination
               "d" (delete): permanently delete files and folders
               "g" (get):    download files, but cannot see folder contents
+              "G" (upget):  "get", but can see filekeys of their own uploads
 
             too many volflags to list here, see the other sections
 
