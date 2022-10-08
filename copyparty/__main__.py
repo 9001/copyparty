@@ -583,12 +583,12 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2 = ap.add_argument_group('qr options')
     ap2.add_argument("--qr", action="store_true", help="show http:// QR-code on startup")
     ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
-    ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m] (also enables --qr if not --qrs)")
+    ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m]")
     ap2.add_argument("--qr-ip", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX")
     ap2.add_argument("--qr-fg", metavar="COLOR", type=int, default=16, help="foreground")
     ap2.add_argument("--qr-bg", metavar="COLOR", type=int, default=229, help="background (white=255)")
-    ap2.add_argument("--qr-pad", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more, but 1 is usually fine)")
-    ap2.add_argument("--qr-zoom", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try 2 on broken fonts)")
+    ap2.add_argument("--qrp", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more, but 1 is usually fine)")
+    ap2.add_argument("--qrz", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try 2 on broken fonts)")
 
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
@@ -920,7 +920,7 @@ def main(argv: Optional[list[str]] = None) -> None:
             zs = "argument {} cannot be '{}'; try one of these: {}"
             raise Exception(zs.format(arg, val, okays))
 
-    if al.qrl and not al.qrs:
+    if not al.qrs and [k for k in argv if k.startswith("--qr")]:
         al.qr = True
 
     if HAVE_SSL:

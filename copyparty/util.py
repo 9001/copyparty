@@ -258,7 +258,7 @@ def py_desc() -> str:
         bitness = struct.calcsize("P") * 8
 
     host_os = platform.system()
-    compiler = platform.python_compiler()
+    compiler = platform.python_compiler().split("http")[0]
 
     m = re.search(r"([0-9]+\.[0-9\.]+)", platform.version())
     os_ver = m.group(1) if m else ""

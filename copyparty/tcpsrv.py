@@ -393,8 +393,8 @@ class TcpSrv(object):
 
         fg = self.args.qr_fg
         bg = self.args.qr_bg
-        pad = self.args.qr_pad
-        zoom = self.args.qr_zoom
+        pad = self.args.qrp
+        zoom = self.args.qrz
         qrc = QrCode.encode_binary(btxt)
         if zoom == 0:
             try:
