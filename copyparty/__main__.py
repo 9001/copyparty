@@ -585,7 +585,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--qr", action="store_true", help="show http:// QR-code on startup")
     ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
     ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m]")
-    ap2.add_argument("--qr-ip", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX")
+    ap2.add_argument("--qri", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX")
     ap2.add_argument("--qr-fg", metavar="COLOR", type=int, default=16, help="foreground")
     ap2.add_argument("--qr-bg", metavar="COLOR", type=int, default=229, help="background (white=255)")
     ap2.add_argument("--qrp", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more, but 1 is usually fine)")

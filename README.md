@@ -56,6 +56,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
+    * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
     * [ftp-server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
@@ -167,7 +168,7 @@ feature summary
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
   * ☑ [ftp-server](#ftp-server)
-  * ☑ [qr-code](https://user-images.githubusercontent.com/241032/194706154-57f50367-7877-4be9-a759-5b782530ff64.png) for quick access
+  * ☑ [qr-code](#qr-code) for quick access
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
@@ -680,6 +681,19 @@ using arguments or config files, or a mix of both:
 * config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf)
 * `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
   * or click the `[reload cfg]` button in the control-panel when logged in as admin 
+
+
+## qr-code
+
+print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access,  great between phones on android hotspots which keep changing the subnet
+
+* `--qr` enables it
+* `--qrs` does https instead of http
+* `--qrl lootbox/?pw=hunter2` appends to the url, linking to the `lootbox` folder with password `hunter2`
+* `--qrz 1` forces 1x zoom instead of autoscaling to fit the terminal size
+  * 1x may render incorrectly on some terminals/fonts, but 2x should always work
+
+it will use your external ip (default route) unless `--qri` specifies an ip-prefix or domain
 
 
 ## ftp-server
@@ -1338,7 +1352,7 @@ apt update && apt -y full-upgrade && apt update && termux-setup-storage && apt -
 echo $?
 ```
 
-after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux -- and if you run it with `--qr` you'll get a [neat qr-code](https://user-images.githubusercontent.com/241032/194706154-57f50367-7877-4be9-a759-5b782530ff64.png) pointing to your external ip
+after the initial setup, you can launch copyparty at any time by running `copyparty` anywhere in Termux -- and if you run it with `--qr` you'll get a [neat qr-code](#qr-code) pointing to your external ip
 
 if you want thumbnails, `apt -y install ffmpeg`
 

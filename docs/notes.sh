@@ -215,7 +215,7 @@ brew install python@2
 pip install virtualenv
 
 # readme toc
-cat README.md | awk 'function pr() { if (!h) {return}; if (/^ *[*!#|]/||!s) {printf "%s\n",h;h=0;return}; if (/.../) {printf "%s - %s\n",h,$0;h=0}; };    /^#/{s=1;pr()} /^#* *(install on android|dev env setup|just the sfx|complete release|optional gpl stuff)|`$/{s=0} /^#/{lv=length($1);sub(/[^ ]+ /,"");bab=$0;gsub(/ /,"-",bab); h=sprintf("%" ((lv-1)*4+1) "s [%s](#%s)", "*",$0,bab);next} !h{next} {sub(/  .*/,"");sub(/[:;,]$/,"")} {pr()}' > toc; grep -E '^## readme toc' -B1000 -A2 <README.md >p1; grep -E '^## quickstart' -B2 -A999999 <README.md >p2; (cat p1; grep quickstart -A1000 <toc; cat p2) >README.md; rm p1 p2 toc
+cat README.md | awk 'function pr() { if (!h) {return}; if (/^ *[*!#|]/||!s) {printf "%s\n",h;h=0;return}; if (/.../) {printf "%s - %s\n",h,$0;h=0}; };    /^#/{s=1;pr()} /^#* *(install on android|dev env setup|just the sfx|complete release|optional gpl stuff)|`$/{s=0} /^#/{lv=length($1);sub(/[^ ]+ /,"");bab=$0;gsub(/ /,"-",bab);gsub(/\./,"",bab); h=sprintf("%" ((lv-1)*4+1) "s [%s](#%s)", "*",$0,bab);next} !h{next} {sub(/  .*/,"");sub(/[:;,]$/,"")} {pr()}' > toc; grep -E '^## readme toc' -B1000 -A2 <README.md >p1; grep -E '^## quickstart' -B2 -A999999 <README.md >p2; (cat p1; grep quickstart -A1000 <toc; cat p2) >README.md; rm p1 p2 toc
 
 # fix firefox phantom breakpoints,
 # suggestions from bugtracker, doesnt work (debugger is not attachable)

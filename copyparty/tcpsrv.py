@@ -344,17 +344,29 @@ class TcpSrv(object):
 
         vs2 = {}
         for k, eps in vs.items():
-            vs2[k] = {
-                ep: 1
-                for ep in eps.keys()
-                if ":" not in ep or ep.split(":")[0] not in eps
-            }
+            filt = {ep: 1 for ep in eps if ":" not in ep}
+            have = set(filt)
+            for ep in sorted(eps):
+                ip = ep.split(":")[0]
+                if ip not in have:
+                    have.add(ip)
+                    filt[ep] = 1
+
+            lo = [x for x in filt if x.startswith("127.")]
+            if len(filt) > 3 and lo:
+                for ip in lo:
+                    filt.pop(ip)
+
+            vs2[k] = filt
 
         title = ""
         vs = vs2
         for p in self.args.wintitle.split(" "):
             if p.startswith("$"):
-                p = " and ".join(sorted(vs.get(p[1:], {"(None)": 1}).keys()))
+                seps = list(sorted(vs.get(p[1:], {"(None)": 1}).keys()))
+                p = ", ".join(seps[:3])
+                if len(seps) > 3:
+                    p += ", ..."
 
             title += "{} ".format(p)
 
@@ -364,13 +376,13 @@ class TcpSrv(object):
     def _qr(self, t1: dict[str, list[int]], t2: dict[str, list[int]]) -> str:
         ip = None
         for ip in list(t1) + list(t2):
-            if ip.startswith(self.args.qr_ip):
+            if ip.startswith(self.args.qri):
                 break
             ip = ""
 
         if not ip:
             # maybe /bin/ip is missing or smth
-            ip = self.args.qr_ip
+            ip = self.args.qri
 
         if not ip:
             return ""
