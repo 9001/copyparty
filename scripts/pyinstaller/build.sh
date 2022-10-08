@@ -47,6 +47,7 @@ $APPDATA/python/python37/scripts/pyinstaller \
     --exclude-module copyparty.broker_mpw \
     --exclude-module curses \
     --exclude-module ctypes.macholib \
+    --exclude-module inspect \
     --exclude-module multiprocessing \
     --exclude-module pdb \
     --exclude-module pickle \
