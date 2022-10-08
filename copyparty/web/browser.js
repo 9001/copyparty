@@ -6428,7 +6428,7 @@ var unpost = (function () {
 		var xhr = new XHR();
 		xhr.n = n;
 		xhr.n2 = n2;
-		xhr.open('POST', '/?delete&lim=1', true);
+		xhr.open('POST', '/?delete&lim=' + links.length, true);
 		xhr.onload = xhr.onerror = unpost_delete_cb;
 		xhr.send(JSON.stringify(req));
 	};

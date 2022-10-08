@@ -106,7 +106,9 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 
 ## quickstart
 
-download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!  if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
+download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
+
+if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 
 running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
