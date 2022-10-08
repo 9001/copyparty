@@ -1330,8 +1330,24 @@ def gen_filekey_dbg(
 
     assert log_ptn
     if log_ptn.search(fspath):
-        t = "fk({}) salt({}) size({}) inode({}) fspath({})"
-        log(t.format(ret[:8], salt, fsize, inode, fspath))
+        try:
+            import inspect
+
+            ctx = ",".join(inspect.stack()[n][3] for n in range(2, 5))
+        except:
+            ctx = ""
+
+        try:
+            p2 = "a"
+            p2 = absreal(fspath)
+            if p2 != fspath:
+                raise Exception()
+        except:
+            t = "maybe wrong abspath for filekey;\norig: {}\nreal: {}"
+            log(t.format(fspath, p2), 1)
+
+        t = "fk({}) salt({}) size({}) inode({}) fspath({}) at({})"
+        log(t.format(ret[:8], salt, fsize, inode, fspath, ctx), 5)
 
     return ret
 

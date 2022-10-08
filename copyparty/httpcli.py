@@ -2491,7 +2491,7 @@ class HttpCli(object):
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
-        abspath = vn.canonical(rem)
+        abspath = vn.dcanonical(rem)
         dbv, vrem = vn.get_dbv(rem)
 
         try:

@@ -447,11 +447,20 @@ class VFS(object):
 
     def canonical(self, rem: str, resolve: bool = True) -> str:
         """returns the canonical path (fully-resolved absolute fs path)"""
-        rp = self.realpath
+        ap = self.realpath
         if rem:
-            rp += "/" + rem
+            ap += "/" + rem
 
-        return absreal(rp) if resolve else rp
+        return absreal(ap) if resolve else ap
+
+    def dcanonical(self, rem: str) -> str:
+        """resolves until the final component (filename)"""
+        ap = self.realpath
+        if rem:
+            ap += "/" + rem
+
+        ad, fn = os.path.split(ap)
+        return os.path.join(absreal(ad), fn)
 
     def ls(
         self,
