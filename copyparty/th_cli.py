@@ -30,6 +30,8 @@ class ThumbCli(object):
 
         try:
             c = hsrv.th_cfg
+            if not c:
+                raise Exception()
         except:
             c = {k: {} for k in ["thumbable", "pil", "vips", "ffi", "ffv", "ffa"]}
 

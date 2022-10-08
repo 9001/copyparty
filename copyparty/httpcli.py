@@ -2532,6 +2532,9 @@ class HttpCli(object):
                 if thp:
                     return self.tx_file(thp)
 
+                if th_fmt == "p":
+                    raise Pebkac(404)
+
                 return self.tx_ico(rem)
 
         if not is_dir and (self.can_read or self.can_get):
