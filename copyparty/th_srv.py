@@ -621,7 +621,7 @@ class ThumbSrv(object):
 
     def _clean(self, cat: str, thumbpath: str) -> int:
         # self.log("cln {}".format(thumbpath))
-        exts = ["jpg", "webp"] if cat == "th" else ["opus", "caf"]
+        exts = ["jpg", "webp", "png"] if cat == "th" else ["opus", "caf"]
         maxage = getattr(self.args, cat + "_maxage")
         now = time.time()
         prev_b64 = None

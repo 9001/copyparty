@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 4, 4)
+VERSION = (1, 4, 5)
 CODENAME = "mostly reliable"
 BUILD_DT = (2022, 10, 9)
 
