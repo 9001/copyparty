@@ -311,6 +311,7 @@ sfx_out=../dist/copyparty-$CSN
 echo cleanup
 find -name '*.pyc' -delete
 find -name __pycache__ -delete
+find -name py.typed -delete
 
 # especially prevent osx from leaking your lan ip (wtf apple)
 find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete

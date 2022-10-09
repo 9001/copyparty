@@ -142,6 +142,7 @@ def testchk(cdata):
 
 def encode(data, size, cksum, ver, ts):
     """creates a new sfx; `data` should yield bufs to attach"""
+    nb = 0
     nin = 0
     nout = 0
     skip = False
@@ -151,6 +152,7 @@ def encode(data, size, cksum, ver, ts):
         for ln in src.split("\n"):
             if ln.endswith("# skip 0"):
                 skip = False
+                nb = 9
                 continue
 
             if ln.endswith("# skip 1") or skip:
@@ -159,6 +161,13 @@ def encode(data, size, cksum, ver, ts):
 
             if ln.strip().startswith("# fmt: "):
                 continue
+
+            if ln:
+                nb = 0
+            else:
+                nb += 1
+                if nb > 2:
+                    continue
 
             unpk += ln + "\n"
 
@@ -177,7 +186,7 @@ def encode(data, size, cksum, ver, ts):
             unpk = unpk.replace("\t    ", "\t\t")
 
     with open("sfx.out", "wb") as f:
-        f.write(unpk.encode("utf-8") + b"\n\n# eof\n# ")
+        f.write(unpk.encode("utf-8").rstrip(b"\n") + b"\n\n\n# eof\n# ")
         for buf in data:
             ebuf = buf.replace(b"\n", b"\n#n").replace(b"\r", b"\n#r")
             f.write(ebuf)
