@@ -269,6 +269,12 @@ def unpack():
         raise Exception(t.format(CKSUM, SIZE, ck, sz))
 
     with tarfile.open(tar, "r:bz2") as tf:
+        # this is safe against traversal
+        # skip 1
+        # since it will never process user-provided data;
+        # the only possible input is a single tar.bz2
+        # which gets hardcoded into this script at build stage
+        # skip 0
         tf.extractall(mine)
 
     os.remove(tar)
