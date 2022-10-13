@@ -1,4 +1,52 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-1009-0919  `v1.4.5`  qr-code
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* display a server [qr-code](https://github.com/9001/copyparty#qr-code) [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) on startup
+  * primarily for running copyparty on a phone and accessing it from another
+  * optionally specify a path or password with `--qrl lootbox/?pw=hunter2`
+  * uses the server's exteral ip (default route) unless `--qri` specifies a domain / ip-prefix
+  * classic cp437 `▄` `▀` for space efficiency; some misbehaving terminals / fonts need `--qrz 2`
+* new permission `G` returns the filekey of uploaded files for users without read-access
+  * when combined with permission `w` and volflag `fk`, uploaded files will not be accessible unless the filekey is provided in the url, and `G` provides the filekey to the uploader unlike `g`
+* filekeys are added to the unpost listing
+
+## bugfixes
+* renaming / moving folders is now **at least 120x faster**
+  * and that's on nvme drives, so probably like 2000x on HDDs
+* uploads to volumes with lifetimes could get instapurged depending on browser and browser settings
+* ux fixes
+  * FINALLY fixed messageboxes appearing offscreen on phones (and some other layout issues)
+  * stop asking about folder-uploads on phones because they dont support it
+  * on android-firefox, default to truncating huge folders with the load-more button due to ff onscroll being buggy
+  * audioplayer looking funky if ffmpeg unavailable
+* waveform-seekbar cache expiration (the thumbcleaner complaining about png files)
+* ie11 panic when opening a folder which contains a file named `up2k`
+  * turns out `<a name=foo>` becomes `window.foo` unless that's already declared somewhere in js -- luckily other browsers "only" do that with IDs
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-0926-2037  `v1.4.3`  signal in the noise
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: [v1.0.14](https://github.com/9001/copyparty/releases/tag/v1.0.14#:~:text=release-specific%20notes)
+
+## new features
+* `--bak-flips` saves a copy of corrupted / bitflipped up2k uploads
+  * comparing against a good copy can help pinpoint the culprit
+  * also see [tracking bitflips](https://github.com/9001/copyparty/blob/hovudstraum/docs/notes.sh#:~:text=tracking%20bitflips)
+
+## bugfixes
+* some edgecases where deleted files didn't get dropped from the db
+  * can reduce performance over time, hitting the filesystem more than necessary
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-0925-1236  `v1.4.2`  fuhgeddaboudit
 
 * read-only demo server at https://a.ocv.me/pub/demo/
