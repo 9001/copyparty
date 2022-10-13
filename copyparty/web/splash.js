@@ -12,7 +12,7 @@ var Ls = {
 		"cc1": "klient-konfigurasjon",
 		"h1": "skru av k304",
 		"i1": "skru på k304",
-		"j1": "k304 bryter tilkoplingen for hver HTTP 304. Dette hjelper visse mellomtjenere som kan sette seg fast / plutselig slutter å laste sider, men det reduserer også ytelsen betydelig",
+		"j1": "k304 bryter tilkoplingen for hver HTTP 304. Dette hjelper mot visse mellomtjenere som kan sette seg fast / plutselig slutter å laste sider, men det reduserer også ytelsen betydelig",
 		"k1": "nullstill innstillinger",
 		"l1": "logg inn:",
 		"m1": "velkommen tilbake,",

@@ -62,8 +62,8 @@ class TcpSrv(object):
                 for x in nonlocals:
                     eps[x] = "external"
 
-        qr1 = {}
-        qr2 = {}
+        qr1: dict[str, list[int]] = {}
+        qr2: dict[str, list[int]] = {}
         msgs = []
         title_tab: dict[str, dict[str, int]] = {}
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
