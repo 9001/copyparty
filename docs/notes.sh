@@ -67,6 +67,7 @@ mkdir -p "${dirs[@]}"
 for dir in "${dirs[@]}"; do for fn in ふが "$(printf \\xed\\x93)" 'qw,er;ty%20as df?gh+jkl%zxc&vbn <qwe>"rty'"'"'uio&asd&nbsp;fgh'; do echo "$dir" > "$dir/$fn.html"; done; done
 # qw er+ty%20ui%%20op<as>df&gh&amp;jk#zx'cv"bn`m=qw*er^ty?ui@op,as.df-gh_jk
 
+
 ##
 ## upload mojibake
 
@@ -144,6 +145,17 @@ sqlite3 -readonly up2k.db.key-full 'select w, v from mt where k = "key" order by
 
 
 ##
+## scanning for exceptions
+
+cd /dev/shm
+journalctl -aS '720 hour ago' -t python3 -o with-unit --utc | cut -d\  -f2,6- > cpp.log
+tac cpp.log | awk '/RuntimeError: generator ignored GeneratorExit/{n=1} n{n--;if(n==0)print} 1' | grep 'generator ignored GeneratorExit' -C7 | head -n 100
+awk '/Exception ignored in: <generator object StreamZip.gen/{s=1;next} /could not create thumbnail/{s=3;next} s{s--;next} 1' <cpp.log | less -R
+less-search:
+  >: |Exception|Traceback
+
+
+##
 ## tracking bitflips
 
 l=log.tmux-1662316902  # your logfile (tmux-capture or decompressed -lo)
@@ -167,6 +179,7 @@ printf '  %s [%s]\n' $h2 "$(grep -F $h2 <handshakes | head -n 1)"
 # quickest way to drop the bad files (if a client generated bad hashes for the initial handshake) is shutting down copyparty and moving aside the unfinished file (both the .PARTIAL and the empty placeholder)
 # BUT the clients will immediately re-handshake the upload with the same bitflipped hashes, so the uploaders have to refresh their browsers before you do that,
 # so maybe just ask them to refresh and do nothing for 6 hours so the timeout kicks in, which deletes the placeholders/name-reservations and you can then manually delete the .PARTIALs at some point later
+
 
 ##
 ## media

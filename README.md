@@ -1399,7 +1399,7 @@ first grab the web-dependencies from a previous sfx (assuming you don't need to 
 ```sh
 rm -rf copyparty/web/deps
 curl -L https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py >x.py
-python3 x.py -h
+python3 x.py --version
 rm x.py
 mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/deps/
 ```

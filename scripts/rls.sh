@@ -31,10 +31,9 @@ rm -f ../dist/copyparty-sfx*
 shift
 ./make-sfx.sh "$@"
 f=../dist/copyparty-sfx
-[ -e $f.py ] || 
-    f=../dist/copyparty-sfx-gz
+[ -e $f.py ] && s= || s=-gz
 
-$f.py -h >/dev/null
+$f$s.py --version >/dev/null
 
 [ $parallel -gt 1 ] && {
     printf '\033[%s' s 2r H "0;1;37;44mbruteforcing sfx size -- press enter to terminate" K u "7m $* " K $'27m\n'
@@ -44,9 +43,9 @@ $f.py -h >/dev/null
     for ((a=0; a<$parallel; a++)); do
         while [ -e .sfx-run ]; do
             CSN=sfx$a ./make-sfx.sh re "$@"
-            sz=$(wc -c <$f$a.py | awk '{print$1}')
+            sz=$(wc -c <$f$a$s.py | awk '{print$1}')
             [ $sz -ge $min ] && continue
-            mv $f$a.py $f.py.$sz
+            mv $f$a$s.py $f$s.py.$sz
             min=$sz
         done &
     done
@@ -55,7 +54,7 @@ $f.py -h >/dev/null
 }
 
 while true; do
-    mv $f.py $f.$(wc -c <$f.py | awk '{print$1}').py
+    mv $f$s.py $f$s.$(wc -c <$f$s.py | awk '{print$1}').py
     ./make-sfx.sh re "$@"
 done
 

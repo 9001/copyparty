@@ -119,7 +119,7 @@ chmod 755 \
 
 # extract the sfx
 ( cd copyparty-extras/sfx-full/
-./copyparty-sfx.py -h
+./copyparty-sfx.py --version
 )
 
 
