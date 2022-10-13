@@ -166,7 +166,7 @@ var Ls = {
 		"mt_oscv": "show album cover in osd\">art",
 		"mt_mloop": "loop the open folder\">🔁 loop",
 		"mt_mnext": "load the next folder and continue\">📂 next",
-		"mt_cflac": "convert flac to opus\">flac",
+		"mt_cflac": "convert flac / wav to opus\">flac",
 		"mt_caac": "convert aac / m4a to opus\">aac",
 		"mt_coth": "convert all others (not mp3) to opus\">oth",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
@@ -541,7 +541,7 @@ var Ls = {
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
 		"mt_mloop": "repeter hele mappen\">🔁 gjenta",
 		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
-		"mt_cflac": "konverter flac-filer til opus\">flac",
+		"mt_cflac": "konverter flac / wav-filer til opus\">flac",
 		"mt_caac": "konverter aac / m4a-filer til to opus\">aac",
 		"mt_coth": "konverter alt annet (men ikke mp3) til opus\">andre",
 		"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjør oppdateringer mindre distraherende",
@@ -1197,7 +1197,7 @@ var mpl = (function () {
 		var c = true;
 		if (!have_acode)
 			c = false;
-		else if (/\.flac$/i.exec(url))
+		else if (/\.(wav|flac)$/i.exec(url))
 			c = r.ac_flac;
 		else if (/\.(aac|m4a)$/i.exec(url))
 			c = r.ac_aac;
