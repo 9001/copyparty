@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import os
 import sys
+import subprocess as sp
 from shutil import rmtree
 from setuptools import setup, Command, find_packages
 
@@ -28,6 +29,11 @@ with open(here + "/README.md", "rb") as f:
     txt = f.read().decode("utf-8")
     long_description = txt
 
+try:
+    cmd = "bash scripts/genlic.sh copyparty/res/COPYING.txt"
+    sp.Popen(cmd.split()).wait()
+except:
+    pass
 
 about = {}
 if not VERSION:
@@ -100,6 +106,7 @@ args = {
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: Jython",
         "Programming Language :: Python :: Implementation :: PyPy",
