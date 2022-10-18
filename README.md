@@ -723,6 +723,7 @@ known issues:
 * winxp cannot show unicode characters outside of *some range*
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
 * win7 cannot access servers which require authentication unless you use https or [enable basic authentication](./contrib/webdav-basicauth.reg) for http
+* win7 has a bug where it doesn't actually send the password to the server, so please type your password into the username field
 
 
 ## file indexing

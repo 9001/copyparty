@@ -32,6 +32,9 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 ### [`webdav-basicauth.reg`](webdav-basicauth.reg)
 * enables webdav basic-auth over plaintext http
 
+### [`webdav-unlimit.bat`](webdav-unlimit.bat)
+* removes the 47.6 MiB filesize limit when downloading from webdav
+
 ### [`cfssl.sh`](cfssl.sh)
 * creates CA and server certificates using cfssl
 * give a 3rd argument to install it to your copyparty config
