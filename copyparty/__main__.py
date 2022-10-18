@@ -195,7 +195,8 @@ def init_E(E: EnvParams) -> None:
         E.mod = _unpack()
 
     if sys.platform == "win32":
-        E.cfg = os.path.normpath(os.environ["APPDATA"] + "/copyparty")
+        bdir = os.environ.get("APPDATA") or os.environ.get("TEMP")
+        E.cfg = os.path.normpath(bdir + "/copyparty")
     elif sys.platform == "darwin":
         E.cfg = os.path.expanduser("~/Library/Preferences/copyparty")
     else:

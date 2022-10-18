@@ -66,7 +66,11 @@ def meichk():
 
     pids = []
     ptn = re.compile(r"^([^\s]+)\s+([0-9]+)")
-    procs = sp.check_output("tasklist").decode("utf-8", "replace")
+    try:
+        procs = sp.check_output("tasklist").decode("utf-8", "replace")
+    except:
+        procs = ""  # winpe
+
     for ln in procs.splitlines():
         m = ptn.match(ln)
         if m and filt in m.group(1).lower():

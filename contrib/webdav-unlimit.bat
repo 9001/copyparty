@@ -1,7 +1,7 @@
 @echo off
 rem removes the 47.6 MiB filesize limit when downloading from webdav
 
-at > nul
+net session >nul 2>&1
 if %errorlevel% neq 0 (
     echo you must run this as admin
     pause
