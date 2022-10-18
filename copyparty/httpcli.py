@@ -671,7 +671,7 @@ class HttpCli(object):
         if not self.can_read and not self.can_write and not self.can_get:
             if self.vpath:
                 self.log("inaccessible: [{}]".format(self.vpath))
-                return self.tx_404(True)
+                raise Pebkac(401, "authenticate")
 
             self.uparam["h"] = ""
 
@@ -731,7 +731,7 @@ class HttpCli(object):
             ]
 
         props = set(props_lst)
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False, err=401)
         depth = self.headers.get("depth", "infinity").lower()
 
         if depth == "infinity":
@@ -2502,7 +2502,7 @@ class HttpCli(object):
 
     def tx_ups(self) -> bool:
         if not self.args.unpost:
-            raise Pebkac(400, "the unpost feature is disabled in server config")
+            raise Pebkac(403, "the unpost feature is disabled in server config")
 
         idx = self.conn.get_u2idx()
         if not hasattr(idx, "p_end"):

@@ -719,6 +719,11 @@ on windows xp/7, connect using the explorer UI:
 on windows 7/8/10, disable wpad for performance:
 * control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
 
+known issues:
+* winxp cannot show unicode characters outside of *some range*
+  * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
+* win7 cannot access servers which require authentication unless you use https or [enable basic authentication](./contrib/webdav-basicauth.reg) for http
+
 
 ## file indexing
 

@@ -411,6 +411,7 @@ class VFS(object):
         will_move: bool = False,
         will_del: bool = False,
         will_get: bool = False,
+        err=403,
     ) -> tuple["VFS", str]:
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         if ANYWIN:
@@ -432,7 +433,7 @@ class VFS(object):
         ]:
             if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
                 t = "you don't have {}-access for this location"
-                raise Pebkac(403, t.format(msg))
+                raise Pebkac(err, t.format(msg))
 
         return vn, rem
 

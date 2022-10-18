@@ -29,6 +29,9 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 * disables thumbnails and folder-type detection in windows explorer
 * makes it way faster (especially for slow/networked locations (such as copyparty-fuse))
 
+### [`webdav-basicauth.reg`](webdav-basicauth.reg)
+* enables webdav basic-auth over plaintext http
+
 ### [`cfssl.sh`](cfssl.sh)
 * creates CA and server certificates using cfssl
 * give a 3rd argument to install it to your copyparty config
