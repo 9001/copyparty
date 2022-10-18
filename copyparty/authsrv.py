@@ -577,12 +577,19 @@ class VFS(object):
                 yield x
 
     def zipgen(
-        self, vrem: str, flt: set[str], uname: str, dots: bool, scandir: bool
+        self,
+        vrem: str,
+        flt: set[str],
+        uname: str,
+        dots: bool,
+        dirs: bool,
+        scandir: bool,
+        wrap: bool = True,
     ) -> Generator[dict[str, Any], None, None]:
 
         # if multiselect: add all items to archive root
         # if single folder: the folder itself is the top-level item
-        folder = "" if flt else (vrem.split("/")[-1] or "top")
+        folder = "" if flt or not wrap else (vrem.split("/")[-1] or "top")
 
         g = self.walk(folder, vrem, [], uname, [[True]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
@@ -617,6 +624,21 @@ class VFS(object):
 
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in ret]:
                 yield f
+
+            if not dirs:
+                continue
+
+            ts = int(time.time())
+            st = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, ts, ts, ts))
+            dnames = [n[0] for n in rd]
+            dstats = [n[1] for n in rd]
+            dnames += list(vd.keys())
+            dstats += [st] * len(vd)
+            vpaths = [vpath + "/" + n for n in dnames] if vpath else dnames
+            apaths = [os.path.join(apath, n) for n in dnames]
+            ret2 = list(zip(vpaths, apaths, dstats))
+            for d in [{"vp": v, "ap": a, "st": n} for v, a, n in ret2]:
+                yield d
 
 
 if WINDOWS:

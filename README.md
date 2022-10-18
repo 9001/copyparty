@@ -57,7 +57,8 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
-    * [ftp-server](#ftp-server) - an FTP server can be started using `--ftp 3921`
+    * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
+    * [webdav server](#webdav-server) - enable with `--dav`
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
@@ -696,7 +697,7 @@ print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/
 it will use your external ip (default route) unless `--qri` specifies an ip-prefix or domain
 
 
-## ftp-server
+## ftp server
 
 an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit TLS (ftpes)
 
@@ -706,6 +707,17 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 * runs in active mode by default, you probably want `--ftp-pr 12000-13000`
   * if you enable both `ftp` and `ftps`, the port-range will be divided in half
   * some older software (filezilla on debian-stable) cannot passive-mode with TLS
+
+
+## webdav server
+
+enable with `--dav`,  supports winxp, win7
+
+on windows xp/7, connect using the explorer UI:
+* rightclick [my computer] -> [map network drive] -> [Connect to a network server] hyperlink -> [Choose a custom network location] -> `http://192.168.123.1:3923/`
+
+on windows 7/8/10, disable wpad for performance:
+* control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
 
 
 ## file indexing
@@ -1134,7 +1146,7 @@ some notes on hardening
   * `--unpost 0`, `--no-del`, `--no-mv` disables all move/delete support
   * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
     * however note if you edit one file it will also affect the other copies
-  * `--vague-403` returns a "404 not found" instead of "403 forbidden" which is a common enterprise meme
+  * `--vague-401` returns a "404 not found" instead of "401 unauthorized" which is a common enterprise meme
   * `--ban-404=50,60,1440` ban client for 1440min (24h) if they hit 50 404's in 60min
     * **NB:** will ban anyone who enables up2k turbo
   * `--nih` removes the server hostname from directory listings

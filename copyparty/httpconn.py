@@ -34,6 +34,9 @@ if TYPE_CHECKING:
     from .httpsrv import HttpSrv
 
 
+PTN_HTTP = re.compile(br"[A-Z]{3}[A-Z ]")
+
+
 class HttpConn(object):
     """
     spawned by HttpSrv to handle an incoming client connection,
@@ -134,7 +137,7 @@ class HttpConn(object):
                 self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
                 return False
 
-        return method not in [None, b"GET ", b"HEAD", b"POST", b"PUT ", b"OPTI"]
+        return not method or not bool(PTN_HTTP.match(method))
 
     def run(self) -> None:
         self.sr = None

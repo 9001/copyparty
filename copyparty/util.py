@@ -130,13 +130,16 @@ HTTPCODE = {
     200: "OK",
     204: "No Content",
     206: "Partial Content",
+    207: "Multi-Status",
     302: "Found",
     304: "Not Modified",
     400: "Bad Request",
+    401: "Unauthorized",
     403: "Forbidden",
     404: "Not Found",
     405: "Method Not Allowed",
     411: "Length Required",
+    412: "Precondition Failed",
     413: "Payload Too Large",
     416: "Requested Range Not Satisfiable",
     422: "Unprocessable Entity",
@@ -1356,7 +1359,7 @@ def gencookie(k: str, v: str, dur: Optional[int]) -> str:
     v = v.replace(";", "")
     if dur:
         dt = datetime.utcfromtimestamp(time.time() + dur)
-        exp = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        exp = dt.strftime(HTTP_TS_FMT)
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
@@ -1564,7 +1567,10 @@ def vsplit(vpath: str) -> tuple[str, str]:
 
 
 def vjoin(rd: str, fn: str) -> str:
-    return rd + "/" + fn if rd else fn
+    if rd and fn:
+        return rd + "/" + fn
+    else:
+        return rd or fn
 
 
 def w8dec(txt: bytes) -> str:

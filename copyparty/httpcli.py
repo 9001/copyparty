@@ -6,6 +6,7 @@ import base64
 import calendar
 import copy
 import gzip
+import itertools
 import json
 import os
 import re
@@ -237,7 +238,8 @@ class HttpCli(object):
             self.http_ver = "HTTP/1.1"
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = False
-            self.loud_reply(unicode(ex), status=ex.code, volsan=True)
+            h = {"WWW-Authenticate": "Basic"} if ex.code == 401 else {}
+            self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
             return self.keepalive
 
         if self.args.rsp_slp:
@@ -357,8 +359,8 @@ class HttpCli(object):
             except:
                 pass
 
-        pwd = uparam.get("pw") or pwd
-        self.uname = self.asrv.iacct.get(pwd) or "*"
+        self.pw = uparam.get("pw") or pwd
+        self.uname = self.asrv.iacct.get(self.pw) or "*"
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
         self.mvol = self.asrv.vfs.amove[self.uname]
@@ -366,8 +368,8 @@ class HttpCli(object):
         self.gvol = self.asrv.vfs.aget[self.uname]
         self.upvol = self.asrv.vfs.apget[self.uname]
 
-        if pwd:
-            self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(pwd)[0]))
+        if self.pw:
+            self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(self.pw)[0]))
 
         if self.is_rclone:
             uparam["raw"] = ""
@@ -396,6 +398,8 @@ class HttpCli(object):
                 return self.handle_put() and self.keepalive
             elif self.mode == "OPTIONS":
                 return self.handle_options() and self.keepalive
+            elif self.mode == "PROPFIND":
+                return self.handle_propfind() and self.keepalive
             else:
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
@@ -425,8 +429,9 @@ class HttpCli(object):
                     self.conn.hsrv.broker.say("log_stacks")
                     msg += "hint: important info in the server log\r\n"
 
-                msg = "<pre>" + html_escape(msg)
-                self.reply(msg.encode("utf-8", "replace"), status=pex.code, volsan=True)
+                zb = b"<pre>" + html_escape(msg).encode("utf-8", "replace")
+                h = {"WWW-Authenticate": "Basic"} if pex.code == 401 else {}
+                self.reply(zb, status=pex.code, headers=h, volsan=True)
                 return self.keepalive
             except Pebkac:
                 return False
@@ -467,6 +472,7 @@ class HttpCli(object):
 
         # close if unknown length, otherwise take client's preference
         response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
+        response.append("Date: " + datetime.utcnow().strftime(HTTP_TS_FMT))
 
         # headers{} overrides anything set previously
         if headers:
@@ -658,19 +664,205 @@ class HttpCli(object):
 
         return self.tx_browser()
 
+    def handle_propfind(self) -> bool:
+        if not self.args.dav:
+            raise Pebkac(405, "WebDAV is disabled in server config")
+
+        if not self.can_read and not self.can_write and not self.can_get:
+            if self.vpath:
+                self.log("inaccessible: [{}]".format(self.vpath))
+                return self.tx_404(True)
+
+            self.uparam["h"] = ""
+
+        enc = "windows-31j"
+        enc = "shift_jis"
+        enc = "utf-8"
+        uenc = enc.upper()
+
+        clen = int(self.headers.get("content-length", 0))
+        if clen:
+            buf = b""
+            for rbuf in self.get_body_reader()[0]:
+                buf += rbuf
+                if not rbuf or len(buf) >= 32768:
+                    break
+
+            props_lst: list[str] = []
+            props_xml = buf.decode(enc, "replace")
+            # dont want defusedxml just for this
+            ptn = re.compile("<(?:[^ :]+:)?([^ =/>]+)")
+            in_prop = False
+            for ln in props_xml.replace(">", "\n").split("\n"):
+                m = ptn.search(ln)
+                if not m:
+                    continue
+
+                tag = m.group(1).lower()
+                if tag == "prop":
+                    in_prop = not in_prop
+                    continue
+
+                if not in_prop:
+                    continue
+
+                props_lst.append(tag)
+        else:
+            props_lst = [
+                "contentclass",
+                "creationdate",
+                "defaultdocument",
+                "displayname",
+                "getcontentlanguage",
+                "getcontentlength",
+                "getcontenttype",
+                "getlastmodified",
+                "href",
+                "iscollection",
+                "ishidden",
+                "isreadonly",
+                "isroot",
+                "isstructureddocument",
+                "lastaccessed",
+                "name",
+                "parentname",
+                "resourcetype",
+                "supportedlock",
+            ]
+
+        props = set(props_lst)
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
+        depth = self.headers.get("depth", "infinity").lower()
+
+        if depth == "infinity":
+            if self.args.dav_nr:
+                raise Pebkac(412, "recursive file listing is disabled in server config")
+
+            fgen = vn.zipgen(
+                rem,
+                set(),
+                self.uname,
+                self.args.ed,
+                True,
+                not self.args.no_scandir,
+                wrap=False,
+            )
+
+        elif depth == "1":
+            _, vfs_ls, vfs_virt = vn.ls(
+                rem, self.uname, not self.args.no_scandir, [[True]]
+            )
+            zi = int(time.time())
+            zsr = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
+            ls = [{"vp": vp, "st": st} for vp, st in vfs_ls]
+            ls += [{"vp": v, "st": zsr} for v in vfs_virt]
+            fgen = ls  # type: ignore
+
+        elif depth == "0":
+            fgen = []  # type: ignore
+
+        else:
+            t = "invalid depth value '{}' (must be either '0' or '1'{})"
+            t2 = "" if self.args.dav_nr else " or 'infinity'"
+            raise Pebkac(412, t.format(depth, t2))
+
+        topdir = {"vp": "", "st": os.stat(vn.canonical(rem))}
+        fgen = itertools.chain([topdir], fgen)  # type: ignore
+        vtop = vjoin(vn.vpath, rem)
+
+        self.send_headers(
+            None, 207, "text/xml; charset=" + enc, {"Transfer-Encoding": "chunked"}
+        )
+
+        ret = '<?xml version="1.0" encoding="{}"?>\n<D:multistatus xmlns:D="DAV:">'
+        ret = ret.format(uenc)
+        for x in fgen:
+            vp = x["vp"]
+            st: os.stat_result = x["st"]
+            rp = vjoin(vtop, vp)
+            isdir = stat.S_ISDIR(st.st_mode)
+
+            t = "<D:response><D:href>/{}{}</D:href><D:propstat><D:prop>"
+            ret += t.format(html_escape(rp), "/" if isdir and vp else "")
+
+            pvs: dict[str, str] = {
+                "displayname": html_escape(vp.split("/")[-1]),
+                "getlastmodified": datetime.utcfromtimestamp(st.st_mtime).strftime(
+                    HTTP_TS_FMT
+                ),
+                "resourcetype": '<D:collection xmlns:D="DAV:"/>' if isdir else "",
+                "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
+            }
+            if not isdir:
+                pvs["getcontenttype"] = "application/octet-stream"
+                pvs["getcontentlength"] = str(st.st_size)
+
+            for k, v in pvs.items():
+                if k not in props:
+                    continue
+                elif v:
+                    ret += "<D:{0}>{1}</D:{0}>".format(k, v)
+                else:
+                    ret += "<D:{}/>".format(k)
+
+            ret += "</D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat>"
+
+            missing = ["<D:{}/>".format(x) for x in props if x not in pvs]
+            if missing and clen:
+                t = "<D:propstat><D:prop>{}</D:prop><D:status>HTTP/1.1 404 Not Found</D:status></D:propstat>"
+                ret += t.format("".join(missing))
+
+            ret += "</D:response>"
+            while len(ret) >= 0x800:
+                ret = self.send_chunk(ret, enc, 0x800)
+
+        ret += "</D:multistatus>"
+        while ret:
+            ret = self.send_chunk(ret, enc, 0x800)
+
+        self.send_chunk("", enc, 0x800)
+        return True
+
+    def send_chunk(self, txt: str, enc: str, bmax: int):
+        orig_len = len(txt)
+        buf = txt[:bmax].encode(enc, "replace")[:bmax]
+        try:
+            _ = buf.decode(enc)
+        except UnicodeDecodeError as ude:
+            buf = buf[: ude.start]
+
+        txt = txt[len(buf.decode(enc)) :]
+        if txt and len(txt) == orig_len:
+            raise Pebkac(500, "chunk slicing failed")
+
+        buf = "{:x}\r\n".format(len(buf)).encode(enc) + buf
+        self.s.sendall(buf + b"\r\n")
+        return txt
+
     def handle_options(self) -> bool:
         if self.do_log:
             self.log("OPTIONS " + self.req)
 
-        self.send_headers(
-            None,
-            204,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Headers": "*",
-            },
-        )
+        ret = {
+            "Allow": "GET, HEAD, POST, PUT, OPTIONS",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
+        }
+
+        wd = {
+            "Dav": "1, 2",
+            "Ms-Author-Via": "DAV",
+        }
+
+        if self.args.dav:
+            # PROPPATCH, LOCK, UNLOCK, COPY: noop (spec-must)
+            zs = ", PROPFIND, PROPPATCH, LOCK, UNLOCK, MKCOL, COPY, MOVE, DELETE"
+            ret["Allow"] += zs
+            ret.update(wd)
+
+        # winxp-webdav doesnt know what 204 is
+        self.send_headers(0, 200, headers=ret)
         return True
 
     def handle_put(self) -> bool:
@@ -1977,7 +2169,9 @@ class HttpCli(object):
         self.log(cdis)
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
-        fgen = vn.zipgen(rem, set(items), self.uname, dots, not self.args.no_scandir)
+        fgen = vn.zipgen(
+            rem, set(items), self.uname, False, dots, not self.args.no_scandir
+        )
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         bgen = packer(self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg)
         bsent = 0
@@ -2023,7 +2217,7 @@ class HttpCli(object):
         mime, ico = self.ico.get(ext, not exact, chrome)
 
         dt = datetime.utcfromtimestamp(self.E.t0)
-        lm = dt.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        lm = dt.strftime(HTTP_TS_FMT)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 
