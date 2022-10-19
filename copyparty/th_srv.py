@@ -269,7 +269,7 @@ class ThumbSrv(object):
                 except Exception as ex:
                     msg = "{} could not create thumbnail of {}\n{}"
                     msg = msg.format(fun.__name__, abspath, min_ex())
-                    c: Union[str, int] = 1 if "<Signals.SIG" in msg else "1;30"
+                    c: Union[str, int] = 1 if "<Signals.SIG" in msg else "90"
                     self.log(msg, c)
                     if getattr(ex, "returncode", 0) != 321:
                         with open(tpath, "wb") as _:
@@ -323,7 +323,7 @@ class ThumbSrv(object):
             try:
                 im = self.fancy_pillow(im)
             except Exception as ex:
-                self.log("fancy_pillow {}".format(ex), "1;30")
+                self.log("fancy_pillow {}".format(ex), "90")
                 im.thumbnail(self.res)
 
             fmts = ["RGB", "L"]
@@ -423,7 +423,7 @@ class ThumbSrv(object):
         if not ret:
             return
 
-        c: Union[str, int] = "1;30"
+        c: Union[str, int] = "90"
         t = "FFmpeg failed (probably a corrupt video file):\n"
         if (
             (not self.args.th_ff_jpg or time.time() - int(self.args.th_ff_jpg) < 60)

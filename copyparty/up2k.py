@@ -614,7 +614,7 @@ class Up2k(object):
 
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
-        fv = "\033[0;36m{}:\033[1;30m{}"
+        fv = "\033[0;36m{}:\033[90m{}"
         fx = set(("html_head",))
         a = [
             (ft if v is True else ff if v is False else fv).format(k, str(v))
@@ -1441,7 +1441,7 @@ class Up2k(object):
 
         if self.args.mtag_vv:
             t = "parsers for {}: \033[0m{}"
-            self.log(t.format(ptop, list(parsers.keys())), "1;30")
+            self.log(t.format(ptop, list(parsers.keys())), "90")
 
         self.mtp_parsers[ptop] = parsers
 
@@ -1572,7 +1572,7 @@ class Up2k(object):
             all_parsers = self.mtp_parsers[ptop]
         except:
             if self.args.mtag_vv:
-                self.log("no mtp defined for {}".format(ptop), "1;30")
+                self.log("no mtp defined for {}".format(ptop), "90")
             return {}
 
         entags = self.entags[ptop]
@@ -1584,13 +1584,13 @@ class Up2k(object):
                     if v.audio == "n":
                         if self.args.mtag_vv:
                             t = "skip mtp {}; is no-audio, have audio"
-                            self.log(t.format(k), "1;30")
+                            self.log(t.format(k), "90")
                         continue
                 # is not audio, require audio?
                 elif v.audio == "y":
                     if self.args.mtag_vv:
                         t = "skip mtp {}; is audio, have no-audio"
-                        self.log(t.format(k), "1;30")
+                        self.log(t.format(k), "90")
                     continue
 
             if v.ext:
@@ -1603,7 +1603,7 @@ class Up2k(object):
                 if not match:
                     if self.args.mtag_vv:
                         t = "skip mtp {}; need file-ext {}, have {}"
-                        self.log(t.format(k, v.ext, abspath.rsplit(".")[-1]), "1;30")
+                        self.log(t.format(k, v.ext, abspath.rsplit(".")[-1]), "90")
                     continue
 
             parsers[k] = v
@@ -1651,13 +1651,13 @@ class Up2k(object):
                 if not qe.mtp:
                     if self.args.mtag_vv:
                         t = "tag-thr: {}({})"
-                        self.log(t.format(self.mtag.backend, qe.abspath), "1;30")
+                        self.log(t.format(self.mtag.backend, qe.abspath), "90")
 
                     tags = self.mtag.get(qe.abspath)
                 else:
                     if self.args.mtag_vv:
                         t = "tag-thr: {}({})"
-                        self.log(t.format(list(qe.mtp.keys()), qe.abspath), "1;30")
+                        self.log(t.format(list(qe.mtp.keys()), qe.abspath), "90")
 
                     tags = self.mtag.get_bin(qe.mtp, qe.abspath, qe.oth_tags)
                     vtags = [

@@ -200,7 +200,7 @@ class HttpSrv(object):
 
         while not self.stopping:
             if self.args.log_conn:
-                self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="1;30")
+                self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="90")
 
             if self.ncli >= self.nclimax:
                 self.log(self.name, "at connection limit; waiting", 3)
@@ -208,7 +208,7 @@ class HttpSrv(object):
                     time.sleep(0.1)
 
             if self.args.log_conn:
-                self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="1;30")
+                self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="90")
 
             try:
                 sck, addr = srv_sck.accept()
@@ -221,7 +221,7 @@ class HttpSrv(object):
                 t = "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
                     "-" * 3, ip, port % 8, port
                 )
-                self.log("%s %s" % addr, t, c="1;30")
+                self.log("%s %s" % addr, t, c="90")
 
             self.accept(sck, addr)
 
@@ -328,7 +328,7 @@ class HttpSrv(object):
         fno = sck.fileno()
         try:
             if self.args.log_conn:
-                self.log("%s %s" % addr, "|%sC-crun" % ("-" * 4,), c="1;30")
+                self.log("%s %s" % addr, "|%sC-crun" % ("-" * 4,), c="90")
 
             cli.run()
 
@@ -343,7 +343,7 @@ class HttpSrv(object):
         finally:
             sck = cli.s
             if self.args.log_conn:
-                self.log("%s %s" % addr, "|%sC-cdone" % ("-" * 5,), c="1;30")
+                self.log("%s %s" % addr, "|%sC-cdone" % ("-" * 5,), c="90")
 
             try:
                 fno = sck.fileno()
@@ -353,7 +353,7 @@ class HttpSrv(object):
                     self.log(
                         "%s %s" % addr,
                         "shut({}): {}".format(fno, ex),
-                        c="1;30",
+                        c="90",
                     )
                 if ex.errno not in E_SCK:
                     raise

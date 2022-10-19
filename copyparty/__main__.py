@@ -804,7 +804,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         S_VERSION,
         CODENAME,
         S_BUILD_DT,
-        py_desc().replace("[", "\033[1;30m["),
+        py_desc().replace("[", "\033[90m["),
         SQLITE_VER,
         JINJA_VER,
         PYFTPD_VER,

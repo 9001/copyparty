@@ -1752,7 +1752,7 @@ def shut_socket(log: "NamedLogger", sck: socket.socket, timeout: int = 3) -> Non
     finally:
         td = time.time() - t0
         if td >= 1:
-            log("shut({}) in {:.3f} sec".format(fd, td), "1;30")
+            log("shut({}) in {:.3f} sec".format(fd, td), "90")
 
         sck.close()
 
