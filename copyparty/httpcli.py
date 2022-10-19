@@ -767,7 +767,13 @@ class HttpCli(object):
             t2 = "" if self.args.dav_nr else " or 'infinity'"
             raise Pebkac(412, t.format(depth, t2))
 
-        topdir = {"vp": "", "st": os.stat(vn.canonical(rem))}
+        try:
+            topdir = {"vp": "", "st": os.stat(vn.canonical(rem))}
+        except OSError as ex:
+            if ex.errno != errno.ENOENT:
+                raise
+            raise Pebkac(404)
+
         fgen = itertools.chain([topdir], fgen)  # type: ignore
         vtop = vjoin(vn.vpath, rem)
 

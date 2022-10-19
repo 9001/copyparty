@@ -707,13 +707,17 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 * runs in active mode by default, you probably want `--ftp-pr 12000-13000`
   * if you enable both `ftp` and `ftps`, the port-range will be divided in half
   * some older software (filezilla on debian-stable) cannot passive-mode with TLS
+* login with any username + your password, or put your password in the username field
 
 
 ## webdav server
 
-enable with `--dav`,  supports winxp, win7
+enable with `--dav`,  supports winxp, win7/8/10
 
-on windows xp/7, connect using the explorer UI:
+general usage:
+* login with any username + your password, or put your password in the username field and leave password empty
+
+on windows xp/7/8/10, connect using the explorer UI:
 * rightclick [my computer] -> [map network drive] -> [Connect to a network server] hyperlink -> [Choose a custom network location] -> `http://192.168.123.1:3923/`
 
 on windows 7/8/10, connect using command prompt (`wark`=password):
@@ -723,8 +727,9 @@ on windows 7/8/10, disable wpad for performance:
 * control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
 
 known issues:
-* win7 has a bug where it doesn't actually send the password to the server, so please type your password into the username field
-* win7 cannot access servers which require authentication unless you use https or [enable basic authentication](./contrib/webdav-basicauth.reg) for http
+* win7/8/10 has a bug where it doesn't actually send the password to the server when authenticating during a reconnect unless you first try to login with an incorrect password and then switch to the correct password
+  * or just type your password into the username field instead to get around it entirely
+* win7 cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
 * win7 cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
 * winxp cannot show unicode characters outside of *some range*
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
