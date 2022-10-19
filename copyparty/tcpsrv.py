@@ -8,7 +8,15 @@ import sys
 
 from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, unicode
 from .stolen.qrcodegen import QrCode
-from .util import chkcmd, sunpack, termsize
+from .util import (
+    E_ACCESS,
+    E_ADDR_IN_USE,
+    E_ADDR_NOT_AVAIL,
+    E_UNREACH,
+    chkcmd,
+    sunpack,
+    termsize,
+)
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -133,9 +141,9 @@ class TcpSrv(object):
             srv.bind((ip, port))
             self.srv.append(srv)
         except (OSError, socket.error) as ex:
-            if ex.errno in [98, 48]:
+            if ex.errno in E_ADDR_IN_USE:
                 e = "\033[1;31mport {} is busy on interface {}\033[0m".format(port, ip)
-            elif ex.errno in [99, 49]:
+            elif ex.errno in E_ADDR_NOT_AVAIL:
                 e = "\033[1;31minterface {} does not exist\033[0m".format(ip)
             else:
                 raise
@@ -321,9 +329,9 @@ class TcpSrv(object):
                 default_route = s.getsockname()[0]
                 break
             except (OSError, socket.error) as ex:
-                if ex.errno == 13:
+                if ex.errno in E_ACCESS:
                     self.log("tcpsrv", "eaccess {} (trying next)".format(ip))
-                elif ex.errno not in [101, 10065, 10051]:
+                elif ex.errno not in E_UNREACH:
                     self.log("tcpsrv", "route lookup failed; err {}".format(ex.errno))
 
         s.close()

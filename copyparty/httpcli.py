@@ -5,6 +5,7 @@ import argparse  # typechk
 import base64
 import calendar
 import copy
+import errno
 import gzip
 import itertools
 import json
@@ -1290,10 +1291,10 @@ class HttpCli(object):
             except OSError as ex:
                 self.log("makedirs failed [{}]".format(dst))
                 if not bos.path.isdir(dst):
-                    if ex.errno == 13:
+                    if ex.errno == errno.EACCES:
                         raise Pebkac(500, "the server OS denied write-access")
 
-                    if ex.errno == 17:
+                    if ex.errno == errno.EEXIST:
                         raise Pebkac(400, "some file got your folder name")
 
                     raise Pebkac(500, min_ex())
@@ -1544,7 +1545,7 @@ class HttpCli(object):
             try:
                 bos.mkdir(fn)
             except OSError as ex:
-                if ex.errno == 13:
+                if ex.errno == errno.EACCES:
                     raise Pebkac(500, "the server OS denied write-access")
 
                 raise Pebkac(500, "mkdir failed:\n" + min_ex())
@@ -1862,7 +1863,7 @@ class HttpCli(object):
             srv_lastmod = st.st_mtime
             srv_lastmod3 = int(srv_lastmod * 1000)
         except OSError as ex:
-            if ex.errno != 2:
+            if ex.errno != errno.ENOENT:
                 raise
 
         # if file exists, chekc that timestamp matches the client's

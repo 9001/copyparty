@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import base64
+import errno
 import gzip
 import hashlib
 import json
@@ -2670,7 +2671,7 @@ class Up2k(object):
         try:
             atomic_move(sabs, dabs)
         except OSError as ex:
-            if ex.errno != 18:
+            if ex.errno != errno.EXDEV:
                 raise
 
             self.log("cross-device move:\n  {}\n  {}".format(sabs, dabs))

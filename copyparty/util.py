@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import base64
 import contextlib
+import errno
 import hashlib
 import hmac
 import math
@@ -28,6 +29,28 @@ from queue import Queue
 from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
+
+
+def _ens(want: str) -> tuple[int, ...]:
+    ret: list[int] = []
+    for v in want.split():
+        try:
+            ret.append(getattr(errno, v))
+        except:
+            pass
+
+    return tuple(ret)
+
+
+# WSAECONNRESET - foribly closed by remote
+# WSAENOTSOCK - no longer a socket
+# EUNATCH - can't assign requested address (wifi down)
+E_SCK = _ens("ENOTCONN EUNATCH EBADF WSAENOTSOCK WSAECONNRESET")
+E_ADDR_NOT_AVAIL = _ens("EADDRNOTAVAIL WSAEADDRNOTAVAIL")
+E_ADDR_IN_USE = _ens("EADDRINUSE WSAEADDRINUSE")
+E_ACCESS = _ens("EACCES WSAEACCES")
+E_UNREACH = _ens("EHOSTUNREACH WSAEHOSTUNREACH ENETUNREACH WSAENETUNREACH")
+
 
 try:
     import ctypes
@@ -1020,7 +1043,7 @@ def ren_open(
         except OSError as ex_:
             ex = ex_
 
-            if ex.errno == 22 and not asciified:
+            if ex.errno == errno.EINVAL and not asciified:
                 asciified = True
                 bname, fname = [
                     zs.encode("ascii", "replace").decode("ascii").replace("?", "_")
@@ -1028,7 +1051,10 @@ def ren_open(
                 ]
                 continue
 
-            if ex.errno not in [36, 63, 95] and (not WINDOWS or ex.errno != 22):
+            # ENOTSUP: zfs on ubuntu 20.04
+            if ex.errno not in (errno.ENAMETOOLONG, errno.ENOSR, errno.ENOTSUP) and (
+                not WINDOWS or ex.errno != errno.EINVAL
+            ):
                 raise
 
         if not b64:
@@ -1884,8 +1910,8 @@ def sendfile_kern(
             stuck = 0
         except OSError as ex:
             d = time.time() - stuck
-            log("sendfile stuck for {:.3f} sec: {!r}".format(d, ex))
-            if d < 3600 and ex.errno == 11:  # eagain
+            log("sendfile stuck for {:.3f} sec: {!r}".format(d, ex), "90")
+            if d < 3600 and ex.errno == errno.EWOULDBLOCK:
                 continue
 
             n = 0
