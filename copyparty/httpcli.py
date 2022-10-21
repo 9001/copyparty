@@ -856,6 +856,9 @@ class HttpCli(object):
             if not rbuf or len(buf) >= 128 * 1024:
                 break
 
+        if self._applesan():
+            return True
+
         txt = buf.decode("ascii", "replace").lower()
         enc = self.get_xml_enc(txt)
         uenc = enc.upper()
@@ -910,6 +913,9 @@ class HttpCli(object):
             if not rbuf or len(buf) >= 128 * 1024:
                 break
 
+        if self._applesan():
+            return True
+
         txt = buf.decode("ascii", "replace").lower()
         enc = self.get_xml_enc(txt)
         uenc = enc.upper()
@@ -956,6 +962,9 @@ class HttpCli(object):
         return True
 
     def handle_mkcol(self) -> bool:
+        if self._applesan():
+            return True
+
         return self._mkdir(self.vpath)
 
     def handle_move(self) -> bool:
@@ -975,6 +984,20 @@ class HttpCli(object):
             pass
 
         return True
+
+    def _applesan(self) -> bool:
+        if self.args.dav_mac or "Darwin/" not in self.ua:
+            return False
+
+        vp = "/" + self.vpath
+        ptn = r"/\.(_|DS_Store|Spotlight-|fseventsd|Trashes|AppleDouble)|/__MACOS"
+        if re.search(ptn, vp):
+            zt = '<?xml version="1.0" encoding="utf-8"?>\n<D:error xmlns:D="DAV:"><D:lock-token-submitted><D:href>{}</D:href></D:lock-token-submitted></D:error>'
+            zb = zt.format(vp).encode("utf-8", "replace")
+            self.reply(zb, 423, "text/xml; charset=utf-8")
+            return True
+
+        return False
 
     def send_chunk(self, txt: str, enc: str, bmax: int) -> str:
         orig_len = len(txt)
@@ -1024,6 +1047,9 @@ class HttpCli(object):
         if not self.can_write:
             t = "{} does not have write-access here"
             raise Pebkac(403, t.format(self.uname))
+
+        if self.args.dav and self._applesan():
+            return self.headers.get("content-length") == "0"
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:

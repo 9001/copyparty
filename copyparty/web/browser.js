@@ -3123,7 +3123,7 @@ var fileman = (function () {
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
-				if (this.status !== 200) {
+				if (this.status !== 201) {
 					var msg = this.responseText;
 					toast.err(9, L.fr_efail + msg);
 					return;
@@ -3278,7 +3278,7 @@ var fileman = (function () {
 			xhr.send();
 		}
 		function paste_cb() {
-			if (this.status !== 200) {
+			if (this.status !== 201) {
 				var msg = this.responseText;
 				toast.err(9, L.fp_err + msg);
 				return;

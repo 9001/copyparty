@@ -167,6 +167,7 @@ HTTPCODE = {
     413: "Payload Too Large",
     416: "Requested Range Not Satisfiable",
     422: "Unprocessable Entity",
+    423: "Locked",
     429: "Too Many Requests",
     500: "Internal Server Error",
     501: "Not Implemented",
