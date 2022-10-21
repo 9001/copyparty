@@ -404,7 +404,7 @@ class HttpCli(object):
             elif self.mode == "PROPFIND":
                 return self.handle_propfind() and self.keepalive
             elif self.mode == "DELETE":
-                return self.handle_rm([]) and self.keepalive
+                return self.handle_delete() and self.keepalive
             elif self.mode == "PROPPATCH":
                 return self.handle_proppatch() and self.keepalive
             elif self.mode == "LOCK":
@@ -1041,6 +1041,10 @@ class HttpCli(object):
         self.send_headers(0, 200, headers=ret)
         return True
 
+    def handle_delete(self) -> bool:
+        self.log("DELETE " + self.req)
+        return self.handle_rm([])
+
     def handle_put(self) -> bool:
         self.log("PUT " + self.req)
 
@@ -1232,8 +1236,22 @@ class HttpCli(object):
         if rnd and not self.args.nw:
             fn = self.rand_name(fdir, fn, rnd)
 
-        if is_put and "daw" in vfs.flags:
-            params["overwrite"] = "a"
+        if is_put and self.args.dav:
+            # allow overwrite if volflag daw is set, or all the following is true:
+            #  * file exists and is empty
+            #  * there is no .PARTIAL
+
+            path = os.path.join(fdir, fn)
+            tnam = fn + ".PARTIAL"
+            if self.args.dotpart:
+                tnam = "." + tnam
+
+            if "daw" in vfs.flags or (
+                not bos.path.exists(os.path.join(fdir, tnam))
+                and bos.path.exists(path)
+                and not bos.path.getsize(path)
+            ):
+                params["overwrite"] = "a"
 
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
