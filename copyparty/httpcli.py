@@ -16,6 +16,7 @@ import stat
 import string
 import threading  # typechk
 import time
+import uuid
 from datetime import datetime
 from operator import itemgetter
 
@@ -391,6 +392,7 @@ class HttpCli(object):
         ) = self.asrv.vfs.can_access(self.vpath, self.uname)
 
         try:
+            # getattr(self.mode) is not yet faster than this
             if self.mode in ["GET", "HEAD"]:
                 return self.handle_get() and self.keepalive
             elif self.mode == "POST":
@@ -401,12 +403,18 @@ class HttpCli(object):
                 return self.handle_options() and self.keepalive
             elif self.mode == "PROPFIND":
                 return self.handle_propfind() and self.keepalive
+            elif self.mode == "DELETE":
+                return self.handle_rm([]) and self.keepalive
             elif self.mode == "PROPPATCH":
                 return self.handle_proppatch() and self.keepalive
             elif self.mode == "LOCK":
                 return self.handle_lock() and self.keepalive
             elif self.mode == "UNLOCK":
                 return self.handle_unlock() and self.keepalive
+            elif self.mode == "MKCOL":
+                return self.handle_mkcol() and self.keepalive
+            elif self.mode == "MOVE":
+                return self.handle_move() and self.keepalive
             else:
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
@@ -785,7 +793,7 @@ class HttpCli(object):
             isdir = stat.S_ISDIR(st.st_mode)
 
             t = "<D:response><D:href>/{}{}</D:href><D:propstat><D:prop>"
-            ret += t.format(html_escape(rp), "/" if isdir and vp else "")
+            ret += t.format(quotep(rp), "/" if isdir and vp else "")
 
             pvs: dict[str, str] = {
                 "displayname": html_escape(vp.split("/")[-1]),
@@ -866,7 +874,7 @@ class HttpCli(object):
 
         el = xroot.find(r"./{DAV:}response")
         assert el
-        e2 = mktnod("D:href", "/" + self.vpath)
+        e2 = mktnod("D:href", quotep("/" + self.vpath))
         el.insert(0, e2)
 
         el = xroot.find(r"./{DAV:}response/{DAV:}propstat")
@@ -893,6 +901,9 @@ class HttpCli(object):
         from .dxml import parse_xml, mkenod, mktnod
         from xml.etree import ElementTree as ET
 
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+        abspath = vn.dcanonical(rem)
+
         buf = b""
         for rbuf in self.get_body_reader()[0]:
             buf += rbuf
@@ -911,9 +922,9 @@ class HttpCli(object):
         if not lk.find(r"./{DAV:}depth"):
             lk.append(mktnod("D:depth", "infinity"))
 
-        lk.append(mkenod("D:timeout", mktnod("D:href", "Second-3600")))
-        lk.append(mkenod("D:locktoken", mktnod("D:href", "56709")))
-        lk.append(mkenod("D:lockroot", mktnod("D:href", "/foo/bar.txt")))
+        lk.append(mkenod("D:timeout", mktnod("D:href", "Second-3310")))
+        lk.append(mkenod("D:locktoken", mktnod("D:href", uuid.uuid4().urn)))
+        lk.append(mkenod("D:lockroot", mktnod("D:href", "/" + quotep(self.vpath))))
 
         lk2 = mkenod("D:activelock")
         xroot = mkenod("D:prop", mkenod("D:lockdiscovery", lk2))
@@ -923,7 +934,11 @@ class HttpCli(object):
         ret = '<?xml version="1.0" encoding="{}"?>\n'.format(uenc)
         ret += ET.tostring(xroot).decode("utf-8")
 
-        self.reply(ret.encode(enc, "replace"), 207, "text/xml; charset=" + enc)
+        if not bos.path.isfile(abspath):
+            with open(fsenc(abspath), "w") as _:
+                pass
+
+        self.reply(ret.encode(enc, "replace"), 200, "text/xml; charset=" + enc)
         return True
 
     def handle_unlock(self) -> bool:
@@ -938,6 +953,27 @@ class HttpCli(object):
             raise Pebkac(401, "authenticate")
 
         self.send_headers(None, 204)
+        return True
+
+    def handle_mkcol(self) -> bool:
+        return self._mkdir(self.vpath)
+
+    def handle_move(self) -> bool:
+        dst = self.headers["destination"]
+        dst = re.sub("^https?://[^/]+", "", dst).lstrip()
+        dst = unquotep(dst)
+        if not self._mv(self.vpath, dst):
+            return False
+
+        # up2k only cares about files and removes all empty folders;
+        # clients naturally expect empty folders to survive a rename
+        vn, rem = self.asrv.vfs.get(dst, self.uname, False, False)
+        dabs = vn.canonical(rem)
+        try:
+            bos.makedirs(dabs)
+        except:
+            pass
+
         return True
 
     def send_chunk(self, txt: str, enc: str, bmax: int) -> str:
@@ -1665,15 +1701,17 @@ class HttpCli(object):
         new_dir = self.parser.require("name", 512)
         self.parser.drop()
 
-        nullwrite = self.args.nw
-        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
-        self._assert_safe_rem(rem)
-
         sanitized = sanitize_fn(new_dir, "", [])
+        return self._mkdir(vjoin(self.vpath, sanitized))
+
+    def _mkdir(self, vpath) -> bool:
+        nullwrite = self.args.nw
+        vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
+        self._assert_safe_rem(rem)
+        fn = vfs.canonical(rem)
 
         if not nullwrite:
-            fdir = vfs.canonical(rem)
-            fn = os.path.join(fdir, sanitized)
+            fdir = os.path.dirname(fn)
 
             if not bos.path.isdir(fdir):
                 raise Pebkac(500, "parent folder does not exist")
@@ -1691,8 +1729,7 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
-        self.out_headers["X-New-Dir"] = quotep(sanitized)
+        self.out_headers["X-New-Dir"] = quotep(vpath.split("/")[-1])
         self.redirect(vpath, status=201)
         return True
 
@@ -2728,12 +2765,6 @@ class HttpCli(object):
         return True
 
     def handle_mv(self) -> bool:
-        if not self.can_move:
-            raise Pebkac(403, "not allowed for user " + self.uname)
-
-        if self.args.no_mv:
-            raise Pebkac(403, "the rename/move feature is disabled in server config")
-
         # full path of new loc (incl filename)
         dst = self.uparam.get("move")
         if not dst:
@@ -2742,8 +2773,17 @@ class HttpCli(object):
         # x-www-form-urlencoded (url query part) uses
         # either + or %20 for 0x20 so handle both
         dst = unquotep(dst.replace("+", " "))
-        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, self.vpath, dst)
-        self.loud_reply(x.get())
+        return self._mv(self.vpath, dst)
+
+    def _mv(self, vsrc: str, vdst: str) -> bool:
+        if not self.can_move:
+            raise Pebkac(403, "not allowed for user " + self.uname)
+
+        if self.args.no_mv:
+            raise Pebkac(403, "the rename/move feature is disabled in server config")
+
+        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, vsrc, vdst)
+        self.loud_reply(x.get(), status=201)
         return True
 
     def tx_ls(self, ls: dict[str, Any]) -> bool:

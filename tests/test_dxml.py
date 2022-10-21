@@ -120,7 +120,6 @@ class TestDXML(unittest.TestCase):
 </D:activelock></D:lockdiscovery></D:prop>"""
 
         txt = re.sub("\n +", "\n", txt)
-        ns = {"": "DAV:"}
         lk = parse_xml(txt)
         self.assertEqual(lk.tag, "{DAV:}lockinfo")
 

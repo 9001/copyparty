@@ -726,8 +726,8 @@ on windows 7/8/10, connect using command prompt (`wark`=password):
 on windows (xp or later), disable wpad for performance:
 * control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
 
-known issues:
-* win7/8/10 has a bug where it doesn't actually send the password to the server when authenticating during a reconnect unless you first try to login with an incorrect password and then switch to the correct password
+known client bugs:
+* win7/8/10 doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
   * or just type your password into the username field instead to get around it entirely
 * win7 cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
 * win7 cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)

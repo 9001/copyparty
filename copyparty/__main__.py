@@ -930,6 +930,9 @@ def main(argv: Optional[list[str]] = None) -> None:
     if not al.qrs and [k for k in argv if k.startswith("--qr")]:
         al.qr = True
 
+    if al.ihead:
+        al.ihead = [x.lower() for x in al.ihead]
+
     if HAVE_SSL:
         if al.ssl_ver:
             configure_ssl_ver(al)

@@ -70,6 +70,6 @@ def mktnod(name: str, text: str) -> ET.Element:
 
 def mkenod(name: str, sub_el: Optional[ET.Element] = None) -> ET.Element:
     el = ET.Element(name)
-    if sub_el:
+    if sub_el is not None:
         el.append(sub_el)
     return el
