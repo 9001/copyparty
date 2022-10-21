@@ -151,6 +151,7 @@ META_NOBOTS = '<meta name="robots" content="noindex, nofollow">'
 
 HTTPCODE = {
     200: "OK",
+    201: "Created",
     204: "No Content",
     206: "Partial Content",
     207: "Multi-Status",
@@ -182,6 +183,7 @@ IMPLICATIONS = [
     ["e2vu", "e2v"],
     ["e2vp", "e2v"],
     ["e2v", "e2d"],
+    ["daw", "dav"],
 ]
 
 
@@ -993,9 +995,17 @@ def ren_open(
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
+    overwrite = kwargs.pop("overwrite", None)
 
     if fname == os.devnull:
         with fun(fname, *args, **kwargs) as f:
+            yield {"orz": (f, fname)}
+            return
+
+    if overwrite:
+        assert fdir
+        fpath = os.path.join(fdir, fname)
+        with fun(fsenc(fpath), *args, **kwargs) as f:
             yield {"orz": (f, fname)}
             return
 

@@ -1215,6 +1215,18 @@ class AuthSrv(object):
                 self.log(t.format(mtp), 1)
                 errors = True
 
+        have_daw = False
+        for vol in vfs.all_vols.values():
+            daw = vol.flags.get("daw") or self.args.daw
+            if daw:
+                vol.flags["daw"] = True
+                have_daw = True
+
+        if have_daw and not self.args.dav:
+            t = 'volume "/{}" has volflag "daw" (webdav write-access), but argument --dav is not set'
+            self.log(t, 1)
+            errors = True
+
         if errors:
             sys.exit(1)
 

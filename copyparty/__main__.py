@@ -633,7 +633,8 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
 
     ap2 = ap.add_argument_group('WebDAV options')
-    ap2.add_argument("--dav", action="store_true", help="enable webdav")
+    ap2.add_argument("--dav", action="store_true", help="enable webdav; read-only even if user has write-access")
+    ap2.add_argument("--daw", action="store_true", help="enable full write support. \033[1;31mNB!\033[0m This has side-effects -- PUT-operations will now \033[1;31mOVERWRITE\033[0m existing files, rather than inventing new filenames to avoid loss of data. You might want to instead set this as a volflag where needed. By not setting this flag, uploaded files can get written to a filename which the client does not expect (which might be okay, depending on client)")
     ap2.add_argument("--dav-nr", action="store_true", help="reject depth:infinite requests (recursive file listing); breaks spec compliance and some clients, which might be a good thing since depth:infinite is extremely server-heavy")
 
     ap2 = ap.add_argument_group('opt-outs')

@@ -723,7 +723,7 @@ on windows xp/7/8/10, connect using the explorer UI:
 on windows 7/8/10, connect using command prompt (`wark`=password):
 * `net use w: http://192.168.123.1:3923/ wark /user:a`
 
-on windows 7/8/10, disable wpad for performance:
+on windows (xp or later), disable wpad for performance:
 * control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
 
 known issues:

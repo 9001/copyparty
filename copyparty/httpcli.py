@@ -401,6 +401,12 @@ class HttpCli(object):
                 return self.handle_options() and self.keepalive
             elif self.mode == "PROPFIND":
                 return self.handle_propfind() and self.keepalive
+            elif self.mode == "PROPPATCH":
+                return self.handle_proppatch() and self.keepalive
+            elif self.mode == "LOCK":
+                return self.handle_lock() and self.keepalive
+            elif self.mode == "UNLOCK":
+                return self.handle_unlock() and self.keepalive
             else:
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
@@ -666,6 +672,9 @@ class HttpCli(object):
         return self.tx_browser()
 
     def handle_propfind(self) -> bool:
+        if self.do_log:
+            self.log("PFIND " + self.req)
+
         if not self.args.dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
@@ -676,8 +685,10 @@ class HttpCli(object):
 
             self.uparam["h"] = ""
 
-        enc = "windows-31j"
-        enc = "shift_jis"
+        from .dxml import parse_xml
+
+        # enc = "windows-31j"
+        # enc = "shift_jis"
         enc = "utf-8"
         uenc = enc.upper()
 
@@ -689,25 +700,9 @@ class HttpCli(object):
                 if not rbuf or len(buf) >= 32768:
                     break
 
-            props_lst: list[str] = []
-            props_xml = buf.decode(enc, "replace")
-            # dont want defusedxml just for this
-            ptn = re.compile("<(?:[^ :]+:)?([^ =/>]+)")
-            in_prop = False
-            for ln in props_xml.replace(">", "\n").split("\n"):
-                m = ptn.search(ln)
-                if not m:
-                    continue
-
-                tag = m.group(1).lower()
-                if tag == "prop":
-                    in_prop = not in_prop
-                    continue
-
-                if not in_prop:
-                    continue
-
-                props_lst.append(tag)
+            xroot = parse_xml(buf.decode(enc, "replace"))
+            xtag = next(x for x in xroot if x.tag.split("}")[-1] == "prop")
+            props_lst = [y.tag.split("}")[-1] for y in xtag]
         else:
             props_lst = [
                 "contentclass",
@@ -830,7 +825,122 @@ class HttpCli(object):
         self.send_chunk("", enc, 0x800)
         return True
 
-    def send_chunk(self, txt: str, enc: str, bmax: int):
+    def handle_proppatch(self) -> bool:
+        if self.do_log:
+            self.log("PPATCH " + self.req)
+
+        if not self.args.dav:
+            raise Pebkac(405, "WebDAV is disabled in server config")
+
+        if not self.can_write:
+            self.log("{} tried to proppatch [{}]".format(self.uname, self.vpath))
+            raise Pebkac(401, "authenticate")
+
+        from .dxml import parse_xml, mkenod, mktnod
+        from xml.etree import ElementTree as ET
+
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+        # abspath = vn.dcanonical(rem)
+
+        buf = b""
+        for rbuf in self.get_body_reader()[0]:
+            buf += rbuf
+            if not rbuf or len(buf) >= 128 * 1024:
+                break
+
+        txt = buf.decode("ascii", "replace").lower()
+        enc = self.get_xml_enc(txt)
+        uenc = enc.upper()
+
+        txt = buf.decode(enc, "replace")
+        ET.register_namespace("D", "DAV:")
+        xroot = mkenod("D:orz")
+        xroot.insert(0, parse_xml(txt))
+        xprop = xroot.find(r"./{DAV:}propertyupdate/{DAV:}set/{DAV:}prop")
+        assert xprop
+        for el in xprop:
+            el.clear()
+
+        txt = """<multistatus xmlns="DAV:"><response><propstat><status>HTTP/1.1 403 Forbidden</status></propstat></response></multistatus>"""
+        xroot = parse_xml(txt)
+
+        el = xroot.find(r"./{DAV:}response")
+        assert el
+        e2 = mktnod("D:href", "/" + self.vpath)
+        el.insert(0, e2)
+
+        el = xroot.find(r"./{DAV:}response/{DAV:}propstat")
+        assert el
+        el.insert(0, xprop)
+
+        ret = '<?xml version="1.0" encoding="{}"?>\n'.format(uenc)
+        ret += ET.tostring(xroot).decode("utf-8")
+
+        self.reply(ret.encode(enc, "replace"), 207, "text/xml; charset=" + enc)
+        return True
+
+    def handle_lock(self) -> bool:
+        if self.do_log:
+            self.log("LOCK " + self.req)
+
+        if not self.args.dav:
+            raise Pebkac(405, "WebDAV is disabled in server config")
+
+        if not self.can_write:
+            self.log("{} tried to lock [{}]".format(self.uname, self.vpath))
+            raise Pebkac(401, "authenticate")
+
+        from .dxml import parse_xml, mkenod, mktnod
+        from xml.etree import ElementTree as ET
+
+        buf = b""
+        for rbuf in self.get_body_reader()[0]:
+            buf += rbuf
+            if not rbuf or len(buf) >= 128 * 1024:
+                break
+
+        txt = buf.decode("ascii", "replace").lower()
+        enc = self.get_xml_enc(txt)
+        uenc = enc.upper()
+
+        txt = buf.decode(enc, "replace")
+        ET.register_namespace("D", "DAV:")
+        lk = parse_xml(txt)
+        assert lk.tag == "{DAV:}lockinfo"
+
+        if not lk.find(r"./{DAV:}depth"):
+            lk.append(mktnod("D:depth", "infinity"))
+
+        lk.append(mkenod("D:timeout", mktnod("D:href", "Second-3600")))
+        lk.append(mkenod("D:locktoken", mktnod("D:href", "56709")))
+        lk.append(mkenod("D:lockroot", mktnod("D:href", "/foo/bar.txt")))
+
+        lk2 = mkenod("D:activelock")
+        xroot = mkenod("D:prop", mkenod("D:lockdiscovery", lk2))
+        for a in lk:
+            lk2.append(a)
+
+        ret = '<?xml version="1.0" encoding="{}"?>\n'.format(uenc)
+        ret += ET.tostring(xroot).decode("utf-8")
+
+        self.reply(ret.encode(enc, "replace"), 207, "text/xml; charset=" + enc)
+        return True
+
+    def handle_unlock(self) -> bool:
+        if self.do_log:
+            self.log("UNLOCK " + self.req)
+
+        if not self.args.dav:
+            raise Pebkac(405, "WebDAV is disabled in server config")
+
+        if not self.can_write:
+            self.log("{} tried to lock [{}]".format(self.uname, self.vpath))
+            raise Pebkac(401, "authenticate")
+
+        self.send_headers(None, 204)
+        return True
+
+    def send_chunk(self, txt: str, enc: str, bmax: int) -> str:
         orig_len = len(txt)
         buf = txt[:bmax].encode(enc, "replace")[:bmax]
         try:
@@ -875,13 +985,17 @@ class HttpCli(object):
     def handle_put(self) -> bool:
         self.log("PUT " + self.req)
 
+        if not self.can_write:
+            t = "{} does not have write-access here"
+            raise Pebkac(403, t.format(self.uname))
+
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
                 self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
             except:
                 raise Pebkac(400, "client d/c before 100 continue")
 
-        return self.handle_stash()
+        return self.handle_stash(True)
 
     def handle_post(self) -> bool:
         self.log("POST " + self.req)
@@ -893,7 +1007,7 @@ class HttpCli(object):
                 raise Pebkac(400, "client d/c before 100 continue")
 
         if "raw" in self.uparam:
-            return self.handle_stash()
+            return self.handle_stash(False)
 
         ctype = self.headers.get("content-type", "").lower()
         if not ctype:
@@ -911,10 +1025,10 @@ class HttpCli(object):
         if "application/x-www-form-urlencoded" in ctype:
             opt = self.args.urlform
             if "stash" in opt:
-                return self.handle_stash()
+                return self.handle_stash(False)
 
             if "save" in opt:
-                post_sz, _, _, _, path, _ = self.dump_to_file()
+                post_sz, _, _, _, path, _ = self.dump_to_file(False)
                 self.log("urlform: {} bytes, {}".format(post_sz, path))
             elif "print" in opt:
                 reader, _ = self.get_body_reader()
@@ -946,6 +1060,21 @@ class HttpCli(object):
 
         raise Pebkac(405, "don't know how to handle POST({})".format(ctype))
 
+    def get_xml_enc(self, txt) -> str:
+        ofs = txt[:512].find(' encoding="')
+        enc = ""
+        if ofs + 1:
+            enc = txt[ofs + 6 :].split('"')[1]
+        else:
+            enc = self.headers.get("content-type", "").lower()
+            ofs = enc.find("charset=")
+            if ofs + 1:
+                enc = enc[ofs + 4].split("=")[1].split(";")[0].strip("\"'")
+            else:
+                enc = ""
+
+        return enc or "utf-8"
+
     def get_body_reader(self) -> tuple[Generator[bytes, None, None], int]:
         if "chunked" in self.headers.get("transfer-encoding", "").lower():
             return read_socket_chunked(self.sr), -1
@@ -957,7 +1086,7 @@ class HttpCli(object):
         else:
             return read_socket(self.sr, remains), remains
 
-    def dump_to_file(self) -> tuple[int, str, str, int, str, str]:
+    def dump_to_file(self, is_put) -> tuple[int, str, str, int, str, str]:
         # post_sz, sha_hex, sha_b64, remains, path, url
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
@@ -1041,6 +1170,9 @@ class HttpCli(object):
         if rnd and not self.args.nw:
             fn = self.rand_name(fdir, fn, rnd)
 
+        if is_put and "daw" in vfs.flags:
+            params["overwrite"] = "a"
+
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
             path = os.path.join(fdir, fn)
@@ -1111,8 +1243,8 @@ class HttpCli(object):
 
         return post_sz, sha_hex, sha_b64, remains, path, url
 
-    def handle_stash(self) -> bool:
-        post_sz, sha_hex, sha_b64, remains, path, url = self.dump_to_file()
+    def handle_stash(self, is_put) -> bool:
+        post_sz, sha_hex, sha_b64, remains, path, url = self.dump_to_file(is_put)
         spd = self._spd(post_sz)
         t = "{} wrote {}/{} bytes to {}  # {}"
         self.log(t.format(spd, post_sz, remains, path, sha_b64[:28]))  # 21
@@ -1125,7 +1257,8 @@ class HttpCli(object):
         else:
             t = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
 
-        self.reply(t.encode("utf-8"))
+        h = {"Location": url} if is_put else {}
+        self.reply(t.encode("utf-8"), 201, headers=h)
         return True
 
     def bakflip(self, f: typing.BinaryIO, ofs: int, sz: int, sha: str) -> None:
@@ -1560,7 +1693,7 @@ class HttpCli(object):
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.out_headers["X-New-Dir"] = quotep(sanitized)
-        self.redirect(vpath)
+        self.redirect(vpath, status=201)
         return True
 
     def handle_new_md(self) -> bool:
@@ -1801,7 +1934,7 @@ class HttpCli(object):
             except Exception as ex:
                 suf = "\nfailed to write the upload report: {}".format(ex)
 
-        sc = 400 if errmsg else 200
+        sc = 400 if errmsg else 201
         if want_url:
             msg = "\n".join([x["url"] for x in jmsg["files"]])
             if errmsg:

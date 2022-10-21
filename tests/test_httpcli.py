@@ -139,7 +139,7 @@ class TestHttpCli(unittest.TestCase):
 
                 # stash
                 h, ret = self.put(url)
-                res = h.startswith("HTTP/1.1 200 ")
+                res = h.startswith("HTTP/1.1 201 ")
                 self.assertEqual(res, wok)
 
     def can_rw(self, fp):
@@ -171,9 +171,12 @@ class TestHttpCli(unittest.TestCase):
     def put(self, url):
         buf = "PUT /{0} HTTP/1.1\r\nCookie: cppwd=o\r\nConnection: close\r\nContent-Length: {1}\r\n\r\nok {0}\n"
         buf = buf.format(url, len(url) + 4).encode("utf-8")
+        print("PUT -->", buf)
         conn = tu.VHttpConn(self.args, self.asrv, self.log, buf)
         HttpCli(conn).run()
-        return conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+        ret = conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+        print("PUT <--", ret)
+        return ret
 
     def curl(self, url, binary=False):
         conn = tu.VHttpConn(self.args, self.asrv, self.log, hdr(url))
@@ -185,5 +188,4 @@ class TestHttpCli(unittest.TestCase):
         return conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
 
     def log(self, src, msg, c=0):
-        # print(repr(msg))
-        pass
+        print(msg)

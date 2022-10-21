@@ -144,11 +144,11 @@ def tc1(vflags):
             files={"f": (d.replace("/", "") + ".h264", vid)},
         )
         c = r.status_code
-        if c == 200 and p not in ["w", "rw"]:
+        if c == 201 and p not in ["w", "rw"]:
             raise Exception("post {} with perm {} at {}".format(c, p, d))
         elif c == 403 and p not in ["r"]:
             raise Exception("post {} with perm {} at {}".format(c, p, d))
-        elif c not in [200, 403]:
+        elif c not in [201, 403]:
             raise Exception("post {} with perm {} at {}".format(c, p, d))
 
     cpp.clean()
