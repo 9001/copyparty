@@ -235,22 +235,24 @@ def unpack():
     try:
         name += str(os.geteuid())
     except:
-        pass
+        name += "0"
 
     tag = "v" + str(STAMP)
     top = tempfile.gettempdir()
     opj = os.path.join
+    ofe = os.path.exists
     final = opj(top, name)
+    san = opj(final, "copyparty/up2k.py")
     for suf in range(0, 9001):
         withpid = "{}.{}.{}".format(name, os.getpid(), suf)
         mine = opj(top, withpid)
-        if not os.path.exists(mine):
+        if not ofe(mine):
             break
 
     tar = opj(mine, "tar")
 
     try:
-        if tag in os.listdir(final):
+        if tag in os.listdir(final) and ofe(san):
             msg("found early")
             return final
     except:
@@ -283,7 +285,7 @@ def unpack():
         f.write(b"h\n")
 
     try:
-        if tag in os.listdir(final):
+        if tag in os.listdir(final) and ofe(san):
             msg("found late")
             return final
     except:
@@ -367,17 +369,12 @@ def get_payload():
 
 def utime(top):
     # avoid cleaners
-    i = 0
     files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
-    while WINDOWS or os.path.exists("/etc/systemd"):
+    while True:
         t = int(time.time())
-        if i:
-            msg("utime {}, {}".format(i, t))
-
         for f in [top] + files:
             os.utime(f, (t, t))
 
-        i += 1
         time.sleep(78123)
 
 
