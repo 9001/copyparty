@@ -804,7 +804,7 @@ class HttpCli(object):
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
             if not isdir:
-                pvs["getcontenttype"] = "application/octet-stream"
+                pvs["getcontenttype"] = guess_mime(vp)
                 pvs["getcontentlength"] = str(st.st_size)
 
             for k, v in pvs.items():
