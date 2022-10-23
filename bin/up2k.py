@@ -154,10 +154,7 @@ class MTHash(object):
         self.done_q = Queue()
         self.thrs = []
         for _ in range(cores):
-            t = threading.Thread(target=self.worker)
-            t.daemon = True
-            t.start()
-            self.thrs.append(t)
+            self.thrs.append(Daemon(self.worker))
 
     def hash(self, f, fsz, chunksz, pcb=None, pcb_opaque=None):
         with self.omutex:
@@ -290,9 +287,7 @@ class CTermsize(object):
         except:
             return
 
-        thr = threading.Thread(target=self.worker)
-        thr.daemon = True
-        thr.start()
+        Daemon(self.worker)
 
     def worker(self):
         while True:
@@ -549,9 +544,11 @@ def upload(req_ses, file, cid, pw):
 
 
 class Daemon(threading.Thread):
-    def __init__(self, *a, **ka):
-        threading.Thread.__init__(self, *a, **ka)
+    def __init__(self, target, name=None, a=None):
+        # type: (Any, Any, Any) -> None
+        threading.Thread.__init__(self, target=target, args=a or (), name=name)
         self.daemon = True
+        self.start()
 
 
 class Ctl(object):
@@ -678,10 +675,10 @@ class Ctl(object):
             atexit.register(self.cleanup_vt100)
             ss.scroll_region(3)
 
-        Daemon(target=self.hasher).start()
+        Daemon(self.hasher)
         for _ in range(self.ar.j):
-            Daemon(target=self.handshaker).start()
-            Daemon(target=self.uploader).start()
+            Daemon(self.handshaker)
+            Daemon(self.uploader)
 
         idles = 0
         while idles < 3:

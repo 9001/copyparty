@@ -35,6 +35,7 @@ from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
 from .up2k import Up2k
 from .util import (
     VERSIONS,
+    Daemon,
     HMaccas,
     alltrace,
     ansi_re,
@@ -232,9 +233,7 @@ class SvcHub(object):
 
         self.up2k.init_vols()
 
-        thr = threading.Thread(target=self.sd_notify, name="sd-notify")
-        thr.daemon = True
-        thr.start()
+        Daemon(self.sd_notify, "sd-notify")
 
     def _logname(self) -> str:
         dt = datetime.utcnow()
@@ -285,9 +284,7 @@ class SvcHub(object):
     def run(self) -> None:
         self.tcpsrv.run()
 
-        thr = threading.Thread(target=self.thr_httpsrv_up, name="sig-hsrv-up2")
-        thr.daemon = True
-        thr.start()
+        Daemon(self.thr_httpsrv_up, "sig-hsrv-up2")
 
         sigs = [signal.SIGINT, signal.SIGTERM]
         if not ANYWIN:
@@ -302,9 +299,7 @@ class SvcHub(object):
         # never lucky
         if ANYWIN:
             # msys-python probably fine but >msys-python
-            thr = threading.Thread(target=self.stop_thr, name="svchub-sig")
-            thr.daemon = True
-            thr.start()
+            Daemon(self.stop_thr, "svchub-sig")
 
             try:
                 while not self.stop_req:
@@ -324,9 +319,7 @@ class SvcHub(object):
             return "cannot reload; already in progress"
 
         self.reloading = True
-        t = threading.Thread(target=self._reload, name="reloading")
-        t.daemon = True
-        t.start()
+        Daemon(self._reload, "reloading")
         return "reload initiated"
 
     def _reload(self) -> None:

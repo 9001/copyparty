@@ -29,6 +29,7 @@ from .mtag import MParser, MTag
 from .util import (
     HAVE_SQLITE3,
     SYMTIME,
+    Daemon,
     MTHash,
     Pebkac,
     ProgressPrinter,
@@ -153,9 +154,7 @@ class Up2k(object):
         if ANYWIN:
             # usually fails to set lastmod too quickly
             self.lastmod_q: list[tuple[str, int, tuple[int, int], bool]] = []
-            thr = threading.Thread(target=self._lastmodder, name="up2k-lastmod")
-            thr.daemon = True
-            thr.start()
+            Daemon(self._lastmodder, "up2k-lastmod")
 
         self.fstab = Fstab(self.log_func)
 
@@ -171,9 +170,7 @@ class Up2k(object):
         if self.args.no_fastboot:
             return
 
-        t = threading.Thread(target=self.deferred_init, name="up2k-deferred-init")
-        t.daemon = True
-        t.start()
+        Daemon(self.deferred_init, "up2k-deferred-init")
 
     def reload(self) -> None:
         self.gid += 1
@@ -188,32 +185,21 @@ class Up2k(object):
         if not self.pp and self.args.exit == "idx":
             return self.hub.sigterm()
 
-        thr = threading.Thread(target=self._snapshot, name="up2k-snapshot")
-        thr.daemon = True
-        thr.start()
-
+        Daemon(self._snapshot, "up2k-snapshot")
         if have_e2d:
-            thr = threading.Thread(target=self._hasher, name="up2k-hasher")
-            thr.daemon = True
-            thr.start()
-
-            thr = threading.Thread(target=self._sched_rescan, name="up2k-rescan")
-            thr.daemon = True
-            thr.start()
-
+            Daemon(self._hasher, "up2k-hasher")
+            Daemon(self._sched_rescan, "up2k-rescan")
             if self.mtag:
                 for n in range(max(1, self.args.mtag_mt)):
-                    name = "tagger-{}".format(n)
-                    thr = threading.Thread(target=self._tagger, name=name)
-                    thr.daemon = True
-                    thr.start()
+                    Daemon(self._tagger, "tagger-{}".format(n))
 
-                thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-init")
-                thr.daemon = True
-                thr.start()
+                Daemon(self._run_all_mtp, "up2k-mtp-init")
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.log_func("up2k", msg + "\033[K", c)
+        if self.pp:
+            msg += "\033[K"
+
+        self.log_func("up2k", msg, c)
 
     def _block(self, why: str) -> None:
         self.blocked = why
@@ -256,13 +242,11 @@ class Up2k(object):
             return "cannot initiate; scan is already in progress"
 
         args = (all_vols, scan_vols)
-        t = threading.Thread(
-            target=self.init_indexes,
-            args=args,
-            name="up2k-rescan-{}".format(scan_vols[0] if scan_vols else "all"),
+        Daemon(
+            self.init_indexes,
+            "up2k-rescan-{}".format(scan_vols[0] if scan_vols else "all"),
+            args,
         )
-        t.daemon = True
-        t.start()
         return ""
 
     def _sched_rescan(self) -> None:
@@ -581,7 +565,7 @@ class Up2k(object):
         if self.mtag:
             t = "online (running mtp)"
             if scan_vols:
-                thr = threading.Thread(target=self._run_all_mtp, name="up2k-mtp-scan")
+                thr = Daemon(self._run_all_mtp, "up2k-mtp-scan", r=False)
         else:
             self.pp = None
             t = "online, idle"
@@ -590,7 +574,6 @@ class Up2k(object):
             self.volstate[vol.vpath] = t
 
         if thr:
-            thr.daemon = True
             thr.start()
 
         return have_e2d
@@ -1622,11 +1605,7 @@ class Up2k(object):
 
         mpool: Queue[Mpqe] = Queue(nw)
         for _ in range(nw):
-            thr = threading.Thread(
-                target=self._tag_thr, args=(mpool,), name="up2k-mpool"
-            )
-            thr.daemon = True
-            thr.start()
+            Daemon(self._tag_thr, "up2k-mpool", (mpool,))
 
         return mpool
 

@@ -9,7 +9,7 @@ import queue
 from .__init__ import CORES, TYPE_CHECKING
 from .broker_mpw import MpWorker
 from .broker_util import try_exec
-from .util import mp
+from .util import Daemon, mp
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -51,13 +51,7 @@ class BrokerMp(object):
             q_yield: queue.Queue[tuple[int, str, list[Any]]] = mp.Queue(64)
 
             proc = MProcess(q_pend, q_yield, MpWorker, (q_pend, q_yield, self.args, n))
-
-            thr = threading.Thread(
-                target=self.collector, args=(proc,), name="mp-sink-{}".format(n)
-            )
-            thr.daemon = True
-            thr.start()
-
+            Daemon(self.collector, "mp-sink-{}".format(n), (proc,))
             self.procs.append(proc)
             proc.start()
 

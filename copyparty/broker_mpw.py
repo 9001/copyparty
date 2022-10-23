@@ -13,7 +13,7 @@ from .__init__ import ANYWIN
 from .authsrv import AuthSrv
 from .broker_util import BrokerCli, ExceptionalQueue
 from .httpsrv import HttpSrv
-from .util import FAKE_MP, HMaccas
+from .util import FAKE_MP, Daemon, HMaccas
 
 try:
     from types import FrameType
@@ -65,10 +65,7 @@ class MpWorker(BrokerCli):
 
         # on winxp and some other platforms,
         # use thr.join() to block all signals
-        thr = threading.Thread(target=self.main, name="mpw-main")
-        thr.daemon = True
-        thr.start()
-        thr.join()
+        Daemon(self.main, "mpw-main").join()
 
     def signal_handler(self, sig: Optional[int], frame: Optional[FrameType]) -> None:
         # print('k')

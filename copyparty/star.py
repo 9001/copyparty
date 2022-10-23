@@ -8,7 +8,7 @@ from queue import Queue
 
 from .bos import bos
 from .sutil import StreamArc, errdesc
-from .util import fsenc, min_ex
+from .util import Daemon, fsenc, min_ex
 
 try:
     from typing import Any, Generator, Optional
@@ -60,9 +60,7 @@ class StreamTar(StreamArc):
         fmt = tarfile.GNU_FORMAT
         self.tar = tarfile.open(fileobj=self.qfile, mode="w|", format=fmt)  # type: ignore
 
-        w = threading.Thread(target=self._gen, name="star-gen")
-        w.daemon = True
-        w.start()
+        Daemon(self._gen, "star-gen")
 
     def gen(self) -> Generator[Optional[bytes], None, None]:
         try:

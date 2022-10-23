@@ -17,7 +17,7 @@ from pyftpdlib.servers import FTPServer
 
 from .__init__ import PY2, TYPE_CHECKING, E
 from .bos import bos
-from .util import Pebkac, exclude_dotfiles, fsenc
+from .util import Daemon, Pebkac, exclude_dotfiles, fsenc
 
 try:
     from pyftpdlib.ioloop import IOLoop
@@ -402,9 +402,7 @@ class Ftpd(object):
             for h, lp in hs:
                 FTPServer((ip, int(lp)), h, ioloop)
 
-        thr = threading.Thread(target=ioloop.loop, name="ftp")
-        thr.daemon = True
-        thr.start()
+        Daemon(ioloop.loop, "ftp")
 
 
 def join(p1: str, p2: str) -> str:

@@ -28,7 +28,7 @@ class Fstab(object):
         self.age = 0.0
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.log_func("fstab", msg + "\033[K", c)
+        self.log_func("fstab", msg, c)
 
     def get(self, path: str) -> str:
         if len(self.cache) > 9000:

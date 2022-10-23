@@ -33,6 +33,7 @@ from .bos import bos
 from .httpconn import HttpConn
 from .util import (
     FHC,
+    Daemon,
     Garda,
     Magician,
     E_SCK,
@@ -121,9 +122,7 @@ class HttpSrv(object):
                 start_log_thrs(self.log, self.args.log_thrs, nid)
 
         self.th_cfg: dict[str, Any] = {}
-        t = threading.Thread(target=self.post_init, name="hsrv-init2")
-        t.daemon = True
-        t.start()
+        Daemon(self.post_init, "hsrv-init2")
 
     def post_init(self) -> None:
         try:
@@ -138,12 +137,7 @@ class HttpSrv(object):
             self.log(self.name, "workers += {} = {}".format(n, self.tp_nthr), 6)
 
         for _ in range(n):
-            thr = threading.Thread(
-                target=self.thr_poolw,
-                name=self.name + "-poolw",
-            )
-            thr.daemon = True
-            thr.start()
+            Daemon(self.thr_poolw, self.name + "-poolw")
 
     def stop_threads(self, n: int) -> None:
         self.tp_nthr -= n
@@ -178,13 +172,11 @@ class HttpSrv(object):
         ip, port = sck.getsockname()
         self.srvs.append(sck)
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
-        t = threading.Thread(
-            target=self.thr_listen,
-            args=(sck,),
-            name="httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),
+        Daemon(
+            self.thr_listen,
+            "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),
+            (sck,),
         )
-        t.daemon = True
-        t.start()
 
     def thr_listen(self, srv_sck: socket.socket) -> None:
         """listens on a shared tcp server"""
@@ -242,10 +234,7 @@ class HttpSrv(object):
                 if self.nid:
                     name += "-{}".format(self.nid)
 
-                thr = threading.Thread(target=self.periodic, name=name)
-                self.t_periodic = thr
-                thr.daemon = True
-                thr.start()
+                self.t_periodic = Daemon(self.periodic, name)
 
             if self.tp_q:
                 self.tp_time = self.tp_time or now
@@ -260,13 +249,11 @@ class HttpSrv(object):
             t = "looks like the httpserver threadpool died; please make an issue on github and tell me the story of how you pulled that off, thanks and dog bless\n"
             self.log(self.name, t, 1)
 
-        thr = threading.Thread(
-            target=self.thr_client,
-            args=(sck, addr),
-            name="httpconn-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
+        Daemon(
+            self.thr_client,
+            "httpconn-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
+            (sck, addr),
         )
-        thr.daemon = True
-        thr.start()
 
     def thr_poolw(self) -> None:
         assert self.tp_q

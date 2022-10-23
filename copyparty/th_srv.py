@@ -14,7 +14,17 @@ from queue import Queue
 from .__init__ import TYPE_CHECKING
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
-from .util import BytesIO, Cooldown, Pebkac, fsenc, min_ex, runcmd, statdir, vsplit
+from .util import (
+    BytesIO,
+    Cooldown,
+    Daemon,
+    Pebkac,
+    fsenc,
+    min_ex,
+    runcmd,
+    statdir,
+    vsplit,
+)
 
 try:
     from typing import Optional, Union
@@ -106,11 +116,7 @@ class ThumbSrv(object):
 
         self.q: Queue[Optional[tuple[str, str]]] = Queue(self.nthr * 4)
         for n in range(self.nthr):
-            thr = threading.Thread(
-                target=self.worker, name="thumb-{}-{}".format(n, self.nthr)
-            )
-            thr.daemon = True
-            thr.start()
+            Daemon(self.worker, "thumb-{}-{}".format(n, self.nthr))
 
         want_ff = not self.args.no_vthumb or not self.args.no_athumb
         if want_ff and (not HAVE_FFMPEG or not HAVE_FFPROBE):
@@ -126,9 +132,7 @@ class ThumbSrv(object):
             self.log(msg, c=3)
 
         if self.args.th_clean:
-            t = threading.Thread(target=self.cleaner, name="thumb.cln")
-            t.daemon = True
-            t.start()
+            Daemon(self.cleaner, "thumb.cln")
 
         self.fmt_pil, self.fmt_vips, self.fmt_ffi, self.fmt_ffv, self.fmt_ffa = [
             set(y.split(","))

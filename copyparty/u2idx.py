@@ -11,7 +11,16 @@ from operator import itemgetter
 from .__init__ import ANYWIN, TYPE_CHECKING, unicode
 from .bos import bos
 from .up2k import up2k_wark_from_hashlist
-from .util import HAVE_SQLITE3, Pebkac, absreal, gen_filekey, min_ex, quotep, s3dec
+from .util import (
+    HAVE_SQLITE3,
+    Daemon,
+    Pebkac,
+    absreal,
+    gen_filekey,
+    min_ex,
+    quotep,
+    s3dec,
+)
 
 if HAVE_SQLITE3:
     import sqlite3
@@ -270,16 +279,7 @@ class U2idx(object):
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
         )
-        thr = threading.Thread(
-            target=self.terminator,
-            args=(
-                self.active_id,
-                done_flag,
-            ),
-            name="u2idx-terminator",
-        )
-        thr.daemon = True
-        thr.start()
+        Daemon(self.terminator, "u2idx-terminator", (self.active_id, done_flag))
 
         if not uq or not uv:
             uq = "select * from up"

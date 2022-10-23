@@ -340,6 +340,20 @@ _: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER)
 __all__ = ["mp", "BytesIO", "quote", "unquote", "SQLITE_VER", "JINJA_VER", "PYFTPD_VER"]
 
 
+class Daemon(threading.Thread):
+    def __init__(
+        self,
+        target: Any,
+        name: Optional[str] = None,
+        a: Iterable[Any] = None,
+        r=True,
+    ) -> None:
+        threading.Thread.__init__(self, target=target, name=name, args=a or ())
+        self.daemon = True
+        if r:
+            self.start()
+
+
 class Cooldown(object):
     def __init__(self, maxage: float) -> None:
         self.maxage = maxage
@@ -569,9 +583,7 @@ class MTHash(object):
         self.done_q: Queue[tuple[int, str, int, int]] = Queue()
         self.thrs = []
         for n in range(cores):
-            t = threading.Thread(target=self.worker, name="mth-" + str(n))
-            t.daemon = True
-            t.start()
+            t = Daemon(self.worker, "mth-" + str(n))
             self.thrs.append(t)
 
     def hash(
@@ -884,13 +896,7 @@ def start_stackmon(arg_str: str, nid: int) -> None:
     suffix = "-{}".format(nid) if nid else ""
     fp, f = arg_str.rsplit(",", 1)
     zi = int(f)
-    t = threading.Thread(
-        target=stackmon,
-        args=(fp, zi, suffix),
-        name="stackmon" + suffix,
-    )
-    t.daemon = True
-    t.start()
+    Daemon(stackmon, "stackmon" + suffix, (fp, zi, suffix))
 
 
 def stackmon(fp: str, ival: float, suffix: str) -> None:
@@ -943,13 +949,7 @@ def start_log_thrs(
         tname = "logthr-n{}-i{:x}".format(nid, os.getpid())
         lname = tname[3:]
 
-    t = threading.Thread(
-        target=log_thrs,
-        args=(logger, ival, lname),
-        name=tname,
-    )
-    t.daemon = True
-    t.start()
+    Daemon(log_thrs, tname, (logger, ival, lname))
 
 
 def log_thrs(log: Callable[[str, str, int], None], ival: float, name: str) -> None:
@@ -1673,10 +1673,7 @@ def db_ex_chk(log: "NamedLogger", ex: Exception, db_path: str) -> bool:
     if str(ex) != "database is locked":
         return False
 
-    thr = threading.Thread(target=lsof, args=(log, db_path), name="dbex")
-    thr.daemon = True
-    thr.start()
-
+    Daemon(lsof, "dbex", (log, db_path))
     return True
 
 
