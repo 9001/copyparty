@@ -184,11 +184,13 @@ IMPLICATIONS = [
     ["e2vu", "e2v"],
     ["e2vp", "e2v"],
     ["e2v", "e2d"],
-    ["daw", "dav"],
     ["smbw", "smb"],
     ["smb1", "smb"],
     ["smb_dbg", "smb"],
 ]
+
+
+UNPLICATIONS = [["no_dav", "daw"]]
 
 
 MIMES = {

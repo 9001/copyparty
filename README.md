@@ -58,7 +58,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * [server config](#server-config) - using arguments or config files, or a mix of both
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
     * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
-    * [webdav server](#webdav-server) - enable with `--dav`
+    * [webdav server](#webdav-server) - with read-write support
     * [smb server](#smb-server) - unsafe, not recommended for wan
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
@@ -715,7 +715,7 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 
 ## webdav server
 
-enable with `--dav`,  supports winxp, win7/8/10
+with read-write support,  supports winxp, win7/8/10, macos, nautilus/gvfs
 
 general usage:
 * login with any username + your password, or put your password in the username field and leave password empty
@@ -730,10 +730,11 @@ on windows (xp or later), disable wpad for performance:
 * control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
 
 known client bugs:
-* win7/8/10 doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
+* win7+ doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
   * or just type your password into the username field instead to get around it entirely
-* win7 cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
-* win7 cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
+* win7+ cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
+* win7+ cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
+* windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 * winxp cannot show unicode characters outside of *some range*
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
 
@@ -1197,12 +1198,14 @@ some notes on hardening
   * `--unpost 0`, `--no-del`, `--no-mv` disables all move/delete support
   * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
     * however note if you edit one file it will also affect the other copies
+  * `--dav-nr` disables recursive webdav directory listings (cpu-intensive)
   * `--vague-401` returns a "404 not found" instead of "401 unauthorized" which is a common enterprise meme
   * `--ban-404=50,60,1440` ban client for 1440min (24h) if they hit 50 404's in 60min
     * **NB:** will ban anyone who enables up2k turbo
   * `--nih` removes the server hostname from directory listings
 
 * option `-sss` is a shortcut for the above plus:
+  * `--no-dav` disables webdav support
   * `-lo cpp-%Y-%m%d-%H%M%S.txt.xz` enables logging to disk
   * `-ls **,*,ln,p,r` does a scan on startup for any dangerous symlinks
 

@@ -81,6 +81,7 @@ class SvcHub(object):
 
         if args.sss or args.s >= 3:
             args.ss = True
+            args.no_dav = True
             args.lo = args.lo or "cpp-%Y-%m%d-%H%M%S.txt.xz"
             args.ls = args.ls or "**,*,ln,p,r"
 
@@ -92,6 +93,7 @@ class SvcHub(object):
             args.no_del = True
             args.no_mv = True
             args.hardlink = True
+            args.dav_nr = True
             args.vague_403 = True
             args.ban_404 = "50,60,1440"
             args.nih = True

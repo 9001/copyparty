@@ -683,7 +683,7 @@ class HttpCli(object):
         if self.do_log:
             self.log("PFIND " + self.req)
 
-        if not self.args.dav:
+        if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
         if not self.can_read and not self.can_write and not self.can_get:
@@ -837,7 +837,7 @@ class HttpCli(object):
         if self.do_log:
             self.log("PPATCH " + self.req)
 
-        if not self.args.dav:
+        if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
         if not self.can_write:
@@ -894,7 +894,7 @@ class HttpCli(object):
         if self.do_log:
             self.log("LOCK " + self.req)
 
-        if not self.args.dav:
+        if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
         if not self.can_write:
@@ -951,7 +951,7 @@ class HttpCli(object):
         if self.do_log:
             self.log("UNLOCK " + self.req)
 
-        if not self.args.dav:
+        if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
         if not self.can_write:
@@ -1031,7 +1031,7 @@ class HttpCli(object):
             "Ms-Author-Via": "DAV",
         }
 
-        if self.args.dav:
+        if not self.args.no_dav:
             # PROPPATCH, LOCK, UNLOCK, COPY: noop (spec-must)
             zs = ", PROPFIND, PROPPATCH, LOCK, UNLOCK, MKCOL, COPY, MOVE, DELETE"
             ret["Allow"] += zs
@@ -1052,7 +1052,7 @@ class HttpCli(object):
             t = "{} does not have write-access here"
             raise Pebkac(403, t.format(self.uname))
 
-        if self.args.dav and self._applesan():
+        if not self.args.no_dav and self._applesan():
             return self.headers.get("content-length") == "0"
 
         if self.headers.get("expect", "").lower() == "100-continue":
@@ -1236,7 +1236,7 @@ class HttpCli(object):
         if rnd and not self.args.nw:
             fn = self.rand_name(fdir, fn, rnd)
 
-        if is_put and self.args.dav:
+        if is_put and not self.args.no_dav:
             # allow overwrite if volflag daw is set, or all the following is true:
             #  * file exists and is empty
             #  * there is no .PARTIAL

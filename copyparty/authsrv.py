@@ -18,6 +18,7 @@ from .util import (
     IMPLICATIONS,
     META_NOBOTS,
     SQLITE_VER,
+    UNPLICATIONS,
     Pebkac,
     absreal,
     fsenc,
@@ -1119,6 +1120,10 @@ class AuthSrv(object):
                 if k1 in vol.flags:
                     vol.flags[k2] = True
 
+            for k1, k2 in UNPLICATIONS:
+                if k1 in vol.flags:
+                    vol.flags[k2] = False
+
             # default tag cfgs if unset
             if "mte" not in vol.flags:
                 vol.flags["mte"] = self.args.mte
@@ -1222,8 +1227,8 @@ class AuthSrv(object):
                 vol.flags["daw"] = True
                 have_daw = True
 
-        if have_daw and not self.args.dav:
-            t = 'volume "/{}" has volflag "daw" (webdav write-access), but argument --dav is not set'
+        if have_daw and self.args.no_dav:
+            t = 'volume "/{}" has volflag "daw" (webdav write-access), but --no-dav is set'
             self.log(t, 1)
             errors = True
 
