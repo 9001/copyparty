@@ -32,11 +32,11 @@ from .__init__ import MACOS, TYPE_CHECKING, EnvParams
 from .bos import bos
 from .httpconn import HttpConn
 from .util import (
+    E_SCK,
     FHC,
     Daemon,
     Garda,
     Magician,
-    E_SCK,
     min_ex,
     shut_socket,
     spack,

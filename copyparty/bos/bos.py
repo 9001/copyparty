@@ -7,7 +7,7 @@ from ..util import SYMTIME, fsdec, fsenc
 from . import path
 
 try:
-    from typing import Optional
+    from typing import Any, Optional
 except:
     pass
 
@@ -36,6 +36,10 @@ def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> None:
 
 def mkdir(p: str, mode: int = 0o755) -> None:
     return os.mkdir(fsenc(p), mode)
+
+
+def open(p: str, *a, **ka) -> Any:
+    return os.open(fsenc(p), *a, **ka)
 
 
 def rename(src: str, dst: str) -> None:

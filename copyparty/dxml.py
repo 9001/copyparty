@@ -1,9 +1,8 @@
-import sys
 import importlib
+import sys
 import xml.etree.ElementTree as ET
 
 from .__init__ import PY2
-
 
 try:
     from typing import Any, Optional

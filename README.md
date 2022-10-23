@@ -59,6 +59,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
     * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [webdav server](#webdav-server) - enable with `--dav`
+    * [smb server](#smb-server) - unsafe, not recommended for wan
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
@@ -168,7 +169,9 @@ feature summary
   * ☑ multiprocessing (actual multithreading)
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
-  * ☑ [ftp-server](#ftp-server)
+  * ☑ [ftp server](#ftp-server)
+  * ☑ [webdav server](#webdav-server)
+  * ☑ [smb/cifs server](#smb-server)
   * ☑ [qr-code](#qr-code) for quick access
 * upload
   * ☑ basic: plain multipart, ie6 support
@@ -733,6 +736,39 @@ known client bugs:
 * win7 cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
 * winxp cannot show unicode characters outside of *some range*
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
+
+
+## smb server
+
+unsafe, not recommended for wan,  enable with `--smb` for read-only or `--smbw` for read-write
+
+dependencies: `python3 -m pip install --user -U impacket==0.10.0`
+* newer versions of impacket will hopefully work just fine but there is monkeypatching so maybe not
+
+some big warnings specific to SMB/CIFS, in decreasing importance:
+* not entirely confident that read-only is read-only
+* the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [./bin#prisonpartysh](prisonparty)
+  * account passwords work per-volume as expected, but account permissions are ignored; all accounts have access to all volumes, and `--smbw` gives all accounts write-access everywhere
+  * shadowing (hiding the contents in subfolders by creating overlapping volumes) probably works as expected but no guarantees
+
+and some minor issues,
+* files are not [indexed](#file-indexing) when uploaded through smb; please [schedule rescans](#periodic-rescan) as a workaround
+* hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
+* listens on the first `-i` interface only (default = 0.0.0.0 = all)
+* login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work
+* python3 only
+* slow
+
+known client bugs:
+* on win7 only, `--smb1` is much faster than smb2 (default) because it keeps rescanning folders on smb2, however win10 onwards does not have smb1
+* windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
+
+the smb protocol listens on TCP port 445, which is a privileged port on linux and macos, which would require running copyparty as root. However, this can be avoided by listening on another port using `--smb-port 3945` and then using NAT to forward the traffic from 445 to there;
+* on linux: `iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 445 -j REDIRECT --to-port 3945`
+
+authenticate with one of the following:
+* username `$username`, password `$password`
+* username `$password`, password blank
 
 
 ## file indexing
@@ -1316,6 +1352,9 @@ enable [thumbnails](#thumbnails) of...
 * **HEIF pictures:** `pyvips` or `ffmpeg` or `pyheif-pillow-opener` (requires Linux or a C compiler)
 * **AVIF pictures:** `pyvips` or `ffmpeg` or `pillow-avif-plugin`
 * **JPEG XL pictures:** `pyvips` or `ffmpeg`
+
+enable [smb](#smb-server) support:
+* `impacket==0.10.0`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
 

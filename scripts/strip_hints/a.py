@@ -58,7 +58,7 @@ def uh1(fp):
     lns = []
     for ln in cs.split("\n"):
         m = ptn.match(ln)
-        if m:
+        if m and "SimpleNamespace" not in ln:
             ln = m.group(1) + "raise Exception()"
 
         lns.append(ln)

@@ -175,7 +175,10 @@ class FtpFs(AbstractedFS):
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, True, False)
 
             fsroot, vfs_ls1, vfs_virt = vfs.ls(
-                rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
+                rem,
+                self.uname,
+                not self.args.no_scandir,
+                [[True, False], [False, True]],
             )
             vfs_ls = [x[0] for x in vfs_ls1]
             vfs_ls.extend(vfs_virt.keys())

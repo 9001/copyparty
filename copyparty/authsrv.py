@@ -592,7 +592,7 @@ class VFS(object):
         # if single folder: the folder itself is the top-level item
         folder = "" if flt or not wrap else (vrem.split("/")[-1] or "top")
 
-        g = self.walk(folder, vrem, [], uname, [[True]], dots, scandir, False)
+        g = self.walk(folder, vrem, [], uname, [[True, False]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
             if flt:
                 files = [x for x in files if x[0] in flt]
@@ -1370,7 +1370,7 @@ class AuthSrv(object):
                     "",
                     [],
                     u,
-                    [[True]],
+                    [[True, False]],
                     True,
                     not self.args.no_scandir,
                     False,

@@ -185,6 +185,9 @@ IMPLICATIONS = [
     ["e2vp", "e2v"],
     ["e2v", "e2d"],
     ["daw", "dav"],
+    ["smbw", "smb"],
+    ["smb1", "smb"],
+    ["smb_dbg", "smb"],
 ]
 
 
@@ -1373,7 +1376,7 @@ def gen_filekey_dbg(
         try:
             import inspect
 
-            ctx = ",".join(inspect.stack()[n][3] for n in range(2, 5))
+            ctx = ",".join(inspect.stack()[n].function for n in range(2, 5))
         except:
             ctx = ""
 

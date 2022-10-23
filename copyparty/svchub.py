@@ -186,6 +186,17 @@ class SvcHub(object):
 
             self.ftpd = Ftpd(self)
 
+        if args.smb:
+            # impacket.dcerpc is noisy about listen timeouts
+            sto = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(None)
+
+            from .smbd import SMB
+
+            self.smbd = SMB(self)
+            socket.setdefaulttimeout(sto)
+            self.smbd.start()
+
         # decide which worker impl to use
         if self.check_mp_enable():
             from .broker_mp import BrokerMp as Broker
@@ -342,6 +353,17 @@ class SvcHub(object):
 
         self.shutdown()
 
+    def kill9(self, delay: float = 0.0):
+        if delay > 0.01:
+            time.sleep(delay)
+            print("component stuck; performing sigkill")
+            time.sleep(0.1)
+
+        if ANYWIN:
+            os.system("taskkill /f /pid {}".format(os.getpid()))
+        else:
+            os.kill(os.getpid(), signal.SIGKILL)
+
     def signal_handler(self, sig: int, frame: Optional[FrameType]) -> None:
         if self.stopping:
             if self.nsigs <= 0:
@@ -351,10 +373,7 @@ class SvcHub(object):
                 except:
                     pass
 
-                if ANYWIN:
-                    os.system("taskkill /f /pid {}".format(os.getpid()))
-                else:
-                    os.kill(os.getpid(), signal.SIGKILL)
+                self.kill9()
             else:
                 self.nsigs -= 1
                 return
@@ -394,6 +413,10 @@ class SvcHub(object):
 
                     if n == 3:
                         self.pr("waiting for thumbsrv (10sec)...")
+
+            if hasattr(self, "smbd"):
+                Daemon(self.kill9, a=(1,))
+                self.smbd.stop()
 
             self.pr("nailed it", end="")
             ret = self.retcode

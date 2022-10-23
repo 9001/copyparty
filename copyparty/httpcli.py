@@ -754,7 +754,7 @@ class HttpCli(object):
 
         elif depth == "1":
             _, vfs_ls, vfs_virt = vn.ls(
-                rem, self.uname, not self.args.no_scandir, [[True]]
+                rem, self.uname, not self.args.no_scandir, [[True, False]]
             )
             zi = int(time.time())
             zsr = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
@@ -844,8 +844,8 @@ class HttpCli(object):
             self.log("{} tried to proppatch [{}]".format(self.uname, self.vpath))
             raise Pebkac(401, "authenticate")
 
-        from .dxml import parse_xml, mkenod, mktnod
         from xml.etree import ElementTree as ET
+        from .dxml import mkenod, mktnod, parse_xml
 
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
         # abspath = vn.dcanonical(rem)
@@ -901,8 +901,8 @@ class HttpCli(object):
             self.log("{} tried to lock [{}]".format(self.uname, self.vpath))
             raise Pebkac(401, "authenticate")
 
-        from .dxml import parse_xml, mkenod, mktnod
         from xml.etree import ElementTree as ET
+        from .dxml import mkenod, mktnod, parse_xml
 
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
         abspath = vn.dcanonical(rem)
@@ -2694,7 +2694,10 @@ class HttpCli(object):
         try:
             vn, rem = self.asrv.vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
-                rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
+                rem,
+                self.uname,
+                not self.args.no_scandir,
+                [[True, False], [False, True]],
             )
         except:
             vfs_ls = []
@@ -3103,7 +3106,7 @@ class HttpCli(object):
                 return self.tx_zip(k, v, vn, rem, [], self.args.ed)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
-            rem, self.uname, not self.args.no_scandir, [[True], [False, True]]
+            rem, self.uname, not self.args.no_scandir, [[True, False], [False, True]]
         )
         stats = {k: v for k, v in vfs_ls}
         ls_names = [x[0] for x in vfs_ls]
