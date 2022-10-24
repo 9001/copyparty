@@ -1759,10 +1759,10 @@ class HttpCli(object):
             fdir = os.path.dirname(fn)
 
             if not bos.path.isdir(fdir):
-                raise Pebkac(500, "parent folder does not exist")
+                raise Pebkac(409, "parent folder does not exist")
 
             if bos.path.isdir(fn):
-                raise Pebkac(500, "that folder exists already")
+                raise Pebkac(405, "that folder exists already")
 
             try:
                 bos.mkdir(fn)

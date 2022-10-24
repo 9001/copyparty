@@ -162,6 +162,7 @@ HTTPCODE = {
     403: "Forbidden",
     404: "Not Found",
     405: "Method Not Allowed",
+    409: "Conflict",
     411: "Length Required",
     412: "Precondition Failed",
     413: "Payload Too Large",
