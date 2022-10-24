@@ -634,12 +634,12 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
 
     ap2 = ap.add_argument_group('WebDAV options')
-    ap2.add_argument("--daw", action="store_true", help="enable full write support. \033[1;31mNB!\033[0m This has side-effects -- PUT-operations will now \033[1;31mOVERWRITE\033[0m existing files, rather than inventing new filenames to avoid loss of data. You might want to instead set this as a volflag where needed. By not setting this flag, uploaded files can get written to a filename which the client does not expect (which might be okay, depending on client)")
+    ap2.add_argument("--daw", action="store_true", help="enable full write support. \033[1;31mWARNING:\033[0m This has side-effects -- PUT-operations will now \033[1;31mOVERWRITE\033[0m existing files, rather than inventing new filenames to avoid loss of data. You might want to instead set this as a volflag where needed. By not setting this flag, uploaded files can get written to a filename which the client does not expect (which might be okay, depending on client)")
     ap2.add_argument("--dav-nr", action="store_true", help="reject depth:infinite requests (recursive file listing); breaks spec compliance and some clients, which might be a good thing since depth:infinite is extremely server-heavy")
     ap2.add_argument("--dav-mac", action="store_true", help="disable apple-garbage filter -- allow macos to create junk files (._* and .DS_Store, .Spotlight-*, .fseventsd, .Trashes, .AppleDouble, __MACOS)")
 
     ap2 = ap.add_argument_group('SMB/CIFS options')
-    ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless --smb-port")
+    ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless --smb-port is set above 1024 and your OS does port-forwarding from 445 to that.\n\033[1;31mWARNING:\033[0m this protocol is dangerous! Never expose to the internet. Account permissions are coalesced; if one account has write-access to a volume, then all accounts do.")
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
     ap2.add_argument("--smb-port", metavar="PORT", type=int, default=445, help="port to listen on -- if you change this value, you must NAT from TCP:445 to this port using iptables or similar")

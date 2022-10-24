@@ -1136,7 +1136,7 @@ regarding the frequent server log message during uploads;
 * on this http connection, `2.77 GiB` transferred, `102.9 MiB/s` average, `948` chunks handled
 * client says `4` uploads OK, `0` failed, `3` busy, `1` queued, `10042 MiB` total size, `7198 MiB` and `00:01:09` left
 
-design detail: [why chunk-hashes](#./docs/devnotes/#why-chunk-hashes)
+design detail: [why chunk-hashes](#./docs/devnotes.md#why-chunk-hashes)
 
 
 # performance
@@ -1369,7 +1369,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 the self-contained "binary"  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
 
-you can reduce the sfx size by repacking it; see [./docs/devnotes/#sfx-repack](#./docs/devnotes/#sfx-repack)
+you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack](#./docs/devnotes.md#sfx-repack)
 
 
 ## copyparty.exe

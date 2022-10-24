@@ -1,5 +1,4 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
 
 import inspect
 import logging
@@ -22,10 +21,6 @@ except:
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
-
-
-class Standin(object):
-    pass
 
 
 class HLog(logging.Handler):
@@ -173,6 +168,7 @@ class SMB(object):
                 self.files = {k: v for k, v in self.files.items() if v[0] > cutoff}
                 logging.info("was tracking %d files, now %d", nf, len(self.files))
 
+            vpath = vpath.replace("\\", "/").lstrip("/")
             self.files[ret] = (now, vpath)
 
         return ret
@@ -234,12 +230,12 @@ class SMB(object):
             yeet("blocked delete (no --smbw): " + vpath)
 
         # return bos.unlink(self._v2a("stat", vpath, *a)[1])
-        vp = vpath.lstrip("/")
         vfs, ap = self._v2a("delete", vpath)
         if not vfs.axs.udel:
             yeet("blocked delete (no-del-acc): " + vpath)
 
-        self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vp], [])
+        vpath = vpath.replace("\\", "/").lstrip("/")
+        self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vpath], [])
 
     def _utime(self, vpath: str, times: tuple[float, float]) -> None:
         if not self.args.smbw:

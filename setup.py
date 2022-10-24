@@ -128,7 +128,6 @@ args = {
         "audiotags": ["mutagen"],
         "ftpd": ["pyftpdlib"],
         "ftps": ["pyftpdlib", "pyopenssl"],
-        "smbd": ["impacket"],
     },
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
     "scripts": ["bin/copyparty-fuse.py", "bin/up2k.py"],
