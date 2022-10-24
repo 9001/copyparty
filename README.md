@@ -59,7 +59,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
     * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [webdav server](#webdav-server) - with read-write support
-    * [smb server](#smb-server) - unsafe, not recommended for wan
+    * [smb server](#smb-server) - unsafe, slow, not recommended for wan
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
@@ -755,7 +755,6 @@ some big warnings specific to SMB/CIFS, in decreasing importance:
   * shadowing (hiding the contents in subfolders by creating overlapping volumes) probably works as expected but no guarantees
 
 and some minor issues,
-* files are not [indexed](#file-indexing) when uploaded through smb; please [schedule rescans](#periodic-rescan) as a workaround
 * hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
 * listens on the first `-i` interface only (default = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work

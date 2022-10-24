@@ -75,8 +75,13 @@ class SMB(object):
                 pass
         fos.close = self._close
         fos.listdir = self._listdir
+        fos.mkdir = self._mkdir
         fos.open = self._open
+        fos.remove = self._unlink
+        fos.rename = self._rename
         fos.stat = self._stat
+        fos.unlink = self._unlink
+        fos.utime = self._utime
         smbserver.os = fos
 
         # ...and smbserver.os.path
@@ -160,7 +165,7 @@ class SMB(object):
         if not readonly:
             now = time.time()
             nf = len(self.files)
-            if nf > 10:
+            if nf > 9000:
                 oldest = min([x[0] for x in self.files.values()])
                 cutoff = oldest + (now - oldest) / 2
                 self.files = {k: v for k, v in self.files.items() if v[0] > cutoff}
@@ -188,8 +193,27 @@ class SMB(object):
             time.time(),
         )
 
+    def _rename(self, vp1: str, vp2: str) -> None:
+        vp1 = vp1.lstrip("/")
+        vp2 = vp2.lstrip("/")
+        ap2 = self._v2a("rename", vp2, vp1)[1]
+        self.hub.up2k.handle_mv(LEELOO_DALLAS, vp1, vp2)
+        bos.makedirs(ap2, exist_ok=True)
+
+    def _mkdir(self, vpath: str) -> None:
+        return bos.mkdir(self._v2a("mkdir", vpath)[1])
+
     def _stat(self, vpath: str, *a: Any, **ka: Any) -> os.stat_result:
         return bos.stat(self._v2a("stat", vpath, *a)[1], *a, **ka)
+
+    def _unlink(self, vpath: str) -> None:
+        # return bos.unlink(self._v2a("stat", vpath, *a)[1])
+        logging.info("delete %s", vpath)
+        vp = vpath.lstrip("/")
+        self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vp], [])
+
+    def _utime(self, vpath: str, times: tuple[float, float]) -> None:
+        return bos.utime(self._v2a("stat", vpath)[1], times)
 
     def _p_exists(self, vpath: str) -> bool:
         try:
@@ -223,14 +247,10 @@ class SMB(object):
         smbserver.os.lchown = self._hook
         smbserver.os.link = self._hook
         smbserver.os.lstat = self._hook
-        smbserver.os.mkdir = self._hook
-        smbserver.os.remove = self._hook
-        smbserver.os.rename = self._hook
         smbserver.os.replace = self._hook
         smbserver.os.scandir = self._hook
         smbserver.os.symlink = self._hook
         smbserver.os.truncate = self._hook
-        smbserver.os.unlink = self._hook
         smbserver.os.walk = self._hook
 
         smbserver.os.path.abspath = self._hook

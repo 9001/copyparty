@@ -38,7 +38,7 @@ def mkdir(p: str, mode: int = 0o755) -> None:
     return os.mkdir(fsenc(p), mode)
 
 
-def open(p: str, *a, **ka) -> Any:
+def open(p: str, *a, **ka) -> int:
     return os.open(fsenc(p), *a, **ka)
 
 
