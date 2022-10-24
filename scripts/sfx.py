@@ -231,11 +231,11 @@ def hashfile(fn):
 
 def unpack():
     """unpacks the tar yielded by `data`"""
-    name = "pe-copyparty."
+    name = "pe-copyparty"
     try:
-        name += str(os.geteuid())
+        name += "." + str(os.geteuid())
     except:
-        name += "0"
+        pass
 
     tag = "v" + str(STAMP)
     top = tempfile.gettempdir()

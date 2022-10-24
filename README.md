@@ -10,7 +10,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 
 * server only needs `py2.7` or `py3.3+`, all dependencies optional
 * browse/upload with [IE4](#browser-support) / netscape4.0 on win3.11 (heh)
-* *resumable* uploads need `firefox 34+` / `chrome 41+` / `safari 7+`
+* protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
 
 try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
 
@@ -30,16 +30,16 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [quickstart](#quickstart) - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
         * [on servers](#on-servers) - you may also want these, especially on servers
         * [on debian](#on-debian) - recommended additional steps on debian
-    * [notes](#notes) - general notes
-    * [status](#status) - feature summary
+    * [features](#features)
     * [testimonials](#testimonials) - small collection of user feedback
 * [motivations](#motivations) - project goals / philosophy
-    * [future plans](#future-plans) - some improvement ideas
+    * [notes](#notes) - general notes
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
 * [FAQ](#FAQ) - "frequently" asked questions
 * [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
+    * [shadowing](#shadowing) - hiding specific subfolders
 * [the browser](#the-browser) - accessing a copyparty server using a web-browser
     * [tabs](#tabs) - the main tabs in the ui
     * [hotkeys](#hotkeys) - the browser has the following hotkeys
@@ -78,7 +78,6 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
 * [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
-    * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
     * [client-side](#client-side) - when uploading files
 * [security](#security) - some notes on hardening
@@ -96,16 +95,10 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary"
-    * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
     * [copyparty.exe](#copypartyexe)
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
-* [building](#building)
-    * [dev env setup](#dev-env-setup)
-    * [just the sfx](#just-the-sfx)
-    * [complete release](#complete-release)
-* [todo](#todo) - roughly sorted by priority
-    * [discarded ideas](#discarded-ideas)
+* [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 
 
 ## quickstart
@@ -147,23 +140,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 (skipped `pyheif-pillow-opener` because apparently debian is too old to build it)
 
 
-## notes
-
-general notes:
-* paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
-  * because no browsers currently implement the media-query to do this properly orz
-
-browser-specific:
-* iPhone/iPad: use Firefox to download files
-* Android-Chrome: increase "parallel uploads" for higher speed (android bug)
-* Android-Firefox: takes a while to select files (their fix for ☝️)
-* Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
-* Desktop-Firefox: may stop you from deleting files you've uploaded until you visit `about:memory` and click `Minimize memory usage`
-
-
-## status
-
-feature summary
+## features
 
 * backend stuff
   * ☑ sanic multipart parser
@@ -233,20 +210,18 @@ project goals / philosophy
   * no build steps; modify the js/python without needing node.js or anything like that
 
 
-## future plans
+## notes
 
-some improvement ideas
+general notes:
+* paper-printing is affected by dark/light-mode! use lightmode for color, darkmode for grayscale
+  * because no browsers currently implement the media-query to do this properly orz
 
-* the JS is a mess -- a preact rewrite would be nice
-  * preferably without build dependencies like webpack/babel/node.js, maybe a python thing to assemble js files into main.js
-  * good excuse to look at using virtual lists (browsers start to struggle when folders contain over 5000 files)
-* the UX is a mess -- a proper design would be nice
-  * very organic (much like the python/js), everything was an afterthought
-  * true for both the layout and the visual flair
-  * something like the tron board-room ui (or most other hollywood ones, like ironman) would be :100:
-* some of the python files are way too big
-  * `up2k.py` ended up doing all the file indexing / db management
-  * `httpcli.py` should be separated into modules in general
+browser-specific:
+* iPhone/iPad: use Firefox to download files
+* Android-Chrome: increase "parallel uploads" for higher speed (android bug)
+* Android-Firefox: takes a while to select files (their fix for ☝️)
+* Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
+* Desktop-Firefox: may stop you from deleting files you've uploaded until you visit `about:memory` and click `Minimize memory usage`
 
 
 # bugs
@@ -347,6 +322,13 @@ examples:
   * replacing the `g` permission with `wG` would let anonymous users upload files, receiving a working direct link in return
 
 anyone trying to bruteforce a password gets banned according to `--ban-pw`; default is 24h ban for 9 failed attempts in 1 hour
+
+
+## shadowing
+
+hiding specific subfolders  by mounting another volume on top of them
+
+for example `-v /mnt::r -v /var/empty:web/certs:r` mounts the server folder `/mnt` as the webroot, but another volume is mounted at `/web/certs` -- so visitors can only see the contents of `/mnt` and `/mnt/web` (at URLs `/` and `/web`), but not `/mnt/web/certs` because URL `/web/certs` is mapped to `/var/empty`
 
 
 # the browser
@@ -749,11 +731,11 @@ unsafe, slow, not recommended for wan,  enable with `--smb` for read-only or `--
 dependencies: `python3 -m pip install --user -U impacket==0.10.0`
 * newer versions of impacket will hopefully work just fine but there is monkeypatching so maybe not
 
-some big warnings specific to SMB/CIFS, in decreasing importance:
+some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 * not entirely confident that read-only is read-only
-* the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [./bin#prisonpartysh](prisonparty)
+* the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh)
   * account passwords work per-volume as expected, but account permissions are ignored; all accounts have access to all volumes, and `--smbw` gives all accounts write-access everywhere
-  * shadowing (hiding the contents in subfolders by creating overlapping volumes) probably works as expected but no guarantees
+  * [shadowing](#shadowing) probably works as expected but no guarantees
 
 and some minor issues,
 * hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
@@ -1153,22 +1135,7 @@ regarding the frequent server log message during uploads;
 * on this http connection, `2.77 GiB` transferred, `102.9 MiB/s` average, `948` chunks handled
 * client says `4` uploads OK, `0` failed, `3` busy, `1` queued, `10042 MiB` total size, `7198 MiB` and `00:01:09` left
 
-
-## why chunk-hashes
-
-a single sha512 would be better, right?
-
-this is due to `crypto.subtle` [not yet](https://github.com/w3c/webcrypto/issues/73) providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
-
-as a result, the hashes are much less useful than they could have been (search the server by sha512, provide the sha512 in the response http headers, ...)
-
-however it allows for hashing multiple chunks in parallel, greatly increasing upload speed from fast storage (NVMe, raid-0 and such)
-
-* both the [browser uploader](#uploading) and the [commandline one](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) does this now, allowing for fast uploading even from plaintext http
-
-hashwasm would solve the streaming issue but reduces hashing speed for sha512 (xxh128 does 6 GiB/s), and it would make old browsers and [iphones](https://bugs.webkit.org/show_bug.cgi?id=228552) unsupported
-
-* blake2 might be a better choice since xxh is non-cryptographic, but that gets ~15 MiB/s on slower androids
+design detail: [why chunk-hashes](#./docs/devnotes/#why-chunk-hashes)
 
 
 # performance
@@ -1401,25 +1368,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 the self-contained "binary"  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
 
-
-## sfx repack
-
-reduce the size of an sfx by removing features
-
-if you don't need all the features, you can repack the sfx and save a bunch of space; all you need is an sfx and a copy of this repo (nothing else to download or build, except if you're on windows then you need msys2 or WSL)
-* `393k` size of original sfx.py as of v1.1.3
-* `310k` after `./scripts/make-sfx.sh re no-cm`
-* `269k` after `./scripts/make-sfx.sh re no-cm no-hl`
-
-the features you can opt to drop are
-* `cm`/easymde, the "fancy" markdown editor, saves ~82k
-* `hl`, prism, the syntax hilighter, saves ~41k
-* `fnt`, source-code-pro, the monospace font, saves ~9k
-* `dd`, the custom mouse cursor for the media player tray tab, saves ~2k
-
-for the `re`pack to work, first run one of the sfx'es once to unpack it
-
-**note:** you can also just download and run [scripts/copyparty-repack.sh](scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a few repacks; works on linux/macos (and windows with msys2 or WSL)
+you can reduce the sfx size by repacking it; see [./docs/devnotes/#sfx-repack](#./docs/devnotes/#sfx-repack)
 
 
 ## copyparty.exe
@@ -1464,86 +1413,6 @@ journalctl -aS '48 hour ago' -u copyparty | grep -C10 FILENAME | tee bug.log
 if there's a wall of base64 in the log (thread stacks) then please include that, especially if you run into something freezing up or getting stuck, for example `OperationalError('database is locked')` -- alternatively you can visit `/?stack` to see the stacks live, so http://127.0.0.1:3923/?stack for example
 
 
-# building
+# devnotes
 
-## dev env setup
-
-you need python 3.9 or newer due to type hints
-
-the rest is mostly optional; if you need a working env for vscode or similar
-
-```sh
-python3 -m venv .venv
-. .venv/bin/activate
-pip install jinja2 strip_hints  # MANDATORY
-pip install mutagen  # audio metadata
-pip install pyftpdlib  # ftp server
-pip install Pillow pyheif-pillow-opener pillow-avif-plugin  # thumbnails
-pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscode tooling
-```
-
-
-## just the sfx
-
-first grab the web-dependencies from a previous sfx (assuming you don't need to modify something in those):
-
-```sh
-rm -rf copyparty/web/deps
-curl -L https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py >x.py
-python3 x.py --version
-rm x.py
-mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/deps/
-```
-
-then build the sfx using any of the following examples:
-
-```sh
-./scripts/make-sfx.sh           # regular edition
-./scripts/make-sfx.sh gz no-cm  # gzip-compressed + no fancy markdown editor
-```
-
-
-## complete release
-
-also builds the sfx so skip the sfx section above
-
-in the `scripts` folder:
-
-* run `make -C deps-docker` to build all dependencies
-* run `./rls.sh 1.2.3` which uploads to pypi + creates github release + sfx
-
-
-# todo
-
-roughly sorted by priority
-
-* nothing! currently
-
-
-## discarded ideas
-
-* reduce up2k roundtrips
-  * start from a chunk index and just go
-  * terminate client on bad data
-    * not worth the effort, just throw enough conncetions at it
-* single sha512 across all up2k chunks?
-  * crypto.subtle cannot into streaming, would have to use hashwasm, expensive
-* separate sqlite table per tag
-  * performance fixed by skipping some indexes (`+mt.k`)
-* audio fingerprinting
-  * only makes sense if there can be a wasm client and that doesn't exist yet (except for olaf which is agpl hence counts as not existing)
-* `os.copy_file_range` for up2k cloning
-  * almost never hit this path anyways
-* up2k partials ui
-  * feels like there isn't much point
-* cache sha512 chunks on client
-  * too dangerous -- overtaken by turbo mode
-* comment field
-  * nah
-* look into android thumbnail cache file format
-  * absolutely not
-* indexedDB for hashes, cfg enable/clear/sz, 2gb avail, ~9k for 1g, ~4k for 100m, 500k items before autoeviction
-  * blank hashlist when up-ok to skip handshake
-    * too many confusing side-effects
-* hls framework for Someone Else to drop code into :^)
-  * probably not, too much stuff to consider -- seeking, start at offset, task stitching (probably np-hard), conditional passthru, rate-control (especially multi-consumer), session keepalive, cache mgmt...
+for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
