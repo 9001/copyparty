@@ -76,6 +76,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [complete examples](#complete-examples)
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
+    * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
 * [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
@@ -743,7 +744,7 @@ known client bugs:
 
 ## smb server
 
-unsafe, not recommended for wan,  enable with `--smb` for read-only or `--smbw` for read-write
+unsafe, slow, not recommended for wan,  enable with `--smb` for read-only or `--smbw` for read-write
 
 dependencies: `python3 -m pip install --user -U impacket==0.10.0`
 * newer versions of impacket will hopefully work just fine but there is monkeypatching so maybe not
@@ -758,6 +759,7 @@ and some minor issues,
 * hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
 * listens on the first `-i` interface only (default = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work
+  * win10 onwards does not allow connecting anonymously / without accounts
 * python3 only
 * slow
 
@@ -1109,6 +1111,20 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 you can provide passwords using cookie `cppwd=hunter2`, as a url-param `?pw=hunter2`, or with basic-authentication (either as the username or password)
 
 NOTE: curl will not send the original filename if you use `-T` combined with url-params! Also, make sure to always leave a trailing slash in URLs unless you want to override the filename
+
+
+## mount as drive
+
+a remote copyparty server as a local filesystem;  some alternatives roughly sorted by speed (unreproducible benchmark), best first:
+
+* [rclone-http](./docs/rclone.md) (25s), read-only
+* [rclone-webdav](./docs/rclone.md) (51s), read/WRITE
+  * copyparty-1.5.0's webdav server is faster than rclone-1.60.0 (69s)
+* [copyparty-fuse.py](./bin/#copyparty-fusepy) (71s), read-only
+* [win10-webdav](#webdav-server) (138s), read/WRITE
+* [win10-smb2](#smb-server) (387s), read/WRITE
+
+most clients will fail to mount the root of a copyparty server unless there is a root volume (so you get the admin-panel instead of a browser when accessing it) -- in that case, mount a specific volume instead
 
 
 # up2k

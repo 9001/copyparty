@@ -14,15 +14,22 @@ when server is on another machine (1gbit LAN),
 
 # creating the config file
 
-if you want to use password auth, add `headers = Cookie,cppwd=fgsfds` below
+replace `hunter2` with your password, or remove the `hunter2` lines if you allow anonymous access
 
 
 ### on windows clients:
 ```
 (
-echo [cpp]
+echo [cpp-rw]
+echo type = webdav
+echo vendor = other
+echo url = http://127.0.0.1:3923/
+echo headers = Cookie,cppwd=hunter2
+echo(
+echo [cpp-ro]
 echo type = http
 echo url = http://127.0.0.1:3923/
+echo headers = Cookie,cppwd=hunter2
 ) > %userprofile%\.config\rclone\rclone.conf
 ```
 
@@ -32,16 +39,26 @@ also install the windows dependencies: [winfsp](https://github.com/billziss-gh/w
 ### on unix clients:
 ```
 cat > ~/.config/rclone/rclone.conf <<'EOF'
-[cpp]
+[cpp-rw]
+type = webdav
+vendor = other
+url = http://127.0.0.1:3923/
+headers = Cookie,cppwd=hunter2
+
+[cpp-ro]
 type = http
 url = http://127.0.0.1:3923/
+headers = Cookie,cppwd=hunter2
 EOF
 ```
 
 
 # mounting the copyparty server locally
+
+connect to `cpp-rw:` for read-write, or `cpp-ro:` for read-only (twice as fast):
+
 ```
-rclone.exe mount --vfs-cache-max-age 5s --attr-timeout 5s --dir-cache-time 5s cpp: Z:
+rclone.exe mount --vfs-cache-mode writes --vfs-cache-max-age 5s --attr-timeout 5s --dir-cache-time 5s cpp-rw: W:
 ```
 
 
@@ -51,12 +68,5 @@ feels out of place but is too good not to mention
 
 ```
 rclone.exe serve http --read-only .
+rclone.exe serve webdav .
 ```
-
-* `webdav` gives write-access but `http` is twice as fast
-* `ftp` is buggy, avoid
-
-
-# bugs
-
-* rclone-client throws an exception if you try to read an empty file (should return zero bytes)
