@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # takes arguments from launch.json
 # is used by no_dbg in tasks.json
 # launches 10x faster than mspython debugpy

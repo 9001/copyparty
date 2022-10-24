@@ -760,6 +760,7 @@ and some minor issues,
 * listens on the first `-i` interface only (default = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work
   * win10 onwards does not allow connecting anonymously / without accounts
+* on windows, creating a new file through rightclick --> new --> textfile throws an error due to impacket limitations -- hit OK and F5 to get your file
 * python3 only
 * slow
 

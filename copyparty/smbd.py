@@ -198,7 +198,10 @@ class SMB(object):
         vp2 = vp2.lstrip("/")
         ap2 = self._v2a("rename", vp2, vp1)[1]
         self.hub.up2k.handle_mv(LEELOO_DALLAS, vp1, vp2)
-        bos.makedirs(ap2, exist_ok=True)
+        try:
+            bos.makedirs(ap2)
+        except:
+            pass
 
     def _mkdir(self, vpath: str) -> None:
         return bos.mkdir(self._v2a("mkdir", vpath)[1])

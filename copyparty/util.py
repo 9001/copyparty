@@ -1923,8 +1923,8 @@ def sendfile_kern(
             n = os.sendfile(out_fd, in_fd, ofs, req)
             stuck = 0
         except OSError as ex:
+            # client stopped reading; do another select
             d = time.time() - stuck
-            log("sendfile stuck for {:.3f} sec: {!r}".format(d, ex), "90")
             if d < 3600 and ex.errno == errno.EWOULDBLOCK:
                 continue
 
