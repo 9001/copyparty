@@ -132,7 +132,7 @@ class SMB(object):
     def _listdir(self, vpath: str, *a: Any, **ka: Any) -> list[str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
         # caller = inspect.currentframe().f_back.f_code.co_name
-        logging.info('listdir("%s", %s)\033[K\033[0m', vpath, str(a))
+        logging.debug('listdir("%s", %s)\033[K\033[0m', vpath, str(a))
         vfs, rem = self.asrv.vfs.get(vpath, LEELOO_DALLAS, False, False)
         _, vfs_ls, vfs_virt = vfs.ls(
             rem, LEELOO_DALLAS, not self.args.no_scandir, [[False, False]]

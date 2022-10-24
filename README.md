@@ -715,16 +715,16 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 
 ## webdav server
 
-with read-write support,  supports winxp, win7/8/10, macos, nautilus/gvfs
+with read-write support,  supports winXP and later, macos, nautilus/gvfs
 
 general usage:
 * login with any username + your password, or put your password in the username field and leave password empty
 
-on windows xp/7/8/10, connect using the explorer UI:
+on windows xp/7+, connect using the explorer UI:
 * rightclick [my computer] -> [map network drive] -> [Connect to a network server] hyperlink -> [Choose a custom network location] -> `http://192.168.123.1:3923/`
 
-on windows 7/8/10, connect using command prompt (`wark`=password):
-* `net use w: http://192.168.123.1:3923/ wark /user:a`
+on windows 7+, connect using command prompt (`wark`=password):
+* `net use w: http://192.168.123.1:3923/ k /user:wark`
 
 on windows (xp or later), disable wpad for performance:
 * control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
@@ -734,6 +734,8 @@ known client bugs:
   * or just type your password into the username field instead to get around it entirely
 * win7+ cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
 * win7+ cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
+* win7+ opens a new tcp connection for every file and sometimes forgets to close them, eventually needing a reboot
+  * maybe NIC-related (??), happens with win10-ltsc on e1000e but not virtio
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 * winxp cannot show unicode characters outside of *some range*
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
@@ -761,7 +763,8 @@ and some minor issues,
 * slow
 
 known client bugs:
-* on win7 only, `--smb1` is much faster than smb2 (default) because it keeps rescanning folders on smb2, however win10 onwards does not have smb1
+* on win7 only, `--smb1` is much faster than smb2 (default) because it keeps rescanning folders on smb2
+  * however smb1 is buggy and is not enabled by default on win10 onwards
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 
 the smb protocol listens on TCP port 445, which is a privileged port on linux and macos, which would require running copyparty as root. However, this can be avoided by listening on another port using `--smb-port 3945` and then using NAT to forward the traffic from 445 to there;
@@ -770,6 +773,9 @@ the smb protocol listens on TCP port 445, which is a privileged port on linux an
 authenticate with one of the following:
 * username `$username`, password `$password`
 * username `$password`, password blank
+
+on windows 7+, connect using command prompt (`wark`=password):
+* `net use w: \\192.168.123.1\a k /user:wark`
 
 
 ## file indexing

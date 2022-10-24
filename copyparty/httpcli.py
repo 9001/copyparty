@@ -252,8 +252,10 @@ class HttpCli(object):
         self.is_ancient = self.ua.startswith("Mozilla/4.")
 
         zs = self.headers.get("connection", "").lower()
-        self.keepalive = not zs.startswith("close") and (
-            self.http_ver != "HTTP/1.0" or zs == "keep-alive"
+        self.keepalive = (
+            not zs.startswith("close")
+            and (self.http_ver != "HTTP/1.0" or zs == "keep-alive")
+            and "Microsoft-WebDAV" not in self.ua
         )
         self.is_https = (
             self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
