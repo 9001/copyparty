@@ -155,14 +155,16 @@ class SMB(object):
         if ANYWIN:
             f_ro |= os.O_BINARY
 
-        readonly = flags == f_ro
+        wr = flags != f_ro
+        if wr and not self.args.smbw:
+            yeet("blocked write (no --smbw): " + vpath)
 
-        if not self.args.smbw and readonly:
-            logging.info("blocked write to %s", vpath)
-            raise Exception("read-only")
+        vfs, ap = self._v2a("open", vpath, *a)
+        if wr and not vfs.axs.uwrite:
+            yeet("blocked write (no-write-acc): " + vpath)
 
-        ret = bos.open(self._v2a("open", vpath, *a)[1], flags, chmod, *a, **ka)
-        if not readonly:
+        ret = bos.open(ap, flags, chmod, *a, **ka)
+        if wr:
             now = time.time()
             nf = len(self.files)
             if nf > 9000:
@@ -194,9 +196,20 @@ class SMB(object):
         )
 
     def _rename(self, vp1: str, vp2: str) -> None:
+        if not self.args.smbw:
+            yeet("blocked rename (no --smbw): " + vp1)
+
         vp1 = vp1.lstrip("/")
         vp2 = vp2.lstrip("/")
-        ap2 = self._v2a("rename", vp2, vp1)[1]
+
+        vfs2, ap2 = self._v2a("rename", vp2, vp1)
+        if not vfs2.axs.uwrite:
+            yeet("blocked rename (no-write-acc): " + vp2)
+
+        vfs1, _ = self.asrv.vfs.get(vp1, LEELOO_DALLAS, True, True)
+        if not vfs1.axs.umove:
+            yeet("blocked rename (no-move-acc): " + vp1)
+
         self.hub.up2k.handle_mv(LEELOO_DALLAS, vp1, vp2)
         try:
             bos.makedirs(ap2)
@@ -204,19 +217,39 @@ class SMB(object):
             pass
 
     def _mkdir(self, vpath: str) -> None:
-        return bos.mkdir(self._v2a("mkdir", vpath)[1])
+        if not self.args.smbw:
+            yeet("blocked mkdir (no --smbw): " + vpath)
+
+        vfs, ap = self._v2a("mkdir", vpath)
+        if not vfs.axs.uwrite:
+            yeet("blocked mkdir (no-write-acc): " + vpath)
+
+        return bos.mkdir(ap)
 
     def _stat(self, vpath: str, *a: Any, **ka: Any) -> os.stat_result:
         return bos.stat(self._v2a("stat", vpath, *a)[1], *a, **ka)
 
     def _unlink(self, vpath: str) -> None:
+        if not self.args.smbw:
+            yeet("blocked delete (no --smbw): " + vpath)
+
         # return bos.unlink(self._v2a("stat", vpath, *a)[1])
-        logging.info("delete %s", vpath)
         vp = vpath.lstrip("/")
+        vfs, ap = self._v2a("delete", vpath)
+        if not vfs.axs.udel:
+            yeet("blocked delete (no-del-acc): " + vpath)
+
         self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vp], [])
 
     def _utime(self, vpath: str, times: tuple[float, float]) -> None:
-        return bos.utime(self._v2a("stat", vpath)[1], times)
+        if not self.args.smbw:
+            yeet("blocked utime (no --smbw): " + vpath)
+
+        vfs, ap = self._v2a("utime", vpath)
+        if not vfs.axs.uwrite:
+            yeet("blocked utime (no-write-acc): " + vpath)
+
+        return bos.utime(ap, times)
 
     def _p_exists(self, vpath: str) -> bool:
         try:
@@ -269,3 +302,8 @@ class SMB(object):
     def _is_in_file_jail(self, *a: Any) -> bool:
         # handled by vfs
         return True
+
+
+def yeet(msg: str) -> None:
+    logging.info(msg)
+    raise Exception(msg)

@@ -734,7 +734,8 @@ dependencies: `python3 -m pip install --user -U impacket==0.10.0`
 some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 * not entirely confident that read-only is read-only
 * the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh)
-  * account passwords work per-volume as expected, but account permissions are ignored; all accounts have access to all volumes, and `--smbw` gives all accounts write-access everywhere
+  * account passwords work per-volume as expected, but account permissions are coalesced; all accounts have read-access to all volumes, and if a single account has write-access to some volume then all other accounts also do
+    * if no accounts have write-access to a specific volume, or if `--smbw` is not set, then writing to that volume from smb *should* be impossible
   * [shadowing](#shadowing) probably works as expected but no guarantees
 
 and some minor issues,
