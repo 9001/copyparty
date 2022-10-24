@@ -2253,7 +2253,7 @@ class HttpCli(object):
         hrange = self.headers.get("range")
 
         # let's not support 206 with compression
-        if do_send and not is_compressed and hrange:
+        if do_send and not is_compressed and hrange and file_sz:
             try:
                 a, b = hrange.split("=", 1)[1].split("-")
 
