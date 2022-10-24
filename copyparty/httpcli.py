@@ -374,7 +374,6 @@ class HttpCli(object):
             self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(self.pw)[0]))
 
         if self.is_rclone:
-            uparam["raw"] = ""
             uparam["dots"] = ""
             uparam["b"] = ""
             cookies["b"] = ""
@@ -2968,7 +2967,7 @@ class HttpCli(object):
                     self.log("wrong filekey, want {}, got {}".format(correct, got))
                     return self.tx_404()
 
-            if abspath.endswith(".md") and "raw" not in self.uparam:
+            if abspath.endswith(".md") and "v" in self.uparam:
                 return self.tx_md(abspath)
 
             return self.tx_file(abspath)

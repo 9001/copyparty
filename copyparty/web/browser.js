@@ -3446,7 +3446,7 @@ var showfile = (function () {
 		xhr.fname = uricom_dec(url.split('/').pop());
 		xhr.no_push = no_push;
 		xhr.ts = Date.now();
-		xhr.open('GET', url.split('?')[0] + '?raw', true);
+		xhr.open('GET', url.split('?')[0], true);
 		xhr.onprogress = loading;
 		xhr.onload = xhr.onerror = load_cb;
 		xhr.send();
@@ -5181,8 +5181,11 @@ var treectl = (function () {
 				id += 'a';
 			seen[id] = 1;
 
-			if (lang)
+			if (lang) {
 				showfile.files.push({ 'id': id, 'name': fname });
+				if (lang == 'md')
+					tn.href += tn.href.indexOf('?') < 0 ? '?v' : '&v';
+			}
 
 			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + tn.href + '" class="doc' + (lang ? ' bri' : '') +

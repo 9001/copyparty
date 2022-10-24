@@ -166,7 +166,7 @@ function save_cb() {
     //alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
 
     // download the saved doc from the server and compare
-    var url = (document.location + '').split('?')[0] + '?raw';
+    var url = (document.location + '').split('?')[0] + '?_=' + Date.now();
     var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';

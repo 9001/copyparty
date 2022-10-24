@@ -2092,7 +2092,7 @@ function up2k_init(subtle) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
         };
 
-        xhr.open('HEAD', t.purl + uricom_enc(t.name) + '?raw', true);
+        xhr.open('HEAD', t.purl + uricom_enc(t.name), true);
         xhr.send();
     }
 

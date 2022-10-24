@@ -253,7 +253,7 @@ function Modpoll() {
         }
 
         console.log('modpoll...');
-        var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
+        var url = (document.location + '').split('?')[0] + '?_=' + Date.now();
         var xhr = new XHR();
         xhr.open('GET', url, true);
         xhr.responseType = 'text';
@@ -389,7 +389,7 @@ function save_cb() {
 
 function run_savechk(lastmod, txt, btn, ntry) {
     // download the saved doc from the server and compare
-    var url = (document.location + '').split('?')[0] + '?raw&_=' + Date.now();
+    var url = (document.location + '').split('?')[0] + '?_=' + Date.now();
     var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';

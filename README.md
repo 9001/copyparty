@@ -1270,7 +1270,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?ups` | show recent uploads from your IP |
 | GET | `?ups&filter=f` | ...where URL contains `f` |
 | GET | `?mime=foo` | specify return mimetype `foo` |
-| GET | `?raw` | get markdown file at URL as plaintext |
+| GET | `?v` | render markdown file at URL |
 | GET | `?txt` | get file at URL as plaintext |
 | GET | `?txt=iso-8859-1` | ...with specific charset |
 | GET | `?th` | get image/video at URL as thumbnail |
