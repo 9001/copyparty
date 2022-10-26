@@ -6195,7 +6195,7 @@ var msel = (function () {
 	function cb() {
 		xhrchk(this, L.fsm_xe1, L.fsm_xe2);
 
-		if (this.status !== 201) {
+		if (this.status < 200 || this.status > 201) {
 			sf.textContent = 'error: ' + this.responseText;
 			return;
 		}
