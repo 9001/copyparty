@@ -35,7 +35,7 @@ some improvement ideas
 
 a single sha512 would be better, right?
 
-this is due to `crypto.subtle` [not yet](https://github.com/w3c/webcrypto/issues/73) providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
+this was due to `crypto.subtle` [not yet](https://github.com/w3c/webcrypto/issues/73) providing a streaming api (or the option to seed the sha512 hasher with a starting hash)
 
 as a result, the hashes are much less useful than they could have been (search the server by sha512, provide the sha512 in the response http headers, ...)
 
@@ -65,7 +65,7 @@ the features you can opt to drop are
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 
-**note:** you can also just download and run [scripts/copyparty-repack.sh](scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a few repacks; works on linux/macos (and windows with msys2 or WSL)
+**note:** you can also just download and run [/scripts/copyparty-repack.sh](https://github.com/9001/copyparty/blob/hovudstraum/scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a few repacks; works on linux/macos (and windows with msys2 or WSL)
 
 
 # building
