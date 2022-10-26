@@ -1387,9 +1387,9 @@ then again, if you are already into downloading shady binaries from the internet
 
 # install on android
 
-install [Termux](https://termux.com/) (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
+install [Termux](https://termux.com/) + its companion app `Termux:API` (see [ocv.me/termux](https://ocv.me/termux/)) and then copy-paste this into Termux (long-tap) all at once:
 ```sh
-apt update && apt -y full-upgrade && apt update && termux-setup-storage && apt -y install python && python -m ensurepip && python -m pip install --user -U copyparty
+apt update && apt -y full-upgrade && apt update && termux-setup-storage && apt -y install python termux-api && python -m ensurepip && python -m pip install --user -U copyparty && { grep -qE 'PATH=.*\.local/bin' ~/.bashrc 2>/dev/null || { echo 'PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && . ~/.bashrc; }; }
 echo $?
 ```
 
