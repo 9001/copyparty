@@ -11,12 +11,10 @@ from __future__ import print_function, unicode_literals
 import collections
 import itertools
 
-try:
+if True:  # pylint: disable=using-constant-test
     from collections.abc import Sequence
 
     from typing import Callable, List, Optional, Tuple, Union
-except:
-    pass
 
 
 def num_char_count_bits(ver: int) -> int:

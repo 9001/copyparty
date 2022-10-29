@@ -38,13 +38,11 @@ from .util import (
     wrap,
 )
 
-try:
+if True:  # pylint: disable=using-constant-test
     from collections.abc import Callable
     from types import FrameType
 
     from typing import Any, Optional
-except:
-    pass
 
 try:
     HAVE_SSL = True
@@ -79,9 +77,9 @@ class RiceFormatter(argparse.HelpFormatter):
                     ret += fmt
 
         if not VT100:
-            ret = re.sub("\033\[[0-9;]+m", "", ret)
+            ret = re.sub("\033\\[[0-9;]+m", "", ret)
 
-        return ret
+        return ret  # type: ignore
 
     def _fill_text(self, text: str, width: int, indent: str) -> str:
         """same as RawDescriptionHelpFormatter(HelpFormatter)"""
@@ -104,7 +102,7 @@ class RiceFormatter(argparse.HelpFormatter):
                     self.__add_whitespace(i, lWSpace, x)
                     for i, x in enumerate(wrap(line, width, width - 1))
                 ]
-                textRows[idx] = lines
+                textRows[idx] = lines  # type: ignore
 
         return [item for sublist in textRows for item in sublist]
 
@@ -141,7 +139,7 @@ def init_E(E: EnvParams) -> None:
     # __init__ runs 18 times when oxidized; do expensive stuff here
 
     def get_unixdir() -> str:
-        paths: list[tuple[Callable[..., str], str]] = [
+        paths: list[tuple[Callable[..., Any], str]] = [
             (os.environ.get, "XDG_CONFIG_HOME"),
             (os.path.expanduser, "~/.config"),
             (os.environ.get, "TMPDIR"),
@@ -163,7 +161,7 @@ def init_E(E: EnvParams) -> None:
                     if not os.path.isdir(p):
                         os.mkdir(p)
 
-                    return p
+                    return p  # type: ignore
                 except:
                     pass
 
@@ -867,7 +865,7 @@ def main(argv: Optional[list[str]] = None) -> None:
             retry = True
             lprint("\n[ {} ]:\n{}\n".format(fmtr, min_ex()))
 
-    assert al
+    assert al  # type: ignore
     al.E = E  # __init__ is not shared when oxidized
 
     if WINDOWS and not al.keep_qem:

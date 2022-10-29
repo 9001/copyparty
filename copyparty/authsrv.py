@@ -31,15 +31,13 @@ from .util import (
     unhumanize,
 )
 
-try:
+if True:  # pylint: disable=using-constant-test
     from collections.abc import Iterable
 
     import typing
     from typing import Any, Generator, Optional, Union
 
     from .util import RootLogger
-except:
-    pass
 
 if TYPE_CHECKING:
     pass
@@ -412,7 +410,7 @@ class VFS(object):
         will_move: bool = False,
         will_del: bool = False,
         will_get: bool = False,
-        err=403,
+        err: int = 403,
     ) -> tuple["VFS", str]:
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
         if ANYWIN:
@@ -762,6 +760,7 @@ class AuthSrv(object):
                 t = "WARNING (config-file): permission flag 'a' is deprecated; please use 'rw' instead"
                 self.log(t, 1)
 
+            assert vol_dst
             self._read_vol_str(lvl, uname, daxs[vol_dst], mflags[vol_dst])
 
     def _read_vol_str(
@@ -911,6 +910,7 @@ class AuthSrv(object):
             zv.flags = mflags[dst]
             zv.dbv = None
 
+        assert vfs
         vfs.all_vols = {}
         vfs.get_all_vols(vfs.all_vols)
 

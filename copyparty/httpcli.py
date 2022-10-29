@@ -83,11 +83,9 @@ from .util import (
     yieldfile,
 )
 
-try:
+if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Generator, Match, Optional, Pattern, Type, Union
-except:
-    pass
 
 if TYPE_CHECKING:
     from .httpconn import HttpConn
@@ -139,11 +137,13 @@ class HttpCli(object):
         self.cookies: dict[str, str] = {}
         self.vpath = " "
         self.uname = " "
+        self.pw = " "
         self.rvol = [" "]
         self.wvol = [" "]
         self.mvol = [" "]
         self.dvol = [" "]
         self.gvol = [" "]
+        self.upvol = [" "]
         self.do_log = True
         self.can_read = False
         self.can_write = False
@@ -423,7 +423,7 @@ class HttpCli(object):
             if not hasattr(ex, "code"):
                 pex = Pebkac(500)
             else:
-                pex = ex  # type: ignore
+                pex: Pebkac = ex  # type: ignore
 
             try:
                 post = self.mode in ["POST", "PUT"] or "content-length" in self.headers
@@ -848,7 +848,7 @@ class HttpCli(object):
         from xml.etree import ElementTree as ET
         from .dxml import mkenod, mktnod, parse_xml
 
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+        self.asrv.vfs.get(self.vpath, self.uname, False, False)
         # abspath = vn.dcanonical(rem)
 
         buf = b""
@@ -870,8 +870,8 @@ class HttpCli(object):
         xroot.insert(0, parse_xml(txt))
         xprop = xroot.find(r"./{DAV:}propertyupdate/{DAV:}set/{DAV:}prop")
         assert xprop
-        for el in xprop:
-            el.clear()
+        for ze in xprop:
+            ze.clear()
 
         txt = """<multistatus xmlns="DAV:"><response><propstat><status>HTTP/1.1 403 Forbidden</status></propstat></response></multistatus>"""
         xroot = parse_xml(txt)
@@ -942,7 +942,7 @@ class HttpCli(object):
         ret += ET.tostring(xroot).decode("utf-8")
 
         if not bos.path.isfile(abspath):
-            with open(fsenc(abspath), "w") as _:
+            with open(fsenc(abspath), "wb") as _:
                 pass
 
         self.reply(ret.encode(enc, "replace"), 200, "text/xml; charset=" + enc)
@@ -1127,7 +1127,7 @@ class HttpCli(object):
 
         raise Pebkac(405, "don't know how to handle POST({})".format(ctype))
 
-    def get_xml_enc(self, txt) -> str:
+    def get_xml_enc(self, txt: str) -> str:
         ofs = txt[:512].find(' encoding="')
         enc = ""
         if ofs + 1:
@@ -1153,11 +1153,11 @@ class HttpCli(object):
         else:
             return read_socket(self.sr, remains), remains
 
-    def dump_to_file(self, is_put) -> tuple[int, str, str, int, str, str]:
+    def dump_to_file(self, is_put: bool) -> tuple[int, str, str, int, str, str]:
         # post_sz, sha_hex, sha_b64, remains, path, url
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
-        rnd, want_url, lifetime = self.upload_flags(vfs)
+        rnd, _, lifetime = self.upload_flags(vfs)
         lim = vfs.get_dbv(rem)[0].lim
         fdir = vfs.canonical(rem)
         if lim:
@@ -1324,7 +1324,7 @@ class HttpCli(object):
 
         return post_sz, sha_hex, sha_b64, remains, path, url
 
-    def handle_stash(self, is_put) -> bool:
+    def handle_stash(self, is_put: bool) -> bool:
         post_sz, sha_hex, sha_b64, remains, path, url = self.dump_to_file(is_put)
         spd = self._spd(post_sz)
         t = "{} wrote {}/{} bytes to {}  # {}"
@@ -1432,13 +1432,12 @@ class HttpCli(object):
 
     def handle_zip_post(self) -> bool:
         assert self.parser
-        for k in ["zip", "tar"]:
-            v = self.uparam.get(k)
-            if v is not None:
-                break
-
-        if v is None:
+        try:
+            k = next(x for x in self.uparam if x in ("zip", "tar"))
+        except:
             raise Pebkac(422, "need zip or tar keyword")
+
+        v = self.uparam[k]
 
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
         zs = self.parser.require("files", 1024 * 1024)
@@ -1504,8 +1503,8 @@ class HttpCli(object):
         body["vcfg"] = dbv.flags
 
         if rem:
+            dst = vfs.canonical(rem)
             try:
-                dst = vfs.canonical(rem)
                 if not bos.path.isdir(dst):
                     bos.makedirs(dst)
             except OSError as ex:
@@ -1749,7 +1748,7 @@ class HttpCli(object):
         sanitized = sanitize_fn(new_dir, "", [])
         return self._mkdir(vjoin(self.vpath, sanitized))
 
-    def _mkdir(self, vpath) -> bool:
+    def _mkdir(self, vpath: str) -> bool:
         nullwrite = self.args.nw
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
@@ -2466,7 +2465,7 @@ class HttpCli(object):
             for c, v in [(b"&", 4), (b"<", 3), (b">", 3)]:
                 sz_md += (len(buf) - len(buf.replace(c, b""))) * v
 
-        file_ts = max(ts_md, ts_html, self.E.t0)
+        file_ts = int(max(ts_md, ts_html, self.E.t0))
         file_lastmod, do_send = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
         self.out_headers.update(NO_CACHE)

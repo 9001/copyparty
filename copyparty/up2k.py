@@ -60,10 +60,8 @@ if HAVE_SQLITE3:
 
 DB_VER = 5
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Pattern, Union
-except:
-    pass
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -940,6 +938,7 @@ class Up2k(object):
             if n:
                 t = "forgetting {} shadowed autoindexed files in [{}] > [{}]"
                 self.log(t.format(n, top, sh_rd))
+                assert sh_erd
 
                 q = "delete from dh where (d = ? or d like ?||'%')"
                 db.c.execute(q, (sh_erd, sh_erd + "/"))

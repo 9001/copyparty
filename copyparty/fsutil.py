@@ -10,12 +10,10 @@ from .authsrv import AXS, VFS
 from .bos import bos
 from .util import chkcmd, min_ex
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
 
     from .util import RootLogger
-except:
-    pass
 
 
 class Fstab(object):

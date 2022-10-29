@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import tarfile
-import threading
 
 from queue import Queue
 
@@ -10,12 +9,10 @@ from .bos import bos
 from .sutil import StreamArc, errdesc
 from .util import Daemon, fsenc, min_ex
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Generator, Optional
 
     from .util import NamedLogger
-except:
-    pass
 
 
 class QFile(object):  # inherit io.StringIO for painful typing

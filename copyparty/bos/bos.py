@@ -4,14 +4,13 @@ from __future__ import print_function, unicode_literals
 import os
 
 from ..util import SYMTIME, fsdec, fsenc
-from . import path
+from . import path as path
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
-except:
-    pass
 
 _ = (path,)
+__all__ = ["path"]
 
 # grep -hRiE '(^|[^a-zA-Z_\.-])os\.' . | gsed -r 's/ /\n/g;s/\(/(\n/g' | grep -hRiE '(^|[^a-zA-Z_\.-])os\.' | sort | uniq -c
 # printf 'os\.(%s)' "$(grep ^def bos/__init__.py | gsed -r 's/^def //;s/\(.*//' | tr '\n' '|' | gsed -r 's/.$//')"

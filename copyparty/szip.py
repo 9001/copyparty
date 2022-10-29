@@ -9,12 +9,10 @@ from .bos import bos
 from .sutil import StreamArc, errdesc
 from .util import min_ex, sanitize_fn, spack, sunpack, yieldfile
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Generator, Optional
 
     from .util import NamedLogger
-except:
-    pass
 
 
 def dostime2unix(buf: bytes) -> int:

@@ -15,12 +15,10 @@ from .broker_util import BrokerCli, ExceptionalQueue
 from .httpsrv import HttpSrv
 from .util import FAKE_MP, Daemon, HMaccas
 
-try:
+if True:  # pylint: disable=using-constant-test
     from types import FrameType
 
     from typing import Any, Optional, Union
-except:
-    pass
 
 
 class MpWorker(BrokerCli):

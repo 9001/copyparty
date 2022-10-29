@@ -6,12 +6,10 @@ from datetime import datetime
 
 from .bos import bos
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Generator, Optional
 
     from .util import NamedLogger
-except:
-    pass
 
 
 class StreamArc(object):
@@ -25,7 +23,7 @@ class StreamArc(object):
         self.fgen = fgen
 
     def gen(self) -> Generator[Optional[bytes], None, None]:
-        pass
+        raise Exception("override me")
 
 
 def errdesc(errors: list[tuple[str, str]]) -> tuple[dict[str, Any], list[str]]:

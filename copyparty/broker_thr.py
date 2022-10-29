@@ -12,10 +12,8 @@ from .util import HMaccas
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any
-except:
-    pass
 
 
 class BrokerThr(BrokerCli):

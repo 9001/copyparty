@@ -10,12 +10,10 @@ from .__init__ import TYPE_CHECKING
 from .authsrv import AuthSrv
 from .util import HMaccas, Pebkac
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Union
 
     from .util import RootLogger
-except:
-    pass
 
 if TYPE_CHECKING:
     from .httpsrv import HttpSrv
@@ -41,12 +39,14 @@ class BrokerCli(object):
     for example resolving httpconn.* in httpcli -- see lines tagged #mypy404
     """
 
+    log: "RootLogger"
+    args: argparse.Namespace
+    asrv: AuthSrv
+    httpsrv: "HttpSrv"
+    iphash: HMaccas
+
     def __init__(self) -> None:
-        self.log: "RootLogger" = None
-        self.args: argparse.Namespace = None
-        self.asrv: AuthSrv = None
-        self.httpsrv: "HttpSrv" = None
-        self.iphash: HMaccas = None
+        pass
 
     def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
         return ExceptionalQueue(1)

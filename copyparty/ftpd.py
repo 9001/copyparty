@@ -6,7 +6,6 @@ import logging
 import os
 import stat
 import sys
-import threading
 import time
 
 from pyftpdlib.authorizers import AuthenticationFailed, DummyAuthorizer
@@ -31,11 +30,9 @@ except ImportError:
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
-try:
+if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional
-except:
-    pass
 
 
 class FtpAuth(DummyAuthorizer):
@@ -288,8 +285,8 @@ class FtpFs(AbstractedFS):
 
 class FtpHandler(FTPHandler):
     abstracted_fs = FtpFs
-    hub: "SvcHub" = None
-    args: argparse.Namespace = None
+    hub: "SvcHub"
+    args: argparse.Namespace
 
     def __init__(self, conn: Any, server: Any, ioloop: Any = None) -> None:
         self.hub: "SvcHub" = FtpHandler.hub

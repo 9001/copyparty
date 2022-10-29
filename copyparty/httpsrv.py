@@ -47,10 +47,8 @@ from .util import (
 if TYPE_CHECKING:
     from .broker_util import BrokerCli
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
-except:
-    pass
 
 
 class HttpSrv(object):

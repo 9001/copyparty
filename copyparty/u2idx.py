@@ -30,10 +30,8 @@ try:
 except:
     pass
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Union
-except:
-    pass
 
 if TYPE_CHECKING:
     from .httpconn import HttpConn
@@ -199,7 +197,7 @@ class U2idx(object):
                     v = "exists(select 1 from mt where mt.w = mtw and " + vq
 
                 else:
-                    raise Pebkac(400, "invalid key [" + v + "]")
+                    raise Pebkac(400, "invalid key [{}]".format(v))
 
                 q += v + " "
                 continue

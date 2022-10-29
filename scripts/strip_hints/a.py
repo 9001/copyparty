@@ -1,7 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import re
 import os
 import sys
 from strip_hints import strip_file_to_string
@@ -51,16 +50,18 @@ def uh1(fp):
     pr(".")
     cs = strip_file_to_string(fp, no_ast=True, to_empty=True)
 
-    libs = "typing|types|collections\.abc"
-    ptn = re.compile(r"^(\s*)(from (?:{0}) import |import (?:{0})\b).*".format(libs))
-
     # remove expensive imports too
     lns = []
+    on = True
     for ln in cs.split("\n"):
-        m = ptn.match(ln)
-        if m and "SimpleNamespace" not in ln:
-            ln = m.group(1) + "raise Exception()"
+        if ln.startswith("if True:"):
+            on = False
+            continue
 
+        if not on and (not ln.strip() or ln.startswith(" ")):
+            continue
+
+        on = True
         lns.append(ln)
 
     cs = "\n".join(lns)

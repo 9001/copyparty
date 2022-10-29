@@ -4,10 +4,8 @@ import xml.etree.ElementTree as ET
 
 from .__init__ import PY2
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
-except:
-    pass
 
 
 def get_ET() -> ET.XMLParser:

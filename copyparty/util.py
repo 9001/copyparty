@@ -76,7 +76,7 @@ try:
 except:
     HAVE_PSUTIL = False
 
-try:
+if True:  # pylint: disable=using-constant-test
     import types
     from collections.abc import Callable, Iterable
 
@@ -91,21 +91,16 @@ try:
         def __call__(self, msg: str, c: Union[int, str] = 0) -> None:
             return None
 
-except:
-    pass
 
 if TYPE_CHECKING:
     import magic
 
     from .authsrv import VFS
 
-FAKE_MP = False
-
 try:
-    if not FAKE_MP:
-        import multiprocessing as mp
-    else:
-        import multiprocessing.dummy as mp  # type: ignore
+    import multiprocessing as mp
+
+    # import multiprocessing.dummy as mp
 except ImportError:
     # support jython
     mp = None  # type: ignore
@@ -351,8 +346,8 @@ class Daemon(threading.Thread):
         self,
         target: Any,
         name: Optional[str] = None,
-        a: Iterable[Any] = None,
-        r=True,
+        a: Optional[Iterable[Any]] = None,
+        r: bool = True,
     ) -> None:
         threading.Thread.__init__(self, target=target, name=name, args=a or ())
         self.daemon = True
@@ -1049,6 +1044,7 @@ def ren_open(
 
             with fun(fsenc(fpath), *args, **kwargs) as f:
                 if b64:
+                    assert fdir
                     fp2 = "fn-trunc.{}.txt".format(b64)
                     fp2 = os.path.join(fdir, fp2)
                     with open(fsenc(fp2), "wb") as f2:
@@ -1075,7 +1071,7 @@ def ren_open(
                 raise
 
         if not b64:
-            zs = (orig_name + "\n" + suffix).encode("utf-8", "replace")
+            zs = "{}\n{}".format(orig_name, suffix).encode("utf-8", "replace")
             zs = hashlib.sha512(zs).digest()[:12]
             b64 = base64.urlsafe_b64encode(zs).decode("utf-8")
 
@@ -1225,6 +1221,7 @@ class MultipartParser(object):
                     buf = buf[d:]
 
                 # look for boundary near the end of the buffer
+                n = 0
                 for n in range(1, len(buf) + 1):
                     if not buf[-n:] in self.boundary:
                         n -= 1
@@ -1383,8 +1380,8 @@ def gen_filekey_dbg(
         except:
             ctx = ""
 
+        p2 = "a"
         try:
-            p2 = "a"
             p2 = absreal(fspath)
             if p2 != fspath:
                 raise Exception()
@@ -1581,17 +1578,21 @@ def html_bescape(s: bytes, quot: bool = False, crlf: bool = False) -> bytes:
     return s
 
 
-def quotep(txt: str) -> str:
+def _quotep2(txt: str) -> str:
     """url quoter which deals with bytes correctly"""
     btxt = w8enc(txt)
-    quot1 = quote(btxt, safe=b"/")
-    if not PY2:
-        quot2 = quot1.encode("ascii")
-    else:
-        quot2 = quot1
+    quot = quote(btxt, safe=b"/")
+    return w8dec(quot.replace(b" ", b"+"))
 
-    quot3 = quot2.replace(b" ", b"+")
-    return w8dec(quot3)
+
+def _quotep3(txt: str) -> str:
+    """url quoter which deals with bytes correctly"""
+    btxt = w8enc(txt)
+    quot = quote(btxt, safe=b"/").encode("utf-8")
+    return w8dec(quot.replace(b" ", b"+"))
+
+
+quotep = _quotep3 if not PY2 else _quotep2
 
 
 def unquotep(txt: str) -> str:
@@ -1616,20 +1617,28 @@ def vjoin(rd: str, fn: str) -> str:
         return rd or fn
 
 
-def w8dec(txt: bytes) -> str:
+def _w8dec2(txt: bytes) -> str:
     """decodes filesystem-bytes to wtf8"""
-    if PY2:
-        return surrogateescape.decodefilename(txt)
+    return surrogateescape.decodefilename(txt)
 
+
+def _w8enc2(txt: str) -> bytes:
+    """encodes wtf8 to filesystem-bytes"""
+    return surrogateescape.encodefilename(txt)
+
+
+def _w8dec3(txt: bytes) -> str:
+    """decodes filesystem-bytes to wtf8"""
     return txt.decode(FS_ENCODING, "surrogateescape")
 
 
-def w8enc(txt: str) -> bytes:
+def _w8enc3(txt: str) -> bytes:
     """encodes wtf8 to filesystem-bytes"""
-    if PY2:
-        return surrogateescape.encodefilename(txt)
-
     return txt.encode(FS_ENCODING, "surrogateescape")
+
+
+w8dec = _w8dec3 if not PY2 else _w8dec2
+w8enc = _w8enc3 if not PY2 else _w8enc2
 
 
 def w8b64dec(txt: str) -> str:
@@ -1642,17 +1651,17 @@ def w8b64enc(txt: str) -> str:
     return base64.urlsafe_b64encode(w8enc(txt)).decode("ascii")
 
 
-if PY2 and WINDOWS:
+if not PY2 or not WINDOWS:
+    fsenc = w8enc
+    fsdec = w8dec
+else:
     # moonrunes become \x3f with bytestrings,
     # losing mojibake support is worth
-    def _not_actually_mbcs(txt):
+    def _not_actually_mbcs(txt: str) -> str:
         return txt
 
     fsenc = _not_actually_mbcs
     fsdec = _not_actually_mbcs
-else:
-    fsenc = w8enc
-    fsdec = w8dec
 
 
 def s3enc(mem_cur: "sqlite3.Cursor", rd: str, fn: str) -> tuple[str, str]:
@@ -1952,6 +1961,7 @@ def statdir(
     if lstat and (PY2 or os.stat not in os.supports_follow_symlinks):
         scandir = False
 
+    src = "statdir"
     try:
         btop = fsenc(top)
         if scandir and hasattr(os, "scandir"):
@@ -2129,7 +2139,7 @@ def killtree(root: int) -> None:
             os.kill(pid, signal.SIGTERM)
     else:
         # windows gets minimal effort sorry
-        os.kill(pid, signal.SIGTERM)
+        os.kill(root, signal.SIGTERM)
         return
 
     for n in range(10):
@@ -2151,19 +2161,21 @@ def runcmd(
     kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
     capture = ka.pop("capture", 3)  # 0=none 1=stdout 2=stderr 3=both
 
-    sin = ka.pop("sin", None)
+    sin: Optional[bytes] = ka.pop("sin", None)
     if sin:
         ka["stdin"] = sp.PIPE
 
     cout = sp.PIPE if capture in [1, 3] else None
     cerr = sp.PIPE if capture in [2, 3] else None
+    bout: bytes
+    berr: bytes
 
     p = sp.Popen(argv, stdout=cout, stderr=cerr, **ka)
     if not timeout or PY2:
-        stdout, stderr = p.communicate(sin)
+        bout, berr = p.communicate(sin)
     else:
         try:
-            stdout, stderr = p.communicate(sin, timeout=timeout)
+            bout, berr = p.communicate(sin, timeout=timeout)
         except sp.TimeoutExpired:
             if kill == "n":
                 return -18, "", ""  # SIGCONT; leave it be
@@ -2173,15 +2185,15 @@ def runcmd(
                 killtree(p.pid)
 
             try:
-                stdout, stderr = p.communicate(timeout=1)
+                bout, berr = p.communicate(timeout=1)
             except:
-                stdout = b""
-                stderr = b""
+                bout = b""
+                berr = b""
 
-    stdout = stdout.decode("utf-8", "replace") if cout else b""
-    stderr = stderr.decode("utf-8", "replace") if cerr else b""
+    stdout = bout.decode("utf-8", "replace") if cout else ""
+    stderr = berr.decode("utf-8", "replace") if cerr else ""
 
-    rc = p.returncode
+    rc: int = p.returncode
     if rc is None:
         rc = -14  # SIGALRM; failed to kill
 

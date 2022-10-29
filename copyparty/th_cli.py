@@ -9,10 +9,8 @@ from .bos import bos
 from .th_srv import HAVE_WEBP, thumb_path
 from .util import Cooldown
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
-except:
-    pass
 
 if TYPE_CHECKING:
     from .httpsrv import HttpSrv

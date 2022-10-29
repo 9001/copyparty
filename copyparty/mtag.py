@@ -12,25 +12,23 @@ from .__init__ import PY2, WINDOWS, E, unicode
 from .bos import bos
 from .util import REKOBO_LKEY, fsenc, min_ex, retchk, runcmd, uncyg
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
 
     from .util import RootLogger
-except:
-    pass
 
 
-def have_ff(cmd: str) -> bool:
+def have_ff(scmd: str) -> bool:
     if PY2:
-        print("# checking {}".format(cmd))
-        cmd = (cmd + " -version").encode("ascii").split(b" ")
+        print("# checking {}".format(scmd))
+        acmd = (scmd + " -version").encode("ascii").split(b" ")
         try:
-            sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
+            sp.Popen(acmd, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
             return True
         except:
             return False
     else:
-        return bool(shutil.which(cmd))
+        return bool(shutil.which(scmd))
 
 
 HAVE_FFMPEG = have_ff("ffmpeg")
@@ -269,7 +267,7 @@ class MTag(object):
         if self.backend == "mutagen":
             self.get = self.get_mutagen
             try:
-                import mutagen  # noqa: F401  # pylint: disable=unused-import,import-outside-toplevel
+                from mutagen import version  # noqa: F401
             except:
                 self.log("could not load Mutagen, trying FFprobe instead", c=3)
                 self.backend = "ffprobe"
@@ -381,18 +379,20 @@ class MTag(object):
                 parser_output[alias] = (priority, tv[0])
 
         # take first value (lowest priority / most preferred)
-        ret = {sk: unicode(tv[1]).strip() for sk, tv in parser_output.items()}
+        ret: dict[str, Union[str, float]] = {
+            sk: unicode(tv[1]).strip() for sk, tv in parser_output.items()
+        }
 
         # track 3/7 => track 3
-        for sk, tv in ret.items():
+        for sk, zv in ret.items():
             if sk[0] == ".":
-                sv = str(tv).split("/")[0].strip().lstrip("0")
+                sv = str(zv).split("/")[0].strip().lstrip("0")
                 ret[sk] = sv or 0
 
         # normalize key notation to rkeobo
         okey = ret.get("key")
         if okey:
-            key = okey.replace(" ", "").replace("maj", "").replace("min", "m")
+            key = str(okey).replace(" ", "").replace("maj", "").replace("min", "m")
             ret["key"] = REKOBO_LKEY.get(key.lower(), okey)
 
         return ret
@@ -441,10 +441,11 @@ class MTag(object):
         if not bos.path.isfile(abspath):
             return {}
 
-        import mutagen
+        from mutagen import File
 
         try:
-            md = mutagen.File(fsenc(abspath), easy=True)
+            md = File(fsenc(abspath), easy=True)
+            assert md
             if not md.info.length and not md.info.codec:
                 raise Exception()
         except:

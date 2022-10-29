@@ -19,13 +19,11 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-try:
+if True:  # pylint: disable=using-constant-test
     from types import FrameType
 
     import typing
     from typing import Any, Optional, Union
-except:
-    pass
 
 from .__init__ import ANYWIN, MACOS, VT100, EnvParams, unicode
 from .authsrv import AuthSrv
@@ -355,7 +353,7 @@ class SvcHub(object):
 
         self.shutdown()
 
-    def kill9(self, delay: float = 0.0):
+    def kill9(self, delay: float = 0.0) -> None:
         if delay > 0.01:
             time.sleep(delay)
             print("component stuck; performing sigkill")

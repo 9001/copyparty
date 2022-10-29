@@ -14,10 +14,8 @@ from .authsrv import LEELOO_DALLAS, VFS
 from .util import Daemon, min_ex
 from .bos import bos
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any
-except:
-    pass
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -144,7 +142,7 @@ class SMB(object):
         return ls
 
     def _open(
-        self, vpath: str, flags: int, chmod: int = 0o777, *a: Any, **ka: Any
+        self, vpath: str, flags: int, *a: Any, chmod: int = 0o777, **ka: Any
     ) -> Any:
         f_ro = os.O_RDONLY
         if ANYWIN:
@@ -158,7 +156,7 @@ class SMB(object):
         if wr and not vfs.axs.uwrite:
             yeet("blocked write (no-write-acc): " + vpath)
 
-        ret = bos.open(ap, flags, chmod, *a, **ka)
+        ret = bos.open(ap, flags, *a, mode=chmod, **ka)
         if wr:
             now = time.time()
             nf = len(self.files)

@@ -20,10 +20,8 @@ PY3 = sys.version_info > (3,)
 WINDOWS = platform.system() == "Windows"
 FS_ERRORS = "surrogateescape"
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Any
-except:
-    pass
 
 
 if PY3:

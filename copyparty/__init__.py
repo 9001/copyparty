@@ -7,9 +7,12 @@ import sys
 import time
 
 try:
-    from typing import TYPE_CHECKING, Any
+    from typing import TYPE_CHECKING
 except:
     TYPE_CHECKING = False
+
+if True:
+    from typing import Any
 
 PY2 = sys.version_info < (3,)
 if PY2:
@@ -40,8 +43,8 @@ except:
 class EnvParams(object):
     def __init__(self) -> None:
         self.t0 = time.time()
-        self.mod = None
-        self.cfg = None
+        self.mod = ""
+        self.cfg = ""
         self.ox = getattr(sys, "oxidized", None)
 
 

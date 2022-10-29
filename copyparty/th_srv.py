@@ -26,10 +26,8 @@ from .util import (
     vsplit,
 )
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
-except:
-    pass
 
 if TYPE_CHECKING:
     from .svchub import SvcHub

@@ -25,10 +25,8 @@ from .th_srv import HAVE_PIL, HAVE_VIPS
 from .u2idx import U2idx
 from .util import HMaccas, shut_socket
 
-try:
+if True:  # pylint: disable=using-constant-test
     from typing import Optional, Pattern, Union
-except:
-    pass
 
 if TYPE_CHECKING:
     from .httpsrv import HttpSrv
