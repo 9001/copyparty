@@ -14,6 +14,7 @@ var wah = '',
     TOUCH = 'ontouchstart' in window,
     MOBILE = TOUCH,
     CHROME = !!window.chrome,
+    VCHROME = CHROME ? 1 : 0,
     FIREFOX = ('netscape' in window) && / rv:/.test(navigator.userAgent),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(navigator.userAgent),
     WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
@@ -36,8 +37,13 @@ try {
     if (navigator.userAgentData.platform == 'Windows')
         WINDOWS = true;
 
-    if (navigator.userAgentData.brands.some(function (d) { return d.brand == 'Chromium' }))
-        CHROME = true;
+    CHROME = navigator.userAgentData.brands.find(function (d) { return d.brand == 'Chromium' });
+    if (CHROME)
+        VCHROME = CHROME.version;
+    else
+        VCHROME = 0;
+
+    CHROME = !!CHROME;
 }
 catch (ex) { }
 
