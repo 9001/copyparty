@@ -1565,13 +1565,13 @@ class Up2k(object):
                     # is audio, require non-audio?
                     if v.audio == "n":
                         if self.args.mtag_vv:
-                            t = "skip mtp {}; is no-audio, have audio"
+                            t = "skip mtp {}; want no-audio, got audio"
                             self.log(t.format(k), "90")
                         continue
                 # is not audio, require audio?
                 elif v.audio == "y":
                     if self.args.mtag_vv:
-                        t = "skip mtp {}; is audio, have no-audio"
+                        t = "skip mtp {}; want audio, got no-audio"
                         self.log(t.format(k), "90")
                     continue
 
@@ -1584,7 +1584,7 @@ class Up2k(object):
 
                 if not match:
                     if self.args.mtag_vv:
-                        t = "skip mtp {}; need file-ext {}, have {}"
+                        t = "skip mtp {}; want file-ext {}, got {}"
                         self.log(t.format(k, v.ext, abspath.rsplit(".")[-1]), "90")
                     continue
 

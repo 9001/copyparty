@@ -395,6 +395,10 @@ class MTag(object):
             key = str(okey).replace(" ", "").replace("maj", "").replace("min", "m")
             ret["key"] = REKOBO_LKEY.get(key.lower(), okey)
 
+        if self.args.mtag_vv:
+            zl = " ".join("\033[36m{} \033[33m{}".format(k, v) for k, v in ret.items())
+            self.log("norm: {}\033[0m".format(zl), "90")
+
         return ret
 
     def compare(self, abspath: str) -> dict[str, Union[str, float]]:
@@ -446,6 +450,10 @@ class MTag(object):
         try:
             md = File(fsenc(abspath), easy=True)
             assert md
+            if self.args.mtag_vv:
+                for zd in (md.info.__dict__, dict(md.tags)):
+                    zl = ["\033[36m{} \033[33m{}".format(k, v) for k, v in zd.items()]
+                    self.log("mutagen: {}\033[0m".format(" ".join(zl)), "90")
             if not md.info.length and not md.info.codec:
                 raise Exception()
         except:
@@ -495,6 +503,12 @@ class MTag(object):
             return {}
 
         ret, md = ffprobe(abspath, self.args.mtag_to)
+
+        if self.args.mtag_vv:
+            for zd in (ret, dict(md)):
+                zl = ["\033[36m{} \033[33m{}".format(k, v) for k, v in zd.items()]
+                self.log("ffprobe: {}\033[0m".format(" ".join(zl)), "90")
+
         return self.normalize_tags(ret, md)
 
     def get_bin(

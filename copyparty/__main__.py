@@ -750,7 +750,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     ap2.add_argument("--mtag-to", metavar="SEC", type=int, default=60, help="timeout for ffprobe tag-scan")
     ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for tag scanning")
     ap2.add_argument("--mtag-v", action="store_true", help="verbose tag scanning; print errors from mtp subprocesses and such")
-    ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings")
+    ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings and mutagen/ffprobe parsers")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
         default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash")
