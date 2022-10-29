@@ -1499,7 +1499,7 @@ function up2k_init(subtle) {
 
         st.oserr = true;
         var msg = HTTPS ? L.u_emtleak3 : L.u_emtleak2.format((window.location + '').replace(':', 's:'));
-        modal.alert(L.u_emtleak1 + msg + L.u_emtleak4 + (CHROME ? L.u_emtleakc : FIREFOX ? L.u_emtleakf : ''));
+        modal.alert(L.u_emtleak1 + msg + (CHROME ? L.u_emtleakc : FIREFOX ? L.u_emtleakf : ''));
     }
 
     /////
