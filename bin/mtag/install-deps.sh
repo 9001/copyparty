@@ -6,6 +6,7 @@ set -e
 #
 # linux/alpine: requires gcc g++ make cmake patchelf {python3,ffmpeg,fftw,libsndfile}-dev py3-{wheel,pip} py3-numpy{,-dev}
 # linux/debian: requires libav{codec,device,filter,format,resample,util}-dev {libfftw3,python3,libsndfile1}-dev python3-{numpy,pip} vamp-{plugin-sdk,examples} patchelf cmake
+# linux/fedora: requires gcc gcc-c++ make cmake patchelf {python3,ffmpeg,fftw,libsndfile}-devel python3-numpy vamp-plugin-sdk qm-vamp-plugins
 # win64: requires msys2-mingw64 environment
 # macos: requires macports
 #
@@ -160,12 +161,12 @@ install_keyfinder() {
 	
 	h="$HOME"
 	so="lib/libkeyfinder.so"
-	memes=()
+	memes=(-DBUILD_TESTING=OFF)
 
 	[ $win ] &&
 		so="bin/libkeyfinder.dll" &&
 		h="$(printf '%s\n' "$USERPROFILE" | tr '\\' '/')" &&
-		memes+=(-G "MinGW Makefiles" -DBUILD_TESTING=OFF)
+		memes+=(-G "MinGW Makefiles")
 	
 	[ $mac ] &&
 		so="lib/libkeyfinder.dylib"
@@ -185,7 +186,7 @@ install_keyfinder() {
 	}
 	
 	# rm -rf /Users/ed/Library/Python/3.9/lib/python/site-packages/*keyfinder*
-	CFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include" \
+	CFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include -I/usr/include/ffmpeg" \
 	LDFLAGS="-L$h/pe/keyfinder/lib -L$h/pe/keyfinder/lib64 -L/opt/local/lib" \
 	PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig \
 	$pybin -m pip install --user keyfinder
