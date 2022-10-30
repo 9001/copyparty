@@ -6409,6 +6409,14 @@ function show_md(md, name, div, url, depth) {
 			els[a].setAttribute('href', '#md-' + href.slice(1));
 		}
 		set_tabindex();
+		var hash = location.hash;
+		if (hash.startsWith('#md-'))
+			setTimeout(function () {
+				try {
+					QS(hash).scrollIntoView();
+				}
+				catch (ex) { }
+			}, 1);
 	}
 	catch (ex) {
 		toast.warn(10, errmsg + ex);

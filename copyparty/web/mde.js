@@ -7,7 +7,7 @@ var dom_md = ebi('mt');
 
 (function () {
     var n = document.location + '';
-    n = n.substr(n.indexOf('//') + 2).split('?')[0].split('/');
+    n = (n.slice(n.indexOf('//') + 2).split('?')[0] + '?v').split('/');
     n[0] = 'top';
     var loc = [];
     var nav = [];
@@ -15,7 +15,7 @@ var dom_md = ebi('mt');
         if (a > 0)
             loc.push(n[a]);
 
-        var dec = uricom_dec(n[a]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        var dec = uricom_dec(n[a].split('?')[0]).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
         nav.push('<a href="/' + loc.join('/') + '">' + dec + '</a>');
     }

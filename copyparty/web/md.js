@@ -1,12 +1,13 @@
 "use strict";
 
-var dom_toc = ebi('toc');
-var dom_wrap = ebi('mw');
-var dom_hbar = ebi('mh');
-var dom_nav = ebi('mn');
-var dom_pre = ebi('mp');
-var dom_src = ebi('mt');
-var dom_navtgl = ebi('navtoggle');
+var dom_toc = ebi('toc'),
+    dom_wrap = ebi('mw'),
+    dom_hbar = ebi('mh'),
+    dom_nav = ebi('mn'),
+    dom_pre = ebi('mp'),
+    dom_src = ebi('mt'),
+    dom_navtgl = ebi('navtoggle'),
+    hash0 = location.hash;
 
 
 // chrome 49 needs this
@@ -35,12 +36,12 @@ var dbg = function () { };
 
 // add navbar
 (function () {
-    var parts = get_evpath().split('/'), link = '', o;
-    for (var a = 0, aa = parts.length - 2; a <= aa; a++) {
+    var parts = (get_evpath().slice(0, -1).split('?')[0] + '?v').split('/'), link = '', o;
+    for (var a = 0, aa = parts.length - 1; a <= aa; a++) {
         link += parts[a] + (a < aa ? '/' : '');
         o = mknod('a');
         o.setAttribute('href', link);
-        o.textContent = uricom_dec(parts[a]) || 'top';
+        o.textContent = uricom_dec(parts[a].split('?')[0]) || 'top';
         dom_nav.appendChild(o);
     }
 })();
@@ -256,7 +257,7 @@ function convert_markdown(md_text, dest_dom) {
         var html = dom_li.innerHTML;
         dom_li.innerHTML =
             '<span class="todo_' + clas + '">' + char + '</span>' +
-            html.substr(html.indexOf('>') + 1);
+            html.slice(html.indexOf('>') + 1);
     }
 
     // separate <code> for each line in <pre>
@@ -328,6 +329,15 @@ function convert_markdown(md_text, dest_dom) {
         catch (ex) {
             md_plug_err(ex, ext[1]);
         }
+
+    if (hash0)
+        setTimeout(function () {
+            try {
+                QS(hash0).scrollIntoView();
+                hash0 = '';
+            }
+            catch (ex) { }
+        }, 1);
 }
 
 
