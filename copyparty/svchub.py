@@ -91,7 +91,6 @@ class SvcHub(object):
             args.no_del = True
             args.no_mv = True
             args.hardlink = True
-            args.dav_nr = True
             args.vague_403 = True
             args.ban_404 = "50,60,1440"
             args.nih = True

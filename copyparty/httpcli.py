@@ -740,8 +740,11 @@ class HttpCli(object):
         depth = self.headers.get("depth", "infinity").lower()
 
         if depth == "infinity":
-            if self.args.dav_nr:
-                raise Pebkac(412, "recursive file listing is disabled in server config")
+            if not self.args.dav_inf:
+                self.log("client wants --dav-inf", 3)
+                zb = b'<?xml version="1.0" encoding="utf-8"?>\n<D:error xmlns:D="DAV:"><D:propfind-finite-depth/></D:error>'
+                self.reply(zb, 403, "application/xml; charset=utf-8")
+                return True
 
             fgen = vn.zipgen(
                 rem,
@@ -768,7 +771,7 @@ class HttpCli(object):
 
         else:
             t = "invalid depth value '{}' (must be either '0' or '1'{})"
-            t2 = "" if self.args.dav_nr else " or 'infinity'"
+            t2 = " or 'infinity'" if self.args.dav_inf else ""
             raise Pebkac(412, t.format(depth, t2))
 
         try:
