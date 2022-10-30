@@ -41,7 +41,7 @@ as a result, the hashes are much less useful than they could have been (search t
 
 however it allows for hashing multiple chunks in parallel, greatly increasing upload speed from fast storage (NVMe, raid-0 and such)
 
-* both the [browser uploader](#uploading) and the [commandline one](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) does this now, allowing for fast uploading even from plaintext http
+* both the [browser uploader](https://github.com/9001/copyparty#uploading) and the [commandline one](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) does this now, allowing for fast uploading even from plaintext http
 
 hashwasm would solve the streaming issue but reduces hashing speed for sha512 (xxh128 does 6 GiB/s), and it would make old browsers and [iphones](https://bugs.webkit.org/show_bug.cgi?id=228552) unsupported
 

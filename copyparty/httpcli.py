@@ -2968,7 +2968,9 @@ class HttpCli(object):
                     self.log("wrong filekey, want {}, got {}".format(correct, got))
                     return self.tx_404()
 
-            if abspath.endswith(".md") and "v" in self.uparam:
+            if abspath.endswith(".md") and (
+                "v" in self.uparam or "edit" in self.uparam or "edit2" in self.uparam
+            ):
                 return self.tx_md(abspath)
 
             return self.tx_file(abspath)

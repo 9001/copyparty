@@ -2991,12 +2991,15 @@ class Up2k(object):
             if x["need"] and now - x["poke"] > self.snap_discard_interval
         ]
 
-        lost = [
-            x
-            for x in reg.values()
-            if x["need"]
-            and not bos.path.exists(os.path.join(x["ptop"], x["prel"], x["name"]))
-        ]
+        if self.args.nw:
+            lost = []
+        else:
+            lost = [
+                x
+                for x in reg.values()
+                if x["need"]
+                and not bos.path.exists(os.path.join(x["ptop"], x["prel"], x["name"]))
+            ]
 
         if rm or lost:
             t = "dropping {} abandoned, {} deleted uploads in {}"
