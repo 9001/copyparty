@@ -719,15 +719,15 @@ using the GUI  (winXP or later):
 connecting from commandline (win7 or later; `wark`=password):
 * `net use w: http://192.168.123.1:3923/ k /user:wark`
 
-on windows (xp or later), disable wpad for performance:
-* control panel -> [network and internet] -> [internet options] -> [connections] tab -> [lan settings] -> automatically detect settings: Nope
+**however,** you probably want to run [webdav-cfg.bat](./contrib/webdav-cfg.bat) first --
+* fixes inability to access files larger than 47.6 MiB (changes the limit to 4 GiB which is the highest windows can go)
+* optionally allows/enables login over plaintext http
+* optionally disables wpad for ~100x performance
 
 known client bugs:
 * win7+ doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
   * or just type your password into the username field instead to get around it entirely
 * connecting to a folder which allows anonymous read will make writing impossible, as windows has decided it doesn't need to login
-* win7+ cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
-* win7+ cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
 * win7+ opens a new tcp connection for every file and sometimes forgets to close them, eventually needing a reboot
   * maybe NIC-related (??), happens with win10-ltsc on e1000e but not virtio
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
