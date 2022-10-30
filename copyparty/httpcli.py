@@ -784,6 +784,8 @@ class HttpCli(object):
         fgen = itertools.chain([topdir], fgen)  # type: ignore
         vtop = vjoin(vn.vpath, rem)
 
+        chunksz = 0x7FF8  # preferred by nginx or cf (dunno which)
+
         self.send_headers(
             None, 207, "text/xml; charset=" + enc, {"Transfer-Encoding": "chunked"}
         )
@@ -827,14 +829,14 @@ class HttpCli(object):
                 ret += t.format("".join(missing))
 
             ret += "</D:response>"
-            while len(ret) >= 0x800:
-                ret = self.send_chunk(ret, enc, 0x800)
+            while len(ret) >= chunksz:
+                ret = self.send_chunk(ret, enc, chunksz)
 
         ret += "</D:multistatus>"
         while ret:
-            ret = self.send_chunk(ret, enc, 0x800)
+            ret = self.send_chunk(ret, enc, chunksz)
 
-        self.send_chunk("", enc, 0x800)
+        self.send_chunk("", enc, chunksz)
         return True
 
     def handle_proppatch(self) -> bool:
