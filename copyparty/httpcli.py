@@ -903,7 +903,8 @@ class HttpCli(object):
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
-        if not self.can_write:
+        # win7+ deadlocks if we say no; just smile and nod
+        if not self.can_write and "Microsoft-WebDAV" not in self.ua:
             self.log("{} tried to lock [{}]".format(self.uname, self.vpath))
             raise Pebkac(401, "authenticate")
 
@@ -960,7 +961,7 @@ class HttpCli(object):
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
-        if not self.can_write:
+        if not self.can_write and "Microsoft-WebDAV" not in self.ua:
             self.log("{} tried to lock [{}]".format(self.uname, self.vpath))
             raise Pebkac(401, "authenticate")
 
@@ -1055,7 +1056,7 @@ class HttpCli(object):
         self.log("PUT " + self.req)
 
         if not self.can_write:
-            t = "{} does not have write-access here"
+            t = "user {} does not have write-access here"
             raise Pebkac(403, t.format(self.uname))
 
         if not self.args.no_dav and self._applesan():

@@ -705,10 +705,18 @@ with read-write support,  supports winXP and later, macos, nautilus/gvfs
 general usage:
 * login with any username + your password, or put your password in the username field and leave password empty
 
-on windows xp/7+, connect using the explorer UI:
-* rightclick [my computer] -> [map network drive] -> [Connect to a network server] hyperlink -> [Choose a custom network location] -> `http://192.168.123.1:3923/`
+on macos, connect from finder:
+* [Go] -> [Connect to Server...] -> http://192.168.123.1:3923/
 
-on windows 7+, connect using command prompt (`wark`=password):
+
+### connecting to webdav from windows
+
+using the GUI  (winXP or later):
+* rightclick [my computer] -> [map network drive] -> Folder: `http://192.168.123.1:3923/`
+  * on winXP only, click the `Sign up for online storage` hyperlink instead and put the URL there
+  * providing your password as the username is recommended; the password field can be anything or empty
+
+connecting from commandline (win7 or later; `wark`=password):
 * `net use w: http://192.168.123.1:3923/ k /user:wark`
 
 on windows (xp or later), disable wpad for performance:
@@ -717,6 +725,7 @@ on windows (xp or later), disable wpad for performance:
 known client bugs:
 * win7+ doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
   * or just type your password into the username field instead to get around it entirely
+* connecting to a folder which allows anonymous read will make writing impossible, as windows has decided it doesn't need to login
 * win7+ cannot access servers which require authentication unless you use https or [enable basic auth](./contrib/webdav-basicauth.reg) for http
 * win7+ cannot download files larger than 47.6 MiB by default; [registry fix](./contrib/webdav-unlimit.bat) to allow files up to 4 GiB (actual absolute max on windows)
 * win7+ opens a new tcp connection for every file and sometimes forgets to close them, eventually needing a reboot
