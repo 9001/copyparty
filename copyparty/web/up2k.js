@@ -1804,7 +1804,7 @@ function up2k_init(subtle) {
         while (true) {
             for (var mul = 1; mul <= 2; mul++) {
                 var nchunks = Math.ceil(filesize / chunksize);
-                if (nchunks <= 256 || chunksize >= 32 * 1024 * 1024)
+                if (nchunks <= 256 || (chunksize >= 32 * 1024 * 1024 && nchunks <= 4096))
                     return chunksize;
 
                 chunksize += stepsize;

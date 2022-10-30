@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-09-05, v0.19, ed <irc.rizon.net>, MIT-Licensed
+2022-10-30, v0.20, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -415,7 +415,7 @@ def up2k_chunksize(filesize):
     while True:
         for mul in [1, 2]:
             nchunks = math.ceil(filesize * 1.0 / chunksize)
-            if nchunks <= 256 or chunksize >= 32 * 1024 * 1024:
+            if nchunks <= 256 or (chunksize >= 32 * 1024 * 1024 and nchunks < 4096):
                 return chunksize
 
             chunksize += stepsize
