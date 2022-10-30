@@ -432,10 +432,11 @@ class HttpCli(object):
 
                 em = str(ex)
                 msg = em if pex == ex else min_ex()
-                self.log(
-                    "{}\033[0m, {}".format(msg, self.vpath),
-                    6 if em.startswith("client d/c ") else 3,
-                )
+                if pex.code != 404 or self.do_log:
+                    self.log(
+                        "{}\033[0m, {}".format(msg, self.vpath),
+                        6 if em.startswith("client d/c ") else 3,
+                    )
 
                 msg = "{}\r\nURL: {}\r\n".format(em, self.vpath)
                 if self.hint:
@@ -971,6 +972,9 @@ class HttpCli(object):
     def handle_mkcol(self) -> bool:
         if self._applesan():
             return True
+
+        if self.do_log:
+            self.log("MKCOL " + self.req)
 
         return self._mkdir(self.vpath)
 
