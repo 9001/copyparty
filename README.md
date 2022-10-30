@@ -354,6 +354,7 @@ the main tabs in the ui
 ## hotkeys
 
 the browser has the following hotkeys  (always qwerty)
+* `?` show hotkeys help
 * `B` toggle breadcrumbs / [navpane](#navpane)
 * `I/K` prev/next folder
 * `M` parent folder (or unexpand current)
@@ -361,6 +362,7 @@ the browser has the following hotkeys  (always qwerty)
 * `G` toggle list / [grid view](#thumbnails) -- same as `田` bottom-right
 * `T` toggle thumbnails / icons
 * `ESC` close various things
+* `ctrl-K` delete selected files/folders
 * `ctrl-X` cut selected files/folders
 * `ctrl-V` paste
 * `F2` [rename](#batch-rename) selected file/folder

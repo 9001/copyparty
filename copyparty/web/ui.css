@@ -202,6 +202,7 @@ html.y #tth {
 	border: .4em solid var(--fg);
 	box-shadow: 0 2em 4em 1em var(--bg-max);
 }
+#hkhelp,
 #modal {
 	position: fixed;
     overflow: auto;

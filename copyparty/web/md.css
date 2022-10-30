@@ -4,6 +4,12 @@ html, body {
 	font-family: sans-serif;
 	line-height: 1.5em;
 }
+html.y #helpbox a {
+	color: #079;
+}
+html.z #helpbox a {
+	color: #fc5;
+}
 #repl {
 	position: absolute;
 	top: 0;

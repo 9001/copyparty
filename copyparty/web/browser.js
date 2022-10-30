@@ -25,6 +25,64 @@ var Ls = {
 			"hz": "sample rate"
 		},
 
+		"hks": [
+			[
+				"misc",
+				["ESC", "close various things"],
+
+				"file-manager",
+				["G", "toggle list / grid view"],
+				["T", "toggle thumbnails / icons"],
+				["🡅 A/D", "thumbnail size"],
+				["ctrl-K", "delete selected"],
+				["ctrl-X", "cut selected"],
+				["ctrl-V", "paste into folder"],
+				["F2", "rename selected"],
+
+				"file-list-sel",
+				["space", "toggle file selection"],
+				["🡑/🡓", "move selection cursor"],
+				["ctrl 🡑/🡓", "move cursor and viewport"],
+				["🡅 🡑/🡓", "select prev/next file"],
+				["ctrl-A", "select all files / folders"],
+			], [
+				"navigation",
+				["B", "toggle breadcrumbs / navpane"],
+				["I/K", "prev/next folder"],
+				["M", "parent folder (or unexpand current)"],
+				["V", "toggle folders / textfiles in navpane"],
+				["A/D", "navpane size"],
+			], [
+				"audio-player",
+				["J/L", "prev/next song"],
+				["U/O", "skip 10sec back/fwd"],
+				["0..9", "jump to 0%..90%"],
+				["P", "play/pause (also initiates)"],
+				["Y", "download song"],
+			], [
+				"image-viewer",
+				["J/L, ←/→", "prev/next pic"],
+				["Home/End", "first/last pic"],
+				["F", "fullscreen"],
+				["R", "rotate clockwise"],
+				["🡅 R", "rotate ccw"],
+				["Y", "download pic"],
+			], [
+				"video-player",
+				["U/O", "skip 10sec back/fwd"],
+				["P/K/Space", "play/pause"],
+				["C", "continue playing next"],
+				["V", "loop"],
+				["M", "mute"],
+				["[ and ]", "set loop interval"],
+			], [
+				"textfile-viewer",
+				["I/K", "prev/next file"],
+				["M", "close textfile"],
+				["S", "select file (for cut/rename)"],
+			]
+		],
+
 		"m_ok": "OK",
 		"m_ng": "Cancel",
 
@@ -398,6 +456,64 @@ var Ls = {
 			"chs": "lydkanaler",
 			"hz": "lyd-oppløsning"
 		},
+
+		"hks": [
+			[
+				"ymse",
+				["ESC", "lukk saker og ting"],
+
+				"filbehandler",
+				["G", "listevisning eller ikoner"],
+				["T", "miniatyrbilder på/av"],
+				["🡅 A/D", "ikonstørrelse"],
+				["ctrl-K", "slett valgte"],
+				["ctrl-X", "klipp ut"],
+				["ctrl-V", "lim inn"],
+				["F2", "endre navn på valgte"],
+
+				"filmarkering",
+				["space", "marker fil"],
+				["🡑/🡓", "flytt markør"],
+				["ctrl 🡑/🡓", "flytt markør og scroll"],
+				["🡅 🡑/🡓", "velg forr./neste fil"],
+				["ctrl-A", "velg alle filer / mapper"],
+			], [
+				"navigering",
+				["B", "mappehierarki eller filsti"],
+				["I/K", "forr./neste mappe"],
+				["M", "ett nivå opp (eller lukk)"],
+				["V", "vis mapper eller tekstfiler"],
+				["A/D", "panelstørrelse"],
+			], [
+				"musikkspiller",
+				["J/L", "forr./neste sang"],
+				["U/O", "hopp 10sek bak/frem"],
+				["0..9", "hopp til 0%..90%"],
+				["P", "pause, eller start / fortsett"],
+				["Y", "last ned sang"],
+			], [
+				"bildeviser",
+				["J/L, ←/→", "forr./neste bilde"],
+				["Home/End", "første/siste bilde"],
+				["F", "fullskjermvisning"],
+				["R", "rotere mot høyre"],
+				["🡅 R", "rotere mot venstre"],
+				["Y", "last ned bilde"],
+			], [
+				"videospiller",
+				["U/O", "hopp 10sek bak/frem"],
+				["P/K/Space", "pause / fortsett"],
+				["C", "fortsett til neste fil"],
+				["V", "gjenta avspilling"],
+				["M", "lyd av/på"],
+				["[ og ]", "gjentaksintervall"],
+			], [
+				"dokumentviser",
+				["I/K", "forr./neste fil"],
+				["M", "lukk tekstdokument"],
+				["S", "velg fil (for F2/ctrl-x/...)"]
+			]
+		],
 
 		"m_ok": "OK",
 		"m_ng": "Avbryt",
@@ -4105,6 +4221,31 @@ function tree_up() {
 }
 
 
+function hkhelp() {
+	var html = [];
+	for (var ic = 0; ic < L.hks.length; ic++) {
+		var c = L.hks[ic];
+		html.push('<table>');
+		for (var a = 0; a < c.length; a++)
+			try {
+				if (c[a].length != 2)
+					html.push('<tr><th colspan="2">' + esc(c[a]) + '</th></tr>');
+				else
+					html.push('<tr><td>{0}</td><td>{1}</td></tr>'.format(c[a][0], c[a][1]));
+			}
+			catch (ex) {
+				html.push(">>> " + c[a]);
+			}
+
+		html.push('</table>');
+	}
+	qsr('#hkhelp');
+	var o = mknod('div', 'hkhelp');
+	o.innerHTML = html.join('\n');
+	document.body.appendChild(o);
+}
+
+
 document.onkeydown = function (e) {
 	if (e.altKey || e.isComposing)
 		return;
@@ -4116,8 +4257,14 @@ document.onkeydown = function (e) {
 		ae = document.activeElement,
 		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
 
+	if (e.key == '?')
+		return hkhelp();
+
 	if (k == 'Escape') {
 		ae && ae.blur();
+
+		if (ebi('hkhelp'))
+			return qsr('#hkhelp');
 
 		if (ebi('rn_cancel'))
 			return ebi('rn_cancel').click();

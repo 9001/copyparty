@@ -246,7 +246,13 @@ window.baguetteBox = (function () {
     }
 
     function keyDownHandler(e) {
-        if (anymod(e, true) || modal.busy)
+        if (modal.busy)
+            return;
+
+        if (e.key == '?')
+            return halp();
+
+        if (anymod(e, true))
             return;
 
         var k = e.code + '', v = vid(), pos = -1;

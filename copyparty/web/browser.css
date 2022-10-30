@@ -1805,6 +1805,28 @@ a.btn,
 	-ms-user-select: none;
 	user-select: none;
 }
+#hkhelp {
+	background: var(--bg);
+}
+#hkhelp table {
+	margin: 2em 2em 0 2em;
+	float: left;
+}
+#hkhelp th {
+	border-bottom: 1px solid var(--bg-u5);
+	background: var(--bg-u1);
+	font-weight: bold;
+	text-align: right;
+}
+#hkhelp tr+tr th {
+	border-top: 1.5em solid var(--bg);
+}
+#hkhelp td {
+	padding: .2em .3em;
+}
+#hkhelp td:first-child {
+	font-family: 'scp', monospace, monospace;
+}
 
 
 
