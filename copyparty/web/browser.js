@@ -3611,7 +3611,7 @@ var showfile = (function () {
 		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('') + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
-			html.push('<li><a href="#" hl="' + file.id +
+			html.push('<li><a href="?doc=' + file.name + '" hl="' + file.id +
 				'">' + esc(uricom_dec(file.name)) + '</a>');
 		}
 		ebi('docul').innerHTML = html.join('\n');
