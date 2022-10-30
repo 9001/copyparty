@@ -1,12 +1,14 @@
 #!/bin/bash
 set -e
 
-curl http://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh |
+curl -k https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh |
 tee build2.sh | cmp build.sh && rm build2.sh || {
     echo "new build script; upgrade y/n:"
     while true; do read -u1 -n1 -r r; [[ $r =~ [yYnN] ]] && break; done
     [[ $r =~ [yY] ]] && mv build{2,}.sh && exec ./build.sh
 }
+
+uname -s | grep WOW64 && m=64 || m=
 
 dl() { curl -fkLO "$1"; }
 
@@ -62,4 +64,4 @@ $APPDATA/python/python37/scripts/pyinstaller \
 
 # ./upx.exe --best --ultra-brute --lzma -k dist/copyparty.exe
 
-curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/
+curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/copyparty$m.exe

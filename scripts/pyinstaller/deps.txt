@@ -1,0 +1,25 @@
+# links to download pages for each dep
+https://pypi.org/project/altgraph/#files
+https://pypi.org/project/future/#files
+https://pypi.org/project/importlib-metadata/#files
+https://pypi.org/project/pefile/#files
+https://pypi.org/project/pip/#files
+https://pypi.org/project/pyinstaller/#files
+https://pypi.org/project/pyinstaller-hooks-contrib/#files
+https://pypi.org/project/pywin32-ctypes/#files
+https://pypi.org/project/typing-extensions/#files
+https://pypi.org/project/zipp/#files
+https://github.com/git-for-windows/git/releases/latest
+https://github.com/upx/upx/releases/latest
+https://support.microsoft.com/en-us/topic/microsoft-security-advisory-insecure-library-loading-could-allow-remote-code-execution-486ea436-2d47-27e5-6cb9-26ab7230c704
+  http://www.microsoft.com/download/details.aspx?familyid=c79c41b0-fbfb-4d61-b5d8-cadbe184b9fc
+  http://www.microsoft.com/download/details.aspx?familyid=146ed6f7-b605-4270-8ec4-b9f0f284bb9e
+    https://www.microsoft.com/en-us/download/details.aspx?id=26767
+    https://www.microsoft.com/en-us/download/details.aspx?id=26764
+      see web.archive.org links below
+
+# direct links to version-frozen deps
+https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe
+https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe
+https://web.archive.org/web/20200412130846if_/https://download.microsoft.com/download/2/D/7/2D78D0DD-2802-41F5-88D6-DC1D559F206D/Windows6.1-KB2533623-x86.msu
+https://web.archive.org/web/20200203192654if_/https://download.microsoft.com/download/f/1/0/f106e158-89a1-41e3-a9b5-32feb2a99a0b/windows6.1-kb2533623-x64.msu

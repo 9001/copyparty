@@ -5,37 +5,55 @@ run ./build.sh in git-bash to build + upload the exe
 ## first-time setup on a stock win7x32sp1 vm:
 ## 
 
-download + install git:
-http://192.168.123.1:3923/ro/pyi/Git-2.37.3-32-bit.exe
+to obtain the files referenced below, see ./deps.txt
 
-<git-bash>
-dl() { curl -fkLOC- "$1"; }
+download + install git (32bit OK on 64):
+http://192.168.123.1:3923/ro/pyi/Git-2.38.1-32-bit.exe
+
+===[ copy-paste into git-bash ]================================
+fns=(
+  upx-4.0.0-win32.zip
+  pip-22.3-py3-none-any.whl
+  altgraph-0.17.3-py2.py3-none-any.whl
+  future-0.18.2.tar.gz
+  importlib_metadata-5.0.0-py3-none-any.whl
+  pefile-2022.5.30.tar.gz
+  pyinstaller_hooks_contrib-2022.11-py2.py3-none-any.whl
+  pywin32_ctypes-0.2.0-py2.py3-none-any.whl
+  typing_extensions-4.4.0-py3-none-any.whl
+  zipp-3.10.0-py3-none-any.whl
+)
+uname -s | grep WOW64 && fns+=(
+  windows6.1-kb2533623-x64.msu
+  pyinstaller-5.6.1-py3-none-win_amd64.whl
+  python-3.7.9-amd64.exe
+) || fns+=(
+  windows6.1-kb2533623-x86.msu
+  pyinstaller-5.6.1-py3-none-win32.whl
+  python-3.7.9.exe
+)
+dl() { curl -fkLOC- "$1" && return 0; echo "$1"; return 1; }
 cd ~/Downloads &&
-dl https://192.168.123.1:3923/ro/pyi/upx-3.96-win32.zip &&
-dl https://192.168.123.1:3923/ro/pyi/KB2533623/Windows6.1-KB2533623-x86.msu &&
-dl https://192.168.123.1:3923/ro/pyi/python-3.7.9.exe &&
-dl https://192.168.123.1:3923/ro/pyi/pip-22.2.2-py3-none-any.whl &&
-dl https://192.168.123.1:3923/ro/pyi/altgraph-0.17.2-py2.py3-none-any.whl &&
-dl https://192.168.123.1:3923/ro/pyi/future-0.18.2.tar.gz &&
-dl https://192.168.123.1:3923/ro/pyi/importlib_metadata-4.12.0-py3-none-any.whl &&
-dl https://192.168.123.1:3923/ro/pyi/pefile-2022.5.30.tar.gz &&
-dl https://192.168.123.1:3923/ro/pyi/pyinstaller-5.4.1-py3-none-win32.whl &&
-dl https://192.168.123.1:3923/ro/pyi/pyinstaller_hooks_contrib-2022.10-py2.py3-none-any.whl &&
-dl https://192.168.123.1:3923/ro/pyi/pywin32_ctypes-0.2.0-py2.py3-none-any.whl &&
-dl https://192.168.123.1:3923/ro/pyi/typing_extensions-4.3.0-py3-none-any.whl &&
-dl https://192.168.123.1:3923/ro/pyi/zipp-3.8.1-py3-none-any.whl &&
-echo ok
+for fn in "${fns[@]}"; do
+  dl "https://192.168.123.1:3923/ro/pyi/$fn" || {
+    echo ERROR; ok=; break
+  }
+done
 
 manually install:
-  windows6.1-kb2533623-x86.msu + reboot
-  python-3.7.9.exe
+  windows6.1-kb2533623 + reboot
+  python-3.7.9
 
-<git-bash>
+===[ copy-paste into git-bash ]================================
 cd ~/Downloads &&
-unzip -j upx-3.96-win32.zip upx-3.96-win32/upx.exe &&
+unzip upx-*-win32.zip &&
+mv upx-*/upx.exe . &&
 python -m ensurepip &&
-python -m pip install --user -U pip-22.2.2-py3-none-any.whl &&
-python -m pip install --user -U pyinstaller-5.4.1-py3-none-win32.whl pefile-2022.5.30.tar.gz pywin32_ctypes-0.2.0-py2.py3-none-any.whl pyinstaller_hooks_contrib-2022.10-py2.py3-none-any.whl altgraph-0.17.2-py2.py3-none-any.whl future-0.18.2.tar.gz importlib_metadata-4.12.0-py3-none-any.whl typing_extensions-4.3.0-py3-none-any.whl zipp-3.8.1-py3-none-any.whl &&
+python -m pip install --user -U pip-*.whl &&
+python -m pip install --user -U pyinstaller-*.whl pefile-*.tar.gz pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl future-*.tar.gz importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl &&
+cd &&
+rm -f build.sh &&
+curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh &&
 echo ok
 # python -m pip install --user -U Pillow-9.2.0-cp37-cp37m-win32.whl
 # sed -ri 's/, bestopt, /]+bestopt+[/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
