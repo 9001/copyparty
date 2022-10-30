@@ -1244,16 +1244,19 @@ class HttpCli(object):
             fn = self.rand_name(fdir, fn, rnd)
 
         if is_put and not self.args.no_dav:
-            # allow overwrite if volflag daw is set, or all the following is true:
+            # allow overwrite if...
+            #  * volflag 'daw' is set
+            #  * and account has delete-access
+            # or...
             #  * file exists and is empty
-            #  * there is no .PARTIAL
+            #  * and there is no .PARTIAL
 
             path = os.path.join(fdir, fn)
             tnam = fn + ".PARTIAL"
             if self.args.dotpart:
                 tnam = "." + tnam
 
-            if "daw" in vfs.flags or (
+            if ("daw" in vfs.flags and self.can_delete) or (
                 not bos.path.exists(os.path.join(fdir, tnam))
                 and bos.path.exists(path)
                 and not bos.path.getsize(path)
