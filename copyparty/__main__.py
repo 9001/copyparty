@@ -411,7 +411,9 @@ def showlic() -> None:
         print(f.read().decode("utf-8", "replace"))
 
 
-def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Namespace:
+def run_argparse(
+    argv: list[str], formatter: Any, retry: bool, nc: int
+) -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
         prog="copyparty",
@@ -569,7 +571,7 @@ def run_argparse(argv: list[str], formatter: Any, retry: bool) -> argparse.Names
     u = unicode
     ap2 = ap.add_argument_group('general options')
     ap2.add_argument("-c", metavar="PATH", type=u, action="append", help="add config file")
-    ap2.add_argument("-nc", metavar="NUM", type=int, default=64, help="max num clients")
+    ap2.add_argument("-nc", metavar="NUM", type=int, default=nc, help="max num clients")
     ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores, 0=all")
     ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, \033[33mUSER\033[0m:\033[33mPASS\033[0m; example [\033[32med:wark\033[0m]")
     ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, \033[33mSRC\033[0m:\033[33mDST\033[0m:\033[33mFLAG\033[0m; examples [\033[32m.::r\033[0m], [\033[32m/mnt/nas/music:/music:r:aed\033[0m]")
@@ -855,10 +857,20 @@ def main(argv: Optional[list[str]] = None) -> None:
     except:
         pass
 
+    nc = 1024
+    try:
+        import resource
+
+        _, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        if hard > 0:  # -1 == infinite
+            nc = min(nc, hard // 4)
+    except:
+        nc = 512
+
     retry = False
     for fmtr in [RiceFormatter, RiceFormatter, Dodge11874, BasicDodge11874]:
         try:
-            al = run_argparse(argv, fmtr, retry)
+            al = run_argparse(argv, fmtr, retry, nc)
         except SystemExit:
             raise
         except:

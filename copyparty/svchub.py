@@ -140,6 +140,11 @@ class SvcHub(object):
         if args.ls:
             self.asrv.dbg_ls()
 
+        if not ANYWIN:
+            self._setlimits()
+
+        self.log("root", "max clients: {}".format(self.args.nc))
+
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
@@ -244,6 +249,46 @@ class SvcHub(object):
         self.up2k.init_vols()
 
         Daemon(self.sd_notify, "sd-notify")
+
+    def _setlimits(self) -> None:
+        try:
+            import resource
+
+            soft, hard = [
+                x if x > 0 else 1024 * 1024
+                for x in list(resource.getrlimit(resource.RLIMIT_NOFILE))
+            ]
+        except:
+            self.log("root", "failed to read rlimits from os", 6)
+            return
+
+        if not soft or not hard:
+            t = "got bogus rlimits from os ({}, {})"
+            self.log("root", t.format(soft, hard), 6)
+            return
+
+        want = self.args.nc * 4
+        new_soft = min(hard, want)
+        if new_soft < soft:
+            return
+
+        # t = "requesting rlimit_nofile({}), have {}"
+        # self.log("root", t.format(new_soft, soft), 6)
+
+        try:
+            import resource
+
+            resource.setrlimit(resource.RLIMIT_NOFILE, (new_soft, hard))
+            soft = new_soft
+        except:
+            t = "rlimit denied; max open files: {}"
+            self.log("root", t.format(soft), 3)
+            return
+
+        if soft < want:
+            t = "max open files: {} (wanted {} for -nc {})"
+            self.log("root", t.format(soft, want, self.args.nc), 3)
+            self.args.nc = min(self.args.nc, soft // 2)
 
     def _logname(self) -> str:
         dt = datetime.utcnow()
