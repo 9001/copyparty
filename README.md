@@ -724,11 +724,14 @@ connecting from commandline (win7 or later; `wark`=password):
 * optionally allows/enables login over plaintext http
 * optionally disables wpad for ~100x performance
 
+better yet, you could skip the windows-builtin webdav support entirely and instead [connect using rclone](./docs/rclone.md) which is 3x faster and way less buggy!
+
 known client bugs:
 * win7+ doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
   * or just type your password into the username field instead to get around it entirely
 * connecting to a folder which allows anonymous read will make writing impossible, as windows has decided it doesn't need to login
-* win7+ opens a new tcp connection for every file and sometimes forgets to close them, eventually needing a reboot
+  * workaround: connect twice; first to a folder which requires auth, then to the folder you actually want, and leave both of those mounted
+* win7+ may open a new tcp connection for every file and sometimes forgets to close them, eventually needing a reboot
   * maybe NIC-related (??), happens with win10-ltsc on e1000e but not virtio
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 * winxp cannot show unicode characters outside of *some range*

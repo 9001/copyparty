@@ -46,6 +46,7 @@ class HttpConn(object):
     ) -> None:
         self.s = sck
         self.sr: Optional[Util._Unrecv] = None
+        self.cli: Optional[HttpCli] = None
         self.addr = addr
         self.hsrv = hsrv
 
@@ -56,6 +57,8 @@ class HttpConn(object):
         self.cert_path = hsrv.cert_path
         self.u2fh: Util.FHC = hsrv.u2fh  # mypy404
         self.iphash: HMaccas = hsrv.broker.iphash
+        self.bans: dict[str, int] = hsrv.bans
+        self.aclose: dict[str, int] = hsrv.aclose
 
         enth = (HAVE_PIL or HAVE_VIPS or HAVE_FFMPEG) and not self.args.no_thumb
         self.thumbcli: Optional[ThumbCli] = ThumbCli(hsrv) if enth else None  # mypy404
@@ -63,7 +66,7 @@ class HttpConn(object):
 
         self.t0: float = time.time()  # mypy404
         self.stopping = False
-        self.nreq: int = 0  # mypy404
+        self.nreq: int = -1  # mypy404
         self.nbyte: int = 0  # mypy404
         self.u2idx: Optional[U2idx] = None
         self.log_func: "Util.RootLogger" = hsrv.log  # mypy404
@@ -138,6 +141,8 @@ class HttpConn(object):
         return not method or not bool(PTN_HTTP.match(method))
 
     def run(self) -> None:
+        self.s.settimeout(10)
+
         self.sr = None
         if self.args.https_only:
             is_https = True
@@ -206,6 +211,6 @@ class HttpConn(object):
 
         while not self.stopping:
             self.nreq += 1
-            cli = HttpCli(self)
-            if not cli.run():
+            self.cli = HttpCli(self)
+            if not self.cli.run():
                 return

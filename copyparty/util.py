@@ -401,7 +401,16 @@ class _Unrecv(object):
             self.buf = self.buf[nbytes:]
             return ret
 
-        ret = self.s.recv(nbytes)
+        while True:
+            try:
+                ret = self.s.recv(nbytes)
+                break
+            except socket.timeout:
+                continue
+            except:
+                ret = b""
+                break
+
         if not ret:
             raise UnrecvEOF("client stopped sending data")
 

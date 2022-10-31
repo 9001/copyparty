@@ -98,10 +98,10 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp dav daw dav_inf dav_mac xdev xvol ed emp force_js ihead magic no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
+        ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp no_dav daw dav_inf dav_mac xdev xvol ed emp force_js ihead magic no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "no_rescan no_sendfile no_voldump plain_ip"
+        ex = "no_rescan no_sendfile no_voldump plain_ip dotpart"
         ka.update(**{k: True for k in ex.split()})
 
         ex = "css_browser hist js_browser no_hash no_idx no_forget"
@@ -155,6 +155,9 @@ class VSock(object):
     def getsockname(self):
         return ("a", 1)
 
+    def settimeout(self, a):
+        pass
+
 
 class VHttpSrv(object):
     def __init__(self):
@@ -181,9 +184,11 @@ class VHttpConn(object):
         self.log_src = "a"
         self.lf_url = None
         self.hsrv = VHttpSrv()
+        self.bans = {}
+        self.aclose = {}
         self.u2fh = FHC()
         self.mutex = threading.Lock()
-        self.nreq = 0
+        self.nreq = -1
         self.nbyte = 0
         self.ico = None
         self.thumbcli = None

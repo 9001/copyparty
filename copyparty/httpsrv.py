@@ -12,6 +12,11 @@ import time
 import queue
 
 try:
+    from ipaddress import IPv6Address
+except:
+    pass
+
+try:
     import jinja2
 except ImportError:
     print(
@@ -28,7 +33,7 @@ except ImportError:
     )
     sys.exit(1)
 
-from .__init__ import MACOS, TYPE_CHECKING, EnvParams
+from .__init__ import MACOS, TYPE_CHECKING, EnvParams, PY2
 from .bos import bos
 from .httpconn import HttpConn
 from .util import (
@@ -70,9 +75,11 @@ class HttpSrv(object):
 
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
-        self.bans: dict[str, int] = {}
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
+        self.gdos = Garda("1,{0},{0}".format(self.args.cd_dos))
+        self.bans: dict[str, int] = {}
+        self.aclose: dict[str, int] = {}
 
         self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()
@@ -192,10 +199,49 @@ class HttpSrv(object):
             if self.args.log_conn:
                 self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="90")
 
-            if self.ncli >= self.nclimax:
-                self.log(self.name, "at connection limit; waiting", 3)
-                while self.ncli >= self.nclimax:
-                    time.sleep(0.1)
+            spins = 0
+            while self.ncli >= self.nclimax:
+                if not spins:
+                    self.log(self.name, "at connection limit; waiting", 3)
+
+                spins += 1
+                time.sleep(0.1)
+                if spins != 30 or not self.args.cd_dos:
+                    continue
+
+                ipfreq: dict[str, int] = {}
+                with self.mutex:
+                    for c in self.clients:
+                        try:
+                            ipfreq[c.ip] += 1
+                        except:
+                            ipfreq[c.ip] = 1
+
+                ip, n = sorted(ipfreq.items(), key=lambda x: x[1], reverse=True)[0]
+                if n < self.nclimax / 2:
+                    continue
+
+                rt, nip = self.gdos.bonk(ip, "")
+                self.aclose[nip] = rt
+                nclose = 0
+                with self.mutex:
+                    for c in self.clients:
+                        cip = c.ip
+                        if ":" in cip and not PY2:
+                            cip = IPv6Address(cip).exploded[:-20]
+
+                        if nip != cip:
+                            continue
+
+                        try:
+                            if c.nreq >= 1 or c.cli.keepalive:
+                                Daemon(c.shutdown)
+                                nclose += 1
+                        except:
+                            pass
+
+                t = "{} downgraded to connection:close for {} min; dropped {} connections"
+                self.log(self.name, t.format(nip, self.args.cd_dos, nclose), 1)
 
             if self.args.log_conn:
                 self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="90")
@@ -310,6 +356,7 @@ class HttpSrv(object):
         with self.mutex:
             self.clients.add(cli)
 
+        print("{}\n".format(len(self.clients)), end="")
         fno = sck.fileno()
         try:
             if self.args.log_conn:

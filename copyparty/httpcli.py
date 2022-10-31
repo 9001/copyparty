@@ -118,7 +118,6 @@ class HttpCli(object):
         self.u2fh = conn.u2fh  # mypy404
         self.log_func = conn.log_func  # mypy404
         self.log_src = conn.log_src  # mypy404
-        self.bans = conn.hsrv.bans
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
         self.tls: bool = hasattr(self.s, "cipher")
 
@@ -213,6 +212,7 @@ class HttpCli(object):
         self.headers = {}
         self.hint = ""
         try:
+            self.s.settimeout(2)
             headerlines = read_header(self.sr)
             if not headerlines:
                 return False
@@ -244,18 +244,13 @@ class HttpCli(object):
             self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
             return self.keepalive
 
-        if self.args.rsp_slp:
-            time.sleep(self.args.rsp_slp)
-
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
         self.is_ancient = self.ua.startswith("Mozilla/4.")
 
         zs = self.headers.get("connection", "").lower()
-        self.keepalive = (
-            not zs.startswith("close")
-            and (self.http_ver != "HTTP/1.0" or zs == "keep-alive")
-            and "Microsoft-WebDAV" not in self.ua
+        self.keepalive = not zs.startswith("close") and (
+            self.http_ver != "HTTP/1.0" or zs == "keep-alive"
         )
         self.is_https = (
             self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
@@ -278,20 +273,30 @@ class HttpCli(object):
 
                 self.log_src = self.conn.set_rproxy(self.ip)
 
-        if self.bans:
+        if self.conn.bans or self.conn.aclose:
             ip = self.ip
             if ":" in ip and not PY2:
                 ip = IPv6Address(ip).exploded[:-20]
 
-            if ip in self.bans:
-                ban = self.bans[ip] - time.time()
-                if ban < 0:
+            bans = self.conn.bans
+            if ip in bans:
+                rt = bans[ip] - time.time()
+                if rt < 0:
                     self.log("client unbanned", 3)
-                    del self.bans[ip]
+                    del bans[ip]
                 else:
-                    self.log("banned for {:.0f} sec".format(ban), 6)
+                    self.log("banned for {:.0f} sec".format(rt), 6)
                     self.reply(b"thank you for playing", 403)
                     return False
+
+            nka = self.conn.aclose
+            if ip in nka:
+                rt = nka[ip] - time.time()
+                if rt < 0:
+                    self.log("client uncapped", 3)
+                    del nka[ip]
+                else:
+                    self.keepalive = False
 
         if self.args.ihead:
             keys = self.args.ihead
@@ -323,6 +328,9 @@ class HttpCli(object):
                     uparam[k.lower()] = ""
 
         self.ouparam = {k: zs for k, zs in uparam.items()}
+
+        if self.args.rsp_slp:
+            time.sleep(self.args.rsp_slp)
 
         zso = self.headers.get("cookie")
         if zso:
@@ -507,6 +515,7 @@ class HttpCli(object):
 
         try:
             # best practice to separate headers and body into different packets
+            self.s.settimeout(None)
             self.s.sendall("\r\n".join(response).encode("utf-8") + b"\r\n\r\n")
         except:
             raise Pebkac(400, "client d/c while replying headers")
@@ -1068,6 +1077,7 @@ class HttpCli(object):
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
+                self.s.settimeout(None)
                 self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
             except:
                 raise Pebkac(400, "client d/c before 100 continue")
@@ -1079,6 +1089,7 @@ class HttpCli(object):
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
+                self.s.settimeout(None)
                 self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
             except:
                 raise Pebkac(400, "client d/c before 100 continue")
