@@ -33,7 +33,7 @@ except ImportError:
     )
     sys.exit(1)
 
-from .__init__ import MACOS, TYPE_CHECKING, EnvParams, PY2
+from .__init__ import MACOS, TYPE_CHECKING, EnvParams
 from .bos import bos
 from .httpconn import HttpConn
 from .util import (
@@ -42,6 +42,7 @@ from .util import (
     Daemon,
     Garda,
     Magician,
+    ipnorm,
     min_ex,
     shut_socket,
     spack,
@@ -77,7 +78,6 @@ class HttpSrv(object):
         self.magician = Magician()
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
-        self.gdos = Garda("1,{0},{0}".format(self.args.cd_dos))
         self.bans: dict[str, int] = {}
         self.aclose: dict[str, int] = {}
 
@@ -206,42 +206,56 @@ class HttpSrv(object):
 
                 spins += 1
                 time.sleep(0.1)
-                if spins != 30 or not self.args.cd_dos:
+                if spins != 50 or not self.args.aclose:
                     continue
 
                 ipfreq: dict[str, int] = {}
                 with self.mutex:
                     for c in self.clients:
+                        ip = ipnorm(c.ip)
                         try:
-                            ipfreq[c.ip] += 1
+                            ipfreq[ip] += 1
                         except:
-                            ipfreq[c.ip] = 1
+                            ipfreq[ip] = 1
 
                 ip, n = sorted(ipfreq.items(), key=lambda x: x[1], reverse=True)[0]
                 if n < self.nclimax / 2:
                     continue
 
-                rt, nip = self.gdos.bonk(ip, "")
-                self.aclose[nip] = rt
+                self.aclose[ip] = int(time.time() + self.args.aclose * 60)
                 nclose = 0
+                nloris = 0
+                nconn = 0
                 with self.mutex:
                     for c in self.clients:
-                        cip = c.ip
-                        if ":" in cip and not PY2:
-                            cip = IPv6Address(cip).exploded[:-20]
-
-                        if nip != cip:
+                        cip = ipnorm(c.ip)
+                        if ip != cip:
                             continue
 
+                        nconn += 1
                         try:
-                            if c.nreq >= 1 or c.cli.keepalive:
+                            if (
+                                c.nreq >= 1
+                                or not c.cli
+                                or c.cli.in_hdr_recv
+                                or c.cli.keepalive
+                            ):
                                 Daemon(c.shutdown)
                                 nclose += 1
+                                if c.nreq <= 0 and (not c.cli or c.cli.in_hdr_recv):
+                                    nloris += 1
                         except:
                             pass
 
-                t = "{} downgraded to connection:close for {} min; dropped {} connections"
-                self.log(self.name, t.format(nip, self.args.cd_dos, nclose), 1)
+                t = "{} downgraded to connection:close for {} min; dropped {}/{} connections"
+                self.log(self.name, t.format(ip, self.args.aclose, nclose, nconn), 1)
+
+                if nloris < nconn / 2:
+                    continue
+
+                t = "slowloris (idle-conn): {} banned for {} min"
+                self.log(self.name, t.format(ip, self.args.loris2, nclose), 1)
+                self.bans[ip] = int(time.time() + self.args.loris2 * 60)
 
             if self.args.log_conn:
                 self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="90")
@@ -356,7 +370,7 @@ class HttpSrv(object):
         with self.mutex:
             self.clients.add(cli)
 
-        print("{}\n".format(len(self.clients)), end="")
+        # print("{}\n".format(len(self.clients)), end="")
         fno = sck.fileno()
         try:
             if self.args.log_conn:

@@ -673,7 +673,9 @@ def run_argparse(
     ap2.add_argument("--logout", metavar="H", type=float, default="8086", help="logout clients after H hours of inactivity; [\033[32m0.0028\033[0m]=10sec, [\033[32m0.1\033[0m]=6min, [\033[32m24\033[0m]=day, [\033[32m168\033[0m]=week, [\033[32m720\033[0m]=month, [\033[32m8760\033[0m]=year)")
     ap2.add_argument("--ban-pw", metavar="N,W,B", type=u, default="9,60,1440", help="more than \033[33mN\033[0m wrong passwords in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; disable with [\033[32mno\033[0m]")
     ap2.add_argument("--ban-404", metavar="N,W,B", type=u, default="no", help="hitting more than \033[33mN\033[0m 404's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes (disabled by default since turbo-up2k counts as 404s)")
-    ap2.add_argument("--cd-dos", metavar="MIN", type=int, default=10, help="if a client maxes out the server connection limit, downgrade it from connection:keep-alive to connection:close for MIN minutes (and also kill its active connections) -- disable with 0")
+    ap2.add_argument("--aclose", metavar="MIN", type=int, default=10, help="if a client maxes out the server connection limit, downgrade it from connection:keep-alive to connection:close for MIN minutes (and also kill its active connections) -- disable with 0")
+    ap2.add_argument("--loris1", metavar="W,B", type=u, default="60,60", help="if a client takes more than W seconds to finish sending headers, ban it for B minutes; disable with [\033[32mno\033[0m]")
+    ap2.add_argument("--loris2", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for B minutes; disable with [\033[32m0\033[0m]")
 
     ap2 = ap.add_argument_group('shutdown options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")

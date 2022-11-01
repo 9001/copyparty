@@ -26,7 +26,7 @@ from datetime import datetime
 
 from queue import Queue
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
+from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS, unicode
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
@@ -1134,7 +1134,7 @@ class MultipartParser(object):
         rfc1341/rfc1521/rfc2047/rfc2231/rfc2388/rfc6266/the-real-world
         (only the fallback non-js uploader relies on these filenames)
         """
-        for ln in read_header(self.sr):
+        for ln in read_header(self.sr, 0):
             self.log(ln)
 
             m = self.re_ctype.match(ln)
@@ -1334,9 +1334,13 @@ def get_boundary(headers: dict[str, str]) -> str:
     return m.group(2)
 
 
-def read_header(sr: Unrecv) -> list[str]:
+def read_header(sr: Unrecv, loris: int) -> list[str]:
+    t0 = time.time()
     ret = b""
     while True:
+        if loris and time.time() - t0 > loris:
+            raise Slowloris()
+
         try:
             ret += sr.recv(1024)
         except:
@@ -1558,6 +1562,17 @@ def u8safe(txt: str) -> str:
 
 def exclude_dotfiles(filepaths: list[str]) -> list[str]:
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
+
+
+def _ipnorm3(ip: str) -> str:
+    if ":" in ip:
+        # assume /64 clients; drop 4 groups
+        return IPv6Address(ip).exploded[:-20]
+
+    return ip
+
+
+ipnorm = _ipnorm3 if not PY2 else unicode
 
 
 def http_ts(ts: int) -> str:
@@ -2416,3 +2431,7 @@ class Pebkac(Exception):
 
     def __repr__(self) -> str:
         return "Pebkac({}, {})".format(self.code, repr(self.args))
+
+
+class Slowloris(Exception):
+    pass

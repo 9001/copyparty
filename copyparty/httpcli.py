@@ -44,6 +44,7 @@ from .util import (
     META_NOBOTS,
     MultipartParser,
     Pebkac,
+    Slowloris,
     UnrecvEOF,
     alltrace,
     atomic_move,
@@ -61,6 +62,7 @@ from .util import (
     html_escape,
     http_ts,
     humansize,
+    ipnorm,
     min_ex,
     quotep,
     read_header,
@@ -124,6 +126,7 @@ class HttpCli(object):
         # placeholders; assigned by run()
         self.keepalive = False
         self.is_https = False
+        self.in_hdr_recv = True
         self.headers: dict[str, str] = {}
         self.mode = " "
         self.req = " "
@@ -211,9 +214,14 @@ class HttpCli(object):
         self.is_https = False
         self.headers = {}
         self.hint = ""
+
+        if self.is_banned():
+            return False
+
         try:
             self.s.settimeout(2)
-            headerlines = read_header(self.sr)
+            headerlines = read_header(self.sr, self.args.loris1w)
+            self.in_hdr_recv = False
             if not headerlines:
                 return False
 
@@ -244,6 +252,13 @@ class HttpCli(object):
             self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
             return self.keepalive
 
+        except Slowloris:
+            ip = ipnorm(self.ip)
+            self.conn.bans[ip] = int(time.time() + self.args.loris1b * 60)
+            t = "slowloris (infinite-headers): {} banned for {} min"
+            self.log(t.format(ip, self.args.loris1b), 1)
+            return False
+
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
         self.is_ancient = self.ua.startswith("Mozilla/4.")
@@ -273,23 +288,12 @@ class HttpCli(object):
 
                 self.log_src = self.conn.set_rproxy(self.ip)
 
-        if self.conn.bans or self.conn.aclose:
-            ip = self.ip
-            if ":" in ip and not PY2:
-                ip = IPv6Address(ip).exploded[:-20]
+        if self.is_banned():
+            return False
 
-            bans = self.conn.bans
-            if ip in bans:
-                rt = bans[ip] - time.time()
-                if rt < 0:
-                    self.log("client unbanned", 3)
-                    del bans[ip]
-                else:
-                    self.log("banned for {:.0f} sec".format(rt), 6)
-                    self.reply(b"thank you for playing", 403)
-                    return False
-
+        if self.conn.aclose:
             nka = self.conn.aclose
+            ip = ipnorm(self.ip)
             if ip in nka:
                 rt = nka[ip] - time.time()
                 if rt < 0:
@@ -466,6 +470,26 @@ class HttpCli(object):
             return self.ip.replace(":", ".")
         else:
             return self.conn.iphash.s(self.ip)
+
+    def is_banned(self) -> bool:
+        if not self.conn.bans:
+            return False
+
+        bans = self.conn.bans
+        ip = ipnorm(self.ip)
+        if ip not in bans:
+            return False
+
+        rt = bans[ip] - time.time()
+        if rt < 0:
+            self.log("client unbanned", 3)
+            del bans[ip]
+            return False
+
+        self.log("banned for {:.0f} sec".format(rt), 6)
+        zb = b"HTTP/1.0 403 Forbidden\r\n\r\nthank you for playing"
+        self.s.sendall(zb)
+        return True
 
     def permit_caching(self) -> None:
         cache = self.uparam.get("cache")

@@ -69,6 +69,14 @@ VT100 = platform.system() != "Windows"
 req_ses = requests.Session()
 
 
+class Daemon(threading.Thread):
+    def __init__(self, target, name=None, a=None):
+        # type: (Any, Any, Any) -> None
+        threading.Thread.__init__(self, target=target, args=a or (), name=name)
+        self.daemon = True
+        self.start()
+
+
 class File(object):
     """an up2k upload task; represents a single file"""
 
@@ -541,14 +549,6 @@ def upload(req_ses, file, cid, pw):
         _ = r.content
     finally:
         f.f.close()
-
-
-class Daemon(threading.Thread):
-    def __init__(self, target, name=None, a=None):
-        # type: (Any, Any, Any) -> None
-        threading.Thread.__init__(self, target=target, args=a or (), name=name)
-        self.daemon = True
-        self.start()
 
 
 class Ctl(object):

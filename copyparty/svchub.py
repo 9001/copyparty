@@ -145,6 +145,9 @@ class SvcHub(object):
 
         self.log("root", "max clients: {}".format(self.args.nc))
 
+        if not self._process_config():
+            raise Exception("bad config")
+
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
 
@@ -249,6 +252,16 @@ class SvcHub(object):
         self.up2k.init_vols()
 
         Daemon(self.sd_notify, "sd-notify")
+
+    def _process_config(self) -> bool:
+        if self.args.loris1 == "no":
+            self.args.loris1 = "0,0"
+
+        i1, i2 = self.args.loris1.split(",")
+        self.args.loris1w = int(i1)
+        self.args.loris1b = int(i2)
+
+        return True
 
     def _setlimits(self) -> None:
         try:
