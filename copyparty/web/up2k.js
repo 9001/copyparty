@@ -1124,7 +1124,7 @@ function up2k_init(subtle) {
                     continue;
 
                 try {
-                    var wi = fobj.webkitGetAsEntry();
+                    var wi = fobj.getAsEntry ? fobj.getAsEntry() : fobj.webkitGetAsEntry();
                     if (wi.isDirectory) {
                         dirs.push(wi);
                         continue;
@@ -1206,7 +1206,7 @@ function up2k_init(subtle) {
                 }
                 else {
                     var name = dn.fullPath;
-                    if (name.indexOf('/') === 0)
+                    if (name.startsWith('/'))
                         name = name.slice(1);
 
                     pf.push(name);
@@ -1229,7 +1229,16 @@ function up2k_init(subtle) {
                 dirs.shift();
                 rd = null;
             }
-            return read_dirs(rd, pf, dirs, good, nil, bad, spins);
+            read_dirs(rd, pf, dirs, good, nil, bad, spins);
+        }, function () {
+            var dn = dirs[0],
+                name = dn.fullPath;
+
+            if (name.startsWith('/'))
+                name = name.slice(1);
+
+            bad.push([dn, name]);
+            read_dirs(null, pf, dirs.slice(1), good, nil, bad, spins);
         });
     }
 
