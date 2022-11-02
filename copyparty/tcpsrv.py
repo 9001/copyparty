@@ -18,6 +18,9 @@ from .util import (
     termsize,
 )
 
+if True:
+    from typing import Generator
+
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
@@ -314,19 +317,52 @@ class TcpSrv(object):
         if "0.0.0.0" not in listen_ips:
             eps = {k: v for k, v in eps.items() if k in listen_ips}
 
-        default_route = None
+        try:
+            ext_devs = list(self._extdevs_nix())
+            ext_ips = [k for k, v in eps.items() if v.split(",")[0] in ext_devs]
+            if not ext_ips:
+                raise Exception()
+        except:
+            ext_ips = [self._defroute()]
+
+        for lip in listen_ips:
+            if not ext_ips or lip not in ["0.0.0.0"] + ext_ips:
+                continue
+
+            desc = "\033[32mexternal"
+            ips = ext_ips if lip == "0.0.0.0" else [lip]
+            for ip in ips:
+                try:
+                    if "external" not in eps[ip]:
+                        eps[ip] += ", " + desc
+                except:
+                    eps[ip] = desc
+
+        return eps
+
+    def _extdevs_nix(self) -> Generator[str, None, None]:
+        with open("/proc/net/route", "rb") as f:
+            next(f)
+            for ln in f:
+                r = ln.decode("utf-8").strip().split()
+                if r[1] == "0" * 8 and int(r[3], 16) & 2:
+                    yield r[0]
+
+    def _defroute(self) -> str:
+        ret = ""
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for ip in [
-            "10.255.255.255",
-            "172.31.255.255",
-            "192.168.255.255",
-            "239.255.255.255",
+            "10.254.39.23",
+            "172.31.39.23",
+            "192.168.39.23",
+            "239.254.39.23",
+            "169.254.39.23",
             # could add 1.1.1.1 as a final fallback
             # but external connections is kinshi
         ]:
             try:
                 s.connect((ip, 1))
-                default_route = s.getsockname()[0]
+                ret = s.getsockname()[0]
                 break
             except (OSError, socket.error) as ex:
                 if ex.errno in E_ACCESS:
@@ -335,16 +371,7 @@ class TcpSrv(object):
                     self.log("tcpsrv", "route lookup failed; err {}".format(ex.errno))
 
         s.close()
-
-        for lip in listen_ips:
-            if default_route and lip in ["0.0.0.0", default_route]:
-                desc = "\033[32mexternal"
-                try:
-                    eps[default_route] += ", " + desc
-                except:
-                    eps[default_route] = desc
-
-        return eps
+        return ret
 
     def _set_wintitle(self, vs: dict[str, dict[str, int]]) -> None:
         vs["all"] = vs.get("all", {"Local-Only": 1})
@@ -436,5 +463,5 @@ class TcpSrv(object):
             qr = re.sub("(█+)", ansify, qr)
 
         qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
-        t = "{} \033[0;38;5;{};48;5;{}m\033[J\n{}\033[999G\033[0m\033[J"
+        t = "{} \033[0;38;5;{};48;5;{}m\n{}\033[999G\033[0m\033[J"
         return t.format(txt, fg, bg, qr)
