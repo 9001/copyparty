@@ -704,7 +704,7 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 with read-write support,  supports winXP and later, macos, nautilus/gvfs
 
 general usage:
-* login with any username + your password, or put your password in the username field and leave password empty
+* login with any username + your password, or put your password in the username field (password field can be empty/whatever)
 
 on macos, connect from finder:
 * [Go] -> [Connect to Server...] -> http://192.168.123.1:3923/
@@ -751,6 +751,7 @@ some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 * the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh)
   * account passwords work per-volume as expected, but account permissions are coalesced; all accounts have read-access to all volumes, and if a single account has write-access to some volume then all other accounts also do
     * if no accounts have write-access to a specific volume, or if `--smbw` is not set, then writing to that volume from smb *should* be impossible
+    * will be fixed once [impacket v0.11.0](https://github.com/SecureAuthCorp/impacket/commit/d923c00f75d54b972bca573a211a82f09b55261a) is released
   * [shadowing](#shadowing) probably works as expected but no guarantees
 
 and some minor issues,
@@ -772,7 +773,7 @@ the smb protocol listens on TCP port 445, which is a privileged port on linux an
 
 authenticate with one of the following:
 * username `$username`, password `$password`
-* username `$password`, password blank
+* username `$password`, password `k`
 
 on windows 7+, connect using command prompt (`wark`=password):
 * `net use w: \\192.168.123.1\a k /user:wark`

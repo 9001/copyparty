@@ -102,7 +102,7 @@ class SMB(object):
         srv.setSMB2Support(not self.args.smb1)
 
         for name, pwd in self.asrv.acct.items():
-            for u, p in ((name, pwd), (pwd, "")):
+            for u, p in ((name, pwd), (pwd, "k")):
                 lmhash = compute_lmhash(p)
                 nthash = compute_nthash(p)
                 srv.addCredential(u, 0, lmhash, nthash)
