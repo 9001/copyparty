@@ -755,6 +755,7 @@ some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
   * [shadowing](#shadowing) probably works as expected but no guarantees
 
 and some minor issues,
+* clients only see the first ~400 files in big folders; [impacket#1433](https://github.com/SecureAuthCorp/impacket/issues/1433)
 * hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
 * listens on the first `-i` interface only (default = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work

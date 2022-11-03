@@ -11,18 +11,20 @@ from types import SimpleNamespace
 
 from .__init__ import ANYWIN, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS
-from .util import Daemon, min_ex
 from .bos import bos
+from .util import Daemon, min_ex
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any
+
+    from .util import RootLogger
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
 
 class HLog(logging.Handler):
-    def __init__(self, log_func: Any) -> None:
+    def __init__(self, log_func: "RootLogger") -> None:
         logging.Handler.__init__(self)
         self.log_func = log_func
 
@@ -35,7 +37,17 @@ class HLog(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:
         msg = self.format(record)
-        self.log_func("smb", msg)
+        lv = record.levelno
+        if lv < logging.INFO:
+            c = 6
+        elif lv < logging.WARNING:
+            c = 0
+        elif lv < logging.ERROR:
+            c = 3
+        else:
+            c = 1
+
+        self.log_func("smb", msg, c)
 
 
 class SMB(object):
@@ -137,9 +149,27 @@ class SMB(object):
         _, vfs_ls, vfs_virt = vfs.ls(
             rem, LEELOO_DALLAS, not self.args.no_scandir, [[False, False]]
         )
-        ls = [x[0] for x in vfs_ls]
-        ls.extend(vfs_virt.keys())
-        return ls
+        dirs = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+        fils = [x[0] for x in vfs_ls if x[0] not in dirs]
+        ls = list(vfs_virt.keys()) + dirs + fils
+        if self.args.smb_nwa_1:
+            return ls
+
+        # clients crash somewhere around 65760 byte
+        ret = []
+        sz = 112 * 2  # ['.', '..']
+        for n, fn in enumerate(ls):
+            if sz >= 64000:
+                t = "listing only %d of %d files (%d byte); see impacket#1433"
+                logging.warning(t, n, len(ls), sz)
+                break
+
+            nsz = len(fn.encode("utf-16", "replace"))
+            nsz = ((nsz + 7) // 8) * 8
+            sz += 104 + nsz
+            ret.append(fn)
+
+        return ret
 
     def _open(
         self, vpath: str, flags: int, *a: Any, chmod: int = 0o777, **ka: Any

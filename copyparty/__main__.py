@@ -644,6 +644,7 @@ def run_argparse(
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
     ap2.add_argument("--smb-port", metavar="PORT", type=int, default=445, help="port to listen on -- if you change this value, you must NAT from TCP:445 to this port using iptables or similar")
     ap2.add_argument("--smb-dbg", action="store_true", help="show debug messages")
+    ap2.add_argument("--smb-nwa-1", action="store_true", help="disable impacket#1433 workaround (truncate directory listings to 64kB)")
 
     ap2 = ap.add_argument_group('opt-outs')
     ap2.add_argument("-nw", action="store_true", help="never write anything to disk (debug/benchmark)")
