@@ -1801,22 +1801,26 @@ var pbar = (function () {
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
+		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : 720;
 		pctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
-		for (var p = 1, mins = adur / 10; p <= mins; p++)
+		for (var p = step, mins = adur / 10; p <= mins; p += step)
 			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
+		var step = sm > 0.15 ? 1 : sm > 0.05 ? 5 : 720;
 		pctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
-		for (var p = 1, mins = adur / 60; p <= mins; p++)
+		for (var p = step, mins = adur / 60; p <= mins; p += step)
 			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
+		step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
 		pctx.font = '.5em sans-serif';
 		pctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
-		for (var p = 1, mins = adur / 60; p <= mins; p++) {
+		for (var p = step, mins = adur / 60; p <= mins; p += step) {
 			pctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
 		}
 
+		step = sm > 0.03 ? 1 : sm > 0.01 ? 3 : sm > 0.005 ? 6 : 24;
 		pctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
-		for (var p = 1, mins = adur / 600; p <= mins; p++)
+		for (var p = step, mins = adur / 600; p <= mins; p += step)
 			pctx.fillRect(Math.floor(sm * p * 600), 0, 2, pc.h);
 
 		var w = 8,
