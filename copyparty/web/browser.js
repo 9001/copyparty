@@ -1723,6 +1723,7 @@ function glossy_grad(can, h, s, l) {
 // buffer/position bar
 var pbar = (function () {
 	var r = {},
+		bau = null,
 		gradh = -1,
 		grad;
 
@@ -1752,12 +1753,16 @@ var pbar = (function () {
 
 	r.drawbuf = function () {
 		var bc = r.buf,
-			bctx = bc.ctx;
+			pc = r.pos,
+			bctx = bc.ctx,
+			apos, adur;
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
 
-		if (!mp || !mp.au)
-			return;
+		if (!mp || !mp.au || !isNum(adur = mp.au.duration) || !isNum(apos = mp.au.currentTime) || apos < 0 || adur < apos)
+			return;  // not-init || unsupp-codec
+
+		bau = mp.au;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
 			gk = bc.h + '' + light,
@@ -1784,6 +1789,28 @@ var pbar = (function () {
 			bctx.filter = 'invert(0)';
 			bctx.globalAlpha = 1;
 		}
+
+		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
+		bctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
+		for (var p = step, mins = adur / 10; p <= mins; p += step)
+			bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
+
+		step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
+		bctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
+		for (var p = step, mins = adur / 60; p <= mins; p += step)
+			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
+
+		step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
+		bctx.font = '.5em sans-serif';
+		bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
+		for (var p = step, mins = adur / 60; p <= mins; p += step) {
+			bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
+		}
+
+		step = sm > 0.2 ? 10 : sm > 0.1 ? 30 : sm > 0.01 ? 60 : sm > 0.005 ? 720 : 1440;
+		bctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
+		for (var p = step, mins = adur / 60; p <= mins; p += step)
+			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 	};
 
 	r.drawpos = function () {
@@ -1797,33 +1824,11 @@ var pbar = (function () {
 		if (!mp || !mp.au || !isNum(adur = mp.au.duration) || !isNum(apos = mp.au.currentTime) || apos < 0 || adur < apos)
 			return;  // not-init || unsupp-codec
 
+		if (bau != mp.au)
+			r.drawbuf();
+
 		var sm = bc.w * 1.0 / adur,
-			dz = themen == 'dz',
-			dy = themen == 'dy';
-
-		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : 720;
-		pctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
-		for (var p = step, mins = adur / 10; p <= mins; p += step)
-			pctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
-
-		var step = sm > 0.15 ? 1 : sm > 0.05 ? 5 : 720;
-		pctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
-		for (var p = step, mins = adur / 60; p <= mins; p += step)
-			pctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
-
-		step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
-		pctx.font = '.5em sans-serif';
-		pctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
-		for (var p = step, mins = adur / 60; p <= mins; p += step) {
-			pctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
-		}
-
-		step = sm > 0.03 ? 1 : sm > 0.01 ? 3 : sm > 0.005 ? 6 : 24;
-		pctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
-		for (var p = step, mins = adur / 600; p <= mins; p += step)
-			pctx.fillRect(Math.floor(sm * p * 600), 0, 2, pc.h);
-
-		var w = 8,
+			w = 8,
 			x = sm * apos;
 
 		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
