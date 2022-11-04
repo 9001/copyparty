@@ -1733,6 +1733,9 @@ var pbar = (function () {
 
 		r.buf = canvas_cfg(ebi('barbuf'));
 		r.pos = canvas_cfg(ebi('barpos'));
+		r.buf.ctx.font = '.5em sans-serif';
+		r.pos.ctx.font = '1em sans-serif';
+		r.pos.ctx.strokeStyle = 'rgba(24,56,0,0.4)';
 		r.drawbuf();
 		r.drawpos();
 	};
@@ -1765,7 +1768,7 @@ var pbar = (function () {
 		bau = mp.au;
 
 		var sm = bc.w * 1.0 / mp.au.duration,
-			gk = bc.h + '' + light,
+			gk = bc.h + '/' + themen,
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
@@ -1801,7 +1804,6 @@ var pbar = (function () {
 			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
 		step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
-		bctx.font = '.5em sans-serif';
 		bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
 		for (var p = step, mins = adur / 60; p <= mins; p += step) {
 			bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
@@ -1836,8 +1838,6 @@ var pbar = (function () {
 
 		pctx.lineWidth = 2.5;
 		pctx.fillStyle = '#fff';
-		pctx.strokeStyle = 'rgba(24,56,0,0.4)';
-		pctx.font = '1em sans-serif';
 
 		var t1 = s2ms(adur),
 			t2 = s2ms(apos),
@@ -1866,6 +1866,8 @@ var pbar = (function () {
 var vbar = (function () {
 	var r = {},
 		gradh = -1,
+		lastv = -1,
+		untext = -1,
 		can, ctx, w, h, grad1, grad2;
 
 	r.onresize = function () {
@@ -1875,6 +1877,7 @@ var vbar = (function () {
 		r.can = canvas_cfg(ebi('pvol'));
 		can = r.can.can;
 		ctx = r.can.ctx;
+		ctx.font = '.7em sans-serif';
 		w = r.can.w;
 		h = r.can.h;
 		r.draw();
@@ -1899,6 +1902,22 @@ var vbar = (function () {
 		}
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
+
+		if (Date.now() - lastv > 1000)
+			return;
+
+		var vt = Math.floor(mp.vol * 100),
+			tw = ctx.measureText(vt).width;
+
+		var li = dy;
+		if (mp.vol < 0.05)
+			li = !li;
+
+		ctx.fillStyle = li ? '#fff' : '#210';
+		ctx.fillText(vt, Math.max(4, w * mp.vol - tw - 8), h / 3 * 2);
+
+		clearTimeout(untext);
+		untext = setTimeout(r.draw, 1000);
 	};
 	window.addEventListener('resize', r.onresize);
 	r.onresize();
@@ -1923,6 +1942,7 @@ var vbar = (function () {
 		if (mul > 0.98)
 			mul = 1;
 
+		lastv = Date.now();
 		mp.setvol(mul);
 		r.draw();
 	}
