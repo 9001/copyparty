@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-10-30, v0.20, ed <irc.rizon.net>, MIT-Licensed
+2022-11-04, v0.21, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -782,15 +782,17 @@ class Ctl(object):
             while True:
                 with self.mutex:
                     if (
-                        self.hash_b - self.up_b < 1024 * 1024 * 128
-                        and self.hash_c - self.up_c < 64
-                        and (
-                            not self.ar.nh
-                            or (
-                                self.q_upload.empty()
-                                and self.q_handshake.empty()
-                                and not self.uploader_busy
-                            )
+                        self.hash_f - self.up_f == 1
+                        or (
+                            self.hash_b - self.up_b < 1024 * 1024 * 1024
+                            and self.hash_c - self.up_c < 512
+                        )
+                    ) and (
+                        not self.ar.nh
+                        or (
+                            self.q_upload.empty()
+                            and self.q_handshake.empty()
+                            and not self.uploader_busy
                         )
                     ):
                         break
