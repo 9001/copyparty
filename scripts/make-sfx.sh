@@ -19,6 +19,17 @@ help() { exec cat <<'EOF'
 # `lang` limits which languages/translations to include,
 #   for example `lang eng` or `lang eng|nor`
 #
+# _____________________________________________________________________
+# core features:
+#
+# `no-ftp` saves ~33k by removing the ftp server and filetype detector,
+#   disabling --ftpd and --magic
+#
+# `no-smb` saves ~3.5k by removing the smb / cifs server
+#
+# _____________________________________________________________________
+# web features:
+#
 # `no-cm` saves ~82k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
@@ -88,6 +99,8 @@ while [ ! -z "$1" ]; do
 		ox)     use_ox=1 ; ;;
 		gz)     use_gz=1 ; ;;
 		gzz)    shift;use_gzz=$1;use_gz=1; ;;
+		no-ftp) no_ftp=1 ; ;;
+		no-smb) no_smb=1 ; ;;
 		no-fnt) no_fnt=1 ; ;;
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
@@ -123,7 +136,8 @@ tmpdir="$(
 [ $repack ] && {
 	old="$tmpdir/pe-copyparty.$(id -u)"
 	echo "repack of files in $old"
-	cp -pR "$old/"*{py2,j2,ftp,copyparty} .
+	cp -pR "$old/"*{py2,j2,copyparty} .
+	cp -pR "$old/"*ftp . || true
 }
 
 [ $repack ] || {
@@ -299,6 +313,15 @@ cat have | while IFS= read -r x; do
 done
 rm have
 
+[ $no_ftp ] &&
+	rm -rf copyparty/ftpd.py ftp asyncore.py asynchat.py &&
+	sed -ri '/add_argument\("--ftp/d' copyparty/__main__.py &&
+	sed -ri '/\.ftp/d' copyparty/svchub.py
+
+[ $no_smb ] &&
+	rm -f copyparty/smbd.py &&
+	sed -ri '/add_argument\("--smb/d' copyparty/__main__.py
+
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
 	echo h > copyparty/web/mde.html
@@ -458,7 +481,7 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 
 
 echo gen tarlist
-for d in copyparty j2 ftp py2; do find $d -type f; done |  # strip_hints
+for d in copyparty j2 py2 ftp; do find $d -type f; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 
