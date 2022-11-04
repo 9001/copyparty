@@ -1169,7 +1169,7 @@ class MultipartParser(object):
                 return field, None
 
             try:
-                is_webkit = self.headers["user-agent"].lower().find("applewebkit") >= 0
+                is_webkit = "applewebkit" in self.headers["user-agent"].lower()
             except:
                 is_webkit = False
 

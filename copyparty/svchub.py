@@ -413,7 +413,7 @@ class SvcHub(object):
     def kill9(self, delay: float = 0.0) -> None:
         if delay > 0.01:
             time.sleep(delay)
-            print("component stuck; performing sigkill")
+            print("component stuck; issuing sigkill")
             time.sleep(0.1)
 
         if ANYWIN:

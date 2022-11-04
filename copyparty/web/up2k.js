@@ -1237,7 +1237,7 @@ function up2k_init(subtle) {
             if (name.startsWith('/'))
                 name = name.slice(1);
 
-            bad.push([dn, name]);
+            bad.push([dn, name + '/']);
             read_dirs(null, pf, dirs.slice(1), good, nil, bad, spins);
         });
     }

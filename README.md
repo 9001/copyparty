@@ -144,8 +144,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 ## features
 
 * backend stuff
-  * ☑ sanic multipart parser
-  * ☑ multiprocessing (actual multithreading)
+  * ☑ [multiprocessing](#performance) (actual multithreading)
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
   * ☑ [ftp server](#ftp-server)
