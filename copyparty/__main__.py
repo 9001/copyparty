@@ -22,7 +22,7 @@ from textwrap import dedent
 
 from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
-from .authsrv import re_vol
+from .authsrv import re_vol, expand_config_file
 from .svchub import SvcHub
 from .util import (
     IMPLICATIONS,
@@ -317,27 +317,29 @@ def configure_ssl_ciphers(al: argparse.Namespace) -> None:
 
 
 def args_from_cfg(cfg_path: str) -> list[str]:
+    lines: list[str] = []
+    expand_config_file(lines, cfg_path, "")
+
     ret: list[str] = []
     skip = False
-    with open(cfg_path, "rb") as f:
-        for ln in [x.decode("utf-8").strip() for x in f]:
-            if not ln:
-                skip = False
-                continue
+    for ln in lines:
+        if not ln:
+            skip = False
+            continue
 
-            if ln.startswith("#"):
-                continue
+        if ln.startswith("#"):
+            continue
 
-            if not ln.startswith("-"):
-                continue
+        if not ln.startswith("-"):
+            continue
 
-            if skip:
-                continue
+        if skip:
+            continue
 
-            try:
-                ret.extend(ln.split(" ", 1))
-            except:
-                ret.append(ln)
+        try:
+            ret.extend(ln.split(" ", 1))
+        except:
+            ret.append(ln)
 
     return ret
 
@@ -837,7 +839,13 @@ def main(argv: Optional[list[str]] = None) -> None:
         ensure_cert()
 
     for k, v in zip(argv[1:], argv[2:]):
-        if k == "-c":
+        if k == "-c" and os.path.isfile(v):
+            supp = args_from_cfg(v)
+            argv.extend(supp)
+
+    for k in argv[1:]:
+        v = k[2:]
+        if k.startswith("-c") and v and os.path.isfile(v):
             supp = args_from_cfg(v)
             argv.extend(supp)
 

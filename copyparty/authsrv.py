@@ -705,7 +705,8 @@ class AuthSrv(object):
 
     def _parse_config_file(
         self,
-        fd: typing.BinaryIO,
+        fp: str,
+        cfg_lines: list[str],
         acct: dict[str, str],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
@@ -715,7 +716,8 @@ class AuthSrv(object):
         vol_src = None
         vol_dst = None
         self.line_ctr = 0
-        for ln in [x.decode("utf-8").strip() for x in fd]:
+        expand_config_file(cfg_lines, fp, "")
+        for ln in cfg_lines:
             self.line_ctr += 1
             if not ln and vol_src is not None:
                 vol_src = None
@@ -744,6 +746,9 @@ class AuthSrv(object):
                 if not vol_dst.startswith("/"):
                     raise Exception('invalid mountpoint "{}"'.format(vol_dst))
 
+                if vol_src.startswith("~"):
+                    vol_src = os.path.expanduser(vol_src)
+
                 # cfg files override arguments and previous files
                 vol_src = absreal(vol_src)
                 vol_dst = vol_dst.strip("/")
@@ -760,7 +765,7 @@ class AuthSrv(object):
                 t = "WARNING (config-file): permission flag 'a' is deprecated; please use 'rw' instead"
                 self.log(t, 1)
 
-            assert vol_dst
+            assert vol_dst is not None
             self._read_vol_str(lvl, uname, daxs[vol_dst], mflags[vol_dst])
 
     def _read_vol_str(
@@ -869,13 +874,16 @@ class AuthSrv(object):
 
         if self.args.c:
             for cfg_fn in self.args.c:
-                with open(cfg_fn, "rb") as f:
-                    try:
-                        self._parse_config_file(f, acct, daxs, mflags, mount)
-                    except:
-                        t = "\n\033[1;31m\nerror in config file {} on line {}:\n\033[0m"
-                        self.log(t.format(cfg_fn, self.line_ctr), 1)
-                        raise
+                lns: list[str] = []
+                try:
+                    self._parse_config_file(cfg_fn, lns, acct, daxs, mflags, mount)
+                except:
+                    lns = lns[: self.line_ctr]
+                    slns = ["{:4}: {}".format(n, s) for n, s in enumerate(lns, 1)]
+                    t = "\033[1;31m\nerror @ line {}, included from {}\033[0m"
+                    t = t.format(self.line_ctr, cfg_fn)
+                    self.log("\n{0}\n{1}{0}".format(t, "\n".join(slns)))
+                    raise
 
         # case-insensitive; normalize
         if WINDOWS:
@@ -1419,3 +1427,33 @@ class AuthSrv(object):
 
         if not flag_r:
             sys.exit(0)
+
+
+def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
+    """expand all % file includes"""
+    fp = absreal(fp)
+    ipath += " -> " + fp
+    ret.append("#\033[36m opening cfg file{}\033[0m".format(ipath))
+    if len(ipath.split(" -> ")) > 64:
+        raise Exception("hit max depth of 64 includes")
+
+    if os.path.isdir(fp):
+        for fn in sorted(os.listdir(fp)):
+            fp2 = os.path.join(fp, fn)
+            if not os.path.isfile(fp2):
+                continue  # dont recurse
+
+            expand_config_file(ret, fp2, ipath)
+        return
+
+    with open(fp, "rb") as f:
+        for ln in [x.decode("utf-8").strip() for x in f]:
+            if ln.startswith("% "):
+                fp2 = ln[1:].strip()
+                fp2 = os.path.join(os.path.dirname(fp), fp2)
+                expand_config_file(ret, fp2, ipath)
+                continue
+
+            ret.append(ln)
+
+    ret.append("#\033[36m closed{}\033[0m".format(ipath))

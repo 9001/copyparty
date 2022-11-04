@@ -667,7 +667,7 @@ for the above example to work, add the commandline argument `-e2ts` to also scan
 # server config
 
 using arguments or config files, or a mix of both:
-* config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf)
+* config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf) and [./docs/example2.conf](docs/example2.conf)
 * `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
   * or click the `[reload cfg]` button in the control-panel when logged in as admin 
 
