@@ -152,7 +152,14 @@ class FtpFs(AbstractedFS):
         return open(fsenc(ap), mode)
 
     def chdir(self, path: str) -> None:
-        self.cwd = join(self.cwd, path)
+        nwd = join(self.cwd, path)
+        vfs, rem = self.hub.asrv.vfs.get(nwd, self.uname, False, False)
+        ap = vfs.canonical(rem)
+        if not bos.path.isdir(ap):
+            # returning 550 is library-default and suitable
+            raise FilesystemError("Failed to change directory")
+
+        self.cwd = nwd
         (
             self.can_read,
             self.can_write,
