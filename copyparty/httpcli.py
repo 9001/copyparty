@@ -1366,7 +1366,7 @@ class HttpCli(object):
 
         url = "{}://{}/{}".format(
             "https" if self.is_https else "http",
-            self.headers.get("host") or "{}:{}".format(*list(self.s.getsockname())),
+            self.headers.get("host") or "{}:{}".format(*list(self.s.getsockname()[:2])),
             vpath + vsuf,
         )
 
@@ -1386,7 +1386,7 @@ class HttpCli(object):
         else:
             t = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
 
-        h = {"Location": url} if is_put else {}
+        h = {"Location": url} if is_put and url else {}
         self.reply(t.encode("utf-8"), 201, headers=h)
         return True
 
@@ -2037,7 +2037,7 @@ class HttpCli(object):
                 "url": "{}://{}/{}".format(
                     "https" if self.is_https else "http",
                     self.headers.get("host")
-                    or "{}:{}".format(*list(self.s.getsockname())),
+                    or "{}:{}".format(*list(self.s.getsockname()[:2])),
                     rel_url,
                 ),
                 "sha512": sha_hex[:56],

@@ -613,7 +613,7 @@ def run_argparse(
     ap2.add_argument("--write-uplog", action="store_true", help="write POST reports to textfiles in working-directory")
 
     ap2 = ap.add_argument_group('network options')
-    ap2.add_argument("-i", metavar="IP", type=u, default="0.0.0.0", help="ip to bind (comma-sep.)")
+    ap2.add_argument("-i", metavar="IP", type=u, default="::", help="ip to bind (comma-sep.), default: all IPv4 and IPv6")
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range)")
     ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to keep; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd), [\033[32m2\033[0m]=cloudflare, [\033[32m3\033[0m]=nginx, [\033[32m-1\033[0m]=closest proxy")
     ap2.add_argument("--s-wr-sz", metavar="B", type=int, default=256*1024, help="socket write size in bytes")

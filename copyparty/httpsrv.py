@@ -174,7 +174,7 @@ class HttpSrv(object):
             sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             sck.settimeout(None)  # < does not inherit, ^ does
 
-        ip, port = sck.getsockname()
+        ip, port = sck.getsockname()[:2]
         self.srvs.append(sck)
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
         Daemon(
@@ -185,9 +185,10 @@ class HttpSrv(object):
 
     def thr_listen(self, srv_sck: socket.socket) -> None:
         """listens on a shared tcp server"""
-        ip, port = srv_sck.getsockname()
+        ip, port = srv_sck.getsockname()[:2]
         fno = srv_sck.fileno()
-        msg = "subscribed @ {}:{}  f{} p{}".format(ip, port, fno, os.getpid())
+        hip = "[{}]".format(ip) if ":" in ip else ip
+        msg = "subscribed @ {}:{}  f{} p{}".format(hip, port, fno, os.getpid())
         self.log(self.name, msg)
 
         def fun() -> None:
@@ -261,7 +262,12 @@ class HttpSrv(object):
                 self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="90")
 
             try:
-                sck, addr = srv_sck.accept()
+                sck, saddr = srv_sck.accept()
+                cip, cport = saddr[:2]
+                if cip.startswith("::ffff:"):
+                    cip = cip[7:]
+
+                addr = (cip, cport)
             except (OSError, socket.error) as ex:
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 time.sleep(0.02)

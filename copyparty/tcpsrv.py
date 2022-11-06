@@ -14,6 +14,7 @@ from .util import (
     E_ADDR_NOT_AVAIL,
     E_UNREACH,
     chkcmd,
+    min_ex,
     sunpack,
     termsize,
 )
@@ -43,25 +44,57 @@ class TcpSrv(object):
         self.srv: list[socket.socket] = []
         self.nsrv = 0
         self.qr = ""
+        pad = False
         ok: dict[str, list[int]] = {}
         for ip in self.args.i:
-            ok[ip] = []
+            if ip == "::":
+                if socket.has_ipv6:
+                    ips = ["::", "0.0.0.0"]
+                    dual = True
+                else:
+                    ips = ["0.0.0.0"]
+                    dual = False
+            else:
+                ips = [ip]
+                dual = False
+
+            for ipa in ips:
+                ok[ipa] = []
+
             for port in self.args.p:
-                self.nsrv += 1
+                successful_binds = 0
                 try:
-                    self._listen(ip, port)
-                    ok[ip].append(port)
+                    for ipa in ips:
+                        try:
+                            self._listen(ipa, port)
+                            ok[ipa].append(port)
+                            successful_binds += 1
+                        except:
+                            if dual and ":" in ipa:
+                                t = "listen on IPv6 [{}] failed; trying IPv4 {}...\n{}"
+                                self.log("tcpsrv", t.format(ipa, ips[1], min_ex()), 3)
+                                pad = True
+                                continue
+
+                            # binding 0.0.0.0 after :: fails on dualstack
+                            # but is necessary on non-dualstakc
+                            if successful_binds:
+                                continue
+
+                            raise
+
                 except Exception as ex:
                     if self.args.ign_ebind or self.args.ign_ebind_all:
                         t = "could not listen on {}:{}: {}"
                         self.log("tcpsrv", t.format(ip, port, ex), c=3)
+                        pad = True
                     else:
                         raise
 
         if not self.srv and not self.args.ign_ebind_all:
             raise Exception("could not listen on any of the given interfaces")
 
-        if self.nsrv != len(self.srv):
+        if pad:
             self.log("tcpsrv", "")
 
         ip = "127.0.0.1"
@@ -81,7 +114,11 @@ class TcpSrv(object):
         t = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
             for port in sorted(self.args.p):
-                if port not in ok.get(ip, ok.get("0.0.0.0", [])):
+                if (
+                    port not in ok.get(ip, [])
+                    and port not in ok.get("::", [])
+                    and port not in ok.get("0.0.0.0", [])
+                ):
                     continue
 
                 proto = " http"
@@ -90,7 +127,8 @@ class TcpSrv(object):
                 elif self.args.https_only or port == 443:
                     proto = "https"
 
-                msgs.append(t.format(proto, ip, port, desc))
+                hip = "[{}]".format(ip) if ":" in ip else ip
+                msgs.append(t.format(proto, hip, port, desc))
 
                 is_ext = "external" in unicode(desc)
                 qrt = qr1 if is_ext else qr2
@@ -125,18 +163,20 @@ class TcpSrv(object):
                         title_tab[tk] = {tv: 1}
 
         if msgs:
-            msgs[-1] += "\n"
             for t in msgs:
                 self.log("tcpsrv", t)
 
         if self.args.wintitle:
             self._set_wintitle(title_tab)
+        else:
+            print("\n", end="")
 
         if self.args.qr or self.args.qrs:
             self.qr = self._qr(qr1, qr2)
 
     def _listen(self, ip: str, port: int) -> None:
-        srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ipv = socket.AF_INET6 if ":" in ip else socket.AF_INET
+        srv = socket.socket(ipv, socket.SOCK_STREAM)
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         srv.settimeout(None)  # < does not inherit, ^ does
@@ -153,16 +193,39 @@ class TcpSrv(object):
             raise Exception(e)
 
     def run(self) -> None:
+        all_eps = [x.getsockname()[:2] for x in self.srv]
+        bound = []
+        srvs = []
         for srv in self.srv:
-            srv.listen(self.args.nc)
-            ip, port = srv.getsockname()
+            ip, port = srv.getsockname()[:2]
+            try:
+                srv.listen(self.args.nc)
+            except:
+                if ip == "0.0.0.0" and ("::", port) in bound:
+                    # dualstack
+                    srv.close()
+                    continue
+
+                if ip == "::" and ("0.0.0.0", port) in all_eps:
+                    # no ipv6
+                    srv.close()
+                    continue
+
+                raise
+
+            bound.append((ip, port))
+            srvs.append(srv)
             fno = srv.fileno()
-            msg = "listening @ {}:{}  f{} p{}".format(ip, port, fno, os.getpid())
+            hip = "[{}]".format(ip) if ":" in ip else ip
+            msg = "listening @ {}:{}  f{} p{}".format(hip, port, fno, os.getpid())
             self.log("tcpsrv", msg)
             if self.args.q:
                 print(msg)
 
             self.hub.broker.say("listen", srv)
+
+        self.srv = srvs
+        self.nsrv = len(srvs)
 
     def shutdown(self) -> None:
         self.stopping = True
@@ -209,19 +272,23 @@ class TcpSrv(object):
         except:
             return self.ips_linux_ifconfig()
 
-        r = re.compile(r"^\s+inet ([^ ]+)/.* (.*)")
-        ri = re.compile(r"^\s*[0-9]+\s*:.*")
+        r = re.compile(r"^\s+inet6? ([^ ]+)/")
+        ri = re.compile(r"^[0-9]+: ([^:]+): ")
+        dev = ""
         up = False
         eps: dict[str, str] = {}
         for ln in txt.split("\n"):
-            if ri.match(ln):
+            m = ri.match(ln)
+            if m:
+                dev = m.group(1)
                 up = "UP" in re.split("[>,< ]", ln)
 
-            try:
-                ip, dev = r.match(ln.rstrip()).groups()  # type: ignore
-                eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
-            except:
-                pass
+            m = r.match(ln.rstrip())
+            if not m or not dev or " scope link" in ln:
+                continue
+
+            ip = m.group(1)
+            eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
 
         return eps
 
@@ -314,7 +381,7 @@ class TcpSrv(object):
         else:
             eps = self.ips_linux()
 
-        if "0.0.0.0" not in listen_ips:
+        if "0.0.0.0" not in listen_ips and "::" not in listen_ips:
             eps = {k: v for k, v in eps.items() if k in listen_ips}
 
         try:
@@ -323,14 +390,15 @@ class TcpSrv(object):
             if not ext_ips:
                 raise Exception()
         except:
-            ext_ips = [self._defroute()]
+            rt = self._defroute()
+            ext_ips = [rt] if rt else []
 
         for lip in listen_ips:
-            if not ext_ips or lip not in ["0.0.0.0"] + ext_ips:
+            if not ext_ips or lip not in ["0.0.0.0", "::"] + ext_ips:
                 continue
 
             desc = "\033[32mexternal"
-            ips = ext_ips if lip == "0.0.0.0" else [lip]
+            ips = ext_ips if lip in ["0.0.0.0", "::"] else [lip]
             for ip in ips:
                 try:
                     if "external" not in eps[ip]:
@@ -421,6 +489,9 @@ class TcpSrv(object):
 
         if not ip:
             return ""
+
+        if ":" in ip:
+            ip = "[{}]".format(ip)
 
         if self.args.http_only:
             https = ""

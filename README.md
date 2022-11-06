@@ -144,6 +144,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 ## features
 
 * backend stuff
+  * ☑ IPv6
   * ☑ [multiprocessing](#performance) (actual multithreading)
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
@@ -222,6 +223,9 @@ browser-specific:
 * Android-Firefox: takes a while to select files (their fix for ☝️)
 * Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
 * Desktop-Firefox: may stop you from deleting files you've uploaded until you visit `about:memory` and click `Minimize memory usage`
+
+server-os-specific:
+* RHEL8 / Rocky8: you can run copyparty using `/usr/libexec/platform-python`
 
 
 # bugs
@@ -756,7 +760,7 @@ some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 and some minor issues,
 * clients only see the first ~400 files in big folders; [impacket#1433](https://github.com/SecureAuthCorp/impacket/issues/1433)
 * hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
-* listens on the first `-i` interface only (default = 0.0.0.0 = all)
+* listens on the first IPv4 `-i` interface only (default = :: = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work
   * win10 onwards does not allow connecting anonymously / without accounts
 * on windows, creating a new file through rightclick --> new --> textfile throws an error due to impacket limitations -- hit OK and F5 to get your file
