@@ -6,6 +6,7 @@ import contextlib
 import errno
 import hashlib
 import hmac
+import logging
 import math
 import mimetypes
 import os
@@ -379,6 +380,44 @@ class Cooldown(object):
                 self.oldest = sorted(self.hist.values())[0]
 
             return ret
+
+
+class HLog(logging.Handler):
+    def __init__(self, log_func: "RootLogger") -> None:
+        logging.Handler.__init__(self)
+        self.log_func = log_func
+        self.ptn_ftp = re.compile(r"^([0-9a-f:\.]+:[0-9]{1,5})-\[")
+        self.ptn_smb_ign = re.compile(r"^(Callback added|Config file parsed)")
+
+    def __repr__(self) -> str:
+        level = logging.getLevelName(self.level)
+        return "<%s cpp(%s)>" % (self.__class__.__name__, level)
+
+    def flush(self) -> None:
+        pass
+
+    def emit(self, record: logging.LogRecord) -> None:
+        msg = self.format(record)
+        lv = record.levelno
+        if lv < logging.INFO:
+            c = 6
+        elif lv < logging.WARNING:
+            c = 0
+        elif lv < logging.ERROR:
+            c = 3
+        else:
+            c = 1
+
+        if record.name == "pyftpdlib":
+            m = self.ptn_ftp.match(msg)
+            if m:
+                record.name = ip = m.group(1)
+                msg = msg[len(ip) + 1 :]
+        elif record.name.startswith("impacket"):
+            if self.ptn_smb_ign.match(msg):
+                return
+
+        self.log_func(record.name[-21:], msg, c)
 
 
 class UnrecvEOF(OSError):

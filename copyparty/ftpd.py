@@ -11,7 +11,6 @@ import time
 from pyftpdlib.authorizers import AuthenticationFailed, DummyAuthorizer
 from pyftpdlib.filesystems import AbstractedFS, FilesystemError
 from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.log import config_logging
 from pyftpdlib.servers import FTPServer
 
 from .__init__ import PY2, TYPE_CHECKING, E
@@ -401,8 +400,8 @@ class Ftpd(object):
             if self.args.ftp_nat:
                 h2.masquerade_address = self.args.ftp_nat
 
-        if self.args.ftp_dbg:
-            config_logging(level=logging.DEBUG)
+        lgr = logging.getLogger("pyftpdlib")
+        lgr.setLevel(logging.DEBUG if self.args.ftp_dbg else logging.INFO)
 
         ioloop = IOLoop()
         for ip in self.args.i:

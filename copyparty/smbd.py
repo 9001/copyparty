@@ -17,37 +17,8 @@ from .util import Daemon, min_ex
 if True:  # pylint: disable=using-constant-test
     from typing import Any
 
-    from .util import RootLogger
-
 if TYPE_CHECKING:
     from .svchub import SvcHub
-
-
-class HLog(logging.Handler):
-    def __init__(self, log_func: "RootLogger") -> None:
-        logging.Handler.__init__(self)
-        self.log_func = log_func
-
-    def __repr__(self) -> str:
-        level = logging.getLevelName(self.level)
-        return "<%s cpp(%s)>" % (self.__class__.__name__, level)
-
-    def flush(self) -> None:
-        pass
-
-    def emit(self, record: logging.LogRecord) -> None:
-        msg = self.format(record)
-        lv = record.levelno
-        if lv < logging.INFO:
-            c = 6
-        elif lv < logging.WARNING:
-            c = 0
-        elif lv < logging.ERROR:
-            c = 3
-        else:
-            c = 1
-
-        self.log_func("smb", msg, c)
 
 
 class SMB(object):
@@ -55,13 +26,12 @@ class SMB(object):
         self.hub = hub
         self.args = hub.args
         self.asrv = hub.asrv
-        self.log_func = hub.log
+        self.log = hub.log
         self.files: dict[int, tuple[float, str]] = {}
 
-        handler = HLog(hub.log)
-        lvl = logging.DEBUG if self.args.smb_dbg else logging.INFO
-        logging.getLogger().addHandler(handler)
-        logging.getLogger().setLevel(lvl)
+        for x in ["impacket", "impacket.smbserver"]:
+            lgr = logging.getLogger(x)
+            lgr.setLevel(logging.DEBUG if self.args.smb_dbg else logging.INFO)
 
         try:
             from impacket import smbserver
@@ -125,7 +95,7 @@ class SMB(object):
 
         self.srv = srv
         self.stop = srv.stop
-        logging.info("listening @ %s:%s", ip, port)
+        self.log("smb", "listening @ {}:{}".format(ip, port))
 
     def start(self) -> None:
         Daemon(self.srv.start)

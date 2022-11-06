@@ -8,6 +8,7 @@ import argparse
 import base64
 import calendar
 import gzip
+import logging
 import os
 import re
 import shlex
@@ -34,6 +35,7 @@ from .up2k import Up2k
 from .util import (
     VERSIONS,
     Daemon,
+    HLog,
     HMaccas,
     alltrace,
     ansi_re,
@@ -105,6 +107,11 @@ class SvcHub(object):
         self.log = self._log_disabled if args.q else self._log_enabled
         if args.lo:
             self._setup_logfile(printed)
+
+        lg = logging.getLogger()
+        lh = HLog(self.log)
+        lg.handlers = [lh]
+        lg.setLevel(logging.INFO)
 
         if args.stackmon:
             start_stackmon(args.stackmon, 0)
