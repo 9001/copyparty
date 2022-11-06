@@ -429,6 +429,8 @@ def run_argparse(
 
     hcores = min(CORES, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
+    tty = os.environ.get("TERM", "").lower() == "linux"
+
     sects = [
         [
             "accounts",
@@ -590,10 +592,10 @@ def run_argparse(
     ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
     ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m]")
     ap2.add_argument("--qri", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX")
-    ap2.add_argument("--qr-fg", metavar="COLOR", type=int, default=16, help="foreground")
+    ap2.add_argument("--qr-fg", metavar="COLOR", type=int, default=0 if tty else 16, help="foreground; try [\033[32m0\033[0m] if the qr-code is unreadable")
     ap2.add_argument("--qr-bg", metavar="COLOR", type=int, default=229, help="background (white=255)")
     ap2.add_argument("--qrp", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more, but 1 is usually fine)")
-    ap2.add_argument("--qrz", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try 2 on broken fonts)")
+    ap2.add_argument("--qrz", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try [\033[32m2\033[0m] on broken fonts)")
 
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
@@ -794,6 +796,19 @@ def run_argparse(
     ap2 = ap.add_argument_group("help sections")
     for k, h, _ in sects:
         ap2.add_argument("--help-" + k, action="store_true", help=h)
+
+    try:
+        if not retry:
+            raise Exception()
+
+        for x in ap._actions:
+            if not x.help:
+                continue
+
+            a = ["ascii", "replace"]
+            x.help = x.help.encode(*a).decode(*a) + "\033[0m"
+    except:
+        pass
 
     ret = ap.parse_args(args=argv[1:])
     for k, h, t in sects:

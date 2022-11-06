@@ -473,7 +473,7 @@ class TcpSrv(object):
 
             title += "{} ".format(p)
 
-        print("\033]0;{}\033\\".format(title), file=sys.stderr, end="")
+        print("\033]0;{}\033\\\n".format(title), file=sys.stderr, end="")
         sys.stderr.flush()
 
     def _qr(self, t1: dict[str, list[int]], t2: dict[str, list[int]]) -> str:
@@ -526,13 +526,17 @@ class TcpSrv(object):
         if not VT100:
             return "{}\n{}".format(txt, qr)
 
+        halfc = "\033[40;48;5;{0}m{1}\033[47;48;5;{2}m"
+        if not fg:
+            halfc = "\033[0;40m{1}\033[0;47m"
+
         def ansify(m: re.Match) -> str:
-            t = "\033[40;48;5;{}m{}\033[47;48;5;{}m"
-            return t.format(fg, " " * len(m.group(1)), bg)
+            return halfc.format(fg, " " * len(m.group(1)), bg)
 
         if zoom > 1:
             qr = re.sub("(█+)", ansify, qr)
 
         qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
-        t = "{} \033[0;38;5;{};48;5;{}m\n{}\033[999G\033[0m\033[J"
-        return t.format(txt, fg, bg, qr)
+        cc = " \033[0;38;5;{0};47;48;5;{1}m" if fg else " \033[0;30;47m"
+        t = cc + "\n{2}\033[999G\033[0m\033[J"
+        return txt + t.format(fg, bg, qr)
