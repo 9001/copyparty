@@ -3,7 +3,6 @@
 from __future__ import print_function
 
 import binascii
-import random
 
 from itertools import chain
 
@@ -39,7 +38,7 @@ QTYPE = Bimap(
     unknown_qtype,
 )
 
-CLASS = Bimap("CLASS", {1: "IN", 254: "None", 255: "*"}, DNSError)
+CLASS = Bimap("CLASS", {1: "IN", 254: "None", 255: "*", 0x8001: "F_IN"}, DNSError)
 
 QR = Bimap("QR", {0: "QUERY", 1: "RESPONSE"}, DNSError)
 
@@ -75,7 +74,7 @@ def label(label, origin=None):
 
 class DNSRecord(object):
     @classmethod
-    def parse(cls, packet):
+    def parse(cls, packet) -> "DNSRecord":
         buffer = DNSBuffer(packet)
         try:
             header = DNSHeader.parse(buffer)
@@ -105,7 +104,7 @@ class DNSRecord(object):
 
     def __init__(
         self, header=None, questions=None, rr=None, q=None, a=None, auth=None, ar=None
-    ):
+    ) -> None:
         self.header = header or DNSHeader()
         self.questions = questions or []
         self.rr = rr or []
@@ -124,23 +123,23 @@ class DNSRecord(object):
             q=self.q,
         )
 
-    def add_question(self, *q):
+    def add_question(self, *q) -> None:
         self.questions.extend(q)
         self.set_header_qa()
 
-    def add_answer(self, *rr):
+    def add_answer(self, *rr) -> None:
         self.rr.extend(rr)
         self.set_header_qa()
 
-    def add_auth(self, *auth):
+    def add_auth(self, *auth) -> None:
         self.auth.extend(auth)
         self.set_header_qa()
 
-    def add_ar(self, *ar):
+    def add_ar(self, *ar) -> None:
         self.ar.extend(ar)
         self.set_header_qa()
 
-    def set_header_qa(self):
+    def set_header_qa(self) -> None:
         self.header.q = len(self.questions)
         self.header.a = len(self.rr)
         self.header.auth = len(self.auth)
@@ -156,7 +155,7 @@ class DNSRecord(object):
 
     a = property(get_a)
 
-    def pack(self):
+    def pack(self) -> bytes:
         self.set_header_qa()
         buffer = DNSBuffer()
         self.header.pack(buffer)
@@ -208,14 +207,10 @@ class DNSHeader(object):
                 "Error unpacking DNSHeader [offset=%d]: %s" % (buffer.offset, e)
             )
 
-    def __init__(self, id=None, bitmap=None, q=0, a=0, auth=0, ar=0, **args):
-        if id is None:
-            self.id = random.randint(0, 65535)
-        else:
-            self.id = id
+    def __init__(self, id=None, bitmap=None, q=0, a=0, auth=0, ar=0, **args) -> None:
+        self.id = id if id else 0
         if bitmap is None:
             self.bitmap = 0
-            self.rd = 1
         else:
             self.bitmap = bitmap
         self.q = q
@@ -382,7 +377,7 @@ class DNSQuestion(object):
                 "Error unpacking DNSQuestion [offset=%d]: %s" % (buffer.offset, e)
             )
 
-    def __init__(self, qname=None, qtype=1, qclass=1):
+    def __init__(self, qname=None, qtype=1, qclass=1) -> None:
         self.qname = qname
         self.qtype = qtype
         self.qclass = qclass
@@ -431,7 +426,7 @@ class RR(object):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking RR [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, rname=None, rtype=1, rclass=1, ttl=0, rdata=None):
+    def __init__(self, rname=None, rtype=1, rclass=1, ttl=0, rdata=None) -> None:
         self.rname = rname
         self.rtype = rtype
         self.rclass = rclass
@@ -480,7 +475,7 @@ class RD(object):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking RD [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, data=b""):
+    def __init__(self, data=b"") -> None:
         check_bytes("data", data)
         self.data = bytes(data)
 
@@ -527,7 +522,7 @@ class TXT(RD):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking TXT [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, data):
+    def __init__(self, data) -> None:
         if type(data) in (tuple, list):
             self.data = [_force_bytes(x) for x in data]
         else:
@@ -558,7 +553,7 @@ class A(RD):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking A [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, data):
+    def __init__(self, data) -> None:
         if type(data) in (tuple, list):
             self.data = tuple(data)
         else:
@@ -615,7 +610,7 @@ class AAAA(RD):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking AAAA [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, data):
+    def __init__(self, data) -> None:
         if type(data) in (tuple, list):
             self.data = tuple(data)
         else:
@@ -637,7 +632,7 @@ class CNAME(RD):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking CNAME [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, label=None):
+    def __init__(self, label=None) -> None:
         self.label = label
 
     def set_label(self, label):
@@ -678,7 +673,7 @@ class SRV(RD):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking SRV [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, priority=0, weight=0, port=0, target=None):
+    def __init__(self, priority=0, weight=0, port=0, target=None) -> None:
         self.priority = priority
         self.weight = weight
         self.port = port
@@ -753,7 +748,7 @@ class NSEC(RD):
         except (BufferError, BimapError) as e:
             raise DNSError("Error unpacking NSEC [offset=%d]: %s" % (buffer.offset, e))
 
-    def __init__(self, label, rrlist):
+    def __init__(self, label, rrlist) -> None:
         self.label = label
         self.rrlist = rrlist
 

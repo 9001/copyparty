@@ -2,7 +2,7 @@
 
 import sys
 
-if sys.version < "3":
+if sys.version_info < (3,):
     int_types = (
         int,
         long,
