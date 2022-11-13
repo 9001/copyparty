@@ -48,6 +48,17 @@ hashwasm would solve the streaming issue but reduces hashing speed for sha512 (x
 * blake2 might be a better choice since xxh is non-cryptographic, but that gets ~15 MiB/s on slower androids
 
 
+## assumptions
+
+### mdns
+
+* outgoing replies will always fit in one packet
+* if a client mentions any of our services, assume it's not missing any
+* always answer with all services, even if the client only asked for a few
+* not-impl: probe tiebreaking (too complicated)
+* not-impl: unicast listen (assume avahi took it)
+
+
 # sfx repack
 
 reduce the size of an sfx by removing features

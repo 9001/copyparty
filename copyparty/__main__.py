@@ -9,11 +9,13 @@ __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
 import argparse
+import base64
 import filecmp
 import locale
 import os
 import re
 import shutil
+import socket
 import sys
 import threading
 import time
@@ -207,6 +209,31 @@ def init_E(E: EnvParams) -> None:
     except:
         if not os.path.isdir(E.cfg):
             raise
+
+
+def get_srvname() -> str:
+    try:
+        ret: str = unicode(socket.gethostname()).split(".")[0].lower()
+    except:
+        ret = ""
+
+    if ret not in ["", "localhost"]:
+        return ret
+
+    fp = os.path.join(E.cfg, "name.txt")
+    lprint("using hostname from {}\n".format(fp))
+    try:
+        with open(fp, "rb") as f:
+            ret = f.read().decode("utf-8", "replace").strip()
+    except:
+        ret = ""
+        while len(ret) < 7:
+            ret += base64.b32encode(os.urandom(4))[:7].decode("utf-8").lower()
+            ret = re.sub("[234567=]", "", ret)[:7]
+        with open(fp, "wb") as f:
+            f.write(ret.encode("utf-8") + b"\n")
+
+    return ret
 
 
 def ensure_locale() -> None:
@@ -431,6 +458,8 @@ def run_argparse(
 
     tty = os.environ.get("TERM", "").lower() == "linux"
 
+    srvname = get_srvname()
+
     sects = [
         [
             "accounts",
@@ -584,6 +613,7 @@ def run_argparse(
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see --help-urlform")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="window title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
+    ap2.add_argument("--name", metavar="TXT", type=str, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
@@ -629,6 +659,21 @@ def run_argparse(
     ap2.add_argument("--ciphers", metavar="LIST", type=u, help="set allowed ssl/tls ciphers; [\033[32mhelp\033[0m] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets for later decryption in wireshark")
+
+    ap2 = ap.add_argument_group("Zeroconf options")
+    ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
+    ap2.add_argument("--zm4", action="store_true", help="IPv4 only -- try this if some clients don't work")
+    ap2.add_argument("--zm6", action="store_true", help="IPv6 only")
+    ap2.add_argument("--zmv", action="store_true", help="verbose mdns")
+    ap2.add_argument("--zmvv", action="store_true", help="verboser mdns")
+    ap2.add_argument("--zms", metavar="dhf", type=str, default="", help="list of services to announce -- d=webdav h=http f=ftp s=smb -- lowercase=plaintext uppercase=TLS -- default: all enabled services except http/https (\033[32mDdfs\033[0m if \033[33m--ftp\033[0m and \033[33m--smb\033[0m is set)")
+    ap2.add_argument("--zm-ld", metavar="PATH", type=str, default="", help="link a specific folder for webdav shares")
+    ap2.add_argument("--zm-lh", metavar="PATH", type=str, default="", help="link a specific folder for http shares")
+    ap2.add_argument("--zm-lf", metavar="PATH", type=str, default="", help="link a specific folder for ftp shares")
+    ap2.add_argument("--zm-ls", metavar="PATH", type=str, default="", help="link a specific folder for smb shares")
+    ap2.add_argument("--zm-mnic", action="store_true", help="merge NICs which share subnets; assume that same subnet means same network")
+    ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working")
+    ap2.add_argument("--mc-hop", metavar="SEC", type=int, default=0, help="rejoin multicast groups every SEC seconds (workaround for some switches/routers which cause mDNS to suddenly stop working after some time); try [\033[32m300\033[0m] or [\033[32m180\033[0m]")
 
     ap2 = ap.add_argument_group('FTP options')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT, for example \033[32m3921")
@@ -898,6 +943,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     for fmtr in [RiceFormatter, RiceFormatter, Dodge11874, BasicDodge11874]:
         try:
             al = run_argparse(argv, fmtr, retry, nc)
+            break
         except SystemExit:
             raise
         except:

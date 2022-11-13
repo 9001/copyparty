@@ -12,14 +12,14 @@ except:
     TYPE_CHECKING = False
 
 if True:
-    from typing import Any
+    from typing import Any, Callable
 
 PY2 = sys.version_info < (3,)
-if PY2:
+if not PY2:
+    unicode: Callable[[str], str] = str
+else:
     sys.dont_write_bytecode = True
     unicode = unicode  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
-else:
-    unicode = str
 
 WINDOWS: Any = (
     [int(x) for x in platform.version().split(".")]

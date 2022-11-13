@@ -11,7 +11,6 @@ import itertools
 import json
 import os
 import re
-import socket
 import stat
 import string
 import threading  # typechk
@@ -24,11 +23,6 @@ import jinja2  # typechk
 
 try:
     import lzma
-except:
-    pass
-
-try:
-    from ipaddress import IPv6Address
 except:
     pass
 
@@ -3030,7 +3024,7 @@ class HttpCli(object):
 
         try:
             if not self.args.nih:
-                srv_info.append(unicode(socket.gethostname()).split(".")[0])
+                srv_info.append(self.args.name)
         except:
             self.log("#wow #whoa")
 

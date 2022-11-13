@@ -27,6 +27,8 @@ help() { exec cat <<'EOF'
 #
 # `no-smb` saves ~3.5k by removing the smb / cifs server
 #
+# `no-zm` saves ~k by removing the zeroconf mDNS server
+#
 # _____________________________________________________________________
 # web features:
 #
@@ -101,6 +103,7 @@ while [ ! -z "$1" ]; do
 		gzz)    shift;use_gzz=$1;use_gz=1; ;;
 		no-ftp) no_ftp=1 ; ;;
 		no-smb) no_smb=1 ; ;;
+		no-zm)  no_zm=1  ; ;;
 		no-fnt) no_fnt=1 ; ;;
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
@@ -136,11 +139,22 @@ tmpdir="$(
 [ $repack ] && {
 	old="$tmpdir/pe-copyparty.$(id -u)"
 	echo "repack of files in $old"
-	cp -pR "$old/"*{py2,j2,copyparty} .
+	cp -pR "$old/"*{py2,py37,j2,copyparty} .
 	cp -pR "$old/"*ftp . || true
 }
 
 [ $repack ] || {
+	echo collecting ipaddress
+	f="../build/ipaddress-1.0.23.tar.gz"
+	[ -e "$f" ] ||
+		(url=https://files.pythonhosted.org/packages/b9/9a/3e9da40ea28b8210dd6504d3fe9fe7e013b62bf45902b458d1cdc3c34ed9/ipaddress-1.0.23.tar.gz;
+		wget -O$f "$url" || curl -L "$url" >$f)
+
+	tar -zxf $f
+	mkdir py37
+	mv ipaddress-*/ipaddress.py py37/
+	rm -rf ipaddress-*
+
 	echo collecting jinja2
 	f="../build/Jinja2-2.11.3.tar.gz"
 	[ -e "$f" ] ||
@@ -237,6 +251,8 @@ tmpdir="$(
 		awk 'NR<4||NR>27;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' ../build/$n >copyparty/vend/$n
 	done
 
+	rm -f copyparty/stolen/*/README.md
+
 	# remove type hints before build instead
 	(cd copyparty; "$pybin" ../../scripts/strip_hints/a.py; rm uh)
 
@@ -321,6 +337,10 @@ rm have
 [ $no_smb ] &&
 	rm -f copyparty/smbd.py &&
 	sed -ri '/add_argument\("--smb/d' copyparty/__main__.py
+
+[ $no_zm ] &&
+	rm -rf copyparty/mdns.py copyparty/stolen/dnslib &&
+	sed -ri '/add_argument\("--zm/d' copyparty/__main__.py
 
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
@@ -464,7 +484,7 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 		echo "copying.txt 404 pls rebuild"
 
 	mv ftp/* j2/* copyparty/vend/* .
-	rm -rf ftp j2 py2 copyparty/vend
+	rm -rf ftp j2 py2 py37 copyparty/vend
 	(cd copyparty; tar -cvf z.tar $t; rm -rf $t)
 	cd ..
 	pyoxidizer build --release --target-triple $tgt
@@ -481,7 +501,7 @@ nf=$(ls -1 "$zdir"/arc.* | wc -l)
 
 
 echo gen tarlist
-for d in copyparty j2 py2 ftp; do find $d -type f; done |  # strip_hints
+for d in copyparty j2 py2 py37 ftp; do find $d -type f; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 

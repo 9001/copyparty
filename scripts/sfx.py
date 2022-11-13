@@ -28,6 +28,7 @@ CKSUM = None
 STAMP = None
 
 PY2 = sys.version_info < (3,)
+PY37 = sys.version_info > (3, 7)
 WINDOWS = sys.platform in ["win32", "msys"]
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
@@ -401,7 +402,7 @@ def run(tmp, j2, ftp):
     t.daemon = True
     t.start()
 
-    ld = (("", ""), (j2, "j2"), (ftp, "ftp"), (not PY2, "py2"))
+    ld = (("", ""), (j2, "j2"), (ftp, "ftp"), (not PY2, "py2"), (PY37, "py37"))
     ld = [os.path.join(tmp, b) for a, b in ld if not a]
 
     # skip 1

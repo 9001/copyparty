@@ -24,6 +24,7 @@ import time
 import traceback
 from collections import Counter
 from datetime import datetime
+from ipaddress import IPv6Address
 
 from queue import Queue
 
@@ -57,11 +58,6 @@ try:
     import ctypes
     import fcntl
     import termios
-except:
-    pass
-
-try:
-    from ipaddress import IPv6Address
 except:
     pass
 
@@ -184,6 +180,9 @@ IMPLICATIONS = [
     ["smbw", "smb"],
     ["smb1", "smb"],
     ["smb_dbg", "smb"],
+    ["zmvv", "zmv"],
+    ["zmv", "zm"],
+    ["zms", "zm"],
 ]
 
 
@@ -536,6 +535,27 @@ class _LUnrecv(object):
 Unrecv = _Unrecv
 
 
+class CachedSet(object):
+    def __init__(self, maxage: float) -> None:
+        self.c: dict[Any, float] = {}
+        self.maxage = maxage
+        self.oldest = 0.0
+
+    def add(self, v: Any) -> None:
+        self.c[v] = time.time()
+
+    def cln(self) -> None:
+        now = time.time()
+        if now - self.oldest < self.maxage:
+            return
+
+        c = self.c = {k: v for k, v in self.c.items() if now - v < self.maxage}
+        try:
+            self.oldest = c[min(c, key=c.get)]
+        except:
+            self.oldest = now
+
+
 class FHC(object):
     class CE(object):
         def __init__(self, fh: typing.BinaryIO) -> None:
@@ -836,7 +856,7 @@ class Garda(object):
         if not self.lim:
             return 0, ip
 
-        if ":" in ip and not PY2:
+        if ":" in ip:
             # assume /64 clients; drop 4 groups
             ip = IPv6Address(ip).exploded[:-20]
 
@@ -1603,15 +1623,12 @@ def exclude_dotfiles(filepaths: list[str]) -> list[str]:
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
 
 
-def _ipnorm3(ip: str) -> str:
+def ipnorm(ip: str) -> str:
     if ":" in ip:
         # assume /64 clients; drop 4 groups
         return IPv6Address(ip).exploded[:-20]
 
     return ip
-
-
-ipnorm = _ipnorm3 if not PY2 else unicode
 
 
 def http_ts(ts: int) -> str:

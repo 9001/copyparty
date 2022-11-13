@@ -195,10 +195,17 @@ class SvcHub(object):
 
         args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)
 
+        zms = ""
+        if not args.https_only:
+            zms += "d"
+        if not args.http_only:
+            zms += "D"
+
         if args.ftp or args.ftps:
             from .ftpd import Ftpd
 
             self.ftpd = Ftpd(self)
+            zms += "f" if args.ftp else "F"
 
         if args.smb:
             # impacket.dcerpc is noisy about listen timeouts
@@ -210,6 +217,12 @@ class SvcHub(object):
             self.smbd = SMB(self)
             socket.setdefaulttimeout(sto)
             self.smbd.start()
+            zms += "s"
+
+        if not args.zms:
+            args.zms = zms
+
+        self.mdns: Any = None
 
         # decide which worker impl to use
         if self.check_mp_enable():
@@ -359,6 +372,15 @@ class SvcHub(object):
     def run(self) -> None:
         self.tcpsrv.run()
 
+        if getattr(self.args, "zm", False):
+            try:
+                from .mdns import MDNS
+
+                self.mdns = MDNS(self)
+                Daemon(self.mdns.run, "mdns")
+            except:
+                self.log("root", "mdns startup failed;\n" + min_ex(), 3)
+
         Daemon(self.thr_httpsrv_up, "sig-hsrv-up2")
 
         sigs = [signal.SIGINT, signal.SIGTERM]
@@ -464,6 +486,11 @@ class SvcHub(object):
         ret = 1
         try:
             self.pr("OPYTHAT")
+            slp = 0.0
+            if self.mdns:
+                Daemon(self.mdns.stop)
+                slp = time.time() + 1
+
             self.tcpsrv.shutdown()
             self.broker.shutdown()
             self.up2k.shutdown()
@@ -481,6 +508,9 @@ class SvcHub(object):
             if hasattr(self, "smbd"):
                 Daemon(self.kill9, a=(1,))
                 self.smbd.stop()
+
+            while time.time() < slp:
+                time.sleep(0.1)
 
             self.pr("nailed it", end="")
             ret = self.retcode

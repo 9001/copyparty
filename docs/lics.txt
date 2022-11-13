@@ -6,17 +6,21 @@ L: MIT
 
 https://github.com/pallets/jinja/
 C: 2007 Pallets
-L: BSD 3-Clause 
+L: BSD 3-Clause
 
 https://github.com/pallets/markupsafe/
 C: 2010 Pallets
-L: BSD 3-Clause 
+L: BSD 3-Clause
+
+https://github.com/paulc/dnslib/
+C: 2010-2017 Paul Chakravarti
+L: BSD 2-Clause
 
 https://github.com/giampaolo/pyftpdlib/
-C: 2007 Giampaolo Rodola'
+C: 2007 Giampaolo Rodola
 L: MIT
 
-https://github.com/nayuki/QR-Code-generator
+https://github.com/nayuki/QR-Code-generator/
 C: Project Nayuki
 L: MIT
 

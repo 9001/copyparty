@@ -25,6 +25,9 @@ if True:
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
+if not hasattr(socket, "IPPROTO_IPV6"):
+    setattr(socket, "IPPROTO_IPV6", 41)
+
 
 class TcpSrv(object):
     """
@@ -42,6 +45,7 @@ class TcpSrv(object):
 
         self.stopping = False
         self.srv: list[socket.socket] = []
+        self.bound: list[tuple[str, int]] = []
         self.nsrv = 0
         self.qr = ""
         pad = False
@@ -97,14 +101,22 @@ class TcpSrv(object):
         if pad:
             self.log("tcpsrv", "")
 
-        ip = "127.0.0.1"
-        eps = {ip: "local only"}
-        nonlocals = [x for x in self.args.i if x != ip]
+        eps = {"127.0.0.1": "local only", "::1": "local only"}
+        nonlocals = [x for x in self.args.i if x not in [k.split("/")[0] for k in eps]]
         if nonlocals:
-            eps = self.detect_interfaces(self.args.i)
+            try:
+                self.netdevs = self.detect_interfaces(self.args.i)
+            except:
+                t = "failed to discover server IP addresses\n"
+                self.log("tcpsrv", t + min_ex(), 3)
+                self.netdevs = {}
+
+            eps.update({k.split("/")[0]: v for k, v in self.netdevs.items()})
             if not eps:
                 for x in nonlocals:
                     eps[x] = "external"
+        else:
+            self.netdevs = {}
 
         qr1: dict[str, list[int]] = {}
         qr2: dict[str, list[int]] = {}
@@ -180,6 +192,12 @@ class TcpSrv(object):
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         srv.settimeout(None)  # < does not inherit, ^ does
+
+        try:
+            srv.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, False)
+        except:
+            pass  # will create another ipv4 socket instead
+
         try:
             srv.bind((ip, port))
             self.srv.append(srv)
@@ -194,8 +212,8 @@ class TcpSrv(object):
 
     def run(self) -> None:
         all_eps = [x.getsockname()[:2] for x in self.srv]
-        bound = []
-        srvs = []
+        bound: list[tuple[str, int]] = []
+        srvs: list[socket.socket] = []
         for srv in self.srv:
             ip, port = srv.getsockname()[:2]
             try:
@@ -225,6 +243,7 @@ class TcpSrv(object):
             self.hub.broker.say("listen", srv)
 
         self.srv = srvs
+        self.bound = bound
         self.nsrv = len(srvs)
 
     def shutdown(self) -> None:
@@ -370,19 +389,22 @@ class TcpSrv(object):
         return eps
 
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, str]:
-        if MACOS:
-            eps = self.ips_macos()
-        elif ANYWIN:
-            eps, off = self.ips_windows_ipconfig()  # sees more interfaces + link state
-            eps.update(self.ips_windows_netsh())  # has better names
-            for k, v in eps.items():
-                if v in off:
-                    eps[k] += ", \033[31mLINK-DOWN"
-        else:
-            eps = self.ips_linux()
+        from .stolen.ifaddr import get_adapters
+
+        nics = get_adapters(True)
+        eps = {}
+        for nic in nics:
+            for nip in nic.ips:
+                ipa = nip.ip[0] if ":" in str(nip.ip) else nip.ip
+                sip = "{}/{}".format(ipa, nip.network_prefix)
+                if sip.startswith("fe80") or sip.startswith("169.254"):
+                    # browsers dont impl linklocal
+                    continue
+
+                eps[sip] = nic.nice_name
 
         if "0.0.0.0" not in listen_ips and "::" not in listen_ips:
-            eps = {k: v for k, v in eps.items() if k in listen_ips}
+            eps = {k: v for k, v in eps.items() if k.split("/")[0] in listen_ips}
 
         try:
             ext_devs = list(self._extdevs_nix())
@@ -478,7 +500,13 @@ class TcpSrv(object):
 
     def _qr(self, t1: dict[str, list[int]], t2: dict[str, list[int]]) -> str:
         ip = None
-        for ip in list(t1) + list(t2):
+        ips = list(t1) + list(t2)
+        if self.args.zm:
+            name = self.args.name + ".local"
+            t1[name] = next(v for v in (t1 or t2).values())
+            ips = [name] + ips
+
+        for ip in ips:
             if ip.startswith(self.args.qri):
                 break
             ip = ""

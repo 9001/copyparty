@@ -12,11 +12,6 @@ import time
 import queue
 
 try:
-    from ipaddress import IPv6Address
-except:
-    pass
-
-try:
     import jinja2
 except ImportError:
     print(
