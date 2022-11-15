@@ -278,6 +278,9 @@ class MDNS(MCast):
                 try:
                     self.eat(buf, addr, sck)
                 except:
+                    if not self.running:
+                        return
+
                     t = "{} {} \033[33m|{}| {}\n{}".format(
                         self.srv[sck].name, addr, len(buf), repr(buf)[2:-1], min_ex()
                     )

@@ -508,8 +508,8 @@ class SvcHub(object):
                         self.pr("waiting for thumbsrv (10sec)...")
 
             if hasattr(self, "smbd"):
-                Daemon(self.kill9, a=(1,))
-                self.smbd.stop()
+                slp = max(slp, time.time() + 0.5)
+                Daemon(self.smbd.stop)
 
             while time.time() < slp:
                 time.sleep(0.1)
