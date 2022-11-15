@@ -346,10 +346,12 @@ class SvcHub(object):
         fn = sel_fn
 
         try:
-            import lzma
+            if fn.lower().endswith(".xz"):
+                import lzma
 
-            lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
-
+                lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
+            else:
+                lh = open(fn, "wt", encoding="utf-8", errors="replace")
         except:
             import codecs
 
