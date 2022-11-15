@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-import fnmatch, re
+import re
 
 from .bit import get_bits, set_bits
 from .buffer import Buffer, BufferError

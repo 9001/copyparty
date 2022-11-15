@@ -9,7 +9,7 @@ https://github.com/pydron/ifaddr/tree/0.2.0
 
 import os
 
-from ._shared import Adapter, IP
+from ._shared import IP, Adapter
 
 if os.name == "nt":
     from ._win32 import get_adapters

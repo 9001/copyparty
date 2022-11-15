@@ -1,11 +1,12 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
-import ctypes.util
-import ipaddress
 import collections
+import ctypes.util
+import os
 import socket
+
+import ipaddress
 
 if True:  # pylint: disable=using-constant-test
     from typing import Iterable, Optional

@@ -3,8 +3,9 @@ from __future__ import print_function, unicode_literals
 
 import socket
 import time
+
 import ipaddress
-from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
 from .__init__ import TYPE_CHECKING
 from .util import min_ex, spack

@@ -24,8 +24,8 @@ import time
 import traceback
 from collections import Counter
 from datetime import datetime
-from ipaddress import IPv6Address
 
+from ipaddress import IPv6Address
 from queue import Queue
 
 from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS, unicode

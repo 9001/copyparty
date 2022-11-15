@@ -26,7 +26,7 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, MACOS, VT100, EnvParams, unicode
+from .__init__ import ANYWIN, MACOS, TYPE_CHECKING, VT100, EnvParams, unicode
 from .authsrv import AuthSrv
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
@@ -44,6 +44,12 @@ from .util import (
     start_log_thrs,
     start_stackmon,
 )
+
+if TYPE_CHECKING:
+    try:
+        from .mdns import MDNS
+    except:
+        pass
 
 
 class SvcHub(object):
@@ -222,7 +228,7 @@ class SvcHub(object):
         if not args.zms:
             args.zms = zms
 
-        self.mdns: Any = None
+        self.mdns: Optional["MDNS"] = None
 
         # decide which worker impl to use
         if self.check_mp_enable():
@@ -491,7 +497,7 @@ class SvcHub(object):
             slp = 0.0
             if self.mdns:
                 Daemon(self.mdns.stop)
-                slp = time.time() + 1
+                slp = time.time() + 0.5
 
             self.tcpsrv.shutdown()
             self.broker.shutdown()

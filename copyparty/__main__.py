@@ -24,7 +24,7 @@ from textwrap import dedent
 
 from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
-from .authsrv import re_vol, expand_config_file
+from .authsrv import expand_config_file, re_vol
 from .svchub import SvcHub
 from .util import (
     IMPLICATIONS,

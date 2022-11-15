@@ -1,14 +1,15 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import sys
 import ctypes
-import socket
-import ipaddress
 import platform
+import socket
+import sys
+
+import ipaddress
 
 if True:  # pylint: disable=using-constant-test
-    from typing import List, Optional, Tuple, Union, Callable
+    from typing import Callable, List, Optional, Union
 
 
 PY2 = sys.version_info < (3,)

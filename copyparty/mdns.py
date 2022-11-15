@@ -5,26 +5,27 @@ import random
 import select
 import socket
 import time
+
 from ipaddress import IPv4Network, IPv6Network
 
 from .__init__ import TYPE_CHECKING
 from .__init__ import unicode as U
-from .util import CachedSet, Daemon, min_ex
 from .multicast import MC_Sck, MCast
+from .stolen.dnslib import CLASS as DC
 from .stolen.dnslib import (
-    RR,
-    DNSHeader,
-    DNSRecord,
-    DNSQuestion,
+    NSEC,
+    PTR,
     QTYPE,
+    RR,
+    SRV,
+    TXT,
     A,
     AAAA,
-    NSEC,
-    SRV,
-    PTR,
-    TXT,
+    DNSHeader,
+    DNSQuestion,
+    DNSRecord,
 )
-from .stolen.dnslib import CLASS as DC
+from .util import CachedSet, Daemon, min_ex
 
 if TYPE_CHECKING:
     from .svchub import SvcHub

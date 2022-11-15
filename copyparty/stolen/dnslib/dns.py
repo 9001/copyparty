@@ -3,14 +3,13 @@
 from __future__ import print_function
 
 import binascii
-
 from itertools import chain
 
-from .bit import get_bits, set_bits
 from .bimap import Bimap, BimapError
+from .bit import get_bits, set_bits
 from .buffer import BufferError
-from .label import DNSLabel, DNSBuffer
-from .ranges import H, I, IP4, IP6, check_bytes
+from .label import DNSBuffer, DNSLabel
+from .ranges import IP4, IP6, H, I, check_bytes
 
 
 class DNSError(Exception):
