@@ -76,6 +76,9 @@ class SMB(object):
         fop.isdir = self._p_isdir
         smbserver.os.path = fop
 
+        if not self.args.smb_nwa_2:
+            fop.join = self._p_join
+
         # other patches
         smbserver.isInFileJail = self._is_in_file_jail
         self._disarm()
@@ -271,6 +274,12 @@ class SMB(object):
             return stat.S_ISDIR(st.st_mode)
         except:
             return False
+
+    def _p_join(self, *a) -> str:
+        # impacket.smbserver reads globs from queryDirectoryRequest['Buffer']
+        # where somehow `fds.*` becomes `fds"*` so lets fix that
+        ret = os.path.join(*a)
+        return ret.replace('"', ".")  # type: ignore
 
     def _hook(self, *a: Any, **ka: Any) -> None:
         src = inspect.currentframe().f_back.f_code.co_name
