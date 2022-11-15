@@ -678,7 +678,7 @@ def run_argparse(
     ap2 = ap.add_argument_group('FTP options')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT, for example \033[32m3921")
     ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on PORT, for example \033[32m3990")
-    ap2.add_argument("--ftp-dbg", action="store_true", help="enable debug logging")
+    ap2.add_argument("--ftpv", action="store_true", help="verbose")
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
 
@@ -692,8 +692,10 @@ def run_argparse(
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
     ap2.add_argument("--smb-port", metavar="PORT", type=int, default=445, help="port to listen on -- if you change this value, you must NAT from TCP:445 to this port using iptables or similar")
-    ap2.add_argument("--smb-dbg", action="store_true", help="show debug messages")
     ap2.add_argument("--smb-nwa-1", action="store_true", help="disable impacket#1433 workaround (truncate directory listings to 64kB)")
+    ap2.add_argument("--smbv", action="store_true", help="verbose")
+    ap2.add_argument("--smbvv", action="store_true", help="verboser")
+    ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
 
     ap2 = ap.add_argument_group('opt-outs')
     ap2.add_argument("-nw", action="store_true", help="never write anything to disk (debug/benchmark)")

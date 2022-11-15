@@ -21,6 +21,10 @@ if TYPE_CHECKING:
     from .svchub import SvcHub
 
 
+lg = logging.getLogger("smb")
+debug, info, warning, error = (lg.debug, lg.info, lg.warning, lg.error)
+
+
 class SMB(object):
     def __init__(self, hub: "SvcHub") -> None:
         self.hub = hub
@@ -29,9 +33,10 @@ class SMB(object):
         self.log = hub.log
         self.files: dict[int, tuple[float, str]] = {}
 
+        lg.setLevel(logging.DEBUG if self.args.smbvvv else logging.INFO)
         for x in ["impacket", "impacket.smbserver"]:
             lgr = logging.getLogger(x)
-            lgr.setLevel(logging.DEBUG if self.args.smb_dbg else logging.INFO)
+            lgr.setLevel(logging.DEBUG if self.args.smbvv else logging.INFO)
 
         try:
             from impacket import smbserver
@@ -109,7 +114,7 @@ class SMB(object):
         # cf = inspect.currentframe().f_back
         # c1 = cf.f_back.f_code.co_name
         # c2 = cf.f_code.co_name
-        logging.debug('%s("%s", %s)\033[K\033[0m', caller, vpath, str(a))
+        debug('%s("%s", %s)\033[K\033[0m', caller, vpath, str(a))
 
         # TODO find a way to grab `identity` in smbComSessionSetupAndX and smb2SessionSetup
         vfs, rem = self.asrv.vfs.get(vpath, LEELOO_DALLAS, True, True)
@@ -118,7 +123,7 @@ class SMB(object):
     def _listdir(self, vpath: str, *a: Any, **ka: Any) -> list[str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
         # caller = inspect.currentframe().f_back.f_code.co_name
-        logging.debug('listdir("%s", %s)\033[K\033[0m', vpath, str(a))
+        debug('listdir("%s", %s)\033[K\033[0m', vpath, str(a))
         vfs, rem = self.asrv.vfs.get(vpath, LEELOO_DALLAS, False, False)
         _, vfs_ls, vfs_virt = vfs.ls(
             rem, LEELOO_DALLAS, not self.args.no_scandir, [[False, False]]
@@ -135,7 +140,7 @@ class SMB(object):
         for n, fn in enumerate(ls):
             if sz >= 64000:
                 t = "listing only %d of %d files (%d byte); see impacket#1433"
-                logging.warning(t, n, len(ls), sz)
+                warning(t, n, len(ls), sz)
                 break
 
             nsz = len(fn.encode("utf-16", "replace"))
@@ -168,7 +173,7 @@ class SMB(object):
                 oldest = min([x[0] for x in self.files.values()])
                 cutoff = oldest + (now - oldest) / 2
                 self.files = {k: v for k, v in self.files.items() if v[0] > cutoff}
-                logging.info("was tracking %d files, now %d", nf, len(self.files))
+                info("was tracking %d files, now %d", nf, len(self.files))
 
             vpath = vpath.replace("\\", "/").lstrip("/")
             self.files[ret] = (now, vpath)
@@ -269,7 +274,7 @@ class SMB(object):
 
     def _hook(self, *a: Any, **ka: Any) -> None:
         src = inspect.currentframe().f_back.f_code.co_name
-        logging.error("\033[31m%s:hook(%s)\033[0m", src, a)
+        error("\033[31m%s:hook(%s)\033[0m", src, a)
         raise Exception("nope")
 
     def _disarm(self) -> None:
@@ -303,5 +308,5 @@ class SMB(object):
 
 
 def yeet(msg: str) -> None:
-    logging.info(msg)
+    info(msg)
     raise Exception(msg)

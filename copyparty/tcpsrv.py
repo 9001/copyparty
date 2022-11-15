@@ -125,6 +125,9 @@ class TcpSrv(object):
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
         t = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
+            if ip.startswith("fe80"):
+                continue
+
             for port in sorted(self.args.p):
                 if (
                     port not in ok.get(ip, [])

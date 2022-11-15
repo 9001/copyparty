@@ -401,7 +401,7 @@ class Ftpd(object):
                 h2.masquerade_address = self.args.ftp_nat
 
         lgr = logging.getLogger("pyftpdlib")
-        lgr.setLevel(logging.DEBUG if self.args.ftp_dbg else logging.INFO)
+        lgr.setLevel(logging.DEBUG if self.args.ftpv else logging.INFO)
 
         ioloop = IOLoop()
         for ip in self.args.i:

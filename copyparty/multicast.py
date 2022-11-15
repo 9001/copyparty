@@ -185,7 +185,8 @@ class MCast(object):
         sck = srv.sck
         if srv.v6:
             if self.args.zmv:
-                self.log("v6({}) idx({}) {}".format(srv.ip, srv.idx, srv.ips), 6)
+                zsl = list(srv.ips.keys())
+                self.log("v6({}) idx({}) {}".format(srv.ip, srv.idx, zsl), 6)
 
             for ip in srv.ips:
                 bip = socket.inet_pton(socket.AF_INET6, ip)

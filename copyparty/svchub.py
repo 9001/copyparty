@@ -111,7 +111,7 @@ class SvcHub(object):
         lg = logging.getLogger()
         lh = HLog(self.log)
         lg.handlers = [lh]
-        lg.setLevel(logging.INFO)
+        lg.setLevel(logging.DEBUG)
 
         if args.stackmon:
             start_stackmon(args.stackmon, 0)
