@@ -3025,7 +3025,7 @@ class Up2k(object):
                 except:
                     pass
 
-        if self.args.nw:
+        if self.args.nw or self.args.no_snap:
             return
 
         path = os.path.join(histpath, "up2k.snap")
@@ -3157,8 +3157,9 @@ class Up2k(object):
         for x in list(self.spools):
             self._unspool(x)
 
-        self.log("writing snapshot")
-        self.do_snapshot()
+        if not self.args.no_snap:
+            self.log("writing snapshot")
+            self.do_snapshot()
 
 
 def up2k_chunksize(filesize: int) -> int:
