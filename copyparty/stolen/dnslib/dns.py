@@ -764,7 +764,7 @@ class NSEC(RD):
     label = property(get_label, set_label)
 
     def pack(self, buffer):
-        buffer.encode_name_nocompress(self.label)
+        buffer.encode_name(self.label)
         buffer.append(encode_type_bitmap(self.rrlist))
 
     def __repr__(self):

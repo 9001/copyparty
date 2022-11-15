@@ -19,6 +19,7 @@ from .stolen.dnslib import (
     QTYPE,
     A,
     AAAA,
+    NSEC,
     SRV,
     PTR,
     TXT,
@@ -41,11 +42,12 @@ class MDNS_Sck(MC_Sck):
         self,
         sck: socket.socket,
         idx: int,
+        name: str,
         grp: str,
         ip: str,
         net: Union[IPv4Network, IPv6Network],
     ):
-        super(MDNS_Sck, self).__init__(sck, idx, grp, ip, net)
+        super(MDNS_Sck, self).__init__(sck, idx, name, grp, ip, net)
 
         self.bp_probe = b""
         self.bp_ip = b""
@@ -143,6 +145,16 @@ class MDNS(MCast):
             sreply = DNSRecord(DNSHeader(0, 0x8400))
             bye = DNSRecord(DNSHeader(0, 0x8400))
 
+            have4 = have6 = False
+            for s2 in self.srv.values():
+                if srv.idx != s2.idx:
+                    continue
+
+                if s2.v6:
+                    have6 = True
+                else:
+                    have4 = True
+
             for ip in srv.ips:
                 if ":" in ip:
                     qt = QTYPE.AAAA
@@ -161,6 +173,12 @@ class MDNS(MCast):
                 areply.add_answer(r120)
                 sreply.add_answer(r120)
                 bye.add_answer(r0)
+
+            if not have4 or not have6:
+                ns = NSEC(self.hn, ["AAAA" if have4 else "A"])
+                r = RR(self.hn, QTYPE.NSEC, DC.F_IN, 120, ns)
+                areply.add_ar(r)
+                sreply.add_ar(r)
 
             for sclass, props in self.svcs.items():
                 sname = props["name"]
@@ -255,13 +273,13 @@ class MDNS(MCast):
             rx: list[socket.socket] = rdy[0]  # type: ignore
             self.rx4.cln()
             self.rx6.cln()
-            for srv in rx:
-                buf, addr = srv.recvfrom(4096)
+            for sck in rx:
+                buf, addr = sck.recvfrom(4096)
                 try:
-                    self.eat(buf, addr)
+                    self.eat(buf, addr, sck)
                 except:
-                    t = "{} \033[33m|{}| {}\n{}".format(
-                        addr, len(buf), repr(buf)[2:-1], min_ex()
+                    t = "{} {} \033[33m|{}| {}\n{}".format(
+                        self.srv[sck].name, addr, len(buf), repr(buf)[2:-1], min_ex()
                     )
                     self.log(t, 6)
 
@@ -279,9 +297,11 @@ class MDNS(MCast):
             for srv in self.srv.values():
                 srv.sck.sendto(srv.bp_bye, (srv.grp, 5353))
 
-    def eat(self, buf: bytes, addr: tuple[str, int]):
+        self.srv = {}
+
+    def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket):
         cip = addr[0]
-        if cip.startswith("fe80") or cip.startswith("169.254"):
+        if cip.startswith("169.254"):
             return
 
         v6 = ":" in cip
@@ -290,14 +310,15 @@ class MDNS(MCast):
             return
 
         cache.add(buf)
-        srv: Optional[MDNS_Sck] = self.map_client(cip)  # type: ignore
+        srv: Optional[MDNS_Sck] = self.srv[sck] if v6 else self.map_client(cip)  # type: ignore
         if not srv:
             return
 
         now = time.time()
 
         if self.args.zmv:
-            self.log("[{}] \033[36m{} \033[0m|{}|".format(srv.ip, cip, len(buf)), "90")
+            t = "{} [{}] \033[36m{} \033[0m|{}|"
+            self.log(t.format(srv.name, srv.ip, cip, len(buf)), "90")
 
         p = DNSRecord.parse(buf)
         if self.args.zmvv:
@@ -336,8 +357,8 @@ class MDNS(MCast):
             else:
                 t += "Emergency stop; hostname '{}' got stolen"
 
-            t += "! Use --name to set another hostname.\n\nName taken by {}\n\nYour IPs: {}\n"
-            self.log(t.format(self.args.name, cips, list(self.sips)), 1)
+            t += " on {}! Use --name to set another hostname.\n\nName taken by {}\n\nYour IPs: {}\n"
+            self.log(t.format(self.args.name, srv.name, cips, list(self.sips)), 1)
             self.stop(True)
             return
 
@@ -348,11 +369,17 @@ class MDNS(MCast):
 
             # gvfs keeps repeating itself
             found = False
+            unicast = False
             for r in p.rr:
                 rname = U(r.rname).lower()
-                if rname == self.hn and r.ttl > 60:
-                    found = True
-                    break
+                if rname == self.hn:
+                    if r.ttl > 60:
+                        found = True
+                    if r.rclass == DC.F_IN:
+                        unicast = True
+
+            if unicast:
+                srv.sck.sendto(srv.bp_ip, (cip, 5353))
 
             if not found:
                 self.q[cip] = (0, srv, srv.bp_ip)

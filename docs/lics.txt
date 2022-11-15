@@ -16,6 +16,10 @@ https://github.com/paulc/dnslib/
 C: 2010-2017 Paul Chakravarti
 L: BSD 2-Clause
 
+https://github.com/pydron/ifaddr/
+C: 2014 Stefan C. Mueller
+L: BSD-2-Clause
+
 https://github.com/giampaolo/pyftpdlib/
 C: 2007 Giampaolo Rodola
 L: MIT

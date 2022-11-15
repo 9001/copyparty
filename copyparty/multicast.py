@@ -26,12 +26,14 @@ class MC_Sck(object):
         self,
         sck: socket.socket,
         idx: int,
+        name: str,
         grp: str,
         ip: str,
         net: Union[IPv4Network, IPv6Network],
     ):
         self.sck = sck
         self.idx = idx
+        self.name = name
         self.grp = grp
         self.mreq = b""
         self.ip = ip
@@ -55,7 +57,7 @@ class MCast(object):
         self.port = port
 
         self.srv: dict[socket.socket, MC_Sck] = {}  # listening sockets
-        self.sips: set[str] = set()  # all listening ips
+        self.sips: set[str] = set()  # all listening ips (including failed attempts)
         self.b2srv: dict[bytes, MC_Sck] = {}  # binary-ip -> server socket
         self.b4: list[bytes] = []  # sorted list of binary-ips
         self.b6: list[bytes] = []  # sorted list of binary-ips
@@ -82,6 +84,7 @@ class MCast(object):
 
         ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
 
+        # ip -> ip/prefix
         ips = [
             [x for x in self.hub.tcpsrv.netdevs if x.startswith(y + "/")][0]
             for y in ips
@@ -92,6 +95,10 @@ class MCast(object):
 
         if not self.grp6:
             ips = [x for x in ips if ":" not in x]
+
+        # discard non-linklocal ipv6
+        all_selected = ips[:]
+        ips = [x for x in ips if ":" not in x or x.startswith("fe80")]
 
         if not ips:
             raise Exception("no server IP matches the mdns config")
@@ -117,16 +124,39 @@ class MCast(object):
             except:
                 pass
 
+            # most ipv6 clients expect multicast on linklocal ip only;
+            # add a/aaaa records for the other nic IPs
+            other_ips: set[str] = set()
+            if v6 and netdev not in ("?", ""):
+                for oip, onic in self.hub.tcpsrv.netdevs.items():
+                    if (
+                        onic.split(",")[0] == netdev
+                        and oip in all_selected
+                        and ":" in oip
+                    ):
+                        other_ips.add(oip)
+
             net = ipaddress.ip_network(ip, False)
             ip = ip.split("/")[0]
-            srv = self.Srv(sck, idx, self.grp6 if ":" in ip else self.grp4, ip, net)
+            srv = self.Srv(
+                sck, idx, netdev, self.grp6 if ":" in ip else self.grp4, ip, net
+            )
+            for oth_ip in other_ips:
+                srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
+
+            # gvfs breaks if a linklocal ip appears in a dns reply
+            srv.ips = {k: v for k, v in srv.ips.items() if not k.startswith("fe80")}
+            if not srv.ips:
+                self.log("no routable IPs on {}; skipping [{}]".format(netdev, ip), 3)
+                continue
 
             try:
                 self.setup_socket(srv)
                 self.srv[sck] = srv
                 bound.append(ip)
             except:
-                self.log("announce failed on [{}]:\n{}".format(ip, min_ex()))
+                t = "announce failed on {} [{}]:\n{}"
+                self.log(t.format(netdev, ip, min_ex()), 3)
 
         if self.args.zm_msub:
             for s1 in self.srv.values():
@@ -145,18 +175,22 @@ class MCast(object):
                             if net1 == net2 and ip1 != ip2:
                                 s1.ips[ip2] = net2
 
-        self.sips = set([x.ip for x in self.srv.values()])
+        self.sips = set([x.split("/")[0] for x in all_selected])
+        for srv in self.srv.values():
+            assert srv.ip in self.sips
+
         return bound
 
     def setup_socket(self, srv: MC_Sck) -> None:
         sck = srv.sck
         if srv.v6:
             if self.args.zmv:
-                self.log("v6({}) idx({})".format(srv.ip, srv.idx), 6)
+                self.log("v6({}) idx({}) {}".format(srv.ip, srv.idx, srv.ips), 6)
 
-            bip = socket.inet_pton(socket.AF_INET6, srv.ip)
-            self.b2srv[bip] = srv
-            self.b6.append(bip)
+            for ip in srv.ips:
+                bip = socket.inet_pton(socket.AF_INET6, ip)
+                self.b2srv[bip] = srv
+                self.b6.append(bip)
 
             sck.bind((self.grp6 if srv.idx else "", self.port, 0, srv.idx))
             bgrp = socket.inet_pton(socket.AF_INET6, self.grp6)

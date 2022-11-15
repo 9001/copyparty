@@ -397,7 +397,7 @@ class TcpSrv(object):
             for nip in nic.ips:
                 ipa = nip.ip[0] if ":" in str(nip.ip) else nip.ip
                 sip = "{}/{}".format(ipa, nip.network_prefix)
-                if sip.startswith("fe80") or sip.startswith("169.254"):
+                if sip.startswith("169.254"):
                     # browsers dont impl linklocal
                     continue
 
