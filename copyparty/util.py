@@ -960,7 +960,7 @@ def alltrace() -> str:
         else:
             rret += ret
 
-    return "\n".join(rret + bret)
+    return "\n".join(rret + bret) + "\n"
 
 
 def start_stackmon(arg_str: str, nid: int) -> None:

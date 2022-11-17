@@ -286,7 +286,10 @@ class MCast(object):
             # just give it something
             ret = list(self.srv.values())[0]
 
-        if not ret:
+        if ret:
+            t = "new client on {} ({}): {}"
+            self.log(t.format(ret.name, ret.net, cip), 6)
+        else:
             t = "could not map client {} to known subnet; maybe forwarded from another network?"
             self.log(t.format(cip), 3)
 

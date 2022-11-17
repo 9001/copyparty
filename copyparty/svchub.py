@@ -515,6 +515,7 @@ class SvcHub(object):
 
             if hasattr(self, "smbd"):
                 slp = max(slp, time.time() + 0.5)
+                Daemon(self.kill9, a=(1,))
                 Daemon(self.smbd.stop)
 
             while time.time() < slp:
