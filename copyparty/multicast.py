@@ -7,7 +7,7 @@ import time
 import ipaddress
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
-from .__init__ import TYPE_CHECKING
+from .__init__ import TYPE_CHECKING, MACOS
 from .util import min_ex, spack
 
 if TYPE_CHECKING:
@@ -72,7 +72,6 @@ class MCast(object):
     def create_servers(self) -> list[str]:
         bound: list[str] = []
         ips = [x[0] for x in self.hub.tcpsrv.bound]
-        ips = list(set(ips))
 
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
@@ -99,8 +98,10 @@ class MCast(object):
         if not self.grp6:
             ips = [x for x in ips if ":" not in x]
 
-        # discard non-linklocal ipv6
+        ips = list(set(ips))
         all_selected = ips[:]
+
+        # discard non-linklocal ipv6
         ips = [x for x in ips if ":" not in x or x.startswith("fe80")]
 
         if not ips:
@@ -196,19 +197,22 @@ class MCast(object):
                 self.b2srv[bip] = srv
                 self.b6.append(bip)
 
-            sck.bind((self.grp6 if srv.idx else "", self.port, 0, srv.idx))
+            grp = self.grp6 if srv.idx and not MACOS else ""
+            sck.bind((grp, self.port, 0, srv.idx))
+
             bgrp = socket.inet_pton(socket.AF_INET6, self.grp6)
             dev = spack(b"@I", srv.idx)
             srv.mreq = bgrp + dev
             if srv.idx != socket.INADDR_ANY:
                 sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_IF, dev)
 
-            self.hop(srv)
             try:
-                sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_LOOP, 1)
                 sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, 255)
+                sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_LOOP, 1)
             except:
-                pass  # macos
+                # macos
+                t = "failed to set IPv6 TTL/LOOP; announcements may not survive multiple switches/routers"
+                self.log(t, 3)
         else:
             if self.args.zmv:
                 self.log("v4({}) idx({})".format(srv.ip, srv.idx), 6)
@@ -217,7 +221,8 @@ class MCast(object):
             self.b2srv[bip] = srv
             self.b4.append(bip)
 
-            sck.bind((self.grp4 if srv.idx else "", self.port))
+            grp = self.grp4 if srv.idx and not MACOS else ""
+            sck.bind((grp, self.port))
             bgrp = socket.inet_aton(self.grp4)
             dev = (
                 spack(b"=I", socket.INADDR_ANY)
@@ -228,13 +233,15 @@ class MCast(object):
             if srv.idx != socket.INADDR_ANY:
                 sck.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, dev)
 
-            self.hop(srv)
             try:
-                sck.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
                 sck.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+                sck.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
             except:
-                pass
+                # probably can't happen but dontcare if it does
+                t = "failed to set IPv4 TTL/LOOP; announcements may not survive multiple switches/routers"
+                self.log(t, 3)
 
+        self.hop(srv)
         self.b4.sort(reverse=True)
         self.b6.sort(reverse=True)
 

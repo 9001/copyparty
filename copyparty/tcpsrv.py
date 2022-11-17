@@ -192,6 +192,10 @@ class TcpSrv(object):
     def _listen(self, ip: str, port: int) -> None:
         ipv = socket.AF_INET6 if ":" in ip else socket.AF_INET
         srv = socket.socket(ipv, socket.SOCK_STREAM)
+        try:
+            srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        except:
+            pass
         srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         srv.settimeout(None)  # < does not inherit, ^ does

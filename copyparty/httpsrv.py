@@ -165,6 +165,10 @@ class HttpSrv(object):
     def listen(self, sck: socket.socket, nlisteners: int) -> None:
         if self.args.j != 1:
             # lost in the pickle; redefine
+            try:
+                sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+            except:
+                pass
             sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             sck.settimeout(None)  # < does not inherit, ^ does

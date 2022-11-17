@@ -68,15 +68,20 @@ class MDNS(MCast):
         self.ttl = 300
         self.running = True
 
-        zs = self.args.name.lower() + ".local."
+        zs = self.args.name + ".local."
         zs = zs.encode("ascii", "replace").decode("ascii", "replace")
-        self.hn = zs.replace("?", "_")
+        self.hn = "-".join(x for x in zs.split("?") if x) or (
+            "vault-{}".format(random.randint(1, 255))
+        )
+        self.lhn = self.hn.lower()
 
         # requester ip -> (response deadline, srv, body):
         self.q: dict[str, tuple[float, MDNS_Sck, bytes]] = {}
         self.rx4 = CachedSet(0.42)  # 3 probes @ 250..500..750 => 500ms span
         self.rx6 = CachedSet(0.42)
         self.svcs, self.sfqdns = self.build_svcs()
+        self.lsvcs = {k.lower(): v for k, v in self.svcs.items()}
+        self.lsfqdns = set([x.lower() for x in self.sfqdns])
 
         self.probing = 0.0
         self.unsolicited: list[float] = []  # scheduled announces on all nics
@@ -211,8 +216,7 @@ class MDNS(MCast):
                 sreply.add_answer(r)
 
             if not (have4 and have6) and not self.args.zm_noneg:
-                have = "AAAA" if have6 else "A"
-                ns = NSEC(self.hn, [have, "PTR", "SRV", "TXT"])
+                ns = NSEC(self.hn, ["AAAA" if have6 else "A"])
                 r = RR(self.hn, QTYPE.NSEC, DC.F_IN, 120, ns)
                 areply.add_ar(r)
                 if len(sreply.pack()) < 1400:
@@ -294,7 +298,8 @@ class MDNS(MCast):
                 continue
 
             if self.probing < time.time():
-                self.log("probe ok; starting announcements", 2)
+                t = "probe ok; announcing [{}]"
+                self.log(t.format(self.hn[:-1]), 2)
                 self.probing = 0
 
     def stop(self, panic=False) -> None:
@@ -331,7 +336,7 @@ class MDNS(MCast):
             self.log(str(p))
 
         # check for incoming probes for our hostname
-        cips = [U(x.rdata) for x in p.auth if U(x.rname).lower() == self.hn]
+        cips = [U(x.rdata) for x in p.auth if U(x.rname).lower() == self.lhn]
         if cips and self.sips.isdisjoint(cips):
             if not [x for x in cips if x not in ("::1", "127.0.0.1")]:
                 # avahi broadcasting 127.0.0.1-only packets
@@ -350,7 +355,7 @@ class MDNS(MCast):
         cips = [
             U(x.rdata)
             for x in p.rr
-            if U(x.rname).lower() == self.hn and x.rclass == DC.F_IN
+            if U(x.rname).lower() == self.lhn and x.rclass == DC.F_IN
         ]
         if cips and self.sips.isdisjoint(cips):
             if not [x for x in cips if x not in ("::1", "127.0.0.1")]:
@@ -370,7 +375,7 @@ class MDNS(MCast):
 
         # then a/aaaa records
         for r in p.questions:
-            if U(r.qname).lower() != self.hn:
+            if U(r.qname).lower() != self.lhn:
                 continue
 
             # gvfs keeps repeating itself
@@ -378,7 +383,7 @@ class MDNS(MCast):
             unicast = False
             for r in p.rr:
                 rname = U(r.rname).lower()
-                if rname == self.hn:
+                if rname == self.lhn:
                     if r.ttl > 60:
                         found = True
                     if r.rclass == DC.F_IN:
@@ -396,7 +401,7 @@ class MDNS(MCast):
         # and service queries
         for r in p.questions:
             qname = U(r.qname).lower()
-            if qname in self.svcs or qname == "_services._dns-sd._udp.local.":
+            if qname in self.lsvcs or qname == "_services._dns-sd._udp.local.":
                 self.q[cip] = (deadline, srv, srv.bp_svc)
                 break
         # heed rfc-7.1 if there was an announce in the past 12sec
@@ -405,7 +410,7 @@ class MDNS(MCast):
         if now < srv.last_tx + 12:
             for r in p.rr:
                 rdata = U(r.rdata).lower()
-                if rdata in self.sfqdns:
+                if rdata in self.lsfqdns:
                     if r.ttl > 2250:
                         self.q.pop(cip, None)
                     break

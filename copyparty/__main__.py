@@ -213,7 +213,7 @@ def init_E(E: EnvParams) -> None:
 
 def get_srvname() -> str:
     try:
-        ret: str = unicode(socket.gethostname()).split(".")[0].lower()
+        ret: str = unicode(socket.gethostname()).split(".")[0]
     except:
         ret = ""
 
