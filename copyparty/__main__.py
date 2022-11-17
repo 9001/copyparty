@@ -663,7 +663,7 @@ def run_argparse(
 
     ap2 = ap.add_argument_group("Zeroconf options")
     ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
-    ap2.add_argument("--zm4", action="store_true", help="IPv4 only -- try this if some clients don't work")
+    ap2.add_argument("--zm4", action="store_true", help="IPv4 only -- try this if some clients can't connect")
     ap2.add_argument("--zm6", action="store_true", help="IPv6 only")
     ap2.add_argument("--zmv", action="store_true", help="verbose mdns")
     ap2.add_argument("--zmvv", action="store_true", help="verboser mdns")
@@ -674,6 +674,7 @@ def run_argparse(
     ap2.add_argument("--zm-ls", metavar="PATH", type=str, default="", help="link a specific folder for smb shares")
     ap2.add_argument("--zm-mnic", action="store_true", help="merge NICs which share subnets; assume that same subnet means same network")
     ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working")
+    ap2.add_argument("--zm-noneg", action="store_true", help="disable NSEC replies -- try this if some clients don't see copyparty")
     ap2.add_argument("--mc-hop", metavar="SEC", type=int, default=0, help="rejoin multicast groups every SEC seconds (workaround for some switches/routers which cause mDNS to suddenly stop working after some time); try [\033[32m300\033[0m] or [\033[32m180\033[0m]")
 
     ap2 = ap.add_argument_group('FTP options')

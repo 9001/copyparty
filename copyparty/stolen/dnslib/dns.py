@@ -105,7 +105,7 @@ class DNSRecord(object):
         self, header=None, questions=None, rr=None, q=None, a=None, auth=None, ar=None
     ) -> None:
         self.header = header or DNSHeader()
-        self.questions = questions or []
+        self.questions: list[DNSQuestion] = questions or []
         self.rr = rr or []
         self.auth = auth or []
         self.ar = ar or []

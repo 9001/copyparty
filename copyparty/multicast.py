@@ -41,6 +41,8 @@ class MC_Sck(object):
         self.net = net
         self.ips = {ip: net}
         self.v6 = ":" in ip
+        self.have4 = ":" not in ip
+        self.have6 = ":" in ip
 
 
 class MCast(object):

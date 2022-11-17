@@ -175,12 +175,6 @@ class MDNS(MCast):
                 sreply.add_answer(r120)
                 bye.add_answer(r0)
 
-            if not have4 or not have6:
-                ns = NSEC(self.hn, ["AAAA" if have4 else "A"])
-                r = RR(self.hn, QTYPE.NSEC, DC.F_IN, 120, ns)
-                areply.add_ar(r)
-                sreply.add_ar(r)
-
             for sclass, props in self.svcs.items():
                 sname = props["name"]
                 sport = props["port"]
@@ -215,6 +209,14 @@ class MDNS(MCast):
                 # gvfs really wants txt even if they're empty
                 r = RR(sfqdn, QTYPE.TXT, DC.F_IN, 4500, TXT(txts))
                 sreply.add_answer(r)
+
+            if not (have4 and have6) and not self.args.zm_noneg:
+                have = "AAAA" if have6 else "A"
+                ns = NSEC(self.hn, [have, "PTR", "SRV", "TXT"])
+                r = RR(self.hn, QTYPE.NSEC, DC.F_IN, 120, ns)
+                areply.add_ar(r)
+                if len(sreply.pack()) < 1400:
+                    sreply.add_ar(r)
 
             srv.bp_probe = probe.pack()
             srv.bp_ip = areply.pack()
