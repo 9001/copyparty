@@ -15,9 +15,10 @@ there's zero binaries! just plaintext python scripts all the way down
   so you can easily unpack the archive and inspect it for shady stuff
 
 the archive data is attached after the b"\n# eof\n" archive marker,
-  b"\n#n" decodes to b"\n"
-  b"\n#r" decodes to b"\r"
-  b"\n# " decodes to b""
+  b"?0" decodes to b"\x00"
+  b"?n" decodes to b"\n"
+  b"?r" decodes to b"\r"
+  b"??" decodes to b"?"
 """
 
 
@@ -187,12 +188,28 @@ def encode(data, size, cksum, ver, ts):
             unpk = unpk.replace("\t    ", "\t\t")
 
     with open("sfx.out", "wb") as f:
-        f.write(unpk.encode("utf-8").rstrip(b"\n") + b"\n\n\n# eof\n# ")
+        f.write(unpk.encode("utf-8").rstrip(b"\n") + b"\n\n\n# eof")
         for buf in data:
-            ebuf = buf.replace(b"\n", b"\n#n").replace(b"\r", b"\n#r")
-            f.write(ebuf)
+            ebuf = (
+                buf.replace(b"?", b"??")
+                .replace(b"\x00", b"?0")
+                .replace(b"\r", b"?r")
+                .replace(b"\n", b"?n")
+            )
             nin += len(buf)
             nout += len(ebuf)
+            while ebuf:
+                ep = 4090
+                while True:
+                    a = ebuf.rfind(b"?", 0, ep)
+                    if a < 0 or ep - a > 2:
+                        break
+                    ep = a
+                buf = ebuf[:ep]
+                ebuf = ebuf[ep:]
+                f.write(b"\n#" + buf)
+
+        f.write(b"\n\n")
 
     msg("wrote {:x}H bytes ({:x}H after encode)".format(nin, nout))
 
@@ -324,48 +341,27 @@ def unpack():
 def get_payload():
     """yields the binary data attached to script"""
     with open(me, "rb") as f:
-        ptn = b"\n# eof\n# "
-        buf = b""
-        for n in range(64):
-            buf += f.read(4096)
-            ofs = buf.find(ptn)
-            if ofs >= 0:
-                break
+        buf = f.read().rstrip(b"\r\n")
 
-        if ofs < 0:
-            raise Exception("could not find archive marker")
+    ptn = b"\n# eof\n#"
+    a = buf.find(ptn)
+    if a < 0:
+        raise Exception("could not find archive marker")
 
-        # start at final b"\n"
-        fpos = ofs + len(ptn) - 3
-        f.seek(fpos)
-        dpos = 0
-        rem = b""
-        while True:
-            rbuf = f.read(1024 * 32)
-            if rbuf:
-                buf = rem + rbuf
-                ofs = buf.rfind(b"\n")
-                if len(buf) <= 4:
-                    rem = buf
-                    continue
-
-                if ofs >= len(buf) - 4:
-                    rem = buf[ofs:]
-                    buf = buf[:ofs]
-                else:
-                    rem = b"\n# "
-            else:
-                buf = rem
-
-            fpos += len(buf) + 1
-            for a, b in [[b"\n# ", b""], [b"\n#r", b"\r"], [b"\n#n", b"\n"]]:
-                buf = buf.replace(a, b)
-
-            dpos += len(buf) - 1
-            yield buf
-
-            if not rbuf:
-                break
+    esc = {b"??": b"?", b"?r": b"\r", b"?n": b"\n", b"?0": b"\x00"}
+    buf = buf[a + len(ptn) :].replace(b"\n#", b"")
+    p = 0
+    while buf:
+        a = buf.find(b"?", p)
+        if a < 0:
+            yield buf[p:]
+            break
+        elif a == p:
+            yield esc[buf[p : p + 2]]
+            p += 2
+        else:
+            yield buf[p:a]
+            p = a
 
 
 def utime(top):
