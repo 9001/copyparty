@@ -37,6 +37,7 @@ var Ls = {
 				["ctrl-K", "delete selected"],
 				["ctrl-X", "cut selected"],
 				["ctrl-V", "paste into folder"],
+				["Y", "download selected"],
 				["F2", "rename selected"],
 
 				"file-list-sel",
@@ -121,6 +122,7 @@ var Ls = {
 		"wt_selall": "select all files$NHotkey: ctrl-A (when file focused)",
 		"wt_selinv": "invert selection",
 		"wt_selzip": "download selection as archive",
+		"wt_seldl": "download selection as separate files$NHotkey: Y",
 		"wt_npirc": "copy irc-formatted track info",
 		"wt_nptxt": "copy plaintext track info",
 		"wt_grid": "toggle grid / list view$NHotkey: G",
@@ -469,6 +471,7 @@ var Ls = {
 				["ctrl-K", "slett valgte"],
 				["ctrl-X", "klipp ut"],
 				["ctrl-V", "lim inn"],
+				["Y", "last ned valgte"],
 				["F2", "endre navn på valgte"],
 
 				"filmarkering",
@@ -553,6 +556,7 @@ var Ls = {
 		"wt_selall": "velg alle filer$NSnarvei: ctrl-A (mens fokus er på en fil)",
 		"wt_selinv": "inverter utvalg",
 		"wt_selzip": "last ned de valgte filene som et arkiv",
+		"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
 		"wt_npirc": "kopier sang-info (irc-formattert)",
 		"wt_nptxt": "kopier sang-info",
 		"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
@@ -903,7 +907,8 @@ ebi('widget').innerHTML = (
 	'</span><span id="wzip"><a' +
 	' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
-	' href="#" id="selzip" tt="' + L.wt_selzip + '">zip</a>' +
+	' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">zip</a><a' +
+	' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">dl</a>' +
 	'</span><span id="wnp"><a' +
 	' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
 	' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
@@ -4440,7 +4445,7 @@ document.onkeydown = function (e) {
 		return seek_au_rel(n) || true;
 
 	if (k == 'KeyY')
-		return dl_song();
+		return msel.getsel().length ? ebi('seldl').click() : dl_song();
 
 	n = k == 'KeyI' ? -1 : k == 'KeyK' ? 1 : 0;
 	if (n !== 0)
@@ -6301,6 +6306,12 @@ var msel = (function () {
 		obj.value = txt;
 		console.log(txt);
 		frm.submit();
+	};
+	ebi('seldl').onclick = function (e) {
+		ev(e);
+		var sel = r.getsel();
+		for (var a = 0; a < sel.length; a++)
+			dl_file(sel[a].vp);
 	};
 	r.render = function () {
 		var tds = QSA('#files tbody td+td+td'),

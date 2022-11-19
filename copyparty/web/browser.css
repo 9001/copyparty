@@ -1177,7 +1177,7 @@ html.y #widget.open {
 	font-size: .4em;
 	margin: -.3em .1em;
 }
-#wtoggle.sel #wzip #selzip {
+#wtoggle.sel .l1 {
 	top: -.6em;
 	padding: .4em .3em;
 }
