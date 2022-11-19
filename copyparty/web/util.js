@@ -54,10 +54,14 @@ var ebi = document.getElementById.bind(document),
     XHR = XMLHttpRequest;
 
 
-function mknod(et, eid) {
+function mknod(et, eid, html) {
     var ret = document.createElement(et);
+
     if (eid)
         ret.id = eid;
+
+    if (html)
+        ret.innerHTML = html;
 
     return ret;
 }

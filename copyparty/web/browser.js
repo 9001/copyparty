@@ -2806,6 +2806,7 @@ function eval_hash() {
 
 
 (function () {
+	// a11y jump-to-content
 	for (var a = 0; a < 2; a++)
 		(function (a) {
 			var d = mknod('a');
@@ -2822,8 +2823,16 @@ function eval_hash() {
 			};
 		})(a);
 
+	// account-info label
 	var d = mknod('div', 'acc_info');
 	document.body.insertBefore(d, ebi('ops'));
+
+	// folder nav
+	ebi('goh').parentElement.appendChild(mknod('span', null,
+		'<a href="#" id="gop">prev</a>/<a href="#" id="gou">up</a>/<a href="#" id="gon">next</a>'));
+	ebi('gop').onclick = function () { tree_neigh(-1); }
+	ebi('gon').onclick = function () { tree_neigh(1); }
+	ebi('gou').onclick = function () { tree_up(true); }
 })();
 
 
@@ -4274,7 +4283,7 @@ function tree_neigh(n) {
 }
 
 
-function tree_up() {
+function tree_up(justgo) {
 	if (showfile.active())
 		return thegrid.setvis(true);
 
@@ -4284,9 +4293,11 @@ function tree_up() {
 		treectl.entree(null, true);
 		return;
 	}
-	if (act.previousSibling.textContent == '-')
-		return act.previousSibling.click();
-
+	if (act.previousSibling.textContent == '-') {
+		act.previousSibling.click();
+		if (!justgo)
+			return;
+	}
 	act.parentNode.parentNode.parentNode.getElementsByTagName('a')[1].click();
 }
 

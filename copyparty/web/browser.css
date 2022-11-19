@@ -857,6 +857,12 @@ html.y #path a:hover {
 	color: var(--srv-3);
 	border-bottom: 1px solid var(--srv-3b);
 }
+#goh+span {
+	color: var(--bg-u5);
+	padding-left: .5em;
+	margin-left: .5em;
+	border-left: .2em solid var(--bg-u5);
+}
 #repl {
 	padding: .33em;
 }
