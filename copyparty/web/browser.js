@@ -649,7 +649,7 @@ var Ls = {
 
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
-		"mt_waves": "waveform seekbar:$Nvis volumindikator i avspillingsfeltet\">~s",
+		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
@@ -1724,6 +1724,8 @@ function glossy_grad(can, h, s, l) {
 var pbar = (function () {
 	var r = {},
 		bau = null,
+		lastmove = 0,
+		mousepos = 0,
 		gradh = -1,
 		grad;
 
@@ -1738,6 +1740,8 @@ var pbar = (function () {
 		r.pos.ctx.strokeStyle = 'rgba(24,56,0,0.4)';
 		r.drawbuf();
 		r.drawpos();
+		if (!r.pos.can.onmouseleave)
+			mleave();
 	};
 
 	r.loadwaves = function (url) {
@@ -1752,6 +1756,33 @@ var pbar = (function () {
 
 	r.unwave = function () {
 		r.wurl = r.wimg = null;
+	}
+
+	function mmove(e) {
+		var adur;
+		if (e.buttons || !mp || !mp.au || !isNum(adur = mp.au.duration))
+			return;
+
+		var rect = r.pos.can.getBoundingClientRect(),
+			x = e.clientX - rect.left,
+			mul = x * 1.0 / rect.width;
+
+		mousepos = adur * mul;
+		lastmove = Date.now();
+		r.drawpos();
+	}
+	function menter() {
+		r.pos.can.onmousemove = mmove;
+		r.pos.can.onmouseleave = mleave;
+	}
+	function mleave() {
+		r.pos.can.onmousemove = null;
+		r.pos.can.onmouseleave = null;
+		r.pos.can.onmouseenter = menter;
+		if (lastmove) {
+			lastmove = 0;
+			r.drawpos();
+		}
 	}
 
 	r.drawbuf = function () {
@@ -1819,6 +1850,7 @@ var pbar = (function () {
 		var bc = r.buf,
 			pc = r.pos,
 			pctx = pc.ctx,
+			w = 8,
 			apos, adur;
 
 		pctx.clearRect(0, 0, pc.w, pc.h);
@@ -1829,12 +1861,16 @@ var pbar = (function () {
 		if (bau != mp.au)
 			r.drawbuf();
 
+		if (Date.now() - lastmove < 400) {
+			apos = mousepos;
+			w = 0;
+		}
+
 		var sm = bc.w * 1.0 / adur,
-			w = 8,
 			x = sm * apos;
 
 		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
-		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, 8, pc.h);
+		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, w, pc.h);
 
 		pctx.lineWidth = 2.5;
 		pctx.fillStyle = '#fff';
