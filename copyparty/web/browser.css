@@ -1350,6 +1350,10 @@ input.eq_gain {
 	padding-right: .2em;
 	text-align: right;
 }
+#srch_form:not(.tags) #tsrch_tags,
+#srch_form:not(.tags) #tsrch_adv {
+	display: none;
+}
 #op_search input {
 	margin: 0;
 }

@@ -4529,20 +4529,16 @@ document.onkeydown = function (e) {
 		[
 			L.s_fn,
 			["name", "name", L.s_f1, "30"]
-		]
-	];
-	var oldcfg = [];
-
-	if (QS('#srch_form.tags')) {
-		sconf.push([
+		],
+		[
 			L.s_ta,
 			["tags", "tags", L.s_t1, "30"]
-		]);
-		sconf.push([
+		],
+		[
 			L.s_ad,
 			["adv", "adv", L.s_a1, "30"]
-		]);
-	}
+		]
+	];
 
 	var trs = [],
 		orig_url = null,
@@ -4550,7 +4546,7 @@ document.onkeydown = function (e) {
 		cap = 125;
 
 	for (var a = 0; a < sconf.length; a++) {
-		var html = ['<tr><td><br />' + sconf[a][0] + '</td>'];
+		var html = ['<tr id="tsrch_' + sconf[a][1][0] + '"><td><br />' + sconf[a][0] + '</td>'];
 		for (var b = 1; b < 3; b++) {
 			var hn = "srch_" + sconf[a][b][0],
 				csp = (sconf[a].length == 2) ? 2 : 1;
@@ -5457,6 +5453,7 @@ var treectl = (function () {
 			if (res.acct) {
 				acct = res.acct;
 				have_up2k_idx = res.idx;
+				have_tags_idx = res.itag;
 				lifetime = res.lifetime;
 				apply_perms(res.perms);
 				fileman.render();
@@ -5667,6 +5664,8 @@ function apply_perms(newperms) {
 		a.setAttribute('data-perm', 'write');
 		a.setAttribute('tt', L.ot_u2w);
 	}
+	clmod(ebi('srch_form'), 'tags', have_tags_idx);
+
 	a.style.display = '';
 	tt.att(QS('#ops'));
 

@@ -3086,6 +3086,7 @@ class HttpCli(object):
             "srvinf": srv_infot,
             "acct": self.uname,
             "idx": ("e2d" in vn.flags),
+            "itag": ("e2t" in vn.flags),
             "lifetime": vn.flags.get("lifetime") or 0,
             "perms": perms,
             "logues": logues,
