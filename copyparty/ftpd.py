@@ -15,7 +15,7 @@ from pyftpdlib.servers import FTPServer
 
 from .__init__ import PY2, TYPE_CHECKING, E
 from .bos import bos
-from .util import Daemon, Pebkac, exclude_dotfiles, fsenc
+from .util import Daemon, Pebkac, exclude_dotfiles, fsenc, ipnorm
 
 try:
     from pyftpdlib.ioloop import IOLoop
@@ -42,20 +42,40 @@ class FtpAuth(DummyAuthorizer):
     def validate_authentication(
         self, username: str, password: str, handler: Any
     ) -> None:
+        handler.username = "{}:{}".format(username, password)
+
+        ip = handler.addr[0]
+        if ip.startswith("::ffff:"):
+            ip = ip[7:]
+
+        ip = ipnorm(ip)
+        bans = self.hub.bans
+        if ip in bans:
+            rt = bans[ip] - time.time()
+            if rt < 0:
+                logging.info("client unbanned")
+                del bans[ip]
+            else:
+                raise AuthenticationFailed("banned")
+
         asrv = self.hub.asrv
         if username == "anonymous":
-            password = ""
+            uname = "*"
+        else:
+            creds = password or username
+            uname = asrv.iacct.get(creds, "") if creds else "*"
 
-        uname = "*"
-        if password:
-            uname = asrv.iacct.get(password, "")
+        if not uname or not (asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)):
+            g = self.hub.gpwd
+            if g.lim:
+                bonk, ip = g.bonk(ip, handler.username)
+                if bonk:
+                    logging.warning("client banned: invalid passwords")
+                    bans[ip] = bonk
+
+            raise AuthenticationFailed("Authentication failed.")
 
         handler.username = uname
-
-        if (password and not uname) or not (
-            asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)
-        ):
-            raise AuthenticationFailed("Authentication failed.")
 
     def get_home_dir(self, username: str) -> str:
         return "/"

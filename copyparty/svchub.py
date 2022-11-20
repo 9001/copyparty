@@ -35,6 +35,7 @@ from .up2k import Up2k
 from .util import (
     VERSIONS,
     Daemon,
+    Garda,
     HLog,
     HMaccas,
     alltrace,
@@ -84,6 +85,11 @@ class SvcHub(object):
         self.tstack = 0.0
 
         self.iphash = HMaccas(os.path.join(self.E.cfg, "iphash"), 8)
+
+        # for non-http clients (ftp)
+        self.bans: dict[str, int] = {}
+        self.gpwd = Garda(self.args.ban_pw)
+        self.g404 = Garda(self.args.ban_404)
 
         if args.sss or args.s >= 3:
             args.ss = True

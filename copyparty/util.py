@@ -412,8 +412,12 @@ class HLog(logging.Handler):
         if record.name == "pyftpdlib":
             m = self.ptn_ftp.match(msg)
             if m:
-                record.name = ip = m.group(1)
+                ip = m.group(1)
                 msg = msg[len(ip) + 1 :]
+                if ip.startswith("::ffff:"):
+                    record.name = ip[7:]
+                else:
+                    record.name = ip
         elif record.name.startswith("impacket"):
             if self.ptn_smb_ign.match(msg):
                 return
