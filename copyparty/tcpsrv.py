@@ -508,19 +508,20 @@ class TcpSrv(object):
     def _qr(self, t1: dict[str, list[int]], t2: dict[str, list[int]]) -> str:
         ip = None
         ips = list(t1) + list(t2)
-        if self.args.zm:
+        qri = self.args.qri
+        if self.args.zm and not qri:
             name = self.args.name + ".local"
             t1[name] = next(v for v in (t1 or t2).values())
             ips = [name] + ips
 
         for ip in ips:
-            if ip.startswith(self.args.qri):
+            if ip.startswith(qri) or qri == ".":
                 break
             ip = ""
 
         if not ip:
             # maybe /bin/ip is missing or smth
-            ip = self.args.qri
+            ip = qri
 
         if not ip:
             return ""

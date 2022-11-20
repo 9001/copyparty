@@ -621,7 +621,7 @@ def run_argparse(
     ap2.add_argument("--qr", action="store_true", help="show http:// QR-code on startup")
     ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
     ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m]")
-    ap2.add_argument("--qri", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX")
+    ap2.add_argument("--qri", metavar="PREFIX", type=u, default="", help="select IP which starts with PREFIX; [\033[32m.\033[0m] to force default IP when mDNS URL would have been used instead")
     ap2.add_argument("--qr-fg", metavar="COLOR", type=int, default=0 if tty else 16, help="foreground; try [\033[32m0\033[0m] if the qr-code is unreadable")
     ap2.add_argument("--qr-bg", metavar="COLOR", type=int, default=229, help="background (white=255)")
     ap2.add_argument("--qrp", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more, but 1 is usually fine)")

@@ -373,24 +373,66 @@ class MDNS(MCast):
             self.stop(True)
             return
 
+        # then rfc-6.7; dns pretending to be mdns (android...)
+        if p.header.id or addr[1] != 5353:
+            rsp: Optional[DNSRecord] = None
+            for r in p.questions:
+                try:
+                    lhn = U(r.qname).lower()
+                except:
+                    self.log("invalid question: {}".format(r))
+                    continue
+
+                if lhn != self.lhn:
+                    continue
+
+                if p.header.id and r.qtype in (QTYPE.A, QTYPE.AAAA):
+                    rsp = rsp or DNSRecord(DNSHeader(p.header.id, 0x8400))
+                    rsp.add_question(r)
+                    for ip in srv.ips:
+                        qt = r.qtype
+                        v6 = ":" in ip
+                        if v6 == (qt == QTYPE.AAAA):
+                            rd = AAAA(ip) if v6 else A(ip)
+                            rr = RR(self.hn, qt, DC.IN, 10, rd)
+                            rsp.add_answer(rr)
+            if rsp:
+                srv.sck.sendto(rsp.pack(), addr[:2])
+                # but don't return in case it's a differently broken client
+
         # then a/aaaa records
         for r in p.questions:
-            if U(r.qname).lower() != self.lhn:
+            try:
+                lhn = U(r.qname).lower()
+            except:
+                self.log("invalid question: {}".format(r))
+                continue
+
+            if lhn != self.lhn:
                 continue
 
             # gvfs keeps repeating itself
             found = False
             unicast = False
-            for r in p.rr:
-                rname = U(r.rname).lower()
+            for rr in p.rr:
+                try:
+                    rname = U(rr.rname).lower()
+                except:
+                    self.log("invalid rr: {}".format(rr))
+                    continue
+
                 if rname == self.lhn:
-                    if r.ttl > 60:
+                    if rr.ttl > 60:
                         found = True
-                    if r.rclass == DC.F_IN:
+                    if rr.rclass == DC.F_IN:
                         unicast = True
 
             if unicast:
+                # spec-compliant mDNS-over-unicast
                 srv.sck.sendto(srv.bp_ip, (cip, 5353))
+            elif addr[1] != 5353:
+                # just in case some clients use (and want us to use) invalid ports
+                srv.sck.sendto(srv.bp_ip, addr[:2])
 
             if not found:
                 self.q[cip] = (0, srv, srv.bp_ip)
@@ -400,6 +442,9 @@ class MDNS(MCast):
 
         # and service queries
         for r in p.questions:
+            if not r or not r.qname:
+                continue
+
             qname = U(r.qname).lower()
             if qname in self.lsvcs or qname == "_services._dns-sd._udp.local.":
                 self.q[cip] = (deadline, srv, srv.bp_svc)
@@ -408,10 +453,13 @@ class MDNS(MCast):
         # (workaround gvfs race-condition where it occasionally
         #  doesn't read/decode the full response...)
         if now < srv.last_tx + 12:
-            for r in p.rr:
-                rdata = U(r.rdata).lower()
+            for rr in p.rr:
+                if not rr.rdata:
+                    continue
+
+                rdata = U(rr.rdata).lower()
                 if rdata in self.lsfqdns:
-                    if r.ttl > 2250:
+                    if rr.ttl > 2250:
                         self.q.pop(cip, None)
                     break
 

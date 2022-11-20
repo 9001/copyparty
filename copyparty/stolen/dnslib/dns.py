@@ -106,9 +106,9 @@ class DNSRecord(object):
     ) -> None:
         self.header = header or DNSHeader()
         self.questions: list[DNSQuestion] = questions or []
-        self.rr = rr or []
-        self.auth = auth or []
-        self.ar = ar or []
+        self.rr: list[RR] = rr or []
+        self.auth: list[RR] = auth or []
+        self.ar: list[RR] = ar or []
 
         if q:
             self.questions.append(q)
