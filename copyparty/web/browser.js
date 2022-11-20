@@ -4289,7 +4289,10 @@ function tree_up(justgo) {
 
 	var act = QS('#treeul a.hl');
 	if (!act) {
-		treectl.dir_cb = tree_up;
+		treectl.dir_cb = function () {
+			tree_up(justgo);
+			treectl.detree();
+		};
 		treectl.entree(null, true);
 		return;
 	}
