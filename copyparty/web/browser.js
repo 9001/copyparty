@@ -176,7 +176,10 @@ var Ls = {
 		"cl_bigdir": "big dirs",
 		"cl_keytype": "key notation",
 		"cl_hiddenc": "hidden columns",
-		"cl_reset": "(reset)",
+		"cl_hidec": "hide",
+		"cl_reset": "reset",
+		"cl_hpick": "click one column header to hide in the table below",
+		"cl_hcancel": "column hiding aborted",
 
 		"ct_thumb": "in icon view, toggle icons or thumbnails$NHotkey: T",
 		"ct_dots": "show hidden files (if server permits)",
@@ -610,7 +613,10 @@ var Ls = {
 		"cl_bigdir": "store mapper",
 		"cl_keytype": "notasjon for musikalsk dur",
 		"cl_hiddenc": "skjulte kolonner",
-		"cl_reset": "(nullstill)",
+		"cl_hidec": "skjul",
+		"cl_reset": "nullstill",
+		"cl_hpick": "klikk overskriften til kolonnen du ønsker å skjule i tabellen nedenfor",
+		"cl_hcancel": "kolonne-skjuling avbrutt",
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
@@ -1078,7 +1084,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div id="key_notation"></div></div>\n' +
-	'<div><h3>' + L.cl_hiddenc + ' <a href="#" id="hcolsr">' + L.cl_reset + '</h3><div id="hcols"></div></div>'
+	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
 
@@ -3943,6 +3949,9 @@ var thegrid = (function () {
 		if (treectl)
 			treectl.textmode(false);
 
+		if (filecols)
+			filecols.uivis();
+
 		aligngriditems();
 	};
 
@@ -5787,16 +5796,19 @@ function mk_files_header(taglist) {
 
 
 var filecols = (function () {
+	var r = { 'picking': false };
 	var hidden = jread('filecols', []);
 
-	var add_btns = function () {
+	r.add_btns = function () {
 		var ths = QSA('#files>thead th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var th = ths[a].parentElement,
 				ttv = L.cols[ths[a].textContent];
 
-			th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + ths[a].outerHTML;
-			th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
+			if (!MOBILE) {
+				th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + ths[a].outerHTML;
+				th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
+			}
 			if (ttv) {
 				th.setAttribute("tt", ttv);
 				th.setAttribute("ttd", "u");
@@ -5811,10 +5823,15 @@ var filecols = (function () {
 		if (t.tagName != 'A')
 			return;
 
-		toggle(t.textContent);
+		r.toggle(t.textContent);
 	}
 
-	var set_style = function (unhide) {
+	r.uivis = function () {
+		var hcols = ebi('hcols');
+		hcols.previousSibling.style.display = hcols.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
+	};
+
+	r.set_style = function (unhide) {
 		hidden.sort();
 
 		if (!unhide)
@@ -5829,11 +5846,10 @@ var filecols = (function () {
 
 			html.push('<a href="#" class="btn"' + tta + esc(hidden[a]) + '</a>');
 		}
-		hcols.previousSibling.style.display = html.length ? 'block' : 'none';
 		hcols.innerHTML = html.join('\n');
 		hcols.onclick = hcols_click;
-
-		add_btns();
+		r.uivis();
+		r.add_btns();
 
 		var ohidden = [],
 			ths = QSA('#files>thead th'),
@@ -5866,30 +5882,63 @@ var filecols = (function () {
 		}
 	};
 
-	var toggle = function (name) {
+	r.setvis = function (name, vis) {
 		var ofs = hidden.indexOf(name);
-		if (ofs !== -1)
+		if (ofs !== -1 && vis != 0)
 			hidden.splice(ofs, 1);
-		else {
+		else if (vis != 1) {
 			if (!sread("chide_ok")) {
 				return modal.confirm(L.f_chide.format(name), function () {
 					swrite("chide_ok", 1);
-					toggle(name);
+					r.toggle(name);
 				}, null);
 			}
 			hidden.push(name);
 		}
-
 		jwrite("filecols", hidden);
-		set_style();
+		r.set_style();
 	};
+	r.show = function (name) { r.setvis(name, 1); };
+	r.hide = function (name) { r.setvis(name, 0); };
+	r.toggle = function (name) { r.setvis(name, -1); };
 
 	ebi('hcolsr').onclick = function (e) {
 		ev(e);
-		reset(true);
+		r.reset(true);
 	};
 
-	function reset(force) {
+	if (MOBILE)
+		ebi('hcolsh').onclick = function (e) {
+			ev(e);
+			if (r.picking)
+				return r.unpick(false);
+
+			var lbs = QSA('#files>thead th>span');
+			for (var a = 0; a < lbs.length; a++) {
+				lbs[a].onclick = function (e) {
+					ev(e);
+					if (toast.tag == 'pickhide')
+						toast.hide();
+
+					r.hide(e.target.textContent);
+					r.unpick(true);
+				};
+			};
+			r.picking = true;
+			toast.inf(0, L.cl_hpick, 'pickhide');
+		};
+
+	r.unpick = function (picked) {
+		r.picking = false;
+		if (!picked)
+			toast.inf(5, L.cl_hcancel);
+
+		var lbs = QSA('#files>thead th>span');
+		for (var a = 0; a < lbs.length; a++)
+			lbs[a].onclick = null;
+	};
+
+	r.reset = function (force) {
 		if (force || JSON.stringify(def_hcols) != sread('hfilecols')) {
 			console.log("applying default hidden-cols");
 			hidden = [];
@@ -5905,9 +5954,9 @@ var filecols = (function () {
 			}
 			jwrite("filecols", hidden);
 		}
-		set_style();
+		r.set_style();
 	}
-	reset();
+	r.reset();
 
 	try {
 		var ci = find_file_col('dur'),
@@ -5922,12 +5971,7 @@ var filecols = (function () {
 	}
 	catch (ex) { }
 
-	return {
-		"add_btns": add_btns,
-		"set_style": set_style,
-		"toggle": toggle,
-		"reset": reset
-	};
+	return r;
 })();
 
 
