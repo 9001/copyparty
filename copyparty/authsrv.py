@@ -1120,7 +1120,11 @@ class AuthSrv(object):
                 if getattr(self.args, k):
                     vol.flags[k] = True
 
-            for ga, vf in [["no_forget", "noforget"], ["magic", "magic"]]:
+            for ga, vf in (
+                ("no_forget", "noforget"),
+                ("no_dupe", "nodupe"),
+                ("magic", "magic"),
+            ):
                 if getattr(self.args, ga):
                     vol.flags[vf] = True
 
