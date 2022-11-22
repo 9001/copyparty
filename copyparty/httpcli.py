@@ -17,6 +17,7 @@ import threading  # typechk
 import time
 import uuid
 from datetime import datetime
+from email.utils import formatdate, parsedate
 from operator import itemgetter
 
 import jinja2  # typechk
@@ -33,7 +34,6 @@ from .star import StreamTar
 from .sutil import StreamArc  # typechk
 from .szip import StreamZip
 from .util import (
-    HTTP_TS_FMT,
     HTTPCODE,
     META_NOBOTS,
     MultipartParser,
@@ -54,7 +54,6 @@ from .util import (
     hashcopy,
     html_bescape,
     html_escape,
-    http_ts,
     humansize,
     ipnorm,
     min_ex,
@@ -515,7 +514,7 @@ class HttpCli(object):
 
         # close if unknown length, otherwise take client's preference
         response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
-        response.append("Date: " + datetime.utcnow().strftime(HTTP_TS_FMT))
+        response.append("Date: " + formatdate(usegmt=True))
 
         # headers{} overrides anything set previously
         if headers:
@@ -831,9 +830,7 @@ class HttpCli(object):
 
             pvs: dict[str, str] = {
                 "displayname": html_escape(vp.split("/")[-1]),
-                "getlastmodified": datetime.utcfromtimestamp(st.st_mtime).strftime(
-                    HTTP_TS_FMT
-                ),
+                "getlastmodified": formatdate(st.st_mtime, usegmt=True),
                 "resourcetype": '<D:collection xmlns:D="DAV:"/>' if isdir else "",
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
@@ -2195,13 +2192,14 @@ class HttpCli(object):
         return True
 
     def _chk_lastmod(self, file_ts: int) -> tuple[str, bool]:
-        file_lastmod = http_ts(file_ts)
+        file_lastmod = formatdate(file_ts, usegmt=True)
         cli_lastmod = self.headers.get("if-modified-since")
         if cli_lastmod:
             try:
                 # some browser append "; length=573"
                 cli_lastmod = cli_lastmod.split(";")[0].strip()
-                cli_dt = time.strptime(cli_lastmod, HTTP_TS_FMT)
+                cli_dt = parsedate(cli_lastmod)
+                assert cli_dt
                 cli_ts = calendar.timegm(cli_dt)
                 return file_lastmod, int(file_ts) > int(cli_ts)
             except Exception as ex:
@@ -2479,8 +2477,7 @@ class HttpCli(object):
         chrome = " rv:" not in self.ua
         mime, ico = self.ico.get(ext, not exact, chrome)
 
-        dt = datetime.utcfromtimestamp(self.E.t0)
-        lm = dt.strftime(HTTP_TS_FMT)
+        lm = formatdate(self.E.t0, usegmt=True)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 

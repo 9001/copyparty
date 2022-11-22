@@ -24,6 +24,7 @@ import time
 import traceback
 from collections import Counter
 from datetime import datetime
+from email.utils import formatdate
 
 from ipaddress import IPv6Address
 from queue import Queue
@@ -136,8 +137,6 @@ else:
 
 
 SYMTIME = sys.version_info > (3, 6) and os.utime in os.supports_follow_symlinks
-
-HTTP_TS_FMT = "%a, %d %b %Y %H:%M:%S GMT"
 
 META_NOBOTS = '<meta name="robots" content="noindex, nofollow">'
 
@@ -1476,8 +1475,7 @@ def gen_filekey_dbg(
 def gencookie(k: str, v: str, dur: Optional[int]) -> str:
     v = v.replace(";", "")
     if dur:
-        dt = datetime.utcfromtimestamp(time.time() + dur)
-        exp = dt.strftime(HTTP_TS_FMT)
+        exp = formatdate(time.time() + dur, usegmt=True)
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
@@ -1635,11 +1633,6 @@ def ipnorm(ip: str) -> str:
         return IPv6Address(ip).exploded[:-20]
 
     return ip
-
-
-def http_ts(ts: int) -> str:
-    file_dt = datetime.utcfromtimestamp(ts)
-    return file_dt.strftime(HTTP_TS_FMT)
 
 
 def html_escape(s: str, quot: bool = False, crlf: bool = False) -> str:
