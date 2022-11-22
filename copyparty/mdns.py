@@ -62,11 +62,10 @@ class MDNS(MCast):
     def __init__(self, hub: "SvcHub") -> None:
         grp4 = "" if hub.args.zm6 else MDNS4
         grp6 = "" if hub.args.zm4 else MDNS6
-        super(MDNS, self).__init__(hub, MDNS_Sck, grp4, grp6, 5353)
+        super(MDNS, self).__init__(hub, MDNS_Sck, grp4, grp6, 5353, hub.args.zmv)
         self.srv: dict[socket.socket, MDNS_Sck] = {}
 
         self.ttl = 300
-        self.running = True
 
         zs = self.args.name + ".local."
         zs = zs.encode("ascii", "replace").decode("ascii", "replace")
@@ -310,12 +309,12 @@ class MDNS(MCast):
 
         self.srv = {}
 
-    def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket):
+    def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket) -> None:
         cip = addr[0]
-        if cip.startswith("169.254"):
+        v6 = ":" in cip
+        if cip.startswith("169.254") or v6 and not cip.startswith("fe80"):
             return
 
-        v6 = ":" in cip
         cache = self.rx6 if v6 else self.rx4
         if buf in cache.c:
             return
@@ -327,7 +326,7 @@ class MDNS(MCast):
 
         now = time.time()
 
-        if self.args.zmv:
+        if self.args.zmv and cip != srv.ip and cip not in srv.ips:
             t = "{} [{}] \033[36m{} \033[0m|{}|"
             self.log(t.format(srv.name, srv.ip, cip, len(buf)), "90")
 

@@ -643,6 +643,9 @@ class HttpCli(object):
             if self.vpath.startswith(".cpr/ico/"):
                 return self.tx_ico(self.vpath.split("/")[-1], exact=True)
 
+            if self.vpath.startswith(".cpr/ssdp"):
+                return self.conn.hsrv.ssdp.reply(self)
+
             static_path = os.path.join(self.E.mod, "web/", self.vpath[5:])
             return self.tx_file(static_path)
 
@@ -2626,14 +2629,14 @@ class HttpCli(object):
         return True
 
     def set_k304(self) -> bool:
-        ck = gencookie("k304", self.uparam["k304"], 60 * 60 * 24 * 365)
+        ck = gencookie("k304", self.uparam["k304"], 60 * 60 * 24 * 299)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.redirect("", "?h#cc")
         return True
 
     def set_am_js(self) -> bool:
         v = "n" if self.uparam["am_js"] == "n" else "y"
-        ck = gencookie("js", v, 60 * 60 * 24 * 365)
+        ck = gencookie("js", v, 60 * 60 * 24 * 299)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.reply(b"promoted\n")
         return True

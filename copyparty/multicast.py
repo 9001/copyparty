@@ -7,7 +7,7 @@ import time
 import ipaddress
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
-from .__init__ import TYPE_CHECKING, MACOS
+from .__init__ import MACOS, TYPE_CHECKING
 from .util import min_ex, spack
 
 if TYPE_CHECKING:
@@ -47,7 +47,13 @@ class MC_Sck(object):
 
 class MCast(object):
     def __init__(
-        self, hub: "SvcHub", Srv: type[MC_Sck], mc_grp_4: str, mc_grp_6: str, port: int
+        self,
+        hub: "SvcHub",
+        Srv: type[MC_Sck],
+        mc_grp_4: str,
+        mc_grp_6: str,
+        port: int,
+        vinit: bool,
     ) -> None:
         """disable ipv%d by setting mc_grp_%d empty"""
         self.hub = hub
@@ -58,6 +64,7 @@ class MCast(object):
         self.grp4 = mc_grp_4
         self.grp6 = mc_grp_6
         self.port = port
+        self.vinit = vinit
 
         self.srv: dict[socket.socket, MC_Sck] = {}  # listening sockets
         self.sips: set[str] = set()  # all listening ips (including failed attempts)
@@ -65,6 +72,8 @@ class MCast(object):
         self.b4: list[bytes] = []  # sorted list of binary-ips
         self.b6: list[bytes] = []  # sorted list of binary-ips
         self.cscache: dict[str, Optional[MC_Sck]] = {}  # client ip -> server cache
+
+        self.running = True
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("multicast", msg, c)
@@ -188,7 +197,7 @@ class MCast(object):
     def setup_socket(self, srv: MC_Sck) -> None:
         sck = srv.sck
         if srv.v6:
-            if self.args.zmv:
+            if self.vinit:
                 zsl = list(srv.ips.keys())
                 self.log("v6({}) idx({}) {}".format(srv.ip, srv.idx, zsl), 6)
 
@@ -214,7 +223,7 @@ class MCast(object):
                 t = "failed to set IPv6 TTL/LOOP; announcements may not survive multiple switches/routers"
                 self.log(t, 3)
         else:
-            if self.args.zmv:
+            if self.vinit:
                 self.log("v4({}) idx({})".format(srv.ip, srv.idx), 6)
 
             bip = socket.inet_aton(srv.ip)

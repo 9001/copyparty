@@ -1,9 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-# from inspect import currentframe
-# print(currentframe().f_lineno)
-
 import argparse
 import base64
 import calendar
@@ -19,6 +16,10 @@ import sys
 import threading
 import time
 from datetime import datetime, timedelta
+
+# from inspect import currentframe
+# print(currentframe().f_lineno)
+
 
 if True:  # pylint: disable=using-constant-test
     from types import FrameType
@@ -49,6 +50,7 @@ from .util import (
 if TYPE_CHECKING:
     try:
         from .mdns import MDNS
+        from .ssdp import SSDPd
     except:
         pass
 
@@ -235,6 +237,7 @@ class SvcHub(object):
             args.zms = zms
 
         self.mdns: Optional["MDNS"] = None
+        self.ssdp: Optional["SSDPd"] = None
 
         # decide which worker impl to use
         if self.check_mp_enable():
@@ -395,6 +398,15 @@ class SvcHub(object):
             except:
                 self.log("root", "mdns startup failed;\n" + min_ex(), 3)
 
+        if getattr(self.args, "zs", False):
+            try:
+                from .ssdp import SSDPd
+
+                self.ssdp = SSDPd(self)
+                Daemon(self.ssdp.run, "ssdp")
+            except:
+                self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
+
         Daemon(self.thr_httpsrv_up, "sig-hsrv-up2")
 
         sigs = [signal.SIGINT, signal.SIGTERM]
@@ -501,8 +513,13 @@ class SvcHub(object):
         try:
             self.pr("OPYTHAT")
             slp = 0.0
+
             if self.mdns:
                 Daemon(self.mdns.stop)
+                slp = time.time() + 0.5
+
+            if self.ssdp:
+                Daemon(self.ssdp.stop)
                 slp = time.time() + 0.5
 
             self.tcpsrv.shutdown()

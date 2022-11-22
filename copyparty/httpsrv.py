@@ -47,6 +47,7 @@ from .util import (
 
 if TYPE_CHECKING:
     from .broker_util import BrokerCli
+    from .ssdp import SSDPr
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
@@ -71,11 +72,14 @@ class HttpSrv(object):
 
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
+        self.ssdp: Optional["SSDPr"] = None
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
         self.bans: dict[str, int] = {}
         self.aclose: dict[str, int] = {}
 
+        self.ip = ""
+        self.port = 0
         self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()
         self.stopping = False
@@ -104,6 +108,11 @@ class HttpSrv(object):
         }
         zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
         self.prism = os.path.exists(zs)
+
+        if self.args.zs:
+            from .ssdp import SSDPr
+
+            self.ssdp = SSDPr(broker)
 
         cert_path = os.path.join(self.E.cfg, "cert.pem")
         if bos.path.exists(cert_path):
@@ -173,12 +182,12 @@ class HttpSrv(object):
             sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             sck.settimeout(None)  # < does not inherit, ^ does
 
-        ip, port = sck.getsockname()[:2]
+        self.ip, self.port = sck.getsockname()[:2]
         self.srvs.append(sck)
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
         Daemon(
             self.thr_listen,
-            "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),
+            "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", self.ip, self.port),
             (sck,),
         )
 

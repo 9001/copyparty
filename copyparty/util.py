@@ -181,9 +181,14 @@ IMPLICATIONS = [
     ["smbvvv", "smbvv"],
     ["smbvv", "smbv"],
     ["smbv", "smb"],
+    ["zv", "zmv"],
+    ["zv", "zsv"],
+    ["z", "zm"],
+    ["z", "zs"],
     ["zmvv", "zmv"],
     ["zmv", "zm"],
     ["zms", "zm"],
+    ["zsv", "zs"],
 ]
 
 

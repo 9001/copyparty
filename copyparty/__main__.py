@@ -20,6 +20,7 @@ import sys
 import threading
 import time
 import traceback
+import uuid
 from textwrap import dedent
 
 from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
@@ -663,6 +664,11 @@ def run_argparse(
     ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets for later decryption in wireshark")
 
     ap2 = ap.add_argument_group("Zeroconf options")
+    ap2.add_argument("-z", action="store_true", help="enable all zeroconf backends (mdns, ssdp)")
+    ap2.add_argument("-zv", action="store_true", help="verbose all zeroconf backends")
+    ap2.add_argument("--mc-hop", metavar="SEC", type=int, default=0, help="rejoin multicast groups every SEC seconds (workaround for some switches/routers which cause mDNS to suddenly stop working after some time); try [\033[32m300\033[0m] or [\033[32m180\033[0m]")
+
+    ap2 = ap.add_argument_group("Zeroconf-mDNS options:")
     ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
     ap2.add_argument("--zm4", action="store_true", help="IPv4 only -- try this if some clients can't connect")
     ap2.add_argument("--zm6", action="store_true", help="IPv6 only")
@@ -676,7 +682,14 @@ def run_argparse(
     ap2.add_argument("--zm-mnic", action="store_true", help="merge NICs which share subnets; assume that same subnet means same network")
     ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working")
     ap2.add_argument("--zm-noneg", action="store_true", help="disable NSEC replies -- try this if some clients don't see copyparty")
-    ap2.add_argument("--mc-hop", metavar="SEC", type=int, default=0, help="rejoin multicast groups every SEC seconds (workaround for some switches/routers which cause mDNS to suddenly stop working after some time); try [\033[32m300\033[0m] or [\033[32m180\033[0m]")
+
+    ap2 = ap.add_argument_group("Zeroconf-SSDP options:")
+    ap2.add_argument("--zs", action="store_true", help="announce the enabled protocols over SSDP -- compatible with Windows")
+    # ap2.add_argument("--zs4", action="store_true", help="IPv4 only")
+    # ap2.add_argument("--zs6", action="store_true", help="IPv6 only")
+    ap2.add_argument("--zsv", action="store_true", help="verbose SSDP")
+    ap2.add_argument("--zsl", metavar="PATH", type=u, default="", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] or [\033[32mpriv/?pw=hunter2\033[0m]")
+    ap2.add_argument("--zsid", metavar="UUID", type=u, default=uuid.uuid4().urn[4:], help="USN (device identifier) to announce")
 
     ap2 = ap.add_argument_group('FTP options')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT, for example \033[32m3921")
