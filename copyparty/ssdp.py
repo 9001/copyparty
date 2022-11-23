@@ -19,8 +19,13 @@ if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
 
 
-SSDP4 = "239.255.255.250"
-SSDP6 = "ff02::c"
+GRP = "239.255.255.250"
+
+
+class SSDP_Sck(MC_Sck):
+    def __init__(self, *a):
+        super(SSDP_Sck, self).__init__(*a)
+        self.hport = 0
 
 
 class SSDPr(object):
@@ -73,7 +78,8 @@ class SSDPr(object):
         ubase = "{}://{}:{}".format(proto, sip, sport)
         zsl = self.args.zsl
         url = zsl if "://" in zsl else ubase + "/" + zsl.lstrip("/")
-        zs = zs.strip().format(ubase, url, self.args.name, self.args.zsid)
+        name = "{} @ {}".format(self.args.doctitle, self.args.name)
+        zs = zs.strip().format(ubase, url, name, self.args.zsid)
         hc.reply(zs.encode("utf-8", "replace"))
         return False  # close connectino
 
@@ -82,16 +88,10 @@ class SSDPd(MCast):
     """communicates with ssdp clients over multicast"""
 
     def __init__(self, hub: "SvcHub") -> None:
-        # grp4 = "" if hub.args.zs6 else SSDP4
-        # grp6 = "" if hub.args.zs4 else SSDP6
-        # no way to find routable IPv6 between us and them
-        grp4 = SSDP4
-        grp6 = ""
         vinit = hub.args.zsv and not hub.args.zmv
-        super(SSDPd, self).__init__(hub, MC_Sck, grp4, grp6, 1900, vinit)
-        self.srv: dict[socket.socket, MC_Sck] = {}
-        self.rx4 = CachedSet(0.7)
-        self.rx6 = CachedSet(0.7)
+        super(SSDPd, self).__init__(hub, SSDP_Sck, GRP, "", 1900, vinit)
+        self.srv: dict[socket.socket, SSDP_Sck] = {}
+        self.rxc = CachedSet(0.7)
         self.txc = CachedSet(5)  # win10: every 3 sec
         self.ptn_st = re.compile(b"\nst: *upnp:rootdevice", re.I)
 
@@ -104,12 +104,21 @@ class SSDPd(MCast):
             self.log("failed to announce copyparty services on the network", 3)
             return
 
+        # find http port for this listening ip
+        for srv in self.srv.values():
+            tcps = self.hub.tcpsrv.bound
+            hp = next((x[1] for x in tcps if x[0] in ("0.0.0.0", srv.ip)), 0)
+            hp = hp or next((x[1] for x in tcps if x[0] == "::"), 0)
+            if not hp:
+                hp = tcps[0][1]
+                self.log("assuming port {} for {}".format(hp, srv.ip), 3)
+            srv.hport = hp
+
         self.log("listening")
         while self.running:
             rdy = select.select(self.srv, [], [], 180)
             rx: list[socket.socket] = rdy[0]  # type: ignore
-            self.rx4.cln()
-            self.rx6.cln()
+            self.rxc.cln()
             for sck in rx:
                 buf, addr = sck.recvfrom(4096)
                 try:
@@ -129,16 +138,14 @@ class SSDPd(MCast):
 
     def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket) -> None:
         cip = addr[0]
-        v6 = ":" in cip
-        if cip.startswith("169.254") or v6 and not cip.startswith("fe80"):
+        if cip.startswith("169.254"):
             return
 
-        cache = self.rx6 if v6 else self.rx4
-        if buf in cache.c:
+        if buf in self.rxc.c:
             return
 
-        cache.add(buf)
-        srv: Optional[MC_Sck] = self.srv[sck] if v6 else self.map_client(cip)  # type: ignore
+        self.rxc.add(buf)
+        srv: Optional[SSDP_Sck] = self.map_client(cip)  # type: ignore
         if not srv:
             return
 
@@ -151,9 +158,6 @@ class SSDPd(MCast):
         if self.args.zsv:
             t = "{} [{}] \033[36m{} \033[0m|{}|"
             self.log(t.format(srv.name, srv.ip, cip, len(buf)), "90")
-
-        sip = "[{}]".format(srv.ip) if v6 else srv.ip
-        sport = self.args.p[0]  # xxx
 
         zs = """
 HTTP/1.1 200 OK
@@ -170,7 +174,7 @@ BOOTID.UPNP.ORG: 0
 CONFIGID.UPNP.ORG: 1
 
 """
-        zs = zs.format(formatdate(usegmt=True), sip, sport, self.args.zsid)
+        zs = zs.format(formatdate(usegmt=True), srv.ip, srv.hport, self.args.zsid)
         zb = zs[1:].replace("\n", "\r\n").encode("utf-8", "replace")
         srv.sck.sendto(zb, addr[:2])
 

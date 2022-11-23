@@ -685,8 +685,6 @@ def run_argparse(
 
     ap2 = ap.add_argument_group("Zeroconf-SSDP options:")
     ap2.add_argument("--zs", action="store_true", help="announce the enabled protocols over SSDP -- compatible with Windows")
-    # ap2.add_argument("--zs4", action="store_true", help="IPv4 only")
-    # ap2.add_argument("--zs6", action="store_true", help="IPv6 only")
     ap2.add_argument("--zsv", action="store_true", help="verbose SSDP")
     ap2.add_argument("--zsl", metavar="PATH", type=u, default="", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] or [\033[32mpriv/?pw=hunter2\033[0m]")
     ap2.add_argument("--zsid", metavar="UUID", type=u, default=uuid.uuid4().urn[4:], help="USN (device identifier) to announce")
