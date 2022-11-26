@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-"""copyparty-fuse: remote copyparty as a local filesystem"""
+"""partyfuse: remote copyparty as a local filesystem"""
 __author__ = "ed <copyparty@ocv.me>"
 __copyright__ = 2019
 __license__ = "MIT"
@@ -12,7 +12,7 @@ __url__ = "https://github.com/9001/copyparty/"
 mount a copyparty server (local or remote) as a filesystem
 
 usage:
-  python copyparty-fuse.py http://192.168.1.69:3923/  ./music
+  python partyfuse.py http://192.168.1.69:3923/  ./music
 
 dependencies:
   python3 -m pip install --user fusepy
@@ -166,7 +166,7 @@ def dewin(txt):
 class RecentLog(object):
     def __init__(self):
         self.mtx = threading.Lock()
-        self.f = None  # open("copyparty-fuse.log", "wb")
+        self.f = None  # open("partyfuse.log", "wb")
         self.q = []
 
         thr = threading.Thread(target=self.printer)
@@ -197,9 +197,9 @@ class RecentLog(object):
             print("".join(q), end="")
 
 
-# [windows/cmd/cpy3]  python dev\copyparty\bin\copyparty-fuse.py q: http://192.168.1.159:1234/
-# [windows/cmd/msys2] C:\msys64\mingw64\bin\python3 dev\copyparty\bin\copyparty-fuse.py q: http://192.168.1.159:1234/
-# [windows/mty/msys2] /mingw64/bin/python3 /c/Users/ed/dev/copyparty/bin/copyparty-fuse.py q: http://192.168.1.159:1234/
+# [windows/cmd/cpy3]  python dev\copyparty\bin\partyfuse.py q: http://192.168.1.159:1234/
+# [windows/cmd/msys2] C:\msys64\mingw64\bin\python3 dev\copyparty\bin\partyfuse.py q: http://192.168.1.159:1234/
+# [windows/mty/msys2] /mingw64/bin/python3 /c/Users/ed/dev/copyparty/bin/partyfuse.py q: http://192.168.1.159:1234/
 #
 # [windows] find /q/music/albums/Phant*24bit -printf '%s %p\n' | sort -n | tail -n 8 | sed -r 's/^[0-9]+ //' | while IFS= read -r x; do dd if="$x" of=/dev/null bs=4k count=8192 & done
 # [alpine]  ll t; for x in t/2020_0724_16{2,3}*; do dd if="$x" of=/dev/null bs=4k count=10240 & done

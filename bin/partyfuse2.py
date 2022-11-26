@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-"""copyparty-fuseb: remote copyparty as a local filesystem"""
+"""partyfuse2: remote copyparty as a local filesystem"""
 __author__ = "ed <copyparty@ocv.me>"
 __copyright__ = 2020
 __license__ = "MIT"
@@ -42,13 +42,13 @@ except:
 mount a copyparty server (local or remote) as a filesystem
 
 usage:
-  python ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas
+  python ./partyfuse2.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas
 
 dependencies:
   sudo apk add fuse-dev python3-dev
   python3 -m pip install --user fuse-python
 
-fork of copyparty-fuse.py based on fuse-python which
+fork of partyfuse.py based on fuse-python which
   appears to be more compliant than fusepy? since this works with samba
     (probably just my garbage code tbh)
 """
@@ -639,7 +639,7 @@ def main():
         print("  need argument: mount-path")
         print("example:")
         print(
-            "  ./copyparty-fuseb.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas"
+            "  ./partyfuse2.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas"
         )
         sys.exit(1)
 
