@@ -289,12 +289,22 @@ class SvcHub(object):
         Daemon(self.sd_notify, "sd-notify")
 
     def _process_config(self) -> bool:
-        if self.args.loris1 == "no":
-            self.args.loris1 = "0,0"
+        al = self.args
+        if al.loris1 == "no":
+            al.loris1 = "0,0"
 
-        i1, i2 = self.args.loris1.split(",")
-        self.args.loris1w = int(i1)
-        self.args.loris1b = int(i2)
+        i1, i2 = al.loris1.split(",")
+        al.loris1w = int(i1)
+        al.loris1b = int(i2)
+
+        al.zm_on = al.zm_on or al.z_on
+        al.zs_on = al.zs_on or al.z_on
+        al.zm_off = al.zm_off or al.z_off
+        al.zs_off = al.zs_off or al.z_off
+        for n in ("zm_on", "zm_off", "zs_on", "zs_off"):
+            vs = getattr(al, n).replace(" ", ",").split(",")
+            vs = [x for x in vs if x]
+            setattr(al, n, vs)
 
         return True
 

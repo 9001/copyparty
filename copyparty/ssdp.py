@@ -88,8 +88,11 @@ class SSDPd(MCast):
     """communicates with ssdp clients over multicast"""
 
     def __init__(self, hub: "SvcHub") -> None:
-        vinit = hub.args.zsv and not hub.args.zmv
-        super(SSDPd, self).__init__(hub, SSDP_Sck, GRP, "", 1900, vinit)
+        al = hub.args
+        vinit = al.zsv and not al.zmv
+        super(SSDPd, self).__init__(
+            hub, SSDP_Sck, al.zs_on, al.zs_off, GRP, "", 1900, vinit
+        )
         self.srv: dict[socket.socket, SSDP_Sck] = {}
         self.rxc = CachedSet(0.7)
         self.txc = CachedSet(5)  # win10: every 3 sec

@@ -60,9 +60,12 @@ class MDNS_Sck(MC_Sck):
 
 class MDNS(MCast):
     def __init__(self, hub: "SvcHub") -> None:
-        grp4 = "" if hub.args.zm6 else MDNS4
-        grp6 = "" if hub.args.zm4 else MDNS6
-        super(MDNS, self).__init__(hub, MDNS_Sck, grp4, grp6, 5353, hub.args.zmv)
+        al = hub.args
+        grp4 = "" if al.zm6 else MDNS4
+        grp6 = "" if al.zm4 else MDNS6
+        super(MDNS, self).__init__(
+            hub, MDNS_Sck, al.zm_on, al.zm_off, grp4, grp6, 5353, hub.args.zmv
+        )
         self.srv: dict[socket.socket, MDNS_Sck] = {}
 
         self.ttl = 300

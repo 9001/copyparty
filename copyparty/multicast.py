@@ -54,6 +54,8 @@ class MCast(object):
         self,
         hub: "SvcHub",
         Srv: type[MC_Sck],
+        on: list[str],
+        off: list[str],
         mc_grp_4: str,
         mc_grp_6: str,
         port: int,
@@ -65,6 +67,8 @@ class MCast(object):
         self.args = hub.args
         self.asrv = hub.asrv
         self.log_func = hub.log
+        self.on = on
+        self.off = off
         self.grp4 = mc_grp_4
         self.grp6 = mc_grp_6
         self.port = port
@@ -84,26 +88,37 @@ class MCast(object):
 
     def create_servers(self) -> list[str]:
         bound: list[str] = []
+        netdevs = self.hub.tcpsrv.netdevs
         ips = [x[0] for x in self.hub.tcpsrv.bound]
 
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
-                [x.split("/")[0] for x in self.hub.tcpsrv.netdevs if ":" in x]
+                [x.split("/")[0] for x in netdevs if ":" in x]
             )
             ips.append("0.0.0.0")
 
         if "0.0.0.0" in ips:
             ips = [x for x in ips if x != "0.0.0.0"] + list(
-                [x.split("/")[0] for x in self.hub.tcpsrv.netdevs if ":" not in x]
+                [x.split("/")[0] for x in netdevs if ":" not in x]
             )
 
         ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
 
         # ip -> ip/prefix
-        ips = [
-            [x for x in self.hub.tcpsrv.netdevs if x.startswith(y + "/")][0]
-            for y in ips
-        ]
+        ips = [[x for x in netdevs if x.startswith(y + "/")][0] for y in ips]
+
+        on = self.on[:]
+        off = self.off[:]
+        for lst in (on, off):
+            for av in list(lst):
+                for sk, sv in netdevs.items():
+                    if av == sv.split(",")[0] and sk not in lst:
+                        lst.append(sk)
+
+        if on:
+            ips = [x for x in ips if x in on]
+        elif off:
+            ips = [x for x in ips if x not in off]
 
         if not self.grp4:
             ips = [x for x in ips if ":" in x]
@@ -124,7 +139,7 @@ class MCast(object):
             v6 = ":" in ip
             netdev = "?"
             try:
-                netdev = self.hub.tcpsrv.netdevs[ip].split(",")[0]
+                netdev = netdevs[ip].split(",")[0]
                 idx = socket.if_nametoindex(netdev)
             except:
                 idx = socket.INADDR_ANY
@@ -145,7 +160,7 @@ class MCast(object):
             # add a/aaaa records for the other nic IPs
             other_ips: set[str] = set()
             if v6 and netdev not in ("?", ""):
-                for oip, onic in self.hub.tcpsrv.netdevs.items():
+                for oip, onic in netdevs.items():
                     if (
                         onic.split(",")[0] == netdev
                         and oip in all_selected
