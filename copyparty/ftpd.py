@@ -62,8 +62,7 @@ class FtpAuth(DummyAuthorizer):
         if username == "anonymous":
             uname = "*"
         else:
-            creds = password or username
-            uname = asrv.iacct.get(creds, "") if creds else "*"
+            uname = asrv.iacct.get(password, "") or asrv.iacct.get(username, "") or "*"
 
         if not uname or not (asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)):
             g = self.hub.gpwd
@@ -164,8 +163,15 @@ class FtpFs(AbstractedFS):
         w = "w" in mode or "a" in mode or "+" in mode
 
         ap = self.rv2a(filename, r, w)
-        if w and bos.path.exists(ap):
-            raise FilesystemError("cannot open existing file for writing")
+        if w:
+            try:
+                st = bos.stat(ap)
+                td = time.time() - st.st_mtime
+            except:
+                td = 0
+
+            if td < -1 or td > self.args.ftp_wt:
+                raise FilesystemError("cannot open existing file for writing")
 
         self.validpath(ap)
         return open(fsenc(ap), mode)
@@ -273,8 +279,11 @@ class FtpFs(AbstractedFS):
         return bos.lstat(ap)
 
     def isfile(self, path: str) -> bool:
-        st = self.stat(path)
-        return stat.S_ISREG(st.st_mode)
+        try:
+            st = self.stat(path)
+            return stat.S_ISREG(st.st_mode)
+        except:
+            return False  # expected for mojibake in ftp_SIZE()
 
     def islink(self, path: str) -> bool:
         ap = self.rv2a(path)
@@ -325,6 +334,9 @@ class FtpHandler(FTPHandler):
 
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map: dict[str, str] = {}
+
+        # reduce non-debug logging
+        self.log_cmds_list = [x for x in self.log_cmds_list if x not in ("CWD", "XCWD")]
 
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
