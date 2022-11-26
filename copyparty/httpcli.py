@@ -425,7 +425,7 @@ class HttpCli(object):
                 raise Pebkac(400, 'invalid HTTP mode "{0}"'.format(self.mode))
 
         except Exception as ex:
-            if not hasattr(ex, "code"):
+            if not isinstance(ex, Pebkac):
                 pex = Pebkac(500)
             else:
                 pex: Pebkac = ex  # type: ignore
@@ -793,6 +793,10 @@ class HttpCli(object):
             _, vfs_ls, vfs_virt = vn.ls(
                 rem, self.uname, not self.args.no_scandir, [[True, False]]
             )
+            if not self.args.ed:
+                names = set(exclude_dotfiles([x[0] for x in vfs_ls]))
+                vfs_ls = [x for x in vfs_ls if x[0] in names]
+
             zi = int(time.time())
             zsr = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
             ls = [{"vp": vp, "st": st} for vp, st in vfs_ls]
@@ -826,22 +830,21 @@ class HttpCli(object):
         ret = '<?xml version="1.0" encoding="{}"?>\n<D:multistatus xmlns:D="DAV:">'
         ret = ret.format(uenc)
         for x in fgen:
-            vp = x["vp"]
+            rp = vjoin(vtop, x["vp"])
             st: os.stat_result = x["st"]
-            rp = vjoin(vtop, vp)
             isdir = stat.S_ISDIR(st.st_mode)
 
             t = "<D:response><D:href>/{}{}</D:href><D:propstat><D:prop>"
-            ret += t.format(quotep(rp), "/" if isdir and vp else "")
+            ret += t.format(quotep(rp), "/" if isdir and rp else "")
 
             pvs: dict[str, str] = {
-                "displayname": html_escape(vp.split("/")[-1]),
+                "displayname": html_escape(rp.split("/")[-1]),
                 "getlastmodified": formatdate(st.st_mtime, usegmt=True),
                 "resourcetype": '<D:collection xmlns:D="DAV:"/>' if isdir else "",
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
             if not isdir:
-                pvs["getcontenttype"] = guess_mime(vp)
+                pvs["getcontenttype"] = guess_mime(rp)
                 pvs["getcontentlength"] = str(st.st_size)
 
             for k, v in pvs.items():
@@ -868,6 +871,7 @@ class HttpCli(object):
             ret = self.send_chunk(ret, enc, chunksz)
 
         self.send_chunk("", enc, chunksz)
+        # self.reply(ret.encode(enc, "replace"),207, "text/xml; charset=" + enc)
         return True
 
     def handle_proppatch(self) -> bool:
@@ -882,6 +886,7 @@ class HttpCli(object):
             raise Pebkac(401, "authenticate")
 
         from xml.etree import ElementTree as ET
+
         from .dxml import mkenod, mktnod, parse_xml
 
         self.asrv.vfs.get(self.vpath, self.uname, False, False)
@@ -940,6 +945,7 @@ class HttpCli(object):
             raise Pebkac(401, "authenticate")
 
         from xml.etree import ElementTree as ET
+
         from .dxml import mkenod, mktnod, parse_xml
 
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
