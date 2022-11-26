@@ -32,9 +32,19 @@ try:
     if not hasattr(fuse, "__version__"):
         raise Exception("your fuse-python is way old")
 except:
-    print(
-        "\n  could not import fuse; these may help:\n    python3 -m pip install --user fuse-python\n    apt install libfuse\n    modprobe fuse\n"
-    )
+    if WINDOWS:
+        libfuse = "install https://github.com/billziss-gh/winfsp/releases/latest"
+    elif MACOS:
+        libfuse = "install https://osxfuse.github.io/"
+    else:
+        libfuse = "apt install libfuse\n    modprobe fuse"
+
+    m = """\033[33m
+  could not import fuse; these may help:
+    {} -m pip install --user fuse-python
+    {}
+\033[0m"""
+    print(m.format(sys.executable, libfuse))
     raise
 
 

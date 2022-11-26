@@ -62,12 +62,12 @@ except:
     else:
         libfuse = "apt install libfuse\n    modprobe fuse"
 
-    print(
-        "\n  could not import fuse; these may help:"
-        + "\n    python3 -m pip install --user fusepy\n    "
-        + libfuse
-        + "\n"
-    )
+    m = """\033[33m
+  could not import fuse; these may help:
+    {} -m pip install --user fusepy
+    {}
+\033[0m"""
+    print(m.format(sys.executable, libfuse))
     raise
 
 
