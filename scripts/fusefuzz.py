@@ -6,7 +6,7 @@ import time
 """
 td=/dev/shm/; [ -e $td ] || td=$HOME; mkdir -p $td/fusefuzz/{r,v}
 PYTHONPATH=.. python3 -m copyparty -v $td/fusefuzz/r::r -i 127.0.0.1
-../bin/copyparty-fuse.py http://127.0.0.1:3923/ $td/fusefuzz/v -cf 2 -cd 0.5
+../bin/partyfuse.py http://127.0.0.1:3923/ $td/fusefuzz/v -cf 2 -cd 0.5
 (d="$PWD"; cd $td/fusefuzz && "$d"/fusefuzz.py)
 """
 

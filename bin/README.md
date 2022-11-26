@@ -11,7 +11,7 @@ produces a chronological list of all uploads by collecting info from up2k databa
 * optional mapping from IP-addresses to nicknames
 
 
-# [`copyparty-fuse.py`](copyparty-fuse.py)
+# [`partyfuse.py`](partyfuse.py)
 * mount a copyparty server as a local filesystem (read-only)
 * **supports Windows!** -- expect `194 MiB/s` sequential read
 * **supports Linux** -- expect `117 MiB/s` sequential read
@@ -30,19 +30,19 @@ also consider using [../docs/rclone.md](../docs/rclone.md) instead for 5x perfor
 * install [winfsp](https://github.com/billziss-gh/winfsp/releases/latest) and [python 3](https://www.python.org/downloads/)
   * [x] add python 3.x to PATH (it asks during install)
 * `python -m pip install --user fusepy`
-* `python ./copyparty-fuse.py n: http://192.168.1.69:3923/`
+* `python ./partyfuse.py n: http://192.168.1.69:3923/`
 
 10% faster in [msys2](https://www.msys2.org/), 700% faster if debug prints are enabled:
 * `pacman -S mingw64/mingw-w64-x86_64-python{,-pip}`
 * `/mingw64/bin/python3 -m pip install --user fusepy`
-* `/mingw64/bin/python3 ./copyparty-fuse.py [...]`
+* `/mingw64/bin/python3 ./partyfuse.py [...]`
 
 you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releases/latest), let me know if you [figure out how](https://github.com/dokan-dev/dokany/wiki/FUSE)  
 (winfsp's sshfs leaks, doesn't look like winfsp itself does, should be fine)
 
 
 
-# [`copyparty-fuse🅱️.py`](copyparty-fuseb.py)
+# [`partyfuse2.py`](partyfuse2.py)
 * mount a copyparty server as a local filesystem (read-only)
 * does the same thing except more correct, `samba` approves
 * **supports Linux** -- expect `18 MiB/s` (wait what)
@@ -50,7 +50,7 @@ you could replace winfsp with [dokan](https://github.com/dokan-dev/dokany/releas
 
 
 
-# [`copyparty-fuse-streaming.py`](copyparty-fuse-streaming.py)
+# [`partyfuse-streaming.py`](partyfuse-streaming.py)
 * pretend this doesn't exist
 
 

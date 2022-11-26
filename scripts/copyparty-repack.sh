@@ -37,7 +37,7 @@ set -e
 #  23663  copyparty-extras/up2k.py
 #           `- standalone utility to upload or search for files
 #
-#  32280  copyparty-extras/copyparty-fuse.py
+#  32280  copyparty-extras/partyfuse.py
 #           `- standalone to mount a URL as a local read-only filesystem
 #
 # 270004  copyparty
@@ -148,7 +148,7 @@ repack sfx-lite "re no-dd no-cm no-hl gz"
 # delete extracted source code
 ( cd copyparty-extras/
 mv copyparty-*/bin/up2k.py .
-mv copyparty-*/bin/copyparty-fuse.py .
+mv copyparty-*/bin/partyfuse.py .
 cp -pv sfx-lite/copyparty-sfx.py ../copyparty
 rm -rf copyparty-{0..9}*.*.*{0..9}
 )

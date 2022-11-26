@@ -27,7 +27,7 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 
 ### [`explorer-nothumbs-nofoldertypes.reg`](explorer-nothumbs-nofoldertypes.reg)
 * disables thumbnails and folder-type detection in windows explorer
-* makes it way faster (especially for slow/networked locations (such as copyparty-fuse))
+* makes it way faster (especially for slow/networked locations (such as partyfuse))
 
 ### [`webdav-basicauth.reg`](webdav-basicauth.reg)
 * enables webdav basic-auth over plaintext http; takes effect after a reboot OR after running `webdav-unlimit.bat`

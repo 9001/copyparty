@@ -4,10 +4,10 @@ speed estimates with server and client on the same win10 machine:
 * `1070 MiB/s` with rclone as both server and client
 * `570 MiB/s` with rclone-client and `copyparty -ed -j16` as server
 * `220 MiB/s` with rclone-client and `copyparty -ed` as server
-* `100 MiB/s` with [../bin/copyparty-fuse.py](../bin/copyparty-fuse.py) as client
+* `100 MiB/s` with [../bin/partyfuse.py](../bin/partyfuse.py) as client
 
 when server is on another machine (1gbit LAN),
-* `75 MiB/s` with [../bin/copyparty-fuse.py](../bin/copyparty-fuse.py) as client
+* `75 MiB/s` with [../bin/partyfuse.py](../bin/partyfuse.py) as client
 * `92 MiB/s` with rclone-client and `copyparty -ed` as server
 * `103 MiB/s` (connection max) with `copyparty -ed -j16` and all the others
 

@@ -162,7 +162,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 * download
   * ☑ single files in browser
   * ☑ [folders as zip / tar files](#zip-downloads)
-  * ☑ [FUSE client](https://github.com/9001/copyparty/tree/hovudstraum/bin#copyparty-fusepy) (read-only)
+  * ☑ [FUSE client](https://github.com/9001/copyparty/tree/hovudstraum/bin#partyfusepy) (read-only)
 * browser
   * ☑ [navpane](#navpane) (directory tree sidebar)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
@@ -1124,7 +1124,7 @@ a remote copyparty server as a local filesystem;  some alternatives roughly sort
 * [rclone-http](./docs/rclone.md) (25s), read-only
 * [rclone-webdav](./docs/rclone.md) (51s), read/WRITE
   * copyparty-1.5.0's webdav server is faster than rclone-1.60.0 (69s)
-* [copyparty-fuse.py](./bin/#copyparty-fusepy) (71s), read-only
+* [partyfuse.py](./bin/#partyfusepy) (71s), read-only
 * [win10-webdav](#webdav-server) (138s), read/WRITE
 * [win10-smb2](#smb-server) (387s), read/WRITE
 
