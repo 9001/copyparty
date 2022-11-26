@@ -92,7 +92,11 @@ rm -rf build/pypi
 mkdir -p build/pypi
 cp -pR setup.py README.md LICENSE copyparty tests bin scripts/strip_hints build/pypi/
 cd build/pypi
-tar --strip-components=2 -xf ../strip-hints-0.1.10.tar.gz strip-hints-0.1.10/src/strip_hints
+f=../strip-hints-0.1.10.tar.gz
+[ -e $f ] || 
+	(url=https://files.pythonhosted.org/packages/9c/d4/312ddce71ee10f7e0ab762afc027e07a918f1c0e1be5b0069db5b0e7542d/strip-hints-0.1.10.tar.gz;
+	wget -O$f "$url" || curl -L "$url" >$f)
+tar --strip-components=2 -xf $f strip-hints-0.1.10/src/strip_hints
 python3 -c 'from strip_hints.a import uh; uh("copyparty")'
 
 ./setup.py clean2

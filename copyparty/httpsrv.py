@@ -37,6 +37,7 @@ from .util import (
     Daemon,
     Garda,
     Magician,
+    NetMap,
     ipnorm,
     min_ex,
     shut_socket,
@@ -72,6 +73,7 @@ class HttpSrv(object):
 
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
+        self.nm = NetMap([], {})
         self.ssdp: Optional["SSDPr"] = None
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
@@ -102,10 +104,8 @@ class HttpSrv(object):
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(self.E.mod, "web"))
-        self.j2 = {
-            x: env.get_template(x + ".html")
-            for x in ["splash", "browser", "browser2", "msg", "md", "mde", "cf"]
-        }
+        jn = ["splash", "svcs", "browser", "browser2", "msg", "md", "mde", "cf"]
+        self.j2 = {x: env.get_template(x + ".html") for x in jn}
         zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
         self.prism = os.path.exists(zs)
 
@@ -139,6 +139,9 @@ class HttpSrv(object):
             self.th_cfg = x.get()
         except:
             pass
+
+    def set_netdevs(self, netdevs: dict[str, str]) -> None:
+        self.nm = NetMap([self.ip], netdevs)
 
     def start_threads(self, n: int) -> None:
         self.tp_nthr += n

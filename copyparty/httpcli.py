@@ -691,6 +691,9 @@ class HttpCli(object):
             if "reset" in self.uparam:
                 return self.set_cfg_reset()
 
+            if "hc" in self.uparam:
+                return self.tx_svcs()
+
             if "h" in self.uparam:
                 return self.tx_mounts()
 
@@ -2560,6 +2563,32 @@ class HttpCli(object):
         if self.do_log:
             self.log(logmsg + " " + unicode(len(html)))
 
+        return True
+
+    def tx_svcs(self) -> bool:
+        aname = re.sub("[^0-9a-zA-Z]+", "", self.args.name) or "a"
+        ep = self.headers["host"]
+        host = ep.split(":")[0]
+        hport = ep[ep.find(":") :] if ":" in ep else ""
+        rip = (
+            host
+            if self.args.rclone_mdns or not self.args.zm
+            else self.conn.hsrv.nm.map(self.ip) or host
+        )
+        html = self.j2s(
+            "svcs",
+            args=self.args,
+            accs=bool(self.asrv.acct),
+            s="s" if self.is_https else "",
+            rip=rip,
+            ep=ep,
+            vp=(self.uparam["hc"] or "").lstrip("/"),
+            host=host,
+            hport=hport,
+            aname=aname,
+            pw=self.pw or "pw",
+        )
+        self.reply(html.encode("utf-8"))
         return True
 
     def tx_mounts(self) -> bool:

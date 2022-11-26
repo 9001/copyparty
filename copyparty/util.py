@@ -26,10 +26,10 @@ from collections import Counter
 from datetime import datetime
 from email.utils import formatdate
 
-from ipaddress import IPv6Address
+from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 from queue import Queue
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS, unicode
+from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
@@ -94,6 +94,8 @@ if TYPE_CHECKING:
     import magic
 
     from .authsrv import VFS
+
+FAKE_MP = False
 
 try:
     import multiprocessing as mp
@@ -427,6 +429,52 @@ class HLog(logging.Handler):
                 return
 
         self.log_func(record.name[-21:], msg, c)
+
+
+class NetMap(object):
+    def __init__(self, ips: list[str], netdevs: dict[str, str]) -> None:
+        if "::" in ips:
+            ips = [x for x in ips if x != "::"] + list(
+                [x.split("/")[0] for x in netdevs if ":" in x]
+            )
+            ips.append("0.0.0.0")
+
+        if "0.0.0.0" in ips:
+            ips = [x for x in ips if x != "0.0.0.0"] + list(
+                [x.split("/")[0] for x in netdevs if ":" not in x]
+            )
+
+        ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
+        ips = [[x for x in netdevs if x.startswith(y + "/")][0] for y in ips]
+
+        self.cache: dict[str, str] = {}
+        self.b2sip: dict[bytes, str] = {}
+        self.b2net: dict[bytes, Union[IPv4Network, IPv6Network]] = {}
+        self.bip: list[bytes] = []
+        for ip in ips:
+            v6 = ":" in ip
+            fam = socket.AF_INET6 if v6 else socket.AF_INET
+            bip = socket.inet_pton(fam, ip.split("/")[0])
+            self.bip.append(bip)
+            self.b2sip[bip] = ip.split('/')[0]
+            self.b2net[bip] = (IPv6Network if v6 else IPv4Network)(ip, False)
+
+        self.bip.sort(reverse=True)
+
+    def map(self, ip: str) -> str:
+        try:
+            return self.cache[ip]
+        except:
+            pass
+
+        v6 = ":" in ip
+        ci = IPv6Address(ip) if v6 else IPv4Address(ip)
+        bip = next((x for x in self.bip if ci in self.b2net[x]), None)
+        ret = self.b2sip[bip] if bip else ""
+        if len(self.cache) > 9000:
+            self.cache = {}
+        self.cache[ip] = ret
+        return ret
 
 
 class UnrecvEOF(OSError):

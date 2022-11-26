@@ -24,11 +24,14 @@ var Ls = {
 		".s1": "kartlegg",
 		"t1": "handling",
 		"u2": "tid siden noen sist skrev til serveren$N( opplastning / navneendring / ... )$N$N17d = 17 dager$N1h23 = 1 time 23 minutter$N4m56 = 4 minuter 56 sekunder",
+		"v1": "koble til",
+		"v2": "bruk denne serveren som en lokal harddisk$N$NADVARSEL: kommer til å vise passordet ditt!"
 	},
 	"eng": {
 		"d2": "shows the state of all active threads",
 		"e2": "reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes",
 		"u2": "time since the last server write$N( upload / rename / ... )$N$N17d = 17 days$N1h23 = 1 hour 23 minutes$N4m56 = 4 minutes 56 seconds",
+		"v2": "use this server as a local HDD$N$NWARNING: this will show your password!",
 	}
 },
 	d = Ls[sread("lang") || lang];

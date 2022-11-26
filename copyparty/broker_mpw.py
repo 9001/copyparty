@@ -97,6 +97,9 @@ class MpWorker(BrokerCli):
             elif dest == "listen":
                 self.httpsrv.listen(args[0], args[1])
 
+            elif dest == "set_netdevs":
+                self.httpsrv.set_netdevs(args[0])
+
             elif dest == "retq":
                 # response from previous ipc call
                 with self.retpend_mutex:

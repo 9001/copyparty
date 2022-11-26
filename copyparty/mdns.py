@@ -257,7 +257,12 @@ class MDNS(MCast):
                     self.log("sendto failed: {} ({})".format(srv.ip, ex), "90")
 
     def run(self) -> None:
-        bound = self.create_servers()
+        try:
+            bound = self.create_servers()
+        except:
+            self.log("no server IP matches the mdns config", 1)
+            bound = []
+
         if not bound:
             self.log("failed to announce copyparty services on the network", 3)
             return

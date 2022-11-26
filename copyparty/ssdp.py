@@ -99,7 +99,12 @@ class SSDPd(MCast):
         self.log_func("SSDP", msg, c)
 
     def run(self) -> None:
-        bound = self.create_servers()
+        try:
+            bound = self.create_servers()
+        except:
+            self.log("no server IP matches the ssdp config", 1)
+            bound = []
+
         if not bound:
             self.log("failed to announce copyparty services on the network", 3)
             return

@@ -113,6 +113,10 @@ class BrokerMp(object):
             for p in self.procs:
                 p.q_pend.put((0, dest, [args[0], len(self.procs)]))
 
+        elif dest == "set_netdevs":
+            for p in self.procs:
+                p.q_pend.put((0, dest, list(args)))
+
         elif dest == "cb_httpsrv_up":
             self.hub.cb_httpsrv_up()
 

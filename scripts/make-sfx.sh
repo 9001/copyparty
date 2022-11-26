@@ -245,6 +245,21 @@ tmpdir="$(
 	}
 	rm -f ../tar
 
+	# resolve symlinks
+	find -type l |
+	while IFS= read -r f1; do (
+		cd "${f1%/*}"
+		f1="./${f1##*/}"
+		f2="$(readlink "$f1")"
+		[ -e "$f2" ] || f2="../$f2"
+		[ -e "$f2" ] || {
+			echo could not resolve "$f1"
+			exit 1
+		}
+		rm "$f1"
+		cp -pv "$f2" "$f1"
+	); done
+
 	# insert asynchat
 	mkdir copyparty/vend
 	for n in asyncore.py asynchat.py; do

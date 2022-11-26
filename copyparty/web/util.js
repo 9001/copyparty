@@ -17,7 +17,9 @@ var wah = '',
     VCHROME = CHROME ? 1 : 0,
     FIREFOX = ('netscape' in window) && / rv:/.test(navigator.userAgent),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(navigator.userAgent),
-    WINDOWS = navigator.platform ? navigator.platform == 'Win32' : /Windows/.test(navigator.userAgent);
+    LINUX = /Linux/.test(navigator.userAgent),
+    MACOS = /[^a-z]mac ?os/i.test(navigator.userAgent),
+    WINDOWS = /Windows/.test(navigator.userAgent);
 
 if (!window.WebAssembly || !WebAssembly.Memory)
     window.WebAssembly = false;

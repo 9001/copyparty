@@ -252,6 +252,7 @@ class TcpSrv(object):
         self.srv = srvs
         self.bound = bound
         self.nsrv = len(srvs)
+        self.hub.broker.say("set_netdevs", self.netdevs)
 
     def shutdown(self) -> None:
         self.stopping = True

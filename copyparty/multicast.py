@@ -20,6 +20,10 @@ if not hasattr(socket, "IPPROTO_IPV6"):
     setattr(socket, "IPPROTO_IPV6", 41)
 
 
+class NoIPs(Exception):
+    pass
+
+
 class MC_Sck(object):
     """there is one socket for each server ip"""
 
@@ -114,7 +118,7 @@ class MCast(object):
         ips = [x for x in ips if ":" not in x or x.startswith("fe80")]
 
         if not ips:
-            raise Exception("no server IP matches the mdns config")
+            raise NoIPs()
 
         for ip in ips:
             v6 = ":" in ip
@@ -302,8 +306,8 @@ class MCast(object):
             t = "could not map client {} to known subnet; maybe forwarded from another network?"
             self.log(t.format(cip), 3)
 
-        self.cscache[cip] = ret
         if len(self.cscache) > 9000:
             self.cscache = {}
 
+        self.cscache[cip] = ret
         return ret

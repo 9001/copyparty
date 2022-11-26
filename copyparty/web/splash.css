@@ -10,6 +10,9 @@ html {
 	padding: 0 1em 3em 1em;
 	line-height: 1.3em;
 }
+#wrap.w {
+	max-width: 96%;
+}
 h1 {
 	border-bottom: 1px solid #ccc;
 	margin: 2em 0 .4em 0;
@@ -25,15 +28,16 @@ a {
 	text-decoration: none;
 	border-bottom: 1px solid #8ab;
 	border-radius: .2em;
-	padding: .2em .8em;
+	padding: .2em .6em;
+	margin: 0 .3em;
 }
-a+a {
-	margin-left: .5em;
+td a {
+	margin: 0;
 }
-.refresh,
+.af,
 .logout {
 	float: right;
-	margin: -.2em 0 0 .5em;
+	margin: -.2em 0 0 .8em;
 }
 .logout,
 a.r {
@@ -64,8 +68,14 @@ table {
 .num td:first-child {
 	text-align: right;
 }
+.c {
+	text-align: center;
+}
 .btns {
 	margin: 1em 0;
+}
+.btns>a:first-child {
+	margin-left: 0;
 }
 #msg {
 	margin: 3em 0;
@@ -82,6 +92,41 @@ blockquote {
 	padding: .7em 1em 0 1em;
 	border-left: .3em solid rgba(128,128,128,0.5);
 	border-radius: 0 0 0 .25em;
+}
+pre, code {
+	color: #480;
+	background: #fff;
+	font-family: 'scp', monospace, monospace;
+	border: 1px solid rgba(128,128,128,0.3);
+	border-radius: .2em;
+	padding: .15em .2em;
+}
+html.z pre,
+html.z code {
+	color: #9e0;
+	background: rgba(0,16,0,0.2);
+}
+.ossel a.r {
+	box-shadow: 0 .3em 1em #c04;
+}
+.os {
+	line-height: 1.5em;
+}
+.sph {
+	margin-top: 4em;
+}
+.sph code {
+	margin-left: .3em;
+}
+pre b,
+code b {
+	color: #000;
+	font-weight: normal;
+	text-shadow: 0 0 .2em #0f0;
+}
+html.z pre b,
+html.z code b {
+	color: #fff;
 }
 
 
@@ -101,6 +146,9 @@ html.z .logout,
 html.z a.r {
 	background: #804;
 	border-color: #c28;
+}
+html.z .ossel a.r {
+	box-shadow: 0 .3em 1em #704, 0 .3em 1em #704;
 }
 html.z input {
 	color: #fff;
