@@ -56,6 +56,9 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
+    * [zeroconf](#zeroconf) - announce enabled services on the LAN
+        * [mdns](#mdns) - LAN domain-name and feature announcer
+        * [ssdp](#ssdp) - windows-explorer announcer
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
     * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [webdav server](#webdav-server) - with read-write support
@@ -127,6 +130,14 @@ you may also want these, especially on servers:
 * [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for better https)
 
+and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
+```
+firewall-cmd --permanent --add-port={80,443,3921,3923,3945,3990}/tcp  # --zone=libvirt
+firewall-cmd --permanent --add-port=12000-12099/tcp --permanent  # --zone=libvirt
+firewall-cmd --permanent --add-port={1900,5353}/udp  # --zone=libvirt
+firewall-cmd --reload
+```
+(1900:ssdp, 3921:ftp, 3923:http/https, 3945:smb, 3990:ftps, 5353:mdns, 12000:passive-ftp)
 
 ### on debian
 
@@ -152,6 +163,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
   * ☑ [webdav server](#webdav-server)
   * ☑ [smb/cifs server](#smb-server)
   * ☑ [qr-code](#qr-code) for quick access
+  * ☑ [upnp / zeroconf / mdns / ssdp](#zeroconf)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
@@ -369,6 +381,7 @@ the browser has the following hotkeys  (always qwerty)
 * `ctrl-K` delete selected files/folders
 * `ctrl-X` cut selected files/folders
 * `ctrl-V` paste
+* `Y` download selected files
 * `F2` [rename](#batch-rename) selected file/folder
 * when a file/folder is selected (in not-grid-view):
   * `Up/Down` move cursor
@@ -676,6 +689,31 @@ using arguments or config files, or a mix of both:
   * or click the `[reload cfg]` button in the control-panel when logged in as admin 
 
 
+## zeroconf
+
+announce enabled services on the LAN  if you specify the `-z` option, which enables [mdns](#mdns) and [ssdp](#ssdp)
+
+
+### mdns
+
+LAN domain-name and feature announcer
+
+uses [multicast dns](https://en.wikipedia.org/wiki/Multicast_DNS) to give copyparty a domain which any machine on the LAN can use to access it
+
+all enabled services ([webdav](#webdav-server), [ftp](#ftp-server), [smb](#smb-server)) will appear in mDNS-aware file managers (KDE, gnome, macOS, ...)
+
+the domain will be http://partybox.local if the machine's hostname is `partybox` unless `--name` specifies soemthing else
+
+
+### ssdp
+
+windows-explorer announcer
+
+uses [ssdp](https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol) to make copyparty appear in the windows file explorer on all machines on the LAN
+
+doubleclicking the icon opens the "connect" page which explains how to mount copyparty as a local filesystem
+
+
 ## qr-code
 
 print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access,  great between phones on android hotspots which keep changing the subnet
@@ -686,7 +724,7 @@ print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/
 * `--qrz 1` forces 1x zoom instead of autoscaling to fit the terminal size
   * 1x may render incorrectly on some terminals/fonts, but 2x should always work
 
-it will use your external ip (default route) unless `--qri` specifies an ip-prefix or domain
+it uses the server hostname if [mdns](#mdns) is enbled, otherwise it'll use your external ip (default route) unless `--qri` specifies a specific ip-prefix or domain
 
 
 ## ftp server
@@ -706,6 +744,8 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
 
 with read-write support,  supports winXP and later, macos, nautilus/gvfs
 
+click the [connect](http://127.0.0.1:3923/?hc) button in the control-panel to see connection instructions for windows, linux, macos
+
 general usage:
 * login with any username + your password, or put your password in the username field (password field can be empty/whatever)
 
@@ -719,16 +759,6 @@ using the GUI  (winXP or later):
 * rightclick [my computer] -> [map network drive] -> Folder: `http://192.168.123.1:3923/`
   * on winXP only, click the `Sign up for online storage` hyperlink instead and put the URL there
   * providing your password as the username is recommended; the password field can be anything or empty
-
-connecting from commandline (win7 or later; `wark`=password):
-* `net use w: http://192.168.123.1:3923/ k /user:wark`
-
-**however,** you probably want to run [webdav-cfg.bat](./contrib/webdav-cfg.bat) first --
-* fixes inability to access files larger than 47.6 MiB (changes the limit to 4 GiB which is the highest windows can go)
-* optionally allows/enables login over plaintext http
-* optionally disables wpad for ~100x performance
-
-better yet, you could skip the windows-builtin webdav support entirely and instead [connect using rclone](./docs/rclone.md) which is 3x faster and way less buggy!
 
 known client bugs:
 * win7+ doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
@@ -745,6 +775,8 @@ known client bugs:
 ## smb server
 
 unsafe, slow, not recommended for wan,  enable with `--smb` for read-only or `--smbw` for read-write
+
+click the [connect](http://127.0.0.1:3923/?hc) button in the control-panel to see connection instructions for windows, linux, macos
 
 dependencies: `python3 -m pip install --user -U impacket==0.10.0`
 * newer versions of impacket will hopefully work just fine but there is monkeypatching so maybe not
@@ -778,9 +810,6 @@ the smb protocol listens on TCP port 445, which is a privileged port on linux an
 authenticate with one of the following:
 * username `$username`, password `$password`
 * username `$password`, password `k`
-
-on windows 7+, connect using command prompt (`wark`=password):
-* `net use w: \\192.168.123.1\a k /user:wark`
 
 
 ## file indexing
@@ -1099,10 +1128,12 @@ interact with copyparty using non-browser clients
 
 * python: [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) is a command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
   * file uploads, file-search, autoresume of aborted/broken uploads
+  * can be downloaded from copyparty: controlpanel -> connect -> [up2k.py](http://127.0.0.1:3923/.cpr/a/up2k.py)
   * see [./bin/README.md#up2kpy](bin/README.md#up2kpy)
 
 * FUSE: mount a copyparty server as a local filesystem
   * cross-platform python client available in [./bin/](bin/)
+  * can be downloaded from copyparty: controlpanel -> connect -> [partyfuse.py](http://127.0.0.1:3923/.cpr/a/partyfuse.py)
   * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
 
 * sharex (screenshot utility): see [./contrib/sharex.sxcu](contrib/#sharexsxcu)
@@ -1122,9 +1153,11 @@ NOTE: curl will not send the original filename if you use `-T` combined with url
 a remote copyparty server as a local filesystem;  some alternatives roughly sorted by speed (unreproducible benchmark), best first:
 
 * [rclone-http](./docs/rclone.md) (25s), read-only
+* [rclone-ftp](./docs/rclone.md) (47s), read/WRITE
 * [rclone-webdav](./docs/rclone.md) (51s), read/WRITE
   * copyparty-1.5.0's webdav server is faster than rclone-1.60.0 (69s)
 * [partyfuse.py](./bin/#partyfusepy) (71s), read-only
+* davfs2 (103s), read/WRITE, *very fast* on small files
 * [win10-webdav](#webdav-server) (138s), read/WRITE
 * [win10-smb2](#smb-server) (387s), read/WRITE
 
@@ -1169,7 +1202,7 @@ below are some tweaks roughly ordered by usefulness:
 * `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
-* `--no-htp --hash-mt=0 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
+* `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
 * `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
   * huge amount of short-lived connections
   * really heavy traffic (downloads/uploads)

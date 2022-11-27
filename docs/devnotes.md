@@ -4,6 +4,8 @@
     * [future plans](#future-plans) - some improvement ideas
 * [design](#design)
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
+    * [assumptions](#assumptions)
+        * [mdns](#mdns)
 * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
 * [building](#building)
     * [dev env setup](#dev-env-setup)
