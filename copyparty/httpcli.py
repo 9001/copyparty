@@ -984,7 +984,7 @@ class HttpCli(object):
         ret = '<?xml version="1.0" encoding="{}"?>\n'.format(uenc)
         ret += ET.tostring(xroot).decode("utf-8")
 
-        if not bos.path.isfile(abspath):
+        if self.can_write and not bos.path.isfile(abspath):
             with open(fsenc(abspath), "wb") as _:
                 pass
 
