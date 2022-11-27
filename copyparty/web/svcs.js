@@ -28,7 +28,7 @@ function setos(os) {
 
     oa = QSA('.ossel a');
     for (var a = 0; a < oa.length; a++)
-        clmod(oa[a], 'r', oa[a].id.slice(1) == os);
+        clmod(oa[a], 'g', oa[a].id.slice(1) == os);
 }
 
 setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : '');

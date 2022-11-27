@@ -44,6 +44,11 @@ a.r {
 	color: #c04;
 	border-color: #c7a;
 }
+a.g {
+	color: #2b0;
+	border-color: #3a0;
+	box-shadow: 0 .3em 1em #4c0;
+}
 #repl {
 	border: none;
 	background: none;
@@ -106,9 +111,6 @@ html.z code {
 	color: #9e0;
 	background: rgba(0,16,0,0.2);
 }
-.ossel a.r {
-	box-shadow: 0 .3em 1em #c04;
-}
 .os {
 	line-height: 1.5em;
 }
@@ -147,8 +149,10 @@ html.z a.r {
 	background: #804;
 	border-color: #c28;
 }
-html.z .ossel a.r {
-	box-shadow: 0 .3em 1em #704, 0 .3em 1em #704;
+html.z a.g {
+	background: #470;
+	border-color: #af4;
+	box-shadow: 0 .3em 1em #7d0;
 }
 html.z input {
 	color: #fff;
