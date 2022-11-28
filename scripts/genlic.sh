@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-outfile="$(realpath "$1")"
+outfile="$($(command -v realpath || command -v grealpath) "$1")"
 
 [ -e genlic.sh ] || cd scripts
 [ -e genlic.sh ]

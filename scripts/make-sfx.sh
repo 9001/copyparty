@@ -50,10 +50,11 @@ help() { exec cat <<'EOF'
 EOF
 }
 
-# port install gnutar findutils gsed coreutils
+# port install gnutar findutils gsed gawk coreutils
 gtar=$(command -v gtar || command -v gnutar) || true
 [ ! -z "$gtar" ] && command -v gfind >/dev/null && {
 	tar()  { $gtar "$@"; }
+	tr()   { gtr   "$@"; }
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
@@ -232,7 +233,7 @@ tmpdir="$(
 
 		cp -pR ../scripts/strip_hints/ .
 	)
-	cp -pR ../scripts/py2/ .
+	cp -pR ../scripts/py2 .
 
 	# msys2 tar is bad, make the best of it
 	echo collecting source

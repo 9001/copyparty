@@ -30,6 +30,8 @@ except:
 
 argv = [os.path.expanduser(x) if x.startswith("~") else x for x in argv]
 
+argv += sys.argv[1:]
+
 if re.search(" -j ?[0-9]", " ".join(argv)):
     argv = [sys.executable, "-m", "copyparty"] + argv
     sp.check_call(argv)
