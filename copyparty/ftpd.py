@@ -276,7 +276,7 @@ class FtpFs(AbstractedFS):
 
     def lstat(self, path: str) -> os.stat_result:
         ap = self.rv2a(path)
-        return bos.lstat(ap)
+        return bos.stat(ap)
 
     def isfile(self, path: str) -> bool:
         try:
