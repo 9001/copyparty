@@ -228,6 +228,7 @@ var Ls = {
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
 		"mt_oseek": "allow seeking through os integration\">seek",
 		"mt_oscv": "show album cover in osd\">art",
+		"mt_follow": "keep the playing track scrolled into view\">🎯",
 		"mt_compact": "compact controls\">⟎",
 		"mt_mloop": "loop the open folder\">🔁 loop",
 		"mt_mnext": "load the next folder and continue\">📂 next",
@@ -667,6 +668,7 @@ var Ls = {
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
+		"mt_follow": "bla slik at sangen som spilles alltid er synlig\">🎯",
 		"mt_compact": "tettpakket avspillerpanel\">⟎",
 		"mt_mloop": "repeter hele mappen\">🔁 gjenta",
 		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
@@ -1241,6 +1243,7 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
+		'<a href="#" class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
 		'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
 		'</div></div>' +
 
@@ -1277,6 +1280,7 @@ var mpl = (function () {
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
 	});
+	bcfg_bind(r, 'follow', 'au_follow', false);
 	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
 	bcfg_bind(r, 'ac_aac', 'ac_aac', false);
 	bcfg_bind(r, 'ac_oth', 'ac_oth', true, reload_mp);
@@ -2620,6 +2624,10 @@ function play(tid, is_ev, seek) {
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	if (thegrid)
 		thegrid.loadsel();
+
+	if (mpl.follow)
+		QS((!thegrid || !thegrid.en) ?
+			'tr.play' : '#ggrid a.play').scrollIntoView();
 
 	try {
 		mp.au.play();
