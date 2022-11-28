@@ -3149,7 +3149,7 @@ class HttpCli(object):
             "url_suf": url_suf,
             "logues": logues,
             "readme": readme,
-            "title": html_escape(self.vpath, crlf=True),
+            "title": html_escape(self.vpath, crlf=True) or "⇆🎉",
             "srv_info": srv_infot,
             "dtheme": self.args.theme,
             "themes": self.args.themes,

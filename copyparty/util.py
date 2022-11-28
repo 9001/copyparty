@@ -415,7 +415,9 @@ class HLog(logging.Handler):
         else:
             c = 1
 
-        if record.name == "pyftpdlib":
+        if record.name.startswith("PIL") and lv < logging.WARNING:
+            return
+        elif record.name == "pyftpdlib":
             m = self.ptn_ftp.match(msg)
             if m:
                 ip = m.group(1)
