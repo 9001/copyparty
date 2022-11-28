@@ -1837,6 +1837,14 @@ a.btn,
 #hkhelp td:first-child {
 	font-family: 'scp', monospace, monospace;
 }
+html.noscroll,
+html.noscroll .sbar {
+	scrollbar-width: none;
+}
+html.noscroll::-webkit-scrollbar,
+html.noscroll .sbar::-webkit-scrollbar {
+	display: none;
+}
 
 
 

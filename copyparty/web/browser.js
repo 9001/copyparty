@@ -185,6 +185,7 @@ var Ls = {
 		"ct_dots": "show hidden files (if server permits)",
 		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
+		"ct_sbars": "show scrollbars",
 
 		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them",
 
@@ -622,6 +623,7 @@ var Ls = {
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
 		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
+		"ct_sbars": "vis rullgardiner / skrollefelt",
 
 		"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres",
 
@@ -1038,6 +1040,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
+	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '">⟊</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -1106,6 +1109,7 @@ ebi('tree').innerHTML = (
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
+clmod(ebi('tree'), 'sbar', 1);
 ebi('entree').setAttribute('tt', L.tt_entree);
 ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
@@ -2812,6 +2816,8 @@ function eval_hash() {
 
 
 (function () {
+	var props = {};
+
 	// a11y jump-to-content
 	for (var a = 0; a < 2; a++)
 		(function (a) {
@@ -2839,6 +2845,13 @@ function eval_hash() {
 	ebi('gop').onclick = function () { tree_neigh(-1); }
 	ebi('gon').onclick = function () { tree_neigh(1); }
 	ebi('gou').onclick = function () { tree_up(true); }
+
+	// show/hide scrollbars
+	function setsb() {
+		clmod(document.documentElement, 'noscroll', !props.sbars);
+	}
+	bcfg_bind(props, 'sbars', 'sbars', true, setsb);
+	setsb();
 })();
 
 
