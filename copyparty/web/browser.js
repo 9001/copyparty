@@ -228,6 +228,7 @@ var Ls = {
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
 		"mt_oseek": "allow seeking through os integration\">seek",
 		"mt_oscv": "show album cover in osd\">art",
+		"mt_compact": "compact controls\">⟎",
 		"mt_mloop": "loop the open folder\">🔁 loop",
 		"mt_mnext": "load the next folder and continue\">📂 next",
 		"mt_cflac": "convert flac / wav to opus\">flac",
@@ -666,6 +667,7 @@ var Ls = {
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
+		"mt_compact": "tettpakket avspillerpanel\">⟎",
 		"mt_mloop": "repeter hele mappen\">🔁 gjenta",
 		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
 		"mt_cflac": "konverter flac / wav-filer til opus\">flac",
@@ -1239,6 +1241,7 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
+		'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
 		'</div></div>' +
 
 		'<div><h3>' + L.ml_pmode + '</h3><div id="pb_mode">' +
@@ -2852,6 +2855,13 @@ function eval_hash() {
 	}
 	bcfg_bind(props, 'sbars', 'sbars', true, setsb);
 	setsb();
+
+	// compact media player
+	function setacmp() {
+		clmod(ebi('widget'), 'cmp', props.mcmp);
+	}
+	bcfg_bind(props, 'mcmp', 'au_compact', false, setacmp);
+	setacmp();
 })();
 
 

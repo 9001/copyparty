@@ -1101,7 +1101,6 @@ html.y #widget.open {
 #wtoggle {
 	position: absolute;
 	white-space: nowrap;
-	font-size: .8em;
 	top: -1em;
 	right: 0;
 	height: 1em;
@@ -1226,6 +1225,40 @@ html.y #widget.open {
 	max-width: 12em;
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
+}
+#widget.cmp {
+	height: 1.6em;
+	bottom: -1.6em;
+}
+#widget.cmp.open {
+	bottom: 0;
+}
+#widget.cmp #wtoggle {
+	font-size: 1.2em;
+}
+#widget.cmp #wtgrid {
+	display: none;
+}
+#widget.cmp #pctl {
+	top: 0;
+	left: 0;
+	font-size: .75em;
+}
+#widget.cmp #pctl a {
+	margin: 0;
+}
+#widget.cmp #barpos,
+#widget.cmp #barbuf {
+	width: calc(100% - 11em);
+	border-radius: 0;
+	left: 5em;
+	top: 0;
+}
+#widget.cmp #pvol {
+	top: 0;
+	right: 0;
+	max-width: 6em;
+	border-radius: 0;
 }
 .opview {
 	display: none;
