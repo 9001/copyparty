@@ -1707,12 +1707,16 @@ class HttpCli(object):
                         ofs += len(buf)
 
                     self.log("clone {} done".format(cstart[0]))
-            finally:
+
                 if not fpool:
                     f.close()
                 else:
                     with self.mutex:
                         self.u2fh.put(path, f)
+            except:
+                # maybe busted handle (eg. disk went full)
+                f.close()
+                raise
         finally:
             x = self.conn.hsrv.broker.ask("up2k.release_chunk", ptop, wark, chash)
             x.get()  # block client until released
