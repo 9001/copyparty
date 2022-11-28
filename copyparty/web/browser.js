@@ -4881,7 +4881,7 @@ function aligngriditems() {
 	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
 	var gridsz = 10;
 	try {
-		gridsz = getComputedStyle(document.documentElement).getPropertyValue('--grid-sz').slice(0, -2);
+		gridsz = cprop('--grid-sz').slice(0, -2);
 	}
 	catch (ex) { }
 	var gridwidth = ebi('ggrid').clientWidth;
@@ -6136,6 +6136,7 @@ var settheme = (function () {
 		pbar.drawpos();
 		vbar.draw();
 		showfile.setstyle();
+		bchrome();
 
 		var html = [], itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
 			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con'];

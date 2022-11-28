@@ -1634,6 +1634,25 @@ var favico = (function () {
 })();
 
 
+function cprop(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name);
+}
+
+
+function bchrome() {
+    console.log(document.documentElement.className);
+    var v, o = QS('meta[name=theme-color]');
+    if (!o)
+        return;
+
+    try {
+        v = cprop('--bg-u3');
+    }
+    catch (ex) { }
+    o.setAttribute('content', v ? v : document.documentElement.className.indexOf('y') + 1 ? '#eee' : '#333');
+}
+bchrome();
+
 var cf_cha_t = 0;
 function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status < 400 && xhr.status >= 200)
