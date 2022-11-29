@@ -2297,8 +2297,8 @@ function up2k_init(subtle) {
                     return;
                 }
 
-                var err_pend = rsp.indexOf('partial upload exists') + 1,
-                    err_dupe = rsp.indexOf('file already exists') + 1;
+                var err_pend = rsp.indexOf('partial upload exists at a different') + 1,
+                    err_dupe = rsp.indexOf('upload rejected, file already exists') + 1;
 
                 if (err_pend || err_dupe) {
                     err = rsp;

@@ -2005,13 +2005,13 @@ class Up2k(object):
                             except:
                                 self.dupesched[src] = [dupe]
 
-                        raise Pebkac(400, err)
+                        raise Pebkac(422, err)
 
                     elif "nodupe" in self.flags[job["ptop"]]:
                         self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
                         err = "upload rejected, file already exists:\n"
                         err += "/" + quotep(vsrc) + " "
-                        raise Pebkac(400, err)
+                        raise Pebkac(409, err)
                     else:
                         # symlink to the client-provided name,
                         # returning the previous upload info
