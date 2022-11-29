@@ -1280,7 +1280,7 @@ var mpl = (function () {
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
 	});
-	bcfg_bind(r, 'follow', 'au_follow', false);
+	bcfg_bind(r, 'follow', 'au_follow', false, setaufollow);
 	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
 	bcfg_bind(r, 'ac_aac', 'ac_aac', false);
 	bcfg_bind(r, 'ac_oth', 'ac_oth', true, reload_mp);
@@ -1354,6 +1354,11 @@ var mpl = (function () {
 
 		navigator.mediaSession.playbackState = mp.au && !mp.au.paused ? "playing" : "paused";
 	};
+
+	function setaufollow() {
+		window[(r.follow ? "add" : "remove") + "EventListener"]("resize", scroll2playing);
+	}
+	setaufollow();
 
 	function announce() {
 		if (!r.os_ctl || !mp.au)
@@ -2626,8 +2631,7 @@ function play(tid, is_ev, seek) {
 		thegrid.loadsel();
 
 	if (mpl.follow)
-		QS((!thegrid || !thegrid.en) ?
-			'tr.play' : '#ggrid a.play').scrollIntoView();
+		scroll2playing();
 
 	try {
 		mp.au.play();
@@ -2659,6 +2663,15 @@ function play(tid, is_ev, seek) {
 	}
 	clmod(ebi(oid), 'act');
 	setTimeout(next_song, 5000);
+}
+
+
+function scroll2playing() {
+	try {
+		QS((!thegrid || !thegrid.en) ?
+			'tr.play' : '#ggrid a.play').scrollIntoView();
+	}
+	catch (ex) { }
 }
 
 

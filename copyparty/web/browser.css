@@ -1257,7 +1257,7 @@ html.y #widget.open {
 #widget.cmp #pvol {
 	top: 0;
 	right: 0;
-	max-width: 6em;
+	max-width: 5.8em;
 	border-radius: 0;
 }
 .opview {
