@@ -51,8 +51,7 @@ except ImportError:
 PY2 = sys.version_info < (3,)
 if PY2:
     from Queue import Queue
-    from urllib import unquote
-    from urllib import quote
+    from urllib import quote, unquote
 
     sys.dont_write_bytecode = True
     bytes = str

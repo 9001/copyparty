@@ -12,7 +12,7 @@ except:
     TYPE_CHECKING = False
 
 if True:
-    from typing import Any, Union, Callable
+    from typing import Any, Callable, Union
 
 PY2 = sys.version_info < (3,)
 if not PY2:

@@ -458,7 +458,7 @@ class NetMap(object):
             fam = socket.AF_INET6 if v6 else socket.AF_INET
             bip = socket.inet_pton(fam, ip.split("/")[0])
             self.bip.append(bip)
-            self.b2sip[bip] = ip.split('/')[0]
+            self.b2sip[bip] = ip.split("/")[0]
             self.b2net[bip] = (IPv6Network if v6 else IPv4Network)(ip, False)
 
         self.bip.sort(reverse=True)

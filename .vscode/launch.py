@@ -11,15 +11,15 @@ import sys
 
 print(sys.executable)
 
+import json5
 import shlex
-import jstyleson
 import subprocess as sp
 
 
 with open(".vscode/launch.json", "r", encoding="utf-8") as f:
     tj = f.read()
 
-oj = jstyleson.loads(tj)
+oj = json5.loads(tj)
 argv = oj["configurations"][0]["args"]
 
 try:
