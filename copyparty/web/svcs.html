@@ -178,7 +178,7 @@
         </div>
 
         <pre class="os mac">
-            @@@ net use <b>w:</b> \\{{ host }}\a k /user:<b>{{ pw }}</b>
+            open 'smb://<b>{{ pw }}</b>:k@{{ host }}/a'
         </pre>
         {% endif %}
 

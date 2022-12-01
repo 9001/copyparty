@@ -107,7 +107,8 @@ var draw_md = (function () {
         map_src = genmap(dom_ref, map_src);
         map_pre = genmap(dom_pre, map_pre);
 
-        clmod(ebi('save'), 'disabled', src == server_md);
+        clmod(ebi('save'), 'disabled',
+            src.replace(/\r/g, "") == server_md.replace(/\r/g, ""));
 
         var t1 = Date.now();
         delay = t1 - t0 > 100 ? 25 : 1;
@@ -284,9 +285,7 @@ function Modpoll() {
         if (r.initial && server_ref != server_now)
             return modal.confirm('Your browser decided to show an outdated copy of the document!\n\nDo you want to load the latest version from the server instead?', function () {
                 dom_src.value = server_md = new_md;
-                dom_src.oninput();
-                dom_src.blur();
-                dom_src.focus();
+                draw_md();
             }, null);
 
         r.initial = false;
