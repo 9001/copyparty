@@ -230,7 +230,8 @@ redraw = (function () {
 // modification checker
 function Modpoll() {
     var r = {
-        skip_one: true,
+        initial: true,
+        skip_one: false,
         disabled: false
     };
 
@@ -275,8 +276,20 @@ function Modpoll() {
         if (!this.responseText)
             return;
 
-        var server_ref = server_md.replace(/\r/g, '');
-        var server_now = this.responseText.replace(/\r/g, '');
+        var new_md = this.responseText,
+            server_ref = server_md.replace(/\r/g, ''),
+            server_now = new_md.replace(/\r/g, '');
+
+        // firefox bug: sometimes get stale text even if copyparty sent a 200
+        if (r.initial && server_ref != server_now)
+            return modal.confirm('Your browser decided to show an outdated copy of the document!\n\nDo you want to load the latest version from the server instead?', function () {
+                dom_src.value = server_md = new_md;
+                dom_src.oninput();
+                dom_src.blur();
+                dom_src.focus();
+            }, null);
+
+        r.initial = false;
 
         if (server_ref != server_now) {
             console.log("modpoll diff |" + server_ref.length + "|, |" + server_now.length + "|");
@@ -296,6 +309,7 @@ function Modpoll() {
         console.log('modpoll eq');
     };
 
+    setTimeout(r.periodic, 300);
     if (md_opt.modpoll_freq > 0)
         setInterval(r.periodic, 1000 * md_opt.modpoll_freq);
 
