@@ -290,12 +290,6 @@ class SvcHub(object):
 
     def _process_config(self) -> bool:
         al = self.args
-        if al.loris1 == "no":
-            al.loris1 = "0,0"
-
-        i1, i2 = al.loris1.split(",")
-        al.loris1w = int(i1)
-        al.loris1b = int(i2)
 
         al.zm_on = al.zm_on or al.z_on
         al.zs_on = al.zs_on or al.z_on

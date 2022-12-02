@@ -1253,7 +1253,7 @@ class MultipartParser(object):
         rfc1341/rfc1521/rfc2047/rfc2231/rfc2388/rfc6266/the-real-world
         (only the fallback non-js uploader relies on these filenames)
         """
-        for ln in read_header(self.sr, 0):
+        for ln in read_header(self.sr):
             self.log(ln)
 
             m = self.re_ctype.match(ln)
@@ -1453,12 +1453,12 @@ def get_boundary(headers: dict[str, str]) -> str:
     return m.group(2)
 
 
-def read_header(sr: Unrecv, loris: int) -> list[str]:
+def read_header(sr: Unrecv) -> list[str]:
     t0 = time.time()
     ret = b""
     while True:
-        if loris and time.time() - t0 > loris:
-            raise Slowloris()
+        if time.time() - t0 > 120:
+            return []
 
         try:
             ret += sr.recv(1024)
@@ -2541,7 +2541,3 @@ class Pebkac(Exception):
 
     def __repr__(self) -> str:
         return "Pebkac({}, {})".format(self.code, repr(self.args))
-
-
-class Slowloris(Exception):
-    pass

@@ -38,7 +38,6 @@ from .util import (
     META_NOBOTS,
     MultipartParser,
     Pebkac,
-    Slowloris,
     UnrecvEOF,
     alltrace,
     atomic_move,
@@ -213,7 +212,7 @@ class HttpCli(object):
 
         try:
             self.s.settimeout(2)
-            headerlines = read_header(self.sr, self.args.loris1w)
+            headerlines = read_header(self.sr)
             self.in_hdr_recv = False
             if not headerlines:
                 return False
@@ -244,13 +243,6 @@ class HttpCli(object):
             h = {"WWW-Authenticate": "Basic"} if ex.code == 401 else {}
             self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
             return self.keepalive
-
-        except Slowloris:
-            ip = ipnorm(self.ip)
-            self.conn.bans[ip] = int(time.time() + self.args.loris1b * 60)
-            t = "slowloris (infinite-headers): {} banned for {} min"
-            self.log(t.format(ip, self.args.loris1b), 1)
-            return False
 
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")

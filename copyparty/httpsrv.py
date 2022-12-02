@@ -266,8 +266,8 @@ class HttpSrv(object):
                     continue
 
                 t = "slowloris (idle-conn): {} banned for {} min"
-                self.log(self.name, t.format(ip, self.args.loris2, nclose), 1)
-                self.bans[ip] = int(time.time() + self.args.loris2 * 60)
+                self.log(self.name, t.format(ip, self.args.loris, nclose), 1)
+                self.bans[ip] = int(time.time() + self.args.loris * 60)
 
             if self.args.log_conn:
                 self.log(self.name, "|%sC-acc1" % ("-" * 2,), c="90")
