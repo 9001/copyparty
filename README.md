@@ -828,6 +828,7 @@ through arguments:
 * `-e2v` verfies file integrity at startup, comparing hashes from the db
 * `-e2vu` patches the database with the new hashes from the filesystem
 * `-e2vp` panics and kills copyparty instead
+* `--xlink` enables deduplication across volumes
 
 the same arguments can be set as volflags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts`, `d2v` for disabling:
 * `-v ~/music::r:c,e2dsa,e2tsr` does a full reindex of everything on startup

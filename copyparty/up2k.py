@@ -1901,12 +1901,23 @@ class Up2k(object):
         sprs = self.fstab.get(pdir) != "ng"
 
         with self.mutex:
-            cur = self.cur.get(cj["ptop"])
-            reg = self.registry[cj["ptop"]]
+            ptop = cj["ptop"]
+            jcur = self.cur.get(ptop)
+            reg = self.registry[ptop]
             vfs = self.asrv.vfs.all_vols[cj["vtop"]]
             n4g = vfs.flags.get("noforget")
-            lost: list[tuple[str, str]] = []
-            if cur:
+            lost: list[tuple["sqlite3.Cursor", str, str]] = []
+
+            vols = [(ptop, jcur)]
+            if vfs.flags.get("xlink"):
+                vols += [(k, v) for k, v in self.cur.items() if k != ptop]
+
+            alts: list[tuple[int, int, dict[str, Any]]] = []
+            for ptop, cur in vols:
+                allv = self.asrv.vfs.all_vols
+                cvfs = next((v for v in allv.values() if v.realpath == ptop), vfs)
+                vtop = cj["vtop"] if cur == jcur else cvfs.vpath
+
                 if self.no_expr_idx:
                     q = r"select * from up where w = ?"
                     argv = [wark]
@@ -1914,13 +1925,12 @@ class Up2k(object):
                     q = r"select * from up where substr(w,1,16) = ? and w = ?"
                     argv = [wark[:16], wark]
 
-                alts: list[tuple[int, int, dict[str, Any]]] = []
-                cur = cur.execute(q, tuple(argv))
-                for _, dtime, dsize, dp_dir, dp_fn, ip, at in cur:
+                c2 = cur.execute(q, tuple(argv))
+                for _, dtime, dsize, dp_dir, dp_fn, ip, at in c2:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
-                    dp_abs = "/".join([cj["ptop"], dp_dir, dp_fn])
+                    dp_abs = "/".join([ptop, dp_dir, dp_fn])
                     try:
                         st = bos.stat(dp_abs)
                         if stat.S_ISLNK(st.st_mode):
@@ -1930,14 +1940,14 @@ class Up2k(object):
                         if n4g:
                             st = os.stat_result((0, -1, -1, 0, 0, 0, 0, 0, 0, 0))
                         else:
-                            lost.append((dp_dir, dp_fn))
+                            lost.append((cur, dp_dir, dp_fn))
                             continue
 
                     j = {
                         "name": dp_fn,
                         "prel": dp_dir,
-                        "vtop": cj["vtop"],
-                        "ptop": cj["ptop"],
+                        "vtop": vtop,
+                        "ptop": ptop,
                         "sprs": sprs,  # dontcare; finished anyways
                         "size": dsize,
                         "lmod": dtime,
@@ -1958,20 +1968,33 @@ class Up2k(object):
                     )
                     alts.append((score, -len(alts), j))
 
-                job = sorted(alts, reverse=True)[0][2] if alts else None
-                if job and wark in reg:
-                    # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
-                    del reg[wark]
+            job = sorted(alts, reverse=True)[0][2] if alts else None
+            if job and wark in reg:
+                # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
+                del reg[wark]
 
-                if lost:
-                    for dp_dir, dp_fn in lost:
-                        self.db_rm(cur, dp_dir, dp_fn)
+            if lost:
+                c2 = None
+                for cur, dp_dir, dp_fn in lost:
+                    self.db_rm(cur, dp_dir, dp_fn)
+                    if c2 and c2 != cur:
+                        c2.connection.commit()
 
-                    cur.connection.commit()
+                    c2 = cur
+
+                assert c2
+                c2.connection.commit()
+
+            cur = jcur
+            ptop = None  # use cj or job as appropriate
 
             if job or wark in reg:
                 job = job or reg[wark]
-                if job["prel"] == cj["prel"] and job["name"] == cj["name"]:
+                if (
+                    job["ptop"] == cj["ptop"]
+                    and job["prel"] == cj["prel"]
+                    and job["name"] == cj["name"]
+                ):
                     # ensure the files haven't been deleted manually
                     names = [job[x] for x in ["name", "tnam"] if x in job]
                     for fn in names:
@@ -2007,7 +2030,7 @@ class Up2k(object):
 
                         raise Pebkac(422, err)
 
-                    elif "nodupe" in self.flags[job["ptop"]]:
+                    elif "nodupe" in self.flags[cj["ptop"]]:
                         self.log("dupe-reject:\n  {0}\n  {1}".format(src, dst))
                         err = "upload rejected, file already exists:\n"
                         err += "/" + quotep(vsrc) + " "

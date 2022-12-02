@@ -1124,6 +1124,7 @@ class AuthSrv(object):
                 ("no_forget", "noforget"),
                 ("no_dupe", "nodupe"),
                 ("magic", "magic"),
+                ("xlink", "xlink"),
             ):
                 if getattr(self.args, ga):
                     vol.flags[vf] = True
