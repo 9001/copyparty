@@ -947,13 +947,18 @@ def main(argv: Optional[list[str]] = None) -> None:
         argv[idx] = nk
         time.sleep(2)
 
+    da = len(argv) == 1
     try:
-        if len(argv) == 1:
+        if da:
             argv.extend(["--qr"])
             if ANYWIN or not os.geteuid():
                 argv.extend(["-p80,443,3923", "--ign-ebind"])
     except:
         pass
+
+    if da:
+        t = "no arguments provided; will use {}\n"
+        lprint(t.format(" ".join(argv[1:])))
 
     nc = 1024
     try:

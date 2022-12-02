@@ -137,6 +137,10 @@ tmpdir="$(
 	awk '/./ {print; exit}'
 )"
 
+necho() {
+	printf '\033[G%s\033[K' "$*"
+}
+
 [ $repack ] && {
 	old="$tmpdir/pe-copyparty.$(id -u)"
 	echo "repack of files in $old"
@@ -145,7 +149,7 @@ tmpdir="$(
 }
 
 [ $repack ] || {
-	echo collecting ipaddress
+	necho collecting ipaddress
 	f="../build/ipaddress-1.0.23.tar.gz"
 	[ -e "$f" ] ||
 		(url=https://files.pythonhosted.org/packages/b9/9a/3e9da40ea28b8210dd6504d3fe9fe7e013b62bf45902b458d1cdc3c34ed9/ipaddress-1.0.23.tar.gz;
@@ -156,7 +160,7 @@ tmpdir="$(
 	mv ipaddress-*/ipaddress.py py37/
 	rm -rf ipaddress-*
 
-	echo collecting jinja2
+	necho collecting jinja2
 	f="../build/Jinja2-2.11.3.tar.gz"
 	[ -e "$f" ] ||
 		(url=https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-2.11.3.tar.gz;
@@ -166,7 +170,7 @@ tmpdir="$(
 	mv Jinja2-*/src/jinja2 .
 	rm -rf Jinja2-*
 	
-	echo collecting markupsafe
+	necho collecting markupsafe
 	f="../build/MarkupSafe-1.1.1.tar.gz"
 	[ -e "$f" ] ||
 		(url=https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz;
@@ -179,7 +183,7 @@ tmpdir="$(
 	mkdir j2/
 	mv {markupsafe,jinja2} j2/
 
-	echo collecting pyftpdlib
+	necho collecting pyftpdlib
 	f="../build/pyftpdlib-1.5.6.tar.gz"
 	[ -e "$f" ] ||
 		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.6.tar.gz;
@@ -192,7 +196,7 @@ tmpdir="$(
 	mkdir ftp/
 	mv pyftpdlib ftp/
 
-	echo collecting asyncore, asynchat
+	necho collecting asyncore, asynchat
 	for n in asyncore.py asynchat.py; do
 		f=../build/$n
 		[ -e "$f" ] ||
@@ -200,7 +204,7 @@ tmpdir="$(
 			wget -O$f "$url" || curl -L "$url" >$f)
 	done
 
-	echo collecting python-magic
+	necho collecting python-magic
 	v=0.4.27
 	f="../build/python-magic-$v.tar.gz"
 	[ -e "$f" ] ||
@@ -220,7 +224,7 @@ tmpdir="$(
 	# enable this to dynamically remove type hints at startup,
 	# in case a future python version can use them for performance
 	true || (
-		echo collecting strip-hints
+		necho collecting strip-hints
 		f=../build/strip-hints-0.1.10.tar.gz
 		[ -e $f ] ||
 			(url=https://files.pythonhosted.org/packages/9c/d4/312ddce71ee10f7e0ab762afc027e07a918f1c0e1be5b0069db5b0e7542d/strip-hints-0.1.10.tar.gz;
@@ -236,7 +240,8 @@ tmpdir="$(
 	cp -pR ../scripts/py2 .
 
 	# msys2 tar is bad, make the best of it
-	echo collecting source
+	necho collecting source
+	echo
 	[ $clean ] && {
 		(cd .. && git archive hovudstraum >tar) && tar -xf ../tar copyparty
 		(cd .. && tar -cf tar copyparty/web/deps) && tar -xf ../tar
@@ -258,7 +263,7 @@ tmpdir="$(
 			exit 1
 		}
 		rm "$f1"
-		cp -pv "$f2" "$f1"
+		cp -p "$f2" "$f1"
 	); done
 
 	# insert asynchat
@@ -328,13 +333,6 @@ find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') 
 
 echo use smol web deps
 rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
-
-# it's fine dw
-grep -lE '\.full\.(js|css)' copyparty/web/* |
-while IFS= read -r x; do
-	sed -r 's/\.full\.(js|css)/.\1/g' <"$x" >t
-	tmv "$x"
-done
 
 find copyparty | LC_ALL=C sort | sed 's/\.gz$//;s/$/,/' > have
 cat have | while IFS= read -r x; do

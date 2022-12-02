@@ -526,8 +526,8 @@ class SvcHub(object):
                 Daemon(self.ssdp.stop)
                 slp = time.time() + 0.5
 
-            self.tcpsrv.shutdown()
             self.broker.shutdown()
+            self.tcpsrv.shutdown()
             self.up2k.shutdown()
             if self.thumbsrv:
                 self.thumbsrv.shutdown()

@@ -280,6 +280,9 @@ class HttpSrv(object):
 
                 addr = (cip, cport)
             except (OSError, socket.error) as ex:
+                if self.stopping:
+                    break
+
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 time.sleep(0.02)
                 continue

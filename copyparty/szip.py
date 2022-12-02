@@ -269,6 +269,7 @@ class StreamZip(StreamArc):
             yield self._ct(buf)
 
     def gen(self) -> Generator[bytes, None, None]:
+        errf: dict[str, Any] = {}
         errors = []
         try:
             for f in self.fgen:
@@ -309,5 +310,5 @@ class StreamZip(StreamArc):
             ecdr, _ = gen_ecdr(self.items, cdir_pos, cdir_end)
             yield self._ct(ecdr)
         finally:
-            if errors:
+            if errf:
                 bos.unlink(errf["ap"])

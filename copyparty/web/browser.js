@@ -4586,7 +4586,7 @@ document.onkeydown = function (e) {
 		],
 		[
 			L.s_ta,
-			["tags", "tags", L.s_t1, "30", "^nhato"]
+			["tags", "tags", L.s_t1, "30", "^ゲリラ$"]
 		],
 		[
 			L.s_ad,

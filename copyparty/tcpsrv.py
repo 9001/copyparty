@@ -576,4 +576,9 @@ class TcpSrv(object):
         qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
         cc = " \033[0;38;5;{0};47;48;5;{1}m" if fg else " \033[0;30;47m"
         t = cc + "\n{2}\033[999G\033[0m\033[J"
-        return txt + t.format(fg, bg, qr)
+        t = t.format(fg, bg, qr)
+        if ANYWIN:
+            # prevent color loss on terminal resize
+            t = t.replace("\n", "`\n`")
+
+        return txt + t
