@@ -1,5 +1,5 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
-adds linetracking to marked.js v4.0.17;
+adds linetracking to marked.js v4.2.3;
 add data-ln="%d" to most tags, %d is the source markdown line
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
@@ -123,20 +123,20 @@ add data-ln="%d" to most tags, %d is the source markdown line
 +        this.ln++;
          lastToken = tokens[tokens.length - 1];
          if (lastToken && lastToken.type === 'text') {
-@@ -365,4 +396,5 @@ export class Lexer {
+@@ -367,4 +398,5 @@ export class Lexer {
            if (token = extTokenizer.call({ lexer: this }, src, tokens)) {
              src = src.substring(token.raw.length);
 +            this.ln = token.ln || this.ln;
              tokens.push(token);
              return true;
-@@ -430,4 +462,6 @@ export class Lexer {
+@@ -432,4 +464,6 @@ export class Lexer {
        if (token = this.tokenizer.br(src)) {
          src = src.substring(token.raw.length);
 +        // no need to reset (no more blockTokens anyways)
 +        token.ln = this.ln++;
          tokens.push(token);
          continue;
-@@ -472,4 +506,5 @@ export class Lexer {
+@@ -474,4 +508,5 @@ export class Lexer {
        if (token = this.tokenizer.inlineText(cutSrc, smartypants)) {
          src = src.substring(token.raw.length);
 +        this.ln = token.ln || this.ln;
@@ -234,7 +234,7 @@ index 7c36a75..aa1a53a 100644
 -    return '<pre><code class="'
 +    return '<pre' + this.ln + '><code class="'
        + this.options.langPrefix
-       + escape(lang, true)
+       + escape(lang)
 @@ -43,5 +49,5 @@ export class Renderer {
     */
    blockquote(quote) {
@@ -293,7 +293,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 index e8a69b6..2cc772b 100644
 --- a/src/Tokenizer.js
 +++ b/src/Tokenizer.js
-@@ -302,4 +302,7 @@ export class Tokenizer {
+@@ -312,4 +312,7 @@ export class Tokenizer {
        const l = list.items.length;
  
 +      // each nested list gets +1 ahead; this hack makes every listgroup -1 but atleast it doesn't get infinitely bad
