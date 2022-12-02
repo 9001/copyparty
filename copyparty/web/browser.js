@@ -338,7 +338,7 @@ var Ls = {
 		"s_r1": "path contains &nbsp; (space-separated)",
 		"s_f1": "name contains &nbsp; (negate with -nope)",
 		"s_t1": "tags contains &nbsp; (^=start, end=$)",
-		"s_a1": "key>=1A&nbsp; key<=2B&nbsp; .bpm>165",
+		"s_a1": "specific metadata properties",
 
 		"md_eshow": "cannot show ",
 
@@ -778,7 +778,7 @@ var Ls = {
 		"s_r1": "mappenavn inneholder",
 		"s_f1": "filnavn inneholder",
 		"s_t1": "sang-info inneholder",
-		"s_a1": "key>=1A&nbsp; key<=2B&nbsp; .bpm>165",
+		"s_a1": "konkrete egenskaper",
 
 		"md_eshow": "kan ikke vise ",
 
@@ -3168,8 +3168,8 @@ var fileman = (function () {
 			'<a id="rn_case" class="tgl btn" href="#" tt="' + L.fr_case + '</a>',
 			'</div>',
 			'<div id="rn_vadv"><table>',
-			'<tr><td>regex</td><td><input type="text" id="rn_re" tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" /></td></tr>',
-			'<tr><td>format</td><td><input type="text" id="rn_fmt" tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" /></td></tr>',
+			'<tr><td>regex</td><td><input type="text" id="rn_re" tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" placeholder="^[0-9]+[\\. ]+(.*) - (.*)" /></td></tr>',
+			'<tr><td>format</td><td><input type="text" id="rn_fmt" tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" placeholder="[(artist) - ](title).(ext)" /></td></tr>',
 			'<tr><td>preset</td><td><select id="rn_pre"></select>',
 			'<button id="rn_pdel">❌ ' + L.fr_pdel + '</button>',
 			'<button id="rn_pnew">💾 ' + L.fr_pnew + '</button>',
@@ -4399,6 +4399,7 @@ document.onkeydown = function (e) {
 
 	if (k == 'Escape') {
 		ae && ae.blur();
+		tt.hide();
 
 		if (ebi('hkhelp'))
 			return qsr('#hkhelp');
@@ -4567,29 +4568,29 @@ document.onkeydown = function (e) {
 	var sconf = [
 		[
 			L.s_sz,
-			["szl", "sz_min", L.s_s1, "14"],
-			["szu", "sz_max", L.s_s2, "14"]
+			["szl", "sz_min", L.s_s1, "14", ""],
+			["szu", "sz_max", L.s_s2, "14", ""]
 		],
 		[
 			L.s_dt,
-			["dtl", "dt_min", L.s_d1, "14"],
-			["dtu", "dt_max", L.s_d2, "14"]
+			["dtl", "dt_min", L.s_d1, "14", "1997-08-15, 01:00"],
+			["dtu", "dt_max", L.s_d2, "14", "2020"]
 		],
 		[
 			L.s_rd,
-			["path", "path", L.s_r1, "30"]
+			["path", "path", L.s_r1, "30", "windows  -system32"]
 		],
 		[
 			L.s_fn,
-			["name", "name", L.s_f1, "30"]
+			["name", "name", L.s_f1, "30", ".exe$"]
 		],
 		[
 			L.s_ta,
-			["tags", "tags", L.s_t1, "30"]
+			["tags", "tags", L.s_t1, "30", "^nhato"]
 		],
 		[
 			L.s_ad,
-			["adv", "adv", L.s_a1, "30"]
+			["adv", "adv", L.s_a1, "30", "key>=1A  key<=2B  .bpm>165"]
 		]
 	];
 
@@ -4608,7 +4609,7 @@ document.onkeydown = function (e) {
 				'<td colspan="' + csp + '"><input id="' + hn + 'c" type="checkbox">\n' +
 				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
 				'<br /><input id="' + hn + 'v" type="text" style="width:' + sconf[a][b][3] +
-				'em" name="' + sconf[a][b][1] + '" /></td>');
+				'em" name="' + sconf[a][b][1] + '" placeholder="' + sconf[a][b][4] + '" /></td>');
 			if (csp == 2)
 				break;
 		}
@@ -4619,7 +4620,7 @@ document.onkeydown = function (e) {
 	for (var a = 0; a < trs.length; a += 2) {
 		html.push('<table>' + (trs[a].concat(trs[a + 1])).join('\n') + '</table>');
 	}
-	html.push('<table id="tq_raw"><tr><td>raw</td><td><input id="q_raw" type="text" name="q" /></td></tr></table>');
+	html.push('<table id="tq_raw"><tr><td>raw</td><td><input id="q_raw" type="text" name="q" placeholder="( tags like *nhato* or tags like *taishi* ) and ( not tags like *nhato* or not tags like *taishi* )" /></td></tr></table>');
 	ebi('srch_form').innerHTML = html.join('\n');
 
 	var o = QSA('#op_search input');
@@ -6645,7 +6646,7 @@ function ev_row_tgl(e) {
 var unpost = (function () {
 	ebi('op_unpost').innerHTML = (
 		L.un_m1 + ' &ndash; <a id="unpost_refresh" href="#">' + L.un_upd + '</a>' +
-		'<p>' + L.un_flt + ' <input type="text" id="unpost_filt" size="20" /><a id="unpost_nofilt" href="#">' + L.un_fclr + '</a></p>' +
+		'<p>' + L.un_flt + ' <input type="text" id="unpost_filt" size="20" placeholder="documents/passwords" /><a id="unpost_nofilt" href="#">' + L.un_fclr + '</a></p>' +
 		'<div id="unpost"></div>'
 	);
 

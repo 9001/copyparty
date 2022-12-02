@@ -42,7 +42,7 @@
 	<div id="op_mkdir" class="opview opbox act">
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="mkdir" />
-			📂<input type="text" name="name" class="i">
+			📂<input type="text" name="name" class="i" placeholder="awesome mix vol.1">
 			<input type="submit" value="make directory">
 		</form>
 	</div>
@@ -50,14 +50,14 @@
 	<div id="op_new_md" class="opview opbox">
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="new_md" />
-			📝<input type="text" name="name" class="i">
+			📝<input type="text" name="name" class="i" placeholder="weekend-plans">
 			<input type="submit" value="new markdown doc">
 		</form>
 	</div>
 
 	<div id="op_msg" class="opview opbox act">
 		<form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
-			📟<input type="text" name="msg" class="i">
+			📟<input type="text" name="msg" class="i" placeholder="lorem ipsum dolor sit amet">
 			<input type="submit" value="send msg to srv log">
 		</form>
 	</div>

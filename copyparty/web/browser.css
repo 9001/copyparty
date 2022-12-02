@@ -1388,7 +1388,7 @@ input.eq_gain {
 	display: none;
 }
 #op_search input {
-	margin: 0;
+	margin: .1em 0 0 0;
 }
 #srch_q {
 	white-space: pre;
