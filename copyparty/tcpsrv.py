@@ -280,7 +280,16 @@ class TcpSrv(object):
                     # browsers dont impl linklocal
                     continue
 
-                eps[sip] = Netdev(sip, nic.index or 0, nic.nice_name, "")
+                nd = Netdev(sip, nic.index or 0, nic.nice_name, "")
+                eps[sip] = nd
+                try:
+                    idx = socket.if_nametoindex(nd.name)
+                    if idx and idx != nd.idx:
+                        t = "netdev idx mismatch; ifaddr={} cpython={}"
+                        self.log("tcpsrv", t.format(nd.idx, idx), 3)
+                        nd.idx = idx
+                except:
+                    pass
 
         if "0.0.0.0" not in listen_ips and "::" not in listen_ips:
             eps = {k: v for k, v in eps.items() if k.split("/")[0] in listen_ips}

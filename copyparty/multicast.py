@@ -8,7 +8,7 @@ import ipaddress
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
 from .__init__ import TYPE_CHECKING
-from .util import Netdev, min_ex, spack
+from .util import MACOS, Netdev, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -216,6 +216,9 @@ class MCast(object):
 
             grp = self.grp6 if srv.idx else ""
             try:
+                if MACOS:
+                    raise Exception()
+
                 sck.bind((grp, self.port, 0, srv.idx))
             except:
                 sck.bind(("", self.port, 0, srv.idx))
@@ -243,6 +246,9 @@ class MCast(object):
 
             grp = self.grp4 if srv.idx else ""
             try:
+                if MACOS:
+                    raise Exception()
+
                 sck.bind((grp, self.port))
             except:
                 sck.bind(("", self.port))
@@ -289,6 +295,8 @@ class MCast(object):
             except:
                 pass
 
+            # t = "joining {} from ip {} idx {} with mreq {}"
+            # self.log(t.format(srv.grp, srv.ip, srv.idx, repr(srv.mreq)), 6)
             sck.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, req)
 
     def map_client(self, cip: str) -> Optional[MC_Sck]:
