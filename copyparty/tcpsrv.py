@@ -6,14 +6,14 @@ import re
 import socket
 import sys
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, unicode
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, VT100, unicode
 from .stolen.qrcodegen import QrCode
 from .util import (
     E_ACCESS,
     E_ADDR_IN_USE,
     E_ADDR_NOT_AVAIL,
     E_UNREACH,
-    chkcmd,
+    Netdev,
     min_ex,
     sunpack,
     termsize,
@@ -101,7 +101,10 @@ class TcpSrv(object):
         if pad:
             self.log("tcpsrv", "")
 
-        eps = {"127.0.0.1": "local only", "::1": "local only"}
+        eps = {
+            "127.0.0.1": Netdev("127.0.0.1", 0, "", "local only"),
+            "::1": Netdev("::1", 0, "", "local only"),
+        }
         nonlocals = [x for x in self.args.i if x not in [k.split("/")[0] for k in eps]]
         if nonlocals:
             try:
@@ -114,7 +117,7 @@ class TcpSrv(object):
             eps.update({k.split("/")[0]: v for k, v in self.netdevs.items()})
             if not eps:
                 for x in nonlocals:
-                    eps[x] = "external"
+                    eps[x] = Netdev(x, 0, "", "external")
         else:
             self.netdevs = {}
 
@@ -264,143 +267,11 @@ class TcpSrv(object):
 
         self.log("tcpsrv", "ok bye")
 
-    def ips_linux_ifconfig(self) -> dict[str, str]:
-        # for termux
-        try:
-            txt, _ = chkcmd(["ifconfig"])
-        except:
-            return {}
-
-        eps: dict[str, str] = {}
-        dev = None
-        ip = None
-        up = None
-        for ln in (txt + "\n").split("\n"):
-            if not ln.strip() and dev and ip:
-                eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
-                dev = ip = up = None
-                continue
-
-            if ln == ln.lstrip():
-                dev = re.split(r"[: ]", ln)[0]
-
-            if "UP" in re.split(r"[<>, \t]", ln):
-                up = True
-
-            m = re.match(r"^\s+inet\s+([^ ]+)", ln)
-            if m:
-                ip = m.group(1)
-
-        return eps
-
-    def ips_linux(self) -> dict[str, str]:
-        try:
-            txt, _ = chkcmd(["ip", "addr"])
-        except:
-            return self.ips_linux_ifconfig()
-
-        r = re.compile(r"^\s+inet6? ([^ ]+)/")
-        ri = re.compile(r"^[0-9]+: ([^:]+): ")
-        dev = ""
-        up = False
-        eps: dict[str, str] = {}
-        for ln in txt.split("\n"):
-            m = ri.match(ln)
-            if m:
-                dev = m.group(1)
-                up = "UP" in re.split("[>,< ]", ln)
-
-            m = r.match(ln.rstrip())
-            if not m or not dev or " scope link" in ln:
-                continue
-
-            ip = m.group(1)
-            eps[ip] = dev + ("" if up else ", \033[31mLINK-DOWN")
-
-        return eps
-
-    def ips_macos(self) -> dict[str, str]:
-        eps: dict[str, str] = {}
-        try:
-            txt, _ = chkcmd(["ifconfig"])
-        except:
-            return eps
-
-        rdev = re.compile(r"^([^ ]+):")
-        rip = re.compile(r"^\tinet ([0-9\.]+) ")
-        dev = "UNKNOWN"
-        for ln in txt.split("\n"):
-            m = rdev.match(ln)
-            if m:
-                dev = m.group(1)
-
-            m = rip.match(ln)
-            if m:
-                eps[m.group(1)] = dev
-                dev = "UNKNOWN"
-
-        return eps
-
-    def ips_windows_ipconfig(self) -> tuple[dict[str, str], set[str]]:
-        eps: dict[str, str] = {}
-        offs: set[str] = set()
-        try:
-            txt, _ = chkcmd(["ipconfig"])
-        except:
-            return eps, offs
-
-        rdev = re.compile(r"(^[^ ].*):$")
-        rip = re.compile(r"^ +IPv?4? [^:]+: *([0-9\.]{7,15})$")
-        roff = re.compile(r".*: Media disconnected$")
-        dev = None
-        for ln in txt.replace("\r", "").split("\n"):
-            m = rdev.match(ln)
-            if m:
-                if dev and dev not in eps.values():
-                    offs.add(dev)
-
-                dev = m.group(1).split(" adapter ", 1)[-1]
-
-            if dev and roff.match(ln):
-                offs.add(dev)
-                dev = None
-
-            m = rip.match(ln)
-            if m and dev:
-                eps[m.group(1)] = dev
-                dev = None
-
-        if dev and dev not in eps.values():
-            offs.add(dev)
-
-        return eps, offs
-
-    def ips_windows_netsh(self) -> dict[str, str]:
-        eps: dict[str, str] = {}
-        try:
-            txt, _ = chkcmd("netsh interface ip show address".split())
-        except:
-            return eps
-
-        rdev = re.compile(r'.* "([^"]+)"$')
-        rip = re.compile(r".* IP\b.*: +([0-9\.]{7,15})$")
-        dev = None
-        for ln in txt.replace("\r", "").split("\n"):
-            m = rdev.match(ln)
-            if m:
-                dev = m.group(1)
-
-            m = rip.match(ln)
-            if m and dev:
-                eps[m.group(1)] = dev
-
-        return eps
-
-    def detect_interfaces(self, listen_ips: list[str]) -> dict[str, str]:
+    def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
         from .stolen.ifaddr import get_adapters
 
         nics = get_adapters(True)
-        eps = {}
+        eps: dict[str, Netdev] = {}
         for nic in nics:
             for nip in nic.ips:
                 ipa = nip.ip[0] if ":" in str(nip.ip) else nip.ip
@@ -409,14 +280,15 @@ class TcpSrv(object):
                     # browsers dont impl linklocal
                     continue
 
-                eps[sip] = nic.nice_name
+                eps[sip] = Netdev(sip, nic.index or 0, nic.nice_name, "")
 
         if "0.0.0.0" not in listen_ips and "::" not in listen_ips:
             eps = {k: v for k, v in eps.items() if k.split("/")[0] in listen_ips}
 
         try:
             ext_devs = list(self._extdevs_nix())
-            ext_ips = [k for k, v in eps.items() if v.split(",")[0] in ext_devs]
+            ext_ips = [k for k, v in eps.items() if v.name in ext_devs]
+            ext_ips = [x.split("/")[0] for x in ext_ips]
             if not ext_ips:
                 raise Exception()
         except:
@@ -430,11 +302,9 @@ class TcpSrv(object):
             desc = "\033[32mexternal"
             ips = ext_ips if lip in ["0.0.0.0", "::"] else [lip]
             for ip in ips:
-                try:
-                    if "external" not in eps[ip]:
-                        eps[ip] += ", " + desc
-                except:
-                    eps[ip] = desc
+                ip = next((x for x in eps if x.startswith(ip + "/")), "")
+                if ip and "external" not in eps[ip].desc:
+                    eps[ip].desc += ", " + desc
 
         return eps
 

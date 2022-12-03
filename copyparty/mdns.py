@@ -25,7 +25,7 @@ from .stolen.dnslib import (
     DNSQuestion,
     DNSRecord,
 )
-from .util import CachedSet, Daemon, min_ex
+from .util import CachedSet, Daemon, Netdev, min_ex
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -42,13 +42,12 @@ class MDNS_Sck(MC_Sck):
     def __init__(
         self,
         sck: socket.socket,
-        idx: int,
-        name: str,
+        nd: Netdev,
         grp: str,
         ip: str,
         net: Union[IPv4Network, IPv6Network],
     ):
-        super(MDNS_Sck, self).__init__(sck, idx, name, grp, ip, net)
+        super(MDNS_Sck, self).__init__(sck, nd, grp, ip, net)
 
         self.bp_probe = b""
         self.bp_ip = b""
@@ -263,7 +262,8 @@ class MDNS(MCast):
         try:
             bound = self.create_servers()
         except:
-            self.log("no server IP matches the mdns config", 1)
+            t = "no server IP matches the mdns config\n{}"
+            self.log(t.format(min_ex()), 1)
             bound = []
 
         if not bound:

@@ -188,10 +188,14 @@ IMPLICATIONS = [
     ["z", "zm"],
     ["z", "zs"],
     ["zmvv", "zmv"],
+    ["zm4", "zm"],
+    ["zm6", "zm"],
     ["zmv", "zm"],
     ["zms", "zm"],
     ["zsv", "zs"],
 ]
+if ANYWIN:
+    IMPLICATIONS.extend([["z", "zm4"]])
 
 
 UNPLICATIONS = [["no_dav", "daw"]]
@@ -363,6 +367,23 @@ class Daemon(threading.Thread):
             self.start()
 
 
+class Netdev(object):
+    def __init__(self, ip: str, idx: int, name: str, desc: str):
+        self.ip = ip
+        self.idx = idx
+        self.name = name
+        self.desc = desc
+
+    def __str__(self):
+        return "{}-{}{}".format(self.idx, self.name, self.desc)
+
+    def __lt__(self, rhs):
+        return str(self) < str(rhs)
+
+    def __eq__(self, rhs):
+        return str(self) == str(rhs)
+
+
 class Cooldown(object):
     def __init__(self, maxage: float) -> None:
         self.maxage = maxage
@@ -434,7 +455,7 @@ class HLog(logging.Handler):
 
 
 class NetMap(object):
-    def __init__(self, ips: list[str], netdevs: dict[str, str]) -> None:
+    def __init__(self, ips: list[str], netdevs: dict[str, Netdev]) -> None:
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
                 [x.split("/")[0] for x in netdevs if ":" in x]
@@ -1791,11 +1812,14 @@ if not PY2 or not WINDOWS:
 else:
     # moonrunes become \x3f with bytestrings,
     # losing mojibake support is worth
-    def _not_actually_mbcs(txt: str) -> str:
+    def _not_actually_mbcs_enc(txt: str) -> bytes:
         return txt
 
-    fsenc = _not_actually_mbcs
-    fsdec = _not_actually_mbcs
+    def _not_actually_mbcs_dec(txt: bytes) -> str:
+        return txt
+
+    fsenc = _not_actually_mbcs_enc
+    fsdec = _not_actually_mbcs_dec
 
 
 def s3enc(mem_cur: "sqlite3.Cursor", rd: str, fn: str) -> tuple[str, str]:

@@ -105,7 +105,8 @@ class SSDPd(MCast):
         try:
             bound = self.create_servers()
         except:
-            self.log("no server IP matches the ssdp config", 1)
+            t = "no server IP matches the ssdp config\n{}"
+            self.log(t.format(min_ex()), 1)
             bound = []
 
         if not bound:
@@ -130,7 +131,7 @@ class SSDPd(MCast):
             for sck in rx:
                 buf, addr = sck.recvfrom(4096)
                 try:
-                    self.eat(buf, addr, sck)
+                    self.eat(buf, addr)
                 except:
                     if not self.running:
                         return
@@ -144,7 +145,7 @@ class SSDPd(MCast):
         self.running = False
         self.srv = {}
 
-    def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket) -> None:
+    def eat(self, buf: bytes, addr: tuple[str, int]) -> None:
         cip = addr[0]
         if cip.startswith("169.254"):
             return

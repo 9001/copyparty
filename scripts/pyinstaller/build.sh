@@ -3,6 +3,7 @@ set -e
 
 curl -k https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh |
 tee build2.sh | cmp build.sh && rm build2.sh || {
+    [ -s build2.sh ] || exit 1
     echo "new build script; upgrade y/n:"
     while true; do read -u1 -n1 -r r; [[ $r =~ [yYnN] ]] && break; done
     [[ $r =~ [yY] ]] && mv build{2,}.sh && exec ./build.sh

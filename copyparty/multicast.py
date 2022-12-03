@@ -7,8 +7,8 @@ import time
 import ipaddress
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 
-from .__init__ import MACOS, TYPE_CHECKING
-from .util import min_ex, spack
+from .__init__ import TYPE_CHECKING
+from .util import Netdev, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -30,15 +30,14 @@ class MC_Sck(object):
     def __init__(
         self,
         sck: socket.socket,
-        idx: int,
-        name: str,
+        nd: Netdev,
         grp: str,
         ip: str,
         net: Union[IPv4Network, IPv6Network],
     ):
         self.sck = sck
-        self.idx = idx
-        self.name = name
+        self.idx = nd.idx
+        self.name = nd.name
         self.grp = grp
         self.mreq = b""
         self.ip = ip
@@ -112,7 +111,7 @@ class MCast(object):
         for lst in (on, off):
             for av in list(lst):
                 for sk, sv in netdevs.items():
-                    if av == sv.split(",")[0] and sk not in lst:
+                    if (av == str(sv.idx) or av == sv.name) and sk not in lst:
                         lst.append(sk)
 
         if on:
@@ -137,12 +136,8 @@ class MCast(object):
 
         for ip in ips:
             v6 = ":" in ip
-            netdev = "?"
-            try:
-                netdev = netdevs[ip].split(",")[0]
-                idx = socket.if_nametoindex(netdev)
-            except:
-                idx = socket.INADDR_ANY
+            netdev = netdevs[ip]
+            if not netdev.idx:
                 t = "using INADDR_ANY for ip [{}], netdev [{}]"
                 if not self.srv and ip not in ["::", "0.0.0.0"]:
                     self.log(t.format(ip, netdev), 3)
@@ -159,20 +154,14 @@ class MCast(object):
             # most ipv6 clients expect multicast on linklocal ip only;
             # add a/aaaa records for the other nic IPs
             other_ips: set[str] = set()
-            if v6 and netdev not in ("?", ""):
-                for oip, onic in netdevs.items():
-                    if (
-                        onic.split(",")[0] == netdev
-                        and oip in all_selected
-                        and ":" in oip
-                    ):
-                        other_ips.add(oip)
+            if v6:
+                for nd in netdevs.values():
+                    if nd.idx == netdev.idx and nd.ip in all_selected and ":" in nd.ip:
+                        other_ips.add(nd.ip)
 
             net = ipaddress.ip_network(ip, False)
             ip = ip.split("/")[0]
-            srv = self.Srv(
-                sck, idx, netdev, self.grp6 if ":" in ip else self.grp4, ip, net
-            )
+            srv = self.Srv(sck, netdev, self.grp6 if ":" in ip else self.grp4, ip, net)
             for oth_ip in other_ips:
                 srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
 
@@ -225,8 +214,11 @@ class MCast(object):
                 self.b2srv[bip] = srv
                 self.b6.append(bip)
 
-            grp = self.grp6 if srv.idx and not MACOS else ""
-            sck.bind((grp, self.port, 0, srv.idx))
+            grp = self.grp6 if srv.idx else ""
+            try:
+                sck.bind((grp, self.port, 0, srv.idx))
+            except:
+                sck.bind(("", self.port, 0, srv.idx))
 
             bgrp = socket.inet_pton(socket.AF_INET6, self.grp6)
             dev = spack(b"@I", srv.idx)
@@ -249,8 +241,12 @@ class MCast(object):
             self.b2srv[bip] = srv
             self.b4.append(bip)
 
-            grp = self.grp4 if srv.idx and not MACOS else ""
-            sck.bind((grp, self.port))
+            grp = self.grp4 if srv.idx else ""
+            try:
+                sck.bind((grp, self.port))
+            except:
+                sck.bind(("", self.port))
+
             bgrp = socket.inet_aton(self.grp4)
             dev = (
                 spack(b"=I", socket.INADDR_ANY)

@@ -38,6 +38,7 @@ from .util import (
     Garda,
     Magician,
     NetMap,
+    Netdev,
     ipnorm,
     min_ex,
     shut_socket,
@@ -140,7 +141,7 @@ class HttpSrv(object):
         except:
             pass
 
-    def set_netdevs(self, netdevs: dict[str, str]) -> None:
+    def set_netdevs(self, netdevs: dict[str, Netdev]) -> None:
         self.nm = NetMap([self.ip], netdevs)
 
     def start_threads(self, n: int) -> None:

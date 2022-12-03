@@ -34,7 +34,6 @@ from .util import (
 if True:  # pylint: disable=using-constant-test
     from collections.abc import Iterable
 
-    import typing
     from typing import Any, Generator, Optional, Union
 
     from .util import RootLogger

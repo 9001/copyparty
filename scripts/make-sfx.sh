@@ -138,7 +138,7 @@ tmpdir="$(
 )"
 
 necho() {
-	printf '\033[G%s\033[K' "$*"
+	printf '\033[G%s ... \033[K' "$*"
 }
 
 [ $repack ] && {
@@ -331,7 +331,6 @@ find -name py.typed -delete
 find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
 find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
 
-echo use smol web deps
 rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
 
 find copyparty | LC_ALL=C sort | sed 's/\.gz$//;s/$/,/' > have
@@ -466,7 +465,7 @@ zdir="$tmpdir/cpp-mk$CSN"
 [ -e "$zdir/$stamp" ] || rm -rf "$zdir"
 mkdir -p "$zdir"
 echo a > "$zdir/$stamp"
-nf=$(ls -1 "$zdir"/arc.* | wc -l)
+nf=$(ls -1 "$zdir"/arc.* 2>/dev/null | wc -l)
 [ $nf -ge 2 ] && [ ! $repack ] && use_zdir=1 || use_zdir=
 
 [ $use_zdir ] || {

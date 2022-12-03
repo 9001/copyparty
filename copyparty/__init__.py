@@ -12,11 +12,11 @@ except:
     TYPE_CHECKING = False
 
 if True:
-    from typing import Any, Callable, Union
+    from typing import Any, Callable
 
 PY2 = sys.version_info < (3,)
 if not PY2:
-    unicode: Callable[[Union[str, int, float]], str] = str
+    unicode: Callable[[Any], str] = str
 else:
     sys.dont_write_bytecode = True
     unicode = unicode  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
