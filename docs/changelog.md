@@ -1,4 +1,16 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-1013-1937  `v1.4.6`  wav2opus
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* latest gzip edition of the sfx: *This version*
+
+## bugfixes
+* the option to transcode flac to opus while playing audio in the browser was supposed to transcode wav-files as well, instead of being extremely hazardous to mobile data plans (sorry)
+* `--license` didn't work if copyparty was installed from `pip`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-1009-0919  `v1.4.5`  qr-code
 
 * read-only demo server at https://a.ocv.me/pub/demo/

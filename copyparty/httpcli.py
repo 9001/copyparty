@@ -241,8 +241,11 @@ class HttpCli(object):
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = False
             h = {"WWW-Authenticate": "Basic"} if ex.code == 401 else {}
-            self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
-            return self.keepalive
+            try:
+                self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
+                return self.keepalive
+            except:
+                return False
 
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
