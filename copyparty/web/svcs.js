@@ -1,10 +1,18 @@
+function QSA(x) {
+    return document.querySelectorAll(x);
+}
+var LINUX = /Linux/.test(navigator.userAgent),
+    MACOS = /[^a-z]mac ?os/i.test(navigator.userAgent),
+    WINDOWS = /Windows/.test(navigator.userAgent);
+
+
 var oa = QSA('pre');
 for (var a = 0; a < oa.length; a++) {
     var html = oa[a].innerHTML,
         nd = /^ +/.exec(html)[0].length,
-        rd = new RegExp('(^|\n) {' + nd + '}', 'g');
+        rd = new RegExp('(^|\r?\n) {' + nd + '}', 'g');
 
-    oa[a].innerHTML = html.replace(rd, '$1').replace(/[ \r\n]+$/, '');
+    oa[a].innerHTML = html.replace(rd, '$1').replace(/[ \r\n]+$/, '').replace(/\r?\n/g, '<br />');
 }
 
 
@@ -14,7 +22,7 @@ for (var a = 0; a < oa.length; a++)
 
 function esetos(e) {
     ev(e);
-    setos(e.target.id.slice(1));
+    setos(((e && e.target) || (window.event && window.event.srcElement)).id.slice(1));
 }
 
 function setos(os) {

@@ -53,7 +53,7 @@
             <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>--no-check-certificate</code> to the mount command</em><br />---</p>
             {% endif %}
             
-            <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes password login), then connect:</p>
+            <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
                 net use <b>w:</b> http{{ s }}://{{ ep }}/{{ vp }}{% if accs %} k /user:<b>{{ pw }}</b>{% endif %}
             </pre>
