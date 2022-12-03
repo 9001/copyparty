@@ -90,7 +90,8 @@ class TestDXML(unittest.TestCase):
         root = mkenod("a")
         root.insert(0, parse_xml(txt))
         prop = root.find(r"./{DAV:}propertyupdate/{DAV:}set/{DAV:}prop")
-        assert prop
+        assert prop is not None
+        assert len(prop)
         for el in prop:
             el.clear()
 

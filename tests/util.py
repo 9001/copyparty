@@ -98,19 +98,19 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp no_dav daw dav_inf dav_mac xdev xvol ed emp force_js ihead magic no_acode no_athumb no_del no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nid nih nw"
+        ex = "daw dav_inf dav_mac e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js ihead magic nid nih no_acode no_athumb no_dav no_del no_dupe no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nw xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "no_rescan no_sendfile no_voldump plain_ip dotpart"
+        ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "css_browser hist js_browser no_hash no_idx no_forget"
+        ex = "css_browser hist js_browser no_forget no_hash no_idx"
         ka.update(**{k: None for k in ex.split()})
 
-        ex = "re_maxage rproxy rsp_slp s_wr_slp theme themes turbo df loris"
+        ex = "df loris re_maxage rproxy rsp_slp s_wr_slp theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "doctitle favico html_head mth textfiles log_fk"
+        ex = "doctitle favico html_head log_fk mth textfiles"
         ka.update(**{k: "" for k in ex.split()})
 
         super(Cfg, self).__init__(

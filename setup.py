@@ -6,7 +6,7 @@ import os
 import sys
 import subprocess as sp
 from shutil import rmtree
-from setuptools import setup, Command, find_packages
+from setuptools import setup, Command
 
 
 NAME = "copyparty"
@@ -120,7 +120,18 @@ args = {
     ],
     "include_package_data": True,
     "data_files": data_files,
-    "packages": find_packages(),
+    "packages": [
+        "copyparty",
+        "copyparty.bos",
+        "copyparty.res",
+        "copyparty.stolen",
+        "copyparty.stolen.dnslib",
+        "copyparty.stolen.ifaddr",
+        "copyparty.web",
+        "copyparty.web.a",
+        "copyparty.web.dd",
+        "copyparty.web.deps",
+    ],
     "install_requires": ["jinja2"],
     "extras_require": {
         "thumbnails": ["Pillow"],

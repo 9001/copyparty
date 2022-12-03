@@ -55,14 +55,6 @@ EOF
 	# set pypi password
 	chmod 600 ~/.pypirc
 	sed -ri 's/qwer/username/;s/asdf/password/' ~/.pypirc
-
-	# if PY2: create build env
-	cd ~/dev/copyparty && virtualenv buildenv
-	(. buildenv/bin/activate && pip install twine)
-
-	# if PY3: create build env
-	cd ~/dev/copyparty && python3 -m venv buildenv
-	(. buildenv/bin/activate && pip install twine wheel)
 }
 
 
@@ -82,15 +74,27 @@ function have() {
 	python -c "import $1; $1; $1.__version__"
 }
 
-. buildenv/bin/activate
-have setuptools
-have wheel
-have twine
+function load_env() {
+	. buildenv/bin/activate
+	have setuptools
+	have wheel
+	have twine
+}
+
+load_env || {
+	echo creating buildenv
+	deactivate || true
+	rm -rf buildenv
+	python3 -m venv buildenv
+	(. buildenv/bin/activate && pip install twine wheel)
+	load_env
+}
 
 # remove type hints to support python < 3.9
 rm -rf build/pypi
 mkdir -p build/pypi
 cp -pR setup.py README.md LICENSE copyparty tests bin scripts/strip_hints build/pypi/
+tar -c docs/lics.txt scripts/genlic.sh build/*.txt | tar -xC build/pypi/
 cd build/pypi
 f=../strip-hints-0.1.10.tar.gz
 [ -e $f ] || 
