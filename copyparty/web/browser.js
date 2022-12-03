@@ -6748,14 +6748,16 @@ var unpost = (function () {
 			n2 = parseInt(tgt.getAttribute('n2') || n + 1),
 			req = [];
 
-		for (var a = n; a < n2; a++)
-			if (QS('#op_unpost a.n' + a))
-				req.push(uricom_dec(r.files[a].vp.split('?')[0]));
+		for (var a = n; a < n2; a++) {
+			var links = QSA('#op_unpost a.n' + a);
+			if (!links.length)
+				continue;
 
-		var links = QSA('#op_unpost a.n' + n);
-		for (var a = 0, aa = links.length; a < aa; a++) {
-			links[a].removeAttribute('href');
-			links[a].innerHTML = '[busy]';
+			req.push(uricom_dec(r.files[a].vp.split('?')[0]));
+			for (var b = 0; b < links.length; b++) {
+				links[b].removeAttribute('href');
+				links[b].innerHTML = '[busy]';
+			}
 		}
 
 		toast.show('inf r', 0, L.un_busy.format(req.length));
@@ -6763,7 +6765,7 @@ var unpost = (function () {
 		var xhr = new XHR();
 		xhr.n = n;
 		xhr.n2 = n2;
-		xhr.open('POST', '/?delete&lim=' + links.length, true);
+		xhr.open('POST', '/?delete&lim=' + req.length, true);
 		xhr.onload = xhr.onerror = unpost_delete_cb;
 		xhr.send(JSON.stringify(req));
 	};

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 5, 0)
+VERSION = (1, 5, 1)
 CODENAME = "babel"
 BUILD_DT = (2022, 12, 3)
 
