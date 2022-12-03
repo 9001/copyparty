@@ -37,6 +37,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * [bugs](#bugs)
     * [general bugs](#general-bugs)
     * [not my bugs](#not-my-bugs)
+* [breaking changes](#breaking-changes) - upgrade notes
 * [FAQ](#FAQ) - "frequently" asked questions
 * [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
     * [shadowing](#shadowing) - hiding specific subfolders
@@ -99,7 +100,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary"
-    * [copyparty.exe](#copypartyexe)
+    * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) or [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe)
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
 * [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
@@ -115,11 +116,10 @@ running the sfx without arguments (for example doubleclicking it on Windows) wil
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
-* `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies)
+* `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies) to enable thumbnails and more
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
   * see [accounts and volumes](#accounts-and-volumes) for the syntax and other permissions (`r`ead, `w`rite, `m`ove, `d`elete, `g`et, up`G`et)
-* `--ls '**,*,ln,p,r'` to crash on startup if any of the volumes contain a symlink which point outside the volume, as that could give users unintended access (see `--help-ls`)
 
 
 ### on servers
@@ -285,6 +285,15 @@ server-os-specific:
 
 * Ubuntu: dragging files from certain folders into firefox or chrome is impossible
   * due to snap security policies -- see `snap connections firefox` for the allowlist, `removable-media` permits all of `/mnt` and `/media` apparently
+
+
+# breaking changes
+
+upgrade notes
+
+* `1.5.0` (2022-12-03): [new chunksize formula](https://github.com/9001/copyparty/commit/54e1c8d261df) for files larger than 128 GiB
+  * **users:** upgrade to the latest [cli uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) if you use that
+  * **devs:** update third-party up2k clients (if those even exist)
 
 
 # FAQ
@@ -692,6 +701,8 @@ using arguments or config files, or a mix of both:
 ## zeroconf
 
 announce enabled services on the LAN  if you specify the `-z` option, which enables [mdns](#mdns) and [ssdp](#ssdp)
+
+* `--z-on` / `--z-off`' limits the feature to certain networks
 
 
 ### mdns
@@ -1151,7 +1162,9 @@ NOTE: curl will not send the original filename if you use `-T` combined with url
 
 ## mount as drive
 
-a remote copyparty server as a local filesystem;  some alternatives roughly sorted by speed (unreproducible benchmark), best first:
+a remote copyparty server as a local filesystem;  go to the control-panel and click `connect` to see a list of commands to do that
+
+alternatively, some alternatives roughly sorted by speed (unreproducible benchmark), best first:
 
 * [rclone-http](./docs/rclone.md) (25s), read-only
 * [rclone-ftp](./docs/rclone.md) (47s), read/WRITE
@@ -1163,34 +1176,6 @@ a remote copyparty server as a local filesystem;  some alternatives roughly sort
 * [win10-smb2](#smb-server) (387s), read/WRITE
 
 most clients will fail to mount the root of a copyparty server unless there is a root volume (so you get the admin-panel instead of a browser when accessing it) -- in that case, mount a specific volume instead
-
-
-# up2k
-
-quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
-* the up2k client splits a file into an "optimal" number of chunks
-  * 1 MiB each, unless that becomes more than 256 chunks
-  * tries 1.5M, 2M, 3, 4, 6, ... until <= 256 chunks or size >= 32M
-* client posts the list of hashes, filename, size, last-modified
-* server creates the `wark`, an identifier for this upload
-  * `sha512( salt + filesize + chunk_hashes )`
-  * and a sparse file is created for the chunks to drop into
-* client uploads each chunk
-  * header entries for the chunk-hash and wark
-  * server writes chunks into place based on the hash
-* client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
-
-up2k has saved a few uploads from becoming corrupted in-transfer already;
-* caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
-* also stopped someone from uploading because their ram was bad
-
-regarding the frequent server log message during uploads;  
-`6.0M 106M/s 2.77G 102.9M/s n948 thank 4/0/3/1 10042/7198 00:01:09`
-* this chunk was `6 MiB`, uploaded at `106 MiB/s`
-* on this http connection, `2.77 GiB` transferred, `102.9 MiB/s` average, `948` chunks handled
-* client says `4` uploads OK, `0` failed, `3` busy, `1` queued, `10042 MiB` total size, `7198 MiB` and `00:01:09` left
-
-design detail: [why chunk-hashes](#./docs/devnotes.md#why-chunk-hashes)
 
 
 # performance
@@ -1288,90 +1273,7 @@ however you can hit `F12` in the up2k tab and use the devtools to see how far yo
 
 # HTTP API
 
-* table-column `params` = URL parameters; `?foo=bar&qux=...`
-* table-column `body` = POST payload
-* method `jPOST` = json post
-* method `mPOST` = multipart post
-* method `uPOST` = url-encoded post
-* `FILE` = conventional HTTP file upload entry (rfc1867 et al, filename in `Content-Disposition`)
-
-authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
-
-## read
-
-| method | params | result |
-|--|--|--|
-| GET | `?ls` | list files/folders at URL as JSON |
-| GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
-| GET | `?ls=t` | list files/folders at URL as plaintext |
-| GET | `?ls=v` | list files/folders at URL, terminal-formatted |
-| GET | `?b` | list files/folders at URL as simplified HTML |
-| GET | `?tree=.` | list one level of subdirectories inside URL |
-| GET | `?tree` | list one level of subdirectories for each level until URL |
-| GET | `?tar` | download everything below URL as a tar file |
-| GET | `?zip=utf-8` | download everything below URL as a zip file |
-| GET | `?ups` | show recent uploads from your IP |
-| GET | `?ups&filter=f` | ...where URL contains `f` |
-| GET | `?mime=foo` | specify return mimetype `foo` |
-| GET | `?v` | render markdown file at URL |
-| GET | `?txt` | get file at URL as plaintext |
-| GET | `?txt=iso-8859-1` | ...with specific charset |
-| GET | `?th` | get image/video at URL as thumbnail |
-| GET | `?th=opus` | convert audio file to 128kbps opus |
-| GET | `?th=caf` | ...in the iOS-proprietary container |
-
-| method | body | result |
-|--|--|--|
-| jPOST | `{"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
-
-| method | params | body | result |
-|--|--|--|--|
-| jPOST | `?tar` | `["foo","bar"]` | download folders `foo` and `bar` inside URL as a tar file |
-
-## write
-
-| method | params | result |
-|--|--|--|
-| GET | `?move=/foo/bar` | move/rename the file/folder at URL to /foo/bar |
-
-| method | params | body | result |
-|--|--|--|--|
-| PUT | | (binary data) | upload into file at URL |
-| PUT | `?gz` | (binary data) | compress with gzip and write into file at URL |
-| PUT | `?xz` | (binary data) | compress with xz and write into file at URL |
-| mPOST | | `act=bput`, `f=FILE` | upload `FILE` into the folder at URL |
-| mPOST | `?j` | `act=bput`, `f=FILE` | ...and reply with json |
-| mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
-| GET | `?delete` | | delete URL recursively |
-| jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |
-| uPOST | | `msg=foo` | send message `foo` into server log |
-| mPOST | | `act=tput`, `body=TEXT` | overwrite markdown document at URL |
-
-upload modifiers:
-
-| http-header | url-param | effect |
-|--|--|--|
-| `Accept: url` | `want=url` | return just the file URL |
-| `Rand: 4` | `rand=4` | generate random filename with 4 characters |
-| `Life: 30` | `life=30` | delete file after 30 seconds |
-
-* `life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
-
-* server behavior of `msg` can be reconfigured with `--urlform`
-
-## admin
-
-| method | params | result |
-|--|--|--|
-| GET | `?reload=cfg` | reload config files and rescan volumes |
-| GET | `?scan` | initiate a rescan of the volume which provides URL |
-| GET | `?stack` | show a stacktrace of all threads |
-
-## general
-
-| method | params | result |
-|--|--|--|
-| GET | `?pw=x` | logout |
+see [devnotes](#./docs/devnotes.md#http-api)
 
 
 # dependencies
@@ -1427,11 +1329,15 @@ you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack]
 
 ## copyparty.exe
 
+download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) or [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe)
+
 ![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/194707422-cb7f66c9-41a2-4cb9-8dbc-2ab866cd4338.png)
 
-[copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) can be convenient on old machines where installing python is problematic, however is **not recommended** and should be considered a last resort -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
+can be convenient on old machines where installing python is problematic, however is **not recommended** and should be considered a last resort -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
 
-the exe is compatible with 32bit windows7, which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and will definitely become a security hazard at some point
+* [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) is compatible with 32bit windows7, which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and will definitely become a security hazard at some point
+
+* [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe) is identical except 64bit so it [works in WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png)
 
 meanwhile [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) instead relies on your system python which gives better performance and will stay safe as long as you keep your python install up-to-date
 

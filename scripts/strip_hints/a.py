@@ -41,7 +41,7 @@ def uh(top):
         for fp in files:
             uh1(fp)
 
-    pr("k\n\n")
+    pr("k\n")
     with open(top + "/uh", "wb") as f:
         f.write(b"a")
 

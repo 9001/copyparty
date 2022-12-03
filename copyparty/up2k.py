@@ -1908,7 +1908,7 @@ class Up2k(object):
             n4g = vfs.flags.get("noforget")
             lost: list[tuple["sqlite3.Cursor", str, str]] = []
 
-            vols = [(ptop, jcur)]
+            vols = [(ptop, jcur)] if jcur else []
             if vfs.flags.get("xlink"):
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
 

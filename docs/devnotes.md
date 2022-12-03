@@ -1,11 +1,11 @@
 ## devnotes toc
 
 * top
-    * [future plans](#future-plans) - some improvement ideas
+* [future plans](#future-plans) - some improvement ideas
 * [design](#design)
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
-    * [assumptions](#assumptions)
-        * [mdns](#mdns)
+* [assumptions](#assumptions)
+    * [mdns](#mdns)
 * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
 * [building](#building)
     * [dev env setup](#dev-env-setup)
@@ -15,7 +15,7 @@
     * [discarded ideas](#discarded-ideas)
 
 
-## future plans
+# future plans
 
 some improvement ideas
 
@@ -32,6 +32,31 @@ some improvement ideas
 
 
 # design
+
+## up2k
+
+quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
+* the up2k client splits a file into an "optimal" number of chunks
+  * 1 MiB each, unless that becomes more than 256 chunks
+  * tries 1.5M, 2M, 3, 4, 6, ... until <= 256 chunks or size >= 32M
+* client posts the list of hashes, filename, size, last-modified
+* server creates the `wark`, an identifier for this upload
+  * `sha512( salt + filesize + chunk_hashes )`
+  * and a sparse file is created for the chunks to drop into
+* client uploads each chunk
+  * header entries for the chunk-hash and wark
+  * server writes chunks into place based on the hash
+* client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
+
+up2k has saved a few uploads from becoming corrupted in-transfer already;
+* caught an android phone on wifi redhanded in wireshark with a bitflip, however bup with https would *probably* have noticed as well (thanks to tls also functioning as an integrity check)
+* also stopped someone from uploading because their ram was bad
+
+regarding the frequent server log message during uploads;  
+`6.0M 106M/s 2.77G 102.9M/s n948 thank 4/0/3/1 10042/7198 00:01:09`
+* this chunk was `6 MiB`, uploaded at `106 MiB/s`
+* on this http connection, `2.77 GiB` transferred, `102.9 MiB/s` average, `948` chunks handled
+* client says `4` uploads OK, `0` failed, `3` busy, `1` queued, `10042 MiB` total size, `7198 MiB` and `00:01:09` left
 
 ## why chunk-hashes
 
@@ -50,9 +75,97 @@ hashwasm would solve the streaming issue but reduces hashing speed for sha512 (x
 * blake2 might be a better choice since xxh is non-cryptographic, but that gets ~15 MiB/s on slower androids
 
 
-## assumptions
+# http api
 
-### mdns
+* table-column `params` = URL parameters; `?foo=bar&qux=...`
+* table-column `body` = POST payload
+* method `jPOST` = json post
+* method `mPOST` = multipart post
+* method `uPOST` = url-encoded post
+* `FILE` = conventional HTTP file upload entry (rfc1867 et al, filename in `Content-Disposition`)
+
+authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
+
+## read
+
+| method | params | result |
+|--|--|--|
+| GET | `?ls` | list files/folders at URL as JSON |
+| GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
+| GET | `?ls=t` | list files/folders at URL as plaintext |
+| GET | `?ls=v` | list files/folders at URL, terminal-formatted |
+| GET | `?b` | list files/folders at URL as simplified HTML |
+| GET | `?tree=.` | list one level of subdirectories inside URL |
+| GET | `?tree` | list one level of subdirectories for each level until URL |
+| GET | `?tar` | download everything below URL as a tar file |
+| GET | `?zip=utf-8` | download everything below URL as a zip file |
+| GET | `?ups` | show recent uploads from your IP |
+| GET | `?ups&filter=f` | ...where URL contains `f` |
+| GET | `?mime=foo` | specify return mimetype `foo` |
+| GET | `?v` | render markdown file at URL |
+| GET | `?txt` | get file at URL as plaintext |
+| GET | `?txt=iso-8859-1` | ...with specific charset |
+| GET | `?th` | get image/video at URL as thumbnail |
+| GET | `?th=opus` | convert audio file to 128kbps opus |
+| GET | `?th=caf` | ...in the iOS-proprietary container |
+
+| method | body | result |
+|--|--|--|
+| jPOST | `{"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
+
+| method | params | body | result |
+|--|--|--|--|
+| jPOST | `?tar` | `["foo","bar"]` | download folders `foo` and `bar` inside URL as a tar file |
+
+## write
+
+| method | params | result |
+|--|--|--|
+| GET | `?move=/foo/bar` | move/rename the file/folder at URL to /foo/bar |
+
+| method | params | body | result |
+|--|--|--|--|
+| PUT | | (binary data) | upload into file at URL |
+| PUT | `?gz` | (binary data) | compress with gzip and write into file at URL |
+| PUT | `?xz` | (binary data) | compress with xz and write into file at URL |
+| mPOST | | `act=bput`, `f=FILE` | upload `FILE` into the folder at URL |
+| mPOST | `?j` | `act=bput`, `f=FILE` | ...and reply with json |
+| mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
+| GET | `?delete` | | delete URL recursively |
+| jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |
+| uPOST | | `msg=foo` | send message `foo` into server log |
+| mPOST | | `act=tput`, `body=TEXT` | overwrite markdown document at URL |
+
+upload modifiers:
+
+| http-header | url-param | effect |
+|--|--|--|
+| `Accept: url` | `want=url` | return just the file URL |
+| `Rand: 4` | `rand=4` | generate random filename with 4 characters |
+| `Life: 30` | `life=30` | delete file after 30 seconds |
+
+* `life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
+
+* server behavior of `msg` can be reconfigured with `--urlform`
+
+## admin
+
+| method | params | result |
+|--|--|--|
+| GET | `?reload=cfg` | reload config files and rescan volumes |
+| GET | `?scan` | initiate a rescan of the volume which provides URL |
+| GET | `?stack` | show a stacktrace of all threads |
+
+## general
+
+| method | params | result |
+|--|--|--|
+| GET | `?pw=x` | logout |
+
+
+# assumptions
+
+## mdns
 
 * outgoing replies will always fit in one packet
 * if a client mentions any of our services, assume it's not missing any
