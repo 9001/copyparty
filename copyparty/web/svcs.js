@@ -39,4 +39,4 @@ function setos(os) {
         clmod(oa[a], 'g', oa[a].id.slice(1) == os);
 }
 
-setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : '');
+setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : 'idk');
