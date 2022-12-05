@@ -296,7 +296,8 @@ class SvcHub(object):
         al.zm_off = al.zm_off or al.z_off
         al.zs_off = al.zs_off or al.z_off
         for n in ("zm_on", "zm_off", "zs_on", "zs_off"):
-            vs = getattr(al, n).replace(" ", ",").split(",")
+            vs = getattr(al, n).split(",")
+            vs = [x.strip() for x in vs]
             vs = [x for x in vs if x]
             setattr(al, n, vs)
 
