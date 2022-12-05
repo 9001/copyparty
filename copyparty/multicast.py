@@ -5,7 +5,14 @@ import socket
 import time
 
 import ipaddress
-from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
+from ipaddress import (
+    IPv4Address,
+    IPv4Network,
+    IPv6Address,
+    IPv6Network,
+    ip_address,
+    ip_network,
+)
 
 from .__init__ import TYPE_CHECKING
 from .util import MACOS, Netdev, min_ex, spack
@@ -110,7 +117,17 @@ class MCast(object):
         off = self.off[:]
         for lst in (on, off):
             for av in list(lst):
+                try:
+                    arg_net = ip_network(av, False)
+                except:
+                    arg_net = None
+
                 for sk, sv in netdevs.items():
+                    if arg_net:
+                        net_ip = ip_address(sk.split("/")[0])
+                        if net_ip in arg_net and sk not in lst:
+                            lst.append(sk)
+
                     if (av == str(sv.idx) or av == sv.name) and sk not in lst:
                         lst.append(sk)
 
