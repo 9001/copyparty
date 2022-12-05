@@ -320,7 +320,9 @@ class MDNS(MCast):
     def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket) -> None:
         cip = addr[0]
         v6 = ":" in cip
-        if cip.startswith("169.254") or v6 and not cip.startswith("fe80"):
+        if cip.startswith("169.254") or (
+            v6 and not cip.startswith("fe80") and not self.args.ll
+        ):
             return
 
         cache = self.rx6 if v6 else self.rx4

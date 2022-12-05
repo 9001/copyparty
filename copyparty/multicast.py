@@ -183,7 +183,9 @@ class MCast(object):
                 srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
 
             # gvfs breaks if a linklocal ip appears in a dns reply
-            srv.ips = {k: v for k, v in srv.ips.items() if not k.startswith("fe80")}
+            if not self.args.ll:
+                srv.ips = {k: v for k, v in srv.ips.items() if not k.startswith("fe80")}
+
             if not srv.ips:
                 self.log("no routable IPs on {}; skipping [{}]".format(netdev, ip), 3)
                 continue
