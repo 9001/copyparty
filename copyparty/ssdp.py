@@ -8,7 +8,7 @@ from email.utils import formatdate
 
 from .__init__ import TYPE_CHECKING
 from .multicast import MC_Sck, MCast
-from .util import CachedSet, min_ex
+from .util import CachedSet, min_ex, html_escape
 
 if TYPE_CHECKING:
     from .broker_util import BrokerCli
@@ -73,13 +73,14 @@ class SSDPr(object):
     </device>
 </root>"""
 
+        c = html_escape
         sip, sport = hc.s.getsockname()[:2]
         proto = "https" if self.args.https_only else "http"
         ubase = "{}://{}:{}".format(proto, sip, sport)
         zsl = self.args.zsl
         url = zsl if "://" in zsl else ubase + "/" + zsl.lstrip("/")
         name = "{} @ {}".format(self.args.doctitle, self.args.name)
-        zs = zs.strip().format(ubase, url, name, self.args.zsid)
+        zs = zs.strip().format(c(ubase), c(url), c(name), c(self.args.zsid))
         hc.reply(zs.encode("utf-8", "replace"))
         return False  # close connectino
 

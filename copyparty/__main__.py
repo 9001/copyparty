@@ -693,7 +693,7 @@ def run_argparse(
     ap2.add_argument("--zs-on", metavar="NICS/NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zs-off", metavar="NICS/NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zsv", action="store_true", help="verbose SSDP")
-    ap2.add_argument("--zsl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] or [\033[32mpriv/?pw=hunter2\033[0m]")
+    ap2.add_argument("--zsl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] (goes directly to /priv/ with password hunter2) or [\033[32m?hc=priv&pw=hunter2\033[0m] (shows mounting options for /priv/ with password)")
     ap2.add_argument("--zsid", metavar="UUID", type=u, default=uuid.uuid4().urn[4:], help="USN (device identifier) to announce")
 
     ap2 = ap.add_argument_group('FTP options')
