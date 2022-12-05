@@ -148,6 +148,7 @@ HTTPCODE = {
     204: "No Content",
     206: "Partial Content",
     207: "Multi-Status",
+    301: "Moved Permanently",
     302: "Found",
     304: "Not Modified",
     400: "Bad Request",
