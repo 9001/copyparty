@@ -98,7 +98,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "daw dav_inf dav_mac e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js ihead magic nid nih no_acode no_athumb no_dav no_del no_dupe no_logues no_mv no_readme no_robots no_scandir no_thumb no_vthumb no_zip nw xdev xlink xvol"
+        ex = "daw dav_inf dav_mac e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js ihead magic nid nih no_acode no_athumb no_dav no_del no_dupe no_logues no_mv no_readme no_robots no_scandir no_sync no_thumb no_vthumb no_wal no_zip nw xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"

@@ -181,6 +181,12 @@ class Up2k(object):
         all_vols = self.asrv.vfs.all_vols
         have_e2d = self.init_indexes(all_vols, [])
 
+        if self.stop:
+            if self.pp:
+                self.pp.end = True
+                self.pp = None
+            return
+
         if not self.pp and self.args.exit == "idx":
             return self.hub.sigterm()
 
@@ -3196,6 +3202,18 @@ class Up2k(object):
         if not self.args.no_snap:
             self.log("writing snapshot")
             self.do_snapshot()
+
+        t0 = time.time()
+        while self.pp:
+            time.sleep(0.1)
+            if time.time() - t0 > 2:
+                break
+
+        for cur in self.cur.values():
+            try:
+                cur.close()
+            except:
+                pass
 
 
 def up2k_chunksize(filesize: int) -> int:

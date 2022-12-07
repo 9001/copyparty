@@ -60,6 +60,13 @@ class U2idx(object):
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("u2idx", msg, c)
 
+    def shutdown(self) -> None:
+        for v in self.cur.values():
+            try:
+                v.close()
+            except:
+                pass
+
     def fsearch(
         self, vols: list[tuple[str, str, dict[str, Any]]], body: dict[str, Any]
     ) -> list[dict[str, Any]]:
