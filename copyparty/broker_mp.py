@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import threading
 import time
+import traceback
 
 import queue
 
@@ -93,12 +94,15 @@ class BrokerMp(object):
 
             else:
                 # new ipc invoking managed service in hub
-                obj = self.hub
-                for node in dest.split("."):
-                    obj = getattr(obj, node)
+                try:
+                    obj = self.hub
+                    for node in dest.split("."):
+                        obj = getattr(obj, node)
 
-                # TODO will deadlock if dest performs another ipc
-                rv = try_exec(retq_id, obj, *args)
+                    # TODO will deadlock if dest performs another ipc
+                    rv = try_exec(retq_id, obj, *args)
+                except:
+                    rv = ["exception", "stack", traceback.format_exc()]
 
                 if retq_id:
                     proc.q_pend.put((retq_id, "retq", rv))

@@ -429,7 +429,7 @@ def run_i(ld):
 
 def run_s(ld):
     # fmt: off
-    c = "import sys,runpy;" + "".join(['sys.path.insert(0,r"' + x + '");' for x in ld]) + 'runpy.run_module("copyparty",run_name="__main__")'
+    c = "import sys,runpy;" + "".join(['sys.path.insert(0,r"' + x.replace("\\", "/") + '");' for x in ld]) + 'runpy.run_module("copyparty",run_name="__main__")'
     c = [str(x) for x in [sys.executable, "-c", c] + list(sys.argv[1:])]
     # fmt: on
     msg("\n", c, "\n")
