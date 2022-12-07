@@ -10,7 +10,10 @@ if possible, for performance and security reasons, please use this instead:
 https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
 """
 
-print(v.replace("\n", "\n▒▌ ")[1:] + "\n")
+try:
+    print(v.replace("\n", "\n▒▌ ")[1:] + "\n")
+except:
+    print(v.replace("\n", "\n|| ")[1:] + "\n")
 
 
 import re
