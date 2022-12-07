@@ -202,6 +202,9 @@ if ANYWIN:
 UNPLICATIONS = [["no_dav", "daw"]]
 
 
+DROPLICATIONS = [["wal", "nowal"]]
+
+
 MIMES = {
     "opus": "audio/ogg; codecs=opus",
 }

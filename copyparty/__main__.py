@@ -540,6 +540,8 @@ def run_argparse(
               \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
               \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
               \033[36mnoforget$\033[35m don't forget files when deleted from disk
+              \033[36mnowal\033[35m guarantee zero dataloss on powerloss by disabling wal
+              \033[36mwal\033[35m enable wal (default; overrides --no-wal)
               \033[36mxlink$\033[35m cross-volume dupe detection / linking
               \033[36mxdev\033[35m do not descend into other filesystems
               \033[36mxvol\033[35m skip symlinks leaving the volume root
@@ -813,6 +815,7 @@ def run_argparse(
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans (volflag=noidx)")
     ap2.add_argument("--no-dhash", action="store_true", help="disable rescan acceleration; do full database integrity check -- makes the db ~5%% smaller and bootup/rescans 3~10x slower")
     ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice (volflag=noforget)")
+    ap2.add_argument("--no-wal", action="store_true", help="1%% faster searches, more reliable upload performance, and slightly more resistant to dataloss, but makes uploads up to 2x slower (volflag=nowal)")
     ap2.add_argument("--xlink", action="store_true", help="on upload: check all volumes for dupes, not just the target volume (volflag=xlink)")
     ap2.add_argument("--xdev", action="store_true", help="do not descend into other filesystems (symlink or bind-mount to another HDD, ...) (volflag=xdev)")
     ap2.add_argument("--xvol", action="store_true", help="skip symlinks leaving the volume root (volflag=xvol)")

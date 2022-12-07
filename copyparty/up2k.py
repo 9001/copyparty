@@ -659,6 +659,13 @@ class Up2k(object):
         try:
             cur = self._open_db(db_path)
             self.cur[ptop] = cur
+
+            try:
+                zs = "delete" if "nowal" in flags else "wal"
+                cur.execute("pragma journal_mode=" + zs)
+            except:
+                pass
+
             return cur, db_path
         except:
             msg = "cannot use database at [{}]:\n{}"

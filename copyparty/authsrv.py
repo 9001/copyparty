@@ -15,6 +15,7 @@ from datetime import datetime
 from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
 from .bos import bos
 from .util import (
+    DROPLICATIONS,
     IMPLICATIONS,
     META_NOBOTS,
     SQLITE_VER,
@@ -1122,6 +1123,7 @@ class AuthSrv(object):
             for ga, vf in (
                 ("no_forget", "noforget"),
                 ("no_dupe", "nodupe"),
+                ("no_wal", "nowal"),
                 ("magic", "magic"),
                 ("xlink", "xlink"),
             ):
@@ -1135,6 +1137,10 @@ class AuthSrv(object):
             for k1, k2 in UNPLICATIONS:
                 if k1 in vol.flags:
                     vol.flags[k2] = False
+
+            for k1, k2 in DROPLICATIONS:
+                if k1 in vol.flags:
+                    vol.flags.pop(k2)
 
             # default tag cfgs if unset
             if "mte" not in vol.flags:

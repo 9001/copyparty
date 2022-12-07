@@ -97,14 +97,17 @@ class U2idx(object):
             return None
 
         cur = None
-        if ANYWIN:
+        if ANYWIN and self.args.no_wal:
             uri = ""
             try:
                 uri = "{}?mode=ro&nolock=1".format(Path(db_path).as_uri())
                 cur = sqlite3.connect(uri, 2, uri=True).cursor()
+                cur.execute('pragma table_info("up")').fetchone()
                 self.log("ro: {}".format(db_path))
             except:
                 self.log("could not open read-only: {}\n{}".format(uri, min_ex()))
+                # may not fail until the pragma so unset it
+                cur = None
 
         if not cur:
             # on windows, this steals the write-lock from up2k.deferred_init --

@@ -1302,7 +1302,7 @@ class HttpCli(object):
             if self.args.dotpart:
                 tnam = "." + tnam
 
-            if ("daw" in vfs.flags and self.can_delete) or (
+            if (vfs.flags.get("daw") and self.can_delete) or (
                 not bos.path.exists(os.path.join(fdir, tnam))
                 and bos.path.exists(path)
                 and not bos.path.getsize(path)
