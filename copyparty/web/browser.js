@@ -6678,7 +6678,7 @@ var unpost = (function () {
 			else
 				html.push('-- <em>' + (filt.value ? L.un_no2 : L.un_no1) + '</em>');
 
-			var mods = [1000, 100, 10];
+			var mods = [10, 100, 1000];
 			for (var a = 0; a < res.length; a++) {
 				for (var b = 0; b < mods.length; b++)
 					if (a % mods[b] == 0 && res.length > a + mods[b] / 10)
