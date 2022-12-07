@@ -28,7 +28,7 @@ except ImportError:
     )
     sys.exit(1)
 
-from .__init__ import MACOS, TYPE_CHECKING, EnvParams
+from .__init__ import ANYWIN, MACOS, TYPE_CHECKING, EnvParams
 from .bos import bos
 from .httpconn import HttpConn
 from .util import (
@@ -182,9 +182,12 @@ class HttpSrv(object):
                 sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
             except:
                 pass
-            sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+            if not ANYWIN or self.args.reuseaddr:
+                sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
             sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            sck.settimeout(None)  # < does not inherit, ^ does
+            sck.settimeout(None)  # < does not inherit, ^ opts above do
 
         self.ip, self.port = sck.getsockname()[:2]
         self.srvs.append(sck)

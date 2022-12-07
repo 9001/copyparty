@@ -199,9 +199,12 @@ class TcpSrv(object):
             srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         except:
             pass
-        srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        if not ANYWIN or self.args.reuseaddr:
+            srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
         srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        srv.settimeout(None)  # < does not inherit, ^ does
+        srv.settimeout(None)  # < does not inherit, ^ opts above do
 
         try:
             srv.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, False)
