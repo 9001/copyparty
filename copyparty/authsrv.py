@@ -1124,6 +1124,7 @@ class AuthSrv(object):
                 ("no_forget", "noforget"),
                 ("no_dupe", "nodupe"),
                 ("no_wal", "nowal"),
+                ("no_sync", "nosync"),
                 ("magic", "magic"),
                 ("xlink", "xlink"),
             ):

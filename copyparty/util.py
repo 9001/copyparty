@@ -202,7 +202,7 @@ if ANYWIN:
 UNPLICATIONS = [["no_dav", "daw"]]
 
 
-DROPLICATIONS = [["wal", "nowal"]]
+DROPLICATIONS = [["wal", "nowal"], ["sync", "nosync"]]
 
 
 MIMES = {

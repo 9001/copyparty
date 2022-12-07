@@ -666,6 +666,9 @@ class Up2k(object):
             except:
                 pass
 
+            if "nosync" in flags:
+                cur.execute("pragma synchronous=0")
+
             return cur, db_path
         except:
             msg = "cannot use database at [{}]:\n{}"
