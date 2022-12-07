@@ -94,6 +94,9 @@ var Ls = {
 		"ht_and": " and ",
 
 		"goh": "control-panel",
+		"gop": 'previous sibling">prev',
+		"gou": 'parent folder">up',
+		"gon": 'next folder">next',
 		"logout": "Logout ",
 		"access": " access",
 		"ot_close": "close submenu",
@@ -534,6 +537,9 @@ var Ls = {
 		"ht_and": " og ",
 
 		"goh": "kontrollpanel",
+		"gop": 'naviger til mappen før denne">forr.',
+		"gou": 'naviger ett nivå opp">opp',
+		"gon": 'naviger til mappen etter denne">neste',
 		"logout": "Logg ut ",
 		"access": " tilgang",
 		"ot_close": "lukk verktøy",
@@ -2865,7 +2871,7 @@ function eval_hash() {
 
 	// folder nav
 	ebi('goh').parentElement.appendChild(mknod('span', null,
-		'<a href="#" id="gop">prev</a>/<a href="#" id="gou">up</a>/<a href="#" id="gon">next</a>'));
+		'<a href="#" id="gop" tt="' + L.gop + '</a>/<a href="#" id="gou" tt="' + L.gou + '</a>/<a href="#" id="gon" tt="' + L.gon + '</a>'));
 	ebi('gop').onclick = function () { tree_neigh(-1); }
 	ebi('gon').onclick = function () { tree_neigh(1); }
 	ebi('gou').onclick = function () { tree_up(true); }
