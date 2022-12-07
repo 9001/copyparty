@@ -63,6 +63,7 @@ from .util import (
     read_socket_unbounded,
     relchk,
     ren_open,
+    hidedir,
     s3enc,
     sanitize_fn,
     sendfile_kern,
@@ -2177,7 +2178,9 @@ class HttpCli(object):
             mdir, mfile = os.path.split(fp)
             mfile2 = "{}.{:.3f}.md".format(mfile[:-3], srv_lastmod)
             try:
-                bos.mkdir(os.path.join(mdir, ".hist"))
+                dp = os.path.join(mdir, ".hist")
+                bos.mkdir(dp)
+                hidedir(dp)
             except:
                 pass
             bos.rename(fp, os.path.join(mdir, ".hist", mfile2))

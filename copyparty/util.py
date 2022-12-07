@@ -2562,6 +2562,17 @@ def termsize() -> tuple[int, int]:
         return 80, 25
 
 
+def hidedir(dp) -> None:
+    if ANYWIN:
+        try:
+            k32 = ctypes.WinDLL("kernel32")
+            attrs = k32.GetFileAttributesW(dp)
+            if attrs >= 0:
+                k32.SetFileAttributesW(dp, attrs | 2)
+        except:
+            pass
+
+
 class Pebkac(Exception):
     def __init__(self, code: int, msg: Optional[str] = None) -> None:
         super(Pebkac, self).__init__(msg or HTTPCODE[code])

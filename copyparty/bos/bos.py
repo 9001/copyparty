@@ -24,13 +24,15 @@ def listdir(p: str = ".") -> list[str]:
     return [fsdec(x) for x in os.listdir(fsenc(p))]
 
 
-def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> None:
+def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> bool:
     bname = fsenc(name)
     try:
         os.makedirs(bname, mode)
+        return True
     except:
         if not exist_ok or not os.path.isdir(bname):
             raise
+        return False
 
 
 def mkdir(p: str, mode: int = 0o755) -> None:

@@ -38,6 +38,7 @@ from .util import (
     db_ex_chk,
     djoin,
     fsenc,
+    hidedir,
     min_ex,
     quotep,
     ren_open,
@@ -654,7 +655,8 @@ class Up2k(object):
         if not HAVE_SQLITE3 or "e2d" not in flags or "d2d" in flags:
             return None
 
-        bos.makedirs(histpath)
+        if bos.makedirs(histpath):
+            hidedir(histpath)
 
         try:
             cur = self._open_db(db_path)
@@ -3074,7 +3076,8 @@ class Up2k(object):
         if etag == self.snap_prev.get(ptop):
             return
 
-        bos.makedirs(histpath)
+        if bos.makedirs(histpath):
+            hidedir(histpath)
 
         path2 = "{}.{}".format(path, os.getpid())
         body = {"droppable": self.droppable[ptop], "registry": reg}
