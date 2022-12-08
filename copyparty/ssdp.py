@@ -154,11 +154,11 @@ class SSDPd(MCast):
         if buf in self.rxc.c:
             return
 
-        self.rxc.add(buf)
         srv: Optional[SSDP_Sck] = self.map_client(cip)  # type: ignore
         if not srv:
             return
 
+        self.rxc.add(buf)
         if not buf.startswith(b"M-SEARCH * HTTP/1."):
             raise Exception("not an ssdp message")
 

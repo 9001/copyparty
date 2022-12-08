@@ -329,11 +329,11 @@ class MDNS(MCast):
         if buf in cache.c:
             return
 
-        cache.add(buf)
         srv: Optional[MDNS_Sck] = self.srv[sck] if v6 else self.map_client(cip)  # type: ignore
         if not srv:
             return
 
+        cache.add(buf)
         now = time.time()
 
         if self.args.zmv and cip != srv.ip and cip not in srv.ips:
