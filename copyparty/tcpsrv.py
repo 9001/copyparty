@@ -121,6 +121,20 @@ class TcpSrv(object):
         else:
             self.netdevs = {}
 
+        # keep IPv6 LL-only nics
+        ll_ok: set[str] = set()
+        for ip, nd in self.netdevs.items():
+            if not ip.startswith("fe80"):
+                continue
+
+            just_ll = True
+            for ip2, nd2 in self.netdevs.items():
+                if nd == nd2 and ":" in ip2 and not ip2.startswith("fe80"):
+                    just_ll = False
+
+            if just_ll or self.args.ll:
+                ll_ok.add(ip.split("/")[0])
+
         qr1: dict[str, list[int]] = {}
         qr2: dict[str, list[int]] = {}
         msgs = []
@@ -128,7 +142,7 @@ class TcpSrv(object):
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
         t = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
-            if ip.startswith("fe80") and not self.args.ll:
+            if ip.startswith("fe80") and ip not in ll_ok:
                 continue
 
             for port in sorted(self.args.p):
@@ -279,10 +293,6 @@ class TcpSrv(object):
             for nip in nic.ips:
                 ipa = nip.ip[0] if ":" in str(nip.ip) else nip.ip
                 sip = "{}/{}".format(ipa, nip.network_prefix)
-                if sip.startswith("169.254"):
-                    # browsers dont impl linklocal
-                    continue
-
                 nd = Netdev(sip, nic.index or 0, nic.nice_name, "")
                 eps[sip] = nd
                 try:

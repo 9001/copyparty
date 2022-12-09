@@ -724,6 +724,10 @@ uses [ssdp](https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol) to 
 
 doubleclicking the icon opens the "connect" page which explains how to mount copyparty as a local filesystem
 
+if copyparty does not appear in windows explorer, use `--zsv` to see why:
+
+* maybe the discovery multicast was sent from an IP which does not intersect with the server subnets
+
 
 ## qr-code
 

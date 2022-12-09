@@ -82,6 +82,7 @@ class MCast(object):
 
         self.srv: dict[socket.socket, MC_Sck] = {}  # listening sockets
         self.sips: set[str] = set()  # all listening ips (including failed attempts)
+        self.ll_ok: set[str] = set()  # fallback linklocal IPv4 and IPv6 addresses
         self.b2srv: dict[bytes, MC_Sck] = {}  # binary-ip -> server socket
         self.b4: list[bytes] = []  # sorted list of binary-ips
         self.b6: list[bytes] = []  # sorted list of binary-ips
@@ -183,11 +184,21 @@ class MCast(object):
                 srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
 
             # gvfs breaks if a linklocal ip appears in a dns reply
+            ll = {
+                k: v
+                for k, v in srv.ips.items()
+                if k.startswith("169.254") or k.startswith("fe80")
+            }
+            rt = {k: v for k, v in srv.ips.items() if k not in ll}
+
+            if self.args.ll or not rt:
+                self.ll_ok.update(list(ll))
+
             if not self.args.ll:
-                srv.ips = {k: v for k, v in srv.ips.items() if not k.startswith("fe80")}
+                srv.ips = rt or ll
 
             if not srv.ips:
-                self.log("no routable IPs on {}; skipping [{}]".format(netdev, ip), 3)
+                self.log("no IPs on {}; skipping [{}]".format(netdev, ip), 3)
                 continue
 
             try:
@@ -336,6 +347,16 @@ class MCast(object):
         if not ret and cip in ("127.0.0.1", "::1"):
             # just give it something
             ret = list(self.srv.values())[0]
+
+        if not ret and cip.startswith("169.254"):
+            # idk how to map LL IPv4 msgs to nics;
+            # just pick one and hope for the best
+            lls = (
+                x
+                for x in self.srv.values()
+                if next((y for y in x.ips if y in self.ll_ok), None)
+            )
+            ret = next(lls, None)
 
         if ret:
             t = "new client on {} ({}): {}"

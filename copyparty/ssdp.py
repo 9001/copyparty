@@ -148,7 +148,7 @@ class SSDPd(MCast):
 
     def eat(self, buf: bytes, addr: tuple[str, int]) -> None:
         cip = addr[0]
-        if cip.startswith("169.254"):
+        if cip.startswith("169.254") and not self.ll_ok:
             return
 
         if buf in self.rxc.c:

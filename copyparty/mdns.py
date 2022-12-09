@@ -313,15 +313,18 @@ class MDNS(MCast):
         self.running = False
         if not panic:
             for srv in self.srv.values():
-                srv.sck.sendto(srv.bp_bye, (srv.grp, 5353))
+                try:
+                    srv.sck.sendto(srv.bp_bye, (srv.grp, 5353))
+                except:
+                    pass
 
         self.srv = {}
 
     def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket) -> None:
         cip = addr[0]
         v6 = ":" in cip
-        if cip.startswith("169.254") or (
-            v6 and not cip.startswith("fe80") and not self.args.ll
+        if (cip.startswith("169.254") and not self.ll_ok) or (
+            v6 and not cip.startswith("fe80")
         ):
             return
 
