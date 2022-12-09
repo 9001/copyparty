@@ -83,9 +83,6 @@ class HttpConn(object):
         except:
             pass
 
-        if self.u2idx:
-            self.u2idx.shutdown()
-
     def set_rproxy(self, ip: Optional[str] = None) -> str:
         if ip is None:
             color = 36
