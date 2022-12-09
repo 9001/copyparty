@@ -241,7 +241,7 @@ class HttpCli(object):
             self.http_ver = "HTTP/1.1"
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = False
-            h = {"WWW-Authenticate": "Basic"} if ex.code == 401 else {}
+            h = {"WWW-Authenticate": 'Basic realm="a"'} if ex.code == 401 else {}
             try:
                 self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
                 return self.keepalive
@@ -448,7 +448,7 @@ class HttpCli(object):
                     msg += "hint: important info in the server log\r\n"
 
                 zb = b"<pre>" + html_escape(msg).encode("utf-8", "replace")
-                h = {"WWW-Authenticate": "Basic"} if pex.code == 401 else {}
+                h = {"WWW-Authenticate": 'Basic realm="a"'} if pex.code == 401 else {}
                 self.reply(zb, status=pex.code, headers=h, volsan=True)
                 return self.keepalive
             except Pebkac:
