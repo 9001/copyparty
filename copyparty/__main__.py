@@ -540,10 +540,7 @@ def run_argparse(
               \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
               \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
               \033[36mnoforget$\033[35m don't forget files when deleted from disk
-              \033[36mnowal\033[35m guarantee zero dataloss on powerloss by disabling wal
-              \033[36mwal\033[35m enable wal (default; overrides --no-wal)
-              \033[36mnosync\033[35m switch to unsafe mode for extremely fast uploads
-              \033[36msync\033[35m normal corruption-protected db config
+              \033[36mdbd=[acid|swal|wal|yolo]\033[35m database speed-durability tradeoff
               \033[36mxlink$\033[35m cross-volume dupe detection / linking
               \033[36mxdev\033[35m do not descend into other filesystems
               \033[36mxvol\033[35m skip symlinks leaving the volume root
@@ -601,6 +598,25 @@ def run_argparse(
               --ls '**'          # list all files which are possible to read
               --ls '**,*,ln'     # check for dangerous symlinks
               --ls '**,*,ln,p,r' # check, then start normally if safe
+            """
+            ),
+        ],
+        [
+            "dbd",
+            "database durability profiles",
+            dedent(
+                """
+            mainly affects uploads of many small files on slow HDDs; speeds measured uploading 520 files on a WD20SPZX (SMR 2.5" 5400rpm 4kb)
+
+            \033[32macid\033[0m = extremely safe but slow; the old default. Should never lose any data no matter what
+
+            \033[32mswal\033[0m = 2.4x faster uploads yet 99.9%% as safe -- theoretical chance of losing metadata for the ~200 most recently uploaded files if there's a power-loss or your OS crashes
+
+            \033[32mwal\033[0m = another 21x faster on HDDs yet 90%% as safe; same pitfall as \033[33mswal\033[0m except more likely
+
+            \033[32myolo\033[0m = another 1.5x faster, and removes the occasional sudden upload-pause while the disk syncs, but now you're at risk of losing the entire database in a powerloss / OS-crash
+            
+            profiles can be set globally (--dbd=yolo), or per-volume with volflags: -v ~/Music:music:r:c,dbd=acid
             """
             ),
         ],
@@ -673,15 +689,15 @@ def run_argparse(
 
     ap2 = ap.add_argument_group("Zeroconf options")
     ap2.add_argument("-z", action="store_true", help="enable all zeroconf backends (mdns, ssdp)")
-    ap2.add_argument("--z-on", metavar="NICS/NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes\n └─example: \033[32meth0, wlo1, virhost0, 192.168.123.0/24, fd00:fda::/96\033[0m")
-    ap2.add_argument("--z-off", metavar="NICS/NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
+    ap2.add_argument("--z-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes\n └─example: \033[32meth0, wlo1, virhost0, 192.168.123.0/24, fd00:fda::/96\033[0m")
+    ap2.add_argument("--z-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("-zv", action="store_true", help="verbose all zeroconf backends")
     ap2.add_argument("--mc-hop", metavar="SEC", type=int, default=0, help="rejoin multicast groups every SEC seconds (workaround for some switches/routers which cause mDNS to suddenly stop working after some time); try [\033[32m300\033[0m] or [\033[32m180\033[0m]")
 
     ap2 = ap.add_argument_group("Zeroconf-mDNS options:")
     ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
-    ap2.add_argument("--zm-on", metavar="NICS/NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
-    ap2.add_argument("--zm-off", metavar="NICS/NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
+    ap2.add_argument("--zm-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
+    ap2.add_argument("--zm-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zm4", action="store_true", help="IPv4 only -- try this if some clients can't connect")
     ap2.add_argument("--zm6", action="store_true", help="IPv6 only")
     ap2.add_argument("--zmv", action="store_true", help="verbose mdns")
@@ -697,8 +713,8 @@ def run_argparse(
 
     ap2 = ap.add_argument_group("Zeroconf-SSDP options:")
     ap2.add_argument("--zs", action="store_true", help="announce the enabled protocols over SSDP -- compatible with Windows")
-    ap2.add_argument("--zs-on", metavar="NICS/NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
-    ap2.add_argument("--zs-off", metavar="NICS/NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
+    ap2.add_argument("--zs-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
+    ap2.add_argument("--zs-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zsv", action="store_true", help="verbose SSDP")
     ap2.add_argument("--zsl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] (goes directly to /priv/ with password hunter2) or [\033[32m?hc=priv&pw=hunter2\033[0m] (shows mounting options for /priv/ with password)")
     ap2.add_argument("--zsid", metavar="UUID", type=u, default=uuid.uuid4().urn[4:], help="USN (device identifier) to announce")
@@ -819,8 +835,7 @@ def run_argparse(
     ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching paths during e2ds folder scans (volflag=noidx)")
     ap2.add_argument("--no-dhash", action="store_true", help="disable rescan acceleration; do full database integrity check -- makes the db ~5%% smaller and bootup/rescans 3~10x slower")
     ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice (volflag=noforget)")
-    ap2.add_argument("--no-wal", action="store_true", help="1%% faster searches, more reliable upload performance, and slightly more resistant to dataloss, but makes uploads up to 2x slower (volflag=nowal)")
-    ap2.add_argument("--no-sync", action="store_true", help="make uploads extremely fast, but removes corruption protection -- if the OS crashes, you might lose the db (volflag=nosync)")
+    ap2.add_argument("--dbd", metavar="PROFILE", default="wal", help="database durability profile; sets the tradeoff between robustness and speed, see --help-dbd (volflag=dbd)")
     ap2.add_argument("--xlink", action="store_true", help="on upload: check all volumes for dupes, not just the target volume (volflag=xlink)")
     ap2.add_argument("--xdev", action="store_true", help="do not descend into other filesystems (symlink or bind-mount to another HDD, ...) (volflag=xdev)")
     ap2.add_argument("--xvol", action="store_true", help="skip symlinks leaving the volume root (volflag=xvol)")

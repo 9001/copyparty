@@ -558,7 +558,7 @@ class Up2k(object):
             return False
 
         for vol in all_vols.values():
-            if "nowal" in vol.flags:
+            if vol.flags["dbd"] == "acid":
                 continue
 
             reg = self.register_vpath(vol.realpath, vol.flags)
@@ -696,15 +696,37 @@ class Up2k(object):
             cur = self._open_db(db_path)
             self.cur[ptop] = cur
 
+            # speeds measured uploading 520 small files on a WD20SPZX (SMR 2.5" 5400rpm 4kb)
+            dbd = flags["dbd"]
+            if dbd == "acid":
+                # 217.5s; python-defaults
+                zs = "delete"
+                sync = "full"
+            elif dbd == "swal":
+                # 88.0s; still 99.9% safe (can lose a bit of on OS crash)
+                zs = "wal"
+                sync = "full"
+            elif dbd == "yolo":
+                # 2.7s; may lose entire db on OS crash
+                zs = "wal"
+                sync = "off"
+            else:
+                # 4.1s; corruption-safe but more likely to lose wal
+                zs = "wal"
+                sync = "normal"
+
             try:
-                zs = "delete" if "nowal" in flags else "wal"
-                cur.execute("pragma journal_mode=" + zs)
-            except:
-                pass
+                amode = cur.execute("pragma journal_mode=" + zs).fetchone()[0]
+                if amode.lower() != zs.lower():
+                    t = "sqlite failed to set journal_mode {}; got {}"
+                    raise Exception(t.format(zs, amode))
+            except Exception as ex:
+                if sync != "off":
+                    sync = "full"
+                    t = "reverting to sync={} because {}"
+                    self.log(t.format(sync, ex))
 
-            if "nosync" in flags:
-                cur.execute("pragma synchronous=0")
-
+            cur.execute("pragma synchronous=" + sync)
             cur.connection.commit()
             return cur, db_path
         except:

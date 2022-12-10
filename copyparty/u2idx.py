@@ -97,7 +97,7 @@ class U2idx(object):
             return None
 
         cur = None
-        if ANYWIN and self.args.no_wal:
+        if ANYWIN and bos.path.exists(db_path + "-wal"):
             uri = ""
             try:
                 uri = "{}?mode=ro&nolock=1".format(Path(db_path).as_uri())
