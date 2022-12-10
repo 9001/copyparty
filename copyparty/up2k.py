@@ -182,9 +182,14 @@ class Up2k(object):
         have_e2d = self.init_indexes(all_vols, [])
 
         if self.stop:
+            # up-mt consistency not guaranteed if init is interrupted;
+            # drop caches for a full scan on next boot
+            self._drop_caches()
+
             if self.pp:
                 self.pp.end = True
                 self.pp = None
+
             return
 
         if not self.pp and self.args.exit == "idx":
@@ -469,6 +474,10 @@ class Up2k(object):
         # e2ds(a) volumes first
         if next((zv for zv in vols if "e2ds" in zv.flags), None):
             self._block("indexing")
+
+        if self.args.re_dhash:
+            self.args.re_dhash = False
+            self._drop_caches()
 
         for vol in vols:
             if self.stop:
@@ -1247,6 +1256,18 @@ class Up2k(object):
             cur.connection.commit()
 
         return ret
+
+    def _drop_caches(self) -> None:
+        self.log("dropping caches for a full filesystem scan")
+        for vol in self.asrv.vfs.all_vols.values():
+            reg = self.register_vpath(vol.realpath, vol.flags)
+            if not reg:
+                continue
+
+            cur, _ = reg
+            self._set_tagscan(cur, True)
+            cur.execute("delete from dh")
+            cur.connection.commit()
 
     def _set_tagscan(self, cur: "sqlite3.Cursor", need: bool) -> bool:
         if self.args.no_dhash:
