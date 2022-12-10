@@ -8,19 +8,19 @@
 	<meta name="viewport" content="width=device-width, initial-scale=0.8">
 	<meta name="theme-color" content="#333">
 {{ html_head }}
-	<link rel="stylesheet" media="screen" href="/.cpr/splash.css?_={{ ts }}">
-	<link rel="stylesheet" media="screen" href="/.cpr/ui.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/splash.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
 </head>
 
 <body>
 	<div id="wrap">
-		<a id="a" href="/?h" class="af">refresh</a>
-		<a id="v" href="/?hc" class="af">connect</a>
+		<a id="a" href="{{ r }}/?h" class="af">refresh</a>
+		<a id="v" href="{{ r }}/?hc" class="af">connect</a>
 
 		{%- if this.uname == '*' %}
 			<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
 		{%- else %}
-			<a id="c" href="/?pw=x" class="logout">logout</a>
+			<a id="c" href="{{ r }}/?pw=x" class="logout">logout</a>
 			<p><span id="m">welcome back,</span> <strong>{{ this.uname }}</strong></p>
 		{%- endif %}
 
@@ -53,8 +53,8 @@
 			</table>
 		</td></tr></table>
 		<div class="btns">
-			<a id="d" href="/?stack">dump stack</a>
-			<a id="e" href="/?reload=cfg">reload cfg</a>
+			<a id="d" href="{{ r }}/?stack">dump stack</a>
+			<a id="e" href="{{ r }}/?reload=cfg">reload cfg</a>
 		</div>
 		{%- endif %}
 
@@ -79,18 +79,18 @@
 		<h1 id="cc">client config:</h1>
 		<ul>
 			{% if k304 %}
-			<li><a id="h" href="/?k304=n">disable k304</a> (currently enabled)
+			<li><a id="h" href="{{ r }}/?k304=n">disable k304</a> (currently enabled)
 			{%- else %}
-			<li><a id="i" href="/?k304=y" class="r">enable k304</a> (currently disabled)
+			<li><a id="i" href="{{ r }}/?k304=y" class="r">enable k304</a> (currently disabled)
 			{% endif %}
 			<blockquote id="j">enabling this will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general</blockquote></li>
 			
-			<li><a id="k" href="/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
+			<li><a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
 		</ul>
 
 		<h1 id="l">login for more:</h1>
 		<ul>
-			<form method="post" enctype="multipart/form-data" action="/{{ qvpath }}">
+			<form method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" name="act" value="login" />
 				<input type="password" name="cppwd" />
 				<input type="submit" value="Login" />
@@ -100,13 +100,14 @@
 	<a href="#" id="repl">π</a>
 	<script>
 
-var lang="{{ lang }}",
+var SR = {{ r|tojson }},
+	lang="{{ lang }}",
 	dfavico="{{ favico }}";
 
 document.documentElement.className=localStorage.theme||"{{ this.args.theme }}";
 
 </script>
-<script src="/.cpr/util.js?_={{ ts }}"></script>
-<script src="/.cpr/splash.js?_={{ ts }}"></script>
+<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+<script src="{{ r }}/.cpr/splash.js?_={{ ts }}"></script>
 </body>
 </html>

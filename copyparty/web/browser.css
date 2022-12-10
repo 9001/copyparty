@@ -1075,18 +1075,18 @@ html.y #widget.open {
 	top: -.12em;
 }
 #wtico {
-	cursor: url(/.cpr/dd/4.png), pointer;
+	cursor: url(dd/4.png), pointer;
 	animation: cursor 500ms;
 }
 #wtico:hover {
 	animation: cursor 500ms infinite;
 }
 @keyframes cursor {
-	 0% {cursor: url(/.cpr/dd/2.png), pointer}
-	30% {cursor: url(/.cpr/dd/3.png), pointer}
-	50% {cursor: url(/.cpr/dd/4.png), pointer}
-	75% {cursor: url(/.cpr/dd/5.png), pointer}
-	85% {cursor: url(/.cpr/dd/4.png), pointer}
+	 0% {cursor: url(dd/2.png), pointer}
+	30% {cursor: url(dd/3.png), pointer}
+	50% {cursor: url(dd/4.png), pointer}
+	75% {cursor: url(dd/5.png), pointer}
+	85% {cursor: url(dd/4.png), pointer}
 }
 @keyframes spin {
 	100% {transform: rotate(360deg)}

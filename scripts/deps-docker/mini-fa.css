@@ -9,7 +9,7 @@ font-family: 'fa';
 font-style: normal;
 font-weight: 400;
 font-display: block;
-src: url("/.cpr/deps/mini-fa.woff") format("woff");
+src: url("mini-fa.woff") format("woff");
 }
 
 .fa,

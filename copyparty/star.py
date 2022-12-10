@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import stat
 import tarfile
 
 from queue import Queue
@@ -78,6 +79,9 @@ class StreamTar(StreamArc):
         name = f["vp"]
         src = f["ap"]
         fsi = f["st"]
+
+        if stat.S_ISDIR(fsi.st_mode):
+            return
 
         inf = tarfile.TarInfo(name=name)
         inf.mode = fsi.st_mode

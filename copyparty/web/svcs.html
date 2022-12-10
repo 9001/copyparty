@@ -8,14 +8,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=0.8">
 	<meta name="theme-color" content="#333">
 {{ html_head }}
-	<link rel="stylesheet" media="screen" href="/.cpr/splash.css?_={{ ts }}">
-	<link rel="stylesheet" media="screen" href="/.cpr/ui.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/splash.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
 </head>
 
 <body>
 	<div id="wrap" class="w">
         <div class="cn">
-            <p class="btns"><a href="/{{ vp }}">browse files</a> // <a href="/?h">control panel</a></p>
+            <p class="btns"><a href="{{ r }}/{{ vp }}">browse files</a> // <a href="{{ r }}/?h">control panel</a></p>
             <p>or choose your OS for cooler alternatives:</p>
             <div class="ossel">
                 <a id="swin" href="#">Windows</a>
@@ -53,7 +53,7 @@
             <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>--no-check-certificate</code> to the mount command</em><br />---</p>
             {% endif %}
             
-            <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
+            <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
                 net use <b>w:</b> http{{ s }}://{{ ep }}/{{ vp }}{% if accs %} k /user:<b>{{ pw }}</b>{% endif %}
             </pre>
@@ -144,7 +144,7 @@
 
         <h1>partyfuse</h1>
         <p>
-            <a href="/.cpr/a/partyfuse.py">partyfuse.py</a> -- fast, read-only,
+            <a href="{{ r }}/.cpr/a/partyfuse.py">partyfuse.py</a> -- fast, read-only,
             <span class="os win">needs <a href="https://winfsp.dev/rel/">winfsp</a></span>
             <span class="os lin">doesn't need root</span>
         </p>
@@ -155,7 +155,7 @@
         <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>-td</code></em></p>
         {% endif %}
         <p>
-            you can use <a href="/.cpr/a/up2k.py">up2k.py</a> to upload (sometimes faster than web-browsers)
+            you can use <a href="{{ r }}/.cpr/a/up2k.py">up2k.py</a> to upload (sometimes faster than web-browsers)
         </p>
 
 
@@ -188,13 +188,14 @@
 	<a href="#" id="repl">π</a>
 	<script>
 
-var lang="{{ lang }}",
+var SR = {{ r|tojson }},
+    lang="{{ lang }}",
 	dfavico="{{ favico }}";
 
 document.documentElement.className=localStorage.theme||"{{ args.theme }}";
 
 </script>
-<script src="/.cpr/util.js?_={{ ts }}"></script>
-<script src="/.cpr/svcs.js?_={{ ts }}"></script>
+<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+<script src="{{ r }}/.cpr/svcs.js?_={{ ts }}"></script>
 </body>
 </html>

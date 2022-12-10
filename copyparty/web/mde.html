@@ -5,10 +5,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=0.7">
 	<meta name="theme-color" content="#333">
 {{ html_head }}
-	<link rel="stylesheet" href="/.cpr/ui.css?_={{ ts }}">
-	<link rel="stylesheet" href="/.cpr/mde.css?_={{ ts }}">
-	<link rel="stylesheet" href="/.cpr/deps/mini-fa.css?_={{ ts }}">
-	<link rel="stylesheet" href="/.cpr/deps/easymde.css?_={{ ts }}">
+	<link rel="stylesheet" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
+	<link rel="stylesheet" href="{{ r }}/.cpr/mde.css?_={{ ts }}">
+	<link rel="stylesheet" href="{{ r }}/.cpr/deps/mini-fa.css?_={{ ts }}">
+	<link rel="stylesheet" href="{{ r }}/.cpr/deps/easymde.css?_={{ ts }}">
 </head>
 <body>
 	<div id="mw">
@@ -26,7 +26,8 @@
 	<a href="#" id="repl">π</a>
 	<script>
 
-var last_modified = {{ lastmod }},
+var SR = {{ r|tojson }},
+	last_modified = {{ lastmod }},
 	have_emp = {{ have_emp|tojson }},
 	dfavico = "{{ favico }}";
 
@@ -48,8 +49,8 @@ l.light = drk? 0:1;
 })();
 
 	</script>
-	<script src="/.cpr/util.js?_={{ ts }}"></script>
-	<script src="/.cpr/deps/marked.js?_={{ ts }}"></script>
-	<script src="/.cpr/deps/easymde.js?_={{ ts }}"></script>
-	<script src="/.cpr/mde.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/deps/marked.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/deps/easymde.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/mde.js?_={{ ts }}"></script>
 </body></html>

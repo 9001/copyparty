@@ -9,6 +9,8 @@ if (!window.console || !console.log)
 var wah = '',
     L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,
     CB = '?_=' + Date.now(),
+    R = SR.slice(1),
+    RS = R ? "/" + R : "",
     HALFMAX = 8192 * 8192 * 8192 * 8192,
     HTTPS = (window.location + '').indexOf('https:') === 0,
     TOUCH = 'ontouchstart' in window,

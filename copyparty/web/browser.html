@@ -8,8 +8,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.6">
 	<meta name="theme-color" content="#333">
 {{ html_head }}
-	<link rel="stylesheet" media="screen" href="/.cpr/ui.css?_={{ ts }}">
-	<link rel="stylesheet" media="screen" href="/.cpr/browser.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/browser.css?_={{ ts }}">
 	{%- if css %}
 	<link rel="stylesheet" media="screen" href="{{ css }}?_={{ ts }}">
 	{%- endif %}
@@ -71,7 +71,7 @@
 	<h1 id="path">
 		<a href="#" id="entree">🌲</a>
 		{%- for n in vpnodes %}
-		<a href="/{{ n[0] }}">{{ n[1] }}</a>
+		<a href="{{ r }}/{{ n[0] }}">{{ n[1] }}</a>
 		{%- endfor %}
 	</h1>
 	
@@ -121,7 +121,7 @@
 	
 	<div id="epi" class="logue">{{ logues[1] }}</div>
 
-	<h2><a href="/?h" id="goh">control-panel</a></h2>
+	<h2><a href="{{ r }}/?h" id="goh">control-panel</a></h2>
 	
 	<a href="#" id="repl">π</a>
 
@@ -134,7 +134,8 @@
 	<div id="widget"></div>
 
 	<script>
-		var acct = "{{ acct }}",
+		var SR = {{ r|tojson }},
+			acct = "{{ acct }}",
 			perms = {{ perms }},
 			themes = {{ themes }},
 			dtheme = "{{ dtheme }}",
@@ -160,10 +161,10 @@
 
 		document.documentElement.className = localStorage.theme || dtheme;
 	</script>
-	<script src="/.cpr/util.js?_={{ ts }}"></script>
-	<script src="/.cpr/baguettebox.js?_={{ ts }}"></script>
-	<script src="/.cpr/browser.js?_={{ ts }}"></script>
-	<script src="/.cpr/up2k.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/baguettebox.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/browser.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/up2k.js?_={{ ts }}"></script>
 	{%- if js %}
 	<script src="{{ js }}?_={{ ts }}"></script>
 	{%- endif %}

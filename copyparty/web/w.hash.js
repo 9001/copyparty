@@ -19,7 +19,7 @@ catch (ex) {
 }
 function load_fb() {
     subtle = null;
-    importScripts('/.cpr/deps/sha512.hw.js');
+    importScripts('deps/sha512.hw.js');
 }
 
 

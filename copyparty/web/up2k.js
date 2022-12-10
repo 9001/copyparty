@@ -779,7 +779,7 @@ function up2k_init(subtle) {
 
     setTimeout(function () {
         if (window.WebAssembly && !hws.length)
-            fetch('/.cpr/w.hash.js' + CB);
+            fetch(SR + '/.cpr/w.hash.js' + CB);
     }, 1000);
 
     function showmodal(msg) {
@@ -809,7 +809,7 @@ function up2k_init(subtle) {
                 m = L.u_https1 + ' <a href="' + (window.location + '').replace(':', 's:') + '">' + L.u_https2 + '</a> ' + L.u_https3;
 
             showmodal('<h1>loading ' + fn + '</h1>');
-            import_js('/.cpr/deps/' + fn, unmodal);
+            import_js(SR + '/.cpr/deps/' + fn, unmodal);
 
             if (HTTPS) {
                 // chrome<37 firefox<34 edge<12 opera<24 safari<7
@@ -1312,7 +1312,7 @@ function up2k_init(subtle) {
 
         if (window.WebAssembly && !hws.length) {
             for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
-                hws.push(new Worker('/.cpr/w.hash.js' + CB));
+                hws.push(new Worker(SR + '/.cpr/w.hash.js' + CB));
 
             console.log(hws.length + " hashers");
         }

@@ -673,6 +673,7 @@ def run_argparse(
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range)")
     ap2.add_argument("--ll", action="store_true", help="include link-local IPv4/IPv6 even if the NIC has routable IPs (breaks some mdns clients)")
     ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to keep; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd), [\033[32m2\033[0m]=cloudflare, [\033[32m3\033[0m]=nginx, [\033[32m-1\033[0m]=closest proxy")
+    ap2.add_argument("--webroot", metavar="PATH", type=u, default="", help="if reverse-proxying on a location instead of a dedicated subdomain, provide the location here")
     if ANYWIN:
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
     ap2.add_argument("--s-wr-sz", metavar="B", type=int, default=256*1024, help="socket write size in bytes")

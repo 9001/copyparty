@@ -3647,7 +3647,7 @@ var showfile = (function () {
 		qsr('#prism_css');
 		var el = mknod('link', 'prism_css');
 		el.rel = 'stylesheet';
-		el.href = '/.cpr/deps/prism' + (light ? '' : 'd') + '.css';
+		el.href = SR + '/.cpr/deps/prism' + (light ? '' : 'd') + '.css';
 		document.head.appendChild(el);
 	};
 
@@ -3775,7 +3775,7 @@ var showfile = (function () {
 				if (!defer)
 					fun(el.firstChild);
 				else
-					import_js('/.cpr/deps/prism.js', function () { fun(); });
+					import_js(SR + '/.cpr/deps/prism.js', function () { fun(); });
 			}
 		}
 
@@ -4181,10 +4181,10 @@ var thegrid = (function () {
 			if (r.thumbs) {
 				ihref += '?th=' + (have_webp ? 'w' : 'j');
 				if (href == "#")
-					ihref = '/.cpr/ico/⏏️';
+					ihref = SR + '/.cpr/ico/⏏️';
 			}
 			else if (isdir) {
-				ihref = '/.cpr/ico/folder';
+				ihref = SR + '/.cpr/ico/folder';
 			}
 			else {
 				var ar = href.split('.');
@@ -4209,7 +4209,7 @@ var thegrid = (function () {
 					else
 						ext = "unk";
 				}
-				ihref = '/.cpr/ico/' + ext;
+				ihref = SR + '/.cpr/ico/' + ext;
 			}
 			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i';
 
@@ -4784,7 +4784,7 @@ document.onkeydown = function (e) {
 		clearTimeout(search_timeout);
 
 		var xhr = new XHR();
-		xhr.open('POST', '/?srch', true);
+		xhr.open('POST', SR + '/?srch', true);
 		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onload = xhr.onerror = xhr_search_results;
 		xhr.ts = Date.now();
@@ -5323,7 +5323,12 @@ var treectl = (function () {
 			treegrow.call(this.previousSibling, e);
 			return;
 		}
-		r.reqls(this.getAttribute('href'), true);
+		var href = this.getAttribute('href');
+		if (R && !href.startsWith(SR)) {
+			window.location = href;
+			return;
+		}
+		r.reqls(href, true);
 		r.dir_cb = tree_scrollto;
 		thegrid.setvis(true);
 	}
@@ -5547,7 +5552,7 @@ var treectl = (function () {
 		qsr('#bbsw');
 		if (ls0 === null) {
 			var xhr = new XHR();
-			xhr.open('GET', '/?am_js', true);
+			xhr.open('GET', SR + '/?am_js', true);
 			xhr.send();
 
 			r.ls_cb = showfile.addlinks;
@@ -6552,7 +6557,7 @@ function show_md(md, name, div, url, depth) {
 		if (depth)
 			return toast.warn(10, errmsg + 'failed to load marked.js')
 
-		return import_js('/.cpr/deps/marked.js', function () {
+		return import_js(SR + '/.cpr/deps/marked.js', function () {
 			show_md(md, name, div, url, 1);
 		});
 	}
@@ -6705,7 +6710,7 @@ var unpost = (function () {
 			r.me = me;
 		}
 
-		var q = '/?ups';
+		var q = SR + '/?ups';
 		if (filt.value)
 			q += '&filter=' + uricom_enc(filt.value, true);
 
@@ -6771,7 +6776,7 @@ var unpost = (function () {
 		var xhr = new XHR();
 		xhr.n = n;
 		xhr.n2 = n2;
-		xhr.open('POST', '/?delete&lim=' + req.length, true);
+		xhr.open('POST', SR + '/?delete&lim=' + req.length, true);
 		xhr.onload = xhr.onerror = unpost_delete_cb;
 		xhr.send(JSON.stringify(req));
 	};

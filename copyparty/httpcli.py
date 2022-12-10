@@ -119,6 +119,8 @@ class HttpCli(object):
         # placeholders; assigned by run()
         self.keepalive = False
         self.is_https = False
+        self.is_proxied = False
+        self.is_vproxied = False
         self.in_hdr_recv = True
         self.headers: dict[str, str] = {}
         self.mode = " "
@@ -191,6 +193,7 @@ class HttpCli(object):
 
     def j2s(self, name: str, **ka: Any) -> str:
         tpl = self.conn.hsrv.j2[name]
+        ka["r"] = self.args.SR if self.is_vproxied else ""
         ka["ts"] = self.conn.hsrv.cachebuster()
         ka["lang"] = self.args.lang
         ka["favico"] = self.args.favico
@@ -276,6 +279,8 @@ class HttpCli(object):
                     self.log(t.format(self.args.rproxy, zso), c=3)
 
                 self.log_src = self.conn.set_rproxy(self.ip)
+                self.is_vproxied = bool(self.args.R)
+                self.is_proxied = True
 
         if self.is_banned():
             return False
@@ -319,6 +324,13 @@ class HttpCli(object):
                     uparam[k.lower()] = zs.strip()
                 else:
                     uparam[k.lower()] = ""
+
+        if self.is_vproxied:
+            if vpath.startswith(self.args.R):
+                vpath = vpath[len(self.args.R) + 1 :]
+            else:
+                t = "incorrect --webroot or webserver config; expected vpath starting with [{}] but got [{}]"
+                self.log(t.format(self.args.R, vpath), 1)
 
         self.ouparam = {k: zs for k, zs in uparam.items()}
 
@@ -604,10 +616,11 @@ class HttpCli(object):
         status: int = 200,
         use302: bool = False,
     ) -> bool:
+        vp = self.args.RS + vpath
         html = self.j2s(
             "msg",
             h2='<a href="/{}">{} /{}</a>'.format(
-                quotep(vpath) + suf, flavor, html_escape(vpath, crlf=True) + suf
+                quotep(vp) + suf, flavor, html_escape(vp, crlf=True) + suf
             ),
             pre=msg,
             click=click,
@@ -1375,7 +1388,7 @@ class HttpCli(object):
         url = "{}://{}/{}".format(
             "https" if self.is_https else "http",
             self.headers.get("host") or "{}:{}".format(*list(self.s.getsockname()[:2])),
-            vpath + vsuf,
+            self.args.RS + vpath + vsuf,
         )
 
         return post_sz, sha_hex, sha_b64, remains, path, url
@@ -1576,6 +1589,10 @@ class HttpCli(object):
 
         x = self.conn.hsrv.broker.ask("up2k.handle_json", body)
         ret = x.get()
+        if self.is_vproxied:
+            if "purl" in ret:
+                ret["purl"] = self.args.SR + ret["purl"]
+
         ret = json.dumps(ret)
         self.log(ret)
         self.reply(ret.encode("utf-8"), mime="application/json")
@@ -1633,6 +1650,10 @@ class HttpCli(object):
         for t in taglist:
             if t not in order:
                 order.append(t)
+
+        if self.is_vproxied:
+            for hit in hits:
+                hit["rp"] = self.args.RS + hit["rp"]
 
         r = json.dumps({"hits": hits, "tag_order": order}).encode("utf-8")
         self.reply(r, mime="application/json")
@@ -2032,7 +2053,7 @@ class HttpCli(object):
                 )[: vfs.flags["fk"]]
 
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
-            rel_url = quotep(vpath) + vsuf
+            rel_url = quotep(self.args.RS + vpath) + vsuf
             msg += 'sha512: {} // {} // {} bytes // <a href="/{}">{}</a> {}\n'.format(
                 sha_hex[:56],
                 sha_b64,
@@ -2537,6 +2558,7 @@ class HttpCli(object):
 
         boundary = "\roll\tide"
         targs = {
+            "r": self.args.SR if self.is_vproxied else "",
             "ts": self.conn.hsrv.cachebuster(),
             "svcname": self.args.doctitle,
             "html_head": self.html_head,
@@ -2765,6 +2787,11 @@ class HttpCli(object):
             dst = dst[len(top) + 1 :]
 
         ret = self.gen_tree(top, dst)
+        if self.is_vproxied:
+            parents = self.args.R.split("/")
+            for parent in parents[::-1]:
+                ret = {"k{}".format(parent): ret, "a": []}
+
         zs = json.dumps(ret)
         self.reply(zs.encode("utf-8"), mime="application/json")
         return True
@@ -2875,6 +2902,11 @@ class HttpCli(object):
                 break
 
         ret = ret[:2000]
+
+        if self.is_vproxied:
+            for v in ret:
+                v["vp"] = self.args.SR + v["vp"]
+
         jtxt = json.dumps(ret, indent=2, sort_keys=True).encode("utf-8", "replace")
         self.log("{} #{} {:.2f}sec".format(lm, len(ret), time.time() - t0))
         self.reply(jtxt, mime="application/json")
@@ -2889,6 +2921,8 @@ class HttpCli(object):
 
         if not req:
             req = [self.vpath]
+        elif self.is_vproxied:
+            req = [x[len(self.args.SR) :] for x in req]
 
         nlim = int(self.uparam.get("lim") or 0)
         lim = [nlim, nlim] if nlim else []
@@ -2900,6 +2934,10 @@ class HttpCli(object):
     def handle_mv(self) -> bool:
         # full path of new loc (incl filename)
         dst = self.uparam.get("move")
+
+        if self.is_vproxied and dst and dst.startswith(self.args.SR):
+            dst = dst[len(self.args.RS) :]
+
         if not dst:
             raise Pebkac(400, "need dst vpath")
 
