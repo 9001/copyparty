@@ -1540,11 +1540,6 @@ class HttpCli(object):
         if "delete" in self.uparam:
             return self.handle_rm(body)
 
-        # up2k-php compat
-        for k in "chunkpit.php", "handshake.php":
-            if self.vpath.endswith(k):
-                self.vpath = self.vpath[: -len(k)]
-
         name = undot(body["name"])
         if "/" in name:
             raise Pebkac(400, "your client is old; press CTRL-SHIFT-R and try again")
@@ -1557,6 +1552,9 @@ class HttpCli(object):
         body["prel"] = vrem
         body["addr"] = self.ip
         body["vcfg"] = dbv.flags
+
+        if not self.can_delete:
+            body.pop("replace")
 
         if rem:
             dst = vfs.canonical(rem)

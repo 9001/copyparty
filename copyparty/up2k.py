@@ -2116,7 +2116,7 @@ class Up2k(object):
                             job[k] = cj[k]
 
                         pdir = djoin(cj["ptop"], cj["prel"])
-                        job["name"] = self._untaken(pdir, cj["name"], now, cj["addr"])
+                        job["name"] = self._untaken(pdir, cj, now)
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
                             bos.unlink(dst)  # TODO ed pls
@@ -2163,7 +2163,7 @@ class Up2k(object):
                 ]:
                     job[k] = cj[k]
 
-                for k in ["life"]:
+                for k in ["life", "replace"]:
                     if k in cj:
                         job[k] = cj[k]
 
@@ -2195,9 +2195,17 @@ class Up2k(object):
                 "wark": wark,
             }
 
-    def _untaken(self, fdir: str, fname: str, ts: float, ip: str) -> str:
+    def _untaken(self, fdir: str, job: dict[str, Any], ts: float) -> str:
+        fname = job["name"]
+        ip = job["addr"]
+
         if self.args.nw:
             return fname
+
+        fp = os.path.join(fdir, fname)
+        if job.get("replace") and bos.path.exists(fp):
+            self.log("replacing existing file at {}".format(fp))
+            bos.unlink(fp)
 
         if self.args.plain_ip:
             dip = ip.replace(":", ".")
@@ -2973,7 +2981,7 @@ class Up2k(object):
             return
 
         self.registry[job["ptop"]][job["wark"]] = job
-        job["name"] = self._untaken(pdir, job["name"], job["t0"], job["addr"])
+        job["name"] = self._untaken(pdir, job, job["t0"])
         # if len(job["name"].split(".")) > 8:
         #    raise Exception("aaa")
 
