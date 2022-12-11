@@ -119,7 +119,6 @@ class HttpCli(object):
         # placeholders; assigned by run()
         self.keepalive = False
         self.is_https = False
-        self.is_proxied = False
         self.is_vproxied = False
         self.in_hdr_recv = True
         self.headers: dict[str, str] = {}
@@ -256,7 +255,7 @@ class HttpCli(object):
         self.is_ancient = self.ua.startswith("Mozilla/4.")
 
         zs = self.headers.get("connection", "").lower()
-        self.keepalive = not zs.startswith("close") and (
+        self.keepalive = "close" not in zs and (
             self.http_ver != "HTTP/1.0" or zs == "keep-alive"
         )
         self.is_https = (
@@ -280,7 +279,6 @@ class HttpCli(object):
 
                 self.log_src = self.conn.set_rproxy(self.ip)
                 self.is_vproxied = bool(self.args.R)
-                self.is_proxied = True
 
         if self.is_banned():
             return False
@@ -1149,7 +1147,11 @@ class HttpCli(object):
         if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
 
-        if "text/plain" in ctype or "application/xml" in ctype:
+        if (
+            "application/json" in ctype
+            or "text/plain" in ctype
+            or "application/xml" in ctype
+        ):
             return self.handle_post_json()
 
         if "application/octet-stream" in ctype:

@@ -370,7 +370,6 @@ class VFS(object):
 
     def _find(self, vpath: str) -> tuple["VFS", str]:
         """return [vfs,remainder]"""
-        vpath = undot(vpath)
         if vpath == "":
             return self, ""
 
@@ -381,7 +380,7 @@ class VFS(object):
             rem = ""
 
         if name in self.nodes:
-            return self.nodes[name]._find(rem)
+            return self.nodes[name]._find(undot(rem))
 
         return self, vpath
 
@@ -389,7 +388,7 @@ class VFS(object):
         self, vpath: str, uname: str
     ) -> tuple[bool, bool, bool, bool, bool, bool]:
         """can Read,Write,Move,Delete,Get,Upget"""
-        vn, _ = self._find(vpath)
+        vn, _ = self._find(undot(vpath))
         c = vn.axs
         return (
             uname in c.uread or "*" in c.uread,
@@ -419,7 +418,7 @@ class VFS(object):
                     self.log("vfs", "invalid relpath [{}]".format(vpath))
                 raise Pebkac(404)
 
-        vn, rem = self._find(vpath)
+        vn, rem = self._find(undot(vpath))
         c: AXS = vn.axs
 
         for req, d, msg in [

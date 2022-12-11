@@ -306,11 +306,9 @@ class SvcHub(object):
             t = "found URL in --webroot; it should be just the location, for example /foo/bar"
             raise Exception(t)
 
-        R = R.strip("/")
-        if R:
-            al.R = R
-            al.SR = "/" + R
-            al.RS = R + "/"
+        al.R = R = R.strip("/")
+        al.SR = "/" + R if R else ""
+        al.RS = R + "/" if R else ""
 
         return True
 
