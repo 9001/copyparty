@@ -904,6 +904,16 @@ function up2k_init(subtle) {
             "u": "",
             "t": ""
         },
+        "etaw": {
+            "h": [['', 0, 0, 0]],
+            "u": [['', 0, 0, 0]],
+            "t": [['', 0, 0, 0]]
+        },
+        "etac": {
+            "h": 0,
+            "u": 0,
+            "t": 0
+        },
         "car": 0,
         "slow_io": null,
         "oserr": false,
@@ -1480,10 +1490,20 @@ function up2k_init(subtle) {
             }
         }
         for (var a = 0; a < t.length; a++) {
-            var rem = st.bytes.total - t[a][2],
-                bps = t[a][1] / t[a][3],
-                hid = t[a][0],
+            var hid = t[a][0],
                 eid = hid.slice(-1),
+                etaw = st.etaw[eid];
+
+            if (st.etac[eid] > 100) {  // num chunks
+                st.etac[eid] = 0;
+                etaw.push(jcp(t[a]));
+                if (etaw.length > 5)
+                    etaw.shift();
+            }
+
+            var h = etaw[0],
+                rem = st.bytes.total - t[a][2],
+                bps = (t[a][1] - h[1]) / Math.max(0.1, t[a][3] - h[3]),
                 eta = Math.floor(rem / bps);
 
             if (t[a][1] < 1024 || t[a][3] < 0.1) {
@@ -1854,6 +1874,7 @@ function up2k_init(subtle) {
                 cdr = Math.min(chunksize + car, t.size);
 
             st.bytes.hashed += cdr - car;
+            st.etac.h++;
 
             function orz(e) {
                 bpend--;
@@ -2403,6 +2424,8 @@ function up2k_init(subtle) {
                 st.bytes.finished += cdr - car;
                 st.bytes.uploaded += cdr - car;
                 t.bytes_uploaded += cdr - car;
+                st.etac.u++;
+                st.etac.t++;
             }
             else if (txt.indexOf('already got that') + 1 ||
                 txt.indexOf('already being written') + 1) {
