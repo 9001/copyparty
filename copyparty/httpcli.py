@@ -327,7 +327,7 @@ class HttpCli(object):
             if vpath.startswith(self.args.R):
                 vpath = vpath[len(self.args.R) + 1 :]
             else:
-                t = "incorrect --webroot or webserver config; expected vpath starting with [{}] but got [{}]"
+                t = "incorrect --rp-loc or webserver config; expected vpath starting with [{}] but got [{}]"
                 self.log(t.format(self.args.R, vpath), 1)
 
         self.ouparam = {k: zs for k, zs in uparam.items()}
@@ -2719,13 +2719,14 @@ class HttpCli(object):
     def tx_404(self, is_403: bool = False) -> bool:
         rc = 404
         if self.args.vague_403:
-            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="/?h">go home</a></p>'
+            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="{}/?h">go home</a></p>'
         elif is_403:
-            t = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="/?h">go home</a></p>'
+            t = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="{}/?h">go home</a></p>'
             rc = 403
         else:
-            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="/?h">go home</a></p>'
+            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="{}/?h">go home</a></p>'
 
+        t = t.format(self.args.SR)
         html = self.j2s("splash", this=self, qvpath=quotep(self.vpath), msg=t)
         self.reply(html.encode("utf-8"), status=rc)
         return True

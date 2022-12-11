@@ -301,9 +301,9 @@ class SvcHub(object):
             vs = [x for x in vs if x]
             setattr(al, n, vs)
 
-        R = al.webroot
+        R = al.rp_loc
         if "//" in R or ":" in R:
-            t = "found URL in --webroot; it should be just the location, for example /foo/bar"
+            t = "found URL in --rp-loc; it should be just the location, for example /foo/bar"
             raise Exception(t)
 
         al.R = R = R.strip("/")

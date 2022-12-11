@@ -1680,7 +1680,7 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
 
         qsr('#cf_frame');
         var fr = mknod('iframe', 'cf_frame');
-        fr.src = '/?cf_challenge';
+        fr.src = SR + '/?cf_challenge';
         document.body.appendChild(fr);
     }
 
