@@ -381,7 +381,7 @@ def walkdirs(err, tops):
             stop = os.path.dirname(top)
 
         if os.path.isdir(top):
-            yield stop, "", os.stat(stop)
+            yield stop, b"", os.stat(stop)
             for ap, inf in walkdir(err, top, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
