@@ -986,6 +986,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-a", metavar="PASSWORD", help="password")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
+    ap.add_argument("--cls", action="store_true", help="clear screen before start")
 
     ap = app.add_argument_group("folder sync")
     ap.add_argument("--dl", action="store_true", help="delete local files after uploading")
@@ -1026,8 +1027,8 @@ source file/folder selection uses rsync syntax, meaning that:
     if "://" not in ar.url:
         ar.url = "http://" + ar.url
 
-    if VT100:
-        print(b"\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
+    if ar.cls:
+        print("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
 
     Ctl(ar)
 
