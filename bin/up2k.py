@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-11-29, v0.22, ed <irc.rizon.net>, MIT-Licensed
+2022-12-11, v0.23, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -42,6 +42,7 @@ except ImportError:
         m = "requests/2.18.4 urllib3/1.23 chardet/3.0.4 certifi/2020.4.5.1 idna/2.7"
         m = ["   https://pypi.org/project/" + x + "/#files" for x in m.split()]
         m = "\n  ERROR: need these:\n" + "\n".join(m) + "\n"
+        m += "\n  for f in *.whl; do unzip $f; done; rm -r *.dist-info\n"
 
     print(m.format(sys.executable))
     sys.exit(1)
@@ -262,10 +263,10 @@ def termsize():
         try:
             import fcntl, termios, struct
 
-            cr = struct.unpack("hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234"))
+            r = struct.unpack(b"hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"AAAA"))
+            return r[::-1]
         except:
-            return
-        return cr
+            return None
 
     cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
     if not cr:
@@ -275,12 +276,11 @@ def termsize():
             os.close(fd)
         except:
             pass
-    if not cr:
-        try:
-            cr = (env["LINES"], env["COLUMNS"])
-        except:
-            cr = (25, 80)
-    return int(cr[1]), int(cr[0])
+
+    try:
+        return cr or (int(env["COLUMNS"]), int(env["LINES"]))
+    except:
+        return 80, 25
 
 
 class CTermsize(object):
@@ -362,14 +362,13 @@ def walkdir(err, top, seen):
 
     seen = seen[:] + [atop]
     for ap, inf in sorted(statdir(err, top)):
+        yield ap, inf
         if stat.S_ISDIR(inf.st_mode):
             try:
                 for x in walkdir(err, ap, seen):
                     yield x
             except Exception as ex:
                 err.append((ap, str(ex)))
-        else:
-            yield ap, inf
 
 
 def walkdirs(err, tops):
@@ -382,6 +381,7 @@ def walkdirs(err, tops):
             stop = os.path.dirname(top)
 
         if os.path.isdir(top):
+            yield stop, "", os.stat(stop)
             for ap, inf in walkdir(err, top, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
@@ -472,13 +472,16 @@ def get_hashlist(file, pcb, mth):
         file.kchunks[k] = [v1, v2]
 
 
-def handshake(url, file, pw, search):
-    # type: (str, File, Any, bool) -> tuple[list[str], bool]
+def handshake(ar, file, search):
+    # type: (argparse.Namespace, File, bool) -> tuple[list[str], bool]
     """
     performs a handshake with the server; reply is:
       if search, a list of search results
       otherwise, a list of chunks to upload
     """
+
+    url = ar.url
+    pw = ar.a
 
     req = {
         "hash": [x[0] for x in file.cids],
@@ -488,11 +491,14 @@ def handshake(url, file, pw, search):
     }
     if search:
         req["srch"] = 1
+    elif ar.dr:
+        req["replace"] = True
 
-    headers = {"Content-Type": "text/plain"}  # wtf ed
+    headers = {"Content-Type": "text/plain"}  # <=1.5.1 compat
     if pw:
         headers["Cookie"] = "=".join(["cppwd", pw])
 
+    file.recheck = False
     if file.url:
         url = file.url
     elif b"/" in file.rel:
@@ -540,7 +546,7 @@ def handshake(url, file, pw, search):
 
 
 def upload(file, cid, pw):
-    # type: (File, str, Any) -> None
+    # type: (File, str, str) -> None
     """upload one specific chunk, `cid` (a chunk-hash)"""
 
     headers = {
@@ -564,27 +570,20 @@ def upload(file, cid, pw):
 
 class Ctl(object):
     """
-    this will be the coordinator which runs everything in parallel
-    (hashing, handshakes, uploads)  but right now it's p dumb
+    the coordinator which runs everything in parallel
+    (hashing, handshakes, uploads)
     """
 
     def __init__(self, ar):
-        self.ar = ar
-        ar.files = [
-            os.path.abspath(os.path.realpath(x.encode("utf-8")))
-            + (x[-1:] if x[-1:] == os.sep else "").encode("utf-8")
-            for x in ar.files
-        ]
-        ar.url = ar.url.rstrip("/") + "/"
-        if "://" not in ar.url:
-            ar.url = "http://" + ar.url
-
         eprint("\nscanning {0} locations\n".format(len(ar.files)))
-
+        self.ar = ar
         nfiles = 0
         nbytes = 0
         err = []
         for _, _, inf in walkdirs(err, ar.files):
+            if stat.S_ISDIR(inf.st_mode):
+                continue
+
             nfiles += 1
             nbytes += inf.st_size
 
@@ -651,6 +650,9 @@ class Ctl(object):
         """minimal basic slow boring fallback codepath"""
         search = self.ar.s
         for nf, (top, rel, inf) in enumerate(self.filegen):
+            if stat.S_ISDIR(inf.st_mode) or not rel:
+                continue
+
             file = File(top, rel, inf.st_size, inf.st_mtime)
             upath = file.abs.decode("utf-8", "replace")
 
@@ -660,7 +662,7 @@ class Ctl(object):
             burl = self.ar.url[:12] + self.ar.url[8:].split("/")[0] + "/"
             while True:
                 print("  hs...")
-                hs, _ = handshake(self.ar.url, file, self.ar.a, search)
+                hs, _ = handshake(self.ar, file, search)
                 if search:
                     if hs:
                         for hit in hs:
@@ -688,7 +690,7 @@ class Ctl(object):
 
         eprint("finalizing {0} duplicate files".format(len(self.recheck)))
         for file in self.recheck:
-            handshake(self.ar.url, file, self.ar.a, search)
+            handshake(self.ar, file, search)
 
     def _fancy(self):
         if VT100:
@@ -765,7 +767,7 @@ class Ctl(object):
 
         eprint("finalizing {0} duplicate files".format(len(self.recheck)))
         for file in self.recheck:
-            handshake(self.ar.url, file, self.ar.a, False)
+            handshake(self.ar, file, False)
 
     def cleanup_vt100(self):
         ss.scroll_region(None)
@@ -778,8 +780,10 @@ class Ctl(object):
         prd = None
         ls = {}
         for top, rel, inf in self.filegen:
-            if self.ar.z:
-                rd = os.path.dirname(rel)
+            isdir = stat.S_ISDIR(inf.st_mode)
+            if self.ar.z or self.ar.drd:
+                rd = rel if isdir else os.path.dirname(rel)
+                srd = rd.decode("utf-8", "replace")
                 if prd != rd:
                     prd = rd
                     headers = {}
@@ -788,19 +792,34 @@ class Ctl(object):
 
                     ls = {}
                     try:
-                        print("      ls ~{0}".format(rd.decode("utf-8", "replace")))
-                        r = req_ses.get(
-                            self.ar.url.encode("utf-8") + quotep(rd) + b"?ls",
-                            headers=headers,
-                        )
-                        for f in r.json()["files"]:
-                            rfn = f["href"].split("?")[0].encode("utf-8", "replace")
-                            ls[unquote(rfn)] = f
+                        print("      ls ~{0}".format(srd))
+                        zb = self.ar.url.encode("utf-8")
+                        zb += quotep(rd.replace(b"\\", b"/"))
+                        r = req_ses.get(zb + b"?ls&dots", headers=headers)
+                        j = r.json()
+                        for f in j["dirs"] + j["files"]:
+                            rfn = f["href"].split("?")[0].rstrip("/")
+                            ls[unquote(rfn.encode("utf-8", "replace"))] = f
                     except:
-                        print("   mkdir ~{0}".format(rd.decode("utf-8", "replace")))
+                        print("   mkdir ~{0}".format(srd))
 
+                    if self.ar.drd:
+                        dp = os.path.join(top, rd)
+                        lnodes = set(os.listdir(dp))
+                        bnames = [x for x in ls if x not in lnodes]
+                        if bnames:
+                            vpath = self.ar.url.split("://")[-1].split("/", 1)[-1]
+                            names = [x.decode("utf-8", "replace") for x in bnames]
+                            locs = [vpath + srd + "/" + x for x in names]
+                            print("DELETING ~{0}/#{1}".format(srd, len(names)))
+                            req_ses.post(self.ar.url + "?delete", json=locs)
+
+            if isdir:
+                continue
+
+            if self.ar.z:
                 rf = ls.get(os.path.basename(rel), None)
-                if rf and rf["sz"] == inf.st_size and abs(rf["ts"] - inf.st_mtime) <= 1:
+                if rf and rf["sz"] == inf.st_size and abs(rf["ts"] - inf.st_mtime) <= 2:
                     self.nfiles -= 1
                     self.nbytes -= inf.st_size
                     continue
@@ -850,7 +869,7 @@ class Ctl(object):
                 self.handshaker_busy += 1
 
             upath = file.abs.decode("utf-8", "replace")
-            hs, sprs = handshake(self.ar.url, file, self.ar.a, search)
+            hs, sprs = handshake(self.ar, file, search)
             if search:
                 if hs:
                     for hit in hs:
@@ -882,6 +901,9 @@ class Ctl(object):
                     self.up_f += 1
                     self.up_c += len(file.cids) - file.up_c
                     self.up_b += file.size - file.up_b
+
+                    if not file.recheck:
+                        self.up_done(file)
 
                 if hs and file.up_c:
                     # some chunks failed
@@ -917,7 +939,7 @@ class Ctl(object):
                 upload(file, cid, self.ar.a)
             except:
                 eprint("upload failed, retrying: {0} #{1}\n".format(file.name, cid[:8]))
-                pass  # handshake will fix it
+                # handshake will fix it
 
             with self.mutex:
                 sz = file.kchunks[cid][1]
@@ -932,6 +954,10 @@ class Ctl(object):
                 file.up_c += 1
                 self.up_c += 1
                 self.uploader_busy -= 1
+
+    def up_done(self, file):
+        if self.ar.dl:
+            os.unlink(file.abs)
 
 
 class APF(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
@@ -960,18 +986,56 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-a", metavar="PASSWORD", help="password")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
+
+    ap = app.add_argument_group("folder sync")
+    ap.add_argument("--dl", action="store_true", help="delete local files after uploading")
+    ap.add_argument("--dr", action="store_true", help="delete remote files which don't exist locally")
+    ap.add_argument("--drd", action="store_true", help="delete remote files during upload instead of afterwards; reduces peak disk space usage, but will reupload instead of detecting renames")
+
     ap = app.add_argument_group("performance tweaks")
     ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
     ap.add_argument("-J", type=int, metavar="THREADS", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
+
     ap = app.add_argument_group("tls")
     ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
     ap.add_argument("-td", action="store_true", help="disable certificate check")
     # fmt: on
 
-    Ctl(app.parse_args())
+    ar = app.parse_args()
+    if ar.drd:
+        ar.dr = True
+
+    for k in "dl dr drd".split():
+        errs = []
+        if ar.safe and getattr(ar, k):
+            errs.append(k)
+
+        if errs:
+            raise Exception("--safe is incompatible with " + str(errs))
+
+    ar.files = [
+        os.path.abspath(os.path.realpath(x.encode("utf-8")))
+        + (x[-1:] if x[-1:] == os.sep else "").encode("utf-8")
+        for x in ar.files
+    ]
+
+    ar.url = ar.url.rstrip("/") + "/"
+    if "://" not in ar.url:
+        ar.url = "http://" + ar.url
+
+    if VT100:
+        print(b"\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
+
+    Ctl(ar)
+
+    if ar.dr and not ar.drd:
+        # run another pass for the deletes
+        ar.drd = True
+        ar.z = True
+        Ctl(ar)
 
 
 if __name__ == "__main__":

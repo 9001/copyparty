@@ -1143,7 +1143,7 @@ interact with copyparty using non-browser clients
   * `(printf 'PUT / HTTP/1.1\r\n\r\n'; cat movie.mkv) >/dev/tcp/127.0.0.1/3923`
 
 * python: [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) is a command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
-  * file uploads, file-search, autoresume of aborted/broken uploads
+  * file uploads, file-search, folder sync, autoresume of aborted/broken uploads
   * can be downloaded from copyparty: controlpanel -> connect -> [up2k.py](http://127.0.0.1:3923/.cpr/a/up2k.py)
   * see [./bin/README.md#up2kpy](bin/README.md#up2kpy)
 

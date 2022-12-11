@@ -2537,7 +2537,7 @@ def termsize() -> tuple[int, int]:
     def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:
         try:
             cr = sunpack(b"hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"AAAA"))
-            return int(cr[1]), int(cr[0])
+            return cr[::-1]
         except:
             return None
 
@@ -2550,11 +2550,8 @@ def termsize() -> tuple[int, int]:
         except:
             pass
 
-    if cr:
-        return cr
-
     try:
-        return int(env["COLUMNS"]), int(env["LINES"])
+        return cr or (int(env["COLUMNS"]), int(env["LINES"]))
     except:
         return 80, 25
 
