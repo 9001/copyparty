@@ -79,10 +79,10 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
+    * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
-* [up2k](#up2k) - quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
     * [client-side](#client-side) - when uploading files
 * [security](#security) - some notes on hardening
@@ -90,11 +90,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
         * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
-* [HTTP API](#HTTP-API)
-    * [read](#read)
-    * [write](#write)
-    * [admin](#admin)
-    * [general](#general)
+* [HTTP API](#HTTP-API) - see [devnotes](#./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [install recommended deps](#install-recommended-deps)
@@ -128,7 +124,7 @@ you may also want these, especially on servers:
 
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
 * [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
-* [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to reverse-proxy behind nginx (for better https)
+* [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to [reverse-proxy](#reverse-proxy) behind nginx (for better https)
 
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
@@ -1070,6 +1066,21 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
   
   * ...with logging to disk  
     `-lo log/cpp-%Y-%m%d-%H%M%S.txt.xz`
+
+
+## reverse-proxy
+
+running copyparty next to other websites  hosted on an existing webserver such as nginx or apache
+
+you can either:
+* give copyparty its own domain or subdomain (recommended)
+* or do location-based proxying, using `--rp-loc=/stuff` to tell copyparty where it is mounted -- has a slight performance cost and higher chance of bugs
+  * if copyparty says `incorrect --rp-loc or webserver config; expected vpath starting with [...]` it's likely because the webserver is stripping away the proxy location from the request URLs -- see the `ProxyPass` in the apache example below
+
+example webserver configs:
+
+* [nginx config](contrib/nginx/copyparty.conf) -- entire domain/subdomain
+* [apache2 config](contrib/apache/copyparty.conf) -- location-based
 
 
 # browser support

@@ -3,7 +3,13 @@
 * top
 * [future plans](#future-plans) - some improvement ideas
 * [design](#design)
+    * [up2k](#up2k) - quick outline of the up2k protocol
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
+* [http api](#http-api)
+    * [read](#read)
+    * [write](#write)
+    * [admin](#admin)
+    * [general](#general)
 * [assumptions](#assumptions)
     * [mdns](#mdns)
 * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
@@ -35,7 +41,7 @@ some improvement ideas
 
 ## up2k
 
-quick outline of the up2k protocol, see [uploading](#uploading) for the web-client
+quick outline of the up2k protocol,  see [uploading](https://github.com/9001/copyparty#uploading) for the web-client
 * the up2k client splits a file into an "optimal" number of chunks
   * 1 MiB each, unless that becomes more than 256 chunks
   * tries 1.5M, 2M, 3, 4, 6, ... until <= 256 chunks or size >= 32M
