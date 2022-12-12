@@ -3,14 +3,12 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-12-11, v0.23, ed <irc.rizon.net>, MIT-Licensed
+2022-12-12, v1.0, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
-- supports python 2.6, 2.7, and 3.3 through 3.11
-
-- almost zero error-handling
-- but if something breaks just try again and it'll autoresume
+- supports python 2.6, 2.7, and 3.3 through 3.12
+- if something breaks just try again and it'll autoresume
 """
 
 import os
@@ -375,14 +373,16 @@ def walkdirs(err, tops):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
     sep = "{0}".format(os.sep).encode("ascii")
     for top in tops:
+        isdir = os.path.isdir(top)
         if top[-1:] == sep:
             stop = top.rstrip(sep)
             yield stop, b"", os.stat(stop)
         else:
             stop, dn = os.path.split(top)
-            yield stop, dn, os.stat(stop)
+            if isdir:
+                yield stop, dn, os.stat(stop)
 
-        if os.path.isdir(top):
+        if isdir:
             for ap, inf in walkdir(err, top, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
@@ -784,7 +784,7 @@ class Ctl(object):
             isdir = stat.S_ISDIR(inf.st_mode)
             if self.ar.z or self.ar.drd:
                 rd = rel if isdir else os.path.dirname(rel)
-                srd = rd.decode("utf-8", "replace")
+                srd = rd.decode("utf-8", "replace").replace("\\", "/")
                 if prd != rd:
                     prd = rd
                     headers = {}
@@ -801,8 +801,8 @@ class Ctl(object):
                         for f in j["dirs"] + j["files"]:
                             rfn = f["href"].split("?")[0].rstrip("/")
                             ls[unquote(rfn.encode("utf-8", "replace"))] = f
-                    except:
-                        print("   mkdir ~{0}".format(srd))
+                    except Exception as ex:
+                        print("   mkdir ~{0}  ({1})".format(srd, ex))
 
                     if self.ar.drd:
                         dp = os.path.join(top, rd)
@@ -987,7 +987,10 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-a", metavar="PASSWORD", help="password")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
+    
+    ap = app.add_argument_group("compatibility")
     ap.add_argument("--cls", action="store_true", help="clear screen before start")
+    ap.add_argument("--ws", action="store_true", help="copyparty is running on windows; wait before deleting files after uploading")
 
     ap = app.add_argument_group("folder sync")
     ap.add_argument("--dl", action="store_true", help="delete local files after uploading")
@@ -1031,10 +1034,14 @@ source file/folder selection uses rsync syntax, meaning that:
     if ar.cls:
         print("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
 
-    Ctl(ar)
+    ctl = Ctl(ar)
 
     if ar.dr and not ar.drd:
         # run another pass for the deletes
+        if getattr(ctl, "up_br") and ar.ws:
+            # wait for up2k to mtime if there was uploads
+            time.sleep(4)
+
         ar.drd = True
         ar.z = True
         Ctl(ar)

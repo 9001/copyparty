@@ -1569,7 +1569,7 @@ class HttpCli(object):
         body["vcfg"] = dbv.flags
 
         if not self.can_delete:
-            body.pop("replace")
+            body.pop("replace", None)
 
         if rem:
             dst = vfs.canonical(rem)

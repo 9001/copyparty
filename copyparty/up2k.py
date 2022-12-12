@@ -153,6 +153,7 @@ class Up2k(object):
         if ANYWIN:
             # usually fails to set lastmod too quickly
             self.lastmod_q: list[tuple[str, int, tuple[int, int], bool]] = []
+            self.lastmod_q2 = self.lastmod_q[:]
             Daemon(self._lastmodder, "up2k-lastmod")
 
         self.fstab = Fstab(self.log_func)
@@ -3070,11 +3071,11 @@ class Up2k(object):
 
     def _lastmodder(self) -> None:
         while True:
-            ready = self.lastmod_q
+            ready = self.lastmod_q2
+            self.lastmod_q2 = self.lastmod_q
             self.lastmod_q = []
 
-            # self.log("lmod: got {}".format(len(ready)))
-            time.sleep(5)
+            time.sleep(1)
             for path, sz, times, sparse in ready:
                 self.log("lmod: setting times {} on {}".format(times, path))
                 try:
