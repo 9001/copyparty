@@ -54,6 +54,7 @@ except:
     HAVE_SSL = False
 
 printed: list[str] = []
+u = unicode
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -238,17 +239,22 @@ def get_srvname() -> str:
 
 
 def ensure_locale() -> None:
+    safe = "en_US.UTF-8"
     for x in [
-        "en_US.UTF-8",
+        safe,
         "English_United States.UTF8",
         "English_United States.1252",
     ]:
         try:
             locale.setlocale(locale.LC_ALL, x)
-            lprint("Locale: {}\n".format(x))
-            break
+            if x != safe:
+                lprint("Locale: {}\n".format(x))
+            return
         except:
             continue
+
+    t = "setlocale {} failed,\n  sorting and dates will be funky"
+    warn(t.format(safe))
 
 
 def ensure_cert() -> None:
@@ -267,8 +273,8 @@ def ensure_cert() -> None:
     try:
         if filecmp.cmp(cert_cfg, cert_insec):
             lprint(
-                "\033[33m  using default TLS certificate; https will be insecure."
-                + "\033[36m\n  certificate location: {}\033[0m\n".format(cert_cfg)
+                "\033[33musing default TLS certificate; https will be insecure."
+                + "\033[36m\ncertificate location: {}\033[0m\n".format(cert_cfg)
             )
     except:
         pass
@@ -441,27 +447,8 @@ def showlic() -> None:
         print(f.read().decode("utf-8", "replace"))
 
 
-def run_argparse(
-    argv: list[str], formatter: Any, retry: bool, nc: int
-) -> argparse.Namespace:
-    ap = argparse.ArgumentParser(
-        formatter_class=formatter,
-        prog="copyparty",
-        description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
-    )
-
-    try:
-        fk_salt = unicode(os.path.getmtime(os.path.join(E.cfg, "cert.pem")))
-    except:
-        fk_salt = "hunter2"
-
-    hcores = min(CORES, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
-
-    tty = os.environ.get("TERM", "").lower() == "linux"
-
-    srvname = get_srvname()
-
-    sects = [
+def get_sects():
+    return [
         [
             "accounts",
             "accounts and volumes",
@@ -615,15 +602,18 @@ def run_argparse(
             \033[32mwal\033[0m = another 21x faster on HDDs yet 90%% as safe; same pitfall as \033[33mswal\033[0m except more likely
 
             \033[32myolo\033[0m = another 1.5x faster, and removes the occasional sudden upload-pause while the disk syncs, but now you're at risk of losing the entire database in a powerloss / OS-crash
-            
+
             profiles can be set globally (--dbd=yolo), or per-volume with volflags: -v ~/Music:music:r:c,dbd=acid
             """
             ),
         ],
     ]
 
-    # fmt: off
-    u = unicode
+
+# fmt: off
+
+
+def add_general(ap, nc, srvname):
     ap2 = ap.add_argument_group('general options')
     ap2.add_argument("-c", metavar="PATH", type=u, action="append", help="add config file")
     ap2.add_argument("-nc", metavar="NUM", type=int, default=nc, help="max num clients")
@@ -639,6 +629,8 @@ def run_argparse(
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
+
+def add_qr(ap, tty):
     ap2 = ap.add_argument_group('qr options')
     ap2.add_argument("--qr", action="store_true", help="show http:// QR-code on startup")
     ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
@@ -649,6 +641,8 @@ def run_argparse(
     ap2.add_argument("--qrp", metavar="CELLS", type=int, default=4, help="padding (spec says 4 or more, but 1 is usually fine)")
     ap2.add_argument("--qrz", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try [\033[32m2\033[0m] on broken fonts)")
 
+
+def add_upload(ap):
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless -ed")
     ap2.add_argument("--plain-ip", action="store_true", help="when avoiding filename collisions by appending the uploader's ip to the filename: append the plaintext ip instead of salting and hashing the ip")
@@ -668,6 +662,8 @@ def run_argparse(
     ap2.add_argument("--u2sort", metavar="TXT", type=u, default="s", help="upload order; [\033[32ms\033[0m]=smallest-first, [\033[32mn\033[0m]=alphabetical, [\033[32mfs\033[0m]=force-s, [\033[32mfn\033[0m]=force-n -- alphabetical is a bit slower on fiber/LAN but makes it easier to eyeball if everything went fine")
     ap2.add_argument("--write-uplog", action="store_true", help="write POST reports to textfiles in working-directory")
 
+
+def add_network(ap):
     ap2 = ap.add_argument_group('network options')
     ap2.add_argument("-i", metavar="IP", type=u, default="::", help="ip to bind (comma-sep.), default: all IPv4 and IPv6")
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range)")
@@ -680,6 +676,8 @@ def run_argparse(
     ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0, help="debug: socket write delay in seconds")
     ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0, help="debug: response delay in seconds")
 
+
+def add_tls(ap):
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
@@ -688,6 +686,8 @@ def run_argparse(
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
     ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets for later decryption in wireshark")
 
+
+def add_zeroconf(ap):
     ap2 = ap.add_argument_group("Zeroconf options")
     ap2.add_argument("-z", action="store_true", help="enable all zeroconf backends (mdns, ssdp)")
     ap2.add_argument("--z-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes\n └─example: \033[32meth0, wlo1, virhost0, 192.168.123.0/24, fd00:fda::/96\033[0m")
@@ -695,6 +695,8 @@ def run_argparse(
     ap2.add_argument("-zv", action="store_true", help="verbose all zeroconf backends")
     ap2.add_argument("--mc-hop", metavar="SEC", type=int, default=0, help="rejoin multicast groups every SEC seconds (workaround for some switches/routers which cause mDNS to suddenly stop working after some time); try [\033[32m300\033[0m] or [\033[32m180\033[0m]")
 
+
+def add_zc_mdns(ap):
     ap2 = ap.add_argument_group("Zeroconf-mDNS options:")
     ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
     ap2.add_argument("--zm-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
@@ -712,6 +714,8 @@ def run_argparse(
     ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working")
     ap2.add_argument("--zm-noneg", action="store_true", help="disable NSEC replies -- try this if some clients don't see copyparty")
 
+
+def add_zc_ssdp(ap):
     ap2 = ap.add_argument_group("Zeroconf-SSDP options:")
     ap2.add_argument("--zs", action="store_true", help="announce the enabled protocols over SSDP -- compatible with Windows")
     ap2.add_argument("--zs-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
@@ -720,6 +724,8 @@ def run_argparse(
     ap2.add_argument("--zsl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] (goes directly to /priv/ with password hunter2) or [\033[32m?hc=priv&pw=hunter2\033[0m] (shows mounting options for /priv/ with password)")
     ap2.add_argument("--zsid", metavar="UUID", type=u, default=uuid.uuid4().urn[4:], help="USN (device identifier) to announce")
 
+
+def add_ftp(ap):
     ap2 = ap.add_argument_group('FTP options')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on PORT, for example \033[32m3921")
     ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on PORT, for example \033[32m3990")
@@ -728,11 +734,15 @@ def run_argparse(
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
 
+
+def add_webdav(ap):
     ap2 = ap.add_argument_group('WebDAV options')
     ap2.add_argument("--daw", action="store_true", help="enable full write support. \033[1;31mWARNING:\033[0m This has side-effects -- PUT-operations will now \033[1;31mOVERWRITE\033[0m existing files, rather than inventing new filenames to avoid loss of data. You might want to instead set this as a volflag where needed. By not setting this flag, uploaded files can get written to a filename which the client does not expect (which might be okay, depending on client)")
     ap2.add_argument("--dav-inf", action="store_true", help="allow depth:infinite requests (recursive file listing); extremely server-heavy but required for spec compliance -- luckily few clients rely on this")
     ap2.add_argument("--dav-mac", action="store_true", help="disable apple-garbage filter -- allow macos to create junk files (._* and .DS_Store, .Spotlight-*, .fseventsd, .Trashes, .AppleDouble, __MACOS)")
 
+
+def add_smb(ap):
     ap2 = ap.add_argument_group('SMB/CIFS options')
     ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless --smb-port is set above 1024 and your OS does port-forwarding from 445 to that.\n\033[1;31mWARNING:\033[0m this protocol is dangerous! Never expose to the internet. Account permissions are coalesced; if one account has write-access to a volume, then all accounts do.")
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
@@ -744,6 +754,8 @@ def run_argparse(
     ap2.add_argument("--smbvv", action="store_true", help="verboser")
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
 
+
+def add_optouts(ap):
     ap2 = ap.add_argument_group('opt-outs')
     ap2.add_argument("-nw", action="store_true", help="never write anything to disk (debug/benchmark)")
     ap2.add_argument("--keep-qem", action="store_true", help="do not disable quick-edit-mode on windows (it is disabled to avoid accidental text selection which will deadlock copyparty)")
@@ -755,6 +767,8 @@ def run_argparse(
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (as specified by the 'lifetime' volflag)")
 
+
+def add_safety(ap, fk_salt):
     ap2 = ap.add_argument_group('safety options')
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --no-dot-mv --no-dot-ren --unpost=0 --no-del --no-mv --hardlink --vague-403 --ban-404=50,60,1440 -nih")
@@ -775,11 +789,15 @@ def run_argparse(
     ap2.add_argument("--aclose", metavar="MIN", type=int, default=10, help="if a client maxes out the server connection limit, downgrade it from connection:keep-alive to connection:close for MIN minutes (and also kill its active connections) -- disable with 0")
     ap2.add_argument("--loris", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for B minutes; disable with [\033[32m0\033[0m]")
 
+
+def add_shutdown(ap):
     ap2 = ap.add_argument_group('shutdown options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
     ap2.add_argument("--ign-ebind-all", action="store_true", help="continue running even if it's impossible to receive connections at all")
     ap2.add_argument("--exit", metavar="WHEN", type=u, default="", help="shutdown after WHEN has finished; for example [\033[32midx\033[0m] will do volume indexing + metadata analysis")
 
+
+def add_logging(ap):
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")
     ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
@@ -789,11 +807,15 @@ def run_argparse(
     ap2.add_argument("--ihead", metavar="HEADER", type=u, action='append', help="dump incoming header")
     ap2.add_argument("--lf-url", metavar="RE", type=u, default=r"^/\.cpr/|\?th=[wj]$|/\.(_|ql_|DS_Store$|localized$)", help="dont log URLs matching")
 
+
+def add_admin(ap):
     ap2 = ap.add_argument_group('admin panel options')
     ap2.add_argument("--no-reload", action="store_true", help="disable ?reload=cfg (reload users/volumes/volflags from config file)")
     ap2.add_argument("--no-rescan", action="store_true", help="disable ?scan (volume reindexing)")
     ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks)")
 
+
+def add_thumbnail(ap):
     ap2 = ap.add_argument_group('thumbnail options')
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails (volflag=dthumb)")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails (volflag=dvthumb)")
@@ -820,10 +842,14 @@ def run_argparse(
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="av1,asf,avi,flv,m4v,mkv,mjpeg,mjpg,mpg,mpeg,mpg2,mpeg2,h264,avc,mts,h265,hevc,mov,3gp,mp4,ts,mpegts,nut,ogv,ogm,rm,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,m4a,ogg,opus,flac,alac,mp3,mp2,ac3,dts,wma,ra,wav,aif,aiff,au,alaw,ulaw,mulaw,amr,gsm,ape,tak,tta,wv,mpc", help="audio formats to decode using ffmpeg")
 
+
+def add_transcoding(ap):
     ap2 = ap.add_argument_group('transcoding options')
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
     ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after SEC seconds")
 
+
+def add_db_general(ap, hcores):
     ap2 = ap.add_argument_group('general db options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplocation")
     ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets -e2d")
@@ -847,6 +873,8 @@ def run_argparse(
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=45, help="search deadline -- terminate searches running for more than SEC seconds")
     ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results to allow clients to fetch; 125 results will be shown initially")
 
+
+def add_db_metadata(ap):
     ap2 = ap.add_argument_group('metadata db options')
     ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing; makes it possible to search for artist/title/codec/resolution/...")
     ap2.add_argument("-e2ts", action="store_true", help="scan existing files on startup; sets -e2t")
@@ -864,6 +892,8 @@ def run_argparse(
         default=".vq,.aq,vc,ac,fmt,res,.fps")
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag M using program BIN to parse the file")
 
+
+def add_ui(ap, retry):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
@@ -877,6 +907,8 @@ def run_argparse(
     ap2.add_argument("--txt-max", metavar="KiB", type=int, default=64, help="max size of embedded textfiles on ?doc= (anything bigger will be lazy-loaded by JS)")
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty", help="title / service-name to show in html documents")
 
+
+def add_debug(ap):
     ap2 = ap.add_argument_group('debug options')
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile; instead using a traditional file read loop")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir; instead using listdir + stat on each file")
@@ -889,9 +921,56 @@ def run_argparse(
     ap2.add_argument("--bak-flips", action="store_true", help="[up2k] if a client uploads a bitflipped/corrupted chunk, store a copy according to --bf-nc and --bf-dir")
     ap2.add_argument("--bf-nc", metavar="NUM", type=int, default=200, help="bak-flips: stop if there's more than NUM files at --kf-dir already; default: 6.3 GiB max (200*32M)")
     ap2.add_argument("--bf-dir", metavar="PATH", type=u, default="bf", help="bak-flips: store corrupted chunks at PATH; default: folder named 'bf' wherever copyparty was started")
-    # fmt: on
+
+
+# fmt: on
+
+
+def run_argparse(
+    argv: list[str], formatter: Any, retry: bool, nc: int
+) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(
+        formatter_class=formatter,
+        prog="copyparty",
+        description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
+    )
+
+    try:
+        fk_salt = unicode(os.path.getmtime(os.path.join(E.cfg, "cert.pem")))
+    except:
+        fk_salt = "hunter2"
+
+    hcores = min(CORES, 4)  # optimal on py3.11 @ r5-4500U
+
+    tty = os.environ.get("TERM", "").lower() == "linux"
+
+    srvname = get_srvname()
+
+    add_general(ap, nc, srvname)
+    add_network(ap)
+    add_tls(ap)
+    add_qr(ap, tty)
+    add_zeroconf(ap)
+    add_zc_mdns(ap)
+    add_zc_ssdp(ap)
+    add_upload(ap)
+    add_db_general(ap, hcores)
+    add_db_metadata(ap)
+    add_thumbnail(ap)
+    add_transcoding(ap)
+    add_ftp(ap)
+    add_webdav(ap)
+    add_smb(ap)
+    add_safety(ap, fk_salt)
+    add_optouts(ap)
+    add_shutdown(ap)
+    add_ui(ap, retry)
+    add_admin(ap)
+    add_logging(ap)
+    add_debug(ap)
 
     ap2 = ap.add_argument_group("help sections")
+    sects = get_sects()
     for k, h, _ in sects:
         ap2.add_argument("--help-" + k, action="store_true", help=h)
 
