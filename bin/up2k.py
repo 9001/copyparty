@@ -377,11 +377,12 @@ def walkdirs(err, tops):
     for top in tops:
         if top[-1:] == sep:
             stop = top.rstrip(sep)
+            yield stop, b"", os.stat(stop)
         else:
-            stop = os.path.dirname(top)
+            stop, dn = os.path.split(top)
+            yield stop, dn, os.stat(stop)
 
         if os.path.isdir(top):
-            yield stop, b"", os.stat(stop)
             for ap, inf in walkdir(err, top, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
