@@ -1,4 +1,72 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-1203-2048  `v1.5.1`  babel
+
+named after [that other thing](https://en.wikipedia.org/wiki/Tower_of_Babel), not [the song](https://soundcloud.com/kanaze/babel-dimension-0-remix)
+* read-only demo server at https://a.ocv.me/pub/demo/
+
+## new features
+* new protocols!
+  * native IPv6 support, no longer requiring a reverse-proxy for that
+  * [webdav server](https://github.com/9001/copyparty#webdav-server) -- read/write-access to copyparty straight from windows explorer, macos finder, kde/gnome
+  * [smb/cifs server](https://github.com/9001/copyparty#smb-server) -- extremely buggy and unsafe, for when there is no other choice
+  * [zeroconf](https://github.com/9001/copyparty#zeroconf) -- copyparty announces itself on the LAN, showing up in various file managers
+    * [mdns](https://github.com/9001/copyparty#mdns) -- macos/kde/gnome + makes copyparty available at http://hostname.local/
+    * [ssdp](https://github.com/9001/copyparty#ssdp) -- windows
+  * commands to mount copyparty as a local disk are in the web-UI at control-panel --> `connect`
+* detect buggy / malicious clients spamming the server with idle connections
+  * first tries to be nice with `Connection: close` (enough to fix windows-webdav)
+  * eventually bans the IP for `--loris` minutes (default: 1 hour)
+* new arg `--xlink` for cross-volume detection of duplicate files on upload
+* new arg `--no-snap` to disable upload tracking on restart
+  * will not create `.hist` folders unless required for thumbnails or markdown backups
+* [config includes](https://github.com/9001/copyparty/blob/hovudstraum/docs/example2.conf) -- split your config across multiple config files
+* ux improvements
+  * hotkey `?` shows a summary of all the hotkeys
+  * hotkey `Y` to download selected files
+  * position indicator when hovering over the audio scrubber
+  * textlabel on the volume slider
+  * placeholder values in textboxes
+  * options to hide scrollbars, compact media player, follow playing song
+  * phone-specific
+    * buttons for prev/next folder
+    * much better ui for hiding folder columns
+
+## bugfixes
+* now possible to upload files larger than 697 GiB
+  * technically a [breaking change](https://github.com/9001/copyparty#breaking-changes) if you wrote your own up2k client
+    * please let me know if you did because that's awesome
+* several macos issues due to hardcoded syscall numbers
+* sfx: fix python 3.12 support (forbids nullbytes in source code)
+* use ctypes to discover network config -- fixes grapheneos, non-english windows
+* detect firefox showing stale markdown documents in the editor
+* detect+ban password bruteforcing on ftp too
+* http 206 failing on empty files
+* incorrect header timestamps on non-english locales
+* remind ftp clients that you cannot cd into an image file -- fixes kde dolphin
+* ux fixes
+  * uploader survives running into inaccessible folders
+  * middleclick documents in the textviewer sidebar to open in a new tab
+  * playing really long audio files (1 week or more) would spinlock the browser
+
+## other changes
+* autodetect max number of clients based on OS limits
+  * `-nc` is probably no longer necessary when running behind a reverse-proxy
+* allow/try playing mkv files in chrome
+* markdown documents returned as plaintext unless `?v`
+* only compress `-lo` logfiles if filename ends with `.xz`
+* changed sfx compression from bz2 to gz
+  * startup is slightly faster
+  * better compatibility with embedded linux
+* copyparty64.exe -- 64bit edition for [running inside WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png)
+  * which was an actual feature request, believe it or not!
+* more attempts at avoiding the [firefox fd leak](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500)
+  * if you are uploading many small files and the browser keeps crashing, use chrome instead
+    * or the commandline client, which is now available for download straight from copyparty
+      * control-panel --> `connect` --> `up2k.py`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-1013-1937  `v1.4.6`  wav2opus
 
 * read-only demo server at https://a.ocv.me/pub/demo/
