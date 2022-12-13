@@ -2784,6 +2784,7 @@ function up2k_init(subtle) {
 
         ebi('nagtest').onclick = function () {
             start_actx();
+            uc.nagtxt = ':^)';
             setTimeout(donut.enstrobe, 200);
         };
     }
