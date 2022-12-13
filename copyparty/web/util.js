@@ -195,8 +195,12 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
         var lsk = Object.keys(ls);
         lsk.sort();
         html.push('<p class="b">');
-        for (var a = 0; a < lsk.length; a++)
+        for (var a = 0; a < lsk.length; a++) {
+            if (ls[lsk[a]].length > 9000)
+                continue;
+
             html.push(' <b>' + esc(lsk[a]) + '</b> <code>' + esc(ls[lsk[a]]) + '</code> ');
+        }
         html.push('</p>');
     }
     catch (e) { }
