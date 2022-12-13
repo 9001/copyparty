@@ -260,6 +260,8 @@ var Ls = {
 		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
 		"fbd_all": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_all">show all</a></div>',
 
+		"f_dls": 'the file links in the current folder have\nbeen changed into download links',
+
 		"ft_paste": "paste {0} items$NHotkey: ctrl-V",
 		"fr_eperm": 'cannot rename:\nyou do not have “move” permission in this folder',
 		"fd_eperm": 'cannot delete:\nyou do not have “delete” permission in this folder',
@@ -702,6 +704,8 @@ var Ls = {
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
 		"fbd_more": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
 		"fbd_all": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
+
+		"f_dls": 'linkene i denne mappen er nå\nomgjort til nedlastningsknapper',
 
 		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
 		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
@@ -2084,8 +2088,13 @@ function prev_song(e) {
 	return song_skip(-1);
 }
 function dl_song() {
-	if (!mp || !mp.au)
-		return;
+	if (!mp || !mp.au) {
+		var o = QSA('#files a[id]');
+		for (var a = 0; a < o.length; a++)
+			o[a].setAttribute('download', '');
+
+		return toast.inf(10, L.f_dls);
+	}
 
 	var url = mp.tracks[mp.au.tid];
 	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
