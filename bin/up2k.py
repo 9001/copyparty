@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-12-12, v1.0, ed <irc.rizon.net>, MIT-Licensed
+2022-12-13, v1.1, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -575,9 +575,9 @@ class Ctl(object):
     (hashing, handshakes, uploads)
     """
 
-    def __init__(self, ar):
+    def _scan(self):
+        ar = self.ar
         eprint("\nscanning {0} locations\n".format(len(ar.files)))
-        self.ar = ar
         nfiles = 0
         nbytes = 0
         err = []
@@ -606,8 +606,15 @@ class Ctl(object):
                 return
 
         eprint("found {0} files, {1}\n\n".format(nfiles, humansize(nbytes)))
-        self.nfiles = nfiles
-        self.nbytes = nbytes
+        return nfiles, nbytes
+
+    def __init__(self, ar, stats=None):
+        self.ar = ar
+        self.stats = stats or self._scan()
+        if not self.stats:
+            return
+
+        self.nfiles, self.nbytes = self.stats
 
         if ar.td:
             requests.packages.urllib3.disable_warnings()
@@ -797,6 +804,9 @@ class Ctl(object):
                         zb = self.ar.url.encode("utf-8")
                         zb += quotep(rd.replace(b"\\", b"/"))
                         r = req_ses.get(zb + b"?ls&dots", headers=headers)
+                        if not r:
+                            raise Exception("HTTP {}".format(r.status_code))
+
                         j = r.json()
                         for f in j["dirs"] + j["files"]:
                             rfn = f["href"].split("?")[0].rstrip("/")
@@ -1037,14 +1047,14 @@ source file/folder selection uses rsync syntax, meaning that:
     ctl = Ctl(ar)
 
     if ar.dr and not ar.drd:
-        # run another pass for the deletes
+        print("\npass 2/2: delete")
         if getattr(ctl, "up_br") and ar.ws:
             # wait for up2k to mtime if there was uploads
             time.sleep(4)
 
         ar.drd = True
         ar.z = True
-        Ctl(ar)
+        Ctl(ar, ctl.stats)
 
 
 if __name__ == "__main__":
