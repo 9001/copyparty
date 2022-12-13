@@ -672,7 +672,7 @@ function Donut(uc, st) {
             favico.upd();
             wintitle();
             if (document.visibilityState == 'hidden')
-                tenstrobe = setTimeout(enstrobe, 500); //debounce
+                tenstrobe = setTimeout(r.enstrobe, 500); //debounce
         }
     };
 
@@ -709,7 +709,7 @@ function Donut(uc, st) {
         }
     };
 
-    function enstrobe() {
+    r.enstrobe = function () {
         strobes = ['████████████████', '________________', '████████████████'];
         tstrober = setInterval(strobe, 300);
 
@@ -867,7 +867,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort);
     bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE || VCHROME >= 107), set_hashw);
     bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
-    bcfg_bind(uc, 'upsfx', 'upsfx', false);
+    bcfg_bind(uc, 'upsfx', 'upsfx', false, set_upsfx);
 
     var st = {
         "files": [],
@@ -2772,6 +2772,20 @@ function up2k_init(subtle) {
 
         if (en && Notification.permission == 'default')
             Notification.requestPermission().then(chknag, chknag);
+
+        set_upsfx(en);
+    }
+
+    function set_upsfx(en) {
+        if (!en)
+            return;
+
+        toast.inf(10, 'OK -- <a href="#" id="nagtest">test it!</a>')
+
+        ebi('nagtest').onclick = function () {
+            start_actx();
+            setTimeout(donut.enstrobe, 200);
+        };
     }
 
     if (uc.upnag && (!window.Notification || Notification.permission != 'granted'))
