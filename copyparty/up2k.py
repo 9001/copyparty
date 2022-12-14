@@ -642,9 +642,15 @@ class Up2k(object):
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
         fx = set(("html_head",))
+        fd = {"dbd": "dbd"}
+        fl = {
+            k: v
+            for k, v in flags.items()
+            if k not in fd or v != getattr(self.args, fd[k])
+        }
         a = [
             (ft if v is True else ff if v is False else fv).format(k, str(v))
-            for k, v in flags.items()
+            for k, v in fl.items()
             if k not in fx
         ]
         if a:

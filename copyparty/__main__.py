@@ -253,7 +253,7 @@ def ensure_locale() -> None:
         except:
             continue
 
-    t = "setlocale {} failed,\n  sorting and dates will be funky"
+    t = "setlocale {} failed,\n  sorting and dates might get funky\n"
     warn(t.format(safe))
 
 

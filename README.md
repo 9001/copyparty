@@ -230,7 +230,7 @@ browser-specific:
 * Android-Chrome: increase "parallel uploads" for higher speed (android bug)
 * Android-Firefox: takes a while to select files (their fix for ☝️)
 * Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
-* Desktop-Firefox: may stop you from deleting files you've uploaded until you visit `about:memory` and click `Minimize memory usage`
+* Desktop-Firefox: [may stop you from unplugging USB flashdrives](https://bugzilla.mozilla.org/show_bug.cgi?id=1792598) until you visit `about:memory` and click `Minimize memory usage`
 
 server-os-specific:
 * RHEL8 / Rocky8: you can run copyparty using `/usr/libexec/platform-python`
@@ -248,23 +248,15 @@ server-os-specific:
 * Windows: if the `up2k.db` (filesystem index) is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
   * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
 * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
-* [the database can get stuck](https://github.com/9001/copyparty/issues/10)
-  * has only happened once but that is once too many
-  * luckily not dangerous for file integrity and doesn't really stop uploads or anything like that
-  * but would really appreciate some logs if anyone ever runs into it again
 * probably more, pls let me know
 
 ## not my bugs
 
 * [Chrome issue 1317069](https://bugs.chromium.org/p/chromium/issues/detail?id=1317069) -- if you try to upload a folder which contains symlinks by dragging it into the browser, the symlinked files will not get uploaded
 
-* [Chrome issue 1354816](https://bugs.chromium.org/p/chromium/issues/detail?id=1354816) -- chrome may eat all RAM uploading over plaintext http with `mt` enabled
+* [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive)
 
-  * more amusingly, [Chrome issue 1354800](https://bugs.chromium.org/p/chromium/issues/detail?id=1354800) -- chrome may eat all RAM uploading in general (altho you probably won't run into this one)
-
-* [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive and likely to run into the above gc bugs)
-
-* [Firefox issue 1790500](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500) -- sometimes forgets to close filedescriptors during upload so the browser can crash after ~4000 files
+* [Firefox issue 1790500](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500) -- entire browser can crash after uploading ~4000 small files
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
