@@ -247,40 +247,40 @@ class ThumbSrv(object):
             abspath, tpath = task
             ext = abspath.split(".")[-1].lower()
             png_ok = False
-            fun = None
+            funs = []
             if not bos.path.exists(tpath):
                 for lib in self.args.th_dec:
-                    if fun:
-                        break
-                    elif lib == "pil" and ext in self.fmt_pil:
-                        fun = self.conv_pil
+                    if lib == "pil" and ext in self.fmt_pil:
+                        funs.append(self.conv_pil)
                     elif lib == "vips" and ext in self.fmt_vips:
-                        fun = self.conv_vips
+                        funs.append(self.conv_vips)
                     elif lib == "ff" and ext in self.fmt_ffi or ext in self.fmt_ffv:
-                        fun = self.conv_ffmpeg
+                        funs.append(self.conv_ffmpeg)
                     elif lib == "ff" and ext in self.fmt_ffa:
                         if tpath.endswith(".opus") or tpath.endswith(".caf"):
-                            fun = self.conv_opus
+                            funs.append(self.conv_opus)
                         elif tpath.endswith(".png"):
-                            fun = self.conv_waves
+                            funs.append(self.conv_waves)
                             png_ok = True
                         else:
-                            fun = self.conv_spec
+                            funs.append(self.conv_spec)
 
             if not png_ok and tpath.endswith(".png"):
                 raise Pebkac(400, "png only allowed for waveforms")
 
-            if fun:
+            for fun in funs:
                 try:
                     fun(abspath, tpath)
+                    break
                 except Exception as ex:
                     msg = "{} could not create thumbnail of {}\n{}"
                     msg = msg.format(fun.__name__, abspath, min_ex())
                     c: Union[str, int] = 1 if "<Signals.SIG" in msg else "90"
                     self.log(msg, c)
                     if getattr(ex, "returncode", 0) != 321:
-                        with open(tpath, "wb") as _:
-                            pass
+                        if fun == funs[-1]:
+                            with open(tpath, "wb") as _:
+                                pass
                     else:
                         # ffmpeg may spawn empty files on windows
                         try:
