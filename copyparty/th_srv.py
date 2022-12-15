@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import base64
 import hashlib
+import logging
 import os
 import shutil
 import subprocess as sp
@@ -61,12 +62,16 @@ try:
         HAVE_AVIF = True
     except:
         pass
+
+    logging.getLogger("PIL").setLevel(logging.WARNING)
 except:
     pass
 
 try:
     HAVE_VIPS = True
     import pyvips
+
+    logging.getLogger("pyvips").setLevel(logging.WARNING)
 except:
     HAVE_VIPS = False
 
@@ -363,7 +368,8 @@ class ThumbSrv(object):
                 img = pyvips.Image.thumbnail(abspath, w, **kw)
                 break
             except:
-                pass
+                if c == crops[-1]:
+                    raise
 
         img.write_to_file(tpath, Q=40)
 
