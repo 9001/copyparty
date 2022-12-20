@@ -848,6 +848,7 @@ class Up2k(object):
         seen = seen + [rcdir]
         unreg: list[str] = []
         files: list[tuple[int, int, str]] = []
+        fat32 = True
 
         assert self.pp and self.mem_cur
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
@@ -872,6 +873,9 @@ class Up2k(object):
 
             lmod = int(inf.st_mtime)
             sz = inf.st_size
+            if fat32 and inf.st_mtime % 2:
+                fat32 = False
+
             if stat.S_ISDIR(inf.st_mode):
                 rap = absreal(abspath)
                 if dev and inf.st_dev != dev:
@@ -958,6 +962,9 @@ class Up2k(object):
                         rep_db = "\n".join([repr(x) for x in in_db])
                         self.log(t.format(top, rp, len(in_db), rep_db))
                         dts = -1
+
+                    if fat32 and abs(dts - lmod) == 1:
+                        dts = lmod
 
                     if dts == lmod and dsz == sz and (nohash or dw[0] != "#" or not sz):
                         continue
