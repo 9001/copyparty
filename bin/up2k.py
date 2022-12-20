@@ -994,7 +994,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
     ap.add_argument("-v", action="store_true", help="verbose")
-    ap.add_argument("-a", metavar="PASSWORD", help="password")
+    ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     
@@ -1040,6 +1040,12 @@ source file/folder selection uses rsync syntax, meaning that:
     ar.url = ar.url.rstrip("/") + "/"
     if "://" not in ar.url:
         ar.url = "http://" + ar.url
+
+    if ar.a and ar.a.startswith("$"):
+        fn = ar.a[1:]
+        print("reading password from file [{}]".format(fn))
+        with open(fn, "rb") as f:
+            ar.a = f.read().decode("utf-8").strip()
 
     if ar.cls:
         print("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")

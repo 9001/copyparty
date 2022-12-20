@@ -997,7 +997,7 @@ def main():
     ap.add_argument(
         "-cf", metavar="NUM_BLOCKS", type=int, default=nf, help="file cache"
     )
-    ap.add_argument("-a", metavar="PASSWORD", help="password")
+    ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
     ap.add_argument("-d", action="store_true", help="enable debug")
     ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
     ap.add_argument("-td", action="store_true", help="disable certificate check")
