@@ -75,6 +75,7 @@ class SSDPr(object):
 
         c = html_escape
         sip, sport = hc.s.getsockname()[:2]
+        sip = sip.replace("::ffff:", "")
         proto = "https" if self.args.https_only else "http"
         ubase = "{}://{}:{}".format(proto, sip, sport)
         zsl = self.args.zsl
@@ -160,7 +161,7 @@ class SSDPd(MCast):
 
         self.rxc.add(buf)
         if not buf.startswith(b"M-SEARCH * HTTP/1."):
-            raise Exception("not an ssdp message")
+            return
 
         if not self.ptn_st.search(buf):
             return
@@ -184,7 +185,8 @@ BOOTID.UPNP.ORG: 0
 CONFIGID.UPNP.ORG: 1
 
 """
-        zs = zs.format(formatdate(usegmt=True), srv.ip, srv.hport, self.args.zsid)
+        v4 = srv.ip.replace("::ffff:", "")
+        zs = zs.format(formatdate(usegmt=True), v4, srv.hport, self.args.zsid)
         zb = zs[1:].replace("\n", "\r\n").encode("utf-8", "replace")
         srv.sck.sendto(zb, addr[:2])
 
