@@ -14,5 +14,5 @@ name="$SVCNAME"
 command_background=true
 pidfile="/var/run/$SVCNAME.pid"
 
-command="/usr/bin/python /usr/local/bin/copyparty-sfx.py"
+command="/usr/bin/python3 /usr/local/bin/copyparty-sfx.py"
 command_args="-q -v /mnt::rw"

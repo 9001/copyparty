@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 5, 3)
+VERSION = (1, 5, 4)
 CODENAME = "babel"
-BUILD_DT = (2022, 12, 13)
+BUILD_DT = (2022, 12, 29)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

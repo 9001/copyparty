@@ -52,9 +52,11 @@
         "--disable=missing-module-docstring",
         "--disable=missing-class-docstring",
         "--disable=missing-function-docstring",
+        "--disable=import-outside-toplevel",
         "--disable=wrong-import-position",
         "--disable=raise-missing-from",
         "--disable=bare-except",
+        "--disable=broad-except",
         "--disable=invalid-name",
         "--disable=line-too-long",
         "--disable=consider-using-f-string"
@@ -64,6 +66,7 @@
     "editor.formatOnSave": true,
     "[html]": {
         "editor.formatOnSave": false,
+        "editor.autoIndent": "keep",
     },
     "[css]": {
         "editor.formatOnSave": false,

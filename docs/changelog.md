@@ -1,4 +1,35 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-1213-1956  `v1.5.3`  folder-sync + turbo-rust
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+
+## new features
+* one-way folder sync (client to server) using [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/README.md#up2kpy) `-z --dr`
+  * great rsync alternative when combined with `-e2ds --hardlink` deduplication on the server
+* **50x faster** when uploading small files to HDD, especially SMR
+  * by switching sqlite to WAL which carries a small chance of temporarily forgetting the ~200 most recent uploads if you have a power outage or your OS crashes; see `--help-dbd` if you have `-mtp` plugins which produces metadata you can't afford to lose
+* location-based [reverse-proxying](https://github.com/9001/copyparty/#reverse-proxy) (but it's still recommended to use a dedicated domain/subdomain instead)
+* IPv6 link-local automatically enabled for TCP and zeroconf on NICs without a routable IPv6
+* zeroconf network filters now accept subnets too, for example `--z-on 192.168.0.0/16`
+* `.hist` folders are hidden on windows
+* ux:
+  * more accurate total ETA on upload
+  * sorting of batch-unpost links was unintuitive / dangerous
+  * hotkey `Y` turns files into download links if nothing's selected
+  * option to replace or disable the mediaplayer-toggle mouse cursor with `--mpmc`
+
+## bugfixes
+* WAL probably/hopefully fixes #10 (we'll know in 6 months roughly)
+* repair db inconsistencies (which can happen if terminated during startup)
+* [davfs2](https://wiki.archlinux.org/title/Davfs2) did not approve of the authentication prompt
+* the `connect` button on the control-panel didn't work on phones
+* couldn't specify windows NICs in arguments `--z-on` / `--z-off` and friends
+* ssdp xml escaping for `--zsl` URL
+* no longer possible to accidentally launch multiple copyparty instances on the same port on windows
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-1203-2048  `v1.5.1`  babel
 
 named after [that other thing](https://en.wikipedia.org/wiki/Tower_of_Babel), not [the song](https://soundcloud.com/kanaze/babel-dimension-0-remix)
