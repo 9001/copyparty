@@ -2006,6 +2006,20 @@ def read_socket_chunked(
             raise Pebkac(400, t.format(x))
 
 
+def list_ips() -> list[str]:
+    from .stolen.ifaddr import get_adapters
+
+    ret: set[str] = set()
+    for nic in get_adapters():
+        for ipo in nic.ips:
+            if len(ipo.ip) < 7:
+                ret.add(ipo.ip[0])  # ipv6 is (ip,0,0)
+            else:
+                ret.add(ipo.ip)
+
+    return list(ret)
+
+
 def yieldfile(fn: str) -> Generator[bytes, None, None]:
     with open(fsenc(fn), "rb", 512 * 1024) as f:
         while True:

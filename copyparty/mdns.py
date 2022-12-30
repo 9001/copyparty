@@ -25,7 +25,7 @@ from .stolen.dnslib import (
     DNSQuestion,
     DNSRecord,
 )
-from .util import CachedSet, Daemon, Netdev, min_ex
+from .util import CachedSet, Daemon, Netdev, list_ips, min_ex
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -55,6 +55,7 @@ class MDNS_Sck(MC_Sck):
         self.bp_bye = b""
 
         self.last_tx = 0.0
+        self.tx_ex = False
 
 
 class MDNS(MCast):
@@ -374,6 +375,14 @@ class MDNS(MCast):
                 # avahi broadcasting 127.0.0.1-only packets
                 return
 
+            # check if we've been given additional IPs
+            for ip in list_ips():
+                if ip in cips:
+                    self.sips.add(ip)
+
+            if not self.sips.isdisjoint(cips):
+                return
+
             t = "mdns zeroconf: "
             if self.probing:
                 t += "Cannot start; hostname '{}' is occupied"
@@ -507,6 +516,15 @@ class MDNS(MCast):
         if now < srv.last_tx + cooldown:
             return False
 
-        srv.sck.sendto(msg, (srv.grp, 5353))
-        srv.last_tx = now
+        try:
+            srv.sck.sendto(msg, (srv.grp, 5353))
+            srv.last_tx = now
+        except Exception as ex:
+            if srv.tx_ex:
+                return True
+
+            srv.tx_ex = True
+            t = "tx({},|{}|,{}): {}"
+            self.log(t.format(srv.ip, len(msg), cooldown, ex), 3)
+
         return True
