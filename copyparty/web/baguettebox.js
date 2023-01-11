@@ -277,8 +277,8 @@ window.baguetteBox = (function () {
             playpause();
         else if (k == "KeyU" || k == "KeyO")
             relseek(k == "KeyU" ? -10 : 10);
-        else if (k.indexOf('Digit') === 0)
-            vid().currentTime = vid().duration * parseInt(k.slice(-1)) * 0.1;
+        else if (k.indexOf('Digit') === 0 && v)
+            v.currentTime = v.duration * parseInt(k.slice(-1)) * 0.1;
         else if (k == "KeyM" && v) {
             v.muted = vmute = !vmute;
             mp_ctl();
