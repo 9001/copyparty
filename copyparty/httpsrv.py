@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import base64
+import errno
 import math
 import os
 import socket
@@ -81,8 +82,7 @@ class HttpSrv(object):
         self.bans: dict[str, int] = {}
         self.aclose: dict[str, int] = {}
 
-        self.ip = ""
-        self.port = 0
+        self.bound: set[tuple[str, int]] = set()
         self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()
         self.stopping = False
@@ -142,7 +142,11 @@ class HttpSrv(object):
             pass
 
     def set_netdevs(self, netdevs: dict[str, Netdev]) -> None:
-        self.nm = NetMap([self.ip], netdevs)
+        ips = set()
+        for ip, _ in self.bound:
+            ips.add(ip)
+
+        self.nm = NetMap(list(ips), netdevs)
 
     def start_threads(self, n: int) -> None:
         self.tp_nthr += n
@@ -184,12 +188,13 @@ class HttpSrv(object):
             sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             sck.settimeout(None)  # < does not inherit, ^ opts above do
 
-        self.ip, self.port = sck.getsockname()[:2]
+        ip, port = sck.getsockname()[:2]
         self.srvs.append(sck)
+        self.bound.add((ip, port))
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
         Daemon(
             self.thr_listen,
-            "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", self.ip, self.port),
+            "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),
             (sck,),
         )
 
@@ -281,6 +286,16 @@ class HttpSrv(object):
             except (OSError, socket.error) as ex:
                 if self.stopping:
                     break
+
+                if (
+                    ex.errno == errno.EINVAL
+                    and ip == "0.0.0.0"
+                    and ("::", port) in self.bound
+                ):
+                    t = "accept({}): {} -- probably due to dualstack; terminating ({}, {})"
+                    self.log(self.name, t.format(fno, ex, ip, port), c=6)
+                    srv_sck.close()
+                    return
 
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 time.sleep(0.02)
