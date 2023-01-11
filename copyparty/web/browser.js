@@ -953,7 +953,7 @@ ebi('op_up2k').innerHTML = (
 
 	'<table id="u2conf">\n' +
 	'	<tr>\n' +
-	'		<td class="c"><br />' + L.ul_par + '</td>\n' +
+	'		<td class="c" data-perm="read"><br />' + L.ul_par + '</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="multitask" />\n' +
 	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
@@ -974,7 +974,7 @@ ebi('op_up2k').innerHTML = (
 	'		<td data-perm="read" rowspan="2" id="u2c3w"></td>\n' +
 	'	</tr>\n' +
 	'	<tr>\n' +
-	'		<td class="c">\n' +
+	'		<td class="c" data-perm="read">\n' +
 	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
 	'				class="txtbox" id="nthread" value="2" tt="' + L.ut_par + '"/><a\n' +
 	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +

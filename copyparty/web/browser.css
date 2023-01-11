@@ -2557,7 +2557,6 @@ html.b #u2conf a.b:hover {
 #u2conf input[type="checkbox"]:checked+label:hover {
 	background: var(--u2-o-1h-bg);
 }
-#op_up2k.srch #u2conf td:nth-child(1)>*,
 #op_up2k.srch #u2conf td:nth-child(2)>*,
 #op_up2k.srch #u2conf td:nth-child(3)>* {
 	background: #777;
