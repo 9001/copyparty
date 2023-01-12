@@ -1,4 +1,23 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2022-1230-0754  `v1.5.5`  made in japan
+
+hello from tokyo
+* read-only demo server at https://a.ocv.me/pub/demo/
+
+## new features
+* image viewer now supports heif, avif, apng, svg
+* [partyfuse and up2k.py](https://github.com/9001/copyparty/tree/hovudstraum/bin): option to read password from textfile
+
+## bugfixes
+* thumbnailing could fail if a primitive build of libvips is installed
+* ssdp was wonky on dualstack ipv6
+* mdns could crash on networks with invalid routes
+* support fat32 timestamp precisions
+  * fixes spurious file reindexing in volumes located on SD cards on android tablets which lie about timestamps until the next device reboot or filesystem remount
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-1213-1956  `v1.5.3`  folder-sync + turbo-rust
 
 * read-only demo server at https://a.ocv.me/pub/demo/

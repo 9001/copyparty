@@ -2381,7 +2381,16 @@ function up2k_init(subtle) {
     function can_upload_next() {
         var upt = st.todo.upload[0],
             upf = st.files[upt.nfile],
+            nhs = st.busy.handshake.length,
+            hs = nhs && st.busy.handshake[0],
             now = Date.now();
+
+        if (nhs >= 16)
+            return false;
+
+        if (hs && hs.t_uploaded && Date.now() - hs.t_busied > 10000)
+            // verification HS possibly held back by uploads
+            return false;
 
         for (var a = 0, aa = st.busy.handshake.length; a < aa; a++) {
             var hs = st.busy.handshake[a];
