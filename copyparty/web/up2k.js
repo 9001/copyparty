@@ -1555,11 +1555,11 @@ function up2k_init(subtle) {
             st.busy.handshake.length)
             return false;
 
-        if (t.n - st.car > 8)
+        if (t.n - st.car > Math.max(8, parallel_uploads))
             // prevent runahead from a stuck upload (slow server hdd)
             return false;
 
-        if ((uc.multitask ? 1 : 0) <
+        if ((uc.multitask ? parallel_uploads : 0) <
             st.todo.upload.length +
             st.busy.upload.length)
             return false;
@@ -1571,21 +1571,22 @@ function up2k_init(subtle) {
         if (!parallel_uploads)
             return false;
 
+        var nhs = st.todo.handshake.length + st.busy.handshake.length,
+            nup = st.todo.upload.length + st.busy.upload.length;
+
         if (uc.multitask) {
+            if (nhs + nup < parallel_uploads)
+                return true;
+
             if (!uc.az)
-                return st.todo.handshake.length + st.busy.handshake.length < 2;
+                return nhs < 2;
 
             var ahead = st.bytes.hashed - st.bytes.finished,
                 nmax = ahead < biggest_file / 8 ? 32 : 16;
 
-            return ahead < biggest_file &&
-                st.todo.handshake.length + st.busy.handshake.length < nmax;
+            return ahead < biggest_file && nhs < nmax;
         }
-        return handshakes_permitted() && 0 ==
-            st.todo.handshake.length +
-            st.busy.handshake.length +
-            st.todo.upload.length +
-            st.busy.upload.length;
+        return handshakes_permitted() && 0 == nhs + nup;
     }
 
     var tasker = (function () {
@@ -1750,20 +1751,22 @@ function up2k_init(subtle) {
         var sr = uc.fsearch,
             ok = pvis.ctr.ok,
             ng = pvis.ctr.ng,
+            spd = Math.floor(st.bytes.finished / st.time.busy),
+            suf = '\n\n{0} @ {1}/s'.format(shumantime(st.time.busy), humansize(spd)),
             t = uc.ask_up ? 0 : 10;
 
         console.log('toast', ok, ng);
 
         if (ok && ng)
-            toast.warn(t, uc.nagtxt = (sr ? L.ur_sm : L.ur_um).format(ok, ng));
+            toast.warn(t, uc.nagtxt = (sr ? L.ur_sm : L.ur_um).format(ok, ng) + suf);
         else if (ok > 1)
-            toast.ok(t, uc.nagtxt = (sr ? L.ur_aso : L.ur_auo).format(ok));
+            toast.ok(t, uc.nagtxt = (sr ? L.ur_aso : L.ur_auo).format(ok) + suf);
         else if (ok)
-            toast.ok(t, uc.nagtxt = sr ? L.ur_1so : L.ur_1uo);
+            toast.ok(t, uc.nagtxt = (sr ? L.ur_1so : L.ur_1uo) + suf);
         else if (ng > 1)
-            toast.err(t, uc.nagtxt = (sr ? L.ur_asn : L.ur_aun).format(ng));
+            toast.err(t, uc.nagtxt = (sr ? L.ur_asn : L.ur_aun).format(ng) + suf);
         else if (ng)
-            toast.err(t, uc.nagtxt = sr ? L.ur_1sn : L.ur_1un);
+            toast.err(t, uc.nagtxt = (sr ? L.ur_1sn : L.ur_1un) + suf);
 
         timer.rm(etafun);
         timer.rm(donut.do);
@@ -2553,8 +2556,14 @@ function up2k_init(subtle) {
         if (dir.target) {
             clmod(obj, 'err', 1);
             var v = Math.floor(parseInt(obj.value));
-            if (v < 0 || v > 64 || v !== v)
+            if (v < 0 || v !== v)
                 return;
+
+            if (v > 64) {
+                var p = obj.selectionStart;
+                v = obj.value = 64;
+                obj.selectionStart = obj.selectionEnd = p;
+            }
 
             parallel_uploads = v;
             swrite('nthread', v);
