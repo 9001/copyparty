@@ -2849,6 +2849,7 @@ class HttpCli(object):
             raise Pebkac(500, "sqlite3 is not available on the server; cannot unpost")
 
         filt = self.uparam.get("filter")
+        filt = unquotep(filt or "")
         lm = "ups [{}]".format(filt)
         self.log(lm)
 
