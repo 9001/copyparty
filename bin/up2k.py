@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2022-12-13, v1.1, ed <irc.rizon.net>, MIT-Licensed
+2023-01-13, v1.2, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -506,24 +506,30 @@ def handshake(ar, file, search):
         url += quotep(file.rel.rsplit(b"/", 1)[0]).decode("utf-8", "replace")
 
     while True:
+        sc = 600
+        txt = ""
         try:
             r = req_ses.post(url, headers=headers, json=req)
-            break
+            sc = r.status_code
+            txt = r.text
+            if sc < 400:
+                break
+
+            raise Exception("http {0}: {1}".format(sc, txt))
+
         except Exception as ex:
-            em = str(ex).split("SSLError(")[-1]
+            em = str(ex).split("SSLError(")[-1].split("\nURL: ")[0].strip()
+
+            if sc == 422 or "<pre>partial upload exists at a different" in txt:
+                file.recheck = True
+                return [], False
+            elif sc == 409 or "<pre>upload rejected, file already exists" in txt:
+                return [], False
+            elif "<pre>you don't have " in txt:
+                raise
+
             eprint("handshake failed, retrying: {0}\n  {1}\n\n".format(file.name, em))
             time.sleep(1)
-
-    sc = r.status_code
-    if sc >= 400:
-        txt = r.text
-        if sc == 422 or "<pre>partial upload exists at a different" in txt:
-            file.recheck = True
-            return [], False
-        elif sc == 409 or "<pre>upload rejected, file already exists" in txt:
-            return [], False
-
-        raise Exception("http {0}: {1}".format(sc, txt))
 
     try:
         r = r.json()
