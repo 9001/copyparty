@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import errno
 import os
 import re
 import socket
@@ -223,6 +224,11 @@ class TcpSrv(object):
 
         try:
             srv.bind((ip, port))
+            sport = srv.getsockname()[1]
+            if port != sport:
+                # linux 6.0.16 lets you bind a port which is in use
+                # except it just gives you a random port instead
+                raise OSError(errno.EADDRINUSE, "")
             self.srv.append(srv)
         except (OSError, socket.error) as ex:
             if ex.errno in E_ADDR_IN_USE:
