@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import argparse
 import base64
 import calendar
+import errno
 import gzip
 import logging
 import os
@@ -635,13 +636,20 @@ class SvcHub(object):
                     print(msg.encode("utf-8", "replace").decode(), end="")
                 except:
                     print(msg.encode("ascii", "replace").decode(), end="")
+            except OSError as ex:
+                if ex.errno != errno.EPIPE:
+                    raise
 
             if self.logf:
                 self.logf.write(msg)
 
     def pr(self, *a: Any, **ka: Any) -> None:
-        with self.log_mutex:
-            print(*a, **ka)
+        try:
+            with self.log_mutex:
+                print(*a, **ka)
+        except OSError as ex:
+            if ex.errno != errno.EPIPE:
+                raise
 
     def check_mp_support(self) -> str:
         if MACOS:
