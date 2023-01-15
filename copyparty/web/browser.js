@@ -5187,7 +5187,7 @@ var treectl = (function () {
 
 	function rendertree(res, ts, top0, dst, rst) {
 		var cur = ebi('treeul').getAttribute('ts');
-		if (cur && parseInt(cur) > ts) {
+		if (cur && parseInt(cur) > ts && QS('#treeul>li>a+a')) {
 			console.log("reject tree");
 			return;
 		}
@@ -5412,7 +5412,7 @@ var treectl = (function () {
 			for (var a = 0; a < res.dirs.length; a++)
 				dirs.push(res.dirs[a].href.split('/')[0].split('?')[0]);
 
-			rendertree({ "a": dirs }, Date.now(), ".", get_evpath());
+			rendertree({ "a": dirs }, this.ts, ".", get_evpath());
 		}
 
 		r.gentab(this.top, res);
