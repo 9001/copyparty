@@ -764,6 +764,7 @@ def add_optouts(ap):
     ap2.add_argument("--no-mv", action="store_true", help="disable move/rename operations")
     ap2.add_argument("-nih", action="store_true", help="no info hostname -- don't show in UI")
     ap2.add_argument("-nid", action="store_true", help="no info disk-usage -- don't show in UI")
+    ap2.add_argument("-nb", action="store_true", help="no powered-by-copyparty branding in UI")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (as specified by the 'lifetime' volflag)")
 
@@ -906,6 +907,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
     ap2.add_argument("--txt-max", metavar="KiB", type=int, default=64, help="max size of embedded textfiles on ?doc= (anything bigger will be lazy-loaded by JS)")
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty", help="title / service-name to show in html documents")
+    ap2.add_argument("--pb-url", metavar="URL", type=u, default="https://github.com/9001/copyparty", help="powered-by link; disable with -np")
 
 
 def add_debug(ap):
