@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import base64
-import errno
 import math
 import os
 import socket
@@ -286,16 +285,6 @@ class HttpSrv(object):
             except (OSError, socket.error) as ex:
                 if self.stopping:
                     break
-
-                if (
-                    ex.errno == errno.EINVAL
-                    and ip == "0.0.0.0"
-                    and ("::", port) in self.bound
-                ):
-                    t = "accept({}): {} -- probably due to dualstack; terminating ({}, {})"
-                    self.log(self.name, t.format(fno, ex, ip, port), c=6)
-                    srv_sck.close()
-                    return
 
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 time.sleep(0.02)
