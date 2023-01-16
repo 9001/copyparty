@@ -697,7 +697,7 @@ def add_zeroconf(ap):
 
 
 def add_zc_mdns(ap):
-    ap2 = ap.add_argument_group("Zeroconf-mDNS options:")
+    ap2 = ap.add_argument_group("Zeroconf-mDNS options")
     ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
     ap2.add_argument("--zm-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zm-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
@@ -716,7 +716,7 @@ def add_zc_mdns(ap):
 
 
 def add_zc_ssdp(ap):
-    ap2 = ap.add_argument_group("Zeroconf-SSDP options:")
+    ap2 = ap.add_argument_group("Zeroconf-SSDP options")
     ap2.add_argument("--zs", action="store_true", help="announce the enabled protocols over SSDP -- compatible with Windows")
     ap2.add_argument("--zs-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zs-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")

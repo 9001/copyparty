@@ -15,7 +15,7 @@
 <body>
 	<div id="wrap" class="w">
         <div class="cn">
-            <p class="btns"><a href="{{ r }}/{{ vp }}">browse files</a> // <a href="{{ r }}/?h">control panel</a></p>
+            <p class="btns"><a href="{{ rvp }}">browse files</a> // <a href="{{ r }}/?h">control panel</a></p>
             <p>or choose your OS for cooler alternatives:</p>
             <div class="ossel">
                 <a id="swin" href="#">Windows</a>
@@ -47,7 +47,7 @@
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
             <pre>
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=other{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
-                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ vp }} <b>W:</b>
+                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>W:</b>
             </pre>
             {% if s %}
             <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>--no-check-certificate</code> to the mount command</em><br />---</p>
@@ -55,19 +55,19 @@
             
             <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
-                net use <b>w:</b> http{{ s }}://{{ ep }}/{{ vp }}{% if accs %} k /user:<b>{{ pw }}</b>{% endif %}
+                net use <b>w:</b> http{{ s }}://{{ ep }}/{{ rvp }}{% if accs %} k /user:<b>{{ pw }}</b>{% endif %}
             </pre>
         </div>
 
         <div class="os lin">
             <pre>
                 yum install davfs2
-                {% if accs %}printf '%s\n' <b>{{ pw }}</b> k | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ vp }} <b>mp</b>
+                {% if accs %}printf '%s\n' <b>{{ pw }}</b> k | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b>
             </pre>
             <p>or you can use rclone instead, which is much slower but doesn't require root:</p>
             <pre>
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=other{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
-                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ vp }} <b>mp</b>
+                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>
             </pre>
             {% if s %}
             <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>--no-check-certificate</code> to the mount command</em><br />---</p>
@@ -77,20 +77,20 @@
             <!-- gnome-bug: ignores vp -->
             <pre>
                 {%- if accs %}
-                echo <b>{{ pw }}</b> | gio mount dav{{ s }}://k@{{ ep }}/{{ vp }}
+                echo <b>{{ pw }}</b> | gio mount dav{{ s }}://k@{{ ep }}/{{ rvp }}
                 {%- else %}
-                gio mount -a dav{{ s }}://{{ ep }}/{{ vp }}
+                gio mount -a dav{{ s }}://{{ ep }}/{{ rvp }}
                 {%- endif %}
             </pre>
         </div>
 
         <div class="os mac">
             <pre>
-                osascript -e ' mount volume "http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ vp }}" '
+                osascript -e ' mount volume "http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}" '
             </pre>
             <p>or you can open up a Finder, press command-K and paste this instead:</p>
             <pre>
-                http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ vp }}
+                http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}
             </pre>
             
             {% if s %}
@@ -108,26 +108,26 @@
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
             <pre>
                 rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp or args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls={{ "false" if args.ftp else "true" }}
-                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ vp }} <b>W:</b>
+                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>W:</b>
             </pre>
             <p>if you want to use the native FTP client in windows instead (please dont), press <code>win+R</code> and run this command:</p>
             <pre>
-                explorer {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}<b>{{ pw }}</b>:k@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ vp }}
+                explorer {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}<b>{{ pw }}</b>:k@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
             </pre>
         </div>
 
         <div class="os lin">
             <pre>
                 rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp or args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls={{ "false" if args.ftp else "true" }}
-                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ vp }} <b>mp</b>
+                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>mp</b>
             </pre>
             <p>emergency alternative (gnome/gui-only):</p>
             <!-- gnome-bug: ignores vp -->
             <pre>
                 {%- if accs %}
-                echo <b>{{ pw }}</b> | gio mount ftp{{ "" if args.ftp else "s" }}://k@{{ host }}:{{ args.ftp or args.ftps }}/{{ vp }}
+                echo <b>{{ pw }}</b> | gio mount ftp{{ "" if args.ftp else "s" }}://k@{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
                 {%- else %}
-                gio mount -a ftp{{ "" if args.ftp else "s" }}://{{ host }}:{{ args.ftp or args.ftps }}/{{ vp }}
+                gio mount -a ftp{{ "" if args.ftp else "s" }}://{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
                 {%- endif %}
             </pre>
         </div>
@@ -135,7 +135,7 @@
         <div class="os mac">
             <p>note: FTP is read-only on macos; please use WebDAV instead</p>
             <pre>
-                open {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}k:<b>{{ pw }}</b>@{% else %}anonymous:@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ vp }}
+                open {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}k:<b>{{ pw }}</b>@{% else %}anonymous:@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
             </pre>
         </div>
         {% endif %}
@@ -149,7 +149,7 @@
             <span class="os lin">doesn't need root</span>
         </p>
         <pre>
-            partyfuse.py{% if accs %} -a <b>{{ pw }}</b>{% endif %} http{{ s }}://{{ ep }}/{{ vp }} <b><span class="os win">W:</span><span class="os lin mac">mp</span></b>
+            partyfuse.py{% if accs %} -a <b>{{ pw }}</b>{% endif %} http{{ s }}://{{ ep }}/{{ rvp }} <b><span class="os win">W:</span><span class="os lin mac">mp</span></b>
         </pre>
         {% if s %}
         <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>-td</code></em></p>

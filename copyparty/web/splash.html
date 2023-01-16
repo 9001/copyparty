@@ -46,7 +46,7 @@
 				<tbody>
 					{% for mp in avol %}
 					{%- if mp in vstate and vstate[mp] %}
-					<tr><td><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a class="s" href="{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
+					<tr><td><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a class="s" href="{{ r }}{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
 					{%- endif %}
 					{% endfor %}
 				</tbody>
@@ -62,7 +62,7 @@
 		<h1 id="f">you can browse:</h1>
 		<ul>
 			{% for mp in rvol %}
-			<li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
+			<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
 			{% endfor %}
 		</ul>
 		{%- endif %}
@@ -71,7 +71,7 @@
 		<h1 id="g">you can upload to:</h1>
 		<ul>
 			{% for mp in wvol %}
-			<li><a href="{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
+			<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
 			{% endfor %}
 		</ul>
 		{%- endif %}

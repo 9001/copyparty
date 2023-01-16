@@ -1789,7 +1789,7 @@ class HttpCli(object):
             if x[0] != "Set-Cookie" or "cppwd=" not in x[1]
         ]
 
-        dst = "/"
+        dst = self.args.SRS
         if self.vpath:
             dst += quotep(self.vpath)
 
@@ -2614,6 +2614,7 @@ class HttpCli(object):
             if self.args.rclone_mdns or not self.args.zm
             else self.conn.hsrv.nm.map(self.ip) or host
         )
+        vp = (self.uparam["hc"] or "").lstrip("/")
         html = self.j2s(
             "svcs",
             args=self.args,
@@ -2621,7 +2622,8 @@ class HttpCli(object):
             s="s" if self.is_https else "",
             rip=rip,
             ep=ep,
-            vp=(self.uparam["hc"] or "").lstrip("/"),
+            vp=vp,
+            rvp=vjoin(self.args.R, vp),
             host=host,
             hport=hport,
             aname=aname,

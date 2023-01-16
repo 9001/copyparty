@@ -310,6 +310,7 @@ class SvcHub(object):
         al.R = R = R.strip("/")
         al.SR = "/" + R if R else ""
         al.RS = R + "/" if R else ""
+        al.SRS = "/" + R + "/" if R else "/"
 
         return True
 
