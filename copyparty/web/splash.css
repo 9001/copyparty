@@ -51,25 +51,28 @@ a.g {
 	border-color: #3a0;
 	box-shadow: 0 .3em 1em #4c0;
 }
-#repl {
-	float: left;
+#repl,
+#pb a {
 	border: none;
 	background: none;
 	color: inherit;
 	padding: 0;
 }
+#repl {
+	position: fixed;
+	bottom: .25em;
+	left: .2em;
+}
 #pb {
 	opacity: .5;
-	text-align: right;
+	position: fixed;
+	bottom: .25em;
+	right: .3em;
 }
 #pb span {
 	opacity: .6;
 }
 #pb a {
-	color: inherit;
-	background: none;
-	border: none;
-	padding: 0;
 	margin: 0;
 }
 table {
