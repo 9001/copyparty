@@ -707,7 +707,7 @@ class Ctl(object):
             handshake(self.ar, file, search)
 
     def _fancy(self):
-        if VT100:
+        if VT100 and not self.ar.ns:
             atexit.register(self.cleanup_vt100)
             ss.scroll_region(3)
 
@@ -731,7 +731,7 @@ class Ctl(object):
                 else:
                     idles = 0
 
-            if VT100:
+            if VT100 and not self.ar.ns:
                 maxlen = ss.w - len(str(self.nfiles)) - 14
                 txt = "\033[s\033[{0}H".format(ss.g)
                 for y, k, st, f in [
@@ -771,7 +771,7 @@ class Ctl(object):
             eta = str(datetime.timedelta(seconds=int(eta)))
             sleft = humansize(self.nbytes - self.up_b)
             nleft = self.nfiles - self.up_f
-            tail = "\033[K\033[u" if VT100 else "\r"
+            tail = "\033[K\033[u" if VT100 and not self.ar.ns else "\r"
 
             t = "{0} eta @ {1}/s, {2}, {3}# left".format(eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
@@ -1003,7 +1003,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
-    
+
     ap = app.add_argument_group("compatibility")
     ap.add_argument("--cls", action="store_true", help="clear screen before start")
     ap.add_argument("--ws", action="store_true", help="copyparty is running on windows; wait before deleting files after uploading")
@@ -1017,6 +1017,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
     ap.add_argument("-J", type=int, metavar="THREADS", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
+    ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles)")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
 
