@@ -2654,7 +2654,11 @@ class HttpCli(object):
                 "dbwt": None,
             }
 
-        if self.uparam.get("ls") in ["v", "t", "txt"]:
+        fmt = self.uparam.get("ls", "")
+        if not fmt and self.ua.startswith("curl/"):
+            fmt = "v"
+
+        if fmt in ["v", "t", "txt"]:
             if self.uname == "*":
                 txt = "howdy stranger (you're not logged in)"
             else:
@@ -2974,7 +2978,7 @@ class HttpCli(object):
                 biggest = 0
 
             if arg == "v":
-                fmt = "\033[0;7;36m{{}} {{:>{}}}\033[0m {{}}"
+                fmt = "\033[0;7;36m{{}}{{:>{}}}\033[0m {{}}"
                 nfmt = "{}"
                 biggest = 0
                 f2 = "".join(
@@ -2994,7 +2998,7 @@ class HttpCli(object):
                         a = x["dt"].replace("-", " ").replace(":", " ").split(" ")
                         x["dt"] = f2.format(*list(a))
                         sz = humansize(x["sz"], True)
-                        x["sz"] = "\033[0;3{}m{:>5}".format(ctab.get(sz[-1:], 0), sz)
+                        x["sz"] = "\033[0;3{}m {:>5}".format(ctab.get(sz[-1:], 0), sz)
             else:
                 fmt = "{{}}  {{:{},}}  {{}}"
                 nfmt = "{:,}"
@@ -3144,6 +3148,10 @@ class HttpCli(object):
         url_suf = self.urlq({}, ["k"])
         is_ls = "ls" in self.uparam
         is_js = self.args.force_js or self.cookies.get("js") == "y"
+
+        if not is_ls and self.ua.startswith("curl/"):
+            self.uparam["ls"] = "v"
+            is_ls = True
 
         tpl = "browser"
         if "b" in self.uparam:
