@@ -29,6 +29,9 @@ if TYPE_CHECKING:
 if not hasattr(socket, "IPPROTO_IPV6"):
     setattr(socket, "IPPROTO_IPV6", 41)
 
+if not hasattr(socket, "IP_FREEBIND"):
+    setattr(socket, "IP_FREEBIND", 15)
+
 
 class TcpSrv(object):
     """
@@ -223,6 +226,9 @@ class TcpSrv(object):
             srv.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, False)
         except:
             pass  # will create another ipv4 socket instead
+
+        if not ANYWIN and self.args.freebind:
+            srv.setsockopt(socket.SOL_IP, socket.IP_FREEBIND, 1)
 
         try:
             srv.bind((ip, port))

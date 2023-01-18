@@ -15,7 +15,7 @@ from ipaddress import (
 )
 
 from .__init__ import TYPE_CHECKING
-from .util import MACOS, Netdev, min_ex, spack
+from .util import MACOS, Netdev, find_prefix, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -110,9 +110,7 @@ class MCast(object):
             )
 
         ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
-
-        # ip -> ip/prefix
-        ips = [[x for x in netdevs if x.startswith(y + "/")][0] for y in ips]
+        ips = find_prefix(ips, netdevs)
 
         on = self.on[:]
         off = self.off[:]

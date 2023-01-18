@@ -471,7 +471,7 @@ class NetMap(object):
             )
 
         ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
-        ips = [[x for x in netdevs if x.startswith(y + "/")][0] for y in ips]
+        ips = find_prefix(ips, netdevs)
 
         self.cache: dict[str, str] = {}
         self.b2sip: dict[bytes, str] = {}
@@ -1712,6 +1712,15 @@ def ipnorm(ip: str) -> str:
         return IPv6Address(ip).exploded[:-20]
 
     return ip
+
+
+def find_prefix(ips: list[str], netdevs: dict[str, Netdev]) -> list[str]:
+    ret = []
+    for ip in ips:
+        hit = next((x for x in netdevs if x.startswith(ip + "/")), None)
+        if hit:
+            ret.append(hit)
+    return ret
 
 
 def html_escape(s: str, quot: bool = False, crlf: bool = False) -> str:
