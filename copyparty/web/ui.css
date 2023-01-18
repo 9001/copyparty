@@ -69,6 +69,7 @@ html {
 #toastb {
 	max-height: 70vh;
 	overflow-y: auto;
+	padding: 1px;
 }
 #toast.scroll #toastb {
 	overflow-y: scroll;
