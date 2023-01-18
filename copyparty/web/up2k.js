@@ -895,9 +895,9 @@ function up2k_init(subtle) {
             "finished": 0
         },
         "time": {
-            "hashing": 0,
-            "uploading": 0,
-            "busy": 0
+            "hashing": 0.01,
+            "uploading": 0.01,
+            "busy": 0.01
         },
         "eta": {
             "h": "",
