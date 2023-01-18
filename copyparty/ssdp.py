@@ -89,19 +89,22 @@ class SSDPr(object):
 class SSDPd(MCast):
     """communicates with ssdp clients over multicast"""
 
-    def __init__(self, hub: "SvcHub") -> None:
+    def __init__(self, hub: "SvcHub", ngen: int) -> None:
         al = hub.args
         vinit = al.zsv and not al.zmv
         super(SSDPd, self).__init__(
             hub, SSDP_Sck, al.zs_on, al.zs_off, GRP, "", 1900, vinit
         )
         self.srv: dict[socket.socket, SSDP_Sck] = {}
+        self.logsrc = "SSDP-{}".format(ngen)
+        self.ngen = ngen
+
         self.rxc = CachedSet(0.7)
         self.txc = CachedSet(5)  # win10: every 3 sec
         self.ptn_st = re.compile(b"\nst: *upnp:rootdevice", re.I)
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.log_func("SSDP", msg, c)
+        self.log_func(self.logsrc, msg, c)
 
     def run(self) -> None:
         try:
@@ -127,24 +130,34 @@ class SSDPd(MCast):
 
         self.log("listening")
         while self.running:
-            rdy = select.select(self.srv, [], [], 180)
+            rdy = select.select(self.srv, [], [], self.args.z_chk or 180)
             rx: list[socket.socket] = rdy[0]  # type: ignore
             self.rxc.cln()
+            buf = b""
+            addr = ("0", 0)
             for sck in rx:
-                buf, addr = sck.recvfrom(4096)
                 try:
+                    buf, addr = sck.recvfrom(4096)
                     self.eat(buf, addr)
                 except:
                     if not self.running:
-                        return
+                        break
 
                     t = "{} {} \033[33m|{}| {}\n{}".format(
                         self.srv[sck].name, addr, len(buf), repr(buf)[2:-1], min_ex()
                     )
                     self.log(t, 6)
 
+        self.log("stopped", 2)
+
     def stop(self) -> None:
         self.running = False
+        for srv in self.srv.values():
+            try:
+                srv.sck.close()
+            except:
+                pass
+
         self.srv = {}
 
     def eat(self, buf: bytes, addr: tuple[str, int]) -> None:

@@ -59,7 +59,7 @@ class MDNS_Sck(MC_Sck):
 
 
 class MDNS(MCast):
-    def __init__(self, hub: "SvcHub") -> None:
+    def __init__(self, hub: "SvcHub", ngen: int) -> None:
         al = hub.args
         grp4 = "" if al.zm6 else MDNS4
         grp6 = "" if al.zm4 else MDNS6
@@ -67,7 +67,8 @@ class MDNS(MCast):
             hub, MDNS_Sck, al.zm_on, al.zm_off, grp4, grp6, 5353, hub.args.zmv
         )
         self.srv: dict[socket.socket, MDNS_Sck] = {}
-
+        self.logsrc = "mDNS-{}".format(ngen)
+        self.ngen = ngen
         self.ttl = 300
 
         zs = self.args.name + ".local."
@@ -90,7 +91,7 @@ class MDNS(MCast):
         self.defend: dict[MDNS_Sck, float] = {}  # server -> deadline
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.log_func("mDNS", msg, c)
+        self.log_func(self.logsrc, msg, c)
 
     def build_svcs(self) -> tuple[dict[str, dict[str, Any]], set[str]]:
         zms = self.args.zms
@@ -288,12 +289,15 @@ class MDNS(MCast):
             rx: list[socket.socket] = rdy[0]  # type: ignore
             self.rx4.cln()
             self.rx6.cln()
+            buf = b""
+            addr = ("0", 0)
             for sck in rx:
-                buf, addr = sck.recvfrom(4096)
                 try:
+                    buf, addr = sck.recvfrom(4096)
                     self.eat(buf, addr, sck)
                 except:
                     if not self.running:
+                        self.log("stopped", 2)
                         return
 
                     t = "{} {} \033[33m|{}| {}\n{}".format(
@@ -310,14 +314,18 @@ class MDNS(MCast):
                 self.log(t.format(self.hn[:-1]), 2)
                 self.probing = 0
 
+        self.log("stopped", 2)
+
     def stop(self, panic=False) -> None:
         self.running = False
-        if not panic:
-            for srv in self.srv.values():
-                try:
+        for srv in self.srv.values():
+            try:
+                if panic:
+                    srv.sck.close()
+                else:
                     srv.sck.sendto(srv.bp_bye, (srv.grp, 5353))
-                except:
-                    pass
+            except:
+                pass
 
         self.srv = {}
 

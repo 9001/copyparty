@@ -237,6 +237,7 @@ class SvcHub(object):
         if not args.zms:
             args.zms = zms
 
+        self.zc_ngen = 0
         self.mdns: Optional["MDNS"] = None
         self.ssdp: Optional["SSDPd"] = None
 
@@ -404,24 +405,10 @@ class SvcHub(object):
 
     def run(self) -> None:
         self.tcpsrv.run()
-
-        if getattr(self.args, "zm", False):
-            try:
-                from .mdns import MDNS
-
-                self.mdns = MDNS(self)
-                Daemon(self.mdns.run, "mdns")
-            except:
-                self.log("root", "mdns startup failed;\n" + min_ex(), 3)
-
-        if getattr(self.args, "zs", False):
-            try:
-                from .ssdp import SSDPd
-
-                self.ssdp = SSDPd(self)
-                Daemon(self.ssdp.run, "ssdp")
-            except:
-                self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
+        if getattr(self.args, "z_chk", 0) and (
+            getattr(self.args, "zm", False) or getattr(self.args, "zs", False)
+        ):
+            Daemon(self.tcpsrv.netmon, "netmon")
 
         Daemon(self.thr_httpsrv_up, "sig-hsrv-up2")
 
@@ -452,6 +439,33 @@ class SvcHub(object):
                 time.sleep(0.1)
         else:
             self.stop_thr()
+
+    def start_zeroconf(self) -> None:
+        self.zc_ngen += 1
+
+        if getattr(self.args, "zm", False):
+            try:
+                from .mdns import MDNS
+
+                if self.mdns:
+                    self.mdns.stop(True)
+
+                self.mdns = MDNS(self, self.zc_ngen)
+                Daemon(self.mdns.run, "mdns")
+            except:
+                self.log("root", "mdns startup failed;\n" + min_ex(), 3)
+
+        if getattr(self.args, "zs", False):
+            try:
+                from .ssdp import SSDPd
+
+                if self.ssdp:
+                    self.ssdp.stop()
+
+                self.ssdp = SSDPd(self, self.zc_ngen)
+                Daemon(self.ssdp.run, "ssdp")
+            except:
+                self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
 
     def reload(self) -> str:
         if self.reloading:

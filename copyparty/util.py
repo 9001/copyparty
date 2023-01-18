@@ -379,6 +379,9 @@ class Netdev(object):
     def __str__(self):
         return "{}-{}{}".format(self.idx, self.name, self.desc)
 
+    def __repr__(self):
+        return "'{}-{}'".format(self.idx, self.name)
+
     def __lt__(self, rhs):
         return str(self) < str(rhs)
 

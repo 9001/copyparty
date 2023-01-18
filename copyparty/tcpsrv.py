@@ -5,6 +5,7 @@ import os
 import re
 import socket
 import sys
+import time
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, VT100, unicode
 from .stolen.qrcodegen import QrCode
@@ -46,6 +47,8 @@ class TcpSrv(object):
         self.stopping = False
         self.srv: list[socket.socket] = []
         self.bound: list[tuple[str, int]] = []
+        self.netdevs: dict[str, Netdev] = {}
+        self.netlist = ""
         self.nsrv = 0
         self.qr = ""
         pad = False
@@ -268,7 +271,11 @@ class TcpSrv(object):
         self.srv = srvs
         self.bound = bound
         self.nsrv = len(srvs)
+        self._distribute_netdevs()
+
+    def _distribute_netdevs(self):
         self.hub.broker.say("set_netdevs", self.netdevs)
+        self.hub.start_zeroconf()
 
     def shutdown(self) -> None:
         self.stopping = True
@@ -279,6 +286,17 @@ class TcpSrv(object):
             pass
 
         self.log("tcpsrv", "ok bye")
+
+    def netmon(self):
+        while not self.stopping:
+            time.sleep(self.args.z_chk)
+            netdevs = self.detect_interfaces(self.args.i)
+            if not netdevs:
+                continue
+
+            self.log("tcpsrv", "network change detected", 3)
+            self.netdevs = netdevs
+            self._distribute_netdevs()
 
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
         from .stolen.ifaddr import get_adapters
@@ -299,6 +317,12 @@ class TcpSrv(object):
                         nd.idx = idx
                 except:
                     pass
+
+        netlist = str(sorted(eps.items()))
+        if netlist == self.netlist and self.netdevs:
+            return {}
+
+        self.netlist = netlist
 
         if "0.0.0.0" not in listen_ips and "::" not in listen_ips:
             eps = {k: v for k, v in eps.items() if k.split("/")[0] in listen_ips}
