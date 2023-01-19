@@ -29,11 +29,11 @@ however if your copyparty is behind a reverse-proxy, you may want to use [`share
 * disables thumbnails and folder-type detection in windows explorer
 * makes it way faster (especially for slow/networked locations (such as partyfuse))
 
-### [`webdav-basicauth.reg`](webdav-basicauth.reg)
-* enables webdav basic-auth over plaintext http; takes effect after a reboot OR after running `webdav-unlimit.bat`
-
-### [`webdav-unlimit.bat`](webdav-unlimit.bat)
-* removes the 47.6 MiB filesize limit when downloading from webdav
+### [`webdav-cfg.reg`](webdav-cfg.bat)
+* improves the native webdav support in windows;
+  * removes the 47.6 MiB filesize limit when downloading from webdav
+  * optionally enables webdav basic-auth over plaintext http
+  * optionally helps disable wpad, removing the 10sec latency
 
 ### [`cfssl.sh`](cfssl.sh)
 * creates CA and server certificates using cfssl

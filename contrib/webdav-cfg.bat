@@ -1,7 +1,7 @@
 @echo off
 rem removes the 47.6 MiB filesize limit when downloading from webdav
 rem + optionally allows/enables password-auth over plaintext http
-rem + optionally helps disable wpad
+rem + optionally helps disable wpad, removing the 10sec latency
 
 setlocal enabledelayedexpansion
 
