@@ -125,6 +125,7 @@ class HttpCli(object):
         self.mode = " "
         self.req = " "
         self.http_ver = " "
+        self.host = " "
         self.ua = " "
         self.is_rclone = False
         self.is_ancient = False
@@ -261,6 +262,9 @@ class HttpCli(object):
         self.is_https = (
             self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
         )
+        self.host = self.headers.get("host") or "{}:{}".format(
+            *list(self.s.getsockname()[:2])
+        )
 
         n = self.args.rproxy
         if n:
@@ -279,6 +283,7 @@ class HttpCli(object):
 
                 self.log_src = self.conn.set_rproxy(self.ip)
                 self.is_vproxied = bool(self.args.R)
+                self.host = self.headers.get("x-forwarded-host") or self.host
 
         if self.is_banned():
             return False
@@ -835,7 +840,7 @@ class HttpCli(object):
             raise Pebkac(404)
 
         fgen = itertools.chain([topdir], fgen)  # type: ignore
-        vtop = vjoin(vn.vpath, rem)
+        vtop = vjoin(self.args.R, vjoin(vn.vpath, rem))
 
         chunksz = 0x7FF8  # preferred by nginx or cf (dunno which)
 
@@ -935,7 +940,7 @@ class HttpCli(object):
 
         el = xroot.find(r"./{DAV:}response")
         assert el
-        e2 = mktnod("D:href", quotep("/" + self.vpath))
+        e2 = mktnod("D:href", quotep(self.args.SRS + self.vpath))
         el.insert(0, e2)
 
         el = xroot.find(r"./{DAV:}response/{DAV:}propstat")
@@ -990,7 +995,9 @@ class HttpCli(object):
 
         lk.append(mkenod("D:timeout", mktnod("D:href", "Second-3310")))
         lk.append(mkenod("D:locktoken", mktnod("D:href", uuid.uuid4().urn)))
-        lk.append(mkenod("D:lockroot", mktnod("D:href", "/" + quotep(self.vpath))))
+        lk.append(
+            mkenod("D:lockroot", mktnod("D:href", quotep(self.args.SRS + self.vpath)))
+        )
 
         lk2 = mkenod("D:activelock")
         xroot = mkenod("D:prop", mkenod("D:lockdiscovery", lk2))
@@ -1389,7 +1396,7 @@ class HttpCli(object):
 
         url = "{}://{}/{}".format(
             "https" if self.is_https else "http",
-            self.headers.get("host") or "{}:{}".format(*list(self.s.getsockname()[:2])),
+            self.host,
             self.args.RS + vpath + vsuf,
         )
 
@@ -2069,8 +2076,7 @@ class HttpCli(object):
             jpart = {
                 "url": "{}://{}/{}".format(
                     "https" if self.is_https else "http",
-                    self.headers.get("host")
-                    or "{}:{}".format(*list(self.s.getsockname()[:2])),
+                    self.host,
                     rel_url,
                 ),
                 "sha512": sha_hex[:56],
@@ -2451,7 +2457,7 @@ class HttpCli(object):
         if fn:
             fn = fn.rstrip("/").split("/")[-1]
         else:
-            fn = self.headers.get("host", "hey")
+            fn = self.host.split(":")[0]
 
         safe = (string.ascii_letters + string.digits).replace("%", "")
         afn = "".join([x if x in safe.replace('"', "") else "_" for x in fn])
@@ -2606,7 +2612,7 @@ class HttpCli(object):
 
     def tx_svcs(self) -> bool:
         aname = re.sub("[^0-9a-zA-Z]+", "", self.args.name) or "a"
-        ep = self.headers["host"]
+        ep = self.host
         host = ep.split(":")[0]
         hport = ep[ep.find(":") :] if ":" in ep else ""
         rip = (
