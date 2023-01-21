@@ -232,6 +232,11 @@ class TcpSrv(object):
 
         try:
             srv.bind((ip, port))
+            sport = srv.getsockname()[1]
+            if port != sport:
+                # linux 6.0.16 lets you bind a port which is in use
+                # except it just gives you a random port instead
+                raise OSError(E_ADDR_IN_USE[0], "")
             self.srv.append(srv)
         except (OSError, socket.error) as ex:
             if ex.errno in E_ADDR_IN_USE:
@@ -250,6 +255,9 @@ class TcpSrv(object):
             ip, port = srv.getsockname()[:2]
             try:
                 srv.listen(self.args.nc)
+                if not srv.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN):
+                    # some linux don't throw on listen(0.0.0.0) after listen(::)
+                    raise Exception("failed to listen on {}".format(srv.getsockname()))
             except:
                 if ip == "0.0.0.0" and ("::", port) in bound:
                     # dualstack
