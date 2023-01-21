@@ -255,7 +255,12 @@ class TcpSrv(object):
             ip, port = srv.getsockname()[:2]
             try:
                 srv.listen(self.args.nc)
-                if not srv.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN):
+                try:
+                    ok = srv.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN)
+                except:
+                    ok = 1  # macos
+
+                if not ok:
                     # some linux don't throw on listen(0.0.0.0) after listen(::)
                     raise Exception("failed to listen on {}".format(srv.getsockname()))
             except:
