@@ -587,7 +587,7 @@ class VFS(object):
 
         # if multiselect: add all items to archive root
         # if single folder: the folder itself is the top-level item
-        folder = "" if flt or not wrap else (vrem.split("/")[-1] or "top")
+        folder = "" if flt or not wrap else (vrem.split("/")[-1].lstrip(".") or "top")
 
         g = self.walk(folder, vrem, [], uname, [[True, False]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
