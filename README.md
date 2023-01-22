@@ -1,6 +1,6 @@
 # ⇆🎉 copyparty
 
-* http file sharing hub (py2/py3) [(on PyPI)](https://pypi.org/project/copyparty/)
+* portable file sharing hub (py2/py3) [(on PyPI)](https://pypi.org/project/copyparty/)
 * MIT-Licensed, 2019-05-26, ed @ irc.rizon.net
 
 
@@ -75,7 +75,8 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
-    * [upload events](#upload-events) - trigger a script/program on each upload
+    * [event hooks](#event-hooks) - trigger a script/program on uploads, renames etc
+        * [upload events](#upload-events) - the older, more powerful approach
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
@@ -163,6 +164,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
+    * not affected by cloudflare's max-upload-size (100 MiB)
   * ☑ stash: simple PUT filedropper
   * ☑ [unpost](#unpost): undo/delete accidental uploads
   * ☑ [self-destruct](#self-destruct) (specified server-side or client-side)
@@ -924,6 +926,8 @@ some examples,
 ## other flags
 
 * `:c,magic` enables filetype detection for nameless uploads, same as `--magic`
+  * needs https://pypi.org/project/python-magic/ `python3 -m pip install --user -U python-magic`
+  * on windows grab this instead `python3 -m pip install --user -U python-magic-bin`
 
 
 ## database location
@@ -992,9 +996,18 @@ copyparty can invoke external programs to collect additional metadata for files 
 if something doesn't work, try `--mtag-v` for verbose error messages
 
 
-## upload events
+## event hooks
 
-trigger a script/program on each upload  like so:
+trigger a script/program on uploads, renames etc
+
+you can set hooks before and/or after an event happens, and currently you can hook uploads, moves/renames, and deletes
+
+there's a bunch of flags and stuff, see `--help-hooks`
+
+
+### upload events
+
+the older, more powerful approach:
 
 ```
 -v /mnt/inc:inc:w:c,mte=+x1:c,mtp=x1=ad,kn,/usr/bin/notify-send
@@ -1004,11 +1017,12 @@ so filesystem location `/mnt/inc` shared at `/inc`, write-only for everyone, app
 
 that'll run the command `notify-send` with the path to the uploaded file as the first and only argument (so on linux it'll show a notification on-screen)
 
-note that it will only trigger on new unique files, not dupes
+note that this is way more complicated than the new [event hooks](#event-hooks) but this approach has the following advantages:
+* non-blocking and multithreaded; doesn't hold other uploads back
+* you get access to tags from FFmpeg and other mtp parsers
+* only trigger on new unique files, not dupes
 
-and it will occupy the parsing threads, so fork anything expensive (or set `kn` to have copyparty fork it for you) -- otoh if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
-
-if this becomes popular maybe there should be a less janky way to do it actually
+note that it will occupy the parsing threads, so fork anything expensive (or set `kn` to have copyparty fork it for you) -- otoh if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
 
 
 ## hiding from google

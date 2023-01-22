@@ -63,6 +63,7 @@ from .util import (
     read_socket_unbounded,
     relchk,
     ren_open,
+    runhook,
     hidedir,
     s3enc,
     sanitize_fn,
@@ -1189,9 +1190,27 @@ class HttpCli(object):
                         plain = zb.decode("utf-8", "replace")
                         if buf.startswith(b"msg="):
                             plain = plain[4:]
+                            vfs, rem = self.asrv.vfs.get(
+                                self.vpath, self.uname, False, False
+                            )
+                            xm = vfs.flags.get("xm")
+                            if xm:
+                                runhook(
+                                    self.log,
+                                    xm,
+                                    vfs.canonical(rem),
+                                    self.vpath,
+                                    self.host,
+                                    self.uname,
+                                    self.ip,
+                                    time.time(),
+                                    len(xm),
+                                    plain,
+                                )
 
                         t = "urlform_dec {} @ {}\n  {}\n"
                         self.log(t.format(len(plain), self.vpath, plain))
+
                     except Exception as ex:
                         self.log(repr(ex))
 
@@ -1232,7 +1251,7 @@ class HttpCli(object):
         # post_sz, sha_hex, sha_b64, remains, path, url
         reader, remains = self.get_body_reader()
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
-        rnd, _, lifetime = self.upload_flags(vfs)
+        rnd, _, lifetime, xbu, xau = self.upload_flags(vfs)
         lim = vfs.get_dbv(rem)[0].lim
         fdir = vfs.canonical(rem)
         if lim:
@@ -1332,6 +1351,24 @@ class HttpCli(object):
             ):
                 params["overwrite"] = "a"
 
+        if xbu:
+            at = time.time() - lifetime
+            if not runhook(
+                self.log,
+                xbu,
+                path,
+                self.vpath,
+                self.host,
+                self.uname,
+                self.ip,
+                at,
+                remains,
+                "",
+            ):
+                t = "upload denied by xbu"
+                self.log(t, 1)
+                raise Pebkac(403, t)
+
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
             path = os.path.join(fdir, fn)
@@ -1371,6 +1408,24 @@ class HttpCli(object):
                 fn = fn2
                 path = path2
 
+        at = time.time() - lifetime
+        if xau and not runhook(
+            self.log,
+            xau,
+            path,
+            self.vpath,
+            self.host,
+            self.uname,
+            self.ip,
+            at,
+            post_sz,
+            "",
+        ):
+            t = "upload denied by xau"
+            self.log(t, 1)
+            os.unlink(path)
+            raise Pebkac(403, t)
+
         vfs, rem = vfs.get_dbv(rem)
         self.conn.hsrv.broker.say(
             "up2k.hash_file",
@@ -1379,7 +1434,7 @@ class HttpCli(object):
             rem,
             fn,
             self.ip,
-            time.time() - lifetime,
+            at,
         )
 
         vsuf = ""
@@ -1572,6 +1627,8 @@ class HttpCli(object):
         body["vtop"] = dbv.vpath
         body["ptop"] = dbv.realpath
         body["prel"] = vrem
+        body["host"] = self.host
+        body["user"] = self.uname
         body["addr"] = self.ip
         body["vcfg"] = dbv.flags
 
@@ -1893,7 +1950,7 @@ class HttpCli(object):
         self.redirect(vpath, "?edit")
         return True
 
-    def upload_flags(self, vfs: VFS) -> tuple[int, bool, int]:
+    def upload_flags(self, vfs: VFS) -> tuple[int, bool, int, list[str], list[str]]:
         srnd = self.uparam.get("rand", self.headers.get("rand", ""))
         rnd = int(srnd) if srnd and not self.args.nw else 0
         ac = self.uparam.get(
@@ -1907,7 +1964,7 @@ class HttpCli(object):
         else:
             lifetime = 0
 
-        return rnd, want_url, lifetime
+        return rnd, want_url, lifetime, vfs.flags.get("xbu"), vfs.flags.get("xau")
 
     def handle_plain_upload(self) -> bool:
         assert self.parser
@@ -1924,7 +1981,7 @@ class HttpCli(object):
             if not nullwrite:
                 bos.makedirs(fdir_base)
 
-        rnd, want_url, lifetime = self.upload_flags(vfs)
+        rnd, want_url, lifetime, xbu, xau = self.upload_flags(vfs)
 
         files: list[tuple[int, str, str, str, str, str]] = []
         # sz, sha_hex, sha_b64, p_file, fname, abspath
@@ -1965,6 +2022,24 @@ class HttpCli(object):
                     open_args = {}
                     tnam = fname = os.devnull
                     fdir = abspath = ""
+
+                if xbu:
+                    at = time.time() - lifetime
+                    if not runhook(
+                        self.log,
+                        xbu,
+                        abspath,
+                        self.vpath,
+                        self.host,
+                        self.uname,
+                        self.ip,
+                        at,
+                        0,
+                        "",
+                    ):
+                        t = "upload denied by xbu"
+                        self.log(t, 1)
+                        raise Pebkac(403, t)
 
                 if lim:
                     lim.chk_bup(self.ip)
@@ -2008,6 +2083,24 @@ class HttpCli(object):
                     files.append(
                         (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
                     )
+                    at = time.time() - lifetime
+                    if xau and not runhook(
+                        self.log,
+                        xau,
+                        abspath,
+                        self.vpath,
+                        self.host,
+                        self.uname,
+                        self.ip,
+                        at,
+                        sz,
+                        "",
+                    ):
+                        t = "upload denied by xau"
+                        self.log(t, 1)
+                        os.unlink(abspath)
+                        raise Pebkac(403, t)
+
                     dbv, vrem = vfs.get_dbv(rem)
                     self.conn.hsrv.broker.say(
                         "up2k.hash_file",
@@ -2016,7 +2109,7 @@ class HttpCli(object):
                         vrem,
                         fname,
                         self.ip,
-                        time.time() - lifetime,
+                        at,
                     )
                     self.conn.nbyte += sz
 

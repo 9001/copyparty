@@ -556,6 +556,44 @@ def get_sects():
             ),
         ],
         [
+            "hooks",
+            "execute commands before/after various events",
+            dedent(
+                """
+            execute a command (a program or script) before or after various events;
+             \033[36mxbu\033[35m executes CMD before a file upload starts
+             \033[36mxau\033[35m executes CMD after  a file upload finishes
+             \033[36mxbr\033[35m executes CMD before a file rename/move
+             \033[36mxar\033[35m executes CMD after  a file rename/move
+             \033[36mxbd\033[35m executes CMD before a file delete
+             \033[36mxad\033[35m executes CMD after  a file delete
+             \033[36mxm\033[35m executes CMD on message
+            \033[0m
+            can be defined as --args or volflags; for example \033[36m
+             --xau notify-send
+             -v .::r:c,xau=notify-send
+            \033[0m
+            commands specified as --args are appended to volflags;
+            each --arg and volflag can be specified multiple times,
+            each command will execute in order unless one returns non-zero
+
+            optionally prefix the command with comma-sep. flags similar to -mtp:
+             \033[36mf\033[35m forks the process, doesn't wait for completion
+             \033[36mc\033[35m checks return code, blocks the action if non-zero
+             \033[36mj\033[35m provides json with info as 1st arg instead of filepath
+             \033[36mwN\033[35m waits N sec after command has been started before continuing
+             \033[36mtN\033[35m sets an N sec timeout before the command is abandoned
+             \033[36mkt\033[35m kills the entire process tree on timeout (default),
+             \033[36mkm\033[35m kills just the main process
+             \033[36mkn\033[35m lets it continue running until copyparty is terminated
+             \033[36mc0\033[35m show all process output (default)
+             \033[36mc1\033[35m show only stderr
+             \033[36mc2\033[35m show only stdout
+             \033[36mc3\033[35m mute all process otput
+            \033[0m"""
+            ),
+        ],
+        [
             "urlform",
             "how to handle url-form POSTs",
             dedent(
@@ -756,6 +794,17 @@ def add_smb(ap):
     ap2.add_argument("--smbv", action="store_true", help="verbose")
     ap2.add_argument("--smbvv", action="store_true", help="verboser")
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
+
+
+def add_hooks(ap):
+    ap2 = ap.add_argument_group('hooks (see --help-hooks)')
+    ap2.add_argument("--xbu", metavar="CMD", type=u, action="append", help="execute CMD before a file upload starts")
+    ap2.add_argument("--xau", metavar="CMD", type=u, action="append", help="execute CMD after  a file upload finishes")
+    ap2.add_argument("--xbr", metavar="CMD", type=u, action="append", help="execute CMD before a file move/rename")
+    ap2.add_argument("--xar", metavar="CMD", type=u, action="append", help="execute CMD after  a file move/rename")
+    ap2.add_argument("--xbd", metavar="CMD", type=u, action="append", help="execute CMD before a file delete")
+    ap2.add_argument("--xad", metavar="CMD", type=u, action="append", help="execute CMD after  a file delete")
+    ap2.add_argument("--xm", metavar="CMD", type=u, action="append", help="execute CMD on message")
 
 
 def add_optouts(ap):
@@ -967,6 +1016,7 @@ def run_argparse(
     add_webdav(ap)
     add_smb(ap)
     add_safety(ap, fk_salt)
+    add_hooks(ap)
     add_optouts(ap)
     add_shutdown(ap)
     add_ui(ap, retry)

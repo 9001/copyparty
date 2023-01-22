@@ -44,6 +44,7 @@ from .util import (
     ren_open,
     rmdirs,
     rmdirs_up,
+    runhook,
     s2hms,
     s3dec,
     s3enc,
@@ -2059,6 +2060,8 @@ class Up2k(object):
                         "sprs": sprs,  # dontcare; finished anyways
                         "size": dsize,
                         "lmod": dtime,
+                        "host": cj["host"],
+                        "user": cj["user"],
                         "addr": ip,
                         "at": at,
                         "hash": [],
@@ -2187,6 +2190,8 @@ class Up2k(object):
                 }
                 # client-provided, sanitized by _get_wark: name, size, lmod
                 for k in [
+                    "host",
+                    "user",
                     "addr",
                     "vtop",
                     "ptop",
@@ -2416,6 +2421,26 @@ class Up2k(object):
         # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
         atomic_move(src, dst)
 
+        upt = job.get("at") or time.time()
+        xau = self.flags[ptop].get("xau")
+        if xau and not runhook(
+            self.log,
+            xau,
+            dst,
+            djoin(job["vtop"], job["prel"], job["name"]),
+            job["host"],
+            job["user"],
+            job["addr"],
+            upt,
+            job["size"],
+            "",
+        ):
+            t = "upload blocked by xau"
+            self.log(t, 1)
+            bos.unlink(dst)
+            self.registry[ptop].pop(wark, None)
+            raise Pebkac(403, t)
+
         times = (int(time.time()), int(job["lmod"]))
         if ANYWIN:
             z1 = (dst, job["size"], times, job["sprs"])
@@ -2427,7 +2452,6 @@ class Up2k(object):
                 pass
 
         z2 = [job[x] for x in "ptop wark prel name lmod size addr".split()]
-        upt = job.get("at") or time.time()
         wake_sr = False
         try:
             flt = job["life"]
@@ -2623,6 +2647,8 @@ class Up2k(object):
             self.log("rm: skip type-{:x} file [{}]".format(st.st_mode, atop))
             return 0, [], []
 
+        xbd = vn.flags.get("xbd")
+        xad = vn.flags.get("xad")
         n_files = 0
         for dbv, vrem, _, adir, files, rd, vd in g:
             for fn in [x[0] for x in files]:
@@ -2638,6 +2664,12 @@ class Up2k(object):
                 vpath = "{}/{}".format(dbv.vpath, volpath).strip("/")
                 self.log("rm {}\n  {}".format(vpath, abspath))
                 _ = dbv.get(volpath, uname, *permsets[0])
+                if xbd and not runhook(
+                    self.log, xbd, abspath, vpath, "", uname, "", 0, 0, ""
+                ):
+                    self.log("delete blocked by xbd: {}".format(abspath), 1)
+                    continue
+
                 with self.mutex:
                     cur = None
                     try:
@@ -2649,6 +2681,8 @@ class Up2k(object):
                             cur.connection.commit()
 
                 bos.unlink(abspath)
+                if xad:
+                    runhook(self.log, xad, abspath, vpath, "", uname, "", 0, 0, "")
 
         ok: list[str] = []
         ng: list[str] = []
@@ -2741,6 +2775,13 @@ class Up2k(object):
         if bos.path.exists(dabs):
             raise Pebkac(400, "mv2: target file exists")
 
+        xbr = svn.flags.get("xbr")
+        xar = dvn.flags.get("xar")
+        if xbr and not runhook(self.log, xbr, sabs, svp, "", uname, "", 0, 0, ""):
+            t = "move blocked by xbr: {}".format(svp)
+            self.log(t, 1)
+            raise Pebkac(405, t)
+
         bos.makedirs(os.path.dirname(dabs))
 
         if bos.path.islink(sabs):
@@ -2756,6 +2797,9 @@ class Up2k(object):
             self.need_rescan.add(dvn.vpath)
             with self.rescan_cond:
                 self.rescan_cond.notify_all()
+
+            if xar:
+                runhook(self.log, xar, dabs, dvp, "", uname, "", 0, 0, "")
 
             return "k"
 
@@ -2800,6 +2844,9 @@ class Up2k(object):
                 raise
 
             os.unlink(b1)
+
+        if xar:
+            runhook(self.log, xar, dabs, dvp, "", uname, "", 0, 0, "")
 
         return "k"
 
@@ -3019,6 +3066,25 @@ class Up2k(object):
         job["name"] = self._untaken(pdir, job, job["t0"])
         # if len(job["name"].split(".")) > 8:
         #    raise Exception("aaa")
+
+        xbu = self.flags[job["ptop"]].get("xbu")
+        ap_chk = djoin(pdir, job["name"])
+        vp_chk = djoin(job["vtop"], job["prel"], job["name"])
+        if xbu and not runhook(
+            self.log,
+            xbu,
+            ap_chk,
+            vp_chk,
+            job["host"],
+            job["user"],
+            job["addr"],
+            job["t0"],
+            job["size"],
+            "",
+        ):
+            t = "upload blocked by xbu: {}".format(vp_chk)
+            self.log(t, 1)
+            raise Pebkac(403, t)
 
         tnam = job["name"] + ".PARTIAL"
         if self.args.dotpart:

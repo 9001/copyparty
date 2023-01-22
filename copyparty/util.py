@@ -6,6 +6,7 @@ import contextlib
 import errno
 import hashlib
 import hmac
+import json
 import logging
 import math
 import mimetypes
@@ -362,8 +363,11 @@ class Daemon(threading.Thread):
         name: Optional[str] = None,
         a: Optional[Iterable[Any]] = None,
         r: bool = True,
+        ka: Optional[dict[Any, Any]] = None,
     ) -> None:
-        threading.Thread.__init__(self, target=target, name=name, args=a or ())
+        threading.Thread.__init__(
+            self, target=target, name=name, args=a or (), kwargs=ka
+        )
         self.daemon = True
         if r:
             self.start()
@@ -2451,6 +2455,124 @@ def retchk(
         logger(t, color)
     else:
         raise Exception(t)
+
+
+def _runhook(
+    log: "NamedLogger",
+    cmd: str,
+    ap: str,
+    vp: str,
+    host: str,
+    uname: str,
+    ip: str,
+    at: float,
+    sz: int,
+    txt: str,
+) -> bool:
+    chk = False
+    fork = False
+    jtxt = False
+    wait = 0
+    tout = 0
+    kill = "t"
+    cap = 0
+    ocmd = cmd
+    while "," in cmd[:6]:
+        arg, cmd = cmd.split(",", 1)
+        if arg == "c":
+            chk = True
+        elif arg == "f":
+            fork = True
+        elif arg == "j":
+            jtxt = True
+        elif arg.startswith("w"):
+            wait = float(arg[1:])
+        elif arg.startswith("t"):
+            tout = float(arg[1:])
+        elif arg.startswith("c"):
+            cap = int(arg[1:])  # 0=none 1=stdout 2=stderr 3=both
+        elif arg.startswith("k"):
+            kill = arg[1:]  # [t]ree [m]ain [n]one
+        else:
+            t = "hook: invalid flag {} in {}"
+            log(t.format(arg, ocmd))
+
+    env = os.environ.copy()
+    # try:
+    pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    zsl = [str(pypath)] + [str(x) for x in sys.path if x]
+    pypath = str(os.pathsep.join(zsl))
+    env["PYTHONPATH"] = pypath
+    # except: if not E.ox: raise
+
+    ka = {
+        "env": env,
+        "timeout": tout,
+        "kill": kill,
+        "capture": cap,
+    }
+
+    if jtxt:
+        ja = {
+            "ap": ap,
+            "vp": vp,
+            "ip": ip,
+            "host": host,
+            "user": uname,
+            "at": at or time.time(),
+            "sz": sz,
+            "txt": txt,
+        }
+        arg = json.dumps(ja)
+    else:
+        arg = txt or ap
+
+    acmd = [cmd, arg]
+    if cmd.endswith(".py"):
+        acmd = [sys.executable] + acmd
+
+    bcmd = [fsenc(x) for x in acmd]
+
+    t0 = time.time()
+    if fork:
+        Daemon(runcmd, ocmd, [acmd], ka=ka)
+    else:
+        rc, v, err = runcmd(bcmd, **ka)  # type: ignore
+        if chk and rc:
+            retchk(rc, bcmd, err, log, 5)
+            return False
+
+    wait -= time.time() - t0
+    if wait > 0:
+        time.sleep(wait)
+
+    return True
+
+
+def runhook(
+    log: "NamedLogger",
+    cmds: list[str],
+    ap: str,
+    vp: str,
+    host: str,
+    uname: str,
+    ip: str,
+    at: float,
+    sz: int,
+    txt: str,
+) -> bool:
+    vp = vp.replace("\\", "/")
+    for cmd in cmds:
+        try:
+            if not _runhook(log, cmd, ap, vp, host, uname, ip, at, sz, txt):
+                return False
+        except Exception as ex:
+            log("hook: {}".format(ex))
+            if ",c," in "," + cmd:
+                return False
+            break
+
+    return True
 
 
 def gzip_orig_sz(fn: str) -> int:

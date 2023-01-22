@@ -812,7 +812,7 @@ class AuthSrv(object):
         value: Union[str, bool, list[str]],
         is_list: bool,
     ) -> None:
-        if name not in ["mtp"]:
+        if name not in ["mtp", "xbu", "xau", "xbr", "xar", "xbd", "xad", "xm"]:
             flags[name] = value
             return
 
@@ -1151,8 +1151,9 @@ class AuthSrv(object):
             if "mth" not in vol.flags:
                 vol.flags["mth"] = self.args.mth
 
-            # append parsers from argv to volflags
-            self._read_volflag(vol.flags, "mtp", self.args.mtp, True)
+            # append additive args from argv to volflags
+            for name in ["mtp", "xbu", "xau", "xbr", "xar", "xbd", "xad", "xm"]:
+                self._read_volflag(vol.flags, name, getattr(self.args, name), True)
 
             # d2d drops all database features for a volume
             for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"], ["d2d", "e2v"]]:

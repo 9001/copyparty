@@ -14,8 +14,8 @@ from ipaddress import (
     ip_network,
 )
 
-from .__init__ import TYPE_CHECKING
-from .util import MACOS, Netdev, find_prefix, min_ex, spack
+from .__init__ import MACOS, TYPE_CHECKING
+from .util import Netdev, find_prefix, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub

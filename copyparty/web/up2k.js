@@ -2322,9 +2322,10 @@ function up2k_init(subtle) {
                 }
 
                 var err_pend = rsp.indexOf('partial upload exists at a different') + 1,
+                    err_plug = rsp.indexOf('upload blocked by x') + 1,
                     err_dupe = rsp.indexOf('upload rejected, file already exists') + 1;
 
-                if (err_pend || err_dupe) {
+                if (err_pend || err_plug || err_dupe) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
@@ -2431,6 +2432,14 @@ function up2k_init(subtle) {
 
         function orz(xhr) {
             var txt = ((xhr.response && xhr.response.err) || xhr.responseText) + '';
+            if (txt.indexOf('upload blocked by x') + 1) {
+                apop(st.busy.upload, upt);
+                apop(t.postlist, npart);
+                pvis.seth(t.n, 1, "ERROR");
+                pvis.seth(t.n, 2, txt.split(/\n/)[0]);
+                pvis.move(t.n, 'ng');
+                return;
+            }
             if (xhr.status == 200) {
                 pvis.prog(t, npart, cdr - car);
                 st.bytes.finished += cdr - car;
