@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
 """
+DEPRECATED -- replaced by event hooks;
+https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py
+
+---
+
 use copyparty as a file downloader by POSTing URLs as
 application/x-www-form-urlencoded (for example using the
 message/pager function on the website)

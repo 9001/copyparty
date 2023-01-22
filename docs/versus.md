@@ -537,11 +537,11 @@ symbol legend,
 * some of its unique features have been added to copyparty as former linx users have migrated
   * file expiration timers, filename randomization
 * ✅ password-protected files
-  * copyparty: password-protected folders and filekeys are 
+  * copyparty: password-protected folders + filekeys to skip the folder password seem to cover most usecases
 * ✅ file deletion keys
 * ✅ download files as torrents
 * ✅ remote uploads (send a link to the server and it downloads it)
-  * copyparty: available as a [terrible hack](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/wget.py)
+  * copyparty: available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
 * ✅ can use S3 as storage backend; copyparty relies on rclone-mount for that
 
 
