@@ -164,7 +164,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
-    * not affected by cloudflare's max-upload-size (100 MiB)
+    * unaffected by cloudflare's max-upload-size (100 MiB)
   * ☑ stash: simple PUT filedropper
   * ☑ [unpost](#unpost): undo/delete accidental uploads
   * ☑ [self-destruct](#self-destruct) (specified server-side or client-side)
@@ -207,8 +207,7 @@ project goals / philosophy
 
 * inverse linux philosophy -- do all the things, and do an *okay* job
   * quick drop-in service to get a lot of features in a pinch
-  * there are probably [better alternatives](https://github.com/awesome-selfhosted/awesome-selfhosted) if you have specific/long-term needs
-    * but the resumable multithreaded uploads are p slick ngl
+  * check [the alternatives](./docs/versus.md)
 * run anywhere, support everything
   * as many web-browsers and python versions as possible
     * every browser should at least be able to browse, download, upload files
