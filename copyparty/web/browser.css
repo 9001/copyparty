@@ -754,8 +754,9 @@ html.y #files thead th {
 	display: inline;
 }
 #path a {
-	margin: 0 0 0 -.2em;
-	padding: 0 0 0 .4em;
+	padding: 0 .35em;
+	position: relative;
+	z-index: 1;
 	/* ie: */
 	border-bottom: .1em solid #777\9;
 	margin-right: 1em\9;
@@ -763,18 +764,17 @@ html.y #files thead th {
 #path a:first-child {
 	padding-left: .8em;
 }
-#path a:not(:last-child):after {
-	content: '';
+#path i {
 	width: 1.05em;
 	height: 1.05em;
-	margin: -.2em .3em -.2em -.4em;
+	margin: -.5em .15em -.15em -.7em;
 	display: inline-block;
 	border: 1px solid rgba(255,224,192,0.3);
 	border-width: .05em .05em 0 0;
 	transform: rotate(45deg);
 	background: linear-gradient(45deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 75%, rgba(0,0,0,0.35));
 }
-html.y #path a:not(:last-child)::after {
+html.y #path i {
 	background: none;
 	border-color: rgba(0,0,0,0.2);
 	border-width: .1em .1em 0 0;

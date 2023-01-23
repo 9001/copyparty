@@ -142,8 +142,8 @@ symbol legend,
 | ┗ max uploads over time | █ |   |   |   |   |   |   |   |   |   |   |
 | ┗ compress before write | █ |   |   |   |   |   |   |   |   |   |   |
 | ┗ randomize filename    | █ |   |   |   |   |   |   | █ | █ |   |   |
-| ┗ mimetype reject-list  | ╱ |   |   |   |   |   |   |   | • |   |   |
-| ┗ extension reject-list | ╱ |   |   |   |   |   |   | █ | • |   |   |
+| ┗ mimetype reject-list  | ╱ |   |   |   |   |   |   |   | • | ╱ |   |
+| ┗ extension reject-list | ╱ |   |   |   |   |   |   | █ | • | ╱ |   |
 | checksums provided      |   |   |   | █ | █ |   |   |   | █ | ╱ |   |
 | cloud storage backend   | ╱ | ╱ | ╱ | █ | █ | █ | ╱ |   |   | ╱ | █ |
 
@@ -158,8 +158,11 @@ symbol legend,
 * `cloud storage backend` = able to serve files from (and write to) s3 or similar cloud services; `╱` means the software can do this with some help from `rclone mount` as a bridge
 
 * `a`/copyparty can reject uploaded files (based on complex conditions), for example [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py)
-* `j`/filebrowser can provide checksums for single files on request
+* `j`/filebrowser remarks:
+  * can provide checksums for single files on request
+  * can probably do extension/mimetype rejection similar to copyparty
 * `k`/filegator download-as-zip is not streaming; it creates the full zipfile before download can start
+
 
 ## protocols and client support
 
@@ -288,8 +291,8 @@ symbol legend,
 | search by custom parser | █ |   |   |   |   |   |   |   |   |   |   |
 | find local file         | █ |   |   |   |   |   |   |   |   |   |   |
 | undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |
-| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ |   | █ |
-| image viewer            | █ |   |   | █ | █ |   |   |   | █ |   | █ |
+| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ | █ | █ |
+| image viewer            | █ |   |   | █ | █ |   |   |   | █ | █ | █ |
 | markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |
 | markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |
 | readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |
@@ -469,10 +472,13 @@ symbol legend,
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ⚠️ http only; no webdav / ftp / zeroconf
 * ⚠️ doesn't support crazy filenames
+* ⚠️ no directory tree nav
 * ⚠️ limited file search
 * ✅ settings gui
 * ✅ good ui/ux
   * ⚠️ but no directory tree for navigation
+* ✅ user signup
+* ✅ command runner / remote shell
 * supposed to have write-only folders but couldn't get it to work
 
 ## [filegator](https://github.com/filegator/filegator)

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-for f in README.md docs/devnotes.md; do
+for f in README.md docs/devnotes.md docs/versus.md; do
 
 cat $f | awk '
     function pr() {
@@ -20,6 +20,8 @@ cat $f | awk '
     /^#/{
         lv=length($1);
         sub(/[^ ]+ /,"");
+        sub(/\[/,"");
+        sub(/\]\([^)]+\)/,"");
         bab=$0;
         gsub(/ /,"-",bab);
         gsub(/\./,"",bab);
@@ -31,9 +33,9 @@ cat $f | awk '
     {pr()}
 ' > toc
 
-grep -E '^#+ [^ ]+ toc$' -B1000 -A2 <$f >p1
+grep -E '^#+ *[^ ]+ toc$' -B1000 -A2 <$f >p1
 
-h2="$(awk '/^#+ [^ ]+ toc$/{o=1;next} o&&/^#/{print;exit}' <$f)"
+h2="$(awk '/^#+ *[^ ]+ toc$/{o=1;next} o&&/^#/{print;exit}' <$f)"
 
 grep -F "$h2" -B2 -A999999 <$f >p2
 

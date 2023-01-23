@@ -6903,18 +6903,19 @@ function reload_browser() {
 	filecols.set_style();
 
 	var parts = get_evpath().split('/'),
-		rm = QSA('#path>a+a+a'),
+		rm = ebi('entree'),
 		ftab = ebi('files'),
-		link = '/', o;
+		link = '', o;
 
-	for (a = rm.length - 1; a >= 0; a--)
-		rm[a].parentNode.removeChild(rm[a]);
+	while (rm.nextSibling)
+		rm.parentNode.removeChild(rm.nextSibling);
 
-	for (var a = 1; a < parts.length - 1; a++) {
+	for (var a = 0; a < parts.length - 1; a++) {
 		link += parts[a] + '/';
 		o = mknod('a');
 		o.setAttribute('href', link);
-		o.textContent = uricom_dec(parts[a]);
+		o.textContent = uricom_dec(parts[a]) || '/';
+		ebi('path').appendChild(mknod('i'));
 		ebi('path').appendChild(o);
 	}
 
