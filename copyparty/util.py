@@ -1555,14 +1555,16 @@ def gen_filekey_dbg(
     return ret
 
 
-def gencookie(k: str, v: str, dur: Optional[int]) -> str:
+def gencookie(k: str, v: str, r: str, tls: bool, dur: Optional[int]) -> str:
     v = v.replace(";", "")
     if dur:
         exp = formatdate(time.time() + dur, usegmt=True)
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
-    return "{}={}; Path=/; Expires={}; SameSite=Lax".format(k, v, exp)
+    return "{}={}; Path=/{}; Expires={}; HttpOnly{}; SameSite=Lax".format(
+        k, v, r, exp, "; Secure" if tls else ""
+    )
 
 
 def humansize(sz: float, terse: bool = False) -> str:

@@ -129,7 +129,6 @@ class HttpCli(object):
         self.host = " "
         self.ua = " "
         self.is_rclone = False
-        self.is_ancient = False
         self.ouparam: dict[str, str] = {}
         self.uparam: dict[str, str] = {}
         self.cookies: dict[str, str] = {}
@@ -254,7 +253,6 @@ class HttpCli(object):
 
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
-        self.is_ancient = self.ua.startswith("Mozilla/4.")
 
         zs = self.headers.get("connection", "").lower()
         self.keepalive = "close" not in zs and (
@@ -300,7 +298,10 @@ class HttpCli(object):
                 else:
                     self.keepalive = False
 
-        if self.args.ihead:
+        ptn: Optional[Pattern[str]] = self.conn.lf_url  # mypy404
+        self.do_log = not ptn or not ptn.search(self.req)
+
+        if self.args.ihead and self.do_log:
             keys = self.args.ihead
             if "*" in keys:
                 keys = list(sorted(self.headers.keys()))
@@ -345,7 +346,7 @@ class HttpCli(object):
         if zso:
             zsll = [x.split("=", 1) for x in zso.split(";") if "=" in x]
             cookies = {k.strip(): unescape_cookie(zs) for k, zs in zsll}
-            for kc, ku in [["cppwd", "pw"], ["b", "b"]]:
+            for kc, ku in (("cppws", "pw"), ("cppwd", "pw"), ("b", "b")):
                 if kc in cookies and ku not in uparam:
                     uparam[ku] = cookies[kc]
         else:
@@ -390,15 +391,12 @@ class HttpCli(object):
         self.upvol = self.asrv.vfs.apget[self.uname]
 
         if self.pw:
-            self.out_headerlist.append(("Set-Cookie", self.get_pwd_cookie(self.pw)[0]))
+            self.get_pwd_cookie(self.pw)
 
         if self.is_rclone:
             uparam["dots"] = ""
             uparam["b"] = ""
             cookies["b"] = ""
-
-        ptn: Optional[Pattern[str]] = self.conn.lf_url  # mypy404
-        self.do_log = not ptn or not ptn.search(self.req)
 
         (
             self.can_read,
@@ -1850,19 +1848,19 @@ class HttpCli(object):
         self.out_headerlist = [
             x
             for x in self.out_headerlist
-            if x[0] != "Set-Cookie" or "cppwd=" not in x[1]
+            if x[0] != "Set-Cookie" or "cppwd" != x[1][:5]
         ]
 
         dst = self.args.SRS
         if self.vpath:
             dst += quotep(self.vpath)
 
-        ck, msg = self.get_pwd_cookie(pwd)
+        msg = self.get_pwd_cookie(pwd)
         html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
-        self.reply(html.encode("utf-8"), headers={"Set-Cookie": ck})
+        self.reply(html.encode("utf-8"))
         return True
 
-    def get_pwd_cookie(self, pwd: str) -> tuple[str, str]:
+    def get_pwd_cookie(self, pwd: str) -> str:
         if pwd in self.asrv.iacct:
             msg = "login ok"
             dur = int(60 * 60 * self.args.logout)
@@ -1879,11 +1877,18 @@ class HttpCli(object):
             pwd = "x"  # nosec
             dur = None
 
-        r = gencookie("cppwd", pwd, dur)
-        if self.is_ancient:
-            r = r.rsplit(" ", 1)[0]
+        if pwd == "x":
+            # reset both plaintext and tls
+            # (only affects active tls cookies when tls)
+            for k in ("cppwd", "cppws") if self.tls else ("cppwd",):
+                ck = gencookie(k, pwd, self.args.R, False, dur)
+                self.out_headerlist.append(("Set-Cookie", ck))
+        else:
+            k = "cppws" if self.tls else "cppwd"
+            ck = gencookie(k, pwd, self.args.R, self.tls, dur)
+            self.out_headerlist.append(("Set-Cookie", ck))
 
-        return r, msg
+        return msg
 
     def handle_mkdir(self) -> bool:
         assert self.parser
@@ -2802,21 +2807,22 @@ class HttpCli(object):
         return True
 
     def set_k304(self) -> bool:
-        ck = gencookie("k304", self.uparam["k304"], 60 * 60 * 24 * 299)
+        ck = gencookie("k304", self.uparam["k304"], self.args.R, False, 86400 * 299)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.redirect("", "?h#cc")
         return True
 
     def set_am_js(self) -> bool:
         v = "n" if self.uparam["am_js"] == "n" else "y"
-        ck = gencookie("js", v, 60 * 60 * 24 * 299)
+        ck = gencookie("js", v, self.args.R, False, 86400 * 299)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.reply(b"promoted\n")
         return True
 
     def set_cfg_reset(self) -> bool:
-        for k in ("k304", "js", "cppwd"):
-            self.out_headerlist.append(("Set-Cookie", gencookie(k, "x", None)))
+        for k in ("k304", "js", "cppwd", "cppws"):
+            cookie = gencookie(k, "x", self.args.R, False, None)
+            self.out_headerlist.append(("Set-Cookie", cookie))
 
         self.redirect("", "?h#cc")
         return True
