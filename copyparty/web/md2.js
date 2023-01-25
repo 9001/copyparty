@@ -930,7 +930,9 @@ var set_lno = (function () {
 (function () {
     function keydown(ev) {
         ev = ev || window.event;
-        var kc = ev.code || ev.keyCode || ev.which;
+        var kc = ev.code || ev.keyCode || ev.which,
+            editing = document.activeElement == dom_src;
+
         //console.log(ev.key, ev.code, ev.keyCode, ev.which);
         if (ctrl(ev) && (ev.code == "KeyS" || kc == 83)) {
             save();
@@ -941,12 +943,17 @@ var set_lno = (function () {
             if (d)
                 d.click();
         }
-        if (document.activeElement != dom_src)
-            return true;
-
-        set_lno();
+        if (editing)
+            set_lno();
 
         if (ctrl(ev)) {
+            if (ev.code == "KeyE") {
+                dom_nsbs.click();
+                return false;
+            }
+            if (!editing)
+                return true;
+
             if (ev.code == "KeyH" || kc == 72) {
                 md_header(ev.shiftKey);
                 return false;
@@ -971,10 +978,6 @@ var set_lno = (function () {
                 iter_uni();
                 return false;
             }
-            if (ev.code == "KeyE") {
-                dom_nsbs.click();
-                return false;
-            }
             var up = ev.code == "ArrowUp" || kc == 38;
             var dn = ev.code == "ArrowDown" || kc == 40;
             if (up || dn) {
@@ -987,6 +990,9 @@ var set_lno = (function () {
             }
         }
         else {
+            if (!editing)
+                return true;
+
             if (ev.code == "Tab" || kc == 9) {
                 md_indent(ev.shiftKey);
                 return false;
