@@ -1152,8 +1152,31 @@ class AuthSrv(object):
                 vol.flags["mth"] = self.args.mth
 
             # append additive args from argv to volflags
-            for name in ["mtp", "xbu", "xau", "xbr", "xar", "xbd", "xad", "xm"]:
+            hooks = "xbu xau xbr xar xbd xad xm".split()
+            for name in ["mtp"] + hooks:
                 self._read_volflag(vol.flags, name, getattr(self.args, name), True)
+
+            for hn in hooks:
+                cmds = vol.flags.get(hn)
+                if not cmds:
+                    continue
+
+                ncmds = []
+                for cmd in cmds:
+                    hfs = []
+                    ocmd = cmd
+                    while "," in cmd[:6]:
+                        zs, cmd = cmd.split(",", 1)
+                        hfs.append(zs)
+
+                    if "c" in hfs and "f" in hfs:
+                        t = "cannot combine flags c and f; removing f from eventhook [{}]"
+                        self.log(t.format(ocmd), 1)
+                        hfs = [x for x in hfs if x != "f"]
+                        ocmd = ",".join(hfs + [cmd])
+
+                    ncmds.append(ocmd)
+                vol.flags[hn] = ncmds
 
             # d2d drops all database features for a volume
             for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"], ["d2d", "e2v"]]:

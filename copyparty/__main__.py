@@ -578,19 +578,26 @@ def get_sects():
             each command will execute in order unless one returns non-zero
 
             optionally prefix the command with comma-sep. flags similar to -mtp:
+
              \033[36mf\033[35m forks the process, doesn't wait for completion
              \033[36mc\033[35m checks return code, blocks the action if non-zero
              \033[36mj\033[35m provides json with info as 1st arg instead of filepath
              \033[36mwN\033[35m waits N sec after command has been started before continuing
              \033[36mtN\033[35m sets an N sec timeout before the command is abandoned
+
              \033[36mkt\033[35m kills the entire process tree on timeout (default),
              \033[36mkm\033[35m kills just the main process
              \033[36mkn\033[35m lets it continue running until copyparty is terminated
+
              \033[36mc0\033[35m show all process output (default)
              \033[36mc1\033[35m show only stderr
              \033[36mc2\033[35m show only stdout
              \033[36mc3\033[35m mute all process otput
-            \033[0m"""
+            \033[0m
+            except for \033[36mxm\033[0m, only one hook / one action can run at a time,
+            so it's recommended to use the \033[36mf\033[0m flag unless you really need
+            to wait for the hook to finish before continuing (without \033[36mf\033[0m
+            the upload speed can easily drop to 10% for small files)"""
             ),
         ],
         [

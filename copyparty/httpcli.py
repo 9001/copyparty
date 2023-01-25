@@ -1329,6 +1329,8 @@ class HttpCli(object):
         if rnd and not self.args.nw:
             fn = self.rand_name(fdir, fn, rnd)
 
+        path = os.path.join(fdir, fn)
+
         if is_put and not self.args.no_dav:
             # allow overwrite if...
             #  * volflag 'daw' is set
@@ -1337,7 +1339,6 @@ class HttpCli(object):
             #  * file exists and is empty
             #  * and there is no .PARTIAL
 
-            path = os.path.join(fdir, fn)
             tnam = fn + ".PARTIAL"
             if self.args.dotpart:
                 tnam = "." + tnam
