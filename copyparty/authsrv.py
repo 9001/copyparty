@@ -1121,6 +1121,9 @@ class AuthSrv(object):
             for ga, vf in (
                 ("no_forget", "noforget"),
                 ("no_dupe", "nodupe"),
+                ("hardlink", "hardlink"),
+                ("never_symlink", "neversymlink"),
+                ("no_dedup", "copydupes"),
                 ("magic", "magic"),
                 ("xlink", "xlink"),
             ):
@@ -1216,6 +1219,9 @@ class AuthSrv(object):
                 t = 'removing lifetime config from volume "/{}" because e2d is disabled'
                 self.log(t.format(vol.vpath), 1)
                 del vol.flags["lifetime"]
+
+            if vol.flags.get("neversymlink") and not vol.flags.get("hardlink"):
+                vol.flags["copydupes"] = True
 
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}

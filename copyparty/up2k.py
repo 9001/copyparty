@@ -2159,7 +2159,8 @@ class Up2k(object):
                         if not self.args.nw:
                             bos.unlink(dst)  # TODO ed pls
                             try:
-                                self._symlink(src, dst, lmod=cj["lmod"])
+                                dst_flags = self.flags[job["ptop"]]
+                                self._symlink(src, dst, dst_flags, lmod=cj["lmod"])
                             except:
                                 if not n4g:
                                     raise
@@ -2257,7 +2258,12 @@ class Up2k(object):
             return zfw["orz"][1]
 
     def _symlink(
-        self, src: str, dst: str, verbose: bool = True, lmod: float = 0
+        self,
+        src: str,
+        dst: str,
+        flags: dict[str, Any],
+        verbose: bool = True,
+        lmod: float = 0,
     ) -> None:
         if verbose:
             self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
@@ -2267,7 +2273,7 @@ class Up2k(object):
 
         linked = False
         try:
-            if self.args.no_dedup:
+            if "copydupes" in flags:
                 raise Exception("disabled in config")
 
             lsrc = src
@@ -2297,12 +2303,12 @@ class Up2k(object):
                 ldst = ldst.replace("/", "\\")
 
             try:
-                if self.args.hardlink:
+                if "hardlink" in flags:
                     os.link(fsenc(src), fsenc(dst))
                     linked = True
             except Exception as ex:
                 self.log("cannot hardlink: " + repr(ex))
-                if self.args.never_symlink:
+                if "neversymlink" in flags:
                     raise Exception("symlink-fallback disabled in cfg")
 
             if not linked:
@@ -2485,7 +2491,7 @@ class Up2k(object):
             if os.path.exists(d2):
                 continue
 
-            self._symlink(dst, d2, lmod=lmod)
+            self._symlink(dst, d2, self.flags[ptop], lmod=lmod)
             if cur:
                 self.db_rm(cur, rd, fn)
                 self.db_add(cur, wark, rd, fn, *z2[-4:])
@@ -2790,7 +2796,7 @@ class Up2k(object):
             self.log(t.format(sabs, dabs, dlabs))
             mt = bos.path.getmtime(sabs, False)
             bos.unlink(sabs)
-            self._symlink(dlabs, dabs, False, lmod=mt)
+            self._symlink(dlabs, dabs, dvn.flags, False, lmod=mt)
 
             # folders are too scary, schedule rescan of both vols
             self.need_rescan.add(svn.vpath)
@@ -2972,14 +2978,14 @@ class Up2k(object):
             bos.unlink(slabs)
             bos.rename(sabs, slabs)
             bos.utime(slabs, (int(time.time()), int(mt)), False)
-            self._symlink(slabs, sabs, False)
+            self._symlink(slabs, sabs, self.flags.get(ptop) or {}, False)
             full[slabs] = (ptop, rem)
             sabs = slabs
 
         if not dabs:
             dabs = list(sorted(full.keys()))[0]
 
-        for alink in links:
+        for alink, parts in links.items():
             lmod = None
             try:
                 if alink != sabs and absreal(alink) != sabs:
@@ -2991,7 +2997,8 @@ class Up2k(object):
             except:
                 pass
 
-            self._symlink(dabs, alink, False, lmod=lmod or 0)
+            flags = self.flags.get(parts[0]) or {}
+            self._symlink(dabs, alink, flags, False, lmod=lmod or 0)
 
         return len(full) + len(links)
 

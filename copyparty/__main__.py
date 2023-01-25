@@ -498,6 +498,9 @@ def get_sects():
 
             \033[0muploads, general:
               \033[36mnodupe\033[35m rejects existing files (instead of symlinking them)
+              \033[36mhardlink\033[35m does dedup with hardlinks instead of symlinks
+              \033[36mneversymlink\033[35m disables symlink fallback; full copy instead
+              \033[36mcopydupes\033[35m disables dedup, always saves full copies of dupes
               \033[36mnosub\033[35m forces all uploads into the top folder of the vfs
               \033[36mmagic$\033[35m enables filetype detection for nameless uploads
               \033[36mgz\033[35m allows server-side gzip of uploads with ?gz (also c,xz)
@@ -695,9 +698,9 @@ def add_upload(ap):
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without -e2d; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload (very slow on windows)")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even when it might be dangerous (multiprocessing, filesystems lacking sparse-files support, ...)")
-    ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem)")
-    ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made")
-    ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead")
+    ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem) (volflag=hardlink)")
+    ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=neversymlink)")
+    ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead (volflag=copydupes")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-snap", action="store_true", help="disable snapshots -- forget unfinished uploads on shutdown; don't create .hist/up2k.snap files -- abandoned/interrupted uploads must be cleaned up manually")
     ap2.add_argument("--magic", action="store_true", help="enable filetype detection on nameless uploads (volflag=magic)")

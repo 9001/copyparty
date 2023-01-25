@@ -151,9 +151,6 @@ class SvcHub(object):
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
 
-        if not args.hardlink and args.never_symlink:
-            args.no_dedup = True
-
         if args.log_fk:
             args.log_fk = re.compile(args.log_fk)
 
