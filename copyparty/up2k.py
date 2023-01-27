@@ -442,6 +442,7 @@ class Up2k(object):
             # only need to protect register_vpath but all in one go feels right
             for vol in vols:
                 try:
+                    bos.makedirs(vol.realpath)  # gonna happen at snap anyways
                     bos.listdir(vol.realpath)
                 except:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
@@ -1494,6 +1495,10 @@ class Up2k(object):
         t0 = time.time()
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
+                if ptop not in self.entags:
+                    t = "skipping mtp for unavailable volume {}"
+                    self.log(t.format(ptop), 1)
+                    continue
                 self._run_one_mtp(ptop, gid)
 
         td = time.time() - t0
@@ -3307,7 +3312,7 @@ class Up2k(object):
                     continue
 
                 # TODO is undef if vol 404 on startup
-                entags = self.entags[ptop]
+                entags = self.entags.get(ptop)
                 if not entags:
                     self.log("no entags okay.jpg", c=3)
                     continue
