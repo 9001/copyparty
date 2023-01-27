@@ -75,8 +75,8 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
-    * [event hooks](#event-hooks) - trigger a script/program on uploads, renames etc
-        * [upload events](#upload-events) - the older, more powerful approach
+    * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
+        * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
@@ -997,7 +997,7 @@ if something doesn't work, try `--mtag-v` for verbose error messages
 
 ## event hooks
 
-trigger a script/program on uploads, renames etc
+trigger a program on uploads, renames etc ([examples](./bin/hooks/))
 
 you can set hooks before and/or after an event happens, and currently you can hook uploads, moves/renames, and deletes
 
@@ -1006,7 +1006,7 @@ there's a bunch of flags and stuff, see `--help-hooks`
 
 ### upload events
 
-the older, more powerful approach:
+the older, more powerful approach ([examples](./bin/mtag/)):
 
 ```
 -v /mnt/inc:inc:w:c,mte=+x1:c,mtp=x1=ad,kn,/usr/bin/notify-send

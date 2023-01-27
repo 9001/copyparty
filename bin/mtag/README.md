@@ -1,5 +1,9 @@
 standalone programs which take an audio file as argument
 
+you may want to forget about all this fancy complicated stuff and just use [event hooks](../hooks/) instead (which doesn't need `-e2ts` or ffmpeg) 
+
+----
+
 **NOTE:** these all require `-e2ts` to be functional, meaning you need to do at least one of these: `apt install ffmpeg` or `pip3 install mutagen`
 
 some of these rely on libraries which are not MIT-compatible
@@ -17,6 +21,7 @@ these do not have any problematic dependencies at all:
 * [cksum.py](./cksum.py) computes various checksums
 * [exe.py](./exe.py) grabs metadata from .exe and .dll files (example for retrieving multiple tags with one parser)
 * [wget.py](./wget.py) lets you download files by POSTing URLs to copyparty
+  * also available as an [event hook](../hooks/wget.py)
 
 
 # dependencies
