@@ -2378,8 +2378,17 @@ class HttpCli(object):
                 if stat.S_ISDIR(st.st_mode):
                     continue
 
+                if stat.S_ISBLK(st.st_mode):
+                    fd = bos.open(fs_path, os.O_RDONLY)
+                    try:
+                        sz = os.lseek(fd, 0, os.SEEK_END)
+                    finally:
+                        os.close(fd)
+                else:
+                    sz = st.st_size
+
                 file_ts = max(file_ts, int(st.st_mtime))
-                editions[ext or "plain"] = (fs_path, st.st_size)
+                editions[ext or "plain"] = (fs_path, sz)
             except:
                 pass
             if not self.vpath.startswith(".cpr/"):
