@@ -5187,8 +5187,8 @@ var treectl = (function () {
 
 	function rendertree(res, ts, top0, dst, rst) {
 		var cur = ebi('treeul').getAttribute('ts');
-		if (cur && parseInt(cur) > ts && QS('#treeul>li>a+a')) {
-			console.log("reject tree");
+		if (cur && parseInt(cur) > ts + 20 && QS('#treeul>li>a+a')) {
+			console.log("reject tree; " + cur + " / " + (ts - cur));
 			return;
 		}
 		ebi('treeul').setAttribute('ts', ts);
