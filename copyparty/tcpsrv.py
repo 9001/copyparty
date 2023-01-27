@@ -313,7 +313,17 @@ class TcpSrv(object):
             if not netdevs:
                 continue
 
-            self.log("tcpsrv", "network change detected", 3)
+            added = "nothing"
+            removed = "nothing"
+            for k, v in netdevs.items():
+                if k not in self.netdevs:
+                    added = "{} = {}".format(k, v)
+            for k, v in self.netdevs.items():
+                if k not in netdevs:
+                    removed = "{} = {}".format(k, v)
+
+            t = "network change detected:\n  added {}\nremoved {}"
+            self.log("tcpsrv", t.format(added, removed), 3)
             self.netdevs = netdevs
             self._distribute_netdevs()
 
