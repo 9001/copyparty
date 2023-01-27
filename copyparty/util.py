@@ -1193,7 +1193,7 @@ def ren_open(
             else:
                 fpath = fname
 
-            if suffix and os.path.exists(fsenc(fpath)):
+            if suffix and os.path.lexists(fsenc(fpath)):
                 fpath += suffix
                 fname += suffix
                 ext += suffix
