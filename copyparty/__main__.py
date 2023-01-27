@@ -229,9 +229,10 @@ def get_srvname() -> str:
             ret = f.read().decode("utf-8", "replace").strip()
     except:
         ret = ""
-        while len(ret) < 7:
+        namelen = 5
+        while len(ret) < namelen:
             ret += base64.b32encode(os.urandom(4))[:7].decode("utf-8").lower()
-            ret = re.sub("[234567=]", "", ret)[:7]
+            ret = re.sub("[234567=]", "", ret)[:namelen]
         with open(fp, "wb") as f:
             f.write(ret.encode("utf-8") + b"\n")
 
