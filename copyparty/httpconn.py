@@ -65,6 +65,7 @@ class HttpConn(object):
         self.ico: Ico = Ico(self.args)  # mypy404
 
         self.t0: float = time.time()  # mypy404
+        self.freshen_pwd: float = 0.0
         self.stopping = False
         self.nreq: int = -1  # mypy404
         self.nbyte: int = 0  # mypy404

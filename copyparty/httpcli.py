@@ -157,7 +157,7 @@ class HttpCli(object):
         self.trailing_slash = True
         self.out_headerlist: list[tuple[str, str]] = []
         self.out_headers = {
-            "Access-Control-Allow-Origin": "*",
+            "Vary": "Origin, PW, Cookie",
             "Cache-Control": "no-store; max-age=0",
         }
         h = self.args.html_head
@@ -346,11 +346,12 @@ class HttpCli(object):
         if zso:
             zsll = [x.split("=", 1) for x in zso.split(";") if "=" in x]
             cookies = {k.strip(): unescape_cookie(zs) for k, zs in zsll}
-            for kc, ku in (("cppws", "pw"), ("cppwd", "pw"), ("b", "b")):
-                if kc in cookies and ku not in uparam:
-                    uparam[ku] = cookies[kc]
+            cookie_pw = cookies.get("cppws") or cookies.get("cppwd")
+            if "b" in cookies and "b" not in uparam:
+                uparam["b"] = cookies["b"]
         else:
             cookies = {}
+            cookie_pw = ""
 
         if len(uparam) > 10 or len(cookies) > 50:
             raise Pebkac(400, "u wot m8")
@@ -363,25 +364,24 @@ class HttpCli(object):
         if ANYWIN:
             ok = ok and not relchk(self.vpath)
 
-        if not ok:
+        if not ok and (self.vpath != "*" or self.mode != "OPTIONS"):
             self.log("invalid relpath [{}]".format(self.vpath))
             return self.tx_404() and self.keepalive
 
-        pwd = ""
         zso = self.headers.get("authorization")
+        bauth = ""
         if zso:
             try:
                 zb = zso.split(" ")[1].encode("ascii")
                 zs = base64.b64decode(zb).decode("utf-8")
                 # try "pwd", "x:pwd", "pwd:x"
-                for zs in [zs] + zs.split(":", 1)[::-1]:
-                    if self.asrv.iacct.get(zs):
-                        pwd = zs
+                for bauth in [zs] + zs.split(":", 1)[::-1]:
+                    if self.asrv.iacct.get(bauth):
                         break
             except:
                 pass
 
-        self.pw = uparam.get("pw") or pwd
+        self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw
         self.uname = self.asrv.iacct.get(self.pw) or "*"
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
@@ -390,7 +390,10 @@ class HttpCli(object):
         self.gvol = self.asrv.vfs.aget[self.uname]
         self.upvol = self.asrv.vfs.apget[self.uname]
 
-        if self.pw:
+        if self.pw and (
+            self.pw != cookie_pw or self.conn.freshen_pwd + 30 < time.time()
+        ):
+            self.conn.freshen_pwd = time.time()
             self.get_pwd_cookie(self.pw)
 
         if self.is_rclone:
@@ -408,15 +411,22 @@ class HttpCli(object):
         ) = self.asrv.vfs.can_access(self.vpath, self.uname)
 
         try:
-            # getattr(self.mode) is not yet faster than this
-            if self.mode in ["GET", "HEAD"]:
+            cors_k = self._cors()
+            if self.mode in ("GET", "HEAD"):
                 return self.handle_get() and self.keepalive
-            elif self.mode == "POST":
+            if self.mode == "OPTIONS":
+                return self.handle_options() and self.keepalive
+
+            if not cors_k:
+                origin = self.headers.get("origin", "<?>")
+                self.log("cors-reject {} from {}".format(self.mode, origin), 3)
+                raise Pebkac(403, "no surfing")
+
+            # getattr(self.mode) is not yet faster than this
+            if self.mode == "POST":
                 return self.handle_post() and self.keepalive
             elif self.mode == "PUT":
                 return self.handle_put() and self.keepalive
-            elif self.mode == "OPTIONS":
-                return self.handle_options() and self.keepalive
             elif self.mode == "PROPFIND":
                 return self.handle_propfind() and self.keepalive
             elif self.mode == "DELETE":
@@ -634,6 +644,60 @@ class HttpCli(object):
             self.reply(html, status=status)
 
         return True
+
+    def _cors(self) -> bool:
+        ih = self.headers
+        origin = ih.get("origin")
+        if not origin:
+            return True
+
+        oh = self.out_headers
+        origin = re.sub(r"(:[0-9]{1,5})?/?$", "", origin.lower())
+        methods = ", ".join(self.conn.hsrv.mallow)
+        good_origins = self.args.acao + [
+            "{}://{}".format(
+                "https" if self.is_https else "http",
+                self.host.lower().split(":")[0],
+            )
+        ]
+        if origin in good_origins:
+            good_origin = True
+            bad_hdrs = ("",)
+        else:
+            good_origin = False
+            bad_hdrs = ("", "pw")
+
+        # '*' blocks all credentials (cookies, http-auth);
+        # exact-match for Origin is necessary to unlock those,
+        # however yolo-requests (?pw=) are always allowed
+        acah = ih.get("access-control-request-headers", "")
+        acao = (origin if good_origin else None) or (
+            "*" if "*" in good_origins else None
+        )
+        if self.args.allow_csrf:
+            acao = origin or acao or "*"  # explicitly permit impersonation
+            acam = ", ".join(methods)  # and all methods + headers
+            oh["Access-Control-Allow-Credentials"] = "true"
+            good_origin = True
+        else:
+            acam = ", ".join(self.args.acam)
+            # wash client-requested headers and roll with that
+            if "range" not in acah.lower():
+                acah += ",Range"  # firefox
+            req_h = acah.split(",")
+            req_h = [x.strip() for x in req_h]
+            req_h = [x for x in req_h if x.lower() not in bad_hdrs]
+            acah = ", ".join(req_h)
+
+        if not acao:
+            return False
+
+        oh["Access-Control-Allow-Origin"] = acao
+        oh["Access-Control-Allow-Methods"] = acam.upper()
+        if acah:
+            oh["Access-Control-Allow-Headers"] = acah
+
+        return good_origin
 
     def handle_get(self) -> bool:
         if self.do_log:
@@ -1088,26 +1152,16 @@ class HttpCli(object):
         if self.do_log:
             self.log("OPTIONS " + self.req)
 
-        ret = {
-            "Allow": "GET, HEAD, POST, PUT, OPTIONS",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "*",
-            "Access-Control-Allow-Headers": "*",
-        }
-
-        wd = {
-            "Dav": "1, 2",
-            "Ms-Author-Via": "DAV",
-        }
+        oh = self.out_headers
+        oh["Allow"] = ", ".join(self.conn.hsrv.mallow)
 
         if not self.args.no_dav:
             # PROPPATCH, LOCK, UNLOCK, COPY: noop (spec-must)
-            zs = ", PROPFIND, PROPPATCH, LOCK, UNLOCK, MKCOL, COPY, MOVE, DELETE"
-            ret["Allow"] += zs
-            ret.update(wd)
+            oh["Dav"] = "1, 2"
+            oh["Ms-Author-Via"] = "DAV"
 
         # winxp-webdav doesnt know what 204 is
-        self.send_headers(0, 200, headers=ret)
+        self.send_headers(0, 200)
         return True
 
     def handle_delete(self) -> bool:

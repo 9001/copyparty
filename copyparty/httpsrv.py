@@ -109,6 +109,11 @@ class HttpSrv(object):
         zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
         self.prism = os.path.exists(zs)
 
+        self.mallow = "GET HEAD POST PUT DELETE OPTIONS".split()
+        if not self.args.no_dav:
+            zs = "PROPFIND PROPPATCH LOCK UNLOCK MKCOL COPY MOVE"
+            self.mallow += zs.split()
+
         if self.args.zs:
             from .ssdp import SSDPr
 

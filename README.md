@@ -88,6 +88,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [client-side](#client-side) - when uploading files
 * [security](#security) - some notes on hardening
     * [gotchas](#gotchas) - behavior that might be unexpected
+    * [cors](#cors) - cross-site request config
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
         * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
@@ -1147,11 +1148,11 @@ interact with copyparty using non-browser clients
 * curl/wget: upload some files (post=file, chunk=stdin)
   * `post(){ curl -F act=bput -F f=@"$1" http://127.0.0.1:3923/?pw=wark;}`  
     `post movie.mkv`
-  * `post(){ curl -b cppwd=wark -H rand:8 -T "$1" http://127.0.0.1:3923/;}`  
+  * `post(){ curl -H pw:wark -H rand:8 -T "$1" http://127.0.0.1:3923/;}`  
     `post movie.mkv`
-  * `post(){ wget --header='Cookie: cppwd=wark' --post-file="$1" -O- http://127.0.0.1:3923/?raw;}`  
+  * `post(){ wget --header='pw: wark' --post-file="$1" -O- http://127.0.0.1:3923/?raw;}`  
     `post movie.mkv`
-  * `chunk(){ curl -b cppwd=wark -T- http://127.0.0.1:3923/;}`  
+  * `chunk(){ curl -H pw:wark -T- http://127.0.0.1:3923/;}`  
     `chunk <movie.mkv`
 
 * bash: when curl and wget is not available or too boring
@@ -1175,7 +1176,7 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
     b512 <movie.mkv
 
-you can provide passwords using cookie `cppwd=hunter2`, as a url-param `?pw=hunter2`, or with basic-authentication (either as the username or password)
+you can provide passwords using header `PW: hunter2`, cookie `cppwd=hunter2`, url-param `?pw=hunter2`, or with basic-authentication (either as the username or password)
 
 NOTE: curl will not send the original filename if you use `-T` combined with url-params! Also, make sure to always leave a trailing slash in URLs unless you want to override the filename
 
@@ -1236,6 +1237,11 @@ when uploading files,
 
 some notes on hardening
 
+* set `--rproxy 0` if your copyparty is directly facing the internet (not through a reverse-proxy)
+  * cors doesn't work right otherwise
+
+safety profiles:
+
 * option `-s` is a shortcut to set the following options:
   * `--no-thumb` disables thumbnails and audio transcoding to stop copyparty from running `FFmpeg`/`Pillow`/`VIPS` on uploaded files, which is a [good idea](https://www.cvedetails.com/vulnerability-list.php?vendor_id=3611) if anonymous upload is enabled
   * `--no-mtag-ff` uses `mutagen` to grab music tags instead of `FFmpeg`, which is safer and faster but less accurate
@@ -1269,6 +1275,20 @@ other misc notes:
 behavior that might be unexpected
 
 * users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
+* anyone with write access can upload a `README.md` with a `<script>` which runs for all visitors unless `--no-readme`
+* anyone with move access can rename `some.html` to `.epilogue.html` so it'll run for all visitors unless either `--no-logues` or `--no-dot-ren`
+
+
+## cors
+
+cross-site request config
+
+by default, except for `GET` and `HEAD` operations, all requests must either:
+* not contain an `Origin` header at all
+* or have an `Origin` matching the server domain
+* or the header `PW` with your password as value
+
+cors can be configured with `--acao` and `--acam`, or the protections entirely disabled with `--allow-csrf`
 
 
 # recovering from crashes

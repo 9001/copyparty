@@ -294,10 +294,23 @@ class SvcHub(object):
         al.zs_on = al.zs_on or al.z_on
         al.zm_off = al.zm_off or al.z_off
         al.zs_off = al.zs_off or al.z_off
-        for n in ("zm_on", "zm_off", "zs_on", "zs_off"):
+        ns = "zm_on zm_off zs_on zs_off acao acam"
+        for n in ns.split(" "):
             vs = getattr(al, n).split(",")
             vs = [x.strip() for x in vs]
             vs = [x for x in vs if x]
+            setattr(al, n, vs)
+
+        ns = "acao acam"
+        for n in ns.split(" "):
+            vs = getattr(al, n)
+            vd = {zs: 1 for zs in vs}
+            setattr(al, n, vd)
+
+        ns = "acao"
+        for n in ns.split(" "):
+            vs = getattr(al, n)
+            vs = [x.lower() for x in vs]
             setattr(al, n, vs)
 
         R = al.rp_loc
