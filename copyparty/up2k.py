@@ -2825,21 +2825,6 @@ class Up2k(object):
             ftime = ftime_
             fsize = fsize_ or 0
 
-        if w:
-            assert c1
-            if c2 and c2 != c1:
-                self._copy_tags(c1, c2, w)
-
-            self._forget_file(svn.realpath, srem, c1, w, c1 != c2)
-            self._relink(w, svn.realpath, srem, dabs)
-            curs.add(c1)
-
-            if c2:
-                self.db_add(c2, w, drd, dfn, ftime, fsize, ip or "", at or 0)
-                curs.add(c2)
-        else:
-            self.log("not found in src db: [{}]".format(svp))
-
         try:
             atomic_move(sabs, dabs)
         except OSError as ex:
@@ -2855,6 +2840,21 @@ class Up2k(object):
                 raise
 
             os.unlink(b1)
+
+        if w:
+            assert c1
+            if c2 and c2 != c1:
+                self._copy_tags(c1, c2, w)
+
+            self._forget_file(svn.realpath, srem, c1, w, c1 != c2)
+            self._relink(w, svn.realpath, srem, dabs)
+            curs.add(c1)
+
+            if c2:
+                self.db_add(c2, w, drd, dfn, ftime, fsize, ip or "", at or 0)
+                curs.add(c2)
+        else:
+            self.log("not found in src db: [{}]".format(svp))
 
         if xar:
             runhook(self.log, xar, dabs, dvp, "", uname, "", 0, 0, "")
