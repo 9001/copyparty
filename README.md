@@ -281,6 +281,9 @@ server-os-specific:
 
 upgrade notes
 
+* `1.6.0`:
+  * http-api: delete/move is now `POST` instead of `GET`
+  * everything other than `GET` and `HEAD` must pass [cors validation](#cors)
 * `1.5.0` (2022-12-03): [new chunksize formula](https://github.com/9001/copyparty/commit/54e1c8d261df) for files larger than 128 GiB
   * **users:** upgrade to the latest [cli uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) if you use that
   * **devs:** update third-party up2k clients (if those even exist)

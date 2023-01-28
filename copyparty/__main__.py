@@ -821,6 +821,7 @@ def add_hooks(ap):
 def add_yolo(ap):
     ap2 = ap.add_argument_group('yolo options')
     ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests")
+    ap2.add_argument("--getmod", action="store_true", help="permit ?move=[...] and ?delete as GET")
 
 
 def add_optouts(ap):

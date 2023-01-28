@@ -3392,7 +3392,7 @@ var fileman = (function () {
 			}
 
 			var xhr = new XHR();
-			xhr.open('GET', f[0].src + '?move=' + dst, true);
+			xhr.open('POST', f[0].src + '?move=' + dst, true);
 			xhr.onload = xhr.onerror = rename_cb;
 			xhr.send();
 		}
@@ -3423,7 +3423,7 @@ var fileman = (function () {
 			}
 			toast.show('inf r', 0, esc(L.fd_busy.format(vps.length + 1, vp)), 'r');
 
-			xhr.open('GET', vp + '?delete', true);
+			xhr.open('POST', vp + '?delete', true);
 			xhr.onload = xhr.onerror = delete_cb;
 			xhr.send();
 		}
@@ -3531,7 +3531,7 @@ var fileman = (function () {
 
 			var dst = get_evpath() + vp.split('/').pop();
 
-			xhr.open('GET', vp + '?move=' + dst, true);
+			xhr.open('POST', vp + '?move=' + dst, true);
 			xhr.onload = xhr.onerror = paste_cb;
 			xhr.send();
 		}

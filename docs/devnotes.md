@@ -127,7 +127,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 
 | method | params | result |
 |--|--|--|
-| GET | `?move=/foo/bar` | move/rename the file/folder at URL to /foo/bar |
+| POST | `?move=/foo/bar` | move/rename the file/folder at URL to /foo/bar |
 
 | method | params | body | result |
 |--|--|--|--|
@@ -137,7 +137,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | mPOST | | `act=bput`, `f=FILE` | upload `FILE` into the folder at URL |
 | mPOST | `?j` | `act=bput`, `f=FILE` | ...and reply with json |
 | mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
-| GET | `?delete` | | delete URL recursively |
+| POST | `?delete` | | delete URL recursively |
 | jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |
 | uPOST | | `msg=foo` | send message `foo` into server log |
 | mPOST | | `act=tput`, `body=TEXT` | overwrite markdown document at URL |

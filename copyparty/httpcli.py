@@ -747,14 +747,15 @@ class HttpCli(object):
         if "tree" in self.uparam:
             return self.tx_tree()
 
-        if "delete" in self.uparam:
-            return self.handle_rm([])
-
-        if "move" in self.uparam:
-            return self.handle_mv()
-
         if "scan" in self.uparam:
             return self.scanvol()
+
+        if self.args.getmod:
+            if "delete" in self.uparam:
+                return self.handle_rm([])
+
+            if "move" in self.uparam:
+                return self.handle_mv()
 
         if not self.vpath:
             if "reload" in self.uparam:
@@ -1199,6 +1200,12 @@ class HttpCli(object):
 
         if "raw" in self.uparam:
             return self.handle_stash(False)
+
+        if "delete" in self.uparam:
+            return self.handle_rm([])
+
+        if "move" in self.uparam:
+            return self.handle_mv()
 
         ctype = self.headers.get("content-type", "").lower()
         if not ctype:
