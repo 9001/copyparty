@@ -1,4 +1,26 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0112-0515  `v1.5.6`  many hands
+
+hello from warsaw airport (goodbye japan ;_;)
+* read-only demo server at https://a.ocv.me/pub/demo/
+
+## new features
+* multiple upload handshakes in parallel
+  * around **5x faster** when uploading small files
+  * or **50x faster** if the server is on the other side of the planet
+    * just crank up the `parallel uploads` like crazy (max is 64)
+* upload ui: total time and average speed is shown on completion
+
+## bugfixes
+* browser ui didn't allow specifying number of threads for file search
+* dont panic if a digit key is pressed while viewing an image
+* workaround [linux kernel bug](https://utcc.utoronto.ca/~cks/space/blog/linux/KernelBindBugIn6016) causing log spam on dualstack
+  * ~~related issue (also mostly harmless) will be fixed next relese 010770684db95bece206943768621f2c7c27bace~~ 
+    * they fixed it in linux 6.1 so these workarounds will be gone too
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2022-1230-0754  `v1.5.5`  made in japan
 
 hello from tokyo

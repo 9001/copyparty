@@ -851,7 +851,7 @@ var Ls = {
 		"u_hashdone": 'befaring ferdig',
 		"u_hashing": 'les',
 		"u_fixed": "OK!&nbsp; Løste seg 👍",
-		"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert harmløst, fortsetter\n\nfil: {2}",
+		"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert greit, fortsetter\n\nfil: {2}",
 		"u_cuerr2": "server nektet opplastningen (del {0} av {1});\nprøver igjen senere\n\nfil: {2}\n\nerror ",
 		"u_ehstmp": "prøver igjen; se mld nederst",
 		"u_ehsfin": "server nektet forespørselen om å ferdigstille filen; prøver igjen...",

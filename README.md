@@ -1215,7 +1215,7 @@ below are some tweaks roughly ordered by usefulness:
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
 * `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
   * huge amount of short-lived connections
-  * really heavy traffic (downloads/uploads)
+  * simultaneous downloads and uploads saturating a 20gbps connection
   
   ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
 

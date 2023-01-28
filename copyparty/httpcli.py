@@ -346,7 +346,7 @@ class HttpCli(object):
         if zso:
             zsll = [x.split("=", 1) for x in zso.split(";") if "=" in x]
             cookies = {k.strip(): unescape_cookie(zs) for k, zs in zsll}
-            cookie_pw = cookies.get("cppws") or cookies.get("cppwd")
+            cookie_pw = cookies.get("cppws") or cookies.get("cppwd") or ""
             if "b" in cookies and "b" not in uparam:
                 uparam["b"] = cookies["b"]
         else:
@@ -652,15 +652,14 @@ class HttpCli(object):
             return True
 
         oh = self.out_headers
-        origin = re.sub(r"(:[0-9]{1,5})?/?$", "", origin.lower())
-        methods = ", ".join(self.conn.hsrv.mallow)
+        origin = origin.lower()
         good_origins = self.args.acao + [
             "{}://{}".format(
                 "https" if self.is_https else "http",
                 self.host.lower().split(":")[0],
             )
         ]
-        if origin in good_origins:
+        if re.sub(r"(:[0-9]{1,5})?/?$", "", origin) in good_origins:
             good_origin = True
             bad_hdrs = ("",)
         else:
@@ -676,7 +675,7 @@ class HttpCli(object):
         )
         if self.args.allow_csrf:
             acao = origin or acao or "*"  # explicitly permit impersonation
-            acam = ", ".join(methods)  # and all methods + headers
+            acam = ", ".join(self.conn.hsrv.mallow)  # and all methods + headers
             oh["Access-Control-Allow-Credentials"] = "true"
             good_origin = True
         else:
@@ -2031,7 +2030,13 @@ class HttpCli(object):
         else:
             lifetime = 0
 
-        return rnd, want_url, lifetime, vfs.flags.get("xbu"), vfs.flags.get("xau")
+        return (
+            rnd,
+            want_url,
+            lifetime,
+            vfs.flags.get("xbu") or [],
+            vfs.flags.get("xau") or [],
+        )
 
     def handle_plain_upload(self) -> bool:
         assert self.parser

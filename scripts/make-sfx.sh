@@ -266,6 +266,14 @@ necho() {
 		cp -p "$f2" "$f1"
 	); done
 
+	# resolve symlinks on windows
+	[ "$OSTYPE" = msys ] &&
+	(cd ..; git ls-files -s | awk '/^120000/{print$4}') |
+	while IFS= read -r x; do
+		[ $(wc -l <"$x") -gt 1 ] && continue
+		(cd "${x%/*}"; cp -p "../$(cat "${x##*/}")" ${x##*/})
+	done
+
 	# insert asynchat
 	mkdir copyparty/vend
 	for n in asyncore.py asynchat.py; do
