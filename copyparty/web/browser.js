@@ -6555,6 +6555,37 @@ var msel = (function () {
 })();
 
 
+var globalcss = (function () {
+	var ret = '';
+	return function () {
+		if (ret)
+			return ret;
+
+		var dcs = document.styleSheets;
+		for (var a = 0; a < dcs.length; a++) {
+			var base = dcs[a].href,
+				ds = dcs[a].cssRules;
+
+			if (!base)
+				continue;
+
+			base = base.replace(/[^/]+$/, '');
+			for (var b = 0; b < ds.length; b++) {
+				var css = ds[b].cssText.split(/\burl\(/g);
+				ret += css[0];
+				for (var c = 1; c < css.length; c++) {
+					var delim = (/^["']/.exec(css[c])) ? css[c].slice(0, 1) : '';
+					ret += 'url(' + delim + ((css[c].slice(0, 8).indexOf('://') + 1 || css[c].startsWith('/')) ? '' : base) +
+						css[c].slice(delim ? 1 : 0);
+				}
+				ret += '\n';
+			}
+		}
+		return ret;
+	};
+})();
+
+
 function show_md(md, name, div, url, depth) {
 	var errmsg = L.md_eshow + name + ':\n\n',
 		now = get_evpath();
@@ -6649,20 +6680,21 @@ function sandbox(tgt, rules, cls, html) {
 	}
 	clmod(tgt, 'sb', 1);
 	var tid = tgt.getAttribute('id'),
-		dcs = document.styleSheets,
 		hash = location.hash,
 		want = '';
 
 	if (hash.startsWith('#md-'))
 		want = hash.slice(1);
 
-	var h2 = '<html class="' + document.documentElement.className + '"><head><base target="_parent">';
-	for (var a = 0; a < dcs.length; a++)
-		if (dcs[a].href)
-			h2 += '<link rel="stylesheet" media="screen" href="' + dcs[a].href + '">';
-
-	html = h2 + '</head><body class="logue ' + cls + '">' + html +
-		'<script>setTimeout(function(){var pih=-1;function f(){var d=document.documentElement,ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);if(ih==pih)return;pih=ih;window.parent.postMessage("iheight #' + tid + '>iframe "+ih,"*")};setInterval(f,100);f();var el="' + want + '"&&document.getElementById("' + want + '");if(el)window.parent.postMessage("iscroll #' + tid + ' "+el.offsetTop,"*")},1)</script></body></html>';
+	html = '<html class="' + document.documentElement.className + '"><head><style>' + globalcss() +
+		'</style><base target="_parent"></head><body class="logue ' + cls + '">' + html +
+		'<script>setTimeout(function(){var its=0,pih=-1,f=function(){' +
+		'var d=document.documentElement,ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);' +
+		'if(ih!=pih){pih=ih;window.parent.postMessage("iheight #' + tid + '>iframe "+ih,"*")}' +
+		'if(++its<20)return setTimeout(f,20);if(its==20)setInterval(f,200)' +
+		'};f();var el="' + want + '"&&document.getElementById("' + want + '");' +
+		'if(el)window.parent.postMessage("iscroll #' + tid + ' "+el.offsetTop,"*")' +
+		'},1)</script></body></html>';
 
 	var fr = mknod('iframe');
 	fr.setAttribute('sandbox', rules ? 'allow-' + rules.replace(/ /g, ' allow-') : '');

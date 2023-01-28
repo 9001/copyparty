@@ -158,7 +158,7 @@ class HttpCli(object):
         self.out_headerlist: list[tuple[str, str]] = []
         self.out_headers = {
             "Vary": "Origin, PW, Cookie",
-            "Cache-Control": "no-store; max-age=0",
+            "Cache-Control": "no-store, max-age=0",
         }
         h = self.args.html_head
         if self.args.no_robots:
