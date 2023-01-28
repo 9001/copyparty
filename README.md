@@ -281,7 +281,7 @@ server-os-specific:
 
 upgrade notes
 
-* `1.6.0`:
+* `1.6.0` (2023-01-28):
   * http-api: delete/move is now `POST` instead of `GET`
   * everything other than `GET` and `HEAD` must pass [cors validation](#cors)
 * `1.5.0` (2022-12-03): [new chunksize formula](https://github.com/9001/copyparty/commit/54e1c8d261df) for files larger than 128 GiB
@@ -1252,7 +1252,6 @@ safety profiles:
   * `--no-robots` and `--force-js` makes life harder for crawlers, see [hiding from google](#hiding-from-google)
 
 * option `-ss` is a shortcut for the above plus:
-  * `--no-logues` and `--no-readme` disables support for readme's and prologues / epilogues in directory listings, which otherwise lets people upload arbitrary `<script>` tags
   * `--unpost 0`, `--no-del`, `--no-mv` disables all move/delete support
   * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
     * however note if you edit one file it will also affect the other copies
@@ -1263,6 +1262,7 @@ safety profiles:
 
 * option `-sss` is a shortcut for the above plus:
   * `--no-dav` disables webdav support
+  * `--no-logues` and `--no-readme` disables support for readme's and prologues / epilogues in directory listings, which otherwise lets people upload arbitrary (but sandboxed) `<script>` tags
   * `-lo cpp-%Y-%m%d-%H%M%S.txt.xz` enables logging to disk
   * `-ls **,*,ln,p,r` does a scan on startup for any dangerous symlinks
 
@@ -1278,8 +1278,10 @@ other misc notes:
 behavior that might be unexpected
 
 * users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
-* anyone with write access can upload a `README.md` with a `<script>` which runs for all visitors unless `--no-readme`
-* anyone with move access can rename `some.html` to `.epilogue.html` so it'll run for all visitors unless either `--no-logues` or `--no-dot-ren`
+* users can submit `<script>`s which autorun for other visitors in a few ways;
+  * uploading a `README.md` -- avoid with `--no-readme`
+  * renaming `some.html` to `.epilogue.html` -- avoid with either `--no-logues` or `--no-dot-ren`
+  * the directory-listing embed is sandboxed (so any malicious scripts can't do any damage) but the markdown editor is not
 
 
 ## cors

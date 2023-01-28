@@ -1119,6 +1119,8 @@ class AuthSrv(object):
                     vol.flags[k] = True
 
             for ga, vf in (
+                ("no_sb_md", "no_sb_md"),
+                ("no_sb_lg", "no_sb_lg"),
                 ("no_forget", "noforget"),
                 ("no_dupe", "nodupe"),
                 ("hardlink", "hardlink"),
@@ -1129,6 +1131,20 @@ class AuthSrv(object):
             ):
                 if getattr(self.args, ga):
                     vol.flags[vf] = True
+
+            for ve, vd in (
+                ("sb_md", "no_sb_md"),
+                ("sb_lg", "no_sb_lg"),
+            ):
+                if ve in vol.flags:
+                    vol.flags.pop(vd, None)
+
+            for ga, vf in (
+                ("md_sbf", "md_sbf"),
+                ("lg_sbf", "lg_sbf"),
+            ):
+                if vf not in vol.flags:
+                    vol.flags[vf] = getattr(self.args, ga)
 
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:

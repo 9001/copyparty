@@ -793,6 +793,13 @@ html.y #path a:hover {
 .logue:empty {
 	display: none;
 }
+.logue>iframe {
+	background: var(--bgg);
+	visibility: hidden;
+	border: none;
+	width: 100%;
+	height: 0;
+}
 #pro.logue {
 	margin-bottom: .8em;
 }
@@ -816,6 +823,9 @@ html.y #path a:hover {
 }
 .mdo {
 	max-width: 52em;
+}
+.mdo.sb {
+	max-width: unset;
 }
 .mdo,
 .mdo * {

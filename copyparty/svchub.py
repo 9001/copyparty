@@ -97,13 +97,13 @@ class SvcHub(object):
         if args.sss or args.s >= 3:
             args.ss = True
             args.no_dav = True
+            args.no_logues = True
+            args.no_readme = True
             args.lo = args.lo or "cpp-%Y-%m%d-%H%M%S.txt.xz"
             args.ls = args.ls or "**,*,ln,p,r"
 
         if args.ss or args.s >= 2:
             args.s = True
-            args.no_logues = True
-            args.no_readme = True
             args.unpost = 0
             args.no_del = True
             args.no_mv = True

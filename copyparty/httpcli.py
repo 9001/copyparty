@@ -649,7 +649,11 @@ class HttpCli(object):
         ih = self.headers
         origin = ih.get("origin")
         if not origin:
-            return True
+            sfsite = ih.get("sec-fetch-site")
+            if sfsite and sfsite.lower().startswith("cross"):
+                origin = ":|"  # sandboxed iframe
+            else:
+                return True
 
         oh = self.out_headers
         origin = origin.lower()
@@ -3356,6 +3360,7 @@ class HttpCli(object):
                         readme = f.read().decode("utf-8")
                         break
 
+        vf = vn.flags
         ls_ret = {
             "dirs": [],
             "files": [],
@@ -3388,6 +3393,8 @@ class HttpCli(object):
             "have_zip": (not self.args.no_zip),
             "have_unpost": int(self.args.unpost),
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
+            "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
+            "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
             "url_suf": url_suf,
             "logues": logues,
             "readme": readme,

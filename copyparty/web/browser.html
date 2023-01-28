@@ -85,7 +85,7 @@
 	<div id="bdoc"></div>
 	{%- endif %}
 
-	<div id="pro" class="logue">{{ logues[0] }}</div>
+	<div id="pro" class="logue">{{ "" if sb_lg else logues[0] }}</div>
 
 	<table id="files">
 		<thead>
@@ -119,7 +119,7 @@
 		</tbody>
 	</table>
 	
-	<div id="epi" class="logue">{{ logues[1] }}</div>
+	<div id="epi" class="logue">{{ "" if sb_lg else logues[1] }}</div>
 
 	<h2><a href="{{ r }}/?h" id="goh">control-panel</a></h2>
 	
@@ -150,12 +150,14 @@
 			have_del = {{ have_del|tojson }},
 			have_unpost = {{ have_unpost }},
 			have_zip = {{ have_zip|tojson }},
+			sb_md = "{{ sb_md }}",
+			sb_lg = "{{ sb_lg }}",
 			lifetime = {{ lifetime }},
 			turbolvl = {{ turbolvl }},
 			u2sort = "{{ u2sort }}",
 			have_emp = {{ have_emp|tojson }},
 			txt_ext = "{{ txt_ext }}",
-			{% if no_prism %}no_prism = 1,{% endif %}
+			logues = {{ logues|tojson if sb_lg else "[]" }},
 			readme = {{ readme|tojson }},
 			ls0 = {{ ls0|tojson }};
 
