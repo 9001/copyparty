@@ -2,6 +2,8 @@ standalone programs which are executed by copyparty when an event happens (uploa
 
 these programs either take zero arguments, or a filepath (the affected file), or a json message with filepath + additional info
 
+> **note:** in addition to event hooks (the stuff described here), copyparty has another api to run your programs/scripts while providing way more information such as audio tags / video codecs / etc and optionally daisychaining data between scripts in a processing pipeline; if that's what you want then see [mtp plugins](../mtag/) instead
+
 
 # after upload
 * [notify.py](notify.py) shows a desktop notification
