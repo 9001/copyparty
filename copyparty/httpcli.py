@@ -1204,15 +1204,7 @@ class HttpCli(object):
         if "raw" in self.uparam:
             return self.handle_stash(False)
 
-        if "delete" in self.uparam:
-            return self.handle_rm([])
-
-        if "move" in self.uparam:
-            return self.handle_mv()
-
         ctype = self.headers.get("content-type", "").lower()
-        if not ctype:
-            raise Pebkac(400, "you can't post without a content-type header")
 
         if "multipart/form-data" in ctype:
             return self.handle_post_multipart()
@@ -1223,6 +1215,12 @@ class HttpCli(object):
             or "application/xml" in ctype
         ):
             return self.handle_post_json()
+
+        if "move" in self.uparam:
+            return self.handle_mv()
+
+        if "delete" in self.uparam:
+            return self.handle_rm([])
 
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
