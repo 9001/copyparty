@@ -57,7 +57,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
-    * [zeroconf](#zeroconf) - announce enabled services on the LAN
+    * [zeroconf](#zeroconf) - announce enabled services on the LAN ([pic](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png))
         * [mdns](#mdns) - LAN domain-name and feature announcer
         * [ssdp](#ssdp) - windows-explorer announcer
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
@@ -208,7 +208,7 @@ project goals / philosophy
 
 * inverse linux philosophy -- do all the things, and do an *okay* job
   * quick drop-in service to get a lot of features in a pinch
-  * check [the alternatives](./docs/versus.md)
+  * some of [the alternatives](./docs/versus.md) might be a better fit for you
 * run anywhere, support everything
   * as many web-browsers and python versions as possible
     * every browser should at least be able to browse, download, upload files

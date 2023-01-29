@@ -13,14 +13,20 @@
 
 # other stuff
 
+## [`example.conf`](example.conf)
+* example config file for `-c`
+
+## [`versus.md`](versus.md)
+* similar software / alternatives (with pros/cons)
+
 ## [`changelog.md`](changelog.md)
 * occasionally grabbed from github release notes
 
+## [`devnotes.md`](devnotes.md)
+* technical stuff
+
 ## [`rclone.md`](rclone.md)
 * notes on using rclone as a fuse client/server
-
-## [`example.conf`](example.conf)
-* example config file for `-c`
 
 
 

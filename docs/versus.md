@@ -309,6 +309,7 @@ symbol legend,
 * `audio player » os-integration` = use the [lockscreen](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) or [media hotkeys](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) to play/pause, prev/next song
 * `search by custom tags` = ability to tag files through the UI and search by those
 * `find local file` = drop a file into the browser to see if it exists on the server
+* `undo recent uploads` = accounts without delete permissions have a time window where they can undo their own uploads
 * `a`/copyparty has teeny-tiny skips playing gapless albums depending on audio codec (opus best)
 * `b`/hfs2 has a very basic directory tree view, not showing sibling folders
 * `f`/rclone can do some file management (mkdir, rename, delete) when hosting througn webdav

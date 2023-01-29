@@ -468,7 +468,7 @@ def get_sects():
               "g" (get):    download files, but cannot see folder contents
               "G" (upget):  "get", but can see filekeys of their own uploads
 
-            too many volflags to list here, see the other sections
+            too many volflags to list here, see --help-flags
 
             example:\033[35m
               -a ed:hunter2 -v .::r:rw,ed -v ../inc:dump:w:rw,ed:c,nodupe  \033[36m
@@ -808,7 +808,7 @@ def add_smb(ap):
 
 
 def add_hooks(ap):
-    ap2 = ap.add_argument_group('hooks (see --help-hooks)')
+    ap2 = ap.add_argument_group('event hooks (see --help-hooks)')
     ap2.add_argument("--xbu", metavar="CMD", type=u, action="append", help="execute CMD before a file upload starts")
     ap2.add_argument("--xau", metavar="CMD", type=u, action="append", help="execute CMD after  a file upload finishes")
     ap2.add_argument("--xbr", metavar="CMD", type=u, action="append", help="execute CMD before a file move/rename")
