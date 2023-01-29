@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 6, 1)
+VERSION = (1, 6, 2)
 CODENAME = "cors k"
 BUILD_DT = (2023, 1, 29)
 
