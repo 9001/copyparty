@@ -572,6 +572,11 @@ html.dy {
 * {
 	line-height: 1.2em;
 }
+::selection {
+	color: var(--bg-d1);
+	background: var(--fg);
+	text-shadow: none;
+}
 html,body,tr,th,td,#files,a {
 	color: inherit;
 	background: none;
