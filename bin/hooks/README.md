@@ -6,8 +6,8 @@ these programs either take zero arguments, or a filepath (the affected file), or
 
 
 # after upload
-* [notify.py](notify.py) shows a desktop notification
-* [discord-announce.py](discord-announce.py) announces new uploads on discord using webhooks
+* [notify.py](notify.py) shows a desktop notification ([example](https://user-images.githubusercontent.com/241032/215335767-9c91ed24-d36e-4b6b-9766-fb95d12d163f.png))
+* [discord-announce.py](discord-announce.py) announces new uploads on discord using webhooks ([example](https://user-images.githubusercontent.com/241032/215304439-1c1cb3c8-ec6f-4c17-9f27-81f969b1811a.png))
 * [reject-mimetype.py](reject-mimetype.py) rejects uploads unless the mimetype is acceptable
 
 
