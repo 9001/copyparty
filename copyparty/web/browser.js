@@ -6605,7 +6605,7 @@ function show_md(md, name, div, url, depth) {
 
 	md_plug = {}
 	md = load_md_plug(md, 'pre');
-	md = load_md_plug(md, 'post');
+	md = load_md_plug(md, 'post', sb_md);
 
 	var marked_opts = {
 		headerPrefix: 'md-',
@@ -6618,7 +6618,8 @@ function show_md(md, name, div, url, depth) {
 
 	try {
 		clmod(div, 'mdo', 1);
-		sandbox(div, sb_md, 'mdo', marked.parse(md, marked_opts));
+		if (sandbox(div, sb_md, 'mdo', marked.parse(md, marked_opts)))
+			return;
 
 		ext = md_plug.post;
 		ext = ext ? [ext[0].render, ext[0].render2] : [];
@@ -6687,13 +6688,20 @@ function sandbox(tgt, rules, cls, html) {
 		want = hash.slice(1);
 
 	html = '<html class="' + document.documentElement.className + '"><head><style>' + globalcss() +
-		'</style><base target="_parent"></head><body class="logue ' + cls + '">' + html +
-		'<script>setTimeout(function(){var its=0,pih=-1,f=function(){' +
-		'var d=document.documentElement,ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);' +
+		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
+		'<script src="' + SR + '/.cpr/util.js?_={{ ts }}"></script>' +
+		'<script>var ebi=document.getElementById.bind(document),d=document.documentElement,' +
+		'loc=new URL("' + location.href.split('?')[0] + '");' +
+		'setTimeout(function(){var its=0,pih=-1,f=function(){' +
+		'var ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);' +
 		'if(ih!=pih){pih=ih;window.parent.postMessage("iheight #' + tid + '>iframe "+ih,"*")}' +
 		'if(++its<20)return setTimeout(f,20);if(its==20)setInterval(f,200)' +
-		'};f();var el="' + want + '"&&document.getElementById("' + want + '");' +
-		'if(el)window.parent.postMessage("iscroll #' + tid + ' "+el.offsetTop,"*")' +
+		'};f();var el="' + want + '"&&ebi("' + want + '");' +
+		'if(el)window.parent.postMessage("iscroll #' + tid + ' "+el.offsetTop,"*");' +
+		(cls == 'mdo' && md_plug.post ?
+			'const x={' + md_plug.post + '};' +
+			'if(x.render)x.render(ebi("b"));' +
+			'if(x.render2)x.render2(ebi("b"));' : '') +
 		'},1)</script></body></html>';
 
 	var fr = mknod('iframe');

@@ -1532,25 +1532,33 @@ var md_plug_err = function (ex, js) {
     if (ex)
         console.log(ex, js);
 };
-function load_md_plug(md_text, plug_type) {
+function load_md_plug(md_text, plug_type, defer) {
+    if (defer)
+        md_plug[plug_type] = null;
+
     if (!have_emp)
         return md_text;
 
-    var find = '\n```copyparty_' + plug_type + '\n';
-    var ofs = md_text.indexOf(find);
-    if (ofs === -1)
+    var find = '\n```copyparty_' + plug_type + '\n',
+        md = md_text.replace(/\r/g, ''),
+        ofs = md.indexOf(find),
+        ofs2 = md.indexOf('\n```', ofs + 1);
+
+    if (ofs < 0 || ofs2 < 0)
         return md_text;
 
-    var ofs2 = md_text.indexOf('\n```', ofs + 1);
-    if (ofs2 == -1)
-        return md_text;
+    var js = md.slice(ofs + find.length, ofs2 + 1);
+    md = md.slice(0, ofs + 1) + md.slice(ofs2 + 4);
+    md = md.replace(/$/g, '\r');
 
-    var js = md_text.slice(ofs + find.length, ofs2 + 1);
-    var md = md_text.slice(0, ofs + 1) + md_text.slice(ofs2 + 4);
+    if (defer) { // insert into sandbox
+        md_plug[plug_type] = js;
+        return md;
+    }
 
     var old_plug = md_plug[plug_type];
     if (!old_plug || old_plug[1] != js) {
-        js = 'const x = { ' + js + ' }; x;';
+        js = 'const loc = new URL("' + location.href + '"), x = { ' + js + ' }; x;';
         try {
             var x = eval(js);
             if (x['ctor']) {

@@ -54,6 +54,8 @@ the values in the `ex:` columns are linkified to `example.com/$value`
 
 and the table can be sorted by clicking the headers
 
+the sandbox also makes `location` unavailable but there is `loc` instead; this website's url is <big><big><b id="whereami">foo</b></big></big>
+
 the difference is that with `copyparty_pre` you'll probably break various copyparty features but if you use `copyparty_post` then future copyparty versions will probably break you
 
 
@@ -136,6 +138,10 @@ render(dom) {
     }
 },
 render2(dom) {
+    // loc == window.location except available inside sandbox
+    ebi('whereami').innerHTML = loc.href;
+
+    // this one also works because util.js gets pulled into the sandbox
     window.makeSortable(dom.getElementsByTagName('table')[0]);
 }
 ```
