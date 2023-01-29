@@ -6687,8 +6687,16 @@ function sandbox(tgt, rules, cls, html) {
 	if (hash.startsWith('#md-'))
 		want = hash.slice(1);
 
+	var env = '', tags = QSA('script');
+	for (var a = 0; a < tags.length; a++) {
+		var js = tags[a].innerHTML;
+		if (js && js.indexOf('have_up2k_idx') + 1)
+			env = js.split(/\blogues *=/)[0] + 'a;';
+	}
+
 	html = '<html class="' + document.documentElement.className + '"><head><style>' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
+		'<script>' + env + '</script>' +
 		'<script src="' + SR + '/.cpr/util.js?_={{ ts }}"></script>' +
 		'<script>var ebi=document.getElementById.bind(document),d=document.documentElement,' +
 		'loc=new URL("' + location.href.split('?')[0] + '");' +
