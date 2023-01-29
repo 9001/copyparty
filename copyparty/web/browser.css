@@ -800,10 +800,14 @@ html.y #path a:hover {
 }
 .logue>iframe {
 	background: var(--bgg);
+	border-radius: .3em;
 	visibility: hidden;
 	border: none;
 	width: 100%;
 	height: 0;
+}
+.logue>iframe.focus {
+	box-shadow: 0 0 .1em .1em var(--a);
 }
 #pro.logue {
 	margin-bottom: .8em;

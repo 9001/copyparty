@@ -6694,18 +6694,22 @@ function sandbox(tgt, rules, cls, html) {
 			env = js.split(/\blogues *=/)[0] + 'a;';
 	}
 
-	html = '<html class="' + document.documentElement.className + '"><head><style>' + globalcss() +
+	html = '<html class="iframe ' + document.documentElement.className + '"><head><style>' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
 		'<script>' + env + '</script>' +
 		'<script src="' + SR + '/.cpr/util.js?_={{ ts }}"></script>' +
 		'<script>var ebi=document.getElementById.bind(document),d=document.documentElement,' +
 		'loc=new URL("' + location.href.split('?')[0] + '");' +
+		'function say(m){window.parent.postMessage(m,"*")};' +
 		'setTimeout(function(){var its=0,pih=-1,f=function(){' +
 		'var ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);' +
-		'if(ih!=pih){pih=ih;window.parent.postMessage("iheight #' + tid + '>iframe "+ih,"*")}' +
+		'if(ih!=pih){pih=ih;say("iheight #' + tid + ' "+ih,"*")}' +
 		'if(++its<20)return setTimeout(f,20);if(its==20)setInterval(f,200)' +
-		'};f();var el="' + want + '"&&ebi("' + want + '");' +
-		'if(el)window.parent.postMessage("iscroll #' + tid + ' "+el.offsetTop,"*");' +
+		'};f();' +
+		'window.onfocus=function(){say("igot #' + tid + '")};' +
+		'window.onblur=function(){say("ilost #' + tid + '")};' +
+		'var el="' + want + '"&&ebi("' + want + '");' +
+		'if(el)say("iscroll #' + tid + ' "+el.offsetTop);' +
 		(cls == 'mdo' && md_plug.post ?
 			'const x={' + md_plug.post + '};' +
 			'if(x.render)x.render(ebi("b"));' +
@@ -6724,7 +6728,7 @@ window.addEventListener("message", function (e) {
 		console.log('msg:' + e.data);
 		var t = e.data.split(/ /g);
 		if (t[0] == 'iheight') {
-			var el = QS(t[1]);
+			var el = QS(t[1] + '>iframe');
 			el.style.height = t[2] + 'px';
 			el.style.visibility = 'unset';
 		}
@@ -6733,6 +6737,9 @@ window.addEventListener("message", function (e) {
 				y2 = parseInt(t[2]);
 			console.log(y1, y2);
 			document.documentElement.scrollTop = y1 + y2;
+		}
+		else if (t[0] == 'igot' || t[0] == 'ilost') {
+			clmod(QS(t[1] + '>iframe'), 'focus', t[0] == 'igot');
 		}
 	} catch (ex) {
 		console.log('msg-err: ' + ex);
