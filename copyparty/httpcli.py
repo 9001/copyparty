@@ -605,12 +605,12 @@ class HttpCli(object):
         if self.is_rclone:
             return ""
 
-        cmap = {"pw": "cppwd"}
-        kv = {
-            k: zs
-            for k, zs in self.uparam.items()
-            if k not in rm and self.cookies.get(cmap.get(k, k)) != zs
-        }
+        kv = {k: zs for k, zs in self.uparam.items() if k not in rm}
+        if "pw" in kv:
+            pw = self.cookies.get("cppws") or self.cookies.get("cppwd")
+            if kv["pw"] == pw:
+                del kv["pw"]
+
         kv.update(add)
         if not kv:
             return ""
@@ -1909,9 +1909,7 @@ class HttpCli(object):
         self.parser.drop()
 
         self.out_headerlist = [
-            x
-            for x in self.out_headerlist
-            if x[0] != "Set-Cookie" or "cppwd" != x[1][:5]
+            x for x in self.out_headerlist if x[0] != "Set-Cookie" or "cppw" != x[1][:4]
         ]
 
         dst = self.args.SRS
@@ -1943,12 +1941,12 @@ class HttpCli(object):
         if pwd == "x":
             # reset both plaintext and tls
             # (only affects active tls cookies when tls)
-            for k in ("cppwd", "cppws") if self.tls else ("cppwd",):
+            for k in ("cppwd", "cppws") if self.is_https else ("cppwd",):
                 ck = gencookie(k, pwd, self.args.R, False, dur)
                 self.out_headerlist.append(("Set-Cookie", ck))
         else:
-            k = "cppws" if self.tls else "cppwd"
-            ck = gencookie(k, pwd, self.args.R, self.tls, dur)
+            k = "cppws" if self.is_https else "cppwd"
+            ck = gencookie(k, pwd, self.args.R, self.is_https, dur)
             self.out_headerlist.append(("Set-Cookie", ck))
 
         return msg

@@ -692,7 +692,9 @@ function noq_href(el) {
 
 
 function get_pwd() {
-    var pwd = ('; ' + document.cookie).split('; cppwd=');
+    var k = HTTPS ? 's=' : 'd=',
+        pwd = ('; ' + document.cookie).split('; cppw' + k);
+
     if (pwd.length < 2)
         return null;
 

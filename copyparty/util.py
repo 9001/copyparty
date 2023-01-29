@@ -1562,7 +1562,7 @@ def gencookie(k: str, v: str, r: str, tls: bool, dur: Optional[int]) -> str:
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
-    return "{}={}; Path=/{}; Expires={}; HttpOnly{}; SameSite=Lax".format(
+    return "{}={}; Path=/{}; Expires={}{}; SameSite=Lax".format(
         k, v, r, exp, "; Secure" if tls else ""
     )
 
