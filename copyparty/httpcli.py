@@ -3491,7 +3491,9 @@ class HttpCli(object):
                 if self.args.no_zip:
                     margin = "DIR"
                 else:
-                    margin = '<a href="{}?zip">zip</a>'.format(quotep(href))
+                    margin = '<a href="{}?zip" rel="nofollow">zip</a>'.format(
+                        quotep(href)
+                    )
             elif fn in hist:
                 margin = '<a href="{}.hist/{}">#{}</a>'.format(
                     base, html_escape(hist[fn][2], quot=True, crlf=True), hist[fn][0]
