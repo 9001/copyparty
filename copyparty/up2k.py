@@ -644,7 +644,14 @@ class Up2k(object):
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
         fx = set(("html_head",))
-        fd = {"dbd": "dbd"}
+        fd = {
+            "dbd": "dbd",
+            "lg_sbf": "lg_sbf",
+            "md_sbf": "md_sbf",
+            "mte": "mte",
+            "mth": "mth",
+            "mtp": "mtp",
+        }
         fl = {
             k: v
             for k, v in flags.items()
