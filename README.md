@@ -177,7 +177,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 * browser
   * ☑ [navpane](#navpane) (directory tree sidebar)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
-  * ☑ audio player (with OS media controls and opus transcoding)
+  * ☑ audio player (with [OS media controls](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) and opus transcoding)
   * ☑ image gallery with webm player
   * ☑ textfile browser with syntax hilighting
   * ☑ [thumbnails](#thumbnails)
@@ -693,7 +693,7 @@ using arguments or config files, or a mix of both:
 
 ## zeroconf
 
-announce enabled services on the LAN  if you specify the `-z` option, which enables [mdns](#mdns) and [ssdp](#ssdp)
+announce enabled services on the LAN ([pic](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png))  -- `-z` enables both [mdns](#mdns) and [ssdp](#ssdp)
 
 * `--z-on` / `--z-off`' limits the feature to certain networks
 

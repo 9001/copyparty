@@ -182,13 +182,14 @@ symbol legend,
 | mojibake filenames      | █ |   |   | • | • | █ | █ | • | • | • |   |
 | undecodable filenames   | █ |   |   | • | • | █ |   | • | • |   |   |
 
-* `zeroconf` = the server announces itself on the LAN, automatically appearing on other zeroconf-capable devices
+* `webdav` = protocol convenient for mounting a remote server as a local filesystem; see zeroconf:
+* `zeroconf` = the server announces itself on the LAN, [automatically appearing](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png) on other zeroconf-capable devices
 * `mojibake filenames` = filenames decoded with the wrong codec and then reencoded (usually to utf-8), so `宇多田ヒカル` might look like `ëFæ╜ôcâqâJâï`
 * `undecodable filenames` = pure binary garbage which cannot be parsed as utf-8
   * you can successfully play `$'\355\221'` with mpv through mounting a remote copyparty server with rclone, pog
 * `a`/copyparty remarks:
   * extremely minimal samba/cifs server
-  * netscape 4 / ie6 support is mostly listed as a joke altho some people have actually found it useful
+  * netscape 4 / ie6 support is mostly listed as a joke altho some people have actually found it useful ([ie4 tho](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png))
 
 
 ## server configuration
@@ -249,12 +250,13 @@ symbol legend,
 * `file action event hooks` = run script before/after upload, move, rename, ...
 * `one-way folder sync` = like rsync, optionally deleting unexpected files at target
 * `full sync` = stateful, dropbox-like sync
-* `curl-friendly ls` = returns a plaintext folder listing when curled
+* `curl-friendly ls` = returns a [sortable plaintext folder listing](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) when curled
 * `curl-friendly upload` = uploading with curl is just `curl -T some.bin http://.../`
 * `a`/copyparty remarks:
   * one-way folder sync from local to server can be done efficiently with [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py), or with webdav and conventional rsync
   * can hot-reload config files (with just a few exceptions)
   * can set per-folder permissions if that folder is made into a separate volume, so there is configuration overhead
+  * [event hooks](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks) ([discord](https://user-images.githubusercontent.com/241032/215304439-1c1cb3c8-ec6f-4c17-9f27-81f969b1811a.png), [desktop](https://user-images.githubusercontent.com/241032/215335767-9c91ed24-d36e-4b6b-9766-fb95d12d163f.png)) inspired by filebrowser, as well as the more complex [media parser](https://github.com/9001/copyparty/tree/hovudstraum/bin/mtag) alternative
   * upload history can be visualized using [partyjournal](https://github.com/9001/copyparty/blob/hovudstraum/bin/partyjournal.py)
 * `k`/filegator remarks:
   * `per-* permissions` -- can limit a user to one folder and its subfolders
@@ -304,7 +306,8 @@ symbol legend,
 | copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |
 
 * `single-page app` = multitasking; possible to continue navigating while uploading
-* `audio player » os-integration` = use the lockscreen to play/pause, prev/next song
+* `audio player » os-integration` = use the [lockscreen](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) or [media hotkeys](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) to play/pause, prev/next song
+* `search by custom tags` = ability to tag files through the UI and search by those
 * `find local file` = drop a file into the browser to see if it exists on the server
 * `a`/copyparty has teeny-tiny skips playing gapless albums depending on audio codec (opus best)
 * `b`/hfs2 has a very basic directory tree view, not showing sibling folders
@@ -324,7 +327,7 @@ symbol legend,
 | sharex                  | █ |   |   | █ |   | █ | ╱ | █ |   |   |   |
 | flameshot               |   |   |   |   |   | █ |   |   |   |   |   |
 
-* sharex ╱ = yes, but does not provide example sharex config
+* sharex `╱` = yes, but does not provide example sharex config
 * `a`/copyparty remarks:
   * `OS alert on upload` available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/notify.py)
   * `discord » announce uploads` available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/discord-announce.py)
@@ -353,7 +356,7 @@ symbol legend,
 | linx               | go     | ░ gpl3 |  20 MB |
 
 * `size` = binary (if available) or installed size of program and its dependencies
-  * copyparty size is for the standalone python file; the windows exe is **6 MiB**
+  * copyparty size is for the [standalone python](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) file; the [windows exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) is **6 MiB**
 
 
 # reviews
