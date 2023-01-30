@@ -6585,6 +6585,28 @@ var globalcss = (function () {
 	};
 })();
 
+var sandboxjs = (function () {
+	var ret = '',
+		busy = false,
+		url = SR + '/.cpr/util.js?_=' + TS,
+		tag = '<script src="' + url + '"></script>';
+
+	return function () {
+		if (ret || busy)
+			return ret || tag;
+
+		var xhr = new XHR();
+		xhr.open('GET', url, true);
+		xhr.onload = function () {
+			if (this.status == 200)
+				ret = '<script>' + this.responseText + '</script>';
+		};
+		xhr.send();
+		busy = true;
+		return tag;
+	};
+})();
+
 
 function show_md(md, name, div, url, depth) {
 	var errmsg = L.md_eshow + name + ':\n\n',
@@ -6696,8 +6718,7 @@ function sandbox(tgt, rules, cls, html) {
 
 	html = '<html class="iframe ' + document.documentElement.className + '"><head><style>' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
-		'<script>' + env + '</script>' +
-		'<script src="' + SR + '/.cpr/util.js?_={{ ts }}"></script>' +
+		'<script>' + env + '</script>' + sandboxjs() +
 		'<script>var ebi=document.getElementById.bind(document),d=document.documentElement,' +
 		'loc=new URL("' + location.href.split('?')[0] + '");' +
 		'function say(m){window.parent.postMessage(m,"*")};' +
