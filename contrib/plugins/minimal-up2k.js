@@ -17,7 +17,7 @@ almost the same as minimal-up2k.html except this one...:
 var u2min = `
 <style>
 
-#ops, #path, #tree, #files, #epi+div+h2,
+#ops, #path, #tree, #files, #wfp,
 #u2conf td.c+.c, #u2cards, #srch_dz, #srch_zd {
   display: none !important;
 }
@@ -55,5 +55,5 @@ var u2min = `
 if (!has(perms, 'read')) {
   var e2 = mknod('div');
   e2.innerHTML = u2min;
-  ebi('wrap').insertBefore(e2, QS('#epi+h2'));
+  ebi('wrap').insertBefore(e2, QS('#wfp'));
 }
