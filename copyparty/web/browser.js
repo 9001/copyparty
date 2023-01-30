@@ -5726,6 +5726,32 @@ function despin(sel) {
 }
 
 
+var wfp_debounce = (function () {
+	var r = { 'n': 0, 't': 0 };
+
+	r.hide = function () {
+		if (++r.n <= 1) {
+			r.n = 1;
+			clearTimeout(r.t);
+			r.t = setTimeout(r.reset, 500);
+			ebi('wfp').style.visibility = 'hidden';
+		}
+	};
+	r.show = function () {
+		if (--r.n <= 0) {
+			r.n = 0;
+			clearTimeout(r.t);
+			ebi('wfp').style.visibility = 'unset';
+		}
+	};
+	r.reset = function () {
+		r.n = 0;
+		r.show();
+	};
+	return r;
+})();
+
+
 function apply_perms(newperms) {
 	perms = newperms || [];
 
@@ -6616,10 +6642,12 @@ function show_md(md, name, div, url, depth) {
 	if (url != now)
 		return;
 
+	wfp_debounce.hide();
 	if (!marked) {
 		if (depth)
 			return toast.warn(10, errmsg + 'failed to load marked.js')
 
+		wfp_debounce.n--;
 		return import_js(SR + '/.cpr/deps/marked.js', function () {
 			show_md(md, name, div, url, 1);
 		});
@@ -6675,6 +6703,7 @@ function show_md(md, name, div, url, depth) {
 	catch (ex) {
 		toast.warn(10, errmsg + ex);
 	}
+	wfp_debounce.show();
 }
 
 
@@ -6702,6 +6731,9 @@ function sandbox(tgt, rules, cls, html) {
 		return false;
 	}
 	clmod(tgt, 'sb', 1);
+	if (!cls)
+		wfp_debounce.hide();
+
 	var tid = tgt.getAttribute('id'),
 		hash = location.hash,
 		want = '';
@@ -6752,6 +6784,7 @@ window.addEventListener("message", function (e) {
 			var el = QS(t[1] + '>iframe');
 			el.style.height = t[2] + 'px';
 			el.style.visibility = 'unset';
+			wfp_debounce.show();
 		}
 		else if (t[0] == 'iscroll') {
 			var y1 = QS(t[1]).offsetTop,
