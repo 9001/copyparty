@@ -1200,6 +1200,17 @@ function goto(dest) {
 }
 
 
+var SBW, SBH;  // scrollbar size
+(function () {
+	var el = mknod('div');
+	el.style.cssText = 'overflow:scroll;width:100px;height:100px';
+	document.body.appendChild(el);
+	SBW = el.offsetWidth - el.clientWidth;
+	SBH = el.offsetHeight - el.clientHeight;
+	document.body.removeChild(el);
+})();
+
+
 var have_webp = sread('have_webp');
 (function () {
 	if (have_webp !== null)
@@ -6762,7 +6773,7 @@ function sandbox(tgt, rules, cls, html) {
 	html = '<html class="iframe ' + document.documentElement.className + '"><head><style>' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
 		'<script>' + env + '</script>' + sandboxjs() +
-		'<script>var ebi=document.getElementById.bind(document),d=document.documentElement,' +
+		'<script>var d=document.documentElement,' +
 		'loc=new URL("' + location.href.split('?')[0] + '");' +
 		'function say(m){window.parent.postMessage(m,"*")};' +
 		'setTimeout(function(){var its=0,pih=-1,f=function(){' +
@@ -6793,7 +6804,7 @@ window.addEventListener("message", function (e) {
 		var t = e.data.split(/ /g);
 		if (t[0] == 'iheight') {
 			var el = QS(t[1] + '>iframe');
-			el.style.height = t[2] + 'px';
+			el.style.height = (parseInt(t[2]) + SBH) + 'px';
 			el.style.visibility = 'unset';
 			wfp_debounce.show();
 		}

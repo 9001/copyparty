@@ -835,8 +835,9 @@ html.y #path a:hover {
 .mdo {
 	max-width: 52em;
 }
-.mdo.sb {
-	max-width: unset;
+.mdo.sb,
+#epi.logue.mdo>iframe {
+	max-width: 54em;
 }
 .mdo,
 .mdo * {
