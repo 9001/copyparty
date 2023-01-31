@@ -51,6 +51,7 @@ from .util import (
     guess_mime,
     gzip_orig_sz,
     hashcopy,
+    hidedir,
     html_bescape,
     html_escape,
     humansize,
@@ -64,7 +65,6 @@ from .util import (
     relchk,
     ren_open,
     runhook,
-    hidedir,
     s3enc,
     sanitize_fn,
     sendfile_kern,
@@ -1057,11 +1057,14 @@ class HttpCli(object):
         lk = parse_xml(txt)
         assert lk.tag == "{DAV:}lockinfo"
 
-        if not lk.find(r"./{DAV:}depth"):
-            lk.append(mktnod("D:depth", "infinity"))
+        token = str(uuid.uuid4())
 
-        lk.append(mkenod("D:timeout", mktnod("D:href", "Second-3310")))
-        lk.append(mkenod("D:locktoken", mktnod("D:href", uuid.uuid4().urn)))
+        if not lk.find(r"./{DAV:}depth"):
+            depth = self.headers.get("depth", "infinity")
+            lk.append(mktnod("D:depth", depth))
+
+        lk.append(mktnod("D:timeout", "Second-3310"))
+        lk.append(mkenod("D:locktoken", mktnod("D:href", token)))
         lk.append(
             mkenod("D:lockroot", mktnod("D:href", quotep(self.args.SRS + self.vpath)))
         )
@@ -1074,11 +1077,13 @@ class HttpCli(object):
         ret = '<?xml version="1.0" encoding="{}"?>\n'.format(uenc)
         ret += ET.tostring(xroot).decode("utf-8")
 
+        rc = 200
         if self.can_write and not bos.path.isfile(abspath):
             with open(fsenc(abspath), "wb") as _:
-                pass
+                rc = 201
 
-        self.reply(ret.encode(enc, "replace"), 200, "text/xml; charset=" + enc)
+        self.out_headers["Lock-Token"] = "<{}>".format(token)
+        self.reply(ret.encode(enc, "replace"), rc, "text/xml; charset=" + enc)
         return True
 
     def handle_unlock(self) -> bool:
@@ -1388,8 +1393,11 @@ class HttpCli(object):
         params.update(open_ka)
         assert fn
 
-        if rnd and not self.args.nw:
-            fn = self.rand_name(fdir, fn, rnd)
+        if not self.args.nw:
+            if rnd:
+                fn = self.rand_name(fdir, fn, rnd)
+
+            fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
 
         path = os.path.join(fdir, fn)
 

@@ -2,8 +2,8 @@
 from __future__ import print_function, unicode_literals
 
 import calendar
-import time
 import stat
+import time
 import zlib
 
 from .bos import bos

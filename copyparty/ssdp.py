@@ -8,7 +8,7 @@ from email.utils import formatdate
 
 from .__init__ import TYPE_CHECKING
 from .multicast import MC_Sck, MCast
-from .util import CachedSet, min_ex, html_escape
+from .util import CachedSet, html_escape, min_ex
 
 if TYPE_CHECKING:
     from .broker_util import BrokerCli

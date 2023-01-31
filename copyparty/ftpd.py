@@ -13,9 +13,18 @@ from pyftpdlib.filesystems import AbstractedFS, FilesystemError
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
-from .__init__ import PY2, TYPE_CHECKING, E
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
 from .bos import bos
-from .util import Daemon, Pebkac, exclude_dotfiles, fsenc, ipnorm
+from .util import (
+    Daemon,
+    Pebkac,
+    exclude_dotfiles,
+    fsenc,
+    ipnorm,
+    relchk,
+    sanitize_fn,
+    vjoin,
+)
 
 try:
     from pyftpdlib.ioloop import IOLoop
@@ -125,6 +134,12 @@ class FtpFs(AbstractedFS):
     ) -> str:
         try:
             vpath = vpath.replace("\\", "/").lstrip("/")
+            rd, fn = os.path.split(vpath)
+            if ANYWIN and not relchk(rd):
+                raise FilesystemError("unsupported characters in filepath")
+
+            fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
+            vpath = vjoin(rd, fn)
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             if not vfs.realpath:
                 raise FilesystemError("no filesystem mounted at this path")
