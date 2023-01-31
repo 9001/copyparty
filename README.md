@@ -1270,6 +1270,7 @@ other misc notes:
 
 * you can disable directory listings by giving permission `g` instead of `r`, only accepting direct URLs to files
   * combine this with volflag `c,fk` to generate filekeys (per-file accesskeys); users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
+    * the default filekey entropy is fairly small so give `--fk-salt` around 30 characters if you want filekeys longer than 16 chars
   * permissions `wG` lets users upload files and receive their own filekeys, still without being able to see other uploads
 
 

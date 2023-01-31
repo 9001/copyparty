@@ -1,4 +1,63 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0129-1842  `v1.6.2`  cors k
+
+[Ellie Goulding - Stay Awake (kors k Hardcore Bootleg).mp3](https://a.ocv.me/pub/demo/music/.bonus/#af-134e597c)
+* 👆 the read-only demo server at https://a.ocv.me/pub/demo/
+
+## breaking changes
+but nothing is affected (that i know of):
+* all requests must pass [cors validation](https://github.com/9001/copyparty#cors)
+  * but they almost definitely did already
+  * sharex and others are OK since they don't supply an `Origin` header
+* [API calls](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#http-api) `?delete` and `?move` are now POST instead of GET
+  * not aware of any clients using these
+
+## known issues
+* the document sandbox is a bit laggy and sometimes eats hotkeys
+  * disable it with `--no-sb-md --no-sb-lg` if you trust everyone who has write and/or move access
+
+## new features
+* [event hooks](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks) -- run programs on new [uploads](https://user-images.githubusercontent.com/241032/215304439-1c1cb3c8-ec6f-4c17-9f27-81f969b1811a.png), renames, deletes
+* [configurable cors](https://github.com/9001/copyparty#cors) (cross-origin resource sharing) behavior; defaults are mostly same as before
+  * `--allow-csrf` disables all csrf protections and makes it intentionally trivial to send authenticated requests from other domains
+* sandboxed readme.md / prologues / epilogues
+  * documents can still run scripts like before, but can no longer tamper with the web-ui / read the login session, so the old advice of `--no-readme` and `--no-logues` is mostly deprecated
+  * unfortunately disables hotkeys while the text has focus + blocks dragdropping files onto that area, oh well
+* password can be provided through http header `PW:` (instead of cookie `cppwd` or or url-param `?pw`)
+* detect network changes (new NICs, IPs) and reconfigure / reannoucne zeroconf
+  * fixes mdns when running as a systemd service and copyparty is started before networking is up
+* add `--freebind` to start listening on IPs before the NIC is up yet (linux-only)
+* per-volume deduplication-control with volflags `hardlink`, `neversymlink`, `copydupes`
+* detect curl and return a [colorful, sortable plaintext](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) directory listing instead
+* add optional [powered-by-copyparty](https://user-images.githubusercontent.com/241032/215322626-11d1f02b-25f4-45df-a3d9-f8c51354a8eb.png) footnode on the controlpanel
+  * can be disabled with `-nb` or redirected with `--pb-url`
+
+## bugfixes
+* change some API calls (`?delete`, `?move`) from `GET` to `POST`
+  * don't panic! this was safe against authenticated csrf thanks to [SameSite=Lax](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite#lax)
+  * `--getmod` restores the GETs if you need the convenience and accept the risks
+* [u2cli](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) (command-line uploader):
+  * recover from network hiccups
+  * add `-ns` for slow uefi TTYs
+* separate login cookies for http / https
+  * avoids an https login from getting accidentally sent over plaintext
+  * sadly no longer possible to login with internet explorer 4.0 / windows 3.11
+* tar/zip-download of hidden folders
+* unpost filtering was buggy for non-ascii characters
+* moving a deduplicated file on a volume where deduplication was since disabled
+* improved the [linux 6.0.16](https://utcc.utoronto.ca/~cks/space/blog/linux/KernelBindBugIn6016) kernel bug [workaround](https://github.com/9001/copyparty/commit/9065226c3d634a9fc15b14a768116158bc1761ad) because there is similar funk in 5.x
+* add custom text selection colors because chrome is currently broken on fedora
+* blockdevs (`/dev/nvme0n1`) couldn't be downloaded as files
+* misc fixes for location-based reverse-proxying
+* macos dualstack thing
+
+## other changes
+* added a collection of [cursed usecases](https://github.com/9001/copyparty/tree/hovudstraum/docs/cursed-usecases)
+* and [comparisons to similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) in case you ever wanna jump ship
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0112-0515  `v1.5.6`  many hands
 
 hello from warsaw airport (goodbye japan ;_;)
