@@ -5730,18 +5730,25 @@ var wfp_debounce = (function () {
 	var r = { 'n': 0, 't': 0 };
 
 	r.hide = function () {
+		if (!sb_lg && !sb_md)
+			return;
+
 		if (++r.n <= 1) {
 			r.n = 1;
 			clearTimeout(r.t);
-			r.t = setTimeout(r.reset, 500);
-			ebi('wfp').style.visibility = 'hidden';
+			r.t = setTimeout(r.reset, 300);
+			ebi('wfp').style.opacity = 0.1;
 		}
 	};
 	r.show = function () {
+		if (!sb_lg && !sb_md)
+			return;
+
 		if (--r.n <= 0) {
 			r.n = 0;
 			clearTimeout(r.t);
-			ebi('wfp').style.visibility = 'unset';
+			ebi('wfp').style.opacity = 'unset';
+			ebi('wrap').style.opacity = 'unset';
 		}
 	};
 	r.reset = function () {
@@ -6731,12 +6738,16 @@ function sandbox(tgt, rules, cls, html) {
 		return false;
 	}
 	clmod(tgt, 'sb', 1);
-	if (!cls)
-		wfp_debounce.hide();
 
 	var tid = tgt.getAttribute('id'),
 		hash = location.hash,
 		want = '';
+
+	if (!cls) {
+		wfp_debounce.hide();
+		if (tid == 'pro')
+			ebi('wrap').style.opacity = 0.2;
+	}
 
 	if (hash.startsWith('#md-'))
 		want = hash.slice(1);
