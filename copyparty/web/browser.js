@@ -6743,6 +6743,10 @@ if (readme)
 
 
 function sandbox(tgt, rules, cls, html) {
+	if (!treectl.ireadme) {
+		tgt.innerHTML = html ? '[📜<em>readme</em>] disabled in [⚙️] -- document hidden' : '';
+		return;
+	}
 	if (!rules || (html || '').indexOf('<') == -1) {
 		tgt.innerHTML = html;
 		clmod(tgt, 'sb');
