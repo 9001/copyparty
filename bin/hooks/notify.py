@@ -26,9 +26,23 @@ parameters explained,
 """
 
 
+try:
+    from copyparty.util import humansize
+except:
+
+    def humansize(n):
+        return n
+
+
 def main():
-    dp, fn = os.path.split(sys.argv[1])
-    msg = "🏷️ {}\n📁 {}".format(fn, dp)
+    fp = sys.argv[1]
+    dp, fn = os.path.split(fp)
+    try:
+        sz = humansize(os.path.getsize(fp))
+    except:
+        sz = "?"
+
+    msg = "{} ({})\n📁 {}".format(fn, sz, dp)
     title = "File received"
 
     if "com.termux" in sys.executable:
