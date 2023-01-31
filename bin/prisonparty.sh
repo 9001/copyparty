@@ -4,7 +4,7 @@ set -e
 # runs copyparty (or any other program really) in a chroot
 #
 # assumption: these directories, and everything within, are owned by root
-sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr )
+sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr /etc/alternatives )
 
 
 # error-handler
