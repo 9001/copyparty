@@ -3355,7 +3355,7 @@ class HttpCli(object):
         if not self.args.no_readme and not logues[1]:
             for fn in ["README.md", "readme.md"]:
                 fn = os.path.join(abspath, fn)
-                if bos.path.exists(fn):
+                if bos.path.isfile(fn):
                     with open(fsenc(fn), "rb") as f:
                         readme = f.read().decode("utf-8")
                         break

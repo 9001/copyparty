@@ -1128,6 +1128,7 @@ class AuthSrv(object):
                 ("no_dedup", "copydupes"),
                 ("magic", "magic"),
                 ("xlink", "xlink"),
+                ("dotsrch", "dotsrch"),
             ):
                 if getattr(self.args, ga):
                     vol.flags[vf] = True
@@ -1135,6 +1136,7 @@ class AuthSrv(object):
             for ve, vd in (
                 ("sb_md", "no_sb_md"),
                 ("sb_lg", "no_sb_lg"),
+                ("nodotsrch", "dotsrch"),
             ):
                 if ve in vol.flags:
                     vol.flags.pop(vd, None)

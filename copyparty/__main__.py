@@ -535,6 +535,8 @@ def get_sects():
               \033[36mxlink$\033[35m cross-volume dupe detection / linking
               \033[36mxdev\033[35m do not descend into other filesystems
               \033[36mxvol\033[35m skip symlinks leaving the volume root
+              \033[36mdotsrch\033[35m show dotfiles in search results
+              \033[36mnodotsrch\033[35m hide dotfiles in search results (default)
 
             \033[0mdatabase, audio tags:
             "mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...
@@ -552,6 +554,12 @@ def get_sects():
               \033[36mhtml_head=TXT\033[35m includes TXT in the <head>
               \033[36mrobots\033[35m allows indexing by search engines (default)
               \033[36mnorobots\033[35m kindly asks search engines to leave
+              \033[36mno_sb_md\033[35m disable js sandbox for markdown files
+              \033[36mno_sb_lg\033[35m disable js sandbox for prologue/epilogue
+              \033[36msb_md\033[35m enable js sandbox for markdown files (default)
+              \033[36msb_lg\033[35m enable js sandbox for prologue/epilogue (default)
+              \033[36mmd_sbf\033[35m list of markdown-sandbox safeguards to disable
+              \033[36mlg_sbf\033[35m list of *logue-sandbox safeguards to disable
 
             \033[0mothers:
               \033[36mfk=8\033[35m generates per-file accesskeys,
@@ -944,6 +952,7 @@ def add_db_general(ap, hcores):
     ap2.add_argument("--db-act", metavar="SEC", type=float, default=10, help="defer any scheduled volume reindexing until SEC seconds after last db write (uploads, renames, ...)")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=45, help="search deadline -- terminate searches running for more than SEC seconds")
     ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results to allow clients to fetch; 125 results will be shown initially")
+    ap2.add_argument("--dotsrch", action="store_true", help="show dotfiles in search results (volflags: dotsrch | nodotsrch)")
 
 
 def add_db_metadata(ap):

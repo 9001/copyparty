@@ -311,6 +311,7 @@ class U2idx(object):
 
             sret = []
             fk = flags.get("fk")
+            dots = flags.get("dotsrch")
             c = cur.execute(uq, tuple(vuv))
             for hit in c:
                 w, ts, sz, rd, fn, ip, at = hit[:7]
@@ -320,6 +321,10 @@ class U2idx(object):
 
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
+
+                rp = quotep("/".join([x for x in [vtop, rd, fn] if x]))
+                if not dots and "/." in ("/" + rp):
+                    continue
 
                 if not fk:
                     suf = ""
@@ -337,8 +342,7 @@ class U2idx(object):
                         )[:fk]
                     )
 
-                rp = quotep("/".join([x for x in [vtop, rd, fn] if x])) + suf
-                sret.append({"ts": int(ts), "sz": sz, "rp": rp, "w": w[:16]})
+                sret.append({"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16]})
 
             for hit in sret:
                 w = hit["w"]
