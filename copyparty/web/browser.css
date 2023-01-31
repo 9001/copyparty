@@ -811,6 +811,9 @@ html.y #path a:hover {
 .logue>iframe.focus {
 	box-shadow: 0 0 .1em .1em var(--a);
 }
+#pro.logue>iframe {
+	height: 100vh;
+}
 #pro.logue {
 	margin-bottom: .8em;
 }

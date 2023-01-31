@@ -5761,7 +5761,6 @@ var wfp_debounce = (function () {
 			r.n = 0;
 			clearTimeout(r.t);
 			ebi('wfp').style.opacity = 'unset';
-			ebi('wrap').style.opacity = 'unset';
 		}
 	};
 	r.reset = function () {
@@ -6760,11 +6759,8 @@ function sandbox(tgt, rules, cls, html) {
 		hash = location.hash,
 		want = '';
 
-	if (!cls) {
+	if (!cls)
 		wfp_debounce.hide();
-		if (tid == 'pro')
-			ebi('wrap').style.opacity = 0.2;
-	}
 
 	if (hash.startsWith('#md-'))
 		want = hash.slice(1);
