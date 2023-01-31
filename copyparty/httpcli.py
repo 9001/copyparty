@@ -1393,25 +1393,6 @@ class HttpCli(object):
 
         path = os.path.join(fdir, fn)
 
-        if is_put and not self.args.no_dav:
-            # allow overwrite if...
-            #  * volflag 'daw' is set
-            #  * and account has delete-access
-            # or...
-            #  * file exists and is empty
-            #  * and there is no .PARTIAL
-
-            tnam = fn + ".PARTIAL"
-            if self.args.dotpart:
-                tnam = "." + tnam
-
-            if (vfs.flags.get("daw") and self.can_delete) or (
-                not bos.path.exists(os.path.join(fdir, tnam))
-                and bos.path.exists(path)
-                and not bos.path.getsize(path)
-            ):
-                params["overwrite"] = "a"
-
         if xbu:
             at = time.time() - lifetime
             if not runhook(
@@ -1429,6 +1410,26 @@ class HttpCli(object):
                 t = "upload denied by xbu"
                 self.log(t, 1)
                 raise Pebkac(403, t)
+
+        if is_put and not self.args.no_dav:
+            # allow overwrite if...
+            #  * volflag 'daw' is set
+            #  * and account has delete-access
+            # or...
+            #  * file exists and is empty
+            #  * and there is no .PARTIAL
+
+            tnam = fn + ".PARTIAL"
+            if self.args.dotpart:
+                tnam = "." + tnam
+
+            if (vfs.flags.get("daw") and self.can_delete) or (
+                not bos.path.exists(os.path.join(fdir, tnam))
+                and bos.path.exists(path)
+                and not bos.path.getsize(path)
+            ):
+                # small toctou, but better than clobbering a hardlink
+                bos.unlink(path)
 
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
@@ -2300,7 +2301,7 @@ class HttpCli(object):
             raise Pebkac(400, "could not read lastmod from request")
 
         nullwrite = self.args.nw
-        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, True, True)
         self._assert_safe_rem(rem)
 
         clen = int(self.headers.get("content-length", -1))
@@ -2381,6 +2382,9 @@ class HttpCli(object):
         p_field, _, p_data = next(self.parser.gen)
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
+
+        if bos.path.exists(fp):
+            bos.unlink(fp)
 
         with open(fsenc(fp), "wb", 512 * 1024) as f:
             sz, sha512, _ = hashcopy(p_data, f, self.args.s_wr_slp)

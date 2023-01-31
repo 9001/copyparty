@@ -1153,17 +1153,9 @@ def ren_open(
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
-    overwrite = kwargs.pop("overwrite", None)
 
     if fname == os.devnull:
         with fun(fname, *args, **kwargs) as f:
-            yield {"orz": (f, fname)}
-            return
-
-    if overwrite:
-        assert fdir
-        fpath = os.path.join(fdir, fname)
-        with fun(fsenc(fpath), *args, **kwargs) as f:
             yield {"orz": (f, fname)}
             return
 
