@@ -988,8 +988,8 @@ def add_ui(ap, retry):
     ap2.add_argument("--txt-max", metavar="KiB", type=int, default=64, help="max size of embedded textfiles on ?doc= (anything bigger will be lazy-loaded by JS)")
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty", help="title / service-name to show in html documents")
     ap2.add_argument("--pb-url", metavar="URL", type=u, default="https://github.com/9001/copyparty", help="powered-by link; disable with -np")
-    ap2.add_argument("--md-sbf", metavar="FLAGS", type=u, default="downloads forms modals popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for README.md docs (volflag=md_sbf); see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox")
-    ap2.add_argument("--lg-sbf", metavar="FLAGS", type=u, default="downloads forms modals popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for prologue/epilogue docs  (volflag=lg_sbf)")
+    ap2.add_argument("--md-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for README.md docs (volflag=md_sbf); see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox")
+    ap2.add_argument("--lg-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for prologue/epilogue docs  (volflag=lg_sbf)")
     ap2.add_argument("--no-sb-md", action="store_true", help="don't sandbox README.md documents (volflags: no_sb_md | sb_md)")
     ap2.add_argument("--no-sb-lg", action="store_true", help="don't sandbox prologue/epilogue docs (volflags: no_sb_lg | sb_lg); enables non-js support")
 

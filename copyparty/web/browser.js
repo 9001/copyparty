@@ -346,6 +346,7 @@ var Ls = {
 		"s_a1": "specific metadata properties",
 
 		"md_eshow": "cannot show ",
+		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
 
 		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
 		"cf_ok": "sorry about that -- DD" + wah + "oS protection kicked in\n\nthings should resume in about 30 sec\n\nif nothing happens, hit F5 to reload the page",
@@ -791,6 +792,7 @@ var Ls = {
 		"s_a1": "konkrete egenskaper",
 
 		"md_eshow": "kan ikke vise ",
+		"md_off": "[📜<em>readme</em>] er avskrudd i [⚙️] -- dokument skjult",
 
 		"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
 		"cf_ok": "beklager -- liten tilfeldig kontroll, alt OK\n\nting skal fortsette om ca. 30 sekunder\n\nhvis ikkeno skjer, trykk F5 for å laste siden på nytt",
@@ -6734,7 +6736,7 @@ function set_tabindex() {
 
 function show_readme(md) {
 	if (!treectl.ireadme)
-		return;
+		return sandbox(ebi('epi'), '', '', 'a');
 
 	show_md(md, 'README.md', ebi('epi'));
 }
@@ -6744,7 +6746,7 @@ if (readme)
 
 function sandbox(tgt, rules, cls, html) {
 	if (!treectl.ireadme) {
-		tgt.innerHTML = html ? '[📜<em>readme</em>] disabled in [⚙️] -- document hidden' : '';
+		tgt.innerHTML = html ? L.md_off : '';
 		return;
 	}
 	if (!rules || (html || '').indexOf('<') == -1) {
