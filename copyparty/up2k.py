@@ -2092,7 +2092,16 @@ class Up2k(object):
                     )
                     alts.append((score, -len(alts), j))
 
-            job = sorted(alts, reverse=True)[0][2] if alts else None
+            if alts:
+                best = sorted(alts, reverse=True)[0]
+                job = best[2]
+                if best[0] == 5 and vfs.flags.get("rand") or cj.get("rand"):
+                    # filenames are randomized; found dupe in same folder;
+                    # perfect! return the original file
+                    cj["name"] = job["name"]
+            else:
+                job = None
+
             if job and wark in reg:
                 # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
                 del reg[wark]
@@ -2167,7 +2176,13 @@ class Up2k(object):
                             job[k] = cj[k]
 
                         pdir = djoin(cj["ptop"], cj["prel"])
-                        job["name"] = self._untaken(pdir, cj, now)
+                        if vfs.flags.get("rand") or cj.get("rand"):
+                            job["name"] = rand_name(
+                                pdir, cj["name"], vfs.flags["nrand"]
+                            )
+                        else:
+                            job["name"] = self._untaken(pdir, cj, now)
+
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
                             bos.unlink(dst)  # TODO ed pls

@@ -134,6 +134,7 @@ var Ls = {
 		"wt_next": "next track$NHotkey: L",
 
 		"ul_par": "parallel uploads:",
+		"ut_rand": "randomize filenames",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
 		"ut_ask": "ask for confirmation before upload starts",
 		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
@@ -580,6 +581,7 @@ var Ls = {
 		"wt_next": "neste sang$NSnarvei: L",
 
 		"ul_par": "samtidige handl.:",
+		"ut_rand": "finn opp nye tilfeldige filnavn",
 		"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
 		"ut_ask": "bekreft filutvalg før opplastning starter",
 		"ut_pot": "forbedre ytelsen på trege enheter ved å$Nforenkle brukergrensesnittet",
@@ -957,8 +959,8 @@ ebi('op_up2k').innerHTML = (
 	'	<tr>\n' +
 	'		<td class="c" data-perm="read"><br />' + L.ul_par + '</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
+	'			<input type="checkbox" id="u2rand" />\n' +
+	'			<label for="u2rand" tt="' + L.ut_rand + '">🎲</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="potato" />\n' +
@@ -1075,6 +1077,7 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
+	'		<a id="multitask" class="tgl btn" href="#" tt="' + L.ut_mt + '">🏃</a>\n' +
 	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '">mt</a>\n' +
 	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '">turbo</a>\n' +
 	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '">date-chk</a>\n' +
