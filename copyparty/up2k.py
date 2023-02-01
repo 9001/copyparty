@@ -41,6 +41,7 @@ from .util import (
     hidedir,
     min_ex,
     quotep,
+    rand_name,
     ren_open,
     rmdirs,
     rmdirs_up,
@@ -2184,8 +2185,11 @@ class Up2k(object):
                             cur.connection.commit()
 
             if not job:
+                ap1 = djoin(cj["ptop"], cj["prel"])
+                if vfs.flags.get("rand") or cj.get("rand"):
+                    cj["name"] = rand_name(ap1, cj["name"], vfs.flags["nrand"])
+
                 if vfs.lim:
-                    ap1 = djoin(cj["ptop"], cj["prel"])
                     ap2, cj["prel"] = vfs.lim.all(
                         cj["addr"], cj["prel"], cj["size"], ap1, reg
                     )

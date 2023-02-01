@@ -1114,39 +1114,57 @@ class AuthSrv(object):
                 if ptn:
                     vol.flags[vf] = re.compile(ptn)
 
-            for k in ["e2t", "e2ts", "e2tsr", "e2v", "e2vu", "e2vp", "xdev", "xvol"]:
+            for k in (
+                "dotsrch",
+                "e2t",
+                "e2ts",
+                "e2tsr",
+                "e2v",
+                "e2vu",
+                "e2vp",
+                "hardlink",
+                "magic",
+                "no_sb_md",
+                "no_sb_lg",
+                "rand",
+                "xdev",
+                "xlink",
+                "xvol",
+            ):
                 if getattr(self.args, k):
                     vol.flags[k] = True
 
             for ga, vf in (
-                ("no_sb_md", "no_sb_md"),
-                ("no_sb_lg", "no_sb_lg"),
-                ("no_forget", "noforget"),
-                ("no_dupe", "nodupe"),
-                ("hardlink", "hardlink"),
                 ("never_symlink", "neversymlink"),
                 ("no_dedup", "copydupes"),
-                ("magic", "magic"),
-                ("xlink", "xlink"),
-                ("dotsrch", "dotsrch"),
+                ("no_dupe", "nodupe"),
+                ("no_forget", "noforget"),
             ):
                 if getattr(self.args, ga):
                     vol.flags[vf] = True
 
             for ve, vd in (
-                ("sb_md", "no_sb_md"),
-                ("sb_lg", "no_sb_lg"),
                 ("nodotsrch", "dotsrch"),
+                ("sb_lg", "no_sb_lg"),
+                ("sb_md", "no_sb_md"),
             ):
                 if ve in vol.flags:
                     vol.flags.pop(vd, None)
 
             for ga, vf in (
-                ("md_sbf", "md_sbf"),
                 ("lg_sbf", "lg_sbf"),
+                ("md_sbf", "md_sbf"),
             ):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
+
+            for k in ("nrand",):
+                if k not in vol.flags:
+                    vol.flags[k] = getattr(self.args, k)
+
+            for k in ("nrand",):
+                if k in vol.flags:
+                    vol.flags[k] = int(vol.flags[k])
 
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:

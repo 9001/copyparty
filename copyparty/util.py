@@ -1505,6 +1505,28 @@ def read_header(sr: Unrecv) -> list[str]:
         return ret[:ofs].decode("utf-8", "surrogateescape").lstrip("\r\n").split("\r\n")
 
 
+def rand_name(fdir: str, fn: str, rnd: int) -> str:
+    ok = False
+    try:
+        ext = "." + fn.rsplit(".", 1)[1]
+    except:
+        ext = ""
+
+    for extra in range(16):
+        for _ in range(16):
+            if ok:
+                break
+
+            nc = rnd + extra
+            nb = int((6 + 6 * nc) / 8)
+            zb = os.urandom(nb)
+            zb = base64.urlsafe_b64encode(zb)
+            fn = zb[:nc].decode("utf-8") + ext
+            ok = not os.path.exists(fsenc(os.path.join(fdir, fn)))
+
+    return fn
+
+
 def gen_filekey(salt: str, fspath: str, fsize: int, inode: int) -> str:
     return base64.urlsafe_b64encode(
         hashlib.sha512(

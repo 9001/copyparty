@@ -58,6 +58,7 @@ from .util import (
     ipnorm,
     min_ex,
     quotep,
+    rand_name,
     read_header,
     read_socket,
     read_socket_chunked,
@@ -1395,7 +1396,7 @@ class HttpCli(object):
 
         if not self.args.nw:
             if rnd:
-                fn = self.rand_name(fdir, fn, rnd)
+                fn = rand_name(fdir, fn, rnd)
 
             fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
 
@@ -1465,7 +1466,7 @@ class HttpCli(object):
 
             if ext:
                 if rnd:
-                    fn2 = self.rand_name(fdir, "a." + ext, rnd)
+                    fn2 = rand_name(fdir, "a." + ext, rnd)
                 else:
                     fn2 = fn.rsplit(".", 1)[0] + "." + ext
 
@@ -1576,27 +1577,6 @@ class HttpCli(object):
             atomic_move(fp, fp + ".trunc")
         else:
             self.log("bakflip ok", 2)
-
-    def rand_name(self, fdir: str, fn: str, rnd: int) -> str:
-        ok = False
-        try:
-            ext = "." + fn.rsplit(".", 1)[1]
-        except:
-            ext = ""
-
-        for extra in range(16):
-            for _ in range(16):
-                if ok:
-                    break
-
-                nc = rnd + extra
-                nb = int((6 + 6 * nc) / 8)
-                zb = os.urandom(nb)
-                zb = base64.urlsafe_b64encode(zb)
-                fn = zb[:nc].decode("utf-8") + ext
-                ok = not bos.path.exists(os.path.join(fdir, fn))
-
-        return fn
 
     def _spd(self, nbytes: int, add: bool = True) -> str:
         if add:
@@ -2026,8 +2006,13 @@ class HttpCli(object):
         return True
 
     def upload_flags(self, vfs: VFS) -> tuple[int, bool, int, list[str], list[str]]:
-        srnd = self.uparam.get("rand", self.headers.get("rand", ""))
-        rnd = int(srnd) if srnd and not self.args.nw else 0
+        if self.args.nw:
+            rnd = 0
+        else:
+            rnd = int(self.uparam.get("rand") or self.headers.get("rand") or 0)
+            if vfs.flags.get("rand"):  # force-enable
+                rnd = max(rnd, vfs.flags["nrand"])
+
         ac = self.uparam.get(
             "want", self.headers.get("accept", "").lower().split(";")[-1]
         )
@@ -2082,7 +2067,7 @@ class HttpCli(object):
                 )
                 if p_file and not nullwrite:
                     if rnd:
-                        fname = self.rand_name(fdir, fname, rnd)
+                        fname = rand_name(fdir, fname, rnd)
 
                     if not bos.path.isdir(fdir):
                         raise Pebkac(404, "that folder does not exist")

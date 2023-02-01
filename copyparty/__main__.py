@@ -510,6 +510,8 @@ def get_sects():
             \033[0mupload rules:
               \033[36mmaxn=250,600\033[35m max 250 uploads over 15min
               \033[36mmaxb=1g,300\033[35m max 1 GiB over 5min (suffixes: b, k, m, g)
+              \033[36mrand\033[35m force randomized filenames, 9 chars long by default
+              \033[36mnrand=N\033[35m randomized filenames are N chars long
               \033[36msz=1k-3m\033[35m allow filesizes between 1 KiB and 3MiB
               \033[36mdf=1g\033[35m ensure 1 GiB free disk space
 
@@ -712,6 +714,8 @@ def add_upload(ap):
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead (volflag=copydupes")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-snap", action="store_true", help="disable snapshots -- forget unfinished uploads on shutdown; don't create .hist/up2k.snap files -- abandoned/interrupted uploads must be cleaned up manually")
+    ap2.add_argument("--rand", action="store_true", help="force randomized filenames, --nrand chars long (volflag=rand)")
+    ap2.add_argument("--nrand", metavar="NUM", type=int, default=9, help="randomized filenames length (volflag=nrand)")
     ap2.add_argument("--magic", action="store_true", help="enable filetype detection on nameless uploads (volflag=magic)")
     ap2.add_argument("--df", metavar="GiB", type=float, default=0, help="ensure GiB free disk space by rejecting upload requests")
     ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
