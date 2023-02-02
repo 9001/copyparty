@@ -229,7 +229,7 @@ rm -rf copyparty/web/deps
 curl -L https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py >x.py
 python3 x.py --version
 rm x.py
-mv /tmp/pe-copyparty/copyparty/web/deps/ copyparty/web/deps/
+cp -R /tmp/pe-copyparty.$(id -u)/copyparty/web/deps copyparty/web/
 ```
 
 then build the sfx using any of the following examples:
