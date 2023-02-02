@@ -42,6 +42,10 @@ html {
 	text-shadow: 1px 1px 0 #000;
 	color: #fff;
 }
+#toast.top {
+	top: 2em;
+	bottom: unset;
+}
 #toast a {
 	color: inherit;
 	text-shadow: inherit;

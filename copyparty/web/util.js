@@ -1280,17 +1280,17 @@ var toast = (function () {
         r.tag = tag;
     };
 
-    r.ok = function (sec, txt, tag) {
-        r.show('ok', sec, txt, tag);
+    r.ok = function (sec, txt, tag, cls) {
+        r.show('ok ' + (cls || ''), sec, txt, tag);
     };
-    r.inf = function (sec, txt, tag) {
-        r.show('inf', sec, txt, tag);
+    r.inf = function (sec, txt, tag, cls) {
+        r.show('inf ' + (cls || ''), sec, txt, tag);
     };
-    r.warn = function (sec, txt, tag) {
-        r.show('warn', sec, txt, tag);
+    r.warn = function (sec, txt, tag, cls) {
+        r.show('warn ' + (cls || ''), sec, txt, tag);
     };
-    r.err = function (sec, txt, tag) {
-        r.show('err', sec, txt, tag);
+    r.err = function (sec, txt, tag, cls) {
+        r.show('err ' + (cls || ''), sec, txt, tag);
     };
 
     return r;
