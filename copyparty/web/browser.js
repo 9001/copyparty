@@ -959,16 +959,16 @@ ebi('op_up2k').innerHTML = (
 	'	<tr>\n' +
 	'		<td class="c" data-perm="read"><br />' + L.ul_par + '</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="u2rand" />\n' +
-	'			<label for="u2rand" tt="' + L.ut_rand + '">🎲</label>\n' +
+	'			<input type="checkbox" id="multitask" />\n' +
+	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="potato" />\n' +
 	'			<label for="potato" tt="' + L.ut_pot + '">🥔</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="ask_up" />\n' +
-	'			<label for="ask_up" tt="' + L.ut_ask + '">💭</label>\n' +
+	'			<input type="checkbox" id="u2rand" />\n' +
+	'			<label for="u2rand" tt="' + L.ut_rand + '">🎲</label>\n' +
 	'		</td>\n' +
 	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
 	'			<input type="checkbox" id="fsearch" />\n' +
@@ -1077,7 +1077,7 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="multitask" class="tgl btn" href="#" tt="' + L.ut_mt + '">🏃</a>\n' +
+	'		<a id="ask_up" class="tgl btn" href="#" tt="' + L.ut_ask + '">💭</a>\n' +
 	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '">mt</a>\n' +
 	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '">turbo</a>\n' +
 	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '">date-chk</a>\n' +

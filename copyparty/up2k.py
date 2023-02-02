@@ -38,6 +38,8 @@ from .util import (
     db_ex_chk,
     djoin,
     fsenc,
+    gen_filekey,
+    gen_filekey_dbg,
     hidedir,
     min_ex,
     quotep,
@@ -159,6 +161,7 @@ class Up2k(object):
             Daemon(self._lastmodder, "up2k-lastmod")
 
         self.fstab = Fstab(self.log_func)
+        self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
 
         if self.args.hash_mt < 2:
             self.mth: Optional[MTHash] = None
@@ -213,6 +216,9 @@ class Up2k(object):
             msg += "\033[K"
 
         self.log_func("up2k", msg, c)
+
+    def _gen_fk(self, salt: str, fspath: str, fsize: int, inode: int) -> str:
+        return gen_filekey_dbg(salt, fspath, fsize, inode, self.log, self.args.log_fk)
 
     def _block(self, why: str) -> None:
         self.blocked = why
@@ -2257,7 +2263,7 @@ class Up2k(object):
             purl = "{}/{}".format(job["vtop"], job["prel"]).strip("/")
             purl = "/{}/".format(purl) if purl else "/"
 
-            return {
+            ret = {
                 "name": job["name"],
                 "purl": purl,
                 "size": job["size"],
@@ -2266,6 +2272,18 @@ class Up2k(object):
                 "hash": job["need"],
                 "wark": wark,
             }
+
+            if (
+                not ret["hash"]
+                and "fk" in vfs.flags
+                and (cj["user"] in vfs.axs.uread or cj["user"] in vfs.axs.upget)
+            ):
+                ap = absreal(os.path.join(job["ptop"], job["prel"], job["name"]))
+                ino = 0 if ANYWIN else bos.stat(ap).st_ino
+                fk = self.gen_fk(self.args.fk_salt, ap, job["size"], ino)
+                ret["fk"] = fk[: vfs.flags["fk"]]
+
+            return ret
 
     def _untaken(self, fdir: str, job: dict[str, Any], ts: float) -> str:
         fname = job["name"]

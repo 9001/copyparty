@@ -1364,8 +1364,7 @@ function up2k_init(subtle) {
 
             if (uc.fsearch)
                 entry.srch = 1;
-
-            if (uc.fsearch && uc.rand)
+            else if (uc.rand)
                 entry.rand = true;
 
             if (biggest_file < entry.size)
@@ -2217,13 +2216,24 @@ function up2k_init(subtle) {
 
                 t.sprs = response.sprs;
 
-                var rsp_purl = url_enc(response.purl);
-                if (rsp_purl !== t.purl || response.name !== t.name) {
-                    // server renamed us (file exists / path restrictions)
-                    console.log("server-rename [" + t.purl + "] [" + t.name + "] to [" + rsp_purl + "] [" + response.name + "]");
+                var fk = response.fk,
+                    rsp_purl = url_enc(response.purl),
+                    rename = rsp_purl !== t.purl || response.name !== t.name;
+
+                if (rename || fk) {
+                    if (rename)
+                        console.log("server-rename [" + t.purl + "] [" + t.name + "] to [" + rsp_purl + "] [" + response.name + "]");
+
                     t.purl = rsp_purl;
                     t.name = response.name;
-                    pvis.seth(t.n, 0, linksplit(t.purl + uricom_enc(t.name)).join(' '));
+
+                    var url = t.purl + uricom_enc(t.name);
+                    if (fk) {
+                        t.fk = fk;
+                        url += '?k=' + fk;
+                    }
+
+                    pvis.seth(t.n, 0, linksplit(url).join(' '));
                 }
 
                 var chunksize = get_chunksize(t.size),
@@ -2372,7 +2382,7 @@ function up2k_init(subtle) {
         };
         if (t.srch)
             req.srch = 1;
-        if (t.rand)
+        else if (t.rand)
             req.rand = true;
 
         xhr.open('POST', t.purl, true);
