@@ -371,7 +371,10 @@ var Ls = {
 		"fz_zipc": "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)",
 
 		"un_m1": "you can delete your recent uploads below",
-		"un_upd": "refresh list",
+		"un_upd": "refresh",
+		"un_m4": "or share the files visible below:",
+		"un_ulist": "show",
+		"un_ucopy": "copy",
 		"un_flt": "optional filter:&nbsp; URL must contain",
 		"un_fclr": "clear filter",
 		"un_derr": 'unpost-delete failed:\n',
@@ -821,7 +824,10 @@ var Ls = {
 		"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",
 
 		"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp",
-		"un_upd": "oppdater listen",
+		"un_upd": "oppdater",
+		"un_m4": "eller hvis du vil dele nedlastnings-lenkene:",
+		"un_ulist": "vis",
+		"un_ucopy": "kopiér",
 		"un_flt": "valgfritt filter:&nbsp; filnavn / filsti må inneholde",
 		"un_fclr": "nullstill filter",
 		"un_derr": 'unpost-sletting feilet:\n',
@@ -6846,6 +6852,7 @@ function ev_row_tgl(e) {
 var unpost = (function () {
 	ebi('op_unpost').innerHTML = (
 		L.un_m1 + ' &ndash; <a id="unpost_refresh" href="#">' + L.un_upd + '</a>' +
+		'<p>' + L.un_m4 + ' <a id="unpost_ulist" href="#">' + L.un_ulist + '</a> / <a id="unpost_ucopy" href="#">' + L.un_ucopy + '</a>' +
 		'<p>' + L.un_flt + ' <input type="text" id="unpost_filt" size="20" placeholder="documents/passwords" /><a id="unpost_nofilt" href="#">' + L.un_fclr + '</a></p>' +
 		'<div id="unpost"></div>'
 	);
@@ -6910,6 +6917,16 @@ var unpost = (function () {
 
 		ct.innerHTML = "<p><em>" + L.un_m3 + "</em></p>";
 	};
+
+	function linklist() {
+		var ret = [],
+			base = document.location.origin.replace(/\/$/, '');
+
+		for (var a = 0; a < r.files.length; a++)
+			ret.push(base + r.files[a].vp);
+
+		return ret.join('\r\n');
+	}
 
 	function unpost_delete_cb() {
 		if (this.status !== 200) {
@@ -6985,6 +7002,19 @@ var unpost = (function () {
 	ebi('unpost_refresh').onclick = function (e) {
 		ev(e);
 		goto('unpost');
+	};
+
+	ebi('unpost_ulist').onclick = function (e) {
+		ev(e);
+		modal.alert(linklist());
+	};
+
+	ebi('unpost_ucopy').onclick = function (e) {
+		ev(e);
+		var txt = linklist();
+		cliptxt(txt + '\n', function () {
+			toast.inf(5, txt.split('\n').length + ' links copied to clipboard');
+		});
 	};
 
 	return r;
