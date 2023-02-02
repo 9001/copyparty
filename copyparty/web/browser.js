@@ -159,6 +159,9 @@ var Ls = {
 		"uct_q": "idle, pending",
 
 		"utl_name": "filename",
+		"utl_ulist": "list",
+		"utl_ucopy": "copy",
+		"utl_links": "links",
 		"utl_stat": "status",
 		"utl_prog": "progress",
 
@@ -573,8 +576,8 @@ var Ls = {
 		"wt_selinv": "inverter utvalg",
 		"wt_selzip": "last ned de valgte filene som et arkiv",
 		"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
-		"wt_npirc": "kopier sang-info (irc-formattert)",
-		"wt_nptxt": "kopier sang-info",
+		"wt_npirc": "kopiér sang-info (irc-formattert)",
+		"wt_nptxt": "kopiér sang-info",
 		"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
 		"wt_prev": "forrige sang$NSnarvei: J",
 		"wt_play": "play / pause$NSnarvei: P",
@@ -606,6 +609,9 @@ var Ls = {
 		"uct_q": "køen",
 
 		"utl_name": "filnavn",
+		"utl_ulist": "vis",
+		"utl_ucopy": "kopiér",
+		"utl_links": "lenker",
 		"utl_stat": "status",
 		"utl_prog": "fremdrift",
 
@@ -1016,7 +1022,7 @@ ebi('op_up2k').innerHTML = (
 	'<div id="u2tabw" class="na"><table id="u2tab">\n' +
 	'	<thead>\n' +
 	'		<tr>\n' +
-	'			<td>' + L.utl_name + '</td>\n' +
+	'			<td>' + L.utl_name + ' &nbsp;(<a href="#" id="luplinks">' + L.utl_ulist + '</a>/<a href="#" id="cuplinks">' + L.utl_ucopy + '</a>' + L.utl_links + ')</td>\n' +
 	'			<td>' + L.utl_stat + '</td>\n' +
 	'			<td>' + L.utl_prog + '</td>\n' +
 	'		</tr>\n' +
@@ -1713,29 +1719,9 @@ var widget = (function () {
 
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
-		var o = mknod('input');
-		o.style.cssText = 'position:fixed;top:45%;left:48%;padding:1em;z-index:9';
-		o.value = m;
-		document.body.appendChild(o);
-
-		var cln = function () {
-			o.value = 'copied to clipboard ';
-			setTimeout(function () {
-				document.body.removeChild(o);
-			}, 500);
-		};
-		var fb = function () {
-			console.log('fb');
-			o.focus();
-			o.select();
-			document.execCommand("copy");
-			cln();
-		};
-		try {
-			// https only
-			navigator.clipboard.writeText(m).then(cln, fb);
-		}
-		catch (ex) { fb(); }
+		cliptxt(m, function () {
+			toast.ok(1, 'copied to clipboard', null, 'top');
+		});
 	};
 	r.set(sread('au_open') == 1);
 	setTimeout(function () {

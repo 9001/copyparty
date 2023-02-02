@@ -1421,6 +1421,35 @@ function up2k_init(subtle) {
     }
     more_one_file();
 
+    function linklist() {
+        var ret = [],
+            base = document.location.origin.replace(/\/$/, '');
+
+        for (var a = 0; a < st.files.length; a++) {
+            var t = st.files[a],
+                url = t.purl + uricom_enc(t.name);
+
+            if (t.fk)
+                url += '?k=' + t.fk;
+
+            ret.push(base + url);
+        }
+        return ret.join('\r\n');
+    }
+
+    ebi('luplinks').onclick = function (e) {
+        ev(e);
+        modal.alert(linklist());
+    };
+
+    ebi('cuplinks').onclick = function (e) {
+        ev(e);
+        var txt = linklist();
+        cliptxt(txt + '\n', function () {
+            toast.inf(5, txt.split('\n').length + ' links copied to clipboard');
+        });
+    };
+
     var etaref = 0, etaskip = 0, utw_minh = 0, utw_read = 0;
     function etafun() {
         var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,

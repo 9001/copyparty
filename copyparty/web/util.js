@@ -978,12 +978,32 @@ function sethash(hv) {
     }
 }
 
+
 function dl_file(url) {
     console.log('DL [%s]', url);
     var o = mknod('a');
     o.setAttribute('href', url);
     o.setAttribute('download', '');
     o.click();
+}
+
+
+function cliptxt(txt, ok) {
+    var fb = function () {
+        console.log('fb');
+        var o = mknod('input');
+        o.value = txt;
+        document.body.appendChild(o);
+        o.focus();
+        o.select();
+        document.execCommand("copy");
+        document.body.removeChild(o);
+        ok();
+    };
+    try {
+        navigator.clipboard.writeText(txt).then(ok, fb);
+    }
+    catch (ex) { fb(); }
 }
 
 
