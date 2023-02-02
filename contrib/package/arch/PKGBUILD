@@ -1,0 +1,39 @@
+# Maintainer: John Smith <devnull@need.moe>
+pkgname=copyparty-git
+_pkgname=copyparty
+pkgver=1.6.3.r2.ga918c28
+pkgrel=1
+pkgdesc="Portable file sharing hub"
+arch=("any")
+url="https://github.com/9001/copyparty"
+license=('MIT')
+depends=("python3")
+makedepends=("git" "curl" "python3")
+optdepends=("python-mutagen" "python-pillow" "python-pyvips" "ffmpeg" "python-pyftpdlib" "python-pyopenssl" "impacket"==0.10.0)
+conflicts=("copyparty")
+source=("git+https://github.com/9001/${_pkgname}.git")
+sha256sums=("SKIP")
+
+prepare() {
+	cd "${srcdir}/${_pkgname}"
+    cp "contrib/systemd/${_pkgname}.service" "package/arch/${_pkgname}.service"
+    sed -i 's/\/usr\/local\/bin\/copyparty-sfx.py/\/usr\/bin\/copyparty/' "package/arch/${_pkgname}.service"
+}
+
+pkgver() {
+	cd "${srcdir}/${_pkgname}"
+	git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "${srcdir}/${_pkgname}/scripts"
+	./make-sfx.sh gz
+}
+
+package() {
+	cd "${srcdir}/${_pkgname}"
+	install -Dm755 "dist/copyparty-sfx-gz.py" "${pkgdir}/usr/bin/${_pkgname}"
+	install -Dm644 "package/arch/${_pkgname}.service"  "${pkgdir}/usr/lib/systemd/system/${_pkgname}.service"
+	install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${_pkgname}/LICENSE"
+    echo "If this is your first time installing copyparty, you'll want to copy the systemd service file to /etc/systemd/system and edit it to suit your needs"
+}
