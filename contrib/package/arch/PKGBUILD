@@ -6,16 +6,14 @@ pkgdesc="Portable file sharing hub"
 arch=("any")
 url="https://github.com/9001/${pkgname}"
 license=('MIT')
-depends=("python3" "python-jinja")
+depends=("python3")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags" 
 			"python-mutagen: music tags (alternative)" 
 			"python-pillow: thumbnails for images" 
 			"python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
 			"libkeyfinder-git: detection of musical keys" 
 			"qm-vamp-plugins: BPM detection" 
-			"python-pyftpdlib: ftp functionality" 
 			"python-pyopenssl: sftp functionality" 
-			"impacket: smb support (bad idea)"
 			"python-impacket-git: smb support (bad idea)"
 )
 source=("${url}/releases/download/v${pkgver}/${pkgname}-sfx.py" 
