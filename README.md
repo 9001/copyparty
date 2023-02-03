@@ -199,7 +199,7 @@ recommended additional steps on debian  which enable audio metadata and thumbnai
 
 small collection of user feedback
 
-`good enough`, `surprisingly correct`, `certified good software`, `just works`, `why`
+`good enough`, `surprisingly correct`, `certified good software`, `just works`, `why`, `wow this is better than nextcloud
 
 
 # motivations
