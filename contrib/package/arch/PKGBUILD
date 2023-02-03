@@ -13,7 +13,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
             "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
             "libkeyfinder-git: detection of musical keys" 
             "qm-vamp-plugins: BPM detection" 
-            "python-pyopenssl: sftp functionality" 
+            "python-pyopenssl: ftps functionality" 
             "python-impacket-git: smb support (bad idea)"
 )
 source=("${url}/releases/download/v${pkgver}/${pkgname}-sfx.py" 
@@ -30,8 +30,8 @@ sha256sums=("56c02d43a0e6c18d71295268674454b4c6f5ff2ccef30fb95f81d58d2d1e260d"
 
 package() {
     cd "${srcdir}/"
-    mkdir -p /etc/${pkgname}.d
 
+	install -dm755 "${pkgdir}/etc/${pkgname}.d"
     install -Dm755 "${pkgname}-sfx.py" "${pkgdir}/usr/bin/${pkgname}"
     install -Dm644 "${pkgname}.conf" "${pkgdir}/etc/${pkgname}.conf"
     install -Dm644 "${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
