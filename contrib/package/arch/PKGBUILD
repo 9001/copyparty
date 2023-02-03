@@ -8,29 +8,29 @@ url="https://github.com/9001/${pkgname}"
 license=('MIT')
 depends=("python3")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags" 
-			"python-mutagen: music tags (alternative)" 
-			"python-pillow: thumbnails for images" 
-			"python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
-			"libkeyfinder-git: detection of musical keys" 
-			"qm-vamp-plugins: BPM detection" 
-			"python-pyopenssl: sftp functionality" 
-			"python-impacket-git: smb support (bad idea)"
+            "python-mutagen: music tags (alternative)" 
+            "python-pillow: thumbnails for images" 
+            "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
+            "libkeyfinder-git: detection of musical keys" 
+            "qm-vamp-plugins: BPM detection" 
+            "python-pyopenssl: sftp functionality" 
+            "python-impacket-git: smb support (bad idea)"
 )
 source=("${url}/releases/download/v${pkgver}/${pkgname}-sfx.py" 
-		"${pkgname}.conf"
-		"${pkgname}.service"
-		"https://raw.githubusercontent.com/9001/${pkgname}/hovudstraum/LICENSE"
+        "${pkgname}.conf"
+        "${pkgname}.service"
+        "https://raw.githubusercontent.com/9001/${pkgname}/hovudstraum/LICENSE"
 )
 backup=("etc/${pkgname}.conf" )
 sha256sums=("56c02d43a0e6c18d71295268674454b4c6f5ff2ccef30fb95f81d58d2d1e260d" 
-			"c19df8d0b6cd32d0b37c68e4f170d8634644e7fe7d99c9030cc6f20622ef95b5"
-			"2ab7598e5150facb4f63bf5433b25b60874603f7a408bb37b24186c54a331b37"
-			"cb2ce3d6277bf2f5a82ecf336cc44963bc6490bcf496ffbd75fc9e21abaa75f3"
+            "c19df8d0b6cd32d0b37c68e4f170d8634644e7fe7d99c9030cc6f20622ef95b5"
+            "2ab7598e5150facb4f63bf5433b25b60874603f7a408bb37b24186c54a331b37"
+            "cb2ce3d6277bf2f5a82ecf336cc44963bc6490bcf496ffbd75fc9e21abaa75f3"
 )
 
 package() {
     cd "${srcdir}/"
-	mkdir -p /etc/${pkgname}.d
+    mkdir -p /etc/${pkgname}.d
 
     install -Dm755 "${pkgname}-sfx.py" "${pkgdir}/usr/bin/${pkgname}"
     install -Dm644 "${pkgname}.conf" "${pkgdir}/etc/${pkgname}.conf"
