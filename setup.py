@@ -29,12 +29,6 @@ with open(here + "/README.md", "rb") as f:
     txt = f.read().decode("utf-8")
     long_description = txt
 
-try:
-    cmd = "bash scripts/genlic.sh copyparty/res/COPYING.txt"
-    sp.Popen(cmd.split()).wait()
-except:
-    pass
-
 about = {}
 if not VERSION:
     with open(os.path.join(here, NAME, "__version__.py"), "rb") as f:
@@ -95,8 +89,6 @@ args = {
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
@@ -145,5 +137,8 @@ args = {
     "scripts": ["bin/partyfuse.py", "bin/up2k.py"],
     "cmdclass": {"clean2": clean2},
 }
+
+if sys.version_info < (3, 8):
+    args["install_requires"].append("ipaddress")
 
 setup(**args)

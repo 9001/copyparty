@@ -15,10 +15,12 @@ gtar=$(command -v gtar || command -v gnutar) || true
 }
 
 mode="$1"
+fast="$2"
 
 [ -z "$mode" ] &&
 {
 	echo "need argument 1:  (D)ry, (T)est, (U)pload"
+	echo " optional arg 2:  fast"
 	echo
 	exit 1
 }
@@ -90,10 +92,13 @@ load_env || {
 	load_env
 }
 
+# grab licenses
+scripts/genlic.sh copyparty/res/COPYING.txt
+
 # remove type hints to support python < 3.9
 rm -rf build/pypi
 mkdir -p build/pypi
-cp -pR setup.py README.md LICENSE copyparty tests bin scripts/strip_hints build/pypi/
+cp -pR setup.py README.md LICENSE copyparty contrib bin scripts/strip_hints build/pypi/
 tar -c docs/lics.txt scripts/genlic.sh build/*.txt | tar -xC build/pypi/
 cd build/pypi
 f=../strip-hints-0.1.10.tar.gz
@@ -103,6 +108,34 @@ f=../strip-hints-0.1.10.tar.gz
 tar --strip-components=2 -xf $f strip-hints-0.1.10/src/strip_hints
 python3 -c 'from strip_hints.a import uh; uh("copyparty")'
 
+# resolve symlinks
+find -type l |
+while IFS= read -r f1; do (
+	cd "${f1%/*}"
+	f1="./${f1##*/}"
+	f2="$(readlink "$f1")"
+	[ -e "$f2" ] || f2="../$f2"
+	[ -e "$f2" ] || {
+		echo could not resolve "$f1"
+		exit 1
+	}
+	rm "$f1"
+	cp -p "$f2" "$f1"
+); done
+
+# resolve symlinks on windows
+[ "$OSTYPE" = msys ] &&
+(cd ../..; git ls-files -s | awk '/^120000/{print$4}') |
+while IFS= read -r x; do
+	[ $(wc -l <"$x") -gt 1 ] && continue
+	(cd "${x%/*}"; cp -p "../$(cat "${x##*/}")" ${x##*/})
+done
+
+rm -rf contrib
+[ $fast ] && sed -ri s/5730/10/ copyparty/web/Makefile
+(cd copyparty/web && make -j$(nproc) && rm Makefile)
+
+# build
 ./setup.py clean2
 ./setup.py sdist bdist_wheel --universal
 
