@@ -2918,7 +2918,7 @@ ebi('ico1').onclick = function () {
 if (QS('#op_up2k.act'))
     goto_up2k();
 
-apply_perms(perms);
+apply_perms({ "perms": perms, "frand": frand });
 
 
 (function () {

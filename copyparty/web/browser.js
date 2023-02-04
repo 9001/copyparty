@@ -5537,7 +5537,7 @@ var treectl = (function () {
 				have_up2k_idx = res.idx;
 				have_tags_idx = res.itag;
 				lifetime = res.lifetime;
-				apply_perms(res.perms);
+				apply_perms(res);
 				fileman.render();
 			}
 			if (sel.length)
@@ -5766,8 +5766,8 @@ var wfp_debounce = (function () {
 })();
 
 
-function apply_perms(newperms) {
-	perms = newperms || [];
+function apply_perms(res) {
+	perms = res.perms || [];
 
 	var a = QS('#ops a[data-dest="up2k"]');
 	if (have_up2k_idx) {
@@ -5841,6 +5841,8 @@ function apply_perms(newperms) {
 			(have_write || tds[a].getAttribute('data-perm') == 'read') ?
 				'table-cell' : 'none';
 	}
+	if (res.frand)
+		ebi('u2rand').parentNode.style.display = 'none';
 
 	if (up2k)
 		up2k.set_fsearch();
