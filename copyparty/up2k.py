@@ -2028,6 +2028,7 @@ class Up2k(object):
             reg = self.registry[ptop]
             vfs = self.asrv.vfs.all_vols[cj["vtop"]]
             n4g = vfs.flags.get("noforget")
+            rand = vfs.flags.get("rand") or cj.get("rand")
             lost: list[tuple["sqlite3.Cursor", str, str]] = []
 
             vols = [(ptop, jcur)] if jcur else []
@@ -2095,10 +2096,6 @@ class Up2k(object):
             if alts:
                 best = sorted(alts, reverse=True)[0]
                 job = best[2]
-                if best[0] == 5 and vfs.flags.get("rand") or cj.get("rand"):
-                    # filenames are randomized; found dupe in same folder;
-                    # perfect! return the original file
-                    cj["name"] = job["name"]
             else:
                 job = None
 
@@ -2172,11 +2169,11 @@ class Up2k(object):
                         # symlink to the client-provided name,
                         # returning the previous upload info
                         job = deepcopy(job)
-                        for k in ["ptop", "vtop", "prel"]:
+                        for k in "ptop vtop prel addr".split():
                             job[k] = cj[k]
 
                         pdir = djoin(cj["ptop"], cj["prel"])
-                        if vfs.flags.get("rand") or cj.get("rand"):
+                        if rand:
                             job["name"] = rand_name(
                                 pdir, cj["name"], vfs.flags["nrand"]
                             )
@@ -2185,23 +2182,24 @@ class Up2k(object):
 
                         dst = os.path.join(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
-                            bos.unlink(dst)  # TODO ed pls
                             try:
-                                dst_flags = self.flags[job["ptop"]]
-                                self._symlink(src, dst, dst_flags, lmod=cj["lmod"])
+                                dvf = self.flags[job["ptop"]]
+                                self._symlink(src, dst, dvf, lmod=cj["lmod"], rm=True)
                             except:
+                                if bos.path.exists(dst):
+                                    bos.unlink(dst)
                                 if not n4g:
                                     raise
 
                         if cur:
-                            a = [cj[x] for x in "prel name lmod size addr".split()]
-                            a += [cj.get("at") or time.time()]
+                            a = [job[x] for x in "prel name lmod size addr".split()]
+                            a += [job.get("at") or time.time()]
                             self.db_add(cur, wark, *a)
                             cur.connection.commit()
 
             if not job:
                 ap1 = djoin(cj["ptop"], cj["prel"])
-                if vfs.flags.get("rand") or cj.get("rand"):
+                if rand:
                     cj["name"] = rand_name(ap1, cj["name"], vfs.flags["nrand"])
 
                 if vfs.lim:
@@ -2306,6 +2304,7 @@ class Up2k(object):
         dst: str,
         flags: dict[str, Any],
         verbose: bool = True,
+        rm: bool = False,
         lmod: float = 0,
     ) -> None:
         if verbose:
@@ -2344,6 +2343,9 @@ class Up2k(object):
             if WINDOWS:
                 lsrc = lsrc.replace("/", "\\")
                 ldst = ldst.replace("/", "\\")
+
+            if rm and bos.path.exists(dst):
+                bos.unlink(dst)
 
             try:
                 if "hardlink" in flags:

@@ -1364,8 +1364,10 @@ function up2k_init(subtle) {
 
             if (uc.fsearch)
                 entry.srch = 1;
-            else if (uc.rand)
+            else if (uc.rand) {
                 entry.rand = true;
+                entry.name = 'a\n' + entry.name;
+            }
 
             if (biggest_file < entry.size)
                 biggest_file = entry.size;
@@ -1401,7 +1403,7 @@ function up2k_init(subtle) {
         ebi('u2tabw').className = 'ye';
 
         setTimeout(function () {
-            if (!actx || actx.state != 'suspended' || toast.tag == L.u_unpt)
+            if (!actx || actx.state != 'suspended' || toast.visible)
                 return;
 
             toast.warn(30, "<div onclick=\"start_actx();toast.inf(3,'thanks!')\">please click this text to<br />unlock full upload speed</div>");
