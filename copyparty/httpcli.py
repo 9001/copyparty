@@ -28,6 +28,7 @@ except:
     pass
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, EnvParams, unicode
+from .__version__ import S_VERSION
 from .authsrv import VFS  # typechk
 from .bos import bos
 from .star import StreamTar
@@ -2875,6 +2876,7 @@ class HttpCli(object):
             dbwt=vs["dbwt"],
             url_suf=suf,
             k304=self.k304(),
+            ver=S_VERSION if self.args.ver else "",
         )
         self.reply(html.encode("utf-8"))
         return True
