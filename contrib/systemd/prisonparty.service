@@ -6,12 +6,17 @@
 #   1) put copyparty-sfx.py and prisonparty.sh in /usr/local/bin
 #   2) cp -pv prisonparty.service /etc/systemd/system && systemctl enable --now prisonparty
 #
+# expose additional filesystem locations to copyparty
+#   by listing them between the last `1000` and `--`
+#
+# `1000 1000` = what user to run copyparty as
+#
 # you may want to:
 #   change '/mnt::rw' to another location or permission-set
 #    (remember to change the '/mnt' chroot arg too)
 #
-# enable line-buffering for realtime logging (slight performance cost):
-#   inside the [Service] block, add the following line:
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
 #   Environment=PYTHONUNBUFFERED=x
 
 [Unit]
@@ -19,7 +24,14 @@ Description=copyparty file server
 
 [Service]
 SyslogIdentifier=prisonparty
-WorkingDirectory=/usr/local/bin
+Environment=PYTHONUNBUFFERED=x
+WorkingDirectory=/var/lib/copyparty-jail
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
+ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
+
+# run copyparty
 ExecStart=/bin/bash /usr/local/bin/prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt -- \
   /usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -v /mnt::rw
 
