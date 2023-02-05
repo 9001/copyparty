@@ -14,6 +14,7 @@ from datetime import datetime
 
 from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
 from .bos import bos
+from .cfg import vf_bmap, vf_vmap, vf_cmap, onedash, flagdescs, permdescs
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
@@ -653,11 +654,15 @@ class AuthSrv(object):
         args: argparse.Namespace,
         log_func: Optional["RootLogger"],
         warn_anonwrite: bool = True,
+        dargs: Optional[argparse.Namespace] = None,
     ) -> None:
         self.args = args
+        self.dargs = dargs or args
         self.log_func = log_func
         self.warn_anonwrite = warn_anonwrite
         self.line_ctr = 0
+        self.indent = ""
+        self.desc = []
 
         self.mutex = threading.Lock()
         self.reload()
@@ -705,6 +710,31 @@ class AuthSrv(object):
         daxs[dst] = AXS()
         mflags[dst] = {}
 
+    def _e(self, desc: str) -> None:
+        if not self.args.vc or not self.line_ctr:
+            return
+
+        if not desc and not self.indent:
+            self.log("")
+            return
+
+        desc = desc.replace("[", "[\033[0m").replace("]", "\033[90m]")
+        self.log(" >>> {}{}".format(self.indent, desc), "90")
+
+    def _l(self, ln: str, c: int) -> None:
+        if not self.args.vc or not self.line_ctr:
+            return
+
+        if c < 10:
+            c += 30
+
+        t = "\033[97m{:4} \033[{}m{}{}"
+        self.log(t.format(self.line_ctr, c, self.indent, ln))
+
+    def _el(self, ln: str, c: int, desc: str) -> None:
+        self._e(desc)
+        self._l(ln, c)
+
     def _parse_config_file(
         self,
         fp: str,
@@ -714,33 +744,59 @@ class AuthSrv(object):
         mflags: dict[str, dict[str, Any]],
         mount: dict[str, str],
     ) -> None:
-        skip = False
         vol_src = None
         vol_dst = None
+        new_blk = True
+        self.desc = []
         self.line_ctr = 0
+
         expand_config_file(cfg_lines, fp, "")
+        if self.args.vc:
+            lns = ["{:4}: {}".format(n, s) for n, s in enumerate(cfg_lines, 1)]
+            self.log("expanded config file (unprocessed):\n" + "\n".join(lns))
+
         for ln in cfg_lines:
             self.line_ctr += 1
             if not ln and vol_src is not None:
+                self.indent = ""
+                self._e("└─end of settings for volume at URL [/{}]".format(vol_dst))
+                if vol_dst is None:
+                    t = "no URL provided for filesystem path [{}]"
+                    raise Exception(t.format(vol_src))
                 vol_src = None
                 vol_dst = None
 
-            if skip:
-                if not ln:
-                    skip = False
+            if not ln:
+                new_blk = True
                 continue
 
-            if not ln or ln.startswith("#"):
+            if ln.startswith("#"):
                 continue
 
             if vol_src is None:
                 if ln.startswith("u "):
                     u, p = ln[2:].split(":", 1)
+                    self._e("")
+                    self._el(ln, 5, "account [{}], password [{}]:".format(u, p))
                     acct[u] = p
                 elif ln.startswith("-"):
-                    skip = True  # argv
-                else:
+                    self._e("")
+                    try:
+                        ck, cv = ln.split(" ", 1)
+                        t = "argument [{}] with value [{}]"
+                        self._el(ln, 6, t.format(ck, cv))
+                    except:
+                        self._el(ln, 6, "argument [{}]".format(ln))
+                elif new_blk:
+                    self._e("")
+                    self._e("┌─share filesystem path [{}]:".format(ln))
+                    self.indent = "│ "
+                    self._l(ln, 3)
                     vol_src = ln
+                else:
+                    raise Exception("unexpected line: {}".format(ln))
+
+                new_blk = False
                 continue
 
             if vol_src and vol_dst is None:
@@ -754,6 +810,9 @@ class AuthSrv(object):
                 # cfg files override arguments and previous files
                 vol_src = absreal(vol_src)
                 vol_dst = vol_dst.strip("/")
+                self._e("[{}]".format(vol_src))
+                self._e("")
+                self._el(ln, 2, "at URL [/{}]:".format(vol_dst))
                 self._map_volume(vol_src, vol_dst, mount, daxs, mflags)
                 continue
 
@@ -768,7 +827,12 @@ class AuthSrv(object):
                 self.log(t, 1)
 
             assert vol_dst is not None
+            self._e("")
             self._read_vol_str(lvl, uname, daxs[vol_dst], mflags[vol_dst])
+            self._l(ln, 2)
+
+        self._e("")
+        self.line_ctr = 0
 
     def _read_vol_str(
         self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
@@ -807,6 +871,9 @@ class AuthSrv(object):
                 ("G", axs.upget),
             ]:  # b bb bbb
                 if ch in lvl:
+                    t = "add permission [{}] for user [{}] -- {}"
+                    desc = permdescs.get(ch, "?")
+                    self._e(t.format(ch, un, desc))
                     al.add(un)
 
     def _read_volflag(
@@ -816,7 +883,13 @@ class AuthSrv(object):
         value: Union[str, bool, list[str]],
         is_list: bool,
     ) -> None:
+        desc = flagdescs.get(name, "?").replace("\n", " ")
         if name not in ["mtp", "xbu", "xau", "xbr", "xar", "xbd", "xad", "xm"]:
+            if value is True:
+                t = "add volflag [{}] = {}  ({})"
+            else:
+                t = "add volflag [{}] = [{}]  ({})"
+            self._e(t.format(name, value, desc))
             flags[name] = value
             return
 
@@ -829,6 +902,7 @@ class AuthSrv(object):
             vals += [value]
 
         flags[name] = vals
+        self._e("volflag [{}] += {}  ({})".format(name, vals, desc))
 
     def reload(self) -> None:
         """
@@ -1118,32 +1192,7 @@ class AuthSrv(object):
                 if ptn:
                     vol.flags[vf] = re.compile(ptn)
 
-            for k in (
-                "dotsrch",
-                "e2t",
-                "e2ts",
-                "e2tsr",
-                "e2v",
-                "e2vu",
-                "e2vp",
-                "hardlink",
-                "magic",
-                "no_sb_md",
-                "no_sb_lg",
-                "rand",
-                "xdev",
-                "xlink",
-                "xvol",
-            ):
-                if getattr(self.args, k):
-                    vol.flags[k] = True
-
-            for ga, vf in (
-                ("never_symlink", "neversymlink"),
-                ("no_dedup", "copydupes"),
-                ("no_dupe", "nodupe"),
-                ("no_forget", "noforget"),
-            ):
+            for ga, vf in vf_bmap().items():
                 if getattr(self.args, ga):
                     vol.flags[vf] = True
 
@@ -1155,10 +1204,7 @@ class AuthSrv(object):
                 if ve in vol.flags:
                     vol.flags.pop(vd, None)
 
-            for ga, vf in (
-                ("lg_sbf", "lg_sbf"),
-                ("md_sbf", "md_sbf"),
-            ):
+            for ga, vf in vf_vmap().items():
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
@@ -1507,6 +1553,122 @@ class AuthSrv(object):
         if not flag_r:
             sys.exit(0)
 
+    def cgen(self) -> None:
+        ret = [
+            "## WARNING:",
+            "##  there will probably be mistakes in",
+            "##  commandline-args (and maybe volflags)",
+            "",
+        ]
+
+        csv = set("i p".split())
+        lst = set("mtp xbu xau xbr xar xbd xad xm c".split())
+        askip = set("a v c vc cgen".split())
+
+        # keymap from argv to vflag
+        amap = vf_bmap()
+        amap.update(vf_vmap())
+        amap.update(vf_cmap())
+        vmap = {v: k for k, v in amap.items()}
+
+        args = {k: v for k, v in vars(self.args).items()}
+        pops = []
+        for k1, k2 in IMPLICATIONS:
+            if args.get(k1):
+                pops.append(k2)
+        for pop in pops:
+            args.pop(pop, None)
+
+        if args:
+            ret.append("# add commandline args")
+            for k, v in args.items():
+                if k in askip:
+                    continue
+                if k in csv:
+                    v = ",".join([str(za) for za in v])
+                try:
+                    v2 = getattr(self.dargs, k)
+                    if v == v2:
+                        continue
+                except:
+                    continue
+
+                dk = ("-" if k in onedash else "--") + k.replace("_", "-")
+                if k in lst:
+                    for ve in v:
+                        ret.append("{} {}".format(dk, ve))
+                else:
+                    if v is True:
+                        ret.append(dk)
+                    elif v not in (False, None, ""):
+                        ret.append("{} {}".format(dk, v))
+            ret.append("")
+
+        if self.acct:
+            ret.append("# add accounts")
+            for u, p in self.acct.items():
+                ret.append("u {}:{}".format(u, p))
+            ret.append("")
+
+        for vol in self.vfs.all_vols.values():
+            ret.append("# add volume [/{}]".format(vol.vpath))
+            ret.append(vol.realpath)
+            ret.append("/" + vol.vpath)
+            perms = {
+                "r": "uread",
+                "w": "uwrite",
+                "m": "umove",
+                "d": "udel",
+                "g": "uget",
+                "G": "upget",
+            }
+            users = {}
+            for pkey in perms.values():
+                for uname in getattr(vol.axs, pkey):
+                    try:
+                        users[uname] += 1
+                    except:
+                        users[uname] = 1
+            users = {v: k for k, v in users.items()}
+            for _, uname in sorted(users.items()):
+                pstr = ""
+                for pchar, pkey in perms.items():
+                    if pchar == "g" and "G" in perms:
+                        continue
+                    if uname in getattr(vol.axs, pkey):
+                        pstr += pchar
+                if uname == "*":
+                    uname = ""
+                ret.append("{} {}".format(pstr, uname).rstrip(" "))
+            trues = []
+            vals = []
+            for k, v in sorted(vol.flags.items()):
+                try:
+                    ak = vmap[k]
+                    if getattr(self.args, ak) is v:
+                        continue
+                except:
+                    pass
+
+                if k in lst:
+                    for ve in v:
+                        vals.append("c {}={}".format(k, ve))
+                elif v is True:
+                    trues.append(k)
+                elif v is not False:
+                    vals.append("c {}={}".format(k, v))
+            pops = []
+            for k1, k2 in IMPLICATIONS:
+                if k1 in trues:
+                    pops.append(k2)
+            trues = [x for x in trues if x not in pops]
+            if trues:
+                ret.append("c " + ",".join(trues))
+            ret.extend(vals)
+            ret.append("")
+
+        self.log("generated config:\n\n" + "\n".join(ret))
+
 
 def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
     """expand all % file includes"""
@@ -1519,7 +1681,7 @@ def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
     if os.path.isdir(fp):
         for fn in sorted(os.listdir(fp)):
             fp2 = os.path.join(fp, fn)
-            if not fp2.endswith(".conf") or fp in ipath:
+            if not fp2.endswith(".conf") or fp2 in ipath:
                 continue
 
             expand_config_file(ret, fp2, ipath)

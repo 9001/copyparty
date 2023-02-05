@@ -67,8 +67,15 @@ class SvcHub(object):
     put() can return a queue (if want_reply=True) which has a blocking get() with the response.
     """
 
-    def __init__(self, args: argparse.Namespace, argv: list[str], printed: str) -> None:
+    def __init__(
+        self,
+        args: argparse.Namespace,
+        dargs: argparse.Namespace,
+        argv: list[str],
+        printed: str,
+    ) -> None:
         self.args = args
+        self.dargs = dargs
         self.argv = argv
         self.E: EnvParams = args.E
         self.logf: Optional[typing.TextIO] = None
@@ -155,7 +162,14 @@ class SvcHub(object):
             args.log_fk = re.compile(args.log_fk)
 
         # initiate all services to manage
-        self.asrv = AuthSrv(self.args, self.log)
+        self.asrv = AuthSrv(self.args, self.log, dargs=self.dargs)
+
+        if args.cgen:
+            self.asrv.cgen()
+
+        if args.exit == "cfg":
+            sys.exit(0)
+
         if args.ls:
             self.asrv.dbg_ls()
 

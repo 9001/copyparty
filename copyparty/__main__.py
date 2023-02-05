@@ -27,6 +27,7 @@ from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import expand_config_file, re_vol
 from .svchub import SvcHub
+from .cfg import flagcats
 from .util import (
     IMPLICATIONS,
     JINJA_VER,
@@ -53,8 +54,9 @@ try:
 except:
     HAVE_SSL = False
 
-printed: list[str] = []
 u = unicode
+printed: list[str] = []
+zsid = uuid.uuid4().urn[4:]
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -366,6 +368,7 @@ def args_from_cfg(cfg_path: str) -> list[str]:
             continue
 
         if not ln.startswith("-"):
+            skip = True
             continue
 
         if skip:
@@ -495,79 +498,9 @@ def get_sects():
                 """
             volflags are appended to volume definitions, for example,
             to create a write-only volume with the \033[33mnodupe\033[0m and \033[32mnosub\033[0m flags:
-              \033[35m-v /mnt/inc:/inc:w\033[33m:c,nodupe\033[32m:c,nosub
-
-            \033[0muploads, general:
-              \033[36mnodupe\033[35m rejects existing files (instead of symlinking them)
-              \033[36mhardlink\033[35m does dedup with hardlinks instead of symlinks
-              \033[36mneversymlink\033[35m disables symlink fallback; full copy instead
-              \033[36mcopydupes\033[35m disables dedup, always saves full copies of dupes
-              \033[36mnosub\033[35m forces all uploads into the top folder of the vfs
-              \033[36mmagic$\033[35m enables filetype detection for nameless uploads
-              \033[36mgz\033[35m allows server-side gzip of uploads with ?gz (also c,xz)
-              \033[36mpk\033[35m forces server-side compression, optional arg: xz,9
-
-            \033[0mupload rules:
-              \033[36mmaxn=250,600\033[35m max 250 uploads over 15min
-              \033[36mmaxb=1g,300\033[35m max 1 GiB over 5min (suffixes: b, k, m, g)
-              \033[36mrand\033[35m force randomized filenames, 9 chars long by default
-              \033[36mnrand=N\033[35m randomized filenames are N chars long
-              \033[36msz=1k-3m\033[35m allow filesizes between 1 KiB and 3MiB
-              \033[36mdf=1g\033[35m ensure 1 GiB free disk space
-
-            \033[0mupload rotation:
-            (moves all uploads into the specified folder structure)
-              \033[36mrotn=100,3\033[35m 3 levels of subfolders with 100 entries in each
-              \033[36mrotf=%Y-%m/%d-%H\033[35m date-formatted organizing
-              \033[36mlifetime=3600\033[35m uploads are deleted after 1 hour
-
-            \033[0mdatabase, general:
-              \033[36me2d\033[35m sets -e2d (all -e2* args can be set using ce2* volflags)
-              \033[36md2ts\033[35m disables metadata collection for existing files
-              \033[36md2ds\033[35m disables onboot indexing, overrides -e2ds*
-              \033[36md2t\033[35m disables metadata collection, overrides -e2t*
-              \033[36md2v\033[35m disables file verification, overrides -e2v*
-              \033[36md2d\033[35m disables all database stuff, overrides -e2*
-              \033[36mhist=/tmp/cdb\033[35m puts thumbnails and indexes at that location
-              \033[36mscan=60\033[35m scan for new files every 60sec, same as --re-maxage
-              \033[36mnohash=\\.iso$\033[35m skips hashing file contents if path matches *.iso
-              \033[36mnoidx=\\.iso$\033[35m fully ignores the contents at paths matching *.iso
-              \033[36mnoforget$\033[35m don't forget files when deleted from disk
-              \033[36mdbd=[acid|swal|wal|yolo]\033[35m database speed-durability tradeoff
-              \033[36mxlink$\033[35m cross-volume dupe detection / linking
-              \033[36mxdev\033[35m do not descend into other filesystems
-              \033[36mxvol\033[35m skip symlinks leaving the volume root
-              \033[36mdotsrch\033[35m show dotfiles in search results
-              \033[36mnodotsrch\033[35m hide dotfiles in search results (default)
-
-            \033[0mdatabase, audio tags:
-            "mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...
-              \033[36mmtp=.bpm=f,audio-bpm.py\033[35m uses the "audio-bpm.py" program to
-                generate ".bpm" tags from uploads (f = overwrite tags)
-              \033[36mmtp=ahash,vhash=media-hash.py\033[35m collects two tags at once
-
-            \033[0mthumbnails:
-              \033[36mdthumb\033[35m disables all thumbnails
-              \033[36mdvthumb\033[35m disables video thumbnails
-              \033[36mdathumb\033[35m disables audio thumbnails (spectrograms)
-              \033[36mdithumb\033[35m disables image thumbnails
-
-            \033[0mclient and ux:
-              \033[36mhtml_head=TXT\033[35m includes TXT in the <head>
-              \033[36mrobots\033[35m allows indexing by search engines (default)
-              \033[36mnorobots\033[35m kindly asks search engines to leave
-              \033[36mno_sb_md\033[35m disable js sandbox for markdown files
-              \033[36mno_sb_lg\033[35m disable js sandbox for prologue/epilogue
-              \033[36msb_md\033[35m enable js sandbox for markdown files (default)
-              \033[36msb_lg\033[35m enable js sandbox for prologue/epilogue (default)
-              \033[36mmd_sbf\033[35m list of markdown-sandbox safeguards to disable
-              \033[36mlg_sbf\033[35m list of *logue-sandbox safeguards to disable
-
-            \033[0mothers:
-              \033[36mfk=8\033[35m generates per-file accesskeys,
-                which will then be required at the "g" permission
-            \033[0m"""
-            ),
+              \033[35m-v /mnt/inc:/inc:w\033[33m:c,nodupe\033[32m:c,nosub"""
+            )
+            + build_flags_desc(),
         ],
         [
             "hooks",
@@ -667,6 +600,17 @@ def get_sects():
             ),
         ],
     ]
+
+
+def build_flags_desc():
+    ret = ""
+    for grp, flags in flagcats.items():
+        ret += "\n\n\033[0m" + grp
+        for k, v in flags.items():
+            v = v.replace("\n", "\n    ")
+            ret += "\n  \033[36m{}\033[35m {}".format(k, v)
+
+    return ret + "\033[0m"
 
 
 # fmt: off
@@ -786,7 +730,7 @@ def add_zc_ssdp(ap):
     ap2.add_argument("--zs-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zsv", action="store_true", help="verbose SSDP")
     ap2.add_argument("--zsl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] (goes directly to /priv/ with password hunter2) or [\033[32m?hc=priv&pw=hunter2\033[0m] (shows mounting options for /priv/ with password)")
-    ap2.add_argument("--zsid", metavar="UUID", type=u, default=uuid.uuid4().urn[4:], help="USN (device identifier) to announce")
+    ap2.add_argument("--zsid", metavar="UUID", type=u, default=zsid, help="USN (device identifier) to announce")
 
 
 def add_ftp(ap):
@@ -878,7 +822,7 @@ def add_shutdown(ap):
     ap2 = ap.add_argument_group('shutdown options')
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
     ap2.add_argument("--ign-ebind-all", action="store_true", help="continue running even if it's impossible to receive connections at all")
-    ap2.add_argument("--exit", metavar="WHEN", type=u, default="", help="shutdown after WHEN has finished; for example [\033[32midx\033[0m] will do volume indexing + metadata analysis")
+    ap2.add_argument("--exit", metavar="WHEN", type=u, default="", help="shutdown after WHEN has finished; [\033[32mcfg\033[0m] config parsing, [\033[32midx\033[0m] volscan + multimedia indexing")
 
 
 def add_logging(ap):
@@ -1001,6 +945,8 @@ def add_ui(ap, retry):
 
 def add_debug(ap):
     ap2 = ap.add_argument_group('debug options')
+    ap2.add_argument("--vc", action="store_true", help="verbose config file parser (explain config)")
+    ap2.add_argument("--cgen", action="store_true", help="generate config file from current config (best-effort; probably buggy)")
     ap2.add_argument("--no-sendfile", action="store_true", help="disable sendfile; instead using a traditional file read loop")
     ap2.add_argument("--no-scandir", action="store_true", help="disable scandir; instead using listdir + stat on each file")
     ap2.add_argument("--no-fastboot", action="store_true", help="wait for up2k indexing before starting the httpd")
@@ -1173,6 +1119,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     for fmtr in [RiceFormatter, RiceFormatter, Dodge11874, BasicDodge11874]:
         try:
             al = run_argparse(argv, fmtr, retry, nc)
+            dal = run_argparse([], fmtr, retry, nc)
             break
         except SystemExit:
             raise
@@ -1182,6 +1129,7 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     try:
         assert al  # type: ignore
+        assert dal  # type: ignore
         al.E = E  # __init__ is not shared when oxidized
     except:
         sys.exit(1)
@@ -1287,7 +1235,7 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     # signal.signal(signal.SIGINT, sighandler)
 
-    SvcHub(al, argv, "".join(printed)).run()
+    SvcHub(al, dal, argv, "".join(printed)).run()
 
 
 if __name__ == "__main__":
