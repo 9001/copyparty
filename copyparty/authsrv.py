@@ -1515,8 +1515,8 @@ def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
     if os.path.isdir(fp):
         for fn in sorted(os.listdir(fp)):
             fp2 = os.path.join(fp, fn)
-            if not os.path.isfile(fp2):
-                continue  # dont recurse
+            if not fp2.endswith(".conf") or fp in ipath:
+                continue
 
             expand_config_file(ret, fp2, ipath)
         return
