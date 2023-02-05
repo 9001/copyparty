@@ -25,6 +25,8 @@ copyparty.egg-info/
 copyparty/res/COPYING.txt
 copyparty/web/deps/
 srv/
+contrib/package/arch/pkg/
+contrib/package/arch/src/
 
 # state/logs
 up.*.txt

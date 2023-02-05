@@ -6,8 +6,9 @@ pkgdesc="Portable file sharing hub"
 arch=("any")
 url="https://github.com/9001/${pkgname}"
 license=('MIT')
-depends=("python3")
+depends=("python" "lsof")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags" 
+            "python-jinja: faster html generator" 
             "python-mutagen: music tags (alternative)" 
             "python-pillow: thumbnails for images" 
             "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
@@ -19,12 +20,18 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
 source=("${url}/releases/download/v${pkgver}/${pkgname}-sfx.py" 
         "${pkgname}.conf"
         "${pkgname}.service"
-        "https://raw.githubusercontent.com/9001/${pkgname}/hovudstraum/LICENSE"
+        "prisonparty.service"
+        "index.md"
+        "https://raw.githubusercontent.com/9001/${pkgname}/v${pkgver}/bin/prisonparty.sh"
+        "https://raw.githubusercontent.com/9001/${pkgname}/v${pkgver}/LICENSE"
 )
-backup=("etc/${pkgname}.conf" )
-sha256sums=("56c02d43a0e6c18d71295268674454b4c6f5ff2ccef30fb95f81d58d2d1e260d" 
-            "c19df8d0b6cd32d0b37c68e4f170d8634644e7fe7d99c9030cc6f20622ef95b5"
-            "2ab7598e5150facb4f63bf5433b25b60874603f7a408bb37b24186c54a331b37"
+backup=("etc/${pkgname}.d/init" )
+sha256sums=("56c02d43a0e6c18d71295268674454b4c6f5ff2ccef30fb95f81d58d2d1e260d"
+            "b8565eba5e64dedba1cf6c7aac7e31c5a731ed7153d6810288a28f00a36c28b2"
+            "f65c207e0670f9d78ad2e399bda18d5502ff30d2ac79e0e7fc48e7fbdc39afdc"
+            "c4f396b083c9ec02ad50b52412c84d2a82be7f079b2d016e1c9fad22d68285ff"
+            "dba701de9fd584405917e923ea1e59dbb249b96ef23bad479cf4e42740b774c8"
+            "0530459e6fbd57f770c374e960d2eb07a4e8c082c0007fb754454e45c0af57c6"
             "cb2ce3d6277bf2f5a82ecf336cc44963bc6490bcf496ffbd75fc9e21abaa75f3"
 )
 
@@ -33,13 +40,18 @@ package() {
 
     install -dm755 "${pkgdir}/etc/${pkgname}.d"
     install -Dm755 "${pkgname}-sfx.py" "${pkgdir}/usr/bin/${pkgname}"
-    install -Dm644 "${pkgname}.conf" "${pkgdir}/etc/${pkgname}.conf"
+    install -Dm755 "prisonparty.sh" "${pkgdir}/usr/bin/prisonparty"
+    install -Dm644 "${pkgname}.conf" "${pkgdir}/etc/${pkgname}.d/init"
     install -Dm644 "${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
+    install -Dm644 "prisonparty.service" "${pkgdir}/usr/lib/systemd/system/prisonparty.service"
+    install -Dm644 "index.md" "${pkgdir}/var/lib/${pkgname}-jail/README.md"
     install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
-    echo "------------"
-    echo "If this is your first time installing ${pkgname}, you'll want to copy the systemd service file"
-    echo "from /usr/lib/systemd/system/${pkgname}.service to /etc/systemd/system and edit /etc/${pkgname}.conf" 
-    echo "to suit your needs"
-    echo "------------"
+    find /etc/${pkgname}.d -iname '*.conf' 2>/dev/null | grep -qE . && return
+    echo "┏━━━━━━━━━━━━━━━──-"
+    echo "┃ Configure ${pkgname} by adding .conf files into /etc/${pkgname}.d/"
+    echo "┃ and maybe copy+edit one of the following to /etc/systemd/system/:"
+    echo "┣━♦ /usr/lib/systemd/system/${pkgname}.service   (standard)"
+    echo "┣━♦ /usr/lib/systemd/system/prisonparty.service (chroot)"
+    echo "┗━━━━━━━━━━━━━━━──-"
 }
