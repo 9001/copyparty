@@ -690,12 +690,16 @@ class AuthSrv(object):
             raise Exception("invalid config")
 
         if src in mount.values():
-            t = "warning: filesystem-path [{}] mounted in multiple locations:"
+            t = "filesystem-path [{}] mounted in multiple locations:"
             t = t.format(src)
             for v in [k for k, v in mount.items() if v == src] + [dst]:
                 t += "\n  /{}".format(v)
 
             self.log(t, c=3)
+            raise Exception("invalid config")
+
+        if not bos.path.isdir(src):
+            self.log("warning: filesystem-path does not exist: {}".format(src), 3)
 
         mount[dst] = src
         daxs[dst] = AXS()
