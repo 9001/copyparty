@@ -97,9 +97,11 @@ done
 
 cln() {
 	rv=$?
-	# cleanup if not in use
-	lsof "$jail" | grep -qF "$jail" &&
-		echo "chroot is in use, will not cleanup" ||
+	wait -f -p rv $p || true
+	cd /
+	echo "stopping chroot..."
+	lsof "$jail" | grep -F "$jail" &&
+		echo "chroot is in use; will not unmount" ||
 	{
 		mount | grep -F " on $jail" |
 		awk '{sub(/ type .*/,"");sub(/.* on /,"");print}' |
@@ -124,5 +126,6 @@ export LOGNAME="$USER"
 #echo "cpp [$cpp]"
 chroot --userspec=$uid:$gid "$jail" "$pybin" $pyarg "$cpp" "$@" &
 p=$!
+trap 'kill -USR1 $p' USR1
 trap 'kill $p' INT TERM
 wait
