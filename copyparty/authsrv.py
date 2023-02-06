@@ -1629,8 +1629,9 @@ class AuthSrv(object):
                         users[uname] += 1
                     except:
                         users[uname] = 1
-            users = {v: k for k, v in users.items()}
-            for _, uname in sorted(users.items()):
+            lusers = [(v, k) for k, v in users.items()]
+            vperms = {}
+            for _, uname in sorted(lusers):
                 pstr = ""
                 for pchar, pkey in perms.items():
                     if pchar == "g" and "G" in perms:
@@ -1639,7 +1640,12 @@ class AuthSrv(object):
                         pstr += pchar
                 if uname == "*":
                     uname = ""
-                ret.append("{} {}".format(pstr, uname).rstrip(" "))
+                try:
+                    vperms[pstr].append(uname)
+                except:
+                    vperms[pstr] = [uname]
+            for pstr, uname in vperms.items():
+                ret.append("{} {}".format(pstr, " ".join(uname)).rstrip(" "))
             trues = []
             vals = []
             for k, v in sorted(vol.flags.items()):
