@@ -1562,7 +1562,7 @@ class AuthSrv(object):
         ]
 
         csv = set("i p".split())
-        lst = set("mtp xbu xau xbr xar xbd xad xm c".split())
+        lst = set("c ihead mtm mtp xad xar xau xbd xbr xbu xm".split())
         askip = set("a v c vc cgen".split())
 
         # keymap from argv to vflag
