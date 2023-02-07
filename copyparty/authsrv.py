@@ -917,7 +917,11 @@ class AuthSrv(object):
                 ("G", axs.upget),
             ]:  # b bb bbb
                 if ch in lvl:
-                    t = "└─add permission [{}] for user [{}] -- {}"
+                    if un == "*":
+                        t = "└─add permission [{0}] for [everyone] -- {2}"
+                    else:
+                        t = "└─add permission [{0}] for user [{1}] -- {2}"
+
                     desc = permdescs.get(ch, "?")
                     self._e(t.format(ch, un, desc))
                     al.add(un)
