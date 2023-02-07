@@ -25,9 +25,9 @@ from textwrap import dedent
 
 from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
-from .authsrv import expand_config_file, re_vol
+from .authsrv import expand_config_file, re_vol, upgrade_cfg_fmt, split_cfg_ln
 from .svchub import SvcHub
-from .cfg import flagcats
+from .cfg import flagcats, onedash
 from .util import (
     IMPLICATIONS,
     JINJA_VER,
@@ -356,28 +356,28 @@ def configure_ssl_ciphers(al: argparse.Namespace) -> None:
 def args_from_cfg(cfg_path: str) -> list[str]:
     lines: list[str] = []
     expand_config_file(lines, cfg_path, "")
+    lines = upgrade_cfg_fmt(None, argparse.Namespace(vc=False), lines, "")
 
     ret: list[str] = []
-    skip = False
+    skip = True
     for ln in lines:
-        if not ln:
+        sn = ln.split("  #")[0].strip()
+        if sn.startswith("["):
+            skip = True
+        if sn.startswith("[global]"):
             skip = False
             continue
-
-        if ln.startswith("#"):
+        if skip or not sn.split("#")[0].strip():
             continue
-
-        if not ln.startswith("-"):
-            skip = True
-            continue
-
-        if skip:
-            continue
-
-        try:
-            ret.extend(ln.split(" ", 1))
-        except:
-            ret.append(ln)
+        for k, v in split_cfg_ln(sn).items():
+            k = k.lstrip("-")
+            if not k:
+                continue
+            prefix = "-" if k in onedash else "--"
+            if v is True:
+                ret.append(prefix + k)
+            else:
+                ret.append(prefix + k + "=" + v)
 
     return ret
 

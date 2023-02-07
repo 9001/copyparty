@@ -306,6 +306,7 @@ upgrade notes
 
 per-folder, per-user permissions  - if your setup is getting complex, consider making a [config file](./docs/example.conf) instead of using arguments
 * much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if logged in as admin)
+  * changes to the `[global]` config section requires a restart to take effect
 
 a quick summary can be seen using `--help-accounts`
 
@@ -690,6 +691,7 @@ using arguments or config files, or a mix of both:
 * config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf) and [./docs/example2.conf](docs/example2.conf)
 * `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
   * or click the `[reload cfg]` button in the control-panel when logged in as admin 
+  * changes to the `[global]` config section requires a restart to take effect
 
 
 ## zeroconf
@@ -800,7 +802,7 @@ some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 
 and some minor issues,
 * clients only see the first ~400 files in big folders; [impacket#1433](https://github.com/SecureAuthCorp/impacket/issues/1433)
-* hot-reload of server config (`/?reload=cfg`) only works for volumes, not account passwords
+* hot-reload of server config (`/?reload=cfg`) does not include the `[global]` section (commandline args)
 * listens on the first IPv4 `-i` interface only (default = :: = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work
   * win10 onwards does not allow connecting anonymously / without accounts

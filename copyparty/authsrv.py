@@ -37,7 +37,7 @@ if True:  # pylint: disable=using-constant-test
 
     from typing import Any, Generator, Optional, Union
 
-    from .util import RootLogger
+    from .util import RootLogger, NamedLogger
 
 if TYPE_CHECKING:
     pass
@@ -710,7 +710,7 @@ class AuthSrv(object):
         daxs[dst] = AXS()
         mflags[dst] = {}
 
-    def _e(self, desc: str) -> None:
+    def _e(self, desc: Optional[str] = None) -> None:
         if not self.args.vc or not self.line_ctr:
             return
 
@@ -718,10 +718,11 @@ class AuthSrv(object):
             self.log("")
             return
 
+        desc = desc or ""
         desc = desc.replace("[", "[\033[0m").replace("]", "\033[90m]")
         self.log(" >>> {}{}".format(self.indent, desc), "90")
 
-    def _l(self, ln: str, c: int) -> None:
+    def _l(self, ln: str, c: int, desc: str) -> None:
         if not self.args.vc or not self.line_ctr:
             return
 
@@ -729,11 +730,11 @@ class AuthSrv(object):
             c += 30
 
         t = "\033[97m{:4} \033[{}m{}{}"
-        self.log(t.format(self.line_ctr, c, self.indent, ln))
+        if desc:
+            t += "  \033[0;90m# {}\033[0m"
+            desc = desc.replace("[", "[\033[0m").replace("]", "\033[90m]")
 
-    def _el(self, ln: str, c: int, desc: str) -> None:
-        self._e(desc)
-        self._l(ln, c)
+        self.log(t.format(self.line_ctr, c, self.indent, ln, desc))
 
     def _parse_config_file(
         self,
@@ -744,9 +745,6 @@ class AuthSrv(object):
         mflags: dict[str, dict[str, Any]],
         mount: dict[str, str],
     ) -> None:
-        vol_src = None
-        vol_dst = None
-        new_blk = True
         self.desc = []
         self.line_ctr = 0
 
@@ -755,83 +753,131 @@ class AuthSrv(object):
             lns = ["{:4}: {}".format(n, s) for n, s in enumerate(cfg_lines, 1)]
             self.log("expanded config file (unprocessed):\n" + "\n".join(lns))
 
+        cfg_lines = upgrade_cfg_fmt(self.log, self.args, cfg_lines, fp)
+
+        cat = ""
+        catg = "[global]"
+        cata = "[accounts]"
+        catx = "accs:"
+        catf = "flags:"
+        ap: Optional[str] = None
+        vp: Optional[str] = None
         for ln in cfg_lines:
             self.line_ctr += 1
-            if not ln and vol_src is not None:
-                self.indent = ""
-                self._e("└─end of settings for volume at URL [/{}]".format(vol_dst))
-                if vol_dst is None:
-                    t = "no URL provided for filesystem path [{}]"
-                    raise Exception(t.format(vol_src))
-                vol_src = None
-                vol_dst = None
-
-            if not ln:
-                new_blk = True
+            ln = ln.split("  #")[0].strip()
+            if not ln.split("#")[0].strip():
                 continue
 
-            if ln.startswith("#"):
-                continue
+            subsection = ln in (catx, catf)
+            if ln.startswith("[") or subsection:
+                self._e()
+                if ap is None and vp is not None:
+                    t = "the first line after [/{}] must be a filesystem path to share on that volume"
+                    raise Exception(t.format(vp))
 
-            if vol_src is None:
-                if ln.startswith("u "):
-                    u, p = ln[2:].split(":", 1)
-                    self._e("")
-                    self._el(ln, 5, "account [{}], password [{}]:".format(u, p))
-                    acct[u] = p
-                elif ln.startswith("-"):
-                    self._e("")
-                    try:
-                        ck, cv = ln.split(" ", 1)
-                        t = "argument [{}] with value [{}]"
-                        self._el(ln, 6, t.format(ck, cv))
-                    except:
-                        self._el(ln, 6, "argument [{}]".format(ln))
-                elif new_blk:
-                    self._e("")
-                    self._e("┌─share filesystem path [{}]:".format(ln))
-                    self.indent = "│ "
-                    self._l(ln, 3)
-                    vol_src = ln
+                cat = ln
+                if not subsection:
+                    ap = vp = None
+                    self.indent = ""
                 else:
-                    raise Exception("unexpected line: {}".format(ln))
+                    self.indent = "  "
 
-                new_blk = False
+                if ln == catg:
+                    t = "begin commandline-arguments (anything from --help; dashes are optional)"
+                    self._l(ln, 6, t)
+                elif ln == cata:
+                    self._l(ln, 5, "begin user-accounts section")
+                elif ln.startswith("[/"):
+                    vp = ln[1:-1].strip("/")
+                    self._l(ln, 2, "define volume at URL [/{}]".format(vp))
+                elif subsection:
+                    if ln == catx:
+                        self._l(ln, 5, "volume access config:")
+                    else:
+                        t = "volume-specific config (anything from --help-flags)"
+                        self._l(ln, 6, t)
+                else:
+                    raise Exception("invalid section header")
+
+                self.indent = "    " if subsection else "  "
                 continue
 
-            if vol_src and vol_dst is None:
-                vol_dst = ln
-                if not vol_dst.startswith("/"):
-                    raise Exception('invalid mountpoint "{}"'.format(vol_dst))
-
-                if vol_src.startswith("~"):
-                    vol_src = os.path.expanduser(vol_src)
-
-                # cfg files override arguments and previous files
-                vol_src = absreal(vol_src)
-                vol_dst = vol_dst.strip("/")
-                self._e("[{}]".format(vol_src))
-                self._e("")
-                self._el(ln, 2, "at URL [/{}]:".format(vol_dst))
-                self._map_volume(vol_src, vol_dst, mount, daxs, mflags)
+            if cat == catg:
+                self._l(ln, 6, "")
+                zt = split_cfg_ln(ln)
+                for zs, za in zt.items():
+                    zs = zs.lstrip("-")
+                    if za is True:
+                        self._e("└─argument [{}]".format(zs))
+                    else:
+                        self._e("└─argument [{}] with value [{}]".format(zs, za))
                 continue
 
-            try:
-                lvl, uname = ln.split(" ", 1)
-            except:
-                lvl = ln
-                uname = "*"
+            if cat == cata:
+                try:
+                    u, p = [zs.strip() for zs in ln.split(":", 1)]
+                    self._l(ln, 5, "account [{}], password [{}]".format(u, p))
+                    acct[u] = p
+                except:
+                    t = 'lines inside the [accounts] section must be "username: password"'
+                    raise Exception(t)
+                continue
 
-            if lvl == "a":
-                t = "WARNING (config-file): permission flag 'a' is deprecated; please use 'rw' instead"
-                self.log(t, 1)
+            if vp is not None and ap is None:
+                ap = ln
+                if ap.startswith("~"):
+                    ap = os.path.expanduser(ap)
 
-            assert vol_dst is not None
-            self._e("")
-            self._read_vol_str(lvl, uname, daxs[vol_dst], mflags[vol_dst])
-            self._l(ln, 2)
+                ap = absreal(ap)
+                self._l(ln, 2, "bound to filesystem-path [{}]".format(ap))
+                self._map_volume(ap, vp, mount, daxs, mflags)
+                continue
 
-        self._e("")
+            if cat == catx:
+                err = ""
+                try:
+                    self._l(ln, 5, "volume access config:")
+                    sk, sv = ln.split(":")
+                    if re.sub("[rwmdgG]", "", sk) or not sk:
+                        err = "invalid accs permissions list; "
+                        raise Exception(err)
+                    if " " in re.sub(", *", "", sv).strip():
+                        err = "list of users is not comma-separated; "
+                        raise Exception(err)
+                    self._read_vol_str(sk, sv.replace(" ", ""), daxs[vp], mflags[vp])
+                    continue
+                except:
+                    err += "accs entries must be 'rwmdgG: user1, user2, ...'"
+                    raise Exception(err)
+
+            if cat == catf:
+                err = ""
+                try:
+                    self._l(ln, 6, "volume-specific config:")
+                    zd = split_cfg_ln(ln)
+                    fstr = ""
+                    for sk, sv in zd.items():
+                        bad = re.sub(r"[a-z0-9_]", "", sk)
+                        if bad:
+                            err = "bad characters [{}] in volflag name [{}]; "
+                            err = err.format(bad, sk)
+                            raise Exception(err)
+                        if sv is True:
+                            fstr += "," + sk
+                        else:
+                            fstr += ",{}={}".format(sk, sv)
+                            self._read_vol_str("c", fstr[1:], daxs[vp], mflags[vp])
+                            fstr = ""
+                    if fstr:
+                        self._read_vol_str("c", fstr[1:], daxs[vp], mflags[vp])
+                    continue
+                except:
+                    err += "flags entries (volflags) must be one of the following:\n  'flag1, flag2, ...'\n  'key: value'\n  'flag1, flag2, key: value'"
+                    raise Exception(err)
+
+            raise Exception("unprocessable line in config")
+
+        self._e()
         self.line_ctr = 0
 
     def _read_vol_str(
@@ -871,7 +917,7 @@ class AuthSrv(object):
                 ("G", axs.upget),
             ]:  # b bb bbb
                 if ch in lvl:
-                    t = "add permission [{}] for user [{}] -- {}"
+                    t = "└─add permission [{}] for user [{}] -- {}"
                     desc = permdescs.get(ch, "?")
                     self._e(t.format(ch, un, desc))
                     al.add(un)
@@ -886,9 +932,9 @@ class AuthSrv(object):
         desc = flagdescs.get(name, "?").replace("\n", " ")
         if name not in ["mtp", "xbu", "xau", "xbr", "xar", "xbd", "xad", "xm"]:
             if value is True:
-                t = "add volflag [{}] = {}  ({})"
+                t = "└─add volflag [{}] = {}  ({})"
             else:
-                t = "add volflag [{}] = [{}]  ({})"
+                t = "└─add volflag [{}] = [{}]  ({})"
             self._e(t.format(name, value, desc))
             flags[name] = value
             return
@@ -1580,12 +1626,12 @@ class AuthSrv(object):
             args.pop(pop, None)
 
         if args:
-            ret.append("# add commandline args")
+            ret.append("[global]")
             for k, v in args.items():
                 if k in askip:
                     continue
                 if k in csv:
-                    v = ",".join([str(za) for za in v])
+                    v = ", ".join([str(za) for za in v])
                 try:
                     v2 = getattr(self.dargs, k)
                     if v == v2:
@@ -1593,27 +1639,27 @@ class AuthSrv(object):
                 except:
                     continue
 
-                dk = ("-" if k in onedash else "--") + k.replace("_", "-")
+                dk = "  " + k.replace("_", "-")
                 if k in lst:
                     for ve in v:
-                        ret.append("{} {}".format(dk, ve))
+                        ret.append("{}: {}".format(dk, ve))
                 else:
                     if v is True:
                         ret.append(dk)
                     elif v not in (False, None, ""):
-                        ret.append("{} {}".format(dk, v))
+                        ret.append("{}: {}".format(dk, v))
             ret.append("")
 
         if self.acct:
-            ret.append("# add accounts")
+            ret.append("[accounts]")
             for u, p in self.acct.items():
-                ret.append("u {}:{}".format(u, p))
+                ret.append("  {}: {}".format(u, p))
             ret.append("")
 
         for vol in self.vfs.all_vols.values():
-            ret.append("# add volume [/{}]".format(vol.vpath))
-            ret.append(vol.realpath)
-            ret.append("/" + vol.vpath)
+            ret.append("[/{}]".format(vol.vpath))
+            ret.append("  " + vol.realpath)
+            ret.append("  accs:")
             perms = {
                 "r": "uread",
                 "w": "uwrite",
@@ -1638,14 +1684,12 @@ class AuthSrv(object):
                         continue
                     if uname in getattr(vol.axs, pkey):
                         pstr += pchar
-                if uname == "*":
-                    uname = ""
                 try:
                     vperms[pstr].append(uname)
                 except:
                     vperms[pstr] = [uname]
             for pstr, uname in vperms.items():
-                ret.append("{} {}".format(pstr, " ".join(uname)).rstrip(" "))
+                ret.append("    {}: {}".format(pstr, ", ".join(uname)))
             trues = []
             vals = []
             for k, v in sorted(vol.flags.items()):
@@ -1658,22 +1702,47 @@ class AuthSrv(object):
 
                 if k in lst:
                     for ve in v:
-                        vals.append("c {}={}".format(k, ve))
+                        vals.append("{}: {}".format(k, ve))
                 elif v is True:
                     trues.append(k)
                 elif v is not False:
-                    vals.append("c {}={}".format(k, v))
+                    vals.append("{}: {}".format(k, v))
             pops = []
             for k1, k2 in IMPLICATIONS:
                 if k1 in trues:
                     pops.append(k2)
             trues = [x for x in trues if x not in pops]
             if trues:
-                ret.append("c " + ",".join(trues))
-            ret.extend(vals)
+                vals.append(", ".join(trues))
+            if vals:
+                ret.append("  flags:")
+                for zs in vals:
+                    ret.append("    " + zs)
             ret.append("")
 
         self.log("generated config:\n\n" + "\n".join(ret))
+
+
+def split_cfg_ln(ln: str) -> dict[str, Any]:
+    # "a, b, c: 3" => {a:true, b:true, c:3}
+    ret = {}
+    while True:
+        ln = ln.strip()
+        if not ln:
+            break
+        ofs_sep = ln.find(",") + 1
+        ofs_var = ln.find(":") + 1
+        if not ofs_sep and not ofs_var:
+            ret[ln] = True
+            break
+        if ofs_sep and (ofs_sep < ofs_var or not ofs_var):
+            k, ln = ln.split(",", 1)
+            ret[k.strip()] = True
+        else:
+            k, ln = ln.split(":", 1)
+            ret[k.strip()] = ln.strip()
+            break
+    return ret
 
 
 def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
@@ -1694,13 +1763,126 @@ def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
         return
 
     with open(fp, "rb") as f:
-        for ln in [x.decode("utf-8").strip() for x in f]:
+        for oln in [x.decode("utf-8").rstrip() for x in f]:
+            ln = oln.split("  #")[0].strip()
             if ln.startswith("% "):
+                pad = " " * len(oln.split("%")[0])
                 fp2 = ln[1:].strip()
                 fp2 = os.path.join(os.path.dirname(fp), fp2)
+                ofs = len(ret)
                 expand_config_file(ret, fp2, ipath)
+                for n in range(ofs, len(ret)):
+                    ret[n] = pad + ret[n]
                 continue
 
-            ret.append(ln)
+            ret.append(oln)
 
     ret.append("#\033[36m closed{}\033[0m".format(ipath))
+
+
+def upgrade_cfg_fmt(
+    log: Optional["NamedLogger"], args: argparse.Namespace, orig: list[str], cfg_fp: str
+) -> list[str]:
+    """convert from v1 to v2 format"""
+    zst = [x.split("#")[0].strip() for x in orig]
+    zst = [x for x in zst if x]
+    if (
+        "[global]" in zst
+        or "[accounts]" in zst
+        or "accs:" in zst
+        or "flags:" in zst
+        or [x for x in zst if x.startswith("[/")]
+        or len(zst) == len([x for x in zst if x.startswith("%")])
+    ):
+        return orig
+
+    zst = [x for x in orig if "#\033[36m opening cfg file" not in x]
+    incl = len(zst) != len(orig) - 1
+
+    t = "upgrading config file [{}] from v1 to v2"
+    if not args.vc:
+        t += ". Run with argument '--vc' to see the converted config if you want to upgrade"
+    if incl:
+        t += ". Please don't include v1 configs from v2 files or vice versa! Upgrade all of them at the same time."
+    if log:
+        log(t.format(cfg_fp), 3)
+
+    ret = []
+    vp = ""
+    ap = ""
+    cat = ""
+    catg = "[global]"
+    cata = "[accounts]"
+    catx = "  accs:"
+    catf = "  flags:"
+    for ln in orig:
+        sn = ln.strip()
+        if not sn:
+            cat = vp = ap = ""
+        if not sn.split("#")[0]:
+            ret.append(ln)
+        elif sn.startswith("-") and cat in ("", catg):
+            if cat != catg:
+                cat = catg
+                ret.append(cat)
+            sn = sn.lstrip("-")
+            zst = sn.split(" ", 1)
+            if len(zst) > 1:
+                sn = "{}: {}".format(zst[0], zst[1].strip())
+            ret.append("  " + sn)
+        elif sn.startswith("u ") and cat in ("", catg, cata):
+            if cat != cata:
+                cat = cata
+                ret.append(cat)
+            s1, s2 = sn[1:].split(":", 1)
+            ret.append("  {}: {}".format(s1.strip(), s2.strip()))
+        elif not ap:
+            ap = sn
+        elif not vp:
+            vp = "/" + sn.strip("/")
+            cat = "[{}]".format(vp)
+            ret.append(cat)
+            ret.append("  " + ap)
+        elif sn.startswith("c "):
+            if cat != catf:
+                cat = catf
+                ret.append(cat)
+            sn = sn[1:].strip()
+            if "=" in sn:
+                zst = sn.split("=", 1)
+                sn = zst[0].replace(",", ", ")
+                sn += ": " + zst[1]
+            else:
+                sn = sn.replace(",", ", ")
+            ret.append("    " + sn)
+        elif sn[:1] in "rwmdgG":
+            if cat != catx:
+                cat = catx
+                ret.append(cat)
+            zst = sn.split(" ")
+            zst = [x for x in zst if x]
+            if len(zst) == 1:
+                zst.append("*")
+            ret.append("    {}: {}".format(zst[0], ", ".join(zst[1:])))
+        else:
+            t = "did not understand line {} in the config"
+            t1 = t
+            n = 0
+            for ln in orig:
+                n += 1
+                t += "\n{:4} {}".format(n, ln)
+            if log:
+                log(t, 1)
+            else:
+                print("\033[31m" + t)
+            raise Exception(t1)
+
+    if args.vc and log:
+        t = "new config syntax (copy/paste this to upgrade your config):\n"
+        t += "\n# ======================[ begin upgraded config ]======================\n\n"
+        for ln in ret:
+            t += ln + "\n"
+        t += "\n# ======================[ end of upgraded config ]======================\n"
+        log(t)
+
+    return ret
