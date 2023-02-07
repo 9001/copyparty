@@ -879,7 +879,7 @@ def add_transcoding(ap):
 
 def add_db_general(ap, hcores):
     ap2 = ap.add_argument_group('general db options')
-    ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplocation")
+    ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplication")
     ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets -e2d")
     ap2.add_argument("-e2dsa", action="store_true", help="scans all folders on startup; sets -e2ds")
     ap2.add_argument("-e2v", action="store_true", help="verify file integrity; rehash all files and compare with db")

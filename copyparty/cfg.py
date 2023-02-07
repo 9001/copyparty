@@ -87,7 +87,12 @@ flagcats = {
         "lifetime=3600": "uploads are deleted after 1 hour",
     },
     "database, general": {
-        "e2d": "sets -e2d (all -e2* args can be set using ce2* volflags)",
+        "e2d": "enable database; makes files searchable + enables upload dedup",
+        "e2ds": "scan writable folders for new files on startup; also sets -e2d",
+        "e2dsa": "scans all folders for new files on startup; also sets -e2d",
+        "e2t": "enable multimedia indexing; makes it possible to search for tags",
+        "e2ts": "scan existing files for tags on startup; also sets -e2t",
+        "e2tsa": "delete all metadata from DB (full rescan); also sets -e2ts",
         "d2ts": "disables metadata collection for existing files",
         "d2ds": "disables onboot indexing, overrides -e2ds*",
         "d2t": "disables metadata collection, overrides -e2t*",
