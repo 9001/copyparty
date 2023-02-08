@@ -485,7 +485,7 @@ class Up2k(object):
         if next((zv for zv in vols if "e2ds" in zv.flags), None):
             self._block("indexing")
 
-        if self.args.re_dhash:
+        if self.args.re_dhash or [zv for zv in vols if "e2tsr" in zv.flags]:
             self.args.re_dhash = False
             self._drop_caches()
 
