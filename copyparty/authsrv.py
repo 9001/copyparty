@@ -1684,10 +1684,10 @@ class AuthSrv(object):
             for _, uname in sorted(lusers):
                 pstr = ""
                 for pchar, pkey in perms.items():
-                    if pchar == "g" and "G" in perms:
-                        continue
                     if uname in getattr(vol.axs, pkey):
                         pstr += pchar
+                if "g" in pstr and "G" in pstr:
+                    pstr = pstr.replace("g", "")
                 try:
                     vperms[pstr].append(uname)
                 except:
