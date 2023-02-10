@@ -798,6 +798,7 @@ html.y #path a:hover {
 .logue:empty {
 	display: none;
 }
+#doc>iframe,
 .logue>iframe {
 	background: var(--bgg);
 	border: 1px solid var(--bgg);
@@ -808,6 +809,7 @@ html.y #path a:hover {
 	width: 100%;
 	height: 0;
 }
+#doc>iframe.focus,
 .logue>iframe.focus {
 	box-shadow: 0 0 .1em .1em var(--a);
 }

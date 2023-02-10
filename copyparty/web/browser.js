@@ -4536,7 +4536,9 @@ document.onkeydown = function (e) {
 		return seek_au_rel(n) || true;
 
 	if (k == 'KeyY')
-		return msel.getsel().length ? ebi('seldl').click() : dl_song();
+		return msel.getsel().length ? ebi('seldl').click() :
+			showfile.active() ? ebi('dldoc').click() :
+				dl_song();
 
 	n = k == 'KeyI' ? -1 : k == 'KeyK' ? 1 : 0;
 	if (n !== 0)
