@@ -1003,6 +1003,18 @@ class AuthSrv(object):
                 lns: list[str] = []
                 try:
                     self._parse_config_file(cfg_fn, lns, acct, daxs, mflags, mount)
+
+                    zs = "#\033[36m cfg files in "
+                    zst = [x[len(zs) :] for x in lns if x.startswith(zs)]
+                    for zs in list(set(zst)):
+                        self.log("discovered config files in " + zs, 6)
+
+                    zs = "#\033[36m opening cfg file"
+                    zstt = [x.split(" -> ") for x in lns if x.startswith(zs)]
+                    zst = [(max(0, len(x) - 2) * " ") + "└" + x[-1] for x in zstt]
+                    t = "loaded {} config files:\n{}"
+                    self.log(t.format(len(zst), "\n".join(zst)))
+
                 except:
                     lns = lns[: self.line_ctr]
                     slns = ["{:4}: {}".format(n, s) for n, s in enumerate(lns, 1)]
@@ -1752,19 +1764,22 @@ def split_cfg_ln(ln: str) -> dict[str, Any]:
 def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
     """expand all % file includes"""
     fp = absreal(fp)
-    ipath += " -> " + fp
-    ret.append("#\033[36m opening cfg file{}\033[0m".format(ipath))
     if len(ipath.split(" -> ")) > 64:
         raise Exception("hit max depth of 64 includes")
 
     if os.path.isdir(fp):
-        for fn in sorted(os.listdir(fp)):
+        names = os.listdir(fp)
+        ret.append("#\033[36m cfg files in {} => {}\033[0m".format(fp, names))
+        for fn in sorted(names):
             fp2 = os.path.join(fp, fn)
             if not fp2.endswith(".conf") or fp2 in ipath:
                 continue
 
             expand_config_file(ret, fp2, ipath)
         return
+
+    ipath += " -> " + fp
+    ret.append("#\033[36m opening cfg file{}\033[0m".format(ipath))
 
     with open(fp, "rb") as f:
         for oln in [x.decode("utf-8").rstrip() for x in f]:

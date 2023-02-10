@@ -1102,7 +1102,8 @@ def main(argv: Optional[list[str]] = None) -> None:
         if da:
             argv.extend(["--qr"])
             if ANYWIN or not os.geteuid():
-                argv.extend(["-p80,443,3923", "--ign-ebind"])
+                # win10 allows symlinks if admin; can be unexpected
+                argv.extend(["-p80,443,3923", "--ign-ebind", "--no-dedup"])
     except:
         pass
 
