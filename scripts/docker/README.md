@@ -13,7 +13,7 @@ docker run --rm -it -u 1000 -p 3923:3923 -v /mnt/nas:/w -v $PWD/cfgdir:/cfg copy
 * `/w` is the path inside the container that gets shared by default, so mount one or more folders to share below there
 * `/cfg` is an optional folder with zero or more config files (*.conf) to load
 * `copyparty/ac` is the recommended [image edition](#editions)
-* you can download the image from github instead by replacing `copyparty/ac` with TODO
+* you can download the image from github instead by replacing `copyparty/ac` with `ghcr.io/9001/copyparty-ac`
 
 i'm unfamiliar with docker-compose and alternatives so let me know if this section could be better 🙏
 

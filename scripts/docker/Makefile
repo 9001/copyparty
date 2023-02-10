@@ -34,6 +34,16 @@ push:
 	docker push copyparty/iv
 	docker push copyparty/ac
 	docker push copyparty/dj
+	docker image tag copyparty/min:latest ghcr.io/9001/copyparty-min:latest
+	docker image tag copyparty/im:latest ghcr.io/9001/copyparty-im:latest
+	docker image tag copyparty/iv:latest ghcr.io/9001/copyparty-iv:latest
+	docker image tag copyparty/ac:latest ghcr.io/9001/copyparty-ac:latest
+	docker image tag copyparty/dj:latest ghcr.io/9001/copyparty-dj:latest
+	docker push ghcr.io/9001/copyparty-min:latest
+	docker push ghcr.io/9001/copyparty-im:latest
+	docker push ghcr.io/9001/copyparty-iv:latest
+	docker push ghcr.io/9001/copyparty-ac:latest
+	docker push ghcr.io/9001/copyparty-dj:latest
 
 clean:
 	-docker kill `docker ps -q`

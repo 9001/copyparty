@@ -110,7 +110,7 @@ download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 
 * or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
-* or if you prefer to [use docker](./scripts/docker/) you can do that too 🐋
+* or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
 
 running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
