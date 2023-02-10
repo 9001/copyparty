@@ -14,6 +14,7 @@ import os
 import platform
 import re
 import select
+import shutil
 import signal
 import socket
 import stat
@@ -288,6 +289,20 @@ REKOBO_KEY = {
 }
 
 REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
+
+
+pybin = sys.executable or ""
+is_exe = bool(getattr(sys, "frozen", False))
+if is_exe:
+    pybin = ""
+    for p in "python3 python".split():
+        try:
+            p = shutil.which(p)
+            if p:
+                pybin = p
+                break
+        except:
+            pass
 
 
 def py_desc() -> str:
@@ -1704,7 +1719,7 @@ def relchk(rp: str) -> str:
 
 def absreal(fpath: str) -> str:
     try:
-        return fsdec(os.path.abspath(os.path.realpath(fsenc(fpath))))
+        return fsdec(os.path.abspath(os.path.realpath(afsenc(fpath))))
     except:
         if not WINDOWS:
             raise
@@ -1824,6 +1839,24 @@ def _w8enc3(txt: str) -> bytes:
     return txt.encode(FS_ENCODING, "surrogateescape")
 
 
+def _msdec(txt: bytes) -> str:
+    ret = txt.decode(FS_ENCODING, "surrogateescape")
+    return ret[4:] if ret.startswith("\\\\?\\") else ret
+
+
+def _msaenc(txt: str) -> bytes:
+    return txt.replace("/", "\\").encode(FS_ENCODING, "surrogateescape")
+
+
+def _msenc(txt: str) -> bytes:
+    txt = txt.replace("/", "\\")
+    if ":" not in txt and not txt.startswith("\\\\"):
+        txt = absreal(txt)
+
+    ret = txt.encode(FS_ENCODING, "surrogateescape")
+    return ret if ret.startswith(b"\\\\?\\") else b"\\\\?\\" + ret
+
+
 w8dec = _w8dec3 if not PY2 else _w8dec2
 w8enc = _w8enc3 if not PY2 else _w8enc2
 
@@ -1838,8 +1871,13 @@ def w8b64enc(txt: str) -> str:
     return base64.urlsafe_b64encode(w8enc(txt)).decode("ascii")
 
 
-if not PY2 or not WINDOWS:
-    fsenc = w8enc
+if not PY2 and WINDOWS:
+    sfsenc = w8enc
+    afsenc = _msaenc
+    fsenc = _msenc
+    fsdec = _msdec
+elif not PY2 or not WINDOWS:
+    fsenc = afsenc = sfsenc = w8enc
     fsdec = w8dec
 else:
     # moonrunes become \x3f with bytestrings,
@@ -1850,7 +1888,7 @@ else:
     def _not_actually_mbcs_dec(txt: bytes) -> str:
         return txt
 
-    fsenc = _not_actually_mbcs_enc
+    fsenc = afsenc = sfsenc = _not_actually_mbcs_enc
     fsdec = _not_actually_mbcs_dec
 
 
@@ -2514,12 +2552,17 @@ def _runhook(
             log(t.format(arg, ocmd))
 
     env = os.environ.copy()
-    # try:
-    pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-    zsl = [str(pypath)] + [str(x) for x in sys.path if x]
-    pypath = str(os.pathsep.join(zsl))
-    env["PYTHONPATH"] = pypath
-    # except: if not E.ox: raise
+    try:
+        if is_exe:
+            raise Exception()
+
+        pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+        zsl = [str(pypath)] + [str(x) for x in sys.path if x]
+        pypath = str(os.pathsep.join(zsl))
+        env["PYTHONPATH"] = pypath
+    except:
+        if not is_exe:
+            raise
 
     ka = {
         "env": env,
@@ -2545,9 +2588,9 @@ def _runhook(
 
     acmd = [cmd, arg]
     if cmd.endswith(".py"):
-        acmd = [sys.executable] + acmd
+        acmd = [pybin] + acmd
 
-    bcmd = [fsenc(x) for x in acmd]
+    bcmd = [fsenc(x) if x == ap else sfsenc(x) for x in acmd]
 
     t0 = time.time()
     if fork:

@@ -21,6 +21,7 @@ from .util import (
     exclude_dotfiles,
     fsenc,
     ipnorm,
+    pybin,
     relchk,
     sanitize_fn,
     vjoin,
@@ -135,7 +136,8 @@ class FtpFs(AbstractedFS):
         try:
             vpath = vpath.replace("\\", "/").lstrip("/")
             rd, fn = os.path.split(vpath)
-            if ANYWIN and not relchk(rd):
+            if ANYWIN and relchk(rd):
+                logging.warning("malicious vpath: %s", vpath)
                 raise FilesystemError("unsupported characters in filepath")
 
             fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
@@ -417,7 +419,7 @@ class Ftpd(object):
                 h1 = SftpHandler
             except:
                 t = "\nftps requires pyopenssl;\nplease run the following:\n\n  {} -m pip install --user pyopenssl\n"
-                print(t.format(sys.executable))
+                print(t.format(pybin))
                 sys.exit(1)
 
             h1.certfile = os.path.join(self.args.E.cfg, "cert.pem")
@@ -450,10 +452,18 @@ class Ftpd(object):
         lgr = logging.getLogger("pyftpdlib")
         lgr.setLevel(logging.DEBUG if self.args.ftpv else logging.INFO)
 
+        ips = self.args.i
+        if "::" in ips:
+            ips.append("0.0.0.0")
+
         ioloop = IOLoop()
-        for ip in self.args.i:
+        for ip in ips:
             for h, lp in hs:
-                FTPServer((ip, int(lp)), h, ioloop)
+                try:
+                    FTPServer((ip, int(lp)), h, ioloop)
+                except:
+                    if ip != "0.0.0.0" or "::" not in ips:
+                        raise
 
         Daemon(ioloop.loop, "ftp")
 

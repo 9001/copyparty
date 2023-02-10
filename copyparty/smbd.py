@@ -12,7 +12,7 @@ from types import SimpleNamespace
 from .__init__ import ANYWIN, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
-from .util import Daemon, min_ex
+from .util import Daemon, is_exe, min_ex, pybin
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any
@@ -42,8 +42,12 @@ class SMB(object):
             from impacket import smbserver
             from impacket.ntlm import compute_lmhash, compute_nthash
         except ImportError:
+            if is_exe:
+                print("copyparty.exe cannot do SMB")
+                sys.exit(1)
+
             m = "\033[36m\n{}\033[31m\n\nERROR: need 'impacket'; please run this command:\033[33m\n {} -m pip install --user impacket\n\033[0m"
-            print(m.format(min_ex(), sys.executable))
+            print(m.format(min_ex(), pybin))
             sys.exit(1)
 
         # patch vfs into smbserver.os

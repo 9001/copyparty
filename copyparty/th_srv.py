@@ -20,6 +20,7 @@ from .util import (
     Cooldown,
     Daemon,
     Pebkac,
+    afsenc,
     fsenc,
     min_ex,
     runcmd,
@@ -82,14 +83,14 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str) -> str:
     # base64 = 64 = 4096
     rd, fn = vsplit(rem)
     if rd:
-        h = hashlib.sha512(fsenc(rd)).digest()
+        h = hashlib.sha512(afsenc(rd)).digest()
         b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]
         rd = "{}/{}/".format(b64[:2], b64[2:4]).lower() + b64
     else:
         rd = "top"
 
     # could keep original filenames but this is safer re pathlen
-    h = hashlib.sha512(fsenc(fn)).digest()
+    h = hashlib.sha512(afsenc(fn)).digest()
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
     if fmt in ("opus", "caf"):
@@ -201,7 +202,7 @@ class ThumbSrv(object):
                 inf_path = os.path.join(thdir, "dir.txt")
                 if not bos.path.exists(inf_path):
                     with open(inf_path, "wb") as f:
-                        f.write(fsenc(os.path.dirname(abspath)))
+                        f.write(afsenc(os.path.dirname(abspath)))
 
                 self.busy[tpath] = [cond]
                 do_conv = True

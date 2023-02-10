@@ -37,6 +37,7 @@ from .util import (
     atomic_move,
     db_ex_chk,
     djoin,
+    sfsenc,
     fsenc,
     gen_filekey,
     gen_filekey_dbg,
@@ -395,7 +396,7 @@ class Up2k(object):
 
     def _vis_job_progress(self, job: dict[str, Any]) -> str:
         perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
-        path = os.path.join(job["ptop"], job["prel"], job["name"])
+        path = djoin(job["ptop"], job["prel"], job["name"])
         return "{:5.1f}% {}".format(perc, path)
 
     def _vis_reg_progress(self, reg: dict[str, dict[str, Any]]) -> list[str]:
@@ -691,7 +692,7 @@ class Up2k(object):
                 pass
 
             for k, job in reg2.items():
-                path = os.path.join(job["ptop"], job["prel"], job["name"])
+                path = djoin(job["ptop"], job["prel"], job["name"])
                 if bos.path.exists(path):
                     reg[k] = job
                     job["poke"] = time.time()
@@ -1086,7 +1087,7 @@ class Up2k(object):
             else:
                 rd = drd
 
-            abspath = os.path.join(top, rd)
+            abspath = djoin(top, rd)
             self.pp.msg = "b{} {}".format(ndirs - nchecked, abspath)
             try:
                 if os.path.isdir(abspath):
@@ -1127,7 +1128,7 @@ class Up2k(object):
                 if crd != rd:
                     crd = rd
                     try:
-                        cdc = set(os.listdir(os.path.join(top, rd)))
+                        cdc = set(os.listdir(djoin(top, rd)))
                     except:
                         cdc.clear()
 
@@ -1203,7 +1204,7 @@ class Up2k(object):
                     rd = drd
                     fn = dfn
 
-                abspath = os.path.join(ptop, rd, fn)
+                abspath = djoin(ptop, rd, fn)
                 if rei and rei.search(abspath):
                     continue
 
@@ -1412,7 +1413,7 @@ class Up2k(object):
                     q = "insert into mt values (?,'t:mtp','a')"
                     cur.execute(q, (w[:16],))
 
-            abspath = os.path.join(ptop, rd, fn)
+            abspath = djoin(ptop, rd, fn)
             self.pp.msg = "c{} {}".format(nq, abspath)
             if not mpool:
                 n_tags = self._tagscan_file(cur, entags, w, abspath, ip, at)
@@ -1576,7 +1577,7 @@ class Up2k(object):
                     q = "select rd, fn, ip, at from up where substr(w,1,16)=? limit 1"
                     rd, fn, ip, at = cur.execute(q, (w,)).fetchone()
                     rd, fn = s3dec(rd, fn)
-                    abspath = os.path.join(ptop, rd, fn)
+                    abspath = djoin(ptop, rd, fn)
 
                     q = "select k from mt where w = ?"
                     zq = cur.execute(q, (w,)).fetchall()
@@ -2053,7 +2054,7 @@ class Up2k(object):
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
-                    dp_abs = "/".join([ptop, dp_dir, dp_fn])
+                    dp_abs = djoin(ptop, dp_dir, dp_fn)
                     try:
                         st = bos.stat(dp_abs)
                         if stat.S_ISLNK(st.st_mode):
@@ -2128,7 +2129,7 @@ class Up2k(object):
                     # ensure the files haven't been deleted manually
                     names = [job[x] for x in ["name", "tnam"] if x in job]
                     for fn in names:
-                        path = os.path.join(job["ptop"], job["prel"], fn)
+                        path = djoin(job["ptop"], job["prel"], fn)
                         try:
                             if bos.path.getsize(path) > 0:
                                 # upload completed or both present
@@ -2140,9 +2141,9 @@ class Up2k(object):
                             break
                 else:
                     # file contents match, but not the path
-                    src = os.path.join(job["ptop"], job["prel"], job["name"])
-                    dst = os.path.join(cj["ptop"], cj["prel"], cj["name"])
-                    vsrc = os.path.join(job["vtop"], job["prel"], job["name"])
+                    src = djoin(job["ptop"], job["prel"], job["name"])
+                    dst = djoin(cj["ptop"], cj["prel"], cj["name"])
+                    vsrc = djoin(job["vtop"], job["prel"], job["name"])
                     vsrc = vsrc.replace("\\", "/")  # just for prints anyways
                     if job["need"]:
                         self.log("unfinished:\n  {0}\n  {1}".format(src, dst))
@@ -2180,7 +2181,7 @@ class Up2k(object):
                         else:
                             job["name"] = self._untaken(pdir, cj, now)
 
-                        dst = os.path.join(job["ptop"], job["prel"], job["name"])
+                        dst = djoin(job["ptop"], job["prel"], job["name"])
                         if not self.args.nw:
                             try:
                                 dvf = self.flags[job["ptop"]]
@@ -2270,7 +2271,7 @@ class Up2k(object):
                 and "fk" in vfs.flags
                 and (cj["user"] in vfs.axs.uread or cj["user"] in vfs.axs.upget)
             ):
-                ap = absreal(os.path.join(job["ptop"], job["prel"], job["name"]))
+                ap = absreal(djoin(job["ptop"], job["prel"], job["name"]))
                 ino = 0 if ANYWIN else bos.stat(ap).st_ino
                 fk = self.gen_fk(self.args.fk_salt, ap, job["size"], ino)
                 ret["fk"] = fk[: vfs.flags["fk"]]
@@ -2284,7 +2285,7 @@ class Up2k(object):
         if self.args.nw:
             return fname
 
-        fp = os.path.join(fdir, fname)
+        fp = djoin(fdir, fname)
         if job.get("replace") and bos.path.exists(fp):
             self.log("replacing existing file at {}".format(fp))
             bos.unlink(fp)
@@ -2397,7 +2398,7 @@ class Up2k(object):
                 t = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
                 raise Pebkac(400, t.format(wark, chash, idx, nh, job["name"]))
 
-            path = os.path.join(job["ptop"], job["prel"], job["tnam"])
+            path = djoin(job["ptop"], job["prel"], job["tnam"])
 
             chunksize = up2k_chunksize(job["size"])
             ofs = [chunksize * x for x in nchunk]
@@ -2428,9 +2429,9 @@ class Up2k(object):
             self.db_act = time.time()
             try:
                 job = self.registry[ptop][wark]
-                pdir = os.path.join(job["ptop"], job["prel"])
-                src = os.path.join(pdir, job["tnam"])
-                dst = os.path.join(pdir, job["name"])
+                pdir = djoin(job["ptop"], job["prel"])
+                src = djoin(pdir, job["tnam"])
+                dst = djoin(pdir, job["name"])
             except Exception as ex:
                 return "confirm_chunk, wark, " + repr(ex)  # type: ignore
 
@@ -2463,9 +2464,9 @@ class Up2k(object):
         self.db_act = time.time()
         try:
             job = self.registry[ptop][wark]
-            pdir = os.path.join(job["ptop"], job["prel"])
-            src = os.path.join(pdir, job["tnam"])
-            dst = os.path.join(pdir, job["name"])
+            pdir = djoin(job["ptop"], job["prel"])
+            src = djoin(pdir, job["tnam"])
+            dst = djoin(pdir, job["name"])
         except Exception as ex:
             raise Pebkac(500, "finish_upload, wark, " + repr(ex))
 
@@ -2532,7 +2533,7 @@ class Up2k(object):
 
         cur = self.cur.get(ptop)
         for rd, fn, lmod in dupes:
-            d2 = os.path.join(ptop, rd, fn)
+            d2 = djoin(ptop, rd, fn)
             if os.path.exists(d2):
                 continue
 
@@ -2710,7 +2711,7 @@ class Up2k(object):
                         break
 
                 n_files += 1
-                abspath = os.path.join(adir, fn)
+                abspath = djoin(adir, fn)
                 volpath = "{}/{}".format(vrem, fn).strip("/")
                 vpath = "{}/{}".format(dbv.vpath, volpath).strip("/")
                 self.log("rm {}\n  {}".format(vpath, abspath))
@@ -2989,14 +2990,14 @@ class Up2k(object):
         or to first remaining full if no dabs (delete)
         """
         dupes = []
-        sabs = os.path.join(sptop, srem)
+        sabs = djoin(sptop, srem)
         q = "select rd, fn from up where substr(w,1,16)=? and w=?"
         for ptop, cur in self.cur.items():
             for rd, fn in cur.execute(q, (wark[:16], wark)):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
-                dvrem = "/".join([rd, fn]).strip("/")
+                dvrem = vjoin(rd, fn).strip("/")
                 if ptop != sptop or srem != dvrem:
                     dupes.append([ptop, dvrem])
                     self.log("found {} dupe: [{}] {}".format(wark, ptop, dvrem))
@@ -3007,7 +3008,7 @@ class Up2k(object):
         full: dict[str, tuple[str, str]] = {}
         links: dict[str, tuple[str, str]] = {}
         for ptop, vp in dupes:
-            ap = os.path.join(ptop, vp)
+            ap = djoin(ptop, vp)
             try:
                 d = links if bos.path.islink(ap) else full
                 d[ap] = (ptop, vp)
@@ -3111,7 +3112,7 @@ class Up2k(object):
 
     def _new_upload(self, job: dict[str, Any]) -> None:
         pdir = djoin(job["ptop"], job["prel"])
-        if not job["size"] and bos.path.isfile(os.path.join(pdir, job["name"])):
+        if not job["size"] and bos.path.isfile(djoin(pdir, job["name"])):
             return
 
         self.registry[job["ptop"]][job["wark"]] = job
@@ -3156,7 +3157,7 @@ class Up2k(object):
         suffix = "-{:.6f}-{}".format(job["t0"], dip)
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
             f, job["tnam"] = zfw["orz"]
-            abspath = os.path.join(pdir, job["tnam"])
+            abspath = djoin(pdir, job["tnam"])
             sprs = job["sprs"]
             sz = job["size"]
             relabel = False
@@ -3255,7 +3256,7 @@ class Up2k(object):
                 x
                 for x in reg.values()
                 if x["need"]
-                and not bos.path.exists(os.path.join(x["ptop"], x["prel"], x["name"]))
+                and not bos.path.exists(djoin(x["ptop"], x["prel"], x["name"]))
             ]
 
         if rm or lost:
@@ -3268,7 +3269,7 @@ class Up2k(object):
                 del reg[job["wark"]]
                 try:
                     # remove the filename reservation
-                    path = os.path.join(job["ptop"], job["prel"], job["name"])
+                    path = djoin(job["ptop"], job["prel"], job["name"])
                     if bos.path.getsize(path) == 0:
                         bos.unlink(path)
                 except:
@@ -3277,7 +3278,7 @@ class Up2k(object):
                 try:
                     if len(job["hash"]) == len(job["need"]):
                         # PARTIAL is empty, delete that too
-                        path = os.path.join(job["ptop"], job["prel"], job["tnam"])
+                        path = djoin(job["ptop"], job["prel"], job["tnam"])
                         bos.unlink(path)
                 except:
                     pass
@@ -3326,7 +3327,7 @@ class Up2k(object):
                 continue
 
             # self.log("\n  " + repr([ptop, rd, fn]))
-            abspath = os.path.join(ptop, rd, fn)
+            abspath = djoin(ptop, rd, fn)
             try:
                 tags = self.mtag.get(abspath)
                 ntags1 = len(tags)
@@ -3376,7 +3377,7 @@ class Up2k(object):
             if "e2d" not in self.flags[ptop]:
                 continue
 
-            abspath = os.path.join(ptop, rd, fn)
+            abspath = djoin(ptop, rd, fn)
             self.log("hashing " + abspath)
             inf = bos.stat(abspath)
             if not inf.st_size:
@@ -3455,6 +3456,6 @@ def up2k_wark_from_hashlist(salt: str, filesize: int, hashes: list[str]) -> str:
 
 
 def up2k_wark_from_metadata(salt: str, sz: int, lastmod: int, rd: str, fn: str) -> str:
-    ret = fsenc("{}\n{}\n{}\n{}\n{}".format(salt, lastmod, sz, rd, fn))
+    ret = sfsenc("{}\n{}\n{}\n{}\n{}".format(salt, lastmod, sz, rd, fn))
     ret = base64.urlsafe_b64encode(hashlib.sha512(ret).digest())
     return "#{}".format(ret.decode("ascii"))[:44]

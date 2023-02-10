@@ -61,7 +61,7 @@ def main():
 
     os.chdir(cwd)
     f1 = fsenc(fn)
-    f2 = os.path.join(b"noexif", f1)
+    f2 = fsenc(os.path.join(b"noexif", fn))
     cmd = [
         b"exiftool",
         b"-exif:all=",

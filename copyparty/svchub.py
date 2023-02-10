@@ -44,6 +44,7 @@ from .util import (
     ansi_re,
     min_ex,
     mp,
+    pybin,
     start_log_thrs,
     start_stackmon,
 )
@@ -206,7 +207,7 @@ class SvcHub(object):
                 self.thumbsrv = ThumbSrv(self)
             else:
                 msg = "need either Pillow, pyvips, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
-                msg = msg.format(" " * 37, os.path.basename(sys.executable))
+                msg = msg.format(" " * 37, os.path.basename(pybin))
                 self.log("thumb", msg, c=3)
 
         if not args.no_acode and args.no_thumb:
@@ -413,7 +414,7 @@ class SvcHub(object):
 
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
 
-        argv = [sys.executable] + self.argv
+        argv = [pybin] + self.argv
         if hasattr(shlex, "quote"):
             argv = [shlex.quote(x) for x in argv]
         else:

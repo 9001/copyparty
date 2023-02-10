@@ -36,8 +36,10 @@ from .util import (
     UNPLICATIONS,
     align_tab,
     ansi_re,
+    is_exe,
     min_ex,
     py_desc,
+    pybin,
     termsize,
     wrap,
 )
@@ -1064,6 +1066,9 @@ def main(argv: Optional[list[str]] = None) -> None:
     if "--license" in argv:
         showlic()
         sys.exit(0)
+
+    if is_exe:
+        print("pybin: {}\n".format(pybin), end="")
 
     ensure_locale()
     if HAVE_SSL:

@@ -1350,7 +1350,7 @@ enable [thumbnails](#thumbnails) of...
 * **AVIF pictures:** `pyvips` or `ffmpeg` or `pillow-avif-plugin`
 * **JPEG XL pictures:** `pyvips` or `ffmpeg`
 
-enable [smb](#smb-server) support:
+enable [smb](#smb-server) support (**not** recommended):
 * `impacket==0.10.0`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`

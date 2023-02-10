@@ -44,21 +44,33 @@ read a b c d _ < <(
 )
 sed -r 's/1,2,3,0/'$a,$b,$c,$d'/;s/1\.2\.3/'$a.$b.$c/ <loader.rc >loader.rc2
 
+excl=(
+    copyparty.broker_mp
+    copyparty.broker_mpw
+    ctypes.macholib
+    curses
+    inspect
+    multiprocessing
+    pdb
+    pickle
+    pyftpdlib.prefork
+    urllib.request
+    urllib.response
+    urllib.robotparser
+    zipfile
+)
+false || excl+=(
+    PIL
+    PIL.ExifTags
+    PIL.Image
+    PIL.ImageDraw
+    PIL.ImageOps
+)
+excl=( "${excl[@]/#/--exclude-module }" )
+
 $APPDATA/python/python37/scripts/pyinstaller \
     -y --clean -p mods --upx-dir=. \
-    --exclude-module copyparty.broker_mp \
-    --exclude-module copyparty.broker_mpw \
-    --exclude-module curses \
-    --exclude-module ctypes.macholib \
-    --exclude-module inspect \
-    --exclude-module multiprocessing \
-    --exclude-module pdb \
-    --exclude-module pickle \
-    --exclude-module pyftpdlib.prefork \
-    --exclude-module urllib.request \
-    --exclude-module urllib.response \
-    --exclude-module urllib.robotparser \
-    --exclude-module zipfile \
+    ${excl[*]} \
     --version-file loader.rc2 -i loader.ico -n copyparty -c -F loader.py \
     --add-data 'mods/copyparty/res;copyparty/res' \
     --add-data 'mods/copyparty/web;copyparty/web'

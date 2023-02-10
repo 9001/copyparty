@@ -10,7 +10,17 @@ import sys
 
 from .__init__ import PY2, WINDOWS, E, unicode
 from .bos import bos
-from .util import REKOBO_LKEY, fsenc, min_ex, retchk, runcmd, uncyg
+from .util import (
+    REKOBO_LKEY,
+    sfsenc,
+    fsenc,
+    is_exe,
+    min_ex,
+    pybin,
+    retchk,
+    runcmd,
+    uncyg,
+)
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
@@ -285,9 +295,14 @@ class MTag(object):
                 self.log(msg, c=3)
 
         if not self.usable:
+            if is_exe:
+                t = "need ffmpeg to read media tags; copyparty.exe cannot use mutagen"
+                self.log(t)
+                return
+
             msg = "need Mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"
-            pybin = os.path.basename(sys.executable)
-            self.log(msg.format(or_ffprobe, " " * 37, pybin), c=1)
+            pyname = os.path.basename(pybin)
+            self.log(msg.format(or_ffprobe, " " * 37, pyname), c=1)
             return
 
         # https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html
@@ -519,12 +534,15 @@ class MTag(object):
 
         env = os.environ.copy()
         try:
+            if is_exe:
+                raise Exception()
+
             pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
             zsl = [str(pypath)] + [str(x) for x in sys.path if x]
             pypath = str(os.pathsep.join(zsl))
             env["PYTHONPATH"] = pypath
         except:
-            if not E.ox:
+            if not E.ox and not is_exe:
                 raise
 
         ret: dict[str, Any] = {}
@@ -532,7 +550,7 @@ class MTag(object):
             try:
                 cmd = [parser.bin, abspath]
                 if parser.bin.endswith(".py"):
-                    cmd = [sys.executable] + cmd
+                    cmd = [pybin] + cmd
 
                 args = {
                     "env": env,
@@ -551,7 +569,7 @@ class MTag(object):
                 else:
                     cmd = ["nice"] + cmd
 
-                bcmd = [fsenc(x) for x in cmd]
+                bcmd = [sfsenc(x) for x in cmd[:-1]] + [fsenc(cmd[-1])]
                 rc, v, err = runcmd(bcmd, **args)  # type: ignore
                 retchk(rc, bcmd, err, self.log, 5, self.args.mtag_v)
                 v = v.strip()

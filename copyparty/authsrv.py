@@ -14,7 +14,7 @@ from datetime import datetime
 
 from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
 from .bos import bos
-from .cfg import vf_bmap, vf_vmap, vf_cmap, onedash, flagdescs, permdescs
+from .cfg import vf_bmap, vf_vmap, vf_cmap, flagdescs, permdescs
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
@@ -22,7 +22,7 @@ from .util import (
     UNPLICATIONS,
     Pebkac,
     absreal,
-    fsenc,
+    afsenc,
     get_df,
     humansize,
     relchk,
@@ -1083,7 +1083,7 @@ class AuthSrv(object):
         promote = []
         demote = []
         for vol in vfs.all_vols.values():
-            zb = hashlib.sha512(fsenc(vol.realpath)).digest()
+            zb = hashlib.sha512(afsenc(vol.realpath)).digest()
             hid = base64.b32encode(zb).decode("ascii").lower()
             vflag = vol.flags.get("hist")
             if vflag == "-":
@@ -1102,7 +1102,7 @@ class AuthSrv(object):
                     except:
                         owner = None
 
-                    me = fsenc(vol.realpath).rstrip()
+                    me = afsenc(vol.realpath).rstrip()
                     if owner not in [None, me]:
                         continue
 
