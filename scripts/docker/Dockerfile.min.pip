@@ -1,0 +1,12 @@
+FROM    alpine:latest
+WORKDIR /z
+
+RUN     apk --no-cache add python3 py3-pip \
+        && python3 -m pip install copyparty \
+        && apk del py3-pip \
+        && mkdir /cfg /w \
+        && chmod 777 /cfg /w \
+        && echo % /cfg > initcfg
+
+WORKDIR /w
+ENTRYPOINT ["python3", "-m", "copyparty", "-c", "/z/initcfg"]

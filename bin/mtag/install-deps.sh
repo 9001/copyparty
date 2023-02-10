@@ -57,6 +57,7 @@ hash -r
 	command -v python3 && pybin=python3 || pybin=python
 }
 
+$pybin -c 'import numpy' ||
 $pybin -m pip install --user numpy
 
 

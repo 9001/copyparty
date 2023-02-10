@@ -232,6 +232,11 @@ rm x.py
 cp -R /tmp/pe-copyparty.$(id -u)/copyparty/web/deps copyparty/web/
 ```
 
+or you could build the web-dependencies from source instead (NB: does not include prismjs, need to grab that manually):
+```sh
+make -C scripts/deps-docker
+```
+
 then build the sfx using any of the following examples:
 
 ```sh

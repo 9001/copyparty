@@ -1,0 +1,12 @@
+FROM    alpine:latest
+WORKDIR /z
+
+RUN     apk --no-cache add \
+            python3 \
+        && mkdir /cfg /w \
+        && chmod 777 /cfg /w \
+        && echo % /cfg > initcfg
+
+COPY    i/dist/copyparty-sfx.py ./
+WORKDIR /w
+ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "-c", "/z/initcfg"]
