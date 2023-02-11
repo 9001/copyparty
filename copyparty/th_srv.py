@@ -200,7 +200,7 @@ class ThumbSrv(object):
                 self.log("wait {}".format(tpath))
             except:
                 thdir = os.path.dirname(tpath)
-                bos.makedirs(thdir)
+                bos.makedirs(os.path.join(thdir, "w"))
 
                 inf_path = os.path.join(thdir, "dir.txt")
                 if not bos.path.exists(inf_path):
@@ -272,9 +272,12 @@ class ThumbSrv(object):
             if not png_ok and tpath.endswith(".png"):
                 raise Pebkac(400, "png only allowed for waveforms")
 
+            tdir, tfn = os.path.split(tpath)
+            ttpath = os.path.join(tdir, "w", tfn)
+
             for fun in funs:
                 try:
-                    fun(abspath, tpath)
+                    fun(abspath, ttpath)
                     break
                 except Exception as ex:
                     msg = "{} could not create thumbnail of {}\n{}"
@@ -283,14 +286,19 @@ class ThumbSrv(object):
                     self.log(msg, c)
                     if getattr(ex, "returncode", 0) != 321:
                         if fun == funs[-1]:
-                            with open(tpath, "wb") as _:
+                            with open(ttpath, "wb") as _:
                                 pass
                     else:
                         # ffmpeg may spawn empty files on windows
                         try:
-                            os.unlink(tpath)
+                            os.unlink(ttpath)
                         except:
                             pass
+
+            try:
+                bos.rename(ttpath, tpath)
+            except:
+                pass
 
             with self.mutex:
                 subs = self.busy[tpath]
