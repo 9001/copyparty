@@ -9,4 +9,11 @@ RUN     apk --no-cache add \
 
 COPY    i/dist/copyparty-sfx.py ./
 WORKDIR /w
+EXPOSE  3923
 ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "-c", "/z/initcfg"]
+
+LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.licenses="MIT" \
+        org.opencontainers.image.title="copyparty-min" \
+        org.opencontainers.image.description="just copyparty, no thumbnails / media tags / audio transcoding"

@@ -33,9 +33,9 @@ the recommended way to configure copyparty inside a container is to mount a fold
 with image size after installation and when gzipped
 
 * `min` (57 MiB, 20 gz) is just copyparty itself
-* `im` (69 MiB, 24 gz) can create thumbnails using pillow (pics only)
-* `ac` (163 MiB, 56 gz) is `im` plus ffmpeg for video/audio thumbnails + audio transcoding
-* `iv` (211 MiB, 73 gz) is `ac` plus vips for faster heif / avic / jxl thumbnails 
+* `im` (70 MiB, 25 gz) can thumbnail images with pillow, parse media files with mutagen
+* `ac` (163 MiB, 56 gz) is `im` plus ffmpeg for video/audio thumbs + audio transcoding + better tags
+* `iv` (211 MiB, 73 gz) is `ac` plus vips for faster heif / avic / jxl thumbnails
 * `dj` (309 MiB, 104 gz) is `iv` plus beatroot/keyfinder to detect musical keys and bpm
 
 `ac` is recommended since the additional features available in `iv` and `dj` are rarely useful

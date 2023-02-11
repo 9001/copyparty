@@ -48,7 +48,7 @@ push:
 clean:
 	-docker kill `docker ps -q`
 	-docker rm   `docker ps -qa`
-	-docker rmi  `docker images -a | awk '/^<none>/{print$$3}'`
+	-docker rmi -f `docker images -a | awk '/<none>/{print$$3}'`
 
 hclean:
 	-docker kill `docker ps -q`

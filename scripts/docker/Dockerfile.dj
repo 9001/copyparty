@@ -26,4 +26,11 @@ RUN     apk add -U \
 
 COPY    i/dist/copyparty-sfx.py ./
 WORKDIR /w
+EXPOSE  3923
 ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "-c", "/z/initcfg"]
+
+LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.licenses="MIT" \
+        org.opencontainers.image.title="copyparty-dj" \
+        org.opencontainers.image.description="copyparty with all optional dependencies, including musical key / bpm detection"
