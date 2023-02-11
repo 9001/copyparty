@@ -14,7 +14,7 @@ from datetime import datetime
 
 from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
 from .bos import bos
-from .cfg import vf_bmap, vf_vmap, vf_cmap, flagdescs, permdescs
+from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
@@ -37,7 +37,7 @@ if True:  # pylint: disable=using-constant-test
 
     from typing import Any, Generator, Optional, Union
 
-    from .util import RootLogger, NamedLogger
+    from .util import NamedLogger, RootLogger
 
 if TYPE_CHECKING:
     pass

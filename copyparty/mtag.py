@@ -11,14 +11,15 @@ import sys
 from .__init__ import PY2, WINDOWS, E, unicode
 from .bos import bos
 from .util import (
+    FFMPEG_URL,
     REKOBO_LKEY,
-    sfsenc,
     fsenc,
     is_exe,
     min_ex,
     pybin,
     retchk,
     runcmd,
+    sfsenc,
     uncyg,
 )
 
@@ -296,8 +297,8 @@ class MTag(object):
 
         if not self.usable:
             if is_exe:
-                t = "need ffmpeg to read media tags; copyparty.exe cannot use mutagen"
-                self.log(t)
+                t = "copyparty.exe cannot use mutagen; need ffprobe.exe to read media tags: "
+                self.log(t + FFMPEG_URL)
                 return
 
             msg = "need Mutagen{} to read media tags so please run this:\n{}{} -m pip install --user mutagen\n"

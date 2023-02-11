@@ -35,6 +35,7 @@ from .tcpsrv import TcpSrv
 from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
 from .up2k import Up2k
 from .util import (
+    FFMPEG_URL,
     VERSIONS,
     Daemon,
     Garda,
@@ -42,6 +43,7 @@ from .util import (
     HMaccas,
     alltrace,
     ansi_re,
+    is_exe,
     min_ex,
     mp,
     pybin,
@@ -208,6 +210,10 @@ class SvcHub(object):
             else:
                 msg = "need either Pillow, pyvips, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
                 msg = msg.format(" " * 37, os.path.basename(pybin))
+                if is_exe:
+                    msg = "copyparty.exe cannot use Pillow or pyvips; need ffprobe.exe and ffmpeg.exe to create thumbnails: "
+                    msg += FFMPEG_URL
+
                 self.log("thumb", msg, c=3)
 
         if not args.no_acode and args.no_thumb:

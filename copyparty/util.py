@@ -144,6 +144,8 @@ SYMTIME = sys.version_info > (3, 6) and os.utime in os.supports_follow_symlinks
 
 META_NOBOTS = '<meta name="robots" content="noindex, nofollow">'
 
+FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z"
+
 HTTPCODE = {
     200: "OK",
     201: "Created",

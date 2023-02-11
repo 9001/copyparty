@@ -11,6 +11,7 @@ from ipaddress import IPv4Network, IPv6Network
 from .__init__ import TYPE_CHECKING
 from .__init__ import unicode as U
 from .multicast import MC_Sck, MCast
+from .stolen.dnslib import AAAA
 from .stolen.dnslib import CLASS as DC
 from .stolen.dnslib import (
     NSEC,
@@ -20,7 +21,6 @@ from .stolen.dnslib import (
     SRV,
     TXT,
     A,
-    AAAA,
     DNSHeader,
     DNSQuestion,
     DNSRecord,

@@ -25,9 +25,9 @@ from textwrap import dedent
 
 from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
-from .authsrv import expand_config_file, re_vol, upgrade_cfg_fmt, split_cfg_ln
-from .svchub import SvcHub
+from .authsrv import expand_config_file, re_vol, split_cfg_ln, upgrade_cfg_fmt
 from .cfg import flagcats, onedash
+from .svchub import SvcHub
 from .util import (
     IMPLICATIONS,
     JINJA_VER,
@@ -866,11 +866,11 @@ def add_thumbnail(ap):
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
     # https://github.com/libvips/libvips
     # ffmpeg -hide_banner -demuxers | awk '/^ D  /{print$2}' | while IFS= read -r x; do ffmpeg -hide_banner -h demuxer=$x; done | grep -E '^Demuxer |extensions:'
-    ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="bmp,dib,gif,icns,ico,jpg,jpeg,jp2,jpx,pcx,png,pbm,pgm,ppm,pnm,sgi,tga,tif,tiff,webp,xbm,dds,xpm,heif,heifs,heic,heics,avif,avifs", help="image formats to decode using pillow")
-    ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="jpg,jpeg,jp2,jpx,jxl,tif,tiff,png,webp,heic,avif,fit,fits,fts,exr,svg,hdr,ppm,pgm,pfm,gif,nii", help="image formats to decode using pyvips")
-    ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,dds,dib,fit,fits,fts,gif,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
-    ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="av1,asf,avi,flv,m4v,mkv,mjpeg,mjpg,mpg,mpeg,mpg2,mpeg2,h264,avc,mts,h265,hevc,mov,3gp,mp4,ts,mpegts,nut,ogv,ogm,rm,vob,webm,wmv", help="video formats to decode using ffmpeg")
-    ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,m4a,ogg,opus,flac,alac,mp3,mp2,ac3,dts,wma,ra,wav,aif,aiff,au,alaw,ulaw,mulaw,amr,gsm,ape,tak,tta,wv,mpc", help="audio formats to decode using ffmpeg")
+    ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="avif,avifs,blp,bmp,dcx,dds,dib,emf,eps,fits,flc,fli,fpx,gif,heic,heics,heif,heifs,icns,ico,im,j2p,j2k,jp2,jpeg,jpg,jpx,pbm,pcx,pgm,png,pnm,ppm,psd,sgi,spi,tga,tif,tiff,webp,wmf,xbm,xpm", help="image formats to decode using pillow")
+    ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="avif,exr,fit,fits,fts,gif,hdr,heic,jp2,jpeg,jpg,jpx,jxl,nii,pfm,pgm,png,ppm,svg,tif,tiff,webp", help="image formats to decode using pyvips")
+    ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,dds,dib,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
+    ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
+    ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itr,itz,m4a,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,ogg,okt,opus,ra,s3gz,s3m,s3r,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmr,xmz,xpk", help="audio formats to decode using ffmpeg")
 
 
 def add_transcoding(ap):
