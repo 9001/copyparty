@@ -12,13 +12,14 @@ import time
 
 from queue import Queue
 
-from .__init__ import TYPE_CHECKING
+from .__init__ import ANYWIN, TYPE_CHECKING
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 from .util import (
     BytesIO,
     Cooldown,
     Daemon,
+    FFMPEG_URL,
     Pebkac,
     afsenc,
     fsenc,
@@ -134,6 +135,8 @@ class ThumbSrv(object):
             msg = "cannot create audio/video thumbnails because some of the required programs are not available: "
             msg += ", ".join(missing)
             self.log(msg, c=3)
+            if ANYWIN:
+                self.log("download FFmpeg to fix it:\033[0m " + FFMPEG_URL, 3)
 
         if self.args.th_clean:
             Daemon(self.cleaner, "thumb.cln")

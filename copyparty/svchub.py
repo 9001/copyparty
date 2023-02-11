@@ -197,6 +197,7 @@ class SvcHub(object):
 
         self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
+        want_ff = False
         if not args.no_thumb:
             t = ", ".join(self.args.th_dec) or "(None available)"
             self.log("thumb", "decoder preference: {}".format(t))
@@ -208,11 +209,11 @@ class SvcHub(object):
             if self.args.th_dec:
                 self.thumbsrv = ThumbSrv(self)
             else:
+                want_ff = True
                 msg = "need either Pillow, pyvips, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
                 msg = msg.format(" " * 37, os.path.basename(pybin))
                 if is_exe:
-                    msg = "copyparty.exe cannot use Pillow or pyvips; need ffprobe.exe and ffmpeg.exe to create thumbnails: "
-                    msg += FFMPEG_URL
+                    msg = "copyparty.exe cannot use Pillow or pyvips; need ffprobe.exe and ffmpeg.exe to create thumbnails"
 
                 self.log("thumb", msg, c=3)
 
@@ -225,6 +226,10 @@ class SvcHub(object):
             msg = "setting --no-acode because either FFmpeg or FFprobe is not available"
             self.log("thumb", msg, c=6)
             args.no_acode = True
+            want_ff = True
+
+        if want_ff and ANYWIN:
+            self.log("thumb", "download FFmpeg to fix it:\033[0m " + FFMPEG_URL, 3)
 
         args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)
 
