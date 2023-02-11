@@ -71,4 +71,4 @@ or using commandline arguments,
 
 # build the images yourself
 
-put `copyparty-sfx.py` into `../dist/` (or [build that from scratch](../docs/devnotes.md#just-the-sfx) too) then run `make`
+put `copyparty-sfx.py` into `../dist/` (or [build that from scratch](../../docs/devnotes.md#just-the-sfx) too) then run `make`

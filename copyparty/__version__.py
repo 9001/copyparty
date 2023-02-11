@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 6, 3)
+VERSION = (1, 6, 4)
 CODENAME = "cors k"
-BUILD_DT = (2023, 1, 31)
+BUILD_DT = (2023, 2, 11)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

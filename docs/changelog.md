@@ -1,4 +1,34 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0131-2103  `v1.6.3`  sandbox k
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* and since [1.6.0](https://github.com/9001/copyparty/releases/tag/v1.6.2) only got 2 days of prime time,
+  * [1.6 theme song](https://a.ocv.me/pub/demo/music/.bonus/#af-134e597c) (hosted on the demo server)
+  * [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) / feature comparison
+
+## new features
+* dotfiles are hidden from search results by default
+  * use `--dotsrch` or volflags `dotsrch` / `nodotsrch` to specify otherwise
+  * they were already being excluded from tar/zip-files if `-ed` is not set, so this makes more sense -- dotfiles *should* now be undiscoverable unless `-ed` or `--smb` is set, but please use [volumes](https://github.com/9001/copyparty#accounts-and-volumes) for isolation / access-control instead, much safer
+
+## bugfixes
+* lots of cosmetic fixes for the new readme/prologue/epilogue sandbox
+  * rushed it into the previous release when someone suggested it, bad idea
+  * still flickers a bit (especially prologues), and hotkeys are blocked while the sandboxed document has focus
+  * can be disabled with `--no-sb-md --no-sb-lg` (not recommended)
+* support webdav uploads from davfs2 (fix LOCK response)
+* always unlink files before overwriting them, in case they are hardlinks
+  * was primarily an issue with `--daw` and webdav clients
+* on windows, replace characters in PUT filenames as necessary
+* [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh): support opus transcoding on debian
+  * `rm -rf .hist/ac` to clear the transcode cache if the old version broke some songs
+
+## other changes
+* add `rel="nofollow"` to zip download links, basic-browser link
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0129-1842  `v1.6.2`  cors k
 
 [Ellie Goulding - Stay Awake (kors k Hardcore Bootleg).mp3](https://a.ocv.me/pub/demo/music/.bonus/#af-134e597c)

@@ -1793,6 +1793,9 @@ var pbar = (function () {
 		r.wurl = url;
 		var img = new Image();
 		img.onload = function () {
+			if (r.wurl != url)
+				return;
+
 			r.wimg = img;
 			r.onresize();
 		};
