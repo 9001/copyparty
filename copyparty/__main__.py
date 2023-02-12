@@ -870,7 +870,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="avif,exr,fit,fits,fts,gif,hdr,heic,jp2,jpeg,jpg,jpx,jxl,nii,pfm,pgm,png,ppm,svg,tif,tiff,webp", help="image formats to decode using pyvips")
     ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,dds,dib,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
-    ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itr,itz,m4a,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,ogg,okt,opus,ra,s3gz,s3m,s3r,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmr,xmz,xpk", help="audio formats to decode using ffmpeg")
+    ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bonk,dfpwm,dts,flac,gsm,ilbc,it,m4a,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,ogg,okt,opus,ra,s3m,tak,tta,ulaw,wav,wma,wv,xm,xpk", help="audio formats to decode using ffmpeg")
 
 
 def add_transcoding(ap):
