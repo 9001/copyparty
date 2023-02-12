@@ -1856,7 +1856,7 @@ def _msenc(txt: str) -> bytes:
         txt = absreal(txt)
 
     ret = txt.encode(FS_ENCODING, "surrogateescape")
-    return ret if ret.startswith(b"\\\\?\\") else b"\\\\?\\" + ret
+    return ret if ret.startswith(b"\\\\") else b"\\\\?\\" + ret
 
 
 w8dec = _w8dec3 if not PY2 else _w8dec2
