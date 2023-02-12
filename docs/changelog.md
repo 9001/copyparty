@@ -1,4 +1,51 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0211-1802  `v1.6.4`  🔧🎲🔗🐳🇦🎶
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [1.6 theme song](https://a.ocv.me/pub/demo/music/.bonus/#af-134e597c) // [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md)
+
+## new features
+* 🔧 new [config syntax](https://github.com/9001/copyparty/blob/hovudstraum/docs/example.conf) (#20)
+  * the new syntax is still kinda esoteric and funky but it's an improvement
+  * old config files are still supported
+    * `--vc` prints the autoconverted config which you can copy back into the config file to upgrade
+  * `--vc` will also [annotate and explain](https://user-images.githubusercontent.com/241032/217356028-eb3e141f-80a6-4bc6-8d04-d8d1d874c3e9.png) the config files
+  * new argument `--cgen` to generate config from commandline arguments
+    * kinda buggy, especially the `[global]` section, so give it a lookover before saving it
+* 🎲 randomize filenames on upload
+  * either optionally, using the 🎲 button in the up2k ui
+  * or force-enabled; globally with `--rand` or per-volume with volflag `rand`
+  * specify filename length with `nrand` (globally or volflag), default 9
+* 🔗 export a list of links to your recent uploads
+  * `copy links` in the up2k tab (🚀) will copy links to all uploads since last page refresh,
+  * `copy` in the unpost tab (🧯) will copy links to all your recent uploads (max 2000 files / 12 hours by default)
+  * filekeys are included if that's enabled and you have access to view those (permissions `G` or `r`)
+* 🇦 [arch package](https://github.com/9001/copyparty/tree/hovudstraum/contrib/package/arch) -- added in #18, thx @icxes 
+  * maybe in aur soon!
+* 🐳 [docker containers](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) -- 5 editions,
+  * [min](https://hub.docker.com/r/copyparty/min) (57 MiB), just copyparty without thumbnails or audio transcoding
+  * [im](https://hub.docker.com/r/copyparty/im) (70 MiB), thumbnails of popular image formats + media tags with mutagen
+  * [ac (163 MiB)](https://hub.docker.com/r/copyparty/ac) 🥇 adds audio/video thumbnails + audio transcoding + better tags
+  * [iv](https://hub.docker.com/r/copyparty/iv) (211 MiB), makes heif/avic/jxl faster to thumbnail
+  * [dj](https://hub.docker.com/r/copyparty/dj) (309 MiB), adds optional detection of musical key / bpm
+* 🎶 [chiptune player](https://a.ocv.me/pub/demo/music/chiptunes/#af-f6fb2e5f)
+  * transcodes mod/xm/s3m/it/mo3/mptm/mt2/okt to opus
+  * uses FFmpeg (libopenmpt) so the accuracy is not perfect, but most files play OK enough
+  * not **yet** supported in the docker container since Alpine's FFmpeg was built without libopenmpt
+* windows: support long filepaths (over 260 chars)
+  * uses the `//?/` winapi syntax to also support windows 7
+* `--ver` shows the server version on the control panel
+
+## bugfixes
+* markdown files didn't scale properly in the document browser
+* detect and refuse multiple volume definitions sharing the same filesystem path
+* don't return incomplete transcodes if multiple clients try to play the same flac file
+* [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh): more reliable chroot cleanup, sigusr1 for config reload
+* pypi packaging: compress web resources, include webdav.bat
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0131-2103  `v1.6.3`  sandbox k
 
 * read-only demo server at https://a.ocv.me/pub/demo/
