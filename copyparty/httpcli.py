@@ -1421,7 +1421,7 @@ class HttpCli(object):
                 self.log(t, 1)
                 raise Pebkac(403, t)
 
-        if is_put and not self.args.no_dav:
+        if is_put and not (self.args.no_dav or self.args.nw):
             # allow overwrite if...
             #  * volflag 'daw' is set
             #  * and account has delete-access

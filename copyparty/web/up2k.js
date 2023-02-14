@@ -1452,7 +1452,7 @@ function up2k_init(subtle) {
         });
     };
 
-    var etaref = 0, etaskip = 0, utw_minh = 0, utw_read = 0;
+    var etaref = 0, etaskip = 0, utw_minh = 0, utw_read = 0, utw_card = 0;
     function etafun() {
         var nhash = st.busy.head.length + st.busy.hash.length + st.todo.head.length + st.todo.hash.length,
             nsend = st.busy.upload.length + st.todo.upload.length,
@@ -1464,6 +1464,12 @@ function up2k_init(subtle) {
             td = 0.05;
 
         //ebi('acc_info').innerHTML = humantime(st.time.busy) + ' ' + f2f(now / 1000, 1);
+
+        if (utw_card != pvis.act) {
+            utw_card = pvis.act;
+            utw_read = 9001;
+            ebi('u2tabw').style.minHeight = '0px';
+        }
 
         if (++utw_read >= 20) {
             utw_read = 0;
