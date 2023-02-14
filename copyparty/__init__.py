@@ -34,6 +34,8 @@ ANYWIN = WINDOWS or sys.platform in ["msys", "cygwin"]
 
 MACOS = platform.system() == "Darwin"
 
+EXE = bool(getattr(sys, "frozen", False))
+
 try:
     CORES = len(os.sched_getaffinity(0))
 except:

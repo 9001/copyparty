@@ -2,34 +2,46 @@ run ./build.sh in git-bash to build + upload the exe
 
 
 ## ============================================================
-## first-time setup on a stock win7x32sp1 vm:
+## first-time setup on a stock win7x32sp1 and/or win10x64 vm:
 ## 
 
 to obtain the files referenced below, see ./deps.txt
 
 download + install git (32bit OK on 64):
-http://192.168.123.1:3923/ro/pyi/Git-2.38.1-32-bit.exe
+http://192.168.123.1:3923/ro/pyi/Git-2.39.1-32-bit.exe
 
 ===[ copy-paste into git-bash ]================================
+uname -s | grep NT-10 && w10=1 || {
+  w7=1; uname -s | grep WOW64 && w7x64=1 || w7x32=1
+}
 fns=(
-  upx-4.0.0-win32.zip
-  pip-22.3-py3-none-any.whl
   altgraph-0.17.3-py2.py3-none-any.whl
+  pefile-2023.2.7-py3-none-any.whl
+  pyinstaller-5.8.0-py3-none-win_amd64.whl
+  pyinstaller_hooks_contrib-2023.0-py2.py3-none-any.whl
+  pywin32_ctypes-0.2.0-py2.py3-none-any.whl
+  upx-4.0.2-win32.zip
+)
+[ $w10 ] && fns+=(
+  mutagen-1.46.0-py3-none-any.whl
+  Pillow-9.4.0-cp311-cp311-win_amd64.whl
+  python-3.11.2-amd64.exe
+}
+[ $w7 ] && fns+=(
   future-0.18.2.tar.gz
   importlib_metadata-5.0.0-py3-none-any.whl
-  pefile-2022.5.30.tar.gz
-  pyinstaller_hooks_contrib-2022.11-py2.py3-none-any.whl
-  pywin32_ctypes-0.2.0-py2.py3-none-any.whl
+  pip-22.3-py3-none-any.whl
   typing_extensions-4.4.0-py3-none-any.whl
   zipp-3.10.0-py3-none-any.whl
 )
-uname -s | grep WOW64 && fns+=(
+[ $w7x64 ] && fns+=(
   windows6.1-kb2533623-x64.msu
-  pyinstaller-5.6.1-py3-none-win_amd64.whl
+  pyinstaller-5.8.0-py3-none-win_amd64.whl
   python-3.7.9-amd64.exe
-) || fns+=(
+)
+[ $w7x32 ] && fns+=(
   windows6.1-kb2533623-x86.msu
-  pyinstaller-5.6.1-py3-none-win32.whl
+  pyinstaller-5.8.0-py3-none-win32.whl
   python-3.7.9.exe
 )
 dl() { curl -fkLOC- "$1" && return 0; echo "$1"; return 1; }
@@ -45,12 +57,15 @@ manually install:
   python-3.7.9
 
 ===[ copy-paste into git-bash ]================================
+uname -s | grep NT-10 && w10=1 || w7=1
 cd ~/Downloads &&
 unzip upx-*-win32.zip &&
 mv upx-*/upx.exe . &&
 python -m ensurepip &&
 python -m pip install --user -U pip-*.whl &&
-python -m pip install --user -U pyinstaller-*.whl pefile-*.tar.gz pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl future-*.tar.gz importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl &&
+{ [ $w7 ] || python -m pip install --user -U mutagen-*.whl Pillow-*.whl; } &&
+{ [ $w10 ] || python -m pip install --user -U future-*.tar.gz importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
+python -m pip install --user -U pyinstaller-*.whl pefile-*.whl pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl &&
 cd &&
 rm -f build.sh &&
 curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh &&
@@ -58,6 +73,14 @@ echo ok
 # python -m pip install --user -U Pillow-9.2.0-cp37-cp37m-win32.whl
 # sed -ri 's/, bestopt, /]+bestopt+[/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
 # sed -ri 's/(^\s+bestopt = ).*/\1["--best","--lzma","--ultra-brute"]/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
+
+===[ win10: copy-paste into git-bash ]=========================
+appd=$(cygpath.exe "$APPDATA")
+curl -fkLO https://192.168.123.1:3923/cpp/scripts/uncomment.py &&
+#for f in $appd/Python/Python311/site-packages/mutagen/*.py; do awk -i inplace '/^\s*def _?(save|write)/{sub(/d.*/,"    ");s=$0;ns=length(s)} ns&&/[^ ]/&&substr($0,0,ns)!=s{ns=0} !ns' "$f"; done &&
+python uncomment.py $appd/Python/Python311/site-packages/{mutagen,PIL,jinja2,markupsafe}/*.py &&
+sed -ri 's/--lzma/--best/' $APPDATA/Python/Python311/site-packages/pyinstaller/building/utils.py &&
+echo ok
 
 
 ## ============================================================

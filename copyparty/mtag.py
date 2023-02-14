@@ -8,13 +8,12 @@ import shutil
 import subprocess as sp
 import sys
 
-from .__init__ import PY2, WINDOWS, E, unicode
+from .__init__ import EXE, PY2, WINDOWS, E, unicode
 from .bos import bos
 from .util import (
     FFMPEG_URL,
     REKOBO_LKEY,
     fsenc,
-    is_exe,
     min_ex,
     pybin,
     retchk,
@@ -270,7 +269,9 @@ class MTag(object):
         self.args = args
         self.usable = True
         self.prefer_mt = not args.no_mtag_ff
-        self.backend = "ffprobe" if args.no_mutagen else "mutagen"
+        self.backend = (
+            "ffprobe" if args.no_mutagen or (HAVE_FFPROBE and EXE) else "mutagen"
+        )
         self.can_ffprobe = HAVE_FFPROBE and not args.no_mtag_ff
         mappings = args.mtm
         or_ffprobe = " or FFprobe"
@@ -296,7 +297,7 @@ class MTag(object):
                 self.log(msg, c=3)
 
         if not self.usable:
-            if is_exe:
+            if EXE:
                 t = "copyparty.exe cannot use mutagen; need ffprobe.exe to read media tags: "
                 self.log(t + FFMPEG_URL)
                 return
@@ -472,7 +473,10 @@ class MTag(object):
                     self.log("mutagen: {}\033[0m".format(" ".join(zl)), "90")
             if not md.info.length and not md.info.codec:
                 raise Exception()
-        except:
+        except Exception as ex:
+            if self.args.mtag_v:
+                self.log("mutagen-err [{}] @ [{}]".format(ex, abspath), "90")
+
             return self.get_ffprobe(abspath) if self.can_ffprobe else {}
 
         sz = bos.path.getsize(abspath)
@@ -535,7 +539,7 @@ class MTag(object):
 
         env = os.environ.copy()
         try:
-            if is_exe:
+            if EXE:
                 raise Exception()
 
             pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -543,7 +547,7 @@ class MTag(object):
             pypath = str(os.pathsep.join(zsl))
             env["PYTHONPATH"] = pypath
         except:
-            if not E.ox and not is_exe:
+            if not E.ox and not EXE:
                 raise
 
         ret: dict[str, Any] = {}

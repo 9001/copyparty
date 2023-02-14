@@ -1,10 +1,28 @@
 # coding: utf-8
 
+import os
+import re
+import shutil
+import subprocess as sp
+import sys
+import traceback
+
 v = r"""
 
-this is the EXE edition of copyparty, compatible with Windows7-SP1
-and later. To make this possible, the EXE was compiled with Python
-3.7.9, which is EOL and does not receive security patches anymore.
+this 32-bit copyparty.exe is compatible with Windows7-SP1 and later.
+To make this possible, the EXE was compiled with Python 3.7.9,
+which is EOL and does not receive security patches anymore.
+
+if possible, for performance and security reasons, please use this instead:
+https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
+"""
+
+if sys.version_info > (3, 10):
+    v = r"""
+
+this 64-bit copyparty.exe is compatible with Windows 8 and later.
+No security issues were known to affect this EXE at build time,
+however that may have changed since then.
 
 if possible, for performance and security reasons, please use this instead:
 https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
@@ -14,14 +32,6 @@ try:
     print(v.replace("\n", "\n▒▌ ")[1:] + "\n")
 except:
     print(v.replace("\n", "\n|| ")[1:] + "\n")
-
-
-import re
-import os
-import sys
-import shutil
-import traceback
-import subprocess as sp
 
 
 def confirm(rv):

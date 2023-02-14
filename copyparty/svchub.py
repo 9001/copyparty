@@ -28,7 +28,7 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, MACOS, TYPE_CHECKING, VT100, EnvParams, unicode
+from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, VT100, EnvParams, unicode
 from .authsrv import AuthSrv
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
@@ -43,7 +43,6 @@ from .util import (
     HMaccas,
     alltrace,
     ansi_re,
-    is_exe,
     min_ex,
     mp,
     pybin,
@@ -212,7 +211,7 @@ class SvcHub(object):
                 want_ff = True
                 msg = "need either Pillow, pyvips, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
                 msg = msg.format(" " * 37, os.path.basename(pybin))
-                if is_exe:
+                if EXE:
                     msg = "copyparty.exe cannot use Pillow or pyvips; need ffprobe.exe and ffmpeg.exe to create thumbnails"
 
                 self.log("thumb", msg, c=3)

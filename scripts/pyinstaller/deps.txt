@@ -1,16 +1,24 @@
 # links to download pages for each dep
 https://pypi.org/project/altgraph/#files
-https://pypi.org/project/future/#files
-https://pypi.org/project/importlib-metadata/#files
 https://pypi.org/project/pefile/#files
-https://pypi.org/project/pip/#files
 https://pypi.org/project/pyinstaller/#files
 https://pypi.org/project/pyinstaller-hooks-contrib/#files
 https://pypi.org/project/pywin32-ctypes/#files
-https://pypi.org/project/typing-extensions/#files
-https://pypi.org/project/zipp/#files
 https://github.com/git-for-windows/git/releases/latest
 https://github.com/upx/upx/releases/latest
+
+# win10 additionals
+https://pypi.org/project/Jinja2/#files
+https://pypi.org/project/MarkupSafe/#files
+https://pypi.org/project/mutagen/#files
+https://pypi.org/project/Pillow/#files
+
+# win7 additionals
+https://pypi.org/project/future/#files
+https://pypi.org/project/importlib-metadata/#files
+https://pypi.org/project/pip/#files
+https://pypi.org/project/typing-extensions/#files
+https://pypi.org/project/zipp/#files
 https://support.microsoft.com/en-us/topic/microsoft-security-advisory-insecure-library-loading-could-allow-remote-code-execution-486ea436-2d47-27e5-6cb9-26ab7230c704
   http://www.microsoft.com/download/details.aspx?familyid=c79c41b0-fbfb-4d61-b5d8-cadbe184b9fc
   http://www.microsoft.com/download/details.aspx?familyid=146ed6f7-b605-4270-8ec4-b9f0f284bb9e

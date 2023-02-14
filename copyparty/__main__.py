@@ -23,7 +23,7 @@ import traceback
 import uuid
 from textwrap import dedent
 
-from .__init__ import ANYWIN, CORES, PY2, VT100, WINDOWS, E, EnvParams, unicode
+from .__init__ import ANYWIN, CORES, EXE, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import expand_config_file, re_vol, split_cfg_ln, upgrade_cfg_fmt
 from .cfg import flagcats, onedash
@@ -36,7 +36,6 @@ from .util import (
     UNPLICATIONS,
     align_tab,
     ansi_re,
-    is_exe,
     min_ex,
     py_desc,
     pybin,
@@ -1067,7 +1066,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         showlic()
         sys.exit(0)
 
-    if is_exe:
+    if EXE:
         print("pybin: {}\n".format(pybin), end="")
 
     ensure_locale()

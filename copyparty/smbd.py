@@ -9,10 +9,10 @@ import sys
 import time
 from types import SimpleNamespace
 
-from .__init__ import ANYWIN, TYPE_CHECKING
+from .__init__ import ANYWIN, EXE, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
-from .util import Daemon, is_exe, min_ex, pybin
+from .util import Daemon, min_ex, pybin
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any
@@ -42,7 +42,7 @@ class SMB(object):
             from impacket import smbserver
             from impacket.ntlm import compute_lmhash, compute_nthash
         except ImportError:
-            if is_exe:
+            if EXE:
                 print("copyparty.exe cannot do SMB")
                 sys.exit(1)
 

@@ -11,9 +11,14 @@ import time
 
 import queue
 
+from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams
+
 try:
     import jinja2
 except ImportError:
+    if EXE:
+        raise
+
     print(
         """\033[1;31m
   you do not have jinja2 installed,\033[33m
@@ -28,7 +33,6 @@ except ImportError:
     )
     sys.exit(1)
 
-from .__init__ import ANYWIN, MACOS, TYPE_CHECKING, EnvParams
 from .bos import bos
 from .httpconn import HttpConn
 from .util import (

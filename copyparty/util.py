@@ -31,7 +31,7 @@ from email.utils import formatdate
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 from queue import Queue
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
+from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
@@ -294,8 +294,7 @@ REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
 
 
 pybin = sys.executable or ""
-is_exe = bool(getattr(sys, "frozen", False))
-if is_exe:
+if EXE:
     pybin = ""
     for p in "python3 python".split():
         try:
@@ -2555,7 +2554,7 @@ def _runhook(
 
     env = os.environ.copy()
     try:
-        if is_exe:
+        if EXE:
             raise Exception()
 
         pypath = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -2563,7 +2562,7 @@ def _runhook(
         pypath = str(os.pathsep.join(zsl))
         env["PYTHONPATH"] = pypath
     except:
-        if not is_exe:
+        if not EXE:
             raise
 
     ka = {

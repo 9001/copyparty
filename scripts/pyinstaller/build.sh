@@ -10,6 +10,11 @@ tee build2.sh | cmp build.sh && rm build2.sh || {
 }
 
 uname -s | grep WOW64 && m=64 || m=
+uname -s | grep NT-10 && w10=1 || w7=1
+[ $w7 ] && pyv=37 || pyv=311
+
+appd=$(cygpath.exe "$APPDATA")
+spkgs=$appd/Python/Python$pyv/site-packages
 
 dl() { curl -fkLO "$1"; }
 
@@ -25,14 +30,23 @@ python copyparty-sfx.py --version
 
 rm -rf mods; mkdir mods
 cp -pR $TEMP/pe-copyparty/copyparty/ $TEMP/pe-copyparty/{ftp,j2}/* mods/
+[ $w10 ] && rm -rf mods/{jinja2,markupsafe}
 
 af() { awk "$1" <$2 >tf; mv tf "$2"; }
 
 rm -rf mods/magic/
 
-sed -ri /pickle/d mods/jinja2/_compat.py
-sed -ri '/(bccache|PackageLoader)/d' mods/jinja2/__init__.py
-af '/^class/{s=0}/^class PackageLoader/{s=1}!s' mods/jinja2/loaders.py
+[ $w7 ] && {
+    sed -ri /pickle/d mods/jinja2/_compat.py
+    sed -ri '/(bccache|PackageLoader)/d' mods/jinja2/__init__.py
+    af '/^class/{s=0}/^class PackageLoader/{s=1}!s' mods/jinja2/loaders.py
+}
+[ $w10 ] && {
+    sed -ri '/(bccache|PackageLoader)/d' $spkgs/jinja2/__init__.py
+    for f in nodes async_utils; do
+        sed -ri 's/\binspect\b/os/' $spkgs/jinja2/$f.py
+    done
+}
 
 sed -ri /fork_process/d mods/pyftpdlib/servers.py
 af '/^class _Base/{s=1}!s' mods/pyftpdlib/authorizers.py
@@ -59,7 +73,12 @@ excl=(
     urllib.robotparser
     zipfile
 )
-false || excl+=(
+[ $w10 ] && excl+=(
+    PIL.ImageQt
+    PIL.ImageShow
+    PIL.ImageTk
+    PIL.ImageWin
+) || excl+=(
     PIL
     PIL.ExifTags
     PIL.Image
@@ -68,7 +87,7 @@ false || excl+=(
 )
 excl=( "${excl[@]/#/--exclude-module }" )
 
-$APPDATA/python/python37/scripts/pyinstaller \
+$APPDATA/python/python$pyv/scripts/pyinstaller \
     -y --clean -p mods --upx-dir=. \
     ${excl[*]} \
     --version-file loader.rc2 -i loader.ico -n copyparty -c -F loader.py \

@@ -135,7 +135,7 @@ class ThumbSrv(object):
             msg = "cannot create audio/video thumbnails because some of the required programs are not available: "
             msg += ", ".join(missing)
             self.log(msg, c=3)
-            if ANYWIN and not self.args.no_acode:
+            if ANYWIN and self.args.no_acode:
                 self.log("download FFmpeg to fix it:\033[0m " + FFMPEG_URL, 3)
 
         if self.args.th_clean:

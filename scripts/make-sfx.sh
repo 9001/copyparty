@@ -184,9 +184,9 @@ necho() {
 	mv {markupsafe,jinja2} j2/
 
 	necho collecting pyftpdlib
-	f="../build/pyftpdlib-1.5.6.tar.gz"
+	f="../build/pyftpdlib-1.5.7.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.6.tar.gz;
+		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.7.tar.gz;
 		wget -O$f "$url" || curl -L "$url" >$f)
 
 	tar -zxf $f
