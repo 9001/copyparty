@@ -1,5 +1,5 @@
 copyparty is availabe in these repos:
-* https://hub.docker.com/r/copyparty
+* https://hub.docker.com/u/copyparty
 * https://github.com/9001?tab=packages&repo_name=copyparty
 
 
@@ -32,13 +32,13 @@ the recommended way to configure copyparty inside a container is to mount a fold
 
 with image size after installation and when gzipped
 
-* `min` (57 MiB, 20 gz) is just copyparty itself
-* `im` (70 MiB, 25 gz) can thumbnail images with pillow, parse media files with mutagen
-* `ac` (163 MiB, 56 gz) is `im` plus ffmpeg for video/audio thumbs + audio transcoding + better tags
-* `iv` (211 MiB, 73 gz) is `ac` plus vips for faster heif / avic / jxl thumbnails
-* `dj` (309 MiB, 104 gz) is `iv` plus beatroot/keyfinder to detect musical keys and bpm
+* [`min` (57 MiB, 20 gz)](https://hub.docker.com/r/copyparty/min) is just copyparty itself
+* [`im` (70 MiB, 25 gz)](https://hub.docker.com/r/copyparty/im) can thumbnail images with pillow, parse media files with mutagen
+* [`ac` (163 MiB, 56 gz)](https://hub.docker.com/r/copyparty/ac) is `im` plus ffmpeg for video/audio thumbs + audio transcoding + better tags
+* [`iv` (211 MiB, 73 gz)](https://hub.docker.com/r/copyparty/iv) is `ac` plus vips for faster heif / avic / jxl thumbnails
+* [`dj` (309 MiB, 104 gz)](https://hub.docker.com/r/copyparty/dj) is `iv` plus beatroot/keyfinder to detect musical keys and bpm
 
-`ac` is recommended since the additional features available in `iv` and `dj` are rarely useful
+[`ac` is recommended](https://hub.docker.com/r/copyparty/ac) since the additional features available in `iv` and `dj` are rarely useful
 
 
 ## detecting bpm and musical key

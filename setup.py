@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import os
 import sys
-import subprocess as sp
 from shutil import rmtree
 from setuptools import setup, Command
 
@@ -78,7 +77,11 @@ class clean2(Command):
 args = {
     "name": NAME,
     "version": about["__version__"],
-    "description": "http file sharing hub",
+    "description": (
+        "Portable file server with accelerated resumable uploads, "
+        + "deduplication, WebDAV, FTP, zeroconf, media indexer, "
+        + "video thumbnails, audio transcoding, and write-only folders"
+    ),
     "long_description": long_description,
     "long_description_content_type": "text/markdown",
     "author": "ed",
