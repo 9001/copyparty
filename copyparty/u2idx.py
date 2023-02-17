@@ -293,6 +293,7 @@ class U2idx(object):
         self.log("qs: {!r} {!r}".format(uq, uv))
 
         ret = []
+        seen_rps: set[str] = set()
         lim = min(lim, int(self.args.srch_hits))
         taglist = {}
         for (vtop, ptop, flags) in vols:
@@ -326,6 +327,9 @@ class U2idx(object):
                 if not dots and "/." in ("/" + rp):
                     continue
 
+                if rp in seen_rps:
+                    continue
+
                 if not fk:
                     suf = ""
                 else:
@@ -342,6 +346,7 @@ class U2idx(object):
                         )[:fk]
                     )
 
+                seen_rps.add(rp)
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16]})
 
             for hit in sret:
@@ -360,14 +365,6 @@ class U2idx(object):
 
         done_flag.append(True)
         self.active_id = ""
-
-        # undupe hits from multiple metadata keys
-        if len(ret) > 1:
-            ret = [ret[0]] + [
-                y
-                for x, y in zip(ret[:-1], ret[1:])
-                if x["rp"].split("?")[0] != y["rp"].split("?")[0]
-            ]
 
         ret.sort(key=itemgetter("rp"))
 
