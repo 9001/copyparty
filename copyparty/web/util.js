@@ -331,6 +331,25 @@ if (!String.prototype.format)
         });
     };
 
+try {
+    new URL('/a/', 'https://a.com/');
+}
+catch (ex) {
+    console.log('ie11 shim URL()');
+    window.URL = function (url, base) {
+        if (url.indexOf('//') < 0)
+            url = base + '/' + url.replace(/^\/?/, '');
+        else if (url.indexOf('//') == 0)
+            url = 'https:' + url;
+
+        var x = url.split('?');
+        return {
+            "pathname": '/' + x[0].split('://')[1].replace(/[^/]+\//, ''),
+            "search": x.length > 1 ? x[1] : ''
+        };
+    }
+}
+
 // https://stackoverflow.com/a/950146
 function import_js(url, cb) {
     var head = document.head || document.getElementsByTagName('head')[0];
