@@ -89,13 +89,16 @@
 		</ul>
 
 		<h1 id="l">login for more:</h1>
-		<ul>
+		<div>
 			<form method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" name="act" value="login" />
 				<input type="password" name="cppwd" />
 				<input type="submit" value="Login" />
+				{% if ahttps %}
+				<a id="w" href="{{ ahttps }}">switch to https</a>
+				{% endif %}
 			</form>
-		</ul>
+		</div>
 	</div>
 	<a href="#" id="repl">π</a>
 	{%- if not this.args.nb %}

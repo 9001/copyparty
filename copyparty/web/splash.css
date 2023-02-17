@@ -36,6 +36,11 @@ a {
 td a {
 	margin: 0;
 }
+#w {
+	color: #fff;
+	background: #940;
+	border-color: #b70;
+}
 .af,
 .logout {
 	float: right;
@@ -175,14 +180,18 @@ html.z a.g {
 	border-color: #af4;
 	box-shadow: 0 .3em 1em #7d0;
 }
-html.z input {
-	color: #fff;
-	background: #626;
-	border: 1px solid #c2c;
-	border-width: 1px 0 0 0;
+input {
+	color: #a50;
+	background: #fff;
+	border: 1px solid #a50;
 	border-radius: .5em;
 	padding: .5em .7em;
 	margin: 0 .5em 0 0;
+}
+html.z input {
+	color: #fff;
+	background: #626;
+	border-color: #c2c;
 }
 html.z .num {
 	border-color: #777;

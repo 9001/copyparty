@@ -25,7 +25,8 @@ var Ls = {
 		"t1": "handling",
 		"u2": "tid siden noen sist skrev til serveren$N( opplastning / navneendring / ... )$N$N17d = 17 dager$N1h23 = 1 time 23 minutter$N4m56 = 4 minuter 56 sekunder",
 		"v1": "koble til",
-		"v2": "bruk denne serveren som en lokal harddisk$N$NADVARSEL: kommer til å vise passordet ditt!"
+		"v2": "bruk denne serveren som en lokal harddisk$N$NADVARSEL: kommer til å vise passordet ditt!",
+		"w1": "bytt til https",
 	},
 	"eng": {
 		"d2": "shows the state of all active threads",

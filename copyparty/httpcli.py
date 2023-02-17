@@ -2877,6 +2877,7 @@ class HttpCli(object):
             url_suf=suf,
             k304=self.k304(),
             ver=S_VERSION if self.args.ver else "",
+            ahttps="" if self.is_https else "https://" + self.host + self.req,
         )
         self.reply(html.encode("utf-8"))
         return True
