@@ -71,7 +71,7 @@ or using commandline arguments,
 
 # build the images yourself
 
-put `copyparty-sfx.py` into `../dist/` (or [build that from scratch](../../docs/devnotes.md#just-the-sfx) too) then run `make`
+basically `./make.sh hclean pull img push` but see [devnotes.md](./devnotes.md)
 
 
 # notes

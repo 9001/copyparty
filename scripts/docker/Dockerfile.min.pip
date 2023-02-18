@@ -1,5 +1,10 @@
 FROM    alpine:latest
 WORKDIR /z
+LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.licenses="MIT" \
+        org.opencontainers.image.title="copyparty-min-pip" \
+        org.opencontainers.image.description="just copyparty, no thumbnails, no media tags, no audio transcoding"
 
 RUN     apk --no-cache add python3 py3-pip \
         && python3 -m pip install copyparty \
@@ -11,9 +16,3 @@ RUN     apk --no-cache add python3 py3-pip \
 WORKDIR /w
 EXPOSE  3923
 ENTRYPOINT ["python3", "-m", "copyparty", "-c", "/z/initcfg"]
-
-LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
-        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
-        org.opencontainers.image.licenses="MIT" \
-        org.opencontainers.image.title="copyparty-min-pip" \
-        org.opencontainers.image.description="just copyparty, no thumbnails, no media tags, no audio transcoding"
