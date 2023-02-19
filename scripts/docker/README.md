@@ -40,6 +40,9 @@ with image size after installation and when gzipped
 
 [`ac` is recommended](https://hub.docker.com/r/copyparty/ac) since the additional features available in `iv` and `dj` are rarely useful
 
+all editions support `x86`, `x86_64`, `armhf`, `aarch64`, `ppc64le`, `s390x`
+* `ppc64le` cannot run `iv` or `dj`
+
 
 ## detecting bpm and musical key
 
