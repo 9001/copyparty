@@ -2833,7 +2833,7 @@ class HttpCli(object):
             }
 
         fmt = self.uparam.get("ls", "")
-        if not fmt and self.ua.startswith("curl/"):
+        if not fmt and (self.ua.startswith("curl/") or self.ua.startswith("fetch")):
             fmt = "v"
 
         if fmt in ["v", "t", "txt"]:
@@ -3330,7 +3330,7 @@ class HttpCli(object):
         is_ls = "ls" in self.uparam
         is_js = self.args.force_js or self.cookies.get("js") == "y"
 
-        if not is_ls and self.ua.startswith("curl/"):
+        if not is_ls and (self.ua.startswith("curl/") or self.ua.startswith("fetch")):
             self.uparam["ls"] = "v"
             is_ls = True
 
