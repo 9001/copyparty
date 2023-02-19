@@ -14,8 +14,13 @@ import queue
 from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams
 
 try:
+    MNFE = ModuleNotFoundError
+except:
+    MNFE = ImportError
+
+try:
     import jinja2
-except ImportError:
+except MNFE:
     if EXE:
         raise
 
