@@ -9,8 +9,8 @@ set -e
 sarchs="386 amd64 arm/v7 arm64/v8 ppc64le s390x"
 archs="amd64 arm s390x 386 arm64 ppc64le"
 imgs="dj iv min im ac"
-dhub_order="iv dj"
-ghcr_order="dj iv"
+dhub_order="iv dj min im ac"
+ghcr_order="ac im min dj iv"
 ngs=(
     iv-{ppc64le,s390x}
     dj-{ppc64le,s390x,arm}
