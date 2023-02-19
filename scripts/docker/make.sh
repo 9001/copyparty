@@ -8,12 +8,12 @@ set -e
 
 sarchs="386 amd64 arm/v7 arm64/v8 ppc64le s390x"
 archs="amd64 arm s390x 386 arm64 ppc64le"
-imgs="min im ac iv dj"
-dhub_order="iv dj min im ac"
-ghcr_order="ac im min dj iv"
+imgs="dj iv min im ac"
+dhub_order="iv dj"
+ghcr_order="dj iv"
 ngs=(
-    iv-ppc64le
-    dj-ppc64le
+    iv-{ppc64le,s390x}
+    dj-{ppc64le,s390x,arm}
 )
 
 for v in "$@"; do
@@ -47,6 +47,7 @@ filt=
         podman rm   $(podman ps -qa)
     }
 	podman rmi -f $(podman images -a --history | awk "$filt") || true
+    podman rmi $(podman images -a --history | awk '/^<none>.*<none>.*-tmp:/{print$3}')
 }
 
 [ $pull ] && {
@@ -74,38 +75,68 @@ filt=
         mkdir -p ../../dist
         wget https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py -O $fp
     }
-    
+
+    # kill abandoned builders
+    ps aux | awk '/bin\/qemu-[^-]+-static/{print$2}' | xargs -r kill -9
+
+    # grab deps
     rm -rf i err
     mkdir i
     tar -cC../.. dist/copyparty-sfx.py bin/mtag | tar -xvCi
 
-    ps aux | awk '/bin\/qemu-[^-]+-static/{print$2}' | xargs -r kill -9
-
     for i in $imgs; do
-        podman rm copyparty-$i || true
+        podman rm copyparty-$i || true  # old manifest
         for a in $archs; do
-            [[ " ${ngs[*]} " =~ " $i-$a " ]] && continue
+            [[ " ${ngs[*]} " =~ " $i-$a " ]] && continue  # known incompat
+
+            # wait for a free slot
+            while true; do
+                touch .blk
+                [ $(jobs -p | wc -l) -lt $(nproc) ] && break
+                while [ -e .blk ]; do sleep 0.2; done
+            done
             aa="$(printf '%7s' $a)"
+
+            # arm takes forever so make it top priority
+            [ ${a::3} == arm ] && nice= || nice=nice
+
             # --pull=never does nothing at all btw
             (set -x
-            podman build \
+            $nice podman build \
                 --pull=never \
                 --from localhost/alpine-$a \
-                --manifest copyparty-$i \
                 -t copyparty-$i-$a \
-                -f Dockerfile.$i . || (echo $? $a >> err)
+                -f Dockerfile.$i . ||
+                    (echo $? $i-$a >> err)
+            rm -f .blk
             ) 2> >(tee $a.err | sed "s/^/$aa:/" >&2) > >(tee $a.out | sed "s/^/$aa:/") &
         done
-        set +x
-        wait
         [ -e err ] && {
             echo somethign died,
             cat err
+            pkill -P $$
             exit 1
         }
         for a in $archs; do
             rm -f $a.{out,err}
         done
+    done
+    wait
+    [ -e err ] && {
+        echo somethign died,
+        cat err
+        pkill -P $$
+        exit 1
+    }
+    # avoid podman race-condition by creating manifest manually --
+    # Error: creating image to hold manifest list: image name "localhost/copyparty-dj:latest" is already associated with image "[0-9a-f]{64}": that name is already in use
+    for i in $imgs; do
+        variants=
+        for a in $archs; do
+            [[ " ${ngs[*]} " =~ " $i-$a " ]] && continue
+            variants="$variants containers-storage:localhost/copyparty-$i-$a"
+        done
+        podman manifest create copyparty-$i $variants
     done
 }
 

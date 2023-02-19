@@ -15,11 +15,13 @@ RUN     apk add -U \
             ffmpeg \
             vips-jxl vips-heif vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
+            vamp-sdk vamp-sdk-libs \
         && python3 -m pip install pyvips \
         && apk --no-cache add -t .bd \
             bash wget gcc g++ make cmake patchelf \
             python3-dev ffmpeg-dev fftw-dev libsndfile-dev \
             py3-wheel py3-numpy-dev \
+            vamp-sdk-dev \
         && bash install-deps.sh \
         && apk del py3-pip .bd \
         && rm -rf /var/cache/apk/* \

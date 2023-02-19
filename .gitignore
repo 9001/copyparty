@@ -32,3 +32,5 @@ contrib/package/arch/src/
 # state/logs
 up.*.txt
 .hist/
+scripts/docker/*.out
+scripts/docker/*.err

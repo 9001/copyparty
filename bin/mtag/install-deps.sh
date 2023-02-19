@@ -225,7 +225,7 @@ install_vamp() {
 	$pybin -m pip install --user vamp
 
 	cd "$td"
-	echo '#include <vamp-sdk/Plugin.h>' | gcc -x c -c -o /dev/null - || [ -e ~/pe/vamp-sdk ] || {
+	echo '#include <vamp-sdk/Plugin.h>' | g++ -x c++ -c -o /dev/null - || [ -e ~/pe/vamp-sdk ] || {
 		printf '\033[33mcould not find the vamp-sdk, building from source\033[0m\n'
 		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/2588/vamp-plugin-sdk-2.9.0.tar.gz)
 		sha512sum -c <(
