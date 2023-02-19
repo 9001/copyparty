@@ -29,7 +29,6 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * top
     * [quickstart](#quickstart) - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
         * [on servers](#on-servers) - you may also want these, especially on servers
-        * [on debian](#on-debian) - recommended additional steps on debian
     * [features](#features)
     * [testimonials](#testimonials) - small collection of user feedback
 * [motivations](#motivations) - project goals / philosophy
@@ -95,7 +94,6 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 * [HTTP API](#HTTP-API) - see [devnotes](#./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
-    * [install recommended deps](#install-recommended-deps)
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary"
     * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) or [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe)
@@ -111,6 +109,17 @@ download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
+
+enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing recommended dependencies:
+
+* **Alpine:** `apk add py3-pillow ffmpeg`
+* **Debian:** `apt install python3-pil ffmpeg`
+* **Fedora:** `dnf install python3-pillow ffmpeg`
+* **FreeBSD:** `pkg install py39-sqlite3 py39-pillow ffmpeg`
+* **MacOS:** `port install py-Pillow ffmpeg`
+* **MacOS** (alternative): `brew install pillow ffmpeg`
+* **Windows:** `python -m pip install --user -U Pillow`
+  * install python and ffmpeg manually; do not use `winget` or `Microsoft Store` (it breaks $PATH)
 
 running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
@@ -128,6 +137,7 @@ you may also want these, especially on servers:
 
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
 * [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
+* [contrib/rc/copyparty](contrib/rc/copyparty) to run copyparty on FreeBSD
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to [reverse-proxy](#reverse-proxy) behind nginx (for better https)
 
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
@@ -138,18 +148,6 @@ firewall-cmd --permanent --add-port={1900,5353}/udp  # --zone=libvirt
 firewall-cmd --reload
 ```
 (1900:ssdp, 3921:ftp, 3923:http/https, 3945:smb, 3990:ftps, 5353:mdns, 12000:passive-ftp)
-
-### on debian
-
-recommended additional steps on debian  which enable audio metadata and thumbnails (from images and videos):
-
-* as root, run the following:  
-  `apt install python3 python3-pip python3-dev ffmpeg`
-
-* then, as the user which will be running copyparty (so hopefully not root), run this:  
-  `python3 -m pip install --user -U Pillow pillow-avif-plugin`
-
-(skipped `pyheif-pillow-opener` because apparently debian is too old to build it)
 
 
 ## features
@@ -1357,12 +1355,6 @@ enable [smb](#smb-server) support (**not** recommended):
 * `impacket==0.10.0`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
-
-
-## install recommended deps
-```
-python -m pip install --user -U jinja2 mutagen Pillow
-```
 
 
 ## optional gpl stuff
