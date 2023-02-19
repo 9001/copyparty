@@ -12,8 +12,8 @@ imgs="min im ac iv dj"
 dhub_order="iv dj min im ac"
 ghcr_order="ac im min dj iv"
 ngs=(
-    iv-{arm,arm64,ppc64le,s390x}
-    dj-{arm,arm64,ppc64le,s390x}
+    iv-ppc64le
+    dj-ppc64le
 )
 
 for v in "$@"; do
@@ -104,7 +104,7 @@ filt=
             exit 1
         }
         for a in $archs; do
-            rm $a.{out,err}
+            rm -f $a.{out,err}
         done
     done
 }

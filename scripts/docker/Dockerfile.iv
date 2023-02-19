@@ -8,7 +8,7 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
 
 RUN     apk --no-cache add \
             wget \
-            py3-pillow py3-pip \
+            py3-pillow py3-pip py3-cffi \
             ffmpeg \
             vips-jxl vips-heif vips-poppler vips-magick \
         && python3 -m pip install pyvips \
