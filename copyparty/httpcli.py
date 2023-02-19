@@ -784,8 +784,8 @@ class HttpCli(object):
             if "hc" in self.uparam:
                 return self.tx_svcs()
 
-            if "h" in self.uparam:
-                return self.tx_mounts()
+        if "h" in self.uparam:
+            return self.tx_mounts()
 
         # conditional redirect to single volumes
         if self.vpath == "" and not self.ouparam:
