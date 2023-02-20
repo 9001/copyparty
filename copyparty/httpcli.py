@@ -10,6 +10,7 @@ import gzip
 import itertools
 import json
 import os
+import random
 import re
 import stat
 import string
@@ -343,6 +344,8 @@ class HttpCli(object):
 
         if self.args.rsp_slp:
             time.sleep(self.args.rsp_slp)
+            if self.args.rsp_jtr:
+                time.sleep(random.random() * self.args.rsp_jtr)
 
         zso = self.headers.get("cookie")
         if zso:

@@ -683,6 +683,7 @@ def add_network(ap):
     ap2.add_argument("--s-wr-sz", metavar="B", type=int, default=256*1024, help="socket write size in bytes")
     ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0, help="debug: socket write delay in seconds")
     ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0, help="debug: response delay in seconds")
+    ap2.add_argument("--rsp-jtr", metavar="SEC", type=float, default=0, help="debug: response delay, random duration 0..SEC")
 
 
 def add_tls(ap):

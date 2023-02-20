@@ -348,6 +348,9 @@ class SvcHub(object):
         al.RS = R + "/" if R else ""
         al.SRS = "/" + R + "/" if R else "/"
 
+        if al.rsp_jtr:
+            al.rsp_slp = 0.000001
+
         return True
 
     def _setlimits(self) -> None:
