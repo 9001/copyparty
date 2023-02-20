@@ -27,7 +27,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 ## readme toc
 
 * top
-    * [quickstart](#quickstart) - download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
+    * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
         * [on servers](#on-servers) - you may also want these, especially on servers
     * [features](#features)
     * [testimonials](#testimonials) - small collection of user feedback
@@ -104,13 +104,14 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
 
 ## quickstart
 
-download **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** and you're all set!
+just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
 * or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
+  * docker has all deps built-in, so skip this step:
 
-enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing recommended dependencies:
+enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing some recommended deps:
 
 * **Alpine:** `apk add py3-pillow ffmpeg`
 * **Debian:** `apt install python3-pil ffmpeg`
@@ -120,15 +121,17 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
 * **MacOS** (alternative): `brew install pillow ffmpeg`
 * **Windows:** `python -m pip install --user -U Pillow`
   * install python and ffmpeg manually; do not use `winget` or `Microsoft Store` (it breaks $PATH)
+  * copyparty.exe comes with `Pillow` and only needs `ffmpeg`
+* see [optional dependencies](#optional-dependencies) to enable even more features
 
-running the sfx without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
+running copyparty without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
-* `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen), see [optional dependencies](#optional-dependencies) to enable thumbnails and more
+* `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen)
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
-  * see [accounts and volumes](#accounts-and-volumes) for the syntax and other permissions (`r`ead, `w`rite, `m`ove, `d`elete, `g`et, up`G`et)
+  * see [accounts and volumes](#accounts-and-volumes) (or `--help-accounts`) for the syntax and other permissions
 
 
 ### on servers
