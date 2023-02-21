@@ -1321,6 +1321,10 @@ html.y #ops svg circle {
 	padding: .3em .6em;
 	white-space: nowrap;
 }
+#noie {
+	color: #b60;
+	margin: 0 0 0 .5em;
+}
 .opbox {
 	padding: .5em;
 	border-radius: 0 .3em .3em 0;

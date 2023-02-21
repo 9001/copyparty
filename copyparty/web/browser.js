@@ -110,6 +110,7 @@ var Ls = {
 		"ot_cfg": "configuration options",
 		"ot_u2i": 'up2k: upload files (if you have write-access) or toggle into the search-mode to see if they exist somewhere on the server$N$Nuploads are resumable, multithreaded, and file timestamps are preserved, but it uses more CPU than [🎈]&nbsp; (the basic uploader)<br /><br />during uploads, this icon becomes a progress indicator!',
 		"ot_u2w": 'up2k: upload files with resume support (close your browser and drop the same files in later)$N$Nmultithreaded, and file timestamps are preserved, but it uses more CPU than [🎈]&nbsp; (the basic uploader)<br /><br />during uploads, this icon becomes a progress indicator!',
+		"ot_noie": 'This works much better in Chrome / Firefox / Edge',
 
 		"ab_mkdir": "make directory",
 		"ab_mkdoc": "new markdown doc",
@@ -563,6 +564,7 @@ var Ls = {
 		"ot_cfg": "andre innstillinger",
 		"ot_u2i": 'up2k: last opp filer (hvis du har skrivetilgang) eller bytt til søkemodus for å sjekke om filene finnes et-eller-annet sted på serveren$N$Nopplastninger kan gjenopptas etter avbrudd, skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn [🎈]&nbsp; (den primitive opplasteren "bup")<br /><br />mens opplastninger foregår så vises fremdriften her oppe!',
 		"ot_u2w": 'up2k: filopplastning med støtte for å gjenoppta avbrutte opplastninger -- steng ned nettleseren og dra de samme filene inn i nettleseren igjen for å plukke opp igjen der du slapp$N$Nopplastninger skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn [🎈]&nbsp; (den primitive opplasteren "bup")<br /><br />mens opplastninger foregår så vises fremdriften her oppe!',
+		"ot_noie": 'Siden fungerer mye bedre i Chrome / Firefox / Edge',
 
 		"ab_mkdir": "lag mappe",
 		"ab_mkdoc": "nytt dokument",
@@ -930,6 +932,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" data-perm="write" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
 	'<a href="#" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
+	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<div id="opdesc"></div>'
 );
 
