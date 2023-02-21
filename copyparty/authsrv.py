@@ -1625,7 +1625,7 @@ class AuthSrv(object):
 
         csv = set("i p".split())
         lst = set("c ihead mtm mtp xad xar xau xbd xbr xbu xm".split())
-        askip = set("a v c vc cgen".split())
+        askip = set("a v c vc cgen theme".split())
 
         # keymap from argv to vflag
         amap = vf_bmap()
@@ -1722,6 +1722,11 @@ class AuthSrv(object):
                 elif v is True:
                     trues.append(k)
                 elif v is not False:
+                    try:
+                        v = v.pattern
+                    except:
+                        pass
+
                     vals.append("{}: {}".format(k, v))
             pops = []
             for k1, k2 in IMPLICATIONS:
