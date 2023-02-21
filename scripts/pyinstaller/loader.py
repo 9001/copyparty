@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import base64
+import hashlib
 import os
 import re
 import shutil
@@ -44,6 +46,30 @@ def confirm(rv):
         pass
 
     sys.exit(rv or 1)
+
+
+def ckck():
+    hs = hashlib.sha512()
+    with open(sys.executable, "rb") as f:
+        f.seek(-12, 2)
+        rem = f.tell()
+        esum = f.read().decode("ascii", "replace")
+        f.seek(0)
+        while rem:
+            buf = f.read(min(rem, 64 * 1024))
+            rem -= len(buf)
+            hs.update(buf)
+            if not buf:
+                t = "unexpected eof @ {} with {} left"
+                raise Exception(t.format(f.tell(), rem))
+
+        fsum = base64.b64encode(hs.digest()[:9]).decode("utf-8")
+        if fsum != esum:
+            t = "exe integrity check error; [{}] != [{}]"
+            raise Exception(t.format(esum, fsum))
+
+
+ckck()
 
 
 def meicln(mod):

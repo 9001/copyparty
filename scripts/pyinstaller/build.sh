@@ -96,4 +96,9 @@ $APPDATA/python/python$pyv/scripts/pyinstaller \
 
 # ./upx.exe --best --ultra-brute --lzma -k dist/copyparty.exe
 
+printf $(sha512sum ~/Downloads/dist/copyparty.exe | head -c 18 | sed -r 's/(..)/\\x\1/g') |
+base64 | head -c12 >> dist/copyparty.exe
+
+dist/copyparty.exe --version
+
 curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/copyparty$m.exe
