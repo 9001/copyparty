@@ -2278,18 +2278,21 @@ def rmdirs(
     return ok, ng
 
 
-def rmdirs_up(top: str) -> tuple[list[str], list[str]]:
+def rmdirs_up(top: str, stop: str) -> tuple[list[str], list[str]]:
     """rmdir on self, then all parents"""
+    if top == stop:
+        return [], [top]
+
     try:
         os.rmdir(fsenc(top))
     except:
         return [], [top]
 
     par = os.path.dirname(top)
-    if not par:
+    if not par or par == stop:
         return [top], []
 
-    ok, ng = rmdirs_up(par)
+    ok, ng = rmdirs_up(par, stop)
     return [top] + ok, ng
 
 

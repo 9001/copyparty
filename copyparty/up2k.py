@@ -2921,7 +2921,7 @@ class Up2k(object):
         if is_dir:
             ok, ng = rmdirs(self.log_func, scandir, True, atop, 1)
 
-        ok2, ng2 = rmdirs_up(os.path.dirname(atop))
+        ok2, ng2 = rmdirs_up(os.path.dirname(atop), ptop)
 
         return n_files, ok + ok2, ng + ng2
 
@@ -2980,7 +2980,7 @@ class Up2k(object):
             curs.clear()
 
         rmdirs(self.log_func, scandir, True, sabs, 1)
-        rmdirs_up(os.path.dirname(sabs))
+        rmdirs_up(os.path.dirname(sabs), svn.realpath)
         return "k"
 
     def _mv_file(
