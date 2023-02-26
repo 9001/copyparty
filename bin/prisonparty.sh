@@ -4,8 +4,9 @@ set -e
 # runs copyparty (or any other program really) in a chroot
 #
 # assumption: these directories, and everything within, are owned by root
-sysdirs=( /bin /lib /lib32 /lib64 /sbin /usr /etc/alternatives )
-
+sysdirs=(); for v in /bin /lib /lib32 /lib64 /sbin /usr /etc/alternatives ; do
+	[ -e $v ] && sysdirs+=($v)
+done
 
 # error-handler
 help() { cat <<'EOF'
@@ -38,7 +39,7 @@ while true; do
 	v="$1"; shift
 	[ "$v" = -- ] && break  # end of volumes
 	[ "$#" -eq 0 ] && break  # invalid usage
-	vols+=( "$(realpath "$v")" )
+	vols+=( "$(realpath "$v" || echo "$v")" )
 done
 pybin="$1"; shift
 pybin="$(command -v "$pybin")"
@@ -82,7 +83,7 @@ jail="${jail%/}"
 printf '%s\n' "${sysdirs[@]}" "${vols[@]}" | sed -r 's`/$``' | LC_ALL=C sort | uniq |
 while IFS= read -r v; do
 	[ -e "$v" ] || {
-		# printf '\033[1;31mfolder does not exist:\033[0m %s\n' "/$v"
+		printf '\033[1;31mfolder does not exist:\033[0m %s\n' "$v"
 		continue
 	}
 	i1=$(stat -c%D.%i "$v"      2>/dev/null || echo a)
