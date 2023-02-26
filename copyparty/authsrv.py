@@ -934,7 +934,7 @@ class AuthSrv(object):
         is_list: bool,
     ) -> None:
         desc = flagdescs.get(name, "?").replace("\n", " ")
-        if name not in ["mtp", "xbu", "xau", "xbr", "xar", "xbd", "xad", "xm"]:
+        if name not in "mtp xbu xau xiu xbr xar xbd xad xm".split():
             if value is True:
                 t = "└─add volflag [{}] = {}  ({})"
             else:
@@ -1303,7 +1303,7 @@ class AuthSrv(object):
                 vol.flags["mth"] = self.args.mth
 
             # append additive args from argv to volflags
-            hooks = "xbu xau xbr xar xbd xad xm".split()
+            hooks = "xbu xau xiu xbr xar xbd xad xm".split()
             for name in ["mtp"] + hooks:
                 self._read_volflag(vol.flags, name, getattr(self.args, name), True)
 
@@ -1363,10 +1363,19 @@ class AuthSrv(object):
                 if k in ints:
                     vol.flags[k] = int(vol.flags[k])
 
-            if "lifetime" in vol.flags and "e2d" not in vol.flags:
-                t = 'removing lifetime config from volume "/{}" because e2d is disabled'
-                self.log(t.format(vol.vpath), 1)
-                del vol.flags["lifetime"]
+            if "e2d" not in vol.flags:
+                if "lifetime" in vol.flags:
+                    t = 'removing lifetime config from volume "/{}" because e2d is disabled'
+                    self.log(t.format(vol.vpath), 1)
+                    del vol.flags["lifetime"]
+
+                needs_e2d = [x for x in hooks if x != "xm"]
+                drop = [x for x in needs_e2d if vol.flags.get(x)]
+                if drop:
+                    t = 'removing [{}] from volume "/{}" because e2d is disabled'
+                    self.log(t.format(", ".join(drop), vol.vpath), 1)
+                    for x in drop:
+                        vol.flags.pop(x)
 
             if vol.flags.get("neversymlink") and not vol.flags.get("hardlink"):
                 vol.flags["copydupes"] = True
@@ -1624,7 +1633,7 @@ class AuthSrv(object):
         ]
 
         csv = set("i p".split())
-        lst = set("c ihead mtm mtp xad xar xau xbd xbr xbu xm".split())
+        lst = set("c ihead mtm mtp xad xar xau xiu xbd xbr xbu xm".split())
         askip = set("a v c vc cgen theme".split())
 
         # keymap from argv to vflag

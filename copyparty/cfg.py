@@ -123,6 +123,7 @@ flagcats = {
     "event hooks\n(better explained in --help-hooks)": {
         "xbu=CMD": "execute CMD before a file upload starts",
         "xau=CMD": "execute CMD after  a file upload finishes",
+        "xiu=CMD": "execute CMD after  all uploads finish and volume is idle",
         "xbr=CMD": "execute CMD before a file rename/move",
         "xar=CMD": "execute CMD after  a file rename/move",
         "xbd=CMD": "execute CMD before a file delete",

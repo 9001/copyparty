@@ -1849,6 +1849,14 @@ def _msaenc(txt: str) -> bytes:
     return txt.replace("/", "\\").encode(FS_ENCODING, "surrogateescape")
 
 
+def _uncify(txt: str) -> str:
+    txt = txt.replace("/", "\\")
+    if ":" not in txt and not txt.startswith("\\\\"):
+        txt = absreal(txt)
+
+    return txt if txt.startswith("\\\\") else "\\\\?\\" + txt
+
+
 def _msenc(txt: str) -> bytes:
     txt = txt.replace("/", "\\")
     if ":" not in txt and not txt.startswith("\\\\"):
@@ -1877,9 +1885,11 @@ if not PY2 and WINDOWS:
     afsenc = _msaenc
     fsenc = _msenc
     fsdec = _msdec
+    uncify = _uncify
 elif not PY2 or not WINDOWS:
     fsenc = afsenc = sfsenc = w8enc
     fsdec = w8dec
+    uncify = str
 else:
     # moonrunes become \x3f with bytestrings,
     # losing mojibake support is worth
@@ -1891,6 +1901,7 @@ else:
 
     fsenc = afsenc = sfsenc = _not_actually_mbcs_enc
     fsdec = _not_actually_mbcs_dec
+    uncify = str
 
 
 def s3enc(mem_cur: "sqlite3.Cursor", rd: str, fn: str) -> tuple[str, str]:
@@ -2512,23 +2523,14 @@ def retchk(
         raise Exception(t)
 
 
-def _runhook(
-    log: "NamedLogger",
-    cmd: str,
-    ap: str,
-    vp: str,
-    host: str,
-    uname: str,
-    ip: str,
-    at: float,
-    sz: int,
-    txt: str,
-) -> bool:
+def _parsehook(
+    log: Optional["NamedLogger"], cmd: str
+) -> tuple[bool, bool, bool, float, dict[str, Any], str]:
     chk = False
     fork = False
     jtxt = False
-    wait = 0
-    tout = 0
+    wait = 0.0
+    tout = 0.0
     kill = "t"
     cap = 0
     ocmd = cmd
@@ -2548,9 +2550,11 @@ def _runhook(
             cap = int(arg[1:])  # 0=none 1=stdout 2=stderr 3=both
         elif arg.startswith("k"):
             kill = arg[1:]  # [t]ree [m]ain [n]one
+        elif arg.startswith("i"):
+            pass
         else:
             t = "hook: invalid flag {} in {}"
-            log(t.format(arg, ocmd))
+            (log or print)(t.format(arg, ocmd))
 
     env = os.environ.copy()
     try:
@@ -2565,22 +2569,92 @@ def _runhook(
         if not EXE:
             raise
 
-    ka = {
+    sp_ka = {
         "env": env,
         "timeout": tout,
         "kill": kill,
         "capture": cap,
     }
 
+    if cmd.startswith("~"):
+        cmd = os.path.expanduser(cmd)
+
+    return chk, fork, jtxt, wait, sp_ka, cmd
+
+
+def runihook(
+    log: Optional["NamedLogger"],
+    cmd: str,
+    vol: "VFS",
+    ups: list[tuple[str, int, int, str, str, str, int]],
+) -> bool:
+    ocmd = cmd
+    chk, fork, jtxt, wait, sp_ka, cmd = _parsehook(log, cmd)
+    bcmd = [sfsenc(cmd)]
+    if cmd.endswith(".py"):
+        bcmd = [sfsenc(pybin)] + bcmd
+
+    vps = [vjoin(*list(s3dec(x[3], x[4]))) for x in ups]
+    aps = [djoin(vol.realpath, x) for x in vps]
+    if jtxt:
+        # 0w 1mt 2sz 3rd 4fn 5ip 6at
+        ja = [
+            {
+                "ap": uncify(ap),  # utf8 for json
+                "vp": vp,
+                "wark": x[0][:16],
+                "mt": x[1],
+                "sz": x[2],
+                "ip": x[5],
+                "at": x[6],
+            }
+            for x, vp, ap in zip(ups, vps, aps)
+        ]
+        sp_ka["sin"] = json.dumps(ja).encode("utf-8", "replace")
+    else:
+        sp_ka["sin"] = b"\n".join(fsenc(x) for x in aps)
+
+    t0 = time.time()
+    if fork:
+        Daemon(runcmd, ocmd, [bcmd], ka=sp_ka)
+    else:
+        rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
+        if chk and rc:
+            retchk(rc, bcmd, err, log, 5)
+            return False
+
+    wait -= time.time() - t0
+    if wait > 0:
+        time.sleep(wait)
+
+    return True
+
+
+def _runhook(
+    log: Optional["NamedLogger"],
+    cmd: str,
+    ap: str,
+    vp: str,
+    host: str,
+    uname: str,
+    mt: float,
+    sz: int,
+    ip: str,
+    at: float,
+    txt: str,
+) -> bool:
+    ocmd = cmd
+    chk, fork, jtxt, wait, sp_ka, cmd = _parsehook(log, cmd)
     if jtxt:
         ja = {
             "ap": ap,
             "vp": vp,
+            "mt": mt,
+            "sz": sz,
             "ip": ip,
+            "at": at or time.time(),
             "host": host,
             "user": uname,
-            "at": at or time.time(),
-            "sz": sz,
             "txt": txt,
         }
         arg = json.dumps(ja)
@@ -2595,9 +2669,9 @@ def _runhook(
 
     t0 = time.time()
     if fork:
-        Daemon(runcmd, ocmd, [acmd], ka=ka)
+        Daemon(runcmd, ocmd, [bcmd], ka=sp_ka)
     else:
-        rc, v, err = runcmd(bcmd, **ka)  # type: ignore
+        rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
         if chk and rc:
             retchk(rc, bcmd, err, log, 5)
             return False
@@ -2610,24 +2684,25 @@ def _runhook(
 
 
 def runhook(
-    log: "NamedLogger",
+    log: Optional["NamedLogger"],
     cmds: list[str],
     ap: str,
     vp: str,
     host: str,
     uname: str,
+    mt: float,
+    sz: int,
     ip: str,
     at: float,
-    sz: int,
     txt: str,
 ) -> bool:
     vp = vp.replace("\\", "/")
     for cmd in cmds:
         try:
-            if not _runhook(log, cmd, ap, vp, host, uname, ip, at, sz, txt):
+            if not _runhook(log, cmd, ap, vp, host, uname, mt, sz, ip, at, txt):
                 return False
         except Exception as ex:
-            log("hook: {}".format(ex))
+            (log or print)("hook: {}".format(ex))
             if ",c," in "," + cmd:
                 return False
             break

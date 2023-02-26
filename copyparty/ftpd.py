@@ -15,6 +15,7 @@ from pyftpdlib.servers import FTPServer
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
 from .bos import bos
+from .authsrv import VFS
 from .util import (
     Daemon,
     Pebkac,
@@ -23,6 +24,7 @@ from .util import (
     ipnorm,
     pybin,
     relchk,
+    runhook,
     sanitize_fn,
     vjoin,
 )
@@ -132,7 +134,7 @@ class FtpFs(AbstractedFS):
         w: bool = False,
         m: bool = False,
         d: bool = False,
-    ) -> str:
+    ) -> tuple[str, VFS, str]:
         try:
             vpath = vpath.replace("\\", "/").lstrip("/")
             rd, fn = os.path.split(vpath)
@@ -146,7 +148,7 @@ class FtpFs(AbstractedFS):
             if not vfs.realpath:
                 raise FilesystemError("no filesystem mounted at this path")
 
-            return os.path.join(vfs.realpath, rem)
+            return os.path.join(vfs.realpath, rem), vfs, rem
         except Pebkac as ex:
             raise FilesystemError(str(ex))
 
@@ -157,7 +159,7 @@ class FtpFs(AbstractedFS):
         w: bool = False,
         m: bool = False,
         d: bool = False,
-    ) -> str:
+    ) -> tuple[str, VFS, str]:
         return self.v2a(os.path.join(self.cwd, vpath), r, w, m, d)
 
     def ftp2fs(self, ftppath: str) -> str:
@@ -179,7 +181,7 @@ class FtpFs(AbstractedFS):
         r = "r" in mode
         w = "w" in mode or "a" in mode or "+" in mode
 
-        ap = self.rv2a(filename, r, w)
+        ap = self.rv2a(filename, r, w)[0]
         if w:
             try:
                 st = bos.stat(ap)
@@ -212,7 +214,7 @@ class FtpFs(AbstractedFS):
         ) = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.username)
 
     def mkdir(self, path: str) -> None:
-        ap = self.rv2a(path, w=True)
+        ap = self.rv2a(path, w=True)[0]
         bos.mkdir(ap)
 
     def listdir(self, path: str) -> list[str]:
@@ -244,7 +246,7 @@ class FtpFs(AbstractedFS):
             return list(sorted(list(r.keys())))
 
     def rmdir(self, path: str) -> None:
-        ap = self.rv2a(path, d=True)
+        ap = self.rv2a(path, d=True)[0]
         bos.rmdir(ap)
 
     def remove(self, path: str) -> None:
@@ -277,10 +279,10 @@ class FtpFs(AbstractedFS):
 
     def stat(self, path: str) -> os.stat_result:
         try:
-            ap = self.rv2a(path, r=True)
+            ap = self.rv2a(path, r=True)[0]
             return bos.stat(ap)
         except:
-            ap = self.rv2a(path)
+            ap = self.rv2a(path)[0]
             st = bos.stat(ap)
             if not stat.S_ISDIR(st.st_mode):
                 raise
@@ -288,11 +290,11 @@ class FtpFs(AbstractedFS):
             return st
 
     def utime(self, path: str, timeval: float) -> None:
-        ap = self.rv2a(path, w=True)
+        ap = self.rv2a(path, w=True)[0]
         return bos.utime(ap, (timeval, timeval))
 
     def lstat(self, path: str) -> os.stat_result:
-        ap = self.rv2a(path)
+        ap = self.rv2a(path)[0]
         return bos.stat(ap)
 
     def isfile(self, path: str) -> bool:
@@ -303,7 +305,7 @@ class FtpFs(AbstractedFS):
             return False  # expected for mojibake in ftp_SIZE()
 
     def islink(self, path: str) -> bool:
-        ap = self.rv2a(path)
+        ap = self.rv2a(path)[0]
         return bos.path.islink(ap)
 
     def isdir(self, path: str) -> bool:
@@ -314,18 +316,18 @@ class FtpFs(AbstractedFS):
             return True
 
     def getsize(self, path: str) -> int:
-        ap = self.rv2a(path)
+        ap = self.rv2a(path)[0]
         return bos.path.getsize(ap)
 
     def getmtime(self, path: str) -> float:
-        ap = self.rv2a(path)
+        ap = self.rv2a(path)[0]
         return bos.path.getmtime(ap)
 
     def realpath(self, path: str) -> str:
         return path
 
     def lexists(self, path: str) -> bool:
-        ap = self.rv2a(path)
+        ap = self.rv2a(path)[0]
         return bos.path.lexists(ap)
 
     def get_user_by_uid(self, uid: int) -> str:
@@ -355,11 +357,31 @@ class FtpHandler(FTPHandler):
         # reduce non-debug logging
         self.log_cmds_list = [x for x in self.log_cmds_list if x not in ("CWD", "XCWD")]
 
+    def die(self, msg):
+        self.respond("550 {}".format(msg))
+        raise FilesystemError(msg)
+
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
         vp = join(self.fs.cwd, file).lstrip("/")
-        ap = self.fs.v2a(vp)
+        ap, vfs, rem = self.fs.v2a(vp)
         self.vfs_map[ap] = vp
+        xbu = vfs.flags.get("xbu")
+        if xbu and not runhook(
+            None,
+            xbu,
+            ap,
+            vfs.canonical(rem),
+            "",
+            self.username,
+            0,
+            0,
+            self.cli_ip,
+            0,
+            "",
+        ):
+            self.die("Upload blocked by xbu server config")
+
         # print("ftp_STOR: {} {} => {}".format(vp, mode, ap))
         ret = FTPHandler.ftp_STOR(self, file, mode)
         # print("ftp_STOR: {} {} OK".format(vp, mode))
@@ -384,11 +406,13 @@ class FtpHandler(FTPHandler):
             vfs, rem = vfs.get_dbv(rem)
             self.hub.up2k.hash_file(
                 vfs.realpath,
+                vfs.vpath,
                 vfs.flags,
                 rem,
                 fn,
-                self.remote_ip,
+                self.cli_ip,
                 time.time(),
+                self.username,
             )
 
         return FTPHandler.log_transfer(

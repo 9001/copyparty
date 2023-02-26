@@ -1272,9 +1272,10 @@ class HttpCli(object):
                                     self.vpath,
                                     self.host,
                                     self.uname,
-                                    self.ip,
                                     time.time(),
                                     len(xm),
+                                    self.ip,
+                                    time.time(),
                                     plain,
                                 )
 
@@ -1415,9 +1416,10 @@ class HttpCli(object):
                 self.vpath,
                 self.host,
                 self.uname,
-                self.ip,
                 at,
                 remains,
+                self.ip,
+                at,
                 "",
             ):
                 t = "upload denied by xbu"
@@ -1491,9 +1493,10 @@ class HttpCli(object):
             self.vpath,
             self.host,
             self.uname,
-            self.ip,
             at,
             post_sz,
+            self.ip,
+            at,
             "",
         ):
             t = "upload denied by xau"
@@ -1505,11 +1508,13 @@ class HttpCli(object):
         self.conn.hsrv.broker.say(
             "up2k.hash_file",
             vfs.realpath,
+            vfs.vpath,
             vfs.flags,
             rem,
             fn,
             self.ip,
             at,
+            self.uname,
         )
 
         vsuf = ""
@@ -2102,9 +2107,10 @@ class HttpCli(object):
                         self.vpath,
                         self.host,
                         self.uname,
-                        self.ip,
                         at,
                         0,
+                        self.ip,
+                        at,
                         "",
                     ):
                         t = "upload denied by xbu"
@@ -2161,9 +2167,10 @@ class HttpCli(object):
                         self.vpath,
                         self.host,
                         self.uname,
-                        self.ip,
                         at,
                         sz,
+                        self.ip,
+                        at,
                         "",
                     ):
                         t = "upload denied by xau"
@@ -2175,11 +2182,13 @@ class HttpCli(object):
                     self.conn.hsrv.broker.say(
                         "up2k.hash_file",
                         dbv.realpath,
+                        vfs.vpath,
                         dbv.flags,
                         vrem,
                         fname,
                         self.ip,
                         at,
+                        self.uname,
                     )
                     self.conn.nbyte += sz
 

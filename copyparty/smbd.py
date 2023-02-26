@@ -12,10 +12,10 @@ from types import SimpleNamespace
 from .__init__ import ANYWIN, EXE, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
-from .util import Daemon, min_ex, pybin
+from .util import Daemon, min_ex, pybin, runhook
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any
+    from typing import Any, Union
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -113,6 +113,9 @@ class SMB(object):
         self.stop = srv.stop
         self.log("smb", "listening @ {}:{}".format(ip, port))
 
+    def nlog(self, msg: str, c: Union[int, str] = 0) -> None:
+        self.log("smb", msg, c)
+
     def start(self) -> None:
         Daemon(self.srv.start)
 
@@ -169,8 +172,15 @@ class SMB(object):
             yeet("blocked write (no --smbw): " + vpath)
 
         vfs, ap = self._v2a("open", vpath, *a)
-        if wr and not vfs.axs.uwrite:
-            yeet("blocked write (no-write-acc): " + vpath)
+        if wr:
+            if not vfs.axs.uwrite:
+                yeet("blocked write (no-write-acc): " + vpath)
+
+            xbu = vfs.flags.get("xbu")
+            if xbu and not runhook(
+                self.nlog, xbu, ap, vpath, "", "", 0, 0, "1.7.6.2", 0, ""
+            ):
+                yeet("blocked by xbu server config: " + vpath)
 
         ret = bos.open(ap, flags, *a, mode=chmod, **ka)
         if wr:
@@ -198,11 +208,13 @@ class SMB(object):
         vfs, rem = vfs.get_dbv(rem)
         self.hub.up2k.hash_file(
             vfs.realpath,
+            vfs.vpath,
             vfs.flags,
             rem,
             fn,
             "1.7.6.2",
             time.time(),
+            "",
         )
 
     def _rename(self, vp1: str, vp2: str) -> None:

@@ -113,7 +113,7 @@ class Cfg(Namespace):
         ex = "doctitle favico html_head lg_sbf log_fk md_sbf mth textfiles R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
-        ex = "xad xar xau xbd xbr xbu xm"
+        ex = "xad xar xau xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
 
         super(Cfg, self).__init__(

@@ -511,6 +511,7 @@ def get_sects():
             execute a command (a program or script) before or after various events;
              \033[36mxbu\033[35m executes CMD before a file upload starts
              \033[36mxau\033[35m executes CMD after  a file upload finishes
+             \033[36mxiu\033[35m executes CMD after  all uploads finish and volume is idle
              \033[36mxbr\033[35m executes CMD before a file rename/move
              \033[36mxar\033[35m executes CMD after  a file rename/move
              \033[36mxbd\033[35m executes CMD before a file delete
@@ -532,6 +533,7 @@ def get_sects():
              \033[36mj\033[35m provides json with info as 1st arg instead of filepath
              \033[36mwN\033[35m waits N sec after command has been started before continuing
              \033[36mtN\033[35m sets an N sec timeout before the command is abandoned
+             \033[36miN\033[35m xiu only: volume must be idle for N sec (default = 5)
 
              \033[36mkt\033[35m kills the entire process tree on timeout (default),
              \033[36mkm\033[35m kills just the main process
@@ -542,6 +544,14 @@ def get_sects():
              \033[36mc2\033[35m show only stdout
              \033[36mc3\033[35m mute all process otput
             \033[0m
+            each hook is executed once for each event, except for \033[36mxiu\033[0m
+            which builds up a backlog of uploads, running the hook just once
+            as soon as the volume has been idle for iN seconds (5 by default)
+
+            \033[36mxiu\033[0m is also unique in that it will pass the metadata to the
+            executed program on STDIN instead of as argv arguments, and
+            it also includes the wark (file-id/hash) as a json property
+
             except for \033[36mxm\033[0m, only one hook / one action can run at a time,
             so it's recommended to use the \033[36mf\033[0m flag unless you really need
             to wait for the hook to finish before continuing (without \033[36mf\033[0m
@@ -769,6 +779,7 @@ def add_hooks(ap):
     ap2 = ap.add_argument_group('event hooks (see --help-hooks)')
     ap2.add_argument("--xbu", metavar="CMD", type=u, action="append", help="execute CMD before a file upload starts")
     ap2.add_argument("--xau", metavar="CMD", type=u, action="append", help="execute CMD after  a file upload finishes")
+    ap2.add_argument("--xiu", metavar="CMD", type=u, action="append", help="execute CMD after  all uploads finish and volume is idle")
     ap2.add_argument("--xbr", metavar="CMD", type=u, action="append", help="execute CMD before a file move/rename")
     ap2.add_argument("--xar", metavar="CMD", type=u, action="append", help="execute CMD after  a file move/rename")
     ap2.add_argument("--xbd", metavar="CMD", type=u, action="append", help="execute CMD before a file delete")
