@@ -7,6 +7,20 @@ there is probably some unintentional bias so please submit corrections
 currently up to date with [awesome-selfhosted](https://github.com/awesome-selfhosted/awesome-selfhosted) but that probably won't last
 
 
+## symbol legends
+
+### ...in feature matrices:
+* `█` = absolutely
+* `╱` = partially
+* `•` = maybe?
+* ` ` = nope
+
+### ...in reviews:
+* ✅ = advantages over copyparty
+* 🔵 = similarities
+* ⚠️ = disadvantages (something copyparty does "better")
+
+
 ## toc
 
 * top
@@ -37,6 +51,8 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
     * [gimme-that](#gimme-that)
     * [ass](#ass)
     * [linx](#linx)
+    * [h5ai](#h5ai)
+    * [autoindex](#autoindex)
 * [briefly considered](#briefly-considered)
 
 
@@ -63,8 +79,8 @@ the table headers in the matrixes below are the different softwares, with a quic
 
 the softwares,
 * `a` = [copyparty](https://github.com/9001/copyparty)
-* `b` = [hfs2](https://github.com/rejetto/hfs2)
-* `c` = [hfs3](https://www.rejetto.com/hfs/)
+* `b` = [hfs2](https://rejetto.com/hfs/)
+* `c` = [hfs3](https://github.com/rejetto/hfs)
 * `d` = [nextcloud](https://github.com/nextcloud/server)
 * `e` = [seafile](https://github.com/haiwen/seafile)
 * `f` = [rclone](https://github.com/rclone/rclone), specifically `rclone serve webdav .`
@@ -363,7 +379,8 @@ symbol legend,
 # reviews
 
 * ✅ are advantages over copyparty
-* ⚠️ are disadvantages
+* 🔵 are similarities
+* ⚠️ are disadvantages (something copyparty does "better")
 
 ## [copyparty](https://github.com/9001/copyparty)
 * resumable uploads which are verified server-side
@@ -371,7 +388,7 @@ symbol legend,
   * both of the above are surprisingly uncommon features
 * very cross-platform (python, no dependencies)
 
-## [hfs2](https://github.com/rejetto/hfs2)
+## [hfs2](https://rejetto.com/hfs/)
 * the OG, the legend
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
@@ -380,7 +397,7 @@ symbol legend,
 * vfs with gui config, per-volume permissions
 * starting to show its age, hence the rewrite:
 
-## [hfs3](https://www.rejetto.com/hfs/)
+## [hfs3](https://github.com/rejetto/hfs)
 * nodejs; cross-platform
 * vfs with gui config, per-volume permissions
 * still early development, let's revisit later
@@ -434,12 +451,12 @@ symbol legend,
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ⚠️ doesn't support crazy filenames
 * ✅ per-url access control (copyparty is per-volume)
-* basic but really snappy ui
-* upload, rename, delete, ... see feature matrix
+* 🔵 basic but really snappy ui
+* 🔵 upload, rename, delete, ... see feature matrix
 
 ## [chibisafe](https://github.com/chibisafe/chibisafe)
 * nodejs; recommends docker
-* *it has upload segmenting!*
+* 🔵 *it has upload segmenting!*
   * ⚠️ but uploads are still not resumable / accelerated / integrity-checked
 * ⚠️ not portable
 * ⚠️ isolated on-disk file hierarchy, incompatible with other software
@@ -456,7 +473,7 @@ symbol legend,
 ## [kodbox](https://github.com/kalcaddle/kodbox)
 * this thing is insane
 * php; [docker](https://hub.docker.com/r/kodcloud/kodbox)
-* *upload segmenting, acceleration, and integrity checking!*
+* 🔵 *upload segmenting, acceleration, and integrity checking!*
   * ⚠️ but uploads are not resumable(?)
 * ⚠️ not portable
 * ⚠️ isolated on-disk file hierarchy, incompatible with other software
@@ -483,17 +500,17 @@ symbol legend,
   * ⚠️ but no directory tree for navigation
 * ✅ user signup
 * ✅ command runner / remote shell
-* supposed to have write-only folders but couldn't get it to work
+* 🔵 supposed to have write-only folders but couldn't get it to work
 
 ## [filegator](https://github.com/filegator/filegator)
 * go; cross-platform (windows, linux, mac)
+* 🔵 *it has upload segmenting and acceleration*
+  * ⚠️ but uploads are still not integrity-checked
 * ⚠️ http only; no webdav / ftp / zeroconf
 * ⚠️ does not support symlinks
 * ⚠️ expensive download-as-zip feature
 * ⚠️ doesn't support crazy filenames
 * ⚠️ limited file search
-* *it has upload segmenting and acceleration*
-  * ⚠️ but uploads are still not integrity-checked
 
 ## [updog](https://github.com/sc0tfree/updog)
 * python; cross-platform
@@ -510,8 +527,8 @@ symbol legend,
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ✅ cool clipboard widget
   * copyparty: the markdown editor is an ok substitute
-* read-only and upload-only modes (same as copyparty's write-only)
-* https, webdav
+* 🔵 read-only and upload-only modes (same as copyparty's write-only)
+* 🔵 https, webdav, but no ftp
 
 ## [gimme-that](https://github.com/nejdetckenobi/gimme-that)
 * python, but with c dependencies
@@ -520,7 +537,7 @@ symbol legend,
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ⚠️ weird folder structure for uploads
 * ✅ clamav antivirus check on upload! neat
-* optional max-filesize, os-notification on uploads
+* 🔵 optional max-filesize, os-notification on uploads
   * copyparty: os-notification available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/notify.py)
 
 ## [ass](https://github.com/tycrek/ass)
@@ -544,7 +561,7 @@ symbol legend,
 * originally [andreimarcu/linx-server](https://github.com/andreimarcu/linx-server) but development has ended
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
-* some of its unique features have been added to copyparty as former linx users have migrated
+* 🔵 some of its unique features have been added to copyparty as former linx users have migrated
   * file expiration timers, filename randomization
 * ✅ password-protected files
   * copyparty: password-protected folders + filekeys to skip the folder password seem to cover most usecases
@@ -554,8 +571,19 @@ symbol legend,
   * copyparty: available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
 * ✅ can use S3 as storage backend; copyparty relies on rclone-mount for that
 
+## [h5ai](https://larsjung.de/h5ai/)
+* ⚠️ read only; no upload/move/delete
+* ⚠️ search hits the filesystem directly; not indexed/cached
+* ✅ slick ui
+* ✅ in-browser qr generator to share URLs
+* 🔵 directory tree, image viewer, thumbnails, download-as-tar
+
+## [autoindex](https://github.com/nielsAD/autoindex)
+* ⚠️ read only; no upload/move/delete
+* ✅ directory cache for faster browsing of cloud storage
+  * copyparty: local index/cache for recursive search (names/attrs/tags), but not for browsing
+
 
 # briefly considered
 * [pydio](https://github.com/pydio/cells): python/agpl3, looks great, fantastic ux -- but needs mariadb, systemwide install
 * [gossa](https://github.com/pldubouilh/gossa): go/mit, minimalistic, basic file upload, text editor, mkdir and rename (no delete/move)
-* [h5ai](https://larsjung.de/h5ai/): php/mit, slick ui, image viewer, directory tree, no upload feature

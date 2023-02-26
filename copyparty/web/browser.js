@@ -452,7 +452,7 @@ var Ls = {
 		"ur_aun": "All {0} uploads failed, sorry",
 		"ur_1sn": "File was NOT found on server",
 		"ur_asn": "The {0} files were NOT found on server",
-		"ur_um": "Finished;\n{0} uplads OK,\n{1} uploads failed, sorry",
+		"ur_um": "Finished;\n{0} uploads OK,\n{1} uploads failed, sorry",
 		"ur_sm": "Finished;\n{0} files found on server,\n{1} files NOT found on server",
 
 		"lang_set": "refresh to make the change take effect?",

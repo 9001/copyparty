@@ -17,6 +17,6 @@ problem: `svchost.exe` is using 100% of a cpu core, and upon further inspection 
 "solution": create a virtual filesystem which is intentionally slow and trick windows into reading it from there instead
 
 * create a file called `AppxManifest.xml` and put something dumb in it
-* serve the file from a copyparty instance with `--rsp-slp=9` so every request will hang for 9 sec
+* serve the file from a copyparty instance with `--rsp-slp=1` so every request will hang for 1 sec
 * `net use m: http://127.0.0.1:3993/`  (mount copyparty using the windows-native webdav client)
 * `mklink /d c:\windows\systemapps\microsoftwindows.client.cbs_cw5n1h2txyewy\AppxManifest.xml m:\AppxManifest.xml`

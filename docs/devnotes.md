@@ -25,13 +25,15 @@
 
 some improvement ideas
 
-* the JS is a mess -- a preact rewrite would be nice
+* the JS is a mess -- a ~~preact~~ rewrite would be nice
   * preferably without build dependencies like webpack/babel/node.js, maybe a python thing to assemble js files into main.js
   * good excuse to look at using virtual lists (browsers start to struggle when folders contain over 5000 files)
+  * maybe preact / vdom isn't the best choice, could just wait for the Next Big Thing
 * the UX is a mess -- a proper design would be nice
   * very organic (much like the python/js), everything was an afterthought
   * true for both the layout and the visual flair
   * something like the tron board-room ui (or most other hollywood ones, like ironman) would be :100:
+    * would preferably keep the information density, just more organized yet [not too boring](https://blog.rachelbinx.com/2023/02/unbearable-sameness/)
 * some of the python files are way too big
   * `up2k.py` ended up doing all the file indexing / db management
   * `httpcli.py` should be separated into modules in general

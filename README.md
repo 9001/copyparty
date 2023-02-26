@@ -96,7 +96,7 @@ try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running fro
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary"
-    * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) or [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe)
+    * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
 * [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
@@ -1376,15 +1376,19 @@ you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack]
 
 ## copyparty.exe
 
-download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) or [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe)
+download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
 
 ![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/194707422-cb7f66c9-41a2-4cb9-8dbc-2ab866cd4338.png)
 
-can be convenient on old machines where installing python is problematic, however is **not recommended** and should be considered a last resort -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
+can be convenient on machines where installing python is problematic, however is **not recommended** -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
 
-* [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) is compatible with 32bit windows7, which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and will definitely become a security hazard at some point
+* [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) runs on win8 or newer, was compiled on win10, does thumbnails + media tags, and is *currently* safe to use, but any future python/expat/pillow CVEs can only be remedied by downloading a newer version of the exe
 
-* [copyparty64.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty64.exe) is identical except 64bit so it [works in WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png)
+  * on win8 it needs [vc redist 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), on win10 it just works
+
+* dangerous: [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) is compatible with windows7, which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and should never be exposed to the internet (LAN is fine)
+
+* dangerous and deprecated: [copyparty64.exe](https://github.com/9001/copyparty/releases/download/v1.6.5/copyparty64.exe) lets you [run copyparty in WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png) and is otherwise completely useless
 
 meanwhile [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) instead relies on your system python which gives better performance and will stay safe as long as you keep your python install up-to-date
 
