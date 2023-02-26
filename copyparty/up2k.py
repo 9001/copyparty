@@ -1050,7 +1050,7 @@ class Up2k(object):
 
             if fn:  # diff-golf
 
-                sql = "select w, mt, sz from up where rd = ? and fn = ?"
+                sql = "select w, mt, sz, at from up where rd = ? and fn = ?"
                 try:
                     c = db.c.execute(sql, (rd, fn))
                 except:
@@ -1059,7 +1059,7 @@ class Up2k(object):
                 in_db = list(c.fetchall())
                 if in_db:
                     self.pp.n -= 1
-                    dw, dts, dsz = in_db[0]
+                    dw, dts, dsz, at = in_db[0]
                     if len(in_db) > 1:
                         t = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
                         rep_db = "\n".join([repr(x) for x in in_db])
@@ -1080,6 +1080,8 @@ class Up2k(object):
                     ret += 1
                     db.n += 1
                     in_db = []
+                else:
+                    at = 0
 
                 self.pp.msg = "a{} {}".format(self.pp.n, abspath)
 
@@ -1103,7 +1105,7 @@ class Up2k(object):
                     wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
 
                 # skip upload hooks by not providing vflags
-                self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", "", 0)
+                self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", "", at)
                 db.n += 1
                 ret += 1
                 td = time.time() - db.t
@@ -2088,6 +2090,17 @@ class Up2k(object):
     def _add_xiu_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5a -> v5b
         # store rd+fn rather than warks to support nohash vols
+        try:
+            cur.execute("select ws, rd, fn from iu limit 1").fetchone()
+            return
+        except:
+            pass
+
+        try:
+            cur.execute("drop table iu")
+        except:
+            pass
+
         for cmd in [
             r"create table iu (c int, w text, rd text, fn text)",
             r"create index iu_c on iu(c)",
