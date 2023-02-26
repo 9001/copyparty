@@ -2939,7 +2939,7 @@ class HttpCli(object):
 
         vn, _ = self.asrv.vfs.get(self.vpath, self.uname, True, True)
 
-        args = [self.asrv.vfs.all_vols, [vn.vpath], False]
+        args = [self.asrv.vfs.all_vols, [vn.vpath], False, True]
 
         x = self.conn.hsrv.broker.ask("up2k.rescan", *args)
         err = x.get()

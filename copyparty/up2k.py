@@ -188,11 +188,11 @@ class Up2k(object):
         self.gid += 1
         self.log("reload #{} initiated".format(self.gid))
         all_vols = self.asrv.vfs.all_vols
-        self.rescan(all_vols, list(all_vols.keys()), True)
+        self.rescan(all_vols, list(all_vols.keys()), True, False)
 
     def deferred_init(self) -> None:
         all_vols = self.asrv.vfs.all_vols
-        have_e2d = self.init_indexes(all_vols, [])
+        have_e2d = self.init_indexes(all_vols, [], False)
 
         if self.stop:
             # up-mt consistency not guaranteed if init is interrupted;
@@ -263,11 +263,13 @@ class Up2k(object):
         }
         return json.dumps(ret, indent=4)
 
-    def rescan(self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool) -> str:
+    def rescan(
+        self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool, fscan: bool
+    ) -> str:
         if not wait and self.pp:
             return "cannot initiate; scan is already in progress"
 
-        args = (all_vols, scan_vols)
+        args = (all_vols, scan_vols, fscan)
         Daemon(
             self.init_indexes,
             "up2k-rescan-{}".format(scan_vols[0] if scan_vols else "all"),
@@ -342,7 +344,7 @@ class Up2k(object):
 
             if vols:
                 cooldown = now + 10
-                err = self.rescan(self.asrv.vfs.all_vols, vols, False)
+                err = self.rescan(self.asrv.vfs.all_vols, vols, False, False)
                 if err:
                     for v in vols:
                         self.need_rescan.add(v)
@@ -504,7 +506,9 @@ class Up2k(object):
 
         return True, ret
 
-    def init_indexes(self, all_vols: dict[str, VFS], scan_vols: list[str]) -> bool:
+    def init_indexes(
+        self, all_vols: dict[str, VFS], scan_vols: list[str], fscan: bool
+    ) -> bool:
         gid = self.gid
         while self.pp and gid == self.gid:
             time.sleep(0.1)
@@ -590,7 +594,7 @@ class Up2k(object):
             if "e2d" in vol.flags:
                 have_e2d = True
 
-            if "e2ds" in vol.flags:
+            if "e2ds" in vol.flags or fscan:
                 self.volstate[vol.vpath] = "busy (hashing files)"
                 _, vac = self._build_file_index(vol, list(all_vols.values()))
                 if vac:
