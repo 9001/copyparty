@@ -2278,8 +2278,9 @@ class Up2k(object):
                         # returning the previous upload info
                         job = deepcopy(job)
                         job["wark"] = wark
-                        for k in "ptop vtop prel addr".split():
-                            job[k] = cj[k]
+                        job["at"] = cj.get("at") or time.time()
+                        for k in "lmod ptop vtop prel host user addr".split():
+                            job[k] = cj.get(k) or ""
 
                         pdir = djoin(cj["ptop"], cj["prel"])
                         if rand:
@@ -2296,12 +2297,12 @@ class Up2k(object):
                             xbu,  # type: ignore
                             dst,
                             job["vtop"],
-                            job.get("host") or "",
-                            job.get("user") or "",
+                            job["host"],
+                            job["user"],
                             job["lmod"],
                             job["size"],
                             job["addr"],
-                            job.get("at") or 0,
+                            job["at"],
                             "",
                         ):
                             t = "upload blocked by xbu server config: {}".format(dst)
@@ -2319,9 +2320,8 @@ class Up2k(object):
                                     raise
 
                         if cur:
-                            zs = "prel name lmod size ptop vtop wark host user addr"
+                            zs = "prel name lmod size ptop vtop wark host user addr at"
                             a = [job[x] for x in zs.split()]
-                            a += [job.get("at") or time.time()]
                             self.db_add(cur, vfs.flags, *a)
                             cur.connection.commit()
 
