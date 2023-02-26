@@ -1431,7 +1431,7 @@ class HttpCli(object):
             #  * volflag 'daw' is set
             #  * and account has delete-access
             # or...
-            #  * file exists and is empty
+            #  * file exists, is empty, sufficiently new
             #  * and there is no .PARTIAL
 
             tnam = fn + ".PARTIAL"
@@ -1442,6 +1442,7 @@ class HttpCli(object):
                 not bos.path.exists(os.path.join(fdir, tnam))
                 and bos.path.exists(path)
                 and not bos.path.getsize(path)
+                and bos.path.getmtime(path) >= time.time() - self.args.blank_wt
             ):
                 # small toctou, but better than clobbering a hardlink
                 bos.unlink(path)
