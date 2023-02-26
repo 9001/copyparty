@@ -1,4 +1,35 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0212-1411  `v1.6.5`  windows smb fix + win10.exe
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+## bugfixes
+* **windows-only:** smb locations (network drives) could not be accessed
+  * appeared in [v1.6.4](https://github.com/9001/copyparty/releases/tag/v1.6.4) while adding support for long filepaths (260chars+)
+
+## other changes
+* removed tentative support for compressed chiptunes (xmgz, xmz, xmj, ...) since FFmpeg usually doesn't
+
+----
+
+# introducing [copyparty640.exe](https://github.com/9001/copyparty/releases/download/v1.6.5/copyparty640.exe)
+* built for win10, comes with the latest python and deps (supports win8 with [vc redist 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145))
+* __*much* safer__ than the old win7-compatible `copyparty.exe` and `copyparty64.exe`
+  * but only `copyparty-sfx.py` takes advantage of the operating system security patches
+* includes pillow for thumbnails and mutagen for media indexing
+* around 10% slower (trying to figure out what's up with that)
+
+starting from the next release,
+* `copyparty.exe` (win7 x32) will become `copyparty32.exe`
+* `copyparty640.exe` (win10) will be the new `copyparty.exe`
+* `copyparty64.exe` (win7 x64) will graduate
+
+so the [copyparty64.exe](https://github.com/9001/copyparty/releases/download/v1.6.5/copyparty64.exe) in this release will be the "final" version able to run inside a [64bit Win7-era winPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png) (all regular 32/64-bit win7 editions can just use `copyparty32.exe` instead)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0211-1802  `v1.6.4`  🔧🎲🔗🐳🇦🎶
 
 * read-only demo server at https://a.ocv.me/pub/demo/
