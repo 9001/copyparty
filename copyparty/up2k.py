@@ -133,7 +133,7 @@ class Up2k(object):
         self.entags: dict[str, set[str]] = {}
         self.mtp_parsers: dict[str, dict[str, MParser]] = {}
         self.pending_tags: list[tuple[set[str], str, str, dict[str, Any]]] = []
-        self.hashq: Queue[tuple[str, str, str, str, str, float, str]] = Queue()
+        self.hashq: Queue[tuple[str, str, str, str, str, float, str, bool]] = Queue()
         self.tagq: Queue[tuple[str, str, str, str, str, float]] = Queue()
         self.tag_event = threading.Condition()
         self.n_hashq = 0
@@ -2685,6 +2685,7 @@ class Up2k(object):
         usr: str,
         ip: str,
         at: float,
+        skip_xau: bool = False,
     ) -> bool:
         cur = self.cur.get(ptop)
         if not cur:
@@ -2694,7 +2695,20 @@ class Up2k(object):
         try:
             self.db_rm(cur, rd, fn)
             self.db_add(
-                cur, vflags, rd, fn, lmod, sz, ptop, vtop, wark, host, usr, ip, at
+                cur,
+                vflags,
+                rd,
+                fn,
+                lmod,
+                sz,
+                ptop,
+                vtop,
+                wark,
+                host,
+                usr,
+                ip,
+                at,
+                skip_xau,
             )
             cur.connection.commit()
         except Exception as ex:
@@ -2732,6 +2746,7 @@ class Up2k(object):
         usr: str,
         ip: str,
         at: float,
+        skip_xau: bool = False,
     ) -> None:
         sql = "insert into up values (?,?,?,?,?,?,?)"
         v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
@@ -2743,7 +2758,7 @@ class Up2k(object):
             v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
             db.execute(sql, v)
 
-        xau = vflags.get("xau")
+        xau = False if skip_xau else vflags.get("xau")
         dst = djoin(ptop, rd, fn)
         if xau and not runhook(
             self.log,
@@ -3571,7 +3586,7 @@ class Up2k(object):
                 self.n_hashq -= 1
             # self.log("hashq {}".format(self.n_hashq))
 
-            ptop, vtop, rd, fn, ip, at, usr = self.hashq.get()
+            ptop, vtop, rd, fn, ip, at, usr, skip_xau = self.hashq.get()
             # self.log("hashq {} pop {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
             if "e2d" not in self.flags[ptop]:
                 continue
@@ -3604,6 +3619,7 @@ class Up2k(object):
                     usr,
                     ip,
                     at,
+                    skip_xau,
                 )
 
             if at and time.time() - at > 30:
@@ -3620,10 +3636,11 @@ class Up2k(object):
         ip: str,
         at: float,
         usr: str,
+        skip_xau: bool = False,
     ) -> None:
         with self.mutex:
             self.register_vpath(ptop, flags)
-            self.hashq.put((ptop, vtop, rd, fn, ip, at, usr))
+            self.hashq.put((ptop, vtop, rd, fn, ip, at, usr, skip_xau))
             self.n_hashq += 1
         # self.log("hashq {} push {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
 

@@ -1515,6 +1515,7 @@ class HttpCli(object):
             self.ip,
             at,
             self.uname,
+            True,
         )
 
         vsuf = ""
@@ -2189,6 +2190,7 @@ class HttpCli(object):
                         self.ip,
                         at,
                         self.uname,
+                        True,
                     )
                     self.conn.nbyte += sz
 
