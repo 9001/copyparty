@@ -1378,7 +1378,7 @@ you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack]
 
 download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
 
-![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/194707422-cb7f66c9-41a2-4cb9-8dbc-2ab866cd4338.png)
+![copyparty-exe-fs8](https://user-images.githubusercontent.com/241032/221445946-1e328e56-8c5b-44a9-8b9f-dee84d942535.png)
 
 can be convenient on machines where installing python is problematic, however is **not recommended** -- if possible, please use **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** instead
 
@@ -1386,7 +1386,7 @@ can be convenient on machines where installing python is problematic, however is
 
   * on win8 it needs [vc redist 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), on win10 it just works
 
-* dangerous: [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) is compatible with windows7, which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and should never be exposed to the internet (LAN is fine)
+* dangerous: [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) is compatible with [windows7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png), which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and should never be exposed to the internet (LAN is fine)
 
 * dangerous and deprecated: [copyparty64.exe](https://github.com/9001/copyparty/releases/download/v1.6.5/copyparty64.exe) lets you [run copyparty in WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png) and is otherwise completely useless
 
