@@ -3330,7 +3330,7 @@ class Up2k(object):
             int(job["t0"]),
             "",
         ):
-            t = "upload blocked by xbu: {}".format(vp_chk)
+            t = "upload blocked by xbu server config: {}".format(vp_chk)
             self.log(t, 1)
             raise Pebkac(403, t)
 

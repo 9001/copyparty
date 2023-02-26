@@ -1422,7 +1422,7 @@ class HttpCli(object):
                 at,
                 "",
             ):
-                t = "upload denied by xbu"
+                t = "upload blocked by xbu server config"
                 self.log(t, 1)
                 raise Pebkac(403, t)
 
@@ -1499,7 +1499,7 @@ class HttpCli(object):
             at,
             "",
         ):
-            t = "upload denied by xau"
+            t = "upload blocked by xau server config"
             self.log(t, 1)
             os.unlink(path)
             raise Pebkac(403, t)
@@ -2113,7 +2113,7 @@ class HttpCli(object):
                         at,
                         "",
                     ):
-                        t = "upload denied by xbu"
+                        t = "upload blocked by xbu server config"
                         self.log(t, 1)
                         raise Pebkac(403, t)
 
@@ -2173,7 +2173,7 @@ class HttpCli(object):
                         at,
                         "",
                     ):
-                        t = "upload denied by xau"
+                        t = "upload blocked by xau server config"
                         self.log(t, 1)
                         os.unlink(abspath)
                         raise Pebkac(403, t)

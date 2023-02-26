@@ -127,6 +127,9 @@ class FtpFs(AbstractedFS):
         self.listdirinfo = self.listdir
         self.chdir(".")
 
+    def die(self, msg):
+        self.h.die(msg)
+
     def v2a(
         self,
         vpath: str,
@@ -140,17 +143,17 @@ class FtpFs(AbstractedFS):
             rd, fn = os.path.split(vpath)
             if ANYWIN and relchk(rd):
                 logging.warning("malicious vpath: %s", vpath)
-                raise FilesystemError("unsupported characters in filepath")
+                self.die("Unsupported characters in filepath")
 
             fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
             vpath = vjoin(rd, fn)
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             if not vfs.realpath:
-                raise FilesystemError("no filesystem mounted at this path")
+                self.die("No filesystem mounted at this path")
 
             return os.path.join(vfs.realpath, rem), vfs, rem
         except Pebkac as ex:
-            raise FilesystemError(str(ex))
+            self.die(str(ex))
 
     def rv2a(
         self,
@@ -173,7 +176,7 @@ class FtpFs(AbstractedFS):
     def validpath(self, path: str) -> bool:
         if "/.hist/" in path:
             if "/up2k." in path or path.endswith("/dir.txt"):
-                raise FilesystemError("access to this file is forbidden")
+                self.die("Access to this file is forbidden")
 
         return True
 
@@ -190,7 +193,7 @@ class FtpFs(AbstractedFS):
                 td = 0
 
             if td < -1 or td > self.args.ftp_wt:
-                raise FilesystemError("cannot open existing file for writing")
+                self.die("Cannot open existing file for writing")
 
         self.validpath(ap)
         return open(fsenc(ap), mode)
@@ -201,7 +204,7 @@ class FtpFs(AbstractedFS):
         ap = vfs.canonical(rem)
         if not bos.path.isdir(ap):
             # returning 550 is library-default and suitable
-            raise FilesystemError("Failed to change directory")
+            self.die("Failed to change directory")
 
         self.cwd = nwd
         (
@@ -251,28 +254,27 @@ class FtpFs(AbstractedFS):
 
     def remove(self, path: str) -> None:
         if self.args.no_del:
-            raise FilesystemError("the delete feature is disabled in server config")
+            self.die("The delete feature is disabled in server config")
 
         vp = join(self.cwd, path).lstrip("/")
         try:
-            self.hub.up2k.handle_rm(self.uname, self.h.remote_ip, [vp], [])
+            self.hub.up2k.handle_rm(self.uname, self.h.cli_ip, [vp], [])
         except Exception as ex:
-            raise FilesystemError(str(ex))
+            self.die(str(ex))
 
     def rename(self, src: str, dst: str) -> None:
         if not self.can_move:
-            raise FilesystemError("not allowed for user " + self.h.username)
+            self.die("Not allowed for user " + self.h.username)
 
         if self.args.no_mv:
-            t = "the rename/move feature is disabled in server config"
-            raise FilesystemError(t)
+            self.die("The rename/move feature is disabled in server config")
 
         svp = join(self.cwd, src).lstrip("/")
         dvp = join(self.cwd, dst).lstrip("/")
         try:
             self.hub.up2k.handle_mv(self.uname, svp, dvp)
         except Exception as ex:
-            raise FilesystemError(str(ex))
+            self.die(str(ex))
 
     def chmod(self, path: str, mode: str) -> None:
         pass
@@ -350,6 +352,9 @@ class FtpHandler(FTPHandler):
             FTPHandler.__init__(self, conn, server, ioloop)
         else:
             super(FtpHandler, self).__init__(conn, server, ioloop)
+
+        cip = self.remote_ip
+        self.cli_ip = cip[7:] if cip.startswith("::ffff:") else cip
 
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map: dict[str, str] = {}

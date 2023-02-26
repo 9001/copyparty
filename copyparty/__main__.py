@@ -813,7 +813,7 @@ def add_safety(ap, fk_salt):
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --unpost=0 --no-del --no-mv --hardlink --vague-403 --ban-404=50,60,1440 -nih")
     ap2.add_argument("-sss", action="store_true", help="further increase safety: Enable logging to disk, scan for dangerous symlinks.\n └─Alias of\033[32m -ss --no-dav --no-logues --no-readme -lo=cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz --ls=**,*,ln,p,r")
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="do a sanity/safety check of all volumes on startup; arguments \033[33mUSER\033[0m,\033[33mVOL\033[0m,\033[33mFLAGS\033[0m; example [\033[32m**,*,ln,p,r\033[0m]")
-    ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt; used to generate unpredictable internal identifiers for uploads -- doesn't really matter")
+    ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt; serves no purpose, no reason to change this (but delete all databases if you do)")
     ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files -- this one DOES matter")
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to make something a dotfile")

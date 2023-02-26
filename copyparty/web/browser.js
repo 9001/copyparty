@@ -294,6 +294,7 @@ var Ls = {
 
 		"fd_ok": "delete OK",
 		"fd_err": "delete failed:\n",
+		"fd_none": "nothing was deleted; maybe blocked by server config (xbd)?",
 		"fd_busy": "deleting {0} items...\n\n{1}",
 		"fd_warn1": "DELETE these {0} items?",
 		"fd_warn2": "<b>Last chance!</b> No way to undo. Delete?",
@@ -748,6 +749,7 @@ var Ls = {
 
 		"fd_ok": "sletting OK",
 		"fd_err": "sletting feilet:\n",
+		"fd_none": "ingenting ble slettet; kanskje avvist av serverkonfigurasjon (xbd)?",
 		"fd_busy": "sletter {0} filer...\n\n{1}",
 		"fd_warn1": "SLETT disse {0} filene?",
 		"fd_warn2": "<b>Siste sjanse!</b> Dette kan ikke angres. Slett?",
@@ -3426,12 +3428,14 @@ var fileman = (function () {
 		if (!sel.length)
 			return toast.err(3, L.fd_emore);
 
-		function deleter() {
+		function deleter(err) {
 			var xhr = new XHR(),
 				vp = vps.shift();
 
 			if (!vp) {
-				toast.ok(2, L.fd_ok);
+				if (err !== 'xbd')
+					toast.ok(2, L.fd_ok);
+
 				treectl.goto(get_evpath());
 				return;
 			}
@@ -3446,6 +3450,10 @@ var fileman = (function () {
 				var msg = this.responseText;
 				toast.err(9, L.fd_err + msg);
 				return;
+			}
+			if (this.responseText.indexOf('deleted 0 files (and 0') + 1) {
+				toast.err(9, L.fd_none);
+				return deleter('xbd');
 			}
 			deleter();
 		}
