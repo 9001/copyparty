@@ -463,11 +463,9 @@ class Up2k(object):
             q = "select * from up where substr(w,1,16)=? and +rd=? and +fn=?"
             ups = []
             for wrf in wrfs:
-                try:
-                    # almost definitely exists; don't care if it doesn't
-                    ups.append(cur.execute(q, wrf).fetchone())
-                except:
-                    pass
+                up = cur.execute(q, wrf).fetchone()
+                if up:
+                    ups.append(up)
 
         # t1 = time.time()
         # self.log("mapped {} warks in {:.3f} sec".format(len(wrfs), t1 - t0))
@@ -2332,7 +2330,7 @@ class Up2k(object):
                                 if not n4g:
                                     raise
 
-                        if cur:
+                        if cur and not self.args.nw:
                             zs = "prel name lmod size ptop vtop wark host user addr at"
                             a = [job[x] for x in zs.split()]
                             self.db_add(cur, vfs.flags, *a)
