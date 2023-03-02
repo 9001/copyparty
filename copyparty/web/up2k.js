@@ -114,10 +114,10 @@ function up2k_flagbus() {
             do_take(now);
             return;
         }
-        if (flag.owner && now - flag.owner[1] > 5000) {
+        if (flag.owner && now - flag.owner[1] > 12000) {
             flag.owner = null;
         }
-        if (flag.wants && now - flag.wants[1] > 5000) {
+        if (flag.wants && now - flag.wants[1] > 12000) {
             flag.wants = null;
         }
         if (!flag.owner && !flag.wants) {
@@ -772,6 +772,7 @@ function fsearch_explain(n) {
 
 function up2k_init(subtle) {
     var r = {
+        "tact": Date.now(),
         "init_deps": init_deps,
         "set_fsearch": set_fsearch,
         "gotallfiles": [gotallfiles]  // hooks
@@ -1647,7 +1648,13 @@ function up2k_init(subtle) {
             running = true;
             while (true) {
                 var now = Date.now(),
+                    blocktime = now - r.tact,
                     is_busy = st.car < st.files.length;
+
+                if (blocktime > 2500)
+                    console.log('main thread blocked for ' + blocktime);
+
+                r.tact = now;
 
                 if (was_busy && !is_busy) {
                     for (var a = 0; a < st.files.length; a++) {
@@ -2043,6 +2050,8 @@ function up2k_init(subtle) {
             nbusy++;
             reading++;
             nchunk++;
+            if (Date.now() - up2k.tact > 1500)
+                tasker();
         }
 
         function onmsg(d) {

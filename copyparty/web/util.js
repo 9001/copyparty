@@ -112,12 +112,13 @@ if ((document.location + '').indexOf(',rej,') + 1)
 
 try {
     console.hist = [];
+    var CMAXHIST = 100;
     var hook = function (t) {
         var orig = console[t].bind(console),
             cfun = function () {
                 console.hist.push(Date.now() + ' ' + t + ': ' + Array.from(arguments).join(', '));
-                if (console.hist.length > 100)
-                    console.hist = console.hist.slice(50);
+                if (console.hist.length > CMAXHIST)
+                    console.hist = console.hist.slice(CMAXHIST / 2);
 
                 orig.apply(console, arguments);
             };
