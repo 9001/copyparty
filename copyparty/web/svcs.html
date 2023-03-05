@@ -64,6 +64,11 @@
                 yum install davfs2
                 {% if accs %}printf '%s\n' <b>{{ pw }}</b> k | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b>
             </pre>
+            <p>make it automount on boot:</p>
+            <pre>
+                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>{{ pw }}</b> k" >> /etc/davfs2/secrets
+                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b> davfs rw,user,uid=1000,noauto 0 0" >> /etc/fstab
+            </pre>
             <p>or you can use rclone instead, which is much slower but doesn't require root:</p>
             <pre>
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=other{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
