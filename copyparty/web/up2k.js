@@ -1795,6 +1795,15 @@ function up2k_init(subtle) {
     })();
 
     function uptoast() {
+        if (st.busy.handshake.length)
+            return;
+
+        for (var a = 0; a < st.files.length; a++) {
+            var t = st.files[a];
+            if (t.want_recheck && !t.rechecks)
+                return;
+        }
+
         var sr = uc.fsearch,
             ok = pvis.ctr.ok,
             ng = pvis.ctr.ng,
