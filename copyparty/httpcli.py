@@ -1714,7 +1714,7 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_json", body)
+        x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
         ret = x.get()
         if self.is_vproxied:
             if "purl" in ret:
@@ -1884,17 +1884,10 @@ class HttpCli(object):
             with self.mutex:
                 self.u2fh.close(path)
 
-        # windows cant rename open files
-        if ANYWIN and path != fin_path and not self.args.nw:
-            self.conn.hsrv.broker.ask("up2k.finish_upload", ptop, wark).get()
-
-        if not ANYWIN and not num_left:
-            times = (int(time.time()), int(lastmod))
-            self.log("no more chunks, setting times {}".format(times))
-            try:
-                bos.utime(fin_path, times)
-            except:
-                self.log("failed to utime ({}, {})".format(fin_path, times))
+        if not num_left and not self.args.nw:
+            self.conn.hsrv.broker.ask(
+                "up2k.finish_upload", ptop, wark, self.u2fh.aps
+            ).get()
 
         cinf = self.headers.get("x-up2k-stat", "")
 

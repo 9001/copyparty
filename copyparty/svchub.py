@@ -149,12 +149,9 @@ class SvcHub(object):
             self.log("root", t.format(args.j))
 
         if not args.no_fpool and args.j != 1:
-            t = "WARNING: --use-fpool combined with multithreading is untested and can probably cause undefined behavior"
-            if ANYWIN:
-                t = 'windows cannot do multithreading without --no-fpool, so enabling that -- note that upload performance will suffer if you have microsoft defender "real-time protection" enabled, so you probably want to use -j 1 instead'
-                args.no_fpool = True
-
-            self.log("root", t, c=3)
+            t = "WARNING: ignoring --use-fpool because multithreading (-j{}) is enabled"
+            self.log("root", t.format(args.j), c=3)
+            args.no_fpool = True
 
         bri = "zy"[args.theme % 2 :][:1]
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]

@@ -124,6 +124,7 @@ class Up2k(object):
         self.droppable: dict[str, list[str]] = {}
         self.volstate: dict[str, str] = {}
         self.vol_act: dict[str, float] = {}
+        self.busy_aps: set[str] = set()
         self.dupesched: dict[str, list[tuple[str, str, float]]] = {}
         self.snap_persist_interval = 300  # persist unfinished index every 5 min
         self.snap_discard_interval = 21600  # drop unfinished after 6 hours inactivity
@@ -160,12 +161,6 @@ class Up2k(object):
         else:
             t = "could not initialize sqlite3, will use in-memory registry only"
             self.log(t, 3)
-
-        if ANYWIN:
-            # usually fails to set lastmod too quickly
-            self.lastmod_q: list[tuple[str, int, tuple[int, int], bool]] = []
-            self.lastmod_q2 = self.lastmod_q[:]
-            Daemon(self._lastmodder, "up2k-lastmod")
 
         self.fstab = Fstab(self.log_func)
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
@@ -2113,7 +2108,8 @@ class Up2k(object):
             if cj["ptop"] not in self.registry:
                 raise Pebkac(410, "location unavailable")
 
-    def handle_json(self, cj: dict[str, Any]) -> dict[str, Any]:
+    def handle_json(self, cj: dict[str, Any], busy_aps: set[str]) -> dict[str, Any]:
+        self.busy_aps = busy_aps
         try:
             # bit expensive; 3.9=10x 3.11=2x
             if self.mutex.acquire(timeout=10):
@@ -2287,6 +2283,13 @@ class Up2k(object):
                     else:
                         # symlink to the client-provided name,
                         # returning the previous upload info
+                        if src in self.busy_aps or (
+                            wark in reg and "done" not in reg[wark]
+                        ):
+                            raise Pebkac(
+                                422, "source file busy; please try again later"
+                            )
+
                         job = deepcopy(job)
                         job["wark"] = wark
                         job["at"] = cj.get("at") or time.time()
@@ -2505,10 +2508,7 @@ class Up2k(object):
 
         if lmod and (not linked or SYMTIME):
             times = (int(time.time()), int(lmod))
-            if ANYWIN:
-                self.lastmod_q.append((dst, 0, times, False))
-            else:
-                bos.utime(dst, times, False)
+            bos.utime(dst, times, False)
 
     def handle_chunk(
         self, ptop: str, wark: str, chash: str
@@ -2589,13 +2589,10 @@ class Up2k(object):
                 self.regdrop(ptop, wark)
                 return ret, dst
 
-            # windows cant rename open files
-            if not ANYWIN or src == dst:
-                self._finish_upload(ptop, wark)
-
         return ret, dst
 
-    def finish_upload(self, ptop: str, wark: str) -> None:
+    def finish_upload(self, ptop: str, wark: str, busy_aps: set[str]) -> None:
+        self.busy_aps = busy_aps
         with self.mutex:
             self._finish_upload(ptop, wark)
 
@@ -2608,6 +2605,10 @@ class Up2k(object):
         except Exception as ex:
             raise Pebkac(500, "finish_upload, wark, " + repr(ex))
 
+        if job["need"]:
+            t = "finish_upload {} with remaining chunks {}"
+            raise Pebkac(500, t.format(wark, job["need"]))
+
         # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
         atomic_move(src, dst)
 
@@ -2615,14 +2616,15 @@ class Up2k(object):
         vflags = self.flags[ptop]
 
         times = (int(time.time()), int(job["lmod"]))
-        if ANYWIN:
-            z1 = (dst, job["size"], times, job["sprs"])
-            self.lastmod_q.append(z1)
-        elif not job["hash"]:
-            try:
-                bos.utime(dst, times)
-            except:
-                pass
+        self.log(
+            "no more chunks, setting times {} ({}) on {}".format(
+                times, bos.path.getsize(dst), dst
+            )
+        )
+        try:
+            bos.utime(dst, times)
+        except:
+            self.log("failed to utime ({}, {})".format(dst, times))
 
         zs = "prel name lmod size ptop vtop wark host user addr"
         z2 = [job[x] for x in zs.split()]
@@ -2643,6 +2645,7 @@ class Up2k(object):
         if self.idx_wark(vflags, *z2):
             del self.registry[ptop][wark]
         else:
+            self.registry[ptop][wark]["done"] = 1
             self.regdrop(ptop, wark)
 
         if wake_sr:
@@ -3425,27 +3428,6 @@ class Up2k(object):
 
         if not job["hash"]:
             self._finish_upload(job["ptop"], job["wark"])
-
-    def _lastmodder(self) -> None:
-        while True:
-            ready = self.lastmod_q2
-            self.lastmod_q2 = self.lastmod_q
-            self.lastmod_q = []
-
-            time.sleep(1)
-            for path, sz, times, sparse in ready:
-                self.log("lmod: setting times {} on {}".format(times, path))
-                try:
-                    bos.utime(path, times, False)
-                except:
-                    t = "lmod: failed to utime ({}, {}):\n{}"
-                    self.log(t.format(path, times, min_ex()))
-
-                if sparse and self.args.sparse and self.args.sparse * 1024 * 1024 <= sz:
-                    try:
-                        sp.check_call(["fsutil", "sparse", "setflag", path, "0"])
-                    except:
-                        self.log("could not unsparse [{}]".format(path), 3)
 
     def _snapshot(self) -> None:
         slp = self.snap_persist_interval

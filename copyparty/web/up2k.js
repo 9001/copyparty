@@ -2382,16 +2382,17 @@ function up2k_init(subtle) {
                 }
 
                 var err_pend = rsp.indexOf('partial upload exists at a different') + 1,
+                    err_srcb = rsp.indexOf('source file busy; please try again') + 1,
                     err_plug = rsp.indexOf('upload blocked by x') + 1,
                     err_dupe = rsp.indexOf('upload rejected, file already exists') + 1;
 
-                if (err_pend || err_plug || err_dupe) {
+                if (err_pend || err_srcb || err_plug || err_dupe) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
                         err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' ');
                     }
-                    if (!t.rechecks && err_pend) {
+                    if (!t.rechecks && (err_pend || err_srcb)) {
                         t.rechecks = 0;
                         t.want_recheck = true;
                     }

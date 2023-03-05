@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 """
 up2k.py: upload to copyparty
-2023-01-13, v1.2, ed <irc.rizon.net>, MIT-Licensed
+2023-03-05, v1.3, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -520,7 +520,11 @@ def handshake(ar, file, search):
         except Exception as ex:
             em = str(ex).split("SSLError(")[-1].split("\nURL: ")[0].strip()
 
-            if sc == 422 or "<pre>partial upload exists at a different" in txt:
+            if (
+                sc == 422
+                or "<pre>partial upload exists at a different" in txt
+                or "<pre>source file busy; please try again" in txt
+            ):
                 file.recheck = True
                 return [], False
             elif sc == 409 or "<pre>upload rejected, file already exists" in txt:

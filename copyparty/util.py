@@ -668,6 +668,7 @@ class FHC(object):
 
     def __init__(self) -> None:
         self.cache: dict[str, FHC.CE] = {}
+        self.aps: set[str] = set()
 
     def close(self, path: str) -> None:
         try:
@@ -679,6 +680,7 @@ class FHC(object):
             fh.close()
 
         del self.cache[path]
+        self.aps.remove(path)
 
     def clean(self) -> None:
         if not self.cache:
@@ -699,6 +701,7 @@ class FHC(object):
         return self.cache[path].fhs.pop()
 
     def put(self, path: str, fh: typing.BinaryIO) -> None:
+        self.aps.add(path)
         try:
             ce = self.cache[path]
             ce.fhs.append(fh)
