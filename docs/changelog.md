@@ -1,4 +1,45 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0226-2030  `v1.6.6`  r 2 0 0
+
+two hundred releases wow
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+* currently fighting a ground fault so the demo server will be unreliable for a while
+
+## new features
+* more docker containers! now runs on x64, x32, aarch64, armhf, ppc64, s390x
+  * pls let me know if you actually run copyparty on an IBM mainframe 👍
+* new [event hook](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks) type `xiu` runs just once for all recent uploads
+  * example hook [xiu-sha.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/xiu-sha.py) generates sha512 checksum files
+* new arg `--rsp-jtr` simulates connection jitter
+* copyparty.exe integrity selftest
+* ux:
+  * return to previous page after logging in
+  * show a warning on the login page if you're not using https
+  * freebsd: detect `fetch` and return the [colorful sortable plaintext](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) listing
+
+## bugfixes
+* permit replacing empty files only during a `--blank-wt` grace period
+* lifetimes: keep upload-time when a size/mtime change triggers a reindex
+* during cleanup after an unlink, never rmdir the entire volume
+* rescan button in the controlpanel required volumes to be e2ds
+* dupes could get indexed with the wrong mtime
+  * only affected the search index; the filesystem got the right one
+* ux: search results could include the same hit twice in case of overlapping volumes
+* ux: upload UI would remain expanded permanently after visiting a huge tab
+* ftp: return proper error messages when client does something illegal
+* ie11: support the back button
+
+## other changes
+* [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) replaces copyparty64.exe -- now built for 64-bit windows 10
+  * **on win10 it just works** -- on win8 it needs [vc redist 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145) -- no win7 support
+  * has the latest security patches, but sfx.py is still better for long-term use
+  * has pillow and mutagen; can make thumbnails and parse/index media
+* [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) is the old win7-compatible, dangerously-insecure edition
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0212-1411  `v1.6.5`  windows smb fix + win10.exe
 
 * read-only demo server at https://a.ocv.me/pub/demo/

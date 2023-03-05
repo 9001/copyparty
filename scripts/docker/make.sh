@@ -43,11 +43,11 @@ filt=
 [ $purge  ] && filt='NR>1{print$3}'
 [ $filt ] && {
     [ $purge ] && {
-        podman kill $(podman ps -q)
-        podman rm   $(podman ps -qa)
+        podman kill $(podman ps -q)  || true
+        podman rm   $(podman ps -qa) || true
     }
 	podman rmi -f $(podman images -a --history | awk "$filt") || true
-    podman rmi $(podman images -a --history | awk '/^<none>.*<none>.*-tmp:/{print$3}')
+    podman rmi $(podman images -a --history | awk '/^<none>.*<none>.*-tmp:/{print$3}') || true
 }
 
 [ $pull ] && {
