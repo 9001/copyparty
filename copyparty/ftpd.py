@@ -218,7 +218,7 @@ class FtpFs(AbstractedFS):
 
     def mkdir(self, path: str) -> None:
         ap = self.rv2a(path, w=True)[0]
-        bos.mkdir(ap)
+        bos.makedirs(ap)  # filezilla expects this
 
     def listdir(self, path: str) -> list[str]:
         vpath = join(self.cwd, path).lstrip("/")
