@@ -28,6 +28,13 @@ fns=(
   python-3.11.2-amd64.exe
 }
 [ $w7 ] && fns+=(
+  certifi-2022.12.7-py3-none-any.whl
+  chardet-5.1.0-py3-none-any.whl
+  idna-3.4-py3-none-any.whl
+  requests-2.28.2-py3-none-any.whl
+  urllib3-1.26.14-py2.py3-none-any.whl
+)
+[ $w7 ] && fns+=(
   future-0.18.2.tar.gz
   importlib_metadata-5.0.0-py3-none-any.whl
   pip-22.3-py3-none-any.whl
@@ -58,28 +65,32 @@ manually install:
 
 ===[ copy-paste into git-bash ]================================
 uname -s | grep NT-10 && w10=1 || w7=1
+[ $w7 ] && pyv=37 || pyv=311
+appd=$(cygpath.exe "$APPDATA")
 cd ~/Downloads &&
 unzip upx-*-win32.zip &&
 mv upx-*/upx.exe . &&
 python -m ensurepip &&
 python -m pip install --user -U pip-*.whl &&
 { [ $w7 ] || python -m pip install --user -U mutagen-*.whl Pillow-*.whl; } &&
+{ [ $w10 ] || python -m pip install --user -U {requests,urllib3,charset_normalizer,certifi,idna}-*.whl; } &&
 { [ $w10 ] || python -m pip install --user -U future-*.tar.gz importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
 python -m pip install --user -U pyinstaller-*.whl pefile-*.whl pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl &&
+sed -ri 's/--lzma/--best/' $appd/Python/Python$pyv/site-packages/pyinstaller/building/utils.py &&
+curl -fkLO https://192.168.123.1:3923/cpp/scripts/uncomment.py &&
+python uncomment.py $(for d in $appd/Python/Python$pyv/site-packages/{requests,urllib3,charset_normalizer,certifi,idna}; do find $d -name \*.py; done) &&
 cd &&
 rm -f build.sh &&
 curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh &&
+curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.sh &&
 echo ok
 # python -m pip install --user -U Pillow-9.2.0-cp37-cp37m-win32.whl
 # sed -ri 's/, bestopt, /]+bestopt+[/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
 # sed -ri 's/(^\s+bestopt = ).*/\1["--best","--lzma","--ultra-brute"]/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
 
 ===[ win10: copy-paste into git-bash ]=========================
-appd=$(cygpath.exe "$APPDATA")
-curl -fkLO https://192.168.123.1:3923/cpp/scripts/uncomment.py &&
 #for f in $appd/Python/Python311/site-packages/mutagen/*.py; do awk -i inplace '/^\s*def _?(save|write)/{sub(/d.*/,"    ");s=$0;ns=length(s)} ns&&/[^ ]/&&substr($0,0,ns)!=s{ns=0} !ns' "$f"; done &&
 python uncomment.py $appd/Python/Python311/site-packages/{mutagen,PIL,jinja2,markupsafe}/*.py &&
-sed -ri 's/--lzma/--best/' $APPDATA/Python/Python311/site-packages/pyinstaller/building/utils.py &&
 echo ok
 
 

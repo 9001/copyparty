@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
+S_VERSION = "1.3"
+S_BUILD_DT = "2023-03-05"
+
 """
 up2k.py: upload to copyparty
-2023-03-05, v1.3, ed <irc.rizon.net>, MIT-Licensed
+2021, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
 
 - dependencies: requests
@@ -24,6 +27,8 @@ import platform
 import threading
 import datetime
 
+EXE = sys.executable.endswith("exe")
+
 try:
     import argparse
 except:
@@ -34,7 +39,9 @@ except:
 try:
     import requests
 except ImportError:
-    if sys.version_info > (2, 7):
+    if EXE:
+        raise
+    elif sys.version_info > (2, 7):
         m = "\nERROR: need 'requests'; please run this command:\n {0} -m pip install --user requests\n"
     else:
         m = "requests/2.18.4 urllib3/1.23 chardet/3.0.4 certifi/2020.4.5.1 idna/2.7"
@@ -993,8 +1000,13 @@ def main():
     cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 2
     hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
+    ver = "{}, v{}".format(S_BUILD_DT, S_VERSION)
+    if "--version" in sys.argv:
+        print(ver)
+        return
+
     # fmt: off
-    ap = app = argparse.ArgumentParser(formatter_class=APF, epilog="""
+    ap = app = argparse.ArgumentParser(formatter_class=APF, description="up2k uploader / filesearch tool, " + ver, epilog="""
 NOTE:
 source file/folder selection uses rsync syntax, meaning that:
   "foo" uploads the entire folder to URL/foo/
@@ -1007,6 +1019,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
+    ap.add_argument("--version", action="store_true", help="show version and exit")
 
     ap = app.add_argument_group("compatibility")
     ap.add_argument("--cls", action="store_true", help="clear screen before start")
@@ -1030,7 +1043,16 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-td", action="store_true", help="disable certificate check")
     # fmt: on
 
-    ar = app.parse_args()
+    try:
+        ar = app.parse_args()
+    finally:
+        if EXE and not sys.argv[1:]:
+            print("*** hit enter to exit ***")
+            try:
+                input()
+            except:
+                pass
+
     if ar.drd:
         ar.dr = True
 

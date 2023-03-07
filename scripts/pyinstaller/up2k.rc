@@ -16,12 +16,12 @@ VSVersionInfo(
       StringTable(
         '000004b0',
         [StringStruct('CompanyName', 'ocv.me'),
-        StringStruct('FileDescription', 'copyparty file server'),
+        StringStruct('FileDescription', 'up2k uploader / filesearch command'),
         StringStruct('FileVersion', '1.2.3'),
-        StringStruct('InternalName', 'copyparty'),
+        StringStruct('InternalName', 'up2k'),
         StringStruct('LegalCopyright', '2019, ed'),
-        StringStruct('OriginalFilename', 'copyparty.exe'),
-        StringStruct('ProductName', 'copyparty'),
+        StringStruct('OriginalFilename', 'up2k.exe'),
+        StringStruct('ProductName', 'up2k client'),
         StringStruct('ProductVersion', '1.2.3')])
       ]), 
     VarFileInfo([VarStruct('Translation', [0, 1200])])

@@ -9,6 +9,8 @@ tee build2.sh | cmp build.sh && rm build2.sh || {
     [[ $r =~ [yY] ]] && mv build{2,}.sh && exec ./build.sh
 }
 
+./up2k.sh
+
 uname -s | grep WOW64 && m= || m=32
 uname -s | grep NT-10 && w10=1 || w7=1
 [ $w7 ] && pyv=37 || pyv=311
