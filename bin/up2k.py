@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.3"
-S_BUILD_DT = "2023-03-05"
+S_VERSION = "1.4"
+S_BUILD_DT = "2023-03-08"
 
 """
 up2k.py: upload to copyparty
@@ -252,7 +252,13 @@ def eprint(*a, **ka):
 
 
 def flushing_print(*a, **ka):
-    _print(*a, **ka)
+    try:
+        _print(*a, **ka)
+    except:
+        v = " ".join(str(x) for x in a)
+        v = v.encode("ascii", "replace").decode("ascii")
+        _print(v, **ka)
+
     if "flush" not in ka:
         sys.stdout.flush()
 
@@ -379,6 +385,23 @@ def walkdir(err, top, seen):
 def walkdirs(err, tops):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
     sep = "{0}".format(os.sep).encode("ascii")
+    if not VT100:
+        za = []
+        for td in tops:
+            try:
+                ap = os.path.abspath(os.path.realpath(td))
+                if td[-1:] in (b"\\", b"/"):
+                    ap += sep
+            except:
+                # maybe cpython #88013 (ok)
+                ap = td
+
+            za.append(ap)
+
+        za = [x if x.startswith(b"\\\\") else b"\\\\?\\" + x for x in za]
+        za = [x.replace(b"/", b"\\") for x in za]
+        tops = za
+
     for top in tops:
         isdir = os.path.isdir(top)
         if top[-1:] == sep:
@@ -897,6 +920,9 @@ class Ctl(object):
                 self.handshaker_busy += 1
 
             upath = file.abs.decode("utf-8", "replace")
+            if not VT100:
+                upath = upath[4:]
+
             hs, sprs = handshake(self.ar, file, search)
             if search:
                 if hs:
@@ -1066,7 +1092,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ar.files = [
         os.path.abspath(os.path.realpath(x.encode("utf-8")))
-        + (x[-1:] if x[-1:] == os.sep else "").encode("utf-8")
+        + (x[-1:] if x[-1:] in ("\\", "/") else "").encode("utf-8")
         for x in ar.files
     ]
 

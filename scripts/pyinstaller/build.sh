@@ -59,6 +59,8 @@ read a b c d _ < <(
     sed -r 's/[^0-9]+//;s/[" )]//g;s/[-,]/ /g;s/$/ 0/'
 )
 sed -r 's/1,2,3,0/'$a,$b,$c,$d'/;s/1\.2\.3/'$a.$b.$c/ <loader.rc >loader.rc2
+[ $m ] &&
+    sed -ri 's/copyparty.exe/copyparty32.exe/' loader.rc2
 
 excl=(
     copyparty.broker_mp
