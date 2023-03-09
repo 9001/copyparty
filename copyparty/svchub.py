@@ -402,6 +402,7 @@ class SvcHub(object):
 
     def _setup_logfile(self, printed: str) -> None:
         base_fn = fn = sel_fn = self._logname()
+        do_xz = fn.lower().endswith(".xz")
         if fn != self.args.lo:
             ctr = 0
             # yup this is a race; if started sufficiently concurrently, two
@@ -413,7 +414,7 @@ class SvcHub(object):
         fn = sel_fn
 
         try:
-            if fn.lower().endswith(".xz"):
+            if do_xz:
                 import lzma
 
                 lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
