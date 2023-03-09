@@ -259,6 +259,7 @@ var Ls = {
 		"mm_e404": "Could not play audio; error 404: File not found.",
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
+		"mm_nof": "not finding any more audio files nearby",
 
 		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
@@ -714,6 +715,7 @@ var Ls = {
 		"mm_e404": "Avspilling feilet: Fil ikke funnet.",
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
+		"mm_nof": "finner ikke flere sanger i nærheten",
 
 		"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
@@ -1312,6 +1314,7 @@ var mpl = (function () {
 	var r = {
 		"pb_mode": (sread('pb_mode') || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
+		'traversals': 0,
 	};
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
@@ -2093,7 +2096,15 @@ function song_skip(n) {
 }
 function next_song(e) {
 	ev(e);
-	return song_skip(1);
+	if (mp.order.length) {
+		mpl.traversals = 0;
+		return song_skip(1);
+	}
+	if (mpl.traversals++ < 5) {
+		treectl.ls_cb = next_song;
+		return tree_neigh(1);
+	}
+	toast.inf(10, L.mm_nof);
 }
 function prev_song(e) {
 	ev(e);
