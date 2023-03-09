@@ -260,6 +260,9 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
+		"mm_hnf": "that song no longer exists",
+
+		"im_hnf": "that image no longer exists",
 
 		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
@@ -716,6 +719,9 @@ var Ls = {
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
+		"mm_hnf": "sangen finnes ikke lenger",
+
+		"im_hnf": "bildet finnes ikke lenger",
 
 		"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
@@ -2593,7 +2599,7 @@ function play(tid, is_ev, seek) {
 	if ((tn + '').indexOf('f-') === 0) {
 		tn = mp.order.indexOf(tn);
 		if (tn < 0)
-			return;
+			return toast.warn(10, L.mm_hnf);
 	}
 
 	if (tn >= mp.order.length) {
@@ -2861,6 +2867,9 @@ function eval_hash() {
 				clearInterval(t);
 				baguetteBox.urltime(ts);
 				var im = QS('#ggrid a[ref="' + id + '"]');
+				if (!im)
+					return toast.warn(10, L.im_hnf);
+
 				im.click();
 				im.scrollIntoView();
 			}, 50);
