@@ -3249,7 +3249,7 @@ class HttpCli(object):
             raise Pebkac(403)
 
         self.html_head = vn.flags.get("html_head", "")
-        if vn.flags.get("norobots"):
+        if vn.flags.get("norobots") or "b" in self.uparam:
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
         else:
             self.out_headers.pop("X-Robots-Tag", None)
