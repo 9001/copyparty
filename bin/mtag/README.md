@@ -31,7 +31,7 @@ run [`install-deps.sh`](install-deps.sh) to build/install most dependencies requ
 *alternatively* (or preferably) use packages from your distro instead, then you'll need at least these:
 
 * from distro: `numpy vamp-plugin-sdk beatroot-vamp mixxx-keyfinder ffmpeg`
-* from pypy: `keyfinder vamp`
+* from pip: `keyfinder vamp`
 
 
 # usage from copyparty

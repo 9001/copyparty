@@ -240,6 +240,9 @@ browser-specific:
 server-os-specific:
 * RHEL8 / Rocky8: you can run copyparty using `/usr/libexec/platform-python`
 
+server notes:
+* pypy is supported but regular cpython is faster if you enable the database
+
 
 # bugs
 
@@ -513,11 +516,13 @@ up2k has several advantages:
 * much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
 * the last-modified timestamp of the file is preserved
 
+> it is perfectly safe to restart / upgrade a copyparty server while someone is uploading to it; all known clients will resume just fine
+
 see [up2k](#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
 
 ![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/129635371-48fc54ca-fa91-48e3-9b1d-ba413e4b68cb.png)
 
-**protip:** you can avoid scaring away users with [contrib/plugins/minimal-up2k.html](contrib/plugins/minimal-up2k.html) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
+**protip:** you can avoid scaring away users with [contrib/plugins/minimal-up2k.js](contrib/plugins/minimal-up2k.js) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
 
 **protip:** if you enable `favicon` in the `[⚙️] settings` tab (by typing something into the textbox), the icon in the browser tab will indicate upload progress -- also, the `[🔔]` and/or `[🔊]` switches enable visible and/or audible notifications on upload completion
 

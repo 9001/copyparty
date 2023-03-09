@@ -1032,7 +1032,7 @@ def main():
         return
 
     # fmt: off
-    ap = app = argparse.ArgumentParser(formatter_class=APF, description="up2k uploader / filesearch tool, " + ver, epilog="""
+    ap = app = argparse.ArgumentParser(formatter_class=APF, description="copyparty up2k uploader / filesearch tool, " + ver, epilog="""
 NOTE:
 source file/folder selection uses rsync syntax, meaning that:
   "foo" uploads the entire folder to URL/foo/
