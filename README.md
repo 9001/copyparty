@@ -516,7 +516,8 @@ up2k has several advantages:
 * much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
 * the last-modified timestamp of the file is preserved
 
-> it is perfectly safe to restart / upgrade a copyparty server while someone is uploading to it; all known clients will resume just fine
+> it is perfectly safe to restart / upgrade copyparty while someone is uploading to it!  
+> all known up2k clients will resume just fine 💪
 
 see [up2k](#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
 
