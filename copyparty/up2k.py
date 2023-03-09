@@ -2283,8 +2283,17 @@ class Up2k(object):
                     else:
                         # symlink to the client-provided name,
                         # returning the previous upload info
-                        if src in self.busy_aps or (
-                            wark in reg and "done" not in reg[wark]
+                        psrc = src + ".PARTIAL"
+                        if self.args.dotpart:
+                            m = re.match(r"(.*[\\/])(.*)", psrc)
+                            if m:  # always true but...
+                                zs1, zs2 = m.groups()
+                                psrc = zs1 + "." + zs2
+
+                        if (
+                            src in self.busy_aps
+                            or psrc in self.busy_aps
+                            or (wark in reg and "done" not in reg[wark])
                         ):
                             raise Pebkac(
                                 422, "source file busy; please try again later"
