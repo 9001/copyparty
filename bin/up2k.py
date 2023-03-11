@@ -586,8 +586,8 @@ def handshake(ar, file, search):
     return r["hash"], r["sprs"]
 
 
-def upload(file, cid, pw):
-    # type: (File, str, str) -> None
+def upload(file, cid, pw, stats):
+    # type: (File, str, str, str) -> None
     """upload one specific chunk, `cid` (a chunk-hash)"""
 
     headers = {
@@ -595,6 +595,10 @@ def upload(file, cid, pw):
         "X-Up2k-Wark": file.wark,
         "Content-Type": "application/octet-stream",
     }
+
+    if stats:
+        headers["X-Up2k-Stat"] = stats
+
     if pw:
         headers["Cookie"] = "=".join(["cppwd", pw])
 
@@ -663,6 +667,8 @@ class Ctl(object):
             req_ses.verify = ar.te
 
         self.filegen = walkdirs([], ar.files)
+        self.recheck = []  # type: list[File]
+
         if ar.safe:
             self._safe()
         else:
@@ -681,11 +687,11 @@ class Ctl(object):
             self.t0 = time.time()
             self.t0_up = None
             self.spd = None
+            self.eta = "99:99:99"
 
             self.mutex = threading.Lock()
             self.q_handshake = Queue()  # type: Queue[File]
             self.q_upload = Queue()  # type: Queue[tuple[File, str]]
-            self.recheck = []  # type: list[File]
 
             self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
             self.st_up = [None, "(idle, starting...)"]  # type: tuple[File, int]
@@ -727,7 +733,8 @@ class Ctl(object):
                 ncs = len(hs)
                 for nc, cid in enumerate(hs):
                     print("  {0} up {1}".format(ncs - nc, cid))
-                    upload(file, cid, self.ar.a)
+                    stats = "{0}/0/0/{1}".format(nf, self.nfiles - nf)
+                    upload(file, cid, self.ar.a, stats)
 
             print("  ok!")
             if file.recheck:
@@ -802,12 +809,12 @@ class Ctl(object):
                 eta = (self.nbytes - self.up_b) / (spd + 1)
 
             spd = humansize(spd)
-            eta = str(datetime.timedelta(seconds=int(eta)))
+            self.eta = str(datetime.timedelta(seconds=int(eta)))
             sleft = humansize(self.nbytes - self.up_b)
             nleft = self.nfiles - self.up_f
             tail = "\033[K\033[u" if VT100 and not self.ar.ns else "\r"
 
-            t = "{0} eta @ {1}/s, {2}, {3}# left".format(eta, spd, sleft, nleft)
+            t = "{0} eta @ {1}/s, {2}, {3}# left".format(self.eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
 
         if not self.recheck:
@@ -845,7 +852,7 @@ class Ctl(object):
                         zb += quotep(rd.replace(b"\\", b"/"))
                         r = req_ses.get(zb + b"?ls&dots", headers=headers)
                         if not r:
-                            raise Exception("HTTP {}".format(r.status_code))
+                            raise Exception("HTTP {0}".format(r.status_code))
 
                         j = r.json()
                         for f in j["dirs"] + j["files"]:
@@ -988,9 +995,20 @@ class Ctl(object):
                 self.uploader_busy += 1
                 self.t0_up = self.t0_up or time.time()
 
+            zs = "{0}/{1}/{2}/{3} {4}/{5} {6}"
+            stats = zs.format(
+                self.up_f,
+                len(self.recheck),
+                self.uploader_busy,
+                self.nfiles - self.up_f,
+                int(self.nbytes / (1024 * 1024)),
+                int((self.nbytes - self.up_b) / (1024 * 1024)),
+                self.eta,
+            )
+
             file, cid = task
             try:
-                upload(file, cid, self.ar.a)
+                upload(file, cid, self.ar.a, stats)
             except:
                 eprint("upload failed, retrying: {0} #{1}\n".format(file.name, cid[:8]))
                 # handshake will fix it
@@ -1026,7 +1044,7 @@ def main():
     cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 2
     hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
-    ver = "{}, v{}".format(S_BUILD_DT, S_VERSION)
+    ver = "{0}, v{1}".format(S_BUILD_DT, S_VERSION)
     if "--version" in sys.argv:
         print(ver)
         return
@@ -1102,7 +1120,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if ar.a and ar.a.startswith("$"):
         fn = ar.a[1:]
-        print("reading password from file [{}]".format(fn))
+        print("reading password from file [{0}]".format(fn))
         with open(fn, "rb") as f:
             ar.a = f.read().decode("utf-8").strip()
 
