@@ -348,6 +348,8 @@ class SvcHub(object):
         if al.rsp_jtr:
             al.rsp_slp = 0.000001
 
+        al.th_covers = set(al.th_covers.split(","))
+
         return True
 
     def _setlimits(self) -> None:

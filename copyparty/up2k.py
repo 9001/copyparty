@@ -73,6 +73,9 @@ if True:  # pylint: disable=using-constant-test
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
+zs = "avif,avifs,bmp,gif,heic,heics,heif,heifs,ico,j2p,j2k,jp2,jpeg,jpg,jpx,png,tga,tif,tiff,webp"
+CV_EXTS = set(zs.split(","))
+
 
 class Dbw(object):
     def __init__(self, c: "sqlite3.Cursor", n: int, t: float) -> None:
@@ -945,6 +948,7 @@ class Up2k(object):
         unreg: list[str] = []
         files: list[tuple[int, int, str]] = []
         fat32 = True
+        cv = ""
 
         assert self.pp and self.mem_cur
         self.pp.msg = "a{} {}".format(self.pp.n, cdir)
@@ -1007,6 +1011,12 @@ class Up2k(object):
                     continue
 
                 files.append((sz, lmod, iname))
+                liname = iname.lower()
+                if sz and (
+                    iname in self.args.th_covers
+                    or (not cv and liname.rsplit(".", 1)[-1] in CV_EXTS)
+                ):
+                    cv = iname
 
         # folder of 1000 files = ~1 MiB RAM best-case (tiny filenames);
         # free up stuff we're done with before dhashing
@@ -1019,6 +1029,7 @@ class Up2k(object):
                 zh = hashlib.sha1()
                 _ = [zh.update(str(x).encode("utf-8", "replace")) for x in files]
 
+            zh.update(cv.encode("utf-8", "replace"))
             zh.update(spack(b"<d", cst.st_mtime))
             dhash = base64.urlsafe_b64encode(zh.digest()[:12]).decode("ascii")
             sql = "select d from dh where d = ? and h = ?"
@@ -1031,6 +1042,18 @@ class Up2k(object):
 
             if c.fetchone():
                 return ret
+
+        if cv and rd:
+            # mojibake not supported (for performance / simplicity):
+            try:
+                q = "select * from cv where rd=? and dn=? and +fn=?"
+                crd, cdn = rd.rsplit("/", 1) if "/" in rd else ("", rd)
+                if not db.c.execute(q, (crd, cdn, cv)).fetchone():
+                    db.c.execute("delete from cv where rd=? and dn=?", (crd, cdn))
+                    db.c.execute("insert into cv values (?,?,?)", (crd, cdn, cv))
+                    db.n += 1
+            except Exception as ex:
+                self.log("cover {}/{} failed: {}".format(rd, cv, ex), 6)
 
         seen_files = set([x[2] for x in files])  # for dropcheck
         for sz, lmod, fn in files:
@@ -1228,6 +1251,18 @@ class Up2k(object):
         if n_rm2:
             self.log("forgetting {} shadowed deleted files".format(n_rm2))
 
+        # then covers
+        n_rm3 = 0
+        q = "delete from cv where rd=? and dn=? and +fn=?"
+        for crd, cdn, fn in cur.execute("select * from cv"):
+            ap = os.path.join(top, crd, cdn, fn)
+            if not bos.path.exists(ap):
+                c2.execute(q, (crd, cdn, fn))
+                n_rm3 += 1
+
+        if n_rm3:
+            self.log("forgetting {} deleted covers".format(n_rm3))
+
         c2.close()
         return n_rm + n_rm2
 
@@ -1380,6 +1415,7 @@ class Up2k(object):
             cur, _ = reg
             self._set_tagscan(cur, True)
             cur.execute("delete from dh")
+            cur.execute("delete from cv")
             cur.connection.commit()
 
     def _set_tagscan(self, cur: "sqlite3.Cursor", need: bool) -> bool:
@@ -1960,6 +1996,7 @@ class Up2k(object):
 
         if ver == DB_VER:
             try:
+                self._add_cv_tab(cur)
                 self._add_xiu_tab(cur)
                 self._add_dhash_tab(cur)
             except:
@@ -2055,6 +2092,7 @@ class Up2k(object):
 
         self._add_dhash_tab(cur)
         self._add_xiu_tab(cur)
+        self._add_cv_tab(cur)
         self.log("created DB at {}".format(db_path))
         return cur
 
@@ -2100,6 +2138,27 @@ class Up2k(object):
             r"create index iu_w on iu(w)",
         ]:
             cur.execute(cmd)
+
+        cur.connection.commit()
+
+    def _add_cv_tab(self, cur: "sqlite3.Cursor") -> None:
+        # v5b -> v5c
+        try:
+            cur.execute("select rd, dn, fn from cv limit 1").fetchone()
+            return
+        except:
+            pass
+
+        for cmd in [
+            r"create table cv (rd text, dn text, fn text)",
+            r"create index cv_i on cv(rd, dn)",
+        ]:
+            cur.execute(cmd)
+
+        try:
+            cur.execute("delete from dh")
+        except:
+            pass
 
         cur.connection.commit()
 
@@ -2823,6 +2882,16 @@ class Up2k(object):
                 self.xiu_asleep = False
                 with self.rescan_cond:
                     self.rescan_cond.notify_all()
+
+        if rd and sz and fn.lower() in self.args.th_covers:
+            # wasteful; db_add will re-index actual covers
+            # but that won't catch existing files
+            crd, cdn = rd.rsplit("/", 1) if "/" in rd else ("", rd)
+            try:
+                db.execute("delete from cv where rd=? and dn=?", (crd, cdn))
+                db.execute("insert into cv values (?,?,?)", (crd, cdn, fn))
+            except:
+                pass
 
     def handle_rm(self, uname: str, ip: str, vpaths: list[str], lim: list[int]) -> str:
         n_files = 0

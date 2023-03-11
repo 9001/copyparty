@@ -3248,6 +3248,9 @@ class HttpCli(object):
         ):
             raise Pebkac(403)
 
+        e2d = "e2d" in vn.flags
+        e2t = "e2t" in vn.flags
+
         self.html_head = vn.flags.get("html_head", "")
         if vn.flags.get("norobots") or "b" in self.uparam:
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
@@ -3255,16 +3258,37 @@ class HttpCli(object):
             self.out_headers.pop("X-Robots-Tag", None)
 
         is_dir = stat.S_ISDIR(st.st_mode)
+        icur = None
+        if e2t or (e2d and is_dir):
+            idx = self.conn.get_u2idx()
+            icur = idx.get_cur(dbv.realpath)
+
         if self.can_read:
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
                 if is_dir:
-                    for fn in self.args.th_covers.split(","):
-                        fp = os.path.join(abspath, fn)
-                        if bos.path.exists(fp):
-                            vrem = "{}/{}".format(vrem.rstrip("/"), fn).strip("/")
-                            is_dir = False
-                            break
+                    vrem = vrem.rstrip("/")
+                    if icur and vrem:
+                        q = "select fn from cv where rd=? and dn=?"
+                        crd, cdn = vrem.rsplit("/", 1) if "/" in vrem else ("", vrem)
+                        # no mojibake support:
+                        try:
+                            cfn = icur.execute(q, (crd, cdn)).fetchone()
+                            if cfn:
+                                fn = cfn[0]
+                                fp = os.path.join(abspath, fn)
+                                if bos.path.exists(fp):
+                                    vrem = "{}/{}".format(vrem, fn).strip("/")
+                                    is_dir = False
+                        except:
+                            pass
+                    else:
+                        for fn in self.args.th_covers:
+                            fp = os.path.join(abspath, fn)
+                            if bos.path.exists(fp):
+                                vrem = "{}/{}".format(vrem, fn).strip("/")
+                                is_dir = False
+                                break
 
                     if is_dir:
                         return self.tx_ico("a.folder")
@@ -3371,8 +3395,8 @@ class HttpCli(object):
             "taglist": [],
             "srvinf": srv_infot,
             "acct": self.uname,
-            "idx": ("e2d" in vn.flags),
-            "itag": ("e2t" in vn.flags),
+            "idx": e2d,
+            "itag": e2t,
             "lifetime": vn.flags.get("lifetime") or 0,
             "frand": bool(vn.flags.get("rand")),
             "perms": perms,
@@ -3391,8 +3415,8 @@ class HttpCli(object):
             "taglist": [],
             "def_hcols": [],
             "have_emp": self.args.emp,
-            "have_up2k_idx": ("e2d" in vn.flags),
-            "have_tags_idx": ("e2t" in vn.flags),
+            "have_up2k_idx": e2d,
+            "have_tags_idx": e2t,
             "have_acode": (not self.args.no_acode),
             "have_mv": (not self.args.no_mv),
             "have_del": (not self.args.no_del),
@@ -3467,11 +3491,6 @@ class HttpCli(object):
         # show dotfiles if permitted and requested
         if not self.args.ed or "dots" not in self.uparam:
             ls_names = exclude_dotfiles(ls_names)
-
-        icur = None
-        if "e2t" in vn.flags:
-            idx = self.conn.get_u2idx()
-            icur = idx.get_cur(dbv.realpath)
 
         add_fk = vn.flags.get("fk")
 

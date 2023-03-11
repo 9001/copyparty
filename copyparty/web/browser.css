@@ -93,6 +93,7 @@
 	--g-fsel-bg: #d39;
 	--g-fsel-b1: #f4a;
 	--g-fsel-ts: #804;
+	--g-dfg: var(--srv-3);
 	--g-fg: var(--a-hil);
 	--g-bg: var(--bg-u2);
 	--g-b1: var(--bg-u4);
@@ -327,6 +328,7 @@ html.c {
 }
 html.cz {
 	--bgg: var(--bg-u2);
+	--srv-3: #fff;
 }
 html.cy {
 	--fg: #fff;
@@ -354,6 +356,7 @@ html.cy {
 	--chk-fg: #fd0;
 
 	--srv-1: #f00;
+	--srv-3: #fff;
 	--op-aa-bg: #fff;
 
 	--u2-b1-bg: #f00;
@@ -964,6 +967,9 @@ html.y #path a:hover {
 #ggrid>a.dir:before {
 	content: '📂';
 }
+#ggrid>a.dir>span {
+	color: var(--g-dfg);
+}
 #ggrid>a.au:before {
 	content: '💾';
 }
@@ -1009,6 +1015,9 @@ html.np_open #ggrid>a.au:before {
 	background: #f3c;
 	background: var(--g-sel-bg);
 	border-color: var(--g-sel-b1);
+}
+#ggrid>a.sel>span {
+	color: var(--g-sel-fg);
 }
 #ggrid>a.sel,
 #ggrid>a[tt].sel {
