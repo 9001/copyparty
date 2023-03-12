@@ -30,6 +30,9 @@ if possible, for performance and security reasons, please use this instead:
 https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
 """
 
+if sys.maxsize > 2 ** 32:
+    v = v.replace("32-bit", "64-bit")
+
 try:
     print(v.replace("\n", "\n▒▌ ")[1:] + "\n")
 except:

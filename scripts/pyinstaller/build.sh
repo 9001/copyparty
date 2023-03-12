@@ -9,11 +9,14 @@ tee build2.sh | cmp build.sh && rm build2.sh || {
     [[ $r =~ [yY] ]] && mv build{2,}.sh && exec ./build.sh
 }
 
-./up2k.sh
+[ -e up2k.sh ] && ./up2k.sh
 
-uname -s | grep WOW64 && m= || m=32
+uname -s | grep WOW64 && m=64 || m=32
 uname -s | grep NT-10 && w10=1 || w7=1
 [ $w7 ] && pyv=37 || pyv=311
+esuf=
+[ $w7 ] && [ $m = 32 ] && esuf=32
+[ $w7 ] && [ $m = 64 ] && esuf=-winpe64
 
 appd=$(cygpath.exe "$APPDATA")
 spkgs=$appd/Python/Python$pyv/site-packages
@@ -59,8 +62,7 @@ read a b c d _ < <(
     sed -r 's/[^0-9]+//;s/[" )]//g;s/[-,]/ /g;s/$/ 0/'
 )
 sed -r 's/1,2,3,0/'$a,$b,$c,$d'/;s/1\.2\.3/'$a.$b.$c/ <loader.rc >loader.rc2
-[ $m ] &&
-    sed -ri 's/copyparty.exe/copyparty32.exe/' loader.rc2
+sed -ri s/copyparty.exe/copyparty$esuf.exe/ loader.rc2
 
 excl=(
     copyparty.broker_mp
@@ -105,4 +107,4 @@ base64 | head -c12 >> dist/copyparty.exe
 
 dist/copyparty.exe --version
 
-curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/copyparty$m.exe
+curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/copyparty$esuf.exe
