@@ -1263,6 +1263,7 @@ class Up2k(object):
         if n_rm3:
             self.log("forgetting {} deleted covers".format(n_rm3))
 
+        c2.connection.commit()
         c2.close()
         return n_rm + n_rm2
 

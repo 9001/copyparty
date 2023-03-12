@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.4"
-S_BUILD_DT = "2023-03-08"
+S_VERSION = "1.5"
+S_BUILD_DT = "2023-03-12"
 
 """
 up2k.py: upload to copyparty

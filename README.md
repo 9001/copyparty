@@ -1,4 +1,4 @@
-# ⇆🎉 copyparty
+# 💾🎉 copyparty
 
 * portable file sharing hub (py2/py3) [(on PyPI)](https://pypi.org/project/copyparty/)
 * MIT-Licensed, 2019-05-26, ed @ irc.rizon.net
@@ -1394,7 +1394,7 @@ can be convenient on machines where installing python is problematic, however is
 
 * dangerous: [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) is compatible with [windows7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png), which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and should never be exposed to the internet (LAN is fine)
 
-* dangerous and deprecated: [copyparty64.exe](https://github.com/9001/copyparty/releases/download/v1.6.5/copyparty64.exe) lets you [run copyparty in WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png) and is otherwise completely useless
+* dangerous and deprecated: [copyparty-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.6.8/copyparty-winpe64.exe) lets you [run copyparty in WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png) and is otherwise completely useless
 
 meanwhile [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) instead relies on your system python which gives better performance and will stay safe as long as you keep your python install up-to-date
 

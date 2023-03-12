@@ -1,4 +1,40 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0305-2018  `v1.6.7`  fix no-dedup + add up2k.exe
+
+## new features
+* controlpanel-connect: add example for webdav automount
+
+## bugfixes
+* fix a race which, in worst case (but unlikely on linux), **could cause data loss**
+  * could only happen if `--no-dedup` or volflag `copydupes` was set (**not** default)
+  * if two identical files were uploaded at the same time, there was a small chance that one of the files would become empty
+  * check if you were affected by doing a search for zero-byte files using either of the following:
+    * https://127.0.0.1:3923/#q=size%20%3D%200
+    * `find -type f -size 0`
+  * let me know if you lost something important and had logging enabled!
+* ftp: mkdir can do multiple levels at once (support filezilla)
+* fix flickering toast on upload finish
+* `[💤]` (upload-baton) could disengage if chrome decides to pause the background tab for 10sec (which it sometimes does)
+
+----
+
+## introducing [up2k.exe](https://github.com/9001/copyparty/releases/latest/download/up2k.exe)
+
+the commandline up2k upload / filesearch client, now as a standalone windows exe
+* based on python 3.7 so it runs on 32bit windows7 or anything newer
+* *no https support* (saves space + the python3.7 openssl is getting old)
+* built from b39ff92f34e3fca389c78109d20d5454af761f8e so it can do long filepaths and mojibake
+
+----
+
+⭐️ **you probably want [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) below;**
+the exe is [not recommended](https://github.com/9001/copyparty#copypartyexe) for longterm use
+and the zip and tar.gz files are source code
+(python packages are available at [PyPI](https://pypi.org/project/copyparty/#files))
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0226-2030  `v1.6.6`  r 2 0 0
 
 two hundred releases wow
