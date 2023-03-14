@@ -165,11 +165,15 @@ firewall-cmd --reload
   * ☑ [smb/cifs server](#smb-server)
   * ☑ [qr-code](#qr-code) for quick access
   * ☑ [upnp / zeroconf / mdns / ssdp](#zeroconf)
+  * ☑ [event hooks](#event-hooks) / script runner
+  * ☑ [reverse-proxy support](https://github.com/9001/copyparty#reverse-proxy)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
     * unaffected by cloudflare's max-upload-size (100 MiB)
   * ☑ stash: simple PUT filedropper
+  * ☑ filename randomizer
+  * ☑ write-only folders
   * ☑ [unpost](#unpost): undo/delete accidental uploads
   * ☑ [self-destruct](#self-destruct) (specified server-side or client-side)
   * ☑ symlink/discard existing files (content-matching)
@@ -193,9 +197,14 @@ firewall-cmd --reload
   * ☑ [locate files by contents](#file-search)
   * ☑ search by name/path/date/size
   * ☑ [search by ID3-tags etc.](#searching)
+* client support
+  * ☑ [sync folder to server](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy)
+  * ☑ [curl-friendly](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png)
 * markdown
   * ☑ [viewer](#markdown-viewer)
   * ☑ editor (sure why not)
+
+PS: something missing? post any crazy ideas you've got as a [feature request](https://github.com/9001/copyparty/issues/new?assignees=9001&labels=enhancement&template=feature_request.md) or [discussion](https://github.com/9001/copyparty/discussions/new?category=ideas) 🤙
 
 
 ## testimonials
