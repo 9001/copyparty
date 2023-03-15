@@ -1251,12 +1251,15 @@ class Up2k(object):
         if n_rm2:
             self.log("forgetting {} shadowed deleted files".format(n_rm2))
 
+        c2.connection.commit()
+
         # then covers
         n_rm3 = 0
+        qu = "select 1 from up where rd=? and +fn=? limit 1"
         q = "delete from cv where rd=? and dn=? and +fn=?"
         for crd, cdn, fn in cur.execute("select * from cv"):
-            ap = os.path.join(top, crd, cdn, fn)
-            if not bos.path.exists(ap):
+            urd = vjoin(crd, cdn)
+            if not c2.execute(qu, (urd, fn)).fetchone():
                 c2.execute(q, (crd, cdn, fn))
                 n_rm3 += 1
 
