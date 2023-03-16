@@ -12,7 +12,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * browse/upload with [IE4](#browser-support) / netscape4.0 on win3.11 (heh)
 * protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
 
-try the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
+**[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
 
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
@@ -108,6 +108,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 
 * or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
+* or if you are on android, [install copyparty in termux](#install-on-android)
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:
 

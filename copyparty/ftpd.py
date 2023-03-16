@@ -129,6 +129,7 @@ class FtpFs(AbstractedFS):
 
     def die(self, msg):
         self.h.die(msg)
+        raise Exception()
 
     def v2a(
         self,

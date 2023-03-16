@@ -1,4 +1,44 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0312-1610  `v1.6.8`  folder thumbs
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+## new features
+* folder thumbnails are indexed in the db
+  * now supports non-lowercase names (`Cover.jpg`, `Folder.JPG`)
+  * folders without a specific cover/folder image will show the first pic inside
+* when audio playback continues into an empty folder, keep trying for a bit
+* add no-index hints (google etc) in basic-browser HTML (`?b`, `?b=u`)
+* [commandline uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) supports long filenames on win7
+
+## bugfixes
+* rotated logfiles didn't get xz compressed
+* image-gallery links pointing to a deleted image shows an error instead of a crashpage
+
+## other changes
+* folder thumbnails have purple text to differentiate from files
+* `copyparty32.exe` starts 30% faster (but is 6% larger)
+
+----
+
+# what to download?
+| download link | is it good? | description |
+| -- | -- | -- |
+| **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** | ✅ the best 👍 | runs anywhere! only needs python |
+| [a docker image](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker/README.md) | it's ok | good if you prefer docker 🐋 |
+| [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) |  ⚠️ [acceptable](https://github.com/9001/copyparty#copypartyexe) | for [win8](https://user-images.githubusercontent.com/241032/221445946-1e328e56-8c5b-44a9-8b9f-dee84d942535.png) or later; built-in thumbnailer |
+| [up2k.exe](https://github.com/9001/copyparty/releases/latest/download/up2k.exe) | ⚠️ acceptable | [CLI uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) as a win7+ exe ([video](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm)) |
+| [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) | ⛔️ [dangerous](https://github.com/9001/copyparty#copypartyexe) | for [win7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png) -- never expose to the internet! |
+| [cpp-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.6.8/copyparty-winpe64.exe) | ⛔️ dangerous | runs on [64bit WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png), otherwise useless |
+
+* except for [up2k.exe](https://github.com/9001/copyparty/releases/latest/download/up2k.exe), all of the options above are equivalent
+* the zip and tar.gz files below are just source code
+* python packages are available at [PyPI](https://pypi.org/project/copyparty/#files)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0305-2018  `v1.6.7`  fix no-dedup + add up2k.exe
 
 ## new features
