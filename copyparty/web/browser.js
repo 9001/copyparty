@@ -1281,6 +1281,7 @@ function set_files_html(html) {
 
 
 var ACtx = window.AudioContext || window.webkitAudioContext,
+	noih = /[?&]v\b/.exec('' + location),
 	hash0 = location.hash,
 	mp;
 
@@ -5503,7 +5504,7 @@ var treectl = (function () {
 	}
 
 	r.chk_index_html = function (top, res) {
-		if (!r.idxh || !res || !res.files)
+		if (!r.idxh || !res || !res.files || noih)
 			return;
 
 		for (var a = 0; a < res.files.length; a++)

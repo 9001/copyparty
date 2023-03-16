@@ -3570,7 +3570,11 @@ class HttpCli(object):
                 files.append(item)
                 item["rd"] = rem
 
-        if self.cookies.get("idxh") == "y":
+        if (
+            self.cookies.get("idxh") == "y"
+            and "ls" not in self.uparam
+            and "v" not in self.uparam
+        ):
             idx_html = set(["index.htm", "index.html"])
             for item in files:
                 if item["name"] in idx_html:
