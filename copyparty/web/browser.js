@@ -193,6 +193,7 @@ var Ls = {
 		"ct_dots": "show hidden files (if server permits)",
 		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
+		"ct_idxh": "show index.html instead of folder listing",
 		"ct_sbars": "show scrollbars",
 
 		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them",
@@ -652,6 +653,7 @@ var Ls = {
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
 		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
+		"ct_idxh": "vis index.html istedenfor fil-liste",
 		"ct_sbars": "vis rullgardiner / skrollefelt",
 
 		"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres",
@@ -1083,6 +1085,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
+	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '">htm</a>\n' +
 	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '">⟊</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -4986,6 +4989,7 @@ var treectl = (function () {
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
+	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
 		r.goto(get_evpath());
@@ -5009,6 +5013,16 @@ var treectl = (function () {
 		reload_tree();
 	}
 	setwrap(r.wtree);
+
+	function setidxh(v) {
+		if (!v == !/\bidxh=y\b/.exec('' + document.cookie))
+			return;
+
+		var xhr = new XHR();
+		xhr.open('GET', SR + '/?setck=idxh=' + (v ? 'y' : 'n'), true);
+		xhr.send();
+	}
+	setidxh(r.idxh);
 
 	r.entree = function (e, nostore) {
 		ev(e);
@@ -5438,6 +5452,9 @@ var treectl = (function () {
 			return;
 		}
 
+		if (r.chk_index_html(this.top, res))
+			return;
+
 		for (var a = 0; a < res.files.length; a++)
 			if (res.files[a].tags === undefined)
 				res.files[a].tags = {};
@@ -5484,6 +5501,17 @@ var treectl = (function () {
 			fun();
 		}
 	}
+
+	r.chk_index_html = function (top, res) {
+		if (!r.idxh || !res || !res.files)
+			return;
+
+		for (var a = 0; a < res.files.length; a++)
+			if (/^index.html?(\?|$)/i.exec(res.files[a].href)) {
+				window.location = vjoin(top, res.files[a].href);
+				return true;
+			}
+	};
 
 	r.gentab = function (top, res) {
 		var nodes = res.dirs.concat(res.files),
@@ -5605,14 +5633,18 @@ var treectl = (function () {
 		qsr('#bbsw');
 		if (ls0 === null) {
 			var xhr = new XHR();
-			xhr.open('GET', SR + '/?am_js', true);
+			xhr.open('GET', SR + '/?setck=js=y', true);
 			xhr.send();
 
 			r.ls_cb = showfile.addlinks;
 			return r.reqls(get_evpath(), false);
 		}
 
-		r.gentab(get_evpath(), ls0);
+		var top = get_evpath();
+		if (r.chk_index_html(top, ls0))
+			return;
+
+		r.gentab(top, ls0);
 		pbar.onresize();
 		vbar.onresize();
 		showfile.addlinks();

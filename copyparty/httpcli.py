@@ -778,8 +778,8 @@ class HttpCli(object):
             if "k304" in self.uparam:
                 return self.set_k304()
 
-            if "am_js" in self.uparam:
-                return self.set_am_js()
+            if "setck" in self.uparam:
+                return self.setck()
 
             if "reset" in self.uparam:
                 return self.set_cfg_reset()
@@ -2896,15 +2896,16 @@ class HttpCli(object):
         self.redirect("", "?h#cc")
         return True
 
-    def set_am_js(self) -> bool:
-        v = "n" if self.uparam["am_js"] == "n" else "y"
-        ck = gencookie("js", v, self.args.R, False, 86400 * 299)
+    def setck(self) -> bool:
+        k, v = self.uparam["setck"].split("=", 1)
+        t = None if v == "" else 86400 * 299
+        ck = gencookie(k, v, self.args.R, False, t)
         self.out_headerlist.append(("Set-Cookie", ck))
-        self.reply(b"promoted\n")
+        self.reply(b"o7\n")
         return True
 
     def set_cfg_reset(self) -> bool:
-        for k in ("k304", "js", "cppwd", "cppws"):
+        for k in ("k304", "js", "idxh", "cppwd", "cppws"):
             cookie = gencookie(k, "x", self.args.R, False, None)
             self.out_headerlist.append(("Set-Cookie", cookie))
 
@@ -3433,6 +3434,7 @@ class HttpCli(object):
             "dtheme": self.args.theme,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
+            "idxh": int(self.args.ih),
             "u2sort": self.args.u2sort,
         }
 
@@ -3565,6 +3567,16 @@ class HttpCli(object):
             else:
                 files.append(item)
                 item["rd"] = rem
+
+        if self.cookies.get("idxh") == "y":
+            idx_html = set(["index.htm", "index.html"])
+            for item in files:
+                if item["name"] in idx_html:
+                    # do full resolve in case of shadowed file
+                    vp = vjoin(self.vpath.split("?")[0], item["name"])
+                    vn, rem = self.asrv.vfs.get(vp, self.uname, True, False)
+                    ap = vn.canonical(rem)
+                    return self.tx_file(ap)  # is no-cache
 
         tagset: set[str] = set()
         for fe in files:

@@ -632,6 +632,29 @@ function vsplit(vp) {
 }
 
 
+function vjoin(p1, p2) {
+    if (!p1)
+        p1 = '';
+
+    if (!p2)
+        p2 = '';
+
+    if (p1.endsWith('/'))
+        p1 = p1.slice(0, -1);
+
+    if (p2.startsWith('/'))
+        p2 = p2.slice(1);
+
+    if (!p1)
+        return p2;
+
+    if (!p2)
+        return p1;
+
+    return p1 + '/' + p2;
+}
+
+
 function uricom_enc(txt, do_fb_enc) {
     try {
         return encodeURIComponent(txt);
