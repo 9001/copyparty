@@ -796,6 +796,8 @@ html.y #path a:hover {
 }
 .logue {
 	padding: .2em 0;
+	position: relative;
+	z-index: 1;
 }
 .logue.hidden,
 .logue:empty {
