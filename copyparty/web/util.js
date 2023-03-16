@@ -1206,13 +1206,13 @@ var tt = (function () {
         r.th.style.top = (e.pageY + 12 * sy) + 'px';
     };
 
-    if (IPHONE) {
+    if (TOUCH) {
         var f1 = r.show,
             f2 = r.hide,
             q = [];
 
         // if an onclick-handler creates a new timer,
-        // iOS 13.1.2 delays the entire handler by up to 401ms,
+        // webkits delay the entire handler by up to 401ms,
         // win by using a shared timer instead
 
         timer.add(function () {
