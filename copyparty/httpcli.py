@@ -1757,12 +1757,13 @@ class HttpCli(object):
             hits = idx.fsearch(vols, body)
             msg: Any = repr(hits)
             taglist: list[str] = []
+            trunc = False
         else:
             # search by query params
             q = body["q"]
             n = body.get("n", self.args.srch_hits)
             self.log("qj: {} |{}|".format(q, n))
-            hits, taglist = idx.search(vols, q, n)
+            hits, taglist, trunc = idx.search(vols, q, n)
             msg = len(hits)
 
         idx.p_end = time.time()
@@ -1782,7 +1783,8 @@ class HttpCli(object):
             for hit in hits:
                 hit["rp"] = self.args.RS + hit["rp"]
 
-        r = json.dumps({"hits": hits, "tag_order": order}).encode("utf-8")
+        rj = {"hits": hits, "tag_order": order, "trunc": trunc}
+        r = json.dumps(rj).encode("utf-8")
         self.reply(r, mime="application/json")
         return True
 

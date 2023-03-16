@@ -120,10 +120,10 @@ class U2idx(object):
 
     def search(
         self, vols: list[tuple[str, str, dict[str, Any]]], uq: str, lim: int
-    ) -> tuple[list[dict[str, Any]], list[str]]:
+    ) -> tuple[list[dict[str, Any]], list[str], bool]:
         """search by query params"""
         if not HAVE_SQLITE3:
-            return [], []
+            return [], [], False
 
         q = ""
         v: Union[str, int] = ""
@@ -275,7 +275,7 @@ class U2idx(object):
         have_up: bool,
         have_mt: bool,
         lim: int,
-    ) -> tuple[list[dict[str, Any]], list[str]]:
+    ) -> tuple[list[dict[str, Any]], list[str], bool]:
         done_flag: list[bool] = []
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
@@ -316,9 +316,6 @@ class U2idx(object):
             c = cur.execute(uq, tuple(vuv))
             for hit in c:
                 w, ts, sz, rd, fn, ip, at = hit[:7]
-                lim -= 1
-                if lim < 0:
-                    break
 
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
@@ -346,6 +343,10 @@ class U2idx(object):
                         )[:fk]
                     )
 
+                lim -= 1
+                if lim < 0:
+                    break
+
                 seen_rps.add(rp)
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16]})
 
@@ -368,7 +369,7 @@ class U2idx(object):
 
         ret.sort(key=itemgetter("rp"))
 
-        return ret, list(taglist.keys())
+        return ret, list(taglist.keys()), lim < 0
 
     def terminator(self, identifier: str, done_flag: list[bool]) -> None:
         for _ in range(self.timeout):
