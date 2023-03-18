@@ -11,17 +11,11 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * server only needs Python (`2.7` or `3.3+`), all dependencies optional
 * browse/upload with [IE4](#browser-support) / netscape4.0 on win3.11 (heh)
 * protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
+* [android app](#android-app) and [iPhone shortcuts](#ios-shortcuts)
 
 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
 
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
-
-
-## get the app
-
-<a href="https://f-droid.org/packages/me.ocv.partyup/"><img src="https://ocv.me/fdroid.png" alt="Get it on F-Droid" height="50" /> '' <img src="https://img.shields.io/f-droid/v/me.ocv.partyup.svg" alt="f-droid version info" /></a> '' <a href="https://github.com/9001/party-up"><img src="https://img.shields.io/github/release/9001/party-up.svg?logo=github" alt="github version info" /></a>
-
-(the app is **NOT** the full copyparty server! just a basic upload client, nothing fancy yet)
 
 
 ## readme toc
@@ -83,6 +77,8 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
+* [android app](#android-app) - upload to copyparty with one tap
+* [iOS shortcuts](#iOS-shortcuts) - there is no iPhone app, but
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
     * [client-side](#client-side) - when uploading files
 * [security](#security) - some notes on hardening
@@ -1225,6 +1221,27 @@ alternatively, some alternatives roughly sorted by speed (unreproducible benchma
 most clients will fail to mount the root of a copyparty server unless there is a root volume (so you get the admin-panel instead of a browser when accessing it) -- in that case, mount a specific volume instead
 
 
+# android app
+
+upload to copyparty with one tap
+
+<a href="https://f-droid.org/packages/me.ocv.partyup/"><img src="https://ocv.me/fdroid.png" alt="Get it on F-Droid" height="50" /> '' <img src="https://img.shields.io/f-droid/v/me.ocv.partyup.svg" alt="f-droid version info" /></a> '' <a href="https://github.com/9001/party-up"><img src="https://img.shields.io/github/release/9001/party-up.svg?logo=github" alt="github version info" /></a>
+
+the app is **NOT** the full copyparty server! just a basic upload client, nothing fancy yet
+
+if you want to run the copyparty server on your android device, see [install on android](#install-on-android)
+
+
+# iOS shortcuts
+
+there is no iPhone app, but  the following shortcuts are almost just as good:
+
+* [upload to copyparty](https://www.icloud.com/shortcuts/41e98dd985cb4d3bb433222bc1e9e770) ([offline](https://github.com/9001/copyparty/raw/hovudstraum/contrib/ios/upload-to-copyparty.shortcut)) ([png](https://user-images.githubusercontent.com/241032/226118053-78623554-b0ed-482e-98e4-6d57ada58ea4.png)) based on the [original](https://www.icloud.com/shortcuts/ab415d5b4de3467b9ce6f151b439a5d7) by [Daedren](https://github.com/Daedren) (thx!)
+  * can strip exif, upload files, pics, vids, links, clipboard
+  * can download links and rehost the target file on copyparty (see first comment inside the shortcut)
+  * pics become lowres if you share from gallery to shortcut, so better to launch the shortcut and pick stuff from there
+
+
 # performance
 
 defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
@@ -1387,7 +1404,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 the self-contained "binary"  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
 
-you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack](#./docs/devnotes.md#sfx-repack)
+you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack](./docs/devnotes.md#sfx-repack)
 
 
 ## copyparty.exe
