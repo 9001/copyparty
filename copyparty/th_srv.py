@@ -561,11 +561,18 @@ class ThumbSrv(object):
         if "ac" not in ret:
             raise Exception("not audio")
 
+        try:
+            dur = ret[".dur"][1]
+        except:
+            dur = 0
+
         src_opus = abspath.lower().endswith(".opus") or ret["ac"][1] == "opus"
         want_caf = tpath.endswith(".caf")
         tmp_opus = tpath
         if want_caf:
             tmp_opus = tpath.rsplit(".", 1)[0] + ".opus"
+
+        caf_src = abspath if src_opus else tmp_opus
 
         if not want_caf or (not src_opus and not bos.path.isfile(tmp_opus)):
             # fmt: off
@@ -584,7 +591,32 @@ class ThumbSrv(object):
             # fmt: on
             self._run_ff(cmd)
 
-        if want_caf:
+        # iOS fails to play some "insufficiently complex" files
+        # (average file shorter than 8 seconds), so of course we
+        # fix that by mixing in some inaudible pink noise :^)
+        # 6.3 sec seems like the cutoff so lets do 7, and
+        # 7 sec of psyqui-musou.opus @ 3:50 is 174 KiB
+        if want_caf and (dur < 20 or bos.path.getsize(caf_src) < 256 * 1024):
+            # fmt: off
+            cmd = [
+                b"ffmpeg",
+                b"-nostdin",
+                b"-v", b"error",
+                b"-hide_banner",
+                b"-i", fsenc(abspath),
+                b"-filter_complex", b"anoisesrc=a=0.001:d=7:c=pink,asplit[l][r]; [l][r]amerge[s]; [0:a:0][s]amix",
+                b"-map_metadata", b"-1",
+                b"-ac", b"2",
+                b"-c:a", b"libopus",
+                b"-b:a", b"128k",
+                b"-f", b"caf",
+                fsenc(tpath)
+            ]
+            # fmt: on
+            self._run_ff(cmd)
+
+        elif want_caf:
+            # simple remux should be safe
             # fmt: off
             cmd = [
                 b"ffmpeg",
