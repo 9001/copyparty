@@ -17,6 +17,7 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
 
 ### ...in reviews:
 * ✅ = advantages over copyparty
+  * 💾 = what copyparty offers as an alternative
 * 🔵 = similarities
 * ⚠️ = disadvantages (something copyparty does "better")
 
@@ -46,6 +47,7 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
     * [kodbox](#kodbox)
     * [filebrowser](#filebrowser)
     * [filegator](#filegator)
+    * [sftpgo](#sftpgo)
     * [updog](#updog)
     * [goshs](#goshs)
     * [gimme-that](#gimme-that)
@@ -53,6 +55,7 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
     * [linx](#linx)
     * [h5ai](#h5ai)
     * [autoindex](#autoindex)
+    * [miniserve](#miniserve)
 * [briefly considered](#briefly-considered)
 
 
@@ -89,6 +92,7 @@ the softwares,
 * `i` = [kodbox](https://github.com/kalcaddle/kodbox)
 * `j` = [filebrowser](https://github.com/filebrowser/filebrowser)
 * `k` = [filegator](https://github.com/filegator/filegator)
+* `l` = [sftpgo](https://github.com/drakkan/sftpgo)
 
 some softwares not in the matrixes,
 * [updog](#updog)
@@ -96,6 +100,9 @@ some softwares not in the matrixes,
 * [gimme-that](#gimmethat)
 * [ass](#ass)
 * [linx](#linx)
+* [h5ai](#h5ai)
+* [autoindex](#autoindex)
+* [miniserve](#miniserve)
 
 symbol legend,
 * `█` = absolutely
@@ -106,62 +113,64 @@ symbol legend,
 
 ## general
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - |
-| intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | 
-| config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | 
-| good documentation      |   |   |   | █ | █ | █ | █ |   |   | █ | █ |
-| runs on iOS             | ╱ |   |   |   |   | ╱ |   |   |   |   |   |
-| runs on Android         | █ |   |   |   |   | █ |   |   |   |   |   |
-| runs on WinXP           | █ | █ |   |   |   | █ |   |   |   |   |   |
-| runs on Windows         | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ | █ |
-| runs on Linux           | █ | ╱ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| runs on Macos           | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| runs on FreeBSD         | █ |   |   | • | █ | █ | █ | • | █ | █ |   |
-| portable binary         | █ | █ | █ |   |   | █ | █ |   |   | █ |   |
-| zero setup, just go     | █ | █ | █ |   |   | ╱ | █ |   |   | █ |   |
-| android app             | ╱ |   |   | █ | █ |   |   |   |   |   |   |
-| iOS app                 |   |   |   | █ | █ |   |   |   |   |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
+| intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | █ |
+| config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ |
+| good documentation      |   |   |   | █ | █ | █ | █ |   |   | █ | █ | ╱ |
+| runs on iOS             | ╱ |   |   |   |   | ╱ |   |   |   |   |   |   |
+| runs on Android         | █ |   |   |   |   | █ |   |   |   |   |   |   |
+| runs on WinXP           | █ | █ |   |   |   | █ |   |   |   |   |   |   |
+| runs on Windows         | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ |
+| runs on Linux           | █ | ╱ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| runs on Macos           | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| runs on FreeBSD         | █ |   |   | • | █ | █ | █ | • | █ | █ |   | █ |
+| portable binary         | █ | █ | █ |   |   | █ | █ |   |   | █ |   | █ |
+| zero setup, just go     | █ | █ | █ |   |   | ╱ | █ |   |   | █ |   | ╱ |
+| android app             | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |
+| iOS app                 | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |
 
 * `zero setup` = you can get a mostly working setup by just launching the app, without having to install any software or configure whatever
 * `a`/copyparty remarks:
   * no gui for server settings; only for client-side stuff
   * can theoretically run on iOS / iPads using [iSH](https://ish.app/), but only the iPad will offer sufficient multitasking i think
   * [android app](https://f-droid.org/en/packages/me.ocv.partyup/) is for uploading only
+  * no iOS app but has [shortcuts](https://github.com/9001/copyparty#ios-shortcuts) for easy uploading
 * `b`/hfs2 runs on linux through wine
 * `f`/rclone must be started with the command `rclone serve webdav .` or similar
 * `h`/chibisafe has undocumented windows support
+* `i`/sftpgo must be launched with a command
 
 
 ## file transfer
 
 *the thing that copyparty is actually kinda good at*
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - |
-| download folder as zip  | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ |
-| download folder as tar  | █ |   |   |   |   |   |   |   |   | █ |   |
-| upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| parallel uploads        | █ |   |   | █ | █ |   | • |   | █ |   | █ |
-| resumable uploads       | █ |   |   |   |   |   |   |   | █ |   | █ |
-| upload segmenting       | █ |   |   |   |   |   |   | █ | █ |   | █ |
-| upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |
-| upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |
-| upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |
-| upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ |
-| keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   |
-| upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ |
-| ┗ max disk usage        | █ | █ |   |   | █ |   |   |   | █ |   |   |
-| ┗ max filesize          | █ |   |   |   |   |   |   | █ |   |   | █ |
-| ┗ max items in folder   | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ max file age          | █ |   |   |   |   |   |   |   | █ |   |   |
-| ┗ max uploads over time | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ compress before write | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ randomize filename    | █ |   |   |   |   |   |   | █ | █ |   |   |
-| ┗ mimetype reject-list  | ╱ |   |   |   |   |   |   |   | • | ╱ |   |
-| ┗ extension reject-list | ╱ |   |   |   |   |   |   | █ | • | ╱ |   |
-| checksums provided      |   |   |   | █ | █ |   |   |   | █ | ╱ |   |
-| cloud storage backend   | ╱ | ╱ | ╱ | █ | █ | █ | ╱ |   |   | ╱ | █ |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
+| download folder as zip  | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ | █ |
+| download folder as tar  | █ |   |   |   |   |   |   |   |   | █ |   |   |
+| upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| parallel uploads        | █ |   |   | █ | █ |   | • |   | █ |   | █ |   |
+| resumable uploads       | █ |   |   |   |   |   |   |   | █ |   | █ | ╱ |
+| upload segmenting       | █ |   |   |   |   |   |   | █ | █ |   | █ | ╱ |
+| upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |   |
+| upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |
+| upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |
+| upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ | ╱ |
+| keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |
+| upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ |
+| ┗ max disk usage        | █ | █ |   |   | █ |   |   |   | █ |   |   | █ |
+| ┗ max filesize          | █ |   |   |   |   |   |   | █ |   |   | █ | █ |
+| ┗ max items in folder   | █ |   |   |   |   |   |   |   |   |   |   | ╱ |
+| ┗ max file age          | █ |   |   |   |   |   |   |   | █ |   |   |   |
+| ┗ max uploads over time | █ |   |   |   |   |   |   |   |   |   |   | ╱ |
+| ┗ compress before write | █ |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ randomize filename    | █ |   |   |   |   |   |   | █ | █ |   |   |   |
+| ┗ mimetype reject-list  | ╱ |   |   |   |   |   |   |   | • | ╱ |   | ╱ |
+| ┗ extension reject-list | ╱ |   |   |   |   |   |   | █ | • | ╱ |   | ╱ |
+| checksums provided      |   |   |   | █ | █ |   |   |   | █ | ╱ |   |   |
+| cloud storage backend   | ╱ | ╱ | ╱ | █ | █ | █ | ╱ |   |   | ╱ | █ | █ |
 
 * `upload segmenting` = files are sliced into chunks, making it possible to upload files larger than 100 MiB on cloudflare for example
 
@@ -178,25 +187,29 @@ symbol legend,
   * can provide checksums for single files on request
   * can probably do extension/mimetype rejection similar to copyparty
 * `k`/filegator download-as-zip is not streaming; it creates the full zipfile before download can start
+* `l`/sftpgo:
+  * resumable/segmented uploads only over SFTP, not over HTTP
+  * upload rules are totals only, not over time
+  * can probably do extension/mimetype rejection similar to copyparty
 
 
 ## protocols and client support
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - |
-| serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   |
-| serve ftp               | █ |   |   |   |   | █ |   |   |   |   |   |
-| serve ftps              | █ |   |   |   |   | █ |   |   |   |   |   |
-| serve sftp              |   |   |   |   |   | █ |   |   |   |   |   |
-| serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |
-| serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |
-| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ |   | █ |
-| zeroconf                | █ |   |   |   |   |   |   |   |   |   |   |
-| supports netscape 4     | ╱ |   |   |   |   | █ |   |   |   |   | • |
-| ...internet explorer 6  | ╱ | █ |   | █ |   | █ |   |   |   |   | • |
-| mojibake filenames      | █ |   |   | • | • | █ | █ | • | • | • |   |
-| undecodable filenames   | █ |   |   | • | • | █ |   | • | • |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
+| serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ |
+| serve ftp               | █ |   |   |   |   | █ |   |   |   |   |   | █ |
+| serve ftps              | █ |   |   |   |   | █ |   |   |   |   |   | █ |
+| serve sftp              |   |   |   |   |   | █ |   |   |   |   |   | █ |
+| serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |
+| serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |
+| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ |   | █ | █ |
+| zeroconf                | █ |   |   |   |   |   |   |   |   |   |   |   |
+| supports netscape 4     | ╱ |   |   |   |   | █ |   |   |   |   | • |   |
+| ...internet explorer 6  | ╱ | █ |   | █ |   | █ |   |   |   |   | • |   |
+| mojibake filenames      | █ |   |   | • | • | █ | █ | • | • | • |   | ╱ |
+| undecodable filenames   | █ |   |   | • | • | █ |   | • | • |   |   | ╱ |
 
 * `webdav` = protocol convenient for mounting a remote server as a local filesystem; see zeroconf:
 * `zeroconf` = the server announces itself on the LAN, [automatically appearing](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png) on other zeroconf-capable devices
@@ -206,57 +219,62 @@ symbol legend,
 * `a`/copyparty remarks:
   * extremely minimal samba/cifs server
   * netscape 4 / ie6 support is mostly listed as a joke altho some people have actually found it useful ([ie4 tho](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png))
+* `l`/sftpgo translates mojibake filenames into valid utf-8 (information loss)
 
 
 ## server configuration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - |
-| config from cmd args    | █ |   |   |   |   | █ | █ |   |   | █ |   |
-| config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • |
-| runtime config reload   | █ | █ | █ |   |   |   |   | █ | █ | █ | █ |
-| same-port http / https  | █ |   |   |   |   |   |   |   |   |   |   |
-| listen multiple ports   | █ |   |   |   |   |   |   |   |   |   |   |
-| virtual file system     | █ | █ | █ |   |   |   | █ |   |   |   |   |
-| reverse-proxy ok        | █ |   | █ | █ | █ | █ | █ | █ | • | • | • |
-| folder-rproxy ok        | █ |   |   |   | █ | █ |   | • | • | • | • |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
+| config from cmd args    | █ |   |   |   |   | █ | █ |   |   | █ |   | ╱ |
+| config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ |
+| runtime config reload   | █ | █ | █ |   |   |   |   | █ | █ | █ | █ |   |
+| same-port http / https  | █ |   |   |   |   |   |   |   |   |   |   |   |
+| listen multiple ports   | █ |   |   |   |   |   |   |   |   |   |   | █ |
+| virtual file system     | █ | █ | █ |   |   |   | █ |   |   |   |   | █ |
+| reverse-proxy ok        | █ |   | █ | █ | █ | █ | █ | █ | • | • | • | █ |
+| folder-rproxy ok        | █ |   |   |   | █ | █ |   | • | • | • | • |   |
 
 * `folder-rproxy` = reverse-proxying without dedicating an entire (sub)domain, using a subfolder instead
+* `l`/sftpgo:
+  * config: users must be added through gui / api calls
 
 
 ## server capabilities
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - |
-| accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| single-sign-on          |   |   |   | █ | █ |   |   |   | • |   |   |
-| token auth              |   |   |   | █ | █ |   |   | █ |   |   |   |
-| per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ |
-| per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ |
-| per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |
-| per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |
-| unmap subfolders        | █ |   |   |   |   |   | █ |   |   | █ | ╱ |
-| index.html blocks list  |   |   |   |   |   |   | █ |   |   | • |   |
-| write-only folders      | █ |   |   |   |   |   |   |   |   |   | █ |
-| files stored as-is      | █ | █ | █ | █ |   | █ | █ |   |   | █ | █ |
-| file versioning         |   |   |   | █ | █ |   |   |   |   |   |   |
-| file encryption         |   |   |   | █ | █ | █ |   |   |   |   |   |
-| file indexing           | █ |   | █ | █ | █ |   |   | █ | █ | █ |   |
-| ┗ per-volume db         | █ |   | • | • | • |   |   | • | • |   |   |
-| ┗ db stored in folder   | █ |   |   |   |   |   |   | • | • | █ |   |
-| ┗ db stored out-of-tree | █ |   | █ | █ | █ |   |   | • | • | █ |   |
-| ┗ existing file tree    | █ |   | █ |   |   |   |   |   |   | █ |   |
-| file action event hooks | █ |   |   |   |   |   |   |   |   | █ |   |
-| one-way folder sync     | █ |   |   | █ | █ | █ |   |   |   |   |   |
-| full sync               |   |   |   | █ | █ |   |   |   |   |   |   |
-| speed throttle          |   | █ | █ |   |   | █ |   |   | █ |   |   |
-| anti-bruteforce         | █ | █ | █ | █ | █ |   |   |   | • |   |   |
-| dyndns updater          |   | █ |   |   |   |   |   |   |   |   |   |
-| self-updater            |   |   | █ |   |   |   |   |   |   |   |   |
-| log rotation            | █ |   | █ | █ | █ |   |   | • | █ |   |   |
-| upload tracking / log   | █ | █ | • | █ | █ |   |   | █ | █ |   |   |
-| curl-friendly ls        | █ |   |   |   |   |   |   |   |   |   |   |
-| curl-friendly upload    | █ |   |   |   |   | █ | █ | • |   |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
+| accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |
+| single-sign-on          |   |   |   | █ | █ |   |   |   | • |   |   |   |
+| token auth              |   |   |   | █ | █ |   |   | █ |   |   |   |   |
+| 2fa                     |   |   |   | █ | █ |   |   |   |   |   |   | █ |
+| per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ | █ |
+| per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ | █ |
+| per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |   |
+| per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |   |
+| unmap subfolders        | █ |   |   |   |   |   | █ |   |   | █ | ╱ | • |
+| index.html blocks list  |   |   |   |   |   |   | █ |   |   | • |   |   |
+| write-only folders      | █ |   |   |   |   |   |   |   |   |   | █ | █ |
+| files stored as-is      | █ | █ | █ | █ |   | █ | █ |   |   | █ | █ | █ |
+| file versioning         |   |   |   | █ | █ |   |   |   |   |   |   |   |
+| file encryption         |   |   |   | █ | █ | █ |   |   |   |   |   | █ |
+| file indexing           | █ |   | █ | █ | █ |   |   | █ | █ | █ |   |   |
+| ┗ per-volume db         | █ |   | • | • | • |   |   | • | • |   |   |   |
+| ┗ db stored in folder   | █ |   |   |   |   |   |   | • | • | █ |   |   |
+| ┗ db stored out-of-tree | █ |   | █ | █ | █ |   |   | • | • | █ |   |   |
+| ┗ existing file tree    | █ |   | █ |   |   |   |   |   |   | █ |   |   |
+| file action event hooks | █ |   |   |   |   |   |   |   |   | █ |   | █ |
+| one-way folder sync     | █ |   |   | █ | █ | █ |   |   |   |   |   |   |
+| full sync               |   |   |   | █ | █ |   |   |   |   |   |   |   |
+| speed throttle          |   | █ | █ |   |   | █ |   |   | █ |   |   | █ |
+| anti-bruteforce         | █ | █ | █ | █ | █ |   |   |   | • |   |   | █ |
+| dyndns updater          |   | █ |   |   |   |   |   |   |   |   |   |   |
+| self-updater            |   |   | █ |   |   |   |   |   |   |   |   |   |
+| log rotation            | █ |   | █ | █ | █ |   |   | • | █ |   |   | █ |
+| upload tracking / log   | █ | █ | • | █ | █ |   |   | █ | █ |   |   | ╱ |
+| curl-friendly ls        | █ |   |   |   |   |   |   |   |   |   |   |   |
+| curl-friendly upload    | █ |   |   |   |   | █ | █ | • |   |   |   |   |
 
 * `unmap subfolders` = "shadowing"; mounting a local folder in the middle of an existing filesystem tree in order to disable access below that path
 * `files stored as-is` = uploaded files are trivially readable from the server HDD, not sliced into chunks or in weird folder structures or anything like that
@@ -277,49 +295,52 @@ symbol legend,
 * `k`/filegator remarks:
   * `per-* permissions` -- can limit a user to one folder and its subfolders
   * `unmap subfolders` -- can globally filter a list of paths
+* `l`/sftpgo:
+  * `file action event hooks` also include on-download triggers
+  * `upload tracking / log` in main logfile
 
 
 ## client features
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------  | - | - | - | - | - | - | - | - | - | - | - |
-| single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |
-| themes                  | █ | █ |   | █ |   |   |   |   | █ |   |   |
-| directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |
-| multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |
-| thumbnails              | █ |   |   | ╱ | ╱ |   |   | █ | █ | ╱ |   |
-| ┗ image thumbnails      | █ |   |   | █ | █ |   |   | █ | █ | █ |   |
-| ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |
-| ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |
-| audio player            | █ |   |   | █ | █ |   |   |   | █ | ╱ |   |
-| ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |
-| ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ OS integration        | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ transcode to lossy    | █ |   |   |   |   |   |   |   |   |   |   |
-| video player            | █ |   |   | █ | █ |   |   |   | █ | █ |   |
-| ┗ video transcoding     |   |   |   |   |   |   |   |   | █ |   |   |
-| audio BPM detector      | █ |   |   |   |   |   |   |   |   |   |   |
-| audio key detector      | █ |   |   |   |   |   |   |   |   |   |   |
-| search by path / name   | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ |
-| search by date / size   | █ |   |   |   | █ |   |   | █ | █ |   |   |
-| search by bpm / key     | █ |   |   |   |   |   |   |   |   |   |   |
-| search by custom tags   |   |   |   |   |   |   |   | █ | █ |   |   |
-| search in file contents |   |   |   | █ | █ |   |   |   | █ |   |   |
-| search by custom parser | █ |   |   |   |   |   |   |   |   |   |   |
-| find local file         | █ |   |   |   |   |   |   |   |   |   |   |
-| undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |
-| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ | █ | █ |
-| image viewer            | █ |   |   | █ | █ |   |   |   | █ | █ | █ |
-| markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |
-| markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |
-| readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |
-| rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ |
-| batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |
-| cut / paste files       | █ | █ |   | █ | █ |   |   |   | █ |   |   |
-| move files              | █ | █ |   | █ | █ |   | █ |   | █ | █ | █ |
-| delete files            | █ | █ |   | █ | █ | ╱ | █ | █ | █ | █ | █ |
-| copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------  | - | - | - | - | - | - | - | - | - | - | - | - |
+| single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   |
+| themes                  | █ | █ |   | █ |   |   |   |   | █ |   |   |   |
+| directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |   |
+| multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |   |
+| thumbnails              | █ |   |   | ╱ | ╱ |   |   | █ | █ | ╱ |   |   |
+| ┗ image thumbnails      | █ |   |   | █ | █ |   |   | █ | █ | █ |   |   |
+| ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |   |
+| ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |   |
+| audio player            | █ |   |   | █ | █ |   |   |   | █ | ╱ |   |   |
+| ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |   |
+| ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ OS integration        | █ |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ transcode to lossy    | █ |   |   |   |   |   |   |   |   |   |   |   |
+| video player            | █ |   |   | █ | █ |   |   |   | █ | █ |   |   |
+| ┗ video transcoding     |   |   |   |   |   |   |   |   | █ |   |   |   |
+| audio BPM detector      | █ |   |   |   |   |   |   |   |   |   |   |   |
+| audio key detector      | █ |   |   |   |   |   |   |   |   |   |   |   |
+| search by path / name   | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ |   |
+| search by date / size   | █ |   |   |   | █ |   |   | █ | █ |   |   |   |
+| search by bpm / key     | █ |   |   |   |   |   |   |   |   |   |   |   |
+| search by custom tags   |   |   |   |   |   |   |   | █ | █ |   |   |   |
+| search in file contents |   |   |   | █ | █ |   |   |   | █ |   |   |   |
+| search by custom parser | █ |   |   |   |   |   |   |   |   |   |   |   |
+| find local file         | █ |   |   |   |   |   |   |   |   |   |   |   |
+| undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |   |
+| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ |
+| image viewer            | █ |   |   | █ | █ |   |   |   | █ | █ | █ |   |
+| markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   |
+| markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   |
+| readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |   |
+| rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ | █ |
+| batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |   |
+| cut / paste files       | █ | █ |   | █ | █ |   |   |   | █ |   |   |   |
+| move files              | █ | █ |   | █ | █ |   | █ |   | █ | █ | █ |   |
+| delete files            | █ | █ |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ |
+| copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |   |
 
 * `single-page app` = multitasking; possible to continue navigating while uploading
 * `audio player » os-integration` = use the [lockscreen](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) or [media hotkeys](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) to play/pause, prev/next song
@@ -335,20 +356,21 @@ symbol legend,
 
 ## integration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - |
-| OS alert on upload      | █ |   |   |   |   |   |   |   |   | ╱ |   |
-| discord                 | █ |   |   |   |   |   |   |   |   | ╱ |   |
-| ┗ announce uploads      | █ |   |   |   |   |   |   |   |   |   |   |
-| ┗ custom embeds         |   |   |   |   |   |   |   |   |   |   |   |
-| sharex                  | █ |   |   | █ |   | █ | ╱ | █ |   |   |   |
-| flameshot               |   |   |   |   |   | █ |   |   |   |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
+| OS alert on upload      | █ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |
+| discord                 | █ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |
+| ┗ announce uploads      | █ |   |   |   |   |   |   |   |   |   |   | ╱ |
+| ┗ custom embeds         |   |   |   |   |   |   |   |   |   |   |   | ╱ |
+| sharex                  | █ |   |   | █ |   | █ | ╱ | █ |   |   |   |   |
+| flameshot               |   |   |   |   |   | █ |   |   |   |   |   |   |
 
 * sharex `╱` = yes, but does not provide example sharex config
 * `a`/copyparty remarks:
   * `OS alert on upload` available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/notify.py)
   * `discord » announce uploads` available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/discord-announce.py)
 * `j`/filebrowser can probably pull those off with command runners similar to copyparty
+* `l`/sftpgo has nothing built-in but is very extensible
 
 
 ## another matrix
@@ -366,6 +388,7 @@ symbol legend,
 | kodbox             | php    | ░ gpl3 |  92 MB |
 | filebrowser        | go     | █ apl2 |  20 MB |
 | filegator          | php    | █ mit  |    •   |
+| sftpgo             | go     | ‼ agpl |  44 MB |
 | updog              | python | █ mit  |  17 MB |
 | goshs              | go     | █ mit  |  11 MB |
 | gimme-that         | python | █ mit  | 4.8 MB |
@@ -379,6 +402,7 @@ symbol legend,
 # reviews
 
 * ✅ are advantages over copyparty
+  * 💾 are what copyparty offers as an alternative
 * 🔵 are similarities
 * ⚠️ are disadvantages (something copyparty does "better")
 
@@ -412,10 +436,11 @@ symbol legend,
 * ⚠️ http/webdav only; no ftp, zeroconf
 * ⚠️ less awesome music player
 * ⚠️ doesn't run on android or ipads
+* ⚠️ AGPL licensed
 * ✅ great ui/ux
 * ✅ config gui
 * ✅ apps (android / iphone)
-  * copyparty: android upload-only app
+  * 💾 android upload-only app + iPhone upload shortcut
 * ✅ more granular permissions (per-file)
 * ✅ search: fulltext indexing of file contents
 * ✅ webauthn passwordless authentication
@@ -430,10 +455,11 @@ symbol legend,
 * ⚠️ http/webdav only; no ftp, zeroconf
 * ⚠️ less awesome music player
 * ⚠️ doesn't run on android or ipads
+* ⚠️ AGPL licensed
 * ✅ great ui/ux
 * ✅ config gui
 * ✅ apps (android / iphone)
-  * copyparty: android upload-only app
+  * 💾 android upload-only app + iPhone upload shortcut
 * ✅ more granular permissions (per-file)
 * ✅ search: fulltext indexing of file contents
 
@@ -467,7 +493,7 @@ symbol legend,
 * ✅ searchable image tags; delete by tag
 * ✅ browser extension to upload files to the server
 * ✅ reject uploads by file extension
-  * copyparty: can reject uploads [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py) using plugins
+  * 💾 can reject uploads [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py) using plugins
 * ✅ token auth (api keys)
 
 ## [kodbox](https://github.com/kalcaddle/kodbox)
@@ -512,6 +538,30 @@ symbol legend,
 * ⚠️ doesn't support crazy filenames
 * ⚠️ limited file search
 
+## [sftpgo](https://github.com/drakkan/sftpgo)
+* go; cross-platform (windows, linux, mac)
+* ⚠️ http uploads not resumable / accelerated / integrity-checked
+  * ⚠️ on cloudflare: max upload size 100 MiB
+  * 🔵 sftp uploads are resumable
+* ⚠️ web UI is very minimal + a bit slow
+  * ⚠️ no thumbnails / image viewer / audio player
+  * ⚠️ basic file manager (no cut/paste/move)
+* ⚠️ no filesystem indexing / search
+* ⚠️ doesn't run on phones, tablets
+* ⚠️ no zeroconf (mdns/ssdp)
+* ⚠️ AGPL licensed
+* 🔵 ftp, ftps, webdav
+* ✅ sftp server
+* ✅ settings gui
+* ✅ acme (automatic tls certs)
+  * 💾 relies on caddy/certbot/acme.sh
+* ✅ at-rest encryption
+  * 💾 relies on LUKS/BitLocker
+* ✅ can use S3/GCS as storage backend
+  * 💾 relies on rclone-mount
+* ✅ on-download event hook (otherwise same as copyparty)
+* ✅ more extensive permissions control
+
 ## [updog](https://github.com/sc0tfree/updog)
 * python; cross-platform
 * basic directory listing with upload feature
@@ -526,7 +576,7 @@ symbol legend,
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ✅ cool clipboard widget
-  * copyparty: the markdown editor is an ok substitute
+  * 💾 the markdown editor is an ok substitute
 * 🔵 read-only and upload-only modes (same as copyparty's write-only)
 * 🔵 https, webdav, but no ftp
 
@@ -538,7 +588,7 @@ symbol legend,
 * ⚠️ weird folder structure for uploads
 * ✅ clamav antivirus check on upload! neat
 * 🔵 optional max-filesize, os-notification on uploads
-  * copyparty: os-notification available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/notify.py)
+  * 💾 os-notification available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/notify.py)
 
 ## [ass](https://github.com/tycrek/ass)
 * nodejs; recommends docker
@@ -549,12 +599,13 @@ symbol legend,
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ✅ token auth
 * ✅ gps metadata stripping
-  * copyparty: possible with [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/image-noexif.py)
+  * 💾 possible with [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/image-noexif.py)
 * ✅ discord integration (custom embeds, upload webhook)
-  * copyparty: [upload webhook plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/discord-announce.py)
+  * 💾 [upload webhook plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/discord-announce.py)
 * ✅ reject uploads by mimetype
-  * copyparty: can reject uploads [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py) using plugins
-* ✅ can use S3 as storage backend; copyparty relies on rclone-mount for that
+  * 💾 can reject uploads [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py) using plugins
+* ✅ can use S3 as storage backend
+  * 💾 relies on rclone-mount
 * ✅ custom 404 pages
 
 ## [linx](https://github.com/ZizzyDizzyMC/linx-server/)
@@ -564,12 +615,13 @@ symbol legend,
 * 🔵 some of its unique features have been added to copyparty as former linx users have migrated
   * file expiration timers, filename randomization
 * ✅ password-protected files
-  * copyparty: password-protected folders + filekeys to skip the folder password seem to cover most usecases
+  * 💾 password-protected folders + filekeys to skip the folder password seem to cover most usecases
 * ✅ file deletion keys
 * ✅ download files as torrents
 * ✅ remote uploads (send a link to the server and it downloads it)
-  * copyparty: available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
-* ✅ can use S3 as storage backend; copyparty relies on rclone-mount for that
+  * 💾 available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
+* ✅ can use S3 as storage backend
+  * 💾 relies on rclone-mount
 
 ## [h5ai](https://larsjung.de/h5ai/)
 * ⚠️ read only; no upload/move/delete
@@ -581,7 +633,16 @@ symbol legend,
 ## [autoindex](https://github.com/nielsAD/autoindex)
 * ⚠️ read only; no upload/move/delete
 * ✅ directory cache for faster browsing of cloud storage
-  * copyparty: local index/cache for recursive search (names/attrs/tags), but not for browsing
+  * 💾 local index/cache for recursive search (names/attrs/tags), but not for browsing
+
+## [miniserve](https://github.com/svenstaro/miniserve)
+* rust; cross-platform (windows, linux, mac)
+* ⚠️ uploads not resumable / accelerated / integrity-checked
+  * ⚠️ on cloudflare: max upload size 100 MiB
+* ⚠️ no thumbnails / image viewer / audio player / file manager
+* ⚠️ no filesystem indexing / search
+* 🔵 upload, tar/zip download, qr-code
+* ✅ faster at loading huge folders
 
 
 # briefly considered

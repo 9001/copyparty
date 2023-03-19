@@ -1,19 +1,12 @@
 # 💾🎉 copyparty
 
-* portable file sharing hub (py2/py3) [(on PyPI)](https://pypi.org/project/copyparty/)
-* MIT-Licensed, 2019-05-26, ed @ irc.rizon.net
+turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
 
+* server only needs Python (2 or 3), all dependencies optional
+* 🔌 protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
+* 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
-## summary
-
-turn your phone or raspi into a portable file server with resumable uploads/downloads using *any* web browser
-
-* server only needs Python (`2.7` or `3.3+`), all dependencies optional
-* browse/upload with [IE4](#browser-support) / netscape4.0 on win3.11 (heh)
-* protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
-* [android app](#android-app) and [iPhone shortcuts](#ios-shortcuts)
-
-**[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
+👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
 
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
@@ -84,6 +77,7 @@ turn your phone or raspi into a portable file server with resumable uploads/down
 * [security](#security) - some notes on hardening
     * [gotchas](#gotchas) - behavior that might be unexpected
     * [cors](#cors) - cross-site request config
+    * [https](#https) - both HTTP and HTTPS are accepted
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
         * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
@@ -274,7 +268,7 @@ server notes:
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
-    * "future" because `AudioContext` is broken in the current iOS version (15.1), maybe one day...
+    * "future" because `AudioContext` can't maintain a stable playback speed in the current iOS version (15.7), maybe one day...
 
 * Windows: folders cannot be accessed if the name ends with `.`
   * python or windows bug
@@ -1098,12 +1092,14 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 
 ## reverse-proxy
 
-running copyparty next to other websites  hosted on an existing webserver such as nginx or apache
+running copyparty next to other websites  hosted on an existing webserver such as nginx, caddy, or apache
 
 you can either:
 * give copyparty its own domain or subdomain (recommended)
 * or do location-based proxying, using `--rp-loc=/stuff` to tell copyparty where it is mounted -- has a slight performance cost and higher chance of bugs
   * if copyparty says `incorrect --rp-loc or webserver config; expected vpath starting with [...]` it's likely because the webserver is stripping away the proxy location from the request URLs -- see the `ProxyPass` in the apache example below
+
+some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatically obtain a valid https/tls certificate for you, and some support HTTP/2 and QUIC which could be a nice speed boost
 
 example webserver configs:
 
@@ -1234,7 +1230,7 @@ if you want to run the copyparty server on your android device, see [install on 
 
 # iOS shortcuts
 
-there is no iPhone app, but  the following shortcuts are almost just as good:
+there is no iPhone app, but  the following shortcuts are almost as good:
 
 * [upload to copyparty](https://www.icloud.com/shortcuts/41e98dd985cb4d3bb433222bc1e9e770) ([offline](https://github.com/9001/copyparty/raw/hovudstraum/contrib/ios/upload-to-copyparty.shortcut)) ([png](https://user-images.githubusercontent.com/241032/226118053-78623554-b0ed-482e-98e4-6d57ada58ea4.png)) based on the [original](https://www.icloud.com/shortcuts/ab415d5b4de3467b9ce6f151b439a5d7) by [Daedren](https://github.com/Daedren) (thx!)
   * can strip exif, upload files, pics, vids, links, clipboard
@@ -1335,6 +1331,13 @@ by default, except for `GET` and `HEAD` operations, all requests must either:
 * or the header `PW` with your password as value
 
 cors can be configured with `--acao` and `--acam`, or the protections entirely disabled with `--allow-csrf`
+
+
+## https
+
+both HTTP and HTTPS are accepted  by default, but letting a [reverse proxy](#reverse-proxy) handle the https/tls/ssl would be better (probably more secure by default)
+
+copyparty doesn't speak HTTP/2 or QUIC, so using a reverse proxy would solve that as well
 
 
 # recovering from crashes
