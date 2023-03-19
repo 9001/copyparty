@@ -118,6 +118,15 @@ mkdir -p "$jail/tmp"
 chmod 777 "$jail/tmp"
 
 
+# create a dev
+(cd $jail; mkdir -p dev; cd dev
+[ -e null ]    || mknod -m 666 null    c 1 3
+[ -e zero ]    || mknod -m 666 zero    c 1 5
+[ -e random ]  || mknod -m 444 random  c 1 8
+[ -e urandom ] || mknod -m 444 urandom c 1 9
+)
+
+
 # run copyparty
 export HOME=$(getent passwd $uid | cut -d: -f6)
 export USER=$(getent passwd $uid | cut -d: -f1)
