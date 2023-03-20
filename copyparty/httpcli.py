@@ -865,7 +865,17 @@ class HttpCli(object):
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False, err=401)
         depth = self.headers.get("depth", "infinity").lower()
 
-        if depth == "infinity":
+        try:
+            topdir = {"vp": "", "st": bos.stat(vn.canonical(rem))}
+        except OSError as ex:
+            if ex.errno != errno.ENOENT:
+                raise
+            raise Pebkac(404)
+
+        if not stat.S_ISDIR(topdir["st"].st_mode):
+            fgen = []
+
+        elif depth == "infinity":
             if not self.args.dav_inf:
                 self.log("client wants --dav-inf", 3)
                 zb = b'<?xml version="1.0" encoding="utf-8"?>\n<D:error xmlns:D="DAV:"><D:propfind-finite-depth/></D:error>'
@@ -903,13 +913,6 @@ class HttpCli(object):
             t = "invalid depth value '{}' (must be either '0' or '1'{})"
             t2 = " or 'infinity'" if self.args.dav_inf else ""
             raise Pebkac(412, t.format(depth, t2))
-
-        try:
-            topdir = {"vp": "", "st": os.stat(vn.canonical(rem))}
-        except OSError as ex:
-            if ex.errno != errno.ENOENT:
-                raise
-            raise Pebkac(404)
 
         fgen = itertools.chain([topdir], fgen)  # type: ignore
         vtop = vjoin(self.args.R, vjoin(vn.vpath, rem))
