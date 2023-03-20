@@ -1429,9 +1429,9 @@ class HttpCli(object):
                 self.log(t, 1)
                 raise Pebkac(403, t)
 
-        if is_put and not (self.args.no_dav or self.args.nw):
+        if is_put and not (self.args.no_dav or self.args.nw) and bos.path.exists(path):
             # allow overwrite if...
-            #  * volflag 'daw' is set
+            #  * volflag 'daw' is set, or client is definitely webdav
             #  * and account has delete-access
             # or...
             #  * file exists, is empty, sufficiently new
@@ -1441,9 +1441,11 @@ class HttpCli(object):
             if self.args.dotpart:
                 tnam = "." + tnam
 
-            if (vfs.flags.get("daw") and self.can_delete) or (
+            if (
+                self.can_delete
+                and (vfs.flags.get("daw") or "x-oc-mtime" in self.headers)
+            ) or (
                 not bos.path.exists(os.path.join(fdir, tnam))
-                and bos.path.exists(path)
                 and not bos.path.getsize(path)
                 and bos.path.getmtime(path) >= time.time() - self.args.blank_wt
             ):
