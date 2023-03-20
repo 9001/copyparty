@@ -1464,6 +1464,16 @@ class HttpCli(object):
         if self.args.nw:
             return post_sz, sha_hex, sha_b64, remains, path, ""
 
+        at = mt = time.time() - lifetime
+        cli_mt = self.headers.get("x-oc-mtime")
+        if cli_mt:
+            try:
+                mt = int(cli_mt)
+                times = (int(time.time()), mt)
+                bos.utime(path, times, False)
+            except:
+                pass
+
         if nameless and "magic" in vfs.flags:
             try:
                 ext = self.conn.hsrv.magician.ext(path)
@@ -1486,7 +1496,6 @@ class HttpCli(object):
                 fn = fn2
                 path = path2
 
-        at = time.time() - lifetime
         if xau and not runhook(
             self.log,
             xau,
@@ -1494,7 +1503,7 @@ class HttpCli(object):
             self.vpath,
             self.host,
             self.uname,
-            at,
+            mt,
             post_sz,
             self.ip,
             at,
