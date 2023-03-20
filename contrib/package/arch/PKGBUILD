@@ -1,6 +1,6 @@
 # Maintainer: icxes <dev.null@need.moe>
 pkgname=copyparty
-pkgver="1.6.9"
+pkgver="1.6.10"
 pkgrel=1
 pkgdesc="Portable file sharing hub"
 arch=("any")
@@ -26,12 +26,12 @@ source=("${url}/releases/download/v${pkgver}/${pkgname}-sfx.py"
         "https://raw.githubusercontent.com/9001/${pkgname}/v${pkgver}/LICENSE"
 )
 backup=("etc/${pkgname}.d/init" )
-sha256sums=("64f3b6a7120b3e1c1167e6aa7c0f023c39abb18e50525013b97467326a2f73ab"
+sha256sums=("1babe0fff685b0dc61ab5db27aa4909c139b8a7bb69c35e029d6730499a2f1e9"
             "b8565eba5e64dedba1cf6c7aac7e31c5a731ed7153d6810288a28f00a36c28b2"
             "f65c207e0670f9d78ad2e399bda18d5502ff30d2ac79e0e7fc48e7fbdc39afdc"
             "c4f396b083c9ec02ad50b52412c84d2a82be7f079b2d016e1c9fad22d68285ff"
             "dba701de9fd584405917e923ea1e59dbb249b96ef23bad479cf4e42740b774c8"
-            "23054bb206153a1ed34038accaf490b8068f9c856e423c2f2595b148b40c0a0c"
+            "8e89d281483e22d11d111bed540652af35b66af6f14f49faae7b959f6cdc6475"
             "cb2ce3d6277bf2f5a82ecf336cc44963bc6490bcf496ffbd75fc9e21abaa75f3"
 )
 
