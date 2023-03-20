@@ -69,7 +69,7 @@
                 printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>{{ pw }}</b> k" >> /etc/davfs2/secrets
                 printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b> davfs rw,user,uid=1000,noauto 0 0" >> /etc/fstab
             </pre>
-            <p>or you can use rclone instead, which is much slower but doesn't require root:</p>
+            <p>or you can use rclone instead, which is much slower but doesn't require root (plus it keeps lastmodified on upload):</p>
             <pre>
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>

@@ -69,6 +69,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
 * [browser support](#browser-support) - TLDR: yes
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
+    * [folder sync](#folder-sync) - sync folders to/from copyparty
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
 * [android app](#android-app) - upload to copyparty with one tap
 * [iOS shortcuts](#iOS-shortcuts) - there is no iPhone app, but
@@ -189,7 +190,7 @@ firewall-cmd --reload
   * ☑ search by name/path/date/size
   * ☑ [search by ID3-tags etc.](#searching)
 * client support
-  * ☑ [sync folder to server](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy)
+  * ☑ [folder sync](#folder-sync)
   * ☑ [curl-friendly](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png)
 * markdown
   * ☑ [viewer](#markdown-viewer)
@@ -1178,7 +1179,7 @@ interact with copyparty using non-browser clients
   * `(printf 'PUT / HTTP/1.1\r\n\r\n'; cat movie.mkv) >/dev/tcp/127.0.0.1/3923`
 
 * python: [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) is a command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
-  * file uploads, file-search, folder sync, autoresume of aborted/broken uploads
+  * file uploads, file-search, [folder sync](#folder-sync), autoresume of aborted/broken uploads
   * can be downloaded from copyparty: controlpanel -> connect -> [up2k.py](http://127.0.0.1:3923/.cpr/a/up2k.py)
   * see [./bin/README.md#up2kpy](bin/README.md#up2kpy)
 
@@ -1197,6 +1198,15 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
 you can provide passwords using header `PW: hunter2`, cookie `cppwd=hunter2`, url-param `?pw=hunter2`, or with basic-authentication (either as the username or password)
 
 NOTE: curl will not send the original filename if you use `-T` combined with url-params! Also, make sure to always leave a trailing slash in URLs unless you want to override the filename
+
+
+## folder sync
+
+sync folders to/from copyparty
+
+the commandline uploader [up2k.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy) with `--dr` is the best way to sync a folder to copyparty; verifies checksums and does files in parallel, and deletes unexpected files on the server after upload has finished which makes file-renames really cheap (it'll rename serverside and skip uploading)
+
+alternatively there is [rclone](./docs/rclone.md) which allows for bidirectional sync and is *way* more flexible (stream files straight from sftp/s3/gcs to copyparty for instance), although syncing to copyparty is about 5x slower than up2k.py if you have many small files in particular
 
 
 ## mount as drive
