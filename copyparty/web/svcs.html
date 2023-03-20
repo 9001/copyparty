@@ -46,7 +46,7 @@
             <p><em>note: rclone-FTP is a bit faster, so {% if args.ftp or args.ftps %}try that first{% else %}consider enabling FTP in server settings{% endif %}</em></p>
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
             <pre>
-                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=other{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
+                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>W:</b>
             </pre>
             {% if s %}
@@ -71,7 +71,7 @@
             </pre>
             <p>or you can use rclone instead, which is much slower but doesn't require root:</p>
             <pre>
-                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=other{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
+                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>
             </pre>
             {% if s %}

@@ -22,7 +22,7 @@ replace `hunter2` with your password, or remove the `hunter2` lines if you allow
 (
 echo [cpp-rw]
 echo type = webdav
-echo vendor = other
+echo vendor = owncloud
 echo url = http://127.0.0.1:3923/
 echo headers = Cookie,cppwd=hunter2
 echo(
@@ -41,7 +41,7 @@ also install the windows dependencies: [winfsp](https://github.com/billziss-gh/w
 cat > ~/.config/rclone/rclone.conf <<'EOF'
 [cpp-rw]
 type = webdav
-vendor = other
+vendor = owncloud
 url = http://127.0.0.1:3923/
 headers = Cookie,cppwd=hunter2
 
@@ -70,3 +70,24 @@ feels out of place but is too good not to mention
 rclone.exe serve http --read-only .
 rclone.exe serve webdav .
 ```
+
+
+# devnotes
+
+copyparty supports and expects [the following](https://github.com/rclone/rclone/blob/46484022b08f8756050aa45505ea0db23e62df8b/backend/webdav/webdav.go#L575-L578) from rclone,
+
+```go
+case "owncloud":
+    f.canStream = true
+    f.precision = time.Second
+    f.useOCMtime = true
+    f.hasOCMD5 = true
+    f.hasOCSHA1 = true
+```
+
+notably,
+* `useOCMtime` enables the `x-oc-mtime` header to retain mtime of uploads from rclone
+* `canStream` is supported but not required by us
+* `hasOCMD5` / `hasOCSHA1` is conveniently dontcare on both ends
+
+there's a scary comment mentioning PROPSET of lastmodified which is not something we wish to support
