@@ -1,4 +1,20 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0316-2106  `v1.6.9`  index.html
+
+## new features
+* option to show `index.html` instead of the folder listing
+  * arg `--ih` makes it default-enabled
+  * clients can enable/disable it in the `[⚙️]` settings tab
+  * url-param `?v` skips it for a particular folder
+* faster folder-thumbnail validation on startup (mostly on conventional HDDs) 
+
+## bugfixes
+* "load more" button didn't always show up when search results got truncated
+* ux: tooltips could block buttons on android
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0312-1610  `v1.6.8`  folder thumbs
 
 * read-only demo server at https://a.ocv.me/pub/demo/
