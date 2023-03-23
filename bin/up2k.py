@@ -1009,8 +1009,9 @@ class Ctl(object):
             file, cid = task
             try:
                 upload(file, cid, self.ar.a, stats)
-            except:
-                eprint("upload failed, retrying: {0} #{1}\n".format(file.name, cid[:8]))
+            except Exception as ex:
+                t = "upload failed, retrying: {0} #{1} ({2})\n"
+                eprint(t.format(file.name, cid[:8], ex))
                 # handshake will fix it
 
             with self.mutex:
@@ -1049,6 +1050,8 @@ def main():
         print(ver)
         return
 
+    sys.argv = [x for x in sys.argv if x != "--ws"]
+
     # fmt: off
     ap = app = argparse.ArgumentParser(formatter_class=APF, description="copyparty up2k uploader / filesearch tool, " + ver, epilog="""
 NOTE:
@@ -1067,7 +1070,6 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ap = app.add_argument_group("compatibility")
     ap.add_argument("--cls", action="store_true", help="clear screen before start")
-    ap.add_argument("--ws", action="store_true", help="copyparty is running on windows; wait before deleting files after uploading")
 
     ap = app.add_argument_group("folder sync")
     ap.add_argument("--dl", action="store_true", help="delete local files after uploading")
@@ -1131,10 +1133,6 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if ar.dr and not ar.drd:
         print("\npass 2/2: delete")
-        if getattr(ctl, "up_br") and ar.ws:
-            # wait for up2k to mtime if there was uploads
-            time.sleep(4)
-
         ar.drd = True
         ar.z = True
         Ctl(ar, ctl.stats)
