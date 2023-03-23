@@ -1115,7 +1115,14 @@ class HttpCli(object):
         if self.do_log:
             self.log("MKCOL " + self.req)
 
-        return self._mkdir(self.vpath)
+        try:
+            return self._mkdir(self.vpath, True)
+        except Pebkac as ex:
+            if ex.code >= 500:
+                raise
+
+            self.reply(b"", ex.code)
+            return True
 
     def handle_move(self) -> bool:
         dst = self.headers["destination"]
@@ -1568,6 +1575,11 @@ class HttpCli(object):
             t = "{}\n{}\n{}\n{}\n".format(post_sz, sha_b64, sha_hex[:56], url)
 
         h = {"Location": url} if is_put and url else {}
+
+        if "x-oc-mtime" in self.headers:
+            h["X-OC-MTime"] = "accepted"
+            t = ""  # some webdav clients expect/prefer this
+
         self.reply(t.encode("utf-8"), 201, headers=h)
         return True
 
@@ -1968,7 +1980,7 @@ class HttpCli(object):
         sanitized = sanitize_fn(new_dir, "", [])
         return self._mkdir(vjoin(self.vpath, sanitized))
 
-    def _mkdir(self, vpath: str) -> bool:
+    def _mkdir(self, vpath: str, dav: bool = False) -> bool:
         nullwrite = self.args.nw
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
@@ -1994,7 +2006,12 @@ class HttpCli(object):
                 raise Pebkac(500, min_ex())
 
         self.out_headers["X-New-Dir"] = quotep(vpath.split("/")[-1])
-        self.redirect(vpath, status=201)
+
+        if dav:
+            self.reply(b"", 201)
+        else:
+            self.redirect(vpath, status=201)
+
         return True
 
     def handle_new_md(self) -> bool:
