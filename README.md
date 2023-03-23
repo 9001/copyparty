@@ -168,7 +168,7 @@ firewall-cmd --reload
   * ☑ write-only folders
   * ☑ [unpost](#unpost): undo/delete accidental uploads
   * ☑ [self-destruct](#self-destruct) (specified server-side or client-side)
-  * ☑ symlink/discard existing files (content-matching)
+  * ☑ symlink/discard duplicates (content-matching)
 * download
   * ☑ single files in browser
   * ☑ [folders as zip / tar files](#zip-downloads)
