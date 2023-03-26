@@ -451,6 +451,20 @@ html.y textarea:focus {
 	padding: .2em .5em;
 	border: .12em solid #aaa;
 }
+.mdo .mdth,
+.mdo .mdthl,
+.mdo .mdthr {
+	margin: .5em .5em .5em 0;
+}
+.mdthl {
+	float: left;
+}
+.mdthr {
+	float: right;
+}
+hr {
+	clear: both;
+}
 
 @media screen {
 	.mdo {

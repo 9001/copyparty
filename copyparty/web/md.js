@@ -231,11 +231,11 @@ function convert_markdown(md_text, dest_dom) {
     var nodes = md_dom.getElementsByTagName('a');
     for (var a = nodes.length - 1; a >= 0; a--) {
         var href = nodes[a].getAttribute('href');
-        var txt = nodes[a].textContent;
+        var txt = nodes[a].innerHTML;
 
         if (!txt)
             nodes[a].textContent = href;
-        else if (href !== txt)
+        else if (href !== txt && !nodes[a].className)
             nodes[a].className = 'vis';
     }
 

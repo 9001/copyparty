@@ -1602,6 +1602,14 @@ function load_md_plug(md_text, plug_type, defer) {
     if (defer)
         md_plug[plug_type] = null;
 
+    if (plug_type == 'pre')
+        try {
+            md_text = md_thumbs(md_text);
+        }
+        catch (ex) {
+            toast.warn(30, '' + ex);
+        }
+
     if (!have_emp)
         return md_text;
 
@@ -1641,6 +1649,33 @@ function load_md_plug(md_text, plug_type, defer) {
     }
 
     return md;
+}
+function md_thumbs(md) {
+    if (!/(^|\n)<!-- th -->/.exec(md))
+        return md;
+
+    // `!th[flags](some.jpg)`
+    // flags: nothing or "l" or "r"
+
+    md = md.split(/!th\[/g);
+    for (var a = 1; a < md.length; a++) {
+        if (!/^[^\]!()]*\]\([^\][!()]+\)/.exec(md[a])) {
+            md[a] = '!th[' + md[a];
+            continue;
+        }
+
+        var t = md[a].split(/\]\(/, 2),
+            t2 = t[1].split(/\)/, 2),
+            url = t2[0],
+            flags = t[0].split(/,/g),
+            float = has(flags, 'l') ? 'left' : has(flags, 'r') ? 'right' : '';
+
+        if (!/[?&]cache/.exec(url))
+            url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=i';
+
+        md[a] = '<a href="' + url + '" class="mdth' + float.slice(0, 1) + '"><img src="' + url + '&th=w" alt="' + t[0] + '" /></a>' + t2[1];
+    }
+    return md.join('');
 }
 
 
