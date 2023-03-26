@@ -1664,16 +1664,17 @@ function md_thumbs(md) {
             continue;
         }
 
-        var t = md[a].split(/\]\(/, 2),
-            t2 = t[1].split(/\)/, 2),
-            url = t2[0],
-            flags = t[0].split(/,/g),
+        var o1 = md[a].indexOf(']('),
+            o2 = md[a].indexOf(')', o1),
+            alt = md[a].slice(0, o1),
+            flags = alt.split(','),
+            url = md[a].slice(o1 + 2, o2),
             float = has(flags, 'l') ? 'left' : has(flags, 'r') ? 'right' : '';
 
         if (!/[?&]cache/.exec(url))
             url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=i';
 
-        md[a] = '<a href="' + url + '" class="mdth' + float.slice(0, 1) + '"><img src="' + url + '&th=w" alt="' + t[0] + '" /></a>' + t2[1];
+        md[a] = '<a href="' + url + '" class="mdth' + float.slice(0, 1) + '"><img src="' + url + '&th=w" alt="' + alt + '" /></a>' + md[a].slice(o2 + 1);
     }
     return md.join('');
 }
