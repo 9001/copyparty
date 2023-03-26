@@ -18,7 +18,12 @@ example usage as global config:
     --xiu i5,j,bin/hooks/xiu-sha.py
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:c,xiu=i5,j,bin/hooks/xiu-sha.py
+    -v srv/inc:inc:r:rw,ed:c,xiu=i5,j,bin/hooks/xiu-sha.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on batches of uploads with the params listed below)
 
 parameters explained,
     xiu = execute after uploads...

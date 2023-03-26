@@ -15,9 +15,13 @@ and also supports --xm (notify on 📟 message)
 example usages; either as global config (all volumes) or as volflag:
     --xm  f,j,bin/hooks/notify2.py
     --xau f,j,bin/hooks/notify2.py
-    -v srv/inc:inc:c,xm=f,j,bin/hooks/notify2.py
-    -v srv/inc:inc:c,xau=f,j,bin/hooks/notify2.py
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    -v srv/inc:inc:r:rw,ed:c,xm=f,j,bin/hooks/notify2.py
+    -v srv/inc:inc:r:rw,ed:c,xau=f,j,bin/hooks/notify2.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on all uploads / msgs with the params listed below)
 
 parameters explained,
     xau = execute after upload

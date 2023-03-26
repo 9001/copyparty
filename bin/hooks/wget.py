@@ -15,9 +15,15 @@ example usage as global config:
     --xm f,j,t3600,bin/hooks/wget.py
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:c,xm=f,j,t3600,bin/hooks/wget.py
+    -v srv/inc:inc:r:rw,ed:c,xm=f,j,t3600,bin/hooks/wget.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on all messages with the params listed below)
 
 parameters explained,
+    xm = execute on message-to-server-log
     f = fork so it doesn't block uploads
     j = provide message information as json; not just the text
     c3 = mute all output

@@ -10,7 +10,12 @@ example usage as global config:
     --xbu c,bin/hooks/reject-extension.py
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:c,xbu=c,bin/hooks/reject-extension.py
+    -v srv/inc:inc:r:rw,ed:c,xbu=c,bin/hooks/reject-extension.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on all uploads with the params listed below)
 
 parameters explained,
     xbu = execute before upload

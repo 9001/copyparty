@@ -17,8 +17,12 @@ depdencies:
 
 example usages; either as global config (all volumes) or as volflag:
     --xau f,bin/hooks/notify.py
-    -v srv/inc:inc:c,xau=f,bin/hooks/notify.py
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    -v srv/inc:inc:r:rw,ed:c,xau=f,bin/hooks/notify.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on all uploads with the params listed below)
 
 parameters explained,
     xau = execute after upload

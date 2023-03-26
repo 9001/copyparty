@@ -17,7 +17,12 @@ example usage as global config:
     --xau c,bin/hooks/reject-mimetype.py
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:c,xau=c,bin/hooks/reject-mimetype.py
+    -v srv/inc:inc:r:rw,ed:c,xau=c,bin/hooks/reject-mimetype.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on all uploads with the params listed below)
 
 parameters explained,
     xau = execute after upload

@@ -13,9 +13,15 @@ example usage as global config:
     --xau f,t5,j,bin/hooks/discord-announce.py
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:c,xau=f,t5,j,bin/hooks/discord-announce.py
+    -v srv/inc:inc:r:rw,ed:c,xau=f,t5,j,bin/hooks/discord-announce.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/inc as volume /inc,
+     readable by everyone, read-write for user 'ed',
+     running this plugin on all uploads with the params listed below)
 
 parameters explained,
+    xbu = execute after upload
     f  = fork; don't wait for it to finish
     t5 = timeout if it's still running after 5 sec
     j  = provide upload information as json; not just the filename
@@ -30,6 +36,7 @@ then use this to design your message: https://discohook.org/
 
 def main():
     WEBHOOK = "https://discord.com/api/webhooks/1234/base64"
+    WEBHOOK = "https://discord.com/api/webhooks/1066830390280597718/M1TDD110hQA-meRLMRhdurych8iyG35LDoI1YhzbrjGP--BXNZodZFczNVwK4Ce7Yme5"
 
     # read info from copyparty
     inf = json.loads(sys.argv[1])
