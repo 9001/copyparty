@@ -1032,7 +1032,7 @@ class Up2k(object):
             zh.update(cv.encode("utf-8", "replace"))
             zh.update(spack(b"<d", cst.st_mtime))
             dhash = base64.urlsafe_b64encode(zh.digest()[:12]).decode("ascii")
-            sql = "select d from dh where d = ? and h = ?"
+            sql = "select d from dh where d=? and +h=?"
             try:
                 c = db.c.execute(sql, (rd, dhash))
                 drd = rd
@@ -1316,9 +1316,9 @@ class Up2k(object):
 
                 w, drd, dfn = zb[:-1].decode("utf-8").split("\x00")
                 with self.mutex:
-                    q = "select mt, sz from up where w = ? and rd = ? and fn = ?"
+                    q = "select mt, sz from up where rd=? and fn=? and +w=?"
                     try:
-                        mt, sz = cur.execute(q, (w, drd, dfn)).fetchone()
+                        mt, sz = cur.execute(q, (drd, dfn, w)).fetchone()
                     except:
                         # file moved/deleted since spooling
                         continue
@@ -2223,7 +2223,7 @@ class Up2k(object):
                     q = r"select * from up where w = ?"
                     argv = [wark]
                 else:
-                    q = r"select * from up where substr(w,1,16) = ? and w = ?"
+                    q = r"select * from up where substr(w,1,16)=? and +w=?"
                     argv = [wark[:16], wark]
 
                 c2 = cur.execute(q, tuple(argv))
@@ -3300,9 +3300,16 @@ class Up2k(object):
         """
         dupes = []
         sabs = djoin(sptop, srem)
-        q = "select rd, fn from up where substr(w,1,16)=? and w=?"
+
+        if self.no_expr_idx:
+            q = r"select rd, fn from up where w = ?"
+            argv = (wark,)
+        else:
+            q = r"select rd, fn from up where substr(w,1,16)=? and +w=?"
+            argv = (wark[:16], wark)
+
         for ptop, cur in self.cur.items():
-            for rd, fn in cur.execute(q, (wark[:16], wark)):
+            for rd, fn in cur.execute(q, argv):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
