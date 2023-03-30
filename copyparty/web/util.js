@@ -1674,9 +1674,22 @@ function md_thumbs(md) {
         if (!/[?&]cache/.exec(url))
             url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=i';
 
-        md[a] = '<a href="' + url + '" class="mdth' + float.slice(0, 1) + '"><img src="' + url + '&th=w" alt="' + alt + '" /></a>' + md[a].slice(o2 + 1);
+        md[a] = '<a href="' + url + '" class="mdth mdth' + float.slice(0, 1) + '"><img src="' + url + '&th=w" alt="' + alt + '" /></a>' + md[a].slice(o2 + 1);
     }
     return md.join('');
+}
+function md_th_set() {
+    var els = QSA('.mdth');
+    for (var a = 0, aa = els.length; a < aa; a++)
+        els[a].onclick = md_th_click;
+}
+function md_th_click(e) {
+    ev(e);
+    var url = this.getAttribute('href').split('?')[0];
+    if (window.sb_md)
+        window.parent.postMessage("imshow " + url, "*");
+    else
+        thegrid.imshow(url);
 }
 
 

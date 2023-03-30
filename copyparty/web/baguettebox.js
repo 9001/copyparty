@@ -27,8 +27,8 @@ window.baguetteBox = (function () {
         isOverlayVisible = false,
         touch = {},  // start-pos
         touchFlag = false,  // busy
-        re_i = /.+\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp)(\?|$)/i,
-        re_v = /.+\.(webm|mkv|mp4)(\?|$)/i,
+        re_i = /^[^?]+\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp)(\?|$)/i,
+        re_v = /^[^?]+\.(webm|mkv|mp4)(\?|$)/i,
         anims = ['slideIn', 'fadeIn', 'none'],
         data = {},  // all galleries
         imagesElements = [],
@@ -580,6 +580,7 @@ window.baguetteBox = (function () {
     function hideOverlay(e) {
         ev(e);
         playvid(false);
+        removeFromCache('#files');
         if (options.noScrollbars) {
             document.documentElement.style.overflowY = 'auto';
             document.body.style.overflowY = 'auto';
@@ -812,10 +813,16 @@ window.baguetteBox = (function () {
     }
 
     function vid() {
+        if (currentIndex >= imagesElements.length)
+            return;
+
         return imagesElements[currentIndex].querySelector('video');
     }
 
     function vidimg() {
+        if (currentIndex >= imagesElements.length)
+            return;
+
         return imagesElements[currentIndex].querySelector('img, video');
     }
 

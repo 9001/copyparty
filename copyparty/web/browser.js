@@ -4150,6 +4150,21 @@ var thegrid = (function () {
 		ev(e);
 	}
 
+	r.imshow = function (url) {
+		var sel = '#ggrid>a'
+		if (!thegrid.en) {
+			thegrid.bagit('#files');
+			sel = '#files a[id]';
+		}
+		var ims = QSA(sel);
+		for (var a = 0, aa = ims.length; a < aa; a++) {
+			var iu = ims[a].getAttribute('href').split('?')[0].split('/').slice(-1)[0];
+			if (iu == url)
+				return ims[a].click();
+		}
+		baguetteBox.hide();
+	};
+
 	r.loadsel = function () {
 		if (r.dirty)
 			return;
@@ -4289,19 +4304,19 @@ var thegrid = (function () {
 		}
 
 		r.dirty = false;
-		r.bagit();
+		r.bagit('#ggrid');
 		r.loadsel();
 		setTimeout(r.tippen, 20);
 	}
 
-	r.bagit = function () {
+	r.bagit = function (isrc) {
 		if (!window.baguetteBox)
 			return;
 
 		if (r.bbox)
 			baguetteBox.destroy();
 
-		r.bbox = baguetteBox.run('#ggrid', {
+		r.bbox = baguetteBox.run(isrc, {
 			captions: function (g) {
 				var idx = -1,
 					h = '' + g;
@@ -6775,6 +6790,7 @@ function show_md(md, name, div, url, depth) {
 
 			els[a].setAttribute('href', '#md-' + href.slice(1));
 		}
+		md_th_set();
 		set_tabindex();
 		var hash = location.hash;
 		if (hash.startsWith('#md-'))
@@ -6853,6 +6869,7 @@ function sandbox(tgt, rules, cls, html) {
 		'window.onblur=function(){say("ilost #' + tid + '")};' +
 		'var el="' + want + '"&&ebi("' + want + '");' +
 		'if(el)say("iscroll #' + tid + ' "+el.offsetTop);' +
+		'md_th_set();' +
 		(cls == 'mdo' && md_plug.post ?
 			'const x={' + md_plug.post + '};' +
 			'if(x.render)x.render(ebi("b"));' +
@@ -6884,6 +6901,9 @@ window.addEventListener("message", function (e) {
 		}
 		else if (t[0] == 'igot' || t[0] == 'ilost') {
 			clmod(QS(t[1] + '>iframe'), 'focus', t[0] == 'igot');
+		}
+		else if (t[0] == 'imshow') {
+			thegrid.imshow(e.data.slice(7));
 		}
 	} catch (ex) {
 		console.log('msg-err: ' + ex);
