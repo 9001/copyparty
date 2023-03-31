@@ -2302,12 +2302,14 @@ function start_actx() {
 	}
 }
 
-var audio_eq = (function () {
+var afilt = (function () {
 	var r = {
-		"en": false,
+		"eqen": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"filters": [],
+		"filterskip": [],
+		"plugs": [],
 		"amp": 0,
 		"chw": 1,
 		"last_au": null,
@@ -2396,6 +2398,10 @@ var audio_eq = (function () {
 				r.filters[a].disconnect();
 
 		r.filters = [];
+		r.filterskip = [];
+
+		for (var a = 0; a < r.plugs.length; a++)
+			r.plugs[a].unload();
 
 		if (!mp)
 			return;
@@ -2413,18 +2419,34 @@ var audio_eq = (function () {
 		if (!actx)
 			bcfg_set('au_eq', false);
 
-		if (!actx || !mp.au || (!r.en && !mp.acs))
+		var plug = false;
+		for (var a = 0; a < r.plugs.length; a++)
+			if (r.plugs[a].en)
+				plug = true;
+
+		if (!actx || !mp.au || (!r.eqen && !plug && !mp.acs))
 			return;
 
 		r.stop();
 		mp.au.id = mp.au.id || Date.now();
 		mp.acs = r.acst[mp.au.id] = r.acst[mp.au.id] || actx.createMediaElementSource(mp.au);
 
-		if (!r.en) {
-			mp.acs.connect(actx.destination);
-			return;
-		}
+		if (r.eqen)
+			add_eq();
 
+		for (var a = 0; a < r.plugs.length; a++)
+			if (r.plugs[a].en)
+				r.plugs[a].load();
+
+		for (var a = 0; a < r.filters.length; a++)
+			if (!has(r.filterskip, a))
+				r.filters[a].connect(a ? r.filters[a - 1] : actx.destination);
+
+		mp.acs.connect(r.filters.length ?
+			r.filters[r.filters.length - 1] : actx.destination);
+	}
+
+	function add_eq() {
 		var min, max;
 		min = max = r.gains[0];
 		for (var a = 1; a < r.gains.length; a++) {
@@ -2455,9 +2477,6 @@ var audio_eq = (function () {
 		fi.gain.value = r.amp + 0.94;  // +.137 dB measured; now -.25 dB and almost bitperfect
 		r.filters.push(fi);
 
-		for (var a = r.filters.length - 1; a >= 0; a--)
-			r.filters[a].connect(a > 0 ? r.filters[a - 1] : actx.destination);
-
 		if (Math.round(r.chw * 25) != 25) {
 			var split = actx.createChannelSplitter(2),
 				merge = actx.createChannelMerger(2),
@@ -2482,11 +2501,10 @@ var audio_eq = (function () {
 			split.connect(lg2, 0);
 			split.connect(rg1, 1);
 			split.connect(rg2, 1);
+			r.filterskip.push(r.filters.length);
 			r.filters.push(split);
 			mp.acs.channelCountMode = 'explicit';
 		}
-
-		mp.acs.connect(r.filters[r.filters.length - 1]);
 	}
 
 	function eq_step(e) {
@@ -2581,7 +2599,7 @@ var audio_eq = (function () {
 		txt[a].onkeydown = eq_keydown;
 	}
 
-	bcfg_bind(r, 'en', 'au_eq', false, r.apply);
+	bcfg_bind(r, 'eqen', 'au_eq', false, r.apply);
 
 	r.draw();
 	return r;
@@ -2663,7 +2681,7 @@ function play(tid, is_ev, seek) {
 	else
 		mp.au.src = mp.au.rsrc = url;
 
-	audio_eq.apply();
+	afilt.apply();
 
 	setTimeout(function () {
 		mpl.unbuffer(url);
@@ -7179,8 +7197,8 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 function reload_mp() {
 	if (mp && mp.au) {
-		if (audio_eq)
-			audio_eq.stop();
+		if (afilt)
+			afilt.stop();
 
 		mp.au.pause();
 		mp.au = null;
@@ -7192,8 +7210,8 @@ function reload_mp() {
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
-	if (audio_eq)
-		audio_eq.acst = {};
+	if (afilt)
+		afilt.acst = {};
 
 	setTimeout(pbar.onresize, 1);
 }
