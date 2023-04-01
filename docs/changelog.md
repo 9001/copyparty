@@ -1,4 +1,24 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0320-2156  `v1.6.10`  rclone sync
+
+## new features
+* [iPhone "app"](https://github.com/9001/copyparty#ios-shortcuts) (upload shortcut) -- thanks @Daedren !
+  * can strip exif, upload files, pics, vids, links, clipboard
+  * can download links and rehost the target file on your server
+* support `rclone sync` to [sync folders](https://github.com/9001/copyparty#folder-sync) to/from copyparty
+  * let webdav clients set lastmodified times during upload
+  * let webdav clients replace files during upload
+
+## bugfixes
+* [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh): FFmpeg transcoding was slow because there was no `/dev/urandom`
+* iphones would fail to play *some* songs (low-bitrate and/or shorter than ~7 seconds)
+  * due to either an iOS bug or an FFmpeg bug in the caf remuxing idk
+  * fixed by mixing in white noise into songs if an iPhone asks for them
+* small correction in the docker readme regarding rootless podman
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0316-2106  `v1.6.9`  index.html
 
 ## new features

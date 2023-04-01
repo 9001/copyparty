@@ -9,6 +9,9 @@
 #   firewall-cmd --reload
 #   systemctl daemon-reload && systemctl enable --now copyparty
 #
+# if it fails to start, first check this: systemctl status copyparty
+# then try starting it while viewing logs: journalctl -fan 100
+#
 # you may want to:
 #   change "User=cpp" and "/home/cpp/" to another user
 #   remove the nft lines to only listen on port 3923
