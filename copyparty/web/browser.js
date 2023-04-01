@@ -974,6 +974,17 @@ ebi('widget').innerHTML = (
 	'	<canvas id="pvol" width="288" height="38"></canvas>' +
 	'	<canvas id="barpos"></canvas>' +
 	'	<canvas id="barbuf"></canvas>' +
+	'</div>' +
+	'<div id="np_inf">' +
+	'	<img id="np_img"></span>' +
+	'	<span id="np_url"></span>' +
+	'	<span id="np_circle"></span>' +
+	'	<span id="np_album"></span>' +
+	'	<span id="np_tn"></span>' +
+	'	<span id="np_artist"></span>' +
+	'	<span id="np_title"></span>' +
+	'	<span id="np_pos"></span>' +
+	'	<span id="np_dur"></span>' +
 	'</div>'
 );
 
@@ -1405,10 +1416,17 @@ var mpl = (function () {
 	};
 
 	r.pp = function () {
+		var adur, apos, playing = mp.au && !mp.au.paused;
+
+		clmod(ebi('np_inf'), 'playing', playing);
+
+		if (mp.au && isNum(adur = mp.au.duration) && isNum(apos = mp.au.currentTime) && apos >= 0)
+			ebi('np_pos').textContent = s2ms(apos);
+
 		if (!r.os_ctl)
 			return;
 
-		navigator.mediaSession.playbackState = mp.au && !mp.au.paused ? "playing" : "paused";
+		navigator.mediaSession.playbackState = playing ? "playing" : "paused";
 	};
 
 	function setaufollow() {
@@ -1423,9 +1441,10 @@ var mpl = (function () {
 		var np = get_np()[0],
 			fns = np.file.split(' - '),
 			artist = (np.circle && np.circle != np.artist ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
-			tags = {
-				title: np.title || fns.pop()
-			};
+			title = np.title || fns.pop(),
+			cover = '',
+			pcover = '',
+			tags = { title: title };
 
 		if (artist)
 			tags.artist = artist;
@@ -1446,14 +1465,24 @@ var mpl = (function () {
 
 			if (cover) {
 				cover += (cover.indexOf('?') === -1 ? '?' : '&') + 'th=j';
+				pcover = cover;
 
 				var pwd = get_pwd();
 				if (pwd)
-					cover += '&pw=' + uricom_enc(pwd);
+					pcover += '&pw=' + uricom_enc(pwd);
 
-				tags.artwork = [{ "src": cover, type: "image/jpeg" }];
+				tags.artwork = [{ "src": pcover, type: "image/jpeg" }];
 			}
 		}
+
+		ebi('np_circle').textContent = np.circle || '';
+		ebi('np_album').textContent = np.album || '';
+		ebi('np_tn').textContent = np['.tn'] || '';
+		ebi('np_artist').textContent = np.artist || (fns.length > 1 ? fns[0] : '');
+		ebi('np_title').textContent = np.title || '';
+		ebi('np_dur').textContent = np['.dur'] || '';
+		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
+		ebi('np_img').setAttribute('src', cover); // dont give last.fm the pwd
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', playpause);
@@ -1787,6 +1816,7 @@ function glossy_grad(can, h, s, l) {
 var pbar = (function () {
 	var r = {},
 		bau = null,
+		html_cdown = 0,
 		lastmove = 0,
 		mousepos = 0,
 		gradh = -1,
@@ -1956,6 +1986,12 @@ var pbar = (function () {
 		pctx.strokeText(t2, xt2, yt);
 		pctx.fillText(t1, xt1, yt);
 		pctx.fillText(t2, xt2, yt);
+
+		if (html_cdown < Date.now() - 99) {
+			html_cdown = Date.now();
+			if (ebi('np_pos').textContent != t2)
+				ebi('np_pos').textContent = t2;
+		}
 	};
 
 	window.addEventListener('resize', r.onresize);

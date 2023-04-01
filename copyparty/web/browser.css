@@ -1074,6 +1074,9 @@ html.np_open #ggrid>a.au:before {
 	background: var(--bg-d3);
 	box-shadow: -.2em .2em 0 var(--f-sel-sh), -.2em -.2em 0 var(--f-sel-sh);
 }
+#player {
+	display: none;
+}
 #widget {
 	position: fixed;
 	font-size: 1.4em;
