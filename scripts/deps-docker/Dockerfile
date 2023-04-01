@@ -3,11 +3,19 @@ FROM    alpine:3.16
 WORKDIR /z
 ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
         ver_hashwasm=4.9.0 \
-        ver_marked=4.2.5 \
+        ver_marked=4.3.0 \
         ver_mde=2.18.0 \
-        ver_codemirror=5.65.11 \
+        ver_codemirror=5.65.12 \
         ver_fontawesome=5.13.0 \
         ver_zopfli=1.0.3
+
+# versioncheck:
+# https://github.com/markedjs/marked/releases
+# https://github.com/Ionaru/easy-markdown-editor/tags
+# https://github.com/codemirror/codemirror5/releases
+# https://github.com/Daninet/hash-wasm/releases
+# https://github.com/openpgpjs/asmcrypto.js
+# https://github.com/google/zopfli/tags
 
 
 # download;

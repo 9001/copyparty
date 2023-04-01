@@ -1,5 +1,5 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
-adds linetracking to marked.js v4.2.3;
+adds linetracking to marked.js v4.3.0;
 add data-ln="%d" to most tags, %d is the source markdown line
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
@@ -206,7 +206,6 @@ index a22a2bc..884ad66 100644
        // Run any renderer extensions
        if (this.options.extensions && this.options.extensions.renderers && this.options.extensions.renderers[token.type]) {
 diff --git a/src/Renderer.js b/src/Renderer.js
-index 7c36a75..aa1a53a 100644
 --- a/src/Renderer.js
 +++ b/src/Renderer.js
 @@ -11,6 +11,12 @@ export class Renderer {
@@ -290,10 +289,9 @@ index 7c36a75..aa1a53a 100644
      if (title) {
        out += ` title="${title}"`;
 diff --git a/src/Tokenizer.js b/src/Tokenizer.js
-index e8a69b6..2cc772b 100644
 --- a/src/Tokenizer.js
 +++ b/src/Tokenizer.js
-@@ -312,4 +312,7 @@ export class Tokenizer {
+@@ -333,4 +333,7 @@ export class Tokenizer {
        const l = list.items.length;
  
 +      // each nested list gets +1 ahead; this hack makes every listgroup -1 but atleast it doesn't get infinitely bad

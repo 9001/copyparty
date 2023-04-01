@@ -1,4 +1,5 @@
 diff --git a/src/Lexer.js b/src/Lexer.js
+strip some features
 --- a/src/Lexer.js
 +++ b/src/Lexer.js
 @@ -7,5 +7,5 @@ import { repeatString } from './helpers.js';
@@ -56,7 +57,7 @@ diff --git a/src/Renderer.js b/src/Renderer.js
 diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 --- a/src/Tokenizer.js
 +++ b/src/Tokenizer.js
-@@ -352,14 +352,7 @@ export class Tokenizer {
+@@ -367,14 +367,7 @@ export class Tokenizer {
          type: 'html',
          raw: cap[0],
 -        pre: !this.options.sanitizer
@@ -72,7 +73,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 -      }
        return token;
      }
-@@ -502,15 +495,9 @@ export class Tokenizer {
+@@ -517,15 +510,9 @@ export class Tokenizer {
  
        return {
 -        type: this.options.sanitize
@@ -90,7 +91,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text: cap[0]
        };
      }
-@@ -699,10 +686,10 @@ export class Tokenizer {
+@@ -714,10 +701,10 @@ export class Tokenizer {
    }
  
 -  autolink(src, mangle) {
@@ -103,7 +104,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text = escape(cap[1]);
          href = 'mailto:' + text;
        } else {
-@@ -727,10 +714,10 @@ export class Tokenizer {
+@@ -742,10 +729,10 @@ export class Tokenizer {
    }
  
 -  url(src, mangle) {
@@ -116,7 +117,7 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 +        text = escape(cap[0]);
          href = 'mailto:' + text;
        } else {
-@@ -764,12 +751,12 @@ export class Tokenizer {
+@@ -779,12 +766,12 @@ export class Tokenizer {
    }
  
 -  inlineText(src, smartypants) {
@@ -135,8 +136,8 @@ diff --git a/src/Tokenizer.js b/src/Tokenizer.js
 diff --git a/src/defaults.js b/src/defaults.js
 --- a/src/defaults.js
 +++ b/src/defaults.js
-@@ -10,11 +10,7 @@ export function getDefaults() {
-     highlight: null,
+@@ -11,11 +11,7 @@ export function getDefaults() {
+     hooks: null,
      langPrefix: 'language-',
 -    mangle: true,
      pedantic: false,
@@ -170,7 +171,7 @@ diff --git a/src/helpers.js b/src/helpers.js
 +export function cleanUrl(base, href) {
    if (base && !originIndependentUrl.test(href)) {
      href = resolveUrl(base, href);
-@@ -250,10 +237,4 @@ export function findClosingBracket(str, b) {
+@@ -233,10 +220,4 @@ export function findClosingBracket(str, b) {
  }
  
 -export function checkSanitizeDeprecation(opt) {
@@ -185,30 +186,25 @@ diff --git a/src/marked.js b/src/marked.js
 --- a/src/marked.js
 +++ b/src/marked.js
 @@ -7,5 +7,4 @@ import { Slugger } from './Slugger.js';
+ import { Hooks } from './Hooks.js';
  import {
-   merge,
 -  checkSanitizeDeprecation,
    escape
  } from './helpers.js';
-@@ -35,5 +34,4 @@ export function marked(src, opt, callback) {
- 
-   opt = merge({}, marked.defaults, opt || {});
--  checkSanitizeDeprecation(opt);
- 
-   if (callback) {
-@@ -318,5 +316,4 @@ marked.parseInline = function(src, opt) {
- 
-   opt = merge({}, marked.defaults, opt || {});
--  checkSanitizeDeprecation(opt);
- 
-   try {
-@@ -327,5 +324,5 @@ marked.parseInline = function(src, opt) {
-     return Parser.parseInline(tokens, opt);
-   } catch (e) {
+@@ -18,5 +17,5 @@ import {
+ function onError(silent, async, callback) {
+   return (e) => {
 -    e.message += '\nPlease report this to https://github.com/markedjs/marked.';
 +    e.message += '\nmake issue @ https://github.com/9001/copyparty';
-     if (opt.silent) {
-       return '<p>An error occurred:</p><pre>'
+ 
+     if (silent) {
+@@ -65,6 +64,4 @@ function parseMarkdown(lexer, parser) {
+     }
+ 
+-    checkSanitizeDeprecation(opt);
+-
+     if (opt.hooks) {
+       opt.hooks.options = opt;
 diff --git a/test/bench.js b/test/bench.js
 --- a/test/bench.js
 +++ b/test/bench.js
@@ -250,70 +246,70 @@ diff --git a/test/specs/run-spec.js b/test/specs/run-spec.js
 diff --git a/test/unit/Lexer-spec.js b/test/unit/Lexer-spec.js
 --- a/test/unit/Lexer-spec.js
 +++ b/test/unit/Lexer-spec.js
-@@ -712,5 +712,5 @@ paragraph
+@@ -794,5 +794,5 @@ paragraph
      });
  
 -    it('sanitize', () => {
 +    /*it('sanitize', () => {
        expectTokens({
          md: '<div>html</div>',
-@@ -730,5 +730,5 @@ paragraph
+@@ -812,5 +812,5 @@ paragraph
          ]
        });
 -    });
 +    });*/
    });
  
-@@ -810,5 +810,5 @@ paragraph
+@@ -892,5 +892,5 @@ paragraph
        });
  
 -      it('html sanitize', () => {
 +      /*it('html sanitize', () => {
          expectInlineTokens({
            md: '<div>html</div>',
-@@ -818,5 +818,5 @@ paragraph
+@@ -900,5 +900,5 @@ paragraph
            ]
          });
 -      });
 +      });*/
  
        it('link', () => {
-@@ -1129,5 +1129,5 @@ paragraph
+@@ -1211,5 +1211,5 @@ paragraph
          });
  
 -        it('autolink mangle email', () => {
 +        /*it('autolink mangle email', () => {
            expectInlineTokens({
              md: '<test@example.com>',
-@@ -1149,5 +1149,5 @@ paragraph
+@@ -1231,5 +1231,5 @@ paragraph
              ]
            });
 -        });
 +        });*/
  
          it('url', () => {
-@@ -1186,5 +1186,5 @@ paragraph
+@@ -1268,5 +1268,5 @@ paragraph
          });
  
 -        it('url mangle email', () => {
 +        /*it('url mangle email', () => {
            expectInlineTokens({
              md: 'test@example.com',
-@@ -1206,5 +1206,5 @@ paragraph
+@@ -1288,5 +1288,5 @@ paragraph
              ]
            });
 -        });
 +        });*/
        });
  
-@@ -1222,5 +1222,5 @@ paragraph
+@@ -1304,5 +1304,5 @@ paragraph
        });
  
 -      describe('smartypants', () => {
 +      /*describe('smartypants', () => {
          it('single quotes', () => {
            expectInlineTokens({
-@@ -1292,5 +1292,5 @@ paragraph
+@@ -1374,5 +1374,5 @@ paragraph
            });
          });
 -      });

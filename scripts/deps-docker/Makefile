@@ -1,10 +1,9 @@
 self := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 vend := $(self)/../../copyparty/web/deps
 
+# prefers podman-docker (optionally rootless) over actual docker/moby
+
 all:
-	-service docker start
-	-systemctl start docker
-	
 	docker build -t build-copyparty-deps .
 	
 	rm -rf $(vend)
