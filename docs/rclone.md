@@ -29,11 +29,13 @@ echo type = webdav
 echo vendor = owncloud
 echo url = http://127.0.0.1:3923/
 echo headers = Cookie,cppwd=hunter2
+echo pacer_min_sleep = 0.01ms
 echo(
 echo [cpp-ro]
 echo type = http
 echo url = http://127.0.0.1:3923/
 echo headers = Cookie,cppwd=hunter2
+echo pacer_min_sleep = 0.01ms
 ) > %userprofile%\.config\rclone\rclone.conf
 ```
 
@@ -48,11 +50,13 @@ type = webdav
 vendor = owncloud
 url = http://127.0.0.1:3923/
 headers = Cookie,cppwd=hunter2
+pacer_min_sleep = 0.01ms
 
 [cpp-ro]
 type = http
 url = http://127.0.0.1:3923/
 headers = Cookie,cppwd=hunter2
+pacer_min_sleep = 0.01ms
 EOF
 ```
 
@@ -73,8 +77,6 @@ note that the up2k client [up2k.py](https://github.com/9001/copyparty/tree/hovud
 ```
 rclone sync /usr/share/icons/ cpp-rw:fds/
 ```
-
-TODO: rclone bug? `--transfers=4` doesn't seem to do anything (it does one request at a time), doesn't matter if the webdav server is copyparty or rclone
 
 
 # use rclone as server too, replacing copyparty

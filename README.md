@@ -1206,7 +1206,9 @@ sync folders to/from copyparty
 
 the commandline uploader [up2k.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy) with `--dr` is the best way to sync a folder to copyparty; verifies checksums and does files in parallel, and deletes unexpected files on the server after upload has finished which makes file-renames really cheap (it'll rename serverside and skip uploading)
 
-alternatively there is [rclone](./docs/rclone.md) which allows for bidirectional sync and is *way* more flexible (stream files straight from sftp/s3/gcs to copyparty for instance), although syncing to copyparty is about 5x slower than up2k.py if you have many small files in particular
+alternatively there is [rclone](./docs/rclone.md) which allows for bidirectional sync and is *way* more flexible (stream files straight from sftp/s3/gcs to copyparty for instance), although there is no integrity check and it won't work with files over 100 MiB if copyparty is behind cloudflare
+
+* starting from rclone v1.63 (currently [in beta](https://beta.rclone.org/?filter=latest)), rclone will also be faster than up2k.py
 
 
 ## mount as drive
@@ -1215,11 +1217,10 @@ a remote copyparty server as a local filesystem;  go to the control-panel and cl
 
 alternatively, some alternatives roughly sorted by speed (unreproducible benchmark), best first:
 
-* [rclone-http](./docs/rclone.md) (25s), read-only
+* [rclone-webdav](./docs/rclone.md) (25s), read/WRITE ((v1.63-beta)[https://beta.rclone.org/?filter=latest])
+* [rclone-http](./docs/rclone.md) (26s), read-only
+* [partyfuse.py](./bin/#partyfusepy) (35s), read-only
 * [rclone-ftp](./docs/rclone.md) (47s), read/WRITE
-* [rclone-webdav](./docs/rclone.md) (51s), read/WRITE
-  * copyparty-1.5.0's webdav server is faster than rclone-1.60.0 (69s)
-* [partyfuse.py](./bin/#partyfusepy) (71s), read-only
 * davfs2 (103s), read/WRITE, *very fast* on small files
 * [win10-webdav](#webdav-server) (138s), read/WRITE
 * [win10-smb2](#smb-server) (387s), read/WRITE
