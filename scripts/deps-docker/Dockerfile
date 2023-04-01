@@ -7,6 +7,7 @@ ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
         ver_mde=2.18.0 \
         ver_codemirror=5.65.12 \
         ver_fontawesome=5.13.0 \
+        ver_prism=1.29.0 \
         ver_zopfli=1.0.3
 
 # versioncheck:
@@ -30,6 +31,7 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
         && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
+        && wget https://github.com/PrismJS/prism/archive/refs/tags/v$ver_prism.tar.gz -O prism.tgz \
         && (mkdir hash-wasm \
             && cd hash-wasm \
             && unzip ../hash-wasm.zip) \
@@ -47,12 +49,9 @@ RUN     mkdir -p /z/dist/no-pk \
             && cd easy-markdown-editor* \
             && npm install \
             && npm i gulp-cli -g ) \
+        && tar -xf prism.tgz \
         && unzip fontawesome.zip \
         && tar -xf zopfli.tgz
-
-
-# todo
-# https://prismjs.com/download.html#themes=prism-funky&languages=markup+css+clike+javascript+autohotkey+bash+basic+batch+c+csharp+cpp+cmake+diff+docker+go+ini+java+json+kotlin+latex+less+lisp+lua+makefile+objectivec+perl+powershell+python+r+jsx+ruby+rust+sass+scss+sql+swift+systemd+toml+typescript+vbnet+verilog+vhdl+yaml&plugins=line-highlight+line-numbers+autolinker
 
 
 # build fonttools (which needs zopfli)
@@ -127,6 +126,12 @@ COPY    mini-fa.sh /z
 COPY    mini-fa.css /z
 COPY    shiftbase.py /z
 RUN     /bin/ash /z/mini-fa.sh
+
+
+# build prismjs
+COPY    genprism.py /z
+COPY    genprism.sh /z
+RUN     ./genprism.sh $ver_prism
 
 
 # compress

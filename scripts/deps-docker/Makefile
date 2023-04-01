@@ -13,6 +13,7 @@ all:
 	docker run --rm -i build-copyparty-deps:latest | \
 	tar -xvC $(vend) --strip-components=1
 
+	touch $(vend)/__init__.py
 	chown -R `stat $(self) -c %u:%g` $(vend)
 
 purge:
