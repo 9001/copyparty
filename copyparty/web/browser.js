@@ -6707,22 +6707,27 @@ var globalcss = (function () {
 
 		var dcs = document.styleSheets;
 		for (var a = 0; a < dcs.length; a++) {
-			var base = dcs[a].href,
+			var ds, base = '';
+			try {
+				base = dcs[a].href;
+				if (!base)
+					continue;
+
 				ds = dcs[a].cssRules;
-
-			if (!base)
-				continue;
-
-			base = base.replace(/[^/]+$/, '');
-			for (var b = 0; b < ds.length; b++) {
-				var css = ds[b].cssText.split(/\burl\(/g);
-				ret += css[0];
-				for (var c = 1; c < css.length; c++) {
-					var delim = (/^["']/.exec(css[c])) ? css[c].slice(0, 1) : '';
-					ret += 'url(' + delim + ((css[c].slice(0, 8).indexOf('://') + 1 || css[c].startsWith('/')) ? '' : base) +
-						css[c].slice(delim ? 1 : 0);
+				base = base.replace(/[^/]+$/, '');
+				for (var b = 0; b < ds.length; b++) {
+					var css = ds[b].cssText.split(/\burl\(/g);
+					ret += css[0];
+					for (var c = 1; c < css.length; c++) {
+						var delim = (/^["']/.exec(css[c])) ? css[c].slice(0, 1) : '';
+						ret += 'url(' + delim + ((css[c].slice(0, 8).indexOf('://') + 1 || css[c].startsWith('/')) ? '' : base) +
+							css[c].slice(delim ? 1 : 0);
+					}
+					ret += '\n';
 				}
-				ret += '\n';
+			}
+			catch (ex) {
+				console.log('could not read css', a, base);
 			}
 		}
 		return ret;
