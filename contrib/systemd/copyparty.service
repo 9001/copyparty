@@ -2,8 +2,9 @@
 # and share '/mnt' with anonymous read+write
 #
 # installation:
-#   cp -pv copyparty.service /etc/systemd/system
-#   restorecon -vr /etc/systemd/system/copyparty.service
+#   wget https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py -O /usr/local/bin/copyparty-sfx.py
+#   cp -pv copyparty.service /etc/systemd/system/
+#   restorecon -vr /etc/systemd/system/copyparty.service  # on fedora/rhel
 #   firewall-cmd --permanent --add-port={80,443,3923}/tcp  # --zone=libvirt
 #   firewall-cmd --reload
 #   systemctl daemon-reload && systemctl enable --now copyparty
@@ -44,7 +45,7 @@ ExecReload=/bin/kill -s USR1 $MAINPID
 User=cpp
 Environment=XDG_CONFIG_HOME=/home/cpp/.config
 
-# setup forwarding from ports 80 and 443 to port 3923
+# OPTIONAL: setup forwarding from ports 80 and 443 to port 3923
 ExecStartPre=+/bin/bash -c 'nft -n -a list table nat | awk "/ to :3923 /{print\$NF}" | xargs -rL1 nft delete rule nat prerouting handle; true'
 ExecStartPre=+nft add table ip nat
 ExecStartPre=+nft -- add chain ip nat prerouting { type nat hook prerouting priority -100 \; }

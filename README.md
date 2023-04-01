@@ -130,7 +130,7 @@ some recommended options:
 
 you may also want these, especially on servers:
 
-* [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service
+* [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service (see guide inside)
 * [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
 * [contrib/rc/copyparty](contrib/rc/copyparty) to run copyparty on FreeBSD
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to [reverse-proxy](#reverse-proxy) behind nginx (for better https)
