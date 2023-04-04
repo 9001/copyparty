@@ -6,6 +6,7 @@
 
   outputs = { self, nixpkgs, flake-utils }:
     {
+      nixosModules.default = ./contrib/nixos/modules/copyparty.nix;
       overlays.default = self: super: {
         copyparty =
           self.python3.pkgs.callPackage ./contrib/package/nix/copyparty {
