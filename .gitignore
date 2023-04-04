@@ -34,3 +34,6 @@ up.*.txt
 .hist/
 scripts/docker/*.out
 scripts/docker/*.err
+
+# nix build output link
+result
