@@ -20,7 +20,7 @@ let
       # smb server
       impacket
     ]);
-in stdenv.mkDerivation rec {
+in stdenv.mkDerivation {
   pname = "copyparty";
   version = pinData.version;
   src = fetchurl {
