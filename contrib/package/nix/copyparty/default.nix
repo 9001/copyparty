@@ -9,7 +9,6 @@ let
       jinja2
       # thumbnails
       pyvips
-      ffmpeg
       # alternative thumbnails, but not needed in the presence of pyvips and ffmpeg
       # pillow pyheif-pillow-opener pillow-avif-plugin
       # audio metadata
