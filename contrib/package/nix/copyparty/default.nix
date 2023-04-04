@@ -2,6 +2,7 @@
 , pyvips, pyftpdlib, pyopenssl, impacket, ffmpeg }:
 
 let
+  pinData = lib.importJSON ./pin.json;
   pyEnv = python.withPackages (ps:
     with ps; [
       # mandatory
@@ -21,11 +22,10 @@ let
     ]);
 in stdenv.mkDerivation rec {
   pname = "copyparty";
-  version = "1.6.11";
+  version = pinData.version;
   src = fetchurl {
-    url =
-      "https://github.com/9001/copyparty/releases/download/v${version}/copyparty-sfx.py";
-    hash = "sha256-0JbjOrZm70UhOJndOhBzX2K1RBM5y3N0+TsjLQtsjTQ=";
+    url = pinData.url;
+    hash = pinData.hash;
   };
   buildInputs = [ makeWrapper ];
   dontUnpack = true;
