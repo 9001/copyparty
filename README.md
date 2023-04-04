@@ -101,6 +101,8 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 
 * or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
+* or install through nix: `nix profile install github:9001/copyparty`
+  * requires a [flake-enabled](https://nixos.wiki/wiki/Flakes) installation of nix
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:
@@ -138,6 +140,7 @@ you may also want these, especially on servers:
 * [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
 * [contrib/rc/copyparty](contrib/rc/copyparty) to run copyparty on FreeBSD
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to [reverse-proxy](#reverse-proxy) behind nginx (for better https)
+* [nixos module](#nixos-module) to run copyparty on NixOS hosts
 
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
@@ -1162,6 +1165,64 @@ example webserver configs:
 * [nginx config](contrib/nginx/copyparty.conf) -- entire domain/subdomain
 * [apache2 config](contrib/apache/copyparty.conf) -- location-based
 
+## nixos module
+for this setup, you will need a [flake-enabled](https://nixos.wiki/wiki/Flakes) installation of NixOS.
+
+```nix
+{
+  # add copyparty flake to your inputs
+  inputs.copyparty.url = "github:9001/copyparty";
+
+  # ensure that copyparty is an allowed argument to the outputs function
+  outputs = { self, nixpkgs, copyparty }: {
+    nixosConfigurations.yourHostName = nixpkgs.lib.nixosSystem {
+      modules = [
+        # load the copyparty NixOS module
+        copyparty.nixosModules.default
+        ({ pkgs, ... }: {
+          # add the copyparty overlay to expose the package to the module
+          nixpkgs.overlays = [ copyparty.overlays.default ];
+          # (optional) install the package globally
+          environment.systemPackages = [ pkgs.copyparty ];
+          # configure the copyparty module
+          services.copyparty.enable = true;
+        })
+      ];
+    };
+  };
+}
+```
+
+copyparty on NixOS is configured via `services.copyparty.config`, for example:
+```nix
+services.copyparty = {
+  enable = true;
+  config = ''
+    [global]
+      i: 0.0.0.0
+      no-reload
+
+    # create users
+    [accounts]
+      # username: password
+      ed: 123
+
+    # create a volume
+    [/]               # create a volume at "/" (the webroot), which will
+      /srv/copyparty  # share the contents of "/srv/copyparty"
+      accs:
+        r: *          # everyone gets read-access, but
+        rw: ed        # the user "ed" gets read-write
+  '';
+  # the service runs in an isolated environment by default
+  # any directory you reference in the volume configuration
+  # needs to be added here, in order to make it discoverable
+  # with the exception of /var/lib/copyparty, which is always available
+  readWritePaths = [ "/srv/copyparty" ];
+  # you may increase the open file limit for the process
+  openFilesLimit = 8192;
+};
+```
 
 # browser support
 
