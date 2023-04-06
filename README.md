@@ -1193,32 +1193,62 @@ for this setup, you will need a [flake-enabled](https://nixos.wiki/wiki/Flakes) 
 }
 ```
 
-copyparty on NixOS is configured via `services.copyparty.config`, for example:
+copyparty on NixOS is configured via `services.copyparty` options, for example:
 ```nix
 services.copyparty = {
   enable = true;
-  config = ''
-    [global]
-      i: 0.0.0.0
-      no-reload
+  # directly maps to values in the [global] section of the copyparty config.
+  # see `copyparty --help` for available options
+  settings = {
+    i = "0.0.0.0";
+    # use lists to set multiple values
+    p = [ 3210 3211 ];
+    # use booleans to set binary flags
+    no-reload = true;
+    # using 'false' will do nothing and omit the value when generating a config
+    ignored-flag = false;
+  };
 
-    # create users
-    [accounts]
-      # username: password
-      ed: 123
+  # create users
+  accounts = {
+    # specify the account name as the key
+    ed = {
+      # provide the path to a file containing the password, keeping it out of /nix/store
+      # must be readable by the copyparty service user
+      passwordFile = "/run/keys/copyparty/ed_password";
+    };
+    # or do both in one go
+    k.passwordFile = "/run/keys/copyparty/k_password";
+  };
 
-    # create a volume
-    [/]               # create a volume at "/" (the webroot), which will
-      /srv/copyparty  # share the contents of "/srv/copyparty"
-      accs:
-        r: *          # everyone gets read-access, but
-        rw: ed        # the user "ed" gets read-write
-  '';
-  # the service runs in an isolated environment by default
-  # any directory you reference in the volume configuration
-  # needs to be added here, in order to make it discoverable
-  # with the exception of /var/lib/copyparty, which is always available
-  readWritePaths = [ "/srv/copyparty" ];
+  # create a volume
+  volumes = {
+    # create a volume at "/" (the webroot), which will
+    "/" = {
+      # share the contents of "/srv/copyparty"
+      path = "/srv/copyparty";
+      # see `copyparty --help-accounts` for available options
+      access = {
+        # everyone gets read-access, but
+        r = "*";
+        # users "ed" and "k" get read-write
+        rw = [ "ed" "k" ];
+      };
+      # see `copyparty --help-flags` for available options
+      flags = {
+        # "fk" enables filekeys (necessary for upget permission) (4 chars long)
+        fk = 4;
+        # scan for new files every 60sec
+        scan = 60;
+        # volflag "e2d" enables the uploads database
+        e2d = true;
+        # "d2t" disables multimedia parsers (in case the uploads are malicious)
+        d2t = true;
+        # skips hashing file contents if path matches *.iso
+        nohash = "\.iso$";
+      };
+    };
+  };
   # you may increase the open file limit for the process
   openFilesLimit = 8192;
 };
