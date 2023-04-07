@@ -1496,7 +1496,7 @@ var mpl = (function () {
 	r.announce = announce;
 
 	r.stop = function () {
-		if (!r.os_ctl || !navigator.mediaSession.metadata)
+		if (!r.os_ctl)
 			return;
 
 		navigator.mediaSession.metadata = null;
@@ -1505,6 +1505,8 @@ var mpl = (function () {
 		var hs = 'play pause seekbackward seekforward previoustrack nexttrack'.split(/ /g);
 		for (var a = 0; a < hs.length; a++)
 			navigator.mediaSession.setActionHandler(hs[a], null);
+
+		navigator.mediaSession.setPositionState();
 	};
 
 	r.unbuffer = function (url) {
@@ -1544,6 +1546,7 @@ function MPlayer() {
 	r.au2 = null;
 	r.tracks = {};
 	r.order = [];
+	r.cd_pause = 0;
 
 	var re_audio = have_acode && mpl.ac_oth ? re_au_all : re_au_native,
 		trs = QSA('#files tbody tr');
@@ -1600,6 +1603,7 @@ function MPlayer() {
 	r.ftid = -1;
 	r.ftimer = null;
 	r.fade_in = function () {
+		r.nopause();
 		r.fvol = 0;
 		r.fdir = 0.025 * r.vol * (CHROME ? 1.5 : 1);
 		if (r.au) {
@@ -1632,9 +1636,9 @@ function MPlayer() {
 			r.au.pause();
 			mpl.pp();
 
-			var t = mp.au.currentTime - 0.8;
+			var t = r.au.currentTime - 0.8;
 			if (isNum(t))
-				mp.au.currentTime = Math.max(t, 0);
+				r.au.currentTime = Math.max(t, 0);
 		}
 		else if (r.fvol > r.vol)
 			r.fvol = r.vol;
@@ -1680,8 +1684,14 @@ function MPlayer() {
 				drop();
 			});
 
-		mp.au2.preload = "auto";
-		mp.au2.src = mp.au2.rsrc = url;
+		r.nopause();
+		r.au2.onloadeddata = r.au2.onloadedmetadata = r.nopause;
+		r.au2.preload = "auto";
+		r.au2.src = r.au2.rsrc = url;
+	};
+
+	r.nopause = function () {
+		r.cd_pause = Date.now();
 	};
 }
 
@@ -1820,7 +1830,7 @@ function glossy_grad(can, h, s, l) {
 var pbar = (function () {
 	var r = {},
 		bau = null,
-		html_cdown = 0,
+		html_txt = 'a',
 		lastmove = 0,
 		mousepos = 0,
 		gradh = -1,
@@ -1991,10 +2001,14 @@ var pbar = (function () {
 		pctx.fillText(t1, xt1, yt);
 		pctx.fillText(t2, xt2, yt);
 
-		if (html_cdown < Date.now() - 99) {
-			html_cdown = Date.now();
-			if (ebi('np_pos').textContent != t2)
-				ebi('np_pos').textContent = t2;
+		if (w && html_txt != t2) {
+			ebi('np_pos').textContent = html_txt = t2;
+			if (mpl.os_ctl)
+				navigator.mediaSession.setPositionState({
+					'duration': adur,
+					'position': apos,
+					'playbackRate': 1
+				});
 		}
 	};
 
@@ -2125,6 +2139,7 @@ function seek_au_sec(seek) {
 	if (!isNum(seek))
 		return;
 
+	mp.nopause();
 	mp.au.currentTime = seek;
 
 	if (mp.au.paused)
@@ -2198,7 +2213,7 @@ function playpause(e) {
 
 
 function mplay(e) {
-	if (mp && mp.au && !mp.au.paused)
+	if (mp.au && !mp.au.paused)
 		return;
 
 	playpause(e);
@@ -2206,7 +2221,10 @@ function mplay(e) {
 
 
 function mpause(e) {
-	if (mp && mp.au && mp.au.paused)
+	if (mp.cd_pause > Date.now() - 100)
+		return;
+
+	if (mp.au && mp.au.paused)
 		return;
 
 	playpause(e);
@@ -2760,6 +2778,7 @@ function play(tid, is_ev, seek) {
 		scroll2playing();
 
 	try {
+		mp.nopause();
 		mp.au.play();
 		if (mp.au.paused)
 			autoplay_blocked(seek);
