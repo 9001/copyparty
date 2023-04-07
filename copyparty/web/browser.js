@@ -1485,8 +1485,8 @@ var mpl = (function () {
 		ebi('np_img').setAttribute('src', cover); // dont give last.fm the pwd
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
-		navigator.mediaSession.setActionHandler('play', playpause);
-		navigator.mediaSession.setActionHandler('pause', playpause);
+		navigator.mediaSession.setActionHandler('play', mplay);
+		navigator.mediaSession.setActionHandler('pause', mpause);
 		navigator.mediaSession.setActionHandler('seekbackward', r.os_seek ? function () { seek_au_rel(-10); } : null);
 		navigator.mediaSession.setActionHandler('seekforward', r.os_seek ? function () { seek_au_rel(10); } : null);
 		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
@@ -1501,6 +1501,10 @@ var mpl = (function () {
 
 		navigator.mediaSession.metadata = null;
 		navigator.mediaSession.playbackState = "paused";
+
+		var hs = 'play pause seekbackward seekforward previoustrack nexttrack'.split(/ /g);
+		for (var a = 0; a < hs.length; a++)
+			navigator.mediaSession.setActionHandler(hs[a], null);
 	};
 
 	r.unbuffer = function (url) {
@@ -2191,6 +2195,22 @@ function playpause(e) {
 
 	mpl.pp();
 };
+
+
+function mplay(e) {
+	if (mp && mp.au && !mp.au.paused)
+		return;
+
+	playpause(e);
+}
+
+
+function mpause(e) {
+	if (mp && mp.au && mp.au.paused)
+		return;
+
+	playpause(e);
+}
 
 
 // hook up the widget buttons
