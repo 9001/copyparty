@@ -39,6 +39,8 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
+    * [media player](#media-player) - plays almost every audio format there is
+        * [audio equalizer](#audio-equalizer) - bass boosted
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
@@ -117,6 +119,8 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
 * see [optional dependencies](#optional-dependencies) to enable even more features
 
 running copyparty without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
+
+or see [complete windows example](./docs/examples/windows.md)
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
@@ -649,12 +653,61 @@ or a mix of both:
 the metadata keys you can use in the format field are the ones in the file-browser table header (whatever is collected with `-mte` and `-mtp`)
 
 
+## media player
+
+plays almost every audio format there is  (if the server has FFmpeg installed for on-demand transcoding)
+
+the following audio formats are usually always playable, even without FFmpeg: `aac|flac|m4a|mp3|ogg|opus|wav`
+
+some hilights:
+* OS integration; control playback from your phone's lockscreen
+* shows the audio waveform in the seekbar
+* not perfectly gapless but can get really close (see settings below); good enough to enjoy gapless albums as intended
+
+click the `play` link next to an audio file, or copy the link target to [share it](https://a.ocv.me/pub/demo/music/Ubiktune%20-%20SOUNDSHOCK%202%20-%20FM%20FUNK%20TERRROR!!/#af-1fbfba61&t=18) (optionally with a timestamp to start playing from, like that example does)
+
+open the `[🎺]` media-player-settings tab to configure it,
+* switches:
+  * `[preload]` starts loading the next track when it's about to end, reduces the silence between songs
+  * `[full]` does a full preload by downloading the entire next file; good for unreliable connections, bad for slow connections
+  * `[~s]` toggles the seekbar waveform display
+  * `[/np]` enables buttons to copy the now-playing info as an irc message
+  * `[os-ctl]` makes it possible to control audio playback from the lockscreen of your device (enables [mediasession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession))
+  * `[seek]` allows seeking with lockscreen controls (buggy on some devices)
+  * `[art]` shows album art on the lockscreen
+  * `[🎯]` keeps the playing song scrolled into view (good when using the player as a taskbar dock)
+  * `[⟎]` shrinks the playback controls
+* playback mode:
+  * `[loop]` keeps looping the folder
+  * `[next]` plays into the next folder
+* transcode:
+  * `[flac]` convers `flac` and `wav` files into opus
+  * `[aac]` converts `aac` and `m4a` files into opus
+  * `[oth]` converts all other known formats into opus
+    * `aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk`
+* "tint" reduces the contrast of the playback bar
+
+
+### audio equalizer
+
+bass boosted
+
+can also boost the volume in general, or increase/decrease stereo width (like [crossfeed](https://www.foobar2000.org/components/view/foo_dsp_meiercf) just worse)
+
+
 ## markdown viewer
 
 and there are *two* editors
 
 ![copyparty-md-read-fs8](https://user-images.githubusercontent.com/241032/115978057-66419080-a57d-11eb-8539-d2be843991aa.png)
 
+there is a built-in extension for inline clickable thumbnails;
+* enable it by adding `<!-- th -->` somewhere in the doc
+* add thumbnails with `!th[l](your.jpg)` where `l` means left-align (`r` = right-align)
+* a single line with `---` clears the float / inlining
+* in the case of README.md being displayed below a file listing, thumbnails will open in the gallery viewer
+
+other notes,
 * the document preview has a max-width which is the same as an A4 paper when printed
 
 

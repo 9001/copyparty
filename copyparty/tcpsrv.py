@@ -322,7 +322,7 @@ class TcpSrv(object):
                 if k not in netdevs:
                     removed = "{} = {}".format(k, v)
 
-            t = "network change detected:\n  added {}\nremoved {}"
+            t = "network change detected:\n  added {}\033[0;33m\nremoved {}"
             self.log("tcpsrv", t.format(added, removed), 3)
             self.netdevs = netdevs
             self._distribute_netdevs()
