@@ -16,8 +16,8 @@ open up notepad and save the following as `c:\users\you\documents\party.conf` (f
 ```yaml
 [global]
   lo: c:\users\you\logs\cpp-%Y-%m%d.xz  # log to file
-  e2dsa, e2ts, no-dedup, z   # this sets 4 different flags
-  p: 80, 443  # listen on ports 80 and 443 instead of 3923
+  e2dsa, e2ts, no-dedup, z   # sets 4 flags; see below
+  p: 80, 443  # listen on ports 80 and 443, not 3923
   theme: 2    # default theme: protonmail-monokai
   lang: nor   # default language: viking
 
