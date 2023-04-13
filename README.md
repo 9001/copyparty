@@ -1131,6 +1131,8 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 
 ## complete examples
 
+* [running on windows](./docs/examples/windows.md)
+
 * read-only music server  
   `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts --no-robots --force-js --theme 2`
   
@@ -1313,11 +1315,13 @@ below are some tweaks roughly ordered by usefulness:
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
-* `-j` enables multiprocessing (actual multithreading) and can make copyparty perform better in cpu-intensive workloads, for example:
-  * huge amount of short-lived connections
+* `-j0` enables multiprocessing (actual multithreading), can reduce latency to `20+80/numCores` percent and generally improve performance in cpu-intensive workloads, for example:
+  * lots of connections (many users or heavy clients)
   * simultaneous downloads and uploads saturating a 20gbps connection
   
   ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
+* using [pypy](https://www.pypy.org/) instead of [cpython](https://www.python.org/) *can* be 70% faster for some workloads, but slower for many others
+  * and pypy can sometimes crash on startup with `-j0` (TODO make issue)
 
 
 ## client-side

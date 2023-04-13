@@ -16,12 +16,12 @@ open up notepad and save the following as `c:\users\you\documents\party.conf` (f
 ```yaml
 [global]
   lo: c:\users\you\logs\cpp-%Y-%m%d.xz  # log to file
-  e2dsa, e2ts, no-dedup, z   # sets 4 flags; see below
+  e2dsa, e2ts, no-dedup, z   # sets 4 flags; see expl.
   p: 80, 443  # listen on ports 80 and 443, not 3923
   theme: 2    # default theme: protonmail-monokai
   lang: nor   # default language: viking
 
-[accounts]
+[accounts]                  # usernames and passwords
   kevin: shangalabangala    # kevin's password
 
 [/]               # create a volume available at /
@@ -52,6 +52,7 @@ the `[global]` section accepts any config parameters you can see when running co
 * `e2dsa` enables the upload deduplicator and file indexer, which enables searching
 * `e2ts` enables music metadata indexing, making albums / titles etc. searchable too
 * `no-dedup` writes full dupes to disk instead of symlinking, since lots of windows software doesn't handle symlinks well
+  * but the improved upload speed from `e2dsa` is not affected
 * `z` enables zeroconf, making the server available at `http://HOSTNAME.local/` from any other machine in the LAN
 * `p: 80,443` listens on the ports `80` and `443` instead of the default `3923`
 * `lang: nor` sets default language to viking
