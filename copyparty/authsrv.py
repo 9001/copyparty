@@ -356,7 +356,8 @@ class VFS(object):
         flags = {k: v for k, v in self.flags.items()}
         hist = flags.get("hist")
         if hist and hist != "-":
-            flags["hist"] = "{}/{}".format(hist.rstrip("/"), name)
+            zs = "{}/{}".format(hist.rstrip("/"), name)
+            flags["hist"] = os.path.expanduser(zs) if zs.startswith("~") else zs
 
         return flags
 
@@ -1101,6 +1102,9 @@ class AuthSrv(object):
             if vflag == "-":
                 pass
             elif vflag:
+                if vflag.startswith("~"):
+                    vflag = os.path.expanduser(vflag)
+
                 vol.histpath = uncyg(vflag) if WINDOWS else vflag
             elif self.args.hist:
                 for nch in range(len(hid)):

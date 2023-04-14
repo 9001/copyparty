@@ -128,6 +128,9 @@ class SvcHub(object):
             args.no_robots = True
             args.force_js = True
 
+        if not self._process_config():
+            raise Exception("bad config")
+
         self.log = self._log_disabled if args.q else self._log_enabled
         if args.lo:
             self._setup_logfile(printed)
@@ -176,9 +179,6 @@ class SvcHub(object):
             self._setlimits()
 
         self.log("root", "max clients: {}".format(self.args.nc))
-
-        if not self._process_config():
-            raise Exception("bad config")
 
         self.tcpsrv = TcpSrv(self)
         self.up2k = Up2k(self)
@@ -349,6 +349,19 @@ class SvcHub(object):
             al.rsp_slp = 0.000001
 
         al.th_covers = set(al.th_covers.split(","))
+
+        for k in "c".split(" "):
+            vl = getattr(al, k)
+            if not vl:
+                continue
+
+            vl = [os.path.expanduser(x) if x.startswith("~") else x for x in vl]
+            setattr(al, k, vl)
+
+        for k in "lo hist ssl_log".split(" "):
+            vs = getattr(al, k)
+            if vs and vs.startswith("~"):
+                setattr(al, k, os.path.expanduser(vs))
 
         return True
 
