@@ -21,6 +21,9 @@ copyparty.egg-info/
 # winmerge
 *.bak
 
+# apple pls
+.DS_Store
+
 # derived
 copyparty/res/COPYING.txt
 copyparty/web/deps/

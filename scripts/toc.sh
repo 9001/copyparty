@@ -16,7 +16,9 @@ cat $f | awk '
             h=0
         };
     };
-    /^#/{s=1;pr()} /^#* *(install on android|dev env setup|just the sfx|complete release|optional gpl stuff)|`$/{s=0}
+    /^#/{s=1;rs=0;pr()}
+    /^#* *(nix package)/{rs=1}
+    /^#* *(install on android|dev env setup|just the sfx|complete release|optional gpl stuff|nixos module)|`$/{s=rs}
     /^#/{
         lv=length($1);
         sub(/[^ ]+ /,"");

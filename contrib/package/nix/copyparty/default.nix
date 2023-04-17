@@ -1,24 +1,41 @@
-{ lib, stdenv, makeWrapper, fetchurl, utillinux, python, jinja2, mutagen, pillow
-, pyvips, pyftpdlib, pyopenssl, impacket, ffmpeg }:
+{ lib, stdenv, makeWrapper, fetchurl, utillinux, python, jinja2, impacket, pyftpdlib, pyopenssl, pillow, pyvips, ffmpeg, mutagen,
+
+# create thumbnails with Pillow; faster than FFmpeg / MediaProcessing
+withThumbnails ? true,
+
+# create thumbnails with PyVIPS; even faster, uses more memory
+# -- can be combined with Pillow to support more filetypes
+withFastThumbnails ? false,
+
+# enable FFmpeg; thumbnails for most filetypes (also video and audio), extract audio metadata, transcode audio to opus
+# -- possibly dangerous if you allow anonymous uploads, since FFmpeg has a huge attack surface
+# -- can be combined with Thumbnails and/or FastThumbnails, since FFmpeg is slower than both
+withMediaProcessing ? true,
+
+# if MediaProcessing is not enabled, you probably want this instead (less accurate, but much safer and faster)
+withBasicAudioMetadata ? false,
+
+# enable FTPS support in the FTP server
+withFTPS ? false,
+
+# samba/cifs server; dangerous and buggy, enable if you really need it
+withSMB ? false,
+
+}:
 
 let
   pinData = lib.importJSON ./pin.json;
   pyEnv = python.withPackages (ps:
     with ps; [
-      # mandatory
       jinja2
-      # thumbnails
-      pyvips
-      # alternative thumbnails, but not needed in the presence of pyvips and ffmpeg
-      # pillow pyheif-pillow-opener pillow-avif-plugin
-      # audio metadata
-      mutagen
-      # ftp server
-      pyftpdlib
-      pyopenssl
-      # smb server
-      impacket
-    ]);
+    ]
+    ++ lib.optional withSMB impacket
+    ++ lib.optional withFTPS pyopenssl
+    ++ lib.optional withThumbnails pillow
+    ++ lib.optional withFastThumbnails pyvips
+    ++ lib.optional withMediaProcessing ffmpeg
+    ++ lib.optional withBasicAudioMetadata mutagen
+    );
 in stdenv.mkDerivation {
   pname = "copyparty";
   version = pinData.version;
@@ -32,7 +49,7 @@ in stdenv.mkDerivation {
   installPhase = ''
     install -Dm755 $src $out/share/copyparty-sfx.py
     makeWrapper ${pyEnv.interpreter} $out/bin/copyparty \
-      --set PATH '${lib.makeBinPath [ utillinux ffmpeg ]}:$PATH' \
+      --set PATH '${lib.makeBinPath ([ utillinux ] ++ lib.optional withMediaProcessing ffmpeg)}:$PATH' \
       --add-flags "$out/share/copyparty-sfx.py"
   '';
 }
