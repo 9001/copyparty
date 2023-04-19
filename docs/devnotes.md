@@ -4,6 +4,7 @@
 * [future plans](#future-plans) - some improvement ideas
 * [design](#design)
     * [up2k](#up2k) - quick outline of the up2k protocol
+    * [why not tus](#why-not-tus) - I didn't know about [tus](https://tus.io/)
     * [why chunk-hashes](#why-chunk-hashes) - a single sha512 would be better, right?
 * [http api](#http-api)
     * [read](#read)
@@ -65,6 +66,13 @@ regarding the frequent server log message during uploads;
 * this chunk was `6 MiB`, uploaded at `106 MiB/s`
 * on this http connection, `2.77 GiB` transferred, `102.9 MiB/s` average, `948` chunks handled
 * client says `4` uploads OK, `0` failed, `3` busy, `1` queued, `10042 MiB` total size, `7198 MiB` and `00:01:09` left
+
+## why not tus
+
+I didn't know about [tus](https://tus.io/)  when I made this, but:
+* up2k has the advantage that it supports parallel uploading of non-contiguous chunks straight into the final file -- [tus does a merge at the end](https://tus.io/protocols/resumable-upload.html#concatenation) which is slow and taxing on the server HDD / filesystem (unless i'm misunderstanding)
+* up2k has the slight disadvantage of requiring the client to hash the entire file before an upload can begin, but this has the benefit of immediately skipping duplicate files
+  * and the hashing happens in a separate thread anyways so it's usually not a bottleneck
 
 ## why chunk-hashes
 

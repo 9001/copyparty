@@ -86,7 +86,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
         * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
-* [HTTP API](#HTTP-API) - see [devnotes](#./docs/devnotes.md#http-api)
+* [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [optional gpl stuff](#optional-gpl-stuff)
@@ -664,9 +664,9 @@ plays almost every audio format there is  (if the server has FFmpeg installed fo
 the following audio formats are usually always playable, even without FFmpeg: `aac|flac|m4a|mp3|ogg|opus|wav`
 
 some hilights:
-* OS integration; control playback from your phone's lockscreen
+* OS integration; control playback from your phone's lockscreen ([windows](https://user-images.githubusercontent.com/241032/233213022-298a98ba-721a-4cf1-a3d4-f62634bc53d5.png) // [iOS](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) // [android](https://user-images.githubusercontent.com/241032/233212311-a7368590-08c7-4f9f-a1af-48ccf3f36fad.png))
 * shows the audio waveform in the seekbar
-* not perfectly gapless but can get really close (see settings below); good enough to enjoy gapless albums as intended
+* not perfectly gapless but can get really close (see settings + eq below); good enough to enjoy gapless albums as intended
 
 click the `play` link next to an audio file, or copy the link target to [share it](https://a.ocv.me/pub/demo/music/Ubiktune%20-%20SOUNDSHOCK%202%20-%20FM%20FUNK%20TERRROR!!/#af-1fbfba61&t=18) (optionally with a timestamp to start playing from, like that example does)
 
@@ -697,6 +697,8 @@ open the `[🎺]` media-player-settings tab to configure it,
 bass boosted
 
 can also boost the volume in general, or increase/decrease stereo width (like [crossfeed](https://www.foobar2000.org/components/view/foo_dsp_meiercf) just worse)
+
+has the convenient side-effect of reducing the pause between songs, so gapless albums play better with the eq enabled (just make it flat)
 
 
 ## markdown viewer
@@ -1538,7 +1540,7 @@ however you can hit `F12` in the up2k tab and use the devtools to see how far yo
 
 # HTTP API
 
-see [devnotes](#./docs/devnotes.md#http-api)
+see [devnotes](./docs/devnotes.md#http-api)
 
 
 # dependencies
