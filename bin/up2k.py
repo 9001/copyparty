@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.5"
-S_BUILD_DT = "2023-03-12"
+S_VERSION = "1.6"
+S_BUILD_DT = "2023-04-20"
 
 """
 up2k.py: upload to copyparty
@@ -653,6 +653,7 @@ class Ctl(object):
         return nfiles, nbytes
 
     def __init__(self, ar, stats=None):
+        self.ok = False
         self.ar = ar
         self.stats = stats or self._scan()
         if not self.stats:
@@ -699,6 +700,8 @@ class Ctl(object):
             self.mth = MTHash(ar.J) if ar.J > 1 else None
 
             self._fancy()
+
+        self.ok = True
 
     def _safe(self):
         """minimal basic slow boring fallback codepath"""
@@ -1131,11 +1134,13 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ctl = Ctl(ar)
 
-    if ar.dr and not ar.drd:
+    if ar.dr and not ar.drd and ctl.ok:
         print("\npass 2/2: delete")
         ar.drd = True
         ar.z = True
-        Ctl(ar, ctl.stats)
+        ctl = Ctl(ar, ctl.stats)
+
+    sys.exit(0 if ctl.ok else 1)
 
 
 if __name__ == "__main__":
