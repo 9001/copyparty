@@ -103,11 +103,12 @@ class HttpConn(object):
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func(self.log_src, msg, c)
 
-    def get_u2idx(self) -> U2idx:
-        # one u2idx per tcp connection;
+    def get_u2idx(self) -> Optional[U2idx]:
+        # grab from a pool of u2idx instances;
         # sqlite3 fully parallelizes under python threads
+        # but avoid running out of FDs by creating too many
         if not self.u2idx:
-            self.u2idx = U2idx(self)
+            self.u2idx = self.hsrv.get_u2idx(str(self.addr))
 
         return self.u2idx
 
@@ -215,3 +216,7 @@ class HttpConn(object):
             self.cli = HttpCli(self)
             if not self.cli.run():
                 return
+
+            if self.u2idx:
+                self.hsrv.put_u2idx(str(self.addr), self.u2idx)
+                self.u2idx = None

@@ -34,14 +34,14 @@ if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Union
 
 if TYPE_CHECKING:
-    from .httpconn import HttpConn
+    from .httpsrv import HttpSrv
 
 
 class U2idx(object):
-    def __init__(self, conn: "HttpConn") -> None:
-        self.log_func = conn.log_func
-        self.asrv = conn.asrv
-        self.args = conn.args
+    def __init__(self, hsrv: "HttpSrv") -> None:
+        self.log_func = hsrv.log
+        self.asrv = hsrv.asrv
+        self.args = hsrv.args
         self.timeout = self.args.srch_time
 
         if not HAVE_SQLITE3:
@@ -51,7 +51,7 @@ class U2idx(object):
         self.active_id = ""
         self.active_cur: Optional["sqlite3.Cursor"] = None
         self.cur: dict[str, "sqlite3.Cursor"] = {}
-        self.mem_cur = sqlite3.connect(":memory:").cursor()
+        self.mem_cur = sqlite3.connect(":memory:", check_same_thread=False).cursor()
         self.mem_cur.execute(r"create table a (b text)")
 
         self.p_end = 0.0
@@ -101,7 +101,8 @@ class U2idx(object):
             uri = ""
             try:
                 uri = "{}?mode=ro&nolock=1".format(Path(db_path).as_uri())
-                cur = sqlite3.connect(uri, 2, uri=True).cursor()
+                db = sqlite3.connect(uri, 2, uri=True, check_same_thread=False)
+                cur = db.cursor()
                 cur.execute('pragma table_info("up")').fetchone()
                 self.log("ro: {}".format(db_path))
             except:
@@ -112,7 +113,7 @@ class U2idx(object):
         if not cur:
             # on windows, this steals the write-lock from up2k.deferred_init --
             # seen on win 10.0.17763.2686, py 3.10.4, sqlite 3.37.2
-            cur = sqlite3.connect(db_path, 2).cursor()
+            cur = sqlite3.connect(db_path, 2, check_same_thread=False).cursor()
             self.log("opened {}".format(db_path))
 
         self.cur[ptop] = cur

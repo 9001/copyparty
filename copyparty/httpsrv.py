@@ -11,7 +11,7 @@ import time
 
 import queue
 
-from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams
+from .__init__ import ANYWIN, CORES, EXE, MACOS, TYPE_CHECKING, EnvParams
 
 try:
     MNFE = ModuleNotFoundError
@@ -40,6 +40,7 @@ except MNFE:
 
 from .bos import bos
 from .httpconn import HttpConn
+from .u2idx import U2idx
 from .util import (
     E_SCK,
     FHC,
@@ -110,6 +111,9 @@ class HttpSrv(object):
         self.nclimax = 0
         self.cb_ts = 0.0
         self.cb_v = ""
+
+        self.u2idx_free: dict[str, U2idx] = {}
+        self.u2idx_n = 0
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(os.path.join(self.E.mod, "web"))
@@ -445,6 +449,9 @@ class HttpSrv(object):
                     self.clients.remove(cli)
                     self.ncli -= 1
 
+                if cli.u2idx:
+                    self.put_u2idx(str(addr), cli.u2idx)
+
     def cachebuster(self) -> str:
         if time.time() - self.cb_ts < 1:
             return self.cb_v
@@ -466,3 +473,31 @@ class HttpSrv(object):
             self.cb_v = v.decode("ascii")[-4:]
             self.cb_ts = time.time()
             return self.cb_v
+
+    def get_u2idx(self, ident: str) -> Optional[U2idx]:
+        utab = self.u2idx_free
+        for _ in range(100):  # 5/0.05 = 5sec
+            with self.mutex:
+                if utab:
+                    if ident in utab:
+                        return utab.pop(ident)
+
+                    return utab.pop(list(utab.keys())[0])
+
+                if self.u2idx_n < CORES:
+                    self.u2idx_n += 1
+                    return U2idx(self)
+
+            time.sleep(0.05)
+            # not using conditional waits, on a hunch that
+            # average performance will be faster like this
+            # since most servers won't be fully saturated
+
+        return None
+
+    def put_u2idx(self, ident: str, u2idx: U2idx) -> None:
+        with self.mutex:
+            while ident in self.u2idx_free:
+                ident += "a"
+
+            self.u2idx_free[ident] = u2idx

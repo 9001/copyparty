@@ -1754,7 +1754,7 @@ class HttpCli(object):
 
     def handle_search(self, body: dict[str, Any]) -> bool:
         idx = self.conn.get_u2idx()
-        if not hasattr(idx, "p_end"):
+        if not idx or not hasattr(idx, "p_end"):
             raise Pebkac(500, "sqlite3 is not available on the server; cannot search")
 
         vols = []
@@ -3079,7 +3079,7 @@ class HttpCli(object):
             raise Pebkac(403, "the unpost feature is disabled in server config")
 
         idx = self.conn.get_u2idx()
-        if not hasattr(idx, "p_end"):
+        if not idx or not hasattr(idx, "p_end"):
             raise Pebkac(500, "sqlite3 is not available on the server; cannot unpost")
 
         filt = self.uparam.get("filter")
@@ -3298,9 +3298,10 @@ class HttpCli(object):
 
         is_dir = stat.S_ISDIR(st.st_mode)
         icur = None
-        if e2t or (e2d and is_dir):
+        if is_dir and (e2t or e2d):
             idx = self.conn.get_u2idx()
-            icur = idx.get_cur(dbv.realpath)
+            if idx and hasattr(idx, "p_end"):
+                icur = idx.get_cur(dbv.realpath)
 
         if self.can_read:
             th_fmt = self.uparam.get("th")
