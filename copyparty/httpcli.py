@@ -2556,8 +2556,12 @@ class HttpCli(object):
         hrange = self.headers.get("range")
 
         # let's not support 206 with compression
-        if do_send and not is_compressed and hrange and file_sz:
+        # and multirange / multipart is also not-impl (mostly because calculating contentlength is a pain)
+        if do_send and not is_compressed and hrange and file_sz and "," not in hrange:
             try:
+                if not hrange.lower().startswith("bytes"):
+                    raise Exception()
+
                 a, b = hrange.split("=", 1)[1].split("-")
 
                 if a.strip():
