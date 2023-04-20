@@ -17,15 +17,15 @@ uname -s | grep NT-10 && w10=1 || {
 fns=(
   altgraph-0.17.3-py2.py3-none-any.whl
   pefile-2023.2.7-py3-none-any.whl
-  pyinstaller-5.8.0-py3-none-win_amd64.whl
-  pyinstaller_hooks_contrib-2023.0-py2.py3-none-any.whl
+  pyinstaller-5.10.1-py3-none-win_amd64.whl
+  pyinstaller_hooks_contrib-2023.2-py2.py3-none-any.whl
   pywin32_ctypes-0.2.0-py2.py3-none-any.whl
   upx-4.0.2-win32.zip
 )
 [ $w10 ] && fns+=(
   mutagen-1.46.0-py3-none-any.whl
   Pillow-9.4.0-cp311-cp311-win_amd64.whl
-  python-3.11.2-amd64.exe
+  python-3.11.3-amd64.exe
 }
 [ $w7 ] && fns+=(
   certifi-2022.12.7-py3-none-any.whl
@@ -43,12 +43,12 @@ fns=(
 )
 [ $w7x64 ] && fns+=(
   windows6.1-kb2533623-x64.msu
-  pyinstaller-5.8.0-py3-none-win_amd64.whl
+  pyinstaller-5.10.1-py3-none-win_amd64.whl
   python-3.7.9-amd64.exe
 )
 [ $w7x32 ] && fns+=(
   windows6.1-kb2533623-x86.msu
-  pyinstaller-5.8.0-py3-none-win32.whl
+  pyinstaller-5.10.1-py3-none-win32.whl
   python-3.7.9.exe
 )
 dl() { curl -fkLOC- "$1" && return 0; echo "$1"; return 1; }

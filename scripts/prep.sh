@@ -40,4 +40,10 @@ update_arch_pkgbuild() {
     rm -rf x
 }
 
+update_nixos_pin() {
+    ( cd $self/../contrib/package/nix/copyparty;
+      ./update.py $self/../dist/copyparty-sfx.py )
+}
+
 update_arch_pkgbuild
+update_nixos_pin

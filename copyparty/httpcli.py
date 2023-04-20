@@ -264,7 +264,7 @@ class HttpCli(object):
         self.is_https = (
             self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
         )
-        self.host = self.headers.get("host")
+        self.host = self.headers.get("host") or ""
         if not self.host:
             zs = "{}:{}".format(*list(self.s.getsockname()[:2]))
             self.host = zs[7:] if zs.startswith("::ffff:") else zs

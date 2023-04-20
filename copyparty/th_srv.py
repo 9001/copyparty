@@ -16,10 +16,10 @@ from .__init__ import ANYWIN, TYPE_CHECKING
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 from .util import (
+    FFMPEG_URL,
     BytesIO,
     Cooldown,
     Daemon,
-    FFMPEG_URL,
     Pebkac,
     afsenc,
     fsenc,

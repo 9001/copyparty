@@ -14,8 +14,8 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
-from .bos import bos
 from .authsrv import VFS
+from .bos import bos
 from .util import (
     Daemon,
     Pebkac,

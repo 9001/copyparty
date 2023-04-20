@@ -1,4 +1,33 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0401-2112  `v1.6.11`  not joke
+
+## new features
+* new event-hook: [exif stripper](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/image-noexif.py)
+* [markdown thumbnails](https://a.ocv.me/pub/demo/pics-vids/README.md?v) -- see [readme](https://github.com/9001/copyparty#markdown-viewer)
+* soon: support for [web-scrobbler](https://github.com/web-scrobbler/web-scrobbler/) - the [Last.fm](https://www.last.fm/user/tripflag) browser extension
+  * will update here + readme with more info when [the v3](https://github.com/web-scrobbler/web-scrobbler/projects/5) is out
+
+## bugfixes
+* more sqlite query-planner twiddling
+  * deleting files is MUCH faster now, and uploads / bootup might be a bit better too
+* webdav optimizations / compliance
+  * should make some webdav clients run faster than before
+  * in very related news, the webdav-client in [rclone](https://github.com/rclone/rclone/) v1.63 ([currently beta](https://beta.rclone.org/?filter=latest)) will be ***FAST!***
+    * does cool stuff such as [bidirectional sync](https://github.com/9001/copyparty#folder-sync) between copyparty and a local folder
+* [bpm detector](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/audio-bpm.py) is a bit more accurate
+* [u2cli](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) / commandline uploader: better error messages if something goes wrong
+* readme rendering could fail in firefox if certain addons were installed (not sure which)
+* event-hooks: more accurate usage examples
+
+## other changes
+* @chinponya automated the prismjs build step (thx!)
+* updated some js deps (markedjs, codemirror)
+* copyparty.exe: updated Pillow to 9.5.0
+* and finally [the joke](https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/rave.js) (looks [like this](https://cd.ocv.me/b/d2/d21/#af-9b927c42))
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0320-2156  `v1.6.10`  rclone sync
 
 ## new features
