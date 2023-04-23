@@ -132,7 +132,7 @@ class HttpSrv(object):
 
             self.ssdp = SSDPr(broker)
 
-        cert_path = os.path.join(self.E.cfg, "cert.pem")
+        cert_path = self.args.cert
         if bos.path.exists(cert_path):
             self.cert_path = cert_path
         else:

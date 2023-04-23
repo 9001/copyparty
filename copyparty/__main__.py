@@ -261,7 +261,7 @@ def ensure_locale() -> None:
     warn(t.format(safe))
 
 
-def ensure_cert() -> None:
+def ensure_cert(al: argparse.Namespace) -> None:
     """
     the default cert (and the entire TLS support) is only here to enable the
     crypto.subtle javascript API, which is necessary due to the webkit guys
@@ -270,15 +270,30 @@ def ensure_cert() -> None:
     i feel awful about this and so should they
     """
     cert_insec = os.path.join(E.mod, "res/insecure.pem")
-    cert_cfg = os.path.join(E.cfg, "cert.pem")
-    if not os.path.exists(cert_cfg):
-        shutil.copy(cert_insec, cert_cfg)
+    cert_appdata = os.path.join(E.cfg, "cert.pem")
+    if not os.path.isfile(al.cert):
+        if cert_appdata != al.cert:
+            raise Exception("certificate file does not exist: " + al.cert)
+
+        shutil.copy(cert_insec, al.cert)
+
+    with open(al.cert, "rb") as f:
+        buf = f.read()
+        o1 = buf.find(b"-BEGIN PRIVATE KEY-")
+        o2 = buf.find(b"-BEGIN CERTIFICATE-")
+        m = "unsupported certificate format: "
+        if o1 < 0:
+            raise Exception(m + "no private key inside pem")
+        if o2 < 0:
+            raise Exception(m + "no server certificate inside pem")
+        if o1 > o2:
+            raise Exception(m + "private key must appear before server certificate")
 
     try:
-        if filecmp.cmp(cert_cfg, cert_insec):
+        if filecmp.cmp(al.cert, cert_insec):
             lprint(
                 "\033[33musing default TLS certificate; https will be insecure."
-                + "\033[36m\ncertificate location: {}\033[0m\n".format(cert_cfg)
+                + "\033[36m\ncertificate location: {}\033[0m\n".format(al.cert)
             )
     except:
         pass
@@ -697,10 +712,11 @@ def add_network(ap):
     ap2.add_argument("--rsp-jtr", metavar="SEC", type=float, default=0, help="debug: response delay, random duration 0..SEC")
 
 
-def add_tls(ap):
+def add_tls(ap, cert_path):
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
+    ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to TLS certificate")
     ap2.add_argument("--ssl-ver", metavar="LIST", type=u, help="set allowed ssl/tls versions; [\033[32mhelp\033[0m] shows available versions; default is what your python version considers safe")
     ap2.add_argument("--ciphers", metavar="LIST", type=u, help="set allowed ssl/tls ciphers; [\033[32mhelp\033[0m] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
@@ -987,8 +1003,10 @@ def run_argparse(
         description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
     )
 
+    cert_path = os.path.join(E.cfg, "cert.pem")
+
     try:
-        fk_salt = unicode(os.path.getmtime(os.path.join(E.cfg, "cert.pem")))
+        fk_salt = unicode(os.path.getmtime(cert_path))
     except:
         fk_salt = "hunter2"
 
@@ -1000,7 +1018,7 @@ def run_argparse(
 
     add_general(ap, nc, srvname)
     add_network(ap)
-    add_tls(ap)
+    add_tls(ap, cert_path)
     add_qr(ap, tty)
     add_zeroconf(ap)
     add_zc_mdns(ap)
@@ -1084,8 +1102,6 @@ def main(argv: Optional[list[str]] = None) -> None:
         print("pybin: {}\n".format(pybin), end="")
 
     ensure_locale()
-    if HAVE_SSL:
-        ensure_cert()
 
     for k, v in zip(argv[1:], argv[2:]):
         if k == "-c" and os.path.isfile(v):
@@ -1152,6 +1168,9 @@ def main(argv: Optional[list[str]] = None) -> None:
         al.E = E  # __init__ is not shared when oxidized
     except:
         sys.exit(1)
+
+    if HAVE_SSL:
+        ensure_cert(al)
 
     if WINDOWS and not al.keep_qem:
         try:
