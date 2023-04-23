@@ -514,8 +514,12 @@ def get_sects():
                 """
             volflags are appended to volume definitions, for example,
             to create a write-only volume with the \033[33mnodupe\033[0m and \033[32mnosub\033[0m flags:
-              \033[35m-v /mnt/inc:/inc:w\033[33m:c,nodupe\033[32m:c,nosub"""
-            )
+              \033[35m-v /mnt/inc:/inc:w\033[33m:c,nodupe\033[32m:c,nosub\033[0m
+
+            if global config defines a volflag for all volumes,
+            you can unset it for a specific volume with -flag
+            """
+            ).rstrip()
             + build_flags_desc(),
         ],
         [

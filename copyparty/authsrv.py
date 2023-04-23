@@ -859,7 +859,7 @@ class AuthSrv(object):
                     zd = split_cfg_ln(ln)
                     fstr = ""
                     for sk, sv in zd.items():
-                        bad = re.sub(r"[a-z0-9_]", "", sk)
+                        bad = re.sub(r"[a-z0-9_-]", "", sk).lstrip("-")
                         if bad:
                             err = "bad characters [{}] in volflag name [{}]; "
                             err = err.format(bad, sk)
@@ -935,7 +935,14 @@ class AuthSrv(object):
         value: Union[str, bool, list[str]],
         is_list: bool,
     ) -> None:
-        desc = flagdescs.get(name, "?").replace("\n", " ")
+        desc = flagdescs.get(name.lstrip("-"), "?").replace("\n", " ")
+
+        if re.match("^-[^-]+$", name):
+            t = "└─unset volflag [{}]  ({})"
+            self._e(t.format(name[1:], desc))
+            flags[name] = True
+            return
+
         if name not in "mtp xbu xau xiu xbr xar xbd xad xm".split():
             if value is True:
                 t = "└─add volflag [{}] = {}  ({})"
@@ -1440,6 +1447,12 @@ class AuthSrv(object):
             t = 'volume "/{}" has volflag "daw" (webdav write-access), but --no-dav is set'
             self.log(t, 1)
             errors = True
+
+        for vol in vfs.all_vols.values():
+            for k in list(vol.flags.keys()):
+                if re.match("^-[^-]+$", k):
+                    vol.flags.pop(k[1:], None)
+                    vol.flags.pop(k)
 
         if errors:
             sys.exit(1)
