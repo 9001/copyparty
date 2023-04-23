@@ -885,6 +885,7 @@ class HttpCli(object):
 
             fgen = vn.zipgen(
                 rem,
+                rem,
                 set(),
                 self.uname,
                 self.args.ed,
@@ -1669,7 +1670,7 @@ class HttpCli(object):
         items = [unquotep(x) for x in items if items]
 
         self.parser.drop()
-        return self.tx_zip(k, v, vn, rem, items, self.args.ed)
+        return self.tx_zip(k, v, "", vn, rem, items, self.args.ed)
 
     def handle_post_json(self) -> bool:
         try:
@@ -2656,7 +2657,14 @@ class HttpCli(object):
         return ret
 
     def tx_zip(
-        self, fmt: str, uarg: str, vn: VFS, rem: str, items: list[str], dots: bool
+        self,
+        fmt: str,
+        uarg: str,
+        vpath: str,
+        vn: VFS,
+        rem: str,
+        items: list[str],
+        dots: bool,
     ) -> bool:
         if self.args.no_zip:
             raise Pebkac(400, "not enabled")
@@ -2699,7 +2707,7 @@ class HttpCli(object):
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
         fgen = vn.zipgen(
-            rem, set(items), self.uname, False, dots, not self.args.no_scandir
+            vpath, rem, set(items), self.uname, dots, False, not self.args.no_scandir
         )
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         bgen = packer(self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg)
@@ -3503,7 +3511,7 @@ class HttpCli(object):
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
             if v is not None:
-                return self.tx_zip(k, v, vn, rem, [], self.args.ed)
+                return self.tx_zip(k, v, self.vpath, vn, rem, [], self.args.ed)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
             rem, self.uname, not self.args.no_scandir, [[True, False], [False, True]]

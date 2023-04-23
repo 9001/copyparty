@@ -578,6 +578,7 @@ class VFS(object):
 
     def zipgen(
         self,
+        vpath: str,
         vrem: str,
         flt: set[str],
         uname: str,
@@ -589,7 +590,7 @@ class VFS(object):
 
         # if multiselect: add all items to archive root
         # if single folder: the folder itself is the top-level item
-        folder = "" if flt or not wrap else (vrem.split("/")[-1].lstrip(".") or "top")
+        folder = "" if flt or not wrap else (vpath.split("/")[-1].lstrip(".") or "top")
 
         g = self.walk(folder, vrem, [], uname, [[True, False]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:

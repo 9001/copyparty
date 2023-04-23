@@ -122,7 +122,7 @@ class TestHttpCli(unittest.TestCase):
                     tar = tarfile.open(fileobj=io.BytesIO(b)).getnames()
                 except:
                     tar = []
-                tar = [x[4:] if x.startswith("top/") else x for x in tar]
+                tar = [x.split("/", 1)[1] for x in tar]
                 tar = ["/".join([y for y in [top, durl, x] if y]) for x in tar]
                 tar = [[x] + self.can_rw(x) for x in tar]
                 tar_ok = [x[0] for x in tar if x[1]]
