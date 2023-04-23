@@ -110,10 +110,21 @@
 
         <div class="os win">
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
+            {% if args.ftp %}
+            <p>connect with plaintext FTP:</p>
             <pre>
-                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp or args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls={{ "false" if args.ftp else "true" }}
+                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>W:</b>
             </pre>
+            {% endif %}
+            {% if args.ftps %}
+            <p>connect with TLS-encrypted FTPS:</p>
+            <pre>
+                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
+                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>W:</b>
+            </pre>
+            <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>no_check_certificate=true</code> to the config command</em><br />---</p>
+            {% endif %}
             <p>if you want to use the native FTP client in windows instead (please dont), press <code>win+R</code> and run this command:</p>
             <pre>
                 explorer {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}<b>{{ pw }}</b>:k@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
@@ -121,10 +132,21 @@
         </div>
 
         <div class="os lin">
+            {% if args.ftp %}
+            <p>connect with plaintext FTP:</p>
             <pre>
-                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp or args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls={{ "false" if args.ftp else "true" }}
+                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>mp</b>
             </pre>
+            {% endif %}
+            {% if args.ftps %}
+            <p>connect with TLS-encrypted FTPS:</p>
+            <pre>
+                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
+                rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>mp</b>
+            </pre>
+            <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>no_check_certificate=true</code> to the config command</em><br />---</p>
+            {% endif %}
             <p>emergency alternative (gnome/gui-only):</p>
             <!-- gnome-bug: ignores vp -->
             <pre>

@@ -818,6 +818,13 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
   * some older software (filezilla on debian-stable) cannot passive-mode with TLS
 * login with any username + your password, or put your password in the username field
 
+some recommended FTP / FTPS clients; `wark` = example password:
+* https://winscp.net/eng/download.php
+* https://filezilla-project.org/ struggles a bit with ftps in active-mode, but is fine otherwise
+* https://rclone.org/ does FTPS with `tls=false explicit_tls=true`
+* `lftp -u k,wark -p 3921 127.0.0.1 -e ls`
+* `lftp -u k,wark -p 3990 127.0.0.1 -e 'set ssl:verify-certificate no; ls'`
+
 
 ## webdav server
 

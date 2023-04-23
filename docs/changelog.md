@@ -1,4 +1,34 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0420-2141  `v1.6.12`  as seen on nixos
+
+## new features
+* @chinponya [made](https://github.com/9001/copyparty/pull/22) a copyparty [Nix package](https://github.com/9001/copyparty#nix-package) and a [NixOS module](https://github.com/9001/copyparty#nixos-module)! nice 🎉
+  * with [systemd-based hardening](https://github.com/9001/copyparty/blob/hovudstraum/contrib/nixos/modules/copyparty.nix#L230-L270) instead of [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh)
+  * complements the [arch package](https://github.com/9001/copyparty/tree/hovudstraum/contrib/package/arch) very well w
+
+## bugfixes
+* fix an sqlite fd leak
+  * with enough simultaneous traffic, copyparty could run out of file descriptors since it relied on the gc to close sqlite cursors
+  * now there's a pool of cursors shared between the tcp connections instead, limited to the number of CPU cores
+  * performance mostly unaffected (or slightly improved) compared to before, except for a 20% reduction only during max server load caused by directory-listings or searches
+  * ~~somehow explicitly closing the cursors didn't always work... maybe this was actually a python bug :\\/~~
+    * yes, it does incomplete cleanup if opening a WAL database fails
+* multirange requests would fail with an error; now they get a 200 as expected (since they're kinda useless and not worth the overhead)
+  * [the only software i've ever seen do that](https://apps.kde.org/discover/) now works as intended
+* expand `~/` filesystem paths in all remaining args: `-c`, `-lo`, `--hist`, `--ssl-log`, and the `hist` volflag
+* never use IPv6-format IPv4 (`::ffff:127.0.0.1`) in responses
+* [u2cli](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py): don't enter delete stage if some of the uploads failed
+* audio player in safari on touchbar macbooks
+  * songs would play backwards because the touchbar keeps spamming play/pause
+  * playback would stop when the preloader kicks in because safari sees the new audio object and freaks out
+
+## other changes
+* added [windows quickstart / service example](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/windows.md)
+* updated pyinstaller (it makes smaller exe files now)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0401-2112  `v1.6.11`  not joke
 
 ## new features
