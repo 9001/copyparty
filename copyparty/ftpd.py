@@ -55,6 +55,7 @@ class FtpAuth(DummyAuthorizer):
         self, username: str, password: str, handler: Any
     ) -> None:
         handler.username = "{}:{}".format(username, password)
+        handler.uname = "*"
 
         ip = handler.addr[0]
         if ip.startswith("::ffff:"):
@@ -86,14 +87,14 @@ class FtpAuth(DummyAuthorizer):
 
             raise AuthenticationFailed("Authentication failed.")
 
-        handler.username = uname
+        handler.uname = uname
 
     def get_home_dir(self, username: str) -> str:
         return "/"
 
     def has_user(self, username: str) -> bool:
         asrv = self.hub.asrv
-        return username in asrv.acct
+        return username in asrv.acct or username in asrv.iacct
 
     def has_perm(self, username: str, perm: int, path: Optional[str] = None) -> bool:
         return True  # handled at filesystem layer
@@ -115,8 +116,7 @@ class FtpFs(AbstractedFS):
         self.h = self.cmd_channel = cmd_channel  # type: FTPHandler
         self.hub: "SvcHub" = cmd_channel.hub
         self.args = cmd_channel.args
-
-        self.uname = self.hub.asrv.iacct.get(cmd_channel.password, "*")
+        self.uname = cmd_channel.uname
 
         self.cwd = "/"  # pyftpdlib convention of leading slash
         self.root = "/var/lib/empty"
@@ -215,7 +215,7 @@ class FtpFs(AbstractedFS):
             self.can_delete,
             self.can_get,
             self.can_upget,
-        ) = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.username)
+        ) = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.uname)
 
     def mkdir(self, path: str) -> None:
         ap = self.rv2a(path, w=True)[0]
@@ -265,7 +265,7 @@ class FtpFs(AbstractedFS):
 
     def rename(self, src: str, dst: str) -> None:
         if not self.can_move:
-            self.die("Not allowed for user " + self.h.username)
+            self.die("Not allowed for user " + self.h.uname)
 
         if self.args.no_mv:
             self.die("The rename/move feature is disabled in server config")
@@ -344,10 +344,12 @@ class FtpHandler(FTPHandler):
     abstracted_fs = FtpFs
     hub: "SvcHub"
     args: argparse.Namespace
+    uname: str
 
     def __init__(self, conn: Any, server: Any, ioloop: Any = None) -> None:
         self.hub: "SvcHub" = FtpHandler.hub
         self.args: argparse.Namespace = FtpHandler.args
+        self.uname = "*"
 
         if PY2:
             FTPHandler.__init__(self, conn, server, ioloop)
@@ -379,7 +381,7 @@ class FtpHandler(FTPHandler):
             ap,
             vfs.canonical(rem),
             "",
-            self.username,
+            self.uname,
             0,
             0,
             self.cli_ip,
@@ -408,7 +410,7 @@ class FtpHandler(FTPHandler):
         # print("xfer_end: {} => {}".format(ap, vp))
         if vp:
             vp, fn = os.path.split(vp)
-            vfs, rem = self.hub.asrv.vfs.get(vp, self.username, False, True)
+            vfs, rem = self.hub.asrv.vfs.get(vp, self.uname, False, True)
             vfs, rem = vfs.get_dbv(rem)
             self.hub.up2k.hash_file(
                 vfs.realpath,
@@ -418,7 +420,7 @@ class FtpHandler(FTPHandler):
                 fn,
                 self.cli_ip,
                 time.time(),
-                self.username,
+                self.uname,
             )
 
         return FTPHandler.log_transfer(
