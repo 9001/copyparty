@@ -1421,7 +1421,6 @@ defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
 below are some tweaks roughly ordered by usefulness:
 
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
-* `--http-only` or `--https-only` (unless you want to support both protocols) will reduce the delay before a new connection is established
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
@@ -1599,6 +1598,7 @@ can be convenient on machines where installing python is problematic, however is
 * [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) runs on win8 or newer, was compiled on win10, does thumbnails + media tags, and is *currently* safe to use, but any future python/expat/pillow CVEs can only be remedied by downloading a newer version of the exe
 
   * on win8 it needs [vc redist 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), on win10 it just works
+  * some antivirus may freak out (false-positive), possibly [Avast, AVG, and McAfee](https://www.virustotal.com/gui/file/52391a1e9842cf70ad243ef83844d46d29c0044d101ee0138fcdd3c8de2237d6/detection)
 
 * dangerous: [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) is compatible with [windows7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png), which means it uses an ancient copy of python (3.7.9) which cannot be upgraded and should never be exposed to the internet (LAN is fine)
 
