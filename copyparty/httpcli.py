@@ -219,7 +219,7 @@ class HttpCli(object):
 
         try:
             self.s.settimeout(2)
-            headerlines = read_header(self.sr)
+            headerlines = read_header(self.sr, self.args.s_thead, self.args.s_thead)
             self.in_hdr_recv = False
             if not headerlines:
                 return False
@@ -416,6 +416,8 @@ class HttpCli(object):
             self.can_upget,
         ) = self.asrv.vfs.can_access(self.vpath, self.uname)
 
+        self.s.settimeout(self.args.s_tbody or None)
+
         try:
             cors_k = self._cors()
             if self.mode in ("GET", "HEAD"):
@@ -558,7 +560,6 @@ class HttpCli(object):
 
         try:
             # best practice to separate headers and body into different packets
-            self.s.settimeout(None)
             self.s.sendall("\r\n".join(response).encode("utf-8") + b"\r\n\r\n")
         except:
             raise Pebkac(400, "client d/c while replying headers")
@@ -1206,7 +1207,6 @@ class HttpCli(object):
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
-                self.s.settimeout(None)
                 self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
             except:
                 raise Pebkac(400, "client d/c before 100 continue")
@@ -1218,7 +1218,6 @@ class HttpCli(object):
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
-                self.s.settimeout(None)
                 self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
             except:
                 raise Pebkac(400, "client d/c before 100 continue")

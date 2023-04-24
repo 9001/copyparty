@@ -537,7 +537,7 @@ class _Unrecv(object):
         self.log = log
         self.buf: bytes = b""
 
-    def recv(self, nbytes: int) -> bytes:
+    def recv(self, nbytes: int, spins: int = 1) -> bytes:
         if self.buf:
             ret = self.buf[:nbytes]
             self.buf = self.buf[nbytes:]
@@ -548,6 +548,10 @@ class _Unrecv(object):
                 ret = self.s.recv(nbytes)
                 break
             except socket.timeout:
+                spins -= 1
+                if spins <= 0:
+                    ret = b""
+                    break
                 continue
             except:
                 ret = b""
@@ -590,7 +594,7 @@ class _LUnrecv(object):
         self.log = log
         self.buf = b""
 
-    def recv(self, nbytes: int) -> bytes:
+    def recv(self, nbytes: int, spins: int) -> bytes:
         if self.buf:
             ret = self.buf[:nbytes]
             self.buf = self.buf[nbytes:]
@@ -1292,7 +1296,7 @@ class MultipartParser(object):
         rfc1341/rfc1521/rfc2047/rfc2231/rfc2388/rfc6266/the-real-world
         (only the fallback non-js uploader relies on these filenames)
         """
-        for ln in read_header(self.sr):
+        for ln in read_header(self.sr, 2, 2592000):
             self.log(ln)
 
             m = self.re_ctype.match(ln)
@@ -1492,15 +1496,15 @@ def get_boundary(headers: dict[str, str]) -> str:
     return m.group(2)
 
 
-def read_header(sr: Unrecv) -> list[str]:
+def read_header(sr: Unrecv, t_idle: int, t_tot: int) -> list[str]:
     t0 = time.time()
     ret = b""
     while True:
-        if time.time() - t0 > 120:
+        if time.time() - t0 >= t_tot:
             return []
 
         try:
-            ret += sr.recv(1024)
+            ret += sr.recv(1024, t_idle // 2)
         except:
             if not ret:
                 return []

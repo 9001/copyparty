@@ -619,9 +619,9 @@ def get_sects():
 
             \033[32macid\033[0m = extremely safe but slow; the old default. Should never lose any data no matter what
 
-            \033[32mswal\033[0m = 2.4x faster uploads yet 99.9%% as safe -- theoretical chance of losing metadata for the ~200 most recently uploaded files if there's a power-loss or your OS crashes
+            \033[32mswal\033[0m = 2.4x faster uploads yet 99.9% as safe -- theoretical chance of losing metadata for the ~200 most recently uploaded files if there's a power-loss or your OS crashes
 
-            \033[32mwal\033[0m = another 21x faster on HDDs yet 90%% as safe; same pitfall as \033[33mswal\033[0m except more likely
+            \033[32mwal\033[0m = another 21x faster on HDDs yet 90% as safe; same pitfall as \033[33mswal\033[0m except more likely
 
             \033[32myolo\033[0m = another 1.5x faster, and removes the occasional sudden upload-pause while the disk syncs, but now you're at risk of losing the entire database in a powerloss / OS-crash
 
@@ -710,6 +710,8 @@ def add_network(ap):
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
     else:
         ap2.add_argument("--freebind", action="store_true", help="allow listening on IPs which do not yet exist, for example if the network interfaces haven't finished going up. Only makes sense for IPs other than '0.0.0.0', '127.0.0.1', '::', and '::1'. May require running as root (unless net.ipv6.ip_nonlocal_bind)")
+    ap2.add_argument("--s-thead", metavar="SEC", type=int, default=120, help="socket timeout (read request header)")
+    ap2.add_argument("--s-tbody", metavar="SEC", type=float, default=186, help="socket timeout (read/write request/response bodies). Use 60 on fast servers (default is extremely safe). Disable with 0 if reverse-proxied for a 2%% speed boost")
     ap2.add_argument("--s-wr-sz", metavar="B", type=int, default=256*1024, help="socket write size in bytes")
     ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0, help="debug: socket write delay in seconds")
     ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0, help="debug: response delay in seconds")
