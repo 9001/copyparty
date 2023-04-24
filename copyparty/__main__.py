@@ -279,8 +279,8 @@ def ensure_cert(al: argparse.Namespace) -> None:
 
     with open(al.cert, "rb") as f:
         buf = f.read()
-        o1 = buf.find(b"-BEGIN PRIVATE KEY-")
-        o2 = buf.find(b"-BEGIN CERTIFICATE-")
+        o1 = buf.find(b" PRIVATE KEY-")
+        o2 = buf.find(b" CERTIFICATE-")
         m = "unsupported certificate format: "
         if o1 < 0:
             raise Exception(m + "no private key inside pem")
