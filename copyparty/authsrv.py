@@ -548,6 +548,8 @@ class VFS(object):
         seen = seen[:] + [fsroot]
         rfiles = [x for x in vfs_ls if not stat.S_ISDIR(x[1].st_mode)]
         rdirs = [x for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+        # if lstat: ignore folder symlinks since copyparty will never make those
+        #            (and we definitely don't want to descend into them)
 
         rfiles.sort()
         rdirs.sort()

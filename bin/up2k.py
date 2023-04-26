@@ -880,7 +880,7 @@ class Ctl(object):
                         print("      ls ~{0}".format(srd))
                         zb = self.ar.url.encode("utf-8")
                         zb += quotep(rd.replace(b"\\", b"/"))
-                        r = req_ses.get(zb + b"?ls&dots", headers=headers)
+                        r = req_ses.get(zb + b"?ls&lt&dots", headers=headers)
                         if not r:
                             raise Exception("HTTP {0}".format(r.status_code))
 

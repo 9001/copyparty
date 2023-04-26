@@ -111,6 +111,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
 | GET | `?ls=t` | list files/folders at URL as plaintext |
 | GET | `?ls=v` | list files/folders at URL, terminal-formatted |
+| GET | `?lt` | in listings, use symlink timestamps rather than targets |
 | GET | `?b` | list files/folders at URL as simplified HTML |
 | GET | `?tree=.` | list one level of subdirectories inside URL |
 | GET | `?tree` | list one level of subdirectories for each level until URL |

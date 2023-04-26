@@ -13,6 +13,7 @@ def vf_bmap() -> dict[str, str]:
         "no_dedup": "copydupes",
         "no_dupe": "nodupe",
         "no_forget": "noforget",
+        "dav_rt": "davrt",
     }
     for k in (
         "dotsrch",
@@ -142,7 +143,8 @@ flagcats = {
         "lg_sbf": "list of *logue-sandbox safeguards to disable",
     },
     "others": {
-        "fk=8": 'generates per-file accesskeys,\nwhich will then be required at the "g" permission'
+        "fk=8": 'generates per-file accesskeys,\nwhich will then be required at the "g" permission',
+        "davrt": "show lastmod time of symlink destination, not the link itself\n(note: this option is always enabled for recursive listings)",
     },
 }
 

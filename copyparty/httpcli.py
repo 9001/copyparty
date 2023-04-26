@@ -403,7 +403,11 @@ class HttpCli(object):
             self.get_pwd_cookie(self.pw)
 
         if self.is_rclone:
+            # dots: always include dotfiles if permitted
+            # lt: probably more important showing the correct timestamps of any dupes it just uploaded rather than the lastmod time of any non-copyparty-managed symlinks
+            # b: basic-browser if it tries to parse the html listing
             uparam["dots"] = ""
+            uparam["lt"] = ""
             uparam["b"] = ""
             cookies["b"] = ""
 
@@ -865,10 +869,11 @@ class HttpCli(object):
 
         props = set(props_lst)
         vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False, err=401)
+        tap = vn.canonical(rem)
         depth = self.headers.get("depth", "infinity").lower()
 
         try:
-            topdir = {"vp": "", "st": bos.stat(vn.canonical(rem))}
+            topdir = {"vp": "", "st": bos.stat(tap)}
         except OSError as ex:
             if ex.errno != errno.ENOENT:
                 raise
@@ -884,6 +889,9 @@ class HttpCli(object):
                 self.reply(zb, 403, "application/xml; charset=utf-8")
                 return True
 
+            # this will return symlink-target timestamps
+            # because lstat=true would not recurse into subfolders
+            # and this is a rare case where we actually want that
             fgen = vn.zipgen(
                 rem,
                 rem,
@@ -897,7 +905,11 @@ class HttpCli(object):
 
         elif depth == "1":
             _, vfs_ls, vfs_virt = vn.ls(
-                rem, self.uname, not self.args.no_scandir, [[True, False]]
+                rem,
+                self.uname,
+                not self.args.no_scandir,
+                [[True, False]],
+                lstat="davrt" not in vn.flags,
             )
             if not self.args.ed:
                 names = set(exclude_dotfiles([x[0] for x in vfs_ls]))
@@ -931,6 +943,13 @@ class HttpCli(object):
         for x in fgen:
             rp = vjoin(vtop, x["vp"])
             st: os.stat_result = x["st"]
+            mtime = st.st_mtime
+            if stat.S_ISLNK(st.st_mode):
+                try:
+                    st = bos.stat(os.path.join(tap, x["vp"]))
+                except:
+                    continue
+
             isdir = stat.S_ISDIR(st.st_mode)
 
             t = "<D:response><D:href>/{}{}</D:href><D:propstat><D:prop>"
@@ -938,7 +957,7 @@ class HttpCli(object):
 
             pvs: dict[str, str] = {
                 "displayname": html_escape(rp.split("/")[-1]),
-                "getlastmodified": formatdate(st.st_mtime, usegmt=True),
+                "getlastmodified": formatdate(mtime, usegmt=True),
                 "resourcetype": '<D:collection xmlns:D="DAV:"/>' if isdir else "",
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
@@ -3513,7 +3532,11 @@ class HttpCli(object):
                 return self.tx_zip(k, v, self.vpath, vn, rem, [], self.args.ed)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
-            rem, self.uname, not self.args.no_scandir, [[True, False], [False, True]]
+            rem,
+            self.uname,
+            not self.args.no_scandir,
+            [[True, False], [False, True]],
+            lstat="lt" in self.uparam,
         )
         stats = {k: v for k, v in vfs_ls}
         ls_names = [x[0] for x in vfs_ls]
@@ -3557,7 +3580,8 @@ class HttpCli(object):
                 fspath = fsroot + "/" + fn
 
             try:
-                inf = stats.get(fn) or bos.stat(fspath)
+                linf = stats.get(fn) or bos.lstat(fspath)
+                inf = bos.stat(fspath) if stat.S_ISLNK(linf.st_mode) else linf
             except:
                 self.log("broken symlink: {}".format(repr(fspath)))
                 continue
@@ -3579,7 +3603,7 @@ class HttpCli(object):
                 margin = "-"
 
             sz = inf.st_size
-            zd = datetime.utcfromtimestamp(inf.st_mtime)
+            zd = datetime.utcfromtimestamp(linf.st_mtime)
             dt = zd.strftime("%Y-%m-%d %H:%M:%S")
 
             try:
@@ -3606,7 +3630,7 @@ class HttpCli(object):
                 "sz": sz,
                 "ext": ext,
                 "dt": dt,
-                "ts": int(inf.st_mtime),
+                "ts": int(linf.st_mtime),
             }
             if is_dir:
                 dirs.append(item)
