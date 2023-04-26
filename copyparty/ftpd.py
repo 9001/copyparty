@@ -113,7 +113,8 @@ class FtpFs(AbstractedFS):
     def __init__(
         self, root: str, cmd_channel: Any
     ) -> None:  # pylint: disable=super-init-not-called
-        self.h = self.cmd_channel = cmd_channel  # type: FTPHandler
+        self.h = cmd_channel  # type: FTPHandler
+        self.cmd_channel = cmd_channel  # type: FTPHandler
         self.hub: "SvcHub" = cmd_channel.hub
         self.args = cmd_channel.args
         self.uname = cmd_channel.uname

@@ -1,4 +1,23 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0424-0609  `v1.6.14`  unsettable flags
+
+## new features
+* unset a volflag (override a global option) by negating it (setting volflag `-flagname`)
+* new argument `--cert` to specify TLS certificate location
+  * defaults to `~/.config/copyparty/cert.pem` like before
+
+## bugfixes
+* in zip/tar downloads, always use the parent-folder name as the archive root
+* more reliable ftp authentication when providing password as username
+* connect-page: fix rclone ftps example
+
+## other changes
+* stop suggesting `--http-only` and `--https-only` for performance since the difference is negligible
+* mention how some antivirus (avast, avg, mcafee) thinks that pillow's webp encoder is a virus, affecting `copyparty.exe`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0420-2141  `v1.6.12`  as seen on nixos
 
 ## new features

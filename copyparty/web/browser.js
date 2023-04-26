@@ -1482,7 +1482,7 @@ var mpl = (function () {
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
-		ebi('np_img').setAttribute('src', cover); // dont give last.fm the pwd
+		ebi('np_img').setAttribute('src', cover || ''); // dont give last.fm the pwd
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', mplay);

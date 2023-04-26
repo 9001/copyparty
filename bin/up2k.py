@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.6"
-S_BUILD_DT = "2023-04-20"
+S_VERSION = "1.7"
+S_BUILD_DT = "2023-04-26"
 
 """
 up2k.py: upload to copyparty
@@ -344,13 +344,13 @@ def undns(url):
     usp = urlsplit(url)
     hn = usp.hostname
     gai = None
-    print("resolving host [{0}] ...".format(hn), end="")
+    eprint("resolving host [{0}] ...".format(hn), end="")
     try:
         gai = socket.getaddrinfo(hn, None)
         hn = gai[0][4][0]
     except:
         t = "\n\033[31mfailed to resolve upload destination host;\033[0m\ngai={0}\n"
-        print(t.format(repr(gai)))
+        eprint(t.format(repr(gai)))
         raise
 
     if usp.port:
@@ -360,7 +360,7 @@ def undns(url):
 
     usp = usp._replace(netloc=hn)
     url = urlunsplit(usp)
-    print(" {0}".format(url))
+    eprint(" {0}".format(url))
     return url
 
 
@@ -1100,6 +1100,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ap = app.add_argument_group("compatibility")
     ap.add_argument("--cls", action="store_true", help="clear screen before start")
+    ap.add_argument("--rh", action="store_true", help="resolve server hostname before upload (good for buggy networks, but TLS certs will break)")
 
     ap = app.add_argument_group("folder sync")
     ap.add_argument("--dl", action="store_true", help="delete local files after uploading")
@@ -1123,7 +1124,7 @@ source file/folder selection uses rsync syntax, meaning that:
         ar = app.parse_args()
     finally:
         if EXE and not sys.argv[1:]:
-            print("*** hit enter to exit ***")
+            eprint("*** hit enter to exit ***")
             try:
                 input()
             except:
@@ -1156,11 +1157,11 @@ source file/folder selection uses rsync syntax, meaning that:
         with open(fn, "rb") as f:
             ar.a = f.read().decode("utf-8").strip()
 
-    # resolve hostname (good on buggy networks)
-    ar.url = undns(ar.url)
+    if ar.rh:
+        ar.url = undns(ar.url)
 
     if ar.cls:
-        print("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
+        eprint("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
 
     ctl = Ctl(ar)
 

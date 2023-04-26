@@ -613,7 +613,7 @@ class _LUnrecv(object):
     def recv_ex(self, nbytes: int, raise_on_trunc: bool = True) -> bytes:
         """read an exact number of bytes"""
         try:
-            ret = self.recv(nbytes)
+            ret = self.recv(nbytes, 1)
             err = False
         except:
             ret = b""
@@ -621,7 +621,7 @@ class _LUnrecv(object):
 
         while not err and len(ret) < nbytes:
             try:
-                ret += self.recv(nbytes - len(ret))
+                ret += self.recv(nbytes - len(ret), 1)
             except OSError:
                 err = True
 

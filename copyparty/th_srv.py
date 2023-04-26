@@ -274,6 +274,10 @@ class ThumbSrv(object):
 
             tdir, tfn = os.path.split(tpath)
             ttpath = os.path.join(tdir, "w", tfn)
+            try:
+                bos.unlink(ttpath)
+            except:
+                pass
 
             for fun in funs:
                 try:
@@ -570,11 +574,15 @@ class ThumbSrv(object):
         want_caf = tpath.endswith(".caf")
         tmp_opus = tpath
         if want_caf:
-            tmp_opus = tpath.rsplit(".", 1)[0] + ".opus"
+            tmp_opus = tpath + ".opus"
+            try:
+                bos.unlink(tmp_opus)
+            except:
+                pass
 
         caf_src = abspath if src_opus else tmp_opus
 
-        if not want_caf or (not src_opus and not bos.path.isfile(tmp_opus)):
+        if not want_caf or not src_opus:
             # fmt: off
             cmd = [
                 b"ffmpeg",
@@ -632,6 +640,12 @@ class ThumbSrv(object):
             ]
             # fmt: on
             self._run_ff(cmd)
+
+        if tmp_opus != tpath:
+            try:
+                bos.unlink(tmp_opus)
+            except:
+                pass
 
     def poke(self, tdir: str) -> None:
         if not self.poke_cd.poke(tdir):
