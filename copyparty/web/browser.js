@@ -1499,6 +1499,7 @@ var mpl = (function () {
 		if (!r.os_ctl)
 			return;
 
+		// dead code; left for debug
 		navigator.mediaSession.metadata = null;
 		navigator.mediaSession.playbackState = "paused";
 
@@ -1538,12 +1539,13 @@ var re_au_native = can_ogg ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i :
 
 
 // extract songs + add play column
+var mpo = { "au": null, "au2": null, "acs": null };
 function MPlayer() {
 	var r = this;
 	r.id = Date.now();
-	r.au = null;
-	r.au = null;
-	r.au2 = null;
+	r.au = mpo.au;
+	r.au2 = mpo.au2;
+	r.acs = mpo.acs;
 	r.tracks = {};
 	r.order = [];
 	r.cd_pause = 0;
@@ -2483,7 +2485,7 @@ var afilt = (function () {
 		if (mp.acs)
 			mp.acs.disconnect();
 
-		mp.acs = null;
+		mp.acs = mpo.acs = null;
 	};
 
 	r.apply = function () {
@@ -2722,7 +2724,9 @@ function play(tid, is_ev, seek) {
 
 	if (mp.au) {
 		mp.au.pause();
-		clmod(ebi('a' + mp.au.tid), 'act');
+		var el = ebi('a' + mp.au.tid);
+		if (el)
+			clmod(el, 'act');
 	}
 	else {
 		mp.au = new Audio();
@@ -2895,7 +2899,7 @@ function autoplay_blocked(seek) {
 	modal.confirm('<h6>' + L.mm_hashplay + '</h6>\n«' + esc(fn) + '»', function () {
 		// chrome 91 may permanently taint on a failed play()
 		// depending on win10 settings or something? idk
-		mp.au = null;
+		mp.au = mpo.au = null;
 
 		play(tid, true, seek);
 		mp.fade_in();
@@ -7280,18 +7284,16 @@ function reload_mp() {
 		if (afilt)
 			afilt.stop();
 
-		mp.au.pause();
-		mp.au = null;
+		mpo.au = mp.au;
+		mpo.au2 = mp.au2;
+		mpo.acs = mp.acs;
 		mpl.unbuffer();
 	}
-	mpl.stop();
 	var plays = QSA('tr>td:first-child>a.play');
 	for (var a = plays.length - 1; a >= 0; a--)
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
-	if (afilt)
-		afilt.acst = {};
 
 	setTimeout(pbar.onresize, 1);
 }
