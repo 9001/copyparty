@@ -266,7 +266,7 @@ class HttpCli(object):
         )
         self.host = self.headers.get("host") or ""
         if not self.host:
-            zs = "{}:{}".format(*list(self.s.getsockname()[:2]))
+            zs = "%s:%s" % self.s.getsockname()[:2]
             self.host = zs[7:] if zs.startswith("::ffff:") else zs
 
         n = self.args.rproxy
@@ -536,7 +536,7 @@ class HttpCli(object):
         mime: Optional[str] = None,
         headers: Optional[dict[str, str]] = None,
     ) -> None:
-        response = ["{} {} {}".format(self.http_ver, status, HTTPCODE[status])]
+        response = ["%s %s %s" % (self.http_ver, status, HTTPCODE[status])]
 
         if length is not None:
             response.append("Content-Length: " + unicode(length))
@@ -560,7 +560,7 @@ class HttpCli(object):
         self.out_headers["Content-Type"] = mime
 
         for k, zs in list(self.out_headers.items()) + self.out_headerlist:
-            response.append("{}: {}".format(k, zs))
+            response.append("%s: %s" % (k, zs))
 
         try:
             # best practice to separate headers and body into different packets
@@ -626,7 +626,7 @@ class HttpCli(object):
         if not kv:
             return ""
 
-        r = ["{}={}".format(k, quotep(zs)) if zs else k for k, zs in kv.items()]
+        r = ["%s=%s" % (k, quotep(zs)) if zs else k for k, zs in kv.items()]
         return "?" + "&amp;".join(r)
 
     def redirect(
@@ -952,8 +952,10 @@ class HttpCli(object):
 
             isdir = stat.S_ISDIR(st.st_mode)
 
-            t = "<D:response><D:href>/{}{}</D:href><D:propstat><D:prop>"
-            ret += t.format(quotep(rp), "/" if isdir and rp else "")
+            ret += "<D:response><D:href>/%s%s</D:href><D:propstat><D:prop>" % (
+                quotep(rp),
+                "/" if isdir and rp else "",
+            )
 
             pvs: dict[str, str] = {
                 "displayname": html_escape(rp.split("/")[-1]),
@@ -969,13 +971,13 @@ class HttpCli(object):
                 if k not in props:
                     continue
                 elif v:
-                    ret += "<D:{0}>{1}</D:{0}>".format(k, v)
+                    ret += "<D:%s>%s</D:%s>" % (k, v, k)
                 else:
-                    ret += "<D:{}/>".format(k)
+                    ret += "<D:%s/>" % (k,)
 
             ret += "</D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat>"
 
-            missing = ["<D:{}/>".format(x) for x in props if x not in pvs]
+            missing = ["<D:%s/>" % (x,) for x in props if x not in pvs]
             if missing and clen:
                 t = "<D:propstat><D:prop>{}</D:prop><D:status>HTTP/1.1 404 Not Found</D:status></D:propstat>"
                 ret += t.format("".join(missing))
@@ -1641,7 +1643,7 @@ class HttpCli(object):
 
         spd1 = get_spd(nbytes, self.t0)
         spd2 = get_spd(self.conn.nbyte, self.conn.t0)
-        return "{} {} n{}".format(spd1, spd2, self.conn.nreq)
+        return "%s %s n%s" % (spd1, spd2, self.conn.nreq)
 
     def handle_post_multipart(self) -> bool:
         self.parser = MultipartParser(self.log, self.sr, self.headers)
@@ -3053,7 +3055,7 @@ class HttpCli(object):
         if self.is_vproxied:
             parents = self.args.R.split("/")
             for parent in parents[::-1]:
-                ret = {"k{}".format(parent): ret, "a": []}
+                ret = {"k%s" % (parent,): ret, "a": []}
 
         zs = json.dumps(ret)
         self.reply(zs.encode("utf-8"), mime="application/json")
@@ -3592,12 +3594,12 @@ class HttpCli(object):
                 if self.args.no_zip:
                     margin = "DIR"
                 else:
-                    margin = '<a href="{}?zip" rel="nofollow">zip</a>'.format(
-                        quotep(href)
-                    )
+                    margin = '<a href="%s?zip" rel="nofollow">zip</a>' % (quotep(href),)
             elif fn in hist:
-                margin = '<a href="{}.hist/{}">#{}</a>'.format(
-                    base, html_escape(hist[fn][2], quot=True, crlf=True), hist[fn][0]
+                margin = '<a href="%s.hist/%s">#%s</a>' % (
+                    base,
+                    html_escape(hist[fn][2], quot=True, crlf=True),
+                    hist[fn][0],
                 )
             else:
                 margin = "-"
@@ -3621,7 +3623,7 @@ class HttpCli(object):
                 ext = "%"
 
             if add_fk:
-                href = "{}?k={}".format(
+                href = "%s?k=%s" % (
                     quotep(href),
                     self.gen_fk(
                         self.args.fk_salt, fspath, sz, 0 if ANYWIN else inf.st_ino

@@ -67,9 +67,9 @@ class AXS(object):
         self.upget: set[str] = set(upget or [])
 
     def __repr__(self) -> str:
-        return "AXS({})".format(
+        return "AXS(%s)" % (
             ", ".join(
-                "{}={!r}".format(k, self.__dict__[k])
+                "%s=%r" % (k, self.__dict__[k])
                 for k in "uread uwrite umove udel uget upget".split()
             )
         )
@@ -304,9 +304,9 @@ class VFS(object):
             self.all_vols = {}
 
     def __repr__(self) -> str:
-        return "VFS({})".format(
+        return "VFS(%s)" % (
             ", ".join(
-                "{}={!r}".format(k, self.__dict__[k])
+                "%s=%r" % (k, self.__dict__[k])
                 for k in "realpath vpath axs flags".split()
             )
         )

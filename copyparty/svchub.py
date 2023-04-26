@@ -684,20 +684,20 @@ class SvcHub(object):
                 print("\033[36m{}\033[0m\n".format(dt.strftime("%Y-%m-%d")), end="")
                 self._set_next_day()
 
-            fmt = "\033[36m{} \033[33m{:21} \033[0m{}\n"
+            fmt = "\033[36m%s \033[33m%-21s \033[0m%s\n"
             if not VT100:
-                fmt = "{} {:21} {}\n"
+                fmt = "%s %-21s %s\n"
                 if "\033" in msg:
                     msg = ansi_re.sub("", msg)
                 if "\033" in src:
                     src = ansi_re.sub("", src)
             elif c:
                 if isinstance(c, int):
-                    msg = "\033[3{}m{}\033[0m".format(c, msg)
+                    msg = "\033[3%sm%s\033[0m" % (c, msg)
                 elif "\033" not in c:
-                    msg = "\033[{}m{}\033[0m".format(c, msg)
+                    msg = "\033[%sm%s\033[0m" % (c, msg)
                 else:
-                    msg = "{}{}\033[0m".format(c, msg)
+                    msg = "%s%s\033[0m" % (c, msg)
 
             zd = datetime.utcfromtimestamp(now)
             ts = "%02d:%02d:%02d.%03d" % (
@@ -706,7 +706,7 @@ class SvcHub(object):
                 zd.second,
                 zd.microsecond // 1000,
             )
-            msg = fmt.format(ts, src, msg)
+            msg = fmt % (ts, src, msg)
             try:
                 print(msg, end="")
             except UnicodeEncodeError:

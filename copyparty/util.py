@@ -1553,7 +1553,7 @@ def rand_name(fdir: str, fn: str, rnd: int) -> str:
 def gen_filekey(salt: str, fspath: str, fsize: int, inode: int) -> str:
     return base64.urlsafe_b64encode(
         hashlib.sha512(
-            "{} {} {} {}".format(salt, fspath, fsize, inode).encode("utf-8", "replace")
+            ("%s %s %s %s" % (salt, fspath, fsize, inode)).encode("utf-8", "replace")
         ).digest()
     ).decode("ascii")
 
@@ -1662,7 +1662,7 @@ def uncyg(path: str) -> str:
     if len(path) > 2 and path[2] != "/":
         return path
 
-    return "{}:\\{}".format(path[1], path[3:])
+    return "%s:\\%s" % (path[1], path[3:])
 
 
 def undot(path: str) -> str:
@@ -1705,7 +1705,7 @@ def sanitize_fn(fn: str, ok: str, bad: list[str]) -> str:
 
         bad = ["con", "prn", "aux", "nul"]
         for n in range(1, 10):
-            bad += "com{0} lpt{0}".format(n).split(" ")
+            bad += ("com%s lpt%s" % (n, n)).split(" ")
 
         if fn.lower().split(".")[0] in bad:
             fn = "_" + fn

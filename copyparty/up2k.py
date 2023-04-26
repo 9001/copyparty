@@ -380,9 +380,9 @@ class Up2k(object):
                         if rd.startswith("//") or fn.startswith("//"):
                             rd, fn = s3dec(rd, fn)
 
-                        fvp = "{}/{}".format(rd, fn).strip("/")
+                        fvp = ("%s/%s" % (rd, fn)).strip("/")
                         if vp:
-                            fvp = "{}/{}".format(vp, fvp)
+                            fvp = "%s/%s" % (vp, fvp)
 
                         self._handle_rm(LEELOO_DALLAS, "", fvp, [])
                         nrm += 1
