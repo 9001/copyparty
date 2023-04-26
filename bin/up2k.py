@@ -21,6 +21,7 @@ import math
 import time
 import atexit
 import signal
+import socket
 import base64
 import hashlib
 import platform
@@ -58,6 +59,7 @@ PY2 = sys.version_info < (3,)
 if PY2:
     from Queue import Queue
     from urllib import quote, unquote
+    from urlparse import urlsplit, urlunsplit
 
     sys.dont_write_bytecode = True
     bytes = str
@@ -65,6 +67,7 @@ else:
     from queue import Queue
     from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
+    from urllib.parse import urlsplit, urlunsplit
 
     unicode = str
 
@@ -335,6 +338,30 @@ class CTermsize(object):
 
 
 ss = CTermsize()
+
+
+def undns(url):
+    usp = urlsplit(url)
+    hn = usp.hostname
+    gai = None
+    print("resolving host [{0}] ...".format(hn), end="")
+    try:
+        gai = socket.getaddrinfo(hn, None)
+        hn = gai[0][4][0]
+    except:
+        t = "\n\033[31mfailed to resolve upload destination host;\033[0m\ngai={0}\n"
+        print(t.format(repr(gai)))
+        raise
+
+    if usp.port:
+        hn = "{0}:{1}".format(hn, usp.port)
+    if usp.username or usp.password:
+        hn = "{0}:{1}@{2}".format(usp.username, usp.password, hn)
+
+    usp = usp._replace(netloc=hn)
+    url = urlunsplit(usp)
+    print(" {0}".format(url))
+    return url
 
 
 def _scd(err, top):
@@ -931,7 +958,7 @@ class Ctl(object):
 
             upath = file.abs.decode("utf-8", "replace")
             if not VT100:
-                upath = upath[4:]
+                upath = upath.lstrip("\\?")
 
             hs, sprs = handshake(self.ar, file, search)
             if search:
@@ -1128,6 +1155,9 @@ source file/folder selection uses rsync syntax, meaning that:
         print("reading password from file [{0}]".format(fn))
         with open(fn, "rb") as f:
             ar.a = f.read().decode("utf-8").strip()
+
+    # resolve hostname (good on buggy networks)
+    ar.url = undns(ar.url)
 
     if ar.cls:
         print("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
