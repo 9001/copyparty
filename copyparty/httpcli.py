@@ -3604,7 +3604,14 @@ class HttpCli(object):
 
             sz = inf.st_size
             zd = datetime.utcfromtimestamp(linf.st_mtime)
-            dt = zd.strftime("%Y-%m-%d %H:%M:%S")
+            dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
+                zd.year,
+                zd.month,
+                zd.day,
+                zd.hour,
+                zd.minute,
+                zd.second,
+            )
 
             try:
                 ext = "---" if is_dir else fn.rsplit(".", 1)[1]

@@ -647,8 +647,14 @@ class SvcHub(object):
             return
 
         with self.log_mutex:
-            ts = datetime.utcnow().strftime("%Y-%m%d-%H%M%S.%f")[:-3]
-            self.logf.write("@{} [{}\033[0m] {}\n".format(ts, src, msg))
+            zd = datetime.utcnow()
+            ts = "%04d-%04d-%06d.%03d" % (
+                zd.year,
+                zd.month * 100 + zd.day,
+                (zd.hour * 100 + zd.minute) * 100 + zd.second,
+                zd.microsecond // 1000,
+            )
+            self.logf.write("@%s [%s\033[0m] %s\n" % (ts, src, msg))
 
             now = time.time()
             if now >= self.next_day:
@@ -693,7 +699,13 @@ class SvcHub(object):
                 else:
                     msg = "{}{}\033[0m".format(c, msg)
 
-            ts = datetime.utcfromtimestamp(now).strftime("%H:%M:%S.%f")[:-3]
+            zd = datetime.utcfromtimestamp(now)
+            ts = "%02d:%02d:%02d.%03d" % (
+                zd.hour,
+                zd.minute,
+                zd.second,
+                zd.microsecond // 1000,
+            )
             msg = fmt.format(ts, src, msg)
             try:
                 print(msg, end="")
