@@ -7294,6 +7294,15 @@ function reload_mp() {
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
+	if (mp.au && mp.au.tid) {
+		var el = QS('a#a' + mp.au.tid);
+		if (el)
+			clmod(el, 'act', 1);
+
+		el = el && el.closest('tr');
+		if (el)
+			clmod(el, 'play', 1);
+	}
 
 	setTimeout(pbar.onresize, 1);
 }
