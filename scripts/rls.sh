@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-parallel=2
+parallel=1
 
 [ -e make-sfx.sh ] || cd scripts
 [ -e make-sfx.sh ] && [ -e deps-docker ] || {

@@ -64,6 +64,8 @@ git archive hovudstraum | tar -xC "$rls_dir"
 echo ">>> export untracked deps"
 tar -c copyparty/web/deps | tar -xC "$rls_dir"
 
+scripts/genlic.sh "$rls_dir/copyparty/res/COPYING.txt"
+
 cd "$rls_dir"
 find -type d -exec chmod 755 '{}' \+
 find -type f -exec chmod 644 '{}' \+
@@ -93,7 +95,7 @@ rm \
   .gitattributes \
   .gitignore
 
-mv LICENSE LICENSE.txt
+cp -pv LICENSE LICENSE.txt
 
 # the regular cleanup memes
 find -name '*.pyc' -delete
