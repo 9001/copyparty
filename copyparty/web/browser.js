@@ -952,6 +952,7 @@ ebi('ops').innerHTML = (
 // media player
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
+	'<span id="wfs"></span>' +
 	'<span id="wfm"><a' +
 	' href="#" id="fren" tt="' + L.wt_ren + '">✎<span>name</span></a><a' +
 	' href="#" id="fdel" tt="' + L.wt_del + '">⌫<span>del.</span></a><a' +
@@ -3238,7 +3239,9 @@ var fileman = (function () {
 		if (r.clip === null)
 			r.clip = jread('fman_clip', []).slice(1);
 
-		var nsel = msel.getsel().length;
+		var sel = msel.getsel(),
+			nsel = sel.length;
+
 		clmod(bren, 'en', nsel);
 		clmod(bdel, 'en', nsel);
 		clmod(bcut, 'en', nsel);
@@ -3250,7 +3253,49 @@ var fileman = (function () {
 		clmod(bpst, 'hide', !(have_mv && has(perms, 'write')));
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
 
+		var wfs = ebi('wfs'), h = '';
+		try {
+			wfs.innerHTML = h = r.fsi(sel);
+		}
+		catch (ex) { }
+		clmod(wfs, 'act', h);
+
 		bpst.setAttribute('tt', L.ft_paste.format(r.clip.length));
+	};
+
+	r.fsi = function (sel) {
+		if (!sel.length)
+			return '';
+
+		var lf = treectl.lsc.files,
+			nf = 0,
+			sz = 0,
+			dur = 0,
+			ntab = new Set();
+
+		for (var a = 0; a < sel.length; a++)
+			ntab.add(sel[a].vp.split('/').pop());
+
+		for (var a = 0; a < lf.length; a++) {
+			if (!ntab.has(lf[a].href.split('?')[0]))
+				continue;
+
+			var f = lf[a];
+			nf++;
+			sz += f.sz;
+			if (f.tags && f.tags['.dur'])
+				dur += f.tags['.dur']
+		}
+
+		if (!nf)
+			return '';
+
+		var ret = '{0}<br />{1}<small>F</small>'.format(humansize(sz), nf);
+
+		if (dur)
+			ret += ' ' + s2ms(dur);
+
+		return ret;
 	};
 
 	r.rename = function (e) {

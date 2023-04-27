@@ -1159,10 +1159,10 @@ html.y #widget.open {
 	background: #fff;
 	background: var(--bg-u3);
 }
-#wfm, #wzip, #wnp {
+#wfs, #wfm, #wzip, #wnp {
 	display: none;
 }
-#wzip, #wnp {
+#wfs, #wzip, #wnp {
 	margin-right: .2em;
 	padding-right: .2em;
 	border: 1px solid var(--bg-u5);
@@ -1174,6 +1174,7 @@ html.y #widget.open {
 	padding-left: .2em;
 	border-left-width: .1em;
 }
+#wfs.act,
 #wfm.act {
 	display: inline-block;
 }
@@ -1196,6 +1197,13 @@ html.y #widget.open {
 	margin: -.3em .1em;
 	position: relative;
 	display: inline-block;
+}
+#wfs {
+	font-size: .36em;
+	text-align: right;
+	line-height: 1.3em;
+	padding: 0 .3em 0 0;
+	border-width: 0 .25em 0 0;
 }
 #wfm span,
 #wnp span {
