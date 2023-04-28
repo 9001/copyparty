@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import argparse
+import errno
 import logging
 import os
 import stat
@@ -44,6 +45,12 @@ if TYPE_CHECKING:
 if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional
+
+
+class FSE(FilesystemError):
+    def __init__(self, msg: str, severity: int = 0) -> None:
+        super(FilesystemError, self).__init__(msg)
+        self.severity = severity
 
 
 class FtpAuth(DummyAuthorizer):
@@ -128,10 +135,6 @@ class FtpFs(AbstractedFS):
         self.listdirinfo = self.listdir
         self.chdir(".")
 
-    def die(self, msg):
-        self.h.die(msg)
-        raise Exception()
-
     def v2a(
         self,
         vpath: str,
@@ -145,17 +148,17 @@ class FtpFs(AbstractedFS):
             rd, fn = os.path.split(vpath)
             if ANYWIN and relchk(rd):
                 logging.warning("malicious vpath: %s", vpath)
-                self.die("Unsupported characters in filepath")
+                raise FSE("Unsupported characters in filepath", 1)
 
             fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
             vpath = vjoin(rd, fn)
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             if not vfs.realpath:
-                self.die("No filesystem mounted at this path")
+                raise FSE("No filesystem mounted at this path", 1)
 
             return os.path.join(vfs.realpath, rem), vfs, rem
         except Pebkac as ex:
-            self.die(str(ex))
+            raise FSE(str(ex))
 
     def rv2a(
         self,
@@ -178,7 +181,7 @@ class FtpFs(AbstractedFS):
     def validpath(self, path: str) -> bool:
         if "/.hist/" in path:
             if "/up2k." in path or path.endswith("/dir.txt"):
-                self.die("Access to this file is forbidden")
+                raise FSE("Access to this file is forbidden", 1)
 
         return True
 
@@ -195,7 +198,7 @@ class FtpFs(AbstractedFS):
                 td = 0
 
             if td < -1 or td > self.args.ftp_wt:
-                self.die("Cannot open existing file for writing")
+                raise FSE("Cannot open existing file for writing")
 
         self.validpath(ap)
         return open(fsenc(ap), mode)
@@ -206,7 +209,7 @@ class FtpFs(AbstractedFS):
         ap = vfs.canonical(rem)
         if not bos.path.isdir(ap):
             # returning 550 is library-default and suitable
-            self.die("Failed to change directory")
+            raise FSE("No such file or directory")
 
         self.cwd = nwd
         (
@@ -241,7 +244,11 @@ class FtpFs(AbstractedFS):
 
             vfs_ls.sort()
             return vfs_ls
-        except:
+        except Exception as ex:
+            # panic on malicious names
+            if getattr(ex, "severity", 0):
+                raise
+
             if vpath:
                 # display write-only folders as empty
                 return []
@@ -252,31 +259,35 @@ class FtpFs(AbstractedFS):
 
     def rmdir(self, path: str) -> None:
         ap = self.rv2a(path, d=True)[0]
-        bos.rmdir(ap)
+        try:
+            bos.rmdir(ap)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
 
     def remove(self, path: str) -> None:
         if self.args.no_del:
-            self.die("The delete feature is disabled in server config")
+            raise FSE("The delete feature is disabled in server config")
 
         vp = join(self.cwd, path).lstrip("/")
         try:
             self.hub.up2k.handle_rm(self.uname, self.h.cli_ip, [vp], [])
         except Exception as ex:
-            self.die(str(ex))
+            raise FSE(str(ex))
 
     def rename(self, src: str, dst: str) -> None:
         if not self.can_move:
-            self.die("Not allowed for user " + self.h.uname)
+            raise FSE("Not allowed for user " + self.h.uname)
 
         if self.args.no_mv:
-            self.die("The rename/move feature is disabled in server config")
+            raise FSE("The rename/move feature is disabled in server config")
 
         svp = join(self.cwd, src).lstrip("/")
         dvp = join(self.cwd, dst).lstrip("/")
         try:
             self.hub.up2k.handle_mv(self.uname, svp, dvp)
         except Exception as ex:
-            self.die(str(ex))
+            raise FSE(str(ex))
 
     def chmod(self, path: str, mode: str) -> None:
         pass
@@ -285,7 +296,10 @@ class FtpFs(AbstractedFS):
         try:
             ap = self.rv2a(path, r=True)[0]
             return bos.stat(ap)
-        except:
+        except FSE as ex:
+            if ex.severity:
+                raise
+
             ap = self.rv2a(path)[0]
             st = bos.stat(ap)
             if not stat.S_ISDIR(st.st_mode):
@@ -305,7 +319,10 @@ class FtpFs(AbstractedFS):
         try:
             st = self.stat(path)
             return stat.S_ISREG(st.st_mode)
-        except:
+        except Exception as ex:
+            if getattr(ex, "severity", 0):
+                raise
+
             return False  # expected for mojibake in ftp_SIZE()
 
     def islink(self, path: str) -> bool:
@@ -316,7 +333,10 @@ class FtpFs(AbstractedFS):
         try:
             st = self.stat(path)
             return stat.S_ISDIR(st.st_mode)
-        except:
+        except Exception as ex:
+            if getattr(ex, "severity", 0):
+                raise
+
             return True
 
     def getsize(self, path: str) -> int:
@@ -366,10 +386,6 @@ class FtpHandler(FTPHandler):
         # reduce non-debug logging
         self.log_cmds_list = [x for x in self.log_cmds_list if x not in ("CWD", "XCWD")]
 
-    def die(self, msg):
-        self.respond("550 {}".format(msg))
-        raise FilesystemError(msg)
-
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
         vp = join(self.fs.cwd, file).lstrip("/")
@@ -389,7 +405,7 @@ class FtpHandler(FTPHandler):
             0,
             "",
         ):
-            self.die("Upload blocked by xbu server config")
+            raise FSE("Upload blocked by xbu server config")
 
         # print("ftp_STOR: {} {} => {}".format(vp, mode, ap))
         ret = FTPHandler.ftp_STOR(self, file, mode)
@@ -488,6 +504,9 @@ class Ftpd(object):
         ips = self.args.i
         if "::" in ips:
             ips.append("0.0.0.0")
+
+        if self.args.ftp4:
+            ips = [x for x in ips if ":" not in x]
 
         ioloop = IOLoop()
         for ip in ips:
