@@ -384,7 +384,7 @@ class Up2k(object):
                         if vp:
                             fvp = "%s/%s" % (vp, fvp)
 
-                        self._handle_rm(LEELOO_DALLAS, "", fvp, [])
+                        self._handle_rm(LEELOO_DALLAS, "", fvp, [], True)
                         nrm += 1
 
                 if nrm:
@@ -2897,7 +2897,9 @@ class Up2k(object):
             except:
                 pass
 
-    def handle_rm(self, uname: str, ip: str, vpaths: list[str], lim: list[int]) -> str:
+    def handle_rm(
+        self, uname: str, ip: str, vpaths: list[str], lim: list[int], rm_up: bool
+    ) -> str:
         n_files = 0
         ok = {}
         ng = {}
@@ -2906,7 +2908,7 @@ class Up2k(object):
                 self.log("hit delete limit of {} files".format(lim[1]), 3)
                 break
 
-            a, b, c = self._handle_rm(uname, ip, vp, lim)
+            a, b, c = self._handle_rm(uname, ip, vp, lim, rm_up)
             n_files += a
             for k in b:
                 ok[k] = 1
@@ -2920,7 +2922,7 @@ class Up2k(object):
         return "deleted {} files (and {}/{} folders)".format(n_files, iok, iok + ing)
 
     def _handle_rm(
-        self, uname: str, ip: str, vpath: str, lim: list[int]
+        self, uname: str, ip: str, vpath: str, lim: list[int], rm_up: bool
     ) -> tuple[int, list[str], list[str]]:
         self.db_act = time.time()
         try:
@@ -3027,16 +3029,22 @@ class Up2k(object):
                 if xad:
                     runhook(self.log, xad, abspath, vpath, "", uname, 0, 0, ip, 0, "")
 
-        ok: list[str] = []
-        ng: list[str] = []
         if is_dir:
             ok, ng = rmdirs(self.log_func, scandir, True, atop, 1)
+        else:
+            ok = ng = []
 
-        ok2, ng2 = rmdirs_up(os.path.dirname(atop), ptop)
+        if rm_up:
+            ok2, ng2 = rmdirs_up(os.path.dirname(atop), ptop)
+        else:
+            ok2 = ng2 = []
 
         return n_files, ok + ok2, ng + ng2
 
     def handle_mv(self, uname: str, svp: str, dvp: str) -> str:
+        if svp == dvp or dvp.startswith(svp + "/"):
+            raise Pebkac(400, "mv: cannot move parent into subfolder")
+
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
         svn, srem = svn.get_dbv(srem)
         sabs = svn.canonical(srem, False)
@@ -3090,8 +3098,21 @@ class Up2k(object):
 
             curs.clear()
 
-        rmdirs(self.log_func, scandir, True, sabs, 1)
-        rmdirs_up(os.path.dirname(sabs), svn.realpath)
+        rm_ok, rm_ng = rmdirs(self.log_func, scandir, True, sabs, 1)
+
+        for zsl in (rm_ok, rm_ng):
+            for ap in reversed(zsl):
+                if not ap.startswith(sabs):
+                    raise Pebkac(500, "mv_d: bug at {}, top {}".format(ap, sabs))
+
+                rem = ap[len(sabs) :].replace(os.sep, "/").lstrip("/")
+                vp = vjoin(dvp, rem)
+                try:
+                    dvn, drem = self.asrv.vfs.get(vp, uname, False, True)
+                    bos.mkdir(dvn.canonical(drem))
+                except:
+                    pass
+
         return "k"
 
     def _mv_file(

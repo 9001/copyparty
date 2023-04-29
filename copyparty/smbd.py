@@ -261,7 +261,7 @@ class SMB(object):
             yeet("blocked delete (no-del-acc): " + vpath)
 
         vpath = vpath.replace("\\", "/").lstrip("/")
-        self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vpath], [])
+        self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vpath], [], False)
 
     def _utime(self, vpath: str, times: tuple[float, float]) -> None:
         if not self.args.smbw:

@@ -2270,7 +2270,7 @@ def rmdirs(
     dirs = [os.path.join(top, x) for x in dirs]
     ok = []
     ng = []
-    for d in dirs[::-1]:
+    for d in reversed(dirs):
         a, b = rmdirs(logger, scandir, lstat, d, depth + 1)
         ok += a
         ng += b

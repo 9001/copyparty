@@ -1152,17 +1152,8 @@ class HttpCli(object):
         dst = self.headers["destination"]
         dst = re.sub("^https?://[^/]+", "", dst).lstrip()
         dst = unquotep(dst)
-        if not self._mv(self.vpath, dst):
+        if not self._mv(self.vpath, dst.lstrip("/")):
             return False
-
-        # up2k only cares about files and removes all empty folders;
-        # clients naturally expect empty folders to survive a rename
-        vn, rem = self.asrv.vfs.get(dst, self.uname, False, False)
-        dabs = vn.canonical(rem)
-        try:
-            bos.makedirs(dabs)
-        except:
-            pass
 
         return True
 
@@ -3054,7 +3045,7 @@ class HttpCli(object):
         ret = self.gen_tree(top, dst)
         if self.is_vproxied:
             parents = self.args.R.split("/")
-            for parent in parents[::-1]:
+            for parent in reversed(parents):
                 ret = {"k%s" % (parent,): ret, "a": []}
 
         zs = json.dumps(ret)
@@ -3193,7 +3184,9 @@ class HttpCli(object):
         nlim = int(self.uparam.get("lim") or 0)
         lim = [nlim, nlim] if nlim else []
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_rm", self.uname, self.ip, req, lim)
+        x = self.conn.hsrv.broker.ask(
+            "up2k.handle_rm", self.uname, self.ip, req, lim, False
+        )
         self.loud_reply(x.get())
         return True
 
@@ -3210,7 +3203,7 @@ class HttpCli(object):
         # x-www-form-urlencoded (url query part) uses
         # either + or %20 for 0x20 so handle both
         dst = unquotep(dst.replace("+", " "))
-        return self._mv(self.vpath, dst)
+        return self._mv(self.vpath, dst.lstrip("/"))
 
     def _mv(self, vsrc: str, vdst: str) -> bool:
         if not self.can_move:
