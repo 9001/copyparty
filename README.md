@@ -41,6 +41,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [media player](#media-player) - plays almost every audio format there is
         * [audio equalizer](#audio-equalizer) - bass boosted
+        * [unreliable playback on android](#unreliable-playback-on-android) - due to phone / app settings
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
@@ -274,6 +275,8 @@ server notes:
 * [Chrome issue 1352210](https://bugs.chromium.org/p/chromium/issues/detail?id=1352210) -- plaintext http may be faster at filehashing than https (but also extremely CPU-intensive)
 
 * [Firefox issue 1790500](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500) -- entire browser can crash after uploading ~4000 small files
+
+* Android: music playback randomly stops due to [battery usage settings](#unreliable-playback-on-android)
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
@@ -699,6 +702,11 @@ bass boosted
 can also boost the volume in general, or increase/decrease stereo width (like [crossfeed](https://www.foobar2000.org/components/view/foo_dsp_meiercf) just worse)
 
 has the convenient side-effect of reducing the pause between songs, so gapless albums play better with the eq enabled (just make it flat)
+
+
+### unreliable playback on android
+
+due to phone / app settings,  android phones may randomly stop playing music when the power saver kicks in, especially at the end of an album -- you can fix it by [disabling power saving](https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png) in the [app settings](https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png) of the browser you use for music streaming (preferably a dedicated one)
 
 
 ## markdown viewer

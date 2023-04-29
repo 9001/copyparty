@@ -261,6 +261,7 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
+		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p>(probably a good idea to use a separate browser dedicated for just music streaming...)</p>',
 		"mm_hnf": "that song no longer exists",
 
 		"im_hnf": "that image no longer exists",
@@ -721,6 +722,7 @@ var Ls = {
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
+		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>(sikkert smart å ha en egen nettleser kun for musikkspilling...)</p>',
 		"mm_hnf": "sangen finnes ikke lenger",
 
 		"im_hnf": "bildet finnes ikke lenger",
@@ -1483,7 +1485,8 @@ var mpl = (function () {
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
-		ebi('np_img').setAttribute('src', cover || ''); // dont give last.fm the pwd
+		if (!MOBILE)
+			ebi('np_img').setAttribute('src', cover || ''); // dont give last.fm the pwd
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', mplay);
@@ -1541,6 +1544,7 @@ var re_au_native = can_ogg ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i :
 
 // extract songs + add play column
 var mpo = { "au": null, "au2": null, "acs": null };
+var t_fchg = 0;
 function MPlayer() {
 	var r = this;
 	r.id = Date.now();
@@ -2162,17 +2166,30 @@ function song_skip(n) {
 	else
 		play(mp.order[n == -1 ? mp.order.length - 1 : 0]);
 }
+function next_song_sig(e) {
+	t_fchg = document.hasFocus() ? 0 : Date.now();
+	return next_song_cmn(e);
+}
 function next_song(e) {
+	t_fchg = 0;
+	return next_song_cmn(e);
+}
+function next_song_cmn(e) {
 	ev(e);
 	if (mp.order.length) {
 		mpl.traversals = 0;
 		return song_skip(1);
 	}
 	if (mpl.traversals++ < 5) {
-		treectl.ls_cb = next_song;
+		if (MOBILE && t_fchg && Date.now() - t_fchg > 30 * 1000)
+			modal.alert(L.mm_pwrsv);
+
+		t_fchg = document.hasFocus() ? 0 : Date.now();
+		treectl.ls_cb = next_song_cmn;
 		return tree_neigh(1);
 	}
 	toast.inf(10, L.mm_nof);
+	t_fchg = 0;
 }
 function prev_song(e) {
 	ev(e);
@@ -2288,6 +2305,10 @@ var mpui = (function () {
 			return;
 		}
 
+		var pos = mp.au.currentTime;
+		if (!isNum(pos))
+			pos = 0;
+
 		// indicate playback state in ui
 		widget.paused(mp.au.paused);
 
@@ -2310,10 +2331,18 @@ var mpui = (function () {
 				pbar.drawbuf();
 		}
 
+		if (pos > 0.3 && t_fchg) {
+			// cannot check document.hasFocus to avoid false positives;
+			// it continues on power-on, doesn't need to be in-browser
+			if (MOBILE && Date.now() - t_fchg > 30 * 1000)
+				modal.alert(L.mm_pwrsv);
+
+			t_fchg = 0;
+		}
+
 		// preload next song
 		if (mpl.preload && preloaded != mp.au.rsrc) {
-			var pos = mp.au.currentTime,
-				len = mp.au.duration,
+			var len = mp.au.duration,
 				rem = pos > 1 ? len - pos : 999,
 				full = null;
 
@@ -2706,6 +2735,7 @@ function play(tid, is_ev, seek) {
 			tn = 0;
 		}
 		else if (mpl.pb_mode == 'next') {
+			t_fchg = document.hasFocus() ? 0 : Date.now();
 			treectl.ls_cb = next_song;
 			return tree_neigh(1);
 		}
@@ -2735,7 +2765,7 @@ function play(tid, is_ev, seek) {
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onplaying = mpui.progress_updater;
-		mp.au.onended = next_song;
+		mp.au.onended = next_song_sig;
 		widget.open();
 	}
 
@@ -2752,7 +2782,7 @@ function play(tid, is_ev, seek) {
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onplaying = mpui.progress_updater;
-		mp.au.onended = next_song;
+		mp.au.onended = next_song_sig;
 		t = mp.au.currentTime;
 		if (isNum(t) && t > 0.1)
 			mp.au.currentTime = 0;
@@ -2812,7 +2842,7 @@ function play(tid, is_ev, seek) {
 		toast.err(0, esc(L.mm_playerr + basenames(ex)));
 	}
 	clmod(ebi(oid), 'act');
-	setTimeout(next_song, 5000);
+	setTimeout(next_song_sig, 5000);
 }
 
 
@@ -7326,9 +7356,6 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 function reload_mp() {
 	if (mp && mp.au) {
-		if (afilt)
-			afilt.stop();
-
 		mpo.au = mp.au;
 		mpo.au2 = mp.au2;
 		mpo.acs = mp.acs;
