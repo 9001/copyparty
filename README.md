@@ -41,7 +41,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [media player](#media-player) - plays almost every audio format there is
         * [audio equalizer](#audio-equalizer) - bass boosted
-        * [unreliable playback on android](#unreliable-playback-on-android) - due to phone / app settings
+        * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
@@ -70,6 +70,8 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [themes](#themes)
     * [complete examples](#complete-examples)
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
+* [packages](#packages) - the party might be closer than you think
+    * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
 * [browser support](#browser-support) - TLDR: yes
@@ -104,7 +106,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 
 * or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
-* or [install through nix](#nix-package), or [on NixOS](#nixos-module)
+* or [install through nix](#nix-package), or [on NixOS](#nixos-module), or [on arch](#arch-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:
@@ -276,7 +278,7 @@ server notes:
 
 * [Firefox issue 1790500](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500) -- entire browser can crash after uploading ~4000 small files
 
-* Android: music playback randomly stops due to [battery usage settings](#unreliable-playback-on-android)
+* Android: music playback randomly stops due to [battery usage settings](#fix-unreliable-playback-on-android)
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
@@ -704,7 +706,7 @@ can also boost the volume in general, or increase/decrease stereo width (like [c
 has the convenient side-effect of reducing the pause between songs, so gapless albums play better with the eq enabled (just make it flat)
 
 
-### unreliable playback on android
+### fix unreliable playback on android
 
 due to phone / app settings,  android phones may randomly stop playing music when the power saver kicks in, especially at the end of an album -- you can fix it by [disabling power saving](https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png) in the [app settings](https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png) of the browser you use for music streaming (preferably a dedicated one)
 
@@ -1182,6 +1184,16 @@ example webserver configs:
 
 * [nginx config](contrib/nginx/copyparty.conf) -- entire domain/subdomain
 * [apache2 config](contrib/apache/copyparty.conf) -- location-based
+
+
+# packages
+
+the party might be closer than you think
+
+
+## arch package
+
+now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
 
 
 ## nix package
