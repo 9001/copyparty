@@ -1,4 +1,33 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0426-2300  `v1.6.15`  unexpected boost
+
+## new features
+* 30% faster folder listings due to [the very last thing](https://github.com/9001/copyparty/commit/55c74ad164633a0a64dceb51f7f534da0422cbb5) i'd ever expect to be a bottleneck, [thx perf](https://docs.python.org/3.12/howto/perf_profiling.html)
+* option to see the lastmod timestamps of symlinks instead of the target files
+  * makes the turbo mode of [u2cli, the commandline uploader and folder-sync tool](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) more turbo since copyparty dedupes uploads by symlinking to an existing copy and the symlink is stamped with the deduped file's lastmod
+  * **webdav:** enabled by default (because rclone will want this), can be disabled with arg `--dav-rt` or volflag `davrt`
+  * **http:** disabled by default, can be enabled per-request with urlparam `lt`
+* [u2cli](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py): option `--rh` to resolve server hostname only once at start of upload
+  * fantastic for buggy networks, but it'll break TLS
+
+## bugfixes
+* new arg `--s-tbody` specifies the network timeout before a dead connection gets dropped (default 3min)
+  * before there was no timeout at all, which could hang uploads or possibly consume all server resources
+  * ...but this is only relevant if your copyparty is directly exposed to the internet with no reverse proxy
+    * with nginx/caddy/etc you can disable the timeout with `--s-tbody 0` for a 3% performance boost (*wow!*)
+* iPhone audio transcoder could turn bad and stop transcoding
+* ~~maybe android phones no longer pause playback at the end of an album~~
+  * nope, that was due to [android's powersaver](https://github.com/9001/copyparty#fix-unreliable-playback-on-android), oh well
+  * ***bonus unintended feature:*** navigate into other folders while a song is plaing
+* [installing from the source tarball](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#build-from-release-tarball) should be ok now
+  * good base for making distro packages probably
+
+## other changes
+* since the network timeout fix is relevant for the single usecase that [cpp-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.6.15/copyparty-winpe64.exe) covers, there is now a new version of that
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0424-0609  `v1.6.14`  unsettable flags
 
 ## new features
