@@ -135,6 +135,7 @@ class HttpCli(object):
         self.ouparam: dict[str, str] = {}
         self.uparam: dict[str, str] = {}
         self.cookies: dict[str, str] = {}
+        self.avn: Optional[VFS] = None
         self.vpath = " "
         self.uname = " "
         self.pw = " "
@@ -411,6 +412,13 @@ class HttpCli(object):
             uparam["b"] = ""
             cookies["b"] = ""
 
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+        if "xdev" in vn.flags or "xvol" in vn.flags:
+            ap = vn.canonical(rem)
+            avn = vn.chk_ap(ap)
+        else:
+            avn = vn
+
         (
             self.can_read,
             self.can_write,
@@ -418,7 +426,10 @@ class HttpCli(object):
             self.can_delete,
             self.can_get,
             self.can_upget,
-        ) = self.asrv.vfs.can_access(self.vpath, self.uname)
+        ) = (
+            avn.can_access("", self.uname) if avn else [False] * 6
+        )
+        self.avn = avn
 
         self.s.settimeout(self.args.s_tbody or None)
 
@@ -875,7 +886,7 @@ class HttpCli(object):
         try:
             topdir = {"vp": "", "st": bos.stat(tap)}
         except OSError as ex:
-            if ex.errno != errno.ENOENT:
+            if ex.errno not in (errno.ENOENT, errno.ENOTDIR):
                 raise
             raise Pebkac(404)
 

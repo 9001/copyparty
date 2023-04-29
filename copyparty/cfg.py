@@ -107,7 +107,7 @@ flagcats = {
         "dbd=[acid|swal|wal|yolo]": "database speed-durability tradeoff",
         "xlink": "cross-volume dupe detection / linking",
         "xdev": "do not descend into other filesystems",
-        "xvol": "skip symlinks leaving the volume root",
+        "xvol": "do not follow symlinks leaving the volume root",
         "dotsrch": "show dotfiles in search results",
         "nodotsrch": "hide dotfiles in search results (default)",
     },

@@ -285,6 +285,8 @@ class VFS(object):
         self.vpath = vpath  # absolute path in the virtual filesystem
         self.axs = axs
         self.flags = flags  # config options
+        self.root = self
+        self.dev = 0  # st_dev
         self.nodes: dict[str, VFS] = {}  # child nodes
         self.histtab: dict[str, str] = {}  # all realpath->histpath
         self.dbv: Optional[VFS] = None  # closest full/non-jump parent
@@ -297,11 +299,17 @@ class VFS(object):
         self.apget: dict[str, list[str]] = {}
 
         if realpath:
+            rp = realpath + ("" if realpath.endswith(os.sep) else os.sep)
+            vp = vpath + ("/" if vpath else "")
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
             self.all_vols = {vpath: self}  # flattened recursive
+            self.all_aps = [(rp, self)]
+            self.all_vps = [(vp, self)]
         else:
             self.histpath = ""
             self.all_vols = {}
+            self.all_aps = []
+            self.all_vps = []
 
     def __repr__(self) -> str:
         return "VFS(%s)" % (
@@ -311,12 +319,22 @@ class VFS(object):
             )
         )
 
-    def get_all_vols(self, outdict: dict[str, "VFS"]) -> None:
+    def get_all_vols(
+        self,
+        vols: dict[str, "VFS"],
+        aps: list[tuple[str, "VFS"]],
+        vps: list[tuple[str, "VFS"]],
+    ) -> None:
         if self.realpath:
-            outdict[self.vpath] = self
+            vols[self.vpath] = self
+            rp = self.realpath
+            rp += "" if rp.endswith(os.sep) else os.sep
+            vp = self.vpath + ("/" if self.vpath else "")
+            aps.append((rp, self))
+            vps.append((vp, self))
 
         for v in self.nodes.values():
-            v.get_all_vols(outdict)
+            v.get_all_vols(vols, aps, vps)
 
     def add(self, src: str, dst: str) -> "VFS":
         """get existing, or add new path to the vfs"""
@@ -390,7 +408,11 @@ class VFS(object):
         self, vpath: str, uname: str
     ) -> tuple[bool, bool, bool, bool, bool, bool]:
         """can Read,Write,Move,Delete,Get,Upget"""
-        vn, _ = self._find(undot(vpath))
+        if vpath:
+            vn, _ = self._find(undot(vpath))
+        else:
+            vn = self
+
         c = vn.axs
         return (
             uname in c.uread or "*" in c.uread,
@@ -545,6 +567,15 @@ class VFS(object):
                 self.log("vfs.walk", t.format(seen[-1], fsroot, self.vpath, rem), 3)
             return
 
+        if "xdev" in self.flags or "xvol" in self.flags:
+            rm1 = []
+            for le in vfs_ls:
+                ap = absreal(os.path.join(fsroot, le[0]))
+                vn2 = self.chk_ap(ap)
+                if not vn2 or not vn2.get("", uname, True, False):
+                    rm1.append(le)
+            _ = [vfs_ls.remove(x) for x in rm1]  # type: ignore
+
         seen = seen[:] + [fsroot]
         rfiles = [x for x in vfs_ls if not stat.S_ISDIR(x[1].st_mode)]
         rdirs = [x for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
@@ -642,6 +673,44 @@ class VFS(object):
             ret2 = list(zip(vpaths, apaths, dstats))
             for d in [{"vp": v, "ap": a, "st": n} for v, a, n in ret2]:
                 yield d
+
+    def chk_ap(self, ap: str, st: Optional[os.stat_result] = None) -> Optional["VFS"]:
+        aps = ap + os.sep
+        if "xdev" in self.flags and not ANYWIN:
+            if not st:
+                ap2 = ap.replace("\\", "/") if ANYWIN else ap
+                while ap2:
+                    try:
+                        st = bos.stat(ap2)
+                        break
+                    except:
+                        if "/" not in ap2:
+                            raise
+                        ap2 = ap2.rsplit("/", 1)[0]
+                assert st
+
+            vdev = self.dev
+            if not vdev:
+                vdev = self.dev = bos.stat(self.realpath).st_dev
+
+            if vdev != st.st_dev:
+                if self.log:
+                    t = "xdev: {}[{}] => {}[{}]"
+                    self.log("vfs", t.format(vdev, self.realpath, st.st_dev, ap), 3)
+
+                return None
+
+        if "xvol" in self.flags:
+            for vap, vn in self.root.all_aps:
+                if aps.startswith(vap):
+                    return vn
+
+            if self.log:
+                self.log("vfs", "xvol: [{}]".format(ap), 3)
+
+            return None
+
+        return self
 
 
 if WINDOWS:
@@ -1069,7 +1138,13 @@ class AuthSrv(object):
 
         assert vfs
         vfs.all_vols = {}
-        vfs.get_all_vols(vfs.all_vols)
+        vfs.all_aps = []
+        vfs.all_vps = []
+        vfs.get_all_vols(vfs.all_vols, vfs.all_aps, vfs.all_vps)
+        for vol in vfs.all_vols.values():
+            vol.all_aps.sort(key=lambda x: len(x[0]), reverse=True)
+            vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
+            vol.root = vfs
 
         for perm in "read write move del get pget".split():
             axs_key = "u" + perm

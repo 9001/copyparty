@@ -30,9 +30,17 @@ except:
 
 argv = [os.path.expanduser(x) if x.startswith("~") else x for x in argv]
 
+sfx = ""
+if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]):
+    sfx = sys.argv[1]
+    sys.argv = [sys.argv[0]] + sys.argv[2:]
+
 argv += sys.argv[1:]
 
-if re.search(" -j ?[0-9]", " ".join(argv)):
+if sfx:
+    argv = [sys.executable, sfx] + argv
+    sp.check_call(argv)
+elif re.search(" -j ?[0-9]", " ".join(argv)):
     argv = [sys.executable, "-m", "copyparty"] + argv
     sp.check_call(argv)
 else:

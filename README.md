@@ -958,7 +958,11 @@ avoid traversing into other filesystems  using `--xdev` / volflag `:c,xdev`, ski
 
 and/or you can `--xvol` / `:c,xvol` to ignore all symlinks leaving the volume's top directory, but still allow bind-mounts pointing elsewhere
 
-**NB: only affects the indexer** -- users can still access anything inside a volume, unless shadowed by another volume
+* symlinks are permitted with `xvol` if they point into another volume where the user has the same level of access
+
+these options will reduce performance; unlikely worst-case estimates are 14% reduction for directory listings, 35% for download-as-tar
+
+as of copyparty v1.7.0 these options also prevent file access at runtime -- in previous versions it was just hints for the indexer
 
 ### periodic rescan
 

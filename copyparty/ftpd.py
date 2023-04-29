@@ -144,17 +144,30 @@ class FtpFs(AbstractedFS):
         d: bool = False,
     ) -> tuple[str, VFS, str]:
         try:
-            vpath = vpath.replace("\\", "/").lstrip("/")
+            vpath = vpath.replace("\\", "/").strip("/")
             rd, fn = os.path.split(vpath)
             if ANYWIN and relchk(rd):
                 logging.warning("malicious vpath: %s", vpath)
-                raise FSE("Unsupported characters in filepath", 1)
+                t = "Unsupported characters in [{}]"
+                raise FSE(t.format(vpath), 1)
 
             fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
             vpath = vjoin(rd, fn)
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             if not vfs.realpath:
-                raise FSE("No filesystem mounted at this path", 1)
+                t = "No filesystem mounted at [{}]"
+                raise FSE(t.format(vpath))
+
+            if "xdev" in vfs.flags or "xvol" in vfs.flags:
+                ap = vfs.canonical(rem)
+                avfs = vfs.chk_ap(ap)
+                t = "Permission denied in [{}]"
+                if not avfs:
+                    raise FSE(t.format(vpath), 1)
+
+                cr, cw, cm, cd, _, _ = avfs.can_access("", self.h.uname)
+                if r and not cr or w and not cw or m and not cm or d and not cd:
+                    raise FSE(t.format(vpath), 1)
 
             return os.path.join(vfs.realpath, rem), vfs, rem
         except Pebkac as ex:
@@ -207,9 +220,17 @@ class FtpFs(AbstractedFS):
         nwd = join(self.cwd, path)
         vfs, rem = self.hub.asrv.vfs.get(nwd, self.uname, False, False)
         ap = vfs.canonical(rem)
-        if not bos.path.isdir(ap):
+        try:
+            st = bos.stat(ap)
+            if not stat.S_ISDIR(st.st_mode):
+                raise Exception()
+        except:
             # returning 550 is library-default and suitable
             raise FSE("No such file or directory")
+
+        avfs = vfs.chk_ap(ap, st)
+        if not avfs:
+            raise FSE("Permission denied", 1)
 
         self.cwd = nwd
         (
@@ -219,16 +240,18 @@ class FtpFs(AbstractedFS):
             self.can_delete,
             self.can_get,
             self.can_upget,
-        ) = self.hub.asrv.vfs.can_access(self.cwd.lstrip("/"), self.h.uname)
+        ) = avfs.can_access("", self.h.uname)
 
     def mkdir(self, path: str) -> None:
         ap = self.rv2a(path, w=True)[0]
         bos.makedirs(ap)  # filezilla expects this
 
     def listdir(self, path: str) -> list[str]:
-        vpath = join(self.cwd, path).lstrip("/")
+        vpath = join(self.cwd, path)
         try:
-            vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, True, False)
+            ap, vfs, rem = self.v2a(vpath, True, False)
+            if not bos.path.isdir(ap):
+                raise FSE("No such file or directory", 1)
 
             fsroot, vfs_ls1, vfs_virt = vfs.ls(
                 rem,
@@ -249,7 +272,7 @@ class FtpFs(AbstractedFS):
             if getattr(ex, "severity", 0):
                 raise
 
-            if vpath:
+            if vpath.strip("/"):
                 # display write-only folders as empty
                 return []
 
@@ -389,7 +412,7 @@ class FtpHandler(FTPHandler):
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
         vp = join(self.fs.cwd, file).lstrip("/")
-        ap, vfs, rem = self.fs.v2a(vp)
+        ap, vfs, rem = self.fs.v2a(vp, w=True)
         self.vfs_map[ap] = vp
         xbu = vfs.flags.get("xbu")
         if xbu and not runhook(
