@@ -1178,6 +1178,14 @@ class AuthSrv(object):
         if LEELOO_DALLAS in all_users:
             raise Exception("sorry, reserved username: " + LEELOO_DALLAS)
 
+        seenpwds = {}
+        for usr, pwd in acct.items():
+            if pwd in seenpwds:
+                t = "accounts [{}] and [{}] have the same password; this is not supported"
+                self.log(t.format(seenpwds[pwd], usr), 1)
+                raise Exception("invalid config")
+            seenpwds[pwd] = usr
+
         promote = []
         demote = []
         for vol in vfs.all_vols.values():
