@@ -104,9 +104,9 @@ turn almost any device into a file server with resumable uploads/downloads using
 
 just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
-* or install through pypi (python3 only): `python3 -m pip install --user -U copyparty`
+* or install through pypi: `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
-* or [install through nix](#nix-package), or [on NixOS](#nixos-module), or [on arch](#arch-package)
+* or install [on arch](#arch-package) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:

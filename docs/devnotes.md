@@ -275,6 +275,8 @@ python3 setup.py build
 python3 setup.py install --skip-build --prefix=/usr --root=$HOME/pe/copyparty
 ```
 
+if you have a very recent python where `setup.py install` finally got obliterated, see [the arch pkg](https://github.com/9001/copyparty/blob/hovudstraum/contrib/package/arch/PKGBUILD) for the current workaround until copyparty finally migrates to the toml meme
+
 
 ## complete release
 
