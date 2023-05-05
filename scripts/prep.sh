@@ -11,30 +11,12 @@ update_arch_pkgbuild() {
     rm -rf x
     mkdir x
 
-    (echo "$self/../dist/copyparty-sfx.py"
-    awk -v self="$self" '
-        /^\)/{o=0}
-        /^source=/{o=1;next}
-        {
-            sub(/..pkgname./,"copyparty");
-            sub(/.*pkgver./,self "/..");
-            sub(/^ +"/,"");sub(/"/,"")
-        }
-        o&&!/https/' PKGBUILD
-    ) |
-    xargs sha256sum > x/sums
+    sha=$(sha256sum "$self/../dist/copyparty-$ver.tar.gz" | awk '{print$1}')
 
-    (awk -v ver=$ver '
+    awk -v ver=$ver -v sha=$sha '
         /^pkgver=/{sub(/[0-9\.]+/,ver)};
-        /^sha256sums=/{exit};
-        1' PKGBUILD
-    echo -n 'sha256sums=('
-    p=; cat x/sums | while read s _; do
-        echo "$p\"$s\""
-        p='            '
-    done
-    awk '/^sha256sums=/{o=1} o&&/^\)/{o=2} o==2' PKGBUILD
-    ) >a
+        /^sha256sums=/{sub(/[0-9a-f]{64}/,sha)};
+        1' PKGBUILD >a
     mv a PKGBUILD
 
     rm -rf x
