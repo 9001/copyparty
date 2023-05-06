@@ -830,12 +830,15 @@ class HttpCli(object):
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
-        if not self.can_read and not self.can_write and not self.can_get:
-            if self.vpath:
-                self.log("inaccessible: [{}]".format(self.vpath))
-                raise Pebkac(401, "authenticate")
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False, err=401)
+        tap = vn.canonical(rem)
 
-            self.uparam["h"] = ""
+        if "davauth" in vn.flags and self.uname == "*":
+            self.can_read = self.can_write = self.can_get = False
+
+        if not self.can_read and not self.can_write and not self.can_get:
+            self.log("inaccessible: [{}]".format(self.vpath))
+            raise Pebkac(401, "authenticate")
 
         from .dxml import parse_xml
 
@@ -879,8 +882,6 @@ class HttpCli(object):
             ]
 
         props = set(props_lst)
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False, err=401)
-        tap = vn.canonical(rem)
         depth = self.headers.get("depth", "infinity").lower()
 
         try:
@@ -890,7 +891,7 @@ class HttpCli(object):
                 raise
             raise Pebkac(404)
 
-        if not stat.S_ISDIR(topdir["st"].st_mode):
+        if depth == "0" or not self.can_read or not stat.S_ISDIR(topdir["st"].st_mode):
             fgen = []
 
         elif depth == "infinity":
@@ -931,9 +932,6 @@ class HttpCli(object):
             ls = [{"vp": vp, "st": st} for vp, st in vfs_ls]
             ls += [{"vp": v, "st": zsr} for v in vfs_virt]
             fgen = ls  # type: ignore
-
-        elif depth == "0":
-            fgen = []  # type: ignore
 
         else:
             t = "invalid depth value '{}' (must be either '0' or '1'{})"

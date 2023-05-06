@@ -13,6 +13,7 @@ def vf_bmap() -> dict[str, str]:
         "no_dedup": "copydupes",
         "no_dupe": "nodupe",
         "no_forget": "noforget",
+        "dav_auth": "davauth",
         "dav_rt": "davrt",
     }
     for k in (
@@ -144,6 +145,7 @@ flagcats = {
     },
     "others": {
         "fk=8": 'generates per-file accesskeys,\nwhich will then be required at the "g" permission',
+        "davauth": "ask webdav clients to login for all folders",
         "davrt": "show lastmod time of symlink destination, not the link itself\n(note: this option is always enabled for recursive listings)",
     },
 }
