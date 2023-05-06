@@ -726,7 +726,7 @@ class HttpCli(object):
 
     def handle_get(self) -> bool:
         if self.do_log:
-            logmsg = "{:4} {}".format(self.mode, self.req)
+            logmsg = "%4s %s @%s" % (self.mode, self.req, self.uname)
 
             if "range" in self.headers:
                 try:
@@ -825,7 +825,7 @@ class HttpCli(object):
 
     def handle_propfind(self) -> bool:
         if self.do_log:
-            self.log("PFIND " + self.req)
+            self.log("PFIND %s @%s" % (self.req, self.uname))
 
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
@@ -1007,7 +1007,7 @@ class HttpCli(object):
 
     def handle_proppatch(self) -> bool:
         if self.do_log:
-            self.log("PPATCH " + self.req)
+            self.log("PPATCH %s @%s" % (self.req, self.uname))
 
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
@@ -1065,7 +1065,7 @@ class HttpCli(object):
 
     def handle_lock(self) -> bool:
         if self.do_log:
-            self.log("LOCK " + self.req)
+            self.log("LOCK %s @%s" % (self.req, self.uname))
 
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
@@ -1131,7 +1131,7 @@ class HttpCli(object):
 
     def handle_unlock(self) -> bool:
         if self.do_log:
-            self.log("UNLOCK " + self.req)
+            self.log("UNLOCK %s @%s" % (self.req, self.uname))
 
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
@@ -1148,7 +1148,7 @@ class HttpCli(object):
             return True
 
         if self.do_log:
-            self.log("MKCOL " + self.req)
+            self.log("MKCOL %s @%s" % (self.req, self.uname))
 
         try:
             return self._mkdir(self.vpath, True)
@@ -1200,7 +1200,7 @@ class HttpCli(object):
 
     def handle_options(self) -> bool:
         if self.do_log:
-            self.log("OPTIONS " + self.req)
+            self.log("OPTIONS %s @%s" % (self.req, self.uname))
 
         oh = self.out_headers
         oh["Allow"] = ", ".join(self.conn.hsrv.mallow)
@@ -1215,11 +1215,11 @@ class HttpCli(object):
         return True
 
     def handle_delete(self) -> bool:
-        self.log("DELETE " + self.req)
+        self.log("DELETE %s @%s" % (self.req, self.uname))
         return self.handle_rm([])
 
     def handle_put(self) -> bool:
-        self.log("PUT " + self.req)
+        self.log("PUT %s @%s" % (self.req, self.uname))
 
         if not self.can_write:
             t = "user {} does not have write-access here"
@@ -1237,7 +1237,7 @@ class HttpCli(object):
         return self.handle_stash(True)
 
     def handle_post(self) -> bool:
-        self.log("POST " + self.req)
+        self.log("POST %s @%s" % (self.req, self.uname))
 
         if self.headers.get("expect", "").lower() == "100-continue":
             try:
@@ -2780,7 +2780,7 @@ class HttpCli(object):
         return True
 
     def tx_md(self, fs_path: str) -> bool:
-        logmsg = "{:4} {} ".format("", self.req)
+        logmsg = "     %s @%s " % (self.req, self.uname)
 
         if not self.can_write:
             if "edit" in self.uparam or "edit2" in self.uparam:
