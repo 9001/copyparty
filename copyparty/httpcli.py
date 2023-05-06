@@ -331,7 +331,7 @@ class HttpCli(object):
             for k in arglist.split("&"):
                 if "=" in k:
                     k, zs = k.split("=", 1)
-                    uparam[k.lower()] = zs.strip()
+                    uparam[k.lower()] = unquotep(zs.strip().replace("+", " "))
                 else:
                     uparam[k.lower()] = ""
 

@@ -742,7 +742,7 @@ function get_pwd() {
     if (pwd.length < 2)
         return null;
 
-    return pwd[1].split(';')[0];
+    return decodeURIComponent(pwd[1].split(';')[0]);
 }
 
 
@@ -1769,7 +1769,6 @@ function cprop(name) {
 
 
 function bchrome() {
-    console.log(document.documentElement.className);
     var v, o = QS('meta[name=theme-color]');
     if (!o)
         return;

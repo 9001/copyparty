@@ -1593,7 +1593,7 @@ def gen_filekey_dbg(
 
 
 def gencookie(k: str, v: str, r: str, tls: bool, dur: Optional[int]) -> str:
-    v = v.replace(";", "")
+    v = v.replace("%", "%25").replace(";", "%3B")
     if dur:
         exp = formatdate(time.time() + dur, usegmt=True)
     else:
@@ -2320,7 +2320,7 @@ def unescape_cookie(orig: str) -> str:
                     ret += chr(int(esc[1:], 16))
                 except:
                     ret += esc
-                    esc = ""
+                esc = ""
 
         else:
             ret += ch
