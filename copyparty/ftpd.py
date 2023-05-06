@@ -94,7 +94,7 @@ class FtpAuth(DummyAuthorizer):
 
             raise AuthenticationFailed("Authentication failed.")
 
-        handler.uname = uname
+        handler.uname = handler.username = uname
 
     def get_home_dir(self, username: str) -> str:
         return "/"
