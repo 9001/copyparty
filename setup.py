@@ -7,6 +7,11 @@ import sys
 from shutil import rmtree
 from setuptools import setup, Command
 
+_ = """
+this probably still works but is no longer in use;
+pyproject.toml and scripts/make-pypi-release.sh
+are in charge of packaging wheels now
+"""
 
 NAME = "copyparty"
 VERSION = None

@@ -73,14 +73,17 @@ pydir="$(
 }
 
 function have() {
-	python -c "import $1; $1; $1.__version__"
+	python -c "import $1; $1; getattr($1,'__version__',0)"
 }
 
 function load_env() {
 	. buildenv/bin/activate
 	have setuptools
 	have wheel
+	have build
 	have twine
+	have jinja2
+	have strip_hints
 }
 
 load_env || {
@@ -88,19 +91,32 @@ load_env || {
 	deactivate || true
 	rm -rf buildenv
 	python3 -m venv buildenv
-	(. buildenv/bin/activate && pip install twine wheel)
+	(. buildenv/bin/activate && pip install \
+		setuptools wheel build twine jinja2 strip_hints )
 	load_env
 }
+
+# cleanup
+rm -rf unt build/pypi
 
 # grab licenses
 scripts/genlic.sh copyparty/res/COPYING.txt
 
-# remove type hints to support python < 3.9
+# clean-ish packaging env
 rm -rf build/pypi
 mkdir -p build/pypi
-cp -pR setup.py README.md LICENSE copyparty contrib bin scripts/strip_hints build/pypi/
+cp -pR pyproject.toml README.md LICENSE copyparty contrib bin scripts/strip_hints build/pypi/
 tar -c docs/lics.txt scripts/genlic.sh build/*.txt | tar -xC build/pypi/
 cd build/pypi
+
+# delete junk
+find -name '*.pyc' -delete
+find -name __pycache__ -delete
+find -name py.typed -delete
+find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
+find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
+
+# remove type hints to support python < 3.9
 f=../strip-hints-0.1.10.tar.gz
 [ -e $f ] || 
 	(url=https://files.pythonhosted.org/packages/9c/d4/312ddce71ee10f7e0ab762afc027e07a918f1c0e1be5b0069db5b0e7542d/strip-hints-0.1.10.tar.gz;
@@ -136,20 +152,7 @@ rm -rf contrib
 (cd copyparty/web && make -j$(nproc) && rm Makefile)
 
 # build
-./setup.py clean2
-./setup.py sdist bdist_wheel --universal
+python3 -m build
 
 [ "$mode" == t ] && twine upload -r pypitest dist/*
 [ "$mode" == u ] && twine upload -r pypi dist/*
-
-cat <<EOF
-
-
-    all done!
-    
-    to clean up the source tree:
-    
-       cd ~/dev/copyparty
-       ./setup.py clean2
-   
-EOF

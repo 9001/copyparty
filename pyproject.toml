@@ -1,0 +1,144 @@
+[project]
+name = "copyparty"
+description = """
+  Portable file server with accelerated resumable uploads, \
+  deduplication, WebDAV, FTP, zeroconf, media indexer, \
+  video thumbnails, audio transcoding, and write-only folders"""
+readme = "README.md"
+authors = [{ name = "ed", email = "copyparty@ocv.me" }]
+license = { text = "MIT" }
+requires-python = ">=3.3"
+dependencies = ["Jinja2"]
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.3",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: Jython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Environment :: Console",
+    "Environment :: No Input/Output (Daemon)",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "Topic :: Communications :: File Sharing",
+    "Topic :: Internet :: File Transfer Protocol (FTP)",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+]
+
+[project.urls]
+"Source Code" = "https://github.com/9001/copyparty"
+"Bug Tracker" = "https://github.com/9001/copyparty/issues"
+"Demo Server" = "https://a.ocv.me/pub/demo/"
+
+[project.optional-dependencies]
+thumbnails = ["Pillow"]
+thumbnails2 = ["pyvips"]
+audiotags = ["mutagen"]
+ftpd = ["pyftpdlib"]
+ftps = ["pyftpdlib", "pyopenssl"]
+
+[project.scripts]
+copyparty = "copyparty.__main__:main"
+"up2k.py" = "copyparty.web.a.up2k:main"
+"partyfuse.py" = "copyparty.web.a.partyfuse:main"
+
+# =====================================================================
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+# requires = ["hatchling"]
+# build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "code"
+path = "copyparty/__version__.py"
+
+[tool.setuptools.dynamic]
+version = { attr = "copyparty.__version__.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["copyparty*"]
+
+[tool.setuptools.package-data]
+copyparty = [
+    "res/COPYING.txt",
+    "res/insecure.pem",
+    "web/*.gz",
+    "web/*.html",
+    "web/a/*.bat",
+    "web/dd/*.png",
+    "web/deps/*.gz",
+    "web/deps/*.woff*",
+]
+
+# =====================================================================
+
+[tool.black]
+required-version = '21.12b0'
+target-version = ['py27']
+
+[tool.isort]
+profile = "black"
+include_trailing_comma = true
+force_sort_within_sections = true
+
+[tool.bandit]
+skips = ["B104", "B110", "B112"]
+
+# =====================================================================
+
+[tool.pylint.MAIN]
+py-version = "3.11"
+jobs = 2
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "import-outside-toplevel",
+    "wrong-import-position",
+    "raise-missing-from",
+    "bare-except",
+    "broad-exception-raised",
+    "broad-exception-caught",
+    "invalid-name",
+    "line-too-long",
+    "too-many-lines",
+    "consider-using-f-string",
+    "pointless-string-statement",
+]
+
+[tool.pylint.FORMAT]
+expected-line-ending-format = "LF"
+
+# =====================================================================
+
+[tool.mypy]
+python_version = "3.11"
+files = ["copyparty"]
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+strict = true
+local_partial_types = true
+strict_equality = true
+warn_unreachable = true
+ignore_missing_imports = true
+follow_imports = "silent"
+
+[[tool.mypy.overrides]]
+no_implicit_reexport = false
