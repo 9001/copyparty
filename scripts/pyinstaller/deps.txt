@@ -13,7 +13,7 @@ https://pypi.org/project/MarkupSafe/#files
 https://pypi.org/project/mutagen/#files
 https://pypi.org/project/Pillow/#files
 
-# up2k (win7) additionals
+# u2c (win7) additionals
 https://pypi.org/project/certifi/#files
 https://pypi.org/project/charset-normalizer/#files  # cp37-cp37m-win32.whl
 https://pypi.org/project/idna/#files

@@ -11,4 +11,4 @@ ex=(
   encodings.{zlib_codec,base64_codec,bz2_codec,charmap,hex_codec,palmos,punycode,rot_13}
 );
 cex=(); for a in "${ex[@]}"; do cex+=(--exclude "$a"); done
-$APPDATA/python/python37/scripts/pyi-makespec --version-file up2k.rc2 -i up2k.ico -n up2k -c -F up2k.py "${cex[@]}"
+$APPDATA/python/python37/scripts/pyi-makespec --version-file up2k.rc2 -i up2k.ico -n u2c -c -F u2c.py "${cex[@]}"

@@ -14,7 +14,7 @@ uname -s | grep -E 'WOW64|NT-10' && echo need win7-32 && exit 1
 dl() { curl -fkLO "$1"; }
 cd ~/Downloads
 
-dl https://192.168.123.1:3923/cpp/bin/up2k.py
+dl https://192.168.123.1:3923/cpp/bin/u2c.py
 dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.ico
 dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.rc
 dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.spec
@@ -37,12 +37,12 @@ grep -E '^from .ssl_ import' $APPDATA/python/python37/site-packages/urllib3/util
     echo golfed
 }
 
-read a b _ < <(awk -F\" '/^S_VERSION =/{$0=$2;sub(/\./," ");print}' < up2k.py)
+read a b _ < <(awk -F\" '/^S_VERSION =/{$0=$2;sub(/\./," ");print}' < u2c.py)
 sed -r 's/1,2,3,0/'$a,$b,0,0'/;s/1\.2\.3/'$a.$b.0/ <up2k.rc >up2k.rc2
 
-#python uncomment.py up2k.py
+#python uncomment.py u2c.py
 $APPDATA/python/python37/scripts/pyinstaller -y --clean --upx-dir=. up2k.spec
 
-./dist/up2k.exe --version
+./dist/u2c.exe --version
 
-curl -fkT dist/up2k.exe -HPW:wark https://192.168.123.1:3923/
+curl -fkT dist/u2c.exe -HPW:wark https://192.168.123.1:3923/

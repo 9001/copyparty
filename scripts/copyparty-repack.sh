@@ -34,7 +34,7 @@ set -e
 #   4823  copyparty-extras/copyparty-repack.sh
 #           `- source files from github
 #
-#  23663  copyparty-extras/up2k.py
+#  23663  copyparty-extras/u2c.py
 #           `- standalone utility to upload or search for files
 #
 #  32280  copyparty-extras/partyfuse.py
@@ -147,7 +147,7 @@ repack sfx-lite "re no-dd no-cm no-hl gz"
 # copy lite-sfx.py to ./copyparty,
 # delete extracted source code
 ( cd copyparty-extras/
-mv copyparty-*/bin/up2k.py .
+mv copyparty-*/bin/u2c.py .
 mv copyparty-*/bin/partyfuse.py .
 cp -pv sfx-lite/copyparty-sfx.py ../copyparty
 rm -rf copyparty-{0..9}*.*.*{0..9}

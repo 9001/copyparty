@@ -287,7 +287,7 @@ symbol legend,
 * `curl-friendly ls` = returns a [sortable plaintext folder listing](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) when curled
 * `curl-friendly upload` = uploading with curl is just `curl -T some.bin http://.../`
 * `a`/copyparty remarks:
-  * one-way folder sync from local to server can be done efficiently with [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py), or with webdav and conventional rsync
+  * one-way folder sync from local to server can be done efficiently with [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy), or with webdav and conventional rsync
   * can hot-reload config files (with just a few exceptions)
   * can set per-folder permissions if that folder is made into a separate volume, so there is configuration overhead
   * [event hooks](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks) ([discord](https://user-images.githubusercontent.com/241032/215304439-1c1cb3c8-ec6f-4c17-9f27-81f969b1811a.png), [desktop](https://user-images.githubusercontent.com/241032/215335767-9c91ed24-d36e-4b6b-9766-fb95d12d163f.png)) inspired by filebrowser, as well as the more complex [media parser](https://github.com/9001/copyparty/tree/hovudstraum/bin/mtag) alternative

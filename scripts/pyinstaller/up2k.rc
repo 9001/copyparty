@@ -18,9 +18,9 @@ VSVersionInfo(
         [StringStruct('CompanyName', 'ocv.me'),
         StringStruct('FileDescription', 'copyparty uploader / filesearch command'),
         StringStruct('FileVersion', '1.2.3'),
-        StringStruct('InternalName', 'up2k'),
+        StringStruct('InternalName', 'u2c'),
         StringStruct('LegalCopyright', '2019, ed'),
-        StringStruct('OriginalFilename', 'up2k.exe'),
+        StringStruct('OriginalFilename', 'u2c.exe'),
         StringStruct('ProductName', 'copyparty up2k client'),
         StringStruct('ProductVersion', '1.2.3')])
       ]), 

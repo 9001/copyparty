@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['up2k.py'],
+    ['u2c.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -60,7 +60,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='up2k',
+    name='u2c',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

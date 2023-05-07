@@ -142,7 +142,7 @@ args = {
         "ftps": ["pyftpdlib", "pyopenssl"],
     },
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
-    "scripts": ["bin/partyfuse.py", "bin/up2k.py"],
+    "scripts": ["bin/partyfuse.py", "bin/u2c.py"],
     "cmdclass": {"clean2": clean2},
 }
 

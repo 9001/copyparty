@@ -305,7 +305,7 @@ upgrade notes
   * http-api: delete/move is now `POST` instead of `GET`
   * everything other than `GET` and `HEAD` must pass [cors validation](#cors)
 * `1.5.0` (2022-12-03): [new chunksize formula](https://github.com/9001/copyparty/commit/54e1c8d261df) for files larger than 128 GiB
-  * **users:** upgrade to the latest [cli uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) if you use that
+  * **users:** upgrade to the latest [cli uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) if you use that
   * **devs:** update third-party up2k clients (if those even exist)
 
 
@@ -512,7 +512,7 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 ## uploading
 
-drag files/folders into the web-browser to upload  (or use the [command-line uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy))
+drag files/folders into the web-browser to upload  (or use the [command-line uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy))
 
 this initiates an upload using `up2k`; there are two uploaders available:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
@@ -1374,10 +1374,10 @@ interact with copyparty using non-browser clients
   * `(printf 'PUT /junk?pw=wark HTTP/1.1\r\n\r\n'; cat movie.mkv) | nc 127.0.0.1 3923`
   * `(printf 'PUT / HTTP/1.1\r\n\r\n'; cat movie.mkv) >/dev/tcp/127.0.0.1/3923`
 
-* python: [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) is a command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
+* python: [u2c.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) is a command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
   * file uploads, file-search, [folder sync](#folder-sync), autoresume of aborted/broken uploads
-  * can be downloaded from copyparty: controlpanel -> connect -> [up2k.py](http://127.0.0.1:3923/.cpr/a/up2k.py)
-  * see [./bin/README.md#up2kpy](bin/README.md#up2kpy)
+  * can be downloaded from copyparty: controlpanel -> connect -> [u2c.py](http://127.0.0.1:3923/.cpr/a/u2c.py)
+  * see [./bin/README.md#u2cpy](bin/README.md#u2cpy)
 
 * FUSE: mount a copyparty server as a local filesystem
   * cross-platform python client available in [./bin/](bin/)
@@ -1400,11 +1400,11 @@ NOTE: curl will not send the original filename if you use `-T` combined with url
 
 sync folders to/from copyparty
 
-the commandline uploader [up2k.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy) with `--dr` is the best way to sync a folder to copyparty; verifies checksums and does files in parallel, and deletes unexpected files on the server after upload has finished which makes file-renames really cheap (it'll rename serverside and skip uploading)
+the commandline uploader [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy) with `--dr` is the best way to sync a folder to copyparty; verifies checksums and does files in parallel, and deletes unexpected files on the server after upload has finished which makes file-renames really cheap (it'll rename serverside and skip uploading)
 
 alternatively there is [rclone](./docs/rclone.md) which allows for bidirectional sync and is *way* more flexible (stream files straight from sftp/s3/gcs to copyparty, ...), although there is no integrity check and it won't work with files over 100 MiB if copyparty is behind cloudflare
 
-* starting from rclone v1.63 (currently [in beta](https://beta.rclone.org/?filter=latest)), rclone will also be faster than up2k.py
+* starting from rclone v1.63 (currently [in beta](https://beta.rclone.org/?filter=latest)), rclone will also be faster than u2c.py
 
 
 ## mount as drive
@@ -1471,7 +1471,7 @@ when uploading files,
 * chrome is recommended, at least compared to firefox:
   * up to 90% faster when hashing, especially on SSDs
   * up to 40% faster when uploading over extremely fast internets
-  * but [up2k.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) can be 40% faster than chrome again
+  * but [u2c.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) can be 40% faster than chrome again
 
 * if you're cpu-bottlenecked, or the browser is maxing a cpu core:
   * up to 30% faster uploads if you hide the upload status list by switching away from the `[🚀]` up2k ui-tab (or closing it)

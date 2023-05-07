@@ -51,8 +51,8 @@ ftps = ["pyftpdlib", "pyopenssl"]
 
 [project.scripts]
 copyparty = "copyparty.__main__:main"
-"up2k.py" = "copyparty.web.a.up2k:main"
-"partyfuse.py" = "copyparty.web.a.partyfuse:main"
+"u2c" = "copyparty.web.a.u2c:main"
+"partyfuse" = "copyparty.web.a.partyfuse:main"
 
 # =====================================================================
 

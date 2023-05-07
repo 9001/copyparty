@@ -72,7 +72,7 @@ rclone.exe mount --vfs-cache-mode writes --vfs-cache-max-age 5s --attr-timeout 5
 
 # sync folders to/from copyparty
 
-note that the up2k client [up2k.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#up2kpy) (available on the "connect" page of your copyparty server) does uploads much faster and safer, but rclone is bidirectional and more ubiquitous
+note that the up2k client [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy) (available on the "connect" page of your copyparty server) does uploads much faster and safer, but rclone is bidirectional and more ubiquitous
 
 ```
 rclone sync /usr/share/icons/ cpp-rw:fds/

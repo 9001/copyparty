@@ -1,4 +1,4 @@
-# [`up2k.py`](up2k.py)
+# [`u2c.py`](u2c.py)
 * command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
 * file uploads, file-search, autoresume of aborted/broken uploads
 * sync local folder to server
