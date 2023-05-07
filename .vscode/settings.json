@@ -35,34 +35,18 @@
     "python.linting.flake8Enabled": true,
     "python.linting.banditEnabled": true,
     "python.linting.mypyEnabled": true,
-    "python.linting.mypyArgs": [
-        "--ignore-missing-imports",
-        "--follow-imports=silent",
-        "--show-column-numbers",
-        "--strict"
-    ],
     "python.linting.flake8Args": [
         "--max-line-length=120",
-        "--ignore=E722,F405,E203,W503,W293,E402,E501,E128",
+        "--ignore=E722,F405,E203,W503,W293,E402,E501,E128,E226",
     ],
     "python.linting.banditArgs": [
-        "--ignore=B104"
-    ],
-    "python.linting.pylintArgs": [
-        "--disable=missing-module-docstring",
-        "--disable=missing-class-docstring",
-        "--disable=missing-function-docstring",
-        "--disable=import-outside-toplevel",
-        "--disable=wrong-import-position",
-        "--disable=raise-missing-from",
-        "--disable=bare-except",
-        "--disable=broad-except",
-        "--disable=invalid-name",
-        "--disable=line-too-long",
-        "--disable=consider-using-f-string"
+        "--ignore=B104,B110,B112"
     ],
     // python3 -m isort --py=27 --profile=black copyparty/
-    "python.formatting.provider": "black",
+    "python.formatting.provider": "none",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
     "editor.formatOnSave": true,
     "[html]": {
         "editor.formatOnSave": false,
@@ -74,10 +58,6 @@
     "files.associations": {
         "*.makefile": "makefile"
     },
-    "python.formatting.blackArgs": [
-        "-t",
-        "py27"
-    ],
     "python.linting.enabled": true,
     "python.pythonPath": "/usr/bin/python3"
 }
