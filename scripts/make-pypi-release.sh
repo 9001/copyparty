@@ -148,7 +148,7 @@ while IFS= read -r x; do
 done
 
 rm -rf contrib
-[ $fast ] && sed -ri s/5730/10/ copyparty/web/Makefile
+[ $fast ] && sed -ri s/573/10/ copyparty/web/Makefile
 (cd copyparty/web && make -j$(nproc) && rm Makefile)
 
 # build
@@ -156,3 +156,5 @@ python3 -m build
 
 [ "$mode" == t ] && twine upload -r pypitest dist/*
 [ "$mode" == u ] && twine upload -r pypi dist/*
+
+true

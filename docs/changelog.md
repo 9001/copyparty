@@ -1,4 +1,32 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0429-2114  `v1.7.0`  unlinked
+
+don't get excited! nothing new and revolutionary, but `xvol` and `xdev` changed behavior so there's an above-average chance of fresh bugs
+
+## new features
+* (#24): `xvol` and `xdev`, previously just hints to the filesystem indexer, now actively block access as well:
+  * `xvol` stops users following symlinks leaving the volumes they have access to
+    * so if you symlink `/home/ed/music` into `/srv/www/music` it'll get blocked
+    * ...unless both folders are accessible through volumes, and the user has read-access to both
+  * `xdev` stops users crossing the filesystem boundary of the volumes they have access to
+    * so if you symlink another HDD into a volume it'll get blocked, but you can still symlink from other places on the same FS
+  * enabling these will add a slight performance hit; the unlikely worst-case is `14%` slower directory listings, `35%` slower download-as-tar
+* file selection summary (num files, size, audio duration) in the bottom right
+* [u2cli](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py): more aggressive resolving with `--rh`
+* [add a warning](https://github.com/9001/copyparty#fix-unreliable-playback-on-android) that the default powersave settings in android may stop playing music during album changes
+  * also appears [in the media player](https://user-images.githubusercontent.com/241032/235327191-7aaefff9-5d41-4e42-b71f-042a8247f29d.png) if the issue is detected at runtime (playback halts for 30sec while screen is off)
+
+## bugfixes
+* (#23): stop autodeleting empty folders when moving or deleting files
+  * but files which expire / [self-destruct](https://github.com/9001/copyparty#self-destruct) still clean up parent directories like before
+* ftp-server: some clients could fail to `mkdir` at first attempt (and also complain during rmdir)
+
+## other changes
+* new version of [cpp-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.7.0/copyparty-winpe64.exe) since the ftp-server fix might be relevant
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0426-2300  `v1.6.15`  unexpected boost
 
 ## new features

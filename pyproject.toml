@@ -77,6 +77,8 @@ copyparty = [
     "res/COPYING.txt",
     "res/insecure.pem",
     "web/*.gz",
+    "web/*.js",
+    "web/*.css",
     "web/*.html",
     "web/a/*.bat",
     "web/dd/*.png",

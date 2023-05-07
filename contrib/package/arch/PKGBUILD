@@ -7,6 +7,7 @@ arch=("any")
 url="https://github.com/9001/${pkgname}"
 license=('MIT')
 depends=("python" "lsof" "python-jinja")
+makedepends=("python-wheel" "python-build" "python-installer" "make" "pigz")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags"
             "python-mutagen: music tags (alternative)" 
             "python-pillow: thumbnails for images" 
@@ -22,6 +23,12 @@ sha256sums=("782e62eb1378e8d9d50af3fa1c18b95d11bb4721df93b4525beba80f14d55661")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
+    
+    pushd copyparty/web
+    make -j$(nproc)
+    rm Makefile
+    popd
+    
     python3 -m build -wn
 }
 

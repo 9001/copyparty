@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 7, 0)
+VERSION = (1, 7, 1)
 CODENAME = "unlinked"
-BUILD_DT = (2023, 4, 29)
+BUILD_DT = (2023, 5, 7)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

@@ -96,6 +96,7 @@ rm \
   .gitignore
 
 cp -pv LICENSE LICENSE.txt
+mv setup.py{,.disabled}
 
 # the regular cleanup memes
 find -name '*.pyc' -delete
