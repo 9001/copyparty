@@ -5,9 +5,9 @@ S_VERSION = "1.8"
 S_BUILD_DT = "2023-04-27"
 
 """
-up2k.py: upload to copyparty
+u2c.py: upload to copyparty
 2021, ed <irc.rizon.net>, MIT-Licensed
-https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py
+https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py
 
 - dependencies: requests
 - supports python 2.6, 2.7, and 3.3 through 3.12
