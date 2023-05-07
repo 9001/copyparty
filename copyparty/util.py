@@ -296,11 +296,11 @@ REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
 pybin = sys.executable or ""
 if EXE:
     pybin = ""
-    for p in "python3 python".split():
+    for zsg in "python3 python".split():
         try:
-            p = shutil.which(p)
-            if p:
-                pybin = p
+            zsg = shutil.which(zsg)
+            if zsg:
+                pybin = zsg
                 break
         except:
             pass

@@ -186,7 +186,7 @@ def init_E(E: EnvParams) -> None:
 
         with open_binary("copyparty", "z.tar") as tgz:
             with tarfile.open(fileobj=tgz) as tf:
-                tf.extractall(tdn)
+                tf.extractall(tdn)  # nosec (archive is safe)
 
         return tdn
 
@@ -201,7 +201,7 @@ def init_E(E: EnvParams) -> None:
         E.mod = _unpack()
 
     if sys.platform == "win32":
-        bdir = os.environ.get("APPDATA") or os.environ.get("TEMP")
+        bdir = os.environ.get("APPDATA") or os.environ.get("TEMP") or "."
         E.cfg = os.path.normpath(bdir + "/copyparty")
     elif sys.platform == "darwin":
         E.cfg = os.path.expanduser("~/Library/Preferences/copyparty")
