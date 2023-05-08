@@ -7,7 +7,7 @@ arch=("any")
 url="https://github.com/9001/${pkgname}"
 license=('MIT')
 depends=("python" "lsof" "python-jinja")
-makedepends=("python-wheel" "python-build" "python-installer" "make" "pigz")
+makedepends=("python-wheel" "python-setuptools" "python-build" "python-installer" "make" "pigz")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags"
             "python-mutagen: music tags (alternative)" 
             "python-pillow: thumbnails for images" 
