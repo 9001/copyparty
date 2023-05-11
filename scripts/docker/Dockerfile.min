@@ -5,9 +5,11 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-min" \
         org.opencontainers.image.description="just copyparty, no thumbnails / media tags / audio transcoding"
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc
 
-RUN     apk --no-cache add \
+RUN     apk --no-cache add !pyc \
             python3 \
+        && rm -rf /tmp/pyc \
         && mkdir /cfg /w \
         && chmod 777 /cfg /w \
         && echo % /cfg > initcfg

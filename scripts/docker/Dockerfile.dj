@@ -5,26 +5,27 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-dj" \
         org.opencontainers.image.description="copyparty with all optional dependencies, including musical key / bpm detection"
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc
 
 COPY    i/bin/mtag/install-deps.sh ./
 COPY    i/bin/mtag/audio-bpm.py /mtag/
 COPY    i/bin/mtag/audio-key.py /mtag/
-RUN     apk add -U \
+RUN     apk add -U !pyc \
             wget \
             py3-pillow py3-pip py3-cffi \
             ffmpeg \
             vips-jxl vips-heif vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
             vamp-sdk vamp-sdk-libs \
-        && python3 -m pip install pyvips \
-        && apk --no-cache add -t .bd \
+        && apk add -t .bd \
             bash wget gcc g++ make cmake patchelf \
             python3-dev ffmpeg-dev fftw-dev libsndfile-dev \
             py3-wheel py3-numpy-dev \
             vamp-sdk-dev \
+        && python3 -m pip install pyvips \
         && bash install-deps.sh \
         && apk del py3-pip .bd \
-        && rm -rf /var/cache/apk/* \
+        && rm -rf /var/cache/apk/* /tmp/pyc \
         && chmod 777 /root \
         && ln -s /root/vamp /root/.local / \
         && mkdir /cfg /w \

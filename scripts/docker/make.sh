@@ -95,7 +95,7 @@ filt=
                 [ $(jobs -p | wc -l) -lt $(nproc) ] && break
                 while [ -e .blk ]; do sleep 0.2; done
             done
-            aa="$(printf '%7s' $a)"
+            aa="$(printf '%11s' $a-$i)"
 
             # arm takes forever so make it top priority
             [ ${a::3} == arm ] && nice= || nice=nice

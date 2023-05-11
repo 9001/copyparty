@@ -5,10 +5,12 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-im" \
         org.opencontainers.image.description="copyparty with Pillow and Mutagen (image thumbnails, media tags)"
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc
 
-RUN     apk --no-cache add \
+RUN     apk --no-cache add !pyc \
             wget \
             py3-pillow py3-mutagen \
+        && rm -rf /tmp/pyc \
         && mkdir /cfg /w \
         && chmod 777 /cfg /w \
         && echo % /cfg > initcfg
