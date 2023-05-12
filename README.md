@@ -126,7 +126,7 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
 
 running copyparty without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
-or see [complete windows example](./docs/examples/windows.md)
+or see [some usage examples](#complete-examples) for inspiration, or the [complete windows example](./docs/examples/windows.md)
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
@@ -1160,7 +1160,29 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 
 * [running on windows](./docs/examples/windows.md)
 
-* read-only music server  
+* allow anyone to download or upload files into the current folder:  
+  `python copyparty-sfx.py`
+
+  * enable searching and music indexing with `-e2dsa -e2ts`
+
+  * start an FTP server on port 3921 with `--ftp 3921`
+
+  * announce it on your LAN with `-z` so it appears in windows/Linux file managers
+
+* anyone can upload, but nobody can see any files (even the uploader):  
+  `python copyparty-sfx.py -e2dsa -v .::w`
+
+  * block uploads if there's less than 4 GiB free disk space with `--df 4`
+
+  * show a popup on new uploads with `--xau bin/hooks/notify.py`
+
+* anyone can upload, and receive "secret" links for each upload they do:  
+  `python copyparty-sfx.py -e2dsa -v .::wG:c,fk=8`
+
+* anyone can browse, only `kevin` (password `okgo`) can upload/move/delete files:  
+  `python copyparty-sfx.py -e2dsa -a kevin:okgo -v .::r:rwmd,kevin`
+
+* read-only music server:  
   `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts --no-robots --force-js --theme 2`
   
   * ...with bpm and key scanning  
