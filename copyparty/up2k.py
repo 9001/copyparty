@@ -2564,7 +2564,7 @@ class Up2k(object):
 
             try:
                 if "hardlink" in flags:
-                    os.link(fsenc(src), fsenc(dst))
+                    os.link(fsenc(absreal(src)), fsenc(dst))
                     linked = True
             except Exception as ex:
                 self.log("cannot hardlink: " + repr(ex))
