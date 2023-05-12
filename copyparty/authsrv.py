@@ -1581,6 +1581,12 @@ class AuthSrv(object):
                 if t:
                     self.log("\n\033[{}\033[0m\n".format(t))
 
+            zv, _ = vfs.get("/", "*", False, False)
+            zs = zv.realpath.lower()
+            if zs in ("/", "c:\\") or zs.startswith(r"c:\windows"):
+                t = "you are sharing a system directory: {}\n"
+                self.log(t.format(zv.realpath), c=1)
+
         try:
             zv, _ = vfs.get("/", "*", False, True)
             if self.warn_anonwrite and os.getcwd() == zv.realpath:
