@@ -726,7 +726,7 @@ class HttpCli(object):
 
     def handle_get(self) -> bool:
         if self.do_log:
-            logmsg = "%4s %s @%s" % (self.mode, self.req, self.uname)
+            logmsg = "%-4s %s @%s" % (self.mode, self.req, self.uname)
 
             if "range" in self.headers:
                 try:

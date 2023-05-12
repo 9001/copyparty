@@ -1826,7 +1826,7 @@ function up2k_init(subtle) {
 
         timer.rm(etafun);
         timer.rm(donut.do);
-        utw_minh = 0;
+        utw_minh = utw_read = 0;
     }
 
     function chill(t) {

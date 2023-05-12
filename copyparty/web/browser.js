@@ -1974,7 +1974,10 @@ var pbar = (function () {
 			w = 8,
 			apos, adur;
 
-		clearTimeout(t_redraw);
+		if (t_redraw) {
+			clearTimeout(t_redraw);
+			t_redraw = 0;
+		}
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
 		if (!mp || !mp.au || !isNum(adur = mp.au.duration) || !isNum(apos = mp.au.currentTime) || apos < 0 || adur < apos)
