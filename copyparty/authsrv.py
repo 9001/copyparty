@@ -841,6 +841,9 @@ class AuthSrv(object):
             if not ln.split("#")[0].strip():
                 continue
 
+            if re.match(r"^\[.*\]:$", ln):
+                ln = ln[:-1]
+
             subsection = ln in (catx, catf)
             if ln.startswith("[") or subsection:
                 self._e()
