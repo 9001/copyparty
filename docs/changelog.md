@@ -1,4 +1,34 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0507-1834  `v1.7.1`  CräzY;PWDs
+
+## new features
+* webdav:
+  * support write-only folders
+  * option `--dav-auth` / volflag `davauth` forces clients to always auth
+    * helps clients such as `davfs2` see all folders if the root is anon-readable but some subfolders are not
+    * alternatively you could configure your client to always send the password in the `PW` header
+* include usernames in http request logs
+* audio player:
+  * consumes less power on phones when the screen is off
+  * smoother playback cursor on short songs
+
+## bugfixes
+* the characters `;` and `%` can now be used in passwords
+  * but non-ascii characters (such as the ä in the release title) can, in fact, not
+* verify that all accounts have unique passwords on startup (#25)
+
+## other changes
+* ftpd: log incorrect passwords only, not correct ones
+* `up2k.py` (the upload, folder-sync, and file-search client) has been renamed to [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy)
+  * `u2c` as in `up2k client`, or `up2k CLI`, or `upload-to-copyparty` -- good name
+  * now the only things named "up2k" are the web-ui and the server backend which is way less confusing
+* upgrade packaging from [setup.py](https://github.com/9001/copyparty/blob/hovudstraum/setup.py) to [pyproject.toml](https://github.com/9001/copyparty/blob/hovudstraum/pyproject.toml)
+  * no practical consequences aside from a warm fuzzy feeling of being in the future
+* the docker images ~~will be~~ got rebuilt 2023-05-11 ~~in a few days (when [alpine](https://alpinelinux.org/) 3.18 is released)~~ enabling [the chiptune player](https://a.ocv.me/pub/demo/music/chiptunes/#af-f6fb2e5f)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0429-2114  `v1.7.0`  unlinked
 
 don't get excited! nothing new and revolutionary, but `xvol` and `xdev` changed behavior so there's an above-average chance of fresh bugs

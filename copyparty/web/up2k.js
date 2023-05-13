@@ -1826,7 +1826,8 @@ function up2k_init(subtle) {
 
         timer.rm(etafun);
         timer.rm(donut.do);
-        utw_minh = utw_read = 0;
+        ebi('u2tabw').style.minHeight = '0px';
+        utw_minh = 0;
     }
 
     function chill(t) {

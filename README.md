@@ -1158,7 +1158,9 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 
 ## complete examples
 
-* [running on windows](./docs/examples/windows.md)
+* see [running on windows](./docs/examples/windows.md) for a fancy windows setup
+
+  * or use any of the examples below, just replace `python copyparty-sfx.py` with `copyparty.exe` if you're using the exe edition
 
 * allow anyone to download or upload files into the current folder:  
   `python copyparty-sfx.py`
