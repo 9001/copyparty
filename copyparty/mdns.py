@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import errno
 import random
 import select
 import socket
@@ -277,6 +278,18 @@ class MDNS(MCast):
         zf = time.time() + 2
         self.probing = zf  # cant unicast so give everyone an extra sec
         self.unsolicited = [zf, zf + 1, zf + 3, zf + 7]  # rfc-8.3
+
+        try:
+            self.run2()
+        except OSError as ex:
+            if ex.errno != errno.EBADF:
+                raise
+
+            self.log("stopping due to {}".format(ex), "90")
+
+        self.log("stopped", 2)
+
+    def run2(self) -> None:
         last_hop = time.time()
         ihop = self.args.mc_hop
         while self.running:
@@ -313,8 +326,6 @@ class MDNS(MCast):
                 t = "probe ok; announcing [{}]"
                 self.log(t.format(self.hn[:-1]), 2)
                 self.probing = 0
-
-        self.log("stopped", 2)
 
     def stop(self, panic=False) -> None:
         self.running = False

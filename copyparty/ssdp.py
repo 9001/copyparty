@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import errno
 import re
 import select
 import socket
@@ -129,6 +130,17 @@ class SSDPd(MCast):
             srv.hport = hp
 
         self.log("listening")
+        try:
+            self.run2()
+        except OSError as ex:
+            if ex.errno != errno.EBADF:
+                raise
+
+            self.log("stopping due to {}".format(ex), "90")
+
+        self.log("stopped", 2)
+
+    def run2(self) -> None:
         while self.running:
             rdy = select.select(self.srv, [], [], self.args.z_chk or 180)
             rx: list[socket.socket] = rdy[0]  # type: ignore
@@ -147,8 +159,6 @@ class SSDPd(MCast):
                         self.srv[sck].name, addr, len(buf), repr(buf)[2:-1], min_ex()
                     )
                     self.log(t, 6)
-
-        self.log("stopped", 2)
 
     def stop(self) -> None:
         self.running = False

@@ -2019,6 +2019,8 @@ def shut_socket(log: "NamedLogger", sck: socket.socket, timeout: int = 3) -> Non
             sck.shutdown(socket.SHUT_RDWR)
         except:
             pass
+    except Exception as ex:
+        log("shut({}): {}".format(fd, ex), "90")
     finally:
         td = time.time() - t0
         if td >= 1:
