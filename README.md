@@ -471,6 +471,7 @@ click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (
 ## thumbnails
 
 press `g` or `田` to toggle grid-view instead of the file listing  and `t` toggles icons / thumbnails
+* can be made default globally with `--grid` or per-volume with volflag `grid`
 
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 

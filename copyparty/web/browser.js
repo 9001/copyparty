@@ -4526,7 +4526,7 @@ var thegrid = (function () {
 
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
-	bcfg_bind(r, 'en', 'griden', false, function (v) {
+	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
 		v ? loadgrid() : r.setvis(true);
 		pbar.onresize();
 		vbar.onresize();

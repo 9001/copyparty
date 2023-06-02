@@ -963,6 +963,7 @@ def add_db_metadata(ap):
 
 def add_ui(ap, retry):
     ap2 = ap.add_argument_group('ui options')
+    ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")

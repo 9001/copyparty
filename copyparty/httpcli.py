@@ -3500,6 +3500,7 @@ class HttpCli(object):
             "readme": readme,
             "title": html_escape(self.vpath, crlf=True) or "💾🎉",
             "srv_info": srv_infot,
+            "dgrid": "grid" in vf,
             "dtheme": self.args.theme,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,

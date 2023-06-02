@@ -24,6 +24,7 @@ def vf_bmap() -> dict[str, str]:
         "e2v",
         "e2vu",
         "e2vp",
+        "grid",
         "hardlink",
         "magic",
         "no_sb_md",
@@ -133,6 +134,7 @@ flagcats = {
         "xm=CMD": "execute CMD on message",
     },
     "client and ux": {
+        "grid": "show grid/thumbnails by default",
         "html_head=TXT": "includes TXT in the <head>",
         "robots": "allows indexing by search engines (default)",
         "norobots": "kindly asks search engines to leave",
