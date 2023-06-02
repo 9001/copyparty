@@ -502,9 +502,9 @@ class Ftpd(object):
 
         for h_lp in hs:
             h2, lp = h_lp
-            h2.hub = hub
-            h2.args = hub.args
-            h2.authorizer = FtpAuth(hub)
+            FtpHandler.hub = h2.hub = hub
+            FtpHandler.args = h2.args = hub.args
+            FtpHandler.authorizer = h2.authorizer = FtpAuth(hub)
 
             if self.args.ftp_pr:
                 p1, p2 = [int(x) for x in self.args.ftp_pr.split("-")]
