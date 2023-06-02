@@ -5726,6 +5726,12 @@ var treectl = (function () {
 			seen = {};
 
 		r.lsc = res;
+		if (res.unlist) {
+			var ptn = new RegExp(res.unlist);
+			for (var a = nodes.length - 1; a >= 0; a--)
+				if (ptn.exec(nodes[a].href.split('?')[0]))
+					nodes.splice(a, 1);
+		}
 		nodes = sortfiles(nodes);
 		window.removeEventListener('scroll', r.tscroll);
 		r.trunc = nodes.length > r.nvis && location.hash.length < 2;

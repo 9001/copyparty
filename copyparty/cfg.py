@@ -41,7 +41,7 @@ def vf_bmap() -> dict[str, str]:
 def vf_vmap() -> dict[str, str]:
     """argv-to-volflag: simple values"""
     ret = {}
-    for k in ("lg_sbf", "md_sbf"):
+    for k in ("lg_sbf", "md_sbf", "unlist"):
         ret[k] = k
     return ret
 
@@ -135,6 +135,7 @@ flagcats = {
     },
     "client and ux": {
         "grid": "show grid/thumbnails by default",
+        "unlist": "dont list files matching REGEX",
         "html_head=TXT": "includes TXT in the <head>",
         "robots": "allows indexing by search engines (default)",
         "norobots": "kindly asks search engines to leave",

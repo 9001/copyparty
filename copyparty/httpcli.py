@@ -3459,6 +3459,7 @@ class HttpCli(object):
                         break
 
         vf = vn.flags
+        unlist = vf.get("unlist", "")
         ls_ret = {
             "dirs": [],
             "files": [],
@@ -3469,6 +3470,7 @@ class HttpCli(object):
             "itag": e2t,
             "lifetime": vn.flags.get("lifetime") or 0,
             "frand": bool(vn.flags.get("rand")),
+            "unlist": unlist,
             "perms": perms,
             "logues": logues,
             "readme": readme,
@@ -3501,6 +3503,7 @@ class HttpCli(object):
             "title": html_escape(self.vpath, crlf=True) or "💾🎉",
             "srv_info": srv_infot,
             "dgrid": "grid" in vf,
+            "unlist": unlist,
             "dtheme": self.args.theme,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
@@ -3730,7 +3733,12 @@ class HttpCli(object):
         dirs.sort(key=itemgetter("name"))
 
         if is_js:
-            j2a["ls0"] = {"dirs": dirs, "files": files, "taglist": taglist}
+            j2a["ls0"] = {
+                "dirs": dirs,
+                "files": files,
+                "taglist": taglist,
+                "unlist": unlist,
+            }
             j2a["files"] = []
         else:
             j2a["files"] = dirs + files
