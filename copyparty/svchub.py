@@ -28,7 +28,7 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, VT100, EnvParams, unicode
+from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
 from .authsrv import AuthSrv
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
@@ -80,6 +80,7 @@ class SvcHub(object):
         self.dargs = dargs
         self.argv = argv
         self.E: EnvParams = args.E
+        self.no_ansi = args.no_ansi
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
         self.stop_req = False
@@ -681,11 +682,15 @@ class SvcHub(object):
             now = time.time()
             if now >= self.next_day:
                 dt = datetime.utcfromtimestamp(now)
-                print("\033[36m{}\033[0m\n".format(dt.strftime("%Y-%m-%d")), end="")
+                zs = "{}\n" if self.no_ansi else "\033[36m{}\033[0m\n"
+                zs = zs.format(dt.strftime("%Y-%m-%d"))
+                print(zs, end="")
                 self._set_next_day()
+                if self.logf:
+                    self.logf.write(zs)
 
             fmt = "\033[36m%s \033[33m%-21s \033[0m%s\n"
-            if not VT100:
+            if self.no_ansi:
                 fmt = "%s %-21s %s\n"
                 if "\033" in msg:
                     msg = ansi_re.sub("", msg)

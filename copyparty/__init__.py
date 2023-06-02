@@ -27,7 +27,11 @@ WINDOWS: Any = (
     else False
 )
 
-VT100 = not WINDOWS or WINDOWS >= [10, 0, 14393]
+VT100 = "--ansi" in sys.argv or (
+    os.environ.get("NO_COLOR", "").lower() in ("", "0", "false")
+    and "--no-ansi" not in sys.argv
+    and (not WINDOWS or WINDOWS >= [10, 0, 14393])
+)
 # introduced in anniversary update
 
 ANYWIN = WINDOWS or sys.platform in ["msys", "cygwin"]

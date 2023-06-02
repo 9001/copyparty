@@ -7,7 +7,7 @@ import socket
 import sys
 import time
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, VT100, unicode
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .stolen.qrcodegen import QrCode
 from .util import (
     E_ACCESS,
@@ -501,7 +501,7 @@ class TcpSrv(object):
                 zoom = 1
 
         qr = qrc.render(zoom, pad)
-        if not VT100:
+        if self.args.no_ansi:
             return "{}\n{}".format(txt, qr)
 
         halfc = "\033[40;48;5;{0}m{1}\033[47;48;5;{2}m"

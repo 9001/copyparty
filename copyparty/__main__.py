@@ -870,6 +870,8 @@ def add_logging(ap):
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet")
     ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
+    ap2.add_argument("--no-ansi", action="store_true", default=not VT100, help="disable colors; same as environment-variable NO_COLOR")
+    ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
     ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
     ap2.add_argument("--log-conn", action="store_true", help="debug: print tcp-server msgs")
     ap2.add_argument("--log-htp", action="store_true", help="debug: print http-server threadpool scaling")
@@ -1179,6 +1181,11 @@ def main(argv: Optional[list[str]] = None) -> None:
     except:
         sys.exit(1)
 
+    if al.ansi:
+        al.no_ansi = False
+    elif not al.no_ansi:
+        al.ansi = VT100
+
     if HAVE_SSL:
         ensure_cert(al)
 
@@ -1188,7 +1195,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         except:
             lprint("\nfailed to disable quick-edit-mode:\n" + min_ex() + "\n")
 
-    if not VT100:
+    if al.ansi:
         al.wintitle = ""
 
     nstrs: list[str] = []
