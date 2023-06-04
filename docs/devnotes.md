@@ -258,6 +258,7 @@ then build the sfx using any of the following examples:
 
 ```sh
 ./scripts/make-sfx.sh           # regular edition
+./scripts/make-sfx.sh fast      # build faster (worse js/css compression)
 ./scripts/make-sfx.sh gz no-cm  # gzip-compressed + no fancy markdown editor
 ```
 

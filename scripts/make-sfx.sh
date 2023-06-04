@@ -6,6 +6,8 @@ help() { exec cat <<'EOF'
 
 # optional args:
 #
+# `fast` builds faster, with cheaper js/css compression
+#
 # `clean` uses files from git (everything except web/deps),
 #   so local changes won't affect the produced sfx
 #
