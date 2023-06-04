@@ -261,6 +261,24 @@ def ensure_locale() -> None:
     warn(t.format(safe))
 
 
+def ensure_webdeps() -> None:
+    ap = os.path.join(E.mod, "web/deps/mini-fa.woff")
+    if os.path.exists(ap):
+        return
+
+    warn(
+        """could not find webdeps;
+  if you are running the sfx, or exe, or pypi package, or docker image,
+  then this is a bug! Please let me know so I can fix it, thanks :-)
+  https://github.com/9001/copyparty/issues/new?labels=bug&template=bug_report.md
+
+  however, if you are a dev, or running copyparty from source, and you want
+  full client functionality, you will need to build or obtain the webdeps:
+  https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building
+    """
+    )
+
+
 def ensure_cert(al: argparse.Namespace) -> None:
     """
     the default cert (and the entire TLS support) is only here to enable the
@@ -1115,6 +1133,8 @@ def main(argv: Optional[list[str]] = None) -> None:
         print("pybin: {}\n".format(pybin), end="")
 
     ensure_locale()
+
+    ensure_webdeps()
 
     for k, v in zip(argv[1:], argv[2:]):
         if k == "-c" and os.path.isfile(v):

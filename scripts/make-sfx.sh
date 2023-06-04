@@ -109,6 +109,7 @@ while [ ! -z "$1" ]; do
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
+		ign-wd) ign_wd=1 ; ;;
 		fast)   zopf=    ; ;;
 		ultra)  ultra=1  ; ;;
 		lang)   shift;langs="$1"; ;;
@@ -223,7 +224,7 @@ necho() {
 
 	# enable this to dynamically remove type hints at startup,
 	# in case a future python version can use them for performance
-	true || (
+	true && (
 		necho collecting strip-hints
 		f=../build/strip-hints-0.1.10.tar.gz
 		[ -e $f ] ||
@@ -283,10 +284,18 @@ necho() {
 	rm -f copyparty/stolen/*/README.md
 
 	# remove type hints before build instead
-	(cd copyparty; "$pybin" ../../scripts/strip_hints/a.py; rm uh)
+	(cd copyparty; PYTHONPATH="..:$PYTHONPATH" "$pybin" ../../scripts/strip_hints/a.py; rm uh)
 
 	licfile=$(realpath copyparty/res/COPYING.txt)
 	(cd ../scripts; ./genlic.sh "$licfile")
+}
+
+[ -e copyparty/web/deps/mini-fa.woff ] || [ $ign_wd ] || { cat <<'EOF'
+
+could not find webdeps; please see https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building
+or run with argument "ign-wd" if this was intentional
+EOF
+	exit 1
 }
 
 ver=

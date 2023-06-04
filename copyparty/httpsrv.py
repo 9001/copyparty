@@ -33,7 +33,23 @@ except MNFE:
    * (try another python version, if you have one)
    * (try copyparty.sfx instead)
 """.format(
-            os.path.basename(sys.executable)
+            sys.executable
+        )
+    )
+    sys.exit(1)
+except SyntaxError:
+    if EXE:
+        raise
+
+    print(
+        """\033[1;31m
+  your jinja2 version is incompatible with your python version;\033[33m
+  please try to replace it with an older version:\033[0m
+   * {} -m pip install --user jinja2==2.11.3
+   * (try another python version, if you have one)
+   * (try copyparty.sfx instead)
+""".format(
+            sys.executable
         )
     )
     sys.exit(1)

@@ -236,6 +236,8 @@ pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscod
 
 ## just the sfx
 
+if you just want to modify the copyparty source code (py/html/css/js) then this is the easiest approach
+
 first grab the web-dependencies from a previous sfx (assuming you don't need to modify something in those):
 
 ```sh
@@ -246,7 +248,8 @@ rm x.py
 cp -R /tmp/pe-copyparty.$(id -u)/copyparty/web/deps copyparty/web/
 ```
 
-or you could build the web-dependencies from source instead (NB: does not include prismjs, need to grab that manually):
+or you could build the web-dependencies from source instead:
+
 ```sh
 make -C scripts/deps-docker
 ```
@@ -284,6 +287,8 @@ python3 setup.py install --skip-build --prefix=/usr --root=$HOME/pe/copyparty
 ## complete release
 
 also builds the sfx so skip the sfx section above
+
+*WARNING: `rls.sh` has not yet been updated with the docker-images and arch/nix packaging*
 
 does everything completely from scratch, straight from your local repo
 
