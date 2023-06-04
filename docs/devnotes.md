@@ -238,23 +238,7 @@ pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscod
 
 if you just want to modify the copyparty source code (py/html/css/js) then this is the easiest approach
 
-first grab the web-dependencies from a previous sfx (assuming you don't need to modify something in those):
-
-```sh
-rm -rf copyparty/web/deps
-curl -L https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py >x.py
-python3 x.py --version
-rm x.py
-cp -R /tmp/pe-copyparty.$(id -u)/copyparty/web/deps copyparty/web/
-```
-
-or you could build the web-dependencies from source instead:
-
-```sh
-make -C scripts/deps-docker
-```
-
-then build the sfx using any of the following examples:
+build the sfx using any of the following examples:
 
 ```sh
 ./scripts/make-sfx.sh           # regular edition

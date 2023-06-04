@@ -2,6 +2,8 @@
 set -e
 echo
 
+berr() { p=$(head -c 72 </dev/zero | tr '\0' =); printf '\n%s\n\n' $p; cat; printf '\n%s\n\n' $p; }
+
 help() { exec cat <<'EOF'
 
 # optional args:
@@ -43,6 +45,13 @@ help() { exec cat <<'EOF'
 #   (browsers will try to use 'Consolas' instead)
 #
 # `no-dd` saves ~2k by removing the mouse cursor
+#
+# _____________________________________________________________________
+# build behavior:
+#
+# `dl-wd` automatically downloads webdeps if necessary
+#
+# `ign-wd` allows building an sfx without webdeps
 #
 # ---------------------------------------------------------------------
 #
@@ -111,6 +120,7 @@ while [ ! -z "$1" ]; do
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
+		dl-wd)  dl_wd=1  ; ;;
 		ign-wd) ign_wd=1 ; ;;
 		fast)   zopf=    ; ;;
 		ultra)  ultra=1  ; ;;
@@ -292,10 +302,46 @@ necho() {
 	(cd ../scripts; ./genlic.sh "$licfile")
 }
 
-[ -e copyparty/web/deps/mini-fa.woff ] || [ $ign_wd ] || { cat <<'EOF'
+[ ! -e copyparty/web/deps/mini-fa.woff ] && [ $dl_wd ] && {
+	echo "could not find webdeps; downloading..."
+	url=https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
+	wget -Ox.py "$url" || curl -L "$url" >x.py
 
-could not find webdeps; please see https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building
-or run with argument "ign-wd" if this was intentional
+	echo "extracting webdeps..."
+	wdsrc="$("$pybin" x.py --version 2>&1 | tee /dev/stderr | awk '/sfxdir:/{sub(/.*: /,"");print;exit}')"
+	[ "$wdsrc" ] || {
+		echo failed to discover tempdir of reference copyparty-sfx.py
+		exit 1
+	}
+	rm -rf copyparty/web/deps
+	cp -pvR "$wdsrc/copyparty/web/deps" copyparty/web/
+
+	# also copy it out into the source-tree for next time
+	rm -rf ../copyparty/web/deps
+	cp -pR copyparty/web/deps ../copyparty/web
+
+	rm x.py
+}
+
+[ -e copyparty/web/deps/mini-fa.woff ] || [ $ign_wd ] || { berr <<'EOF'
+ERROR:
+  could not find webdeps; the front-end will not be fully functional
+
+please choose one of the following:
+
+A) add the argument "dl-wd" to fix it automatically; this will
+    download copyparty-sfx.py and extract the webdeps from there
+
+B) build the webdeps from source:  make -C scripts/deps-docker
+
+C) add the argument "ign-wd" to continue building the sfx without webdeps
+
+alternative A is a good choice if you are only intending to
+modify the copyparty source code (py/html/css/js) and do not
+plan to make any changes to the mostly-third-party webdeps
+
+there may be additional hints in the devnotes:
+https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building
 EOF
 	exit 1
 }
