@@ -6,7 +6,9 @@ import platform
 import sys
 import time
 
-_: int = 1  # --->--->--->  hey there! if you are reading this, your python is too old to run copyparty without some help. Please use https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py or the pypi package instead, or see https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building if you want to build it yourself :-)
+# fmt: off
+_:tuple[int,int]=(0,0)  # _____________________________________________________________________  hey there! if you are reading this, your python is too old to run copyparty without some help. Please use https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py or the pypi package instead, or see https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building if you want to build it yourself :-)  ************************************************************************************************************************************************
+# fmt: on
 
 try:
     from typing import TYPE_CHECKING
