@@ -1,14 +1,40 @@
 #!/bin/bash
 set -e
 
+cat >/dev/null <<'EOF'
+
+this script generates a new self-signed TLS certificate and
+replaces the default insecure one that comes with copyparty
+
+as it is trivial to impersonate a copyparty server using the
+default certificate, it is highly recommended to do this
+
+this will create a self-signed CA, and a Server certificate
+which gets signed by that CA -- you can run it multiple times
+with different server-FQDNs / IPs to create additional certs
+for all your different servers / (non-)copyparty services
+
+EOF
+
+
 # ca-name and server-fqdn
 ca_name="$1"
 srv_fqdn="$2"
 
-[ -z "$srv_fqdn" ] && {
-	echo "need arg 1: ca name"
-	echo "need arg 2: server fqdn and/or IPs, comma-separated"
-	echo "optional arg 3: if set, write cert into copyparty cfg"
+[ -z "$srv_fqdn" ] && { cat <<'EOF'
+need arg 1: ca name
+need arg 2: server fqdn and/or IPs, comma-separated
+optional arg 3: if set, write cert into copyparty cfg
+
+example:
+  ./cfssl.sh PartyCo partybox.local y
+EOF
+	exit 1
+}
+
+
+command -v cfssljson 2>/dev/null || {
+	echo please install cfssl and try again
 	exit 1
 }
 
@@ -59,12 +85,14 @@ show() {
 }
 show ca.pem
 show "$srv_fqdn.pem"
-
+echo
+echo "successfully generated new certificates"
 
 # write cert into copyparty config
 [ -z "$3" ] || {
 	mkdir -p ~/.config/copyparty
 	cat "$srv_fqdn".{key,pem} ca.pem >~/.config/copyparty/cert.pem 
+	echo "successfully replaced copyparty certificate"
 }
 
 

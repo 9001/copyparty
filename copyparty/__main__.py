@@ -310,7 +310,8 @@ def ensure_cert(al: argparse.Namespace) -> None:
     try:
         if filecmp.cmp(al.cert, cert_insec):
             lprint(
-                "\033[33musing default TLS certificate; https will be insecure."
+                "\033[33musing default TLS certificate; https will be insecure -- please see\n"
+                + "https://github.com/9001/copyparty/blob/hovudstraum/contrib/cfssl.sh"
                 + "\033[36m\ncertificate location: {}\033[0m\n".format(al.cert)
             )
     except:
