@@ -482,6 +482,7 @@ it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video f
 audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
 
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
+* and, if you enable [file indexing](#file-indexing), all remaining folders will also get thumbnails (as long as they contain any pics at all)
 
 in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
 * indicated by the audio files having the ▶ icon instead of 💾
@@ -930,14 +931,13 @@ through arguments:
 * `--xlink` enables deduplication across volumes
 
 the same arguments can be set as volflags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts`, `d2v` for disabling:
-* `-v ~/music::r:c,e2dsa,e2tsr` does a full reindex of everything on startup
+* `-v ~/music::r:c,e2ds,e2tsr` does a full reindex of everything on startup
 * `-v ~/music::r:c,d2d` disables **all** indexing, even if any `-e2*` are on
 * `-v ~/music::r:c,d2t` disables all `-e2t*` (tags), does not affect `-e2d*`
 * `-v ~/music::r:c,d2ds` disables on-boot scans; only index new uploads
 * `-v ~/music::r:c,d2ts` same except only affecting tags
 
 note:
-* the parser can finally handle `c,e2dsa,e2tsr` so you no longer have to `c,e2dsa:c,e2tsr`
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 * deduplication is possible on windows if you run copyparty as administrator (not saying you should!)

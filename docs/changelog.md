@@ -1,4 +1,21 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0513-0000  `v1.7.2`  hard resolve
+
+## new features
+* print a warning if `c:\`, `c:\windows*`, or all of `/` are shared
+* upgraded the docker image to v3.18 which enables the [chiptune player](https://a.ocv.me/pub/demo/music/chiptunes/#af-f6fb2e5f)
+* in config files, allow trailing `:` in section headers
+
+## bugfixes
+* when `--hardlink` (or the volflag) is set, resolve symlinks before hardlinking
+  * uploads could fail due to relative symlinks
+* really minor ux fixes
+  * left-align `GET` in access logs
+  * the upload panel didn't always shrink back down after uploads completed
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0507-1834  `v1.7.1`  CräzY;PWDs
 
 ## new features

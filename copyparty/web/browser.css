@@ -1751,6 +1751,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	display: none;
 }
 .ghead {
+	background: var(--bg-u2);
 	border-radius: .3em;
 	padding: .2em .5em;
 	line-height: 2.3em;
@@ -2947,6 +2948,7 @@ html.b #treepar {
 html.b #wrap {
 	margin-top: 2em;
 }
+html.by .ghead,
 html.bz .ghead {
 	background: var(--bg);
 	padding: .2em 0;

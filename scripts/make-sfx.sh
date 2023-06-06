@@ -478,7 +478,7 @@ while IFS= read -r f; do
 done
 
 # up2k goes from 28k to 22k laff
-awk 'BEGIN{gensub(//,"",1)}' </dev/null &&
+awk 'BEGIN{gensub(//,"",1)}' </dev/null 2>/dev/null &&
 echo entabbening &&
 find | grep -E '\.css$' | while IFS= read -r f; do
 	awk '{
@@ -492,7 +492,9 @@ find | grep -E '\.css$' | while IFS= read -r f; do
 	1
 	' <$f | sed -r 's/;\}$/}/; /\{\}$/d' >t
 	tmv "$f"
-done
+done ||
+	echo "WARNING: your awk does not have gensub, so the sfx will not have optimal compression"
+
 unexpand -h 2>/dev/null &&
 find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 	unexpand -t 4 --first-only <"$f" >t
@@ -586,7 +588,7 @@ sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 for n in {1..50}; do
 	(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1 | (shuf||gshuf) ) >list || true
 	s=$( (sha1sum||shasum) < list | cut -c-16)
-	grep -q $s "$zdir/h" && continue
+	grep -q $s "$zdir/h" 2>/dev/null && continue
 	echo $s >> "$zdir/h"
 	break
 done
