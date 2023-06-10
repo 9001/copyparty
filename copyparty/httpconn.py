@@ -8,12 +8,6 @@ import socket
 import threading  # typechk
 import time
 
-try:
-    HAVE_SSL = True
-    import ssl
-except:
-    HAVE_SSL = False
-
 from . import util as Util
 from .__init__ import TYPE_CHECKING, EnvParams
 from .authsrv import AuthSrv  # typechk
@@ -54,7 +48,6 @@ class HttpConn(object):
         self.args: argparse.Namespace = hsrv.args  # mypy404
         self.E: EnvParams = self.args.E
         self.asrv: AuthSrv = hsrv.asrv  # mypy404
-        self.cert_path = hsrv.cert_path
         self.u2fh: Util.FHC = hsrv.u2fh  # mypy404
         self.iphash: HMaccas = hsrv.broker.iphash
         self.bans: dict[str, int] = hsrv.bans
@@ -114,7 +107,7 @@ class HttpConn(object):
 
     def _detect_https(self) -> bool:
         method = None
-        if self.cert_path:
+        if True:
             try:
                 method = self.s.recv(4, socket.MSG_PEEK)
             except socket.timeout:
@@ -148,7 +141,7 @@ class HttpConn(object):
         self.sr = None
         if self.args.https_only:
             is_https = True
-        elif self.args.http_only or not HAVE_SSL:
+        elif self.args.http_only:
             is_https = False
         else:
             # raise Exception("asdf")
@@ -162,7 +155,7 @@ class HttpConn(object):
             self.log_src = self.log_src.replace("[36m", "[35m")
             try:
                 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                ctx.load_cert_chain(self.cert_path)
+                ctx.load_cert_chain(self.args.cert)
                 if self.args.ssl_ver:
                     ctx.options &= ~self.args.ssl_flags_en
                     ctx.options |= self.args.ssl_flags_de

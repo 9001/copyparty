@@ -9,13 +9,6 @@ import calendar
 from .util import runcmd, Netdev
 
 
-try:
-    HAVE_SSL = True
-    import ssl
-except:
-    HAVE_SSL = False
-
-
 HAVE_CFSSL = True
 
 
@@ -124,8 +117,12 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     if not args.crt_noip:
         for ip in netdevs.keys():
             names.append(ip.split("/")[0])
+    if args.crt_nolo:
+        names = [x for x in names if x not in ("localhost", "127.0.0.1", "::1")]
     if not names:
         names = ["127.0.0.1"]
+    if "127.0.0.1" in names or "::1" in names:
+        names.append("localhost")
     names = list({x: 1 for x in names}.keys())
 
     try:
@@ -158,7 +155,7 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     with open(os.path.join(args.crt_dir, "cfssl.json"), "wb") as f:
         f.write(json.dumps(cfg).encode("utf-8"))
 
-    cn = args.crt_cnc.replace("--crt-cn", args.crt_cn)
+    cn = args.crt_cns.replace("--crt-cn", args.crt_cn)
     algo, ksz = args.crt_alg.split("-")
     req = {
         "key": {"algo": algo, "size": int(ksz)},
@@ -200,7 +197,7 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
 def gencert(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     global HAVE_CFSSL
 
-    if not HAVE_SSL or args.http_only:
+    if args.http_only:
         return
 
     if args.no_crt or not HAVE_CFSSL:

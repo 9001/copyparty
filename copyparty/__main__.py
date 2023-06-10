@@ -729,11 +729,12 @@ def add_cert(ap, cert_path):
     ap2.add_argument("--crt-ns", metavar="N,N", type=u, default="", help="comma-separated list of FQDNs (domains) to add into the certificate")
     ap2.add_argument("--crt-exact", action="store_true", help="do not add wildcard entries for each --crt-ns")
     ap2.add_argument("--crt-noip", action="store_true", help="do not add autodetected IP addresses into cert")
+    ap2.add_argument("--crt-nolo", action="store_true", help="do not add 127.0.0.1 / localhost into cert")
     ap2.add_argument("--crt-dir", metavar="PATH", default=cert_dir, help="where to save the CA cert")
     ap2.add_argument("--crt-cdays", metavar="D", type=float, default=3650, help="ca-certificate expiration time in days")
     ap2.add_argument("--crt-sdays", metavar="D", type=float, default=365, help="server-cert expiration time in days")
     ap2.add_argument("--crt-cn", metavar="TXT", type=u, default="partyco", help="CA/server-cert common-name")
-    ap2.add_argument("--crt-cnc", metavar="TXT", type=u, default="--crt-cn ca", help="override CA name")
+    ap2.add_argument("--crt-cnc", metavar="TXT", type=u, default="--crt-cn", help="override CA name")
     ap2.add_argument("--crt-cns", metavar="TXT", type=u, default="--crt-cn cpp", help="override server-cert name")
     ap2.add_argument("--crt-back", metavar="HRS", type=float, default=72, help="backdate in hours")
     ap2.add_argument("--crt-alg", metavar="S-N", type=u, default="ecdsa-256", help="algorithm and keysize; one of these: ecdsa-256 rsa-4096 rsa-2048")
@@ -1282,6 +1283,7 @@ def main(argv: Optional[list[str]] = None) -> None:
             configure_ssl_ciphers(al)
     else:
         warn("ssl module does not exist; cannot enable https")
+        al.http_only = True
 
     if PY2 and WINDOWS and al.e2d:
         warn(

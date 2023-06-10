@@ -148,12 +148,6 @@ class HttpSrv(object):
 
             self.ssdp = SSDPr(broker)
 
-        cert_path = self.args.cert
-        if bos.path.exists(cert_path):
-            self.cert_path = cert_path
-        else:
-            self.cert_path = ""
-
         if self.tp_q:
             self.start_threads(4)
 
