@@ -1572,6 +1572,11 @@ both HTTP and HTTPS are accepted  by default, but letting a [reverse proxy](#rev
 
 copyparty doesn't speak HTTP/2 or QUIC, so using a reverse proxy would solve that as well
 
+if [cfssl](https://github.com/cloudflare/cfssl/releases/latest) is installed, copyparty will automatically create a CA and server-cert on startup
+* the certs are written to `--crt-dir` for distribution, see `--help` for the other `--crt` options
+* this will be a self-signed certificate so you must install your `ca.pem` into all your browsers/devices
+* if you want to avoid the hassle of distributing certs manually, please consider using a reverse proxy
+
 
 # recovering from crashes
 

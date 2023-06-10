@@ -1,3 +1,6 @@
+# NOTE: this is now a built-in feature in copyparty
+# but you may still want this if you have specific needs
+#
 # systemd service which generates a new TLS certificate on each boot,
 # that way the one-year expiry time won't cause any issues --
 # just have everyone trust the ca.pem once every 10 years

@@ -10,11 +10,9 @@ __url__ = "https://github.com/9001/copyparty/"
 
 import argparse
 import base64
-import filecmp
 import locale
 import os
 import re
-import shutil
 import socket
 import sys
 import threading
@@ -277,48 +275,6 @@ def ensure_webdeps() -> None:
   https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#building
     """
     )
-
-
-def ensure_cert(al: argparse.Namespace) -> None:
-    """
-    the default cert (and the entire TLS support) is only here to enable the
-    crypto.subtle javascript API, which is necessary due to the webkit guys
-    being massive memers (https://www.chromium.org/blink/webcrypto)
-
-    i feel awful about this and so should they
-    """
-    cert_insec = os.path.join(E.mod, "res/insecure.pem")
-    cert_appdata = os.path.join(E.cfg, "cert.pem")
-    if not os.path.isfile(al.cert):
-        if cert_appdata != al.cert:
-            raise Exception("certificate file does not exist: " + al.cert)
-
-        shutil.copy(cert_insec, al.cert)
-
-    with open(al.cert, "rb") as f:
-        buf = f.read()
-        o1 = buf.find(b" PRIVATE KEY-")
-        o2 = buf.find(b" CERTIFICATE-")
-        m = "unsupported certificate format: "
-        if o1 < 0:
-            raise Exception(m + "no private key inside pem")
-        if o2 < 0:
-            raise Exception(m + "no server certificate inside pem")
-        if o1 > o2:
-            raise Exception(m + "private key must appear before server certificate")
-
-    try:
-        if filecmp.cmp(al.cert, cert_insec):
-            lprint(
-                "\033[33musing default TLS certificate; https will be insecure -- please see\n"
-                + "https://github.com/9001/copyparty/blob/hovudstraum/contrib/cfssl.sh"
-                + "\033[36m\ncertificate location: {}\033[0m\n".format(al.cert)
-            )
-    except:
-        pass
-
-    # speaking of the default cert,
-    # printf 'NO\n.\n.\n.\n.\ncopyparty-insecure\n.\n' | faketime '2000-01-01 00:00:00' openssl req -x509 -sha256 -newkey rsa:2048 -keyout insecure.pem -out insecure.pem -days $((($(printf %d 0x7fffffff)-$(date +%s --date=2000-01-01T00:00:00Z))/(60*60*24))) -nodes && ls -al insecure.pem && openssl x509 -in insecure.pem -text -noout
 
 
 def configure_ssl_ver(al: argparse.Namespace) -> None:
@@ -748,6 +704,23 @@ def add_tls(ap, cert_path):
     ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets for later decryption in wireshark")
 
 
+def add_cert(ap, cert_path):
+    cert_dir = os.path.dirname(cert_path)
+    ap2 = ap.add_argument_group('TLS certificate generator options')
+    ap2.add_argument("--no-crt", action="store_true", help="disable automatic certificate creation")
+    ap2.add_argument("--crt-ns", metavar="N,N", type=u, default="", help="comma-separated list of FQDNs (domains) to add into the certificate")
+    ap2.add_argument("--crt-exact", action="store_true", help="do not add wildcard entries for each --crt-ns")
+    ap2.add_argument("--crt-noip", action="store_true", help="do not add autodetected IP addresses into cert")
+    ap2.add_argument("--crt-dir", metavar="PATH", default=cert_dir, help="where to save the CA cert")
+    ap2.add_argument("--crt-cdays", metavar="D", type=float, default=3650, help="ca-certificate expiration time in days")
+    ap2.add_argument("--crt-sdays", metavar="D", type=float, default=365, help="server-cert expiration time in days")
+    ap2.add_argument("--crt-cn", metavar="TXT", type=u, default="partyco", help="CA/server-cert common-name")
+    ap2.add_argument("--crt-cnc", metavar="TXT", type=u, default="--crt-cn ca", help="override CA name")
+    ap2.add_argument("--crt-cns", metavar="TXT", type=u, default="--crt-cn cpp", help="override server-cert name")
+    ap2.add_argument("--crt-back", metavar="HRS", type=float, default=72, help="backdate in hours")
+    ap2.add_argument("--crt-alg", metavar="S-N", type=u, default="ecdsa-256", help="algorithm and keysize; one of these: ecdsa-256 rsa-4096 rsa-2048")
+
+
 def add_zeroconf(ap):
     ap2 = ap.add_argument_group("Zeroconf options")
     ap2.add_argument("-z", action="store_true", help="enable all zeroconf backends (mdns, ssdp)")
@@ -1051,6 +1024,7 @@ def run_argparse(
     add_general(ap, nc, srvname)
     add_network(ap)
     add_tls(ap, cert_path)
+    add_cert(ap, cert_path)
     add_qr(ap, tty)
     add_zeroconf(ap)
     add_zc_mdns(ap)
@@ -1207,9 +1181,6 @@ def main(argv: Optional[list[str]] = None) -> None:
         al.no_ansi = False
     elif not al.no_ansi:
         al.ansi = VT100
-
-    if HAVE_SSL:
-        ensure_cert(al)
 
     if WINDOWS and not al.keep_qem:
         try:

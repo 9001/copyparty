@@ -3,6 +3,10 @@ set -e
 
 cat >/dev/null <<'EOF'
 
+NOTE: copyparty is now able to do this automatically;
+however you may wish to use this script instead if
+you have specific needs (or if copyparty breaks)
+
 this script generates a new self-signed TLS certificate and
 replaces the default insecure one that comes with copyparty
 
