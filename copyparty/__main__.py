@@ -240,6 +240,24 @@ def get_srvname() -> str:
     return ret
 
 
+def get_fk_salt(cert_path) -> str:
+    fp = os.path.join(E.cfg, "fk-salt.txt")
+    try:
+        with open(fp, "rb") as f:
+            ret = f.read().strip()
+    except:
+        if os.path.exists(cert_path):
+            print("salt from cert")
+            return unicode(os.path.getmtime(cert_path))
+        else:
+            print("salt from os.random")
+            ret = base64.b64encode(os.urandom(18))
+            with open(fp, "wb") as f:
+                f.write(ret + b"\n")
+
+    return ret.decode("utf-8")
+
+
 def ensure_locale() -> None:
     safe = "en_US.UTF-8"
     for x in [
@@ -1010,10 +1028,7 @@ def run_argparse(
 
     cert_path = os.path.join(E.cfg, "cert.pem")
 
-    try:
-        fk_salt = unicode(os.path.getmtime(cert_path))
-    except:
-        fk_salt = "hunter2"
+    fk_salt = get_fk_salt(cert_path)
 
     hcores = min(CORES, 4)  # optimal on py3.11 @ r5-4500U
 
