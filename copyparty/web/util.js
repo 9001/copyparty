@@ -160,7 +160,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     var html = [
         '<h1>you hit a bug!</h1>',
         '<p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a> / <a href="?b=u">basic</a></p>',
-        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">github issue</a> or <code>ed#2644</code></p>',
+        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">github issue</a></p>',
         '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)).replace(/\n/g, '<br />') + '</p>',
         '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
     ];
