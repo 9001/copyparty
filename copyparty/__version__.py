@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 7, 3)
+VERSION = (1, 7, 4)
 CODENAME = "unlinked"
 BUILD_DT = (2023, 6, 11)
 

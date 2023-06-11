@@ -8,6 +8,12 @@ import socket
 import threading  # typechk
 import time
 
+try:
+    HAVE_SSL = True
+    import ssl
+except:
+    HAVE_SSL = False
+
 from . import util as Util
 from .__init__ import TYPE_CHECKING, EnvParams
 from .authsrv import AuthSrv  # typechk
