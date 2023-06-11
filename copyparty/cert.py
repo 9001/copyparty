@@ -1,13 +1,12 @@
-import os
-import errno
-import time
-import json
-import shutil
-import filecmp
 import calendar
+import errno
+import filecmp
+import json
+import os
+import shutil
+import time
 
-from .util import runcmd, Netdev
-
+from .util import Netdev, runcmd
 
 HAVE_CFSSL = True
 

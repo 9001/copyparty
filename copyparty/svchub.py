@@ -30,6 +30,7 @@ if True:  # pylint: disable=using-constant-test
 
 from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
 from .authsrv import AuthSrv
+from .cert import ensure_cert
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
 from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
@@ -239,7 +240,8 @@ class SvcHub(object):
         if args.ftp or args.ftps:
             from .ftpd import Ftpd
 
-            self.ftpd = Ftpd(self)
+            self.ftpd: Optional[Ftpd] = None
+            Daemon(self.start_ftpd, "start_ftpd")
             zms += "f" if args.ftp else "F"
 
         if args.smb:
@@ -268,6 +270,28 @@ class SvcHub(object):
             from .broker_thr import BrokerThr as Broker  # type: ignore
 
         self.broker = Broker(self)
+
+    def start_ftpd(self) -> None:
+        time.sleep(30)
+        if self.ftpd:
+            return
+
+        self.restart_ftpd()
+
+    def restart_ftpd(self) -> None:
+        if not hasattr(self, "ftpd"):
+            return
+
+        from .ftpd import Ftpd
+
+        if self.ftpd:
+            return  # todo
+
+        if not os.path.exists(self.args.cert):
+            ensure_cert(self.log, self.args)
+
+        self.ftpd = Ftpd(self)
+        self.log("root", "started FTPd")
 
     def thr_httpsrv_up(self) -> None:
         time.sleep(1 if self.args.ign_ebind_all else 5)

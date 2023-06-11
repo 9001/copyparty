@@ -8,8 +8,8 @@ import sys
 import time
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
-from .stolen.qrcodegen import QrCode
 from .cert import gencert
+from .stolen.qrcodegen import QrCode
 from .util import (
     E_ACCESS,
     E_ADDR_IN_USE,
@@ -297,6 +297,7 @@ class TcpSrv(object):
         self.hub.broker.say("set_netdevs", self.netdevs)
         self.hub.start_zeroconf()
         gencert(self.log, self.args, self.netdevs)
+        self.hub.restart_ftpd()
 
     def shutdown(self) -> None:
         self.stopping = True
