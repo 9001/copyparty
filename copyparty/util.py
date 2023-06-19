@@ -1626,7 +1626,12 @@ def unhumanize(sz: str) -> int:
         pass
 
     mc = sz[-1:].lower()
-    mi = {"k": 1024, "m": 1024 * 1024, "g": 1024 * 1024 * 1024}.get(mc, 1)
+    mi = {
+        "k": 1024,
+        "m": 1024 * 1024,
+        "g": 1024 * 1024 * 1024,
+        "t": 1024 * 1024 * 1024 * 1024,
+    }.get(mc, 1)
     return int(float(sz[:-1]) * mi)
 
 

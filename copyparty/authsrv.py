@@ -40,7 +40,10 @@ if True:  # pylint: disable=using-constant-test
     from .util import NamedLogger, RootLogger
 
 if TYPE_CHECKING:
-    pass
+    from .broker_mp import BrokerMp
+    from .broker_thr import BrokerThr
+    from .broker_util import BrokerCli
+
     # Vflags: TypeAlias = dict[str, str | bool | float | list[str]]
     # Vflags: TypeAlias = dict[str, Any]
     # Mflags: TypeAlias = dict[str, Vflags]
@@ -90,6 +93,8 @@ class Lim(object):
         self.dfl = 0  # free disk space limit
         self.dft = 0  # last-measured time
         self.dfv = 0  # currently free
+        self.vbmax = 0  # volume bytes max
+        self.vnmax = 0  # volume max num files
 
         self.smin = 0  # filesize min
         self.smax = 0  # filesize max
@@ -119,8 +124,11 @@ class Lim(object):
         ip: str,
         rem: str,
         sz: int,
+        ptop: str,
         abspath: str,
+        broker: Optional[Union["BrokerCli", "BrokerMp", "BrokerThr"]] = None,
         reg: Optional[dict[str, dict[str, Any]]] = None,
+        volgetter: str = "up2k.get_volsize",
     ) -> tuple[str, str]:
         if reg is not None and self.reg is None:
             self.reg = reg
@@ -131,6 +139,7 @@ class Lim(object):
         self.chk_rem(rem)
         if sz != -1:
             self.chk_sz(sz)
+            self.chk_vsz(broker, ptop, sz, volgetter)
             self.chk_df(abspath, sz)  # side effects; keep last-ish
 
         ap2, vp2 = self.rot(abspath)
@@ -145,6 +154,25 @@ class Lim(object):
 
         if self.smax and sz > self.smax:
             raise Pebkac(400, "file too big")
+
+    def chk_vsz(
+        self,
+        broker: Optional[Union["BrokerCli", "BrokerMp", "BrokerThr"]],
+        ptop: str,
+        sz: int,
+        volgetter: str = "up2k.get_volsize",
+    ) -> None:
+        if not broker or not self.vbmax + self.vnmax:
+            return
+
+        x = broker.ask(volgetter, ptop)
+        nbytes, nfiles = x.get()
+
+        if self.vbmax and self.vbmax < nbytes + sz:
+            raise Pebkac(400, "volume has exceeded max size")
+
+        if self.vnmax and self.vnmax < nfiles + 1:
+            raise Pebkac(400, "volume has exceeded max num.files")
 
     def chk_df(self, abspath: str, sz: int, already_written: bool = False) -> None:
         if not self.dfl:
@@ -266,7 +294,7 @@ class Lim(object):
 
         self.bupc[ip] = mark
         if mark >= self.bmax:
-            raise Pebkac(429, "ingress saturated")
+            raise Pebkac(429, "upload size limit exceeded")
 
 
 class VFS(object):
@@ -1289,6 +1317,16 @@ class AuthSrv(object):
             if zs:
                 use = True
                 lim.bmax, lim.bwin = [unhumanize(x) for x in zs.split(",")]
+
+            zs = vol.flags.get("vmaxb")
+            if zs:
+                use = True
+                lim.vbmax = unhumanize(zs)
+
+            zs = vol.flags.get("vmaxn")
+            if zs:
+                use = True
+                lim.vnmax = unhumanize(zs)
 
             if use:
                 vol.lim = lim

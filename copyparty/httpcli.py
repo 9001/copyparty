@@ -1358,7 +1358,9 @@ class HttpCli(object):
         lim = vfs.get_dbv(rem)[0].lim
         fdir = vfs.canonical(rem)
         if lim:
-            fdir, rem = lim.all(self.ip, rem, remains, fdir)
+            fdir, rem = lim.all(
+                self.ip, rem, remains, vfs.realpath, fdir, self.conn.hsrv.broker
+            )
 
         fn = None
         if rem and not self.trailing_slash and not bos.path.isdir(fdir):
@@ -1491,6 +1493,7 @@ class HttpCli(object):
             lim.bup(self.ip, post_sz)
             try:
                 lim.chk_sz(post_sz)
+                lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, post_sz)
             except:
                 bos.unlink(path)
                 raise
@@ -2101,7 +2104,9 @@ class HttpCli(object):
         lim = vfs.get_dbv(rem)[0].lim
         fdir_base = vfs.canonical(rem)
         if lim:
-            fdir_base, rem = lim.all(self.ip, rem, -1, fdir_base)
+            fdir_base, rem = lim.all(
+                self.ip, rem, -1, vfs.realpath, fdir_base, self.conn.hsrv.broker
+            )
             upload_vpath = "{}/{}".format(vfs.vpath, rem).strip("/")
             if not nullwrite:
                 bos.makedirs(fdir_base)
@@ -2194,6 +2199,7 @@ class HttpCli(object):
                         try:
                             lim.chk_df(tabspath, sz, True)
                             lim.chk_sz(sz)
+                            lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, sz)
                             lim.chk_bup(self.ip)
                             lim.chk_nup(self.ip)
                         except:
@@ -2369,7 +2375,7 @@ class HttpCli(object):
         fp = vfs.canonical(rp)
         lim = vfs.get_dbv(rem)[0].lim
         if lim:
-            fp, rp = lim.all(self.ip, rp, clen, fp)
+            fp, rp = lim.all(self.ip, rp, clen, vfs.realpath, fp, self.conn.hsrv.broker)
             bos.makedirs(fp)
 
         fp = os.path.join(fp, fn)
@@ -2451,6 +2457,7 @@ class HttpCli(object):
             lim.bup(self.ip, sz)
             try:
                 lim.chk_sz(sz)
+                lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, sz)
             except:
                 bos.unlink(fp)
                 raise

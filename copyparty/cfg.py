@@ -78,7 +78,9 @@ flagcats = {
     },
     "upload rules": {
         "maxn=250,600": "max 250 uploads over 15min",
-        "maxb=1g,300": "max 1 GiB over 5min (suffixes: b, k, m, g)",
+        "maxb=1g,300": "max 1 GiB over 5min (suffixes: b, k, m, g, t)",
+        "vmaxb=1g": "total volume size max 1 GiB (suffixes: b, k, m, g, t)",
+        "vmaxn=4k": "max 4096 files in volume (suffixes: b, k, m, g, t)",
         "rand": "force randomized filenames, 9 chars long by default",
         "nrand=N": "randomized filenames are N chars long",
         "sz=1k-3m": "allow filesizes between 1 KiB and 3MiB",

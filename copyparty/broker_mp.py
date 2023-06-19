@@ -9,7 +9,7 @@ import queue
 
 from .__init__ import CORES, TYPE_CHECKING
 from .broker_mpw import MpWorker
-from .broker_util import try_exec
+from .broker_util import ExceptionalQueue, try_exec
 from .util import Daemon, mp
 
 if TYPE_CHECKING:
@@ -106,6 +106,19 @@ class BrokerMp(object):
 
                 if retq_id:
                     proc.q_pend.put((retq_id, "retq", rv))
+
+    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+
+        # new non-ipc invoking managed service in hub
+        obj = self.hub
+        for node in dest.split("."):
+            obj = getattr(obj, node)
+
+        rv = try_exec(True, obj, *args)
+
+        retq = ExceptionalQueue(1)
+        retq.put(rv)
+        return retq
 
     def say(self, dest: str, *args: Any) -> None:
         """

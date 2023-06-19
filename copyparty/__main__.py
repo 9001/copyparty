@@ -980,7 +980,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")
-    ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files matching REGEX in file list. Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\.(js|css)$\033[0m] (volflag=unlist)")
+    ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files matching REGEX in file list. Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
     ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="\033[33mfavicon-text\033[0m [ \033[33mforeground\033[0m [ \033[33mbackground\033[0m ] ], set blank to disable")
     ap2.add_argument("--mpmc", metavar="URL", type=u, default="", help="change the mediaplayer-toggle mouse cursor; URL to a folder with {2..5}.png inside (or disable with [\033[32m.\033[0m])")
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")

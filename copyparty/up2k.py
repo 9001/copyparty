@@ -41,6 +41,7 @@ from .util import (
     gen_filekey,
     gen_filekey_dbg,
     hidedir,
+    humansize,
     min_ex,
     quotep,
     rand_name,
@@ -56,6 +57,7 @@ from .util import (
     sfsenc,
     spack,
     statdir,
+    unhumanize,
     vjoin,
     vsplit,
     w8b64dec,
@@ -125,6 +127,8 @@ class Up2k(object):
         self.registry: dict[str, dict[str, dict[str, Any]]] = {}
         self.flags: dict[str, dict[str, Any]] = {}
         self.droppable: dict[str, list[str]] = {}
+        self.volnfiles: dict["sqlite3.Cursor", int] = {}
+        self.volsize: dict["sqlite3.Cursor", int] = {}
         self.volstate: dict[str, str] = {}
         self.vol_act: dict[str, float] = {}
         self.busy_aps: set[str] = set()
@@ -260,6 +264,20 @@ class Up2k(object):
             ),
         }
         return json.dumps(ret, indent=4)
+
+    def get_volsize(self, ptop: str) -> tuple[int, int]:
+        with self.mutex:
+            return self._get_volsize(ptop)
+
+    def _get_volsize(self, ptop: str) -> tuple[int, int]:
+        cur = self.cur[ptop]
+        nbytes = self.volsize[cur]
+        nfiles = self.volnfiles[cur]
+        for j in list(self.registry.get(ptop, {}).values()):
+            nbytes += j["size"]
+            nfiles += 1
+
+        return (nbytes, nfiles)
 
     def rescan(
         self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool, fscan: bool
@@ -810,6 +828,8 @@ class Up2k(object):
         try:
             cur = self._open_db(db_path)
             self.cur[ptop] = cur
+            self.volsize[cur] = 0
+            self.volnfiles[cur] = 0
 
             # speeds measured uploading 520 small files on a WD20SPZX (SMR 2.5" 5400rpm 4kb)
             dbd = flags["dbd"]
@@ -916,6 +936,24 @@ class Up2k(object):
                 self._set_tagscan(db.c, True)
 
             db.c.connection.commit()
+
+            if vol.flags.get("vmaxb") or vol.flags.get("vmaxn"):
+                zs = "select count(sz), sum(sz) from up"
+                vn, vb = db.c.execute(zs).fetchone()
+                vb = vb or 0
+                vb += vn * 2048
+                self.volsize[db.c] = vb
+                self.volnfiles[db.c] = vn
+                vmaxb = unhumanize(vol.flags.get("vmaxb") or "0")
+                vmaxn = unhumanize(vol.flags.get("vmaxn") or "0")
+                t = "{} / {}  ( {} / {} files) in {}".format(
+                    humansize(vb, True),
+                    humansize(vmaxb, True),
+                    humansize(vn, True).rstrip("B"),
+                    humansize(vmaxn, True).rstrip("B"),
+                    vol.realpath,
+                )
+                self.log(t)
 
             return True, bool(n_add or n_rm or do_vac)
 
@@ -1092,7 +1130,7 @@ class Up2k(object):
                         top, rp, dts, lmod, dsz, sz
                     )
                     self.log(t)
-                    self.db_rm(db.c, rd, fn)
+                    self.db_rm(db.c, rd, fn, 0)
                     ret += 1
                     db.n += 1
                     in_db = []
@@ -1175,7 +1213,7 @@ class Up2k(object):
         rm_files = [x for x in hits if x not in seen_files]
         n_rm = len(rm_files)
         for fn in rm_files:
-            self.db_rm(db.c, rd, fn)
+            self.db_rm(db.c, rd, fn, 0)
 
         if n_rm:
             self.log("forgot {} deleted files".format(n_rm))
@@ -2284,7 +2322,9 @@ class Up2k(object):
             if lost:
                 c2 = None
                 for cur, dp_dir, dp_fn in lost:
-                    self.db_rm(cur, dp_dir, dp_fn)
+                    t = "forgetting deleted file: /{}"
+                    self.log(t.format(vjoin(vjoin(vfs.vpath, dp_dir), dp_fn)))
+                    self.db_rm(cur, dp_dir, dp_fn, cj["size"])
                     if c2 and c2 != cur:
                         c2.connection.commit()
 
@@ -2418,7 +2458,14 @@ class Up2k(object):
 
                 if vfs.lim:
                     ap2, cj["prel"] = vfs.lim.all(
-                        cj["addr"], cj["prel"], cj["size"], ap1, reg
+                        cj["addr"],
+                        cj["prel"],
+                        cj["size"],
+                        cj["ptop"],
+                        ap1,
+                        self.hub.broker,
+                        reg,
+                        "up2k._get_volsize",
                     )
                     bos.makedirs(ap2)
                     vfs.lim.nup(cj["addr"])
@@ -2736,7 +2783,7 @@ class Up2k(object):
 
             self._symlink(dst, d2, self.flags[ptop], lmod=lmod)
             if cur:
-                self.db_rm(cur, rd, fn)
+                self.db_rm(cur, rd, fn, job["size"])
                 self.db_add(cur, vflags, rd, fn, lmod, *z2[3:])
 
         if cur:
@@ -2779,7 +2826,7 @@ class Up2k(object):
 
         self.db_act = self.vol_act[ptop] = time.time()
         try:
-            self.db_rm(cur, rd, fn)
+            self.db_rm(cur, rd, fn, sz)
             self.db_add(
                 cur,
                 vflags,
@@ -2809,13 +2856,17 @@ class Up2k(object):
 
         return True
 
-    def db_rm(self, db: "sqlite3.Cursor", rd: str, fn: str) -> None:
+    def db_rm(self, db: "sqlite3.Cursor", rd: str, fn: str, sz: int) -> None:
         sql = "delete from up where rd = ? and fn = ?"
         try:
-            db.execute(sql, (rd, fn))
+            r = db.execute(sql, (rd, fn))
         except:
             assert self.mem_cur
-            db.execute(sql, s3enc(self.mem_cur, rd, fn))
+            r = db.execute(sql, s3enc(self.mem_cur, rd, fn))
+
+        if r.rowcount:
+            self.volsize[db] -= sz
+            self.volnfiles[db] -= 1
 
     def db_add(
         self,
@@ -2843,6 +2894,9 @@ class Up2k(object):
             rd, fn = s3enc(self.mem_cur, rd, fn)
             v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
             db.execute(sql, v)
+
+        self.volsize[db] += sz
+        self.volnfiles[db] += 1
 
         xau = False if skip_xau else vflags.get("xau")
         dst = djoin(ptop, rd, fn)
@@ -2991,12 +3045,12 @@ class Up2k(object):
                         break
 
                 abspath = djoin(adir, fn)
+                st = bos.stat(abspath)
                 volpath = "{}/{}".format(vrem, fn).strip("/")
                 vpath = "{}/{}".format(dbv.vpath, volpath).strip("/")
                 self.log("rm {}\n  {}".format(vpath, abspath))
                 _ = dbv.get(volpath, uname, *permsets[0])
                 if xbd:
-                    st = bos.stat(abspath)
                     if not runhook(
                         self.log,
                         xbd,
@@ -3020,14 +3074,26 @@ class Up2k(object):
                     try:
                         ptop = dbv.realpath
                         cur, wark, _, _, _, _ = self._find_from_vpath(ptop, volpath)
-                        self._forget_file(ptop, volpath, cur, wark, True)
+                        self._forget_file(ptop, volpath, cur, wark, True, st.st_size)
                     finally:
                         if cur:
                             cur.connection.commit()
 
                 bos.unlink(abspath)
                 if xad:
-                    runhook(self.log, xad, abspath, vpath, "", uname, 0, 0, ip, 0, "")
+                    runhook(
+                        self.log,
+                        xad,
+                        abspath,
+                        vpath,
+                        "",
+                        uname,
+                        st.st_mtime,
+                        st.st_size,
+                        ip,
+                        0,
+                        "",
+                    )
 
         if is_dir:
             ok, ng = rmdirs(self.log_func, scandir, True, atop, 1)
@@ -3203,7 +3269,7 @@ class Up2k(object):
             if c2 and c2 != c1:
                 self._copy_tags(c1, c2, w)
 
-            self._forget_file(svn.realpath, srem, c1, w, c1 != c2)
+            self._forget_file(svn.realpath, srem, c1, w, c1 != c2, fsize)
             self._relink(w, svn.realpath, srem, dabs)
             curs.add(c1)
 
@@ -3279,6 +3345,7 @@ class Up2k(object):
         cur: Optional["sqlite3.Cursor"],
         wark: Optional[str],
         drop_tags: bool,
+        sz: int,
     ) -> None:
         """forgets file in db, fixes symlinks, does not delete"""
         srd, sfn = vsplit(vrem)
@@ -3293,7 +3360,7 @@ class Up2k(object):
                 q = "delete from mt where w=?"
                 cur.execute(q, (wark[:16],))
 
-            self.db_rm(cur, srd, sfn)
+            self.db_rm(cur, srd, sfn, sz)
 
         reg = self.registry.get(ptop)
         if reg:

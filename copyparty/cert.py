@@ -10,6 +10,9 @@ from .util import Netdev, runcmd
 
 HAVE_CFSSL = True
 
+if True:  # pylint: disable=using-constant-test
+    from .util import RootLogger
+
 
 def ensure_cert(log: "RootLogger", args) -> None:
     """
