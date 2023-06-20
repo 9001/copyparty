@@ -2446,6 +2446,25 @@ class HttpCli(object):
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
 
+        xbu = vfs.flags.get("xbu")
+        if xbu:
+            if not runhook(
+                self.log,
+                xbu,
+                fp,
+                self.vpath,
+                self.host,
+                self.uname,
+                time.time(),
+                0,
+                self.ip,
+                time.time(),
+                "",
+            ):
+                t = "save blocked by xbu server config"
+                self.log(t, 1)
+                raise Pebkac(403, t)
+
         if bos.path.exists(fp):
             bos.unlink(fp)
 
@@ -2465,6 +2484,39 @@ class HttpCli(object):
         new_lastmod = bos.stat(fp).st_mtime
         new_lastmod3 = int(new_lastmod * 1000)
         sha512 = sha512[:56]
+
+        xau = vfs.flags.get("xau")
+        if xau and not runhook(
+            self.log,
+            xau,
+            fp,
+            self.vpath,
+            self.host,
+            self.uname,
+            new_lastmod,
+            sz,
+            self.ip,
+            new_lastmod,
+            "",
+        ):
+            t = "save blocked by xau server config"
+            self.log(t, 1)
+            os.unlink(fp)
+            raise Pebkac(403, t)
+
+        vfs, rem = vfs.get_dbv(rem)
+        self.conn.hsrv.broker.say(
+            "up2k.hash_file",
+            vfs.realpath,
+            vfs.vpath,
+            vfs.flags,
+            vsplit(rem)[0],
+            fn,
+            self.ip,
+            new_lastmod,
+            self.uname,
+            True,
+        )
 
         response = json.dumps(
             {"ok": True, "lastmod": new_lastmod3, "size": sz, "sha512": sha512}
