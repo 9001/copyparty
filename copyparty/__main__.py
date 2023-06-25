@@ -258,6 +258,19 @@ def get_fk_salt(cert_path) -> str:
     return ret.decode("utf-8")
 
 
+def get_ah_salt() -> str:
+    fp = os.path.join(E.cfg, "ah-salt.txt")
+    try:
+        with open(fp, "rb") as f:
+            ret = f.read().strip()
+    except:
+        ret = base64.b64encode(os.urandom(18))
+        with open(fp, "wb") as f:
+            f.write(ret + b"\n")
+
+    return ret.decode("utf-8")
+
+
 def ensure_locale() -> None:
     safe = "en_US.UTF-8"
     for x in [
@@ -622,6 +635,37 @@ def get_sects():
             """
             ),
         ],
+        [
+            "pwhash",
+            "password hashing",
+            dedent(
+                """
+            when \033[36m--ah-alg\033[0m is not the default [\033[32mnone\033[0m], all account passwords must be hashed
+
+            passwords can be hashed on the commandline with \033[36m--ah-gen\033[0m, but copyparty will also hash and print any passwords that are non-hashed (password which do not start with '+') and then terminate afterwards
+
+            \033[36m--ah-alg\033[0m specifies the hashing algorithm and a list of optional comma-separated arguments:
+
+            \033[36m--ah-alg argon2\033[0m  # which is the same as:
+            \033[36m--ah-alg argon2,3,256,4,19\033[0m
+            use argon2id with timecost 3, 256 MiB, 4 threads, version 19 (0x13/v1.3)
+
+            \033[36m--ah-alg scrypt\033[0m  # which is the same as:
+            \033[36m--ah-alg scrypt,13,2,8,4\033[0m
+            use scrypt with cost 2**13, 2 iterations, blocksize 8, 4 threads
+
+            \033[36m--ah-alg sha2\033[0m  # which is the same as:
+            \033[36m--ah-alg sha2,424242\033[0m
+            use sha2-512 with 424242 iterations
+
+            recommended: \033[32m--ah-alg argon2\033[0m
+
+            argon2 needs python-package argon2-cffi,
+            scrypt needs openssl,
+            sha2 is always available
+            """
+            ),
+        ],
     ]
 
 
@@ -844,7 +888,7 @@ def add_optouts(ap):
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (as specified by the 'lifetime' volflag)")
 
 
-def add_safety(ap, fk_salt):
+def add_safety(ap):
     ap2 = ap.add_argument_group('safety options')
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --unpost=0 --no-del --no-mv --hardlink --vague-403 --ban-404=50,60,1440 -nih")
@@ -852,8 +896,6 @@ def add_safety(ap, fk_salt):
     ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="do a sanity/safety check of all volumes on startup; arguments \033[33mUSER\033[0m,\033[33mVOL\033[0m,\033[33mFLAGS\033[0m; example [\033[32m**,*,ln,p,r\033[0m]")
     ap2.add_argument("--xvol", action="store_true", help="never follow symlinks leaving the volume root, unless the link is into another volume where the user has similar access (volflag=xvol)")
     ap2.add_argument("--xdev", action="store_true", help="stay within the filesystem of the volume root; do not descend into other devices (symlink or bind-mount to another HDD, ...) (volflag=xdev)")
-    ap2.add_argument("--salt", type=u, default="hunter2", help="up2k file-hash salt; serves no purpose, no reason to change this (but delete all databases if you do)")
-    ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files -- this one DOES matter")
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to make something a dotfile")
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
@@ -868,6 +910,16 @@ def add_safety(ap, fk_salt):
     ap2.add_argument("--loris", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for B minutes; disable with [\033[32m0\033[0m]")
     ap2.add_argument("--acao", metavar="V[,V]", type=u, default="*", help="Access-Control-Allow-Origin; list of origins (domains/IPs without port) to accept requests from; [\033[32mhttps://1.2.3.4\033[0m]. Default [\033[32m*\033[0m] allows requests from all sites but removes cookies and http-auth; only ?pw=hunter2 survives")
     ap2.add_argument("--acam", metavar="V[,V]", type=u, default="GET,HEAD", help="Access-Control-Allow-Methods; list of methods to accept from offsite ('*' behaves like described in --acao)")
+
+
+def add_salt(ap, fk_salt, ah_salt):
+    ap2 = ap.add_argument_group('salting options')
+    ap2.add_argument("--ah-alg", metavar="ALG", type=u, default="none", help="account-pw hashing algorithm; one of these, best to worst: argon2 scrypt sha2 none (each optionally followed by alg-specific comma-sep. config)")
+    ap2.add_argument("--ah-salt", metavar="SALT", type=u, default=ah_salt, help="account-pw salt; ignored if --ah-alg is none (default)")
+    ap2.add_argument("--ah-gen", metavar="PW", type=u, default="", help="generate hashed password for \033[33mPW\033[0m, or read passwords from STDIN if \033[33mPW\033[0m is [\033[32m-\033[0m]")
+    ap2.add_argument("--ah-cli", action="store_true", help="interactive shell which hashes passwords without ever storing or displaying the original passwords")
+    ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files")
+    ap2.add_argument("--warksalt", metavar="SALT", type=u, default="hunter2", help="up2k file-hash salt; serves no purpose, no reason to change this (but delete all databases if you do)")
 
 
 def add_shutdown(ap):
@@ -1030,6 +1082,7 @@ def run_argparse(
     cert_path = os.path.join(E.cfg, "cert.pem")
 
     fk_salt = get_fk_salt(cert_path)
+    ah_salt = get_ah_salt()
 
     hcores = min(CORES, 4)  # optimal on py3.11 @ r5-4500U
 
@@ -1053,7 +1106,8 @@ def run_argparse(
     add_ftp(ap)
     add_webdav(ap)
     add_smb(ap)
-    add_safety(ap, fk_salt)
+    add_safety(ap)
+    add_salt(ap, fk_salt, ah_salt)
     add_optouts(ap)
     add_shutdown(ap)
     add_yolo(ap)
@@ -1138,16 +1192,22 @@ def main(argv: Optional[list[str]] = None) -> None:
             supp = args_from_cfg(v)
             argv.extend(supp)
 
-    deprecated: list[tuple[str, str]] = []
+    deprecated: list[tuple[str, str]] = [("--salt", "--warksalt")]
     for dk, nk in deprecated:
-        try:
-            idx = argv.index(dk)
-        except:
+        idx = -1
+        ov = ""
+        for n, k in enumerate(argv):
+            if k == dk or k.startswith(dk + "="):
+                idx = n
+                if "=" in k:
+                    ov = "=" + k.split("=", 1)[1]
+
+        if idx < 0:
             continue
 
         msg = "\033[1;31mWARNING:\033[0;1m\n  {} \033[0;33mwas replaced with\033[0;1m {} \033[0;33mand will be removed\n\033[0m"
         lprint(msg.format(dk, nk))
-        argv[idx] = nk
+        argv[idx] = nk + ov
         time.sleep(2)
 
     da = len(argv) == 1

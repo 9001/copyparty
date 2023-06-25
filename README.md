@@ -85,6 +85,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [security](#security) - some notes on hardening
     * [gotchas](#gotchas) - behavior that might be unexpected
     * [cors](#cors) - cross-site request config
+    * [password hashing](#password-hashing) - you can hash passwords
     * [https](#https) - both HTTP and HTTPS are accepted
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
@@ -1568,6 +1569,17 @@ by default, except for `GET` and `HEAD` operations, all requests must either:
 cors can be configured with `--acao` and `--acam`, or the protections entirely disabled with `--allow-csrf`
 
 
+## password hashing
+
+you can hash passwords  before putting them into config files / providing them as arguments; see `--help-pwhash` for all the details
+
+basically, specify `--ah-alg argon2` to enable the feature and it will print the hashed passwords on startup so you can replace the plaintext ones
+
+optionally also specify `--ah-cli` to enter an interactive mode where it will hash passwords without ever writing the plaintext ones to disk
+
+the default configs take about 0.4 sec to process a new password on a decent laptop
+
+
 ## https
 
 both HTTP and HTTPS are accepted  by default, but letting a [reverse proxy](#reverse-proxy) handle the https/tls/ssl would be better (probably more secure by default)
@@ -1614,6 +1626,8 @@ mandatory deps:
 ## optional dependencies
 
 install these to enable bonus features
+
+enable hashed passwords in config: `argon2-cffi`
 
 enable ftp-server:
 * for just plaintext FTP, `pyftpdlib` (is built into the SFX)

@@ -173,13 +173,16 @@ class HttpCli(object):
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         ptn = self.asrv.re_pwd
         if ptn and ptn.search(msg):
-            msg = ptn.sub(self.unpwd, msg)
+            if self.asrv.ah.on:
+                msg = ptn.sub("\033[7m pw \033[27m", msg)
+            else:
+                msg = ptn.sub(self.unpwd, msg)
 
         self.log_func(self.log_src, msg, c)
 
     def unpwd(self, m: Match[str]) -> str:
-        a, b = m.groups()
-        return "=\033[7m {} \033[27m{}".format(self.asrv.iacct[a], b)
+        a, b, c = m.groups()
+        return "{}\033[7m {} \033[27m{}".format(a, self.asrv.iacct[b], c)
 
     def _check_nonfatal(self, ex: Pebkac, post: bool) -> bool:
         if post:
@@ -383,13 +386,14 @@ class HttpCli(object):
                 zs = base64.b64decode(zb).decode("utf-8")
                 # try "pwd", "x:pwd", "pwd:x"
                 for bauth in [zs] + zs.split(":", 1)[::-1]:
-                    if self.asrv.iacct.get(bauth):
+                    hpw = self.asrv.ah.hash(bauth)
+                    if self.asrv.iacct.get(hpw):
                         break
             except:
                 pass
 
         self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw
-        self.uname = self.asrv.iacct.get(self.pw) or "*"
+        self.uname = self.asrv.iacct.get(self.asrv.ah.hash(self.pw)) or "*"
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
         self.mvol = self.asrv.vfs.amove[self.uname]
@@ -1968,7 +1972,7 @@ class HttpCli(object):
         return True
 
     def get_pwd_cookie(self, pwd: str) -> str:
-        if pwd in self.asrv.iacct:
+        if self.asrv.ah.hash(pwd) in self.asrv.iacct:
             msg = "login ok"
             dur = int(60 * 60 * self.args.logout)
         else:

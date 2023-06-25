@@ -112,7 +112,7 @@ class Up2k(object):
         self.args = hub.args
         self.log_func = hub.log
 
-        self.salt = self.args.salt
+        self.salt = self.args.warksalt
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
 
         self.gid = 0

@@ -15,6 +15,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
             "libkeyfinder-git: detection of musical keys" 
             "qm-vamp-plugins: BPM detection" 
             "python-pyopenssl: ftps functionality" 
+            "python-argon2_cffi: hashed passwords in config" 
             "python-impacket-git: smb support (bad idea)"
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")

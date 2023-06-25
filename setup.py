@@ -140,6 +140,7 @@ args = {
         "audiotags": ["mutagen"],
         "ftpd": ["pyftpdlib"],
         "ftps": ["pyftpdlib", "pyopenssl"],
+        "pwhash": ["argon2-cffi"],
     },
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
     "scripts": ["bin/partyfuse.py", "bin/u2c.py"],

@@ -69,7 +69,7 @@ class U2idx(object):
 
         fsize = body["size"]
         fhash = body["hash"]
-        wark = up2k_wark_from_hashlist(self.args.salt, fsize, fhash)
+        wark = up2k_wark_from_hashlist(self.args.warksalt, fsize, fhash)
 
         uq = "substr(w,1,16) = ? and w = ?"
         uv: list[Union[str, int]] = [wark[:16], wark]

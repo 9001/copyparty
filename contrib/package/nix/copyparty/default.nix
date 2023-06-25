@@ -1,4 +1,7 @@
-{ lib, stdenv, makeWrapper, fetchurl, utillinux, python, jinja2, impacket, pyftpdlib, pyopenssl, pillow, pyvips, ffmpeg, mutagen,
+{ lib, stdenv, makeWrapper, fetchurl, utillinux, python, jinja2, impacket, pyftpdlib, pyopenssl, argon2-cffi, pillow, pyvips, ffmpeg, mutagen,
+
+# use argon2id-hashed passwords in config files (sha2 is always available)
+withHashedPasswords ? true,
 
 # create thumbnails with Pillow; faster than FFmpeg / MediaProcessing
 withThumbnails ? true,
@@ -35,6 +38,7 @@ let
     ++ lib.optional withFastThumbnails pyvips
     ++ lib.optional withMediaProcessing ffmpeg
     ++ lib.optional withBasicAudioMetadata mutagen
+    ++ lib.optional withHashedPasswords argon2-cffi
     );
 in stdenv.mkDerivation {
   pname = "copyparty";

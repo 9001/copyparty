@@ -15,6 +15,7 @@ from datetime import datetime
 from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
+from .pwhash import PWHash
 from .util import (
     IMPLICATIONS,
     META_NOBOTS,
@@ -757,6 +758,7 @@ class AuthSrv(object):
         warn_anonwrite: bool = True,
         dargs: Optional[argparse.Namespace] = None,
     ) -> None:
+        self.ah = PWHash(args)
         self.args = args
         self.dargs = dargs or args
         self.log_func = log_func
@@ -1133,6 +1135,8 @@ class AuthSrv(object):
                     t = t.format(self.line_ctr, cfg_fn)
                     self.log("\n{0}\n{1}{0}".format(t, "\n".join(slns)))
                     raise
+
+        self.setup_pwhash()
 
         # case-insensitive; normalize
         if WINDOWS:
@@ -1574,6 +1578,10 @@ class AuthSrv(object):
             self.log(t, 1)
             errors = True
 
+        if self.args.smb and self.ah.on and acct:
+            self.log("--smb can only be used when --ah-alg is none", 1)
+            errors = True
+
         for vol in vfs.all_vols.values():
             for k in list(vol.flags.keys()):
                 if re.match("^-[^-]+$", k):
@@ -1643,7 +1651,54 @@ class AuthSrv(object):
             self.re_pwd = None
             pwds = [re.escape(x) for x in self.iacct.keys()]
             if pwds:
-                self.re_pwd = re.compile("=(" + "|".join(pwds) + ")([]&; ]|$)")
+                if self.ah.on:
+                    zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
+                else:
+                    zs = r"(\[H\] pw:.*|=)(" + "|".join(pwds) + r")([]&; ]|$)"
+
+                self.re_pwd = re.compile(zs)
+
+    def setup_pwhash(self) -> None:
+        self.ah = PWHash(self.args)
+        if self.ah.alg == "none":
+            return
+
+        if self.args.ah_cli:
+            self.ah.cli()
+            sys.exit()
+        elif self.args.ah_gen == "-":
+            self.ah.stdin()
+            sys.exit()
+        elif self.args.ah_gen:
+            print(self.ah.hash(self.args.ah_gen))
+            sys.exit()
+
+        if not self.args.a:
+            return
+
+        changed = False
+        for acct in self.args.a[:]:
+            uname, pw = acct.split(":", 1)
+            if pw.startswith("+") and len(pw) == 33:
+                continue
+
+            changed = True
+            hpw = self.ah.hash(pw)
+            self.args.a.remove(acct)
+            self.args.a.append("{}:{}".format(uname, hpw))
+            t = "hashed password for account {}: {}"
+            self.log(t.format(uname, hpw), 3)
+
+        if not changed:
+            return
+
+        lns = []
+        for acct in self.args.a:
+            uname, pw = acct.split(":", 1)
+            lns.append("  {}: {}".format(uname, pw))
+
+        t = "please use the following hashed passwords in your config:\n{}"
+        self.log(t.format("\n".join(lns)), 3)
 
     def chk_sqlite_threadsafe(self) -> str:
         v = SQLITE_VER[-1:]
