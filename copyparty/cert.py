@@ -121,6 +121,9 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
             names.append(ip.split("/")[0])
     if args.crt_nolo:
         names = [x for x in names if x not in ("localhost", "127.0.0.1", "::1")]
+    if not args.crt_nohn:
+        names.append(args.name)
+        names.append(args.name + ".local")
     if not names:
         names = ["127.0.0.1"]
     if "127.0.0.1" in names or "::1" in names:

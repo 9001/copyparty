@@ -1573,7 +1573,7 @@ cors can be configured with `--acao` and `--acam`, or the protections entirely d
 
 you can hash passwords  before putting them into config files / providing them as arguments; see `--help-pwhash` for all the details
 
-basically, specify `--ah-alg argon2` to enable the feature and it will print the hashed passwords on startup so you can replace the plaintext ones
+`--ah-alg argon2` enables it, and if you have any plaintext passwords then it'll print the hashed versions on startup so you can replace them
 
 optionally also specify `--ah-cli` to enter an interactive mode where it will hash passwords without ever writing the plaintext ones to disk
 

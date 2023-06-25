@@ -774,6 +774,7 @@ def add_cert(ap, cert_path):
     ap2.add_argument("--crt-exact", action="store_true", help="do not add wildcard entries for each --crt-ns")
     ap2.add_argument("--crt-noip", action="store_true", help="do not add autodetected IP addresses into cert")
     ap2.add_argument("--crt-nolo", action="store_true", help="do not add 127.0.0.1 / localhost into cert")
+    ap2.add_argument("--crt-nohn", action="store_true", help="do not add mDNS names / hostname into cert")
     ap2.add_argument("--crt-dir", metavar="PATH", default=cert_dir, help="where to save the CA cert")
     ap2.add_argument("--crt-cdays", metavar="D", type=float, default=3650, help="ca-certificate expiration time in days")
     ap2.add_argument("--crt-sdays", metavar="D", type=float, default=365, help="server-cert expiration time in days")
