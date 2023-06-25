@@ -159,8 +159,8 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     window.onerror = undefined;
     var html = [
         '<h1>you hit a bug!</h1>',
-        '<p style="font-size:1.3em;margin:0">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a> / <a href="?b=u">basic</a></p>',
-        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">github issue</a></p>',
+        '<p style="font-size:1.3em;margin:0;line-height:2em">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a> / <a href="?b=u">basic</a></p>',
+        '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">new github issue</a></p>',
         '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)).replace(/\n/g, '<br />') + '</p>',
         '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
     ];
@@ -225,7 +225,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
                 '#exbox{background:#222;color:#ddd;font-family:sans-serif;font-size:0.8em;padding:0 1em 1em 1em;z-index:80386;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;overflow:auto;width:calc(100% - 2em)} ' +
                 '#exbox,#exbox *{line-height:1.5em;overflow-wrap:break-word} ' +
                 '#exbox code{color:#bf7;background:#222;padding:.1em;margin:.2em;font-size:1.1em;font-family:monospace,monospace} ' +
-                '#exbox a{text-decoration:underline;color:#fc0} ' +
+                '#exbox a{text-decoration:underline;color:#fc0;background:#222;border:none} ' +
                 '#exbox h1{margin:.5em 1em 0 0;padding:0} ' +
                 '#exbox p.b{border-top:1px solid #999;margin:1em 0 0 0;font-size:1em} ' +
                 '#exbox ul, #exbox li {margin:0 0 0 .5em;padding:0} ' +
@@ -1786,16 +1786,17 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status < 400 && xhr.status >= 200)
         return true;
 
-    if (xhr.status == 403)
+    var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
+        fun = toast[lvl || 'err'],
+        is_cf = /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser|\/chall[e]nge-platform|"chall[e]nge-error|nable Ja[v]aScript and cook/.test(errtxt);
+
+    if (xhr.status == 403 && !is_cf)
         return toast.err(0, prefix + (L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"), tag);
 
     if (xhr.status == 404)
         return toast.err(0, prefix + e404, tag);
 
-    var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
-        fun = toast[lvl || 'err'];
-
-    if (xhr.status == 503 && /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser/.test(errtxt)) {
+    if (is_cf && (xhr.status == 403 || xhr.status == 503)) {
         var now = Date.now(), td = now - cf_cha_t;
         if (td < 15000)
             return;

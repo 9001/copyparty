@@ -3080,6 +3080,8 @@ function eval_hash() {
 	// compact media player
 	function setacmp() {
 		clmod(ebi('widget'), 'cmp', props.mcmp);
+		pbar.onresize();
+		vbar.onresize();
 	}
 	bcfg_bind(props, 'mcmp', 'au_compact', false, setacmp);
 	setacmp();
