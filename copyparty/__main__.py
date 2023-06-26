@@ -659,6 +659,7 @@ def get_sects():
             use sha2-512 with 424242 iterations
 
             recommended: \033[32m--ah-alg argon2\033[0m
+              (takes about 0.4 sec and 256M RAM to process a new password)
 
             argon2 needs python-package argon2-cffi,
             scrypt needs openssl,

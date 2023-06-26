@@ -20,9 +20,12 @@ class PWHash(object):
             alg = args.ah_alg
             ac = {}
 
+        if alg == "none":
+            alg = ""
+
         self.alg = alg
         self.ac = ac
-        if alg == "none":
+        if not alg:
             self.on = False
             self.hash = unicode
             return

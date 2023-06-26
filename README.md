@@ -1577,7 +1577,7 @@ you can hash passwords  before putting them into config files / providing them a
 
 optionally also specify `--ah-cli` to enter an interactive mode where it will hash passwords without ever writing the plaintext ones to disk
 
-the default configs take about 0.4 sec to process a new password on a decent laptop
+the default configs take about 0.4 sec and 256 MiB RAM to process a new password on a decent laptop
 
 
 ## https

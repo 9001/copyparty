@@ -1136,7 +1136,7 @@ class AuthSrv(object):
                     self.log("\n{0}\n{1}{0}".format(t, "\n".join(slns)))
                     raise
 
-        self.setup_pwhash()
+        self.setup_pwhash(acct)
 
         # case-insensitive; normalize
         if WINDOWS:
@@ -1658,9 +1658,9 @@ class AuthSrv(object):
 
                 self.re_pwd = re.compile(zs)
 
-    def setup_pwhash(self) -> None:
+    def setup_pwhash(self, acct: dict[str, str]) -> None:
         self.ah = PWHash(self.args)
-        if self.ah.alg == "none":
+        if not self.ah.on:
             return
 
         if self.args.ah_cli:
@@ -1673,19 +1673,17 @@ class AuthSrv(object):
             print(self.ah.hash(self.args.ah_gen))
             sys.exit()
 
-        if not self.args.a:
+        if not acct:
             return
 
         changed = False
-        for acct in self.args.a[:]:
-            uname, pw = acct.split(":", 1)
+        for uname, pw in list(acct.items())[:]:
             if pw.startswith("+") and len(pw) == 33:
                 continue
 
             changed = True
             hpw = self.ah.hash(pw)
-            self.args.a.remove(acct)
-            self.args.a.append("{}:{}".format(uname, hpw))
+            acct[uname] = hpw
             t = "hashed password for account {}: {}"
             self.log(t.format(uname, hpw), 3)
 
@@ -1693,8 +1691,7 @@ class AuthSrv(object):
             return
 
         lns = []
-        for acct in self.args.a:
-            uname, pw = acct.split(":", 1)
+        for uname, pw in acct.items():
             lns.append("  {}: {}".format(uname, pw))
 
         t = "please use the following hashed passwords in your config:\n{}"
