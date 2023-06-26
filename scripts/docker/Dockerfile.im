@@ -9,7 +9,7 @@ ENV     PYTHONPYCACHEPREFIX=/tmp/pyc
 
 RUN     apk --no-cache add !pyc \
             wget \
-            py3-pillow py3-mutagen \
+            py3-argon2-cffi py3-pillow py3-mutagen \
         && rm -rf /tmp/pyc \
         && mkdir /cfg /w \
         && chmod 777 /cfg /w \

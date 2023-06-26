@@ -12,7 +12,7 @@ COPY    i/bin/mtag/audio-bpm.py /mtag/
 COPY    i/bin/mtag/audio-key.py /mtag/
 RUN     apk add -U !pyc \
             wget \
-            py3-pillow py3-pip py3-cffi \
+            py3-argon2-cffi py3-pillow py3-pip py3-cffi \
             ffmpeg \
             vips-jxl vips-heif vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
