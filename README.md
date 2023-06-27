@@ -1228,6 +1228,19 @@ the party might be closer than you think
 now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
 
 
+## fedora package
+
+now [available on copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/)  , maintained autonomously -- [track record](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/package/python-copyparty/) seems OK
+
+```bash
+dnf copr enable @copr/PyPI
+dnf install python3-copyparty  # just a minimal install, or... 
+dnf install python3-{copyparty,pillow,argon2-cffi,pyftpdlib,pyOpenSSL} ffmpeg-free  # with recommended deps
+```
+
+this *may* also work on RHEL but [I'm not paying IBM to verify that](https://www.jeffgeerling.com/blog/2023/dear-red-hat-are-you-dumb)
+
+
 ## nix package
 
 `nix profile install github:9001/copyparty`
