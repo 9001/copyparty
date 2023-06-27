@@ -72,6 +72,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
+    * [fedora package](#fedora-package) - now [available on copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/)
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
 * [browser support](#browser-support) - TLDR: yes

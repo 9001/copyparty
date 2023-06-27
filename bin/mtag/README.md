@@ -24,6 +24,15 @@ these do not have any problematic dependencies at all:
   * also available as an [event hook](../hooks/wget.py)
 
 
+## dangerous plugins
+
+plugins in this section should only be used with appropriate precautions:
+
+* [very-bad-idea.py](./very-bad-idea.py) combined with [meadup.js](https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/meadup.js) converts copyparty into a janky yet extremely flexible chromecast clone
+  * also adds a virtual keyboard by @steinuil to the basic-upload tab for comfy couch crowd control
+  * anything uploaded through the [android app](https://github.com/9001/party-up) (files or links) are executed on the server, meaning anyone can infect your PC with malware... so protect this with a password and keep it on a LAN!
+
+
 # dependencies
 
 run [`install-deps.sh`](install-deps.sh) to build/install most dependencies required by these programs (supports windows/linux/macos)

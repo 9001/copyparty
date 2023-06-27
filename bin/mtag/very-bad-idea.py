@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
 """
+WARNING -- DANGEROUS PLUGIN --
+  if someone is able to upload files to a copyparty which is
+  running this plugin, they can execute malware on your machine
+  so please keep this on a LAN and protect it with a password
+
 use copyparty as a chromecast replacement:
   * post a URL and it will open in the default browser
   * upload a file and it will open in the default application
@@ -12,11 +17,9 @@ the android app makes it a breeze to post pics and links:
   https://github.com/9001/party-up/releases
   (iOS devices have to rely on the web-UI)
 
-goes without saying, but this is HELLA DANGEROUS,
-  GIVES RCE TO ANYONE WHO HAVE UPLOAD PERMISSIONS
-
-example copyparty config to use this:
-  --urlform save,get -v.::w:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,c0,bin/mtag/very-bad-idea.py
+example copyparty config to use this;
+lets the user "kevin" with password "hunter2" use this plugin:
+  -a kevin:hunter2 --urlform save,get -v.::w,kevin:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,c0,bin/mtag/very-bad-idea.py
 
 recommended deps:
   apt install xdotool libnotify-bin
