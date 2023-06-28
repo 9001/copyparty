@@ -15,14 +15,17 @@ use copyparty as a chromecast replacement:
 
 the android app makes it a breeze to post pics and links:
   https://github.com/9001/party-up/releases
-  (iOS devices have to rely on the web-UI)
+
+iOS devices can use the web-UI or the shortcut instead:
+  https://github.com/9001/copyparty#ios-shortcuts
 
 example copyparty config to use this;
 lets the user "kevin" with password "hunter2" use this plugin:
   -a kevin:hunter2 --urlform save,get -v.::w,kevin:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,c0,bin/mtag/very-bad-idea.py
 
 recommended deps:
-  apt install xdotool libnotify-bin
+  apt install xdotool libnotify-bin mpv
+  python3 -m pip install --user -U streamlink yt-dlp
   https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/meadup.js
 
 and you probably want `twitter-unmute.user.js` from the res folder
@@ -66,8 +69,10 @@ set -e
 EOF
 chmod 755 /usr/local/bin/chromium-browser
 
-# start the server  (note: replace `-v.::rw:` with `-v.::w:` to disallow retrieving uploaded stuff)
-cd ~/Downloads; python3 copyparty-sfx.py --urlform save,get -v.::rw:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,very-bad-idea.py
+# start the server
+# note 1: replace hunter2 with a better password to access the server
+# note 2: replace `-v.::rw` with `-v.::w` to disallow retrieving uploaded stuff
+cd ~/Downloads; python3 copyparty-sfx.py -a kevin:hunter2 --urlform save,get -v.::rw,kevin:c,e2d,e2t,mte=+a1:c,mtp=a1=ad,kn,very-bad-idea.py
 
 """
 
@@ -75,11 +80,23 @@ cd ~/Downloads; python3 copyparty-sfx.py --urlform save,get -v.::rw:c,e2d,e2t,mt
 import os
 import sys
 import time
+import shutil
 import subprocess as sp
 from urllib.parse import unquote_to_bytes as unquote
+from urllib.parse import quote
+
+have_mpv = shutil.which("mpv")
+have_vlc = shutil.which("vlc")
 
 
 def main():
+    if len(sys.argv) > 2 and sys.argv[1] == "x":
+        # invoked on commandline for testing;
+        # python3 very-bad-idea.py x msg=https://youtu.be/dQw4w9WgXcQ
+        txt = " ".join(sys.argv[2:])
+        txt = quote(txt.replace(" ", "+"))
+        return open_post(txt.encode("utf-8"))
+
     fp = os.path.abspath(sys.argv[1])
     with open(fp, "rb") as f:
         txt = f.read(4096)
@@ -95,7 +112,7 @@ def open_post(txt):
     try:
         k, v = txt.split(" ", 1)
     except:
-        open_url(txt)
+        return open_url(txt)
 
     if k == "key":
         sp.call(["xdotool", "key"] + v.split(" "))
@@ -131,12 +148,58 @@ def open_url(txt):
     # else:
     #    sp.call(["xdotool", "getactivewindow", "windowminimize"])  # minimizes the focused windo
 
+    # mpv is probably smart enough to use streamlink automatically
+    if try_mpv(txt):
+        print("mpv got it")
+        return
+
+    # or maybe streamlink would be a good choice to open this
+    if try_streamlink(txt):
+        print("streamlink got it")
+        return
+
+    # nope,
     # close any error messages:
     sp.call(["xdotool", "search", "--name", "Error", "windowclose"])
     # sp.call(["xdotool", "key", "ctrl+alt+d"])  # doesnt work at all
     # sp.call(["xdotool", "keydown", "--delay", "100", "ctrl+alt+d"])
     # sp.call(["xdotool", "keyup", "ctrl+alt+d"])
     sp.call(["xdg-open", txt])
+
+
+def try_mpv(url):
+    t0 = time.time()
+    try:
+        print("trying mpv...")
+        sp.check_call(["mpv", "--fs", url])
+        return True
+    except:
+        # if it ran for 15 sec it probably succeeded and terminated
+        t = time.time()
+        return t - t0 > 15
+
+
+def try_streamlink(url):
+    t0 = time.time()
+    try:
+        import streamlink
+
+        print("trying streamlink...")
+        streamlink.Streamlink().resolve_url(url)
+
+        if have_mpv:
+            args = "-m streamlink -p mpv -a --fs"
+        else:
+            args = "-m streamlink"
+
+        cmd = [sys.executable] + args.split() + [url, "best"]
+        t0 = time.time()
+        sp.check_call(cmd)
+        return True
+    except:
+        # if it ran for 10 sec it probably succeeded and terminated
+        t = time.time()
+        return t - t0 > 10
 
 
 main()
