@@ -533,8 +533,8 @@ def get_sects():
             "use plugins to handle certain events",
             dedent(
                 """
-            usually copyparty returns a 404 if a file does not exist, and
-            403 if a user tries to access a file they don't have access to
+            usually copyparty returns a \033[33m404\033[0m if a file does not exist, and
+            \033[33m403\033[0m if a user tries to access a file they don't have access to
 
             you can load a plugin which will be invoked right before this
             happens, and the plugin can choose to override this behavior
@@ -543,31 +543,30 @@ def get_sects():
              --on404 ~/partyhandlers/not404.py
              -v .::r:c,on404=~/partyhandlers/not404.py
             \033[0m
-
-            the file must define a `main(cli,vn,rem)` function:
-             cli: the HttpCli instance
-             vn:  the VFS which overlaps with the requested URL
-             rem: the remainder of the URL below the VFS mountpoint
+            the file must define the function \033[35mmain(cli,vn,rem)\033[0m:
+             \033[35mcli\033[0m: the copyparty HttpCli instance
+             \033[35mvn\033[0m:  the VFS which overlaps with the requested URL
+             \033[35mrem\033[0m: the remainder of the URL below the VFS mountpoint
 
             `main` must return a string; one of the following:
 
-            > "true": the plugin has responded to the request,
+            > \033[32m"true"\033[0m: the plugin has responded to the request,
                 and the TCP connection should be kept open
 
-            > "false": the plugin has responded to the request,
+            > \033[32m"false"\033[0m: the plugin has responded to the request,
                 and the TCP connection should be terminated
 
-            > "retry": the plugin has done something to resolve the 404
+            > \033[32m"retry"\033[0m: the plugin has done something to resolve the 404
                 situation, and copyparty should reattempt reading the file.
                 if it still fails, a regular 404 will be returned
 
-            > "allow": should ignore the insufficient permissions
+            > \033[32m"allow"\033[0m: should ignore the insufficient permissions
                 and let the client continue anyways
 
-            > "": the plugin has not handled the request;
+            > \033[32m""\033[0m: the plugin has not handled the request;
                 try the next plugin or return the usual 404 or 403
 
-            PS! the folder that contains the python file should ideally
+            \033[1;35mPS!\033[0m the folder that contains the python file should ideally
               not contain many other python files, and especially nothing
               with filenames that overlap with modules used by copyparty
             """
