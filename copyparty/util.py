@@ -2727,6 +2727,34 @@ def runhook(
     return True
 
 
+def loadpy(ap: str, hot: bool) -> Any:
+    """
+    a nice can of worms capable of causing all sorts of bugs
+    depending on what other inconveniently named files happen
+    to be in the same folder
+    """
+    if ap.startswith("~"):
+        ap = os.path.expanduser(ap)
+
+    mdir, mfile = os.path.split(absreal(ap))
+    mname = mfile.rsplit(".", 1)[0]
+    sys.path.insert(0, mdir)
+
+    if PY2:
+        mod = __import__(mname)
+        if hot:
+            reload(mod)
+    else:
+        import importlib
+
+        mod = importlib.import_module(mname)
+        if hot:
+            importlib.reload(mod)
+
+    sys.path.remove(mdir)
+    return mod
+
+
 def gzip_orig_sz(fn: str) -> int:
     with open(fsenc(fn), "rb") as f:
         f.seek(-4, 2)

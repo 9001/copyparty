@@ -66,6 +66,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
     * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
+    * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
@@ -1125,6 +1126,13 @@ note that this is way more complicated than the new [event hooks](#event-hooks) 
 * only trigger on new unique files, not dupes
 
 note that it will occupy the parsing threads, so fork anything expensive (or set `kn` to have copyparty fork it for you) -- otoh if you want to intentionally queue/singlethread you can combine it with `--mtag-mt 1`
+
+
+## handlers
+
+redefine behavior with plugins ([examples](./bin/handlers/))
+
+replace 404 and 403 errors with something completely different (that's it for now)
 
 
 ## hiding from google

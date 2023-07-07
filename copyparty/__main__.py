@@ -529,6 +529,51 @@ def get_sects():
             + build_flags_desc(),
         ],
         [
+            "handlers",
+            "use plugins to handle certain events",
+            dedent(
+                """
+            usually copyparty returns a 404 if a file does not exist, and
+            403 if a user tries to access a file they don't have access to
+
+            you can load a plugin which will be invoked right before this
+            happens, and the plugin can choose to override this behavior
+
+            load the plugin using --args or volflags; for example \033[36m
+             --on404 ~/partyhandlers/not404.py
+             -v .::r:c,on404=~/partyhandlers/not404.py
+            \033[0m
+
+            the file must define a `main(cli,vn,rem)` function:
+             cli: the HttpCli instance
+             vn:  the VFS which overlaps with the requested URL
+             rem: the remainder of the URL below the VFS mountpoint
+
+            `main` must return a string; one of the following:
+
+            > "true": the plugin has responded to the request,
+                and the TCP connection should be kept open
+
+            > "false": the plugin has responded to the request,
+                and the TCP connection should be terminated
+
+            > "retry": the plugin has done something to resolve the 404
+                situation, and copyparty should reattempt reading the file.
+                if it still fails, a regular 404 will be returned
+
+            > "allow": should ignore the insufficient permissions
+                and let the client continue anyways
+
+            > "": the plugin has not handled the request;
+                try the next plugin or return the usual 404 or 403
+
+            PS! the folder that contains the python file should ideally
+              not contain many other python files, and especially nothing
+              with filenames that overlap with modules used by copyparty
+            """
+            ),
+        ],
+        [
             "hooks",
             "execute commands before/after various events",
             dedent(
@@ -858,6 +903,13 @@ def add_smb(ap):
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
 
 
+def add_handlers(ap):
+    ap2 = ap.add_argument_group('handlers (see --help-handlers)')
+    ap2.add_argument("--on404", metavar="PY", type=u, action="append", help="handle 404s by executing PY file")
+    ap2.add_argument("--on403", metavar="PY", type=u, action="append", help="handle 403s by executing PY file")
+    ap2.add_argument("--hot-handlers", action="store_true", help="reload handlers on each request -- expensive but convenient when hacking on stuff")
+
+
 def add_hooks(ap):
     ap2 = ap.add_argument_group('event hooks (see --help-hooks)')
     ap2.add_argument("--xbu", metavar="CMD", type=u, action="append", help="execute CMD before a file upload starts")
@@ -1113,6 +1165,7 @@ def run_argparse(
     add_optouts(ap)
     add_shutdown(ap)
     add_yolo(ap)
+    add_handlers(ap)
     add_hooks(ap)
     add_ui(ap, retry)
     add_admin(ap)

@@ -58,6 +58,7 @@ from .util import (
     html_escape,
     humansize,
     ipnorm,
+    loadpy,
     min_ex,
     quotep,
     rand_name,
@@ -767,11 +768,27 @@ class HttpCli(object):
             return True
 
         if not self.can_read and not self.can_write and not self.can_get:
-            if self.vpath:
-                self.log("inaccessible: [{}]".format(self.vpath))
-                return self.tx_404(True)
+            t = "@{} has no access to [{}]"
+            self.log(t.format(self.uname, self.vpath))
 
-            self.uparam["h"] = ""
+            if self.avn and "on403" in self.avn.flags:
+                vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+                ret = self.on40x(vn.flags["on403"], vn, rem)
+                if ret == "true":
+                    return True
+                elif ret == "false":
+                    return False
+                elif ret == "allow":
+                    self.log("plugin override; access permitted")
+                    self.can_read = self.can_write = self.can_move = True
+                    self.can_delete = self.can_get = self.can_upget = True
+                else:
+                    return self.tx_404(True)
+            else:
+                if self.vpath:
+                    return self.tx_404(True)
+
+                self.uparam["h"] = ""
 
         if "tree" in self.uparam:
             return self.tx_tree()
@@ -3056,6 +3073,20 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"), status=rc)
         return True
 
+    def on40x(self, mods: list[str], vn: VFS, rem: str) -> str:
+        for mpath in mods:
+            try:
+                mod = loadpy(mpath, self.args.hot_handlers)
+            except Exception as ex:
+                self.log("import failed: {!r}".format(ex))
+                continue
+
+            ret = mod.main(self, vn, rem)
+            if ret:
+                return ret.lower()
+
+        return ""  # unhandled / fallthrough
+
     def scanvol(self) -> bool:
         if not self.can_read or not self.can_write:
             raise Pebkac(403, "not allowed for user " + self.uname)
@@ -3373,7 +3404,21 @@ class HttpCli(object):
         try:
             st = bos.stat(abspath)
         except:
-            return self.tx_404()
+            if "on404" not in vn.flags:
+                return self.tx_404()
+
+            ret = self.on40x(vn.flags["on404"], vn, rem)
+            if ret == "true":
+                return True
+            elif ret == "false":
+                return False
+            elif ret == "retry":
+                try:
+                    st = bos.stat(abspath)
+                except:
+                    return self.tx_404()
+            else:
+                return self.tx_404()
 
         if rem.startswith(".hist/up2k.") or (
             rem.endswith("/dir.txt") and rem.startswith(".hist/th/")

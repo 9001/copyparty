@@ -125,6 +125,10 @@ flagcats = {
         "dathumb": "disables audio thumbnails (spectrograms)",
         "dithumb": "disables image thumbnails",
     },
+    "handlers\n(better explained in --help-handlers)": {
+        "on404=PY": "handle 404s by executing PY file",
+        "on403=PY": "handle 403s by executing PY file",
+    },
     "event hooks\n(better explained in --help-hooks)": {
         "xbu=CMD": "execute CMD before a file upload starts",
         "xau=CMD": "execute CMD after  a file upload finishes",

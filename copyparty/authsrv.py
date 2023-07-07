@@ -1047,7 +1047,7 @@ class AuthSrv(object):
             flags[name] = True
             return
 
-        if name not in "mtp xbu xau xiu xbr xar xbd xad xm".split():
+        if name not in "mtp xbu xau xiu xbr xar xbd xad xm on404 on403".split():
             if value is True:
                 t = "└─add volflag [{}] = {}  ({})"
             else:
@@ -1446,7 +1446,7 @@ class AuthSrv(object):
 
             # append additive args from argv to volflags
             hooks = "xbu xau xiu xbr xar xbd xad xm".split()
-            for name in ["mtp"] + hooks:
+            for name in "mtp on404 on403".split() + hooks:
                 self._read_volflag(vol.flags, name, getattr(self.args, name), True)
 
             for hn in hooks:
@@ -1835,7 +1835,7 @@ class AuthSrv(object):
         ]
 
         csv = set("i p".split())
-        lst = set("c ihead mtm mtp xad xar xau xiu xbd xbr xbu xm".split())
+        lst = set("c ihead mtm mtp xad xar xau xiu xbd xbr xbu xm on404 on403".split())
         askip = set("a v c vc cgen theme".split())
 
         # keymap from argv to vflag
