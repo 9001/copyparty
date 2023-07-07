@@ -35,7 +35,7 @@ class Ico(object):
             h = int(100 / (float(sw) / float(sh)))
             w = 100
 
-        if chrome and as_thumb:
+        if chrome:
             # cannot handle more than ~2000 unique SVGs
             if HAVE_PIL:
                 # svg: 3s, cache: 6s, this: 8s
@@ -45,8 +45,19 @@ class Ico(object):
                 w = 64
                 img = Image.new("RGB", (w, h), "#" + c[:6])
                 pb = ImageDraw.Draw(img)
-                tw, th = pb.textsize(ext)
-                pb.text(((w - tw) // 2, (h - th) // 2), ext, fill="#" + c[6:])
+                try:
+                    _, _, tw, th = pb.textbbox((0, 0), ext)
+                except:
+                    tw, th = pb.textsize(ext)
+
+                tw += len(ext)
+                cw = tw // len(ext)
+                x = ((w - tw) // 2) - (cw * 2) // 3
+                fill = "#" + c[6:]
+                for ch in ext:
+                    pb.text((x, (h - th) // 2), " %s " % (ch,), fill=fill)
+                    x += cw
+
                 img = img.resize((w * 3, h * 3), Image.NEAREST)
 
                 buf = BytesIO()
