@@ -55,6 +55,7 @@
 	--u2-sbtn-b1: #999;
 	--u2-txt-bg: var(--bg-u5);
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
+	--u2-tab-b1: rgba(128,128,128,0.8);
 	--u2-tab-1-fg: #fd7;
 	--u2-tab-1-bg: linear-gradient(to bottom, var(#353), var(--bg) 80%);
 	--u2-tab-1-b1: #7c5;
@@ -270,6 +271,7 @@ html.bz {
 	--btn-1h-fg: #000;
 	--txt-sh: a;
 
+	--u2-tab-b1: var(--bg-u5);
 	--u2-tab-1-fg: var(--fg-max);
 	--u2-tab-1-bg: var(--bg);
 
@@ -329,6 +331,7 @@ html.c {
 html.cz {
 	--bgg: var(--bg-u2);
 	--srv-3: #fff;
+	--u2-tab-b1: var(--bg-d3);
 }
 html.cy {
 	--fg: #fff;
@@ -411,10 +414,11 @@ html.dz {
 	--op-aa-bg: var(--bg-d2);
 	--op-a-sh: rgba(0,0,0,0.5);
 
-	--u2-btn-b1: #999;
-	--u2-sbtn-b1: #999;
+	--u2-btn-b1: var(--fg-weak);
+	--u2-sbtn-b1: var(--fg-weak);
 	--u2-txt-bg: var(--bg-u5);
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
+	--u2-tab-b1: var(--fg-weak);
 	--u2-tab-1-fg: #fff;
 	--u2-tab-1-bg: linear-gradient(to bottom, var(#353), var(--bg) 80%);
 	--u2-tab-1-b1: #7c5;
@@ -423,6 +427,12 @@ html.dz {
 	--u2-b-fg: #fff;
 	--u2-b1-bg: #3a3;
 	--u2-b2-bg: #3a3;
+	--u2-o-bg: var(--btn-bg);
+	--u2-o-b1: var(--bg-u5);
+	--u2-o-h-bg: var(--fg-weak);
+	--u2-o-1-bg: var(--fg-weak);
+	--u2-o-1-b1: var(--a);
+	--u2-o-1h-bg: var(--a);
 	--u2-inf-bg: #07a;
 	--u2-inf-b1: #0be;
 	--u2-ok-bg: #380;
@@ -2465,7 +2475,7 @@ html.y #bbox-overlay figcaption a {
 	width: 21em;
 }
 #u2cards {
-	padding: 1em 1em .3em 1em;
+	padding: 1em 1em .42em 1em;
 	margin: 0 auto;
 	white-space: nowrap;
 	text-align: center;
@@ -2490,7 +2500,8 @@ html.y #bbox-overlay figcaption a {
 #u2cards a {
 	padding: .2em 1em;
 	background: var(--u2-tab-bg);
-	border: 1px solid rgba(128,128,128,0.8);
+	border: 1px solid #999;
+	border-color: var(--u2-tab-b1);
 	border-width: 0 0 1px 0;
 }
 #u2cards a:first-child {
