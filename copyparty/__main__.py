@@ -1260,7 +1260,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     elif not al.no_ansi:
         al.ansi = VT100
 
-    if WINDOWS and not al.keep_qem:
+    if WINDOWS and not al.keep_qem and not al.ah_cli:
         try:
             disable_quickedit()
         except:
