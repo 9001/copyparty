@@ -24,6 +24,7 @@ from queue import Queue
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
 from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
 from .bos import bos
+from .cfg import vf_bmap, vf_vmap
 from .fsutil import Fstab
 from .mtag import MParser, MTag
 from .util import (
@@ -757,8 +758,9 @@ class Up2k(object):
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
         fx = set(("html_head",))
-        fdl = ("dbd", "lg_sbf", "md_sbf", "mte", "mth", "mtp", "nrand", "rand")
-        fd = {x: x for x in fdl}
+        fd = vf_bmap()
+        fd.update(vf_vmap())
+        fd = {v: k for k, v in fd.items()}
         fl = {
             k: v
             for k, v in flags.items()
@@ -769,6 +771,9 @@ class Up2k(object):
             for k, v in fl.items()
             if k not in fx
         ]
+        if not a:
+            a = ["\033[90mall-default"]
+
         if a:
             vpath = "?"
             for k, v in self.asrv.vfs.all_vols.items():

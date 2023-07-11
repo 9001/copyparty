@@ -2427,7 +2427,7 @@ def killtree(root: int) -> None:
 
 
 def runcmd(
-    argv: Union[list[bytes], list[str]], timeout: Optional[int] = None, **ka: Any
+    argv: Union[list[bytes], list[str]], timeout: Optional[float] = None, **ka: Any
 ) -> tuple[int, str, str]:
     kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
     capture = ka.pop("capture", 3)  # 0=none 1=stdout 2=stderr 3=both
@@ -2480,7 +2480,7 @@ def chkcmd(argv: Union[list[bytes], list[str]], **ka: Any) -> tuple[str, str]:
     return sout, serr
 
 
-def mchkcmd(argv: Union[list[bytes], list[str]], timeout: int = 10) -> None:
+def mchkcmd(argv: Union[list[bytes], list[str]], timeout: float = 10) -> None:
     if PY2:
         with open(os.devnull, "wb") as f:
             rv = sp.call(argv, stdout=f, stderr=f)

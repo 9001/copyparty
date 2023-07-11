@@ -13,6 +13,7 @@ def vf_bmap() -> dict[str, str]:
         "no_dedup": "copydupes",
         "no_dupe": "nodupe",
         "no_forget": "noforget",
+        "th_no_crop": "nocrop",
         "dav_auth": "davauth",
         "dav_rt": "davrt",
     }
@@ -40,8 +41,8 @@ def vf_bmap() -> dict[str, str]:
 
 def vf_vmap() -> dict[str, str]:
     """argv-to-volflag: simple values"""
-    ret = {}
-    for k in ("lg_sbf", "md_sbf", "unlist"):
+    ret = {"th_convt": "convt", "th_size": "thsize"}
+    for k in ("dbd", "lg_sbf", "md_sbf", "nrand", "unlist"):
         ret[k] = k
     return ret
 
@@ -49,7 +50,7 @@ def vf_vmap() -> dict[str, str]:
 def vf_cmap() -> dict[str, str]:
     """argv-to-volflag: complex/lists"""
     ret = {}
-    for k in ("dbd", "html_head", "mte", "mth", "nrand"):
+    for k in ("html_head", "mte", "mth"):
         ret[k] = k
     return ret
 
@@ -124,6 +125,9 @@ flagcats = {
         "dvthumb": "disables video thumbnails",
         "dathumb": "disables audio thumbnails (spectrograms)",
         "dithumb": "disables image thumbnails",
+        "thsize": "thumbnail res; WxH",
+        "nocrop": "disable center-cropping",
+        "convt": "conversion timeout in seconds",
     },
     "handlers\n(better explained in --help-handlers)": {
         "on404=PY": "handle 404s by executing PY file",

@@ -1420,6 +1420,10 @@ class AuthSrv(object):
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
 
+            for k in ("convt",):
+                if k in vol.flags:
+                    vol.flags[k] = float(vol.flags[k])
+
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
                     vol.flags[k2] = True
