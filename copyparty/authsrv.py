@@ -62,6 +62,7 @@ class AXS(object):
         udel: Optional[Union[list[str], set[str]]] = None,
         uget: Optional[Union[list[str], set[str]]] = None,
         upget: Optional[Union[list[str], set[str]]] = None,
+        uadmin: Optional[Union[list[str], set[str]]] = None,
     ) -> None:
         self.uread: set[str] = set(uread or [])
         self.uwrite: set[str] = set(uwrite or [])
@@ -69,14 +70,11 @@ class AXS(object):
         self.udel: set[str] = set(udel or [])
         self.uget: set[str] = set(uget or [])
         self.upget: set[str] = set(upget or [])
+        self.uadmin: set[str] = set(uadmin or [])
 
     def __repr__(self) -> str:
-        return "AXS(%s)" % (
-            ", ".join(
-                "%s=%r" % (k, self.__dict__[k])
-                for k in "uread uwrite umove udel uget upget".split()
-            )
-        )
+        ks = "uread uwrite umove udel uget upget uadmin".split()
+        return "AXS(%s)" % (", ".join("%s=%r" % (k, self.__dict__[k]) for k in ks),)
 
 
 class Lim(object):
@@ -435,8 +433,8 @@ class VFS(object):
 
     def can_access(
         self, vpath: str, uname: str
-    ) -> tuple[bool, bool, bool, bool, bool, bool]:
-        """can Read,Write,Move,Delete,Get,Upget"""
+    ) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
+        """can Read,Write,Move,Delete,Get,Upget,Admin"""
         if vpath:
             vn, _ = self._find(undot(vpath))
         else:
@@ -450,6 +448,7 @@ class VFS(object):
             uname in c.udel or "*" in c.udel,
             uname in c.uget or "*" in c.uget,
             uname in c.upget or "*" in c.upget,
+            uname in c.uadmin or "*" in c.uadmin,
         )
 
     def get(
@@ -944,7 +943,7 @@ class AuthSrv(object):
                 try:
                     self._l(ln, 5, "volume access config:")
                     sk, sv = ln.split(":")
-                    if re.sub("[rwmdgG]", "", sk) or not sk:
+                    if re.sub("[rwmdgGa]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
                         raise Exception(err)
                     if " " in re.sub(", *", "", sv).strip():
@@ -953,7 +952,7 @@ class AuthSrv(object):
                     self._read_vol_str(sk, sv.replace(" ", ""), daxs[vp], mflags[vp])
                     continue
                 except:
-                    err += "accs entries must be 'rwmdgG: user1, user2, ...'"
+                    err += "accs entries must be 'rwmdgGa: user1, user2, ...'"
                     raise Exception(err)
 
             if cat == catf:
@@ -989,7 +988,7 @@ class AuthSrv(object):
     def _read_vol_str(
         self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
     ) -> None:
-        if lvl.strip("crwmdgG"):
+        if lvl.strip("crwmdgGa"):
             raise Exception("invalid volflag: {},{}".format(lvl, uname))
 
         if lvl == "c":
@@ -1021,6 +1020,7 @@ class AuthSrv(object):
                 ("g", axs.uget),
                 ("G", axs.uget),
                 ("G", axs.upget),
+                ("a", axs.uadmin),
             ]:  # b bb bbb
                 if ch in lvl:
                     if un == "*":
@@ -1092,7 +1092,7 @@ class AuthSrv(object):
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is <rwmdgG>[,username][,username] or <c>,<flag>[=args]
+            # permset is <rwmdgGa>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
                 m = re_vol.match(v_str)
                 if not m:
@@ -1196,7 +1196,15 @@ class AuthSrv(object):
         all_users = {}
         missing_users = {}
         for axs in daxs.values():
-            for d in [axs.uread, axs.uwrite, axs.umove, axs.udel, axs.uget, axs.upget]:
+            for d in [
+                axs.uread,
+                axs.uwrite,
+                axs.umove,
+                axs.udel,
+                axs.uget,
+                axs.upget,
+                axs.uadmin,
+            ]:
                 for usr in d:
                     all_users[usr] = 1
                     if usr != "*" and usr not in acct:
@@ -1611,6 +1619,7 @@ class AuthSrv(object):
                 ["delete", "udel"],
                 ["   get", "uget"],
                 [" upget", "upget"],
+                ["uadmin", "uadmin"],
             ]:
                 u = list(sorted(getattr(zv.axs, attr)))
                 u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
@@ -1756,10 +1765,19 @@ class AuthSrv(object):
                 raise Exception("volume not found: " + zs)
 
         self.log(str({"users": users, "vols": vols, "flags": flags}))
-        t = "/{}: read({}) write({}) move({}) del({}) get({}) upget({})"
+        t = "/{}: read({}) write({}) move({}) del({}) get({}) upget({}) uadmin({})"
         for k, zv in self.vfs.all_vols.items():
             vc = zv.axs
-            vs = [k, vc.uread, vc.uwrite, vc.umove, vc.udel, vc.uget, vc.upget]
+            vs = [
+                k,
+                vc.uread,
+                vc.uwrite,
+                vc.umove,
+                vc.udel,
+                vc.uget,
+                vc.upget,
+                vc.uadmin,
+            ]
             self.log(t.format(*vs))
 
         flag_v = "v" in flags
@@ -1898,6 +1916,7 @@ class AuthSrv(object):
                 "d": "udel",
                 "g": "uget",
                 "G": "upget",
+                "a": "uadmin",
             }
             users = {}
             for pkey in perms.values():
@@ -2094,7 +2113,7 @@ def upgrade_cfg_fmt(
             else:
                 sn = sn.replace(",", ", ")
             ret.append("    " + sn)
-        elif sn[:1] in "rwmdgG":
+        elif sn[:1] in "rwmdgGa":
             if cat != catx:
                 cat = catx
                 ret.append(cat)

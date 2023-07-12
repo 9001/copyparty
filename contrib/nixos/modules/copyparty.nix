@@ -138,6 +138,7 @@ in {
                 "d" (delete): permanently delete files and folders
                 "g" (get):    download files, but cannot see folder contents
                 "G" (upget):  "get", but can see filekeys of their own uploads
+                "a" (upget):  can see uploader IPs
 
               For example: "rwmd"
 

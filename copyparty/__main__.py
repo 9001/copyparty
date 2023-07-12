@@ -492,6 +492,7 @@ def get_sects():
               "d" (delete): permanently delete files and folders
               "g" (get):    download files, but cannot see folder contents
               "G" (upget):  "get", but can see filekeys of their own uploads
+              "a" (admin):  can see uploader IPs
 
             too many volflags to list here, see --help-flags
 
@@ -1073,7 +1074,7 @@ def add_db_metadata(ap):
     ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings and mutagen/ffprobe parsers")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
-        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash")
+        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash,up_ip,.up_at")
     ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.)",
         default=".vq,.aq,vc,ac,fmt,res,.fps")
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag M using program BIN to parse the file")
@@ -1337,11 +1338,9 @@ def main(argv: Optional[list[str]] = None) -> None:
             if re.match("c[^,]", opt):
                 mod = True
                 na.append("c," + opt[1:])
-            elif re.sub("^[rwmdgG]*", "", opt) and "," not in opt:
+            elif re.sub("^[rwmdgGa]*", "", opt) and "," not in opt:
                 mod = True
                 perm = opt[0]
-                if perm == "a":
-                    perm = "rw"
                 na.append(perm + "," + opt[1:])
             else:
                 na.append(opt)

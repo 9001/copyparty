@@ -346,6 +346,7 @@ permissions:
 * `d` (delete): delete files/folders
 * `g` (get): only download files, cannot see folder contents or zip/tar
 * `G` (upget): same as `g` except uploaders get to see their own filekeys (see `fk` in examples below)
+* `a` (admin): can see uploader IPs
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`

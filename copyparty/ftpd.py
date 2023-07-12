@@ -134,6 +134,7 @@ class FtpFs(AbstractedFS):
 
         self.can_read = self.can_write = self.can_move = False
         self.can_delete = self.can_get = self.can_upget = False
+        self.can_admin = False
 
         self.listdirinfo = self.listdir
         self.chdir(".")
@@ -168,7 +169,7 @@ class FtpFs(AbstractedFS):
                 if not avfs:
                     raise FSE(t.format(vpath), 1)
 
-                cr, cw, cm, cd, _, _ = avfs.can_access("", self.h.uname)
+                cr, cw, cm, cd, _, _, _ = avfs.can_access("", self.h.uname)
                 if r and not cr or w and not cw or m and not cm or d and not cd:
                     raise FSE(t.format(vpath), 1)
 
@@ -243,6 +244,7 @@ class FtpFs(AbstractedFS):
             self.can_delete,
             self.can_get,
             self.can_upget,
+            self.can_admin,
         ) = avfs.can_access("", self.h.uname)
 
     def mkdir(self, path: str) -> None:

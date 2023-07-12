@@ -5780,14 +5780,18 @@ var treectl = (function () {
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
-					v = (tn.tags || {})[k] || "";
+					v = (tn.tags || {})[k] || "",
+					sv = null;
 
-				if (k == ".dur") {
-					var sv = v ? s2ms(v) : "";
-					ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
+				if (k == ".dur")
+					sv = v ? s2ms(v) : "";
+				else if (k == ".up_at")
+					sv = v ? unix2iso(v) : "";
+				else {
+					ln.push(v);
 					continue;
 				}
-				ln.push(v);
+				ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
 			}
 			ln = ln.concat([tn.ext, unix2iso(tn.ts)]).join('</td><td>');
 			html.push(ln + '</td></tr>');
@@ -6066,7 +6070,7 @@ function apply_perms(res) {
 
 	var axs = [],
 		aclass = '>',
-		chk = ['read', 'write', 'move', 'delete', 'get'];
+		chk = ['read', 'write', 'move', 'delete', 'get', 'admin'];
 
 	for (var a = 0; a < chk.length; a++)
 		if (has(perms, chk[a]))

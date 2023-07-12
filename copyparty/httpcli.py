@@ -153,6 +153,7 @@ class HttpCli(object):
         self.can_delete = False
         self.can_get = False
         self.can_upget = False
+        self.can_admin = False
         # post
         self.parser: Optional[MultipartParser] = None
         # end placeholders
@@ -431,6 +432,7 @@ class HttpCli(object):
             self.can_delete,
             self.can_get,
             self.can_upget,
+            self.can_admin,
         ) = (
             avn.can_access("", self.uname) if avn else [False] * 6
         )
@@ -782,6 +784,7 @@ class HttpCli(object):
                     self.log("plugin override; access permitted")
                     self.can_read = self.can_write = self.can_move = True
                     self.can_delete = self.can_get = self.can_upget = True
+                    self.can_admin = True
                 else:
                     return self.tx_404(True)
             else:
@@ -3535,6 +3538,8 @@ class HttpCli(object):
             perms.append("get")
         if self.can_upget:
             perms.append("upget")
+        if self.can_admin:
+            perms.append("admin")
 
         url_suf = self.urlq({}, ["k"])
         is_ls = "ls" in self.uparam
@@ -3786,22 +3791,33 @@ class HttpCli(object):
             if vn != dbv:
                 _, rd = vn.get_dbv(rd)
 
+            erd_efn = (rd, fn)
             q = "select mt.k, mt.v from up inner join mt on mt.w = substr(up.w,1,16) where up.rd = ? and up.fn = ? and +mt.k != 'x'"
             try:
-                r = icur.execute(q, (rd, fn))
+                r = icur.execute(q, erd_efn)
             except Exception as ex:
                 if "database is locked" in str(ex):
                     break
 
                 try:
-                    args = s3enc(idx.mem_cur, rd, fn)
-                    r = icur.execute(q, args)
+                    erd_efn = s3enc(idx.mem_cur, rd, fn)
+                    r = icur.execute(q, erd_efn)
                 except:
                     t = "tag read error, {}/{}\n{}"
                     self.log(t.format(rd, fn, min_ex()))
                     break
 
             fe["tags"] = {k: v for k, v in r}
+
+            if self.can_admin:
+                q = "select ip, at from up where rd=? and fn=?"
+                try:
+                    zs1, zs2 = icur.execute(q, erd_efn).fetchone()
+                    fe["tags"]["up_ip"] = zs1
+                    fe["tags"][".up_at"] = zs2
+                except:
+                    pass
+
             _ = [tagset.add(k) for k in fe["tags"]]
 
         if icur:
