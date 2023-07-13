@@ -137,6 +137,8 @@ class HttpCli(object):
         self.uparam: dict[str, str] = {}
         self.cookies: dict[str, str] = {}
         self.avn: Optional[VFS] = None
+        self.vn = self.asrv.vfs
+        self.rem = " "
         self.vpath = " "
         self.uname = " "
         self.pw = " "
@@ -437,6 +439,8 @@ class HttpCli(object):
             avn.can_access("", self.uname) if avn else [False] * 6
         )
         self.avn = avn
+        self.vn = vn
+        self.rem = rem
 
         self.s.settimeout(self.args.s_tbody or None)
 
@@ -572,9 +576,8 @@ class HttpCli(object):
 
         # default to utf8 html if no content-type is set
         if not mime:
-            mime = self.out_headers.get("Content-Type", "text/html; charset=utf-8")
+            mime = self.out_headers.get("Content-Type") or "text/html; charset=utf-8"
 
-        assert mime
         self.out_headers["Content-Type"] = mime
 
         for k, zs in list(self.out_headers.items()) + self.out_headerlist:
@@ -773,9 +776,8 @@ class HttpCli(object):
             t = "@{} has no access to [{}]"
             self.log(t.format(self.uname, self.vpath))
 
-            if self.avn and "on403" in self.avn.flags:
-                vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
-                ret = self.on40x(vn.flags["on403"], vn, rem)
+            if "on403" in self.vn.flags:
+                ret = self.on40x(self.vn.flags["on403"], self.vn, self.rem)
                 if ret == "true":
                     return True
                 elif ret == "false":
@@ -1042,9 +1044,6 @@ class HttpCli(object):
 
         from .dxml import mkenod, mktnod, parse_xml
 
-        self.asrv.vfs.get(self.vpath, self.uname, False, False)
-        # abspath = vn.dcanonical(rem)
-
         buf = b""
         for rbuf in self.get_body_reader()[0]:
             buf += rbuf
@@ -1101,8 +1100,7 @@ class HttpCli(object):
 
         from .dxml import mkenod, mktnod, parse_xml
 
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
-        abspath = vn.dcanonical(rem)
+        abspath = self.vn.dcanonical(self.rem)
 
         buf = b""
         for rbuf in self.get_body_reader()[0]:
@@ -1316,15 +1314,12 @@ class HttpCli(object):
                         plain = zb.decode("utf-8", "replace")
                         if buf.startswith(b"msg="):
                             plain = plain[4:]
-                            vfs, rem = self.asrv.vfs.get(
-                                self.vpath, self.uname, False, False
-                            )
-                            xm = vfs.flags.get("xm")
+                            xm = self.vn.flags.get("xm")
                             if xm:
                                 runhook(
                                     self.log,
                                     xm,
-                                    vfs.canonical(rem),
+                                    self.vn.canonical(self.rem),
                                     self.vpath,
                                     self.host,
                                     self.uname,
@@ -2731,6 +2726,9 @@ class HttpCli(object):
         else:
             mime = guess_mime(req_path)
 
+        if "nohtml" in self.vn.flags and "html" in mime:
+            mime = "text/plain; charset=utf-8"
+
         self.out_headers["Accept-Ranges"] = "bytes"
         self.send_headers(length=upper - lower, status=status, mime=mime)
 
@@ -3400,7 +3398,8 @@ class HttpCli(object):
 
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+        vn = self.vn
+        rem = self.rem
         abspath = vn.dcanonical(rem)
         dbv, vrem = vn.get_dbv(rem)
 
@@ -3496,8 +3495,14 @@ class HttpCli(object):
                     self.log("wrong filekey, want {}, got {}".format(correct, got))
                     return self.tx_404()
 
-            if abspath.endswith(".md") and (
-                "v" in self.uparam or "edit" in self.uparam or "edit2" in self.uparam
+            if (
+                abspath.endswith(".md")
+                and "nohtml" not in vn.flags
+                and (
+                    "v" in self.uparam
+                    or "edit" in self.uparam
+                    or "edit2" in self.uparam
+                )
             ):
                 return self.tx_md(abspath)
 

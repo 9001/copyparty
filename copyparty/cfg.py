@@ -155,6 +155,7 @@ flagcats = {
         "sb_lg": "enable js sandbox for prologue/epilogue (default)",
         "md_sbf": "list of markdown-sandbox safeguards to disable",
         "lg_sbf": "list of *logue-sandbox safeguards to disable",
+        "nohtml": "return html and markdown as text/html",
     },
     "others": {
         "fk=8": 'generates per-file accesskeys,\nwhich will then be required at the "g" permission',
