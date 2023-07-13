@@ -587,6 +587,7 @@ def get_sects():
              \033[36mxbd\033[35m executes CMD before a file delete
              \033[36mxad\033[35m executes CMD after  a file delete
              \033[36mxm\033[35m executes CMD on message
+             \033[36mxban\033[35m executes CMD if someone gets banned
             \033[0m
             can be defined as --args or volflags; for example \033[36m
              --xau notify-send
@@ -621,6 +622,9 @@ def get_sects():
             \033[36mxiu\033[0m is also unique in that it will pass the metadata to the
             executed program on STDIN instead of as argv arguments, and
             it also includes the wark (file-id/hash) as a json property
+
+            \033[36mxban\033[0m can be used to overrule / cancel a user ban event;
+            if the program returns 0 (true/OK) then the ban will NOT happen
 
             except for \033[36mxm\033[0m, only one hook / one action can run at a time,
             so it's recommended to use the \033[36mf\033[0m flag unless you really need
@@ -920,6 +924,7 @@ def add_hooks(ap):
     ap2.add_argument("--xbd", metavar="CMD", type=u, action="append", help="execute CMD before a file delete")
     ap2.add_argument("--xad", metavar="CMD", type=u, action="append", help="execute CMD after  a file delete")
     ap2.add_argument("--xm", metavar="CMD", type=u, action="append", help="execute CMD on message")
+    ap2.add_argument("--xban", metavar="CMD", type=u, action="append", help="execute CMD if someone gets banned (pw/404)")
 
 
 def add_yolo(ap):

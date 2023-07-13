@@ -142,6 +142,7 @@ flagcats = {
         "xbd=CMD": "execute CMD before a file delete",
         "xad=CMD": "execute CMD after  a file delete",
         "xm=CMD": "execute CMD on message",
+        "xban=CMD": "execute CMD if someone gets banned",
     },
     "client and ux": {
         "grid": "show grid/thumbnails by default",

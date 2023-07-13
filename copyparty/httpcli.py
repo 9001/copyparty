@@ -602,8 +602,22 @@ class HttpCli(object):
             if g.lim:
                 bonk, ip = g.bonk(self.ip, self.vpath)
                 if bonk:
-                    self.log("client banned: 404s", 1)
-                    self.conn.hsrv.bans[ip] = bonk
+                    xban = self.vn.flags.get("xban")
+                    if not xban or not runhook(
+                        self.log,
+                        xban,
+                        self.vn.canonical(self.rem),
+                        self.vpath,
+                        self.host,
+                        self.uname,
+                        time.time(),
+                        0,
+                        self.ip,
+                        time.time(),
+                        "404",
+                    ):
+                        self.log("client banned: 404s", 1)
+                        self.conn.hsrv.bans[ip] = bonk
 
         if volsan:
             vols = list(self.asrv.vfs.all_vols.values())
@@ -1324,7 +1338,7 @@ class HttpCli(object):
                                     self.host,
                                     self.uname,
                                     time.time(),
-                                    len(xm),
+                                    len(buf),
                                     self.ip,
                                     time.time(),
                                     plain,
@@ -1996,8 +2010,22 @@ class HttpCli(object):
             if g.lim:
                 bonk, ip = g.bonk(self.ip, pwd)
                 if bonk:
-                    self.log("client banned: invalid passwords", 1)
-                    self.conn.hsrv.bans[ip] = bonk
+                    xban = self.vn.flags.get("xban")
+                    if not xban or not runhook(
+                        self.log,
+                        xban,
+                        self.vn.canonical(self.rem),
+                        self.vpath,
+                        self.host,
+                        self.uname,
+                        time.time(),
+                        0,
+                        self.ip,
+                        time.time(),
+                        "pw",
+                    ):
+                        self.log("client banned: invalid passwords", 1)
+                        self.conn.hsrv.bans[ip] = bonk
 
             msg = "naw dude"
             pwd = "x"  # nosec

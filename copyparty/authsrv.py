@@ -1047,7 +1047,8 @@ class AuthSrv(object):
             flags[name] = True
             return
 
-        if name not in "mtp xbu xau xiu xbr xar xbd xad xm on404 on403".split():
+        zs = "mtp on403 on404 xbu xau xiu xbr xar xbd xad xm xban"
+        if name not in zs.split():
             if value is True:
                 t = "└─add volflag [{}] = {}  ({})"
             else:
@@ -1457,7 +1458,7 @@ class AuthSrv(object):
                 vol.flags["mth"] = self.args.mth
 
             # append additive args from argv to volflags
-            hooks = "xbu xau xiu xbr xar xbd xad xm".split()
+            hooks = "xbu xau xiu xbr xar xbd xad xm xban".split()
             for name in "mtp on404 on403".split() + hooks:
                 self._read_volflag(vol.flags, name, getattr(self.args, name), True)
 
@@ -1478,6 +1479,10 @@ class AuthSrv(object):
                         t = "cannot combine flags c and f; removing f from eventhook [{}]"
                         self.log(t.format(ocmd), 1)
                         hfs = [x for x in hfs if x != "f"]
+                        ocmd = ",".join(hfs + [cmd])
+
+                    if "c" not in hfs and "f" not in hfs and hn == "xban":
+                        hfs = ["c"] + hfs
                         ocmd = ",".join(hfs + [cmd])
 
                     ncmds.append(ocmd)
@@ -1857,7 +1862,8 @@ class AuthSrv(object):
         ]
 
         csv = set("i p".split())
-        lst = set("c ihead mtm mtp xad xar xau xiu xbd xbr xbu xm on404 on403".split())
+        zs = "c ihead mtm mtp on403 on404 xad xar xau xiu xban xbd xbr xbu xm"
+        lst = set(zs.split())
         askip = set("a v c vc cgen theme".split())
 
         # keymap from argv to vflag
