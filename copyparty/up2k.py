@@ -200,7 +200,8 @@ class Up2k(object):
         if self.stop:
             # up-mt consistency not guaranteed if init is interrupted;
             # drop caches for a full scan on next boot
-            self._drop_caches()
+            with self.mutex:
+                self._drop_caches()
 
             if self.pp:
                 self.pp.end = True
@@ -594,7 +595,8 @@ class Up2k(object):
 
         if self.args.re_dhash or [zv for zv in vols if "e2tsr" in zv.flags]:
             self.args.re_dhash = False
-            self._drop_caches()
+            with self.mutex:
+                self._drop_caches()
 
         for vol in vols:
             if self.stop:
