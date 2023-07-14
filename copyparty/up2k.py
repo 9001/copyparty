@@ -3000,7 +3000,8 @@ class Up2k(object):
             permsets = [[False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             vn, rem = vn.get_dbv(rem)
-            _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
+            with self.mutex:
+                _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
 
             t = "you cannot delete this: "
             if not dip:
