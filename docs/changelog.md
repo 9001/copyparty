@@ -1,4 +1,21 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0707-2220  `v1.8.1`  in case of 404
+
+## new features
+* [handlers](https://github.com/9001/copyparty/tree/hovudstraum/bin/handlers); change the behavior of 404 / 403 with plugins
+  * makes it possible to use copyparty as a [caching proxy](https://github.com/9001/copyparty/blob/hovudstraum/bin/handlers/caching-proxy.py)
+* #42 add mpv + streamlink support to [very-bad-idea](https://github.com/9001/copyparty/tree/hovudstraum/bin/mtag#dangerous-plugins)
+* add support for Pillow 10
+  * also improved text rendering in icons
+* mention the [fedora package](https://github.com/9001/copyparty#fedora-package) in the readme
+
+## bugfixes
+* theme 6 (hacker) didn't show the state of some toggle-switches
+* windows: keep quickedit enabled when hashing passwords interactively
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0626-0005  `v1.8.0`  argon
 
 News: if you use rclone as a copyparty webdav client, upgrading to [rclone v1.63](https://github.com/rclone/rclone/releases/tag/v1.63.0) (just released) will give you [a huge speed boost](https://github.com/rclone/rclone/pull/6897) for small files
