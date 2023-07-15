@@ -3863,7 +3863,8 @@ class HttpCli(object):
             _ = [tagset.add(k) for k in fe["tags"]]
 
         if icur:
-            taglist = [k for k in vn.flags.get("mte", "").split(",") if k in tagset]
+            mte = vn.flags.get("mte") or "up_ip,.up_at"
+            taglist = [k for k in mte.split(",") if k in tagset]
             for fe in dirs:
                 fe["tags"] = {}
         else:
