@@ -492,7 +492,7 @@ def get_sects():
               "d" (delete): permanently delete files and folders
               "g" (get):    download files, but cannot see folder contents
               "G" (upget):  "get", but can see filekeys of their own uploads
-              "a" (admin):  can see uploader IPs
+              "a" (admin):  can see uploader IPs, config-reload
 
             too many volflags to list here, see --help-flags
 

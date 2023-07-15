@@ -327,7 +327,7 @@ upgrade notes
 # accounts and volumes
 
 per-folder, per-user permissions  - if your setup is getting complex, consider making a [config file](./docs/example.conf) instead of using arguments
-* much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if logged in as admin)
+* much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if the user has `a`/admin in any volume)
   * changes to the `[global]` config section requires a restart to take effect
 
 a quick summary can be seen using `--help-accounts`
@@ -346,7 +346,7 @@ permissions:
 * `d` (delete): delete files/folders
 * `g` (get): only download files, cannot see folder contents or zip/tar
 * `G` (upget): same as `g` except uploaders get to see their own filekeys (see `fk` in examples below)
-* `a` (admin): can see uploader IPs
+* `a` (admin): can see uploader IPs, config-reload
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
@@ -774,7 +774,7 @@ for the above example to work, add the commandline argument `-e2ts` to also scan
 using arguments or config files, or a mix of both:
 * config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf) and [./docs/example2.conf](docs/example2.conf)
 * `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
-  * or click the `[reload cfg]` button in the control-panel when logged in as admin 
+  * or click the `[reload cfg]` button in the control-panel if the user has `a`/admin in any volume
   * changes to the `[global]` config section requires a restart to take effect
 
 

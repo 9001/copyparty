@@ -324,6 +324,7 @@ class VFS(object):
         self.adel: dict[str, list[str]] = {}
         self.aget: dict[str, list[str]] = {}
         self.apget: dict[str, list[str]] = {}
+        self.aadmin: dict[str, list[str]] = {}
 
         if realpath:
             rp = realpath + ("" if realpath.endswith(os.sep) else os.sep)
@@ -1182,7 +1183,7 @@ class AuthSrv(object):
             vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
             vol.root = vfs
 
-        for perm in "read write move del get pget".split():
+        for perm in "read write move del get pget admin".split():
             axs_key = "u" + perm
             unames = ["*"] + list(acct.keys())
             umap: dict[str, list[str]] = {x: [] for x in unames}

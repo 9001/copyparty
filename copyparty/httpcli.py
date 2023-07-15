@@ -149,6 +149,7 @@ class HttpCli(object):
         self.dvol = [" "]
         self.gvol = [" "]
         self.upvol = [" "]
+        self.avol = [" "]
         self.do_log = True
         self.can_read = False
         self.can_write = False
@@ -405,6 +406,7 @@ class HttpCli(object):
         self.dvol = self.asrv.vfs.adel[self.uname]
         self.gvol = self.asrv.vfs.aget[self.uname]
         self.upvol = self.asrv.vfs.apget[self.uname]
+        self.avol = self.asrv.vfs.aadmin[self.uname]
 
         if self.pw and (
             self.pw != cookie_pw or self.conn.freshen_pwd + 30 < time.time()
@@ -3003,13 +3005,12 @@ class HttpCli(object):
 
     def tx_mounts(self) -> bool:
         suf = self.urlq({}, ["h"])
-        avol = [x for x in self.wvol if x in self.rvol]
         rvol, wvol, avol = [
             [("/" + x).rstrip("/") + "/" for x in y]
-            for y in [self.rvol, self.wvol, avol]
+            for y in [self.rvol, self.wvol, self.avol]
         ]
 
-        if avol and not self.args.no_rescan:
+        if self.avol and not self.args.no_rescan:
             x = self.conn.hsrv.broker.ask("up2k.get_state")
             vs = json.loads(x.get())
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
