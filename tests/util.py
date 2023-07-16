@@ -32,7 +32,7 @@ if MACOS:
 
 from copyparty.__init__ import E
 from copyparty.__main__ import init_E
-from copyparty.util import Unrecv, FHC
+from copyparty.util import Unrecv, FHC, Garda
 
 init_E(E)
 
@@ -98,7 +98,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vc xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
@@ -113,7 +113,7 @@ class Cfg(Namespace):
         ex = "df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg doctitle favico html_head lg_sbf log_fk md_sbf mth textfiles unlist R RS SR"
+        ex = "ah_alg doctitle favico html_head lg_sbf log_fk md_sbf mth name textfiles unlist R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
@@ -175,6 +175,9 @@ class VHttpSrv(object):
 
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
+
+        self.gpwd = Garda("")
+        self.g404 = Garda("")
 
     def cachebuster(self):
         return "a"
