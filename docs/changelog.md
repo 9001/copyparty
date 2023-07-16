@@ -1,4 +1,70 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0714-1558  `v1.8.2`  URGENT: fix path traversal vulnerability
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+Starting with the bad and important news; this release fixes https://github.com/9001/copyparty/security/advisories/GHSA-pxfv-7rr3-2qjg / [CVE-2023-37474](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-37474) -- so please upgrade!
+
+Every version until now had a [path traversal vulnerability](https://owasp.org/www-community/attacks/Path_Traversal) which allowed read-access to any file on the server's filesystem. To summarize,
+* Every file that the copyparty process had the OS-level permissions to read, could be retrieved over HTTP without password authentication
+* However, an attacker would need to know the full (or copyparty-module-relative) path to the file; it was luckily impossible to list directory contents to discover files on the server
+* You may have been running copyparty with some mitigations against this:
+  * [prisonparty](https://github.com/9001/copyparty/tree/hovudstraum/bin#prisonpartysh) limited the scope of access to files which were intentionally given to copyparty for sharing; meaning all volumes, as well as the following read-only filesystem locations: `/bin`, `/lib`, `/lib32`, `/lib64`, `/sbin`, `/usr`, `/etc/alternatives`
+  * the [nix package](https://github.com/9001/copyparty#nix-package) has a similar mitigation implemented using systemd concepts
+  * [docker containers](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) would only expose the files which were intentionally mounted into the container, so even better
+* More conventional setups, such as just running the sfx (python or exe editions), would unfortunately expose all files readable by the current user
+* The following configurations would have made the impact much worse:
+  * running copyparty as root
+
+So, three years, and finally a CVE -- which has been there since day one... Not great huh. There is a list of all the copyparty alternatives that I know of in the `similar software` link above.
+
+Thanks for flying copyparty! And especially if you decide to continue doing so :-)
+
+## new features
+* #43 volflags to specify thumbnailer behavior per-volume;
+  * `--th-no-crop` / volflag `nocrop` to specify whether autocrop should be disabled
+  * `--th-size` / volflag `thsize` to set a custom thumbnail resolution
+  * `--th-convt` / volflag `convt` to specify conversion timeout
+* #45 resulted in a handful of opportunities to tighten security in intentionally-dangerous setups (public folders with anonymous uploads enabled):
+  * a new permission, `a` (in addition to the existing `rwmdgG`), to show the uploader-IP and upload-time for each file in the file listing
+    * accidentally incompatible with the `d2t` volflag (will be fixed in the next ver)
+  * volflag `nohtml` is a good defense against (un)intentional XSS; it returns HTML-files and markdown-files as plaintext instead of rendering them, meaning any malicious `<script>` won't run -- bad idea for regular use since it breaks fundamental functionality, but good when you really need it
+    * the README-previews below the file-listing still renders as usual, as this is fine thanks to the sandbox
+  * a new eventhook `--xban` to run a plugin when copyparty decides to ban someone (for password bruteforcing or excessive 404's), for example to blackhole the IP using fail2ban or similar
+
+## bugfixes
+* **fixes a path traversal vulnerability,** https://github.com/9001/copyparty/security/advisories/GHSA-pxfv-7rr3-2qjg / [CVE-2023-37474](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-37474)
+  * HUGE thanks to @TheHackyDog for reporting this !!
+  * if you use a reverse proxy, you can check if you have been exploited like so:
+    * nginx: grep your logs for URLs containing both `.cpr/` and `%2[^0]`, for example using the following command:
+      ```bash
+      (gzip -dc access.log.*.gz; cat access.log) | sed -r 's/" [0-9]+ .*//' | grep -E 'cpr/.*%2[^0]' | grep -vF data:image/svg
+      ```
+* 77f1e5144455eb946db7368792ea11c934f0f6da fixes an extremely unlikely race-condition (see the commit for details)
+* 8f59afb1593a75b8ce8c91ceee304097a07aea6e fixes another race-condition which is a bit worse:
+  * the unpost feature could collide with other database activity, with the worst-case outcome being aborted batch operations, for example a directory move or a batch-rename which stops halfways
+
+----
+
+# 💾 what to download?
+| download link | is it good? | description |
+| -- | -- | -- |
+| **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** | ✅ the best 👍 | runs anywhere! only needs python |
+| [a docker image](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker/README.md) | it's ok | good if you prefer docker 🐋 |
+| [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) |  ⚠️ [acceptable](https://github.com/9001/copyparty#copypartyexe) | for [win8](https://user-images.githubusercontent.com/241032/221445946-1e328e56-8c5b-44a9-8b9f-dee84d942535.png) or later; built-in thumbnailer |
+| [u2c.exe](https://github.com/9001/copyparty/releases/download/v1.7.1/u2c.exe) | ⚠️ acceptable | [CLI uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) as a win7+ exe ([video](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm)) |
+| [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) | ⛔️ [dangerous](https://github.com/9001/copyparty#copypartyexe) | for [win7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png) -- never expose to the internet! |
+| [cpp-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.8.2/copyparty-winpe64.exe) | ⛔️ dangerous | runs on [64bit WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png), otherwise useless |
+
+* except for [u2c.exe](https://github.com/9001/copyparty/releases/download/v1.7.1/u2c.exe), all of the options above are equivalent
+* the zip and tar.gz files below are just source code
+* python packages are available at [PyPI](https://pypi.org/project/copyparty/#files)
+
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0707-2220  `v1.8.1`  in case of 404
 
 ## new features

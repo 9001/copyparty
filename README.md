@@ -491,6 +491,9 @@ images with the following names (see `--th-covers`) become the thumbnail of the 
 in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
 * indicated by the audio files having the ▶ icon instead of 💾
 
+enabling `multiselect` lets you click files to select them, and then shift-click another file for range-select
+* `multiselect` is mostly intended for phones/tablets, but the `sel` option in the `[⚙️] settings` tab is better suited for desktop use, allowing selection by CTRL-clicking and range-selection with SHIFT-click, all without affecting regular clicking
+
 
 ## zip downloads
 
@@ -613,6 +616,7 @@ file selection: click somewhere on the line (not the link itsef), then:
 * `up/down` to move
 * `shift-up/down` to move-and-select
 * `ctrl-shift-up/down` to also scroll
+* shift-click another line for range-select
 
 * cut: select some files and `ctrl-x`
 * paste: `ctrl-v` in another folder

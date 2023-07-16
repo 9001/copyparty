@@ -62,7 +62,16 @@ class Cpp(object):
 
 def tc1(vflags):
     ub = "http://127.0.0.1:4321/"
-    td = os.path.join("srv", "smoketest")
+    try:
+        if not os.path.exists("/dev/shm"):
+            raise Exception()
+
+        td = "/dev/shm/cppsmoketst"
+        ntd = 4
+    except:
+        td = os.path.join("srv", "smoketest")
+        ntd = 2
+
     try:
         shutil.rmtree(td)
     except:
@@ -91,6 +100,7 @@ def tc1(vflags):
         "-p4321",
         "-e2dsa",
         "-e2tsr",
+        "--dbd=yolo",
         "--no-mutagen",
         "--th-ff-jpg",
         "--hist",
@@ -99,38 +109,38 @@ def tc1(vflags):
     pdirs = []
     hpaths = {}
 
-    for d1 in ["r", "w", "a"]:
+    for d1 in ["r", "w", "rw"]:
         pdirs.append("{}/{}".format(td, d1))
         pdirs.append("{}/{}/j".format(td, d1))
-        for d2 in ["r", "w", "a", "c"]:
+        for d2 in ["r", "w", "rw", "c"]:
             d = os.path.join(td, d1, "j", d2)
             pdirs.append(d)
             os.makedirs(d)
 
     pdirs = [x.replace("\\", "/") for x in pdirs]
-    udirs = [x.split("/", 2)[2] for x in pdirs]
+    udirs = [x.split("/", ntd)[ntd] for x in pdirs]
     perms = [x.rstrip("cj/")[-1] for x in pdirs]
-    perms = ["rw" if x == "a" else x for x in perms]
     for pd, ud, p in zip(pdirs, udirs, perms):
         if ud[-1] == "j" or ud[-1] == "c":
             continue
 
         hp = None
-        if pd.endswith("st/a"):
+        if pd.endswith("st/rw"):
             hp = hpaths[ud] = os.path.join(td, "db1")
-        elif pd[:-1].endswith("a/j/"):
+        elif pd[:-1].endswith("rw/j/"):
             hpaths[ud] = os.path.join(td, "dbm")
             hp = None
         else:
             hp = "-"
             hpaths[ud] = os.path.join(pd, ".hist")
 
-        arg = "{}:{}:{}".format(pd, ud, p)
+        arg = "{}:{}:a{}".format(pd, ud, p)
         if hp:
             arg += ":c,hist=" + hp
 
         args += ["-v", arg + vflags]
 
+    # print("\n".join(args))
     # return
     cpp = Cpp(args)
     CPP.append(cpp)
@@ -163,7 +173,7 @@ def tc1(vflags):
 
     # stat filesystem
     for d, p in zip(pdirs, perms):
-        u = "{}/{}.h264".format(d, d.split("test/")[-1].replace("/", ""))
+        u = "{}/{}.h264".format(d, d[len(td) :].replace("/", ""))
         ok = os.path.exists(u)
         if ok != (p in ["rw", "w"]):
             raise Exception("stat {} with perm {} at {}".format(ok, p, u))

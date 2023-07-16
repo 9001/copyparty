@@ -77,8 +77,3 @@ or using commandline arguments,
 # build the images yourself
 
 basically `./make.sh hclean pull img push` but see [devnotes.md](./devnotes.md)
-
-
-# notes
-
-* currently unable to play [tracker music](https://en.wikipedia.org/wiki/Module_file) (mod/s3m/xm/it/...) -- will be fixed in june 2023 (Alpine 3.18)
