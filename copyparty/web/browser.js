@@ -190,6 +190,7 @@ var Ls = {
 		"cl_hcancel": "column hiding aborted",
 
 		"ct_thumb": "in icon view, toggle icons or thumbnails$NHotkey: T",
+		"ct_csel": "use CTRL and SHIFT for file selection",
 		"ct_dots": "show hidden files (if server permits)",
 		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
@@ -651,6 +652,7 @@ var Ls = {
 		"cl_hcancel": "kolonne-skjuling avbrutt",
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
+		"ct_csel": "bruk tastene CTRL og SHIFT for markering av filer",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
 		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
@@ -1096,6 +1098,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
+	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '">sel</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
@@ -3689,18 +3692,27 @@ var fileman = (function () {
 		if (!sel.length)
 			toast.err(3, L.fc_emore);
 
-		var els = [];
+		var els = [], griden = thegrid.en;
 		for (var a = 0; a < sel.length; a++) {
 			vps.push(sel[a].vp);
-			if (sel.length < 100) {
-				els.push(ebi(sel[a].id).closest('tr'));
-				clmod(els[a], 'fcut');
-			}
+			if (sel.length < 100)
+				try {
+					if (griden)
+						els.push(QS('#ggrid>a[ref="' + sel[a].id + '"]'));
+					else
+						els.push(ebi(sel[a].id).closest('tr'));
+
+					clmod(els[a], 'fcut');
+				}
+				catch (ex) { }
 		}
 
 		setTimeout(function () {
-			for (var a = 0; a < els.length; a++)
-				clmod(els[a], 'fcut', 1);
+			try {
+				for (var a = 0; a < els.length; a++)
+					clmod(els[a], 'fcut', 1);
+			}
+			catch (ex) { }
 		}, 1);
 
 		try {
@@ -4288,7 +4300,7 @@ var thegrid = (function () {
 	setsz();
 
 	function gclick1(e) {
-		if (ctrl(e))
+		if (ctrl(e) && !treectl.csel)
 			return true;
 
 		return gclick.bind(this)(e, false);
@@ -4312,8 +4324,10 @@ var thegrid = (function () {
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if (r.sel && !dbl) {
-			td.click();
+		if (r.sel && !dbl || treectl.csel && (e.shiftKey || ctrl(e))) {
+			td.onclick.bind(td)(e);
+			if (e.shiftKey)
+				return r.loadsel();
 			clmod(this, 'sel', clgot(tr, 'sel'));
 		}
 		else if (widget.is_open && aplay)
@@ -4706,6 +4720,7 @@ document.onkeydown = function (e) {
 
 				if (e.shiftKey) {
 					clmod(el, 'sel', 't');
+					msel.origin_tr(el);
 					msel.selui();
 				}
 
@@ -4714,6 +4729,7 @@ document.onkeydown = function (e) {
 		}
 		if (k == 'Space') {
 			clmod(ae, 'sel', 't');
+			msel.origin_tr(ae);
 			msel.selui();
 			return ev(e);
 		}
@@ -4722,6 +4738,7 @@ document.onkeydown = function (e) {
 				all = msel.getall();
 
 			msel.evsel(e, sel.length < all.length);
+			msel.origin_id(null);
 			return ev(e);
 		}
 	}
@@ -5198,6 +5215,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
+	bcfg_bind(r, 'csel', 'csel', false);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
 		r.goto(get_evpath());
 	});
@@ -6139,6 +6157,16 @@ function apply_perms(res) {
 }
 
 
+function tr2id(tr) {
+	try {
+		return tr.cells[1].querySelector('a[id]').getAttribute('id');
+	}
+	catch (ex) {
+		return null;
+	}
+}
+
+
 function find_file_col(txt) {
 	var i = -1,
 		min = false,
@@ -6641,9 +6669,11 @@ var msel = (function () {
 	var r = {};
 	r.sel = null;
 	r.all = null;
+	r.so = null;  // selection origin
+	r.pr = null;  // previous range
 
-	r.load = function () {
-		if (r.sel)
+	r.load = function (reset) {
+		if (r.sel && !reset)
 			return;
 
 		r.sel = [];
@@ -6654,7 +6684,8 @@ var msel = (function () {
 				if (ao.sel)
 					r.sel.push(ao);
 			}
-			return;
+			if (!reset)
+				return;
 		}
 
 		r.all = [];
@@ -6680,6 +6711,7 @@ var msel = (function () {
 	};
 
 	r.loadsel = function (sel) {
+		r.so = r.pr = null;
 		r.sel = [];
 		r.load();
 
@@ -6711,15 +6743,55 @@ var msel = (function () {
 		thegrid.loadsel();
 		fileman.render();
 		showfile.updtree();
-	}
+	};
 	r.seltgl = function (e) {
 		ev(e);
-		var tr = this.parentNode;
-		clmod(tr, 'sel', 't');
+		var tr = this.parentNode,
+			id = tr2id(tr);
+
+		if (treectl.csel && e.shiftKey && r.so && id && r.so != id) {
+			var o1 = -1, o2 = -1;
+			for (a = 0; a < r.all.length; a++) {
+				var ai = r.all[a].id;
+				if (ai == r.so)
+					o1 = a;
+				if (ai == id)
+					o2 = a;
+			}
+			var st = r.all[o1].sel;
+			if (o1 > o2)
+				o2 = [o1, o1 = o2][0];
+
+			if (r.pr)
+				// invert previous range, in case it was narrowed
+				for (var a = r.pr[0]; a <= r.pr[1]; a++)
+					clmod(ebi(r.all[a].id).closest('tr'), 'sel', !st);
+
+			for (var a = o1; a <= o2; a++)
+				clmod(ebi(r.all[a].id).closest('tr'), 'sel', st);
+
+			r.pr = [o1, o2];
+
+			if (window.getSelection)
+				window.getSelection().removeAllRanges();
+		}
+		else {
+			clmod(tr, 'sel', 't');
+			r.origin_tr(tr);
+		}
 		r.selui();
-	}
+	};
+	r.origin_tr = function (tr) {
+		r.so = tr2id(tr);
+		r.pr = null;
+	};
+	r.origin_id = function (id) {
+		r.so = id;
+		r.pr = null;
+	};
 	r.evsel = function (e, fun) {
 		ev(e);
+		r.so = r.pr = null;
 		var trs = QSA('#files tbody tr');
 		for (var a = 0, aa = trs.length; a < aa; a++)
 			clmod(trs[a], 'sel', fun);
@@ -7344,7 +7416,7 @@ ebi('path').onclick = function (e) {
 
 
 ebi('files').onclick = ebi('docul').onclick = function (e) {
-	if (ctrl(e))
+	if (!treectl.csel && e && (ctrl(e) || e.shiftKey))
 		return true;
 
 	var tgt = e.target.closest('a[id]');
@@ -7441,6 +7513,8 @@ function reload_browser() {
 	reload_mp();
 	try { showsort(ftab); } catch (ex) { }
 	makeSortable(ftab, function () {
+		msel.origin_id(null);
+		msel.load(true);
 		thegrid.setdirty();
 		mp.read_order();
 	});

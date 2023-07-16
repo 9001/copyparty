@@ -1230,7 +1230,8 @@ html.y #widget.open {
 #wfm a.hide {
 	display: none;
 }
-#files tbody tr.fcut td {
+#files tbody tr.fcut td,
+#ggrid>a.fcut {
 	animation: fcut .5s ease-out;
 }
 @keyframes fcut {
