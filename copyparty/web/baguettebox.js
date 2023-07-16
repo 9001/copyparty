@@ -127,7 +127,7 @@ window.baguetteBox = (function () {
             var gallery = [];
             [].forEach.call(tagsNodeList, function (imageElement, imageIndex) {
                 var imageElementClickHandler = function (e) {
-                    if (ctrl(e))
+                    if (ctrl(e) || e && e.shiftKey)
                         return true;
 
                     e.preventDefault ? e.preventDefault() : e.returnValue = false;

@@ -189,8 +189,8 @@ var Ls = {
 		"cl_hpick": "click one column header to hide in the table below",
 		"cl_hcancel": "column hiding aborted",
 
-		"ct_thumb": "in icon view, toggle icons or thumbnails$NHotkey: T",
-		"ct_csel": "use CTRL and SHIFT for file selection",
+		"ct_thumb": "in grid-view, toggle icons or thumbnails$NHotkey: T",
+		"ct_csel": "use CTRL and SHIFT for file selection in grid-view",
 		"ct_dots": "show hidden files (if server permits)",
 		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
@@ -652,7 +652,7 @@ var Ls = {
 		"cl_hcancel": "kolonne-skjuling avbrutt",
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
-		"ct_csel": "bruk tastene CTRL og SHIFT for markering av filer",
+		"ct_csel": "bruk tastene CTRL og SHIFT for markering av filer i ikonvisning",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
 		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
@@ -4300,7 +4300,7 @@ var thegrid = (function () {
 	setsz();
 
 	function gclick1(e) {
-		if (ctrl(e) && !treectl.csel)
+		if (ctrl(e) && !treectl.csel && !r.sel)
 			return true;
 
 		return gclick.bind(this)(e, false);
@@ -4324,7 +4324,7 @@ var thegrid = (function () {
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if (r.sel && !dbl || treectl.csel && (e.shiftKey || ctrl(e))) {
+		if ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e)))) {
 			td.onclick.bind(td)(e);
 			if (e.shiftKey)
 				return r.loadsel();
@@ -6749,7 +6749,7 @@ var msel = (function () {
 		var tr = this.parentNode,
 			id = tr2id(tr);
 
-		if (treectl.csel && e.shiftKey && r.so && id && r.so != id) {
+		if ((treectl.csel || !thegrid.en || thegrid.sel) && e.shiftKey && r.so && id && r.so != id) {
 			var o1 = -1, o2 = -1;
 			for (a = 0; a < r.all.length; a++) {
 				var ai = r.all[a].id;
@@ -6762,10 +6762,15 @@ var msel = (function () {
 			if (o1 > o2)
 				o2 = [o1, o1 = o2][0];
 
-			if (r.pr)
+			if (r.pr) {
 				// invert previous range, in case it was narrowed
 				for (var a = r.pr[0]; a <= r.pr[1]; a++)
 					clmod(ebi(r.all[a].id).closest('tr'), 'sel', !st);
+
+				// and invert current selection if repeated
+				if (r.pr[0] === o1 && r.pr[1] === o2)
+					st = !st;
+			}
 
 			for (var a = o1; a <= o2; a++)
 				clmod(ebi(r.all[a].id).closest('tr'), 'sel', st);
