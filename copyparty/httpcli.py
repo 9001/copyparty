@@ -3126,7 +3126,7 @@ class HttpCli(object):
         return ""  # unhandled / fallthrough
 
     def scanvol(self) -> bool:
-        if not self.can_read or not self.can_write:
+        if not self.can_admin:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_rescan:
@@ -3149,7 +3149,7 @@ class HttpCli(object):
         if act != "cfg":
             raise Pebkac(400, "only config files ('cfg') can be reloaded rn")
 
-        if not [x for x in self.wvol if x in self.rvol]:
+        if not self.avol:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_reload:
@@ -3159,7 +3159,7 @@ class HttpCli(object):
         return self.redirect("", "?h", x.get(), "return to", False)
 
     def tx_stack(self) -> bool:
-        if not [x for x in self.wvol if x in self.rvol]:
+        if not self.avol and not [x for x in self.wvol if x in self.rvol]:
             raise Pebkac(403, "not allowed for user " + self.uname)
 
         if self.args.no_stack:

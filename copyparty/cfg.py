@@ -109,6 +109,7 @@ flagcats = {
         "nohash=\\.iso$": "skips hashing file contents if path matches *.iso",
         "noidx=\\.iso$": "fully ignores the contents at paths matching *.iso",
         "noforget": "don't forget files when deleted from disk",
+        "fat32": "avoid excessive reindexing on android sdcardfs",
         "dbd=[acid|swal|wal|yolo]": "database speed-durability tradeoff",
         "xlink": "cross-volume dupe detection / linking",
         "xdev": "do not descend into other filesystems",

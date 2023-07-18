@@ -883,6 +883,7 @@ class Up2k(object):
         rei = vol.flags.get("noidx")
         reh = vol.flags.get("nohash")
         n4g = bool(vol.flags.get("noforget"))
+        ffat = "fat32" in vol.flags
         cst = bos.stat(top)
         dev = cst.st_dev if vol.flags.get("xdev") else 0
 
@@ -919,6 +920,7 @@ class Up2k(object):
                     rei,
                     reh,
                     n4g,
+                    ffat,
                     [],
                     cst,
                     dev,
@@ -974,6 +976,7 @@ class Up2k(object):
         rei: Optional[Pattern[str]],
         reh: Optional[Pattern[str]],
         n4g: bool,
+        ffat: bool,
         seen: list[str],
         cst: os.stat_result,
         dev: int,
@@ -1018,7 +1021,7 @@ class Up2k(object):
 
             lmod = int(inf.st_mtime)
             sz = inf.st_size
-            if fat32 and inf.st_mtime % 2:
+            if fat32 and not ffat and inf.st_mtime % 2:
                 fat32 = False
 
             if stat.S_ISDIR(inf.st_mode):
@@ -1035,7 +1038,19 @@ class Up2k(object):
                 # self.log(" dir: {}".format(abspath))
                 try:
                     ret += self._build_dir(
-                        db, top, excl, abspath, rap, rei, reh, n4g, seen, inf, dev, xvol
+                        db,
+                        top,
+                        excl,
+                        abspath,
+                        rap,
+                        rei,
+                        reh,
+                        n4g,
+                        fat32,
+                        seen,
+                        inf,
+                        dev,
+                        xvol,
                     )
                 except:
                     t = "failed to index subdir [{}]:\n{}"
