@@ -2985,7 +2985,9 @@ class HttpCli(object):
             if self.args.rclone_mdns or not self.args.zm
             else self.conn.hsrv.nm.map(self.ip) or host
         )
-        vp = (self.uparam["hc"] or "").lstrip("/")
+        # safer than html_escape/quotep since this avoids both XSS and shell-stuff
+        pw = re.sub(r"[<>&$?`]", "_", self.pw or "pw")
+        vp = re.sub(r"[<>&$?`]", "_", self.uparam["hc"] or "").lstrip("/")
         html = self.j2s(
             "svcs",
             args=self.args,
@@ -2998,7 +3000,7 @@ class HttpCli(object):
             host=host,
             hport=hport,
             aname=aname,
-            pw=self.pw or "pw",
+            pw=pw,
         )
         self.reply(html.encode("utf-8"))
         return True
