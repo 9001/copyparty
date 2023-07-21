@@ -392,9 +392,9 @@ find -name '*.pyc' -delete
 find -name __pycache__ -delete
 find -name py.typed -delete
 
-# especially prevent osx from leaking your lan ip (wtf apple)
+# especially prevent macos/osx from leaking your lan ip (wtf apple)
 find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
-find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -f -- "$f"; done
+find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -fv -- "$f"; done
 
 rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
 

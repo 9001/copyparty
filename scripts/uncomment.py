@@ -69,8 +69,13 @@ def uncomment(fpath):
 def main():
     print("uncommenting", end="", flush=True)
     try:
+        if sys.argv[1] == "1":
+            sys.argv.remove("1")
+            raise Exception("disabled")
+
         import multiprocessing as mp
 
+        mp.set_start_method("spawn", True)
         with mp.Pool(os.cpu_count()) as pool:
             pool.map(uncomment, sys.argv[1:])
     except Exception as ex:

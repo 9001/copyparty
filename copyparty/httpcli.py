@@ -439,7 +439,7 @@ class HttpCli(object):
             self.can_upget,
             self.can_admin,
         ) = (
-            avn.can_access("", self.uname) if avn else [False] * 6
+            avn.can_access("", self.uname) if avn else [False] * 7
         )
         self.avn = avn
         self.vn = vn

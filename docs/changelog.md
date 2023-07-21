@@ -1,4 +1,39 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0718-0746  `v1.8.4`  range-select v2
+
+**IMPORTANT:** `v1.8.2` (previous release) fixed [CVE-2023-37474](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-37474) ; please see the [1.8.2 release notes](https://github.com/9001/copyparty/releases/tag/v1.8.2) (all serverlogs reviewed so far showed no signs of exploitation)
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+## new features
+* #47 file selection by shift-clicking
+  * in list-view: click a table row to select it, then shift-click another to select all files in-between
+  * in grid-view: either enable the `multiselect` button (mainly for phones/tablets), or the new `sel` button in the `[⚙️] settings` tab (better for mouse+keyboard), then shift-click two files
+* volflag `fat32` avoids a bug in android's sdcardfs causing excessive reindexing on startup if any files were modified on the sdcard since last reboot
+
+## bugfixes
+* minor corrections to the new features from #45
+  * uploader IPs are now visible for `a`dmin accounts in `d2t` volumes as well
+
+## other changes
+* the admin-panel is only accessible for accounts which have the `a` (admin) permission-level in one or more volumes; so instead of giving your user `rwmd` access, you'll want `rwmda` instead:
+  ```bash
+  python3 copyparty-sfx.py -a joe:hunter2 -v /mnt/nas/pub:pub:rwmda,joe
+  ```
+  or in a settings file,
+  ```yaml
+  [/pub]
+    /mnt/nas/pub
+    accs:
+      rwmda: joe
+  ```
+  * until now, `rw` was enough, however most readwrite users don't need access to those features
+  * grabbing a stacktrace with `?stack` is permitted for both `rw` and `a`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0714-1558  `v1.8.2`  URGENT: fix path traversal vulnerability
 
 * read-only demo server at https://a.ocv.me/pub/demo/
