@@ -84,7 +84,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [iOS shortcuts](#iOS-shortcuts) - there is no iPhone app, but
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
     * [client-side](#client-side) - when uploading files
-* [security](#security) - some notes on hardening
+* [security](#security) - there is a [discord server](https://discord.gg/25J8CdTT6G)
     * [gotchas](#gotchas) - behavior that might be unexpected
     * [cors](#cors) - cross-site request config
     * [password hashing](#password-hashing) - you can hash passwords
@@ -1536,6 +1536,8 @@ when uploading files,
 
 
 # security
+
+there is a [discord server](https://discord.gg/25J8CdTT6G)  with an `@everyone` for all important updates (at the lack of better ideas)
 
 some notes on hardening
 

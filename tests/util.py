@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import time
 import shutil
@@ -178,6 +179,8 @@ class VHttpSrv(object):
 
         self.gpwd = Garda("")
         self.g404 = Garda("")
+
+        self.ptn_cc = re.compile(r"[\x00-\x1f]")
 
     def cachebuster(self):
         return "a"

@@ -1,4 +1,20 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0721-0036  `v1.8.6`  fix reflected XSS
+
+## bugfixes
+* reflected XSS through `/?hc` (the optional subfolder parameter to the [connect](https://a.ocv.me/?hc) page)
+  * if someone tricked you into clicking `http://127.0.0.1:3923/?hc=<script>alert(1)</script>` they could potentially have moved/deleted existing files on the server, or uploaded new files, using your account
+  * if you use a reverse proxy, you can check if you have been exploited like so:
+    * nginx: grep your logs for URLs containing `?hc=` with `<` somewhere in its value, for example using the following command:
+      ```bash
+      (gzip -dc access.log*.gz; cat access.log) | sed -r 's/" [0-9]+ .*//' | grep -E '[?&](hc|pw)=.*[<>]'
+      ```
+  * if you find any traces of exploitation (or just want to be on the safe side) it's recommended to change the passwords of your copyparty accounts
+  * thanks again to @TheHackyDog !
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0718-0746  `v1.8.4`  range-select v2
 
 **IMPORTANT:** `v1.8.2` (previous release) fixed [CVE-2023-37474](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-37474) ; please see the [1.8.2 release notes](https://github.com/9001/copyparty/releases/tag/v1.8.2) (all serverlogs reviewed so far showed no signs of exploitation)
