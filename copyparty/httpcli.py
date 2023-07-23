@@ -804,13 +804,15 @@ class HttpCli(object):
 
             path_base = os.path.join(self.E.mod, "web")
             static_path = absreal(os.path.join(path_base, self.vpath[5:]))
+            if static_path in self.conn.hsrv.statics:
+                return self.tx_file(static_path)
+
             if not static_path.startswith(path_base):
                 t = "malicious user; attempted path traversal [{}] => [{}]"
                 self.log(t.format(self.vpath, static_path), 1)
-                self.tx_404()
-                return False
 
-            return self.tx_file(static_path)
+            self.tx_404()
+            return False
 
         if "cf_challenge" in self.uparam:
             self.reply(self.j2s("cf").encode("utf-8", "replace"))

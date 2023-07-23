@@ -55,7 +55,6 @@ except SyntaxError:
     )
     sys.exit(1)
 
-from .bos import bos
 from .httpconn import HttpConn
 from .u2idx import U2idx
 from .util import (
@@ -66,6 +65,7 @@ from .util import (
     Magician,
     Netdev,
     NetMap,
+    absreal,
     ipnorm,
     min_ex,
     shut_socket,
@@ -139,6 +139,9 @@ class HttpSrv(object):
         zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
         self.prism = os.path.exists(zs)
 
+        self.statics: set[str] = set()
+        self._build_statics()
+
         self.ptn_cc = re.compile(r"[\x00-\x1f]")
 
         self.mallow = "GET HEAD POST PUT DELETE OPTIONS".split()
@@ -170,6 +173,14 @@ class HttpSrv(object):
             self.th_cfg = x.get()
         except:
             pass
+
+    def _build_statics(self) -> None:
+        for dp, _, df in os.walk(os.path.join(self.E.mod, "web")):
+            for fn in df:
+                ap = absreal(os.path.join(dp, fn))
+                self.statics.add(ap)
+                if ap.endswith(".gz") or ap.endswith(".br"):
+                    self.statics.add(ap[:-3])
 
     def set_netdevs(self, netdevs: dict[str, Netdev]) -> None:
         ips = set()
