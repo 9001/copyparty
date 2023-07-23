@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import base64
 import math
 import os
+import re
 import socket
 import sys
 import threading
@@ -137,6 +138,8 @@ class HttpSrv(object):
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
         zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
         self.prism = os.path.exists(zs)
+
+        self.ptn_cc = re.compile(r"[\x00-\x1f]")
 
         self.mallow = "GET HEAD POST PUT DELETE OPTIONS".split()
         if not self.args.no_dav:

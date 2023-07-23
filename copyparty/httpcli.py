@@ -337,6 +337,15 @@ class HttpCli(object):
             vpath, arglist = self.req.split("?", 1)
             self.trailing_slash = vpath.endswith("/")
             vpath = undot(vpath)
+
+            zs = unquotep(arglist)
+            m = self.conn.hsrv.ptn_cc.search(zs)
+            if m:
+                hit = zs[m.span()[0] :]
+                t = "malicious user; Cc in query [{}] => [{!r}]"
+                self.log(t.format(self.req, hit), 1)
+                return False
+
             for k in arglist.split("&"):
                 if "=" in k:
                     k, zs = k.split("=", 1)
@@ -488,6 +497,9 @@ class HttpCli(object):
                 pex: Pebkac = ex  # type: ignore
 
             try:
+                if pex.code == 999:
+                    return False
+
                 post = self.mode in ["POST", "PUT"] or "content-length" in self.headers
                 if not self._check_nonfatal(pex, post):
                     self.keepalive = False
@@ -585,6 +597,14 @@ class HttpCli(object):
 
         for k, zs in list(self.out_headers.items()) + self.out_headerlist:
             response.append("%s: %s" % (k, zs))
+
+        for zs in response:
+            m = self.conn.hsrv.ptn_cc.search(zs)
+            if m:
+                hit = zs[m.span()[0] :]
+                t = "malicious user; Cc in out-hdr {!r} => [{!r}]"
+                self.log(t.format(zs, hit), 1)
+                raise Pebkac(999)
 
         try:
             # best practice to separate headers and body into different packets
@@ -785,7 +805,7 @@ class HttpCli(object):
             path_base = os.path.join(self.E.mod, "web")
             static_path = absreal(os.path.join(path_base, self.vpath[5:]))
             if not static_path.startswith(path_base):
-                t = "attempted path traversal [{}] => [{}]"
+                t = "malicious user; attempted path traversal [{}] => [{}]"
                 self.log(t.format(self.vpath, static_path), 1)
                 self.tx_404()
                 return False
@@ -3077,7 +3097,14 @@ class HttpCli(object):
         return True
 
     def set_k304(self) -> bool:
-        ck = gencookie("k304", self.uparam["k304"], self.args.R, False, 86400 * 299)
+        v = self.uparam["k304"].lower()
+        if v == "y":
+            dur = 86400 * 299
+        else:
+            dur = None
+            v = "x"
+
+        ck = gencookie("k304", v, self.args.R, False, dur)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.redirect("", "?h#cc")
         return True
