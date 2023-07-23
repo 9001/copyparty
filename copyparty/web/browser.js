@@ -2173,13 +2173,18 @@ function seek_au_sec(seek) {
 }
 
 
-function song_skip(n) {
-	var tid = null;
-	if (mp.au)
-		tid = mp.au.tid;
+function song_skip(n, dirskip) {
+	var tid = mp.au ? mp.au.tid : null,
+		ofs = tid ? mp.order.indexOf(tid) : -1;
 
-	if (tid !== null)
-		play(mp.order.indexOf(tid) + n);
+	if (dirskip && ofs + 1 && ofs > mp.order.length - 2) {
+		toast.inf(10, L.mm_nof);
+		mpl.traversals = 0;
+		return;
+	}
+
+	if (tid)
+		play(ofs + n);
 	else
 		play(mp.order[n == -1 ? mp.order.length - 1 : 0]);
 }
@@ -2194,8 +2199,9 @@ function next_song(e) {
 function next_song_cmn(e) {
 	ev(e);
 	if (mp.order.length) {
+		var dirskip = mpl.traversals;
 		mpl.traversals = 0;
-		return song_skip(1);
+		return song_skip(1, dirskip);
 	}
 	if (mpl.traversals++ < 5) {
 		if (MOBILE && t_fchg && Date.now() - t_fchg > 30 * 1000)
