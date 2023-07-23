@@ -3008,8 +3008,10 @@ class HttpCli(object):
             else self.conn.hsrv.nm.map(self.ip) or host
         )
         # safer than html_escape/quotep since this avoids both XSS and shell-stuff
-        pw = re.sub(r"[<>&$?`]", "_", self.pw or "pw")
-        vp = re.sub(r"[<>&$?`]", "_", self.uparam["hc"] or "").lstrip("/")
+        pw = re.sub(r"[<>&$?`\"']", "_", self.pw or "pw")
+        vp = re.sub(r"[<>&$?`\"']", "_", self.uparam["hc"] or "").lstrip("/")
+        pw = pw.replace(" ", "%20")
+        vp = vp.replace(" ", "%20")
         html = self.j2s(
             "svcs",
             args=self.args,
