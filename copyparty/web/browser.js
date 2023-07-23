@@ -3930,7 +3930,7 @@ var showfile = (function () {
 			if (!lang)
 				continue;
 
-			r.files.push({ 'id': link.id, 'name': fn });
+			r.files.push({ 'id': link.id, 'name': uricom_dec(fn) });
 
 			var td = ebi(link.id).closest('tr').getElementsByTagName('td')[0];
 
@@ -4120,8 +4120,9 @@ var showfile = (function () {
 		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('') + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
-			html.push('<li><a href="?doc=' + file.name + '" hl="' + file.id +
-				'">' + esc(uricom_dec(file.name)) + '</a>');
+			html.push('<li><a href="?doc=' +
+				uricom_enc(file.name) + '" hl="' + file.id +
+				'">' + esc(file.name) + '</a>');
 		}
 		ebi('docul').innerHTML = html.join('\n');
 	};
