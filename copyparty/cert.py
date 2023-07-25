@@ -181,6 +181,10 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
         raise Exception("failed to translate cert: {}, {}".format(rc, se))
 
     bname = os.path.join(args.crt_dir, "srv")
+    try:
+        os.unlink(bname + ".key")
+    except:
+        pass
     os.rename(bname + "-key.pem", bname + ".key")
     os.unlink(bname + ".csr")
 
@@ -216,7 +220,7 @@ def gencert(log: "RootLogger", args, netdevs: dict[str, Netdev]):
         HAVE_CFSSL = False
         log("cert", "could not create TLS certificates: {}".format(ex), 3)
         if getattr(ex, "errno", 0) == errno.ENOENT:
-            t = "install cfssl if you want to fix this; https://github.com/cloudflare/cfssl/releases/latest"
+            t = "install cfssl if you want to fix this; https://github.com/cloudflare/cfssl/releases/latest  (cfssl, cfssljson, cfssl-certinfo)"
             log("cert", t, 6)
 
         ensure_cert(log, args)
