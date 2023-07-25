@@ -141,6 +141,7 @@ class HttpCli(object):
         self.vn = self.asrv.vfs
         self.rem = " "
         self.vpath = " "
+        self.vpaths = " "
         self.uname = " "
         self.pw = " "
         self.rvol = [" "]
@@ -384,6 +385,9 @@ class HttpCli(object):
         self.uparam = uparam
         self.cookies = cookies
         self.vpath = unquotep(vpath)  # not query, so + means +
+        self.vpaths = (
+            self.vpath + "/" if self.trailing_slash and self.vpath else self.vpath
+        )
 
         ok = "\x00" not in self.vpath
         if ANYWIN:
@@ -686,6 +690,21 @@ class HttpCli(object):
 
         r = ["%s=%s" % (k, quotep(zs)) if zs else k for k, zs in kv.items()]
         return "?" + "&amp;".join(r)
+
+    def ourlq(self) -> str:
+        skip = ("pw", "k")
+        ret = []
+        for k, v in self.ouparam.items():
+            if k in skip:
+                continue
+
+            t = "{}={}".format(quotep(k), quotep(v))
+            ret.append(t.replace(" ", "+").rstrip("="))
+
+        if not ret:
+            return ""
+
+        return "?" + "&".join(ret)
 
     def redirect(
         self,
@@ -2025,7 +2044,9 @@ class HttpCli(object):
 
         dst = self.args.SRS
         if self.vpath:
-            dst += quotep(self.vpath)
+            dst += quotep(self.vpaths)
+
+        dst += self.ourlq()
 
         msg = self.get_pwd_cookie(pwd)
         html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
@@ -3090,7 +3111,7 @@ class HttpCli(object):
         html = self.j2s(
             "splash",
             this=self,
-            qvpath=quotep(self.vpath),
+            qvpath=quotep(self.vpaths) + self.ourlq(),
             rvol=rvol,
             wvol=wvol,
             avol=avol,
@@ -3148,7 +3169,8 @@ class HttpCli(object):
             t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="{}/?h">go home</a></p>'
 
         t = t.format(self.args.SR)
-        html = self.j2s("splash", this=self, qvpath=quotep(self.vpath), msg=t)
+        qv = quotep(self.vpaths) + self.ourlq()
+        html = self.j2s("splash", this=self, qvpath=qv, msg=t)
         self.reply(html.encode("utf-8"), status=rc)
         return True
 
