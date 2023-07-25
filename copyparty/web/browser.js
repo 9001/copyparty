@@ -5848,6 +5848,8 @@ var treectl = (function () {
 			}
 			if (sel.length)
 				msel.loadsel(sel);
+			else
+				msel.origin_id(null);
 
 			setTimeout(eval_hash, 1);
 		}
@@ -6718,7 +6720,9 @@ var msel = (function () {
 	};
 
 	r.loadsel = function (sel) {
-		r.so = r.pr = null;
+		if (!sel || !r.so || !ebi(r.so))
+			r.so = r.pr = null;
+
 		r.sel = [];
 		r.load();
 
