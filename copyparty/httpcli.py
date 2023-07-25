@@ -692,7 +692,7 @@ class HttpCli(object):
         return "?" + "&amp;".join(r)
 
     def ourlq(self) -> str:
-        skip = ("pw", "k")
+        skip = ("pw", "h", "k")
         ret = []
         for k, v in self.ouparam.items():
             if k in skip:

@@ -1,4 +1,24 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0723-1543  `v1.8.7`  XSS for days
+
+at the lack of better ideas, there is now a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` for all future important updates such as this one
+
+## bugfixes
+* reflected XSS through `/?k304` and `/?setck`
+  * if someone tricked you into clicking a URL containing a chain of `%0d` and `%0a` they could potentially have moved/deleted existing files on the server, or uploaded new files, using your account
+  * if you use a reverse proxy, you can check if you have been exploited like so:
+    * nginx: grep your logs for URLs containing `%0d%0a%0d%0a`, for example using the following command:
+      ```bash
+      (gzip -dc access.log*.gz; cat access.log) | sed -r 's/" [0-9]+ .*//' | grep -iE '%0[da]%0[da]%0[da]%0[da]'
+      ```
+  * if you find any traces of exploitation (or just want to be on the safe side) it's recommended to change the passwords of your copyparty accounts
+  * huge thanks *again* to @TheHackyDog !
+* the original fix for CVE-2023-37474 broke the download links for u2c.py and partyfuse.py
+* fix mediaplayer spinlock if the server only has a single audio file
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0721-0036  `v1.8.6`  fix reflected XSS
 
 ## bugfixes
