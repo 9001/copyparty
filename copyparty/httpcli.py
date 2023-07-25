@@ -2634,7 +2634,7 @@ class HttpCli(object):
         #
         # if request is for foo.js, check if we have foo.js.{gz,br}
 
-        file_ts = 0
+        file_ts = 0.0
         editions: dict[str, tuple[str, int]] = {}
         for ext in ["", ".gz", ".br"]:
             try:
@@ -2652,7 +2652,7 @@ class HttpCli(object):
                 else:
                     sz = st.st_size
 
-                file_ts = max(file_ts, int(st.st_mtime))
+                file_ts = max(file_ts, st.st_mtime)
                 editions[ext or "plain"] = (fs_path, sz)
             except:
                 pass
@@ -2665,10 +2665,13 @@ class HttpCli(object):
         #
         # if-modified
 
-        file_lastmod, do_send = self._chk_lastmod(file_ts)
+        file_lastmod, do_send = self._chk_lastmod(int(file_ts))
         self.out_headers["Last-Modified"] = file_lastmod
         if not do_send:
             status = 304
+
+        if self.can_write:
+            self.out_headers["X-Lastmod3"] = str(int(file_ts * 1000))
 
         #
         # Accept-Encoding and UA decides which edition to send

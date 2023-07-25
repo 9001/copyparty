@@ -278,6 +278,7 @@ function Modpoll() {
             return;
 
         var new_md = this.responseText,
+            new_mt = this.getResponseHeader('X-Lastmod3') || r.lastmod,
             server_ref = server_md.replace(/\r/g, ''),
             server_now = new_md.replace(/\r/g, '');
 
@@ -285,6 +286,7 @@ function Modpoll() {
         if (r.initial && server_ref != server_now)
             return modal.confirm('Your browser decided to show an outdated copy of the document!\n\nDo you want to load the latest version from the server instead?', function () {
                 dom_src.value = server_md = new_md;
+                last_modified = new_mt;
                 draw_md();
             }, null);
 
