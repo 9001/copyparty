@@ -2939,7 +2939,12 @@ class HttpCli(object):
         ts_html = st.st_mtime
 
         sz_md = 0
+        lead = b""
         for buf in yieldfile(fs_path):
+            if not sz_md and b"\n" in buf[:2]:
+                lead = buf[: buf.find(b"\n") + 1]
+                sz_md += len(lead)
+
             sz_md += len(buf)
             for c, v in [(b"&", 4), (b"<", 3), (b">", 3)]:
                 sz_md += (len(buf) - len(buf.replace(c, b""))) * v
@@ -2985,7 +2990,7 @@ class HttpCli(object):
             return True
 
         try:
-            self.s.sendall(html[0])
+            self.s.sendall(html[0] + lead)
             for buf in yieldfile(fs_path):
                 self.s.sendall(html_bescape(buf))
 
