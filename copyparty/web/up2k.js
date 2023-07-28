@@ -998,13 +998,26 @@ function up2k_init(subtle) {
         return onover.bind(this)(e);
     }
     function onover(e) {
+        return onovercmn(this, e, false);
+    }
+    function onoverbtn(e) {
+        return onovercmn(this, e, true);
+    }
+    function onovercmn(self, e, btn) {
         try {
             var ok = false, dt = e.dataTransfer.types;
             for (var a = 0; a < dt.length; a++)
                 if (dt[a] == 'Files')
                     ok = true;
-                else if (dt[a] == 'text/uri-list')
-                    return true;
+                else if (dt[a] == 'text/uri-list') {
+                    if (btn) {
+                        ok = true;
+                        if (toast.txt == L.u_uri)
+                            toast.hide();
+                    }
+                    else
+                        return toast.inf(10, L.u_uri) || true;
+                }
 
             if (!ok)
                 return true;
@@ -1020,8 +1033,11 @@ function up2k_init(subtle) {
             document.body.ondragenter = document.body.ondragleave = document.body.ondragover = null;
             return modal.alert('your browser does not support drag-and-drop uploading');
         }
+        if (btn)
+            return;
+
         clmod(ebi('drops'), 'vis', 1);
-        var v = this.getAttribute('v');
+        var v = self.getAttribute('v');
         if (v)
             clmod(ebi(v), 'hl', 1);
     }
@@ -1045,6 +1061,8 @@ function up2k_init(subtle) {
     document.body.ondragleave = offdrag;
     document.body.ondragover = onover;
     document.body.ondrop = gotfile;
+    ebi('u2btn').ondrop = gotfile;
+    ebi('u2btn').ondragover = onoverbtn;
 
     var drops = [ebi('up_dz'), ebi('srch_dz')];
     for (var a = 0; a < 2; a++) {
@@ -1132,7 +1150,7 @@ function up2k_init(subtle) {
                 dst = good_files;
 
             if (is_itemlist) {
-                if (fobj.kind !== 'file')
+                if (fobj.kind !== 'file' && fobj.type !== 'text/uri-list')
                     continue;
 
                 try {
@@ -1144,6 +1162,8 @@ function up2k_init(subtle) {
                 }
                 catch (ex) { }
                 fobj = fobj.getAsFile();
+                if (!fobj)
+                    continue;
             }
             try {
                 if (fobj.size < 1)

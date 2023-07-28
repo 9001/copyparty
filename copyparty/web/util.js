@@ -1274,6 +1274,9 @@ var toast = (function () {
     r.visible = false;
     r.txt = null;
     r.tag = obj;  // filler value (null is scary)
+    r.p_txt = '';
+    r.p_sec = 0;
+    r.p_t = 0;
 
     function scrollchk() {
         if (scrolling)
@@ -1306,9 +1309,22 @@ var toast = (function () {
     };
 
     r.show = function (cl, sec, txt, tag) {
+        var same = r.visible && txt == r.p_txt && r.p_sec == sec,
+            delta = Date.now() - r.p_t;
+
+        if (same && delta < 100)
+            return;
+
+        r.p_txt = txt;
+        r.p_sec = sec;
+        r.p_t = Date.now();
+
         clearTimeout(te);
         if (sec)
             te = setTimeout(r.hide, sec * 1000);
+
+        if (same && delta < 1000)
+            return;
 
         if (txt.indexOf('<body>') + 1)
             txt = txt.slice(0, txt.indexOf('<')) + ' [...]';
