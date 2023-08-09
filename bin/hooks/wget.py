@@ -4,7 +4,8 @@ import os
 import sys
 import json
 import subprocess as sp
-
+from urllib.parse import urlparse
+from shlex import quote
 
 _ = r"""
 use copyparty as a file downloader by POSTing URLs as
@@ -30,12 +31,24 @@ parameters explained,
     t3600 = timeout and kill download after 1 hour
 """
 
+def validate_url(url):
+    parsed_url = urlparse(url)
+    if parsed_url.scheme not in ('http', 'https') or not parsed_url.netloc:
+        raise ValueError("Invalid URL")
+    return url
 
 def main():
     inf = json.loads(sys.argv[1])
     url = inf["txt"]
     if "://" not in url:
         url = "https://" + url
+
+    # Validate the URL
+    try:
+        url = validate_url(url)
+    except ValueError as e:
+        print(str(e))
+        return
 
     os.chdir(inf["ap"])
 
@@ -44,12 +57,14 @@ def main():
     print(f"{tfn}\n", end="")
     open(tfn, "wb").close()
 
-    cmd = ["wget", "--trust-server-names", "-nv", "--", url]
+    # Quote the URL to prevent shell injection
+    quoted_url = quote(url)
+    cmd = ["wget", "--trust-server-names", "-nv", "--", quoted_url]
 
     try:
         sp.check_call(cmd)
     except:
-        t = "-- FAILED TO DONWLOAD " + name
+        t = "-- FAILED TO DOWNLOAD " + name
         print(f"{t}\n", end="")
         open(t, "wb").close()
 
