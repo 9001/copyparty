@@ -52,6 +52,10 @@ if TYPE_CHECKING:
 
 LEELOO_DALLAS = "leeloo_dallas"
 
+SEE_LOG = "see log for details"
+SSEELOG = " ({})".format(SEE_LOG)
+BAD_CFG = "invalid config; {}".format(SEE_LOG)
+SBADCFG = " ({})".format(BAD_CFG)
 
 class AXS(object):
     def __init__(
@@ -795,7 +799,7 @@ class AuthSrv(object):
         if dst in mount:
             t = "multiple filesystem-paths mounted at [/{}]:\n  [{}]\n  [{}]"
             self.log(t.format(dst, mount[dst], src), c=1)
-            raise Exception("invalid config")
+            raise Exception(BAD_CFG)
 
         if src in mount.values():
             t = "filesystem-path [{}] mounted in multiple locations:"
@@ -804,7 +808,7 @@ class AuthSrv(object):
                 t += "\n  /{}".format(v)
 
             self.log(t, c=3)
-            raise Exception("invalid config")
+            raise Exception(BAD_CFG)
 
         if not bos.path.isdir(src):
             self.log("warning: filesystem-path does not exist: {}".format(src), 3)
@@ -903,7 +907,7 @@ class AuthSrv(object):
                         t = "volume-specific config (anything from --help-flags)"
                         self._l(ln, 6, t)
                 else:
-                    raise Exception("invalid section header")
+                    raise Exception("invalid section header" + SBADCFG)
 
                 self.indent = "    " if subsection else "  "
                 continue
@@ -926,7 +930,7 @@ class AuthSrv(object):
                     acct[u] = p
                 except:
                     t = 'lines inside the [accounts] section must be "username: password"'
-                    raise Exception(t)
+                    raise Exception(t + SBADCFG)
                 continue
 
             if vp is not None and ap is None:
@@ -954,7 +958,7 @@ class AuthSrv(object):
                     continue
                 except:
                     err += "accs entries must be 'rwmdgGa: user1, user2, ...'"
-                    raise Exception(err)
+                    raise Exception(err + SBADCFG)
 
             if cat == catf:
                 err = ""
@@ -967,7 +971,7 @@ class AuthSrv(object):
                         if bad:
                             err = "bad characters [{}] in volflag name [{}]; "
                             err = err.format(bad, sk)
-                            raise Exception(err)
+                            raise Exception(err + SBADCFG)
                         if sv is True:
                             fstr += "," + sk
                         else:
@@ -979,9 +983,9 @@ class AuthSrv(object):
                     continue
                 except:
                     err += "flags entries (volflags) must be one of the following:\n  'flag1, flag2, ...'\n  'key: value'\n  'flag1, flag2, key: value'"
-                    raise Exception(err)
+                    raise Exception(err + SBADCFG)
 
-            raise Exception("unprocessable line in config")
+            raise Exception("unprocessable line in config" + SBADCFG)
 
         self._e()
         self.line_ctr = 0
@@ -1218,7 +1222,7 @@ class AuthSrv(object):
                 + ", ".join(k for k in sorted(missing_users)),
                 c=1,
             )
-            raise Exception("invalid config")
+            raise Exception(BAD_CFG)
 
         if LEELOO_DALLAS in all_users:
             raise Exception("sorry, reserved username: " + LEELOO_DALLAS)
@@ -1228,7 +1232,7 @@ class AuthSrv(object):
             if pwd in seenpwds:
                 t = "accounts [{}] and [{}] have the same password; this is not supported"
                 self.log(t.format(seenpwds[pwd], usr), 1)
-                raise Exception("invalid config")
+                raise Exception(BAD_CFG)
             seenpwds[pwd] = usr
 
         promote = []

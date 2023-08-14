@@ -22,7 +22,7 @@ from copy import deepcopy
 from queue import Queue
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
-from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
+from .authsrv import LEELOO_DALLAS, SSEELOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_vmap
 from .fsutil import Fstab
@@ -2660,7 +2660,7 @@ class Up2k(object):
             if not job:
                 known = " ".join([x for x in self.registry[ptop].keys()])
                 self.log("unknown wark [{}], known: {}".format(wark, known))
-                raise Pebkac(400, "unknown wark")
+                raise Pebkac(400, "unknown wark" + SSEELOG)
 
             if chash not in job["need"]:
                 msg = "chash = {} , need:\n".format(chash)

@@ -29,7 +29,7 @@ if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Union
 
 from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
-from .authsrv import AuthSrv
+from .authsrv import BAD_CFG, AuthSrv
 from .cert import ensure_cert
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
@@ -131,7 +131,7 @@ class SvcHub(object):
             args.force_js = True
 
         if not self._process_config():
-            raise Exception("bad config")
+            raise Exception(BAD_CFG)
 
         self.log_div = 10 ** (6 - args.log_tdec)
         self.log_efmt = "%02d:%02d:%02d.%0{}d".format(args.log_tdec)
