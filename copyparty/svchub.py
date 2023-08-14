@@ -133,6 +133,9 @@ class SvcHub(object):
         if not self._process_config():
             raise Exception("bad config")
 
+        self.log_div = 10 ** (6 - args.log_tdec)
+        self.log_efmt = "%02d:%02d:%02d.%0{}d".format(args.log_tdec)
+        self.log_dfmt = "%04d-%04d-%06d.%0{}d".format(args.log_tdec)
         self.log = self._log_disabled if args.q else self._log_enabled
         if args.lo:
             self._setup_logfile(printed)
@@ -673,11 +676,11 @@ class SvcHub(object):
 
         with self.log_mutex:
             zd = datetime.utcnow()
-            ts = "%04d-%04d-%06d.%03d" % (
+            ts = self.log_dfmt % (
                 zd.year,
                 zd.month * 100 + zd.day,
                 (zd.hour * 100 + zd.minute) * 100 + zd.second,
-                zd.microsecond // 1000,
+                zd.microsecond // self.log_div,
             )
             self.logf.write("@%s [%s\033[0m] %s\n" % (ts, src, msg))
 
@@ -729,11 +732,11 @@ class SvcHub(object):
                     msg = "%s%s\033[0m" % (c, msg)
 
             zd = datetime.utcfromtimestamp(now)
-            ts = "%02d:%02d:%02d.%03d" % (
+            ts = self.log_efmt % (
                 zd.hour,
                 zd.minute,
                 zd.second,
-                zd.microsecond // 1000,
+                zd.microsecond // self.log_div,
             )
             msg = fmt % (ts, src, msg)
             try:
