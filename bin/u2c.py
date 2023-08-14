@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.9"
-S_BUILD_DT = "2023-05-07"
+S_VERSION = "1.10"
+S_BUILD_DT = "2023-08-15"
 
 """
 u2c.py: upload to copyparty
@@ -14,6 +14,7 @@ https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py
 - if something breaks just try again and it'll autoresume
 """
 
+import re
 import os
 import sys
 import stat
@@ -411,10 +412,11 @@ def walkdir(err, top, seen):
                 err.append((ap, str(ex)))
 
 
-def walkdirs(err, tops):
+def walkdirs(err, tops, excl):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
     sep = "{0}".format(os.sep).encode("ascii")
     if not VT100:
+        excl = excl.replace("/", r"\\")
         za = []
         for td in tops:
             try:
@@ -431,6 +433,8 @@ def walkdirs(err, tops):
         za = [x.replace(b"/", b"\\") for x in za]
         tops = za
 
+    ptn = re.compile(excl.encode("utf-8") or b"\n")
+
     for top in tops:
         isdir = os.path.isdir(top)
         if top[-1:] == sep:
@@ -443,6 +447,8 @@ def walkdirs(err, tops):
 
         if isdir:
             for ap, inf in walkdir(err, top, []):
+                if ptn.match(ap):
+                    continue
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
             d, n = top.rsplit(sep, 1)
@@ -654,7 +660,7 @@ class Ctl(object):
         nfiles = 0
         nbytes = 0
         err = []
-        for _, _, inf in walkdirs(err, ar.files):
+        for _, _, inf in walkdirs(err, ar.files, ar.x):
             if stat.S_ISDIR(inf.st_mode):
                 continue
 
@@ -696,7 +702,7 @@ class Ctl(object):
         if ar.te:
             req_ses.verify = ar.te
 
-        self.filegen = walkdirs([], ar.files)
+        self.filegen = walkdirs([], ar.files, ar.x)
         self.recheck = []  # type: list[File]
 
         if ar.safe:
@@ -1097,6 +1103,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-v", action="store_true", help="verbose")
     ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
+    ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap.add_argument("--version", action="store_true", help="show version and exit")
 
@@ -1113,7 +1120,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
     ap.add_argument("-J", type=int, metavar="THREADS", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
-    ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles)")
+    ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles and macos)")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
 
