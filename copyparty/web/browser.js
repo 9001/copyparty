@@ -7414,8 +7414,16 @@ function goto_unpost(e) {
 }
 
 
-function wintitle(txt) {
-	document.title = (txt ? txt : '') + get_vpath().slice(1, -1).split('/').pop();
+function wintitle(txt, noname) {
+	if (txt === undefined)
+		txt = '';
+
+	if (s_name && !noname)
+		txt = s_name + ' ' + txt;
+
+	txt += get_vpath().slice(1, -1).split('/').pop();
+
+	document.title = txt;
 }
 
 

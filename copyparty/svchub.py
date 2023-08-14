@@ -165,6 +165,14 @@ class SvcHub(object):
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
 
+        if args.nih:
+            args.vname = ""
+            args.doctitle = args.doctitle.replace(" @ --name", "")
+        else:
+            args.vname = args.name
+        args.doctitle = args.doctitle.replace("--name", args.vname)
+        args.vbname = "" if args.nth else args.vname
+
         if args.log_fk:
             args.log_fk = re.compile(args.log_fk)
 

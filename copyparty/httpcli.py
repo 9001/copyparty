@@ -211,7 +211,8 @@ class HttpCli(object):
         ka["ts"] = self.conn.hsrv.cachebuster()
         ka["lang"] = self.args.lang
         ka["favico"] = self.args.favico
-        ka["svcname"] = self.args.doctitle
+        ka["s_name"] = self.args.vbname
+        ka["s_doctitle"] = self.args.doctitle
         ka["html_head"] = self.html_head
         return tpl.render(**ka)  # type: ignore
 
@@ -2984,7 +2985,6 @@ class HttpCli(object):
         targs = {
             "r": self.args.SR if self.is_vproxied else "",
             "ts": self.conn.hsrv.cachebuster(),
-            "svcname": self.args.doctitle,
             "html_head": self.html_head,
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
@@ -3027,7 +3027,7 @@ class HttpCli(object):
         return True
 
     def tx_svcs(self) -> bool:
-        aname = re.sub("[^0-9a-zA-Z]+", "", self.args.name) or "a"
+        aname = re.sub("[^0-9a-zA-Z]+", "", self.args.vname) or "a"
         ep = self.host
         host = ep.split(":")[0]
         hport = ep[ep.find(":") :] if ":" in ep else ""
@@ -3718,7 +3718,7 @@ class HttpCli(object):
             "url_suf": url_suf,
             "logues": logues,
             "readme": readme,
-            "title": html_escape(self.vpath, crlf=True) or "💾🎉",
+            "title": html_escape("%s %s" % (self.args.vbname, self.vpath), crlf=True),
             "srv_info": srv_infot,
             "dgrid": "grid" in vf,
             "unlist": unlist,

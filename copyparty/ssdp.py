@@ -81,7 +81,7 @@ class SSDPr(object):
         ubase = "{}://{}:{}".format(proto, sip, sport)
         zsl = self.args.zsl
         url = zsl if "://" in zsl else ubase + "/" + zsl.lstrip("/")
-        name = "{} @ {}".format(self.args.doctitle, self.args.name)
+        name = self.args.doctitle
         zs = zs.strip().format(c(ubase), c(url), c(name), c(self.args.zsid))
         hc.reply(zs.encode("utf-8", "replace"))
         return False  # close connectino

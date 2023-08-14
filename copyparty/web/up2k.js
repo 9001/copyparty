@@ -723,7 +723,7 @@ function Donut(uc, st) {
 
     function strobe() {
         var txt = strobes.pop();
-        wintitle(txt);
+        wintitle(txt, false);
         if (!txt)
             clearInterval(tstrober);
     }
