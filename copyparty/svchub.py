@@ -171,7 +171,7 @@ class SvcHub(object):
         else:
             args.vname = args.name
         args.doctitle = args.doctitle.replace("--name", args.vname)
-        args.vbname = "" if args.nth else args.vname
+        args.bname = args.bname.replace("--name", args.vname) or args.vname
 
         if args.log_fk:
             args.log_fk = re.compile(args.log_fk)

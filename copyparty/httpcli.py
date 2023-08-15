@@ -211,7 +211,7 @@ class HttpCli(object):
         ka["ts"] = self.conn.hsrv.cachebuster()
         ka["lang"] = self.args.lang
         ka["favico"] = self.args.favico
-        ka["s_name"] = self.args.vbname
+        ka["s_name"] = self.args.bname
         ka["s_doctitle"] = self.args.doctitle
         ka["html_head"] = self.html_head
         return tpl.render(**ka)  # type: ignore
@@ -3718,7 +3718,7 @@ class HttpCli(object):
             "url_suf": url_suf,
             "logues": logues,
             "readme": readme,
-            "title": html_escape("%s %s" % (self.args.vbname, self.vpath), crlf=True),
+            "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
             "dgrid": "grid" in vf,
             "unlist": unlist,
