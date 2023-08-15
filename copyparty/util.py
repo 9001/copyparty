@@ -1228,12 +1228,15 @@ def ren_open(
         except OSError as ex_:
             ex = ex_
 
-            if ex.errno == errno.EINVAL and not asciified:
+            # EPERM: android13
+            if ex.errno in (errno.EINVAL, errno.EPERM) and not asciified:
                 asciified = True
-                bname, fname = [
-                    zs.encode("ascii", "replace").decode("ascii").replace("?", "_")
-                    for zs in [bname, fname]
-                ]
+                zsl = []
+                for zs in (bname, fname):
+                    zs = zs.encode("ascii", "replace").decode("ascii")
+                    zs = re.sub(r"[^][a-zA-Z0-9(){}.,+=!-]", "_", zs)
+                    zsl.append(zs)
+                bname, fname = zsl
                 continue
 
             # ENOTSUP: zfs on ubuntu 20.04
