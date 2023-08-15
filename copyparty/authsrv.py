@@ -2020,13 +2020,19 @@ def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
 
     if os.path.isdir(fp):
         names = os.listdir(fp)
-        ret.append("#\033[36m cfg files in {} => {}\033[0m".format(fp, names))
+        crumb = "#\033[36m cfg files in {} => {}\033[0m".format(fp, names)
+        ret.append(crumb)
         for fn in sorted(names):
             fp2 = os.path.join(fp, fn)
             if not fp2.endswith(".conf") or fp2 in ipath:
                 continue
 
             expand_config_file(ret, fp2, ipath)
+
+        if ret[-1] == crumb:
+            # no config files below; remove breadcrumb
+            ret.pop()
+
         return
 
     ipath += " -> " + fp

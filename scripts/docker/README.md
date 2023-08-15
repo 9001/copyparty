@@ -15,6 +15,7 @@ docker run --rm -it -u 1000 -p 3923:3923 -v /mnt/nas:/w -v $PWD/cfgdir:/cfg copy
 * `copyparty/ac` is the recommended [image edition](#editions)
 * you can download the image from github instead by replacing `copyparty/ac` with `ghcr.io/9001/copyparty-ac`
 * if you are using rootless podman, remove `-u 1000`
+* if you have selinux, append `:z` to all `-v` args (for example `-v /mnt/nas:/w:z`)
 
 i'm unfamiliar with docker-compose and alternatives so let me know if this section could be better 🙏
 

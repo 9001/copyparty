@@ -5,7 +5,8 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-im" \
         org.opencontainers.image.description="copyparty with Pillow and Mutagen (image thumbnails, media tags)"
-ENV     PYTHONPYCACHEPREFIX=/tmp/pyc
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
+        XDG_CONFIG_HOME=/cfg
 
 RUN     apk --no-cache add !pyc \
             wget \
@@ -18,4 +19,4 @@ RUN     apk --no-cache add !pyc \
 COPY    i/dist/copyparty-sfx.py ./
 WORKDIR /w
 EXPOSE  3923
-ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "-c", "/z/initcfg"]
+ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "--no-crt", "-c", "/z/initcfg"]

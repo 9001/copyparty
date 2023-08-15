@@ -5,7 +5,8 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-min-pip" \
         org.opencontainers.image.description="just copyparty, no thumbnails, no media tags, no audio transcoding"
-ENV     PYTHONPYCACHEPREFIX=/tmp/pyc
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
+        XDG_CONFIG_HOME=/cfg
 
 RUN     apk --no-cache add python3 py3-pip !pyc \
         && python3 -m pip install copyparty \
@@ -17,4 +18,4 @@ RUN     apk --no-cache add python3 py3-pip !pyc \
 
 WORKDIR /w
 EXPOSE  3923
-ENTRYPOINT ["python3", "-m", "copyparty", "-c", "/z/initcfg"]
+ENTRYPOINT ["python3", "-m", "copyparty", "--no-crt", "--no-thumb", "-c", "/z/initcfg"]
