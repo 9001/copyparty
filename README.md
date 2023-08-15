@@ -295,6 +295,7 @@ server notes:
 
 * VirtualBox: sqlite throws `Disk I/O Error` when running in a VM and the up2k database is in a vboxsf
   * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db inside the vm instead
+  * also happens on mergerfs, so put the db elsewhere
 
 * Ubuntu: dragging files from certain folders into firefox or chrome is impossible
   * due to snap security policies -- see `snap connections firefox` for the allowlist, `removable-media` permits all of `/mnt` and `/media` apparently
@@ -1225,6 +1226,7 @@ you can either:
   * if copyparty says `incorrect --rp-loc or webserver config; expected vpath starting with [...]` it's likely because the webserver is stripping away the proxy location from the request URLs -- see the `ProxyPass` in the apache example below
 
 some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatically obtain a valid https/tls certificate for you, and some support HTTP/2 and QUIC which could be a nice speed boost
+* **warning:** nginx-QUIC is still experimental and can make uploads much slower, so HTTP/2 is recommended for now
 
 example webserver configs:
 
