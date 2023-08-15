@@ -1051,6 +1051,67 @@ function cliptxt(txt, ok) {
 }
 
 
+function Debounce(delay) {
+    var r = this;
+    r.delay = delay;
+    r.timer = 0;
+    r.t_hit = 0;
+    r.t_run = 0;
+    r.q = [];
+
+    r.add = function (fun, run) {
+        r.rm(fun);
+        r.q.push(fun);
+
+        if (run)
+            fun();
+    };
+
+    r.rm = function (fun) {
+        apop(r.q, fun);
+    };
+
+    r.run = function () {
+        if (crashed)
+            return;
+
+        r.t_run = Date.now();
+
+        var q = r.q.slice(0);
+        for (var a = 0; a < q.length; a++)
+            q[a]();
+    };
+
+    r.hit = function () {
+        if (crashed)
+            return;
+
+        var now = Date.now(),
+            td_hit = now - r.t_hit,
+            td_run = now - r.t_run;
+
+        if (td_run >= r.delay * 2)
+            r.t_run = now;
+
+        if (td_run >= r.delay && td_run <= r.delay * 2) {
+            // r.delay is also deadline
+            clearTimeout(r.timer);
+            return r.run();
+        }
+
+        if (td_hit < r.delay / 5)
+            return;
+
+        clearTimeout(r.timer);
+        r.timer = setTimeout(r.doit, r.delay);
+        r.t_hit = now;
+    };
+};
+
+var onresize100 = new Debounce(100);
+window.addEventListener('resize', onresize100.hit);
+
+
 var timer = (function () {
     var r = {};
     r.q = [];

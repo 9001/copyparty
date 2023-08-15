@@ -2038,8 +2038,7 @@ var pbar = (function () {
 			t_redraw = setTimeout(r.drawpos, sm > 50 ? 20 : 50);
 	};
 
-	window.addEventListener('resize', r.onresize);
-	r.onresize();
+	onresize100.add(r.onresize, true);
 	return r;
 })();
 
@@ -2101,8 +2100,7 @@ var vbar = (function () {
 		clearTimeout(untext);
 		untext = setTimeout(r.draw, 1000);
 	};
-	window.addEventListener('resize', r.onresize);
-	r.onresize();
+	onresize100.add(r.onresize, true);
 
 	var rect;
 	function mousedown(e) {
@@ -5183,6 +5181,7 @@ document.onkeydown = function (e) {
 	}
 })();
 
+
 function aligngriditems() {
 	if (!treectl)
 		return;
@@ -5205,7 +5204,8 @@ function aligngriditems() {
 		ebi('ggrid').style.justifyContent = treectl.hidden ? 'center' : 'space-between';
 	}
 }
-window.addEventListener('resize', aligngriditems);
+onresize100.add(aligngriditems);
+
 
 var treectl = (function () {
 	var r = {

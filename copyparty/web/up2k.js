@@ -2630,8 +2630,7 @@ function up2k_init(subtle) {
             }
         }
     }
-    window.addEventListener('resize', onresize);
-    onresize();
+    onresize100.add(onresize, true);
 
     if (MOBILE) {
         // android-chrome wobbles for a bit; firefox / iOS-safari are OK
