@@ -5207,6 +5207,23 @@ function aligngriditems() {
 onresize100.add(aligngriditems);
 
 
+var filecolwidth = (function () {
+	var lastwidth = -1;
+
+	return function () {
+		var vw = window.innerWidth / parseFloat(getComputedStyle(document.body)['font-size']),
+			w = Math.floor(vw - 2);
+
+		if (w == lastwidth)
+			return;
+
+		lastwidth = w;
+		document.documentElement.style.setProperty('--file-td-w', w + 'em');
+	}
+})();
+onresize100.add(filecolwidth, true);
+
+
 var treectl = (function () {
 	var r = {
 		"hidden": true,

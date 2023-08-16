@@ -1103,7 +1103,7 @@ function Debounce(delay) {
             return;
 
         clearTimeout(r.timer);
-        r.timer = setTimeout(r.doit, r.delay);
+        r.timer = setTimeout(r.run, r.delay);
         r.t_hit = now;
     };
 };
