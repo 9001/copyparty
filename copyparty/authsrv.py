@@ -1617,6 +1617,7 @@ class AuthSrv(object):
         vfs.bubble_flags()
 
         have_e2d = False
+        have_e2t = False
         t = "volumes and permissions:\n"
         for zv in vfs.all_vols.values():
             if not self.warn_anonwrite:
@@ -1640,6 +1641,9 @@ class AuthSrv(object):
             if "e2d" in zv.flags:
                 have_e2d = True
 
+            if "e2t" in zv.flags:
+                have_e2t = True
+
             t += "\n"
 
         if self.warn_anonwrite:
@@ -1650,6 +1654,13 @@ class AuthSrv(object):
                 t = self.chk_sqlite_threadsafe()
                 if t:
                     self.log("\n\033[{}\033[0m\n".format(t))
+
+                if not have_e2t:
+                    t = "hint: argument -e2ts enables multimedia indexing (artist/title/...)"
+                    self.log(t, 6)
+            else:
+                t = "hint: argument -e2dsa enables searching, upload-undo, and better deduplication"
+                self.log(t, 6)
 
             zv, _ = vfs.get("/", "*", False, False)
             zs = zv.realpath.lower()
