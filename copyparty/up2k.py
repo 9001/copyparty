@@ -791,9 +791,9 @@ class Up2k(object):
 
         reg = {}
         drp = None
-        path = os.path.join(histpath, "up2k.snap")
-        if bos.path.exists(path):
-            with gzip.GzipFile(path, "rb") as f:
+        snap = os.path.join(histpath, "up2k.snap")
+        if bos.path.exists(snap):
+            with gzip.GzipFile(snap, "rb") as f:
                 j = f.read().decode("utf-8")
 
             reg2 = json.loads(j)
@@ -804,20 +804,20 @@ class Up2k(object):
                 pass
 
             for k, job in reg2.items():
-                path = djoin(job["ptop"], job["prel"], job["name"])
-                if bos.path.exists(path):
+                fp = djoin(job["ptop"], job["prel"], job["name"])
+                if bos.path.exists(fp):
                     reg[k] = job
                     job["poke"] = time.time()
                     job["busy"] = {}
                 else:
-                    self.log("ign deleted file in snap: [{}]".format(path))
+                    self.log("ign deleted file in snap: [{}]".format(fp))
 
             if drp is None:
                 drp = [k for k, v in reg.items() if not v.get("need", [])]
             else:
                 drp = [x for x in drp if x in reg]
 
-            t = "loaded snap {} |{}| ({})".format(path, len(reg.keys()), len(drp or []))
+            t = "loaded snap {} |{}| ({})".format(snap, len(reg.keys()), len(drp or []))
             ta = [t] + self._vis_reg_progress(reg)
             self.log("\n".join(ta))
 

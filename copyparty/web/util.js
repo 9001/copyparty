@@ -1165,7 +1165,7 @@ var tt = (function () {
     var prev = null;
     r.cshow = function () {
         if (this !== prev)
-            r.show.bind(this)();
+            r.show.call(this);
 
         prev = this;
     };
@@ -1177,7 +1177,7 @@ var tt = (function () {
             return;
 
         if (Date.now() - r.lvis < 400)
-            return r.show.bind(this)();
+            return r.show.call(this);
 
         tev = setTimeout(r.show.bind(this), 800);
         if (TOUCH)

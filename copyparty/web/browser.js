@@ -4310,14 +4310,14 @@ var thegrid = (function () {
 		if (ctrl(e) && !treectl.csel && !r.sel)
 			return true;
 
-		return gclick.bind(this)(e, false);
+		return gclick.call(this, e, false);
 	}
 
 	function gclick2(e) {
 		if (ctrl(e) || !r.sel)
 			return true;
 
-		return gclick.bind(this)(e, true);
+		return gclick.call(this, e, true);
 	}
 
 	function gclick(e, dbl) {
@@ -4332,7 +4332,7 @@ var thegrid = (function () {
 			tr = td.parentNode;
 
 		if ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e)))) {
-			td.onclick.bind(td)(e);
+			td.onclick.call(td, e);
 			if (e.shiftKey)
 				return r.loadsel();
 			clmod(this, 'sel', clgot(tr, 'sel'));

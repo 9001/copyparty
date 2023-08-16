@@ -971,7 +971,7 @@ function up2k_init(subtle) {
         if (++nenters <= 0)
             nenters = 1;
 
-        if (onover.bind(this)(e))
+        if (onover.call(this, e))
             return true;
 
         var mup, up = QS('#up_zd');
@@ -995,7 +995,7 @@ function up2k_init(subtle) {
     function onoverb(e) {
         // zones are alive; disable cuo2duo branch
         document.body.ondragover = document.body.ondrop = null;
-        return onover.bind(this)(e);
+        return onover.call(this, e);
     }
     function onover(e) {
         return onovercmn(this, e, false);
@@ -1106,7 +1106,7 @@ function up2k_init(subtle) {
     function gotfile(e) {
         ev(e);
         nenters = 0;
-        offdrag.bind(this)();
+        offdrag.call(this);
         var dz = this && this.getAttribute('id');
         if (!dz && e && e.clientY)
             // cuo2duo fallback

@@ -310,7 +310,7 @@ window.baguetteBox = (function () {
         options = {};
         setOptions(o);
         if (tt.en)
-            tt.show.bind(this)();
+            tt.show.call(this);
     }
 
     function setVmode() {
@@ -356,7 +356,7 @@ window.baguetteBox = (function () {
 
         setVmode();
         if (tt.en)
-            tt.show.bind(this)();
+            tt.show.call(this);
     }
 
     function findfile() {
