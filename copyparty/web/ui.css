@@ -4,6 +4,8 @@
 	src: local('Source Code Pro Regular'), local('SourceCodePro-Regular'), url(deps/scp.woff2) format('woff2');
 }
 html {
+	text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
 	touch-action: manipulation;
 }
 #tt, #toast {
