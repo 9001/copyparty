@@ -4618,8 +4618,7 @@ function tree_neigh(n) {
 	if (act >= links.length)
 		act = 0;
 
-	treectl.dir_cb = tree_scrollto;
-	links[act].click();
+	treectl.treego.call(links[act]);
 	links[act].focus();
 }
 
@@ -4638,7 +4637,7 @@ function tree_up(justgo) {
 		return;
 	}
 	if (act.previousSibling.textContent == '-') {
-		act.previousSibling.click();
+		treectl.treego.call(act.previousSibling);
 		if (!justgo)
 			return;
 	}
@@ -5569,7 +5568,7 @@ var treectl = (function () {
 			}
 
 			links[a].className = cl;
-			links[a].onclick = treego;
+			links[a].onclick = r.treego;
 			links[a].onmouseenter = nowrap ? menter : null;
 			links[a].onmouseleave = nowrap ? mleave : null;
 		}
@@ -5631,7 +5630,7 @@ var treectl = (function () {
 				return els[a].click();
 	}
 
-	function treego(e) {
+	r.treego = function (e) {
 		if (ctrl(e))
 			return true;
 
