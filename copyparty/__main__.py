@@ -716,6 +716,37 @@ def get_sects():
             """
             ),
         ],
+        [
+            "zm",
+            "mDNS debugging",
+            dedent(
+                """
+            the mDNS protocol is multicast-based, which means there are thousands
+            of fun and intersesting ways for it to break unexpectedly
+
+            things to check if it does not work at all:
+
+            * is there a firewall blocking port 5353 on either the server or client?
+
+            * is multicast accidentally disabled on either the server or client?
+
+            * the router/switch must be multicast and igmp capable
+
+            things to check if it works for a while but then it doesn't:
+
+            * is there a firewall blocking port 5353 on either the server or client?
+              (copyparty may be unable to see the queries from the clients, but the
+               clients may still be able to see the initial unsolicited announce,
+               so it works for about 2 minutes after startup until TTL expires)
+
+            * does the client have multiple IPs on its interface, and some of the
+              IPs are in subnets which the copyparty server is not a member of?
+
+            for both of the above intermittent issues, try --zm-spam 30
+            (not spec-compliant but nothing will mind)
+            """
+            ),
+        ],
     ]
 
 
@@ -846,7 +877,7 @@ def add_zeroconf(ap):
 
 
 def add_zc_mdns(ap):
-    ap2 = ap.add_argument_group("Zeroconf-mDNS options")
+    ap2 = ap.add_argument_group("Zeroconf-mDNS options; also see --help-zm")
     ap2.add_argument("--zm", action="store_true", help="announce the enabled protocols over mDNS (multicast DNS-SD) -- compatible with KDE, gnome, macOS, ...")
     ap2.add_argument("--zm-on", metavar="NETS", type=u, default="", help="enable zeroconf ONLY on the comma-separated list of subnets and/or interface names/indexes")
     ap2.add_argument("--zm-off", metavar="NETS", type=u, default="", help="disable zeroconf on the comma-separated list of subnets and/or interface names/indexes")
@@ -860,8 +891,9 @@ def add_zc_mdns(ap):
     ap2.add_argument("--zm-lf", metavar="PATH", type=u, default="", help="link a specific folder for ftp shares")
     ap2.add_argument("--zm-ls", metavar="PATH", type=u, default="", help="link a specific folder for smb shares")
     ap2.add_argument("--zm-mnic", action="store_true", help="merge NICs which share subnets; assume that same subnet means same network")
-    ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working")
+    ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working, and clients cannot be in subnets that the server is not")
     ap2.add_argument("--zm-noneg", action="store_true", help="disable NSEC replies -- try this if some clients don't see copyparty")
+    ap2.add_argument("--zm-spam", metavar="SEC", type=float, default=0, help="send unsolicited announce every SEC; useful if clients have IPs in a subnet which doesn't overlap with the server")
 
 
 def add_zc_ssdp(ap):

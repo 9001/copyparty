@@ -513,6 +513,9 @@ class MDNS(MCast):
             for srv in self.srv.values():
                 tx.add(srv)
 
+            if not self.unsolicited and self.args.zm_spam:
+                self.unsolicited.append(time.time() + self.args.zm_spam)
+
         for srv, deadline in list(self.defend.items()):
             if now < deadline:
                 continue
