@@ -1041,6 +1041,7 @@ def add_thumbnail(ap):
 def add_transcoding(ap):
     ap2 = ap.add_argument_group('transcoding options')
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
+    ap2.add_argument("--no-bacode", action="store_true", help="disable batch audio transcoding by folder download (zip/tar)")
     ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after SEC seconds")
 
 

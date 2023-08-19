@@ -519,6 +519,10 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 ![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/129635374-e5136e01-470a-49b1-a762-848e8a4c9cdc.png)
 
+cool trick: download a folder by appending url-params `?tar&opus` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus before they're added to the archive
+* super useful if you're 5 minutes away from takeoff and realize you don't have any music on your phone but your server only has flac files and downloading those will burn through all your data + there wouldn't be enough time anyways
+* and url-params `&j` / `&w` produce jpeg/webm thumbnails/spectrograms instead of the original audio/video/images
+
 
 ## uploading
 
@@ -701,7 +705,7 @@ open the `[🎺]` media-player-settings tab to configure it,
   * `[loop]` keeps looping the folder
   * `[next]` plays into the next folder
 * transcode:
-  * `[flac]` convers `flac` and `wav` files into opus
+  * `[flac]` converts `flac` and `wav` files into opus
   * `[aac]` converts `aac` and `m4a` files into opus
   * `[oth]` converts all other known formats into opus
     * `aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk`

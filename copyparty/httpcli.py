@@ -33,7 +33,7 @@ from .__version__ import S_VERSION
 from .authsrv import VFS  # typechk
 from .bos import bos
 from .star import StreamTar
-from .sutil import StreamArc  # typechk
+from .sutil import StreamArc, gfilter
 from .szip import StreamZip
 from .util import (
     HTTPCODE,
@@ -2896,6 +2896,16 @@ class HttpCli(object):
             vpath, rem, set(items), self.uname, dots, False, not self.args.no_scandir
         )
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
+        cfmt = ""
+        if self.thumbcli and not self.args.no_bacode:
+            for zs in ("opus", "w", "j"):
+                if zs in self.ouparam or uarg == zs:
+                    cfmt = zs
+
+            if cfmt:
+                self.log("transcoding to [{}]".format(cfmt))
+                fgen = gfilter(fgen, self.thumbcli, self.uname, vpath, cfmt)
+
         bgen = packer(self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg)
         bsent = 0
         for buf in bgen.gen():
@@ -2907,6 +2917,7 @@ class HttpCli(object):
                 bsent += len(buf)
             except:
                 logmsg += " \033[31m" + unicode(bsent) + "\033[0m"
+                bgen.stop()
                 break
 
         spd = self._spd(bsent)

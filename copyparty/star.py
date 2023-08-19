@@ -61,6 +61,7 @@ class StreamTar(StreamArc):
         Daemon(self._gen, "star-gen")
 
     def gen(self) -> Generator[Optional[bytes], None, None]:
+        buf = b""
         try:
             while True:
                 buf = self.qfile.q.get()
@@ -72,6 +73,12 @@ class StreamTar(StreamArc):
 
             yield None
         finally:
+            while buf:
+                try:
+                    buf = self.qfile.q.get()
+                except:
+                    pass
+
             if self.errf:
                 bos.unlink(self.errf["ap"])
 
@@ -100,6 +107,9 @@ class StreamTar(StreamArc):
             if "err" in f:
                 errors.append((f["vp"], f["err"]))
                 continue
+
+            if self.stopped:
+                break
 
             try:
                 self.ser(f)

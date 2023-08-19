@@ -108,6 +108,7 @@ class ThumbCli(object):
                 if st.st_size:
                     ret = tpath = tp
                     fmt = ret.rsplit(".")[1]
+                    break
                 else:
                     abort = True
             except:
