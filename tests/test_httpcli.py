@@ -12,7 +12,7 @@ import tempfile
 import unittest
 
 from tests import util as tu
-from tests.util import Cfg
+from tests.util import Cfg, eprint
 
 from copyparty.authsrv import AuthSrv
 from copyparty.httpcli import HttpCli
@@ -93,7 +93,7 @@ class TestHttpCli(unittest.TestCase):
                 res = "ok " + fp in ret
                 print("[{}] {} {} = {}".format(fp, rok, wok, res))
                 if rok != res:
-                    print("\033[33m{}\n# {}\033[0m".format(ret, furl))
+                    eprint("\033[33m{}\n# {}\033[0m".format(ret, furl))
                     self.fail()
 
                 # file browser: html
@@ -101,7 +101,7 @@ class TestHttpCli(unittest.TestCase):
                 res = "'{}'".format(self.fn) in ret
                 print(res)
                 if rok != res:
-                    print("\033[33m{}\n# {}\033[0m".format(ret, durl))
+                    eprint("\033[33m{}\n# {}\033[0m".format(ret, durl))
                     self.fail()
 
                 # file browser: json
@@ -110,7 +110,7 @@ class TestHttpCli(unittest.TestCase):
                 res = '"{}"'.format(self.fn) in ret
                 print(res)
                 if rok != res:
-                    print("\033[33m{}\n# {}\033[0m".format(ret, url))
+                    eprint("\033[33m{}\n# {}\033[0m".format(ret, url))
                     self.fail()
 
                 # tar
@@ -132,7 +132,9 @@ class TestHttpCli(unittest.TestCase):
                 if durl.split("/")[-1] in self.can_read:
                     ref = [x for x in vfiles if self.in_dive(top + "/" + durl, x)]
                     for f in ref:
-                        print("{}: {}".format("ok" if f in tar_ok else "NG", f))
+                        ok = f in tar_ok
+                        pr = print if ok else eprint
+                        pr("{}: {}".format("ok" if ok else "NG", f))
                     ref.sort()
                     tar_ok.sort()
                     self.assertEqual(ref, tar_ok)

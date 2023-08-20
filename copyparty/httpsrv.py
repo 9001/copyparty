@@ -56,6 +56,7 @@ except SyntaxError:
     sys.exit(1)
 
 from .httpconn import HttpConn
+from .metrics import Metrics
 from .u2idx import U2idx
 from .util import (
     E_SCK,
@@ -99,6 +100,7 @@ class HttpSrv(object):
         # redefine in case of multiprocessing
         socket.setdefaulttimeout(120)
 
+        self.t0 = time.time()
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
         self.nm = NetMap([], {})
@@ -122,6 +124,7 @@ class HttpSrv(object):
         self.t_periodic: Optional[threading.Thread] = None
 
         self.u2fh = FHC()
+        self.metrics = Metrics(self)
         self.srvs: list[socket.socket] = []
         self.ncli = 0  # exact
         self.clients: set[HttpConn] = set()  # laggy

@@ -267,11 +267,49 @@ class Up2k(object):
         }
         return json.dumps(ret, indent=4)
 
+    def get_unfinished(self) -> str:
+        if PY2 or not self.mutex.acquire(timeout=0.5):
+            return "{}"
+
+        ret: dict[str, tuple[int, int]] = {}
+        try:
+            for ptop, tab2 in self.registry.items():
+                nbytes = 0
+                nfiles = 0
+                drp = self.droppable.get(ptop, {})
+                for wark, job in tab2.items():
+                    if wark in drp:
+                        continue
+
+                    nfiles += 1
+                    try:
+                        # close enough on average
+                        nbytes += len(job["need"]) * job["size"] // len(job["hash"])
+                    except:
+                        pass
+
+                ret[ptop] = (nbytes, nfiles)
+        finally:
+            self.mutex.release()
+
+        return json.dumps(ret, indent=4)
+
     def get_volsize(self, ptop: str) -> tuple[int, int]:
         with self.mutex:
             return self._get_volsize(ptop)
 
+    def get_volsizes(self, ptops: list[str]) -> list[tuple[int, int]]:
+        ret = []
+        with self.mutex:
+            for ptop in ptops:
+                ret.append(self._get_volsize(ptop))
+
+        return ret
+
     def _get_volsize(self, ptop: str) -> tuple[int, int]:
+        if "e2ds" not in self.flags.get(ptop, {}):
+            return (0, 0)
+
         cur = self.cur[ptop]
         nbytes = self.volsize[cur]
         nfiles = self.volnfiles[cur]
@@ -946,7 +984,11 @@ class Up2k(object):
 
             db.c.connection.commit()
 
-            if vol.flags.get("vmaxb") or vol.flags.get("vmaxn"):
+            if (
+                vol.flags.get("vmaxb")
+                or vol.flags.get("vmaxn")
+                or (self.args.stats and not self.args.nos_vol)
+            ):
                 zs = "select count(sz), sum(sz) from up"
                 vn, vb = db.c.execute(zs).fetchone()
                 vb = vb or 0

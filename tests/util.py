@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# coding: utf-8
+from __future__ import print_function, unicode_literals
+
 import os
 import re
 import sys
@@ -21,6 +25,12 @@ J2_FILES = J2_ENV.from_string("{{ files|join('\n') }}")
 
 def nah(*a, **ka):
     return False
+
+
+def eprint(*a, **ka):
+    ka["file"] = sys.stderr
+    print(*a, **ka)
+    sys.stderr.flush()
 
 
 if MACOS:
@@ -114,7 +124,7 @@ class Cfg(Namespace):
         ex = "df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg doctitle favico html_head lg_sbf log_fk md_sbf mth name textfiles unlist vname R RS SR"
+        ex = "ah_alg bname doctitle favico html_head lg_sbf log_fk md_sbf mth name textfiles unlist vname R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "on403 on404 xad xar xau xban xbd xbr xbu xiu xm"

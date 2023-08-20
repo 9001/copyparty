@@ -71,6 +71,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [themes](#themes)
     * [complete examples](#complete-examples)
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
+    * [prometheus](#prometheus) - metrics/stats can be enabled
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
     * [fedora package](#fedora-package) - now [available on copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/)
@@ -1008,6 +1009,9 @@ you can also set transaction limits which apply per-IP and per-volume, but these
 * `:c,maxn=250,3600` allows 250 files over 1 hour from each IP (tracked per-volume)
 * `:c,maxb=1g,300` allows 1 GiB total over 5 minutes from each IP (tracked per-volume)
 
+notes:
+* `vmaxb` and `vmaxn` requires either the `e2ds` volflag or `-e2dsa` global-option
+
 
 ## compress uploads
 
@@ -1236,6 +1240,51 @@ example webserver configs:
 
 * [nginx config](contrib/nginx/copyparty.conf) -- entire domain/subdomain
 * [apache2 config](contrib/apache/copyparty.conf) -- location-based
+
+
+## prometheus
+
+metrics/stats can be enabled  at `/.cpr/s/metrics` for grafana / prometheus / etc.
+
+must be enabled with `--stats` since it reduces startup time a tiny bit
+
+the endpoint is only accessible by `admin` accounts, meaning the `a` in `rwmda` of the following example commandline: `python3 -m copyparty -a ed:wark -v /mnt/nas::rwmda,ed`
+
+follow a guide for setting up `node_exporter` except have it read from copyparty instead; example `/etc/prometheus/prometheus.yml` below
+
+```yaml
+scrape_configs:
+  - job_name: copyparty
+    metrics_path: /.cpr/s/metrics
+    basic_auth:
+      password: wark
+    static_configs:
+      - targets: ['192.168.123.1:3923']
+```
+
+currently the following metrics are available,
+* `cpp_uptime` in seconds
+* `cpp_bans` number of banned IPs
+
+and these are available per-volume only:
+* `cpp_disk_size` total HDD size in MiB
+* `cpp_disk_free` free HDD space in MiB
+
+and these are per-volume and `total`:
+* `cpp_vol_mib` size of all files in MiB
+* `cpp_vol_files` number of files
+* `cpp_dupe_mib` amount of MiB presumably saved by deduplication
+* `cpp_dupe_files` number of dupe files
+* `cpp_unf_mib` currently unfinished / incoming uploads
+
+some of the metrics have additional requirements to function correctly,
+* `cpp_vol_mib` and `cpp_vol_files` requires either the `e2ds` volflag or `-e2dsa` global-option
+
+the following options are available to disable some of the metrics:
+* `--nos-hdd` disables `cpp_disk_*` which can prevent spinning up HDDs
+* `--nos-vol` disables `cpp_vol_*` which reduces server startup time
+* `--nos-dup` disables `cpp_dupe_*` which reduces the server load caused by prometheus queries
+* `--nos-unf` disables `cpp_unf_mib` for no particular purpose
 
 
 # packages

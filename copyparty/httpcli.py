@@ -822,6 +822,9 @@ class HttpCli(object):
                 self.reply(b"", 301, headers=h)
                 return True
 
+            if self.vpath == ".cpr/s/metrics":
+                return self.conn.hsrv.metrics.tx(self)
+
             path_base = os.path.join(self.E.mod, "web")
             static_path = absreal(os.path.join(path_base, self.vpath[5:]))
             if static_path in self.conn.hsrv.statics:
