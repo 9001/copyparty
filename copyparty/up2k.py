@@ -997,7 +997,7 @@ class Up2k(object):
                 self.volnfiles[db.c] = vn
                 vmaxb = unhumanize(vol.flags.get("vmaxb") or "0")
                 vmaxn = unhumanize(vol.flags.get("vmaxn") or "0")
-                t = "{} / {}  ( {} / {} files) in {}".format(
+                t = "{:>5} / {:>5}  ( {:>5} / {:>5} files) in {}".format(
                     humansize(vb, True),
                     humansize(vmaxb, True),
                     humansize(vn, True).rstrip("B"),

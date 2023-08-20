@@ -34,40 +34,45 @@ class Metrics(object):
 
         ret: list[str] = []
 
-        def add(name: str, typ: str, v: str, desc: str) -> None:
-            zs = "# HELP %s %s\n# TYPE %s %s\n%s %s"
-            ret.append(zs % (name, desc, name, typ, name, v))
+        def addc(k: str, unit: str, v: str, desc: str) -> None:
+            if unit:
+                k += "_" + unit
+                zs = "# TYPE %s counter\n# UNIT %s %s\n# HELP %s %s\n%s_created %s\n%s_total %s"
+                ret.append(zs % (k, k, unit, k, desc, k, int(self.hsrv.t0), k, v))
+            else:
+                zs = "# TYPE %s counter\n# HELP %s %s\n%s_created %s\n%s_total %s"
+                ret.append(zs % (k, k, desc, k, int(self.hsrv.t0), k, v))
 
-        def addh(name: str, typ: str, desc: str) -> None:
-            zs = "# HELP %s %s\n# TYPE %s %s"
-            ret.append(zs % (name, desc, name, typ))
+        def addh(k: str, typ: str, desc: str) -> None:
+            zs = "# TYPE %s %s\n# HELP %s %s"
+            ret.append(zs % (k, typ, k, desc))
 
-        def addv(name: str, v: str) -> None:
-            ret.append("%s %s" % (name, v))
+        def addbh(k: str, desc: str) -> None:
+            zs = "# TYPE %s gauge\n# UNIT %s bytes\n# HELP %s %s"
+            ret.append(zs % (k, k, k, desc))
+
+        def addv(k: str, v: str) -> None:
+            ret.append("%s %s" % (k, v))
 
         v = "{:.3f}".format(time.time() - self.hsrv.t0)
-        add("cpp_uptime", "counter", v, "time since last server restart")
+        addc("cpp_uptime", "seconds", v, "time since last server restart")
 
         v = str(len(conn.bans or []))
-        add("cpp_bans", "counter", v, "number of banned IPs")
+        addc("cpp_bans", "", v, "number of banned IPs")
 
         if not args.nos_hdd:
-            addh("cpp_disk_mib", "gauge", "total HDD size (MiB) of volume")
-            addh("cpp_disk_free", "gauge", "free HDD space (MiB) in volume")
+            addbh("cpp_disk_size_bytes", "total HDD size of volume")
+            addbh("cpp_disk_free_bytes", "free HDD space in volume")
             for vpath, vol in allvols:
                 free, total = get_df(vol.realpath)
-
-                v = "{:.3f}".format(total / 1048576.0)
-                addv('cpp_disk_size{vol="/%s"}' % (vpath), v)
-
-                v = "{:.3f}".format(free / 1048576.0)
-                addv('cpp_disk_free{vol="/%s"}' % (vpath), v)
+                addv('cpp_disk_size_bytes{vol="/%s"}' % (vpath), str(total))
+                addv('cpp_disk_free_bytes{vol="/%s"}' % (vpath), str(free))
 
         if idx and not args.nos_vol:
-            addh("cpp_vol_mib", "gauge", "total MiB in volume")
-            addh("cpp_vol_files", "gauge", "total num files in volume")
-            addh("cpp_vol_mib_free", "gauge", "free space (vmaxb) in volume")
-            addh("cpp_vol_files_free", "gauge", "free space (vmaxn) in volume")
+            addbh("cpp_vol_bytes", "num bytes of data in volume")
+            addh("cpp_vol_files", "gauge", "num files in volume")
+            addbh("cpp_vol_free_bytes", "free space (vmaxb) in volume")
+            addh("cpp_vol_free_files", "gauge", "free space (vmaxn) in volume")
             tnbytes = 0
             tnfiles = 0
 
@@ -82,29 +87,27 @@ class Metrics(object):
             for (vpath, vol), (nbytes, nfiles) in zip(allvols, volsizes):
                 tnbytes += nbytes
                 tnfiles += nfiles
-                v = "{:.3f}".format(nbytes / 1048576.0)
-                addv('cpp_vol_mib{vol="/%s"}' % (vpath), v)
+                addv('cpp_vol_bytes{vol="/%s"}' % (vpath), str(nbytes))
                 addv('cpp_vol_files{vol="/%s"}' % (vpath), str(nfiles))
 
                 if vol.flags.get("vmaxb") or vol.flags.get("vmaxn"):
 
                     zi = unhumanize(vol.flags.get("vmaxb") or "0")
                     if zi:
-                        v = "{:.3f}".format((zi - nbytes) / 1048576.0)
-                        addv('cpp_vol_mib_free{vol="/%s"}' % (vpath), v)
+                        v = str(zi - nbytes)
+                        addv('cpp_vol_free_bytes{vol="/%s"}' % (vpath), v)
 
                     zi = unhumanize(vol.flags.get("vmaxn") or "0")
                     if zi:
                         v = str(zi - nfiles)
-                        addv('cpp_vol_nfiles_free{vol="/%s"}' % (vpath), v)
+                        addv('cpp_vol_free_files{vol="/%s"}' % (vpath), v)
 
             if volsizes:
-                v = "{:.3f}".format(tnbytes / 1048576.0)
-                addv('cpp_vol_mib{vol="total"}', v)
+                addv('cpp_vol_bytes{vol="total"}', str(tnbytes))
                 addv('cpp_vol_files{vol="total"}', str(tnfiles))
 
         if idx and not args.nos_dup:
-            addh("cpp_dupe_mib", "gauge", "num dupe MiB in volume")
+            addbh("cpp_dupe_bytes", "num dupe bytes in volume")
             addh("cpp_dupe_files", "gauge", "num dupe files in volume")
             tnbytes = 0
             tnfiles = 0
@@ -122,16 +125,14 @@ class Metrics(object):
 
                 tnbytes += nbytes
                 tnfiles += nfiles
-                v = "{:.3f}".format(nbytes / 1048576.0)
-                addv('cpp_dupe_mib{vol="/%s"}' % (vpath), v)
+                addv('cpp_dupe_bytes{vol="/%s"}' % (vpath), str(nbytes))
                 addv('cpp_dupe_files{vol="/%s"}' % (vpath), str(nfiles))
 
-            v = "{:.3f}".format(tnbytes / 1048576.0)
-            addv('cpp_dupe_mib{vol="total"}', v)
+            addv('cpp_dupe_bytes{vol="total"}', str(tnbytes))
             addv('cpp_dupe_files{vol="total"}', str(tnfiles))
 
         if not args.nos_unf:
-            addh("cpp_unf_mib", "gauge", "incoming/unfinished uploads (MiB)")
+            addbh("cpp_unf_bytes", "incoming/unfinished uploads (num bytes)")
             addh("cpp_unf_files", "gauge", "incoming/unfinished uploads (num files)")
             tnbytes = 0
             tnfiles = 0
@@ -148,16 +149,17 @@ class Metrics(object):
                         cli.log(t.format(ptop), 3)
                         continue
 
-                    v = "{:.3f}".format(nbytes / 1048576.0)
-                    addv('cpp_unf_mib{vol="/%s"}' % (vol.vpath), v)
+                    addv('cpp_unf_bytes{vol="/%s"}' % (vol.vpath), str(nbytes))
                     addv('cpp_unf_files{vol="/%s"}' % (vol.vpath), str(nfiles))
 
-                v = "{:.3f}".format(tnbytes / 1048576.0)
-                addv('cpp_unf_mib{vol="total"}', v)
+                addv('cpp_unf_bytes{vol="total"}', str(tnbytes))
                 addv('cpp_unf_files{vol="total"}', str(tnfiles))
 
             except Exception as ex:
                 cli.log("tx_stats get_unfinished: {!r}".format(ex), 3)
 
-        cli.reply("\n".join(ret).encode("utf-8"), mime="text/plain")
+        ret.append("# EOF")
+
+        mime = "application/openmetrics-text; version=1.0.0; charset=utf-8"
+        cli.reply("\n".join(ret).encode("utf-8"), mime=mime)
         return True

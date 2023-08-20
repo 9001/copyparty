@@ -1263,28 +1263,28 @@ scrape_configs:
 ```
 
 currently the following metrics are available,
-* `cpp_uptime` in seconds
+* `cpp_uptime_seconds`
 * `cpp_bans` number of banned IPs
 
 and these are available per-volume only:
-* `cpp_disk_size` total HDD size in MiB
-* `cpp_disk_free` free HDD space in MiB
+* `cpp_disk_size_bytes` total HDD size
+* `cpp_disk_free_bytes` free HDD space
 
 and these are per-volume and `total`:
-* `cpp_vol_mib` size of all files in MiB
+* `cpp_vol_bytes` size of all files in volume
 * `cpp_vol_files` number of files
-* `cpp_dupe_mib` amount of MiB presumably saved by deduplication
+* `cpp_dupe_bytes` disk space presumably saved by deduplication
 * `cpp_dupe_files` number of dupe files
-* `cpp_unf_mib` currently unfinished / incoming uploads
+* `cpp_unf_bytes` currently unfinished / incoming uploads
 
 some of the metrics have additional requirements to function correctly,
-* `cpp_vol_mib` and `cpp_vol_files` requires either the `e2ds` volflag or `-e2dsa` global-option
+* `cpp_vol_*` requires either the `e2ds` volflag or `-e2dsa` global-option
 
 the following options are available to disable some of the metrics:
 * `--nos-hdd` disables `cpp_disk_*` which can prevent spinning up HDDs
 * `--nos-vol` disables `cpp_vol_*` which reduces server startup time
 * `--nos-dup` disables `cpp_dupe_*` which reduces the server load caused by prometheus queries
-* `--nos-unf` disables `cpp_unf_mib` for no particular purpose
+* `--nos-unf` disables `cpp_unf_*` for no particular purpose
 
 
 # packages
