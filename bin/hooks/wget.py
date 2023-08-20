@@ -37,6 +37,10 @@ def main():
     if "://" not in url:
         url = "https://" + url
 
+    proto = url.split("://")[0].lower()
+    if proto not in ("http", "https", "ftp", "ftps"):
+        raise Exception("bad proto {}".format(proto))
+
     os.chdir(inf["ap"])
 
     name = url.split("?")[0].split("/")[-1]
