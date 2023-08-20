@@ -4642,7 +4642,7 @@ function tree_up(justgo) {
 		return;
 	}
 	if (act.previousSibling.textContent == '-') {
-		treectl.treego.call(act.previousSibling);
+		act.previousSibling.click();
 		if (!justgo)
 			return;
 	}
