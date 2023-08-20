@@ -2400,27 +2400,29 @@ class Up2k(object):
             cur = jcur
             ptop = None  # use cj or job as appropriate
 
+            if not job and wark in reg:
+                # ensure the files haven't been deleted manually
+                rj = reg[wark]
+                names = [rj[x] for x in ["name", "tnam"] if x in rj]
+                for fn in names:
+                    path = djoin(rj["ptop"], rj["prel"], fn)
+                    try:
+                        if bos.path.getsize(path) > 0 or not rj["need"]:
+                            # upload completed or both present
+                            break
+                    except:
+                        # missing; restart
+                        if not self.args.nw and not n4g:
+                            del reg[wark]
+                        break
+
             if job or wark in reg:
                 job = job or reg[wark]
                 if (
-                    job["ptop"] == cj["ptop"]
-                    and job["prel"] == cj["prel"]
-                    and job["name"] == cj["name"]
+                    job["ptop"] != cj["ptop"]
+                    or job["prel"] != cj["prel"]
+                    or job["name"] != cj["name"]
                 ):
-                    # ensure the files haven't been deleted manually
-                    names = [job[x] for x in ["name", "tnam"] if x in job]
-                    for fn in names:
-                        path = djoin(job["ptop"], job["prel"], fn)
-                        try:
-                            if bos.path.getsize(path) > 0:
-                                # upload completed or both present
-                                break
-                        except:
-                            # missing; restart
-                            if not self.args.nw and not n4g:
-                                job = None
-                            break
-                else:
                     # file contents match, but not the path
                     src = djoin(job["ptop"], job["prel"], job["name"])
                     dst = djoin(cj["ptop"], cj["prel"], cj["name"])
