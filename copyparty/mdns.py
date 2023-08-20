@@ -295,7 +295,9 @@ class MDNS(MCast):
         while self.running:
             timeout = (
                 0.02 + random.random() * 0.07
-                if self.probing or self.q or self.defend or self.unsolicited
+                if self.probing or self.q or self.defend
+                else max(0.05, self.unsolicited[0] - time.time())
+                if self.unsolicited
                 else (last_hop + ihop if ihop else 180)
             )
             rdy = select.select(self.srv, [], [], timeout)
@@ -514,7 +516,8 @@ class MDNS(MCast):
                 tx.add(srv)
 
             if not self.unsolicited and self.args.zm_spam:
-                self.unsolicited.append(time.time() + self.args.zm_spam)
+                zf = time.time() + self.args.zm_spam + random.random() * 0.07
+                self.unsolicited.append(zf)
 
         for srv, deadline in list(self.defend.items()):
             if now < deadline:

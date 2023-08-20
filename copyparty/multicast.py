@@ -15,7 +15,7 @@ from ipaddress import (
 )
 
 from .__init__ import MACOS, TYPE_CHECKING
-from .util import Netdev, find_prefix, min_ex, spack
+from .util import Daemon, Netdev, find_prefix, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -228,6 +228,7 @@ class MCast(object):
         for srv in self.srv.values():
             assert srv.ip in self.sips
 
+        Daemon(self.hopper, "mc-hop")
         return bound
 
     def setup_socket(self, srv: MC_Sck) -> None:
@@ -299,33 +300,55 @@ class MCast(object):
                 t = "failed to set IPv4 TTL/LOOP; announcements may not survive multiple switches/routers"
                 self.log(t, 3)
 
-        self.hop(srv)
+        if self.hop(srv, False):
+            self.log("igmp was already joined?? chilling for a sec", 3)
+            time.sleep(1.2)
+
+        self.hop(srv, True)
         self.b4.sort(reverse=True)
         self.b6.sort(reverse=True)
 
-    def hop(self, srv: MC_Sck) -> None:
+    def hop(self, srv: MC_Sck, on: bool) -> bool:
         """rejoin to keepalive on routers/switches without igmp-snooping"""
         sck = srv.sck
         req = srv.mreq
         if ":" in srv.ip:
-            try:
-                sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_LEAVE_GROUP, req)
-                # linux does leaves/joins twice with 0.2~1.05s spacing
-                time.sleep(1.2)
-            except:
-                pass
-
-            sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_JOIN_GROUP, req)
+            if not on:
+                try:
+                    sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_LEAVE_GROUP, req)
+                    return True
+                except:
+                    return False
+            else:
+                sck.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_JOIN_GROUP, req)
         else:
-            try:
-                sck.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, req)
-                time.sleep(1.2)
-            except:
-                pass
+            if not on:
+                try:
+                    sck.setsockopt(socket.IPPROTO_IP, socket.IP_DROP_MEMBERSHIP, req)
+                    return True
+                except:
+                    return False
+            else:
+                # t = "joining {} from ip {} idx {} with mreq {}"
+                # self.log(t.format(srv.grp, srv.ip, srv.idx, repr(srv.mreq)), 6)
+                sck.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, req)
 
-            # t = "joining {} from ip {} idx {} with mreq {}"
-            # self.log(t.format(srv.grp, srv.ip, srv.idx, repr(srv.mreq)), 6)
-            sck.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, req)
+        return True
+
+    def hopper(self):
+        while self.args.mc_hop and self.running:
+            time.sleep(self.args.mc_hop)
+            if not self.running:
+                return
+
+            for srv in self.srv.values():
+                self.hop(srv, False)
+
+            # linux does leaves/joins twice with 0.2~1.05s spacing
+            time.sleep(1.2)
+
+            for srv in self.srv.values():
+                self.hop(srv, True)
 
     def map_client(self, cip: str) -> Optional[MC_Sck]:
         try:
