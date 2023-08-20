@@ -822,7 +822,7 @@ class HttpCli(object):
                 self.reply(b"", 301, headers=h)
                 return True
 
-            if self.vpath == ".cpr/s/metrics":
+            if self.vpath == ".cpr/metrics":
                 return self.conn.hsrv.metrics.tx(self)
 
             path_base = os.path.join(self.E.mod, "web")

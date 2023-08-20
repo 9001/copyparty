@@ -964,7 +964,7 @@ def add_hooks(ap):
 
 def add_stats(ap):
     ap2 = ap.add_argument_group('grafana/prometheus metrics endpoint')
-    ap2.add_argument("--stats", action="store_true", help="enable stats at /.cpr/s/metrics for admin accounts")
+    ap2.add_argument("--stats", action="store_true", help="enable openmetrics at /.cpr/metrics for admin accounts")
     ap2.add_argument("--nos-hdd", action="store_true", help="disable disk-space metrics (used/free space)")
     ap2.add_argument("--nos-vol", action="store_true", help="disable volume size metrics (num files, total bytes, vmaxb/vmaxn)")
     ap2.add_argument("--nos-dup", action="store_true", help="disable dupe-files metrics (good idea; very slow)")

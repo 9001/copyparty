@@ -2413,6 +2413,8 @@ class Up2k(object):
                     except:
                         # missing; restart
                         if not self.args.nw and not n4g:
+                            t = "forgetting deleted partial upload at {}"
+                            self.log(t.format(path))
                             del reg[wark]
                         break
 

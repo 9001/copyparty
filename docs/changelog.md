@@ -1,4 +1,27 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0725-1550  `v1.8.8`  just boring bugfixes
+
+final release until late august unless something bad happens and i end up building this thing on a shinkansen
+
+## recent security / vulnerability fixes
+* there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` in case of future important updates
+* [v1.8.7](https://github.com/9001/copyparty/releases/tag/v1.8.7) (2023-07-23) - [CVE-2023-38501](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-38501) - reflected XSS
+* [v1.8.2](https://github.com/9001/copyparty/releases/tag/v1.8.2) (2023-07-14) - [CVE-2023-37474](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-37474) - path traversal (first CVE)
+  * all serverlogs reviewed so far (5 public servers) showed no signs of exploitation
+
+## bugfixes
+* range-select with shiftclick:
+  * don't crash when entering another folder and shift-clicking some more
+  * remember selection origin when lazy-loading more stuff into the viewport
+* markdown editor:
+  * fix confusing warnings when the browser cache decides it *really* wants to cache
+  * and when a document starts with a newline
+* remember intended actions such as `?edit` on login prompts
+* Windows: TLS-cert generation (triggered by network changes) could occasionally fail
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0723-1543  `v1.8.7`  XSS for days
 
 at the lack of better ideas, there is now a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` for all future important updates such as this one

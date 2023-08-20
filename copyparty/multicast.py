@@ -346,6 +346,8 @@ class MCast(object):
 
             # linux does leaves/joins twice with 0.2~1.05s spacing
             time.sleep(1.2)
+            if not self.running:
+                return
 
             for srv in self.srv.values():
                 self.hop(srv, True)

@@ -1244,18 +1244,18 @@ example webserver configs:
 
 ## prometheus
 
-metrics/stats can be enabled  at `/.cpr/s/metrics` for grafana / prometheus / etc.
+metrics/stats can be enabled  at URL `/.cpr/metrics` for grafana / prometheus / etc (openmetrics 1.0.0)
 
-must be enabled with `--stats` since it reduces startup time a tiny bit
+must be enabled with `--stats` since it reduces startup time a tiny bit, and you probably want `-e2dsa` too
 
-the endpoint is only accessible by `admin` accounts, meaning the `a` in `rwmda` of the following example commandline: `python3 -m copyparty -a ed:wark -v /mnt/nas::rwmda,ed`
+the endpoint is only accessible by `admin` accounts, meaning the `a` in `rwmda` in the following example commandline: `python3 -m copyparty -a ed:wark -v /mnt/nas::rwmda,ed --stats -e2dsa`
 
 follow a guide for setting up `node_exporter` except have it read from copyparty instead; example `/etc/prometheus/prometheus.yml` below
 
 ```yaml
 scrape_configs:
   - job_name: copyparty
-    metrics_path: /.cpr/s/metrics
+    metrics_path: /.cpr/metrics
     basic_auth:
       password: wark
     static_configs:
