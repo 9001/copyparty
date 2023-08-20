@@ -7,6 +7,7 @@ if (!window.console || !console.log)
 
 
 var wah = '',
+    NOAC = 'autocorrect="off" autocapitalize="off"',
     L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,
     CB = '?_=' + Date.now(),
     R = SR.slice(1),
@@ -1565,7 +1566,7 @@ var modal = (function () {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
         cb_up = fun;
-        html += '<input id="modali" type="text" /><div id="modalb">' + ok_cancel + '</div>';
+        html += '<input id="modali" type="text" ' + NOAC + ' /><div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
 
         ebi('modali').value = v || '';

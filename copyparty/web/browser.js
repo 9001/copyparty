@@ -1138,16 +1138,16 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_favico + ' <span id="ico1">🎉</span></h3>\n' +
 	'	<div>\n' +
-	'		<input type="text" id="icot" style="width:1.3em" value="" tt="' + L.cft_text + '" />' +
-	'		<input type="text" id="icof" style="width:2em" value="" tt="' + L.cft_fg + '" />' +
-	'		<input type="text" id="icob" style="width:2em" value="" tt="' + L.cft_bg + '" />' +
+	'		<input type="text" id="icot" value="" ' + NOAC + ' style="width:1.3em" tt="' + L.cft_text + '" />' +
+	'		<input type="text" id="icof" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_fg + '" />' +
+	'		<input type="text" id="icob" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_bg + '" />' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
 	'	<h3>' + L.cl_bigdir + '</h3>\n' +
 	'	<div>\n' +
-	'		<input type="text" id="bd_lim" value="250" style="width:4em" tt="' + L.cdt_lim + '" />' +
+	'		<input type="text" id="bd_lim" value="250" ' + NOAC + ' style="width:4em" tt="' + L.cdt_lim + '" />' +
 	'		<a id="bd_ask" class="tgl btn" href="#" tt="' + L.cdt_ask + '">ask</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
@@ -1335,7 +1335,7 @@ var mpl = (function () {
 		) : '') +
 
 		'<div><h3>' + L.ml_tint + '</h3><div>' +
-		'<input type="text" id="pb_tint" style="width:2.4em" value="0" tt="' + L.mt_tint + '" />' +
+		'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
 		'</div></div>' +
 
 		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>');
@@ -2125,6 +2125,11 @@ var vbar = (function () {
 		lastv = Date.now();
 		mp.setvol(mul);
 		r.draw();
+
+		setTimeout(function () {
+			if (IPHONE && mp.au && mul < 0.9 && mp.au.volume == 1)
+				toast.inf(6, 'volume doesnt work because <a href="https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11" target="_blank">apple says no</a>');
+		}, 1);
 	}
 	can.onmousedown = function (e) {
 		if (e.button !== 0)
@@ -2713,7 +2718,7 @@ var afilt = (function () {
 		html.push('<td><a href="#" class="eq_step" step="0.5" band="' + b + '">+</a></td>');
 		h2.push('<td>' + vs[a][1] + '</td>');
 		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + b + '">&ndash;</a></td>');
-		h3.push('<td><input type="text" class="eq_gain" band="' + b + '" value="' + vs[a][2] + '" /></td>');
+		h3.push('<td><input type="text" class="eq_gain" ' + NOAC + ' band="' + b + '" value="' + vs[a][2] + '" /></td>');
 	}
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><tr>';
@@ -3423,8 +3428,8 @@ var fileman = (function () {
 			'<a id="rn_case" class="tgl btn" href="#" tt="' + L.fr_case + '</a>',
 			'</div>',
 			'<div id="rn_vadv"><table>',
-			'<tr><td>regex</td><td><input type="text" id="rn_re" tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" placeholder="^[0-9]+[\\. ]+(.*) - (.*)" /></td></tr>',
-			'<tr><td>format</td><td><input type="text" id="rn_fmt" tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" placeholder="[(artist) - ](title).(ext)" /></td></tr>',
+			'<tr><td>regex</td><td><input type="text" id="rn_re" ' + NOAC + ' tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" placeholder="^[0-9]+[\\. ]+(.*) - (.*)" /></td></tr>',
+			'<tr><td>format</td><td><input type="text" id="rn_fmt" ' + NOAC + ' tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" placeholder="[(artist) - ](title).(ext)" /></td></tr>',
 			'<tr><td>preset</td><td><select id="rn_pre"></select>',
 			'<button id="rn_pdel">❌ ' + L.fr_pdel + '</button>',
 			'<button id="rn_pnew">💾 ' + L.fr_pnew + '</button>',
@@ -4912,7 +4917,7 @@ document.onkeydown = function (e) {
 	for (var a = 0; a < trs.length; a += 2) {
 		html.push('<table>' + (trs[a].concat(trs[a + 1])).join('\n') + '</table>');
 	}
-	html.push('<table id="tq_raw"><tr><td>raw</td><td><input id="q_raw" type="text" name="q" placeholder="( tags like *nhato* or tags like *taishi* ) and ( not tags like *nhato* or not tags like *taishi* )" /></td></tr></table>');
+	html.push('<table id="tq_raw"><tr><td>raw</td><td><input id="q_raw" type="text" name="q" ' + NOAC + ' placeholder="( tags like *nhato* or tags like *taishi* ) and ( not tags like *nhato* or not tags like *taishi* )" /></td></tr></table>');
 	ebi('srch_form').innerHTML = html.join('\n');
 
 	var o = QSA('#op_search input');

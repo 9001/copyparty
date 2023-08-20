@@ -376,7 +376,12 @@ window.baguetteBox = (function () {
             else
                 (vid() || ebi('bbox-overlay')).requestFullscreen();
         }
-        catch (ex) { alert(ex); }
+        catch (ex) {
+            if (IPHONE)
+                alert('sorry, apple decided to make this impossible on iphones (should work on ipad tho)');
+            else
+                alert(ex);
+        }
     }
 
     function tglsel() {
@@ -968,7 +973,7 @@ window.baguetteBox = (function () {
             clmod(btnPrev, 'off', 't');
             clmod(btnNext, 'off', 't');
 
-            if (Date.now() - ctime <= 500)
+            if (Date.now() - ctime <= 500 && !IPHONE)
                 tglfull();
 
             ctime = Date.now();
