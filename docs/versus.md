@@ -148,7 +148,7 @@ symbol legend,
 
 | feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| download folder as zip  | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ | █ |
+| download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ |
 | download folder as tar  | █ |   |   |   |   |   |   |   |   | █ |   |   |
 | upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | parallel uploads        | █ |   |   | █ | █ |   | • |   | █ |   | █ |   |
@@ -183,6 +183,7 @@ symbol legend,
 * `cloud storage backend` = able to serve files from (and write to) s3 or similar cloud services; `╱` means the software can do this with some help from `rclone mount` as a bridge
 
 * `a`/copyparty can reject uploaded files (based on complex conditions), for example [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py)
+* `e`/seafile download-as-zip is not streaming; it creates the full zipfile before download can start, and fails on big folders
 * `j`/filebrowser remarks:
   * can provide checksums for single files on request
   * can probably do extension/mimetype rejection similar to copyparty
@@ -432,6 +433,7 @@ symbol legend,
   * not that bad, can probably be remedied with bindmounts or maybe symlinks
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
+* ⚠️ uploading small files is slow; `2.2` files per sec (copyparty does `87`/sec), tested locally with [linuxserver/nextcloud](https://hub.docker.com/r/linuxserver/nextcloud) (sqlite)
 * ⚠️ no write-only / upload-only folders
 * ⚠️ http/webdav only; no ftp, zeroconf
 * ⚠️ less awesome music player
@@ -451,7 +453,9 @@ symbol legend,
   * *much worse than nextcloud* in that regard
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
+* ⚠️ uploading small files is slow; `2.7` files per sec (copyparty does `87`/sec), tested locally with [official container](https://manual.seafile.com/docker/deploy_seafile_with_docker/)
 * ⚠️ no write-only / upload-only folders
+* ⚠️ big folders cannot be zip-downloaded
 * ⚠️ http/webdav only; no ftp, zeroconf
 * ⚠️ less awesome music player
 * ⚠️ doesn't run on android or ipads

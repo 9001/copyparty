@@ -40,7 +40,7 @@ except:
 
 try:
     import requests
-except ImportError:
+except ImportError as ex:
     if EXE:
         raise
     elif sys.version_info > (2, 7):
@@ -51,7 +51,7 @@ except ImportError:
         m = "\n  ERROR: need these:\n" + "\n".join(m) + "\n"
         m += "\n  for f in *.whl; do unzip $f; done; rm -r *.dist-info\n"
 
-    print(m.format(sys.executable))
+    print(m.format(sys.executable), "\nspecifically,", ex)
     sys.exit(1)
 
 
