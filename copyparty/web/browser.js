@@ -4623,7 +4623,11 @@ function tree_neigh(n) {
 	if (act >= links.length)
 		act = 0;
 
-	treectl.treego.call(links[act]);
+	if (showfile.active())
+		links[act].click();
+	else
+		treectl.treego.call(links[act]);
+
 	links[act].focus();
 }
 
