@@ -4679,6 +4679,7 @@ function hkhelp() {
 }
 
 
+var fselgen, fselctr;
 document.onkeydown = function (e) {
 	if (e.altKey || e.isComposing)
 		return;
@@ -4723,15 +4724,26 @@ document.onkeydown = function (e) {
 	}
 
 	if (aet == 'tr' && ae.closest('#files')) {
-		var d = '';
+		var d = '', rem = 0;
 		if (k == 'ArrowUp') d = 'previous';
 		if (k == 'ArrowDown') d = 'next';
+		if (k == 'PageUp') { d = 'previous'; rem = 0.6; }
+		if (k == 'PageDown') { d = 'next'; rem = 0.6; }
 		if (d) {
-			var el = ae[d + 'ElementSibling'];
-			if (el) {
+			fselctr = 0;
+			var gen = fselgen = Date.now();
+			if (rem)
+				rem *= window.innerHeight;
+
+			function selfun() {
+				var el = ae[d + 'ElementSibling'];
+				if (!el || gen != fselgen)
+					return;
+
 				el.focus();
+				var elh = el.offsetHeight;
 				if (ctrl(e))
-					document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * el.offsetHeight;
+					document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * elh;
 
 				if (e.shiftKey) {
 					clmod(el, 'sel', 't');
@@ -4739,8 +4751,17 @@ document.onkeydown = function (e) {
 					msel.selui();
 				}
 
-				return ev(e);
+				rem -= elh;
+				if (rem > 0) {
+					ae = document.activeElement;
+					if (++fselctr % 5 && rem > elh * (FIREFOX ? 5 : 2))
+						selfun();
+					else
+						setTimeout(selfun, 1);
+				}
 			}
+			selfun();
+			return ev(e);
 		}
 		if (k == 'Space') {
 			clmod(ae, 'sel', 't');
@@ -5776,8 +5797,14 @@ var treectl = (function () {
 		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
 			sel = r.lsc === res ? msel.getsel() : [],
+			ae = document.activeElement,
+			cid = null,
 			plain = [],
 			seen = {};
+
+		if (ae && /^tr$/i.exec(ae.nodeName))
+			if (ae = ae.querySelector('a[id]'))
+				cid = ae.getAttribute('id');
 
 		r.lsc = res;
 		if (res.unlist) {
@@ -5877,6 +5904,10 @@ var treectl = (function () {
 				msel.loadsel(sel);
 			else
 				msel.origin_id(null);
+
+			if (cid) try {
+				ebi(cid).closest('tr').focus();
+			} catch (ex) { }
 
 			setTimeout(eval_hash, 1);
 		}
