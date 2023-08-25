@@ -843,14 +843,17 @@ class HttpCli(object):
 
         if not self.can_read and not self.can_write and not self.can_get:
             t = "@{} has no access to [{}]"
-            self.log(t.format(self.uname, self.vpath))
 
             if "on403" in self.vn.flags:
+                t += " (on403)"
+                self.log(t.format(self.uname, self.vpath))
                 ret = self.on40x(self.vn.flags["on403"], self.vn, self.rem)
                 if ret == "true":
                     return True
                 elif ret == "false":
                     return False
+                elif ret == "home":
+                    self.uparam["h"] = ""
                 elif ret == "allow":
                     self.log("plugin override; access permitted")
                     self.can_read = self.can_write = self.can_move = True
@@ -860,6 +863,7 @@ class HttpCli(object):
                     return self.tx_404(True)
             else:
                 if self.vpath:
+                    self.log(t.format(self.uname, self.vpath))
                     return self.tx_404(True)
 
                 self.uparam["h"] = ""
