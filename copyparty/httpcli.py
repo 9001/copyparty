@@ -881,7 +881,10 @@ class HttpCli(object):
                     return self.tx_404(True)
             else:
                 if self.vpath:
-                    self.log(t.format(self.uname, self.vpath))
+                    ptn = self.args.nonsus_urls
+                    if not ptn or not ptn.search(self.vpath):
+                        self.log(t.format(self.uname, self.vpath))
+
                     return self.tx_404(True)
 
                 self.uparam["h"] = ""
@@ -3822,7 +3825,9 @@ class HttpCli(object):
             pass
 
         # show dotfiles if permitted and requested
-        if not self.args.ed or "dots" not in self.uparam:
+        if not self.args.ed or (
+            "dots" not in self.uparam and (is_ls or "dots" not in self.cookies)
+        ):
             ls_names = exclude_dotfiles(ls_names)
 
         add_fk = vn.flags.get("fk")

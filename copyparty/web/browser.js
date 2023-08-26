@@ -5273,6 +5273,9 @@ var treectl = (function () {
 	bcfg_bind(r, 'csel', 'csel', false);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
 		r.goto(get_evpath());
+		var xhr = new XHR();
+		xhr.open('GET', SR + '/?setck=dots=' + (v ? 'y' : ''), true);
+		xhr.send();
 	});
 	bcfg_bind(r, 'dir1st', 'dir1st', true, function (v) {
 		treectl.gentab(get_evpath(), treectl.lsc);
