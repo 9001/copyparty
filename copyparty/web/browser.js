@@ -6028,7 +6028,8 @@ var treectl = (function () {
 		for (var a = 0; a < keys.length; a++) {
 			var kk = keys[a],
 				ks = kk.slice(1),
-				k = uricom_sdec(ks),
+				ded = ks.endsWith('\n'),
+				k = uricom_sdec(ded ? ks.replace(/\n$/, '') : ks),
 				hek = esc(k[0]),
 				uek = k[1] ? uricom_enc(k[0], true) : k[0],
 				url = '/' + (top ? top + uek : uek) + '/',
@@ -6041,7 +6042,7 @@ var treectl = (function () {
 				ret += '<li>' + link + '\n<ul>\n' + subtree + '</ul></li>\n';
 			}
 			else {
-				ret += '<li>' + link + '</li>\n';
+				ret += (ded ? '<li class="offline">' : '<li>') + link + '</li>\n';
 			}
 		}
 		return ret;

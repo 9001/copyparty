@@ -3331,6 +3331,10 @@ class HttpCli(object):
 
         for x in vfs_virt:
             if x != excl:
+                try:
+                    bos.stat(vn.nodes[x].realpath)
+                except:
+                    x += "\n"
                 dirs.append(x)
 
         ret["a"] = dirs

@@ -867,8 +867,11 @@ class Up2k(object):
         if not HAVE_SQLITE3 or "e2d" not in flags or "d2d" in flags:
             return None
 
-        if bos.makedirs(histpath):
-            hidedir(histpath)
+        try:
+            if bos.makedirs(histpath):
+                hidedir(histpath)
+        except:
+            return None
 
         try:
             cur = self._open_db(db_path)

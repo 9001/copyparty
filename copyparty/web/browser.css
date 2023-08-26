@@ -1620,6 +1620,12 @@ html.cz .tgl.btn.on {
 	list-style: none;
 	border-top: 1px solid var(--bg-u5);
 }
+#tree li.offline>a:first-child:before {
+	content: '❌';
+	position: absolute;
+	margin-left: -.25em;
+	z-index: 3;
+}
 #tree ul a.sel {
 	background: #000;
 	background: var(--bg-d3);
