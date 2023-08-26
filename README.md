@@ -1599,6 +1599,7 @@ some notes on hardening
 * set `--rproxy 0` if your copyparty is directly facing the internet (not through a reverse-proxy)
   * cors doesn't work right otherwise
 * if you allow anonymous uploads or otherwise don't trust the contents of a volume, you can prevent XSS with volflag `nohtml`
+  * this returns html documents as plaintext, and also disables markdown rendering
 
 safety profiles:
 

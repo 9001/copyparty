@@ -212,6 +212,8 @@ function convert_markdown(md_text, dest_dom) {
 
     try {
         var md_html = marked.parse(md_text, marked_opts);
+        if (!have_emp)
+            md_html = DOMPurify.sanitize(md_html);
     }
     catch (ex) {
         if (ext)

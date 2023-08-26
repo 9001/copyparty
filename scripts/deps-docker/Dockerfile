@@ -3,6 +3,7 @@ WORKDIR /z
 ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
         ver_hashwasm=4.9.0 \
         ver_marked=4.3.0 \
+        ver_dompf=3.0.5 \
         ver_mde=2.18.0 \
         ver_codemirror=5.65.12 \
         ver_fontawesome=5.13.0 \
@@ -13,6 +14,7 @@ ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
 # https://github.com/markedjs/marked/releases
 # https://github.com/Ionaru/easy-markdown-editor/tags
 # https://github.com/codemirror/codemirror5/releases
+# https://github.com/cure53/DOMPurify/releases
 # https://github.com/Daninet/hash-wasm/releases
 # https://github.com/openpgpjs/asmcrypto.js
 # https://github.com/google/zopfli/tags
@@ -27,6 +29,7 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
         && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
         && wget https://github.com/codemirror/codemirror5/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
+        && wget https://github.com/cure53/DOMPurify/archive/refs/tags/$ver_dompf.tar.gz -O dompurify.tgz \
         && wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
         && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
@@ -48,6 +51,7 @@ RUN     mkdir -p /z/dist/no-pk \
             && cd easy-markdown-editor* \
             && npm install \
             && npm i gulp-cli -g ) \
+        && tar -xf dompurify.tgz \
         && tar -xf prism.tgz \
         && unzip fontawesome.zip \
         && tar -xf zopfli.tgz
@@ -118,6 +122,10 @@ RUN     cd easy-markdown-editor-$ver_mde \
         && gulp \
         && cp -pv dist/easymde.min.css /z/dist/easymde.css \
         && cp -pv dist/easymde.min.js /z/dist/easymde.js
+
+
+# build dompurify
+RUN     (echo; cat DOMPurify-$ver_dompf/dist/purify.min.js) >> /z/dist/marked.js
 
 
 # build fontawesome and scp

@@ -7123,7 +7123,12 @@ function show_md(md, name, div, url, depth) {
 
 	try {
 		clmod(div, 'mdo', 1);
-		if (sandbox(div, sb_md, 'mdo', marked.parse(md, marked_opts)))
+
+		var md_html = marked.parse(md, marked_opts);
+		if (!have_emp)
+			md_html = DOMPurify.sanitize(md_html);
+
+		if (sandbox(div, sb_md, 'mdo', md_html))
 			return;
 
 		ext = md_plug.post;
