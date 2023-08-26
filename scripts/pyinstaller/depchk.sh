@@ -44,7 +44,7 @@ ckgh() {
 			curl -s https://api.github.com/repos/$dep/releases | tee h |
 			jq -r 'first|.assets|.[]|.name'
 		)
-		[ -z "$k" ] && echo "outdated: $dep" && cp h "ng-$dep" e=1
+		[ -z "$k" ] && echo "outdated: $dep" && cp h "ng-$dep" && e=1
 	done
 	true
 }

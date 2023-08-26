@@ -100,6 +100,7 @@ def tc1(vflags):
         "-p4321",
         "-e2dsa",
         "-e2tsr",
+        "--ban-403=no",
         "--dbd=yolo",
         "--no-mutagen",
         "--th-ff-jpg",

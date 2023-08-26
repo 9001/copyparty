@@ -1637,10 +1637,12 @@ other misc notes:
 behavior that might be unexpected
 
 * users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
-* users can submit `<script>`s which autorun for other visitors in a few ways;
+* users can submit `<script>`s which autorun (in a sandbox) for other visitors in a few ways;
   * uploading a `README.md` -- avoid with `--no-readme`
   * renaming `some.html` to `.epilogue.html` -- avoid with either `--no-logues` or `--no-dot-ren`
-  * the directory-listing embed is sandboxed (so any malicious scripts can't do any damage) but the markdown editor is not
+  * the directory-listing embed is sandboxed (so any malicious scripts can't do any damage) but the markdown editor is not 100% safe, see below
+* markdown documents can contain html and `<script>`s; attempts are made to prevent scripts from executing (unless `-emp` is specified) but this is not 100% bulletproof, so setting the `nohtml` volflag is still the safest choice
+  * or eliminate the problem entirely by only giving write-access to trustworthy people :^)
 
 
 ## cors
