@@ -107,6 +107,9 @@ class HttpSrv(object):
         self.ssdp: Optional["SSDPr"] = None
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
+        self.g403 = Garda(self.args.ban_403)
+        self.g422 = Garda(self.args.ban_422, False)
+        self.gurl = Garda(self.args.ban_url)
         self.bans: dict[str, int] = {}
         self.aclose: dict[str, int] = {}
 

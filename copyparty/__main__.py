@@ -959,7 +959,7 @@ def add_hooks(ap):
     ap2.add_argument("--xbd", metavar="CMD", type=u, action="append", help="execute CMD before a file delete")
     ap2.add_argument("--xad", metavar="CMD", type=u, action="append", help="execute CMD after  a file delete")
     ap2.add_argument("--xm", metavar="CMD", type=u, action="append", help="execute CMD on message")
-    ap2.add_argument("--xban", metavar="CMD", type=u, action="append", help="execute CMD if someone gets banned (pw/404)")
+    ap2.add_argument("--xban", metavar="CMD", type=u, action="append", help="execute CMD if someone gets banned (pw/404/403/url)")
 
 
 def add_stats(ap):
@@ -1010,6 +1010,11 @@ def add_safety(ap):
     ap2.add_argument("--logout", metavar="H", type=float, default="8086", help="logout clients after H hours of inactivity; [\033[32m0.0028\033[0m]=10sec, [\033[32m0.1\033[0m]=6min, [\033[32m24\033[0m]=day, [\033[32m168\033[0m]=week, [\033[32m720\033[0m]=month, [\033[32m8760\033[0m]=year)")
     ap2.add_argument("--ban-pw", metavar="N,W,B", type=u, default="9,60,1440", help="more than \033[33mN\033[0m wrong passwords in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; disable with [\033[32mno\033[0m]")
     ap2.add_argument("--ban-404", metavar="N,W,B", type=u, default="no", help="hitting more than \033[33mN\033[0m 404's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes (disabled by default since turbo-up2k counts as 404s)")
+    ap2.add_argument("--ban-403", metavar="N,W,B", type=u, default="9,2,1440", help="hitting more than \033[33mN\033[0m 403's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; [\033[32m1440\033[0m]=day, [\033[32m10080\033[0m]=week, [\033[32m43200\033[0m]=month")
+    ap2.add_argument("--ban-422", metavar="N,W,B", type=u, default="9,2,1440", help="hitting more than \033[33mN\033[0m 422's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes (422 is server fuzzing, invalid POSTs and so)")
+    ap2.add_argument("--ban-url", metavar="N,W,B", type=u, default="9,2,1440", help="hitting more than \033[33mN\033[0m sus URL's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes (decent replacement for --ban-404 if that can't be used)")
+    ap2.add_argument("--sus-urls", metavar="REGEX", type=u, default=r"\.php$|(^|/)wp-(admin|content|includes)/", help="URLs which are considered sus / eligible for banning; disable with blank or [\033[32mno\033[0m]")
+    ap2.add_argument("--nonsus-urls", metavar="REGEX", type=u, default=r"^(favicon\.ico|robots\.txt)$|^apple-touch-icon|^\.well-known", help="harmless URLs ignored from 404-bans; disable with blank or [\033[32mno\033[0m]")
     ap2.add_argument("--aclose", metavar="MIN", type=int, default=10, help="if a client maxes out the server connection limit, downgrade it from connection:keep-alive to connection:close for MIN minutes (and also kill its active connections) -- disable with 0")
     ap2.add_argument("--loris", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for B minutes; disable with [\033[32m0\033[0m]")
     ap2.add_argument("--acao", metavar="V[,V]", type=u, default="*", help="Access-Control-Allow-Origin; list of origins (domains/IPs without port) to accept requests from; [\033[32mhttps://1.2.3.4\033[0m]. Default [\033[32m*\033[0m] allows requests from all sites but removes cookies and http-auth; only ?pw=hunter2 survives")

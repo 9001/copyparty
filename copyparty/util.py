@@ -926,7 +926,8 @@ class Magician(object):
 class Garda(object):
     """ban clients for repeated offenses"""
 
-    def __init__(self, cfg: str) -> None:
+    def __init__(self, cfg: str, uniq: bool = True) -> None:
+        self.uniq = uniq
         try:
             a, b, c = cfg.strip().split(",")
             self.lim = int(a)
@@ -972,7 +973,7 @@ class Garda(object):
             # assume /64 clients; drop 4 groups
             ip = IPv6Address(ip).exploded[:-20]
 
-        if prev:
+        if prev and self.uniq:
             if self.prev.get(ip) == prev:
                 return 0, ip
 
@@ -1447,7 +1448,7 @@ class MultipartParser(object):
         for buf in iterable:
             ret += buf
             if len(ret) > max_len:
-                raise Pebkac(400, "field length is too long")
+                raise Pebkac(422, "field length is too long")
 
         return ret
 

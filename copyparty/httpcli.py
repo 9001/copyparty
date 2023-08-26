@@ -625,9 +625,27 @@ class HttpCli(object):
         headers: Optional[dict[str, str]] = None,
         volsan: bool = False,
     ) -> bytes:
-        if status == 404:
-            g = self.conn.hsrv.g404
-            if g.lim:
+        if status > 400 and status in (403, 404, 422):
+            if status == 404:
+                g = self.conn.hsrv.g404
+            elif status == 403:
+                g = self.conn.hsrv.g403
+            else:
+                g = self.conn.hsrv.g422
+
+            gurl = self.conn.hsrv.gurl
+            if (
+                gurl.lim
+                and (not g.lim or gurl.lim < g.lim)
+                and self.args.sus_urls.search(self.vpath)
+            ):
+                g = self.conn.hsrv.gurl
+
+            if g.lim and (
+                g == self.conn.hsrv.g422
+                or not self.args.nonsus_urls
+                or not self.args.nonsus_urls.search(self.vpath)
+            ):
                 bonk, ip = g.bonk(self.ip, self.vpath)
                 if bonk:
                     xban = self.vn.flags.get("xban")
@@ -642,9 +660,9 @@ class HttpCli(object):
                         0,
                         self.ip,
                         time.time(),
-                        "404",
+                        str(status),
                     ):
-                        self.log("client banned: 404s", 1)
+                        self.log("client banned: %ss" % (status,), 1)
                         self.conn.hsrv.bans[ip] = bonk
 
         if volsan:
@@ -3260,7 +3278,7 @@ class HttpCli(object):
             dst = ""
         elif top:
             if not dst.startswith(top + "/"):
-                raise Pebkac(400, "arg funk")
+                raise Pebkac(422, "arg funk")
 
             dst = dst[len(top) + 1 :]
 

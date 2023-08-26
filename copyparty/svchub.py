@@ -100,11 +100,6 @@ class SvcHub(object):
 
         self.iphash = HMaccas(os.path.join(self.E.cfg, "iphash"), 8)
 
-        # for non-http clients (ftp)
-        self.bans: dict[str, int] = {}
-        self.gpwd = Garda(self.args.ban_pw)
-        self.g404 = Garda(self.args.ban_404)
-
         if args.sss or args.s >= 3:
             args.ss = True
             args.no_dav = True
@@ -133,6 +128,14 @@ class SvcHub(object):
 
         if not self._process_config():
             raise Exception(BAD_CFG)
+
+        # for non-http clients (ftp)
+        self.bans: dict[str, int] = {}
+        self.gpwd = Garda(self.args.ban_pw)
+        self.g404 = Garda(self.args.ban_404)
+        self.g403 = Garda(self.args.ban_403)
+        self.g422 = Garda(self.args.ban_422)
+        self.gurl = Garda(self.args.ban_url)
 
         self.log_div = 10 ** (6 - args.log_tdec)
         self.log_efmt = "%02d:%02d:%02d.%0{}d".format(args.log_tdec)
@@ -399,6 +402,18 @@ class SvcHub(object):
             vs = getattr(al, k)
             if vs and vs.startswith("~"):
                 setattr(al, k, os.path.expanduser(vs))
+
+        for k in "sus_urls nonsus_urls".split(" "):
+            vs = getattr(al, k)
+            if not vs or vs == "no":
+                setattr(al, k, None)
+            else:
+                setattr(al, k, re.compile(vs))
+
+        if not al.sus_urls:
+            al.ban_url = "no"
+        elif al.ban_url == "no":
+            al.sus_urls = None
 
         return True
 

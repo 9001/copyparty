@@ -189,6 +189,8 @@ class VHttpSrv(object):
 
         self.gpwd = Garda("")
         self.g404 = Garda("")
+        self.g403 = Garda("")
+        self.gurl = Garda("")
 
         self.ptn_cc = re.compile(r"[\x00-\x1f]")
 
