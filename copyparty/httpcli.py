@@ -3303,8 +3303,9 @@ class HttpCli(object):
             sub = self.gen_tree("/".join([top, excl]).strip("/"), target)
             ret["k" + quotep(excl)] = sub
 
+        vfs = self.asrv.vfs
         try:
-            vn, rem = self.asrv.vfs.get(top, self.uname, True, False)
+            vn, rem = vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
                 rem,
                 self.uname,
@@ -3317,7 +3318,7 @@ class HttpCli(object):
             for v in self.rvol:
                 d1, d2 = v.rsplit("/", 1) if "/" in v else ["", v]
                 if d1 == top:
-                    vfs_virt[d2] = self.asrv.vfs  # typechk, value never read
+                    vfs_virt[d2] = vfs  # typechk, value never read
 
         dirs = []
 
@@ -3332,7 +3333,8 @@ class HttpCli(object):
         for x in vfs_virt:
             if x != excl:
                 try:
-                    bos.stat(vn.nodes[x].realpath)
+                    dvn, drem = vfs.get(vjoin(top, x), self.uname, True, False)
+                    bos.stat(dvn.canonical(drem, False))
                 except:
                     x += "\n"
                 dirs.append(x)
