@@ -2698,6 +2698,11 @@ function up2k_init(subtle) {
     }
 
     function draw_turbo() {
+        if (turbolvl < 0 && uc.turbo) {
+            bcfg_set('u2turbo', uc.turbo = false);
+            toast.err(10, "turbo is disabled in server config");
+        }
+
         var msg = (turbolvl || !uc.turbo) ? null : uc.fsearch ? L.u_ts : L.u_tu,
             html = ebi('u2foot').innerHTML;
 
