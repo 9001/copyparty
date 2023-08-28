@@ -9,12 +9,19 @@ import stat
 import sys
 import time
 
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
+
+try:
+    import asynchat
+except:
+    sys.path.append(os.path.join(E.mod, "vend"))
+
 from pyftpdlib.authorizers import AuthenticationFailed, DummyAuthorizer
 from pyftpdlib.filesystems import AbstractedFS, FilesystemError
 from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.ioloop import IOLoop
 from pyftpdlib.servers import FTPServer
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
 from .authsrv import VFS
 from .bos import bos
 from .util import (
@@ -29,15 +36,6 @@ from .util import (
     sanitize_fn,
     vjoin,
 )
-
-try:
-    from pyftpdlib.ioloop import IOLoop
-except ImportError:
-    p = os.path.join(E.mod, "vend")
-    print("loading asynchat from " + p)
-    sys.path.append(p)
-    from pyftpdlib.ioloop import IOLoop
-
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
