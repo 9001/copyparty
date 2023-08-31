@@ -333,10 +333,12 @@ class HttpCli(object):
         # split req into vpath + uparam
         uparam = {}
         if "?" not in self.req:
-            self.trailing_slash = self.req.endswith("/")
-            vpath = undot(self.req)
+            vpath = unquotep(self.req)  # not query, so + means +
+            self.trailing_slash = vpath.endswith("/")
+            vpath = undot(vpath)
         else:
             vpath, arglist = self.req.split("?", 1)
+            vpath = unquotep(vpath)
             self.trailing_slash = vpath.endswith("/")
             vpath = undot(vpath)
 
@@ -351,6 +353,8 @@ class HttpCli(object):
             for k in arglist.split("&"):
                 if "=" in k:
                     k, zs = k.split("=", 1)
+                    # x-www-form-urlencoded (url query part) uses
+                    # either + or %20 for 0x20 so handle both
                     uparam[k.lower()] = unquotep(zs.strip().replace("+", " "))
                 else:
                     uparam[k.lower()] = ""
@@ -385,7 +389,7 @@ class HttpCli(object):
 
         self.uparam = uparam
         self.cookies = cookies
-        self.vpath = unquotep(vpath)  # not query, so + means +
+        self.vpath = vpath
         self.vpaths = (
             self.vpath + "/" if self.trailing_slash and self.vpath else self.vpath
         )
@@ -564,8 +568,8 @@ class HttpCli(object):
             self.out_headers.update(NO_CACHE)
             return
 
-        n = "604869" if cache == "i" else cache or "69"
-        self.out_headers["Cache-Control"] = "max-age=" + n
+        n = 69 if not cache else 604869 if cache == "i" else int(cache)
+        self.out_headers["Cache-Control"] = "max-age=" + str(n)
 
     def k304(self) -> bool:
         k304 = self.cookies.get("k304")
@@ -668,6 +672,11 @@ class HttpCli(object):
         if volsan:
             vols = list(self.asrv.vfs.all_vols.values())
             body = vol_san(vols, body)
+            try:
+                zs = absreal(__file__).rsplit(os.path.sep, 2)[0]
+                body = body.replace(zs.encode("utf-8"), b"PP")
+            except:
+                pass
 
         self.send_headers(len(body), status, mime, headers)
 
@@ -3350,8 +3359,7 @@ class HttpCli(object):
         if not idx or not hasattr(idx, "p_end"):
             raise Pebkac(500, "sqlite3 is not available on the server; cannot unpost")
 
-        filt = self.uparam.get("filter")
-        filt = unquotep(filt or "")
+        filt = self.uparam.get("filter") or ""
         lm = "ups [{}]".format(filt)
         self.log(lm)
 
@@ -3449,9 +3457,6 @@ class HttpCli(object):
         if not dst:
             raise Pebkac(400, "need dst vpath")
 
-        # x-www-form-urlencoded (url query part) uses
-        # either + or %20 for 0x20 so handle both
-        dst = unquotep(dst.replace("+", " "))
         return self._mv(self.vpath, dst.lstrip("/"))
 
     def _mv(self, vsrc: str, vdst: str) -> bool:
