@@ -7229,7 +7229,7 @@ function sandbox(tgt, rules, cls, html) {
 		'function say(m){window.parent.postMessage(m,"*")};' +
 		'setTimeout(function(){var its=0,pih=-1,f=function(){' +
 		'var ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);' +
-		'if(ih!=pih){pih=ih;say("iheight #' + tid + ' "+ih,"*")}' +
+		'if(ih!=pih&&!isNaN(ih)){pih=ih;say("iheight #' + tid + ' "+ih,"*")}' +
 		'if(++its<20)return setTimeout(f,20);if(its==20)setInterval(f,200)' +
 		'};f();' +
 		'window.onfocus=function(){say("igot #' + tid + '")};' +

@@ -476,7 +476,8 @@ class VFS(object):
                     self.log("vfs", "invalid relpath [{}]".format(vpath))
                 raise Pebkac(404)
 
-        vn, rem = self._find(undot(vpath))
+        cvpath = undot(vpath)
+        vn, rem = self._find(cvpath)
         c: AXS = vn.axs
 
         for req, d, msg in [
@@ -487,6 +488,11 @@ class VFS(object):
             (will_get, c.uget, "get"),
         ]:
             if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
+                if self.log and err != 999:
+                    ap = vn.canonical(rem)
+                    t = "{} has no {} in [{}] => [{}] => [{}]"
+                    self.log("vfs", t.format(uname, msg, vpath, cvpath, ap), 6)
+
                 t = "you don't have {}-access for this location"
                 raise Pebkac(err, t.format(msg))
 
@@ -1669,7 +1675,7 @@ class AuthSrv(object):
                 self.log(t.format(zv.realpath), c=1)
 
         try:
-            zv, _ = vfs.get("/", "*", False, True)
+            zv, _ = vfs.get("/", "*", False, True, err=999)
             if self.warn_anonwrite and os.getcwd() == zv.realpath:
                 t = "anyone can write to the current directory: {}\n"
                 self.log(t.format(zv.realpath), c=1)
