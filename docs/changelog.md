@@ -1,4 +1,37 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0826-2116  `v1.9.2`  bigger hammer
+
+## new features
+* more ways to automatically ban users! three new sensors, all default-enabled, giving a 1 day ban after 9 hits in 2 minutes:
+  * `--ban-403`: trying to access volumes that dont exist or require authentication
+  * `--ban-422`: invalid POST messages (from brutefocing POST parameters and such)
+  * `--ban-url`: URLs which 404 and also match `--sus-urls` (scanners/crawlers)
+  * if you want to run a vulnerability scan on copyparty, please just [download the server](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) and do it locally! takes less than 30 seconds to set up, you get lower latency, and you won't be filling up the logfiles on the demo server with junk, thank you 🙏
+* more ban-related stuff,
+  * new global option `--nonsus-urls` specifies regex of URLs which are OK to 404 and shouldn't ban people
+  * `--turbo` now accepts the value `-1` which makes it impossible for clients to enable it, making `--ban-404` safe to use
+* range-selecting files in the list-view by shift-pgup/pgdn
+* volumes which are currently unavailable (dead nfs share, external HDD which is off, ...) are marked with a ❌ in the directory tree sidebar
+* the toggle-button to see dotfiles is now persisted as a cookie so it also applies on the initial page load
+* more effort is made to prevent `<script>`s inside markdown documents from running in the markdown editor and the fullpage viewer
+  * anyone who wanted to use markdown files for malicious stuff can still just upload an html file instead, so this doesn't make anything more secure, just less confusing
+  * the safest approach is still the `nohtml` volflag which disables markdown rendering outside sandboxes entirely, or only giving out write-access to trustworthy people
+  * enabling markdown plugins with `-emp` now has the side-effect of cancelling this band-aid too
+
+## bugfixes
+* textfile navigation hotkeys broke in the previous version
+
+## other changes
+* example [nginx config](https://github.com/9001/copyparty/blob/hovudstraum/contrib/nginx/copyparty.conf) was not compatible with cloudflare (suggest `$http_cf_connecting_ip` instead of `$proxy_add_x_forwarded_for`)
+* `copyparty.exe` is now built with python 3.11.5 which fixes [CVE-2023-40217](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-40217)
+  * `copyparty32.exe` is not, because python understandably ended win7 support 
+* [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md):
+  * copyparty appears to be 30x faster than nextcloud and seafile at receiving uploads of many small files
+  * seafile has a size limit when zip-downloading folders
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0820-2338  `v1.9.1`  prometheable
 
 ## new features
