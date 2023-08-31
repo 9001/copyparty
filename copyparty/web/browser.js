@@ -1299,7 +1299,8 @@ function set_files_html(html) {
 }
 
 
-var ACtx = window.AudioContext || window.webkitAudioContext,
+// actx breaks background album playback on ios
+var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 	noih = /[?&]v\b/.exec('' + location),
 	hash0 = location.hash,
 	mp;

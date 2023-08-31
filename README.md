@@ -285,8 +285,7 @@ server notes:
 * Android: music playback randomly stops due to [battery usage settings](#fix-unreliable-playback-on-android)
 
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
-  * *future workaround:* enable the equalizer, make it all-zero, and set a negative boost to reduce the volume
-    * "future" because `AudioContext` can't maintain a stable playback speed in the current iOS version (15.7), maybe one day...
+  * `AudioContext` will probably never be a viable workaround as apple introduces new issues faster than they fix current ones
 
 * Windows: folders cannot be accessed if the name ends with `.`
   * python or windows bug
@@ -720,6 +719,8 @@ bass boosted
 can also boost the volume in general, or increase/decrease stereo width (like [crossfeed](https://www.foobar2000.org/components/view/foo_dsp_meiercf) just worse)
 
 has the convenient side-effect of reducing the pause between songs, so gapless albums play better with the eq enabled (just make it flat)
+
+not available on iPhones / iPads because AudioContext currently breaks background audio playback on iOS (15.7.8)
 
 
 ### fix unreliable playback on android
