@@ -29,7 +29,7 @@
 
 	<div id="op_player" class="opview opbox opwide"></div>
 
-	<div id="op_bup" class="opview opbox act">
+	<div id="op_bup" class="opview opbox {% if not ls0 %}act{% endif %}">
 		<div id="u2err"></div>
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="bput" />
@@ -39,7 +39,7 @@
 		<a id="bbsw" href="?b=u" rel="nofollow"><br />switch to basic browser</a>
 	</div>
 
-	<div id="op_mkdir" class="opview opbox act">
+	<div id="op_mkdir" class="opview opbox {% if not ls0 %}act{% endif %}">
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="mkdir" />
 			📂<input type="text" name="name" class="i" placeholder="awesome mix vol.1">
@@ -55,7 +55,7 @@
 		</form>
 	</div>
 
-	<div id="op_msg" class="opview opbox act">
+	<div id="op_msg" class="opview opbox {% if not ls0 %}act{% endif %}">
 		<form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
 			📟<input type="text" name="msg" class="i" placeholder="lorem ipsum dolor sit amet">
 			<input type="submit" value="send msg to srv log">
