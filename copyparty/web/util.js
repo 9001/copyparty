@@ -369,6 +369,15 @@ function import_js(url, cb) {
 }
 
 
+function unsmart(txt) {
+    return !IPHONE ? txt : (txt.
+        replace(/[\u2014]/g, "--").
+        replace(/[\u2022]/g, "*").
+        replace(/[\u2018\u2019]/g, "'").
+        replace(/[\u201c\u201d]/g, '"'));
+}
+
+
 var crctab = (function () {
     var c, tab = [];
     for (var n = 0; n < 256; n++) {
@@ -1653,6 +1662,8 @@ function repl(e) {
     modal.prompt(html.join(''), '', function (cmd) {
         if (!cmd)
             return toast.inf(3, 'eval aborted');
+
+        cmd = unsmart(cmd);
 
         if (cmd.startsWith(',')) {
             evalex_fatal = true;

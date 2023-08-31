@@ -4962,7 +4962,7 @@ document.onkeydown = function (e) {
 		search_in_progress = 0;
 
 	function ev_search_input() {
-		var v = this.value,
+		var v = unsmart(this.value),
 			id = this.getAttribute('id');
 
 		if (id.slice(-1) == 'v') {
@@ -4999,7 +4999,7 @@ document.onkeydown = function (e) {
 		if (search_in_progress)
 			return;
 
-		var q = ebi('q_raw').value,
+		var q = unsmart(ebi('q_raw').value),
 			vq = ebi('files').getAttribute('q_raw');
 
 		srch_msg(false, (q == vq) ? '' : L.sm_prev + (vq ? vq : '(*)'));
@@ -5011,7 +5011,7 @@ document.onkeydown = function (e) {
 			for (var b = 1; b < sconf[a].length; b++) {
 				var k = sconf[a][b][0],
 					chk = 'srch_' + k + 'c',
-					vs = ebi('srch_' + k + 'v').value,
+					vs = unsmart(ebi('srch_' + k + 'v').value),
 					tvs = [];
 
 				if (a == 1)
@@ -5104,7 +5104,7 @@ document.onkeydown = function (e) {
 		xhr.setRequestHeader('Content-Type', 'text/plain');
 		xhr.onload = xhr.onerror = xhr_search_results;
 		xhr.ts = Date.now();
-		xhr.q_raw = ebi('q_raw').value;
+		xhr.q_raw = unsmart(ebi('q_raw').value);
 		xhr.send(JSON.stringify({ "q": xhr.q_raw, "n": cap }));
 	}
 
