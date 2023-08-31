@@ -262,7 +262,8 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
-		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p>(probably a good idea to use a separate browser dedicated for just music streaming...)</p>',
+		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p><em>however,</em> it could also be due to the browser\'s autoplay settings;</p><p>Firefox: tap the icon on the left side of the address bar, then select "autoplay" and "allow audio"</p><p>Chrome: the problem will gradually dissipate as you play more music on this site</p>',
+		"mm_iosblk": "<p>your web browser thinks the audio playback is unwanted, and it decided to block playback until you start another track manually... unfortunately we are both powerless in telling it otherwise</p><p>supposedly this will get better as you continue playing music on this site, but I'm unfamiliar with apple devices so idk if that's true</p><p>you could try another browser, maybe firefox or chrome?</p>",
 		"mm_hnf": "that song no longer exists",
 
 		"im_hnf": "that image no longer exists",
@@ -725,7 +726,8 @@ var Ls = {
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
-		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>(sikkert smart å ha en egen nettleser kun for musikkspilling...)</p>',
+		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>NB: det kan også være pga. autoplay-innstillingene, så prøv dette:</p><p>Firefox: klikk på ikonet i venstre side av addressefeltet, velg "autoplay" og "tillat lyd"</p><p>Chrome: problemet vil minske gradvis jo mer musikk du spiller på denne siden</p>',
+		"mm_iosblk": "<p>nettleseren din tror at musikken er uønsket, og den bestemte seg for å stoppe avspillingen slik at du manuelt må velge en ny sang... dessverre er både du og jeg maktesløse når den har bestemt seg.</p><p>det ryktes at problemet vil minske jo mer musikk du spiller på denne siden, men jeg er ikke godt kjent med apple-dingser så jeg er ikke sikker.</p><p>kanskje firefox eller chrome fungerer bedre?</p>",
 		"mm_hnf": "sangen finnes ikke lenger",
 
 		"im_hnf": "bildet finnes ikke lenger",
@@ -2185,6 +2187,7 @@ function song_skip(n, dirskip) {
 
 	if (dirskip && ofs + 1 && ofs > mp.order.length - 2) {
 		toast.inf(10, L.mm_nof);
+		console.log("mm_nof1");
 		mpl.traversals = 0;
 		return;
 	}
@@ -2211,13 +2214,14 @@ function next_song_cmn(e) {
 	}
 	if (mpl.traversals++ < 5) {
 		if (MOBILE && t_fchg && Date.now() - t_fchg > 30 * 1000)
-			modal.alert(L.mm_pwrsv);
+			modal.alert(IPHONE ? L.mm_iosblk : L.mm_pwrsv);
 
 		t_fchg = document.hasFocus() ? 0 : Date.now();
 		treectl.ls_cb = next_song_cmn;
 		return tree_neigh(1);
 	}
 	toast.inf(10, L.mm_nof);
+	console.log("mm_nof2");
 	mpl.traversals = 0;
 	t_fchg = 0;
 }
@@ -2367,7 +2371,7 @@ var mpui = (function () {
 			// cannot check document.hasFocus to avoid false positives;
 			// it continues on power-on, doesn't need to be in-browser
 			if (MOBILE && Date.now() - t_fchg > 30 * 1000)
-				modal.alert(L.mm_pwrsv);
+				modal.alert(IPHONE ? L.mm_iosblk : L.mm_pwrsv);
 
 			t_fchg = 0;
 		}
@@ -2933,6 +2937,7 @@ function evau_error(e) {
 		err = e404;
 
 	toast.warn(15, esc(basenames(err + mfile)));
+	console.log(basenames(err + mfile));
 
 	if (em.startsWith('MEDIA_ELEMENT_ERROR:')) {
 		// chromish for 40x

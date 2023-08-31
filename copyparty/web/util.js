@@ -1126,6 +1126,8 @@ var timer = (function () {
     var r = {};
     r.q = [];
     r.last = 0;
+    r.fs = 0;
+    r.fc = 0;
 
     r.add = function (fun, run) {
         r.rm(fun);
@@ -1151,6 +1153,7 @@ var timer = (function () {
             q[a]();
 
         r.last = Date.now();
+        //r.fc++; if (r.last - r.fs >= 2000) { console.log(r.last - r.fs, r.fc); r.fs = r.last; r.fc = 0; }
     }
     setInterval(doevents, 100);
 
@@ -1607,7 +1610,7 @@ function repl_load() {
             ret = [
                 'var v=Object.keys(localStorage); v.sort(); JSON.stringify(v)',
                 "for (var a of QSA('#files a[id]')) a.setAttribute('download','')",
-                'console.hist.slice(-10).join("\\n")'
+                'console.hist.slice(-50).join("\\n")'
             ];
 
         ipre.innerHTML = '<option value=""></option>';
