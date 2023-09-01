@@ -3049,7 +3049,7 @@ function eval_hash() {
 		goto('search');
 		var i = ebi('q_raw');
 		i.value = uricom_dec(v.slice(3));
-		return i.oninput();
+		return i.onkeydown({ 'key': 'Enter' });
 	}
 
 	if (v.indexOf('#v=') === 0) {
