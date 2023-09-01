@@ -221,6 +221,7 @@ class StreamZip(StreamArc):
         fgen: Generator[dict[str, Any], None, None],
         utf8: bool = False,
         pre_crc: bool = False,
+        **kwargs: Any
     ) -> None:
         super(StreamZip, self).__init__(log, fgen)
 

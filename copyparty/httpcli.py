@@ -2943,7 +2943,11 @@ class HttpCli(object):
                 self.log("transcoding to [{}]".format(cfmt))
                 fgen = gfilter(fgen, self.thumbcli, self.uname, vpath, cfmt)
 
-        bgen = packer(self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg)
+        cmp = "" if self.args.no_tarcmp else uarg
+
+        bgen = packer(
+            self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg, cmp=cmp
+        )
         bsent = 0
         for buf in bgen.gen():
             if not buf:

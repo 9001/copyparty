@@ -44,6 +44,7 @@ class StreamTar(StreamArc):
         self,
         log: "NamedLogger",
         fgen: Generator[dict[str, Any], None, None],
+        cmp: str = "",
         **kwargs: Any
     ):
         super(StreamTar, self).__init__(log, fgen)
@@ -53,10 +54,31 @@ class StreamTar(StreamArc):
         self.qfile = QFile()
         self.errf: dict[str, Any] = {}
 
+        try:
+            cmp, lv = cmp.replace(":", ",").split(",")
+            lv = int(lv)
+        except:
+            lv = None
+
         # python 3.8 changed to PAX_FORMAT as default,
         # waste of space and don't care about the new features
         fmt = tarfile.GNU_FORMAT
-        self.tar = tarfile.open(fileobj=self.qfile, mode="w|", format=fmt)  # type: ignore
+
+        arg = {"name": None, "fileobj": self.qfile, "mode": "w", "format": fmt}
+        if cmp == "gz":
+            fun = tarfile.TarFile.gzopen
+            arg["compresslevel"] = lv if lv is not None else 3
+        elif cmp == "bz2":
+            fun = tarfile.TarFile.bz2open
+            arg["compresslevel"] = lv if lv is not None else 2
+        elif cmp == "xz":
+            fun = tarfile.TarFile.xzopen
+            arg["preset"] = lv if lv is not None else 1
+        else:
+            fun = tarfile.open
+            arg["mode"] = "w|"
+
+        self.tar = fun(**arg)
 
         Daemon(self._gen, "star-gen")
 

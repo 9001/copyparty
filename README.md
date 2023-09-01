@@ -505,10 +505,16 @@ select which type of archive you want in the `[⚙️] config` tab:
 | name | url-suffix | description |
 |--|--|--|
 | `tar` | `?tar` | plain gnutar, works great with `curl \| tar -xv` |
+| `tar.gz` | `?tar=gz` | gzip compressed tar, for `curl \| tar -xvz` |
+| `tar.xz` | `?tar=xz` | gnu-tar with xz / lzma compression (good) |
+| `tar.bz2` | `?tar=bz2` | bzip2-compressed tar (mostly useless) |
 | `zip` | `?zip=utf8` | works everywhere, glitchy filenames on win7 and older |
 | `zip_dos` | `?zip` | traditional cp437 (no unicode) to fix glitchy filenames |
 | `zip_crc` | `?zip=crc` | cp437 with crc32 computed early for truly ancient software |
 
+* gzip default level is `3` (0=fast, 9=best), change with `?tar=gz:9`
+* xz default level is `1` (0=fast, 9=best), change with `?tar=xz:9`
+* bz2 default level is `2` (1=fast, 9=best), change with `?tar=bz2:9`
 * hidden files (dotfiles) are excluded unless `-ed`
   * `up2k.db` and `dir.txt` is always excluded
 * `zip_crc` will take longer to download since the server has to read each file twice

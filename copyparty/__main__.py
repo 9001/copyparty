@@ -989,6 +989,7 @@ def add_optouts(ap):
     ap2.add_argument("-nid", action="store_true", help="no info disk-usage -- don't show in UI")
     ap2.add_argument("-nb", action="store_true", help="no powered-by-copyparty branding in UI")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
+    ap2.add_argument("--no-tarcmp", action="store_true", help="disable download as compressed tar (?tar=gz, ?tar=bz2, ?tar=xz, ?tar=gz:9, ...)")
     ap2.add_argument("--no-lifetime", action="store_true", help="disable automatic deletion of uploads after a certain time (as specified by the 'lifetime' volflag)")
 
 
