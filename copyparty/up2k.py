@@ -1050,7 +1050,7 @@ class Up2k(object):
         if WINDOWS:
             rd = rd.replace("\\", "/").strip("/")
 
-        g = statdir(self.log_func, not self.args.no_scandir, False, cdir)
+        g = statdir(self.log_func, not self.args.no_scandir, True, cdir)
         gl = sorted(g)
         partials = set([x[0] for x in gl if "PARTIAL" in x[0]])
         for iname, inf in gl:
@@ -1065,6 +1065,12 @@ class Up2k(object):
                 continue
 
             lmod = int(inf.st_mtime)
+            if stat.S_ISLNK(inf.st_mode):
+                try:
+                    inf = bos.stat(abspath)
+                except:
+                    continue
+
             sz = inf.st_size
             if fat32 and not ffat and inf.st_mtime % 2:
                 fat32 = False
@@ -1445,9 +1451,11 @@ class Up2k(object):
                 pf = "v{}, {:.0f}+".format(n_left, b_left / 1024 / 1024)
                 self.pp.msg = pf + abspath
 
-                st = bos.stat(abspath)
+                # throws on broken symlinks (always did)
+                stl = bos.lstat(abspath)
+                st = bos.stat(abspath) if stat.S_ISLNK(stl.st_mode) else stl
+                mt2 = int(stl.st_mtime)
                 sz2 = st.st_size
-                mt2 = int(st.st_mtime)
 
                 if nohash or not sz2:
                     w2 = up2k_wark_from_metadata(self.salt, sz2, mt2, rd, fn)
@@ -1468,6 +1476,13 @@ class Up2k(object):
 
                 if w == w2:
                     continue
+
+                # symlink mtime was inconsistent before v1.9.4; check if that's it
+                if st != stl and (nohash or not sz2):
+                    mt2b = int(st.st_mtime)
+                    w2b = up2k_wark_from_metadata(self.salt, sz2, mt2b, rd, fn)
+                    if w == w2b:
+                        continue
 
                 rewark.append((drd, dfn, w2, sz2, mt2))
 
