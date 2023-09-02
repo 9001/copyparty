@@ -2895,12 +2895,26 @@ class HttpCli(object):
         logmsg = "{:4} {} ".format("", self.req)
         self.keepalive = False
 
+        cancmp = not self.args.no_tarcmp
+
         if fmt == "tar":
-            mime = "application/x-tar"
             packer: Type[StreamArc] = StreamTar
+            if cancmp and uarg.startswith("gz"):
+                mime = "application/gzip"
+                ext = "tar.gz"
+            elif cancmp and uarg.startswith("bz2"):
+                mime = "application/x-bzip"
+                ext = "tar.bz2"
+            elif cancmp and uarg.startswith("xz"):
+                mime = "application/x-xz"
+                ext = "tar.xz"
+            else:
+                mime = "application/x-tar"
+                ext = "tar"
         else:
             mime = "application/zip"
             packer = StreamZip
+            ext = "zip"
 
         fn = items[0] if items and items[0] else self.vpath
         if fn:
@@ -2925,7 +2939,7 @@ class HttpCli(object):
         ufn = b"".join(zbl).decode("ascii")
 
         cdis = "attachment; filename=\"{}.{}\"; filename*=UTF-8''{}.{}"
-        cdis = cdis.format(afn, fmt, ufn, fmt)
+        cdis = cdis.format(afn, ext, ufn, ext)
         self.log(cdis)
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
@@ -2943,10 +2957,12 @@ class HttpCli(object):
                 self.log("transcoding to [{}]".format(cfmt))
                 fgen = gfilter(fgen, self.thumbcli, self.uname, vpath, cfmt)
 
-        cmp = "" if self.args.no_tarcmp else uarg
-
         bgen = packer(
-            self.log, fgen, utf8="utf" in uarg, pre_crc="crc" in uarg, cmp=cmp
+            self.log,
+            fgen,
+            utf8="utf" in uarg,
+            pre_crc="crc" in uarg,
+            cmp=uarg if cancmp else "",
         )
         bsent = 0
         for buf in bgen.gen():

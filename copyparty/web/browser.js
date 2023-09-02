@@ -376,8 +376,8 @@ var Ls = {
 		"fu_xe2": "404: File not found??",
 
 		"fz_tar": "plain gnu-tar file (linux / mac)",
-		"fz_targz": "tar with gzip level 3 compression",
-		"fz_tarxz": "tar with xz level 1 compression",
+		"fz_targz": "tar with gzip level 3 compression$N$Nthis is usually very slow, so$Nuse uncompressed tar instead",
+		"fz_tarxz": "tar with xz level 1 compression$N$Nthis is usually very slow, so$Nuse uncompressed tar instead",
 		"fz_zip8": "zip with utf8 filenames (maybe wonky on windows 7 and older)",
 		"fz_zipd": "zip with traditional cp437 filenames, for really old software",
 		"fz_zipc": "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)",
@@ -842,8 +842,8 @@ var Ls = {
 		"fu_xe2": "404: Filen finnes ikke??",
 
 		"fz_tar": "ukomprimert gnu-tar arkiv, for linux og mac",
-		"fz_targz": "gnu-tar pakket med gzip (nivå 3)",
-		"fz_tarxz": "gnu-tar pakket med xz (nivå 1)",
+		"fz_targz": "gnu-tar pakket med gzip (nivå 3)$N$NNB: denne er veldig treg;$Nukomprimert tar er bedre",
+		"fz_tarxz": "gnu-tar pakket med xz (nivå 1)$N$NNB: denne er veldig treg;$Nukomprimert tar er bedre",
 		"fz_zip8": "zip med filnavn i utf8 (noe problematisk på windows 7 og eldre)",
 		"fz_zipd": "zip med filnavn i cp437, for høggamle maskiner",
 		"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",

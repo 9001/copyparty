@@ -1,4 +1,30 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0831-2211  `v1.9.3`  iOS and http fixes
+
+## new features
+* iPhones and iPads are now able to...
+  * 9986136dfb2364edb35aa9fbb87410641c6d6af3 play entire albums while the screen is off without the music randomly stopping
+    * apple keeps breaking AudioContext in new and interesting ways; time to give up (no more equalizer)
+  * 1c0d978979a703edeb792e552b18d3b7695b2d90 perform search queries and execude js code
+    * by translating [smart-quotes](https://stackoverflow.com/questions/48678359/ios-11-safari-html-disable-smart-punctuation) into regular `'` and `"` characters
+* python 3.12 support
+  * technically a bugfix since it was added [a year ago](https://github.com/9001/copyparty/commit/32e22dfe84d5e0b13914b4d0e15c1b8c9725a76d) way before the first py3.12 alpha was released but turns out i botched it, oh well
+* filter error messages so they never include the filesystem path where copyparty's python files reside
+* print more context in server logs if someone hits an unexpected permission-denied
+
+# bugfixes
+found some iffy stuff combing over the code but, as far as I can tell, luckily none of these were dangerous:
+* URL normalization was a bit funky, but it appears everything access-control-related was unaffected
+* some url parameters were double-decoded, causing the unpost filtering and file renaming to fail if the values contained `%`
+* clients could cause the server to return an invalid cache-control header, but newlines and control-characters got rejected correctly
+* minor cosmetics / qol fixes:
+  * reduced flickering on page load in chrome
+  * fixed some console spam in search results
+  * markdown documents now have the same line-height in directory listings and the editor
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0826-2116  `v1.9.2`  bigger hammer
 
 ## new features

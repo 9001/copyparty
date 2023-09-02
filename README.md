@@ -287,6 +287,10 @@ server notes:
 * iPhones: the volume control doesn't work because [apple doesn't want it to](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11)
   * `AudioContext` will probably never be a viable workaround as apple introduces new issues faster than they fix current ones
 
+* iPhones: the preload feature (in the media-player-options tab) can cause a tiny audio glitch 20sec before the end of each song, but disabling it may cause worse iOS bugs to appear instead
+  * just a hunch, but disabling preloading may cause playback to stop entirely, or possibly mess with bluetooth speakers
+  * tried to add a tooltip regarding this but looks like apple broke my tooltips
+
 * Windows: folders cannot be accessed if the name ends with `.`
   * python or windows bug
 
