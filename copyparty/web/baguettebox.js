@@ -261,7 +261,7 @@ window.baguetteBox = (function () {
             setloop(1);
         else if (k == "BracketRight")
             setloop(2);
-        else if (e.shiftKey)
+        else if (e.shiftKey && k != 'KeyR')
             return;
         else if (k == "ArrowLeft" || k == "KeyJ")
             showPreviousImage();
