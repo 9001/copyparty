@@ -11,7 +11,7 @@
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/browser.css?_={{ ts }}">
 	{%- if css %}
-	<link rel="stylesheet" media="screen" href="{{ css }}?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ css }}_={{ ts }}">
 	{%- endif %}
 </head>
 
@@ -173,7 +173,7 @@
 	<script src="{{ r }}/.cpr/browser.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/up2k.js?_={{ ts }}"></script>
 	{%- if js %}
-	<script src="{{ js }}?_={{ ts }}"></script>
+	<script src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
 </body>
 

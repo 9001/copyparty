@@ -3800,10 +3800,14 @@ class HttpCli(object):
         }
 
         if self.args.js_browser:
-            j2a["js"] = self.args.js_browser
+            zs = self.args.js_browser
+            zs += "&" if "?" in zs else "?"
+            j2a["js"] = zs
 
         if self.args.css_browser:
-            j2a["css"] = self.args.css_browser
+            zs = self.args.css_browser
+            zs += "&" if "?" in zs else "?"
+            j2a["css"] = zs
 
         if not self.conn.hsrv.prism:
             j2a["no_prism"] = True
