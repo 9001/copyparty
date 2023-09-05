@@ -2125,7 +2125,7 @@ def list_ips() -> list[str]:
 def yieldfile(fn: str) -> Generator[bytes, None, None]:
     with open(fsenc(fn), "rb", 512 * 1024) as f:
         while True:
-            buf = f.read(64 * 1024)
+            buf = f.read(128 * 1024)
             if not buf:
                 break
 

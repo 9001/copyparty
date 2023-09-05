@@ -276,6 +276,7 @@ class StreamZip(StreamArc):
     def gen(self) -> Generator[bytes, None, None]:
         errf: dict[str, Any] = {}
         errors = []
+        mbuf = b""
         try:
             for f in self.fgen:
                 if "err" in f:
@@ -284,12 +285,19 @@ class StreamZip(StreamArc):
 
                 try:
                     for x in self.ser(f):
-                        yield x
+                        mbuf += x
+                        if len(mbuf) >= 16384:
+                            yield mbuf
+                            mbuf = b""
                 except GeneratorExit:
                     raise
                 except:
                     ex = min_ex(5, True).replace("\n", "\n-- ")
                     errors.append((f["vp"], ex))
+
+            if mbuf:
+                yield mbuf
+                mbuf = b""
 
             if errors:
                 errf, txt = errdesc(errors)
@@ -300,20 +308,23 @@ class StreamZip(StreamArc):
             cdir_pos = self.pos
             for name, sz, ts, crc, h_pos in self.items:
                 buf = gen_hdr(h_pos, name, sz, ts, self.utf8, crc, self.pre_crc)
-                yield self._ct(buf)
+                mbuf += self._ct(buf)
+                if len(mbuf) >= 16384:
+                    yield mbuf
+                    mbuf = b""
             cdir_end = self.pos
 
             _, need_64 = gen_ecdr(self.items, cdir_pos, cdir_end)
             if need_64:
                 ecdir64_pos = self.pos
                 buf = gen_ecdr64(self.items, cdir_pos, cdir_end)
-                yield self._ct(buf)
+                mbuf += self._ct(buf)
 
                 buf = gen_ecdr64_loc(ecdir64_pos)
-                yield self._ct(buf)
+                mbuf += self._ct(buf)
 
             ecdr, _ = gen_ecdr(self.items, cdir_pos, cdir_end)
-            yield self._ct(ecdr)
+            yield mbuf + self._ct(ecdr)
         finally:
             if errf:
                 bos.unlink(errf["ap"])
