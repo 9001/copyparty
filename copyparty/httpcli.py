@@ -3607,6 +3607,7 @@ class HttpCli(object):
             self.out_headers.pop("X-Robots-Tag", None)
 
         is_dir = stat.S_ISDIR(st.st_mode)
+        fk_pass = False
         icur = None
         if is_dir and (e2t or e2d):
             idx = self.conn.get_u2idx()
@@ -3655,8 +3656,38 @@ class HttpCli(object):
 
                 return self.tx_ico(rem)
 
+        elif self.can_get and self.avn:
+            axs = self.avn.axs
+            if self.uname not in axs.uhtml and "*" not in axs.uhtml:
+                pass
+            elif is_dir:
+                for fn in ("index.htm", "index.html"):
+                    ap2 = os.path.join(abspath, fn)
+                    try:
+                        st2 = bos.stat(ap2)
+                    except:
+                        continue
+
+                    # might as well be extra careful
+                    if not stat.S_ISREG(st2.st_mode):
+                        continue
+
+                    if not self.trailing_slash:
+                        return self.redirect(
+                            self.vpath + "/", flavor="redirecting to", use302=True
+                        )
+
+                    fk_pass = True
+                    is_dir = False
+                    rem = vjoin(rem, fn)
+                    vrem = vjoin(vrem, fn)
+                    abspath = ap2
+                    break
+            elif self.vpath.rsplit("/", 1)[1] in ("index.htm", "index.html"):
+                fk_pass = True
+
         if not is_dir and (self.can_read or self.can_get):
-            if not self.can_read and "fk" in vn.flags:
+            if not self.can_read and not fk_pass and "fk" in vn.flags:
                 correct = self.gen_fk(
                     self.args.fk_salt, abspath, st.st_size, 0 if ANYWIN else st.st_ino
                 )[: vn.flags["fk"]]

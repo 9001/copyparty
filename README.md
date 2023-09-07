@@ -351,6 +351,7 @@ permissions:
 * `d` (delete): delete files/folders
 * `g` (get): only download files, cannot see folder contents or zip/tar
 * `G` (upget): same as `g` except uploaders get to see their own filekeys (see `fk` in examples below)
+* `g` (get): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
 * `a` (admin): can see uploader IPs, config-reload
 
 examples:

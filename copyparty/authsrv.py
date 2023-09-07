@@ -67,6 +67,7 @@ class AXS(object):
         udel: Optional[Union[list[str], set[str]]] = None,
         uget: Optional[Union[list[str], set[str]]] = None,
         upget: Optional[Union[list[str], set[str]]] = None,
+        uhtml: Optional[Union[list[str], set[str]]] = None,
         uadmin: Optional[Union[list[str], set[str]]] = None,
     ) -> None:
         self.uread: set[str] = set(uread or [])
@@ -75,10 +76,11 @@ class AXS(object):
         self.udel: set[str] = set(udel or [])
         self.uget: set[str] = set(uget or [])
         self.upget: set[str] = set(upget or [])
+        self.uhtml: set[str] = set(uhtml or [])
         self.uadmin: set[str] = set(uadmin or [])
 
     def __repr__(self) -> str:
-        ks = "uread uwrite umove udel uget upget uadmin".split()
+        ks = "uread uwrite umove udel uget upget uhtml uadmin".split()
         return "AXS(%s)" % (", ".join("%s=%r" % (k, self.__dict__[k]) for k in ks),)
 
 
@@ -329,6 +331,7 @@ class VFS(object):
         self.adel: dict[str, list[str]] = {}
         self.aget: dict[str, list[str]] = {}
         self.apget: dict[str, list[str]] = {}
+        self.ahtml: dict[str, list[str]] = {}
         self.aadmin: dict[str, list[str]] = {}
 
         if realpath:
@@ -456,6 +459,7 @@ class VFS(object):
             uname in c.upget or "*" in c.upget,
             uname in c.uadmin or "*" in c.uadmin,
         )
+        # skip uhtml because it's rarely needed
 
     def get(
         self,
@@ -955,7 +959,7 @@ class AuthSrv(object):
                 try:
                     self._l(ln, 5, "volume access config:")
                     sk, sv = ln.split(":")
-                    if re.sub("[rwmdgGa]", "", sk) or not sk:
+                    if re.sub("[rwmdgGha]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
                         raise Exception(err)
                     if " " in re.sub(", *", "", sv).strip():
@@ -964,7 +968,7 @@ class AuthSrv(object):
                     self._read_vol_str(sk, sv.replace(" ", ""), daxs[vp], mflags[vp])
                     continue
                 except:
-                    err += "accs entries must be 'rwmdgGa: user1, user2, ...'"
+                    err += "accs entries must be 'rwmdgGha: user1, user2, ...'"
                     raise Exception(err + SBADCFG)
 
             if cat == catf:
@@ -1000,7 +1004,7 @@ class AuthSrv(object):
     def _read_vol_str(
         self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
     ) -> None:
-        if lvl.strip("crwmdgGa"):
+        if lvl.strip("crwmdgGha"):
             raise Exception("invalid volflag: {},{}".format(lvl, uname))
 
         if lvl == "c":
@@ -1029,10 +1033,12 @@ class AuthSrv(object):
                 ("w", axs.uwrite),
                 ("m", axs.umove),
                 ("d", axs.udel),
+                ("a", axs.uadmin),
+                ("h", axs.uhtml),
+                ("h", axs.uget),
                 ("g", axs.uget),
                 ("G", axs.uget),
                 ("G", axs.upget),
-                ("a", axs.uadmin),
             ]:  # b bb bbb
                 if ch in lvl:
                     if un == "*":
@@ -1105,7 +1111,7 @@ class AuthSrv(object):
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is <rwmdgGa>[,username][,username] or <c>,<flag>[=args]
+            # permset is <rwmdgGha>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
                 m = re_vol.match(v_str)
                 if not m:
@@ -1194,7 +1200,7 @@ class AuthSrv(object):
             vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
             vol.root = vfs
 
-        for perm in "read write move del get pget admin".split():
+        for perm in "read write move del get pget html admin".split():
             axs_key = "u" + perm
             unames = ["*"] + list(acct.keys())
             umap: dict[str, list[str]] = {x: [] for x in unames}
@@ -1216,6 +1222,7 @@ class AuthSrv(object):
                 axs.udel,
                 axs.uget,
                 axs.upget,
+                axs.uhtml,
                 axs.uadmin,
             ]:
                 for usr in d:
@@ -1637,6 +1644,7 @@ class AuthSrv(object):
                 ["delete", "udel"],
                 ["   get", "uget"],
                 [" upget", "upget"],
+                ["  html", "uhtml"],
                 ["uadmin", "uadmin"],
             ]:
                 u = list(sorted(getattr(zv.axs, attr)))
@@ -1804,6 +1812,7 @@ class AuthSrv(object):
                 vc.udel,
                 vc.uget,
                 vc.upget,
+                vc.uhtml,
                 vc.uadmin,
             ]
             self.log(t.format(*vs))
@@ -1945,6 +1954,7 @@ class AuthSrv(object):
                 "d": "udel",
                 "g": "uget",
                 "G": "upget",
+                "h": "uhtml",
                 "a": "uadmin",
             }
             users = {}
@@ -2148,7 +2158,7 @@ def upgrade_cfg_fmt(
             else:
                 sn = sn.replace(",", ", ")
             ret.append("    " + sn)
-        elif sn[:1] in "rwmdgGa":
+        elif sn[:1] in "rwmdgGha":
             if cat != catx:
                 cat = catx
                 ret.append(cat)
