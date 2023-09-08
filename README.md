@@ -351,7 +351,7 @@ permissions:
 * `d` (delete): delete files/folders
 * `g` (get): only download files, cannot see folder contents or zip/tar
 * `G` (upget): same as `g` except uploaders get to see their own filekeys (see `fk` in examples below)
-* `g` (get): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
+* `h` (html): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
 * `a` (admin): can see uploader IPs, config-reload
 
 examples:
@@ -1642,6 +1642,8 @@ other misc notes:
   * combine this with volflag `c,fk` to generate filekeys (per-file accesskeys); users which have full read-access will then see URLs with `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
     * the default filekey entropy is fairly small so give `--fk-salt` around 30 characters if you want filekeys longer than 16 chars
   * permissions `wG` lets users upload files and receive their own filekeys, still without being able to see other uploads
+  * permission `h` instead of `r` makes copyparty behave like a traditional webserver with directory listing/index disabled, returning index.html instead
+    * compatibility with filekeys: index.html itself can be retrieved without the correct filekey, but all other files are protected
 
 
 ## gotchas

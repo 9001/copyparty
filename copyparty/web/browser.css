@@ -493,6 +493,7 @@ html.dz {
 	--err-ts: #500;
 
 	text-shadow: none;
+	font-family: 'scp', monospace, monospace;
 }
 html.dy {
 	--fg: #000;
@@ -1397,6 +1398,9 @@ input[type="checkbox"]:checked+label {
 	color: #0e0;
 	color: var(--a);
 }
+html.dz input {
+	font-family: 'scp', monospace, monospace;
+}
 .opwide div>span>input+label {
 	padding: .3em 0 .3em .3em;
 	margin: 0 0 0 -.3em;
@@ -1577,6 +1581,7 @@ html.cz .btn {
 	border-bottom: .2em solid #709;
 }
 html.dz .btn {
+	font-size: 1em;
 	box-shadow: 0 0 0 .1em #080 inset;
 }
 html.dz .tgl.btn.on {
@@ -2766,6 +2771,9 @@ html.c .opbox,
 html.a .opbox {
 	margin: 1.5em 0 0 0;
 }
+html.dz .opview input.i {
+	width: calc(100% - 17em);
+}
 html.c #tree,
 html.c #treeh,
 html.a #tree,
@@ -2817,6 +2825,9 @@ html.a #u2btn {
 }
 html.ay #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
+}
+html.dz #u2btn {
+	letter-spacing: -.033em;
 }
 html.c #u2conf.ww #u2btn,
 html.a #u2conf.ww #u2btn {
