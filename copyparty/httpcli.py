@@ -2581,7 +2581,8 @@ class HttpCli(object):
                 return True
 
             mdir, mfile = os.path.split(fp)
-            mfile2 = "{}.{:.3f}.md".format(mfile[:-3], srv_lastmod)
+            fname, fext = mfile.rsplit(".", 1) if "." in mfile else (mfile, "md")
+            mfile2 = "{}.{:.3f}.{}".format(fname, srv_lastmod, fext)
             try:
                 dp = os.path.join(mdir, ".hist")
                 bos.mkdir(dp)

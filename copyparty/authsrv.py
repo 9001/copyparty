@@ -492,7 +492,7 @@ class VFS(object):
             (will_get, c.uget, "get"),
         ]:
             if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
-                if self.log and err != 999:
+                if self.log and err != 999 and msg != "read":
                     ap = vn.canonical(rem)
                     t = "{} has no {} in [{}] => [{}] => [{}]"
                     self.log("vfs", t.format(uname, msg, vpath, cvpath, ap), 6)
