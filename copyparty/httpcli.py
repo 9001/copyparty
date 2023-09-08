@@ -629,7 +629,17 @@ class HttpCli(object):
         headers: Optional[dict[str, str]] = None,
         volsan: bool = False,
     ) -> bytes:
-        if status > 400 and status in (403, 404, 422):
+        if (
+            status > 400
+            and status in (403, 404, 422)
+            and (
+                status != 422
+                or (
+                    not body.startswith(b"<pre>partial upload exists")
+                    and not body.startswith(b"<pre>source file busy")
+                )
+            )
+        ):
             if status == 404:
                 g = self.conn.hsrv.g404
             elif status == 403:
