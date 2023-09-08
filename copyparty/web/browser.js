@@ -80,6 +80,7 @@ var Ls = {
 				"textfile-viewer",
 				["I/K", "prev/next file"],
 				["M", "close textfile"],
+				["E", "edit textfile"],
 				["S", "select file (for cut/rename)"],
 			]
 		],
@@ -327,6 +328,7 @@ var Ls = {
 		"tvt_prev": "show previous document$NHotkey: i\">⬆ prev",
 		"tvt_next": "show next document$NHotkey: K\">⬇ next",
 		"tvt_sel": "select file &nbsp; ( for cut / delete / ... )$NHotkey: S\">sel",
+		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
 		"gt_zoom": "zoom",
@@ -546,6 +548,7 @@ var Ls = {
 				"dokumentviser",
 				["I/K", "forr./neste fil"],
 				["M", "lukk tekstdokument"],
+				["E", "rediger tekstdokument"]
 				["S", "velg fil (for F2/ctrl-x/...)"]
 			]
 		],
@@ -788,11 +791,12 @@ var Ls = {
 		"tv_xe1": "kunne ikke laste tekstfil:\n\nfeil ",
 		"tv_xe2": "404, Fil ikke funnet",
 		"tv_lst": "tekstfiler i mappen",
-		"tvt_close": "gå tilbake til mappen$NSnarvei: M\">❌ close",
+		"tvt_close": "gå tilbake til mappen$NSnarvei: M\">❌ lukk",
 		"tvt_dl": "last ned denne filen\">💾 last ned",
-		"tvt_prev": "vis forrige dokument$NSnarvei: i\">⬆ prev",
-		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ next",
-		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">sel",
+		"tvt_prev": "vis forrige dokument$NSnarvei: i\">⬆ forr.",
+		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
+		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
+		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
 
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
 		"gt_zoom": "zoom",
@@ -4019,6 +4023,8 @@ var showfile = (function () {
 
 		ebi('files').style.display = ebi('gfiles').style.display = ebi('lazy').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
 		ebi('dldoc').setAttribute('href', url);
+		ebi('editdoc').setAttribute('href', url + (url.indexOf('?') > 0 ? '&' : '?') + 'edit');
+		ebi('editdoc').style.display = (has(perms, 'write') && (is_md || has(perms, 'delete'))) ? '' : 'none';
 
 		var wr = ebi('bdoc'),
 			defer = !Prism.highlightElement;
@@ -4030,7 +4036,7 @@ var showfile = (function () {
 
 				el = el || QS('#doc>code');
 				Prism.highlightElement(el);
-				if (el.className == 'language-ans')
+				if (el.className == 'language-ans' || (!lang && /\x1b\[[0-9;]{0,16}m/.exec(txt.slice(0, 4096))))
 					r.ansify(el);
 			}
 			catch (ex) { }
@@ -4189,6 +4195,7 @@ var showfile = (function () {
 		'<a href="#" class="btn" id="prevdoc" tt="' + L.tvt_prev + '</a>\n' +
 		'<a href="#" class="btn" id="nextdoc" tt="' + L.tvt_next + '</a>\n' +
 		'<a href="#" class="btn" id="seldoc" tt="' + L.tvt_sel + '</a>\n' +
+		'<a href="#" class="btn" id="editdoc" tt="' + L.tvt_edit + '</a>\n' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
@@ -4891,6 +4898,8 @@ document.onkeydown = function (e) {
 	if (showfile.active()) {
 		if (k == 'KeyS')
 			showfile.tglsel();
+		if (k == 'KeyE' && ebi('editdoc').style.display != 'none')
+			ebi('editdoc').click();
 	}
 };
 

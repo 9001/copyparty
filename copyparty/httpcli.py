@@ -2186,7 +2186,8 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
-        if not new_file.endswith(".md"):
+        ext = "" if "." not in new_file else new_file.split(".")[-1]
+        if not ext or len(ext) > 5 or not self.can_delete:
             new_file += ".md"
 
         sanitized = sanitize_fn(new_file, "", [])
@@ -2519,7 +2520,7 @@ class HttpCli(object):
         fp = os.path.join(fp, fn)
         rem = "{}/{}".format(rp, fn).strip("/")
 
-        if not rem.endswith(".md"):
+        if not rem.endswith(".md") and not self.can_delete:
             raise Pebkac(400, "only markdown pls")
 
         if nullwrite:
@@ -3697,7 +3698,7 @@ class HttpCli(object):
                     return self.tx_404()
 
             if (
-                abspath.endswith(".md")
+                (abspath.endswith(".md") or self.can_delete)
                 and "nohtml" not in vn.flags
                 and (
                     "v" in self.uparam
