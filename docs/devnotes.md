@@ -125,8 +125,14 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?b` | list files/folders at URL as simplified HTML |
 | GET | `?tree=.` | list one level of subdirectories inside URL |
 | GET | `?tree` | list one level of subdirectories for each level until URL |
-| GET | `?tar` | download everything below URL as a tar file |
-| GET | `?zip=utf-8` | download everything below URL as a zip file |
+| GET | `?tar` | download everything below URL as a gnu-tar file |
+| GET | `?tar=gz:9` | ...as a gzip-level-9 gnu-tar file |
+| GET | `?tar=xz:9` | ...as an xz-level-9 gnu-tar file |
+| GET | `?tar=pax` | ...as a pax-tar file |
+| GET | `?tar=pax,xz` | ...as an xz-level-1 pax-tar file |
+| GET | `?zip=utf-8` | ...as a zip file |
+| GET | `?zip` | ...as a WinXP-compatible zip file |
+| GET | `?zip=crc` | ...as an MSDOS-compatible zip file |
 | GET | `?ups` | show recent uploads from your IP |
 | GET | `?ups&filter=f` | ...where URL contains `f` |
 | GET | `?mime=foo` | specify return mimetype `foo` |

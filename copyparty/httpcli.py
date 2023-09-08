@@ -2910,13 +2910,13 @@ class HttpCli(object):
 
         if fmt == "tar":
             packer: Type[StreamArc] = StreamTar
-            if cancmp and uarg.startswith("gz"):
+            if cancmp and "gz" in uarg:
                 mime = "application/gzip"
                 ext = "tar.gz"
-            elif cancmp and uarg.startswith("bz2"):
+            elif cancmp and "bz2" in uarg:
                 mime = "application/x-bzip"
                 ext = "tar.bz2"
-            elif cancmp and uarg.startswith("xz"):
+            elif cancmp and "xz" in uarg:
                 mime = "application/x-xz"
                 ext = "tar.xz"
             else:
@@ -2973,7 +2973,7 @@ class HttpCli(object):
             fgen,
             utf8="utf" in uarg,
             pre_crc="crc" in uarg,
-            cmp=uarg if cancmp else "",
+            cmp=uarg if cancmp or uarg == "pax" else "",
         )
         bsent = 0
         for buf in bgen.gen():

@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import re
 import stat
 import tarfile
 
@@ -54,15 +55,20 @@ class StreamTar(StreamArc):
         self.qfile = QFile()
         self.errf: dict[str, Any] = {}
 
+        # python 3.8 changed to PAX_FORMAT as default;
+        # slower, bigger, and no particular advantage
+        fmt = tarfile.GNU_FORMAT
+        if "pax" in cmp:
+            # unless a client asks for it (currently
+            # gnu-tar has wider support than pax-tar)
+            fmt = tarfile.PAX_FORMAT
+            cmp = re.sub(r"[^a-z0-9]*pax[^a-z0-9]*", "", cmp)
+
         try:
             cmp, lv = cmp.replace(":", ",").split(",")
             lv = int(lv)
         except:
             lv = None
-
-        # python 3.8 changed to PAX_FORMAT as default,
-        # waste of space and don't care about the new features
-        fmt = tarfile.GNU_FORMAT
 
         arg = {"name": None, "fileobj": self.qfile, "mode": "w", "format": fmt}
         if cmp == "gz":

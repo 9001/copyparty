@@ -510,9 +510,9 @@ select which type of archive you want in the `[⚙️] config` tab:
 | name | url-suffix | description |
 |--|--|--|
 | `tar` | `?tar` | plain gnutar, works great with `curl \| tar -xv` |
-| `tar.gz` | `?tar=gz` | gzip compressed tar, for `curl \| tar -xvz` |
-| `tar.xz` | `?tar=xz` | gnu-tar with xz / lzma compression (good) |
-| `tar.bz2` | `?tar=bz2` | bzip2-compressed tar (mostly useless) |
+| `pax` | `?tar=pax` | pax-format tar, futureproof, not as fast |
+| `tgz` | `?tar=gz` | gzip compressed gnu-tar (slow), for `curl \| tar -xvz` |
+| `txz` | `?tar=xz` | gnu-tar with xz / lzma compression (v.slow) |
 | `zip` | `?zip=utf8` | works everywhere, glitchy filenames on win7 and older |
 | `zip_dos` | `?zip` | traditional cp437 (no unicode) to fix glitchy filenames |
 | `zip_crc` | `?zip=crc` | cp437 with crc32 computed early for truly ancient software |

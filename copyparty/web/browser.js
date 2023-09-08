@@ -377,9 +377,10 @@ var Ls = {
 		"fu_xe1": "failed to load unpost list from server:\n\nerror ",
 		"fu_xe2": "404: File not found??",
 
-		"fz_tar": "plain gnu-tar file (linux / mac)",
-		"fz_targz": "tar with gzip level 3 compression$N$Nthis is usually very slow, so$Nuse uncompressed tar instead",
-		"fz_tarxz": "tar with xz level 1 compression$N$Nthis is usually very slow, so$Nuse uncompressed tar instead",
+		"fz_tar": "uncompressed gnu-tar file (linux / mac)",
+		"fz_pax": "uncompressed pax-format tar (slower)",
+		"fz_targz": "gnu-tar with gzip level 3 compression$N$Nthis is usually very slow, so$Nuse uncompressed tar instead",
+		"fz_tarxz": "gnu-tar with xz level 1 compression$N$Nthis is usually very slow, so$Nuse uncompressed tar instead",
 		"fz_zip8": "zip with utf8 filenames (maybe wonky on windows 7 and older)",
 		"fz_zipd": "zip with traditional cp437 filenames, for really old software",
 		"fz_zipc": "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)",
@@ -846,6 +847,7 @@ var Ls = {
 		"fu_xe2": "404: Filen finnes ikke??",
 
 		"fz_tar": "ukomprimert gnu-tar arkiv, for linux og mac",
+		"fz_pax": "ukomprimert pax-tar arkiv, litt tregere",
 		"fz_targz": "gnu-tar pakket med gzip (nivå 3)$N$NNB: denne er veldig treg;$Nukomprimert tar er bedre",
 		"fz_tarxz": "gnu-tar pakket med xz (nivå 1)$N$NNB: denne er veldig treg;$Nukomprimert tar er bedre",
 		"fz_zip8": "zip med filnavn i utf8 (noe problematisk på windows 7 og eldre)",
@@ -6685,6 +6687,7 @@ var arcfmt = (function () {
 	var html = [],
 		fmts = [
 			["tar", "tar", L.fz_tar],
+			["pax", "tar=pax", L.fz_pax],
 			["tgz", "tar=gz", L.fz_targz],
 			["txz", "tar=xz", L.fz_tarxz],
 			["zip", "zip=utf8", L.fz_zip8],
@@ -6716,7 +6719,7 @@ var arcfmt = (function () {
 
 		for (var a = 0, aa = tds.length; a < aa; a++) {
 			var o = tds[a], txt = o.textContent, href = o.getAttribute('href');
-			if (!/^(zip|tar|tgz|txz)$/.exec(txt))
+			if (!/^(zip|tar|pax|tgz|txz)$/.exec(txt))
 				continue;
 
 			var ofs = href.lastIndexOf('?');
