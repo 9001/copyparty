@@ -1,6 +1,6 @@
 # Maintainer: icxes <dev.null@need.moe>
 pkgname=copyparty
-pkgver="1.9.4"
+pkgver="1.9.5"
 pkgrel=1
 pkgdesc="Portable file sharing hub"
 arch=("any")
@@ -20,7 +20,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
 backup=("etc/${pkgname}.d/init" )
-sha256sums=("c327ac35deaa5e6cc86b3b1a251cc78517be5578c37c4dff90e98465ced82abc")
+sha256sums=("0c68368bab5b17716860994b3e6485e4d396d0ec3eb5f1c8947eca8cb2b18821")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
