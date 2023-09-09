@@ -932,12 +932,13 @@ def add_webdav(ap):
 
 def add_smb(ap):
     ap2 = ap.add_argument_group('SMB/CIFS options')
-    ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless --smb-port is set above 1024 and your OS does port-forwarding from 445 to that.\n\033[1;31mWARNING:\033[0m this protocol is dangerous! Never expose to the internet. Account permissions are coalesced; if one account has write-access to a volume, then all accounts do.")
+    ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless --smb-port is set above 1024 and your OS does port-forwarding from 445 to that.\n\033[1;31mWARNING:\033[0m this protocol is dangerous! Never expose to the internet!")
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
     ap2.add_argument("--smb-port", metavar="PORT", type=int, default=445, help="port to listen on -- if you change this value, you must NAT from TCP:445 to this port using iptables or similar")
     ap2.add_argument("--smb-nwa-1", action="store_true", help="disable impacket#1433 workaround (truncate directory listings to 64kB)")
     ap2.add_argument("--smb-nwa-2", action="store_true", help="disable impacket workaround for filecopy globs")
+    ap2.add_argument("--smba", action="store_true", help="small performance boost: disable per-account permissions, enables account coalescing instead (if one user has write/delete-access, then everyone does)")
     ap2.add_argument("--smbv", action="store_true", help="verbose")
     ap2.add_argument("--smbvv", action="store_true", help="verboser")
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")

@@ -904,15 +904,13 @@ unsafe, slow, not recommended for wan,  enable with `--smb` for read-only or `--
 
 click the [connect](http://127.0.0.1:3923/?hc) button in the control-panel to see connection instructions for windows, linux, macos
 
-dependencies: `python3 -m pip install --user -U impacket==0.10.0`
+dependencies: `python3 -m pip install --user -U impacket==0.11.0`
 * newer versions of impacket will hopefully work just fine but there is monkeypatching so maybe not
 
 some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 * not entirely confident that read-only is read-only
 * the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh)
-  * account passwords work per-volume as expected, but account permissions are coalesced; all accounts have read-access to all volumes, and if a single account has write-access to some volume then all other accounts also do
-    * if no accounts have write-access to a specific volume, or if `--smbw` is not set, then writing to that volume from smb *should* be impossible
-    * will be fixed once [impacket v0.11.0](https://github.com/SecureAuthCorp/impacket/commit/d923c00f75d54b972bca573a211a82f09b55261a) is released
+  * account passwords work per-volume as expected, and so does account permissions (read/write/move/delete), but `--smbw` must be given to allow write-access from smb
   * [shadowing](#shadowing) probably works as expected but no guarantees
 
 and some minor issues,
@@ -923,7 +921,7 @@ and some minor issues,
   * win10 onwards does not allow connecting anonymously / without accounts
 * on windows, creating a new file through rightclick --> new --> textfile throws an error due to impacket limitations -- hit OK and F5 to get your file
 * python3 only
-* slow
+* slow (the builtin webdav support in windows is 5x faster, and rclone-webdav is 30x faster)
 
 known client bugs:
 * on win7 only, `--smb1` is much faster than smb2 (default) because it keeps rescanning folders on smb2
@@ -1747,7 +1745,7 @@ enable [thumbnails](#thumbnails) of...
 * **JPEG XL pictures:** `pyvips` or `ffmpeg`
 
 enable [smb](#smb-server) support (**not** recommended):
-* `impacket==0.10.0`
+* `impacket==0.11.0`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
 

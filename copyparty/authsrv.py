@@ -492,7 +492,7 @@ class VFS(object):
             (will_get, c.uget, "get"),
         ]:
             if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
-                if self.log and err != 999 and msg != "read":
+                if vpath != cvpath and vpath != "." and self.log:
                     ap = vn.canonical(rem)
                     t = "{} has no {} in [{}] => [{}] => [{}]"
                     self.log("vfs", t.format(uname, msg, vpath, cvpath, ap), 6)
@@ -1683,7 +1683,7 @@ class AuthSrv(object):
                 self.log(t.format(zv.realpath), c=1)
 
         try:
-            zv, _ = vfs.get("/", "*", False, True, err=999)
+            zv, _ = vfs.get("", "*", False, True, err=999)
             if self.warn_anonwrite and os.getcwd() == zv.realpath:
                 t = "anyone can write to the current directory: {}\n"
                 self.log(t.format(zv.realpath), c=1)

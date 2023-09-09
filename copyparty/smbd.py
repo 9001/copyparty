@@ -32,6 +32,8 @@ class SMB(object):
         self.asrv = hub.asrv
         self.log = hub.log
         self.files: dict[int, tuple[float, str]] = {}
+        self.noacc = self.args.smba
+        self.accs = not self.args.smba
 
         lg.setLevel(logging.DEBUG if self.args.smbvvv else logging.INFO)
         for x in ["impacket", "impacket.smbserver"]:
@@ -94,6 +96,14 @@ class SMB(object):
 
         port = int(self.args.smb_port)
         srv = smbserver.SimpleSMBServer(listenAddress=ip, listenPort=port)
+        try:
+            if self.accs:
+                srv.setAuthCallback(self._auth_cb)
+        except:
+            self.accs = False
+            self.noacc = True
+            t = "impacket too old; access permissions will not work! all accounts are admin!"
+            self.log("smb", t, 1)
 
         ro = "no" if self.args.smbw else "yes"  # (does nothing)
         srv.addShare("A", "/", readOnly=ro)
@@ -119,24 +129,73 @@ class SMB(object):
     def start(self) -> None:
         Daemon(self.srv.start)
 
-    def _v2a(self, caller: str, vpath: str, *a: Any) -> tuple[VFS, str]:
+    def _auth_cb(self, *a, **ka):
+        debug("auth-result: %s %s", a, ka)
+        conndata = ka["connData"]
+        auth_ok = conndata["Authenticated"]
+        uname = ka["user_name"] if auth_ok else "*"
+        uname = self.asrv.iacct.get(uname, uname) or "*"
+        oldname = conndata.get("partygoer", "*") or "*"
+        cli_ip = conndata["ClientIP"]
+        cli_hn = ka["host_name"]
+        if uname != "*":
+            conndata["partygoer"] = uname
+            info("client %s [%s] authed as %s", cli_ip, cli_hn, uname)
+        elif oldname != "*":
+            info("client %s [%s] keeping old auth as %s", cli_ip, cli_hn, oldname)
+        elif auth_ok:
+            info("client %s [%s] authed as [*] (anon)", cli_ip, cli_hn)
+        else:
+            info("client %s [%s] rejected", cli_ip, cli_hn)
+
+    def _uname(self) -> str:
+        if self.noacc:
+            return LEELOO_DALLAS
+
+        try:
+            # you found it! my single worst bit of code so far
+            # (if you can think of a better way to track users through impacket i'm all ears)
+            cf0 = inspect.currentframe().f_back.f_back
+            cf = cf0.f_back
+            for n in range(3):
+                cl = cf.f_locals
+                if "connData" in cl:
+                    return cl["connData"]["partygoer"]
+                cf = cf.f_back
+        except:
+            warning(
+                "nyoron... %s <<-- %s <<-- %s <<-- %s",
+                cf0.f_code.co_name,
+                cf0.f_back.f_code.co_name,
+                cf0.f_back.f_back.f_code.co_name,
+                cf0.f_back.f_back.f_back.f_code.co_name,
+            )
+            return "*"
+
+    def _v2a(
+        self, caller: str, vpath: str, *a: Any, uname="", perms=None
+    ) -> tuple[VFS, str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
         # cf = inspect.currentframe().f_back
         # c1 = cf.f_back.f_code.co_name
         # c2 = cf.f_code.co_name
-        debug('%s("%s", %s)\033[K\033[0m', caller, vpath, str(a))
+        if not uname:
+            uname = self._uname()
+        if not perms:
+            perms = [True, True]
 
-        # TODO find a way to grab `identity` in smbComSessionSetupAndX and smb2SessionSetup
-        vfs, rem = self.asrv.vfs.get(vpath, LEELOO_DALLAS, True, True)
+        debug('%s("%s", %s) %s @%s\033[K\033[0m', caller, vpath, str(a), perms, uname)
+        vfs, rem = self.asrv.vfs.get(vpath, uname, *perms)
         return vfs, vfs.canonical(rem)
 
     def _listdir(self, vpath: str, *a: Any, **ka: Any) -> list[str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
         # caller = inspect.currentframe().f_back.f_code.co_name
-        debug('listdir("%s", %s)\033[K\033[0m', vpath, str(a))
-        vfs, rem = self.asrv.vfs.get(vpath, LEELOO_DALLAS, False, False)
+        uname = self._uname()
+        # debug('listdir("%s", %s) @%s\033[K\033[0m', vpath, str(a), uname)
+        vfs, rem = self.asrv.vfs.get(vpath, uname, False, False)
         _, vfs_ls, vfs_virt = vfs.ls(
-            rem, LEELOO_DALLAS, not self.args.no_scandir, [[False, False]]
+            rem, uname, not self.args.no_scandir, [[False, False]]
         )
         dirs = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
         fils = [x[0] for x in vfs_ls if x[0] not in dirs]
@@ -149,8 +208,8 @@ class SMB(object):
         sz = 112 * 2  # ['.', '..']
         for n, fn in enumerate(ls):
             if sz >= 64000:
-                t = "listing only %d of %d files (%d byte); see impacket#1433"
-                warning(t, n, len(ls), sz)
+                t = "listing only %d of %d files (%d byte) in /%s; see impacket#1433"
+                warning(t, n, len(ls), sz, vpath)
                 break
 
             nsz = len(fn.encode("utf-16", "replace"))
@@ -171,10 +230,12 @@ class SMB(object):
         if wr and not self.args.smbw:
             yeet("blocked write (no --smbw): " + vpath)
 
-        vfs, ap = self._v2a("open", vpath, *a)
+        uname = self._uname()
+        vfs, ap = self._v2a("open", vpath, *a, uname=uname, perms=[True, wr])
         if wr:
             if not vfs.axs.uwrite:
-                yeet("blocked write (no-write-acc): " + vpath)
+                t = "blocked write (no-write-acc %s): /%s @%s"
+                yeet(t % (vfs.axs.uwrite, vpath, uname))
 
             xbu = vfs.flags.get("xbu")
             if xbu and not runhook(
@@ -204,7 +265,7 @@ class SMB(object):
 
         _, vp = self.files.pop(fd)
         vp, fn = os.path.split(vp)
-        vfs, rem = self.hub.asrv.vfs.get(vp, LEELOO_DALLAS, False, True)
+        vfs, rem = self.hub.asrv.vfs.get(vp, self._uname(), False, True)
         vfs, rem = vfs.get_dbv(rem)
         self.hub.up2k.hash_file(
             vfs.realpath,
@@ -224,15 +285,18 @@ class SMB(object):
         vp1 = vp1.lstrip("/")
         vp2 = vp2.lstrip("/")
 
-        vfs2, ap2 = self._v2a("rename", vp2, vp1)
+        uname = self._uname()
+        vfs2, ap2 = self._v2a("rename", vp2, vp1, uname=uname)
         if not vfs2.axs.uwrite:
-            yeet("blocked rename (no-write-acc): " + vp2)
+            t = "blocked write (no-write-acc %s): /%s @%s"
+            yeet(t % (vfs2.axs.uwrite, vp2, uname))
 
-        vfs1, _ = self.asrv.vfs.get(vp1, LEELOO_DALLAS, True, True)
+        vfs1, _ = self.asrv.vfs.get(vp1, uname, True, True, True)
         if not vfs1.axs.umove:
-            yeet("blocked rename (no-move-acc): " + vp1)
+            t = "blocked rename (no-move-acc %s): /%s @%s"
+            yeet(t % (vfs1.axs.umove, vp1, uname))
 
-        self.hub.up2k.handle_mv(LEELOO_DALLAS, vp1, vp2)
+        self.hub.up2k.handle_mv(uname, vp1, vp2)
         try:
             bos.makedirs(ap2)
         except:
@@ -242,52 +306,74 @@ class SMB(object):
         if not self.args.smbw:
             yeet("blocked mkdir (no --smbw): " + vpath)
 
-        vfs, ap = self._v2a("mkdir", vpath)
+        uname = self._uname()
+        vfs, ap = self._v2a("mkdir", vpath, uname=uname)
         if not vfs.axs.uwrite:
-            yeet("blocked mkdir (no-write-acc): " + vpath)
+            t = "blocked mkdir (no-write-acc %s): /%s @%s"
+            yeet(t % (vfs.axs.uwrite, vpath, uname))
 
         return bos.mkdir(ap)
 
     def _stat(self, vpath: str, *a: Any, **ka: Any) -> os.stat_result:
-        return bos.stat(self._v2a("stat", vpath, *a)[1], *a, **ka)
+        try:
+            ap = self._v2a("stat", vpath, *a, perms=[True, False])[1]
+            ret = bos.stat(ap, *a, **ka)
+            # debug(" `-stat:ok")
+            return ret
+        except:
+            # white lie: windows freaks out if we raise due to an offline volume
+            # debug(" `-stat:NOPE (faking a directory)")
+            ts = int(time.time())
+            return os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, ts, ts, ts))
 
     def _unlink(self, vpath: str) -> None:
         if not self.args.smbw:
             yeet("blocked delete (no --smbw): " + vpath)
 
         # return bos.unlink(self._v2a("stat", vpath, *a)[1])
-        vfs, ap = self._v2a("delete", vpath)
+        uname = self._uname()
+        vfs, ap = self._v2a(
+            "delete", vpath, uname=uname, perms=[True, False, False, True]
+        )
         if not vfs.axs.udel:
             yeet("blocked delete (no-del-acc): " + vpath)
 
         vpath = vpath.replace("\\", "/").lstrip("/")
-        self.hub.up2k.handle_rm(LEELOO_DALLAS, "1.7.6.2", [vpath], [], False)
+        self.hub.up2k.handle_rm(uname, "1.7.6.2", [vpath], [], False)
 
     def _utime(self, vpath: str, times: tuple[float, float]) -> None:
         if not self.args.smbw:
             yeet("blocked utime (no --smbw): " + vpath)
 
-        vfs, ap = self._v2a("utime", vpath)
+        uname = self._uname()
+        vfs, ap = self._v2a("utime", vpath, uname=uname)
         if not vfs.axs.uwrite:
-            yeet("blocked utime (no-write-acc): " + vpath)
+            t = "blocked utime (no-write-acc %s): /%s @%s"
+            yeet(t % (vfs.axs.uwrite, vpath, uname))
 
         return bos.utime(ap, times)
 
     def _p_exists(self, vpath: str) -> bool:
+        # ap = "?"
         try:
-            bos.stat(self._v2a("p.exists", vpath)[1])
+            ap = self._v2a("p.exists", vpath, perms=[True, False])[1]
+            bos.stat(ap)
+            # debug(" `-exists((%s)->(%s)):ok", vpath, ap)
             return True
         except:
+            # debug(" `-exists((%s)->(%s)):NOPE", vpath, ap)
             return False
 
     def _p_getsize(self, vpath: str) -> int:
-        st = bos.stat(self._v2a("p.getsize", vpath)[1])
+        st = bos.stat(self._v2a("p.getsize", vpath, perms=[True, False])[1])
         return st.st_size
 
     def _p_isdir(self, vpath: str) -> bool:
         try:
-            st = bos.stat(self._v2a("p.isdir", vpath)[1])
-            return stat.S_ISDIR(st.st_mode)
+            st = bos.stat(self._v2a("p.isdir", vpath, perms=[True, False])[1])
+            ret = stat.S_ISDIR(st.st_mode)
+            # debug(" `-isdir:%s:%s", st.st_mode, ret)
+            return ret
         except:
             return False
 

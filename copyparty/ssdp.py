@@ -214,7 +214,7 @@ CONFIGID.UPNP.ORG: 1
         srv.sck.sendto(zb, addr[:2])
 
         if cip not in self.txc.c:
-            self.log("{} [{}] --> {}".format(srv.name, srv.ip, cip), "6")
+            self.log("{} [{}] --> {}".format(srv.name, srv.ip, cip), 6)
 
         self.txc.add(cip)
         self.txc.cln()
