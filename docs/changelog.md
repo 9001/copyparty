@@ -1,4 +1,26 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0902-0018  `v1.9.4`  yes symlink times
+
+hello! it's been a while, an entire day even...
+
+## new features
+* download folder as tar.gz, tar.bz2, tar.xz
+  * single-threaded, so extremely slow, but nice for easily compressed data or challenged networks
+  * append `?tar=gz`, `?tar=bz2` or `?tar=xz` to a folder URL to do it
+  * default compression levels are gz:3, bz2:2, xz:1; override with `?tar=gz:9`
+
+# bugfixes
+* c1efd227b7377144a5760bc6cff64f4e87b626d9 symlink-deduplicated files got indexed with the wrong last-modified timestamp
+  * mostly inconsequential; would cause the dupe's uploader-ip to be forgotten on the next server restart since it would reindex to "fix" the timestamp
+* when linking [a search query](https://a.ocv.me/pub/#q=tags%20like%20soundsho*) it loads the results faster
+
+# other changes
+* update readme to mention that iPhones and iPads dislike the preload feature and respond by glitching the audio a bit when a song is exactly 20 seconds away from ending and yet how it's probably a bad idea to disable preloading since i bet it's load-bearing against other iOS bugs
+  * speaking of iPhones and iPads, the [previous version](https://github.com/9001/copyparty/releases/tag/v1.9.3) should have fixed album playback on those
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0831-2211  `v1.9.3`  iOS and http fixes
 
 ## new features
