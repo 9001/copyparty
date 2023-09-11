@@ -119,8 +119,11 @@ class TestHttpCli(unittest.TestCase):
                 # with open(os.path.join(td, "tar"), "wb") as f:
                 #    f.write(b)
                 try:
-                    tar = tarfile.open(fileobj=io.BytesIO(b)).getnames()
+                    tar = tarfile.open(fileobj=io.BytesIO(b), mode="r|").getnames()
                 except:
+                    if "HTTP/1.1 403 Forbidden" not in h and b != b"\nJ2EOT":
+                        eprint("bad tar?", url, h, b)
+                        raise
                     tar = []
                 tar = [x.split("/", 1)[1] for x in tar]
                 tar = ["/".join([y for y in [top, durl, x] if y]) for x in tar]

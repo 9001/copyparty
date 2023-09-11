@@ -20,7 +20,7 @@ ANYWIN = WINDOWS or sys.platform in ["msys"]
 MACOS = platform.system() == "Darwin"
 
 J2_ENV = jinja2.Environment(loader=jinja2.BaseLoader)
-J2_FILES = J2_ENV.from_string("{{ files|join('\n') }}")
+J2_FILES = J2_ENV.from_string("{{ files|join('\n') }}\nJ2EOT")
 
 
 def nah(*a, **ka):
@@ -109,13 +109,13 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vague_403 vc ver xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "css_browser hist js_browser no_forget no_hash no_idx"
+        ex = "css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "s_thead s_tbody th_convt"
