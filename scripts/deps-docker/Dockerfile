@@ -142,10 +142,11 @@ RUN     ./genprism.sh $ver_prism
 
 
 # compress
-COPY    zopfli.makefile /z/dist/Makefile
+COPY    brotli.makefile zopfli.makefile /z/dist/
 RUN     cd /z/dist \
-        && make -j$(nproc) \
-        && rm Makefile \
+        && make -j$(nproc) -f brotli.makefile \
+        && make -j$(nproc) -f zopfli.makefile \
+        && rm *.makefile \
         && mv no-pk/* . \
         && rmdir no-pk
 

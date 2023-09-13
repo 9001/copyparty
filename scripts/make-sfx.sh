@@ -134,6 +134,14 @@ tmv() {
 	touch -r "$1" t
 	mv t "$1"
 }
+iawk() {
+	awk "$1" <"$2" >t
+	tmv "$2"
+}
+ised() {
+	sed -r "$1" <"$2" >t
+	tmv "$2"
+}
 
 stamp=$(
 	for d in copyparty scripts; do
@@ -229,9 +237,7 @@ necho() {
 	mv python-magic-*/magic .
 	rm -rf python-magic-*
 	rm magic/compat.py
-	f=magic/__init__.py
-	awk '/^def _add_compat/{o=1} !o; /^_add_compat/{o=0}' <$f >t
-	tmv "$f"
+	iawk '/^def _add_compat/{o=1} !o; /^_add_compat/{o=0}' magic/__init__.py
 	mv magic ftp/  # doesn't provide a version label anyways
 
 	# enable this to dynamically remove type hints at startup,
@@ -398,7 +404,7 @@ find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') 
 
 rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
 
-find copyparty | LC_ALL=C sort | sed 's/\.gz$//;s/$/,/' > have
+find copyparty | LC_ALL=C sort | sed -r 's/\.(gz|br)$//;s/$/,/' > have
 cat have | while IFS= read -r x; do
 	grep -qF -- "$x" ../scripts/sfx.ls || {
 		echo "unexpected file: $x"
@@ -406,6 +412,11 @@ cat have | while IFS= read -r x; do
 	}
 done
 rm have
+
+ised /fork_process/d ftp/pyftpdlib/servers.py
+iawk '/^class _Base/{s=1}!s' ftp/pyftpdlib/authorizers.py
+iawk '/^ {0,4}[^ ]/{s=0}/^ {4}def (serve_forever|_loop)/{s=1}!s' ftp/pyftpdlib/servers.py
+rm -f ftp/pyftpdlib/{__main__,prefork}.py
 
 [ $no_ftp ] &&
 	rm -rf copyparty/ftpd.py ftp asyncore.py asynchat.py &&
@@ -423,9 +434,7 @@ rm have
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
 	echo h > copyparty/web/mde.html
-	f=copyparty/web/md.html
-	sed -r '/edit2">edit \(fancy/d' <$f >t
-	tmv "$f"
+	ised '/edit2">edit \(fancy/d' copyparty/web/md.html
 }
 
 [ $no_hl ] &&
@@ -435,23 +444,20 @@ rm have
 	rm -f copyparty/web/deps/scp.woff2
 	f=copyparty/web/ui.css
 	gzip -d "$f.gz" || true
-	sed -r "s/src:.*scp.*\)/src:local('Consolas')/" <$f >t
-	tmv "$f"
+	ised "s/src:.*scp.*\)/src:local('Consolas')/" $f
 }
 
 [ $no_dd ] && {
 	rm -rf copyparty/web/dd
 	f=copyparty/web/browser.css
 	gzip -d "$f.gz" || true
-	sed -r 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; s/[0-9]+% \{cursor:[^}]+\}//; s/animation: ?cursor[^};]+//' <$f >t
-	tmv "$f"
+	ised 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; s/[0-9]+% \{cursor:[^}]+\}//; s/animation: ?cursor[^};]+//' $f
 }
 
 [ $langs ] &&
 	for f in copyparty/web/{browser.js,splash.js}; do
 		gzip -d "$f.gz" || true
-		awk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' <$f >t
-		tmv "$f"
+		iawk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' $f
 	done
 
 [ ! $repack ] && [ ! $use_ox ] && {
@@ -466,10 +472,20 @@ rm have
 	#	sed -ri '/: TypeAlias = /d' "$x"; done
 }
 
-f=j2/jinja2/constants.py
-awk '/^LOREM_IPSUM_WORDS/{o=1;print "LOREM_IPSUM_WORDS = u\"a\"";next} !o; /"""/{o=0}' <$f >t
-tmv "$f"
-rm -f j2/jinja2/async*
+rm -f j2/jinja2/constants.py
+iawk '/^ {4}def /{s=0}/^ {4}def compile_templates\(/{s=1}!s' j2/jinja2/environment.py
+ised '/generate_lorem_ipsum/d' j2/jinja2/defaults.py
+iawk '/^def /{s=0}/^def generate_lorem_ipsum/{s=1}!s' j2/jinja2/utils.py
+iawk '/^(class|def) /{s=0}/^(class InternationalizationExtension|def _make_new_n?gettext)/{s=1}!s' j2/jinja2/ext.py
+iawk '/^[^ ]/{s=0}/^def babel_extract/{s=1}!s' j2/jinja2/ext.py
+ised '/InternationalizationExtension/d' j2/jinja2/ext.py
+iawk '/^class/{s=0}/^class (Package|Dict|Function|Prefix|Choice|Module)Loader/{s=1}!s' j2/jinja2/loaders.py
+sed -ri '/^from .bccache | (Package|Dict|Function|Prefix|Choice|Module)Loader$/d' j2/jinja2/__init__.py
+rm -f j2/jinja2/async* j2/jinja2/bccache.py
+cat > j2/jinja2/_identifier.py <<'EOF'
+import re
+pattern = re.compile(r"\w+")
+EOF
 
 grep -rLE '^#[^a-z]*coding: utf-8' j2 |
 while IFS= read -r f; do

@@ -55,6 +55,11 @@ def uncomment(fpath):
                 out += '"a"'
         elif token_type != tokenize.COMMENT or is_legalese:
             out += token_string
+        else:
+            if out.rstrip(" ").endswith("\n"):
+                out = out.rstrip() + "\n"
+            else:
+                out = out.rstrip()
 
         prev_toktype = token_type
         last_lineno = end_line
