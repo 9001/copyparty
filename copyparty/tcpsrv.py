@@ -15,6 +15,7 @@ from .util import (
     E_ADDR_IN_USE,
     E_ADDR_NOT_AVAIL,
     E_UNREACH,
+    IP6ALL,
     Netdev,
     min_ex,
     sunpack,
@@ -254,6 +255,9 @@ class TcpSrv(object):
         srvs: list[socket.socket] = []
         for srv in self.srv:
             ip, port = srv.getsockname()[:2]
+            if ip == IP6ALL:
+                ip = "::"  # jython
+
             try:
                 srv.listen(self.args.nc)
                 try:
@@ -275,6 +279,8 @@ class TcpSrv(object):
                     srv.close()
                     continue
 
+                t = "\n\nERROR: could not open listening socket, probably because one of the server ports ({}) is busy on one of the requested interfaces ({}); avoid this issue by specifying a different port (-p 3939) and/or a specific interface to listen on (-i 192.168.56.1)\n"
+                self.log("tcpsrv", t.format(port, ip), 1)
                 raise
 
             bound.append((ip, port))

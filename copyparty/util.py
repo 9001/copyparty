@@ -56,6 +56,8 @@ E_ADDR_IN_USE = _ens("EADDRINUSE WSAEADDRINUSE")
 E_ACCESS = _ens("EACCES WSAEACCES")
 E_UNREACH = _ens("EHOSTUNREACH WSAEHOSTUNREACH ENETUNREACH WSAENETUNREACH")
 
+IP6ALL = "0:0:0:0:0:0:0:0"
+
 
 try:
     import ctypes
@@ -66,7 +68,9 @@ except:
 
 try:
     HAVE_SQLITE3 = True
-    import sqlite3  # pylint: disable=unused-import  # typechk
+    import sqlite3
+
+    assert hasattr(sqlite3, "connect")  # graalpy
 except:
     HAVE_SQLITE3 = False
 
