@@ -8,7 +8,7 @@ import shutil
 import subprocess as sp
 import sys
 
-from .__init__ import EXE, PY2, WINDOWS, E, unicode
+from .__init__ import ANYWIN, EXE, PY2, WINDOWS, E, unicode
 from .bos import bos
 from .util import (
     FFMPEG_URL,
@@ -29,6 +29,9 @@ if True:  # pylint: disable=using-constant-test
 
 
 def have_ff(scmd: str) -> bool:
+    if ANYWIN:
+        scmd += ".exe"
+
     if PY2:
         print("# checking {}".format(scmd))
         acmd = (scmd + " -version").encode("ascii").split(b" ")

@@ -298,11 +298,19 @@ REKOBO_KEY = {
 REKOBO_LKEY = {k.lower(): v for k, v in REKOBO_KEY.items()}
 
 
+_exestr = "python3 python ffmpeg ffprobe cfssl cfssljson cfssl-certinfo"
+CMD_EXEB = set(_exestr.encode("utf-8").split())
+CMD_EXES = set(_exestr.split())
+
+
 pybin = sys.executable or ""
 if EXE:
     pybin = ""
     for zsg in "python3 python".split():
         try:
+            if ANYWIN:
+                zsg += ".exe"
+
             zsg = shutil.which(zsg)
             if zsg:
                 pybin = zsg
@@ -2449,6 +2457,14 @@ def runcmd(
     cerr = sp.PIPE if capture in [2, 3] else None
     bout: bytes
     berr: bytes
+
+    if ANYWIN:
+        if isinstance(argv[0], (bytes, bytearray)):
+            if argv[0] in CMD_EXEB:
+                argv[0] += b".exe"
+        else:
+            if argv[0] in CMD_EXES:
+                argv[0] += ".exe"
 
     p = sp.Popen(argv, stdout=cout, stderr=cerr, **ka)
     if not timeout or PY2:
