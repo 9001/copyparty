@@ -339,7 +339,12 @@ class SvcHub(object):
         if self.httpsrv_up != self.broker.num_workers:
             return
 
-        time.sleep(0.1)  # purely cosmetic dw
+        ar = self.args
+        for _ in range(10 if ar.ftp or ar.ftps else 0):
+            time.sleep(0.03)
+            if self.ftpd:
+                break
+
         if self.tcpsrv.qr:
             self.log("qr-code", self.tcpsrv.qr)
         else:
@@ -645,19 +650,25 @@ class SvcHub(object):
         ret = 1
         try:
             self.pr("OPYTHAT")
+            tasks = []
             slp = 0.0
 
             if self.mdns:
-                Daemon(self.mdns.stop)
+                tasks.append(Daemon(self.mdns.stop, "mdns"))
                 slp = time.time() + 0.5
 
             if self.ssdp:
-                Daemon(self.ssdp.stop)
+                tasks.append(Daemon(self.ssdp.stop, "ssdp"))
                 slp = time.time() + 0.5
 
             self.broker.shutdown()
             self.tcpsrv.shutdown()
             self.up2k.shutdown()
+
+            if hasattr(self, "smbd"):
+                slp = max(slp, time.time() + 0.5)
+                tasks.append(Daemon(self.smbd.stop, "smbd"))
+
             if self.thumbsrv:
                 self.thumbsrv.shutdown()
 
@@ -667,17 +678,19 @@ class SvcHub(object):
                         break
 
                     if n == 3:
-                        self.pr("waiting for thumbsrv (10sec)...")
+                        self.log("root", "waiting for thumbsrv (10sec)...")
 
             if hasattr(self, "smbd"):
-                slp = max(slp, time.time() + 0.5)
-                Daemon(self.kill9, a=(1,))
-                Daemon(self.smbd.stop)
+                zf = max(time.time() - slp, 0)
+                Daemon(self.kill9, a=(zf + 0.5,))
 
             while time.time() < slp:
-                time.sleep(0.1)
+                if not next((x for x in tasks if x.is_alive), None):
+                    break
 
-            self.pr("nailed it", end="")
+                time.sleep(0.05)
+
+            self.log("root", "nailed it")
             ret = self.retcode
         except:
             self.pr("\033[31m[ error during shutdown ]\n{}\033[0m".format(min_ex()))
@@ -687,7 +700,7 @@ class SvcHub(object):
                 print("\033]0;\033\\", file=sys.stderr, end="")
                 sys.stderr.flush()
 
-            self.pr("\033[0m")
+            self.pr("\033[0m", end="")
             if self.logf:
                 self.logf.close()
 

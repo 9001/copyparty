@@ -140,21 +140,27 @@ catch (ex) {
 }
 var crashed = false, ignexd = {}, evalex_fatal = false;
 function vis_exh(msg, url, lineNo, columnNo, error) {
-    if ((msg + '').indexOf('ResizeObserver') + 1)
+    msg = String(msg);
+    url = String(url);
+
+    if (msg.indexOf('ResizeObserver') + 1)
         return;  // chrome issue 809574 (benign, from <video>)
 
-    if ((msg + '').indexOf('l2d.js') + 1)
+    if (msg.indexOf('l2d.js') + 1)
         return;  // `t` undefined in tapEvent -> hitTestSimpleCustom
 
-    if (!/\.js($|\?)/.exec('' + url))
+    if (!/\.js($|\?)/.exec(url))
         return;  // chrome debugger
 
-    if ((url + '').indexOf(' > eval') + 1 && !evalex_fatal)
+    if (url.indexOf(' > eval') + 1 && !evalex_fatal)
         return;  // md timer
 
     var ekey = url + '\n' + lineNo + '\n' + msg;
     if (ignexd[ekey] || crashed)
         return;
+
+    if (url.indexOf('deps/marked.js') + 1 && !window.WebAssembly)
+        return; // ff<52
 
     crashed = true;
     window.onerror = undefined;
@@ -162,7 +168,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
         '<h1>you hit a bug!</h1>',
         '<p style="font-size:1.3em;margin:0;line-height:2em">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a> / <a href="?b=u">basic</a></p>',
         '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">new github issue</a></p>',
-        '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(String(msg)).replace(/\n/g, '<br />') + '</p>',
+        '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(msg).replace(/\n/g, '<br />') + '</p>',
         '<p><b>UA:</b> ' + esc(navigator.userAgent + '')
     ];
 
@@ -354,13 +360,13 @@ catch (ex) {
 }
 
 // https://stackoverflow.com/a/950146
-function import_js(url, cb) {
+function import_js(url, cb, ecb) {
     var head = document.head || document.getElementsByTagName('head')[0];
     var script = mknod('script');
     script.type = 'text/javascript';
     script.src = url;
     script.onload = cb;
-    script.onerror = function () {
+    script.onerror = ecb || function () {
         var m = 'Failed to load module:\n' + url;
         console.log(m);
         toast.err(0, m);
@@ -1141,7 +1147,7 @@ var timer = (function () {
         apop(r.q, fun);
     };
 
-    function doevents() {
+    var doevents = function () {
         if (crashed)
             return;
 
@@ -1352,7 +1358,7 @@ var toast = (function () {
     r.p_sec = 0;
     r.p_t = 0;
 
-    function scrollchk() {
+    var scrollchk = function () {
         if (scrolling)
             return;
 
@@ -1367,7 +1373,7 @@ var toast = (function () {
         scrolling = true;
     }
 
-    function unscroll() {
+    var unscroll = function () {
         timer.rm(scrollchk);
         clmod(obj, 'scroll');
         scrolling = false;
@@ -1486,7 +1492,7 @@ var modal = (function () {
         r.busy = false;
         setTimeout(next, 50);
     };
-    function ok(e) {
+    var ok = function (e) {
         ev(e);
         var v = ebi('modali');
         v = v ? v.value : true;
@@ -1494,14 +1500,14 @@ var modal = (function () {
         if (cb_ok)
             cb_ok(v);
     }
-    function ng(e) {
+    var ng = function (e) {
         ev(e);
         r.hide();
         if (cb_ng)
             cb_ng(null);
     }
 
-    function onfocus(e) {
+    var onfocus = function (e) {
         var ctr = ebi('modalc');
         if (!ctr || !ctr.contains || !document.activeElement || ctr.contains(document.activeElement))
             return;
@@ -1513,7 +1519,7 @@ var modal = (function () {
         ev(e);
     }
 
-    function onkey(e) {
+    var onkey = function (e) {
         var k = e.code,
             eok = ebi('modal-ok'),
             eng = ebi('modal-ng'),
@@ -1536,7 +1542,7 @@ var modal = (function () {
             return ng();
     }
 
-    function next() {
+    var next = function () {
         if (!r.busy && q.length)
             q.shift()();
     }
@@ -1547,7 +1553,7 @@ var modal = (function () {
         });
         next();
     };
-    function _alert(html, cb, fun) {
+    var _alert = function (html, cb, fun) {
         cb_ok = cb_ng = cb;
         cb_up = fun;
         html += '<div id="modalb"><a href="#" id="modal-ok">OK</a></div>';
@@ -1560,7 +1566,7 @@ var modal = (function () {
         });
         next();
     }
-    function _confirm(html, cok, cng, fun, btns) {
+    var _confirm = function (html, cok, cng, fun, btns) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : cng;
         cb_up = fun;
@@ -1574,7 +1580,7 @@ var modal = (function () {
         });
         next();
     }
-    function _prompt(html, v, cok, cng, fun) {
+    var _prompt = function (html, v, cok, cng, fun) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
         cb_up = fun;
@@ -1793,7 +1799,7 @@ var favico = (function () {
     r.en = true;
     r.tag = null;
 
-    function gx(txt) {
+    var gx = function (txt) {
         return (svg_decl +
             '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
             (r.bg ? '<rect width="100%" height="100%" rx="16" fill="#' + r.bg + '" />\n' : '') +

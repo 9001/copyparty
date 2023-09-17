@@ -4699,6 +4699,39 @@ function hkhelp() {
 
 
 var fselgen, fselctr;
+function fselfunw(e, ae, d, rem) {
+	fselctr = 0;
+	var gen = fselgen = Date.now();
+	if (rem)
+		rem *= window.innerHeight;
+
+	var selfun = function () {
+		var el = ae[d + 'ElementSibling'];
+		if (!el || gen != fselgen)
+			return;
+
+		el.focus();
+		var elh = el.offsetHeight;
+		if (ctrl(e))
+			document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * elh;
+
+		if (e.shiftKey) {
+			clmod(el, 'sel', 't');
+			msel.origin_tr(el);
+			msel.selui();
+		}
+
+		rem -= elh;
+		if (rem > 0) {
+			ae = document.activeElement;
+			if (++fselctr % 5 && rem > elh * (FIREFOX ? 5 : 2))
+				selfun();
+			else
+				setTimeout(selfun, 1);
+		}
+	}
+	selfun();
+}
 document.onkeydown = function (e) {
 	if (e.altKey || e.isComposing)
 		return;
@@ -4749,37 +4782,7 @@ document.onkeydown = function (e) {
 		if (k == 'PageUp') { d = 'previous'; rem = 0.6; }
 		if (k == 'PageDown') { d = 'next'; rem = 0.6; }
 		if (d) {
-			fselctr = 0;
-			var gen = fselgen = Date.now();
-			if (rem)
-				rem *= window.innerHeight;
-
-			function selfun() {
-				var el = ae[d + 'ElementSibling'];
-				if (!el || gen != fselgen)
-					return;
-
-				el.focus();
-				var elh = el.offsetHeight;
-				if (ctrl(e))
-					document.documentElement.scrollTop += (d == 'next' ? 1 : -1) * elh;
-
-				if (e.shiftKey) {
-					clmod(el, 'sel', 't');
-					msel.origin_tr(el);
-					msel.selui();
-				}
-
-				rem -= elh;
-				if (rem > 0) {
-					ae = document.activeElement;
-					if (++fselctr % 5 && rem > elh * (FIREFOX ? 5 : 2))
-						selfun();
-					else
-						setTimeout(selfun, 1);
-				}
-			}
-			selfun();
+			fselfunw(e, ae, d, rem);
 			return ev(e);
 		}
 		if (k == 'Space') {
@@ -5268,7 +5271,10 @@ var filecolwidth = (function () {
 			return;
 
 		lastwidth = w;
-		document.documentElement.style.setProperty('--file-td-w', w + 'em');
+		try {
+			document.documentElement.style.setProperty('--file-td-w', w + 'em');
+		}
+		catch (ex) { }
 	}
 })();
 onresize100.add(filecolwidth, true);
@@ -6316,10 +6322,11 @@ var filecols = (function () {
 		var ths = QSA('#files>thead th>span');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var th = ths[a].parentElement,
+				toh = ths[a].outerHTML, // !ff10
 				ttv = L.cols[ths[a].textContent];
 
-			if (!MOBILE) {
-				th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + ths[a].outerHTML;
+			if (!MOBILE && toh) {
+				th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + toh;
 				th.getElementsByTagName('a')[0].onclick = ev_row_tgl;
 			}
 			if (ttv) {
@@ -7125,7 +7132,7 @@ function show_md(md, name, div, url, depth) {
 	wfp_debounce.hide();
 	if (!marked) {
 		if (depth)
-			return toast.warn(10, errmsg + 'failed to load marked.js')
+			return toast.warn(10, errmsg + (window.WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
 
 		wfp_debounce.n--;
 		return import_js(SR + '/.cpr/deps/marked.js', function () {

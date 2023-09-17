@@ -1,4 +1,4 @@
-all: $(addsuffix .br, $(wildcard prism* easymde*))
+all: $(addsuffix .br, $(wildcard easymde*))
 
 %.br: %
 	brotli -jZ $<

@@ -52,7 +52,7 @@ var img_load = (function () {
     var r = {};
     r.callbacks = [];
 
-    function fire() {
+    var fire = function () {
         for (var a = 0; a < r.callbacks.length; a++)
             r.callbacks[a]();
     }
@@ -472,7 +472,7 @@ img_load.callbacks = [toc.refresh];
 // scroll handler
 var redraw = (function () {
     var sbs = true;
-    function onresize() {
+    var onresize = function () {
         if (window.matchMedia)
             sbs = window.matchMedia('(min-width: 64em)').matches;
 
@@ -485,7 +485,7 @@ var redraw = (function () {
         onscroll();
     }
 
-    function onscroll() {
+    var onscroll = function () {
         toc.refresh();
     }
 
@@ -506,6 +506,12 @@ dom_navtgl.onclick = function () {
     swrite('hidenav', hidden ? 1 : 0);
     redraw();
 };
+
+if (!HTTPS)
+    ebi('edit2').onclick = function (e) {
+        toast.err(0, "the fancy editor is only available over https");
+        return ev(e);
+    }
 
 if (sread('hidenav') == 1)
     dom_navtgl.onclick();

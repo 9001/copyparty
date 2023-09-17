@@ -69,7 +69,7 @@ class BrokerMp(object):
 
         while procs:
             if procs[-1].is_alive():
-                time.sleep(0.1)
+                time.sleep(0.05)
                 continue
 
             procs.pop()

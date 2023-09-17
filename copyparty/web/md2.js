@@ -92,7 +92,7 @@ var action_stack = null;
 var nlines = 0;
 var draw_md = (function () {
     var delay = 1;
-    function draw_md() {
+    var draw_md = function () {
         var t0 = Date.now();
         var src = dom_src.value;
         convert_markdown(src, dom_pre);
@@ -135,7 +135,7 @@ img_load.callbacks = [function () {
 
 // resize handler
 redraw = (function () {
-    function onresize() {
+    var onresize = function () {
         var y = (dom_hbar.offsetTop + dom_hbar.offsetHeight) + 'px';
         dom_wrap.style.top = y;
         dom_swrap.style.top = y;
@@ -143,12 +143,12 @@ redraw = (function () {
         map_src = genmap(dom_ref, map_src);
         map_pre = genmap(dom_pre, map_pre);
     }
-    function setsbs() {
+    var setsbs = function () {
         dom_wrap.className = '';
         dom_swrap.className = '';
         onresize();
     }
-    function modetoggle() {
+    var modetoggle = function () {
         var mode = dom_nsbs.innerHTML;
         dom_nsbs.innerHTML = mode == 'editor' ? 'preview' : 'editor';
         mode += ' single';
@@ -172,7 +172,7 @@ redraw = (function () {
 (function () {
     var skip_src = false, skip_pre = false;
 
-    function scroll(src, srcmap, dst, dstmap) {
+    var scroll = function (src, srcmap, dst, dstmap) {
         var y = src.scrollTop;
         if (y < 8) {
             dst.scrollTop = 0;
@@ -900,12 +900,12 @@ var set_lno = (function () {
         pv = null,
         lno = ebi('lno');
 
-    function poke() {
+    var poke = function () {
         clearTimeout(t);
         t = setTimeout(fire, 20);
     }
 
-    function fire() {
+    var fire = function () {
         try {
             clearTimeout(t);
 
@@ -930,7 +930,7 @@ var set_lno = (function () {
 
 // hotkeys / toolbar
 (function () {
-    function keydown(ev) {
+    var keydown = function (ev) {
         ev = ev || window.event;
         var kc = ev.code || ev.keyCode || ev.which,
             editing = document.activeElement == dom_src;
@@ -1058,7 +1058,7 @@ action_stack = (function () {
     var ignore = false;
     var ref = dom_src.value;
 
-    function diff(from, to, cpos) {
+    var diff = function (from, to, cpos) {
         if (from === to)
             return null;
 
@@ -1089,14 +1089,14 @@ action_stack = (function () {
         };
     }
 
-    function undiff(from, change) {
+    var undiff = function (from, change) {
         return {
             txt: from.substring(0, change.car) + change.txt + from.substring(change.cdr),
             cpos: change.cpos
         };
     }
 
-    function apply(src, dst) {
+    var apply = function (src, dst) {
         dbg('undos(%d) redos(%d)', hist.un.length, hist.re.length);
 
         if (src.length === 0)
@@ -1120,7 +1120,7 @@ action_stack = (function () {
         return true;
     }
 
-    function schedule_push() {
+    var schedule_push = function () {
         if (ignore) {
             ignore = false;
             return;
@@ -1131,7 +1131,7 @@ action_stack = (function () {
         sched_timer = setTimeout(push, 500);
     }
 
-    function undo() {
+    var undo = function () {
         if (hist.re.length == 0) {
             clearTimeout(sched_timer);
             push();
@@ -1139,11 +1139,11 @@ action_stack = (function () {
         return apply(hist.un, hist.re);
     }
 
-    function redo() {
+    var redo = function () {
         return apply(hist.re, hist.un);
     }
 
-    function push() {
+    var push = function () {
         var newtxt = dom_src.value;
         var change = diff(ref, newtxt, sched_cpos);
         if (change !== null)

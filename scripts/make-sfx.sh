@@ -481,7 +481,7 @@ iawk '/^[^ ]/{s=0}/^def babel_extract/{s=1}!s' j2/jinja2/ext.py
 ised '/InternationalizationExtension/d' j2/jinja2/ext.py
 iawk '/^class/{s=0}/^class (Package|Dict|Function|Prefix|Choice|Module)Loader/{s=1}!s' j2/jinja2/loaders.py
 sed -ri '/^from .bccache | (Package|Dict|Function|Prefix|Choice|Module)Loader$/d' j2/jinja2/__init__.py
-rm -f j2/jinja2/async* j2/jinja2/bccache.py
+rm -f j2/jinja2/async* j2/jinja2/{bccache,sandbox}.py
 cat > j2/jinja2/_identifier.py <<'EOF'
 import re
 pattern = re.compile(r"\w+")

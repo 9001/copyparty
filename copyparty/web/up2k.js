@@ -588,7 +588,7 @@ function U2pvis(act, btns, uc, st) {
         btns[a].onclick = function (e) {
             ev(e);
             var newtab = this.getAttribute('act');
-            function go() {
+            var go = function () {
                 for (var b = 0; b < btns.length; b++) {
                     btns[b].className = (
                         btns[b].getAttribute('act') == newtab) ? 'act' : '';
@@ -1654,11 +1654,11 @@ function up2k_init(subtle) {
         var running = false,
             was_busy = false;
 
-        function defer() {
+        var defer = function () {
             running = false;
         }
 
-        function taskerd() {
+        var taskerd = function () {
             if (running)
                 return;
 
@@ -1956,7 +1956,7 @@ function up2k_init(subtle) {
             st.bytes.hashed += cdr - car;
             st.etac.h++;
 
-            function orz(e) {
+            var orz = function (e) {
                 bpend--;
                 segm_next();
                 hash_calc(nch, e.target.result);
@@ -2239,7 +2239,7 @@ function up2k_init(subtle) {
             st.todo.handshake.unshift(t);
             t.keepalive = keepalive;
         };
-        function orz(e) {
+        var orz = function (e) {
             if (t.t_busied != me) {
                 console.log('zombie handshake onload,', t.name, t);
                 return;
@@ -2523,7 +2523,7 @@ function up2k_init(subtle) {
         if (cdr >= t.size)
             cdr = t.size;
 
-        function orz(xhr) {
+        var orz = function (xhr) {
             var txt = ((xhr.response && xhr.response.err) || xhr.responseText) + '';
             if (txt.indexOf('upload blocked by x') + 1) {
                 apop(st.busy.upload, upt);
@@ -2552,7 +2552,7 @@ function up2k_init(subtle) {
             }
             orz2(xhr);
         }
-        function orz2(xhr) {
+        var orz2 = function (xhr) {
             apop(st.busy.upload, upt);
             apop(t.postlist, npart);
             if (!t.postlist.length) {

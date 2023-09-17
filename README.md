@@ -328,6 +328,12 @@ upgrade notes
 * can I make copyparty download a file to my server if I give it a URL?
   * yes, using [hooks](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
 
+* i want to learn python and/or programming and am considering looking at the copyparty source code in that occasion
+    ```bash
+     _|  _      __   _  _|_
+    (_| (_)     | | (_)  |_
+    ```
+
 
 # accounts and volumes
 
