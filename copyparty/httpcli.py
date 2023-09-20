@@ -283,7 +283,7 @@ class HttpCli(object):
 
         n = self.args.rproxy
         if n:
-            zso = self.headers.get("x-forwarded-for")
+            zso = self.headers.get(self.args.ip_hdr)
             if zso and self.conn.addr[0] in ["127.0.0.1", "::1"]:
                 if n > 0:
                     n -= 1

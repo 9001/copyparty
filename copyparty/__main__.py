@@ -826,7 +826,8 @@ def add_network(ap):
     ap2.add_argument("-i", metavar="IP", type=u, default="::", help="ip to bind (comma-sep.), default: all IPv4 and IPv6")
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range)")
     ap2.add_argument("--ll", action="store_true", help="include link-local IPv4/IPv6 even if the NIC has routable IPs (breaks some mdns clients)")
-    ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to keep; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd), [\033[32m2\033[0m]=cloudflare, [\033[32m3\033[0m]=nginx, [\033[32m-1\033[0m]=closest proxy")
+    ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to keep; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd, unsafe), [\033[32m2\033[0m]=outermost-proxy, [\033[32m3\033[0m]=second-proxy, [\033[32m-1\033[0m]=closest-proxy")
+    ap2.add_argument("--ip-hdr", metavar="NAME", type=u, default="x-forwarded-for", help="if reverse-proxied, which http header to read the client's real ip from (argument must be lowercase, but not the actual header)")
     ap2.add_argument("--rp-loc", metavar="PATH", type=u, default="", help="if reverse-proxying on a location instead of a dedicated domain/subdomain, provide the base location here (eg. /foo/bar)")
     if ANYWIN:
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
