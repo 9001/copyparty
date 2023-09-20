@@ -875,7 +875,7 @@ window.baguetteBox = (function () {
 
         if (loopB !== null) {
             timer.add(loopchk);
-            sethash(window.location.hash.slice(1).split('&')[0] + '&t=' + (loopA || 0) + '-' + loopB);
+            sethash(location.hash.slice(1).split('&')[0] + '&t=' + (loopA || 0) + '-' + loopB);
         }
     }
 

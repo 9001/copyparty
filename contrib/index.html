@@ -26,8 +26,8 @@ a {
 	<script>
 
 var a = document.getElementById('redir'),
-	proto = window.location.protocol.indexOf('https') === 0 ? 'https' : 'http',
-	loc = window.location.hostname || '127.0.0.1',
+	proto = location.protocol.indexOf('https') === 0 ? 'https' : 'http',
+	loc = location.hostname || '127.0.0.1',
 	port = a.getAttribute('href').split(':').pop().split('/')[0],
 	url = proto + '://' + loc + ':' + port + '/';
 
@@ -35,7 +35,7 @@ a.setAttribute('href', url);
 document.getElementById('desc').innerHTML = 'redirecting to';
 
 setTimeout(function() {
-	window.location.href = url;
+	location.href = url;
 }, 500);
 
 </script>

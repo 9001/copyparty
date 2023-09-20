@@ -42,7 +42,7 @@
 	{%- if redir %}
 	<script>
 		setTimeout(function() {
-			window.location.replace("{{ redir }}");
+			location.replace("{{ redir }}");
 		}, 1000);
 	</script>
 	{%- endif %}

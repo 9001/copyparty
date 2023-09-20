@@ -3915,9 +3915,9 @@ var showfile = (function () {
 	window.Prism = { 'manual': true };
 	var em = QS('#bdoc>pre');
 	if (em)
-		em = [r.sname(window.location.search), location.hash, em.textContent];
+		em = [r.sname(location.search), location.hash, em.textContent];
 	else {
-		var m = /[?&]doc=([^&]+)/.exec(window.location.search);
+		var m = /[?&]doc=([^&]+)/.exec(location.search);
 		if (m) {
 			setTimeout(function () {
 				r.show(uricom_dec(m[1]), true);
@@ -3937,7 +3937,7 @@ var showfile = (function () {
 	};
 
 	r.active = function () {
-		return document.location.search.indexOf('doc=') + 1;
+		return location.search.indexOf('doc=') + 1;
 	};
 
 	r.getlang = function (fn) {
@@ -5702,7 +5702,7 @@ var treectl = (function () {
 		}
 		var href = this.getAttribute('href');
 		if (R && !href.startsWith(SR)) {
-			window.location = href;
+			location = href;
 			return;
 		}
 		r.reqls(href, true);
@@ -5758,7 +5758,7 @@ var treectl = (function () {
 			var res = JSON.parse(this.responseText);
 		}
 		catch (ex) {
-			window.location = this.top;
+			location = this.top;
 			return;
 		}
 
@@ -5818,7 +5818,7 @@ var treectl = (function () {
 
 		for (var a = 0; a < res.files.length; a++)
 			if (/^index.html?(\?|$)/i.exec(res.files[a].href)) {
-				window.location = vjoin(top, res.files[a].href);
+				location = vjoin(top, res.files[a].href);
 				return true;
 			}
 	};

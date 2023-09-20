@@ -507,11 +507,12 @@ dom_navtgl.onclick = function () {
     redraw();
 };
 
-if (!HTTPS)
+if (!HTTPS && location.hostname != '127.0.0.1') try {
     ebi('edit2').onclick = function (e) {
         toast.err(0, "the fancy editor is only available over https");
         return ev(e);
     }
+} catch (ex) { }
 
 if (sread('hidenav') == 1)
     dom_navtgl.onclick();

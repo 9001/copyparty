@@ -807,7 +807,7 @@ function up2k_init(subtle) {
     function init_deps() {
         if (!loading_deps && !got_deps()) {
             var fn = 'sha512.' + sha_js + '.js',
-                m = L.u_https1 + ' <a href="' + (window.location + '').replace(':', 's:') + '">' + L.u_https2 + '</a> ' + L.u_https3;
+                m = L.u_https1 + ' <a href="' + (location + '').replace(':', 's:') + '">' + L.u_https2 + '</a> ' + L.u_https3;
 
             showmodal('<h1>loading ' + fn + '</h1>');
             import_js(SR + '/.cpr/deps/' + fn, unmodal);
@@ -1588,7 +1588,7 @@ function up2k_init(subtle) {
             return;
 
         st.oserr = true;
-        var msg = HTTPS ? L.u_emtleak3 : L.u_emtleak2.format((window.location + '').replace(':', 's:'));
+        var msg = HTTPS ? L.u_emtleak3 : L.u_emtleak2.format((location + '').replace(':', 's:'));
         modal.alert(L.u_emtleak1 + msg + (CHROME ? L.u_emtleakc : FIREFOX ? L.u_emtleakf : ''));
     }
 
