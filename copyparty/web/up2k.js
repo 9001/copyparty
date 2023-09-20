@@ -2160,6 +2160,9 @@ function up2k_init(subtle) {
 
     function exec_head() {
         var t = st.todo.head.shift();
+        if (t.done)
+            return console.log('done; skip head1', t.name, t);
+
         st.busy.head.push(t);
 
         var xhr = new XMLHttpRequest();
@@ -2172,6 +2175,9 @@ function up2k_init(subtle) {
             st.todo.head.unshift(t);
         };
         function orz(e) {
+            if (t.done)
+                return console.log('done; skip head2', t.name, t);
+
             var ok = false;
             if (xhr.status == 200) {
                 var srv_sz = xhr.getResponseHeader('Content-Length'),
@@ -2218,6 +2224,9 @@ function up2k_init(subtle) {
             keepalive = t.keepalive,
             me = Date.now();
 
+        if (t.done)
+            return console.log('done; skip hs', t.name, t);
+
         st.busy.handshake.push(t);
         t.keepalive = undefined;
         t.t_busied = me;
@@ -2227,10 +2236,9 @@ function up2k_init(subtle) {
 
         var xhr = new XMLHttpRequest();
         xhr.onerror = function () {
-            if (t.t_busied != me) {
-                console.log('zombie handshake onerror,', t.name, t);
-                return;
-            }
+            if (t.t_busied != me)  // t.done ok
+                return console.log('zombie handshake onerror', t.name, t);
+
             if (!toast.visible)
                 toast.warn(9.98, L.u_eneths + "\n\nfile: " + t.name, t);
 
@@ -2240,10 +2248,9 @@ function up2k_init(subtle) {
             t.keepalive = keepalive;
         };
         var orz = function (e) {
-            if (t.t_busied != me) {
-                console.log('zombie handshake onload,', t.name, t);
-                return;
-            }
+            if (t.t_busied != me || t.done)
+                return console.log('zombie handshake onload', t.name, t);
+
             if (xhr.status == 200) {
                 t.t_handshake = Date.now();
                 if (keepalive) {
@@ -2503,13 +2510,16 @@ function up2k_init(subtle) {
     }
 
     function exec_upload() {
-        var upt = st.todo.upload.shift();
+        var upt = st.todo.upload.shift(),
+            t = st.files[upt.nfile],
+            npart = upt.npart,
+            tries = 0;
+
+        if (t.done)
+            return console.log('done; skip chunk', t.name, t);
+
         st.busy.upload.push(upt);
         st.nfile.upload = upt.nfile;
-
-        var npart = upt.npart,
-            t = st.files[upt.nfile],
-            tries = 0;
 
         if (!t.t_uploading)
             t.t_uploading = Date.now();
