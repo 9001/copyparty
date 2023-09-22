@@ -198,6 +198,10 @@ class SvcHub(object):
         self.log("root", "max clients: {}".format(self.args.nc))
 
         self.tcpsrv = TcpSrv(self)
+
+        if not self.tcpsrv.srv and self.args.ign_ebind_all:
+            self.args.no_fastboot = True
+
         self.up2k = Up2k(self)
 
         decs = {k: 1 for k in self.args.th_dec.split(",")}
@@ -350,6 +354,9 @@ class SvcHub(object):
         else:
             self.log("root", "workers OK\n")
 
+        self.after_httpsrv_up()
+
+    def after_httpsrv_up(self) -> None:
         self.up2k.init_vols()
 
         Daemon(self.sd_notify, "sd-notify")
