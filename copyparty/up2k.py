@@ -952,6 +952,11 @@ class Up2k(object):
             rtop = absreal(top)
             n_add = n_rm = 0
             try:
+                if not bos.listdir(rtop):
+                    t = "volume /%s at [%s] is empty; will not be indexed as this could be due to an offline filesystem"
+                    self.log(t % (vol.vpath, rtop), 6)
+                    return True, False
+
                 n_add = self._build_dir(
                     db,
                     top,
