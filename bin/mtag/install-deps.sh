@@ -250,8 +250,9 @@ install_vamp() {
 		rm -- *.tar.gz
 		cd beatroot-vamp-v1.0
 		[ -e ~/pe/vamp-sdk ] &&
-			sed -ri 's`^(CFLAGS :=.*)`\1 -I'$HOME'/pe/vamp-sdk/include`' Makefile.linux
-		make -f Makefile.linux -j4 LDFLAGS=-L$HOME/pe/vamp-sdk/lib
+			sed -ri 's`^(CFLAGS :=.*)`\1 -I'$HOME'/pe/vamp-sdk/include`' Makefile.linux ||
+			sed -ri 's`^(CFLAGS :=.*)`\1 -I/usr/include/vamp-sdk`' Makefile.linux
+		make -f Makefile.linux -j4 LDFLAGS="-L$HOME/pe/vamp-sdk/lib -L/usr/lib64"
 		# /home/ed/vamp /home/ed/.vamp /usr/local/lib/vamp
 		mkdir ~/vamp
 		cp -pv beatroot-vamp.* ~/vamp/

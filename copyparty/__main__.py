@@ -1200,7 +1200,10 @@ def run_argparse(
     fk_salt = get_fk_salt(cert_path)
     ah_salt = get_ah_salt()
 
-    hcores = min(CORES, 4)  # optimal on py3.11 @ r5-4500U
+    # alpine peaks at 5 threads for some reason,
+    # all others scale past that (but try to avoid SMT),
+    # 5 should be plenty anyways (3 GiB/s on most machines)
+    hcores = min(CORES, 5 if CORES > 8 else 4)
 
     tty = os.environ.get("TERM", "").lower() == "linux"
 
