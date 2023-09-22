@@ -283,22 +283,35 @@ class HttpCli(object):
 
         n = self.args.rproxy
         if n:
-            zso = self.headers.get(self.args.ip_hdr)
-            if zso and self.conn.addr[0] in ["127.0.0.1", "::1"]:
+            zso = self.headers.get(self.args.xff_hdr)
+            if zso:
                 if n > 0:
                     n -= 1
 
                 zsl = zso.split(",")
                 try:
-                    self.ip = zsl[n].strip()
+                    cli_ip = zsl[n].strip()
                 except:
-                    self.ip = zsl[0].strip()
+                    cli_ip = zsl[0].strip()
                     t = "rproxy={} oob x-fwd {}"
                     self.log(t.format(self.args.rproxy, zso), c=3)
 
-                self.log_src = self.conn.set_rproxy(self.ip)
-                self.is_vproxied = bool(self.args.R)
-                self.host = self.headers.get("x-forwarded-host") or self.host
+                pip = self.conn.addr[0]
+                if self.args.xff_re and not self.args.xff_re.match(pip):
+                    t = 'got header "%s" from untrusted source "%s" claiming the true client ip is "%s" (raw value: "%s");  if you trust this, you must allowlist this proxy with "--xff-src=%s"'
+                    if self.headers.get("cf-connecting-ip"):
+                        t += "  Alternatively, if you are behind cloudflare, it is better to specify these two instead:  --xff-hdr=cf-connecting-ip  --xff-src=any"
+                    zs = (
+                        ".".join(pip.split(".")[:2]) + "."
+                        if "." in pip
+                        else ":".join(pip.split(":")[:4]) + ":"
+                    )
+                    self.log(t % (self.args.xff_hdr, pip, cli_ip, zso, zs), 3)
+                else:
+                    self.ip = cli_ip
+                    self.is_vproxied = bool(self.args.R)
+                    self.log_src = self.conn.set_rproxy(self.ip)
+                    self.host = self.headers.get("x-forwarded-host") or self.host
 
         if self.is_banned():
             return False

@@ -420,6 +420,12 @@ class SvcHub(object):
         elif al.ban_url == "no":
             al.sus_urls = None
 
+        if al.xff_src in ("any", "0", ""):
+            al.xff_re = None
+        else:
+            zs = al.xff_src.replace(" ", "").replace(".", "\\.").replace(",", "|")
+            al.xff_re = re.compile("^(?:" + zs + ")")
+
         return True
 
     def _setlimits(self) -> None:
