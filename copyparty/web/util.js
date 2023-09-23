@@ -1712,7 +1712,7 @@ function load_md_plug(md_text, plug_type, defer) {
         return md_text;
 
     var find = '\n```copyparty_' + plug_type + '\n',
-        md = md_text.replace(/\r/g, ''),
+        md = '\n' + md_text.replace(/\r/g, '') + '\n',
         ofs = md.indexOf(find),
         ofs2 = md.indexOf('\n```', ofs + 1);
 

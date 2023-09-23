@@ -3634,7 +3634,7 @@ var fileman = (function () {
 
 			if (!f.length) {
 				toast.ok(2, 'rename OK');
-				treectl.goto(get_evpath());
+				treectl.goto();
 				return rn_cancel();
 			}
 
@@ -3681,7 +3681,7 @@ var fileman = (function () {
 				if (err !== 'xbd')
 					toast.ok(2, L.fd_ok);
 
-				treectl.goto(get_evpath());
+				treectl.goto();
 				return;
 			}
 			toast.show('inf r', 0, esc(L.fd_busy.format(vps.length + 1, vp)), 'r');
@@ -3799,7 +3799,7 @@ var fileman = (function () {
 
 			if (!vp) {
 				toast.ok(2, L.fp_ok);
-				treectl.goto(get_evpath());
+				treectl.goto();
 				r.tx(srcdir);
 				return;
 			}
@@ -5283,6 +5283,7 @@ onresize100.add(filecolwidth, true);
 var treectl = (function () {
 	var r = {
 		"hidden": true,
+		"sb_msg": false,
 		"ls_cb": null,
 		"dir_cb": tree_scrollto,
 		"pdir": []
@@ -5299,7 +5300,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'csel', 'csel', false);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
-		r.goto(get_evpath());
+		r.goto();
 		var xhr = new XHR();
 		xhr.open('GET', SR + '/?setck=dots=' + (v ? 'y' : ''), true);
 		xhr.send();
@@ -5524,6 +5525,9 @@ var treectl = (function () {
 	};
 
 	r.goto = function (url, push, back) {
+		if (!url || !url.startsWith('/'))
+			url = get_evpath() + (url || '');
+
 		get_tree("", url, true);
 		r.reqls(url, push, back);
 	};
@@ -5721,6 +5725,7 @@ var treectl = (function () {
 		xhr.send();
 
 		r.nvis = r.lim;
+		r.sb_msg = false;
 		r.nextdir = xhr.top;
 		enspin('#tree');
 		enspin(thegrid.en ? '#gfiles' : '#files');
@@ -5747,7 +5752,9 @@ var treectl = (function () {
 			return;
 
 		r.nextdir = null;
-		var cur = ebi('files').getAttribute('ts');
+		var cdir = get_evpath(),
+			cur = ebi('files').getAttribute('ts');
+
 		if (cur && parseInt(cur) > this.ts) {
 			console.log("reject ls");
 			return;
@@ -5791,12 +5798,19 @@ var treectl = (function () {
 		despin('#files');
 		despin('#gfiles');
 
-		sandbox(ebi('pro'), sb_lg, '', res.logues ? res.logues[0] || "" : "");
-		sandbox(ebi('epi'), sb_lg, '', res.logues ? res.logues[1] || "" : "");
+		var lg0 = res.logues ? res.logues[0] || "" : "",
+			lg1 = res.logues ? res.logues[1] || "" : "",
+			dirchg = get_evpath() != cdir;
+
+		sandbox(ebi('pro'), sb_lg, '', lg0);
+		if (dirchg)
+			sandbox(ebi('epi'), sb_lg, '', lg1);
 
 		clmod(ebi('epi'), 'mdo');
-		if (res.readme)
+		if (res.readme && treectl.ireadme)
 			show_readme(res.readme);
+		else if (!dirchg)
+			sandbox(ebi('epi'), sb_lg, '', lg1);
 
 		if (this.hpush && !this.back) {
 			var ofs = ebi('wrap').offsetTop;
@@ -7057,7 +7071,7 @@ var msel = (function () {
 		clmod(sf, 'vis');
 		sf.textContent = 'sent: "' + this.msg + '"';
 		setTimeout(function () {
-			treectl.goto(get_evpath());
+			treectl.goto();
 		}, 100);
 	}
 })();
@@ -7259,6 +7273,7 @@ function sandbox(tgt, rules, cls, html) {
 		'};f();' +
 		'window.onfocus=function(){say("igot #' + tid + '")};' +
 		'window.onblur=function(){say("ilost #' + tid + '")};' +
+		'window.treectl={"goto":function(a){say("goto #' + tid + ' "+(a||""))}};' +
 		'var el="' + want + '"&&ebi("' + want + '");' +
 		'if(el)say("iscroll #' + tid + ' "+el.offsetTop);' +
 		'md_th_set();' +
@@ -7272,16 +7287,24 @@ function sandbox(tgt, rules, cls, html) {
 	fr.setAttribute('title', 'folder ' + tid + 'logue');
 	fr.setAttribute('sandbox', rules ? 'allow-' + rules.replace(/ /g, ' allow-') : '');
 	fr.setAttribute('srcdoc', html);
-	tgt.innerHTML = '';
 	tgt.appendChild(fr);
+	treectl.sb_msg = true;
 	return true;
 }
 window.addEventListener("message", function (e) {
+	if (!treectl.sb_msg)
+		return;
+
 	try {
 		console.log('msg:' + e.data);
 		var t = e.data.split(/ /g);
 		if (t[0] == 'iheight') {
-			var el = QS(t[1] + '>iframe');
+			var el = QSA(t[1] + '>iframe');
+			el = el[el.length - 1];
+			if (wfp_debounce.n)
+				while (el.previousSibling)
+					el.parentNode.removeChild(el.previousSibling);
+
 			el.style.height = (parseInt(t[2]) + SBH) + 'px';
 			el.style.visibility = 'unset';
 			wfp_debounce.show();
@@ -7297,6 +7320,10 @@ window.addEventListener("message", function (e) {
 		}
 		else if (t[0] == 'imshow') {
 			thegrid.imshow(e.data.slice(7));
+		}
+		else if (t[0] == 'goto') {
+			var t = e.data.replace(/^[^ ]+ [^ ]+ /, '').split(/[?&]/)[0];
+			treectl.goto(t, !!t);
 		}
 	} catch (ex) {
 		console.log('msg-err: ' + ex);
