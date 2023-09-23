@@ -24,7 +24,7 @@ fns=(
 )
 [ $w10 ] && fns+=(
   mutagen-1.47.0-py3-none-any.whl
-  Pillow-9.4.0-cp311-cp311-win_amd64.whl
+  Pillow-10.0.1-cp311-cp311-win_amd64.whl
   python-3.11.3-amd64.exe
 }
 [ $w7 ] && fns+=(

@@ -1,4 +1,30 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0909-1336  `v1.9.5`  webhotell
+
+[happy 9/9!](https://safebooru.org/index.php?page=post&s=view&id=4027419)
+
+## new features
+* new permission `h` disables directory listing (so works like `g`) except it redirects to the folder's index.html instead of 404
+  * index.html is accessible by anyone with `h` even if filekeys are enabled
+  * well suited for running a shared-webhosting gig (thx kipu) especially now that the...
+* markdown editor can now be used on non-markdown files if account has `w`rite and `d`elete
+  * hotkey `e` to edit a textfile while it's open in the textfile viewer
+* SMB: account permissions now work fully as intended, thanks to impacket 0.11
+  * but enabling `--smb` is still strongly discouraged as it's a massive security hazard
+* download-as-zip can be 2.5x faster on tiny files, at least 15% faster in general
+* download folders as pax-format tarfiles with `?tar=pax` or `?tar=pax,xz:9`
+
+## bugfixes
+* 422-autoban accidentally triggered when uploading lots of duplicate files (thx hiem!)
+* `--css-browser` and `--js-browser` now accepts URLs with cache directives
+  * `--css-browser=/the.css?cache=600` (seconds) or `--js-browser=/.res/the.js?cache=i` (7 days)
+* SMB: avoid windows freaking out and disconnecting if it hits an offline volume
+* hotkey shift-r to rotate pictures counter-clockwise didn't do anything
+* hacker theme wasn't hacker enough (everything is monospace now)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0902-0018  `v1.9.4`  yes symlink times
 
 hello! it's been a while, an entire day even...
