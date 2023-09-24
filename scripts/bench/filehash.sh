@@ -21,7 +21,7 @@ set -euo pipefail
 sfx="$1"
 shift
 sfx="$(realpath "$sfx" || readlink -e "$sfx" || echo "$sfx")"
-awk=$(which gawk || which awk)
+awk=$(command -v gawk || command -v awk)
 
 # try to use /dev/shm to avoid hitting filesystems at all,
 # otherwise fallback to mktemp which probably uses /tmp
@@ -65,3 +65,4 @@ echo deleting $td and exiting
 
 # notes,
 # podman run --rm -it --shm-size 512m --entrypoint /bin/ash localhost/copyparty-min
+# podman <filehash.sh run --rm -i --shm-size 512m --entrypoint /bin/ash localhost/copyparty-min -s - /z/copyparty-sfx.py

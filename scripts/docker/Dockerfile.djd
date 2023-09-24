@@ -1,0 +1,78 @@
+FROM    debian:12-slim
+WORKDIR /z
+LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.licenses="MIT" \
+        org.opencontainers.image.title="copyparty-djd" \
+        org.opencontainers.image.description="copyparty with all optional dependencies, including musical key / bpm detection, and higher performance than the other editions"
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
+        XDG_CONFIG_HOME=/cfg
+
+COPY    i/bin/mtag/install-deps.sh ./
+COPY    i/bin/mtag/audio-bpm.py /mtag/
+COPY    i/bin/mtag/audio-key.py /mtag/
+
+# Suites: bookworm bookworm-updates
+# Components: main
+RUN     sed -ri 's/( main)$/\1 contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources \
+        && apt update \
+        && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+            wget \
+            python3-argon2 python3-pillow python3-pip \
+            ffmpeg libvips42 vamp-plugin-sdk \
+            python3-numpy libfftw3-double3 libsndfile1 \
+            gcc g++ make cmake patchelf jq \
+            libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev \
+            libfftw3-dev python3-dev libsndfile1-dev python3-pip \
+            patchelf cmake \
+        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
+        && python3 -m pip install --user pyvips \
+        && bash install-deps.sh \
+        && DEBIAN_FRONTEND=noninteractive apt purge -y \
+            gcc g++ make cmake patchelf jq \
+            libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev \
+            libfftw3-dev python3-dev libsndfile1-dev python3-pip \
+            patchelf cmake \
+        && DEBIAN_FRONTEND=noninteractive apt-get autoremove -y \
+        && dpkg -r --force-depends libraqm0 libgdbm-compat4 libgdbm6 libperl5.36 perl-modules-5.36 mailcap mime-support \
+        && DEBIAN_FRONTEND=noninteractive apt-get clean -y \
+        && find /usr/ -name __pycache__ | xargs rm -rf \
+        && find /usr/ -type d -name tests | grep packages/numpy | xargs rm -rf \
+        && rm -rf \
+            /var/lib/apt/lists/* \
+            /tmp/pyc \
+            /usr/lib/python*/dist-packages/pip \
+            /usr/lib/python*/dist-packages/setuptools \
+            /usr/lib/*/dri \
+            /usr/lib/*/mfx \
+            /usr/share/doc \
+            /usr/share/X11 \
+            /usr/share/fonts \
+            /usr/share/libmysofa \
+            /usr/share/libthai \
+            /usr/share/alsa \
+            /usr/share/bash-completion \
+        && chmod 777 /root \
+        && ln -s /root/vamp /root/.local / \
+        && mkdir /cfg /w \
+        && chmod 777 /cfg /w \
+        && echo % /cfg > initcfg
+
+COPY    i/dist/copyparty-sfx.py ./
+WORKDIR /w
+EXPOSE  3923
+ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "--no-crt", "-c", "/z/initcfg"]
+
+# size: 598 MB
+# bpm/key: 485 sec
+# idx-bench: 2751 MB/s
+
+# notes:
+# libraqm0 (pillow dep) pulls in the other packages mentioned on the dpkg line; saves 50m
+
+# advantage: official packages only
+# advantage: ffmpeg with gme, codec2, radiance-hdr
+# drawback: ffmpeg bloat; dc1394, flite, mfx, xorg
+# drawback: python packaging is a bit jank
+# drawback: they apply exciting patches due to old deps
+# drawback: dropping perl the hard way might cause issues

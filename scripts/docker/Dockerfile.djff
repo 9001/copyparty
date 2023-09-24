@@ -1,0 +1,61 @@
+FROM    fedora:38
+WORKDIR /z
+LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.licenses="MIT" \
+        org.opencontainers.image.title="copyparty-djff" \
+        org.opencontainers.image.description="copyparty with all optional dependencies, including musical key / bpm detection, and higher performance than the other editions"
+ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
+        XDG_CONFIG_HOME=/cfg
+
+COPY    i/bin/mtag/install-deps.sh ./
+COPY    i/bin/mtag/audio-bpm.py /mtag/
+COPY    i/bin/mtag/audio-key.py /mtag/
+RUN     dnf install -y --setopt=install_weak_deps=False \
+            wget \
+            python3-argon2-cffi python3-pillow python3-pip python3-cffi \
+            ffmpeg-free \
+            vips vips-jxl vips-poppler vips-magick \
+            python3-numpy fftw libsndfile \
+            gcc gcc-c++ make cmake patchelf jq \
+            python3-devel ffmpeg-free-devel fftw-devel libsndfile-devel python3-setuptools \
+            vamp-plugin-sdk qm-vamp-plugins \
+            vamp-plugin-sdk-devel vamp-plugin-sdk-static \
+        && python3 -m pip install --user pyvips \
+        && bash install-deps.sh \
+        && dnf erase -y \
+            gcc gcc-c++ make cmake patchelf jq \
+            python3-devel ffmpeg-free-devel fftw-devel libsndfile-devel python3-setuptools \
+            vamp-plugin-sdk-devel vamp-plugin-sdk-static \
+        && dnf clean all \
+        && find /usr/ -name __pycache__ | xargs rm -rf \
+        && find /usr/ -type d -name tests | grep packages/numpy | xargs rm -rf \
+        && rm -rf \
+            /usr/share/adobe \
+            /usr/share/fonts \
+            /usr/share/graphviz \
+            /usr/share/poppler/cMap \
+            /usr/share/licenses \
+            /usr/share/ghostscript \
+            /usr/share/tesseract \
+            /usr/share/X11 \
+            /usr/share/hwdata \
+            /usr/share/python-wheels \
+            /usr/bin/cyrusbdb2current \
+        && rm -rf /tmp/pyc \
+        && chmod 777 /root \
+        && ln -s /root/vamp /root/.local / \
+        && mkdir /cfg /w \
+        && chmod 777 /cfg /w \
+        && echo % /cfg > initcfg
+
+COPY    i/dist/copyparty-sfx.py ./
+WORKDIR /w
+EXPOSE  3923
+ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "--no-crt", "-c", "/z/initcfg"]
+
+# size: 673 MB
+# bpm/key: 408 sec
+# idx-bench: 2744 MB/s
+
+# drawback: less ffmpeg features we want, more features we don't (compared to rpmfusion)

@@ -37,3 +37,7 @@ COPY    i/dist/copyparty-sfx.py ./
 WORKDIR /w
 EXPOSE  3923
 ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "--no-crt", "-c", "/z/initcfg"]
+
+# size: 286 MB
+# bpm/key: 529 sec
+# idx-bench: 2352 MB/s
