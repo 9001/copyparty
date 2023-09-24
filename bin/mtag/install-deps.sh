@@ -7,6 +7,7 @@ set -e
 # linux/alpine: requires gcc g++ make cmake patchelf {python3,ffmpeg,fftw,libsndfile}-dev py3-{wheel,pip} py3-numpy{,-dev}
 # linux/debian: requires libav{codec,device,filter,format,resample,util}-dev {libfftw3,python3,libsndfile1}-dev python3-{numpy,pip} vamp-{plugin-sdk,examples} patchelf cmake
 # linux/fedora: requires gcc gcc-c++ make cmake patchelf {python3,ffmpeg,fftw,libsndfile}-devel python3-numpy vamp-plugin-sdk qm-vamp-plugins
+# linux/arch:   requires gcc make cmake patchelf python3 ffmpeg fftw libsndfile python-{numpy,wheel,pip,setuptools}
 # win64: requires msys2-mingw64 environment
 # macos: requires macports
 #
@@ -227,15 +228,16 @@ install_vamp() {
 	cd "$td"
 	echo '#include <vamp-sdk/Plugin.h>' | g++ -x c++ -c -o /dev/null - || [ -e ~/pe/vamp-sdk ] || {
 		printf '\033[33mcould not find the vamp-sdk, building from source\033[0m\n'
-		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/2588/vamp-plugin-sdk-2.9.0.tar.gz)
+		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/2691/vamp-plugin-sdk-2.10.0.tar.gz)
 		sha512sum -c <(
-			echo "7ef7f837d19a08048b059e0da408373a7964ced452b290fae40b85d6d70ca9000bcfb3302cd0b4dc76cf2a848528456f78c1ce1ee0c402228d812bd347b6983b  -"
-		) <vamp-plugin-sdk-2.9.0.tar.gz
-		tar -xf vamp-plugin-sdk-2.9.0.tar.gz
+			echo "153b7f2fa01b77c65ad393ca0689742d66421017fd5931d216caa0fcf6909355fff74706fabbc062a3a04588a619c9b515a1dae00f21a57afd97902a355c48ed  -"
+		) <vamp-plugin-sdk-2.10.0.tar.gz
+		tar -xf vamp-plugin-sdk-2.10.0.tar.gz
 		rm -- *.tar.gz
 		ls -al
 		cd vamp-plugin-sdk-*
-		./configure --prefix=$HOME/pe/vamp-sdk
+		printf '%s\n' "int main(int argc, char **argv) { return 0; }" > host/vamp-simple-host.cpp
+		./configure --disable-programs --prefix=$HOME/pe/vamp-sdk
 		make -j1 install
 	}
 
