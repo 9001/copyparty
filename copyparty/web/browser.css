@@ -728,6 +728,11 @@ a:hover {
 html.y #files thead th {
 	box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
+html #files.hhpick thead th {
+	color: #f7d;
+	background: #000;
+	box-shadow: .1em .2em 0 #f6c inset, -.1em -.1em 0 #f6c inset;
+}
 #files td {
 	margin: 0;
 	padding: .3em .5em;
@@ -2112,12 +2117,12 @@ html.y #bbox-overlay figcaption a {
 }
 .bbox-btn,
 #bbox-btns {
-    opacity: 1;
+	opacity: 1;
 	animation: opacity .2s infinite ease-in-out;
 }
 .bbox-btn.off,
 #bbox-btns.off {
-    opacity: 0;
+	opacity: 0;
 }
 #bbox-overlay button {
 	cursor: pointer;
@@ -2387,7 +2392,7 @@ html.y #bbox-overlay figcaption a {
 	display: block;
 }
 #u2bm sup {
-    font-weight: bold;
+	font-weight: bold;
 }
 #u2notbtn {
 	display: none;
@@ -2991,13 +2996,13 @@ html.b .btn {
 	top: -.1em;
 }
 html.b #op_up2k.srch sup {
-    color: #fc0;
+	color: #fc0;
 }
 html.by #u2btn sup {
-    color: #06b;
+	color: #06b;
 }
 html.by #op_up2k.srch sup {
-    color: #b70;
+	color: #b70;
 }
 html.bz #u2cards a.act {
 	box-shadow: 0 -.1em .2em var(--bg-d2);

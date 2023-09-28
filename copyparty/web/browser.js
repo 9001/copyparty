@@ -187,7 +187,7 @@ var Ls = {
 		"cl_hiddenc": "hidden columns",
 		"cl_hidec": "hide",
 		"cl_reset": "reset",
-		"cl_hpick": "click one column header to hide in the table below",
+		"cl_hpick": "tap on column headers to hide in the table below",
 		"cl_hcancel": "column hiding aborted",
 
 		"ct_thumb": "in grid-view, toggle icons or thumbnails$NHotkey: T",
@@ -656,7 +656,7 @@ var Ls = {
 		"cl_hiddenc": "skjulte kolonner",
 		"cl_hidec": "skjul",
 		"cl_reset": "nullstill",
-		"cl_hpick": "klikk overskriften til kolonnen du ønsker å skjule i tabellen nedenfor",
+		"cl_hpick": "klikk på overskriften til kolonnene du ønsker å skjule i tabellen nedenfor",
 		"cl_hcancel": "kolonne-skjuling avbrutt",
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
@@ -6445,9 +6445,9 @@ var filecols = (function () {
 		ebi('hcolsh').onclick = function (e) {
 			ev(e);
 			if (r.picking)
-				return r.unpick(false);
+				return r.unpick();
 
-			var lbs = QSA('#files>thead th>span');
+			var lbs = QSA('#files>thead th');
 			for (var a = 0; a < lbs.length; a++) {
 				lbs[a].onclick = function (e) {
 					ev(e);
@@ -6455,19 +6455,20 @@ var filecols = (function () {
 						toast.hide();
 
 					r.hide(e.target.textContent);
-					r.unpick(true);
 				};
 			};
 			r.picking = true;
+			clmod(ebi('files'), 'hhpick', 1);
 			toast.inf(0, L.cl_hpick, 'pickhide');
 		};
 
-	r.unpick = function (picked) {
+	r.unpick = function () {
 		r.picking = false;
-		if (!picked)
-			toast.inf(5, L.cl_hcancel);
+		toast.inf(5, L.cl_hcancel);
 
-		var lbs = QSA('#files>thead th>span');
+		clmod(ebi('files'), 'hhpick');
+
+		var lbs = QSA('#files>thead th');
 		for (var a = 0; a < lbs.length; a++)
 			lbs[a].onclick = null;
 	};
