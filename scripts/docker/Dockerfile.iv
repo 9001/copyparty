@@ -16,6 +16,7 @@ RUN     apk add -U !pyc \
         && apk add -t .bd \
             bash wget gcc g++ make cmake patchelf \
             python3-dev py3-wheel \
+        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && python3 -m pip install pyvips \
         && apk del py3-pip .bd \
         && rm -rf /var/cache/apk/* /tmp/pyc \

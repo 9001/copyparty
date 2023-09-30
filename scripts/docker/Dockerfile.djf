@@ -24,6 +24,7 @@ RUN     dnf install -y \
             python3-devel ffmpeg-devel fftw-devel libsndfile-devel python3-setuptools \
             vamp-plugin-sdk qm-vamp-plugins \
             vamp-plugin-sdk-devel vamp-plugin-sdk-static \
+        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && python3 -m pip install --user pyvips \
         && bash install-deps.sh \
         && dnf erase -y \

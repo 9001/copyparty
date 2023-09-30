@@ -23,6 +23,7 @@ RUN     apk add -U !pyc \
             python3-dev ffmpeg-dev fftw-dev libsndfile-dev \
             py3-wheel py3-numpy-dev \
             vamp-sdk-dev \
+        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && python3 -m pip install pyvips \
         && bash install-deps.sh \
         && apk del py3-pip .bd \

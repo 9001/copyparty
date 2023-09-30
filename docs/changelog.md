@@ -1,4 +1,28 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0923-1215  `v1.9.6`  configurable x-forwarded-for
+
+## new features
+* rudimentary support for jython and graalpy, and directory tree sidebar in internet explorer 9 through 11, and firefox 10
+  * all older browsers (ie4, ie6, ie8, Netscape) get basic html instead
+* #35 adds a [hook](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/msg-log.py) which extends the message-to-serverlog feature so it writes the message to a textfile on the server
+  * could theoretically be extended into a [full instant-messaging feature](https://github.com/9001/copyparty/blob/hovudstraum/srv/chat.md) but that's silly, [nobody would do that](https://ocv.me/stuff/cchat.webm)
+    * [r0c is much better](https://github.com/9001/r0c) than this joke
+
+## bugfixes
+* 163e3fce46122d64bf824762b6733ff2c3551ba5 the `x-forwarded-for` header was ignored if the nearest reverse-proxy is not asking from 127.0.0.1, which broke client IPs in containerized deployments
+  * the serverlog will now explain how to trust the reverse-proxy to provide client IPs, but basically,
+  * `--xff-hdr` specifies which header to read the client's real ip from
+  * `--xff-src` is an allowlist of IP-addresses to trust that header from
+* a62f744a187bc9f821b540e8bb4e0b9a67bd01c8 if copyparty was started while an external HDD was not connected, and that volume's index was stored elsewhere, then the index would get wiped (since all the files are gone)
+* 3b8f66c0d5c27a68841814ec06f1758f146a5ff5 javascript could crash while uploading from a very unreliable internet connection
+
+## other changes
+* copyparty.exe: updated pillow to 10.0.1 which fixes the webp cve
+* alpine, which the docker images are based on, turns out to be fairly slow -- currently working on a new docker image (probably fedora-based) which will be 30% faster at analyzing multimedia files and in general 20% faster on average
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0909-1336  `v1.9.5`  webhotell
 
 [happy 9/9!](https://safebooru.org/index.php?page=post&s=view&id=4027419)

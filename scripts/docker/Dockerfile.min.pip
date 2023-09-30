@@ -9,6 +9,7 @@ ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
         XDG_CONFIG_HOME=/cfg
 
 RUN     apk --no-cache add python3 py3-pip !pyc \
+        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && python3 -m pip install copyparty \
         && apk del py3-pip \
         && rm -rf /tmp/pyc \

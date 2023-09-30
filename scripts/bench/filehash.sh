@@ -40,7 +40,7 @@ echo warming up cache
 cat 1 >/dev/null
 
 echo ok lets go
-python3 "$sfx" -p39204 -e2dsa --dbd=yolo --exit=idx -lo=t "$@"
+python3 "$sfx" -p39204 -e2dsa --dbd=yolo --exit=idx -lo=t -q "$@"
 
 echo and the results are...
 $awk '/1 volumes in / {printf "%s MiB/s\n", 256*128/$(NF-1)}' <t
@@ -52,8 +52,8 @@ echo deleting $td and exiting
 
 # MiB/s @ cpu or device  (copyparty, pythonver, distro/os)  // comment
 
-#  3340 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.5, fedora 38)  // --hash-mt=6; laptop
-#  2696 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.5, fedora 38)  // --hash-mt=4 (old-default)
+#  3608 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.5, fedora 38)  // --hash-mt=6; laptop
+#  2726 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.5, fedora 38)  // --hash-mt=4 (old-default)
 #  2202 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.5, docker-alpine 3.18.3) ??? alpine slow
 #  2719 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.2, docker-debian 12.1)
 
