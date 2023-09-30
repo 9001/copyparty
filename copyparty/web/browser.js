@@ -941,12 +941,27 @@ var Ls = {
 		"lang_set": "passer det å laste siden på nytt?",
 	},
 };
-var L = Ls[sread("lang") || lang];
-if (Ls.eng && L != Ls.eng) {
-	for (var k in Ls.eng)
-		if (!L[k])
-			L[k] = Ls.eng[k];
+var LANGS = ["eng", "nor"],
+	L = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor;
+
+for (var a = 0; a < LANGS.length; a++) {
+	for (var b = a + 1; b < LANGS.length; b++) {
+		var i1 = Object.keys(Ls[LANGS[a]]).length > Object.keys(Ls[LANGS[b]]).length ? a : b,
+			i2 = i1 == a ? b : a,
+			t1 = Ls[LANGS[i1]],
+			t2 = Ls[LANGS[i2]];
+
+		for (var k in t1)
+			if (!t2[k]) {
+				console.log("E missing TL", LANGS[i2], k);
+				t2[k] = t1[k];
+			}
+	}
 }
+
+if (!has(LANGS, lang))
+	alert('unsupported --lang "' + lang + '" specified in server args;\nplease use one of these: ' + LANGS);
+
 modal.load();
 
 
@@ -1354,7 +1369,7 @@ var mpl = (function () {
 		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>');
 
 	var r = {
-		"pb_mode": (sread('pb_mode') || 'next').split('-')[0],
+		"pb_mode": (sread('pb_mode', ['loop', 'next']) || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 		'traversals': 0,
 	};
@@ -6532,7 +6547,9 @@ var mukey = (function () {
 			"6d ", "7d ", "8d ", "9d ", "10d", "11d", "12d", "1d ", "2d ", "3d ", "4d ", "5d ",
 			"6m ", "7m ", "8m ", "9m ", "10m", "11m", "12m", "1m ", "2m ", "3m ", "4m ", "5m "
 		]
-	};
+	},
+		defnot = 'rekobo_alnum';
+
 	var map = {},
 		html = [];
 
@@ -6557,7 +6574,7 @@ var mukey = (function () {
 	}
 
 	function load_notation(notation) {
-		swrite("key_notation", notation);
+		swrite("cpp_keynot", notation);
 		map = {};
 		var dst = maps[notation];
 		for (var k in maps)
@@ -6605,7 +6622,10 @@ var mukey = (function () {
 		}
 	}
 
-	var notation = sread("key_notation") || "rekobo_alnum";
+	var notation = sread("cpp_keynot") || defnot;
+	if (!maps[notation])
+		notation = defnot;
+
 	ebi('key_' + notation).checked = true;
 	load_notation(notation);
 
@@ -6624,7 +6644,7 @@ var light, theme, themen;
 var settheme = (function () {
 	var ax = 'abcdefghijklmnopqrstuvwx';
 
-	theme = sread('theme') || 'a';
+	theme = sread('cpp_thm') || 'a';
 	if (!/^[a-x][yz]/.exec(theme))
 		theme = dtheme;
 
@@ -6666,7 +6686,7 @@ var settheme = (function () {
 			l = light ? 'y' : 'z';
 		theme = c + l + ' ' + c + ' ' + l;
 		themen = c + l;
-		swrite('theme', theme);
+		swrite('cpp_thm', theme);
 		freshen();
 	}
 
@@ -6677,7 +6697,7 @@ var settheme = (function () {
 
 (function () {
 	function freshen() {
-		lang = sread("lang") || lang;
+		lang = sread("cpp_lang", LANGS) || lang;
 		var html = [];
 		for (var k in Ls)
 			if (Ls.hasOwnProperty(k))
@@ -6693,7 +6713,7 @@ var settheme = (function () {
 	function setlang(e) {
 		ev(e);
 		L = Ls[this.textContent];
-		swrite("lang", this.textContent);
+		swrite("cpp_lang", this.textContent);
 		freshen();
 		modal.confirm(Ls.eng.lang_set + "\n\n" + Ls.nor.lang_set, location.reload.bind(location), null);
 	};

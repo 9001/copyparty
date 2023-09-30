@@ -882,9 +882,10 @@ function jcp(obj) {
 }
 
 
-function sread(key) {
+function sread(key, al) {
     try {
-        return localStorage.getItem(key);
+        var ret = localStorage.getItem(key);
+        return (!al || has(al, ret)) ? ret : null;
     }
     catch (e) {
         return null;
@@ -906,7 +907,13 @@ function jread(key, fb) {
     if (!str)
         return fb;
 
-    return JSON.parse(str);
+    try {
+        // '' throws, null is ok, sasuga
+        return JSON.parse(str);
+    }
+    catch (e) {
+        return fb;
+    }
 }
 
 function jwrite(key, val) {

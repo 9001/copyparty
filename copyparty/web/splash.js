@@ -35,7 +35,7 @@ var Ls = {
 		"v2": "use this server as a local HDD$N$NWARNING: this will show your password!",
 	}
 },
-	d = Ls[sread("lang") || lang];
+	d = Ls[sread("cpp_lang", ["eng", "nor"]) || lang] || Ls.eng || Ls.nor;
 
 for (var k in (d || {})) {
 	var f = k.slice(-1),

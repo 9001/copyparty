@@ -1145,7 +1145,7 @@ def add_db_metadata(ap):
 def add_ui(ap, retry):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
-    ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language")
+    ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language; one of the following: eng nor")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")
     ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files matching REGEX in file list. Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
