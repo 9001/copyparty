@@ -528,6 +528,8 @@ select which type of archive you want in the `[⚙️] config` tab:
 * bz2 default level is `2` (1=fast, 9=best), change with `?tar=bz2:9`
 * hidden files (dotfiles) are excluded unless `-ed`
   * `up2k.db` and `dir.txt` is always excluded
+* bsdtar supports streaming unzipping: `curl foo?zip=utf8 | bsdtar -xv`
+  * good, because copyparty's zip is faster than tar on small files
 * `zip_crc` will take longer to download since the server has to read each file twice
   * this is only to support MS-DOS PKZIP v2.04g (october 1993) and older
     * how are you accessing copyparty actually
@@ -539,6 +541,7 @@ you can also zip a selection of files or folders by clicking them in the browser
 cool trick: download a folder by appending url-params `?tar&opus` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus before they're added to the archive
 * super useful if you're 5 minutes away from takeoff and realize you don't have any music on your phone but your server only has flac files and downloading those will burn through all your data + there wouldn't be enough time anyways
 * and url-params `&j` / `&w` produce jpeg/webm thumbnails/spectrograms instead of the original audio/video/images
+  * can also be used to pregenerate thumbnails; combine with `--th-maxage=9999999` or `--th-clean=0`
 
 
 ## uploading
