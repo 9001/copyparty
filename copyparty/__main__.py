@@ -246,12 +246,7 @@ def get_fk_salt(cert_path) -> str:
         with open(fp, "rb") as f:
             ret = f.read().strip()
     except:
-        if os.path.exists(cert_path):
-            zi = os.path.getmtime(cert_path)
-            ret = "{}".format(zi).encode("utf-8")
-        else:
-            ret = base64.b64encode(os.urandom(18))
-
+        ret = base64.b64encode(os.urandom(18))
         with open(fp, "wb") as f:
             f.write(ret + b"\n")
 

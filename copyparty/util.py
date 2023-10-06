@@ -1567,15 +1567,18 @@ def rand_name(fdir: str, fn: str, rnd: int) -> str:
     return fn
 
 
-def gen_filekey(salt: str, fspath: str, fsize: int, inode: int) -> str:
-    return base64.urlsafe_b64encode(
-        hashlib.sha512(
-            ("%s %s %s %s" % (salt, fspath, fsize, inode)).encode("utf-8", "replace")
-        ).digest()
-    ).decode("ascii")
+def gen_filekey(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
+    if alg == 1:
+        zs = "%s %s %s %s" % (salt, fspath, fsize, inode)
+    else:
+        zs = "%s %s" % (salt, fspath)
+
+    zb = zs.encode("utf-8", "replace")
+    return base64.urlsafe_b64encode(hashlib.sha512(zb).digest()).decode("ascii")
 
 
 def gen_filekey_dbg(
+    alg: int,
     salt: str,
     fspath: str,
     fsize: int,
@@ -1583,7 +1586,7 @@ def gen_filekey_dbg(
     log: "NamedLogger",
     log_ptn: Optional[Pattern[str]],
 ) -> str:
-    ret = gen_filekey(salt, fspath, fsize, inode)
+    ret = gen_filekey(alg, salt, fspath, fsize, inode)
 
     assert log_ptn
     if log_ptn.search(fspath):

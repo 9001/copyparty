@@ -12,7 +12,7 @@ import threading
 import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS
+from .__init__ import ANYWIN, E, TYPE_CHECKING, WINDOWS
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
@@ -1390,12 +1390,21 @@ class AuthSrv(object):
         have_fk = False
         for vol in vfs.all_vols.values():
             fk = vol.flags.get("fk")
+            fka = vol.flags.get("fka")
+            if fka and not fk:
+                fk = fka
             if fk:
                 vol.flags["fk"] = int(fk) if fk is not True else 8
                 have_fk = True
 
         if have_fk and re.match(r"^[0-9\.]+$", self.args.fk_salt):
             self.log("filekey salt: {}".format(self.args.fk_salt))
+
+        fk_len = len(self.args.fk_salt)
+        if have_fk and fk_len < 14:
+            t = "WARNING: filekeys are enabled, but the salt is only %d chars long; %d or longer is recommended. Either specify a stronger salt using --fk-salt or delete this file and restart copyparty: %s"
+            zs = os.path.join(E.cfg, "fk-salt.txt")
+            self.log(t % (fk_len, 16, zs), 3)
 
         for vol in vfs.all_vols.values():
             if "pk" in vol.flags and "gz" not in vol.flags and "xz" not in vol.flags:

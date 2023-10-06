@@ -202,8 +202,10 @@ class HttpCli(object):
         if rem.startswith("/") or rem.startswith("../") or "/../" in rem:
             raise Exception("that was close")
 
-    def _gen_fk(self, salt: str, fspath: str, fsize: int, inode: int) -> str:
-        return gen_filekey_dbg(salt, fspath, fsize, inode, self.log, self.args.log_fk)
+    def _gen_fk(self, alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
+        return gen_filekey_dbg(
+            alg, salt, fspath, fsize, inode, self.log, self.args.log_fk
+        )
 
     def j2s(self, name: str, **ka: Any) -> str:
         tpl = self.conn.hsrv.j2[name]
@@ -1712,7 +1714,9 @@ class HttpCli(object):
 
         vsuf = ""
         if (self.can_read or self.can_upget) and "fk" in vfs.flags:
+            alg = 2 if "fka" in vfs.flags else 1
             vsuf = "?k=" + self.gen_fk(
+                alg,
                 self.args.fk_salt,
                 path,
                 post_sz,
@@ -2445,7 +2449,9 @@ class HttpCli(object):
         for sz, sha_hex, sha_b64, ofn, lfn, ap in files:
             vsuf = ""
             if (self.can_read or self.can_upget) and "fk" in vfs.flags:
+                alg = 2 if "fka" in vfs.flags else 1
                 vsuf = "?k=" + self.gen_fk(
+                    alg,
                     self.args.fk_salt,
                     ap,
                     sz,
@@ -3412,7 +3418,7 @@ class HttpCli(object):
         t0 = time.time()
         lim = time.time() - self.args.unpost
         fk_vols = {
-            vol: vol.flags["fk"]
+            vol: (vol.flags["fk"], 2 if "fka" in vol.flags else 1)
             for vp, vol in self.asrv.vfs.all_vols.items()
             if "fk" in vol.flags and (vp in self.rvol or vp in self.upvol)
         }
@@ -3421,7 +3427,7 @@ class HttpCli(object):
             if not cur:
                 continue
 
-            nfk = fk_vols.get(vol, 0)
+            nfk, fk_alg = fk_vols.get(vol) or (0, 0)
 
             q = "select sz, rd, fn, at from up where ip=? and at>?"
             for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
@@ -3432,6 +3438,7 @@ class HttpCli(object):
                 rv = {"vp": quotep(vp), "sz": sz, "at": at, "nfk": nfk}
                 if nfk:
                     rv["ap"] = vol.canonical(vjoin(rd, fn))
+                    rv["fk_alg"] = fk_alg
 
                 ret.append(rv)
                 if len(ret) > 3000:
@@ -3445,6 +3452,7 @@ class HttpCli(object):
             if not nfk:
                 continue
 
+            alg = rv.pop("fk_alg")
             ap = rv.pop("ap")
             try:
                 st = bos.stat(ap)
@@ -3452,7 +3460,7 @@ class HttpCli(object):
                 continue
 
             fk = self.gen_fk(
-                self.args.fk_salt, ap, st.st_size, 0 if ANYWIN else st.st_ino
+                alg, self.args.fk_salt, ap, st.st_size, 0 if ANYWIN else st.st_ino
             )
             rv["vp"] += "?k=" + fk[:nfk]
 
@@ -3713,8 +3721,13 @@ class HttpCli(object):
 
         if not is_dir and (self.can_read or self.can_get):
             if not self.can_read and not fk_pass and "fk" in vn.flags:
+                alg = 2 if "fka" in vn.flags else 1
                 correct = self.gen_fk(
-                    self.args.fk_salt, abspath, st.st_size, 0 if ANYWIN else st.st_ino
+                    alg,
+                    self.args.fk_salt,
+                    abspath,
+                    st.st_size,
+                    0 if ANYWIN else st.st_ino,
                 )[: vn.flags["fk"]]
                 got = self.uparam.get("k")
                 if got != correct:
@@ -3922,6 +3935,7 @@ class HttpCli(object):
             ls_names = exclude_dotfiles(ls_names)
 
         add_fk = vn.flags.get("fk")
+        fk_alg = 2 if "fka" in vn.flags else 1
 
         dirs = []
         files = []
@@ -3978,11 +3992,15 @@ class HttpCli(object):
             except:
                 ext = "%"
 
-            if add_fk:
+            if add_fk and not is_dir:
                 href = "%s?k=%s" % (
                     quotep(href),
                     self.gen_fk(
-                        self.args.fk_salt, fspath, sz, 0 if ANYWIN else inf.st_ino
+                        fk_alg,
+                        self.args.fk_salt,
+                        fspath,
+                        sz,
+                        0 if ANYWIN else inf.st_ino,
                     )[:add_fk],
                 )
             else:

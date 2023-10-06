@@ -138,6 +138,7 @@ class Cfg(Namespace):
             dbd="wal",
             s_wr_sz=512 * 1024,
             th_size="320x256",
+            fk_salt="a" * 16,
             unpost=600,
             u2sort="s",
             mtp=[],

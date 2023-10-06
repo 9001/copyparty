@@ -228,8 +228,10 @@ class Up2k(object):
 
         self.log_func("up2k", msg, c)
 
-    def _gen_fk(self, salt: str, fspath: str, fsize: int, inode: int) -> str:
-        return gen_filekey_dbg(salt, fspath, fsize, inode, self.log, self.args.log_fk)
+    def _gen_fk(self, alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
+        return gen_filekey_dbg(
+            alg, salt, fspath, fsize, inode, self.log, self.args.log_fk
+        )
 
     def _block(self, why: str) -> None:
         self.blocked = why
@@ -2623,9 +2625,10 @@ class Up2k(object):
                 and not self.args.nw
                 and (cj["user"] in vfs.axs.uread or cj["user"] in vfs.axs.upget)
             ):
+                alg = 2 if "fka" in vfs.flags else 1
                 ap = absreal(djoin(job["ptop"], job["prel"], job["name"]))
                 ino = 0 if ANYWIN else bos.stat(ap).st_ino
-                fk = self.gen_fk(self.args.fk_salt, ap, job["size"], ino)
+                fk = self.gen_fk(alg, self.args.fk_salt, ap, job["size"], ino)
                 ret["fk"] = fk[: vfs.flags["fk"]]
 
             return ret

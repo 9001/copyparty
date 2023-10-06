@@ -314,6 +314,7 @@ class U2idx(object):
             sret = []
             fk = flags.get("fk")
             dots = flags.get("dotsrch")
+            fk_alg = 2 if "fka" in flags else 1
             c = cur.execute(uq, tuple(vuv))
             for hit in c:
                 w, ts, sz, rd, fn, ip, at = hit[:7]
@@ -333,16 +334,17 @@ class U2idx(object):
                 else:
                     try:
                         ap = absreal(os.path.join(ptop, rd, fn))
-                        inf = bos.stat(ap)
+                        ino = 0 if ANYWIN or fk_alg == 2 else bos.stat(ap).st_ino
                     except:
                         continue
 
-                    suf = (
-                        "?k="
-                        + gen_filekey(
-                            self.args.fk_salt, ap, sz, 0 if ANYWIN else inf.st_ino
-                        )[:fk]
-                    )
+                    suf = "?k=" + gen_filekey(
+                        fk_alg,
+                        self.args.fk_salt,
+                        ap,
+                        sz,
+                        ino,
+                    )[:fk]
 
                 lim -= 1
                 if lim < 0:
