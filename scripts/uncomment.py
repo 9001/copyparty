@@ -86,7 +86,10 @@ def main():
     except Exception as ex:
         print("\nnon-mp fallback due to {}\n".format(ex))
         for f in sys.argv[1:]:
-            uncomment(f)
+            try:
+                uncomment(f)
+            except Exception as ex:
+                print("uncomment failed: [%s] %s" % (f, repr(ex)))
 
     print("k")
 

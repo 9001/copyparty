@@ -1,4 +1,22 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-0930-2332  `v1.9.7`  better column hider
+
+## new features
+* column hiding on phones is much more intuitive
+  * since you usually want to hide multiple columns, the hiding mode must now be manually disengaged
+  * click-handler now covers the entire header cell, preventing a misclick from accidentally sorting the table instead
+
+## bugfixes
+* #51 running copyparty with an invalid value for `--lang` made it crash with a confusing error message
+  * also makes it more compatible with other localStorage-using webservices running on the same domain
+
+## other changes
+* CVE-2023-5217, a vulnerability in libvpx, was fixed by alpine recently and no longer present in the docker images
+  * unlike the fix in v1.9.6, this is irrelevant since it was impossible to reach in all conceivable setups, but still nice
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0923-1215  `v1.9.6`  configurable x-forwarded-for
 
 ## new features

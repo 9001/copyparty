@@ -1177,7 +1177,7 @@ source file/folder selection uses rsync syntax, meaning that:
                 raise
 
     if ar.cls:
-        eprint("\x1b\x5b\x48\x1b\x5b\x32\x4a\x1b\x5b\x33\x4a", end="")
+        eprint("\033[H\033[2J\033[3J", end="")
 
     ctl = Ctl(ar)
 

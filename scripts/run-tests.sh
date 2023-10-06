@@ -27,7 +27,7 @@ python3 ../scripts/strip_hints/a.py
 
 pids=()
 for py in python{2,3}; do
-    [ ${1:0:6} = python ] && [ $1 != $py ] && continue
+    [ "${1:0:6}" = python ] && [ "$1" != $py ] && continue
 
     PYTHONPATH=
     [ $py = python2 ] && PYTHONPATH=../scripts/py2:../sfx/py37
