@@ -2680,7 +2680,7 @@ class Up2k(object):
             fs2 = bos.stat(os.path.dirname(dst)).st_dev
             if fs1 == 0 or fs2 == 0:
                 # py2 on winxp or other unsupported combination
-                raise OSError(38, "filesystem does not have st_dev")
+                raise OSError(errno.ENOSYS, "filesystem does not have st_dev")
             elif fs1 == fs2:
                 # same fs; make symlink as relative as possible
                 spl = r"[\\/]" if WINDOWS else "/"
@@ -3300,10 +3300,15 @@ class Up2k(object):
         if bos.path.exists(dabs):
             raise Pebkac(400, "mv2: target file exists")
 
+        stl = bos.lstat(sabs)
+        try:
+            st = bos.stat(sabs)
+        except:
+            st = stl
+
         xbr = svn.flags.get("xbr")
         xar = dvn.flags.get("xar")
         if xbr:
-            st = bos.stat(sabs)
             if not runhook(
                 self.log, xbr, sabs, svp, "", uname, st.st_mtime, st.st_size, "", 0, ""
             ):
@@ -3311,9 +3316,16 @@ class Up2k(object):
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
+        is_xvol = svn.realpath != dvn.realpath
+        if stat.S_ISLNK(stl.st_mode):
+            is_dirlink = stat.S_ISDIR(st.st_mode)
+            is_link = True
+        else:
+            is_link = is_dirlink = False
+
         bos.makedirs(os.path.dirname(dabs))
 
-        if bos.path.islink(sabs):
+        if is_dirlink:
             dlabs = absreal(sabs)
             t = "moving symlink from [{}] to [{}], target [{}]"
             self.log(t.format(sabs, dabs, dlabs))
@@ -3336,36 +3348,22 @@ class Up2k(object):
         c2 = self.cur.get(dvn.realpath)
 
         if ftime_ is None:
-            st = bos.stat(sabs)
             ftime = st.st_mtime
             fsize = st.st_size
         else:
             ftime = ftime_
             fsize = fsize_ or 0
 
-        try:
-            atomic_move(sabs, dabs)
-        except OSError as ex:
-            if ex.errno != errno.EXDEV:
-                raise
-
-            self.log("cross-device move:\n  {}\n  {}".format(sabs, dabs))
-            b1, b2 = fsenc(sabs), fsenc(dabs)
-            try:
-                shutil.copy2(b1, b2)
-            except:
-                os.unlink(b2)
-                raise
-
-            os.unlink(b1)
-
+        has_dupes = False
         if w:
             assert c1
             if c2 and c2 != c1:
                 self._copy_tags(c1, c2, w)
 
-            self._forget_file(svn.realpath, srem, c1, w, c1 != c2, fsize)
-            self._relink(w, svn.realpath, srem, dabs)
+            has_dupes = self._forget_file(svn.realpath, srem, c1, w, is_xvol, fsize)
+            if not is_xvol:
+                has_dupes = self._relink(w, svn.realpath, srem, dabs)
+
             curs.add(c1)
 
             if c2:
@@ -3387,6 +3385,47 @@ class Up2k(object):
                 curs.add(c2)
         else:
             self.log("not found in src db: [{}]".format(svp))
+
+        try:
+            if is_xvol and has_dupes:
+                raise OSError(errno.EXDEV, "src is symlink")
+
+            atomic_move(sabs, dabs)
+
+        except OSError as ex:
+            if ex.errno != errno.EXDEV:
+                raise
+
+            self.log("using copy+delete (%s):\n  %s\n  %s" % (ex.strerror, sabs, dabs))
+            b1, b2 = fsenc(sabs), fsenc(dabs)
+            is_link = os.path.islink(b1)  # due to _relink
+            try:
+                shutil.copy2(b1, b2)
+            except:
+                try:
+                    os.unlink(b2)
+                except:
+                    pass
+
+                if not is_link:
+                    raise
+
+                # broken symlink? keep it as-is
+                try:
+                    zb = os.readlink(b1)
+                    os.symlink(zb, b2)
+                except:
+                    os.unlink(b2)
+                    raise
+
+            if is_link:
+                try:
+                    times = (int(time.time()), int(stl.st_mtime))
+                    bos.utime(dabs, times, False)
+                except:
+                    pass
+
+            os.unlink(b1)
 
         if xar:
             runhook(self.log, xar, dabs, dvp, "", uname, 0, 0, "", 0, "")
@@ -3441,14 +3480,16 @@ class Up2k(object):
         wark: Optional[str],
         drop_tags: bool,
         sz: int,
-    ) -> None:
+    ) -> bool:
         """forgets file in db, fixes symlinks, does not delete"""
         srd, sfn = vsplit(vrem)
+        has_dupes = False
         self.log("forgetting {}".format(vrem))
         if wark and cur:
             self.log("found {} in db".format(wark))
             if drop_tags:
                 if self._relink(wark, ptop, vrem, ""):
+                    has_dupes = True
                     drop_tags = False
 
             if drop_tags:
@@ -3475,6 +3516,8 @@ class Up2k(object):
                 self.log(t.format(wark, p))
                 assert wark
                 del reg[wark]
+
+        return has_dupes
 
     def _relink(self, wark: str, sptop: str, srem: str, dabs: str) -> int:
         """

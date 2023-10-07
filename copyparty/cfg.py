@@ -162,7 +162,8 @@ flagcats = {
         "nohtml": "return html and markdown as text/html",
     },
     "others": {
-        "fk=8": 'generates per-file accesskeys,\nwhich will then be required at the "g" permission',
+        "fk=8": 'generates per-file accesskeys,\nwhich are then required at the "g" permission;\nkeys are invalidated if filesize or inode changes',
+        "fka=8": 'generates slightly weaker per-file accesskeys,\nwhich are then required at the "g" permission;\nnot affected by filesize or inode numbers',
         "davauth": "ask webdav clients to login for all folders",
         "davrt": "show lastmod time of symlink destination, not the link itself\n(note: this option is always enabled for recursive listings)",
     },
