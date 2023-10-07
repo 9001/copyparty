@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 9, 8)
+VERSION = (1, 9, 9)
 CODENAME = "prometheable"
-BUILD_DT = (2023, 10, 6)
+BUILD_DT = (2023, 10, 8)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

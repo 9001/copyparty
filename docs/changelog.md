@@ -1,4 +1,21 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1006-1750  `v1.9.8`  static filekeys
+
+## new features
+* #52 add alternative filekey generator:
+  * volflag `fka` changes the calculation to ignore filesize and inode-number, only caring about the absolute-path on the filesystem and the `--fk-salt`
+  * good for linking to markdown files which might be edited, but reduces security a tiny bit
+* add warning on startup if `--fk-salt` is too weak (for example when it was upgraded from before [v1.7.6](https://github.com/9001/copyparty/releases/tag/v1.7.6))
+  * removed the filekey upgrade feaure to ensure a weak fk-salt is not selected; a new filekey will be generated from scratch on startup if necessary
+
+## other changes
+* pyftpdlib upgraded to 1.5.8
+* copyparty.exe built on python 3.11.6
+  * the exe in this release will be replaced with an 3.12.0 exe as soon as [pillow adds 3.12 support](https://github.com/python-pillow/Pillow/issues/6941)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-0930-2332  `v1.9.7`  better column hider
 
 ## new features
