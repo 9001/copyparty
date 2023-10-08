@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 9, 9)
+VERSION = (1, 9, 10)
 CODENAME = "prometheable"
 BUILD_DT = (2023, 10, 8)
 

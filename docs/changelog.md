@@ -1,4 +1,12 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1007-2229  `v1.9.9`  fix cross-volume dedup moves
+
+## bugfixes
+* v1.6.2 introduced a bug which, when moving files between volumes, could cause the move operation to abort when it encounters a deduplicated file
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1006-1750  `v1.9.8`  static filekeys
 
 ## new features
