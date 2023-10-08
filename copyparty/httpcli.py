@@ -7,6 +7,7 @@ import calendar
 import copy
 import errno
 import gzip
+import hashlib
 import itertools
 import json
 import os
@@ -2129,7 +2130,15 @@ class HttpCli(object):
             msg = "login ok"
             dur = int(60 * 60 * self.args.logout)
         else:
-            self.log("invalid password: {}".format(pwd), 3)
+            logpwd = pwd
+            if self.args.log_badpwd == 0:
+                logpwd = ""
+            elif self.args.log_badpwd == 2:
+                zb = hashlib.sha512(pwd.encode("utf-8", "replace")).digest()
+                logpwd = "%" + base64.b64encode(zb[:12]).decode("utf-8")
+
+            self.log("invalid password: {}".format(logpwd), 3)
+
             g = self.conn.hsrv.gpwd
             if g.lim:
                 bonk, ip = g.bonk(self.ip, pwd)
