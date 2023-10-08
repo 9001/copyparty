@@ -131,6 +131,7 @@ class HttpCli(object):
         self.mode = " "
         self.req = " "
         self.http_ver = " "
+        self.hint = " "
         self.host = " "
         self.ua = " "
         self.is_rclone = False
@@ -142,6 +143,7 @@ class HttpCli(object):
         self.rem = " "
         self.vpath = " "
         self.vpaths = " "
+        self.trailing_slash = True
         self.uname = " "
         self.pw = " "
         self.rvol = [" "]
@@ -159,22 +161,17 @@ class HttpCli(object):
         self.can_get = False
         self.can_upget = False
         self.can_admin = False
+        self.out_headerlist: list[tuple[str, str]] = []
+        self.out_headers: dict[str, str] = {}
+        self.html_head = " "
         # post
         self.parser: Optional[MultipartParser] = None
         # end placeholders
 
         self.bufsz = 1024 * 32
-        self.hint = ""
-        self.trailing_slash = True
-        self.out_headerlist: list[tuple[str, str]] = []
-        self.out_headers = {
-            "Vary": "Origin, PW, Cookie",
-            "Cache-Control": "no-store, max-age=0",
-        }
         h = self.args.html_head
         if self.args.no_robots:
             h = META_NOBOTS + (("\n" + h) if h else "")
-            self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
         self.html_head = h
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
@@ -227,6 +224,15 @@ class HttpCli(object):
         self.is_https = False
         self.headers = {}
         self.hint = ""
+        self.uname = self.pw = " "
+
+        self.out_headerlist = []
+        self.out_headers = {
+            "Vary": "Origin, PW, Cookie",
+            "Cache-Control": "no-store, max-age=0",
+        }
+        if self.args.no_robots:
+            self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
 
         if self.is_banned():
             return False
@@ -264,9 +270,9 @@ class HttpCli(object):
             h = {"WWW-Authenticate": 'Basic realm="a"'} if ex.code == 401 else {}
             try:
                 self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
-                return self.keepalive
             except:
-                return False
+                pass
+            return False
 
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
