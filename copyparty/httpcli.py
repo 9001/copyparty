@@ -132,7 +132,7 @@ class HttpCli(object):
         self.mode = " "
         self.req = " "
         self.http_ver = " "
-        self.hint = " "
+        self.hint = ""
         self.host = " "
         self.ua = " "
         self.is_rclone = False
@@ -221,13 +221,6 @@ class HttpCli(object):
 
     def run(self) -> bool:
         """returns true if connection can be reused"""
-        self.keepalive = False
-        self.is_https = False
-        self.headers = {}
-        self.hint = ""
-        self.uname = self.pw = " "
-
-        self.out_headerlist = []
         self.out_headers = {
             "Vary": "Origin, PW, Cookie",
             "Cache-Control": "no-store, max-age=0",

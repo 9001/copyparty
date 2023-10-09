@@ -1,4 +1,20 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1008-2051  `v1.9.10`  badpwd
+
+## new features
+* argument `--log-badpwd` specifies how to log invalid login attempts;
+  * `0` = just a warning with no further information
+  * `1` = log incorrect password in plaintext (default)
+  * `2` = log sha512 hash of the incorrect password
+  * `1` and `2` are convenient for stuff like setting up autoban triggers for common passwords using fail2ban or similar
+
+## bugfixes
+* none!
+  * the formerly mentioned caching-directives bug turned out to be unreachable... oh well, better safe than sorry
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1007-2229  `v1.9.9`  fix cross-volume dedup moves
 
 ## bugfixes
