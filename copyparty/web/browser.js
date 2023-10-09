@@ -7284,7 +7284,7 @@ function sandbox(tgt, rules, cls, html) {
 	html = '<html class="iframe ' + document.documentElement.className + '"><head><style>' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
 		'<script>' + env + '</script>' + sandboxjs() +
-		'<script>var d=document.documentElement,' +
+		'<script>var d=document.documentElement,TS="' + TS + '",' +
 		'loc=new URL("' + location.href.split('?')[0] + '");' +
 		'function say(m){window.parent.postMessage(m,"*")};' +
 		'setTimeout(function(){var its=0,pih=-1,f=function(){' +

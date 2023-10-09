@@ -364,7 +364,7 @@ function import_js(url, cb, ecb) {
     var head = document.head || document.getElementsByTagName('head')[0];
     var script = mknod('script');
     script.type = 'text/javascript';
-    script.src = url;
+    script.src = url + '?_=' + (window.TS || 'a');
     script.onload = cb;
     script.onerror = ecb || function () {
         var m = 'Failed to load module:\n' + url;
