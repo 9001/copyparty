@@ -1777,6 +1777,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	display: none;
 }
 .ghead {
+	background: #fff;
 	background: var(--bg-u2);
 	border-radius: .3em;
 	padding: .2em .5em;
@@ -1807,6 +1808,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	padding: 0;
 }
 #rui {
+	background: #fff;
 	background: var(--bg);
 	position: fixed;
 	top: 0;
@@ -1863,6 +1865,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 #doc {
 	overflow: visible;
+	background: #fff;
 	background: var(--bg);
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
