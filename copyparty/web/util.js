@@ -6,6 +6,11 @@ if (!window.console || !console.log)
     };
 
 
+if (window.CGV)
+    for (var k in CGV)
+        window[k] = CGV[k];
+
+
 var wah = '',
     NOAC = 'autocorrect="off" autocapitalize="off"',
     L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,

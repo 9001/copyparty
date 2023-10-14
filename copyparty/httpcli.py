@@ -3840,40 +3840,42 @@ class HttpCli(object):
             "logues": logues,
             "readme": readme,
         }
-        j2a = {
-            "vdir": quotep(self.vpath),
-            "vpnodes": vpnodes,
-            "files": [],
+        cgv = {
             "ls0": None,
             "acct": self.uname,
-            "perms": json.dumps(perms),
+            "perms": perms,
             "lifetime": ls_ret["lifetime"],
             "frand": bool(vn.flags.get("rand")),
-            "taglist": [],
             "def_hcols": [],
             "have_emp": self.args.emp,
             "have_up2k_idx": e2d,
-            "have_tags_idx": e2t,
             "have_acode": (not self.args.no_acode),
             "have_mv": (not self.args.no_mv),
             "have_del": (not self.args.no_del),
             "have_zip": (not self.args.no_zip),
             "have_unpost": int(self.args.unpost),
-            "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
-            "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
-            "url_suf": url_suf,
-            "logues": logues,
             "readme": readme,
-            "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
-            "srv_info": srv_infot,
             "dgrid": "grid" in vf,
-            "unlist": unlist,
-            "dtheme": self.args.theme,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
             "idxh": int(self.args.ih),
             "u2sort": self.args.u2sort,
+        }
+        j2a = {
+            "cgv": cgv,
+            "vpnodes": vpnodes,
+            "files": [],
+            "ls0": None,
+            "taglist": [],
+            "have_tags_idx": e2t,
+            "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
+            "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
+            "url_suf": url_suf,
+            "logues": logues,
+            "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
+            "srv_info": srv_infot,
+            "dtheme": self.args.theme,
         }
 
         if self.args.js_browser:
@@ -4120,7 +4122,7 @@ class HttpCli(object):
         dirs.sort(key=itemgetter("name"))
 
         if is_js:
-            j2a["ls0"] = {
+            j2a["ls0"] = cgv["ls0"] = {
                 "dirs": dirs,
                 "files": files,
                 "taglist": taglist,
