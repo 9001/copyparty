@@ -15,6 +15,7 @@ html {
 	max-width: min(34em, calc(100% - 7em));
 	color: #ddd;
 	background: #333;
+	background: var(--bg-u2);
 	border: 0 solid #777;
 	box-shadow: 0 .2em .5em #111;
 	border-radius: .4em;
@@ -159,9 +160,10 @@ html {
 #modalc code,
 #tt code {
 	color: #eee;
+	color: var(--fg-max);
 	background: #444;
+	background: var(--bg-u5);
 	padding: .1em .3em;
-	border-top: 1px solid #777;
 	border-radius: .3em;
 	line-height: 1.7em;
 }
@@ -182,8 +184,10 @@ html.y #toast {
 	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
 html.y #tt code {
-	background: #060;
 	color: #fff;
+	color: var(--fg-max);
+	background: #060;
+	background: var(--bg-u5);
 }
 #modalc code {
 	color: #060;

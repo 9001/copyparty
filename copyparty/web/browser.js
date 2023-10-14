@@ -3133,11 +3133,34 @@ function eval_hash() {
 })();
 
 
+function read_dsort(txt) {
+	try {
+		var zt = txt.trim().split(/,+/g);
+		dsort = [];
+		for (var a = 0; a < zt.length; a++) {
+			var z = zt[a].trim(), n = 1, t = "";
+			if (z.startsWith("-")) {
+				z = z.slice(1);
+				n = -1;
+			}
+			if (z == "sz" || z.indexOf('/.') + 1)
+				t = "int";
+
+			dsort.push([z, n, t]);
+		}
+	}
+	catch (ex) {
+		toast.warn(10, 'failed to apply default sort order [' + txt + ']:\n' + ex);
+	}
+}
+read_dsort(dsort);
+
+
 function sortfiles(nodes) {
 	if (!nodes.length)
 		return nodes;
 
-	var sopts = jread('fsort', [["href", 1, ""]]),
+	var sopts = jread('fsort', jcp(dsort)),
 		dir1st = sread('dir1st') !== '0';
 
 	try {
@@ -5791,6 +5814,8 @@ var treectl = (function () {
 			if (res.files[a].tags === undefined)
 				res.files[a].tags = {};
 
+		read_dsort(res.dsort);
+
 		srvinf = res.srvinf;
 		try {
 			ebi('srv_info').innerHTML = ebi('srv_info2').innerHTML = '<span>' + res.srvinf + '</span>';
@@ -6354,6 +6379,7 @@ var filecols = (function () {
 				toh = ths[a].outerHTML, // !ff10
 				ttv = L.cols[ths[a].textContent];
 
+			ttv = (ttv ? ttv + '$N' : '') + 'ID: <code>' + th.getAttribute('name') + '</code>';
 			if (!MOBILE && toh) {
 				th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + toh;
 				th.getElementsByTagName('a')[0].onclick = ev_row_tgl;

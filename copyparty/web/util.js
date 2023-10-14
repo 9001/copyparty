@@ -483,7 +483,7 @@ function yscroll() {
 
 function showsort(tab) {
     var v, vn, v1, v2, th = tab.tHead,
-        sopts = jread('fsort', [["href", 1, ""]]);
+        sopts = jread('fsort', jcp(dsort));
 
     th && (th = th.rows[0]) && (th = th.cells);
 
