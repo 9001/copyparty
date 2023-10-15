@@ -170,7 +170,7 @@ class HttpSrv(object):
             if self.args.log_thrs:
                 start_log_thrs(self.log, self.args.log_thrs, nid)
 
-        self.th_cfg: dict[str, Any] = {}
+        self.th_cfg: dict[str, set[str]] = {}
         Daemon(self.post_init, "hsrv-init2")
 
     def post_init(self) -> None:

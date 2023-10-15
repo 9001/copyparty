@@ -31,7 +31,7 @@ class ThumbCli(object):
             if not c:
                 raise Exception()
         except:
-            c = {k: {} for k in ["thumbable", "pil", "vips", "ffi", "ffv", "ffa"]}
+            c = {k: set() for k in ["thumbable", "pil", "vips", "ffi", "ffv", "ffa"]}
 
         self.thumbable = c["thumbable"]
         self.fmt_pil = c["pil"]
@@ -94,7 +94,7 @@ class ThumbCli(object):
             self.log("no histpath for [{}]".format(ptop))
             return None
 
-        tpath = thumb_path(histpath, rem, mtime, fmt)
+        tpath = thumb_path(histpath, rem, mtime, fmt, self.fmt_ffa)
         tpaths = [tpath]
         if fmt == "w":
             # also check for jpg (maybe webp is unavailable)

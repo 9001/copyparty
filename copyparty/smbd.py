@@ -162,6 +162,7 @@ class SMB(object):
                 if "connData" in cl:
                     return cl["connData"]["partygoer"]
                 cf = cf.f_back
+            raise Exception()
         except:
             warning(
                 "nyoron... %s <<-- %s <<-- %s <<-- %s",

@@ -12,7 +12,7 @@ import threading
 import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, E, TYPE_CHECKING, WINDOWS
+from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash

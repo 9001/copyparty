@@ -79,13 +79,18 @@ except:
     HAVE_VIPS = False
 
 
-def thumb_path(histpath: str, rem: str, mtime: float, fmt: str) -> str:
+def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -> str:
     # base16 = 16 = 256
     # b64-lc = 38 = 1444
     # base64 = 64 = 4096
     rd, fn = vsplit(rem)
     if not rd:
         rd = "\ntop"
+
+    # spectrograms are never cropped; strip fullsize flag
+    ext = rem.split(".")[-1].lower()
+    if ext in ffa and fmt in ("wf", "jf"):
+        fmt = fmt[:1]
 
     rd += "\n" + fmt
     h = hashlib.sha512(afsenc(rd)).digest()
@@ -195,7 +200,7 @@ class ThumbSrv(object):
             self.log("no histpath for [{}]".format(ptop))
             return None
 
-        tpath = thumb_path(histpath, rem, mtime, fmt)
+        tpath = thumb_path(histpath, rem, mtime, fmt, self.fmt_ffa)
         abspath = os.path.join(ptop, rem)
         cond = threading.Condition(self.mutex)
         do_conv = False
