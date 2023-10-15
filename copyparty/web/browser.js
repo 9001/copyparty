@@ -3042,6 +3042,8 @@ function scan_hash(v) {
 
 
 function eval_hash() {
+	window.onpopstate = treectl.onpopfun;
+
 	var v = hash0;
 	hash0 = null;
 	if (!v)
@@ -6170,7 +6172,7 @@ var treectl = (function () {
 	if (cs == 'tree' || (cs != 'na' && vw >= 60))
 		r.entree(null, true);
 
-	window.onpopstate = function (e) {
+	r.onpopfun = function (e) {
 		console.log("h-pop " + e.state);
 		if (!e.state)
 			return;
