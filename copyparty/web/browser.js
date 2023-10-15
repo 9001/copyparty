@@ -1050,7 +1050,7 @@ ebi('op_up2k').innerHTML = (
 	'		</td>\n' +
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="u2ts" />\n' +
-	'			<label for="u2ts" tt="' + L.ut_u2ts + '">🕒</a>\n' +
+	'			<label for="u2ts" tt="' + L.ut_u2ts + '">📅</a>\n' +
 	'		</td>\n' +
 	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
 	'			<input type="checkbox" id="fsearch" />\n' +
@@ -3147,7 +3147,7 @@ function eval_hash() {
 
 function read_dsort(txt) {
 	try {
-		var zt = txt.trim().split(/,+/g);
+		var zt = (('' + txt).trim() || 'href').split(/,+/g);
 		dsort = [];
 		for (var a = 0; a < zt.length; a++) {
 			var z = zt[a].trim(), n = 1, t = "";
@@ -3163,6 +3163,7 @@ function read_dsort(txt) {
 	}
 	catch (ex) {
 		toast.warn(10, 'failed to apply default sort order [' + txt + ']:\n' + ex);
+		dsort = [['href', 1, '']];
 	}
 }
 read_dsort(dsort);
@@ -6400,7 +6401,7 @@ var filecols = (function () {
 				toh = ths[a].outerHTML, // !ff10
 				ttv = L.cols[ths[a].textContent];
 
-			ttv = (ttv ? ttv + '$N' : '') + 'ID: <code>' + th.getAttribute('name') + '</code>';
+			ttv = (ttv ? ttv + '; ' : '') + 'id=<code>' + th.getAttribute('name') + '</code>';
 			if (!MOBILE && toh) {
 				th.innerHTML = '<div class="cfg"><a href="#">-</a></div>' + toh;
 				th.getElementsByTagName('a')[0].onclick = ev_row_tgl;

@@ -86,6 +86,7 @@ flagcats = {
         "vmaxn=4k": "max 4096 files in volume (suffixes: b, k, m, g, t)",
         "rand": "force randomized filenames, 9 chars long by default",
         "nrand=N": "randomized filenames are N chars long",
+        "u2ts=fc": "[f]orce [c]lient-last-modified or [u]pload-time",
         "sz=1k-3m": "allow filesizes between 1 KiB and 3MiB",
         "df=1g": "ensure 1 GiB free disk space",
     },

@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import argparse  # typechk
 import colorsys
 import hashlib
+import re
 
 from .__init__ import PY2
 from .th_srv import HAVE_PIL, HAVE_PILF
@@ -24,7 +25,7 @@ class Ico(object):
             zb = [ord(x) for x in zb]
 
         c1 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 0.3)
-        c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 1)
+        c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 0.8 if HAVE_PILF else 1, 1)
         ci = [int(x * 255) for x in list(c1) + list(c2)]
         c = "".join(["{:02x}".format(x) for x in ci])
 
@@ -38,16 +39,21 @@ class Ico(object):
         if chrome:
             # cannot handle more than ~2000 unique SVGs
             if HAVE_PILF:
+                # pillow 10.1 made this the default font;
+                # svg: 3.7s, this: 36s
                 try:
                     from PIL import Image, ImageDraw
 
-                    h = int(96 * h / w)
-                    w = 96
+                    # [.lt] are hard to see lowercase / unspaced
+                    ext2 = re.sub("(.)", "\\1 ", ext).upper()
+
+                    h = int(128 * h / w)
+                    w = 128
                     img = Image.new("RGB", (w, h), "#" + c[:6])
                     pb = ImageDraw.Draw(img)
-                    _, _, tw, th = pb.textbbox((0, 0), ext, font_size=16)
+                    _, _, tw, th = pb.textbbox((0, 0), ext2, font_size=16)
                     xy = ((w - tw) // 2, (h - th) // 2)
-                    pb.text(xy, ext, fill="#" + c[6:], font_size=16)
+                    pb.text(xy, ext2, fill="#" + c[6:], font_size=16)
 
                     img = img.resize((w * 2, h * 2), Image.NEAREST)
 
