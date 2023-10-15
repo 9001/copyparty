@@ -2812,6 +2812,8 @@ function up2k_init(subtle) {
 
     function set_fsearch(new_state) {
         var fixed = false,
+            persist = new_state !== undefined,
+            preferred = bcfg_get('fsearch', undefined),
             can_write = false;
 
         if (!ebi('fsearch')) {
@@ -2828,8 +2830,14 @@ function up2k_init(subtle) {
             }
         }
 
+        if (new_state === undefined)
+            new_state = preferred;
+
         if (new_state !== undefined)
-            bcfg_set('fsearch', uc.fsearch = new_state);
+            if (persist)
+                bcfg_set('fsearch', uc.fsearch = new_state);
+            else
+                bcfg_upd_ui('fsearch', uc.fsearch = new_state);
 
         try {
             clmod(ebi('u2c3w'), 's', !can_write);
