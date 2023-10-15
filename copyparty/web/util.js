@@ -982,13 +982,14 @@ function bcfg_set(name, val) {
 function bcfg_upd_ui(name, val) {
     var o = ebi(name);
     if (!o)
-        return;
+        return val;
 
     if (o.getAttribute('type') == 'checkbox')
         o.checked = val;
     else if (o) {
         clmod(o, 'on', val);
     }
+    return val;
 }
 
 function bcfg_bind(obj, oname, cname, defval, cb, un_ev) {

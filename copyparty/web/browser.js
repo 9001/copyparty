@@ -137,6 +137,7 @@ var Ls = {
 
 		"ul_par": "parallel uploads:",
 		"ut_rand": "randomize filenames",
+		"ut_u2ts": "copy the last-modified timestamp$Nfrom your filesystem to the server",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
 		"ut_ask": "ask for confirmation before upload starts",
 		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
@@ -168,6 +169,7 @@ var Ls = {
 		"utl_prog": "progress",
 
 		"ul_flagblk": "the files were added to the queue</b><br>however there is a busy up2k in another browser tab,<br>so waiting for that to finish first",
+		"ul_btnlk": "the server configuration has locked this switch into this state",
 
 		"udt_up": "Upload",
 		"udt_srch": "Search",
@@ -606,6 +608,7 @@ var Ls = {
 
 		"ul_par": "samtidige handl.:",
 		"ut_rand": "finn opp nye tilfeldige filnavn",
+		"ut_u2ts": "gi filen på serveren samme$Ntidsstempel som lokalt hos deg",
 		"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
 		"ut_ask": "bekreft filutvalg før opplastning starter",
 		"ut_pot": "forbedre ytelsen på trege enheter ved å$Nforenkle brukergrensesnittet",
@@ -637,6 +640,7 @@ var Ls = {
 		"utl_prog": "fremdrift",
 
 		"ul_flagblk": "filene har blitt lagt i køen</b><br>men det er en annen nettleserfane som holder på med befaring eller opplastning akkurat nå,<br>så venter til den er ferdig først",
+		"ul_btnlk": "bryteren har blitt låst til denne tilstanden i serverens konfigurasjon",
 
 		"udt_up": "Last opp",
 		"udt_srch": "Søk",
@@ -1041,6 +1045,10 @@ ebi('op_up2k').innerHTML = (
 	'		<td class="c" rowspan="2">\n' +
 	'			<input type="checkbox" id="u2rand" />\n' +
 	'			<label for="u2rand" tt="' + L.ut_rand + '">🎲</label>\n' +
+	'		</td>\n' +
+	'		<td class="c" rowspan="2">\n' +
+	'			<input type="checkbox" id="u2ts" />\n' +
+	'			<label for="u2ts" tt="' + L.ut_u2ts + '">🕒</a>\n' +
 	'		</td>\n' +
 	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
 	'			<input type="checkbox" id="fsearch" />\n' +
@@ -6299,6 +6307,7 @@ function apply_perms(res) {
 	if (res.frand)
 		ebi('u2rand').parentNode.style.display = 'none';
 
+	u2ts = res.u2ts;
 	if (up2k)
 		up2k.set_fsearch();
 

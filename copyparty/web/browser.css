@@ -2502,14 +2502,14 @@ html.y #bbox-overlay figcaption a {
 	min-width: 24em;
 }
 #u2cards.w {
-	width: 44em;
+	width: 48em;
 	text-align: left;
 }
 #u2cards.ww {
 	display: inline-block;
 }
 #u2etaw.w {
-	width: 52em;
+	width: 55em;
 	text-align: right;
 	margin: 2em auto -2.7em auto;
 }
@@ -2554,10 +2554,10 @@ html.y #bbox-overlay figcaption a {
 	width: 30em;
 }
 #u2conf.w {
-	width: 48em;
+	width: 51em;
 }
 #u2conf.ww {
-	width: 78em;
+	width: 82em;
 }
 #u2conf.ww #u2c3w {
 	width: 29em;
@@ -3054,6 +3054,16 @@ html.d #treepar {
 
 
 
+@media (max-width: 32em) {
+	#u2conf {
+		font-size: .9em;
+	}
+}
+@media (max-width: 28em) {
+	#u2conf {
+		font-size: .8em;
+	}
+}
 @media (min-width: 70em) {
 	#barpos,
 	#barbuf {

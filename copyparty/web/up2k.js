@@ -861,6 +861,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
     bcfg_bind(uc, 'potato', 'potato', false, set_potato, false);
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
+    bcfg_bind(uc, 'u2ts', 'u2ts', !u2ts.endsWith('u'), set_u2ts, false);
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
 
     bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
@@ -1361,7 +1362,7 @@ function up2k_init(subtle) {
                 name = good_files[a][1],
                 fdir = evpath,
                 now = Date.now(),
-                lmod = fobj.lastModified || now,
+                lmod = uc.u2ts ? (fobj.lastModified || now) : 0,
                 ofs = name.lastIndexOf('/') + 1;
 
             if (ofs) {
@@ -2620,7 +2621,7 @@ function up2k_init(subtle) {
             wpx = window.innerWidth,
             fpx = parseInt(getComputedStyle(bar)['font-size']),
             wem = wpx * 1.0 / fpx,
-            wide = wem > 54 ? 'w' : '',
+            wide = wem > 57 ? 'w' : '',
             parent = ebi(wide ? 'u2btn_cw' : 'u2btn_ct'),
             btn = ebi('u2btn');
 
@@ -2629,7 +2630,7 @@ function up2k_init(subtle) {
             ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
         }
 
-        wide = wem > 82 ? 'ww' : wide;
+        wide = wem > 86 ? 'ww' : wide;
         parent = ebi(wide == 'ww' ? 'u2c3w' : 'u2c3t');
         var its = [ebi('u2etaw'), ebi('u2cards')];
         if (its[0].parentNode !== parent) {
@@ -2851,6 +2852,9 @@ function up2k_init(subtle) {
         ebi('u2cards').style.display = ebi('u2tab').style.display = potato ? 'none' : '';
         ebi('u2mu').style.display = potato ? '' : 'none';
 
+        if (u2ts.startsWith('f') || !sread('u2ts'))
+            uc.u2ts = bcfg_upd_ui('u2ts', !u2ts.endsWith('u'));
+
         draw_turbo();
         draw_life();
         onresize();
@@ -2875,12 +2879,24 @@ function up2k_init(subtle) {
         }
     }
 
-    function set_u2sort() {
+    function set_u2sort(en) {
         if (u2sort.indexOf('f') < 0)
             return;
 
-        bcfg_set('u2sort', uc.az = u2sort.indexOf('n') + 1);
-        localStorage.removeItem('u2sort');
+        var fen = uc.az = u2sort.indexOf('n') + 1;
+        bcfg_upd_ui('u2sort', fen);
+        if (en != fen)
+            toast.warn(10, L.ul_btnlk);
+    }
+
+    function set_u2ts(en) {
+        if (u2ts.indexOf('f') < 0)
+            return;
+
+        var fen = !u2ts.endsWith('u');
+        bcfg_upd_ui('u2ts', fen);
+        if (en != fen)
+            toast.warn(10, L.ul_btnlk);
     }
 
     function set_hashw() {
@@ -2978,7 +2994,7 @@ ebi('ico1').onclick = function () {
 if (QS('#op_up2k.act'))
     goto_up2k();
 
-apply_perms({ "perms": perms, "frand": frand });
+apply_perms({ "perms": perms, "frand": frand, "u2ts": u2ts });
 
 
 (function () {

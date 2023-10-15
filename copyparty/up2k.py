@@ -2339,6 +2339,9 @@ class Up2k(object):
             vols = [(ptop, jcur)] if jcur else []
             if vfs.flags.get("xlink"):
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
+            if vfs.flags.get("up_ts", "") == "fu" or not cj["lmod"]:
+                # force upload time rather than last-modified
+                cj["lmod"] = int(time.time())
 
             alts: list[tuple[int, int, dict[str, Any]]] = []
             for ptop, cur in vols:

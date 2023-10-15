@@ -42,7 +42,7 @@ def vf_bmap() -> dict[str, str]:
 def vf_vmap() -> dict[str, str]:
     """argv-to-volflag: simple values"""
     ret = {"th_convt": "convt", "th_size": "thsize"}
-    for k in ("dbd", "lg_sbf", "md_sbf", "nrand", "sort", "unlist"):
+    for k in ("dbd", "lg_sbf", "md_sbf", "nrand", "sort", "unlist", "u2ts"):
         ret[k] = k
     return ret
 
