@@ -1069,7 +1069,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-size", metavar="WxH", default="320x256", help="thumbnail res (volflag=thsize)")
     ap2.add_argument("--th-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for generating thumbnails")
     ap2.add_argument("--th-convt", metavar="SEC", type=float, default=60, help="conversion timeout in seconds (volflag=convt)")
-    ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image (volflag=nocrop)")
+    ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image by default (volflag=nocrop)")
     ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="image decoders, in order of preference")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")

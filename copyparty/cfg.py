@@ -129,7 +129,7 @@ flagcats = {
         "dathumb": "disables audio thumbnails (spectrograms)",
         "dithumb": "disables image thumbnails",
         "thsize": "thumbnail res; WxH",
-        "nocrop": "disable center-cropping",
+        "nocrop": "disable center-cropping by default",
         "convt": "conversion timeout in seconds",
     },
     "handlers\n(better explained in --help-handlers)": {

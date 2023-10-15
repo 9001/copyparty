@@ -333,6 +333,7 @@ var Ls = {
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
+		"gt_full": "show uncropped thumbnails\">full",
 		"gt_zoom": "zoom",
 		"gt_chop": "chop",
 		"gt_sort": "sort by",
@@ -804,6 +805,7 @@ var Ls = {
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
 
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
+		"gt_full": "ikke beskjær bildene\">full",
 		"gt_zoom": "zoom",
 		"gt_chop": "trim",
 		"gt_sort": "sorter",
@@ -4265,7 +4267,8 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> <span>' + L.gt_zoom + ': ' +
+		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
+		'<a href="#" class="tgl btn" id="gridfull" tt="' + L.gt_full + '</a> <span>' + L.gt_zoom + ': ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
 		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
 		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
@@ -4515,6 +4518,9 @@ var thegrid = (function () {
 		if (!r.dirty)
 			return r.loadsel();
 
+		if (dfull != r.full && !sread('gridfull'))
+			bcfg_upd_ui('gridfull', r.full = dfull);
+
 		var html = [],
 			svgs = new Set(),
 			max_svgs = CHROME ? 500 : 5000,
@@ -4532,6 +4538,8 @@ var thegrid = (function () {
 
 			if (r.thumbs) {
 				ihref += '?th=' + (have_webp ? 'w' : 'j');
+				if (r.full)
+					ihref += 'f'
 				if (href == "#")
 					ihref = SR + '/.cpr/ico/⏏️';
 			}
@@ -4618,6 +4626,7 @@ var thegrid = (function () {
 	};
 
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
+	bcfg_bind(r, 'full', 'gridfull', false, r.setdirty);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
 		v ? loadgrid() : r.setvis(true);
@@ -5823,6 +5832,7 @@ var treectl = (function () {
 				res.files[a].tags = {};
 
 		read_dsort(res.dsort);
+		dfull = res.dfull;
 
 		srvinf = res.srvinf;
 		try {

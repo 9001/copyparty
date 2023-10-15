@@ -84,12 +84,13 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str) -> str:
     # b64-lc = 38 = 1444
     # base64 = 64 = 4096
     rd, fn = vsplit(rem)
-    if rd:
-        h = hashlib.sha512(afsenc(rd)).digest()
-        b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]
-        rd = "{}/{}/".format(b64[:2], b64[2:4]).lower() + b64
-    else:
-        rd = "top"
+    if not rd:
+        rd = "\ntop"
+
+    rd += "\n" + fmt
+    h = hashlib.sha512(afsenc(rd)).digest()
+    b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]
+    rd = "{}/{}/".format(b64[:2], b64[2:4]).lower() + b64
 
     # could keep original filenames but this is safer re pathlen
     h = hashlib.sha512(afsenc(fn)).digest()
@@ -98,7 +99,8 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str) -> str:
     if fmt in ("opus", "caf"):
         cat = "ac"
     else:
-        fmt = "webp" if fmt == "w" else "png" if fmt == "p" else "jpg"
+        fc = fmt[:1]
+        fmt = "webp" if fc == "w" else "png" if fc == "p" else "jpg"
         cat = "th"
 
     return "{}/{}/{}/{}.{:x}.{}".format(histpath, cat, rd, fn, int(mtime), fmt)
@@ -118,7 +120,7 @@ class ThumbSrv(object):
         self.stopping = False
         self.nthr = max(1, self.args.th_mt)
 
-        self.q: Queue[Optional[tuple[str, str, VFS]]] = Queue(self.nthr * 4)
+        self.q: Queue[Optional[tuple[str, str, str, VFS]]] = Queue(self.nthr * 4)
         for n in range(self.nthr):
             Daemon(self.worker, "thumb-{}-{}".format(n, self.nthr))
 
@@ -220,8 +222,8 @@ class ThumbSrv(object):
                 self.log("ptop [{}] not in {}".format(ptop, allvols), 3)
                 vn = self.asrv.vfs.all_aps[0][1]
 
-            self.q.put((abspath, tpath, vn))
-            self.log("conv {} \033[0m{}".format(tpath, abspath), c=6)
+            self.q.put((abspath, tpath, fmt, vn))
+            self.log("conv {} :{} \033[0m{}".format(tpath, fmt, abspath), c=6)
 
         while not self.stopping:
             with self.mutex:
@@ -257,7 +259,7 @@ class ThumbSrv(object):
             if not task:
                 break
 
-            abspath, tpath, vn = task
+            abspath, tpath, fmt, vn = task
             ext = abspath.split(".")[-1].lower()
             png_ok = False
             funs = []
@@ -290,7 +292,7 @@ class ThumbSrv(object):
 
             for fun in funs:
                 try:
-                    fun(abspath, ttpath, vn)
+                    fun(abspath, ttpath, fmt, vn)
                     break
                 except Exception as ex:
                     msg = "{} could not create thumbnail of {}\n{}"
@@ -324,7 +326,7 @@ class ThumbSrv(object):
         with self.mutex:
             self.nthr -= 1
 
-    def fancy_pillow(self, im: "Image.Image", vn: VFS) -> "Image.Image":
+    def fancy_pillow(self, im: "Image.Image", fmt: str, vn: VFS) -> "Image.Image":
         # exif_transpose is expensive (loads full image + unconditional copy)
         res = self.getres(vn)
         r = max(*res) * 2
@@ -341,7 +343,7 @@ class ThumbSrv(object):
         if rot in rots:
             im = im.transpose(rots[rot])
 
-        if "nocrop" in vn.flags:
+        if fmt.endswith("f"):
             im.thumbnail(res, resample=Image.LANCZOS)
         else:
             iw, ih = im.size
@@ -351,10 +353,10 @@ class ThumbSrv(object):
 
         return im
 
-    def conv_pil(self, abspath: str, tpath: str, vn: VFS) -> None:
+    def conv_pil(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         with Image.open(fsenc(abspath)) as im:
             try:
-                im = self.fancy_pillow(im, vn)
+                im = self.fancy_pillow(im, fmt, vn)
             except Exception as ex:
                 self.log("fancy_pillow {}".format(ex), "90")
                 im.thumbnail(self.getres(vn))
@@ -380,9 +382,9 @@ class ThumbSrv(object):
 
             im.save(tpath, **args)
 
-    def conv_vips(self, abspath: str, tpath: str, vn: VFS) -> None:
+    def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         crops = ["centre", "none"]
-        if "nocrop" in vn.flags:
+        if fmt.endswith("f"):
             crops = ["none"]
 
         w, h = self.getres(vn)
@@ -399,7 +401,7 @@ class ThumbSrv(object):
 
         img.write_to_file(tpath, Q=40)
 
-    def conv_ffmpeg(self, abspath: str, tpath: str, vn: VFS) -> None:
+    def conv_ffmpeg(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if not ret:
             return
@@ -412,7 +414,7 @@ class ThumbSrv(object):
             seek = [b"-ss", "{:.0f}".format(dur / 3).encode("utf-8")]
 
         scale = "scale={0}:{1}:force_original_aspect_ratio="
-        if "nocrop" in vn.flags:
+        if fmt.endswith("f"):
             scale += "decrease,setsar=1:1"
         else:
             scale += "increase,crop={0}:{1},setsar=1:1"
@@ -497,7 +499,7 @@ class ThumbSrv(object):
         self.log(t + txt, c=c)
         raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
-    def conv_waves(self, abspath: str, tpath: str, vn: VFS) -> None:
+    def conv_waves(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if "ac" not in ret:
             raise Exception("not audio")
@@ -525,7 +527,7 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd, vn)
 
-    def conv_spec(self, abspath: str, tpath: str, vn: VFS) -> None:
+    def conv_spec(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if "ac" not in ret:
             raise Exception("not audio")
@@ -568,7 +570,7 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd, vn)
 
-    def conv_opus(self, abspath: str, tpath: str, vn: VFS) -> None:
+    def conv_opus(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         if self.args.no_acode:
             raise Exception("disabled in server config")
 
