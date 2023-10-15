@@ -37,14 +37,21 @@ if TYPE_CHECKING:
     from .svchub import SvcHub
 
 HAVE_PIL = False
+HAVE_PILF = False
 HAVE_HEIF = False
 HAVE_AVIF = False
 HAVE_WEBP = False
 
 try:
-    from PIL import ExifTags, Image, ImageOps
+    from PIL import ExifTags, Image, ImageFont, ImageOps
 
     HAVE_PIL = True
+    try:
+        ImageFont.load_default(size=16)
+        HAVE_PILF = True
+    except:
+        pass
+
     try:
         Image.new("RGB", (2, 2)).save(BytesIO(), format="webp")
         HAVE_WEBP = True

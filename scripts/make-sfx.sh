@@ -420,16 +420,13 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 
 [ $no_ftp ] &&
 	rm -rf copyparty/ftpd.py ftp asyncore.py asynchat.py &&
-	sed -ri '/add_argument\("--ftp/d' copyparty/__main__.py &&
 	sed -ri '/\.ftp/d' copyparty/svchub.py
 
 [ $no_smb ] &&
-	rm -f copyparty/smbd.py &&
-	sed -ri '/add_argument\("--smb/d' copyparty/__main__.py
+	rm -f copyparty/smbd.py
 
 [ $no_zm ] &&
-	rm -rf copyparty/mdns.py copyparty/stolen/dnslib &&
-	sed -ri '/add_argument\("--zm/d' copyparty/__main__.py
+	rm -rf copyparty/mdns.py copyparty/stolen/dnslib
 
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*

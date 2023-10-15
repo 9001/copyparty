@@ -6,7 +6,7 @@ import colorsys
 import hashlib
 
 from .__init__ import PY2
-from .th_srv import HAVE_PIL
+from .th_srv import HAVE_PIL, HAVE_PILF
 from .util import BytesIO
 
 
@@ -37,6 +37,27 @@ class Ico(object):
 
         if chrome:
             # cannot handle more than ~2000 unique SVGs
+            if HAVE_PILF:
+                try:
+                    from PIL import Image, ImageDraw
+
+                    h = int(96 * h / w)
+                    w = 96
+                    img = Image.new("RGB", (w, h), "#" + c[:6])
+                    pb = ImageDraw.Draw(img)
+                    _, _, tw, th = pb.textbbox((0, 0), ext, font_size=16)
+                    xy = ((w - tw) // 2, (h - th) // 2)
+                    pb.text(xy, ext, fill="#" + c[6:], font_size=16)
+
+                    img = img.resize((w * 2, h * 2), Image.NEAREST)
+
+                    buf = BytesIO()
+                    img.save(buf, format="PNG", compress_level=1)
+                    return "image/png", buf.getvalue()
+
+                except:
+                    pass
+
             if HAVE_PIL:
                 # svg: 3s, cache: 6s, this: 8s
                 from PIL import Image, ImageDraw

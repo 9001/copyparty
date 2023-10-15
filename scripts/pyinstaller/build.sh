@@ -9,10 +9,13 @@ tee build2.sh | cmp build.sh && rm build2.sh || {
     [[ $r =~ [yY] ]] && mv build{2,}.sh && exec ./build.sh
 }
 
-[ -e up2k.sh ] && [ ! "$1" ] && ./up2k.sh
+clean=--clean
+[ "$1" = f ] && clean= && shift
 
 uname -s | grep WOW64 && m=64 || m=32
 uname -s | grep NT-10 && w10=1 || w7=1
+[ $w7 ] && [ -e up2k.sh ] && [ ! "$1" ] && ./up2k.sh
+
 [ $w7 ] && pyv=37 || pyv=311
 esuf=
 [ $w7 ] && [ $m = 32 ] && esuf=32
@@ -65,12 +68,18 @@ sed -r 's/1,2,3,0/'$a,$b,$c,$d'/;s/1\.2\.3/'$a.$b.$c/ <loader.rc >loader.rc2
 sed -ri s/copyparty.exe/copyparty$esuf.exe/ loader.rc2
 
 excl=(
+    asyncio
     copyparty.broker_mp
     copyparty.broker_mpw
+    copyparty.smbd
     ctypes.macholib
     curses
+    email._header_value_parser
+    email.header
+    email.parser
     inspect
     multiprocessing
+    packaging
     pdb
     pickle
     PIL.EpsImagePlugin
@@ -85,6 +94,7 @@ excl=(
     PIL.ImageShow
     PIL.ImageTk
     PIL.ImageWin
+    PIL.PdfParser
 ) || excl+=(
     PIL
     PIL.ExifTags
@@ -95,7 +105,7 @@ excl=(
 excl=( "${excl[@]/#/--exclude-module }" )
 
 $APPDATA/python/python$pyv/scripts/pyinstaller \
-    -y --clean -p mods --upx-dir=. \
+    -y $clean -p mods --upx-dir=. \
     ${excl[*]} \
     --version-file loader.rc2 -i loader.ico -n copyparty -c -F loader.py \
     --add-data 'mods/copyparty/res;copyparty/res' \
