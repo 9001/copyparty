@@ -36,6 +36,14 @@ from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
 
+if sys.version_info >= (3, 7) or (
+    sys.version_info >= (3, 6) and platform.python_implementation() == "CPython"
+):
+    ODict = dict
+else:
+    from collections import OrderedDict as ODict
+
+
 def _ens(want: str) -> tuple[int, ...]:
     ret: list[int] = []
     for v in want.split():
@@ -259,6 +267,11 @@ EXTS: dict[str, str] = {v: k for k, v in MIMES.items()}
 EXTS["vnd.mozilla.apng"] = "png"
 
 MAGIC_MAP = {"jpeg": "jpg"}
+
+
+DEF_MTE = "circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
+
+DEF_MTH = ".vq,.aq,vc,ac,fmt,res,.fps"
 
 
 REKOBO_KEY = {
@@ -1772,6 +1785,21 @@ def u8safe(txt: str) -> str:
 
 def exclude_dotfiles(filepaths: list[str]) -> list[str]:
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
+
+
+def odfusion(base: ODict[str, bool], oth: str) -> ODict[str, bool]:
+    # merge an "ordered set" (just a dict really) with another list of keys
+    ret = base.copy()
+    if oth.startswith("+"):
+        for k in oth[1:].split(","):
+            ret[k] = True
+    elif oth[:1] in ("-", "/"):
+        for k in oth[1:].split(","):
+            ret.pop(k, None)
+    else:
+        ret = ODict.fromkeys(oth.split(","), True)
+
+    return ret
 
 
 def ipnorm(ip: str) -> str:

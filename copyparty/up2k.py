@@ -642,10 +642,7 @@ class Up2k(object):
             if self.stop:
                 break
 
-            en: set[str] = set()
-            if "mte" in vol.flags:
-                en = set(vol.flags["mte"].split(","))
-
+            en = set(vol.flags.get("mte", {}))
             self.entags[vol.realpath] = en
 
             if "e2d" in vol.flags:

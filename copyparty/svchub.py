@@ -39,13 +39,17 @@ from .util import (
     FFMPEG_URL,
     VERSIONS,
     Daemon,
+    DEF_MTE,
+    DEF_MTH,
     Garda,
     HLog,
     HMaccas,
+    ODict,
     alltrace,
     ansi_re,
     min_ex,
     mp,
+    odfusion,
     pybin,
     start_log_thrs,
     start_stackmon,
@@ -432,6 +436,12 @@ class SvcHub(object):
         else:
             zs = al.xff_src.replace(" ", "").replace(".", "\\.").replace(",", "|")
             al.xff_re = re.compile("^(?:" + zs + ")")
+
+        mte = ODict.fromkeys(DEF_MTE.split(","), True)
+        al.mte = odfusion(mte, al.mte)
+
+        mth = ODict.fromkeys(DEF_MTH.split(","), True)
+        al.mth = odfusion(mth, al.mth)
 
         return True
 

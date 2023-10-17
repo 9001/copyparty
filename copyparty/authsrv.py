@@ -21,11 +21,13 @@ from .util import (
     META_NOBOTS,
     SQLITE_VER,
     UNPLICATIONS,
+    ODict,
     Pebkac,
     absreal,
     afsenc,
     get_df,
     humansize,
+    odfusion,
     relchk,
     statdir,
     uncyg,
@@ -1477,13 +1479,14 @@ class AuthSrv(object):
 
             # default tag cfgs if unset
             if "mte" not in vol.flags:
-                vol.flags["mte"] = self.args.mte
-            elif vol.flags["mte"].startswith("+"):
-                vol.flags["mte"] = ",".join(
-                    x for x in [self.args.mte, vol.flags["mte"][1:]] if x
-                )
+                vol.flags["mte"] = self.args.mte.copy()
+            else:
+                vol.flags["mte"] = odfusion(self.args.mte, vol.flags["mte"])
+
             if "mth" not in vol.flags:
-                vol.flags["mth"] = self.args.mth
+                vol.flags["mth"] = self.args.mth.copy()
+            else:
+                vol.flags["mth"] = odfusion(self.args.mth, vol.flags["mth"])
 
             # append additive args from argv to volflags
             hooks = "xbu xau xiu xbr xar xbd xad xm xban".split()
@@ -1584,12 +1587,12 @@ class AuthSrv(object):
                 if local:
                     local_only_mtp[a] = True
 
-            local_mte = {}
-            for a in vol.flags.get("mte", "").split(","):
+            local_mte = ODict()
+            for a in vol.flags.get("mte", {}).keys():
                 local = True
                 all_mte[a] = True
                 local_mte[a] = True
-                for b in self.args.mte.split(","):
+                for b in self.args.mte.keys():
                     if not a or not b:
                         continue
 

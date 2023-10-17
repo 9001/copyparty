@@ -27,6 +27,8 @@ from .authsrv import expand_config_file, re_vol, split_cfg_ln, upgrade_cfg_fmt
 from .cfg import flagcats, onedash
 from .svchub import SvcHub
 from .util import (
+    DEF_MTE,
+    DEF_MTH,
     IMPLICATIONS,
     JINJA_VER,
     PYFTPD_VER,
@@ -1132,10 +1134,8 @@ def add_db_metadata(ap):
     ap2.add_argument("--mtag-v", action="store_true", help="verbose tag scanning; print errors from mtp subprocesses and such")
     ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings and mutagen/ffprobe parsers")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
-    ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.)",
-        default="circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash,up_ip,.up_at")
-    ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.)",
-        default=".vq,.aq,vc,ac,fmt,res,.fps")
+    ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.); either an entire replacement list, or add/remove stuff on the default-list with +foo or /bar", default=DEF_MTE)
+    ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.); assign/add/remove same as -mte", default=DEF_MTH)
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag M using program BIN to parse the file")
 
 

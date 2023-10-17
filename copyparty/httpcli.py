@@ -40,6 +40,7 @@ from .util import (
     HTTPCODE,
     META_NOBOTS,
     MultipartParser,
+    ODict,
     Pebkac,
     UnrecvEOF,
     absreal,
@@ -1971,8 +1972,7 @@ class HttpCli(object):
         self.log("q#: {} ({:.2f}s)".format(msg, idx.p_dur))
 
         order = []
-        cfg = self.args.mte.split(",")
-        for t in cfg:
+        for t in self.args.mte:
             if t in taglist:
                 order.append(t)
         for t in taglist:
@@ -4051,6 +4051,9 @@ class HttpCli(object):
                     ap = vn.canonical(rem)
                     return self.tx_file(ap)  # is no-cache
 
+        mte = vn.flags.get("mte", {})
+        add_up_at = ".up_at" in mte
+        is_admin = self.can_admin
         tagset: set[str] = set()
         for fe in files:
             fn = fe["name"]
@@ -4078,24 +4081,38 @@ class HttpCli(object):
                     self.log(t.format(rd, fn, min_ex()))
                     break
 
-            fe["tags"] = {k: v for k, v in r}
+            tags = {k: v for k, v in r}
 
-            if self.can_admin:
+            if is_admin:
                 q = "select ip, at from up where rd=? and fn=?"
                 try:
                     zs1, zs2 = icur.execute(q, erd_efn).fetchone()
-                    fe["tags"]["up_ip"] = zs1
-                    fe["tags"][".up_at"] = zs2
+                    if zs1:
+                        tags["up_ip"] = zs1
+                    if zs2:
+                        tags[".up_at"] = zs2
+                except:
+                    pass
+            elif add_up_at:
+                q = "select at from up where rd=? and fn=?"
+                try:
+                    (zs1,) = icur.execute(q, erd_efn).fetchone()
+                    if zs1:
+                        tags[".up_at"] = zs1
                 except:
                     pass
 
-            _ = [tagset.add(k) for k in fe["tags"]]
+            _ = [tagset.add(k) for k in tags]
+            fe["tags"] = tags
 
         if icur:
-            mte = vn.flags.get("mte") or "up_ip,.up_at"
-            taglist = [k for k in mte.split(",") if k in tagset]
+            lmte = list(mte)
+            if self.can_admin:
+                lmte += ["up_ip", ".up_at"]
+
+            taglist = [k for k in lmte if k in tagset]
             for fe in dirs:
-                fe["tags"] = {}
+                fe["tags"] = ODict()
         else:
             taglist = list(tagset)
 
@@ -4142,7 +4159,7 @@ class HttpCli(object):
         j2a["txt_ext"] = self.args.textfiles.replace(",", " ")
 
         if "mth" in vn.flags:
-            j2a["def_hcols"] = vn.flags["mth"].split(",")
+            j2a["def_hcols"] = list(vn.flags["mth"])
 
         html = self.j2s(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))
