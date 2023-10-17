@@ -20,9 +20,8 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [testimonials](#testimonials) - small collection of user feedback
 * [motivations](#motivations) - project goals / philosophy
     * [notes](#notes) - general notes
-* [bugs](#bugs)
-    * [general bugs](#general-bugs)
-    * [not my bugs](#not-my-bugs)
+* [bugs](#bugs) - roughly sorted by chance of encounter
+    * [not my bugs](#not-my-bugs) - same order here too
 * [breaking changes](#breaking-changes) - upgrade notes
 * [FAQ](#FAQ) - "frequently" asked questions
 * [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
@@ -263,19 +262,27 @@ server notes:
 
 # bugs
 
-* Windows: python 2.7 cannot index non-ascii filenames with `-e2d`
-* Windows: python 2.7 cannot handle filenames with mojibake
-* `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions (macos, some linux)
-* `--th-ff-swr` may fix audio thumbnails on some FFmpeg versions
+roughly sorted by chance of encounter
 
-## general bugs
+* general:
+  * `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions (macos, some linux)
+  * `--th-ff-swr` may fix audio thumbnails on some FFmpeg versions
+  * if the `up2k.db` (filesystem index) is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
+    * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
+  * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
+  * probably more, pls let me know
 
-* Windows: if the `up2k.db` (filesystem index) is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
-  * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
-* all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
-* probably more, pls let me know
+* python 3.4 and older (including 2.7):
+  * many rare and exciting edge-cases because [python didn't handle EINTR yet](https://peps.python.org/pep-0475/)
+    * downloads from copyparty may suddenly fail, but uploads *should* be fine
+
+* python 2.7 on Windows:
+  * cannot index non-ascii filenames with `-e2d`
+  * cannot handle filenames with mojibake
 
 ## not my bugs
+
+same order here too
 
 * [Chrome issue 1317069](https://bugs.chromium.org/p/chromium/issues/detail?id=1317069) -- if you try to upload a folder which contains symlinks by dragging it into the browser, the symlinked files will not get uploaded
 
