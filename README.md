@@ -1643,8 +1643,6 @@ safety profiles:
   * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
     * however note if you edit one file it will also affect the other copies
   * `--vague-403` returns a "404 not found" instead of "401 unauthorized" which is a common enterprise meme
-  * `--ban-404=50,60,1440` ban client for 1440min (24h) if they hit 50 404's in 60min
-    * `--turbo=-1` to force-disable turbo-mode in the uploader which could otherwise hit the 404-ban
   * `--nih` removes the server hostname from directory listings
 
 * option `-sss` is a shortcut for the above plus:

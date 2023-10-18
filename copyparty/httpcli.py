@@ -655,6 +655,7 @@ class HttpCli(object):
                     and not body.startswith(b"<pre>source file busy")
                 )
             )
+            and (status != 404 or (self.can_get and not self.can_read))
         ):
             if status == 404:
                 g = self.conn.hsrv.g404

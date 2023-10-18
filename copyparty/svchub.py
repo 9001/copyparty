@@ -119,8 +119,6 @@ class SvcHub(object):
             args.no_mv = True
             args.hardlink = True
             args.vague_403 = True
-            args.ban_404 = "50,60,1440"
-            args.turbo = -1
             args.nih = True
 
         if args.s:

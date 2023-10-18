@@ -1340,6 +1340,7 @@ function up2k_init(subtle) {
 
     function up_them(good_files) {
         start_actx();
+        draw_turbo();
         var evpath = get_evpath(),
             draw_each = good_files.length < 50;
 
@@ -2711,7 +2712,12 @@ function up2k_init(subtle) {
     function draw_turbo() {
         if (turbolvl < 0 && uc.turbo) {
             bcfg_set('u2turbo', uc.turbo = false);
-            toast.err(10, "turbo is disabled in server config");
+            toast.err(10, L.u_turbo_c);
+        }
+
+        if (uc.turbo && !has(perms, 'read')) {
+            bcfg_set('u2turbo', uc.turbo = false);
+            toast.warn(30, L.u_turbo_g);
         }
 
         var msg = (turbolvl || !uc.turbo) ? null : uc.fsearch ? L.u_ts : L.u_tu,
