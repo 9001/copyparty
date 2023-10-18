@@ -5956,7 +5956,8 @@ var treectl = (function () {
 			}
 
 			if (tn.lead == '-')
-				tn.lead = '<a href="?doc=' + tn.href + '" class="doc' + (lang ? ' bri' : '') +
+				tn.lead = '<a href="?doc=' + bhref +
+					'" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
 			var ln = ['<tr><td>' + tn.lead + '</td><td><a href="' +
