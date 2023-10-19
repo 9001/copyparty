@@ -1475,6 +1475,8 @@ input.eq_gain {
 	width: calc(100% - 2em);
 	margin: .3em 0 0 1.4em;
 }
+@media (max-width: 130em) { #srch_form.tags #tq_raw { width: calc(100% - 34em) } }
+@media (max-width: 95em) { #srch_form.tags #tq_raw { width: calc(100% - 2em) } }
 #tq_raw td+td {
 	width: 100%;
 }

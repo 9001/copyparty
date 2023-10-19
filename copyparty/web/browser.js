@@ -354,11 +354,14 @@ var Ls = {
 		"s_rd": "path",
 		"s_fn": "name",
 		"s_ta": "tags",
+		"s_ua": "up@",
 		"s_ad": "adv.",
 		"s_s1": "minimum MiB",
 		"s_s2": "maximum MiB",
 		"s_d1": "min. iso8601",
 		"s_d2": "max. iso8601",
+		"s_u1": "uploaded after",
+		"s_u2": "and/or before",
 		"s_r1": "path contains &nbsp; (space-separated)",
 		"s_f1": "name contains &nbsp; (negate with -nope)",
 		"s_t1": "tags contains &nbsp; (^=start, end=$)",
@@ -828,11 +831,14 @@ var Ls = {
 		"s_rd": "sti",
 		"s_fn": "navn",
 		"s_ta": "meta",
+		"s_ua": "up@",
 		"s_ad": "avns.",
 		"s_s1": "større enn ↓ MiB",
 		"s_s2": "mindre enn ↓ MiB",
 		"s_d1": "nyere enn &lt;dato&gt;",
 		"s_d2": "eldre enn",
+		"s_u1": "lastet opp etter",
+		"s_u2": "og/eller før",
 		"s_r1": "mappenavn inneholder",
 		"s_f1": "filnavn inneholder",
 		"s_t1": "sang-info inneholder",
@@ -4999,6 +5005,11 @@ document.onkeydown = function (e) {
 		[
 			L.s_ad,
 			["adv", "adv", L.s_a1, "30", "key>=1A  key<=2B  .bpm>165"]
+		],
+		[
+			L.s_ua,
+			["utl", "ut_min", L.s_u1, "14", "2007-04-08"],
+			["utu", "ut_max", L.s_u2, "14", "2038-01-19"]
 		]
 	];
 
@@ -5143,7 +5154,7 @@ document.onkeydown = function (e) {
 					}
 
 					if (k.length == 3) {
-						q += k.replace(/sz/, 'size').replace(/dt/, 'date').replace(/l$/, ' >= ').replace(/u$/, ' <= ') + tv;
+						q += k.replace(/l$/, ' >= ').replace(/u$/, ' <= ').replace(/^sz/, 'size').replace(/^dt/, 'date').replace(/^ut/, 'up_at') + tv;
 						continue;
 					}
 

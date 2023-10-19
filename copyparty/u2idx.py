@@ -181,6 +181,11 @@ class U2idx(object):
                     is_date = True
                     have_up = True
 
+                elif v == "up_at":
+                    v = "up.at"
+                    is_date = True
+                    have_up = True
+
                 elif v == "path":
                     v = "trim(?||up.rd,'/')"
                     va.append("\nrd")
