@@ -8,7 +8,7 @@ from datetime import datetime
 from .__init__ import CORES
 from .bos import bos
 from .th_cli import ThumbCli
-from .util import vjoin
+from .util import UTC, vjoin
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Generator, Optional
@@ -108,7 +108,7 @@ def errdesc(errors: list[tuple[str, str]]) -> tuple[dict[str, Any], list[str]]:
         tf_path = tf.name
         tf.write("\r\n".join(report).encode("utf-8", "replace"))
 
-    dt = datetime.utcnow().strftime("%Y-%m%d-%H%M%S")
+    dt = datetime.now(UTC).strftime("%Y-%m%d-%H%M%S")
 
     bos.chmod(tf_path, 0o444)
     return {

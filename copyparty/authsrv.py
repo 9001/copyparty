@@ -23,6 +23,7 @@ from .util import (
     UNPLICATIONS,
     ODict,
     Pebkac,
+    UTC,
     absreal,
     afsenc,
     get_df,
@@ -215,7 +216,7 @@ class Lim(object):
             if self.rot_re.search(path.replace("\\", "/")):
                 return path, ""
 
-            suf = datetime.utcnow().strftime(self.rotf)
+            suf = datetime.now(UTC).strftime(self.rotf)
             if path:
                 path += "/"
 

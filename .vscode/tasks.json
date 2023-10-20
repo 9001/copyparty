@@ -11,6 +11,7 @@
             "type": "shell",
             "command": "${config:python.pythonPath}",
             "args": [
+                "-Wa", //-We
                 ".vscode/launch.py"
             ]
         }

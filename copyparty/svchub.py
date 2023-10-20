@@ -45,6 +45,7 @@ from .util import (
     HLog,
     HMaccas,
     ODict,
+    UTC,
     alltrace,
     ansi_re,
     min_ex,
@@ -484,7 +485,7 @@ class SvcHub(object):
             self.args.nc = min(self.args.nc, soft // 2)
 
     def _logname(self) -> str:
-        dt = datetime.utcnow()
+        dt = datetime.now(UTC)
         fn = str(self.args.lo)
         for fs in "YmdHMS":
             fs = "%" + fs
@@ -733,7 +734,7 @@ class SvcHub(object):
             return
 
         with self.log_mutex:
-            zd = datetime.utcnow()
+            zd = datetime.now(UTC)
             ts = self.log_dfmt % (
                 zd.year,
                 zd.month * 100 + zd.day,
@@ -751,7 +752,7 @@ class SvcHub(object):
             self.logf.close()
             self._setup_logfile("")
 
-        dt = datetime.utcnow()
+        dt = datetime.now(UTC)
 
         # unix timestamp of next 00:00:00 (leap-seconds safe)
         day_now = dt.day
@@ -759,14 +760,20 @@ class SvcHub(object):
             dt += timedelta(hours=12)
 
         dt = dt.replace(hour=0, minute=0, second=0)
-        self.next_day = calendar.timegm(dt.utctimetuple())
+        try:
+            tt = dt.utctimetuple()
+        except:
+            # still makes me hella uncomfortable
+            tt = dt.timetuple()
+
+        self.next_day = calendar.timegm(tt)
 
     def _log_enabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
         """handles logging from all components"""
         with self.log_mutex:
             now = time.time()
             if now >= self.next_day:
-                dt = datetime.utcfromtimestamp(now)
+                dt = datetime.fromtimestamp(now, UTC)
                 zs = "{}\n" if self.no_ansi else "\033[36m{}\033[0m\n"
                 zs = zs.format(dt.strftime("%Y-%m-%d"))
                 print(zs, end="")
@@ -789,7 +796,7 @@ class SvcHub(object):
                 else:
                     msg = "%s%s\033[0m" % (c, msg)
 
-            zd = datetime.utcfromtimestamp(now)
+            zd = datetime.fromtimestamp(now, UTC)
             ts = self.log_efmt % (
                 zd.hour,
                 zd.minute,

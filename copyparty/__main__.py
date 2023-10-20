@@ -186,7 +186,10 @@ def init_E(E: EnvParams) -> None:
 
         with open_binary("copyparty", "z.tar") as tgz:
             with tarfile.open(fileobj=tgz) as tf:
-                tf.extractall(tdn)  # nosec (archive is safe)
+                try:
+                    tf.extractall(tdn, filter="tar")
+                except TypeError:
+                    tf.extractall(tdn)  # nosec (archive is safe)
 
         return tdn
 

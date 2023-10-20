@@ -20,12 +20,13 @@ import sys
 import base64
 import sqlite3
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import quote_from_bytes as quote
 from urllib.parse import unquote_to_bytes as unquote
 
 
 FS_ENCODING = sys.getfilesystemencoding()
+UTC = timezone.utc
 
 
 class APF(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
@@ -155,11 +156,10 @@ th {
                 link = txt.decode("utf-8")[4:]
 
         sz = "{:,}".format(sz)
+        dt = datetime.fromtimestamp(at if at > 0 else mt, UTC)
         v = [
             w[:16],
-            datetime.utcfromtimestamp(at if at > 0 else mt).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
+            dt.strftime("%Y-%m-%d %H:%M:%S"),
             sz,
             imap.get(ip, ip),
         ]

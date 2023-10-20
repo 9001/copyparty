@@ -25,7 +25,6 @@ import threading
 import time
 import traceback
 from collections import Counter
-from datetime import datetime
 from email.utils import formatdate
 
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
@@ -34,6 +33,27 @@ from queue import Queue
 from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
+
+try:
+    from datetime import datetime, timezone
+
+    UTC = timezone.utc
+except:
+    from datetime import datetime, timedelta, tzinfo
+
+    TD_ZERO = timedelta(0)
+
+    class _UTC(tzinfo):
+        def utcoffset(self, dt):
+            return TD_ZERO
+
+        def tzname(self, dt):
+            return "UTC"
+
+        def dst(self, dt):
+            return TD_ZERO
+
+    UTC = _UTC()
 
 
 if sys.version_info >= (3, 7) or (
@@ -1131,7 +1151,7 @@ def stackmon(fp: str, ival: float, suffix: str) -> None:
             buf = lzma.compress(buf, preset=0)
 
         if "%" in fp:
-            dt = datetime.utcnow()
+            dt = datetime.now(UTC)
             for fs in "YmdHMS":
                 fs = "%" + fs
                 if fs in fp:

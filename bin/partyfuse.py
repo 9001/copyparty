@@ -46,12 +46,13 @@ import traceback
 import http.client  # py2: httplib
 import urllib.parse
 import calendar
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import quote_from_bytes as quote
 from urllib.parse import unquote_to_bytes as unquote
 
 WINDOWS = sys.platform == "win32"
 MACOS = platform.system() == "Darwin"
+UTC = timezone.utc
 info = log = dbg = None
 
 
@@ -176,7 +177,7 @@ class RecentLog(object):
     def put(self, msg):
         msg = "{:10.6f} {} {}\n".format(time.time() % 900, rice_tid(), msg)
         if self.f:
-            fmsg = " ".join([datetime.utcnow().strftime("%H%M%S.%f"), str(msg)])
+            fmsg = " ".join([datetime.now(UTC).strftime("%H%M%S.%f"), str(msg)])
             self.f.write(fmsg.encode("utf-8"))
 
         with self.mtx:

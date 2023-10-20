@@ -3,7 +3,7 @@
 import hashlib
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 _ = r"""
@@ -43,8 +43,11 @@ except:
         return p
 
 
+UTC = timezone.utc
+
+
 def humantime(ts):
-    return datetime.utcfromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.fromtimestamp(ts, UTC).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def find_files_root(inf):
@@ -96,7 +99,7 @@ def main():
 
     ret.append("# {} files, {} bytes total".format(len(inf), total_sz))
     ret.append("")
-    ftime = datetime.utcnow().strftime("%Y-%m%d-%H%M%S.%f")
+    ftime = datetime.now(UTC).strftime("%Y-%m%d-%H%M%S.%f")
     fp = "{}xfer-{}.sha512".format(inf[0]["ap"][:di], ftime)
     with open(fsenc(fp), "wb") as f:
         f.write("\n".join(ret).encode("utf-8", "replace"))

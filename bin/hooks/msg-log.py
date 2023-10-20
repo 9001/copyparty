@@ -7,7 +7,11 @@ import json
 import os
 import sys
 import time
-from datetime import datetime
+
+try:
+    from datetime import datetime, timezone
+except:
+    from datetime import datetime
 
 
 """
@@ -96,7 +100,11 @@ def main(argv=None):
     msg_info = json.loads(sys.argv[1])
     # print(msg_info)
 
-    dt = datetime.utcfromtimestamp(msg_info["at"])
+    try:
+        dt = datetime.fromtimestamp(msg_info["at"], timezone.utc)
+    except:
+        dt = datetime.utcfromtimestamp(msg_info["at"])
+
     msg_info["datetime"] = dt.strftime("%Y-%m-%d, %H:%M:%S")
 
     msg_text = TEMPLATE % msg_info

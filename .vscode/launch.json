@@ -9,6 +9,10 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false,
+            "env": {
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+                "PYTHONWARNINGS": "always", //error
+            },
             "args": [
                 //"-nw",
                 "-ed",

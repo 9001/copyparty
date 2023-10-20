@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import subprocess as sp
-from datetime import datetime
+from datetime import datetime, timezone
 from plyer import notification
 
 
@@ -43,7 +43,8 @@ def main():
     fp = inf["ap"]
     sz = humansize(inf["sz"])
     dp, fn = os.path.split(fp)
-    mt = datetime.utcfromtimestamp(inf["mt"]).strftime("%Y-%m-%d %H:%M:%S")
+    dt = datetime.fromtimestamp(inf["mt"], timezone.utc)
+    mt = dt.strftime("%Y-%m-%d %H:%M:%S")
 
     msg = f"{fn} ({sz})\n📁 {dp}"
     title = "File received"

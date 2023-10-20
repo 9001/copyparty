@@ -41,7 +41,7 @@ if sfx:
     argv = [sys.executable, sfx] + argv
     sp.check_call(argv)
 elif re.search(" -j ?[0-9]", " ".join(argv)):
-    argv = [sys.executable, "-m", "copyparty"] + argv
+    argv = [sys.executable, "-Wa", "-m", "copyparty"] + argv
     sp.check_call(argv)
 else:
     sys.path.insert(0, os.getcwd())

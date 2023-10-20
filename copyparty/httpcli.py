@@ -42,6 +42,7 @@ from .util import (
     MultipartParser,
     ODict,
     Pebkac,
+    UTC,
     UnrecvEOF,
     absreal,
     alltrace,
@@ -3992,7 +3993,7 @@ class HttpCli(object):
                 margin = "-"
 
             sz = inf.st_size
-            zd = datetime.utcfromtimestamp(linf.st_mtime)
+            zd = datetime.fromtimestamp(linf.st_mtime, UTC)
             dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
                 zd.year,
                 zd.month,
