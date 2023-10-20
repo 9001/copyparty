@@ -134,8 +134,6 @@ class Up2k(object):
         self.vol_act: dict[str, float] = {}
         self.busy_aps: set[str] = set()
         self.dupesched: dict[str, list[tuple[str, str, float]]] = {}
-        self.snap_persist_interval = 300  # persist unfinished index every 5 min
-        self.snap_discard_interval = 21600  # drop unfinished after 6 hours inactivity
         self.snap_prev: dict[str, Optional[tuple[int, float]]] = {}
 
         self.mtag: Optional[MTag] = None
@@ -3745,13 +3743,16 @@ class Up2k(object):
             self._finish_upload(job["ptop"], job["wark"])
 
     def _snapshot(self) -> None:
-        slp = self.snap_persist_interval
+        slp = self.args.snap_wri
+        if not slp or self.args.no_snap:
+            return
+
         while True:
             time.sleep(slp)
             if self.pp:
                 slp = 5
             else:
-                slp = self.snap_persist_interval
+                slp = self.args.snap_wri
                 self.do_snapshot()
 
     def do_snapshot(self) -> None:
@@ -3765,11 +3766,8 @@ class Up2k(object):
         if not histpath:
             return
 
-        rm = [
-            x
-            for x in reg.values()
-            if x["need"] and now - x["poke"] > self.snap_discard_interval
-        ]
+        idrop = self.args.snap_drop * 60
+        rm = [x for x in reg.values() if x["need"] and now - x["poke"] >= idrop]
 
         if self.args.nw:
             lost = []

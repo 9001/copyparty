@@ -808,6 +808,8 @@ def add_upload(ap):
     ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead (volflag=copydupes)")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-snap", action="store_true", help="disable snapshots -- forget unfinished uploads on shutdown; don't create .hist/up2k.snap files -- abandoned/interrupted uploads must be cleaned up manually")
+    ap2.add_argument("--snap-wri", metavar="SEC", type=int, default=300, help="write upload state to ./hist/up2k.snap every SEC seconds; allows resuming incomplete uploads after a server crash")
+    ap2.add_argument("--snap-drop", metavar="MIN", type=float, default=1440, help="forget unfinished uploads after MIN minutes; impossible to resume them after that (360=6h, 1440=24h)")
     ap2.add_argument("--u2ts", metavar="TXT", type=u, default="c", help="how to timestamp uploaded files; [\033[32mc\033[0m]=client-last-modified, [\033[32mu\033[0m]=upload-time, [\033[32mfc\033[0m]=force-c, [\033[32mfu\033[0m]=force-u (volflag=u2ts)")
     ap2.add_argument("--rand", action="store_true", help="force randomized filenames, --nrand chars long (volflag=rand)")
     ap2.add_argument("--nrand", metavar="NUM", type=int, default=9, help="randomized filenames length (volflag=nrand)")
