@@ -233,6 +233,7 @@ var Ls = {
 		"ml_tcode": "transcode",
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer",
+		"ml_drc": "dynamic range compressor",
 
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
@@ -250,6 +251,7 @@ var Ls = {
 		"mt_coth": "convert all others (not mp3) to opus\">oth",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
 		"mt_eq": "enables the equalizer and gain control;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100% volume (unmodified)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (unmodified)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% left-right crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
+		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of tresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90$N$Nplease see wikipedia instead, this is probably wrong",
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
@@ -710,6 +712,7 @@ var Ls = {
 		"ml_tcode": "konvertering",
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer (tonejustering)",
+		"ml_drc": "compressor (volum-utjevning)",
 
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
@@ -727,6 +730,7 @@ var Ls = {
 		"mt_coth": "konverter alt annet (men ikke mp3) til opus\">andre",
 		"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjør oppdateringer mindre distraherende",
 		"mt_eq": "aktiver tonekontroll og forsterker;$N$Nboost &lt;code&gt;0&lt;/code&gt; = normal volumskala$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = normal stereo$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% blanding venstre-høyre$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = instrumental :^)$N$Nreduserer også dødtid imellom sangfiler",
+		"mt_drc": "aktiver volum-utjevning (dynamic range compressor); vil også aktivere tonejustering, så sett alle EQ-feltene bortsett fra 'width' til 0 hvis du ikke vil ha noe EQ$N$Nfilteret vil dempe volumet på alt som er høyere enn TRESH dB; for hver RATIO dB over grensen er det 1dB som treffer høyttalerne, så standardverdiene tresh -24 og ratio 12 skal bety at volumet ikke går høyere enn -22 dB, slik at man trygt kan øke boost-verdien i equalizer'n til rundt 0.8, eller 1.8 kombinert med ATK 0 og RLS 90$N$Ngodt mulig jeg har misforstått litt, så wikipedia forklarer nok bedre",
 
 		"mb_play": "lytt",
 		"mm_hashplay": "spill denne sangen?",
@@ -1386,7 +1390,9 @@ var mpl = (function () {
 		'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
 		'</div></div>' +
 
-		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>');
+		'<div><h3 id="h_drc">' + L.ml_drc + '</h3><div id="audio_drc"></div></div>' +
+		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>' +
+		'');
 
 	var r = {
 		"pb_mode": (sread('pb_mode', ['loop', 'next']) || 'next').split('-')[0],
@@ -2492,8 +2498,13 @@ function start_actx() {
 var afilt = (function () {
 	var r = {
 		"eqen": false,
+		"drcen": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
+		"drcv": [-24, 30, 12, 0.003, 0.25],
+		"drch": ['tresh', 'knee', 'ratio', 'atk', 'rls'],
+		"drck": ['threshold', 'knee', 'ratio', 'attack', 'release'],
+		"drcn": null,
 		"filters": [],
 		"filterskip": [],
 		"plugs": [],
@@ -2503,16 +2514,18 @@ var afilt = (function () {
 		"acst": {}
 	};
 
-	if (!ACtx)
-		ebi('audio_eq').parentNode.style.display = 'none';
+	function setvis(vis) {
+		ebi('audio_eq').parentNode.style.display = ebi('audio_drc').parentNode.style.display = (vis ? '' : 'none');
+	}
+
+	setvis(ACtx);
 
 	r.init = function () {
 		start_actx();
 		if (r.cfg)
 			return;
 
-		if (!actx)
-			ebi('audio_eq').parentNode.style.display = 'none';
+		setvis(actx);
 
 		// some browsers have insane high-frequency boost
 		// (or rather the actual problem is Q but close enough)
@@ -2599,12 +2612,20 @@ var afilt = (function () {
 		mp.acs = mpo.acs = null;
 	};
 
-	r.apply = function () {
+	r.apply = function (v) {
 		r.init();
 		r.draw();
 
-		if (!actx)
-			bcfg_set('au_eq', false);
+		if (!actx) {
+			bcfg_set('au_eq', r.eqen = false);
+			bcfg_set('au_drc', r.drcen = false);
+		}
+		else if (v === true && r.drcen && !r.eqen)
+			bcfg_set('au_eq', r.eqen = true);
+		else if (v === false && !r.eqen)
+			bcfg_set('au_drc', r.drcen = false);
+
+		r.drcn = null;
 
 		var plug = false;
 		for (var a = 0; a < r.plugs.length; a++)
@@ -2663,6 +2684,17 @@ var afilt = (function () {
 		fi = actx.createGain();
 		fi.gain.value = r.amp + 0.94;  // +.137 dB measured; now -.25 dB and almost bitperfect
 		r.filters.push(fi);
+
+		// wait nevermind, drc goes first
+		timer.rm(showdrc);
+		if (r.drcen) {
+			fi = r.drcn = actx.createDynamicsCompressor();
+			for (var a = 0; a < r.drcv.length; a++)
+				fi[r.drck[a]].value = r.drcv[a];
+
+			r.filters.push(fi);
+			timer.add(showdrc);
+		}
 
 		if (Math.round(r.chw * 25) != 25) {
 			var split = actx.createChannelSplitter(2),
@@ -2736,6 +2768,31 @@ var afilt = (function () {
 		clmod(that, 'err', err);
 	}
 
+	function adj_drc() {
+		var err = false;
+		try {
+			var n = this.getAttribute('k'),
+				ov = r.drcv[n],
+				vs = this.value,
+				v = parseFloat(vs);
+
+			if (!isNum(v) || v + '' != vs)
+				throw new Error('inval v');
+
+			if (v == ov)
+				return;
+
+			r.drcv[n] = v;
+			jwrite('au_drc', r.drcv);
+			if (r.drcn)
+				r.drcn[r.drck[n]].value = v;
+		}
+		catch (ex) {
+			err = true;
+		}
+		clmod(this, 'err', err);
+	}
+
 	function eq_mod(e) {
 		ev(e);
 		adj_band(this, 0);
@@ -2745,6 +2802,13 @@ var afilt = (function () {
 		var step = e.key == 'ArrowUp' ? 0.25 : e.key == 'ArrowDown' ? -0.25 : 0;
 		if (step != 0)
 			adj_band(this, step);
+	}
+
+	function showdrc() {
+		if (!r.drcn)
+			return timer.rm(showdrc);
+
+		ebi('h_drc').textContent = f2f(r.drcn.reduction, 1);
 	}
 
 	var html = ['<table><tr><td rowspan="4">',
@@ -2776,6 +2840,18 @@ var afilt = (function () {
 	html += h4.join('\n') + '</tr><table>';
 	ebi('audio_eq').innerHTML = html;
 
+	h2 = [];
+	html = ['<table><tr><td rowspan="2">',
+		'<a id="au_drc" class="tgl btn" href="#" tt="' + L.mt_drc + '">enable</a></td>'];
+
+	for (var a = 0; a < r.drch.length; a++) {
+		html.push('<td>' + r.drch[a] + '</td>');
+		h2.push('<td><input type="text" class="drc_v" ' + NOAC + ' k="' + a + '" value="' + r.drcv[a] + '" /></td>');
+	}
+	html = html.join('\n') + '</tr><tr>';
+	html += h2.join('\n') + '</tr><table>';
+	ebi('audio_drc').innerHTML = html;
+
 	var stp = QSA('a.eq_step');
 	for (var a = 0, aa = stp.length; a < aa; a++)
 		stp[a].onclick = eq_step;
@@ -2785,8 +2861,12 @@ var afilt = (function () {
 		txt[a].oninput = eq_mod;
 		txt[a].onkeydown = eq_keydown;
 	}
+	txt = QSA('input.drc_v');
+	for (var a = 0; a < txt.length; a++)
+		txt[a].oninput = txt[a].onkeydown = adj_drc;
 
 	bcfg_bind(r, 'eqen', 'au_eq', false, r.apply);
+	bcfg_bind(r, 'drcen', 'au_drc', false, r.apply);
 
 	r.draw();
 	return r;

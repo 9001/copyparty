@@ -1414,14 +1414,17 @@ html.dz input {
 .opview input.i {
 	width: calc(100% - 16.2em);
 }
+input.drc_v,
 input.eq_gain {
 	width: 3em;
 	text-align: center;
 	margin: 0 .6em;
 }
+#audio_drc table,
 #audio_eq table {
 	border-collapse: collapse;
 }
+#audio_drc td,
 #audio_eq td {
 	text-align: center;
 }
@@ -1430,10 +1433,14 @@ input.eq_gain {
 	display: block;
 	padding: 0;
 }
+#au_drc,
 #au_eq {
 	display: block;
 	margin-top: .5em;
 	padding: 1.3em .3em;
+}
+#au_drc {
+	padding: .4em .3em;
 }
 #ico1 {
 	cursor: pointer;
