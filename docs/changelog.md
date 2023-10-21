@@ -1,4 +1,45 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1015-2006  `v1.9.12`  more buttons
+
+just adding requested features, nothing important
+
+## new features
+* button `📅` in the uploader (default-enabled) sends your local last-modified timestamps to the server
+  * when deselected, the files on the server will have the upload time as their timestamps instead
+  * `--u2ts` specifies the default setting, `c` client-last-modified or `u` upload-time, or `fc` and `fu` to force
+* button `full` in the gridview decides if thumbnails should be center-cropped or not
+  * `--no-crop` and the `nocrop` volflag now sets the default value of this instead of forcing the setting
+  * thumbnail cleanup is now more granular, cleaning full-jpg separately from cropped-webp for example
+* set default sort order with `--sort` or volflag `sort`
+  * one or more comma-separated values; `tags/Cirle,tags/.tn,tags/Artist,tags/Title,href`
+    * see the column header tooltips in the browser to know what names (`id`) to use
+  * prefix a column name with `-` for descending sort
+  * specifying a sort order in the client will override all server-defined ones
+* when visiting a read-only folder, the upload-or-filesearch toggle will remember its previous state and restore it when leaving the folder
+  * much more intuitive, if anything about this UI can be called that...
+
+## bugfixes
+* iPhone: rare javascript panic when switching between safari and another app
+* ie9: file-rename ui was borked
+
+## other changes
+* copyparty.exe: upgrade to pillow 10.1 (which adds a new font for thumbnails in chrome)
+  * still based on python 3.11.6 because 3.12 is currently slower than 3.11
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1009-0036  `v1.9.11`  bustin'
+
+okay, i swear this is the last version for weeks! probably
+
+## bugfixes
+* cachebuster didn't apply to dynamically loaded javascript files
+  * READMEs could fail to render with `ReferenceError: DOMPurify is not defined` after upgrading from a copyparty older than v1.9.2
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1008-2051  `v1.9.10`  badpwd
 
 ## new features

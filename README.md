@@ -39,7 +39,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [media player](#media-player) - plays almost every audio format there is
-        * [audio equalizer](#audio-equalizer) - bass boosted
+        * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
     * [other tricks](#other-tricks)
@@ -366,7 +366,7 @@ permissions:
 * `g` (get): only download files, cannot see folder contents or zip/tar
 * `G` (upget): same as `g` except uploaders get to see their own [filekeys](#filekeys) (see `fk` in examples below)
 * `h` (html): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
-* `a` (admin): can see uploader IPs, config-reload
+* `a` (admin): can see upload time, uploader IPs, config-reload
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
@@ -743,7 +743,7 @@ open the `[🎺]` media-player-settings tab to configure it,
 
 ### audio equalizer
 
-bass boosted
+and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
 
 can also boost the volume in general, or increase/decrease stereo width (like [crossfeed](https://www.foobar2000.org/components/view/foo_dsp_meiercf) just worse)
 
@@ -980,6 +980,7 @@ the same arguments can be set as volflags, in addition to `d2d`, `d2ds`, `d2t`, 
 * `-v ~/music::r:c,d2ts` same except only affecting tags
 
 note:
+* upload-times can be displayed in the file listing by enabling the `.up_at` metadata key, either globally with `-e2d -mte +.up_at` or per-volume with volflags `e2d,mte=+.up_at` (will have a ~17% performance impact on directory listings)
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 * deduplication is possible on windows if you run copyparty as administrator (not saying you should!)
