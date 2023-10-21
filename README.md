@@ -954,6 +954,16 @@ authenticate with one of the following:
 * username `$password`, password `k`
 
 
+## browser ux
+
+tweaking the ui
+
+* set default sort order globally with `--sort` or per-volume with the `sort` volflag; specify one or more comma-separated columns to sort by, and prefix the column name with `-` for reverse sort
+  * the column names you can use are visible as tooltips when hovering over the column headers in the directory listing, for example `href ext sz ts tags/.up_at tags/Cirle tags/.tn tags/Artist tags/Title`
+  * to sort in music order (album, track, artist, title) with filename as fallback, you could `--sort tags/Cirle,tags/.tn,tags/Artist,tags/Title,href`
+  * to sort by upload date, first enable showing the upload date in the listing with `-e2d -mte +.up_at` and then `--sort tags/.up_at`
+
+
 ## file indexing
 
 enables dedup and music search ++
