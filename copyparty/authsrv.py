@@ -1541,7 +1541,11 @@ class AuthSrv(object):
                 if vol.flags.get(grp, False):
                     continue
 
-                vol.flags = {k: v for k, v in vol.flags.items() if not k.startswith(rm)}
+                vol.flags = {
+                    k: v
+                    for k, v in vol.flags.items()
+                    if not k.startswith(rm) or k == "mte"
+                }
 
             for grp, rm in [["d2v", "e2v"]]:
                 if not vol.flags.get(grp, False):
