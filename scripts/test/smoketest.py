@@ -97,6 +97,7 @@ def tc1(vflags):
         ovid = f.read()
 
     args = [
+        "-q",
         "-p4321",
         "-e2dsa",
         "-e2tsr",

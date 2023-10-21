@@ -19,6 +19,9 @@ def vf_bmap() -> dict[str, str]:
     }
     for k in (
         "dotsrch",
+        "e2d",
+        "e2ds",
+        "e2dsa",
         "e2t",
         "e2ts",
         "e2tsr",
@@ -41,7 +44,12 @@ def vf_bmap() -> dict[str, str]:
 
 def vf_vmap() -> dict[str, str]:
     """argv-to-volflag: simple values"""
-    ret = {"th_convt": "convt", "th_size": "thsize"}
+    ret = {
+        "no_hash": "nohash",
+        "no_idx": "noidx",
+        "th_convt": "convt",
+        "th_size": "thsize",
+    }
     for k in ("dbd", "lg_sbf", "md_sbf", "nrand", "sort", "unlist", "u2ts"):
         ret[k] = k
     return ret
@@ -50,7 +58,21 @@ def vf_vmap() -> dict[str, str]:
 def vf_cmap() -> dict[str, str]:
     """argv-to-volflag: complex/lists"""
     ret = {}
-    for k in ("html_head", "mte", "mth"):
+    for k in (
+        "html_head",
+        "mte",
+        "mth",
+        "mtp",
+        "xad",
+        "xar",
+        "xau",
+        "xban",
+        "xbd",
+        "xbr",
+        "xbu",
+        "xiu",
+        "xm",
+    ):
         ret[k] = k
     return ret
 

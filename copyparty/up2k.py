@@ -24,7 +24,7 @@ from queue import Queue
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
 from .authsrv import LEELOO_DALLAS, SSEELOG, VFS, AuthSrv
 from .bos import bos
-from .cfg import vf_bmap, vf_vmap
+from .cfg import vf_bmap, vf_cmap, vf_vmap
 from .fsutil import Fstab
 from .mtag import MParser, MTag
 from .util import (
@@ -796,13 +796,25 @@ class Up2k(object):
         fv = "\033[0;36m{}:\033[90m{}"
         fx = set(("html_head",))
         fd = vf_bmap()
+        fd.update(vf_cmap())
         fd.update(vf_vmap())
         fd = {v: k for k, v in fd.items()}
         fl = {
             k: v
             for k, v in flags.items()
-            if k not in fd or v != getattr(self.args, fd[k])
+            if k not in fd
+            or (
+                v != getattr(self.args, fd[k])
+                and str(v) != str(getattr(self.args, fd[k]))
+            )
         }
+        for k1, k2 in vf_cmap().items():
+            if k1 not in fl or k1 in fx:
+                continue
+            if str(fl[k1]) == str(getattr(self.args, k2)):
+                del fl[k1]
+            else:
+                fl[k1] = ",".join(x for x in fl)
         a = [
             (ft if v is True else ff if v is False else fv).format(k, str(v))
             for k, v in fl.items()
@@ -821,7 +833,7 @@ class Up2k(object):
                 vpath += "/"
 
             zs = " ".join(sorted(a))
-            zs = zs.replace("30mre.compile(", "30m(")  # nohash
+            zs = zs.replace("90mre.compile(", "90m(")  # nohash
             self.log("/{} {}".format(vpath, zs), "35")
 
         reg = {}
@@ -2130,7 +2142,7 @@ class Up2k(object):
 
             try:
                 nfiles = next(cur.execute("select count(w) from up"))[0]
-                self.log("OK: {} |{}|".format(db_path, nfiles))
+                self.log("  {} |{}|".format(db_path, nfiles), "90")
                 return cur
             except:
                 self.log("WARN: could not list files; DB corrupt?\n" + min_ex())

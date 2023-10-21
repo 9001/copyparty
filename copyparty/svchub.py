@@ -442,6 +442,11 @@ class SvcHub(object):
         mth = ODict.fromkeys(DEF_MTH.split(","), True)
         al.mth = odfusion(mth, al.mth)
 
+        for k in ["no_hash", "no_idx"]:
+            ptn = getattr(self.args, k)
+            if ptn:
+                setattr(self.args, k, re.compile(ptn))
+
         return True
 
     def _setlimits(self) -> None:

@@ -1429,12 +1429,12 @@ class AuthSrv(object):
 
             for ga, vf in [["no_hash", "nohash"], ["no_idx", "noidx"]]:
                 if vf in vol.flags:
-                    ptn = vol.flags.pop(vf)
+                    ptn = re.compile(vol.flags.pop(vf))
                 else:
                     ptn = getattr(self.args, ga)
 
                 if ptn:
-                    vol.flags[vf] = re.compile(ptn)
+                    vol.flags[vf] = ptn
 
             for ga, vf in vf_bmap().items():
                 if getattr(self.args, ga):
