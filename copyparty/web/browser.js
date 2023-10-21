@@ -251,7 +251,7 @@ var Ls = {
 		"mt_coth": "convert all others (not mp3) to opus\">oth",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
 		"mt_eq": "enables the equalizer and gain control;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100% volume (unmodified)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (unmodified)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% left-right crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
-		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of tresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90$N$Nplease see wikipedia instead, this is probably wrong",
+		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of tresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90$N$N(see wikipedia, they explain it much better)",
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
@@ -730,7 +730,7 @@ var Ls = {
 		"mt_coth": "konverter alt annet (men ikke mp3) til opus\">andre",
 		"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjør oppdateringer mindre distraherende",
 		"mt_eq": "aktiver tonekontroll og forsterker;$N$Nboost &lt;code&gt;0&lt;/code&gt; = normal volumskala$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = normal stereo$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% blanding venstre-høyre$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = instrumental :^)$N$Nreduserer også dødtid imellom sangfiler",
-		"mt_drc": "aktiver volum-utjevning (dynamic range compressor); vil også aktivere tonejustering, så sett alle EQ-feltene bortsett fra 'width' til 0 hvis du ikke vil ha noe EQ$N$Nfilteret vil dempe volumet på alt som er høyere enn TRESH dB; for hver RATIO dB over grensen er det 1dB som treffer høyttalerne, så standardverdiene tresh -24 og ratio 12 skal bety at volumet ikke går høyere enn -22 dB, slik at man trygt kan øke boost-verdien i equalizer'n til rundt 0.8, eller 1.8 kombinert med ATK 0 og RLS 90$N$Ngodt mulig jeg har misforstått litt, så wikipedia forklarer nok bedre",
+		"mt_drc": "aktiver volum-utjevning (dynamic range compressor); vil også aktivere tonejustering, så sett alle EQ-feltene bortsett fra 'width' til 0 hvis du ikke vil ha noe EQ$N$Nfilteret vil dempe volumet på alt som er høyere enn TRESH dB; for hver RATIO dB over grensen er det 1dB som treffer høyttalerne, så standardverdiene tresh -24 og ratio 12 skal bety at volumet ikke går høyere enn -22 dB, slik at man trygt kan øke boost-verdien i equalizer'n til rundt 0.8, eller 1.8 kombinert med ATK 0 og RLS 90$N$Nwikipedia forklarer dette mye bedre forresten",
 
 		"mb_play": "lytt",
 		"mm_hashplay": "spill denne sangen?",
@@ -2576,6 +2576,8 @@ var afilt = (function () {
 		var gains = jread('au_eq_gain', r.gains);
 		if (r.gains.length == gains.length)
 			r.gains = gains;
+
+		r.drcv = jread('au_drcv', r.drcv);
 	}
 	catch (ex) { }
 
@@ -2692,6 +2694,13 @@ var afilt = (function () {
 			for (var a = 0; a < r.drcv.length; a++)
 				fi[r.drck[a]].value = r.drcv[a];
 
+			fi.release.value = 0.03;
+			setTimeout(function () {
+				try {
+					fi.release.value = r.drcv[4];
+				}
+				catch (ex) { }
+			}, 250);
 			r.filters.push(fi);
 			timer.add(showdrc);
 		}
@@ -2783,7 +2792,7 @@ var afilt = (function () {
 				return;
 
 			r.drcv[n] = v;
-			jwrite('au_drc', r.drcv);
+			jwrite('au_drcv', r.drcv);
 			if (r.drcn)
 				r.drcn[r.drck[n]].value = v;
 		}
