@@ -2501,7 +2501,7 @@ var afilt = (function () {
 		"drcen": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
-		"drcv": [-24, 30, 12, 0.003, 0.25],
+		"drcv": [-24, 30, 12, 0.01, 0.25],
 		"drch": ['tresh', 'knee', 'ratio', 'atk', 'rls'],
 		"drck": ['threshold', 'knee', 'ratio', 'attack', 'release'],
 		"drcn": null,
@@ -2694,13 +2694,6 @@ var afilt = (function () {
 			for (var a = 0; a < r.drcv.length; a++)
 				fi[r.drck[a]].value = r.drcv[a];
 
-			fi.release.value = 0.03;
-			setTimeout(function () {
-				try {
-					fi.release.value = r.drcv[4];
-				}
-				catch (ex) { }
-			}, 250);
 			r.filters.push(fi);
 			timer.add(showdrc);
 		}
