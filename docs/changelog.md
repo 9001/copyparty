@@ -1,4 +1,31 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1021-1443  `v1.9.14`  uptime
+
+## new features
+* search for files by upload time
+* option to display upload time in directory listings
+  * enable globally with `-e2d -mte +.up_at` or per-volume with volflags `e2d,mte=+.up_at`
+  * has a ~17% performance impact on directory listings
+* [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression) in the audioplayer settings
+* `--ban-404` is now default-enabled
+  * the turbo-uploader will now un-turbo when necessary to avoid banning itself
+  * this only affects accounts with permissions `g`, `G`, or `h`
+    * accounts with read-access (which are able to see directory listings anyways) and accounts with write-only access are no longer affected by `--ban-404` or `--ban-url`
+
+## bugfixes
+* #55 clients could hit the `--url-ban` filter when uploading over webdav
+  * fixed by limiting `--ban-404` and `--ban-url` to accounts with permission `g`, `G`, or `h`
+* fixed 20% performance drop in python 3.12 due to utcfromtimestamp deprecation
+  * but 3.12.0 is still 5% slower than 3.11.6 for some reason
+* volume listing on startup would display some redundant info
+
+## other changes
+* timeout for unfinished uploads increased from 6 to 24 hours
+  * and is now configurable with `--snap-drop`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1015-2006  `v1.9.12`  more buttons
 
 just adding requested features, nothing important
