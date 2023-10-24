@@ -17,7 +17,6 @@ def vf_bmap() -> dict[str, str]:
         "no_thumb": "dthumb",
         "no_vthumb": "dvthumb",
         "no_athumb": "dathumb",
-        "re_maxage": "scan",
         "th_no_crop": "nocrop",
         "dav_auth": "davauth",
         "dav_rt": "davrt",
@@ -33,6 +32,7 @@ def vf_bmap() -> dict[str, str]:
         "e2v",
         "e2vu",
         "e2vp",
+        "exp",
         "grid",
         "hardlink",
         "magic",
@@ -52,10 +52,19 @@ def vf_vmap() -> dict[str, str]:
     ret = {
         "no_hash": "nohash",
         "no_idx": "noidx",
+        "re_maxage": "scan",
         "th_convt": "convt",
         "th_size": "thsize",
     }
-    for k in ("dbd", "lg_sbf", "md_sbf", "nrand", "sort", "unlist", "u2ts"):
+    for k in (
+        "dbd",
+        "lg_sbf",
+        "md_sbf",
+        "nrand",
+        "sort",
+        "unlist",
+        "u2ts",
+    ):
         ret[k] = k
     return ret
 
@@ -64,6 +73,8 @@ def vf_cmap() -> dict[str, str]:
     """argv-to-volflag: complex/lists"""
     ret = {}
     for k in (
+        "exp_lg",
+        "exp_md",
         "html_head",
         "mte",
         "mth",

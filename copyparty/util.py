@@ -289,6 +289,8 @@ EXTS["vnd.mozilla.apng"] = "png"
 MAGIC_MAP = {"jpeg": "jpg"}
 
 
+DEF_EXP = "self.ip self.ua self.uname self.host cfg.name cfg.logout vf.scan vf.thsize hdr.cf_ipcountry srv.itime srv.htime"
+
 DEF_MTE = "circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
 
 DEF_MTH = ".vq,.aq,vc,ac,fmt,res,.fps"
@@ -1809,15 +1811,18 @@ def exclude_dotfiles(filepaths: list[str]) -> list[str]:
 
 def odfusion(base: ODict[str, bool], oth: str) -> ODict[str, bool]:
     # merge an "ordered set" (just a dict really) with another list of keys
+    words0 = [x for x in oth.split(",") if x]
+    words1 = [x for x in oth[1:].split(",") if x]
+
     ret = base.copy()
     if oth.startswith("+"):
-        for k in oth[1:].split(","):
+        for k in words1:
             ret[k] = True
     elif oth[:1] in ("-", "/"):
-        for k in oth[1:].split(","):
+        for k in words1:
             ret.pop(k, None)
     else:
-        ret = ODict.fromkeys(oth.split(","), True)
+        ret = ODict.fromkeys(words0, True)
 
     return ret
 

@@ -27,6 +27,7 @@ from .authsrv import expand_config_file, re_vol, split_cfg_ln, upgrade_cfg_fmt
 from .cfg import flagcats, onedash
 from .svchub import SvcHub
 from .util import (
+    DEF_EXP,
     DEF_MTE,
     DEF_MTH,
     IMPLICATIONS,
@@ -647,6 +648,47 @@ def get_sects():
             ),
         ],
         [
+            "exp",
+            "text expansion",
+            dedent(
+                """
+            specify --exp or the "exp" volflag to enable placeholder expansions
+            in README.md / .prologue.html / .epilogue.html
+
+            --exp-md (volflag exp_md) holds the list of placeholders which can be
+            expanded in READMEs, and --exp-lg (volflag exp_lg) likewise for logues;
+            any placeholder not given in those lists will be ignored and shown as-is
+
+            the default list will expand the following placeholders:
+            \033[36m{{self.ip}}     \033[35mclient ip
+            \033[36m{{self.ua}}     \033[35mclient user-agent
+            \033[36m{{self.uname}}  \033[35mclient username
+            \033[36m{{self.host}}   \033[35mthe "Host" header, or the server's external IP otherwise
+            \033[36m{{cfg.name}}    \033[35mthe --name global-config
+            \033[36m{{cfg.logout}}  \033[35mthe --logout global-config
+            \033[36m{{vf.scan}}     \033[35mthe "scan" volflag
+            \033[36m{{vf.thsize}}   \033[35mthumbnail size
+            \033[36m{{srv.itime}}   \033[35mserver time in seconds
+            \033[36m{{srv.htime}}   \033[35mserver time as YY-mm-dd, HH:MM:SS (UTC)
+            \033[36m{{hdr.cf_ipcountry}} \033[35mthe "CF-IPCountry" client header (probably blank)
+            \033[0m
+            so the following types of placeholders can be added to the lists:
+            * any client header can be accessed through {{hdr.*}}
+            * any variable in httpcli.py can be accessed through {{self.*}}
+            * any global server setting can be accessed through {{cfg.*}}
+            * any volflag can be accessed through {{vf.*}}
+
+            remove vf.scan from default list using --exp-md /vf.scan
+            add "accept" header to def. list using --exp-md +hdr.accept
+
+            for performance reasons, expansion only happens while embedding
+            documents into directory listings, and when accessing a ?doc=...
+            link, but never otherwise, so if you click a -txt- link you'll
+            have to refresh the page to apply expansion
+            """
+            ),
+        ],
+        [
             "ls",
             "volume inspection",
             dedent(
@@ -776,8 +818,6 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, \033[33mUSER\033[0m:\033[33mPASS\033[0m; example [\033[32med:wark\033[0m]")
     ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, \033[33mSRC\033[0m:\033[33mDST\033[0m:\033[33mFLAG\033[0m; examples [\033[32m.::r\033[0m], [\033[32m/mnt/nas/music:/music:r:aed\033[0m]")
     ap2.add_argument("-ed", action="store_true", help="enable the ?dots url parameter / client option which allows clients to see dotfiles / hidden files")
-    ap2.add_argument("-emp", action="store_true", help="enable markdown plugins -- neat but dangerous, big XSS risk")
-    ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="md-editor mod-chk rate")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see --help-urlform")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="window title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
     ap2.add_argument("--name", metavar="TXT", type=u, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
@@ -1144,6 +1184,15 @@ def add_db_metadata(ap):
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag M using program BIN to parse the file")
 
 
+def add_txt(ap):
+    ap2 = ap.add_argument_group('textfile options')
+    ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="textfile editor checks for serverside changes every SEC seconds")
+    ap2.add_argument("-emp", action="store_true", help="enable markdown plugins -- neat but dangerous, big XSS risk")
+    ap2.add_argument("--exp", action="store_true", help="enable textfile expansion -- replace {{self.ip}} and such; see --help-exp (volflag=exp)")
+    ap2.add_argument("--exp-md", metavar="V,V,V", type=u, default=DEF_EXP, help="comma/space-separated list of placeholders to expand in markdown files; add/remove stuff on the default list with +hdr_foo or /vf.scan (volflag=exp_md)")
+    ap2.add_argument("--exp-lg", metavar="V,V,V", type=u, default=DEF_EXP, help="comma/space-separated list of placeholders to expand in prologue/epilogue files (volflag=exp_lg)")
+
+
 def add_ui(ap, retry):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
@@ -1237,6 +1286,7 @@ def run_argparse(
     add_handlers(ap)
     add_hooks(ap)
     add_stats(ap)
+    add_txt(ap)
     add_ui(ap, retry)
     add_admin(ap)
     add_logging(ap)

@@ -1479,15 +1479,11 @@ class AuthSrv(object):
                 raise Exception(t.format(dbd, dbds))
 
             # default tag cfgs if unset
-            if "mte" not in vol.flags:
-                vol.flags["mte"] = self.args.mte.copy()
-            else:
-                vol.flags["mte"] = odfusion(self.args.mte, vol.flags["mte"])
-
-            if "mth" not in vol.flags:
-                vol.flags["mth"] = self.args.mth.copy()
-            else:
-                vol.flags["mth"] = odfusion(self.args.mth, vol.flags["mth"])
+            for k in ("mte", "mth", "exp_md", "exp_lg"):
+                if k not in vol.flags:
+                    vol.flags[k] = getattr(self.args, k).copy()
+                else:
+                    vol.flags[k] = odfusion(getattr(self.args, k), vol.flags[k])
 
             # append additive args from argv to volflags
             hooks = "xbu xau xiu xbr xar xbd xad xm xban".split()

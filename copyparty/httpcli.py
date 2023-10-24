@@ -2726,6 +2726,29 @@ class HttpCli(object):
 
         return file_lastmod, True
 
+    def _expand(self, txt: str, phs: list[str]) -> str:
+        for ph in phs:
+            if ph.startswith("hdr."):
+                sv = str(self.headers.get(ph[4:], ""))
+            elif ph.startswith("self."):
+                sv = str(getattr(self, ph[5:], ""))
+            elif ph.startswith("cfg."):
+                sv = str(getattr(self.args, ph[4:], ""))
+            elif ph.startswith("vf."):
+                sv = str(self.vn.flags.get(ph[3:]) or "")
+            elif ph == "srv.itime":
+                sv = str(int(time.time()))
+            elif ph == "srv.htime":
+                sv = datetime.now(UTC).strftime("%Y-%m-%d, %H:%M:%S")
+            else:
+                self.log("unknown placeholder in server config: [%s]" % (ph), 3)
+                continue
+
+            sv = self.conn.hsrv.ptn_hsafe.sub("_", sv)
+            txt = txt.replace("{{%s}}" % (ph,), sv)
+
+        return txt
+
     def tx_file(self, req_path: str) -> bool:
         status = 200
         logmsg = "{:4} {} ".format("", self.req)
@@ -3052,7 +3075,7 @@ class HttpCli(object):
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 
-    def tx_md(self, fs_path: str) -> bool:
+    def tx_md(self, vn: VFS, fs_path: str) -> bool:
         logmsg = "     %s @%s " % (self.req, self.uname)
 
         if not self.can_write:
@@ -3069,9 +3092,16 @@ class HttpCli(object):
         st = bos.stat(html_path)
         ts_html = st.st_mtime
 
+        max_sz = 1024 * self.args.txt_max
         sz_md = 0
         lead = b""
+        fullfile = b""
         for buf in yieldfile(fs_path):
+            if sz_md < max_sz:
+                fullfile += buf
+            else:
+                fullfile = b""
+
             if not sz_md and b"\n" in buf[:2]:
                 lead = buf[: buf.find(b"\n") + 1]
                 sz_md += len(lead)
@@ -3079,6 +3109,21 @@ class HttpCli(object):
             sz_md += len(buf)
             for c, v in [(b"&", 4), (b"<", 3), (b">", 3)]:
                 sz_md += (len(buf) - len(buf.replace(c, b""))) * v
+
+        if (
+            fullfile
+            and "exp" in vn.flags
+            and "edit" not in self.uparam
+            and "edit2" not in self.uparam
+            and vn.flags.get("exp_md")
+        ):
+            fulltxt = fullfile.decode("utf-8", "replace")
+            fulltxt = self._expand(fulltxt, vn.flags.get("exp_md") or [])
+            fullfile = fulltxt.encode("utf-8", "replace")
+
+        if fullfile:
+            fullfile = html_bescape(fullfile)
+            sz_md = len(lead) + len(fullfile)
 
         file_ts = int(max(ts_md, ts_html, self.E.t0))
         file_lastmod, do_send = self._chk_lastmod(file_ts)
@@ -3121,8 +3166,11 @@ class HttpCli(object):
 
         try:
             self.s.sendall(html[0] + lead)
-            for buf in yieldfile(fs_path):
-                self.s.sendall(html_bescape(buf))
+            if fullfile:
+                self.s.sendall(fullfile)
+            else:
+                for buf in yieldfile(fs_path):
+                    self.s.sendall(html_bescape(buf))
 
             self.s.sendall(html[1])
 
@@ -3753,7 +3801,7 @@ class HttpCli(object):
                     or "edit2" in self.uparam
                 )
             ):
-                return self.tx_md(abspath)
+                return self.tx_md(vn, abspath)
 
             return self.tx_file(abspath)
 
@@ -3815,6 +3863,10 @@ class HttpCli(object):
                 if bos.path.exists(fn):
                     with open(fsenc(fn), "rb") as f:
                         logues[n] = f.read().decode("utf-8")
+                    if "exp" in vn.flags:
+                        logues[n] = self._expand(
+                            logues[n], vn.flags.get("exp_lg") or []
+                        )
 
         readme = ""
         if not self.args.no_readme and not logues[1]:
@@ -3824,6 +3876,8 @@ class HttpCli(object):
                     with open(fsenc(fn), "rb") as f:
                         readme = f.read().decode("utf-8")
                         break
+            if readme and "exp" in vn.flags:
+                readme = self._expand(readme, vn.flags.get("exp_md") or [])
 
         vf = vn.flags
         unlist = vf.get("unlist", "")
@@ -4134,6 +4188,12 @@ class HttpCli(object):
                 if sz < 1024 * self.args.txt_max:
                     with open(fsenc(docpath), "rb") as f:
                         doctxt = f.read().decode("utf-8", "replace")
+
+                    if doc.lower().endswith(".md") and "exp" in vn.flags:
+                        doctxt = self._expand(doctxt, vn.flags.get("exp_md") or [])
+                else:
+                    self.log("doc 2big: [{}]".format(doc), c=6)
+                    doctxt = "( size of textfile exceeds serverside limit )"
             else:
                 self.log("doc 404: [{}]".format(doc), c=6)
                 doctxt = "( textfile not found )"

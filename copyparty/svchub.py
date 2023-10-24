@@ -39,6 +39,7 @@ from .util import (
     FFMPEG_URL,
     VERSIONS,
     Daemon,
+    DEF_EXP,
     DEF_MTE,
     DEF_MTH,
     Garda,
@@ -441,6 +442,10 @@ class SvcHub(object):
 
         mth = ODict.fromkeys(DEF_MTH.split(","), True)
         al.mth = odfusion(mth, al.mth)
+
+        exp = ODict.fromkeys(DEF_EXP.split(" "), True)
+        al.exp_md = odfusion(exp, al.exp_md.replace(" ", ","))
+        al.exp_lg = odfusion(exp, al.exp_lg.replace(" ", ","))
 
         for k in ["no_hash", "no_idx"]:
             ptn = getattr(self.args, k)

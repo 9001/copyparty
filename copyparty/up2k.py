@@ -814,7 +814,7 @@ class Up2k(object):
             if str(fl[k1]) == str(getattr(self.args, k2)):
                 del fl[k1]
             else:
-                fl[k1] = ",".join(x for x in fl)
+                fl[k1] = ",".join(x for x in fl[k1])
         a = [
             (ft if v is True else ff if v is False else fv).format(k, str(v))
             for k, v in fl.items()

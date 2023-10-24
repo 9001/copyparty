@@ -149,6 +149,7 @@ class HttpSrv(object):
         self._build_statics()
 
         self.ptn_cc = re.compile(r"[\x00-\x1f]")
+        self.ptn_hsafe = re.compile(r"[\x00-\x1f<>\"'&]")
 
         self.mallow = "GET HEAD POST PUT DELETE OPTIONS".split()
         if not self.args.no_dav:

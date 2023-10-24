@@ -109,7 +109,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vague_403 vc ver xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
@@ -129,6 +129,9 @@ class Cfg(Namespace):
 
         ex = "on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
+
+        ex = "exp_lg exp_md"
+        ka.update(**{k: {} for k in ex.split()})
 
         super(Cfg, self).__init__(
             a=a or [],
