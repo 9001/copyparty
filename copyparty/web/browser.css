@@ -1891,6 +1891,10 @@ html.y #doc {
 	text-align: center;
 	padding: .5em;
 }
+#docul li.bn span {
+	font-weight: bold;
+	color: var(--fg-max);
+}
 #doc.prism {
 	padding-left: 3em;
 }

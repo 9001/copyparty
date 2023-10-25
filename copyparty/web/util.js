@@ -622,9 +622,8 @@ function linksplit(rp, id) {
         }
         var vlink = esc(uricom_dec(link));
 
-        if (link.indexOf('/') !== -1) {
-            vlink = vlink.slice(0, -1) + '<span>/</span>';
-        }
+        if (link.indexOf('/') !== -1)
+            vlink = vlink.slice(0, -1);
 
         if (!rp) {
             if (q)

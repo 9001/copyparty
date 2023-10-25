@@ -1407,7 +1407,7 @@ function up2k_init(subtle) {
 
             pvis.addfile([
                 uc.fsearch ? esc(entry.name) : linksplit(
-                    entry.purl + uricom_enc(entry.name)).join(' '),
+                    entry.purl + uricom_enc(entry.name)).join(' / '),
                 '📐 ' + L.u_hashing,
                 ''
             ], entry.size, draw_each);
@@ -2284,7 +2284,7 @@ function up2k_init(subtle) {
                                 cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
                                 sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;
 
-                            msg.push(linksplit(hit.rp).join('') + '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</small></span>');
+                            msg.push(linksplit(hit.rp).join(' / ') + '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</small></span>');
                         }
                         msg = msg.join('<br />\n');
                     }
@@ -2318,7 +2318,7 @@ function up2k_init(subtle) {
                         url += '?k=' + fk;
                     }
 
-                    pvis.seth(t.n, 0, linksplit(url).join(' '));
+                    pvis.seth(t.n, 0, linksplit(url).join(' / '));
                 }
 
                 var chunksize = get_chunksize(t.size),
@@ -2429,7 +2429,7 @@ function up2k_init(subtle) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
-                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' ');
+                        err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' / ');
                     }
                     if (!t.rechecks && (err_pend || err_srcb)) {
                         t.rechecks = 0;

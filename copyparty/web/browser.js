@@ -4300,7 +4300,7 @@ var showfile = (function () {
 	};
 
 	r.mktree = function () {
-		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('') + '</li>'];
+		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('<span>/</span>') + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="?doc=' +
@@ -5342,7 +5342,7 @@ document.onkeydown = function (e) {
 			if (ext.length > 8)
 				ext = '%';
 
-			var links = linksplit(r.rp + '', id).join(''),
+			var links = linksplit(r.rp + '', id).join('<span>/</span>'),
 				nodes = ['<tr><td>-</td><td><div>' + links + '</div>', sz];
 
 			for (var b = 0; b < tagord.length; b++) {
@@ -7586,7 +7586,7 @@ var unpost = (function () {
 					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + L.un_del + '</a></td>' +
 					'<td>' + unix2iso(res[a].at) + '</td>' +
 					'<td>' + res[a].sz + '</td>' +
-					'<td>' + linksplit(res[a].vp).join(' ') + '</td></tr>');
+					'<td>' + linksplit(res[a].vp).join('<span> / </span>') + '</td></tr>');
 			}
 
 			html.push("</tbody></table>");
