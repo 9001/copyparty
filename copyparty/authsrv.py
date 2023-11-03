@@ -1723,6 +1723,9 @@ class AuthSrv(object):
     def setup_pwhash(self, acct: dict[str, str]) -> None:
         self.ah = PWHash(self.args)
         if not self.ah.on:
+            if self.args.ah_cli or self.args.ah_gen:
+                t = "\n  BAD CONFIG:\n    cannot --ah-cli or --ah-gen without --ah-alg"
+                raise Exception(t)
             return
 
         if self.args.ah_cli:

@@ -136,8 +136,12 @@ class PWHash(object):
         import getpass
 
         while True:
-            p1 = getpass.getpass("password> ")
-            p2 = getpass.getpass("again or just hit ENTER> ")
+            try:
+                p1 = getpass.getpass("password> ")
+                p2 = getpass.getpass("again or just hit ENTER> ")
+            except EOFError:
+                return
+
             if p2 and p1 != p2:
                 print("\033[31minputs don't match; try again\033[0m", file=sys.stderr)
                 continue

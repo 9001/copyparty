@@ -1094,7 +1094,7 @@ def add_logging(ap):
     ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
     ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
     ap2.add_argument("--log-tdec", metavar="N", type=int, default=3, help="timestamp resolution / number of timestamp decimals")
-    ap2.add_argument("--log-badpwd", metavar="N", type=int, default=1, help="log passphrase of failed login attempts: 0=terse, 1=plaintext, 2=hashed")
+    ap2.add_argument("--log-badpwd", metavar="N", type=int, default=1, help="log failed login attempt passwords: 0=terse, 1=plaintext, 2=hashed")
     ap2.add_argument("--log-conn", action="store_true", help="debug: print tcp-server msgs")
     ap2.add_argument("--log-htp", action="store_true", help="debug: print http-server threadpool scaling")
     ap2.add_argument("--ihead", metavar="HEADER", type=u, action='append', help="dump incoming header")
@@ -1314,7 +1314,7 @@ def run_argparse(
     for k, h, t in sects:
         k2 = "help_" + k.replace("-", "_")
         if vars(ret)[k2]:
-            lprint("# {} help page".format(k))
+            lprint("# %s help page (%s)" % (k, h))
             lprint(t + "\033[0m")
             sys.exit(0)
 
