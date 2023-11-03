@@ -3797,7 +3797,7 @@ var fileman = (function () {
 
 			function rename_cb() {
 				if (this.status !== 201) {
-					var msg = this.responseText;
+					var msg = unpre(this.responseText);
 					toast.err(9, L.fr_efail + msg);
 					return;
 				}
@@ -3846,7 +3846,7 @@ var fileman = (function () {
 		}
 		function delete_cb() {
 			if (this.status !== 200) {
-				var msg = this.responseText;
+				var msg = unpre(this.responseText);
 				toast.err(9, L.fd_err + msg);
 				return;
 			}
@@ -3967,7 +3967,7 @@ var fileman = (function () {
 		}
 		function paste_cb() {
 			if (this.status !== 201) {
-				var msg = this.responseText;
+				var msg = unpre(this.responseText);
 				toast.err(9, L.fp_err + msg);
 				return;
 			}
@@ -5300,10 +5300,7 @@ document.onkeydown = function (e) {
 
 	function xhr_search_results() {
 		if (this.status !== 200) {
-			var msg = this.responseText;
-			if (msg.indexOf('<pre>') === 0)
-				msg = msg.slice(5);
-
+			var msg = unpre(this.responseText);
 			srch_msg(true, "http " + this.status + ": " + msg);
 			search_in_progress = 0;
 			return;
@@ -7194,7 +7191,7 @@ var msel = (function () {
 		xhrchk(this, L.fd_xe1, L.fd_xe2);
 
 		if (this.status !== 201) {
-			sf.textContent = 'error: ' + this.responseText;
+			sf.textContent = 'error: ' + unpre(this.responseText);
 			return;
 		}
 
@@ -7241,7 +7238,7 @@ var msel = (function () {
 		xhrchk(this, L.fsm_xe1, L.fsm_xe2);
 
 		if (this.status < 200 || this.status > 201) {
-			sf.textContent = 'error: ' + this.responseText;
+			sf.textContent = 'error: ' + unpre(this.responseText);
 			return;
 		}
 
@@ -7619,7 +7616,7 @@ var unpost = (function () {
 
 	function unpost_delete_cb() {
 		if (this.status !== 200) {
-			var msg = this.responseText;
+			var msg = unpre(this.responseText);
 			toast.err(9, L.un_derr + msg);
 			return;
 		}

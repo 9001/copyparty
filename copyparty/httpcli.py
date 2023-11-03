@@ -37,6 +37,7 @@ from .star import StreamTar
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
 from .util import (
+    Garda,
     HTTPCODE,
     META_NOBOTS,
     MultipartParser,
@@ -75,6 +76,7 @@ from .util import (
     runhook,
     s3enc,
     sanitize_fn,
+    sanitize_vpath,
     sendfile_kern,
     sendfile_py,
     undot,
@@ -146,6 +148,7 @@ class HttpCli(object):
         self.rem = " "
         self.vpath = " "
         self.vpaths = " "
+        self.gctx = " "  # additional context for garda
         self.trailing_slash = True
         self.uname = " "
         self.pw = " "
@@ -254,8 +257,8 @@ class HttpCli(object):
                     k, zs = header_line.split(":", 1)
                     self.headers[k.lower()] = zs.strip()
             except:
-                msg = " ]\n#[ ".join(headerlines)
-                raise Pebkac(400, "bad headers:\n#[ " + msg + " ]")
+                msg = "#[ " + " ]\n#[ ".join(headerlines) + " ]"
+                raise Pebkac(400, "bad headers", log=msg)
 
         except Pebkac as ex:
             self.mode = "GET"
@@ -268,6 +271,10 @@ class HttpCli(object):
                 self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
             except:
                 pass
+
+            if ex.log:
+                self.log("additional error context:\n" + ex.log, 6)
+
             return False
 
         self.ua = self.headers.get("user-agent", "")
@@ -411,12 +418,9 @@ class HttpCli(object):
             self.vpath + "/" if self.trailing_slash and self.vpath else self.vpath
         )
 
-        ok = "\x00" not in self.vpath
-        if ANYWIN:
-            ok = ok and not relchk(self.vpath)
-
-        if not ok and (self.vpath != "*" or self.mode != "OPTIONS"):
+        if relchk(self.vpath) and (self.vpath != "*" or self.mode != "OPTIONS"):
             self.log("invalid relpath [{}]".format(self.vpath))
+            self.cbonk(self.conn.hsrv.g422, self.vpath, "bad_vp", "invalid relpaths")
             return self.tx_404() and self.keepalive
 
         zso = self.headers.get("authorization")
@@ -549,6 +553,9 @@ class HttpCli(object):
                 zb = b"<pre>" + html_escape(msg).encode("utf-8", "replace")
                 h = {"WWW-Authenticate": 'Basic realm="a"'} if pex.code == 401 else {}
                 self.reply(zb, status=pex.code, headers=h, volsan=True)
+                if pex.log:
+                    self.log("additional error context:\n" + pex.log, 6)
+
                 return self.keepalive
             except Pebkac:
                 return False
@@ -558,6 +565,34 @@ class HttpCli(object):
             return self.ip.replace(":", ".")
         else:
             return self.conn.iphash.s(self.ip)
+
+    def cbonk(self, g: Garda, v: str, reason: str, descr: str) -> bool:
+        if not g.lim:
+            return False
+
+        bonk, ip = g.bonk(self.ip, v + self.gctx)
+        if not bonk:
+            return False
+
+        xban = self.vn.flags.get("xban")
+        if not xban or not runhook(
+            self.log,
+            xban,
+            self.vn.canonical(self.rem),
+            self.vpath,
+            self.host,
+            self.uname,
+            time.time(),
+            0,
+            self.ip,
+            time.time(),
+            reason,
+        ):
+            self.log("client banned: %s" % (descr,), 1)
+            self.conn.hsrv.bans[ip] = bonk
+            return True
+
+        return False
 
     def is_banned(self) -> bool:
         if not self.conn.bans:
@@ -678,24 +713,7 @@ class HttpCli(object):
                 or not self.args.nonsus_urls
                 or not self.args.nonsus_urls.search(self.vpath)
             ):
-                bonk, ip = g.bonk(self.ip, self.vpath)
-                if bonk:
-                    xban = self.vn.flags.get("xban")
-                    if not xban or not runhook(
-                        self.log,
-                        xban,
-                        self.vn.canonical(self.rem),
-                        self.vpath,
-                        self.host,
-                        self.uname,
-                        time.time(),
-                        0,
-                        self.ip,
-                        time.time(),
-                        str(status),
-                    ):
-                        self.log("client banned: %ss" % (status,), 1)
-                        self.conn.hsrv.bans[ip] = bonk
+                self.cbonk(g, self.vpath, str(status), "%ss" % (status,))
 
         if volsan:
             vols = list(self.asrv.vfs.all_vols.values())
@@ -2133,27 +2151,7 @@ class HttpCli(object):
                 logpwd = "%" + base64.b64encode(zb[:12]).decode("utf-8")
 
             self.log("invalid password: {}".format(logpwd), 3)
-
-            g = self.conn.hsrv.gpwd
-            if g.lim:
-                bonk, ip = g.bonk(self.ip, pwd)
-                if bonk:
-                    xban = self.vn.flags.get("xban")
-                    if not xban or not runhook(
-                        self.log,
-                        xban,
-                        self.vn.canonical(self.rem),
-                        self.vpath,
-                        self.host,
-                        self.uname,
-                        time.time(),
-                        0,
-                        self.ip,
-                        time.time(),
-                        "pw",
-                    ):
-                        self.log("client banned: invalid passwords", 1)
-                        self.conn.hsrv.bans[ip] = bonk
+            self.cbonk(self.conn.hsrv.gpwd, pwd, "pw", "invalid passwords")
 
             msg = "naw dude"
             pwd = "x"  # nosec

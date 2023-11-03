@@ -1563,8 +1563,8 @@ def read_header(sr: Unrecv, t_idle: int, t_tot: int) -> list[str]:
 
             raise Pebkac(
                 400,
-                "protocol error while reading headers:\n"
-                + ret.decode("utf-8", "replace"),
+                "protocol error while reading headers",
+                log=ret.decode("utf-8", "replace"),
             )
 
         ofs = ret.find(b"\r\n\r\n")
@@ -1774,6 +1774,9 @@ def sanitize_fn(fn: str, ok: str, bad: list[str]) -> str:
 
 
 def relchk(rp: str) -> str:
+    if "\x00" in rp:
+        return "[nul]"
+
     if ANYWIN:
         if "\n" in rp or "\r" in rp:
             return "x\nx"
@@ -2976,9 +2979,12 @@ def hidedir(dp) -> None:
 
 
 class Pebkac(Exception):
-    def __init__(self, code: int, msg: Optional[str] = None) -> None:
+    def __init__(
+        self, code: int, msg: Optional[str] = None, log: Optional[str] = None
+    ) -> None:
         super(Pebkac, self).__init__(msg or HTTPCODE[code])
         self.code = code
+        self.log = log
 
     def __repr__(self) -> str:
         return "Pebkac({}, {})".format(self.code, repr(self.args))

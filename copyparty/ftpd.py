@@ -148,7 +148,7 @@ class FtpFs(AbstractedFS):
         try:
             vpath = vpath.replace("\\", "/").strip("/")
             rd, fn = os.path.split(vpath)
-            if ANYWIN and relchk(rd):
+            if relchk(rd):
                 logging.warning("malicious vpath: %s", vpath)
                 t = "Unsupported characters in [{}]"
                 raise FSE(t.format(vpath), 1)

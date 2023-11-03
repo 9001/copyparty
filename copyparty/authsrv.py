@@ -476,12 +476,10 @@ class VFS(object):
         err: int = 403,
     ) -> tuple["VFS", str]:
         """returns [vfsnode,fs_remainder] if user has the requested permissions"""
-        if ANYWIN:
-            mod = relchk(vpath)
-            if mod:
-                if self.log:
-                    self.log("vfs", "invalid relpath [{}]".format(vpath))
-                raise Pebkac(404)
+        if relchk(vpath):
+            if self.log:
+                self.log("vfs", "invalid relpath [{}]".format(vpath))
+            raise Pebkac(422)
 
         cvpath = undot(vpath)
         vn, rem = self._find(cvpath)

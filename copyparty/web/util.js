@@ -1356,6 +1356,11 @@ function lf2br(txt) {
 }
 
 
+function unpre(txt) {
+    return ('' + txt).replace(/^<pre>/, '');
+}
+
+
 var toast = (function () {
     var r = {},
         te = null,

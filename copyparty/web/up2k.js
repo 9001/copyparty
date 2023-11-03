@@ -2402,14 +2402,11 @@ function up2k_init(subtle) {
                 pvis.seth(t.n, 2, L.u_ehstmp, t);
 
                 var err = "",
-                    rsp = (xhr.responseText + ''),
+                    rsp = unpre(this.responseText),
                     ofs = rsp.lastIndexOf('\nURL: ');
 
                 if (ofs !== -1)
                     rsp = rsp.slice(0, ofs);
-
-                if (rsp.indexOf('<pre>') === 0)
-                    rsp = rsp.slice(5);
 
                 if (rsp.indexOf('rate-limit ') !== -1) {
                     var penalty = rsp.replace(/.*rate-limit /, "").split(' ')[0];
@@ -2536,7 +2533,7 @@ function up2k_init(subtle) {
             cdr = t.size;
 
         var orz = function (xhr) {
-            var txt = ((xhr.response && xhr.response.err) || xhr.responseText) + '';
+            var txt = unpre((xhr.response && xhr.response.err) || xhr.responseText);
             if (txt.indexOf('upload blocked by x') + 1) {
                 apop(st.busy.upload, upt);
                 apop(t.postlist, npart);
