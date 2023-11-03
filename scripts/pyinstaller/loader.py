@@ -106,20 +106,19 @@ def meichk():
     if filt not in sys.executable:
         filt = os.path.basename(sys.executable)
 
-    pids = []
-    ptn = re.compile(r"^([^\s]+)\s+([0-9]+)")
+    hits = []
     try:
-        procs = sp.check_output("tasklist").decode("utf-8", "replace")
+        cmd = "tasklist /fo csv".split(" ")
+        procs = sp.check_output(cmd).decode("utf-8", "replace")
     except:
         procs = ""  # winpe
 
-    for ln in procs.splitlines():
-        m = ptn.match(ln)
-        if m and filt in m.group(1).lower():
-            pids.append(int(m.group(2)))
+    for ln in procs.split("\n"):
+        if filt in ln.split('"')[:2][-1]:
+            hits.append(ln)
 
     mod = os.path.dirname(os.path.realpath(__file__))
-    if os.path.basename(mod).startswith("_MEI") and len(pids) == 2:
+    if os.path.basename(mod).startswith("_MEI") and len(hits) == 2:
         meicln(mod)
 
 
