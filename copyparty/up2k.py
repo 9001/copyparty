@@ -65,6 +65,11 @@ from .util import (
     w8b64enc,
 )
 
+try:
+    from pathlib import Path
+except:
+    pass
+
 if HAVE_SQLITE3:
     import sqlite3
 
@@ -2723,7 +2728,18 @@ class Up2k(object):
                     raise Exception("symlink-fallback disabled in cfg")
 
             if not linked:
-                os.symlink(fsenc(lsrc), fsenc(ldst))
+                if ANYWIN:
+                    Path(ldst).symlink_to(lsrc)
+                    if not bos.path.exists(dst):
+                        try:
+                            bos.unlink(dst)
+                        except:
+                            pass
+                        t = "the created symlink [%s] did not resolve to [%s]"
+                        raise Exception(t % (ldst, lsrc))
+                else:
+                    os.symlink(fsenc(lsrc), fsenc(ldst))
+
                 linked = True
         except Exception as ex:
             self.log("cannot link; creating copy: " + repr(ex))
