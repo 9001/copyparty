@@ -7200,8 +7200,8 @@ var msel = (function () {
 		sf.textContent = '';
 
 		var dn = this.getResponseHeader('X-New-Dir');
-		dn = dn || uricom_enc(this.dn);
-		treectl.goto(this.vp + dn + '/', true);
+		dn = dn ? '/' + dn + '/' : uricom_enc(this.dn);
+		treectl.goto(dn, true);
 	}
 })();
 

@@ -2175,26 +2175,30 @@ class HttpCli(object):
         new_dir = self.parser.require("name", 512)
         self.parser.drop()
 
-        sanitized = sanitize_fn(new_dir, "", [])
-        return self._mkdir(vjoin(self.vpath, sanitized))
+        return self._mkdir(vjoin(self.vpath, new_dir))
 
     def _mkdir(self, vpath: str, dav: bool = False) -> bool:
         nullwrite = self.args.nw
+        self.gctx = vpath
+        vpath = undot(vpath)
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
-        self._assert_safe_rem(rem)
+        rem = sanitize_vpath(rem, "/", [])
         fn = vfs.canonical(rem)
+        if not fn.startswith(vfs.realpath):
+            self.log("invalid mkdir [%s] [%s]" % (self.gctx, vpath), 1)
+            raise Pebkac(422)
 
         if not nullwrite:
             fdir = os.path.dirname(fn)
 
-            if not bos.path.isdir(fdir):
+            if dav and not bos.path.isdir(fdir):
                 raise Pebkac(409, "parent folder does not exist")
 
             if bos.path.isdir(fn):
-                raise Pebkac(405, "that folder exists already")
+                raise Pebkac(405, 'folder "/%s" already exists' % (vpath,))
 
             try:
-                bos.mkdir(fn)
+                bos.makedirs(fn)
             except OSError as ex:
                 if ex.errno == errno.EACCES:
                     raise Pebkac(500, "the server OS denied write-access")
@@ -2203,7 +2207,7 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        self.out_headers["X-New-Dir"] = quotep(vpath.split("/")[-1])
+        self.out_headers["X-New-Dir"] = quotep(vpath)
 
         if dav:
             self.reply(b"", 201)

@@ -1773,6 +1773,12 @@ def sanitize_fn(fn: str, ok: str, bad: list[str]) -> str:
     return fn.strip()
 
 
+def sanitize_vpath(vp: str, ok: str, bad: list[str]) -> str:
+    parts = vp.replace(os.sep, "/").split("/")
+    ret = [sanitize_fn(x, ok, bad) for x in parts]
+    return "/".join(ret)
+
+
 def relchk(rp: str) -> str:
     if "\x00" in rp:
         return "[nul]"

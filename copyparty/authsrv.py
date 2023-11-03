@@ -498,8 +498,8 @@ class VFS(object):
                     t = "{} has no {} in [{}] => [{}] => [{}]"
                     self.log("vfs", t.format(uname, msg, vpath, cvpath, ap), 6)
 
-                t = "you don't have {}-access for this location"
-                raise Pebkac(err, t.format(msg))
+                t = 'you don\'t have %s-access in "/%s"'
+                raise Pebkac(err, t % (msg, cvpath))
 
         return vn, rem
 
