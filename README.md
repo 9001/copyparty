@@ -1304,8 +1304,23 @@ scrape_configs:
 ```
 
 currently the following metrics are available,
-* `cpp_uptime_seconds`
-* `cpp_bans` number of banned IPs
+* `cpp_uptime_seconds` time since last copyparty restart
+* `cpp_boot_unixtime_seconds` same but as an absolute timestamp
+* `cpp_http_conns` number of open http(s) connections
+* `cpp_http_reqs` number of http(s) requests handled
+* `cpp_sus_reqs` number of 403/422/malicious requests
+* `cpp_active_bans` number of currently banned IPs
+* `cpp_total_bans` number of IPs banned since last restart
+
+these are available unless `--nos-vst` is specified:
+* `cpp_db_idle_seconds` time since last database activity (upload/rename/delete)
+* `cpp_db_act_seconds` same but as an absolute timestamp
+* `cpp_idle_vols` number of volumes which are idle / ready
+* `cpp_busy_vols` number of volumes which are busy / indexing
+* `cpp_offline_vols` number of volumes which are offline / unavailable
+* `cpp_hashing_files` number of files queued for hashing / indexing
+* `cpp_tagq_files` number of files queued for metadata scanning
+* `cpp_mtpq_files` number of files queued for plugin-based analysis
 
 and these are available per-volume only:
 * `cpp_disk_size_bytes` total HDD size
@@ -1324,8 +1339,11 @@ some of the metrics have additional requirements to function correctly,
 the following options are available to disable some of the metrics:
 * `--nos-hdd` disables `cpp_disk_*` which can prevent spinning up HDDs
 * `--nos-vol` disables `cpp_vol_*` which reduces server startup time
+* `--nos-vst` disables volume state, reducing the worst-case prometheus query time by 0.5 sec
 * `--nos-dup` disables `cpp_dupe_*` which reduces the server load caused by prometheus queries
 * `--nos-unf` disables `cpp_unf_*` for no particular purpose
+
+note: the following metrics are counted incorrectly if multiprocessing is enabled with `-j`: `cpp_http_conns`, `cpp_http_reqs`, `cpp_sus_reqs`, `cpp_active_bans`, `cpp_total_bans`
 
 
 # packages

@@ -128,6 +128,9 @@ class HttpSrv(object):
 
         self.u2fh = FHC()
         self.metrics = Metrics(self)
+        self.nreq = 0
+        self.nsus = 0
+        self.nban = 0
         self.srvs: list[socket.socket] = []
         self.ncli = 0  # exact
         self.clients: set[HttpConn] = set()  # laggy

@@ -277,6 +277,8 @@ class HttpCli(object):
 
             return False
 
+        self.conn.hsrv.nreq += 1
+
         self.ua = self.headers.get("user-agent", "")
         self.is_rclone = self.ua.startswith("rclone/")
 
@@ -567,6 +569,7 @@ class HttpCli(object):
             return self.conn.iphash.s(self.ip)
 
     def cbonk(self, g: Garda, v: str, reason: str, descr: str) -> bool:
+        self.conn.hsrv.nsus += 1
         if not g.lim:
             return False
 
@@ -590,6 +593,7 @@ class HttpCli(object):
         ):
             self.log("client banned: %s" % (descr,), 1)
             self.conn.hsrv.bans[ip] = bonk
+            self.conn.hsrv.nban += 1
             return True
 
         return False

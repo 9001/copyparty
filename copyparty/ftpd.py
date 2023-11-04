@@ -92,6 +92,12 @@ class FtpAuth(DummyAuthorizer):
                 if bonk:
                     logging.warning("client banned: invalid passwords")
                     bans[ip] = bonk
+                    try:
+                        # only possible if multiprocessing disabled
+                        self.hub.broker.httpsrv.bans[ip] = bonk
+                        self.hub.broker.httpsrv.nban += 1
+                    except:
+                        pass
 
             raise AuthenticationFailed("Authentication failed.")
 

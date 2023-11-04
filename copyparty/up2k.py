@@ -266,6 +266,7 @@ class Up2k(object):
             "hashq": self.n_hashq,
             "tagq": self.n_tagq,
             "mtpq": mtpq,
+            "dbwu": "{:.2f}".format(self.db_act),
             "dbwt": "{:.2f}".format(
                 min(1000 * 24 * 60 * 60 - 1, time.time() - self.db_act)
             ),
