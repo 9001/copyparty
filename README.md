@@ -53,6 +53,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [webdav server](#webdav-server) - with read-write support
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
+    * [browser ux](#browser-ux) - tweaking the ui
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
@@ -317,6 +318,8 @@ same order here too
 
 upgrade notes
 
+* `1.9.16` (2023-11-04):
+  * `--stats`/prometheus: `cpp_bans` renamed to `cpp_active_bans`, and that + `cpp_uptime` are gauges
 * `1.6.0` (2023-01-29):
   * http-api: delete/move is now `POST` instead of `GET`
   * everything other than `GET` and `HEAD` must pass [cors validation](#cors)

@@ -1,4 +1,21 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1024-1643  `v1.9.15`  expand placeholder
+
+[made it just in time!](https://a.ocv.me/pub/g/nerd-stuff/PXL_20231024_170348367.jpg) (EDIT: nevermind, three of the containers didn't finish uploading to ghcr before takeoff ;_; all up now)
+
+## new features
+* #56 placeholder variables in markdown documents and prologue/epilogue html files
+  * default-disabled; must be enabled globally with `--exp` or per-volume with volflag `exp`
+  * `{{self.ip}}` becomes the client IP; see [/srv/expand/README.md](https://github.com/9001/copyparty/blob/hovudstraum/srv/expand/README.md) for more examples
+* dynamic-range-compressor: reduced volume jumps between songs when enabled
+
+## bugfixes
+* v1.9.14 broke the `scan` volflag, causing volume rescans to happen every 10sec if enabled
+  * its global counterpart `--re-maxage` was not affected
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1021-1443  `v1.9.14`  uptime
 
 ## new features

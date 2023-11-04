@@ -2143,8 +2143,10 @@ class HttpCli(object):
         return True
 
     def get_pwd_cookie(self, pwd: str) -> str:
-        if self.asrv.ah.hash(pwd) in self.asrv.iacct:
-            msg = "login ok"
+        hpwd = self.asrv.ah.hash(pwd)
+        uname = self.asrv.iacct.get(hpwd)
+        if uname:
+            msg = "hi " + uname
             dur = int(60 * 60 * self.args.logout)
         else:
             logpwd = pwd
