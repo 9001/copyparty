@@ -141,12 +141,25 @@ filt=
 }
 
 [ $push ] && {
+    ver=$(
+        python3 ../../dist/copyparty-sfx.py --version 2>/dev/null |
+        awk '/^copyparty v/{sub(/-.*/,"");sub(/v/,"");print$2;exit}'
+    )
+    echo $ver | grep -E '[0-9]\.[0-9]' || {
+        echo no ver
+        exit 1
+    }
     for i in $dhub_order; do
+        printf '\ndockerhub %s\n' $i
+        podman manifest push --all copyparty-$i copyparty/$i:$ver
         podman manifest push --all copyparty-$i copyparty/$i:latest
-    done
+    done &
     for i in $ghcr_order; do
+        printf '\nghcr %s\n' $i
+        podman manifest push --all copyparty-$i ghcr.io/9001/copyparty-$i:$ver
         podman manifest push --all copyparty-$i ghcr.io/9001/copyparty-$i:latest
-    done
+    done &
+    wait
 }
 
 echo ok
