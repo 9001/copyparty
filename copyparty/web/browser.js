@@ -7165,16 +7165,17 @@ var msel = (function () {
 	form.onsubmit = function (e) {
 		ev(e);
 		clmod(sf, 'vis', 1);
-		sf.textContent = 'creating "' + tb.value + '"...';
+		var dn = tb.value;
+		sf.textContent = 'creating "' + dn + '"...';
 
 		var fd = new FormData();
 		fd.append("act", "mkdir");
-		fd.append("name", tb.value);
+		fd.append("name", dn);
 
 		var xhr = new XHR();
 		xhr.vp = get_evpath();
-		xhr.dn = tb.value;
-		xhr.open('POST', xhr.vp, true);
+		xhr.dn = dn;
+		xhr.open('POST', dn.startsWith('/') ? (SR || '/') : xhr.vp, true);
 		xhr.onload = xhr.onerror = cb;
 		xhr.responseType = 'text';
 		xhr.send(fd);
@@ -7202,6 +7203,7 @@ var msel = (function () {
 		var dn = this.getResponseHeader('X-New-Dir');
 		dn = dn ? '/' + dn + '/' : uricom_enc(this.dn);
 		treectl.goto(dn, true);
+		tree_scrollto();
 	}
 })();
 
