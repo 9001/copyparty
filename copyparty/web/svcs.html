@@ -10,6 +10,7 @@
 {{ html_head }}
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/splash.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
+    <style>ul{padding-left:1.3em}li{margin:.4em 0}</style>
 </head>
 
 <body>
@@ -48,9 +49,13 @@
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>W:</b>
             </pre>
-            {% if s %}
-            <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>--no-check-certificate</code> to the mount command</em><br />---</p>
-            {% endif %}
+            <ul>
+                {% if s %}
+                <li>running <code>rclone mount</code> on LAN (or just dont have valid certificates)? add <code>--no-check-certificate</code></li>
+                {% endif %}
+                <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
+                <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
+            </ul>
             
             <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
@@ -73,10 +78,13 @@
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>
             </pre>
-            {% if s %}
-            <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>--no-check-certificate</code> to the mount command</em><br />---</p>
-            {% endif %}
-            
+            <ul>
+                {% if s %}
+                <li>running <code>rclone mount</code> on LAN (or just dont have valid certificates)? add <code>--no-check-certificate</code></li>
+                {% endif %}
+                <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
+                <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
+            </ul>
             <p>or the emergency alternative (gnome/gui-only):</p>
             <!-- gnome-bug: ignores vp -->
             <pre>
@@ -123,8 +131,14 @@
                 rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>W:</b>
             </pre>
-            <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>no_check_certificate=true</code> to the config command</em><br />---</p>
             {% endif %}
+            <ul>
+                {% if args.ftps %}
+                <li>running on LAN (or just dont have valid certificates)? add <code>no_check_certificate=true</code> to the config command</li>
+                {% endif %}
+                <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
+                <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
+            </ul>
             <p>if you want to use the native FTP client in windows instead (please dont), press <code>win+R</code> and run this command:</p>
             <pre>
                 explorer {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}<b>{{ pw }}</b>:k@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
@@ -145,8 +159,14 @@
                 rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>mp</b>
             </pre>
-            <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>no_check_certificate=true</code> to the config command</em><br />---</p>
             {% endif %}
+            <ul>
+                {% if args.ftps %}
+                <li>running on LAN (or just dont have valid certificates)? add <code>no_check_certificate=true</code> to the config command</li>
+                {% endif %}
+                <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
+                <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
+            </ul>
             <p>emergency alternative (gnome/gui-only):</p>
             <!-- gnome-bug: ignores vp -->
             <pre>
@@ -178,7 +198,7 @@
             partyfuse.py{% if accs %} -a <b>{{ pw }}</b>{% endif %} http{{ s }}://{{ ep }}/{{ rvp }} <b><span class="os win">W:</span><span class="os lin mac">mp</span></b>
         </pre>
         {% if s %}
-        <p><em>note: if you are on LAN (or just dont have valid certificates), add <code>-td</code></em></p>
+        <ul><li>if you are on LAN (or just dont have valid certificates), add <code>-td</code></li></ul>
         {% endif %}
         <p>
             you can use <a href="{{ r }}/.cpr/a/u2c.py">u2c.py</a> to upload (sometimes faster than web-browsers)
