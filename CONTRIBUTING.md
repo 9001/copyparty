@@ -34,6 +34,8 @@ aside from documentation and ideas, some other things that would be cool to have
 
 * **packaging** for various linux distributions -- this could either be as simple as just plopping the sfx.py in the right place and calling that from systemd (the [archlinux package](https://github.com/9001/copyparty/pull/18) originally did this); maybe with a small config-file which would cause copyparty to load settings from `/etc/copyparty.d` (like the [archlinux package](https://github.com/9001/copyparty/tree/hovudstraum/contrib/package/arch) does; copyparty.conf), or it could be a proper installation of the copyparty python package into /usr/lib or similar (the archlinux package [eventually went for this approach](https://github.com/9001/copyparty/pull/26) eventually)
 
+  * [fpm](https://github.com/jordansissel/fpm) can probably help with the technical part of it, but someone needs to handle distro relations :-)
+
 * **software integration** -- I'm sure there's a lot of usecases where copyparty could complement something else, or the other way around, so any ideas or any work in this regard would be dope. This doesn't necessarily have to be code inside copyparty itself;
 
   * [hooks](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks) -- these are small programs which are called by copyparty when certain things happen (files are uploaded, someone hits a 404, etc.), and could be a fun way to add support for more usecases
