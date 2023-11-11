@@ -112,6 +112,7 @@ class File(object):
         # set by upload
         self.up_b = 0  # type: int
         self.up_c = 0  # type: int
+        self.cd = 0
 
         # t = "size({}) lmod({}) top({}) rel({}) abs({}) name({})\n"
         # eprint(t.format(self.size, self.lmod, self.top, self.rel, self.abs, self.name))
@@ -599,7 +600,7 @@ def handshake(ar, file, search):
                 raise
 
             eprint("handshake failed, retrying: {0}\n  {1}\n\n".format(file.name, em))
-            time.sleep(1)
+            time.sleep(ar.cd)
 
     try:
         r = r.json()
@@ -976,6 +977,9 @@ class Ctl(object):
             with self.mutex:
                 self.handshaker_busy += 1
 
+            while time.time() < file.cd:
+                time.sleep(0.1)
+
             hs, sprs = handshake(self.ar, file, search)
             if search:
                 if hs:
@@ -1058,6 +1062,7 @@ class Ctl(object):
             except Exception as ex:
                 t = "upload failed, retrying: {0} #{1} ({2})\n"
                 eprint(t.format(file.name, cid[:8], ex))
+                file.cd = time.time() + self.ar.cd
                 # handshake will fix it
 
             with self.mutex:
@@ -1129,6 +1134,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-J", type=int, metavar="THREADS", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles and macos)")
+    ap.add_argument("--cd", type=float, metavar="SEC", default=5, help="delay before reattempting a failed handshake/upload")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
 
