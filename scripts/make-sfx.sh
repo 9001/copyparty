@@ -205,25 +205,21 @@ necho() {
 	mv {markupsafe,jinja2} j2/
 
 	necho collecting pyftpdlib
-	f="../build/pyftpdlib-1.5.8.tar.gz"
+	f="../build/pyftpdlib-1.5.9.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.8.tar.gz;
+		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.9.tar.gz;
 		wget -O$f "$url" || curl -L "$url" >$f)
 
 	tar -zxf $f
 	mv pyftpdlib-release-*/pyftpdlib .
 	rm -rf pyftpdlib-release-* pyftpdlib/test
+	for f in pyftpdlib/_async{hat,ore}.py; do
+		[ -e "$f" ] || continue;
+		iawk 'NR<4||NR>27||!/^#/;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' $f
+	done
 
 	mkdir ftp/
 	mv pyftpdlib ftp/
-
-	necho collecting asyncore, asynchat
-	for n in asyncore.py asynchat.py; do
-		f=../build/$n
-		[ -e "$f" ] ||
-			(url=https://raw.githubusercontent.com/python/cpython/c4d45ee670c09d4f6da709df072ec80cb7dfad22/Lib/$n;
-			wget -O$f "$url" || curl -L "$url" >$f)
-	done
 
 	necho collecting python-magic
 	v=0.4.27
@@ -291,12 +287,6 @@ necho() {
 	while IFS= read -r x; do
 		[ $(wc -l <"$x") -gt 1 ] && continue
 		(cd "${x%/*}"; cp -p "../$(cat "${x##*/}")" ${x##*/})
-	done
-
-	# insert asynchat
-	mkdir copyparty/vend
-	for n in asyncore.py asynchat.py; do
-		awk 'NR<4||NR>27;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' ../build/$n >copyparty/vend/$n
 	done
 
 	rm -f copyparty/stolen/*/README.md
@@ -419,7 +409,7 @@ iawk '/^ {0,4}[^ ]/{s=0}/^ {4}def (serve_forever|_loop)/{s=1}!s' ftp/pyftpdlib/s
 rm -f ftp/pyftpdlib/{__main__,prefork}.py
 
 [ $no_ftp ] &&
-	rm -rf copyparty/ftpd.py ftp asyncore.py asynchat.py &&
+	rm -rf copyparty/ftpd.py ftp &&
 	sed -ri '/\.ftp/d' copyparty/svchub.py
 
 [ $no_smb ] &&
@@ -576,8 +566,8 @@ nf=$(ls -1 "$zdir"/arc.* 2>/dev/null | wc -l)
 	cat ../$bdir/COPYING.txt) >> copyparty/res/COPYING.txt ||
 		echo "copying.txt 404 pls rebuild"
 
-	mv ftp/* j2/* copyparty/vend/* .
-	rm -rf ftp j2 py2 py37 copyparty/vend
+	mv ftp/* j2/* .
+	rm -rf ftp j2 py2 py37
 	(cd copyparty; tar -cvf z.tar $t; rm -rf $t)
 	cd ..
 	pyoxidizer build --release --target-triple $tgt

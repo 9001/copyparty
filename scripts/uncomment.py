@@ -16,16 +16,11 @@ def uncomment(fpath):
         orig = f.read().decode("utf-8")
 
     out = ""
-    for ln in orig.split("\n"):
-        if not ln.startswith("#"):
-            break
-
-        out += ln + "\n"
-
     io_obj = io.StringIO(orig)
     prev_toktype = tokenize.INDENT
     last_lineno = -1
     last_col = 0
+    code = False
     for tok in tokenize.generate_tokens(io_obj.readline):
         # print(repr(tok))
         token_type = tok[0]
@@ -53,7 +48,11 @@ def uncomment(fpath):
                 out += token_string
             else:
                 out += '"a"'
-        elif token_type != tokenize.COMMENT or is_legalese:
+        elif token_type != tokenize.COMMENT:
+            out += token_string
+            if not code and token_string.strip():
+                code = True
+        elif is_legalese or (not start_col and not code):
             out += token_string
         else:
             if out.rstrip(" ").endswith("\n"):

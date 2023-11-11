@@ -28,10 +28,6 @@ https://github.com/nayuki/QR-Code-generator/
 C: Project Nayuki
 L: MIT
 
-https://github.com/python/cpython/blob/3.10/Lib/asyncore.py
-C: 1996 Sam Rushing
-L: ISC
-
 https://github.com/ahupp/python-magic/
 C: 2001-2014 Adam Hupp
 L: MIT
