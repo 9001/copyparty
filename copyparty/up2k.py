@@ -3921,45 +3921,58 @@ class Up2k(object):
                 self.n_hashq -= 1
             # self.log("hashq {}".format(self.n_hashq))
 
-            ptop, vtop, rd, fn, ip, at, usr, skip_xau = self.hashq.get()
-            # self.log("hashq {} pop {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
-            if "e2d" not in self.flags[ptop]:
-                continue
+            task = self.hashq.get()
+            if len(task) != 8:
+                raise Exception("invalid hash task")
 
-            abspath = djoin(ptop, rd, fn)
-            self.log("hashing " + abspath)
-            inf = bos.stat(abspath)
-            if not inf.st_size:
-                wark = up2k_wark_from_metadata(
-                    self.salt, inf.st_size, int(inf.st_mtime), rd, fn
-                )
-            else:
-                hashes = self._hashlist_from_file(abspath)
-                if not hashes:
+            try:
+                if not self._hash_t(task):
                     return
+            except Exception as ex:
+                self.log("failed to hash %s: %s" % (task, ex), 1)
 
-                wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
+    def _hash_t(self, task: tuple[str, str, str, str, str, float, str, bool]) -> bool:
+        ptop, vtop, rd, fn, ip, at, usr, skip_xau = task
+        # self.log("hashq {} pop {}/{}/{}".format(self.n_hashq, ptop, rd, fn))
+        if "e2d" not in self.flags[ptop]:
+            return True
 
-            with self.mutex:
-                self.idx_wark(
-                    self.flags[ptop],
-                    rd,
-                    fn,
-                    inf.st_mtime,
-                    inf.st_size,
-                    ptop,
-                    vtop,
-                    wark,
-                    "",
-                    usr,
-                    ip,
-                    at,
-                    skip_xau,
-                )
+        abspath = djoin(ptop, rd, fn)
+        self.log("hashing " + abspath)
+        inf = bos.stat(abspath)
+        if not inf.st_size:
+            wark = up2k_wark_from_metadata(
+                self.salt, inf.st_size, int(inf.st_mtime), rd, fn
+            )
+        else:
+            hashes = self._hashlist_from_file(abspath)
+            if not hashes:
+                return False
 
-            if at and time.time() - at > 30:
-                with self.rescan_cond:
-                    self.rescan_cond.notify_all()
+            wark = up2k_wark_from_hashlist(self.salt, inf.st_size, hashes)
+
+        with self.mutex:
+            self.idx_wark(
+                self.flags[ptop],
+                rd,
+                fn,
+                inf.st_mtime,
+                inf.st_size,
+                ptop,
+                vtop,
+                wark,
+                "",
+                usr,
+                ip,
+                at,
+                skip_xau,
+            )
+
+        if at and time.time() - at > 30:
+            with self.rescan_cond:
+                self.rescan_cond.notify_all()
+
+        return True
 
     def hash_file(
         self,
