@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.10"
-S_BUILD_DT = "2023-08-15"
+S_VERSION = "1.11"
+S_BUILD_DT = "2023-11-11"
 
 """
 u2c.py: upload to copyparty
@@ -433,7 +433,7 @@ def walkdirs(err, tops, excl):
         za = [x.replace(b"/", b"\\") for x in za]
         tops = za
 
-    ptn = re.compile(excl.encode("utf-8") or b"\n")
+    ptn = re.compile(excl.encode("utf-8") or b"\n", re.I)
 
     for top in tops:
         isdir = os.path.isdir(top)
