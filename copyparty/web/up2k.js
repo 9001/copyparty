@@ -2402,7 +2402,7 @@ function up2k_init(subtle) {
                 pvis.seth(t.n, 2, L.u_ehstmp, t);
 
                 var err = "",
-                    rsp = unpre(this.responseText),
+                    rsp = unpre(xhr.responseText),
                     ofs = rsp.lastIndexOf('\nURL: ');
 
                 if (ofs !== -1)
