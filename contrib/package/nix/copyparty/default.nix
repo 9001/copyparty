@@ -3,6 +3,9 @@
 # use argon2id-hashed passwords in config files (sha2 is always available)
 withHashedPasswords ? true,
 
+# generate TLS certificates on startup (pointless when reverse-proxied)
+withCertgen ? false,
+
 # create thumbnails with Pillow; faster than FFmpeg / MediaProcessing
 withThumbnails ? true,
 
@@ -34,6 +37,7 @@ let
     ]
     ++ lib.optional withSMB impacket
     ++ lib.optional withFTPS pyopenssl
+    ++ lib.optional withCertgen cfssl
     ++ lib.optional withThumbnails pillow
     ++ lib.optional withFastThumbnails pyvips
     ++ lib.optional withMediaProcessing ffmpeg

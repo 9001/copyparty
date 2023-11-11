@@ -132,7 +132,10 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
 
     try:
         expiry, inf = _read_crt(args, "srv.pem")
-        expired = time.time() + args.crt_sdays * 60 * 60 * 24 * 0.1 > expiry
+        if "sans" not in inf:
+            raise Exception("no useable cert found")
+
+        expired = time.time() + args.crt_sdays * 60 * 60 * 24 * 0.5 > expiry
         cert_insec = os.path.join(args.E.mod, "res/insecure.pem")
         for n in names:
             if n not in inf["sans"]:

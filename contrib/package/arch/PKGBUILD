@@ -9,6 +9,7 @@ license=('MIT')
 depends=("python" "lsof" "python-jinja")
 makedepends=("python-wheel" "python-setuptools" "python-build" "python-installer" "make" "pigz")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags"
+            "cfssl: generate TLS certificates on startup (pointless when reverse-proxied)"
             "python-mutagen: music tags (alternative)" 
             "python-pillow: thumbnails for images" 
             "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
