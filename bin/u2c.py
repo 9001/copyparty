@@ -107,6 +107,7 @@ class File(object):
         self.ucids = []  # type: list[str]  # chunks which need to be uploaded
         self.wark = None  # type: str
         self.url = None  # type: str
+        self.nhs = 0
 
         # set by upload
         self.up_b = 0  # type: int
@@ -689,6 +690,7 @@ class Ctl(object):
 
     def __init__(self, ar, stats=None):
         self.ok = False
+        self.errs = 0
         self.ar = ar
         self.stats = stats or self._scan()
         if not self.stats:
@@ -736,7 +738,7 @@ class Ctl(object):
 
             self._fancy()
 
-        self.ok = True
+        self.ok = not self.errs
 
     def _safe(self):
         """minimal basic slow boring fallback codepath"""
@@ -961,12 +963,18 @@ class Ctl(object):
                 self.q_upload.put(None)
                 break
 
-            with self.mutex:
-                self.handshaker_busy += 1
-
             upath = file.abs.decode("utf-8", "replace")
             if not VT100:
                 upath = upath.lstrip("\\?")
+
+            file.nhs += 1
+            if file.nhs > 32:
+                print("ERROR: giving up on file %s" % (upath))
+                self.errs += 1
+                continue
+
+            with self.mutex:
+                self.handshaker_busy += 1
 
             hs, sprs = handshake(self.ar, file, search)
             if search:
@@ -1186,6 +1194,9 @@ source file/folder selection uses rsync syntax, meaning that:
         ar.drd = True
         ar.z = True
         ctl = Ctl(ar, ctl.stats)
+
+    if ctl.errs:
+        print("WARNING: %d errors" % (ctl.errs))
 
     sys.exit(0 if ctl.ok else 1)
 
