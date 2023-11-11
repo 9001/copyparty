@@ -36,17 +36,17 @@ from .tcpsrv import TcpSrv
 from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
 from .up2k import Up2k
 from .util import (
-    FFMPEG_URL,
-    VERSIONS,
-    Daemon,
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
+    FFMPEG_URL,
+    UTC,
+    VERSIONS,
+    Daemon,
     Garda,
     HLog,
     HMaccas,
     ODict,
-    UTC,
     alltrace,
     ansi_re,
     min_ex,

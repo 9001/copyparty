@@ -115,7 +115,7 @@ class Cfg(Namespace):
         ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
+        ex = "ah_cli ah_gen css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "s_thead s_tbody th_convt"
@@ -190,6 +190,7 @@ class VHttpSrv(object):
         self.broker = NullBroker()
         self.prism = None
         self.bans = {}
+        self.nreq = 0
 
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}

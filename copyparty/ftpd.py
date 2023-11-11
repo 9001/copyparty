@@ -11,11 +11,6 @@ import time
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
 
-try:
-    import asynchat
-except:
-    sys.path.append(os.path.join(E.mod, "vend"))
-
 from pyftpdlib.authorizers import AuthenticationFailed, DummyAuthorizer
 from pyftpdlib.filesystems import AbstractedFS, FilesystemError
 from pyftpdlib.handlers import FTPHandler

@@ -1,4 +1,40 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1104-2158  `v1.9.16`  windedup
+
+## breaking changes
+* two of the prometheus metrics have changed slightly; see the [breaking changes readme section](https://github.com/9001/copyparty#breaking-changes)
+  * (i'm not familiar with prometheus so i'm not sure if this is a big deal)
+
+## new features
+* #58 versioned docker images! no longer just `latest`
+* browser: the mkdir feature now accepts `foo/bar/qux` and `../foo` and `/bar`
+* add 14 more prometheus metrics; see [readme](https://github.com/9001/copyparty#prometheus) for details
+  * connections, requests, malicious requests, volume state, file hashing/analyzation queues
+* catch some more malicious requests in the autoban filters
+  * some malicious requests are now answered with HTTP 422, so that they count against `--ban-422`
+
+## bugfixes
+* windows: fix symlink-based upload deduplication
+  * MS decided to make symlinks relative to working-directory rather than destination-path...
+* `--stats` would produce invalid metrics if a volume was offline
+* minor improvements to password hashing ux:
+  * properly warn if `--ah-cli` or `--ah-gen` is used without `--ah-alg`
+  * support `^D` during `--ah-cli`
+* browser-ux / cosmetics:
+  * fix toast/tooltip colors on splashpage
+  * easier to do partial text selection inside links (search results, breadcrumbs, uploads)
+  * more rclone-related hints on the connect-page
+
+## other changes
+* malformed http headers from clients are no longer included in the client error-message
+  * just in case there are deployments with a reverse-proxy inserting interesting stuff on the way in
+  * the serverlog still contains all the necessary info to debug your own clients
+* updated [example nginx config](https://github.com/9001/copyparty/blob/hovudstraum/contrib/nginx/copyparty.conf) to recover faster from brief server outages
+  * the default value of `fail_timeout` (10sec) makes nginx cache the outage for longer than necessary
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1024-1643  `v1.9.15`  expand placeholder
 
 [made it just in time!](https://a.ocv.me/pub/g/nerd-stuff/PXL_20231024_170348367.jpg) (EDIT: nevermind, three of the containers didn't finish uploading to ghcr before takeoff ;_; all up now)

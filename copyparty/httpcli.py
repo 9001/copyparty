@@ -37,13 +37,13 @@ from .star import StreamTar
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
 from .util import (
-    Garda,
     HTTPCODE,
     META_NOBOTS,
+    UTC,
+    Garda,
     MultipartParser,
     ODict,
     Pebkac,
-    UTC,
     UnrecvEOF,
     absreal,
     alltrace,
