@@ -795,6 +795,11 @@ class Up2k(object):
             except:
                 return None
 
+        vpath = "?"
+        for k, v in self.asrv.vfs.all_vols.items():
+            if v.realpath == ptop:
+                vpath = k
+
         _, flags = self._expr_idx_filter(flags)
 
         ft = "\033[0;32m{}{:.0}"
@@ -830,17 +835,9 @@ class Up2k(object):
             a = ["\033[90mall-default"]
 
         if a:
-            vpath = "?"
-            for k, v in self.asrv.vfs.all_vols.items():
-                if v.realpath == ptop:
-                    vpath = k
-
-            if vpath:
-                vpath += "/"
-
             zs = " ".join(sorted(a))
             zs = zs.replace("90mre.compile(", "90m(")  # nohash
-            self.log("/{} {}".format(vpath, zs), "35")
+            self.log("/{} {}".format(vpath + ("/" if vpath else ""), zs), "35")
 
         reg = {}
         drp = None
@@ -890,9 +887,6 @@ class Up2k(object):
 
         try:
             cur = self._open_db(db_path)
-            self.cur[ptop] = cur
-            self.volsize[cur] = 0
-            self.volnfiles[cur] = 0
 
             # speeds measured uploading 520 small files on a WD20SPZX (SMR 2.5" 5400rpm 4kb)
             dbd = flags["dbd"]
@@ -926,12 +920,38 @@ class Up2k(object):
 
             cur.execute("pragma synchronous=" + sync)
             cur.connection.commit()
+
+            self._verify_db_cache(cur, vpath)
+
+            self.cur[ptop] = cur
+            self.volsize[cur] = 0
+            self.volnfiles[cur] = 0
+
             return cur, db_path
         except:
             msg = "cannot use database at [{}]:\n{}"
             self.log(msg.format(ptop, traceback.format_exc()))
 
         return None
+
+    def _verify_db_cache(self, cur: "sqlite3.Cursor", vpath: str) -> None:
+        # check if volume config changed since last use; drop caches if so
+        zsl = [vpath] + list(sorted(self.asrv.vfs.all_vols.keys()))
+        zb = hashlib.sha1("\n".join(zsl).encode("utf-8", "replace")).digest()
+        vcfg = base64.urlsafe_b64encode(zb[:18]).decode("ascii")
+
+        c = cur.execute("select v from kv where k = 'volcfg'")
+        try:
+            (oldcfg,) = c.fetchone()
+        except:
+            oldcfg = ""
+        
+        if oldcfg != vcfg:
+            cur.execute("delete from kv where k = 'volcfg'")
+            cur.execute("delete from dh")
+            cur.execute("delete from cv")
+            cur.execute("insert into kv values ('volcfg',?)", (vcfg,))
+            cur.connection.commit()
 
     def _build_file_index(self, vol: VFS, all_vols: list[VFS]) -> tuple[bool, bool]:
         do_vac = False
