@@ -4505,12 +4505,13 @@ var thegrid = (function () {
 			aplay = ebi('a' + oth.getAttribute('id')),
 			is_img = /\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp|webm|mkv|mp4)(\?|$)/i.test(href),
 			is_dir = href.endsWith('/'),
+			is_srch = !!ebi('unsearch'),
 			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),
 			have_sel = QS('#files tr.sel'),
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e)))) {
+		if (!is_srch && ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e))))) {
 			td.onclick.call(td, e);
 			if (e.shiftKey)
 				return r.loadsel();
