@@ -4648,7 +4648,7 @@ var thegrid = (function () {
 				if (r.full)
 					ihref += 'f'
 				if (href == "#")
-					ihref = SR + '/.cpr/ico/⏏️';
+					ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
 			}
 			else if (isdir) {
 				ihref = SR + '/.cpr/ico/folder';
