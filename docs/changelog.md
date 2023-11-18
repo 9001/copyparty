@@ -1,4 +1,22 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1111-1738  `v1.9.17`  11-11
+
+## new features
+* `u2c.py` / `u2c.exe` (the commandline uploader):
+  * `-x` is now case-insensitive
+  * if a file fails to upload after 30 attempts, give up (bitflips)
+  * add 5 sec delay before reattempts (configurable with `--cd`)
+
+## bugfixes
+* clients could crash the file indexer by uploading and then instantly deleting files (as some webdav clients tend to do)
+* and fix some upload errorhandling which broke during a refactoring in v1.9.16
+
+## other changes
+* upgraded pyftpdlib to v1.5.9
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1104-2158  `v1.9.16`  windedup
 
 ## breaking changes

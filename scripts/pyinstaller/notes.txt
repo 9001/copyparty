@@ -33,7 +33,7 @@ fns=(
 )
 [ $w7 ] && fns+=(
   pyinstaller-5.13.2-py3-none-win32.whl
-  certifi-2022.12.7-py3-none-any.whl
+  certifi-2023.11.17-py3-none-any.whl
   chardet-5.1.0-py3-none-any.whl
   idna-3.4-py3-none-any.whl
   requests-2.28.2-py3-none-any.whl
