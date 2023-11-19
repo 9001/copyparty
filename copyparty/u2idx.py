@@ -9,6 +9,7 @@ import time
 from operator import itemgetter
 
 from .__init__ import ANYWIN, TYPE_CHECKING, unicode
+from .authsrv import LEELOO_DALLAS
 from .bos import bos
 from .up2k import up2k_wark_from_hashlist
 from .util import (
@@ -20,6 +21,7 @@ from .util import (
     min_ex,
     quotep,
     s3dec,
+    vjoin,
 )
 
 if HAVE_SQLITE3:
@@ -282,6 +284,11 @@ class U2idx(object):
         have_mt: bool,
         lim: int,
     ) -> tuple[list[dict[str, Any]], list[str], bool]:
+        if self.args.srch_dbg:
+            t = "searching across all %s volumes in which the user has 'r' (full read access):\n  %s"
+            zs = "\n  ".join(["/%s = %s" % (x[0], x[1]) for x in vols])
+            self.log(t % (len(vols), zs), 5)
+
         done_flag: list[bool] = []
         self.active_id = "{:.6f}_{}".format(
             time.time(), threading.current_thread().ident
@@ -303,9 +310,21 @@ class U2idx(object):
         lim = min(lim, int(self.args.srch_hits))
         taglist = {}
         for (vtop, ptop, flags) in vols:
+            if lim < 0:
+                break
+
             cur = self.get_cur(ptop)
             if not cur:
                 continue
+
+            excl = []
+            for vp2 in self.asrv.vfs.all_vols.keys():
+                if vp2.startswith((vtop + "/").lstrip("/")) and vtop != vp2:
+                    excl.append(vp2[len(vtop) :].lstrip("/"))
+
+            if self.args.srch_dbg:
+                t = "searching in volume /%s (%s), excludelist %s"
+                self.log(t % (vtop, ptop, excl), 5)
 
             self.active_cur = cur
 
@@ -326,6 +345,13 @@ class U2idx(object):
 
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
+
+                if rd in excl or any([x for x in excl if rd.startswith(x + "/")]):
+                    if self.args.srch_dbg:
+                        zs = vjoin(vjoin(vtop, rd), fn)
+                        t = "database inconsistency in volume '/%s'; ignoring: %s"
+                        self.log(t % (vtop, zs), 1)
+                    continue
 
                 rp = quotep("/".join([x for x in [vtop, rd, fn] if x]))
                 if not dots and "/." in ("/" + rp):
@@ -355,6 +381,18 @@ class U2idx(object):
                 if lim < 0:
                     break
 
+                if self.args.srch_dbg:
+                    t = "in volume '/%s': hit: %s"
+                    self.log(t % (vtop, rp), 5)
+
+                    zs = vjoin(vtop, rp)
+                    chk_vn, _ = self.asrv.vfs.get(zs, LEELOO_DALLAS, True, False)
+                    if chk_vn.vpath != vtop:
+                        raise Exception(
+                            "database inconsistency! in volume '/%s' (%s), found file [%s] which belongs to volume '/%s' (%s)"
+                            % (vtop, ptop, zs, chk_vn.vpath, chk_vn.realpath)
+                        )
+
                 seen_rps.add(rp)
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16]})
 
@@ -371,6 +409,10 @@ class U2idx(object):
 
             ret.extend(sret)
             # print("[{}] {}".format(ptop, sret))
+
+            if self.args.srch_dbg:
+                t = "in volume '/%s': got %d hits, %d total so far"
+                self.log(t % (vtop, len(sret), len(ret)), 5)
 
         done_flag.append(True)
         self.active_id = ""
