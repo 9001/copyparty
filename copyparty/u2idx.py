@@ -387,6 +387,7 @@ class U2idx(object):
 
                     zs = vjoin(vtop, rp)
                     chk_vn, _ = self.asrv.vfs.get(zs, LEELOO_DALLAS, True, False)
+                    chk_vn = chk_vn.dbv or chk_vn
                     if chk_vn.vpath != vtop:
                         raise Exception(
                             "database inconsistency! in volume '/%s' (%s), found file [%s] which belongs to volume '/%s' (%s)"
