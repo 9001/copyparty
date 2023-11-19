@@ -9,14 +9,13 @@ import stat
 import sys
 import time
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
-
 from pyftpdlib.authorizers import AuthenticationFailed, DummyAuthorizer
 from pyftpdlib.filesystems import AbstractedFS, FilesystemError
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.ioloop import IOLoop
 from pyftpdlib.servers import FTPServer
 
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
 from .authsrv import VFS
 from .bos import bos
 from .util import (

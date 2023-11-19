@@ -1,4 +1,20 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1118-2106  `v1.9.18`  cache invalidation
+
+## bugfixes
+* #61 search results could contain stale records from overlapping volumes:
+  * if volume `/foo` is indexed and then volume `/foo/bar` is later created, any files inside the `bar` subfolder would not become forgotten in `/foo`'s database until something in `/foo` changes, which could be never
+  * as a result, search results could show stale metadata from `/foo`'s database regarding files in `/foo/bar`
+  * fix this by dropping caches and reindexing if copyparty is started with a different list of volumes than last time
+* #60 client error when ctrl-clicking search results
+* icons for the close/more buttons in search results are now pillow-10.x compatible
+
+## other changes
+* `u2c.exe`: upgraded certifi to version `2023.11.17`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1111-1738  `v1.9.17`  11-11
 
 ## new features
