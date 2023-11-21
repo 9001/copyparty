@@ -1,4 +1,13 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1119-1229  `v1.9.19`  shadow filter
+
+## bugfixes
+* #61 Mk.II: filter search results to also handle this issue in volumes where reindexing is disabled, or (spoiler warning:) a bug in the directory indexer prevents shadowed files from being forgotten
+* filekeys didn't always get included in the up2k UI for world-readable folders
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1118-2106  `v1.9.18`  cache invalidation
 
 ## bugfixes
