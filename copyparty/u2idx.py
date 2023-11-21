@@ -307,7 +307,13 @@ class U2idx(object):
 
         ret = []
         seen_rps: set[str] = set()
-        lim = min(lim, int(self.args.srch_hits))
+        clamp = int(self.args.srch_hits)
+        if lim >= clamp:
+            lim = clamp
+            clamped = True
+        else:
+            clamped = False
+
         taglist = {}
         for (vtop, ptop, flags) in vols:
             if lim < 0:
@@ -420,7 +426,7 @@ class U2idx(object):
 
         ret.sort(key=itemgetter("rp"))
 
-        return ret, list(taglist.keys()), lim < 0
+        return ret, list(taglist.keys()), lim < 0 and not clamped
 
     def terminator(self, identifier: str, done_flag: list[bool]) -> None:
         for _ in range(self.timeout):
