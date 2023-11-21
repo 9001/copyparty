@@ -468,7 +468,7 @@ class ThumbSrv(object):
 
     def _run_ff(self, cmd: list[bytes], vn: VFS) -> None:
         # self.log((b" ".join(cmd)).decode("utf-8"))
-        ret, _, serr = runcmd(cmd, timeout=vn.flags["convt"])
+        ret, _, serr = runcmd(cmd, timeout=vn.flags["convt"], nice=True)
         if not ret:
             return
 

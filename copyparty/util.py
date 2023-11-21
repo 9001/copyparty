@@ -2508,9 +2508,34 @@ def killtree(root: int) -> None:
             pass
 
 
+def _find_nice() -> str:
+    if WINDOWS:
+        return ""  # use creationflags
+    
+    try:
+        zs = shutil.which("nice")
+        if zs:
+            return zs
+    except:
+        pass
+
+    # busted PATHs and/or py2
+    for zs in ("/bin", "/sbin", "/usr/bin", "/usr/sbin"):
+        zs += "/nice"
+        if os.path.exists(zs):
+            return zs
+
+    return ""
+
+
+NICES = _find_nice()
+NICEB = NICES.encode("utf-8")
+
+
 def runcmd(
     argv: Union[list[bytes], list[str]], timeout: Optional[float] = None, **ka: Any
 ) -> tuple[int, str, str]:
+    isbytes = isinstance(argv[0], (bytes, bytearray))
     kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
     capture = ka.pop("capture", 3)  # 0=none 1=stdout 2=stderr 3=both
 
@@ -2524,12 +2549,21 @@ def runcmd(
     berr: bytes
 
     if ANYWIN:
-        if isinstance(argv[0], (bytes, bytearray)):
+        if isbytes:
             if argv[0] in CMD_EXEB:
                 argv[0] += b".exe"
         else:
             if argv[0] in CMD_EXES:
                 argv[0] += ".exe"
+
+    if ka.pop("nice", None):
+        if WINDOWS:
+            ka["creationflags"] = 0x4000
+        elif NICEB:
+            if isbytes:
+                argv = [NICEB] + argv
+            else:
+                argv = [NICES] + argv
 
     p = sp.Popen(argv, stdout=cout, stderr=cerr, **ka)
     if not timeout or PY2:
@@ -2678,6 +2712,7 @@ def _parsehook(
 
     sp_ka = {
         "env": env,
+        "nice": True,
         "timeout": tout,
         "kill": kill,
         "capture": cap,

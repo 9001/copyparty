@@ -118,7 +118,7 @@ def ffprobe(
         b"--",
         fsenc(abspath),
     ]
-    rc, so, se = runcmd(cmd, timeout=timeout)
+    rc, so, se = runcmd(cmd, timeout=timeout, nice=True)
     retchk(rc, cmd, se)
     return parse_ffprobe(so)
 
@@ -562,6 +562,7 @@ class MTag(object):
 
                 args = {
                     "env": env,
+                    "nice": True,
                     "timeout": parser.timeout,
                     "kill": parser.kill,
                     "capture": parser.capture,
@@ -571,11 +572,6 @@ class MTag(object):
                     zd = oth_tags.copy()
                     zd.update(ret)
                     args["sin"] = json.dumps(zd).encode("utf-8", "replace")
-
-                if WINDOWS:
-                    args["creationflags"] = 0x4000
-                else:
-                    cmd = ["nice"] + cmd
 
                 bcmd = [sfsenc(x) for x in cmd[:-1]] + [fsenc(cmd[-1])]
                 rc, v, err = runcmd(bcmd, **args)  # type: ignore
