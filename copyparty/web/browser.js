@@ -6097,6 +6097,7 @@ var treectl = (function () {
 				setTimeout(r.tscroll, 100);
 			}
 		}
+		else ebi('lazy').innerHTML = '';
 
 		function asdf() {
 			showfile.mktree();
