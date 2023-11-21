@@ -2243,7 +2243,7 @@ function song_skip(n, dirskip) {
 		return;
 	}
 
-	if (tid)
+	if (tid && !dirskip)
 		play(ofs + n);
 	else
 		play(mp.order[n == -1 ? mp.order.length - 1 : 0]);
@@ -2270,6 +2270,21 @@ function next_song_cmn(e) {
 		t_fchg = document.hasFocus() ? 0 : Date.now();
 		treectl.ls_cb = next_song_cmn;
 		return tree_neigh(1);
+	}
+	toast.inf(10, L.mm_nof);
+	console.log("mm_nof2");
+	mpl.traversals = 0;
+	t_fchg = 0;
+}
+function last_song(e) {
+	ev(e);
+	if (mp.order.length) {
+		mpl.traversals = 0;
+		return song_skip(-1, true);
+	}
+	if (mpl.traversals++ < 5) {
+		treectl.ls_cb = last_song;
+		return tree_neigh(-1);
 	}
 	toast.inf(10, L.mm_nof);
 	console.log("mm_nof2");
@@ -2920,7 +2935,7 @@ function play(tid, is_ev, seek) {
 			tn = mp.order.length - 1;
 		}
 		else if (mpl.pb_mode == 'next') {
-			treectl.ls_cb = prev_song;
+			treectl.ls_cb = last_song;
 			return tree_neigh(-1);
 		}
 	}
