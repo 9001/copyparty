@@ -1,5 +1,5 @@
 # this will start `/usr/local/bin/copyparty-sfx.py`
-# in a chroot, preventing accidental access elsewhere
+# in a chroot, preventing accidental access elsewhere,
 # and share '/mnt' with anonymous read+write
 #
 # installation:
@@ -7,9 +7,9 @@
 #   2) cp -pv prisonparty.service /etc/systemd/system && systemctl enable --now prisonparty
 #
 # expose additional filesystem locations to copyparty
-#   by listing them between the last `1000` and `--`
+#   by listing them between the last `cpp` and `--`
 #
-# `1000 1000` = what user to run copyparty as
+# `cpp cpp` = user/group to run copyparty as; can be IDs (1000 1000)
 #
 # you may want to:
 #   change '/mnt::rw' to another location or permission-set
@@ -32,7 +32,9 @@ ExecReload=/bin/kill -s USR1 $MAINPID
 ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
 
 # run copyparty
-ExecStart=/bin/bash /usr/local/bin/prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt -- \
+ExecStart=/bin/bash /usr/local/bin/prisonparty.sh /var/lib/copyparty-jail cpp cpp \
+  /mnt \
+  -- \
   /usr/bin/python3 /usr/local/bin/copyparty-sfx.py -q -v /mnt::rw
 
 [Install]

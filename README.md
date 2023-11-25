@@ -119,8 +119,8 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing some recommended deps:
 
 * **Alpine:** `apk add py3-pillow ffmpeg`
-* **Debian:** `apt install python3-pil ffmpeg`
-* **Fedora:** `dnf install python3-pillow ffmpeg`
+* **Debian:** `apt install --no-install-recommends python3-pil ffmpeg`
+* **Fedora:** rpmfusion + `dnf install python3-pillow ffmpeg`
 * **FreeBSD:** `pkg install py39-sqlite3 py39-pillow ffmpeg`
 * **MacOS:** `port install py-Pillow ffmpeg`
 * **MacOS** (alternative): `brew install pillow ffmpeg`
@@ -1366,7 +1366,7 @@ now [available on copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI
 ```bash
 dnf copr enable @copr/PyPI
 dnf install python3-copyparty  # just a minimal install, or... 
-dnf install python3-{copyparty,pillow,argon2-cffi,pyftpdlib,pyOpenSSL} ffmpeg-free  # with recommended deps
+dnf install python3-{copyparty,pillow,argon2-cffi,pyftpdlib,pyOpenSSL} ffmpeg  # with recommended deps
 ```
 
 this *may* also work on RHEL but [I'm not paying IBM to verify that](https://www.jeffgeerling.com/blog/2023/dear-red-hat-are-you-dumb)

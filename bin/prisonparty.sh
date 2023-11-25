@@ -12,13 +12,13 @@ done
 help() { cat <<'EOF'
 
 usage:
-  ./prisonparty.sh <ROOTDIR> <UID> <GID> [VOLDIR [VOLDIR...]] -- python3 copyparty-sfx.py [...]
+  ./prisonparty.sh <ROOTDIR> <USER|UID> <GROUP|GID> [VOLDIR [VOLDIR...]] -- python3 copyparty-sfx.py [...]
 
 example:
-  ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 copyparty-sfx.py -v /mnt/nas/music::rwmd
+  ./prisonparty.sh /var/lib/copyparty-jail cpp cpp /mnt/nas/music -- python3 copyparty-sfx.py -v /mnt/nas/music::rwmd
 
 example for running straight from source (instead of using an sfx):
-  PYTHONPATH=$PWD ./prisonparty.sh /var/lib/copyparty-jail 1000 1000 /mnt/nas/music -- python3 -um copyparty -v /mnt/nas/music::rwmd
+  PYTHONPATH=$PWD ./prisonparty.sh /var/lib/copyparty-jail cpp cpp /mnt/nas/music -- python3 -um copyparty -v /mnt/nas/music::rwmd
 
 note that if you have python modules installed as --user (such as bpm/key detectors),
   you should add /home/foo/.local as a VOLDIR
@@ -68,11 +68,18 @@ cpp="$1"; shift
 }
 trap - EXIT
 
+usr="$(getent passwd $uid | cut -d: -f1)"
+[ "$usr" ] || { echo "ERROR invalid username/uid $uid"; exit 1; }
+uid="$(getent passwd $uid | cut -d: -f3)"
+
+grp="$(getent group $gid | cut -d: -f1)"
+[ "$grp" ] || { echo "ERROR invalid groupname/gid $gid"; exit 1; }
+gid="$(getent group $gid | cut -d: -f3)"
 
 # debug/vis
 echo
 echo "chroot-dir = $jail"
-echo "user:group = $uid:$gid"
+echo "user:group = $uid:$gid ($usr:$grp)"
 echo " copyparty = $cpp"
 echo
 printf '\033[33m%s\033[0m\n' "copyparty can access these folders and all their subdirectories:"
@@ -139,8 +146,8 @@ chmod 777 "$jail/tmp"
 
 
 # run copyparty
-export HOME=$(getent passwd $uid | cut -d: -f6)
-export USER=$(getent passwd $uid | cut -d: -f1)
+export HOME="$(getent passwd $uid | cut -d: -f6)"
+export USER="$usr"
 export LOGNAME="$USER"
 #echo "pybin [$pybin]"
 #echo "pyarg [$pyarg]"
