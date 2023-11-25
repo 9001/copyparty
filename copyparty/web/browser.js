@@ -327,8 +327,8 @@ var Ls = {
 		"tv_xe1": "could not load textfile:\n\nerror ",
 		"tv_xe2": "404, file not found",
 		"tv_lst": "list of textfiles in",
-		"tvt_close": "return to folder view$NHotkey: M\">❌ close",
-		"tvt_dl": "download this file\">💾 download",
+		"tvt_close": "return to folder view$NHotkey: M (or Esc)\">❌ close",
+		"tvt_dl": "download this file$NHotkey: Y\">💾 download",
 		"tvt_prev": "show previous document$NHotkey: i\">⬆ prev",
 		"tvt_next": "show next document$NHotkey: K\">⬇ next",
 		"tvt_sel": "select file &nbsp; ( for cut / delete / ... )$NHotkey: S\">sel",
@@ -559,8 +559,9 @@ var Ls = {
 				"dokumentviser",
 				["I/K", "forr./neste fil"],
 				["M", "lukk tekstdokument"],
-				["E", "rediger tekstdokument"]
-				["S", "velg fil (for F2/ctrl-x/...)"]
+				["E", "rediger tekstdokument"],
+				["S", "velg fil (for F2/ctrl-x/...)"],
+				["Y", "last ned tekstfil"],
 			]
 		],
 
@@ -806,8 +807,8 @@ var Ls = {
 		"tv_xe1": "kunne ikke laste tekstfil:\n\nfeil ",
 		"tv_xe2": "404, Fil ikke funnet",
 		"tv_lst": "tekstfiler i mappen",
-		"tvt_close": "gå tilbake til mappen$NSnarvei: M\">❌ lukk",
-		"tvt_dl": "last ned denne filen\">💾 last ned",
+		"tvt_close": "gå tilbake til mappen$NSnarvei: M (eller Esc)\">❌ lukk",
+		"tvt_dl": "last ned denne filen$NSnarvei: Y\">💾 last ned",
 		"tvt_prev": "vis forrige dokument$NSnarvei: i\">⬆ forr.",
 		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
 		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
@@ -4133,7 +4134,10 @@ var showfile = (function () {
 			if (lang == 'md' && td.textContent != '-')
 				continue;
 
-			td.innerHTML = '<a href="#" class="doc bri" hl="' + link.id + '">-txt-</a>';
+			td.innerHTML = '<a href="#" id="t' +
+				link.id + '" class="doc bri" hl="' +
+				link.id + '">-txt-</a>';
+
 			td.getElementsByTagName('a')[0].setAttribute('href', '?doc=' + fn);
 		}
 		r.mktree();
@@ -4227,6 +4231,9 @@ var showfile = (function () {
 			el.textContent = txt;
 			el.innerHTML = '<code>' + el.innerHTML + '</code>';
 			if (!window.no_prism) {
+				if ((lang == 'conf' || lang == 'cfg') && ('\n' + txt).indexOf('\n# -*- mode: yaml -*-') + 1)
+					lang = 'yaml';
+
 				el.className = 'prism linkable-line-numbers line-numbers language-' + lang;
 				if (!defer)
 					fun(el.firstChild);
@@ -4517,7 +4524,10 @@ var thegrid = (function () {
 	function gclick(e, dbl) {
 		var oth = ebi(this.getAttribute('ref')),
 			href = noq_href(this),
-			aplay = ebi('a' + oth.getAttribute('id')),
+			fid = oth.getAttribute('id'),
+			aplay = ebi('a' + fid),
+			atext = ebi('t' + fid),
+			is_txt = atext && showfile.getlang(href),
 			is_img = /\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp|webm|mkv|mp4)(\?|$)/i.test(href),
 			is_dir = href.endsWith('/'),
 			is_srch = !!ebi('unsearch'),
@@ -4532,14 +4542,20 @@ var thegrid = (function () {
 				return r.loadsel();
 			clmod(this, 'sel', clgot(tr, 'sel'));
 		}
-		else if (widget.is_open && aplay)
-			aplay.click();
-
 		else if (in_tree && !have_sel)
 			in_tree.click();
 
+		else if (oth.hasAttribute('download'))
+			oth.click();
+
+		else if (widget.is_open && aplay)
+			aplay.click();
+
 		else if (is_dir && !have_sel)
 			treectl.reqls(href, true);
+
+		else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
+			atext.click();
 
 		else if (!is_img && have_sel)
 			window.open(href, '_blank');
@@ -5066,6 +5082,13 @@ document.onkeydown = function (e) {
 			return QS('#twobytwo').click();
 	}
 
+	if (showfile.active()) {
+		if (k == 'KeyS')
+			showfile.tglsel();
+		if (k == 'KeyE' && ebi('editdoc').style.display != 'none')
+			ebi('editdoc').click();
+	}
+
 	if (thegrid.en) {
 		if (k == 'KeyS')
 			return ebi('gridsel').click();
@@ -5075,13 +5098,6 @@ document.onkeydown = function (e) {
 
 		if (k == 'KeyD')
 			return QSA('#ghead a[z]')[1].click();
-	}
-
-	if (showfile.active()) {
-		if (k == 'KeyS')
-			showfile.tglsel();
-		if (k == 'KeyE' && ebi('editdoc').style.display != 'none')
-			ebi('editdoc').click();
 	}
 };
 
@@ -6077,7 +6093,7 @@ var treectl = (function () {
 			}
 
 			if (tn.lead == '-')
-				tn.lead = '<a href="?doc=' + bhref +
+				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
 					'" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
