@@ -97,6 +97,7 @@ jail="${jail%/}"
 
 
 # bind-mount system directories and volumes
+for a in {1..30}; do mkdir "$jail/.prisonlock" && break; sleep 0.1; done
 printf '%s\n' "${sysdirs[@]}" "${vols[@]}" | sed -r 's`/$``' | LC_ALL=C sort | uniq |
 while IFS= read -r v; do
 	[ -e "$v" ] || {
@@ -110,6 +111,7 @@ while IFS= read -r v; do
 	mkdir -p "$jail$v"
 	mount --bind "$v" "$jail$v"
 done
+rmdir "$jail/.prisonlock" || true
 
 
 cln() {
@@ -117,6 +119,7 @@ cln() {
 	wait -f -n $p && rv=0 || rv=$?
 	cd /
 	echo "stopping chroot..."
+	for a in {1..30}; do mkdir "$jail/.prisonlock" && break; sleep 0.1; done
 	lsof "$jail" 2>/dev/null | grep -F "$jail" &&
 		echo "chroot is in use; will not unmount" ||
 	{
@@ -126,6 +129,7 @@ cln() {
 			umount "$v" && echo "umount OK: $v"
 		done
 	}
+	rmdir "$jail/.prisonlock" || true
 	exit $rv
 }
 trap cln EXIT
