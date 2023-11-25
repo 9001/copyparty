@@ -1,4 +1,18 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1121-2325  `v1.9.20`  nice
+
+## new features
+* expensive subprocesses (ffmpeg, parsers, hooks) will run with `nice` to reduce cpu priority
+  * ...so listening to flacs won't grind everything else to a halt
+
+## bugfixes
+* the "load more" search results button didn't disappear if you hit the serverside limit
+* the "show all" button for huge folders didn't disappear when navigating into a smaller folder
+* trying to play the previous track when you're already playing the first track in a folder would send you on a wild adventure
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1119-1229  `v1.9.19`  shadow filter
 
 ## bugfixes
