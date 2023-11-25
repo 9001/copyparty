@@ -28,6 +28,16 @@ exit 1
 }
 
 
+errs=
+for c in awk chroot dirname getent lsof mknod mount realpath sed sort stat uniq; do
+	command -v $c >/dev/null || {
+		echo ERROR: command not found: $c
+		errs=1
+	}
+done
+[ $errs ] && exit 1
+
+
 # read arguments
 trap help EXIT
 jail="$(realpath "$1")"; shift
@@ -86,27 +96,28 @@ while IFS= read -r v; do
 		printf '\033[1;31mfolder does not exist:\033[0m %s\n' "$v"
 		continue
 	}
-	i1=$(stat -c%D.%i "$v"      2>/dev/null || echo a)
-	i2=$(stat -c%D.%i "$jail$v" 2>/dev/null || echo b)
-	# echo "v [$v] i1 [$i1] i2 [$i2]"
+	i1=$(stat -c%D.%i "$v/"      2>/dev/null || echo a)
+	i2=$(stat -c%D.%i "$jail$v/" 2>/dev/null || echo b)
 	[ $i1 = $i2 ] && continue
-	
+	mount | grep -qF " $jail$v " && echo wtf $i1 $i2 $v && continue
 	mkdir -p "$jail$v"
 	mount --bind "$v" "$jail$v"
 done
 
 
 cln() {
-	rv=$?
-	wait -f -p rv $p || true
+	trap - EXIT
+	wait -f -n $p && rv=0 || rv=$?
 	cd /
 	echo "stopping chroot..."
-	lsof "$jail" | grep -F "$jail" &&
+	lsof "$jail" 2>/dev/null | grep -F "$jail" &&
 		echo "chroot is in use; will not unmount" ||
 	{
 		mount | grep -F " on $jail" |
 		awk '{sub(/ type .*/,"");sub(/.* on /,"");print}' |
-		LC_ALL=C sort -r  | tee /dev/stderr | tr '\n' '\0' | xargs -r0 umount
+		LC_ALL=C sort -r | while IFS= read -r v; do
+			umount "$v" && echo "umount OK: $v"
+		done
 	}
 	exit $rv
 }
@@ -137,5 +148,5 @@ export LOGNAME="$USER"
 chroot --userspec=$uid:$gid "$jail" "$pybin" $pyarg "$cpp" "$@" &
 p=$!
 trap 'kill -USR1 $p' USR1
-trap 'kill $p' INT TERM
+trap 'trap - INT TERM; kill $p' INT TERM
 wait
