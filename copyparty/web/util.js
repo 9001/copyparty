@@ -277,7 +277,6 @@ function anymod(e, shift_ok) {
 
 
 function ev(e) {
-    e = e || window.event;
     if (!e)
         return;
 

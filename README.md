@@ -1505,7 +1505,7 @@ TLDR: yes
 | play ogg/opus   |  -  |  -   |  -   |  -   |  yep  | yep  | `*3` | yep |
 | **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
 
-* internet explorer 6 to 8 behave the same
+* internet explorer 6 through 8 behave the same
 * firefox 52 and chrome 49 are the final winxp versions
 * `*1` yes, but extremely slow (ie10: `1 MiB/s`, ie11: `270 KiB/s`)
 * `*3` iOS 11 and newer, opus only, and requires FFmpeg on the server

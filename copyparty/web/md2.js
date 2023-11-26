@@ -931,7 +931,6 @@ var set_lno = (function () {
 // hotkeys / toolbar
 (function () {
     var keydown = function (ev) {
-        ev = ev || window.event;
         var kc = ev.code || ev.keyCode || ev.which,
             editing = document.activeElement == dom_src;
 
