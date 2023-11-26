@@ -295,7 +295,7 @@ function ev(e) {
 
 
 function noope(e) {
-    ev(e);
+    try { ev(e); } catch (ex) { }
 }
 
 

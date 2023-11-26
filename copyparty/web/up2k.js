@@ -1043,7 +1043,7 @@ function up2k_init(subtle) {
             clmod(ebi(v), 'hl', 1);
     }
     function offdrag(e) {
-        ev(e);
+        noope(e);
 
         var v = this.getAttribute('v');
         if (v)
