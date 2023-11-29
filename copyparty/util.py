@@ -1647,16 +1647,15 @@ def gen_filekey_dbg(
     return ret
 
 
-def gencookie(k: str, v: str, r: str, tls: bool, dur: Optional[int]) -> str:
+def gencookie(k: str, v: str, r: str, tls: bool, dur: int = 0, txt: str = "") -> str:
     v = v.replace("%", "%25").replace(";", "%3B")
     if dur:
         exp = formatdate(time.time() + dur, usegmt=True)
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
-    return "{}={}; Path=/{}; Expires={}{}; SameSite=Lax".format(
-        k, v, r, exp, "; Secure" if tls else ""
-    )
+    t = "%s=%s; Path=/%s; Expires=%s%s%s; SameSite=Lax"
+    return t % (k, v, r, exp, "; Secure" if tls else "", txt)
 
 
 def humansize(sz: float, terse: bool = False) -> str:
@@ -2511,7 +2510,7 @@ def killtree(root: int) -> None:
 def _find_nice() -> str:
     if WINDOWS:
         return ""  # use creationflags
-    
+
     try:
         zs = shutil.which("nice")
         if zs:

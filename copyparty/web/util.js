@@ -754,17 +754,6 @@ function noq_href(el) {
 }
 
 
-function get_pwd() {
-    var k = HTTPS ? 's=' : 'd=',
-        pwd = ('; ' + document.cookie).split('; cppw' + k);
-
-    if (pwd.length < 2)
-        return null;
-
-    return decodeURIComponent(pwd[1].split(';')[0]);
-}
-
-
 function unix2iso(ts) {
     return new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
 }

@@ -1506,7 +1506,6 @@ var mpl = (function () {
 			artist = (np.circle && np.circle != np.artist ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
 			title = np.title || fns.pop(),
 			cover = '',
-			pcover = '',
 			tags = { title: title };
 
 		if (artist)
@@ -1521,20 +1520,14 @@ var mpl = (function () {
 
 			for (var a = 0, aa = files.length; a < aa; a++) {
 				if (/^(cover|folder)\.(jpe?g|png|gif)$/i.test(files[a].textContent)) {
-					cover = noq_href(files[a]);
+					cover = files[a].getAttribute('href');
 					break;
 				}
 			}
 
 			if (cover) {
 				cover += (cover.indexOf('?') === -1 ? '?' : '&') + 'th=j';
-				pcover = cover;
-
-				var pwd = get_pwd();
-				if (pwd)
-					pcover += '&pw=' + uricom_enc(pwd);
-
-				tags.artwork = [{ "src": pcover, type: "image/jpeg" }];
+				tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 			}
 		}
 
@@ -1546,7 +1539,7 @@ var mpl = (function () {
 		ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
 		if (!MOBILE)
-			ebi('np_img').setAttribute('src', cover || ''); // dont give last.fm the pwd
+			ebi('np_img').setAttribute('src', cover || '');
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', mplay);
@@ -1724,7 +1717,7 @@ function MPlayer() {
 		var t0 = Date.now();
 
 		if (mpl.waves)
-			fetch(url + '&th=p').then(function (x) {
+			fetch(url.replace(/\bth=opus&/, '') + '&th=p').then(function (x) {
 				x.body.getReader().read();
 			});
 
@@ -3020,7 +3013,7 @@ function play(tid, is_ev, seek) {
 
 		pbar.unwave();
 		if (mpl.waves)
-			pbar.loadwaves(url + '&th=p');
+			pbar.loadwaves(url.replace(/\bth=opus&/, '') + '&th=p');
 
 		mpui.progress_updater();
 		pbar.onresize();

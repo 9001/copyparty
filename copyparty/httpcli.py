@@ -2161,17 +2161,17 @@ class HttpCli(object):
 
             msg = "naw dude"
             pwd = "x"  # nosec
-            dur = None
+            dur = 0
 
         if pwd == "x":
             # reset both plaintext and tls
             # (only affects active tls cookies when tls)
             for k in ("cppwd", "cppws") if self.is_https else ("cppwd",):
-                ck = gencookie(k, pwd, self.args.R, False, dur)
+                ck = gencookie(k, pwd, self.args.R, False)
                 self.out_headerlist.append(("Set-Cookie", ck))
         else:
             k = "cppws" if self.is_https else "cppwd"
-            ck = gencookie(k, pwd, self.args.R, self.is_https, dur)
+            ck = gencookie(k, pwd, self.args.R, self.is_https, dur, "; HttpOnly")
             self.out_headerlist.append(("Set-Cookie", ck))
 
         return msg
@@ -3299,7 +3299,7 @@ class HttpCli(object):
         if v == "y":
             dur = 86400 * 299
         else:
-            dur = None
+            dur = 0
             v = "x"
 
         ck = gencookie("k304", v, self.args.R, False, dur)
@@ -3317,7 +3317,7 @@ class HttpCli(object):
 
     def set_cfg_reset(self) -> bool:
         for k in ("k304", "js", "idxh", "cppwd", "cppws"):
-            cookie = gencookie(k, "x", self.args.R, False, None)
+            cookie = gencookie(k, "x", self.args.R, False)
             self.out_headerlist.append(("Set-Cookie", cookie))
 
         self.redirect("", "?h#cc")
