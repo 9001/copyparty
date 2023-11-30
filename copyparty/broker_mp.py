@@ -46,8 +46,8 @@ class BrokerMp(object):
         self.num_workers = self.args.j or CORES
         self.log("broker", "booting {} subprocesses".format(self.num_workers))
         for n in range(1, self.num_workers + 1):
-            q_pend: queue.Queue[tuple[int, str, list[Any]]] = mp.Queue(1)
-            q_yield: queue.Queue[tuple[int, str, list[Any]]] = mp.Queue(64)
+            q_pend: queue.Queue[tuple[int, str, list[Any]]] = mp.Queue(1)  # type: ignore
+            q_yield: queue.Queue[tuple[int, str, list[Any]]] = mp.Queue(64)  # type: ignore
 
             proc = MProcess(q_pend, q_yield, MpWorker, (q_pend, q_yield, self.args, n))
             Daemon(self.collector, "mp-sink-{}".format(n), (proc,))

@@ -15,7 +15,7 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.ioloop import IOLoop
 from pyftpdlib.servers import FTPServer
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, E
+from .__init__ import PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .util import (
@@ -88,8 +88,8 @@ class FtpAuth(DummyAuthorizer):
                     bans[ip] = bonk
                     try:
                         # only possible if multiprocessing disabled
-                        self.hub.broker.httpsrv.bans[ip] = bonk
-                        self.hub.broker.httpsrv.nban += 1
+                        self.hub.broker.httpsrv.bans[ip] = bonk  # type: ignore
+                        self.hub.broker.httpsrv.nban += 1  # type: ignore
                     except:
                         pass
 

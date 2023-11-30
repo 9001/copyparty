@@ -23,7 +23,7 @@ if not PY2:
     unicode: Callable[[Any], str] = str
 else:
     sys.dont_write_bytecode = True
-    unicode = unicode  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
+    unicode = unicode  # type: ignore
 
 WINDOWS: Any = (
     [int(x) for x in platform.version().split(".")]

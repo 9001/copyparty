@@ -207,7 +207,7 @@ def examples():
 
 
 def main():
-    global NC, BY_PATH
+    global NC, BY_PATH  # pylint: disable=global-statement
     os.system("")
     print()
 
@@ -282,7 +282,8 @@ def main():
         if ver == "corrupt":
             die("{} database appears to be corrupt, sorry")
 
-        if ver < DB_VER1 or ver > DB_VER2:
+        iver = int(ver)
+        if iver < DB_VER1 or iver > DB_VER2:
             m = f"{n} db is version {ver}, this tool only supports versions between {DB_VER1} and {DB_VER2}, please upgrade it with copyparty first"
             die(m)
 

@@ -8,7 +8,7 @@ import re
 
 from .__init__ import PY2
 from .th_srv import HAVE_PIL, HAVE_PILF
-from .util import BytesIO
+from .util import BytesIO  # type: ignore
 
 
 class Ico(object):
@@ -22,7 +22,7 @@ class Ico(object):
         ext = bext.decode("utf-8")
         zb = hashlib.sha1(bext).digest()[2:4]
         if PY2:
-            zb = [ord(x) for x in zb]
+            zb = [ord(x) for x in zb]  # type: ignore
 
         c1 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 0.3)
         c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 0.8 if HAVE_PILF else 1, 1)
@@ -90,20 +90,6 @@ class Ico(object):
                 buf = BytesIO()
                 img.save(buf, format="PNG", compress_level=1)
                 return "image/png", buf.getvalue()
-
-            elif False:
-                # 48s, too slow
-                import pyvips
-
-                h = int(192 * h / w)
-                w = 192
-                img = pyvips.Image.text(
-                    ext, width=w, height=h, dpi=192, align=pyvips.Align.CENTRE
-                )
-                img = img.ifthenelse(ci[3:], ci[:3], blend=True)
-                # i = i.resize(3, kernel=pyvips.Kernel.NEAREST)
-                buf = img.write_to_buffer(".png[compression=1]")
-                return "image/png", buf
 
         svg = """\
 <?xml version="1.0" encoding="UTF-8"?>

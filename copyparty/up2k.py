@@ -1285,8 +1285,8 @@ class Up2k(object):
                     db.t = time.time()
 
         if not self.args.no_dhash:
-            db.c.execute("delete from dh where d = ?", (drd,))
-            db.c.execute("insert into dh values (?,?)", (drd, dhash))
+            db.c.execute("delete from dh where d = ?", (drd,))  # type: ignore
+            db.c.execute("insert into dh values (?,?)", (drd, dhash))  # type: ignore
 
         if self.stop:
             return -1
@@ -1305,7 +1305,7 @@ class Up2k(object):
             if n:
                 t = "forgetting {} shadowed autoindexed files in [{}] > [{}]"
                 self.log(t.format(n, top, sh_rd))
-                assert sh_erd
+                assert sh_erd  # type: ignore
 
                 q = "delete from dh where (d = ? or d like ?||'%')"
                 db.c.execute(q, (sh_erd, sh_erd + "/"))
@@ -2204,7 +2204,7 @@ class Up2k(object):
             t = "native sqlite3 backup failed; using fallback method:\n"
             self.log(t + min_ex())
         finally:
-            c2.close()
+            c2.close()  # type: ignore
 
         db = cur.connection
         cur.close()

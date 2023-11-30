@@ -18,7 +18,7 @@ from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
 from .util import (
     FFMPEG_URL,
-    BytesIO,
+    BytesIO,  # type: ignore
     Cooldown,
     Daemon,
     Pebkac,
@@ -411,6 +411,7 @@ class ThumbSrv(object):
                 if c == crops[-1]:
                     raise
 
+        assert img  # type: ignore
         img.write_to_file(tpath, Q=40)
 
     def conv_ffmpeg(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:

@@ -100,6 +100,10 @@ include_trailing_comma = true
 [tool.bandit]
 skips = ["B104", "B110", "B112"]
 
+[tool.ruff]
+line-length = 120
+ignore = ["E402", "E722"]
+
 # =====================================================================
 
 [tool.pylint.MAIN]

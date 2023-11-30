@@ -143,8 +143,10 @@ def warn(msg: str) -> None:
     lprint("\033[1mwarning:\033[0;33m {}\033[0m\n".format(msg))
 
 
-def init_E(E: EnvParams) -> None:
+def init_E(EE: EnvParams) -> None:
     # __init__ runs 18 times when oxidized; do expensive stuff here
+
+    E = EE  # pylint: disable=redefined-outer-name
 
     def get_unixdir() -> str:
         paths: list[tuple[Callable[..., Any], str]] = [
@@ -246,7 +248,7 @@ def get_srvname() -> str:
     return ret
 
 
-def get_fk_salt(cert_path) -> str:
+def get_fk_salt() -> str:
     fp = os.path.join(E.cfg, "fk-salt.txt")
     try:
         with open(fp, "rb") as f:
@@ -320,6 +322,7 @@ def configure_ssl_ver(al: argparse.Namespace) -> None:
     # oh man i love openssl
     # check this out
     # hold my beer
+    assert ssl
     ptn = re.compile(r"^OP_NO_(TLS|SSL)v")
     sslver = terse_sslver(al.ssl_ver).split(",")
     flags = [k for k in ssl.__dict__ if ptn.match(k)]
@@ -353,6 +356,7 @@ def configure_ssl_ver(al: argparse.Namespace) -> None:
 
 
 def configure_ssl_ciphers(al: argparse.Namespace) -> None:
+    assert ssl
     ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     if al.ssl_ver:
         ctx.options &= ~al.ssl_flags_en
@@ -432,9 +436,9 @@ def disable_quickedit() -> None:
     if PY2:
         wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
 
-    k32.GetStdHandle.errcheck = ecb
-    k32.GetConsoleMode.errcheck = ecb
-    k32.SetConsoleMode.errcheck = ecb
+    k32.GetStdHandle.errcheck = ecb    # type: ignore
+    k32.GetConsoleMode.errcheck = ecb  # type: ignore
+    k32.SetConsoleMode.errcheck = ecb  # type: ignore
     k32.GetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.LPDWORD)
     k32.SetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.DWORD)
 
@@ -1253,7 +1257,7 @@ def run_argparse(
 
     cert_path = os.path.join(E.cfg, "cert.pem")
 
-    fk_salt = get_fk_salt(cert_path)
+    fk_salt = get_fk_salt()
     ah_salt = get_ah_salt()
 
     # alpine peaks at 5 threads for some reason,
@@ -1269,6 +1273,7 @@ def run_argparse(
     add_network(ap)
     add_tls(ap, cert_path)
     add_cert(ap, cert_path)
+    add_auth(ap)
     add_qr(ap, tty)
     add_zeroconf(ap)
     add_zc_mdns(ap)

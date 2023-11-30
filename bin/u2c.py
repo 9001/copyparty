@@ -105,8 +105,8 @@ class File(object):
         # set by handshake
         self.recheck = False  # duplicate; redo handshake after all files done
         self.ucids = []  # type: list[str]  # chunks which need to be uploaded
-        self.wark = None  # type: str
-        self.url = None  # type: str
+        self.wark = ""  # type: str
+        self.url = ""  # type: str
         self.nhs = 0
 
         # set by upload
@@ -223,6 +223,7 @@ class MTHash(object):
 
     def hash_at(self, nch):
         f = self.f
+        assert f
         ofs = ofs0 = nch * self.csz
         hashobj = hashlib.sha512()
         chunk_sz = chunk_rem = min(self.csz, self.sz - ofs)
@@ -463,7 +464,7 @@ def quotep(btxt):
     if not PY2:
         quot1 = quot1.encode("ascii")
 
-    return quot1.replace(b" ", b"+")
+    return quot1.replace(b" ", b"+")  # type: ignore
 
 
 # from copyparty/util.py
@@ -500,7 +501,7 @@ def up2k_chunksize(filesize):
 
 # mostly from copyparty/up2k.py
 def get_hashlist(file, pcb, mth):
-    # type: (File, any, any) -> None
+    # type: (File, Any, Any) -> None
     """generates the up2k hashlist from file contents, inserts it into `file`"""
 
     chunk_sz = up2k_chunksize(file.size)
@@ -1116,7 +1117,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-v", action="store_true", help="verbose")
     ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
-    ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\.hist/.*'")
+    ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap.add_argument("--version", action="store_true", help="show version and exit")
 

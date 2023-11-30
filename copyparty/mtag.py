@@ -261,7 +261,8 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
     if ".resw" in ret and ".resh" in ret:
         ret["res"] = "{}x{}".format(ret[".resw"], ret[".resh"])
 
-    zd = {k: (0, v) for k, v in ret.items()}
+    zero = int("0")
+    zd = {k: (zero, v) for k, v in ret.items()}
 
     return zd, md
 

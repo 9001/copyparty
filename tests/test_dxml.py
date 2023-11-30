@@ -4,9 +4,9 @@ from __future__ import print_function, unicode_literals
 
 import re
 import unittest
-
 from xml.etree import ElementTree as ET
-from copyparty.dxml import parse_xml, BadXML, mkenod, mktnod
+
+from copyparty.dxml import BadXML, mkenod, mktnod, parse_xml
 
 ET.register_namespace("D", "DAV:")
 

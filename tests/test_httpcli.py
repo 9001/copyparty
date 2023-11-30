@@ -4,18 +4,17 @@ from __future__ import print_function, unicode_literals
 
 import io
 import os
-import time
-import shutil
 import pprint
+import shutil
 import tarfile
 import tempfile
+import time
 import unittest
-
-from tests import util as tu
-from tests.util import Cfg, eprint
 
 from copyparty.authsrv import AuthSrv
 from copyparty.httpcli import HttpCli
+from tests import util as tu
+from tests.util import Cfg, eprint
 
 
 def hdr(query):

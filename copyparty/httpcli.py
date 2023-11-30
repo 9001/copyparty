@@ -81,7 +81,7 @@ from .util import (
     sendfile_py,
     undot,
     unescape_cookie,
-    unquote,
+    unquote,  # type: ignore
     unquotep,
     vjoin,
     vol_san,
@@ -888,7 +888,11 @@ class HttpCli(object):
                 return self.tx_ico(self.vpath.split("/")[-1], exact=True)
 
             if self.vpath.startswith(".cpr/ssdp"):
-                return self.conn.hsrv.ssdp.reply(self)
+                if self.conn.hsrv.ssdp:
+                    return self.conn.hsrv.ssdp.reply(self)
+                else:
+                    self.reply(b"ssdp is disabled in server config", 404)
+                    return False
 
             if self.vpath.startswith(".cpr/dd/") and self.args.mpmc:
                 if self.args.mpmc == ".":
@@ -3309,7 +3313,7 @@ class HttpCli(object):
 
     def setck(self) -> bool:
         k, v = self.uparam["setck"].split("=", 1)
-        t = None if v == "" else 86400 * 299
+        t = 0 if v == "" else 86400 * 299
         ck = gencookie(k, v, self.args.R, False, t)
         self.out_headerlist.append(("Set-Cookie", ck))
         self.reply(b"o7\n")

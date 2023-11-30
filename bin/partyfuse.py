@@ -53,7 +53,13 @@ from urllib.parse import unquote_to_bytes as unquote
 WINDOWS = sys.platform == "win32"
 MACOS = platform.system() == "Darwin"
 UTC = timezone.utc
-info = log = dbg = None
+
+
+def print(*args, **kwargs):
+    try:
+        builtins.print(*list(args), **kwargs)
+    except:
+        builtins.print(termsafe(" ".join(str(x) for x in args)), **kwargs)
 
 
 print(
@@ -63,6 +69,13 @@ print(
         sys.executable,
     )
 )
+
+
+def null_log(msg):
+    pass
+
+
+info = log = dbg = null_log
 
 
 try:
@@ -82,13 +95,6 @@ except:
 \033[0m"""
     print(m.format(sys.executable, libfuse))
     raise
-
-
-def print(*args, **kwargs):
-    try:
-        builtins.print(*list(args), **kwargs)
-    except:
-        builtins.print(termsafe(" ".join(str(x) for x in args)), **kwargs)
 
 
 def termsafe(txt):
@@ -117,10 +123,6 @@ def rice_tid():
 
 def fancy_log(msg):
     print("{:10.6f} {} {}\n".format(time.time() % 900, rice_tid(), msg), end="")
-
-
-def null_log(msg):
-    pass
 
 
 def hexler(binary):

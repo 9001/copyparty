@@ -2,18 +2,17 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import os
 import json
+import os
 import shutil
 import tempfile
 import unittest
 from textwrap import dedent
 
+from copyparty import util
+from copyparty.authsrv import VFS, AuthSrv
 from tests import util as tu
 from tests.util import Cfg
-
-from copyparty.authsrv import AuthSrv, VFS
-from copyparty import util
 
 
 class TestVFS(unittest.TestCase):

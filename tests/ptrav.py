@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
+import itertools
 import re
 import sys
 import time
-import itertools
-
-from . import util as tu
-from .util import Cfg
 
 from copyparty.authsrv import AuthSrv
 from copyparty.httpcli import HttpCli
+
+from . import util as tu
+from .util import Cfg
 
 atlas = ["%", "25", "2e", "2f", ".", "/"]
 

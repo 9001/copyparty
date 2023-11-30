@@ -3,23 +3,23 @@
 from __future__ import print_function, unicode_literals
 
 import os
-import re
-import sys
-import time
-import shutil
-import jinja2
-import threading
-import tempfile
 import platform
+import re
+import shutil
 import subprocess as sp
+import sys
+import tempfile
+import threading
+import time
 from argparse import Namespace
 
+import jinja2
 
 WINDOWS = platform.system() == "Windows"
 ANYWIN = WINDOWS or sys.platform in ["msys"]
 MACOS = platform.system() == "Darwin"
 
-J2_ENV = jinja2.Environment(loader=jinja2.BaseLoader)
+J2_ENV = jinja2.Environment(loader=jinja2.BaseLoader)  # type: ignore
 J2_FILES = J2_ENV.from_string("{{ files|join('\n') }}\nJ2EOT")
 
 
@@ -43,7 +43,7 @@ if MACOS:
 
 from copyparty.__init__ import E
 from copyparty.__main__ import init_E
-from copyparty.util import Unrecv, FHC, Garda
+from copyparty.util import FHC, Garda, Unrecv
 
 init_E(E)
 
@@ -83,8 +83,8 @@ def get_ramdisk():
         for _ in range(10):
             try:
                 _, _ = chkcmd(["diskutil", "eraseVolume", "HFS+", "cptd", devname])
-                with open("/Volumes/cptd/.metadata_never_index", "w") as f:
-                    f.write("orz")
+                with open("/Volumes/cptd/.metadata_never_index", "wb") as f:
+                    f.write(b"orz")
 
                 try:
                     shutil.rmtree("/Volumes/cptd/.fseventsd")
@@ -99,10 +99,10 @@ def get_ramdisk():
         raise Exception("ramdisk creation failed")
 
     ret = os.path.join(tempfile.gettempdir(), "copyparty-test")
-    try:
+    if not os.path.isdir(ret):
         os.mkdir(ret)
-    finally:
-        return subdir(ret)
+
+    return subdir(ret)
 
 
 class Cfg(Namespace):
@@ -156,10 +156,10 @@ class Cfg(Namespace):
 
 
 class NullBroker(object):
-    def say(*args):
+    def say(self, *args):
         pass
 
-    def ask(*args):
+    def ask(self, *args):
         pass
 
 
@@ -209,7 +209,7 @@ class VHttpSrv(object):
 class VHttpConn(object):
     def __init__(self, args, asrv, log, buf):
         self.s = VSock(buf)
-        self.sr = Unrecv(self.s, None)
+        self.sr = Unrecv(self.s, None)  # type: ignore
         self.addr = ("127.0.0.1", "42069")
         self.args = args
         self.asrv = asrv

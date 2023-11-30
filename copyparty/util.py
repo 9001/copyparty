@@ -115,6 +115,11 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Generator, Optional, Pattern, Protocol, Union
 
+    try:
+        from typing import LiteralString
+    except:
+        pass
+
     class RootLogger(Protocol):
         def __call__(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
             return None
@@ -144,15 +149,15 @@ if not PY2:
     from urllib.parse import quote_from_bytes as quote
     from urllib.parse import unquote_to_bytes as unquote
 else:
-    from StringIO import StringIO as BytesIO
-    from urllib import quote  # pylint: disable=no-name-in-module
-    from urllib import unquote  # pylint: disable=no-name-in-module
+    from StringIO import StringIO as BytesIO  # type: ignore
+    from urllib import quote  # type: ignore # pylint: disable=no-name-in-module
+    from urllib import unquote  # type: ignore # pylint: disable=no-name-in-module
 
 
 try:
     struct.unpack(b">i", b"idgi")
-    spack = struct.pack
-    sunpack = struct.unpack
+    spack = struct.pack  # type: ignore
+    sunpack = struct.unpack  # type: ignore
 except:
 
     def spack(fmt: bytes, *a: Any) -> bytes:
@@ -378,6 +383,7 @@ def py_desc() -> str:
 
 
 def _sqlite_ver() -> str:
+    assert sqlite3  # type: ignore
     try:
         co = sqlite3.connect(":memory:")
         cur = co.cursor()
@@ -1817,7 +1823,7 @@ def exclude_dotfiles(filepaths: list[str]) -> list[str]:
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
 
 
-def odfusion(base: ODict[str, bool], oth: str) -> ODict[str, bool]:
+def odfusion(base: Union[ODict[str, bool], ODict["LiteralString", bool]], oth: str) -> ODict[str, bool]:
     # merge an "ordered set" (just a dict really) with another list of keys
     words0 = [x for x in oth.split(",") if x]
     words1 = [x for x in oth[1:].split(",") if x]
@@ -1987,10 +1993,10 @@ else:
     # moonrunes become \x3f with bytestrings,
     # losing mojibake support is worth
     def _not_actually_mbcs_enc(txt: str) -> bytes:
-        return txt
+        return txt  # type: ignore
 
     def _not_actually_mbcs_dec(txt: bytes) -> str:
-        return txt
+        return txt  # type: ignore
 
     fsenc = afsenc = sfsenc = _not_actually_mbcs_enc
     fsdec = _not_actually_mbcs_dec
@@ -2049,6 +2055,7 @@ def atomic_move(usrc: str, udst: str) -> None:
 def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:
     try:
         # some fuses misbehave
+        assert ctypes
         if ANYWIN:
             bfree = ctypes.c_ulonglong(0)
             ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
@@ -2451,6 +2458,7 @@ def getalive(pids: list[int], pgid: int) -> list[int]:
                     alive.append(pid)
             else:
                 # windows doesn't have pgroups; assume
+                assert psutil
                 psutil.Process(pid)
                 alive.append(pid)
         except:
@@ -2468,6 +2476,7 @@ def killtree(root: int) -> None:
         pgid = 0
 
     if HAVE_PSUTIL:
+        assert psutil
         pids = [root]
         parent = psutil.Process(root)
         for child in parent.children(recursive=True):
@@ -2864,7 +2873,7 @@ def loadpy(ap: str, hot: bool) -> Any:
     if PY2:
         mod = __import__(mname)
         if hot:
-            reload(mod)
+            reload(mod)  # type: ignore
     else:
         import importlib
 
@@ -3007,6 +3016,7 @@ def termsize() -> tuple[int, int]:
 def hidedir(dp) -> None:
     if ANYWIN:
         try:
+            assert ctypes
             k32 = ctypes.WinDLL("kernel32")
             attrs = k32.GetFileAttributesW(dp)
             if attrs >= 0:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
 import runpy
+import sys
 
 host = sys.argv[1]
 sys.argv = sys.argv[:1] + sys.argv[2:]

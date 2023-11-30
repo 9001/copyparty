@@ -957,6 +957,7 @@ class AuthSrv(object):
                 err = ""
                 try:
                     self._l(ln, 5, "volume access config:")
+                    assert vp
                     sk, sv = ln.split(":")
                     if re.sub("[rwmdgGha]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
@@ -974,6 +975,7 @@ class AuthSrv(object):
                 err = ""
                 try:
                     self._l(ln, 6, "volume-specific config:")
+                    assert vp
                     zd = split_cfg_ln(ln)
                     fstr = ""
                     for sk, sv in zd.items():
@@ -1184,12 +1186,13 @@ class AuthSrv(object):
                 vfs = VFS(self.log_func, mount[dst], dst, daxs[dst], mflags[dst])
                 continue
 
+            assert vfs  # type: ignore
             zv = vfs.add(mount[dst], dst)
             zv.axs = daxs[dst]
             zv.flags = mflags[dst]
             zv.dbv = None
 
-        assert vfs
+        assert vfs  # type: ignore
         vfs.all_vols = {}
         vfs.all_aps = []
         vfs.all_vps = []

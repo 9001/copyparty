@@ -66,7 +66,7 @@ def main():
                 ofs = ln.find("{")
                 j = json.loads(ln[ofs:])
             except:
-                pass
+                continue
 
             w = j["wark"]
             if db.execute("select w from up where w = ?", (w,)).fetchone():
