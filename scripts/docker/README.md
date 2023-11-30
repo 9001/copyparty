@@ -17,10 +17,14 @@ docker run --rm -it -u 1000 -p 3923:3923 -v /mnt/nas:/w -v $PWD/cfgdir:/cfg copy
 * if you are using rootless podman, remove `-u 1000`
 * if you have selinux, append `:z` to all `-v` args (for example `-v /mnt/nas:/w:z`)
 
+this example is also available as a podman-compatible [docker-compose yaml](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose); example usage: `docker-compose up` (you may need to `systemctl enable --now podman.socket` or similar)
+
 i'm unfamiliar with docker-compose and alternatives so let me know if this section could be better 🙏
 
 
 ## configuration
+
+> this section basically explains how the [docker-compose yaml](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose) works, so you may look there instead
 
 the container has the same default config as the sfx and the pypi module, meaning it will listen on port 3923 and share the "current folder" (`/w` inside the container) as read-write for anyone
 
