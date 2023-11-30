@@ -438,6 +438,12 @@ class SvcHub(object):
             zs = al.xff_src.replace(" ", "").replace(".", "\\.").replace(",", "|")
             al.xff_re = re.compile("^(?:" + zs + ")")
 
+        if al.ipa in ("any", "0", ""):
+            al.ipa_re = None
+        else:
+            zs = al.ipa.replace(" ", "").replace(".", "\\.").replace(",", "|")
+            al.ipa_re = re.compile("^(?:" + zs + ")")
+
         mte = ODict.fromkeys(DEF_MTE.split(","), True)
         al.mte = odfusion(mte, al.mte)
 
@@ -517,6 +523,10 @@ class SvcHub(object):
                 sel_fn = "{}.{}".format(fn, ctr)
 
         fn = sel_fn
+        try:
+            os.makedirs(os.path.dirname(fn))
+        except:
+            pass
 
         try:
             if do_xz:

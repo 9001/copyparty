@@ -236,6 +236,10 @@ class HttpCli(object):
         if self.is_banned():
             return False
 
+        if self.args.ipa_re and not self.args.ipa_re.match(self.conn.addr[0]):
+            self.log("client rejected (--ipa)", 3)
+            return False
+
         try:
             self.s.settimeout(2)
             headerlines = read_header(self.sr, self.args.s_thead, self.args.s_thead)
