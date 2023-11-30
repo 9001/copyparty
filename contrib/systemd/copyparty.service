@@ -1,28 +1,25 @@
-# this will start `/usr/local/bin/copyparty-sfx.py`
-# and share '/mnt' with anonymous read+write
+# this will start `/usr/local/bin/copyparty-sfx.py` and
+# read copyparty config from `/etc/copyparty.conf`, for example:
+# https://github.com/9001/copyparty/blob/hovudstraum/contrib/systemd/copyparty.conf
 #
 # installation:
 #   wget https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py -O /usr/local/bin/copyparty-sfx.py
-#   cp -pv copyparty.service /etc/systemd/system/
-#   restorecon -vr /etc/systemd/system/copyparty.service  # on fedora/rhel
-#   firewall-cmd --permanent --add-port={80,443,3923}/tcp  # --zone=libvirt
+#   useradd -r -s /sbin/nologin -d /var/lib/copyparty copyparty
+#   firewall-cmd --permanent --add-port=3923/tcp  # --zone=libvirt
 #   firewall-cmd --reload
+#   cp -pv copyparty.service /etc/systemd/system/
+#   cp -pv copyparty.conf /etc/
+#   restorecon -vr /etc/systemd/system/copyparty.service  # on fedora/rhel
 #   systemctl daemon-reload && systemctl enable --now copyparty
 #
 # if it fails to start, first check this: systemctl status copyparty
 # then try starting it while viewing logs: journalctl -fan 100
 #
 # you may want to:
-#   change "User=cpp" and "/home/cpp/" to another user
-#   remove the nft lines to only listen on port 3923
+#  - change "User=copyparty" and "/var/lib/copyparty/" to another user
+#  - edit /etc/copyparty.conf to configure copyparty
 # and in the ExecStart= line:
-#   change '/usr/bin/python3' to another interpreter
-#   change '/mnt::rw' to another location or permission-set
-#   add '-q' to disable logging on busy servers
-#   add '-i 127.0.0.1' to only allow local connections
-#   add '-e2dsa' to enable filesystem scanning + indexing
-#   add '-e2ts' to enable metadata indexing
-#   remove '--ansi' to disable colored logs
+#  - change '/usr/bin/python3' to another interpreter
 #
 # with `Type=notify`, copyparty will signal systemd when it is ready to
 #   accept connections; correctly delaying units depending on copyparty.
@@ -34,7 +31,9 @@
 #   following line to allow buffering (slightly better performance):
 #   Environment=PYTHONUNBUFFERED=x
 #
-# keep ExecStartPre before ExecStart, at least on rhel8
+########################################################################
+########################################################################
+
 
 [Unit]
 Description=copyparty file server
@@ -44,23 +43,47 @@ Type=notify
 SyslogIdentifier=copyparty
 Environment=PYTHONUNBUFFERED=x
 ExecReload=/bin/kill -s USR1 $MAINPID
+PermissionsStartOnly=true
 
-# user to run as + where the TLS certificate is (if any)
-User=cpp
-Environment=XDG_CONFIG_HOME=/home/cpp/.config
+## user to run as + where the TLS certificate is (if any)
+##
+User=copyparty
+Group=copyparty
+WorkingDirectory=/var/lib/copyparty
+Environment=XDG_CONFIG_HOME=/var/lib/copyparty/.config
 
-# OPTIONAL: setup forwarding from ports 80 and 443 to port 3923
-ExecStartPre=+/bin/bash -c 'nft -n -a list table nat | awk "/ to :3923 /{print\$NF}" | xargs -rL1 nft delete rule nat prerouting handle; true'
-ExecStartPre=+nft add table ip nat
-ExecStartPre=+nft -- add chain ip nat prerouting { type nat hook prerouting priority -100 \; }
-ExecStartPre=+nft add rule ip nat prerouting tcp dport 80 redirect to :3923
-ExecStartPre=+nft add rule ip nat prerouting tcp dport 443 redirect to :3923
+## OPTIONAL: allow copyparty to listen on low ports (like 80/443);
+##   you need to uncomment the "p: 80,443,3923" in the config too
+##   ------------------------------------------------------------
+##   a slightly safer alternative is to enable partyalone.service
+##   which does portforwarding with nftables instead, but an even
+##   better option is to use a reverse-proxy (nginx/caddy/...)
+##
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 
-# stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
-ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
+## some quick hardening; TODO port more from the nixos package
+##
+MemoryMax=50%
+MemorySwapMax=50%
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+RemoveIPC=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
 
-# copyparty settings
-ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py --ansi -e2d -v /mnt::rw
+## finally, start copyparty and give it the config file:
+##
+ExecStart=/usr/bin/python3 /usr/local/bin/copyparty-sfx.py -c /etc/copyparty.conf
+
+# NOTE: if you installed copyparty from an OS package repo (nice)
+#   then you probably want something like this instead:
+#ExecStart=/usr/bin/copyparty -c /etc/copyparty.conf
 
 [Install]
 WantedBy=multi-user.target
