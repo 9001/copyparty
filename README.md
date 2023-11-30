@@ -67,6 +67,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
     * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
+    * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
@@ -1193,6 +1194,17 @@ redefine behavior with plugins ([examples](./bin/handlers/))
 replace 404 and 403 errors with something completely different (that's it for now)
 
 
+## identity providers
+
+replace copyparty passwords with oauth and such
+
+work is [ongoing](https://github.com/9001/copyparty/issues/62) to support authenticating / authorizing users based on a separate authentication proxy, which makes it possible to support oauth, single-sign-on, etc.
+
+it is currently possible to specify `--hdr-au-usr x-username`; copyparty will then skip password validation and blindly trust the username specified in the `X-Username` request header
+
+the remaining stuff (accepting user groups through another header, creating volumes on the fly) are still to-do
+
+
 ## hiding from google
 
 tell search engines you dont wanna be indexed,  either using the good old [robots.txt](https://www.robotstxt.org/robotstxt.html) or through copyparty settings:
@@ -1368,6 +1380,10 @@ dnf copr enable @copr/PyPI
 dnf install python3-copyparty  # just a minimal install, or... 
 dnf install python3-{copyparty,pillow,argon2-cffi,pyftpdlib,pyOpenSSL} ffmpeg  # with recommended deps
 ```
+
+`ffmpeg` comes from [rpmfusion](https://rpmfusion.org/Configuration#Command_Line_Setup_using_rpm) so it's recommended to enable that (you don't want `ffmpeg-free` since it fails to thumbnail most h264/mkv/mp4 videos)
+
+to run copyparty as a service, use the [systemd service scripts](https://github.com/9001/copyparty/tree/hovudstraum/contrib/systemd), just replace `/usr/bin/python3 /usr/local/bin/copyparty-sfx.py` with `/usr/bin/copyparty`
 
 this *may* also work on RHEL but [I'm not paying IBM to verify that](https://www.jeffgeerling.com/blog/2023/dear-red-hat-are-you-dumb)
 

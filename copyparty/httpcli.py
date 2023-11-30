@@ -447,8 +447,8 @@ class HttpCli(object):
             self.pw = ""
             self.uname = self.headers.get(self.args.hdr_au_usr) or "*"
             if self.uname not in self.asrv.vfs.aread:
-                self.loud_reply("unknown username: [%s]" % (self.uname), 401)
-                return False
+                self.log("unknown username: [%s]" % (self.uname), 1)
+                self.uname = "*"
         else:
             self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw
             self.uname = self.asrv.iacct.get(self.asrv.ah.hash(self.pw)) or "*"
