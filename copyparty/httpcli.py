@@ -439,8 +439,16 @@ class HttpCli(object):
             except:
                 pass
 
-        self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw
-        self.uname = self.asrv.iacct.get(self.asrv.ah.hash(self.pw)) or "*"
+        if self.args.hdr_au_usr:
+            self.pw = ""
+            self.uname = self.headers.get(self.args.hdr_au_usr) or "*"
+            if self.uname not in self.asrv.vfs.aread:
+                self.loud_reply("unknown username: [%s]" % (self.uname), 401)
+                return False
+        else:
+            self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw
+            self.uname = self.asrv.iacct.get(self.asrv.ah.hash(self.pw)) or "*"
+
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
         self.mvol = self.asrv.vfs.amove[self.uname]

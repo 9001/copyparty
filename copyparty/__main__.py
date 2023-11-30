@@ -919,6 +919,11 @@ def add_cert(ap, cert_path):
     ap2.add_argument("--crt-alg", metavar="S-N", type=u, default="ecdsa-256", help="algorithm and keysize; one of these: ecdsa-256 rsa-4096 rsa-2048")
 
 
+def add_auth(ap):
+    ap2 = ap.add_argument_group('user authentication options')
+    ap2.add_argument("--hdr-au-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks and assume the request-header \033[33mHN\033[0m contains the username of the requesting user (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this feature, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy. Also, the argument must be lowercase, but not the actual header")
+
+
 def add_zeroconf(ap):
     ap2 = ap.add_argument_group("Zeroconf options")
     ap2.add_argument("-z", action="store_true", help="enable all zeroconf backends (mdns, ssdp)")
