@@ -1466,6 +1466,7 @@ var modal = (function () {
     r.load();
 
     r.busy = false;
+    r.nofocus = 0;
 
     r.show = function (html) {
         o = mknod('div', 'modal');
@@ -1489,6 +1490,7 @@ var modal = (function () {
             }, 0);
 
         document.addEventListener('focus', onfocus);
+        document.addEventListener('selectionchange', onselch);
         timer.add(onfocus);
         if (cb_up)
             setTimeout(cb_up, 1);
@@ -1496,6 +1498,7 @@ var modal = (function () {
 
     r.hide = function () {
         timer.rm(onfocus);
+        document.removeEventListener('selectionchange', onselch);
         document.removeEventListener('focus', onfocus);
         document.removeEventListener('keydown', onkey);
         o.parentNode.removeChild(o);
@@ -1517,12 +1520,19 @@ var modal = (function () {
             cb_ng(null);
     }
 
+    var onselch = function (e) {
+        r.nofocus = 30;
+    };
+
     var onfocus = function (e) {
         var ctr = ebi('modalc');
         if (!ctr || !ctr.contains || !document.activeElement || ctr.contains(document.activeElement))
             return;
 
         setTimeout(function () {
+            if (--r.nofocus > 0)
+                return;
+
             if (ctr = ebi('modal-ok'))
                 ctr.focus();
         }, 20);
