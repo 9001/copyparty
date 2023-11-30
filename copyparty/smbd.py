@@ -406,6 +406,7 @@ class SMB(object):
 
         smbserver.os.path.abspath = self._hook
         smbserver.os.path.expanduser = self._hook
+        smbserver.os.path.expandvars = self._hook
         smbserver.os.path.getatime = self._hook
         smbserver.os.path.getctime = self._hook
         smbserver.os.path.getmtime = self._hook

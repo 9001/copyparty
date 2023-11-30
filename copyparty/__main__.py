@@ -1093,6 +1093,7 @@ def add_logging(ap):
     ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz")
     ap2.add_argument("--no-ansi", action="store_true", default=not VT100, help="disable colors; same as environment-variable NO_COLOR")
     ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
+    ap2.add_argument("--no-logflush", action="store_true", help="don't flush the logfile after each write; tiny bit faster")
     ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
     ap2.add_argument("--log-tdec", metavar="N", type=int, default=3, help="timestamp resolution / number of timestamp decimals")
     ap2.add_argument("--log-badpwd", metavar="N", type=int, default=1, help="log failed login attempt passwords: 0=terse, 1=plaintext, 2=hashed")

@@ -411,13 +411,14 @@ class SvcHub(object):
             if not vl:
                 continue
 
-            vl = [os.path.expanduser(x) if x.startswith("~") else x for x in vl]
+            vl = [os.path.expandvars(os.path.expanduser(x)) for x in vl]
             setattr(al, k, vl)
 
         for k in "lo hist ssl_log".split(" "):
             vs = getattr(al, k)
-            if vs and vs.startswith("~"):
-                setattr(al, k, os.path.expanduser(vs))
+            if vs:
+                vs = os.path.expandvars(os.path.expanduser(vs))
+                setattr(al, k, vs)
 
         for k in "sus_urls nonsus_urls".split(" "):
             vs = getattr(al, k)
@@ -522,6 +523,7 @@ class SvcHub(object):
                 import lzma
 
                 lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
+                self.args.no_logflush = True
             else:
                 lh = open(fn, "wt", encoding="utf-8", errors="replace")
         except:
@@ -751,7 +753,24 @@ class SvcHub(object):
                 (zd.hour * 100 + zd.minute) * 100 + zd.second,
                 zd.microsecond // self.log_div,
             )
-            self.logf.write("@%s [%s\033[0m] %s\n" % (ts, src, msg))
+
+            if c and not self.args.no_ansi:
+                if isinstance(c, int):
+                    msg = "\033[3%sm%s\033[0m" % (c, msg)
+                elif "\033" not in c:
+                    msg = "\033[%sm%s\033[0m" % (c, msg)
+                else:
+                    msg = "%s%s\033[0m" % (c, msg)
+
+            if "\033" in src:
+                src += "\033[0m"
+
+            if "\033" in msg:
+                msg += "\033[0m"
+
+            self.logf.write("@%s [%s] %s\n" % (ts, src, msg))
+            if not self.args.no_logflush:
+                self.logf.flush()
 
             now = time.time()
             if now >= self.next_day:
@@ -827,6 +846,8 @@ class SvcHub(object):
 
             if self.logf:
                 self.logf.write(msg)
+                if not self.args.no_logflush:
+                    self.logf.flush()
 
     def pr(self, *a: Any, **ka: Any) -> None:
         try:

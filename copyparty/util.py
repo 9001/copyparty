@@ -2717,8 +2717,7 @@ def _parsehook(
         "capture": cap,
     }
 
-    if cmd.startswith("~"):
-        cmd = os.path.expanduser(cmd)
+    cmd = os.path.expandvars(os.path.expanduser(cmd))
 
     return chk, fork, jtxt, wait, sp_ka, cmd
 
@@ -2857,9 +2856,7 @@ def loadpy(ap: str, hot: bool) -> Any:
     depending on what other inconveniently named files happen
     to be in the same folder
     """
-    if ap.startswith("~"):
-        ap = os.path.expanduser(ap)
-
+    ap = os.path.expandvars(os.path.expanduser(ap))
     mdir, mfile = os.path.split(absreal(ap))
     mname = mfile.rsplit(".", 1)[0]
     sys.path.insert(0, mdir)

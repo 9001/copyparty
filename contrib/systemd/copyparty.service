@@ -13,7 +13,9 @@
 #   systemctl daemon-reload && systemctl enable --now copyparty
 #
 # if it fails to start, first check this: systemctl status copyparty
-# then try starting it while viewing logs: journalctl -fan 100
+# then try starting it while viewing logs:
+#   journalctl -fan 100
+#   tail -Fn 100 /var/log/copyparty/$(date +%Y-%m%d.log)
 #
 # you may want to:
 #  - change "User=copyparty" and "/var/lib/copyparty/" to another user
@@ -26,10 +28,6 @@
 #   But note that journalctl will get the timestamps wrong due to
 #   python disabling line-buffering, so messages are out-of-order:
 #   https://user-images.githubusercontent.com/241032/126040249-cb535cc7-c599-4931-a796-a5d9af691bad.png
-#
-# unless you add -q to disable logging, you may want to remove the
-#   following line to allow buffering (slightly better performance):
-#   Environment=PYTHONUNBUFFERED=x
 #
 ########################################################################
 ########################################################################
@@ -76,6 +74,11 @@ RemoveIPC=true
 RestrictNamespaces=true
 RestrictRealtime=true
 RestrictSUIDSGID=true
+
+## create a directory for logfiles;
+##   this defines $LOGS_DIRECTORY which is used in copyparty.conf
+##
+LogsDirectory=copyparty
 
 ## finally, start copyparty and give it the config file:
 ##

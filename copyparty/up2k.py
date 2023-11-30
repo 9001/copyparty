@@ -882,7 +882,9 @@ class Up2k(object):
         try:
             if bos.makedirs(histpath):
                 hidedir(histpath)
-        except:
+        except Exception as ex:
+            t = "failed to initialize volume '/%s': %s"
+            self.log(t % (vpath, ex), 1)
             return None
 
         try:

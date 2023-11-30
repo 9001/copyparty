@@ -414,7 +414,7 @@ class VFS(object):
         hist = flags.get("hist")
         if hist and hist != "-":
             zs = "{}/{}".format(hist.rstrip("/"), name)
-            flags["hist"] = os.path.expanduser(zs) if zs.startswith("~") else zs
+            flags["hist"] = os.path.expandvars(os.path.expanduser(zs))
 
         return flags
 
@@ -947,9 +947,7 @@ class AuthSrv(object):
 
             if vp is not None and ap is None:
                 ap = ln
-                if ap.startswith("~"):
-                    ap = os.path.expanduser(ap)
-
+                ap = os.path.expandvars(os.path.expanduser(ap))
                 ap = absreal(ap)
                 self._l(ln, 2, "bound to filesystem-path [{}]".format(ap))
                 self._map_volume(ap, vp, mount, daxs, mflags)
@@ -1259,9 +1257,7 @@ class AuthSrv(object):
             if vflag == "-":
                 pass
             elif vflag:
-                if vflag.startswith("~"):
-                    vflag = os.path.expanduser(vflag)
-
+                vflag = os.path.expandvars(os.path.expanduser(vflag))
                 vol.histpath = uncyg(vflag) if WINDOWS else vflag
             elif self.args.hist:
                 for nch in range(len(hid)):
