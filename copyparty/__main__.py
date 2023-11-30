@@ -971,6 +971,7 @@ def add_ftp(ap):
     ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
     ap2.add_argument("--ftp4", action="store_true", help="only listen on IPv4")
+    ap2.add_argument("--ftp-ipa", metavar="PFX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPFX\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Example: [\033[32m127., 10.89., 192.168.\033[0m]")
     ap2.add_argument("--ftp-wt", metavar="SEC", type=int, default=7, help="grace period for resuming interrupted uploads (any client can write to any file last-modified more recently than \033[33mSEC\033[0m seconds ago)")
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")

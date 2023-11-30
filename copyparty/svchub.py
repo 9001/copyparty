@@ -432,17 +432,9 @@ class SvcHub(object):
         elif al.ban_url == "no":
             al.sus_urls = None
 
-        if al.xff_src in ("any", "0", ""):
-            al.xff_re = None
-        else:
-            zs = al.xff_src.replace(" ", "").replace(".", "\\.").replace(",", "|")
-            al.xff_re = re.compile("^(?:" + zs + ")")
-
-        if al.ipa in ("any", "0", ""):
-            al.ipa_re = None
-        else:
-            zs = al.ipa.replace(" ", "").replace(".", "\\.").replace(",", "|")
-            al.ipa_re = re.compile("^(?:" + zs + ")")
+        al.xff_re = self._ipa2re(al.xff_src)
+        al.ipa_re = self._ipa2re(al.ipa)
+        al.ftp_ipa_re = self._ipa2re(al.ftp_ipa or al.ipa)
 
         mte = ODict.fromkeys(DEF_MTE.split(","), True)
         al.mte = odfusion(mte, al.mte)
@@ -460,6 +452,13 @@ class SvcHub(object):
                 setattr(self.args, k, re.compile(ptn))
 
         return True
+
+    def _ipa2re(self, txt) -> Optional[re.Pattern]:
+        if txt in ("any", "0", ""):
+            return None
+        
+        zs = txt.replace(" ", "").replace(".", "\\.").replace(",", "|")
+        return re.compile("^(?:" + zs + ")")
 
     def _setlimits(self) -> None:
         try:

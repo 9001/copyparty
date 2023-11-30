@@ -404,7 +404,16 @@ class FtpHandler(FTPHandler):
             super(FtpHandler, self).__init__(conn, server, ioloop)
 
         cip = self.remote_ip
-        self.cli_ip = cip[7:] if cip.startswith("::ffff:") else cip
+        if cip.startswith("::ffff:"):
+            cip = cip[7:]
+
+        if self.args.ftp_ipa_re and not self.args.ftp_ipa_re.match(cip):
+            logging.warning("client rejected (--ftp-ipa): %s", cip)
+            self.connected = False
+            conn.close()
+            return
+
+        self.cli_ip = cip
 
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map: dict[str, str] = {}
