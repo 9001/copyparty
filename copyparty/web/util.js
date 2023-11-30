@@ -277,6 +277,11 @@ function anymod(e, shift_ok) {
 
 
 function ev(e) {
+    if (!e && window.event) {
+        e = window.event;
+        toast.warn(10, 'hello from fallback code ;_;\ncheck console trace');
+        console.error('using window.event');
+    }
     if (!e)
         return;
 
@@ -1535,16 +1540,16 @@ var modal = (function () {
 
         if (k == 'Enter') {
             if (ae && ae == eng)
-                return ng();
+                return ng(e);
 
-            return ok();
+            return ok(e);
         }
 
         if ((k == 'ArrowLeft' || k == 'ArrowRight') && eng && (ae == eok || ae == eng))
             return (ae == eok ? eng : eok).focus() || ev(e);
 
         if (k == 'Escape')
-            return ng();
+            return ng(e);
     }
 
     var next = function () {

@@ -931,6 +931,11 @@ var set_lno = (function () {
 // hotkeys / toolbar
 (function () {
     var keydown = function (ev) {
+        if (!ev && window.event) {
+            ev = window.event;
+            toast.warn(10, 'hello from fallback code ;_;\ncheck console trace');
+            console.error('using window.event');
+        }
         var kc = ev.code || ev.keyCode || ev.which,
             editing = document.activeElement == dom_src;
 
