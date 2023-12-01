@@ -1,4 +1,20 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1125-1417  `v1.9.21`  in a bind
+
+## new features
+* #63 the grid-view will open textfiles in the textfile viewer
+* [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh) now accepts user/group names (in addition to IDs)
+
+## bugfixes
+* the `Y` hotkey (which turns all links into download links) didn't affect the grid-view
+* on some servers with unusual filesystem layouts (especially ubuntu-zfs), [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh) would make an unholy mess of recursive bind-mounts, quickly running out of inodes and requiring a server reboot
+  * added several safeguards to avoid anything like this in the future
+    * mutex around jail setup/teardown to prevent racing other instances
+    * verify jail status by inspecting /proc/mounts between each folder to bind
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1121-2325  `v1.9.20`  nice
 
 ## new features
