@@ -138,7 +138,8 @@ class SvcHub(object):
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
         self.g403 = Garda(self.args.ban_403)
-        self.g422 = Garda(self.args.ban_422)
+        self.g422 = Garda(self.args.ban_422, False)
+        self.gmal = Garda(self.args.ban_422)
         self.gurl = Garda(self.args.ban_url)
 
         self.log_div = 10 ** (6 - args.log_tdec)

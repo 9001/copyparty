@@ -135,7 +135,7 @@ class HttpCli(object):
         self.headers: dict[str, str] = {}
         self.mode = " "
         self.req = " "
-        self.http_ver = " "
+        self.http_ver = ""
         self.hint = ""
         self.host = " "
         self.ua = " "
@@ -238,6 +238,7 @@ class HttpCli(object):
 
         if self.args.ipa_re and not self.args.ipa_re.match(self.conn.addr[0]):
             self.log("client rejected (--ipa)", 3)
+            self.terse_reply(b"", 500)
             return False
 
         try:
@@ -372,22 +373,33 @@ class HttpCli(object):
             self.trailing_slash = vpath.endswith("/")
             vpath = undot(vpath)
 
-            zs = unquotep(arglist)
-            m = self.conn.hsrv.ptn_cc.search(zs)
-            if m:
-                hit = zs[m.span()[0] :]
-                t = "malicious user; Cc in query [{}] => [{!r}]"
-                self.log(t.format(self.req, hit), 1)
-                return False
-
+            ptn = self.conn.hsrv.ptn_cc
             for k in arglist.split("&"):
                 if "=" in k:
                     k, zs = k.split("=", 1)
                     # x-www-form-urlencoded (url query part) uses
                     # either + or %20 for 0x20 so handle both
-                    uparam[k.lower()] = unquotep(zs.strip().replace("+", " "))
+                    sv = unquotep(zs.strip().replace("+", " "))
                 else:
-                    uparam[k.lower()] = ""
+                    sv = ""
+
+                k = k.lower()
+                uparam[k] = sv
+
+                if k in ("doc", "move", "tree"):
+                    continue
+
+                zs = "%s=%s" % (k, sv)
+                m = ptn.search(zs)
+                if not m:
+                    continue
+
+                hit = zs[m.span()[0] :]
+                t = "malicious user; Cc in query [{}] => [{!r}]"
+                self.log(t.format(self.req, hit), 1)
+                self.cbonk(self.conn.hsrv.gmal, self.req, "cc_q", "Cc in query")
+                self.terse_reply(b"", 500)
+                return False
 
         if self.is_vproxied:
             if vpath.startswith(self.args.R):
@@ -426,7 +438,7 @@ class HttpCli(object):
 
         if relchk(self.vpath) and (self.vpath != "*" or self.mode != "OPTIONS"):
             self.log("invalid relpath [{}]".format(self.vpath))
-            self.cbonk(self.conn.hsrv.g422, self.vpath, "bad_vp", "invalid relpaths")
+            self.cbonk(self.conn.hsrv.gmal, self.req, "bad_vp", "invalid relpaths")
             return self.tx_404() and self.keepalive
 
         zso = self.headers.get("authorization")
@@ -542,6 +554,7 @@ class HttpCli(object):
 
             try:
                 if pex.code == 999:
+                    self.terse_reply(b"", 500)
                     return False
 
                 post = self.mode in ["POST", "PUT"] or "content-length" in self.headers
@@ -626,8 +639,7 @@ class HttpCli(object):
             return False
 
         self.log("banned for {:.0f} sec".format(rt), 6)
-        zb = b"HTTP/1.0 403 Forbidden\r\n\r\nthank you for playing"
-        self.s.sendall(zb)
+        self.terse_reply(b"thank you for playing", 403)
         return True
 
     def permit_caching(self) -> None:
@@ -681,6 +693,7 @@ class HttpCli(object):
                 hit = zs[m.span()[0] :]
                 t = "malicious user; Cc in out-hdr {!r} => [{!r}]"
                 self.log(t.format(zs, hit), 1)
+                self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
                 raise Pebkac(999)
 
         try:
@@ -756,6 +769,19 @@ class HttpCli(object):
 
         self.log(body.rstrip())
         self.reply(body.encode("utf-8") + b"\r\n", *list(args), **kwargs)
+
+    def terse_reply(self, body: bytes, status: int = 200) -> None:
+        self.keepalive = False
+
+        lines = [
+            "%s %s %s" % (self.http_ver or "HTTP/1.1", status, HTTPCODE[status]),
+            "Connection: Close",
+        ]
+
+        if body:
+            lines.append("Content-Length: " + unicode(len(body)))
+
+        self.s.sendall("\r\n".join(lines).encode("utf-8") + b"\r\n\r\n" + body)
 
     def urlq(self, add: dict[str, str], rm: list[str]) -> str:
         """
@@ -926,6 +952,7 @@ class HttpCli(object):
             if not static_path.startswith(path_base):
                 t = "malicious user; attempted path traversal [{}] => [{}]"
                 self.log(t.format(self.vpath, static_path), 1)
+                self.cbonk(self.conn.hsrv.gmal, self.req, "trav", "path traversal")
 
             self.tx_404()
             return False

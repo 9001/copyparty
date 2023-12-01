@@ -115,7 +115,7 @@ class Cfg(Namespace):
         ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "ah_cli ah_gen css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
+        ex = "ah_cli ah_gen css_browser hist ipa_re js_browser no_forget no_hash no_idx nonsus_urls"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "s_thead s_tbody th_convt"
@@ -124,7 +124,7 @@ class Cfg(Namespace):
         ex = "df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname doctitle favico html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
+        ex = "ah_alg bname doctitle favico hdr_au_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
