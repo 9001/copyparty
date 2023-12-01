@@ -1009,7 +1009,7 @@ var set_lno = (function () {
                 md_home(ev.shiftKey);
                 return false;
             }
-            if (!ev.shiftKey && (ev.code == "Enter" || kc == 13)) {
+            if (!ev.shiftKey && (ev.code.endsWith("Enter") || kc == 13)) {
                 return md_newline();
             }
             if (!ev.shiftKey && kc == 8) {

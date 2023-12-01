@@ -3656,7 +3656,7 @@ var fileman = (function () {
 				(function (a) {
 					f[a].inew.onkeydown = function (e) {
 						rn_ok(a, true);
-						if (e.key == 'Enter')
+						if (e.key.endsWith('Enter'))
 							return rn_apply();
 					};
 					QS('.rn_dec' + k).onclick = function (e) {
@@ -3751,7 +3751,7 @@ var fileman = (function () {
 			if (e.key == 'Escape')
 				return rn_cancel();
 
-			if (e.key == 'Enter')
+			if (e.key.endsWith('Enter'))
 				return rn_apply();
 		};
 
@@ -4999,7 +4999,7 @@ document.onkeydown = function (e) {
 		}
 	}
 
-	if (k == 'Enter' && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
+	if (k.endsWith('Enter') && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
 		return ev(e) && ae.click() || true;
 
 	if (aet && aet != 'a' && aet != 'tr' && aet != 'pre')
@@ -5197,7 +5197,7 @@ document.onkeydown = function (e) {
 	}
 
 	function ev_search_keydown(e) {
-		if (e.key == 'Enter')
+		if (e.key.endsWith('Enter'))
 			do_search();
 	}
 

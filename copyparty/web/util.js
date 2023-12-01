@@ -1566,7 +1566,7 @@ var modal = (function () {
         if (k == 'Space' && ae && (ae === eok || ae === eng))
             k = 'Enter';
 
-        if (k == 'Enter') {
+        if (k.endsWith('Enter')) {
             if (ae && ae == eng)
                 return ng(e);
 
