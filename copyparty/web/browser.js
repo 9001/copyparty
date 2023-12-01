@@ -4462,6 +4462,7 @@ var thegrid = (function () {
 			filecols.uivis();
 
 		aligngriditems();
+		restore_scroll();
 	};
 
 	r.setdirty = function () {
@@ -7767,9 +7768,35 @@ ebi('path').onclick = function (e) {
 };
 
 
+var scroll_y = -1;
+var scroll_vp = '\n';
+var scroll_obj = null;
+function persist_scroll() {
+	var obj = scroll_obj;
+	if (!obj) {
+		var o1 = document.getElementsByTagName('html')[0];
+		var o2 = document.body;
+		obj = o1.scrollTop > o2.scrollTop ? o1 : o2;
+	}
+	var y = obj.scrollTop;
+	if (y > 0)
+		scroll_obj = obj;
+
+	scroll_y = y;
+	scroll_vp = get_evpath();
+}
+function restore_scroll() {
+	if (get_evpath() == scroll_vp && scroll_obj && scroll_obj.scrollTop < 1)
+		scroll_obj.scrollTop = scroll_y;
+}
+
+
 ebi('files').onclick = ebi('docul').onclick = function (e) {
 	if (!treectl.csel && e && (ctrl(e) || e.shiftKey))
 		return true;
+
+	if (!showfile.active())
+		persist_scroll();
 
 	var tgt = e.target.closest('a[id]');
 	if (tgt && tgt.getAttribute('id').indexOf('f-') === 0 && tgt.textContent.endsWith('/')) {
