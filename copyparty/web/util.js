@@ -1482,6 +1482,7 @@ var modal = (function () {
             a.onclick = ng;
 
         a = ebi('modal-ok');
+        a.addEventListener('blur', onblur);
         a.onclick = ok;
 
         var inp = ebi('modali');
@@ -1500,6 +1501,10 @@ var modal = (function () {
 
     r.hide = function () {
         timer.rm(onfocus);
+        try {
+            ebi('modal-ok').removeEventListener('blur', onblur);
+        }
+        catch (ex) { }
         document.removeEventListener('selectionchange', onselch);
         document.removeEventListener('focus', onfocus);
         document.removeEventListener('keydown', onkey);
@@ -1522,24 +1527,35 @@ var modal = (function () {
             cb_ng(null);
     }
 
-    var onselch = function (e) {
-        r.nofocus = 30;
+    var onselch = function () {
+        try {
+            if (window.getSelection() + '')
+                r.nofocus = 10;
+        }
+        catch (ex) { }
+    };
+
+    var onblur = function () {
+        r.nofocus = 3;
     };
 
     var onfocus = function (e) {
+        if (MOBILE)
+            return;
+
         var ctr = ebi('modalc');
         if (!ctr || !ctr.contains || !document.activeElement || ctr.contains(document.activeElement))
             return;
 
         setTimeout(function () {
-            if (--r.nofocus > 0)
+            if (--r.nofocus >= 0)
                 return;
 
             if (ctr = ebi('modal-ok'))
                 ctr.focus();
         }, 20);
         ev(e);
-    }
+    };
 
     var onkey = function (e) {
         var k = e.code,
