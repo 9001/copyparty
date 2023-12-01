@@ -1,4 +1,28 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1201-0210  `v1.9.24`  header auth
+
+## new features
+* initial work on #62 (support identity providers, oauth/SSO/...); see [readme](https://github.com/9001/copyparty#identity-providers)
+  * only authentication so far; no authorization yet, and users must exist in the copyparty config with bogus passwords
+* new option `--ipa` rejects connections from clients outside of a given allowlist of IP prefixes
+* environment variables can be used almost everywhere that takes a filesystem path; should make it way more comfy to write configs for docker / systemd
+* #59 added a basic [docker-compose yaml](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose) and an example config
+  * probably much room for improvement on everything docker still
+
+## bugfixes
+* the nftables-based port-forwarding in the [systemd example](https://github.com/9001/copyparty/tree/hovudstraum/contrib/systemd) was buggy; replaced with CAP_NET_BIND_SERVICE
+* palemoon-specific js crash if a text selection was dragged
+* text selection in messageboxes was jank
+
+## other changes
+* improved [systemd example](https://github.com/9001/copyparty/tree/hovudstraum/contrib/systemd) with hardening and a better example config
+* logfiles are flushed for every line written; can be disabled with `--no-logflush` for ~3% more performance best-case
+* iphones probably won't broadcast cover-art to car stereos over bluetooth anymore since the thingamajig in iOS that's in charge of that doesn't have cookie-access, and strapping in the auth is too funky so let's stop doing that b7723ac245b8b3e38d6410891ef1aa92d4772114
+  * can be remedied by enabling filekeys and granting unauthenticated people access that way, but that's too much effort for anyone to bother with I'm sure
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1125-1417  `v1.9.21`  in a bind
 
 ## new features

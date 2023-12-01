@@ -1530,7 +1530,7 @@ var modal = (function () {
     var onselch = function () {
         try {
             if (window.getSelection() + '')
-                r.nofocus = 10;
+                r.nofocus = 15;
         }
         catch (ex) { }
     };
