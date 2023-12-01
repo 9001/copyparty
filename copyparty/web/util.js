@@ -279,8 +279,10 @@ function anymod(e, shift_ok) {
 function ev(e) {
     if (!e && window.event) {
         e = window.event;
-        toast.warn(10, 'hello from fallback code ;_;\ncheck console trace');
-        console.error('using window.event');
+        if (localStorage.dev_fbw == 1) {
+            toast.warn(10, 'hello from fallback code ;_;\ncheck console trace');
+            console.error('using window.event');
+        }
     }
     if (!e)
         return;
