@@ -957,7 +957,6 @@ class AuthSrv(object):
                 err = ""
                 try:
                     self._l(ln, 5, "volume access config:")
-                    assert vp
                     sk, sv = ln.split(":")
                     if re.sub("[rwmdgGha]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
@@ -975,7 +974,6 @@ class AuthSrv(object):
                 err = ""
                 try:
                     self._l(ln, 6, "volume-specific config:")
-                    assert vp
                     zd = split_cfg_ln(ln)
                     fstr = ""
                     for sk, sv in zd.items():
