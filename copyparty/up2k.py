@@ -2931,7 +2931,6 @@ class Up2k(object):
 
             self._symlink(dst, d2, self.flags[ptop], lmod=lmod)
             if cur:
-                self.db_rm(cur, rd, fn, job["size"])
                 self.db_add(cur, vflags, rd, fn, lmod, *z2[3:])
 
         if cur:
@@ -2974,7 +2973,6 @@ class Up2k(object):
 
         self.db_act = self.vol_act[ptop] = time.time()
         try:
-            self.db_rm(cur, rd, fn, sz)
             self.db_add(
                 cur,
                 vflags,
@@ -3033,6 +3031,8 @@ class Up2k(object):
         at: float,
         skip_xau: bool = False,
     ) -> None:
+        self.db_rm(db, rd, fn, sz)
+
         sql = "insert into up values (?,?,?,?,?,?,?)"
         v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
         try:
