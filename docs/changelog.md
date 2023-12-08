@@ -1,4 +1,22 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1201-2326  `v1.9.25`  focus
+
+## new features
+* remember and restore scroll position when leaving the textfile viewer
+
+## bugfixes
+* the request-smuggling detetcor was too strict, blocking access to textfiles with newlines / control-codes in the filename
+* focus and text selection in messageboxes was still jank, mainly in firefox and especially phones
+
+## other changes
+* the banhammer now applies on attempts at request-smuggling and path traversals
+  * these were merely detected and rejected before, might as well bonk them
+* reject bad requests with a terse 500 instead of abruptly disconnecting in some cases
+  * stops firefox from rapidly spamming additional attempts
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1201-0210  `v1.9.24`  header auth
 
 ## new features
