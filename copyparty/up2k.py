@@ -3360,28 +3360,27 @@ class Up2k(object):
         if bos.path.exists(dabs):
             raise Pebkac(400, "mv2: target file exists")
 
-        stl = bos.lstat(sabs)
-        try:
-            st = bos.stat(sabs)
-        except:
-            st = stl
+        is_link = is_dirlink = False
+        st = stl = bos.lstat(sabs)
+        if stat.S_ISLNK(stl.st_mode):
+            is_link = True
+            try:
+                st = bos.stat(sabs)
+                is_dirlink = stat.S_ISDIR(st.st_mode)
+            except:
+                pass  # broken symlink; keep as-is
 
         xbr = svn.flags.get("xbr")
         xar = dvn.flags.get("xar")
         if xbr:
             if not runhook(
-                self.log, xbr, sabs, svp, "", uname, st.st_mtime, st.st_size, "", 0, ""
+                self.log, xbr, sabs, svp, "", uname, stl.st_mtime, st.st_size, "", 0, ""
             ):
                 t = "move blocked by xbr server config: {}".format(svp)
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
         is_xvol = svn.realpath != dvn.realpath
-        if stat.S_ISLNK(stl.st_mode):
-            is_dirlink = stat.S_ISDIR(st.st_mode)
-            is_link = True
-        else:
-            is_link = is_dirlink = False
 
         bos.makedirs(os.path.dirname(dabs))
 
@@ -3408,7 +3407,7 @@ class Up2k(object):
         c2 = self.cur.get(dvn.realpath)
 
         if ftime_ is None:
-            ftime = st.st_mtime
+            ftime = stl.st_mtime
             fsize = st.st_size
         else:
             ftime = ftime_
@@ -3450,7 +3449,16 @@ class Up2k(object):
             if is_xvol and has_dupes:
                 raise OSError(errno.EXDEV, "src is symlink")
 
-            atomic_move(sabs, dabs)
+            if is_link and st != stl:
+                # relink non-broken symlinks to still work after the move,
+                # but only resolve 1st level to maintain relativity
+                dlink = bos.readlink(sabs)
+                dlink = os.path.join(os.path.dirname(sabs), dlink)
+                dlink = bos.path.abspath(dlink)
+                self._symlink(dlink, dabs, dvn.flags, lmod=ftime)
+                bos.unlink(sabs)
+            else:
+                atomic_move(sabs, dabs)
 
         except OSError as ex:
             if ex.errno != errno.EXDEV:
