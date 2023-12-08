@@ -43,6 +43,10 @@ def open(p: str, *a, **ka) -> int:
     return os.open(fsenc(p), *a, **ka)
 
 
+def readlink(p: str) -> str:
+    return fsdec(os.readlink(fsenc(p)))
+
+
 def rename(src: str, dst: str) -> None:
     return os.rename(fsenc(src), fsenc(dst))
 

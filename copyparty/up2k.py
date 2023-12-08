@@ -3617,6 +3617,8 @@ class Up2k(object):
             except:
                 self.log("relink: not found: [{}]".format(ap))
 
+        # self.log("full:\n" + "\n".join("  {:90}: {}".format(*x) for x in full.items()))
+        # self.log("links:\n" + "\n".join("  {:90}: {}".format(*x) for x in links.items()))
         if not dabs and not full and links:
             # deleting final remaining full copy; swap it with a symlink
             slabs = list(sorted(links.keys()))[0]
@@ -3634,12 +3636,45 @@ class Up2k(object):
             dabs = list(sorted(full.keys()))[0]
 
         for alink, parts in links.items():
-            lmod = None
+            lmod = 0.0
             try:
-                if alink != sabs and absreal(alink) != sabs:
-                    continue
+                faulty = False
+                ldst = alink
+                try:
+                    for n in range(40):  # MAXSYMLINKS
+                        zs = bos.readlink(ldst)
+                        ldst = os.path.join(os.path.dirname(ldst), zs)
+                        ldst = bos.path.abspath(ldst)
+                        if not bos.path.islink(ldst):
+                            break
 
-                self.log("relinking [{}] to [{}]".format(alink, dabs))
+                        if ldst == sabs:
+                            t = "relink because level %d would break:"
+                            self.log(t % (n,), 6)
+                            faulty = True
+                except Exception as ex:
+                    self.log("relink because walk failed: %s; %r" % (ex, ex), 3)
+                    faulty = True
+
+                zs = absreal(alink)
+                if ldst != zs:
+                    t = "relink because computed != actual destination:\n  %s\n  %s"
+                    self.log(t % (ldst, zs), 3)
+                    ldst = zs
+                    faulty = True
+
+                if bos.path.islink(ldst):
+                    raise Exception("broken symlink: %s" % (alink,))
+
+                if alink != sabs and ldst != sabs and not faulty:
+                    continue  # original symlink OK; leave it be
+
+            except Exception as ex:
+                t = "relink because symlink verification failed: %s; %r"
+                self.log(t % (ex, ex), 3)
+
+            self.log("relinking [%s] to [%s]" % (alink, dabs))
+            try:
                 lmod = bos.path.getmtime(alink, False)
                 bos.unlink(alink)
             except:
