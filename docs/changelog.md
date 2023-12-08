@@ -1,4 +1,39 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1208-0136  `v1.9.26`  dont break symlinks
+
+## new features
+* *tumbleweed*
+
+## bugfixes
+
+* deleting files from the server could make some duplicates of that file unavailable (by breaking nested symlinks)
+
+  * don't worry, we are **not** talking about data loss! but such broken links would disappear from the directory listing and would need to be remedied by replacing the broken links manually, either by using a file explorer or commandline
+
+  * **only** affected linux/macos, did **not** affect servers with `--hardlink` or `--never-symlink` or `--no-dedup`, and **mainly** affected servers with lots of duplicate files (with some dupes in the same folder and some elsewhere)
+
+  * if you want to check for such broken symlinks, the following unix command will find all of them: `find -L -type l`
+
+  * to repair a broken link, first remove it and then replace it: `rm thelink.opus; ln -s /mnt/music/realfile.opus thelink.opus`
+
+  * if you are left with a mystery file and want to know where its duplicates are, you can grep for the filename in the logs and you'll find something like the following line, where the `wark` is the file identifier; grep for that to find all the other copies of that file -- `purl` is the folder/URL which that copy of the file was uploaded to:
+    ```json
+    {"name": "04. GHOST.opus", "purl": "/mu/vt/suisei/still-still-stellar/", "size": 4520986, "lmod": 1697091772, "sprs": true, "hash": [], "wark": "SJMASMtWOa0UZnc002nn5unO5iCBMa-krt2CDcq8eJe9"}
+    ```
+
+* the server would throw an error if you tried to delete a broken symlink
+* prevent warnings about duplicate file entries in the database by preventing that from happening in the first place
+* `u2c.py` (commandline uploader) would fail to delete files from the server if there's more than ~10'000 files to be deleted
+  * and forgot to bump the version number... `1.11 (2nd season)`
+
+## other changes
+* `--help` was slightly improved
+* docker images are now based on alpine v3.19
+* `copyparty.exe` is now based on python v3.11.7
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1201-2326  `v1.9.25`  focus
 
 ## new features
