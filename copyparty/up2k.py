@@ -3194,7 +3194,13 @@ class Up2k(object):
                         break
 
                 abspath = djoin(adir, fn)
-                st = bos.stat(abspath)
+                st = stl = bos.lstat(abspath)
+                if stat.S_ISLNK(st.st_mode):
+                    try:
+                        st = bos.stat(abspath)
+                    except:
+                        pass
+
                 volpath = "{}/{}".format(vrem, fn).strip("/")
                 vpath = "{}/{}".format(dbv.vpath, volpath).strip("/")
                 self.log("rm {}\n  {}".format(vpath, abspath))
@@ -3207,7 +3213,7 @@ class Up2k(object):
                         vpath,
                         "",
                         uname,
-                        st.st_mtime,
+                        stl.st_mtime,
                         st.st_size,
                         ip,
                         0,
@@ -3237,7 +3243,7 @@ class Up2k(object):
                         vpath,
                         "",
                         uname,
-                        st.st_mtime,
+                        stl.st_mtime,
                         st.st_size,
                         ip,
                         0,
