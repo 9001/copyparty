@@ -907,12 +907,23 @@ class Ctl(object):
                         dp = os.path.join(top, rd)
                         lnodes = set(os.listdir(dp))
                         bnames = [x for x in ls if x not in lnodes]
-                        if bnames:
-                            vpath = self.ar.url.split("://")[-1].split("/", 1)[-1]
-                            names = [x.decode("utf-8", "replace") for x in bnames]
-                            locs = [vpath + srd + "/" + x for x in names]
-                            print("DELETING ~{0}/#{1}".format(srd, len(names)))
-                            req_ses.post(self.ar.url + "?delete", json=locs)
+                        vpath = self.ar.url.split("://")[-1].split("/", 1)[-1]
+                        names = [x.decode("utf-8", "replace") for x in bnames]
+                        locs = [vpath + srd + "/" + x for x in names]
+                        while locs:
+                            req = locs
+                            while req:
+                                print("DELETING ~%s/#%s" % (srd, len(req)))
+                                r = req_ses.post(self.ar.url + "?delete", json=req)
+                                if r.status_code == 413 and "json 2big" in r.text:
+                                    print(" (delete request too big; slicing...)")
+                                    req = req[: len(req) // 2]
+                                    continue
+                                elif not r:
+                                    t = "delete request failed: %r %s"
+                                    raise Exception(t % (r, r.text))
+                                break
+                            locs = locs[len(req) :]
 
             if isdir:
                 continue
