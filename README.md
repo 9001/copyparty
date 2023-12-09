@@ -1389,6 +1389,14 @@ dnf install python3-copyparty  # just a minimal install, or...
 dnf install python3-{copyparty,pillow,argon2-cffi,pyftpdlib,pyOpenSSL} ffmpeg  # with recommended deps
 ```
 
+in case `copr` is having issues and not building any packages (for example right now), run one of the following commands to upgrade copyparty to the latest version:
+
+```bash
+dnf install https://ocv.me/copyparty/fedora/37/python3-copyparty.fc37.noarch.rpm
+dnf install https://ocv.me/copyparty/fedora/38/python3-copyparty.fc38.noarch.rpm
+dnf install https://ocv.me/copyparty/fedora/39/python3-copyparty.fc39.noarch.rpm
+```
+
 `ffmpeg` comes from [rpmfusion](https://rpmfusion.org/Configuration#Command_Line_Setup_using_rpm) so it's recommended to enable that (you don't want `ffmpeg-free` since it fails to thumbnail most h264/mkv/mp4 videos)
 
 to run copyparty as a service, use the [systemd service scripts](https://github.com/9001/copyparty/tree/hovudstraum/contrib/systemd), just replace `/usr/bin/python3 /usr/local/bin/copyparty-sfx.py` with `/usr/bin/copyparty`
