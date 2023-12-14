@@ -511,7 +511,7 @@ it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video f
 audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
 
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
-* and, if you enable [file indexing](#file-indexing), all remaining folders will also get thumbnails (as long as they contain any pics at all)
+* and, if you enable [file indexing](#file-indexing), it will also try those names as dotfiles (`.folder.jpg` and so), and then fallback on the first picture in the folder (if it has any pictures at all)
 
 in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
 * indicated by the audio files having the ▶ icon instead of 💾

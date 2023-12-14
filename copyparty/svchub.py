@@ -405,7 +405,11 @@ class SvcHub(object):
         if al.rsp_jtr:
             al.rsp_slp = 0.000001
 
-        al.th_covers = set(al.th_covers.split(","))
+        zsl = al.th_covers.split(",")
+        zsl = [x.strip() for x in zsl]
+        zsl = [x for x in zsl if x]
+        al.th_covers = set(zsl)
+        al.th_coversd = set(zsl + ["." + x for x in zsl])
 
         for k in "c".split(" "):
             vl = getattr(al, k)

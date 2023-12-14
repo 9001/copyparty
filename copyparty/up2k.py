@@ -1165,8 +1165,12 @@ class Up2k(object):
                 files.append((sz, lmod, iname))
                 liname = iname.lower()
                 if sz and (
-                    iname in self.args.th_covers
-                    or (not cv and liname.rsplit(".", 1)[-1] in CV_EXTS)
+                    iname in self.args.th_coversd
+                    or (
+                        not cv
+                        and liname.rsplit(".", 1)[-1] in CV_EXTS
+                        and not iname.startswith(".")
+                    )
                 ):
                     cv = iname
 
@@ -3088,7 +3092,7 @@ class Up2k(object):
                 with self.rescan_cond:
                     self.rescan_cond.notify_all()
 
-        if rd and sz and fn.lower() in self.args.th_covers:
+        if rd and sz and fn.lower() in self.args.th_coversd:
             # wasteful; db_add will re-index actual covers
             # but that won't catch existing files
             crd, cdn = rd.rsplit("/", 1) if "/" in rd else ("", rd)
