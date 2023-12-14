@@ -2137,7 +2137,9 @@ class Up2k(object):
         self.log("ST: {}".format(msg))
 
     def _orz(self, db_path: str) -> "sqlite3.Cursor":
-        c = sqlite3.connect(db_path, self.timeout, check_same_thread=False).cursor()
+        c = sqlite3.connect(
+            db_path, timeout=self.timeout, check_same_thread=False
+        ).cursor()
         # c.connection.set_trace_callback(self._trace)
         return c
 

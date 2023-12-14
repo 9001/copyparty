@@ -103,7 +103,7 @@ class U2idx(object):
             uri = ""
             try:
                 uri = "{}?mode=ro&nolock=1".format(Path(db_path).as_uri())
-                db = sqlite3.connect(uri, 2, uri=True, check_same_thread=False)
+                db = sqlite3.connect(uri, timeout=2, uri=True, check_same_thread=False)
                 cur = db.cursor()
                 cur.execute('pragma table_info("up")').fetchone()
                 self.log("ro: {}".format(db_path))
@@ -115,7 +115,7 @@ class U2idx(object):
         if not cur:
             # on windows, this steals the write-lock from up2k.deferred_init --
             # seen on win 10.0.17763.2686, py 3.10.4, sqlite 3.37.2
-            cur = sqlite3.connect(db_path, 2, check_same_thread=False).cursor()
+            cur = sqlite3.connect(db_path, timeout=2, check_same_thread=False).cursor()
             self.log("opened {}".format(db_path))
 
         self.cur[ptop] = cur
