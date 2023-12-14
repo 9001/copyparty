@@ -436,7 +436,7 @@ def disable_quickedit() -> None:
     if PY2:
         wintypes.LPDWORD = ctypes.POINTER(wintypes.DWORD)
 
-    k32.GetStdHandle.errcheck = ecb    # type: ignore
+    k32.GetStdHandle.errcheck = ecb  # type: ignore
     k32.GetConsoleMode.errcheck = ecb  # type: ignore
     k32.SetConsoleMode.errcheck = ecb  # type: ignore
     k32.GetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.LPDWORD)

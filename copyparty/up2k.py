@@ -419,50 +419,49 @@ class Up2k(object):
     def _check_lifetimes(self) -> float:
         now = time.time()
         timeout = now + 9001
-        if now:  # diff-golf
-            for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
-                lifetime = vol.flags.get("lifetime")
-                if not lifetime:
-                    continue
+        for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
+            lifetime = vol.flags.get("lifetime")
+            if not lifetime:
+                continue
 
-                cur = self.cur.get(vol.realpath)
-                if not cur:
-                    continue
+            cur = self.cur.get(vol.realpath)
+            if not cur:
+                continue
 
-                nrm = 0
-                deadline = time.time() - lifetime
-                timeout = min(timeout, now + lifetime)
-                q = "select rd, fn from up where at > 0 and at < ? limit 100"
-                while True:
-                    with self.mutex:
-                        hits = cur.execute(q, (deadline,)).fetchall()
-
-                    if not hits:
-                        break
-
-                    for rd, fn in hits:
-                        if rd.startswith("//") or fn.startswith("//"):
-                            rd, fn = s3dec(rd, fn)
-
-                        fvp = ("%s/%s" % (rd, fn)).strip("/")
-                        if vp:
-                            fvp = "%s/%s" % (vp, fvp)
-
-                        self._handle_rm(LEELOO_DALLAS, "", fvp, [], True)
-                        nrm += 1
-
-                if nrm:
-                    self.log("{} files graduated in {}".format(nrm, vp))
-
-                if timeout < 10:
-                    continue
-
-                q = "select at from up where at > 0 order by at limit 1"
+            nrm = 0
+            deadline = time.time() - lifetime
+            timeout = min(timeout, now + lifetime)
+            q = "select rd, fn from up where at > 0 and at < ? limit 100"
+            while True:
                 with self.mutex:
-                    hits = cur.execute(q).fetchone()
+                    hits = cur.execute(q, (deadline,)).fetchall()
 
-                if hits:
-                    timeout = min(timeout, now + lifetime - (now - hits[0]))
+                if not hits:
+                    break
+
+                for rd, fn in hits:
+                    if rd.startswith("//") or fn.startswith("//"):
+                        rd, fn = s3dec(rd, fn)
+
+                    fvp = ("%s/%s" % (rd, fn)).strip("/")
+                    if vp:
+                        fvp = "%s/%s" % (vp, fvp)
+
+                    self._handle_rm(LEELOO_DALLAS, "", fvp, [], True)
+                    nrm += 1
+
+            if nrm:
+                self.log("{} files graduated in {}".format(nrm, vp))
+
+            if timeout < 10:
+                continue
+
+            q = "select at from up where at > 0 order by at limit 1"
+            with self.mutex:
+                hits = cur.execute(q).fetchone()
+
+            if hits:
+                timeout = min(timeout, now + lifetime - (now - hits[0]))
 
         return timeout
 
@@ -1217,72 +1216,70 @@ class Up2k(object):
             abspath = os.path.join(cdir, fn)
             nohash = reh.search(abspath) if reh else False
 
-            if fn:  # diff-golf
+            sql = "select w, mt, sz, at from up where rd = ? and fn = ?"
+            try:
+                c = db.c.execute(sql, (rd, fn))
+            except:
+                c = db.c.execute(sql, s3enc(self.mem_cur, rd, fn))
 
-                sql = "select w, mt, sz, at from up where rd = ? and fn = ?"
-                try:
-                    c = db.c.execute(sql, (rd, fn))
-                except:
-                    c = db.c.execute(sql, s3enc(self.mem_cur, rd, fn))
+            in_db = list(c.fetchall())
+            if in_db:
+                self.pp.n -= 1
+                dw, dts, dsz, at = in_db[0]
+                if len(in_db) > 1:
+                    t = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
+                    rep_db = "\n".join([repr(x) for x in in_db])
+                    self.log(t.format(top, rp, len(in_db), rep_db))
+                    dts = -1
 
-                in_db = list(c.fetchall())
-                if in_db:
-                    self.pp.n -= 1
-                    dw, dts, dsz, at = in_db[0]
-                    if len(in_db) > 1:
-                        t = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
-                        rep_db = "\n".join([repr(x) for x in in_db])
-                        self.log(t.format(top, rp, len(in_db), rep_db))
-                        dts = -1
+                if fat32 and abs(dts - lmod) == 1:
+                    dts = lmod
 
-                    if fat32 and abs(dts - lmod) == 1:
-                        dts = lmod
+                if dts == lmod and dsz == sz and (nohash or dw[0] != "#" or not sz):
+                    continue
 
-                    if dts == lmod and dsz == sz and (nohash or dw[0] != "#" or not sz):
-                        continue
-
-                    t = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
-                        top, rp, dts, lmod, dsz, sz
-                    )
-                    self.log(t)
-                    self.db_rm(db.c, rd, fn, 0)
-                    ret += 1
-                    db.n += 1
-                    in_db = []
-                else:
-                    at = 0
-
-                self.pp.msg = "a{} {}".format(self.pp.n, abspath)
-
-                if nohash or not sz:
-                    wark = up2k_wark_from_metadata(self.salt, sz, lmod, rd, fn)
-                else:
-                    if sz > 1024 * 1024:
-                        self.log("file: {}".format(abspath))
-
-                    try:
-                        hashes = self._hashlist_from_file(
-                            abspath, "a{}, ".format(self.pp.n)
-                        )
-                    except Exception as ex:
-                        self.log("hash: {} @ [{}]".format(repr(ex), abspath))
-                        continue
-
-                    if not hashes:
-                        return -1
-
-                    wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
-
-                # skip upload hooks by not providing vflags
-                self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", "", at)
-                db.n += 1
+                t = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
+                    top, rp, dts, lmod, dsz, sz
+                )
+                self.log(t)
+                self.db_rm(db.c, rd, fn, 0)
                 ret += 1
-                td = time.time() - db.t
-                if db.n >= 4096 or td >= 60:
-                    self.log("commit {} new files".format(db.n))
-                    db.c.connection.commit()
-                    db.n = 0
-                    db.t = time.time()
+                db.n += 1
+                in_db = []
+            else:
+                at = 0
+
+            self.pp.msg = "a{} {}".format(self.pp.n, abspath)
+
+            if nohash or not sz:
+                wark = up2k_wark_from_metadata(self.salt, sz, lmod, rd, fn)
+            else:
+                if sz > 1024 * 1024:
+                    self.log("file: {}".format(abspath))
+
+                try:
+                    hashes = self._hashlist_from_file(
+                        abspath, "a{}, ".format(self.pp.n)
+                    )
+                except Exception as ex:
+                    self.log("hash: {} @ [{}]".format(repr(ex), abspath))
+                    continue
+
+                if not hashes:
+                    return -1
+
+                wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
+
+            # skip upload hooks by not providing vflags
+            self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", "", at)
+            db.n += 1
+            ret += 1
+            td = time.time() - db.t
+            if db.n >= 4096 or td >= 60:
+                self.log("commit {} new files".format(db.n))
+                db.c.connection.commit()
+                db.n = 0
+                db.t = time.time()
 
         if not self.args.no_dhash:
             db.c.execute("delete from dh where d = ?", (drd,))  # type: ignore

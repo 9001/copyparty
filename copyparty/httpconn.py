@@ -112,32 +112,30 @@ class HttpConn(object):
         return self.u2idx
 
     def _detect_https(self) -> bool:
-        method = None
-        if True:
-            try:
-                method = self.s.recv(4, socket.MSG_PEEK)
-            except socket.timeout:
-                return False
-            except AttributeError:
-                # jython does not support msg_peek; forget about https
-                method = self.s.recv(4)
-                self.sr = Util.Unrecv(self.s, self.log)
-                self.sr.buf = method
+        try:
+            method = self.s.recv(4, socket.MSG_PEEK)
+        except socket.timeout:
+            return False
+        except AttributeError:
+            # jython does not support msg_peek; forget about https
+            method = self.s.recv(4)
+            self.sr = Util.Unrecv(self.s, self.log)
+            self.sr.buf = method
 
-                # jython used to do this, they stopped since it's broken
-                # but reimplementing sendall is out of scope for now
-                if not getattr(self.s, "sendall", None):
-                    self.s.sendall = self.s.send  # type: ignore
+            # jython used to do this, they stopped since it's broken
+            # but reimplementing sendall is out of scope for now
+            if not getattr(self.s, "sendall", None):
+                self.s.sendall = self.s.send  # type: ignore
 
-            if len(method) != 4:
-                err = "need at least 4 bytes in the first packet; got {}".format(
-                    len(method)
-                )
-                if method:
-                    self.log(err)
+        if len(method) != 4:
+            err = "need at least 4 bytes in the first packet; got {}".format(
+                len(method)
+            )
+            if method:
+                self.log(err)
 
-                self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
-                return False
+            self.s.send(b"HTTP/1.1 400 Bad Request\r\n\r\n" + err.encode("utf-8"))
+            return False
 
         return not method or not bool(PTN_HTTP.match(method))
 

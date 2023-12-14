@@ -19,7 +19,7 @@ docker run --rm -it -u 1000 -p 3923:3923 -v /mnt/nas:/w -v $PWD/cfgdir:/cfg copy
 
 this example is also available as a podman-compatible [docker-compose yaml](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose); example usage: `docker-compose up` (you may need to `systemctl enable --now podman.socket` or similar)
 
-i'm unfamiliar with docker-compose and alternatives so let me know if this section could be better 🙏
+i'm not very familiar with containers, so let me know if this section could be better 🙏
 
 
 ## configuration

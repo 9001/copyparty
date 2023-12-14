@@ -457,7 +457,7 @@ class SvcHub(object):
     def _ipa2re(self, txt) -> Optional[re.Pattern]:
         if txt in ("any", "0", ""):
             return None
-        
+
         zs = txt.replace(" ", "").replace(".", "\\.").replace(",", "|")
         return re.compile("^(?:" + zs + ")")
 

@@ -61,7 +61,7 @@ class Adapter(object):
         )
 
 
-if True:
+if True:  # pylint: disable=using-constant-test
     # Type of an IPv4 address (a string in "xxx.xxx.xxx.xxx" format)
     _IPv4Address = str
 

@@ -1823,7 +1823,9 @@ def exclude_dotfiles(filepaths: list[str]) -> list[str]:
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
 
 
-def odfusion(base: Union[ODict[str, bool], ODict["LiteralString", bool]], oth: str) -> ODict[str, bool]:
+def odfusion(
+    base: Union[ODict[str, bool], ODict["LiteralString", bool]], oth: str
+) -> ODict[str, bool]:
     # merge an "ordered set" (just a dict really) with another list of keys
     words0 = [x for x in oth.split(",") if x]
     words1 = [x for x in oth[1:].split(",") if x]
