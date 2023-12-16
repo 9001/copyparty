@@ -19,11 +19,10 @@ import threading
 import time
 import traceback
 import uuid
-from textwrap import dedent
 
 from .__init__ import ANYWIN, CORES, EXE, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
-from .authsrv import expand_config_file, re_vol, split_cfg_ln, upgrade_cfg_fmt
+from .authsrv import expand_config_file, split_cfg_ln, upgrade_cfg_fmt
 from .cfg import flagcats, onedash
 from .svchub import SvcHub
 from .util import (
@@ -37,6 +36,7 @@ from .util import (
     UNPLICATIONS,
     align_tab,
     ansi_re,
+    dedent,
     min_ex,
     py_desc,
     pybin,
@@ -498,6 +498,7 @@ def get_sects():
               "g" (get):    download files, but cannot see folder contents
               "G" (upget):  "get", but can see filekeys of their own uploads
               "h" (html):   "get", but folders return their index.html
+              "." (dots):   user can ask to show dotfiles in listings
               "a" (admin):  can see uploader IPs, config-reload
 
             too many volflags to list here, see --help-flags
@@ -705,6 +706,7 @@ def get_sects():
                 \033[36mln\033[0m only prints symlinks leaving the volume mountpoint
                 \033[36mp\033[0m exits 1 if any such symlinks are found
                 \033[36mr\033[0m resumes startup after the listing
+
             examples:
               --ls '**'          # list all files which are possible to read
               --ls '**,*,ln'     # check for dangerous symlinks
@@ -738,9 +740,12 @@ def get_sects():
                 """
             when \033[36m--ah-alg\033[0m is not the default [\033[32mnone\033[0m], all account passwords must be hashed
 
-            passwords can be hashed on the commandline with \033[36m--ah-gen\033[0m, but copyparty will also hash and print any passwords that are non-hashed (password which do not start with '+') and then terminate afterwards
+            passwords can be hashed on the commandline with \033[36m--ah-gen\033[0m, but
+            copyparty will also hash and print any passwords that are non-hashed
+            (password which do not start with '+') and then terminate afterwards
 
-            \033[36m--ah-alg\033[0m specifies the hashing algorithm and a list of optional comma-separated arguments:
+            \033[36m--ah-alg\033[0m specifies the hashing algorithm and a
+               list of optional comma-separated arguments:
 
             \033[36m--ah-alg argon2\033[0m  # which is the same as:
             \033[36m--ah-alg argon2,3,256,4,19\033[0m
@@ -821,7 +826,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores, 0=all")
     ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, \033[33mUSER\033[0m:\033[33mPASS\033[0m; example [\033[32med:wark\033[0m]")
     ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, \033[33mSRC\033[0m:\033[33mDST\033[0m:\033[33mFLAG\033[0m; examples [\033[32m.::r\033[0m], [\033[32m/mnt/nas/music:/music:r:aed\033[0m]")
-    ap2.add_argument("-ed", action="store_true", help="enable the ?dots url parameter / client option which allows clients to see dotfiles / hidden files")
+    ap2.add_argument("-ed", action="store_true", help="enable the ?dots url parameter / client option which allows clients to see dotfiles / hidden files (volflag=dots)")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see \033[33m--help-urlform\033[0m")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="server terminal title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
     ap2.add_argument("--name", metavar="TXT", type=u, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
@@ -1456,40 +1461,6 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     if al.ansi:
         al.wintitle = ""
-
-    nstrs: list[str] = []
-    anymod = False
-    for ostr in al.v or []:
-        m = re_vol.match(ostr)
-        if not m:
-            # not our problem
-            nstrs.append(ostr)
-            continue
-
-        src, dst, perms = m.groups()
-        na = [src, dst]
-        mod = False
-        for opt in perms.split(":"):
-            if re.match("c[^,]", opt):
-                mod = True
-                na.append("c," + opt[1:])
-            elif re.sub("^[rwmdgGha]*", "", opt) and "," not in opt:
-                mod = True
-                perm = opt[0]
-                na.append(perm + "," + opt[1:])
-            else:
-                na.append(opt)
-
-        nstr = ":".join(na)
-        nstrs.append(nstr if mod else ostr)
-        if mod:
-            msg = "\033[1;31mWARNING:\033[0;1m\n  -v {} \033[0;33mwas replaced with\033[0;1m\n  -v {} \n\033[0m"
-            lprint(msg.format(ostr, nstr))
-            anymod = True
-
-    if anymod:
-        al.v = nstrs
-        time.sleep(2)
 
     # propagate implications
     for k1, k2 in IMPLICATIONS:

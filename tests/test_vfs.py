@@ -7,7 +7,6 @@ import os
 import shutil
 import tempfile
 import unittest
-from textwrap import dedent
 
 from copyparty import util
 from copyparty.authsrv import VFS, AuthSrv
@@ -175,11 +174,11 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(len(vfs.nodes), 1)
         self.assertEqual(n.vpath, "a")
         self.assertEqual(n.realpath, os.path.join(td, "a"))
-        self.assertAxs(n.axs.uread, ["*"])
+        self.assertAxs(n.axs.uread, ["*", "k"])
         self.assertAxs(n.axs.uwrite, [])
-        perm_na = (False, False, False, False, False, False, False)
-        perm_rw = (True, True, False, False, False, False, False)
-        perm_ro = (True, False, False, False, False, False, False)
+        perm_na = (False, False, False, False, False, False, False, False)
+        perm_rw = (True, True, False, False, False, False, False, False)
+        perm_ro = (True, False, False, False, False, False, False, False)
         self.assertEqual(vfs.can_access("/", "*"), perm_na)
         self.assertEqual(vfs.can_access("/", "k"), perm_rw)
         self.assertEqual(vfs.can_access("/a", "*"), perm_ro)
@@ -232,7 +231,7 @@ class TestVFS(unittest.TestCase):
         cfg_path = os.path.join(self.td, "test.cfg")
         with open(cfg_path, "wb") as f:
             f.write(
-                dedent(
+                util.dedent(
                     """
                     u a:123
                     u asd:fgh:jkl

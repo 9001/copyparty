@@ -9,6 +9,9 @@ onedash = set(zs.split())
 def vf_bmap() -> dict[str, str]:
     """argv-to-volflag: simple bools"""
     ret = {
+        "dav_auth": "davauth",
+        "dav_rt": "davrt",
+        "ed": "dots",
         "never_symlink": "neversymlink",
         "no_dedup": "copydupes",
         "no_dupe": "nodupe",
@@ -18,8 +21,6 @@ def vf_bmap() -> dict[str, str]:
         "no_vthumb": "dvthumb",
         "no_athumb": "dathumb",
         "th_no_crop": "nocrop",
-        "dav_auth": "davauth",
-        "dav_rt": "davrt",
     }
     for k in (
         "dotsrch",
@@ -98,6 +99,7 @@ permdescs = {
     "w": 'write; upload files; need "r" to see the uploads',
     "m": 'move; move files and folders; need "w" at destination',
     "d": "delete; permanently delete files and folders",
+    ".": "dots; user can ask to show dotfiles in listings",
     "g": "get; download files, but cannot see folder contents",
     "G": 'upget; same as "g" but can see filekeys of their own uploads',
     "h": 'html; same as "g" but folders return their index.html',
@@ -202,6 +204,7 @@ flagcats = {
         "nohtml": "return html and markdown as text/html",
     },
     "others": {
+        "dots": "allow all users with read-access to\nenable the option to show dotfiles in listings",
         "fk=8": 'generates per-file accesskeys,\nwhich are then required at the "g" permission;\nkeys are invalidated if filesize or inode changes',
         "fka=8": 'generates slightly weaker per-file accesskeys,\nwhich are then required at the "g" permission;\nnot affected by filesize or inode numbers',
         "davauth": "ask webdav clients to login for all folders",

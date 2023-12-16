@@ -9,7 +9,7 @@ import time
 from operator import itemgetter
 
 from .__init__ import ANYWIN, TYPE_CHECKING, unicode
-from .authsrv import LEELOO_DALLAS
+from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
 from .up2k import up2k_wark_from_hashlist
 from .util import (
@@ -63,7 +63,7 @@ class U2idx(object):
         self.log_func("u2idx", msg, c)
 
     def fsearch(
-        self, vols: list[tuple[str, str, dict[str, Any]]], body: dict[str, Any]
+        self, uname: str, vols: list[VFS], body: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """search by up2k hashlist"""
         if not HAVE_SQLITE3:
@@ -77,7 +77,7 @@ class U2idx(object):
         uv: list[Union[str, int]] = [wark[:16], wark]
 
         try:
-            return self.run_query(vols, uq, uv, True, False, 99999)[0]
+            return self.run_query(uname, vols, uq, uv, False, 99999)[0]
         except:
             raise Pebkac(500, min_ex())
 
@@ -122,7 +122,7 @@ class U2idx(object):
         return cur
 
     def search(
-        self, vols: list[tuple[str, str, dict[str, Any]]], uq: str, lim: int
+        self, uname: str, vols: list[VFS], uq: str, lim: int
     ) -> tuple[list[dict[str, Any]], list[str], bool]:
         """search by query params"""
         if not HAVE_SQLITE3:
@@ -131,7 +131,6 @@ class U2idx(object):
         q = ""
         v: Union[str, int] = ""
         va: list[Union[str, int]] = []
-        have_up = False  # query has up.* operands
         have_mt = False
         is_key = True
         is_size = False
@@ -176,26 +175,21 @@ class U2idx(object):
                 if v == "size":
                     v = "up.sz"
                     is_size = True
-                    have_up = True
 
                 elif v == "date":
                     v = "up.mt"
                     is_date = True
-                    have_up = True
 
                 elif v == "up_at":
                     v = "up.at"
                     is_date = True
-                    have_up = True
 
                 elif v == "path":
                     v = "trim(?||up.rd,'/')"
                     va.append("\nrd")
-                    have_up = True
 
                 elif v == "name":
                     v = "up.fn"
-                    have_up = True
 
                 elif v == "tags" or ptn_mt.match(v):
                     have_mt = True
@@ -271,22 +265,22 @@ class U2idx(object):
                 q += " lower({}) {} ? ) ".format(field, oper)
 
         try:
-            return self.run_query(vols, q, va, have_up, have_mt, lim)
+            return self.run_query(uname, vols, q, va, have_mt, lim)
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
     def run_query(
         self,
-        vols: list[tuple[str, str, dict[str, Any]]],
+        uname: str,
+        vols: list[VFS],
         uq: str,
         uv: list[Union[str, int]],
-        have_up: bool,
         have_mt: bool,
         lim: int,
     ) -> tuple[list[dict[str, Any]], list[str], bool]:
         if self.args.srch_dbg:
             t = "searching across all %s volumes in which the user has 'r' (full read access):\n  %s"
-            zs = "\n  ".join(["/%s = %s" % (x[0], x[1]) for x in vols])
+            zs = "\n  ".join(["/%s = %s" % (x.vpath, x.realpath) for x in vols])
             self.log(t % (len(vols), zs), 5)
 
         done_flag: list[bool] = []
@@ -315,9 +309,13 @@ class U2idx(object):
             clamped = False
 
         taglist = {}
-        for (vtop, ptop, flags) in vols:
+        for vol in vols:
             if lim < 0:
                 break
+
+            vtop = vol.vpath
+            ptop = vol.realpath
+            flags = vol.flags
 
             cur = self.get_cur(ptop)
             if not cur:
@@ -343,7 +341,7 @@ class U2idx(object):
 
             sret = []
             fk = flags.get("fk")
-            dots = flags.get("dotsrch")
+            dots = flags.get("dotsrch") and uname in vol.axs.udot
             fk_alg = 2 if "fka" in flags else 1
             c = cur.execute(uq, tuple(vuv))
             for hit in c:

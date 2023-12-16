@@ -26,6 +26,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [FAQ](#FAQ) - "frequently" asked questions
 * [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
     * [shadowing](#shadowing) - hiding specific subfolders
+    * [dotfiles](#dotfiles) - unix-style hidden files/folders
 * [the browser](#the-browser) - accessing a copyparty server using a web-browser
     * [tabs](#tabs) - the main tabs in the ui
     * [hotkeys](#hotkeys) - the browser has the following hotkeys
@@ -368,6 +369,7 @@ permissions:
 * `w` (write): upload files, move files *into* this folder
 * `m` (move): move files/folders *from* this folder
 * `d` (delete): delete files/folders
+* `.` (dots): user can ask to show dotfiles in directory listings
 * `g` (get): only download files, cannot see folder contents or zip/tar
 * `G` (upget): same as `g` except uploaders get to see their own [filekeys](#filekeys) (see `fk` in examples below)
 * `h` (html): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
@@ -397,6 +399,17 @@ anyone trying to bruteforce a password gets banned according to `--ban-pw`; defa
 hiding specific subfolders  by mounting another volume on top of them
 
 for example `-v /mnt::r -v /var/empty:web/certs:r` mounts the server folder `/mnt` as the webroot, but another volume is mounted at `/web/certs` -- so visitors can only see the contents of `/mnt` and `/mnt/web` (at URLs `/` and `/web`), but not `/mnt/web/certs` because URL `/web/certs` is mapped to `/var/empty`
+
+
+## dotfiles
+
+unix-style hidden files/folders  by starting the name with a dot
+
+anyone can access these if they know the name, but they normally don't appear in directory listings
+
+a client can request to see dotfiles in directory listings if global option `-ed` is specified, or the volume has volflag `dots`, or the user has permission `.`
+
+dotfiles do not appear in search results unless one of the above is true, **and** the global option / volflag `dotsrch` is set
 
 
 # the browser
@@ -539,7 +552,7 @@ select which type of archive you want in the `[⚙️] config` tab:
 * gzip default level is `3` (0=fast, 9=best), change with `?tar=gz:9`
 * xz default level is `1` (0=fast, 9=best), change with `?tar=xz:9`
 * bz2 default level is `2` (1=fast, 9=best), change with `?tar=bz2:9`
-* hidden files (dotfiles) are excluded unless `-ed`
+* hidden files ([dotfiles](#dotfiles)) are excluded unless account is allowed to list them
   * `up2k.db` and `dir.txt` is always excluded
 * bsdtar supports streaming unzipping: `curl foo?zip=utf8 | bsdtar -xv`
   * good, because copyparty's zip is faster than tar on small files

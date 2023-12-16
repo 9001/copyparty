@@ -154,10 +154,6 @@ class HttpCli(object):
         self.pw = " "
         self.rvol = [" "]
         self.wvol = [" "]
-        self.mvol = [" "]
-        self.dvol = [" "]
-        self.gvol = [" "]
-        self.upvol = [" "]
         self.avol = [" "]
         self.do_log = True
         self.can_read = False
@@ -167,6 +163,7 @@ class HttpCli(object):
         self.can_get = False
         self.can_upget = False
         self.can_admin = False
+        self.can_dot = False
         self.out_headerlist: list[tuple[str, str]] = []
         self.out_headers: dict[str, str] = {}
         self.html_head = " "
@@ -467,10 +464,6 @@ class HttpCli(object):
 
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
-        self.mvol = self.asrv.vfs.amove[self.uname]
-        self.dvol = self.asrv.vfs.adel[self.uname]
-        self.gvol = self.asrv.vfs.aget[self.uname]
-        self.upvol = self.asrv.vfs.apget[self.uname]
         self.avol = self.asrv.vfs.aadmin[self.uname]
 
         if self.pw and (
@@ -503,6 +496,7 @@ class HttpCli(object):
             self.can_get,
             self.can_upget,
             self.can_admin,
+            self.can_dot,
         ) = (
             avn.can_access("", self.uname) if avn else [False] * 7
         )
@@ -1131,7 +1125,6 @@ class HttpCli(object):
                 rem,
                 set(),
                 self.uname,
-                self.args.ed,
                 True,
                 not self.args.no_scandir,
                 wrap=False,
@@ -1145,7 +1138,7 @@ class HttpCli(object):
                 [[True, False]],
                 lstat="davrt" not in vn.flags,
             )
-            if not self.args.ed:
+            if not self.can_dot:
                 names = set(exclude_dotfiles([x[0] for x in vfs_ls]))
                 vfs_ls = [x for x in vfs_ls if x[0] in names]
 
@@ -1910,7 +1903,7 @@ class HttpCli(object):
         items = [unquotep(x) for x in items if items]
 
         self.parser.drop()
-        return self.tx_zip(k, v, "", vn, rem, items, self.args.ed)
+        return self.tx_zip(k, v, "", vn, rem, items)
 
     def handle_post_json(self) -> bool:
         try:
@@ -1996,10 +1989,10 @@ class HttpCli(object):
     def handle_search(self, body: dict[str, Any]) -> bool:
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
-            raise Pebkac(500, "sqlite3 is not available on the server; cannot search")
+            raise Pebkac(500, "server busy, or sqlite3 not available; cannot search")
 
-        vols = []
-        seen = {}
+        vols: list[VFS] = []
+        seen: dict[VFS, bool] = {}
         for vtop in self.rvol:
             vfs, _ = self.asrv.vfs.get(vtop, self.uname, True, False)
             vfs = vfs.dbv or vfs
@@ -2007,7 +2000,7 @@ class HttpCli(object):
                 continue
 
             seen[vfs] = True
-            vols.append((vfs.vpath, vfs.realpath, vfs.flags))
+            vols.append(vfs)
 
         t0 = time.time()
         if idx.p_end:
@@ -2022,7 +2015,7 @@ class HttpCli(object):
             vbody = copy.deepcopy(body)
             vbody["hash"] = len(vbody["hash"])
             self.log("qj: " + repr(vbody))
-            hits = idx.fsearch(vols, body)
+            hits = idx.fsearch(self.uname, vols, body)
             msg: Any = repr(hits)
             taglist: list[str] = []
             trunc = False
@@ -2031,7 +2024,7 @@ class HttpCli(object):
             q = body["q"]
             n = body.get("n", self.args.srch_hits)
             self.log("qj: {} |{}|".format(q, n))
-            hits, taglist, trunc = idx.search(vols, q, n)
+            hits, taglist, trunc = idx.search(self.uname, vols, q, n)
             msg = len(hits)
 
         idx.p_end = time.time()
@@ -3002,7 +2995,6 @@ class HttpCli(object):
         vn: VFS,
         rem: str,
         items: list[str],
-        dots: bool,
     ) -> bool:
         if self.args.no_zip:
             raise Pebkac(400, "not enabled")
@@ -3059,7 +3051,7 @@ class HttpCli(object):
         self.send_headers(None, mime=mime, headers={"Content-Disposition": cdis})
 
         fgen = vn.zipgen(
-            vpath, rem, set(items), self.uname, dots, False, not self.args.no_scandir
+            vpath, rem, set(items), self.uname, False, not self.args.no_scandir
         )
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         cfmt = ""
@@ -3473,6 +3465,7 @@ class HttpCli(object):
             ret["k" + quotep(excl)] = sub
 
         vfs = self.asrv.vfs
+        dots = False
         try:
             vn, rem = vfs.get(top, self.uname, True, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
@@ -3481,6 +3474,7 @@ class HttpCli(object):
                 not self.args.no_scandir,
                 [[True, False], [False, True]],
             )
+            dots = self.uname in vn.axs.udot
         except:
             vfs_ls = []
             vfs_virt = {}
@@ -3493,7 +3487,7 @@ class HttpCli(object):
 
         dirnames = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 
-        if not self.args.ed or "dots" not in self.uparam:
+        if not dots or "dots" not in self.uparam:
             dirnames = exclude_dotfiles(dirnames)
 
         for fn in [x for x in dirnames if x != excl]:
@@ -3529,7 +3523,8 @@ class HttpCli(object):
         fk_vols = {
             vol: (vol.flags["fk"], 2 if "fka" in vol.flags else 1)
             for vp, vol in self.asrv.vfs.all_vols.items()
-            if "fk" in vol.flags and (vp in self.rvol or vp in self.upvol)
+            if "fk" in vol.flags
+            and (self.uname in vol.axs.uread or self.uname in vol.axs.upget)
         }
         for vol in self.asrv.vfs.all_vols.values():
             cur = idx.get_cur(vol.realpath)
@@ -3800,7 +3795,7 @@ class HttpCli(object):
 
         elif self.can_get and self.avn:
             axs = self.avn.axs
-            if self.uname not in axs.uhtml and "*" not in axs.uhtml:
+            if self.uname not in axs.uhtml:
                 pass
             elif is_dir:
                 for fn in ("index.htm", "index.html"):
@@ -4021,7 +4016,7 @@ class HttpCli(object):
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
             if v is not None:
-                return self.tx_zip(k, v, self.vpath, vn, rem, [], self.args.ed)
+                return self.tx_zip(k, v, self.vpath, vn, rem, [])
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
             rem,
@@ -4052,13 +4047,13 @@ class HttpCli(object):
             pass
 
         # show dotfiles if permitted and requested
-        if not self.args.ed or (
+        if not self.can_dot or (
             "dots" not in self.uparam and (is_ls or "dots" not in self.cookies)
         ):
             ls_names = exclude_dotfiles(ls_names)
 
-        add_fk = vn.flags.get("fk")
-        fk_alg = 2 if "fka" in vn.flags else 1
+        add_fk = vf.get("fk")
+        fk_alg = 2 if "fka" in vf else 1
 
         dirs = []
         files = []

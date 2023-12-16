@@ -44,6 +44,7 @@ if MACOS:
 from copyparty.__init__ import E
 from copyparty.__main__ import init_E
 from copyparty.util import FHC, Garda, Unrecv
+from copyparty.u2idx import U2idx
 
 init_E(E)
 
@@ -106,32 +107,37 @@ def get_ramdisk():
 
 
 class Cfg(Namespace):
-    def __init__(self, a=None, v=None, c=None):
+    def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt dotsrch e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw rand smb th_no_crop vague_403 vc ver xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw rand smb srch_dbg stats th_no_crop vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "dotpart no_rescan no_sendfile no_voldump plain_ip"
+        ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
         ex = "ah_cli ah_gen css_browser hist ipa_re js_browser no_forget no_hash no_idx nonsus_urls"
         ka.update(**{k: None for k in ex.split()})
 
-        ex = "s_thead s_tbody th_convt"
+        ex = "hash_mt srch_time"
+        ka.update(**{k: 1 for k in ex.split()})
+
+        ex = "reg_cap s_thead s_tbody th_convt"
         ka.update(**{k: 9 for k in ex.split()})
 
-        ex = "df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp theme themes turbo"
+        ex = "db_act df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname doctitle favico hdr_au_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
+        ex = "ah_alg bname doctitle exit favico hdr_au_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
 
-        ex = "exp_lg exp_md"
+        ex = "exp_lg exp_md th_coversd"
         ka.update(**{k: {} for k in ex.split()})
+
+        ka.update(ka0)
 
         super(Cfg, self).__init__(
             a=a or [],
@@ -139,18 +145,21 @@ class Cfg(Namespace):
             c=c,
             E=E,
             dbd="wal",
-            s_wr_sz=512 * 1024,
-            th_size="320x256",
             fk_salt="a" * 16,
-            unpost=600,
-            u2sort="s",
-            u2ts="c",
-            sort="href",
-            mtp=[],
+            lang="eng",
+            log_badpwd=1,
+            logout=573,
             mte={"a": True},
             mth={},
-            lang="eng",
-            logout=573,
+            mtp=[],
+            s_wr_sz=512 * 1024,
+            sort="href",
+            srch_hits=99999,
+            th_size="320x256",
+            u2sort="s",
+            u2ts="c",
+            unpost=600,
+            warksalt="hunter2",
             **ka
         )
 
@@ -186,11 +195,16 @@ class VSock(object):
 
 
 class VHttpSrv(object):
-    def __init__(self):
+    def __init__(self, args, asrv, log):
+        self.args = args
+        self.asrv = asrv
+        self.log = log
+
         self.broker = NullBroker()
         self.prism = None
         self.bans = {}
         self.nreq = 0
+        self.nsus = 0
 
         aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
@@ -200,31 +214,38 @@ class VHttpSrv(object):
         self.g403 = Garda("")
         self.gurl = Garda("")
 
+        self.u2idx = None
         self.ptn_cc = re.compile(r"[\x00-\x1f]")
 
     def cachebuster(self):
         return "a"
 
+    def get_u2idx(self):
+        self.u2idx = self.u2idx or U2idx(self)
+        return self.u2idx
+
 
 class VHttpConn(object):
     def __init__(self, args, asrv, log, buf):
+        self.t0 = time.time()
         self.s = VSock(buf)
         self.sr = Unrecv(self.s, None)  # type: ignore
+        self.aclose = {}
         self.addr = ("127.0.0.1", "42069")
         self.args = args
         self.asrv = asrv
-        self.nid = None
+        self.bans = {}
+        self.freshen_pwd = 0.0
+        self.hsrv = VHttpSrv(args, asrv, log)
+        self.ico = None
+        self.lf_url = None
         self.log_func = log
         self.log_src = "a"
-        self.lf_url = None
-        self.hsrv = VHttpSrv()
-        self.bans = {}
-        self.aclose = {}
-        self.u2fh = FHC()
         self.mutex = threading.Lock()
-        self.nreq = -1
         self.nbyte = 0
-        self.ico = None
+        self.nid = None
+        self.nreq = -1
         self.thumbcli = None
-        self.freshen_pwd = 0.0
-        self.t0 = time.time()
+        self.u2fh = FHC()
+
+        self.get_u2idx = self.hsrv.get_u2idx

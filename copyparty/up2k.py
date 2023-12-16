@@ -2664,12 +2664,7 @@ class Up2k(object):
                 not ret["hash"]
                 and "fk" in vfs.flags
                 and not self.args.nw
-                and (
-                    cj["user"] in vfs.axs.uread
-                    or cj["user"] in vfs.axs.upget
-                    or "*" in vfs.axs.uread
-                    or "*" in vfs.axs.upget
-                )
+                and (cj["user"] in vfs.axs.uread or cj["user"] in vfs.axs.upget)
             ):
                 alg = 2 if "fka" in vfs.flags else 1
                 ap = absreal(djoin(job["ptop"], job["prel"], job["name"]))

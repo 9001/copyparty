@@ -1074,6 +1074,17 @@ def nuprint(msg: str) -> None:
     uprint("{}\n".format(msg))
 
 
+def dedent(txt: str) -> str:
+    pad = 64
+    lns = txt.replace("\r", "").split("\n")
+    for ln in lns:
+        zs = ln.lstrip()
+        pad2 = len(ln) - len(zs)
+        if zs and pad > pad2:
+            pad = pad2
+    return "\n".join([ln[pad:] for ln in lns])
+
+
 def rice_tid() -> str:
     tid = threading.current_thread().ident
     c = sunpack(b"B" * 5, spack(b">Q", tid)[-5:])

@@ -72,6 +72,7 @@ class AXS(object):
         upget: Optional[Union[list[str], set[str]]] = None,
         uhtml: Optional[Union[list[str], set[str]]] = None,
         uadmin: Optional[Union[list[str], set[str]]] = None,
+        udot: Optional[Union[list[str], set[str]]] = None,
     ) -> None:
         self.uread: set[str] = set(uread or [])
         self.uwrite: set[str] = set(uwrite or [])
@@ -81,9 +82,10 @@ class AXS(object):
         self.upget: set[str] = set(upget or [])
         self.uhtml: set[str] = set(uhtml or [])
         self.uadmin: set[str] = set(uadmin or [])
+        self.udot: set[str] = set(udot or [])
 
     def __repr__(self) -> str:
-        ks = "uread uwrite umove udel uget upget uhtml uadmin".split()
+        ks = "uread uwrite umove udel uget upget uhtml uadmin udot".split()
         return "AXS(%s)" % (", ".join("%s=%r" % (k, self.__dict__[k]) for k in ks),)
 
 
@@ -336,6 +338,8 @@ class VFS(object):
         self.apget: dict[str, list[str]] = {}
         self.ahtml: dict[str, list[str]] = {}
         self.aadmin: dict[str, list[str]] = {}
+        self.adot: dict[str, list[str]] = {}
+        self.all_vols: dict[str, VFS] = {}
 
         if realpath:
             rp = realpath + ("" if realpath.endswith(os.sep) else os.sep)
@@ -445,8 +449,8 @@ class VFS(object):
 
     def can_access(
         self, vpath: str, uname: str
-    ) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
-        """can Read,Write,Move,Delete,Get,Upget,Admin"""
+    ) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
+        """can Read,Write,Move,Delete,Get,Upget,Admin,Dot"""
         if vpath:
             vn, _ = self._find(undot(vpath))
         else:
@@ -454,13 +458,14 @@ class VFS(object):
 
         c = vn.axs
         return (
-            uname in c.uread or "*" in c.uread,
-            uname in c.uwrite or "*" in c.uwrite,
-            uname in c.umove or "*" in c.umove,
-            uname in c.udel or "*" in c.udel,
-            uname in c.uget or "*" in c.uget,
-            uname in c.upget or "*" in c.upget,
-            uname in c.uadmin or "*" in c.uadmin,
+            uname in c.uread,
+            uname in c.uwrite,
+            uname in c.umove,
+            uname in c.udel,
+            uname in c.uget,
+            uname in c.upget,
+            uname in c.uadmin,
+            uname in c.udot,
         )
         # skip uhtml because it's rarely needed
 
@@ -492,7 +497,7 @@ class VFS(object):
             (will_del, c.udel, "delete"),
             (will_get, c.uget, "get"),
         ]:
-            if req and (uname not in d and "*" not in d) and uname != LEELOO_DALLAS:
+            if req and uname not in d and uname != LEELOO_DALLAS:
                 if vpath != cvpath and vpath != "." and self.log:
                     ap = vn.canonical(rem)
                     t = "{} has no {} in [{}] => [{}] => [{}]"
@@ -553,7 +558,7 @@ class VFS(object):
                 for pset in permsets:
                     ok = True
                     for req, lst in zip(pset, axs):
-                        if req and uname not in lst and "*" not in lst:
+                        if req and uname not in lst:
                             ok = False
                     if ok:
                         break
@@ -577,7 +582,7 @@ class VFS(object):
         seen: list[str],
         uname: str,
         permsets: list[list[bool]],
-        dots: bool,
+        wantdots: bool,
         scandir: bool,
         lstat: bool,
         subvols: bool = True,
@@ -621,6 +626,10 @@ class VFS(object):
                     rm1.append(le)
             _ = [vfs_ls.remove(x) for x in rm1]  # type: ignore
 
+        dots_ok = wantdots and uname in dbv.axs.udot
+        if not dots_ok:
+            vfs_ls = [x for x in vfs_ls if "/." not in "/" + x[0]]
+
         seen = seen[:] + [fsroot]
         rfiles = [x for x in vfs_ls if not stat.S_ISDIR(x[1].st_mode)]
         rdirs = [x for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
@@ -633,13 +642,13 @@ class VFS(object):
         yield dbv, vrem, rel, fsroot, rfiles, rdirs, vfs_virt
 
         for rdir, _ in rdirs:
-            if not dots and rdir.startswith("."):
+            if not dots_ok and rdir.startswith("."):
                 continue
 
             wrel = (rel + "/" + rdir).lstrip("/")
             wrem = (rem + "/" + rdir).lstrip("/")
             for x in self.walk(
-                wrel, wrem, seen, uname, permsets, dots, scandir, lstat, subvols
+                wrel, wrem, seen, uname, permsets, wantdots, scandir, lstat, subvols
             ):
                 yield x
 
@@ -647,11 +656,13 @@ class VFS(object):
             return
 
         for n, vfs in sorted(vfs_virt.items()):
-            if not dots and n.startswith("."):
+            if not dots_ok and n.startswith("."):
                 continue
 
             wrel = (rel + "/" + n).lstrip("/")
-            for x in vfs.walk(wrel, "", seen, uname, permsets, dots, scandir, lstat):
+            for x in vfs.walk(
+                wrel, "", seen, uname, permsets, wantdots, scandir, lstat
+            ):
                 yield x
 
     def zipgen(
@@ -660,7 +671,6 @@ class VFS(object):
         vrem: str,
         flt: set[str],
         uname: str,
-        dots: bool,
         dirs: bool,
         scandir: bool,
         wrap: bool = True,
@@ -670,7 +680,7 @@ class VFS(object):
         # if single folder: the folder itself is the top-level item
         folder = "" if flt or not wrap else (vpath.split("/")[-1].lstrip(".") or "top")
 
-        g = self.walk(folder, vrem, [], uname, [[True, False]], dots, scandir, False)
+        g = self.walk(folder, vrem, [], uname, [[True, False]], True, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
             if flt:
                 files = [x for x in files if x[0] in flt]
@@ -688,18 +698,6 @@ class VFS(object):
             vpaths = [vpath + "/" + n for n in fnames] if vpath else fnames
             apaths = [os.path.join(apath, n) for n in fnames]
             ret = list(zip(vpaths, apaths, files))
-
-            if not dots:
-                # dotfile filtering based on vpath (intended visibility)
-                ret = [x for x in ret if "/." not in "/" + x[0]]
-
-                zel = [ze for ze in rd if ze[0].startswith(".")]
-                for ze in zel:
-                    rd.remove(ze)
-
-                zsl = [zs for zs in vd.keys() if zs.startswith(".")]
-                for zs in zsl:
-                    del vd[zs]
 
             for f in [{"vp": v, "ap": a, "st": n[1]} for v, a, n in ret]:
                 yield f
@@ -958,16 +956,17 @@ class AuthSrv(object):
                 try:
                     self._l(ln, 5, "volume access config:")
                     sk, sv = ln.split(":")
-                    if re.sub("[rwmdgGha]", "", sk) or not sk:
+                    if re.sub("[rwmdgGha.]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
                         raise Exception(err)
                     if " " in re.sub(", *", "", sv).strip():
                         err = "list of users is not comma-separated; "
                         raise Exception(err)
+                    assert vp is not None
                     self._read_vol_str(sk, sv.replace(" ", ""), daxs[vp], mflags[vp])
                     continue
                 except:
-                    err += "accs entries must be 'rwmdgGha: user1, user2, ...'"
+                    err += "accs entries must be 'rwmdgGha.: user1, user2, ...'"
                     raise Exception(err + SBADCFG)
 
             if cat == catf:
@@ -986,9 +985,11 @@ class AuthSrv(object):
                             fstr += "," + sk
                         else:
                             fstr += ",{}={}".format(sk, sv)
+                            assert vp is not None
                             self._read_vol_str("c", fstr[1:], daxs[vp], mflags[vp])
                             fstr = ""
                     if fstr:
+                        assert vp is not None
                         self._read_vol_str("c", fstr[1:], daxs[vp], mflags[vp])
                     continue
                 except:
@@ -1003,8 +1004,9 @@ class AuthSrv(object):
     def _read_vol_str(
         self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
     ) -> None:
-        if lvl.strip("crwmdgGha"):
-            raise Exception("invalid volflag: {},{}".format(lvl, uname))
+        if lvl.strip("crwmdgGha."):
+            t = "%s,%s" % (lvl, uname) if uname else lvl
+            raise Exception("invalid config value (volume or volflag): %s" % (t,))
 
         if lvl == "c":
             cval: Union[bool, str] = True
@@ -1032,6 +1034,7 @@ class AuthSrv(object):
                 ("w", axs.uwrite),
                 ("m", axs.umove),
                 ("d", axs.udel),
+                (".", axs.udot),
                 ("a", axs.uadmin),
                 ("h", axs.uhtml),
                 ("h", axs.uget),
@@ -1110,7 +1113,7 @@ class AuthSrv(object):
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is <rwmdgGha>[,username][,username] or <c>,<flag>[=args]
+            # permset is <rwmdgGha.>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
                 m = re_vol.match(v_str)
                 if not m:
@@ -1200,14 +1203,21 @@ class AuthSrv(object):
             vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
             vol.root = vfs
 
-        for perm in "read write move del get pget html admin".split():
+        for perm in "read write move del get pget html admin dot".split():
             axs_key = "u" + perm
             unames = ["*"] + list(acct.keys())
+            for vp, vol in vfs.all_vols.items():
+                zx = getattr(vol.axs, axs_key)
+                if "*" in zx:
+                    for usr in unames:
+                        zx.add(usr)
+
+            # aread,... = dict[uname, list[volnames] or []]
             umap: dict[str, list[str]] = {x: [] for x in unames}
             for usr in unames:
                 for vp, vol in vfs.all_vols.items():
                     zx = getattr(vol.axs, axs_key)
-                    if usr in zx or "*" in zx:
+                    if usr in zx:
                         umap[usr].append(vp)
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
@@ -1224,6 +1234,7 @@ class AuthSrv(object):
                 axs.upget,
                 axs.uhtml,
                 axs.uadmin,
+                axs.udot,
             ]:
                 for usr in d:
                     all_users[usr] = 1
@@ -1632,6 +1643,11 @@ class AuthSrv(object):
                     vol.flags.pop(k[1:], None)
                     vol.flags.pop(k)
 
+        for vol in vfs.all_vols.values():
+            if vol.flags.get("dots"):
+                for name in vol.axs.uread:
+                    vol.axs.udot.add(name)
+
         if errors:
             sys.exit(1)
 
@@ -1650,12 +1666,14 @@ class AuthSrv(object):
                 [" write", "uwrite"],
                 ["  move", "umove"],
                 ["delete", "udel"],
+                ["  dots", "udot"],
                 ["   get", "uget"],
-                [" upget", "upget"],
+                [" upGet", "upget"],
                 ["  html", "uhtml"],
                 ["uadmin", "uadmin"],
             ]:
                 u = list(sorted(getattr(zv.axs, attr)))
+                u = ["*"] if "*" in u else u
                 u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
                 u = u if u else "\033[36m--none--\033[0m"
                 t += "\n|  {}:  {}".format(txt, u)
@@ -1812,7 +1830,7 @@ class AuthSrv(object):
                 raise Exception("volume not found: " + zs)
 
         self.log(str({"users": users, "vols": vols, "flags": flags}))
-        t = "/{}: read({}) write({}) move({}) del({}) get({}) upget({}) uadmin({})"
+        t = "/{}: read({}) write({}) move({}) del({}) dots({}) get({}) upGet({}) uadmin({})"
         for k, zv in self.vfs.all_vols.items():
             vc = zv.axs
             vs = [
@@ -1821,6 +1839,7 @@ class AuthSrv(object):
                 vc.uwrite,
                 vc.umove,
                 vc.udel,
+                vc.udot,
                 vc.uget,
                 vc.upget,
                 vc.uhtml,
@@ -1963,6 +1982,7 @@ class AuthSrv(object):
                 "w": "uwrite",
                 "m": "umove",
                 "d": "udel",
+                ".": "udot",
                 "g": "uget",
                 "G": "upget",
                 "h": "uhtml",
@@ -2169,7 +2189,7 @@ def upgrade_cfg_fmt(
             else:
                 sn = sn.replace(",", ", ")
             ret.append("    " + sn)
-        elif sn[:1] in "rwmdgGha":
+        elif sn[:1] in "rwmdgGha.":
             if cat != catx:
                 cat = catx
                 ret.append(cat)
