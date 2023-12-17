@@ -4,6 +4,9 @@ from __future__ import print_function, unicode_literals
 
 import io
 import os
+import time
+import json
+import pprint
 import shutil
 import tarfile
 import tempfile
@@ -66,7 +69,9 @@ class TestHttpCli(unittest.TestCase):
 
         self.assertEqual(self.curl("?tar", "x")[1][:17], "\nJ2EOT")
 
-        # search
+        ##
+        ## search
+
         up2k = Up2k(self)
         u2idx = U2idx(self)
         allvols = list(self.asrv.vfs.all_vols.values())
@@ -91,15 +96,55 @@ class TestHttpCli(unittest.TestCase):
         xe = "a/da/f4 a/f3 f0 t/f1"
         self.assertEqual(x, xe)
 
+        ##
+        ## dirkeys
+
+        os.mkdir("v")
+        with open("v/f1.txt", "wb") as f:
+            f.write(b"a")
+        os.rename("a", "v/a")
+        os.rename(".b", "v/.b")
+
+        vcfg = [
+            ".::r.,u1:g,u2:c,dk",
+            "v/a:v/a:r.,u1:g,u2:c,dk",
+            "v/.b:v/.b:r.,u1:g,u2:c,dk"
+        ]
+        self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"])
+        self.asrv = AuthSrv(self.args, self.log)
+        zj = json.loads(self.curl("?ls", "u1")[1])
+        url = "?k=" + zj["dk"]
+        # should descend into folders, but not other volumes:
+        self.assertEqual(self.tardir(url, "u2"), "f0 t/f1 v/f1.txt")
+
+        zj = json.loads(self.curl("v?ls", "u1")[1])
+        url = "v?k=" + zj["dk"]
+        self.assertEqual(self.tarsel(url, "u2", ["f1.txt", "a", ".b"]), "f1.txt")
+
     def tardir(self, url, uname):
-        h, b = self.curl("/" + url + "?tar", uname, True)
+        top = url.split("?")[0]
+        top = ("top" if not top else top.lstrip(".").split("/")[0]) + "/"
+        url += ("&" if "?" in url else "?") + "tar"
+        h, b = self.curl(url, uname, True)
         tar = tarfile.open(fileobj=io.BytesIO(b), mode="r|").getnames()
-        top = ("top" if not url else url.lstrip(".").split("/")[0]) + "/"
-        assert len(tar) == len([x for x in tar if x.startswith(top)])
+        if len(tar) != len([x for x in tar if x.startswith(top)]):
+            raise Exception("bad-prefix:", tar)
         return " ".join([x[len(top):] for x in tar])
 
-    def curl(self, url, uname, binary=False):
-        conn = tu.VHttpConn(self.args, self.asrv, self.log, hdr(url, uname))
+    def tarsel(self, url, uname, sel):
+        url += ("&" if "?" in url else "?") + "tar"
+        zs = '--XD\r\nContent-Disposition: form-data; name="act"\r\n\r\nzip\r\n--XD\r\nContent-Disposition: form-data; name="files"\r\n\r\n'
+        zs += "\r\n".join(sel) + '\r\n--XD--\r\n'
+        zb = zs.encode("utf-8")
+        hdr = "POST /%s HTTP/1.1\r\nPW: %s\r\nConnection: close\r\nContent-Type: multipart/form-data; boundary=XD\r\nContent-Length: %d\r\n\r\n"
+        req = (hdr % (url, uname, len(zb))).encode("utf-8") + zb
+        h, b = self.curl("/" + url, uname, True, req)
+        tar = tarfile.open(fileobj=io.BytesIO(b), mode="r|").getnames()
+        return " ".join(tar)
+
+    def curl(self, url, uname, binary=False, req=b""):
+        req = req or hdr(url, uname)
+        conn = tu.VHttpConn(self.args, self.asrv, self.log, req)
         HttpCli(conn).run()
         if binary:
             h, b = conn.s._reply.split(b"\r\n\r\n", 1)

@@ -551,7 +551,12 @@ class VFS(object):
             # no vfs nodes in the list of real inodes
             real = [x for x in real if x[0] not in self.nodes]
 
+            dbv = self.dbv or self
             for name, vn2 in sorted(self.nodes.items()):
+                if vn2.dbv == dbv and self.flags.get("dk"):
+                    virt_vis[name] = vn2
+                    continue
+
                 ok = False
                 zx = vn2.axs
                 axs = [zx.uread, zx.uwrite, zx.umove, zx.udel, zx.uget]
@@ -1405,6 +1410,13 @@ class AuthSrv(object):
             if fk:
                 vol.flags["fk"] = int(fk) if fk is not True else 8
                 have_fk = True
+
+            dk = vol.flags.get("dk")
+            dks = vol.flags.get("dks")
+            if dks and not dk:
+                dk = dks
+            if dk:
+                vol.flags["dk"] = int(dk) if dk is not True else 8
 
         if have_fk and re.match(r"^[0-9\.]+$", self.args.fk_salt):
             self.log("filekey salt: {}".format(self.args.fk_salt))

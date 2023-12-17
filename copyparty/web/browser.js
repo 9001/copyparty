@@ -1355,7 +1355,7 @@ function set_files_html(html) {
 var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 	noih = /[?&]v\b/.exec('' + location),
 	hash0 = location.hash,
-	mp;
+	dk, mp;
 
 
 var mpl = (function () {
@@ -1475,7 +1475,7 @@ var mpl = (function () {
 		if (!c)
 			return url;
 
-		return url + (url.indexOf('?') < 0 ? '?' : '&') + 'th=' + (can_ogg ? 'opus' : 'caf');
+		return addq(url, 'th=') + (can_ogg ? 'opus' : 'caf');
 	};
 
 	r.pp = function () {
@@ -1526,7 +1526,7 @@ var mpl = (function () {
 			}
 
 			if (cover) {
-				cover += (cover.indexOf('?') === -1 ? '?' : '&') + 'th=j';
+				cover = addq(cover, 'th=j');
 				tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 			}
 		}
@@ -1616,8 +1616,8 @@ function MPlayer() {
 			link = tds[1].getElementsByTagName('a');
 
 		link = link[link.length - 1];
-		var url = noq_href(link),
-			m = re_audio.exec(url);
+		var url = link.getAttribute('href'),
+			m = re_audio.exec(url.split('?')[0]);
 
 		if (m) {
 			var tid = link.getAttribute('id');
@@ -1711,8 +1711,7 @@ function MPlayer() {
 	}
 
 	r.preload = function (url, full) {
-		url = mpl.acode(url);
-		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+		url = addq(mpl.acode(url), 'cache=987');
 		mpl.preload_url = full ? url : null;
 		var t0 = Date.now();
 
@@ -2302,8 +2301,7 @@ function dl_song() {
 		return toast.inf(10, L.f_dls);
 	}
 
-	var url = mp.tracks[mp.au.tid];
-	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+	var url = addq(mp.tracks[mp.au.tid], 'cache=987');
 	dl_file(url);
 }
 
@@ -2952,8 +2950,7 @@ function play(tid, is_ev, seek) {
 		widget.open();
 	}
 
-	var url = mpl.acode(mp.tracks[tid]);
-	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+	var url = addq(mpl.acode(mp.tracks[tid]), 'cache=987');
 
 	if (mp.au.rsrc == url)
 		mp.au.currentTime = 0;
@@ -4100,7 +4097,7 @@ var showfile = (function () {
 	};
 
 	r.active = function () {
-		return location.search.indexOf('doc=') + 1;
+		return !!/[?&]doc=/.exec(location.search);
 	};
 
 	r.getlang = function (fn) {
@@ -4141,12 +4138,15 @@ var showfile = (function () {
 	};
 
 	r.show = function (url, no_push) {
-		var xhr = new XHR();
+		var xhr = new XHR(),
+			m = /[?&](k=[^&]+)/.exec(url);
+
+		url = url.split('?')[0] + (m ? '?' + m[1] : '');
 		xhr.url = url;
 		xhr.fname = uricom_dec(url.split('/').pop());
 		xhr.no_push = no_push;
 		xhr.ts = Date.now();
-		xhr.open('GET', url.split('?')[0], true);
+		xhr.open('GET', url, true);
 		xhr.onprogress = loading;
 		xhr.onload = xhr.onerror = load_cb;
 		xhr.send();
@@ -4184,14 +4184,14 @@ var showfile = (function () {
 		var url = doc[0],
 			lnh = doc[1],
 			txt = doc[2],
-			name = url.split('/').pop(),
+			name = url.split('?')[0].split('/').pop(),
 			tname = uricom_dec(name),
 			lang = r.getlang(name),
 			is_md = lang == 'md';
 
 		ebi('files').style.display = ebi('gfiles').style.display = ebi('lazy').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
 		ebi('dldoc').setAttribute('href', url);
-		ebi('editdoc').setAttribute('href', url + (url.indexOf('?') > 0 ? '&' : '?') + 'edit');
+		ebi('editdoc').setAttribute('href', addq(url, 'edit'));
 		ebi('editdoc').style.display = (has(perms, 'write') && (is_md || has(perms, 'delete'))) ? '' : 'none';
 
 		var wr = ebi('bdoc'),
@@ -4242,7 +4242,7 @@ var showfile = (function () {
 		wintitle(tname + ' \u2014 ');
 		document.documentElement.scrollTop = 0;
 		var hfun = no_push ? hist_replace : hist_push;
-		hfun(get_evpath() + '?doc=' + url.split('/').pop());
+		hfun(get_evpath() + '?doc=' + name);  // can't dk: server wants dk and js needs fk
 
 		qsr('#docname');
 		el = mknod('span', 'docname');
@@ -4441,7 +4441,7 @@ var thegrid = (function () {
 			if (!force)
 				return;
 
-			hist_push(get_evpath());
+			hist_push(get_evpath() + (dk ? '?k=' + dk : ''));
 			wintitle();
 		}
 
@@ -4666,10 +4666,10 @@ var thegrid = (function () {
 				ref = ao.getAttribute('id'),
 				isdir = href.endsWith('/'),
 				ac = isdir ? ' class="dir"' : '',
-				ihref = href;
+				ihref = ohref;
 
 			if (r.thumbs) {
-				ihref += '?th=' + (have_webp ? 'w' : 'j');
+				ihref = addq(ihref, 'th=') + (have_webp ? 'w' : 'j');
 				if (r.full)
 					ihref += 'f'
 				if (href == "#")
@@ -4703,7 +4703,7 @@ var thegrid = (function () {
 				}
 				ihref = SR + '/.cpr/ico/' + ext;
 			}
-			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i';
+			ihref = addq(ihref, 'cache=i');
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +
@@ -5722,12 +5722,15 @@ var treectl = (function () {
 	};
 
 	function get_tree(top, dst, rst) {
-		var xhr = new XHR();
+		var xhr = new XHR(),
+			m = /[?&](k=[^&]+)/.exec(dst),
+			k = m ? '&' + m[1] : dk ? '&k=' + dk : '';
+
 		xhr.top = top;
 		xhr.dst = dst;
 		xhr.rst = rst;
 		xhr.ts = Date.now();
-		xhr.open('GET', dst + '?tree=' + top + (r.dots ? '&dots' : ''), true);
+		xhr.open('GET', addq(dst, 'tree=') + top + (r.dots ? '&dots' : '') + k, true);
 		xhr.onload = xhr.onerror = recvtree;
 		xhr.send();
 		enspin('#tree');
@@ -5804,13 +5807,19 @@ var treectl = (function () {
 
 	function reload_tree() {
 		var cdir = r.nextdir || get_vpath(),
+			cevp = get_evpath(),
 			links = QSA('#treeul a+a'),
 			nowrap = QS('#tree.nowrap') && QS('#hovertree.on'),
 			act = null;
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = uricom_dec(links[a].getAttribute('href')),
+			var qhref = links[a].getAttribute('href'),
+				ehref = qhref.split('?')[0],
+				href = uricom_dec(ehref),
 				cl = '';
+
+			if (dk && ehref == cevp && !/[?&]k=/.exec(qhref))
+				links[a].setAttribute('href', addq(qhref, 'k=') + dk);
 
 			if (href == cdir) {
 				act = links[a];
@@ -5904,12 +5913,15 @@ var treectl = (function () {
 	}
 
 	r.reqls = function (url, hpush, back) {
-		var xhr = new XHR();
+		var xhr = new XHR(),
+			m = /[?&](k=[^&]+)/.exec(url),
+			k = m ? '&' + m[1] : dk ? '&k=' + dk : '';
+
 		xhr.top = url.split('?')[0];
 		xhr.back = back
 		xhr.hpush = hpush;
 		xhr.ts = Date.now();
-		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : ''), true);
+		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : '') + k, true);
 		xhr.onload = xhr.onerror = recvls;
 		xhr.send();
 
@@ -5967,6 +5979,7 @@ var treectl = (function () {
 
 		read_dsort(res.dsort);
 		dfull = res.dfull;
+		dk = res.dk;
 
 		srvinf = res.srvinf;
 		try {
@@ -5975,14 +5988,14 @@ var treectl = (function () {
 		catch (ex) { }
 
 		if (this.hpush && !showfile.active())
-			hist_push(this.top);
+			hist_push(this.top + (dk ? '?k=' + dk : ''));
 
 		if (!this.back) {
 			var dirs = [];
 			for (var a = 0; a < res.dirs.length; a++)
 				dirs.push(res.dirs[a].href.split('/')[0].split('?')[0]);
 
-			rendertree({ "a": dirs }, this.ts, ".", get_evpath());
+			rendertree({ "a": dirs }, this.ts, ".", get_evpath() + (dk ? '?k=' + dk : ''));
 		}
 
 		r.gentab(this.top, res);
@@ -6083,7 +6096,7 @@ var treectl = (function () {
 			if (lang) {
 				showfile.files.push({ 'id': id, 'name': fname });
 				if (lang == 'md')
-					tn.href += tn.href.indexOf('?') < 0 ? '?v' : '&v';
+					tn.href = addq(tn.href, 'v');
 			}
 
 			if (tn.lead == '-')
@@ -6159,7 +6172,7 @@ var treectl = (function () {
 				url = url.href;
 				var mt = m[0] == 'a' ? 'audio' : /\.(webm|mkv)($|\?)/i.exec(url) ? 'video' : 'image'
 				if (mt == 'image') {
-					url += url.indexOf('?') < 0 ? '?cache' : '&cache';
+					url = addq(url, 'cache');
 					console.log(url);
 					new Image().src = url;
 				}
@@ -6262,7 +6275,9 @@ var treectl = (function () {
 		keys.sort(function (a, b) { return a.localeCompare(b); });
 		for (var a = 0; a < keys.length; a++) {
 			var kk = keys[a],
-				ks = kk.slice(1),
+				m = /(\?k=[^\n]+)/.exec(kk),
+				kdk = m ? m[1] : '',
+				ks = kk.replace(kdk, '').slice(1),
 				ded = ks.endsWith('\n'),
 				k = uricom_sdec(ded ? ks.replace(/\n$/, '') : ks),
 				hek = esc(k[0]),
@@ -6270,7 +6285,7 @@ var treectl = (function () {
 				url = '/' + (top ? top + uek : uek) + '/',
 				sym = res[kk] ? '-' : '+',
 				link = '<a href="#">' + sym + '</a><a href="' +
-					url + '">' + hek + '</a>';
+					url + kdk + '">' + hek + '</a>';
 
 			if (res[kk]) {
 				var subtree = parsetree(res[kk], url.slice(1));
@@ -6311,16 +6326,24 @@ var treectl = (function () {
 		if (!e.state)
 			return;
 
-		var url = new URL(e.state, "https://" + document.location.host);
-		var hbase = url.pathname;
-		var cbase = document.location.pathname;
-		if (url.search.indexOf('doc=') + 1 && hbase == cbase)
+		var url = new URL(e.state, "https://" + location.host),
+			req = url.pathname,
+			hbase = req,
+			cbase = location.pathname,
+			mdoc = /[?&]doc=/.exec('' + url),
+			mdk = /[?&](k=[^&]+)/.exec('' + url);
+
+		if (mdoc && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);
 
-		r.goto(url.pathname, false, true);
+		if (mdk)
+			req += '?' + mdk[1];
+
+		r.goto(req, false, true);
 	};
 
-	hist_replace(get_evpath() + location.hash);
+	var evp = get_evpath() + (dk ? '?k=' + dk : '');
+	hist_replace(evp + location.hash);
 	r.onscroll = onscroll;
 	return r;
 })();
@@ -6945,11 +6968,11 @@ var arcfmt = (function () {
 			if (!/^(zip|tar|pax|tgz|txz)$/.exec(txt))
 				continue;
 
-			var ofs = href.lastIndexOf('?');
-			if (ofs < 0)
+			var m = /(.*[?&])(tar|zip)([^&]*)(.*)$/.exec(href);
+			if (!m)
 				throw new Error('missing arg in url');
 
-			o.setAttribute("href", href.slice(0, ofs + 1) + arg);
+			o.setAttribute("href", m[1] + arg + m[4]);
 			o.textContent = fmt.split('_')[0];
 		}
 		ebi('selzip').textContent = fmt.split('_')[0];
@@ -7012,12 +7035,19 @@ var msel = (function () {
 			vbase = get_evpath();
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
-			var href = noq_href(links[a]).replace(/\/$/, ""),
+			var qhref = links[a].getAttribute('href'),
+				href = qhref.split('?')[0].replace(/\/$/, ""),
 				item = {};
 
 			item.id = links[a].getAttribute('id');
 			item.sel = clgot(links[a].closest('tr'), 'sel');
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
+
+			if (dk) {
+				var m = /[?&](k=[^&]+)/.exec(qhref);
+				item.q = m ? '?' + m[1] : '';
+			}
+			else item.q = '';
 
 			r.all.push(item);
 			if (item.sel)
@@ -7135,6 +7165,9 @@ var msel = (function () {
 			frm = mknod('form'),
 			txt = [];
 
+		if (dk)
+			arg += '&k=' + dk;
+
 		for (var a = 0; a < sel.length; a++)
 			txt.push(vsplit(sel[a].vp)[1]);
 
@@ -7159,7 +7192,7 @@ var msel = (function () {
 		ev(e);
 		var sel = r.getsel();
 		for (var a = 0; a < sel.length; a++)
-			dl_file(sel[a].vp);
+			dl_file(sel[a].vp + sel[a].q);
 	};
 	r.render = function () {
 		var tds = QSA('#files tbody td+td+td'),
@@ -7635,7 +7668,7 @@ var unpost = (function () {
 
 	function linklist() {
 		var ret = [],
-			base = document.location.origin.replace(/\/$/, '');
+			base = location.origin.replace(/\/$/, '');
 
 		for (var a = 0; a < r.files.length; a++)
 			ret.push(base + r.files[a].vp);
@@ -7812,8 +7845,9 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 	tgt = e.target.closest('a[hl]');
 	if (tgt) {
 		var a = ebi(tgt.getAttribute('hl')),
+			href = a.getAttribute('href'),
 			fun = function () {
-				showfile.show(noq_href(a), tgt.getAttribute('lang'));
+				showfile.show(href, tgt.getAttribute('lang'));
 			},
 			szs = ft2dict(a.closest('tr'))[0].sz,
 			sz = parseInt(szs.replace(/[, ]/g, ''));

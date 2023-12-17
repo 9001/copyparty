@@ -498,7 +498,7 @@ class HttpCli(object):
             self.can_admin,
             self.can_dot,
         ) = (
-            avn.can_access("", self.uname) if avn else [False] * 7
+            avn.can_access("", self.uname) if avn else [False] * 8
         )
         self.avn = avn
         self.vn = vn
@@ -1894,7 +1894,12 @@ class HttpCli(object):
 
         v = self.uparam[k]
 
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
+        if self._use_dirkey():
+            vn = self.vn
+            rem = self.rem
+        else:
+            vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
+
         zs = self.parser.require("files", 1024 * 1024)
         if not zs:
             raise Pebkac(422, "need files list")
@@ -2770,6 +2775,27 @@ class HttpCli(object):
 
         return file_lastmod, True
 
+    def _use_dirkey(self, ap: str = "") -> bool:
+        if self.can_read or not self.can_get:
+            return False
+
+        req = self.uparam.get("k") or ""
+        if not req:
+            return False
+
+        dk_len = self.vn.flags.get("dk")
+        if not dk_len:
+            return False
+
+        ap = ap or self.vn.canonical(self.rem)
+        zs = self.gen_fk(2, self.args.dk_salt, ap, 0, 0)[:dk_len]
+        if req == zs:
+            return True
+
+        t = "wrong dirkey, want %s, got %s\n  vp: %s\n  ap: %s"
+        self.log(t % (zs, req, self.req, ap), 6)
+        return False
+
     def _expand(self, txt: str, phs: list[str]) -> str:
         for ph in phs:
             if ph.startswith("hdr."):
@@ -3446,7 +3472,7 @@ class HttpCli(object):
 
             dst = dst[len(top) + 1 :]
 
-        ret = self.gen_tree(top, dst)
+        ret = self.gen_tree(top, dst, self.uparam.get("k", ""))
         if self.is_vproxied:
             parents = self.args.R.split("/")
             for parent in reversed(parents):
@@ -3456,18 +3482,25 @@ class HttpCli(object):
         self.reply(zs.encode("utf-8"), mime="application/json")
         return True
 
-    def gen_tree(self, top: str, target: str) -> dict[str, Any]:
+    def gen_tree(self, top: str, target: str, dk: str) -> dict[str, Any]:
         ret: dict[str, Any] = {}
         excl = None
         if target:
             excl, target = (target.split("/", 1) + [""])[:2]
-            sub = self.gen_tree("/".join([top, excl]).strip("/"), target)
+            sub = self.gen_tree("/".join([top, excl]).strip("/"), target, dk)
             ret["k" + quotep(excl)] = sub
 
         vfs = self.asrv.vfs
+        dk_sz = False
+        if dk:
+            vn, rem = vfs.get(top, self.uname, False, False)
+            if vn.flags.get("dks") and self._use_dirkey(vn.canonical(rem)):
+                dk_sz = vn.flags.get("dk")
+
         dots = False
+        fsroot = ""
         try:
-            vn, rem = vfs.get(top, self.uname, True, False)
+            vn, rem = vfs.get(top, self.uname, not dk_sz, False)
             fsroot, vfs_ls, vfs_virt = vn.ls(
                 rem,
                 self.uname,
@@ -3483,15 +3516,20 @@ class HttpCli(object):
                 if d1 == top:
                     vfs_virt[d2] = vfs  # typechk, value never read
 
-        dirs = []
-
-        dirnames = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+        dirs = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 
         if not dots or "dots" not in self.uparam:
-            dirnames = exclude_dotfiles(dirnames)
+            dirs = exclude_dotfiles(dirs)
 
-        for fn in [x for x in dirnames if x != excl]:
-            dirs.append(quotep(fn))
+        dirs = [quotep(x) for x in dirs if x != excl]
+
+        if dk_sz and fsroot:
+            kdirs = []
+            for dn in dirs:
+                ap = os.path.join(fsroot, dn)
+                zs = self.gen_fk(2, self.args.dk_salt, ap, 0, 0)[:dk_sz]
+                kdirs.append(dn + "?k=" + zs)
+            dirs = kdirs
 
         for x in vfs_virt:
             if x != excl:
@@ -3744,6 +3782,7 @@ class HttpCli(object):
             self.out_headers.pop("X-Robots-Tag", None)
 
         is_dir = stat.S_ISDIR(st.st_mode)
+        is_dk = False
         fk_pass = False
         icur = None
         if is_dir and (e2t or e2d):
@@ -3751,47 +3790,48 @@ class HttpCli(object):
             if idx and hasattr(idx, "p_end"):
                 icur = idx.get_cur(dbv.realpath)
 
-        if self.can_read:
-            th_fmt = self.uparam.get("th")
-            if th_fmt is not None:
-                if is_dir:
-                    vrem = vrem.rstrip("/")
-                    if icur and vrem:
-                        q = "select fn from cv where rd=? and dn=?"
-                        crd, cdn = vrem.rsplit("/", 1) if "/" in vrem else ("", vrem)
-                        # no mojibake support:
-                        try:
-                            cfn = icur.execute(q, (crd, cdn)).fetchone()
-                            if cfn:
-                                fn = cfn[0]
-                                fp = os.path.join(abspath, fn)
-                                if bos.path.exists(fp):
-                                    vrem = "{}/{}".format(vrem, fn).strip("/")
-                                    is_dir = False
-                        except:
-                            pass
-                    else:
-                        for fn in self.args.th_covers:
+        th_fmt = self.uparam.get("th")
+        if th_fmt is not None and (
+            self.can_read or (self.can_get and vn.flags.get("dk"))
+        ):
+            if is_dir:
+                vrem = vrem.rstrip("/")
+                if icur and vrem:
+                    q = "select fn from cv where rd=? and dn=?"
+                    crd, cdn = vrem.rsplit("/", 1) if "/" in vrem else ("", vrem)
+                    # no mojibake support:
+                    try:
+                        cfn = icur.execute(q, (crd, cdn)).fetchone()
+                        if cfn:
+                            fn = cfn[0]
                             fp = os.path.join(abspath, fn)
                             if bos.path.exists(fp):
                                 vrem = "{}/{}".format(vrem, fn).strip("/")
                                 is_dir = False
-                                break
+                    except:
+                        pass
+                else:
+                    for fn in self.args.th_covers:
+                        fp = os.path.join(abspath, fn)
+                        if bos.path.exists(fp):
+                            vrem = "{}/{}".format(vrem, fn).strip("/")
+                            is_dir = False
+                            break
 
-                    if is_dir:
-                        return self.tx_ico("a.folder")
+                if is_dir:
+                    return self.tx_ico("a.folder")
 
-                thp = None
-                if self.thumbcli:
-                    thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
+            thp = None
+            if self.thumbcli:
+                thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
 
-                if thp:
-                    return self.tx_file(thp)
+            if thp:
+                return self.tx_file(thp)
 
-                if th_fmt == "p":
-                    raise Pebkac(404)
+            if th_fmt == "p":
+                raise Pebkac(404)
 
-                return self.tx_ico(rem)
+            return self.tx_ico(rem)
 
         elif self.can_get and self.avn:
             axs = self.avn.axs
@@ -3835,7 +3875,8 @@ class HttpCli(object):
                 )[: vn.flags["fk"]]
                 got = self.uparam.get("k")
                 if got != correct:
-                    self.log("wrong filekey, want {}, got {}".format(correct, got))
+                    t = "wrong filekey, want %s, got %s\n  vp: %s\n  ap: %s"
+                    self.log(t % (correct, got, self.req, abspath), 6)
                     return self.tx_404()
 
             if (
@@ -3851,8 +3892,11 @@ class HttpCli(object):
 
             return self.tx_file(abspath)
 
-        elif is_dir and not self.can_read and not self.can_write:
-            return self.tx_404(True)
+        elif is_dir and not self.can_read:
+            if self._use_dirkey(abspath):
+                is_dk = True
+            elif not self.can_write:
+                return self.tx_404(True)
 
         srv_info = []
 
@@ -3874,7 +3918,7 @@ class HttpCli(object):
         srv_infot = "</span> // <span>".join(srv_info)
 
         perms = []
-        if self.can_read:
+        if self.can_read or is_dk:
             perms.append("read")
         if self.can_write:
             perms.append("write")
@@ -3999,7 +4043,7 @@ class HttpCli(object):
         if not self.conn.hsrv.prism:
             j2a["no_prism"] = True
 
-        if not self.can_read:
+        if not self.can_read and not is_dk:
             if is_ls:
                 return self.tx_ls(ls_ret)
 
@@ -4052,8 +4096,12 @@ class HttpCli(object):
         ):
             ls_names = exclude_dotfiles(ls_names)
 
+        add_dk = vf.get("dk")
         add_fk = vf.get("fk")
         fk_alg = 2 if "fka" in vf else 1
+        if add_dk:
+            zs = self.gen_fk(2, self.args.dk_salt, abspath, 0, 0)[:add_dk]
+            ls_ret["dk"] = cgv["dk"] = zs
 
         dirs = []
         files = []
@@ -4081,6 +4129,12 @@ class HttpCli(object):
                 href += "/"
                 if self.args.no_zip:
                     margin = "DIR"
+                elif add_dk:
+                    zs = absreal(fspath)
+                    margin = '<a href="%s?k=%s&zip" rel="nofollow">zip</a>' % (
+                        quotep(href),
+                        self.gen_fk(2, self.args.dk_salt, zs, 0, 0)[:add_dk],
+                    )
                 else:
                     margin = '<a href="%s?zip" rel="nofollow">zip</a>' % (quotep(href),)
             elif fn in hist:
@@ -4121,6 +4175,11 @@ class HttpCli(object):
                         0 if ANYWIN else inf.st_ino,
                     )[:add_fk],
                 )
+            elif add_dk and is_dir:
+                href = "%s?k=%s" % (
+                    quotep(href),
+                    self.gen_fk(2, self.args.dk_salt, fspath, 0, 0)[:add_dk],
+                )
             else:
                 href = quotep(href)
 
@@ -4138,6 +4197,9 @@ class HttpCli(object):
             else:
                 files.append(item)
                 item["rd"] = rem
+
+        if is_dk and not vf.get("dks"):
+            dirs = []
 
         if (
             self.cookies.get("idxh") == "y"

@@ -91,6 +91,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [gotchas](#gotchas) - behavior that might be unexpected
     * [cors](#cors) - cross-site request config
     * [filekeys](#filekeys) - prevent filename bruteforcing
+        * [dirkeys](#dirkeys) - share specific folders in a volume
     * [password hashing](#password-hashing) - you can hash passwords
     * [https](#https) - both HTTP and HTTPS are accepted
 * [recovering from crashes](#recovering-from-crashes)
@@ -1767,11 +1768,24 @@ cors can be configured with `--acao` and `--acam`, or the protections entirely d
 
 prevent filename bruteforcing
 
-volflag `c,fk` generates filekeys (per-file accesskeys) for all files; users which have full read-access (permission `r`) will then see URLs with the correct filekey `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
+volflag `fk` generates filekeys (per-file accesskeys) for all files; users which have full read-access (permission `r`) will then see URLs with the correct filekey `?k=...` appended to the end, and `g` users must provide that URL including the correct key to avoid a 404
 
 by default, filekeys are generated based on salt (`--fk-salt`) + filesystem-path + file-size + inode (if not windows); add volflag `fka` to generate slightly weaker filekeys which will not be invalidated if the file is edited (only salt + path)
 
 permissions `wG` (write + upget) lets users upload files and receive their own filekeys, still without being able to see other uploads
+
+### dirkeys
+
+share specific folders in a volume  without giving away full read-access to the rest -- the visitor only needs the `g` (get) permission to view the link
+
+volflag `dk` generates dirkeys (per-directory accesskeys) for all folders, granting read-access to that folder; by default only that folder itself, no subfolders
+
+volflag `dks` lets people enter subfolders as well, and also enables download-as-zip/tar
+
+dirkeys are generated based on another salt (`--dk-salt`) + filesystem-path and have a few limitations:
+* the key does not change if the contents of the folder is modified
+  * if you need a new dirkey, either change the salt or rename the folder
+* linking to a textfile (so it opens in the textfile viewer) is not possible if recipient doesn't have read-access
 
 
 ## password hashing

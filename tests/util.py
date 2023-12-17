@@ -146,6 +146,7 @@ class Cfg(Namespace):
             E=E,
             dbd="wal",
             fk_salt="a" * 16,
+            dk_salt="b" * 16,
             lang="eng",
             log_badpwd=1,
             logout=573,

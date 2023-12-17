@@ -392,8 +392,7 @@ window.baguetteBox = (function () {
     }
 
     function dlpic() {
-        var url = findfile()[3].href;
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache';
+        var url = addq(findfile()[3].href, 'cache');
         dl_file(url);
     }
 
@@ -641,7 +640,7 @@ window.baguetteBox = (function () {
                 options.captions.call(currentGallery, imageElement) :
                 imageElement.getAttribute('data-caption') || imageElement.title;
 
-        imageSrc += imageSrc.indexOf('?') < 0 ? '?cache' : '&cache';
+        imageSrc = addq(imageSrc, 'cache');
 
         if (is_vid && index != currentIndex)
             return;  // no preload
