@@ -498,7 +498,7 @@ class HttpCli(object):
             self.can_admin,
             self.can_dot,
         ) = (
-            avn.can_access("", self.uname) if avn else [False] * 7
+            avn.can_access("", self.uname) if avn else [False] * 8
         )
         self.avn = avn
         self.vn = vn
@@ -2960,18 +2960,19 @@ class HttpCli(object):
             mime = "text/plain; charset=utf-8"
 
         self.out_headers["Accept-Ranges"] = "bytes"
-        self.send_headers(length=upper - lower, status=status, mime=mime)
-
         logmsg += unicode(status) + logtail
 
         if self.mode == "HEAD" or not do_send:
             if self.do_log:
                 self.log(logmsg)
 
+            self.send_headers(length=upper - lower, status=status, mime=mime)
             return True
 
         ret = True
         with open_func(*open_args) as f:
+            self.send_headers(length=upper - lower, status=status, mime=mime)
+
             sendfun = sendfile_kern if use_sendfile else sendfile_py
             remains = sendfun(
                 self.log, lower, upper, f, self.s, self.args.s_wr_sz, self.args.s_wr_slp
@@ -2979,7 +2980,7 @@ class HttpCli(object):
 
         if remains > 0:
             logmsg += " \033[31m" + unicode(upper - remains) + "\033[0m"
-            self.keepalive = False
+            ret = False
 
         spd = self._spd((upper - lower) - remains)
         if self.do_log:
@@ -3483,15 +3484,12 @@ class HttpCli(object):
                 if d1 == top:
                     vfs_virt[d2] = vfs  # typechk, value never read
 
-        dirs = []
-
-        dirnames = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+        dirs = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
 
         if not dots or "dots" not in self.uparam:
-            dirnames = exclude_dotfiles(dirnames)
+            dirs = exclude_dotfiles(dirs)
 
-        for fn in [x for x in dirnames if x != excl]:
-            dirs.append(quotep(fn))
+        dirs = [quotep(x) for x in dirs if x != excl]
 
         for x in vfs_virt:
             if x != excl:
@@ -3835,7 +3833,8 @@ class HttpCli(object):
                 )[: vn.flags["fk"]]
                 got = self.uparam.get("k")
                 if got != correct:
-                    self.log("wrong filekey, want {}, got {}".format(correct, got))
+                    t = "wrong filekey, want %s, got %s\n  vp: %s\n  ap: %s"
+                    self.log(t % (correct, got, self.req, abspath), 6)
                     return self.tx_404()
 
             if (

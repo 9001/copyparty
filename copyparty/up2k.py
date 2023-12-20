@@ -1118,7 +1118,11 @@ class Up2k(object):
 
             if stat.S_ISDIR(inf.st_mode):
                 rap = absreal(abspath)
-                if dev and inf.st_dev != dev:
+                if (
+                    dev
+                    and inf.st_dev != dev
+                    and not (ANYWIN and bos.stat(rap).st_dev == dev)
+                ):
                     self.log("skip xdev {}->{}: {}".format(dev, inf.st_dev, abspath), 6)
                     continue
                 if abspath in excl or rap in excl:
