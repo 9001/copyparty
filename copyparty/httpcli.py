@@ -861,16 +861,16 @@ class HttpCli(object):
                 self.host.lower().split(":")[0],
             )
         ]
-        if re.sub(r"(:[0-9]{1,5})?/?$", "", origin) in good_origins:
+        if "pw" in ih or re.sub(r"(:[0-9]{1,5})?/?$", "", origin) in good_origins:
             good_origin = True
             bad_hdrs = ("",)
         else:
             good_origin = False
             bad_hdrs = ("", "pw")
 
-        # '*' blocks all credentials (cookies, http-auth);
+        # '*' blocks auth through cookies / WWW-Authenticate;
         # exact-match for Origin is necessary to unlock those,
-        # however yolo-requests (?pw=) are always allowed
+        # but the ?pw= param and PW: header are always allowed
         acah = ih.get("access-control-request-headers", "")
         acao = (origin if good_origin else None) or (
             "*" if "*" in good_origins else None
