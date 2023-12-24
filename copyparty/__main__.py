@@ -879,7 +879,7 @@ def add_network(ap):
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range)")
     ap2.add_argument("--ll", action="store_true", help="include link-local IPv4/IPv6 in mDNS replies, even if the NIC has routable IPs (breaks some mDNS clients)")
     ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to associate clients with; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd, unsafe), [\033[32m2\033[0m]=outermost-proxy, [\033[32m3\033[0m]=second-proxy, [\033[32m-1\033[0m]=closest-proxy")
-    ap2.add_argument("--xff-hdr", metavar="NAME", type=u, default="x-forwarded-for", help="if reverse-proxied, which http header to read the client's real ip from (argument must be lowercase, but not the actual header)")
+    ap2.add_argument("--xff-hdr", metavar="NAME", type=u, default="x-forwarded-for", help="if reverse-proxied, which http header to read the client's real ip from")
     ap2.add_argument("--xff-src", metavar="IP", type=u, default="127., ::1", help="comma-separated list of trusted reverse-proxy IPs; only accept the real-ip header (\033[33m--xff-hdr\033[0m) if the incoming connection is from an IP starting with either of these. Can be disabled with [\033[32many\033[0m] if you are behind cloudflare (or similar) and are using \033[32m--xff-hdr=cf-connecting-ip\033[0m (or similar)")
     ap2.add_argument("--ipa", metavar="PREFIX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPREFIX\033[0m; example: [\033[32m127., 10.89., 192.168.\033[0m]")
     ap2.add_argument("--rp-loc", metavar="PATH", type=u, default="", help="if reverse-proxying on a location instead of a dedicated domain/subdomain, provide the base location here; example: [\033[32m/foo/bar\033[0m]")
@@ -926,8 +926,9 @@ def add_cert(ap, cert_path):
 
 
 def add_auth(ap):
-    ap2 = ap.add_argument_group('user authentication options')
-    ap2.add_argument("--hdr-au-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks and assume the request-header \033[33mHN\033[0m contains the username of the requesting user (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy. Also, the argument must be lowercase, but not the actual header")
+    ap2 = ap.add_argument_group('IdP / identity provider / user authentication options')
+    ap2.add_argument("--idp-h-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks and assume the request-header \033[33mHN\033[0m contains the username of the requesting user (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
+    ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
 
 
 def add_zeroconf(ap):
@@ -1387,7 +1388,10 @@ def main(argv: Optional[list[str]] = None) -> None:
             supp = args_from_cfg(v)
             argv.extend(supp)
 
-    deprecated: list[tuple[str, str]] = [("--salt", "--warksalt")]
+    deprecated: list[tuple[str, str]] = [
+        ("--salt", "--warksalt"),
+        ("--hdr-au-usr", "--idp-h-usr"),
+    ]
     for dk, nk in deprecated:
         idx = -1
         ov = ""

@@ -128,7 +128,7 @@ class Cfg(Namespace):
         ex = "db_act df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname doctitle exit favico hdr_au_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
+        ex = "ah_alg bname doctitle exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "on403 on404 xad xar xau xban xbd xbr xbu xiu xm"

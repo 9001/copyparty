@@ -1,6 +1,17 @@
 #!/bin/bash
 set -ex
 
+# osx support
+gtar=$(command -v gtar || command -v gnutar) || true
+[ ! -z "$gtar" ] && command -v gfind >/dev/null && {
+	tar()  { $gtar "$@"; }
+	sed()  { gsed  "$@"; }
+	find() { gfind "$@"; }
+	sort() { gsort "$@"; }
+	command -v grealpath >/dev/null &&
+		realpath() { grealpath "$@"; }
+}
+
 rm -rf unt
 mkdir -p unt/srv
 cp -pR copyparty tests unt/
@@ -30,8 +41,10 @@ for py in python{2,3}; do
     [ "${1:0:6}" = python ] && [ "$1" != $py ] && continue
 
     PYTHONPATH=
-    [ $py = python2 ] && PYTHONPATH=../scripts/py2:../sfx/py37
+    [ $py = python2 ] && PYTHONPATH=../scripts/py2:../sfx/py37:../sfx/j2
     export PYTHONPATH
+
+    [ $py = python2 ] && py=$(command -v python2.7 || echo $py)
 
     nice $py -m unittest discover -s tests >/dev/null &
     pids+=($!)

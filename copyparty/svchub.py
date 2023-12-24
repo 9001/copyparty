@@ -437,6 +437,10 @@ class SvcHub(object):
         elif al.ban_url == "no":
             al.sus_urls = None
 
+        al.xff_hdr = al.xff_hdr.lower()
+        al.idp_h_usr = al.idp_h_usr.lower()
+        al.idp_h_grp = al.idp_h_grp.lower()
+
         al.xff_re = self._ipa2re(al.xff_src)
         al.ipa_re = self._ipa2re(al.ipa)
         al.ftp_ipa_re = self._ipa2re(al.ftp_ipa or al.ipa)

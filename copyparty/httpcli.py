@@ -452,9 +452,9 @@ class HttpCli(object):
             except:
                 pass
 
-        if self.args.hdr_au_usr:
+        if self.args.idp_h_usr:
             self.pw = ""
-            self.uname = self.headers.get(self.args.hdr_au_usr) or "*"
+            self.uname = self.headers.get(self.args.idp_h_usr) or "*"
             if self.uname not in self.asrv.vfs.aread:
                 self.log("unknown username: [%s]" % (self.uname), 1)
                 self.uname = "*"

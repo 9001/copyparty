@@ -1217,7 +1217,7 @@ replace copyparty passwords with oauth and such
 
 work is [ongoing](https://github.com/9001/copyparty/issues/62) to support authenticating / authorizing users based on a separate authentication proxy, which makes it possible to support oauth, single-sign-on, etc.
 
-it is currently possible to specify `--hdr-au-usr x-username`; copyparty will then skip password validation and blindly trust the username specified in the `X-Username` request header
+it is currently possible to specify `--idp-h-usr x-username`; copyparty will then skip password validation and blindly trust the username specified in the `X-Username` request header
 
 the remaining stuff (accepting user groups through another header, creating volumes on the fly) are still to-do
 
