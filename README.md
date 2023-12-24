@@ -1219,7 +1219,7 @@ work is [ongoing](https://github.com/9001/copyparty/issues/62) to support authen
 
 it is currently possible to specify `--idp-h-usr x-username`; copyparty will then skip password validation and blindly trust the username specified in the `X-Username` request header
 
-the remaining stuff (accepting user groups through another header, creating volumes on the fly) are still to-do
+the remaining stuff (accepting user groups through another header, creating volumes on the fly) are still to-do; configuration will probably [look like this](./docs/examples/docker/idp/copyparty.conf)
 
 
 ## hiding from google
