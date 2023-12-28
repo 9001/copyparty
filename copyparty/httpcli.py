@@ -3966,6 +3966,7 @@ class HttpCli(object):
             "dsort": vf["sort"],
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
+            "u2j": self.args.u2j,
             "idxh": int(self.args.ih),
             "u2sort": self.args.u2sort,
         }

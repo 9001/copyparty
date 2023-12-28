@@ -931,7 +931,7 @@ function fcfg_get(name, defval) {
         val = parseFloat(sread(name));
 
     if (!isNum(val))
-        return parseFloat(o ? o.value : defval);
+        return parseFloat(o && o.value !== '' ? o.value : defval);
 
     if (o)
         o.value = val;

@@ -852,7 +852,7 @@ function up2k_init(subtle) {
 
     setmsg(suggest_up2k, 'msg');
 
-    var parallel_uploads = icfg_get('nthread'),
+    var parallel_uploads = ebi('nthread').value = icfg_get('nthread', u2j),
         uc = {},
         fdom_ctr = 0,
         biggest_file = 0;
@@ -2685,7 +2685,11 @@ function up2k_init(subtle) {
             }
 
             parallel_uploads = v;
-            swrite('nthread', v);
+            if (v == u2j)
+                localStorage.removeItem('nthread');
+            else
+                swrite('nthread', v);
+
             clmod(obj, 'err');
             return;
         }
@@ -2699,7 +2703,7 @@ function up2k_init(subtle) {
             parallel_uploads = 16;
 
         obj.value = parallel_uploads;
-        bumpthread({ "target": 1 })
+        bumpthread({ "target": 1 });
     }
 
     function tgl_fsearch() {

@@ -1077,7 +1077,7 @@ ebi('op_up2k').innerHTML = (
 	'	<tr>\n' +
 	'		<td class="c" data-perm="read">\n' +
 	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
-	'				class="txtbox" id="nthread" value="2" tt="' + L.ut_par + '"/><a\n' +
+	'				class="txtbox" id="nthread" value="" tt="' + L.ut_par + '"/><a\n' +
 	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +
 	'		</td>\n' +
 	'	</tr>\n' +
