@@ -956,7 +956,7 @@ class AuthSrv(object):
                 try:
                     self._l(ln, 5, "volume access config:")
                     sk, sv = ln.split(":")
-                    if re.sub("[rwmdgGha.]", "", sk) or not sk:
+                    if re.sub("[rwmdgGhaA.]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
                         raise Exception(err)
                     if " " in re.sub(", *", "", sv).strip():
@@ -966,7 +966,7 @@ class AuthSrv(object):
                     self._read_vol_str(sk, sv.replace(" ", ""), daxs[vp], mflags[vp])
                     continue
                 except:
-                    err += "accs entries must be 'rwmdgGha.: user1, user2, ...'"
+                    err += "accs entries must be 'rwmdgGhaA.: user1, user2, ...'"
                     raise Exception(err + SBADCFG)
 
             if cat == catf:
@@ -1004,7 +1004,7 @@ class AuthSrv(object):
     def _read_vol_str(
         self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
     ) -> None:
-        if lvl.strip("crwmdgGha."):
+        if lvl.strip("crwmdgGhaA."):
             t = "%s,%s" % (lvl, uname) if uname else lvl
             raise Exception("invalid config value (volume or volflag): %s" % (t,))
 
@@ -1028,7 +1028,19 @@ class AuthSrv(object):
         if uname == "":
             uname = "*"
 
+        junkset = set()
         for un in uname.replace(",", " ").strip().split():
+            for alias, mapping in [
+                ("h", "gh"),
+                ("G", "gG"),
+                ("A", "rwmda.A"),
+            ]:
+                expanded = ""
+                for ch in mapping:
+                    if ch not in lvl:
+                        expanded += ch
+                    lvl = lvl.replace(alias, expanded + alias)
+
             for ch, al in [
                 ("r", axs.uread),
                 ("w", axs.uwrite),
@@ -1036,12 +1048,11 @@ class AuthSrv(object):
                 ("d", axs.udel),
                 (".", axs.udot),
                 ("a", axs.uadmin),
-                ("h", axs.uhtml),
-                ("h", axs.uget),
+                ("A", junkset),
                 ("g", axs.uget),
-                ("G", axs.uget),
                 ("G", axs.upget),
-            ]:  # b bb bbb
+                ("h", axs.uhtml),
+            ]:
                 if ch in lvl:
                     if un == "*":
                         t = "└─add permission [{0}] for [everyone] -- {2}"
@@ -1113,7 +1124,7 @@ class AuthSrv(object):
 
         if self.args.v:
             # list of src:dst:permset:permset:...
-            # permset is <rwmdgGha.>[,username][,username] or <c>,<flag>[=args]
+            # permset is <rwmdgGhaA.>[,username][,username] or <c>,<flag>[=args]
             for v_str in self.args.v:
                 m = re_vol.match(v_str)
                 if not m:
@@ -2189,7 +2200,7 @@ def upgrade_cfg_fmt(
             else:
                 sn = sn.replace(",", ", ")
             ret.append("    " + sn)
-        elif sn[:1] in "rwmdgGha.":
+        elif sn[:1] in "rwmdgGhaA.":
             if cat != catx:
                 cat = catx
                 ret.append(cat)

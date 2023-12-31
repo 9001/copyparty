@@ -500,6 +500,7 @@ def get_sects():
               "h" (html):   "get", but folders return their index.html
               "." (dots):   user can ask to show dotfiles in listings
               "a" (admin):  can see uploader IPs, config-reload
+              "A" ("all"):  same as "rwmda." (read/write/move/delete/admin/dotfiles)
 
             too many volflags to list here, see --help-flags
 

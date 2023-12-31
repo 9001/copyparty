@@ -374,6 +374,7 @@ permissions:
 * `G` (upget): same as `g` except uploaders get to see their own [filekeys](#filekeys) (see `fk` in examples below)
 * `h` (html): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
 * `a` (admin): can see upload time, uploader IPs, config-reload
+* 'A' ("all"): same as `rwmda.` (read/write/move/delete/dotfiles)
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`

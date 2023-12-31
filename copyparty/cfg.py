@@ -104,6 +104,7 @@ permdescs = {
     "G": 'upget; same as "g" but can see filekeys of their own uploads',
     "h": 'html; same as "g" but folders return their index.html',
     "a": "admin; can see uploader IPs, config-reload",
+    "A": "all; same as 'rwmda.' (read/write/move/delete/dotfiles)",
 }
 
 
