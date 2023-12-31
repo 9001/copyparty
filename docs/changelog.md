@@ -1,4 +1,29 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1208-2133  `v1.9.27`  another dedup bug
+
+so [v1.9.26](https://github.com/9001/copyparty/releases/tag/v1.9.26) fixed how moving a symlink could break other related symlinks, and then it turns out symlinks themselves could also die when moving them to another location, and somehow nobody encountered any of these until now... surely there are no more deduplication-related issues left at this point, yeah?
+
+## bugfixes
+
+* #65 moving deduplicated copies of files (symlinks) from one location to another could make them disappear (break the symlinks)
+
+  * don't worry, we are **not** talking about data loss! but see the [release notes for v1.9.26](https://github.com/9001/copyparty/releases/tag/v1.9.26) which explain how to deal with this issue (how to find, diagnose, and repair broken symlinks)
+
+----
+
+## regarding fedora packages
+
+[copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/) (fedora's build service) is not building at the moment; ***if you installed copyparty from copr-pypi,*** you can upgrade to this release by running one of the following:
+
+```bash
+dnf install https://ocv.me/copyparty/fedora/37/python3-copyparty.fc37.noarch.rpm
+dnf install https://ocv.me/copyparty/fedora/38/python3-copyparty.fc38.noarch.rpm
+dnf install https://ocv.me/copyparty/fedora/39/python3-copyparty.fc39.noarch.rpm
+```
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1208-0136  `v1.9.26`  dont break symlinks
 
 ## new features

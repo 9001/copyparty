@@ -374,7 +374,7 @@ permissions:
 * `G` (upget): same as `g` except uploaders get to see their own [filekeys](#filekeys) (see `fk` in examples below)
 * `h` (html): same as `g` except folders return their index.html, and filekeys are not necessary for index.html
 * `a` (admin): can see upload time, uploader IPs, config-reload
-* 'A' ("all"): same as `rwmda.` (read/write/move/delete/dotfiles)
+* `A` ("all"): same as `rwmda.` (read/write/move/delete/admin/dotfiles)
 
 examples:
 * add accounts named u1, u2, u3 with passwords p1, p2, p3: `-a u1:p1 -a u2:p2 -a u3:p3`
@@ -1282,8 +1282,8 @@ see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where 
 * anyone can upload, and receive "secret" links for each upload they do:  
   `python copyparty-sfx.py -e2dsa -v .::wG:c,fk=8`
 
-* anyone can browse, only `kevin` (password `okgo`) can upload/move/delete files:  
-  `python copyparty-sfx.py -e2dsa -a kevin:okgo -v .::r:rwmd,kevin`
+* anyone can browse (`r`), only `kevin` (password `okgo`) can upload/move/delete (`A`) files:  
+  `python copyparty-sfx.py -e2dsa -a kevin:okgo -v .::r:A,kevin`
 
 * read-only music server:  
   `python copyparty-sfx.py -v /mnt/nas/music:/music:r -e2dsa -e2ts --no-robots --force-js --theme 2`
