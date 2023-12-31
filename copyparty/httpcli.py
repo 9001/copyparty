@@ -3363,11 +3363,19 @@ class HttpCli(object):
         rc = 404
         if self.args.vague_403:
             t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="{}/?h">go home</a></p>'
+            pt = "404 not found  ┐( ´ -`)┌   (or maybe you don't have access -- try logging in)"
         elif is_403:
             t = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="{}/?h">go home</a></p>'
+            pt = "403 forbiddena ~┻━┻   (you'll have to log in)"
             rc = 403
         else:
             t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p><a id="r" href="{}/?h">go home</a></p>'
+            pt = "404 not found  ┐( ´ -`)┌"
+
+        if self.ua.startswith("curl/") or self.ua.startswith("fetch"):
+            pt = "# acct: %s\n%s" % (self.uname, pt)
+            self.reply(pt.encode("utf-8"), status=rc)
+            return True
 
         t = t.format(self.args.SR)
         qv = quotep(self.vpaths) + self.ourlq()
