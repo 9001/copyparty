@@ -786,7 +786,7 @@ class SvcHub(object):
             if "\033" in msg:
                 msg += "\033[0m"
 
-            self.logf.write("@%s [%s] %s\n" % (ts, src, msg))
+            self.logf.write("@%s [%-21s] %s\n" % (ts, src, msg))
             if not self.args.no_logflush:
                 self.logf.flush()
 
