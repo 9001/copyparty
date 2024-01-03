@@ -43,7 +43,7 @@ echo ok lets go
 python3 "$sfx" -p39204 -e2dsa --dbd=yolo --exit=idx -lo=t -q "$@"
 
 echo and the results are...
-$awk '/1 volumes in / {printf "%s MiB/s\n", 256*128/$(NF-1)}' <t
+LC_ALL=C $awk '/1 volumes in / {s=$(NF-1); printf "speed: %.1f MiB/s  (time=%.2fs)\n", 256*128/s, s}' <t
 
 echo deleting $td and exiting
 
@@ -57,11 +57,19 @@ echo deleting $td and exiting
 #  2202 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.5, docker-alpine 3.18.3) ??? alpine slow
 #  2719 @ Ryzen 5 4500U  (cpp 1.9.5, py 3.11.2, docker-debian 12.1)
 
+#  7746 @ mbp 2023 m3pro (cpp 1.9.5, py 3.11.7, macos 14.1)  // --hash-mt=6
+#  6687 @ mbp 2023 m3pro (cpp 1.9.5, py 3.11.7, macos 14.1)  // --hash-mt=5 (default)
 #  5544 @ Intel i5-12500 (cpp 1.9.5, py 3.11.2, debian 12.0)  // --hash-mt=12; desktop
 #  5197 @ Ryzen 7 3700X  (cpp 1.9.5, py 3.9.18, freebsd 13.2)  // --hash-mt=8; 2u server
+#  4551 @ mbp 2020 m1    (cpp 1.9.5, py 3.11.7, macos 14.2.1)
 #  2606 @ Ryzen 7 3700X  (cpp 1.9.5, py 3.9.18, freebsd 13.2)  // --hash-mt=4 (old-default)
 #  1436 @ Ryzen 5 5500U  (cpp 1.9.5, py 3.11.4, alpine 3.18.3)  // nuc
 #  1065 @ Pixel 7        (cpp 1.9.5, py 3.11.5, termux 2023-09)
+#   945 @ Pi 5B v1.0     (cpp 1.9.5, py 3.11.6, alpine 3.19.0)
+#   548 @ Pi 4B v1.5     (cpp 1.9.5, py 3.11.6, debian 11)
+#   435 @ Pi 4B v1.5     (cpp 1.9.5, py 3.11.6, alpine 3.19.0)
+#   212 @ Pi Zero2W v1.0 (cpp 1.9.5, py 3.11.6, alpine 3.19.0)
+#  10.0 @ Pi Zero W v1.1 (cpp 1.9.5, py 3.11.6, alpine 3.19.0)
 
 # notes,
 # podman run --rm -it --shm-size 512m --entrypoint /bin/ash localhost/copyparty-min
