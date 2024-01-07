@@ -118,7 +118,7 @@ def ffprobe(
         b"--",
         fsenc(abspath),
     ]
-    rc, so, se = runcmd(cmd, timeout=timeout, nice=True)
+    rc, so, se = runcmd(cmd, timeout=timeout, nice=True, oom=200)
     retchk(rc, cmd, se)
     return parse_ffprobe(so)
 
@@ -564,6 +564,7 @@ class MTag(object):
                 args = {
                     "env": env,
                     "nice": True,
+                    "oom": 300,
                     "timeout": parser.timeout,
                     "kill": parser.kill,
                     "capture": parser.capture,

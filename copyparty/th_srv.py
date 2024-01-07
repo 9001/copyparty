@@ -467,9 +467,9 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd, vn)
 
-    def _run_ff(self, cmd: list[bytes], vn: VFS) -> None:
+    def _run_ff(self, cmd: list[bytes], vn: VFS, oom: int = 400) -> None:
         # self.log((b" ".join(cmd)).decode("utf-8"))
-        ret, _, serr = runcmd(cmd, timeout=vn.flags["convt"], nice=True)
+        ret, _, serr = runcmd(cmd, timeout=vn.flags["convt"], nice=True, oom=oom)
         if not ret:
             return
 
@@ -623,7 +623,7 @@ class ThumbSrv(object):
                 fsenc(tmp_opus)
             ]
             # fmt: on
-            self._run_ff(cmd, vn)
+            self._run_ff(cmd, vn, oom=300)
 
         # iOS fails to play some "insufficiently complex" files
         # (average file shorter than 8 seconds), so of course we
@@ -647,7 +647,7 @@ class ThumbSrv(object):
                 fsenc(tpath)
             ]
             # fmt: on
-            self._run_ff(cmd, vn)
+            self._run_ff(cmd, vn, oom=300)
 
         elif want_caf:
             # simple remux should be safe
@@ -665,7 +665,7 @@ class ThumbSrv(object):
                 fsenc(tpath)
             ]
             # fmt: on
-            self._run_ff(cmd, vn)
+            self._run_ff(cmd, vn, oom=300)
 
         if tmp_opus != tpath:
             try:

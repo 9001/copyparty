@@ -2557,6 +2557,7 @@ def runcmd(
     argv: Union[list[bytes], list[str]], timeout: Optional[float] = None, **ka: Any
 ) -> tuple[int, str, str]:
     isbytes = isinstance(argv[0], (bytes, bytearray))
+    oom = ka.pop("oom", 0)  # 0..1000
     kill = ka.pop("kill", "t")  # [t]ree [m]ain [n]one
     capture = ka.pop("capture", 3)  # 0=none 1=stdout 2=stderr 3=both
 
@@ -2587,6 +2588,14 @@ def runcmd(
                 argv = [NICES] + argv
 
     p = sp.Popen(argv, stdout=cout, stderr=cerr, **ka)
+
+    if oom and not ANYWIN and not MACOS:
+        try:
+            with open("/proc/%d/oom_score_adj" % (p.pid,), "wb") as f:
+                f.write(("%d\n" % (oom,)).encode("utf-8"))
+        except:
+            pass
+
     if not timeout or PY2:
         bout, berr = p.communicate(sin)
     else:
@@ -2734,6 +2743,7 @@ def _parsehook(
     sp_ka = {
         "env": env,
         "nice": True,
+        "oom": 300,
         "timeout": tout,
         "kill": kill,
         "capture": cap,
