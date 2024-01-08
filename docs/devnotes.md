@@ -162,8 +162,8 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | PUT | | (binary data) | upload into file at URL |
 | PUT | `?gz` | (binary data) | compress with gzip and write into file at URL |
 | PUT | `?xz` | (binary data) | compress with xz and write into file at URL |
-| mPOST | | `act=bput`, `f=FILE` | upload `FILE` into the folder at URL |
-| mPOST | `?j` | `act=bput`, `f=FILE` | ...and reply with json |
+| mPOST | | `f=FILE` | upload `FILE` into the folder at URL |
+| mPOST | `?j` | `f=FILE` | ...and reply with json |
 | mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
 | POST | `?delete` | | delete URL recursively |
 | jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |

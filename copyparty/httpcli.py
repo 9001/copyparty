@@ -45,6 +45,7 @@ from .util import (
     ODict,
     Pebkac,
     UnrecvEOF,
+    WrongPostKey,
     absreal,
     alltrace,
     atomic_move,
@@ -1862,7 +1863,16 @@ class HttpCli(object):
         self.parser = MultipartParser(self.log, self.sr, self.headers)
         self.parser.parse()
 
-        act = self.parser.require("act", 64)
+        file0: list[tuple[str, Optional[str], Generator[bytes, None, None]]] = []
+        try:
+            act = self.parser.require("act", 64)
+        except WrongPostKey as ex:
+            if ex.got == "f" and ex.fname:
+                self.log("missing 'act', but looks like an upload so assuming that")
+                file0 = [(ex.got, ex.fname, ex.datagen)]
+                act = "bput"
+            else:
+                raise
 
         if act == "login":
             return self.handle_login()
@@ -1875,7 +1885,7 @@ class HttpCli(object):
             return self.handle_new_md()
 
         if act == "bput":
-            return self.handle_plain_upload()
+            return self.handle_plain_upload(file0)
 
         if act == "tput":
             return self.handle_text_upload()
@@ -2314,7 +2324,9 @@ class HttpCli(object):
             vfs.flags.get("xau") or [],
         )
 
-    def handle_plain_upload(self) -> bool:
+    def handle_plain_upload(
+        self, file0: list[tuple[str, Optional[str], Generator[bytes, None, None]]]
+    ) -> bool:
         assert self.parser
         nullwrite = self.args.nw
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
@@ -2340,7 +2352,8 @@ class HttpCli(object):
         t0 = time.time()
         try:
             assert self.parser.gen
-            for nfile, (p_field, p_file, p_data) in enumerate(self.parser.gen):
+            gens = itertools.chain(file0, self.parser.gen)
+            for nfile, (p_field, p_file, p_data) in enumerate(gens):
                 if not p_file:
                     self.log("discarding incoming file without filename")
                     # fallthrough

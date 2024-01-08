@@ -1569,10 +1569,12 @@ interact with copyparty using non-browser clients
   * `var xhr = new XMLHttpRequest(); xhr.open('POST', '//127.0.0.1:3923/msgs?raw'); xhr.send('foo');`
 
 * curl/wget: upload some files (post=file, chunk=stdin)
-  * `post(){ curl -F act=bput -F f=@"$1" http://127.0.0.1:3923/?pw=wark;}`  
-    `post movie.mkv`
+  * `post(){ curl -F f=@"$1" http://127.0.0.1:3923/?pw=wark;}`  
+    `post movie.mkv`  (gives HTML in return)
+  * `post(){ curl -F f=@"$1" 'http://127.0.0.1:3923/?want=url&pw=wark';}`  
+    `post movie.mkv`  (gives hotlink in return)
   * `post(){ curl -H pw:wark -H rand:8 -T "$1" http://127.0.0.1:3923/;}`  
-    `post movie.mkv`
+    `post movie.mkv`  (randomized filename)
   * `post(){ wget --header='pw: wark' --post-file="$1" -O- http://127.0.0.1:3923/?raw;}`  
     `post movie.mkv`
   * `chunk(){ curl -H pw:wark -T- http://127.0.0.1:3923/;}`  

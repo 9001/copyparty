@@ -1537,11 +1537,9 @@ class MultipartParser(object):
         raises if the field name is not as expected
         """
         assert self.gen
-        p_field, _, p_data = next(self.gen)
+        p_field, p_fname, p_data = next(self.gen)
         if p_field != field_name:
-            raise Pebkac(
-                422, 'expected field "{}", got "{}"'.format(field_name, p_field)
-            )
+            raise WrongPostKey(field_name, p_field, p_fname, p_data)
 
         return self._read_value(p_data, max_len).decode("utf-8", "surrogateescape")
 
@@ -3058,3 +3056,20 @@ class Pebkac(Exception):
 
     def __repr__(self) -> str:
         return "Pebkac({}, {})".format(self.code, repr(self.args))
+
+
+class WrongPostKey(Pebkac):
+    def __init__(
+        self,
+        expected: str,
+        got: str,
+        fname: Optional[str],
+        datagen: Generator[bytes, None, None],
+    ) -> None:
+        msg = 'expected field "{}", got "{}"'.format(expected, got)
+        super(WrongPostKey, self).__init__(422, msg)
+
+        self.expected = expected
+        self.got = got
+        self.fname = fname
+        self.datagen = datagen
