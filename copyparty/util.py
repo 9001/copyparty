@@ -2363,6 +2363,12 @@ def statdir(
             print(t)
 
 
+def dir_is_empty(logger: "RootLogger", scandir: bool, top: str):
+    for _ in statdir(logger, scandir, False, top):
+        return False
+    return True
+
+
 def rmdirs(
     logger: "RootLogger", scandir: bool, lstat: bool, top: str, depth: int
 ) -> tuple[list[str], list[str]]:

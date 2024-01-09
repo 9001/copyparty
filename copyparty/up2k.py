@@ -37,6 +37,7 @@ from .util import (
     absreal,
     atomic_move,
     db_ex_chk,
+    dir_is_empty,
     djoin,
     fsenc,
     gen_filekey,
@@ -604,7 +605,7 @@ class Up2k(object):
             for vol in vols:
                 try:
                     bos.makedirs(vol.realpath)  # gonna happen at snap anyways
-                    bos.listdir(vol.realpath)
+                    dir_is_empty(self.log_func, not self.args.no_scandir, vol.realpath)
                 except:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
                     self.log("cannot access " + vol.realpath, c=1)
@@ -991,7 +992,7 @@ class Up2k(object):
             rtop = absreal(top)
             n_add = n_rm = 0
             try:
-                if not bos.listdir(rtop):
+                if dir_is_empty(self.log_func, not self.args.no_scandir, rtop):
                     t = "volume /%s at [%s] is empty; will not be indexed as this could be due to an offline filesystem"
                     self.log(t % (vol.vpath, rtop), 6)
                     return True, False
