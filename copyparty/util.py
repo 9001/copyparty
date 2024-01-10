@@ -623,9 +623,14 @@ class _Unrecv(object):
             while nbytes > len(ret):
                 ret += self.recv(nbytes - len(ret))
         except OSError:
-            t = "client only sent {} of {} expected bytes".format(len(ret), nbytes)
-            if len(ret) <= 16:
-                t += "; got {!r}".format(ret)
+            t = "client stopped sending data; expected at least %d more bytes"
+            if not ret:
+                t = t % (nbytes,)
+            else:
+                t += ", only got %d"
+                t = t % (nbytes, len(ret))
+                if len(ret) <= 16:
+                    t += "; %r" % (ret,)
 
             if raise_on_trunc:
                 raise UnrecvEOF(5, t)
@@ -1517,15 +1522,20 @@ class MultipartParser(object):
         return ret
 
     def parse(self) -> None:
+        boundary = get_boundary(self.headers)
+        self.log("boundary=%r" % (boundary,))
+
         # spec says there might be junk before the first boundary,
         # can't have the leading \r\n if that's not the case
-        self.boundary = b"--" + get_boundary(self.headers).encode("utf-8")
+        self.boundary = b"--" + boundary.encode("utf-8")
 
         # discard junk before the first boundary
         for junk in self._read_data():
-            self.log(
-                "discarding preamble: [{}]".format(junk.decode("utf-8", "replace"))
-            )
+            if not junk:
+                continue
+
+            jtxt = junk.decode("utf-8", "replace")
+            self.log("discarding preamble |%d| %r" % (len(junk), jtxt))
 
         # nice, now make it fast
         self.boundary = b"\r\n" + self.boundary

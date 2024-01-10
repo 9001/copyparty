@@ -2349,6 +2349,7 @@ class HttpCli(object):
         files: list[tuple[int, str, str, str, str, str]] = []
         # sz, sha_hex, sha_b64, p_file, fname, abspath
         errmsg = ""
+        tabspath = ""
         dip = self.dip()
         t0 = time.time()
         try:
@@ -2446,6 +2447,8 @@ class HttpCli(object):
                     if not nullwrite:
                         atomic_move(tabspath, abspath)
 
+                    tabspath = ""
+
                     files.append(
                         (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
                     )
@@ -2491,6 +2494,12 @@ class HttpCli(object):
             errmsg = vol_san(
                 list(self.asrv.vfs.all_vols.values()), unicode(ex).encode("utf-8")
             ).decode("utf-8")
+            try:
+                got = bos.path.getsize(tabspath)
+                t = "connection lost after receiving %s of the file"
+                self.log(t % (humansize(got),), 3)
+            except:
+                pass
 
         td = max(0.1, time.time() - t0)
         sz_total = sum(x[0] for x in files)
