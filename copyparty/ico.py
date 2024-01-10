@@ -27,13 +27,13 @@ class Ico(object):
         c1 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 0.3)
         c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 0.8 if HAVE_PILF else 1, 1)
         ci = [int(x * 255) for x in list(c1) + list(c2)]
-        c = "".join(["{:02x}".format(x) for x in ci])
+        c = "".join(["%02x" % (x,) for x in ci])
 
         w = 100
         h = 30
         if not self.args.th_no_crop and as_thumb:
             sw, sh = self.args.th_size.split("x")
-            h = int(100 / (float(sw) / float(sh)))
+            h = int(100.0 / (float(sw) / float(sh)))
             w = 100
 
         if chrome:
@@ -47,12 +47,12 @@ class Ico(object):
                     # [.lt] are hard to see lowercase / unspaced
                     ext2 = re.sub("(.)", "\\1 ", ext).upper()
 
-                    h = int(128 * h / w)
+                    h = int(128.0 * h / w)
                     w = 128
                     img = Image.new("RGB", (w, h), "#" + c[:6])
                     pb = ImageDraw.Draw(img)
                     _, _, tw, th = pb.textbbox((0, 0), ext2, font_size=16)
-                    xy = ((w - tw) // 2, (h - th) // 2)
+                    xy = (int((w - tw) / 2), int((h - th) / 2))
                     pb.text(xy, ext2, fill="#" + c[6:], font_size=16)
 
                     img = img.resize((w * 2, h * 2), Image.NEAREST)
@@ -68,7 +68,7 @@ class Ico(object):
                 # svg: 3s, cache: 6s, this: 8s
                 from PIL import Image, ImageDraw
 
-                h = int(64 * h / w)
+                h = int(64.0 * h / w)
                 w = 64
                 img = Image.new("RGB", (w, h), "#" + c[:6])
                 pb = ImageDraw.Draw(img)

@@ -474,7 +474,7 @@ class SvcHub(object):
             import resource
 
             soft, hard = [
-                x if x > 0 else 1024 * 1024
+                int(x) if x > 0 else 1024 * 1024
                 for x in list(resource.getrlimit(resource.RLIMIT_NOFILE))
             ]
         except:
@@ -791,7 +791,7 @@ class SvcHub(object):
                 self.logf.flush()
 
             now = time.time()
-            if now >= self.next_day:
+            if int(now) >= self.next_day:
                 self._set_next_day()
 
     def _set_next_day(self) -> None:
@@ -819,7 +819,7 @@ class SvcHub(object):
         """handles logging from all components"""
         with self.log_mutex:
             now = time.time()
-            if now >= self.next_day:
+            if int(now) >= self.next_day:
                 dt = datetime.fromtimestamp(now, UTC)
                 zs = "{}\n" if self.no_ansi else "\033[36m{}\033[0m\n"
                 zs = zs.format(dt.strftime("%Y-%m-%d"))

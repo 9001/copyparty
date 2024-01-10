@@ -102,7 +102,7 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
     rd += "\n" + fmt
     h = hashlib.sha512(afsenc(rd)).digest()
     b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]
-    rd = "{}/{}/".format(b64[:2], b64[2:4]).lower() + b64
+    rd = ("%s/%s/" % (b64[:2], b64[2:4])).lower() + b64
 
     # could keep original filenames but this is safer re pathlen
     h = hashlib.sha512(afsenc(fn)).digest()
@@ -115,7 +115,7 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
         fmt = "webp" if fc == "w" else "png" if fc == "p" else "jpg"
         cat = "th"
 
-    return "{}/{}/{}/{}.{:x}.{}".format(histpath, cat, rd, fn, int(mtime), fmt)
+    return "%s/%s/%s/%s.%x.%s" % (histpath, cat, rd, fn, int(mtime), fmt)
 
 
 class ThumbSrv(object):
@@ -382,7 +382,7 @@ class ThumbSrv(object):
                 # method 0 = pillow-default, fast
                 # method 4 = ffmpeg-default
                 # method 6 = max, slow
-                fmts += ["RGBA", "LA"]
+                fmts.extend(("RGBA", "LA"))
                 args["method"] = 6
             else:
                 # default q = 75

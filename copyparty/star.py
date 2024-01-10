@@ -65,21 +65,21 @@ class StreamTar(StreamArc):
             cmp = re.sub(r"[^a-z0-9]*pax[^a-z0-9]*", "", cmp)
 
         try:
-            cmp, lv = cmp.replace(":", ",").split(",")
-            lv = int(lv)
+            cmp, zs = cmp.replace(":", ",").split(",")
+            lv = int(zs)
         except:
-            lv = None
+            lv = -1
 
         arg = {"name": None, "fileobj": self.qfile, "mode": "w", "format": fmt}
         if cmp == "gz":
             fun = tarfile.TarFile.gzopen
-            arg["compresslevel"] = lv if lv is not None else 3
+            arg["compresslevel"] = lv if lv >= 0 else 3
         elif cmp == "bz2":
             fun = tarfile.TarFile.bz2open
-            arg["compresslevel"] = lv if lv is not None else 2
+            arg["compresslevel"] = lv if lv >= 0 else 2
         elif cmp == "xz":
             fun = tarfile.TarFile.xzopen
-            arg["preset"] = lv if lv is not None else 1
+            arg["preset"] = lv if lv >= 0 else 1
         else:
             fun = tarfile.open
             arg["mode"] = "w|"

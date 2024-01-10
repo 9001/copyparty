@@ -1432,7 +1432,7 @@ def main(argv: Optional[list[str]] = None) -> None:
 
         _, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
         if hard > 0:  # -1 == infinite
-            nc = min(nc, hard // 4)
+            nc = min(nc, int(hard / 4))
     except:
         nc = 512
 

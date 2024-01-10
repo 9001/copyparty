@@ -190,7 +190,7 @@ class HttpCli(object):
 
     def unpwd(self, m: Match[str]) -> str:
         a, b, c = m.groups()
-        return "{}\033[7m {} \033[27m{}".format(a, self.asrv.iacct[b], c)
+        return "%s\033[7m %s \033[27m%s" % (a, self.asrv.iacct[b], c)
 
     def _check_nonfatal(self, ex: Pebkac, post: bool) -> bool:
         if post:
@@ -557,16 +557,16 @@ class HttpCli(object):
                     self.keepalive = False
 
                 em = str(ex)
-                msg = em if pex == ex else min_ex()
+                msg = em if pex is ex else min_ex()
                 if pex.code != 404 or self.do_log:
                     self.log(
-                        "{}\033[0m, {}".format(msg, self.vpath),
+                        "%s\033[0m, %s" % (msg, self.vpath),
                         6 if em.startswith("client d/c ") else 3,
                     )
 
-                msg = "{}\r\nURL: {}\r\n".format(em, self.vpath)
+                msg = "%s\r\nURL: %s\r\n" % (em, self.vpath)
                 if self.hint:
-                    msg += "hint: {}\r\n".format(self.hint)
+                    msg += "hint: %s\r\n" % (self.hint,)
 
                 if "database is locked" in em:
                     self.conn.hsrv.broker.say("log_stacks")
@@ -809,7 +809,7 @@ class HttpCli(object):
             if k in skip:
                 continue
 
-            t = "{}={}".format(quotep(k), quotep(v))
+            t = "%s=%s" % (quotep(k), quotep(v))
             ret.append(t.replace(" ", "+").rstrip("="))
 
         if not ret:
@@ -857,7 +857,8 @@ class HttpCli(object):
         oh = self.out_headers
         origin = origin.lower()
         good_origins = self.args.acao + [
-            "{}://{}".format(
+            "%s://%s"
+            % (
                 "https" if self.is_https else "http",
                 self.host.lower().split(":")[0],
             )
@@ -1054,7 +1055,7 @@ class HttpCli(object):
             self.can_read = self.can_write = self.can_get = False
 
         if not self.can_read and not self.can_write and not self.can_get:
-            self.log("inaccessible: [{}]".format(self.vpath))
+            self.log("inaccessible: [%s]" % (self.vpath,))
             raise Pebkac(401, "authenticate")
 
         from .dxml import parse_xml
@@ -1404,7 +1405,7 @@ class HttpCli(object):
         if txt and len(txt) == orig_len:
             raise Pebkac(500, "chunk slicing failed")
 
-        buf = "{:x}\r\n".format(len(buf)).encode(enc) + buf
+        buf = ("%x\r\n" % (len(buf),)).encode(enc) + buf
         self.s.sendall(buf + b"\r\n")
         return txt
 
@@ -4231,7 +4232,7 @@ class HttpCli(object):
         if icur:
             lmte = list(mte)
             if self.can_admin:
-                lmte += ["up_ip", ".up_at"]
+                lmte.extend(("up_ip", ".up_at"))
 
             taglist = [k for k in lmte if k in tagset]
             for fe in dirs:

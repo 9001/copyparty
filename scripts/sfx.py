@@ -262,7 +262,7 @@ def unpack():
     final = opj(top, name)
     san = opj(final, "copyparty/up2k.py")
     for suf in range(0, 9001):
-        withpid = "{}.{}.{}".format(name, os.getpid(), suf)
+        withpid = "%s.%d.%s" % (name, os.getpid(), suf)
         mine = opj(top, withpid)
         if not ofe(mine):
             break
@@ -285,8 +285,8 @@ def unpack():
 
     ck = hashfile(tar)
     if ck != CKSUM:
-        t = "\n\nexpected {} ({} byte)\nobtained {} ({} byte)\nsfx corrupt"
-        raise Exception(t.format(CKSUM, SIZE, ck, sz))
+        t = "\n\nexpected %s (%d byte)\nobtained %s (%d byte)\nsfx corrupt"
+        raise Exception(t % (CKSUM, SIZE, ck, sz))
 
     with tarfile.open(tar, "r:bz2") as tf:
         # this is safe against traversal

@@ -849,7 +849,7 @@ class MTHash(object):
                     ex = ex or str(qe)
 
                 if pp:
-                    mb = int((fsz - nch * chunksz) / 1024 / 1024)
+                    mb = (fsz - nch * chunksz) // (1024 * 1024)
                     pp.msg = prefix + str(mb) + suffix
 
             if ex:
@@ -1071,7 +1071,7 @@ def uprint(msg: str) -> None:
 
 
 def nuprint(msg: str) -> None:
-    uprint("{}\n".format(msg))
+    uprint("%s\n" % (msg,))
 
 
 def dedent(txt: str) -> str:
@@ -1094,10 +1094,10 @@ def rice_tid() -> str:
 def trace(*args: Any, **kwargs: Any) -> None:
     t = time.time()
     stack = "".join(
-        "\033[36m{}\033[33m{}".format(x[0].split(os.sep)[-1][:-3], x[1])
+        "\033[36m%s\033[33m%s" % (x[0].split(os.sep)[-1][:-3], x[1])
         for x in traceback.extract_stack()[3:-1]
     )
-    parts = ["{:.6f}".format(t), rice_tid(), stack]
+    parts = ["%.6f" % (t,), rice_tid(), stack]
 
     if args:
         parts.append(repr(args))
@@ -1114,17 +1114,17 @@ def alltrace() -> str:
     threads: dict[str, types.FrameType] = {}
     names = dict([(t.ident, t.name) for t in threading.enumerate()])
     for tid, stack in sys._current_frames().items():
-        name = "{} ({:x})".format(names.get(tid), tid)
+        name = "%s (%x)" % (names.get(tid), tid)
         threads[name] = stack
 
     rret: list[str] = []
     bret: list[str] = []
     for name, stack in sorted(threads.items()):
-        ret = ["\n\n# {}".format(name)]
+        ret = ["\n\n# %s" % (name,)]
         pad = None
         for fn, lno, name, line in traceback.extract_stack(stack):
             fn = os.sep.join(fn.split(os.sep)[-3:])
-            ret.append('File: "{}", line {}, in {}'.format(fn, lno, name))
+            ret.append('File: "%s", line %d, in %s' % (fn, lno, name))
             if line:
                 ret.append("  " + str(line.strip()))
                 if "self.not_empty.wait()" in line:
@@ -1133,7 +1133,7 @@ def alltrace() -> str:
         if pad:
             bret += [ret[0]] + [pad + x for x in ret[1:]]
         else:
-            rret += ret
+            rret.extend(ret)
 
     return "\n".join(rret + bret) + "\n"
 
@@ -1229,9 +1229,9 @@ def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
 def min_ex(max_lines: int = 8, reverse: bool = False) -> str:
     et, ev, tb = sys.exc_info()
     stb = traceback.extract_tb(tb)
-    fmt = "{} @ {} <{}>: {}"
-    ex = [fmt.format(fp.split(os.sep)[-1], ln, fun, txt) for fp, ln, fun, txt in stb]
-    ex.append("[{}] {}".format(et.__name__ if et else "(anonymous)", ev))
+    fmt = "%s @ %d <%s>: %s"
+    ex = [fmt % (fp.split(os.sep)[-1], ln, fun, txt) for fp, ln, fun, txt in stb]
+    ex.append("[%s] %s" % (et.__name__ if et else "(anonymous)", ev))
     return "\n".join(ex[-max_lines:][:: -1 if reverse else 1])
 
 
@@ -1282,7 +1282,7 @@ def ren_open(
             with fun(fsenc(fpath), *args, **kwargs) as f:
                 if b64:
                     assert fdir
-                    fp2 = "fn-trunc.{}.txt".format(b64)
+                    fp2 = "fn-trunc.%s.txt" % (b64,)
                     fp2 = os.path.join(fdir, fp2)
                     with open(fsenc(fp2), "wb") as f2:
                         f2.write(orig_name.encode("utf-8"))
@@ -1311,7 +1311,7 @@ def ren_open(
                 raise
 
         if not b64:
-            zs = "{}\n{}".format(orig_name, suffix).encode("utf-8", "replace")
+            zs = ("%s\n%s" % (orig_name, suffix)).encode("utf-8", "replace")
             zs = hashlib.sha512(zs).digest()[:12]
             b64 = base64.urlsafe_b64encode(zs).decode("utf-8")
 
@@ -1331,7 +1331,7 @@ def ren_open(
                     # okay do the first letter then
                     ext = "." + ext[2:]
 
-            fname = "{}~{}{}".format(bname, b64, ext)
+            fname = "%s~%s%s" % (bname, b64, ext)
 
 
 class MultipartParser(object):
@@ -1608,7 +1608,7 @@ def rand_name(fdir: str, fn: str, rnd: int) -> str:
                 break
 
             nc = rnd + extra
-            nb = int((6 + 6 * nc) / 8)
+            nb = (6 + 6 * nc) // 8
             zb = os.urandom(nb)
             zb = base64.urlsafe_b64encode(zb)
             fn = zb[:nc].decode("utf-8") + ext
@@ -1711,7 +1711,7 @@ def get_spd(nbyte: int, t0: float, t: Optional[float] = None) -> str:
     bps = nbyte / ((t - t0) + 0.001)
     s1 = humansize(nbyte).replace(" ", "\033[33m").replace("iB", "")
     s2 = humansize(bps).replace(" ", "\033[35m").replace("iB", "")
-    return "{} \033[0m{}/s\033[0m".format(s1, s2)
+    return "%s \033[0m%s/s\033[0m" % (s1, s2)
 
 
 def s2hms(s: float, optional_h: bool = False) -> str:
@@ -1719,9 +1719,9 @@ def s2hms(s: float, optional_h: bool = False) -> str:
     h, s = divmod(s, 3600)
     m, s = divmod(s, 60)
     if not h and optional_h:
-        return "{}:{:02}".format(m, s)
+        return "%d:%02d" % (m, s)
 
-    return "{}:{:02}:{:02}".format(h, m, s)
+    return "%d:%02d:%02d" % (h, m, s)
 
 
 def djoin(*paths: str) -> str:
@@ -2191,7 +2191,7 @@ def read_socket_chunked(
             raise Pebkac(400, t.format(x))
 
         if log:
-            log("receiving {} byte chunk".format(chunklen))
+            log("receiving %d byte chunk" % (chunklen,))
 
         for chunk in read_socket(sr, chunklen):
             yield chunk
@@ -2964,7 +2964,7 @@ def visual_length(txt: str) -> int:
                 pend = None
             else:
                 if ch == "\033":
-                    pend = "{0}".format(ch)
+                    pend = "%s" % (ch,)
                 else:
                     co = ord(ch)
                     # the safe parts of latin1 and cp437 (no greek stuff)

@@ -1057,14 +1057,13 @@ class Ctl(object):
                 self.uploader_busy += 1
                 self.t0_up = self.t0_up or time.time()
 
-            zs = "{0}/{1}/{2}/{3} {4}/{5} {6}"
-            stats = zs.format(
+            stats = "%d/%d/%d/%d %d/%d %s" % (
                 self.up_f,
                 len(self.recheck),
                 self.uploader_busy,
                 self.nfiles - self.up_f,
-                int(self.nbytes / (1024 * 1024)),
-                int((self.nbytes - self.up_b) / (1024 * 1024)),
+                self.nbytes // (1024 * 1024),
+                (self.nbytes - self.up_b) // (1024 * 1024),
                 self.eta,
             )
 

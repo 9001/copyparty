@@ -93,7 +93,7 @@ class HttpConn(object):
             self.rproxy = ip
 
         self.ip = ip
-        self.log_src = "{} \033[{}m{}".format(ip, color, self.addr[1]).ljust(26)
+        self.log_src = ("%s \033[%dm%d" % (ip, color, self.addr[1])).ljust(26)
         return self.log_src
 
     def respath(self, res_name: str) -> str:
@@ -176,7 +176,7 @@ class HttpConn(object):
 
                 self.s = ctx.wrap_socket(self.s, server_side=True)
                 msg = [
-                    "\033[1;3{:d}m{}".format(c, s)
+                    "\033[1;3%dm%s" % (c, s)
                     for c, s in zip([0, 5, 0], self.s.cipher())  # type: ignore
                 ]
                 self.log(" ".join(msg) + "\033[0m")

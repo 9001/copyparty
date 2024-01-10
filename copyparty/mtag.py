@@ -240,7 +240,7 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
         if "/" in fps:
             fa, fb = fps.split("/")
             try:
-                fps = int(fa) * 1.0 / int(fb)
+                fps = float(fa) / float(fb)
             except:
                 fps = 9001
 

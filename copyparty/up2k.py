@@ -987,7 +987,7 @@ class Up2k(object):
                 excl = [x.replace("/", "\\") for x in excl]
             else:
                 # ~/.wine/dosdevices/z:/ and such
-                excl += ["/dev", "/proc", "/run", "/sys"]
+                excl.extend(("/dev", "/proc", "/run", "/sys"))
 
             rtop = absreal(top)
             n_add = n_rm = 0
@@ -1089,7 +1089,7 @@ class Up2k(object):
         cv = ""
 
         assert self.pp and self.mem_cur
-        self.pp.msg = "a{} {}".format(self.pp.n, cdir)
+        self.pp.msg = "a%d %s" % (self.pp.n, cdir)
 
         rd = cdir[len(top) :].strip("/")
         if WINDOWS:
@@ -1164,8 +1164,8 @@ class Up2k(object):
                     continue
 
                 if not sz and (
-                    "{}.PARTIAL".format(iname) in partials
-                    or ".{}.PARTIAL".format(iname) in partials
+                    "%s.PARTIAL" % (iname,) in partials
+                    or ".%s.PARTIAL" % (iname,) in partials
                 ):
                     # placeholder for unfinished upload
                     continue
@@ -1261,7 +1261,7 @@ class Up2k(object):
             else:
                 at = 0
 
-            self.pp.msg = "a{} {}".format(self.pp.n, abspath)
+            self.pp.msg = "a%d %s" % (self.pp.n, abspath)
 
             if nohash or not sz:
                 wark = up2k_wark_from_metadata(self.salt, sz, lmod, rd, fn)
@@ -1361,7 +1361,7 @@ class Up2k(object):
                 rd = drd
 
             abspath = djoin(top, rd)
-            self.pp.msg = "b{} {}".format(ndirs - nchecked, abspath)
+            self.pp.msg = "b%d %s" % (ndirs - nchecked, abspath)
             try:
                 if os.path.isdir(abspath):
                     continue
@@ -1713,7 +1713,7 @@ class Up2k(object):
                     cur.execute(q, (w[:16],))
 
             abspath = djoin(ptop, rd, fn)
-            self.pp.msg = "c{} {}".format(nq, abspath)
+            self.pp.msg = "c%d %s" % (nq, abspath)
             if not mpool:
                 n_tags = self._tagscan_file(cur, entags, w, abspath, ip, at)
             else:
@@ -1770,7 +1770,7 @@ class Up2k(object):
                     if c2.execute(q, (row[0][:16],)).fetchone():
                         continue
 
-                gf.write("{}\n".format("\x00".join(row)).encode("utf-8"))
+                gf.write(("%s\n" % ("\x00".join(row),)).encode("utf-8"))
                 n += 1
 
         c2.close()
@@ -2700,7 +2700,7 @@ class Up2k(object):
         else:
             dip = self.hub.iphash.s(ip)
 
-        suffix = "-{:.6f}-{}".format(ts, dip)
+        suffix = "-%.6f-%s" % (ts, dip)
         with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
             return zfw["orz"][1]
 
@@ -2915,7 +2915,7 @@ class Up2k(object):
         except:
             pass
 
-        z2 += [upt]
+        z2.append(upt)
         if self.idx_wark(vflags, *z2):
             del self.registry[ptop][wark]
         else:
@@ -3208,9 +3208,9 @@ class Up2k(object):
                     except:
                         pass
 
-                volpath = "{}/{}".format(vrem, fn).strip("/")
-                vpath = "{}/{}".format(dbv.vpath, volpath).strip("/")
-                self.log("rm {}\n  {}".format(vpath, abspath))
+                volpath = ("%s/%s" % (vrem, fn)).strip("/")
+                vpath = ("%s/%s" % (dbv.vpath, volpath)).strip("/")
+                self.log("rm %s\n  %s" % (vpath, abspath))
                 _ = dbv.get(volpath, uname, *permsets[0])
                 if xbd:
                     if not runhook(
@@ -3742,7 +3742,7 @@ class Up2k(object):
                     return []
 
                 if self.pp:
-                    mb = int(fsz / 1024 / 1024)
+                    mb = fsz // (1024 * 1024)
                     self.pp.msg = prefix + str(mb) + suffix
 
                 hashobj = hashlib.sha512()
@@ -3807,7 +3807,7 @@ class Up2k(object):
         else:
             dip = self.hub.iphash.s(job["addr"])
 
-        suffix = "-{:.6f}-{}".format(job["t0"], dip)
+        suffix = "-%.6f-%s" % (job["t0"], dip)
         with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
             f, job["tnam"] = zfw["orz"]
             abspath = djoin(pdir, job["tnam"])
@@ -4138,6 +4138,6 @@ def up2k_wark_from_hashlist(salt: str, filesize: int, hashes: list[str]) -> str:
 
 
 def up2k_wark_from_metadata(salt: str, sz: int, lastmod: int, rd: str, fn: str) -> str:
-    ret = sfsenc("{}\n{}\n{}\n{}\n{}".format(salt, lastmod, sz, rd, fn))
+    ret = sfsenc("%s\n%d\n%d\n%s\n%s" % (salt, lastmod, sz, rd, fn))
     ret = base64.urlsafe_b64encode(hashlib.sha512(ret).digest())
-    return "#{}".format(ret.decode("ascii"))[:44]
+    return ("#%s" % (ret.decode("ascii"),))[:44]

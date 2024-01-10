@@ -76,7 +76,7 @@ class MpWorker(BrokerCli):
         pass
 
     def logw(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.log("mp{}".format(self.n), msg, c)
+        self.log("mp%d" % (self.n,), msg, c)
 
     def main(self) -> None:
         while True:

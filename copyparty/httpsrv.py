@@ -366,7 +366,7 @@ class HttpSrv(object):
             if not self.t_periodic:
                 name = "hsrv-pt"
                 if self.nid:
-                    name += "-{}".format(self.nid)
+                    name += "-%d" % (self.nid,)
 
                 self.t_periodic = Daemon(self.periodic, name)
 
@@ -385,7 +385,7 @@ class HttpSrv(object):
 
         Daemon(
             self.thr_client,
-            "httpconn-{}-{}".format(addr[0].split(".", 2)[-1][-6:], addr[1]),
+            "httpconn-%s-%d" % (addr[0].split(".", 2)[-1][-6:], addr[1]),
             (sck, addr),
         )
 
@@ -402,9 +402,7 @@ class HttpSrv(object):
             try:
                 sck, addr = task
                 me = threading.current_thread()
-                me.name = "httpconn-{}-{}".format(
-                    addr[0].split(".", 2)[-1][-6:], addr[1]
-                )
+                me.name = "httpconn-%s-%d" % (addr[0].split(".", 2)[-1][-6:], addr[1])
                 self.thr_client(sck, addr)
                 me.name = self.name + "-poolw"
             except Exception as ex:
