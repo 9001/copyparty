@@ -1235,6 +1235,7 @@ class AuthSrv(object):
 
         all_users = {}
         missing_users = {}
+        associated_users = {}
         for axs in daxs.values():
             for d in [
                 axs.uread,
@@ -1251,6 +1252,8 @@ class AuthSrv(object):
                     all_users[usr] = 1
                     if usr != "*" and usr not in acct:
                         missing_users[usr] = 1
+                    if "*" not in d:
+                        associated_users[usr] = 1
 
         if missing_users:
             self.log(
@@ -1270,6 +1273,16 @@ class AuthSrv(object):
                 self.log(t.format(seenpwds[pwd], usr), 1)
                 raise Exception(BAD_CFG)
             seenpwds[pwd] = usr
+
+        for usr in acct:
+            if usr not in associated_users:
+                if len(vfs.all_vols) > 1:
+                    # user probably familiar enough that the verbose message is not necessary
+                    t = "account [%s] is not mentioned in any volume definitions; see --help-accounts"
+                    self.log(t % (usr,), 1)
+                else:
+                    t = "WARNING: the account [%s] is not mentioned in any volume definitions and thus has the same access-level and privileges that guests have; please see --help-accounts for details.  For example, if you intended to give that user full access to the current directory, you could do this:  -v .::A,%s"
+                    self.log(t % (usr, usr), 1)
 
         promote = []
         demote = []
