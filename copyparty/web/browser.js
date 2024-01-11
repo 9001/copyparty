@@ -5179,9 +5179,11 @@ document.onkeydown = function (e) {
 
 	function ev_search_input() {
 		var v = unsmart(this.value),
-			id = this.getAttribute('id');
+			id = this.getAttribute('id'),
+			is_txt = id.slice(-1) == 'v',
+			is_chk = id.slice(-1) == 'c';
 
-		if (id.slice(-1) == 'v') {
+		if (is_txt) {
 			var chk = ebi(id.slice(0, -1) + 'c');
 			chk.checked = ((v + '').length > 0);
 		}
@@ -5193,6 +5195,9 @@ document.onkeydown = function (e) {
 		cap = 125;
 
 		clearTimeout(defer_timeout);
+		if (is_chk)
+			return do_search();
+
 		defer_timeout = setTimeout(try_search, 2000);
 		try_search(v);
 	}
