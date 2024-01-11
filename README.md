@@ -1028,6 +1028,8 @@ to save some time,  you can provide a regex pattern for filepaths to only index 
 
 similarly, you can fully ignore files/folders using `--no-idx [...]` and `:c,noidx=\.iso$`
 
+* when running on macos, all the usual apple metadata files are excluded by default
+
 if you set `--no-hash [...]` globally, you can enable hashing for specific volumes using flag `:c,nohash=`
 
 ### filesystem guards

@@ -20,12 +20,13 @@ import time
 import traceback
 import uuid
 
-from .__init__ import ANYWIN, CORES, EXE, PY2, VT100, WINDOWS, E, EnvParams, unicode
+from .__init__ import ANYWIN, CORES, EXE, MACOS, PY2, VT100, WINDOWS, E, EnvParams, unicode
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import expand_config_file, split_cfg_ln, upgrade_cfg_fmt
 from .cfg import flagcats, onedash
 from .svchub import SvcHub
 from .util import (
+    APPLESAN_TXT,
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
@@ -1166,6 +1167,7 @@ def add_transcoding(ap):
 
 
 def add_db_general(ap, hcores):
+    noidx = APPLESAN_TXT if MACOS else ""
     ap2 = ap.add_argument_group('general db options')
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplication")
     ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets \033[33m-e2d\033[0m")
@@ -1175,7 +1177,7 @@ def add_db_general(ap, hcores):
     ap2.add_argument("-e2vp", action="store_true", help="on hash mismatch: panic and quit copyparty")
     ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs) (volflag=hist)")
     ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching absolute-filesystem-paths during e2ds folder scans (volflag=nohash)")
-    ap2.add_argument("--no-idx", metavar="PTN", type=u, help="regex: disable indexing of matching absolute-filesystem-paths during e2ds folder scans (volflag=noidx)")
+    ap2.add_argument("--no-idx", metavar="PTN", type=u, default=noidx, help="regex: disable indexing of matching absolute-filesystem-paths during e2ds folder scans (volflag=noidx)")
     ap2.add_argument("--no-dhash", action="store_true", help="disable rescan acceleration; do full database integrity check -- makes the db ~5%% smaller and bootup/rescans 3~10x slower")
     ap2.add_argument("--re-dhash", action="store_true", help="rebuild the cache if it gets out of sync (for example crash on startup during metadata scanning)")
     ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice -- only useful for offloading uploads to a cloud service or something (volflag=noforget)")

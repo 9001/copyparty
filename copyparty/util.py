@@ -343,6 +343,11 @@ CMD_EXEB = set(_exestr.encode("utf-8").split())
 CMD_EXES = set(_exestr.split())
 
 
+# mostly from https://github.com/github/gitignore/blob/main/Global/macOS.gitignore
+APPLESAN_TXT = r"/(__MACOS|Icon\r\r)|/\.(_|DS_Store|AppleDouble|LSOverride|DocumentRevisions-|fseventsd|Spotlight-|TemporaryItems|Trashes|VolumeIcon\.icns|com\.apple\.timemachine\.donotpresent|AppleDB|AppleDesktop|apdisk)"
+APPLESAN_RE = re.compile(APPLESAN_TXT)
+
+
 pybin = sys.executable or ""
 if EXE:
     pybin = ""

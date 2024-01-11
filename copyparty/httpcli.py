@@ -37,6 +37,7 @@ from .star import StreamTar
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
 from .util import (
+    APPLESAN_RE,
     HTTPCODE,
     META_NOBOTS,
     UTC,
@@ -1384,8 +1385,7 @@ class HttpCli(object):
             return False
 
         vp = "/" + self.vpath
-        ptn = r"/\.(_|DS_Store|Spotlight-|fseventsd|Trashes|AppleDouble)|/__MACOS"
-        if re.search(ptn, vp):
+        if re.search(APPLESAN_RE, vp):
             zt = '<?xml version="1.0" encoding="utf-8"?>\n<D:error xmlns:D="DAV:"><D:lock-token-submitted><D:href>{}</D:href></D:lock-token-submitted></D:error>'
             zb = zt.format(vp).encode("utf-8", "replace")
             self.reply(zb, 423, "text/xml; charset=utf-8")
@@ -3396,7 +3396,7 @@ class HttpCli(object):
             pt = "404 not found  ┐( ´ -`)┌"
 
         if self.ua.startswith("curl/") or self.ua.startswith("fetch"):
-            pt = "# acct: %s\n%s" % (self.uname, pt)
+            pt = "# acct: %s\n%s\n" % (self.uname, pt)
             self.reply(pt.encode("utf-8"), status=rc)
             return True
 
