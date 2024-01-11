@@ -204,6 +204,8 @@ var Ls = {
 
 		"cut_datechk": "has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished / corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards",
 
+		"cut_appl": "skip uploading apple/macos metadata files$Nsuch as __MACOSX, .DS_Store, .fseventsd",
+
 		"cut_flag": "ensure only one tab is uploading at a time $N -- other tabs must have this enabled too $N -- only affects tabs on the same domain",
 
 		"cut_az": "upload files in alphabetical order, rather than smallest-file-first$N$Nalphabetical order can make it easier to eyeball if something went wrong on the server, but it makes uploading slightly slower on fiber / LAN",
@@ -428,6 +430,7 @@ var Ls = {
 		"u_enoi": 'file-search is not enabled in server config',
 		"u_badf": 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n\n',
 		"u_blankf": 'These {0} files (of {1} total) are blank / empty; upload them anyways?\n\n',
+		"u_applef": 'Because the apple/macos filter is enabled ("up2k switches" in settings),\nsome files ({0} out of {1} in total) will be excluded / skipped.\n\nPress <code>OK/Enter</code> to SKIP the following files,\nPress <code>Cancel/ESC</code> to NOT exclude, and UPLOAD those as well:\n\n',
 		"u_just1": '\nMaybe it works better if you select just one file',
 		"u_ff_many": "This amount of files <em>may</em> cause Firefox to skip some files, or crash.\nPlease try again with fewer files (or use Chrome) if that happens.",
 		"u_up_life": "This upload will be deleted from the server\n{0} after it completes",
@@ -684,6 +687,8 @@ var Ls = {
 
 		"cut_datechk": "har ingen effekt dersom turbo er avslått$N$Ngjør turbo bittelitt tryggere ved å sjekke datostemplingen på filene (i tillegg til filstørrelse)$N$N<em>burde</em> oppdage og gjenoppta de fleste ufullstendige opplastninger, men er <em>ikke</em> en fullverdig erstatning for å deaktivere turbo og gjøre en skikkelig sjekk",
 
+		"cut_appl": "filtrer vekk apple/macos tilleggsfiler før opplastning,$Nf.eks. __MACOSX, .DS_Store, .fseventsd",
+
 		"cut_flag": "samkjører nettleserfaner slik at bare én $N kan holde på med befaring / opplastning $N -- andre faner må også ha denne skrudd på $N -- fungerer kun innenfor samme domene",
 
 		"cut_az": "last opp filer i alfabetisk rekkefølge, istedenfor minste-fil-først$N$Nalfabetisk kan gjøre det lettere å anslå om alt gikk bra, men er bittelitt tregere på fiber / LAN",
@@ -908,6 +913,7 @@ var Ls = {
 		"u_enoi": 'filsøk er deaktivert i serverkonfigurasjonen',
 		"u_badf": 'Disse {0} filene (av totalt {1}) kan ikke leses, kanskje pga rettighetsproblemer i filsystemet på datamaskinen din:\n\n',
 		"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhold; ønsker du å laste dem opp uansett?\n\n',
+		"u_applef": 'Fordi apple/macos-filteret er aktivert (eple-knappen i innstillinger),\nså er følgende {0} (av totalt {1}) filer anbefalt ekskludert.\n\nTrykk <code>OK/Enter</code> for å HOPPE OVER disse filene,\nTrykk <code>Avbryt/ESC</code> for å LASTE OPP disse filene også:\n\n',
 		"u_just1": '\nFunker kanskje bedre hvis du bare tar én fil om gangen',
 		"u_ff_many": "Det var mange filer! Mulig at Firefox kommer til å krasje, eller\nhoppe over et par av dem. Smart å ha Chrome på lur i tilfelle.",
 		"u_up_life": "Filene slettes fra serveren {0}\netter at opplastningen er fullført",
@@ -1180,6 +1186,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '">mt</a>\n' +
 	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '">turbo</a>\n' +
 	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '">date-chk</a>\n' +
+	'		<a id="u2appl" class="tgl btn" href="#" tt="' + L.cut_appl + '">🍎</a>\n' +
 	'		<a id="flag_en" class="tgl btn" href="#" tt="' + L.cut_flag + '">💤</a>\n' +
 	'		<a id="u2sort" class="tgl btn" href="#" tt="' + L.cut_az + '">az</a>\n' +
 	'		<a id="upnag" class="tgl btn" href="#" tt="' + L.cut_nag + '">🔔</a>\n' +

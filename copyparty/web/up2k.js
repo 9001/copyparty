@@ -867,6 +867,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'flag_en', 'flag_en', false, apply_flag_cfg);
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null);
+    bcfg_bind(uc, 'appl', 'u2appl', true, null);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort);
     bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE || VCHROME >= 107), set_hashw);
     bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
@@ -1310,6 +1311,45 @@ function up2k_init(subtle) {
             });
         }
 
+        applefilter(good_files);
+    }
+
+    function applefilter(good_files) {
+        if (!uc.appl)
+            return gotallfiles2(good_files);
+
+        var junk = [], rmi = [];
+        for (var a = 0; a < good_files.length; a++) {
+            if (/\/(__MACOS|Icon\r\r)|\/\.(_|DS_Store|AppleDouble|LSOverride|DocumentRevisions-|fseventsd|Spotlight-|TemporaryItems|Trashes|VolumeIcon\.icns|com\.apple\.timemachine\.donotpresent|AppleDB|AppleDesktop|apdisk)/.exec(good_files[a][1])) {
+                junk.push(good_files[a]);
+                rmi.push(a);
+            }
+        }
+
+        if (!junk.length)
+            return gotallfiles2(good_files);
+
+        // todo: if there's hits so far, start looking for appledoubles
+        //   (files named ._foo where foo is another file in the list)
+        //   and get rid of those too
+
+        var msg = L.u_applef.format(junk.length, good_files.length);
+        for (var a = 0, aa = Math.min(20, junk.length); a < aa; a++)
+            msg += '-- ' + junk[a][1] + '\n';
+
+        return modal.confirm(msg, function () {
+            for (var a = rmi.length - 1; a >= 0; a--)
+                good_files.splice(rmi[a], 1);
+
+            start_actx();
+            gotallfiles2(good_files);
+        }, function () {
+            start_actx();
+            gotallfiles2(good_files);
+        });
+    }
+
+    function gotallfiles2(good_files) {
         good_files.sort(function (a, b) {
             a = a[1];
             b = b[1];
