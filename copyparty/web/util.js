@@ -202,19 +202,24 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
         }
         ignexd[ekey] = true;
 
-        var ls = jcp(localStorage);
-        if (ls.fman_clip)
-            ls.fman_clip = ls.fman_clip.length + ' items';
+        var ls = {},
+            lsk = Object.keys(localStorage),
+            nka = lsk.length,
+            nk = Math.min(200, nka);
 
-        var lsk = Object.keys(ls);
-        lsk.sort();
-        html.push('<p class="b">');
-        for (var a = 0; a < lsk.length; a++) {
-            if (ls[lsk[a]].length > 9000)
-                continue;
+        for (var a = 0; a < nk; a++) {
+            var k = lsk[a],
+                v = localStorage.getItem(k);
 
-            html.push(' <b>' + esc(lsk[a]) + '</b> <code>' + esc(ls[lsk[a]]) + '</code> ');
+            ls[k] = v.length > 256 ? v.slice(0, 32) + '[...' + v.length + 'b]' : v;
         }
+
+        lsk = Object.keys(ls);
+        lsk.sort();
+        html.push('<p class="b"><b>' + nka + ':&nbsp;</b>');
+        for (var a = 0; a < nk; a++)
+            html.push(' <b>' + esc(lsk[a]) + '</b> <code>' + esc(ls[lsk[a]]) + '</code> ');
+
         html.push('</p>');
     }
     catch (e) { }
