@@ -1228,7 +1228,7 @@ class Up2k(object):
             abspath = os.path.join(cdir, fn)
             nohash = reh.search(abspath) if reh else False
 
-            sql = "select w, mt, sz, at from up where rd = ? and fn = ?"
+            sql = "select w, mt, sz, ip, at from up where rd = ? and fn = ?"
             try:
                 c = db.c.execute(sql, (rd, fn))
             except:
@@ -1237,7 +1237,7 @@ class Up2k(object):
             in_db = list(c.fetchall())
             if in_db:
                 self.pp.n -= 1
-                dw, dts, dsz, at = in_db[0]
+                dw, dts, dsz, ip, at = in_db[0]
                 if len(in_db) > 1:
                     t = "WARN: multiple entries: [{}] => [{}] |{}|\n{}"
                     rep_db = "\n".join([repr(x) for x in in_db])
@@ -1259,6 +1259,8 @@ class Up2k(object):
                 db.n += 1
                 in_db = []
             else:
+                dw = ""
+                ip = ""
                 at = 0
 
             self.pp.msg = "a%d %s" % (self.pp.n, abspath)
@@ -1282,8 +1284,12 @@ class Up2k(object):
 
                 wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
 
+            if dw and dw != wark:
+                ip = ""
+                at = 0
+
             # skip upload hooks by not providing vflags
-            self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", "", at)
+            self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", ip, at)
             db.n += 1
             ret += 1
             td = time.time() - db.t
