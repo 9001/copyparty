@@ -230,6 +230,7 @@ var Ls = {
 		"tt_hover": "reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )",
 
 		"ml_pmode": "playback mode",
+		"ml_btns": "cmds",
 		"ml_tcode": "transcode",
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer",
@@ -244,6 +245,7 @@ var Ls = {
 		"mt_oscv": "show album cover in osd\">art",
 		"mt_follow": "keep the playing track scrolled into view\">🎯",
 		"mt_compact": "compact controls\">⟎",
+		"mt_uncache": "clear cache &nbsp;(try this if your browser cached$Na broken copy of a song so it refuses to play)\">uncache",
 		"mt_mloop": "loop the open folder\">🔁 loop",
 		"mt_mnext": "load the next folder and continue\">📂 next",
 		"mt_cflac": "convert flac / wav to opus\">flac",
@@ -267,6 +269,7 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
+		"mm_uncache": "cache cleared; all songs will redownload on next playback",
 		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p><em>however,</em> it could also be due to the browser\'s autoplay settings;</p><p>Firefox: tap the icon on the left side of the address bar, then select "autoplay" and "allow audio"</p><p>Chrome: the problem will gradually dissipate as you play more music on this site</p>',
 		"mm_iosblk": "<p>your web browser thinks the audio playback is unwanted, and it decided to block playback until you start another track manually... unfortunately we are both powerless in telling it otherwise</p><p>supposedly this will get better as you continue playing music on this site, but I'm unfamiliar with apple devices so idk if that's true</p><p>you could try another browser, maybe firefox or chrome?</p>",
 		"mm_hnf": "that song no longer exists",
@@ -710,6 +713,7 @@ var Ls = {
 		"tt_hover": "vis hele mappenavnet når musepekeren treffer mappen$N( gjør dessverre at scrollhjulet fusker dersom musepekeren ikke befinner seg i grøfta )",
 
 		"ml_pmode": "spillemodus",
+		"ml_btns": "knapper",
 		"ml_tcode": "konvertering",
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer (tonejustering)",
@@ -724,6 +728,7 @@ var Ls = {
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
 		"mt_follow": "bla slik at sangen som spilles alltid er synlig\">🎯",
 		"mt_compact": "tettpakket avspillerpanel\">⟎",
+		"mt_uncache": "prøv denne hvis en sang ikke spiller riktig\">uncache",
 		"mt_mloop": "repeter hele mappen\">🔁 gjenta",
 		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
 		"mt_cflac": "konverter flac / wav-filer til opus\">flac",
@@ -747,6 +752,7 @@ var Ls = {
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
+		"mm_uncache": "alle sanger vil lastes på nytt ved neste avspilling",
 		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>NB: det kan også være pga. autoplay-innstillingene, så prøv dette:</p><p>Firefox: klikk på ikonet i venstre side av addressefeltet, velg "autoplay" og "tillat lyd"</p><p>Chrome: problemet vil minske gradvis jo mer musikk du spiller på denne siden</p>',
 		"mm_iosblk": "<p>nettleseren din tror at musikken er uønsket, og den bestemte seg for å stoppe avspillingen slik at du manuelt må velge en ny sang... dessverre er både du og jeg maktesløse når den har bestemt seg.</p><p>det ryktes at problemet vil minske jo mer musikk du spiller på denne siden, men jeg er ikke godt kjent med apple-dingser så jeg er ikke sikker.</p><p>kanskje firefox eller chrome fungerer bedre?</p>",
 		"mm_hnf": "sangen finnes ikke lenger",
@@ -1353,6 +1359,7 @@ function set_files_html(html) {
 
 // actx breaks background album playback on ios
 var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
+	ACB = sread('au_cbv') || 1,
 	noih = /[?&]v\b/.exec('' + location),
 	hash0 = location.hash,
 	mp;
@@ -1372,6 +1379,10 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
 		'<a href="#" class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
 		'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
+		'</div></div>' +
+
+		'<div><h3>' + L.ml_btns + '</h3><div>' +
+		'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
 		'</div></div>' +
 
 		'<div><h3>' + L.ml_pmode + '</h3><div id="pb_mode">' +
@@ -1421,6 +1432,14 @@ var mpl = (function () {
 		ebi('au_fullpre').style.display = 'none';
 		r.fullpre = false;
 	}
+
+	ebi('au_uncache').onclick = function (e) {
+		ev(e);
+		ACB = (Date.now() % 46656).toString(36);
+		swrite('au_cbv', ACB);
+		reload_mp();
+		toast.inf(5, L.mm_uncache);
+	};
 
 	ebi('au_os_ctl').onclick = function (e) {
 		ev(e);
@@ -1712,7 +1731,7 @@ function MPlayer() {
 
 	r.preload = function (url, full) {
 		url = mpl.acode(url);
-		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987&_=' + ACB;
 		mpl.preload_url = full ? url : null;
 		var t0 = Date.now();
 
@@ -2303,7 +2322,7 @@ function dl_song() {
 	}
 
 	var url = mp.tracks[mp.au.tid];
-	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987&_=' + ACB;
 	dl_file(url);
 }
 
@@ -2953,7 +2972,7 @@ function play(tid, is_ev, seek) {
 	}
 
 	var url = mpl.acode(mp.tracks[tid]);
-	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987';
+	url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987&_=' + ACB;
 
 	if (mp.au.rsrc == url)
 		mp.au.currentTime = 0;
@@ -4706,7 +4725,7 @@ var thegrid = (function () {
 				}
 				ihref = SR + '/.cpr/ico/' + ext;
 			}
-			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i';
+			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i&_=' + ACB;
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +

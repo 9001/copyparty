@@ -14,7 +14,8 @@ if (window.CGV)
 var wah = '',
     NOAC = 'autocorrect="off" autocapitalize="off"',
     L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,
-    CB = '?_=' + Date.now(),
+    T0 = Date.now(),
+    CB = '?_=' + Math.floor(T0 / 1000).toString(36),
     R = SR.slice(1),
     RS = R ? "/" + R : "",
     HALFMAX = 8192 * 8192 * 8192 * 8192,
@@ -1062,7 +1063,7 @@ function dl_file(url) {
 
 function cliptxt(txt, ok) {
     var fb = function () {
-        console.log('fb');
+        console.log('clip-fb');
         var o = mknod('input');
         o.value = txt;
         document.body.appendChild(o);
@@ -1859,21 +1860,17 @@ var favico = (function () {
         var b64;
         try {
             b64 = btoa(svg ? svg_decl + svg : gx(r.txt));
-            //console.log('f1');
         }
         catch (e1) {
             try {
                 b64 = btoa(gx(encodeURIComponent(r.txt).replace(/%([0-9A-F]{2})/g,
                     function x(m, v) { return String.fromCharCode('0x' + v); })));
-                //console.log('f2');
             }
             catch (e2) {
                 try {
                     b64 = btoa(gx(unescape(encodeURIComponent(r.txt))));
-                    //console.log('f3');
                 }
                 catch (e3) {
-                    //console.log('fe');
                     return;
                 }
             }
