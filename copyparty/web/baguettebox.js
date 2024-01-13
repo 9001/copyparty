@@ -255,19 +255,19 @@ window.baguetteBox = (function () {
         if (anymod(e, true))
             return;
 
-        var k = e.code + '', v = vid(), pos = -1;
+        var k = (e.code || e.key) + '', v = vid(), pos = -1;
 
         if (k == "BracketLeft")
             setloop(1);
         else if (k == "BracketRight")
             setloop(2);
-        else if (e.shiftKey && k != 'KeyR')
+        else if (e.shiftKey && k != "KeyR" && k != "R")
             return;
-        else if (k == "ArrowLeft" || k == "KeyJ")
+        else if (k == "ArrowLeft" || k == "KeyJ" || k == "Left" || k == "j")
             showPreviousImage();
-        else if (k == "ArrowRight" || k == "KeyL")
+        else if (k == "ArrowRight" || k == "KeyL" || k == "Right" || k == "l")
             showNextImage();
-        else if (k == "Escape")
+        else if (k == "Escape" || k == "Esc")
             hideOverlay();
         else if (k == "Home")
             showFirstImage(e);
@@ -295,9 +295,9 @@ window.baguetteBox = (function () {
         }
         else if (k == "KeyF")
             tglfull();
-        else if (k == "KeyS")
+        else if (k == "KeyS" || k == "s")
             tglsel();
-        else if (k == "KeyR")
+        else if (k == "KeyR" || k == "r" || k == "R")
             rotn(e.shiftKey ? -1 : 1);
         else if (k == "KeyY")
             dlpic();

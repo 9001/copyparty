@@ -216,6 +216,11 @@ function convert_markdown(md_text, dest_dom) {
             md_html = DOMPurify.sanitize(md_html);
     }
     catch (ex) {
+        if (IE) {
+            dest_dom.innerHTML = 'IE cannot into markdown ;_;';
+            return;
+        }
+
         if (ext)
             md_plug_err(ex, ext[1]);
 

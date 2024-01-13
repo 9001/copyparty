@@ -1653,7 +1653,9 @@ html.cz .tgl.btn.on {
 	color: var(--fg-max);
 }
 #tree ul a.hl {
+	color: #fff;
 	color: var(--btn-1-fg);
+	background: #000;
 	background: var(--btn-1-bg);
 	text-shadow: none;
 }
@@ -2174,6 +2176,7 @@ html.y #bbox-overlay figcaption a {
 }
 #bbox-halp {
 	color: var(--fg-max);
+	background: #fff;
 	background: var(--bg);
 	position: absolute;
 	top: 0;

@@ -1563,7 +1563,7 @@ var modal = (function () {
     };
 
     var onkey = function (e) {
-        var k = e.code,
+        var k = (e.code || e.key) + '',
             eok = ebi('modal-ok'),
             eng = ebi('modal-ng'),
             ae = document.activeElement;
@@ -1578,10 +1578,10 @@ var modal = (function () {
             return ok(e);
         }
 
-        if ((k == 'ArrowLeft' || k == 'ArrowRight') && eng && (ae == eok || ae == eng))
+        if ((k == 'ArrowLeft' || k == 'ArrowRight' || k == 'Left' || k == 'Right') && eng && (ae == eok || ae == eng))
             return (ae == eok ? eng : eok).focus() || ev(e);
 
-        if (k == 'Escape')
+        if (k == 'Escape' || k == 'Esc')
             return ng(e);
     }
 

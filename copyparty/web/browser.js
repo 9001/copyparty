@@ -3656,7 +3656,8 @@ var fileman = (function () {
 				(function (a) {
 					f[a].inew.onkeydown = function (e) {
 						rn_ok(a, true);
-						if (e.key.endsWith('Enter'))
+						var kc = (e.code || e.key) + '';
+						if (kc.endsWith('Enter'))
 							return rn_apply();
 					};
 					QS('.rn_dec' + k).onclick = function (e) {
@@ -3748,10 +3749,12 @@ var fileman = (function () {
 		spresets();
 
 		ire.onkeydown = ifmt.onkeydown = function (e) {
-			if (e.key == 'Escape')
+			var k = (e.code || e.key) + '';
+
+			if (k == 'Escape' || k == 'Esc')
 				return rn_cancel();
 
-			if (e.key.endsWith('Enter'))
+			if (k.endsWith('Enter'))
 				return rn_apply();
 		};
 
@@ -4926,14 +4929,14 @@ document.onkeydown = function (e) {
 	if (QS('#bbox-overlay.visible') || modal.busy)
 		return;
 
-	var k = e.code + '', pos = -1, n,
+	var k = (e.code || e.key) + '', pos = -1, n,
 		ae = document.activeElement,
 		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
 
 	if (e.key == '?')
 		return hkhelp();
 
-	if (k == 'Escape') {
+	if (k == 'Escape' || k == 'Esc') {
 		ae && ae.blur();
 		tt.hide();
 
@@ -5003,23 +5006,23 @@ document.onkeydown = function (e) {
 	if (k.endsWith('Enter') && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
 		return ev(e) && ae.click() || true;
 
-	if (aet && aet != 'a' && aet != 'tr' && aet != 'pre')
+	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
 		return;
 
 	if (ctrl(e)) {
-		if (k == 'KeyX')
+		if (k == 'KeyX' || k == 'x')
 			return fileman.cut();
 
-		if (k == 'KeyV')
+		if (k == 'KeyV' || k == 'v')
 			return fileman.paste();
 
-		if (k == 'KeyK')
+		if (k == 'KeyK' || k == 'k')
 			return fileman.delete();
 
 		return;
 	}
 
-	if (e.shiftKey && k != 'KeyA' && k != 'KeyD')
+	if (e.shiftKey && k != 'KeyA' && k != 'KeyD' && k != 'A' && k != 'D')
 		return;
 
 	if (k.indexOf('Digit') === 0)
@@ -5028,16 +5031,17 @@ document.onkeydown = function (e) {
 	if (pos !== -1)
 		return seek_au_mul(pos) || true;
 
-	if (k == 'KeyJ')
+	if (k == 'KeyJ' || k == 'j')
 		return prev_song() || true;
 
-	if (k == 'KeyL')
+	if (k == 'KeyL' || k == 'l')
 		return next_song() || true;
 
-	if (k == 'KeyP')
+	if (k == 'KeyP' || k == 'p')
 		return playpause() || true;
 
-	n = k == 'KeyU' ? -10 : k == 'KeyO' ? 10 : 0;
+	n = (k == 'KeyU' || k == 'u') ? -10 :
+		(k == 'KeyO' || k == 'o') ? 10 : 0;
 	if (n !== 0)
 		return seek_au_rel(n) || true;
 
@@ -5046,51 +5050,52 @@ document.onkeydown = function (e) {
 			showfile.active() ? ebi('dldoc').click() :
 				dl_song();
 
-	n = k == 'KeyI' ? -1 : k == 'KeyK' ? 1 : 0;
+	n = (k == 'KeyI' || k == 'i') ? -1 :
+		(k == 'KeyK' || k == 'k') ? 1 : 0;
 	if (n !== 0)
 		return tree_neigh(n);
 
-	if (k == 'KeyM')
+	if (k == 'KeyM' || k == 'm')
 		return tree_up();
 
-	if (k == 'KeyB')
+	if (k == 'KeyB' || k == 'b')
 		return treectl.hidden ? treectl.entree() : treectl.detree();
 
-	if (k == 'KeyG')
+	if (k == 'KeyG' || k == 'g')
 		return ebi('griden').click();
 
-	if (k == 'KeyT')
+	if (k == 'KeyT' || k == 't')
 		return ebi('thumbs').click();
 
-	if (k == 'KeyV')
+	if (k == 'KeyV' || k == 'v')
 		return ebi('filetree').click();
 
 	if (k == 'F2')
 		return fileman.rename();
 
 	if (!treectl.hidden && (!e.shiftKey || !thegrid.en)) {
-		if (k == 'KeyA')
+		if (k == 'KeyA' || k == 'a')
 			return QS('#twig').click();
 
-		if (k == 'KeyD')
+		if (k == 'KeyD' || k == 'd')
 			return QS('#twobytwo').click();
 	}
 
 	if (showfile.active()) {
-		if (k == 'KeyS')
+		if (k == 'KeyS' || k == 's')
 			showfile.tglsel();
-		if (k == 'KeyE' && ebi('editdoc').style.display != 'none')
+		if ((k == 'KeyE' || k == 'e') && ebi('editdoc').style.display != 'none')
 			ebi('editdoc').click();
 	}
 
 	if (thegrid.en) {
-		if (k == 'KeyS')
+		if (k == 'KeyS' || k == 's')
 			return ebi('gridsel').click();
 
-		if (k == 'KeyA')
+		if (k == 'KeyA' || k == 'a')
 			return QSA('#ghead a[z]')[0].click();
 
-		if (k == 'KeyD')
+		if (k == 'KeyD' || k == 'd')
 			return QSA('#ghead a[z]')[1].click();
 	}
 };
@@ -5203,7 +5208,7 @@ document.onkeydown = function (e) {
 	}
 
 	function ev_search_keydown(e) {
-		if (e.key.endsWith('Enter'))
+		if ((e.key + '').endsWith('Enter'))
 			do_search();
 	}
 
