@@ -28,7 +28,7 @@ fns=(
   MarkupSafe-2.1.3-cp311-cp311-win_amd64.whl
   mutagen-1.47.0-py3-none-any.whl
   packaging-23.2-py3-none-any.whl
-  Pillow-10.1.0-cp311-cp311-win_amd64.whl
+  pillow-10.2.0-cp311-cp311-win_amd64.whl
   python-3.11.7-amd64.exe
 )
 [ $w7 ] && fns+=(

@@ -1,11 +1,11 @@
 FROM    alpine:3.18
 WORKDIR /z
 ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
-        ver_hashwasm=4.9.0 \
+        ver_hashwasm=4.10.0 \
         ver_marked=4.3.0 \
-        ver_dompf=3.0.5 \
+        ver_dompf=3.0.8 \
         ver_mde=2.18.0 \
-        ver_codemirror=5.65.12 \
+        ver_codemirror=5.65.16 \
         ver_fontawesome=5.13.0 \
         ver_prism=1.29.0 \
         ver_zopfli=1.0.3
@@ -80,7 +80,7 @@ RUN     cd asmcrypto.js-$ver_asmcrypto \
 
 
 # build hash-wasm
-RUN     cd hash-wasm \
+RUN     cd hash-wasm/dist \
         && mv sha512.umd.min.js /z/dist/sha512.hw.js
 
 
