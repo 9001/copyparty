@@ -129,6 +129,8 @@ class ThumbSrv(object):
 
         self.mutex = threading.Lock()
         self.busy: dict[str, list[threading.Condition]] = {}
+        self.ram: dict[str, float] = {}
+        self.memcond = threading.Condition(self.mutex)
         self.stopping = False
         self.nthr = max(1, self.args.th_mt)
 
@@ -214,7 +216,7 @@ class ThumbSrv(object):
         with self.mutex:
             try:
                 self.busy[tpath].append(cond)
-                self.log("wait {}".format(tpath))
+                self.log("joined waiting room for %s" % (tpath,))
             except:
                 thdir = os.path.dirname(tpath)
                 bos.makedirs(os.path.join(thdir, "w"))
@@ -264,6 +266,23 @@ class ThumbSrv(object):
             "ffv": self.fmt_ffv,
             "ffa": self.fmt_ffa,
         }
+
+    def wait4ram(self, need: float, ttpath: str) -> None:
+        ram = self.args.th_ram_max
+        if need > ram * 0.99:
+            t = "file too big; need %.2f GiB RAM, but --th-ram-max is only %.1f"
+            raise Exception(t % (need, ram))
+
+        while True:
+            with self.mutex:
+                used = sum([v for k, v in self.ram.items() if k != ttpath]) + need
+                if used < ram:
+                    # self.log("XXX self.ram: %s" % (self.ram,), 5)
+                    self.ram[ttpath] = need
+                    return
+            with self.memcond:
+                # self.log("at RAM limit; used %.2f GiB, need %.2f more" % (used-need, need), 1)
+                self.memcond.wait(3)
 
     def worker(self) -> None:
         while not self.stopping:
@@ -330,10 +349,14 @@ class ThumbSrv(object):
             with self.mutex:
                 subs = self.busy[tpath]
                 del self.busy[tpath]
+                self.ram.pop(ttpath, None)
 
             for x in subs:
                 with x:
                     x.notify_all()
+
+            with self.memcond:
+                self.memcond.notify_all()
 
         with self.mutex:
             self.nthr -= 1
@@ -366,6 +389,7 @@ class ThumbSrv(object):
         return im
 
     def conv_pil(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        self.wait4ram(0.2, tpath)
         with Image.open(fsenc(abspath)) as im:
             try:
                 im = self.fancy_pillow(im, fmt, vn)
@@ -395,6 +419,7 @@ class ThumbSrv(object):
             im.save(tpath, **args)
 
     def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        self.wait4ram(0.2, tpath)
         crops = ["centre", "none"]
         if fmt.endswith("f"):
             crops = ["none"]
@@ -415,6 +440,7 @@ class ThumbSrv(object):
         img.write_to_file(tpath, Q=40)
 
     def conv_ffmpeg(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        self.wait4ram(0.2, tpath)
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if not ret:
             return
@@ -517,8 +543,21 @@ class ThumbSrv(object):
         if "ac" not in ret:
             raise Exception("not audio")
 
-        flt = (
-            b"[0:a:0]"
+        # jt_versi.xm: 405M/839s
+        dur = ret[".dur"][1] if ".dur" in ret else 300
+        need = 0.2 + dur / 3000
+        speedup = b""
+        if need > self.args.th_ram_max * 0.7:
+            self.log("waves too big (need %.2f GiB); trying to optimize" % (need,))
+            need = 0.2 + dur / 4200  # only helps about this much...
+            speedup = b"aresample=8000,"
+        if need > self.args.th_ram_max * 0.96:
+            raise Exception("file too big; cannot waves")
+
+        self.wait4ram(need, tpath)
+
+        flt = b"[0:a:0]" + speedup
+        flt += (
             b"compand=.3|.3:1|1:-90/-60|-60/-40|-40/-30|-20/-20:6:0:-90:0.2"
             b",volume=2"
             b",showwavespic=s=2048x64:colors=white"
@@ -544,6 +583,15 @@ class ThumbSrv(object):
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if "ac" not in ret:
             raise Exception("not audio")
+
+        # https://trac.ffmpeg.org/ticket/10797
+        # expect 1 GiB every 600 seconds when duration is tricky;
+        # simple filetypes are generally safer so let's special-case those
+        safe = ("flac", "wav", "aif", "aiff", "opus")
+        coeff = 1800 if abspath.split(".")[-1].lower() in safe else 600
+        dur = ret[".dur"][1] if ".dur" in ret else 300
+        need = 0.2 + dur / coeff
+        self.wait4ram(need, tpath)
 
         fc = "[0:a:0]aresample=48000{},showspectrumpic=s=640x512,crop=780:544:70:50[o]"
 
@@ -587,6 +635,7 @@ class ThumbSrv(object):
         if self.args.no_acode:
             raise Exception("disabled in server config")
 
+        self.wait4ram(0.2, tpath)
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if "ac" not in ret:
             raise Exception("not audio")
