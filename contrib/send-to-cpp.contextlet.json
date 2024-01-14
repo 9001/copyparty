@@ -1,0 +1,11 @@
+{
+    "code": "// https://addons.mozilla.org/en-US/firefox/addon/contextlets/\n// https://github.com/davidmhammond/contextlets\n\nvar url = 'http://partybox.local:3923/';\nvar pw = 'wark';\n\nvar xhr = new XMLHttpRequest();\nxhr.msg = this.info.linkUrl || this.info.srcUrl;\nxhr.open('POST', url, true);\nxhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');\nxhr.setRequestHeader('PW', pw);\nxhr.send('msg=' + xhr.msg);\n",
+    "contexts": [
+        "link"
+    ],
+    "icons": null,
+    "patterns": "",
+    "scope": "background",
+    "title": "send to cpp",
+    "type": "normal"
+}

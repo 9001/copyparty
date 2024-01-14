@@ -1,4 +1,35 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2023-1231-1849  `v1.9.28`  eo2023
+
+was hoping to finish the IdP stuff during 37c3 but that fell through, so here's all the other recent fixes instead -- happy newyears
+
+## new features
+
+* #66 new permission `.` to grant access to see dotfiles (hidden files) to specific users
+  * and new volflag `dots` to grant access to all users with `r`ead
+  * `-ed` still behaves like before (anyone with `r` can see dotfiles in all volumes)
+* #70 new permission `A` (alias of `rwmda.`) grants read/write/move/delete/admin/dotfiles
+* #67 folder thumbnails can be dotfiles (`.cover.jpg`, `.folder.png`) if the database is enabled (`-e2dsa`)
+* new option `--u2j` to specify default number of parallel file uploads in the up2k browser client
+  * default (2) is good on average; 16 can be good when most uploaders are overseas
+* curl gets plaintext 404/403 messages
+
+## bugfixes
+
+* cors-checking is disabled if the `PW` header is provided, just like the [readme](https://github.com/9001/copyparty#cors) always claimed
+* server would return `200 OK` while trying to return a file that is unreadable due to filesystem permissions
+* `--xdev` still doesn't work on windows, but at least now it doesn't entirely break filesystem indexing
+* fix tiny resource leak due to funky dualstack on macos
+
+## other changes
+
+* logfiles are padded to align messages when `-q` is specified, similar to current/previous behavior without `-q`
+* `--hdr-au-usr` was renamed to `--idp-h-usr` in preparation for other `--idp` things
+  * any mentions of `--hdr-au-usr` are translated to the new name on startup
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1208-2133  `v1.9.27`  another dedup bug
 
 so [v1.9.26](https://github.com/9001/copyparty/releases/tag/v1.9.26) fixed how moving a symlink could break other related symlinks, and then it turns out symlinks themselves could also die when moving them to another location, and somehow nobody encountered any of these until now... surely there are no more deduplication-related issues left at this point, yeah?

@@ -1598,6 +1598,10 @@ interact with copyparty using non-browser clients
 
 * sharex (screenshot utility): see [./contrib/sharex.sxcu](contrib/#sharexsxcu)
 
+* contextlet (web browser integration); see [contrib contextlet](contrib/readme.md#send-to-cppcontextletjson)
+
+* [igloo irc](https://iglooirc.com/): Method: `post` Host: `https://you.com/up/?want=url&pw=hunter2` Multipart: `yes` File parameter: `f`
+
 copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uplaods:
 
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
@@ -1616,7 +1620,7 @@ the commandline uploader [u2c.py](https://github.com/9001/copyparty/tree/hovudst
 
 alternatively there is [rclone](./docs/rclone.md) which allows for bidirectional sync and is *way* more flexible (stream files straight from sftp/s3/gcs to copyparty, ...), although there is no integrity check and it won't work with files over 100 MiB if copyparty is behind cloudflare
 
-* starting from rclone v1.63 (currently [in beta](https://beta.rclone.org/?filter=latest)), rclone will also be faster than u2c.py
+* starting from rclone v1.63, rclone is faster than u2c.py on low-latency connections
 
 
 ## mount as drive
@@ -1625,7 +1629,7 @@ a remote copyparty server as a local filesystem;  go to the control-panel and cl
 
 alternatively, some alternatives roughly sorted by speed (unreproducible benchmark), best first:
 
-* [rclone-webdav](./docs/rclone.md) (25s), read/WRITE ([v1.63-beta](https://beta.rclone.org/?filter=latest))
+* [rclone-webdav](./docs/rclone.md) (25s), read/WRITE (rclone v1.63 or later)
 * [rclone-http](./docs/rclone.md) (26s), read-only
 * [partyfuse.py](./bin/#partyfusepy) (35s), read-only
 * [rclone-ftp](./docs/rclone.md) (47s), read/WRITE
