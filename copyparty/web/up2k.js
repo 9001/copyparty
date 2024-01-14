@@ -1332,7 +1332,8 @@ function up2k_init(subtle) {
             return modal.confirm(msg.join('') + '</ul>', function () {
                 start_actx();
                 up_them(good_files);
-                toast.inf(15, L.u_unpt, L.u_unpt);
+                if (have_up2k_idx)
+                    toast.inf(15, L.u_unpt, L.u_unpt);
             }, null);
 
         up_them(good_files);
