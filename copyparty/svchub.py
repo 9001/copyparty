@@ -460,6 +460,13 @@ class SvcHub(object):
             if ptn:
                 setattr(self.args, k, re.compile(ptn))
 
+        try:
+            zf1, zf2 = self.args.rm_retry.split("/")
+            self.args.rm_re_t = float(zf1)
+            self.args.rm_re_r = float(zf2)
+        except:
+            raise Exception("invalid --rm-retry [%s]" % (self.args.rm_retry,))
+
         return True
 
     def _ipa2re(self, txt) -> Optional[re.Pattern]:

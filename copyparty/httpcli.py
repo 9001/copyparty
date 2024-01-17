@@ -88,6 +88,7 @@ from .util import (
     vjoin,
     vol_san,
     vsplit,
+    wunlink,
     yieldfile,
 )
 
@@ -1691,7 +1692,7 @@ class HttpCli(object):
                 and bos.path.getmtime(path) >= time.time() - self.args.blank_wt
             ):
                 # small toctou, but better than clobbering a hardlink
-                bos.unlink(path)
+                wunlink(self.log, path, vfs.flags)
 
         with ren_open(fn, *open_a, **params) as zfw:
             f, fn = zfw["orz"]
@@ -1705,7 +1706,7 @@ class HttpCli(object):
                 lim.chk_sz(post_sz)
                 lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, post_sz)
             except:
-                bos.unlink(path)
+                wunlink(self.log, path, vfs.flags)
                 raise
 
         if self.args.nw:
@@ -1758,7 +1759,7 @@ class HttpCli(object):
         ):
             t = "upload blocked by xau server config"
             self.log(t, 1)
-            os.unlink(path)
+            wunlink(self.log, path, vfs.flags)
             raise Pebkac(403, t)
 
         vfs, rem = vfs.get_dbv(rem)
@@ -2439,8 +2440,8 @@ class HttpCli(object):
                             lim.chk_nup(self.ip)
                         except:
                             if not nullwrite:
-                                bos.unlink(tabspath)
-                                bos.unlink(abspath)
+                                wunlink(self.log, tabspath, vfs.flags)
+                                wunlink(self.log, abspath, vfs.flags)
                             fname = os.devnull
                             raise
 
@@ -2468,7 +2469,7 @@ class HttpCli(object):
                     ):
                         t = "upload blocked by xau server config"
                         self.log(t, 1)
-                        os.unlink(abspath)
+                        wunlink(self.log, abspath, vfs.flags)
                         raise Pebkac(403, t)
 
                     dbv, vrem = vfs.get_dbv(rem)
@@ -2712,7 +2713,7 @@ class HttpCli(object):
                 raise Pebkac(403, t)
 
         if bos.path.exists(fp):
-            bos.unlink(fp)
+            wunlink(self.log, fp, vfs.flags)
 
         with open(fsenc(fp), "wb", 512 * 1024) as f:
             sz, sha512, _ = hashcopy(p_data, f, self.args.s_wr_slp)
@@ -2724,7 +2725,7 @@ class HttpCli(object):
                 lim.chk_sz(sz)
                 lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, sz)
             except:
-                bos.unlink(fp)
+                wunlink(self.log, fp, vfs.flags)
                 raise
 
         new_lastmod = bos.stat(fp).st_mtime
@@ -2747,7 +2748,7 @@ class HttpCli(object):
         ):
             t = "save blocked by xau server config"
             self.log(t, 1)
-            os.unlink(fp)
+            wunlink(self.log, fp, vfs.flags)
             raise Pebkac(403, t)
 
         vfs, rem = vfs.get_dbv(rem)

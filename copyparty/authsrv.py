@@ -1494,6 +1494,14 @@ class AuthSrv(object):
                 if k in vol.flags:
                     vol.flags[k] = float(vol.flags[k])
 
+            try:
+                zs1, zs2 = vol.flags["rm_retry"].split("/")
+                vol.flags["rm_re_t"] = float(zs1)
+                vol.flags["rm_re_r"] = float(zs2)
+            except:
+                t = 'volume "/%s" has invalid rm_retry [%s]'
+                raise Exception(t % (vol.vpath, vol.flags.get("rm_retry")))
+
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
                     vol.flags[k2] = True
@@ -1505,8 +1513,8 @@ class AuthSrv(object):
             dbds = "acid|swal|wal|yolo"
             vol.flags["dbd"] = dbd = vol.flags.get("dbd") or self.args.dbd
             if dbd not in dbds.split("|"):
-                t = "invalid dbd [{}]; must be one of [{}]"
-                raise Exception(t.format(dbd, dbds))
+                t = 'volume "/%s" has invalid dbd [%s]; must be one of [%s]'
+                raise Exception(t % (vol.vpath, dbd, dbds))
 
             # default tag cfgs if unset
             for k in ("mte", "mth", "exp_md", "exp_lg"):

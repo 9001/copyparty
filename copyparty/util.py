@@ -2078,6 +2078,41 @@ def atomic_move(usrc: str, udst: str) -> None:
         os.rename(src, dst)
 
 
+def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
+    maxtime = flags.get("rm_re_t", 0.0)
+    bpath = fsenc(abspath)
+    if not maxtime:
+        os.unlink(bpath)
+        return True
+
+    chill = flags.get("rm_re_r", 0.0)
+    if chill < 0.001:
+        chill = 0.1
+
+    t0 = now = time.time()
+    for attempt in range(90210):
+        try:
+            os.unlink(bpath)
+            if attempt:
+                now = time.time()
+                t = "deleted in %.2f sec, attempt %d"
+                log(t % (now - t0, attempt + 1))
+            return True
+        except OSError as ex:
+            now = time.time()
+            if ex.errno == errno.ENOENT:
+                return False
+            if now - t0 > maxtime or attempt == 90209:
+                raise
+            if not attempt:
+                t = "delete failed (err.%d); retrying for %d sec: %s"
+                log(t % (ex.errno, maxtime + 0.99, abspath))
+
+        time.sleep(chill)
+
+    return False  # makes pylance happy
+
+
 def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:
     try:
         # some fuses misbehave

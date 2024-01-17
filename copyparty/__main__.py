@@ -859,6 +859,12 @@ def add_qr(ap, tty):
     ap2.add_argument("--qrz", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try [\033[32m2\033[0m] on broken fonts)")
 
 
+def add_fs(ap):
+    ap2 = ap.add_argument_group("filesystem options")
+    rm_re_def = "5/0.1" if ANYWIN else "0/0"
+    ap2.add_argument("--rm-retry", metavar="T/R", type=u, default=rm_re_def, help="if a file cannot be deleted because it is busy, continue trying for \033[33mT\033[0m seconds, retry every \033[33mR\033[0m seconds; disable with 0/0 (volflag=rm_retry)")
+
+
 def add_upload(ap):
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless \033[33m-ed\033[0m")
@@ -1308,6 +1314,7 @@ def run_argparse(
     add_zeroconf(ap)
     add_zc_mdns(ap)
     add_zc_ssdp(ap)
+    add_fs(ap)
     add_upload(ap)
     add_db_general(ap, hcores)
     add_db_metadata(ap)

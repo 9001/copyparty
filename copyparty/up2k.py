@@ -64,6 +64,7 @@ from .util import (
     vsplit,
     w8b64dec,
     w8b64enc,
+    wunlink,
 )
 
 try:
@@ -808,7 +809,7 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
-        fx = set(("html_head",))
+        fx = set(("html_head", "rm_re_t", "rm_re_r"))
         fd = vf_bmap()
         fd.update(vf_cmap())
         fd.update(vf_vmap())
@@ -2585,12 +2586,13 @@ class Up2k(object):
                             raise Pebkac(403, t)
 
                         if not self.args.nw:
+                            dvf: dict[str, Any] = vfs.flags
                             try:
                                 dvf = self.flags[job["ptop"]]
                                 self._symlink(src, dst, dvf, lmod=cj["lmod"], rm=True)
                             except:
                                 if bos.path.exists(dst):
-                                    bos.unlink(dst)
+                                    wunlink(self.log, dst, dvf)
                                 if not n4g:
                                     raise
 
@@ -2699,7 +2701,7 @@ class Up2k(object):
         fp = djoin(fdir, fname)
         if job.get("replace") and bos.path.exists(fp):
             self.log("replacing existing file at {}".format(fp))
-            bos.unlink(fp)
+            wunlink(self.log, fp, self.flags.get(job["ptop"]) or {})
 
         if self.args.plain_ip:
             dip = ip.replace(":", ".")
@@ -2757,7 +2759,7 @@ class Up2k(object):
                 ldst = ldst.replace("/", "\\")
 
             if rm and bos.path.exists(dst):
-                bos.unlink(dst)
+                wunlink(self.log, dst, flags)
 
             try:
                 if "hardlink" in flags:
@@ -2773,7 +2775,7 @@ class Up2k(object):
                     Path(ldst).symlink_to(lsrc)
                     if not bos.path.exists(dst):
                         try:
-                            bos.unlink(dst)
+                            wunlink(self.log, dst, flags)
                         except:
                             pass
                         t = "the created symlink [%s] did not resolve to [%s]"
@@ -3076,7 +3078,7 @@ class Up2k(object):
         ):
             t = "upload blocked by xau server config"
             self.log(t, 1)
-            bos.unlink(dst)
+            wunlink(self.log, dst, vflags)
             self.registry[ptop].pop(wark, None)
             raise Pebkac(403, t)
 
@@ -3247,7 +3249,7 @@ class Up2k(object):
                         if cur:
                             cur.connection.commit()
 
-                bos.unlink(abspath)
+                wunlink(self.log, abspath, dbv.flags)
                 if xad:
                     runhook(
                         self.log,
@@ -3402,7 +3404,7 @@ class Up2k(object):
             t = "moving symlink from [{}] to [{}], target [{}]"
             self.log(t.format(sabs, dabs, dlabs))
             mt = bos.path.getmtime(sabs, False)
-            bos.unlink(sabs)
+            wunlink(self.log, sabs, svn.flags)
             self._symlink(dlabs, dabs, dvn.flags, False, lmod=mt)
 
             # folders are too scary, schedule rescan of both vols
@@ -3469,7 +3471,7 @@ class Up2k(object):
                 dlink = os.path.join(os.path.dirname(sabs), dlink)
                 dlink = bos.path.abspath(dlink)
                 self._symlink(dlink, dabs, dvn.flags, lmod=ftime)
-                bos.unlink(sabs)
+                wunlink(self.log, sabs, svn.flags)
             else:
                 atomic_move(sabs, dabs)
 
@@ -3484,7 +3486,7 @@ class Up2k(object):
                 shutil.copy2(b1, b2)
             except:
                 try:
-                    os.unlink(b2)
+                    wunlink(self.log, dabs, dvn.flags)
                 except:
                     pass
 
@@ -3496,7 +3498,7 @@ class Up2k(object):
                     zb = os.readlink(b1)
                     os.symlink(zb, b2)
                 except:
-                    os.unlink(b2)
+                    wunlink(self.log, dabs, dvn.flags)
                     raise
 
             if is_link:
@@ -3506,7 +3508,7 @@ class Up2k(object):
                 except:
                     pass
 
-            os.unlink(b1)
+            wunlink(self.log, sabs, svn.flags)
 
         if xar:
             runhook(self.log, xar, dabs, dvp, "", uname, 0, 0, "", 0, "")
@@ -3646,10 +3648,11 @@ class Up2k(object):
             ptop, rem = links.pop(slabs)
             self.log("linkswap [{}] and [{}]".format(sabs, slabs))
             mt = bos.path.getmtime(slabs, False)
-            bos.unlink(slabs)
+            flags = self.flags.get(ptop) or {}
+            wunlink(self.log, slabs, flags)
             bos.rename(sabs, slabs)
             bos.utime(slabs, (int(time.time()), int(mt)), False)
-            self._symlink(slabs, sabs, self.flags.get(ptop) or {}, False)
+            self._symlink(slabs, sabs, flags, False)
             full[slabs] = (ptop, rem)
             sabs = slabs
 
@@ -3695,13 +3698,13 @@ class Up2k(object):
                 self.log(t % (ex, ex), 3)
 
             self.log("relinking [%s] to [%s]" % (alink, dabs))
+            flags = self.flags.get(parts[0]) or {}
             try:
                 lmod = bos.path.getmtime(alink, False)
-                bos.unlink(alink)
+                wunlink(self.log, alink, flags)
             except:
                 pass
 
-            flags = self.flags.get(parts[0]) or {}
             self._symlink(dabs, alink, flags, False, lmod=lmod or 0)
 
         return len(full) + len(links)

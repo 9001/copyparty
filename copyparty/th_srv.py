@@ -28,6 +28,7 @@ from .util import (
     runcmd,
     statdir,
     vsplit,
+    wunlink,
 )
 
 if True:  # pylint: disable=using-constant-test
@@ -317,7 +318,7 @@ class ThumbSrv(object):
             tdir, tfn = os.path.split(tpath)
             ttpath = os.path.join(tdir, "w", tfn)
             try:
-                bos.unlink(ttpath)
+                wunlink(self.log, ttpath, vn.flags)
             except:
                 pass
 
@@ -337,7 +338,7 @@ class ThumbSrv(object):
                     else:
                         # ffmpeg may spawn empty files on windows
                         try:
-                            os.unlink(ttpath)
+                            wunlink(self.log, ttpath, vn.flags)
                         except:
                             pass
 
@@ -651,7 +652,7 @@ class ThumbSrv(object):
         if want_caf:
             tmp_opus = tpath + ".opus"
             try:
-                bos.unlink(tmp_opus)
+                wunlink(self.log, tmp_opus, vn.flags)
             except:
                 pass
 
@@ -718,7 +719,7 @@ class ThumbSrv(object):
 
         if tmp_opus != tpath:
             try:
-                bos.unlink(tmp_opus)
+                wunlink(self.log, tmp_opus, vn.flags)
             except:
                 pass
 
@@ -745,7 +746,10 @@ class ThumbSrv(object):
                 else:
                     self.log("\033[Jcln {} ({})/\033[A".format(histpath, vol))
 
-                ndirs += self.clean(histpath)
+                try:
+                    ndirs += self.clean(histpath)
+                except Exception as ex:
+                    self.log("\033[Jcln err in %s: %r" % (histpath, ex), 3)
 
             self.log("\033[Jcln ok; rm {} dirs".format(ndirs))
 
