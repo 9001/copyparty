@@ -43,6 +43,7 @@ from .util import (
     DEF_MTH,
     IMPLICATIONS,
     JINJA_VER,
+    PY_DESC,
     PYFTPD_VER,
     SQLITE_VER,
     UNPLICATIONS,
@@ -50,7 +51,6 @@ from .util import (
     ansi_re,
     dedent,
     min_ex,
-    py_desc,
     pybin,
     termsize,
     wrap,
@@ -1380,7 +1380,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         S_VERSION,
         CODENAME,
         S_BUILD_DT,
-        py_desc().replace("[", "\033[90m["),
+        PY_DESC.replace("[", "\033[90m["),
         SQLITE_VER,
         JINJA_VER,
         PYFTPD_VER,
@@ -1544,6 +1544,9 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     if sys.version_info < (3, 6):
         al.no_scandir = True
+
+    if not hasattr(os, "sendfile"):
+        al.no_sendfile = True
 
     # signal.signal(signal.SIGINT, sighandler)
 

@@ -167,6 +167,12 @@ except:
         return struct.unpack(fmt.decode("ascii"), a)
 
 
+try:
+    BITNESS = struct.calcsize(b"P") * 8
+except:
+    BITNESS = struct.calcsize("P") * 8
+
+
 ansi_re = re.compile("\033\\[[^mK]*[mK]")
 
 
@@ -371,11 +377,6 @@ def py_desc() -> str:
     if ofs > 0:
         py_ver = py_ver[:ofs]
 
-    try:
-        bitness = struct.calcsize(b"P") * 8
-    except:
-        bitness = struct.calcsize("P") * 8
-
     host_os = platform.system()
     compiler = platform.python_compiler().split("http")[0]
 
@@ -383,7 +384,7 @@ def py_desc() -> str:
     os_ver = m.group(1) if m else ""
 
     return "{:>9} v{} on {}{} {} [{}]".format(
-        interp, py_ver, host_os, bitness, os_ver, compiler
+        interp, py_ver, host_os, BITNESS, os_ver, compiler
     )
 
 
@@ -422,8 +423,10 @@ except:
     PYFTPD_VER = "(None)"
 
 
+PY_DESC = py_desc()
+
 VERSIONS = "copyparty v{} ({})\n{}\n   sqlite v{} | jinja v{} | pyftpd v{}".format(
-    S_VERSION, S_BUILD_DT, py_desc(), SQLITE_VER, JINJA_VER, PYFTPD_VER
+    S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER
 )
 
 

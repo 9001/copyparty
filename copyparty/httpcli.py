@@ -38,6 +38,7 @@ from .sutil import StreamArc, gfilter
 from .szip import StreamZip
 from .util import (
     APPLESAN_RE,
+    BITNESS,
     HTTPCODE,
     META_NOBOTS,
     UTC,
@@ -2962,7 +2963,7 @@ class HttpCli(object):
             use_sendfile = (
                 not self.tls  #
                 and not self.args.no_sendfile
-                and hasattr(os, "sendfile")
+                and (BITNESS > 32 or file_sz < 0x7fffFFFF)
             )
 
         #
