@@ -2092,9 +2092,13 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
     if chill < 0.001:
         chill = 0.1
 
+    ino = 0
     t0 = now = time.time()
     for attempt in range(90210):
         try:
+            if ino and os.stat(bpath).st_ino != ino:
+                log("inode changed; aborting delete")
+                return False
             os.unlink(bpath)
             if attempt:
                 now = time.time()
@@ -2108,6 +2112,8 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
             if now - t0 > maxtime or attempt == 90209:
                 raise
             if not attempt:
+                if not PY2:
+                    ino = os.stat(bpath).st_ino
                 t = "delete failed (err.%d); retrying for %d sec: %s"
                 log(t % (ex.errno, maxtime + 0.99, abspath))
 
