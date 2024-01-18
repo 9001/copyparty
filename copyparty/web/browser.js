@@ -229,13 +229,14 @@ var Ls = {
 		"tt_wrap": "word wrap",
 		"tt_hover": "reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )",
 
-		"ml_pmode": "playback mode",
+		"ml_pmode": "at end of folder...",
 		"ml_btns": "cmds",
 		"ml_tcode": "transcode",
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer",
 		"ml_drc": "dynamic range compressor",
 
+		"mt_shuf": "shuffle the songs in each folder\">🔀",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
@@ -712,13 +713,14 @@ var Ls = {
 		"tt_wrap": "linjebryting",
 		"tt_hover": "vis hele mappenavnet når musepekeren treffer mappen$N( gjør dessverre at scrollhjulet fusker dersom musepekeren ikke befinner seg i grøfta )",
 
-		"ml_pmode": "spillemodus",
+		"ml_pmode": "ved enden av mappen",
 		"ml_btns": "knapper",
 		"ml_tcode": "konvertering",
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer (tonejustering)",
 		"ml_drc": "compressor (volum-utjevning)",
 
+		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
@@ -1370,6 +1372,7 @@ var mpl = (function () {
 
 	ebi('op_player').innerHTML = (
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
+		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
 		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
@@ -1411,6 +1414,9 @@ var mpl = (function () {
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 		'traversals': 0,
 	};
+	bcfg_bind(r, 'shuf', 'au_shuf', false, function () {
+		mp.read_order();  // don't bind
+	});
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
 	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
@@ -1663,6 +1669,20 @@ function MPlayer() {
 			r.au.volume = r.expvol(r.vol);
 	};
 
+	r.shuffle = function () {
+		if (!mpl.shuf)
+			return;
+
+		// durstenfeld
+		for (var a = r.order.length - 1; a > 0; a--) {
+			var b = Math.floor(Math.random() * (a + 1)),
+				c = r.order[a];
+			r.order[a] = r.order[b];
+			r.order[b] = c;
+		}
+	};
+	r.shuffle();
+
 	r.read_order = function () {
 		var order = [],
 			links = QSA('#files>tbody>tr>td:nth-child(1)>a');
@@ -1675,6 +1695,7 @@ function MPlayer() {
 			order.push(tid.slice(1));
 		}
 		r.order = order;
+		r.shuffle();
 	};
 
 	r.fdir = 0;

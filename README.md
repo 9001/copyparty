@@ -739,7 +739,8 @@ some hilights:
 click the `play` link next to an audio file, or copy the link target to [share it](https://a.ocv.me/pub/demo/music/Ubiktune%20-%20SOUNDSHOCK%202%20-%20FM%20FUNK%20TERRROR!!/#af-1fbfba61&t=18) (optionally with a timestamp to start playing from, like that example does)
 
 open the `[🎺]` media-player-settings tab to configure it,
-* switches:
+* "switches":
+  * `[🔀]` shuffles the files inside each folder
   * `[preload]` starts loading the next track when it's about to end, reduces the silence between songs
   * `[full]` does a full preload by downloading the entire next file; good for unreliable connections, bad for slow connections
   * `[~s]` toggles the seekbar waveform display
@@ -749,10 +750,12 @@ open the `[🎺]` media-player-settings tab to configure it,
   * `[art]` shows album art on the lockscreen
   * `[🎯]` keeps the playing song scrolled into view (good when using the player as a taskbar dock)
   * `[⟎]` shrinks the playback controls
-* playback mode:
+* "buttons":
+  * `[uncache]` may fix songs that won't play correctly due to bad files in browser cache
+* "at end of folder":
   * `[loop]` keeps looping the folder
   * `[next]` plays into the next folder
-* transcode:
+* "transcode":
   * `[flac]` converts `flac` and `wav` files into opus
   * `[aac]` converts `aac` and `m4a` files into opus
   * `[oth]` converts all other known formats into opus
