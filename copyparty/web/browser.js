@@ -372,7 +372,7 @@ var Ls = {
 		"s_t1": "tags contains &nbsp; (^=start, end=$)",
 		"s_a1": "specific metadata properties",
 
-		"md_eshow": "cannot show ",
+		"md_eshow": "cannot render ",
 		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
 
 		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
@@ -855,7 +855,7 @@ var Ls = {
 		"s_t1": "sang-info inneholder",
 		"s_a1": "konkrete egenskaper",
 
-		"md_eshow": "kan ikke vise ",
+		"md_eshow": "viser forenklet ",
 		"md_off": "[📜<em>readme</em>] er avskrudd i [⚙️] -- dokument skjult",
 
 		"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
@@ -5933,6 +5933,9 @@ var treectl = (function () {
 	}
 
 	r.reqls = function (url, hpush, back) {
+		if (IE && !history.pushState)
+			return window.location = url;
+
 		var xhr = new XHR();
 		xhr.top = url.split('?')[0];
 		xhr.back = back
@@ -7378,8 +7381,11 @@ function show_md(md, name, div, url, depth) {
 
 	wfp_debounce.hide();
 	if (!marked) {
-		if (depth)
+		if (depth) {
+			clmod(div, 'raw', 1);
+			div.textContent = "--[ " + name + " ]---------\r\n" + md;
 			return toast.warn(10, errmsg + (window.WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
+		}
 
 		wfp_debounce.n--;
 		return import_js(SR + '/.cpr/deps/marked.js', function () {

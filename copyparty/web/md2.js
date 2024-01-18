@@ -163,7 +163,7 @@ redraw = (function () {
     dom_sbs.onclick = setsbs;
     dom_nsbs.onclick = modetoggle;
 
-    onresize();
+    (IE ? modetoggle : onresize)();
     return onresize;
 })();
 

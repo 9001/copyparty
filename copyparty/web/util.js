@@ -161,6 +161,9 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if (url.indexOf(' > eval') + 1 && !evalex_fatal)
         return;  // md timer
 
+    if (IE && url.indexOf('prism.js') + 1)
+        return;
+
     var ekey = url + '\n' + lineNo + '\n' + msg;
     if (ignexd[ekey] || crashed)
         return;
@@ -375,6 +378,22 @@ catch (ex) {
         };
     }
 }
+
+if (!window.Set)
+    window.Set = function () {
+        var r = this;
+        r.size = 0;
+        r.d = {};
+        r.add = function (k) {
+            if (!r.d[k]) {
+                r.d[k] = 1;
+                r.size++;
+            }
+        };
+        r.has = function (k) {
+            return r.d[k];
+        };
+    };
 
 // https://stackoverflow.com/a/950146
 function import_js(url, cb, ecb) {
@@ -1404,6 +1423,10 @@ var toast = (function () {
         clmod(obj, 'vis');
         r.visible = false;
         r.tag = obj;
+        if (!window.WebAssembly)
+            te = setTimeout(function () {
+                obj.className = 'hide';
+            }, 500);
     };
 
     r.show = function (cl, sec, txt, tag) {

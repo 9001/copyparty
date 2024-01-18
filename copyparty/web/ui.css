@@ -105,6 +105,9 @@ html {
 #toast pre {
 	margin: 0;
 }
+#toast.hide {
+	display: none;
+}
 #toast.vis {
 	right: 1.3em;
 	transform: inherit;

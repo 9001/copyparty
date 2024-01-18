@@ -818,6 +818,10 @@ html.y #path a:hover {
 .logue:empty {
 	display: none;
 }
+.logue.raw {
+	white-space: pre;
+	font-family: 'scp', 'consolas', monospace;
+}
 #doc>iframe,
 .logue>iframe {
 	background: var(--bgg);
