@@ -299,6 +299,8 @@ var Ls = {
 		"frb_apply": "APPLY RENAME",
 		"fr_adv": "batch / metadata / pattern renaming\">advanced",
 		"fr_case": "case-sensitive regex\">case",
+		"fr_win": "windows-safe names; replace <code>&lt;&gt;:&quot;\\|?*</code> with japanese fullwidth characters\">win",
+		"fr_slash": "replace <code>/</code> with a character that doesn't cause new folders to be created\">no /",
 		"fr_pdel": "delete",
 		"fr_pnew": "save as",
 		"fr_pname": "provide a name for your new preset",
@@ -308,6 +310,7 @@ var Ls = {
 		"fr_tags": "tags for the selected files (read-only, just for reference):",
 		"fr_busy": "renaming {0} items...\n\n{1}",
 		"fr_efail": "rename failed:\n",
+		"fr_nchg": "{0} of the new names were altered due to <code>win</code> and/or <code>ikke /</code>\n\nOK to continue with these altered new names?",
 
 		"fd_ok": "delete OK",
 		"fd_err": "delete failed:\n",
@@ -783,6 +786,8 @@ var Ls = {
 		"frb_apply": "IVERKSETT",
 		"fr_adv": "automasjon basert på metadata<br>og / eller mønster (regulære uttrykk)\">avansert",
 		"fr_case": "versalfølsomme uttrykk\">Aa",
+		"fr_win": "bytt ut bokstavene <code>&lt;&gt;:&quot;\\|?*</code> med$Ntilsvarende som windows ikke får panikk av\">win",
+		"fr_slash": "bytt ut bokstaven <code>/</code> slik at den ikke forårsaker at nye mapper opprettes\">ikke /",
 		"fr_pdel": "slett",
 		"fr_pnew": "lagre som",
 		"fr_pname": "gi innstillingene dine et navn",
@@ -792,6 +797,7 @@ var Ls = {
 		"fr_tags": "metadata for de valgte filene (kun for referanse):",
 		"fr_busy": "endrer navn på {0} filer...\n\n{1}",
 		"fr_efail": "endring av navn feilet:\n",
+		"fr_nchg": "{0} av navnene ble justert pga. <code>win</code> og/eller <code>ikke /</code>\n\nvil du fortsette med de nye navnene som ble valgt?",
 
 		"fd_ok": "sletting OK",
 		"fd_err": "sletting feilet:\n",
@@ -3645,6 +3651,8 @@ var fileman = (function () {
 			'<button id="rn_apply">✅ ' + L.frb_apply + '</button>',
 			'<a id="rn_adv" class="tgl btn" href="#" tt="' + L.fr_adv + '</a>',
 			'<a id="rn_case" class="tgl btn" href="#" tt="' + L.fr_case + '</a>',
+			'<a id="rn_win" class="tgl btn" href="#" tt="' + L.fr_win + '</a>',
+			'<a id="rn_slash" class="tgl btn" href="#" tt="' + L.fr_slash + '</a>',
 			'</div>',
 			'<div id="rn_vadv"><table>',
 			'<tr><td>regex</td><td><input type="text" id="rn_re" ' + NOAC + ' tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" placeholder="^[0-9]+[\\. ]+(.*) - (.*)" /></td></tr>',
@@ -3718,6 +3726,8 @@ var fileman = (function () {
 		}
 		bcfg_bind(r, 'adv', 'rn_adv', false, sadv);
 		bcfg_bind(r, 'cs', 'rn_case', false);
+		bcfg_bind(r, 'win', 'rn_win', true);
+		bcfg_bind(r, 'slash', 'rn_slash', true);
 		sadv();
 
 		function rn_ok(n, ok) {
@@ -3835,6 +3845,24 @@ var fileman = (function () {
 
 		function rn_apply(e) {
 			ev(e);
+			if (r.win || r.slash) {
+				var changed = 0;
+				for (var a = 0; a < f.length; a++) {
+					var ov = f[a].inew.value,
+						nv = namesan(ov, r.win, r.slash);
+
+					if (ov != nv) {
+						f[a].inew.value = nv;
+						changed++;
+					}
+				}
+				if (changed)
+					return modal.confirm(L.fr_nchg.format(changed), rn_apply_loop, null);
+			}
+			rn_apply_loop();
+		}
+
+		function rn_apply_loop() {
 			while (f.length && (!f[0].ok || f[0].ofn == f[0].inew.value))
 				f.shift();
 
@@ -3855,7 +3883,7 @@ var fileman = (function () {
 				}
 
 				f.shift().inew.value = '( OK )';
-				return rn_apply();
+				return rn_apply_loop();
 			}
 
 			var xhr = new XHR();
@@ -5922,6 +5950,9 @@ var treectl = (function () {
 	}
 
 	function bad_proxy(e) {
+		if (ctrl(e))
+			return true;
+
 		ev(e);
 		var dst = this.getAttribute('dst'),
 			k = dst ? 'dst' : 'href',

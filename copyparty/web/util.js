@@ -420,6 +420,25 @@ function unsmart(txt) {
 }
 
 
+function namesan(txt, win, fslash) {
+    if (win)
+        txt = (txt.
+            replace(/</g, "＜").
+            replace(/>/g, "＞").
+            replace(/:/g, "：").
+            replace(/"/g, "＂").
+            replace(/\\/g, "＼").
+            replace(/\|/g, "｜").
+            replace(/\?/g, "？").
+            replace(/\*/g, "＊"));
+
+    if (fslash)
+        txt = txt.replace(/\//g, "／");
+
+    return txt;
+}
+
+
 var crctab = (function () {
     var c, tab = [];
     for (var n = 0; n < 256; n++) {
