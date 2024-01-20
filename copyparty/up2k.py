@@ -583,7 +583,7 @@ class Up2k(object):
         if gid:
             self.log("reload #{} running".format(self.gid))
 
-        self.pp = ProgressPrinter()
+        self.pp = ProgressPrinter(self.log, self.args)
         vols = list(all_vols.values())
         t0 = time.time()
         have_e2d = False

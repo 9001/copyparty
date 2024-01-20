@@ -1601,7 +1601,7 @@ interact with copyparty using non-browser clients
 
 * sharex (screenshot utility): see [./contrib/sharex.sxcu](contrib/#sharexsxcu)
 
-* contextlet (web browser integration); see [contrib contextlet](contrib/readme.md#send-to-cppcontextletjson)
+* contextlet (web browser integration); see [contrib contextlet](contrib/#send-to-cppcontextletjson)
 
 * [igloo irc](https://iglooirc.com/): Method: `post` Host: `https://you.com/up/?want=url&pw=hunter2` Multipart: `yes` File parameter: `f`
 

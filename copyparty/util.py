@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import argparse
 import base64
 import contextlib
 import errno
@@ -788,16 +789,20 @@ class ProgressPrinter(threading.Thread):
     periodically print progress info without linefeeds
     """
 
-    def __init__(self) -> None:
+    def __init__(self, log: "NamedLogger", args: argparse.Namespace) -> None:
         threading.Thread.__init__(self, name="pp")
         self.daemon = True
+        self.log = log
+        self.args = args
         self.msg = ""
         self.end = False
         self.n = -1
         self.start()
 
     def run(self) -> None:
+        tp = 0
         msg = None
+        no_stdout = self.args.q
         fmt = " {}\033[K\r" if VT100 else " {} $\r"
         while not self.end:
             time.sleep(0.1)
@@ -805,9 +810,20 @@ class ProgressPrinter(threading.Thread):
                 continue
 
             msg = self.msg
+            now = time.time()
+            if msg and now - tp > 10:
+                tp = now
+                self.log("progress: %s" % (msg,), 6)
+
+            if no_stdout:
+                continue
+
             uprint(fmt.format(msg))
             if PY2:
                 sys.stdout.flush()
+
+        if no_stdout:
+            return
 
         if VT100:
             print("\033[K", end="")
