@@ -1,4 +1,40 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0114-0629  `v1.9.29`  RAM friendly
+
+## new features
+
+* try to keep track of RAM usage in the thumbnailer 95a59996
+  * very inaccurate, just wild guessing really, but probably good enough:
+  * an attempt to stop FFmpeg from eating all the RAM when generating spectrograms
+  * `--th-ram-max` specifies how much RAM it's allowed to use (default 6 GB), crank it up if thumbnailing is too slow now
+* much faster startup on devices with slow filesystems and lots of files in the volume root (especially android phones) f1358dba
+* `uncache` button (in mediaplayer settings) a55e0d6e
+  * rotates all audio URLs, in case the browser has a cached copy of a broken mp3 or whatnot
+* now possible to POST files without having to set the `act: bput` multipart field 9bc09ce9
+  * mainly to support [igloo irc](https://github.com/9001/copyparty#client-examples) and other simplistic upload clients
+* try to point the linux oom-killer at FFmpeg so it doesn't kill innocent processes instead dc8e621d
+  * only works if copyparty has acces to /proc, so not in prisonparty, and maybe not in docker (todo)
+* UX:
+  * do another search immediately if a search-filter gets unchecked a4239a46
+  * several ie11 fixes (keyboard hotkeys and a working text editor) 2fd2c6b9
+
+## bugfixes
+
+* POSTing files could block for a really long time if the database is busy (filesystem reindexing), now it schedules the indexing for later instead e8a653ca
+* less confusing behavior when reindexing a file (keep uploader-ip/time if file contents turn out to be unmodified, and drop both otherwise) 226c7c30
+
+## other changes
+
+* better log messages when clients decide to disconnect in the middle of a POST 02430359
+* add a warning if copyparty is started with an account definition (`-a`) which isn't used in any volumes e01ba855
+* when running on macos, don't index apple metadata files (`.DS_Store` and such) d0eb014c
+  * they are still downloadable by anyone with read-access, and still appear in directory listings for users with access to see dotfiles
+* added a [log repacker](https://github.com/9001/copyparty/blob/hovudstraum/scripts/logpack.sh) to shrink/optimize old logs dee0950f
+* and a [contextlet](https://github.com/9001/copyparty/blob/hovudstraum/contrib/README.md#send-to-cppcontextletjson) example
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2023-1231-1849  `v1.9.28`  eo2023
 
 was hoping to finish the IdP stuff during 37c3 but that fell through, so here's all the other recent fixes instead -- happy newyears
@@ -4498,5 +4534,834 @@ nothing really important happened since [v0.11.6](https://github.com/9001/copypa
 * loader animation appears over thumbnails too
 * restore support for firefox 12
 
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0601-0625  `v0.11.6`  vtec
+
+### things to know when upgrading:
+* see release-notes for [v0.11.0](https://github.com/9001/copyparty/releases/tag/v0.11.0) and [v0.11.1](https://github.com/9001/copyparty/releases/tag/v0.11.1) as they introduced new features you may wish to disable
+
+### new features:
+* searching for audio tags is now literally 1000x faster
+  (almost as fast as the version numbers recently)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0601-0155  `v0.11.4`  please upgrade
+
+## important news:
+* this release fixes a missing permission check which could allow users to download write-only folders
+  * this bug was introduced 19 days ago, in `v0.10.17`
+  * the requirement to be affected is write-only folders mounted within readable folders
+  * and the worst part is there was a unit-test exactly for this, https://github.com/9001/copyparty/commit/273ca0c8da0d94f9d06ca16bd86c0301d9d06455 way overdue
+* also fixes minor bugs introduced in `v0.11.1`
+* this version is the same as `v0.11.5` on pypi
+
+----
+
+### things to know when upgrading:
+* see [v0.11.0](https://github.com/9001/copyparty/releases/tag/v0.11.0) and [v0.11.1](https://github.com/9001/copyparty/releases/tag/v0.11.1) as they introduce new features you may wish to disable
+  * especially the `dbtool` part if your database is huge
+
+### new features:
+* filesearch now powered by a boolean query syntax
+  * the regular search interface generates example queries
+  * `size >= 2048 and ( name like *.mp4 or name like *.mkv )`
+
+### bugfixes:
+* scan files on upload (broke in 0.11.1)
+* restore the loud "folder does not exist" warning (another 0.11.1)
+* fix thumbnails in search results (never worked)
+
+#### really minor stuff:
+* increased default thumbnail clean interval from 30min to 12h
+* admin panel also links to the volumes
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0529-2139  `v0.11.1`  do it live
+
+no important bugfixes, just new features
+
+### things to know when upgrading:
+* `--no-rescan` disables `?scan`, a new feature which lets users initiate a recursive scan for new files to hash and read tags from
+  * this is enabled per-volume for users with read+write access
+* `--no-stack` disables `?stack`, a new feature which shows a dump of all the stacks
+  * this is enabled if a user has read+write on at least one folder
+* if you wish to wipe the DB and rebuild it to get the new metadata collected as of v0.11.0, and you have expensive `-mtp` parsers (bpm/key) and a huge database (or a slow server), consider https://github.com/9001/copyparty/tree/master/bin#dbtoolpy
+
+### new features:
+* **live rescan!** no more rebooting if you add/move files outside of copyparty and want to update the database, just hit the rescan button in the new...
+* **admin panel!** access `/?h` (the old control-panel link) to see it
+* **fast startup!** added 40TB of music? no need to wait for the initial scan, it runs in the background now
+  * when this turns out to be buggy you can `--no-fastboot`
+  * uploading is not possible until the initial file hashing has finished and it has started doing tags
+    * you can follow the progress in the new admin panel
+
+### bugfixes:
+* windows: avoid drifting into subvolumes and doublehashing files
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0529-1303  `v0.11.0`  welcome to the grid
+
+no important bugfixes, just new features
+
+### things to know when upgrading:
+* `Pillow` and `FFmpeg` is now used to generate thumbnails
+  * `--no-thumb` disables both
+  * `--no-vthumb` disables just `FFmpeg`
+* new optional dependencies:
+  * `Pillow` to enable thumbnails
+    * `pyheif-pillow-opener` to enable reading HEIF images
+    * `pillow-avif-plugin` to enable reading AVIF images
+    * `ffmpeg` and `ffprobe` to enable video thumbnails
+* if you wish to wipe the DB and rebuild it to get the new metadata collected as of this version, and you have expensive `-mtp` parsers (bpm/key) and a huge database (or a slow server), consider https://github.com/9001/copyparty/tree/master/bin#dbtoolpy
+
+### new features:
+* thumbnails! of both static images and video files
+  * served as webp or jpg depending on browser support
+  * new hotkeys: G, T, S, A/D
+* additional metadata collection with `-e2ts`
+  * audio/video codecs, video/image resolution, fps, ...
+  * if you wanna reindex, do a single run with `-e2tsr` to wipe the DB
+* mtp can collect multiple tags at once
+  * expects json like `{ "tag": "value" }`, see end of https://github.com/9001/copyparty/blob/master/bin/mtag/exe.py
+
+### bugfixes:
+* when sorting by name, show folders first
+* mimetypes for webp and opus on GET
+* mojibake support
+  * up2k into mb folder
+  * indexing files in mb folders
+  * editing markdown in mb folders
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0518-0210  `v0.10.22`  this is a no drift zone
+
+* browser: fix off-by-one which made the page slowly shrink back down when navigating away from a large folder
+* browser/mediaplayer: handle unsupported audio codecs better in some (older?) browsers
+* readme/requirements: firefox 34 and chrome 41 were the first browsers with native sha512 / full speed in up2k
+* and the feature nobody asked for:
+![2021-0518-041625-hexchat-fs8](https://user-images.githubusercontent.com/241032/118581146-67876700-b791-11eb-99c0-f1f5ace50797.png)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0516-1822  `v0.10.21`  fix tagger crash
+
+a
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0516-0551  `v0.10.20`  inspect
+
+nothing important this time, just new bling and some fixes to support old browsers  
+(well except for the basic-uploader summary autoclosing immediately on completion, that was kinda user-confusing)
+
+* add `ad`/`an` flags to `-mtp`; collect and display metadata from any file, not just audio-files
+* up2k speedboost on older iPhones (native hashing on safari 7 through 10)
+* add `--lf-url`, URL regex to exclude from log, defaults to `^/\.cpr/` (static files)
+* add `--ihead` to print specific request headers, `*` prints all
+* ux fixes
+  * include links to the uploaded files in bup summaries
+  * ...also make the bup summary not auto-close
+  * don't link to bup from up2k if read-only access
+  * toggle-switch for tooltips also affects the up2k ui
+  * stop flipping back to up2k on older browsers
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0513-2200  `v0.10.19`  imagine running servers on windows
+
+* fix: uploads when running copyparty on windows (broke in 0.10.18)
+* fix: bup uploads would not get PARTIAL-suffixed if the filename length hits filesystem-max and the client disconnects mid-upload 
+* add `--dotpart` which hides uploads as dotfiles until completed
+* very careful styling of the basic-browser
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0513-1542  `v0.10.18`  just 302 it my dude
+
+* stop trying to be smart, do full redirects instead
+* allow switching to basic-browser using cookie `b=u`
+* fix mode-toggling (upload/search) depending on folder permissions
+* persist/clear the password cookie with expiration
+* slight optimizations for rclone clients
+* other minor ui tweaks
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0512-2139  `v0.10.17`  denoise
+
+* allow navigating to write-only folders using the tree sidebar
+* show logues (prologue/epilogue) in write-only folders as well
+  * rename `.prologue.html` / `.epilogue.html` when uploaded so people can't embed javascript
+* support pyinstaller
+* hide more of the UI while in write-only folders
+  * hide [even more](https://i.fiery.me/MBJAd.png) using [lovely hacks](https://github.com/9001/copyparty/blob/master/docs/minimal-up2k.html)
+* add a notice in bup that up2k is generally better
+
+alternative title: [Petit Up2k's - No Gui!](https://www.youtube.com/watch?v=IreeUoI6Kqc)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0502-0718  `v0.10.16`  somebody used -c
+
+* cfg-file: fix shorthand for assigning permissions to anonymous users
+* sfx: `-j` works on python3 (pickle did not enjoy the binary comments)
+* sfx: higher cooldown before it starts deleting tempfiles from old instances
+* sfx: should be a bit smaller (put compressed blobs at the end of the tar)
+* misc minor ui tweaks, mostly the bright-mode theme
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0424-0205  `v0.10.15`  write-only volumes are write-only
+
+good thing it was so obviously broken and/or that nobody ever tried to use it
+* regression test added to keep it fixed
+* can now make a hidden/inaccessible folder (optionally inside a public folder) like `-v /mnt/nas/music:/music:r -v /mnt/nas/music/inc:/music/inc:w`
+
+in other news, minor ui tweaks:
+* clickdrag in the media player sliders doesn't select text any more
+* a few lightmode adjustments
+* less cpu usage? should be
+
+`copyparty-sfx.py` (latest) made from c5db7c1a0c8f6ab23138ad7ea7642a6260e7da9b (v0.10.15-15) fixes `-j` (multiprocessing/high-performance)
+`copyparty-sfx-5a579db.py` (old) made from 5a579dba52e46c202b79c3d80c3b1c996c7b2e4a (v0.10.15-5) reduced the size
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0421-2004  `v0.10.14`  sparse4win
+
+# great stuff
+* firefox no longer leaking memory like crazy during large uploads
+    * not fixed intentionally (the firefox bug still exists i think)
+        * one of the v0.10.x changes are accidentally avoiding it w
+
+# good stuff
+* up2k-cli: conditional readahead based on filereader latency (firefox was not happy)
+* up2k-srv: make sparse files on windows if larger than `--sparse` MiB
+    * files will unsparse when upload completes if win10 or newer
+    * performance gain starts around 32 and up but default is 4 to save the SSDs
+* up2k-cli: fix high cpu usage after returning to idle
+* up2k-cli: ui tweaks
+* browser: give 404 instead of redirecting home when folder is 404 or 403
+* md-srv: stream documents rather than load into memory
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0420-2319  `v0.10.13`  moon
+
+600 MiB/s for both hashing and uploading on a ryzen 3700
+
+* up2k: hashing 2x faster than before
+    * except on android-chrome where it is now slightly slower because the android file api is a meme
+        * ...but android-firefox gained 4x and is now 3x faster than chrome, google pls
+
+this concludes the optimization arc
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0419-1958  `v0.10.12`  rocket
+
+up2k [way faster on large files](https://i.fiery.me/NEpAq.webm) this time
+* js: removed a cpu bottleneck in the up2k client
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0419-1517  `v0.10.10`  blinded by the light
+
+* up2k: fix progress bars
+* up2k: more specific error messages (for example when trying to up a rangelocked file)
+* browser: link to timestamps in media files (media fragment urls)
+* fix crash when trying to -e2ts without the necessary dependencies available
+* since there wasn't enough pointless features that nobody will ever use already: added lightmode
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0416-2329  `v0.10.9`  fasten your seatbelts
+
+* up2k: [way faster](https://i.fiery.me/Jsqf9.webm) when uploading a large number of files
+  * 2x faster at 500 files, 3x faster at 1000, **8x at 3000**
+* up2k: show ETA and upload/hashing speeds in realtime
+* browser: hide search tab when database disabled
+* avoid crash on startup when mounting the root of a restricted smb share on windows, [cpython bug](https://bugs.python.org/issue43847)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0411-1926  `v0.10.8`  misc
+
+nothing massive, just a bunch of small things
+
+* browser: fix zip download on iphone/android
+* sfx: prevent StorageSense from deleting copyparty while it's running
+* browser: less tree jitter when scrolling
+* browser: only capture hotkeys without modifiers
+* up2k: add some missing presentational uridecodes
+* browser: add `?b` for an extremely minimal browser
+    * `?b=u` includes the uploader
+* browser: somewhat support `?pw=hunter2` in addition to the cppwd cookie
+* make-sfx: optional argument `gz` to build non-bz2 sfx
+* stop crashing argparse on pythons <= june 2018
+* support http/1.0
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0402-2235  `v0.10.7`  thx exci
+
+up2k-client fixes:
+* uploads getting stuck if more than 128 MiB was rejected as dupes
+* displayed links on rejected uploads
+* displayed upload speed was way off
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0402-0111  `v0.10.6`  enterprise ready
+
+minimal-effort support for really old browsers
+* internet explorer 6 can browse, upload files, mkdir
+* internet explorer 9 can also play mp3s, zip selected files
+* internet explorer 10 and newer has near-full support
+* the final version of chrome and firefox on xp have full support
+* netscape 4.5 works well enough, text is yellow on white
+* [netscape 4.0 segfaults](https://i.fiery.me/FZc6a.png) (rip)
+
+on a more serious note,
+* fix multiselect zip diving into unselected subfolders
+* decode urlform messages to plaintext
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0330-2328  `v0.10.5`  search fix
+
+* fix audio playback in search results (broke in v0.9.9)
+* sort search results according to userdefined order
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0329-1853  `v0.10.4`  stablesort
+
+running out of things to fix so here are nitpicks
+* stable sort when sorting multiple columns
+* default to filenames with directories first (column 2 + 1)
+* remove some console spam
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0329-0247  `v0.10.3`  not slow as tar
+
+nothing too big this time,
+* tar 6x faster (does 1.8 GiB/s now)
+* fix selective archiving of subfolders
+* mute the loadbalancer when `-q`
+* don't show 0:00 as duration for non-audio files
+
+known inconvenience since 0.9.13 that won't ever be fixed:
+if you use the subfolder hiding thing (`-v :foo/bar:cd2d`) it creates intermediate volumes between the actual volume and the hidden subfolder which kinda messes with existing indexes (it will reindex stuff inside the intermediate volumes) but everything still works so it's just a pain
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0327-1703  `v0.10.2`  do i have to think of a name
+
+* select multiple files/folders to download as tar/zip
+* recover from read-errors when zipping things, adding a textfile in the zip explaining what went wrong
+* fix permissions in zip files for linux/macos unpacking
+* make the first browser column sortable
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0327-0144  `v0.10.1`  zip it
+
+* download folders as .zip or .tar files
+* upload entire folders by dropping them in
+* 4x faster response on the first request on each new connection
+
+forgot to explain the zip formats
+
+| name | url-suffix | description |
+|--|--|--|
+| `tar` | `?tar` | a plain gnutar, works great with `curl \| tar -xv` |
+| `zip` | `?zip=utf8` | works everywhere, glitchy filenames on win7 and older |
+| `zip_dos` | `?zip` | traditional cp437 (no unicode) to fix glitchy filenames |
+| `zip_crc` | `?zip=crc` | cp437 with crc32 computed early for truly ancient software |
+
+`zip_crc` will take longer to download since the server has to read each file twice, please let me know if you find a program old enough to actually need it btw, curious
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0323-0113  `v0.9.13`  micromanage
+
+you can skip this version unless your volume setup is crazy advanced
+
+* support hiding specific subfolders with `-v :/foo/bar:cd2d`
+* properly disable db/tags/etc when `cd2d` or `cd2t` volflags are set
+* volume info on startup is prettier
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0321-2105  `v0.9.10`  nurupo
+
+not so strong anymore
+
+* fixes a nullpointer when sorting a folder that contains markdown revisions
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0321-1615  `v0.9.9`  the strongest
+
+## big ones
+* add support for external analysis tools to provide arbitrary tags for the index
+* add example tools for detecting bpm and melodic key
+  * https://github.com/9001/copyparty/tree/master/bin/mtag
+* add range-search (duration/bpm/key/... between min/max values)
+* hotkeys for changing songs + skipping
+  * `0..9`=jump, `J/L`=file, `U/O`=10sec, `K/I`=folder, `P`=parent
+
+## the rest
+* add search timeouts and rate-control on both server/client-side
+* add time markers in the audio player
+* remember the file browser sort order
+  * the initial html retains server order, so use the tree to navigate
+* fix a race in the tag parser when using the multithreaded FFprobe backend
+* fix minor stuff related to volume flags and tag-display options
+* repacker should no longer break the bundled jinja2
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0315-0013  `v0.9.8`  the strongest for a while
+
+nothing more to add or fix for now (barely avoided adding bpm/tempo detection using keyfinder and vamp+qm since thats just too ridiculous)
+
+* browser: correct music playback order after sorting
+* browser: no more glitching on resize in non-tree-mode
+* fuse-client: read password from `some.txt` with `-a $some.txt`
+* sfx: reduce startup time by 20% or so (import rather than shell out)
+* sfx: support pypy, jython, and ironpy
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0308-0251  `v0.9.7`  the strongest hotfix 2nd season
+
+* actually fix it so it doesn't truncate in the first place
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0307-2044  `v0.9.6`  the strongest hotfix
+
+* don't crash the file browser on truncated table rows
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0307-1825  `v0.9.5`  the strongest potions
+
+* better support for mojibake filenames
+* separate scrollbar for the directory tree
+* stop persisting page data in the browser, reload on each navigation
+  * firefox disapproves of storing >= 4 MB of json in sessionStorage
+* normalization of musical keys collected from tags
+* recover from dying tag parsers
+* be nice to rhelics
+  * add support for the 2013 edition of sqlite3 in rhel 7
+  * and fix some py2 issues with `-e2d`, again thx to ^
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0305-0106  `v0.9.4`  the strongest orz
+
+markdown editor works
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0304-2300  `v0.9.3`  the strongest performance
+
+gotta go fast
+
+| | windows | linux | macos |
+|--|--|--|--|
+| file browser / directory listing | *15 times* faster | 2% slower sorry | 15% faster |
+| startup / `-e2ds` verification | 10% faster | even | 10% faster |
+| reading tags with ffprobe | 5 times faster | 4 times faster | 2 times faster |
+
+## new features
+* async scan incoming files for tags (from up2k, basic-upper, PUT)
+* resizable file browser tree
+
+## bugfixes
+* floor mtime so `-e2ds` doesn't keep rescanning
+* use localStorage for pushState data since firefox couldn't handle big folders
+* minor directory rescan semantics
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0303-0028  `v0.9.1`  the strongest bugs
+
+imagine downloading a .0
+* fix file search / search by contents
+* stop spamming responses with `{"tags":["x"]}`
+* recover from missing writable volumes during startup
+* redo search when filter-checkboxes are toggled
+* 1.5x faster client-side sorting
+* 1.02x faster server-side
+
+and i just realized i never added runtime tag scanning so copyparty will have to be restarted to see tags of new uploads, TODO for next ver
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0301-2312  `v0.9.0`  the strongest music server
+
+* grab tags from music files and make them searchable
+* and show the tags in the file browser
+* make all the browser columns minimizable
+* shrink the media player widget thing on big screens
+
+use `-e2dsa` and `-e2ts` to enable the media tag features globally, or enable/disable them per-volume (see readme)
+
+**NOTE:** older fuse clients (from before 5e3775c1afc9438f9930080a9b8542a063ba1765  / older than v0.8.0) must be upgraded for this copyparty release, however the new client still supports connecting to old servers
+
+other changes include
+* support chunked PUT requests from curl
+* fix a pypy memleak which broke sqlite3
+* fix directory tree sidebar breaking when nothing is mounted on `/`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0222-2058  `v0.8.3`  discovery
+
+forgot to update the release name for 0.8 (which introduced searching and directory trees), good opportunity to name it after a dope album with some absolute bangers
+
+aside from the release name this version is entirely unrevolutionary
+
+* fixed debug prints on xp / win7 / win8 / early win10 versions
+* load prologues/epilogues when switching between folders
+* fix up2k modeswitching between read/write folders
+* additional minor ux tweaks
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0222-0254  `v0.8.1`  the ux update
+
+* search by name/path/size/date
+* search by file contents
+* directory tree sidebar thing
+  * navigate between folders while uploading
+
+NOTE: this will upgrade your `up2k.db` to `v2` but it will leave a backup of the old version in case you need to downgrade or whatever
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0214-0113  `v0.7.7`  trafikklys
+
+* new checkbox in up2k which coordinates uploading from multiple tabs
+  * if one tab is uploading, others will wait
+* fix up2k handshakes so uploads complete faster
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0212-1953  `v0.7.6`  nothing big
+
+* up2k: resume hashing when <= 128 MiB left to upload
+* stop showing `up2k.db/snap` in the file list
+* fix `--ciphers help`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0212-0706  `v0.7.5`  you can https if you want to
+
+* fix https on python3 after breaking it in v0.6.3
+  * workaround for older versions: `--no-sendfile`
+  * don't use the native https anyways (pls reverse-proxy)
+* that said, added a bunch of ssl/tls/https options
+  * choice to only accept http or https
+  * specify ssl/tls versions and ciphers to allow
+  * log master-secrets to file
+  * print cipher overlap on connect
+* up2k indexer flushes to disk every minute
+* up2k indexer mentions the filepath on errors
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0204-0001  `v0.7.4`  a
+
+* sfx: save 43kB by replacing all docstrings with "a"
+* sfx: upgrade the bundled jinja2 and markupsafe
+    * zero dependencies on python3 as well now
+* do something useful with url-encoded POSTs
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0202-2357  `v0.7.3`  Hey! Listen!
+
+* bind multiple IP's / port ranges
+* dim the connection tracking messages a bit
+* stop gz/br unpacker from being too helpful
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0128-2352  `v0.7.2`  QUALITY
+
+* make up2k confirmations optional
+* let pending uploads stay for 6 hours
+* fix the 0.7.1 regression we won't talk about
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0123-1855  `v0.7.1`  checking it twice
+
+* up2k-client shows an OK/Cancel box before upload starts
+* up2k-client hashes the next pending file at most
+  * previously, all pending uploads were announced immediately
+* fix edgecase when the registry snapshot contained deleted files
+* delete all related files after 1h if an up2k upload was initiated but never started
+  * previously, the `.PARTIAL` (upload data) was kept, even when blank
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0110-1649  `v0.7.0`  keeping track
+
+## remember all uploads using `-e2d` to avoid duplicates
+* `-e2d` stores the up2k registry in a per-volume sqlite3 database at `$VOL/.hist/up2k.db`
+* unfinished uploads are indexed in `$VOL/.hist/up2k.snap` every 30 seconds
+* unfinished uploads which are idle for over 1 hour are forgotten
+* duplicate uploads will be symlinked to the new name (by default) or rejected
+
+## build an index of all existing files at startup using `-e2s`
+* ...so copyparty also knows about files from older versions / other sources
+* this detects deleted/renamed files and updates the database
+
+## reject duplicate uploads instead of symlinking
+* this is a per-volume config option, see the `cnodupe` example in `-h`
+* the uploader gets an error message with the path to the existing file
+
+## other changes
+* uploads temporarily have the extension `.PARTIAL` until the upload is completed
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2021-0107-0009  `v0.6.3`  no nagles beyond this point
+
+* reduce latency of final packet by ~0.2 sec
+* use sendfile(2) when possible (linux and macos)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1214-0328  `v0.6.2`  happy end of 2020
+
+* support uploads with massive filenames
+* list world-readable volumes when logged in
+* up2k-client: ignore rejected dupe uploads
+* sfx-repack: support wget
+* dodge python-bug #7980 
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1201-0158  `v0.6.0`  CHRISTMAAAAAS
+
+https://www.youtube.com/watch?v=rWc9XuqwoLI
+* md cleanup/fixes (thx eslint)
+* fix the sfx repacker
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1130-0201  `v0.5.7`  multiuser notepad
+
+not in the etherpad sense but rather
+* md: poll for changes every `-mcr` sec and warn if doc changed
+* md: prevent closing the tab on unsaved changes
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1129-1849  `v0.5.6`  the extra mile
+
+* use git tag/commit as version when creating sfx
+* md: table prettyprinter compacting properly
+* md/plug: add error handling to the plugins
+* md/plug: new feature to modify the final dom tree
+* md/plug: actually replace the plugin instances rather than keep adding new ones tehe
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1127-0225  `v0.5.5`  far beyond
+
+valvrave-stop.jpg
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1117-2258  `v0.5.4`  edovprim
+
+(get it? becasue reverse proxy haha)
+
+* reverse-proxy support
+* filetype column in the browser
+* md-edit: table formatter more chill
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-1113-0231  `v0.5.3`  improved
+
+* show per-connection and per-transfer speeds
+* restore macos support in sfx.sh
+* http correctness fixes
+  * SameSite=Lax
+  * support multiple cookies in parser
+  * `+` no longer decodes to ` `, goodbye netscape 3.04
+* fuse stuff
+  * python client: mojibake support on windows
+  * python client: https and password support
+  * support rclone as client (windows/linux)
+* new markdown-editor features
+  * table formatter
+  * mojibake/unicode hunter
+  * more predictable behavior
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0818-1822  `v0.5.2`  da setter vi punktum
+
+full disclaimer: `copyparty-sfx.py` was built using `sfx.py` from ~~82e568d4c9f25bfdfd1bf5166f0ebedf058723ee~~ f550a8171d298992f4ef569d2fc99a6037a44ea8
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0817-2155  `v0.5.1`  insert soho joke
+
+* add info-banner with hostname and disk-free
+* make older firefox versions cache less aggressively
+* expect less correctness from cots nas
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0816-2304  `v0.5.0`  fuse jelly
+
+* change default port from `1234` to `3923`
+* fuse 10x faster + add windows support
+* minimal CORS support added
+* PUT stuff from a browser-console or wherever
+* markdown editor improvements again
+  * paragraph-jump with ctrl-cursors
+  * fix firefox not showing the latest ver on F5
+* fix systemd killing the sfx binaries (ﾉ ﾟヮﾟ)ﾉ ~┻━┻
+* not actually related to the tegra exploit
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0517-1446  `v0.4.3`  🌲🪓🎉
+
+* print your documents! kill the trees!
+* drop support for opus/vorbis audio playback on iOS 11 *and older*
+* chrome's now twice as fast in the markdown editor
+  * firefox still wins
+* upgrade to marked.js v1.1.0
+* minor fuse + ux fixes
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0514-2302  `v0.4.2`  still not quite emacs (the editor is too good)
+
+* better editor cursor behavior
+* better editor autoindent
+* less broken fuse client
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0513-2308  `v0.4.1`  Further improvements to overall system stability and other minor adjustments have been made to enhance the user experience
+
+* better editor performance in massive documents
+* better undo/redo cursor positioning
+* better ux on safari
+* better ux on phones
+* better
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0512-2244  `v0.4.0`  NIH
+
+* new "basic" markdown editor
+  * textarea-based, way less buggy on phones
+  * better autoindent + undo/redo
+* smaller sfx (~170k)
+* osx fixes
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0506-2220  `v0.3.1`  v0.3.1
+
+* indicate version history for files in the browser
+* (also move old versions into .hist subfolders)
+* handle uploads with illegal filenames on windows
+* sortable file list
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0505-2302  `v0.3.0`  docuparty
+
+"why does a file server have a markdown editor"
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2020-0119-1512  `v0.2.3`  hello world
 
 
