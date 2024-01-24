@@ -861,6 +861,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'multitask', 'multitask', true, null, false);
     bcfg_bind(uc, 'potato', 'potato', false, set_potato, false);
     bcfg_bind(uc, 'ask_up', 'ask_up', true, null, false);
+    bcfg_bind(uc, 'umod', 'umod', false, null, false);
     bcfg_bind(uc, 'u2ts', 'u2ts', !u2ts.endsWith('u'), set_u2ts, false);
     bcfg_bind(uc, 'fsearch', 'fsearch', false, set_fsearch, false);
 
@@ -1392,6 +1393,8 @@ function up2k_init(subtle) {
                 entry.rand = true;
                 entry.name = 'a\n' + entry.name;
             }
+            else if (uc.umod)
+                entry.umod = true;
 
             if (biggest_file < entry.size)
                 biggest_file = entry.size;
@@ -2468,6 +2471,8 @@ function up2k_init(subtle) {
             req.srch = 1;
         else if (t.rand)
             req.rand = true;
+        else if (t.umod)
+            req.umod = true;
 
         xhr.open('POST', t.purl, true);
         xhr.responseType = 'text';

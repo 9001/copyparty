@@ -2689,6 +2689,28 @@ class Up2k(object):
                 fk = self.gen_fk(alg, self.args.fk_salt, ap, job["size"], ino)
                 ret["fk"] = fk[: vfs.flags["fk"]]
 
+            if (
+                not ret["hash"]
+                and cur
+                and cj.get("umod")
+                and int(cj["lmod"]) != int(job["lmod"])
+                and not self.args.nw
+                and cj["user"] in vfs.axs.uwrite
+                and cj["user"] in vfs.axs.udel
+            ):
+                sql = "update up set mt=? where substr(w,1,16)=? and +rd=? and +fn=?"
+                try:
+                    cur.execute(sql, (cj["lmod"], wark[:16], job["prel"], job["name"]))
+                    cur.connection.commit()
+
+                    ap = djoin(job["ptop"], job["prel"], job["name"])
+                    times = (int(time.time()), int(cj["lmod"]))
+                    bos.utime(ap, times, False)
+
+                    self.log("touched %s from %d to %d" % (ap, job["lmod"], cj["lmod"]))
+                except Exception as ex:
+                    self.log("umod failed, %r" % (ex,), 3)
+
             return ret
 
     def _untaken(self, fdir: str, job: dict[str, Any], ts: float) -> str:

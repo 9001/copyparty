@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.12"
-S_BUILD_DT = "2023-12-08"
+S_VERSION = "1.13"
+S_BUILD_DT = "2024-01-24"
 
 """
 u2c.py: upload to copyparty
@@ -560,8 +560,11 @@ def handshake(ar, file, search):
     }
     if search:
         req["srch"] = 1
-    elif ar.dr:
-        req["replace"] = True
+    else:
+        if ar.touch:
+            req["umod"] = True
+        if ar.dr:
+            req["replace"] = True
 
     headers = {"Content-Type": "text/plain"}  # <=1.5.1 compat
     if pw:
@@ -1129,6 +1132,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
+    ap.add_argument("--touch", action="store_true", help="if last-modified timestamps differ, push local to server (need write+delete perms)")
     ap.add_argument("--version", action="store_true", help="show version and exit")
 
     ap = app.add_argument_group("compatibility")
