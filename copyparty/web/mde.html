@@ -37,12 +37,12 @@ var md_opt = {
 };
 
 var lightswitch = (function () {
-	var l = localStorage,
-		drk = l.light != 1,
+	var l = window.localStorage,
+		drk = (l && l.light) != 1,
 		f = function (e) {
 if (e) drk = !drk;
 document.documentElement.className = drk? "z":"y";
-l.light = drk? 0:1;
+try { l.light = drk? 0:1; } catch (ex) { }
 		};
 	f();
 	return f;

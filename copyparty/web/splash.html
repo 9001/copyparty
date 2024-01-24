@@ -110,7 +110,8 @@ var SR = {{ r|tojson }},
 	lang="{{ lang }}",
 	dfavico="{{ favico }}";
 
-document.documentElement.className=localStorage.cpp_thm||"{{ this.args.theme }}";
+var STG = window.localStorage;
+document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
 
 </script>
 <script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>

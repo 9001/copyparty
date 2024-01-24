@@ -431,7 +431,7 @@ function U2pvis(act, btns, uc, st) {
         if (sread('potato') === null) {
             btn.click();
             toast.inf(30, L.u_gotpot);
-            localStorage.removeItem('potato');
+            sdrop('potato');
         }
 
         u2f.appendChild(ode);
@@ -2687,7 +2687,7 @@ function up2k_init(subtle) {
 
             parallel_uploads = v;
             if (v == u2j)
-                localStorage.removeItem('nthread');
+                sdrop('nthread');
             else
                 swrite('nthread', v);
 

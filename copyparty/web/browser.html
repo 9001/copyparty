@@ -148,7 +148,8 @@
 			logues = {{ logues|tojson if sb_lg else "[]" }},
 			ls0 = {{ ls0|tojson }};
 
-		document.documentElement.className = localStorage.cpp_thm || dtheme;
+		var STG = window.localStorage;
+		document.documentElement.className = (STG && STG.cpp_thm) || dtheme;
 	</script>
 	<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/baguettebox.js?_={{ ts }}"></script>

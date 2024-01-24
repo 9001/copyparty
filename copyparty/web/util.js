@@ -12,6 +12,7 @@ if (window.CGV)
 
 
 var wah = '',
+    STG = null,
     NOAC = 'autocorrect="off" autocapitalize="off"',
     L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,
     T0 = Date.now(),
@@ -39,6 +40,16 @@ if (!window.Notification || !Notification.permission)
 
 if (!window.FormData)
     window.FormData = false;
+
+try {
+    STG = window.localStorage;
+    STG.STG;
+}
+catch (ex) {
+    STG = null;
+    if ((ex + '').indexOf('sandbox') < 0)
+        console.log('no localStorage: ' + ex);
+}
 
 try {
     CB = '?' + document.currentScript.src.split('?').pop();
@@ -285,10 +296,11 @@ function anymod(e, shift_ok) {
 }
 
 
+var dev_fbw = sread('dev_fbw');
 function ev(e) {
     if (!e && window.event) {
         e = window.event;
-        if (localStorage.dev_fbw == 1) {
+        if (dev_fbw == 1) {
             toast.warn(10, 'hello from fallback code ;_;\ncheck console trace');
             console.error('using window.event');
         }
@@ -925,9 +937,16 @@ function jcp(obj) {
 }
 
 
+function sdrop(key) {
+    try {
+        STG.removeItem(key);
+    }
+    catch (ex) { }
+}
+
 function sread(key, al) {
     try {
-        var ret = localStorage.getItem(key);
+        var ret = STG.getItem(key);
         return (!al || has(al, ret)) ? ret : null;
     }
     catch (e) {
@@ -938,9 +957,9 @@ function sread(key, al) {
 function swrite(key, val) {
     try {
         if (val === undefined || val === null)
-            localStorage.removeItem(key);
+            STG.removeItem(key);
         else
-            localStorage.setItem(key, val);
+            STG.setItem(key, val);
     }
     catch (e) { }
 }

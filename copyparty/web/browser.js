@@ -3405,8 +3405,8 @@ function sortfiles(nodes) {
 	}
 	catch (ex) {
 		console.log("failed to apply sort config: " + ex);
-		console.log("resetting fsort " + sread('fsort'))
-		localStorage.removeItem('fsort');
+		console.log("resetting fsort " + sread('fsort'));
+		sdrop('fsort');
 	}
 	return nodes;
 }
