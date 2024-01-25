@@ -4709,7 +4709,7 @@ nothing important this time, just new bling and some fixes to support old browse
   * rename `.prologue.html` / `.epilogue.html` when uploaded so people can't embed javascript
 * support pyinstaller
 * hide more of the UI while in write-only folders
-  * hide [even more](https://i.fiery.me/MBJAd.png) using [lovely hacks](https://github.com/9001/copyparty/blob/master/docs/minimal-up2k.html)
+  * hide [even more](https://a.ocv.me/pub/g/nerd-stuff/cpp/2021-0513-ui-mod.png) using [lovely hacks](https://github.com/9001/copyparty/blob/master/docs/minimal-up2k.html)
 * add a notice in bup that up2k is generally better
 
 alternative title: [Petit Up2k's - No Gui!](https://www.youtube.com/watch?v=IreeUoI6Kqc)
@@ -4780,7 +4780,7 @@ this concludes the optimization arc
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2021-0419-1958  `v0.10.12`  rocket
 
-up2k [way faster on large files](https://i.fiery.me/NEpAq.webm) this time
+up2k [way faster on large files](https://a.ocv.me/pub/g/nerd-stuff/cpp/2021-0419-up2k.webm) this time
 * js: removed a cpu bottleneck in the up2k client
 
 
@@ -4799,7 +4799,7 @@ up2k [way faster on large files](https://i.fiery.me/NEpAq.webm) this time
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2021-0416-2329  `v0.10.9`  fasten your seatbelts
 
-* up2k: [way faster](https://i.fiery.me/Jsqf9.webm) when uploading a large number of files
+* up2k: [way faster](https://a.ocv.me/pub/g/nerd-stuff/cpp/2021-0416-up2k.webm) when uploading a large number of files
   * 2x faster at 500 files, 3x faster at 1000, **8x at 3000**
 * up2k: show ETA and upload/hashing speeds in realtime
 * browser: hide search tab when database disabled
@@ -4845,7 +4845,7 @@ minimal-effort support for really old browsers
 * internet explorer 10 and newer has near-full support
 * the final version of chrome and firefox on xp have full support
 * netscape 4.5 works well enough, text is yellow on white
-* [netscape 4.0 segfaults](https://i.fiery.me/FZc6a.png) (rip)
+* [netscape 4.0 segfaults](https://a.ocv.me/pub/g/nerd-stuff/cpp/2021-0402-netscape.png) (rip)
 
 on a more serious note,
 * fix multiselect zip diving into unselected subfolders

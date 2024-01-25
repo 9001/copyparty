@@ -1540,8 +1540,8 @@ TLDR: yes
 | navpane         |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | image viewer    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | video player    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
-| markdown editor |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
-| markdown viewer |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| markdown editor |  -  |  -   | `*2` | `*2` |  yep  | yep  | yep | yep  |
+| markdown viewer |  -  | `*2` | `*2` | `*2` |  yep  | yep  | yep | yep  |
 | play mp3/m4a    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | play ogg/opus   |  -  |  -   |  -   |  -   |  yep  | yep  | `*3` | yep |
 | **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
@@ -1549,6 +1549,7 @@ TLDR: yes
 * internet explorer 6 through 8 behave the same
 * firefox 52 and chrome 49 are the final winxp versions
 * `*1` yes, but extremely slow (ie10: `1 MiB/s`, ie11: `270 KiB/s`)
+* `*2` only able to do plaintext documents (no markdown rendering)
 * `*3` iOS 11 and newer, opus only, and requires FFmpeg on the server
 
 quick summary of more eccentric web-browsers trying to view a directory index:
