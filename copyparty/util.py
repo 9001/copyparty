@@ -1245,12 +1245,20 @@ def log_thrs(log: Callable[[str, str, int], None], ival: float, name: str) -> No
 
 
 def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
+    txt0 = txt
     for vol in vols:
-        txt = txt.replace(vol.realpath.encode("utf-8"), vol.vpath.encode("utf-8"))
-        txt = txt.replace(
-            vol.realpath.encode("utf-8").replace(b"\\", b"\\\\"),
-            vol.vpath.encode("utf-8"),
-        )
+        bap = vol.realpath.encode("utf-8")
+        bhp = vol.histpath.encode("utf-8")
+        bvp = vol.vpath.encode("utf-8")
+        bvph = b"$hist(/" + bvp + b")"
+
+        txt = txt.replace(bap, bvp)
+        txt = txt.replace(bhp, bvph)
+        txt = txt.replace(bap.replace(b"\\", b"\\\\"), bvp)
+        txt = txt.replace(bhp.replace(b"\\", b"\\\\"), bvph)
+
+    if txt != txt0:
+        txt += b"\r\nNOTE: filepaths sanitized; see serverlog for correct values"
 
     return txt
 
