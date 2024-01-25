@@ -381,7 +381,7 @@ class VFS(object):
 
     def add(self, src: str, dst: str) -> "VFS":
         """get existing, or add new path to the vfs"""
-        assert not src.endswith("/")  # nosec
+        assert src == "/" or not src.endswith("/")  # nosec
         assert not dst.endswith("/")  # nosec
 
         if "/" in dst:
@@ -779,7 +779,6 @@ class AuthSrv(object):
         self.warn_anonwrite = warn_anonwrite
         self.line_ctr = 0
         self.indent = ""
-        self.desc = []
 
         self.mutex = threading.Lock()
         self.reload()
@@ -862,7 +861,6 @@ class AuthSrv(object):
         mflags: dict[str, dict[str, Any]],
         mount: dict[str, str],
     ) -> None:
-        self.desc = []
         self.line_ctr = 0
 
         expand_config_file(cfg_lines, fp, "")
@@ -1009,6 +1007,7 @@ class AuthSrv(object):
             raise Exception("invalid config value (volume or volflag): %s" % (t,))
 
         if lvl == "c":
+            # here, 'uname' is not a username; it is a volflag name... sorry
             cval: Union[bool, str] = True
             try:
                 # volflag with arguments, possibly with a preceding list of bools

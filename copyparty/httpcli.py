@@ -2961,9 +2961,11 @@ class HttpCli(object):
             # 512 kB is optimal for huge files, use 64k
             open_args = [fsenc(fs_path), "rb", 64 * 1024]
             use_sendfile = (
-                not self.tls  #
+                # fmt: off
+                not self.tls
                 and not self.args.no_sendfile
                 and (BITNESS > 32 or file_sz < 0x7fffFFFF)
+                # fmt: on
             )
 
         #
