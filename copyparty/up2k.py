@@ -3795,8 +3795,14 @@ class Up2k(object):
 
     def _new_upload(self, job: dict[str, Any]) -> None:
         pdir = djoin(job["ptop"], job["prel"])
-        if not job["size"] and bos.path.isfile(djoin(pdir, job["name"])):
-            return
+        if not job["size"]:
+            try:
+                inf = bos.stat(djoin(pdir, job["name"]))
+                if stat.S_ISREG(inf.st_mode):
+                    job["lmod"] = inf.st_size
+                    return
+            except:
+                pass
 
         self.registry[job["ptop"]][job["wark"]] = job
         job["name"] = self._untaken(pdir, job, job["t0"])
