@@ -25,6 +25,27 @@ echo; find -type f | while IFS= read -r x; do printf '\033[A\033[36m%s\033[K\033
 
 
 ##
+## sync pics/vids from phone
+##  (takes all files named (IMG|PXL|PANORAMA|Screenshot)_20231224_*)
+
+cd /storage/emulated/0/DCIM/Camera
+find -mindepth 1 -maxdepth 1 | sort | cut -c3- > ls
+url=https://192.168.1.3:3923/rw/pics/Camera/$d/; awk -F_ '!/^[A-Z][A-Za-z]{1,16}_[0-9]{8}[_-]/{next} {d=substr($2,1,6)} !t[d]++{print d}' ls | while read d; do grep -E "^[A-Z][A-Za-z]{1,16}_$d" ls | tr '\n' '\0' | xargs -0 python3 ~/dev/copyparty/bin/u2c.py -td $url --; done
+
+
+##
+## convert symlinks to hardlinks (probably safe, no guarantees)
+
+find -type l | while IFS= read -r lnk; do [ -h "$lnk" ] || { printf 'nonlink: %s\n' "$lnk"; continue; }; dst="$(readlink -f -- "$lnk")"; [ -e "$dst" ] || { printf '???\n%s\n%s\n' "$lnk" "$dst"; continue; }; printf 'relinking:\n  %s\n  %s\n' "$lnk" "$dst"; rm -- "$lnk"; ln -- "$dst" "$lnk"; done 
+
+
+##
+## convert hardlinks to symlinks (maybe not as safe? use with caution)
+
+e=; p=; find -printf '%i %p\n' | awk '{i=$1;sub(/[^ ]+ /,"")} !n[i]++{p[i]=$0;next} {printf "real %s\nlink %s\n",p[i],$0}' | while read cls p; do [ -e "$p" ] || e=1; p="$(realpath -- "$p")" || e=1; [ -e "$p" ] || e=1; [ $cls = real ] && { real="$p"; continue; }; [ $cls = link ] || e=1; [ "$p" ] || e=1; [ $e ] && { echo "ERROR $p"; break; }; printf '\033[36m%s \033[0m -> \033[35m%s\033[0m\n' "$p" "$real"; rm "$p"; ln -s "$real" "$p" || { echo LINK FAILED; break; }; done
+
+
+##
 ## create a test payload
 
 head -c $((2*1024*1024*1024)) /dev/zero | openssl enc -aes-256-ctr -pass pass:hunter2 -nosalt > garbage.file
