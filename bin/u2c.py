@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.13"
-S_BUILD_DT = "2024-01-24"
+S_VERSION = "1.14"
+S_BUILD_DT = "2024-01-27"
 
 """
 u2c.py: upload to copyparty
@@ -877,6 +877,8 @@ class Ctl(object):
         self.st_hash = [file, ofs]
 
     def hasher(self):
+        ptn = re.compile(self.ar.x.encode("utf-8"), re.I) if self.ar.x else None
+        sep = "{0}".format(os.sep).encode("ascii")
         prd = None
         ls = {}
         for top, rel, inf in self.filegen:
@@ -909,7 +911,12 @@ class Ctl(object):
                     if self.ar.drd:
                         dp = os.path.join(top, rd)
                         lnodes = set(os.listdir(dp))
-                        bnames = [x for x in ls if x not in lnodes]
+                        if ptn:
+                            zs = dp.replace(sep, b"/").rstrip(b"/") + b"/"
+                            zls = [zs + x for x in lnodes]
+                            zls = [x for x in zls if not ptn.match(x)]
+                            lnodes = [x.split(b"/")[-1] for x in zls]
+                        bnames = [x for x in ls if x not in lnodes and x != b".hist"]
                         vpath = self.ar.url.split("://")[-1].split("/", 1)[-1]
                         names = [x.decode("utf-8", "replace") for x in bnames]
                         locs = [vpath + srd + "/" + x for x in names]
