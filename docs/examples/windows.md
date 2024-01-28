@@ -6,7 +6,7 @@ you will definitely need either [copyparty.exe](https://github.com/9001/copypart
 
 * if you decided to grab `copyparty-sfx.py` instead of the exe you will also need to install the ["Latest Python 3 Release"](https://www.python.org/downloads/windows/)
 
-then you probably want to download [FFmpeg](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip) and put `ffmpeg.exe` and `ffprobe.exe` in your PATH (so for example `C:\Windows\System32\`) -- this enables thumbnails, audio transcoding, and making music metadata searchable
+then you probably want to download [FFmpeg](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z) and put `ffmpeg.exe` and `ffprobe.exe` in your PATH (so for example `C:\Windows\System32\`) -- this enables thumbnails, audio transcoding, and making music metadata searchable
 
 
 ## the config file
