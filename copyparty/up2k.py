@@ -195,11 +195,16 @@ class Up2k(object):
 
         Daemon(self.deferred_init, "up2k-deferred-init")
 
-    def reload(self) -> None:
+    def reload(self, rescan_all_vols: bool) -> None:
         self.gid += 1
         self.log("reload #{} initiated".format(self.gid))
         all_vols = self.asrv.vfs.all_vols
-        self.rescan(all_vols, list(all_vols.keys()), True, False)
+
+        scan_vols = [k for k, v in all_vols.items() if v.realpath not in self.registry]
+        if rescan_all_vols:
+            scan_vols = list(all_vols.keys())
+
+        self.rescan(all_vols, scan_vols, True, False)
 
     def deferred_init(self) -> None:
         all_vols = self.asrv.vfs.all_vols

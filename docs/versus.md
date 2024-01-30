@@ -247,9 +247,9 @@ symbol legend,
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
 | accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |
-| single-sign-on          |   |   |   | █ | █ |   |   |   | • |   |   |   |
-| token auth              |   |   |   | █ | █ |   |   | █ |   |   |   |   |
-| 2fa                     |   |   |   | █ | █ |   |   |   |   |   |   | █ |
+| single-sign-on          | ╱ |   |   | █ | █ |   |   |   | • |   |   |   |
+| token auth              | ╱ |   |   | █ | █ |   |   | █ |   |   |   |   |
+| 2fa                     | ╱ |   |   | █ | █ |   |   |   |   |   |   | █ |
 | per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ | █ |
 | per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ | █ |
 | per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |   |
@@ -288,6 +288,7 @@ symbol legend,
 * `curl-friendly ls` = returns a [sortable plaintext folder listing](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) when curled
 * `curl-friendly upload` = uploading with curl is just `curl -T some.bin http://.../`
 * `a`/copyparty remarks:
+  * single-sign-on, token-auth, and 2fa is possible through authelia/authentik or similar; see TODO:example
   * one-way folder sync from local to server can be done efficiently with [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy), or with webdav and conventional rsync
   * can hot-reload config files (with just a few exceptions)
   * can set per-folder permissions if that folder is made into a separate volume, so there is configuration overhead

@@ -642,11 +642,13 @@ class SvcHub(object):
         Daemon(self._reload, "reloading")
         return "reload initiated"
 
-    def _reload(self) -> None:
+    def _reload(self, rescan_all_vols: bool = True) -> None:
+        self.reloading = True
         self.log("root", "reload scheduled")
         with self.up2k.mutex:
+            self.reloading = True
             self.asrv.reload()
-            self.up2k.reload()
+            self.up2k.reload(rescan_all_vols)
             self.broker.reload()
 
         self.reloading = False

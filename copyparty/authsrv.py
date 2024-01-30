@@ -61,6 +61,10 @@ BAD_CFG = "invalid config; {}".format(SEE_LOG)
 SBADCFG = " ({})".format(BAD_CFG)
 
 
+class CfgEx(Exception):
+    pass
+
+
 class AXS(object):
     def __init__(
         self,
@@ -780,6 +784,19 @@ class AuthSrv(object):
         self.line_ctr = 0
         self.indent = ""
 
+        # fwd-decl
+        self.vfs = VFS(log_func, "", "", AXS(), {})
+        self.acct: dict[str, str] = {}
+        self.iacct: dict[str, str] = {}
+        self.grps: dict[str, list[str]] = {}
+        self.re_pwd: Optional[re.Pattern] = None
+
+        # all volumes ever seen (from current or previous runs)
+        self.idp_vols: dict[str, str] = {}  # vpath->abspath
+
+        # all users/groups observed since last restart
+        self.idp_accs: dict[str, str] = {}  # username->groupname
+
         self.mutex = threading.Lock()
         self.reload()
 
@@ -797,6 +814,76 @@ class AuthSrv(object):
 
         yield prev, True
 
+    def idp_checkin(
+        self, broker: Optional["BrokerCli"], uname: str, gname: str
+    ) -> bool:
+        if uname in self.acct:
+            return False
+
+        if self.idp_accs.get(uname) == gname:
+            return False
+
+        with self.mutex:
+            if self.idp_accs.get(uname) == gname:
+                return False
+
+            self.idp_accs[uname] = gname
+
+            t = "reinitializing due to new user from IdP: [%s:%s]"
+            self.log(t % (uname, gname), 3)
+
+            if not broker:
+                # only true for tests
+                self._reload()
+                return True
+
+        broker.ask("_reload", False).get()
+        return True
+
+    def _map_volume_idp(
+        self,
+        src: str,
+        dst: str,
+        mount: dict[str, str],
+        daxs: dict[str, AXS],
+        mflags: dict[str, dict[str, Any]],
+        un_gn: dict[str, str],
+    ) -> list[tuple[str, str, str, str]]:
+        ret: list[tuple[str, str, str, str]] = []
+        visited = set()
+        src0 = src  # abspath
+        dst0 = dst  # vpath
+
+        # +('','') to ensure volume creation if there's no users
+        for un, gn in list(un_gn.items()) + [("", "")]:
+            # if ap/vp has a user/group placeholder, make sure to keep
+            # track so the same user/gruop is mapped when setting perms;
+            # otherwise clear un/gn to indicate it's a regular volume
+
+            src1 = src0.replace("${u}", un or "\n")
+            dst1 = dst0.replace("${u}", un or "\n")
+            if src0 == src1 and dst0 == dst1:
+                un = ""
+
+            src = src1.replace("${g}", gn or "\n")
+            dst = dst1.replace("${g}", gn or "\n")
+            if src == src1 and dst == dst1:
+                gn = ""
+
+            if "\n" in (src + dst):
+                continue
+
+            label = "%s\n%s" % (src, dst)
+            if label in visited:
+                continue
+            visited.add(label)
+
+            src, dst = self._map_volume(src, dst, mount, daxs, mflags)
+            if src:
+                ret.append((src, dst, un, gn))
+
+        return ret
+
     def _map_volume(
         self,
         src: str,
@@ -804,7 +891,12 @@ class AuthSrv(object):
         mount: dict[str, str],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
-    ) -> None:
+        only_if_exist: bool = False,
+    ) -> tuple[str, str]:
+        src = os.path.expandvars(os.path.expanduser(src))
+        src = absreal(src)
+        dst = dst.strip("/")
+
         if dst in mount:
             t = "multiple filesystem-paths mounted at [/{}]:\n  [{}]\n  [{}]"
             self.log(t.format(dst, mount[dst], src), c=1)
@@ -820,11 +912,15 @@ class AuthSrv(object):
             raise Exception(BAD_CFG)
 
         if not bos.path.isdir(src):
+            if only_if_exist:
+                return ("", "")
+
             self.log("warning: filesystem-path does not exist: {}".format(src), 3)
 
         mount[dst] = src
         daxs[dst] = AXS()
         mflags[dst] = {}
+        return (src, dst)
 
     def _e(self, desc: Optional[str] = None) -> None:
         if not self.args.vc or not self.line_ctr:
@@ -852,11 +948,30 @@ class AuthSrv(object):
 
         self.log(t.format(self.line_ctr, c, self.indent, ln, desc))
 
+    def _all_un_gn(
+        self,
+        acct: dict[str, str],
+        grps: dict[str, list[str]],
+    ) -> dict[str, str]:
+        """
+        generate list of all confirmed pairs of username/groupname seen since last restart;
+        in case of conflicting group memberships then it is selected as follows:
+         * any non-zero value from IdP group header
+         * otherwise take --grps / [groups]
+        """
+        ret = self.idp_accs.copy()
+        ret.update({zs: "" for zs in acct if zs not in ret})
+        for gn, uns in grps.items():
+            ret.update({un: gn for un in uns if not ret.get(un)})
+
+        return ret
+
     def _parse_config_file(
         self,
         fp: str,
         cfg_lines: list[str],
         acct: dict[str, str],
+        grps: dict[str, list[str]],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
         mount: dict[str, str],
@@ -870,13 +985,35 @@ class AuthSrv(object):
 
         cfg_lines = upgrade_cfg_fmt(self.log, self.args, cfg_lines, fp)
 
+        # due to IdP, volumes must be parsed after users and groups;
+        # do volumes in a 2nd pass to allow arbitrary order in config files
+        for npass in range(1, 3):
+            if self.args.vc:
+                self.log("parsing config files; pass %d/%d" % (npass, 2))
+            self._parse_config_file_2(cfg_lines, acct, grps, daxs, mflags, mount, npass)
+
+    def _parse_config_file_2(
+        self,
+        cfg_lines: list[str],
+        acct: dict[str, str],
+        grps: dict[str, list[str]],
+        daxs: dict[str, AXS],
+        mflags: dict[str, dict[str, Any]],
+        mount: dict[str, str],
+        npass: int,
+    ) -> None:
+        self.line_ctr = 0
+        all_un_gn = self._all_un_gn(acct, grps)
+
         cat = ""
         catg = "[global]"
         cata = "[accounts]"
+        catgrp = "[groups]"
         catx = "accs:"
         catf = "flags:"
         ap: Optional[str] = None
         vp: Optional[str] = None
+        vols: list[tuple[str, str, str, str]] = []
         for ln in cfg_lines:
             self.line_ctr += 1
             ln = ln.split("  #")[0].strip()
@@ -889,7 +1026,7 @@ class AuthSrv(object):
             subsection = ln in (catx, catf)
             if ln.startswith("[") or subsection:
                 self._e()
-                if ap is None and vp is not None:
+                if npass > 1 and ap is None and vp is not None:
                     t = "the first line after [/{}] must be a filesystem path to share on that volume"
                     raise Exception(t.format(vp))
 
@@ -905,6 +1042,8 @@ class AuthSrv(object):
                     self._l(ln, 6, t)
                 elif ln == cata:
                     self._l(ln, 5, "begin user-accounts section")
+                elif ln == catgrp:
+                    self._l(ln, 5, "begin user-groups section")
                 elif ln.startswith("[/"):
                     vp = ln[1:-1].strip("/")
                     self._l(ln, 2, "define volume at URL [/{}]".format(vp))
@@ -941,15 +1080,39 @@ class AuthSrv(object):
                     raise Exception(t + SBADCFG)
                 continue
 
+            if cat == catgrp:
+                try:
+                    gn, zs1 = [zs.strip() for zs in ln.split(":", 1)]
+                    uns = [zs.strip() for zs in zs1.split(",")]
+                    t = "group [%s] = " % (gn,)
+                    t += ", ".join("user [%s]" % (x,) for x in uns)
+                    self._l(ln, 5, t)
+                    grps[gn] = uns
+                except:
+                    t = 'lines inside the [groups] section must be "groupname: user1, user2, user..."'
+                    raise Exception(t + SBADCFG)
+                continue
+
             if vp is not None and ap is None:
+                if npass != 2:
+                    continue
+
                 ap = ln
-                ap = os.path.expandvars(os.path.expanduser(ap))
-                ap = absreal(ap)
                 self._l(ln, 2, "bound to filesystem-path [{}]".format(ap))
-                self._map_volume(ap, vp, mount, daxs, mflags)
+                vols = self._map_volume_idp(ap, vp, mount, daxs, mflags, all_un_gn)
+                if not vols:
+                    ap = vp = None
+                    self._l(ln, 2, "└─no users/groups known; was not mapped")
+                elif len(vols) > 1:
+                    for vol in vols:
+                        self._l(ln, 2, "└─mapping: [%s] => [%s]" % (vol[1], vol[0]))
                 continue
 
             if cat == catx:
+                if npass != 2 or not ap:
+                    # not stage2, or unmapped ${u}/${g}
+                    continue
+
                 err = ""
                 try:
                     self._l(ln, 5, "volume access config:")
@@ -960,14 +1123,20 @@ class AuthSrv(object):
                     if " " in re.sub(", *", "", sv).strip():
                         err = "list of users is not comma-separated; "
                         raise Exception(err)
-                    assert vp is not None
-                    self._read_vol_str(sk, sv.replace(" ", ""), daxs[vp], mflags[vp])
+                    sv = sv.replace(" ", "")
+                    self._read_vol_str_idp(sk, sv, vols, all_un_gn, daxs, mflags)
                     continue
+                except CfgEx:
+                    raise
                 except:
                     err += "accs entries must be 'rwmdgGhaA.: user1, user2, ...'"
-                    raise Exception(err + SBADCFG)
+                    raise CfgEx(err + SBADCFG)
 
             if cat == catf:
+                if npass != 2 or not ap:
+                    # not stage2, or unmapped ${u}/${g}
+                    continue
+
                 err = ""
                 try:
                     self._l(ln, 6, "volume-specific config:")
@@ -984,11 +1153,14 @@ class AuthSrv(object):
                         else:
                             fstr += ",{}={}".format(sk, sv)
                             assert vp is not None
-                            self._read_vol_str("c", fstr[1:], daxs[vp], mflags[vp])
+                            self._read_vol_str_idp(
+                                "c", fstr[1:], vols, all_un_gn, daxs, mflags
+                            )
                             fstr = ""
                     if fstr:
-                        assert vp is not None
-                        self._read_vol_str("c", fstr[1:], daxs[vp], mflags[vp])
+                        self._read_vol_str_idp(
+                            "c", fstr[1:], vols, all_un_gn, daxs, mflags
+                        )
                     continue
                 except:
                     err += "flags entries (volflags) must be one of the following:\n  'flag1, flag2, ...'\n  'key: value'\n  'flag1, flag2, key: value'"
@@ -999,12 +1171,18 @@ class AuthSrv(object):
         self._e()
         self.line_ctr = 0
 
-    def _read_vol_str(
-        self, lvl: str, uname: str, axs: AXS, flags: dict[str, Any]
+    def _read_vol_str_idp(
+        self,
+        lvl: str,
+        uname: str,
+        vols: list[tuple[str, str, str, str]],
+        un_gn: dict[str, str],
+        axs: dict[str, AXS],
+        flags: dict[str, dict[str, Any]],
     ) -> None:
         if lvl.strip("crwmdgGhaA."):
             t = "%s,%s" % (lvl, uname) if uname else lvl
-            raise Exception("invalid config value (volume or volflag): %s" % (t,))
+            raise CfgEx("invalid config value (volume or volflag): %s" % (t,))
 
         if lvl == "c":
             # here, 'uname' is not a username; it is a volflag name... sorry
@@ -1019,16 +1197,62 @@ class AuthSrv(object):
             while "," in uname:
                 # one or more bools before the final flag; eat them
                 n1, uname = uname.split(",", 1)
-                self._read_volflag(flags, n1, True, False)
+                for _, vp, _, _ in vols:
+                    self._read_volflag(flags[vp], n1, True, False)
 
-            self._read_volflag(flags, uname, cval, False)
+            for _, vp, _, _ in vols:
+                self._read_volflag(flags[vp], uname, cval, False)
+
             return
 
         if uname == "":
             uname = "*"
 
-        junkset = set()
+        unames = []
         for un in uname.replace(",", " ").strip().split():
+            if un.startswith("@"):
+                grp = un[1:]
+                uns = [x[0] for x in un_gn.items() if x[1] == grp]
+                if not uns and grp != "${g}":
+                    t = "group [%s] must be defined with --grp argument (or in a [groups] config section)"
+                    raise CfgEx(t % (grp,))
+
+                unames.extend(uns)
+            else:
+                unames.append(un)
+
+        # unames may still contain ${u} and ${g} so now expand those;
+        # need ("*","") to match "*" in unames
+        un_gn = un_gn.copy()
+        un_gn["*"] = un_gn.get("*", "")
+
+        for _, dst, vu, vg in vols:
+            unames2 = set()
+            for un, gn in un_gn.items():
+                # if vu/vg (volume user/group) is non-null,
+                # then each non-null value corresponds to
+                # ${u}/${g}; consider this a filter to
+                # apply to unames, as well as un_gn
+                if (vu and vu != un) or (vg and vg != gn):
+                    continue
+
+                for uname in unames + ([un] if vu or vg else []):
+                    if uname == "${u}":
+                        uname = vu or un
+                    elif uname in ("${g}", "@${g}"):
+                        uname = vg or gn
+
+                    if vu and vu != uname:
+                        continue
+
+                    if uname:
+                        unames2.add(uname)
+
+            self._read_vol_str(lvl, list(unames2), axs[dst])
+
+    def _read_vol_str(self, lvl: str, unames: list[str], axs: AXS) -> None:
+        junkset = set()
+        for un in unames:
             for alias, mapping in [
                 ("h", "gh"),
                 ("G", "gG"),
@@ -1105,8 +1329,12 @@ class AuthSrv(object):
         then supplementing with config files
         before finally building the VFS
         """
+        with self.mutex:
+            self._reload()
 
+    def _reload(self) -> None:
         acct: dict[str, str] = {}  # username:password
+        grps: dict[str, list[str]] = {}  # groupname:usernames
         daxs: dict[str, AXS] = {}
         mflags: dict[str, dict[str, Any]] = {}  # moutpoint:flags
         mount: dict[str, str] = {}  # dst:src (mountpoint:realpath)
@@ -1121,9 +1349,22 @@ class AuthSrv(object):
                     t = '\n  invalid value "{}" for argument -a, must be username:password'
                     raise Exception(t.format(x))
 
+        if self.args.grp:
+            # list of groupname:username,username,...
+            for x in self.args.grp:
+                try:
+                    # accept both = and : as separator between groupname and usernames,
+                    # accept both , and : as separators between usernames
+                    zs1, zs2 = x.replace("=", ":").split(":", 1)
+                    grps[zs1] = zs2.replace(":", ",").split(",")
+                except:
+                    t = '\n  invalid value "{}" for argument --grp, must be groupname:username1,username2,...'
+                    raise Exception(t.format(x))
+
         if self.args.v:
             # list of src:dst:permset:permset:...
             # permset is <rwmdgGhaA.>[,username][,username] or <c>,<flag>[=args]
+            all_un_gn = self._all_un_gn(acct, grps)
             for v_str in self.args.v:
                 m = re_vol.match(v_str)
                 if not m:
@@ -1133,20 +1374,19 @@ class AuthSrv(object):
                 if WINDOWS:
                     src = uncyg(src)
 
-                # print("\n".join([src, dst, perms]))
-                src = absreal(src)
-                dst = dst.strip("/")
-                self._map_volume(src, dst, mount, daxs, mflags)
+                vols = self._map_volume_idp(src, dst, mount, daxs, mflags, all_un_gn)
 
                 for x in perms.split(":"):
                     lvl, uname = x.split(",", 1) if "," in x else [x, ""]
-                    self._read_vol_str(lvl, uname, daxs[dst], mflags[dst])
+                    self._read_vol_str_idp(lvl, uname, vols, all_un_gn, daxs, mflags)
 
         if self.args.c:
             for cfg_fn in self.args.c:
                 lns: list[str] = []
                 try:
-                    self._parse_config_file(cfg_fn, lns, acct, daxs, mflags, mount)
+                    self._parse_config_file(
+                        cfg_fn, lns, acct, grps, daxs, mflags, mount
+                    )
 
                     zs = "#\033[36m cfg files in "
                     zst = [x[len(zs) :] for x in lns if x.startswith(zs)]
@@ -1177,7 +1417,7 @@ class AuthSrv(object):
 
             mount = cased
 
-        if not mount:
+        if not mount and not self.args.idp_h_usr:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
             vfs = VFS(self.log_func, absreal("."), "", axs, {})
@@ -1213,9 +1453,13 @@ class AuthSrv(object):
             vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
             vol.root = vfs
 
+        zss = set(acct)
+        zss.update(self.idp_accs)
+        zss.discard("*")
+        unames = ["*"] + list(sorted(zss))
+
         for perm in "read write move del get pget html admin dot".split():
             axs_key = "u" + perm
-            unames = ["*"] + list(acct.keys())
             for vp, vol in vfs.all_vols.items():
                 zx = getattr(vol.axs, axs_key)
                 if "*" in zx:
@@ -1249,18 +1493,20 @@ class AuthSrv(object):
             ]:
                 for usr in d:
                     all_users[usr] = 1
-                    if usr != "*" and usr not in acct:
+                    if usr != "*" and usr not in acct and usr not in self.idp_accs:
                         missing_users[usr] = 1
                     if "*" not in d:
                         associated_users[usr] = 1
 
         if missing_users:
-            self.log(
-                "you must -a the following users: "
-                + ", ".join(k for k in sorted(missing_users)),
-                c=1,
-            )
-            raise Exception(BAD_CFG)
+            zs = ", ".join(k for k in sorted(missing_users))
+            if self.args.idp_h_usr:
+                t = "the following users are unknown, and assumed to come from IdP: "
+                self.log(t + zs, c=6)
+            else:
+                t = "you must -a the following users: "
+                self.log(t + zs, c=1)
+                raise Exception(BAD_CFG)
 
         if LEELOO_DALLAS in all_users:
             raise Exception("sorry, reserved username: " + LEELOO_DALLAS)
@@ -1749,20 +1995,20 @@ class AuthSrv(object):
         except Pebkac:
             self.warn_anonwrite = True
 
-        with self.mutex:
-            self.vfs = vfs
-            self.acct = acct
-            self.iacct = {v: k for k, v in acct.items()}
+        self.vfs = vfs
+        self.acct = acct
+        self.grps = grps
+        self.iacct = {v: k for k, v in acct.items()}
 
-            self.re_pwd = None
-            pwds = [re.escape(x) for x in self.iacct.keys()]
-            if pwds:
-                if self.ah.on:
-                    zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
-                else:
-                    zs = r"(\[H\] pw:.*|=)(" + "|".join(pwds) + r")([]&; ]|$)"
+        self.re_pwd = None
+        pwds = [re.escape(x) for x in self.iacct.keys()]
+        if pwds:
+            if self.ah.on:
+                zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
+            else:
+                zs = r"(\[H\] pw:.*|=)(" + "|".join(pwds) + r")([]&; ]|$)"
 
-                self.re_pwd = re.compile(zs)
+            self.re_pwd = re.compile(zs)
 
     def setup_pwhash(self, acct: dict[str, str]) -> None:
         self.ah = PWHash(self.args)
@@ -2002,6 +2248,12 @@ class AuthSrv(object):
             ret.append("[accounts]")
             for u, p in self.acct.items():
                 ret.append("  {}: {}".format(u, p))
+            ret.append("")
+
+        if self.grps:
+            ret.append("[groups]")
+            for gn, uns in self.grps.items():
+                ret.append("  %s: %s" % (gn, ", ".join(uns)))
             ret.append("")
 
         for vol in self.vfs.all_vols.values():

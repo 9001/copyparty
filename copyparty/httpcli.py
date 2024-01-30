@@ -458,9 +458,20 @@ class HttpCli(object):
 
         if self.args.idp_h_usr:
             self.pw = ""
-            self.uname = self.headers.get(self.args.idp_h_usr) or "*"
-            if self.uname not in self.asrv.vfs.aread:
-                self.log("unknown username: [%s]" % (self.uname), 1)
+            idp_usr = self.headers.get(self.args.idp_h_usr) or ""
+            if idp_usr:
+                idp_grp = (
+                    self.headers.get(self.args.idp_h_grp) or ""
+                    if self.args.idp_h_grp
+                    else ""
+                )
+                self.asrv.idp_checkin(self.conn.hsrv.broker, idp_usr, idp_grp)
+                if idp_usr in self.asrv.vfs.aread:
+                    self.uname = idp_usr
+                else:
+                    self.log("unknown username: [%s]" % (idp_usr), 1)
+                    self.uname = "*"
+            else:
                 self.uname = "*"
         else:
             self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw

@@ -502,6 +502,10 @@ def get_sects():
                 * "\033[33mperm\033[0m" is "permissions,username1,username2,..."
                 * "\033[32mvolflag\033[0m" is config flags to set on this volume
 
+            --grp takes groupname:username1,username2,...
+            and groupnames can be used instead of usernames in -v
+            by prefixing the groupname with %
+
             list of permissions:
               "r" (read):   list folder contents, download files
               "w" (write):  upload files; need "r" to see the uploads
@@ -839,6 +843,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores, 0=all")
     ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, \033[33mUSER\033[0m:\033[33mPASS\033[0m; example [\033[32med:wark\033[0m]")
     ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, \033[33mSRC\033[0m:\033[33mDST\033[0m:\033[33mFLAG\033[0m; examples [\033[32m.::r\033[0m], [\033[32m/mnt/nas/music:/music:r:aed\033[0m], see --help-accounts")
+    ap2.add_argument("--grp", metavar="G:N,N", type=u, action="append", help="add group, \033[33mNAME\033[0m:\033[33mUSER1\033[0m,\033[33mUSER2\033[0m,\033[33m...\033[0m; example [\033[32madmins:ed,foo,bar\033[0m]")
     ap2.add_argument("-ed", action="store_true", help="enable the ?dots url parameter / client option which allows clients to see dotfiles / hidden files (volflag=dots)")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see \033[33m--help-urlform\033[0m")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="server terminal title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
@@ -948,7 +953,6 @@ def add_cert(ap, cert_path):
 def add_auth(ap):
     ap2 = ap.add_argument_group('IdP / identity provider / user authentication options')
     ap2.add_argument("--idp-h-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks and assume the request-header \033[33mHN\033[0m contains the username of the requesting user (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
-    return
     ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
 
 
