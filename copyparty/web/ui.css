@@ -147,6 +147,10 @@ html {
 #toast.err #toastc {
 	background: #d06;
 }
+#toast code {
+	padding: 0 .2em;
+	background: rgba(0,0,0,0.2);
+}
 #tth {
 	color: #fff;
 	background: #111;

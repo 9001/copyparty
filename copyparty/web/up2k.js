@@ -2720,6 +2720,9 @@ function up2k_init(subtle) {
         if (parallel_uploads > 16)
             parallel_uploads = 16;
 
+        if (parallel_uploads > 7)
+            toast.warn(10, L.u_maxconn);
+
         obj.value = parallel_uploads;
         bumpthread({ "target": 1 });
     }
