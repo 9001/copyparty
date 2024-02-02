@@ -895,6 +895,7 @@ function up2k_init(subtle) {
         "bytes": {
             "total": 0,
             "hashed": 0,
+            "inflight": 0,
             "uploaded": 0,
             "finished": 0
         },
@@ -1543,17 +1544,21 @@ function up2k_init(subtle) {
             if (uc.fsearch)
                 t.push(['u2etat', st.bytes.hashed, st.bytes.hashed, st.time.hashing]);
         }
+
+        var b_up = st.bytes.inflight + st.bytes.uploaded,
+            b_fin = st.bytes.inflight + st.bytes.finished;
+
         if (nsend) {
             st.time.uploading += td;
-            t.push(['u2etau', st.bytes.uploaded, st.bytes.finished, st.time.uploading]);
+            t.push(['u2etau', b_up, b_fin, st.time.uploading]);
         }
         if ((nhash || nsend) && !uc.fsearch) {
-            if (!st.bytes.finished) {
+            if (!b_fin) {
                 ebi('u2etat').innerHTML = L.u_etaprep;
             }
             else {
                 st.time.busy += td;
-                t.push(['u2etat', st.bytes.finished, st.bytes.finished, st.time.busy]);
+                t.push(['u2etat', b_fin, b_fin, st.time.busy]);
             }
         }
         for (var a = 0; a < t.length; a++) {
@@ -2539,6 +2544,7 @@ function up2k_init(subtle) {
             cdr = t.size;
 
         var orz = function (xhr) {
+            st.bytes.inflight -= xhr.bsent;
             var txt = unpre((xhr.response && xhr.response.err) || xhr.responseText);
             if (txt.indexOf('upload blocked by x') + 1) {
                 apop(st.busy.upload, upt);
@@ -2583,7 +2589,10 @@ function up2k_init(subtle) {
                 btot = Math.floor(st.bytes.total / 1024 / 1024);
 
             xhr.upload.onprogress = function (xev) {
-                pvis.prog(t, npart, xev.loaded);
+                var nb = xev.loaded;
+                st.bytes.inflight += nb - xhr.bsent;
+                xhr.bsent = nb;
+                pvis.prog(t, npart, nb);
             };
             xhr.onload = function (xev) {
                 try { orz(xhr); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
@@ -2591,6 +2600,8 @@ function up2k_init(subtle) {
             xhr.onerror = function (xev) {
                 if (crashed)
                     return;
+
+                st.bytes.inflight -= (xhr.bsent || 0);
 
                 if (!toast.visible)
                     toast.warn(9.98, L.u_cuerr.format(npart, Math.ceil(t.size / chunksize), t.name), t);
@@ -2608,6 +2619,7 @@ function up2k_init(subtle) {
             if (xhr.overrideMimeType)
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
 
+            xhr.bsent = 0;
             xhr.responseType = 'text';
             xhr.send(t.fobj.slice(car, cdr));
         }
