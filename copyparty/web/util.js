@@ -1455,7 +1455,9 @@ var toast = (function () {
     }
 
     r.hide = function (e) {
-        ev(e);
+        if (this === ebi('toastc'))
+            ev(e);
+
         unscroll();
         clearTimeout(te);
         clmod(obj, 'vis');
@@ -1984,6 +1986,9 @@ var cf_cha_t = 0;
 function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status < 400 && xhr.status >= 200)
         return true;
+
+    if (tag === undefined)
+        tag = prefix;
 
     var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
         fun = toast[lvl || 'err'],

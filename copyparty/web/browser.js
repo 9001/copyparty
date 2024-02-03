@@ -332,6 +332,8 @@ var Ls = {
 		"fp_confirm": "move these {0} items here?",
 		"fp_etab": 'failed to read clipboard from other browser tab',
 
+		"mk_noname": "type a name into the text field on the left before you do that :p",
+
 		"tv_load": "Loading text document:\n\n{0}\n\n{1}% ({2} of {3} MiB loaded)",
 		"tv_xe1": "could not load textfile:\n\nerror ",
 		"tv_xe2": "404, file not found",
@@ -463,6 +465,7 @@ var Ls = {
 		"u_emtleakf": 'try the following:\n<ul><li>hit <code>F5</code> to refresh the page</li><li>then enable <code>🥔</code> (potato) in the upload UI<li>and try that upload again</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">will hopefully have a bugfix</a> at some point',
 		"u_s404": "not found on server",
 		"u_expl": "explain",
+		"u_maxconn": "most browsers limit this to 6, but firefox lets you raise it with <code>connections-per-server</code> in <code>about:config</code>",
 		"u_tu": '<p class="warn">WARNING: turbo enabled, <span>&nbsp;client may not detect and resume incomplete uploads; see turbo-button tooltip</span></p>',
 		"u_ts": '<p class="warn">WARNING: turbo enabled, <span>&nbsp;search results can be incorrect; see turbo-button tooltip</span></p>',
 		"u_turbo_c": "turbo is disabled in server config",
@@ -821,6 +824,8 @@ var Ls = {
 		"fp_confirm": "flytt disse {0} filene hit?",
 		"fp_etab": 'kunne ikke lese listen med filer ifra den andre nettleserfanen',
 
+		"mk_noname": "skriv inn et navn i tekstboksen til venstre først :p",
+
 		"tv_load": "Laster inn tekstfil:\n\n{0}\n\n{1}% ({2} av {3} MiB lastet ned)",
 		"tv_xe1": "kunne ikke laste tekstfil:\n\nfeil ",
 		"tv_xe2": "404, Fil ikke funnet",
@@ -952,6 +957,7 @@ var Ls = {
 		"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplasteren</li><li>og forsøk den samme opplastningen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">fikser forhåpentligvis feilen</a> en eller annen gang',
 		"u_s404": "ikke funnet på serveren",
 		"u_expl": "forklar",
+		"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> in <code>about:config</code>",
 		"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrutte opplastninger vil muligens ikke oppdages og gjenopptas; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_ts": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;søkeresultater kan være feil; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_turbo_c": "turbo er deaktivert i serverkonfigurasjonen",
@@ -7271,6 +7277,28 @@ var msel = (function () {
 	if (!window.FormData)
 		return;
 
+	var form = QS('#op_new_md>form'),
+		tb = QS('#op_new_md input[name="name"]');
+
+	form.onsubmit = function (e) {
+		if (tb.value) {
+			if (toast.tag == L.mk_noname)
+				toast.hide();
+
+			return true;
+		}
+
+		ev(e);
+		toast.err(10, L.mk_noname, L.mk_noname);
+		return false;
+	};
+})();
+
+
+(function () {
+	if (!window.FormData)
+		return;
+
 	var form = QS('#op_mkdir>form'),
 		tb = QS('#op_mkdir input[name="name"]'),
 		sf = mknod('div');
@@ -7280,8 +7308,16 @@ var msel = (function () {
 
 	form.onsubmit = function (e) {
 		ev(e);
-		clmod(sf, 'vis', 1);
 		var dn = tb.value;
+		if (!dn) {
+			toast.err(10, L.mk_noname, L.mk_noname);
+			return false;
+		}
+
+		if (toast.tag == L.mk_noname || toast.tag == L.fd_xe1)
+			toast.hide();
+
+		clmod(sf, 'vis', 1);
 		sf.textContent = 'creating "' + dn + '"...';
 
 		var fd = new FormData();

@@ -1,4 +1,34 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0125-2252  `v1.9.30`  retime
+
+probably last release before v1.10 (IdP), please watch warmly
+
+## new features
+
+* option to replace serverside last-modified timestamps to match uploader's local files 55eb6921
+  * requires uploader to have write+delete permissions because it tampers with existing files
+  * in the browser-UI, enable with the `re📅` button in the settings tab `⚙️`
+  * u2c (commandline uploader): `--touch`
+* media player can shuffle songs now 01c82b54
+  * click `🔀` in the media-player settings tab `🎺` to enable
+* windows: retry deleting busy files 3313503e aa3a9719
+  * to support webdav-clients that upload and then immediately delete files (clonezilla)
+* options in batch-rename UI to ensure filenames are windows-safe b4e0a341
+* more support for older browsers 4ef31060
+  * ie9: gridview, navpane, text-viewer, text-editor
+  * ie9, firefox10: make sure toasts are properly closed
+
+## bugfixes
+
+* older chromes (and current iPhones) could randomly panic in incognito mode b32d6520
+* errormessage filepath sanitizer didn't catch histpaths in non-default locations 0f386c4b
+* now possible to mount the entire filesystem as a volume (please don't) 14bccbe4
+* on 32bit machines, disable sendfile when necessary to avoid python bug b9d0c853
+* `-q` would still print filesystem-indexing progress to STDOUT 6dbfcddc
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0114-0629  `v1.9.29`  RAM friendly
 
 ## new features

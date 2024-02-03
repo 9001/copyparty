@@ -615,7 +615,43 @@ window.baguetteBox = (function () {
 
             documentLastFocus && documentLastFocus.focus();
             isOverlayVisible = false;
-        }, 500);
+            unvid();
+            unfig();
+        }, 250);
+    }
+
+    function unvid(keep) {
+        var vids = QSA('#bbox-overlay video');
+        for (var a = vids.length - 1; a >= 0; a--) {
+            var v = vids[a];
+            if (v == keep)
+                continue;
+
+            v.src = '';
+            v.load();
+
+            var p = v.parentNode;
+            p.removeChild(v);
+            p.parentNode.removeChild(p);
+        }
+    }
+
+    function unfig(keep) {
+        var figs = QSA('#bbox-overlay figure'),
+            npre = options.preload || 0,
+            k = [];
+
+        if (keep === undefined)
+            keep = -9;
+
+        for (var a = keep - npre; a <= keep + npre; a++)
+            k.push('bbox-figure-' + a);
+
+        for (var a = figs.length - 1; a >= 0; a--) {
+            var f = figs[a];
+            if (!has(k, f.getAttribute('id')))
+                f.parentNode.removeChild(f);
+        }
     }
 
     function loadImage(index, callback) {
@@ -708,6 +744,7 @@ window.baguetteBox = (function () {
     }
 
     function show(index, gallery) {
+        gallery = gallery || currentGallery;
         if (!isOverlayVisible && index >= 0 && index < gallery.length) {
             prepareOverlay(gallery, options);
             showOverlay(index);
@@ -720,12 +757,10 @@ window.baguetteBox = (function () {
         if (index >= imagesElements.length)
             return bounceAnimation('right');
 
-        var v = vid();
-        if (v) {
-            v.src = '';
-            v.load();
-            v.parentNode.removeChild(v);
+        try {
+            vid().pause();
         }
+        catch (ex) { }
 
         currentIndex = index;
         loadImage(currentIndex, function () {
@@ -733,6 +768,15 @@ window.baguetteBox = (function () {
             preloadPrev(currentIndex);
         });
         updateOffset();
+
+        if (options.animation == 'none')
+            unvid(vid());
+        else
+            setTimeout(function () {
+                unvid(vid());
+            }, 100);
+
+        unfig(index);
 
         if (options.onChange)
             options.onChange(currentIndex, imagesElements.length);
