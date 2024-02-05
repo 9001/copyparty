@@ -5830,7 +5830,7 @@ var treectl = (function () {
 			var res = JSON.parse(this.responseText);
 		}
 		catch (ex) {
-			return;
+			return toast.err(30, "bad <code>?tree</code> reply;\nexpected json, got this:\n\n" + esc(this.responseText + ''));
 		}
 		rendertree(res, this.ts, this.top, this.dst, this.rst);
 	}
@@ -5995,7 +5995,7 @@ var treectl = (function () {
 		thegrid.setvis(true);
 	}
 
-	r.reqls = function (url, hpush, back) {
+	r.reqls = function (url, hpush, back, hydrate) {
 		if (IE && !history.pushState)
 			return window.location = url;
 
@@ -6003,6 +6003,7 @@ var treectl = (function () {
 		xhr.top = url.split('?')[0];
 		xhr.back = back
 		xhr.hpush = hpush;
+		xhr.hydrate = hydrate;
 		xhr.ts = Date.now();
 		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : ''), true);
 		xhr.onload = xhr.onerror = recvls;
@@ -6049,8 +6050,10 @@ var treectl = (function () {
 			var res = JSON.parse(this.responseText);
 		}
 		catch (ex) {
-			location = this.top;
-			return;
+			if (!this.hydrate)
+				location = this.top;
+
+			return toast.err(30, "bad <code>?ls</code> reply;\nexpected json, got this:\n\n" + esc(this.responseText + ''));
 		}
 
 		if (r.chk_index_html(this.top, res))
@@ -6272,7 +6275,7 @@ var treectl = (function () {
 			xhr.send();
 
 			r.ls_cb = showfile.addlinks;
-			return r.reqls(get_evpath(), false);
+			return r.reqls(get_evpath(), false, undefined, true);
 		}
 
 		var top = get_evpath();
