@@ -1813,19 +1813,21 @@ function MPlayer() {
 }
 
 
-function ft2dict(tr) {
+function ft2dict(tr, skip) {
 	var th = ebi('files').tHead.rows[0].cells,
 		rv = [],
 		rh = [],
 		ra = [],
 		rt = {};
 
+	skip = skip || {};
+
 	for (var a = 1, aa = th.length; a < aa; a++) {
 		var tv = tr.cells[a].textContent,
 			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
 			vis = th[a].className.indexOf('min') === -1;
 
-		if (!tv)
+		if (!tv || skip[tk])
 			continue;
 
 		(vis ? rv : rh).push(tk);
@@ -1838,7 +1840,7 @@ function ft2dict(tr) {
 
 function get_np() {
 	var tr = QS('#files tr.play');
-	return ft2dict(tr);
+	return ft2dict(tr, { 'up_ip': 1 });
 };
 
 
@@ -1899,7 +1901,7 @@ var widget = (function () {
 			np = npr[0];
 
 		for (var a = 0; a < npk.length; a++)
-			m += (npk[a] == 'file' ? '' : npk[a]) + '(' + cv + np[npk[a]] + ck + ') // ';
+			m += (npk[a] == 'file' ? '' : npk[a]).replace(/^\./, '') + '(' + cv + np[npk[a]] + ck + ') // ';
 
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
