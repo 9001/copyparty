@@ -29,7 +29,7 @@ fns=(
   mutagen-1.47.0-py3-none-any.whl
   packaging-23.2-py3-none-any.whl
   pillow-10.2.0-cp311-cp311-win_amd64.whl
-  python-3.11.7-amd64.exe
+  python-3.11.8-amd64.exe
 )
 [ $w7 ] && fns+=(
   pyinstaller-5.13.2-py3-none-win32.whl
