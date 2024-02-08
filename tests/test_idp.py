@@ -139,3 +139,33 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(self.nav(au, "vu/iua").realpath, "/u-iua")
         self.assertEqual(self.nav(au, "vg/iga1").realpath, "/g1-iga")
         self.assertEqual(self.nav(au, "vg/iga2").realpath, "/g2-iga")
+
+    def test_5(self):
+        """
+        one IdP user in multiple groups
+        """
+        _, cfgdir, xcfg = self.prep()
+        au = AuthSrv(Cfg(c=[cfgdir + "/5.conf"], **xcfg), self.log)
+
+        self.assertEqual(au.vfs.vpath, "")
+        self.assertEqual(au.vfs.realpath, "")
+        self.assertNodes(au.vfs, ["g", "ga", "gb"])
+        self.assertAxs(au.vfs.axs, [])
+
+        au.idp_checkin(None, "iua", "ga")
+        self.assertNodes(au.vfs, ["g", "ga", "gb"])
+        self.assertAxsAt(au, "g", [["iua"]])
+        self.assertAxsAt(au, "ga", [["iua"]])
+        self.assertAxsAt(au, "gb", [])
+
+        au.idp_checkin(None, "iua", "gb")
+        self.assertNodes(au.vfs, ["g", "ga", "gb"])
+        self.assertAxsAt(au, "g", [["iua"]])
+        self.assertAxsAt(au, "ga", [])
+        self.assertAxsAt(au, "gb", [["iua"]])
+
+        au.idp_checkin(None, "iua", "ga|gb")
+        self.assertNodes(au.vfs, ["g", "ga", "gb"])
+        self.assertAxsAt(au, "g", [["iua"]])
+        self.assertAxsAt(au, "ga", [["iua"]])
+        self.assertAxsAt(au, "gb", [["iua"]])

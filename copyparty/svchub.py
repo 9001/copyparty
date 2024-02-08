@@ -460,6 +460,18 @@ class SvcHub(object):
             if ptn:
                 setattr(self.args, k, re.compile(ptn))
 
+        for k in ["idp_h_sep"]:
+            ptn = getattr(self.args, k)
+            if "]" in ptn:
+                ptn = "]" + ptn.replace("]", "")
+            if "[" in ptn:
+                ptn = ptn.replace("[", "") + "["
+            if "-" in ptn:
+                ptn = ptn.replace("-", "") + "-"
+
+            ptn = ptn.replace("\\", "\\\\").replace("^", "\\^")
+            setattr(self.args, k, re.compile("[%s]" % (ptn,)))
+
         try:
             zf1, zf2 = self.args.rm_retry.split("/")
             self.args.rm_re_t = float(zf1)

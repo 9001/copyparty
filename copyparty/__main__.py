@@ -954,6 +954,7 @@ def add_auth(ap):
     ap2 = ap.add_argument_group('IdP / identity provider / user authentication options')
     ap2.add_argument("--idp-h-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks and assume the request-header \033[33mHN\033[0m contains the username of the requesting user (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
     ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
+    ap2.add_argument("--idp-h-sep", metavar="RE", type=u, default="|:;+,", help="if there are multiple groups in \033[33m--idp-h-grp\033[0m, they are separated by one of the characters in \033[33mRE\033[0m")
 
 
 def add_zeroconf(ap):

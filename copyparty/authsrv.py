@@ -795,7 +795,8 @@ class AuthSrv(object):
         self.idp_vols: dict[str, str] = {}  # vpath->abspath
 
         # all users/groups observed since last restart
-        self.idp_accs: dict[str, str] = {}  # username->groupname
+        self.idp_accs: dict[str, list[str]] = {}  # username->groupnames
+        self.idp_usr_gh: dict[str, str] = {}  # username->group-header-value (cache)
 
         self.mutex = threading.Lock()
         self.reload()
@@ -820,17 +821,21 @@ class AuthSrv(object):
         if uname in self.acct:
             return False
 
-        if self.idp_accs.get(uname) == gname:
+        if self.idp_usr_gh.get(uname) == gname:
             return False
 
+        gnames = [x.strip() for x in self.args.idp_h_sep.split(gname)]
+        gnames.sort()
+
         with self.mutex:
-            if self.idp_accs.get(uname) == gname:
+            self.idp_usr_gh[uname] = gname
+            if self.idp_accs.get(uname) == gnames:
                 return False
 
-            self.idp_accs[uname] = gname
+            self.idp_accs[uname] = gnames
 
             t = "reinitializing due to new user from IdP: [%s:%s]"
-            self.log(t % (uname, gname), 3)
+            self.log(t % (uname, gnames), 3)
 
             if not broker:
                 # only true for tests
@@ -847,15 +852,19 @@ class AuthSrv(object):
         mount: dict[str, str],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
-        un_gn: dict[str, str],
+        un_gns: dict[str, list[str]],
     ) -> list[tuple[str, str, str, str]]:
         ret: list[tuple[str, str, str, str]] = []
         visited = set()
         src0 = src  # abspath
         dst0 = dst  # vpath
 
-        # +('','') to ensure volume creation if there's no users
-        for un, gn in list(un_gn.items()) + [("", "")]:
+        un_gn = [(un, gn) for un, gns in un_gns.items() for gn in gns]
+        if not un_gn:
+            # ensure volume creation if there's no users
+            un_gn = [("", "")]
+
+        for un, gn in un_gn:
             # if ap/vp has a user/group placeholder, make sure to keep
             # track so the same user/gruop is mapped when setting perms;
             # otherwise clear un/gn to indicate it's a regular volume
@@ -952,17 +961,21 @@ class AuthSrv(object):
         self,
         acct: dict[str, str],
         grps: dict[str, list[str]],
-    ) -> dict[str, str]:
+    ) -> dict[str, list[str]]:
         """
         generate list of all confirmed pairs of username/groupname seen since last restart;
         in case of conflicting group memberships then it is selected as follows:
          * any non-zero value from IdP group header
          * otherwise take --grps / [groups]
         """
-        ret = self.idp_accs.copy()
-        ret.update({zs: "" for zs in acct if zs not in ret})
+        ret = {un:gns[:] for un, gns in self.idp_accs.items()}
+        ret.update({zs: [""] for zs in acct if zs not in ret})
         for gn, uns in grps.items():
-            ret.update({un: gn for un in uns if not ret.get(un)})
+            for un in uns:
+                try:
+                    ret[un].append(gn)
+                except:
+                    ret[un] = [gn]
 
         return ret
 
@@ -1176,7 +1189,7 @@ class AuthSrv(object):
         lvl: str,
         uname: str,
         vols: list[tuple[str, str, str, str]],
-        un_gn: dict[str, str],
+        un_gns: dict[str, list[str]],
         axs: dict[str, AXS],
         flags: dict[str, dict[str, Any]],
     ) -> None:
@@ -1212,8 +1225,8 @@ class AuthSrv(object):
         for un in uname.replace(",", " ").strip().split():
             if un.startswith("@"):
                 grp = un[1:]
-                uns = [x[0] for x in un_gn.items() if x[1] == grp]
-                if not uns and grp != "${g}":
+                uns = [x[0] for x in un_gns.items() if grp in x[1]]
+                if not uns and grp != "${g}" and not self.args.idp_h_grp:
                     t = "group [%s] must be defined with --grp argument (or in a [groups] config section)"
                     raise CfgEx(t % (grp,))
 
@@ -1222,13 +1235,14 @@ class AuthSrv(object):
                 unames.append(un)
 
         # unames may still contain ${u} and ${g} so now expand those;
-        # need ("*","") to match "*" in unames
-        un_gn = un_gn.copy()
-        un_gn["*"] = un_gn.get("*", "")
+        un_gn = [(un, gn) for un, gns in un_gns.items() for gn in gns]
+        if "*" not in un_gns:
+            # need ("*","") to match "*" in unames
+            un_gn.append(("*", ""))
 
         for _, dst, vu, vg in vols:
             unames2 = set()
-            for un, gn in un_gn.items():
+            for un, gn in un_gn:
                 # if vu/vg (volume user/group) is non-null,
                 # then each non-null value corresponds to
                 # ${u}/${g}; consider this a filter to
