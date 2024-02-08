@@ -1470,6 +1470,8 @@ var toast = (function () {
     };
 
     r.show = function (cl, sec, txt, tag) {
+        txt = (txt + '').slice(0, 16384);
+
         var same = r.visible && txt == r.p_txt && r.p_sec == sec,
             delta = Date.now() - r.p_t;
 

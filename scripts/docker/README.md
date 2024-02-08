@@ -79,6 +79,15 @@ or using commandline arguments,
 ```
 
 
+# faq
+
+the following advice is best-effort and not guaranteed to be entirely correct
+
+* q: starting a rootless container on debian 12 fails with `failed to register layer: lsetxattr user.overlay.impure /etc: operation not supported`
+  * a: docker's default rootless configuration on debian is to use the overlay2 storage driver; this does not work. Your options are to replace docker with podman (good choice), or to configure docker to use the `fuse-overlayfs` storage driver
+
+
+
 # build the images yourself
 
 basically `./make.sh hclean pull img push` but see [devnotes.md](./devnotes.md)

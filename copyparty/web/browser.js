@@ -1813,19 +1813,21 @@ function MPlayer() {
 }
 
 
-function ft2dict(tr) {
+function ft2dict(tr, skip) {
 	var th = ebi('files').tHead.rows[0].cells,
 		rv = [],
 		rh = [],
 		ra = [],
 		rt = {};
 
+	skip = skip || {};
+
 	for (var a = 1, aa = th.length; a < aa; a++) {
 		var tv = tr.cells[a].textContent,
 			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
 			vis = th[a].className.indexOf('min') === -1;
 
-		if (!tv)
+		if (!tv || skip[tk])
 			continue;
 
 		(vis ? rv : rh).push(tk);
@@ -1838,7 +1840,7 @@ function ft2dict(tr) {
 
 function get_np() {
 	var tr = QS('#files tr.play');
-	return ft2dict(tr);
+	return ft2dict(tr, { 'up_ip': 1 });
 };
 
 
@@ -1899,7 +1901,7 @@ var widget = (function () {
 			np = npr[0];
 
 		for (var a = 0; a < npk.length; a++)
-			m += (npk[a] == 'file' ? '' : npk[a]) + '(' + cv + np[npk[a]] + ck + ') // ';
+			m += (npk[a] == 'file' ? '' : npk[a]).replace(/^\./, '') + '(' + cv + np[npk[a]] + ck + ') // ';
 
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
@@ -5830,7 +5832,7 @@ var treectl = (function () {
 			var res = JSON.parse(this.responseText);
 		}
 		catch (ex) {
-			return;
+			return toast.err(30, "bad <code>?tree</code> reply;\nexpected json, got this:\n\n" + esc(this.responseText + ''));
 		}
 		rendertree(res, this.ts, this.top, this.dst, this.rst);
 	}
@@ -5995,7 +5997,7 @@ var treectl = (function () {
 		thegrid.setvis(true);
 	}
 
-	r.reqls = function (url, hpush, back) {
+	r.reqls = function (url, hpush, back, hydrate) {
 		if (IE && !history.pushState)
 			return window.location = url;
 
@@ -6003,6 +6005,7 @@ var treectl = (function () {
 		xhr.top = url.split('?')[0];
 		xhr.back = back
 		xhr.hpush = hpush;
+		xhr.hydrate = hydrate;
 		xhr.ts = Date.now();
 		xhr.open('GET', xhr.top + '?ls' + (r.dots ? '&dots' : ''), true);
 		xhr.onload = xhr.onerror = recvls;
@@ -6049,8 +6052,10 @@ var treectl = (function () {
 			var res = JSON.parse(this.responseText);
 		}
 		catch (ex) {
-			location = this.top;
-			return;
+			if (!this.hydrate)
+				location = this.top;
+
+			return toast.err(30, "bad <code>?ls</code> reply;\nexpected json, got this:\n\n" + esc(this.responseText + ''));
 		}
 
 		if (r.chk_index_html(this.top, res))
@@ -6272,7 +6277,7 @@ var treectl = (function () {
 			xhr.send();
 
 			r.ls_cb = showfile.addlinks;
-			return r.reqls(get_evpath(), false);
+			return r.reqls(get_evpath(), false, undefined, true);
 		}
 
 		var top = get_evpath();
