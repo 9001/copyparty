@@ -423,16 +423,21 @@ try:
 except:
     PYFTPD_VER = "(None)"
 
+try:
+    from partftpy.__init__ import __version__ as PARTFTPY_VER
+except:
+    PARTFTPY_VER = "(None)"
+
 
 PY_DESC = py_desc()
 
-VERSIONS = "copyparty v{} ({})\n{}\n   sqlite v{} | jinja v{} | pyftpd v{}".format(
-    S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER
+VERSIONS = "copyparty v{} ({})\n{}\n   sqlite {} | jinja {} | pyftpd {} | tftp {}".format(
+    S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER
 )
 
 
-_: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER)
-__all__ = ["mp", "BytesIO", "quote", "unquote", "SQLITE_VER", "JINJA_VER", "PYFTPD_VER"]
+_: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER)
+__all__ = ["mp", "BytesIO", "quote", "unquote", "SQLITE_VER", "JINJA_VER", "PYFTPD_VER", "PARTFTPY_VER"]
 
 
 class Daemon(threading.Thread):
@@ -536,6 +541,8 @@ class HLog(logging.Handler):
         elif record.name.startswith("impacket"):
             if self.ptn_smb_ign.match(msg):
                 return
+        elif record.name.startswith("partftpy."):
+            record.name = record.name[9:]
 
         self.log_func(record.name[-21:], msg, c)
 

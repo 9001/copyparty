@@ -46,6 +46,7 @@ from .util import (
     PY_DESC,
     PYFTPD_VER,
     SQLITE_VER,
+    PARTFTPY_VER,
     UNPLICATIONS,
     align_tab,
     ansi_re,
@@ -993,7 +994,7 @@ def add_zc_ssdp(ap):
 
 
 def add_ftp(ap):
-    ap2 = ap.add_argument_group('FTP options')
+    ap2 = ap.add_argument_group('FTP options (TCP only)')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on \033[33mPORT\033[0m, for example \033[32m3921")
     ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
@@ -1011,6 +1012,14 @@ def add_webdav(ap):
     ap2.add_argument("--dav-mac", action="store_true", help="disable apple-garbage filter -- allow macos to create junk files (._* and .DS_Store, .Spotlight-*, .fseventsd, .Trashes, .AppleDouble, __MACOS)")
     ap2.add_argument("--dav-rt", action="store_true", help="show symlink-destination's lastmodified instead of the link itself; always enabled for recursive listings (volflag=davrt)")
     ap2.add_argument("--dav-auth", action="store_true", help="force auth for all folders (required by davfs2 when only some folders are world-readable) (volflag=davauth)")
+
+
+def add_tftp(ap):
+    ap2 = ap.add_argument_group('TFTP options (UDP only)')
+    ap2.add_argument("--tftp", metavar="PORT", type=int, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
+    ap2.add_argument("--tftpv", action="store_true", help="verbose")
+    ap2.add_argument("--tftpvv", action="store_true", help="verboser")
+    ap2.add_argument("--tftp-ipa", metavar="PFX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPFX\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Example: [\033[32m127., 10.89., 192.168.\033[0m]")
 
 
 def add_smb(ap):
@@ -1322,6 +1331,7 @@ def run_argparse(
     add_transcoding(ap)
     add_ftp(ap)
     add_webdav(ap)
+    add_tftp(ap)
     add_smb(ap)
     add_safety(ap)
     add_salt(ap, fk_salt, ah_salt)
@@ -1375,7 +1385,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     if argv is None:
         argv = sys.argv
 
-    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite v{} | jinja2 v{} | pyftpd v{}\n\033[0m'
+    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite {} | jinja {} | pyftpd {} | tftp {}\n\033[0m'
     f = f.format(
         S_VERSION,
         CODENAME,
@@ -1384,6 +1394,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         SQLITE_VER,
         JINJA_VER,
         PYFTPD_VER,
+        PARTFTPY_VER,
     )
     lprint(f)
 

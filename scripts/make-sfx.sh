@@ -26,8 +26,9 @@ help() { exec cat <<'EOF'
 # _____________________________________________________________________
 # core features:
 #
-# `no-ftp` saves ~33k by removing the ftp server and filetype detector,
-#   disabling --ftpd and --magic
+# `no-ftp` saves ~30k by removing the ftp server, disabling --ftp
+#
+# `no-tfp` saves ~10k by removing the tftp server, disabling --tftp
 #
 # `no-smb` saves ~3.5k by removing the smb / cifs server
 #
@@ -114,6 +115,7 @@ while [ ! -z "$1" ]; do
 		gz)     use_gz=1 ; ;;
 		gzz)    shift;use_gzz=$1;use_gz=1; ;;
 		no-ftp) no_ftp=1 ; ;;
+		no-tfp) no_tfp=1 ; ;;
 		no-smb) no_smb=1 ; ;;
 		no-zm)  no_zm=1  ; ;;
 		no-fnt) no_fnt=1 ; ;;
@@ -165,7 +167,8 @@ necho() {
 [ $repack ] && {
 	old="$tmpdir/pe-copyparty.$(id -u)"
 	echo "repack of files in $old"
-	cp -pR "$old/"*{py2,py37,j2,copyparty} .
+	cp -pR "$old/"*{py2,py37,magic,j2,copyparty} .
+	cp -pR "$old/"*partftpy . || true
 	cp -pR "$old/"*ftp . || true
 }
 
@@ -221,6 +224,16 @@ necho() {
 	mkdir ftp/
 	mv pyftpdlib ftp/
 
+	necho collecting partftpy
+	f="../build/partftpy-0.1.0.tar.gz"
+	[ -e "$f" ] ||
+		(url=https://files.pythonhosted.org/packages/55/25/e043193fb3d941b91fc84a55e0560b1c248f3f04d73747eb4f35f5e2776e/partftpy-0.1.0.tar.gz;
+		wget -O$f "$url" || curl -L "$url" >$f)
+
+	tar -zxf $f
+	mv partftpy-*/partftpy .
+	rm -rf partftpy-* partftpy/bin
+
 	necho collecting python-magic
 	v=0.4.27
 	f="../build/python-magic-$v.tar.gz"
@@ -234,7 +247,6 @@ necho() {
 	rm -rf python-magic-*
 	rm magic/compat.py
 	iawk '/^def _add_compat/{o=1} !o; /^_add_compat/{o=0}' magic/__init__.py
-	mv magic ftp/  # doesn't provide a version label anyways
 
 	# enable this to dynamically remove type hints at startup,
 	# in case a future python version can use them for performance
@@ -409,8 +421,10 @@ iawk '/^ {0,4}[^ ]/{s=0}/^ {4}def (serve_forever|_loop)/{s=1}!s' ftp/pyftpdlib/s
 rm -f ftp/pyftpdlib/{__main__,prefork}.py
 
 [ $no_ftp ] &&
-	rm -rf copyparty/ftpd.py ftp &&
-	sed -ri '/\.ftp/d' copyparty/svchub.py
+	rm -rf copyparty/ftpd.py ftp
+
+[ $no_tfp ] &&
+	rm -rf copyparty/tftpd.py partftpy
 
 [ $no_smb ] &&
 	rm -f copyparty/smbd.py
@@ -584,7 +598,7 @@ nf=$(ls -1 "$zdir"/arc.* 2>/dev/null | wc -l)
 
 
 echo gen tarlist
-for d in copyparty j2 py2 py37 ftp; do find $d -type f; done |  # strip_hints
+for d in copyparty partftpy magic j2 py2 py37 ftp; do find $d -type f || true; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 

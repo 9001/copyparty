@@ -48,6 +48,7 @@ thumbnails2 = ["pyvips"]
 audiotags = ["mutagen"]
 ftpd = ["pyftpdlib"]
 ftps = ["pyftpdlib", "pyopenssl"]
+tftpd = ["partftpy"]
 pwhash = ["argon2-cffi"]
 
 [project.scripts]

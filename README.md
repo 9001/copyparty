@@ -3,7 +3,7 @@
 turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
 
 * server only needs Python (2 or 3), all dependencies optional
-* 🔌 protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
+* 🔌 protocols: [http](#the-browser) // [webdav](#webdav-server) // [ftp](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
@@ -53,6 +53,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [webdav server](#webdav-server) - with read-write support
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
+    * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
     * [browser ux](#browser-ux) - tweaking the ui
     * [file indexing](#file-indexing) - enables dedup and music search ++
@@ -157,11 +158,11 @@ you may also want these, especially on servers:
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
 firewall-cmd --permanent --add-port={80,443,3921,3923,3945,3990}/tcp  # --zone=libvirt
-firewall-cmd --permanent --add-port=12000-12099/tcp --permanent  # --zone=libvirt
-firewall-cmd --permanent --add-port={1900,5353}/udp  # --zone=libvirt
+firewall-cmd --permanent --add-port=12000-12099/tcp  # --zone=libvirt
+firewall-cmd --permanent --add-port={69,1900,3969,5353}/udp  # --zone=libvirt
 firewall-cmd --reload
 ```
-(1900:ssdp, 3921:ftp, 3923:http/https, 3945:smb, 3990:ftps, 5353:mdns, 12000:passive-ftp)
+(69:tftp, 1900:ssdp, 3921:ftp, 3923:http/https, 3945:smb, 3969:tftp, 3990:ftps, 5353:mdns, 12000:passive-ftp)
 
 
 ## features
@@ -172,6 +173,7 @@ firewall-cmd --reload
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
   * ☑ [ftp server](#ftp-server)
+  * ☑ [tftp server](#tftp-server)
   * ☑ [webdav server](#webdav-server)
   * ☑ [smb/cifs server](#smb-server)
   * ☑ [qr-code](#qr-code) for quick access
@@ -941,6 +943,23 @@ known client bugs:
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 * winxp cannot show unicode characters outside of *some range*
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
+
+
+## tftp server
+
+a TFTP server (read/write) can be started using `--tftp 3969`  (you probably want [ftp](#ftp-server) instead unless you are *actually* communicating with hardware from the 80s (in which case we should definitely hang some time))
+
+* based on [partftpy](https://github.com/9001/partftpy)
+* needs a dedicated port (cannot share with the HTTP/HTTPS API)
+  * run as root to use the spec-recommended port `69` (nice)
+* no accounts; read from world-readable folders, write to world-writable, overwrite in world-deletable
+* [RFC 7440](https://datatracker.ietf.org/doc/html/rfc7440) is **not** supported (will be extremely slow over WAN)
+
+some recommended TFTP clients:
+* windows: `tftp.exe` (you probably already have it)
+* linux: `tftp-hpa`, `atftp`
+  * `tftp 127.0.0.1 3969 -v -m binary -c put initrd.bin`
+* `curl` (read-only)
 
 
 ## smb server

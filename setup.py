@@ -84,7 +84,7 @@ args = {
     "version": about["__version__"],
     "description": (
         "Portable file server with accelerated resumable uploads, "
-        + "deduplication, WebDAV, FTP, zeroconf, media indexer, "
+        + "deduplication, WebDAV, FTP, TFTP, zeroconf, media indexer, "
         + "video thumbnails, audio transcoding, and write-only folders"
     ),
     "long_description": long_description,
@@ -140,6 +140,7 @@ args = {
         "audiotags": ["mutagen"],
         "ftpd": ["pyftpdlib"],
         "ftps": ["pyftpdlib", "pyopenssl"],
+        "tftpd": ["partftpy"],
         "pwhash": ["argon2-cffi"],
     },
     "entry_points": {"console_scripts": ["copyparty = copyparty.__main__:main"]},
