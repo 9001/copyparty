@@ -103,10 +103,12 @@ class Tftpd(object):
         self.srv = TftpServer.TftpServer("/", self._ls)
         self.stop = self.srv.stop
 
-        Daemon(self.srv.listen, "tftp", [self.ip, self.port])
+        ports = []
+        if self.args.tftp_pr:
+            p1, p2 = [int(x) for x in self.args.tftp_pr.split("-")]
+            ports = list(range(p1, p2 + 1))
 
-        # XXX TODO hook TftpContextServer.start;
-        # append tftp-ipa check at bottom and throw TftpException if not match
+        Daemon(self.srv.listen, "tftp", [self.ip, self.port], ka={"ports": ports})
 
     def nlog(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log("tftp", msg, c)
@@ -122,7 +124,7 @@ class Tftpd(object):
         vfs, rem = self.asrv.vfs.get(vpath, "*", *perms)
         return vfs, vfs.canonical(rem)
 
-    def _ls(self, vpath: str) -> Any:
+    def _ls(self, vpath: str, raddress: str, rport: int) -> Any:
         # generate file listing if vpath is dir.txt and return as file object
         return None
 

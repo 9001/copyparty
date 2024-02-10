@@ -1020,6 +1020,7 @@ def add_tftp(ap):
     ap2.add_argument("--tftpv", action="store_true", help="verbose")
     ap2.add_argument("--tftpvv", action="store_true", help="verboser")
     ap2.add_argument("--tftp-ipa", metavar="PFX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPFX\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Example: [\033[32m127., 10.89., 192.168.\033[0m]")
+    ap2.add_argument("--tftp-pr", metavar="P-P", type=u, help="the range of UDP ports to use for data transfer, for example \033[32m12000-13000")
 
 
 def add_smb(ap):
