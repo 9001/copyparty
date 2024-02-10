@@ -11,8 +11,8 @@ import unittest
 
 from copyparty.authsrv import AuthSrv
 from copyparty.httpcli import HttpCli
-from copyparty.up2k import Up2k
 from copyparty.u2idx import U2idx
+from copyparty.up2k import Up2k
 from tests import util as tu
 from tests.util import Cfg
 

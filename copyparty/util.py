@@ -431,13 +431,24 @@ except:
 
 PY_DESC = py_desc()
 
-VERSIONS = "copyparty v{} ({})\n{}\n   sqlite {} | jinja {} | pyftpd {} | tftp {}".format(
-    S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER
+VERSIONS = (
+    "copyparty v{} ({})\n{}\n   sqlite {} | jinja {} | pyftpd {} | tftp {}".format(
+        S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER
+    )
 )
 
 
 _: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER)
-__all__ = ["mp", "BytesIO", "quote", "unquote", "SQLITE_VER", "JINJA_VER", "PYFTPD_VER", "PARTFTPY_VER"]
+__all__ = [
+    "mp",
+    "BytesIO",
+    "quote",
+    "unquote",
+    "SQLITE_VER",
+    "JINJA_VER",
+    "PYFTPD_VER",
+    "PARTFTPY_VER",
+]
 
 
 class Daemon(threading.Thread):

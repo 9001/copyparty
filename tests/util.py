@@ -43,8 +43,8 @@ if MACOS:
 
 from copyparty.__init__ import E
 from copyparty.__main__ import init_E
-from copyparty.util import FHC, Garda, Unrecv
 from copyparty.u2idx import U2idx
+from copyparty.util import FHC, Garda, Unrecv
 
 init_E(E)
 

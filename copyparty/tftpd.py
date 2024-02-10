@@ -4,14 +4,17 @@ from __future__ import print_function, unicode_literals
 try:
     from types import SimpleNamespace
 except:
+
     class SimpleNamespace(object):
         def __init__(self, **attr):
             self.__dict__.update(attr)
+
 
 import inspect
 import logging
 import os
 import stat
+from datetime import datetime
 
 from partftpy import TftpContexts, TftpServer, TftpStates
 from partftpy.TftpShared import TftpException
@@ -19,7 +22,7 @@ from partftpy.TftpShared import TftpException
 from .__init__ import PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
-from .util import Daemon, min_ex, pybin, runhook, undot
+from .util import BytesIO, Daemon, exclude_dotfiles, runhook, undot
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
@@ -39,6 +42,7 @@ def _serverInitial(self, pkt: Any, raddress: str, rport: int) -> bool:
     if ptn and not ptn.match(raddress):
         yeet("client rejected (--tftp-ipa): %s" % (raddress,))
     return ret
+
 
 # patch ipa-check into partftpd
 _hub: list["SvcHub"] = []
@@ -113,9 +117,7 @@ class Tftpd(object):
     def nlog(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log("tftp", msg, c)
 
-    def _v2a(
-        self, caller: str, vpath: str, perms: list, *a: Any
-    ) -> tuple[VFS, str]:
+    def _v2a(self, caller: str, vpath: str, perms: list, *a: Any) -> tuple[VFS, str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
         if not perms:
             perms = [True, True]
@@ -124,9 +126,71 @@ class Tftpd(object):
         vfs, rem = self.asrv.vfs.get(vpath, "*", *perms)
         return vfs, vfs.canonical(rem)
 
-    def _ls(self, vpath: str, raddress: str, rport: int) -> Any:
+    def _ls(self, vpath: str, raddress: str, rport: int, force=False) -> Any:
         # generate file listing if vpath is dir.txt and return as file object
-        return None
+        if not force:
+            vpath, fn = os.path.split(vpath.replace("\\", "/"))
+            ptn = self.args.tftp_lsf
+            if not ptn or not ptn.match(fn.lower()):
+                return None
+
+        vn, rem = self.asrv.vfs.get(vpath, "*", True, False)
+        fsroot, vfs_ls, vfs_virt = vn.ls(
+            rem,
+            "*",
+            not self.args.no_scandir,
+            [[True, False]],
+        )
+        dnames = set([x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)])
+        dirs1 = [(v.st_mtime, v.st_size, k + "/") for k, v in vfs_ls if k in dnames]
+        fils1 = [(v.st_mtime, v.st_size, k) for k, v in vfs_ls if k not in dnames]
+        real1 = dirs1 + fils1
+        realt = [(datetime.fromtimestamp(mt), sz, fn) for mt, sz, fn in real1]
+        reals = [
+            (
+                "%04d-%02d-%02d %02d:%02d:%02d"
+                % (
+                    zd.year,
+                    zd.month,
+                    zd.day,
+                    zd.hour,
+                    zd.minute,
+                    zd.second,
+                ),
+                sz,
+                fn,
+            )
+            for zd, sz, fn in realt
+        ]
+        virs = [("????-??-?? ??:??:??", 0, k + "/") for k in vfs_virt.keys()]
+        ls = virs + reals
+
+        if "*" not in vn.axs.udot:
+            names = set(exclude_dotfiles([x[2] for x in ls]))
+            ls = [x for x in ls if x[2] in names]
+
+        try:
+            biggest = max([x[1] for x in ls])
+        except:
+            biggest = 0
+
+        perms = []
+        if "*" in vn.axs.uread:
+            perms.append("read")
+        if "*" in vn.axs.udot:
+            perms.append("hidden")
+        if "*" in vn.axs.uwrite:
+            if "*" in vn.axs.udel:
+                perms.append("overwrite")
+            else:
+                perms.append("write")
+
+        fmt = "{{}}  {{:{},}}  {{}}"
+        fmt = fmt.format(len("{:,}".format(biggest)))
+        retl = ["# permissions: %s" % (", ".join(perms),)]
+        retl += [fmt.format(*x) for x in ls]
+        ret = "\n".join(retl).encode("utf-8", "replace")
+        return BytesIO(ret)
 
     def _open(self, vpath: str, mode: str, *a: Any, **ka: Any) -> Any:
         rd = wr = False
@@ -151,6 +215,9 @@ class Tftpd(object):
             ):
                 yeet("blocked by xbu server config: " + vpath)
 
+        if not self.args.tftp_nols and bos.path.isdir(ap):
+            return self._ls(vpath, "", 0, True)
+
         return open(ap, mode, *a, **ka)
 
     def _mkdir(self, vpath: str, *a) -> None:
@@ -162,9 +229,7 @@ class Tftpd(object):
 
     def _unlink(self, vpath: str) -> None:
         # return bos.unlink(self._v2a("stat", vpath, *a)[1])
-        vfs, ap = self._v2a(
-            "delete", vpath, [True, False, False, True]
-        )
+        vfs, ap = self._v2a("delete", vpath, [True, False, False, True])
 
         try:
             inf = bos.stat(ap)
@@ -237,6 +302,7 @@ class Tftpd(object):
         fos.path.isfile = self._hook
         fos.path.islink = self._hook
         fos.path.realpath = self._hook
+
 
 def yeet(msg: str) -> None:
     warning(msg)

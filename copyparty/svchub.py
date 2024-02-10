@@ -451,6 +451,13 @@ class SvcHub(object):
             else:
                 setattr(al, k, re.compile(vs))
 
+        for k in "tftp_lsf".split(" "):
+            vs = getattr(al, k)
+            if not vs or vs == "no":
+                setattr(al, k, None)
+            else:
+                setattr(al, k, re.compile("^" + vs + "$"))
+
         if not al.sus_urls:
             al.ban_url = "no"
         elif al.ban_url == "no":
