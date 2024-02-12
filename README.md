@@ -947,19 +947,24 @@ known client bugs:
 
 ## tftp server
 
-a TFTP server (read/write) can be started using `--tftp 3969`  (you probably want [ftp](#ftp-server) instead unless you are *actually* communicating with hardware from the 80s (in which case we should definitely hang some time))
+a TFTP server (read/write) can be started using `--tftp 3969`  (you probably want [ftp](#ftp-server) instead unless you are *actually* communicating with hardware from the 90s (in which case we should definitely hang some time))
+
+> that makes this the first RTX DECT Base that has been updated using copyparty 🎉
 
 * based on [partftpy](https://github.com/9001/partftpy)
+* no accounts; read from world-readable folders, write to world-writable, overwrite in world-deletable
 * needs a dedicated port (cannot share with the HTTP/HTTPS API)
   * run as root to use the spec-recommended port `69` (nice)
-* no accounts; read from world-readable folders, write to world-writable, overwrite in world-deletable
+* can reply from a predefined portrange (good for firewalls)
+* only supports the binary/octet/image transfer mode (no netascii)
 * [RFC 7440](https://datatracker.ietf.org/doc/html/rfc7440) is **not** supported (will be extremely slow over WAN)
+  * expect ~1100 KiB/s over 1000BASE-T, 400~500 KiB/s over wifi, ~200 on bad wifi
 
 some recommended TFTP clients:
 * windows: `tftp.exe` (you probably already have it)
 * linux: `tftp-hpa`, `atftp`
-  * `tftp 127.0.0.1 3969 -v -m binary -c put initrd.bin`
-* `curl` (read-only)
+  * `tftp 127.0.0.1 3969 -v -m binary -c put firmware.bin`
+* `curl tftp://127.0.0.1:3969/firmware.bin` (read-only)
 
 
 ## smb server

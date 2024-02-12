@@ -57,7 +57,7 @@ class Tftpd(object):
         self.asrv = hub.asrv
         self.log = hub.log
 
-        _hub.clear()
+        _hub[:] = []
         _hub.append(hub)
 
         lg.setLevel(logging.DEBUG if self.args.tftpv else logging.INFO)
