@@ -957,8 +957,8 @@ a TFTP server (read/write) can be started using `--tftp 3969`  (you probably wan
   * run as root to use the spec-recommended port `69` (nice)
 * can reply from a predefined portrange (good for firewalls)
 * only supports the binary/octet/image transfer mode (no netascii)
-* [RFC 7440](https://datatracker.ietf.org/doc/html/rfc7440) is **not** supported (will be extremely slow over WAN)
-  * expect ~1100 KiB/s over 1000BASE-T, 400~500 KiB/s over wifi, ~200 on bad wifi
+* [RFC 7440](https://datatracker.ietf.org/doc/html/rfc7440) is **not** supported, so will be extremely slow over WAN
+  * expect 1100 KiB/s over 1000BASE-T, 400-500 KiB/s over wifi, 200 on bad wifi
 
 some recommended TFTP clients:
 * windows: `tftp.exe` (you probably already have it)
