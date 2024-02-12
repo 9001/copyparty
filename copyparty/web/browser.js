@@ -4812,6 +4812,7 @@ var thegrid = (function () {
 		r.dirty = false;
 		r.bagit('#ggrid');
 		r.loadsel();
+		aligngriditems();
 		setTimeout(r.tippen, 20);
 	}
 
