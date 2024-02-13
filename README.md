@@ -1697,6 +1697,7 @@ below are some tweaks roughly ordered by usefulness:
 
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
+  * and also makes thumbnails load faster, regardless of e2d/e2t
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
 * `-j0` enables multiprocessing (actual multithreading), can reduce latency to `20+80/numCores` percent and generally improve performance in cpu-intensive workloads, for example:
@@ -1704,7 +1705,7 @@ below are some tweaks roughly ordered by usefulness:
   * simultaneous downloads and uploads saturating a 20gbps connection
   * if `-e2d` is enabled, `-j2` gives 4x performance for directory listings; `-j4` gives 16x
   
-  ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
+  ...however it also increases the server/filesystem/HDD load during uploads, and adds an overhead to internal communication, so it is usually a better idea to don't
 * using [pypy](https://www.pypy.org/) instead of [cpython](https://www.python.org/) *can* be 70% faster for some workloads, but slower for many others
   * and pypy can sometimes crash on startup with `-j0` (TODO make issue)
 
