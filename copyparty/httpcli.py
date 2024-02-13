@@ -115,7 +115,7 @@ class HttpCli(object):
 
         self.t0 = time.time()
         self.conn = conn
-        self.mutex = conn.mutex  # mypy404
+        self.u2mutex = conn.u2mutex  # mypy404
         self.s = conn.s
         self.sr = conn.sr
         self.ip = conn.addr[0]
@@ -1988,8 +1988,11 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
-        ret = x.get()
+        # not to protect u2fh, but to prevent handshakes while files are closing
+        with self.u2mutex:
+            x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
+            ret = x.get()
+
         if self.is_vproxied:
             if "purl" in ret:
                 ret["purl"] = self.args.SR + ret["purl"]
@@ -2094,7 +2097,7 @@ class HttpCli(object):
             f = None
             fpool = not self.args.no_fpool and sprs
             if fpool:
-                with self.mutex:
+                with self.u2mutex:
                     try:
                         f = self.u2fh.pop(path)
                     except:
@@ -2137,7 +2140,7 @@ class HttpCli(object):
                 if not fpool:
                     f.close()
                 else:
-                    with self.mutex:
+                    with self.u2mutex:
                         self.u2fh.put(path, f)
             except:
                 # maybe busted handle (eg. disk went full)
@@ -2156,7 +2159,7 @@ class HttpCli(object):
             return False
 
         if not num_left and fpool:
-            with self.mutex:
+            with self.u2mutex:
                 self.u2fh.close(path)
 
         if not num_left and not self.args.nw:

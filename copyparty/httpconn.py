@@ -50,7 +50,7 @@ class HttpConn(object):
         self.addr = addr
         self.hsrv = hsrv
 
-        self.mutex: threading.Lock = hsrv.mutex  # mypy404
+        self.u2mutex: threading.Lock = hsrv.u2mutex  # mypy404
         self.args: argparse.Namespace = hsrv.args  # mypy404
         self.E: EnvParams = self.args.E
         self.asrv: AuthSrv = hsrv.asrv  # mypy404

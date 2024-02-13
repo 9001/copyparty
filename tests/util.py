@@ -243,6 +243,7 @@ class VHttpConn(object):
         self.log_func = log
         self.log_src = "a"
         self.mutex = threading.Lock()
+        self.u2mutex = threading.Lock()
         self.nbyte = 0
         self.nid = None
         self.nreq = -1
