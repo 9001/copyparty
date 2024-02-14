@@ -5089,23 +5089,24 @@ document.onkeydown = function (e) {
 			return ebi('griden').click();
 	}
 
-	if (aet == 'tr' && ae.closest('#files')) {
+	if ((aet == 'tr' || aet == 'td') && ae.closest('#files')) {
 		var d = '', rem = 0;
-		if (k == 'ArrowUp') d = 'previous';
-		if (k == 'ArrowDown') d = 'next';
+		if (aet == 'td') ae = ae.closest('tr'); //ie11
+		if (k == 'ArrowUp' || k == 'Up') d = 'previous';
+		if (k == 'ArrowDown' || k == 'Down') d = 'next';
 		if (k == 'PageUp') { d = 'previous'; rem = 0.6; }
 		if (k == 'PageDown') { d = 'next'; rem = 0.6; }
 		if (d) {
 			fselfunw(e, ae, d, rem);
 			return ev(e);
 		}
-		if (k == 'Space') {
+		if (k == 'Space' || k == 'Spacebar') {
 			clmod(ae, 'sel', 't');
 			msel.origin_tr(ae);
 			msel.selui();
 			return ev(e);
 		}
-		if (k == 'KeyA' && ctrl(e)) {
+		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
 			var sel = msel.getsel(),
 				all = msel.getall();
 
@@ -5116,7 +5117,7 @@ document.onkeydown = function (e) {
 	}
 
 	if (ae && ae.closest('pre')) {
-		if (k == 'KeyA' && ctrl(e)) {
+		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
 			var sel = document.getSelection(),
 				ran = document.createRange();
 
