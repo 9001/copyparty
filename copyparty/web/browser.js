@@ -240,6 +240,7 @@ var Ls = {
 
 		"mt_shuf": "shuffle the songs in each folder\">🔀",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
+		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
@@ -272,6 +273,8 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
+		"mm_prescan": "Looking for music to play next...",
+		"mm_scank": "Found the next song:",
 		"mm_uncache": "cache cleared; all songs will redownload on next playback",
 		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p><em>however,</em> it could also be due to the browser\'s autoplay settings;</p><p>Firefox: tap the icon on the left side of the address bar, then select "autoplay" and "allow audio"</p><p>Chrome: the problem will gradually dissipate as you play more music on this site</p>',
 		"mm_iosblk": "<p>your web browser thinks the audio playback is unwanted, and it decided to block playback until you start another track manually... unfortunately we are both powerless in telling it otherwise</p><p>supposedly this will get better as you continue playing music on this site, but I'm unfamiliar with apple devices so idk if that's true</p><p>you could try another browser, maybe firefox or chrome?</p>",
@@ -732,6 +735,7 @@ var Ls = {
 
 		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
+		"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
@@ -764,6 +768,8 @@ var Ls = {
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
+		"mm_prescan": "Leter etter neste sang...",
+		"mm_scank": "Fant neste sang:",
 		"mm_uncache": "alle sanger vil lastes på nytt ved neste avspilling",
 		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>NB: det kan også være pga. autoplay-innstillingene, så prøv dette:</p><p>Firefox: klikk på ikonet i venstre side av addressefeltet, velg "autoplay" og "tillat lyd"</p><p>Chrome: problemet vil minske gradvis jo mer musikk du spiller på denne siden</p>',
 		"mm_iosblk": "<p>nettleseren din tror at musikken er uønsket, og den bestemte seg for å stoppe avspillingen slik at du manuelt må velge en ny sang... dessverre er både du og jeg maktesløse når den har bestemt seg.</p><p>det ryktes at problemet vil minske jo mer musikk du spiller på denne siden, men jeg er ikke godt kjent med apple-dingser så jeg er ikke sikker.</p><p>kanskje firefox eller chrome fungerer bedre?</p>",
@@ -1391,6 +1397,7 @@ var mpl = (function () {
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
+		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
 		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
@@ -1435,6 +1442,7 @@ var mpl = (function () {
 		mp.read_order();  // don't bind
 	});
 	bcfg_bind(r, 'preload', 'au_preload', true);
+	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
 	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
 		if (!v) pbar.unwave();
@@ -1580,8 +1588,10 @@ var mpl = (function () {
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
-		if (!MOBILE)
-			ebi('np_img').setAttribute('src', cover || '');
+		if (!MOBILE && cover)
+			ebi('np_img').setAttribute('src', cover);
+		else
+			ebi('np_img').removeAttribute('src');
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', mplay);
@@ -1768,10 +1778,12 @@ function MPlayer() {
 	}
 
 	r.preload = function (url, full) {
+		var t0 = Date.now(),
+			fname = uricom_dec(url.split('/').pop());
+
 		url = mpl.acode(url);
 		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987&_=' + ACB;
 		mpl.preload_url = full ? url : null;
-		var t0 = Date.now();
 
 		if (mpl.waves)
 			fetch(url.replace(/\bth=opus&/, '') + '&th=p').then(function (x) {
@@ -1805,6 +1817,12 @@ function MPlayer() {
 		r.au2.onloadeddata = r.au2.onloadedmetadata = r.nopause;
 		r.au2.preload = "auto";
 		r.au2.src = r.au2.rsrc = url;
+
+		if (mpl.prescan_evp) {
+			mpl.prescan_evp = null;
+			toast.ok(7, L.mm_scank + "\n" + esc(fname));
+		}
+		console.log("preloading " + fname);
 	};
 
 	r.nopause = function () {
@@ -2451,6 +2469,10 @@ var mpui = (function () {
 		timer.add(updater_impl, true);
 	};
 
+	function repreload() {
+		preloaded = fpreloaded = null;
+	}
+
 	function updater_impl() {
 		if (!mp.au) {
 			widget.paused(true);
@@ -2512,7 +2534,26 @@ var mpui = (function () {
 
 			if (full !== null)
 				try {
-					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]], full);
+					var oi = mp.order.indexOf(mp.au.tid) + 1,
+						evp = get_evpath();
+
+					if (mpl.pb_mode == 'loop' || mp.au.evp != evp)
+						oi = 0;
+
+					if (oi >= mp.order.length) {
+						if (!mpl.prescan)
+							throw "prescan disabled";
+
+						if (mpl.prescan_evp == evp)
+							throw "evp match";
+
+						mpl.prescan_evp = evp;
+						toast.inf(10, L.mm_prescan);
+						treectl.ls_cb = repreload;
+						tree_neigh(1);
+					}
+					else
+						mp.preload(mp.tracks[mp.order[oi]], full);
 				}
 				catch (ex) {
 					console.log("preload failed", ex);
@@ -3039,6 +3080,7 @@ function play(tid, is_ev, seek) {
 	}, 500);
 
 	mp.au.tid = tid;
+	mp.au.evp = get_evpath();
 	mp.au.volume = mp.expvol(mp.vol);
 	var trs = QSA('#files tr.play');
 	for (var a = 0, aa = trs.length; a < aa; a++)

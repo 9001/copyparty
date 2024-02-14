@@ -1775,6 +1775,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	padding: 0;
 }
 #thumbs,
+#au_prescan,
 #au_fullpre,
 #au_os_seek,
 #au_osd_cv,
@@ -1782,7 +1783,8 @@ html.y #tree.nowrap .ntree a+a:hover {
 	opacity: .3;
 }
 #griden.on+#thumbs,
-#au_preload.on+#au_fullpre,
+#au_preload.on+#au_prescan,
+#au_preload.on+#au_prescan+#au_fullpre,
 #au_os_ctl.on+#au_os_seek,
 #au_os_ctl.on+#au_os_seek+#au_osd_cv,
 #u2turbo.on+#u2tdate {
