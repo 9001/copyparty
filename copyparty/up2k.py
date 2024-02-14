@@ -21,7 +21,7 @@ from copy import deepcopy
 
 from queue import Queue
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS, E
 from .authsrv import LEELOO_DALLAS, SSEELOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
@@ -35,6 +35,7 @@ from .util import (
     Pebkac,
     ProgressPrinter,
     absreal,
+    alltrace,
     atomic_move,
     db_ex_chk,
     dir_is_empty,
@@ -85,6 +86,9 @@ if TYPE_CHECKING:
 
 zsg = "avif,avifs,bmp,gif,heic,heics,heif,heifs,ico,j2p,j2k,jp2,jpeg,jpg,jpx,png,tga,tif,tiff,webp"
 CV_EXTS = set(zsg.split(","))
+
+
+HINT_HISTPATH = "you could try moving the database to another location (preferably an SSD or NVME drive) using either the --hist argument (global option for all volumes), or the hist volflag (just for this volume)"
 
 
 class Dbw(object):
@@ -892,7 +896,7 @@ class Up2k(object):
             return None
 
         try:
-            cur = self._open_db(db_path)
+            cur = self._open_db_wd(db_path)
 
             # speeds measured uploading 520 small files on a WD20SPZX (SMR 2.5" 5400rpm 4kb)
             dbd = flags["dbd"]
@@ -935,8 +939,8 @@ class Up2k(object):
 
             return cur, db_path
         except:
-            msg = "cannot use database at [{}]:\n{}"
-            self.log(msg.format(ptop, traceback.format_exc()))
+            msg = "ERROR: cannot use database at [%s]:\n%s\n\033[33mhint: %s\n"
+            self.log(msg % (db_path, traceback.format_exc(), HINT_HISTPATH), 1)
 
         return None
 
@@ -2155,6 +2159,46 @@ class Up2k(object):
     def _trace(self, msg: str) -> None:
         self.log("ST: {}".format(msg))
 
+    def _open_db_wd(self, db_path: str) -> "sqlite3.Cursor":
+        ok: list[int] = []
+        Daemon(self._open_db_timeout, "opendb_watchdog", [db_path, ok])
+        try:
+            return self._open_db(db_path)
+        finally:
+            ok.append(1)
+
+    def _open_db_timeout(self, db_path, ok: list[int]) -> None:
+        # give it plenty of time due to the count statement (and wisdom from byte's box)
+        for _ in range(60):
+            time.sleep(1)
+            if ok:
+                return
+
+        t = "WARNING:\n\n  initializing an up2k database is taking longer than one minute; something has probably gone wrong:\n\n"
+        self._log_sqlite_incompat(db_path, t)
+
+    def _log_sqlite_incompat(self, db_path, t0) -> None:
+        txt = t0 or ""
+        digest = hashlib.sha512(db_path.encode("utf-8", "replace")).digest()
+        stackname = base64.urlsafe_b64encode(digest[:9]).decode("utf-8")
+        stackpath = os.path.join(E.cfg, "stack-%s.txt" % (stackname,))
+
+        t = "  the filesystem at %s may not support locking, or is otherwise incompatible with sqlite\n\n  %s\n\n"
+        t += "  PS: if you think this is a bug and wish to report it, please include your configuration + the following file: %s\n"
+        txt += t % (db_path, HINT_HISTPATH, stackpath)
+        self.log(txt, 3)
+
+        try:
+            stk = alltrace()
+            with open(stackpath, "wb") as f:
+                f.write(stk.encode("utf-8", "replace"))
+        except Exception as ex:
+            self.log("warning: failed to write %s: %s" % (stackpath, ex), 3)
+
+        if self.args.q:
+            t = "-" * 72
+            raise Exception("%s\n%s\n%s" % (t, txt, t))
+
     def _orz(self, db_path: str) -> "sqlite3.Cursor":
         c = sqlite3.connect(
             db_path, timeout=self.timeout, check_same_thread=False
@@ -2167,7 +2211,7 @@ class Up2k(object):
         cur = self._orz(db_path)
         ver = self._read_ver(cur)
         if not existed and ver is None:
-            return self._create_db(db_path, cur)
+            return self._try_create_db(db_path, cur)
 
         if ver == 4:
             try:
@@ -2205,8 +2249,16 @@ class Up2k(object):
         db = cur.connection
         cur.close()
         db.close()
-        bos.unlink(db_path)
-        return self._create_db(db_path, None)
+        self._delete_db(db_path)
+        return self._try_create_db(db_path, None)
+
+    def _delete_db(self, db_path: str):
+        for suf in ("", "-shm", "-wal", "-journal"):
+            try:
+                bos.unlink(db_path + suf)
+            except:
+                if not suf:
+                    raise
 
     def _backup_db(
         self, db_path: str, cur: "sqlite3.Cursor", ver: Optional[int], msg: str
@@ -2242,6 +2294,18 @@ class Up2k(object):
             if rows:
                 return int(rows[0][0])
         return None
+
+    def _try_create_db(
+        self, db_path: str, cur: Optional["sqlite3.Cursor"]
+    ) -> "sqlite3.Cursor":
+        try:
+            return self._create_db(db_path, cur)
+        except:
+            try:
+                self._delete_db(db_path)
+            except:
+                pass
+            raise
 
     def _create_db(
         self, db_path: str, cur: Optional["sqlite3.Cursor"]
