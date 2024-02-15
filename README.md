@@ -1714,7 +1714,7 @@ below are some tweaks roughly ordered by usefulness:
 
 when uploading files,
 
-* chrome is recommended, at least compared to firefox:
+* chrome is recommended (unfortunately), at least compared to firefox:
   * up to 90% faster when hashing, especially on SSDs
   * up to 40% faster when uploading over extremely fast internets
   * but [u2c.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) can be 40% faster than chrome again

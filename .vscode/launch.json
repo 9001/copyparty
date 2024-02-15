@@ -19,8 +19,7 @@
                 "-emp",
                 "-e2dsa",
                 "-e2ts",
-                "-mtp",
-                ".bpm=f,bin/mtag/audio-bpm.py",
+                "-mtp=.bpm=f,bin/mtag/audio-bpm.py",
                 "-aed:wark",
                 "-vsrv::r:rw,ed:c,dupe",
                 "-vdist:dist:r"

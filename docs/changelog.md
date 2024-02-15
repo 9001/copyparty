@@ -1,4 +1,26 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0203-1533  `v1.9.31`  eject
+
+## new features
+
+* disable mkdir / new-doc buttons until a name is provided d3db6d29
+* warning about browsers limiting the number of connections c354a38b
+
+## bugfixes
+
+* #71 stop videos from buffering in the background a17c267d
+* improve up2k ETA on slow networks / many connections c1180d6f
+* u2c: exclude-filter didn't apply to file deletions b2e23340
+* `--touch` / `re📅` didn't apply to zerobyte files 945170e2
+
+## other changes
+
+* notes on [hardlink/symlink conversion](https://github.com/9001/copyparty/blob/6c2c6090/docs/notes.sh#L35-L46) 6c2c6090
+* [lore](https://github.com/9001/copyparty/blob/hovudstraum/docs/notes.md#trivia--lore) b1cf5884
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0125-2252  `v1.9.30`  retime
 
 probably last release before v1.10 (IdP), please watch warmly

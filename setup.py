@@ -111,6 +111,7 @@ args = {
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: Jython",
         "Programming Language :: Python :: Implementation :: PyPy",
+        "Operating System :: OS Independent",
         "Environment :: Console",
         "Environment :: No Input/Output (Daemon)",
         "Intended Audience :: End Users/Desktop",
