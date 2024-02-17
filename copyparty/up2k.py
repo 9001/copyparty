@@ -3680,9 +3680,10 @@ class Up2k(object):
             )
             job = reg.get(wark) if wark else None
             if job:
-                t = "forgetting partial upload {} ({})"
-                p = self._vis_job_progress(job)
-                self.log(t.format(wark, p))
+                if job["need"]:
+                    t = "forgetting partial upload {} ({})"
+                    p = self._vis_job_progress(job)
+                    self.log(t.format(wark, p))
                 assert wark
                 del reg[wark]
 
