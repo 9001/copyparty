@@ -954,17 +954,24 @@ a TFTP server (read/write) can be started using `--tftp 3969`  (you probably wan
 * based on [partftpy](https://github.com/9001/partftpy)
 * no accounts; read from world-readable folders, write to world-writable, overwrite in world-deletable
 * needs a dedicated port (cannot share with the HTTP/HTTPS API)
-  * run as root to use the spec-recommended port `69` (nice)
+  * run as root (or see below) to use the spec-recommended port `69` (nice)
 * can reply from a predefined portrange (good for firewalls)
 * only supports the binary/octet/image transfer mode (no netascii)
 * [RFC 7440](https://datatracker.ietf.org/doc/html/rfc7440) is **not** supported, so will be extremely slow over WAN
-  * expect 1100 KiB/s over 1000BASE-T, 400-500 KiB/s over wifi, 200 on bad wifi
+  * assuming default blksize (512), expect 1100 KiB/s over 100BASE-T, 400-500 KiB/s over wifi, 200 on bad wifi
+
+most clients expect to find TFTP on port 69, but on linux and macos you need to be root to listen on that. Alternatively, listen on 3969 and use NAT on the server to forward 69 to that port;
+* on linux: `iptables -t nat -A PREROUTING -i eth0 -p udp --dport 69 -j REDIRECT --to-port 3969`
 
 some recommended TFTP clients:
+* curl (cross-platform, read/write)
+  * get: `curl --tftp-blksize 1428 tftp://127.0.0.1:3969/firmware.bin`
+  * put: `curl --tftp-blksize 1428 -T firmware.bin tftp://127.0.0.1:3969/`
 * windows: `tftp.exe` (you probably already have it)
+  * `tftp -i 127.0.0.1 put firmware.bin`
 * linux: `tftp-hpa`, `atftp`
-  * `tftp 127.0.0.1 3969 -v -m binary -c put firmware.bin`
-* `curl tftp://127.0.0.1:3969/firmware.bin` (read-only)
+  * `atftp --option "blksize 1428" 127.0.0.1 3969 -p -l firmware.bin -r firmware.bin`
+  * `tftp -v -m binary 127.0.0.1 3969 -c put firmware.bin`
 
 
 ## smb server
@@ -997,7 +1004,7 @@ known client bugs:
   * however smb1 is buggy and is not enabled by default on win10 onwards
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 
-the smb protocol listens on TCP port 445, which is a privileged port on linux and macos, which would require running copyparty as root. However, this can be avoided by listening on another port using `--smb-port 3945` and then using NAT to forward the traffic from 445 to there;
+the smb protocol listens on TCP port 445, which is a privileged port on linux and macos, which would require running copyparty as root. However, this can be avoided by listening on another port using `--smb-port 3945` and then using NAT on the server to forward the traffic from 445 to there;
 * on linux: `iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 445 -j REDIRECT --to-port 3945`
 
 authenticate with one of the following:

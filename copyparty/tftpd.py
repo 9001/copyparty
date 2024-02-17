@@ -10,19 +10,33 @@ except:
             self.__dict__.update(attr)
 
 
-import inspect
 import logging
 import os
+import re
+import socket
 import stat
+import threading
+import time
 from datetime import datetime
 
-from partftpy import TftpContexts, TftpServer, TftpStates
+try:
+    import inspect
+except:
+    pass
+
+from partftpy import (
+    TftpContexts,
+    TftpPacketFactory,
+    TftpPacketTypes,
+    TftpServer,
+    TftpStates,
+)
 from partftpy.TftpShared import TftpException
 
-from .__init__ import PY2, TYPE_CHECKING
+from .__init__ import EXE, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
-from .util import BytesIO, Daemon, exclude_dotfiles, runhook, undot
+from .util import BytesIO, Daemon, exclude_dotfiles, min_ex, runhook, undot
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
@@ -33,6 +47,10 @@ if TYPE_CHECKING:
 
 lg = logging.getLogger("tftp")
 debug, info, warning, error = (lg.debug, lg.info, lg.warning, lg.error)
+
+
+def noop(*a, **ka) -> None:
+    pass
 
 
 def _serverInitial(self, pkt: Any, raddress: str, rport: int) -> bool:
@@ -56,6 +74,7 @@ class Tftpd(object):
         self.args = hub.args
         self.asrv = hub.asrv
         self.log = hub.log
+        self.mutex = threading.Lock()
 
         _hub[:] = []
         _hub.append(hub)
@@ -64,6 +83,38 @@ class Tftpd(object):
         for x in ["partftpy", "partftpy.TftpStates", "partftpy.TftpServer"]:
             lgr = logging.getLogger(x)
             lgr.setLevel(logging.DEBUG if self.args.tftpv else logging.INFO)
+
+        if not self.args.tftpv and not self.args.tftpvv:
+            # contexts -> states -> packettypes -> shared
+            # contexts -> packetfactory
+            # packetfactory -> packettypes
+            Cs = [
+                TftpPacketTypes,
+                TftpPacketFactory,
+                TftpStates,
+                TftpContexts,
+                TftpServer,
+            ]
+            cbak = []
+            if not self.args.tftp_no_fast and not EXE:
+                try:
+                    import inspect
+
+                    ptn = re.compile(r"(^\s*)log\.debug\(.*\)$")
+                    for C in Cs:
+                        cbak.append(C.__dict__)
+                        src1 = inspect.getsource(C).split("\n")
+                        src2 = "\n".join([ptn.sub("\\1pass", ln) for ln in src1])
+                        cfn = C.__spec__.origin
+                        exec (compile(src2, filename=cfn, mode="exec"), C.__dict__)
+                except Exception:
+                    t = "failed to optimize tftp code; run with --tftp-noopt if there are issues:\n"
+                    self.log("tftp", t + min_ex(), 3)
+                    for n, zd in enumerate(cbak):
+                        Cs[n].__dict__ = zd
+
+            for C in Cs:
+                C.log.debug = noop
 
         # patch vfs into partftpy
         TftpContexts.open = self._open
@@ -102,20 +153,51 @@ class Tftpd(object):
             self.log("tftp", "IPv6 not supported for tftp; listening on 0.0.0.0", 3)
             ip = "0.0.0.0"
 
-        self.ip = ip
         self.port = int(self.args.tftp)
-        self.srv = TftpServer.TftpServer("/", self._ls)
-        self.stop = self.srv.stop
+        self.srv = []
+        self.ips = []
 
         ports = []
         if self.args.tftp_pr:
             p1, p2 = [int(x) for x in self.args.tftp_pr.split("-")]
             ports = list(range(p1, p2 + 1))
 
-        Daemon(self.srv.listen, "tftp", [self.ip, self.port], ka={"ports": ports})
+        ips = self.args.i
+        if "::" in ips:
+            ips.append("0.0.0.0")
+
+        if self.args.ftp4:
+            ips = [x for x in ips if ":" not in x]
+
+        for ip in ips:
+            name = "tftp_%s" % (ip,)
+            Daemon(self._start, name, [ip, ports])
+            time.sleep(0.2)  # give dualstack a chance
 
     def nlog(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log("tftp", msg, c)
+
+    def _start(self, ip, ports):
+        fam = socket.AF_INET6 if ":" in ip else socket.AF_INET
+        srv = TftpServer.TftpServer("/", self._ls)
+        with self.mutex:
+            self.srv.append(srv)
+            self.ips.append(ip)
+        try:
+            srv.listen(ip, self.port, af_family=fam, ports=ports)
+        except OSError:
+            with self.mutex:
+                self.srv.remove(srv)
+                self.ips.remove(ip)
+            if ip != "0.0.0.0" or "::" not in self.ips:
+                raise
+
+    def stop(self):
+        with self.mutex:
+            srvs = self.srv[:]
+
+        for srv in srvs:
+            srv.stop()
 
     def _v2a(self, caller: str, vpath: str, perms: list, *a: Any) -> tuple[VFS, str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
@@ -190,7 +272,7 @@ class Tftpd(object):
         retl = ["# permissions: %s" % (", ".join(perms),)]
         retl += [fmt.format(*x) for x in ls]
         ret = "\n".join(retl).encode("utf-8", "replace")
-        return BytesIO(ret)
+        return BytesIO(ret + b"\n")
 
     def _open(self, vpath: str, mode: str, *a: Any, **ka: Any) -> Any:
         rd = wr = False
