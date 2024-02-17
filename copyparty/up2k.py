@@ -154,7 +154,7 @@ class Up2k(object):
         self.hashq: Queue[
             tuple[str, str, dict[str, Any], str, str, str, float, str, bool]
         ] = Queue()
-        self.tagq: Queue[tuple[str, str, str, str, str, float]] = Queue()
+        self.tagq: Queue[tuple[str, str, str, str, int, str, float]] = Queue()
         self.tag_event = threading.Condition()
         self.hashq_mutex = threading.Lock()
         self.n_hashq = 0
@@ -2055,12 +2055,13 @@ class Up2k(object):
                 return
 
             try:
+                st = bos.stat(qe.abspath)
                 if not qe.mtp:
                     if self.args.mtag_vv:
                         t = "tag-thr: {}({})"
                         self.log(t.format(self.mtag.backend, qe.abspath), "90")
 
-                    tags = self.mtag.get(qe.abspath)
+                    tags = self.mtag.get(qe.abspath) if st.st_size else {}
                 else:
                     if self.args.mtag_vv:
                         t = "tag-thr: {}({})"
@@ -2101,11 +2102,16 @@ class Up2k(object):
         """will mutex"""
         assert self.mtag
 
-        if not bos.path.isfile(abspath):
+        try:
+            st = bos.stat(abspath)
+        except:
+            return 0
+
+        if not stat.S_ISREG(st.st_mode):
             return 0
 
         try:
-            tags = self.mtag.get(abspath)
+            tags = self.mtag.get(abspath) if st.st_size else {}
         except Exception as ex:
             self._log_tag_err("", abspath, ex)
             return 0
@@ -3098,7 +3104,7 @@ class Up2k(object):
             raise
 
         if "e2t" in self.flags[ptop]:
-            self.tagq.put((ptop, wark, rd, fn, ip, at))
+            self.tagq.put((ptop, wark, rd, fn, sz, ip, at))
             self.n_tagq += 1
 
         return True
@@ -4056,14 +4062,14 @@ class Up2k(object):
             with self.mutex:
                 self.n_tagq -= 1
 
-            ptop, wark, rd, fn, ip, at = self.tagq.get()
+            ptop, wark, rd, fn, sz, ip, at = self.tagq.get()
             if "e2t" not in self.flags[ptop]:
                 continue
 
             # self.log("\n  " + repr([ptop, rd, fn]))
             abspath = djoin(ptop, rd, fn)
             try:
-                tags = self.mtag.get(abspath)
+                tags = self.mtag.get(abspath) if sz else {}
                 ntags1 = len(tags)
                 parsers = self._get_parsers(ptop, tags, abspath)
                 if self.args.mtag_vv:
