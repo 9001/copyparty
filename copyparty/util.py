@@ -1768,7 +1768,7 @@ def get_spd(nbyte: int, t0: float, t: Optional[float] = None) -> str:
     if t is None:
         t = time.time()
 
-    bps = nbyte / ((t - t0) + 0.001)
+    bps = nbyte / ((t - t0) or 0.001)
     s1 = humansize(nbyte).replace(" ", "\033[33m").replace("iB", "")
     s2 = humansize(bps).replace(" ", "\033[35m").replace("iB", "")
     return "%s \033[0m%s/s\033[0m" % (s1, s2)

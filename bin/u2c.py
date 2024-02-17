@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.14"
-S_BUILD_DT = "2024-01-27"
+S_VERSION = "1.15"
+S_BUILD_DT = "2024-02-18"
 
 """
 u2c.py: upload to copyparty
@@ -29,7 +29,7 @@ import platform
 import threading
 import datetime
 
-EXE = sys.executable.endswith("exe")
+EXE = bool(getattr(sys, "frozen", False))
 
 try:
     import argparse
@@ -846,12 +846,12 @@ class Ctl(object):
                 txt = " "
 
             if not self.up_br:
-                spd = self.hash_b / (time.time() - self.t0)
-                eta = (self.nbytes - self.hash_b) / (spd + 1)
+                spd = self.hash_b / ((time.time() - self.t0) or 1)
+                eta = (self.nbytes - self.hash_b) / (spd or 1)
             else:
-                spd = self.up_br / (time.time() - self.t0_up)
+                spd = self.up_br / ((time.time() - self.t0_up) or 1)
                 spd = self.spd = (self.spd or spd) * 0.9 + spd * 0.1
-                eta = (self.nbytes - self.up_b) / (spd + 1)
+                eta = (self.nbytes - self.up_b) / (spd or 1)
 
             spd = humansize(spd)
             self.eta = str(datetime.timedelta(seconds=int(eta)))

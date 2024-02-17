@@ -552,7 +552,7 @@ class Up2k(object):
             runihook(self.log, cmd, vol, ups)
 
     def _vis_job_progress(self, job: dict[str, Any]) -> str:
-        perc = 100 - (len(job["need"]) * 100.0 / len(job["hash"]))
+        perc = 100 - (len(job["need"]) * 100.0 / (len(job["hash"]) or 1))
         path = djoin(job["ptop"], job["prel"], job["name"])
         return "{:5.1f}% {}".format(perc, path)
 

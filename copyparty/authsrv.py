@@ -193,7 +193,7 @@ class Lim(object):
             self.dft = int(time.time()) + 300
             self.dfv = get_df(abspath)[0] or 0
             for j in list(self.reg.values()) if self.reg else []:
-                self.dfv -= int(j["size"] / len(j["hash"]) * len(j["need"]))
+                self.dfv -= int(j["size"] / (len(j["hash"]) or 999) * len(j["need"]))
 
             if already_written:
                 sz = 0
