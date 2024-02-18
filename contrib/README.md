@@ -17,11 +17,6 @@
 * `RequestURL`: full URL to the target folder
 * `pw`: password (remove the `pw` line if anon-write)
 
-however if your copyparty is behind a reverse-proxy, you may want to use [`sharex-html.sxcu`](sharex-html.sxcu) instead:
-* `RequestURL`: full URL to the target folder
-* `URL`: full URL to the root folder (with trailing slash) followed by `$regex:1|1$`
-* `pw`: password (remove `Parameters` if anon-write)
-
 ### [`send-to-cpp.contextlet.json`](send-to-cpp.contextlet.json)
 * browser integration, kind of? custom rightclick actions and stuff
 * rightclick a pic and send it to copyparty straight from your browser

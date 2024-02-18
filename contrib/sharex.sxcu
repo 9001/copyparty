@@ -1,17 +1,19 @@
 {
-  "Version": "13.5.0",
+  "Version": "15.0.0",
   "Name": "copyparty",
   "DestinationType": "ImageUploader",
   "RequestMethod": "POST",
   "RequestURL": "http://127.0.0.1:3923/sharex",
   "Parameters": {
-    "pw": "wark",
     "j": null
+  },
+  "Headers": {
+    "pw": "PUT_YOUR_PASSWORD_HERE_MY_DUDE"
   },
   "Body": "MultipartFormData",
   "Arguments": {
     "act": "bput"
   },
   "FileFormName": "f",
-  "URL": "$json:files[0].url$"
+  "URL": "{json:files[0].url}"
 }
