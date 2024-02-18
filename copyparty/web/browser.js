@@ -4882,6 +4882,7 @@ var thegrid = (function () {
 			duringHide: r.onhide,
 			afterShow: function () {
 				r.bbox_opts.refocus = true;
+				document.body.style.overflow = 'hidden';
 			},
 			captions: function (g) {
 				var idx = -1,
@@ -4904,6 +4905,7 @@ var thegrid = (function () {
 	};
 
 	r.onhide = function () {
+		document.body.style.overflow = '';
 		if (!thegrid.ihop)
 			return;
 

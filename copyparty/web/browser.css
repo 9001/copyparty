@@ -3142,7 +3142,7 @@ html.d #treepar {
 		margin-top: 1.7em;
 	}
 }
-@supports (display: grid) {
+@supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;
 		margin: 0em 0.25em;
