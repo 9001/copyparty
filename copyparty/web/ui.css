@@ -580,3 +580,11 @@ hr {
 		border: .07em dashed #444;
 	}
 }
+
+@media (prefers-reduced-motion) {
+	#toast,
+	#toast a#toastc,
+	#tt {
+		transition: none;
+	}
+}

@@ -1151,9 +1151,6 @@ html.y #widget.open {
 @keyframes spin {
 	100% {transform: rotate(360deg)}
 }
-@media (prefers-reduced-motion) {
-	@keyframes spin { }
-}
 @keyframes fadein {
 	0% {opacity: 0}
 	100% {opacity: 1}
@@ -3168,5 +3165,26 @@ html.d #treepar {
   	#ggrid>a>span {
 		text-align: center;
 		padding: 0.2em;
+	}
+}
+
+
+
+
+
+@media (prefers-reduced-motion) {
+	@keyframes spin { }
+	@keyframes gexit { }
+	@keyframes bounce { }
+	@keyframes bounceFromLeft { }
+	@keyframes bounceFromRight { }
+
+	#ggrid>a:before,
+	#widget.anim,
+	#u2tabw,
+	.dropdesc,
+	.dropdesc b,
+	.dropdesc>div>div {
+		transition: none;
 	}
 }
