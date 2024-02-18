@@ -1,4 +1,36 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0215-0000  `v1.10.0`  tftp
+
+## new features
+
+* TFTP server d636316a 8796c09f acbb8267 02879713
+  * based on [partftpy](https://github.com/9001/partftpy), has most essential features EXCEPT for [rfc7440](https://datatracker.ietf.org/doc/html/rfc7440) so WAN will be slow
+  * is already doing real work out in the wild! see the fantastic quote in the [readme](https://github.com/9001/copyparty?tab=readme-ov-file#tftp-server)
+* detect some (un)common configuration mistakes
+  * buggy reverse-proxy which strips away all URL parameters 136c0fdc
+    * could cause the browser to get stuck in a refresh-loop
+  * a volume on an sqlite-incompatible filesystem (a remote cifs server or such) and an up2k volume inside d4da3861
+    * sqlite could deadlock or randomly throw exceptions; serverlog will now explain how to fix it
+* ie11: file selection with shift-up/down 64ad5853
+
+## bugfixes
+
+* prevent music playback from stopping at the end of a folder f262aee8
+  * preloader will now proactively hunt for the next file to play as the last song is ending
+* in very specific scenarios, clients could be told their upload had finished processing a tiny bit too early, while the HDD was still busy taking in the last couple bytes 6f8a588c
+  * so if you expected to find the complete file on the server HDD immediately as the final chunk got confirmed, that was not necessarily the case if your server HDD was severely overloaded to the point where closing a file takes half a minute
+    * huge thx to friend with said overloaded server for finding all the crazy edge cases
+* ignore harmless javascript errors from easymde 879e83e2
+
+## other changes
+
+* the "copy currently playing song info to clipboard" button now excludes the uploader IP ed524d84
+* mention that enabling `-j0` can improve HDD load during uploads 5d92f4df
+* mention a debian-specific docker bug which prevents starting most containers (not just copyparty) 4e797a71
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0203-1533  `v1.9.31`  eject
 
 ## new features

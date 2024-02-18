@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 10, 0)
+VERSION = (1, 10, 1)
 CODENAME = "tftp"
-BUILD_DT = (2024, 2, 15)
+BUILD_DT = (2024, 2, 18)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)
