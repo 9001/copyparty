@@ -1247,6 +1247,13 @@ html.y #widget.open {
 	0% {opacity:0}
 	100% {opacity:1}
 }
+#ggrid>a.glow {
+	animation: gexit .6s ease-out;
+}
+@keyframes gexit {
+	0% {box-shadow: 0 0 0 2em var(--a)}
+	100% {box-shadow: 0 0 0em 0em var(--a)}
+}
 #wzip a {
 	font-size: .4em;
 	margin: -.3em .1em;

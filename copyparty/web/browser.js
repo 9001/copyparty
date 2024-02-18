@@ -194,6 +194,7 @@ var Ls = {
 
 		"ct_thumb": "in grid-view, toggle icons or thumbnails$NHotkey: T",
 		"ct_csel": "use CTRL and SHIFT for file selection in grid-view",
+		"ct_ihop": "when the image viewer is closed, scroll down to the last viewed file",
 		"ct_dots": "show hidden files (if server permits)",
 		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
@@ -690,6 +691,7 @@ var Ls = {
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
 		"ct_csel": "bruk tastene CTRL og SHIFT for markering av filer i ikonvisning",
+		"ct_ihop": "bla ned til sist viste bilde når bildeviseren lukkes",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
 		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
@@ -1185,6 +1187,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '">sel</a>\n' +
+	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '">g⮯</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
@@ -4875,7 +4878,11 @@ var thegrid = (function () {
 		if (r.bbox)
 			baguetteBox.destroy();
 
-		r.bbox = baguetteBox.run(isrc, {
+		var br = baguetteBox.run(isrc, {
+			duringHide: r.onhide,
+			afterShow: function () {
+				r.bbox_opts.refocus = true;
+			},
 			captions: function (g) {
 				var idx = -1,
 					h = '' + g;
@@ -4891,7 +4898,44 @@ var thegrid = (function () {
 			onChange: function (i) {
 				sethash('g' + r.bbox[i].imageElement.getAttribute('ref'));
 			}
-		})[0];
+		});
+		r.bbox = br[0][0];
+		r.bbox_opts = br[1];
+	};
+
+	r.onhide = function () {
+		if (!thegrid.ihop)
+			return;
+
+		try {
+			var el = QS('#ggrid a[ref="' + location.hash.slice(2) + '"]'),
+				f = function () {
+					try {
+						el.focus();
+					}
+					catch (ex) { }
+				};
+
+			f();
+			setTimeout(f, 10);
+			setTimeout(f, 100);
+			setTimeout(f, 200);
+			// thx fullscreen api
+
+			if (ANIM) {
+				clmod(el, 'glow', 1);
+				setTimeout(function () {
+					try {
+						clmod(el, 'glow');
+					}
+					catch (ex) { }
+				}, 600);
+			}
+			r.bbox_opts.refocus = false;
+		}
+		catch (ex) {
+			console.log('ihop:', ex);
+		}
 	};
 
 	r.set_crop = function (en) {
@@ -4915,6 +4959,7 @@ var thegrid = (function () {
 	};
 
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
+	bcfg_bind(r, 'ihop', 'ihop', true);
 	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
 	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
