@@ -4944,7 +4944,7 @@ var thegrid = (function () {
 		if (!dcrop.startsWith('f'))
 			return r.setdirty();
 
-		r.crop = dcrop.startsWith('y');
+		r.crop = dcrop.endsWith('y');
 		bcfg_upd_ui('gridcrop', r.crop);
 		if (r.crop != en)
 			toast.warn(10, L.ul_btnlk);
@@ -4954,7 +4954,7 @@ var thegrid = (function () {
 		if (!dth3x.startsWith('f'))
 			return r.setdirty();
 
-		r.x3 = dth3x.startsWith('y');
+		r.x3 = dth3x.endsWith('y');
 		bcfg_upd_ui('grid3x', r.x3);
 		if (r.x3 != en)
 			toast.warn(10, L.ul_btnlk);
