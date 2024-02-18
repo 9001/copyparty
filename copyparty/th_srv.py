@@ -97,8 +97,8 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
 
     # spectrograms are never cropped; strip fullsize flag
     ext = rem.split(".")[-1].lower()
-    if ext in ffa and fmt in ("wf", "jf"):
-        fmt = fmt[:1]
+    if ext in ffa and fmt[:2] in ("wf", "jf"):
+        fmt = fmt.replace("f", "")
 
     rd += "\n" + fmt
     h = hashlib.sha512(afsenc(rd)).digest()
@@ -200,9 +200,10 @@ class ThumbSrv(object):
         with self.mutex:
             return not self.nthr
 
-    def getres(self, vn: VFS) -> tuple[int, int]:
+    def getres(self, vn: VFS, fmt: str) -> tuple[int, int]:
+        mul = 3 if "3" in fmt else 1
         w, h = vn.flags["thsize"].split("x")
-        return int(w), int(h)
+        return int(w) * mul, int(h) * mul
 
     def get(self, ptop: str, rem: str, mtime: float, fmt: str) -> Optional[str]:
         histpath = self.asrv.vfs.histtab.get(ptop)
@@ -364,7 +365,7 @@ class ThumbSrv(object):
 
     def fancy_pillow(self, im: "Image.Image", fmt: str, vn: VFS) -> "Image.Image":
         # exif_transpose is expensive (loads full image + unconditional copy)
-        res = self.getres(vn)
+        res = self.getres(vn, fmt)
         r = max(*res) * 2
         im.thumbnail((r, r), resample=Image.LANCZOS)
         try:
@@ -379,7 +380,7 @@ class ThumbSrv(object):
         if rot in rots:
             im = im.transpose(rots[rot])
 
-        if fmt.endswith("f"):
+        if "f" in fmt:
             im.thumbnail(res, resample=Image.LANCZOS)
         else:
             iw, ih = im.size
@@ -396,7 +397,7 @@ class ThumbSrv(object):
                 im = self.fancy_pillow(im, fmt, vn)
             except Exception as ex:
                 self.log("fancy_pillow {}".format(ex), "90")
-                im.thumbnail(self.getres(vn))
+                im.thumbnail(self.getres(vn, fmt))
 
             fmts = ["RGB", "L"]
             args = {"quality": 40}
@@ -422,10 +423,10 @@ class ThumbSrv(object):
     def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)
         crops = ["centre", "none"]
-        if fmt.endswith("f"):
+        if "f" in fmt:
             crops = ["none"]
 
-        w, h = self.getres(vn)
+        w, h = self.getres(vn, fmt)
         kw = {"height": h, "size": "down", "intent": "relative"}
 
         for c in crops:
@@ -454,12 +455,12 @@ class ThumbSrv(object):
             seek = [b"-ss", "{:.0f}".format(dur / 3).encode("utf-8")]
 
         scale = "scale={0}:{1}:force_original_aspect_ratio="
-        if fmt.endswith("f"):
+        if "f" in fmt:
             scale += "decrease,setsar=1:1"
         else:
             scale += "increase,crop={0}:{1},setsar=1:1"
 
-        res = self.getres(vn)
+        res = self.getres(vn, fmt)
         bscale = scale.format(*list(res)).encode("utf-8")
         # fmt: off
         cmd = [
@@ -594,7 +595,11 @@ class ThumbSrv(object):
         need = 0.2 + dur / coeff
         self.wait4ram(need, tpath)
 
-        fc = "[0:a:0]aresample=48000{},showspectrumpic=s=640x512,crop=780:544:70:50[o]"
+        fc = "[0:a:0]aresample=48000{},showspectrumpic=s="
+        if "3" in fmt:
+            fc += "1280x1024,crop=1420:1056:70:48[o]"
+        else:
+            fc += "640x512,crop=780:544:70:48[o]"
 
         if self.args.th_ff_swr:
             fco = ":filter_size=128:cutoff=0.877"

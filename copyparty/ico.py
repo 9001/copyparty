@@ -31,7 +31,7 @@ class Ico(object):
 
         w = 100
         h = 30
-        if not self.args.th_no_crop and as_thumb:
+        if "n" in self.args.th_crop and as_thumb:
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
             w = 100

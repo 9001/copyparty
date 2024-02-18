@@ -349,7 +349,8 @@ var Ls = {
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
-		"gt_full": "show uncropped thumbnails\">full",
+		"gt_crop": "center-crop thumbnails\">crop",
+		"gt_3x": "hi-res thumbnails\">3x",
 		"gt_zoom": "zoom",
 		"gt_chop": "chop",
 		"gt_sort": "sort by",
@@ -844,7 +845,8 @@ var Ls = {
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
 
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
-		"gt_full": "ikke beskjær bildene\">full",
+		"gt_crop": "beskjær ikonene så de passer bedre\">✂",
+		"gt_3x": "høyere oppløsning på ikoner\">3x",
 		"gt_zoom": "zoom",
 		"gt_chop": "trim",
 		"gt_sort": "sorter",
@@ -4515,7 +4517,9 @@ var thegrid = (function () {
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
-		'<a href="#" class="tgl btn" id="gridfull" tt="' + L.gt_full + '</a> <span>' + L.gt_zoom + ': ' +
+		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
+		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
+		'<span>' + L.gt_zoom + ': ' +
 		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
 		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
 		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
@@ -4530,7 +4534,7 @@ var thegrid = (function () {
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 
 	var r = {
-		'sz': clamp(fcfg_get('gridsz', 10), 4, 40),
+		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
 		'ln': clamp(icfg_get('gridln', 3), 1, 7),
 		'isdirty': true,
 		'bbox': null
@@ -4593,10 +4597,10 @@ var thegrid = (function () {
 
 	r.setdirty = function () {
 		r.dirty = true;
-		if (r.en) {
+		if (r.en)
 			loadgrid();
-		}
-		r.setvis();
+		else
+			r.setvis();
 	};
 
 	function setln(v) {
@@ -4616,7 +4620,7 @@ var thegrid = (function () {
 
 	function setsz(v) {
 		if (v !== undefined) {
-			r.sz = clamp(v, 4, 40);
+			r.sz = clamp(v, 4, 80);
 			swrite('gridsz', r.sz);
 			setTimeout(r.tippen, 20);
 		}
@@ -4624,6 +4628,7 @@ var thegrid = (function () {
 			document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
 		}
 		catch (ex) { }
+		aligngriditems();
 	}
 	setsz();
 
@@ -4776,8 +4781,11 @@ var thegrid = (function () {
 		if (!r.dirty)
 			return r.loadsel();
 
-		if (dfull != r.full && !sread('gridfull'))
-			bcfg_upd_ui('gridfull', r.full = dfull);
+		if (dcrop.startsWith('f') || !sread('gridcrop'))
+			bcfg_upd_ui('gridcrop', r.crop = ('y' == dcrop.slice(-1)));
+
+		if (dth3x.startsWith('f') || !sread('grid3x'))
+			bcfg_upd_ui('grid3x', r.x3 = ('y' == dth3x.slice(-1)));
 
 		var html = [],
 			svgs = new Set(),
@@ -4796,8 +4804,10 @@ var thegrid = (function () {
 
 			if (r.thumbs) {
 				ihref += '?th=' + (have_webp ? 'w' : 'j');
-				if (r.full)
-					ihref += 'f'
+				if (!r.crop)
+					ihref += 'f';
+				if (r.x3)
+					ihref += '3';
 				if (href == "#")
 					ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
 			}
@@ -4833,7 +4843,7 @@ var thegrid = (function () {
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +
-				(r.sz / 1.25) + 'em" onload="th_onload(this)" src="' +
+				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ebi('ggrid').innerHTML = html.join('\n');
@@ -4884,8 +4894,29 @@ var thegrid = (function () {
 		})[0];
 	};
 
+	r.set_crop = function (en) {
+		if (!dcrop.startsWith('f'))
+			return r.setdirty();
+
+		r.crop = dcrop.startsWith('y');
+		bcfg_upd_ui('gridcrop', r.crop);
+		if (r.crop != en)
+			toast.warn(10, L.ul_btnlk);
+	};
+
+	r.set_x3 = function (en) {
+		if (!dth3x.startsWith('f'))
+			return r.setdirty();
+
+		r.x3 = dth3x.startsWith('y');
+		bcfg_upd_ui('grid3x', r.x3);
+		if (r.x3 != en)
+			toast.warn(10, L.ul_btnlk);
+	};
+
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
-	bcfg_bind(r, 'full', 'gridfull', false, r.setdirty);
+	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
+	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
 		v ? loadgrid() : r.setvis(true);
@@ -5575,11 +5606,15 @@ function aligngriditems() {
 	if (/b/.test(themen + ''))
 		totalgapwidth *= 2.8;
 
+	var val, st = ebi('ggrid').style;
+
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
-		ebi('ggrid').style.justifyContent = 'left';
+		val = 'left';
 	} else {
-		ebi('ggrid').style.justifyContent = treectl.hidden ? 'center' : 'space-between';
+		val = treectl.hidden ? 'center' : 'space-between';
 	}
+	if (st.justifyContent != val)
+		st.justifyContent = val;
 }
 onresize100.add(aligngriditems);
 
@@ -6110,7 +6145,8 @@ var treectl = (function () {
 				res.files[a].tags = {};
 
 		read_dsort(res.dsort);
-		dfull = res.dfull;
+		dcrop = res.dcrop;
+		dth3x = res.dth3x;
 
 		srvinf = res.srvinf;
 		try {
