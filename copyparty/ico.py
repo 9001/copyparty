@@ -31,10 +31,9 @@ class Ico(object):
 
         w = 100
         h = 30
-        if "n" in self.args.th_crop and as_thumb:
+        if as_thumb:
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
-            w = 100
 
         if chrome:
             # cannot handle more than ~2000 unique SVGs
