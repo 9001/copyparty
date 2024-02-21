@@ -36,7 +36,7 @@ from partftpy.TftpShared import TftpException
 from .__init__ import EXE, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
-from .util import BytesIO, Daemon, exclude_dotfiles, min_ex, runhook, undot
+from .util import BytesIO, Daemon, ODict, exclude_dotfiles, min_ex, runhook, undot
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
@@ -169,6 +169,8 @@ class Tftpd(object):
         if self.args.ftp4:
             ips = [x for x in ips if ":" not in x]
 
+        ips = list(ODict.fromkeys(ips))  # dedup
+
         for ip in ips:
             name = "tftp_%s" % (ip,)
             Daemon(self._start, name, [ip, ports])
@@ -179,18 +181,54 @@ class Tftpd(object):
 
     def _start(self, ip, ports):
         fam = socket.AF_INET6 if ":" in ip else socket.AF_INET
-        srv = TftpServer.TftpServer("/", self._ls)
-        with self.mutex:
-            self.srv.append(srv)
-            self.ips.append(ip)
-        try:
-            srv.listen(ip, self.port, af_family=fam, ports=ports)
-        except OSError:
+        have_been_alive = False
+        while True:
+            srv = TftpServer.TftpServer("/", self._ls)
             with self.mutex:
-                self.srv.remove(srv)
-                self.ips.remove(ip)
-            if ip != "0.0.0.0" or "::" not in self.ips:
-                raise
+                self.srv.append(srv)
+                self.ips.append(ip)
+
+            try:
+                # this is the listen loop; it should block forever
+                srv.listen(ip, self.port, af_family=fam, ports=ports)
+            except:
+                with self.mutex:
+                    self.srv.remove(srv)
+                    self.ips.remove(ip)
+
+                try:
+                    srv.sock.close()
+                except:
+                    pass
+
+                try:
+                    bound = bool(srv.listenport)
+                except:
+                    bound = False
+
+                if bound:
+                    # this instance has managed to bind at least once
+                    have_been_alive = True
+
+                if have_been_alive:
+                    t = "tftp server [%s]:%d crashed; restarting in 3 sec:\n%s"
+                    error(t, ip, self.port, min_ex())
+                    time.sleep(3)
+                    continue
+
+                # server failed to start; could be due to dualstack (ipv6 managed to bind and this is ipv4)
+                if ip != "0.0.0.0" or "::" not in self.ips:
+                    # nope, it's fatal
+                    t = "tftp server [%s]:%d failed to start:\n%s"
+                    error(t, ip, self.port, min_ex())
+
+                # yep; ignore
+                # (TODO: move the "listening @ ..." infolog in partftpy to
+                #   after the bind attempt so it doesn't print twice)
+                return
+
+            info("tftp server [%s]:%d terminated", ip, self.port)
+            break
 
     def stop(self):
         with self.mutex:

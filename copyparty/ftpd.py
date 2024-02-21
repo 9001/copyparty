@@ -20,6 +20,7 @@ from .authsrv import VFS
 from .bos import bos
 from .util import (
     Daemon,
+    ODict,
     Pebkac,
     exclude_dotfiles,
     fsenc,
@@ -544,6 +545,8 @@ class Ftpd(object):
 
         if self.args.ftp4:
             ips = [x for x in ips if ":" not in x]
+
+        ips = list(ODict.fromkeys(ips))  # dedup
 
         ioloop = IOLoop()
         for ip in ips:
