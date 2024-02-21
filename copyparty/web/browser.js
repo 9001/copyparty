@@ -4847,6 +4847,8 @@ var thegrid = (function () {
 				ihref = SR + '/.cpr/ico/' + ext;
 			}
 			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i&_=' + ACB;
+			if (CHROME)
+				ihref += "&raster";
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +

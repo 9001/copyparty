@@ -3142,8 +3142,9 @@ class HttpCli(object):
             ext = "~" + ext[-9:]
 
         # chrome cannot handle more than ~2000 unique SVGs
-        chrome = " rv:" not in self.ua
-        mime, ico = self.ico.get(ext, not exact, chrome)
+        # so url-param "raster" returns a png/webp instead
+        # (useragent-sniffing kinshi due to caching proxies)
+        mime, ico = self.ico.get(ext, not exact, "raster" in self.uparam)
 
         lm = formatdate(self.E.t0, usegmt=True)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
