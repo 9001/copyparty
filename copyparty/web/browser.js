@@ -4523,8 +4523,8 @@ var thegrid = (function () {
 		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
 		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
 		'<span>' + L.gt_zoom + ': ' +
-		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
+		'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
+		'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
 		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
 		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span>' + L.gt_sort + ': ' +
 		'<a href="#" s="href">' + L.gt_name + '</a> ' +
@@ -4535,6 +4535,7 @@ var thegrid = (function () {
 		'<div id="ggrid"></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
+	var ggrid = ebi('ggrid');
 
 	var r = {
 		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
@@ -4555,7 +4556,7 @@ var thegrid = (function () {
 		if (l)
 			return setln(parseInt(l));
 
-		var t = ebi('files').tHead.rows[0].cells;
+		var t = lfiles.tHead.rows[0].cells;
 		for (var a = 0; a < t.length; a++)
 			if (t[a].getAttribute('name') == s) {
 				t[a].click();
@@ -4580,10 +4581,13 @@ var thegrid = (function () {
 
 		lfiles = ebi('files');
 		gfiles = ebi('gfiles');
+		ggrid = ebi('ggrid');
 
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
+		clmod(ggrid, 'crop', r.crop);
+		clmod(ggrid, 'nocrop', !r.crop);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
@@ -4773,7 +4777,7 @@ var thegrid = (function () {
 				pels[a].removeAttribute('tt');
 		}
 
-		tt.att(ebi('ggrid'));
+		tt.att(ggrid);
 	};
 
 	function loadgrid() {
@@ -4849,7 +4853,9 @@ var thegrid = (function () {
 				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
-		ebi('ggrid').innerHTML = html.join('\n');
+		ggrid.innerHTML = html.join('\n');
+		clmod(ggrid, 'crop', r.crop);
+		clmod(ggrid, 'nocrop', !r.crop);
 
 		var srch = ebi('unsearch'),
 			gsel = ebi('gridsel');
@@ -5641,19 +5647,21 @@ function aligngriditems() {
 	if (!treectl)
 		return;
 
-	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
-	var gridsz = 10;
+	var ggrid = ebi('ggrid'),
+		em2px = parseFloat(getComputedStyle(ggrid).fontSize),
+		gridsz = 10;
 	try {
 		gridsz = cprop('--grid-sz').slice(0, -2);
 	}
 	catch (ex) { }
-	var gridwidth = ebi('ggrid').clientWidth;
-	var griditemcount = ebi('ggrid').children.length;
-	var totalgapwidth = em2px * griditemcount;
+	var gridwidth = ggrid.clientWidth,
+		griditemcount = ggrid.children.length,
+		totalgapwidth = em2px * griditemcount;
+
 	if (/b/.test(themen + ''))
 		totalgapwidth *= 2.8;
 
-	var val, st = ebi('ggrid').style;
+	var val, st = ggrid.style;
 
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
 		val = 'left';
@@ -6166,13 +6174,14 @@ var treectl = (function () {
 
 		r.nextdir = null;
 		var cdir = get_evpath(),
-			cur = ebi('files').getAttribute('ts');
+			lfiles = ebi('files'),
+			cur = lfiles.getAttribute('ts');
 
 		if (cur && parseInt(cur) > this.ts) {
 			console.log("reject ls");
 			return;
 		}
-		ebi('files').setAttribute('ts', this.ts);
+		lfiles.setAttribute('ts', this.ts);
 
 		try {
 			var res = JSON.parse(this.responseText);

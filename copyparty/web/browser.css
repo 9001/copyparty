@@ -985,6 +985,10 @@ html.y #path a:hover {
 	margin: 0 auto;
 	display: block;
 }
+#ggrid.nocrop>a img {
+	max-height: 20em;
+	max-height: calc(var(--grid-sz)*2);
+}
 #ggrid>a.dir:before {
 	content: '📂';
 }
