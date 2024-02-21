@@ -3139,7 +3139,7 @@ class HttpCli(object):
 
         ext = ext.rstrip(".") or "unk"
         if len(ext) > 11:
-            ext = "⋯" + ext[-9:]
+            ext = "~" + ext[-9:]
 
         # chrome cannot handle more than ~2000 unique SVGs
         chrome = " rv:" not in self.ua
@@ -3406,6 +3406,9 @@ class HttpCli(object):
             pt = "# acct: %s\n%s\n" % (self.uname, pt)
             self.reply(pt.encode("utf-8"), status=rc)
             return True
+
+        if "th" in self.ouparam:
+            return self.tx_ico("a.e" + pt[:3])
 
         t = t.format(self.args.SR)
         qv = quotep(self.vpaths) + self.ourlq()
