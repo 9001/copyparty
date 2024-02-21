@@ -3141,10 +3141,13 @@ class HttpCli(object):
         if len(ext) > 11:
             ext = "~" + ext[-9:]
 
+        return self.tx_svg(ext, exact)
+
+    def tx_svg(self, txt: str, small: bool = False) -> bool:
         # chrome cannot handle more than ~2000 unique SVGs
         # so url-param "raster" returns a png/webp instead
         # (useragent-sniffing kinshi due to caching proxies)
-        mime, ico = self.ico.get(ext, not exact, "raster" in self.uparam)
+        mime, ico = self.ico.get(txt, not small, "raster" in self.uparam)
 
         lm = formatdate(self.E.t0, usegmt=True)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
@@ -3409,7 +3412,7 @@ class HttpCli(object):
             return True
 
         if "th" in self.ouparam:
-            return self.tx_ico("a.e" + pt[:3])
+            return self.tx_svg("e" + pt[:3])
 
         t = t.format(self.args.SR)
         qv = quotep(self.vpaths) + self.ourlq()
@@ -3791,8 +3794,8 @@ class HttpCli(object):
             if idx and hasattr(idx, "p_end"):
                 icur = idx.get_cur(dbv.realpath)
 
+        th_fmt = self.uparam.get("th")
         if self.can_read:
-            th_fmt = self.uparam.get("th")
             if th_fmt is not None:
                 nothumb = "dthumb" in dbv.flags
                 if is_dir:
@@ -3822,7 +3825,7 @@ class HttpCli(object):
                                 break
 
                     if is_dir:
-                        return self.tx_ico("a.folder")
+                        return self.tx_svg("folder")
 
                 thp = None
                 if self.thumbcli and not nothumb:
@@ -3835,6 +3838,9 @@ class HttpCli(object):
                     raise Pebkac(404)
 
                 return self.tx_ico(rem)
+
+        elif self.can_write and th_fmt is not None:
+            return self.tx_svg("upload\nonly")
 
         elif self.can_get and self.avn:
             axs = self.avn.axs
