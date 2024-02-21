@@ -3794,9 +3794,12 @@ class HttpCli(object):
         if self.can_read:
             th_fmt = self.uparam.get("th")
             if th_fmt is not None:
+                nothumb = "dthumb" in dbv.flags
                 if is_dir:
                     vrem = vrem.rstrip("/")
-                    if icur and vrem:
+                    if nothumb:
+                        pass
+                    elif icur and vrem:
                         q = "select fn from cv where rd=? and dn=?"
                         crd, cdn = vrem.rsplit("/", 1) if "/" in vrem else ("", vrem)
                         # no mojibake support:
@@ -3822,7 +3825,7 @@ class HttpCli(object):
                         return self.tx_ico("a.folder")
 
                 thp = None
-                if self.thumbcli:
+                if self.thumbcli and not nothumb:
                     thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
 
                 if thp:
