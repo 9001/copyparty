@@ -1,4 +1,37 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0218-1554  `v1.10.1`  big thumbs
+
+## new features
+
+* button to enable hi-res thumbnails 33f41f3e 58ae38c6
+  * enable with the `3x` button in the gridview
+  * can be force-enabled/disabled serverside with `--th-x3` or volflag `th3x`
+* tftp: IPv6 support and UTF-8 filenames + optimizations 0504b010
+* ux:
+  * when closing the image viewer, scroll to the last viewed pic bbc37990
+  * respect `prefers-reduced-motion` some more places fbfdd833
+
+## bugfixes
+
+* #72 impossible to delete recently uploaded zerobyte files if database was disabled 6bd087dd
+* tftp now works in `copyparty.exe`, `copyparty32.exe`, `copyparty-winpe64.exe`
+* the [sharex config example](https://github.com/9001/copyparty/tree/hovudstraum/contrib#sharexsxcu) was still using cookie-auth 8ff7094e
+* ux:
+  * prevent scrolling while a pic is open 7f1c9926
+  * fix gridview in older firefox versions 7f1c9926
+
+## other changes
+
+* thumbnail center-cropping can be force-enabled/disabled serverside with `--th-crop` or volflag `crop`
+  * replaces `--th-no-crop` which is now deprecated (but will continue to work)
+
+----
+
+this release contains a build of `copyparty-winpe64.exe` which is almost **entirely useless,** except for in *extremely specific scenarios*, namely the kind where a TFTP server could also be useful -- the [previous build](https://github.com/9001/copyparty/releases/download/v1.8.7/copyparty-winpe64.exe) was from [version 1.8.7](https://github.com/9001/copyparty/releases/tag/v1.8.7) (2023-07-23)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0215-0000  `v1.10.0`  tftp
 
 ## new features
