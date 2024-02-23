@@ -3,7 +3,7 @@
 turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
 
 * server only needs Python (2 or 3), all dependencies optional
-* 🔌 protocols: [http](#the-browser) // [ftp](#ftp-server) // [webdav](#webdav-server) // [smb/cifs](#smb-server)
+* 🔌 protocols: [http](#the-browser) // [webdav](#webdav-server) // [ftp](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
@@ -53,6 +53,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
     * [webdav server](#webdav-server) - with read-write support
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
+    * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
     * [browser ux](#browser-ux) - tweaking the ui
     * [file indexing](#file-indexing) - enables dedup and music search ++
@@ -157,11 +158,11 @@ you may also want these, especially on servers:
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
 firewall-cmd --permanent --add-port={80,443,3921,3923,3945,3990}/tcp  # --zone=libvirt
-firewall-cmd --permanent --add-port=12000-12099/tcp --permanent  # --zone=libvirt
-firewall-cmd --permanent --add-port={1900,5353}/udp  # --zone=libvirt
+firewall-cmd --permanent --add-port=12000-12099/tcp  # --zone=libvirt
+firewall-cmd --permanent --add-port={69,1900,3969,5353}/udp  # --zone=libvirt
 firewall-cmd --reload
 ```
-(1900:ssdp, 3921:ftp, 3923:http/https, 3945:smb, 3990:ftps, 5353:mdns, 12000:passive-ftp)
+(69:tftp, 1900:ssdp, 3921:ftp, 3923:http/https, 3945:smb, 3969:tftp, 3990:ftps, 5353:mdns, 12000:passive-ftp)
 
 
 ## features
@@ -172,6 +173,7 @@ firewall-cmd --reload
   * ☑ volumes (mountpoints)
   * ☑ [accounts](#accounts-and-volumes)
   * ☑ [ftp server](#ftp-server)
+  * ☑ [tftp server](#tftp-server)
   * ☑ [webdav server](#webdav-server)
   * ☑ [smb/cifs server](#smb-server)
   * ☑ [qr-code](#qr-code) for quick access
@@ -943,6 +945,35 @@ known client bugs:
   * latin-1 is fine, hiragana is not (not even as shift-jis on japanese xp)
 
 
+## tftp server
+
+a TFTP server (read/write) can be started using `--tftp 3969`  (you probably want [ftp](#ftp-server) instead unless you are *actually* communicating with hardware from the 90s (in which case we should definitely hang some time))
+
+> that makes this the first RTX DECT Base that has been updated using copyparty 🎉
+
+* based on [partftpy](https://github.com/9001/partftpy)
+* no accounts; read from world-readable folders, write to world-writable, overwrite in world-deletable
+* needs a dedicated port (cannot share with the HTTP/HTTPS API)
+  * run as root (or see below) to use the spec-recommended port `69` (nice)
+* can reply from a predefined portrange (good for firewalls)
+* only supports the binary/octet/image transfer mode (no netascii)
+* [RFC 7440](https://datatracker.ietf.org/doc/html/rfc7440) is **not** supported, so will be extremely slow over WAN
+  * assuming default blksize (512), expect 1100 KiB/s over 100BASE-T, 400-500 KiB/s over wifi, 200 on bad wifi
+
+most clients expect to find TFTP on port 69, but on linux and macos you need to be root to listen on that. Alternatively, listen on 3969 and use NAT on the server to forward 69 to that port;
+* on linux: `iptables -t nat -A PREROUTING -i eth0 -p udp --dport 69 -j REDIRECT --to-port 3969`
+
+some recommended TFTP clients:
+* curl (cross-platform, read/write)
+  * get: `curl --tftp-blksize 1428 tftp://127.0.0.1:3969/firmware.bin`
+  * put: `curl --tftp-blksize 1428 -T firmware.bin tftp://127.0.0.1:3969/`
+* windows: `tftp.exe` (you probably already have it)
+  * `tftp -i 127.0.0.1 put firmware.bin`
+* linux: `tftp-hpa`, `atftp`
+  * `atftp --option "blksize 1428" 127.0.0.1 3969 -p -l firmware.bin -r firmware.bin`
+  * `tftp -v -m binary 127.0.0.1 3969 -c put firmware.bin`
+
+
 ## smb server
 
 unsafe, slow, not recommended for wan,  enable with `--smb` for read-only or `--smbw` for read-write
@@ -973,7 +1004,7 @@ known client bugs:
   * however smb1 is buggy and is not enabled by default on win10 onwards
 * windows cannot access folders which contain filenames with invalid unicode or forbidden characters (`<>:"/\|?*`), or names ending with `.`
 
-the smb protocol listens on TCP port 445, which is a privileged port on linux and macos, which would require running copyparty as root. However, this can be avoided by listening on another port using `--smb-port 3945` and then using NAT to forward the traffic from 445 to there;
+the smb protocol listens on TCP port 445, which is a privileged port on linux and macos, which would require running copyparty as root. However, this can be avoided by listening on another port using `--smb-port 3945` and then using NAT on the server to forward the traffic from 445 to there;
 * on linux: `iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 445 -j REDIRECT --to-port 3945`
 
 authenticate with one of the following:
@@ -1673,6 +1704,7 @@ below are some tweaks roughly ordered by usefulness:
 
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
+  * and also makes thumbnails load faster, regardless of e2d/e2t
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
 * `-j0` enables multiprocessing (actual multithreading), can reduce latency to `20+80/numCores` percent and generally improve performance in cpu-intensive workloads, for example:
@@ -1680,7 +1712,7 @@ below are some tweaks roughly ordered by usefulness:
   * simultaneous downloads and uploads saturating a 20gbps connection
   * if `-e2d` is enabled, `-j2` gives 4x performance for directory listings; `-j4` gives 16x
   
-  ...however it adds an overhead to internal communication so it might be a net loss, see if it works 4 u
+  ...however it also increases the server/filesystem/HDD load during uploads, and adds an overhead to internal communication, so it is usually a better idea to don't
 * using [pypy](https://www.pypy.org/) instead of [cpython](https://www.python.org/) *can* be 70% faster for some workloads, but slower for many others
   * and pypy can sometimes crash on startup with `-j0` (TODO make issue)
 
@@ -1689,7 +1721,7 @@ below are some tweaks roughly ordered by usefulness:
 
 when uploading files,
 
-* chrome is recommended, at least compared to firefox:
+* chrome is recommended (unfortunately), at least compared to firefox:
   * up to 90% faster when hashing, especially on SSDs
   * up to 40% faster when uploading over extremely fast internets
   * but [u2c.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) can be 40% faster than chrome again

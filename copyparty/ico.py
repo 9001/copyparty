@@ -8,7 +8,7 @@ import re
 
 from .__init__ import PY2
 from .th_srv import HAVE_PIL, HAVE_PILF
-from .util import BytesIO  # type: ignore
+from .util import BytesIO, html_escape  # type: ignore
 
 
 class Ico(object):
@@ -31,10 +31,9 @@ class Ico(object):
 
         w = 100
         h = 30
-        if not self.args.th_no_crop and as_thumb:
+        if as_thumb:
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
-            w = 100
 
         if chrome:
             # cannot handle more than ~2000 unique SVGs
@@ -99,6 +98,6 @@ class Ico(object):
   fill="#{}" font-family="monospace" font-size="14px" style="letter-spacing:.5px">{}</text>
 </g></svg>
 """
-        svg = svg.format(h, c[:6], c[6:], ext)
+        svg = svg.format(h, c[:6], c[6:], html_escape(ext, True))
 
         return "image/svg+xml", svg.encode("utf-8")

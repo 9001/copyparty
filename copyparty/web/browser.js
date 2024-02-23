@@ -194,6 +194,7 @@ var Ls = {
 
 		"ct_thumb": "in grid-view, toggle icons or thumbnails$NHotkey: T",
 		"ct_csel": "use CTRL and SHIFT for file selection in grid-view",
+		"ct_ihop": "when the image viewer is closed, scroll down to the last viewed file",
 		"ct_dots": "show hidden files (if server permits)",
 		"ct_dir1st": "sort folders before files",
 		"ct_readme": "show README.md in folder listings",
@@ -240,6 +241,7 @@ var Ls = {
 
 		"mt_shuf": "shuffle the songs in each folder\">🔀",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
+		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
@@ -272,6 +274,8 @@ var Ls = {
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
+		"mm_prescan": "Looking for music to play next...",
+		"mm_scank": "Found the next song:",
 		"mm_uncache": "cache cleared; all songs will redownload on next playback",
 		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p><em>however,</em> it could also be due to the browser\'s autoplay settings;</p><p>Firefox: tap the icon on the left side of the address bar, then select "autoplay" and "allow audio"</p><p>Chrome: the problem will gradually dissipate as you play more music on this site</p>',
 		"mm_iosblk": "<p>your web browser thinks the audio playback is unwanted, and it decided to block playback until you start another track manually... unfortunately we are both powerless in telling it otherwise</p><p>supposedly this will get better as you continue playing music on this site, but I'm unfamiliar with apple devices so idk if that's true</p><p>you could try another browser, maybe firefox or chrome?</p>",
@@ -346,7 +350,8 @@ var Ls = {
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
-		"gt_full": "show uncropped thumbnails\">full",
+		"gt_crop": "center-crop thumbnails\">crop",
+		"gt_3x": "hi-res thumbnails\">3x",
 		"gt_zoom": "zoom",
 		"gt_chop": "chop",
 		"gt_sort": "sort by",
@@ -686,6 +691,7 @@ var Ls = {
 
 		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
 		"ct_csel": "bruk tastene CTRL og SHIFT for markering av filer i ikonvisning",
+		"ct_ihop": "bla ned til sist viste bilde når bildeviseren lukkes",
 		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
 		"ct_dir1st": "sorter slik at mapper kommer foran filer",
 		"ct_readme": "vis README.md nedenfor filene",
@@ -732,6 +738,7 @@ var Ls = {
 
 		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
+		"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
@@ -764,6 +771,8 @@ var Ls = {
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
+		"mm_prescan": "Leter etter neste sang...",
+		"mm_scank": "Fant neste sang:",
 		"mm_uncache": "alle sanger vil lastes på nytt ved neste avspilling",
 		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>NB: det kan også være pga. autoplay-innstillingene, så prøv dette:</p><p>Firefox: klikk på ikonet i venstre side av addressefeltet, velg "autoplay" og "tillat lyd"</p><p>Chrome: problemet vil minske gradvis jo mer musikk du spiller på denne siden</p>',
 		"mm_iosblk": "<p>nettleseren din tror at musikken er uønsket, og den bestemte seg for å stoppe avspillingen slik at du manuelt må velge en ny sang... dessverre er både du og jeg maktesløse når den har bestemt seg.</p><p>det ryktes at problemet vil minske jo mer musikk du spiller på denne siden, men jeg er ikke godt kjent med apple-dingser så jeg er ikke sikker.</p><p>kanskje firefox eller chrome fungerer bedre?</p>",
@@ -838,7 +847,8 @@ var Ls = {
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
 
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
-		"gt_full": "ikke beskjær bildene\">full",
+		"gt_crop": "beskjær ikonene så de passer bedre\">✂",
+		"gt_3x": "høyere oppløsning på ikoner\">3x",
 		"gt_zoom": "zoom",
 		"gt_chop": "trim",
 		"gt_sort": "sorter",
@@ -1177,6 +1187,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '">sel</a>\n' +
+	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '">g⮯</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
@@ -1391,6 +1402,7 @@ var mpl = (function () {
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
+		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
 		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
@@ -1435,6 +1447,7 @@ var mpl = (function () {
 		mp.read_order();  // don't bind
 	});
 	bcfg_bind(r, 'preload', 'au_preload', true);
+	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
 	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
 		if (!v) pbar.unwave();
@@ -1580,8 +1593,10 @@ var mpl = (function () {
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
-		if (!MOBILE)
-			ebi('np_img').setAttribute('src', cover || '');
+		if (!MOBILE && cover)
+			ebi('np_img').setAttribute('src', cover);
+		else
+			ebi('np_img').removeAttribute('src');
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', mplay);
@@ -1768,10 +1783,12 @@ function MPlayer() {
 	}
 
 	r.preload = function (url, full) {
+		var t0 = Date.now(),
+			fname = uricom_dec(url.split('/').pop());
+
 		url = mpl.acode(url);
 		url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=987&_=' + ACB;
 		mpl.preload_url = full ? url : null;
-		var t0 = Date.now();
 
 		if (mpl.waves)
 			fetch(url.replace(/\bth=opus&/, '') + '&th=p').then(function (x) {
@@ -1805,6 +1822,12 @@ function MPlayer() {
 		r.au2.onloadeddata = r.au2.onloadedmetadata = r.nopause;
 		r.au2.preload = "auto";
 		r.au2.src = r.au2.rsrc = url;
+
+		if (mpl.prescan_evp) {
+			mpl.prescan_evp = null;
+			toast.ok(7, L.mm_scank + "\n" + esc(fname));
+		}
+		console.log("preloading " + fname);
 	};
 
 	r.nopause = function () {
@@ -2451,6 +2474,10 @@ var mpui = (function () {
 		timer.add(updater_impl, true);
 	};
 
+	function repreload() {
+		preloaded = fpreloaded = null;
+	}
+
 	function updater_impl() {
 		if (!mp.au) {
 			widget.paused(true);
@@ -2512,7 +2539,26 @@ var mpui = (function () {
 
 			if (full !== null)
 				try {
-					mp.preload(mp.tracks[mp.order[mp.order.indexOf(mp.au.tid) + 1]], full);
+					var oi = mp.order.indexOf(mp.au.tid) + 1,
+						evp = get_evpath();
+
+					if (mpl.pb_mode == 'loop' || mp.au.evp != evp)
+						oi = 0;
+
+					if (oi >= mp.order.length) {
+						if (!mpl.prescan)
+							throw "prescan disabled";
+
+						if (mpl.prescan_evp == evp)
+							throw "evp match";
+
+						mpl.prescan_evp = evp;
+						toast.inf(10, L.mm_prescan);
+						treectl.ls_cb = repreload;
+						tree_neigh(1);
+					}
+					else
+						mp.preload(mp.tracks[mp.order[oi]], full);
 				}
 				catch (ex) {
 					console.log("preload failed", ex);
@@ -3039,6 +3085,7 @@ function play(tid, is_ev, seek) {
 	}, 500);
 
 	mp.au.tid = tid;
+	mp.au.evp = get_evpath();
 	mp.au.volume = mp.expvol(mp.vol);
 	var trs = QSA('#files tr.play');
 	for (var a = 0, aa = trs.length; a < aa; a++)
@@ -4473,9 +4520,11 @@ var thegrid = (function () {
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
-		'<a href="#" class="tgl btn" id="gridfull" tt="' + L.gt_full + '</a> <span>' + L.gt_zoom + ': ' +
-		'<a href="#" class="btn" z="-1.2" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.2" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
+		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
+		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
+		'<span>' + L.gt_zoom + ': ' +
+		'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
+		'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
 		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
 		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span>' + L.gt_sort + ': ' +
 		'<a href="#" s="href">' + L.gt_name + '</a> ' +
@@ -4486,9 +4535,10 @@ var thegrid = (function () {
 		'<div id="ggrid"></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
+	var ggrid = ebi('ggrid');
 
 	var r = {
-		'sz': clamp(fcfg_get('gridsz', 10), 4, 40),
+		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
 		'ln': clamp(icfg_get('gridln', 3), 1, 7),
 		'isdirty': true,
 		'bbox': null
@@ -4506,7 +4556,7 @@ var thegrid = (function () {
 		if (l)
 			return setln(parseInt(l));
 
-		var t = ebi('files').tHead.rows[0].cells;
+		var t = lfiles.tHead.rows[0].cells;
 		for (var a = 0; a < t.length; a++)
 			if (t[a].getAttribute('name') == s) {
 				t[a].click();
@@ -4531,10 +4581,13 @@ var thegrid = (function () {
 
 		lfiles = ebi('files');
 		gfiles = ebi('gfiles');
+		ggrid = ebi('ggrid');
 
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
+		clmod(ggrid, 'crop', r.crop);
+		clmod(ggrid, 'nocrop', !r.crop);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
@@ -4551,10 +4604,10 @@ var thegrid = (function () {
 
 	r.setdirty = function () {
 		r.dirty = true;
-		if (r.en) {
+		if (r.en)
 			loadgrid();
-		}
-		r.setvis();
+		else
+			r.setvis();
 	};
 
 	function setln(v) {
@@ -4574,7 +4627,7 @@ var thegrid = (function () {
 
 	function setsz(v) {
 		if (v !== undefined) {
-			r.sz = clamp(v, 4, 40);
+			r.sz = clamp(v, 4, 80);
 			swrite('gridsz', r.sz);
 			setTimeout(r.tippen, 20);
 		}
@@ -4582,6 +4635,7 @@ var thegrid = (function () {
 			document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
 		}
 		catch (ex) { }
+		aligngriditems();
 	}
 	setsz();
 
@@ -4723,7 +4777,7 @@ var thegrid = (function () {
 				pels[a].removeAttribute('tt');
 		}
 
-		tt.att(ebi('ggrid'));
+		tt.att(ggrid);
 	};
 
 	function loadgrid() {
@@ -4734,8 +4788,11 @@ var thegrid = (function () {
 		if (!r.dirty)
 			return r.loadsel();
 
-		if (dfull != r.full && !sread('gridfull'))
-			bcfg_upd_ui('gridfull', r.full = dfull);
+		if (dcrop.startsWith('f') || !sread('gridcrop'))
+			bcfg_upd_ui('gridcrop', r.crop = ('y' == dcrop.slice(-1)));
+
+		if (dth3x.startsWith('f') || !sread('grid3x'))
+			bcfg_upd_ui('grid3x', r.x3 = ('y' == dth3x.slice(-1)));
 
 		var html = [],
 			svgs = new Set(),
@@ -4754,8 +4811,10 @@ var thegrid = (function () {
 
 			if (r.thumbs) {
 				ihref += '?th=' + (have_webp ? 'w' : 'j');
-				if (r.full)
-					ihref += 'f'
+				if (!r.crop)
+					ihref += 'f';
+				if (r.x3)
+					ihref += '3';
 				if (href == "#")
 					ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
 			}
@@ -4788,13 +4847,17 @@ var thegrid = (function () {
 				ihref = SR + '/.cpr/ico/' + ext;
 			}
 			ihref += (ihref.indexOf('?') > 0 ? '&' : '?') + 'cache=i&_=' + ACB;
+			if (CHROME)
+				ihref += "&raster";
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +
-				(r.sz / 1.25) + 'em" onload="th_onload(this)" src="' +
+				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
-		ebi('ggrid').innerHTML = html.join('\n');
+		ggrid.innerHTML = html.join('\n');
+		clmod(ggrid, 'crop', r.crop);
+		clmod(ggrid, 'nocrop', !r.crop);
 
 		var srch = ebi('unsearch'),
 			gsel = ebi('gridsel');
@@ -4812,6 +4875,7 @@ var thegrid = (function () {
 		r.dirty = false;
 		r.bagit('#ggrid');
 		r.loadsel();
+		aligngriditems();
 		setTimeout(r.tippen, 20);
 	}
 
@@ -4822,7 +4886,12 @@ var thegrid = (function () {
 		if (r.bbox)
 			baguetteBox.destroy();
 
-		r.bbox = baguetteBox.run(isrc, {
+		var br = baguetteBox.run(isrc, {
+			duringHide: r.onhide,
+			afterShow: function () {
+				r.bbox_opts.refocus = true;
+				document.body.style.overflow = 'hidden';
+			},
 			captions: function (g) {
 				var idx = -1,
 					h = '' + g;
@@ -4838,11 +4907,71 @@ var thegrid = (function () {
 			onChange: function (i) {
 				sethash('g' + r.bbox[i].imageElement.getAttribute('ref'));
 			}
-		})[0];
+		});
+		r.bbox = br[0][0];
+		r.bbox_opts = br[1];
+	};
+
+	r.onhide = function () {
+		document.body.style.overflow = '';
+		if (!thegrid.ihop)
+			return;
+
+		try {
+			var el = QS('#ggrid a[ref="' + location.hash.slice(2) + '"]'),
+				f = function () {
+					try {
+						el.focus();
+					}
+					catch (ex) { }
+				};
+
+			f();
+			setTimeout(f, 10);
+			setTimeout(f, 100);
+			setTimeout(f, 200);
+			// thx fullscreen api
+
+			if (ANIM) {
+				clmod(el, 'glow', 1);
+				setTimeout(function () {
+					try {
+						clmod(el, 'glow');
+					}
+					catch (ex) { }
+				}, 600);
+			}
+			r.bbox_opts.refocus = false;
+		}
+		catch (ex) {
+			console.log('ihop:', ex);
+		}
+	};
+
+	r.set_crop = function (en) {
+		if (!dcrop.startsWith('f'))
+			return r.setdirty();
+
+		r.crop = dcrop.endsWith('y');
+		bcfg_upd_ui('gridcrop', r.crop);
+		if (r.crop != en)
+			toast.warn(10, L.ul_btnlk);
+	};
+
+	r.set_x3 = function (en) {
+		if (!dth3x.startsWith('f'))
+			return r.setdirty();
+
+		r.x3 = dth3x.endsWith('y');
+		bcfg_upd_ui('grid3x', r.x3);
+		if (r.x3 != en)
+			toast.warn(10, L.ul_btnlk);
 	};
 
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
-	bcfg_bind(r, 'full', 'gridfull', false, r.setdirty);
+	bcfg_bind(r, 'ihop', 'ihop', true);
+	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
+	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
 		v ? loadgrid() : r.setvis(true);
@@ -5046,23 +5175,24 @@ document.onkeydown = function (e) {
 			return ebi('griden').click();
 	}
 
-	if (aet == 'tr' && ae.closest('#files')) {
+	if ((aet == 'tr' || aet == 'td') && ae.closest('#files')) {
 		var d = '', rem = 0;
-		if (k == 'ArrowUp') d = 'previous';
-		if (k == 'ArrowDown') d = 'next';
+		if (aet == 'td') ae = ae.closest('tr'); //ie11
+		if (k == 'ArrowUp' || k == 'Up') d = 'previous';
+		if (k == 'ArrowDown' || k == 'Down') d = 'next';
 		if (k == 'PageUp') { d = 'previous'; rem = 0.6; }
 		if (k == 'PageDown') { d = 'next'; rem = 0.6; }
 		if (d) {
 			fselfunw(e, ae, d, rem);
 			return ev(e);
 		}
-		if (k == 'Space') {
+		if (k == 'Space' || k == 'Spacebar') {
 			clmod(ae, 'sel', 't');
 			msel.origin_tr(ae);
 			msel.selui();
 			return ev(e);
 		}
-		if (k == 'KeyA' && ctrl(e)) {
+		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
 			var sel = msel.getsel(),
 				all = msel.getall();
 
@@ -5073,7 +5203,7 @@ document.onkeydown = function (e) {
 	}
 
 	if (ae && ae.closest('pre')) {
-		if (k == 'KeyA' && ctrl(e)) {
+		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
 			var sel = document.getSelection(),
 				ran = document.createRange();
 
@@ -5519,23 +5649,29 @@ function aligngriditems() {
 	if (!treectl)
 		return;
 
-	var em2px = parseFloat(getComputedStyle(ebi('ggrid')).fontSize);
-	var gridsz = 10;
+	var ggrid = ebi('ggrid'),
+		em2px = parseFloat(getComputedStyle(ggrid).fontSize),
+		gridsz = 10;
 	try {
 		gridsz = cprop('--grid-sz').slice(0, -2);
 	}
 	catch (ex) { }
-	var gridwidth = ebi('ggrid').clientWidth;
-	var griditemcount = ebi('ggrid').children.length;
-	var totalgapwidth = em2px * griditemcount;
+	var gridwidth = ggrid.clientWidth,
+		griditemcount = ggrid.children.length,
+		totalgapwidth = em2px * griditemcount;
+
 	if (/b/.test(themen + ''))
 		totalgapwidth *= 2.8;
 
+	var val, st = ggrid.style;
+
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
-		ebi('ggrid').style.justifyContent = 'left';
+		val = 'left';
 	} else {
-		ebi('ggrid').style.justifyContent = treectl.hidden ? 'center' : 'space-between';
+		val = treectl.hidden ? 'center' : 'space-between';
 	}
+	if (st.justifyContent != val)
+		st.justifyContent = val;
 }
 onresize100.add(aligngriditems);
 
@@ -6040,13 +6176,14 @@ var treectl = (function () {
 
 		r.nextdir = null;
 		var cdir = get_evpath(),
-			cur = ebi('files').getAttribute('ts');
+			lfiles = ebi('files'),
+			cur = lfiles.getAttribute('ts');
 
 		if (cur && parseInt(cur) > this.ts) {
 			console.log("reject ls");
 			return;
 		}
-		ebi('files').setAttribute('ts', this.ts);
+		lfiles.setAttribute('ts', this.ts);
 
 		try {
 			var res = JSON.parse(this.responseText);
@@ -6066,7 +6203,8 @@ var treectl = (function () {
 				res.files[a].tags = {};
 
 		read_dsort(res.dsort);
-		dfull = res.dfull;
+		dcrop = res.dcrop;
+		dth3x = res.dth3x;
 
 		srvinf = res.srvinf;
 		try {

@@ -24,6 +24,10 @@ https://github.com/giampaolo/pyftpdlib/
 C: 2007 Giampaolo Rodola
 L: MIT
 
+https://github.com/9001/partftpy
+C: 2010-2021 Michael P. Soulier
+L: MIT
+
 https://github.com/nayuki/QR-Code-generator/
 C: Project Nayuki
 L: MIT

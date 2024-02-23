@@ -115,7 +115,7 @@ class HttpCli(object):
 
         self.t0 = time.time()
         self.conn = conn
-        self.mutex = conn.mutex  # mypy404
+        self.u2mutex = conn.u2mutex  # mypy404
         self.s = conn.s
         self.sr = conn.sr
         self.ip = conn.addr[0]
@@ -1999,8 +1999,11 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
-        ret = x.get()
+        # not to protect u2fh, but to prevent handshakes while files are closing
+        with self.u2mutex:
+            x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
+            ret = x.get()
+
         if self.is_vproxied:
             if "purl" in ret:
                 ret["purl"] = self.args.SR + ret["purl"]
@@ -2105,7 +2108,7 @@ class HttpCli(object):
             f = None
             fpool = not self.args.no_fpool and sprs
             if fpool:
-                with self.mutex:
+                with self.u2mutex:
                     try:
                         f = self.u2fh.pop(path)
                     except:
@@ -2148,7 +2151,7 @@ class HttpCli(object):
                 if not fpool:
                     f.close()
                 else:
-                    with self.mutex:
+                    with self.u2mutex:
                         self.u2fh.put(path, f)
             except:
                 # maybe busted handle (eg. disk went full)
@@ -2167,7 +2170,7 @@ class HttpCli(object):
             return False
 
         if not num_left and fpool:
-            with self.mutex:
+            with self.u2mutex:
                 self.u2fh.close(path)
 
         if not num_left and not self.args.nw:
@@ -3147,11 +3150,15 @@ class HttpCli(object):
 
         ext = ext.rstrip(".") or "unk"
         if len(ext) > 11:
-            ext = "⋯" + ext[-9:]
+            ext = "~" + ext[-9:]
 
+        return self.tx_svg(ext, exact)
+
+    def tx_svg(self, txt: str, small: bool = False) -> bool:
         # chrome cannot handle more than ~2000 unique SVGs
-        chrome = " rv:" not in self.ua
-        mime, ico = self.ico.get(ext, not exact, chrome)
+        # so url-param "raster" returns a png/webp instead
+        # (useragent-sniffing kinshi due to caching proxies)
+        mime, ico = self.ico.get(txt, not small, "raster" in self.uparam)
 
         lm = formatdate(self.E.t0, usegmt=True)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
@@ -3414,6 +3421,9 @@ class HttpCli(object):
             pt = "# acct: %s\n%s\n" % (self.uname, pt)
             self.reply(pt.encode("utf-8"), status=rc)
             return True
+
+        if "th" in self.ouparam:
+            return self.tx_svg("e" + pt[:3])
 
         t = t.format(self.args.SR)
         qv = quotep(self.vpaths) + self.ourlq()
@@ -3795,12 +3805,15 @@ class HttpCli(object):
             if idx and hasattr(idx, "p_end"):
                 icur = idx.get_cur(dbv.realpath)
 
+        th_fmt = self.uparam.get("th")
         if self.can_read:
-            th_fmt = self.uparam.get("th")
             if th_fmt is not None:
+                nothumb = "dthumb" in dbv.flags
                 if is_dir:
                     vrem = vrem.rstrip("/")
-                    if icur and vrem:
+                    if nothumb:
+                        pass
+                    elif icur and vrem:
                         q = "select fn from cv where rd=? and dn=?"
                         crd, cdn = vrem.rsplit("/", 1) if "/" in vrem else ("", vrem)
                         # no mojibake support:
@@ -3823,10 +3836,10 @@ class HttpCli(object):
                                 break
 
                     if is_dir:
-                        return self.tx_ico("a.folder")
+                        return self.tx_svg("folder")
 
                 thp = None
-                if self.thumbcli:
+                if self.thumbcli and not nothumb:
                     thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
 
                 if thp:
@@ -3836,6 +3849,9 @@ class HttpCli(object):
                     raise Pebkac(404)
 
                 return self.tx_ico(rem)
+
+        elif self.can_write and th_fmt is not None:
+            return self.tx_svg("upload\nonly")
 
         elif self.can_get and self.avn:
             axs = self.avn.axs
@@ -3981,7 +3997,8 @@ class HttpCli(object):
             "idx": e2d,
             "itag": e2t,
             "dsort": vf["sort"],
-            "dfull": "nocrop" in vf,
+            "dcrop": vf["crop"],
+            "dth3x": vf["th3x"],
             "u2ts": vf["u2ts"],
             "lifetime": vn.flags.get("lifetime") or 0,
             "frand": bool(vn.flags.get("rand")),
@@ -4008,8 +4025,9 @@ class HttpCli(object):
             "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
             "readme": readme,
             "dgrid": "grid" in vf,
-            "dfull": "nocrop" in vf,
             "dsort": vf["sort"],
+            "dcrop": vf["crop"],
+            "dth3x": vf["th3x"],
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
             "u2j": self.args.u2j,

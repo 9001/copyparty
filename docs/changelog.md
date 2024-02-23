@@ -1,4 +1,91 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0218-1554  `v1.10.1`  big thumbs
+
+## new features
+
+* button to enable hi-res thumbnails 33f41f3e 58ae38c6
+  * enable with the `3x` button in the gridview
+  * can be force-enabled/disabled serverside with `--th-x3` or volflag `th3x`
+* tftp: IPv6 support and UTF-8 filenames + optimizations 0504b010
+* ux:
+  * when closing the image viewer, scroll to the last viewed pic bbc37990
+  * respect `prefers-reduced-motion` some more places fbfdd833
+
+## bugfixes
+
+* #72 impossible to delete recently uploaded zerobyte files if database was disabled 6bd087dd
+* tftp now works in `copyparty.exe`, `copyparty32.exe`, `copyparty-winpe64.exe`
+* the [sharex config example](https://github.com/9001/copyparty/tree/hovudstraum/contrib#sharexsxcu) was still using cookie-auth 8ff7094e
+* ux:
+  * prevent scrolling while a pic is open 7f1c9926
+  * fix gridview in older firefox versions 7f1c9926
+
+## other changes
+
+* thumbnail center-cropping can be force-enabled/disabled serverside with `--th-crop` or volflag `crop`
+  * replaces `--th-no-crop` which is now deprecated (but will continue to work)
+
+----
+
+this release contains a build of `copyparty-winpe64.exe` which is almost **entirely useless,** except for in *extremely specific scenarios*, namely the kind where a TFTP server could also be useful -- the [previous build](https://github.com/9001/copyparty/releases/download/v1.8.7/copyparty-winpe64.exe) was from [version 1.8.7](https://github.com/9001/copyparty/releases/tag/v1.8.7) (2023-07-23)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0215-0000  `v1.10.0`  tftp
+
+## new features
+
+* TFTP server d636316a 8796c09f acbb8267 02879713
+  * based on [partftpy](https://github.com/9001/partftpy), has most essential features EXCEPT for [rfc7440](https://datatracker.ietf.org/doc/html/rfc7440) so WAN will be slow
+  * is already doing real work out in the wild! see the fantastic quote in the [readme](https://github.com/9001/copyparty?tab=readme-ov-file#tftp-server)
+* detect some (un)common configuration mistakes
+  * buggy reverse-proxy which strips away all URL parameters 136c0fdc
+    * could cause the browser to get stuck in a refresh-loop
+  * a volume on an sqlite-incompatible filesystem (a remote cifs server or such) and an up2k volume inside d4da3861
+    * sqlite could deadlock or randomly throw exceptions; serverlog will now explain how to fix it
+* ie11: file selection with shift-up/down 64ad5853
+
+## bugfixes
+
+* prevent music playback from stopping at the end of a folder f262aee8
+  * preloader will now proactively hunt for the next file to play as the last song is ending
+* in very specific scenarios, clients could be told their upload had finished processing a tiny bit too early, while the HDD was still busy taking in the last couple bytes 6f8a588c
+  * so if you expected to find the complete file on the server HDD immediately as the final chunk got confirmed, that was not necessarily the case if your server HDD was severely overloaded to the point where closing a file takes half a minute
+    * huge thx to friend with said overloaded server for finding all the crazy edge cases
+* ignore harmless javascript errors from easymde 879e83e2
+
+## other changes
+
+* the "copy currently playing song info to clipboard" button now excludes the uploader IP ed524d84
+* mention that enabling `-j0` can improve HDD load during uploads 5d92f4df
+* mention a debian-specific docker bug which prevents starting most containers (not just copyparty) 4e797a71
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0203-1533  `v1.9.31`  eject
+
+## new features
+
+* disable mkdir / new-doc buttons until a name is provided d3db6d29
+* warning about browsers limiting the number of connections c354a38b
+
+## bugfixes
+
+* #71 stop videos from buffering in the background a17c267d
+* improve up2k ETA on slow networks / many connections c1180d6f
+* u2c: exclude-filter didn't apply to file deletions b2e23340
+* `--touch` / `re📅` didn't apply to zerobyte files 945170e2
+
+## other changes
+
+* notes on [hardlink/symlink conversion](https://github.com/9001/copyparty/blob/6c2c6090/docs/notes.sh#L35-L46) 6c2c6090
+* [lore](https://github.com/9001/copyparty/blob/hovudstraum/docs/notes.md#trivia--lore) b1cf5884
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0125-2252  `v1.9.30`  retime
 
 probably last release before v1.10 (IdP), please watch warmly

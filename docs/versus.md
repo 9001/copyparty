@@ -200,9 +200,10 @@ symbol legend,
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
 | serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ |
-| serve ftp               | █ |   |   |   |   | █ |   |   |   |   |   | █ |
-| serve ftps              | █ |   |   |   |   | █ |   |   |   |   |   | █ |
-| serve sftp              |   |   |   |   |   | █ |   |   |   |   |   | █ |
+| serve ftp  (tcp)        | █ |   |   |   |   | █ |   |   |   |   |   | █ |
+| serve ftps (tls)        | █ |   |   |   |   | █ |   |   |   |   |   | █ |
+| serve tftp (udp)        | █ |   |   |   |   |   |   |   |   |   |   |   |
+| serve sftp (ssh)        |   |   |   |   |   | █ |   |   |   |   |   | █ |
 | serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |
 | serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |
 | listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ |   | █ | █ |

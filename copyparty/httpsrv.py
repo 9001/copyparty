@@ -117,6 +117,7 @@ class HttpSrv(object):
         self.bound: set[tuple[str, int]] = set()
         self.name = "hsrv" + nsuf
         self.mutex = threading.Lock()
+        self.u2mutex = threading.Lock()
         self.stopping = False
 
         self.tp_nthr = 0  # actual
@@ -220,7 +221,7 @@ class HttpSrv(object):
     def periodic(self) -> None:
         while True:
             time.sleep(2 if self.tp_ncli or self.ncli else 10)
-            with self.mutex:
+            with self.u2mutex, self.mutex:
                 self.u2fh.clean()
                 if self.tp_q:
                     self.tp_ncli = max(self.ncli, self.tp_ncli - 2)

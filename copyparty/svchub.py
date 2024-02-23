@@ -133,7 +133,7 @@ class SvcHub(object):
         if not self._process_config():
             raise Exception(BAD_CFG)
 
-        # for non-http clients (ftp)
+        # for non-http clients (ftp, tftp)
         self.bans: dict[str, int] = {}
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
@@ -268,6 +268,12 @@ class SvcHub(object):
             Daemon(self.start_ftpd, "start_ftpd")
             zms += "f" if args.ftp else "F"
 
+        if args.tftp:
+            from .tftpd import Tftpd
+
+            self.tftpd: Optional[Tftpd] = None
+            Daemon(self.start_ftpd, "start_tftpd")
+
         if args.smb:
             # impacket.dcerpc is noisy about listen timeouts
             sto = socket.getdefaulttimeout()
@@ -297,10 +303,12 @@ class SvcHub(object):
 
     def start_ftpd(self) -> None:
         time.sleep(30)
-        if self.ftpd:
-            return
 
-        self.restart_ftpd()
+        if hasattr(self, "ftpd") and not self.ftpd:
+            self.restart_ftpd()
+
+        if hasattr(self, "tftpd") and not self.tftpd:
+            self.restart_tftpd()
 
     def restart_ftpd(self) -> None:
         if not hasattr(self, "ftpd"):
@@ -316,6 +324,17 @@ class SvcHub(object):
 
         self.ftpd = Ftpd(self)
         self.log("root", "started FTPd")
+
+    def restart_tftpd(self) -> None:
+        if not hasattr(self, "tftpd"):
+            return
+
+        from .tftpd import Tftpd
+
+        if self.tftpd:
+            return  # todo
+
+        self.tftpd = Tftpd(self)
 
     def thr_httpsrv_up(self) -> None:
         time.sleep(1 if self.args.ign_ebind_all else 5)
@@ -432,6 +451,13 @@ class SvcHub(object):
             else:
                 setattr(al, k, re.compile(vs))
 
+        for k in "tftp_lsf".split(" "):
+            vs = getattr(al, k)
+            if not vs or vs == "no":
+                setattr(al, k, None)
+            else:
+                setattr(al, k, re.compile("^" + vs + "$"))
+
         if not al.sus_urls:
             al.ban_url = "no"
         elif al.ban_url == "no":
@@ -444,6 +470,7 @@ class SvcHub(object):
         al.xff_re = self._ipa2re(al.xff_src)
         al.ipa_re = self._ipa2re(al.ipa)
         al.ftp_ipa_re = self._ipa2re(al.ftp_ipa or al.ipa)
+        al.tftp_ipa_re = self._ipa2re(al.tftp_ipa or al.ipa)
 
         mte = ODict.fromkeys(DEF_MTE.split(","), True)
         al.mte = odfusion(mte, al.mte)

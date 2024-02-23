@@ -17,8 +17,10 @@ window.baguetteBox = (function () {
             titleTag: false,
             async: false,
             preload: 2,
+            refocus: true,
             afterShow: null,
             afterHide: null,
+            duringHide: null,
             onChange: null,
         },
         overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnVmode, btnClose,
@@ -144,7 +146,7 @@ window.baguetteBox = (function () {
             selectorData.galleries.push(gallery);
         });
 
-        return selectorData.galleries;
+        return [selectorData.galleries, options];
     }
 
     function clearCachedData() {
@@ -593,6 +595,9 @@ window.baguetteBox = (function () {
         if (overlay.style.display === 'none')
             return;
 
+        if (options.duringHide)
+            options.duringHide();
+
         sethash('');
         unbindEvents();
         try {
@@ -613,7 +618,7 @@ window.baguetteBox = (function () {
             if (options.afterHide)
                 options.afterHide();
 
-            documentLastFocus && documentLastFocus.focus();
+            options.refocus && documentLastFocus && documentLastFocus.focus();
             isOverlayVisible = false;
             unvid();
             unfig();

@@ -28,6 +28,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: Jython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Operating System :: OS Independent",
     "Environment :: Console",
     "Environment :: No Input/Output (Daemon)",
     "Intended Audience :: End Users/Desktop",
@@ -48,6 +49,7 @@ thumbnails2 = ["pyvips"]
 audiotags = ["mutagen"]
 ftpd = ["pyftpdlib"]
 ftps = ["pyftpdlib", "pyopenssl"]
+tftpd = ["partftpy>=0.3.0"]
 pwhash = ["argon2-cffi"]
 
 [project.scripts]

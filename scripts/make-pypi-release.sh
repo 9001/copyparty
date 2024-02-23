@@ -77,13 +77,14 @@ function have() {
 }
 
 function load_env() {
-	. buildenv/bin/activate
-	have setuptools
-	have wheel
-	have build
-	have twine
-	have jinja2
-	have strip_hints
+	. buildenv/bin/activate || return 1
+	have setuptools &&
+	have wheel &&
+	have build &&
+	have twine &&
+	have jinja2 &&
+	have strip_hints &&
+	return 0 || return 1
 }
 
 load_env || {

@@ -309,6 +309,7 @@ class TcpSrv(object):
         self.hub.start_zeroconf()
         gencert(self.log, self.args, self.netdevs)
         self.hub.restart_ftpd()
+        self.hub.restart_tftpd()
 
     def shutdown(self) -> None:
         self.stopping = True

@@ -43,8 +43,8 @@ if MACOS:
 
 from copyparty.__init__ import E
 from copyparty.__main__ import init_E
-from copyparty.util import FHC, Garda, Unrecv
 from copyparty.u2idx import U2idx
+from copyparty.util import FHC, Garda, Unrecv
 
 init_E(E)
 
@@ -110,7 +110,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw q rand smb srch_dbg stats th_no_crop vague_403 vc ver xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw q rand smb srch_dbg stats vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_voldump re_dhash plain_ip"
@@ -157,7 +157,9 @@ class Cfg(Namespace):
             s_wr_sz=512 * 1024,
             sort="href",
             srch_hits=99999,
+            th_crop="y",
             th_size="320x256",
+            th_x3="n",
             u2sort="s",
             u2ts="c",
             unpost=600,
@@ -244,6 +246,7 @@ class VHttpConn(object):
         self.log_func = log
         self.log_src = "a"
         self.mutex = threading.Lock()
+        self.u2mutex = threading.Lock()
         self.nbyte = 0
         self.nid = None
         self.nreq = -1

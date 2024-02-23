@@ -985,6 +985,10 @@ html.y #path a:hover {
 	margin: 0 auto;
 	display: block;
 }
+#ggrid.nocrop>a img {
+	max-height: 20em;
+	max-height: calc(var(--grid-sz)*2);
+}
 #ggrid>a.dir:before {
 	content: '📂';
 }
@@ -1151,9 +1155,6 @@ html.y #widget.open {
 @keyframes spin {
 	100% {transform: rotate(360deg)}
 }
-@media (prefers-reduced-motion) {
-	@keyframes spin { }
-}
 @keyframes fadein {
 	0% {opacity: 0}
 	100% {opacity: 1}
@@ -1246,6 +1247,13 @@ html.y #widget.open {
 @keyframes fcut {
 	0% {opacity:0}
 	100% {opacity:1}
+}
+#ggrid>a.glow {
+	animation: gexit .6s ease-out;
+}
+@keyframes gexit {
+	0% {box-shadow: 0 0 0 2em var(--a)}
+	100% {box-shadow: 0 0 0em 0em var(--a)}
 }
 #wzip a {
 	font-size: .4em;
@@ -1775,6 +1783,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	padding: 0;
 }
 #thumbs,
+#au_prescan,
 #au_fullpre,
 #au_os_seek,
 #au_osd_cv,
@@ -1782,7 +1791,8 @@ html.y #tree.nowrap .ntree a+a:hover {
 	opacity: .3;
 }
 #griden.on+#thumbs,
-#au_preload.on+#au_fullpre,
+#au_preload.on+#au_prescan,
+#au_preload.on+#au_prescan+#au_fullpre,
 #au_os_ctl.on+#au_os_seek,
 #au_os_ctl.on+#au_os_seek+#au_osd_cv,
 #u2turbo.on+#u2tdate {
@@ -3136,7 +3146,7 @@ html.d #treepar {
 		margin-top: 1.7em;
 	}
 }
-@supports (display: grid) {
+@supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;
 		margin: 0em 0.25em;
@@ -3159,5 +3169,26 @@ html.d #treepar {
   	#ggrid>a>span {
 		text-align: center;
 		padding: 0.2em;
+	}
+}
+
+
+
+
+
+@media (prefers-reduced-motion) {
+	@keyframes spin { }
+	@keyframes gexit { }
+	@keyframes bounce { }
+	@keyframes bounceFromLeft { }
+	@keyframes bounceFromRight { }
+
+	#ggrid>a:before,
+	#widget.anim,
+	#u2tabw,
+	.dropdesc,
+	.dropdesc b,
+	.dropdesc>div>div {
+		transition: none;
 	}
 }

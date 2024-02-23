@@ -43,6 +43,7 @@ from .util import (
     DEF_MTH,
     IMPLICATIONS,
     JINJA_VER,
+    PARTFTPY_VER,
     PY_DESC,
     PYFTPD_VER,
     SQLITE_VER,
@@ -998,7 +999,7 @@ def add_zc_ssdp(ap):
 
 
 def add_ftp(ap):
-    ap2 = ap.add_argument_group('FTP options')
+    ap2 = ap.add_argument_group('FTP options (TCP only)')
     ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on \033[33mPORT\033[0m, for example \033[32m3921")
     ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
@@ -1016,6 +1017,18 @@ def add_webdav(ap):
     ap2.add_argument("--dav-mac", action="store_true", help="disable apple-garbage filter -- allow macos to create junk files (._* and .DS_Store, .Spotlight-*, .fseventsd, .Trashes, .AppleDouble, __MACOS)")
     ap2.add_argument("--dav-rt", action="store_true", help="show symlink-destination's lastmodified instead of the link itself; always enabled for recursive listings (volflag=davrt)")
     ap2.add_argument("--dav-auth", action="store_true", help="force auth for all folders (required by davfs2 when only some folders are world-readable) (volflag=davauth)")
+
+
+def add_tftp(ap):
+    ap2 = ap.add_argument_group('TFTP options (UDP only)')
+    ap2.add_argument("--tftp", metavar="PORT", type=int, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
+    ap2.add_argument("--tftpv", action="store_true", help="verbose")
+    ap2.add_argument("--tftpvv", action="store_true", help="verboser")
+    ap2.add_argument("--tftp-no-fast", action="store_true", help="debug: disable optimizations")
+    ap2.add_argument("--tftp-lsf", metavar="PTN", type=u, default="\\.?(dir|ls)(\\.txt)?", help="return a directory listing if a file with this name is requested and it does not exist; defaults matches .ls, dir, .dir.txt, ls.txt, ...")
+    ap2.add_argument("--tftp-nols", action="store_true", help="if someone tries to download a directory, return an error instead of showing its directory listing")
+    ap2.add_argument("--tftp-ipa", metavar="PFX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPFX\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Example: [\033[32m127., 10.89., 192.168.\033[0m]")
+    ap2.add_argument("--tftp-pr", metavar="P-P", type=u, help="the range of UDP ports to use for data transfer, for example \033[32m12000-13000")
 
 
 def add_smb(ap):
@@ -1162,7 +1175,8 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for generating thumbnails")
     ap2.add_argument("--th-convt", metavar="SEC", type=float, default=60, help="conversion timeout in seconds (volflag=convt)")
     ap2.add_argument("--th-ram-max", metavar="GB", type=float, default=6, help="max memory usage (GiB) permitted by thumbnailer; not very accurate")
-    ap2.add_argument("--th-no-crop", action="store_true", help="dynamic height; show full image by default (client can override in UI) (volflag=nocrop)")
+    ap2.add_argument("--th-crop", metavar="TXT", type=u, default="y", help="crop thumbnails to 4:3 or keep dynamic height; client can override in UI unless force. [\033[32mfy\033[0m]=crop, [\033[32mfn\033[0m]=nocrop, [\033[32mfy\033[0m]=force-y, [\033[32mfn\033[0m]=force-n (volflag=crop)")
+    ap2.add_argument("--th-x3", metavar="TXT", type=u, default="n", help="show thumbs at 3x resolution; client can override in UI unless force. [\033[32mfy\033[0m]=yes, [\033[32mfn\033[0m]=no, [\033[32mfy\033[0m]=force-yes, [\033[32mfn\033[0m]=force-no (volflag=th3x)")
     ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="image decoders, in order of preference")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
@@ -1327,6 +1341,7 @@ def run_argparse(
     add_transcoding(ap)
     add_ftp(ap)
     add_webdav(ap)
+    add_tftp(ap)
     add_smb(ap)
     add_safety(ap)
     add_salt(ap, fk_salt, ah_salt)
@@ -1380,7 +1395,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     if argv is None:
         argv = sys.argv
 
-    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite v{} | jinja2 v{} | pyftpd v{}\n\033[0m'
+    f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite {} | jinja {} | pyftpd {} | tftp {}\n\033[0m'
     f = f.format(
         S_VERSION,
         CODENAME,
@@ -1389,6 +1404,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         SQLITE_VER,
         JINJA_VER,
         PYFTPD_VER,
+        PARTFTPY_VER,
     )
     lprint(f)
 
@@ -1420,6 +1436,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     deprecated: list[tuple[str, str]] = [
         ("--salt", "--warksalt"),
         ("--hdr-au-usr", "--idp-h-usr"),
+        ("--th-no-crop", "--th-crop=n"),
     ]
     for dk, nk in deprecated:
         idx = -1

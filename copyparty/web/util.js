@@ -157,6 +157,10 @@ catch (ex) {
 }
 var crashed = false, ignexd = {}, evalex_fatal = false;
 function vis_exh(msg, url, lineNo, columnNo, error) {
+    var ekey = url + '\n' + lineNo + '\n' + msg;
+    if (ignexd[ekey] || crashed)
+        return;
+
     msg = String(msg);
     url = String(url);
 
@@ -175,9 +179,8 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if (IE && url.indexOf('prism.js') + 1)
         return;
 
-    var ekey = url + '\n' + lineNo + '\n' + msg;
-    if (ignexd[ekey] || crashed)
-        return;
+    if (url.indexOf('easymde.js') + 1)
+        return;  // clicking the preview pane
 
     if (url.indexOf('deps/marked.js') + 1 && !window.WebAssembly)
         return; // ff<52

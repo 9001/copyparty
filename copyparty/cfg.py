@@ -20,7 +20,6 @@ def vf_bmap() -> dict[str, str]:
         "no_thumb": "dthumb",
         "no_vthumb": "dvthumb",
         "no_athumb": "dathumb",
-        "th_no_crop": "nocrop",
     }
     for k in (
         "dotsrch",
@@ -56,6 +55,8 @@ def vf_vmap() -> dict[str, str]:
         "re_maxage": "scan",
         "th_convt": "convt",
         "th_size": "thsize",
+        "th_crop": "crop",
+        "th_x3": "th3x",
     }
     for k in (
         "dbd",
@@ -172,7 +173,8 @@ flagcats = {
         "dathumb": "disables audio thumbnails (spectrograms)",
         "dithumb": "disables image thumbnails",
         "thsize": "thumbnail res; WxH",
-        "nocrop": "disable center-cropping by default",
+        "crop": "center-cropping (y/n/fy/fn)",
+        "th3x": "3x resolution (y/n/fy/fn)",
         "convt": "conversion timeout in seconds",
     },
     "handlers\n(better explained in --help-handlers)": {

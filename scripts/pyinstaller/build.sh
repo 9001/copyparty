@@ -37,7 +37,7 @@ rm -rf $TEMP/pe-copyparty*
 python copyparty-sfx.py --version
 
 rm -rf mods; mkdir mods
-cp -pR $TEMP/pe-copyparty/copyparty/ $TEMP/pe-copyparty/{ftp,j2}/* mods/
+cp -pR $TEMP/pe-copyparty/{copyparty,partftpy}/ $TEMP/pe-copyparty/{ftp,j2}/* mods/
 [ $w10 ] && rm -rf mods/{jinja2,markupsafe}
 
 af() { awk "$1" <$2 >tf; mv tf "$2"; }

@@ -78,16 +78,34 @@ class ThumbCli(object):
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg", "png"]:
             return os.path.join(ptop, rem)
 
-        if fmt == "j" and self.args.th_no_jpg:
-            fmt = "w"
+        if fmt[:1] in "jw":
+            sfmt = fmt[:1]
 
-        if fmt == "w":
-            if (
-                self.args.th_no_webp
-                or (is_img and not self.can_webp)
-                or (self.args.th_ff_jpg and (not is_img or preferred == "ff"))
-            ):
-                fmt = "j"
+            if sfmt == "j" and self.args.th_no_jpg:
+                sfmt = "w"
+
+            if sfmt == "w":
+                if (
+                    self.args.th_no_webp
+                    or (is_img and not self.can_webp)
+                    or (self.args.th_ff_jpg and (not is_img or preferred == "ff"))
+                ):
+                    sfmt = "j"
+
+            vf_crop = dbv.flags["crop"]
+            vf_th3x = dbv.flags["th3x"]
+
+            if "f" in vf_crop:
+                sfmt += "f" if "n" in vf_crop else ""
+            else:
+                sfmt += "f" if "f" in fmt else ""
+
+            if "f" in vf_th3x:
+                sfmt += "3" if "y" in vf_th3x else ""
+            else:
+                sfmt += "3" if "3" in fmt else ""
+
+            fmt = sfmt
 
         histpath = self.asrv.vfs.histtab.get(ptop)
         if not histpath:
