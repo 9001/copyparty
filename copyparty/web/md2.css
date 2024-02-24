@@ -9,7 +9,7 @@
 	width: calc(100% - 56em);
 }
 #mw {
-	left: calc(100% - 55em);
+	left: max(0em, calc(100% - 55em));
 	overflow-y: auto;
 	position: fixed;
 	bottom: 0;
