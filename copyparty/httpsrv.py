@@ -191,7 +191,7 @@ class HttpSrv(object):
             for fn in df:
                 ap = absreal(os.path.join(dp, fn))
                 self.statics.add(ap)
-                if ap.endswith(".gz") or ap.endswith(".br"):
+                if ap.endswith(".gz"):
                     self.statics.add(ap[:-3])
 
     def set_netdevs(self, netdevs: dict[str, Netdev]) -> None:

@@ -24,7 +24,7 @@ ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
 # the scp url is regular latin from https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap
 RUN     mkdir -p /z/dist/no-pk \
         && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
-        && apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev brotli py3-brotli \
+        && apk add cmake make g++ git bash npm patch wget tar pigz brotli gzip unzip python3 python3-dev py3-brotli \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && wget https://github.com/openpgpjs/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
@@ -143,9 +143,8 @@ RUN     ./genprism.sh $ver_prism
 
 
 # compress
-COPY    brotli.makefile zopfli.makefile /z/dist/
+COPY    zopfli.makefile /z/dist/
 RUN     cd /z/dist \
-        && make -j$(nproc) -f brotli.makefile \
         && make -j$(nproc) -f zopfli.makefile \
         && rm *.makefile \
         && mv no-pk/* . \

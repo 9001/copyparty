@@ -37,7 +37,7 @@ help() { exec cat <<'EOF'
 # _____________________________________________________________________
 # web features:
 #
-# `no-cm` saves ~82k by removing easymde/codemirror
+# `no-cm` saves ~89k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
 # `no-hl` saves ~41k by removing syntax hilighting in the text viewer
@@ -406,7 +406,7 @@ find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') 
 
 rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
 
-find copyparty | LC_ALL=C sort | sed -r 's/\.(gz|br)$//;s/$/,/' > have
+find copyparty | LC_ALL=C sort | sed -r 's/\.gz$//;s/$/,/' > have
 cat have | while IFS= read -r x; do
 	grep -qF -- "$x" ../scripts/sfx.ls || {
 		echo "unexpected file: $x"
@@ -603,7 +603,7 @@ sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
 
 for n in {1..50}; do
-	(grep -vE '\.(gz|br)$' list1; grep -E '\.(gz|br)$' list1 | (shuf||gshuf) ) >list || true
+	(grep -vE '\.gz$' list1; grep -E '\.gz$' list1 | (shuf||gshuf) ) >list || true
 	s=$( (sha1sum||shasum) < list | cut -c-16)
 	grep -q $s "$zdir/h" 2>/dev/null && continue
 	echo $s >> "$zdir/h"

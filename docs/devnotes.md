@@ -218,7 +218,7 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 * `269k` after `./scripts/make-sfx.sh re no-cm no-hl`
 
 the features you can opt to drop are
-* `cm`/easymde, the "fancy" markdown editor, saves ~82k
+* `cm`/easymde, the "fancy" markdown editor, saves ~89k
 * `hl`, prism, the syntax hilighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
 * `dd`, the custom mouse cursor for the media player tray tab, saves ~2k

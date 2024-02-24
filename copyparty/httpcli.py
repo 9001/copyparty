@@ -2827,11 +2827,11 @@ class HttpCli(object):
         logtail = ""
 
         #
-        # if request is for foo.js, check if we have foo.js.{gz,br}
+        # if request is for foo.js, check if we have foo.js.gz
 
         file_ts = 0.0
         editions: dict[str, tuple[str, int]] = {}
-        for ext in ["", ".gz", ".br"]:
+        for ext in ("", ".gz"):
             try:
                 fs_path = req_path + ext
                 st = bos.stat(fs_path)
@@ -2876,12 +2876,7 @@ class HttpCli(object):
             x.strip()
             for x in self.headers.get("accept-encoding", "").lower().split(",")
         ]
-        if ".br" in editions and "br" in supported_editions:
-            is_compressed = True
-            selected_edition = ".br"
-            fs_path, file_sz = editions[".br"]
-            self.out_headers["Content-Encoding"] = "br"
-        elif ".gz" in editions:
+        if ".gz" in editions:
             is_compressed = True
             selected_edition = ".gz"
             fs_path, file_sz = editions[".gz"]
@@ -2897,13 +2892,8 @@ class HttpCli(object):
             is_compressed = False
             selected_edition = "plain"
 
-        try:
-            fs_path, file_sz = editions[selected_edition]
-            logmsg += "{} ".format(selected_edition.lstrip("."))
-        except:
-            # client is old and we only have .br
-            # (could make brotli a dep to fix this but it's not worth)
-            raise Pebkac(404)
+        fs_path, file_sz = editions[selected_edition]
+        logmsg += "{} ".format(selected_edition.lstrip("."))
 
         #
         # partial
