@@ -2,6 +2,7 @@ html {
 	color: #333;
 	background: #f7f7f7;
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 	touch-action: manipulation;
 }
 #wrap {
@@ -127,6 +128,7 @@ pre, code {
 	color: #480;
 	background: #fff;
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 	border: 1px solid rgba(128,128,128,0.3);
 	border-radius: .2em;
 	padding: .15em .2em;

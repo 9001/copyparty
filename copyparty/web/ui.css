@@ -1,4 +1,8 @@
 :root {
+	--font-main: sans-serif;
+	--font-serif: serif;
+	--font-mono: 'scp';
+
 	--fg: #ccc;
 	--fg-max: #fff;
 	--bg-u2: #2b2b2b;
@@ -378,6 +382,7 @@ html.y textarea:focus {
 .mdo code,
 .mdo tt {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 	white-space: pre-wrap;
 	word-break: break-all;
 }
@@ -447,6 +452,7 @@ html.y textarea:focus {
 }
 .mdo blockquote {
 	font-family: serif;
+	font-family: var(--font-serif), serif;
 	background: #f7f7f7;
 	border: .07em dashed #ccc;
 	padding: 0 2em;

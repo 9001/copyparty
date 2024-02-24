@@ -1292,6 +1292,8 @@ the classname of the HTML tag is set according to the selected theme, which is u
 
 see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where the color variables are set, and there's layout-specific stuff near the bottom
 
+if you want to change the fonts, see [./docs/rice/](./docs/rice/)
+
 
 ## complete examples
 
