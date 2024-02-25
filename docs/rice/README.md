@@ -4,6 +4,13 @@ to change the fonts in the web-UI,  first create a css file with your customizat
 
 add this to your copyparty config so the css file gets loaded: `--html-head='<link rel="stylesheet" href="/customfonts.css">'`
 
+alternatively, if you are using a config file instead of commandline args:
+
+```yaml
+[global]
+  html-head: <link rel="stylesheet" href="/customfonts.css">
+```
+
 make your changes in the css file; this is the default values to get you started:
 
 ```css
