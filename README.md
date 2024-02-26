@@ -344,6 +344,9 @@ upgrade notes
 * can I make copyparty download a file to my server if I give it a URL?
   * yes, using [hooks](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
 
+* firefox refuses to connect over https, saying "Secure Connection Failed" or "SEC_ERROR_BAD_SIGNATURE", but the usual button to "Accept the Risk and Continue" is not shown
+  * firefox has corrupted its certstore; fix this by exiting firefox, then find and delete the file named `cert9.db` somewhere in your firefox profile folder
+
 * i want to learn python and/or programming and am considering looking at the copyparty source code in that occasion
   * ```bash
      _|  _      __   _  _|_
