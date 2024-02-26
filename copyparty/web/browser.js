@@ -7569,11 +7569,24 @@ var globalcss = (function () {
 					var css = ds[b].cssText.split(/\burl\(/g);
 					ret += css[0];
 					for (var c = 1; c < css.length; c++) {
-						var delim = (/^["']/.exec(css[c])) ? css[c].slice(0, 1) : '';
-						ret += 'url(' + delim + ((css[c].slice(0, 8).indexOf('://') + 1 || css[c].startsWith('/')) ? '' : base) +
-							css[c].slice(delim ? 1 : 0);
+						var m = /(^ *["']?)(.*)/.exec(css[c]),
+							delim = m[1],
+							ctxt = m[2],
+							is_abs = /^\/|[^)/:]+:\/\//.exec(ctxt);
+
+						ret += 'url(' + delim + (is_abs ? '' : base) + ctxt;
 					}
 					ret += '\n';
+				}
+				if (ret.indexOf('\n@import') + 1) {
+					var c0 = ret.split('\n'),
+						c1 = [],
+						c2 = [];
+
+					for (var a = 0; a < c0.length; a++)
+						(c0[a].startsWith('@import') ? c1 : c2).push(c0[a]);
+
+					ret = c1.concat(c2).join('\n');
 				}
 			}
 			catch (ex) {
