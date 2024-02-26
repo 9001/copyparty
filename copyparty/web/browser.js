@@ -240,13 +240,14 @@ var Ls = {
 		"ml_drc": "dynamic range compressor",
 
 		"mt_shuf": "shuffle the songs in each folder\">🔀",
+		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
-		"mt_oseek": "allow seeking through os integration\">seek",
+		"mt_oseek": "allow seeking through os integration$N$Nnote: on some devices (iPhones),$Nthis replaces the next-song button\">seek",
 		"mt_oscv": "show album cover in osd\">art",
 		"mt_follow": "keep the playing track scrolled into view\">🎯",
 		"mt_compact": "compact controls\">⟎",
@@ -737,13 +738,14 @@ var Ls = {
 		"ml_drc": "compressor (volum-utjevning)",
 
 		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
+		"mt_aplay": "forsøk å starte avspilling hvis linken du klikket på for å åpne nettsiden inneholder en sang-ID$N$Nhvis denne deaktiveres så vil heller ikke nettside-URLen bli oppdatert med sang-ID'er når musikk spilles, i tilfelle innstillingene skulle gå tapt og nettsiden lastes på ny\">a▶",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
-		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
+		"mt_oseek": "tillat spoling med fjernkontroll$N$Nmerk: på noen enheter (iPhones) så vil$Ndette erstatte knappen for neste sang\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
 		"mt_follow": "bla slik at sangen som spilles alltid er synlig\">🎯",
 		"mt_compact": "tettpakket avspillerpanel\">⟎",
@@ -1401,6 +1403,7 @@ var mpl = (function () {
 	ebi('op_player').innerHTML = (
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
+		'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
@@ -1446,6 +1449,7 @@ var mpl = (function () {
 	bcfg_bind(r, 'shuf', 'au_shuf', false, function () {
 		mp.read_order();  // don't bind
 	});
+	bcfg_bind(r, 'aplay', 'au_aplay', true);
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
@@ -3103,7 +3107,9 @@ function play(tid, is_ev, seek) {
 
 	try {
 		mp.nopause();
-		mp.au.play();
+		if (mpl.aplay || is_ev !== -1)
+			mp.au.play();
+
 		if (mp.au.paused)
 			autoplay_blocked(seek);
 		else if (seek) {
@@ -3113,7 +3119,8 @@ function play(tid, is_ev, seek) {
 		if (!seek && !ebi('unsearch')) {
 			var o = ebi(oid);
 			o.setAttribute('id', 'thx_js');
-			sethash(oid);
+			if (mpl.aplay)
+				sethash(oid);
 			o.setAttribute('id', oid);
 		}
 
@@ -3275,9 +3282,9 @@ function eval_hash() {
 
 		if (mtype == 'a') {
 			if (!ts)
-				return play(id);
+				return play(id, -1);
 
-			return play(id, false, ts);
+			return play(id, -1, ts);
 		}
 
 		if (mtype == 'g') {
