@@ -1,0 +1,99 @@
+version: '3.3'
+
+networks:
+  net:
+    driver: bridge
+
+services:
+  copyparty:
+    image: copyparty/ac:idp
+    container_name: idp_copyparty
+    user: "1000:1000"  # should match the user/group of your fileshare volumes
+    volumes:
+      - ./cpp/:/cfg:z  # the copyparty config folder
+      - /srv/pub:/w:z  # this is where we declare that "/srv/pub" is the filesystem-path on the server that shall be shared online
+    networks:
+      - net
+    expose:
+      - 3923
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.copyparty.rule=Host(`fs.example.com`)'
+      - 'traefik.http.routers.copyparty.entrypoints=https'
+      - 'traefik.http.routers.copyparty.tls=true'
+      - 'traefik.http.routers.copyparty.middlewares=authelia@docker'
+    stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
+
+  authelia:
+    image: authelia/authelia:v4.38.0-beta3  # the config files in the authelia folder use the new syntax
+    container_name: idp_authelia
+    volumes:
+      - ./authelia:/config:z
+    networks:
+      - net
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.authelia.rule=Host(`authelia.example.com`)'
+      - 'traefik.http.routers.authelia.entrypoints=https'
+      - 'traefik.http.routers.authelia.tls=true'
+      #- 'traefik.http.routers.authelia.tls.certresolver=letsencrypt'  # uncomment this to enable automatic certificate signing (1/2)
+      - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https://authelia.example.com'
+      - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
+      - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+    expose:
+      - 9091
+    restart: unless-stopped
+    healthcheck:
+      disable: true
+    environment:
+      - TZ=Etc/UTC
+
+  redis:
+    image: redis:7.2.4-alpine3.19
+    container_name: idp_redis
+    volumes:
+      - ./redis:/data:z
+    networks:
+      - net
+    expose:
+      - 6379
+    restart: unless-stopped
+    environment:
+      - TZ=Etc/UTC
+
+  traefik:
+    image: traefik:2.11.0
+    container_name: idp_traefik
+    volumes:
+      - ./traefik:/etc/traefik:z
+      - /var/run/docker.sock:/var/run/docker.sock  # WARNING: this gives traefik full root-access to the host OS, but is recommended/required(?) by traefik
+    security_opt:
+      - label:disable  # disable selinux because it (rightly) blocks access to docker.sock
+    networks:
+      - net
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.api.rule=Host(`traefik.example.com`)'
+      - 'traefik.http.routers.api.entrypoints=https'
+      - 'traefik.http.routers.api.service=api@internal'
+      - 'traefik.http.routers.api.tls=true'
+      #- 'traefik.http.routers.api.tls.certresolver=letsencrypt'  # uncomment this to enable automatic certificate signing (2/2)
+      - 'traefik.http.routers.api.middlewares=authelia@docker'
+    ports:
+      - '80:80'
+      - '443:443'
+    command:
+      - '--api'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedByDefault=false'
+      - '--entrypoints.http=true'
+      - '--entrypoints.http.address=:80'
+      - '--entrypoints.http.http.redirections.entrypoint.to=https'
+      - '--entrypoints.http.http.redirections.entrypoint.scheme=https'
+      - '--entrypoints.https=true'
+      - '--entrypoints.https.address=:443'
+      - '--certificatesResolvers.letsencrypt.acme.email=your-email@your-domain.com'
+      - '--certificatesResolvers.letsencrypt.acme.storage=/etc/traefik/acme.json'
+      - '--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=http'
+      - '--log=true'
+      - '--log.level=WARNING'  # DEBUG

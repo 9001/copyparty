@@ -1,0 +1,131 @@
+version: "3.4"
+
+volumes:
+  database:
+    driver: local
+  redis:
+    driver: local
+
+services:
+  copyparty:
+    image: copyparty/ac:idp
+    container_name: idp_copyparty
+    restart: unless-stopped
+    user: "1000:1000"  # should match the user/group of your fileshare volumes
+    volumes:
+      - ./cpp/:/cfg:z  # the copyparty config folder
+      - /srv/pub:/w:z  # this is where we declare that "/srv/pub" is the filesystem-path on the server that shall be shared online
+    ports:
+      - 3923
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.fs.rule=Host(`fs.example.com`)'
+      - 'traefik.http.routers.fs.entrypoints=http'
+      #- 'traefik.http.routers.fs.middlewares=authelia@docker'  # TODO: ???
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q 127.0.0.1:3923/?reset"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 15s
+    stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
+
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # WARNING: this gives traefik full root-access to the host OS, but is recommended/required(?) by traefik
+    security_opt:
+      - label:disable  # disable selinux because it (rightly) blocks access to docker.sock
+    ports:
+      - 80:80
+    command:
+      - '--api'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedByDefault=false'
+      - '--entrypoints.web.address=:80'
+
+  postgresql:
+    image: docker.io/library/postgres:12-alpine
+    container_name: idp_postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - database:/var/lib/postgresql/data:z
+    environment:
+      POSTGRES_PASSWORD: postgrass
+      POSTGRES_USER: authentik
+      POSTGRES_DB: authentik
+    env_file:
+      - .env
+
+  redis:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    container_name: idp_redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - redis:/data:z
+
+  authentik_server:
+    image: ghcr.io/goauthentik/server:2024.2.1
+    container_name: idp_authentik_server
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: postgrass
+    volumes:
+      - ./media:/media:z
+      - ./custom-templates:/templates:z
+    env_file:
+      - .env
+    ports:
+      - 9000
+      - 9443
+    depends_on:
+      - postgresql
+      - redis
+
+  authentik_worker:
+    image: ghcr.io/goauthentik/server:2024.2.1
+    container_name: idp_authentik_worker
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: postgrass
+    # `user: root` and the docker socket volume are optional.
+    # See more for the docker socket integration here:
+    # https://goauthentik.io/docs/outposts/integrations/docker
+    # Removing `user: root` also prevents the worker from fixing the permissions
+    # on the mounted folders, so when removing this make sure the folders have the correct UID/GID
+    # (1000:1000 by default)
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./media:/media:z
+      - ./certs:/certs:z
+      - ./custom-templates:/templates:z
+    env_file:
+      - .env
+    depends_on:
+      - postgresql
+      - redis

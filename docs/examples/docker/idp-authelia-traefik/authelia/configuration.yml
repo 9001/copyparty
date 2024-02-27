@@ -1,0 +1,66 @@
+# based on https://github.com/authelia/authelia/blob/39763aaed24c4abdecd884b47357a052b235942d/examples/compose/lite/authelia/configuration.yml
+
+# Authelia configuration
+
+# This secret can also be set using the env variables AUTHELIA_JWT_SECRET_FILE
+jwt_secret: a_very_important_secret
+
+server:
+  address: 'tcp://:9091'
+
+log:
+  level: info  # debug
+
+totp:
+  issuer: authelia.com
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+
+access_control:
+  default_policy: deny
+  rules:
+    # Rules applied to everyone
+    - domain: traefik.example.com
+      policy: one_factor
+    - domain: fs.example.com
+      policy: one_factor
+
+session:
+  # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
+  secret: unsecure_session_secret
+
+  cookies:
+    - name: authelia_session
+      domain: example.com  # Should match whatever your root protected domain is
+      default_redirection_url: https://fs.example.com
+      authelia_url: https://authelia.example.com/
+      expiration: 3600  # 1 hour
+      inactivity: 300  # 5 minutes
+
+  redis:
+    host: redis
+    port: 6379
+    # This secret can also be set using the env variables AUTHELIA_SESSION_REDIS_PASSWORD_FILE
+    # password: authelia
+
+regulation:
+  max_retries: 3
+  find_time: 120
+  ban_time: 300
+
+storage:
+  encryption_key: you_must_generate_a_random_string_of_more_than_twenty_chars_and_configure_this
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  disable_startup_check: true
+  smtp:
+    username: test
+    # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
+    password: password
+    host: mail.example.com
+    port: 25
+    sender: admin@example.com

@@ -1,0 +1,18 @@
+# based on https://github.com/authelia/authelia/blob/39763aaed24c4abdecd884b47357a052b235942d/examples/compose/lite/authelia/users_database.yml
+
+# Users Database
+
+# This file can be used if you do not have an LDAP set up.
+
+# List of users
+users:
+  authelia:
+    disabled: false
+    displayname: "Authelia User"
+    # Password is authelia
+    password: "$6$rounds=50000$BpLnfgDsc2WD8F2q$Zis.ixdg9s/UOJYrs56b5QEZFiZECu0qZVNsIYxBaNJ7ucIL.nlxVCT5tqh8KHG8X4tlwCFm5r6NTOZZ5qRFN/"
+    email: authelia@authelia.com
+    groups:
+      - admins
+      - dev
+      - su
