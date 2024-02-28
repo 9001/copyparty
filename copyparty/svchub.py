@@ -94,7 +94,7 @@ class SvcHub(object):
         self.stopping = False
         self.stopped = False
         self.reload_req = False
-        self.reloading = False
+        self.reloading = 0
         self.stop_cond = threading.Condition()
         self.nsigs = 3
         self.retcode = 0
@@ -662,21 +662,24 @@ class SvcHub(object):
                 self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
 
     def reload(self) -> str:
-        if self.reloading:
-            return "cannot reload; already in progress"
+        with self.up2k.mutex:
+            if self.reloading:
+                return "cannot reload; already in progress"
+            self.reloading = 1
 
-        self.reloading = True
         Daemon(self._reload, "reloading")
         return "reload initiated"
 
     def _reload(self) -> None:
-        self.log("root", "reload scheduled")
         with self.up2k.mutex:
+            if self.reloading != 1:
+                return
+            self.reloading = 2
+            self.log("root", "reloading config")
             self.asrv.reload()
             self.up2k.reload()
             self.broker.reload()
-
-        self.reloading = False
+            self.reloading = 0
 
     def stop_thr(self) -> None:
         while not self.stop_req:
