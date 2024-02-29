@@ -104,7 +104,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [sfx](#sfx) - the self-contained "binary"
     * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
 * [install on android](#install-on-android)
-* [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
+* [reporting bugs](#reporting-bugs) - ideas for context to include, and where to submit them
 * [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 
 
@@ -285,6 +285,9 @@ roughly sorted by chance of encounter
 * python 2.7 on Windows:
   * cannot index non-ascii filenames with `-e2d`
   * cannot handle filenames with mojibake
+
+if you have a new exciting bug to share, see [reporting bugs](#reporting-bugs)
+
 
 ## not my bugs
 
@@ -1948,7 +1951,12 @@ if you want thumbnails (photos+videos) and you're okay with spending another 132
 
 # reporting bugs
 
-ideas for context to include in bug reports
+ideas for context to include, and where to submit them
+
+please get in touch using any of the following URLs:
+* https://github.com/9001/copyparty/ **(primary)**
+* https://gitlab.com/9001/copyparty/ *(mirror)*
+* https://codeberg.org/9001/copyparty *(mirror)*
 
 in general, commandline arguments (and config file if any)
 
