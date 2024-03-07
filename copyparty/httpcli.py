@@ -518,9 +518,13 @@ class HttpCli(object):
                 return self.handle_options() and self.keepalive
 
             if not cors_k:
+                host = self.headers.get("host", "<?>")
                 origin = self.headers.get("origin", "<?>")
-                self.log("cors-reject {} from {}".format(self.mode, origin), 3)
-                raise Pebkac(403, "no surfing")
+                proto = "https://" if self.is_https else "http://"
+                guess = "modifying" if (origin and host) else "stripping"
+                t = "cors-reject %s because request-header Origin='%s' does not match request-protocol '%s' and host '%s' based on request-header Host='%s' (note: if this request is not malicious, check if your reverse-proxy is accidentally %s request headers, in particular 'Origin', for example by running copyparty with --ihead='*' to show all request headers)"
+                self.log(t % (self.mode, origin, proto, self.host, host, guess), 3)
+                raise Pebkac(403, "rejected by cors-check")
 
             # getattr(self.mode) is not yet faster than this
             if self.mode == "POST":

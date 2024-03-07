@@ -863,7 +863,7 @@ class AuthSrv(object):
     ) -> None:
         self.line_ctr = 0
 
-        expand_config_file(cfg_lines, fp, "")
+        expand_config_file(self.log, cfg_lines, fp, "")
         if self.args.vc:
             lns = ["{:4}: {}".format(n, s) for n, s in enumerate(cfg_lines, 1)]
             self.log("expanded config file (unprocessed):\n" + "\n".join(lns))
@@ -2101,27 +2101,47 @@ def split_cfg_ln(ln: str) -> dict[str, Any]:
     return ret
 
 
-def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
+def expand_config_file(log: Optional["NamedLogger"], ret: list[str], fp: str, ipath: str) -> None:
     """expand all % file includes"""
     fp = absreal(fp)
     if len(ipath.split(" -> ")) > 64:
         raise Exception("hit max depth of 64 includes")
 
     if os.path.isdir(fp):
-        names = os.listdir(fp)
-        crumb = "#\033[36m cfg files in {} => {}\033[0m".format(fp, names)
-        ret.append(crumb)
-        for fn in sorted(names):
+        names = list(sorted(os.listdir(fp)))
+        cnames = [x for x in names if x.lower().endswith(".conf")]
+        if not cnames:
+            t = "warning: tried to read config-files from folder '%s' but it does not contain any "
+            if names:
+                t += ".conf files; the following files were ignored: %s"
+                t = t % (fp, ", ".join(names[:8]))
+            else:
+                t += "files at all"
+                t = t % (fp,)
+
+            if log:
+                log(t, 3)
+
+            ret.append("#\033[33m %s\033[0m" % (t,))
+        else:
+            zs = "#\033[36m cfg files in %s => %s\033[0m" % (fp, cnames)
+            ret.append(zs)
+
+        for fn in cnames:
             fp2 = os.path.join(fp, fn)
-            if not fp2.endswith(".conf") or fp2 in ipath:
+            if fp2 in ipath:
                 continue
 
-            expand_config_file(ret, fp2, ipath)
+            expand_config_file(log, ret, fp2, ipath)
 
-        if ret[-1] == crumb:
-            # no config files below; remove breadcrumb
-            ret.pop()
+        return
 
+    if not os.path.exists(fp):
+        t = "warning: tried to read config from '%s' but the file/folder does not exist" % (fp,)
+        if log:
+            log(t, 3)
+
+        ret.append("#\033[31m %s\033[0m" % (t,))
         return
 
     ipath += " -> " + fp
@@ -2135,7 +2155,7 @@ def expand_config_file(ret: list[str], fp: str, ipath: str) -> None:
                 fp2 = ln[1:].strip()
                 fp2 = os.path.join(os.path.dirname(fp), fp2)
                 ofs = len(ret)
-                expand_config_file(ret, fp2, ipath)
+                expand_config_file(log, ret, fp2, ipath)
                 for n in range(ofs, len(ret)):
                     ret[n] = pad + ret[n]
                 continue

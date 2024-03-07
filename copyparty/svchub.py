@@ -28,7 +28,7 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, E, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
 from .authsrv import BAD_CFG, AuthSrv
 from .cert import ensure_cert
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
@@ -153,6 +153,8 @@ class SvcHub(object):
         lh = HLog(self.log)
         lg.handlers = [lh]
         lg.setLevel(logging.DEBUG)
+
+        self._check_env()
 
         if args.stackmon:
             start_stackmon(args.stackmon, 0)
@@ -384,6 +386,17 @@ class SvcHub(object):
         self.up2k.init_vols()
 
         Daemon(self.sd_notify, "sd-notify")
+
+    def _check_env(self) -> None:
+        try:
+            files = os.listdir(E.cfg)
+        except:
+            files = []
+
+        hits = [x for x in files if x.lower().endswith(".conf")]
+        if hits:
+            t = "WARNING: found config files in [%s]: %s\n  config files are not expected here, and will NOT be loaded (unless your setup is intentionally hella funky)"
+            self.log("root", t % (E.cfg, ", ".join(hits)), 3)
 
     def _process_config(self) -> bool:
         al = self.args

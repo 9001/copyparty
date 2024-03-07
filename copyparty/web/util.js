@@ -1995,15 +1995,19 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (tag === undefined)
         tag = prefix;
 
-    var errtxt = (xhr.response && xhr.response.err) || xhr.responseText,
+    var errtxt = ((xhr.response && xhr.response.err) || xhr.responseText) || '',
+        suf = '',
         fun = toast[lvl || 'err'],
         is_cf = /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser|\/chall[e]nge-platform|"chall[e]nge-error|nable Ja[v]aScript and cook/.test(errtxt);
 
+    if (errtxt.startsWith('<pre>'))
+        suf = '\n\nerror-details: «' + errtxt.slice(5).split('\n')[0].trim() + '»';
+
     if (xhr.status == 403 && !is_cf)
-        return toast.err(0, prefix + (L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out"), tag);
+        return toast.err(0, prefix + (L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out") + suf, tag);
 
     if (xhr.status == 404)
-        return toast.err(0, prefix + e404, tag);
+        return toast.err(0, prefix + e404 + suf, tag);
 
     if (is_cf && (xhr.status == 403 || xhr.status == 503)) {
         var now = Date.now(), td = now - cf_cha_t;

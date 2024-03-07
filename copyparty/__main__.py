@@ -395,7 +395,7 @@ def configure_ssl_ciphers(al: argparse.Namespace) -> None:
 
 def args_from_cfg(cfg_path: str) -> list[str]:
     lines: list[str] = []
-    expand_config_file(lines, cfg_path, "")
+    expand_config_file(None, lines, cfg_path, "")
     lines = upgrade_cfg_fmt(None, argparse.Namespace(vc=False), lines, "")
 
     ret: list[str] = []
