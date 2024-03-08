@@ -3956,7 +3956,13 @@ class Up2k(object):
 
             if not ANYWIN and sprs and sz > 1024 * 1024:
                 fs = self.fstab.get(pdir)
-                if fs != "ok":
+                if fs == "ok":
+                    pass
+                elif "sparse" in self.flags[job["ptop"]]:
+                    t = "volflag 'sparse' is forcing use of sparse files for uploads to [%s]"
+                    self.log(t % (job["ptop"],))
+                    relabel = True
+                else:
                     relabel = True
                     f.seek(1024 * 1024 - 1)
                     f.write(b"e")

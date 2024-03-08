@@ -116,6 +116,7 @@ flagcats = {
         "hardlink": "does dedup with hardlinks instead of symlinks",
         "neversymlink": "disables symlink fallback; full copy instead",
         "copydupes": "disables dedup, always saves full copies of dupes",
+        "sparse": "force use of sparse files, mainly for s3-backed storage",
         "daw": "enable full WebDAV write support (dangerous);\nPUT-operations will now \033[1;31mOVERWRITE\033[0;35m existing files",
         "nosub": "forces all uploads into the top folder of the vfs",
         "magic": "enables filetype detection for nameless uploads",
