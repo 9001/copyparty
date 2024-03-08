@@ -1722,8 +1722,6 @@ function up2k_init(subtle) {
                         ebi('u2etas').style.textAlign = 'left';
                     }
                     etafun();
-                    if (pvis.act == 'bz')
-                        pvis.changecard('bz');
                 }
 
                 if (flag) {
@@ -1859,6 +1857,9 @@ function up2k_init(subtle) {
         timer.rm(donut.do);
         ebi('u2tabw').style.minHeight = '0px';
         utw_minh = 0;
+
+        if (pvis.act == 'bz')
+            pvis.changecard('bz');
     }
 
     function chill(t) {
