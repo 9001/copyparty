@@ -389,6 +389,8 @@ var Ls = {
 		"md_eshow": "cannot render ",
 		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
 
+		"badreply": "Failed to parse reply from server",
+
 		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
 		"cf_ok": "sorry about that -- DD" + wah + "oS protection kicked in\n\nthings should resume in about 30 sec\n\nif nothing happens, hit F5 to reload the page",
 		"tl_xe1": "could not list subfolders:\n\nerror ",
@@ -887,6 +889,8 @@ var Ls = {
 		"md_eshow": "viser forenklet ",
 		"md_off": "[📜<em>readme</em>] er avskrudd i [⚙️] -- dokument skjult",
 
+		"badreply": "Ugyldig svar ifra serveren",
+
 		"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
 		"cf_ok": "beklager -- liten tilfeldig kontroll, alt OK\n\nting skal fortsette om ca. 30 sekunder\n\nhvis ikkeno skjer, trykk F5 for å laste siden på nytt",
 		"tl_xe1": "kunne ikke hente undermapper:\n\nfeil ",
@@ -969,7 +973,7 @@ var Ls = {
 		"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplasteren</li><li>og forsøk den samme opplastningen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">fikser forhåpentligvis feilen</a> en eller annen gang',
 		"u_s404": "ikke funnet på serveren",
 		"u_expl": "forklar",
-		"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> in <code>about:config</code>",
+		"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> i <code>about:config</code>",
 		"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrutte opplastninger vil muligens ikke oppdages og gjenopptas; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_ts": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;søkeresultater kan være feil; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_turbo_c": "turbo er deaktivert i serverkonfigurasjonen",
@@ -5554,7 +5558,7 @@ document.onkeydown = function (e) {
 
 	function xhr_search_results() {
 		if (this.status !== 200) {
-			var msg = unpre(this.responseText);
+			var msg = hunpre(this.responseText);
 			srch_msg(true, "http " + this.status + ": " + msg);
 			search_in_progress = 0;
 			return;
@@ -7494,7 +7498,7 @@ var msel = (function () {
 		xhrchk(this, L.fd_xe1, L.fd_xe2);
 
 		if (this.status !== 201) {
-			sf.textContent = 'error: ' + unpre(this.responseText);
+			sf.textContent = 'error: ' + hunpre(this.responseText);
 			return;
 		}
 
@@ -7542,7 +7546,7 @@ var msel = (function () {
 		xhrchk(this, L.fsm_xe1, L.fsm_xe2);
 
 		if (this.status < 200 || this.status > 201) {
-			sf.textContent = 'error: ' + unpre(this.responseText);
+			sf.textContent = 'error: ' + hunpre(this.responseText);
 			return;
 		}
 
@@ -7878,7 +7882,12 @@ var unpost = (function () {
 			if (!xhrchk(this, L.fu_xe1, L.fu_xe2))
 				return ebi('op_unpost').innerHTML = L.fu_xe1;
 
-			var res = JSON.parse(this.responseText);
+			try {
+				var res = JSON.parse(this.responseText);
+			}
+			catch (ex) {
+				return ebi('op_unpost').innerHTML = '<p>' + L.badreply + ':</p>' + unpre(this.responseText);
+			}
 			if (res.length) {
 				if (res.length == 2000)
 					html.push("<p>" + L.un_max);

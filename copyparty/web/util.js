@@ -1417,8 +1417,11 @@ function lf2br(txt) {
 }
 
 
-function unpre(txt) {
+function hunpre(txt) {
     return ('' + txt).replace(/^<pre>/, '');
+}
+function unpre(txt) {
+    return esc(hunpre(txt));
 }
 
 
@@ -2001,7 +2004,9 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
         is_cf = /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser|\/chall[e]nge-platform|"chall[e]nge-error|nable Ja[v]aScript and cook/.test(errtxt);
 
     if (errtxt.startsWith('<pre>'))
-        suf = '\n\nerror-details: «' + errtxt.slice(5).split('\n')[0].trim() + '»';
+        suf = '\n\nerror-details: «' + unpre(errtxt).split('\n')[0].trim() + '»';
+    else
+        errtxt = esc(errtxt).slice(0, 32768);
 
     if (xhr.status == 403 && !is_cf)
         return toast.err(0, prefix + (L && L.xhr403 || "403: access denied\n\ntry pressing F5, maybe you got logged out") + suf, tag);
