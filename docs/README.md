@@ -13,6 +13,9 @@
 
 # other stuff
 
+## [`TODO.md`](TODO.md)
+* planned features / fixes / changes
+
 ## [`example.conf`](example.conf)
 * example config file for `-c`
 

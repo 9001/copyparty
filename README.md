@@ -344,6 +344,12 @@ upgrade notes
   * yes, using the [`g` permission](#accounts-and-volumes), see the examples there
   * you can also do this with linux filesystem permissions; `chmod 111 music` will make it possible to access files and folders inside the `music` folder but not list the immediate contents -- also works with other software, not just copyparty
 
+* can I link someone to a password-protected volume/file by including the password in the URL?
+  * yes, by adding `?pw=hunter2` to the end; replace `?` with `&` if there are parameters in the URL already, meaning it contains a `?` near the end
+
+* how do I stop `.hist` folders from appearing everywhere on my HDD?
+  * by default, a `.hist` folder is created inside each volume for the filesystem index, thumbnails, audio transcodes, and markdown document history. Use the `--hist` global-option or the `hist` volflag to move it somewhere else; see [database location](#database-location)
+
 * can I make copyparty download a file to my server if I give it a URL?
   * yes, using [hooks](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
 
@@ -1971,3 +1977,6 @@ if there's a wall of base64 in the log (thread stacks) then please include that,
 # devnotes
 
 for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
+
+see [./docs/TODO.md](./docs/TODO.md) for planned features / fixes / changes
+
