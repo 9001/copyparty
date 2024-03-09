@@ -2868,6 +2868,8 @@ function up2k_init(subtle) {
                 new_state = false;
                 fixed = true;
             }
+            if (new_state === undefined)
+                new_state = can_write ? false : have_up2k_idx ? true : undefined;
         }
 
         if (new_state === undefined)
