@@ -655,7 +655,11 @@ class HttpCli(object):
 
     def k304(self) -> bool:
         k304 = self.cookies.get("k304")
-        return k304 == "y" or ("; Trident/" in self.ua and not k304)
+        return (
+            k304 == "y"
+            or (self.args.k304 == 2 and k304 != "n")
+            or ("; Trident/" in self.ua and not k304)
+        )
 
     def send_headers(
         self,
@@ -3352,6 +3356,7 @@ class HttpCli(object):
             dbwt=vs["dbwt"],
             url_suf=suf,
             k304=self.k304(),
+            k304vis=self.args.k304 > 0,
             ver=S_VERSION if self.args.ver else "",
             ahttps="" if self.is_https else "https://" + self.host + self.req,
         )
@@ -3360,7 +3365,7 @@ class HttpCli(object):
 
     def set_k304(self) -> bool:
         v = self.uparam["k304"].lower()
-        if v == "y":
+        if v in "yn":
             dur = 86400 * 299
         else:
             dur = 0
