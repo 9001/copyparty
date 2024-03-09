@@ -319,7 +319,9 @@ class HttpCli(object):
                 if self.args.xff_re and not self.args.xff_re.match(pip):
                     t = 'got header "%s" from untrusted source "%s" claiming the true client ip is "%s" (raw value: "%s");  if you trust this, you must allowlist this proxy with "--xff-src=%s"'
                     if self.headers.get("cf-connecting-ip"):
-                        t += "  Alternatively, if you are behind cloudflare, it is better to specify these two instead:  --xff-hdr=cf-connecting-ip  --xff-src=any"
+                        t += '  Note: if you are behind cloudflare, then this default header is not a good choice; please first make sure your local reverse-proxy (if any) does not allow non-cloudflare IPs from providing cf-* headers, and then add this additional global setting: "--xff-hdr=cf-connecting-ip"'
+                    else:
+                        t += '  Note: depending on your reverse-proxy, and/or WAF, and/or other intermediates, you may want to read the true client IP from another header by also specifying "--xff-hdr=SomeOtherHeader"'
                     zs = (
                         ".".join(pip.split(".")[:2]) + "."
                         if "." in pip
