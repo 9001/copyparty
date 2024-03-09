@@ -6,7 +6,7 @@ var Ls = {
 		"d1": "tilstand",
 		"d2": "vis tilstanden til alle tråder",
 		"e1": "last innst.",
-		"e2": "leser inn konfigurasjonsfiler på nytt$N(kontoer, volumer, volumbrytere)$Nog kartlegger alle e2ds-volumer",
+		"e2": "leser inn konfigurasjonsfiler på nytt$N(kontoer, volumer, volumbrytere)$Nog kartlegger alle e2ds-volumer$N$Nmerk: endringer i globale parametere$Nkrever en full restart for å ta gjenge",
 		"f1": "du kan betrakte:",
 		"g1": "du kan laste opp til:",
 		"cc1": "klient-konfigurasjon",
@@ -30,7 +30,7 @@ var Ls = {
 	},
 	"eng": {
 		"d2": "shows the state of all active threads",
-		"e2": "reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes",
+		"e2": "reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes$N$Nnote: any changes to global settings$Nrequire a full restart to take effect",
 		"u2": "time since the last server write$N( upload / rename / ... )$N$N17d = 17 days$N1h23 = 1 hour 23 minutes$N4m56 = 4 minutes 56 seconds",
 		"v2": "use this server as a local HDD$N$NWARNING: this will show your password!",
 	}
