@@ -1,0 +1,13 @@
+{
+  "Name": "copyparty",
+  "DestinationType": "ImageUploader, TextUploader, FileUploader",
+  "RequestURL": "http://127.0.0.1:3923/sharex",
+  "FileFormName": "f",
+  "Arguments": {
+    "act": "bput"
+  },
+  "Headers": {
+    "accept": "url",
+    "pw": "PUT_YOUR_PASSWORD_HERE_MY_DUDE"
+  }
+}

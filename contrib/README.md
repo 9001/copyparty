@@ -16,6 +16,8 @@
 * sharex config file to upload screenshots and grab the URL
 * `RequestURL`: full URL to the target folder
 * `pw`: password (remove the `pw` line if anon-write)
+* the `act:bput` thing is optional since copyparty v1.9.29
+* using an older sharex version, maybe sharex v12.1.1 for example? dw fam i got your back 👉😎👉 [`sharex12.sxcu`](sharex12.sxcu)
 
 ### [`send-to-cpp.contextlet.json`](send-to-cpp.contextlet.json)
 * browser integration, kind of? custom rightclick actions and stuff
