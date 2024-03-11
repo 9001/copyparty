@@ -1839,6 +1839,10 @@ html.y #tree.nowrap .ntree a+a:hover {
 	margin: 0;
 	padding: 0;
 }
+#unpost td:nth-child(3),
+#unpost td:nth-child(4) {
+	text-align: right;
+}
 #rui {
 	background: #fff;
 	background: var(--bg);

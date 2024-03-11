@@ -360,7 +360,7 @@ class Tftpd(object):
             yeet("attempted delete of non-empty file")
 
         vpath = vpath.replace("\\", "/").lstrip("/")
-        self.hub.up2k.handle_rm("*", "8.3.8.7", [vpath], [], False)
+        self.hub.up2k.handle_rm("*", "8.3.8.7", [vpath], [], False, False)
 
     def _access(self, *a: Any) -> bool:
         return True

@@ -3550,8 +3550,7 @@ class HttpCli(object):
         return ret
 
     def tx_ups(self) -> bool:
-        if not self.args.unpost:
-            raise Pebkac(403, "the unpost feature is disabled in server config")
+        have_unpost = self.args.unpost and "e2d" in self.vn.flags
 
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
@@ -3570,7 +3569,14 @@ class HttpCli(object):
             if "fk" in vol.flags
             and (self.uname in vol.axs.uread or self.uname in vol.axs.upget)
         }
-        for vol in self.asrv.vfs.all_vols.values():
+
+        x = self.conn.hsrv.broker.ask(
+            "up2k.get_unfinished_by_user", self.uname, self.ip
+        )
+        uret = x.get()
+
+        allvols = self.asrv.vfs.all_vols if have_unpost else {}
+        for vol in allvols.values():
             cur = idx.get_cur(vol.realpath)
             if not cur:
                 continue
@@ -3622,9 +3628,13 @@ class HttpCli(object):
             for v in ret:
                 v["vp"] = self.args.SR + v["vp"]
 
-        jtxt = json.dumps(ret, indent=2, sort_keys=True).encode("utf-8", "replace")
-        self.log("{} #{} {:.2f}sec".format(lm, len(ret), time.time() - t0))
-        self.reply(jtxt, mime="application/json")
+        if not have_unpost:
+            ret = [{"kinshi":1}]
+
+        jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, indent=0))
+        zi = len(uret.split('\n"pd":')) - 1
+        self.log("%s #%d+%d %.2fsec" % (lm, zi, len(ret), time.time() - t0))
+        self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
         return True
 
     def handle_rm(self, req: list[str]) -> bool:
@@ -3639,11 +3649,12 @@ class HttpCli(object):
         elif self.is_vproxied:
             req = [x[len(self.args.SR) :] for x in req]
 
+        unpost = "unpost" in self.uparam
         nlim = int(self.uparam.get("lim") or 0)
         lim = [nlim, nlim] if nlim else []
 
         x = self.conn.hsrv.broker.ask(
-            "up2k.handle_rm", self.uname, self.ip, req, lim, False
+            "up2k.handle_rm", self.uname, self.ip, req, lim, False, unpost
         )
         self.loud_reply(x.get())
         return True

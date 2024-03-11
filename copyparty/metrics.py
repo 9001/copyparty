@@ -206,6 +206,9 @@ class Metrics(object):
             try:
                 x = self.hsrv.broker.ask("up2k.get_unfinished")
                 xs = x.get()
+                if not xs:
+                    raise Exception("up2k mutex acquisition timed out")
+
                 xj = json.loads(xs)
                 for ptop, (nbytes, nfiles) in xj.items():
                     tnbytes += nbytes

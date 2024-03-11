@@ -1485,7 +1485,7 @@ class AuthSrv(object):
                 if k not in vol.flags:
                     vol.flags[k] = getattr(self.args, k)
 
-            for k in ("nrand",):
+            for k in ("nrand", "u2abort"):
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
 
@@ -2101,7 +2101,9 @@ def split_cfg_ln(ln: str) -> dict[str, Any]:
     return ret
 
 
-def expand_config_file(log: Optional["NamedLogger"], ret: list[str], fp: str, ipath: str) -> None:
+def expand_config_file(
+    log: Optional["NamedLogger"], ret: list[str], fp: str, ipath: str
+) -> None:
     """expand all % file includes"""
     fp = absreal(fp)
     if len(ipath.split(" -> ")) > 64:
@@ -2137,7 +2139,8 @@ def expand_config_file(log: Optional["NamedLogger"], ret: list[str], fp: str, ip
         return
 
     if not os.path.exists(fp):
-        t = "warning: tried to read config from '%s' but the file/folder does not exist" % (fp,)
+        t = "warning: tried to read config from '%s' but the file/folder does not exist"
+        t = t % (fp,)
         if log:
             log(t, 3)
 

@@ -282,9 +282,44 @@ class Up2k(object):
         }
         return json.dumps(ret, indent=4)
 
+    def get_unfinished_by_user(self, uname, ip) -> str:
+        if PY2 or not self.mutex.acquire(timeout=2):
+            return '[{"timeout":1}]'
+
+        ret: list[tuple[int, str, int, int, int]] = []
+        try:
+            for ptop, tab2 in self.registry.items():
+                cfg = self.flags.get(ptop, {}).get("u2abort", 1)
+                if not cfg:
+                    continue
+                addr = (ip or "\n") if cfg in (1, 2) else ""
+                user = (uname or "\n") if cfg in (1, 3) else ""
+                drp = self.droppable.get(ptop, {})
+                for wark, job in tab2.items():
+                    if wark in drp or (user and user != job["user"]) or (addr and addr != job["addr"]):
+                        continue
+
+                    zt5 = (
+                        int(job["t0"]),
+                        djoin(job["vtop"], job["prel"], job["name"]),
+                        job["size"],
+                        len(job["need"]),
+                        len(job["hash"]),
+                    )
+                    ret.append(zt5)
+        finally:
+            self.mutex.release()
+
+        ret.sort(reverse=True)
+        ret2 = [
+            {"at": at, "vp": "/" + vp, "pd": 100 - ((nn * 100) // (nh or 1)), "sz": sz}
+            for (at, vp, sz, nn, nh) in ret
+        ]
+        return json.dumps(ret2, indent=0)
+
     def get_unfinished(self) -> str:
         if PY2 or not self.mutex.acquire(timeout=0.5):
-            return "{}"
+            return ""
 
         ret: dict[str, tuple[int, int]] = {}
         try:
@@ -463,7 +498,7 @@ class Up2k(object):
                     if vp:
                         fvp = "%s/%s" % (vp, fvp)
 
-                    self._handle_rm(LEELOO_DALLAS, "", fvp, [], True)
+                    self._handle_rm(LEELOO_DALLAS, "", fvp, [], True, False)
                     nrm += 1
 
             if nrm:
@@ -2690,6 +2725,9 @@ class Up2k(object):
                             a = [job[x] for x in zs.split()]
                             self.db_add(cur, vfs.flags, *a)
                             cur.connection.commit()
+                elif wark in reg:
+                    # checks out, but client may have hopped IPs
+                    job["addr"] = cj["addr"]
 
             if not job:
                 ap1 = djoin(cj["ptop"], cj["prel"])
@@ -3226,7 +3264,7 @@ class Up2k(object):
                 pass
 
     def handle_rm(
-        self, uname: str, ip: str, vpaths: list[str], lim: list[int], rm_up: bool
+        self, uname: str, ip: str, vpaths: list[str], lim: list[int], rm_up: bool, unpost: bool
     ) -> str:
         n_files = 0
         ok = {}
@@ -3236,7 +3274,7 @@ class Up2k(object):
                 self.log("hit delete limit of {} files".format(lim[1]), 3)
                 break
 
-            a, b, c = self._handle_rm(uname, ip, vp, lim, rm_up)
+            a, b, c = self._handle_rm(uname, ip, vp, lim, rm_up, unpost)
             n_files += a
             for k in b:
                 ok[k] = 1
@@ -3250,25 +3288,42 @@ class Up2k(object):
         return "deleted {} files (and {}/{} folders)".format(n_files, iok, iok + ing)
 
     def _handle_rm(
-        self, uname: str, ip: str, vpath: str, lim: list[int], rm_up: bool
+        self, uname: str, ip: str, vpath: str, lim: list[int], rm_up: bool, unpost: bool
     ) -> tuple[int, list[str], list[str]]:
         self.db_act = time.time()
-        try:
+        partial = ""
+        if not unpost:
             permsets = [[True, False, False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             vn, rem = vn.get_dbv(rem)
-            unpost = False
-        except:
+        else:
             # unpost with missing permissions? verify with db
-            if not self.args.unpost:
-                raise Pebkac(400, "the unpost feature is disabled in server config")
-
-            unpost = True
             permsets = [[False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             vn, rem = vn.get_dbv(rem)
+            ptop = vn.realpath
             with self.mutex:
-                _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
+                abrt_cfg = self.flags.get(ptop, {}).get("u2abort", 1)
+                addr = (ip or "\n") if abrt_cfg in (1, 2) else ""
+                user = (uname or "\n") if abrt_cfg in (1, 3) else ""
+                reg = self.registry.get(ptop, {}) if abrt_cfg else {}
+                for wark, job in reg.items():
+                    if (user and user != job["user"]) or (addr and addr != job["addr"]):
+                        continue
+                    if djoin(job["prel"], job["name"]) == rem:
+                        if job["ptop"] != ptop:
+                            t = "job.ptop [%s] != vol.ptop [%s] ??"
+                            raise Exception(t % (job["ptop"] != ptop))
+                        partial = vn.canonical(vjoin(job["prel"], job["tnam"]))
+                        break
+                if partial:
+                    dip = ip
+                    dat = time.time()
+                else:
+                    if not self.args.unpost:
+                        raise Pebkac(400, "the unpost feature is disabled in server config")
+
+                    _, _, _, _, dip, dat = self._find_from_vpath(ptop, rem)
 
             t = "you cannot delete this: "
             if not dip:
@@ -3361,6 +3416,9 @@ class Up2k(object):
                             cur.connection.commit()
 
                 wunlink(self.log, abspath, dbv.flags)
+                if partial:
+                    wunlink(self.log, partial, dbv.flags)
+                    partial = ""
                 if xad:
                     runhook(
                         self.log,

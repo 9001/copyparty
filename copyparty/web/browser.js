@@ -102,7 +102,7 @@ var Ls = {
 		"access": " access",
 		"ot_close": "close submenu",
 		"ot_search": "search for files by attributes, path / name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both «foo» and «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain «foo» but not «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with «yana» and be an «opus» file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N&lt;code&gt;2009-12-31&lt;/code&gt; or &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
-		"ot_unpost": "unpost: delete your recent uploads",
+		"ot_unpost": "unpost: delete your recent uploads, or abort unfinished ones",
 		"ot_bup": "bup: basic uploader, even supports netscape 4.0",
 		"ot_mkdir": "mkdir: create a new directory",
 		"ot_md": "new-md: create a new markdown document",
@@ -412,7 +412,7 @@ var Ls = {
 		"fz_zipd": "zip with traditional cp437 filenames, for really old software",
 		"fz_zipc": "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)",
 
-		"un_m1": "you can delete your recent uploads below",
+		"un_m1": "you can delete your recent uploads (or abort unfinished ones) below",
 		"un_upd": "refresh",
 		"un_m4": "or share the files visible below:",
 		"un_ulist": "show",
@@ -421,12 +421,15 @@ var Ls = {
 		"un_fclr": "clear filter",
 		"un_derr": 'unpost-delete failed:\n',
 		"un_f5": 'something broke, please try a refresh or hit F5',
+		"un_nou": '<b>warning:</b> server too busy to show unfinished uploads; click the "refresh" link in a bit',
+		"un_noc": '<b>warning:</b> unpost of fully uploaded files is not enabled/permitted in server config',
 		"un_max": "showing first 2000 files (use the filter)",
-		"un_avail": "{0} uploads can be deleted",
-		"un_m2": "sorted by upload time &ndash; most recent first:",
+		"un_avail": "{0} recent uploads can be deleted<br />{1} unfinished ones can be aborted",
+		"un_m2": "sorted by upload time; most recent first:",
 		"un_no1": "sike! no uploads are sufficiently recent",
 		"un_no2": "sike! no uploads matching that filter are sufficiently recent",
 		"un_next": "delete the next {0} files below",
+		"un_abrt": "abort",
 		"un_del": "delete",
 		"un_m3": "loading your recent uploads...",
 		"un_busy": "deleting {0} files...",
@@ -912,7 +915,7 @@ var Ls = {
 		"fz_zipd": "zip med filnavn i cp437, for høggamle maskiner",
 		"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",
 
-		"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp",
+		"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp, eller avbryte ufullstendige opplastninger",
 		"un_upd": "oppdater",
 		"un_m4": "eller hvis du vil dele nedlastnings-lenkene:",
 		"un_ulist": "vis",
@@ -921,12 +924,15 @@ var Ls = {
 		"un_fclr": "nullstill filter",
 		"un_derr": 'unpost-sletting feilet:\n',
 		"un_f5": 'noe gikk galt, prøv å oppdatere listen eller trykk F5',
+		"un_nou": '<b>advarsel:</b> kan ikke vise ufullstendige opplastninger akkurat nå; klikk på oppdater-linken om litt',
+		"un_noc": '<b>advarsel:</b> angring av fullførte opplastninger er deaktivert i serverkonfigurasjonen',
 		"un_max": "viser de første 2000 filene (bruk filteret for å innsnevre)",
-		"un_avail": "{0} filer kan slettes",
-		"un_m2": "sortert etter opplastningstid &ndash; nyeste først:",
+		"un_avail": "{0} nylig opplastede filer kan slettes<br />{1} ufullstendige opplastninger kan avbrytes",
+		"un_m2": "sortert etter opplastningstid; nyeste først:",
 		"un_no1": "men nei, her var det jaggu ikkeno som slettes kan",
 		"un_no2": "men nei, her var det jaggu ingenting som passet overens med filteret",
 		"un_next": "slett de neste {0} filene nedenfor",
+		"un_abrt": "avbryt",
 		"un_del": "slett",
 		"un_m3": "henter listen med nylig opplastede filer...",
 		"un_busy": "sletter {0} filer...",
@@ -1030,7 +1036,7 @@ modal.load();
 ebi('ops').innerHTML = (
 	'<a href="#" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
-	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="' + L.ot_unpost + '">🧯</a>' : '') +
+	(have_del ? '<a href="#" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" data-dest="up2k">🚀</a>' +
 	'<a href="#" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
 	'<a href="#" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
@@ -7883,19 +7889,38 @@ var unpost = (function () {
 				return ebi('op_unpost').innerHTML = L.fu_xe1;
 
 			try {
-				var res = JSON.parse(this.responseText);
+				var ores = JSON.parse(this.responseText);
 			}
 			catch (ex) {
 				return ebi('op_unpost').innerHTML = '<p>' + L.badreply + ':</p>' + unpre(this.responseText);
 			}
+
+			if (ores.u.length == 1 && ores.u[0].timeout) {
+				html.push('<p>' + L.un_nou + '</p>');
+				ores.u = [];
+			}
+
+			if (ores.c.length == 1 && ores.c[0].kinshi) {
+				html.push('<p>' + L.un_noc + '</p>');
+				ores.c = [];
+			}
+
+			for (var a = 0; a < ores.u.length; a++)
+				ores.u[a].k = 'u';
+
+			for (var a = 0; a < ores.c.length; a++)
+				ores.c[a].k = 'c';
+
+			var res = ores.u.concat(ores.c);
+
 			if (res.length) {
 				if (res.length == 2000)
 					html.push("<p>" + L.un_max);
 				else
-					html.push("<p>" + L.un_avail.format(res.length));
+					html.push("<p>" + L.un_avail.format(ores.c.length, ores.u.length));
 
-				html.push(" &ndash; " + L.un_m2 + "</p>");
-				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>file</td></tr></thead><tbody>");
+				html.push("<br />" + L.un_m2 + "</p>");
+				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>done</td><td>file</td></tr></thead><tbody>");
 			}
 			else
 				html.push('-- <em>' + (filt.value ? L.un_no2 : L.un_no1) + '</em>');
@@ -7908,10 +7933,13 @@ var unpost = (function () {
 							'<tr><td></td><td colspan="3" style="padding:.5em">' +
 							'<a me="' + me + '" class="n' + a + '" n2="' + (a + mods[b]) +
 							'" href="#">' + L.un_next.format(Math.min(mods[b], res.length - a)) + '</a></td></tr>');
+
+				var done = res[a].k == 'c';
 				html.push(
-					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + L.un_del + '</a></td>' +
+					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + (done ? L.un_del : L.un_abrt) + '</a></td>' +
 					'<td>' + unix2iso(res[a].at) + '</td>' +
-					'<td>' + res[a].sz + '</td>' +
+					'<td>' + ('' + res[a].sz).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + '</td>' +
+					(done ? '<td>100%</td>' : '<td>' + res[a].pd + '%</td>') +
 					'<td>' + linksplit(res[a].vp).join('<span> / </span>') + '</td></tr>');
 			}
 
@@ -7997,7 +8025,7 @@ var unpost = (function () {
 		var xhr = new XHR();
 		xhr.n = n;
 		xhr.n2 = n2;
-		xhr.open('POST', SR + '/?delete&lim=' + req.length, true);
+		xhr.open('POST', SR + '/?delete&unpost&lim=' + req.length, true);
 		xhr.onload = xhr.onerror = unpost_delete_cb;
 		xhr.send(JSON.stringify(req));
 	};

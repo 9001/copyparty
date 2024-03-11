@@ -119,13 +119,13 @@ class Cfg(Namespace):
         ex = "ah_cli ah_gen css_browser hist ipa_re js_browser no_forget no_hash no_idx nonsus_urls"
         ka.update(**{k: None for k in ex.split()})
 
-        ex = "hash_mt srch_time u2j"
+        ex = "hash_mt srch_time u2abort u2j"
         ka.update(**{k: 1 for k in ex.split()})
 
         ex = "reg_cap s_thead s_tbody th_convt"
         ka.update(**{k: 9 for k in ex.split()})
 
-        ex = "db_act df loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
+        ex = "db_act df k304 loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
         ex = "ah_alg bname doctitle exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
