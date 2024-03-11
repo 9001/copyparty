@@ -296,7 +296,11 @@ class Up2k(object):
                 user = (uname or "\n") if cfg in (1, 3) else ""
                 drp = self.droppable.get(ptop, {})
                 for wark, job in tab2.items():
-                    if wark in drp or (user and user != job["user"]) or (addr and addr != job["addr"]):
+                    if (
+                        wark in drp
+                        or (user and user != job["user"])
+                        or (addr and addr != job["addr"])
+                    ):
                         continue
 
                     zt5 = (
@@ -3264,7 +3268,13 @@ class Up2k(object):
                 pass
 
     def handle_rm(
-        self, uname: str, ip: str, vpaths: list[str], lim: list[int], rm_up: bool, unpost: bool
+        self,
+        uname: str,
+        ip: str,
+        vpaths: list[str],
+        lim: list[int],
+        rm_up: bool,
+        unpost: bool,
     ) -> str:
         n_files = 0
         ok = {}
@@ -3321,7 +3331,8 @@ class Up2k(object):
                     dat = time.time()
                 else:
                     if not self.args.unpost:
-                        raise Pebkac(400, "the unpost feature is disabled in server config")
+                        t = "the unpost feature is disabled in server config"
+                        raise Pebkac(400, t)
 
                     _, _, _, _, dip, dat = self._find_from_vpath(ptop, rem)
 

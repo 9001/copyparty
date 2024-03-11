@@ -3629,7 +3629,7 @@ class HttpCli(object):
                 v["vp"] = self.args.SR + v["vp"]
 
         if not have_unpost:
-            ret = [{"kinshi":1}]
+            ret = [{"kinshi": 1}]
 
         jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, indent=0))
         zi = len(uret.split('\n"pd":')) - 1
