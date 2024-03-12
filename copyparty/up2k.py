@@ -200,15 +200,15 @@ class Up2k(object):
         Daemon(self.deferred_init, "up2k-deferred-init")
 
     def reload(self, rescan_all_vols: bool) -> None:
-        self.gid += 1
-        self.log("reload #{} initiated".format(self.gid))
+        """mutex me"""
+        self.log("reload #{} scheduled".format(self.gid + 1))
         all_vols = self.asrv.vfs.all_vols
 
         scan_vols = [k for k, v in all_vols.items() if v.realpath not in self.registry]
         if rescan_all_vols:
             scan_vols = list(all_vols.keys())
 
-        self.rescan(all_vols, scan_vols, True, False)
+        self._rescan(all_vols, scan_vols, True, False)
 
     def deferred_init(self) -> None:
         all_vols = self.asrv.vfs.all_vols
@@ -237,7 +237,7 @@ class Up2k(object):
                 for n in range(max(1, self.args.mtag_mt)):
                     Daemon(self._tagger, "tagger-{}".format(n))
 
-                Daemon(self._run_all_mtp, "up2k-mtp-init")
+                Daemon(self._run_all_mtp, "up2k-mtp-init", (self.gid,))
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         if self.pp:
@@ -287,9 +287,48 @@ class Up2k(object):
         }
         return json.dumps(ret, indent=4)
 
+    def get_unfinished_by_user(self, uname, ip) -> str:
+        if PY2 or not self.mutex.acquire(timeout=2):
+            return '[{"timeout":1}]'
+
+        ret: list[tuple[int, str, int, int, int]] = []
+        try:
+            for ptop, tab2 in self.registry.items():
+                cfg = self.flags.get(ptop, {}).get("u2abort", 1)
+                if not cfg:
+                    continue
+                addr = (ip or "\n") if cfg in (1, 2) else ""
+                user = (uname or "\n") if cfg in (1, 3) else ""
+                drp = self.droppable.get(ptop, {})
+                for wark, job in tab2.items():
+                    if (
+                        wark in drp
+                        or (user and user != job["user"])
+                        or (addr and addr != job["addr"])
+                    ):
+                        continue
+
+                    zt5 = (
+                        int(job["t0"]),
+                        djoin(job["vtop"], job["prel"], job["name"]),
+                        job["size"],
+                        len(job["need"]),
+                        len(job["hash"]),
+                    )
+                    ret.append(zt5)
+        finally:
+            self.mutex.release()
+
+        ret.sort(reverse=True)
+        ret2 = [
+            {"at": at, "vp": "/" + vp, "pd": 100 - ((nn * 100) // (nh or 1)), "sz": sz}
+            for (at, vp, sz, nn, nh) in ret
+        ]
+        return json.dumps(ret2, indent=0)
+
     def get_unfinished(self) -> str:
         if PY2 or not self.mutex.acquire(timeout=0.5):
-            return "{}"
+            return ""
 
         ret: dict[str, tuple[int, int]] = {}
         try:
@@ -342,14 +381,21 @@ class Up2k(object):
     def rescan(
         self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool, fscan: bool
     ) -> str:
+        with self.mutex:
+            return self._rescan(all_vols, scan_vols, wait, fscan)
+
+    def _rescan(
+        self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool, fscan: bool
+    ) -> str:
+        """mutex me"""
         if not wait and self.pp:
             return "cannot initiate; scan is already in progress"
 
-        args = (all_vols, scan_vols, fscan)
+        self.gid += 1
         Daemon(
             self.init_indexes,
             "up2k-rescan-{}".format(scan_vols[0] if scan_vols else "all"),
-            args,
+            (all_vols, scan_vols, fscan, self.gid),
         )
         return ""
 
@@ -461,7 +507,7 @@ class Up2k(object):
                     if vp:
                         fvp = "%s/%s" % (vp, fvp)
 
-                    self._handle_rm(LEELOO_DALLAS, "", fvp, [], True)
+                    self._handle_rm(LEELOO_DALLAS, "", fvp, [], True, False)
                     nrm += 1
 
             if nrm:
@@ -580,19 +626,32 @@ class Up2k(object):
         return True, ret
 
     def init_indexes(
-        self, all_vols: dict[str, VFS], scan_vols: list[str], fscan: bool
+        self, all_vols: dict[str, VFS], scan_vols: list[str], fscan: bool, gid: int = 0
     ) -> bool:
-        gid = self.gid
-        while self.pp and gid == self.gid:
-            time.sleep(0.1)
+        if not gid:
+            with self.mutex:
+                gid = self.gid
 
-        if gid != self.gid:
-            return False
+        nspin = 0
+        while True:
+            nspin += 1
+            if nspin > 1:
+                time.sleep(0.1)
+
+            with self.mutex:
+                if gid != self.gid:
+                    return False
+
+                if self.pp:
+                    continue
+
+                self.pp = ProgressPrinter(self.log, self.args)
+
+            break
 
         if gid:
-            self.log("reload #{} running".format(self.gid))
+            self.log("reload #%d running" % (gid,))
 
-        self.pp = ProgressPrinter(self.log, self.args)
         vols = list(all_vols.values())
         t0 = time.time()
         have_e2d = False
@@ -780,7 +839,7 @@ class Up2k(object):
         if self.mtag:
             t = "online (running mtp)"
             if scan_vols:
-                thr = Daemon(self._run_all_mtp, "up2k-mtp-scan", r=False)
+                thr = Daemon(self._run_all_mtp, "up2k-mtp-scan", (gid,), r=False)
         else:
             self.pp = None
             t = "online, idle"
@@ -1814,8 +1873,7 @@ class Up2k(object):
         self.pending_tags = []
         return ret
 
-    def _run_all_mtp(self) -> None:
-        gid = self.gid
+    def _run_all_mtp(self, gid: int) -> None:
         t0 = time.time()
         for ptop, flags in self.flags.items():
             if "mtp" in flags:
@@ -2676,6 +2734,9 @@ class Up2k(object):
                             a = [job[x] for x in zs.split()]
                             self.db_add(cur, vfs.flags, *a)
                             cur.connection.commit()
+                elif wark in reg:
+                    # checks out, but client may have hopped IPs
+                    job["addr"] = cj["addr"]
 
             if not job:
                 ap1 = djoin(cj["ptop"], cj["prel"])
@@ -3212,7 +3273,13 @@ class Up2k(object):
                 pass
 
     def handle_rm(
-        self, uname: str, ip: str, vpaths: list[str], lim: list[int], rm_up: bool
+        self,
+        uname: str,
+        ip: str,
+        vpaths: list[str],
+        lim: list[int],
+        rm_up: bool,
+        unpost: bool,
     ) -> str:
         n_files = 0
         ok = {}
@@ -3222,7 +3289,7 @@ class Up2k(object):
                 self.log("hit delete limit of {} files".format(lim[1]), 3)
                 break
 
-            a, b, c = self._handle_rm(uname, ip, vp, lim, rm_up)
+            a, b, c = self._handle_rm(uname, ip, vp, lim, rm_up, unpost)
             n_files += a
             for k in b:
                 ok[k] = 1
@@ -3236,25 +3303,43 @@ class Up2k(object):
         return "deleted {} files (and {}/{} folders)".format(n_files, iok, iok + ing)
 
     def _handle_rm(
-        self, uname: str, ip: str, vpath: str, lim: list[int], rm_up: bool
+        self, uname: str, ip: str, vpath: str, lim: list[int], rm_up: bool, unpost: bool
     ) -> tuple[int, list[str], list[str]]:
         self.db_act = time.time()
-        try:
+        partial = ""
+        if not unpost:
             permsets = [[True, False, False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             vn, rem = vn.get_dbv(rem)
-            unpost = False
-        except:
+        else:
             # unpost with missing permissions? verify with db
-            if not self.args.unpost:
-                raise Pebkac(400, "the unpost feature is disabled in server config")
-
-            unpost = True
             permsets = [[False, True]]
             vn, rem = self.asrv.vfs.get(vpath, uname, *permsets[0])
             vn, rem = vn.get_dbv(rem)
+            ptop = vn.realpath
             with self.mutex:
-                _, _, _, _, dip, dat = self._find_from_vpath(vn.realpath, rem)
+                abrt_cfg = self.flags.get(ptop, {}).get("u2abort", 1)
+                addr = (ip or "\n") if abrt_cfg in (1, 2) else ""
+                user = (uname or "\n") if abrt_cfg in (1, 3) else ""
+                reg = self.registry.get(ptop, {}) if abrt_cfg else {}
+                for wark, job in reg.items():
+                    if (user and user != job["user"]) or (addr and addr != job["addr"]):
+                        continue
+                    if djoin(job["prel"], job["name"]) == rem:
+                        if job["ptop"] != ptop:
+                            t = "job.ptop [%s] != vol.ptop [%s] ??"
+                            raise Exception(t % (job["ptop"] != ptop))
+                        partial = vn.canonical(vjoin(job["prel"], job["tnam"]))
+                        break
+                if partial:
+                    dip = ip
+                    dat = time.time()
+                else:
+                    if not self.args.unpost:
+                        t = "the unpost feature is disabled in server config"
+                        raise Pebkac(400, t)
+
+                    _, _, _, _, dip, dat = self._find_from_vpath(ptop, rem)
 
             t = "you cannot delete this: "
             if not dip:
@@ -3347,6 +3432,9 @@ class Up2k(object):
                             cur.connection.commit()
 
                 wunlink(self.log, abspath, dbv.flags)
+                if partial:
+                    wunlink(self.log, partial, dbv.flags)
+                    partial = ""
                 if xad:
                     runhook(
                         self.log,
@@ -3942,7 +4030,13 @@ class Up2k(object):
 
             if not ANYWIN and sprs and sz > 1024 * 1024:
                 fs = self.fstab.get(pdir)
-                if fs != "ok":
+                if fs == "ok":
+                    pass
+                elif "sparse" in self.flags[job["ptop"]]:
+                    t = "volflag 'sparse' is forcing use of sparse files for uploads to [%s]"
+                    self.log(t % (job["ptop"],))
+                    relabel = True
+                else:
                     relabel = True
                     f.seek(1024 * 1024 - 1)
                     f.write(b"e")

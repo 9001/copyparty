@@ -66,6 +66,7 @@ def vf_vmap() -> dict[str, str]:
         "rm_retry",
         "sort",
         "unlist",
+        "u2abort",
         "u2ts",
     ):
         ret[k] = k
@@ -116,6 +117,7 @@ flagcats = {
         "hardlink": "does dedup with hardlinks instead of symlinks",
         "neversymlink": "disables symlink fallback; full copy instead",
         "copydupes": "disables dedup, always saves full copies of dupes",
+        "sparse": "force use of sparse files, mainly for s3-backed storage",
         "daw": "enable full WebDAV write support (dangerous);\nPUT-operations will now \033[1;31mOVERWRITE\033[0;35m existing files",
         "nosub": "forces all uploads into the top folder of the vfs",
         "magic": "enables filetype detection for nameless uploads",
@@ -130,6 +132,7 @@ flagcats = {
         "rand": "force randomized filenames, 9 chars long by default",
         "nrand=N": "randomized filenames are N chars long",
         "u2ts=fc": "[f]orce [c]lient-last-modified or [u]pload-time",
+        "u2abort=1": "allow aborting unfinished uploads? 0=no 1=strict 2=ip-chk 3=acct-chk",
         "sz=1k-3m": "allow filesizes between 1 KiB and 3MiB",
         "df=1g": "ensure 1 GiB free disk space",
     },

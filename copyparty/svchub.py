@@ -28,7 +28,7 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, E, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
 from .authsrv import BAD_CFG, AuthSrv
 from .cert import ensure_cert
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
@@ -94,7 +94,7 @@ class SvcHub(object):
         self.stopping = False
         self.stopped = False
         self.reload_req = False
-        self.reloading = False
+        self.reloading = 0
         self.stop_cond = threading.Condition()
         self.nsigs = 3
         self.retcode = 0
@@ -153,6 +153,8 @@ class SvcHub(object):
         lh = HLog(self.log)
         lg.handlers = [lh]
         lg.setLevel(logging.DEBUG)
+
+        self._check_env()
 
         if args.stackmon:
             start_stackmon(args.stackmon, 0)
@@ -384,6 +386,17 @@ class SvcHub(object):
         self.up2k.init_vols()
 
         Daemon(self.sd_notify, "sd-notify")
+
+    def _check_env(self) -> None:
+        try:
+            files = os.listdir(E.cfg)
+        except:
+            files = []
+
+        hits = [x for x in files if x.lower().endswith(".conf")]
+        if hits:
+            t = "WARNING: found config files in [%s]: %s\n  config files are not expected here, and will NOT be loaded (unless your setup is intentionally hella funky)"
+            self.log("root", t % (E.cfg, ", ".join(hits)), 3)
 
     def _process_config(self) -> bool:
         al = self.args
@@ -674,23 +687,24 @@ class SvcHub(object):
                 self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
 
     def reload(self) -> str:
-        if self.reloading:
-            return "cannot reload; already in progress"
+        with self.up2k.mutex:
+            if self.reloading:
+                return "cannot reload; already in progress"
+            self.reloading = 1
 
-        self.reloading = True
         Daemon(self._reload, "reloading")
         return "reload initiated"
 
     def _reload(self, rescan_all_vols: bool = True) -> None:
-        self.reloading = True
-        self.log("root", "reload scheduled")
         with self.up2k.mutex:
-            self.reloading = True
+            if self.reloading != 1:
+                return
+            self.reloading = 2
+            self.log("root", "reloading config")
             self.asrv.reload()
             self.up2k.reload(rescan_all_vols)
             self.broker.reload()
-
-        self.reloading = False
+            self.reloading = 0
 
     def stop_thr(self) -> None:
         while not self.stop_req:

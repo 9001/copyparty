@@ -1,3 +1,8 @@
+:root {
+	--font-main: sans-serif;
+	--font-serif: serif;
+	--font-mono: 'scp';
+}
 html,body,tr,th,td,#files,a {
 	color: inherit;
 	background: none;
@@ -10,6 +15,7 @@ html {
 	color: #ccc;
 	background: #333;
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 	text-shadow: 1px 1px 0px #000;
 	touch-action: manipulation;
 }
@@ -23,6 +29,7 @@ html, body {
 }
 pre {
 	font-family: monospace, monospace;
+	font-family: var(--font-mono), monospace, monospace;
 }
 a {
 	color: #fc5;

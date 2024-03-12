@@ -395,7 +395,7 @@ def configure_ssl_ciphers(al: argparse.Namespace) -> None:
 
 def args_from_cfg(cfg_path: str) -> list[str]:
     lines: list[str] = []
-    expand_config_file(lines, cfg_path, "")
+    expand_config_file(None, lines, cfg_path, "")
     lines = upgrade_cfg_fmt(None, argparse.Namespace(vc=False), lines, "")
 
     ret: list[str] = []
@@ -876,6 +876,7 @@ def add_upload(ap):
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless \033[33m-ed\033[0m")
     ap2.add_argument("--plain-ip", action="store_true", help="when avoiding filename collisions by appending the uploader's ip to the filename: append the plaintext ip instead of salting and hashing the ip")
     ap2.add_argument("--unpost", metavar="SEC", type=int, default=3600*12, help="grace period where uploads can be deleted by the uploader, even without delete permissions; 0=disabled, default=12h")
+    ap2.add_argument("--u2abort", metavar="NUM", type=int, default=1, help="clients can abort incomplete uploads by using the unpost tab (requires \033[33m-e2d\033[0m). [\033[32m0\033[0m] = never allowed (disable feature), [\033[32m1\033[0m] = allow if client has the same IP as the upload AND is using the same account, [\033[32m2\033[0m] = just check the IP, [\033[32m3\033[0m] = just check account-name (volflag=u2abort)")
     ap2.add_argument("--blank-wt", metavar="SEC", type=int, default=300, help="file write grace period (any client can write to a blank file last-modified more recently than \033[33mSEC\033[0m seconds ago)")
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without \033[33m-e2d\033[0m; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload (bad idea to enable this on windows and/or cow filesystems)")
@@ -1274,6 +1275,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--bname", metavar="TXT", type=u, default="--name", help="server name (displayed in filebrowser document title)")
     ap2.add_argument("--pb-url", metavar="URL", type=u, default="https://github.com/9001/copyparty", help="powered-by link; disable with \033[33m-np\033[0m")
     ap2.add_argument("--ver", action="store_true", help="show version on the control panel (incompatible with \033[33m-nb\033[0m)")
+    ap2.add_argument("--k304", metavar="NUM", type=int, default=0, help="configure the option to enable/disable k304 on the controlpanel (workaround for buggy reverse-proxies); [\033[32m0\033[0m] = hidden and default-off, [\033[32m1\033[0m] = visible and default-off, [\033[32m2\033[0m] = visible and default-on")
     ap2.add_argument("--md-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for README.md docs (volflag=md_sbf); see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox")
     ap2.add_argument("--lg-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for prologue/epilogue docs  (volflag=lg_sbf)")
     ap2.add_argument("--no-sb-md", action="store_true", help="don't sandbox README.md documents (volflags: no_sb_md | sb_md)")

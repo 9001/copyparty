@@ -2,6 +2,7 @@ html, body {
 	color: #333;
 	background: #eee;
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 	line-height: 1.5em;
 }
 html.y #helpbox a {
@@ -67,6 +68,7 @@ a {
 	position: relative;
 	display: inline-block;
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 	font-weight: bold;
 	font-size: 1.3em;
 	line-height: .1em;

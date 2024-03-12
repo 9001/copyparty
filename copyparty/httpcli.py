@@ -319,7 +319,9 @@ class HttpCli(object):
                 if self.args.xff_re and not self.args.xff_re.match(pip):
                     t = 'got header "%s" from untrusted source "%s" claiming the true client ip is "%s" (raw value: "%s");  if you trust this, you must allowlist this proxy with "--xff-src=%s"'
                     if self.headers.get("cf-connecting-ip"):
-                        t += "  Alternatively, if you are behind cloudflare, it is better to specify these two instead:  --xff-hdr=cf-connecting-ip  --xff-src=any"
+                        t += '  Note: if you are behind cloudflare, then this default header is not a good choice; please first make sure your local reverse-proxy (if any) does not allow non-cloudflare IPs from providing cf-* headers, and then add this additional global setting: "--xff-hdr=cf-connecting-ip"'
+                    else:
+                        t += '  Note: depending on your reverse-proxy, and/or WAF, and/or other intermediates, you may want to read the true client IP from another header by also specifying "--xff-hdr=SomeOtherHeader"'
                     zs = (
                         ".".join(pip.split(".")[:2]) + "."
                         if "." in pip
@@ -529,9 +531,13 @@ class HttpCli(object):
                 return self.handle_options() and self.keepalive
 
             if not cors_k:
+                host = self.headers.get("host", "<?>")
                 origin = self.headers.get("origin", "<?>")
-                self.log("cors-reject {} from {}".format(self.mode, origin), 3)
-                raise Pebkac(403, "no surfing")
+                proto = "https://" if self.is_https else "http://"
+                guess = "modifying" if (origin and host) else "stripping"
+                t = "cors-reject %s because request-header Origin='%s' does not match request-protocol '%s' and host '%s' based on request-header Host='%s' (note: if this request is not malicious, check if your reverse-proxy is accidentally %s request headers, in particular 'Origin', for example by running copyparty with --ihead='*' to show all request headers)"
+                self.log(t % (self.mode, origin, proto, self.host, host, guess), 3)
+                raise Pebkac(403, "rejected by cors-check")
 
             # getattr(self.mode) is not yet faster than this
             if self.mode == "POST":
@@ -662,7 +668,11 @@ class HttpCli(object):
 
     def k304(self) -> bool:
         k304 = self.cookies.get("k304")
-        return k304 == "y" or ("; Trident/" in self.ua and not k304)
+        return (
+            k304 == "y"
+            or (self.args.k304 == 2 and k304 != "n")
+            or ("; Trident/" in self.ua and not k304)
+        )
 
     def send_headers(
         self,
@@ -2838,11 +2848,11 @@ class HttpCli(object):
         logtail = ""
 
         #
-        # if request is for foo.js, check if we have foo.js.{gz,br}
+        # if request is for foo.js, check if we have foo.js.gz
 
         file_ts = 0.0
         editions: dict[str, tuple[str, int]] = {}
-        for ext in ["", ".gz", ".br"]:
+        for ext in ("", ".gz"):
             try:
                 fs_path = req_path + ext
                 st = bos.stat(fs_path)
@@ -2887,12 +2897,7 @@ class HttpCli(object):
             x.strip()
             for x in self.headers.get("accept-encoding", "").lower().split(",")
         ]
-        if ".br" in editions and "br" in supported_editions:
-            is_compressed = True
-            selected_edition = ".br"
-            fs_path, file_sz = editions[".br"]
-            self.out_headers["Content-Encoding"] = "br"
-        elif ".gz" in editions:
+        if ".gz" in editions:
             is_compressed = True
             selected_edition = ".gz"
             fs_path, file_sz = editions[".gz"]
@@ -2908,13 +2913,8 @@ class HttpCli(object):
             is_compressed = False
             selected_edition = "plain"
 
-        try:
-            fs_path, file_sz = editions[selected_edition]
-            logmsg += "{} ".format(selected_edition.lstrip("."))
-        except:
-            # client is old and we only have .br
-            # (could make brotli a dep to fix this but it's not worth)
-            raise Pebkac(404)
+        fs_path, file_sz = editions[selected_edition]
+        logmsg += "{} ".format(selected_edition.lstrip("."))
 
         #
         # partial
@@ -3369,6 +3369,7 @@ class HttpCli(object):
             dbwt=vs["dbwt"],
             url_suf=suf,
             k304=self.k304(),
+            k304vis=self.args.k304 > 0,
             ver=S_VERSION if self.args.ver else "",
             ahttps="" if self.is_https else "https://" + self.host + self.req,
         )
@@ -3377,7 +3378,7 @@ class HttpCli(object):
 
     def set_k304(self) -> bool:
         v = self.uparam["k304"].lower()
-        if v == "y":
+        if v in "yn":
             dur = 86400 * 299
         else:
             dur = 0
@@ -3560,8 +3561,7 @@ class HttpCli(object):
         return ret
 
     def tx_ups(self) -> bool:
-        if not self.args.unpost:
-            raise Pebkac(403, "the unpost feature is disabled in server config")
+        have_unpost = self.args.unpost and "e2d" in self.vn.flags
 
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
@@ -3580,7 +3580,14 @@ class HttpCli(object):
             if "fk" in vol.flags
             and (self.uname in vol.axs.uread or self.uname in vol.axs.upget)
         }
-        for vol in self.asrv.vfs.all_vols.values():
+
+        x = self.conn.hsrv.broker.ask(
+            "up2k.get_unfinished_by_user", self.uname, self.ip
+        )
+        uret = x.get()
+
+        allvols = self.asrv.vfs.all_vols if have_unpost else {}
+        for vol in allvols.values():
             cur = idx.get_cur(vol.realpath)
             if not cur:
                 continue
@@ -3632,9 +3639,13 @@ class HttpCli(object):
             for v in ret:
                 v["vp"] = self.args.SR + v["vp"]
 
-        jtxt = json.dumps(ret, indent=2, sort_keys=True).encode("utf-8", "replace")
-        self.log("{} #{} {:.2f}sec".format(lm, len(ret), time.time() - t0))
-        self.reply(jtxt, mime="application/json")
+        if not have_unpost:
+            ret = [{"kinshi": 1}]
+
+        jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, indent=0))
+        zi = len(uret.split('\n"pd":')) - 1
+        self.log("%s #%d+%d %.2fsec" % (lm, zi, len(ret), time.time() - t0))
+        self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
         return True
 
     def handle_rm(self, req: list[str]) -> bool:
@@ -3649,11 +3660,12 @@ class HttpCli(object):
         elif self.is_vproxied:
             req = [x[len(self.args.SR) :] for x in req]
 
+        unpost = "unpost" in self.uparam
         nlim = int(self.uparam.get("lim") or 0)
         lim = [nlim, nlim] if nlim else []
 
         x = self.conn.hsrv.broker.ask(
-            "up2k.handle_rm", self.uname, self.ip, req, lim, False
+            "up2k.handle_rm", self.uname, self.ip, req, lim, False, unpost
         )
         self.loud_reply(x.get())
         return True

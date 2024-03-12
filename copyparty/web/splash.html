@@ -7,9 +7,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=0.8">
 	<meta name="theme-color" content="#333">
-{{ html_head }}
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/splash.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
+{{ html_head }}
 </head>
 
 <body>
@@ -78,13 +78,15 @@
 
 		<h1 id="cc">client config:</h1>
 		<ul>
+			{% if k304 or k304vis %}
 			{% if k304 %}
 			<li><a id="h" href="{{ r }}/?k304=n">disable k304</a> (currently enabled)
 			{%- else %}
 			<li><a id="i" href="{{ r }}/?k304=y" class="r">enable k304</a> (currently disabled)
 			{% endif %}
 			<blockquote id="j">enabling this will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general</blockquote></li>
-			
+			{% endif %}
+
 			<li><a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
 		</ul>
 

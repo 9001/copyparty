@@ -102,7 +102,7 @@ var Ls = {
 		"access": " access",
 		"ot_close": "close submenu",
 		"ot_search": "search for files by attributes, path / name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both «foo» and «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain «foo» but not «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with «yana» and be an «opus» file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N&lt;code&gt;2009-12-31&lt;/code&gt; or &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
-		"ot_unpost": "unpost: delete your recent uploads",
+		"ot_unpost": "unpost: delete your recent uploads, or abort unfinished ones",
 		"ot_bup": "bup: basic uploader, even supports netscape 4.0",
 		"ot_mkdir": "mkdir: create a new directory",
 		"ot_md": "new-md: create a new markdown document",
@@ -240,13 +240,14 @@ var Ls = {
 		"ml_drc": "dynamic range compressor",
 
 		"mt_shuf": "shuffle the songs in each folder\">🔀",
+		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
-		"mt_oseek": "allow seeking through os integration\">seek",
+		"mt_oseek": "allow seeking through os integration$N$Nnote: on some devices (iPhones),$Nthis replaces the next-song button\">seek",
 		"mt_oscv": "show album cover in osd\">art",
 		"mt_follow": "keep the playing track scrolled into view\">🎯",
 		"mt_compact": "compact controls\">⟎",
@@ -388,6 +389,8 @@ var Ls = {
 		"md_eshow": "cannot render ",
 		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
 
+		"badreply": "Failed to parse reply from server",
+
 		"xhr403": "403: Access denied\n\ntry pressing F5, maybe you got logged out",
 		"cf_ok": "sorry about that -- DD" + wah + "oS protection kicked in\n\nthings should resume in about 30 sec\n\nif nothing happens, hit F5 to reload the page",
 		"tl_xe1": "could not list subfolders:\n\nerror ",
@@ -409,7 +412,7 @@ var Ls = {
 		"fz_zipd": "zip with traditional cp437 filenames, for really old software",
 		"fz_zipc": "cp437 with crc32 computed early,$Nfor MS-DOS PKZIP v2.04g (october 1993)$N(takes longer to process before download can start)",
 
-		"un_m1": "you can delete your recent uploads below",
+		"un_m1": "you can delete your recent uploads (or abort unfinished ones) below",
 		"un_upd": "refresh",
 		"un_m4": "or share the files visible below:",
 		"un_ulist": "show",
@@ -418,12 +421,15 @@ var Ls = {
 		"un_fclr": "clear filter",
 		"un_derr": 'unpost-delete failed:\n',
 		"un_f5": 'something broke, please try a refresh or hit F5',
+		"un_nou": '<b>warning:</b> server too busy to show unfinished uploads; click the "refresh" link in a bit',
+		"un_noc": '<b>warning:</b> unpost of fully uploaded files is not enabled/permitted in server config',
 		"un_max": "showing first 2000 files (use the filter)",
-		"un_avail": "{0} uploads can be deleted",
-		"un_m2": "sorted by upload time &ndash; most recent first:",
+		"un_avail": "{0} recent uploads can be deleted<br />{1} unfinished ones can be aborted",
+		"un_m2": "sorted by upload time; most recent first:",
 		"un_no1": "sike! no uploads are sufficiently recent",
 		"un_no2": "sike! no uploads matching that filter are sufficiently recent",
 		"un_next": "delete the next {0} files below",
+		"un_abrt": "abort",
 		"un_del": "delete",
 		"un_m3": "loading your recent uploads...",
 		"un_busy": "deleting {0} files...",
@@ -737,13 +743,14 @@ var Ls = {
 		"ml_drc": "compressor (volum-utjevning)",
 
 		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
+		"mt_aplay": "forsøk å starte avspilling hvis linken du klikket på for å åpne nettsiden inneholder en sang-ID$N$Nhvis denne deaktiveres så vil heller ikke nettside-URLen bli oppdatert med sang-ID'er når musikk spilles, i tilfelle innstillingene skulle gå tapt og nettsiden lastes på ny\">a▶",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
-		"mt_oseek": "tillat spoling med fjernkontroll\">spoling",
+		"mt_oseek": "tillat spoling med fjernkontroll$N$Nmerk: på noen enheter (iPhones) så vil$Ndette erstatte knappen for neste sang\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
 		"mt_follow": "bla slik at sangen som spilles alltid er synlig\">🎯",
 		"mt_compact": "tettpakket avspillerpanel\">⟎",
@@ -885,6 +892,8 @@ var Ls = {
 		"md_eshow": "viser forenklet ",
 		"md_off": "[📜<em>readme</em>] er avskrudd i [⚙️] -- dokument skjult",
 
+		"badreply": "Ugyldig svar ifra serveren",
+
 		"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
 		"cf_ok": "beklager -- liten tilfeldig kontroll, alt OK\n\nting skal fortsette om ca. 30 sekunder\n\nhvis ikkeno skjer, trykk F5 for å laste siden på nytt",
 		"tl_xe1": "kunne ikke hente undermapper:\n\nfeil ",
@@ -906,7 +915,7 @@ var Ls = {
 		"fz_zipd": "zip med filnavn i cp437, for høggamle maskiner",
 		"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",
 
-		"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp",
+		"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp, eller avbryte ufullstendige opplastninger",
 		"un_upd": "oppdater",
 		"un_m4": "eller hvis du vil dele nedlastnings-lenkene:",
 		"un_ulist": "vis",
@@ -915,12 +924,15 @@ var Ls = {
 		"un_fclr": "nullstill filter",
 		"un_derr": 'unpost-sletting feilet:\n',
 		"un_f5": 'noe gikk galt, prøv å oppdatere listen eller trykk F5',
+		"un_nou": '<b>advarsel:</b> kan ikke vise ufullstendige opplastninger akkurat nå; klikk på oppdater-linken om litt',
+		"un_noc": '<b>advarsel:</b> angring av fullførte opplastninger er deaktivert i serverkonfigurasjonen',
 		"un_max": "viser de første 2000 filene (bruk filteret for å innsnevre)",
-		"un_avail": "{0} filer kan slettes",
-		"un_m2": "sortert etter opplastningstid &ndash; nyeste først:",
+		"un_avail": "{0} nylig opplastede filer kan slettes<br />{1} ufullstendige opplastninger kan avbrytes",
+		"un_m2": "sortert etter opplastningstid; nyeste først:",
 		"un_no1": "men nei, her var det jaggu ikkeno som slettes kan",
 		"un_no2": "men nei, her var det jaggu ingenting som passet overens med filteret",
 		"un_next": "slett de neste {0} filene nedenfor",
+		"un_abrt": "avbryt",
 		"un_del": "slett",
 		"un_m3": "henter listen med nylig opplastede filer...",
 		"un_busy": "sletter {0} filer...",
@@ -967,7 +979,7 @@ var Ls = {
 		"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplasteren</li><li>og forsøk den samme opplastningen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">fikser forhåpentligvis feilen</a> en eller annen gang',
 		"u_s404": "ikke funnet på serveren",
 		"u_expl": "forklar",
-		"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> in <code>about:config</code>",
+		"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> i <code>about:config</code>",
 		"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrutte opplastninger vil muligens ikke oppdages og gjenopptas; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_ts": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;søkeresultater kan være feil; hold musepekeren over turbo-knappen for mer info</span></p>',
 		"u_turbo_c": "turbo er deaktivert i serverkonfigurasjonen",
@@ -1024,7 +1036,7 @@ modal.load();
 ebi('ops').innerHTML = (
 	'<a href="#" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	'<a href="#" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
-	(have_del && have_unpost ? '<a href="#" data-dest="unpost" data-dep="idx" tt="' + L.ot_unpost + '">🧯</a>' : '') +
+	(have_del ? '<a href="#" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" data-dest="up2k">🚀</a>' +
 	'<a href="#" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
 	'<a href="#" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
@@ -1401,6 +1413,7 @@ var mpl = (function () {
 	ebi('op_player').innerHTML = (
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
+		'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
@@ -1446,6 +1459,7 @@ var mpl = (function () {
 	bcfg_bind(r, 'shuf', 'au_shuf', false, function () {
 		mp.read_order();  // don't bind
 	});
+	bcfg_bind(r, 'aplay', 'au_aplay', true);
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
@@ -3103,7 +3117,9 @@ function play(tid, is_ev, seek) {
 
 	try {
 		mp.nopause();
-		mp.au.play();
+		if (mpl.aplay || is_ev !== -1)
+			mp.au.play();
+
 		if (mp.au.paused)
 			autoplay_blocked(seek);
 		else if (seek) {
@@ -3113,7 +3129,8 @@ function play(tid, is_ev, seek) {
 		if (!seek && !ebi('unsearch')) {
 			var o = ebi(oid);
 			o.setAttribute('id', 'thx_js');
-			sethash(oid);
+			if (mpl.aplay)
+				sethash(oid);
 			o.setAttribute('id', oid);
 		}
 
@@ -3275,9 +3292,9 @@ function eval_hash() {
 
 		if (mtype == 'a') {
 			if (!ts)
-				return play(id);
+				return play(id, -1);
 
-			return play(id, false, ts);
+			return play(id, -1, ts);
 		}
 
 		if (mtype == 'g') {
@@ -5547,7 +5564,7 @@ document.onkeydown = function (e) {
 
 	function xhr_search_results() {
 		if (this.status !== 200) {
-			var msg = unpre(this.responseText);
+			var msg = hunpre(this.responseText);
 			srch_msg(true, "http " + this.status + ": " + msg);
 			search_in_progress = 0;
 			return;
@@ -7487,7 +7504,7 @@ var msel = (function () {
 		xhrchk(this, L.fd_xe1, L.fd_xe2);
 
 		if (this.status !== 201) {
-			sf.textContent = 'error: ' + unpre(this.responseText);
+			sf.textContent = 'error: ' + hunpre(this.responseText);
 			return;
 		}
 
@@ -7535,7 +7552,7 @@ var msel = (function () {
 		xhrchk(this, L.fsm_xe1, L.fsm_xe2);
 
 		if (this.status < 200 || this.status > 201) {
-			sf.textContent = 'error: ' + unpre(this.responseText);
+			sf.textContent = 'error: ' + hunpre(this.responseText);
 			return;
 		}
 
@@ -7569,11 +7586,24 @@ var globalcss = (function () {
 					var css = ds[b].cssText.split(/\burl\(/g);
 					ret += css[0];
 					for (var c = 1; c < css.length; c++) {
-						var delim = (/^["']/.exec(css[c])) ? css[c].slice(0, 1) : '';
-						ret += 'url(' + delim + ((css[c].slice(0, 8).indexOf('://') + 1 || css[c].startsWith('/')) ? '' : base) +
-							css[c].slice(delim ? 1 : 0);
+						var m = /(^ *["']?)(.*)/.exec(css[c]),
+							delim = m[1],
+							ctxt = m[2],
+							is_abs = /^\/|[^)/:]+:\/\//.exec(ctxt);
+
+						ret += 'url(' + delim + (is_abs ? '' : base) + ctxt;
 					}
 					ret += '\n';
+				}
+				if (ret.indexOf('\n@import') + 1) {
+					var c0 = ret.split('\n'),
+						c1 = [],
+						c2 = [];
+
+					for (var a = 0; a < c0.length; a++)
+						(c0[a].startsWith('@import') ? c1 : c2).push(c0[a]);
+
+					ret = c1.concat(c2).join('\n');
 				}
 			}
 			catch (ex) {
@@ -7858,15 +7888,39 @@ var unpost = (function () {
 			if (!xhrchk(this, L.fu_xe1, L.fu_xe2))
 				return ebi('op_unpost').innerHTML = L.fu_xe1;
 
-			var res = JSON.parse(this.responseText);
+			try {
+				var ores = JSON.parse(this.responseText);
+			}
+			catch (ex) {
+				return ebi('op_unpost').innerHTML = '<p>' + L.badreply + ':</p>' + unpre(this.responseText);
+			}
+
+			if (ores.u.length == 1 && ores.u[0].timeout) {
+				html.push('<p>' + L.un_nou + '</p>');
+				ores.u = [];
+			}
+
+			if (ores.c.length == 1 && ores.c[0].kinshi) {
+				html.push('<p>' + L.un_noc + '</p>');
+				ores.c = [];
+			}
+
+			for (var a = 0; a < ores.u.length; a++)
+				ores.u[a].k = 'u';
+
+			for (var a = 0; a < ores.c.length; a++)
+				ores.c[a].k = 'c';
+
+			var res = ores.u.concat(ores.c);
+
 			if (res.length) {
 				if (res.length == 2000)
 					html.push("<p>" + L.un_max);
 				else
-					html.push("<p>" + L.un_avail.format(res.length));
+					html.push("<p>" + L.un_avail.format(ores.c.length, ores.u.length));
 
-				html.push(" &ndash; " + L.un_m2 + "</p>");
-				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>file</td></tr></thead><tbody>");
+				html.push("<br />" + L.un_m2 + "</p>");
+				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>done</td><td>file</td></tr></thead><tbody>");
 			}
 			else
 				html.push('-- <em>' + (filt.value ? L.un_no2 : L.un_no1) + '</em>');
@@ -7879,10 +7933,13 @@ var unpost = (function () {
 							'<tr><td></td><td colspan="3" style="padding:.5em">' +
 							'<a me="' + me + '" class="n' + a + '" n2="' + (a + mods[b]) +
 							'" href="#">' + L.un_next.format(Math.min(mods[b], res.length - a)) + '</a></td></tr>');
+
+				var done = res[a].k == 'c';
 				html.push(
-					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + L.un_del + '</a></td>' +
+					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + (done ? L.un_del : L.un_abrt) + '</a></td>' +
 					'<td>' + unix2iso(res[a].at) + '</td>' +
-					'<td>' + res[a].sz + '</td>' +
+					'<td>' + ('' + res[a].sz).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + '</td>' +
+					(done ? '<td>100%</td>' : '<td>' + res[a].pd + '%</td>') +
 					'<td>' + linksplit(res[a].vp).join('<span> / </span>') + '</td></tr>');
 			}
 
@@ -7968,7 +8025,7 @@ var unpost = (function () {
 		var xhr = new XHR();
 		xhr.n = n;
 		xhr.n2 = n2;
-		xhr.open('POST', SR + '/?delete&lim=' + req.length, true);
+		xhr.open('POST', SR + '/?delete&unpost&lim=' + req.length, true);
 		xhr.onload = xhr.onerror = unpost_delete_cb;
 		xhr.send(JSON.stringify(req));
 	};

@@ -104,7 +104,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [sfx](#sfx) - the self-contained "binary"
     * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
 * [install on android](#install-on-android)
-* [reporting bugs](#reporting-bugs) - ideas for context to include in bug reports
+* [reporting bugs](#reporting-bugs) - ideas for context to include, and where to submit them
 * [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 
 
@@ -286,6 +286,9 @@ roughly sorted by chance of encounter
   * cannot index non-ascii filenames with `-e2d`
   * cannot handle filenames with mojibake
 
+if you have a new exciting bug to share, see [reporting bugs](#reporting-bugs)
+
+
 ## not my bugs
 
 same order here too
@@ -341,8 +344,17 @@ upgrade notes
   * yes, using the [`g` permission](#accounts-and-volumes), see the examples there
   * you can also do this with linux filesystem permissions; `chmod 111 music` will make it possible to access files and folders inside the `music` folder but not list the immediate contents -- also works with other software, not just copyparty
 
+* can I link someone to a password-protected volume/file by including the password in the URL?
+  * yes, by adding `?pw=hunter2` to the end; replace `?` with `&` if there are parameters in the URL already, meaning it contains a `?` near the end
+
+* how do I stop `.hist` folders from appearing everywhere on my HDD?
+  * by default, a `.hist` folder is created inside each volume for the filesystem index, thumbnails, audio transcodes, and markdown document history. Use the `--hist` global-option or the `hist` volflag to move it somewhere else; see [database location](#database-location)
+
 * can I make copyparty download a file to my server if I give it a URL?
   * yes, using [hooks](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py)
+
+* firefox refuses to connect over https, saying "Secure Connection Failed" or "SEC_ERROR_BAD_SIGNATURE", but the usual button to "Accept the Risk and Continue" is not shown
+  * firefox has corrupted its certstore; fix this by exiting firefox, then find and delete the file named `cert9.db` somewhere in your firefox profile folder
 
 * i want to learn python and/or programming and am considering looking at the copyparty source code in that occasion
   * ```bash
@@ -1292,6 +1304,8 @@ the classname of the HTML tag is set according to the selected theme, which is u
 
 see the top of [./copyparty/web/browser.css](./copyparty/web/browser.css) where the color variables are set, and there's layout-specific stuff near the bottom
 
+if you want to change the fonts, see [./docs/rice/](./docs/rice/)
+
 
 ## complete examples
 
@@ -1943,7 +1957,12 @@ if you want thumbnails (photos+videos) and you're okay with spending another 132
 
 # reporting bugs
 
-ideas for context to include in bug reports
+ideas for context to include, and where to submit them
+
+please get in touch using any of the following URLs:
+* https://github.com/9001/copyparty/ **(primary)**
+* https://gitlab.com/9001/copyparty/ *(mirror)*
+* https://codeberg.org/9001/copyparty *(mirror)*
 
 in general, commandline arguments (and config file if any)
 
@@ -1958,3 +1977,6 @@ if there's a wall of base64 in the log (thread stacks) then please include that,
 # devnotes
 
 for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
+
+see [./docs/TODO.md](./docs/TODO.md) for planned features / fixes / changes
+

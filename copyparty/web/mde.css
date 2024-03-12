@@ -17,6 +17,7 @@ html, body {
 	padding: 0;
 	min-height: 100%;
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 	background: #f7f7f7;
 	color: #333;
 }

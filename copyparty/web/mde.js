@@ -134,14 +134,14 @@ function save(mde) {
 
 function save_cb() {
     if (this.status !== 200)
-        return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
+        return toast.err(0, 'Error!  The file was NOT saved.\n\nError ' + this.status + ":\n" + unpre(this.responseText));
 
     var r;
     try {
         r = JSON.parse(this.responseText);
     }
     catch (ex) {
-        return toast.err(0, 'Failed to parse reply from server:\n\n' + this.responseText);
+        return toast.err(0, 'Error!  The file was likely NOT saved.\n\nFailed to parse reply from server:\n\n' + unpre(this.responseText));
     }
 
     if (!r.ok) {
@@ -180,7 +180,7 @@ function save_cb() {
 
 function save_chk() {
     if (this.status !== 200)
-        return toast.err(0, 'Error!  The file was NOT saved.\n\n' + this.status + ": " + (this.responseText + '').replace(/^<pre>/, ""));
+        return toast.err(0, 'Error!  The file was NOT saved.\n\nError ' + this.status + ":\n" + unpre(this.responseText));
 
     var doc1 = this.txt.replace(/\r\n/g, "\n");
     var doc2 = this.responseText.replace(/\r\n/g, "\n");

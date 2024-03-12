@@ -1722,8 +1722,6 @@ function up2k_init(subtle) {
                         ebi('u2etas').style.textAlign = 'left';
                     }
                     etafun();
-                    if (pvis.act == 'bz')
-                        pvis.changecard('bz');
                 }
 
                 if (flag) {
@@ -1859,6 +1857,9 @@ function up2k_init(subtle) {
         timer.rm(donut.do);
         ebi('u2tabw').style.minHeight = '0px';
         utw_minh = 0;
+
+        if (pvis.act == 'bz')
+            pvis.changecard('bz');
     }
 
     function chill(t) {
@@ -2256,6 +2257,7 @@ function up2k_init(subtle) {
             console.log('handshake onerror, retrying', t.name, t);
             apop(st.busy.handshake, t);
             st.todo.handshake.unshift(t);
+            t.cooldown = Date.now() + 5000 + Math.floor(Math.random() * 3000);
             t.keepalive = keepalive;
         };
         var orz = function (e) {
@@ -2263,16 +2265,26 @@ function up2k_init(subtle) {
                 return console.log('zombie handshake onload', t.name, t);
 
             if (xhr.status == 200) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                }
+                catch (ex) {
+                    apop(st.busy.handshake, t);
+                    st.todo.handshake.unshift(t);
+                    t.cooldown = Date.now() + 5000 + Math.floor(Math.random() * 3000);
+                    return toast.err(0, 'Handshake error; will retry...\n\n' + L.badreply + ':\n\n' + unpre(xhr.responseText));
+                }
+
                 t.t_handshake = Date.now();
                 if (keepalive) {
                     apop(st.busy.handshake, t);
+                    tasker();
                     return;
                 }
 
                 if (toast.tag === t)
                     toast.ok(5, L.u_fixed);
 
-                var response = JSON.parse(xhr.responseText);
                 if (!response.name) {
                     var msg = '',
                         smsg = '';
@@ -2856,6 +2868,8 @@ function up2k_init(subtle) {
                 new_state = false;
                 fixed = true;
             }
+            if (new_state === undefined)
+                new_state = can_write ? false : have_up2k_idx ? true : undefined;
         }
 
         if (new_state === undefined)

@@ -494,6 +494,7 @@ html.dz {
 
 	text-shadow: none;
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 html.dy {
 	--fg: #000;
@@ -603,6 +604,7 @@ html {
 	color: var(--fg);
 	background: var(--bgg);
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 	text-shadow: 1px 1px 0px var(--bg-max);
 }
 html, body {
@@ -611,6 +613,7 @@ html, body {
 }
 pre, code, tt, #doc, #doc>code {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 .ayjump {
 	position: fixed;
@@ -759,6 +762,7 @@ html #files.hhpick thead th {
 }
 #files tbody td:nth-child(3) {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 	text-align: right;
 	padding-right: 1em;
 	white-space: nowrap;
@@ -821,6 +825,7 @@ html.y #path a:hover {
 .logue.raw {
 	white-space: pre;
 	font-family: 'scp', 'consolas', monospace;
+	font-family: var(--font-mono), 'scp', 'consolas', monospace;
 }
 #doc>iframe,
 .logue>iframe {
@@ -1417,6 +1422,7 @@ input[type="checkbox"]:checked+label {
 }
 html.dz input {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 .opwide div>span>input+label {
 	padding: .3em 0 .3em .3em;
@@ -1702,6 +1708,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 .ntree a:first-child {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 	font-size: 1.2em;
 	line-height: 0;
 }
@@ -1832,6 +1839,10 @@ html.y #tree.nowrap .ntree a+a:hover {
 	margin: 0;
 	padding: 0;
 }
+#unpost td:nth-child(3),
+#unpost td:nth-child(4) {
+	text-align: right;
+}
 #rui {
 	background: #fff;
 	background: var(--bg);
@@ -1859,6 +1870,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 #rn_vadv input {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 #rui td+td,
 #rui td input[type="text"] {
@@ -1922,6 +1934,7 @@ html.y #doc {
 #doc.mdo {
 	white-space: normal;
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 }
 #doc.prism * {
 	line-height: 1.5em;
@@ -1981,6 +1994,7 @@ a.btn,
 }
 #hkhelp td:first-child {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 html.noscroll,
 html.noscroll .sbar {
@@ -2490,6 +2504,7 @@ html.y #bbox-overlay figcaption a {
 }
 #op_up2k.srch td.prog {
 	font-family: sans-serif;
+	font-family: var(--font-main), sans-serif;
 	font-size: 1em;
 	width: auto;
 }
@@ -2504,6 +2519,7 @@ html.y #bbox-overlay figcaption a {
 	white-space: nowrap;
 	display: inline-block;
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 #u2etas.o {
 	width: 20em;
@@ -2573,6 +2589,7 @@ html.y #bbox-overlay figcaption a {
 #u2cards span {
 	color: var(--fg-max);
 	font-family: 'scp', monospace;
+	font-family: var(--font-mono), 'scp', monospace;
 }
 #u2cards > a:nth-child(4) > span {
 	display: inline-block;
@@ -2738,6 +2755,7 @@ html.b #u2conf a.b:hover {
 }
 .prog {
 	font-family: 'scp', monospace, monospace;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
 #u2tab span.inf,
 #u2tab span.ok,

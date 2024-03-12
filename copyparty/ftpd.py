@@ -300,7 +300,7 @@ class FtpFs(AbstractedFS):
 
         vp = join(self.cwd, path).lstrip("/")
         try:
-            self.hub.up2k.handle_rm(self.uname, self.h.cli_ip, [vp], [], False)
+            self.hub.up2k.handle_rm(self.uname, self.h.cli_ip, [vp], [], False, False)
         except Exception as ex:
             raise FSE(str(ex))
 
