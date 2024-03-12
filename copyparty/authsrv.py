@@ -968,7 +968,7 @@ class AuthSrv(object):
          * any non-zero value from IdP group header
          * otherwise take --grps / [groups]
         """
-        ret = {un:gns[:] for un, gns in self.idp_accs.items()}
+        ret = {un: gns[:] for un, gns in self.idp_accs.items()}
         ret.update({zs: [""] for zs in acct if zs not in ret})
         for gn, uns in grps.items():
             for un in uns:

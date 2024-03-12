@@ -478,7 +478,8 @@ class SvcHub(object):
 
         al.xff_hdr = al.xff_hdr.lower()
         al.idp_h_usr = al.idp_h_usr.lower()
-        # al.idp_h_grp = al.idp_h_grp.lower()
+        al.idp_h_grp = al.idp_h_grp.lower()
+        al.idp_h_key = al.idp_h_key.lower()
 
         al.xff_re = self._ipa2re(al.xff_src)
         al.ipa_re = self._ipa2re(al.ipa)

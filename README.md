@@ -1266,9 +1266,9 @@ replace copyparty passwords with oauth and such
 
 work is [ongoing](https://github.com/9001/copyparty/issues/62) to support authenticating / authorizing users based on a separate authentication proxy, which makes it possible to support oauth, single-sign-on, etc.
 
-it is currently possible to specify `--idp-h-usr x-username`; copyparty will then skip password validation and blindly trust the username specified in the `X-Username` request header
+there is a [docker-compose example](./docs/examples/docker/idp-authelia-traefik) which is hopefully a good starting point (alternatively see [./docs/idp.md](./docs/idp.md) if you're the DIY type)
 
-the remaining stuff (accepting user groups through another header, creating volumes on the fly) are still to-do; configuration will probably [look like this](./docs/examples/docker/idp/copyparty.conf)
+a more complete example of the copyparty configuration options [look like this](./docs/examples/docker/idp/copyparty.conf)
 
 
 ## hiding from google
