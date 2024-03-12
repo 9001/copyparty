@@ -500,7 +500,7 @@ class SvcHub(object):
             if ptn:
                 setattr(self.args, k, re.compile(ptn))
 
-        for k in ["idp_h_sep"]:
+        for k in ["idp_gsep"]:
             ptn = getattr(self.args, k)
             if "]" in ptn:
                 ptn = "]" + ptn.replace("]", "")
@@ -705,6 +705,19 @@ class SvcHub(object):
             self.up2k.reload(rescan_all_vols)
             self.broker.reload()
             self.reloading = 0
+
+    def _reload_blocking(self, rescan_all_vols: bool = True) -> None:
+        while True:
+            with self.up2k.mutex:
+                if self.reloading < 2:
+                    self.reloading = 1
+                    break
+            time.sleep(0.05)
+
+        # try to handle multiple pending IdP reloads at once:
+        time.sleep(0.2)
+
+        self._reload(rescan_all_vols=rescan_all_vols)
 
     def stop_thr(self) -> None:
         while not self.stop_req:

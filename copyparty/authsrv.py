@@ -824,7 +824,7 @@ class AuthSrv(object):
         if self.idp_usr_gh.get(uname) == gname:
             return False
 
-        gnames = [x.strip() for x in self.args.idp_h_sep.split(gname)]
+        gnames = [x.strip() for x in self.args.idp_gsep.split(gname)]
         gnames.sort()
 
         with self.mutex:
@@ -842,7 +842,7 @@ class AuthSrv(object):
                 self._reload()
                 return True
 
-        broker.ask("_reload", False).get()
+        broker.ask("_reload_blocking", False).get()
         return True
 
     def _map_volume_idp(

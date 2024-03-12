@@ -836,10 +836,9 @@ class Up2k(object):
             self.log(msg, c=1)
 
         thr = None
-        if self.mtag:
+        if self.mtag and scan_vols:
             t = "online (running mtp)"
-            if scan_vols:
-                thr = Daemon(self._run_all_mtp, "up2k-mtp-scan", (gid,), r=False)
+            thr = Daemon(self._run_all_mtp, "up2k-mtp-scan", (gid,), r=False)
         else:
             self.pp = None
             t = "online, idle"
