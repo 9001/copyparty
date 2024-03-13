@@ -2323,7 +2323,7 @@ function seek_au_sec(seek) {
 
 
 function song_skip(n, dirskip) {
-	var tid = mp.au ? mp.au.tid : null,
+	var tid = mp.au && mp.au.evp == get_evpath() ? mp.au.tid : null,
 		ofs = tid ? mp.order.indexOf(tid) : -1;
 
 	if (dirskip && ofs + 1 && ofs > mp.order.length - 2) {
@@ -8175,7 +8175,7 @@ function reload_mp() {
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
-	if (mp.au && mp.au.tid) {
+	if (mp.au && mp.au.tid && mp.au.evp == get_evpath()) {
 		var el = QS('a#a' + mp.au.tid);
 		if (el)
 			clmod(el, 'act', 1);
