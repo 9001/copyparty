@@ -33,6 +33,7 @@ from .util import (
     uncyg,
     undot,
     unhumanize,
+    vsplit,
 )
 
 if True:  # pylint: disable=using-constant-test
@@ -790,7 +791,7 @@ class AuthSrv(object):
         self.grps: dict[str, list[str]] = {}
         self.re_pwd: Optional[re.Pattern] = None
 
-        # all volumes ever seen (from current or previous runs)
+        # all volumes observed since last restart
         self.idp_vols: dict[str, str] = {}  # vpath->abspath
 
         # all users/groups observed since last restart
@@ -889,6 +890,8 @@ class AuthSrv(object):
             src, dst = self._map_volume(src, dst, mount, daxs, mflags)
             if src:
                 ret.append((src, dst, un, gn))
+                if un or gn:
+                    self.idp_vols[dst] = src
 
         return ret
 
@@ -1351,6 +1354,8 @@ class AuthSrv(object):
         daxs: dict[str, AXS] = {}
         mflags: dict[str, dict[str, Any]] = {}  # moutpoint:flags
         mount: dict[str, str] = {}  # dst:src (mountpoint:realpath)
+
+        self.idp_vols = {}  # yolo
 
         if self.args.a:
             # list of username:password
@@ -2000,6 +2005,17 @@ class AuthSrv(object):
             self.warn_anonwrite = False
         except Pebkac:
             self.warn_anonwrite = True
+
+        idp_err = "WARNING! The following IdP volumes are mounted directly below another volume where anonymous users can read and/or write files. This is a SECURITY HAZARD!! When copyparty is restarted, it will not know about these IdP volumes yet. These volumes will then be accessible by anonymous users UNTIL one of the users associated with their volume sends a request to the server. RECOMMENDATION: You should create a restricted volume where nobody can read/write files, and make sure that all IdP volumes are configured to appear somewhere below that volume."
+        for idp_vp in self.idp_vols:
+            parent_vp = vsplit(idp_vp)[0]
+            vn, _ = vfs.get(parent_vp, "*", False, False)
+            zs = "READABLE" if "*" in vn.axs.uread else "WRITABLE" if "*" in vn.axs.uwrite else ""
+            if zs:
+                t = '\nWARNING: Volume "/%s" appears below "/%s" and would be WORLD-%s'
+                idp_err += t % (idp_vp, vn.vpath, zs)
+        if "\n" in idp_err:
+            self.log(idp_err, 1)
 
         self.vfs = vfs
         self.acct = acct
