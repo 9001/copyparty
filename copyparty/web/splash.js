@@ -50,7 +50,7 @@ for (var k in (d || {})) {
 }
 
 try {
-	if (window.is_idp) {
+	if (is_idp) {
 		var z = ['#l+div', '#l', '#c'];
 		for (var a = 0; a < z.length; a++)
 			QS(z[a]).style.display = 'none';

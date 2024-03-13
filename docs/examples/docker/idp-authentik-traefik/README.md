@@ -2,7 +2,7 @@
 > I am unable to guarantee the quality, safety, and security of anything in this folder; it is a combination of examples I found online. Please submit corrections or improvements 🙏
 
 > [!WARNING]  
-> does not work
+> does not work yet... if you are able to fix this, please do!
 
 this is based on:
 * https://goauthentik.io/docker-compose.yml

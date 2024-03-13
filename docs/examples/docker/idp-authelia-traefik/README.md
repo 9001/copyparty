@@ -21,6 +21,19 @@ incomplete list of modifications made:
 * added a warning that traefik is given access to the docker socket (as recommended by traefik docs) which means traefik is able to break out of the container and has full root access on the host machine
 
 
+# security
+
+there is probably/definitely room for improvement in this example setup. Some ideas taken from [github issue #62](https://github.com/9001/copyparty/issues/62):
+
+* Add in a redis password to limit attacker lateral movement in the system
+* Move redis to a private network shared with just authelia
+* Pin to image hashes (or go all in on updates and add `watchtower`)
+* Drop bridge networking for just exposing traefik's public ports
+* Configure docker for non-root access to docker socket and then move traefik to use [non-root perms](https://docs.docker.com/engine/security/rootless/)
+
+if you manage to improve on any of this, especially in a way that might be useful for other people, consider sending a PR :>
+
+
 # performance
 
 currently **not optimal,** at least when compared to running the python sfx outside of docker... some numbers from my laptop (ryzen4500u/fedora39):
