@@ -232,8 +232,6 @@ class Up2k(object):
                 for n in range(max(1, self.args.mtag_mt)):
                     Daemon(self._tagger, "tagger-{}".format(n))
 
-                Daemon(self._run_all_mtp, "up2k-mtp-init", (self.gid,))
-
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         if self.pp:
             msg += "\033[K"
@@ -830,20 +828,14 @@ class Up2k(object):
             msg = "could not read tags because no backends are available (Mutagen or FFprobe)"
             self.log(msg, c=1)
 
-        thr = None
-        if self.mtag:
-            t = "online (running mtp)"
-            if scan_vols:
-                thr = Daemon(self._run_all_mtp, "up2k-mtp-scan", (gid,), r=False)
-        else:
-            self.pp = None
-            t = "online, idle"
-
+        t = "online (running mtp)" if self.mtag else "online, idle"
         for vol in vols:
             self.volstate[vol.vpath] = t
 
-        if thr:
-            thr.start()
+        if self.mtag:
+            Daemon(self._run_all_mtp, "up2k-mtp-scan", (gid,))
+        else:
+            self.pp = None
 
         return have_e2d
 
@@ -1875,18 +1867,21 @@ class Up2k(object):
                 if ptop not in self.entags:
                     t = "skipping mtp for unavailable volume {}"
                     self.log(t.format(ptop), 1)
-                    continue
-                self._run_one_mtp(ptop, gid)
+                else:
+                    self._run_one_mtp(ptop, gid)
+
+            vtop = "\n"
+            for vol in self.asrv.vfs.all_vols.values():
+                if vol.realpath == ptop:
+                    vtop = vol.vpath
+            if "running mtp" in self.volstate.get(vtop, ""):
+                self.volstate[vtop] = "online, idle"
 
         td = time.time() - t0
         msg = "mtp finished in {:.2f} sec ({})"
         self.log(msg.format(td, s2hms(td, True)))
 
         self.pp = None
-        for k in list(self.volstate.keys()):
-            if "OFFLINE" not in self.volstate[k]:
-                self.volstate[k] = "online, idle"
-
         if self.args.exit == "idx":
             self.hub.sigterm()
 
