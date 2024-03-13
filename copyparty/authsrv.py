@@ -18,7 +18,6 @@ from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
 from .util import (
     IMPLICATIONS,
-    META_NOBOTS,
     SQLITE_VER,
     UNPLICATIONS,
     UTC,
@@ -1660,13 +1659,6 @@ class AuthSrv(object):
                 # volflag "robots" overrides global "norobots", allowing indexing by search engines for this vol
                 if not vol.flags.get("robots"):
                     vol.flags["norobots"] = True
-
-        for vol in vfs.all_vols.values():
-            h = [vol.flags.get("html_head", self.args.html_head)]
-            if vol.flags.get("norobots"):
-                h.insert(0, META_NOBOTS)
-
-            vol.flags["html_head"] = "\n".join([x for x in h if x])
 
         for vol in vfs.all_vols.values():
             if self.args.no_vthumb:

@@ -6634,7 +6634,7 @@ function apply_perms(res) {
 
 	ebi('acc_info').innerHTML = '<span id="srv_info2"><span>' + srvinf +
 		'</span></span><span' + aclass + axs + L.access + '</span>' + (acct != '*' ?
-			'<a href="' + SR + '/?pw=x">' + L.logout + acct + '</a>' :
+			'<a href="' + SR + '/?pw=x">' + (window.is_idp ? '' : L.logout) + acct + '</a>' :
 			'<a href="?h">Login</a>');
 
 	var o = QSA('#ops>a[data-perm]');

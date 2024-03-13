@@ -170,16 +170,12 @@ class HttpCli(object):
         self.can_dot = False
         self.out_headerlist: list[tuple[str, str]] = []
         self.out_headers: dict[str, str] = {}
-        self.html_head = " "
         # post
         self.parser: Optional[MultipartParser] = None
         # end placeholders
 
         self.bufsz = 1024 * 32
-        h = self.args.html_head
-        if self.args.no_robots:
-            h = META_NOBOTS + (("\n" + h) if h else "")
-        self.html_head = h
+        self.html_head = ""
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         ptn = self.asrv.re_pwd
@@ -231,8 +227,6 @@ class HttpCli(object):
             "Vary": "Origin, PW, Cookie",
             "Cache-Control": "no-store, max-age=0",
         }
-        if self.args.no_robots:
-            self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
 
         if self.is_banned():
             return False
@@ -506,6 +500,7 @@ class HttpCli(object):
 
                 if idp_usr in self.asrv.vfs.aread:
                     self.uname = idp_usr
+                    self.html_head += "<script>var is_idp=1</script>\n"
                 else:
                     self.log("unknown username: [%s]" % (idp_usr), 1)
                     self.uname = "*"
@@ -558,6 +553,10 @@ class HttpCli(object):
         self.rem = rem
 
         self.s.settimeout(self.args.s_tbody or None)
+
+        if "norobots" in vn.flags:
+            self.html_head += META_NOBOTS
+            self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
 
         try:
             cors_k = self._cors()
@@ -3390,6 +3389,8 @@ class HttpCli(object):
             self.reply(zb, mime="text/plain; charset=utf-8")
             return True
 
+        self.html_head += self.vn.flags.get("html_head", "")
+
         html = self.j2s(
             "splash",
             this=self,
@@ -3839,11 +3840,9 @@ class HttpCli(object):
         e2d = "e2d" in vn.flags
         e2t = "e2t" in vn.flags
 
-        self.html_head = vn.flags.get("html_head", "")
-        if vn.flags.get("norobots") or "b" in self.uparam:
+        self.html_head += vn.flags.get("html_head", "")
+        if "b" in self.uparam:
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
-        else:
-            self.out_headers.pop("X-Robots-Tag", None)
 
         is_dir = stat.S_ISDIR(st.st_mode)
         fk_pass = False

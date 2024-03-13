@@ -49,6 +49,15 @@ for (var k in (d || {})) {
 			o[a].setAttribute("tt", d[k]);
 }
 
+try {
+	if (window.is_idp) {
+		var z = ['#l+div', '#l', '#c'];
+		for (var a = 0; a < z.length; a++)
+			QS(z[a]).style.display = 'none';
+	}
+}
+catch (ex) { }
+
 tt.init();
 var o = QS('input[name="cppwd"]');
 if (!ebi('c') && o.offsetTop + o.offsetHeight < window.innerHeight)
