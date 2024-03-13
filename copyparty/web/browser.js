@@ -278,8 +278,6 @@ var Ls = {
 		"mm_prescan": "Looking for music to play next...",
 		"mm_scank": "Found the next song:",
 		"mm_uncache": "cache cleared; all songs will redownload on next playback",
-		"mm_pwrsv": "<p>it looks like playback is being interrupted by your phone's power-saving settings!</p>" + '<p>please go to <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">the app settings of your browser</a> and then <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">allow unrestricted battery usage</a> to fix it.</p><p><em>however,</em> it could also be due to the browser\'s autoplay settings;</p><p>Firefox: tap the icon on the left side of the address bar, then select "autoplay" and "allow audio"</p><p>Chrome: the problem will gradually dissipate as you play more music on this site</p>',
-		"mm_iosblk": "<p>your web browser thinks the audio playback is unwanted, and it decided to block playback until you start another track manually... unfortunately we are both powerless in telling it otherwise</p><p>supposedly this will get better as you continue playing music on this site, but I'm unfamiliar with apple devices so idk if that's true</p><p>you could try another browser, maybe firefox or chrome?</p>",
 		"mm_hnf": "that song no longer exists",
 
 		"im_hnf": "that image no longer exists",
@@ -781,8 +779,6 @@ var Ls = {
 		"mm_prescan": "Leter etter neste sang...",
 		"mm_scank": "Fant neste sang:",
 		"mm_uncache": "alle sanger vil lastes på nytt ved neste avspilling",
-		"mm_pwrsv": "<p>det ser ut som musikken ble avbrutt av telefonen sine strømsparings-innstillinger!</p>" + '<p>ta en tur innom <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png">app-innstillingene til nettleseren din</a> og så <a target="_blank" href="https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png">tillat ubegrenset batteriforbruk</a></p><p>NB: det kan også være pga. autoplay-innstillingene, så prøv dette:</p><p>Firefox: klikk på ikonet i venstre side av addressefeltet, velg "autoplay" og "tillat lyd"</p><p>Chrome: problemet vil minske gradvis jo mer musikk du spiller på denne siden</p>',
-		"mm_iosblk": "<p>nettleseren din tror at musikken er uønsket, og den bestemte seg for å stoppe avspillingen slik at du manuelt må velge en ny sang... dessverre er både du og jeg maktesløse når den har bestemt seg.</p><p>det ryktes at problemet vil minske jo mer musikk du spiller på denne siden, men jeg er ikke godt kjent med apple-dingser så jeg er ikke sikker.</p><p>kanskje firefox eller chrome fungerer bedre?</p>",
 		"mm_hnf": "sangen finnes ikke lenger",
 
 		"im_hnf": "bildet finnes ikke lenger",
@@ -1668,7 +1664,6 @@ var re_au_native = can_ogg ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i :
 
 // extract songs + add play column
 var mpo = { "au": null, "au2": null, "acs": null };
-var t_fchg = 0;
 function MPlayer() {
 	var r = this;
 	r.id = Date.now();
@@ -2323,7 +2318,7 @@ function seek_au_sec(seek) {
 
 
 function song_skip(n, dirskip) {
-	var tid = mp.au ? mp.au.tid : null,
+	var tid = mp.au && mp.au.evp == get_evpath() ? mp.au.tid : null,
 		ofs = tid ? mp.order.indexOf(tid) : -1;
 
 	if (dirskip && ofs + 1 && ofs > mp.order.length - 2) {
@@ -2338,15 +2333,7 @@ function song_skip(n, dirskip) {
 	else
 		play(mp.order[n == -1 ? mp.order.length - 1 : 0]);
 }
-function next_song_sig(e) {
-	t_fchg = document.hasFocus() ? 0 : Date.now();
-	return next_song_cmn(e);
-}
 function next_song(e) {
-	t_fchg = 0;
-	return next_song_cmn(e);
-}
-function next_song_cmn(e) {
 	ev(e);
 	if (mp.order.length) {
 		var dirskip = mpl.traversals;
@@ -2354,17 +2341,12 @@ function next_song_cmn(e) {
 		return song_skip(1, dirskip);
 	}
 	if (mpl.traversals++ < 5) {
-		if (MOBILE && t_fchg && Date.now() - t_fchg > 30 * 1000)
-			modal.alert(IPHONE ? L.mm_iosblk : L.mm_pwrsv);
-
-		t_fchg = document.hasFocus() ? 0 : Date.now();
-		treectl.ls_cb = next_song_cmn;
+		treectl.ls_cb = next_song;
 		return tree_neigh(1);
 	}
 	toast.inf(10, L.mm_nof);
 	console.log("mm_nof2");
 	mpl.traversals = 0;
-	t_fchg = 0;
 }
 function last_song(e) {
 	ev(e);
@@ -2379,7 +2361,6 @@ function last_song(e) {
 	toast.inf(10, L.mm_nof);
 	console.log("mm_nof2");
 	mpl.traversals = 0;
-	t_fchg = 0;
 }
 function prev_song(e) {
 	ev(e);
@@ -2525,15 +2506,6 @@ var mpui = (function () {
 			// occasionally draw buffered regions
 			if (nth % 5 == 0)
 				pbar.drawbuf();
-		}
-
-		if (pos > 0.3 && t_fchg) {
-			// cannot check document.hasFocus to avoid false positives;
-			// it continues on power-on, doesn't need to be in-browser
-			if (MOBILE && Date.now() - t_fchg > 30 * 1000)
-				modal.alert(IPHONE ? L.mm_iosblk : L.mm_pwrsv);
-
-			t_fchg = 0;
 		}
 
 		// preload next song
@@ -3037,7 +3009,6 @@ function play(tid, is_ev, seek) {
 			tn = 0;
 		}
 		else if (mpl.pb_mode == 'next') {
-			t_fchg = document.hasFocus() ? 0 : Date.now();
 			treectl.ls_cb = next_song;
 			return tree_neigh(1);
 		}
@@ -3067,7 +3038,7 @@ function play(tid, is_ev, seek) {
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onplaying = mpui.progress_updater;
-		mp.au.onended = next_song_sig;
+		mp.au.onended = next_song;
 		widget.open();
 	}
 
@@ -3084,7 +3055,7 @@ function play(tid, is_ev, seek) {
 		mp.au.onerror = evau_error;
 		mp.au.onprogress = pbar.drawpos;
 		mp.au.onplaying = mpui.progress_updater;
-		mp.au.onended = next_song_sig;
+		mp.au.onended = next_song;
 		t = mp.au.currentTime;
 		if (isNum(t) && t > 0.1)
 			mp.au.currentTime = 0;
@@ -3148,7 +3119,7 @@ function play(tid, is_ev, seek) {
 		toast.err(0, esc(L.mm_playerr + basenames(ex)));
 	}
 	clmod(ebi(oid), 'act');
-	setTimeout(next_song_sig, 5000);
+	setTimeout(next_song, 5000);
 }
 
 
@@ -8175,7 +8146,7 @@ function reload_mp() {
 		plays[a].parentNode.innerHTML = '-';
 
 	mp = new MPlayer();
-	if (mp.au && mp.au.tid) {
+	if (mp.au && mp.au.tid && mp.au.evp == get_evpath()) {
 		var el = QS('a#a' + mp.au.tid);
 		if (el)
 			clmod(el, 'act', 1);
