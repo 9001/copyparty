@@ -1264,7 +1264,9 @@ replace 404 and 403 errors with something completely different (that's it for no
 
 replace copyparty passwords with oauth and such
 
-work is [ongoing](https://github.com/9001/copyparty/issues/62) to support authenticating / authorizing users based on a separate authentication proxy, which makes it possible to support oauth, single-sign-on, etc.
+you can disable the built-in password-based login sysem, and instead replace it with a separate piece of software (an identity provider) which will then handle authenticating / authorizing of users; this makes it possible to support oauth, single-sign-on, etc.
+
+a popular choice is [Authelia](https://www.authelia.com/) (config-file based), another one is [authentik](https://goauthentik.io/) (GUI-based, more complex)
 
 there is a [docker-compose example](./docs/examples/docker/idp-authelia-traefik) which is hopefully a good starting point (alternatively see [./docs/idp.md](./docs/idp.md) if you're the DIY type)
 

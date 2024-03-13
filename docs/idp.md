@@ -4,4 +4,4 @@ to configure IdP from scratch, you must place copyparty behind a reverse-proxy w
 
 in the copyparty `[global]` config, specify which headers to read client info from; username is required (`idp-h-usr: X-Authooley-User`), group(s) are optional (`idp-h-grp: X-Authooley-Groups`)
 
-* it is also required to specify the subnet that legit requests will be coming from, for example `--xff-src=10.88.` to allow 10.88.x.x, and it is recommended to configure the reverseproxy to include a secret header as proof that the other headers are also legit (and not smuggled in by a malicious client), telling copyparty the headername to expect with `idp-h-key: X-Totes-Legit`
+* it is also required to specify the subnet that legit requests will be coming from, for example `--xff-src=10.88.` to allow 10.88.x.x, and it is recommended to configure the reverseproxy to include a secret header as proof that the other headers are also legit (and not smuggled in by a malicious client), telling copyparty the headername to expect with `idp-h-key: shangala-bangala`
