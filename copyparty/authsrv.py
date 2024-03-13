@@ -902,7 +902,6 @@ class AuthSrv(object):
         mount: dict[str, str],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
-        only_if_exist: bool = False,
     ) -> tuple[str, str]:
         src = os.path.expandvars(os.path.expanduser(src))
         src = absreal(src)
@@ -923,9 +922,6 @@ class AuthSrv(object):
             raise Exception(BAD_CFG)
 
         if not bos.path.isdir(src):
-            if only_if_exist:
-                return ("", "")
-
             self.log("warning: filesystem-path does not exist: {}".format(src), 3)
 
         mount[dst] = src
