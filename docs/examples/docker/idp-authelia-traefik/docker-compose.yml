@@ -6,7 +6,7 @@ networks:
 
 services:
   copyparty:
-    image: copyparty/ac:idp
+    image: copyparty/ac
     container_name: idp_copyparty
     user: "1000:1000"  # should match the user/group of your fileshare volumes
     volumes:

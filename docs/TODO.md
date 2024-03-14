@@ -1,12 +1,5 @@
 a living list of upcoming features / fixes / changes, very roughly in order of priority
 
-* readme / docs
-  * docker ftp config
-  * custom-fonts (copy from issue)
-  * s3 speedfix
-  * reverseproxy/cloudflare: ensure cloudflare does not terminate https
-  * docker: suggest putting hists in /cfg/hists/
-
 * download accelerator
   * definitely download chunks in parallel
   * maybe resumable downloads (chrome-only, jank api)

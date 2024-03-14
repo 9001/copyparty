@@ -33,6 +33,8 @@ the recommended way to configure copyparty inside a container is to mount a fold
 * but you can also provide arguments to the docker command if you prefer that
 * config files must be named `something.conf` to get picked up
 
+also see [docker-specific recommendations](#docker-specific-recommendations)
+
 
 ## editions
 
@@ -86,6 +88,26 @@ the following advice is best-effort and not guaranteed to be entirely correct
 * q: starting a rootless container on debian 12 fails with `failed to register layer: lsetxattr user.overlay.impure /etc: operation not supported`
   * a: docker's default rootless configuration on debian is to use the overlay2 storage driver; this does not work. Your options are to replace docker with podman (good choice), or to configure docker to use the `fuse-overlayfs` storage driver
 
+
+
+# docker-specific recommendations
+
+* copyparty will generally create a `.hist` folder at the top of each volume, which contains the filesystem index, thumbnails and such. For performance reasons, but also just to keep things tidy, it might be convenient to store these inside the config folder instead. Add the line `hist: /cfg/hists/` inside the `[global]` section of your `copyparty.conf` to do this
+
+
+## enabling the ftp server
+
+...is tricky because ftp is a weird protocol and docker is making it worse 🎉
+
+add the following three config entries into the `[global]` section of your `copyparty.conf`:
+
+* `ftp: 3921` to enable the service, listening for connections on port 3921
+
+* `ftp-nat: 127.0.0.1` but replace `127.0.0.1` with the actual external IP of your server; the clients will only be able to connect to this IP, even if the server has multiple IPs
+
+* `ftp-pr: 12000-12099` to restrict the [passive-mode](http://slacksite.com/other/ftp.html#passive) port selection range; this allows up to 100 simultaneous file transfers
+
+then finally update your docker config so that the port-range you specified (12000-12099) is exposed to the internet
 
 
 # build the images yourself

@@ -70,6 +70,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
     * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
     * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
+    * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
@@ -355,6 +356,9 @@ upgrade notes
 
 * firefox refuses to connect over https, saying "Secure Connection Failed" or "SEC_ERROR_BAD_SIGNATURE", but the usual button to "Accept the Risk and Continue" is not shown
   * firefox has corrupted its certstore; fix this by exiting firefox, then find and delete the file named `cert9.db` somewhere in your firefox profile folder
+
+* copyparty seems to think I am using http, even though the URL is https
+  * your reverse-proxy is not sending the `X-Forwarded-Proto: https` header; this could be because your reverse-proxy itself is confused. Ensure that none of the intermediates (such as cloudflare) are terminating https before the traffic hits your entrypoint
 
 * i want to learn python and/or programming and am considering looking at the copyparty source code in that occasion
   * ```bash
@@ -1271,6 +1275,17 @@ a popular choice is [Authelia](https://www.authelia.com/) (config-file based), a
 there is a [docker-compose example](./docs/examples/docker/idp-authelia-traefik) which is hopefully a good starting point (alternatively see [./docs/idp.md](./docs/idp.md) if you're the DIY type)
 
 a more complete example of the copyparty configuration options [look like this](./docs/examples/docker/idp/copyparty.conf)
+
+
+## using the cloud as storage
+
+connecting to an aws s3 bucket and similar
+
+there is no built-in support for this, but you can use FUSE-software such as [rclone](https://rclone.org/) / [geesefs](https://github.com/yandex-cloud/geesefs) / [JuiceFS](https://juicefs.com/en/) to first mount your cloud storage as a local disk, and then let copyparty use (a folder in) that disk as a volume
+
+you may experience poor upload performance this way, but that can sometimes be fixed by specifying the volflag `sparse` to force the use of sparse files; this has improved the upload speeds from `1.5 MiB/s` to over `80 MiB/s` in one case, but note that you are also more likely to discover funny bugs in your FUSE software this way, so buckle up
+
+someone has also tested geesefs in combination with [gocryptfs](https://nuetzlich.net/gocryptfs/) with surprisingly good results, getting 60 MiB/s upload speeds on a gbit line, but JuiceFS won with 80 MiB/s using its built-in encryption
 
 
 ## hiding from google
