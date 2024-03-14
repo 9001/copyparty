@@ -2006,7 +2006,13 @@ class AuthSrv(object):
         for idp_vp in self.idp_vols:
             parent_vp = vsplit(idp_vp)[0]
             vn, _ = vfs.get(parent_vp, "*", False, False)
-            zs = "READABLE" if "*" in vn.axs.uread else "WRITABLE" if "*" in vn.axs.uwrite else ""
+            zs = (
+                "READABLE"
+                if "*" in vn.axs.uread
+                else "WRITABLE"
+                if "*" in vn.axs.uwrite
+                else ""
+            )
             if zs:
                 t = '\nWARNING: Volume "/%s" appears below "/%s" and would be WORLD-%s'
                 idp_err += t % (idp_vp, vn.vpath, zs)
