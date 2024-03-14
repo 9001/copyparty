@@ -67,6 +67,7 @@ from .util import (
     Netdev,
     NetMap,
     absreal,
+    build_netmap,
     ipnorm,
     min_ex,
     shut_socket,
@@ -150,6 +151,10 @@ class HttpSrv(object):
         zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
         self.prism = os.path.exists(zs)
 
+        self.ipa_nm = build_netmap(self.args.ipa)
+        self.xff_nm = build_netmap(self.args.xff_src)
+        self.xff_lan = build_netmap("lan")
+
         self.statics: set[str] = set()
         self._build_statics()
 
@@ -199,7 +204,7 @@ class HttpSrv(object):
         for ip, _ in self.bound:
             ips.add(ip)
 
-        self.nm = NetMap(list(ips), netdevs)
+        self.nm = NetMap(list(ips), list(netdevs))
 
     def start_threads(self, n: int) -> None:
         self.tp_nthr += n

@@ -410,7 +410,7 @@ class FtpHandler(FTPHandler):
         if cip.startswith("::ffff:"):
             cip = cip[7:]
 
-        if self.args.ftp_ipa_re and not self.args.ftp_ipa_re.match(cip):
+        if self.args.ftp_ipa_nm and not self.args.ftp_ipa_nm.map(cip):
             logging.warning("client rejected (--ftp-ipa): %s", cip)
             self.connected = False
             conn.close()

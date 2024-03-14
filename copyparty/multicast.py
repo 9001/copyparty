@@ -110,7 +110,7 @@ class MCast(object):
             )
 
         ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
-        ips = find_prefix(ips, netdevs)
+        ips = find_prefix(ips, list(netdevs))
 
         on = self.on[:]
         off = self.off[:]

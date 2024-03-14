@@ -23,7 +23,7 @@ from .mtag import HAVE_FFMPEG
 from .th_cli import ThumbCli
 from .th_srv import HAVE_PIL, HAVE_VIPS
 from .u2idx import U2idx
-from .util import HMaccas, shut_socket
+from .util import HMaccas, NetMap, shut_socket
 
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Pattern, Union
@@ -55,6 +55,8 @@ class HttpConn(object):
         self.E: EnvParams = self.args.E
         self.asrv: AuthSrv = hsrv.asrv  # mypy404
         self.u2fh: Util.FHC = hsrv.u2fh  # mypy404
+        self.ipa_nm: NetMap = hsrv.ipa_nm
+        self.xff_nm: NetMap = hsrv.xff_nm
         self.iphash: HMaccas = hsrv.broker.iphash
         self.bans: dict[str, int] = hsrv.bans
         self.aclose: dict[str, int] = hsrv.aclose

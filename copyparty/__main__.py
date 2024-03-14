@@ -907,8 +907,8 @@ def add_network(ap):
     ap2.add_argument("--ll", action="store_true", help="include link-local IPv4/IPv6 in mDNS replies, even if the NIC has routable IPs (breaks some mDNS clients)")
     ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to associate clients with; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd, unsafe), [\033[32m2\033[0m]=outermost-proxy, [\033[32m3\033[0m]=second-proxy, [\033[32m-1\033[0m]=closest-proxy")
     ap2.add_argument("--xff-hdr", metavar="NAME", type=u, default="x-forwarded-for", help="if reverse-proxied, which http header to read the client's real ip from")
-    ap2.add_argument("--xff-src", metavar="IP", type=u, default="127., ::1", help="comma-separated list of trusted reverse-proxy IPs; only accept the real-ip header (\033[33m--xff-hdr\033[0m) if the incoming connection is from an IP starting with either of these. Can be disabled with [\033[32many\033[0m] if you are behind cloudflare (or similar) and are using \033[32m--xff-hdr=cf-connecting-ip\033[0m (or similar)")
-    ap2.add_argument("--ipa", metavar="PREFIX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPREFIX\033[0m; example: [\033[32m127., 10.89., 192.168.\033[0m]")
+    ap2.add_argument("--xff-src", metavar="CIDR", type=u, default="127.0.0.0/8, ::1/128", help="comma-separated list of trusted reverse-proxy CIDRs; only accept the real-ip header (\033[33m--xff-hdr\033[0m) and IdP headers if the incoming connection is from an IP within either of these subnets. Specify [\033[32mlan\033[0m] to allow all LAN / private / non-internet IPs. Can be disabled with [\033[32many\033[0m] if you are behind cloudflare (or similar) and are using \033[32m--xff-hdr=cf-connecting-ip\033[0m (or similar)")
+    ap2.add_argument("--ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; examples: [\033[32mlan\033[0m], [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--rp-loc", metavar="PATH", type=u, default="", help="if reverse-proxying on a location instead of a dedicated domain/subdomain, provide the base location here; example: [\033[32m/foo/bar\033[0m]")
     if ANYWIN:
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
@@ -1006,7 +1006,7 @@ def add_ftp(ap):
     ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
     ap2.add_argument("--ftp4", action="store_true", help="only listen on IPv4")
-    ap2.add_argument("--ftp-ipa", metavar="PFX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPFX\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Example: [\033[32m127., 10.89., 192.168.\033[0m]")
+    ap2.add_argument("--ftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--ftp-wt", metavar="SEC", type=int, default=7, help="grace period for resuming interrupted uploads (any client can write to any file last-modified more recently than \033[33mSEC\033[0m seconds ago)")
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
@@ -1029,7 +1029,7 @@ def add_tftp(ap):
     ap2.add_argument("--tftp-no-fast", action="store_true", help="debug: disable optimizations")
     ap2.add_argument("--tftp-lsf", metavar="PTN", type=u, default="\\.?(dir|ls)(\\.txt)?", help="return a directory listing if a file with this name is requested and it does not exist; defaults matches .ls, dir, .dir.txt, ls.txt, ...")
     ap2.add_argument("--tftp-nols", action="store_true", help="if someone tries to download a directory, return an error instead of showing its directory listing")
-    ap2.add_argument("--tftp-ipa", metavar="PFX", type=u, default="", help="only accept connections from IP-addresses starting with \033[33mPFX\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Example: [\033[32m127., 10.89., 192.168.\033[0m]")
+    ap2.add_argument("--tftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--tftp-pr", metavar="P-P", type=u, help="the range of UDP ports to use for data transfer, for example \033[32m12000-13000")
 
 

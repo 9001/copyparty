@@ -116,7 +116,7 @@ class Cfg(Namespace):
         ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "ah_cli ah_gen css_browser hist ipa_re js_browser no_forget no_hash no_idx nonsus_urls"
+        ex = "ah_cli ah_gen css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "hash_mt srch_time u2abort u2j"
@@ -242,6 +242,7 @@ class VHttpConn(object):
         self.freshen_pwd = 0.0
         self.hsrv = VHttpSrv(args, asrv, log)
         self.ico = None
+        self.ipa_nm = None
         self.lf_url = None
         self.log_func = log
         self.log_src = "a"

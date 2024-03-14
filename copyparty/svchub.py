@@ -49,6 +49,7 @@ from .util import (
     ODict,
     alltrace,
     ansi_re,
+    build_netmap,
     min_ex,
     mp,
     odfusion,
@@ -481,10 +482,8 @@ class SvcHub(object):
         al.idp_h_grp = al.idp_h_grp.lower()
         al.idp_h_key = al.idp_h_key.lower()
 
-        al.xff_re = self._ipa2re(al.xff_src)
-        al.ipa_re = self._ipa2re(al.ipa)
-        al.ftp_ipa_re = self._ipa2re(al.ftp_ipa or al.ipa)
-        al.tftp_ipa_re = self._ipa2re(al.tftp_ipa or al.ipa)
+        al.ftp_ipa_nm = build_netmap(al.ftp_ipa or al.ipa)
+        al.tftp_ipa_nm = build_netmap(al.tftp_ipa or al.ipa)
 
         mte = ODict.fromkeys(DEF_MTE.split(","), True)
         al.mte = odfusion(mte, al.mte)

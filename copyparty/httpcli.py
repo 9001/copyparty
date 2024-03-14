@@ -231,7 +231,7 @@ class HttpCli(object):
         if self.is_banned():
             return False
 
-        if self.args.ipa_re and not self.args.ipa_re.match(self.conn.addr[0]):
+        if self.conn.ipa_nm and not self.conn.ipa_nm.map(self.conn.addr[0]):
             self.log("client rejected (--ipa)", 3)
             self.terse_reply(b"", 500)
             return False
@@ -311,8 +311,9 @@ class HttpCli(object):
                     self.log(t.format(self.args.rproxy, zso), c=3)
 
                 pip = self.conn.addr[0]
-                if self.args.xff_re and not self.args.xff_re.match(pip):
-                    t = 'got header "%s" from untrusted source "%s" claiming the true client ip is "%s" (raw value: "%s");  if you trust this, you must allowlist this proxy with "--xff-src=%s"'
+                xffs = self.conn.xff_nm
+                if xffs and not xffs.map(pip):
+                    t = 'got header "%s" from untrusted source "%s" claiming the true client ip is "%s" (raw value: "%s");  if you trust this, you must allowlist this proxy with "--xff-src=%s"%s'
                     if self.headers.get("cf-connecting-ip"):
                         t += '  Note: if you are behind cloudflare, then this default header is not a good choice; please first make sure your local reverse-proxy (if any) does not allow non-cloudflare IPs from providing cf-* headers, and then add this additional global setting: "--xff-hdr=cf-connecting-ip"'
                     else:
@@ -321,8 +322,9 @@ class HttpCli(object):
                         ".".join(pip.split(".")[:2]) + "."
                         if "." in pip
                         else ":".join(pip.split(":")[:4]) + ":"
-                    )
-                    self.log(t % (self.args.xff_hdr, pip, cli_ip, zso, zs), 3)
+                    ) + "0.0/16"
+                    zs2 = ' or "--xff-src=lan"' if self.conn.hsrv.xff_lan.map(pip) else ""
+                    self.log(t % (self.args.xff_hdr, pip, cli_ip, zso, zs, zs2), 3)
                 else:
                     self.ip = cli_ip
                     self.is_vproxied = bool(self.args.R)
@@ -466,24 +468,22 @@ class HttpCli(object):
 
                 if not trusted_xff:
                     pip = self.conn.addr[0]
-                    trusted_xff = self.args.xff_re and self.args.xff_re.match(pip)
-
-                # always require --xff-src with idp, but check against original (xff_src) rather than computed value (xff_re) to allow 'any'
-                trusted_xff_strict = trusted_xff and self.args.xff_src
+                    xffs = self.conn.xff_nm
+                    trusted_xff = xffs and xffs.map(pip)
 
                 trusted_key = (
                     not self.args.idp_h_key
                 ) or self.args.idp_h_key in self.headers
 
-                if trusted_key and trusted_xff_strict:
+                if trusted_key and trusted_xff:
                     self.asrv.idp_checkin(self.conn.hsrv.broker, idp_usr, idp_grp)
                 else:
                     if not trusted_key:
                         t = 'the idp-h-key header ("%s") is not present in the request; will NOT trust the other headers saying that the client\'s username is "%s" and group is "%s"'
                         self.log(t % (self.args.idp_h_key, idp_usr, idp_grp), 3)
 
-                    if not trusted_xff_strict:
-                        t = 'got IdP headers from untrusted source "%s" claiming the client\'s username is "%s" and group is "%s";  if you trust this, you must allowlist this proxy with "--xff-src=%s"'
+                    if not trusted_xff:
+                        t = 'got IdP headers from untrusted source "%s" claiming the client\'s username is "%s" and group is "%s";  if you trust this, you must allowlist this proxy with "--xff-src=%s"%s'
                         if not self.args.idp_h_key:
                             t += "  Note: you probably also want to specify --idp-h-key <SECRET-HEADER-NAME> for additional security"
 
@@ -492,8 +492,9 @@ class HttpCli(object):
                             ".".join(pip.split(".")[:2]) + "."
                             if "." in pip
                             else ":".join(pip.split(":")[:4]) + ":"
-                        )
-                        self.log(t % (pip, idp_usr, idp_grp, zs), 3)
+                        ) + "0.0/16"
+                        zs2 = ' or "--xff-src=lan"' if self.conn.hsrv.xff_lan.map(pip) else ""
+                        self.log(t % (pip, idp_usr, idp_grp, zs, zs2), 3)
 
                     idp_usr = "*"
                     idp_grp = ""

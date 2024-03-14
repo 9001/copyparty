@@ -55,17 +55,16 @@ def noop(*a, **ka) -> None:
 
 def _serverInitial(self, pkt: Any, raddress: str, rport: int) -> bool:
     info("connection from %s:%s", raddress, rport)
-    ret = _orig_serverInitial(self, pkt, raddress, rport)
-    ptn = _hub[0].args.tftp_ipa_re
-    if ptn and not ptn.match(raddress):
+    ret = _sinitial[0](self, pkt, raddress, rport)
+    nm = _hub[0].args.tftp_ipa_nm
+    if nm and not nm.map(raddress):
         yeet("client rejected (--tftp-ipa): %s" % (raddress,))
     return ret
 
 
-# patch ipa-check into partftpd
+# patch ipa-check into partftpd (part 1/2)
 _hub: list["SvcHub"] = []
-_orig_serverInitial = TftpStates.TftpServerState.serverInitial
-TftpStates.TftpServerState.serverInitial = _serverInitial
+_sinitial: list[Any] = []
 
 
 class Tftpd(object):
@@ -115,6 +114,11 @@ class Tftpd(object):
 
             for C in Cs:
                 C.log.debug = noop
+
+        # patch ipa-check into partftpd (part 2/2)
+        _sinitial[:] = []
+        _sinitial.append(TftpStates.TftpServerState.serverInitial)
+        TftpStates.TftpServerState.serverInitial = _serverInitial
 
         # patch vfs into partftpy
         TftpContexts.open = self._open

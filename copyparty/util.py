@@ -559,20 +559,26 @@ class HLog(logging.Handler):
 
 
 class NetMap(object):
-    def __init__(self, ips: list[str], netdevs: dict[str, Netdev]) -> None:
+    def __init__(self, ips: list[str], cidrs: list[str], keep_lo=False) -> None:
+        """
+        ips: list of plain ipv4/ipv6 IPs, not cidr
+        cidrs: list of cidr-notation IPs (ip/prefix)
+        """
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
-                [x.split("/")[0] for x in netdevs if ":" in x]
+                [x.split("/")[0] for x in cidrs if ":" in x]
             )
             ips.append("0.0.0.0")
 
         if "0.0.0.0" in ips:
             ips = [x for x in ips if x != "0.0.0.0"] + list(
-                [x.split("/")[0] for x in netdevs if ":" not in x]
+                [x.split("/")[0] for x in cidrs if ":" not in x]
             )
 
-        ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
-        ips = find_prefix(ips, netdevs)
+        if not keep_lo:
+            ips = [x for x in ips if x not in ("::1", "127.0.0.1")]
+
+        ips = find_prefix(ips, cidrs)
 
         self.cache: dict[str, str] = {}
         self.b2sip: dict[bytes, str] = {}
@@ -589,6 +595,9 @@ class NetMap(object):
         self.bip.sort(reverse=True)
 
     def map(self, ip: str) -> str:
+        if ip.startswith("::ffff:"):
+            ip = ip[7:]
+
         try:
             return self.cache[ip]
         except:
@@ -1920,10 +1929,10 @@ def ipnorm(ip: str) -> str:
     return ip
 
 
-def find_prefix(ips: list[str], netdevs: dict[str, Netdev]) -> list[str]:
+def find_prefix(ips: list[str], cidrs: list[str]) -> list[str]:
     ret = []
     for ip in ips:
-        hit = next((x for x in netdevs if x.startswith(ip + "/")), None)
+        hit = next((x for x in cidrs if x.startswith(ip + "/") or ip == x), None)
         if hit:
             ret.append(hit)
     return ret
@@ -2315,6 +2324,41 @@ def list_ips() -> list[str]:
                 ret.add(ipo.ip)
 
     return list(ret)
+
+
+def build_netmap(csv: str):
+    csv = csv.lower().strip()
+
+    if csv in ("any", "all", "no", ",", ""):
+        return None
+
+    if csv in ("lan", "local", "private", "prvt"):
+        csv = "10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, fd00::/8"  # lan
+        csv += ", 169.254.0.0/16, fe80::/10"  # link-local
+        csv += ", 127.0.0.0/8, ::1/128"  # loopback
+
+    srcs = [x.strip() for x in csv.split(",") if x.strip()]
+    cidrs = []
+    for zs in srcs:
+        if not zs.endswith("."):
+            cidrs.append(zs)
+            continue
+
+        # translate old syntax "172.19." => "172.19.0.0/16"
+        words = len(zs.rstrip(".").split("."))
+        if words == 1:
+            zs += "0.0.0/8"
+        elif words == 2:
+            zs += "0.0/16"
+        elif words == 3:
+            zs += "0/24"
+        else:
+            raise Exception("invalid config value [%s]" % (zs,))
+
+        cidrs.append(zs)
+
+    ips = [x.split("/")[0] for x in cidrs]
+    return NetMap(ips, cidrs, True)
 
 
 def yieldfile(fn: str) -> Generator[bytes, None, None]:
