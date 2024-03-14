@@ -225,9 +225,9 @@ necho() {
 	mv pyftpdlib ftp/
 
 	necho collecting partftpy
-	f="../build/partftpy-0.3.0.tar.gz"
+	f="../build/partftpy-0.3.1.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/06/ce/531978c831c47f79bc72d5bbb3f12757daf1602d1fffad012305f2d270f6/partftpy-0.3.0.tar.gz;
+		(url=https://files.pythonhosted.org/packages/37/79/1a1de1d3fdf27ddc9c2d55fec6552e7b8ed115258fedac6120679898b83d/partftpy-0.3.1.tar.gz;
 		wget -O$f "$url" || curl -L "$url" >$f)
 
 	tar -zxf $f
