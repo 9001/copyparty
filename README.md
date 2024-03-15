@@ -78,7 +78,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [prometheus](#prometheus) - metrics/stats can be enabled
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
-    * [fedora package](#fedora-package) - currently **NOT** available on [copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/)
+    * [fedora package](#fedora-package) - does not exist yet
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
 * [browser support](#browser-support) - TLDR: yes
@@ -1268,7 +1268,7 @@ replace 404 and 403 errors with something completely different (that's it for no
 
 replace copyparty passwords with oauth and such
 
-you can disable the built-in password-based login sysem, and instead replace it with a separate piece of software (an identity provider) which will then handle authenticating / authorizing of users; this makes it possible to support oauth, single-sign-on, etc.
+you can disable the built-in password-based login sysem, and instead replace it with a separate piece of software (an identity provider) which will then handle authenticating / authorizing of users; this makes it possible to login with passkeys / fido2 / webauthn / yubikey / ldap / active directory / oauth / many other single-sign-on contraptions
 
 a popular choice is [Authelia](https://www.authelia.com/) (config-file based), another one is [authentik](https://goauthentik.io/) (GUI-based, more complex)
 
@@ -1462,17 +1462,7 @@ it comes with a [systemd service](./contrib/package/arch/copyparty.service) and 
 
 ## fedora package
 
-currently **NOT** available on [copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/)  ,  fedora is having issues with their build servers and won't be fixed for several months
-
-if you previously installed copyparty from copr, you may run one of the following commands to upgrade to a more recent version:
-
-```bash
-dnf install https://ocv.me/copyparty/fedora/37/python3-copyparty.fc37.noarch.rpm
-dnf install https://ocv.me/copyparty/fedora/38/python3-copyparty.fc38.noarch.rpm
-dnf install https://ocv.me/copyparty/fedora/39/python3-copyparty.fc39.noarch.rpm
-```
-
-to run copyparty as a service, use the [systemd service scripts](https://github.com/9001/copyparty/tree/hovudstraum/contrib/systemd), just replace `/usr/bin/python3 /usr/local/bin/copyparty-sfx.py` with `/usr/bin/copyparty`
+does not exist yet;  using the [copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/) builds is **NOT recommended** because updates can be delayed by [several months](https://github.com/fedora-copr/copr/issues/3056)
 
 
 ## nix package
