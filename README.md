@@ -597,7 +597,7 @@ this initiates an upload using `up2k`; there are two uploaders available:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
 * `[🚀] up2k`, the good / fancy one
 
-NB: you can undo/delete your own uploads with `[🧯]` [unpost](#unpost)
+NB: you can undo/delete your own uploads with `[🧯]` [unpost](#unpost) (and this is also where you abort unfinished uploads, but you have to refresh the page first)
 
 up2k has several advantages:
 * you can drop folders into the browser (files are added recursively)

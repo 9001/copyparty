@@ -223,7 +223,10 @@ install_vamp() {
 	#   use msys2 in mingw-w64 mode
 	#   pacman -S --needed mingw-w64-x86_64-{ffmpeg,python,python-pip,vamp-plugin-sdk}
 	
-	$pybin -m pip install --user vamp
+	$pybin -m pip install --user vamp || {
+		printf '\n\033[7malright, trying something else...\033[0m\n'
+		$pybin -m pip install --user --no-build-isolation vamp
+	}
 
 	cd "$td"
 	echo '#include <vamp-sdk/Plugin.h>' | g++ -x c++ -c -o /dev/null - || [ -e ~/pe/vamp-sdk ] || {

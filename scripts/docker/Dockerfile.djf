@@ -1,4 +1,4 @@
-FROM    fedora:38
+FROM    fedora:39
 WORKDIR /z
 LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
@@ -21,7 +21,7 @@ RUN     dnf install -y \
             vips vips-jxl vips-poppler vips-magick \
             python3-numpy fftw libsndfile \
             gcc gcc-c++ make cmake patchelf jq \
-            python3-devel ffmpeg-devel fftw-devel libsndfile-devel python3-setuptools \
+            python3-devel ffmpeg-devel fftw-devel libsndfile-devel python3-setuptools python3-wheel \
             vamp-plugin-sdk qm-vamp-plugins \
             vamp-plugin-sdk-devel vamp-plugin-sdk-static \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
@@ -29,7 +29,7 @@ RUN     dnf install -y \
         && bash install-deps.sh \
         && dnf erase -y \
             gcc gcc-c++ make cmake patchelf jq \
-            python3-devel ffmpeg-devel fftw-devel libsndfile-devel python3-setuptools \
+            python3-devel ffmpeg-devel fftw-devel libsndfile-devel python3-setuptools python3-wheel \
             vamp-plugin-sdk-devel vamp-plugin-sdk-static \
         && dnf clean all \
         && find /usr/ -name __pycache__ | xargs rm -rf \
