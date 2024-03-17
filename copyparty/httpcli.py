@@ -228,7 +228,7 @@ class HttpCli(object):
             "Cache-Control": "no-store, max-age=0",
         }
 
-        if self.is_banned():
+        if self.args.early_ban and self.is_banned():
             return False
 
         if self.conn.ipa_nm and not self.conn.ipa_nm.map(self.conn.addr[0]):
