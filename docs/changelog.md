@@ -1,4 +1,83 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0315-2047  `v1.11.0`  You Can (Not) Proceed
+
+this release was made possible by [stoltzekleiven, kvikklunsj, and tako](https://a.ocv.me/pub/g/nerd-stuff/2024-0310-stoltzekleiven.jpg)
+
+## new features
+
+* #62 support for [identity providers](https://github.com/9001/copyparty#identity-providers) and automatically creating volumes for each user/group ("home folders")
+  * login with passkeys / fido2 / webauthn / yubikey / ldap / active directory / oauth / many other single-sign-on contraptions
+  * [documentation](https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md) and [examples](https://github.com/9001/copyparty/tree/hovudstraum/docs/examples/docker/idp-authelia-traefik) could still use some help (I did my best)
+* #77 UI to cancel unfinished uploads (available in the 🧯 unpost tab) 3f05b665
+  * the user's IP and username must match the upload by default; can be changed with global-option / volflag `u2abort`
+* new volflag `sparse` to pretend sparse files are supported even if the filesystem doesn't 8785d2f9
+  * gives drastically better performance when writing to s3 buckets through juicefs/geesefs
+  * only for when you know the filesystem can deal with it (so juicefs/geesefs is OK, but **definitely not** fat32)
+* `--xff-src` and `--ipa` now support CIDR notation (but the old syntax still works) b377791b
+* ux:
+  * #74 option to use [custom fonts](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice) 263adec7 6cc7101d 8016e671
+  * option to disable autoplay when page url contains a song hash 8413ed6d
+    * good if you're using copyparty to listen to music at the office and the office policy is to have the webbrowser automatically restart to install updates, meaning your coworkers are suddenly and involuntarily enjoying some loud af jcore while you're asleep at home
+
+## bugfixes
+
+* don't panic if cloudflare (or another reverse-proxy) decides to hijack json responses and replace them with html 7741870d
+* #73 the fancy markdown editor was incompatible with caddy (a reverse-proxy) ac96fd9c
+* media player could get confused if neighboring folders had songs with the same filenames 206af8f1
+* benign race condition in the config reloader (could only be triggered by admins and/or SIGUSR1) 096de508
+* running tftp with optimizations enabled would cause issues for `--ipa` b377791b
+* cosmetic tftp bugs 115020ba
+* ux:
+  * up2k rendering glitch if the last couple uploads were dupes 547a4863
+  * up2k rendering glitch when switching between readonly/writeonly folders 51a83b04
+  * markdown editor preview was glitchy on tiny screens e5582605
+
+## other changes
+
+* add a [sharex v12.1](https://github.com/9001/copyparty/tree/hovudstraum/contrib#sharexsxcu) config example 2527e903
+* make it easier to discover/diagnose issues with docker and/or reverse-proxy config d744f3ff
+* stop recommending the use of `--xff-src=any` in the log messages 7f08f10c
+* ux:
+  * remove the `k304` togglebutton in the controlpanel by default 1c011ff0
+  * mention that a full restart is required for `[global]` config changes to take effect 0c039219
+* docs e78af022
+  * [how to use copyparty with amazon aws s3](https://github.com/9001/copyparty#using-the-cloud-as-storage)
+  * faq: http/https confusion caused by incorrectly configured cloudflare
+  * #76 docker: ftp-server howto
+* copyparty.exe: updated pyinstaller to 6.5.0 bdbcbbb0
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0221-2132  `v1.10.2`  tall thumbs
+
+## new features
+
+* thumbnails can be way taller when centercrop is disabled in the browser UI 5026b212
+  * good for folders with lots of portrait pics (no more letterboxing)
+* more thumbnail stuff:
+  * zoom levels are twice as granular 5026b212
+  * write-only folders get an "upload-only" icon 89c6c2e0
+  * inaccessible files/folders get a 403/404 icon 8a38101e
+
+## bugfixes
+
+* tftp fixes d07859e8
+  * server could crash if a nic disappeared / got restarted mid-transfer
+  * tiny resource leak if dualstack causes ipv4 bind to fail
+* thumbnails:
+  * when behind a caching proxy (cloudflare), icons in folders would be a random mix of png and svg 43ee6b9f
+  * produce valid folder icons when thumbnails are disabled 14af136f
+* trailing newline in html responses d39a99c9
+
+## other changes
+
+* webdeps: update dompurify 13e77777
+* copyparty.exe: update jinja2, markupsafe, pyinstaller, upx 13e77777
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0218-1554  `v1.10.1`  big thumbs
 
 ## new features
