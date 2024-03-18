@@ -75,6 +75,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [themes](#themes)
     * [complete examples](#complete-examples)
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
+        * [real-ip](#real-ip) - teaching copyparty how to see client IPs
     * [prometheus](#prometheus) - metrics/stats can be enabled
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
@@ -356,6 +357,9 @@ upgrade notes
 
 * firefox refuses to connect over https, saying "Secure Connection Failed" or "SEC_ERROR_BAD_SIGNATURE", but the usual button to "Accept the Risk and Continue" is not shown
   * firefox has corrupted its certstore; fix this by exiting firefox, then find and delete the file named `cert9.db` somewhere in your firefox profile folder
+
+* the server keeps saying `thank you for playing` when I try to access the website
+  * you've gotten banned for malicious traffic! if this happens by mistake, and you're running a reverse-proxy and/or something like cloudflare, see [real-ip](#real-ip) on how to fix this
 
 * copyparty seems to think I am using http, even though the URL is https
   * your reverse-proxy is not sending the `X-Forwarded-Proto: https` header; this could be because your reverse-proxy itself is confused. Ensure that none of the intermediates (such as cloudflare) are terminating https before the traffic hits your entrypoint
@@ -1381,6 +1385,15 @@ example webserver configs:
 
 * [nginx config](contrib/nginx/copyparty.conf) -- entire domain/subdomain
 * [apache2 config](contrib/apache/copyparty.conf) -- location-based
+
+
+### real-ip
+
+teaching copyparty how to see client IPs  when running behind a reverse-proxy, or a WAF, or another protection service such as cloudflare
+
+if you (and maybe everybody else) keep getting a message that says `thank you for playing`, then you've gotten banned for malicious traffic. This ban applies to the IP address that copyparty *thinks* identifies the shady client -- so, depending on your setup, you might have to tell copyparty where to find the correct IP
+
+for most common setups, there should be a helpful message in the server-log explaining what to do, but see [docs/xff.md](docs/xff.md) if you want to learn more, including a quick hack to **just make it work** (which is **not** recommended, but hey...)
 
 
 ## prometheus
