@@ -97,8 +97,6 @@ class Tftpd(object):
             cbak = []
             if not self.args.tftp_no_fast and not EXE:
                 try:
-                    import inspect
-
                     ptn = re.compile(r"(^\s*)log\.debug\(.*\)$")
                     for C in Cs:
                         cbak.append(C.__dict__)

@@ -323,9 +323,7 @@ class HttpCli(object):
                         if "." in pip
                         else ":".join(pip.split(":")[:4]) + ":"
                     ) + "0.0/16"
-                    zs2 = (
-                        ' or "--xff-src=lan"' if self.conn.hsrv.xff_lan.map(pip) else ""
-                    )
+                    zs2 = ' or "--xff-src=lan"' if self.conn.xff_lan.map(pip) else ""
                     self.log(t % (self.args.xff_hdr, pip, cli_ip, zso, zs, zs2), 3)
                 else:
                     self.ip = cli_ip
@@ -496,9 +494,7 @@ class HttpCli(object):
                             else ":".join(pip.split(":")[:4]) + ":"
                         ) + "0.0/16"
                         zs2 = (
-                            ' or "--xff-src=lan"'
-                            if self.conn.hsrv.xff_lan.map(pip)
-                            else ""
+                            ' or "--xff-src=lan"' if self.conn.xff_lan.map(pip) else ""
                         )
                         self.log(t % (pip, idp_usr, idp_grp, zs, zs2), 3)
 

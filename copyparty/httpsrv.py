@@ -104,7 +104,7 @@ class HttpSrv(object):
         self.t0 = time.time()
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
-        self.nm = NetMap([], {})
+        self.nm = NetMap([], [])
         self.ssdp: Optional["SSDPr"] = None
         self.gpwd = Garda(self.args.ban_pw)
         self.g404 = Garda(self.args.ban_404)
