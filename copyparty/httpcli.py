@@ -3605,8 +3605,6 @@ class HttpCli(object):
         return ret
 
     def tx_ups(self) -> bool:
-        have_unpost = self.args.unpost and "e2d" in self.vn.flags
-
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
             raise Pebkac(500, "sqlite3 is not available on the server; cannot unpost")
@@ -3630,8 +3628,14 @@ class HttpCli(object):
         )
         uret = x.get()
 
-        allvols = self.asrv.vfs.all_vols if have_unpost else {}
-        for vol in allvols.values():
+        if not self.args.unpost:
+            allvols = []
+        else:
+            allvols = list(self.asrv.vfs.all_vols.values())
+
+        allvols = [x for x in allvols if "e2d" in x.flags]
+
+        for vol in allvols:
             cur = idx.get_cur(vol.realpath)
             if not cur:
                 continue
@@ -3683,7 +3687,7 @@ class HttpCli(object):
             for v in ret:
                 v["vp"] = self.args.SR + v["vp"]
 
-        if not have_unpost:
+        if not allvols:
             ret = [{"kinshi": 1}]
 
         jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, indent=0))
