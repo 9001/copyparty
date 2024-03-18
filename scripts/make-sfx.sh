@@ -368,7 +368,7 @@ git describe --tags >/dev/null 2>/dev/null && {
 
 	printf '%s\n' "$git_ver" | grep -qE '^v[0-9\.]+-[0-9]+-g[0-9a-f]+$' && {
 		# long format (unreleased commit)
-		t_ver="$(printf '%s\n' "$ver" | sed -r 's/\./, /g; s/(.*) (.*)/\1 "\2"/')"
+		t_ver="$(printf '%s\n' "$ver" | sed -r 's/[-.]/, /g; s/(.*) (.*)/\1 "\2"/')"
 	}
 
 	[ -z "$t_ver" ] && {
