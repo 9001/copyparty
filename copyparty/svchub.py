@@ -28,7 +28,7 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, E, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, E, EnvParams, unicode
 from .authsrv import BAD_CFG, AuthSrv
 from .cert import ensure_cert
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE

@@ -36,6 +36,7 @@ from .bos import bos
 from .star import StreamTar
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
+from .util import unquote  # type: ignore
 from .util import (
     APPLESAN_RE,
     BITNESS,
@@ -84,7 +85,6 @@ from .util import (
     sendfile_py,
     undot,
     unescape_cookie,
-    unquote,  # type: ignore
     unquotep,
     vjoin,
     vol_san,

@@ -44,7 +44,7 @@ class TestVFS(unittest.TestCase):
         cfgdir = os.path.join(here, "res", "idp")
 
         # globals are applied by main so need to cheat a little
-        xcfg = { "idp_h_usr": "x-idp-user", "idp_h_grp": "x-idp-group" }
+        xcfg = {"idp_h_usr": "x-idp-user", "idp_h_grp": "x-idp-group"}
 
         return here, cfgdir, xcfg
 

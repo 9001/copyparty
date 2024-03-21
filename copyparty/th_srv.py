@@ -16,9 +16,9 @@ from .__init__ import ANYWIN, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
+from .util import BytesIO  # type: ignore
 from .util import (
     FFMPEG_URL,
-    BytesIO,  # type: ignore
     Cooldown,
     Daemon,
     Pebkac,

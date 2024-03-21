@@ -49,11 +49,7 @@ class TestHttpCli(unittest.TestCase):
                 with open(filepath, "wb") as f:
                     f.write(filepath.encode("utf-8"))
 
-        vcfg = [
-            ".::r,u1:r.,u2",
-            "a:a:r,u1:r,u2",
-            ".b:.b:r.,u1:r,u2"
-        ]
+        vcfg = [".::r,u1:r.,u2", "a:a:r,u1:r,u2", ".b:.b:r.,u1:r,u2"]
         self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"], e2dsa=True)
         self.asrv = AuthSrv(self.args, self.log)
 
@@ -96,7 +92,7 @@ class TestHttpCli(unittest.TestCase):
         tar = tarfile.open(fileobj=io.BytesIO(b), mode="r|").getnames()
         top = ("top" if not url else url.lstrip(".").split("/")[0]) + "/"
         assert len(tar) == len([x for x in tar if x.startswith(top)])
-        return " ".join([x[len(top):] for x in tar])
+        return " ".join([x[len(top) :] for x in tar])
 
     def curl(self, url, uname, binary=False):
         conn = tu.VHttpConn(self.args, self.asrv, self.log, hdr(url, uname))
