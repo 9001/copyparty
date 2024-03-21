@@ -1224,7 +1224,9 @@ class AuthSrv(object):
             if un.startswith("@"):
                 grp = un[1:]
                 uns = [x[0] for x in un_gns.items() if grp in x[1]]
-                if not uns and grp != "${g}" and not self.args.idp_h_grp:
+                if grp == "${g}":
+                    unames.append(un)
+                elif not uns and not self.args.idp_h_grp:
                     t = "group [%s] must be defined with --grp argument (or in a [groups] config section)"
                     raise CfgEx(t % (grp,))
 
@@ -1234,31 +1236,28 @@ class AuthSrv(object):
 
         # unames may still contain ${u} and ${g} so now expand those;
         un_gn = [(un, gn) for un, gns in un_gns.items() for gn in gns]
-        if "*" not in un_gns:
-            # need ("*","") to match "*" in unames
-            un_gn.append(("*", ""))
 
-        for _, dst, vu, vg in vols:
-            unames2 = set()
-            for un, gn in un_gn:
-                # if vu/vg (volume user/group) is non-null,
-                # then each non-null value corresponds to
-                # ${u}/${g}; consider this a filter to
-                # apply to unames, as well as un_gn
-                if (vu and vu != un) or (vg and vg != gn):
-                    continue
+        for src, dst, vu, vg in vols:
+            unames2 = set(unames)
 
-                for uname in unames + ([un] if vu or vg else []):
-                    if uname == "${u}":
-                        uname = vu or un
-                    elif uname in ("${g}", "@${g}"):
-                        uname = vg or gn
+            if "${u}" in unames:
+                if not vu:
+                    t = "cannot use ${u} in accs of volume [%s] because the volume url does not contain ${u}"
+                    raise CfgEx(t % (src,))
+                unames2.add(vu)
 
-                    if vu and vu != uname:
-                        continue
+            if "@${g}" in unames:
+                if not vg:
+                    t = "cannot use @${g} in accs of volume [%s] because the volume url does not contain @${g}"
+                    raise CfgEx(t % (src,))
+                unames2.update([un for un, gn in un_gn if gn == vg])
 
-                    if uname:
-                        unames2.add(uname)
+            if "${g}" in unames:
+                t = 'the accs of volume [%s] contains "${g}" but the only supported way of specifying that is "@${g}"'
+                raise CfgEx(t % (src,))
+
+            unames2.discard("${u}")
+            unames2.discard("@${g}")
 
             self._read_vol_str(lvl, list(unames2), axs[dst])
 

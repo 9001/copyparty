@@ -15,6 +15,16 @@ class TestVFS(unittest.TestCase):
         print(json.dumps(vfs, indent=4, sort_keys=True, default=lambda o: o.__dict__))
 
     def log(self, src, msg, c=0):
+        m = "%s" % (msg,)
+        if (
+            "warning: filesystem-path does not exist:" in m
+            or "you are sharing a system directory:" in m
+            or "reinitializing due to new user from IdP:" in m
+            or m.startswith("hint: argument")
+            or (m.startswith("loaded ") and " config files:" in m)
+        ):
+            return
+
         print(("[%s] %s" % (src, msg)).encode("ascii", "replace").decode("ascii"))
 
     def nav(self, au, vp):
@@ -30,14 +40,16 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(unpacked, expected + [[]] * pad)
 
     def assertAxsAt(self, au, vp, expected):
-        self.assertAxs(self.nav(au, vp).axs, expected)
+        vn = self.nav(au, vp)
+        self.assertAxs(vn.axs, expected)
 
     def assertNodes(self, vfs, expected):
         got = list(sorted(vfs.nodes.keys()))
         self.assertEqual(got, expected)
 
     def assertNodesAt(self, au, vp, expected):
-        self.assertNodes(self.nav(au, vp), expected)
+        vn = self.nav(au, vp)
+        self.assertNodes(vn, expected)
 
     def prep(self):
         here = os.path.abspath(os.path.dirname(__file__))
@@ -140,6 +152,11 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(self.nav(au, "vg/iga1").realpath, "/g1-iga")
         self.assertEqual(self.nav(au, "vg/iga2").realpath, "/g2-iga")
 
+        au.idp_checkin(None, "iub", "iga")
+        self.assertAxsAt(au, "vu/iua", [["iua"]])
+        self.assertAxsAt(au, "vg/iga1", [["iua", "iub"]])
+        self.assertAxsAt(au, "vg/iga2", [["iua", "iub", "ua"]])
+
     def test_5(self):
         """
         one IdP user in multiple groups
@@ -169,3 +186,44 @@ class TestVFS(unittest.TestCase):
         self.assertAxsAt(au, "g", [["iua"]])
         self.assertAxsAt(au, "ga", [["iua"]])
         self.assertAxsAt(au, "gb", [["iua"]])
+
+    def test_6(self):
+        """
+        IdP volumes with anon-get and other users/groups (github#79)
+        """
+        _, cfgdir, xcfg = self.prep()
+        au = AuthSrv(Cfg(c=[cfgdir + "/6.conf"], **xcfg), self.log)
+
+        self.assertAxs(au.vfs.axs, [])
+        self.assertEqual(au.vfs.vpath, "")
+        self.assertEqual(au.vfs.realpath, "")
+        self.assertNodes(au.vfs, [])
+
+        au.idp_checkin(None, "iua", "")
+        star = ["*", "iua"]
+        self.assertNodes(au.vfs, ["get", "priv"])
+        self.assertAxsAt(au, "get/iua", [["iua"], [], [], [], star])
+        self.assertAxsAt(au, "priv/iua", [["iua"], [], []])
+
+        au.idp_checkin(None, "iub", "")
+        star = ["*", "iua", "iub"]
+        self.assertNodes(au.vfs, ["get", "priv"])
+        self.assertAxsAt(au, "get/iua", [["iua"], [], [], [], star])
+        self.assertAxsAt(au, "get/iub", [["iub"], [], [], [], star])
+        self.assertAxsAt(au, "priv/iua", [["iua"], [], []])
+        self.assertAxsAt(au, "priv/iub", [["iub"], [], []])
+
+        au.idp_checkin(None, "iuc", "su")
+        star = ["*", "iua", "iub", "iuc"]
+        self.assertNodes(au.vfs, ["get", "priv", "team"])
+        self.assertAxsAt(au, "get/iua", [["iua", "iuc"], [], ["iuc"], [], star])
+        self.assertAxsAt(au, "get/iub", [["iub", "iuc"], [], ["iuc"], [], star])
+        self.assertAxsAt(au, "get/iuc", [["iuc"], [], ["iuc"], [], star])
+        self.assertAxsAt(au, "priv/iua", [["iua", "iuc"], [], ["iuc"]])
+        self.assertAxsAt(au, "priv/iub", [["iub", "iuc"], [], ["iuc"]])
+        self.assertAxsAt(au, "priv/iuc", [["iuc"], [], ["iuc"]])
+        self.assertAxsAt(au, "team/su/iuc", [["iuc"]])
+
+        au.idp_checkin(None, "iud", "su")
+        self.assertAxsAt(au, "team/su/iuc", [["iuc", "iud"]])
+        self.assertAxsAt(au, "team/su/iud", [["iuc", "iud"]])
