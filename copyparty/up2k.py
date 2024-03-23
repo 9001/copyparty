@@ -3920,7 +3920,7 @@ class Up2k(object):
         csz = up2k_chunksize(fsz)
         ret = []
         suffix = " MB, {}".format(path)
-        with open(fsenc(path), "rb", 512 * 1024) as f:
+        with open(fsenc(path), "rb", self.args.iobuf) as f:
             if self.mth and fsz >= 1024 * 512:
                 tlt = self.mth.hash(f, fsz, csz, self.pp, prefix, suffix)
                 ret = [x[0] for x in tlt]

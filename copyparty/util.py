@@ -2361,10 +2361,11 @@ def build_netmap(csv: str):
     return NetMap(ips, cidrs, True)
 
 
-def yieldfile(fn: str) -> Generator[bytes, None, None]:
-    with open(fsenc(fn), "rb", 512 * 1024) as f:
+def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
+    readsz = min(bufsz, 128 * 1024)
+    with open(fsenc(fn), "rb", bufsz) as f:
         while True:
-            buf = f.read(128 * 1024)
+            buf = f.read(readsz)
             if not buf:
                 break
 

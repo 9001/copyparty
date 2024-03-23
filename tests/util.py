@@ -147,6 +147,7 @@ class Cfg(Namespace):
             dbd="wal",
             fk_salt="a" * 16,
             idp_gsep=re.compile("[|:;+,]"),
+            iobuf=256 * 1024,
             lang="eng",
             log_badpwd=1,
             logout=573,

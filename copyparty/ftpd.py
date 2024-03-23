@@ -218,7 +218,7 @@ class FtpFs(AbstractedFS):
                 raise FSE("Cannot open existing file for writing")
 
         self.validpath(ap)
-        return open(fsenc(ap), mode)
+        return open(fsenc(ap), mode, self.args.iobuf)
 
     def chdir(self, path: str) -> None:
         nwd = join(self.cwd, path)

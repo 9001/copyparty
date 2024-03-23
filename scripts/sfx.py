@@ -234,8 +234,9 @@ def u8(gen):
 
 
 def yieldfile(fn):
-    with open(fn, "rb") as f:
-        for block in iter(lambda: f.read(64 * 1024), b""):
+    s = 64 * 1024
+    with open(fn, "rb", s * 4) as f:
+        for block in iter(lambda: f.read(s), b""):
             yield block
 
 

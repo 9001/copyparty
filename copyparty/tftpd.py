@@ -340,6 +340,9 @@ class Tftpd(object):
         if not self.args.tftp_nols and bos.path.isdir(ap):
             return self._ls(vpath, "", 0, True)
 
+        if not a:
+            a = [self.args.iobuf]
+
         return open(ap, mode, *a, **ka)
 
     def _mkdir(self, vpath: str, *a) -> None:

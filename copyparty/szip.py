@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import argparse
 import calendar
 import stat
 import time
@@ -218,12 +219,13 @@ class StreamZip(StreamArc):
     def __init__(
         self,
         log: "NamedLogger",
+        args: argparse.Namespace,
         fgen: Generator[dict[str, Any], None, None],
         utf8: bool = False,
         pre_crc: bool = False,
         **kwargs: Any
     ) -> None:
-        super(StreamZip, self).__init__(log, fgen)
+        super(StreamZip, self).__init__(log, args, fgen)
 
         self.utf8 = utf8
         self.pre_crc = pre_crc
@@ -248,7 +250,7 @@ class StreamZip(StreamArc):
 
         crc = 0
         if self.pre_crc:
-            for buf in yieldfile(src):
+            for buf in yieldfile(src, self.args.iobuf):
                 crc = zlib.crc32(buf, crc)
 
             crc &= 0xFFFFFFFF
@@ -257,7 +259,7 @@ class StreamZip(StreamArc):
         buf = gen_hdr(None, name, sz, ts, self.utf8, crc, self.pre_crc)
         yield self._ct(buf)
 
-        for buf in yieldfile(src):
+        for buf in yieldfile(src, self.args.iobuf):
             if not self.pre_crc:
                 crc = zlib.crc32(buf, crc)
 

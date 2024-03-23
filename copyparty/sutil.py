@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import argparse
 import os
 import tempfile
 from datetime import datetime
@@ -20,10 +21,12 @@ class StreamArc(object):
     def __init__(
         self,
         log: "NamedLogger",
+        args: argparse.Namespace,
         fgen: Generator[dict[str, Any], None, None],
         **kwargs: Any
     ):
         self.log = log
+        self.args = args
         self.fgen = fgen
         self.stopped = False
 

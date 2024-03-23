@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import argparse
 import re
 import stat
 import tarfile
@@ -44,11 +45,12 @@ class StreamTar(StreamArc):
     def __init__(
         self,
         log: "NamedLogger",
+        args: argparse.Namespace,
         fgen: Generator[dict[str, Any], None, None],
         cmp: str = "",
         **kwargs: Any
     ):
-        super(StreamTar, self).__init__(log, fgen)
+        super(StreamTar, self).__init__(log, args, fgen)
 
         self.ci = 0
         self.co = 0
@@ -126,7 +128,7 @@ class StreamTar(StreamArc):
         inf.gid = 0
 
         self.ci += inf.size
-        with open(fsenc(src), "rb", 512 * 1024) as fo:
+        with open(fsenc(src), "rb", self.args.iobuf) as fo:
             self.tar.addfile(inf, fo)
 
     def _gen(self) -> None:

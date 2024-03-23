@@ -174,7 +174,6 @@ class HttpCli(object):
         self.parser: Optional[MultipartParser] = None
         # end placeholders
 
-        self.bufsz = 1024 * 32
         self.html_head = ""
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
@@ -1641,7 +1640,7 @@ class HttpCli(object):
         bos.makedirs(fdir)
 
         open_ka: dict[str, Any] = {"fun": open}
-        open_a = ["wb", 512 * 1024]
+        open_a = ["wb", self.args.iobuf]
 
         # user-request || config-force
         if ("gz" in vfs.flags or "xz" in vfs.flags) and (
@@ -1900,7 +1899,7 @@ class HttpCli(object):
         f.seek(ofs)
         with open(fp, "wb") as fo:
             while nrem:
-                buf = f.read(min(nrem, 512 * 1024))
+                buf = f.read(min(nrem, self.args.iobuf))
                 if not buf:
                     break
 
@@ -2162,7 +2161,7 @@ class HttpCli(object):
                     except:
                         pass
 
-            f = f or open(fsenc(path), "rb+", 512 * 1024)
+            f = f or open(fsenc(path), "rb+", self.args.iobuf)
 
             try:
                 f.seek(cstart[0])
@@ -2185,7 +2184,8 @@ class HttpCli(object):
                     )
                     ofs = 0
                     while ofs < chunksize:
-                        bufsz = min(chunksize - ofs, 4 * 1024 * 1024)
+                        bufsz = max(4 * 1024 * 1024, self.args.iobuf)
+                        bufsz = min(chunksize - ofs, bufsz)
                         f.seek(cstart[0] + ofs)
                         buf = f.read(bufsz)
                         for wofs in cstart[1:]:
@@ -2482,7 +2482,7 @@ class HttpCli(object):
                         v2 = lim.dfv - lim.dfl
                         max_sz = min(v1, v2) if v1 and v2 else v1 or v2
 
-                    with ren_open(tnam, "wb", 512 * 1024, **open_args) as zfw:
+                    with ren_open(tnam, "wb", self.args.iobuf, **open_args) as zfw:
                         f, tnam = zfw["orz"]
                         tabspath = os.path.join(fdir, tnam)
                         self.log("writing to {}".format(tabspath))
@@ -2778,7 +2778,7 @@ class HttpCli(object):
         if bos.path.exists(fp):
             wunlink(self.log, fp, vfs.flags)
 
-        with open(fsenc(fp), "wb", 512 * 1024) as f:
+        with open(fsenc(fp), "wb", self.args.iobuf) as f:
             sz, sha512, _ = hashcopy(p_data, f, self.args.s_wr_slp)
 
         if lim:
@@ -3010,8 +3010,7 @@ class HttpCli(object):
             upper = gzip_orig_sz(fs_path)
         else:
             open_func = open
-            # 512 kB is optimal for huge files, use 64k
-            open_args = [fsenc(fs_path), "rb", 64 * 1024]
+            open_args = [fsenc(fs_path), "rb", self.args.iobuf]
             use_sendfile = (
                 # fmt: off
                 not self.tls
@@ -3146,6 +3145,7 @@ class HttpCli(object):
 
         bgen = packer(
             self.log,
+            self.args,
             fgen,
             utf8="utf" in uarg,
             pre_crc="crc" in uarg,
@@ -3223,7 +3223,7 @@ class HttpCli(object):
         sz_md = 0
         lead = b""
         fullfile = b""
-        for buf in yieldfile(fs_path):
+        for buf in yieldfile(fs_path, self.args.iobuf):
             if sz_md < max_sz:
                 fullfile += buf
             else:
@@ -3296,7 +3296,7 @@ class HttpCli(object):
             if fullfile:
                 self.s.sendall(fullfile)
             else:
-                for buf in yieldfile(fs_path):
+                for buf in yieldfile(fs_path, self.args.iobuf):
                     self.s.sendall(html_bescape(buf))
 
             self.s.sendall(html[1])
