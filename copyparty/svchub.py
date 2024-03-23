@@ -173,6 +173,26 @@ class SvcHub(object):
             self.log("root", t.format(args.j), c=3)
             args.no_fpool = True
 
+        for name, arg in (
+            ("iobuf", "iobuf"),
+            ("s-rd-sz", "s_rd_sz"),
+            ("s-wr-sz", "s_wr_sz"),
+        ):
+            zi = getattr(args, arg)
+            if zi < 32768:
+                t = "WARNING: expect very poor performance because you specified a very low value (%d) for --%s"
+                self.log("root", t % (zi, name), 3)
+                zi = 2
+            zi2 = 2 ** (zi - 1).bit_length()
+            if zi != zi2:
+                zi3 = 2 ** ((zi - 1).bit_length() - 1)
+                t = "WARNING: expect poor performance because --%s is not a power-of-two; consider using %d or %d instead of %d"
+                self.log("root", t % (name, zi2, zi3, zi), 3)
+
+        if args.s_rd_sz > args.iobuf:
+            t = "WARNING: --s-rd-sz (%d) is larger than --iobuf (%d); this may lead to reduced performance"
+            self.log("root", t % (args.s_rd_sz, args.iobuf), 3)
+
         bri = "zy"[args.theme % 2 :][:1]
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)

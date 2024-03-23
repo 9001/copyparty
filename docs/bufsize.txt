@@ -1,0 +1,96 @@
+notes from testing various buffer sizes of files and sockets
+
+summary:
+
+download-folder-as-tar:   would be 7% faster with --iobuf 65536 (but got 20% faster in v1.11.2)
+
+download-folder-as-zip:   optimal with default --iobuf 262144
+
+download-file-over-https: optimal with default --iobuf 262144
+
+put-large-file:           optimal with default --iobuf 262144, --s-rd-sz 262144 (and got 14% faster in v1.11.2)
+
+post-large-file:          optimal with default --iobuf 262144, --s-rd-sz 262144 (and got 18% faster in v1.11.2)
+
+----
+
+oha -z10s -c1 --ipv4 --insecure http://127.0.0.1:3923/bigs/?tar
+ 3.3            req/s 1.11.1
+ 4.3  4.0  3.3  req/s 1.12.2
+  64  256  512  --iobuf        256 (prefer smaller)
+  32   32   32  --s-rd-sz
+
+oha -z10s -c1 --ipv4 --insecure http://127.0.0.1:3923/bigs/?zip
+ 2.9            req/s 1.11.1
+ 2.5  2.9  2.9  req/s 1.12.2
+  64  256  512  --iobuf        256 (prefer bigger)
+  32   32   32  --s-rd-sz
+
+oha -z10s -c1 --ipv4 --insecure http://127.0.0.1:3923/pairdupes/?tar
+ 8.3            req/s 1.11.1
+ 8.4  8.4  8.5  req/s 1.12.2
+  64  256  512  --iobuf        256 (prefer bigger)
+  32   32   32  --s-rd-sz
+
+oha -z10s -c1 --ipv4 --insecure http://127.0.0.1:3923/pairdupes/?zip
+ 13.9              req/s 1.11.1
+ 14.1  14.0  13.8  req/s 1.12.2
+   64   256   512  --iobuf     256 (prefer smaller)
+   32    32    32  --s-rd-sz
+
+oha -z10s -c1 --ipv4 --insecure http://127.0.0.1:3923/pairdupes/987a
+5260                    req/s 1.11.1
+5246  5246  5280  5268  req/s 1.12.2
+  64   256   512   256  --iobuf      dontcare
+  32    32    32   512  --s-rd-sz    dontcare
+
+oha -z10s -c1 --ipv4 --insecure https://127.0.0.1:3923/pairdupes/987a
+4445              req/s 1.11.1
+4462  4494  4444  req/s 1.12.2
+  64   256   512  --iobuf      dontcare
+  32    32    32  --s-rd-sz
+
+oha -z10s -c1 --ipv4 --insecure http://127.0.0.1:3923/bigs/gssc-02-cannonball-skydrift/track10.cdda.flac
+ 95       req/s 1.11.1
+ 95   97  req/s 1.12.2
+ 64  512  --iobuf              dontcare
+ 32   32  --s-rd-sz
+
+oha -z10s -c1 --ipv4 --insecure https://127.0.0.1:3923/bigs/gssc-02-cannonball-skydrift/track10.cdda.flac
+ 15.4                    req/s 1.11.1
+ 15.4  15.3  14.9  15.4  req/s 1.12.2
+   64   256   512   512  --iobuf        256 (prefer smaller, and smaller than s-wr-sz)
+   32    32    32    32  --s-rd-sz
+  256   256   256   512  --s-wr-sz
+
+----
+
+python3 ~/dev/old/copyparty\ v1.11.1\ dont\ ban\ the\ pipes.py -q -i 127.0.0.1 -v .::A --daw 
+python3 ~/dev/copyparty/dist/copyparty-sfx.py -q -i 127.0.0.1 -v .::A --daw --iobuf $((1024*512)) 
+
+oha -z10s -c1 --ipv4 --insecure -mPUT -r0 -D ~/Music/gssc-02-cannonball-skydrift/track10.cdda.flac http://127.0.0.1:3923/a.bin 
+10.8                                req/s 1.11.1
+10.8  11.5  11.8  12.1  12.2  12.3  req/s new
+ 512   512   512   512   512   256  --iobuf         256
+  32    64   128   256   512   256  --s-rd-sz       256 (prefer bigger)
+
+----
+
+buildpost() {
+b=--jeg-er-grensestaven;
+printf -- "$b\r\nContent-Disposition: form-data; name=\"act\"\r\n\r\nbput\r\n$b\r\nContent-Disposition: form-data; name=\"f\"; filename=\"a.bin\"\r\nContent-Type: audio/mpeg\r\n\r\n"
+cat "$1"
+printf -- "\r\n${b}--\r\n"
+}
+buildpost ~/Music/gssc-02-cannonball-skydrift/track10.cdda.flac >big.post
+buildpost ~/Music/bottomtext.txt >smol.post
+
+oha -z10s -c1 --ipv4 --insecure -mPOST -r0 -T 'multipart/form-data; boundary=jeg-er-grensestaven' -D big.post http://127.0.0.1:3923/?replace
+9.6  11.2  11.3  11.1  10.9  req/s v1.11.2
+512   512   256   128   256  --iobuf         256
+ 32   512   256   128   128  --s-rd-sz       256
+
+oha -z10s -c1 --ipv4 --insecure -mPOST -r0 -T 'multipart/form-data; boundary=jeg-er-grensestaven' -D smol.post http://127.0.0.1:3923/?replace
+2445  2414  2401  2437  
+ 256   128   256   256  --iobuf           256
+ 128   128   256    64  --s-rd-sz         128 (but use 256 since big posts are more important)

@@ -1291,6 +1291,8 @@ you may experience poor upload performance this way, but that can sometimes be f
 
 someone has also tested geesefs in combination with [gocryptfs](https://nuetzlich.net/gocryptfs/) with surprisingly good results, getting 60 MiB/s upload speeds on a gbit line, but JuiceFS won with 80 MiB/s using its built-in encryption
 
+you may improve performance by specifying larger values for `--iobuf` / `--s-rd-sz` / `--s-wr-sz`
+
 
 ## hiding from google
 
@@ -1740,6 +1742,7 @@ below are some tweaks roughly ordered by usefulness:
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
   * and also makes thumbnails load faster, regardless of e2d/e2t
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
+* if your volumes are on a network-disk such as NFS / SMB / s3, specifying larger values for `--iobuf` and/or `--s-rd-sz` and/or `--s-wr-sz` may help; try setting all of them to `524288` or `1048576` or `4194304`
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
 * `-j0` enables multiprocessing (actual multithreading), can reduce latency to `20+80/numCores` percent and generally improve performance in cpu-intensive workloads, for example:
   * lots of connections (many users or heavy clients)

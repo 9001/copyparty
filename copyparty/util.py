@@ -1400,10 +1400,15 @@ def ren_open(
 
 class MultipartParser(object):
     def __init__(
-        self, log_func: "NamedLogger", sr: Unrecv, http_headers: dict[str, str]
+        self,
+        log_func: "NamedLogger",
+        args: argparse.Namespace,
+        sr: Unrecv,
+        http_headers: dict[str, str],
     ):
         self.sr = sr
         self.log = log_func
+        self.args = args
         self.headers = http_headers
 
         self.re_ctype = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
@@ -1502,7 +1507,7 @@ class MultipartParser(object):
 
     def _read_data(self) -> Generator[bytes, None, None]:
         blen = len(self.boundary)
-        bufsz = 32 * 1024
+        bufsz = self.args.s_rd_sz
         while True:
             try:
                 buf = self.sr.recv(bufsz)
@@ -2243,10 +2248,11 @@ def shut_socket(log: "NamedLogger", sck: socket.socket, timeout: int = 3) -> Non
         sck.close()
 
 
-def read_socket(sr: Unrecv, total_size: int) -> Generator[bytes, None, None]:
+def read_socket(
+    sr: Unrecv, bufsz: int, total_size: int
+) -> Generator[bytes, None, None]:
     remains = total_size
     while remains > 0:
-        bufsz = 32 * 1024
         if bufsz > remains:
             bufsz = remains
 
@@ -2260,16 +2266,16 @@ def read_socket(sr: Unrecv, total_size: int) -> Generator[bytes, None, None]:
         yield buf
 
 
-def read_socket_unbounded(sr: Unrecv) -> Generator[bytes, None, None]:
+def read_socket_unbounded(sr: Unrecv, bufsz: int) -> Generator[bytes, None, None]:
     try:
         while True:
-            yield sr.recv(32 * 1024)
+            yield sr.recv(bufsz)
     except:
         return
 
 
 def read_socket_chunked(
-    sr: Unrecv, log: Optional["NamedLogger"] = None
+    sr: Unrecv, bufsz: int, log: Optional["NamedLogger"] = None
 ) -> Generator[bytes, None, None]:
     err = "upload aborted: expected chunk length, got [{}] |{}| instead"
     while True:
@@ -2303,7 +2309,7 @@ def read_socket_chunked(
         if log:
             log("receiving %d byte chunk" % (chunklen,))
 
-        for chunk in read_socket(sr, chunklen):
+        for chunk in read_socket(sr, bufsz, chunklen):
             yield chunk
 
         x = sr.recv_ex(2, False)

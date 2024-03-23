@@ -1610,15 +1610,16 @@ class HttpCli(object):
         return enc or "utf-8"
 
     def get_body_reader(self) -> tuple[Generator[bytes, None, None], int]:
+        bufsz = self.args.s_rd_sz
         if "chunked" in self.headers.get("transfer-encoding", "").lower():
-            return read_socket_chunked(self.sr), -1
+            return read_socket_chunked(self.sr, bufsz), -1
 
         remains = int(self.headers.get("content-length", -1))
         if remains == -1:
             self.keepalive = False
-            return read_socket_unbounded(self.sr), remains
+            return read_socket_unbounded(self.sr, bufsz), remains
         else:
-            return read_socket(self.sr, remains), remains
+            return read_socket(self.sr, bufsz, remains), remains
 
     def dump_to_file(self, is_put: bool) -> tuple[int, str, str, int, str, str]:
         # post_sz, sha_hex, sha_b64, remains, path, url
@@ -1921,7 +1922,7 @@ class HttpCli(object):
         return "%s %s n%s" % (spd1, spd2, self.conn.nreq)
 
     def handle_post_multipart(self) -> bool:
-        self.parser = MultipartParser(self.log, self.sr, self.headers)
+        self.parser = MultipartParser(self.log, self.args, self.sr, self.headers)
         self.parser.parse()
 
         file0: list[tuple[str, Optional[str], Generator[bytes, None, None]]] = []
@@ -2150,7 +2151,7 @@ class HttpCli(object):
 
             self.log("writing {} #{} @{} len {}".format(path, chash, cstart, remains))
 
-            reader = read_socket(self.sr, remains)
+            reader = read_socket(self.sr, self.args.s_rd_sz, remains)
 
             f = None
             fpool = not self.args.no_fpool and sprs
@@ -2437,6 +2438,18 @@ class HttpCli(object):
 
                     suffix = "-{:.6f}-{}".format(time.time(), dip)
                     open_args = {"fdir": fdir, "suffix": suffix}
+
+                    if "replace" in self.uparam:
+                        abspath = os.path.join(fdir, fname)
+                        if not self.can_delete:
+                            self.log("user not allowed to overwrite with ?replace")
+                        elif bos.path.exists(abspath):
+                            try:
+                                bos.unlink(abspath)
+                                t = "overwriting file with new upload: %s"
+                            except:
+                                t = "toctou while deleting for ?replace: %s"
+                            self.log(t % (abspath,))
 
                     # reserve destination filename
                     with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
