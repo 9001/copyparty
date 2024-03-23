@@ -1,4 +1,25 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0318-1709  `v1.11.1`  dont ban the pipes
+
+the [previous release](https://github.com/9001/copyparty/releases/tag/v1.11.0) had all the fun new features... this one's just bugfixes
+
+## bugfixes
+
+* less aggressive rejection of requests from banned IPs 51d31588
+  * clients would get kicked before the header was parsed (which contains the xff header), meaning the server could become inaccessible to everyone if the reverse-proxy itself were to "somehow" get banned
+    * ...which can happen if a server behind cloudflare also accepts non-cloudflare connections, meaning the client IP would not be resolved, and it'll ban the LAN IP instead heh
+      * that part still happens, but now it won't affect legit clients through the intended route
+  * the old behavior can be restored with `--early-ban` to save some cycles, and/or avoid slowloris somewhat
+* the unpost feature could appear to be disabled on servers where no volume was mapped to `/` 0287c7ba
+* python 3.12 support for [compiling the dependencies](https://github.com/9001/copyparty/tree/hovudstraum/bin/mtag#dependencies) necessary to detect bpm/key in audio files 32553e45
+
+## other changes
+
+* mention [real-ip configuration](https://github.com/9001/copyparty?tab=readme-ov-file#real-ip) in the readme ee80cdb9
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0315-2047  `v1.11.0`  You Can (Not) Proceed
 
 this release was made possible by [stoltzekleiven, kvikklunsj, and tako](https://a.ocv.me/pub/g/nerd-stuff/2024-0310-stoltzekleiven.jpg)
