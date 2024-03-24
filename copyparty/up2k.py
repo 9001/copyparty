@@ -2745,9 +2745,9 @@ class Up2k(object):
                         cj["size"],
                         cj["ptop"],
                         ap1,
-                        self.hub.broker,
+                        self.hub,
                         reg,
-                        "up2k._get_volsize",
+                        "_get_volsize",
                     )
                     bos.makedirs(ap2)
                     vfs.lim.nup(cj["addr"])

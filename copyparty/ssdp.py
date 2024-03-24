@@ -12,7 +12,6 @@ from .multicast import MC_Sck, MCast
 from .util import CachedSet, html_escape, min_ex
 
 if TYPE_CHECKING:
-    from .broker_util import BrokerCli
     from .httpcli import HttpCli
     from .svchub import SvcHub
 
@@ -32,9 +31,9 @@ class SSDP_Sck(MC_Sck):
 class SSDPr(object):
     """generates http responses for httpcli"""
 
-    def __init__(self, broker: "BrokerCli") -> None:
-        self.broker = broker
-        self.args = broker.args
+    def __init__(self, hub: "SvcHub") -> None:
+        self.hub = hub
+        self.args = hub.args
 
     def reply(self, hc: "HttpCli") -> bool:
         if hc.vpath.endswith("device.xml"):

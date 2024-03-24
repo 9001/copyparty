@@ -44,9 +44,7 @@ if True:  # pylint: disable=using-constant-test
     from .util import NamedLogger, RootLogger
 
 if TYPE_CHECKING:
-    from .broker_mp import BrokerMp
-    from .broker_thr import BrokerThr
-    from .broker_util import BrokerCli
+    from .svchub import SvcHub
 
     # Vflags: TypeAlias = dict[str, str | bool | float | list[str]]
     # Vflags: TypeAlias = dict[str, Any]
@@ -141,9 +139,9 @@ class Lim(object):
         sz: int,
         ptop: str,
         abspath: str,
-        broker: Optional[Union["BrokerCli", "BrokerMp", "BrokerThr"]] = None,
+        hub: Optional["SvcHub"] = None,
         reg: Optional[dict[str, dict[str, Any]]] = None,
-        volgetter: str = "up2k.get_volsize",
+        volgetter: str = "get_volsize",
     ) -> tuple[str, str]:
         if reg is not None and self.reg is None:
             self.reg = reg
@@ -154,7 +152,7 @@ class Lim(object):
         self.chk_rem(rem)
         if sz != -1:
             self.chk_sz(sz)
-            self.chk_vsz(broker, ptop, sz, volgetter)
+            self.chk_vsz(hub, ptop, sz, volgetter)
             self.chk_df(abspath, sz)  # side effects; keep last-ish
 
         ap2, vp2 = self.rot(abspath)
@@ -172,16 +170,15 @@ class Lim(object):
 
     def chk_vsz(
         self,
-        broker: Optional[Union["BrokerCli", "BrokerMp", "BrokerThr"]],
+        hub: Optional["SvcHub"],
         ptop: str,
         sz: int,
         volgetter: str = "up2k.get_volsize",
     ) -> None:
-        if not broker or not self.vbmax + self.vnmax:
+        if not hub or not self.vbmax + self.vnmax:
             return
 
-        x = broker.ask(volgetter, ptop)
-        nbytes, nfiles = x.get()
+        nbytes, nfiles = hub.up2k.getattr(volgetter)(ptop)
 
         if self.vbmax and self.vbmax < nbytes + sz:
             raise Pebkac(400, "volume has exceeded max size")
@@ -815,9 +812,7 @@ class AuthSrv(object):
 
         yield prev, True
 
-    def idp_checkin(
-        self, broker: Optional["BrokerCli"], uname: str, gname: str
-    ) -> bool:
+    def idp_checkin(self, hub: Optional["SvcHub"], uname: str, gname: str) -> bool:
         if uname in self.acct:
             return False
 
@@ -837,12 +832,12 @@ class AuthSrv(object):
             t = "reinitializing due to new user from IdP: [%s:%s]"
             self.log(t % (uname, gnames), 3)
 
-            if not broker:
+            if not hub:
                 # only true for tests
                 self._reload()
                 return True
 
-        broker.ask("_reload_blocking", False).get()
+        hub._reload_blocking(False)
         return True
 
     def _map_volume_idp(

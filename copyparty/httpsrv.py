@@ -77,7 +77,7 @@ from .util import (
 )
 
 if TYPE_CHECKING:
-    from .broker_util import BrokerCli
+    from .svchub import SvcHub
     from .ssdp import SSDPr
 
 if True:  # pylint: disable=using-constant-test
@@ -90,16 +90,13 @@ class HttpSrv(object):
     relying on MpSrv for performance (HttpSrv is just plain threads)
     """
 
-    def __init__(self, broker: "BrokerCli", nid: Optional[int]) -> None:
-        self.broker = broker
+    def __init__(self, hub: "SvcHub", nid: Optional[int]) -> None:
+        self.hub = hub
         self.nid = nid
-        self.args = broker.args
+        self.args = hub.args
         self.E: EnvParams = self.args.E
-        self.log = broker.log
-        self.asrv = broker.asrv
-
-        # redefine in case of multiprocessing
-        socket.setdefaulttimeout(120)
+        self.log = hub.log
+        self.asrv = hub.asrv
 
         self.t0 = time.time()
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
@@ -169,7 +166,7 @@ class HttpSrv(object):
         if self.args.zs:
             from .ssdp import SSDPr
 
-            self.ssdp = SSDPr(broker)
+            self.ssdp = SSDPr(hub)
 
         if self.tp_q:
             self.start_threads(4)
@@ -186,8 +183,7 @@ class HttpSrv(object):
 
     def post_init(self) -> None:
         try:
-            x = self.broker.ask("thumbsrv.getcfg")
-            self.th_cfg = x.get()
+            self.th_cfg = self.hub.thumbsrv.getcfg()
         except:
             pass
 
@@ -237,19 +233,11 @@ class HttpSrv(object):
                     self.t_periodic = None
                     return
 
-    def listen(self, sck: socket.socket, nlisteners: int) -> None:
-        if self.args.j != 1:
-            # lost in the pickle; redefine
-            if not ANYWIN or self.args.reuseaddr:
-                sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-            sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            sck.settimeout(None)  # < does not inherit, ^ opts above do
-
+    def listen(self, sck: socket.socket) -> None:
         ip, port = sck.getsockname()[:2]
         self.srvs.append(sck)
         self.bound.add((ip, port))
-        self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
+        self.nclimax = self.args.nc
         Daemon(
             self.thr_listen,
             "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),
@@ -265,7 +253,7 @@ class HttpSrv(object):
         self.log(self.name, msg)
 
         def fun() -> None:
-            self.broker.say("cb_httpsrv_up")
+            self.hub.cb_httpsrv_up()
 
         threading.Thread(target=fun, name="sig-hsrv-up1").start()
 

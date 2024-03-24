@@ -28,9 +28,10 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, EXE, MACOS, TYPE_CHECKING, E, EnvParams, unicode
+from .__init__ import ANYWIN, EXE, TYPE_CHECKING, E, EnvParams, unicode
 from .authsrv import BAD_CFG, AuthSrv
 from .cert import ensure_cert
+from .httpsrv import HttpSrv
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
 from .tcpsrv import TcpSrv
 from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
@@ -51,7 +52,6 @@ from .util import (
     ansi_re,
     build_netmap,
     min_ex,
-    mp,
     odfusion,
     pybin,
     start_log_thrs,
@@ -67,16 +67,6 @@ if TYPE_CHECKING:
 
 
 class SvcHub(object):
-    """
-    Hosts all services which cannot be parallelized due to reliance on monolithic resources.
-    Creates a Broker which does most of the heavy stuff; hosted services can use this to perform work:
-        hub.broker.<say|ask>(destination, args_list).
-
-    Either BrokerThr (plain threads) or BrokerMP (multiprocessing) is used depending on configuration.
-    Nothing is returned synchronously; if you want any value returned from the call,
-    put() can return a queue (if want_reply=True) which has a blocking get() with the response.
-    """
-
     def __init__(
         self,
         args: argparse.Namespace,
@@ -162,16 +152,6 @@ class SvcHub(object):
 
         if args.log_thrs:
             start_log_thrs(self.log, args.log_thrs, 0)
-
-        if not args.use_fpool and args.j != 1:
-            args.no_fpool = True
-            t = "multithreading enabled with -j {}, so disabling fpool -- this can reduce upload performance on some filesystems"
-            self.log("root", t.format(args.j))
-
-        if not args.no_fpool and args.j != 1:
-            t = "WARNING: ignoring --use-fpool because multithreading (-j{}) is enabled"
-            self.log("root", t.format(args.j), c=3)
-            args.no_fpool = True
 
         for name, arg in (
             ("iobuf", "iobuf"),
@@ -316,13 +296,7 @@ class SvcHub(object):
         self.mdns: Optional["MDNS"] = None
         self.ssdp: Optional["SSDPd"] = None
 
-        # decide which worker impl to use
-        if self.check_mp_enable():
-            from .broker_mp import BrokerMp as Broker
-        else:
-            from .broker_thr import BrokerThr as Broker  # type: ignore
-
-        self.broker = Broker(self)
+        self.httpsrv = HttpSrv(self, None)
 
     def start_ftpd(self) -> None:
         time.sleep(30)
@@ -361,15 +335,14 @@ class SvcHub(object):
 
     def thr_httpsrv_up(self) -> None:
         time.sleep(1 if self.args.ign_ebind_all else 5)
-        expected = self.broker.num_workers * self.tcpsrv.nsrv
+        expected = self.tcpsrv.nsrv
         failed = expected - self.httpsrv_up
         if not failed:
             return
 
         if self.args.ign_ebind_all:
             if not self.tcpsrv.srv:
-                for _ in range(self.broker.num_workers):
-                    self.broker.say("cb_httpsrv_up")
+                self.cb_httpsrv_up()
             return
 
         if self.args.ign_ebind and self.tcpsrv.srv:
@@ -387,8 +360,6 @@ class SvcHub(object):
 
     def cb_httpsrv_up(self) -> None:
         self.httpsrv_up += 1
-        if self.httpsrv_up != self.broker.num_workers:
-            return
 
         ar = self.args
         for _ in range(10 if ar.ftp or ar.ftps else 0):
@@ -723,7 +694,6 @@ class SvcHub(object):
             self.log("root", "reloading config")
             self.asrv.reload()
             self.up2k.reload(rescan_all_vols)
-            self.broker.reload()
             self.reloading = 0
 
     def _reload_blocking(self, rescan_all_vols: bool = True) -> None:
@@ -808,7 +778,7 @@ class SvcHub(object):
                 tasks.append(Daemon(self.ssdp.stop, "ssdp"))
                 slp = time.time() + 0.5
 
-            self.broker.shutdown()
+            self.httpsrv.shutdown()
             self.tcpsrv.shutdown()
             self.up2k.shutdown()
 
@@ -969,48 +939,6 @@ class SvcHub(object):
         except OSError as ex:
             if ex.errno != errno.EPIPE:
                 raise
-
-    def check_mp_support(self) -> str:
-        if MACOS:
-            return "multiprocessing is wonky on mac osx;"
-        elif sys.version_info < (3, 3):
-            return "need python 3.3 or newer for multiprocessing;"
-
-        try:
-            x: mp.Queue[tuple[str, str]] = mp.Queue(1)
-            x.put(("foo", "bar"))
-            if x.get()[0] != "foo":
-                raise Exception()
-        except:
-            return "multiprocessing is not supported on your platform;"
-
-        return ""
-
-    def check_mp_enable(self) -> bool:
-        if self.args.j == 1:
-            return False
-
-        try:
-            if mp.cpu_count() <= 1:
-                raise Exception()
-        except:
-            self.log("svchub", "only one CPU detected; multiprocessing disabled")
-            return False
-
-        try:
-            # support vscode debugger (bonus: same behavior as on windows)
-            mp.set_start_method("spawn", True)
-        except AttributeError:
-            # py2.7 probably, anyways dontcare
-            pass
-
-        err = self.check_mp_support()
-        if not err:
-            return True
-        else:
-            self.log("svchub", err)
-            self.log("svchub", "cannot efficiently use multiple CPU cores")
-            return False
 
     def sd_notify(self) -> None:
         try:

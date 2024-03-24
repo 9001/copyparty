@@ -297,7 +297,7 @@ class TcpSrv(object):
             if self.args.q:
                 print(msg)
 
-            self.hub.broker.say("listen", srv)
+            self.hub.httpsrv.listen(srv)
 
         self.srv = srvs
         self.bound = bound
@@ -305,7 +305,7 @@ class TcpSrv(object):
         self._distribute_netdevs()
 
     def _distribute_netdevs(self):
-        self.hub.broker.say("set_netdevs", self.netdevs)
+        self.hub.httpsrv.set_netdevs(self.netdevs)
         self.hub.start_zeroconf()
         gencert(self.log, self.args, self.netdevs)
         self.hub.restart_ftpd()

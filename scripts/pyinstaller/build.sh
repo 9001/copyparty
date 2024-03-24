@@ -69,8 +69,6 @@ sed -ri s/copyparty.exe/copyparty$esuf.exe/ loader.rc2
 
 excl=(
     asyncio
-    copyparty.broker_mp
-    copyparty.broker_mpw
     copyparty.smbd
     ctypes.macholib
     curses

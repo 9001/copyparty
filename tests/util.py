@@ -170,12 +170,14 @@ class Cfg(Namespace):
         )
 
 
-class NullBroker(object):
-    def say(self, *args):
+class NullUp2k(object):
+    def hash_file(*a):
         pass
 
-    def ask(self, *args):
-        pass
+
+class NullHub(object):
+    def __init__(self):
+        self.up2k = NullUp2k()
 
 
 class VSock(object):
@@ -206,7 +208,7 @@ class VHttpSrv(object):
         self.asrv = asrv
         self.log = log
 
-        self.broker = NullBroker()
+        self.hub = NullHub()
         self.prism = None
         self.bans = {}
         self.nreq = 0

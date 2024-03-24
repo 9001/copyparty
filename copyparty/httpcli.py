@@ -115,6 +115,7 @@ class HttpCli(object):
 
         self.t0 = time.time()
         self.conn = conn
+        self.hub = conn.hsrv.hub
         self.u2mutex = conn.u2mutex  # mypy404
         self.s = conn.s
         self.sr = conn.sr
@@ -475,7 +476,7 @@ class HttpCli(object):
                 ) or self.args.idp_h_key in self.headers
 
                 if trusted_key and trusted_xff:
-                    self.asrv.idp_checkin(self.conn.hsrv.broker, idp_usr, idp_grp)
+                    self.asrv.idp_checkin(self.hub, idp_usr, idp_grp)
                 else:
                     if not trusted_key:
                         t = 'the idp-h-key header ("%s") is not present in the request; will NOT trust the other headers saying that the client\'s username is "%s" and group is "%s"'
@@ -626,7 +627,7 @@ class HttpCli(object):
                     msg += "hint: %s\r\n" % (self.hint,)
 
                 if "database is locked" in em:
-                    self.conn.hsrv.broker.say("log_stacks")
+                    self.hub.log_stacks()
                     msg += "hint: important info in the server log\r\n"
 
                 zb = b"<pre>" + html_escape(msg).encode("utf-8", "replace")
@@ -1629,9 +1630,7 @@ class HttpCli(object):
         lim = vfs.get_dbv(rem)[0].lim
         fdir = vfs.canonical(rem)
         if lim:
-            fdir, rem = lim.all(
-                self.ip, rem, remains, vfs.realpath, fdir, self.conn.hsrv.broker
-            )
+            fdir, rem = lim.all(self.ip, rem, remains, vfs.realpath, fdir, self.hub)
 
         fn = None
         if rem and not self.trailing_slash and not bos.path.isdir(fdir):
@@ -1764,7 +1763,7 @@ class HttpCli(object):
             lim.bup(self.ip, post_sz)
             try:
                 lim.chk_sz(post_sz)
-                lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, post_sz)
+                lim.chk_vsz(self.hub, vfs.realpath, post_sz)
             except:
                 wunlink(self.log, path, vfs.flags)
                 raise
@@ -1823,8 +1822,7 @@ class HttpCli(object):
             raise Pebkac(403, t)
 
         vfs, rem = vfs.get_dbv(rem)
-        self.conn.hsrv.broker.say(
-            "up2k.hash_file",
+        self.hub.up2k.hash_file(
             vfs.realpath,
             vfs.vpath,
             vfs.flags,
@@ -2049,8 +2047,7 @@ class HttpCli(object):
 
         # not to protect u2fh, but to prevent handshakes while files are closing
         with self.u2mutex:
-            x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
-            ret = x.get()
+            ret = self.hub.up2k.handle_json(body, self.u2fh.aps)
 
         if self.is_vproxied:
             if "purl" in ret:
@@ -2138,7 +2135,7 @@ class HttpCli(object):
         vfs, _ = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         ptop = (vfs.dbv or vfs).realpath
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_chunk", ptop, wark, chash)
+        x = self.hub.up2k.handle_chunk(ptop, wark, chash)
         response = x.get()
         chunksize, cstart, path, lastmod, sprs = response
 
@@ -2207,11 +2204,9 @@ class HttpCli(object):
                 f.close()
                 raise
         finally:
-            x = self.conn.hsrv.broker.ask("up2k.release_chunk", ptop, wark, chash)
-            x.get()  # block client until released
+            self.hub.up2k.release_chunk(ptop, wark, chash)
 
-        x = self.conn.hsrv.broker.ask("up2k.confirm_chunk", ptop, wark, chash)
-        ztis = x.get()
+        ztis = self.hub.up2k.confirm_chunk(ptop, wark, chash)
         try:
             num_left, fin_path = ztis
         except:
@@ -2223,9 +2218,7 @@ class HttpCli(object):
                 self.u2fh.close(path)
 
         if not num_left and not self.args.nw:
-            self.conn.hsrv.broker.ask(
-                "up2k.finish_upload", ptop, wark, self.u2fh.aps
-            ).get()
+            self.hub.up2k.finish_upload(ptop, wark, self.u2fh.aps)
 
         cinf = self.headers.get("x-up2k-stat", "")
 
@@ -2403,7 +2396,7 @@ class HttpCli(object):
         fdir_base = vfs.canonical(rem)
         if lim:
             fdir_base, rem = lim.all(
-                self.ip, rem, -1, vfs.realpath, fdir_base, self.conn.hsrv.broker
+                self.ip, rem, -1, vfs.realpath, fdir_base, self.hub
             )
             upload_vpath = "{}/{}".format(vfs.vpath, rem).strip("/")
             if not nullwrite:
@@ -2511,7 +2504,7 @@ class HttpCli(object):
                         try:
                             lim.chk_df(tabspath, sz, True)
                             lim.chk_sz(sz)
-                            lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, sz)
+                            lim.chk_vsz(self.hub, vfs.realpath, sz)
                             lim.chk_bup(self.ip)
                             lim.chk_nup(self.ip)
                         except:
@@ -2549,8 +2542,7 @@ class HttpCli(object):
                         raise Pebkac(403, t)
 
                     dbv, vrem = vfs.get_dbv(rem)
-                    self.conn.hsrv.broker.say(
-                        "up2k.hash_file",
+                    self.hub.up2k.hash_file(
                         dbv.realpath,
                         vfs.vpath,
                         dbv.flags,
@@ -2697,7 +2689,7 @@ class HttpCli(object):
         fp = vfs.canonical(rp)
         lim = vfs.get_dbv(rem)[0].lim
         if lim:
-            fp, rp = lim.all(self.ip, rp, clen, vfs.realpath, fp, self.conn.hsrv.broker)
+            fp, rp = lim.all(self.ip, rp, clen, vfs.realpath, fp, self.hub)
             bos.makedirs(fp)
 
         fp = os.path.join(fp, fn)
@@ -2799,7 +2791,7 @@ class HttpCli(object):
             lim.bup(self.ip, sz)
             try:
                 lim.chk_sz(sz)
-                lim.chk_vsz(self.conn.hsrv.broker, vfs.realpath, sz)
+                lim.chk_vsz(self.hub, vfs.realpath, sz)
             except:
                 wunlink(self.log, fp, vfs.flags)
                 raise
@@ -2828,8 +2820,7 @@ class HttpCli(object):
             raise Pebkac(403, t)
 
         vfs, rem = vfs.get_dbv(rem)
-        self.conn.hsrv.broker.say(
-            "up2k.hash_file",
+        self.hub.up2k.hash_file(
             vfs.realpath,
             vfs.vpath,
             vfs.flags,
@@ -3363,8 +3354,8 @@ class HttpCli(object):
         ]
 
         if self.avol and not self.args.no_rescan:
-            x = self.conn.hsrv.broker.ask("up2k.get_state")
-            vs = json.loads(x.get())
+            zs = self.hub.up2k.get_state()
+            vs = json.loads(zs)
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
         else:
             vstate = {}
@@ -3508,10 +3499,8 @@ class HttpCli(object):
 
         vn, _ = self.asrv.vfs.get(self.vpath, self.uname, True, True)
 
-        args = [self.asrv.vfs.all_vols, [vn.vpath], False, True]
+        err = self.hub.up2k.rescan(self.asrv.vfs.all_vols, [vn.vpath], False, True)
 
-        x = self.conn.hsrv.broker.ask("up2k.rescan", *args)
-        err = x.get()
         if not err:
             self.redirect("", "?h")
             return True
@@ -3529,8 +3518,8 @@ class HttpCli(object):
         if self.args.no_reload:
             raise Pebkac(403, "the reload feature is disabled in server config")
 
-        x = self.conn.hsrv.broker.ask("reload")
-        return self.redirect("", "?h", x.get(), "return to", False)
+        zs = self.hub.reload()
+        return self.redirect("", "?h", zs, "return to", False)
 
     def tx_stack(self) -> bool:
         if not self.avol and not [x for x in self.wvol if x in self.rvol]:
@@ -3632,10 +3621,7 @@ class HttpCli(object):
             and (self.uname in vol.axs.uread or self.uname in vol.axs.upget)
         }
 
-        x = self.conn.hsrv.broker.ask(
-            "up2k.get_unfinished_by_user", self.uname, self.ip
-        )
-        uret = x.get()
+        uret = self.hub.up2k.get_unfinished_by_user(self.uname, self.ip)
 
         if not self.args.unpost:
             allvols = []
@@ -3721,10 +3707,8 @@ class HttpCli(object):
         nlim = int(self.uparam.get("lim") or 0)
         lim = [nlim, nlim] if nlim else []
 
-        x = self.conn.hsrv.broker.ask(
-            "up2k.handle_rm", self.uname, self.ip, req, lim, False, unpost
-        )
-        self.loud_reply(x.get())
+        zs = self.hub.up2k.handle_rm(self.uname, self.ip, req, lim, False, unpost)
+        self.loud_reply(zs)
         return True
 
     def handle_mv(self) -> bool:
@@ -3746,8 +3730,8 @@ class HttpCli(object):
         if self.args.no_mv:
             raise Pebkac(403, "the rename/move feature is disabled in server config")
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, vsrc, vdst)
-        self.loud_reply(x.get(), status=201)
+        zs = self.hub.up2k.handle_mv(self.uname, vsrc, vdst)
+        self.loud_reply(zs, status=201)
         return True
 
     def tx_ls(self, ls: dict[str, Any]) -> bool:

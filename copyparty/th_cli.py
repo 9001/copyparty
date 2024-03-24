@@ -7,7 +7,6 @@ from .__init__ import TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .th_srv import HAVE_WEBP, thumb_path
-from .util import Cooldown
 
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
@@ -18,13 +17,10 @@ if TYPE_CHECKING:
 
 class ThumbCli(object):
     def __init__(self, hsrv: "HttpSrv") -> None:
-        self.broker = hsrv.broker
+        self.hub = hsrv.hub
         self.log_func = hsrv.log
         self.args = hsrv.args
         self.asrv = hsrv.asrv
-
-        # cache on both sides for less broker spam
-        self.cooldown = Cooldown(self.args.th_poke)
 
         try:
             c = hsrv.th_cfg
@@ -134,13 +130,11 @@ class ThumbCli(object):
 
         if ret:
             tdir = os.path.dirname(tpath)
-            if self.cooldown.poke(tdir):
-                self.broker.say("thumbsrv.poke", tdir)
+            self.hub.thumbsrv.poke(tdir)
 
             if want_opus:
                 # audio files expire individually
-                if self.cooldown.poke(tpath):
-                    self.broker.say("thumbsrv.poke", tpath)
+                self.hub.thumbsrv.poke(tpath)
 
             return ret
 
@@ -150,5 +144,4 @@ class ThumbCli(object):
         if not bos.path.getsize(os.path.join(ptop, rem)):
             return None
 
-        x = self.broker.ask("thumbsrv.get", ptop, rem, mtime, fmt)
-        return x.get()  # type: ignore
+        return self.hub.thumbsrv.get(ptop, rem, mtime, fmt)

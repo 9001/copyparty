@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 class Metrics(object):
     def __init__(self, hsrv: "HttpSrv") -> None:
         self.hsrv = hsrv
+        self.hub = hsrv.hub
 
     def tx(self, cli: "HttpCli") -> bool:
         if not cli.avol:
@@ -88,8 +89,8 @@ class Metrics(object):
         addg("cpp_total_bans", str(self.hsrv.nban), t)
 
         if not args.nos_vst:
-            x = self.hsrv.broker.ask("up2k.get_state")
-            vs = json.loads(x.get())
+            zs = self.hub.up2k.get_state()
+            vs = json.loads(zs.get())
 
             nvidle = 0
             nvbusy = 0
@@ -146,8 +147,7 @@ class Metrics(object):
             volsizes = []
             try:
                 ptops = [x.realpath for _, x in allvols]
-                x = self.hsrv.broker.ask("up2k.get_volsizes", ptops)
-                volsizes = x.get()
+                volsizes = self.hub.up2k.get_volsizes(ptops)
             except Exception as ex:
                 cli.log("tx_stats get_volsizes: {!r}".format(ex), 3)
 
@@ -204,8 +204,7 @@ class Metrics(object):
             tnbytes = 0
             tnfiles = 0
             try:
-                x = self.hsrv.broker.ask("up2k.get_unfinished")
-                xs = x.get()
+                xs = self.hub.up2k.get_unfinished()
                 if not xs:
                     raise Exception("up2k mutex acquisition timed out")
 

@@ -58,7 +58,7 @@ class HttpConn(object):
         self.ipa_nm: Optional[NetMap] = hsrv.ipa_nm
         self.xff_nm: Optional[NetMap] = hsrv.xff_nm
         self.xff_lan: NetMap = hsrv.xff_lan  # type: ignore
-        self.iphash: HMaccas = hsrv.broker.iphash
+        self.iphash: HMaccas = hsrv.hub.iphash
         self.bans: dict[str, int] = hsrv.bans
         self.aclose: dict[str, int] = hsrv.aclose
 
