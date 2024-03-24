@@ -310,6 +310,10 @@ roughly sorted by priority
 
 ## discarded ideas
 
+* optimization attempts which didn't improve performance
+  * remove brokers / multiprocessing stuff; https://github.com/9001/copyparty/tree/no-broker
+  * reduce the nesting / indirections in `HttpCli` / `httpcli.py`
+    * nearly zero benefit from stuff like replacing all the `self.conn.hsrv` with a local `hsrv` variable
 * reduce up2k roundtrips
   * start from a chunk index and just go
   * terminate client on bad data
