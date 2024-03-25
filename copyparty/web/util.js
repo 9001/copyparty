@@ -740,6 +740,11 @@ function vjoin(p1, p2) {
 }
 
 
+function addq(url, q) {
+    return url + (url.indexOf('?') < 0 ? '?' : '&') + (q === undefined ? '' : q);
+}
+
+
 function uricom_enc(txt, do_fb_enc) {
     try {
         return encodeURIComponent(txt);
@@ -1885,7 +1890,7 @@ function md_thumbs(md) {
             float = has(flags, 'l') ? 'left' : has(flags, 'r') ? 'right' : '';
 
         if (!/[?&]cache/.exec(url))
-            url += (url.indexOf('?') < 0 ? '?' : '&') + 'cache=i';
+            url = addq(url, 'cache=i');
 
         md[a] = '<a href="' + url + '" class="mdth mdth' + float.slice(0, 1) + '"><img src="' + url + '&th=w" alt="' + alt + '" /></a>' + md[a].slice(o2 + 1);
     }

@@ -274,6 +274,19 @@ def get_fk_salt() -> str:
     return ret.decode("utf-8")
 
 
+def get_dk_salt() -> str:
+    fp = os.path.join(E.cfg, "dk-salt.txt")
+    try:
+        with open(fp, "rb") as f:
+            ret = f.read().strip()
+    except:
+        ret = base64.b64encode(os.urandom(30))
+        with open(fp, "wb") as f:
+            f.write(ret + b"\n")
+
+    return ret.decode("utf-8")
+
+
 def get_ah_salt() -> str:
     fp = os.path.join(E.cfg, "ah-salt.txt")
     try:
@@ -1131,13 +1144,14 @@ def add_safety(ap):
     ap2.add_argument("--acam", metavar="V[,V]", type=u, default="GET,HEAD", help="Access-Control-Allow-Methods; list of methods to accept from offsite ('*' behaves like \033[33m--acao\033[0m's description)")
 
 
-def add_salt(ap, fk_salt, ah_salt):
+def add_salt(ap, fk_salt, dk_salt, ah_salt):
     ap2 = ap.add_argument_group('salting options')
     ap2.add_argument("--ah-alg", metavar="ALG", type=u, default="none", help="account-pw hashing algorithm; one of these, best to worst: \033[32margon2 scrypt sha2 none\033[0m (each optionally followed by alg-specific comma-sep. config)")
     ap2.add_argument("--ah-salt", metavar="SALT", type=u, default=ah_salt, help="account-pw salt; ignored if \033[33m--ah-alg\033[0m is none (default)")
     ap2.add_argument("--ah-gen", metavar="PW", type=u, default="", help="generate hashed password for \033[33mPW\033[0m, or read passwords from STDIN if \033[33mPW\033[0m is [\033[32m-\033[0m]")
     ap2.add_argument("--ah-cli", action="store_true", help="launch an interactive shell which hashes passwords without ever storing or displaying the original passwords")
     ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files")
+    ap2.add_argument("--dk-salt", metavar="SALT", type=u, default=dk_salt, help="per-directory accesskey salt; used to generate unpredictable URLs to share folders with users who only have the 'get' permission")
     ap2.add_argument("--warksalt", metavar="SALT", type=u, default="hunter2", help="up2k file-hash salt; serves no purpose, no reason to change this (but delete all databases if you do)")
 
 
@@ -1319,6 +1333,7 @@ def run_argparse(
     cert_path = os.path.join(E.cfg, "cert.pem")
 
     fk_salt = get_fk_salt()
+    dk_salt = get_dk_salt()
     ah_salt = get_ah_salt()
 
     # alpine peaks at 5 threads for some reason,
@@ -1350,7 +1365,7 @@ def run_argparse(
     add_tftp(ap)
     add_smb(ap)
     add_safety(ap)
-    add_salt(ap, fk_salt, ah_salt)
+    add_salt(ap, fk_salt, dk_salt, ah_salt)
     add_optouts(ap)
     add_shutdown(ap)
     add_yolo(ap)

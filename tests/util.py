@@ -145,6 +145,7 @@ class Cfg(Namespace):
             c=c,
             E=E,
             dbd="wal",
+            dk_salt="b" * 16,
             fk_salt="a" * 16,
             idp_gsep=re.compile("[|:;+,]"),
             iobuf=256 * 1024,
