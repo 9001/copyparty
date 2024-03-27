@@ -2879,6 +2879,9 @@ class HttpCli(object):
         if self.can_read or not self.can_get:
             return False
 
+        if self.vn.flags.get("dky"):
+            return True
+
         req = self.uparam.get("k") or ""
         if not req:
             return False
@@ -4234,8 +4237,11 @@ class HttpCli(object):
         add_fk = vf.get("fk")
         fk_alg = 2 if "fka" in vf else 1
         if add_dk:
-            zs = self.gen_fk(2, self.args.dk_salt, abspath, 0, 0)[:add_dk]
-            ls_ret["dk"] = cgv["dk"] = zs
+            if vf.get("dky"):
+                add_dk = False
+            else:
+                zs = self.gen_fk(2, self.args.dk_salt, abspath, 0, 0)[:add_dk]
+                ls_ret["dk"] = cgv["dk"] = zs
 
         dirs = []
         files = []

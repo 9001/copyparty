@@ -1852,6 +1852,8 @@ share specific folders in a volume  without giving away full read-access to the 
 
 volflag `dk` generates dirkeys (per-directory accesskeys) for all folders, granting read-access to that folder; by default only that folder itself, no subfolders
 
+volflag `dky` disables the actual key-check, meaning anyone can see the contents of a folder where they have `g` access, but not its subdirectories
+
 volflag `dks` lets people enter subfolders as well, and also enables download-as-zip/tar
 
 dirkeys are generated based on another salt (`--dk-salt`) + filesystem-path and have a few limitations:

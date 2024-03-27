@@ -1688,8 +1688,15 @@ class AuthSrv(object):
 
             dk = vol.flags.get("dk")
             dks = vol.flags.get("dks")
+            dky = vol.flags.get("dky")
+            if dks is not None and dky is not None:
+                t = "WARNING: volume /%s has both dks and dky enabled; this is too yolo and not permitted"
+                raise Exception(t % (vol.vpath,))
+
             if dks and not dk:
                 dk = dks
+            if dky and not dk:
+                dk = dky
             if dk:
                 vol.flags["dk"] = int(dk) if dk is not True else 8
 
