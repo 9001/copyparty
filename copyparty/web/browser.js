@@ -1400,6 +1400,8 @@ var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 	ACB = sread('au_cbv') || 1,
 	noih = /[?&]v\b/.exec('' + location),
 	hash0 = location.hash,
+	ldks = [],
+	dks = {},
 	dk, mp;
 
 
@@ -5723,6 +5725,14 @@ var treectl = (function () {
 	};
 	r.nvis = r.lim;
 
+	ldks = jread('dks', []);
+	for (var a = ldks.length - 1; a >= 0; a--) {
+		var s = ldks[a],
+			o = s.lastIndexOf('?');
+
+		dks[s.slice(0, o)] = s.slice(o + 1);
+	}
+
 	function setwrap(v) {
 		clmod(ebi('tree'), 'nowrap', !v);
 		reload_tree();
@@ -5972,7 +5982,7 @@ var treectl = (function () {
 		}
 		ebi('treeul').setAttribute('ts', ts);
 
-		var top = top0 == '.' ? dst : top0,
+		var top = (top0 == '.' ? dst : top0).split('?')[0],
 			name = uricom_dec(top.split('/').slice(-2)[0]),
 			rtop = top.replace(/^\/+/, ""),
 			html = parsetree(res, rtop);
@@ -5989,7 +5999,7 @@ var treectl = (function () {
 
 			var links = QSA('#treeul a+a');
 			for (var a = 0, aa = links.length; a < aa; a++) {
-				if (links[a].getAttribute('href') == top) {
+				if (links[a].getAttribute('href').split('?')[0] == top) {
 					var o = links[a].parentNode;
 					if (!o.getElementsByTagName('li').length)
 						o.innerHTML = html;
@@ -6218,8 +6228,16 @@ var treectl = (function () {
 
 		if (!this.back) {
 			var dirs = [];
-			for (var a = 0; a < res.dirs.length; a++)
-				dirs.push(res.dirs[a].href.split('/')[0].split('?')[0]);
+			for (var a = 0; a < res.dirs.length; a++) {
+				var dh = res.dirs[a].href,
+					dn = dh.split('/')[0].split('?')[0],
+					m = /[?&](k=[^&]+)/.exec(dh);
+
+				if (m)
+					dn += '?' + m[1];
+
+				dirs.push(dn);
+			}
 
 			rendertree({ "a": dirs }, this.ts, ".", get_evpath() + (dk ? '?k=' + dk : ''));
 		}
@@ -6280,6 +6298,10 @@ var treectl = (function () {
 		if (ae && /^tr$/i.exec(ae.nodeName))
 			if (ae = ae.querySelector('a[id]'))
 				cid = ae.getAttribute('id');
+
+		var m = /[?&]k=([^&]+)/.exec(location.search);
+		if (m)
+			memo_dk(top, m[1]);
 
 		r.lsc = res;
 		if (res.unlist) {
@@ -6429,6 +6451,30 @@ var treectl = (function () {
 		showfile.addlinks();
 		setTimeout(eval_hash, 1);
 	};
+
+	function memo_dk(vp, k) {
+		dks[vp] = k;
+		var lv = vp + "?" + k;
+		if (has(ldks, lv))
+			return;
+
+		ldks.unshift(lv);
+		if (ldks.length > 32) {
+			var keep = [], evp = get_evpath();
+			for (var a = 0; a < ldks.length; a++) {
+				var s = ldks[a];
+				if (evp.startsWith(s.replace(/\?[^?]+$/, '')))
+					keep.push(s);
+			}
+			var lim = 32 - keep.length;
+			for (var a = 0; a < lim; a++) {
+				if (!has(keep, ldks[a]))
+					keep.push(ldks[a])
+			}
+			ldks = keep;
+		}
+		jwrite('dks', ldks);
+	}
 
 	r.setlazy = function (plain) {
 		var html = ['<div id="plazy">', esc(plain.join(' ')), '</div>'],
@@ -8207,8 +8253,10 @@ function reload_browser() {
 
 	for (var a = 0; a < parts.length - 1; a++) {
 		link += parts[a] + '/';
+		var link2 = dks[link] ? addq(link, 'k=') + dks[link] : link;
+
 		o = mknod('a');
-		o.setAttribute('href', link);
+		o.setAttribute('href', link2);
 		o.textContent = uricom_dec(parts[a]) || '/';
 		ebi('path').appendChild(mknod('i'));
 		ebi('path').appendChild(o);
