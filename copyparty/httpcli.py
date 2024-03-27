@@ -2875,7 +2875,7 @@ class HttpCli(object):
 
         return file_lastmod, True
 
-    def _use_dirkey(self, ap: str = "", throw: bool = False) -> bool:
+    def _use_dirkey(self, ap: str = "") -> bool:
         if self.can_read or not self.can_get:
             return False
 
@@ -2894,9 +2894,6 @@ class HttpCli(object):
 
         t = "wrong dirkey, want %s, got %s\n  vp: %s\n  ap: %s"
         self.log(t % (zs, req, self.req, ap), 6)
-        if throw:
-            raise Pebkac(403)
-
         return False
 
     def _expand(self, txt: str, phs: list[str]) -> str:
@@ -3608,8 +3605,7 @@ class HttpCli(object):
         dk_sz = False
         if dk:
             vn, rem = vfs.get(top, self.uname, False, False)
-            if vn.flags.get("dks"):
-                self._use_dirkey(vn.canonical(rem), True)
+            if vn.flags.get("dks") and self._use_dirkey(vn.canonical(rem)):
                 dk_sz = vn.flags.get("dk")
 
         dots = False
@@ -3623,7 +3619,9 @@ class HttpCli(object):
                 [[True, False], [False, True]],
             )
             dots = self.uname in vn.axs.udot
+            dk_sz = vn.flags.get("dk")
         except:
+            dk_sz = None
             vfs_ls = []
             vfs_virt = {}
             for v in self.rvol:
