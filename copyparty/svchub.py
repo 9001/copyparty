@@ -276,6 +276,11 @@ class SvcHub(object):
         if want_ff and ANYWIN:
             self.log("thumb", "download FFmpeg to fix it:\033[0m " + FFMPEG_URL, 3)
 
+        if not args.no_acode:
+            if not re.match("^(0|[qv][0-9]|[0-9]{2,3}k)$", args.q_mp3.lower()):
+                t = "invalid mp3 transcoding quality [%s] specified; only supports [0] to disable, a CBR value such as [192k], or a CQ/CRF value such as [v2]"
+                raise Exception(t % (args.q_mp3,))
+
         args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)
 
         zms = ""

@@ -200,7 +200,7 @@ firewall-cmd --reload
 * browser
   * ☑ [navpane](#navpane) (directory tree sidebar)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
-  * ☑ audio player (with [OS media controls](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) and opus transcoding)
+  * ☑ audio player (with [OS media controls](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) and opus/mp3 transcoding)
   * ☑ image gallery with webm player
   * ☑ textfile browser with syntax hilighting
   * ☑ [thumbnails](#thumbnails)
@@ -588,7 +588,7 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 ![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/129635374-e5136e01-470a-49b1-a762-848e8a4c9cdc.png)
 
-cool trick: download a folder by appending url-params `?tar&opus` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus before they're added to the archive
+cool trick: download a folder by appending url-params `?tar&opus` or `?tar&mp3` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus/mp3 before they're added to the archive
 * super useful if you're 5 minutes away from takeoff and realize you don't have any music on your phone but your server only has flac files and downloading those will burn through all your data + there wouldn't be enough time anyways
 * and url-params `&j` / `&w` produce jpeg/webm thumbnails/spectrograms instead of the original audio/video/images
   * can also be used to pregenerate thumbnails; combine with `--th-maxage=9999999` or `--th-clean=0`
@@ -779,9 +779,9 @@ open the `[🎺]` media-player-settings tab to configure it,
   * `[loop]` keeps looping the folder
   * `[next]` plays into the next folder
 * "transcode":
-  * `[flac]` converts `flac` and `wav` files into opus
-  * `[aac]` converts `aac` and `m4a` files into opus
-  * `[oth]` converts all other known formats into opus
+  * `[flac]` converts `flac` and `wav` files into opus (if supported by browser) or mp3
+  * `[aac]` converts `aac` and `m4a` files into opus (if supported by browser) or mp3
+  * `[oth]` converts all other known formats into opus (if supported by browser) or mp3
     * `aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk`
 * "tint" reduces the contrast of the playback bar
 
@@ -1853,6 +1853,8 @@ share specific folders in a volume  without giving away full read-access to the 
 volflag `dk` generates dirkeys (per-directory accesskeys) for all folders, granting read-access to that folder; by default only that folder itself, no subfolders
 
 volflag `dky` disables the actual key-check, meaning anyone can see the contents of a folder where they have `g` access, but not its subdirectories
+
+* `dk` + `dky` gives the same behavior as if all users with `g` access have full read-access, but subfolders are hidden files (their names start with a dot), so `dky` is an alternative to renaming all the folders for that purpose, maybe just for some users
 
 volflag `dks` lets people enter subfolders as well, and also enables download-as-zip/tar
 

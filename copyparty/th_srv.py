@@ -109,7 +109,7 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
     h = hashlib.sha512(afsenc(fn)).digest()
     fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
 
-    if fmt in ("opus", "caf"):
+    if fmt in ("opus", "caf", "mp3"):
         cat = "ac"
     else:
         fc = fmt[:1]
@@ -307,6 +307,8 @@ class ThumbSrv(object):
                     elif lib == "ff" and ext in self.fmt_ffa:
                         if tpath.endswith(".opus") or tpath.endswith(".caf"):
                             funs.append(self.conv_opus)
+                        elif tpath.endswith(".mp3"):
+                            funs.append(self.conv_mp3)
                         elif tpath.endswith(".png"):
                             funs.append(self.conv_waves)
                             png_ok = True
@@ -637,8 +639,47 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd, vn)
 
+    def conv_mp3(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        quality = self.args.q_mp3.lower()
+        if self.args.no_acode or not quality:
+            raise Exception("disabled in server config")
+
+        self.wait4ram(0.2, tpath)
+        ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
+        if "ac" not in ret:
+            raise Exception("not audio")
+
+        if quality.endswith("k"):
+            qk = b"-b:a"
+            qv = quality.encode("ascii")
+        else:
+            qk = b"-q:a"
+            qv = quality[1:].encode("ascii")
+
+        # extremely conservative choices for output format
+        # (always 2ch 44k1) because if a device is old enough
+        # to not support opus then it's probably also super picky
+
+        # fmt: off
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-v", b"error",
+            b"-hide_banner",
+            b"-i", fsenc(abspath),
+            b"-map_metadata", b"-1",
+            b"-map", b"0:a:0",
+            b"-ar", b"44100",
+            b"-ac", b"2",
+            b"-c:a", b"libmp3lame",
+            qk, qv,
+            fsenc(tpath)
+        ]
+        # fmt: on
+        self._run_ff(cmd, vn, oom=300)
+
     def conv_opus(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        if self.args.no_acode:
+        if self.args.no_acode or not self.args.q_opus:
             raise Exception("disabled in server config")
 
         self.wait4ram(0.2, tpath)
@@ -662,6 +703,7 @@ class ThumbSrv(object):
                 pass
 
         caf_src = abspath if src_opus else tmp_opus
+        bq = ("%dk" % (self.args.q_opus,)).encode("ascii")
 
         if not want_caf or not src_opus:
             # fmt: off
@@ -674,7 +716,7 @@ class ThumbSrv(object):
                 b"-map_metadata", b"-1",
                 b"-map", b"0:a:0",
                 b"-c:a", b"libopus",
-                b"-b:a", b"128k",
+                b"-b:a", bq,
                 fsenc(tmp_opus)
             ]
             # fmt: on
@@ -697,7 +739,7 @@ class ThumbSrv(object):
                 b"-map_metadata", b"-1",
                 b"-ac", b"2",
                 b"-c:a", b"libopus",
-                b"-b:a", b"128k",
+                b"-b:a", bq,
                 b"-f", b"caf",
                 fsenc(tpath)
             ]
@@ -771,7 +813,7 @@ class ThumbSrv(object):
 
     def _clean(self, cat: str, thumbpath: str) -> int:
         # self.log("cln {}".format(thumbpath))
-        exts = ["jpg", "webp", "png"] if cat == "th" else ["opus", "caf"]
+        exts = ["jpg", "webp", "png"] if cat == "th" else ["opus", "caf", "mp3"]
         maxage = getattr(self.args, cat + "_maxage")
         now = time.time()
         prev_b64 = None

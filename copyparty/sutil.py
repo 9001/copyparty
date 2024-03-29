@@ -81,7 +81,9 @@ def enthumb(
 ) -> dict[str, Any]:
     rem = f["vp"]
     ext = rem.rsplit(".", 1)[-1].lower()
-    if fmt == "opus" and ext in "aac|m4a|mp3|ogg|opus|wma".split("|"):
+    if (fmt == "mp3" and ext == "mp3") or (
+        fmt == "opus" and ext in "aac|m4a|mp3|ogg|opus|wma".split("|")
+    ):
         raise Exception()
 
     vp = vjoin(vtop, rem.split("/", 1)[1])

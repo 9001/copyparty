@@ -1534,7 +1534,7 @@ var mpl = (function () {
 			c = r.ac_flac;
 		else if (/\.(aac|m4a)$/i.exec(url))
 			c = r.ac_aac;
-		else if (/\.opus$/i.exec(url) && !can_ogg)
+		else if (/\.(ogg|opus)$/i.exec(url) && !can_ogg)
 			c = true;
 		else if (re_au_native.exec(url))
 			c = false;
@@ -1542,7 +1542,7 @@ var mpl = (function () {
 		if (!c)
 			return url;
 
-		return addq(url, 'th=') + (can_ogg ? 'opus' : 'caf');
+		return addq(url, 'th=') + (can_ogg ? 'opus' : (IPHONE || MACOS) ? 'caf' : 'mp3');
 	};
 
 	r.pp = function () {
@@ -1652,15 +1652,11 @@ var mpl = (function () {
 var can_ogg = true;
 try {
 	can_ogg = new Audio().canPlayType('audio/ogg; codecs=opus') === 'probably';
-
-	if (document.documentMode)
-		can_ogg = true;  // ie8-11
 }
 catch (ex) { }
 
 
-var re_au_native = can_ogg ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i :
-	have_acode ? /\.(aac|flac|m4a|mp3|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
+var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
 	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk)$/i;
 
 
@@ -1801,7 +1797,7 @@ function MPlayer() {
 		mpl.preload_url = full ? url : null;
 
 		if (mpl.waves)
-			fetch(url.replace(/\bth=opus&/, '') + '&th=p').then(function (x) {
+			fetch(url.replace(/\bth=(opus|mp3)&/, '') + '&th=p').then(function (x) {
 				x.body.getReader().read();
 			});
 
@@ -3106,7 +3102,7 @@ function play(tid, is_ev, seek) {
 
 		pbar.unwave();
 		if (mpl.waves)
-			pbar.loadwaves(url.replace(/\bth=opus&/, '') + '&th=p');
+			pbar.loadwaves(url.replace(/\bth=(opus|mp3)&/, '') + '&th=p');
 
 		mpui.progress_updater();
 		pbar.onresize();

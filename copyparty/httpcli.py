@@ -2450,7 +2450,7 @@ class HttpCli(object):
                             self.log("user not allowed to overwrite with ?replace")
                         elif bos.path.exists(abspath):
                             try:
-                                bos.unlink(abspath)
+                                wunlink(self.log, abspath, vfs.flags)
                                 t = "overwriting file with new upload: %s"
                             except:
                                 t = "toctou while deleting for ?replace: %s"
@@ -3177,7 +3177,7 @@ class HttpCli(object):
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         cfmt = ""
         if self.thumbcli and not self.args.no_bacode:
-            for zs in ("opus", "w", "j"):
+            for zs in ("opus", "mp3", "w", "j"):
                 if zs in self.ouparam or uarg == zs:
                     cfmt = zs
 

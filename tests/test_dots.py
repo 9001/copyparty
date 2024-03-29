@@ -104,7 +104,7 @@ class TestHttpCli(unittest.TestCase):
         vcfg = [
             ".::r.,u1:g,u2:c,dk",
             "v/a:v/a:r.,u1:g,u2:c,dk",
-            "v/.b:v/.b:r.,u1:g,u2:c,dk"
+            "v/.b:v/.b:r.,u1:g,u2:c,dk",
         ]
         self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"])
         self.asrv = AuthSrv(self.args, self.log)
@@ -130,7 +130,7 @@ class TestHttpCli(unittest.TestCase):
     def tarsel(self, url, uname, sel):
         url += ("&" if "?" in url else "?") + "tar"
         zs = '--XD\r\nContent-Disposition: form-data; name="act"\r\n\r\nzip\r\n--XD\r\nContent-Disposition: form-data; name="files"\r\n\r\n'
-        zs += "\r\n".join(sel) + '\r\n--XD--\r\n'
+        zs += "\r\n".join(sel) + "\r\n--XD--\r\n"
         zb = zs.encode("utf-8")
         hdr = "POST /%s HTTP/1.1\r\nPW: %s\r\nConnection: close\r\nContent-Type: multipart/form-data; boundary=XD\r\nContent-Length: %d\r\n\r\n"
         req = (hdr % (url, uname, len(zb))).encode("utf-8") + zb

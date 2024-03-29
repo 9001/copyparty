@@ -57,7 +57,7 @@ class ThumbCli(object):
         if is_vid and "dvthumb" in dbv.flags:
             return None
 
-        want_opus = fmt in ("opus", "caf")
+        want_opus = fmt in ("opus", "caf", "mp3")
         is_au = ext in self.fmt_ffa
         if is_au:
             if want_opus:

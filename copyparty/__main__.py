@@ -1217,6 +1217,8 @@ def add_thumbnail(ap):
 
 def add_transcoding(ap):
     ap2 = ap.add_argument_group('transcoding options')
+    ap2.add_argument("--q-opus", metavar="KBPS", type=int, default=128, help="target bitrate for transcoding to opus; set 0 to disable")
+    ap2.add_argument("--q-mp3", metavar="QUALITY", type=u, default="q2", help="target quality for transcoding to mp3, for example [\033[32m192k\033[0m] (CBR) or [\033[32mq0\033[0m] (CQ/CRF, q0=maxquality, q9=smallest); set 0 to disable")
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
     ap2.add_argument("--no-bacode", action="store_true", help="disable batch audio transcoding by folder download (zip/tar)")
     ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after \033[33mSEC\033[0m seconds")
