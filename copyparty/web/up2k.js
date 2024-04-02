@@ -17,7 +17,7 @@ function goto_up2k() {
 var up2k = null,
     up2k_hooks = [],
     hws = [],
-    sha_js = window.WebAssembly ? 'hw' : 'ac',  // ff53,c57,sa11
+    sha_js = WebAssembly ? 'hw' : 'ac',  // ff53,c57,sa11
     m = 'will use ' + sha_js + ' instead of native sha512 due to';
 
 try {
@@ -717,7 +717,7 @@ function Donut(uc, st) {
             sfx();
 
         // firefox may forget that filedrops are user-gestures so it can skip this:
-        if (uc.upnag && window.Notification && Notification.permission == 'granted')
+        if (uc.upnag && Notification && Notification.permission == 'granted')
             new Notification(uc.nagtxt);
     }
 
@@ -779,7 +779,7 @@ function up2k_init(subtle) {
     };
 
     setTimeout(function () {
-        if (window.WebAssembly && !hws.length)
+        if (WebAssembly && !hws.length)
             fetch(SR + '/.cpr/w.hash.js' + CB);
     }, 1000);
 
@@ -869,7 +869,7 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort);
-    bcfg_bind(uc, 'hashw', 'hashw', !!window.WebAssembly && (!subtle || !CHROME || MOBILE || VCHROME >= 107), set_hashw);
+    bcfg_bind(uc, 'hashw', 'hashw', !!WebAssembly && (!subtle || !CHROME || MOBILE || VCHROME >= 107), set_hashw);
     bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
     bcfg_bind(uc, 'upsfx', 'upsfx', false, set_upsfx);
 
@@ -1347,7 +1347,7 @@ function up2k_init(subtle) {
         var evpath = get_evpath(),
             draw_each = good_files.length < 50;
 
-        if (window.WebAssembly && !hws.length) {
+        if (WebAssembly && !hws.length) {
             for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
                 hws.push(new Worker(SR + '/.cpr/w.hash.js' + CB));
 
@@ -2950,7 +2950,7 @@ function up2k_init(subtle) {
     }
 
     function set_hashw() {
-        if (!window.WebAssembly) {
+        if (!WebAssembly) {
             bcfg_set('hashw', uc.hashw = false);
             toast.err(10, L.u_nowork);
         }
@@ -2967,7 +2967,7 @@ function up2k_init(subtle) {
                 nopenag();
         }
 
-        if (!window.Notification || !HTTPS)
+        if (!Notification || !HTTPS)
             return nopenag();
 
         if (en && Notification.permission == 'default')
@@ -2989,7 +2989,7 @@ function up2k_init(subtle) {
         };
     }
 
-    if (uc.upnag && (!window.Notification || Notification.permission != 'granted'))
+    if (uc.upnag && (!Notification || Notification.permission != 'granted'))
         bcfg_set('upnag', uc.upnag = false);
 
     ebi('nthread_add').onclick = function (e) {

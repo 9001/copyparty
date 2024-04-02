@@ -182,7 +182,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if (url.indexOf('easymde.js') + 1)
         return;  // clicking the preview pane
 
-    if (url.indexOf('deps/marked.js') + 1 && !window.WebAssembly)
+    if (url.indexOf('deps/marked.js') + 1 && !WebAssembly)
         return; // ff<52
 
     crashed = true;
@@ -1474,7 +1474,7 @@ var toast = (function () {
         clmod(obj, 'vis');
         r.visible = false;
         r.tag = obj;
-        if (!window.WebAssembly)
+        if (!WebAssembly)
             te = setTimeout(function () {
                 obj.className = 'hide';
             }, 500);

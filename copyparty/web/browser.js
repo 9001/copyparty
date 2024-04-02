@@ -7480,7 +7480,7 @@ var msel = (function () {
 
 
 (function () {
-	if (!window.FormData)
+	if (!FormData)
 		return;
 
 	var form = QS('#op_new_md>form'),
@@ -7502,7 +7502,7 @@ var msel = (function () {
 
 
 (function () {
-	if (!window.FormData)
+	if (!FormData)
 		return;
 
 	var form = QS('#op_mkdir>form'),
@@ -7696,7 +7696,7 @@ function show_md(md, name, div, url, depth) {
 		if (depth) {
 			clmod(div, 'raw', 1);
 			div.textContent = "--[ " + name + " ]---------\r\n" + md;
-			return toast.warn(10, errmsg + (window.WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
+			return toast.warn(10, errmsg + (WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
 		}
 
 		wfp_debounce.n--;
