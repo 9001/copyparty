@@ -1,5 +1,8 @@
 a living list of upcoming features / fixes / changes, very roughly in order of priority
 
+* ensure continuous music playback on android w/ unreliable network
+  * playback stops if preload doesn't finish before end of current track, but suspiciously resumes when phone is unsuspended and browser gets focus... preloading earlier is a band-aid; some filler / comfortnoise probably better, but the browser probably requires the play-action to be chained from an end-of-track event... maybe make two audio objects (wn1/wn2) with ≈2sec audio and eot-hop between them until au2 is ready, maybe assembled at runtime by repeating an mp3 frame (b64 is a bit sus)
+
 * download accelerator
   * definitely download chunks in parallel
   * maybe resumable downloads (chrome-only, jank api)
