@@ -591,11 +591,12 @@ window.baguetteBox = (function () {
             document.documentElement.style.overflowY = 'auto';
             document.body.style.overflowY = 'auto';
         }
-        if (overlay.style.display === 'none')
-            return;
 
         if (options.duringHide)
             options.duringHide();
+
+        if (overlay.style.display === 'none')
+            return;
 
         sethash('');
         unbindEvents();
