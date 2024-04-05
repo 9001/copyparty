@@ -157,7 +157,8 @@ def warn(msg: str) -> None:
 
 
 def init_E(EE: EnvParams) -> None:
-    # __init__ runs 18 times when oxidized; do expensive stuff here
+    # some cpython alternatives (such as pyoxidizer) can
+    # __init__ several times, so do expensive stuff here
 
     E = EE  # pylint: disable=redefined-outer-name
 
@@ -190,34 +191,9 @@ def init_E(EE: EnvParams) -> None:
 
         raise Exception("could not find a writable path for config")
 
-    def _unpack() -> str:
-        import atexit
-        import tarfile
-        import tempfile
-        from importlib.resources import open_binary
-
-        td = tempfile.TemporaryDirectory(prefix="")
-        atexit.register(td.cleanup)
-        tdn = td.name
-
-        with open_binary("copyparty", "z.tar") as tgz:
-            with tarfile.open(fileobj=tgz) as tf:
-                try:
-                    tf.extractall(tdn, filter="tar")
-                except TypeError:
-                    tf.extractall(tdn)  # nosec (archive is safe)
-
-        return tdn
-
-    try:
-        E.mod = os.path.dirname(os.path.realpath(__file__))
-        if E.mod.endswith("__init__"):
-            E.mod = os.path.dirname(E.mod)
-    except:
-        if not E.ox:
-            raise
-
-        E.mod = _unpack()
+    E.mod = os.path.dirname(os.path.realpath(__file__))
+    if E.mod.endswith("__init__"):
+        E.mod = os.path.dirname(E.mod)
 
     if sys.platform == "win32":
         bdir = os.environ.get("APPDATA") or os.environ.get("TEMP") or "."

@@ -16,8 +16,6 @@ help() { exec cat <<'EOF'
 # `re` does a repack of an sfx which you already executed once
 #   (grabs files from the sfx-created tempdir), overrides `clean`
 #
-# `ox` builds a pyoxidizer exe instead of py
-#
 # `gz` creates a gzip-compressed python sfx instead of bzip2
 #
 # `lang` limits which languages/translations to include,
@@ -111,7 +109,6 @@ while [ ! -z "$1" ]; do
 	case $1 in
 		clean)  clean=1  ; ;;
 		re)     repack=1 ; ;;
-		ox)     use_ox=1 ; ;;
 		gz)     use_gz=1 ; ;;
 		gzz)    shift;use_gzz=$1;use_gz=1; ;;
 		no-ftp) no_ftp=1 ; ;;
@@ -461,8 +458,8 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 		iawk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' $f
 	done
 
-[ ! $repack ] && [ ! $use_ox ] && {
-	# uncomment; oxidized drops 45 KiB but becomes undebuggable
+[ ! $repack ] && {
+	# uncomment
 	find | grep -E '\.py$' |
 		grep -vE '__version__' |
 		tr '\n' '\0' |
@@ -567,33 +564,6 @@ nf=$(ls -1 "$zdir"/arc.* 2>/dev/null | wc -l)
 	for f in copyparty/web/*.gz; do
 		rm "${f%.*}"
 	done
-}
-
-
-[ $use_ox ] && {
-	tgt=x86_64-pc-windows-msvc
-	tgt=i686-pc-windows-msvc  # 2M smaller (770k after upx)
-	bdir=build/$tgt/release/install/copyparty
-
-	t="res web"
-	(printf "\n\n\nBUT WAIT! THERE'S MORE!!\n\n";
-	cat ../$bdir/COPYING.txt) >> copyparty/res/COPYING.txt ||
-		echo "copying.txt 404 pls rebuild"
-
-	mv ftp/* j2/* .
-	rm -rf ftp j2 py2 py37
-	(cd copyparty; tar -cvf z.tar $t; rm -rf $t)
-	cd ..
-	pyoxidizer build --release --target-triple $tgt
-	mv $bdir/copyparty.exe dist/
-	cp -pv "$(for d in '/c/Program Files (x86)/Microsoft Visual Studio/'*'/BuildTools/VC/Redist/MSVC'; do
-		find "$d" -name vcruntime140.dll; done | sort | grep -vE '/x64/|/onecore/' | head -n 1)" dist/
-	dist/copyparty.exe --version
-	cp -pv dist/copyparty{,.orig}.exe
-	[ $ultra ] && a="--best --lzma" || a=-1
-	/bin/time -f %es upx $a dist/copyparty.exe >/dev/null
-	ls -al dist/copyparty{,.orig}.exe
-	exit 0
 }
 
 

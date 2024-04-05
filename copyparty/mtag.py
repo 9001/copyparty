@@ -551,8 +551,7 @@ class MTag(object):
             pypath = str(os.pathsep.join(zsl))
             env["PYTHONPATH"] = pypath
         except:
-            if not E.ox and not EXE:
-                raise
+            raise  # might be expected outside cpython
 
         ret: dict[str, Any] = {}
         for tagname, parser in sorted(parsers.items(), key=lambda x: (x[1].pri, x[0])):
