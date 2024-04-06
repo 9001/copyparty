@@ -1464,7 +1464,7 @@ var mpl = (function () {
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
-	bcfg_bind(r, 'fau', 'au_fau', MOBILE, function (v) {
+	bcfg_bind(r, 'fau', 'au_fau', MOBILE && !IPHONE, function (v) {
 		mp.nopause();
 		if (mp.fau) {
 			mp.fau.pause();
@@ -2534,7 +2534,7 @@ var mpui = (function () {
 				rem = pos > 1 ? len - pos : 999,
 				full = null;
 
-			if (rem < (mpl.fullpre ? 7 : 40)) {
+			if (rem < 7 || (!mpl.fullpre && (rem < 40 || pos > 10))) {
 				preloaded = fpreloaded = mp.au.rsrc;
 				full = false;
 			}

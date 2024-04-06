@@ -20,6 +20,8 @@
     * [just the sfx](#just-the-sfx)
     * [build from release tarball](#build-from-release-tarball) - uses the included prebuilt webdeps
     * [complete release](#complete-release)
+* [debugging](#debugging)
+    * [music playback halting on phones](#music-playback-halting-on-phones) - mostly fine on android
 * [todo](#todo) - roughly sorted by priority
     * [discarded ideas](#discarded-ideas)
 
@@ -299,6 +301,19 @@ in the `scripts` folder:
 
 * run `make -C deps-docker` to build all dependencies
 * run `./rls.sh 1.2.3` which uploads to pypi + creates github release + sfx
+
+
+# debugging
+
+## music playback halting on phones
+
+mostly fine on android,  but still haven't find a way to massage iphones into behaving well
+
+* conditionally starting/stopping mp.fau according to mp.au.readyState <3 or <4 doesn't help
+* loop=true doesn't work, and manually looping mp.fau from an onended also doesn't work (it does nothing)
+* assigning fau.currentTime in a timer doesn't work, as safari merely pretends to assign it
+
+can be reproduced with `--no-sendfile --s-wr-sz 8192 --s-wr-slp 0.3 --rsp-slp 6` and then play a collection of small audio files with the screen off, `ffmpeg -i track01.cdda.flac -c:a libopus -b:a 128k -segment_time 12 -f segment smol-%02d.opus`
 
 
 # todo

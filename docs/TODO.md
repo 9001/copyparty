@@ -5,9 +5,6 @@ a living list of upcoming features / fixes / changes, very roughly in order of p
   * maybe resumable downloads (chrome-only, jank api)
   * maybe checksum validation (return sha512 of requested range in responses, and probably also warks)
 
-* [github issue #64](https://github.com/9001/copyparty/issues/64) - dirkeys 2nd season
-  * popular feature request, finally time to refactor browser.js i suppose...
-
 * [github issue #37](https://github.com/9001/copyparty/issues/37) - upload PWA
   * or [maybe not](https://arstechnica.com/tech-policy/2024/02/apple-under-fire-for-disabling-iphone-web-apps-eu-asks-developers-to-weigh-in/), or [maybe](https://arstechnica.com/gadgets/2024/03/apple-changes-course-will-keep-iphone-eu-web-apps-how-they-are-in-ios-17-4/)
 

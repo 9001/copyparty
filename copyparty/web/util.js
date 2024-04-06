@@ -127,7 +127,7 @@ if ((document.location + '').indexOf(',rej,') + 1)
 
 try {
     console.hist = [];
-    var CMAXHIST = 100;
+    var CMAXHIST = 1000;
     var hook = function (t) {
         var orig = console[t].bind(console),
             cfun = function () {
@@ -148,8 +148,6 @@ try {
     hook('error');
 }
 catch (ex) {
-    if (console.stdlog)
-        console.log = console.stdlog;
     console.log('console capture failed', ex);
 }
 var crashed = false, ignexd = {}, evalex_fatal = false;
