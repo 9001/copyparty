@@ -1,7 +1,48 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0323-1724  `v1.11.2`  public idp volumes
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` in case of future important updates, such as [vulnerabilities](https://github.com/9001/copyparty/security) (most recently 2023-07-23)
+
+## new features
+
+* global-option `--iobuf` to set a custom I/O buffersize 2b24c50e
+  * changes the default buffersize to 256 KiB everywhere (was a mix of 64 and 512)
+  * may improve performance of networked volumes (s3 etc.) if increased
+  * on gbit networks: download-as-tar is now up to 20% faster
+  * slightly faster FTP and TFTP too
+
+* global-option `--s-rd-sz` to set a custom read-size for sockets c6acd3a9
+  * changes the default from 32 to 256 KiB
+  * may improve performance of networked volumes (s3 etc.) if increased
+  * on 10gbit networks: uploading large files is now up to 17% faster
+
+* add url parameter `?replace` to overwrite any existing files with a multipart-post c6acd3a9
+
+## bugfixes
+
+* #79 idp volumes (introduced in [v1.11.0](https://github.com/9001/copyparty/releases/tag/v1.11.0)) would only accept permissions for the user that owned the volume; was impossible to grant read/write-access to other users d30ae845
+
+## other changes
+
+* mention the [lack of persistence for idp volumes](https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md#important-notes) in the IdP docs 2f20d29e
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0318-1709  `v1.11.1`  dont ban the pipes
 
 the [previous release](https://github.com/9001/copyparty/releases/tag/v1.11.0) had all the fun new features... this one's just bugfixes
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+### no vulnerabilities since 2023-07-23
+* there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` in case of future important updates
+* [v1.8.7](https://github.com/9001/copyparty/releases/tag/v1.8.7) (2023-07-23) - [CVE-2023-38501](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-38501) - reflected XSS
+* [v1.8.2](https://github.com/9001/copyparty/releases/tag/v1.8.2) (2023-07-14) - [CVE-2023-37474](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-37474) - path traversal (first CVE)
 
 ## bugfixes
 
