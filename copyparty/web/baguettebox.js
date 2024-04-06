@@ -720,6 +720,9 @@ window.baguetteBox = (function () {
 
         figure.appendChild(image);
 
+        if (is_vid && window.afilt)
+            afilt.apply(undefined, image);
+
         if (options.async && callback)
             callback();
     }

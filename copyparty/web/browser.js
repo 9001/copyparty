@@ -2734,7 +2734,7 @@ var afilt = (function () {
 		mp.acs = mpo.acs = null;
 	};
 
-	r.apply = function (v) {
+	r.apply = function (v, au) {
 		r.init();
 		r.draw();
 
@@ -2754,12 +2754,13 @@ var afilt = (function () {
 			if (r.plugs[a].en)
 				plug = true;
 
-		if (!actx || !mp.au || (!r.eqen && !plug && !mp.acs))
+		au = au || (mp && mp.au);
+		if (!actx || !au || (!r.eqen && !plug && !mp.acs))
 			return;
 
 		r.stop();
-		mp.au.id = mp.au.id || Date.now();
-		mp.acs = r.acst[mp.au.id] = r.acst[mp.au.id] || actx.createMediaElementSource(mp.au);
+		au.id = au.id || Date.now();
+		mp.acs = r.acst[au.id] = r.acst[au.id] || actx.createMediaElementSource(au);
 
 		if (r.eqen)
 			add_eq();
@@ -4928,6 +4929,8 @@ var thegrid = (function () {
 	};
 
 	r.onhide = function () {
+		afilt.apply();
+
 		if (!thegrid.ihop)
 			return;
 
