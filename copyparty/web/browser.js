@@ -244,6 +244,7 @@ var Ls = {
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
+		"mt_fau": "on phones, prevent music from stopping if the next song doesn't preload fast enough (can make tags display glitchy)\">☕️",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
@@ -745,6 +746,7 @@ var Ls = {
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
+		"mt_fau": "for telefoner: forhindre at avspilling stopper hvis nettet er for tregt til å laste neste sang i tide. Hvis påskrudd, kan forårsake at sang-info ikke vises korrekt i OS'et\">☕️",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
@@ -1415,6 +1417,7 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
+		'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
 		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
@@ -1461,6 +1464,15 @@ var mpl = (function () {
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
+	bcfg_bind(r, 'fau', 'au_fau', MOBILE, function (v) {
+		mp.nopause();
+		if (mp.fau) {
+			mp.fau.pause();
+			mp.fau = mpo.fau = null;
+			console.log('stop fau');
+		}
+		mp.init_fau();
+	});
 	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
 		if (!v) pbar.unwave();
 	});
@@ -1661,13 +1673,14 @@ var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$
 
 
 // extract songs + add play column
-var mpo = { "au": null, "au2": null, "acs": null };
+var mpo = { "au": null, "au2": null, "acs": null, "fau": null };
 function MPlayer() {
 	var r = this;
 	r.id = Date.now();
 	r.au = mpo.au;
 	r.au2 = mpo.au2;
 	r.acs = mpo.acs;
+	r.fau = mpo.fau;
 	r.tracks = {};
 	r.order = [];
 	r.cd_pause = 0;
@@ -1838,6 +1851,17 @@ function MPlayer() {
 
 	r.nopause = function () {
 		r.cd_pause = Date.now();
+	};
+
+	r.init_fau = function () {
+		if (r.fau || !mpl.fau)
+			return;
+
+		// breaks touchbar-macs
+		console.log('init fau');
+		r.fau = new Audio(SR + '/.cpr/deps/busy.mp3?_=' + TS);
+		r.fau.loop = true;
+		r.fau.play();
 	};
 }
 
@@ -2510,11 +2534,11 @@ var mpui = (function () {
 				rem = pos > 1 ? len - pos : 999,
 				full = null;
 
-			if (rem < (mpl.fullpre ? 7 : 20)) {
+			if (rem < (mpl.fullpre ? 7 : 40)) {
 				preloaded = fpreloaded = mp.au.rsrc;
 				full = false;
 			}
-			else if (rem < 40 && mpl.fullpre && fpreloaded != mp.au.rsrc) {
+			else if (rem < 60 && mpl.fullpre && fpreloaded != mp.au.rsrc) {
 				fpreloaded = mp.au.rsrc;
 				full = true;
 			}
@@ -2991,6 +3015,7 @@ function play(tid, is_ev, seek) {
 		return;
 
 	mpl.preload_url = null;
+	mp.nopause();
 	mp.stopfade(true);
 
 	var tn = tid;
@@ -3037,6 +3062,7 @@ function play(tid, is_ev, seek) {
 		mp.au.onended = next_song;
 		widget.open();
 	}
+	mp.init_fau();
 
 	var url = addq(mpl.acode(mp.tracks[tid]), 'cache=987&_=' + ACB);
 
@@ -3189,7 +3215,10 @@ function evau_error(e) {
 			toast.warn(15, esc(basenames(err + mfile)));
 		};
 		xhr.send();
+		return;
 	}
+
+	setTimeout(next_song, 15000);
 }
 
 
@@ -8214,6 +8243,7 @@ function reload_mp() {
 		mpo.au = mp.au;
 		mpo.au2 = mp.au2;
 		mpo.acs = mp.acs;
+		mpo.fau = mp.fau;
 		mpl.unbuffer();
 	}
 	var plays = QSA('tr>td:first-child>a.play');
