@@ -4238,7 +4238,7 @@ var showfile = (function () {
 		qsr('#prism_css');
 		var el = mknod('link', 'prism_css');
 		el.rel = 'stylesheet';
-		el.href = SR + '/.cpr/deps/prism' + (light ? '' : 'd') + '.css';
+		el.href = SR + '/.cpr/deps/prism' + (light ? '' : 'd') + '.css?_=' + TS;
 		document.head.appendChild(el);
 	};
 
@@ -4861,7 +4861,7 @@ var thegrid = (function () {
 				}
 				ihref = SR + '/.cpr/ico/' + ext;
 			}
-			ihref = addq(ihref, 'cache=i&_=' + ACB);
+			ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
 			if (CHROME)
 				ihref += "&raster";
 

@@ -16,7 +16,6 @@ var wah = '',
     NOAC = 'autocorrect="off" autocapitalize="off"',
     L, tt, treectl, thegrid, up2k, asmCrypto, hashwasm, vbar, marked,
     T0 = Date.now(),
-    CB = '?_=' + Math.floor(T0 / 1000).toString(36),
     R = SR.slice(1),
     RS = R ? "/" + R : "",
     HALFMAX = 8192 * 8192 * 8192 * 8192,
@@ -52,8 +51,6 @@ catch (ex) {
 }
 
 try {
-    CB = '?' + document.currentScript.src.split('?').pop();
-
     if (navigator.userAgentData.mobile)
         MOBILE = true;
 

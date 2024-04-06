@@ -780,7 +780,7 @@ function up2k_init(subtle) {
 
     setTimeout(function () {
         if (WebAssembly && !hws.length)
-            fetch(SR + '/.cpr/w.hash.js' + CB);
+            fetch(SR + '/.cpr/w.hash.js?_=' + TS);
     }, 1000);
 
     function showmodal(msg) {
@@ -1349,7 +1349,7 @@ function up2k_init(subtle) {
 
         if (WebAssembly && !hws.length) {
             for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
-                hws.push(new Worker(SR + '/.cpr/w.hash.js' + CB));
+                hws.push(new Worker(SR + '/.cpr/w.hash.js?_=' + TS));
 
             console.log(hws.length + " hashers");
         }
