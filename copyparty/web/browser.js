@@ -2534,7 +2534,7 @@ var mpui = (function () {
 				rem = pos > 1 ? len - pos : 999,
 				full = null;
 
-			if (rem < 7 || (!mpl.fullpre && (rem < 40 || pos > 10))) {
+			if (rem < 7 || (!mpl.fullpre && (rem < 40 || (rem < 90 && pos > 10)))) {
 				preloaded = fpreloaded = mp.au.rsrc;
 				full = false;
 			}
