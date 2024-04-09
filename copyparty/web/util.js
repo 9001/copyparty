@@ -736,7 +736,11 @@ function vjoin(p1, p2) {
 
 
 function addq(url, q) {
-    return url + (url.indexOf('?') < 0 ? '?' : '&') + (q === undefined ? '' : q);
+    var uh = url.split('#', 1),
+        u = uh[0],
+        h = uh.length == 1 ? '' : '#' + uh[1];
+
+    return u + (u.indexOf('?') < 0 ? '?' : '&') + (q === undefined ? '' : q) + h;
 }
 
 

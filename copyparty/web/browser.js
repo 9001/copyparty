@@ -1554,7 +1554,7 @@ var mpl = (function () {
 		if (!c)
 			return url;
 
-		return addq(url, 'th=') + (can_ogg ? 'opus' : (IPHONE || MACOS) ? 'caf' : 'mp3');
+		return addq(url, 'th=' + (can_ogg ? 'opus' : (IPHONE || MACOS) ? 'caf' : 'mp3'));
 	};
 
 	r.pp = function () {
@@ -4286,7 +4286,7 @@ var showfile = (function () {
 
 	r.show = function (url, no_push) {
 		var xhr = new XHR(),
-			m = /[?&](k=[^&]+)/.exec(url);
+			m = /[?&](k=[^&#]+)/.exec(url);
 
 		url = url.split('?')[0] + (m ? '?' + m[1] : '');
 		xhr.url = url;
@@ -4826,7 +4826,7 @@ var thegrid = (function () {
 				ihref = ohref;
 
 			if (r.thumbs) {
-				ihref = addq(ihref, 'th=') + (have_webp ? 'w' : 'j');
+				ihref = addq(ihref, 'th=' + (have_webp ? 'w' : 'j'));
 				if (!r.crop)
 					ihref += 'f';
 				if (r.x3)
@@ -5975,14 +5975,14 @@ var treectl = (function () {
 
 	function get_tree(top, dst, rst) {
 		var xhr = new XHR(),
-			m = /[?&](k=[^&]+)/.exec(dst),
+			m = /[?&](k=[^&#]+)/.exec(dst),
 			k = m ? '&' + m[1] : dk ? '&k=' + dk : '';
 
 		xhr.top = top;
 		xhr.dst = dst;
 		xhr.rst = rst;
 		xhr.ts = Date.now();
-		xhr.open('GET', addq(dst, 'tree=') + top + (r.dots ? '&dots' : '') + k, true);
+		xhr.open('GET', addq(dst, 'tree=' + top + (r.dots ? '&dots' : '') + k), true);
 		xhr.onload = xhr.onerror = recvtree;
 		xhr.send();
 		enspin('#tree');
@@ -6071,7 +6071,7 @@ var treectl = (function () {
 				cl = '';
 
 			if (dk && ehref == cevp && !/[?&]k=/.exec(qhref))
-				links[a].setAttribute('href', addq(qhref, 'k=') + dk);
+				links[a].setAttribute('href', addq(qhref, 'k=' + dk));
 
 			if (href == cdir) {
 				act = links[a];
@@ -6172,7 +6172,7 @@ var treectl = (function () {
 			return window.location = url;
 
 		var xhr = new XHR(),
-			m = /[?&](k=[^&]+)/.exec(url),
+			m = /[?&](k=[^&#]+)/.exec(url),
 			k = m ? '&' + m[1] : dk ? '&k=' + dk : '';
 
 		xhr.top = url.split('?')[0];
@@ -6258,7 +6258,7 @@ var treectl = (function () {
 			for (var a = 0; a < res.dirs.length; a++) {
 				var dh = res.dirs[a].href,
 					dn = dh.split('/')[0].split('?')[0],
-					m = /[?&](k=[^&]+)/.exec(dh);
+					m = /[?&](k=[^&#]+)/.exec(dh);
 
 				if (m)
 					dn += '?' + m[1];
@@ -6630,7 +6630,7 @@ var treectl = (function () {
 			hbase = req,
 			cbase = location.pathname,
 			mdoc = /[?&]doc=/.exec('' + url),
-			mdk = /[?&](k=[^&]+)/.exec('' + url);
+			mdk = /[?&](k=[^&#]+)/.exec('' + url);
 
 		if (mdoc && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);
@@ -7267,7 +7267,7 @@ var arcfmt = (function () {
 			if (!/^(zip|tar|pax|tgz|txz)$/.exec(txt))
 				continue;
 
-			var m = /(.*[?&])(tar|zip)([^&]*)(.*)$/.exec(href);
+			var m = /(.*[?&])(tar|zip)([^&#]*)(.*)$/.exec(href);
 			if (!m)
 				throw new Error('missing arg in url');
 
@@ -7343,7 +7343,7 @@ var msel = (function () {
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
 
 			if (dk) {
-				var m = /[?&](k=[^&]+)/.exec(qhref);
+				var m = /[?&](k=[^&#]+)/.exec(qhref);
 				item.q = m ? '?' + m[1] : '';
 			}
 			else item.q = '';
@@ -8281,7 +8281,7 @@ function reload_browser() {
 
 	for (var a = 0; a < parts.length - 1; a++) {
 		link += parts[a] + '/';
-		var link2 = dks[link] ? addq(link, 'k=') + dks[link] : link;
+		var link2 = dks[link] ? addq(link, 'k=' + dks[link]) : link;
 
 		o = mknod('a');
 		o.setAttribute('href', link2);
