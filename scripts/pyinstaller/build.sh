@@ -118,4 +118,12 @@ base64 | head -c12 >> dist/copyparty.exe
 
 dist/copyparty.exe --version
 
-curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/copyparty$esuf.exe
+csum=$(sha512sum <dist/copyparty.exe | cut -c-56)
+
+curl -fkT dist/copyparty.exe -b cppwd=wark https://192.168.123.1:3923/copyparty$esuf.exe >uplod.log
+cat uplod.log
+
+grep -q $csum uplod.log && echo upload OK || {
+    echo UPLOAD FAILED
+    exit 1
+}

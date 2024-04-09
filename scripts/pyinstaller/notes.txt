@@ -8,7 +8,7 @@ run ./build.sh in git-bash to build + upload the exe
 to obtain the files referenced below, see ./deps.txt
 
 download + install git (32bit OK on 64):
-http://192.168.123.1:3923/ro/pyi/Git-2.39.1-32-bit.exe
+http://192.168.123.1:3923/ro/pyi/Git-2.44.0-32-bit.exe
 
 ===[ copy-paste into git-bash ]================================
 uname -s | grep NT-10 && w10=1 || {
@@ -16,6 +16,7 @@ uname -s | grep NT-10 && w10=1 || {
 }
 fns=(
   altgraph-0.17.4-py2.py3-none-any.whl
+  packaging-24.0-py3-none-any.whl
   pefile-2023.2.7-py3-none-any.whl
   pyinstaller_hooks_contrib-2024.3-py2.py3-none-any.whl
   pywin32_ctypes-0.2.2-py3-none-any.whl
@@ -26,26 +27,25 @@ fns=(
   Jinja2-3.1.3-py3-none-any.whl
   MarkupSafe-2.1.5-cp311-cp311-win_amd64.whl
   mutagen-1.47.0-py3-none-any.whl
-  packaging-23.2-py3-none-any.whl
   pillow-10.3.0-cp311-cp311-win_amd64.whl
   python-3.11.9-amd64.exe
   upx-4.2.2-win64.zip
 )
 [ $w7 ] && fns+=(
   pyinstaller-5.13.2-py3-none-win32.whl
-  certifi-2023.11.17-py3-none-any.whl
-  chardet-5.1.0-py3-none-any.whl
-  idna-3.4-py3-none-any.whl
-  requests-2.28.2-py3-none-any.whl
-  urllib3-1.26.14-py2.py3-none-any.whl
+  certifi-2024.2.2-py3-none-any.whl
+  charset_normalizer-3.3.2-cp37-cp37m-win32.whl
+  idna-3.6-py3-none-any.whl
+  requests-2.31.0-py3-none-any.whl
+  urllib3-1.26.18-py2.py3-none-any.whl
   upx-4.2.2-win32.zip
 )
 [ $w7 ] && fns+=(
-  future-0.18.2.tar.gz
-  importlib_metadata-5.0.0-py3-none-any.whl
-  pip-23.2.1-py3-none-any.whl
-  typing_extensions-4.4.0-py3-none-any.whl
-  zipp-3.10.0-py3-none-any.whl
+  future-1.0.0-py3-none-any.whl
+  importlib_metadata-6.7.0-py3-none-any.whl
+  pip-24.0-py3-none-any.whl
+  typing_extensions-4.7.1-py3-none-any.whl
+  zipp-3.15.0-py3-none-any.whl
 )
 [ $w7x64 ] && fns+=(
   windows6.1-kb2533623-x64.msu
@@ -77,9 +77,10 @@ yes | unzip upx-*-win32.zip &&
 mv upx-*/upx.exe . &&
 python -m ensurepip &&
 { [ $w10 ] || python -m pip install --user -U pip-*.whl; } &&
-{ [ $w7 ] || python -m pip install --user -U {packaging,setuptools,mutagen,Pillow,Jinja2,MarkupSafe}-*.whl; } &&
+python -m pip install --user -U packaging-*.whl &&
+{ [ $w7 ] || python -m pip install --user -U {setuptools,mutagen,Pillow,Jinja2,MarkupSafe}-*.whl; } &&
 { [ $w10 ] || python -m pip install --user -U {requests,urllib3,charset_normalizer,certifi,idna}-*.whl; } &&
-{ [ $w10 ] || python -m pip install --user -U future-*.tar.gz importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
+{ [ $w10 ] || python -m pip install --user -U future-*.whl importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
 python -m pip install --user -U pyinstaller-*.whl pefile-*.whl pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl &&
 sed -ri 's/--lzma/--best/' $appd/Python/Python$pyv/site-packages/pyinstaller/building/utils.py &&
 curl -fkLO https://192.168.123.1:3923/cpp/scripts/uncomment.py &&
