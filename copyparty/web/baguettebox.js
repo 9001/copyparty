@@ -29,6 +29,7 @@ window.baguetteBox = (function () {
         isOverlayVisible = false,
         touch = {},  // start-pos
         touchFlag = false,  // busy
+        scrollTimer = 0,
         re_i = /^[^?]+\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp)(\?|$)/i,
         re_v = /^[^?]+\.(webm|mkv|mp4)(\?|$)/i,
         anims = ['slideIn', 'fadeIn', 'none'],
@@ -89,6 +90,30 @@ window.baguetteBox = (function () {
     };
     var contextmenuHandler = function () {
         touchendHandler();
+    };
+
+    var overlayWheelHandler = function (e) {
+        if (!options.noScrollbars || anymod(e))
+            return;
+
+        ev(e);
+
+        var x = e.deltaX,
+            y = e.deltaY,
+            d = Math.abs(x) > Math.abs(y) ? x : y;
+
+        if (e.deltaMode)
+            d *= 10;
+
+        if (Date.now() - scrollTimer < (Math.abs(d) > 20 ? 100 : 300))
+            return;
+
+        scrollTimer = Date.now();
+
+        if (d > 0)
+            showNextImage();
+        else
+            showPreviousImage();
     };
 
     var trapFocusInsideOverlay = function (e) {
@@ -451,6 +476,7 @@ window.baguetteBox = (function () {
         bind(document, 'keyup', keyUpHandler);
         bind(document, 'fullscreenchange', onFSC);
         bind(overlay, 'click', overlayClickHandler);
+        bind(overlay, 'wheel', overlayWheelHandler);
         bind(btnPrev, 'click', showPreviousImage);
         bind(btnNext, 'click', showNextImage);
         bind(btnClose, 'click', hideOverlay);
@@ -473,6 +499,7 @@ window.baguetteBox = (function () {
         unbind(document, 'keyup', keyUpHandler);
         unbind(document, 'fullscreenchange', onFSC);
         unbind(overlay, 'click', overlayClickHandler);
+        unbind(overlay, 'wheel', overlayWheelHandler);
         unbind(btnPrev, 'click', showPreviousImage);
         unbind(btnNext, 'click', showNextImage);
         unbind(btnClose, 'click', hideOverlay);
