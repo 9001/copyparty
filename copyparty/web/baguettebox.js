@@ -583,7 +583,7 @@ window.baguetteBox = (function () {
         isOverlayVisible = true;
     }
 
-    function hideOverlay(e) {
+    function hideOverlay(e, dtor) {
         ev(e);
         playvid(false);
         removeFromCache('#files');
@@ -592,19 +592,21 @@ window.baguetteBox = (function () {
             document.body.style.overflowY = 'auto';
         }
 
+        try {
+            if (document.fullscreenElement)
+                document.exitFullscreen();
+        }
+        catch (ex) { }
+        isFullscreen = false;
+
+        if (dtor || overlay.style.display === 'none')
+            return;
+
         if (options.duringHide)
             options.duringHide();
 
-        if (overlay.style.display === 'none')
-            return;
-
         sethash('');
         unbindEvents();
-        try {
-            document.exitFullscreen();
-            isFullscreen = false;
-        }
-        catch (ex) { }
 
         // Fade out and hide the overlay
         overlay.className = '';
@@ -1065,6 +1067,7 @@ window.baguetteBox = (function () {
     }
 
     function destroyPlugin() {
+        hideOverlay(undefined, true);
         unbindEvents();
         clearCachedData();
         document.getElementsByTagName('body')[0].removeChild(ebi('bbox-overlay'));
