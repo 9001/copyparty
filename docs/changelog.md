@@ -1,4 +1,30 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0406-2011  `v1.12.0`  locksmith
+
+## new features
+
+* #64 dirkeys; option to auto-generate passwords for folders, so you can give someone a link to a specific folder inside a volume without sharing the rest of the volume 10bc2d92 32c912bb ef52e2c0 0ae12868
+  * enabled by volflag `dk` (exact folder only) and/or volflag `dks` (also subfolders); see [readme](https://github.com/9001/copyparty#dirkeys)
+* audio transcoding to mp3 if browser doesn't support opus a080759a
+  * recursively transcode and download a folder using `?tar&mp3`
+  * accidentally adds support for playing just about any audio format in ie11
+* audio equalizer also applies to videos 7744226b
+
+## bugfixes
+
+* #81 scrolling could break after viewing an image in the lightbox 9c42cbec
+* on phones, audio playback could stop if network is slow/unreliable 59f815ff b88cc7b5 59a53ba9
+  * fixes the issue on android, but ios/safari appears to be [impossible](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#music-playback-halting-on-phones) d94b5b3f
+
+## other changes
+
+* updated dompurify to 3.0.11
+* copyparty.exe: updated to python 3.11.9
+* support for building with pyoxidizer was removed 5ab54763
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0323-1724  `v1.11.2`  public idp volumes
 
 * read-only demo server at https://a.ocv.me/pub/demo/

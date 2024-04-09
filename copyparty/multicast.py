@@ -206,6 +206,7 @@ class MCast(object):
             except:
                 t = "announce failed on {} [{}]:\n{}"
                 self.log(t.format(netdev, ip, min_ex()), 3)
+                sck.close()
 
         if self.args.zm_msub:
             for s1 in self.srv.values():

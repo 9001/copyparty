@@ -1042,6 +1042,8 @@ tweaking the ui
   * to sort in music order (album, track, artist, title) with filename as fallback, you could `--sort tags/Cirle,tags/.tn,tags/Artist,tags/Title,href`
   * to sort by upload date, first enable showing the upload date in the listing with `-e2d -mte +.up_at` and then `--sort tags/.up_at`
 
+see [./docs/rice](./docs/rice) for more
+
 
 ## file indexing
 
