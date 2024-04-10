@@ -1,82 +1,71 @@
 ﻿# recipe for building an exe with nuitka (extreme jank edition)
-#
-# NOTE: win7 and win10 builds both work on win10 but
-#   on win7 they immediately c0000005 in kernelbase.dll
-#
-# first install python-3.6.8-amd64.exe
-#   [x] add to path
-#
+
+NOTE: copyparty runs SLOWER when compiled with nuitka;
+  just use copyparty-sfx.py and/or pyinstaller instead
+
+  ( the sfx and the pyinstaller EXEs are equally fast if you
+  have the latest jinja2 installed, but the older jinja that
+  comes bundled with the sfx is slightly faster yet )
+
+  roughly, copyparty-sfx.py is 6% faster than copyparty.exe
+  (win10-pyinstaller), and copyparty.exe is 10% faster than
+  nuitka, making copyparty-sfx.py 17% faster than nuitka
+
+NOTE: every time a nuitka-compiled copyparty.exe is launched,
+  it will show the windows firewall prompt since nuitka will
+  pick a new unique location in %TEMP% to unpack an exe into,
+  unlike pyinstaller which doesn't fork itself on startup...
+  might be fixable by configuring nuitka differently, idk
+
+NOTE: nuitka EXEs are larger than pyinstaller ones;
+  a minimal nuitka build of just the sfx (with its bundled
+  dependencies) was already the same size as the pyinstaller
+  copyparty.exe which also includes Mutagen and Pillow
+
+NOTE: nuitka takes a lot longer to build than pyinstaller
+  (due to actual compilation of course, but still)
+
+NOTE: binaries built with nuitka cannot run on windows7,
+  even when compiled with python 3.6 on windows 7 itself
+
+NOTE: `--python-flags=-m` is the magic sauce to
+  correctly compile `from .util import Daemon`
+  (which otherwise only explodes at runtime)
+
+NOTE: `--deployment` doesn't seem to affect performance
+
+########################################################################
 # copypaste the rest of this file into cmd
 
-rem from pypi
-cd \users\ed\downloads
-python -m pip install --user Nuitka-0.6.14.7.tar.gz
 
-rem https://github.com/brechtsanders/winlibs_mingw/releases/download/10.2.0-11.0.0-8.0.0-r5/winlibs-x86_64-posix-seh-gcc-10.2.0-llvm-11.0.0-mingw-w64-8.0.0-r5.zip
-mkdir C:\Users\ed\AppData\Local\Nuitka\
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\gcc\
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\gcc\x86_64\
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\gcc\x86_64\10.2.0-11.0.0-8.0.0-r5\
-copy c:\users\ed\downloads\winlibs-x86_64-posix-seh-gcc-10.2.0-llvm-11.0.0-mingw-w64-8.0.0-r5.zip C:\Users\ed\AppData\Local\Nuitka\Nuitka\gcc\x86_64\10.2.0-11.0.0-8.0.0-r5\winlibs-x86_64-posix-seh-gcc-10.2.0-llvm-11.0.0-mingw-w64-8.0.0-r5.zip
 
-rem https://github.com/ccache/ccache/releases/download/v3.7.12/ccache-3.7.12-windows-32.zip
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\ccache\
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\ccache\v3.7.12\
-copy c:\users\ed\downloads\ccache-3.7.12-windows-32.zip C:\Users\ed\AppData\Local\Nuitka\Nuitka\ccache\v3.7.12\ccache-3.7.12-windows-32.zip
+python -m pip install --user -U nuitka
 
-rem https://dependencywalker.com/depends22_x64.zip
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\depends\
-mkdir C:\Users\ed\AppData\Local\Nuitka\Nuitka\depends\x86_64\
-copy c:\users\ed\downloads\depends22_x64.zip C:\Users\ed\AppData\Local\Nuitka\Nuitka\depends\x86_64\depends22_x64.zip
+cd %homedrive%
+cd %homepath%\downloads
 
-cd \
-rd /s /q %appdata%\..\local\temp\pe-copyparty
-cd \users\ed\downloads
-python copyparty-sfx.py -h
-cd %appdata%\..\local\temp\pe-copyparty\copyparty
+rd /s /q copypuitka
+mkdir copypuitka
+cd copypuitka
 
-python
-import os, re
-os.rename('../dep-j2/jinja2', '../jinja2')
-os.rename('../dep-j2/markupsafe', '../markupsafe')
+rd /s /q %temp%\pe-copyparty
+python ..\copyparty-sfx.py --version
 
-print("# nuitka dies if .__init__.stuff is imported")
-with open('__init__.py','r',encoding='utf-8') as f:
- t1 = f.read()
+move %temp%\pe-copyparty\copyparty .\
+move %temp%\pe-copyparty\partftpy .\
+move %temp%\pe-copyparty\ftp\pyftpdlib .\
+move %temp%\pe-copyparty\j2\jinja2 .\
+move %temp%\pe-copyparty\j2\markupsafe .\
 
-with open('util.py','r',encoding='utf-8') as f:
- t2 = f.read().split('\n')[3:]
+rd /s /q %temp%\pe-copyparty
 
-t2 = [x for x in t2 if 'from .__init__' not in x]
-t = t1 + '\n'.join(t2)
-with open('__init__.py','w',encoding='utf-8') as f:
- f.write('\n')
+python -m nuitka ^
+  --onefile --deployment --python-flag=-m ^
+  --include-package=markupsafe ^
+  --include-package=jinja2 ^
+  --include-package=partftpy ^
+  --include-package=pyftpdlib ^
+  --include-data-dir=copyparty\web=copyparty\web ^
+  --include-data-dir=copyparty\res=copyparty\res ^
+  --run copyparty
 
-with open('util.py','w',encoding='utf-8') as f:
- f.write(t)
-
-print("# local-imports fail, prefix module names")
-ptn = re.compile(r'^( *from )(\.[^ ]+ import .*)')
-for d, _, fs in os.walk('.'):
- for f in fs:
-  fp = os.path.join(d, f)
-  if not fp.endswith('.py'):
-   continue
-  t = ''
-  with open(fp,'r',encoding='utf-8') as f:
-   for ln in [x.rstrip('\r\n') for x in f]:
-    m = ptn.match(ln)
-    if not m:
-     t += ln + '\n'
-     continue
-    p1, p2 = m.groups()
-    t += "{}copyparty{}\n".format(p1, p2).replace("__init__", "util")
-  with open(fp,'w',encoding='utf-8') as f:
-   f.write(t)
-
-exit()
-
-cd ..
-
-rd /s /q bout & python -m nuitka --standalone --onefile --windows-onefile-tempdir --python-flag=no_site --assume-yes-for-downloads --include-data-dir=copyparty\web=copyparty\web --include-data-dir=copyparty\res=copyparty\res --run --output-dir=bout --mingw64 --include-package=markupsafe --include-package=jinja2 copyparty
