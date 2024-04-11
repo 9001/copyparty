@@ -190,10 +190,20 @@ input {
 	padding: .5em .7em;
 	margin: 0 .5em 0 0;
 }
+input::placeholder {
+	font-size: 1.2em;
+	font-style: italic;
+	letter-spacing: .04em;
+	opacity: 0.64;
+	color: #930;
+}
 html.z input {
 	color: #fff;
 	background: #626;
 	border-color: #c2c;
+}
+html.z input::placeholder {
+	color: #fff;
 }
 html.z .num {
 	border-color: #777;
