@@ -1600,6 +1600,7 @@ html {
 	padding: .2em .4em;
 	font-size: 1.2em;
 	margin: .2em;
+	display: inline-block;
 	white-space: pre;
 	position: relative;
 	top: -.12em;
@@ -1772,9 +1773,6 @@ html.y #tree.nowrap .ntree a+a:hover {
 	border-left: .4em solid var(--bg-u5);
 	margin: .7em 0 .7em .5em;
 	padding-left: .5em;
-}
-.opwide>div>div>a {
-	line-height: 2em;
 }
 .opwide>div>h3 {
 	color: var(--fg-weak);
