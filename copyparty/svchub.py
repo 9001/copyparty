@@ -424,6 +424,12 @@ class SvcHub(object):
             t = "WARNING: found config files in [%s]: %s\n  config files are not expected here, and will NOT be loaded (unless your setup is intentionally hella funky)"
             self.log("root", t % (E.cfg, ", ".join(hits)), 3)
 
+        if self.args.no_bauth:
+            t = "WARNING: --no-bauth disables support for the Android app; you may want to use --bauth-last instead"
+            self.log("root", t, 3)
+            if self.args.bauth_last:
+                self.log("root", "WARNING: ignoring --bauth-last due to --no-bauth", 3)
+
     def _process_config(self) -> bool:
         al = self.args
 

@@ -443,7 +443,11 @@ class HttpCli(object):
 
         zso = self.headers.get("authorization")
         bauth = ""
-        if zso:
+        if (
+            zso
+            and not self.args.no_bauth
+            and (not cookie_pw or not self.args.bauth_last)
+        ):
             try:
                 zb = zso.split(" ")[1].encode("ascii")
                 zs = base64.b64decode(zb).decode("utf-8")
