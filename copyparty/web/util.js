@@ -148,6 +148,8 @@ try {
     hook('error');
 }
 catch (ex) {
+    if (console.stdlog)
+        console.log = console.stdlog;
     console.log('console capture failed', ex);
 }
 var crashed = false, ignexd = {}, evalex_fatal = false;
