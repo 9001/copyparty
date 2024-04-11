@@ -1539,16 +1539,18 @@ var mpl = (function () {
 	set_tint();
 
 	r.acode = function (url) {
-		var c = true;
+		var c = true,
+			cs = url.split('?')[0];
+
 		if (!have_acode)
 			c = false;
-		else if (/\.(wav|flac)$/i.exec(url))
+		else if (/\.(wav|flac)$/i.exec(cs))
 			c = r.ac_flac;
-		else if (/\.(aac|m4a)$/i.exec(url))
+		else if (/\.(aac|m4a)$/i.exec(cs))
 			c = r.ac_aac;
-		else if (/\.(ogg|opus)$/i.exec(url) && !can_ogg)
+		else if (/\.(ogg|opus)$/i.exec(cs) && !can_ogg)
 			c = true;
-		else if (re_au_native.exec(url))
+		else if (re_au_native.exec(cs))
 			c = false;
 
 		if (!c)
