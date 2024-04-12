@@ -231,7 +231,7 @@ install_vamp() {
 	cd "$td"
 	echo '#include <vamp-sdk/Plugin.h>' | g++ -x c++ -c -o /dev/null - || [ -e ~/pe/vamp-sdk ] || {
 		printf '\033[33mcould not find the vamp-sdk, building from source\033[0m\n'
-		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/2691/vamp-plugin-sdk-2.10.0.tar.gz)
+		(dl_files yolo https://ocv.me/mirror/vamp-plugin-sdk-2.10.0.tar.gz)
 		sha512sum -c <(
 			echo "153b7f2fa01b77c65ad393ca0689742d66421017fd5931d216caa0fcf6909355fff74706fabbc062a3a04588a619c9b515a1dae00f21a57afd97902a355c48ed  -"
 		) <vamp-plugin-sdk-2.10.0.tar.gz
@@ -247,7 +247,7 @@ install_vamp() {
 	cd "$td"
 	have_beatroot || {
 		printf '\033[33mcould not find the vamp beatroot plugin, building from source\033[0m\n'
-		(dl_files yolo https://code.soundsoftware.ac.uk/attachments/download/885/beatroot-vamp-v1.0.tar.gz)
+		(dl_files yolo https://ocv.me/mirror/beatroot-vamp-v1.0.tar.gz)
 		sha512sum -c <(
 			echo "1f444d1d58ccf565c0adfe99f1a1aa62789e19f5071e46857e2adfbc9d453037bc1c4dcb039b02c16240e9b97f444aaff3afb625c86aa2470233e711f55b6874  -"
 		) <beatroot-vamp-v1.0.tar.gz
