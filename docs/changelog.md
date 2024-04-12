@@ -1,4 +1,24 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0409-2334  `v1.12.1`  scrolling stuff
+
+## new features
+
+* while viewing pictures/videos, the scrollwheel can be used to view the prev/next file 844d16b9
+
+## bugfixes
+
+* #81 (scrolling suddenly getting disabled) properly fixed after @icxes found another way to reproduce it (thx) 4f0cad54
+* and fixed at least one javascript glitch introduced in v1.12.0 while adding dirkeys 989cc613
+  * directory tree sidebar could fail to render when popping browser history into the lightbox
+
+## other changes
+
+* music preloader is slightly less hyper f89de6b3
+* u2c.exe: updated TLS-certs and deps ab18893c
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0406-2011  `v1.12.0`  locksmith
 
 ## new features

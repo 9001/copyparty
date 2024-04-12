@@ -15,6 +15,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 
 * top
     * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
+        * [at home](#at-home) - make it accessible over the internet
         * [on servers](#on-servers) - you may also want these, especially on servers
     * [features](#features)
     * [testimonials](#testimonials) - small collection of user feedback
@@ -145,6 +146,17 @@ some recommended options:
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
   * see [accounts and volumes](#accounts-and-volumes) (or `--help-accounts`) for the syntax and other permissions
+
+
+### at home
+
+make it accessible over the internet  by starting a [cloudflare quicktunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/) like so:
+
+first download [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) and then start the tunnel with `cloudflared tunnel --url http://127.0.0.1:3923`
+
+as the tunnel starts, it will show a URL which you can share to let anyone browse your stash or upload files to you
+
+since people will be connecting through cloudflare, run copyparty with `--xff-hdr cf-connecting-ip` to detect client IPs correctly
 
 
 ### on servers
