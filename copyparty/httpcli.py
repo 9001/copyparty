@@ -89,6 +89,7 @@ from .util import (
     vjoin,
     vol_san,
     vsplit,
+    wrename,
     wunlink,
     yieldfile,
 )
@@ -1804,7 +1805,7 @@ class HttpCli(object):
                     f, fn = zfw["orz"]
 
                 path2 = os.path.join(fdir, fn2)
-                atomic_move(path, path2)
+                atomic_move(self.log, path, path2, vfs.flags)
                 fn = fn2
                 path = path2
 
@@ -1885,7 +1886,9 @@ class HttpCli(object):
         self.reply(t.encode("utf-8"), 201, headers=h)
         return True
 
-    def bakflip(self, f: typing.BinaryIO, ofs: int, sz: int, sha: str) -> None:
+    def bakflip(
+        self, f: typing.BinaryIO, ofs: int, sz: int, sha: str, flags: dict[str, Any]
+    ) -> None:
         if not self.args.bak_flips or self.args.nw:
             return
 
@@ -1913,7 +1916,7 @@ class HttpCli(object):
 
         if nrem:
             self.log("bakflip truncated; {} remains".format(nrem), 1)
-            atomic_move(fp, fp + ".trunc")
+            atomic_move(self.log, fp, fp + ".trunc", flags)
         else:
             self.log("bakflip ok", 2)
 
@@ -2179,7 +2182,7 @@ class HttpCli(object):
 
                 if sha_b64 != chash:
                     try:
-                        self.bakflip(f, cstart[0], post_sz, sha_b64)
+                        self.bakflip(f, cstart[0], post_sz, sha_b64, vfs.flags)
                     except:
                         self.log("bakflip failed: " + min_ex())
 
@@ -2531,7 +2534,7 @@ class HttpCli(object):
                             raise
 
                     if not nullwrite:
-                        atomic_move(tabspath, abspath)
+                        atomic_move(self.log, tabspath, abspath, vfs.flags)
 
                     tabspath = ""
 
@@ -2771,7 +2774,7 @@ class HttpCli(object):
                 hidedir(dp)
             except:
                 pass
-            bos.rename(fp, os.path.join(mdir, ".hist", mfile2))
+            wrename(self.log, fp, os.path.join(mdir, ".hist", mfile2), vfs.flags)
 
         assert self.parser.gen
         p_field, _, p_data = next(self.parser.gen)

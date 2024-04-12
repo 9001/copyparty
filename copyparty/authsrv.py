@@ -1764,13 +1764,14 @@ class AuthSrv(object):
                 if k in vol.flags:
                     vol.flags[k] = float(vol.flags[k])
 
-            try:
-                zs1, zs2 = vol.flags["rm_retry"].split("/")
-                vol.flags["rm_re_t"] = float(zs1)
-                vol.flags["rm_re_r"] = float(zs2)
-            except:
-                t = 'volume "/%s" has invalid rm_retry [%s]'
-                raise Exception(t % (vol.vpath, vol.flags.get("rm_retry")))
+            for k in ("mv_re", "rm_re"):
+                try:
+                    zs1, zs2 = vol.flags[k + "try"].split("/")
+                    vol.flags[k + "_t"] = float(zs1)
+                    vol.flags[k + "_r"] = float(zs2)
+                except:
+                    t = 'volume "/%s" has invalid %stry [%s]'
+                    raise Exception(t % (vol.vpath, k, vol.flags.get(k + "try")))
 
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:

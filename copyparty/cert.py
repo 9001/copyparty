@@ -6,12 +6,19 @@ import os
 import shutil
 import time
 
-from .util import Netdev, runcmd
+from .__init__ import ANYWIN
+from .util import Netdev, runcmd, wrename, wunlink
 
 HAVE_CFSSL = True
 
 if True:  # pylint: disable=using-constant-test
     from .util import RootLogger
+
+
+if ANYWIN:
+    VF = {"mv_re_t": 5, "rm_re_t": 5, "mv_re_r": 0.1, "rm_re_r": 0.1}
+else:
+    VF = {"mv_re_t": 0, "rm_re_t": 0}
 
 
 def ensure_cert(log: "RootLogger", args) -> None:
@@ -105,8 +112,12 @@ def _gen_ca(log: "RootLogger", args):
         raise Exception("failed to translate ca-cert: {}, {}".format(rc, se), 3)
 
     bname = os.path.join(args.crt_dir, "ca")
-    os.rename(bname + "-key.pem", bname + ".key")
-    os.unlink(bname + ".csr")
+    try:
+        wunlink(log, bname + ".key", VF)
+    except:
+        pass
+    wrename(log, bname + "-key.pem", bname + ".key", VF)
+    wunlink(log, bname + ".csr", VF)
 
     log("cert", "new ca OK", 2)
 
@@ -185,11 +196,11 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
 
     bname = os.path.join(args.crt_dir, "srv")
     try:
-        os.unlink(bname + ".key")
+        wunlink(log, bname + ".key", VF)
     except:
         pass
-    os.rename(bname + "-key.pem", bname + ".key")
-    os.unlink(bname + ".csr")
+    wrename(log, bname + "-key.pem", bname + ".key", VF)
+    wunlink(log, bname + ".csr", VF)
 
     with open(os.path.join(args.crt_dir, "ca.pem"), "rb") as f:
         ca = f.read()

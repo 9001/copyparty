@@ -2125,26 +2125,29 @@ def lsof(log: "NamedLogger", abspath: str) -> None:
         log("lsof failed; " + min_ex(), 3)
 
 
-def atomic_move(usrc: str, udst: str) -> None:
-    src = fsenc(usrc)
-    dst = fsenc(udst)
-    if not PY2:
-        os.replace(src, dst)
+def _fs_mvrm(
+    log: "NamedLogger", src: str, dst: str, atomic: bool, flags: dict[str, Any]
+) -> bool:
+    bsrc = fsenc(src)
+    bdst = fsenc(dst)
+    if atomic:
+        k = "mv_re_"
+        act = "atomic-rename"
+        osfun = os.replace
+        args = [bsrc, bdst]
+    elif dst:
+        k = "mv_re_"
+        act = "rename"
+        osfun = os.rename
+        args = [bsrc, bdst]
     else:
-        if os.path.exists(dst):
-            os.unlink(dst)
+        k = "rm_re_"
+        act = "delete"
+        osfun = os.unlink
+        args = [bsrc]
 
-        os.rename(src, dst)
-
-
-def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
-    maxtime = flags.get("rm_re_t", 0.0)
-    bpath = fsenc(abspath)
-    if not maxtime:
-        os.unlink(bpath)
-        return True
-
-    chill = flags.get("rm_re_r", 0.0)
+    maxtime = flags.get(k + "t", 0.0)
+    chill = flags.get(k + "r", 0.0)
     if chill < 0.001:
         chill = 0.1
 
@@ -2152,14 +2155,19 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
     t0 = now = time.time()
     for attempt in range(90210):
         try:
-            if ino and os.stat(bpath).st_ino != ino:
-                log("inode changed; aborting delete")
+            if ino and os.stat(bsrc).st_ino != ino:
+                t = "src inode changed; aborting %s %s"
+                log(t % (act, src), 1)
                 return False
-            os.unlink(bpath)
+            if (dst and not atomic) and os.path.exists(bdst):
+                t = "something appeared at dst; aborting rename [%s] ==> [%s]"
+                log(t % (src, dst), 1)
+                return False
+            osfun(*args)
             if attempt:
                 now = time.time()
-                t = "deleted in %.2f sec, attempt %d"
-                log(t % (now - t0, attempt + 1))
+                t = "%sd in %.2f sec, attempt %d: %s"
+                log(t % (act, now - t0, attempt + 1, src))
             return True
         except OSError as ex:
             now = time.time()
@@ -2169,13 +2177,43 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
                 raise
             if not attempt:
                 if not PY2:
-                    ino = os.stat(bpath).st_ino
-                t = "delete failed (err.%d); retrying for %d sec: %s"
-                log(t % (ex.errno, maxtime + 0.99, abspath))
+                    ino = os.stat(bsrc).st_ino
+                t = "%s failed (err.%d); retrying for %d sec: [%s]"
+                log(t % (act, ex.errno, maxtime + 0.99, src))
 
         time.sleep(chill)
 
     return False  # makes pylance happy
+
+
+def atomic_move(log: "NamedLogger", src: str, dst: str, flags: dict[str, Any]) -> None:
+    bsrc = fsenc(src)
+    bdst = fsenc(dst)
+    if PY2:
+        if os.path.exists(bdst):
+            _fs_mvrm(log, dst, "", False, flags)  # unlink
+
+        _fs_mvrm(log, src, dst, False, flags)  # rename
+    elif flags.get("mv_re_t"):
+        _fs_mvrm(log, src, dst, True, flags)
+    else:
+        os.replace(bsrc, bdst)
+
+
+def wrename(log: "NamedLogger", src: str, dst: str, flags: dict[str, Any]) -> bool:
+    if not flags.get("mv_re_t"):
+        os.rename(fsenc(src), fsenc(dst))
+        return True
+
+    return _fs_mvrm(log, src, dst, False, flags)
+
+
+def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
+    if not flags.get("rm_re_t"):
+        os.unlink(fsenc(abspath))
+        return True
+
+    return _fs_mvrm(log, abspath, "", False, flags)
 
 
 def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:

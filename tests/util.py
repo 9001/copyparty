@@ -155,6 +155,7 @@ class Cfg(Namespace):
             mte={"a": True},
             mth={},
             mtp=[],
+            mv_retry="0/0",
             rm_retry="0/0",
             s_rd_sz=256 * 1024,
             s_wr_sz=256 * 1024,

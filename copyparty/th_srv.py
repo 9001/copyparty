@@ -28,6 +28,7 @@ from .util import (
     runcmd,
     statdir,
     vsplit,
+    wrename,
     wunlink,
 )
 
@@ -346,7 +347,7 @@ class ThumbSrv(object):
                             pass
 
             try:
-                bos.rename(ttpath, tpath)
+                wrename(self.log, ttpath, tpath, vn.flags)
             except:
                 pass
 

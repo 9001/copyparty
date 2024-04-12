@@ -91,6 +91,9 @@ CV_EXTS = set(zsg.split(","))
 HINT_HISTPATH = "you could try moving the database to another location (preferably an SSD or NVME drive) using either the --hist argument (global option for all volumes), or the hist volflag (just for this volume)"
 
 
+VF_CAREFUL = {"mv_re_t": 5, "rm_re_t": 5, "mv_re_r": 0.1, "rm_re_r": 0.1}
+
+
 class Dbw(object):
     def __init__(self, c: "sqlite3.Cursor", n: int, t: float) -> None:
         self.c = c
@@ -869,7 +872,7 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
-        fx = set(("html_head", "rm_re_t", "rm_re_r"))
+        fx = set(("html_head", "rm_re_t", "rm_re_r", "mv_re_t", "mv_re_r"))
         fd = vf_bmap()
         fd.update(vf_cmap())
         fd.update(vf_vmap())
@@ -3044,11 +3047,10 @@ class Up2k(object):
             t = "finish_upload {} with remaining chunks {}"
             raise Pebkac(500, t.format(wark, job["need"]))
 
-        # self.log("--- " + wark + "  " + dst + " finish_upload atomic " + dst, 4)
-        atomic_move(src, dst)
-
         upt = job.get("at") or time.time()
         vflags = self.flags[ptop]
+
+        atomic_move(self.log, src, dst, vflags)
 
         times = (int(time.time()), int(job["lmod"]))
         self.log(
@@ -3653,7 +3655,7 @@ class Up2k(object):
                 self._symlink(dlink, dabs, dvn.flags, lmod=ftime)
                 wunlink(self.log, sabs, svn.flags)
             else:
-                atomic_move(sabs, dabs)
+                atomic_move(self.log, sabs, dabs, svn.flags)
 
         except OSError as ex:
             if ex.errno != errno.EXDEV:
@@ -3830,8 +3832,7 @@ class Up2k(object):
             self.log("linkswap [{}] and [{}]".format(sabs, slabs))
             mt = bos.path.getmtime(slabs, False)
             flags = self.flags.get(ptop) or {}
-            wunlink(self.log, slabs, flags)
-            bos.rename(sabs, slabs)
+            atomic_move(self.log, sabs, slabs, flags)
             bos.utime(slabs, (int(time.time()), int(mt)), False)
             self._symlink(slabs, sabs, flags, False)
             full[slabs] = (ptop, rem)
@@ -4142,7 +4143,7 @@ class Up2k(object):
         with gzip.GzipFile(path2, "wb") as f:
             f.write(j)
 
-        atomic_move(path2, path)
+        atomic_move(self.log, path2, path, VF_CAREFUL)
 
         self.log("snap: {} |{}|".format(path, len(reg.keys())))
         self.snap_prev[ptop] = etag
