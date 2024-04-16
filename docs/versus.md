@@ -48,6 +48,7 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
     * [filebrowser](#filebrowser)
     * [filegator](#filegator)
     * [sftpgo](#sftpgo)
+    * [arozos](#arozos)
     * [updog](#updog)
     * [goshs](#goshs)
     * [gimme-that](#gimme-that)
@@ -93,6 +94,7 @@ the softwares,
 * `j` = [filebrowser](https://github.com/filebrowser/filebrowser)
 * `k` = [filegator](https://github.com/filegator/filegator)
 * `l` = [sftpgo](https://github.com/drakkan/sftpgo)
+* `m` = [arozos](https://github.com/tobychui/arozos)
 
 some softwares not in the matrixes,
 * [updog](#updog)
@@ -113,22 +115,22 @@ symbol legend,
 
 ## general
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | █ |
-| config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ |
-| good documentation      |   |   |   | █ | █ | █ | █ |   |   | █ | █ | ╱ |
-| runs on iOS             | ╱ |   |   |   |   | ╱ |   |   |   |   |   |   |
-| runs on Android         | █ |   |   |   |   | █ |   |   |   |   |   |   |
-| runs on WinXP           | █ | █ |   |   |   | █ |   |   |   |   |   |   |
-| runs on Windows         | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ |
-| runs on Linux           | █ | ╱ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| runs on Macos           | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| runs on FreeBSD         | █ |   |   | • | █ | █ | █ | • | █ | █ |   | █ |
-| portable binary         | █ | █ | █ |   |   | █ | █ |   |   | █ |   | █ |
-| zero setup, just go     | █ | █ | █ |   |   | ╱ | █ |   |   | █ |   | ╱ |
-| android app             | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |
-| iOS app                 | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | █ | █ |
+| config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ | █ |
+| good documentation      |   |   |   | █ | █ | █ | █ |   |   | █ | █ | ╱ | ╱ |
+| runs on iOS             | ╱ |   |   |   |   | ╱ |   |   |   |   |   |   |   |
+| runs on Android         | █ |   |   |   |   | █ |   |   |   |   |   |   |   |
+| runs on WinXP           | █ | █ |   |   |   | █ |   |   |   |   |   |   |   |
+| runs on Windows         | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ | ╱ |
+| runs on Linux           | █ | ╱ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| runs on Macos           | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |   |
+| runs on FreeBSD         | █ |   |   | • | █ | █ | █ | • | █ | █ |   | █ |   |
+| portable binary         | █ | █ | █ |   |   | █ | █ |   |   | █ |   | █ | █ |
+| zero setup, just go     | █ | █ | █ |   |   | ╱ | █ |   |   | █ |   | ╱ | █ |
+| android app             | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |   |
+| iOS app                 | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |   |
 
 * `zero setup` = you can get a mostly working setup by just launching the app, without having to install any software or configure whatever
 * `a`/copyparty remarks:
@@ -140,37 +142,38 @@ symbol legend,
 * `f`/rclone must be started with the command `rclone serve webdav .` or similar
 * `h`/chibisafe has undocumented windows support
 * `i`/sftpgo must be launched with a command
+* `m`/arozos has partial windows support
 
 
 ## file transfer
 
 *the thing that copyparty is actually kinda good at*
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ |
-| download folder as tar  | █ |   |   |   |   |   |   |   |   | █ |   |   |
-| upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| parallel uploads        | █ |   |   | █ | █ |   | • |   | █ |   | █ |   |
-| resumable uploads       | █ |   |   |   |   |   |   |   | █ |   | █ | ╱ |
-| upload segmenting       | █ |   |   |   |   |   |   | █ | █ |   | █ | ╱ |
-| upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |   |
-| upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |
-| upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |
-| upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ | ╱ |
-| keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |
-| upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ |
-| ┗ max disk usage        | █ | █ |   |   | █ |   |   |   | █ |   |   | █ |
-| ┗ max filesize          | █ |   |   |   |   |   |   | █ |   |   | █ | █ |
-| ┗ max items in folder   | █ |   |   |   |   |   |   |   |   |   |   | ╱ |
-| ┗ max file age          | █ |   |   |   |   |   |   |   | █ |   |   |   |
-| ┗ max uploads over time | █ |   |   |   |   |   |   |   |   |   |   | ╱ |
-| ┗ compress before write | █ |   |   |   |   |   |   |   |   |   |   |   |
-| ┗ randomize filename    | █ |   |   |   |   |   |   | █ | █ |   |   |   |
-| ┗ mimetype reject-list  | ╱ |   |   |   |   |   |   |   | • | ╱ |   | ╱ |
-| ┗ extension reject-list | ╱ |   |   |   |   |   |   | █ | • | ╱ |   | ╱ |
-| checksums provided      |   |   |   | █ | █ |   |   |   | █ | ╱ |   |   |
-| cloud storage backend   | ╱ | ╱ | ╱ | █ | █ | █ | ╱ |   |   | ╱ | █ | █ |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ | ╱ |
+| download folder as tar  | █ |   |   |   |   |   |   |   |   | █ |   |   |   |
+| upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| parallel uploads        | █ |   |   | █ | █ |   | • |   | █ |   | █ |   | █ |
+| resumable uploads       | █ |   |   |   |   |   |   |   | █ |   | █ | ╱ |   |
+| upload segmenting       | █ |   |   |   |   |   |   | █ | █ |   | █ | ╱ | █ |
+| upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |   |   |
+| upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |   |
+| upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |   |
+| upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ | ╱ | ╱ |
+| keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
+| upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ | ╱ |
+| ┗ max disk usage        | █ | █ |   |   | █ |   |   |   | █ |   |   | █ | █ |
+| ┗ max filesize          | █ |   |   |   |   |   |   | █ |   |   | █ | █ | █ |
+| ┗ max items in folder   | █ |   |   |   |   |   |   |   |   |   |   | ╱ |   |
+| ┗ max file age          | █ |   |   |   |   |   |   |   | █ |   |   |   |   |
+| ┗ max uploads over time | █ |   |   |   |   |   |   |   |   |   |   | ╱ |   |
+| ┗ compress before write | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ randomize filename    | █ |   |   |   |   |   |   | █ | █ |   |   |   |   |
+| ┗ mimetype reject-list  | ╱ |   |   |   |   |   |   |   | • | ╱ |   | ╱ | • |
+| ┗ extension reject-list | ╱ |   |   |   |   |   |   | █ | • | ╱ |   | ╱ | • |
+| checksums provided      |   |   |   | █ | █ |   |   |   | █ | ╱ |   |   |   |
+| cloud storage backend   | ╱ | ╱ | ╱ | █ | █ | █ | ╱ |   |   | ╱ | █ | █ | ╱ |
 
 * `upload segmenting` = files are sliced into chunks, making it possible to upload files larger than 100 MiB on cloudflare for example
 
@@ -192,26 +195,27 @@ symbol legend,
   * resumable/segmented uploads only over SFTP, not over HTTP
   * upload rules are totals only, not over time
   * can probably do extension/mimetype rejection similar to copyparty
+* `m`/arozos download-as-zip is not streaming; it creates the full zipfile before download can start, and fails on big folders
 
 
 ## protocols and client support
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ |
-| serve ftp  (tcp)        | █ |   |   |   |   | █ |   |   |   |   |   | █ |
-| serve ftps (tls)        | █ |   |   |   |   | █ |   |   |   |   |   | █ |
-| serve tftp (udp)        | █ |   |   |   |   |   |   |   |   |   |   |   |
-| serve sftp (ssh)        |   |   |   |   |   | █ |   |   |   |   |   | █ |
-| serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |
-| serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |
-| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ |   | █ | █ |
-| zeroconf                | █ |   |   |   |   |   |   |   |   |   |   |   |
-| supports netscape 4     | ╱ |   |   |   |   | █ |   |   |   |   | • |   |
-| ...internet explorer 6  | ╱ | █ |   | █ |   | █ |   |   |   |   | • |   |
-| mojibake filenames      | █ |   |   | • | • | █ | █ | • | • | • |   | ╱ |
-| undecodable filenames   | █ |   |   | • | • | █ |   | • | • |   |   | ╱ |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ | █ |
+| serve ftp  (tcp)        | █ |   |   |   |   | █ |   |   |   |   |   | █ | █ |
+| serve ftps (tls)        | █ |   |   |   |   | █ |   |   |   |   |   | █ |   |
+| serve tftp (udp)        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| serve sftp (ssh)        |   |   |   |   |   | █ |   |   |   |   |   | █ | █ |
+| serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |   |
+| serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |   |
+| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ |   | █ | █ |   |
+| zeroconf                | █ |   |   |   |   |   |   |   |   |   |   |   | █ |
+| supports netscape 4     | ╱ |   |   |   |   | █ |   |   |   |   | • |   | ╱ |
+| ...internet explorer 6  | ╱ | █ |   | █ |   | █ |   |   |   |   | • |   | ╱ |
+| mojibake filenames      | █ |   |   | • | • | █ | █ | • | █ | • |   | ╱ |   |
+| undecodable filenames   | █ |   |   | • | • | █ |   | • |   |   |   | ╱ |   |
 
 * `webdav` = protocol convenient for mounting a remote server as a local filesystem; see zeroconf:
 * `zeroconf` = the server announces itself on the LAN, [automatically appearing](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png) on other zeroconf-capable devices
@@ -222,61 +226,65 @@ symbol legend,
   * extremely minimal samba/cifs server
   * netscape 4 / ie6 support is mostly listed as a joke altho some people have actually found it useful ([ie4 tho](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png))
 * `l`/sftpgo translates mojibake filenames into valid utf-8 (information loss)
+* `m`/arozos has readonly-support for older browsers; no uploading
 
 
 ## server configuration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| config from cmd args    | █ |   |   |   |   | █ | █ |   |   | █ |   | ╱ |
-| config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ |
-| runtime config reload   | █ | █ | █ |   |   |   |   | █ | █ | █ | █ |   |
-| same-port http / https  | █ |   |   |   |   |   |   |   |   |   |   |   |
-| listen multiple ports   | █ |   |   |   |   |   |   |   |   |   |   | █ |
-| virtual file system     | █ | █ | █ |   |   |   | █ |   |   |   |   | █ |
-| reverse-proxy ok        | █ |   | █ | █ | █ | █ | █ | █ | • | • | • | █ |
-| folder-rproxy ok        | █ |   |   |   | █ | █ |   | • | • | • | • |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| config from cmd args    | █ |   |   |   |   | █ | █ |   |   | █ |   | ╱ | ╱ |
+| config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ | ╱ |
+| runtime config reload   | █ | █ | █ |   |   |   |   | █ | █ | █ | █ |   | █ |
+| same-port http / https  | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| listen multiple ports   | █ |   |   |   |   |   |   |   |   |   |   | █ |   |
+| virtual file system     | █ | █ | █ |   |   |   | █ |   |   |   |   | █ |   |
+| reverse-proxy ok        | █ |   | █ | █ | █ | █ | █ | █ | • | • | • | █ | ╱ |
+| folder-rproxy ok        | █ |   |   |   | █ | █ |   | • | • | • | • |   | • |
 
 * `folder-rproxy` = reverse-proxying without dedicating an entire (sub)domain, using a subfolder instead
 * `l`/sftpgo:
   * config: users must be added through gui / api calls
+* `m`/arozos:
+  * configuration is primarily through GUI
+  * reverse-proxy is not guaranteed to see the correct client IP
 
 
 ## server capabilities
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |
-| single-sign-on          | ╱ |   |   | █ | █ |   |   |   | • |   |   |   |
-| token auth              | ╱ |   |   | █ | █ |   |   | █ |   |   |   |   |
-| 2fa                     | ╱ |   |   | █ | █ |   |   |   |   |   |   | █ |
-| per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ | █ |
-| per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ | █ |
-| per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |   |
-| per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |   |
-| unmap subfolders        | █ |   |   |   |   |   | █ |   |   | █ | ╱ | • |
-| index.html blocks list  | ╱ |   |   |   |   |   | █ |   |   | • |   |   |
-| write-only folders      | █ |   |   |   |   |   |   |   |   |   | █ | █ |
-| files stored as-is      | █ | █ | █ | █ |   | █ | █ |   |   | █ | █ | █ |
-| file versioning         |   |   |   | █ | █ |   |   |   |   |   |   |   |
-| file encryption         |   |   |   | █ | █ | █ |   |   |   |   |   | █ |
-| file indexing           | █ |   | █ | █ | █ |   |   | █ | █ | █ |   |   |
-| ┗ per-volume db         | █ |   | • | • | • |   |   | • | • |   |   |   |
-| ┗ db stored in folder   | █ |   |   |   |   |   |   | • | • | █ |   |   |
-| ┗ db stored out-of-tree | █ |   | █ | █ | █ |   |   | • | • | █ |   |   |
-| ┗ existing file tree    | █ |   | █ |   |   |   |   |   |   | █ |   |   |
-| file action event hooks | █ |   |   |   |   |   |   |   |   | █ |   | █ |
-| one-way folder sync     | █ |   |   | █ | █ | █ |   |   |   |   |   |   |
-| full sync               |   |   |   | █ | █ |   |   |   |   |   |   |   |
-| speed throttle          |   | █ | █ |   |   | █ |   |   | █ |   |   | █ |
-| anti-bruteforce         | █ | █ | █ | █ | █ |   |   |   | • |   |   | █ |
-| dyndns updater          |   | █ |   |   |   |   |   |   |   |   |   |   |
-| self-updater            |   |   | █ |   |   |   |   |   |   |   |   |   |
-| log rotation            | █ |   | █ | █ | █ |   |   | • | █ |   |   | █ |
-| upload tracking / log   | █ | █ | • | █ | █ |   |   | █ | █ |   |   | ╱ |
-| curl-friendly ls        | █ |   |   |   |   |   |   |   |   |   |   |   |
-| curl-friendly upload    | █ |   |   |   |   | █ | █ | • |   |   |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
+| per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |   |
+| single-sign-on          | ╱ |   |   | █ | █ |   |   |   | • |   |   |   |   |
+| token auth              | ╱ |   |   | █ | █ |   |   | █ |   |   |   |   | █ |
+| 2fa                     | ╱ |   |   | █ | █ |   |   |   |   |   |   | █ | ╱ |
+| per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ | █ | █ |
+| per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ | █ | █ |
+| per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
+| per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
+| unmap subfolders        | █ |   |   |   |   |   | █ |   |   | █ | ╱ | • |   |
+| index.html blocks list  | ╱ |   |   |   |   |   | █ |   |   | • |   |   |   |
+| write-only folders      | █ |   |   |   |   |   |   |   |   |   | █ | █ |   |
+| files stored as-is      | █ | █ | █ | █ |   | █ | █ |   |   | █ | █ | █ | █ |
+| file versioning         |   |   |   | █ | █ |   |   |   |   |   |   |   |   |
+| file encryption         |   |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
+| file indexing           | █ |   | █ | █ | █ |   |   | █ | █ | █ |   |   |   |
+| ┗ per-volume db         | █ |   | • | • | • |   |   | • | • |   |   |   |   |
+| ┗ db stored in folder   | █ |   |   |   |   |   |   | • | • | █ |   |   |   |
+| ┗ db stored out-of-tree | █ |   | █ | █ | █ |   |   | • | • | █ |   |   |   |
+| ┗ existing file tree    | █ |   | █ |   |   |   |   |   |   | █ |   |   |   |
+| file action event hooks | █ |   |   |   |   |   |   |   |   | █ |   | █ | • |
+| one-way folder sync     | █ |   |   | █ | █ | █ |   |   |   |   |   |   |   |
+| full sync               |   |   |   | █ | █ |   |   |   |   |   |   |   |   |
+| speed throttle          |   | █ | █ |   |   | █ |   |   | █ |   |   | █ |   |
+| anti-bruteforce         | █ | █ | █ | █ | █ |   |   |   | • |   |   | █ | • |
+| dyndns updater          |   | █ |   |   |   |   |   |   |   |   |   |   |   |
+| self-updater            |   |   | █ |   |   |   |   |   |   |   |   |   | █ |
+| log rotation            | █ |   | █ | █ | █ |   |   | • | █ |   |   | █ | • |
+| upload tracking / log   | █ | █ | • | █ | █ |   |   | █ | █ |   |   | ╱ | █ |
+| curl-friendly ls        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| curl-friendly upload    | █ |   |   |   |   | █ | █ | • |   |   |   |   |   |
 
 * `unmap subfolders` = "shadowing"; mounting a local folder in the middle of an existing filesystem tree in order to disable access below that path
 * `files stored as-is` = uploaded files are trivially readable from the server HDD, not sliced into chunks or in weird folder structures or anything like that
@@ -302,49 +310,51 @@ symbol legend,
 * `l`/sftpgo:
   * `file action event hooks` also include on-download triggers
   * `upload tracking / log` in main logfile
+* `m`/arozos:
+  * `2fa` maybe possible through LDAP/Oauth
 
 
 ## client features
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------  | - | - | - | - | - | - | - | - | - | - | - | - |
-| single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   |
-| themes                  | █ | █ |   | █ |   |   |   |   | █ |   |   |   |
-| directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |   |
-| multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |   |
-| thumbnails              | █ |   |   | ╱ | ╱ |   |   | █ | █ | ╱ |   |   |
-| ┗ image thumbnails      | █ |   |   | █ | █ |   |   | █ | █ | █ |   |   |
-| ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |   |
-| ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |   |
-| audio player            | █ |   |   | █ | █ |   |   |   | █ | ╱ |   |   |
-| ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |   |
-| ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |   |
-| ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |   |
-| ┗ OS integration        | █ |   |   |   |   |   |   |   |   |   |   |   |
-| ┗ transcode to lossy    | █ |   |   |   |   |   |   |   |   |   |   |   |
-| video player            | █ |   |   | █ | █ |   |   |   | █ | █ |   |   |
-| ┗ video transcoding     |   |   |   |   |   |   |   |   | █ |   |   |   |
-| audio BPM detector      | █ |   |   |   |   |   |   |   |   |   |   |   |
-| audio key detector      | █ |   |   |   |   |   |   |   |   |   |   |   |
-| search by path / name   | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ |   |
-| search by date / size   | █ |   |   |   | █ |   |   | █ | █ |   |   |   |
-| search by bpm / key     | █ |   |   |   |   |   |   |   |   |   |   |   |
-| search by custom tags   |   |   |   |   |   |   |   | █ | █ |   |   |   |
-| search in file contents |   |   |   | █ | █ |   |   |   | █ |   |   |   |
-| search by custom parser | █ |   |   |   |   |   |   |   |   |   |   |   |
-| find local file         | █ |   |   |   |   |   |   |   |   |   |   |   |
-| undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |   |
-| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ |
-| image viewer            | █ |   |   | █ | █ |   |   |   | █ | █ | █ |   |
-| markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   |
-| markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   |
-| readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |   |
-| rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ | █ |
-| batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |   |
-| cut / paste files       | █ | █ |   | █ | █ |   |   |   | █ |   |   |   |
-| move files              | █ | █ |   | █ | █ |   | █ |   | █ | █ | █ |   |
-| delete files            | █ | █ |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ |
-| copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------  | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   | █ |
+| themes                  | █ | █ |   | █ |   |   |   |   | █ |   |   |   |   |
+| directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |   |   |
+| multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| thumbnails              | █ |   |   | ╱ | ╱ |   |   | █ | █ | ╱ |   |   | █ |
+| ┗ image thumbnails      | █ |   |   | █ | █ |   |   | █ | █ | █ |   |   | █ |
+| ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |   | █ |
+| ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| audio player            | █ |   |   | █ | █ |   |   |   | █ | ╱ |   |   | █ |
+| ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |   |   |
+| ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ OS integration        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ transcode to lossy    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| video player            | █ |   |   | █ | █ |   |   |   | █ | █ |   |   | █ |
+| ┗ video transcoding     |   |   |   |   |   |   |   |   | █ |   |   |   |   |
+| audio BPM detector      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| audio key detector      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| search by path / name   | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ |   |   |
+| search by date / size   | █ |   |   |   | █ |   |   | █ | █ |   |   |   |   |
+| search by bpm / key     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| search by custom tags   |   |   |   |   |   |   |   | █ | █ |   |   |   |   |
+| search in file contents |   |   |   | █ | █ |   |   |   | █ |   |   |   |   |
+| search by custom parser | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| find local file         | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
+| image viewer            | █ |   |   | █ | █ |   |   |   | █ | █ | █ |   | █ |
+| markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
+| markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
+| readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |   |   |
+| rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ | █ | █ |
+| batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |   |   |
+| cut / paste files       | █ | █ |   | █ | █ |   |   |   | █ |   |   |   | █ |
+| move files              | █ | █ |   | █ | █ |   | █ |   | █ | █ | █ |   | █ |
+| delete files            | █ | █ |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
+| copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |   | █ |
 
 * `single-page app` = multitasking; possible to continue navigating while uploading
 * `audio player » os-integration` = use the [lockscreen](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) or [media hotkeys](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) to play/pause, prev/next song
@@ -360,14 +370,14 @@ symbol legend,
 
 ## integration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l |
-| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| OS alert on upload      | █ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |
-| discord                 | █ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |
-| ┗ announce uploads      | █ |   |   |   |   |   |   |   |   |   |   | ╱ |
-| ┗ custom embeds         |   |   |   |   |   |   |   |   |   |   |   | ╱ |
-| sharex                  | █ |   |   | █ |   | █ | ╱ | █ |   |   |   |   |
-| flameshot               |   |   |   |   |   | █ |   |   |   |   |   |   |
+| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| OS alert on upload      | █ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
+| discord                 | █ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
+| ┗ announce uploads      | █ |   |   |   |   |   |   |   |   |   |   | ╱ |   |
+| ┗ custom embeds         |   |   |   |   |   |   |   |   |   |   |   | ╱ |   |
+| sharex                  | █ |   |   | █ |   | █ | ╱ | █ |   |   |   |   |   |
+| flameshot               |   |   |   |   |   | █ |   |   |   |   |   |   |   |
 
 * sharex `╱` = yes, but does not provide example sharex config
 * `a`/copyparty remarks:
@@ -393,6 +403,7 @@ symbol legend,
 | filebrowser        | go     | █ apl2 |  20 MB |
 | filegator          | php    | █ mit  |    •   |
 | sftpgo             | go     | ‼ agpl |  44 MB |
+| arozos             | go     | ░ gpl3 | 531 MB |
 | updog              | python | █ mit  |  17 MB |
 | goshs              | go     | █ mit  |  11 MB |
 | gimme-that         | python | █ mit  | 4.8 MB |
@@ -504,12 +515,14 @@ symbol legend,
 * ✅ token auth (api keys)
 
 ## [kodbox](https://github.com/kalcaddle/kodbox)
-* this thing is insane
+* this thing is insane (but is getting competition from [arozos](#arozos))
 * php; [docker](https://hub.docker.com/r/kodcloud/kodbox)
 * 🔵 *upload segmenting, acceleration, and integrity checking!*
   * ⚠️ but uploads are not resumable(?)
 * ⚠️ not portable
 * ⚠️ isolated on-disk file hierarchy, incompatible with other software
+* ⚠️ uploading small files to copyparty is 16x faster
+* ⚠️ uploading large files to copyparty is 3x faster
 * ⚠️ http/webdav only; no ftp or zeroconf
 * ⚠️ some parts of the GUI are in chinese
 * ✅ fantastic ui/ux
@@ -568,6 +581,24 @@ symbol legend,
   * 💾 relies on rclone-mount
 * ✅ on-download event hook (otherwise same as copyparty)
 * ✅ more extensive permissions control
+
+## [arozos](https://github.com/tobychui/arozos)
+* big suite of applications similar to [kodbox](#kodbox), copyparty is better at downloading/uploading/music/indexing but arozos has other advantages
+* go; primarily linux (limited support for windows)
+* ⚠️ uploads not resumable / integrity-checked
+* ⚠️ uploading small files to copyparty is 2.7x faster
+* ⚠️ uploading large files to copyparty is at least 10% faster
+  * arozos is websocket-based, 512 KiB chunks; writes each chunk to separate files and then merges
+  * copyparty splices directly into the final file; faster and better for the HDD and filesystem
+* ⚠️ no directory tree navpane; not as easy to navigate
+* ⚠️ download-as-zip is not streaming; creates a temp.file on the server
+* ⚠️ not self-contained (pulls from jsdelivr)
+* ⚠️ has an audio player, but supports less filetypes
+* ⚠️ limited support for configuring real-ip detection
+* ✅ sftp server
+* ✅ settings gui
+* ✅ good-looking gui
+* ✅ an IDE, msoffice viewer, rich host integration, much more
 
 ## [updog](https://github.com/sc0tfree/updog)
 * python; cross-platform

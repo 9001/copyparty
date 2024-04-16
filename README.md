@@ -17,7 +17,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
         * [at home](#at-home) - make it accessible over the internet
         * [on servers](#on-servers) - you may also want these, especially on servers
-    * [features](#features)
+    * [features](#features) - also see [comparison to similar software](./docs/versus.md)
     * [testimonials](#testimonials) - small collection of user feedback
 * [motivations](#motivations) - project goals / philosophy
     * [notes](#notes) - general notes
@@ -127,7 +127,7 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
 
 * **Alpine:** `apk add py3-pillow ffmpeg`
 * **Debian:** `apt install --no-install-recommends python3-pil ffmpeg`
-* **Fedora:** rpmfusion + `dnf install python3-pillow ffmpeg`
+* **Fedora:** rpmfusion + `dnf install python3-pillow ffmpeg --allowerasing`
 * **FreeBSD:** `pkg install py39-sqlite3 py39-pillow ffmpeg`
 * **MacOS:** `port install py-Pillow ffmpeg`
 * **MacOS** (alternative): `brew install pillow ffmpeg`
@@ -181,6 +181,8 @@ firewall-cmd --reload
 
 
 ## features
+
+also see [comparison to similar software](./docs/versus.md)
 
 * backend stuff
   * ☑ IPv6
