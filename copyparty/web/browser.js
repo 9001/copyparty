@@ -290,6 +290,8 @@ var Ls = {
 
 		"f_dls": 'the file links in the current folder have\nbeen changed into download links',
 
+		"f_partial": "To safely download a file which is currently being uploaded, please click the file which has the same filename, but without the <code>.PARTIAL</code> file extension. Please press CANCEL or Escape to do this.\n\nPressing OK / Enter will ignore this warning and continue downloading the <code>.PARTIAL</code> scratchfile instead, which will almost definitely give you corrupted data.",
+
 		"ft_paste": "paste {0} items$NHotkey: ctrl-V",
 		"fr_eperm": 'cannot rename:\nyou do not have “move” permission in this folder',
 		"fd_eperm": 'cannot delete:\nyou do not have “delete” permission in this folder',
@@ -791,6 +793,8 @@ var Ls = {
 		"fbd_all": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
 
 		"f_dls": 'linkene i denne mappen er nå\nomgjort til nedlastningsknapper',
+
+		"f_partial": "For å laste ned en fil som enda ikke er ferdig opplastet, klikk på filen som har samme filnavn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastning går bra. Derfor anbefales det sterkt å trykke ABRYT eller Escape-tasten.\n\nHvis du virkelig ønsker å laste ned denne <code>.PARTIAL</code>-filen på en ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høyst sannsynlig motta korrupt data.",
 
 		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
 		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
@@ -1806,7 +1810,7 @@ function MPlayer() {
 
 	r.preload = function (url, full) {
 		var t0 = Date.now(),
-			fname = uricom_dec(url.split('/').pop());
+			fname = uricom_dec(url.split('/').pop().split('?')[0]);
 
 		url = addq(mpl.acode(url), 'cache=987&_=' + ACB);
 		mpl.preload_url = full ? url : null;
@@ -6381,8 +6385,9 @@ var treectl = (function () {
 					'" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var ln = ['<tr><td>' + tn.lead + '</td><td><a href="' +
-				top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
+			var cl = /\.PARTIAL$/.exec(fname) ? ' class="fade"' : '',
+				ln = ['<tr' + cl + '><td>' + tn.lead + '</td><td><a href="' +
+					top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = res.taglist[b],
@@ -8214,6 +8219,13 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 		}
 		treectl.reqls(tgt.getAttribute('href'), true);
 		return ev(e);
+	}
+	if (tgt && /\.PARTIAL(\?|$)/.exec('' + tgt.getAttribute('href')) && !window.partdlok) {
+		ev(e);
+		modal.confirm(L.f_partial, function () {
+			window.partdlok = 1;
+			tgt.click();
+		}, null);
 	}
 
 	tgt = e.target.closest('a[hl]');

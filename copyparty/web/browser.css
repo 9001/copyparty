@@ -699,12 +699,12 @@ a:hover {
 .s0:after,
 .s1:after {
 	content: '⌄';
-	margin-left: -.1em;
+	margin-left: -.15em;
 }
 .s0r:after,
 .s1r:after {
 	content: '⌃';
-	margin-left: -.1em;
+	margin-left: -.15em;
 }
 .s0:after,
 .s0r:after {
@@ -715,7 +715,7 @@ a:hover {
 	color: var(--sort-2);
 }
 #files thead th:after {
-	margin-right: -.7em;
+	margin-right: -.5em;
 }
 #files tbody tr:hover td,
 #files tbody tr:hover td+td {
@@ -743,6 +743,15 @@ html #files.hhpick thead th {
 	max-width: var(--file-td-w);
 	word-wrap: break-word;
 	overflow: hidden;
+}
+#files tr.fade a {
+	color: #999;
+	color: rgba(255, 255, 255, 0.4);
+	font-style: italic;
+}
+html.y #files tr.fade a {
+	color: #999;
+	color: rgba(0, 0, 0, 0.4);
 }
 #files tr:nth-child(2n) td {
 	background: var(--row-alt);
@@ -1737,6 +1746,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 #files th span {
 	position: relative;
+	white-space: nowrap;
 }
 #files>thead>tr>th.min,
 #files td.min {
