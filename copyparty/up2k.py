@@ -342,6 +342,9 @@ class Up2k(object):
         finally:
             self.reg_mutex.release()
 
+        if ANYWIN:
+            ret = [(x[0], x[1].replace("\\", "/"), x[2], x[3], x[4]) for x in ret]
+
         ret.sort(reverse=True)
         ret2 = [
             {"at": at, "vp": "/" + vp, "pd": 100 - ((nn * 100) // (nh or 1)), "sz": sz}
@@ -2508,6 +2511,7 @@ class Up2k(object):
         cur.connection.commit()
 
     def handle_json(self, cj: dict[str, Any], busy_aps: set[str]) -> dict[str, Any]:
+        # busy_aps is u2fh (always undefined if -j0) so this is safe
         self.busy_aps = busy_aps
         got_lock = False
         try:
@@ -3365,7 +3369,10 @@ class Up2k(object):
                 for wark, job in reg.items():
                     if (user and user != job["user"]) or (addr and addr != job["addr"]):
                         continue
-                    if djoin(job["prel"], job["name"]) == rem:
+                    jrem = djoin(job["prel"], job["name"])
+                    if ANYWIN:
+                        jrem = jrem.replace("\\", "/")
+                    if jrem == rem:
                         if job["ptop"] != ptop:
                             t = "job.ptop [%s] != vol.ptop [%s] ??"
                             raise Exception(t % (job["ptop"] != ptop))
