@@ -1091,6 +1091,7 @@ def add_optouts(ap):
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar")
     ap2.add_argument("--no-tarcmp", action="store_true", help="disable download as compressed tar (?tar=gz, ?tar=bz2, ?tar=xz, ?tar=gz:9, ...)")
     ap2.add_argument("--no-lifetime", action="store_true", help="do not allow clients (or server config) to schedule an upload to be deleted after a given time")
+    ap2.add_argument("--no-db-ip", action="store_true", help="do not write uploader IPs into the database")
 
 
 def add_safety(ap):

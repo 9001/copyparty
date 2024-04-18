@@ -3240,14 +3240,20 @@ class Up2k(object):
         """mutex(main) me"""
         self.db_rm(db, rd, fn, sz)
 
+        if not ip:
+            db_ip = ""
+        else:
+            # plugins may expect this to look like an actual IP
+            db_ip = "1.1.1.1" if self.args.no_db_ip else ip
+
         sql = "insert into up values (?,?,?,?,?,?,?)"
-        v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
+        v = (wark, int(ts), sz, rd, fn, db_ip, int(at or 0))
         try:
             db.execute(sql, v)
         except:
             assert self.mem_cur
             rd, fn = s3enc(self.mem_cur, rd, fn)
-            v = (wark, int(ts), sz, rd, fn, ip or "", int(at or 0))
+            v = (wark, int(ts), sz, rd, fn, db_ip, int(at or 0))
             db.execute(sql, v)
 
         self.volsize[db] += sz
