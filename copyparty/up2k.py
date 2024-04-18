@@ -811,7 +811,9 @@ class Up2k(object):
             self.volstate[vol.vpath] = "online (mtp soon)"
 
         for vol in need_vac:
-            reg = self.register_vpath(vol.realpath, vol.flags)
+            with self.mutex, self.reg_mutex:
+                reg = self.register_vpath(vol.realpath, vol.flags)
+
             assert reg
             cur, _ = reg
             with self.mutex:
@@ -825,7 +827,9 @@ class Up2k(object):
             if vol.flags["dbd"] == "acid":
                 continue
 
-            reg = self.register_vpath(vol.realpath, vol.flags)
+            with self.mutex, self.reg_mutex:
+                reg = self.register_vpath(vol.realpath, vol.flags)
+
             try:
                 assert reg
                 cur, db_path = reg
@@ -4251,7 +4255,7 @@ class Up2k(object):
                 raise Exception("invalid hash task")
 
             try:
-                if not self._hash_t(task):
+                if not self._hash_t(task) and self.stop:
                     return
             except Exception as ex:
                 self.log("failed to hash %s: %s" % (task, ex), 1)
