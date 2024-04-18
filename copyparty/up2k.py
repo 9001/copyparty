@@ -293,6 +293,23 @@ class Up2k(object):
         }
         return json.dumps(ret, indent=4)
 
+    def find_job_by_ap(self, ptop: str, ap: str) -> str:
+        try:
+            if ANYWIN:
+                ap = ap.replace("\\", "/")
+
+            vp = ap[len(ptop) :].strip("/")
+            dn, fn = vsplit(vp)
+            with self.reg_mutex:
+                tab2 = self.registry[ptop]
+                for job in tab2.values():
+                    if job["prel"] == dn and job["name"] == fn:
+                        return json.dumps(job, indent=0)
+        except:
+            pass
+
+        return "{}"
+
     def get_unfinished_by_user(self, uname, ip) -> str:
         if PY2 or not self.reg_mutex.acquire(timeout=2):
             return '[{"timeout":1}]'
