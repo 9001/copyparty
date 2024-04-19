@@ -16,6 +16,7 @@ def vf_bmap() -> dict[str, str]:
         "no_dedup": "copydupes",
         "no_dupe": "nodupe",
         "no_forget": "noforget",
+        "no_pipe": "nopipe",
         "no_robots": "norobots",
         "no_thumb": "dthumb",
         "no_vthumb": "dvthumb",

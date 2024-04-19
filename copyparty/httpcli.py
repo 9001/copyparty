@@ -2936,12 +2936,12 @@ class HttpCli(object):
         logtail = ""
 
         if ptop is not None:
-            dp, fn = os.path.split(req_path)
-            tnam = fn + ".PARTIAL"
-            if self.args.dotpart:
-                tnam = "." + tnam
-            ap_data = os.path.join(dp, tnam)
             try:
+                dp, fn = os.path.split(req_path)
+                tnam = fn + ".PARTIAL"
+                if self.args.dotpart:
+                    tnam = "." + tnam
+                ap_data = os.path.join(dp, tnam)
                 st_data = bos.stat(ap_data)
                 if not st_data.st_size:
                     raise Exception("partial is empty")
@@ -4179,7 +4179,9 @@ class HttpCli(object):
             ):
                 return self.tx_md(vn, abspath)
 
-            return self.tx_file(abspath, None if st.st_size else vn.realpath)
+            return self.tx_file(
+                abspath, None if st.st_size or "nopipe" in vn.flags else vn.realpath
+            )
 
         elif is_dir and not self.can_read:
             if self._use_dirkey(abspath):
