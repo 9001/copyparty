@@ -38,6 +38,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
+        * [race the beam](#race-the-beam) - download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [media player](#media-player) - plays almost every audio format there is
@@ -206,6 +207,7 @@ also see [comparison to similar software](./docs/versus.md)
   * ☑ write-only folders
   * ☑ [unpost](#unpost): undo/delete accidental uploads
   * ☑ [self-destruct](#self-destruct) (specified server-side or client-side)
+  * ☑ [race the beam](#race-the-beam) (almost like peer-to-peer)
   * ☑ symlink/discard duplicates (content-matching)
 * download
   * ☑ single files in browser
@@ -631,7 +633,7 @@ up2k has several advantages:
 > it is perfectly safe to restart / upgrade copyparty while someone is uploading to it!  
 > all known up2k clients will resume just fine 💪
 
-see [up2k](#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
+see [up2k](./docs/devnotes.md#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
 
 ![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/129635371-48fc54ca-fa91-48e3-9b1d-ba413e4b68cb.png)
 
@@ -695,6 +697,13 @@ the feature must be enabled per-volume with the `lifetime` [upload rule](#upload
 clients can specify a shorter expiration time using the [up2k ui](#uploading) -- the relevant options become visible upon navigating into a folder with `lifetimes` enabled -- or by using the `life` [upload modifier](#write)
 
 specifying a custom expiration time client-side will affect the timespan in which unposts are permitted, so keep an eye on the estimates in the up2k ui
+
+
+### race the beam
+
+download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))  -- it's almost like peer-to-peer
+
+requires the file to be uploaded using up2k (which is the default drag-and-drop uploader), alternatively the command-line program
 
 
 ## file manager

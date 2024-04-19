@@ -161,6 +161,7 @@ symbol legend,
 | upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |   |
 | upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |   |
 | upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ | ╱ | ╱ |
+| race the beam ("p2p")   | █ |   |   |   |   |   |   |   |   | • |   |   |   |
 | keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
 | upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ | ╱ |
 | ┗ max disk usage        | █ | █ |   |   | █ |   |   |   | █ |   |   | █ | █ |
@@ -180,6 +181,8 @@ symbol legend,
 * `upload acceleration` = each file can be uploaded using several TCP connections, which can offer a huge speed boost over huge distances / on flaky connections -- like the good old [download accelerators](https://en.wikipedia.org/wiki/GetRight) except in reverse
 
 * `upload verification` = uploads are checksummed or otherwise confirmed to have been transferred correctly
+
+* `race the beam` = files can be downloaded while they're still uploading; downloaders are slowed down such that the uploader is always ahead
 
 * `checksums provided` = when downloading a file from the server, the file's checksum is provided for verification client-side
 
@@ -283,6 +286,7 @@ symbol legend,
 | self-updater            |   |   | █ |   |   |   |   |   |   |   |   |   | █ |
 | log rotation            | █ |   | █ | █ | █ |   |   | • | █ |   |   | █ | • |
 | upload tracking / log   | █ | █ | • | █ | █ |   |   | █ | █ |   |   | ╱ | █ |
+| prometheus metrics      | █ |   |   | █ |   |   |   |   |   |   |   | █ |   |
 | curl-friendly ls        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | curl-friendly upload    | █ |   |   |   |   | █ | █ | • |   |   |   |   |   |
 
