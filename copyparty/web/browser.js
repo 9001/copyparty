@@ -422,6 +422,7 @@ var Ls = {
 		"un_fclr": "clear filter",
 		"un_derr": 'unpost-delete failed:\n',
 		"un_f5": 'something broke, please try a refresh or hit F5',
+		"un_uf5": "sorry but you have to refresh the page (for example by pressing F5 or CTRL-R) before this upload can be aborted",
 		"un_nou": '<b>warning:</b> server too busy to show unfinished uploads; click the "refresh" link in a bit',
 		"un_noc": '<b>warning:</b> unpost of fully uploaded files is not enabled/permitted in server config',
 		"un_max": "showing first 2000 files (use the filter)",
@@ -926,6 +927,7 @@ var Ls = {
 		"un_fclr": "nullstill filter",
 		"un_derr": 'unpost-sletting feilet:\n',
 		"un_f5": 'noe gikk galt, prøv å oppdatere listen eller trykk F5',
+		"un_uf5": "beklager, men du må laste siden på nytt (f.eks. ved å trykke F5 eller CTRL-R) før denne opplastningen kan avbrytes",
 		"un_nou": '<b>advarsel:</b> kan ikke vise ufullstendige opplastninger akkurat nå; klikk på oppdater-linken om litt',
 		"un_noc": '<b>advarsel:</b> angring av fullførte opplastninger er deaktivert i serverkonfigurasjonen',
 		"un_max": "viser de første 2000 filene (bruk filteret for å innsnevre)",
@@ -8097,7 +8099,17 @@ var unpost = (function () {
 			if (!links.length)
 				continue;
 
-			req.push(uricom_dec(r.files[a].vp.split('?')[0]));
+			var f = r.files[a];
+			if (f.k == 'u') {
+				var vp = vsplit(f.vp.split('?')[0]),
+					dfn = uricom_dec(vp[1]);
+				for (var iu = 0; iu < up2k.st.files.length; iu++) {
+					var uf = up2k.st.files[iu];
+					if (uf.name == dfn && uf.purl == vp[0])
+						return modal.alert(L.un_uf5);
+				}
+			}
+			req.push(uricom_dec(f.vp.split('?')[0]));
 			for (var b = 0; b < links.length; b++) {
 				links[b].removeAttribute('href');
 				links[b].innerHTML = '[busy]';

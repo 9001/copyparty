@@ -347,7 +347,12 @@ class Up2k(object):
 
         ret.sort(reverse=True)
         ret2 = [
-            {"at": at, "vp": "/" + vp, "pd": 100 - ((nn * 100) // (nh or 1)), "sz": sz}
+            {
+                "at": at,
+                "vp": "/" + quotep(vp),
+                "pd": 100 - ((nn * 100) // (nh or 1)),
+                "sz": sz,
+            }
             for (at, vp, sz, nn, nh) in ret
         ]
         return json.dumps(ret2, indent=0)
