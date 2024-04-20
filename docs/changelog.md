@@ -1,4 +1,27 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0412-2110  `v1.12.2`  ie11 fix
+
+## new features
+
+* new option `--bauth-last` for when you're hosting other [basic-auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) services on the same domain 7b94e4ed
+  * makes it possible to log into copyparty as intended, but it still sees the passwords from the other service until you do
+  * alternatively, the other new option `--no-bauth` entirely disables basic-auth support, but that also kills [the android app](https://github.com/9001/party-up)
+
+## bugfixes
+
+* internet explorer isn't working?! FIX IT!!! 9e5253ef
+* audio transcoding was buggy with filekeys enabled b8733653
+* on windows, theoretical chance that antivirus could interrupt renaming files, so preemptively guard against that c8e3ed3a
+
+## other changes
+
+* add a "password" placeholder on the login page since you might think it's asking for a username da26ec36
+* config buttons were jank on iOS b772a4f8
+* readme: [making your homeserver accessible from the internet](https://github.com/9001/copyparty#at-home)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0409-2334  `v1.12.1`  scrolling stuff
 
 ## new features
