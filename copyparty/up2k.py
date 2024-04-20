@@ -147,7 +147,7 @@ class Up2k(object):
         self.volsize: dict["sqlite3.Cursor", int] = {}
         self.volstate: dict[str, str] = {}
         self.vol_act: dict[str, float] = {}
-        self.busy_aps: set[str] = set()
+        self.busy_aps: dict[str, int] = {}
         self.dupesched: dict[str, list[tuple[str, str, float]]] = {}
         self.snap_prev: dict[str, Optional[tuple[int, float]]] = {}
 
@@ -2515,7 +2515,9 @@ class Up2k(object):
 
         cur.connection.commit()
 
-    def handle_json(self, cj: dict[str, Any], busy_aps: set[str]) -> dict[str, Any]:
+    def handle_json(
+        self, cj: dict[str, Any], busy_aps: dict[str, int]
+    ) -> dict[str, Any]:
         # busy_aps is u2fh (always undefined if -j0) so this is safe
         self.busy_aps = busy_aps
         got_lock = False

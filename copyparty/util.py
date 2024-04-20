@@ -761,7 +761,6 @@ class CachedSet(object):
 
 class CachedDict(object):
     def __init__(self, maxage: float) -> None:
-        self.lk = threading.Lock()
         self.c: dict[str, tuple[float, Any]] = {}
         self.maxage = maxage
         self.oldest = 0.0
@@ -795,10 +794,11 @@ class FHC(object):
         def __init__(self, fh: typing.BinaryIO) -> None:
             self.ts: float = 0
             self.fhs = [fh]
+            self.all_fhs = set([fh])
 
     def __init__(self) -> None:
         self.cache: dict[str, FHC.CE] = {}
-        self.aps: set[str] = set()
+        self.aps: dict[str, int] = {}
 
     def close(self, path: str) -> None:
         try:
@@ -810,7 +810,7 @@ class FHC(object):
             fh.close()
 
         del self.cache[path]
-        self.aps.remove(path)
+        del self.aps[path]
 
     def clean(self) -> None:
         if not self.cache:
@@ -831,9 +831,12 @@ class FHC(object):
         return self.cache[path].fhs.pop()
 
     def put(self, path: str, fh: typing.BinaryIO) -> None:
-        self.aps.add(path)
+        if path not in self.aps:
+            self.aps[path] = 0
+
         try:
             ce = self.cache[path]
+            ce.all_fhs.add(fh)
             ce.fhs.append(fh)
         except:
             ce = self.CE(fh)

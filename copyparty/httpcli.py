@@ -3174,7 +3174,7 @@ class HttpCli(object):
         tiers = ["uncapped", "reduced speed", "one byte per sec"]
 
         while lower < upper and not broken:
-            with self.pipes.lk:
+            with self.u2mutex:
                 job = self.pipes.get(req_path)
                 if not job:
                     x = self.conn.hsrv.broker.ask("up2k.find_job_by_ap", ptop, req_path)
@@ -3183,7 +3183,8 @@ class HttpCli(object):
                         self.pipes.set(req_path, job)
 
             if not job:
-                t = "pipe: upload has finished; yeeting remainder"
+                t = "pipe: OK, upload has finished; yeeting remainder"
+                self.log(t, 2)
                 data_end = file_size
                 break
 
@@ -3196,6 +3197,16 @@ class HttpCli(object):
                     data_end += chunk_size
                 t = "pipe: can stream %.2f MiB; requested range is %.2f to %.2f"
                 self.log(t % (data_end / M, lower / M, upper / M), 6)
+                with self.u2mutex:
+                    if data_end > self.u2fh.aps.get(ap_data, data_end):
+                        try:
+                            fhs = self.u2fh.cache[ap_data].all_fhs
+                            for fh in fhs:
+                                fh.flush()
+                            self.u2fh.aps[ap_data] = data_end
+                            self.log("pipe: flushed %d up2k-FDs" % (len(fhs),))
+                        except Exception as ex:
+                            self.log("pipe: u2fh flush failed: %r" % (ex,))
 
             if lower >= data_end:
                 if data_end:
@@ -3238,7 +3249,7 @@ class HttpCli(object):
                     raise Exception("got 0 bytes (EOF?)")
             except Exception as ex:
                 self.log("pipe: read failed at %.2f MiB: %s" % (lower / M, ex), 3)
-                with self.pipes.lk:
+                with self.u2mutex:
                     self.pipes.c.pop(req_path, None)
                 spins += 1
                 if spins > 3:
@@ -3265,7 +3276,7 @@ class HttpCli(object):
 
         if lower < upper and not broken:
             with open(req_path, "rb") as f:
-                remains = sendfile_py(self.log, lower, upper, f, self.s, bufsz, slp)
+                remains = sendfile_py(self.log, lower, upper, f, self.s, wr_sz, wr_slp)
 
         spd = self._spd((upper - lower) - remains)
         if self.do_log:
