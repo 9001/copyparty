@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.15"
-S_BUILD_DT = "2024-02-18"
+S_VERSION = "1.16"
+S_BUILD_DT = "2024-04-20"
 
 """
 u2c.py: upload to copyparty
@@ -563,7 +563,7 @@ def handshake(ar, file, search):
     else:
         if ar.touch:
             req["umod"] = True
-        if ar.dr:
+        if ar.ow:
             req["replace"] = True
 
     headers = {"Content-Type": "text/plain"}  # <=1.5.1 compat
@@ -1140,6 +1140,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap.add_argument("--touch", action="store_true", help="if last-modified timestamps differ, push local to server (need write+delete perms)")
+    ap.add_argument("--ow", action="store_true", help="overwrite existing files instead of autorenaming")
     ap.add_argument("--version", action="store_true", help="show version and exit")
 
     ap = app.add_argument_group("compatibility")
@@ -1148,7 +1149,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ap = app.add_argument_group("folder sync")
     ap.add_argument("--dl", action="store_true", help="delete local files after uploading")
-    ap.add_argument("--dr", action="store_true", help="delete remote files which don't exist locally")
+    ap.add_argument("--dr", action="store_true", help="delete remote files which don't exist locally (implies --ow)")
     ap.add_argument("--drd", action="store_true", help="delete remote files during upload instead of afterwards; reduces peak disk space usage, but will reupload instead of detecting renames")
 
     ap = app.add_argument_group("performance tweaks")
@@ -1177,6 +1178,9 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if ar.drd:
         ar.dr = True
+
+    if ar.dr:
+        ar.ow = True
 
     for k in "dl dr drd".split():
         errs = []
