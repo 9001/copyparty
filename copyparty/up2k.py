@@ -291,7 +291,7 @@ class Up2k(object):
                 min(1000 * 24 * 60 * 60 - 1, time.time() - self.db_act)
             ),
         }
-        return json.dumps(ret, indent=4)
+        return json.dumps(ret, separators=(",\n", ": "))
 
     def find_job_by_ap(self, ptop: str, ap: str) -> str:
         try:
@@ -304,7 +304,7 @@ class Up2k(object):
                 tab2 = self.registry[ptop]
                 for job in tab2.values():
                     if job["prel"] == dn and job["name"] == fn:
-                        return json.dumps(job, indent=0)
+                        return json.dumps(job, separators=(",\n", ": "))
         except:
             pass
 
@@ -355,7 +355,7 @@ class Up2k(object):
             }
             for (at, vp, sz, nn, nh) in ret
         ]
-        return json.dumps(ret2, indent=0)
+        return json.dumps(ret2, separators=(",\n", ": "))
 
     def get_unfinished(self) -> str:
         if PY2 or not self.reg_mutex.acquire(timeout=0.5):
@@ -382,7 +382,7 @@ class Up2k(object):
         finally:
             self.reg_mutex.release()
 
-        return json.dumps(ret, indent=4)
+        return json.dumps(ret, separators=(",\n", ": "))
 
     def get_volsize(self, ptop: str) -> tuple[int, int]:
         with self.reg_mutex:
@@ -4200,7 +4200,7 @@ class Up2k(object):
 
         path2 = "{}.{}".format(path, os.getpid())
         body = {"droppable": self.droppable[ptop], "registry": reg}
-        j = json.dumps(body, indent=2, sort_keys=True).encode("utf-8")
+        j = json.dumps(body, sort_keys=True, separators=(",\n", ": ")).encode("utf-8")
         with gzip.GzipFile(path2, "wb") as f:
             f.write(j)
 

@@ -128,6 +128,7 @@ class HttpCli(object):
         self.ico = conn.ico  # mypy404
         self.thumbcli = conn.thumbcli  # mypy404
         self.u2fh = conn.u2fh  # mypy404
+        self.pipes = conn.pipes  # mypy404
         self.log_func = conn.log_func  # mypy404
         self.log_src = conn.log_src  # mypy404
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
@@ -2949,6 +2950,7 @@ class HttpCli(object):
                 job = json.loads(x.get())
                 if not job:
                     raise Exception("not found in registry")
+                self.pipes.set(req_path, job)
             except Exception as ex:
                 self.log("will not pipe [%s]; %s" % (ap_data, ex), 6)
                 ptop = None
@@ -3172,8 +3174,14 @@ class HttpCli(object):
         tiers = ["uncapped", "reduced speed", "one byte per sec"]
 
         while lower < upper and not broken:
-            x = self.conn.hsrv.broker.ask("up2k.find_job_by_ap", ptop, req_path)
-            job = json.loads(x.get())
+            with self.pipes.lk:
+                job = self.pipes.get(req_path)
+                if not job:
+                    x = self.conn.hsrv.broker.ask("up2k.find_job_by_ap", ptop, req_path)
+                    job = json.loads(x.get())
+                    if job:
+                        self.pipes.set(req_path, job)
+
             if not job:
                 t = "pipe: upload has finished; yeeting remainder"
                 data_end = file_size
@@ -3223,13 +3231,15 @@ class HttpCli(object):
                 self.log("moved to tier %d (%s)" % (tier, tiers[tier]))
 
             try:
-                with open(ap_data, "rb") as f:
+                with open(ap_data, "rb", self.args.iobuf) as f:
                     f.seek(lower)
                     page = f.read(min(winsz, data_end - lower, upper - lower))
                 if not page:
                     raise Exception("got 0 bytes (EOF?)")
             except Exception as ex:
                 self.log("pipe: read failed at %.2f MiB: %s" % (lower / M, ex), 3)
+                with self.pipes.lk:
+                    self.pipes.c.pop(req_path, None)
                 spins += 1
                 if spins > 3:
                     raise Pebkac(500, "file became unreadable")
@@ -3900,7 +3910,7 @@ class HttpCli(object):
         if not allvols:
             ret = [{"kinshi": 1}]
 
-        jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, indent=0))
+        jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, separators=(",\n", ": ")))
         zi = len(uret.split('\n"pd":')) - 1
         self.log("%s #%d+%d %.2fsec" % (lm, zi, len(ret), time.time() - t0))
         self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")

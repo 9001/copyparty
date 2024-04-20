@@ -61,6 +61,7 @@ from .u2idx import U2idx
 from .util import (
     E_SCK,
     FHC,
+    CachedDict,
     Daemon,
     Garda,
     Magician,
@@ -130,6 +131,7 @@ class HttpSrv(object):
         self.t_periodic: Optional[threading.Thread] = None
 
         self.u2fh = FHC()
+        self.pipes = CachedDict(0.2)
         self.metrics = Metrics(self)
         self.nreq = 0
         self.nsus = 0

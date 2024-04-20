@@ -759,6 +759,37 @@ class CachedSet(object):
             self.oldest = now
 
 
+class CachedDict(object):
+    def __init__(self, maxage: float) -> None:
+        self.lk = threading.Lock()
+        self.c: dict[str, tuple[float, Any]] = {}
+        self.maxage = maxage
+        self.oldest = 0.0
+
+    def set(self, k: str, v: Any) -> None:
+        now = time.time()
+        self.c[k] = (now, v)
+        if now - self.oldest < self.maxage:
+            return
+
+        c = self.c = {k: v for k, v in self.c.items() if now - v[0] < self.maxage}
+        try:
+            self.oldest = min([x[0] for x in c.values()])
+        except:
+            self.oldest = now
+
+    def get(self, k: str) -> Optional[tuple[str, Any]]:
+        try:
+            ts, ret = self.c[k]
+            now = time.time()
+            if now - ts > self.maxage:
+                del self.c[k]
+                return None
+            return ret
+        except:
+            return None
+
+
 class FHC(object):
     class CE(object):
         def __init__(self, fh: typing.BinaryIO) -> None:

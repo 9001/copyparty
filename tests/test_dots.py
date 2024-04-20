@@ -3,10 +3,8 @@
 from __future__ import print_function, unicode_literals
 
 import io
-import os
-import time
 import json
-import pprint
+import os
 import shutil
 import tarfile
 import tempfile
