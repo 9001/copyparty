@@ -3188,7 +3188,7 @@ class HttpCli(object):
                 data_end = file_size
                 break
 
-            if num_need != len(job["need"]):
+            if num_need != len(job["need"]) and data_end - lower < 8 * M:
                 num_need = len(job["need"])
                 data_end = 0
                 for cid in job["hash"]:
