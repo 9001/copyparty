@@ -3867,7 +3867,7 @@ class HttpCli(object):
         allvols = [x for x in allvols if "e2d" in x.flags]
 
         for vol in allvols:
-            cur = idx.get_cur(vol.realpath)
+            cur = idx.get_cur(vol)
             if not cur:
                 continue
 
@@ -4093,7 +4093,7 @@ class HttpCli(object):
         if is_dir and (e2t or e2d):
             idx = self.conn.get_u2idx()
             if idx and hasattr(idx, "p_end"):
-                icur = idx.get_cur(dbv.realpath)
+                icur = idx.get_cur(dbv)
 
         th_fmt = self.uparam.get("th")
         if self.can_read or (self.can_get and vn.flags.get("dk")):

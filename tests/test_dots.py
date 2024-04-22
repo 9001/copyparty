@@ -80,7 +80,7 @@ class TestHttpCli(unittest.TestCase):
         x = " ".join(sorted([x["rp"] for x in x[0]]))
         self.assertEqual(x, ".f0 .t/.f2 .t/f2 a/da/f4 a/f3 f0 t/.f1 t/f1")
 
-        self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"], dotsrch=False)
+        self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"], dotsrch=False, e2d=True)
         self.asrv = AuthSrv(self.args, self.log)
         u2idx = U2idx(self)
 

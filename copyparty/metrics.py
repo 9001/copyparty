@@ -179,7 +179,7 @@ class Metrics(object):
             tnbytes = 0
             tnfiles = 0
             for vpath, vol in allvols:
-                cur = idx.get_cur(vol.realpath)
+                cur = idx.get_cur(vol)
                 if not cur:
                     continue
 

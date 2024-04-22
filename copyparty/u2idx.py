@@ -81,14 +81,18 @@ class U2idx(object):
         except:
             raise Pebkac(500, min_ex())
 
-    def get_cur(self, ptop: str) -> Optional["sqlite3.Cursor"]:
+    def get_cur(self, vn: VFS) -> Optional["sqlite3.Cursor"]:
         if not HAVE_SQLITE3:
             return None
 
-        cur = self.cur.get(ptop)
+        cur = self.cur.get(vn.realpath)
         if cur:
             return cur
 
+        if "e2d" not in vn.flags:
+            return None
+
+        ptop = vn.realpath
         histpath = self.asrv.vfs.histtab.get(ptop)
         if not histpath:
             self.log("no histpath for [{}]".format(ptop))
@@ -317,7 +321,7 @@ class U2idx(object):
             ptop = vol.realpath
             flags = vol.flags
 
-            cur = self.get_cur(ptop)
+            cur = self.get_cur(vol)
             if not cur:
                 continue
 
