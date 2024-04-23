@@ -337,6 +337,8 @@ var Ls = {
 		"fp_err": "move failed:\n",
 		"fp_confirm": "move these {0} items here?",
 		"fp_etab": 'failed to read clipboard from other browser tab',
+		"fp_both": 'what do you want to paste?\n\nOK/Enter: Upload {0} files from system clipboard\nEsc/Abort: Move {1} files on server',
+		"fp_name": "Uploading a PNG image from clipboard.\n\nconfirm by giving it a filename:",
 
 		"mk_noname": "type a name into the text field on the left before you do that :p",
 
@@ -842,6 +844,8 @@ var Ls = {
 		"fp_err": "flytting feilet:\n",
 		"fp_confirm": "flytt disse {0} filene hit?",
 		"fp_etab": 'kunne ikke lese listen med filer ifra den andre nettleserfanen',
+		"fp_both": "hva vil du lime inn?\n\nOK/Enter: Last opp {0} filer ifra enheten din\nEsc/Avbryt: Flytt {1} filer på serveren",
+		"fp_name": "Laster opp PNG-bilde ifra utklippstavle.\n\nbekreft ved å velge et filnavn:",
 
 		"mk_noname": "skriv inn et navn i tekstboksen til venstre først :p",
 
@@ -3596,6 +3600,7 @@ var fileman = (function () {
 		bdel = ebi('fdel'),
 		bcut = ebi('fcut'),
 		bpst = ebi('fpst'),
+		t_paste,
 		r = {};
 
 	r.clip = null;
@@ -4073,8 +4078,66 @@ var fileman = (function () {
 		}
 	};
 
-	r.paste = function (e) {
-		ev(e);
+	document.onpaste = function (e) {
+		var xfer = e.clipboardData || window.clipboardData;
+		if (!xfer || !xfer.files || !xfer.files.length)
+			return;
+
+		var files = [];
+		for (var a = 0, aa = xfer.files.length; a < aa; a++)
+			files.push(xfer.files[a]);
+
+		clearTimeout(t_paste);
+
+		if (!r.clip.length)
+			return r.clip_up(files);
+
+		modal.confirm(
+			L.fp_both.format(files.length, r.clip.length),
+			function () { r.clip_up(files); }, r.paste);
+	};
+
+	r.clip_up = function (files) {
+		goto_up2k();
+		var good = [], nil = [], bad = [];
+		for (var a = 0, aa = files.length; a < aa; a++) {
+			var fobj = files[a], dst = good;
+			try {
+				if (fobj.size < 1)
+					dst = nil;
+			}
+			catch (ex) {
+				dst = bad;
+			}
+			dst.push([fobj, fobj.name]);
+		}
+		var doit = function (is_img) {
+			jwrite('fman_clip', [Date.now()]);
+			r.clip = [];
+
+			var x = up2k.uc.ask_up;
+			if (is_img)
+				up2k.uc.ask_up = false;
+
+			up2k.gotallfiles[0](good, nil, bad, up2k.gotallfiles.slice(1));
+			up2k.uc.ask_up = x;
+		};
+		if (good.length != 1 || !/\.png$/.test(good[0][1]))
+			return doit();
+
+		modal.prompt(L.fp_name, good[0][1].slice(0, -4), function (v) {
+			good[0][1] = v + '.png';
+			doit(true);
+		}, null);
+	};
+
+	r.d_paste = function () {
+		// gets called before onpaste; defer
+		clearTimeout(t_paste);
+		t_paste = setTimeout(r.paste, 50);
+	};
+
+	r.paste = function () {
 		if (clgot(bpst, 'hide'))
 			return toast.err(3, L.fp_eperm);
 
@@ -5178,6 +5241,9 @@ document.onkeydown = function (e) {
 		if (ebi('hkhelp'))
 			return qsr('#hkhelp');
 
+		if (toast.visible)
+			return toast.hide();
+
 		if (ebi('rn_cancel'))
 			return ebi('rn_cancel').click();
 
@@ -5250,7 +5316,7 @@ document.onkeydown = function (e) {
 			return fileman.cut();
 
 		if (k == 'KeyV' || k == 'v')
-			return fileman.paste();
+			return fileman.d_paste();
 
 		if (k == 'KeyK' || k == 'k')
 			return fileman.delete();
