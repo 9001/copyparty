@@ -3656,7 +3656,7 @@ class HttpCli(object):
         return True
 
     def set_cfg_reset(self) -> bool:
-        for k in ("k304", "js", "idxh", "cppwd", "cppws"):
+        for k in ("k304", "js", "idxh", "dots", "cppwd", "cppws"):
             cookie = gencookie(k, "x", self.args.R, False)
             self.out_headerlist.append(("Set-Cookie", cookie))
 
