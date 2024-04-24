@@ -186,7 +186,7 @@ class Up2k(object):
             t = "could not initialize sqlite3, will use in-memory registry only"
             self.log(t, 3)
 
-        self.fstab = Fstab(self.log_func)
+        self.fstab = Fstab(self.log_func, self.args)
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
 
         if self.args.hash_mt < 2:

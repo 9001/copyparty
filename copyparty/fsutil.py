@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import argparse
 import os
 import re
 import time
@@ -17,20 +18,26 @@ if True:  # pylint: disable=using-constant-test
 
 
 class Fstab(object):
-    def __init__(self, log: "RootLogger"):
+    def __init__(self, log: "RootLogger", args: argparse.Namespace):
         self.log_func = log
 
+        self.warned = False
         self.trusted = False
         self.tab: Optional[VFS] = None
+        self.oldtab: Optional[VFS] = None
+        self.srctab = "a"
         self.cache: dict[str, str] = {}
         self.age = 0.0
+        self.maxage = args.mtab_age
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("fstab", msg, c)
 
     def get(self, path: str) -> str:
-        if len(self.cache) > 9000:
-            self.age = time.time()
+        now = time.time()
+        if now - self.age > self.maxage or len(self.cache) > 9000:
+            self.age = now
+            self.oldtab = self.tab or self.oldtab
             self.tab = None
             self.cache = {}
 
@@ -75,7 +82,7 @@ class Fstab(object):
         self.trusted = False
 
     def build_tab(self) -> None:
-        self.log("building tab")
+        self.log("inspecting mtab for changes")
 
         sptn = r"^.*? on (.*) type ([^ ]+) \(.*"
         if MACOS:
@@ -84,6 +91,7 @@ class Fstab(object):
         ptn = re.compile(sptn)
         so, _ = chkcmd(["mount"])
         tab1: list[tuple[str, str]] = []
+        atab = []
         for ln in so.split("\n"):
             m = ptn.match(ln)
             if not m:
@@ -91,6 +99,15 @@ class Fstab(object):
 
             zs1, zs2 = m.groups()
             tab1.append((str(zs1), str(zs2)))
+            atab.append(ln)
+
+        # keep empirically-correct values if mounttab unchanged
+        srctab = "\n".join(sorted(atab))
+        if srctab == self.srctab:
+            self.tab = self.oldtab
+            return
+
+        self.log("mtab has changed; reevaluating support for sparse files")
 
         tab1.sort(key=lambda x: (len(x[0]), x[0]))
         path1, fs1 = tab1[0]
@@ -99,6 +116,7 @@ class Fstab(object):
             tab.add(fs, path.lstrip("/"))
 
         self.tab = tab
+        self.srctab = srctab
 
     def relabel(self, path: str, nval: str) -> None:
         assert self.tab
@@ -133,7 +151,9 @@ class Fstab(object):
                 self.trusted = True
             except:
                 # prisonparty or other restrictive environment
-                self.log("failed to build tab:\n{}".format(min_ex()), 3)
+                if not self.warned:
+                    self.warned = True
+                    self.log("failed to build tab:\n{}".format(min_ex()), 3)
                 self.build_fallback()
 
         assert self.tab

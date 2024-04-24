@@ -122,7 +122,7 @@ class Cfg(Namespace):
         ex = "hash_mt srch_time u2abort u2j"
         ka.update(**{k: 1 for k in ex.split()})
 
-        ex = "reg_cap s_thead s_tbody th_convt"
+        ex = "mtab_age reg_cap s_thead s_tbody th_convt"
         ka.update(**{k: 9 for k in ex.split()})
 
         ex = "db_act df k304 loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
