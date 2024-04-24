@@ -42,7 +42,7 @@ $f$s.py --version >/dev/null
     min=99999999
     for ((a=0; a<$parallel; a++)); do
         while [ -e .sfx-run ]; do
-            CSN=sfx$a ./make-sfx.sh re "$@"
+            CSN=$a ./make-sfx.sh re "$@"
             sz=$(wc -c <$f$a$s.py | awk '{print$1}')
             [ $sz -ge $min ] && continue
             mv $f$a$s.py $f$s.py.$sz

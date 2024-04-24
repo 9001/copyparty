@@ -12,6 +12,7 @@ copyparty.egg-info/
 /dist/
 /py2/
 /sfx*
+/pyz/
 /unt/
 /log/
 

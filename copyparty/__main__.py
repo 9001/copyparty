@@ -1391,12 +1391,16 @@ def run_argparse(
     return ret
 
 
-def main(argv: Optional[list[str]] = None) -> None:
+def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
         os.system("rem")  # enables colors
 
     init_E(E)
+
+    if rsrc:  # pyz
+        E.mod = rsrc
+
     if argv is None:
         argv = sys.argv
 

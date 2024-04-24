@@ -99,9 +99,6 @@ pybin=$(command -v python3 || command -v python) || {
 	exit 1
 }
 
-[ $CSN ] ||
-	CSN=sfx
-
 langs=
 use_gz=
 zopf=2560
@@ -148,9 +145,9 @@ stamp=$(
 	done | sort | tail -n 1 | sha1sum | cut -c-16
 )
 
-rm -rf $CSN/*
-mkdir -p $CSN build
-cd $CSN
+rm -rf sfx$CSN/*
+mkdir -p sfx$CSN build
+cd sfx$CSN
 
 tmpdir="$(
 	printf '%s\n' "$TMPDIR" /tmp |
@@ -386,11 +383,13 @@ git describe --tags >/dev/null 2>/dev/null && {
 	ver="$(awk '/^VERSION *= \(/ {
 		gsub(/[^0-9,a-g-]/,""); gsub(/,/,"."); print; exit}' < copyparty/__version__.py)"
 
+echo "$ver" >ver  # pyz
+
 ts=$(date -u +%s)
 hts=$(date -u +%Y-%m%d-%H%M%S) # --date=@$ts (thx osx)
 
 mkdir -p ../dist
-sfx_out=../dist/copyparty-$CSN
+sfx_out=../dist/copyparty-sfx$CSN
 
 echo cleanup
 find -name '*.pyc' -delete
@@ -542,7 +541,7 @@ gzres() {
 }
 
 
-zdir="$tmpdir/cpp-mk$CSN"
+zdir="$tmpdir/cpp-mksfx$CSN"
 [ -e "$zdir/$stamp" ] || rm -rf "$zdir"
 mkdir -p "$zdir"
 echo a > "$zdir/$stamp"
