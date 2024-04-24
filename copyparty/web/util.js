@@ -1539,6 +1539,8 @@ var modal = (function () {
         cb_up = null,
         cb_ok = null,
         cb_ng = null,
+        sel_0 = 0,
+        sel_1 = 0,
         tok, tng, prim, sec, ok_cancel;
 
     r.load = function () {
@@ -1572,7 +1574,7 @@ var modal = (function () {
         (inp || a).focus();
         if (inp)
             setTimeout(function () {
-                inp.setSelectionRange(0, inp.value.length, "forward");
+                inp.setSelectionRange(sel_0, sel_1, "forward");
             }, 0);
 
         document.addEventListener('focus', onfocus);
@@ -1695,16 +1697,18 @@ var modal = (function () {
         r.show(html);
     }
 
-    r.prompt = function (html, v, cok, cng, fun) {
+    r.prompt = function (html, v, cok, cng, fun, so0, so1) {
         q.push(function () {
-            _prompt(lf2br(html), v, cok, cng, fun);
+            _prompt(lf2br(html), v, cok, cng, fun, so0, so1);
         });
         next();
     }
-    var _prompt = function (html, v, cok, cng, fun) {
+    var _prompt = function (html, v, cok, cng, fun, so0, so1) {
         cb_ok = cok;
         cb_ng = cng === undefined ? cok : null;
         cb_up = fun;
+        sel_0 = so0 || 0;
+        sel_1 = so1 === undefined ? v.length : so1;
         html += '<input id="modali" type="text" ' + NOAC + ' /><div id="modalb">' + ok_cancel + '</div>';
         r.show(html);
 

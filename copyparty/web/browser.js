@@ -337,8 +337,9 @@ var Ls = {
 		"fp_err": "move failed:\n",
 		"fp_confirm": "move these {0} items here?",
 		"fp_etab": 'failed to read clipboard from other browser tab',
-		"fp_both": 'what do you want to paste?\n\nOK/Enter: Upload {0} files from system clipboard\nEsc/Abort: Move {1} files on server',
-		"fp_name": "Uploading a PNG image from clipboard.\n\nconfirm by giving it a filename:",
+		"fp_name": "uploading a file from your device. Give it a name:",
+		"fp_both_m": '<h6>choose what to paste</h6><code>Enter</code> = Move {0} files from «{1}»\n<code>ESC</code> = Upload {2} files from your device',
+		"fp_both_b": '<a href="#" id="modal-ok">Move</a><a href="#" id="modal-ng">Upload</a>',
 
 		"mk_noname": "type a name into the text field on the left before you do that :p",
 
@@ -844,8 +845,9 @@ var Ls = {
 		"fp_err": "flytting feilet:\n",
 		"fp_confirm": "flytt disse {0} filene hit?",
 		"fp_etab": 'kunne ikke lese listen med filer ifra den andre nettleserfanen',
-		"fp_both": "hva vil du lime inn?\n\nOK/Enter: Last opp {0} filer ifra enheten din\nEsc/Avbryt: Flytt {1} filer på serveren",
-		"fp_name": "Laster opp PNG-bilde ifra utklippstavle.\n\nbekreft ved å velge et filnavn:",
+		"fp_name": "Laster opp én fil fra enheten din. Velg filnavn:",
+		"fp_both_m": '<h6>hva skal limes inn her?</h6><code>Enter</code> = Flytt {0} filer fra «{1}»\n<code>ESC</code> = Last opp {2} filer fra enheten din',
+		"fp_both_b": '<a href="#" id="modal-ok">Flytt</a><a href="#" id="modal-ng">Last opp</a>',
 
 		"mk_noname": "skriv inn et navn i tekstboksen til venstre først :p",
 
@@ -4092,9 +4094,10 @@ var fileman = (function () {
 		if (!r.clip.length)
 			return r.clip_up(files);
 
-		modal.confirm(
-			L.fp_both.format(files.length, r.clip.length),
-			function () { r.clip_up(files); }, r.paste);
+		var src = r.clip.length == 1 ? r.clip[0] : vsplit(r.clip[0])[0],
+			msg = L.fp_both_m.format(r.clip.length, src, files.length);
+
+		modal.confirm(msg, r.paste, function () { r.clip_up(files); }, null, L.fp_both_b);
 	};
 
 	r.clip_up = function (files) {
@@ -4122,13 +4125,19 @@ var fileman = (function () {
 			up2k.gotallfiles[0](good, nil, bad, up2k.gotallfiles.slice(1));
 			up2k.uc.ask_up = x;
 		};
-		if (good.length != 1 || !/\.png$/.test(good[0][1]))
+		if (good.length != 1)
 			return doit();
 
-		modal.prompt(L.fp_name, good[0][1].slice(0, -4), function (v) {
-			good[0][1] = v + '.png';
-			doit(true);
-		}, null);
+		var fn = good[0][1],
+			ofs = fn.lastIndexOf('.');
+
+		// stop linux-chrome from adding the fs-path into the <input>
+		setTimeout(function () {
+			modal.prompt(L.fp_name, fn, function (v) {
+				good[0][1] = v;
+				doit(true);
+			}, null, null, 0, ofs > 0 ? ofs : undefined);
+		}, 1);
 	};
 
 	r.d_paste = function () {

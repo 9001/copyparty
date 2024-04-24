@@ -28,6 +28,8 @@
 	--row-alt: #282828;
 
 	--scroll: #eb0;
+	--sel-fg: var(--bg-d1);
+	--sel-bg: var(--fg);
 
 	--a: #fc5;
 	--a-b: #c90;
@@ -330,6 +332,8 @@ html.c {
 }
 html.cz {
 	--bgg: var(--bg-u2);
+	--sel-bg: var(--bg-u5);
+	--sel-fg: var(--fg);
 	--srv-3: #fff;
 	--u2-tab-b1: var(--bg-d3);
 }
@@ -342,6 +346,8 @@ html.cy {
 	--bg-u5: #999;
 	--bg-d3: #f77;
 	--bg-d2: #ff0;
+
+	--sel-bg: #f77;
 
 	--a: #fff;
 	--a-hil: #fff;
@@ -588,8 +594,8 @@ html.dy {
 	line-height: 1.2em;
 }
 ::selection {
-	color: var(--bg-d1);
-	background: var(--fg);
+	color: var(--sel-fg);
+	background: var(--sel-bg);
 	text-shadow: none;
 }
 html,body,tr,th,td,#files,a {
