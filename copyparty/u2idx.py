@@ -62,6 +62,17 @@ class U2idx(object):
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("u2idx", msg, c)
 
+    def shutdown(self) -> None:
+        for cur in self.cur.values():
+            db = cur.connection
+            try:
+                db.interrupt()
+            except:
+                pass
+
+            cur.close()
+            db.close()
+
     def fsearch(
         self, uname: str, vols: list[VFS], body: dict[str, Any]
     ) -> list[dict[str, Any]]:

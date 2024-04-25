@@ -6,6 +6,7 @@ import json
 import os
 import unittest
 
+from copyparty.__init__ import ANYWIN
 from copyparty.authsrv import AuthSrv
 from tests.util import Cfg
 
@@ -51,6 +52,12 @@ class TestVFS(unittest.TestCase):
         vn = self.nav(au, vp)
         self.assertNodes(vn, expected)
 
+    def assertApEq(self, ap, rhs):
+        if ANYWIN and len(ap) > 2 and ap[1] == ":":
+            ap = ap[2:].replace("\\", "/")
+
+        return self.assertEqual(ap, rhs)
+
     def prep(self):
         here = os.path.abspath(os.path.dirname(__file__))
         cfgdir = os.path.join(here, "res", "idp")
@@ -70,7 +77,7 @@ class TestVFS(unittest.TestCase):
         au = AuthSrv(Cfg(c=[cfgdir + "/1.conf"], **xcfg), self.log)
 
         self.assertEqual(au.vfs.vpath, "")
-        self.assertEqual(au.vfs.realpath, "/")
+        self.assertApEq(au.vfs.realpath, "/")
         self.assertNodes(au.vfs, ["vb"])
         self.assertNodes(au.vfs.nodes["vb"], [])
 
@@ -85,7 +92,7 @@ class TestVFS(unittest.TestCase):
         au = AuthSrv(Cfg(c=[cfgdir + "/2.conf"], **xcfg), self.log)
 
         self.assertEqual(au.vfs.vpath, "")
-        self.assertEqual(au.vfs.realpath, "/")
+        self.assertApEq(au.vfs.realpath, "/")
         self.assertNodes(au.vfs, ["vb", "vc"])
         self.assertNodes(au.vfs.nodes["vb"], [])
         self.assertNodes(au.vfs.nodes["vc"], [])
@@ -103,7 +110,7 @@ class TestVFS(unittest.TestCase):
         au = AuthSrv(Cfg(c=[cfgdir + "/3.conf"], **xcfg), self.log)
 
         self.assertEqual(au.vfs.vpath, "")
-        self.assertEqual(au.vfs.realpath, "")
+        self.assertApEq(au.vfs.realpath, "")
         self.assertNodes(au.vfs, [])
         self.assertAxs(au.vfs.axs, [])
 
@@ -112,8 +119,8 @@ class TestVFS(unittest.TestCase):
         self.assertNodesAt(au, "vu", ["iua"])  # same as:
         self.assertNodes(au.vfs.nodes["vu"], ["iua"])
         self.assertNodes(au.vfs.nodes["vg"], ["iga"])
-        self.assertEqual(au.vfs.nodes["vu"].realpath, "")
-        self.assertEqual(au.vfs.nodes["vg"].realpath, "")
+        self.assertApEq(au.vfs.nodes["vu"].realpath, "")
+        self.assertApEq(au.vfs.nodes["vg"].realpath, "")
         self.assertAxs(au.vfs.axs, [])
         self.assertAxsAt(au, "vu/iua", [["iua"]])  # same as:
         self.assertAxs(self.nav(au, "vu/iua").axs, [["iua"]])
@@ -127,7 +134,7 @@ class TestVFS(unittest.TestCase):
         au = AuthSrv(Cfg(c=[cfgdir + "/4.conf"], **xcfg), self.log)
 
         self.assertEqual(au.vfs.vpath, "")
-        self.assertEqual(au.vfs.realpath, "")
+        self.assertApEq(au.vfs.realpath, "")
         self.assertNodes(au.vfs, ["vu"])
         self.assertNodesAt(au, "vu", ["ua", "ub"])
         self.assertAxs(au.vfs.axs, [])
@@ -147,10 +154,10 @@ class TestVFS(unittest.TestCase):
         self.assertAxsAt(au, "vg", [])
         self.assertAxsAt(au, "vg/iga1", [["iua"]])
         self.assertAxsAt(au, "vg/iga2", [["iua", "ua"]])
-        self.assertEqual(self.nav(au, "vu/ua").realpath, "/u-ua")
-        self.assertEqual(self.nav(au, "vu/iua").realpath, "/u-iua")
-        self.assertEqual(self.nav(au, "vg/iga1").realpath, "/g1-iga")
-        self.assertEqual(self.nav(au, "vg/iga2").realpath, "/g2-iga")
+        self.assertApEq(self.nav(au, "vu/ua").realpath, "/u-ua")
+        self.assertApEq(self.nav(au, "vu/iua").realpath, "/u-iua")
+        self.assertApEq(self.nav(au, "vg/iga1").realpath, "/g1-iga")
+        self.assertApEq(self.nav(au, "vg/iga2").realpath, "/g2-iga")
 
         au.idp_checkin(None, "iub", "iga")
         self.assertAxsAt(au, "vu/iua", [["iua"]])
@@ -165,7 +172,7 @@ class TestVFS(unittest.TestCase):
         au = AuthSrv(Cfg(c=[cfgdir + "/5.conf"], **xcfg), self.log)
 
         self.assertEqual(au.vfs.vpath, "")
-        self.assertEqual(au.vfs.realpath, "")
+        self.assertApEq(au.vfs.realpath, "")
         self.assertNodes(au.vfs, ["g", "ga", "gb"])
         self.assertAxs(au.vfs.axs, [])
 
@@ -196,7 +203,7 @@ class TestVFS(unittest.TestCase):
 
         self.assertAxs(au.vfs.axs, [])
         self.assertEqual(au.vfs.vpath, "")
-        self.assertEqual(au.vfs.realpath, "")
+        self.assertApEq(au.vfs.realpath, "")
         self.assertNodes(au.vfs, [])
 
         au.idp_checkin(None, "iua", "")

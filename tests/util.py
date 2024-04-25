@@ -113,7 +113,7 @@ class Cfg(Namespace):
         ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw q rand smb srch_dbg stats vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_voldump re_dhash plain_ip"
+        ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
         ex = "ah_cli ah_gen css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
@@ -260,3 +260,7 @@ class VHttpConn(object):
         self.u2fh = FHC()
 
         self.get_u2idx = self.hsrv.get_u2idx
+
+
+if WINDOWS:
+    os.system("rem")

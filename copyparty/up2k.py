@@ -4379,6 +4379,18 @@ class Up2k(object):
         for x in list(self.spools):
             self._unspool(x)
 
+        for cur in self.cur.values():
+            db = cur.connection
+            try:
+                db.interrupt()
+            except:
+                pass
+
+            cur.close()
+            db.close()
+
+        self.registry = {}
+
 
 def up2k_chunksize(filesize: int) -> int:
     chunksize = 1024 * 1024

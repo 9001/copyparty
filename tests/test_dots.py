@@ -80,6 +80,7 @@ class TestHttpCli(unittest.TestCase):
         x = " ".join(sorted([x["rp"] for x in x[0]]))
         self.assertEqual(x, ".f0 .t/.f2 .t/f2 a/da/f4 a/f3 f0 t/.f1 t/f1")
 
+        u2idx.shutdown()
         self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"], dotsrch=False, e2d=True)
         self.asrv = AuthSrv(self.args, self.log)
         u2idx = U2idx(self)
@@ -89,6 +90,8 @@ class TestHttpCli(unittest.TestCase):
         # u1 can see dotfiles in volB so they should be included
         xe = "a/da/f4 a/f3 f0 t/f1"
         self.assertEqual(x, xe)
+        u2idx.shutdown()
+        up2k.shutdown()
 
         ##
         ## dirkeys
@@ -147,4 +150,4 @@ class TestHttpCli(unittest.TestCase):
         return conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
 
     def log(self, src, msg, c=0):
-        print(msg)
+        print(msg, "\033[0m")

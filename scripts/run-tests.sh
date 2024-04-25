@@ -1,6 +1,21 @@
 #!/bin/bash
 set -ex
 
+if uname | grep -iE '^(msys|mingw)'; then
+    pids=()
+
+    python -m unittest discover -s tests >/dev/null &
+    pids+=($!)
+
+    python scripts/test/smoketest.py &
+    pids+=($!)
+
+    for pid in ${pids[@]}; do
+        wait $pid
+    done
+    exit $?
+fi
+
 # osx support
 gtar=$(command -v gtar || command -v gnutar) || true
 [ ! -z "$gtar" ] && command -v gfind >/dev/null && {
