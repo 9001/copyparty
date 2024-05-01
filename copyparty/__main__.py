@@ -1257,6 +1257,18 @@ def add_txt(ap):
     ap2.add_argument("--exp-lg", metavar="V,V,V", type=u, default=DEF_EXP, help="comma/space-separated list of placeholders to expand in prologue/epilogue files (volflag=exp_lg)")
 
 
+def add_og(ap):
+    ap2 = ap.add_argument_group('og / open graph / discord-embed options')
+    ap2.add_argument("--og", action="store_true", help="disable hotlinking and return an html document instead; this is required by open-graph, but can also be useful on its own (volflag=og)")
+    ap2.add_argument("--og-ua", metavar="RE", type=u, default="", help="only disable hotlinking / engage OG behavior if the useragent matches regex \033[33mRE\033[0m (volflag=og_ua)")
+    ap2.add_argument("--og-tpl", metavar="PATH", type=u, default="", help="do not return the regular copyparty html, but instead load the jinja2 template at \033[33mPATH\033[0m (if path contains 'EXT' then EXT will be replaced with the requested file's extension) (volflag=og_tpl)")
+    ap2.add_argument("--og-no-head", action="store_true", help="do not automatically add OG entries into <head> (useful if you're doing this yourself in a template or such) (volflag=og_no_head)")
+    ap2.add_argument("--og-th", metavar="FMT", type=u, default="jf3", help="thumbnail format; j=jpeg, jf=jpeg-uncropped, jf3=jpeg-uncropped-large, w=webm, ... (volflag=og_th)")
+    ap2.add_argument("--og-title", metavar="TXT", type=u, default="", help="fallback title if there is nothing in the \033[33m-e2t\033[0m database (volflag=og_site)")
+    ap2.add_argument("--og-desc", metavar="TXT", type=u, default="", help="description text; same for all files, disable with [\033[32m-\033[0m] (volflag=og_desc)")
+    ap2.add_argument("--og-site", metavar="TXT", type=u, default="", help="sitename; defaults to \033[33m--name\033[0m, disable with [\033[32m-\033[0m] (volflag=og_site)")
+
+
 def add_ui(ap, retry):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
@@ -1357,6 +1369,7 @@ def run_argparse(
     add_hooks(ap)
     add_stats(ap)
     add_txt(ap)
+    add_og(ap)
     add_ui(ap, retry)
     add_admin(ap)
     add_logging(ap)

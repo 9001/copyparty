@@ -1,6 +1,8 @@
 "use strict";
 
-var XHR = XMLHttpRequest;
+var XHR = XMLHttpRequest,
+	img_re = /\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp|webm|mkv|mp4)(\?|$)/i;
+
 var Ls = {
 	"eng": {
 		"tt": "English",
@@ -1417,6 +1419,12 @@ var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 	ldks = [],
 	dks = {},
 	dk, mp;
+
+
+if (window.og_fn) {
+	hash0 = 1;
+	hist_replace(vsplit(get_evpath())[0]);
+}
 
 
 var mpl = (function () {
@@ -3289,6 +3297,21 @@ function scan_hash(v) {
 function eval_hash() {
 	window.onpopstate = treectl.onpopfun;
 
+	if (hash0 && window.og_fn) {
+		var all = msel.getall(), mi;
+		for (var a = 0; a < all.length; a++)
+			if (og_fn == uricom_dec(vsplit(all[a].vp)[1].split('?')[0])) {
+				mi = all[a];
+				break;
+			}
+
+		if (mi && img_re.exec(og_fn))
+			hash0 = '#g' + mi.id;
+
+		if (ebi('a' + mi.id))
+			hash0 = '#a' + mi.id;
+	}
+
 	var v = hash0;
 	hash0 = null;
 	if (!v)
@@ -4756,7 +4779,7 @@ var thegrid = (function () {
 			aplay = ebi('a' + fid),
 			atext = ebi('t' + fid),
 			is_txt = atext && showfile.getlang(href),
-			is_img = /\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp|webm|mkv|mp4)(\?|$)/i.test(href),
+			is_img = img_re.test(href),
 			is_dir = href.endsWith('/'),
 			is_srch = !!ebi('unsearch'),
 			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),

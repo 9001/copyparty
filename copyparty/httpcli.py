@@ -84,6 +84,7 @@ from .util import (
     sanitize_vpath,
     sendfile_kern,
     sendfile_py,
+    ujoin,
     undot,
     unescape_cookie,
     unquotep,
@@ -4074,6 +4075,27 @@ class HttpCli(object):
         return True
 
     def tx_browser(self) -> bool:
+        vn = self.vn
+        rem = self.rem
+
+        add_og = "og" in vn.flags
+        if add_og:
+            if ".og-raw/" in rem:
+                # sad workaround: discord strips ?raw=1 so give it a unique url instead
+                self.uparam["raw"] = True
+                self.vpath = self.vpath.replace(".og-raw/", "")
+                vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+                self.vn = vn
+                self.rem = rem
+            if "th" in self.uparam or "raw" in self.uparam:
+                og_ua = add_og = False
+            elif self.args.og_ua:
+                og_ua = add_og = self.args.og_ua.search(self.ua)
+            else:
+                og_ua = False
+                add_og = True
+            og_fn = ""
+
         vpath = ""
         vpnodes = [["", "/"]]
         if self.vpath:
@@ -4085,8 +4107,6 @@ class HttpCli(object):
 
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
-        vn = self.vn
-        rem = self.rem
         abspath = vn.dcanonical(rem)
         dbv, vrem = vn.get_dbv(rem)
 
@@ -4117,7 +4137,6 @@ class HttpCli(object):
         e2d = "e2d" in vn.flags
         e2t = "e2t" in vn.flags
 
-        self.html_head += vn.flags.get("html_head", "")
         if "b" in self.uparam:
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
 
@@ -4125,13 +4144,15 @@ class HttpCli(object):
         is_dk = False
         fk_pass = False
         icur = None
-        if is_dir and (e2t or e2d):
+        if (e2t or e2d) and (is_dir or add_og):
             idx = self.conn.get_u2idx()
             if idx and hasattr(idx, "p_end"):
                 icur = idx.get_cur(dbv)
 
         th_fmt = self.uparam.get("th")
-        if self.can_read or (self.can_get and vn.flags.get("dk")):
+        if self.can_read or (
+            self.can_get and (vn.flags.get("dk") or "fk" not in vn.flags)
+        ):
             if th_fmt is not None:
                 nothumb = "dthumb" in dbv.flags
                 if is_dir:
@@ -4178,7 +4199,7 @@ class HttpCli(object):
         elif self.can_write and th_fmt is not None:
             return self.tx_svg("upload\nonly")
 
-        elif self.can_get and self.avn:
+        if not self.can_read and self.can_get and self.avn:
             axs = self.avn.axs
             if self.uname not in axs.uhtml:
                 pass
@@ -4224,6 +4245,17 @@ class HttpCli(object):
                     self.log(t % (correct, got, self.req, abspath), 6)
                     return self.tx_404()
 
+            if add_og:
+                if og_ua or self.host not in self.headers.get("referer", ""):
+                    self.vpath, og_fn = vsplit(self.vpath)
+                    vpath = self.vpath
+                    vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
+                    abspath = vn.dcanonical(rem)
+                    dbv, vrem = vn.get_dbv(rem)
+                    is_dir = stat.S_ISDIR(st.st_mode)
+                    is_dk = True
+                    vpnodes.pop()
+
             if (
                 (abspath.endswith(".md") or self.can_delete)
                 and "nohtml" not in vn.flags
@@ -4235,9 +4267,10 @@ class HttpCli(object):
             ):
                 return self.tx_md(vn, abspath)
 
-            return self.tx_file(
-                abspath, None if st.st_size or "nopipe" in vn.flags else vn.realpath
-            )
+            if not add_og or not og_fn:
+                return self.tx_file(
+                    abspath, None if st.st_size or "nopipe" in vn.flags else vn.realpath
+                )
 
         elif is_dir and not self.can_read:
             if self._use_dirkey(abspath):
@@ -4284,7 +4317,11 @@ class HttpCli(object):
         is_ls = "ls" in self.uparam
         is_js = self.args.force_js or self.cookies.get("js") == "y"
 
-        if not is_ls and (self.ua.startswith("curl/") or self.ua.startswith("fetch")):
+        if (
+            not is_ls
+            and not add_og
+            and (self.ua.startswith("curl/") or self.ua.startswith("fetch"))
+        ):
             self.uparam["ls"] = "v"
             is_ls = True
 
@@ -4409,7 +4446,7 @@ class HttpCli(object):
 
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
-            if v is not None:
+            if v is not None and (not add_og or not og_fn):
                 return self.tx_zip(k, v, self.vpath, vn, rem, [])
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
@@ -4422,6 +4459,10 @@ class HttpCli(object):
         stats = {k: v for k, v in vfs_ls}
         ls_names = [x[0] for x in vfs_ls]
         ls_names.extend(list(vfs_virt.keys()))
+
+        if add_og and og_fn and not self.can_read:
+            ls_names = [og_fn]
+            is_js = True
 
         # check for old versions of files,
         # [num-backups, most-recent, hist-path]
@@ -4683,6 +4724,121 @@ class HttpCli(object):
 
         if "mth" in vn.flags:
             j2a["def_hcols"] = list(vn.flags["mth"])
+
+        if add_og and "raw" not in self.uparam:
+            j2a["this"] = self
+            cgv["og_fn"] = og_fn
+            if og_fn and vn.flags.get("og_tpl"):
+                tpl = vn.flags["og_tpl"]
+                if "EXT" in tpl:
+                    zs = og_fn.split(".")[-1].lower()
+                    tpl2 = tpl.replace("EXT", zs)
+                    if os.path.exists(tpl2):
+                        tpl = tpl2
+                with self.conn.hsrv.mutex:
+                    if tpl not in self.conn.hsrv.j2:
+                        tdir, tname = os.path.split(tpl)
+                        j2env = jinja2.Environment()
+                        j2env.loader = jinja2.FileSystemLoader(tdir)
+                        self.conn.hsrv.j2[tpl] = j2env.get_template(tname)
+            thumb = ""
+            is_pic = is_vid = is_au = False
+            covernames = self.args.th_coversd
+            for fn in ls_names:
+                if fn.lower() in covernames:
+                    thumb = fn
+                    break
+            if og_fn:
+                ext = og_fn.split(".")[-1].lower()
+                if ext in self.thumbcli.thumbable:
+                    is_pic = (
+                        ext in self.thumbcli.fmt_pil
+                        or ext in self.thumbcli.fmt_vips
+                        or ext in self.thumbcli.fmt_ffi
+                    )
+                    is_vid = ext in self.thumbcli.fmt_ffv
+                    is_au = ext in self.thumbcli.fmt_ffa
+                    if not thumb or not is_au:
+                        thumb = og_fn
+                file = next((x for x in files if x["name"] == og_fn), None)
+            else:
+                file = None
+
+            url_base = "%s://%s/%s" % (
+                "https" if self.is_https else "http",
+                self.host,
+                self.args.RS + quotep(vpath),
+            )
+            j2a["og_is_pic"] = is_pic
+            j2a["og_is_vid"] = is_vid
+            j2a["og_is_au"] = is_au
+            if thumb:
+                fmt = vn.flags.get("og_th", "j")
+                zs = ujoin(url_base, quotep(thumb))
+                j2a["og_thumb"] = "%s?th=%s&cache" % (zs, fmt)
+
+            j2a["og_fn"] = og_fn
+            j2a["og_file"] = file
+            if og_fn:
+                og_fn_q = quotep(og_fn)
+                j2a["og_url"] = ujoin(url_base, og_fn_q)
+                j2a["og_raw"] = ujoin(url_base, vjoin(".og-raw", og_fn_q))
+                # discord strips ?raw so it always downloads the html... orz
+            else:
+                j2a["og_url"] = j2a["og_raw"] = url_base
+
+            if not vn.flags.get("og_no_head"):
+                ogh = {"twitter:card": "summary"}
+
+                if thumb:
+                    ogh["og:image"] = j2a["og_thumb"]
+
+                zso = vn.flags.get("og_title")
+                if zso:
+                    ogh["og:title"] = str(zso)
+
+                zso = vn.flags.get("og_desc") or ""
+                if zso != "-":
+                    ogh["og:description"] = str(zso)
+
+                zs = vn.flags.get("og_site") or self.args.name
+                if zs not in ("", "-"):
+                    ogh["og:site_name"] = zs
+
+                tagmap = {}
+                if is_au:
+                    ogh["og:type"] = "music.song"
+                    ogh["og:audio"] = j2a["og_raw"]
+                    tagmap = {
+                        "title": "og:title",
+                        "artist": "og:music:musician",
+                        "album": "og:music:album",
+                        ".dur": "og:music:duration",
+                    }
+                elif is_vid:
+                    ogh["og:type"] = "video.other"
+                    ogh["og:video"] = j2a["og_raw"]
+                    tagmap = {
+                        "title": "og:title",
+                        ".dur": "og:video:duration",
+                    }
+                elif is_pic:
+                    ogh["og:type"] = "video.other"
+                    ogh["og:image"] = j2a["og_raw"]
+
+                for tag, hname in tagmap.items():
+                    try:
+                        v = file["tags"][tag]
+                        if not v:
+                            continue
+                        ogh[hname] = int(v) if tag == ".dur" else v
+                    except:
+                        pass
+
+                zs = '\t<meta property="%s" content="%s">'
+                oghs = [zs % (k, v) for k, v in ogh.items()]
+                zs = self.html_head + "\n%s\n" % ("\n".join(oghs),)
+                self.html_head = zs.replace("\n\n", "\n")
 
         html = self.j2s(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))

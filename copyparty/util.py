@@ -2031,9 +2031,18 @@ def vsplit(vpath: str) -> tuple[str, str]:
     return vpath.rsplit("/", 1)  # type: ignore
 
 
+# vpath-join
 def vjoin(rd: str, fn: str) -> str:
     if rd and fn:
         return rd + "/" + fn
+    else:
+        return rd or fn
+
+
+# url-join
+def ujoin(rd: str, fn: str) -> str:
+    if rd and fn:
+        return rd.rstrip("/") + "/" + fn.lstrip("/")
     else:
         return rd or fn
 

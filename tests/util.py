@@ -110,13 +110,13 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw q rand smb srch_dbg stats vague_403 vc ver xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw og og_no_head q rand smb srch_dbg stats vague_403 vc ver xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "ah_cli ah_gen css_browser hist js_browser no_forget no_hash no_idx nonsus_urls"
+        ex = "ah_cli ah_gen css_browser hist js_browser no_forget no_hash no_idx nonsus_urls og_tpl og_ua"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "hash_mt srch_time u2abort u2j"
@@ -128,7 +128,7 @@ class Cfg(Namespace):
         ex = "db_act df k304 loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname doctitle exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name textfiles unlist vname R RS SR"
+        ex = "ah_alg bname doctitle exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name og_desc og_site og_th og_title textfiles unlist vname R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "grp on403 on404 xad xar xau xban xbd xbr xbu xiu xm"

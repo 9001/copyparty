@@ -60,6 +60,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
     * [browser ux](#browser-ux) - tweaking the ui
+    * [opengraph](#opengraph) - discord and social-media embeds
     * [file indexing](#file-indexing) - enables dedup and music search ++
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
@@ -234,6 +235,7 @@ also see [comparison to similar software](./docs/versus.md)
 * client support
   * ☑ [folder sync](#folder-sync)
   * ☑ [curl-friendly](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png)
+  * ☑ [opengraph](#opengraph) (discord embeds)
 * markdown
   * ☑ [viewer](#markdown-viewer)
   * ☑ editor (sure why not)
@@ -1068,6 +1070,21 @@ tweaking the ui
   * to sort by upload date, first enable showing the upload date in the listing with `-e2d -mte +.up_at` and then `--sort tags/.up_at`
 
 see [./docs/rice](./docs/rice) for more, including how to add stuff (css/`<meta>`/...) to the html `<head>` tag
+
+
+## opengraph
+
+discord and social-media embeds
+
+can be enabled globally with `--og` or per-volume with volflag `og`
+
+note that this disables hotlinking because the opengraph spec demands it; to sneak past this intentional limitation, you can enable opengraph selectively by user-agent, for example `--og-ua '(Discord|Twitter|Slack)bot'` (or volflag `og_ua`)
+
+you can also hotlink files regardless by appending `?raw` to the url
+
+if you want to entirely replace the copyparty response with your own jinja2 template, give the template filepath to `--og-tpl` or volflag `og_tpl` (all members of `HttpCli` are available through the `this` object)
+
+because discord (and maybe others) strip query args such as `?raw`, opengraph is incompatible with filekeys and dirkeys
 
 
 ## file indexing
