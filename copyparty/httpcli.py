@@ -217,6 +217,12 @@ class HttpCli(object):
         ka["favico"] = self.args.favico
         ka["s_name"] = self.args.bname
         ka["s_doctitle"] = self.args.doctitle
+
+        zso = self.vn.flags.get("html_head")
+        if zso:
+            ka["this"] = self
+            self._build_html_head(zso, ka)
+
         ka["html_head"] = self.html_head
         return tpl.render(**ka)  # type: ignore
 
@@ -717,6 +723,31 @@ class HttpCli(object):
             or (self.args.k304 == 2 and k304 != "n")
             or ("; Trident/" in self.ua and not k304)
         )
+
+    def _build_html_head(self, maybe_html: Any, kv: dict[str, Any]) -> bool:
+        html = str(maybe_html)
+        is_jinja = html[:2] in "%@%"
+        if is_jinja:
+            html = html.replace("%", "", 1)
+
+        if html.startswith("@"):
+            with open(html[1:], "rb") as f:
+                html = f.read().decode("utf-8")
+
+        if html.startswith("%"):
+            html = html[1:]
+            is_jinja = True
+
+        if is_jinja:
+            print("applying jinja")
+            with self.conn.hsrv.mutex:
+                if html not in self.conn.hsrv.j2:
+                    j2env = jinja2.Environment()
+                    tpl = j2env.from_string(html)
+                    self.conn.hsrv.j2[html] = tpl
+                html = self.conn.hsrv.j2[html].render(**kv)
+
+        self.html_head += html + "\n"
 
     def send_headers(
         self,
@@ -3484,7 +3515,6 @@ class HttpCli(object):
         targs = {
             "r": self.args.SR if self.is_vproxied else "",
             "ts": self.conn.hsrv.cachebuster(),
-            "html_head": self.html_head,
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
@@ -3495,6 +3525,13 @@ class HttpCli(object):
             "md": boundary,
             "arg_base": arg_base,
         }
+
+        zfv = self.vn.flags.get("html_head")
+        if zfv:
+            targs["this"] = self
+            self._build_html_head(zfv, targs)
+
+        targs["html_head"] = self.html_head
         zs = template.render(**targs).encode("utf-8", "replace")
         html = zs.split(boundary.encode("utf-8"))
         if len(html) != 2:
@@ -3609,8 +3646,6 @@ class HttpCli(object):
             zb = txt.encode("utf-8", "replace") + b"\n"
             self.reply(zb, mime="text/plain; charset=utf-8")
             return True
-
-        self.html_head += self.vn.flags.get("html_head", "")
 
         html = self.j2s(
             "splash",

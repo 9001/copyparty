@@ -61,6 +61,7 @@ def vf_vmap() -> dict[str, str]:
     }
     for k in (
         "dbd",
+        "html_head",
         "lg_sbf",
         "md_sbf",
         "nrand",
@@ -81,7 +82,6 @@ def vf_cmap() -> dict[str, str]:
     for k in (
         "exp_lg",
         "exp_md",
-        "html_head",
         "mte",
         "mth",
         "mtp",
@@ -201,7 +201,7 @@ flagcats = {
         "grid": "show grid/thumbnails by default",
         "sort": "default sort order",
         "unlist": "dont list files matching REGEX",
-        "html_head=TXT": "includes TXT in the <head>",
+        "html_head=TXT": "includes TXT in the <head>, or @PATH for file at PATH",
         "robots": "allows indexing by search engines (default)",
         "norobots": "kindly asks search engines to leave",
         "no_sb_md": "disable js sandbox for markdown files",
