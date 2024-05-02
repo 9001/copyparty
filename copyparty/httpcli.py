@@ -84,6 +84,8 @@ from .util import (
     sanitize_vpath,
     sendfile_kern,
     sendfile_py,
+    ub64dec,
+    ub64enc,
     ujoin,
     undot,
     unescape_cookie,
@@ -371,6 +373,21 @@ class HttpCli(object):
         if "&" in self.req and "?" not in self.req:
             self.hint = "did you mean '?' instead of '&'"
 
+        if self.args.uqe and "/.uqe/" in self.req:
+            try:
+                vpath, query = self.req.split("?")[0].split("/.uqe/")
+                query = query.split("/")[0]  # discard trailing junk
+                # (usually a "filename" to trick discord into behaving)
+                query = ub64dec(query.encode("utf-8")).decode("utf-8", "replace")
+                if query.startswith("/"):
+                    self.req = "%s/?%s" % (vpath, query[1:])
+                else:
+                    self.req = "%s?%s" % (vpath, query)
+            except Exception as ex:
+                t = "bad uqe in request [%s]: %r" % (self.req, ex)
+                self.loud_reply(t, status=400)
+                return False
+
         # split req into vpath + uparam
         uparam = {}
         if "?" not in self.req:
@@ -437,7 +454,8 @@ class HttpCli(object):
             cookie_pw = ""
 
         if len(uparam) > 10 or len(cookies) > 50:
-            raise Pebkac(400, "u wot m8")
+            self.loud_reply("u wot m8", status=400)
+            return False
 
         self.uparam = uparam
         self.cookies = cookies
@@ -4075,27 +4093,6 @@ class HttpCli(object):
         return True
 
     def tx_browser(self) -> bool:
-        vn = self.vn
-        rem = self.rem
-
-        add_og = "og" in vn.flags
-        if add_og:
-            if ".og-raw/" in rem:
-                # sad workaround: discord strips ?raw=1 so give it a unique url instead
-                self.uparam["raw"] = True
-                self.vpath = self.vpath.replace(".og-raw/", "")
-                vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False)
-                self.vn = vn
-                self.rem = rem
-            if "th" in self.uparam or "raw" in self.uparam:
-                og_ua = add_og = False
-            elif self.args.og_ua:
-                og_ua = add_og = self.args.og_ua.search(self.ua)
-            else:
-                og_ua = False
-                add_og = True
-            og_fn = ""
-
         vpath = ""
         vpnodes = [["", "/"]]
         if self.vpath:
@@ -4107,6 +4104,8 @@ class HttpCli(object):
 
                 vpnodes.append([quotep(vpath) + "/", html_escape(node, crlf=True)])
 
+        vn = self.vn
+        rem = self.rem
         abspath = vn.dcanonical(rem)
         dbv, vrem = vn.get_dbv(rem)
 
@@ -4136,6 +4135,17 @@ class HttpCli(object):
 
         e2d = "e2d" in vn.flags
         e2t = "e2t" in vn.flags
+
+        add_og = "og" in vn.flags
+        if add_og:
+            if "th" in self.uparam or "raw" in self.uparam:
+                og_ua = add_og = False
+            elif self.args.og_ua:
+                og_ua = add_og = self.args.og_ua.search(self.ua)
+            else:
+                og_ua = False
+                add_og = True
+            og_fn = ""
 
         if "b" in self.uparam:
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
@@ -4774,16 +4784,23 @@ class HttpCli(object):
             j2a["og_is_au"] = is_au
             if thumb:
                 fmt = vn.flags.get("og_th", "j")
-                zs = ujoin(url_base, quotep(thumb))
-                j2a["og_thumb"] = "%s?th=%s&cache" % (zs, fmt)
+                th_base = ujoin(url_base, quotep(thumb))
+                query = "th=%s&cache" % (fmt,)
+                query = ub64enc(query.encode("utf-8")).decode("utf-8")
+                # discord looks at file extension, not content-type...
+                query += "/a.jpg" if "j" in fmt else "/a.webp"
+                j2a["og_thumb"] = "%s/.uqe/%s" % (th_base, query)
 
             j2a["og_fn"] = og_fn
             j2a["og_file"] = file
             if og_fn:
                 og_fn_q = quotep(og_fn)
+                query = ub64enc(b"raw").decode("utf-8")
+                if "." in og_fn:
+                    query += "/a.%s" % (og_fn.split(".")[-1])
+
                 j2a["og_url"] = ujoin(url_base, og_fn_q)
-                j2a["og_raw"] = ujoin(url_base, vjoin(".og-raw", og_fn_q))
-                # discord strips ?raw so it always downloads the html... orz
+                j2a["og_raw"] = j2a["og_url"] + "/.uqe/" + query
             else:
                 j2a["og_url"] = j2a["og_raw"] = url_base
 
@@ -4836,7 +4853,7 @@ class HttpCli(object):
                         pass
 
                 zs = '\t<meta property="%s" content="%s">'
-                oghs = [zs % (k, v) for k, v in ogh.items()]
+                oghs = [zs % (k, html_escape(str(v))) for k, v in ogh.items()]
                 zs = self.html_head + "\n%s\n" % ("\n".join(oghs),)
                 self.html_head = zs.replace("\n\n", "\n")
 

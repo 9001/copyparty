@@ -1267,6 +1267,7 @@ def add_og(ap):
     ap2.add_argument("--og-title", metavar="TXT", type=u, default="", help="fallback title if there is nothing in the \033[33m-e2t\033[0m database (volflag=og_site)")
     ap2.add_argument("--og-desc", metavar="TXT", type=u, default="", help="description text; same for all files, disable with [\033[32m-\033[0m] (volflag=og_desc)")
     ap2.add_argument("--og-site", metavar="TXT", type=u, default="", help="sitename; defaults to \033[33m--name\033[0m, disable with [\033[32m-\033[0m] (volflag=og_site)")
+    ap2.add_argument("--uqe", action="store_true", help="query-string parceling; translate a request for \033[33m/foo/.uqe/BASE64\033[0m into \033[33m/foo?TEXT\033[0m, or \033[33m/foo/?TEXT\033[0m if the first character in \033[33mTEXT\033[0m is a slash. Automatically enabled for \033[33m--og\033[0m")
 
 
 def add_ui(ap, retry):
@@ -1281,7 +1282,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--mpmc", metavar="URL", type=u, default="", help="change the mediaplayer-toggle mouse cursor; URL to a folder with {2..5}.png inside (or disable with [\033[32m.\033[0m])")
     ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
     ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
-    ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages; can be @PATH to send the contents of a file at PATH, and/or begin with % to render as jinja2 template (volflag=html_head)")
+    ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages; can be @PATH to send the contents of a file at PATH, and/or begin with %% to render as jinja2 template (volflag=html_head)")
     ap2.add_argument("--ih", action="store_true", help="if a folder contains index.html, show that instead of the directory listing by default (can be changed in the client settings UI, or add ?v to URL for override)")
     ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
     ap2.add_argument("--txt-max", metavar="KiB", type=int, default=64, help="max size of embedded textfiles on ?doc= (anything bigger will be lazy-loaded by JS)")

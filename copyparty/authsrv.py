@@ -1777,6 +1777,9 @@ class AuthSrv(object):
                     t = 'volume "/%s" has invalid %stry [%s]'
                     raise Exception(t % (vol.vpath, k, vol.flags.get(k + "try")))
 
+            if vol.flags.get("og"):
+                self.args.uqe = True
+
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
                     vol.flags[k2] = True

@@ -35,6 +35,9 @@ from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
 
+ub64dec = base64.urlsafe_b64decode
+ub64enc = base64.urlsafe_b64encode
+
 try:
     from datetime import datetime, timezone
 
