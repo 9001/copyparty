@@ -220,6 +220,7 @@ class HttpCli(object):
         ka["favico"] = self.args.favico
         ka["s_name"] = self.args.bname
         ka["s_doctitle"] = self.args.doctitle
+        ka["tcolor"] = self.vn.flags["tcolor"]
 
         zso = self.vn.flags.get("html_head")
         if zso:
@@ -4807,12 +4808,10 @@ class HttpCli(object):
             if not vn.flags.get("og_no_head"):
                 ogh = {"twitter:card": "summary"}
 
+                title = str(vn.flags.get("og_title") or "")
+
                 if thumb:
                     ogh["og:image"] = j2a["og_thumb"]
-
-                zso = vn.flags.get("og_title")
-                if zso:
-                    ogh["og:title"] = str(zso)
 
                 zso = vn.flags.get("og_desc") or ""
                 if zso != "-":
@@ -4824,15 +4823,16 @@ class HttpCli(object):
 
                 tagmap = {}
                 if is_au:
+                    title = str(vn.flags.get("og_title_a") or "")
                     ogh["og:type"] = "music.song"
                     ogh["og:audio"] = j2a["og_raw"]
                     tagmap = {
-                        "title": "og:title",
                         "artist": "og:music:musician",
                         "album": "og:music:album",
                         ".dur": "og:music:duration",
                     }
                 elif is_vid:
+                    title = str(vn.flags.get("og_title_v") or "")
                     ogh["og:type"] = "video.other"
                     ogh["og:video"] = j2a["og_raw"]
                     tagmap = {
@@ -4840,8 +4840,25 @@ class HttpCli(object):
                         ".dur": "og:video:duration",
                     }
                 elif is_pic:
-                    ogh["og:type"] = "video.other"
-                    ogh["og:image"] = j2a["og_raw"]
+                    title = str(vn.flags.get("og_title_i") or "")
+                    ogh["og:type"] = "website"
+                    ogh["twitter:card"] = "photo"
+                    ogh["twitter:image:src"] = ogh["og:image"] = j2a["og_raw"]
+
+                try:
+                    for k, v in file["tags"].items():
+                        zs = "{{ %s }}" % (k,)
+                        title = title.replace(zs, str(v))
+                except:
+                    pass
+                title = re.sub(r"\{\{ [^}]+ \}\}", "", title)
+                while title.startswith(" - "):
+                    title = title[3:]
+                while title.endswith(" - "):
+                    title = title[:3]
+
+                if vn.flags.get("og_s_title"):
+                    title = str(vn.flags.get("og_title") or "")
 
                 for tag, hname in tagmap.items():
                     try:
@@ -4851,6 +4868,8 @@ class HttpCli(object):
                         ogh[hname] = int(v) if tag == ".dur" else v
                     except:
                         pass
+
+                ogh["og:title"] = title
 
                 zs = '\t<meta property="%s" content="%s">'
                 oghs = [zs % (k, html_escape(str(v))) for k, v in ogh.items()]

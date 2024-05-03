@@ -1264,9 +1264,14 @@ def add_og(ap):
     ap2.add_argument("--og-tpl", metavar="PATH", type=u, default="", help="do not return the regular copyparty html, but instead load the jinja2 template at \033[33mPATH\033[0m (if path contains 'EXT' then EXT will be replaced with the requested file's extension) (volflag=og_tpl)")
     ap2.add_argument("--og-no-head", action="store_true", help="do not automatically add OG entries into <head> (useful if you're doing this yourself in a template or such) (volflag=og_no_head)")
     ap2.add_argument("--og-th", metavar="FMT", type=u, default="jf3", help="thumbnail format; j=jpeg, jf=jpeg-uncropped, jf3=jpeg-uncropped-large, w=webm, ... (volflag=og_th)")
-    ap2.add_argument("--og-title", metavar="TXT", type=u, default="", help="fallback title if there is nothing in the \033[33m-e2t\033[0m database (volflag=og_site)")
+    ap2.add_argument("--og-title", metavar="TXT", type=u, default="", help="fallback title if there is nothing in the \033[33m-e2t\033[0m database (volflag=og_title)")
+    ap2.add_argument("--og-title-a", metavar="T", type=u, default="🎵 {{ artist }} - {{ title }}", help="audio title format; takes any metadata key (volflag=og_title_a)")
+    ap2.add_argument("--og-title-v", metavar="T", type=u, default="{{ title }}", help="video title format; takes any metadata key (volflag=og_title_v)")
+    ap2.add_argument("--og-title-i", metavar="T", type=u, default="{{ title }}", help="image title format; takes any metadata key (volflag=og_title_i)")
+    ap2.add_argument("--og-s-title", action="store_true", help="force default title; do not read from tags (volflag=og_s_title)")
     ap2.add_argument("--og-desc", metavar="TXT", type=u, default="", help="description text; same for all files, disable with [\033[32m-\033[0m] (volflag=og_desc)")
     ap2.add_argument("--og-site", metavar="TXT", type=u, default="", help="sitename; defaults to \033[33m--name\033[0m, disable with [\033[32m-\033[0m] (volflag=og_site)")
+    ap2.add_argument("--tcolor", metavar="RGB", type=u, default="333", help="accent color (3 or 6 hex digits); may also affect safari and/or android-chrome (volflag=tcolor)")
     ap2.add_argument("--uqe", action="store_true", help="query-string parceling; translate a request for \033[33m/foo/.uqe/BASE64\033[0m into \033[33m/foo?TEXT\033[0m, or \033[33m/foo/?TEXT\033[0m if the first character in \033[33mTEXT\033[0m is a slash. Automatically enabled for \033[33m--og\033[0m")
 
 

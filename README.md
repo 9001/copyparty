@@ -1082,9 +1082,9 @@ note that this disables hotlinking because the opengraph spec demands it; to sne
 
 you can also hotlink files regardless by appending `?raw` to the url
 
-if you want to entirely replace the copyparty response with your own jinja2 template, give the template filepath to `--og-tpl` or volflag `og_tpl` (all members of `HttpCli` are available through the `this` object)
+NOTE: because discord (and maybe others) strip query args such as `?raw` in opengraph tags, any links which require a filekey or dirkey will not work
 
-because discord (and maybe others) strip query args such as `?raw`, opengraph is incompatible with filekeys and dirkeys
+if you want to entirely replace the copyparty response with your own jinja2 template, give the template filepath to `--og-tpl` or volflag `og_tpl` (all members of `HttpCli` are available through the `this` object)
 
 
 ## file indexing

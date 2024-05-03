@@ -1442,6 +1442,7 @@ class AuthSrv(object):
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             vfs = VFS(self.log_func, "", "", AXS(), {})
+            vfs.flags["tcolor"] = self.args.tcolor
             vfs.flags["d2d"] = True
 
         maxdepth = 0
@@ -1779,6 +1780,10 @@ class AuthSrv(object):
 
             if vol.flags.get("og"):
                 self.args.uqe = True
+
+            zs = str(vol.flags.get("tcolor", ""))
+            if len(zs) == 3:  # fc5 => ffcc55
+                vol.flags["tcolor"] = "".join([x*2 for x in zs])
 
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
