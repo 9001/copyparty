@@ -4841,9 +4841,8 @@ class HttpCli(object):
                     }
                 elif is_pic:
                     title = str(vn.flags.get("og_title_i") or "")
-                    ogh["og:type"] = "website"
-                    ogh["twitter:card"] = "photo"
-                    ogh["twitter:image:src"] = ogh["og:image"] = j2a["og_raw"]
+                    ogh["twitter:card"] = "summary_large_image"
+                    ogh["twitter:image"] = ogh["og:image"] = j2a["og_raw"]
 
                 try:
                     for k, v in file["tags"].items():
