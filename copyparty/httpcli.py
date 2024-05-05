@@ -4406,6 +4406,7 @@ class HttpCli(object):
             "dsort": vf["sort"],
             "dcrop": vf["crop"],
             "dth3x": vf["th3x"],
+            "dvol": self.args.volume,
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
             "u2j": self.args.u2j,

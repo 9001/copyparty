@@ -1730,7 +1730,7 @@ function MPlayer() {
 		}
 	}
 
-	r.vol = clamp(fcfg_get('vol', IPHONE ? 1 : 0.5), 0, 1);
+	r.vol = clamp(fcfg_get('vol', IPHONE ? 1 : dvol / 100), 0, 1);
 
 	r.expvol = function (v) {
 		return 0.5 * v + 0.5 * v * v;

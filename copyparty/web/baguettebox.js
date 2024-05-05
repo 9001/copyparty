@@ -740,6 +740,7 @@ window.baguetteBox = (function () {
         });
         image.setAttribute('src', imageSrc);
         if (is_vid) {
+            image.volume = clamp(fcfg_get('vol', dvol / 100), 0, 1);
             image.setAttribute('controls', 'controls');
             image.onended = vidEnd;
         }
