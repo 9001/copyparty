@@ -1781,7 +1781,7 @@ class AuthSrv(object):
             if vol.flags.get("og"):
                 self.args.uqe = True
 
-            zs = str(vol.flags.get("tcolor", ""))
+            zs = str(vol.flags.get("tcolor", "")).lstrip("#")
             if len(zs) == 3:  # fc5 => ffcc55
                 vol.flags["tcolor"] = "".join([x * 2 for x in zs])
 

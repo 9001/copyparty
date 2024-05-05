@@ -557,6 +557,10 @@ class SvcHub(object):
         except:
             raise Exception("invalid --mv-retry [%s]" % (self.args.mv_retry,))
 
+        al.tcolor = al.tcolor.lstrip('#')
+        if len(al.tcolor) == 3:  # fc5 => ffcc55
+            al.tcolor = "".join([x * 2 for x in al.tcolor])
+
         return True
 
     def _ipa2re(self, txt) -> Optional[re.Pattern]:
