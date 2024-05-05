@@ -47,6 +47,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
+        * [markdown vars](#markdown-vars) - dynamic docs with serverside variable expansion
     * [other tricks](#other-tricks)
     * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
 * [server config](#server-config) - using arguments or config files, or a mix of both
@@ -239,6 +240,7 @@ also see [comparison to similar software](./docs/versus.md)
 * markdown
   * ☑ [viewer](#markdown-viewer)
   * ☑ editor (sure why not)
+  * ☑ [variables](#markdown-vars)
 
 PS: something missing? post any crazy ideas you've got as a [feature request](https://github.com/9001/copyparty/issues/new?assignees=9001&labels=enhancement&template=feature_request.md) or [discussion](https://github.com/9001/copyparty/discussions/new?category=ideas) 🤙
 
@@ -843,6 +845,13 @@ there is a built-in extension for inline clickable thumbnails;
 
 other notes,
 * the document preview has a max-width which is the same as an A4 paper when printed
+
+
+### markdown vars
+
+dynamic docs with serverside variable expansion  to replace stuff like `{{self.ip}}` with the client's IP, or `{{srv.htime}}` with the current time on the server
+
+see [./srv/expand/](./srv/expand/) for usage and examples
 
 
 ## other tricks

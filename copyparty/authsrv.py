@@ -1783,7 +1783,7 @@ class AuthSrv(object):
 
             zs = str(vol.flags.get("tcolor", ""))
             if len(zs) == 3:  # fc5 => ffcc55
-                vol.flags["tcolor"] = "".join([x*2 for x in zs])
+                vol.flags["tcolor"] = "".join([x * 2 for x in zs])
 
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
@@ -2422,7 +2422,7 @@ def expand_config_file(
         if not cnames:
             t = "warning: tried to read config-files from folder '%s' but it does not contain any "
             if names:
-                t += ".conf files; the following files were ignored: %s"
+                t += ".conf files; the following files/subfolders were ignored: %s"
                 t = t % (fp, ", ".join(names[:8]))
             else:
                 t += "files at all"
