@@ -1281,7 +1281,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language; one of the following: \033[32meng nor\033[0m")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use (0..7)")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")
-    ap2.add_argument("--volume", metavar="NUM", type=int, default=50, help="default audio/video volume; 100=max")
+    ap2.add_argument("--au-vol", metavar="0-100", type=int, default=50, choices=range(0, 101), help="default audio/video volume percent")
     ap2.add_argument("--sort", metavar="C,C,C", type=u, default="href", help="default sort order, comma-separated column IDs (see header tooltips), prefix with '-' for descending. Examples: \033[32mhref -href ext sz ts tags/Album tags/.tn\033[0m (volflag=sort)")
     ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files matching \033[33mREGEX\033[0m in file list. Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
     ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="\033[33mfavicon-text\033[0m [ \033[33mforeground\033[0m [ \033[33mbackground\033[0m ] ], set blank to disable")
