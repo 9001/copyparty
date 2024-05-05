@@ -463,6 +463,12 @@ class TcpSrv(object):
         sys.stderr.flush()
 
     def _qr(self, t1: dict[str, list[int]], t2: dict[str, list[int]]) -> str:
+        t2c = {zs: zli for zs, zli in t2.items() if zs in ("127.0.0.1", "::1")}
+        t2b = {zs: zli for zs, zli in t2.items() if ":" in zs and zs not in t2c}
+        t2 = {zs: zli for zs, zli in t2.items() if zs not in t2b and zs not in t2c}
+        t2.update(t2b)  # first ipv4, then ipv6...
+        t2.update(t2c)  # ...and finally localhost
+
         ip = None
         ips = list(t1) + list(t2)
         qri = self.args.qri
