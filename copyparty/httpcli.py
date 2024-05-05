@@ -4857,7 +4857,7 @@ class HttpCli(object):
                 while title.endswith(" - "):
                     title = title[:3]
 
-                if vn.flags.get("og_s_title"):
+                if vn.flags.get("og_s_title") or not title:
                     title = str(vn.flags.get("og_title") or "")
 
                 for tag, hname in tagmap.items():
