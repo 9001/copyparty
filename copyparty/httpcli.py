@@ -4687,6 +4687,9 @@ class HttpCli(object):
         else:
             taglist = list(tagset)
 
+        if not files and not dirs and not readme and not logues[0] and not logues[1]:
+            logues[1] = "this folder is empty"
+
         if is_ls:
             ls_ret["dirs"] = dirs
             ls_ret["files"] = files

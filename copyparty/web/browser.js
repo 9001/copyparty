@@ -285,6 +285,7 @@ var Ls = {
 
 		"im_hnf": "that image no longer exists",
 
+		"f_empty": 'this folder is empty',
 		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
 		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
@@ -793,6 +794,7 @@ var Ls = {
 
 		"im_hnf": "bildet finnes ikke lenger",
 
+		"f_empty": 'denne mappen er tom',
 		"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
 		"fbd_more": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
@@ -6384,6 +6386,9 @@ var treectl = (function () {
 			lg1 = res.logues ? res.logues[1] || "" : "",
 			dirchg = get_evpath() != cdir;
 
+		if (lg1 === Ls.eng.f_empty)
+			lg1 = L.f_empty;
+
 		sandbox(ebi('pro'), sb_lg, '', lg0);
 		if (dirchg)
 			sandbox(ebi('epi'), sb_lg, '', lg1);
@@ -8021,6 +8026,9 @@ window.addEventListener("message", function (e) {
 
 
 if (sb_lg && logues.length) {
+	if (logues[1] === Ls.eng.f_empty)
+		logues[1] = L.f_empty;
+
 	sandbox(ebi('pro'), sb_lg, '', logues[0]);
 	sandbox(ebi('epi'), sb_lg, '', logues[1]);
 }
