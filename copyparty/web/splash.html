@@ -95,6 +95,7 @@
 			<form method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" name="act" value="login" />
 				<input type="password" name="cppwd" placeholder=" password" />
+				<input type="hidden" name="uhash" id="uhash" value="x" />
 				<input type="submit" value="Login" />
 				{% if ahttps %}
 				<a id="w" href="{{ ahttps }}">switch to https</a>

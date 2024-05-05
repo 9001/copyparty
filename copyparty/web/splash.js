@@ -66,3 +66,5 @@ if (!ebi('c') && o.offsetTop + o.offsetHeight < window.innerHeight)
 o = ebi('u');
 if (o && /[0-9]+$/.exec(o.innerHTML))
 	o.innerHTML = shumantime(o.innerHTML);
+
+ebi('uhash').value = '' + location.hash;

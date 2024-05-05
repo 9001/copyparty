@@ -2302,6 +2302,10 @@ class HttpCli(object):
     def handle_login(self) -> bool:
         assert self.parser
         pwd = self.parser.require("cppwd", 64)
+        try:
+            uhash = self.parser.require("uhash", 256)
+        except:
+            uhash = ""
         self.parser.drop()
 
         self.out_headerlist = [
@@ -2313,6 +2317,11 @@ class HttpCli(object):
             dst += quotep(self.vpaths)
 
         dst += self.ourlq()
+
+        uhash = uhash.lstrip("#")
+        if uhash not in ("", "-"):
+            dst += "&" if "?" in dst else "?"
+            dst += "_=1#" + html_escape(uhash, True, True)
 
         msg = self.get_pwd_cookie(pwd)
         html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
@@ -4876,8 +4885,11 @@ class HttpCli(object):
 
                 ogh["og:title"] = title
 
-                zs = '\t<meta property="%s" content="%s">'
-                oghs = [zs % (k, html_escape(str(v))) for k, v in ogh.items()]
+                oghs = [
+                    '\t<meta property="%s" content="%s">'
+                    % (k, html_escape(str(v), True, True))
+                    for k, v in ogh.items()
+                ]
                 zs = self.html_head + "\n%s\n" % ("\n".join(oghs),)
                 self.html_head = zs.replace("\n\n", "\n")
 
