@@ -1,6 +1,6 @@
 # Maintainer: icxes <dev.null@need.moe>
 pkgname=copyparty
-pkgver="1.13.0"
+pkgver="1.13.1"
 pkgrel=1
 pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer, thumbnails++"
 arch=("any")
@@ -21,7 +21,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
 backup=("etc/${pkgname}.d/init" )
-sha256sums=("9ad9ea5d4bdf947ed39f4ae571219d3528794c2ec6d4f470a5f3737899787e03")
+sha256sums=("f103b784c423a45fbab47c584e4cc53d887fe0616f803bffe009fbfdab3963d7")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
