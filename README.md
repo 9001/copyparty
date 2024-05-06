@@ -110,8 +110,9 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
     * [optional gpl stuff](#optional-gpl-stuff)
-* [sfx](#sfx) - the self-contained "binary"
+* [sfx](#sfx) - the self-contained "binary" (recommended!)
     * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
+    * [zipapp](#zipapp) - another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)
 * [install on android](#install-on-android)
 * [reporting bugs](#reporting-bugs) - ideas for context to include, and where to submit them
 * [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
@@ -125,6 +126,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 * or install [on arch](#arch-package) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
+* or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:
 
@@ -618,9 +620,15 @@ cool trick: download a folder by appending url-params `?tar&opus` or `?tar&mp3` 
 
 ## uploading
 
-drag files/folders into the web-browser to upload  (or use the [command-line uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy))
+drag files/folders into the web-browser to upload
 
-this initiates an upload using `up2k`; there are two uploaders available:
+dragdrop is the recommended way, but you may also:
+
+* select some files (not folders) in your file explorer and press CTRL-V inside the browser window
+* use the [command-line uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy)
+* upload using [curl or sharex](#client-examples)
+
+when uploading files through dragdrop or CTRL-V, this initiates an upload using `up2k`; there are two browser-based uploaders available:
 * `[🎈] bup`, the basic uploader, supports almost every browser since netscape 4.0
 * `[🚀] up2k`, the good / fancy one
 
@@ -2007,7 +2015,7 @@ these are standalone programs and will never be imported / evaluated by copypart
 
 # sfx
 
-the self-contained "binary"  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
+the self-contained "binary" (recommended!)  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
 
 you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack](./docs/devnotes.md#sfx-repack)
 
@@ -2032,6 +2040,16 @@ can be convenient on machines where installing python is problematic, however is
 meanwhile [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) instead relies on your system python which gives better performance and will stay safe as long as you keep your python install up-to-date
 
 then again, if you are already into downloading shady binaries from the internet, you may also want my [minimal builds](./scripts/pyinstaller#ffmpeg) of [ffmpeg](https://ocv.me/stuff/bin/ffmpeg.exe) and [ffprobe](https://ocv.me/stuff/bin/ffprobe.exe) which enables copyparty to extract multimedia-info, do audio-transcoding, and thumbnails/spectrograms/waveforms, however it's much better to instead grab a [recent official build](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z) every once ina while if you can afford the size
+
+
+## zipapp
+
+another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)  has less features, requires python 3.7 or newer, worse compression, and more importantly is unable to benefit from more recent versions of jinja2 and such (which makes it less secure)... lots of drawbacks with this one really -- but it *may* just work if the regular sfx fails to start because the computer is messed up in certain funky ways, so it's worth a shot if all else fails
+
+run it by doubleclicking it, or try typing `python copyparty.pyz` in your terminal/console/commandline/telex if that fails
+
+it is a python [zipapp](https://docs.python.org/3/library/zipapp.html) meaning it doesn't have to unpack its own python code anywhere to run, so if the filesystem is busted it has a better chance of getting somewhere
+* but note that it currently still needs to extract the web-resources somewhere (they'll land in the default TEMP-folder of your OS)
 
 
 # install on android
