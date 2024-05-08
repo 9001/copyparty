@@ -2681,7 +2681,7 @@ def unescape_cookie(orig: str) -> str:
 
 def guess_mime(url: str, fallback: str = "application/octet-stream") -> str:
     try:
-        _, ext = url.rsplit(".", 1)
+        ext = url.rsplit(".", 1)[1].lower()
     except:
         return fallback
 
