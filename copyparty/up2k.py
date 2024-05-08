@@ -1039,8 +1039,11 @@ class Up2k(object):
         return None
 
     def _verify_db_cache(self, cur: "sqlite3.Cursor", vpath: str) -> None:
-        # check if volume config changed since last use; drop caches if so
-        zsl = [vpath] + list(sorted(self.asrv.vfs.all_vols.keys()))
+        # check if list of intersecting volumes changed since last use; drop caches if so
+        prefix = (vpath + "/").lstrip("/")
+        zsl = [x for x in self.asrv.vfs.all_vols if x.startswith(prefix)]
+        zsl = [x[len(prefix) :] for x in zsl]
+        zsl.sort()
         zb = hashlib.sha1("\n".join(zsl).encode("utf-8", "replace")).digest()
         vcfg = base64.urlsafe_b64encode(zb[:18]).decode("ascii")
 
