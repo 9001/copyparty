@@ -17,7 +17,9 @@ from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
 from .util import (
+    EXTS,
     IMPLICATIONS,
+    MIMES,
     SQLITE_VER,
     UNPLICATIONS,
     UTC,
@@ -2064,6 +2066,13 @@ class AuthSrv(object):
                 zs = r"(\[H\] pw:.*|=)(" + "|".join(pwds) + r")([]&; ]|$)"
 
             self.re_pwd = re.compile(zs)
+
+        # to ensure it propagates into tcpsrv with mp on
+        if self.args.mime:
+            for zs in self.args.mime:
+                ext, mime = zs.split("=", 1)
+                MIMES[ext] = mime
+            EXTS.update({v: k for k, v in MIMES.items()})
 
     def setup_pwhash(self, acct: dict[str, str]) -> None:
         self.ah = PWHash(self.args)

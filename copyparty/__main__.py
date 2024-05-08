@@ -43,6 +43,7 @@ from .util import (
     DEF_MTH,
     IMPLICATIONS,
     JINJA_VER,
+    MIMES,
     PARTFTPY_VER,
     PY_DESC,
     PYFTPD_VER,
@@ -838,6 +839,8 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,get", help="how to handle url-form POSTs; see \033[33m--help-urlform\033[0m")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="server terminal title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
     ap2.add_argument("--name", metavar="TXT", type=u, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
+    ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
+    ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
@@ -1442,6 +1445,10 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
 
     if "--license" in argv:
         showlic()
+        sys.exit(0)
+
+    if "--mimes" in argv:
+        print("\n".join("%8s %s" % (k, v) for k, v in sorted(MIMES.items())))
         sys.exit(0)
 
     if EXE:
