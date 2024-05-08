@@ -821,7 +821,7 @@ def build_flags_desc():
             v = v.replace("\n", "\n    ")
             ret += "\n  \033[36m{}\033[35m {}".format(k, v)
 
-    return ret + "\033[0m"
+    return ret
 
 
 # fmt: off
@@ -1408,7 +1408,7 @@ def run_argparse(
         k2 = "help_" + k.replace("-", "_")
         if vars(ret)[k2]:
             lprint("# %s help page (%s)" % (k, h))
-            lprint(t + "\033[0m")
+            lprint(t.rstrip() + "\033[0m")
             sys.exit(0)
 
     return ret

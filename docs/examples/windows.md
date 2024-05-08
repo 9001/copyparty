@@ -46,7 +46,7 @@ open up notepad and save the following as `c:\users\you\documents\party.conf` (f
 
 ### config explained: [global]
 
-the `[global]` section accepts any config parameters you can see when running copyparty (either the exe or the sfx.py) with `--help`, so this is the same as running copyparty with arguments `--lo c:\users\you\logs\copyparty-%Y-%m%d.xz -e2dsa -e2ts --no-dedup -z -p 80,443 --theme 2 --lang nor`
+the `[global]` section accepts any config parameters [listed here](https://ocv.me/copyparty/helptext.html), also viewable by running copyparty (either the exe or the sfx.py) with `--help`, so this is the same as running copyparty with arguments `--lo c:\users\you\logs\copyparty-%Y-%m%d.xz -e2dsa -e2ts --no-dedup -z -p 80,443 --theme 2 --lang nor`
 * `lo: ~/logs/cpp-%Y-%m%d.xz` writes compressed logs (the compression will make them delayed)
 * `e2dsa` enables the upload deduplicator and file indexer, which enables searching
 * `e2ts` enables music metadata indexing, making albums / titles etc. searchable too

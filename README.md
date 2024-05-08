@@ -412,7 +412,7 @@ configuring accounts/volumes with arguments:
     `-v .::r,usr1,usr2:rw,usr3,usr4` = usr1/2 read-only, 3/4 read-write
 
 permissions:
-* `r` (read): browse folder contents, download files, download as zip/tar
+* `r` (read): browse folder contents, download files, download as zip/tar, see filekeys/dirkeys
 * `w` (write): upload files, move files *into* this folder
 * `m` (move): move files/folders *from* this folder
 * `d` (delete): delete files/folders
@@ -910,6 +910,8 @@ using arguments or config files, or a mix of both:
 
 **NB:** as humongous as this readme is, there is also a lot of undocumented features. Run copyparty with `--help` to see all available global options; all of those can be used in the `[global]` section of config files, and everything listed in `--help-flags` can be used in volumes as volflags.
 * if running in docker/podman, try this: `docker run --rm -it copyparty/ac --help`
+* or see this (probably outdated): https://ocv.me/copyparty/helptext.html
+* or if you prefer plaintext, https://ocv.me/copyparty/helptext.txt
 
 
 ## zeroconf
