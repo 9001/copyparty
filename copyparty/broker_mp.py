@@ -57,11 +57,8 @@ class BrokerMp(object):
     def shutdown(self) -> None:
         self.log("broker", "shutting down")
         for n, proc in enumerate(self.procs):
-            thr = threading.Thread(
-                target=proc.q_pend.put((0, "shutdown", [])),
-                name="mp-shutdown-{}-{}".format(n, len(self.procs)),
-            )
-            thr.start()
+            name = "mp-shut-%d-%d" % (n, len(self.procs))
+            Daemon(proc.q_pend.put, name, ((0, "shutdown", []),))
 
         with self.mutex:
             procs = self.procs

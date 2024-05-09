@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.16"
-S_BUILD_DT = "2024-04-20"
+S_VERSION = "1.17"
+S_BUILD_DT = "2024-05-09"
 
 """
 u2c.py: upload to copyparty
@@ -79,11 +79,20 @@ req_ses = requests.Session()
 
 
 class Daemon(threading.Thread):
-    def __init__(self, target, name=None, a=None):
-        # type: (Any, Any, Any) -> None
-        threading.Thread.__init__(self, target=target, args=a or (), name=name)
+    def __init__(self, target, name = None, a = None):
+        threading.Thread.__init__(self, name=name)
+        self.a = a or ()
+        self.fun = target
         self.daemon = True
         self.start()
+
+    def run(self):
+        try:
+            signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM])
+        except:
+            pass
+
+        self.fun(*self.a)
 
 
 class File(object):

@@ -49,6 +49,7 @@ from .util import (
     PYFTPD_VER,
     SQLITE_VER,
     UNPLICATIONS,
+    Daemon,
     align_tab,
     ansi_re,
     dedent,
@@ -469,6 +470,16 @@ def disable_quickedit() -> None:
         if mode & 4 != 4:
             atexit.register(cmode, True, orig_out)
             cmode(True, mode | 4)
+
+
+def sfx_tpoke(top: str):
+    files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
+    while True:
+        t = int(time.time())
+        for f in [top] + files:
+            os.utime(f, (t, t))
+
+        time.sleep(78123)
 
 
 def showlic() -> None:
@@ -1453,6 +1464,12 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
 
     if EXE:
         print("pybin: {}\n".format(pybin), end="")
+
+    for n, zs in enumerate(argv):
+        if zs.startswith("--sfx-tpoke="):
+            Daemon(sfx_tpoke, "sfx-tpoke", (zs.split("=", 1)[1],))
+            argv.pop(n)
+            break
 
     ensure_locale()
 

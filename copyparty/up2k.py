@@ -10,7 +10,6 @@ import math
 import os
 import re
 import shutil
-import signal
 import stat
 import subprocess as sp
 import tempfile
@@ -1659,7 +1658,7 @@ class Up2k(object):
 
         if e2vp and rewark:
             self.hub.retcode = 1
-            os.kill(os.getpid(), signal.SIGTERM)
+            Daemon(self.hub.sigterm)
             raise Exception("{} files have incorrect hashes".format(len(rewark)))
 
         if not e2vu or not rewark:

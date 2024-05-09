@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: latin-1
 from __future__ import print_function, unicode_literals
-import re, os, sys, time, shutil, signal, threading, tarfile, hashlib, platform, tempfile, traceback
+import re, os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile, traceback
 import subprocess as sp
 
 
@@ -368,17 +368,6 @@ def get_payload():
             p = a
 
 
-def utime(top):
-    # avoid cleaners
-    files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
-    while True:
-        t = int(time.time())
-        for f in [top] + files:
-            os.utime(f, (t, t))
-
-        time.sleep(78123)
-
-
 def confirm(rv):
     msg()
     msg("retcode", rv if rv else traceback.format_exc())
@@ -398,9 +387,7 @@ def run(tmp, j2, ftp):
     msg("sfxdir:", tmp)
     msg()
 
-    t = threading.Thread(target=utime, args=(tmp,), name="utime")
-    t.daemon = True
-    t.start()
+    sys.argv.append("--sfx-tpoke=" + tmp)
 
     ld = (("", ""), (j2, "j2"), (ftp, "ftp"), (not PY2, "py2"), (PY37, "py37"))
     ld = [os.path.join(tmp, b) for a, b in ld if not a]

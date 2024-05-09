@@ -463,12 +463,19 @@ class Daemon(threading.Thread):
         r: bool = True,
         ka: Optional[dict[Any, Any]] = None,
     ) -> None:
-        threading.Thread.__init__(
-            self, target=target, name=name, args=a or (), kwargs=ka
-        )
+        threading.Thread.__init__(self, name=name)
+        self.a = a or ()
+        self.ka = ka or {}
+        self.fun = target
         self.daemon = True
         if r:
             self.start()
+
+    def run(self):
+        if not ANYWIN and not PY2:
+            signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1])
+
+        self.fun(*self.a, **self.ka)
 
 
 class Netdev(object):
@@ -864,6 +871,7 @@ class ProgressPrinter(threading.Thread):
         self.start()
 
     def run(self) -> None:
+        sigblock()
         tp = 0
         msg = None
         no_stdout = self.args.q
@@ -1308,6 +1316,13 @@ def log_thrs(log: Callable[[str, str, int], None], ival: float, name: str) -> No
         log(name, "\033[0m \033[33m".join(tv), 3)
 
 
+def sigblock():
+    if ANYWIN or PY2:
+        return
+
+    signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1])
+
+
 def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
     txt0 = txt
     for vol in vols:
@@ -1329,10 +1344,11 @@ def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
 
 def min_ex(max_lines: int = 8, reverse: bool = False) -> str:
     et, ev, tb = sys.exc_info()
-    stb = traceback.extract_tb(tb)
+    stb = traceback.extract_tb(tb) if tb else traceback.extract_stack()[:-1]
     fmt = "%s @ %d <%s>: %s"
     ex = [fmt % (fp.split(os.sep)[-1], ln, fun, txt) for fp, ln, fun, txt in stb]
-    ex.append("[%s] %s" % (et.__name__ if et else "(anonymous)", ev))
+    if et or ev or tb:
+        ex.append("[%s] %s" % (et.__name__ if et else "(anonymous)", ev))
     return "\n".join(ex[-max_lines:][:: -1 if reverse else 1])
 
 

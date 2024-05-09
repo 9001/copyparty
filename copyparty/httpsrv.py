@@ -266,10 +266,7 @@ class HttpSrv(object):
         msg = "subscribed @ {}:{}  f{} p{}".format(hip, port, fno, os.getpid())
         self.log(self.name, msg)
 
-        def fun() -> None:
-            self.broker.say("cb_httpsrv_up")
-
-        threading.Thread(target=fun, name="sig-hsrv-up1").start()
+        Daemon(self.broker.say, "sig-hsrv-up1", ("cb_httpsrv_up",))
 
         while not self.stopping:
             if self.args.log_conn:

@@ -293,13 +293,14 @@ class SvcHub(object):
             from .ftpd import Ftpd
 
             self.ftpd: Optional[Ftpd] = None
-            Daemon(self.start_ftpd, "start_ftpd")
             zms += "f" if args.ftp else "F"
 
         if args.tftp:
             from .tftpd import Tftpd
 
             self.tftpd: Optional[Tftpd] = None
+
+        if args.ftp or args.ftps or args.tftp:
             Daemon(self.start_ftpd, "start_tftpd")
 
         if args.smb:
@@ -388,7 +389,7 @@ class SvcHub(object):
         self.sigterm()
 
     def sigterm(self) -> None:
-        os.kill(os.getpid(), signal.SIGTERM)
+        self.signal_handler(signal.SIGTERM, None)
 
     def cb_httpsrv_up(self) -> None:
         self.httpsrv_up += 1

@@ -127,7 +127,7 @@ class SMB(object):
         self.log("smb", msg, c)
 
     def start(self) -> None:
-        Daemon(self.srv.start)
+        Daemon(self.srv.start, "smbd")
 
     def _auth_cb(self, *a, **ka):
         debug("auth-result: %s %s", a, ka)

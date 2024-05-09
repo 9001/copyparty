@@ -6,7 +6,6 @@ import platform
 import sys
 import tarfile
 import tempfile
-import threading
 import time
 import traceback
 
@@ -80,9 +79,7 @@ def run():
     msg("  rsrc dir:", rsrc)
     msg()
 
-    t = threading.Thread(target=utime, args=(rsrc,), name="utime")
-    t.daemon = True
-    t.start()
+    sys.argv.append("--sfx-tpoke=" + rsrc)
 
     cm(rsrc=rsrc)
 
