@@ -34,8 +34,14 @@ var Ls = {
 		"u2": "time since the last server write$N( upload / rename / ... )$N$N17d = 17 days$N1h23 = 1 hour 23 minutes$N4m56 = 4 minutes 56 seconds",
 		"v2": "use this server as a local HDD$N$NWARNING: this will show your password!",
 	}
-},
-	d = Ls[sread("cpp_lang", ["eng", "nor"]) || lang] || Ls.eng || Ls.nor;
+};
+
+var LANGS = ["eng", "nor"];
+
+if (window.langmod)
+	langmod();
+
+var d = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor;
 
 for (var k in (d || {})) {
 	var f = k.slice(-1),

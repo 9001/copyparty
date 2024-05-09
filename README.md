@@ -230,6 +230,7 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ ...of videos using FFmpeg
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
+  * ☑ multilingual UI (english, norwegian, [add your own](./docs/rice/#translations)))
   * ☑ SPA (browse while uploading)
 * server indexing
   * ☑ [locate files by contents](#file-search)
@@ -1088,7 +1089,7 @@ tweaking the ui
   * to sort in music order (album, track, artist, title) with filename as fallback, you could `--sort tags/Cirle,tags/.tn,tags/Artist,tags/Title,href`
   * to sort by upload date, first enable showing the upload date in the listing with `-e2d -mte +.up_at` and then `--sort tags/.up_at`
 
-see [./docs/rice](./docs/rice) for more, including how to add stuff (css/`<meta>`/...) to the html `<head>` tag
+see [./docs/rice](./docs/rice) for more, including how to add stuff (css/`<meta>`/...) to the html `<head>` tag, or to add your own translation
 
 
 ## opengraph

@@ -141,7 +141,7 @@ var Ls = {
 		"ut_rand": "randomize filenames",
 		"ut_u2ts": "copy the last-modified timestamp$Nfrom your filesystem to the server",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
-		"ut_ask": "ask for confirmation before upload starts",
+		"ut_ask": 'ask for confirmation before upload starts">💭',
 		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
 		"ut_srch": "don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)",
 		"ut_par": "pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck",
@@ -194,20 +194,21 @@ var Ls = {
 		"cl_hpick": "tap on column headers to hide in the table below",
 		"cl_hcancel": "column hiding aborted",
 
-		"ct_thumb": "in grid-view, toggle icons or thumbnails$NHotkey: T",
-		"ct_csel": "use CTRL and SHIFT for file selection in grid-view",
-		"ct_ihop": "when the image viewer is closed, scroll down to the last viewed file",
-		"ct_dots": "show hidden files (if server permits)",
-		"ct_dir1st": "sort folders before files",
-		"ct_readme": "show README.md in folder listings",
-		"ct_idxh": "show index.html instead of folder listing",
-		"ct_sbars": "show scrollbars",
+		"ct_grid": '田 the grid',
+		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
+		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
+		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
+		"ct_dots": 'show hidden files (if server permits)">dotfiles',
+		"ct_dir1st": 'sort folders before files">📁 first',
+		"ct_readme": 'show README.md in folder listings">📜 readme',
+		"ct_idxh": 'show index.html instead of folder listing">htm',
+		"ct_sbars": 'show scrollbars">⟊',
 
-		"cut_umod": "if a file already exists on the server, update the server's last-modified timestamp to match your local file (requires write+delete permissions)",
+		"cut_umod": "if a file already exists on the server, update the server's last-modified timestamp to match your local file (requires write+delete permissions)\">re📅",
 
-		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them",
+		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them\">turbo",
 
-		"cut_datechk": "has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished / corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards",
+		"cut_datechk": "has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished / corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards\">date-chk",
 
 		"cut_flag": "ensure only one tab is uploading at a time $N -- other tabs must have this enabled too $N -- only affects tabs on the same domain",
 
@@ -216,7 +217,7 @@ var Ls = {
 		"cut_nag": "OS notification when upload completes$N(only if the browser or tab is not active)",
 		"cut_sfx": "audible alert when upload completes$N(only if the browser or tab is not active)",
 
-		"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$N30% faster https, 4.5x faster http,$Nand 5.3x faster on android phones",
+		"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$N30% faster https, 4.5x faster http,$Nand 5.3x faster on android phones\">mt",
 
 		"cft_text": "favicon text (blank and refresh to disable)",
 		"cft_fg": "foreground color",
@@ -650,7 +651,7 @@ var Ls = {
 		"ut_rand": "finn opp nye tilfeldige filnavn",
 		"ut_u2ts": "gi filen på serveren samme$Ntidsstempel som lokalt hos deg",
 		"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
-		"ut_ask": "bekreft filutvalg før opplastning starter",
+		"ut_ask": 'bekreft filutvalg før opplastning starter">💭',
 		"ut_pot": "forbedre ytelsen på trege enheter ved å$Nforenkle brukergrensesnittet",
 		"ut_srch": "utfør søk istedenfor å laste opp --$Nleter igjennom alle mappene du har lov til å se",
 		"ut_par": "sett til 0 for å midlertidig stanse opplastning$N$Nhøye verdier (4 eller 8) kan gi bedre ytelse,$Nspesielt på trege internettlinjer$N$Nbør ikke være høyere enn 1 på LAN$Neller hvis serveren sin harddisk er treg",
@@ -703,20 +704,21 @@ var Ls = {
 		"cl_hpick": "klikk på overskriften til kolonnene du ønsker å skjule i tabellen nedenfor",
 		"cl_hcancel": "kolonne-skjuling avbrutt",
 
-		"ct_thumb": "vis miniatyrbilder istedenfor ikoner$NSnarvei: T",
-		"ct_csel": "bruk tastene CTRL og SHIFT for markering av filer i ikonvisning",
-		"ct_ihop": "bla ned til sist viste bilde når bildeviseren lukkes",
-		"ct_dots": "vis skjulte filer (gitt at serveren tillater det)",
-		"ct_dir1st": "sorter slik at mapper kommer foran filer",
-		"ct_readme": "vis README.md nedenfor filene",
-		"ct_idxh": "vis index.html istedenfor fil-liste",
-		"ct_sbars": "vis rullgardiner / skrollefelt",
+		"ct_grid": '田 ikoner',
+		"ct_thumb": 'vis miniatyrbilder istedenfor ikoner$NSnarvei: T">🖼️ bilder',
+		"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
+		"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
+		"ct_dots": 'vis skjulte filer (gitt at serveren tillater det)">.synlig',
+		"ct_dir1st": 'sorter slik at mapper kommer foran filer">📁 først',
+		"ct_readme": 'vis README.md nedenfor filene">📜 readme',
+		"ct_idxh": 'vis index.html istedenfor fil-liste">htm',
+		"ct_sbars": 'vis rullgardiner / skrollefelt">⟊',
 
-		"cut_umod": "i tilfelle en fil du laster opp allerede finnes på serveren, så skal serverens tidsstempel oppdateres slik at det stemmer overens med din lokale fil (krever rettighetene write+delete)",
+		"cut_umod": 'i tilfelle en fil du laster opp allerede finnes på serveren, så skal serverens tidsstempel oppdateres slik at det stemmer overens med din lokale fil (krever rettighetene write+delete)">re📅',
 
-		"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres",
+		"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres\">turbo",
 
-		"cut_datechk": "har ingen effekt dersom turbo er avslått$N$Ngjør turbo bittelitt tryggere ved å sjekke datostemplingen på filene (i tillegg til filstørrelse)$N$N<em>burde</em> oppdage og gjenoppta de fleste ufullstendige opplastninger, men er <em>ikke</em> en fullverdig erstatning for å deaktivere turbo og gjøre en skikkelig sjekk",
+		"cut_datechk": "har ingen effekt dersom turbo er avslått$N$Ngjør turbo bittelitt tryggere ved å sjekke datostemplingen på filene (i tillegg til filstørrelse)$N$N<em>burde</em> oppdage og gjenoppta de fleste ufullstendige opplastninger, men er <em>ikke</em> en fullverdig erstatning for å deaktivere turbo og gjøre en skikkelig sjekk\">date-chk",
 
 		"cut_flag": "samkjører nettleserfaner slik at bare én $N kan holde på med befaring / opplastning $N -- andre faner må også ha denne skrudd på $N -- fungerer kun innenfor samme domene",
 
@@ -725,7 +727,7 @@ var Ls = {
 		"cut_nag": "meldingsvarsel når opplastning er ferdig$N(kun on nettleserfanen ikke er synlig)",
 		"cut_sfx": "lydvarsel når opplastning er ferdig$N(kun on nettleserfanen ikke er synlig)",
 
-		"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$N30% raskere https, 4.5x raskere http,$Nog 5.3x raskere på android-telefoner",
+		"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$N30% raskere https, 4.5x raskere http,$Nog 5.3x raskere på android-telefoner\">mt",
 
 		"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
 		"cft_fg": "farge",
@@ -1022,8 +1024,13 @@ var Ls = {
 		"lang_set": "passer det å laste siden på nytt?",
 	},
 };
-var LANGS = ["eng", "nor"],
-	L = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor;
+
+var LANGS = ["eng", "nor"];
+
+if (window.langmod)
+	langmod();
+
+var L = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor;
 
 for (var a = 0; a < LANGS.length; a++) {
 	for (var b = a + 1; b < LANGS.length; b++) {
@@ -1210,15 +1217,15 @@ ebi('op_cfg').innerHTML = (
 	'	<h3>' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
-	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">田 the grid</a>\n' +
-	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '">🖼️ thumbs</a>\n' +
-	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '">sel</a>\n' +
-	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '">g⮯</a>\n' +
-	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '">dotfiles</a>\n' +
-	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '">📁 first</a>\n' +
-	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '">📜 readme</a>\n' +
-	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '">htm</a>\n' +
-	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '">⟊</a>\n' +
+	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
+	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
+	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
+	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
+	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
+	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '</a>\n' +
+	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
+	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
+	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -1237,11 +1244,11 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="ask_up" class="tgl btn" href="#" tt="' + L.ut_ask + '">💭</a>\n' +
-	'		<a id="umod" class="tgl btn" href="#" tt="' + L.cut_umod + '">re📅</a>\n' +
-	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '">mt</a>\n' +
-	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '">turbo</a>\n' +
-	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '">date-chk</a>\n' +
+	'		<a id="ask_up" class="tgl btn" href="#" tt="' + L.ut_ask + '</a>\n' +
+	'		<a id="umod" class="tgl btn" href="#" tt="' + L.cut_umod + '</a>\n' +
+	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '</a>\n' +
+	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '</a>\n' +
+	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '</a>\n' +
 	'		<a id="flag_en" class="tgl btn" href="#" tt="' + L.cut_flag + '">💤</a>\n' +
 	'		<a id="u2sort" class="tgl btn" href="#" tt="' + L.cut_az + '">az</a>\n' +
 	'		<a id="upnag" class="tgl btn" href="#" tt="' + L.cut_nag + '">🔔</a>\n' +

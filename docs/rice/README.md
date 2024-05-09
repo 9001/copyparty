@@ -55,3 +55,17 @@ to add stuff to the html `<head>`, for example a css `<link>` or `<meta>` tags, 
 if you give it the value `@ASDF` it will try to open a file named ASDF and send the text within
 
 if the value starts with `%` it will assume a jinja2 template and expand it; the template has access to the `HttpCli` object through a property named `this` as well as everything in `j2a` and the stuff added by `self.j2s`; see [browser.html](https://github.com/9001/copyparty/blob/hovudstraum/copyparty/web/browser.html) for inspiration or look under the hood in [httpcli.py](https://github.com/9001/copyparty/blob/hovudstraum/copyparty/httpcli.py)
+
+
+# translations
+
+add your own translations by using the english or norwegian one from `browser.js` as a template
+
+the easy way is to open up and modify `browser.js` in your own installation; depending on how you installed copyparty it might be named `browser.js.gz` instead, in which case just decompress it, restart copyparty, and start editing it anyways
+
+if you're running `copyparty-sfx.py` then you'll find it at `/tmp/pe-copyparty.1000/copyparty/web` (on linux) or `%TEMP%\pe-copyparty\copyparty\web` (on windows)
+* make sure to keep backups of your work religiously! since that location is volatile af
+
+if editing `browser.js` is inconvenient in your setup then you can instead do this:
+* add your translation to a separate javascript file (`tl.js`) and make it load before `browser.js` with the help of `--html-head='<script src="/tl.js"></script>'`
+* as the page loads, `browser.js` will look for a function named `langmod` so define that function and make it insert your translation into the `Ls` and `LANGS` variables so it'll take effect
