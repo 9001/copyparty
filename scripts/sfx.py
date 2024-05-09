@@ -398,7 +398,7 @@ def run(tmp, j2, ftp):
     msg("sfxdir:", tmp)
     msg()
 
-    t = threading.Thread(target=utime, args=(tmp,))
+    t = threading.Thread(target=utime, args=(tmp,), name="utime")
     t.daemon = True
     t.start()
 

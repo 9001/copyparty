@@ -80,7 +80,7 @@ def run():
     msg("  rsrc dir:", rsrc)
     msg()
 
-    t = threading.Thread(target=utime, args=(rsrc,))
+    t = threading.Thread(target=utime, args=(rsrc,), name="utime")
     t.daemon = True
     t.start()
 

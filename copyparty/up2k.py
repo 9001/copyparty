@@ -461,7 +461,13 @@ class Up2k(object):
                 # important; not deferred by db_act
                 timeout = self._check_lifetimes()
 
-            timeout = min(timeout, now + self._check_xiu())
+            try:
+                timeout = min(timeout, now + self._check_xiu())
+            except Exception as ex:
+                if "closed cursor" in str(ex):
+                    self.log("sched_rescan: lost db")
+                    return
+                raise
 
             with self.mutex:
                 for vp, vol in sorted(self.asrv.vfs.all_vols.items()):
