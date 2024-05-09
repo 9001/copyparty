@@ -4804,7 +4804,7 @@ class HttpCli(object):
                 query = "th=%s&cache" % (fmt,)
                 query = ub64enc(query.encode("utf-8")).decode("utf-8")
                 # discord looks at file extension, not content-type...
-                query += "/a.jpg" if "j" in fmt else "/a.webp"
+                query += "/th.jpg" if "j" in fmt else "/th.webp"
                 j2a["og_thumb"] = "%s/.uqe/%s" % (th_base, query)
 
             j2a["og_fn"] = og_fn
@@ -4812,9 +4812,7 @@ class HttpCli(object):
             if og_fn:
                 og_fn_q = quotep(og_fn)
                 query = ub64enc(b"raw").decode("utf-8")
-                if "." in og_fn:
-                    query += "/a.%s" % (og_fn.split(".")[-1])
-
+                query += "/%s" % (og_fn_q,)
                 j2a["og_url"] = ujoin(url_base, og_fn_q)
                 j2a["og_raw"] = j2a["og_url"] + "/.uqe/" + query
             else:
