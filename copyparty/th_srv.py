@@ -322,9 +322,6 @@ class ThumbSrv(object):
                         else:
                             funs.append(self.conv_spec)
 
-            if not png_ok and tpath.endswith(".png"):
-                raise Pebkac(400, "png only allowed for waveforms")
-
             tdir, tfn = os.path.split(tpath)
             ttpath = os.path.join(tdir, "w", tfn)
             try:
@@ -334,6 +331,9 @@ class ThumbSrv(object):
 
             for fun in funs:
                 try:
+                    if not png_ok and tpath.endswith(".png"):
+                        raise Exception("png only allowed for waveforms")
+
                     fun(ap_unpk, ttpath, fmt, vn)
                     break
                 except Exception as ex:

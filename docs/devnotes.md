@@ -134,6 +134,9 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?zip=utf-8` | ...as a zip file |
 | GET | `?zip` | ...as a WinXP-compatible zip file |
 | GET | `?zip=crc` | ...as an MSDOS-compatible zip file |
+| GET | `?tar&w` | pregenerate webp thumbnails |
+| GET | `?tar&j` | pregenerate jpg thumbnails |
+| GET | `?tar&p` | pregenerate audio waveforms |
 | GET | `?ups` | show recent uploads from your IP |
 | GET | `?ups&filter=f` | ...where URL contains `f` |
 | GET | `?mime=foo` | specify return mimetype `foo` |

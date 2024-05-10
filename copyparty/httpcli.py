@@ -3413,7 +3413,7 @@ class HttpCli(object):
         # for f in fgen: print(repr({k: f[k] for k in ["vp", "ap"]}))
         cfmt = ""
         if self.thumbcli and not self.args.no_bacode:
-            for zs in ("opus", "mp3", "w", "j"):
+            for zs in ("opus", "mp3", "w", "j", "p"):
                 if zs in self.ouparam or uarg == zs:
                     cfmt = zs
 
