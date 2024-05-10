@@ -476,7 +476,9 @@ class Daemon(threading.Thread):
 
     def run(self):
         if not ANYWIN and not PY2:
-            signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1])
+            signal.pthread_sigmask(
+                signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
+            )
 
         self.fun(*self.a, **self.ka)
 
@@ -1323,7 +1325,9 @@ def sigblock():
     if ANYWIN or PY2:
         return
 
-    signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1])
+    signal.pthread_sigmask(
+        signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
+    )
 
 
 def vol_san(vols: list["VFS"], txt: bytes) -> bytes:

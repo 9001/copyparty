@@ -1,4 +1,59 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0506-0029  `v1.13.1`  ctrl-v
+
+## new features
+
+* upload files by `ctrl-c` from OS and `ctrl-v` into browser c5f7cfc3
+  * from just about any file manager (windows explorer, thunar on linux, etc.) into the copyparty web-ui
+  * only files, not folders, so drag-drop is still the recommended way
+* empty folders show an "empty folder" banner fdda567f
+* opengraph / discord embeds ea270ab9 36f2c446 48a6789d b15a4ef7
+  * embeds  [audio with covers](https://cd.ocv.me/c/d2/d22/snowy.mp3) , [images](https://cd.ocv.me/c/d2/d22/cover.jpg) , [videos](https://cd.ocv.me/c/d2/d21/no-effect.webm) , [audio without coverart](https://cd.ocv.me/c/d2/bitconnect.mp3) (links to one of the copyparty demoservers where the feature is enabled; link those in discord to test)
+  * images are currently not rendering correctly once clicked on android-discord (works on ios and in browser)
+  * default-disabled because opengraph disables hotlinking by design
+    * enable with `--og` and [see readme](https://github.com/9001/copyparty#opengraph) and [the --help](https://github.com/9001/copyparty/assets/241032/2dabf21e-2470-4e20-8ef0-3821b24be1b6)
+* add option to support base64-encoded url queries parceled into the url location 69517e46
+  * because android-specific discord bugs prevent the use of queries in opengraph tags
+* improve server performance when downloading unfinished uploads, especially on slow storage 70a3cf36
+* add dynamic content into `<head>` using `--html-head` which now takes files and/or jinja templates as input b6cf2d30
+* `--au-vol` (default 50, same as before) sets default audio volume in percent da091aec
+* add **[copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** buildscript 27485a4c
+* support ie4 and the [version of winzip](https://a.ocv.me/pub/g/nerd-stuff/cpp/win311zip.png) you'd find on an average windows 3.11 pc 603d0ed7
+
+## bugfixes
+
+* when logging in from the 403 page, remember and apply the original url hash f8491970
+* the config-reset button in the control-panel didn't clear the dotfiles preference bc2c1e42
+* the search feature could discover and use stale indexes in volumes where indexing was since disabled 95d9e693
+* when in doubt, periodically recheck if filesystems support sparse files f6e693f0
+  * reduces opportunities for confusion on servers with removable media (usb flashdrives)
+
+----
+
+this release introduces **[copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)**, yet another way to bring copyparty where it's needed -- very limited and with many drawbacks (see [readme](https://github.com/9001/copyparty#zipapp)) but may work when the others don't
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0420-2232  `v1.13.0`  race the beam
+
+## new features
+
+* files can be downloaded before the upload has completed ("almost like peer-to-peer")
+  * watch the [release trailer](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) 👌
+  * if the downloader catches up with the upload, the speed is gradually slowed down so it never runs ahead
+  * can be disabled with `--no-pipe`
+* option `--no-db-ip` disables storing the uploader IP in the database bf585078
+* u2c (cli uploader): option `--ow` to overwrite existing files on the server 439cb7f8
+
+## bugfixes
+
+* when running on windows, using the web-UI to abort an upload could fail 8c552f1a
+* rapidly PUT-uploading and then deleting files could crash the file hasher feecb3e0
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0412-2110  `v1.12.2`  ie11 fix
 
 ## new features

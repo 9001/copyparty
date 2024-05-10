@@ -3259,7 +3259,7 @@ function autoplay_blocked(seek) {
 	var tid = mp.au.tid,
 		fn = mp.tracks[tid].split(/\//).pop();
 
-	fn = uricom_dec(fn.replace(/\+/g, ' '));
+	fn = uricom_dec(fn.replace(/\+/g, ' ').split('?')[0]);
 
 	modal.confirm('<h6>' + L.mm_hashplay + '</h6>\n«' + esc(fn) + '»', function () {
 		// chrome 91 may permanently taint on a failed play()
