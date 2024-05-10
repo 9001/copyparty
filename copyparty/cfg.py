@@ -190,6 +190,7 @@ flagcats = {
         "dvthumb": "disables video thumbnails",
         "dathumb": "disables audio thumbnails (spectrograms)",
         "dithumb": "disables image thumbnails",
+        "pngquant": "compress audio waveforms 33% better",
         "thsize": "thumbnail res; WxH",
         "crop": "center-cropping (y/n/fy/fn)",
         "th3x": "3x resolution (y/n/fy/fn)",

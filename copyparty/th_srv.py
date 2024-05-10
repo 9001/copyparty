@@ -593,6 +593,24 @@ class ThumbSrv(object):
         cmd += [fsenc(tpath)]
         self._run_ff(cmd, vn)
 
+        if "pngquant" in vn.flags:
+            wtpath = tpath + ".png"
+            cmd = [
+                b"pngquant",
+                b"--strip",
+                b"--nofs",
+                b"--output", fsenc(wtpath),
+                fsenc(tpath)
+            ]
+            ret = runcmd(cmd, timeout=vn.flags["convt"], nice=True, oom=400)[0]
+            if ret:
+                try:
+                    wunlink(self.log, wtpath,  vn.flags)
+                except:
+                    pass
+            else:
+                wrename(self.log, wtpath, tpath, vn.flags)
+
     def conv_spec(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
         if "ac" not in ret:
