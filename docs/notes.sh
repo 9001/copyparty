@@ -221,6 +221,11 @@ sox -DnV -r8000 -b8 -c1 /dev/shm/a.wav synth 1.1 sin 400 vol 0.02
 # play icon calibration pics
 for w in 150 170 190 210 230 250; do for h in 130 150 170 190 210; do /c/Program\ Files/ImageMagick-7.0.11-Q16-HDRI/magick.exe convert -size ${w}x${h} xc:brown -fill orange -draw "circle $((w/2)),$((h/2)) $((w/2)),$((h/3))" $w-$h.png; done; done
 
+# compress chiptune modules
+mkdir gz; for f in *.*; do pigz -c11 -I100 <"$f" >gz/"$f"gz; touch -r "$f" gz/"$f"gz; done
+mkdir xz; for f in *.*; do xz -cz9 <"$f" >xz/"$f"xz; touch -r "$f" xz/"$f"xz; done
+mkdir z; for f in *.*; do 7z a -tzip -mx=9 -mm=lzma "z/${f}z" "$f" && touch -r "$f" z/"$f"z; done 
+
 
 ##
 ## vscode

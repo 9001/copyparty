@@ -358,6 +358,9 @@ APPLESAN_TXT = r"/(__MACOS|Icon\r\r)|/\.(_|DS_Store|AppleDouble|LSOverride|Docum
 APPLESAN_RE = re.compile(APPLESAN_TXT)
 
 
+VF_CAREFUL = {"mv_re_t": 5, "rm_re_t": 5, "mv_re_r": 0.1, "rm_re_r": 0.1}
+
+
 pybin = sys.executable or ""
 if EXE:
     pybin = ""

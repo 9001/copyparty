@@ -1700,7 +1700,7 @@ catch (ex) { }
 
 
 var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
-	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk)$/i;
+	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|itgz|itxz|itz|m4a|mdgz|mdxz|mdz|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|s3gz|s3xz|s3z|tak|tta|ulaw|wav|wma|wv|xm|xmgz|xmxz|xmz|xpk)$/i;
 
 
 // extract songs + add play column

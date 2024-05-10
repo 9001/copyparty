@@ -240,6 +240,10 @@ class SvcHub(object):
         if not HAVE_FFMPEG or not HAVE_FFPROBE:
             decs.pop("ff", None)
 
+        # compressed formats; "s3z=s3m.zip, s3gz=s3m.gz, ..."
+        zlss = [x.strip().lower().split("=", 1) for x in args.au_unpk.split(",")]
+        args.au_unpk = {x[0]: x[1] for x in zlss}
+
         self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
         want_ff = False
@@ -280,6 +284,8 @@ class SvcHub(object):
             if not re.match("^(0|[qv][0-9]|[0-9]{2,3}k)$", args.q_mp3.lower()):
                 t = "invalid mp3 transcoding quality [%s] specified; only supports [0] to disable, a CBR value such as [192k], or a CQ/CRF value such as [v2]"
                 raise Exception(t % (args.q_mp3,))
+        else:
+            args.au_unpk = {}
 
         args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)
 

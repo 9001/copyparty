@@ -7,12 +7,15 @@ import os
 import shutil
 import subprocess as sp
 import sys
+import tempfile
 
 from .__init__ import ANYWIN, EXE, PY2, WINDOWS, E, unicode
+from .authsrv import VFS
 from .bos import bos
 from .util import (
     FFMPEG_URL,
     REKOBO_LKEY,
+    VF_CAREFUL,
     fsenc,
     min_ex,
     pybin,
@@ -20,12 +23,13 @@ from .util import (
     runcmd,
     sfsenc,
     uncyg,
+    wunlink,
 )
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any, Union
+    from typing import Any, Optional, Union
 
-    from .util import RootLogger
+    from .util import NamedLogger, RootLogger
 
 
 def have_ff(scmd: str) -> bool:
@@ -105,6 +109,51 @@ class MParser(object):
                 continue
 
             raise Exception()
+
+
+def au_unpk(log: "NamedLogger", fmt_map: dict[str, str], abspath: str, vn: Optional[VFS] = None) -> str:
+    ret = ""
+    try:
+        ext = abspath.split(".")[-1].lower()
+        au, pk = fmt_map[ext].split(".")
+
+        fd, ret = tempfile.mkstemp("." + au)
+
+        if pk == "gz":
+            import gzip
+
+            fi = gzip.GzipFile(abspath, mode="rb")
+
+        elif pk == "xz":
+            import lzma
+
+            fi = lzma.open(abspath, "rb")
+
+        elif pk == "zip":
+            import zipfile
+
+            zf = zipfile.ZipFile(abspath, "r")
+            zil = zf.infolist()
+            zil = [x for x in zil if x.filename.lower().split(".")[-1] == au]
+            fi = zf.open(zil[0])
+
+        with os.fdopen(fd, "wb") as fo:
+            while True:
+                buf = fi.read(32768)
+                if not buf:
+                    break
+
+                fo.write(buf)
+
+        return ret
+
+    except Exception as ex:
+        if ret:
+            t = "failed to decompress audio file [%s]: %r"
+            log(t % (abspath, ex))
+            wunlink(log, ret, vn.flags if vn else VF_CAREFUL)
+
+        return abspath
 
 
 def ffprobe(
@@ -281,7 +330,7 @@ class MTag(object):
         or_ffprobe = " or FFprobe"
 
         if self.backend == "mutagen":
-            self.get = self.get_mutagen
+            self._get = self.get_mutagen
             try:
                 from mutagen import version  # noqa: F401
             except:
@@ -290,7 +339,7 @@ class MTag(object):
 
         if self.backend == "ffprobe":
             self.usable = self.can_ffprobe
-            self.get = self.get_ffprobe
+            self._get = self.get_ffprobe
             self.prefer_mt = True
 
             if not HAVE_FFPROBE:
@@ -460,6 +509,17 @@ class MTag(object):
 
         return r1
 
+    def get(self, abspath: str) -> dict[str, Union[str, float]]:
+        ext = abspath.split(".")[-1].lower()
+        if ext not in self.args.au_unpk:
+            return self._get(abspath)
+
+        ap = au_unpk(self.log, self.args.au_unpk, abspath)
+        ret = self._get(ap)
+        if ap != abspath:
+            wunlink(self.log, ap, VF_CAREFUL)
+        return ret
+
     def get_mutagen(self, abspath: str) -> dict[str, Union[str, float]]:
         ret: dict[str, tuple[int, Any]] = {}
 
@@ -553,10 +613,16 @@ class MTag(object):
         except:
             raise  # might be expected outside cpython
 
+        ext = abspath.split(".")[-1].lower()
+        if ext in self.args.au_unpk:
+            ap = au_unpk(self.log, self.args.au_unpk, abspath)
+        else:
+            ap = abspath
+
         ret: dict[str, Any] = {}
         for tagname, parser in sorted(parsers.items(), key=lambda x: (x[1].pri, x[0])):
             try:
-                cmd = [parser.bin, abspath]
+                cmd = [parser.bin, ap]
                 if parser.bin.endswith(".py"):
                     cmd = [pybin] + cmd
 
@@ -592,5 +658,8 @@ class MTag(object):
                 if self.args.mtag_v:
                     t = "mtag error: tagname {}, parser {}, file {} => {}"
                     self.log(t.format(tagname, parser.bin, abspath, min_ex()))
+
+        if ap != abspath:
+            wunlink(self.log, ap, VF_CAREFUL)
 
         return ret

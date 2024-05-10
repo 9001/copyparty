@@ -28,6 +28,7 @@ from .fsutil import Fstab
 from .mtag import MParser, MTag
 from .util import (
     HAVE_SQLITE3,
+    VF_CAREFUL,
     SYMTIME,
     Daemon,
     MTHash,
@@ -88,9 +89,6 @@ CV_EXTS = set(zsg.split(","))
 
 
 HINT_HISTPATH = "you could try moving the database to another location (preferably an SSD or NVME drive) using either the --hist argument (global option for all volumes), or the hist volflag (just for this volume)"
-
-
-VF_CAREFUL = {"mv_re_t": 5, "rm_re_t": 5, "mv_re_r": 0.1, "rm_re_r": 0.1}
 
 
 class Dbw(object):

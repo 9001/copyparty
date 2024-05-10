@@ -15,7 +15,7 @@ from queue import Queue
 from .__init__ import ANYWIN, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
-from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, ffprobe
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, ffprobe
 from .util import BytesIO  # type: ignore
 from .util import (
     FFMPEG_URL,
@@ -297,6 +297,12 @@ class ThumbSrv(object):
             ext = abspath.split(".")[-1].lower()
             png_ok = False
             funs = []
+
+            if ext in self.args.au_unpk:
+                ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
+            else:
+                ap_unpk = abspath
+
             if not bos.path.exists(tpath):
                 for lib in self.args.th_dec:
                     if lib == "pil" and ext in self.fmt_pil:
@@ -328,7 +334,7 @@ class ThumbSrv(object):
 
             for fun in funs:
                 try:
-                    fun(abspath, ttpath, fmt, vn)
+                    fun(ap_unpk, ttpath, fmt, vn)
                     break
                 except Exception as ex:
                     msg = "{} could not create thumbnail of {}\n{}"
@@ -345,6 +351,9 @@ class ThumbSrv(object):
                             wunlink(self.log, ttpath, vn.flags)
                         except:
                             pass
+
+            if abspath != ap_unpk:
+                wunlink(self.log, ap_unpk, vn.flags)
 
             try:
                 wrename(self.log, ttpath, tpath, vn.flags)
