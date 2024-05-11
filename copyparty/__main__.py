@@ -173,8 +173,10 @@ def init_E(EE: EnvParams) -> None:
             (os.environ.get, "TMP"),
             (unicode, "/tmp"),
         ]
+        errs = []
         for chk in [os.listdir, os.mkdir]:
-            for pf, pa in paths:
+            for npath, (pf, pa) in enumerate(paths):
+                p = ""
                 try:
                     p = pf(pa)
                     # print(chk.__name__, p, pa)
@@ -187,9 +189,20 @@ def init_E(EE: EnvParams) -> None:
                     if not os.path.isdir(p):
                         os.mkdir(p)
 
+                    if npath > 1:
+                        t = "Using [%s] for config; filekeys/dirkeys will change on every restart. Consider setting XDG_CONFIG_HOME or giving the unix-user a ~/.config/"
+                        errs.append(t % (p,))
+                    elif errs:
+                        errs.append("Using [%s] instead" % (p,))
+
+                    if errs:
+                        print("WARNING: " + ". ".join(errs))
+
                     return p  # type: ignore
-                except:
-                    pass
+                except Exception as ex:
+                    if p and npath < 2:
+                        t = "Unable to store config in [%s] due to %r"
+                        errs.append(t % (p, ex))
 
         raise Exception("could not find a writable path for config")
 
