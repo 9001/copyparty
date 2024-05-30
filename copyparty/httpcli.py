@@ -759,7 +759,6 @@ class HttpCli(object):
             is_jinja = True
 
         if is_jinja:
-            print("applying jinja")
             with self.conn.hsrv.mutex:
                 if html not in self.conn.hsrv.j2:
                     j2env = jinja2.Environment()
@@ -3423,7 +3422,7 @@ class HttpCli(object):
 
         bgen = packer(
             self.log,
-            self.args,
+            self.asrv,
             fgen,
             utf8="utf" in uarg,
             pre_crc="crc" in uarg,

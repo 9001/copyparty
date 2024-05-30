@@ -1,12 +1,12 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import argparse
 import calendar
 import stat
 import time
 import zlib
 
+from .authsrv import AuthSrv
 from .bos import bos
 from .sutil import StreamArc, errdesc
 from .util import min_ex, sanitize_fn, spack, sunpack, yieldfile
@@ -219,13 +219,13 @@ class StreamZip(StreamArc):
     def __init__(
         self,
         log: "NamedLogger",
-        args: argparse.Namespace,
+        asrv: AuthSrv,
         fgen: Generator[dict[str, Any], None, None],
         utf8: bool = False,
         pre_crc: bool = False,
         **kwargs: Any
     ) -> None:
-        super(StreamZip, self).__init__(log, args, fgen)
+        super(StreamZip, self).__init__(log, asrv, fgen)
 
         self.utf8 = utf8
         self.pre_crc = pre_crc
@@ -302,7 +302,7 @@ class StreamZip(StreamArc):
                 mbuf = b""
 
             if errors:
-                errf, txt = errdesc(errors)
+                errf, txt = errdesc(self.asrv.vfs, errors)
                 self.log("\n".join(([repr(errf)] + txt[1:])))
                 for x in self.ser(errf):
                     yield x

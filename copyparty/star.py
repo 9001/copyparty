@@ -1,13 +1,13 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import argparse
 import re
 import stat
 import tarfile
 
 from queue import Queue
 
+from .authsrv import AuthSrv
 from .bos import bos
 from .sutil import StreamArc, errdesc
 from .util import Daemon, fsenc, min_ex
@@ -45,12 +45,12 @@ class StreamTar(StreamArc):
     def __init__(
         self,
         log: "NamedLogger",
-        args: argparse.Namespace,
+        asrv: AuthSrv,
         fgen: Generator[dict[str, Any], None, None],
         cmp: str = "",
         **kwargs: Any
     ):
-        super(StreamTar, self).__init__(log, args, fgen)
+        super(StreamTar, self).__init__(log, asrv, fgen)
 
         self.ci = 0
         self.co = 0
@@ -148,7 +148,7 @@ class StreamTar(StreamArc):
                 errors.append((f["vp"], ex))
 
         if errors:
-            self.errf, txt = errdesc(errors)
+            self.errf, txt = errdesc(self.asrv.vfs, errors)
             self.log("\n".join(([repr(self.errf)] + txt[1:])))
             self.ser(self.errf)
 

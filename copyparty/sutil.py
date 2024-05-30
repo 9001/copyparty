@@ -1,15 +1,15 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import argparse
 import os
 import tempfile
 from datetime import datetime
 
 from .__init__ import CORES
+from .authsrv import AuthSrv, VFS
 from .bos import bos
 from .th_cli import ThumbCli
-from .util import UTC, vjoin
+from .util import UTC, vjoin, vol_san
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Generator, Optional
@@ -21,12 +21,13 @@ class StreamArc(object):
     def __init__(
         self,
         log: "NamedLogger",
-        args: argparse.Namespace,
+        asrv: AuthSrv,
         fgen: Generator[dict[str, Any], None, None],
         **kwargs: Any
     ):
         self.log = log
-        self.args = args
+        self.asrv = asrv
+        self.args = asrv.args
         self.fgen = fgen
         self.stopped = False
 
@@ -103,15 +104,18 @@ def enthumb(
     return f
 
 
-def errdesc(errors: list[tuple[str, str]]) -> tuple[dict[str, Any], list[str]]:
+def errdesc(vfs: VFS, errors: list[tuple[str, str]]) -> tuple[dict[str, Any], list[str]]:
     report = ["copyparty failed to add the following files to the archive:", ""]
 
     for fn, err in errors:
         report.extend([" file: {}".format(fn), "error: {}".format(err), ""])
 
+    btxt = "\r\n".join(report).encode("utf-8", "replace")
+    btxt = vol_san(list(vfs.all_vols.values()), btxt)
+
     with tempfile.NamedTemporaryFile(prefix="copyparty-", delete=False) as tf:
         tf_path = tf.name
-        tf.write("\r\n".join(report).encode("utf-8", "replace"))
+        tf.write(btxt)
 
     dt = datetime.now(UTC).strftime("%Y-%m%d-%H%M%S")
 
