@@ -673,8 +673,8 @@ class ThumbSrv(object):
             raise Exception("disabled in server config")
 
         self.wait4ram(0.2, tpath)
-        ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in ret:
+        tags, rawtags = ffprobe(abspath, int(vn.flags["convt"] / 2))
+        if "ac" not in tags:
             raise Exception("not audio")
 
         if quality.endswith("k"):
@@ -695,7 +695,7 @@ class ThumbSrv(object):
             b"-v", b"error",
             b"-hide_banner",
             b"-i", fsenc(abspath),
-            b"-map_metadata", b"-1",
+        ] + self.big_tags(rawtags) + [
             b"-map", b"0:a:0",
             b"-ar", b"44100",
             b"-ac", b"2",
@@ -711,16 +711,16 @@ class ThumbSrv(object):
             raise Exception("disabled in server config")
 
         self.wait4ram(0.2, tpath)
-        ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in ret:
+        tags, rawtags = ffprobe(abspath, int(vn.flags["convt"] / 2))
+        if "ac" not in tags:
             raise Exception("not audio")
 
         try:
-            dur = ret[".dur"][1]
+            dur = tags[".dur"][1]
         except:
             dur = 0
 
-        src_opus = abspath.lower().endswith(".opus") or ret["ac"][1] == "opus"
+        src_opus = abspath.lower().endswith(".opus") or tags["ac"][1] == "opus"
         want_caf = tpath.endswith(".caf")
         tmp_opus = tpath
         if want_caf:
@@ -741,7 +741,7 @@ class ThumbSrv(object):
                 b"-v", b"error",
                 b"-hide_banner",
                 b"-i", fsenc(abspath),
-                b"-map_metadata", b"-1",
+            ] + self.big_tags(rawtags) + [
                 b"-map", b"0:a:0",
                 b"-c:a", b"libopus",
                 b"-b:a", bq,
@@ -797,6 +797,16 @@ class ThumbSrv(object):
                 wunlink(self.log, tmp_opus, vn.flags)
             except:
                 pass
+
+    def big_tags(self, raw_tags: dict[str, list[str]]) -> list[bytes]:
+        ret = []
+        for k, vs in raw_tags.items():
+            for v in vs:
+                if len(str(v)) >= 1024:
+                    bv = (k + "=").encode("utf-8", "replace")
+                    ret += [b"-metadata", bv]
+                    break
+        return ret
 
     def poke(self, tdir: str) -> None:
         if not self.poke_cd.poke(tdir):
