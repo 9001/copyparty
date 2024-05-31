@@ -106,7 +106,7 @@ class ThumbCli(object):
                 sfmt += "3" if "3" in fmt else ""
 
             fmt = sfmt
-        
+
         elif fmt[:1] == "p" and not is_au:
             t = "cannot thumbnail [%s]: png only allowed for waveforms"
             self.log(t % (rem), 6)

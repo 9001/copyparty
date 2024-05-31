@@ -104,7 +104,9 @@ def enthumb(
     return f
 
 
-def errdesc(vfs: VFS, errors: list[tuple[str, str]]) -> tuple[dict[str, Any], list[str]]:
+def errdesc(
+    vfs: VFS, errors: list[tuple[str, str]]
+) -> tuple[dict[str, Any], list[str]]:
     report = ["copyparty failed to add the following files to the archive:", ""]
 
     for fn, err in errors:

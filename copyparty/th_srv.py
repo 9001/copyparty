@@ -599,13 +599,14 @@ class ThumbSrv(object):
                 b"pngquant",
                 b"--strip",
                 b"--nofs",
-                b"--output", fsenc(wtpath),
-                fsenc(tpath)
+                b"--output",
+                fsenc(wtpath),
+                fsenc(tpath),
             ]
             ret = runcmd(cmd, timeout=vn.flags["convt"], nice=True, oom=400)[0]
             if ret:
                 try:
-                    wunlink(self.log, wtpath,  vn.flags)
+                    wunlink(self.log, wtpath, vn.flags)
                 except:
                     pass
             else:
@@ -803,8 +804,8 @@ class ThumbSrv(object):
         for k, vs in raw_tags.items():
             for v in vs:
                 if len(str(v)) >= 1024:
-                    bv = (k + "=").encode("utf-8", "replace")
-                    ret += [b"-metadata", bv]
+                    bv = k.encode("utf-8", "replace")
+                    ret += [b"-metadata", bv + b"="]
                     break
         return ret
 

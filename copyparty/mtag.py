@@ -111,7 +111,9 @@ class MParser(object):
             raise Exception()
 
 
-def au_unpk(log: "NamedLogger", fmt_map: dict[str, str], abspath: str, vn: Optional[VFS] = None) -> str:
+def au_unpk(
+    log: "NamedLogger", fmt_map: dict[str, str], abspath: str, vn: Optional[VFS] = None
+) -> str:
     ret = ""
     try:
         ext = abspath.split(".")[-1].lower()
