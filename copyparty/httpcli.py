@@ -3193,7 +3193,14 @@ class HttpCli(object):
 
             sendfun = sendfile_kern if use_sendfile else sendfile_py
             remains = sendfun(
-                self.log, lower, upper, f, self.s, self.args.s_wr_sz, self.args.s_wr_slp
+                self.log,
+                lower,
+                upper,
+                f,
+                self.s,
+                self.args.s_wr_sz,
+                self.args.s_wr_slp,
+                not self.args.no_poll,
             )
 
         if remains > 0:

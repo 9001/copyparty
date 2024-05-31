@@ -2517,6 +2517,7 @@ def sendfile_py(
     s: socket.socket,
     bufsz: int,
     slp: int,
+    use_poll: bool,
 ) -> int:
     remains = upper - lower
     f.seek(lower)
@@ -2545,22 +2546,31 @@ def sendfile_kern(
     s: socket.socket,
     bufsz: int,
     slp: int,
+    use_poll: bool,
 ) -> int:
     out_fd = s.fileno()
     in_fd = f.fileno()
     ofs = lower
     stuck = 0.0
+    if use_poll:
+        poll = select.poll()
+        poll.register(out_fd, select.POLLOUT)
+
     while ofs < upper:
         stuck = stuck or time.time()
         try:
             req = min(2 ** 30, upper - ofs)
-            select.select([], [out_fd], [], 10)
+            if use_poll:
+                poll.poll(10000)
+            else:
+                select.select([], [out_fd], [], 10)
             n = os.sendfile(out_fd, in_fd, ofs, req)
             stuck = 0
         except OSError as ex:
             # client stopped reading; do another select
             d = time.time() - stuck
             if d < 3600 and ex.errno == errno.EWOULDBLOCK:
+                time.sleep(0.02)
                 continue
 
             n = 0

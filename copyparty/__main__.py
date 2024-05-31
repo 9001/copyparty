@@ -13,6 +13,7 @@ import base64
 import locale
 import os
 import re
+import select
 import socket
 import sys
 import threading
@@ -1335,6 +1336,8 @@ def add_debug(ap):
     ap2 = ap.add_argument_group('debug options')
     ap2.add_argument("--vc", action="store_true", help="verbose config file parser (explain config)")
     ap2.add_argument("--cgen", action="store_true", help="generate config file from current config (best-effort; probably buggy)")
+    if hasattr(select, "poll"):
+        ap2.add_argument("--no-poll", action="store_true", help="kernel-bug workaround: disable poll; use select instead (limits max num clients to ~700)")
     ap2.add_argument("--no-sendfile", action="store_true", help="kernel-bug workaround: disable sendfile; do a safe and slow read-send-loop instead")
     ap2.add_argument("--no-scandir", action="store_true", help="kernel-bug workaround: disable scandir; do a listdir + stat on each file instead")
     ap2.add_argument("--no-fastboot", action="store_true", help="wait for initial filesystem indexing before accepting client requests")
@@ -1545,7 +1548,7 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
         if hard > 0:  # -1 == infinite
             nc = min(nc, int(hard / 4))
     except:
-        nc = 512
+        nc = 486  # mdns/ssdp restart headroom; select() maxfd is 512 on windows
 
     retry = False
     for fmtr in [RiceFormatter, RiceFormatter, Dodge11874, BasicDodge11874]:
@@ -1637,6 +1640,9 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
 
     if not hasattr(os, "sendfile"):
         al.no_sendfile = True
+
+    if not hasattr(select, "poll"):
+        al.no_poll = True
 
     # signal.signal(signal.SIGINT, sighandler)
 

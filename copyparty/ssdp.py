@@ -141,9 +141,29 @@ class SSDPd(MCast):
         self.log("stopped", 2)
 
     def run2(self) -> None:
+        try:
+            if self.args.no_poll:
+                raise Exception()
+            fd2sck = {}
+            srvpoll = select.poll()
+            for sck in self.srv:
+                fd = sck.fileno()
+                fd2sck[fd] = sck
+                srvpoll.register(fd, select.POLLIN)
+        except Exception as ex:
+            srvpoll = None
+            if not self.args.no_poll:
+                t = "WARNING: failed to poll(), will use select() instead: %r"
+                self.log(t % (ex,), 3)
+
         while self.running:
-            rdy = select.select(self.srv, [], [], self.args.z_chk or 180)
-            rx: list[socket.socket] = rdy[0]  # type: ignore
+            if srvpoll:
+                pr = srvpoll.poll((self.args.z_chk or 180) * 1000)
+                rx = [fd2sck[x[0]] for x in pr if x[1] & select.POLLIN]
+            else:
+                rdy = select.select(self.srv, [], [], self.args.z_chk or 180)
+                rx: list[socket.socket] = rdy[0]  # type: ignore
+
             self.rxc.cln()
             buf = b""
             addr = ("0", 0)
