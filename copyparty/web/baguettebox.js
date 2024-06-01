@@ -743,6 +743,8 @@ window.baguetteBox = (function () {
             image.volume = clamp(fcfg_get('vol', dvol / 100), 0, 1);
             image.setAttribute('controls', 'controls');
             image.onended = vidEnd;
+            image.onplay = function () { show_buttons(1); };
+            image.onpause = function () { show_buttons(); };
         }
         image.alt = thumbnailElement ? thumbnailElement.alt || '' : '';
         if (options.titleTag && imageCaption)
@@ -988,6 +990,12 @@ window.baguetteBox = (function () {
         }
     }
 
+    function show_buttons(v) {
+        clmod(ebi('bbox-btns'), 'off', v);
+        clmod(btnPrev, 'off', v);
+        clmod(btnNext, 'off', v);
+    }
+
     function bounceAnimation(direction) {
         slider.className = options.animation == 'slideIn' ? 'bounce-from-' + direction : 'eog';
         setTimeout(function () {
@@ -1051,10 +1059,8 @@ window.baguetteBox = (function () {
             if (fx > 0.7)
                 return showNextImage();
 
-            clmod(ebi('bbox-btns'), 'off', 't');
-            clmod(btnPrev, 'off', 't');
-            clmod(btnNext, 'off', 't');
-
+            show_buttons('t');
+            
             if (Date.now() - ctime <= 500 && !IPHONE)
                 tglfull();
 

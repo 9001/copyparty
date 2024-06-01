@@ -2047,8 +2047,8 @@ var pbar = (function () {
 		r.buf = canvas_cfg(ebi('barbuf'));
 		r.pos = canvas_cfg(ebi('barpos'));
 		r.buf.ctx.font = '.5em sans-serif';
-		r.pos.ctx.font = '1em sans-serif';
-		r.pos.ctx.strokeStyle = 'rgba(24,56,0,0.4)';
+		r.pos.ctx.font = '.9em sans-serif';
+		r.pos.ctx.strokeStyle = 'rgba(24,56,0,0.5)';
 		r.drawbuf();
 		r.drawpos();
 		if (!r.pos.can.onmouseleave)
@@ -2214,7 +2214,7 @@ var pbar = (function () {
 		var m1 = pctx.measureText(t1),
 			m1b = pctx.measureText(t1 + ":88"),
 			m2 = pctx.measureText(t2),
-			yt = pc.h / 3 * 2.1,
+			yt = pc.h * 0.94,
 			xt1 = pc.w - (m1.width + 12),
 			xt2 = x < m1.width * 1.4 ? (x + 12) : (Math.min(pc.w - m1b.width, x - 12) - m2.width);
 
