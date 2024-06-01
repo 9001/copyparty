@@ -358,6 +358,18 @@ APPLESAN_TXT = r"/(__MACOS|Icon\r\r)|/\.(_|DS_Store|AppleDouble|LSOverride|Docum
 APPLESAN_RE = re.compile(APPLESAN_TXT)
 
 
+HUMANSIZE_UNITS = ("B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB")
+
+UNHUMANIZE_UNITS = {
+    "b": 1,
+    "k": 1024,
+    "m": 1024 * 1024,
+    "g": 1024 * 1024 * 1024,
+    "t": 1024 * 1024 * 1024 * 1024,
+    "p": 1024 * 1024 * 1024 * 1024 * 1024,
+    "e": 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+}
+
 VF_CAREFUL = {"mv_re_t": 5, "rm_re_t": 5, "mv_re_r": 0.1, "rm_re_r": 0.1}
 
 
@@ -1808,7 +1820,7 @@ def gencookie(k: str, v: str, r: str, tls: bool, dur: int = 0, txt: str = "") ->
 
 
 def humansize(sz: float, terse: bool = False) -> str:
-    for unit in ["B", "KiB", "MiB", "GiB", "TiB"]:
+    for unit in HUMANSIZE_UNITS:
         if sz < 1024:
             break
 
@@ -1829,12 +1841,7 @@ def unhumanize(sz: str) -> int:
         pass
 
     mc = sz[-1:].lower()
-    mi = {
-        "k": 1024,
-        "m": 1024 * 1024,
-        "g": 1024 * 1024 * 1024,
-        "t": 1024 * 1024 * 1024 * 1024,
-    }.get(mc, 1)
+    mi = UNHUMANIZE_UNITS.get(mc, 1)
     return int(float(sz[:-1]) * mi)
 
 

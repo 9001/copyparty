@@ -1617,11 +1617,14 @@ class AuthSrv(object):
                 use = True
                 lim.nosub = True
 
-            zs = vol.flags.get("df") or (
-                "{}g".format(self.args.df) if self.args.df else ""
-            )
-            if zs:
+            zs = vol.flags.get("df") or self.args.df or ""
+            if zs not in ("", "0"):
                 use = True
+                try:
+                    _ = float(zs)
+                    zs = "%sg" % (zs)
+                except:
+                    pass
                 lim.dfl = unhumanize(zs)
 
             zs = vol.flags.get("sz")
