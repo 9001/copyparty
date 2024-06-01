@@ -1,4 +1,56 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0510-1431  `v1.13.2`  s3xmodit.zip
+
+## new features
+
+* play [compressed](https://a.ocv.me/pub/demo/music/chiptunes/compressed/#af-99f0c0e4) s3xmodit chiptunes/modules c0466279
+  * can now read gz/xz/zip-compressed s3m/xm/mod/it songs
+  * new filetypes supported: mdz, mdgz, mdxz, s3z, s3gz, s3xz, xmz, xmgz, xmxz, itz, itgz, itxz
+  * and if you need to fit even more tracks on the mixtape, [try mo3](https://a.ocv.me/pub/demo/music/chiptunes/compressed/#af-0bc9b877)
+* option to batch-convert audio waveforms 38e4fdfe
+* volflag to improve audio waveform compression with pngquant 82ce6862
+* option to add or change mappings from file-extensions to mimetypes 560d7b66
+* export and publish the `--help` text for online viewing 560d7b66
+  * now available [as html](https://ocv.me/copyparty/helptext.html) and as [plaintext](https://ocv.me/copyparty/helptext.txt), includes many features not documented in the readme
+* another way to add your own UI translations 19d156ff
+
+## bugfixes
+
+* ensure OS signals are immediately received and processed 87c60a1e
+  * things like reload and shutdown signals from systemd could get lost/stuck
+* fix mimetype detection for uppercase file extensions 565daee9
+* when clicking a `.ts` file in the gridview, don't open it as text 925c7f0a
+  * ...as it's probably an mpeg transport-stream, not a typescript file
+* be less aggressive in dropping volume caches e396c5c2
+  * very minor performance gain, only really relevant if you're doing something like burning a copyparty volume onto a CD
+  * previously, adding or removing any volume at all was enough to drop covers cache for all volumes; now this only happens if an intersecting volume is added/removed
+
+## other changes
+
+* updated dompurify to 3.1.2 566cbb65
+* opengraph: add the full filename as url suffix 5c1e2390
+  * so discord picks a good filename when saving an image
+
+----
+
+# 💾 what to download?
+| download link | is it good? | description |
+| -- | -- | -- |
+| **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** | ✅ the best 👍 | runs anywhere! only needs python |
+| [a docker image](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker/README.md) | it's ok | good if you prefer docker 🐋 |
+| [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) |  ⚠️ [acceptable](https://github.com/9001/copyparty#copypartyexe) | for [win8](https://user-images.githubusercontent.com/241032/221445946-1e328e56-8c5b-44a9-8b9f-dee84d942535.png) or later; built-in thumbnailer |
+| [u2c.exe](https://github.com/9001/copyparty/releases/download/v1.13.0/u2c.exe) | ⚠️ acceptable | [CLI uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) as a win7+ exe ([video](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm)) |
+| [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz) | ⚠️ acceptable | similar to the regular sfx, [mostly worse](https://github.com/9001/copyparty#zipapp) |
+| [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) | ⛔️ [dangerous](https://github.com/9001/copyparty#copypartyexe) | for [win7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png) -- never expose to the internet! |
+| [cpp-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.10.1/copyparty-winpe64.exe) | ⛔️ dangerous | runs on [64bit WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png), otherwise useless |
+
+* except for [u2c.exe](https://github.com/9001/copyparty/releases/download/v1.13.0/u2c.exe), all of the options above are mostly equivalent
+* the zip and tar.gz files below are just source code
+* python packages are available at [PyPI](https://pypi.org/project/copyparty/#files)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0506-0029  `v1.13.1`  ctrl-v
 
 ## new features
@@ -30,7 +82,7 @@
 
 ----
 
-this release introduces **[copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)**, yet another way to bring copyparty where it's needed -- very limited and with many drawbacks (see [readme](https://github.com/9001/copyparty#zipapp)) but may work when the others don't
+this release introduces **[copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)**, yet another way to bring copyparty where it's needed -- very limited and with many drawbacks (see [readme](https://github.com/9001/copyparty#zipapp)) but may work when the others don't
 
 
 

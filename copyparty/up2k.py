@@ -709,9 +709,9 @@ class Up2k(object):
                 try:
                     bos.makedirs(vol.realpath)  # gonna happen at snap anyways
                     dir_is_empty(self.log_func, not self.args.no_scandir, vol.realpath)
-                except:
+                except Exception as ex:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
-                    self.log("cannot access " + vol.realpath, c=1)
+                    self.log("cannot access %s: %r" % (vol.realpath, ex), c=1)
                     continue
 
                 if scan_vols and vol.vpath not in scan_vols:

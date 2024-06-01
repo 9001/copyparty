@@ -269,6 +269,7 @@ html.bz {
 	--btn-bg: #202231;
 	--btn-h-bg: #2d2f45;
 	--btn-1-bg: #ba2959;
+	--btn-1-is: #f59;
 	--btn-1-fg: #fff;
 	--btn-1h-fg: #000;
 	--txt-sh: a;
@@ -3059,6 +3060,14 @@ html.b #ggrid>a {
 }
 html.b .btn {
 	top: -.1em;
+}
+html.b .btn,
+html.b #u2conf a.b,
+html.b #u2conf input[type="checkbox"]:not(:checked)+label {
+	box-shadow: 0 .05em 0 var(--bg-d3) inset;
+}
+html.b .tgl.btn.on {
+	box-shadow: 0 .05em 0 var(--btn-1-is) inset;
 }
 html.b #op_up2k.srch sup {
 	color: #fc0;
