@@ -607,10 +607,10 @@ function md_newline() {
     var s = linebounds(true),
         ln = s.md.substring(s.n1, s.n2),
         m1 = /^( *)([0-9]+)(\. +)/.exec(ln),
-        m2 = /^[ \t>+-]*(\* )?/.exec(ln),
+        m2 = /^[ \t]*[>+*-]{0,2}[ \t]/.exec(ln),
         drop = dom_src.selectionEnd - dom_src.selectionStart;
 
-    var pre = m2[0];
+    var pre = m2 ? m2[0] : '';
     if (m1 !== null)
         pre = m1[1] + (parseInt(m1[2]) + 1) + m1[3];
 
