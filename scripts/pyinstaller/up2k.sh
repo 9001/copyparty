@@ -37,6 +37,8 @@ grep -E '^from .ssl_ import' $APPDATA/python/python37/site-packages/urllib3/util
     echo golfed
 }
 
+sed -ri 's/(add_argument."-t[de]",.*help=")[^"]+/\1not applicable; HTTPS is disabled in this exe/; s/for some reason/in this exe for safety reasons/' u2c.py
+
 read a b _ < <(awk -F\" '/^S_VERSION =/{$0=$2;sub(/\./," ");print}' < u2c.py)
 sed -r 's/1,2,3,0/'$a,$b,0,0'/;s/1\.2\.3/'$a.$b.0/ <up2k.rc >up2k.rc2
 

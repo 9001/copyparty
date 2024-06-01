@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.17"
-S_BUILD_DT = "2024-05-09"
+S_VERSION = "1.18"
+S_BUILD_DT = "2024-06-01"
 
 """
 u2c.py: upload to copyparty
@@ -1144,7 +1144,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
     ap.add_argument("-v", action="store_true", help="verbose")
-    ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
+    ap.add_argument("-a", metavar="PASSWD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
@@ -1162,8 +1162,8 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("--drd", action="store_true", help="delete remote files during upload instead of afterwards; reduces peak disk space usage, but will reupload instead of detecting renames")
 
     ap = app.add_argument_group("performance tweaks")
-    ap.add_argument("-j", type=int, metavar="THREADS", default=4, help="parallel connections")
-    ap.add_argument("-J", type=int, metavar="THREADS", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
+    ap.add_argument("-j", type=int, metavar="CONNS", default=2, help="parallel connections")
+    ap.add_argument("-J", type=int, metavar="CORES", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles and macos)")
     ap.add_argument("--cd", type=float, metavar="SEC", default=5, help="delay before reattempting a failed handshake/upload")
@@ -1171,7 +1171,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
 
     ap = app.add_argument_group("tls")
-    ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
+    ap.add_argument("-te", metavar="PATH", help="path to ca.pem or cert.pem to expect/verify")
     ap.add_argument("-td", action="store_true", help="disable certificate check")
     # fmt: on
 
@@ -1208,6 +1208,14 @@ source file/folder selection uses rsync syntax, meaning that:
     ar.url = ar.url.rstrip("/") + "/"
     if "://" not in ar.url:
         ar.url = "http://" + ar.url
+    
+    if "https://" in ar.url.lower():
+        try:
+            import ssl, zipfile
+        except:
+            t = "ERROR: https is not available for some reason; please use http"
+            print("\n\n   %s\n\n" % (t,))
+            raise
 
     if ar.a and ar.a.startswith("$"):
         fn = ar.a[1:]
