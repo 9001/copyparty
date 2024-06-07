@@ -2495,7 +2495,7 @@ function mpause(e) {
 		seek_au_mul(x * 1.0 / rect.width);
 	};
 
-	if (!TOUCH)
+	if (!TOUCH) {
 		bar.onwheel = function (e) {
 			var dist = Math.sign(e.deltaY) * 10;
 			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
@@ -2507,6 +2507,19 @@ function mpause(e) {
 			seek_au_rel(dist);
 			ev(e);
 		};
+		ebi('pvol').onwheel = function (e) {
+			var dist = Math.sign(e.deltaY) * 10;
+			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
+				dist = e.deltaY;
+
+			if (!dist || !mp.au)
+				return true;
+
+			mp.setvol(mp.vol + dist / 500);
+			vbar.draw();
+			ev(e);
+		};
+	}
 })();
 
 
