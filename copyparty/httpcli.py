@@ -646,8 +646,12 @@ class HttpCli(object):
                 if not self._check_nonfatal(pex, post):
                     self.keepalive = False
 
-                em = str(ex)
-                msg = em if pex is ex else min_ex()
+                if pex is ex:
+                    em = msg = str(ex)
+                else:
+                    em = repr(ex)
+                    msg = min_ex()
+
                 if pex.code != 404 or self.do_log:
                     self.log(
                         "%s\033[0m, %s" % (msg, self.vpath),
@@ -1904,6 +1908,9 @@ class HttpCli(object):
                 0 if ANYWIN else bos.stat(path).st_ino,
             )[: vfs.flags["fk"]]
 
+        if "media" in self.uparam or "medialinks" in vfs.flags:
+            vsuf += "&v" if vsuf else "?v"
+
         vpath = "/".join([x for x in [vfs.vpath, rem, fn] if x])
         vpath = quotep(vpath)
 
@@ -2684,6 +2691,9 @@ class HttpCli(object):
                     sz,
                     0 if ANYWIN or not ap else bos.stat(ap).st_ino,
                 )[: vfs.flags["fk"]]
+
+            if "media" in self.uparam or "medialinks" in vfs.flags:
+                vsuf += "&v" if vsuf else "?v"
 
             vpath = "{}/{}".format(upload_vpath, lfn).strip("/")
             rel_url = quotep(self.args.RS + vpath) + vsuf
@@ -4163,6 +4173,9 @@ class HttpCli(object):
                 add_og = True
             og_fn = ""
 
+        if "v" in self.uparam:
+            add_og = og_ua = True
+
         if "b" in self.uparam:
             self.out_headers["X-Robots-Tag"] = "noindex, nofollow"
 
@@ -4286,7 +4299,7 @@ class HttpCli(object):
                 (abspath.endswith(".md") or self.can_delete)
                 and "nohtml" not in vn.flags
                 and (
-                    "v" in self.uparam
+                    ("v" in self.uparam and abspath.endswith(".md"))
                     or "edit" in self.uparam
                     or "edit2" in self.uparam
                 )

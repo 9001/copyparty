@@ -141,6 +141,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?ups&filter=f` | ...where URL contains `f` |
 | GET | `?mime=foo` | specify return mimetype `foo` |
 | GET | `?v` | render markdown file at URL |
+| GET | `?v` | open image/video/audio in mediaplayer |
 | GET | `?txt` | get file at URL as plaintext |
 | GET | `?txt=iso-8859-1` | ...with specific charset |
 | GET | `?th` | get image/video at URL as thumbnail |
@@ -169,6 +170,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | mPOST | | `f=FILE` | upload `FILE` into the folder at URL |
 | mPOST | `?j` | `f=FILE` | ...and reply with json |
 | mPOST | `?replace` | `f=FILE` | ...and overwrite existing files |
+| mPOST | `?media` | `f=FILE` | ...and return medialink (not hotlink) |
 | mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
 | POST | `?delete` | | delete URL recursively |
 | jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |

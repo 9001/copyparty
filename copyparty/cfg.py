@@ -144,6 +144,7 @@ flagcats = {
         "maxb=1g,300": "max 1 GiB over 5min (suffixes: b, k, m, g, t)",
         "vmaxb=1g": "total volume size max 1 GiB (suffixes: b, k, m, g, t)",
         "vmaxn=4k": "max 4096 files in volume (suffixes: b, k, m, g, t)",
+        "medialinks": "return medialinks for non-up2k uploads (not hotlinks)",
         "rand": "force randomized filenames, 9 chars long by default",
         "nrand=N": "randomized filenames are N chars long",
         "u2ts=fc": "[f]orce [c]lient-last-modified or [u]pload-time",
