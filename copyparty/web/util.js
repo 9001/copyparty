@@ -2024,6 +2024,9 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status == 404)
         return toast.err(0, prefix + e404 + suf, tag);
 
+    if (!xhr.status && !errtxt)
+        return toast.err(0, prefix + L.xhr0);
+
     if (is_cf && (xhr.status == 403 || xhr.status == 503)) {
         var now = Date.now(), td = now - cf_cha_t;
         if (td < 15000)
