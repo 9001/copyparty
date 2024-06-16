@@ -1047,6 +1047,7 @@ def add_webdav(ap):
 def add_tftp(ap):
     ap2 = ap.add_argument_group('TFTP options (UDP only)')
     ap2.add_argument("--tftp", metavar="PORT", type=int, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
+    ap2.add_argument("--tftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--tftpv", action="store_true", help="verbose")
     ap2.add_argument("--tftpvv", action="store_true", help="verboser")
     ap2.add_argument("--tftp-no-fast", action="store_true", help="debug: disable optimizations")

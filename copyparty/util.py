@@ -231,6 +231,7 @@ IMPLICATIONS = [
     ["e2vu", "e2v"],
     ["e2vp", "e2v"],
     ["e2v", "e2d"],
+    ["tftpvv", "tftpv"],
     ["smbw", "smb"],
     ["smb1", "smb"],
     ["smbvvv", "smbvv"],

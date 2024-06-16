@@ -150,11 +150,6 @@ class Tftpd(object):
 
         self._disarm(fos)
 
-        ip = next((x for x in self.args.i if ":" not in x), None)
-        if not ip:
-            self.log("tftp", "IPv6 not supported for tftp; listening on 0.0.0.0", 3)
-            ip = "0.0.0.0"
-
         self.port = int(self.args.tftp)
         self.srv = []
         self.ips = []
@@ -168,7 +163,7 @@ class Tftpd(object):
         if "::" in ips:
             ips.append("0.0.0.0")
 
-        if self.args.ftp4:
+        if self.args.tftp4:
             ips = [x for x in ips if ":" not in x]
 
         ips = list(ODict.fromkeys(ips))  # dedup
