@@ -490,6 +490,11 @@ while IFS= read -r f; do
 	tmv "$f"
 done
 
+grep -rlE '^class [^(]+:' |
+while IFS= read -r f; do
+	ised 's/(^class [^(:]+):/\1(object):/' "$f"
+done
+
 # up2k goes from 28k to 22k laff
 awk 'BEGIN{gensub(//,"",1)}' </dev/null 2>/dev/null &&
 echo entabbening &&

@@ -15,6 +15,7 @@ from .util import (
     E_ADDR_IN_USE,
     E_ADDR_NOT_AVAIL,
     E_UNREACH,
+    HAVE_IPV6,
     IP6ALL,
     Netdev,
     min_ex,
@@ -111,8 +112,10 @@ class TcpSrv(object):
 
         eps = {
             "127.0.0.1": Netdev("127.0.0.1", 0, "", "local only"),
-            "::1": Netdev("::1", 0, "", "local only"),
         }
+        if HAVE_IPV6:
+            eps["::1"] = Netdev("::1", 0, "", "local only")
+
         nonlocals = [x for x in self.args.i if x not in [k.split("/")[0] for k in eps]]
         if nonlocals:
             try:

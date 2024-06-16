@@ -159,6 +159,17 @@ else:
 
 
 try:
+    socket.inet_pton(socket.AF_INET6, "::1")
+    HAVE_IPV6 = True
+except:
+    def inet_pton(fam, ip):
+        return socket.inet_aton(ip)
+
+    socket.inet_pton = inet_pton
+    HAVE_IPV6 = False
+
+
+try:
     struct.unpack(b">i", b"idgi")
     spack = struct.pack  # type: ignore
     sunpack = struct.unpack  # type: ignore
@@ -2459,6 +2470,9 @@ def build_netmap(csv: str):
         csv += ", 127.0.0.0/8, ::1/128"  # loopback
 
     srcs = [x.strip() for x in csv.split(",") if x.strip()]
+    if not HAVE_IPV6:
+        srcs = [x for x in srcs if ":" not in x]
+
     cidrs = []
     for zs in srcs:
         if not zs.endswith("."):

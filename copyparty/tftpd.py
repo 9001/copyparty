@@ -33,7 +33,7 @@ from partftpy import (
 )
 from partftpy.TftpShared import TftpException
 
-from .__init__ import EXE, TYPE_CHECKING
+from .__init__ import EXE, PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .util import BytesIO, Daemon, ODict, exclude_dotfiles, min_ex, runhook, undot
@@ -95,7 +95,7 @@ class Tftpd(object):
                 TftpServer,
             ]
             cbak = []
-            if not self.args.tftp_no_fast and not EXE:
+            if not self.args.tftp_no_fast and not EXE and not PY2:
                 try:
                     ptn = re.compile(r"(^\s*)log\.debug\(.*\)$")
                     for C in Cs:
@@ -105,7 +105,7 @@ class Tftpd(object):
                         cfn = C.__spec__.origin
                         exec (compile(src2, filename=cfn, mode="exec"), C.__dict__)
                 except Exception:
-                    t = "failed to optimize tftp code; run with --tftp-noopt if there are issues:\n"
+                    t = "failed to optimize tftp code; run with --tftp-no-fast if there are issues:\n"
                     self.log("tftp", t + min_ex(), 3)
                     for n, zd in enumerate(cbak):
                         Cs[n].__dict__ = zd

@@ -42,6 +42,7 @@ from .util import (
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
+    HAVE_IPV6,
     IMPLICATIONS,
     JINJA_VER,
     MIMES,
@@ -293,6 +294,9 @@ def get_ah_salt() -> str:
 
 
 def ensure_locale() -> None:
+    if ANYWIN and PY2:
+        return  # maybe XP, so busted 65001
+
     safe = "en_US.UTF-8"
     for x in [
         safe,
@@ -1593,6 +1597,9 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
     for k1, k2 in UNPLICATIONS:
         if getattr(al, k1):
             setattr(al, k2, False)
+
+    if not HAVE_IPV6 and al.i == "::":
+        al.i = "0.0.0.0"
 
     al.i = al.i.split(",")
     try:
