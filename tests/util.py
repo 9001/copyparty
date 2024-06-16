@@ -43,6 +43,7 @@ if MACOS:
 
 from copyparty.__init__ import E
 from copyparty.__main__ import init_E
+from copyparty.ico import Ico
 from copyparty.u2idx import U2idx
 from copyparty.util import FHC, CachedDict, Garda, Unrecv
 
@@ -161,6 +162,7 @@ class Cfg(Namespace):
             s_wr_sz=256 * 1024,
             sort="href",
             srch_hits=99999,
+            th_covers=["folder.png"],
             th_crop="y",
             th_size="320x256",
             th_x3="n",
@@ -245,7 +247,7 @@ class VHttpConn(object):
         self.bans = {}
         self.freshen_pwd = 0.0
         self.hsrv = VHttpSrv(args, asrv, log)
-        self.ico = None
+        self.ico = Ico(args)
         self.ipa_nm = None
         self.lf_url = None
         self.log_func = log

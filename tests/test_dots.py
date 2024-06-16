@@ -23,7 +23,7 @@ def hdr(query, uname):
     return (h % (query, uname)).encode("utf-8")
 
 
-class TestHttpCli(unittest.TestCase):
+class TestDots(unittest.TestCase):
     def setUp(self):
         self.td = tu.get_ramdisk()
 
@@ -31,7 +31,7 @@ class TestHttpCli(unittest.TestCase):
         os.chdir(tempfile.gettempdir())
         shutil.rmtree(self.td)
 
-    def test(self):
+    def test_dots(self):
         td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
@@ -117,6 +117,214 @@ class TestHttpCli(unittest.TestCase):
         zj = json.loads(self.curl("v?ls", "u1")[1])
         url = "v?k=" + zj["dk"]
         self.assertEqual(self.tarsel(url, "u2", ["f1.txt", "a", ".b"]), "f1.txt")
+
+        shutil.rmtree("v")
+
+    def test_dk_fk(self):
+        # python3 -m unittest tests.test_dots.TestDots.test_dk_fk
+
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = []
+        for k in "dk dks dky fk fka dk,fk dks,fk".split():
+            vcfg += ["{0}:{0}:r.,u1:g,u2:c,{0}".format(k)]
+            zs = "%s/s1/s2" % (k,)
+            os.makedirs(zs)
+
+            with open("%s/f.t1" % (k,), "wb") as f:
+                f.write(b"f1")
+
+            with open("%s/s1/f.t2" % (k,), "wb") as f:
+                f.write(b"f2")
+
+            with open("%s/s1/s2/f.t3" % (k,), "wb") as f:
+                f.write(b"f3")
+
+        self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"])
+        self.asrv = AuthSrv(self.args, self.log)
+
+        dk = {}
+        for d in "dk dks dk,fk dks,fk".split():
+            zj = json.loads(self.curl("%s?ls" % (d,), "u1")[1])
+            dk[d] = zj["dk"]
+
+        ##
+        ## dk
+
+        # should not be able to access dk with wrong dirkey,
+        zs = self.curl("dk?ls&k=%s" % (dk["dks"]), "u2")[1]
+        self.assertEqual(zs, "\nJ2EOT")
+        # so use the right key
+        zs = self.curl("dk?ls&k=%s" % (dk["dk"]), "u2")[1]
+        zj = json.loads(zs)
+        self.assertEqual(len(zj["dirs"]), 0)
+        self.assertEqual(len(zj["files"]), 1)
+        self.assertEqual(zj["files"][0]["href"], "f.t1")
+
+        ##
+        ## dk thumbs
+
+        self.assertIn('">folder</text>', self.curl("dk?th=x", "u1")[1])
+        self.assertIn('">e403</text>', self.curl("dk?th=x", "u2")[1])
+
+        zs = "dk?th=x&k=%s" % (dk["dks"])
+        self.assertIn('">e403</text>', self.curl(zs, "u2")[1])
+
+        zs = "dk?th=x&k=%s" % (dk["dk"])
+        self.assertIn('">folder</text>', self.curl(zs, "u2")[1])
+
+        # fk not enabled, so this should work
+        self.assertIn('">t1</text>', self.curl("dk/f.t1?th=x", "u2")[1])
+        self.assertIn('">t2</text>', self.curl("dk/s1/f.t2?th=x", "u2")[1])
+
+        ##
+        ## dks
+
+        # should not be able to access dks with wrong dirkey,
+        zs = self.curl("dks?ls&k=%s" % (dk["dk"]), "u2")[1]
+        self.assertEqual(zs, "\nJ2EOT")
+        # so use the right key
+        zs = self.curl("dks?ls&k=%s" % (dk["dks"]), "u2")[1]
+        zj = json.loads(zs)
+        self.assertEqual(len(zj["dirs"]), 1)
+        self.assertEqual(len(zj["files"]), 1)
+        self.assertEqual(zj["files"][0]["href"], "f.t1")
+        # dks should return correct dirkey of subfolders;
+        s1 = zj["dirs"][0]["href"]
+        self.assertEqual(s1.split("/")[0], "s1")
+        zs = self.curl("dks/%s&ls" % (s1), "u2")[1]
+        self.assertIn('"s2/?k=', zs)
+
+        ##
+        ## dks thumbs
+
+        self.assertIn('">folder</text>', self.curl("dks?th=x", "u1")[1])
+        self.assertIn('">e403</text>', self.curl("dks?th=x", "u2")[1])
+
+        zs = "dks?th=x&k=%s" % (dk["dk"])
+        self.assertIn('">e403</text>', self.curl(zs, "u2")[1])
+
+        zs = "dks?th=x&k=%s" % (dk["dks"])
+        self.assertIn('">folder</text>', self.curl(zs, "u2")[1])
+
+        # fk not enabled, so this should work
+        self.assertIn('">t1</text>', self.curl("dks/f.t1?th=x", "u2")[1])
+        self.assertIn('">t2</text>', self.curl("dks/s1/f.t2?th=x", "u2")[1])
+
+        ##
+        ## dky
+
+        # doesn't care about keys
+        zs = self.curl("dky?ls&k=ok", "u2")[1]
+        self.assertEqual(zs, self.curl("dky?ls", "u2")[1])
+        zj = json.loads(zs)
+        self.assertEqual(len(zj["dirs"]), 0)
+        self.assertEqual(len(zj["files"]), 1)
+        self.assertEqual(zj["files"][0]["href"], "f.t1")
+
+        ##
+        ## dky thumbs
+
+        self.assertIn('">folder</text>', self.curl("dky?th=x", "u1")[1])
+        self.assertIn('">folder</text>', self.curl("dky?th=x", "u2")[1])
+
+        zs = "dky?th=x&k=%s" % (dk["dk"])
+        self.assertIn('">folder</text>', self.curl(zs, "u2")[1])
+
+        # fk not enabled, so this should work
+        self.assertIn('">t1</text>', self.curl("dky/f.t1?th=x", "u2")[1])
+        self.assertIn('">t2</text>', self.curl("dky/s1/f.t2?th=x", "u2")[1])
+
+        ##
+        ## dk+fk
+
+        # should not be able to access dk with wrong dirkey,
+        zs = self.curl("dk,fk?ls&k=%s" % (dk["dk"]), "u2")[1]
+        self.assertEqual(zs, "\nJ2EOT")
+        # so use the right key
+        zs = self.curl("dk,fk?ls&k=%s" % (dk["dk,fk"]), "u2")[1]
+        zj = json.loads(zs)
+        self.assertEqual(len(zj["dirs"]), 0)
+        self.assertEqual(len(zj["files"]), 1)
+        self.assertEqual(zj["files"][0]["href"][:7], "f.t1?k=")
+
+        ##
+        ## dk+fk thumbs
+
+        self.assertIn('">folder</text>', self.curl("dk,fk?th=x", "u1")[1])
+        self.assertIn('">e403</text>', self.curl("dk,fk?th=x", "u2")[1])
+
+        zs = "dk,fk?th=x&k=%s" % (dk["dk"])
+        self.assertIn('">e403</text>', self.curl(zs, "u2")[1])
+
+        zs = "dk,fk?th=x&k=%s" % (dk["dk,fk"])
+        self.assertIn('">folder</text>', self.curl(zs, "u2")[1])
+
+        # fk enabled, so this should fail
+        self.assertIn('">e404</text>', self.curl("dk,fk/f.t1?th=x", "u2")[1])
+        self.assertIn('">e404</text>', self.curl("dk,fk/s1/f.t2?th=x", "u2")[1])
+
+        # but dk should return correct filekeys, so try that
+        zs = "dk,fk/%s&th=x" % (zj["files"][0]["href"])
+        self.assertIn('">t1</text>', self.curl(zs, "u2")[1])
+
+        ##
+        ## dks+fk
+
+        # should not be able to access dk with wrong dirkey,
+        zs = self.curl("dks,fk?ls&k=%s" % (dk["dk"]), "u2")[1]
+        self.assertEqual(zs, "\nJ2EOT")
+        # so use the right key
+        zs = self.curl("dks,fk?ls&k=%s" % (dk["dks,fk"]), "u2")[1]
+        zj = json.loads(zs)
+        self.assertEqual(len(zj["dirs"]), 1)
+        self.assertEqual(len(zj["files"]), 1)
+        self.assertEqual(zj["dirs"][0]["href"][:6], "s1/?k=")
+        self.assertEqual(zj["files"][0]["href"][:7], "f.t1?k=")
+
+        ##
+        ## dks+fk thumbs
+
+        self.assertIn('">folder</text>', self.curl("dks,fk?th=x", "u1")[1])
+        self.assertIn('">e403</text>', self.curl("dks,fk?th=x", "u2")[1])
+
+        zs = "dks,fk?th=x&k=%s" % (dk["dk"])
+        self.assertIn('">e403</text>', self.curl(zs, "u2")[1])
+
+        zs = "dks,fk?th=x&k=%s" % (dk["dks,fk"])
+        self.assertIn('">folder</text>', self.curl(zs, "u2")[1])
+
+        # subdir s1 without key
+        zs = "dks,fk/s1/?th=x"
+        self.assertIn('">e403</text>', self.curl(zs, "u2")[1])
+
+        # subdir s1 with bad key
+        zs = "dks,fk/s1/?th=x&k=no"
+        self.assertIn('">e403</text>', self.curl(zs, "u2")[1])
+
+        # subdir s1 with correct key
+        zs = "dks,fk/%s&th=x" % (zj["dirs"][0]["href"])
+        self.assertIn('">folder</text>', self.curl(zs, "u2")[1])
+
+        # fk enabled, so this should fail
+        self.assertIn('">e404</text>', self.curl("dks,fk/f.t1?th=x", "u2")[1])
+        self.assertIn('">e404</text>', self.curl("dks,fk/s1/f.t2?th=x", "u2")[1])
+
+        # but dk should return correct filekeys, so try that
+        zs = "dks,fk/%s&th=x" % (zj["files"][0]["href"])
+        self.assertIn('">t1</text>', self.curl(zs, "u2")[1])
+
+        # subdir
+        self.assertIn('">e403</text>', self.curl("dks,fk/s1/?th=x", "u2")[1])
+        self.assertEqual("\nJ2EOT", self.curl("dks,fk/s1/?ls", "u2")[1])
+        zs = "dks,fk/s1%s&th=x" % (zj["files"][0]["href"])
+        zs = self.curl("dks,fk?ls&k=%s" % (dk["dks,fk"]), "u2")[1]
+        zj = json.loads(zs)
+        url = "dks,fk/%s" % zj["dirs"][0]["href"]
+        self.assertIn('"files"', self.curl(url + "&ls", "u2")[1])
+        self.assertEqual("\nJ2EOT", self.curl(url + "x&ls", "u2")[1])
 
     def tardir(self, url, uname):
         top = url.split("?")[0]

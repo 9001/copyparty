@@ -2032,7 +2032,7 @@ class HttpCli(object):
 
         v = self.uparam[k]
 
-        if self._use_dirkey():
+        if self._use_dirkey(self.vn, ""):
             vn = self.vn
             rem = self.rem
         else:
@@ -2953,27 +2953,57 @@ class HttpCli(object):
 
         return file_lastmod, True
 
-    def _use_dirkey(self, ap: str = "") -> bool:
+    def _use_dirkey(self, vn: VFS, ap: str) -> bool:
         if self.can_read or not self.can_get:
             return False
 
-        if self.vn.flags.get("dky"):
+        if vn.flags.get("dky"):
             return True
 
         req = self.uparam.get("k") or ""
         if not req:
             return False
 
-        dk_len = self.vn.flags.get("dk")
+        dk_len = vn.flags.get("dk")
         if not dk_len:
             return False
 
-        ap = ap or self.vn.canonical(self.rem)
+        if not ap:
+            ap = vn.canonical(self.rem)
+
         zs = self.gen_fk(2, self.args.dk_salt, ap, 0, 0)[:dk_len]
         if req == zs:
             return True
 
         t = "wrong dirkey, want %s, got %s\n  vp: %s\n  ap: %s"
+        self.log(t % (zs, req, self.req, ap), 6)
+        return False
+
+    def _use_filekey(self, vn: VFS, ap: str, st: os.stat_result) -> bool:
+        if self.can_read or not self.can_get:
+            return False
+
+        req = self.uparam.get("k") or ""
+        if not req:
+            return False
+
+        fk_len = vn.flags.get("fk")
+        if not fk_len:
+            return False
+
+        if not ap:
+            ap = self.vn.canonical(self.rem)
+
+        alg = 2 if "fka" in vn.flags else 1
+
+        zs = self.gen_fk(
+            alg, self.args.fk_salt, ap, st.st_size, 0 if ANYWIN else st.st_ino
+        )[:fk_len]
+
+        if req == zs:
+            return True
+
+        t = "wrong filekey, want %s, got %s\n  vp: %s\n  ap: %s"
         self.log(t % (zs, req, self.req, ap), 6)
         return False
 
@@ -3864,7 +3894,7 @@ class HttpCli(object):
         dk_sz = False
         if dk:
             vn, rem = vfs.get(top, self.uname, False, False)
-            if vn.flags.get("dks") and self._use_dirkey(vn.canonical(rem)):
+            if vn.flags.get("dks") and self._use_dirkey(vn, vn.canonical(rem)):
                 dk_sz = vn.flags.get("dk")
 
         dots = False
@@ -4188,9 +4218,20 @@ class HttpCli(object):
             if idx and hasattr(idx, "p_end"):
                 icur = idx.get_cur(dbv)
 
+        if "k" in self.uparam or "dky" in vn.flags:
+            if is_dir:
+                use_dirkey = self._use_dirkey(vn, abspath)
+                use_filekey = False
+            else:
+                use_filekey = self._use_filekey(vn, abspath, st)
+                use_dirkey = False
+        else:
+            use_dirkey = use_filekey = False
+
         th_fmt = self.uparam.get("th")
         if self.can_read or (
-            self.can_get and (vn.flags.get("dk") or "fk" not in vn.flags)
+            self.can_get
+            and (use_filekey or use_dirkey or (not is_dir and "fk" not in vn.flags))
         ):
             if th_fmt is not None:
                 nothumb = "dthumb" in dbv.flags
@@ -4270,18 +4311,7 @@ class HttpCli(object):
 
         if not is_dir and (self.can_read or self.can_get):
             if not self.can_read and not fk_pass and "fk" in vn.flags:
-                alg = 2 if "fka" in vn.flags else 1
-                correct = self.gen_fk(
-                    alg,
-                    self.args.fk_salt,
-                    abspath,
-                    st.st_size,
-                    0 if ANYWIN else st.st_ino,
-                )[: vn.flags["fk"]]
-                got = self.uparam.get("k")
-                if got != correct:
-                    t = "wrong filekey, want %s, got %s\n  vp: %s\n  ap: %s"
-                    self.log(t % (correct, got, self.req, abspath), 6)
+                if not use_filekey:
                     return self.tx_404()
 
             if add_og:
@@ -4312,7 +4342,7 @@ class HttpCli(object):
                 )
 
         elif is_dir and not self.can_read:
-            if self._use_dirkey(abspath):
+            if use_dirkey:
                 is_dk = True
             elif not self.can_write:
                 return self.tx_404(True)

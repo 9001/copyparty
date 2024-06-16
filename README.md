@@ -1918,7 +1918,7 @@ volflag `dk` generates dirkeys (per-directory accesskeys) for all folders, grant
 
 volflag `dky` disables the actual key-check, meaning anyone can see the contents of a folder where they have `g` access, but not its subdirectories
 
-* `dk` + `dky` gives the same behavior as if all users with `g` access have full read-access, but subfolders are hidden files (their names start with a dot), so `dky` is an alternative to renaming all the folders for that purpose, maybe just for some users
+* `dk` + `dky` gives the same behavior as if all users with `g` access have full read-access, but subfolders are hidden files (as if their names start with a dot), so `dky` is an alternative to renaming all the folders for that purpose, maybe just for some users
 
 volflag `dks` lets people enter subfolders as well, and also enables download-as-zip/tar
 
