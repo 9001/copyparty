@@ -19,6 +19,7 @@ from .__init__ import PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .util import (
+    VF_CAREFUL,
     Daemon,
     ODict,
     Pebkac,
@@ -30,6 +31,7 @@ from .util import (
     runhook,
     sanitize_fn,
     vjoin,
+    wunlink,
 )
 
 if TYPE_CHECKING:
@@ -37,7 +39,7 @@ if TYPE_CHECKING:
 
 if True:  # pylint: disable=using-constant-test
     import typing
-    from typing import Any, Optional
+    from typing import Any, Optional, Union
 
 
 class FSE(FilesystemError):
@@ -139,6 +141,9 @@ class FtpFs(AbstractedFS):
         self.listdirinfo = self.listdir
         self.chdir(".")
 
+    def log(self, msg: str, c: Union[int, str] = 0) -> None:
+        self.hub.log("ftpd", msg, c)
+
     def v2a(
         self,
         vpath: str,
@@ -207,17 +212,37 @@ class FtpFs(AbstractedFS):
         w = "w" in mode or "a" in mode or "+" in mode
 
         ap = self.rv2a(filename, r, w)[0]
+        self.validpath(ap)
         if w:
             try:
                 st = bos.stat(ap)
                 td = time.time() - st.st_mtime
+                need_unlink = True
             except:
+                need_unlink = False
                 td = 0
 
-            if td < -1 or td > self.args.ftp_wt:
-                raise FSE("Cannot open existing file for writing")
+        if w and need_unlink:
+            if td >= -1 and td <= self.args.ftp_wt:
+                # within permitted timeframe; unlink and accept
+                do_it = True
+            elif self.args.no_del or self.args.ftp_no_ow:
+                # file too old, or overwrite not allowed; reject
+                do_it = False
+            else:
+                # allow overwrite if user has delete permission
+                # (avoids win2000 freaking out and deleting the server copy without uploading its own)
+                try:
+                    self.rv2a(filename, False, True, False, True)
+                    do_it = True
+                except:
+                    do_it = False
 
-        self.validpath(ap)
+            if not do_it:
+                raise FSE("File already exists")
+
+            wunlink(self.log, ap, VF_CAREFUL)
+
         return open(fsenc(ap), mode, self.args.iobuf)
 
     def chdir(self, path: str) -> None:
