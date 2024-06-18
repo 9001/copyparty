@@ -12,7 +12,7 @@ import time
 
 import queue
 
-from .__init__ import ANYWIN, CORES, EXE, MACOS, TYPE_CHECKING, EnvParams
+from .__init__ import ANYWIN, CORES, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
 
 try:
     MNFE = ModuleNotFoundError
@@ -335,11 +335,11 @@ class HttpSrv(object):
 
             try:
                 sck, saddr = srv_sck.accept()
-                cip, cport = saddr[:2]
+                cip = unicode(saddr[0])
                 if cip.startswith("::ffff:"):
                     cip = cip[7:]
 
-                addr = (cip, cport)
+                addr = (cip, saddr[1])
             except (OSError, socket.error) as ex:
                 if self.stopping:
                     break

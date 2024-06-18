@@ -162,6 +162,7 @@ try:
     socket.inet_pton(socket.AF_INET6, "::1")
     HAVE_IPV6 = True
 except:
+
     def inet_pton(fam, ip):
         return socket.inet_aton(ip)
 
