@@ -5867,7 +5867,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
-	bcfg_bind(r, 'csel', 'csel', false);
+	bcfg_bind(r, 'csel', 'csel', dgsel);
 	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
 		r.goto();
 		var xhr = new XHR();

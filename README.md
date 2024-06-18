@@ -580,6 +580,7 @@ in the grid/thumbnail view, if the audio player panel is open, songs will start 
 
 enabling `multiselect` lets you click files to select them, and then shift-click another file for range-select
 * `multiselect` is mostly intended for phones/tablets, but the `sel` option in the `[⚙️] settings` tab is better suited for desktop use, allowing selection by CTRL-clicking and range-selection with SHIFT-click, all without affecting regular clicking
+  * the `sel` option can be made default globally with `--gsel` or per-volume with volflag `gsel`
 
 
 ## zip downloads

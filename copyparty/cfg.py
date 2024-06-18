@@ -35,6 +35,7 @@ def vf_bmap() -> dict[str, str]:
         "e2vp",
         "exp",
         "grid",
+        "gsel",
         "hardlink",
         "magic",
         "no_sb_md",
@@ -214,6 +215,7 @@ flagcats = {
     },
     "client and ux": {
         "grid": "show grid/thumbnails by default",
+        "gsel": "select files in grid by ctrl-click",
         "sort": "default sort order",
         "unlist": "dont list files matching REGEX",
         "html_head=TXT": "includes TXT in the <head>, or @PATH for file at PATH",

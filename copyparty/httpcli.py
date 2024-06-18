@@ -4461,6 +4461,7 @@ class HttpCli(object):
             "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
             "readme": readme,
             "dgrid": "grid" in vf,
+            "dgsel": "gsel" in vf,
             "dsort": vf["sort"],
             "dcrop": vf["crop"],
             "dth3x": vf["th3x"],

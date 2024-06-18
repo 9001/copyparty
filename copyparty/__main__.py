@@ -1313,6 +1313,7 @@ def add_og(ap):
 def add_ui(ap, retry):
     ap2 = ap.add_argument_group('ui options')
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
+    ap2.add_argument("--gsel", action="store_true", help="select files in grid by ctrl-click (volflag=gsel)")
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language; one of the following: \033[32meng nor\033[0m")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use (0..7)")
     ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")
