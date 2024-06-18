@@ -4825,7 +4825,7 @@ class HttpCli(object):
                     break
             if og_fn:
                 ext = og_fn.split(".")[-1].lower()
-                if ext in self.thumbcli.thumbable:
+                if self.thumbcli and ext in self.thumbcli.thumbable:
                     is_pic = (
                         ext in self.thumbcli.fmt_pil
                         or ext in self.thumbcli.fmt_vips

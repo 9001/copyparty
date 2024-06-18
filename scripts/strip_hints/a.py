@@ -47,6 +47,14 @@ def uh(top):
 
 
 def uh1(fp):
+    try:
+        uh2(fp)
+    except:
+        print("failed to process", fp)
+        raise
+
+
+def uh2(fp):
     pr(".")
     cs = strip_file_to_string(fp, no_ast=True, to_empty=True)
 
