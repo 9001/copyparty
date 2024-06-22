@@ -3061,6 +3061,7 @@ var afilt = (function () {
 
 // plays the tid'th audio file on the page
 function play(tid, is_ev, seek) {
+	clearTimeout(mpl.t_eplay);
 	if (mp.order.length == 0)
 		return console.log('no audio found wait what');
 
@@ -3193,7 +3194,7 @@ function play(tid, is_ev, seek) {
 		toast.err(0, esc(L.mm_playerr + basenames(ex)));
 	}
 	clmod(ebi(oid), 'act');
-	setTimeout(next_song, 5000);
+	mpl.t_eplay = setTimeout(next_song, 5000);
 }
 
 
@@ -3271,7 +3272,7 @@ function evau_error(e) {
 		return;
 	}
 
-	setTimeout(next_song, 15000);
+	mpl.t_eplay = setTimeout(next_song, 15000);
 }
 
 
