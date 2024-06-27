@@ -654,7 +654,7 @@ class Up2k(object):
             return False, flags
 
         ret = {k: v for k, v in flags.items() if not k.startswith("e2t")}
-        if ret.keys() == flags.keys():
+        if len(ret) == len(flags):
             return False, flags
 
         return True, ret
