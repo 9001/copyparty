@@ -4,7 +4,7 @@
 #
 # installation:
 #   wget https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py -O /usr/local/bin/copyparty-sfx.py
-#   useradd -r -s /sbin/nologin -d /var/lib/copyparty copyparty
+#   useradd -r -s /sbin/nologin -m -d /var/lib/copyparty copyparty
 #   firewall-cmd --permanent --add-port=3923/tcp  # --zone=libvirt
 #   firewall-cmd --reload
 #   cp -pv copyparty.service /etc/systemd/system/
@@ -12,10 +12,17 @@
 #   restorecon -vr /etc/systemd/system/copyparty.service  # on fedora/rhel
 #   systemctl daemon-reload && systemctl enable --now copyparty
 #
+# every time you edit this file, you must "systemctl daemon-reload"
+# for the changes to take effect and then "systemctl restart copyparty"
+#
 # if it fails to start, first check this: systemctl status copyparty
 # then try starting it while viewing logs:
 #   journalctl -fan 100
 #   tail -Fn 100 /var/log/copyparty/$(date +%Y-%m%d.log)
+#
+# if you run into any issues, for example thumbnails not working,
+# try removing the "some quick hardening" section and then please
+# let me know if that actually helped so we can look into it
 #
 # you may want to:
 #  - change "User=copyparty" and "/var/lib/copyparty/" to another user
