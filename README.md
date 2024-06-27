@@ -83,6 +83,8 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
         * [real-ip](#real-ip) - teaching copyparty how to see client IPs
     * [prometheus](#prometheus) - metrics/stats can be enabled
+    * [other extremely specific features](#other-extremely-specific-features) - you'll never find a use for these
+        * [custom mimetypes](#custom-mimetypes) - change the association of a file extension
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
     * [fedora package](#fedora-package) - does not exist yet
@@ -1526,6 +1528,28 @@ the following options are available to disable some of the metrics:
 * `--nos-unf` disables `cpp_unf_*` for no particular purpose
 
 note: the following metrics are counted incorrectly if multiprocessing is enabled with `-j`: `cpp_http_conns`, `cpp_http_reqs`, `cpp_sus_reqs`, `cpp_active_bans`, `cpp_total_bans`
+
+
+## other extremely specific features
+
+you'll never find a use for these:
+
+
+### custom mimetypes
+
+change the association of a file extension
+
+using commandline args, you can do something like `--mime gif=image/jif` and `--mime ts=text/x.typescript` (can be specified multiple times)
+
+in a config-file, this is the same as:
+
+```yaml
+[global]
+  mime: gif=image/jif
+  mime: ts=text/x.typescript
+```
+
+run copyparty with `--mimes` to list all the default mappings
 
 
 # packages
