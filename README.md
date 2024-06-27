@@ -1446,8 +1446,9 @@ you can either:
 * or do location-based proxying, using `--rp-loc=/stuff` to tell copyparty where it is mounted -- has a slight performance cost and higher chance of bugs
   * if copyparty says `incorrect --rp-loc or webserver config; expected vpath starting with [...]` it's likely because the webserver is stripping away the proxy location from the request URLs -- see the `ProxyPass` in the apache example below
 
-some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatically obtain a valid https/tls certificate for you, and some support HTTP/2 and QUIC which could be a nice speed boost
-* **warning:** nginx-QUIC is still experimental and can make uploads much slower, so HTTP/2 is recommended for now
+some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatically obtain a valid https/tls certificate for you, and some support HTTP/2 and QUIC which *could* be a nice speed boost, depending on a lot of factors
+* **warning:** nginx-QUIC (HTTP/3) is still experimental and can make uploads much slower, so HTTP/1.1 is recommended for now
+* depending on server/client, HTTP/1.1 can also be 5x faster than HTTP/2
 
 example webserver configs:
 
@@ -1804,6 +1805,7 @@ defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
 
 below are some tweaks roughly ordered by usefulness:
 
+* disabling HTTP/2 and HTTP/3 can make uploads 5x faster, depending on server/client software
 * `-q` disables logging and can help a bunch, even when combined with `-lo` to redirect logs to file
 * `--hist` pointing to a fast location (ssd) will make directory listings and searches faster when `-e2d` or `-e2t` is set
   * and also makes thumbnails load faster, regardless of e2d/e2t
@@ -1944,7 +1946,7 @@ the default configs take about 0.4 sec and 256 MiB RAM to process a new password
 
 both HTTP and HTTPS are accepted  by default, but letting a [reverse proxy](#reverse-proxy) handle the https/tls/ssl would be better (probably more secure by default)
 
-copyparty doesn't speak HTTP/2 or QUIC, so using a reverse proxy would solve that as well
+copyparty doesn't speak HTTP/2 or QUIC, so using a reverse proxy would solve that as well -- but note that HTTP/1 is usually faster than both HTTP/2 and HTTP/3
 
 if [cfssl](https://github.com/cloudflare/cfssl/releases/latest) is installed, copyparty will automatically create a CA and server-cert on startup
 * the certs are written to `--crt-dir` for distribution, see `--help` for the other `--crt` options
