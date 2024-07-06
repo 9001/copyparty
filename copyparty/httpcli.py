@@ -3007,6 +3007,43 @@ class HttpCli(object):
         self.log(t % (zs, req, self.req, ap), 6)
         return False
 
+    def _add_logues(
+        self, vn: VFS, abspath: str, lnames: Optional[dict[str, str]]
+    ) -> tuple[list[str], str]:
+        logues = ["", ""]
+        if not self.args.no_logues:
+            for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
+                if lnames is not None and fn not in lnames:
+                    continue
+                fn = os.path.join(abspath, fn)
+                if bos.path.exists(fn):
+                    with open(fsenc(fn), "rb") as f:
+                        logues[n] = f.read().decode("utf-8")
+                    if "exp" in vn.flags:
+                        logues[n] = self._expand(
+                            logues[n], vn.flags.get("exp_lg") or []
+                        )
+
+        readme = ""
+        if not self.args.no_readme and not logues[1]:
+            if lnames is None:
+                fns = ["README.md", "readme.md"]
+            elif "readme.md" in lnames:
+                fns = [lnames["readme.md"]]
+            else:
+                fns = []
+
+            for fn in fns:
+                fn = os.path.join(abspath, fn)
+                if bos.path.isfile(fn):
+                    with open(fsenc(fn), "rb") as f:
+                        readme = f.read().decode("utf-8")
+                        break
+            if readme and "exp" in vn.flags:
+                readme = self._expand(readme, vn.flags.get("exp_md") or [])
+
+        return logues, readme
+
     def _expand(self, txt: str, phs: list[str]) -> str:
         for ph in phs:
             if ph.startswith("hdr."):
@@ -4399,29 +4436,6 @@ class HttpCli(object):
             tpl = "browser2"
             is_js = False
 
-        logues = ["", ""]
-        if not self.args.no_logues:
-            for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
-                fn = os.path.join(abspath, fn)
-                if bos.path.exists(fn):
-                    with open(fsenc(fn), "rb") as f:
-                        logues[n] = f.read().decode("utf-8")
-                    if "exp" in vn.flags:
-                        logues[n] = self._expand(
-                            logues[n], vn.flags.get("exp_lg") or []
-                        )
-
-        readme = ""
-        if not self.args.no_readme and not logues[1]:
-            for fn in ["README.md", "readme.md"]:
-                fn = os.path.join(abspath, fn)
-                if bos.path.isfile(fn):
-                    with open(fsenc(fn), "rb") as f:
-                        readme = f.read().decode("utf-8")
-                        break
-            if readme and "exp" in vn.flags:
-                readme = self._expand(readme, vn.flags.get("exp_md") or [])
-
         vf = vn.flags
         unlist = vf.get("unlist", "")
         ls_ret = {
@@ -4440,8 +4454,6 @@ class HttpCli(object):
             "frand": bool(vn.flags.get("rand")),
             "unlist": unlist,
             "perms": perms,
-            "logues": logues,
-            "readme": readme,
         }
         cgv = {
             "ls0": None,
@@ -4459,7 +4471,6 @@ class HttpCli(object):
             "have_zip": (not self.args.no_zip),
             "have_unpost": int(self.args.unpost),
             "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
-            "readme": readme,
             "dgrid": "grid" in vf,
             "dgsel": "gsel" in vf,
             "dsort": vf["sort"],
@@ -4482,7 +4493,6 @@ class HttpCli(object):
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
             "url_suf": url_suf,
-            "logues": logues,
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
             "dtheme": self.args.theme,
@@ -4502,6 +4512,10 @@ class HttpCli(object):
             j2a["no_prism"] = True
 
         if not self.can_read and not is_dk:
+            logues, readme = self._add_logues(abspath, vn, None)
+            ls_ret["logues"] = j2a["logues"] = logues
+            ls_ret["readme"] = cgv["readme"] = readme
+
             if is_ls:
                 return self.tx_ls(ls_ret)
 
@@ -4557,6 +4571,8 @@ class HttpCli(object):
             "dots" not in self.uparam and (is_ls or "dots" not in self.cookies)
         ):
             ls_names = exclude_dotfiles(ls_names)
+
+        lnames = {x.lower(): x for x in ls_names}
 
         add_dk = vf.get("dk")
         add_fk = vf.get("fk")
@@ -4747,8 +4763,44 @@ class HttpCli(object):
         else:
             taglist = list(tagset)
 
+        logues, readme = self._add_logues(vn, abspath, lnames)
+        ls_ret["logues"] = j2a["logues"] = logues
+        ls_ret["readme"] = cgv["readme"] = readme
+
         if not files and not dirs and not readme and not logues[0] and not logues[1]:
             logues[1] = "this folder is empty"
+
+        if "descript.ion" in lnames and os.path.isfile(
+            os.path.join(abspath, lnames["descript.ion"])
+        ):
+            rem = []
+            with open(os.path.join(abspath, lnames["descript.ion"]), "rb") as f:
+                for bln in [x.strip() for x in f]:
+                    try:
+                        if bln.endswith(b"\x04\xc2"):
+                            # multiline comment; replace literal r"\n" with " // "
+                            bln = bln.replace(br"\\n", b" // ")[:-2]
+                        ln = bln.decode("utf-8", "replace")
+                        if ln.startswith('"'):
+                            fn, desc = ln.split('" ', 1)
+                            fn = fn[1:]
+                        else:
+                            fn, desc = ln.split(" ", 1)
+                        fe = next(
+                            (x for x in files if x["name"].lower() == fn.lower()), None
+                        )
+                        if fe:
+                            fe["tags"]["descript.ion"] = desc
+                        else:
+                            t = "<li><code>%s</code> %s</li>"
+                            rem.append(t % (html_escape(fn), html_escape(desc)))
+                    except:
+                        pass
+            if "descript.ion" not in taglist:
+                taglist.insert(0, "descript.ion")
+            if rem and not logues[1]:
+                t = "<h3>descript.ion</h3><ul>\n"
+                logues[1] = t + "\n".join(rem) + "</ul>"
 
         if is_ls:
             ls_ret["dirs"] = dirs
@@ -4819,10 +4871,9 @@ class HttpCli(object):
                         self.conn.hsrv.j2[tpl] = j2env.get_template(tname)
             thumb = ""
             is_pic = is_vid = is_au = False
-            covernames = self.args.th_coversd
-            for fn in ls_names:
-                if fn.lower() in covernames:
-                    thumb = fn
+            for fn in self.args.th_coversd:
+                if fn in lnames:
+                    thumb = lnames[fn]
                     break
             if og_fn:
                 ext = og_fn.split(".")[-1].lower()

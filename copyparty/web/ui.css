@@ -184,6 +184,7 @@ html {
 	padding: 1.5em 2em;
 	border-width: .5em 0;
 }
+.logue code,
 #modalc code,
 #tt code {
 	color: #eee;

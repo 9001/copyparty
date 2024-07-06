@@ -712,7 +712,7 @@ uploads can be given a lifetime,  afer which they expire / self-destruct
 
 the feature must be enabled per-volume with the `lifetime` [upload rule](#upload-rules) which sets the upper limit for how long a file gets to stay on the server
 
-clients can specify a shorter expiration time using the [up2k ui](#uploading) -- the relevant options become visible upon navigating into a folder with `lifetimes` enabled -- or by using the `life` [upload modifier](#write)
+clients can specify a shorter expiration time using the [up2k ui](#uploading) -- the relevant options become visible upon navigating into a folder with `lifetimes` enabled -- or by using the `life` [upload modifier](./docs/devnotes.md#write)
 
 specifying a custom expiration time client-side will affect the timespan in which unposts are permitted, so keep an eye on the estimates in the up2k ui
 
@@ -879,6 +879,8 @@ see [./srv/expand/](./srv/expand/) for usage and examples
 * click the bottom-left `π` to open a javascript prompt for debugging
 
 * files named `.prologue.html` / `.epilogue.html` will be rendered before/after directory listings unless `--no-logues`
+
+* files named `descript.ion` / `DESCRIPT.ION` are parsed and displayed in the file listing, or as the epilogue if nonstandard
 
 * files named `README.md` / `readme.md` will be rendered after directory listings unless `--no-readme` (but `.epilogue.html` takes precedence)
 
