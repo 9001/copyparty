@@ -4314,7 +4314,7 @@ class HttpCli(object):
                 if not use_filekey:
                     return self.tx_404()
 
-            if add_og:
+            if add_og and not abspath.lower().endswith(".md"):
                 if og_ua or self.host not in self.headers.get("referer", ""):
                     self.vpath, og_fn = vsplit(self.vpath)
                     vpath = self.vpath
