@@ -1678,6 +1678,8 @@ class HttpCli(object):
         remains = int(self.headers.get("content-length", -1))
         if remains == -1:
             self.keepalive = False
+            self.in_hdr_recv = True
+            self.s.settimeout(max(self.args.s_tbody // 20, 1))
             return read_socket_unbounded(self.sr, bufsz), remains
         else:
             return read_socket(self.sr, bufsz, remains), remains
