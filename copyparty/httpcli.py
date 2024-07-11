@@ -4287,18 +4287,21 @@ class HttpCli(object):
                             if cfn:
                                 fn = cfn[0]
                                 fp = os.path.join(abspath, fn)
-                                if bos.path.exists(fp):
-                                    vrem = "{}/{}".format(vrem, fn).strip("/")
-                                    is_dir = False
+                                st = bos.stat(fp)
+                                vrem = "{}/{}".format(vrem, fn).strip("/")
+                                is_dir = False
                         except:
                             pass
                     else:
                         for fn in self.args.th_covers:
                             fp = os.path.join(abspath, fn)
-                            if bos.path.exists(fp):
+                            try:
+                                st = bos.stat(fp)
                                 vrem = "{}/{}".format(vrem, fn).strip("/")
                                 is_dir = False
                                 break
+                            except:
+                                pass
 
                     if is_dir:
                         return self.tx_svg("folder")
