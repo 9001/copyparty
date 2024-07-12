@@ -135,7 +135,7 @@ class Cfg(Namespace):
         ex = "grp on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
 
-        ex = "exp_lg exp_md th_coversd"
+        ex = "exp_lg exp_md"
         ka.update(**{k: {} for k in ex.split()})
 
         ka.update(ka0)
@@ -163,6 +163,9 @@ class Cfg(Namespace):
             sort="href",
             srch_hits=99999,
             th_covers=["folder.png"],
+            th_coversd=["folder.png"],
+            th_covers_set=set(["folder.png"]),
+            th_coversd_set=set(["folder.png"]),
             th_crop="y",
             th_size="320x256",
             th_x3="n",

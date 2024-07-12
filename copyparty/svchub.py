@@ -479,8 +479,10 @@ class SvcHub(object):
         zsl = al.th_covers.split(",")
         zsl = [x.strip() for x in zsl]
         zsl = [x for x in zsl if x]
-        al.th_covers = set(zsl)
-        al.th_coversd = set(zsl + ["." + x for x in zsl])
+        al.th_covers = zsl
+        al.th_coversd = zsl + ["." + x for x in zsl]
+        al.th_covers_set = set(al.th_covers)
+        al.th_coversd_set = set(al.th_coversd)
 
         for k in "c".split(" "):
             vl = getattr(al, k)

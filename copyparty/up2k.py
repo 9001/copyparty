@@ -1195,6 +1195,9 @@ class Up2k(object):
         fat32 = True
         cv = ""
 
+        th_cvd = self.args.th_coversd
+        th_cvds = self.args.th_coversd_set
+
         assert self.pp and self.mem_cur
         self.pp.msg = "a%d %s" % (self.pp.n, cdir)
 
@@ -1279,12 +1282,21 @@ class Up2k(object):
 
                 files.append((sz, lmod, iname))
                 liname = iname.lower()
-                if sz and (
-                    iname in self.args.th_coversd
-                    or (
+                if (
+                    sz
+                    and (
+                        liname in th_cvds
+                        or (
+                            not cv
+                            and liname.rsplit(".", 1)[-1] in CV_EXTS
+                            and not iname.startswith(".")
+                        )
+                    )
+                    and (
                         not cv
-                        and liname.rsplit(".", 1)[-1] in CV_EXTS
-                        and not iname.startswith(".")
+                        or liname not in th_cvds
+                        or cv.lower() not in th_cvds
+                        or th_cvd.index(iname) < th_cvd.index(cv)
                     )
                 ):
                     cv = iname
@@ -3319,15 +3331,29 @@ class Up2k(object):
                 with self.rescan_cond:
                     self.rescan_cond.notify_all()
 
-        if rd and sz and fn.lower() in self.args.th_coversd:
+        if rd and sz and fn.lower() in self.args.th_coversd_set:
             # wasteful; db_add will re-index actual covers
             # but that won't catch existing files
             crd, cdn = rd.rsplit("/", 1) if "/" in rd else ("", rd)
             try:
-                db.execute("delete from cv where rd=? and dn=?", (crd, cdn))
-                db.execute("insert into cv values (?,?,?)", (crd, cdn, fn))
+                q = "select fn from cv where rd=? and dn=?"
+                db_cv = db.execute(q, (crd, cdn)).fetchone()[0]
+                db_lcv = db_cv.lower()
+                if db_lcv in self.args.th_coversd_set:
+                    idx_db = self.args.th_coversd.index(db_lcv)
+                    idx_fn = self.args.th_coversd.index(fn.lower())
+                    add_cv = idx_fn < idx_db
+                else:
+                    add_cv = True
             except:
-                pass
+                add_cv = True
+
+            if add_cv:
+                try:
+                    db.execute("delete from cv where rd=? and dn=?", (crd, cdn))
+                    db.execute("insert into cv values (?,?,?)", (crd, cdn, fn))
+                except:
+                    pass
 
     def handle_rm(
         self,
