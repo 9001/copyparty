@@ -14,19 +14,32 @@ except:
     from datetime import datetime
 
 
-"""
+_ = r"""
 use copyparty as a dumb messaging server / guestbook thing;
+accepts guestbook entries from 📟 (message-to-server-log) in the web-ui
 initially contributed by @clach04 in https://github.com/9001/copyparty/issues/35 (thanks!)
 
-Sample usage:
-
+example usage as global config:
     python copyparty-sfx.py --xm j,bin/hooks/msg-log.py
 
-Where:
+parameters explained,
+    xm = execute on message (📟)
+    j  = this hook needs message information as json (not just the message-text)
 
-    xm = execute on message-to-server-log
-    j = provide message information as json; not just the text - this script REQUIRES json
-    t10 = timeout and kill download after 10 secs
+example usage as a volflag (per-volume config):
+    python copyparty-sfx.py -v srv/log:log:r:c,xm=j,bin/hooks/msg-log.py
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    (share filesystem-path srv/log as volume /log, readable by everyone,
+     running this plugin on all messages with the params explained above)
+
+example usage as a volflag in a copyparty config file:
+    [/log]
+      srv/log
+      accs:
+        r: *
+      flags:
+        xm: j,bin/hooks/msg-log.py
 """
 
 

@@ -12,19 +12,28 @@ announces a new upload on discord
 example usage as global config:
     --xau f,t5,j,bin/hooks/discord-announce.py
 
+parameters explained,
+    xau = execute after upload
+    f  = fork; don't delay other hooks while this is running
+    t5 = timeout if it's still running after 5 sec
+    j  = this hook needs upload information as json (not just the filename)
+
 example usage as a volflag (per-volume config):
     -v srv/inc:inc:r:rw,ed:c,xau=f,t5,j,bin/hooks/discord-announce.py
                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     (share filesystem-path srv/inc as volume /inc,
      readable by everyone, read-write for user 'ed',
-     running this plugin on all uploads with the params listed below)
+     running this plugin on all uploads with the params explained above)
 
-parameters explained,
-    xbu = execute after upload
-    f  = fork; don't wait for it to finish
-    t5 = timeout if it's still running after 5 sec
-    j  = provide upload information as json; not just the filename
+example usage as a volflag in a copyparty config file:
+    [/inc]
+      srv/inc
+      accs:
+        r: *
+        rw: ed
+      flags:
+        xau: f,t5,j,bin/hooks/discord-announce.py
 
 replace "xau" with "xbu" to announce Before upload starts instead of After completion
 
