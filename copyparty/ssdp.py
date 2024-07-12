@@ -188,7 +188,7 @@ class SSDPd(MCast):
             except:
                 pass
 
-        self.srv = {}
+        self.srv.clear()
 
     def eat(self, buf: bytes, addr: tuple[str, int]) -> None:
         cip = addr[0]

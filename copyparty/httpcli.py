@@ -748,7 +748,7 @@ class HttpCli(object):
             or ("; Trident/" in self.ua and not k304)
         )
 
-    def _build_html_head(self, maybe_html: Any, kv: dict[str, Any]) -> bool:
+    def _build_html_head(self, maybe_html: Any, kv: dict[str, Any]) -> None:
         html = str(maybe_html)
         is_jinja = html[:2] in "%@%"
         if is_jinja:
@@ -3075,6 +3075,7 @@ class HttpCli(object):
         logtail = ""
 
         if ptop is not None:
+            ap_data = "<%s>" % (req_path,)
             try:
                 dp, fn = os.path.split(req_path)
                 tnam = fn + ".PARTIAL"

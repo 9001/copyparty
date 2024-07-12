@@ -139,6 +139,9 @@ def au_unpk(
             zil = [x for x in zil if x.filename.lower().split(".")[-1] == au]
             fi = zf.open(zil[0])
 
+        else:
+            raise Exception("unknown compression %s" % (pk,))
+
         with os.fdopen(fd, "wb") as fo:
             while True:
                 buf = fi.read(32768)

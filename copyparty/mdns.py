@@ -361,7 +361,7 @@ class MDNS(MCast):
             except:
                 pass
 
-        self.srv = {}
+        self.srv.clear()
 
     def eat(self, buf: bytes, addr: tuple[str, int], sck: socket.socket) -> None:
         cip = addr[0]
