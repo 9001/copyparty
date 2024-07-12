@@ -3421,7 +3421,16 @@ class HttpCli(object):
 
         if lower < upper and not broken:
             with open(req_path, "rb") as f:
-                remains = sendfile_py(self.log, lower, upper, f, self.s, wr_sz, wr_slp)
+                remains = sendfile_py(
+                    self.log,
+                    lower,
+                    upper,
+                    f,
+                    self.s,
+                    wr_sz,
+                    wr_slp,
+                    not self.args.no_poll,
+                )
 
         spd = self._spd((upper - lower) - remains)
         if self.do_log:

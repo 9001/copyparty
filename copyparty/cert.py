@@ -12,7 +12,7 @@ from .util import Netdev, runcmd, wrename, wunlink
 HAVE_CFSSL = True
 
 if True:  # pylint: disable=using-constant-test
-    from .util import RootLogger
+    from .util import NamedLogger, RootLogger
 
 
 if ANYWIN:
@@ -83,6 +83,8 @@ def _read_crt(args, fn):
 
 
 def _gen_ca(log: "RootLogger", args):
+    nlog: "NamedLogger" = lambda msg, c=0: log("cert-gen-ca", msg, c)
+
     expiry = _read_crt(args, "ca.pem")[0]
     if time.time() + args.crt_cdays * 60 * 60 * 24 * 0.1 < expiry:
         return
@@ -113,16 +115,18 @@ def _gen_ca(log: "RootLogger", args):
 
     bname = os.path.join(args.crt_dir, "ca")
     try:
-        wunlink(log, bname + ".key", VF)
+        wunlink(nlog, bname + ".key", VF)
     except:
         pass
-    wrename(log, bname + "-key.pem", bname + ".key", VF)
-    wunlink(log, bname + ".csr", VF)
+    wrename(nlog, bname + "-key.pem", bname + ".key", VF)
+    wunlink(nlog, bname + ".csr", VF)
 
     log("cert", "new ca OK", 2)
 
 
 def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
+    nlog: "NamedLogger" = lambda msg, c=0: log("cert-gen-srv", msg, c)
+
     names = args.crt_ns.split(",") if args.crt_ns else []
     if not args.crt_exact:
         for n in names[:]:
@@ -196,11 +200,11 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
 
     bname = os.path.join(args.crt_dir, "srv")
     try:
-        wunlink(log, bname + ".key", VF)
+        wunlink(nlog, bname + ".key", VF)
     except:
         pass
-    wrename(log, bname + "-key.pem", bname + ".key", VF)
-    wunlink(log, bname + ".csr", VF)
+    wrename(nlog, bname + "-key.pem", bname + ".key", VF)
+    wunlink(nlog, bname + ".csr", VF)
 
     with open(os.path.join(args.crt_dir, "ca.pem"), "rb") as f:
         ca = f.read()
