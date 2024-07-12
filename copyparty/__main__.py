@@ -911,7 +911,7 @@ def add_upload(ap):
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-snap", action="store_true", help="disable snapshots -- forget unfinished uploads on shutdown; don't create .hist/up2k.snap files -- abandoned/interrupted uploads must be cleaned up manually")
     ap2.add_argument("--snap-wri", metavar="SEC", type=int, default=300, help="write upload state to ./hist/up2k.snap every \033[33mSEC\033[0m seconds; allows resuming incomplete uploads after a server crash")
-    ap2.add_argument("--snap-drop", metavar="MIN", type=float, default=1440, help="forget unfinished uploads after \033[33mMIN\033[0m minutes; impossible to resume them after that (360=6h, 1440=24h)")
+    ap2.add_argument("--snap-drop", metavar="MIN", type=float, default=1440.0, help="forget unfinished uploads after \033[33mMIN\033[0m minutes; impossible to resume them after that (360=6h, 1440=24h)")
     ap2.add_argument("--u2ts", metavar="TXT", type=u, default="c", help="how to timestamp uploaded files; [\033[32mc\033[0m]=client-last-modified, [\033[32mu\033[0m]=upload-time, [\033[32mfc\033[0m]=force-c, [\033[32mfu\033[0m]=force-u (volflag=u2ts)")
     ap2.add_argument("--rand", action="store_true", help="force randomized filenames, \033[33m--nrand\033[0m chars long (volflag=rand)")
     ap2.add_argument("--nrand", metavar="NUM", type=int, default=9, help="randomized filenames length (volflag=nrand)")
@@ -939,12 +939,12 @@ def add_network(ap):
     else:
         ap2.add_argument("--freebind", action="store_true", help="allow listening on IPs which do not yet exist, for example if the network interfaces haven't finished going up. Only makes sense for IPs other than '0.0.0.0', '127.0.0.1', '::', and '::1'. May require running as root (unless net.ipv6.ip_nonlocal_bind)")
     ap2.add_argument("--s-thead", metavar="SEC", type=int, default=120, help="socket timeout (read request header)")
-    ap2.add_argument("--s-tbody", metavar="SEC", type=float, default=186, help="socket timeout (read/write request/response bodies). Use 60 on fast servers (default is extremely safe). Disable with 0 if reverse-proxied for a 2%% speed boost")
+    ap2.add_argument("--s-tbody", metavar="SEC", type=float, default=186.0, help="socket timeout (read/write request/response bodies). Use 60 on fast servers (default is extremely safe). Disable with 0 if reverse-proxied for a 2%% speed boost")
     ap2.add_argument("--s-rd-sz", metavar="B", type=int, default=256*1024, help="socket read size in bytes (indirectly affects filesystem writes; recommendation: keep equal-to or lower-than \033[33m--iobuf\033[0m)")
     ap2.add_argument("--s-wr-sz", metavar="B", type=int, default=256*1024, help="socket write size in bytes")
-    ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0, help="debug: socket write delay in seconds")
-    ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0, help="debug: response delay in seconds")
-    ap2.add_argument("--rsp-jtr", metavar="SEC", type=float, default=0, help="debug: response delay, random duration 0..\033[33mSEC\033[0m")
+    ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0.0, help="debug: socket write delay in seconds")
+    ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0.0, help="debug: response delay in seconds")
+    ap2.add_argument("--rsp-jtr", metavar="SEC", type=float, default=0.0, help="debug: response delay, random duration 0..\033[33mSEC\033[0m")
 
 
 def add_tls(ap, cert_path):
@@ -952,10 +952,10 @@ def add_tls(ap, cert_path):
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
     ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to TLS certificate")
-    ap2.add_argument("--ssl-ver", metavar="LIST", type=u, help="set allowed ssl/tls versions; [\033[32mhelp\033[0m] shows available versions; default is what your python version considers safe")
-    ap2.add_argument("--ciphers", metavar="LIST", type=u, help="set allowed ssl/tls ciphers; [\033[32mhelp\033[0m] shows available ciphers")
+    ap2.add_argument("--ssl-ver", metavar="LIST", type=u, default="", help="set allowed ssl/tls versions; [\033[32mhelp\033[0m] shows available versions; default is what your python version considers safe")
+    ap2.add_argument("--ciphers", metavar="LIST", type=u, default="", help="set allowed ssl/tls ciphers; [\033[32mhelp\033[0m] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
-    ap2.add_argument("--ssl-log", metavar="PATH", type=u, help="log master secrets for later decryption in wireshark")
+    ap2.add_argument("--ssl-log", metavar="PATH", type=u, default="", help="log master secrets for later decryption in wireshark")
 
 
 def add_cert(ap, cert_path):
@@ -968,12 +968,12 @@ def add_cert(ap, cert_path):
     ap2.add_argument("--crt-nolo", action="store_true", help="do not add 127.0.0.1 / localhost into cert")
     ap2.add_argument("--crt-nohn", action="store_true", help="do not add mDNS names / hostname into cert")
     ap2.add_argument("--crt-dir", metavar="PATH", default=cert_dir, help="where to save the CA cert")
-    ap2.add_argument("--crt-cdays", metavar="D", type=float, default=3650, help="ca-certificate expiration time in days")
-    ap2.add_argument("--crt-sdays", metavar="D", type=float, default=365, help="server-cert expiration time in days")
+    ap2.add_argument("--crt-cdays", metavar="D", type=float, default=3650.0, help="ca-certificate expiration time in days")
+    ap2.add_argument("--crt-sdays", metavar="D", type=float, default=365.0, help="server-cert expiration time in days")
     ap2.add_argument("--crt-cn", metavar="TXT", type=u, default="partyco", help="CA/server-cert common-name")
     ap2.add_argument("--crt-cnc", metavar="TXT", type=u, default="--crt-cn", help="override CA name")
     ap2.add_argument("--crt-cns", metavar="TXT", type=u, default="--crt-cn cpp", help="override server-cert name")
-    ap2.add_argument("--crt-back", metavar="HRS", type=float, default=72, help="backdate in hours")
+    ap2.add_argument("--crt-back", metavar="HRS", type=float, default=72.0, help="backdate in hours")
     ap2.add_argument("--crt-alg", metavar="S-N", type=u, default="ecdsa-256", help="algorithm and keysize; one of these: \033[32mecdsa-256 rsa-4096 rsa-2048\033[0m")
 
 
@@ -1014,7 +1014,7 @@ def add_zc_mdns(ap):
     ap2.add_argument("--zm-mnic", action="store_true", help="merge NICs which share subnets; assume that same subnet means same network")
     ap2.add_argument("--zm-msub", action="store_true", help="merge subnets on each NIC -- always enabled for ipv6 -- reduces network load, but gnome-gvfs clients may stop working, and clients cannot be in subnets that the server is not")
     ap2.add_argument("--zm-noneg", action="store_true", help="disable NSEC replies -- try this if some clients don't see copyparty")
-    ap2.add_argument("--zm-spam", metavar="SEC", type=float, default=0, help="send unsolicited announce every \033[33mSEC\033[0m; useful if clients have IPs in a subnet which doesn't overlap with the server, or to avoid some firewall issues")
+    ap2.add_argument("--zm-spam", metavar="SEC", type=float, default=0.0, help="send unsolicited announce every \033[33mSEC\033[0m; useful if clients have IPs in a subnet which doesn't overlap with the server, or to avoid some firewall issues")
 
 
 def add_zc_ssdp(ap):
@@ -1029,15 +1029,15 @@ def add_zc_ssdp(ap):
 
 def add_ftp(ap):
     ap2 = ap.add_argument_group('FTP options (TCP only)')
-    ap2.add_argument("--ftp", metavar="PORT", type=int, help="enable FTP server on \033[33mPORT\033[0m, for example \033[32m3921")
-    ap2.add_argument("--ftps", metavar="PORT", type=int, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
+    ap2.add_argument("--ftp", metavar="PORT", type=int, default=0, help="enable FTP server on \033[33mPORT\033[0m, for example \033[32m3921")
+    ap2.add_argument("--ftps", metavar="PORT", type=int, default=0, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
     ap2.add_argument("--ftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--ftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--ftp-no-ow", action="store_true", help="if target file exists, reject upload instead of overwrite")
     ap2.add_argument("--ftp-wt", metavar="SEC", type=int, default=7, help="grace period for resuming interrupted uploads (any client can write to any file last-modified more recently than \033[33mSEC\033[0m seconds ago)")
-    ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, help="the NAT address to use for passive connections")
-    ap2.add_argument("--ftp-pr", metavar="P-P", type=u, help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
+    ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, default="", help="the NAT address to use for passive connections")
+    ap2.add_argument("--ftp-pr", metavar="P-P", type=u, default="", help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
 
 
 def add_webdav(ap):
@@ -1051,7 +1051,7 @@ def add_webdav(ap):
 
 def add_tftp(ap):
     ap2 = ap.add_argument_group('TFTP options (UDP only)')
-    ap2.add_argument("--tftp", metavar="PORT", type=int, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
+    ap2.add_argument("--tftp", metavar="PORT", type=int, default=0, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
     ap2.add_argument("--tftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--tftpv", action="store_true", help="verbose")
     ap2.add_argument("--tftpvv", action="store_true", help="verboser")
@@ -1059,7 +1059,7 @@ def add_tftp(ap):
     ap2.add_argument("--tftp-lsf", metavar="PTN", type=u, default="\\.?(dir|ls)(\\.txt)?", help="return a directory listing if a file with this name is requested and it does not exist; defaults matches .ls, dir, .dir.txt, ls.txt, ...")
     ap2.add_argument("--tftp-nols", action="store_true", help="if someone tries to download a directory, return an error instead of showing its directory listing")
     ap2.add_argument("--tftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
-    ap2.add_argument("--tftp-pr", metavar="P-P", type=u, help="the range of UDP ports to use for data transfer, for example \033[32m12000-13000")
+    ap2.add_argument("--tftp-pr", metavar="P-P", type=u, default="", help="the range of UDP ports to use for data transfer, for example \033[32m12000-13000")
 
 
 def add_smb(ap):
@@ -1135,7 +1135,7 @@ def add_safety(ap):
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --unpost=0 --no-del --no-mv --hardlink --vague-403 -nih")
     ap2.add_argument("-sss", action="store_true", help="further increase safety: Enable logging to disk, scan for dangerous symlinks.\n └─Alias of\033[32m -ss --no-dav --no-logues --no-readme -lo=cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz --ls=**,*,ln,p,r")
-    ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, help="do a sanity/safety check of all volumes on startup; arguments \033[33mUSER\033[0m,\033[33mVOL\033[0m,\033[33mFLAGS\033[0m (see \033[33m--help-ls\033[0m); example [\033[32m**,*,ln,p,r\033[0m]")
+    ap2.add_argument("--ls", metavar="U[,V[,F]]", type=u, default="", help="do a sanity/safety check of all volumes on startup; arguments \033[33mUSER\033[0m,\033[33mVOL\033[0m,\033[33mFLAGS\033[0m (see \033[33m--help-ls\033[0m); example [\033[32m**,*,ln,p,r\033[0m]")
     ap2.add_argument("--xvol", action="store_true", help="never follow symlinks leaving the volume root, unless the link is into another volume where the user has similar access (volflag=xvol)")
     ap2.add_argument("--xdev", action="store_true", help="stay within the filesystem of the volume root; do not descend into other devices (symlink or bind-mount to another HDD, ...) (volflag=xdev)")
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
@@ -1145,7 +1145,7 @@ def add_safety(ap):
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything (volflag=norobots)")
-    ap2.add_argument("--logout", metavar="H", type=float, default="8086", help="logout clients after \033[33mH\033[0m hours of inactivity; [\033[32m0.0028\033[0m]=10sec, [\033[32m0.1\033[0m]=6min, [\033[32m24\033[0m]=day, [\033[32m168\033[0m]=week, [\033[32m720\033[0m]=month, [\033[32m8760\033[0m]=year)")
+    ap2.add_argument("--logout", metavar="H", type=float, default=8086.0, help="logout clients after \033[33mH\033[0m hours of inactivity; [\033[32m0.0028\033[0m]=10sec, [\033[32m0.1\033[0m]=6min, [\033[32m24\033[0m]=day, [\033[32m168\033[0m]=week, [\033[32m720\033[0m]=month, [\033[32m8760\033[0m]=year)")
     ap2.add_argument("--ban-pw", metavar="N,W,B", type=u, default="9,60,1440", help="more than \033[33mN\033[0m wrong passwords in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; disable with [\033[32mno\033[0m]")
     ap2.add_argument("--ban-404", metavar="N,W,B", type=u, default="50,60,1440", help="hitting more than \033[33mN\033[0m 404's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; only affects users who cannot see directory listings because their access is either g/G/h")
     ap2.add_argument("--ban-403", metavar="N,W,B", type=u, default="9,2,1440", help="hitting more than \033[33mN\033[0m 403's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; [\033[32m1440\033[0m]=day, [\033[32m10080\033[0m]=week, [\033[32m43200\033[0m]=month")
@@ -1181,7 +1181,7 @@ def add_shutdown(ap):
 def add_logging(ap):
     ap2 = ap.add_argument_group('logging options')
     ap2.add_argument("-q", action="store_true", help="quiet; disable most STDOUT messages")
-    ap2.add_argument("-lo", metavar="PATH", type=u, help="logfile, example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz\033[0m (NB: some errors may appear on STDOUT only)")
+    ap2.add_argument("-lo", metavar="PATH", type=u, default="", help="logfile, example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz\033[0m (NB: some errors may appear on STDOUT only)")
     ap2.add_argument("--no-ansi", action="store_true", default=not VT100, help="disable colors; same as environment-variable NO_COLOR")
     ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
     ap2.add_argument("--no-logflush", action="store_true", help="don't flush the logfile after each write; tiny bit faster")
@@ -1208,8 +1208,8 @@ def add_thumbnail(ap):
     ap2.add_argument("--no-athumb", action="store_true", help="disable audio thumbnails (spectrograms) (volflag=dathumb)")
     ap2.add_argument("--th-size", metavar="WxH", default="320x256", help="thumbnail res (volflag=thsize)")
     ap2.add_argument("--th-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for generating thumbnails")
-    ap2.add_argument("--th-convt", metavar="SEC", type=float, default=60, help="conversion timeout in seconds (volflag=convt)")
-    ap2.add_argument("--th-ram-max", metavar="GB", type=float, default=6, help="max memory usage (GiB) permitted by thumbnailer; not very accurate")
+    ap2.add_argument("--th-convt", metavar="SEC", type=float, default=60.0, help="conversion timeout in seconds (volflag=convt)")
+    ap2.add_argument("--th-ram-max", metavar="GB", type=float, default=6.0, help="max memory usage (GiB) permitted by thumbnailer; not very accurate")
     ap2.add_argument("--th-crop", metavar="TXT", type=u, default="y", help="crop thumbnails to 4:3 or keep dynamic height; client can override in UI unless force. [\033[32my\033[0m]=crop, [\033[32mn\033[0m]=nocrop, [\033[32mfy\033[0m]=force-y, [\033[32mfn\033[0m]=force-n (volflag=crop)")
     ap2.add_argument("--th-x3", metavar="TXT", type=u, default="n", help="show thumbs at 3x resolution; client can override in UI unless force. [\033[32my\033[0m]=yes, [\033[32mn\033[0m]=no, [\033[32mfy\033[0m]=force-yes, [\033[32mfn\033[0m]=force-no (volflag=th3x)")
     ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="image decoders, in order of preference")
@@ -1250,8 +1250,8 @@ def add_db_general(ap, hcores):
     ap2.add_argument("-e2v", action="store_true", help="verify file integrity; rehash all files and compare with db")
     ap2.add_argument("-e2vu", action="store_true", help="on hash mismatch: update the database with the new hash")
     ap2.add_argument("-e2vp", action="store_true", help="on hash mismatch: panic and quit copyparty")
-    ap2.add_argument("--hist", metavar="PATH", type=u, help="where to store volume data (db, thumbs) (volflag=hist)")
-    ap2.add_argument("--no-hash", metavar="PTN", type=u, help="regex: disable hashing of matching absolute-filesystem-paths during e2ds folder scans (volflag=nohash)")
+    ap2.add_argument("--hist", metavar="PATH", type=u, default="", help="where to store volume data (db, thumbs); default is a folder named \".hist\" inside each volume (volflag=hist)")
+    ap2.add_argument("--no-hash", metavar="PTN", type=u, default="", help="regex: disable hashing of matching absolute-filesystem-paths during e2ds folder scans (volflag=nohash)")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, default=noidx, help="regex: disable indexing of matching absolute-filesystem-paths during e2ds folder scans (volflag=noidx)")
     ap2.add_argument("--no-dhash", action="store_true", help="disable rescan acceleration; do full database integrity check -- makes the db ~5%% smaller and bootup/rescans 3~10x slower")
     ap2.add_argument("--re-dhash", action="store_true", help="force a cache rebuild on startup; enable this once if it gets out of sync (should never be necessary)")
@@ -1260,7 +1260,7 @@ def add_db_general(ap, hcores):
     ap2.add_argument("--xlink", action="store_true", help="on upload: check all volumes for dupes, not just the target volume (volflag=xlink)")
     ap2.add_argument("--hash-mt", metavar="CORES", type=int, default=hcores, help="num cpu cores to use for file hashing; set 0 or 1 for single-core hashing")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="rescan filesystem for changes every \033[33mSEC\033[0m seconds; 0=off (volflag=scan)")
-    ap2.add_argument("--db-act", metavar="SEC", type=float, default=10, help="defer any scheduled volume reindexing until \033[33mSEC\033[0m seconds after last db write (uploads, renames, ...)")
+    ap2.add_argument("--db-act", metavar="SEC", type=float, default=10.0, help="defer any scheduled volume reindexing until \033[33mSEC\033[0m seconds after last db write (uploads, renames, ...)")
     ap2.add_argument("--srch-time", metavar="SEC", type=int, default=45, help="search deadline -- terminate searches running for more than \033[33mSEC\033[0m seconds")
     ap2.add_argument("--srch-hits", metavar="N", type=int, default=7999, help="max search results to allow clients to fetch; 125 results will be shown initially")
     ap2.add_argument("--dotsrch", action="store_true", help="show dotfiles in search results (volflags: dotsrch | nodotsrch)")
@@ -1322,8 +1322,8 @@ def add_ui(ap, retry):
     ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files matching \033[33mREGEX\033[0m in file list. Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
     ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="\033[33mfavicon-text\033[0m [ \033[33mforeground\033[0m [ \033[33mbackground\033[0m ] ], set blank to disable")
     ap2.add_argument("--mpmc", metavar="URL", type=u, default="", help="change the mediaplayer-toggle mouse cursor; URL to a folder with {2..5}.png inside (or disable with [\033[32m.\033[0m])")
-    ap2.add_argument("--js-browser", metavar="L", type=u, help="URL to additional JS to include")
-    ap2.add_argument("--css-browser", metavar="L", type=u, help="URL to additional CSS to include")
+    ap2.add_argument("--js-browser", metavar="L", type=u, default="", help="URL to additional JS to include")
+    ap2.add_argument("--css-browser", metavar="L", type=u, default="", help="URL to additional CSS to include")
     ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages; can be @PATH to send the contents of a file at PATH, and/or begin with %% to render as jinja2 template (volflag=html_head)")
     ap2.add_argument("--ih", action="store_true", help="if a folder contains index.html, show that instead of the directory listing by default (can be changed in the client settings UI, or add ?v to URL for override)")
     ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
@@ -1351,8 +1351,8 @@ def add_debug(ap):
     ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
     ap2.add_argument("--srch-dbg", action="store_true", help="explain search processing, and do some extra expensive sanity checks")
     ap2.add_argument("--rclone-mdns", action="store_true", help="use mdns-domain instead of server-ip on /?hc")
-    ap2.add_argument("--stackmon", metavar="P,S", type=u, help="write stacktrace to \033[33mP\033[0math every \033[33mS\033[0m second, for example --stackmon=\033[32m./st/%%Y-%%m/%%d/%%H%%M.xz,60")
-    ap2.add_argument("--log-thrs", metavar="SEC", type=float, help="list active threads every \033[33mSEC\033[0m")
+    ap2.add_argument("--stackmon", metavar="P,S", type=u, default="", help="write stacktrace to \033[33mP\033[0math every \033[33mS\033[0m second, for example --stackmon=\033[32m./st/%%Y-%%m/%%d/%%H%%M.xz,60")
+    ap2.add_argument("--log-thrs", metavar="SEC", type=float, default=0.0, help="list active threads every \033[33mSEC\033[0m")
     ap2.add_argument("--log-fk", metavar="REGEX", type=u, default="", help="log filekey params for files where path matches \033[33mREGEX\033[0m; [\033[32m.\033[0m] (a single dot) = all files")
     ap2.add_argument("--bak-flips", action="store_true", help="[up2k] if a client uploads a bitflipped/corrupted chunk, store a copy according to \033[33m--bf-nc\033[0m and \033[33m--bf-dir\033[0m")
     ap2.add_argument("--bf-nc", metavar="NUM", type=int, default=200, help="bak-flips: stop if there's more than \033[33mNUM\033[0m files at \033[33m--kf-dir\033[0m already; default: 6.3 GiB max (200*32M)")

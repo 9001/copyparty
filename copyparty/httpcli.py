@@ -4517,7 +4517,7 @@ class HttpCli(object):
             j2a["no_prism"] = True
 
         if not self.can_read and not is_dk:
-            logues, readme = self._add_logues(abspath, vn, None)
+            logues, readme = self._add_logues(vn, abspath, None)
             ls_ret["logues"] = j2a["logues"] = logues
             ls_ret["readme"] = cgv["readme"] = readme
 

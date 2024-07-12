@@ -17,6 +17,8 @@ from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
 from .util import (
+    DEF_MTE,
+    DEF_MTH,
     EXTS,
     IMPLICATIONS,
     MIMES,
@@ -2267,10 +2269,11 @@ class AuthSrv(object):
             "",
         ]
 
-        csv = set("i p".split())
+        csv = set("i p th_covers zm_on zm_off zs_on zs_off".split())
         zs = "c ihead mtm mtp on403 on404 xad xar xau xiu xban xbd xbr xbu xm"
         lst = set(zs.split())
-        askip = set("a v c vc cgen theme".split())
+        askip = set("a v c vc cgen exp_lg exp_md theme".split())
+        fskip = set("exp_lg exp_md mv_re_r mv_re_t rm_re_r rm_re_t".split())
 
         # keymap from argv to vflag
         amap = vf_bmap()
@@ -2291,11 +2294,35 @@ class AuthSrv(object):
             for k, v in args.items():
                 if k in askip:
                     continue
+
+                try:
+                    v = v.pattern
+                    if k in ("idp_gsep", "tftp_lsf"):
+                        v = v[1:-1]  # close enough
+                except:
+                    pass
+
+                skip = False
+                for k2, defstr in (("mte", DEF_MTE), ("mth", DEF_MTH)):
+                    if k != k2:
+                        continue
+                    s1 = list(sorted(list(v)))
+                    s2 = list(sorted(defstr.split(",")))
+                    if s1 == s2:
+                        skip = True
+                        break
+                    v = ",".join(s1)
+
+                if skip:
+                    continue
+
                 if k in csv:
                     v = ", ".join([str(za) for za in v])
                 try:
                     v2 = getattr(self.dargs, k)
-                    if v == v2:
+                    if k == "tcolor" and len(v2) == 3:
+                        v2 = "".join([x * 2 for x in v2])
+                    if v == v2 or v.replace(", ", ",") == v2:
                         continue
                 except:
                     continue
@@ -2354,6 +2381,7 @@ class AuthSrv(object):
                         pstr += pchar
                 if "g" in pstr and "G" in pstr:
                     pstr = pstr.replace("g", "")
+                pstr = pstr.replace("rwmd.a", "A")
                 try:
                     vperms[pstr].append(uname)
                 except:
@@ -2363,12 +2391,41 @@ class AuthSrv(object):
             trues = []
             vals = []
             for k, v in sorted(vol.flags.items()):
+                if k in fskip:
+                    continue
+
+                try:
+                    v = v.pattern
+                except:
+                    pass
+
                 try:
                     ak = vmap[k]
-                    if getattr(self.args, ak) is v:
+                    v2 = getattr(self.args, ak)
+
+                    try:
+                        v2 = v2.pattern
+                    except:
+                        pass
+
+                    if v2 is v:
                         continue
                 except:
                     pass
+
+                skip = False
+                for k2, defstr in (("mte", DEF_MTE), ("mth", DEF_MTH)):
+                    if k != k2:
+                        continue
+                    s1 = list(sorted(list(v)))
+                    s2 = list(sorted(defstr.split(",")))
+                    if s1 == s2:
+                        skip = True
+                        break
+                    v = ",".join(s1)
+
+                if skip:
+                    continue
 
                 if k in lst:
                     for ve in v:
@@ -2376,11 +2433,6 @@ class AuthSrv(object):
                 elif v is True:
                     trues.append(k)
                 elif v is not False:
-                    try:
-                        v = v.pattern
-                    except:
-                        pass
-
                     vals.append("{}: {}".format(k, v))
             pops = []
             for k1, k2 in IMPLICATIONS:

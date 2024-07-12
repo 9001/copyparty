@@ -2511,7 +2511,7 @@ def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
 def hashcopy(
     fin: Generator[bytes, None, None],
     fout: Union[typing.BinaryIO, typing.IO[Any]],
-    slp: int = 0,
+    slp: float = 0,
     max_sz: int = 0,
 ) -> tuple[int, str, str]:
     hashobj = hashlib.sha512()
@@ -2539,7 +2539,7 @@ def sendfile_py(
     f: typing.BinaryIO,
     s: socket.socket,
     bufsz: int,
-    slp: int,
+    slp: float,
     use_poll: bool,
 ) -> int:
     remains = upper - lower
@@ -2568,7 +2568,7 @@ def sendfile_kern(
     f: typing.BinaryIO,
     s: socket.socket,
     bufsz: int,
-    slp: int,
+    slp: float,
     use_poll: bool,
 ) -> int:
     out_fd = s.fileno()
