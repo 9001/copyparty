@@ -1804,6 +1804,8 @@ alternatively, some alternatives roughly sorted by speed (unreproducible benchma
 
 most clients will fail to mount the root of a copyparty server unless there is a root volume (so you get the admin-panel instead of a browser when accessing it) -- in that case, mount a specific volume instead
 
+if you have volumes that are accessible without a password, then some webdav clients (such as davfs2) require the global-option `--dav-auth` to access any password-protected areas
+
 
 # android app
 
