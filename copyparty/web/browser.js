@@ -2433,7 +2433,7 @@ function dl_song() {
 		return toast.inf(10, L.f_dls);
 	}
 
-	var url = addq(mp.tracks[mp.au.tid], 'cache=987&_=' + ACB);
+	var url = addq(mp.au.osrc, 'cache=987&_=' + ACB);
 	dl_file(url);
 }
 
@@ -3138,6 +3138,7 @@ function play(tid, is_ev, seek) {
 	else
 		mp.au.src = mp.au.rsrc = url;
 
+	mp.au.osrc = mp.tracks[tid];
 	afilt.apply();
 
 	setTimeout(function () {
