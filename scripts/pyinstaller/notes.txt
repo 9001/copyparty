@@ -1,14 +1,26 @@
+after performing all the initial setup in this file,
 run ./build.sh in git-bash to build + upload the exe
-
-
-## ============================================================
-## first-time setup on a stock win7x32sp1 and/or win10x64 vm:
-## 
 
 to obtain the files referenced below, see ./deps.txt
 
-download + install git (32bit OK on 64):
-http://192.168.123.1:3923/ro/pyi/Git-2.44.0-32-bit.exe
+and if you don't yet have a windows vm to build in, then the
+first step will be "creating the windows VM templates" below
+
+commands to start the VMs after initial setup:
+qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -device usb-tablet -net bridge,br=virhost0 -net nic,model=e1000e -drive file=win7-x32.qcow2,discard=unmap,detect-zeroes=unmap
+qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -device usb-tablet -net bridge,br=virhost0 -net nic,model=virtio -drive file=win10-e2021.qcow2,if=virtio,discard=unmap
+
+
+
+## ============================================================
+## first-time setup in a stock win7x32sp1 and/or win10x64 vm:
+## 
+
+grab & install from ftp2host:  Git-2.45.2-32-bit.exe
+
+...and do this on the host so you can grab these notes too:
+unix2dos <~/dev/copyparty/scripts/pyinstaller/notes.txt >~/dev/pyi/notes.txt
+
 
 ===[ copy-paste into git-bash ]================================
 uname -s | grep NT-10 && w10=1 || {
@@ -16,39 +28,40 @@ uname -s | grep NT-10 && w10=1 || {
 }
 fns=(
   altgraph-0.17.4-py2.py3-none-any.whl
-  packaging-24.0-py3-none-any.whl
   pefile-2023.2.7-py3-none-any.whl
-  pyinstaller_hooks_contrib-2024.3-py2.py3-none-any.whl
   pywin32_ctypes-0.2.2-py3-none-any.whl
-  setuptools-68.2.2-py3-none-any.whl
+  setuptools-70.3.0-py3-none-any.whl
+  upx-4.2.4-win32.zip
 )
 [ $w10 ] && fns+=(
-  pyinstaller-6.5.0-py3-none-win_amd64.whl
-  Jinja2-3.1.4-py3-none-any.whl
-  MarkupSafe-2.1.5-cp311-cp311-win_amd64.whl
+  jinja2-3.1.4-py3-none-any.whl
+  MarkupSafe-2.1.5-cp312-cp312-win_amd64.whl
   mutagen-1.47.0-py3-none-any.whl
-  pillow-10.3.0-cp311-cp311-win_amd64.whl
-  python-3.11.9-amd64.exe
-  upx-4.2.2-win64.zip
+  packaging-24.1-py3-none-any.whl
+  pillow-10.4.0-cp312-cp312-win_amd64.whl
+  pyinstaller-6.9.0-py3-none-win_amd64.whl
+  pyinstaller_hooks_contrib-2024.7-py2.py3-none-any.whl
+  python-3.12.4-amd64.exe
 )
-[ $w7 ] && fns+=(
-  pyinstaller-5.13.2-py3-none-win32.whl
+[ $w7 ] && fns+=(  # u2c stuff
   certifi-2024.2.2-py3-none-any.whl
   charset_normalizer-3.3.2-cp37-cp37m-win32.whl
   idna-3.6-py3-none-any.whl
-  requests-2.31.0-py3-none-any.whl
-  urllib3-1.26.18-py2.py3-none-any.whl
-  upx-4.2.2-win32.zip
+  requests-2.29.0-py3-none-any.whl
+  urllib3-1.26.19-py2.py3-none-any.whl
 )
 [ $w7 ] && fns+=(
   future-1.0.0-py3-none-any.whl
   importlib_metadata-6.7.0-py3-none-any.whl
+  packaging-24.0-py3-none-any.whl
   pip-24.0-py3-none-any.whl
+  pyinstaller_hooks_contrib-2023.8-py2.py3-none-any.whl
   typing_extensions-4.7.1-py3-none-any.whl
   zipp-3.15.0-py3-none-any.whl
 )
 [ $w7x64 ] && fns+=(
   windows6.1-kb2533623-x64.msu
+  pyinstaller-5.13.2-py3-none-win64.whl
   python-3.7.9-amd64.exe
 )
 [ $w7x32 ] && fns+=(
@@ -57,20 +70,24 @@ fns=(
   python-3.7.9.exe
 )
 dl() { curl -fkLOC- "$1" && return 0; echo "$1"; return 1; }
-cd ~/Downloads &&
+cd ~/Downloads && rm -f Git-*.exe &&
 for fn in "${fns[@]}"; do
   dl "https://192.168.123.1:3923/ro/pyi/$fn" || {
     echo ERROR; ok=; break
   }
 done
 
-manually install:
-  windows6.1-kb2533623 + reboot
-  python-3.7.9
+
+WIN7-ONLY: manually install windows6.1-kb2533623 and reboot
+
+manually install python-3.99.99.exe and then delete it
+
+close and reopen git-bash so python is in PATH
+
 
 ===[ copy-paste into git-bash ]================================
 uname -s | grep NT-10 && w10=1 || w7=1
-[ $w7 ] && pyv=37 || pyv=311
+[ $w7 ] && pyv=37 || pyv=312
 appd=$(cygpath.exe "$APPDATA")
 cd ~/Downloads &&
 yes | unzip upx-*-win32.zip &&
@@ -78,7 +95,7 @@ mv upx-*/upx.exe . &&
 python -m ensurepip &&
 { [ $w10 ] || python -m pip install --user -U pip-*.whl; } &&
 python -m pip install --user -U packaging-*.whl &&
-{ [ $w7 ] || python -m pip install --user -U {setuptools,mutagen,Pillow,Jinja2,MarkupSafe}-*.whl; } &&
+{ [ $w7 ] || python -m pip install --user -U {setuptools,mutagen,pillow,jinja2,MarkupSafe}-*.whl; } &&
 { [ $w10 ] || python -m pip install --user -U {requests,urllib3,charset_normalizer,certifi,idna}-*.whl; } &&
 { [ $w10 ] || python -m pip install --user -U future-*.whl importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
 python -m pip install --user -U pyinstaller-*.whl pefile-*.whl pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl &&
@@ -90,9 +107,65 @@ rm -f build.sh &&
 curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh &&
 { [ $w10 ] || curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.sh; } &&
 echo ok
-# python -m pip install --user -U Pillow-9.2.0-cp37-cp37m-win32.whl
-# sed -ri 's/, bestopt, /]+bestopt+[/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
-# sed -ri 's/(^\s+bestopt = ).*/\1["--best","--lzma","--ultra-brute"]/' $APPDATA/Python/Python37/site-packages/pyinstaller/building/utils.py
+
+
+now is an excellent time to take another snapshot, but:
+* on win7: first do the 4g.nul thing again
+* on win10: first do a reboot so fstrim kicks in
+then shutdown and:  vmsnap the.qcow2 snap2
+
+
+
+
+
+## ============================================================
+## creating the windows VM templates
+##
+
+bash ~/dev/asm/doc/setup-virhost.sh  # github:9001/asm
+truncate -s 4G ~/dev/pyi/4g.nul  # win7 "trim"
+
+note: if you keep accidentally killing the vm with alt-f4 then remove "-device usb-tablet" in the qemu commands below
+
+# win7: don't bother with virtio stuff since win7 doesn't fstrim properly anyways (4g.nul takes care of that)
+rm -f win7-x32.qcow2
+qemu-img create -f qcow2 win7-x32.qcow2 64g
+qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -device usb-tablet -net bridge,br=virhost0 -net nic,model=e1000e -drive file=win7-x32.qcow2,discard=unmap,detect-zeroes=unmap \
+  -cdrom ~/iso/win7-X17-59183-english-32bit-professional.iso
+
+# win10: use virtio hdd and net (viostor+netkvm), but do NOT use qxl graphics (kills mouse cursor)
+rm -f win10-e2021.qcow2
+qemu-img create -f qcow2 win10-e2021.qcow2 64g
+qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -device usb-tablet -net bridge,br=virhost0 -net nic,model=virtio -drive file=win10-e2021.qcow2,if=virtio,discard=unmap \
+  -drive file=$HOME/iso/virtio-win-0.1.248.iso,media=cdrom -cdrom $HOME/iso/en-us_windows_10_enterprise_ltsc_2021_x64_dvd_d289cf96.iso
+
+tweak stuff to your preference, but also do these steps in order:
+* press ctrl-alt-g so you don't accidentally alt-f4 the vm
+* startmenu, type "sysdm.cpl" and hit Enter,
+  * system protection -> configure -> disable
+  * advanced > performance > advanced > virtual memory > no paging file
+* startmenu, type "cmd" and hit Ctrl-Shift-Enter, run command:  powercfg /h off
+* reboot
+* make screen resolution something comfy (1440x900 is always a winner)
+* cmd.exe window-width 176 (assuming 1440x900) and buffer-height 8191
+* fix explorer settings (show hidden files and file extensions)
+* WIN10-ONLY: startmenu, device manager, install netkvm driver for ethernet
+* create ftp2host.bat on desktop with following contents:
+    start explorer ftp://wark:k@192.168.123.1:3921/ro/pyi/
+* WIN7-ONLY: connect to ftp, download 4g.nul to desktop, then delete it (poor man's fstrim...)
+
+and finally take snapshots of the VMs by copypasting this stuff into your shell:
+vmsnap() { zstd --long=31 -vT0 -19 <$1 >$1.$2; };
+vmsnap win7-x32.qcow2 snap1
+vmsnap win10-e2021.qcow2 snap1
+
+note: vmsnap could have defragged the qcow2 as well, but
+  that makes it hard to do xdelta3 memes so it's not worth it --
+  but you can add this before "zstd" if you still want to:
+  qemu-img convert -f qcow2 -O qcow2 $1 a.qcow2 && mv a.qcow2 $1 &&
+
+
+
 
 
 ## ============================================================

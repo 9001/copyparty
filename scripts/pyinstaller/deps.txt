@@ -34,6 +34,7 @@ https://support.microsoft.com/en-us/topic/microsoft-security-advisory-insecure-l
       see web.archive.org links below
 
 # direct links to version-frozen deps
+https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.248-1/virtio-win-0.1.248.iso
 https://www.python.org/ftp/python/3.7.9/python-3.7.9-amd64.exe
 https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe
 https://web.archive.org/web/20200412130846if_/https://download.microsoft.com/download/2/D/7/2D78D0DD-2802-41F5-88D6-DC1D559F206D/Windows6.1-KB2533623-x86.msu

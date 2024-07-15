@@ -16,7 +16,7 @@ uname -s | grep WOW64 && m=64 || m=32
 uname -s | grep NT-10 && w10=1 || w7=1
 [ $w7 ] && [ -e up2k.sh ] && [ ! "$1" ] && ./up2k.sh
 
-[ $w7 ] && pyv=37 || pyv=311
+[ $w7 ] && pyv=37 || pyv=312
 esuf=
 [ $w7 ] && [ $m = 32 ] && esuf=32
 [ $w7 ] && [ $m = 64 ] && esuf=-winpe64
@@ -127,3 +127,6 @@ grep -q $csum uplod.log && echo upload OK || {
     echo UPLOAD FAILED
     exit 1
 }
+
+echo; read -u1 -n1 -p 'shutdown? y/n: '
+[ "$REPLY" = y ] && shutdown -s -t 1
