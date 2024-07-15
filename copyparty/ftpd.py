@@ -307,9 +307,20 @@ class FtpFs(AbstractedFS):
                 # display write-only folders as empty
                 return []
 
-            # return list of volumes
-            r = {x.split("/")[0]: 1 for x in self.hub.asrv.vfs.all_vols.keys()}
-            return list(sorted(list(r.keys())))
+            # return list of accessible volumes
+            ret = []
+            for vn in self.hub.asrv.vfs.all_vols.values():
+                if "/" in vn.vpath or not vn.vpath:
+                    continue  # only include toplevel-mounted vols
+
+                try:
+                    self.hub.asrv.vfs.get(vn.vpath, self.uname, True, False)
+                    ret.append(vn.vpath)
+                except:
+                    pass
+
+            ret.sort()
+            return ret
 
     def rmdir(self, path: str) -> None:
         ap = self.rv2a(path, d=True)[0]
