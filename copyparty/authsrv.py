@@ -477,6 +477,13 @@ class VFS(object):
         )
         # skip uhtml because it's rarely needed
 
+    def get_perms(self, vpath: str, uname: str) -> str:
+        zbl = self.can_access(vpath, uname)
+        ret = "".join(ch for ch, ok in zip("rwmdgGa.", zbl) if ok)
+        if "rwmd" in ret and "a." in ret:
+            ret += "A"
+        return ret
+
     def get(
         self,
         vpath: str,

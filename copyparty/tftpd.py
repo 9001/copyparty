@@ -328,7 +328,7 @@ class Tftpd(object):
 
             xbu = vfs.flags.get("xbu")
             if xbu and not runhook(
-                self.nlog, xbu, ap, vpath, "", "", 0, 0, "8.3.8.7", 0, ""
+                self.nlog, xbu, ap, vpath, "", "", "", 0, 0, "8.3.8.7", 0, ""
             ):
                 yeet("blocked by xbu server config: " + vpath)
 

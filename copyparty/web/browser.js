@@ -1064,7 +1064,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
 	'<a href="#" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
 	'<a href="#" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '">📝</a>' +
-	'<a href="#" data-perm="write" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
+	'<a href="#" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
 	'<a href="#" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +

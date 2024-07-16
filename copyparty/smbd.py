@@ -240,7 +240,7 @@ class SMB(object):
 
             xbu = vfs.flags.get("xbu")
             if xbu and not runhook(
-                self.nlog, xbu, ap, vpath, "", "", 0, 0, "1.7.6.2", 0, ""
+                self.nlog, xbu, ap, vpath, "", "", "", 0, 0, "1.7.6.2", 0, ""
             ):
                 yeet("blocked by xbu server config: " + vpath)
 

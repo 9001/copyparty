@@ -634,12 +634,12 @@ def get_sects():
              \033[36mxban\033[35m executes CMD if someone gets banned
             \033[0m
             can be defined as --args or volflags; for example \033[36m
-             --xau notify-send
-             -v .::r:c,xau=notify-send
+             --xau foo.py
+             -v .::r:c,xau=bar.py
             \033[0m
-            commands specified as --args are appended to volflags;
-            each --arg and volflag can be specified multiple times,
-            each command will execute in order unless one returns non-zero
+            hooks specified as commandline --args are appended to volflags;
+            each commandline --arg and volflag can be specified multiple times,
+            each hook will execute in order unless one returns non-zero
 
             optionally prefix the command with comma-sep. flags similar to -mtp:
 
@@ -650,6 +650,10 @@ def get_sects():
              \033[36mtN\033[35m sets an N sec timeout before the command is abandoned
              \033[36miN\033[35m xiu only: volume must be idle for N sec (default = 5)
 
+             \033[36mar\033[35m only run hook if user has read-access
+             \033[36marw\033[35m only run hook if user has read-write-access
+             \033[36marwmd\033[35m ...and so on... (doesn't work for xiu or xban)
+
              \033[36mkt\033[35m kills the entire process tree on timeout (default),
              \033[36mkm\033[35m kills just the main process
              \033[36mkn\033[35m lets it continue running until copyparty is terminated
@@ -658,6 +662,21 @@ def get_sects():
              \033[36mc1\033[35m show only stderr
              \033[36mc2\033[35m show only stdout
              \033[36mc3\033[35m mute all process otput
+            \033[0m
+            examples:
+
+             \033[36m--xm some.py\033[35m runs \033[33msome.py msgtxt\033[35m on each 📟 message;
+              \033[33mmsgtxt\033[35m is the message that was written into the web-ui
+
+             \033[36m--xm j,some.py\033[35m runs \033[33msome.py jsontext\033[35m on each 📟 message;
+              \033[33mjsontext\033[35m is the message info (ip, user, ..., msg-text)
+
+             \033[36m--xm aw,j,some.py\033[35m requires user to have write-access
+
+             \033[36m--xm aw,,notify-send,hey,--\033[35m shows an OS alert on linux;
+              the \033[33m,,\033[35m stops copyparty from reading the rest as flags and
+              the \033[33m--\033[35m stops notify-send from reading the message as args
+              and the alert will be "hey" followed by the messagetext
             \033[0m
             each hook is executed once for each event, except for \033[36mxiu\033[0m
             which builds up a backlog of uploads, running the hook just once
@@ -685,7 +704,10 @@ def get_sects():
               \033[36mstash\033[35m dumps the data to file and returns length + checksum
               \033[36msave,get\033[35m dumps to file and returns the page like a GET
               \033[36mprint,get\033[35m prints the data in the log and returns GET
-              (leave out the ",get" to return an error instead)
+              (leave out the ",get" to return an error instead)\033[0m
+
+            note that the \033[35m--xm\033[0m hook will only run if \033[35m--urlform\033[0m
+              is either \033[36mprint\033[0m or the default \033[36mprint,get\033[0m
             """
             ),
         ],

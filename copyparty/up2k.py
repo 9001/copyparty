@@ -2770,6 +2770,7 @@ class Up2k(object):
                             job["vtop"],
                             job["host"],
                             job["user"],
+                            self.asrv.vfs.get_perms(job["vtop"], job["user"]),
                             job["lmod"],
                             job["size"],
                             job["addr"],
@@ -3297,6 +3298,7 @@ class Up2k(object):
             djoin(vtop, rd, fn),
             host,
             usr,
+            self.asrv.vfs.get_perms(djoin(vtop, rd, fn), usr),
             int(ts),
             sz,
             ip,
@@ -3496,6 +3498,7 @@ class Up2k(object):
                         vpath,
                         "",
                         uname,
+                        self.asrv.vfs.get_perms(vpath, uname),
                         stl.st_mtime,
                         st.st_size,
                         ip,
@@ -3529,6 +3532,7 @@ class Up2k(object):
                         vpath,
                         "",
                         uname,
+                        self.asrv.vfs.get_perms(vpath, uname),
                         stl.st_mtime,
                         st.st_size,
                         ip,
@@ -3661,7 +3665,18 @@ class Up2k(object):
         xar = dvn.flags.get("xar")
         if xbr:
             if not runhook(
-                self.log, xbr, sabs, svp, "", uname, stl.st_mtime, st.st_size, "", 0, ""
+                self.log,
+                xbr,
+                sabs,
+                svp,
+                "",
+                uname,
+                self.asrv.vfs.get_perms(svp, uname),
+                stl.st_mtime,
+                st.st_size,
+                "",
+                0,
+                "",
             ):
                 t = "move blocked by xbr server config: {}".format(svp)
                 self.log(t, 1)
@@ -3686,7 +3701,20 @@ class Up2k(object):
                 self.rescan_cond.notify_all()
 
             if xar:
-                runhook(self.log, xar, dabs, dvp, "", uname, 0, 0, "", 0, "")
+                runhook(
+                    self.log,
+                    xar,
+                    dabs,
+                    dvp,
+                    "",
+                    uname,
+                    self.asrv.vfs.get_perms(dvp, uname),
+                    0,
+                    0,
+                    "",
+                    0,
+                    "",
+                )
 
             return "k"
 
@@ -3785,7 +3813,20 @@ class Up2k(object):
             wunlink(self.log, sabs, svn.flags)
 
         if xar:
-            runhook(self.log, xar, dabs, dvp, "", uname, 0, 0, "", 0, "")
+            runhook(
+                self.log,
+                xar,
+                dabs,
+                dvp,
+                "",
+                uname,
+                self.asrv.vfs.get_perms(dvp, uname),
+                0,
+                0,
+                "",
+                0,
+                "",
+            )
 
         return "k"
 
@@ -4074,6 +4115,7 @@ class Up2k(object):
             vp_chk,
             job["host"],
             job["user"],
+            self.asrv.vfs.get_perms(vp_chk, job["user"]),
             int(job["lmod"]),
             job["size"],
             job["addr"],

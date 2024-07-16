@@ -2992,7 +2992,8 @@ def retchk(
 
 def _parsehook(
     log: Optional["NamedLogger"], cmd: str
-) -> tuple[bool, bool, bool, float, dict[str, Any], str]:
+) -> tuple[str, bool, bool, bool, float, dict[str, Any], list[str]]:
+    areq = ""
     chk = False
     fork = False
     jtxt = False
@@ -3017,8 +3018,12 @@ def _parsehook(
             cap = int(arg[1:])  # 0=none 1=stdout 2=stderr 3=both
         elif arg.startswith("k"):
             kill = arg[1:]  # [t]ree [m]ain [n]one
+        elif arg.startswith("a"):
+            areq = arg[1:]  # required perms
         elif arg.startswith("i"):
             pass
+        elif not arg:
+            break
         else:
             t = "hook: invalid flag {} in {}"
             (log or print)(t.format(arg, ocmd))
@@ -3045,9 +3050,11 @@ def _parsehook(
         "capture": cap,
     }
 
-    cmd = os.path.expandvars(os.path.expanduser(cmd))
+    argv = cmd.split(",") if "," in cmd else [cmd]
 
-    return chk, fork, jtxt, wait, sp_ka, cmd
+    argv[0] = os.path.expandvars(os.path.expanduser(argv[0]))
+
+    return areq, chk, fork, jtxt, wait, sp_ka, argv
 
 
 def runihook(
@@ -3056,10 +3063,9 @@ def runihook(
     vol: "VFS",
     ups: list[tuple[str, int, int, str, str, str, int]],
 ) -> bool:
-    ocmd = cmd
-    chk, fork, jtxt, wait, sp_ka, cmd = _parsehook(log, cmd)
-    bcmd = [sfsenc(cmd)]
-    if cmd.endswith(".py"):
+    _, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
+    bcmd = [sfsenc(x) for x in acmd]
+    if acmd[0].endswith(".py"):
         bcmd = [sfsenc(pybin)] + bcmd
 
     vps = [vjoin(*list(s3dec(x[3], x[4]))) for x in ups]
@@ -3084,7 +3090,7 @@ def runihook(
 
     t0 = time.time()
     if fork:
-        Daemon(runcmd, ocmd, [bcmd], ka=sp_ka)
+        Daemon(runcmd, cmd, bcmd, ka=sp_ka)
     else:
         rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
         if chk and rc:
@@ -3105,14 +3111,20 @@ def _runhook(
     vp: str,
     host: str,
     uname: str,
+    perms: str,
     mt: float,
     sz: int,
     ip: str,
     at: float,
     txt: str,
 ) -> bool:
-    ocmd = cmd
-    chk, fork, jtxt, wait, sp_ka, cmd = _parsehook(log, cmd)
+    areq, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
+    if areq:
+        for ch in areq:
+            if ch not in perms:
+                t = "user %s not allowed to run hook %s; need perms %s, have %s"
+                log(t % (uname, cmd, areq, perms))
+                return True  # fallthrough to next hook
     if jtxt:
         ja = {
             "ap": ap,
@@ -3123,21 +3135,22 @@ def _runhook(
             "at": at or time.time(),
             "host": host,
             "user": uname,
+            "perms": perms,
             "txt": txt,
         }
         arg = json.dumps(ja)
     else:
         arg = txt or ap
 
-    acmd = [cmd, arg]
-    if cmd.endswith(".py"):
+    acmd += [arg]
+    if acmd[0].endswith(".py"):
         acmd = [pybin] + acmd
 
     bcmd = [fsenc(x) if x == ap else sfsenc(x) for x in acmd]
 
     t0 = time.time()
     if fork:
-        Daemon(runcmd, ocmd, [bcmd], ka=sp_ka)
+        Daemon(runcmd, cmd, [bcmd], ka=sp_ka)
     else:
         rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
         if chk and rc:
@@ -3158,6 +3171,7 @@ def runhook(
     vp: str,
     host: str,
     uname: str,
+    perms: str,
     mt: float,
     sz: int,
     ip: str,
@@ -3167,7 +3181,7 @@ def runhook(
     vp = vp.replace("\\", "/")
     for cmd in cmds:
         try:
-            if not _runhook(log, cmd, ap, vp, host, uname, mt, sz, ip, at, txt):
+            if not _runhook(log, cmd, ap, vp, host, uname, perms, mt, sz, ip, at, txt):
                 return False
         except Exception as ex:
             (log or print)("hook: {}".format(ex))
