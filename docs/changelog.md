@@ -1,4 +1,34 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0601-2324  `v1.13.3`  700+
+
+## new features
+
+* keep tags when transcoding music to opus/mp3 07ea629c
+  * useful for batch-downloading folders with [on-the-fly transcoding](https://github.com/9001/copyparty#zip-downloads)
+  * excessively large tags will be individually dropped (traktor beatmaps, cover-art, xmp)
+
+## bugfixes
+
+* optimization for large amounts (700+) of tcp connections / clients 07b2bf11
+  * `select()` was used for non-https downloads and mdns/ssdp initialization, which would start spinning at more than 1024 FDs, so now they `poll()` when possible (so not on windows)
+  * default max number of connections on windows was lowered to 486 since windows maxes out at 512 FDs
+* the markdown editor autoindent would duplicate `<hr>` 692175f5
+
+## other changes
+
+* #83: more intuitive behavior for `--df` and the `df` volflag 5ad65450
+* print helpful warning if OS restrictions make it impossible to persist config b629d18d
+* censor filesystem paths in the download-as-zip error summary 5919607a
+* `u2c.exe`: explain that https is disabled bef96176
+* ux: 60c96f99
+  * hide lightbox buttons when a video is playing
+  * move audio seekbar text down a bit so it hides less of the waveform and minute-markers
+* updated dompurify to 3.1.5 f00b9394
+* updated docker images to alpine 3.20
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0510-1431  `v1.13.2`  s3xmodit.zip
 
 ## new features

@@ -6325,6 +6325,7 @@ var treectl = (function () {
 		r.nvis = r.lim;
 		r.sb_msg = false;
 		r.nextdir = xhr.top;
+		clearTimeout(mpl.t_eplay);
 		enspin('#tree');
 		enspin(thegrid.en ? '#gfiles' : '#files');
 		window.removeEventListener('scroll', r.tscroll);

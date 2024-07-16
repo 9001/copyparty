@@ -3093,7 +3093,7 @@ class Up2k(object):
 
         return ret, dst
 
-    def finish_upload(self, ptop: str, wark: str, busy_aps: set[str]) -> None:
+    def finish_upload(self, ptop: str, wark: str, busy_aps: dict[str, int]) -> None:
         self.busy_aps = busy_aps
         with self.mutex, self.reg_mutex:
             self._finish_upload(ptop, wark)
