@@ -13,6 +13,7 @@ run copyparty with `--help-hooks` for usage details / hook type explanations (xb
 * [image-noexif.py](image-noexif.py) removes image exif by overwriting / directly editing the uploaded file
 * [discord-announce.py](discord-announce.py) announces new uploads on discord using webhooks ([example](https://user-images.githubusercontent.com/241032/215304439-1c1cb3c8-ec6f-4c17-9f27-81f969b1811a.png))
 * [reject-mimetype.py](reject-mimetype.py) rejects uploads unless the mimetype is acceptable
+* [into-the-cache-it-goes.py](into-the-cache-it-goes.py) avoids bugs in caching proxies by immediately downloading each file that is uploaded
 
 
 # upload batches
