@@ -1296,7 +1296,7 @@ class Up2k(object):
                         not cv
                         or liname not in th_cvds
                         or cv.lower() not in th_cvds
-                        or th_cvd.index(iname) < th_cvd.index(cv)
+                        or th_cvd.index(liname) < th_cvd.index(cv.lower())
                     )
                 ):
                     cv = iname
