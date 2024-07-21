@@ -55,8 +55,8 @@ quick outline of the up2k protocol,  see [uploading](https://github.com/9001/cop
 * server creates the `wark`, an identifier for this upload
   * `sha512( salt + filesize + chunk_hashes )`
   * and a sparse file is created for the chunks to drop into
-* client uploads each chunk
-  * header entries for the chunk-hash and wark
+* client sends a series of POSTs, with one or more consecutive chunks in each
+  * header entries for the chunk-hashes (comma-separated) and wark
   * server writes chunks into place based on the hash
 * client does another handshake with the hashlist; server replies with OK or a list of chunks to reupload
 
@@ -327,10 +327,6 @@ can be reproduced with `--no-sendfile --s-wr-sz 8192 --s-wr-slp 0.3 --rsp-slp 6`
   * remove brokers / multiprocessing stuff; https://github.com/9001/copyparty/tree/no-broker
   * reduce the nesting / indirections in `HttpCli` / `httpcli.py`
     * nearly zero benefit from stuff like replacing all the `self.conn.hsrv` with a local `hsrv` variable
-* reduce up2k roundtrips
-  * start from a chunk index and just go
-  * terminate client on bad data
-    * not worth the effort, just throw enough conncetions at it
 * single sha512 across all up2k chunks?
   * crypto.subtle cannot into streaming, would have to use hashwasm, expensive
 * separate sqlite table per tag

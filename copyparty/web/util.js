@@ -1396,10 +1396,10 @@ var tt = (function () {
             o = ctr.querySelectorAll('*[tt]');
 
         for (var a = o.length - 1; a >= 0; a--) {
-            o[a].onfocus = _cshow;
-            o[a].onblur = _hide;
-            o[a].onmouseenter = _dshow;
-            o[a].onmouseleave = _hide;
+            o[a].addEventListener('focus', _cshow);
+            o[a].addEventListener('blur', _hide);
+            o[a].addEventListener('mouseenter', _dshow);
+            o[a].addEventListener('mouseleave', _hide);
         }
         r.hide();
     }

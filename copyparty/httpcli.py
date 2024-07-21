@@ -2199,33 +2199,36 @@ class HttpCli(object):
 
     def handle_post_binary(self) -> bool:
         try:
-            remains = int(self.headers["content-length"])
+            postsize = remains = int(self.headers["content-length"])
         except:
             raise Pebkac(400, "you must supply a content-length for binary POST")
 
         try:
-            chash = self.headers["x-up2k-hash"]
+            chashes = self.headers["x-up2k-hash"].split(",")
             wark = self.headers["x-up2k-wark"]
         except KeyError:
             raise Pebkac(400, "need hash and wark headers for binary POST")
 
+        chashes = [x.strip() for x in chashes]
+
         vfs, _ = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         ptop = (vfs.dbv or vfs).realpath
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_chunk", ptop, wark, chash)
+        x = self.conn.hsrv.broker.ask("up2k.handle_chunks", ptop, wark, chashes)
         response = x.get()
-        chunksize, cstart, path, lastmod, sprs = response
+        chunksize, cstarts, path, lastmod, sprs = response
+        maxsize = chunksize * len(chashes)
+        cstart0 = cstarts[0]
 
         try:
             if self.args.nw:
                 path = os.devnull
 
-            if remains > chunksize:
-                raise Pebkac(400, "your chunk is too big to fit")
+            if remains > maxsize:
+                t = "your client is sending %d bytes which is too much (server expected %d bytes at most)"
+                raise Pebkac(400, t % (remains, maxsize))
 
-            self.log("writing {} #{} @{} len {}".format(path, chash, cstart, remains))
-
-            reader = read_socket(self.sr, self.args.s_rd_sz, remains)
+            self.log("writing {} {} @{} len {}".format(path, chashes, cstart0, remains))
 
             f = None
             fpool = not self.args.no_fpool and sprs
@@ -2239,37 +2242,43 @@ class HttpCli(object):
             f = f or open(fsenc(path), "rb+", self.args.iobuf)
 
             try:
-                f.seek(cstart[0])
-                post_sz, _, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
-
-                if sha_b64 != chash:
-                    try:
-                        self.bakflip(f, cstart[0], post_sz, sha_b64, vfs.flags)
-                    except:
-                        self.log("bakflip failed: " + min_ex())
-
-                    t = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
-                    raise Pebkac(400, t.format(post_sz, chash, sha_b64))
-
-                if len(cstart) > 1 and path != os.devnull:
-                    self.log(
-                        "clone {} to {}".format(
-                            cstart[0], " & ".join(unicode(x) for x in cstart[1:])
-                        )
+                for chash, cstart in zip(chashes, cstarts):
+                    f.seek(cstart[0])
+                    reader = read_socket(
+                        self.sr, self.args.s_rd_sz, min(remains, chunksize)
                     )
-                    ofs = 0
-                    while ofs < chunksize:
-                        bufsz = max(4 * 1024 * 1024, self.args.iobuf)
-                        bufsz = min(chunksize - ofs, bufsz)
-                        f.seek(cstart[0] + ofs)
-                        buf = f.read(bufsz)
-                        for wofs in cstart[1:]:
-                            f.seek(wofs + ofs)
-                            f.write(buf)
+                    post_sz, _, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
 
-                        ofs += len(buf)
+                    if sha_b64 != chash:
+                        try:
+                            self.bakflip(f, cstart[0], post_sz, sha_b64, vfs.flags)
+                        except:
+                            self.log("bakflip failed: " + min_ex())
 
-                    self.log("clone {} done".format(cstart[0]))
+                        t = "your chunk got corrupted somehow (received {} bytes); expected vs received hash:\n{}\n{}"
+                        raise Pebkac(400, t.format(post_sz, chash, sha_b64))
+
+                    remains -= chunksize
+
+                    if len(cstart) > 1 and path != os.devnull:
+                        self.log(
+                            "clone {} to {}".format(
+                                cstart[0], " & ".join(unicode(x) for x in cstart[1:])
+                            )
+                        )
+                        ofs = 0
+                        while ofs < chunksize:
+                            bufsz = max(4 * 1024 * 1024, self.args.iobuf)
+                            bufsz = min(chunksize - ofs, bufsz)
+                            f.seek(cstart[0] + ofs)
+                            buf = f.read(bufsz)
+                            for wofs in cstart[1:]:
+                                f.seek(wofs + ofs)
+                                f.write(buf)
+
+                            ofs += len(buf)
+
+                        self.log("clone {} done".format(cstart[0]))
 
                 if not fpool:
                     f.close()
@@ -2281,10 +2290,10 @@ class HttpCli(object):
                 f.close()
                 raise
         finally:
-            x = self.conn.hsrv.broker.ask("up2k.release_chunk", ptop, wark, chash)
+            x = self.conn.hsrv.broker.ask("up2k.release_chunks", ptop, wark, chashes)
             x.get()  # block client until released
 
-        x = self.conn.hsrv.broker.ask("up2k.confirm_chunk", ptop, wark, chash)
+        x = self.conn.hsrv.broker.ask("up2k.confirm_chunks", ptop, wark, chashes)
         ztis = x.get()
         try:
             num_left, fin_path = ztis
@@ -2303,7 +2312,7 @@ class HttpCli(object):
 
         cinf = self.headers.get("x-up2k-stat", "")
 
-        spd = self._spd(post_sz)
+        spd = self._spd(postsize)
         self.log("{:70} thank {}".format(spd, cinf))
         self.reply(b"thank")
         return True
@@ -4500,6 +4509,7 @@ class HttpCli(object):
             "themes": self.args.themes,
             "turbolvl": self.args.turbo,
             "u2j": self.args.u2j,
+            "u2sz": self.args.u2sz,
             "idxh": int(self.args.ih),
             "u2sort": self.args.u2sort,
         }
