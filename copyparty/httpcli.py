@@ -646,11 +646,8 @@ class HttpCli(object):
                 if not self._check_nonfatal(pex, post):
                     self.keepalive = False
 
-                if pex is ex:
-                    em = msg = str(ex)
-                else:
-                    em = repr(ex)
-                    msg = min_ex()
+                em = str(ex)
+                msg = em if pex is ex else min_ex()
 
                 if pex.code != 404 or self.do_log:
                     self.log(

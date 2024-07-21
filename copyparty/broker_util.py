@@ -28,7 +28,7 @@ class ExceptionalQueue(Queue, object):
                 if rv[1] == "pebkac":
                     raise Pebkac(*rv[2:])
                 else:
-                    raise Exception(rv[2])
+                    raise rv[2]
 
         return rv
 
@@ -65,8 +65,8 @@ def try_exec(want_retval: Union[bool, int], func: Any, *args: list[Any]) -> Any:
 
         return ["exception", "pebkac", ex.code, str(ex)]
 
-    except:
+    except Exception as ex:
         if not want_retval:
             raise
 
-        return ["exception", "stack", traceback.format_exc()]
+        return ["exception", "stack", ex]

@@ -1377,7 +1377,7 @@ def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
 def min_ex(max_lines: int = 8, reverse: bool = False) -> str:
     et, ev, tb = sys.exc_info()
     stb = traceback.extract_tb(tb) if tb else traceback.extract_stack()[:-1]
-    fmt = "%s @ %d <%s>: %s"
+    fmt = "%s:%d <%s>: %s"
     ex = [fmt % (fp.split(os.sep)[-1], ln, fun, txt) for fp, ln, fun, txt in stb]
     if et or ev or tb:
         ex.append("[%s] %s" % (et.__name__ if et else "(anonymous)", ev))
