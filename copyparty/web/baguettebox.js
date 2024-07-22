@@ -29,6 +29,7 @@ window.baguetteBox = (function () {
         isOverlayVisible = false,
         touch = {},  // start-pos
         touchFlag = false,  // busy
+        scrollCSS = ['', ''],
         scrollTimer = 0,
         re_i = /^[^?]+\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp)(\?|$)/i,
         re_v = /^[^?]+\.(webm|mkv|mp4)(\?|$)/i,
@@ -567,6 +568,12 @@ window.baguetteBox = (function () {
 
     function showOverlay(chosenImageIndex) {
         if (options.noScrollbars) {
+            var a = document.documentElement.style.overflowY,
+                b = document.body.style.overflowY;
+
+            if (a != 'hidden' || b != 'scroll')
+                scrollCSS = [a, b];
+            
             document.documentElement.style.overflowY = 'hidden';
             document.body.style.overflowY = 'scroll';
         }
@@ -615,8 +622,8 @@ window.baguetteBox = (function () {
         playvid(false);
         removeFromCache('#files');
         if (options.noScrollbars) {
-            document.documentElement.style.overflowY = 'auto';
-            document.body.style.overflowY = 'auto';
+            document.documentElement.style.overflowY = scrollCSS[0];
+            document.body.style.overflowY = scrollCSS[1];
         }
 
         try {
