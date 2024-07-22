@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.19"
-S_BUILD_DT = "2024-07-21"
+S_VERSION = "1.20"
+S_BUILD_DT = "2024-07-22"
 
 """
 u2c.py: upload to copyparty
@@ -20,6 +20,7 @@ import sys
 import stat
 import math
 import time
+import json
 import atexit
 import signal
 import socket
@@ -79,7 +80,7 @@ req_ses = requests.Session()
 
 
 class Daemon(threading.Thread):
-    def __init__(self, target, name = None, a = None):
+    def __init__(self, target, name=None, a=None):
         threading.Thread.__init__(self, name=name)
         self.a = a or ()
         self.fun = target
@@ -110,19 +111,22 @@ class File(object):
         # set by get_hashlist
         self.cids = []  # type: list[tuple[str, int, int]]  # [ hash, ofs, sz ]
         self.kchunks = {}  # type: dict[str, tuple[int, int]]  # hash: [ ofs, sz ]
+        self.t_hash = 0.0  # type: float
 
         # set by handshake
         self.recheck = False  # duplicate; redo handshake after all files done
         self.ucids = []  # type: list[str]  # chunks which need to be uploaded
         self.wark = ""  # type: str
         self.url = ""  # type: str
-        self.nhs = 0
+        self.nhs = 0  # type: int
 
         # set by upload
+        self.t0_up = 0.0  # type: float
+        self.t1_up = 0.0  # type: float
         self.nojoin = 0  # type: int
         self.up_b = 0  # type: int
         self.up_c = 0  # type: int
-        self.cd = 0
+        self.cd = 0  # type: int
 
         # t = "size({}) lmod({}) top({}) rel({}) abs({}) name({})\n"
         # eprint(t.format(self.size, self.lmod, self.top, self.rel, self.abs, self.name))
@@ -368,7 +372,7 @@ def undns(url):
     usp = urlsplit(url)
     hn = usp.hostname
     gai = None
-    eprint("resolving host [{0}] ...".format(hn), end="")
+    eprint("resolving host [%s] ..." % (hn,))
     try:
         gai = socket.getaddrinfo(hn, None)
         hn = gai[0][4][0]
@@ -386,7 +390,7 @@ def undns(url):
 
     usp = usp._replace(netloc=hn)
     url = urlunsplit(usp)
-    eprint(" {0}".format(url))
+    eprint(" %s\n" % (url,))
     return url
 
 
@@ -529,6 +533,8 @@ def get_hashlist(file, pcb, mth):
     file_ofs = 0
     ret = []
     with open(file.abs, "rb", 512 * 1024) as f:
+        t0 = time.time()
+
         if mth and file.size >= 1024 * 512:
             ret = mth.hash(f, file.size, chunk_sz, pcb, file)
             file_rem = 0
@@ -555,10 +561,12 @@ def get_hashlist(file, pcb, mth):
             if pcb:
                 pcb(file, file_ofs)
 
+    file.t_hash = time.time() - t0
     file.cids = ret
     file.kchunks = {}
     for k, v1, v2 in ret:
-        file.kchunks[k] = [v1, v2]
+        if k not in file.kchunks:
+            file.kchunks[k] = [v1, v2]
 
 
 def handshake(ar, file, search):
@@ -600,7 +608,8 @@ def handshake(ar, file, search):
         sc = 600
         txt = ""
         try:
-            r = req_ses.post(url, headers=headers, json=req)
+            zs = json.dumps(req, separators=(",\n", ": "))
+            r = req_ses.post(url, headers=headers, data=zs)
             sc = r.status_code
             txt = r.text
             if sc < 400:
@@ -668,7 +677,11 @@ def upload(fsl, pw, stats):
 
         if r.status_code == 400:
             txt = r.text
-            if "already got that" in txt or "already being written" in txt:
+            if (
+                "already being written" in txt
+                or "already got that" in txt
+                or "only sibling chunks" in txt
+            ):
                 fsl.file.nojoin = 1
 
         if not r:
@@ -740,6 +753,8 @@ class Ctl(object):
         if ar.safe:
             self._safe()
         else:
+            self.at_hash = 0.0
+            self.at_up = 0.0
             self.hash_f = 0
             self.hash_c = 0
             self.hash_b = 0
@@ -814,7 +829,7 @@ class Ctl(object):
         if not self.recheck:
             return
 
-        eprint("finalizing {0} duplicate files".format(len(self.recheck)))
+        eprint("finalizing %d duplicate files\n" % (len(self.recheck),))
         for file in self.recheck:
             handshake(self.ar, file, search)
 
@@ -888,10 +903,16 @@ class Ctl(object):
             t = "{0} eta @ {1}/s, {2}, {3}# left".format(self.eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
 
+        spd = humansize(self.hash_b / self.at_hash)
+        eprint("\nhasher: %.2f sec, %s/s\n" % (self.at_hash, spd))
+        if self.up_b and self.at_up:
+            spd = humansize(self.up_b / self.at_up)
+            eprint("upload: %.2f sec, %s/s\n" % (self.at_up, spd))
+
         if not self.recheck:
             return
 
-        eprint("finalizing {0} duplicate files".format(len(self.recheck)))
+        eprint("finalizing %d duplicate files\n" % (len(self.recheck),))
         for file in self.recheck:
             handshake(self.ar, file, False)
 
@@ -1077,8 +1098,30 @@ class Ctl(object):
                 self.handshaker_busy -= 1
 
             if not hs:
-                kw = "uploaded" if file.up_b else "   found"
-                print("{0} {1}".format(kw, upath))
+                self.at_hash += file.t_hash
+                if file.up_b:
+                    t_up = file.t1_up - file.t0_up
+                    self.at_up += t_up
+
+                if self.ar.spd:
+                    if VT100:
+                        c1 = "\033[36m"
+                        c2 = "\033[0m"
+                    else:
+                        c1 = c2 = ""
+
+                    spd_h = humansize(file.size / file.t_hash, True)
+                    if file.up_b:
+                        spd_u = humansize(file.size / t_up, True)
+
+                        t = "uploaded %s %s(h:%.2fs,%s/s,up:%.2fs,%s/s)%s"
+                        print(t % (upath, c1, file.t_hash, spd_h, t_up, spd_u, c2))
+                    else:
+                        t = "   found %s %s(%.2fs,%s/s)%s"
+                        print(t % (upath, c1, file.t_hash, spd_h, c2))
+                else:
+                    kw = "uploaded" if file.up_b else "   found"
+                    print("{0} {1}".format(kw, upath))
 
             cs = hs[:]
             while cs:
@@ -1086,11 +1129,11 @@ class Ctl(object):
                 try:
                     if file.nojoin:
                         raise Exception()
-                    for n in range(2, self.ar.sz + 1):
+                    for n in range(2, min(len(cs), self.ar.sz) + 1):
                         fsl = FileSlice(file, cs[:n])
                 except:
                     pass
-                cs = cs[len(fsl.cids):]
+                cs = cs[len(fsl.cids) :]
                 self.q_upload.put(fsl)
 
     def uploader(self):
@@ -1100,9 +1143,15 @@ class Ctl(object):
                 self.st_up = [None, "(finished)"]
                 break
 
+            file = fsl.file
+            cids = fsl.cids
+
             with self.mutex:
                 self.uploader_busy += 1
-                self.t0_up = self.t0_up or time.time()
+                if not file.t0_up:
+                    file.t0_up = time.time()
+                    if not self.t0_up:
+                        self.t0_up = file.t0_up
 
             stats = "%d/%d/%d/%d %d/%d %s" % (
                 self.up_f,
@@ -1114,12 +1163,10 @@ class Ctl(object):
                 self.eta,
             )
 
-            file = fsl.file
-            cids = fsl.cids
             try:
                 upload(fsl, self.ar.a, stats)
             except Exception as ex:
-                t = "upload failed, retrying: %s #%d+%d (%s)\n"
+                t = "upload failed, retrying: %s #%s+%d (%s)\n"
                 eprint(t % (file.name, cids[0][:8], len(cids) - 1, ex))
                 file.cd = time.time() + self.ar.cd
                 # handshake will fix it
@@ -1128,6 +1175,7 @@ class Ctl(object):
                 sz = fsl.len
                 file.ucids = [x for x in file.ucids if x not in cids]
                 if not file.ucids:
+                    file.t1_up = time.time()
                     self.q_handshake.put(file)
 
                 self.st_up = [file, cids[0]]
@@ -1179,6 +1227,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap.add_argument("--touch", action="store_true", help="if last-modified timestamps differ, push local to server (need write+delete perms)")
     ap.add_argument("--ow", action="store_true", help="overwrite existing files instead of autorenaming")
+    ap.add_argument("--spd", action="store_true", help="print speeds for each file")
     ap.add_argument("--version", action="store_true", help="show version and exit")
 
     ap = app.add_argument_group("compatibility")
@@ -1238,7 +1287,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ar.url = ar.url.rstrip("/") + "/"
     if "://" not in ar.url:
         ar.url = "http://" + ar.url
-    
+
     if "https://" in ar.url.lower():
         try:
             import ssl, zipfile
