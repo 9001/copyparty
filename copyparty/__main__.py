@@ -491,11 +491,17 @@ def disable_quickedit() -> None:
 
 
 def sfx_tpoke(top: str):
-    files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
+    files = [top] + [
+        os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df
+    ]
     while True:
         t = int(time.time())
-        for f in [top] + files:
-            os.utime(f, (t, t))
+        for f in list(files):
+            try:
+                os.utime(f, (t, t))
+            except Exception as ex:
+                lprint("<TPOKE> [%s] %r" % (f, ex))
+                files.remove(f)
 
         time.sleep(78123)
 

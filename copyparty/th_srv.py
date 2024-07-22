@@ -309,7 +309,9 @@ class ThumbSrv(object):
                 want_png = tpath.endswith(".png")
                 want_au = want_mp3 or want_opus
                 for lib in self.args.th_dec:
-                    can_au = lib == "ff" and (ext in self.fmt_ffa or ext in self.fmt_ffv)
+                    can_au = lib == "ff" and (
+                        ext in self.fmt_ffa or ext in self.fmt_ffv
+                    )
 
                     if lib == "pil" and ext in self.fmt_pil:
                         funs.append(self.conv_pil)

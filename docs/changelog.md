@@ -1,4 +1,55 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0716-0457  `v1.13.4`  descript.ion
+
+## new features
+
+* "medialinks"; instead of the usual hotlink, the basic-uploader (as used by sharex and such) can return a link that opens the file in the media viewer c9281f89
+  * enable for all uploads with volflag `medialinks`, or just for one upload by adding `?media` to the post url
+* thumbnails are now fully compatible with dirkeys/filekeys 52e06226
+* `--th-covers` will respect filename order, selecting the first matching filename as the folder thumbnail 1cdb1702
+* new hook: [bittorrent downloader](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#on-message) bd3b3863 803e1565
+* hooks: d749683d
+  * can be restricted to only run when user has specific permissions
+  * user permissions are also included in the json message to the hook
+  * new syntax to prepend args to the hook's command
+  * (all this will be better documented after some additional upcoming hook-related features, see `--help-hooks` for now)
+* support `descript.ion` usenet metadata; will parse and render into directory listings when possible 927c3bce
+  * directory listings are now 2% slower, eh who's keeping count anyways
+* tftp-server: 45259251
+  * improved support for buggy clients
+  * improved ipv6 support, especially on macos
+  * improved robustness on unreliable networks
+* #85 new option `--gsel` to default-enable the client setting to select files by ctrl-clicking them in the grid 9a87ee2f
+* music player: set audio volume by scrollwheel 36d6d29a
+
+## bugfixes
+
+* race-the-beam (downloading an unfinished upload) could get interrupted near the end, requiring a manual resume in the browser's download manager to finish f37187a0
+* ftp-server: when accessing the root folder of servers without a root folder, it could mention inaccessible folders 84e8e1dd
+* ftp-server: uploads will automatically replace existing files if user has delete perms 0a9f4c60
+  * windows 2000 expects this behavior, otherwise it'll freak out and delete stuff and then not actually upload it, nice
+  * new option `--ftp-no-ow` restores old default behavior of rejecting upload if target filename exists
+* music player:
+  * stop trying to recover from a corrupted file if the user already fixed it manually 55a011b9
+  * support downloading the currently playing song regardless of current folder c06aa683
+* music player preloader: db6059e1
+  * stop searching after 5 folders of nothing
+  * don't crash playback by walking into error-pages
+* `--og` (rich discord embeds) was incompatible with viewing markdown docs d75a2c77
+* `--cgen` (configfile generator) much less jank d5de3f2f
+
+## other changes
+
+* mention that HTTP/2 is still usually slower than HTTP/1.1 dfe7f1d9
+* give up much sooner if a client is supposed to send a request body but isn't c549f367
+* support running copyparty as a server on windows 2000 and winXP 8c73e0cb 2fd12a83
+* updated deps 6e58514b
+  * copyparty.exe: python 3.12, pillow 10.4, pyinstaller 6.9
+  * dompurify 3.1.6
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0601-2324  `v1.13.3`  700+
 
 ## new features
