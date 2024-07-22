@@ -360,6 +360,7 @@ var Ls = {
 		"tvt_sel": "select file &nbsp; ( for cut / delete / ... )$NHotkey: S\">sel",
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 
+		"gt_vau": "don't show videos, just play the audio\">🎧",
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
 		"gt_crop": "center-crop thumbnails\">crop",
 		"gt_3x": "hi-res thumbnails\">3x",
@@ -874,6 +875,7 @@ var Ls = {
 		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
 
+		"gt_vau": "ikke vis videofiler, bare spill lyden\">🎧",
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
 		"gt_crop": "beskjær ikonene så de passer bedre\">✂",
 		"gt_3x": "høyere oppløsning på ikoner\">3x",
@@ -1709,7 +1711,7 @@ catch (ex) { }
 
 
 var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
-	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|itgz|itxz|itz|m4a|mdgz|mdxz|mdz|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|s3gz|s3xz|s3z|tak|tta|ulaw|wav|wma|wv|xm|xmgz|xmxz|xmz|xpk)$/i;
+	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|itgz|itxz|itz|m4a|mdgz|mdxz|mdz|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|s3gz|s3xz|s3z|tak|tta|ulaw|wav|wma|wv|xm|xmgz|xmxz|xmz|xpk|3gp|asf|avi|flv|m4v|mkv|mov|mp4|mpeg|mpeg2|mpegts|mpg|mpg2|nut|ogm|ogv|rm|ts|vob|webm|wmv)$/i;
 
 
 // extract songs + add play column
@@ -4410,7 +4412,7 @@ var showfile = (function () {
 
 			var td = ebi(link.id).closest('tr').getElementsByTagName('td')[0];
 
-			if (lang == 'md' && td.textContent != '-')
+			if (lang == 'ts' || (lang == 'md' && td.textContent != '-'))
 				continue;
 
 			td.innerHTML = '<a href="#" id="t' +
@@ -4677,6 +4679,7 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
+		'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
 		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
 		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
@@ -4838,7 +4841,7 @@ var thegrid = (function () {
 		else if (oth.hasAttribute('download'))
 			oth.click();
 
-		else if (widget.is_open && aplay)
+		else if (aplay && (r.vau || !is_img))
 			aplay.click();
 
 		else if (is_dir && !have_sel)
@@ -5129,6 +5132,7 @@ var thegrid = (function () {
 
 	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
 	bcfg_bind(r, 'ihop', 'ihop', true);
+	bcfg_bind(r, 'vau', 'gridvau', false);
 	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
 	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);

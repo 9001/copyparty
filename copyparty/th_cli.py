@@ -59,7 +59,8 @@ class ThumbCli(object):
 
         want_opus = fmt in ("opus", "caf", "mp3")
         is_au = ext in self.fmt_ffa
-        if is_au:
+        is_vau = want_opus and ext in self.fmt_ffv
+        if is_au or is_vau:
             if want_opus:
                 if self.args.no_acode:
                     return None
@@ -107,7 +108,7 @@ class ThumbCli(object):
 
             fmt = sfmt
 
-        elif fmt[:1] == "p" and not is_au:
+        elif fmt[:1] == "p" and not is_au and not is_vid:
             t = "cannot thumbnail [%s]: png only allowed for waveforms"
             self.log(t % (rem), 6)
             return None
