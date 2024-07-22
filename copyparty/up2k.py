@@ -3052,7 +3052,7 @@ class Up2k(object):
                 gap = (ofs2[0] - ofs1[0]) - chunksize
                 if gap:
                     t = "only sibling chunks can be stitched; gap of %d bytes between offsets %d and %d in %s"
-                    raise Pebkac(400, t % (ofs1, ofs2, gap, job["name"]))
+                    raise Pebkac(400, t % (gap, ofs1[0], ofs2[0], job["name"]))
 
             path = djoin(job["ptop"], job["prel"], job["tnam"])
 

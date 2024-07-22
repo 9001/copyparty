@@ -658,7 +658,9 @@ function Donut(uc, st) {
     }
 
     function pos() {
-        return uc.fsearch ? Math.max(st.bytes.hashed, st.bytes.finished) : st.bytes.finished;
+        return uc.fsearch ?
+            Math.max(st.bytes.hashed, st.bytes.finished) :
+            st.bytes.inflight + st.bytes.finished;
     }
 
     r.on = function (ya) {
@@ -1737,6 +1739,11 @@ function up2k_init(subtle) {
                     }
                 }
 
+                if (st.bytes.inflight && (st.bytes.inflight < 0 || !st.busy.upload.length)) {
+                    console.log('insane inflight ' + st.bytes.inflight);
+                    st.bytes.inflight = 0;
+                }
+
                 var mou_ikkai = false;
 
                 if (st.busy.handshake.length &&
@@ -2768,7 +2775,11 @@ function up2k_init(subtle) {
 
     var read_u2sz = function () {
 		var el = ebi('u2szg'), n = parseInt(el.value), dv = u2sz.split(',');
-        n = isNaN(n) ? dv[1] : n < dv[0] ? dv[0] : n > dv[2] ? dv[2] : n;
+        stitch_tgt = n = (
+            isNaN(n) ? dv[1] :
+            n < dv[0] ? dv[0] :
+            n > dv[2] ? dv[2] : n
+        );
         if (n == dv[1]) sdrop('u2sz'); else swrite('u2sz', n);
         if (el.value != n) el.value = n;
     };

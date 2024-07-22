@@ -209,7 +209,7 @@ also see [comparison to similar software](./docs/versus.md)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
-    * unaffected by cloudflare's max-upload-size (100 MiB)
+    * **no filesize limit!** ...unless you use Cloudflare, then it's 383.9 GiB
   * ☑ stash: simple PUT filedropper
   * ☑ filename randomizer
   * ☑ write-only folders
@@ -646,6 +646,7 @@ up2k has several advantages:
   * uploads resume if you reboot your browser or pc, just upload the same files again
   * server detects any corruption; the client reuploads affected chunks
   * the client doesn't upload anything that already exists on the server
+  * no filesize limit unless imposed by a proxy, for example Cloudflare, which blocks uploads over 383.9 GiB
 * much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
 * the last-modified timestamp of the file is preserved
 

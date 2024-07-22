@@ -2228,7 +2228,10 @@ class HttpCli(object):
                 t = "your client is sending %d bytes which is too much (server expected %d bytes at most)"
                 raise Pebkac(400, t % (remains, maxsize))
 
-            self.log("writing {} {} @{} len {}".format(path, chashes, cstart0, remains))
+            t = "writing %s %s+%d #%d+%d %s"
+            chunkno = cstart0[0] // chunksize
+            zs = " ".join([chashes[0][:15]] + [x[:9] for x in chashes[1:]])
+            self.log(t % (path, cstart0, remains, chunkno, len(chashes), zs))
 
             f = None
             fpool = not self.args.no_fpool and sprs
