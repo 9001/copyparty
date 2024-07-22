@@ -7999,7 +7999,8 @@ function sandbox(tgt, rules, cls, html) {
 			env = js.split(/\blogues *=/)[0] + 'a;';
 	}
 
-	html = '<html class="iframe ' + document.documentElement.className + '"><head><style>' + globalcss() +
+	html = '<html class="iframe ' + document.documentElement.className +
+		'"><head><style>html{background:#eee;color:#000}\n' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
 		'<script>' + env + '</script>' + sandboxjs() +
 		'<script>var d=document.documentElement,TS="' + TS + '",' +
