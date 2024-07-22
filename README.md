@@ -990,7 +990,7 @@ some recommended FTP / FTPS clients; `wark` = example password:
 
 ## webdav server
 
-with read-write support,  supports winXP and later, macos, nautilus/gvfs
+with read-write support,  supports winXP and later, macos, nautilus/gvfs  ... a greay way to [access copyparty straight from the file explorer in your OS](#mount-as-drive)
 
 click the [connect](http://127.0.0.1:3923/?hc) button in the control-panel to see connection instructions for windows, linux, macos
 
@@ -1801,7 +1801,7 @@ alternatively, some alternatives roughly sorted by speed (unreproducible benchma
 * [rclone-http](./docs/rclone.md) (26s), read-only
 * [partyfuse.py](./bin/#partyfusepy) (35s), read-only
 * [rclone-ftp](./docs/rclone.md) (47s), read/WRITE
-* davfs2 (103s), read/WRITE, *very fast* on small files
+* davfs2 (103s), read/WRITE
 * [win10-webdav](#webdav-server) (138s), read/WRITE
 * [win10-smb2](#smb-server) (387s), read/WRITE
 

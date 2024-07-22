@@ -64,16 +64,7 @@
         </div>
 
         <div class="os lin">
-            <pre>
-                yum install davfs2
-                {% if accs %}printf '%s\n' <b>{{ pw }}</b> k | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b>
-            </pre>
-            <p>make it automount on boot:</p>
-            <pre>
-                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>{{ pw }}</b> k" >> /etc/davfs2/secrets
-                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b> davfs rw,user,uid=1000,noauto 0 0" >> /etc/fstab
-            </pre>
-            <p>or you can use rclone instead, which is much slower but doesn't require root (plus it keeps lastmodified on upload):</p>
+            <p>rclone (v1.63 or later) is recommended:</p>
             <pre>
                 rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>
@@ -85,6 +76,16 @@
                 <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
+            <p>alternatively use davfs2 (requires root, is slower, forgets lastmodified-timestamp on upload):</p>
+            <pre>
+                yum install davfs2
+                {% if accs %}printf '%s\n' <b>{{ pw }}</b> k | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b>
+            </pre>
+            <p>make davfs2 automount on boot:</p>
+            <pre>
+                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>{{ pw }}</b> k" >> /etc/davfs2/secrets
+                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b> davfs rw,user,uid=1000,noauto 0 0" >> /etc/fstab
+            </pre>
             <p>or the emergency alternative (gnome/gui-only):</p>
             <!-- gnome-bug: ignores vp -->
             <pre>
