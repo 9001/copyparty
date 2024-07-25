@@ -12,18 +12,19 @@ application/x-www-form-urlencoded (for example using the
 📟 message-to-server-log in the web-ui)
 
 example usage as global config:
-    --xm f,j,t3600,bin/hooks/wget.py
+    --xm aw,f,j,t3600,bin/hooks/wget.py
 
 parameters explained,
     xm = execute on message-to-server-log
+    aw = only users with write-access can use this
     f = fork; don't delay other hooks while this is running
     j = provide message information as json (not just the text)
     c3 = mute all output
     t3600 = timeout and abort download after 1 hour
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:r:rw,ed:c,xm=f,j,t3600,bin/hooks/wget.py
-                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    -v srv/inc:inc:r:rw,ed:c,xm=aw,f,j,t3600,bin/hooks/wget.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     (share filesystem-path srv/inc as volume /inc,
      readable by everyone, read-write for user 'ed',
@@ -36,7 +37,7 @@ example usage as a volflag in a copyparty config file:
         r: *
         rw: ed
       flags:
-        xm: f,j,t3600,bin/hooks/wget.py     
+        xm: aw,f,j,t3600,bin/hooks/wget.py
 
 the volflag examples only kicks in if you send the message
 while you're in the /inc folder (or any folder below there)

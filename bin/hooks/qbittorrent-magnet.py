@@ -23,17 +23,18 @@ because the keyword "anime" is in the DESTS config below
 needs python3
 
 example usage as global config (not a good idea):
-    python copyparty-sfx.py --xm f,j,t60,bin/hooks/qbittorrent-magnet.py
+    python copyparty-sfx.py --xm aw,f,j,t60,bin/hooks/qbittorrent-magnet.py
 
 parameters explained,
     xm = execute on message (📟)
+    aw = only users with write-access can use this
     f = fork; don't delay other hooks while this is running
     j = provide message information as json (not just the text)
     t60 = abort if qbittorrent has to think about it for more than 1 min
 
 example usage as a volflag (per-volume config, much better):
-    -v srv/qb:qb:A,ed:c,xm=f,j,t60,bin/hooks/qbittorrent-magnet.py
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    -v srv/qb:qb:A,ed:c,xm=aw,f,j,t60,bin/hooks/qbittorrent-magnet.py
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     (share filesystem-path srv/qb as volume /qb with Admin for user 'ed',
      running this plugin on all messages with the params explained above)
@@ -44,7 +45,7 @@ example usage as a volflag in a copyparty config file:
       accs:
         A: ed
       flags:
-        xm: f,j,t60,bin/hooks/qbittorrent-magnet.py
+        xm: aw,f,j,t60,bin/hooks/qbittorrent-magnet.py
 
 the volflag examples only kicks in if you send the torrent magnet
 while you're in the /qb folder (or any folder below there)
