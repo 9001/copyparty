@@ -1,0 +1,118 @@
+/* copy bsod.* into a folder named ".themes" in your webroot and then
+     --themes=10 --theme=9 --css-browser=/.themes/bsod.css
+*/
+
+html.ey {
+    --w2: #3d7bbc;
+    --w3: #5fcbec;
+
+    --fg: #fff;
+    --fg-max: #fff;
+    --fg-weak: var(--w3);
+
+    --bg: #2067b2;
+    --bg-d3: var(--bg);
+    --bg-d2: var(--w2);
+    --bg-d1: var(--fg-weak);
+    --bg-u2: var(--bg);
+    --bg-u3: var(--bg);
+    --bg-u5: var(--w2);
+
+    --tab-alt: var(--fg-weak);
+	--row-alt: var(--w2);
+
+    --scroll: var(--w3);
+
+    --a: #fff;
+    --a-b: #fff;
+    --a-hil: #fff;
+    --a-h-bg: var(--fg-weak);
+    --a-dark: var(--a);
+    --a-gray: var(--fg-weak);
+
+	--btn-fg: var(--a);
+	--btn-bg: var(--w2);
+    --btn-h-fg: var(--w2);
+	--btn-1-fg: var(--bg);
+	--btn-1-bg: var(--a);
+    --txt-sh: a;
+    --txt-bg: var(--w2);
+
+	--u2-b1-bg: var(--w2);
+	--u2-b2-bg: var(--w2);
+	--u2-o-bg: var(--w2);
+	--u2-o-1-bg: var(--a);
+    --u2-txt-bg: var(--w2);
+	--u2-tab-bg: a;
+	--u2-tab-1-bg: var(--w2);
+
+    --sort-1: var(--a);
+    --sort-1: var(--fg-weak);
+
+    --tree-bg: var(--bg);
+
+	--g-b1: a;
+	--g-b2: a;
+    --g-f-bg: var(--w2);
+
+    --f-sh1: 0.1;
+    --f-sh2: 0.02;
+    --f-sh3: 0.1;
+    --f-h-b1: a;
+
+    --srv-1: var(--a);
+    --srv-3: var(--a);
+
+    --mp-sh: a;
+}
+
+html.ey {
+    background: url('bsod.png') top 5em right 4.5em no-repeat fixed var(--bg);
+}
+html.ey body#b {
+    background: var(--bg);  /*sandbox*/
+}
+html.ey #ops {
+    margin: 1.7em 1.5em 0 1.5em;
+	border-radius: .3em;
+	border-width: 1px 0;
+}
+html.ey #ops a {
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+html.ey .opbox {
+	margin: 1.5em 0 0 0;
+}
+html.ey #tree {
+    box-shadow: none;
+}
+html.ey #tt {
+    border-color: var(--w2);
+    background: var(--w2);
+}
+html.ey .mdo a {
+    background: none;
+    text-decoration: underline;
+}
+html.ey .mdo pre,
+html.ey .mdo code {
+    color: #fff;
+    background: var(--w2);
+    border: none;
+}
+html.ey .mdo h1,
+html.ey .mdo h2 {
+    background: none;
+    border-color: var(--w2);
+}
+html.ey .mdo ul ul,
+html.ey .mdo ul ol,
+html.ey .mdo ol ul,
+html.ey .mdo ol ol {
+	border-color: var(--w2);
+}
+html.ey .mdo p>em,
+html.ey .mdo li>em,
+html.ey .mdo td>em {
+	color: #fd0;
+}
