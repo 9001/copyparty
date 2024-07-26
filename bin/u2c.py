@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.20"
-S_BUILD_DT = "2024-07-22"
+S_VERSION = "1.21"
+S_BUILD_DT = "2024-07-26"
 
 """
 u2c.py: upload to copyparty
@@ -755,6 +755,7 @@ class Ctl(object):
         else:
             self.at_hash = 0.0
             self.at_up = 0.0
+            self.at_upr = 0.0
             self.hash_f = 0
             self.hash_c = 0
             self.hash_b = 0
@@ -903,8 +904,9 @@ class Ctl(object):
             t = "{0} eta @ {1}/s, {2}, {3}# left".format(self.eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
 
-        spd = humansize(self.hash_b / self.at_hash)
-        eprint("\nhasher: %.2f sec, %s/s\n" % (self.at_hash, spd))
+        if self.hash_b and self.at_hash:
+            spd = humansize(self.hash_b / self.at_hash)
+            eprint("\nhasher: %.2f sec, %s/s\n" % (self.at_hash, spd))
         if self.up_b and self.at_up:
             spd = humansize(self.up_b / self.at_up)
             eprint("upload: %.2f sec, %s/s\n" % (self.at_up, spd))
@@ -1099,9 +1101,6 @@ class Ctl(object):
 
             if not hs:
                 self.at_hash += file.t_hash
-                if file.up_b:
-                    t_up = file.t1_up - file.t0_up
-                    self.at_up += t_up
 
                 if self.ar.spd:
                     if VT100:
@@ -1112,6 +1111,7 @@ class Ctl(object):
 
                     spd_h = humansize(file.size / file.t_hash, True)
                     if file.up_b:
+                        t_up = file.t1_up - file.t0_up
                         spd_u = humansize(file.size / t_up, True)
 
                         t = "uploaded %s %s(h:%.2fs,%s/s,up:%.2fs,%s/s)%s"
@@ -1123,13 +1123,15 @@ class Ctl(object):
                     kw = "uploaded" if file.up_b else "   found"
                     print("{0} {1}".format(kw, upath))
 
+            chunksz = up2k_chunksize(file.size)
+            njoin = (self.ar.sz * 1024 * 1024) // chunksz
             cs = hs[:]
             while cs:
                 fsl = FileSlice(file, cs[:1])
                 try:
                     if file.nojoin:
                         raise Exception()
-                    for n in range(2, min(len(cs), self.ar.sz) + 1):
+                    for n in range(2, min(len(cs), njoin + 1)):
                         fsl = FileSlice(file, cs[:n])
                 except:
                     pass
@@ -1147,6 +1149,8 @@ class Ctl(object):
             cids = fsl.cids
 
             with self.mutex:
+                if not self.uploader_busy:
+                    self.at_upr = time.time()
                 self.uploader_busy += 1
                 if not file.t0_up:
                     file.t0_up = time.time()
@@ -1185,6 +1189,8 @@ class Ctl(object):
                 file.up_c += 1
                 self.up_c += 1
                 self.uploader_busy -= 1
+                if not self.uploader_busy:
+                    self.at_up += time.time() - self.at_upr
 
     def up_done(self, file):
         if self.ar.dl:
