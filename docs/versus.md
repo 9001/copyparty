@@ -20,6 +20,7 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
   * 💾 = what copyparty offers as an alternative
 * 🔵 = similarities
 * ⚠️ = disadvantages (something copyparty does "better")
+* 🔥 = hazards
 
 
 ## toc
@@ -37,7 +38,7 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
     * [another matrix](#another-matrix)
 * [reviews](#reviews)
     * [copyparty](#copyparty)
-    * [hfs2](#hfs2)
+    * [hfs2](#hfs2) 🔥
     * [hfs3](#hfs3)
     * [nextcloud](#nextcloud)
     * [seafile](#seafile)
@@ -83,8 +84,8 @@ the table headers in the matrixes below are the different softwares, with a quic
 
 the softwares,
 * `a` = [copyparty](https://github.com/9001/copyparty)
-* `b` = [hfs2](https://rejetto.com/hfs/)
-* `c` = [hfs3](https://github.com/rejetto/hfs)
+* `b` = [hfs2](https://github.com/rejetto/hfs2/) 🔥
+* `c` = [hfs3](https://rejetto.com/hfs/)
 * `d` = [nextcloud](https://github.com/nextcloud/server)
 * `e` = [seafile](https://github.com/haiwen/seafile)
 * `f` = [rclone](https://github.com/rclone/rclone), specifically `rclone serve webdav .`
@@ -152,19 +153,20 @@ symbol legend,
 | feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ | ╱ |
-| download folder as tar  | █ |   |   |   |   |   |   |   |   | █ |   |   |   |
-| upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
-| parallel uploads        | █ |   |   | █ | █ |   | • |   | █ |   | █ |   | █ |
-| resumable uploads       | █ |   |   |   |   |   |   |   | █ |   | █ | ╱ |   |
-| upload segmenting       | █ |   |   |   |   |   |   | █ | █ |   | █ | ╱ | █ |
+| download folder as tar  | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ |
+| parallel uploads        | █ |   |   | █ | █ |   | • |   | █ | █ | █ |   | █ |
+| resumable uploads       | █ |   | █ |   |   |   |   |   | █ | █ | █ | ╱ |   |
+| upload segmenting       | █ |   |   |   |   |   |   | █ | █ | █ | █ | ╱ | █ |
 | upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |   |   |
 | upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |   |
 | upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |   |
 | upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ | ╱ | ╱ |
-| race the beam ("p2p")   | █ |   |   |   |   |   |   |   |   | • |   |   |   |
+| CTRL-V from device      | █ |   |   | █ |   |   |   |   |   |   |   |   |   |
+| race the beam ("p2p")   | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
 | upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ | ╱ |
-| ┗ max disk usage        | █ | █ |   |   | █ |   |   |   | █ |   |   | █ | █ |
+| ┗ max disk usage        | █ | █ | █ |   | █ |   |   |   | █ |   |   | █ | █ |
 | ┗ max filesize          | █ |   |   |   |   |   |   | █ |   |   | █ | █ | █ |
 | ┗ max items in folder   | █ |   |   |   |   |   |   |   |   |   |   | ╱ |   |
 | ┗ max file age          | █ |   |   |   |   |   |   |   | █ |   |   |   |   |
@@ -181,6 +183,8 @@ symbol legend,
 * `upload acceleration` = each file can be uploaded using several TCP connections, which can offer a huge speed boost over huge distances / on flaky connections -- like the good old [download accelerators](https://en.wikipedia.org/wiki/GetRight) except in reverse
 
 * `upload verification` = uploads are checksummed or otherwise confirmed to have been transferred correctly
+
+* `CTRL-V from device` = press CTRL-C in Windows Explorer (or whatever) and paste into the webbrowser to upload it
 
 * `race the beam` = files can be downloaded while they're still uploading; downloaders are slowed down such that the uploader is always ahead
 
@@ -213,7 +217,7 @@ symbol legend,
 | serve sftp (ssh)        |   |   |   |   |   | █ |   |   |   |   |   | █ | █ |
 | serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |   |
 | serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |   |
-| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ |   | █ | █ |   |
+| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ | █ | █ | █ |   |
 | zeroconf                | █ |   |   |   |   |   |   |   |   |   |   |   | █ |
 | supports netscape 4     | ╱ |   |   |   |   | █ |   |   |   |   | • |   | ╱ |
 | ...internet explorer 6  | ╱ | █ |   | █ |   | █ |   |   |   |   | • |   | ╱ |
@@ -243,7 +247,7 @@ symbol legend,
 | listen multiple ports   | █ |   |   |   |   |   |   |   |   |   |   | █ |   |
 | virtual file system     | █ | █ | █ |   |   |   | █ |   |   |   |   | █ |   |
 | reverse-proxy ok        | █ |   | █ | █ | █ | █ | █ | █ | • | • | • | █ | ╱ |
-| folder-rproxy ok        | █ |   |   |   | █ | █ |   | • | • | • | • |   | • |
+| folder-rproxy ok        | █ |   | █ |   | █ | █ |   | • | • | █ | • |   | • |
 
 * `folder-rproxy` = reverse-proxying without dedicating an entire (sub)domain, using a subfolder instead
 * `l`/sftpgo:
@@ -266,9 +270,9 @@ symbol legend,
 | per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ | █ | █ |
 | per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
 | per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
-| unmap subfolders        | █ |   |   |   |   |   | █ |   |   | █ | ╱ | • |   |
+| unmap subfolders        | █ |   | █ |   |   |   | █ |   |   | █ | ╱ | • |   |
 | index.html blocks list  | ╱ |   |   |   |   |   | █ |   |   | • |   |   |   |
-| write-only folders      | █ |   |   |   |   |   |   |   |   |   | █ | █ |   |
+| write-only folders      | █ |   | █ |   |   |   |   |   |   |   | █ | █ |   |
 | files stored as-is      | █ | █ | █ | █ |   | █ | █ |   |   | █ | █ | █ | █ |
 | file versioning         |   |   |   | █ | █ |   |   |   |   |   |   |   |   |
 | file encryption         |   |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
@@ -298,6 +302,7 @@ symbol legend,
 * `file action event hooks` = run script before/after upload, move, rename, ...
 * `one-way folder sync` = like rsync, optionally deleting unexpected files at target
 * `full sync` = stateful, dropbox-like sync
+* `speed throttle` = rate limiting (per ip, per user, per connection, anything like that)
 * `curl-friendly ls` = returns a [sortable plaintext folder listing](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) when curled
 * `curl-friendly upload` = uploading with curl is just `curl -T some.bin http://.../`
 * `a`/copyparty remarks:
@@ -323,14 +328,14 @@ symbol legend,
 | feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
 | ----------------------  | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   | █ |
-| themes                  | █ | █ |   | █ |   |   |   |   | █ |   |   |   |   |
+| themes                  | █ | █ | █ | █ |   |   |   |   | █ |   |   |   |   |
 | directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |   |   |
 | multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | thumbnails              | █ |   |   | ╱ | ╱ |   |   | █ | █ | ╱ |   |   | █ |
 | ┗ image thumbnails      | █ |   |   | █ | █ |   |   | █ | █ | █ |   |   | █ |
 | ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |   | █ |
 | ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| audio player            | █ |   |   | █ | █ |   |   |   | █ | ╱ |   |   | █ |
+| audio player            | █ |   | ╱ | █ | █ |   |   |   | █ | ╱ |   |   | █ |
 | ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |   |   |
 | ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
@@ -348,16 +353,16 @@ symbol legend,
 | search by custom parser | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | find local file         | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| create directories      | █ |   |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
-| image viewer            | █ |   |   | █ | █ |   |   |   | █ | █ | █ |   | █ |
+| create directories      | █ |   | █ | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
+| image viewer            | █ |   | █ | █ | █ |   |   |   | █ | █ | █ |   | █ |
 | markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
 | markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
 | readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |   |   |
 | rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ | █ | █ |
 | batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |   |   |
 | cut / paste files       | █ | █ |   | █ | █ |   |   |   | █ |   |   |   | █ |
-| move files              | █ | █ |   | █ | █ |   | █ |   | █ | █ | █ |   | █ |
-| delete files            | █ | █ |   | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
+| move files              | █ | █ | █ | █ | █ |   | █ |   | █ | █ | █ |   | █ |
+| delete files            | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
 | copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |   | █ |
 
 * `single-page app` = multitasking; possible to continue navigating while uploading
@@ -367,8 +372,12 @@ symbol legend,
 * `undo recent uploads` = accounts without delete permissions have a time window where they can undo their own uploads
 * `a`/copyparty has teeny-tiny skips playing gapless albums depending on audio codec (opus best)
 * `b`/hfs2 has a very basic directory tree view, not showing sibling folders
+* `c`/hfs3 remarks:
+  * audio playback does not continue into next song
 * `f`/rclone can do some file management (mkdir, rename, delete) when hosting througn webdav
-* `j`/filebrowser has a plaintext viewer/editor
+* `j`/filebrowser remarks:
+  * audio playback does not continue into next song
+  * plaintext viewer/editor
 * `k`/filegator directory tree is a modal window
 
 
@@ -424,6 +433,7 @@ symbol legend,
   * 💾 are what copyparty offers as an alternative
 * 🔵 are similarities
 * ⚠️ are disadvantages (something copyparty does "better")
+* 🔥 are hazards
 
 ## [copyparty](https://github.com/9001/copyparty)
 * resumable uploads which are verified server-side
@@ -431,8 +441,9 @@ symbol legend,
   * both of the above are surprisingly uncommon features
 * very cross-platform (python, no dependencies)
 
-## [hfs2](https://rejetto.com/hfs/)
-* the OG, the legend
+## [hfs2](https://github.com/rejetto/hfs2/)
+* the OG, the legend (now replaced by [hfs3](#hfs3))
+* 🔥 hfs2 is dead and dangerous! unfixed RCE: [info](https://github.com/rejetto/hfs2/issues/44), [info](https://github.com/drapid/hfs/issues/3), [info](https://asec.ahnlab.com/en/67650/)
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
 * ⚠️ windows-only
@@ -440,10 +451,19 @@ symbol legend,
 * vfs with gui config, per-volume permissions
 * starting to show its age, hence the rewrite:
 
-## [hfs3](https://github.com/rejetto/hfs)
+## [hfs3](https://rejetto.com/hfs/)
 * nodejs; cross-platform
 * vfs with gui config, per-volume permissions
-* still early development, let's revisit later
+* 🔵 uploads are resumable
+* ⚠️ uploads are not segmented; max upload size 100 MiB on cloudflare
+* ⚠️ uploads are not accelerated (copyparty is 3x faster across the atlantic)
+* ⚠️ uploads are not integrity-checked
+* ⚠️ copies the file after upload; need twice filesize free disk space
+* ⚠️ doesn't support crazy filenames
+* ✅ config GUI
+* ✅ download counter
+* ✅ watch active connections
+* ✅ plugins
 
 ## [nextcloud](https://github.com/nextcloud/server)
 * php, mariadb
@@ -497,6 +517,7 @@ symbol legend,
 * rust; cross-platform (windows, linux, macos)
 * ⚠️ uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
+  * ⚠️ across the atlantic, copyparty is 3x faster
 * ⚠️ doesn't support crazy filenames
 * ✅ per-url access control (copyparty is per-volume)
 * 🔵 basic but really snappy ui
@@ -539,8 +560,10 @@ symbol legend,
 
 ## [filebrowser](https://github.com/filebrowser/filebrowser)
 * go; cross-platform (windows, linux, mac)
-* ⚠️ uploads not resumable / accelerated / integrity-checked
-  * ⚠️ on cloudflare: max upload size 100 MiB
+* 🔵 uploads are resumable and segmented
+* 🔵 multiple files are uploaded in parallel, but...
+  * ⚠️ big files are not accelerated (copyparty is 5x faster across the atlantic)
+* ⚠️ uploads are not integrity-checked
 * ⚠️ http only; no webdav / ftp / zeroconf
 * ⚠️ doesn't support crazy filenames
 * ⚠️ no directory tree nav
@@ -550,12 +573,14 @@ symbol legend,
   * ⚠️ but no directory tree for navigation
 * ✅ user signup
 * ✅ command runner / remote shell
-* 🔵 supposed to have write-only folders but couldn't get it to work
+* ✅ more efficient; can handle around twice as much simultaneous traffic
 
 ## [filegator](https://github.com/filegator/filegator)
-* go; cross-platform (windows, linux, mac)
+* php; cross-platform (windows, linux, mac)
 * 🔵 *it has upload segmenting and acceleration*
   * ⚠️ but uploads are still not integrity-checked
+  * ⚠️ on copyparty, uploads are 40x faster
+    * compared to the official filegator docker example which might be bad
 * ⚠️ http only; no webdav / ftp / zeroconf
 * ⚠️ does not support symlinks
 * ⚠️ expensive download-as-zip feature
@@ -566,6 +591,7 @@ symbol legend,
 * go; cross-platform (windows, linux, mac)
 * ⚠️ http uploads not resumable / accelerated / integrity-checked
   * ⚠️ on cloudflare: max upload size 100 MiB
+  * ⚠️ across the atlantic, copyparty is 2.5x faster
   * 🔵 sftp uploads are resumable
 * ⚠️ web UI is very minimal + a bit slow
   * ⚠️ no thumbnails / image viewer / audio player
@@ -573,6 +599,7 @@ symbol legend,
 * ⚠️ no filesystem indexing / search
 * ⚠️ doesn't run on phones, tablets
 * ⚠️ no zeroconf (mdns/ssdp)
+* ⚠️ impractical directory URLs
 * ⚠️ AGPL licensed
 * 🔵 ftp, ftps, webdav
 * ✅ sftp server
@@ -589,11 +616,13 @@ symbol legend,
 ## [arozos](https://github.com/tobychui/arozos)
 * big suite of applications similar to [kodbox](#kodbox), copyparty is better at downloading/uploading/music/indexing but arozos has other advantages
 * go; primarily linux (limited support for windows)
+* ⚠️ needs root
 * ⚠️ uploads not resumable / integrity-checked
 * ⚠️ uploading small files to copyparty is 2.7x faster
 * ⚠️ uploading large files to copyparty is at least 10% faster
   * arozos is websocket-based, 512 KiB chunks; writes each chunk to separate files and then merges
   * copyparty splices directly into the final file; faster and better for the HDD and filesystem
+* ⚠️ across the atlantic, uploading to copyparty is 6x faster
 * ⚠️ no directory tree navpane; not as easy to navigate
 * ⚠️ download-as-zip is not streaming; creates a temp.file on the server
 * ⚠️ not self-contained (pulls from jsdelivr)
