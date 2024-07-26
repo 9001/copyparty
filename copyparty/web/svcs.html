@@ -56,7 +56,7 @@
                 <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
-            
+
             <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
                 net use <b>w:</b> http{{ s }}://{{ ep }}/{{ rvp }}{% if accs %} k /user:<b>{{ pw }}</b>{% endif %}
@@ -105,7 +105,7 @@
             <pre>
                 http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}
             </pre>
-            
+
             {% if s %}
             <p><em>replace <code>https</code> with <code>http</code> if it doesn't work</em></p>
             {% endif %}

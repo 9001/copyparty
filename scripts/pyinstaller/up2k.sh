@@ -25,7 +25,7 @@ grep -E '^from .ssl_ import' $APPDATA/python/python37/site-packages/urllib3/util
     echo golfing
     echo > $APPDATA/python/python37/site-packages/requests/certs.py
     sed -ri 's/^(DEFAULT_CA_BUNDLE_PATH = ).*/\1""/' $APPDATA/python/python37/site-packages/requests/utils.py
-    sed -ri '/^import zipfile$/d' $APPDATA/python/python37/site-packages/requests/utils.py             
+    sed -ri '/^import zipfile$/d' $APPDATA/python/python37/site-packages/requests/utils.py
     sed -ri 's/"idna"//' $APPDATA/python/python37/site-packages/requests/packages.py
     sed -ri 's/import charset_normalizer.*/pass/' $APPDATA/python/python37/site-packages/requests/compat.py
     sed -ri 's/raise.*charset_normalizer.*/pass/' $APPDATA/python/python37/site-packages/requests/__init__.py

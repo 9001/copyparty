@@ -573,7 +573,7 @@ window.baguetteBox = (function () {
 
             if (a != 'hidden' || b != 'scroll')
                 scrollCSS = [a, b];
-            
+
             document.documentElement.style.overflowY = 'hidden';
             document.body.style.overflowY = 'scroll';
         }
@@ -1067,7 +1067,7 @@ window.baguetteBox = (function () {
                 return showNextImage();
 
             show_buttons('t');
-            
+
             if (Date.now() - ctime <= 500 && !IPHONE)
                 tglfull();
 

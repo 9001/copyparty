@@ -235,7 +235,7 @@ class TestVFS(unittest.TestCase):
                     """
                     u a:123
                     u asd:fgh:jkl
-                    
+
                     ./src
                     /dst
                     r a
