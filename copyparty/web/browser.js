@@ -464,7 +464,7 @@ var Ls = {
 		"u_badf": 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n\n',
 		"u_blankf": 'These {0} files (of {1} total) are blank / empty; upload them anyways?\n\n',
 		"u_just1": '\nMaybe it works better if you select just one file',
-		"u_ff_many": "This amount of files <em>may</em> cause Firefox to skip some files, or crash.\nPlease try again with fewer files (or use Chrome) if that happens.",
+		"u_ff_many": "if you're using <b>Linux / MacOS / Android,</b> then this amount of files <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>may</em> crash Firefox!</a>\nif that happens, please try again (or use Chrome).",
 		"u_up_life": "This upload will be deleted from the server\n{0} after it completes",
 		"u_asku": 'upload these {0} files to <code>{1}</code>',
 		"u_unpt": "you can undo / delete this upload using the top-left 🧯",
@@ -486,8 +486,8 @@ var Ls = {
 		"u_emtleak1": "it looks like your webbrowser may have a memory leak;\nplease",
 		"u_emtleak2": ' <a href="{0}">switch to https (recommended)</a> or ',
 		"u_emtleak3": ' ',
-		"u_emtleakc": 'try the following:\n<ul><li>hit <code>F5</code> to refresh the page</li><li>then disable the &nbsp;<code>mt</code>&nbsp; button in the &nbsp;<code>⚙️ settings</code></li><li>and try that upload again</li></ul>Uploads will be a bit slower, but oh well.\nSorry for the trouble !\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816">has a bugfix</a> for this',
-		"u_emtleakf": 'try the following:\n<ul><li>hit <code>F5</code> to refresh the page</li><li>then enable <code>🥔</code> (potato) in the upload UI<li>and try that upload again</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">will hopefully have a bugfix</a> at some point',
+		"u_emtleakc": 'try the following:\n<ul><li>hit <code>F5</code> to refresh the page</li><li>then disable the &nbsp;<code>mt</code>&nbsp; button in the &nbsp;<code>⚙️ settings</code></li><li>and try that upload again</li></ul>Uploads will be a bit slower, but oh well.\nSorry for the trouble !\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">has a bugfix</a> for this',
+		"u_emtleakf": 'try the following:\n<ul><li>hit <code>F5</code> to refresh the page</li><li>then enable <code>🥔</code> (potato) in the upload UI<li>and try that upload again</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">will hopefully have a bugfix</a> at some point',
 		"u_s404": "not found on server",
 		"u_expl": "explain",
 		"u_maxconn": "most browsers limit this to 6, but firefox lets you raise it with <code>connections-per-server</code> in <code>about:config</code>",
@@ -979,7 +979,7 @@ var Ls = {
 		"u_badf": 'Disse {0} filene (av totalt {1}) kan ikke leses, kanskje pga rettighetsproblemer i filsystemet på datamaskinen din:\n\n',
 		"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhold; ønsker du å laste dem opp uansett?\n\n',
 		"u_just1": '\nFunker kanskje bedre hvis du bare tar én fil om gangen',
-		"u_ff_many": "Det var mange filer! Mulig at Firefox kommer til å krasje, eller\nhoppe over et par av dem. Smart å ha Chrome på lur i tilfelle.",
+		"u_ff_many": 'Hvis du bruker <b>Linux / MacOS / Android,</b> så kan dette antallet filer<br /><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank"><em>kanskje</em> krasje Firefox!</a> Hvis det skjer, så prøv igjen (eller bruk Chrome).',
 		"u_up_life": "Filene slettes fra serveren {0}\netter at opplastningen er fullført",
 		"u_asku": 'Laste opp disse {0} filene til <code>{1}</code>',
 		"u_unpt": "Du kan angre / slette opplastningen med 🧯 oppe til venstre",
@@ -1001,8 +1001,8 @@ var Ls = {
 		"u_emtleak1": "uff, det er mulig at nettleseren din har en minnelekkasje...\nForeslår",
 		"u_emtleak2": ' helst at du <a href="{0}">bytter til https</a>, eller ',
 		"u_emtleak3": ' at du ',
-		"u_emtleakc": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru av &nbsp;<code>mt</code>&nbsp; bryteren under &nbsp;<code>⚙️ innstillinger</code></li><li>og forsøk den samme opplastningen igjen</li></ul>Opplastning vil gå litt tregere, men det får så være.\nBeklager bryderiet !\n\nPS: feilen <a href="<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816">skal være fikset</a> i chrome v107',
-		"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplasteren</li><li>og forsøk den samme opplastningen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500">fikser forhåpentligvis feilen</a> en eller annen gang',
+		"u_emtleakc": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru av &nbsp;<code>mt</code>&nbsp; bryteren under &nbsp;<code>⚙️ innstillinger</code></li><li>og forsøk den samme opplastningen igjen</li></ul>Opplastning vil gå litt tregere, men det får så være.\nBeklager bryderiet !\n\nPS: feilen <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">skal være fikset</a> i chrome v107',
+		"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplasteren</li><li>og forsøk den samme opplastningen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">fikser forhåpentligvis feilen</a> en eller annen gang',
 		"u_s404": "ikke funnet på serveren",
 		"u_expl": "forklar",
 		"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> i <code>about:config</code>",
@@ -3336,6 +3336,7 @@ function scan_hash(v) {
 
 
 function eval_hash() {
+	document.onkeydown = ahotkeys;
 	window.onpopstate = treectl.onpopfun;
 
 	if (hash0 && window.og_fn) {
@@ -5232,7 +5233,9 @@ function tree_up(justgo) {
 		if (!justgo)
 			return;
 	}
-	act.parentNode.parentNode.parentNode.getElementsByTagName('a')[1].click();
+	var a = act.parentNode.parentNode.parentNode.getElementsByTagName('a')[1];
+	if (a.parentNode.tagName == 'LI')
+		a.click();
 }
 
 
@@ -5295,7 +5298,7 @@ function fselfunw(e, ae, d, rem) {
 	}
 	selfun();
 }
-document.onkeydown = function (e) {
+var ahotkeys = function (e) {
 	if (e.altKey || e.isComposing)
 		return;
 

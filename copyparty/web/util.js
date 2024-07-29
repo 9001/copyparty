@@ -127,13 +127,13 @@ if ((document.location + '').indexOf(',rej,') + 1)
 
 try {
     console.hist = [];
-    var CMAXHIST = 1000;
+    var CMAXHIST = MOBILE ? 9000 : 44000;
     var hook = function (t) {
         var orig = console[t].bind(console),
             cfun = function () {
                 console.hist.push(Date.now() + ' ' + t + ': ' + Array.from(arguments).join(', '));
                 if (console.hist.length > CMAXHIST)
-                    console.hist = console.hist.slice(CMAXHIST / 2);
+                    console.hist = console.hist.slice(CMAXHIST / 4);
 
                 orig.apply(console, arguments);
             };

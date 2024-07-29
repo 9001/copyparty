@@ -545,7 +545,7 @@ class Up2k(object):
                     nrm += 1
 
             if nrm:
-                self.log("{} files graduated in {}".format(nrm, vp))
+                self.log("%d files graduated in /%s" % (nrm, vp))
 
             if timeout < 10:
                 continue

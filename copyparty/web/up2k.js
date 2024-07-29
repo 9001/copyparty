@@ -1210,7 +1210,7 @@ function up2k_init(subtle) {
                     match = false;
 
             if (match) {
-                var msg = ['directory iterator got stuck on the following {0} items; good chance your browser is about to spinlock:<ul>'.format(missing.length)];
+                var msg = ['directory iterator got stuck trying to access the following {0} items; will skip:<ul>'.format(missing.length)];
                 for (var a = 0; a < Math.min(20, missing.length); a++)
                     msg.push('<li>' + esc(missing[a]) + '</li>');
 
@@ -2766,15 +2766,17 @@ function up2k_init(subtle) {
         if (parallel_uploads > 16)
             parallel_uploads = 16;
 
-        if (parallel_uploads > 7)
+        if (parallel_uploads > 6)
             toast.warn(10, L.u_maxconn);
+        else if (toast.txt == L.u_maxconn)
+            toast.hide();
 
         obj.value = parallel_uploads;
         bumpthread({ "target": 1 });
     }
 
     var read_u2sz = function () {
-		var el = ebi('u2szg'), n = parseInt(el.value), dv = u2sz.split(',');
+        var el = ebi('u2szg'), n = parseInt(el.value), dv = u2sz.split(',');
         stitch_tgt = n = (
             isNaN(n) ? dv[1] :
             n < dv[0] ? dv[0] :
