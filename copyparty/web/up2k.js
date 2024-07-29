@@ -2391,7 +2391,8 @@ function up2k_init(subtle) {
                         --a;
                         for (var b = 0; b < stitch; b++) {
                             nparts.push(t.postlist[++a]);
-                            if (tbytes + chunksize > 64 * 1024 * 1024 || t.postlist[a+1] - t.postlist[a] !== 1)
+                            tbytes += chunksize;
+                            if (tbytes + chunksize > stitch * 1024 * 1024 || t.postlist[a + 1] - t.postlist[a] !== 1)
                                 break;
                         }
                         arr.push({
