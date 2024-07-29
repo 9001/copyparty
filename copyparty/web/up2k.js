@@ -2186,7 +2186,7 @@ function up2k_init(subtle) {
         st.busy.head.push(t);
 
         var xhr = new XMLHttpRequest();
-        xhr.onerror = function () {
+        xhr.onerror = xhr.ontimeout = function () {
             console.log('head onerror, retrying', t.name, t);
             if (!toast.visible)
                 toast.warn(9.98, L.u_enethd + "\n\nfile: " + t.name, t);
@@ -2230,6 +2230,7 @@ function up2k_init(subtle) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
         };
 
+        xhr.timeout = 34000;
         xhr.open('HEAD', t.purl + uricom_enc(t.name), true);
         xhr.send();
     }
@@ -2255,7 +2256,7 @@ function up2k_init(subtle) {
             console.log("sending keepalive handshake", t.name, t);
 
         var xhr = new XMLHttpRequest();
-        xhr.onerror = function () {
+        xhr.onerror = xhr.ontimeout = function () {
             if (t.t_busied != me)  // t.done ok
                 return console.log('zombie handshake onerror', t.name, t);
 
@@ -2512,6 +2513,7 @@ function up2k_init(subtle) {
 
         xhr.open('POST', t.purl, true);
         xhr.responseType = 'text';
+        xhr.timeout = 42000;
         xhr.send(JSON.stringify(req));
     }
 
@@ -2631,15 +2633,21 @@ function up2k_init(subtle) {
                 btot = Math.floor(st.bytes.total / 1024 / 1024);
 
             xhr.upload.onprogress = function (xev) {
-                var nb = xev.loaded;
-                st.bytes.inflight += nb - xhr.bsent;
+                var nb = xev.loaded,
+                    db = nb - xhr.bsent;
+
+                if (!db)
+                    return;
+
+                st.bytes.inflight += db;
                 xhr.bsent = nb;
+                xhr.timeout = 64000 + Date.now() - xhr.t0;
                 pvis.prog(t, pcar, nb);
             };
             xhr.onload = function (xev) {
                 try { orz(xhr); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
             };
-            xhr.onerror = function (xev) {
+            xhr.onerror = xhr.ontimeout = function (xev) {
                 if (crashed)
                     return;
 
@@ -2666,6 +2674,8 @@ function up2k_init(subtle) {
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
 
             xhr.bsent = 0;
+            xhr.t0 = Date.now();
+            xhr.timeout = 42000;
             xhr.responseType = 'text';
             xhr.send(t.fobj.slice(car, cdr));
         }
