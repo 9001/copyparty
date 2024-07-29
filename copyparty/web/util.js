@@ -1536,6 +1536,7 @@ var modal = (function () {
     var r = {},
         q = [],
         o = null,
+        scrolling = null,
         cb_up = null,
         cb_ok = null,
         cb_ng = null,
@@ -1579,6 +1580,7 @@ var modal = (function () {
 
         document.addEventListener('focus', onfocus);
         document.addEventListener('selectionchange', onselch);
+        timer.add(scrollchk, 1);
         timer.add(onfocus);
         if (cb_up)
             setTimeout(cb_up, 1);
@@ -1586,6 +1588,8 @@ var modal = (function () {
 
     r.hide = function () {
         timer.rm(onfocus);
+        timer.rm(scrollchk);
+        scrolling = null;
         try {
             ebi('modal-ok').removeEventListener('blur', onblur);
         }
@@ -1604,13 +1608,28 @@ var modal = (function () {
         r.hide();
         if (cb_ok)
             cb_ok(v);
-    }
+    };
     var ng = function (e) {
         ev(e);
         r.hide();
         if (cb_ng)
             cb_ng(null);
-    }
+    };
+
+    var scrollchk = function () {
+        if (scrolling === true)
+            return;
+
+        var o = ebi('modalc'),
+            vis = o.offsetHeight,
+            all = o.scrollHeight,
+            nsc = 8 + vis < all;
+
+        if (scrolling !== nsc)
+            clmod(o, 'yk', !nsc);
+
+        scrolling = nsc;
+    };
 
     var onselch = function () {
         try {

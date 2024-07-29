@@ -265,7 +265,11 @@ html.y #tth {
     box-shadow: 0 .3em 3em rgba(0,0,0,0.5);
 	max-width: 50em;
 	max-height: 30em;
-	overflow: auto;
+	overflow-x: auto;
+	overflow-y: scroll;
+}
+#modalc.yk {
+	overflow-y: auto;
 }
 #modalc td {
 	text-align: unset;
