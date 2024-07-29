@@ -1557,6 +1557,7 @@ var modal = (function () {
     r.nofocus = 0;
 
     r.show = function (html) {
+        tt.hide();
         o = mknod('div', 'modal');
         o.innerHTML = '<table><tr><td><div id="modalc">' + html + '</div></td></tr></table>';
         document.body.appendChild(o);

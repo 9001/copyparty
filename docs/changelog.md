@@ -1,4 +1,37 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0722-2323  `v1.13.5`  american sized
+
+## new features
+
+* long-distance uploads are now **twice as fast** on average 132a8350
+  * boost tcp windowsize scaling by stitching together smaller chunks into bigger chonks so they fly better across the atlantic
+  * i'm not kidding, on the two routes we've tested this on we gained 1.6x / 160% (from US-West to Finland) and **2.6x / 260%** (Norway to US-East)
+    * files that are between 4 MiB and 256 MiB see the biggest improvement; 70% faster <= 768 MiB, 40% <= 1.5 GiB, 10% <= 6G
+  * if this turns out to be buggy, disable it serverside with `--u2sz 1,1,1` or clientside in the browser-ui: `[⚙️]` -> `up2k switches` -> change `64` to `1`
+* u2c.py (CLI uploader): support stitching (☝️) + print a summary with hashing and upload speeds  987bce21
+* video files can play as audio 53f1e3c9
+  * audio is extracted serverside to avoid wasting bandwidth
+  * extraction is lossy (converted to opus or mp3 depending on browser)
+  * togglebutton `🎧` in the gridview toolbar to enable/disable
+* new hook: [into-the-cache-it-goes.py](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#after-upload) d26a944d
+  * avoids a cloudflare bug (race condition?) where it will send truncated files to visitors on the very first load if several people simultaneously access a file that hasn't been viewed before
+
+## bugfixes
+
+* inline markdown/logues rendered black-on-black in firefox 54 and some other browsers from 2017 and older eeef8091
+* unintuitive folder thumbnail selection if folder contains both `Cover.jpg` and `cover.jpg` f955d2bd
+* the gridview toolbar got undocked after viewing a pic/vid dc449bf8
+
+## other changes
+
+* #90 recommend rclone in favor of davfs2 ef0ecf87
+* improved some error messages e565ad5f
+* added helptext exporters to generate the online [html](https://ocv.me/copyparty/helptext.html) and [txt](https://ocv.me/copyparty/helptext.txt) editions 59533990
+* mention that cloudflare is incompatible with uploading files larger than 383.9 GiB 
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0716-0457  `v1.13.4`  descript.ion
 
 ## new features
