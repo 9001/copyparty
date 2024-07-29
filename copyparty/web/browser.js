@@ -270,6 +270,8 @@ var Ls = {
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
 		"mp_breq": "need firefox 82+ or chrome 73+ or iOS 15+",
+		"mm_bload": "now loading...",
+		"mm_bconv": "converting to {0}, please wait...",
 		"mm_opusen": "your browser cannot play aac / m4a files;\ntranscoding to opus is now enabled",
 		"mm_playerr": "playback failed: ",
 		"mm_eabrt": "The playback attempt was cancelled",
@@ -785,6 +787,8 @@ var Ls = {
 		"mb_play": "lytt",
 		"mm_hashplay": "spill denne sangen?",
 		"mp_breq": "krever firefox 82+, chrome 73+, eller iOS 15+",
+		"mm_bload": "laster inn...",
+		"mm_bconv": "konverterer til {0}, vent litt...",
 		"mm_opusen": "nettleseren din forstår ikke aac / m4a;\nkonvertering til opus er nå aktivert",
 		"mm_playerr": "avspilling feilet: ",
 		"mm_eabrt": "Avspillingsforespørselen ble avbrutt",
@@ -1602,6 +1606,8 @@ var mpl = (function () {
 	r.pp = function () {
 		var adur, apos, playing = mp.au && !mp.au.paused;
 
+		clearTimeout(mpl.t_eplay);
+
 		clmod(ebi('np_inf'), 'playing', playing);
 
 		if (mp.au && isNum(adur = mp.au.duration) && isNum(apos = mp.au.currentTime) && apos >= 0)
@@ -2187,8 +2193,21 @@ var pbar = (function () {
 		}
 		pctx.clearRect(0, 0, pc.w, pc.h);
 
-		if (!mp || !mp.au || !isNum(adur = mp.au.duration) || !isNum(apos = mp.au.currentTime) || apos < 0 || adur < apos)
+		if (!mp || !mp.au)
+			return;  // not-init
+
+		if (!isNum(adur = mp.au.duration) || !isNum(apos = mp.au.currentTime) || apos < 0 || adur < apos) {
+			if (Date.now() - mp.au.pt0 < 500)
+				return;
+
+			pctx.fillStyle = light ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)';
+			var m = /[?&]th=(opus|caf|mp3)/.exec('' + mp.au.rsrc),
+				txt = mp.au.ded ? L.mm_playerr.replace(':', ' ;_;') :
+					m ? L.mm_bconv.format(m[1]) : L.mm_bload;
+
+			pctx.fillText(txt, 16, pc.h / 1.5);
 			return;  // not-init || unsupp-codec
+		}
 
 		if (bau != mp.au)
 			r.drawbuf();
@@ -3154,7 +3173,9 @@ function play(tid, is_ev, seek) {
 		mpl.unbuffer(url);
 	}, 500);
 
+	mp.au.ded = 0;
 	mp.au.tid = tid;
+	mp.au.pt0 = Date.now();
 	mp.au.evp = get_evpath();
 	mp.au.volume = mp.expvol(mp.vol);
 	var trs = QSA('#files tr.play');
@@ -3221,6 +3242,8 @@ function scroll2playing() {
 function evau_error(e) {
 	var err = '',
 		eplaya = (e && e.target) || (window.event && window.event.srcElement);
+
+	eplaya.ded = 1;
 
 	switch (eplaya.error.code) {
 		case eplaya.error.MEDIA_ERR_ABORTED:
