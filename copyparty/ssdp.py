@@ -5,11 +5,11 @@ import errno
 import re
 import select
 import socket
-from email.utils import formatdate
+import time
 
 from .__init__ import TYPE_CHECKING
 from .multicast import MC_Sck, MCast
-from .util import CachedSet, html_escape, min_ex
+from .util import CachedSet, formatdate, html_escape, min_ex
 
 if TYPE_CHECKING:
     from .broker_util import BrokerCli
@@ -229,7 +229,7 @@ CONFIGID.UPNP.ORG: 1
 
 """
         v4 = srv.ip.replace("::ffff:", "")
-        zs = zs.format(formatdate(usegmt=True), v4, srv.hport, self.args.zsid)
+        zs = zs.format(formatdate(), v4, srv.hport, self.args.zsid)
         zb = zs[1:].replace("\n", "\r\n").encode("utf-8", "replace")
         srv.sck.sendto(zb, addr[:2])
 

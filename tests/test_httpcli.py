@@ -168,6 +168,11 @@ class TestHttpCli(unittest.TestCase):
                 h, ret = self.put(url)
                 res = h.startswith("HTTP/1.1 201 ")
                 self.assertEqual(res, wok)
+                if wok:
+                    vp = h.split("\nLocation: http://a:1/")[1].split("\r")[0]
+                    vn, rem = self.asrv.vfs.get(vp, "*", False, False)
+                    ap = os.path.join(vn.realpath, rem)
+                    os.unlink(ap)
 
     def can_rw(self, fp):
         # lowest non-neutral folder declares permissions

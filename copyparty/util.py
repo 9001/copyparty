@@ -26,7 +26,6 @@ import threading
 import time
 import traceback
 from collections import Counter
-from email.utils import formatdate
 
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 from queue import Queue
@@ -1821,10 +1820,21 @@ def gen_filekey_dbg(
     return ret
 
 
+WKDAYS = "Mon Tue Wed Thu Fri Sat Sun".split()
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+RFC2822 = "%s, %02d %s %04d %02d:%02d:%02d GMT"
+
+
+def formatdate(ts: Optional[int] = None) -> str:
+    # gmtime ~= datetime.fromtimestamp(ts, UTC).timetuple()
+    y, mo, d, h, mi, s, wd, _, _ = time.gmtime(ts)
+    return RFC2822 % (WKDAYS[wd], d, MONTHS[mo - 1], y, h, mi, s)
+
+
 def gencookie(k: str, v: str, r: str, tls: bool, dur: int = 0, txt: str = "") -> str:
     v = v.replace("%", "%25").replace(";", "%3B")
     if dur:
-        exp = formatdate(time.time() + dur, usegmt=True)
+        exp = formatdate(time.time() + dur)
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
@@ -1839,12 +1849,10 @@ def humansize(sz: float, terse: bool = False) -> str:
 
         sz /= 1024.0
 
-    ret = " ".join([str(sz)[:4].rstrip("."), unit])
-
-    if not terse:
-        return ret
-
-    return ret.replace("iB", "").replace(" ", "")
+    if terse:
+        return "%s%s" % (str(sz)[:4].rstrip("."), unit[:1])
+    else:
+        return "%s %s" % (str(sz)[:4].rstrip("."), unit)
 
 
 def unhumanize(sz: str) -> int:
@@ -1896,7 +1904,7 @@ def uncyg(path: str) -> str:
 def undot(path: str) -> str:
     ret: list[str] = []
     for node in path.split("/"):
-        if node in ["", "."]:
+        if node == "." or not node:
             continue
 
         if node == "..":
@@ -2709,30 +2717,30 @@ def rmdirs_up(top: str, stop: str) -> tuple[list[str], list[str]]:
 
 def unescape_cookie(orig: str) -> str:
     # mw=idk; doot=qwe%2Crty%3Basd+fgh%2Bjkl%25zxc%26vbn  # qwe,rty;asd fgh+jkl%zxc&vbn
-    ret = ""
+    ret = []
     esc = ""
     for ch in orig:
         if ch == "%":
-            if len(esc) > 0:
-                ret += esc
+            if esc:
+                ret.append(esc)
             esc = ch
 
-        elif len(esc) > 0:
+        elif esc:
             esc += ch
             if len(esc) == 3:
                 try:
-                    ret += chr(int(esc[1:], 16))
+                    ret.append(chr(int(esc[1:], 16)))
                 except:
-                    ret += esc
+                    ret.append(esc)
                 esc = ""
 
         else:
-            ret += ch
+            ret.append(ch)
 
-    if len(esc) > 0:
-        ret += esc
+    if esc:
+        ret.append(esc)
 
-    return ret
+    return "".join(ret)
 
 
 def guess_mime(url: str, fallback: str = "application/octet-stream") -> str:

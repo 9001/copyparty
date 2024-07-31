@@ -19,7 +19,7 @@ import threading  # typechk
 import time
 import uuid
 from datetime import datetime
-from email.utils import formatdate, parsedate
+from email.utils import parsedate
 from operator import itemgetter
 
 import jinja2  # typechk
@@ -54,6 +54,7 @@ from .util import (
     alltrace,
     atomic_move,
     exclude_dotfiles,
+    formatdate,
     fsenc,
     gen_filekey,
     gen_filekey_dbg,
@@ -787,7 +788,7 @@ class HttpCli(object):
 
         # close if unknown length, otherwise take client's preference
         response.append("Connection: " + ("Keep-Alive" if self.keepalive else "Close"))
-        response.append("Date: " + formatdate(usegmt=True))
+        response.append("Date: " + formatdate())
 
         # headers{} overrides anything set previously
         if headers:
@@ -811,9 +812,9 @@ class HttpCli(object):
                 self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
                 raise Pebkac(999)
 
+        response.append("\r\n")
         try:
-            # best practice to separate headers and body into different packets
-            self.s.sendall("\r\n".join(response).encode("utf-8") + b"\r\n\r\n")
+            self.s.sendall("\r\n".join(response).encode("utf-8"))
         except:
             raise Pebkac(400, "client d/c while replying headers")
 
@@ -1146,7 +1147,7 @@ class HttpCli(object):
             return self.tx_mounts()
 
         # conditional redirect to single volumes
-        if self.vpath == "" and not self.ouparam:
+        if not self.vpath and not self.ouparam:
             nread = len(self.rvol)
             nwrite = len(self.wvol)
             if nread + nwrite == 1 or (self.rvol == self.wvol and nread == 1):
@@ -1305,7 +1306,7 @@ class HttpCli(object):
 
             pvs: dict[str, str] = {
                 "displayname": html_escape(rp.split("/")[-1]),
-                "getlastmodified": formatdate(mtime, usegmt=True),
+                "getlastmodified": formatdate(mtime),
                 "resourcetype": '<D:collection xmlns:D="DAV:"/>' if isdir else "",
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
@@ -2952,7 +2953,7 @@ class HttpCli(object):
         return True
 
     def _chk_lastmod(self, file_ts: int) -> tuple[str, bool]:
-        file_lastmod = formatdate(file_ts, usegmt=True)
+        file_lastmod = formatdate(file_ts)
         cli_lastmod = self.headers.get("if-modified-since")
         if cli_lastmod:
             try:
@@ -3034,8 +3035,8 @@ class HttpCli(object):
             for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
                 if lnames is not None and fn not in lnames:
                     continue
-                fn = os.path.join(abspath, fn)
-                if bos.path.exists(fn):
+                fn = "%s/%s" % (abspath, fn)
+                if bos.path.isfile(fn):
                     with open(fsenc(fn), "rb") as f:
                         logues[n] = f.read().decode("utf-8")
                     if "exp" in vn.flags:
@@ -3053,7 +3054,7 @@ class HttpCli(object):
                 fns = []
 
             for fn in fns:
-                fn = os.path.join(abspath, fn)
+                fn = "%s/%s" % (abspath, fn)
                 if bos.path.isfile(fn):
                     with open(fsenc(fn), "rb") as f:
                         readme = f.read().decode("utf-8")
@@ -3588,7 +3589,7 @@ class HttpCli(object):
         # (useragent-sniffing kinshi due to caching proxies)
         mime, ico = self.ico.get(txt, not small, "raster" in self.uparam)
 
-        lm = formatdate(self.E.t0, usegmt=True)
+        lm = formatdate(self.E.t0)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 

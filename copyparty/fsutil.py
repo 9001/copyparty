@@ -14,7 +14,7 @@ from .util import chkcmd, min_ex
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
 
-    from .util import RootLogger
+    from .util import RootLogger, undot
 
 
 class Fstab(object):
@@ -52,7 +52,7 @@ class Fstab(object):
                 self.log(msg.format(path, fs, min_ex()), 3)
                 return fs
 
-        path = path.lstrip("/")
+        path = undot(path)
         try:
             return self.cache[path]
         except:
@@ -124,7 +124,7 @@ class Fstab(object):
         if ANYWIN:
             path = self._winpath(path)
 
-        path = path.lstrip("/")
+        path = undot(path)
         ptn = re.compile(r"^[^\\/]*")
         vn, rem = self.tab._find(path)
         if not self.trusted:

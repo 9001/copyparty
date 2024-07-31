@@ -37,9 +37,7 @@ def dostime2unix(buf: bytes) -> int:
 
 
 def unixtime2dos(ts: int) -> bytes:
-    tt = time.gmtime(ts + 1)
-    dy, dm, dd, th, tm, ts = list(tt)[:6]
-
+    dy, dm, dd, th, tm, ts, _, _, _ = time.gmtime(ts + 1)
     bd = ((dy - 1980) << 9) + (dm << 5) + dd
     bt = (th << 11) + (tm << 5) + ts // 2
     try:

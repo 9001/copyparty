@@ -441,7 +441,7 @@ class VFS(object):
 
     def _find(self, vpath: str) -> tuple["VFS", str]:
         """return [vfs,remainder]"""
-        if vpath == "":
+        if not vpath:
             return self, ""
 
         if "/" in vpath:
@@ -451,7 +451,7 @@ class VFS(object):
             rem = ""
 
         if name in self.nodes:
-            return self.nodes[name]._find(undot(rem))
+            return self.nodes[name]._find(rem)
 
         return self, vpath
 

@@ -36,7 +36,7 @@ from partftpy.TftpShared import TftpException
 from .__init__ import EXE, PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
-from .util import BytesIO, Daemon, ODict, exclude_dotfiles, min_ex, runhook, undot
+from .util import UTC, BytesIO, Daemon, ODict, exclude_dotfiles, min_ex, runhook, undot
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
@@ -262,7 +262,7 @@ class Tftpd(object):
         dirs1 = [(v.st_mtime, v.st_size, k + "/") for k, v in vfs_ls if k in dnames]
         fils1 = [(v.st_mtime, v.st_size, k) for k, v in vfs_ls if k not in dnames]
         real1 = dirs1 + fils1
-        realt = [(datetime.fromtimestamp(mt), sz, fn) for mt, sz, fn in real1]
+        realt = [(datetime.fromtimestamp(mt, UTC), sz, fn) for mt, sz, fn in real1]
         reals = [
             (
                 "%04d-%02d-%02d %02d:%02d:%02d"
