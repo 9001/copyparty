@@ -12,7 +12,7 @@ import time
 
 from queue import Queue
 
-from .__init__ import ANYWIN, TYPE_CHECKING
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, ffprobe
@@ -37,6 +37,9 @@ if True:  # pylint: disable=using-constant-test
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
+
+if PY2:
+    range = xrange
 
 HAVE_PIL = False
 HAVE_PILF = False

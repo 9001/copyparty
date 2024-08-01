@@ -67,6 +67,9 @@ if True:  # pylint: disable=using-constant-test
 
     from typing import Any, Optional
 
+if PY2:
+    range = xrange
+
 try:
     if os.environ.get("PRTY_NO_TLS"):
         raise Exception()

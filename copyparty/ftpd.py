@@ -41,6 +41,9 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
+if PY2:
+    range = xrange
+
 
 class FSE(FilesystemError):
     def __init__(self, msg: str, severity: int = 0) -> None:

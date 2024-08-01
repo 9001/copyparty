@@ -12,7 +12,7 @@ import threading
 import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, TYPE_CHECKING, WINDOWS, E
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
@@ -55,6 +55,9 @@ if TYPE_CHECKING:
     # Vflags: TypeAlias = dict[str, str | bool | float | list[str]]
     # Vflags: TypeAlias = dict[str, Any]
     # Mflags: TypeAlias = dict[str, Vflags]
+
+if PY2:
+    range = xrange
 
 
 LEELOO_DALLAS = "leeloo_dallas"

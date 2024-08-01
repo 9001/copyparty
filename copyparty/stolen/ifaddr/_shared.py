@@ -17,6 +17,7 @@ if not PY2:
     U: Callable[[str], str] = str
 else:
     U = unicode  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
+    range = xrange  # noqa: F821  # pylint: disable=undefined-variable,self-assigning-variable
 
 
 class Adapter(object):

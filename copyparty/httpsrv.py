@@ -12,7 +12,7 @@ import time
 
 import queue
 
-from .__init__ import ANYWIN, CORES, EXE, MACOS, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, CORES, EXE, MACOS, PY2, TYPE_CHECKING, EnvParams, unicode
 
 try:
     MNFE = ModuleNotFoundError
@@ -83,6 +83,9 @@ if TYPE_CHECKING:
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
+
+if PY2:
+    range = xrange
 
 
 class HttpSrv(object):

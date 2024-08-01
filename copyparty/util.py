@@ -59,6 +59,10 @@ except:
     UTC = _UTC()
 
 
+if PY2:
+    range = xrange
+
+
 if sys.version_info >= (3, 7) or (
     sys.version_info >= (3, 6) and platform.python_implementation() == "CPython"
 ):

@@ -8,7 +8,7 @@ import threading
 import time
 from operator import itemgetter
 
-from .__init__ import ANYWIN, TYPE_CHECKING, unicode
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
 from .up2k import up2k_wark_from_hashlist
@@ -37,6 +37,9 @@ if True:  # pylint: disable=using-constant-test
 
 if TYPE_CHECKING:
     from .httpsrv import HttpSrv
+
+if PY2:
+    range = xrange
 
 
 class U2idx(object):

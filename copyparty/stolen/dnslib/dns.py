@@ -12,6 +12,12 @@ from .label import DNSBuffer, DNSLabel
 from .ranges import IP4, IP6, H, I, check_bytes
 
 
+try:
+    range = xrange
+except:
+    pass
+
+
 class DNSError(Exception):
     pass
 

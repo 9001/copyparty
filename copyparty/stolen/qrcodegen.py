@@ -16,6 +16,11 @@ if True:  # pylint: disable=using-constant-test
 
     from typing import Callable, List, Optional, Tuple, Union
 
+try:
+    range = xrange
+except:
+    pass
+
 
 def num_char_count_bits(ver: int) -> int:
     return 16 if (ver + 7) // 17 else 8
