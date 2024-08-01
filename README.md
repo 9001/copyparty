@@ -111,6 +111,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
+        * [dependency chickenbits](#dependency-chickenbits) - prevent loading an optional dependency
     * [optional gpl stuff](#optional-gpl-stuff)
 * [sfx](#sfx) - the self-contained "binary" (recommended!)
     * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
@@ -2042,6 +2043,41 @@ enable [smb](#smb-server) support (**not** recommended):
 * `impacket==0.11.0`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
+
+
+### dependency chickenbits
+
+prevent loading an optional dependency  , for example if:
+
+* you have an incompatible version installed and it causes problems
+* you just don't want copyparty to use it, maybe to save ram
+
+set any of the following environment variables to disable its associated optional feature,
+
+| env-var              | what it does |
+| -------------------- | ------------ |
+| `PRTY_NO_CFSSL`      | never attempt to generate self-signed certificates using [cfssl](https://github.com/cloudflare/cfssl) |
+| `PRTY_NO_FFMPEG`     | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips |
+| `PRTY_NO_FFPROBE`    | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips, **metadata-scanning** must be handled by mutagen |
+| `PRTY_NO_IPV6`       | disable some ipv6 support (should not be necessary since windows 2000) |
+| `PRTY_NO_LZMA`       | disable streaming xz compression of incoming uploads |
+| `PRTY_NO_MP`         | disable all use of the python `multiprocessing` module (actual multithreading, cpu-count for parsers/thumbnailers) |
+| `PRTY_NO_MUTAGEN`    | do not use [mutagen](https://pypi.org/project/mutagen/) for reading metadata from media files; will fallback to ffprobe |
+| `PRTY_NO_PIL`        | disable all [Pillow](https://pypi.org/project/pillow/)-based thumbnail support; will fallback to libvips or ffmpeg |
+| `PRTY_NO_PILF`       | disable Pillow `ImageFont` text rendering, used for folder thumbnails |
+| `PRTY_NO_PIL_AVIF`   | disable 3rd-party Pillow plugin for [AVIF support](https://pypi.org/project/pillow-avif-plugin/) |
+| `PRTY_NO_PIL_HEIF`   | disable 3rd-party Pillow plugin for [HEIF support](https://pypi.org/project/pyheif-pillow-opener/) |
+| `PRTY_NO_PIL_WEBP`   | disable use of native webp support in Pillow |
+| `PRTY_NO_PSUTIL`     | do not use [psutil](https://pypi.org/project/psutil/) for reaping stuck hooks and plugins on Windows |
+| `PRTY_NO_SQLITE`     | disable all database-related functionality (file indexing, metadata indexing, most file deduplication logic) |
+| `PRTY_NO_TLS`        | disable native HTTPS support; if you still want to accept HTTPS connections then TLS must now be terminated by a reverse-proxy |
+| `PRTY_NO_VIPS`       | disable all [libvips](https://pypi.org/project/pyvips/)-based thumbnail support; will fallback to Pillow or ffmpeg |
+
+example: `PRTY_NO_PIL=1 python3 copyparty-sfx.py`
+
+* `PRTY_NO_PIL` saves ram
+* `PRTY_NO_VIPS` saves ram and startup time
+* python2.7 on windows: `PRTY_NO_FFMPEG` + `PRTY_NO_FFPROBE` saves startup time
 
 
 ## optional gpl stuff

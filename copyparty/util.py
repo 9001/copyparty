@@ -98,6 +98,9 @@ except:
     pass
 
 try:
+    if os.environ.get("PRTY_NO_SQLITE"):
+        raise Exception()
+
     HAVE_SQLITE3 = True
     import sqlite3
 
@@ -106,6 +109,9 @@ except:
     HAVE_SQLITE3 = False
 
 try:
+    if os.environ.get("PRTY_NO_PSUTIL"):
+        raise Exception()
+
     HAVE_PSUTIL = True
     import psutil
 except:
@@ -140,6 +146,9 @@ if TYPE_CHECKING:
 FAKE_MP = False
 
 try:
+    if os.environ.get("PRTY_NO_MP"):
+        raise ImportError()
+
     import multiprocessing as mp
 
     # import multiprocessing.dummy as mp
@@ -158,6 +167,9 @@ else:
 
 
 try:
+    if os.environ.get("PRTY_NO_IPV6"):
+        raise Exception()
+
     socket.inet_pton(socket.AF_INET6, "::1")
     HAVE_IPV6 = True
 except:

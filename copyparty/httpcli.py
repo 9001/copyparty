@@ -25,6 +25,9 @@ from operator import itemgetter
 import jinja2  # typechk
 
 try:
+    if os.environ.get("PRTY_NO_LZMA"):
+        raise Exception()
+
     import lzma
 except:
     pass

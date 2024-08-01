@@ -9,6 +9,9 @@ import threading  # typechk
 import time
 
 try:
+    if os.environ.get("PRTY_NO_TLS"):
+        raise Exception()
+
     HAVE_SSL = True
     import ssl
 except:

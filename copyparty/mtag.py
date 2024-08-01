@@ -48,8 +48,8 @@ def have_ff(scmd: str) -> bool:
         return bool(shutil.which(scmd))
 
 
-HAVE_FFMPEG = have_ff("ffmpeg")
-HAVE_FFPROBE = have_ff("ffprobe")
+HAVE_FFMPEG = not os.environ.get("PRTY_NO_FFMPEG") and have_ff("ffmpeg")
+HAVE_FFPROBE = not os.environ.get("PRTY_NO_FFPROBE") and have_ff("ffprobe")
 
 
 class MParser(object):
@@ -337,6 +337,9 @@ class MTag(object):
         if self.backend == "mutagen":
             self._get = self.get_mutagen
             try:
+                if os.environ.get("PRTY_NO_MUTAGEN"):
+                    raise Exception()
+
                 from mutagen import version  # noqa: F401
             except:
                 self.log("could not load Mutagen, trying FFprobe instead", c=3)

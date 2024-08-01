@@ -45,22 +45,34 @@ HAVE_AVIF = False
 HAVE_WEBP = False
 
 try:
+    if os.environ.get("PRTY_NO_PIL"):
+        raise Exception()
+
     from PIL import ExifTags, Image, ImageFont, ImageOps
 
     HAVE_PIL = True
     try:
+        if os.environ.get("PRTY_NO_PILF"):
+            raise Exception()
+
         ImageFont.load_default(size=16)
         HAVE_PILF = True
     except:
         pass
 
     try:
+        if os.environ.get("PRTY_NO_PIL_WEBP"):
+            raise Exception()
+
         Image.new("RGB", (2, 2)).save(BytesIO(), format="webp")
         HAVE_WEBP = True
     except:
         pass
 
     try:
+        if os.environ.get("PRTY_NO_PIL_HEIF"):
+            raise Exception()
+
         from pyheif_pillow_opener import register_heif_opener
 
         register_heif_opener()
@@ -69,6 +81,9 @@ try:
         pass
 
     try:
+        if os.environ.get("PRTY_NO_PIL_AVIF"):
+            raise Exception()
+
         import pillow_avif  # noqa: F401  # pylint: disable=unused-import
 
         HAVE_AVIF = True
@@ -80,6 +95,9 @@ except:
     pass
 
 try:
+    if os.environ.get("PRTY_NO_VIPS"):
+        raise Exception()
+
     HAVE_VIPS = True
     import pyvips
 

@@ -9,7 +9,7 @@ import time
 from .__init__ import ANYWIN
 from .util import Netdev, runcmd, wrename, wunlink
 
-HAVE_CFSSL = True
+HAVE_CFSSL = not os.environ.get("PRTY_NO_CFSSL")
 
 if True:  # pylint: disable=using-constant-test
     from .util import NamedLogger, RootLogger
