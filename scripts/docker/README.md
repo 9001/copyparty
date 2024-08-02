@@ -22,6 +22,11 @@ this example is also available as a podman-compatible [docker-compose yaml](http
 i'm not very familiar with containers, so let me know if this section could be better 🙏
 
 
+## portainer
+
+* there is a [portainer howto](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/portainer.md) which is mostly untested
+
+
 ## configuration
 
 > this section basically explains how the [docker-compose yaml](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose) works, so you may look there instead
