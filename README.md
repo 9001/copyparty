@@ -85,6 +85,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [prometheus](#prometheus) - metrics/stats can be enabled
     * [other extremely specific features](#other-extremely-specific-features) - you'll never find a use for these
         * [custom mimetypes](#custom-mimetypes) - change the association of a file extension
+        * [feature chickenbits](#feature-chickenbits) - buggy feature? rip it out
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
     * [fedora package](#fedora-package) - does not exist yet
@@ -1559,6 +1560,23 @@ in a config-file, this is the same as:
 run copyparty with `--mimes` to list all the default mappings
 
 
+### feature chickenbits
+
+buggy feature? rip it out  by setting any of the following environment variables to disable its associated bell or whistle,
+
+| env-var              | what it does |
+| -------------------- | ------------ |
+| `PRTY_NO_IFADDR`     | disable ip/nic discovery by poking into your OS with ctypes |
+| `PRTY_NO_IPV6`       | disable some ipv6 support (should not be necessary since windows 2000) |
+| `PRTY_NO_LZMA`       | disable streaming xz compression of incoming uploads |
+| `PRTY_NO_MP`         | disable all use of the python `multiprocessing` module (actual multithreading, cpu-count for parsers/thumbnailers) |
+| `PRTY_NO_SQLITE`     | disable all database-related functionality (file indexing, metadata indexing, most file deduplication logic) |
+| `PRTY_NO_TLS`        | disable native HTTPS support; if you still want to accept HTTPS connections then TLS must now be terminated by a reverse-proxy |
+| `PRTY_NO_TPOKE`      | disable systemd-tmpfilesd avoider |
+
+example: `PRTY_NO_IFADDR=1 python3 copyparty-sfx.py`
+
+
 # packages
 
 the party might be closer than you think
@@ -2059,9 +2077,6 @@ set any of the following environment variables to disable its associated optiona
 | `PRTY_NO_CFSSL`      | never attempt to generate self-signed certificates using [cfssl](https://github.com/cloudflare/cfssl) |
 | `PRTY_NO_FFMPEG`     | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips |
 | `PRTY_NO_FFPROBE`    | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips, **metadata-scanning** must be handled by mutagen |
-| `PRTY_NO_IPV6`       | disable some ipv6 support (should not be necessary since windows 2000) |
-| `PRTY_NO_LZMA`       | disable streaming xz compression of incoming uploads |
-| `PRTY_NO_MP`         | disable all use of the python `multiprocessing` module (actual multithreading, cpu-count for parsers/thumbnailers) |
 | `PRTY_NO_MUTAGEN`    | do not use [mutagen](https://pypi.org/project/mutagen/) for reading metadata from media files; will fallback to ffprobe |
 | `PRTY_NO_PIL`        | disable all [Pillow](https://pypi.org/project/pillow/)-based thumbnail support; will fallback to libvips or ffmpeg |
 | `PRTY_NO_PILF`       | disable Pillow `ImageFont` text rendering, used for folder thumbnails |
@@ -2069,8 +2084,6 @@ set any of the following environment variables to disable its associated optiona
 | `PRTY_NO_PIL_HEIF`   | disable 3rd-party Pillow plugin for [HEIF support](https://pypi.org/project/pyheif-pillow-opener/) |
 | `PRTY_NO_PIL_WEBP`   | disable use of native webp support in Pillow |
 | `PRTY_NO_PSUTIL`     | do not use [psutil](https://pypi.org/project/psutil/) for reaping stuck hooks and plugins on Windows |
-| `PRTY_NO_SQLITE`     | disable all database-related functionality (file indexing, metadata indexing, most file deduplication logic) |
-| `PRTY_NO_TLS`        | disable native HTTPS support; if you still want to accept HTTPS connections then TLS must now be terminated by a reverse-proxy |
 | `PRTY_NO_VIPS`       | disable all [libvips](https://pypi.org/project/pyvips/)-based thumbnail support; will fallback to Pillow or ffmpeg |
 
 example: `PRTY_NO_PIL=1 python3 copyparty-sfx.py`

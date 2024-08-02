@@ -11,7 +11,15 @@ import os
 
 from ._shared import IP, Adapter
 
-if os.name == "nt":
+
+def nope(include_unconfigured=False):
+    return []
+
+
+if os.environ.get("PRTY_NO_IFADDR") or os.uname().machine == "s390x":
+    # s390x deadlocks at libc.getifaddrs
+    get_adapters = nope
+elif os.name == "nt":
     from ._win32 import get_adapters
 elif os.name == "posix":
     from ._posix import get_adapters
