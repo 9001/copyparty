@@ -6,6 +6,8 @@ set -e
     exit 1
 }
 
+suf=-b1
+suf=
 sarchs="386 amd64 arm/v7 arm64/v8 ppc64le s390x"
 archs="amd64 arm s390x 386 arm64 ppc64le"
 imgs="dj iv min im ac"
@@ -103,11 +105,12 @@ filt=
             # --pull=never does nothing at all btw
             (set -x
             $nice podman build \
+                --squash \
                 --pull=never \
                 --from localhost/alpine-$a \
-                -t copyparty-$i-$a \
+                -t copyparty-$i-$a$suf \
                 -f Dockerfile.$i . ||
-                    (echo $? $i-$a >> err)
+                    (echo $? $i-$a >> err; printf '%096d\n' $(seq 1 42))
             rm -f .blk
             ) 2> >(tee $a.err | sed "s/^/$aa:/" >&2) > >(tee $a.out | sed "s/^/$aa:/") &
         done
@@ -134,9 +137,10 @@ filt=
         variants=
         for a in $archs; do
             [[ " ${ngs[*]} " =~ " $i-$a " ]] && continue
-            variants="$variants containers-storage:localhost/copyparty-$i-$a"
+            variants="$variants containers-storage:localhost/copyparty-$i-$a$suf"
         done
-        podman manifest create copyparty-$i $variants
+        podman manifest rm copyparty-$i$suf || echo "(that's fine btw)"
+        podman manifest create copyparty-$i$suf $variants
     done
 }
 

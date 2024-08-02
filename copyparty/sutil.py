@@ -6,7 +6,7 @@ import tempfile
 from datetime import datetime
 
 from .__init__ import CORES
-from .authsrv import AuthSrv, VFS
+from .authsrv import VFS, AuthSrv
 from .bos import bos
 from .th_cli import ThumbCli
 from .util import UTC, vjoin, vol_san

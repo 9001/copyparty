@@ -497,6 +497,9 @@ def disable_quickedit() -> None:
 
 
 def sfx_tpoke(top: str):
+    if os.environ.get("PRTY_NO_TPOKE"):
+        return
+
     files = [top] + [
         os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df
     ]

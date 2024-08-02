@@ -28,8 +28,8 @@ from .fsutil import Fstab
 from .mtag import MParser, MTag
 from .util import (
     HAVE_SQLITE3,
-    VF_CAREFUL,
     SYMTIME,
+    VF_CAREFUL,
     Daemon,
     MTHash,
     Pebkac,

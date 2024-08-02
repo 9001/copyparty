@@ -9,7 +9,7 @@ import time
 from .__init__ import ANYWIN, MACOS
 from .authsrv import AXS, VFS
 from .bos import bos
-from .util import chkcmd, min_ex
+from .util import chkcmd, min_ex, undot
 
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union

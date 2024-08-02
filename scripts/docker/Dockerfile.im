@@ -5,18 +5,15 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-im" \
         org.opencontainers.image.description="copyparty with Pillow and Mutagen (image thumbnails, media tags)"
-ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
-        XDG_CONFIG_HOME=/cfg
+ENV     XDG_CONFIG_HOME=/cfg
 
 RUN     apk --no-cache add !pyc \
             wget \
-            py3-argon2-cffi py3-pillow py3-mutagen \
-        && rm -rf /tmp/pyc \
-        && mkdir /cfg /w \
-        && chmod 777 /cfg /w \
-        && echo % /cfg > initcfg
+            py3-jinja2 py3-argon2-cffi py3-pillow py3-mutagen
 
-COPY    i/dist/copyparty-sfx.py ./
+COPY    i/dist/copyparty-sfx.py innvikler.sh ./
+RUN     ash innvikler.sh && rm innvikler.sh
+
 WORKDIR /w
 EXPOSE  3923
-ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "--no-crt", "-c", "/z/initcfg"]
+ENTRYPOINT ["python3", "-m", "copyparty", "--no-crt", "-c", "/z/initcfg"]

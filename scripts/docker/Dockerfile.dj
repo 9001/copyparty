@@ -5,15 +5,14 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-dj" \
         org.opencontainers.image.description="copyparty with all optional dependencies, including musical key / bpm detection"
-ENV     PYTHONPYCACHEPREFIX=/tmp/pyc \
-        XDG_CONFIG_HOME=/cfg
+ENV     XDG_CONFIG_HOME=/cfg
 
 COPY    i/bin/mtag/install-deps.sh ./
 COPY    i/bin/mtag/audio-bpm.py /mtag/
 COPY    i/bin/mtag/audio-key.py /mtag/
 RUN     apk add -U !pyc \
             wget \
-            py3-argon2-cffi py3-pillow py3-pip py3-cffi \
+            py3-jinja2 py3-argon2-cffi py3-pillow py3-pip py3-cffi \
             ffmpeg \
             vips-jxl vips-heif vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
@@ -27,18 +26,12 @@ RUN     apk add -U !pyc \
         && python3 -m pip install pyvips \
         && bash install-deps.sh \
         && apk del py3-pip .bd \
-        && rm -rf /var/cache/apk/* /tmp/pyc \
         && chmod 777 /root \
-        && ln -s /root/vamp /root/.local / \
-        && mkdir /cfg /w \
-        && chmod 777 /cfg /w \
-        && echo % /cfg > initcfg
+        && ln -s /root/vamp /root/.local /
 
-COPY    i/dist/copyparty-sfx.py ./
+COPY    i/dist/copyparty-sfx.py innvikler.sh ./
+RUN     ash innvikler.sh && rm innvikler.sh
+
 WORKDIR /w
 EXPOSE  3923
-ENTRYPOINT ["python3", "/z/copyparty-sfx.py", "--no-crt", "-c", "/z/initcfg"]
-
-# size: 286 MB
-# bpm/key: 529 sec
-# idx-bench: 2352 MB/s
+ENTRYPOINT ["python3", "-m", "copyparty", "--no-crt", "-c", "/z/initcfg"]
