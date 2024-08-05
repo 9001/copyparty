@@ -2400,6 +2400,7 @@ function up2k_init(subtle) {
                             'nparts': nparts
                         });
                     }
+                    t.nojoin = 0;
 
                     msg = null;
                     done = false;
@@ -2606,7 +2607,7 @@ function up2k_init(subtle) {
             }
             else if (txt.indexOf('already got that') + 1 ||
                 txt.indexOf('already being written') + 1) {
-                t.nojoin = t.postlist.length;
+                t.nojoin = t.nojoin || t.postlist.length;
                 console.log("ignoring dupe-segment with backoff", t.nojoin, t.name, t);
                 if (!toast.visible && st.todo.upload.length < 4)
                     toast.msg(10, L.u_cbusy);
@@ -2657,6 +2658,7 @@ function up2k_init(subtle) {
                 if (!toast.visible)
                     toast.warn(9.98, L.u_cuerr.format(snpart, Math.ceil(t.size / chunksize), t.name), t);
 
+                t.nojoin = t.nojoin || t.postlist.length;  // maybe rproxy postsize limit
                 console.log('chunkpit onerror,', ++tries, t.name, t);
                 orz2(xhr);
             };

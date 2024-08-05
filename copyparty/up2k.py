@@ -3041,6 +3041,7 @@ class Up2k(object):
             chunksize = up2k_chunksize(job["size"])
 
             coffsets = []
+            nchunks = []
             for chash in chashes:
                 nchunk = [n for n, v in enumerate(job["hash"]) if v == chash]
                 if not nchunk:
@@ -3048,6 +3049,7 @@ class Up2k(object):
 
                 ofs = [chunksize * x for x in nchunk]
                 coffsets.append(ofs)
+                nchunks.append(nchunk)
 
             for ofs1, ofs2 in zip(coffsets, coffsets[1:]):
                 gap = (ofs2[0] - ofs1[0]) - chunksize
@@ -3059,9 +3061,9 @@ class Up2k(object):
 
             if not job["sprs"]:
                 cur_sz = bos.path.getsize(path)
-                if ofs[0] > cur_sz:
+                if coffsets[0][0] > cur_sz:
                     t = "please upload sequentially using one thread;\nserver filesystem does not support sparse files.\n  file: {}\n  chunk: {}\n  cofs: {}\n  flen: {}"
-                    t = t.format(job["name"], nchunk[0], ofs[0], cur_sz)
+                    t = t.format(job["name"], nchunks[0][0], coffsets[0][0], cur_sz)
                     raise Pebkac(400, t)
 
             job["busy"][chash] = 1
