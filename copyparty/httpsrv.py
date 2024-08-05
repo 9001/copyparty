@@ -85,7 +85,7 @@ if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 
 class HttpSrv(object):

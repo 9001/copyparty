@@ -60,7 +60,7 @@ except:
 
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 
 if sys.version_info >= (3, 7) or (
@@ -809,7 +809,7 @@ class CachedSet(object):
 
         c = self.c = {k: v for k, v in self.c.items() if now - v < self.maxage}
         try:
-            self.oldest = c[min(c, key=c.get)]
+            self.oldest = c[min(c, key=c.get)]  # type: ignore
         except:
             self.oldest = now
 
@@ -1841,7 +1841,7 @@ MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 RFC2822 = "%s, %02d %s %04d %02d:%02d:%02d GMT"
 
 
-def formatdate(ts: Optional[int] = None) -> str:
+def formatdate(ts: Optional[float] = None) -> str:
     # gmtime ~= datetime.fromtimestamp(ts, UTC).timetuple()
     y, mo, d, h, mi, s, wd, _, _ = time.gmtime(ts)
     return RFC2822 % (WKDAYS[wd], d, MONTHS[mo - 1], y, h, mi, s)
@@ -2073,7 +2073,7 @@ def _quotep2(txt: str) -> str:
     """url quoter which deals with bytes correctly"""
     btxt = w8enc(txt)
     quot = quote(btxt, safe=b"/")
-    return w8dec(quot.replace(b" ", b"+"))
+    return w8dec(quot.replace(b" ", b"+"))  # type: ignore
 
 
 def _quotep3(txt: str) -> str:

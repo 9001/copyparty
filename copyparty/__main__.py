@@ -68,7 +68,7 @@ if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 try:
     if os.environ.get("PRTY_NO_TLS"):
@@ -350,7 +350,7 @@ def configure_ssl_ver(al: argparse.Namespace) -> None:
     # oh man i love openssl
     # check this out
     # hold my beer
-    assert ssl
+    assert ssl  # type: ignore
     ptn = re.compile(r"^OP_NO_(TLS|SSL)v")
     sslver = terse_sslver(al.ssl_ver).split(",")
     flags = [k for k in ssl.__dict__ if ptn.match(k)]
@@ -384,7 +384,7 @@ def configure_ssl_ver(al: argparse.Namespace) -> None:
 
 
 def configure_ssl_ciphers(al: argparse.Namespace) -> None:
-    assert ssl
+    assert ssl  # type: ignore
     ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     if al.ssl_ver:
         ctx.options &= ~al.ssl_flags_en

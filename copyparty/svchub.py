@@ -66,7 +66,7 @@ if TYPE_CHECKING:
         pass
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 
 class SvcHub(object):

@@ -74,7 +74,7 @@ class Ico(object):
                 try:
                     _, _, tw, th = pb.textbbox((0, 0), ext)
                 except:
-                    tw, th = pb.textsize(ext)
+                    tw, th = pb.textsize(ext)  # type: ignore
 
                 tw += len(ext)
                 cw = tw // len(ext)

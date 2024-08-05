@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from .svchub import SvcHub
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 HAVE_PIL = False
 HAVE_PILF = False

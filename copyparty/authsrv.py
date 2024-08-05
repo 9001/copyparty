@@ -57,7 +57,7 @@ if TYPE_CHECKING:
     # Mflags: TypeAlias = dict[str, Vflags]
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 
 LEELOO_DALLAS = "leeloo_dallas"

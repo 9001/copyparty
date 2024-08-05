@@ -22,6 +22,9 @@
         "terminal.ansiBrightCyan": "#9cf0ed",
         "terminal.ansiBrightWhite": "#ffffff",
     },
+    "python.terminal.activateEnvironment": false,
+    "python.analysis.enablePytestSupport": false,
+    "python.analysis.typeCheckingMode": "standard",
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
@@ -31,23 +34,8 @@
         "-p",
         "test_*.py"
     ],
-    "python.linting.pylintEnabled": true,
-    "python.linting.flake8Enabled": true,
-    "python.linting.banditEnabled": true,
-    "python.linting.mypyEnabled": true,
-    "python.linting.flake8Args": [
-        "--max-line-length=120",
-        "--ignore=E722,F405,E203,W503,W293,E402,E501,E128,E226",
-    ],
-    "python.linting.banditArgs": [
-        "--ignore=B104,B110,B112"
-    ],
-    // python3 -m isort --py=27 --profile=black copyparty/
-    "python.formatting.provider": "none",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    },
-    "editor.formatOnSave": true,
+    // python3 -m isort --py=27 --profile=black ~/dev/copyparty/{copyparty,tests}/*.py && python3 -m black -t py27 ~/dev/copyparty/{copyparty,tests,bin}/*.py $(find ~/dev/copyparty/copyparty/stolen -iname '*.py')
+    "editor.formatOnSave": false,
     "[html]": {
         "editor.formatOnSave": false,
         "editor.autoIndent": "keep",
@@ -58,6 +46,4 @@
     "files.associations": {
         "*.makefile": "makefile"
     },
-    "python.linting.enabled": true,
-    "python.pythonPath": "/usr/bin/python3"
 }

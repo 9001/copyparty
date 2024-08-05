@@ -3015,7 +3015,7 @@ class Up2k(object):
 
     def handle_chunks(
         self, ptop: str, wark: str, chashes: list[str]
-    ) -> tuple[list[int], list[list[int]], str, float, bool]:
+    ) -> tuple[int, list[list[int]], str, float, bool]:
         with self.mutex, self.reg_mutex:
             self.db_act = self.vol_act[ptop] = time.time()
             job = self.registry[ptop].get(wark)
@@ -3037,6 +3037,7 @@ class Up2k(object):
                     t = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
                     raise Pebkac(400, t.format(wark, chash, idx, nh, job["name"]))
 
+            assert chash  # type: ignore
             chunksize = up2k_chunksize(job["size"])
 
             coffsets = []

@@ -581,7 +581,7 @@ class MTag(object):
                 continue
 
             if k == ".aq":
-                v /= 1000
+                v /= 1000  # type: ignore
 
             if k == "ac" and v.startswith("mp4a.40."):
                 v = "aac"

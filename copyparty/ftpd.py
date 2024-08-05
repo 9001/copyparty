@@ -42,7 +42,7 @@ if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Union
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 
 class FSE(FilesystemError):

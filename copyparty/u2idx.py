@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from .httpsrv import HttpSrv
 
 if PY2:
-    range = xrange
+    range = xrange  # type: ignore
 
 
 class U2idx(object):
