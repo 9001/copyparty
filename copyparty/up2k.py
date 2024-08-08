@@ -2851,11 +2851,11 @@ class Up2k(object):
                 # one chunk may occur multiple times in a file;
                 # filter to unique values for the list of missing chunks
                 # (preserve order to reduce disk thrashing)
-                lut = {}
+                lut = set()
                 for k in cj["hash"]:
                     if k not in lut:
                         job["need"].append(k)
-                        lut[k] = 1
+                        lut.add(k)
 
                 try:
                     self._new_upload(job)
@@ -3015,7 +3015,7 @@ class Up2k(object):
 
     def handle_chunks(
         self, ptop: str, wark: str, chashes: list[str]
-    ) -> tuple[int, list[list[int]], str, float, bool]:
+    ) -> tuple[list[str], int, list[list[int]], str, float, bool]:
         with self.mutex, self.reg_mutex:
             self.db_act = self.vol_act[ptop] = time.time()
             job = self.registry[ptop].get(wark)
@@ -3024,12 +3024,37 @@ class Up2k(object):
                 self.log("unknown wark [{}], known: {}".format(wark, known))
                 raise Pebkac(400, "unknown wark" + SSEELOG)
 
+            if len(chashes) > 1 and len(chashes[1]) < 44:
+                # first hash is full-length; expand remaining ones
+                uniq = []
+                lut = set()
+                for chash in job["hash"]:
+                    if chash not in lut:
+                        uniq.append(chash)
+                        lut.add(chash)
+                try:
+                    nchunk = uniq.index(chashes[0])
+                except:
+                    raise Pebkac(400, "unknown chunk0 [%s]" % (chashes[0]))
+                expanded = [chashes[0]]
+                for prefix in chashes[1:]:
+                    nchunk += 1
+                    chash = uniq[nchunk]
+                    if not chash.startswith(prefix):
+                        t = "next sibling chunk does not start with expected prefix [%s]: [%s]"
+                        raise Pebkac(400, t % (prefix, chash))
+                    expanded.append(chash)
+                chashes = expanded
+
             for chash in chashes:
                 if chash not in job["need"]:
                     msg = "chash = {} , need:\n".format(chash)
                     msg += "\n".join(job["need"])
                     self.log(msg)
-                    raise Pebkac(400, "already got that (%s) but thanks??" % (chash,))
+                    t = "already got that (%s) but thanks??"
+                    if chash not in job["hash"]:
+                        t = "unknown chunk wtf: %s"
+                    raise Pebkac(400, t % (chash,))
 
                 if chash in job["busy"]:
                     nh = len(job["hash"])
@@ -3070,7 +3095,7 @@ class Up2k(object):
 
         job["poke"] = time.time()
 
-        return chunksize, coffsets, path, job["lmod"], job["sprs"]
+        return chashes, chunksize, coffsets, path, job["lmod"], job["sprs"]
 
     def release_chunks(self, ptop: str, wark: str, chashes: list[str]) -> bool:
         with self.reg_mutex:

@@ -2214,13 +2214,21 @@ class HttpCli(object):
             raise Pebkac(400, "need hash and wark headers for binary POST")
 
         chashes = [x.strip() for x in chashes]
+        if len(chashes) == 3 and len(chashes[1]) == 1:
+            # the first hash, then length of consecutive hashes,
+            # then a list of stitched hashes as one long string
+            clen = int(chashes[1])
+            siblings = chashes[2]
+            chashes = [chashes[0]]
+            for n in range(0, len(siblings), clen):
+                chashes.append(siblings[n : n + clen])
 
         vfs, _ = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         ptop = (vfs.dbv or vfs).realpath
 
         x = self.conn.hsrv.broker.ask("up2k.handle_chunks", ptop, wark, chashes)
         response = x.get()
-        chunksize, cstarts, path, lastmod, sprs = response
+        chashes, chunksize, cstarts, path, lastmod, sprs = response
         maxsize = chunksize * len(chashes)
         cstart0 = cstarts[0]
 

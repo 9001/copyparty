@@ -2662,12 +2662,20 @@ function up2k_init(subtle) {
                 console.log('chunkpit onerror,', ++tries, t.name, t);
                 orz2(xhr);
             };
-            var chashes = [];
-            for (var a = pcar; a <= pcdr; a++)
-                chashes.push(t.hash[a]);
+
+            var chashes = [],
+                ctxt = t.hash[pcar],
+                plen = Math.floor(192 / nparts.length);
+
+            plen = plen > 9 ? 9 : plen < 2 ? 2 : plen;
+            for (var a = pcar + 1; a <= pcdr; a++)
+                chashes.push(t.hash[a].slice(0, plen));
+
+            if (chashes.length)
+                ctxt += ',' + plen + ',' + chashes.join('');
 
             xhr.open('POST', t.purl, true);
-            xhr.setRequestHeader("X-Up2k-Hash", chashes.join(","));
+            xhr.setRequestHeader("X-Up2k-Hash", ctxt);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
             xhr.setRequestHeader("X-Up2k-Stat", "{0}/{1}/{2}/{3} {4}/{5} {6}".format(
                 pvis.ctr.ok, pvis.ctr.ng, pvis.ctr.bz, pvis.ctr.q, btot, btot - bfin,

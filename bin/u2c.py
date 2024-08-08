@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.21"
-S_BUILD_DT = "2024-07-26"
+S_VERSION = "1.22"
+S_BUILD_DT = "2024-08-08"
 
 """
 u2c.py: upload to copyparty
@@ -660,8 +660,15 @@ def upload(fsl, pw, stats):
     # type: (FileSlice, str, str) -> None
     """upload a range of file data, defined by one or more `cid` (chunk-hash)"""
 
+    ctxt = fsl.cids[0]
+    if len(fsl.cids) > 1:
+        n = 192 // len(fsl.cids)
+        n = 9 if n > 9 else 2 if n < 2 else n
+        zsl = [zs[:n] for zs in fsl.cids[1:]]
+        ctxt += ",%d,%s" % (n, "".join(zsl))
+
     headers = {
-        "X-Up2k-Hash": ",".join(fsl.cids),
+        "X-Up2k-Hash": ctxt,
         "X-Up2k-Wark": fsl.file.wark,
         "Content-Type": "application/octet-stream",
     }
