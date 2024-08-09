@@ -1017,9 +1017,6 @@ html.y #path a:hover {
 	color: var(--g-dfg);
 }
 #ggrid>a.au:before {
-	content: '💾';
-}
-html.np_open #ggrid>a.au:before {
 	content: '▶';
 }
 #ggrid>a:before {

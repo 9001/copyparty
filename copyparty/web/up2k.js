@@ -2654,6 +2654,7 @@ function up2k_init(subtle) {
                     return;
 
                 st.bytes.inflight -= (xhr.bsent || 0);
+                xhr.bsent = 0;
 
                 if (!toast.visible)
                     toast.warn(9.98, L.u_cuerr.format(snpart, Math.ceil(t.size / chunksize), t.name), t);

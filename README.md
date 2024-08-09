@@ -581,9 +581,6 @@ images with the following names (see `--th-covers`) become the thumbnail of the 
 * the order is significant, so if both `cover.png` and `folder.jpg` exist in a folder, it will pick the first matching `--th-covers` entry (`folder.jpg`)
 * and, if you enable [file indexing](#file-indexing), it will also try those names as dotfiles (`.folder.jpg` and so), and then fallback on the first picture in the folder (if it has any pictures at all)
 
-in the grid/thumbnail view, if the audio player panel is open, songs will start playing when clicked
-* indicated by the audio files having the ▶ icon instead of 💾
-
 enabling `multiselect` lets you click files to select them, and then shift-click another file for range-select
 * `multiselect` is mostly intended for phones/tablets, but the `sel` option in the `[⚙️] settings` tab is better suited for desktop use, allowing selection by CTRL-clicking and range-selection with SHIFT-click, all without affecting regular clicking
   * the `sel` option can be made default globally with `--gsel` or per-volume with volflag `gsel`
