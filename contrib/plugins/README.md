@@ -20,6 +20,13 @@ point `--js-browser` to one of these by URL:
 
 
 
+## example any-js
+point `--js-browser` and/or `--js-other` to one of these by URL:
+
+* [`banner.js`](banner.js) shows a very enterprise [legal-banner](https://github.com/user-attachments/assets/8ae8e087-b209-449c-b08d-74e040f0284b)
+
+
+
 ## example browser-css
 point `--css-browser` to one of these by URL:
 

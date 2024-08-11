@@ -228,6 +228,11 @@ class HttpCli(object):
         ka["s_doctitle"] = self.args.doctitle
         ka["tcolor"] = self.vn.flags["tcolor"]
 
+        if self.args.js_other and "js" not in ka:
+            zs = self.args.js_other
+            zs += "&" if "?" in zs else "?"
+            ka["js"] = zs
+
         zso = self.vn.flags.get("html_head")
         if zso:
             ka["this"] = self
@@ -3792,6 +3797,11 @@ class HttpCli(object):
             "md": boundary,
             "arg_base": arg_base,
         }
+
+        if self.args.js_other and "js" not in targs:
+            zs = self.args.js_other
+            zs += "&" if "?" in zs else "?"
+            targs["js"] = zs
 
         zfv = self.vn.flags.get("html_head")
         if zfv:

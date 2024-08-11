@@ -46,6 +46,9 @@
 		}, 1000);
 	</script>
 	{%- endif %}
+	{%- if js %}
+	<script src="{{ js }}_={{ ts }}"></script>
+	{%- endif %}
 </body>
 
 </html>
