@@ -33,12 +33,10 @@ example usage as a volflag in a copyparty config file:
       flags:
         xbu: j,c1,bin/hooks/reloc-by-ext.py
 
-note: this only works with the basic uploader (sharex and such),
-  does not work with up2k / dragdrop into browser
-
 note: this could also work as an xau hook (after-upload), but
   because it doesn't need to read the file contents its better
-  as xbu (before-upload) since that's safer / less buggy
+  as xbu (before-upload) since that's safer / less buggy,
+  and only xbu works with up2k (dragdrop into browser)
 """
 
 
