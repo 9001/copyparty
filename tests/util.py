@@ -68,6 +68,13 @@ def chkcmd(argv):
 
 def get_ramdisk():
     def subdir(top):
+        for d in os.listdir(top):
+            if not d.startswith("cptd-"):
+                continue
+            p = os.path.join(top, d)
+            st = os.stat(p)
+            if time.time() - st.st_mtime > 300:
+                shutil.rmtree(p)
         ret = os.path.join(top, "cptd-{}".format(os.getpid()))
         shutil.rmtree(ret, True)
         os.mkdir(ret)
@@ -111,10 +118,10 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw og og_no_head og_s_title q rand smb srch_dbg stats uqe vague_403 vc ver xdev xlink xvol"
+        ex = "daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw og og_no_head og_s_title q rand smb srch_dbg stats uqe vague_403 vc ver write_uplog xdev xlink xvol"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "dotpart dotsrch no_dhash no_fastboot no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
+        ex = "dotpart dotsrch hook_v no_dhash no_fastboot no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
         ex = "ah_cli ah_gen css_browser hist js_browser mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua"
@@ -178,6 +185,10 @@ class Cfg(Namespace):
 
 
 class NullBroker(object):
+    def __init__(self, args, asrv):
+        self.args = args
+        self.asrv = asrv
+
     def say(self, *args):
         pass
 
@@ -213,7 +224,7 @@ class VHttpSrv(object):
         self.asrv = asrv
         self.log = log
 
-        self.broker = NullBroker()
+        self.broker = NullBroker(args, asrv)
         self.prism = None
         self.bans = {}
         self.nreq = 0

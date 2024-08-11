@@ -521,8 +521,8 @@ class VFS(object):
                     t = "{} has no {} in [{}] => [{}] => [{}]"
                     self.log("vfs", t.format(uname, msg, vpath, cvpath, ap), 6)
 
-                t = 'you don\'t have %s-access in "/%s"'
-                raise Pebkac(err, t % (msg, cvpath))
+                t = 'you don\'t have %s-access in "/%s" or below "/%s"'
+                raise Pebkac(err, t % (msg, cvpath, vn.vpath))
 
         return vn, rem
 
@@ -1898,7 +1898,7 @@ class AuthSrv(object):
                     self.log(t.format(vol.vpath), 1)
                     del vol.flags["lifetime"]
 
-                needs_e2d = [x for x in hooks if x != "xm"]
+                needs_e2d = [x for x in hooks if x in ("xau", "xiu")]
                 drop = [x for x in needs_e2d if vol.flags.get(x)]
                 if drop:
                     t = 'removing [{}] from volume "/{}" because e2d is disabled'

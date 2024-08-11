@@ -41,8 +41,8 @@ parameters explained,
     t10 = abort download and continue if it takes longer than 10sec
 
 example usage as a volflag (per-volume config):
-    -v srv/inc:inc:r:rw,ed:xau=j,t10,bin/hooks/into-the-cache-it-goes.py
-                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    -v srv/inc:inc:r:rw,ed:c,xau=j,t10,bin/hooks/into-the-cache-it-goes.py
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     (share filesystem-path srv/inc as volume /inc,
      readable by everyone, read-write for user 'ed',

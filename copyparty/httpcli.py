@@ -73,7 +73,9 @@ from .util import (
     humansize,
     ipnorm,
     loadpy,
+    log_reloc,
     min_ex,
+    pathmod,
     quotep,
     rand_name,
     read_header,
@@ -695,6 +697,9 @@ class HttpCli(object):
         xban = self.vn.flags.get("xban")
         if not xban or not runhook(
             self.log,
+            self.conn.hsrv.broker,
+            None,
+            "xban",
             xban,
             self.vn.canonical(self.rem),
             self.vpath,
@@ -1172,7 +1177,8 @@ class HttpCli(object):
         if self.args.no_dav:
             raise Pebkac(405, "WebDAV is disabled in server config")
 
-        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, False, False, err=401)
+        vn = self.vn
+        rem = self.rem
         tap = vn.canonical(rem)
 
         if "davauth" in vn.flags and self.uname == "*":
@@ -1556,8 +1562,8 @@ class HttpCli(object):
         self.log("PUT %s @%s" % (self.req, self.uname))
 
         if not self.can_write:
-            t = "user {} does not have write-access here"
-            raise Pebkac(403, t.format(self.uname))
+            t = "user %s does not have write-access under /%s"
+            raise Pebkac(403, t % (self.uname, self.vn.vpath))
 
         if not self.args.no_dav and self._applesan():
             return self.headers.get("content-length") == "0"
@@ -1632,6 +1638,9 @@ class HttpCli(object):
                             if xm:
                                 runhook(
                                     self.log,
+                                    self.conn.hsrv.broker,
+                                    None,
+                                    "xm",
                                     xm,
                                     self.vn.canonical(self.rem),
                                     self.vpath,
@@ -1780,11 +1789,15 @@ class HttpCli(object):
 
         if xbu:
             at = time.time() - lifetime
-            if not runhook(
+            vp = vjoin(self.vpath, fn) if nameless else self.vpath
+            hr = runhook(
                 self.log,
+                self.conn.hsrv.broker,
+                None,
+                "xbu.http.dump",
                 xbu,
                 path,
-                self.vpath,
+                vp,
                 self.host,
                 self.uname,
                 self.asrv.vfs.get_perms(self.vpath, self.uname),
@@ -1793,10 +1806,25 @@ class HttpCli(object):
                 self.ip,
                 at,
                 "",
-            ):
+            )
+            if not hr:
                 t = "upload blocked by xbu server config"
                 self.log(t, 1)
                 raise Pebkac(403, t)
+            if hr.get("reloc"):
+                x = pathmod(self.asrv.vfs, path, vp, hr["reloc"])
+                if x:
+                    if self.args.hook_v:
+                        log_reloc(self.log, hr["reloc"], x, path, vp, fn, vfs, rem)
+                    fdir, self.vpath, fn, (vfs, rem) = x
+                    if self.args.nw:
+                        fn = os.devnull
+                    else:
+                        bos.makedirs(fdir)
+                        path = os.path.join(fdir, fn)
+                        if not nameless:
+                            self.vpath = vjoin(self.vpath, fn)
+                        params["fdir"] = fdir
 
         if is_put and not (self.args.no_dav or self.args.nw) and bos.path.exists(path):
             # allow overwrite if...
@@ -1871,24 +1899,45 @@ class HttpCli(object):
                 fn = fn2
                 path = path2
 
-        if xau and not runhook(
-            self.log,
-            xau,
-            path,
-            self.vpath,
-            self.host,
-            self.uname,
-            self.asrv.vfs.get_perms(self.vpath, self.uname),
-            mt,
-            post_sz,
-            self.ip,
-            at,
-            "",
-        ):
-            t = "upload blocked by xau server config"
-            self.log(t, 1)
-            wunlink(self.log, path, vfs.flags)
-            raise Pebkac(403, t)
+        if xau:
+            vp = vjoin(self.vpath, fn) if nameless else self.vpath
+            hr = runhook(
+                self.log,
+                self.conn.hsrv.broker,
+                None,
+                "xau.http.dump",
+                xau,
+                path,
+                vp,
+                self.host,
+                self.uname,
+                self.asrv.vfs.get_perms(self.vpath, self.uname),
+                mt,
+                post_sz,
+                self.ip,
+                at,
+                "",
+            )
+            if not hr:
+                t = "upload blocked by xau server config"
+                self.log(t, 1)
+                wunlink(self.log, path, vfs.flags)
+                raise Pebkac(403, t)
+            if hr.get("reloc"):
+                x = pathmod(self.asrv.vfs, path, vp, hr["reloc"])
+                if x:
+                    if self.args.hook_v:
+                        log_reloc(self.log, hr["reloc"], x, path, vp, fn, vfs, rem)
+                    fdir, self.vpath, fn, (vfs, rem) = x
+                    bos.makedirs(fdir)
+                    path2 = os.path.join(fdir, fn)
+                    atomic_move(self.log, path, path2, vfs.flags)
+                    path = path2
+                    if not nameless:
+                        self.vpath = vjoin(self.vpath, fn)
+            sz = bos.path.getsize(path)
+        else:
+            sz = post_sz
 
         vfs, rem = vfs.get_dbv(rem)
         self.conn.hsrv.broker.say(
@@ -1911,7 +1960,7 @@ class HttpCli(object):
                 alg,
                 self.args.fk_salt,
                 path,
-                post_sz,
+                sz,
                 0 if ANYWIN else bos.stat(path).st_ino,
             )[: vfs.flags["fk"]]
 
@@ -2536,18 +2585,15 @@ class HttpCli(object):
                 fname = sanitize_fn(
                     p_file or "", "", [".prologue.html", ".epilogue.html"]
                 )
+                abspath = os.path.join(fdir, fname)
+                suffix = "-%.6f-%s" % (time.time(), dip)
                 if p_file and not nullwrite:
                     if rnd:
                         fname = rand_name(fdir, fname, rnd)
 
-                    if not bos.path.isdir(fdir):
-                        raise Pebkac(404, "that folder does not exist")
-
-                    suffix = "-{:.6f}-{}".format(time.time(), dip)
                     open_args = {"fdir": fdir, "suffix": suffix}
 
                     if "replace" in self.uparam:
-                        abspath = os.path.join(fdir, fname)
                         if not self.can_delete:
                             self.log("user not allowed to overwrite with ?replace")
                         elif bos.path.exists(abspath):
@@ -2557,6 +2603,58 @@ class HttpCli(object):
                             except:
                                 t = "toctou while deleting for ?replace: %s"
                             self.log(t % (abspath,))
+                else:
+                    open_args = {}
+                    tnam = fname = os.devnull
+                    fdir = abspath = ""
+
+                if xbu:
+                    at = time.time() - lifetime
+                    hr = runhook(
+                        self.log,
+                        self.conn.hsrv.broker,
+                        None,
+                        "xbu.http.bup",
+                        xbu,
+                        abspath,
+                        vjoin(upload_vpath, fname),
+                        self.host,
+                        self.uname,
+                        self.asrv.vfs.get_perms(upload_vpath, self.uname),
+                        at,
+                        0,
+                        self.ip,
+                        at,
+                        "",
+                    )
+                    if not hr:
+                        t = "upload blocked by xbu server config"
+                        self.log(t, 1)
+                        raise Pebkac(403, t)
+                    if hr.get("reloc"):
+                        zs = vjoin(upload_vpath, fname)
+                        x = pathmod(self.asrv.vfs, abspath, zs, hr["reloc"])
+                        if x:
+                            if self.args.hook_v:
+                                log_reloc(
+                                    self.log,
+                                    hr["reloc"],
+                                    x,
+                                    abspath,
+                                    zs,
+                                    fname,
+                                    vfs,
+                                    rem,
+                                )
+                            fdir, upload_vpath, fname, (vfs, rem) = x
+                            abspath = os.path.join(fdir, fname)
+                            if nullwrite:
+                                fdir = abspath = ""
+                            else:
+                                open_args["fdir"] = fdir
+
+                if p_file and not nullwrite:
+                    bos.makedirs(fdir)
 
                     # reserve destination filename
                     with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
@@ -2571,26 +2669,6 @@ class HttpCli(object):
                     open_args = {}
                     tnam = fname = os.devnull
                     fdir = abspath = ""
-
-                if xbu:
-                    at = time.time() - lifetime
-                    if not runhook(
-                        self.log,
-                        xbu,
-                        abspath,
-                        self.vpath,
-                        self.host,
-                        self.uname,
-                        self.asrv.vfs.get_perms(self.vpath, self.uname),
-                        at,
-                        0,
-                        self.ip,
-                        at,
-                        "",
-                    ):
-                        t = "upload blocked by xbu server config"
-                        self.log(t, 1)
-                        raise Pebkac(403, t)
 
                 if lim:
                     lim.chk_bup(self.ip)
@@ -2634,29 +2712,58 @@ class HttpCli(object):
 
                     tabspath = ""
 
+                    at = time.time() - lifetime
+                    if xau:
+                        hr = runhook(
+                            self.log,
+                            self.conn.hsrv.broker,
+                            None,
+                            "xau.http.bup",
+                            xau,
+                            abspath,
+                            vjoin(upload_vpath, fname),
+                            self.host,
+                            self.uname,
+                            self.asrv.vfs.get_perms(upload_vpath, self.uname),
+                            at,
+                            sz,
+                            self.ip,
+                            at,
+                            "",
+                        )
+                        if not hr:
+                            t = "upload blocked by xau server config"
+                            self.log(t, 1)
+                            wunlink(self.log, abspath, vfs.flags)
+                            raise Pebkac(403, t)
+                        if hr.get("reloc"):
+                            zs = vjoin(upload_vpath, fname)
+                            x = pathmod(self.asrv.vfs, abspath, zs, hr["reloc"])
+                            if x:
+                                if self.args.hook_v:
+                                    log_reloc(
+                                        self.log,
+                                        hr["reloc"],
+                                        x,
+                                        abspath,
+                                        zs,
+                                        fname,
+                                        vfs,
+                                        rem,
+                                    )
+                                fdir, upload_vpath, fname, (vfs, rem) = x
+                                ap2 = os.path.join(fdir, fname)
+                                if nullwrite:
+                                    fdir = ap2 = ""
+                                else:
+                                    bos.makedirs(fdir)
+                                    atomic_move(self.log, abspath, ap2, vfs.flags)
+                                abspath = ap2
+                        sz = bos.path.getsize(abspath)
+
                     files.append(
                         (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
                     )
-                    at = time.time() - lifetime
-                    if xau and not runhook(
-                        self.log,
-                        xau,
-                        abspath,
-                        self.vpath,
-                        self.host,
-                        self.uname,
-                        self.asrv.vfs.get_perms(self.vpath, self.uname),
-                        at,
-                        sz,
-                        self.ip,
-                        at,
-                        "",
-                    ):
-                        t = "upload blocked by xau server config"
-                        self.log(t, 1)
-                        wunlink(self.log, abspath, vfs.flags)
-                        raise Pebkac(403, t)
-
                     dbv, vrem = vfs.get_dbv(rem)
                     self.conn.hsrv.broker.say(
                         "up2k.hash_file",
@@ -2712,13 +2819,14 @@ class HttpCli(object):
         for sz, sha_hex, sha_b64, ofn, lfn, ap in files:
             vsuf = ""
             if (self.can_read or self.can_upget) and "fk" in vfs.flags:
+                st = bos.stat(ap)
                 alg = 2 if "fka" in vfs.flags else 1
                 vsuf = "?k=" + self.gen_fk(
                     alg,
                     self.args.fk_salt,
                     ap,
-                    sz,
-                    0 if ANYWIN or not ap else bos.stat(ap).st_ino,
+                    st.st_size,
+                    0 if ANYWIN or not ap else st.st_ino,
                 )[: vfs.flags["fk"]]
 
             if "media" in self.uparam or "medialinks" in vfs.flags:
@@ -2885,6 +2993,9 @@ class HttpCli(object):
         if xbu:
             if not runhook(
                 self.log,
+                self.conn.hsrv.broker,
+                None,
+                "xbu.http.txt",
                 xbu,
                 fp,
                 self.vpath,
@@ -2924,6 +3035,9 @@ class HttpCli(object):
         xau = vfs.flags.get("xau")
         if xau and not runhook(
             self.log,
+            self.conn.hsrv.broker,
+            None,
+            "xau.http.txt",
             xau,
             fp,
             self.vpath,
@@ -4156,7 +4270,7 @@ class HttpCli(object):
         if self.args.no_mv:
             raise Pebkac(403, "the rename/move feature is disabled in server config")
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, vsrc, vdst)
+        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, self.ip, vsrc, vdst)
         self.loud_reply(x.get(), status=201)
         return True
 

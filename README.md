@@ -1313,6 +1313,8 @@ you can set hooks before and/or after an event happens, and currently you can ho
 
 there's a bunch of flags and stuff, see `--help-hooks`
 
+if you want to write your own hooks, see [devnotes](./docs/devnotes.md#event-hooks)
+
 
 ### upload events
 

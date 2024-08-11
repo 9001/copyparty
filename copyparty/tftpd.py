@@ -244,6 +244,8 @@ class Tftpd(object):
 
         debug('%s("%s", %s) %s\033[K\033[0m', caller, vpath, str(a), perms)
         vfs, rem = self.asrv.vfs.get(vpath, "*", *perms)
+        if not vfs.realpath:
+            raise Exception("unmapped vfs")
         return vfs, vfs.canonical(rem)
 
     def _ls(self, vpath: str, raddress: str, rport: int, force=False) -> Any:
@@ -331,7 +333,21 @@ class Tftpd(object):
 
             xbu = vfs.flags.get("xbu")
             if xbu and not runhook(
-                self.nlog, xbu, ap, vpath, "", "", "", 0, 0, "8.3.8.7", 0, ""
+                self.nlog,
+                None,
+                self.hub.up2k,
+                "xbu.tftpd",
+                xbu,
+                ap,
+                vpath,
+                "",
+                "",
+                "",
+                0,
+                0,
+                "8.3.8.7",
+                time.time(),
+                "",
             ):
                 yeet("blocked by xbu server config: " + vpath)
 
@@ -339,7 +355,7 @@ class Tftpd(object):
             return self._ls(vpath, "", 0, True)
 
         if not a:
-            a = [self.args.iobuf]
+            a = (self.args.iobuf,)
 
         return open(ap, mode, *a, **ka)
 

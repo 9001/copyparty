@@ -704,6 +704,11 @@ def get_sects():
             \033[36mxban\033[0m can be used to overrule / cancel a user ban event;
             if the program returns 0 (true/OK) then the ban will NOT happen
 
+            effects can be used to redirect uploads into other
+            locations, and to delete or index other files based
+            on new uploads, but with certain limitations. See
+            bin/hooks/reloc* and docs/devnotes.md#hook-effects
+
             except for \033[36mxm\033[0m, only one hook / one action can run at a time,
             so it's recommended to use the \033[36mf\033[0m flag unless you really need
             to wait for the hook to finish before continuing (without \033[36mf\033[0m
@@ -1132,6 +1137,7 @@ def add_hooks(ap):
     ap2.add_argument("--xad", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m after  a file delete")
     ap2.add_argument("--xm", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m on message")
     ap2.add_argument("--xban", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m if someone gets banned (pw/404/403/url)")
+    ap2.add_argument("--hook-v", action="store_true", help="verbose hooks")
 
 
 def add_stats(ap):

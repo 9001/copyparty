@@ -353,7 +353,7 @@ class FtpFs(AbstractedFS):
         svp = join(self.cwd, src).lstrip("/")
         dvp = join(self.cwd, dst).lstrip("/")
         try:
-            self.hub.up2k.handle_mv(self.uname, svp, dvp)
+            self.hub.up2k.handle_mv(self.uname, self.h.cli_ip, svp, dvp)
         except Exception as ex:
             raise FSE(str(ex))
 
@@ -471,6 +471,9 @@ class FtpHandler(FTPHandler):
         xbu = vfs.flags.get("xbu")
         if xbu and not runhook(
             None,
+            None,
+            self.hub.up2k,
+            "xbu.ftpd",
             xbu,
             ap,
             vp,
@@ -480,7 +483,7 @@ class FtpHandler(FTPHandler):
             0,
             0,
             self.cli_ip,
-            0,
+            time.time(),
             "",
         ):
             raise FSE("Upload blocked by xbu server config")

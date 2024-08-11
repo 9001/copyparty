@@ -46,6 +46,7 @@ from .util import (
     hidedir,
     humansize,
     min_ex,
+    pathmod,
     quotep,
     rand_name,
     ren_open,
@@ -165,6 +166,7 @@ class Up2k(object):
         self.xiu_ptn = re.compile(r"(?:^|,)i([0-9]+)")
         self.xiu_busy = False  # currently running hook
         self.xiu_asleep = True  # needs rescan_cond poke to schedule self
+        self.fx_backlog: list[tuple[str, dict[str, str], str]] = []
 
         self.cur: dict[str, "sqlite3.Cursor"] = {}
         self.mem_cur = None
@@ -2544,7 +2546,7 @@ class Up2k(object):
             if self.mutex.acquire(timeout=10):
                 got_lock = True
                 with self.reg_mutex:
-                    return self._handle_json(cj)
+                    ret = self._handle_json(cj)
             else:
                 t = "cannot receive uploads right now;\nserver busy with {}.\nPlease wait; the client will retry..."
                 raise Pebkac(503, t.format(self.blocked or "[unknown]"))
@@ -2552,10 +2554,15 @@ class Up2k(object):
             if not PY2:
                 raise
             with self.mutex, self.reg_mutex:
-                return self._handle_json(cj)
+                ret = self._handle_json(cj)
         finally:
             if got_lock:
                 self.mutex.release()
+
+        if self.fx_backlog:
+            self.do_fx_backlog()
+
+        return ret
 
     def _handle_json(self, cj: dict[str, Any]) -> dict[str, Any]:
         ptop = cj["ptop"]
@@ -2758,28 +2765,43 @@ class Up2k(object):
                             job["name"] = rand_name(
                                 pdir, cj["name"], vfs.flags["nrand"]
                             )
-                        else:
-                            job["name"] = self._untaken(pdir, cj, now)
 
                         dst = djoin(job["ptop"], job["prel"], job["name"])
                         xbu = vfs.flags.get("xbu")
-                        if xbu and not runhook(
-                            self.log,
-                            xbu,  # type: ignore
-                            dst,
-                            job["vtop"],
-                            job["host"],
-                            job["user"],
-                            self.asrv.vfs.get_perms(job["vtop"], job["user"]),
-                            job["lmod"],
-                            job["size"],
-                            job["addr"],
-                            job["at"],
-                            "",
-                        ):
-                            t = "upload blocked by xbu server config: {}".format(dst)
-                            self.log(t, 1)
-                            raise Pebkac(403, t)
+                        if xbu:
+                            vp = djoin(job["vtop"], job["prel"], job["name"])
+                            hr = runhook(
+                                self.log,
+                                None,
+                                self,
+                                "xbu.up2k.dupe",
+                                xbu,  # type: ignore
+                                dst,
+                                vp,
+                                job["host"],
+                                job["user"],
+                                self.asrv.vfs.get_perms(job["vtop"], job["user"]),
+                                job["lmod"],
+                                job["size"],
+                                job["addr"],
+                                job["at"],
+                                "",
+                            )
+                            if not hr:
+                                t = "upload blocked by xbu server config: %s" % (dst,)
+                                self.log(t, 1)
+                                raise Pebkac(403, t)
+                            if hr.get("reloc"):
+                                x = pathmod(self.asrv.vfs, dst, vp, hr["reloc"])
+                                if x:
+                                    pdir, _, job["name"], (vfs, rem) = x
+                                    dst = os.path.join(pdir, job["name"])
+                                    job["ptop"] = vfs.realpath
+                                    job["vtop"] = vfs.vpath
+                                    job["prel"] = rem
+                                    bos.makedirs(pdir)
+
+                        job["name"] = self._untaken(pdir, cj, now)
 
                         if not self.args.nw:
                             dvf: dict[str, Any] = vfs.flags
@@ -3142,6 +3164,9 @@ class Up2k(object):
         with self.mutex, self.reg_mutex:
             self._finish_upload(ptop, wark)
 
+        if self.fx_backlog:
+            self.do_fx_backlog()
+
     def _finish_upload(self, ptop: str, wark: str) -> None:
         """mutex(main,reg) me"""
         try:
@@ -3335,25 +3360,30 @@ class Up2k(object):
 
         xau = False if skip_xau else vflags.get("xau")
         dst = djoin(ptop, rd, fn)
-        if xau and not runhook(
-            self.log,
-            xau,
-            dst,
-            djoin(vtop, rd, fn),
-            host,
-            usr,
-            self.asrv.vfs.get_perms(djoin(vtop, rd, fn), usr),
-            int(ts),
-            sz,
-            ip,
-            at or time.time(),
-            "",
-        ):
-            t = "upload blocked by xau server config"
-            self.log(t, 1)
-            wunlink(self.log, dst, vflags)
-            self.registry[ptop].pop(wark, None)
-            raise Pebkac(403, t)
+        if xau:
+            hr = runhook(
+                self.log,
+                None,
+                self,
+                "xau.up2k",
+                xau,
+                dst,
+                djoin(vtop, rd, fn),
+                host,
+                usr,
+                self.asrv.vfs.get_perms(djoin(vtop, rd, fn), usr),
+                ts,
+                sz,
+                ip,
+                at or time.time(),
+                "",
+            )
+            if not hr:
+                t = "upload blocked by xau server config"
+                self.log(t, 1)
+                wunlink(self.log, dst, vflags)
+                self.registry[ptop].pop(wark, None)
+                raise Pebkac(403, t)
 
         xiu = vflags.get("xiu")
         if xiu:
@@ -3537,6 +3567,9 @@ class Up2k(object):
                 if xbd:
                     if not runhook(
                         self.log,
+                        None,
+                        self,
+                        "xbd",
                         xbd,
                         abspath,
                         vpath,
@@ -3546,7 +3579,7 @@ class Up2k(object):
                         stl.st_mtime,
                         st.st_size,
                         ip,
-                        0,
+                        time.time(),
                         "",
                     ):
                         t = "delete blocked by xbd server config: {}"
@@ -3571,6 +3604,9 @@ class Up2k(object):
                 if xad:
                     runhook(
                         self.log,
+                        None,
+                        self,
+                        "xad",
                         xad,
                         abspath,
                         vpath,
@@ -3580,7 +3616,7 @@ class Up2k(object):
                         stl.st_mtime,
                         st.st_size,
                         ip,
-                        0,
+                        time.time(),
                         "",
                     )
 
@@ -3596,7 +3632,7 @@ class Up2k(object):
 
         return n_files, ok + ok2, ng + ng2
 
-    def handle_mv(self, uname: str, svp: str, dvp: str) -> str:
+    def handle_mv(self, uname: str, ip: str, svp: str, dvp: str) -> str:
         if svp == dvp or dvp.startswith(svp + "/"):
             raise Pebkac(400, "mv: cannot move parent into subfolder")
 
@@ -3613,7 +3649,7 @@ class Up2k(object):
         if stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode):
             with self.mutex:
                 try:
-                    ret = self._mv_file(uname, svp, dvp, curs)
+                    ret = self._mv_file(uname, ip, svp, dvp, curs)
                 finally:
                     for v in curs:
                         v.connection.commit()
@@ -3646,7 +3682,7 @@ class Up2k(object):
                             raise Pebkac(500, "mv: bug at {}, top {}".format(svpf, svp))
 
                         dvpf = dvp + svpf[len(svp) :]
-                        self._mv_file(uname, svpf, dvpf, curs)
+                        self._mv_file(uname, ip, svpf, dvpf, curs)
                 finally:
                     for v in curs:
                         v.connection.commit()
@@ -3671,7 +3707,7 @@ class Up2k(object):
         return "k"
 
     def _mv_file(
-        self, uname: str, svp: str, dvp: str, curs: set["sqlite3.Cursor"]
+        self, uname: str, ip: str, svp: str, dvp: str, curs: set["sqlite3.Cursor"]
     ) -> str:
         """mutex(main) me;  will mutex(reg)"""
         svn, srem = self.asrv.vfs.get(svp, uname, True, False, True)
@@ -3705,21 +3741,27 @@ class Up2k(object):
             except:
                 pass  # broken symlink; keep as-is
 
+        ftime = stl.st_mtime
+        fsize = st.st_size
+
         xbr = svn.flags.get("xbr")
         xar = dvn.flags.get("xar")
         if xbr:
             if not runhook(
                 self.log,
+                None,
+                self,
+                "xbr",
                 xbr,
                 sabs,
                 svp,
                 "",
                 uname,
                 self.asrv.vfs.get_perms(svp, uname),
-                stl.st_mtime,
-                st.st_size,
-                "",
-                0,
+                ftime,
+                fsize,
+                ip,
+                time.time(),
                 "",
             ):
                 t = "move blocked by xbr server config: {}".format(svp)
@@ -3747,16 +3789,19 @@ class Up2k(object):
             if xar:
                 runhook(
                     self.log,
+                    None,
+                    self,
+                    "xar.ln",
                     xar,
                     dabs,
                     dvp,
                     "",
                     uname,
                     self.asrv.vfs.get_perms(dvp, uname),
-                    0,
-                    0,
-                    "",
-                    0,
+                    ftime,
+                    fsize,
+                    ip,
+                    time.time(),
                     "",
                 )
 
@@ -3765,13 +3810,6 @@ class Up2k(object):
         c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(svn.realpath, srem)
         c2 = self.cur.get(dvn.realpath)
 
-        if ftime_ is None:
-            ftime = stl.st_mtime
-            fsize = st.st_size
-        else:
-            ftime = ftime_
-            fsize = fsize_ or 0
-
         has_dupes = False
         if w:
             assert c1
@@ -3779,7 +3817,9 @@ class Up2k(object):
                 self._copy_tags(c1, c2, w)
 
             with self.reg_mutex:
-                has_dupes = self._forget_file(svn.realpath, srem, c1, w, is_xvol, fsize)
+                has_dupes = self._forget_file(
+                    svn.realpath, srem, c1, w, is_xvol, fsize_ or fsize
+                )
 
             if not is_xvol:
                 has_dupes = self._relink(w, svn.realpath, srem, dabs)
@@ -3849,7 +3889,7 @@ class Up2k(object):
 
             if is_link:
                 try:
-                    times = (int(time.time()), int(stl.st_mtime))
+                    times = (int(time.time()), int(ftime))
                     bos.utime(dabs, times, False)
                 except:
                     pass
@@ -3859,16 +3899,19 @@ class Up2k(object):
         if xar:
             runhook(
                 self.log,
+                None,
+                self,
+                "xar.mv",
                 xar,
                 dabs,
                 dvp,
                 "",
                 uname,
                 self.asrv.vfs.get_perms(dvp, uname),
-                0,
-                0,
-                "",
-                0,
+                ftime,
+                fsize,
+                ip,
+                time.time(),
                 "",
             )
 
@@ -4152,23 +4195,35 @@ class Up2k(object):
         xbu = self.flags[job["ptop"]].get("xbu")
         ap_chk = djoin(pdir, job["name"])
         vp_chk = djoin(job["vtop"], job["prel"], job["name"])
-        if xbu and not runhook(
-            self.log,
-            xbu,
-            ap_chk,
-            vp_chk,
-            job["host"],
-            job["user"],
-            self.asrv.vfs.get_perms(vp_chk, job["user"]),
-            int(job["lmod"]),
-            job["size"],
-            job["addr"],
-            int(job["t0"]),
-            "",
-        ):
-            t = "upload blocked by xbu server config: {}".format(vp_chk)
-            self.log(t, 1)
-            raise Pebkac(403, t)
+        if xbu:
+            hr = runhook(
+                self.log,
+                None,
+                self,
+                "xbu.up2k",
+                xbu,
+                ap_chk,
+                vp_chk,
+                job["host"],
+                job["user"],
+                self.asrv.vfs.get_perms(vp_chk, job["user"]),
+                job["lmod"],
+                job["size"],
+                job["addr"],
+                job["t0"],
+                "",
+            )
+            if not hr:
+                t = "upload blocked by xbu server config: {}".format(vp_chk)
+                self.log(t, 1)
+                raise Pebkac(403, t)
+            if hr.get("reloc"):
+                x = pathmod(self.asrv.vfs, ap_chk, vp_chk, hr["reloc"])
+                if x:
+                    pdir, _, job["name"], (vfs, rem) = x
+                    job["ptop"] = vfs.realpath
+                    job["vtop"] = vfs.vpath
+                    job["prel"] = rem
 
         tnam = job["name"] + ".PARTIAL"
         if self.args.dotpart:
@@ -4442,6 +4497,9 @@ class Up2k(object):
             with self.rescan_cond:
                 self.rescan_cond.notify_all()
 
+        if self.fx_backlog:
+            self.do_fx_backlog()
+
         return True
 
     def hash_file(
@@ -4472,6 +4530,48 @@ class Up2k(object):
         with self.hashq_mutex:
             self.hashq.put(zt)
             self.n_hashq += 1
+
+    def do_fx_backlog(self):
+        with self.mutex, self.reg_mutex:
+            todo = self.fx_backlog
+            self.fx_backlog = []
+        for act, hr, req_vp in todo:
+            self.hook_fx(act, hr, req_vp)
+
+    def hook_fx(self, act: str, hr: dict[str, str], req_vp: str) -> None:
+        bad = [k for k in hr if k != "vp"]
+        if bad:
+            t = "got unsupported key in %s from hook: %s"
+            raise Exception(t % (act, bad))
+
+        for fvp in hr.get("vp") or []:
+            # expect vpath including filename; either absolute
+            # or relative to the client's vpath (request url)
+            if fvp.startswith("/"):
+                fvp, fn = vsplit(fvp[1:])
+                fvp = "/" + fvp
+            else:
+                fvp, fn = vsplit(fvp)
+
+            x = pathmod(self.asrv.vfs, "", req_vp, {"vp": fvp, "fn": fn})
+            if not x:
+                t = "hook_fx(%s): failed to resolve %s based on %s"
+                self.log(t % (act, fvp, req_vp))
+                continue
+
+            ap, rd, fn, (vn, rem) = x
+            vp = vjoin(rd, fn)
+            if not vp:
+                raise Exception("hook_fx: blank vp from pathmod")
+
+            if act == "idx":
+                rd = rd[len(vn.vpath) :].strip("/")
+                self.hash_file(
+                    vn.realpath, vn.vpath, vn.flags, rd, fn, "", time.time(), "", True
+                )
+
+            if act == "del":
+                self._handle_rm(LEELOO_DALLAS, "", vp, [], False, False)
 
     def shutdown(self) -> None:
         self.stop = True

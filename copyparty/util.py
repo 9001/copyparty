@@ -146,6 +146,8 @@ if TYPE_CHECKING:
     import magic
 
     from .authsrv import VFS
+    from .broker_util import BrokerCli
+    from .up2k import Up2k
 
 FAKE_MP = False
 
@@ -2117,6 +2119,72 @@ def ujoin(rd: str, fn: str) -> str:
         return rd or fn
 
 
+def log_reloc(
+    log: "NamedLogger",
+    re: dict[str, str],
+    pm: tuple[str, str, str, tuple["VFS", str]],
+    ap: str,
+    vp: str,
+    fn: str,
+    vn: "VFS",
+    rem: str,
+) -> None:
+    nap, nvp, nfn, (nvn, nrem) = pm
+    t = "reloc %s:\nold ap [%s]\nnew ap [%s\033[36m/%s\033[0m]\nold vp [%s]\nnew vp [%s\033[36m/%s\033[0m]\nold fn [%s]\nnew fn [%s]\nold vfs [%s]\nnew vfs [%s]\nold rem [%s]\nnew rem [%s]"
+    log(t % (re, ap, nap, nfn, vp, nvp, nfn, fn, nfn, vn.vpath, nvn.vpath, rem, nrem))
+
+
+def pathmod(
+    vfs: "VFS", ap: str, vp: str, mod: dict[str, str]
+) -> Optional[tuple[str, str, str, tuple["VFS", str]]]:
+    # vfs: authsrv.vfs
+    # ap: original abspath to a file
+    # vp: original urlpath to a file
+    # mod: modification (ap/vp/fn)
+
+    nvp = "\n"  # new vpath
+    ap = os.path.dirname(ap)
+    vp, fn = vsplit(vp)
+    if mod.get("fn"):
+        fn = mod["fn"]
+        nvp = vp
+
+    for ref, k in ((ap, "ap"), (vp, "vp")):
+        if k not in mod:
+            continue
+
+        ms = mod[k].replace(os.sep, "/")
+        if ms.startswith("/"):
+            np = ms
+        elif k == "vp":
+            np = undot(vjoin(ref, ms))
+        else:
+            np = os.path.abspath(os.path.join(ref, ms))
+
+        if k == "vp":
+            nvp = np.lstrip("/")
+            continue
+
+        # try to map abspath to vpath
+        np = np.replace("/", os.sep)
+        for vn_ap, vn in vfs.all_aps:
+            if not np.startswith(vn_ap):
+                continue
+            zs = np[len(vn_ap) :].replace(os.sep, "/")
+            nvp = vjoin(vn.vpath, zs)
+            break
+
+    if nvp == "\n":
+        return None
+
+    vn, rem = vfs.get(nvp, "*", False, False)
+    if not vn.realpath:
+        raise Exception("unmapped vfs")
+
+    ap = vn.canonical(rem)
+    return ap, nvp, fn, (vn, rem)
+
+
 def _w8dec2(txt: bytes) -> str:
     """decodes filesystem-bytes to wtf8"""
     return surrogateescape.decodefilename(txt)
@@ -3130,6 +3198,7 @@ def runihook(
 
 def _runhook(
     log: Optional["NamedLogger"],
+    src: str,
     cmd: str,
     ap: str,
     vp: str,
@@ -3141,14 +3210,16 @@ def _runhook(
     ip: str,
     at: float,
     txt: str,
-) -> bool:
+) -> dict[str, Any]:
+    ret = {"rc": 0}
     areq, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
     if areq:
         for ch in areq:
             if ch not in perms:
                 t = "user %s not allowed to run hook %s; need perms %s, have %s"
-                log(t % (uname, cmd, areq, perms))
-                return True  # fallthrough to next hook
+                if log:
+                    log(t % (uname, cmd, areq, perms))
+                return ret  # fallthrough to next hook
     if jtxt:
         ja = {
             "ap": ap,
@@ -3160,6 +3231,7 @@ def _runhook(
             "host": host,
             "user": uname,
             "perms": perms,
+            "src": src,
             "txt": txt,
         }
         arg = json.dumps(ja)
@@ -3178,18 +3250,34 @@ def _runhook(
     else:
         rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
         if chk and rc:
+            ret["rc"] = rc
             retchk(rc, bcmd, err, log, 5)
-            return False
+        else:
+            try:
+                ret = json.loads(v)
+            except:
+                ret = {}
+
+            try:
+                if "stdout" not in ret:
+                    ret["stdout"] = v
+                if "rc" not in ret:
+                    ret["rc"] = rc
+            except:
+                ret = {"rc": rc, "stdout": v}
 
     wait -= time.time() - t0
     if wait > 0:
         time.sleep(wait)
 
-    return True
+    return ret
 
 
 def runhook(
     log: Optional["NamedLogger"],
+    broker: Optional["BrokerCli"],
+    up2k: Optional["Up2k"],
+    src: str,
     cmds: list[str],
     ap: str,
     vp: str,
@@ -3201,19 +3289,42 @@ def runhook(
     ip: str,
     at: float,
     txt: str,
-) -> bool:
+) -> dict[str, Any]:
+    assert broker or up2k
+    asrv = (broker or up2k).asrv
+    args = (broker or up2k).args
     vp = vp.replace("\\", "/")
+    ret = {"rc": 0}
     for cmd in cmds:
         try:
-            if not _runhook(log, cmd, ap, vp, host, uname, perms, mt, sz, ip, at, txt):
-                return False
+            hr = _runhook(
+                log, src, cmd, ap, vp, host, uname, perms, mt, sz, ip, at, txt
+            )
+            if log and args.hook_v:
+                log("hook(%s) [%s] => \033[32m%s" % (src, cmd, hr), 6)
+            if not hr:
+                return {}
+            for k, v in hr.items():
+                if k in ("idx", "del") and v:
+                    if broker:
+                        broker.say("up2k.hook_fx", k, v, vp)
+                    else:
+                        up2k.fx_backlog.append((k, v, vp))
+                elif k == "reloc" and v:
+                    # idk, just take the last one ig
+                    ret["reloc"] = v
+                elif k in ret:
+                    if k == "rc" and v:
+                        ret[k] = v
+                else:
+                    ret[k] = v
         except Exception as ex:
             (log or print)("hook: {}".format(ex))
             if ",c," in "," + cmd:
-                return False
+                return {}
             break
 
-    return True
+    return ret
 
 
 def loadpy(ap: str, hot: bool) -> Any:

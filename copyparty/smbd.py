@@ -187,6 +187,8 @@ class SMB(object):
 
         debug('%s("%s", %s) %s @%s\033[K\033[0m', caller, vpath, str(a), perms, uname)
         vfs, rem = self.asrv.vfs.get(vpath, uname, *perms)
+        if not vfs.realpath:
+            raise Exception("unmapped vfs")
         return vfs, vfs.canonical(rem)
 
     def _listdir(self, vpath: str, *a: Any, **ka: Any) -> list[str]:
@@ -195,6 +197,8 @@ class SMB(object):
         uname = self._uname()
         # debug('listdir("%s", %s) @%s\033[K\033[0m', vpath, str(a), uname)
         vfs, rem = self.asrv.vfs.get(vpath, uname, False, False)
+        if not vfs.realpath:
+            raise Exception("unmapped vfs")
         _, vfs_ls, vfs_virt = vfs.ls(
             rem, uname, not self.args.no_scandir, [[False, False]]
         )
@@ -240,7 +244,21 @@ class SMB(object):
 
             xbu = vfs.flags.get("xbu")
             if xbu and not runhook(
-                self.nlog, xbu, ap, vpath, "", "", "", 0, 0, "1.7.6.2", 0, ""
+                self.nlog,
+                None,
+                self.hub.up2k,
+                "xbu.smb",
+                xbu,
+                ap,
+                vpath,
+                "",
+                "",
+                "",
+                0,
+                0,
+                "1.7.6.2",
+                time.time(),
+                "",
             ):
                 yeet("blocked by xbu server config: " + vpath)
 
@@ -297,7 +315,7 @@ class SMB(object):
             t = "blocked rename (no-move-acc %s): /%s @%s"
             yeet(t % (vfs1.axs.umove, vp1, uname))
 
-        self.hub.up2k.handle_mv(uname, vp1, vp2)
+        self.hub.up2k.handle_mv(uname, "1.7.6.2", vp1, vp2)
         try:
             bos.makedirs(ap2)
         except:

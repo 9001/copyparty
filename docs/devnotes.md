@@ -12,6 +12,8 @@
     * [write](#write)
     * [admin](#admin)
     * [general](#general)
+* [event hooks](#event-hooks) - on writing your own [hooks](../README.md#event-hooks)
+    * [hook effects](#hook-effects) - hooks can cause intentional side-effects
 * [assumptions](#assumptions)
     * [mdns](#mdns)
 * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
@@ -202,6 +204,32 @@ upload modifiers:
 | method | params | result |
 |--|--|--|
 | GET | `?pw=x` | logout |
+
+
+# event hooks
+
+on writing your own [hooks](../README.md#event-hooks)
+
+## hook effects
+
+hooks can cause intentional side-effects,  such as redirecting an upload into another location, or creating+indexing additional files, or deleting existing files, by returning json on stdout
+
+* `reloc` can redirect uploads before/after uploading has finished, based on filename, extension, file contents, uploader ip/name etc.
+* `idx` informs copyparty about a new file to index as a consequence of this upload
+* `del` tells copyparty to delete an unrelated file by vpath
+
+for these to take effect, the hook must be defined with the `c1` flag; see example [reloc-by-ext](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reloc-by-ext.py)
+
+a subset of effect types are available for a subset of hook types,
+
+* most hook types (xbu/xau/xbr/xar/xbd/xad/xm) support `idx` and `del` for all http protocols (up2k / basic-uploader / webdav), but not ftp/tftp/smb
+* most hook types will abort/reject the action if the hook returns nonzero, assuming flag `c` is given, see examples [reject-extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) and [reject-mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py)
+* `xbu` supports `reloc` for all http protocols (up2k / basic-uploader / webdav), but not ftp/tftp/smb
+* `xau` supports `reloc` for basic-uploader / webdav only, not up2k or ftp/tftp/smb
+  * so clients like sharex are supported, but not dragdrop into browser
+
+to trigger indexing of files `/foo/1.txt` and `/foo/bar/2.txt`, a hook can `print(json.dumps({"idx":{"vp":["/foo/1.txt","/foo/bar/2.txt"]}}))` (and replace "idx" with "del" to delete instead)
+* note: paths starting with `/` are absolute URLs, but you can also do `../3.txt` relative to the destination folder of each uploaded file
 
 
 # assumptions
