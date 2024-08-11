@@ -2383,8 +2383,23 @@ function up2k_init(subtle) {
                     var arr = st.todo.upload,
                         sort = arr.length && arr[arr.length - 1].nfile > t.n;
 
+                    if (!t.stitch_sz) {
+                        // keep all connections busy
+                        var bpc = (st.bytes.total - st.bytes.finished) / (parallel_uploads || 1),
+                            ocs = 1024 * 1024,
+                            stp = 1024 * 512,
+                            ccs = ocs;
+                        while (ccs < bpc) {
+                            ocs = ccs;
+                            ccs += stp; if (ccs < bpc) ocs = ccs;
+                            ccs += stp; stp *= 2;
+                        }
+                        ocs = Math.floor(ocs / 1024 / 1024);
+                        t.stitch_sz = Math.min(ocs, stitch_tgt);
+                    }
+
                     for (var a = 0; a < t.postlist.length; a++) {
-                        var nparts = [], tbytes = 0, stitch = stitch_tgt;
+                        var nparts = [], tbytes = 0, stitch = t.stitch_sz;
                         if (t.nojoin && t.nojoin - t.postlist.length < 6)
                             stitch = 1;
 
