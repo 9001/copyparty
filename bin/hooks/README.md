@@ -24,6 +24,7 @@ these are `--xiu` hooks; unlike `xbu` and `xau` (which get executed on every sin
 
 # before upload
 * [reject-extension.py](reject-extension.py) rejects uploads if they match a list of file extensions
+* [reloc-by-ext.py](reloc-by-ext.py) redirects an upload to another destination based on the file extension
 
 
 # on message
