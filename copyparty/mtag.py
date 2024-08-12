@@ -32,6 +32,17 @@ if True:  # pylint: disable=using-constant-test
     from .util import NamedLogger, RootLogger
 
 
+try:
+    if os.environ.get("PRTY_NO_MUTAGEN"):
+        raise Exception()
+
+    from mutagen import version  # noqa: F401
+
+    HAVE_MUTAGEN = True
+except:
+    HAVE_MUTAGEN = False
+
+
 def have_ff(scmd: str) -> bool:
     if ANYWIN:
         scmd += ".exe"
@@ -336,12 +347,7 @@ class MTag(object):
 
         if self.backend == "mutagen":
             self._get = self.get_mutagen
-            try:
-                if os.environ.get("PRTY_NO_MUTAGEN"):
-                    raise Exception()
-
-                from mutagen import version  # noqa: F401
-            except:
+            if not HAVE_MUTAGEN:
                 self.log("could not load Mutagen, trying FFprobe instead", c=3)
                 self.backend = "ffprobe"
 

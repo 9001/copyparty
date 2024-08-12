@@ -31,15 +31,27 @@ if True:  # pylint: disable=using-constant-test
 from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, E, EnvParams, unicode
 from .authsrv import BAD_CFG, AuthSrv
 from .cert import ensure_cert
-from .mtag import HAVE_FFMPEG, HAVE_FFPROBE
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, HAVE_MUTAGEN
+from .pwhash import HAVE_ARGON2
 from .tcpsrv import TcpSrv
-from .th_srv import HAVE_PIL, HAVE_VIPS, HAVE_WEBP, ThumbSrv
+from .th_srv import (
+    HAVE_AVIF,
+    HAVE_FFMPEG,
+    HAVE_FFPROBE,
+    HAVE_HEIF,
+    HAVE_PIL,
+    HAVE_VIPS,
+    HAVE_WEBP,
+    ThumbSrv,
+)
 from .up2k import Up2k
 from .util import (
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
     FFMPEG_URL,
+    HAVE_PSUTIL,
+    HAVE_SQLITE3,
     UTC,
     VERSIONS,
     Daemon,
@@ -235,6 +247,8 @@ class SvcHub(object):
 
         self.up2k = Up2k(self)
 
+        self._feature_test()
+
         decs = {k: 1 for k in self.args.th_dec.split(",")}
         if not HAVE_VIPS:
             decs.pop("vips", None)
@@ -422,6 +436,58 @@ class SvcHub(object):
         self.up2k.init_vols()
 
         Daemon(self.sd_notify, "sd-notify")
+
+    def _feature_test(self) -> None:
+        fok = []
+        fng = []
+        t_ff = "transcode audio, create spectrograms, video thumbnails"
+        to_check = [
+            (HAVE_SQLITE3, "sqlite", "file and media indexing"),
+            (HAVE_PIL, "pillow", "image thumbnails (plenty fast)"),
+            (HAVE_VIPS, "vips", "image thumbnails (faster, eats more ram)"),
+            (HAVE_WEBP, "pillow-webp", "create thumbnails as webp files"),
+            (HAVE_FFMPEG, "ffmpeg", t_ff + ", good-but-slow image thumbnails"),
+            (HAVE_FFPROBE, "ffprobe", t_ff + ", read audio/media tags"),
+            (HAVE_MUTAGEN, "mutagen", "read audio tags (ffprobe is better but slower)"),
+            (HAVE_ARGON2, "argon2", "secure password hashing (advanced users only)"),
+            (HAVE_HEIF, "pillow-heif", "read .heif images with pillow (rarely useful)"),
+            (HAVE_AVIF, "pillow-avif", "read .avif images with pillow (rarely useful)"),
+        ]
+        if ANYWIN:
+            to_check += [
+                (HAVE_PSUTIL, "psutil", "improved plugin cleanup  (rarely useful)")
+            ]
+
+        verbose = self.args.deps
+        if verbose:
+            self.log("dependencies", "")
+
+        for have, feat, what in to_check:
+            lst = fok if have else fng
+            lst.append((feat, what))
+            if verbose:
+                zi = 2 if have else 5
+                sgot = "found" if have else "missing"
+                t = "%7s: %s \033[36m(%s)"
+                self.log("dependencies", t % (sgot, feat, what), zi)
+
+        if verbose:
+            self.log("dependencies", "")
+            return
+
+        sok = ", ".join(x[0] for x in fok)
+        sng = ", ".join(x[0] for x in fng)
+
+        t = ""
+        if sok:
+            t += "OK: \033[32m" + sok
+        if sng:
+            if t:
+                t += ", "
+            t += "\033[0mNG: \033[35m" + sng
+
+        t += "\033[0m, see --deps"
+        self.log("dependencies", t, 6)
 
     def _check_env(self) -> None:
         try:

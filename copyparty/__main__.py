@@ -1388,6 +1388,7 @@ def add_debug(ap):
     ap2 = ap.add_argument_group('debug options')
     ap2.add_argument("--vc", action="store_true", help="verbose config file parser (explain config)")
     ap2.add_argument("--cgen", action="store_true", help="generate config file from current config (best-effort; probably buggy)")
+    ap2.add_argument("--deps", action="store_true", help="list information about detected optional dependencies")
     if hasattr(select, "poll"):
         ap2.add_argument("--no-poll", action="store_true", help="kernel-bug workaround: disable poll; use select instead (limits max num clients to ~700)")
     ap2.add_argument("--no-sendfile", action="store_true", help="kernel-bug workaround: disable sendfile; do a safe and slow read-send-loop instead")

@@ -4,10 +4,20 @@ from __future__ import print_function, unicode_literals
 import argparse
 import base64
 import hashlib
+import os
 import sys
 import threading
 
 from .__init__ import unicode
+
+try:
+    if os.environ.get("PRTY_NO_ARGON2"):
+        raise Exception()
+
+    HAVE_ARGON2 = True
+    from argon2 import __version__ as argon2ver
+except:
+    HAVE_ARGON2 = False
 
 
 class PWHash(object):
