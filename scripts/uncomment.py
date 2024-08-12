@@ -8,6 +8,12 @@ import sys
 import tokenize
 
 
+try:
+    FSTRING_MIDDLE = tokenize.FSTRING_MIDDLE
+except:
+    FSTRING_MIDDLE = -9001
+
+
 def uncomment(fpath):
     """modified https://stackoverflow.com/a/62074206"""
 
@@ -31,7 +37,7 @@ def uncomment(fpath):
         if start_line > last_lineno:
             last_col = 0
 
-        if start_col > last_col:
+        if start_col > last_col and prev_toktype != FSTRING_MIDDLE:
             out += " " * (start_col - last_col)
 
         is_legalese = (
@@ -48,6 +54,10 @@ def uncomment(fpath):
                 out += token_string
             else:
                 out += '"a"'
+        elif token_type == FSTRING_MIDDLE:
+            out += token_string.replace(r"{", r"{{").replace(r"}", r"}}")
+            if not code and token_string.strip():
+                code = True
         elif token_type != tokenize.COMMENT:
             out += token_string
             if not code and token_string.strip():
