@@ -16,7 +16,13 @@ def nope(include_unconfigured=False):
     return []
 
 
-if os.environ.get("PRTY_NO_IFADDR") or os.uname().machine == "s390x":
+try:
+    S390X = os.uname().machine == "s390x"
+except:
+    S390X = False
+
+
+if os.environ.get("PRTY_NO_IFADDR") or S390X:
     # s390x deadlocks at libc.getifaddrs
     get_adapters = nope
 elif os.name == "nt":

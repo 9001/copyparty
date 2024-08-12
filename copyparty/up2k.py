@@ -2757,7 +2757,7 @@ class Up2k(object):
                         job = deepcopy(job)
                         job["wark"] = wark
                         job["at"] = cj.get("at") or time.time()
-                        for k in "lmod ptop vtop prel host user addr".split():
+                        for k in "lmod ptop vtop prel name host user addr".split():
                             job[k] = cj.get(k) or ""
 
                         pdir = djoin(cj["ptop"], cj["prel"])
@@ -2801,7 +2801,7 @@ class Up2k(object):
                                     job["prel"] = rem
                                     bos.makedirs(pdir)
 
-                        job["name"] = self._untaken(pdir, cj, now)
+                        job["name"] = self._untaken(pdir, job, now)
 
                         if not self.args.nw:
                             dvf: dict[str, Any] = vfs.flags

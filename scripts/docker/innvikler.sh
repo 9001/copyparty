@@ -13,12 +13,6 @@ echo % /cfg > initcfg
 python3 copyparty-sfx.py --version
 cd /tmp/pe-copyparty.0
 
-# workaround s390x deadlock on startup
-[ $(uname -m) = s390x ] && cat >copyparty/stolen/ifaddr/_posix.py <<'EOF'
-def get_adapters(include_unconfigured=False):
-    return []
-EOF
-
 # steal the stuff we need
 mv copyparty partftpy ftp/* /usr/lib/python3.*/site-packages/
 
