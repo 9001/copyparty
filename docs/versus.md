@@ -221,7 +221,7 @@ symbol legend,
 | serve sftp (ssh)        |   |   |   |   |   | █ |   |   |   |   |   | █ | █ |
 | serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |   |
 | serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |   |
-| listen on unix-socket   |   |   |   | █ | █ |   | █ | █ | █ | █ | █ | █ |   |
+| listen on unix-socket   | █ |   |   | █ | █ |   | █ | █ | █ | █ | █ | █ |   |
 | zeroconf                | █ |   |   |   |   |   |   |   |   |   |   |   | █ |
 | supports netscape 4     | ╱ |   |   |   |   | █ |   |   |   |   | • |   | ╱ |
 | ...internet explorer 6  | ╱ | █ |   | █ |   | █ |   |   |   |   | • |   | ╱ |

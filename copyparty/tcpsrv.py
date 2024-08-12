@@ -17,14 +17,16 @@ from .util import (
     E_UNREACH,
     HAVE_IPV6,
     IP6ALL,
+    VF_CAREFUL,
     Netdev,
+    atomic_move,
     min_ex,
     sunpack,
     termsize,
 )
 
 if True:
-    from typing import Generator
+    from typing import Generator, Union
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -217,14 +219,29 @@ class TcpSrv(object):
         if self.args.qr or self.args.qrs:
             self.qr = self._qr(qr1, qr2)
 
+    def nlog(self, msg: str, c: Union[int, str] = 0) -> None:
+        self.log("tcpsrv", msg, c)
+
     def _listen(self, ip: str, port: int) -> None:
-        ipv = socket.AF_INET6 if ":" in ip else socket.AF_INET
+        if "unix:" in ip:
+            tcp = False
+            ipv = socket.AF_UNIX
+            ip = ip.split("unix:")[1]
+        elif ":" in ip:
+            tcp = True
+            ipv = socket.AF_INET6
+        else:
+            tcp = True
+            ipv = socket.AF_INET
+
         srv = socket.socket(ipv, socket.SOCK_STREAM)
 
         if not ANYWIN or self.args.reuseaddr:
             srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-        srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        if tcp:
+            srv.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+
         srv.settimeout(None)  # < does not inherit, ^ opts above do
 
         try:
@@ -236,8 +253,19 @@ class TcpSrv(object):
             srv.setsockopt(socket.SOL_IP, socket.IP_FREEBIND, 1)
 
         try:
-            srv.bind((ip, port))
-            sport = srv.getsockname()[1]
+            if tcp:
+                srv.bind((ip, port))
+            else:
+                if ANYWIN or self.args.rm_sck:
+                    if os.path.exists(ip):
+                        os.unlink(ip)
+                    srv.bind(ip)
+                else:
+                    tf = "%s.%d" % (ip, os.getpid())
+                    srv.bind(tf)
+                    atomic_move(self.nlog, tf, ip, VF_CAREFUL)
+
+            sport = srv.getsockname()[1] if tcp else port
             if port != sport:
                 # linux 6.0.16 lets you bind a port which is in use
                 # except it just gives you a random port instead
@@ -249,12 +277,23 @@ class TcpSrv(object):
             except:
                 pass
 
+            e = ""
             if ex.errno in E_ADDR_IN_USE:
                 e = "\033[1;31mport {} is busy on interface {}\033[0m".format(port, ip)
+                if not tcp:
+                    e = "\033[1;31munix-socket {} is busy\033[0m".format(ip)
             elif ex.errno in E_ADDR_NOT_AVAIL:
                 e = "\033[1;31minterface {} does not exist\033[0m".format(ip)
-            else:
+
+            if not e:
+                if not tcp:
+                    t = "\n\n\n  NOTE: this crash may be due to a unix-socket bug; try --rm-sck\n"
+                    self.log("tcpsrv", t, 2)
                 raise
+
+            if not tcp and not self.args.rm_sck:
+                e += "; maybe this is a bug? try --rm-sck"
+
             raise Exception(e)
 
     def run(self) -> None:
@@ -262,7 +301,14 @@ class TcpSrv(object):
         bound: list[tuple[str, int]] = []
         srvs: list[socket.socket] = []
         for srv in self.srv:
-            ip, port = srv.getsockname()[:2]
+            if srv.family == socket.AF_UNIX:
+                tcp = False
+                ip = re.sub(r"\.[0-9]+$", "", srv.getsockname())
+                port = 0
+            else:
+                tcp = True
+                ip, port = srv.getsockname()[:2]
+
             if ip == IP6ALL:
                 ip = "::"  # jython
 
@@ -294,8 +340,12 @@ class TcpSrv(object):
             bound.append((ip, port))
             srvs.append(srv)
             fno = srv.fileno()
-            hip = "[{}]".format(ip) if ":" in ip else ip
-            msg = "listening @ {}:{}  f{} p{}".format(hip, port, fno, os.getpid())
+            if tcp:
+                hip = "[{}]".format(ip) if ":" in ip else ip
+                msg = "listening @ {}:{}  f{} p{}".format(hip, port, fno, os.getpid())
+            else:
+                msg = "listening @ {}  f{} p{}".format(ip, fno, os.getpid())
+
             self.log("tcpsrv", msg)
             if self.args.q:
                 print(msg)
@@ -347,6 +397,8 @@ class TcpSrv(object):
 
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
         from .stolen.ifaddr import get_adapters
+
+        listen_ips = [x for x in listen_ips if "unix:" not in x]
 
         nics = get_adapters(True)
         eps: dict[str, Netdev] = {}

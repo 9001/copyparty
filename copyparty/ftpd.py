@@ -586,8 +586,14 @@ class Ftpd(object):
         if "::" in ips:
             ips.append("0.0.0.0")
 
+        ips = [x for x in ips if "unix:" not in x]
+
         if self.args.ftp4:
             ips = [x for x in ips if ":" not in x]
+
+        if not ips:
+            lgr.fatal("cannot start ftp-server; no compatible IPs in -i")
+            return
 
         ips = list(ODict.fromkeys(ips))  # dedup
 

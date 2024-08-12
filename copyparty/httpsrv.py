@@ -243,15 +243,24 @@ class HttpSrv(object):
                     return
 
     def listen(self, sck: socket.socket, nlisteners: int) -> None:
+        tcp = sck.family != socket.AF_UNIX
+
         if self.args.j != 1:
             # lost in the pickle; redefine
             if not ANYWIN or self.args.reuseaddr:
                 sck.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-            sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            if tcp:
+                sck.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+
             sck.settimeout(None)  # < does not inherit, ^ opts above do
 
-        ip, port = sck.getsockname()[:2]
+        if tcp:
+            ip, port = sck.getsockname()[:2]
+        else:
+            ip = re.sub(r"\.[0-9]+$", "", sck.getsockname().split("/")[-1])
+            port = 0
+
         self.srvs.append(sck)
         self.bound.add((ip, port))
         self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
@@ -263,10 +272,19 @@ class HttpSrv(object):
 
     def thr_listen(self, srv_sck: socket.socket) -> None:
         """listens on a shared tcp server"""
-        ip, port = srv_sck.getsockname()[:2]
         fno = srv_sck.fileno()
-        hip = "[{}]".format(ip) if ":" in ip else ip
-        msg = "subscribed @ {}:{}  f{} p{}".format(hip, port, fno, os.getpid())
+        if srv_sck.family == socket.AF_UNIX:
+            ip = re.sub(r"\.[0-9]+$", "", srv_sck.getsockname())
+            msg = "subscribed @ %s  f%d p%d" % (ip, fno, os.getpid())
+            ip = ip.split("/")[-1]
+            port = 0
+            tcp = False
+        else:
+            tcp = True
+            ip, port = srv_sck.getsockname()[:2]
+            hip = "[%s]" % (ip,) if ":" in ip else ip
+            msg = "subscribed @ %s:%d  f%d p%d" % (hip, port, fno, os.getpid())
+
         self.log(self.name, msg)
 
         Daemon(self.broker.say, "sig-hsrv-up1", ("cb_httpsrv_up",))
@@ -338,11 +356,13 @@ class HttpSrv(object):
 
             try:
                 sck, saddr = srv_sck.accept()
-                cip = unicode(saddr[0])
-                if cip.startswith("::ffff:"):
-                    cip = cip[7:]
-
-                addr = (cip, saddr[1])
+                if tcp:
+                    cip = unicode(saddr[0])
+                    if cip.startswith("::ffff:"):
+                        cip = cip[7:]
+                    addr = (cip, saddr[1])
+                else:
+                    addr = (ip, sck.fileno())
             except (OSError, socket.error) as ex:
                 if self.stopping:
                     break

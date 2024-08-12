@@ -13,6 +13,7 @@ import json
 import os
 import random
 import re
+import socket
 import stat
 import string
 import threading  # typechk
@@ -314,8 +315,11 @@ class HttpCli(object):
         )
         self.host = self.headers.get("host") or ""
         if not self.host:
-            zs = "%s:%s" % self.s.getsockname()[:2]
-            self.host = zs[7:] if zs.startswith("::ffff:") else zs
+            if self.s.family == socket.AF_UNIX:
+                self.host = self.args.name
+            else:
+                zs = "%s:%s" % self.s.getsockname()[:2]
+                self.host = zs[7:] if zs.startswith("::ffff:") else zs
 
         trusted_xff = False
         n = self.args.rproxy

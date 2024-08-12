@@ -6,6 +6,7 @@ import os
 import platform
 import re
 import shutil
+import socket
 import subprocess as sp
 import sys
 import tempfile
@@ -124,7 +125,7 @@ class Cfg(Namespace):
         ex = "dotpart dotsrch hook_v no_dhash no_fastboot no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
-        ex = "ah_cli ah_gen css_browser hist js_browser mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua"
+        ex = "ah_cli ah_gen css_browser hist js_browser js_other mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua"
         ka.update(**{k: None for k in ex.split()})
 
         ex = "hash_mt srch_time u2abort u2j u2sz"
@@ -200,6 +201,7 @@ class VSock(object):
     def __init__(self, buf):
         self._query = buf
         self._reply = b""
+        self.family = socket.AF_INET
         self.sendall = self.send
 
     def recv(self, sz):
