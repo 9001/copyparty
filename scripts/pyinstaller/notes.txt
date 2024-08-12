@@ -41,7 +41,7 @@ fns=(
   pillow-10.4.0-cp312-cp312-win_amd64.whl
   pyinstaller-6.9.0-py3-none-win_amd64.whl
   pyinstaller_hooks_contrib-2024.7-py2.py3-none-any.whl
-  python-3.12.4-amd64.exe
+  python-3.12.5-amd64.exe
 )
 [ $w7 ] && fns+=(  # u2c stuff
   certifi-2024.2.2-py3-none-any.whl

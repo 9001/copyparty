@@ -202,14 +202,14 @@ necho() {
 	mv {markupsafe,jinja2} j2/
 
 	necho collecting pyftpdlib
-	f="../build/pyftpdlib-1.5.9.tar.gz"
+	f="../build/pyftpdlib-1.5.10.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://github.com/giampaolo/pyftpdlib/archive/refs/tags/release-1.5.9.tar.gz;
+		(url=https://files.pythonhosted.org/packages/cf/31/8d910cf40317dd0db74ba0b8558d0dee23c8b002468c14d3a5dec0e6e9fd/pyftpdlib-1.5.10.tar.gz;
 		wget -O$f "$url" || curl -L "$url" >$f)
 
 	tar -zxf $f
-	mv pyftpdlib-release-*/pyftpdlib .
-	rm -rf pyftpdlib-release-* pyftpdlib/test
+	mv pyftpdlib-*/pyftpdlib .
+	rm -rf pyftpdlib-* pyftpdlib/test
 	for f in pyftpdlib/_async{hat,ore}.py; do
 		[ -e "$f" ] || continue;
 		iawk 'NR<4||NR>27||!/^#/;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' $f
@@ -413,7 +413,7 @@ rm have
 
 ised /fork_process/d ftp/pyftpdlib/servers.py
 iawk '/^class _Base/{s=1}!s' ftp/pyftpdlib/authorizers.py
-iawk '/^ {0,4}[^ ]/{s=0}/^ {4}def (serve_forever|_loop)/{s=1}!s' ftp/pyftpdlib/servers.py
+iawk '/^ {0,4}[a-zA-Z]/{s=0}/^ {4}def (serve_forever|_loop)/{s=1}!s' ftp/pyftpdlib/servers.py
 rm -f ftp/pyftpdlib/{__main__,prefork}.py
 
 [ $no_ftp ] &&
