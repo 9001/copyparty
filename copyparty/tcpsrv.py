@@ -31,6 +31,9 @@ if True:
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
+if not hasattr(socket, "AF_UNIX"):
+    setattr(socket, "AF_UNIX", -9001)
+
 if not hasattr(socket, "IPPROTO_IPV6"):
     setattr(socket, "IPPROTO_IPV6", 41)
 

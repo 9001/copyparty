@@ -1,4 +1,41 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0729-2028  `v1.13.6`  not that big
+
+## new features
+
+* up2k.js: set clientside timeouts on http connections during upload 85e54980
+  * some reverse-proxy setups could cause uploads to hang indefinitely by eating requests; should recover nicely now
+* audio-player shows statustext while loading 662541c6
+* [bsod theme](https://github.com/9001/copyparty/tree/hovudstraum/contrib/themes) [(live demo)](https://cd.ocv.me/c/) 15ddcf53
+
+## bugfixes
+
+* fix bugs in the [long-distance upload optimizations](https://github.com/9001/copyparty/releases/tag/v1.13.5) in the previous version:
+  * up2k.js didn't necessarily use the expected chunksize when stitching 225bd80e
+  * u2c (commandline uploader): 8916bce3
+    * use the correct chunksize instead of overshooting like crazy
+    * could crash on exit if `-z` was enabled (so basically harmless)
+    * the "time spent uploading" statustext that was printed on exit could multiply by `-j` and exceed walltime
+* misc ux 9bb6e0dc
+  * don't accept hotkeys until it's safe to do so
+  * improve messages regarding the [firefox crash](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500)
+  * keep more console logs in memory (easier to debug)
+  * fix wordwrap in messageboxes on firefox a19a0fa9
+
+## other changes
+
+* changed the `xm` / "on message" [hook examples](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#on-message) to reject users without write-access 99edba4f
+* docker images were rebuilt on 2024-08-02, 23:30 UTC with new optimizations: 98ffaadf
+  * 😃 RAM usage decreased by `5-6 MiB` for most flavors; `10 MiB` for dj/iv
+  * 😕 image size grew by `4 MiB` (min), `6 MiB` (ac/im/iv), `9 MiB` (dj)
+  * 😃 startup time reduced to about half
+  * and avoids a deadlock on IBM mainframes
+* updated comparison to other software 6b54972e
+  * `hfs2` is dead, `hfs3` and `filebrowser` improved
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0722-2323  `v1.13.5`  american sized
 
 ## new features

@@ -112,6 +112,9 @@ if True:  # pylint: disable=using-constant-test
 if TYPE_CHECKING:
     from .httpconn import HttpConn
 
+if not hasattr(socket, "AF_UNIX"):
+    setattr(socket, "AF_UNIX", -9001)
+
 _ = (argparse, threading)
 
 NO_CACHE = {"Cache-Control": "no-cache"}

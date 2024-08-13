@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 13, 6)
+VERSION = (1, 13, 8)
 CODENAME = "race the beam"
-BUILD_DT = (2024, 7, 29)
+BUILD_DT = (2024, 8, 13)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

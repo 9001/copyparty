@@ -87,6 +87,9 @@ if True:  # pylint: disable=using-constant-test
 if PY2:
     range = xrange  # type: ignore
 
+if not hasattr(socket, "AF_UNIX"):
+    setattr(socket, "AF_UNIX", -9001)
+
 
 class HttpSrv(object):
     """
