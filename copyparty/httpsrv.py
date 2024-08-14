@@ -365,7 +365,7 @@ class HttpSrv(object):
                         cip = cip[7:]
                     addr = (cip, saddr[1])
                 else:
-                    addr = (ip, sck.fileno())
+                    addr = ("127.8.3.7", sck.fileno())
             except (OSError, socket.error) as ex:
                 if self.stopping:
                     break

@@ -528,6 +528,41 @@ def showlic() -> None:
 def get_sects():
     return [
         [
+            "bind",
+            "configure listening",
+            dedent(
+                """
+            \033[33m-i\033[0m takes a comma-separated list of interfaces to listen on;
+            IP-addresses and/or unix-sockets (Unix Domain Sockets)
+
+            the default (\033[32m-i ::\033[0m) means all IPv4 and IPv6 addresses
+
+            \033[32m-i 0.0.0.0\033[0m    listens on all IPv4 NICs/subnets
+            \033[32m-i 127.0.0.1\033[0m  listens on IPv4 localhost only
+            \033[32m-i 127.1\033[0m      listens on IPv4 localhost only
+            \033[32m-i 127.1,192.168.123.1\033[0m = IPv4 localhost and 192.168.123.1
+
+            \033[33m-p\033[0m takes a comma-separated list of tcp ports to listen on;
+            the default is \033[32m-p 3923\033[0m but as root you can \033[32m-p 80,443,3923\033[0m
+
+            when running behind a reverse-proxy, it's recommended to
+            use unix-sockets for improved performance and security;
+
+            \033[32m-i unix:770:www:\033[33m/tmp/a.sock\033[0m listens on \033[33m/tmp/a.sock\033[0m with
+            permissions \033[33m0770\033[0m; only accessible to members of the \033[33mwww\033[0m
+            group. This is the best approach. Alternatively,
+
+            \033[32m-i unix:777:\033[33m/tmp/a.sock\033[0m sets perms \033[33m0777\033[0m so anyone can
+            access it; bad unless it's inside a restricted folder
+
+            \033[32m-i unix:\033[33m/tmp/a.sock\033[0m keeps umask-defined permissions
+            (usually \033[33m0600\033[0m) and the same user/group as copyparty
+
+            \033[33m-p\033[0m (tcp ports) is ignored for unix sockets
+            """
+            ),
+        ],
+        [
             "accounts",
             "accounts and volumes",
             dedent(
@@ -969,8 +1004,8 @@ def add_upload(ap):
 
 def add_network(ap):
     ap2 = ap.add_argument_group('network options')
-    ap2.add_argument("-i", metavar="IP", type=u, default="::", help="ip to bind (comma-sep.) and/or [\033[32munix:/tmp/a.sock\033[0m], default: all IPv4 and IPv6")
-    ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to bind (comma/range); ignored for unix-sockets")
+    ap2.add_argument("-i", metavar="IP", type=u, default="::", help="IPs and/or unix-sockets to listen on (see \033[33m--help-bind\033[0m). Default: all IPv4 and IPv6")
+    ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to listen on (comma/range); ignored for unix-sockets")
     ap2.add_argument("--ll", action="store_true", help="include link-local IPv4/IPv6 in mDNS replies, even if the NIC has routable IPs (breaks some mDNS clients)")
     ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to associate clients with; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd, unsafe), [\033[32m2\033[0m]=outermost-proxy, [\033[32m3\033[0m]=second-proxy, [\033[32m-1\033[0m]=closest-proxy")
     ap2.add_argument("--xff-hdr", metavar="NAME", type=u, default="x-forwarded-for", help="if reverse-proxied, which http header to read the client's real ip from")

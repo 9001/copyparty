@@ -1459,7 +1459,7 @@ some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatical
 * **warning:** nginx-QUIC (HTTP/3) is still experimental and can make uploads much slower, so HTTP/1.1 is recommended for now
 * depending on server/client, HTTP/1.1 can also be 5x faster than HTTP/2
 
-for improved security (and a tiny performance boost) consider listening on a unix-socket with `-i /tmp/party.sock` instead of `-i 127.0.0.1`
+for improved security (and a 10% performance boost) consider listening on a unix-socket with `-i unix:770:www:/tmp/party.sock` (permission `770` means only members of group `www` can access it)
 
 example webserver configs:
 
@@ -1900,7 +1900,7 @@ some notes on hardening
   * cors doesn't work right otherwise
 * if you allow anonymous uploads or otherwise don't trust the contents of a volume, you can prevent XSS with volflag `nohtml`
   * this returns html documents as plaintext, and also disables markdown rendering
-* when running behind a reverse-proxy, listen on a unix-socket with `-i /tmp/party.sock` instead of `-i 127.0.0.1` for tighter access control (plus you get a tiny performance boost for free)
+* when running behind a reverse-proxy, listen on a unix-socket for tighter access control (and more performance); see [reverse-proxy](#reverse-proxy) or `--help-bind`
 
 safety profiles:
 

@@ -226,10 +226,22 @@ class TcpSrv(object):
         self.log("tcpsrv", msg, c)
 
     def _listen(self, ip: str, port: int) -> None:
+        uds_perm = uds_gid = -1
         if "unix:" in ip:
             tcp = False
             ipv = socket.AF_UNIX
-            ip = ip.split("unix:")[1]
+            uds = ip.split(":")
+            ip = uds[-1]
+            if len(uds) > 2:
+                uds_perm = int(uds[1], 8)
+            if len(uds) > 3:
+                try:
+                    uds_gid = int(uds[2])
+                except:
+                    import grp
+
+                    uds_gid = grp.getgrnam(uds[2]).gr_gid
+
         elif ":" in ip:
             tcp = True
             ipv = socket.AF_INET6
@@ -265,7 +277,13 @@ class TcpSrv(object):
                     srv.bind(ip)
                 else:
                     tf = "%s.%d" % (ip, os.getpid())
+                    if os.path.exists(tf):
+                        os.unlink(tf)
                     srv.bind(tf)
+                    if uds_gid != -1:
+                        os.chown(tf, -1, uds_gid)
+                    if uds_perm != -1:
+                        os.chmod(tf, uds_perm)
                     atomic_move(self.nlog, tf, ip, VF_CAREFUL)
 
             sport = srv.getsockname()[1] if tcp else port
