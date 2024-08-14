@@ -208,6 +208,11 @@ class SvcHub(object):
             t = "WARNING: --s-rd-sz (%d) is larger than --iobuf (%d); this may lead to reduced performance"
             self.log("root", t % (args.s_rd_sz, args.iobuf), 3)
 
+        if args.chpw and args.idp_h_usr:
+            t = "ERROR: user-changeable passwords is incompatible with IdP/identity-providers; you must disable either --chpw or --idp-h-usr"
+            self.log("root", t, 1)
+            raise Exception(t)
+
         bri = "zy"[args.theme % 2 :][:1]
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
@@ -815,18 +820,21 @@ class SvcHub(object):
         Daemon(self._reload, "reloading")
         return "reload initiated"
 
-    def _reload(self, rescan_all_vols: bool = True) -> None:
+    def _reload(self, rescan_all_vols: bool = True, up2k: bool = True) -> None:
         with self.up2k.mutex:
             if self.reloading != 1:
                 return
             self.reloading = 2
             self.log("root", "reloading config")
             self.asrv.reload()
-            self.up2k.reload(rescan_all_vols)
+            if up2k:
+                self.up2k.reload(rescan_all_vols)
+            else:
+                self.log("root", "reload done")
             self.broker.reload()
             self.reloading = 0
 
-    def _reload_blocking(self, rescan_all_vols: bool = True) -> None:
+    def _reload_blocking(self, rescan_all_vols: bool = True, up2k: bool = True) -> None:
         while True:
             with self.up2k.mutex:
                 if self.reloading < 2:
@@ -837,7 +845,7 @@ class SvcHub(object):
         # try to handle multiple pending IdP reloads at once:
         time.sleep(0.2)
 
-        self._reload(rescan_all_vols=rescan_all_vols)
+        self._reload(rescan_all_vols=rescan_all_vols, up2k=up2k)
 
     def stop_thr(self) -> None:
         while not self.stop_req:

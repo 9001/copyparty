@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import argparse
 import base64
 import hashlib
+import json
 import os
 import re
 import stat
@@ -807,6 +808,7 @@ class AuthSrv(object):
         self.vfs = VFS(log_func, "", "", AXS(), {})
         self.acct: dict[str, str] = {}
         self.iacct: dict[str, str] = {}
+        self.defpw: dict[str, str] = {}
         self.grps: dict[str, list[str]] = {}
         self.re_pwd: Optional[re.Pattern] = None
 
@@ -1440,6 +1442,8 @@ class AuthSrv(object):
                     raise
 
         self.setup_pwhash(acct)
+        defpw = acct.copy()
+        self.setup_chpw(acct)
 
         # case-insensitive; normalize
         if WINDOWS:
@@ -2069,6 +2073,7 @@ class AuthSrv(object):
 
         self.vfs = vfs
         self.acct = acct
+        self.defpw = defpw
         self.grps = grps
         self.iacct = {v: k for k, v in acct.items()}
 
@@ -2088,6 +2093,96 @@ class AuthSrv(object):
                 ext, mime = zs.split("=", 1)
                 MIMES[ext] = mime
             EXTS.update({v: k for k, v in MIMES.items()})
+
+    def chpw(self, broker: Optional["BrokerCli"], uname, pw) -> tuple[bool, str]:
+        if not self.args.chpw:
+            return False, "feature disabled in server config"
+
+        if uname == "*" or uname not in self.defpw:
+            return False, "not logged in"
+
+        if len(pw) < self.args.chpw_len:
+            t = "minimum password length: %d characters"
+            return False, t % (self.args.chpw_len,)
+
+        hpw = self.ah.hash(pw) if self.ah.on else pw
+        if hpw in self.iacct:
+            return False, "password is taken"
+
+        with self.mutex:
+            ap = self.args.chpw_db
+            if not bos.path.exists(ap):
+                pwdb = {}
+            else:
+                with open(ap, "r", encoding="utf-8") as f:
+                    pwdb = json.load(f)
+
+            pwdb = [x for x in pwdb if x[0] != uname]
+            pwdb.append((uname, self.defpw[uname], hpw))
+
+            with open(ap, "w", encoding="utf-8") as f:
+                json.dump(pwdb, f, separators=(",\n", ": "))
+
+            self.log("reinitializing due to password-change for user [%s]" % (uname,))
+
+            if not broker:
+                # only true for tests
+                self._reload()
+                return True, "new password OK"
+
+        broker.ask("_reload_blocking", False, False).get()
+        return True, "new password OK"
+
+    def setup_chpw(self, acct: dict[str, str]) -> None:
+        ap = self.args.chpw_db
+        if not self.args.chpw or not bos.path.exists(ap):
+            return
+
+        with open(ap, "r", encoding="utf-8") as f:
+            pwdb = json.load(f)
+
+        u404 = set()
+        urst = set()
+        uok = set()
+        for usr, orig, mod in pwdb:
+            if usr not in acct:
+                u404.add(usr)
+                continue
+            if acct[usr] != orig:
+                urst.add(usr)
+                continue
+            uok.add(usr)
+            acct[usr] = mod
+
+        if self.args.chpw_q:
+            return
+
+        for zs in uok:
+            urst.discard(zs)
+
+        if not self.args.chpw_v:
+            t = "chpw: %d loaded, %d default, %d ignored"
+            self.log(t % (len(uok), len(urst), len(u404)))
+            return
+
+        msg = ""
+        if uok:
+            t = "\033[0mloaded: \033[32m%s"
+            msg += t % (", ".join(list(uok)),)
+        if urst:
+            t = "%s\033[0mdefault: \033[35m%s"
+            msg += t % (
+                ", " if msg else "",
+                ", ".join(list(urst)),
+            )
+        if u404:
+            t = "%s\033[0mignored: \033[35m%s"
+            msg += t % (
+                ", " if msg else "",
+                ", ".join(list(u404)),
+            )
+
+        self.log("chpw: " + msg, 6)
 
     def setup_pwhash(self, acct: dict[str, str]) -> None:
         self.ah = PWHash(self.args)

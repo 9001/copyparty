@@ -76,6 +76,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
     * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
     * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
+    * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
     * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
     * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
     * [themes](#themes)
@@ -1354,6 +1355,29 @@ a popular choice is [Authelia](https://www.authelia.com/) (config-file based), a
 there is a [docker-compose example](./docs/examples/docker/idp-authelia-traefik) which is hopefully a good starting point (alternatively see [./docs/idp.md](./docs/idp.md) if you're the DIY type)
 
 a more complete example of the copyparty configuration options [look like this](./docs/examples/docker/idp/copyparty.conf)
+
+but if you just want to let users change their own passwords, then you probably want [user-changeable passwords](#user-changeable-passwords) instead
+
+
+## user-changeable passwords
+
+if permitted, users can change their own passwords  in the control-panel
+
+* not compatible with [identity providers](#identity-providers)
+
+* must be enabled with `--chpw` because account-sharing is a popular usecase
+
+  * if you want to enable the feature but deny password-changing for a specific list of accounts, you can do that with `--chpw-no name1,name2,name3,...`
+
+* to perform a password reset, edit the server config and give the user another password there, then do a [config reload](#server-config) or server restart
+
+* the custom passwords are kept in a textfile at filesystem-path `--chpw-db`, by default `chpw.json` in the copyparty config folder
+
+  * if you run multiple copyparty instances with different users you *almost definitely* want to specify separate DBs for each instance
+
+  * if [password hashing](#password-hashing) is enbled, the passwords in the db are also hashed
+
+    * ...which means that all user-defined passwords will be forgotten if you change password-hashing settings
 
 
 ## using the cloud as storage

@@ -1065,6 +1065,17 @@ def add_auth(ap):
     ap2.add_argument("--bauth-last", action="store_true", help="keeps basic-authentication enabled, but only as a last-resort; if a cookie is also provided then the cookie wins")
 
 
+def add_chpw(ap):
+    db_path = os.path.join(E.cfg, "chpw.json")
+    ap2 = ap.add_argument_group('user-changeable passwords options')
+    ap2.add_argument("--chpw", action="store_true", help="allow users to change their own passwords")
+    ap2.add_argument("--chpw-no", metavar="U,U,U", type=u, action="append", help="do not allow password-changes for this comma-separated list of usernames")
+    ap2.add_argument("--chpw-db", metavar="PATH", type=u, default=db_path, help="where to store the passwords database (if you run multiple copyparty instances, make sure they use different DBs)")
+    ap2.add_argument("--chpw-len", metavar="N", type=int, default=8, help="minimum password length")
+    ap2.add_argument("--chpw-v", action="store_true", help="verbose (when loading: list status of each user)")
+    ap2.add_argument("--chpw-q", action="store_true", help="quiet (when loading: don't print summary)")
+
+
 def add_zeroconf(ap):
     ap2 = ap.add_argument_group("Zeroconf options")
     ap2.add_argument("-z", action="store_true", help="enable all zeroconf backends (mdns, ssdp)")
@@ -1473,6 +1484,7 @@ def run_argparse(
     add_tls(ap, cert_path)
     add_cert(ap, cert_path)
     add_auth(ap)
+    add_chpw(ap)
     add_qr(ap, tty)
     add_zeroconf(ap)
     add_zc_mdns(ap)

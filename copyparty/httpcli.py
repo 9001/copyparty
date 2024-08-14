@@ -2089,6 +2089,9 @@ class HttpCli(object):
         if act == "zip":
             return self.handle_zip_post()
 
+        if act == "chpw":
+            return self.handle_chpw()
+
         raise Pebkac(422, 'invalid action "{}"'.format(act))
 
     def handle_zip_post(self) -> bool:
@@ -2393,6 +2396,22 @@ class HttpCli(object):
         self.reply(b"thank")
         return True
 
+    def handle_chpw(self) -> bool:
+        assert self.parser
+        pwd = self.parser.require("pw", 64)
+        self.parser.drop()
+
+        ok, msg = self.asrv.chpw(self.conn.hsrv.broker, self.uname, pwd)
+        if ok:
+            ok, msg = self.get_pwd_cookie(pwd)
+            if ok:
+                msg = "new password OK"
+
+        redir = "/?h" if ok else ""
+        html = self.j2s("msg", h1=msg, h2='<a href="/?h">ack</a>', redir=redir)
+        self.reply(html.encode("utf-8"))
+        return True
+
     def handle_login(self) -> bool:
         assert self.parser
         pwd = self.parser.require("cppwd", 64)
@@ -2417,12 +2436,12 @@ class HttpCli(object):
             dst += "&" if "?" in dst else "?"
             dst += "_=1#" + html_escape(uhash, True, True)
 
-        msg = self.get_pwd_cookie(pwd)
+        _, msg = self.get_pwd_cookie(pwd)
         html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
         self.reply(html.encode("utf-8"))
         return True
 
-    def get_pwd_cookie(self, pwd: str) -> str:
+    def get_pwd_cookie(self, pwd: str) -> tuple[bool, str]:
         hpwd = self.asrv.ah.hash(pwd)
         uname = self.asrv.iacct.get(hpwd)
         if uname:
@@ -2454,7 +2473,7 @@ class HttpCli(object):
             ck = gencookie(k, pwd, self.args.R, self.is_https, dur, "; HttpOnly")
             self.out_headerlist.append(("Set-Cookie", ck))
 
-        return msg
+        return dur > 0, msg
 
     def handle_mkdir(self) -> bool:
         assert self.parser
@@ -3948,6 +3967,7 @@ class HttpCli(object):
             k304=self.k304(),
             k304vis=self.args.k304 > 0,
             ver=S_VERSION if self.args.ver else "",
+            chpw=self.args.chpw and self.uname != "*",
             ahttps="" if self.is_https else "https://" + self.host + self.req,
         )
         self.reply(html.encode("utf-8"))

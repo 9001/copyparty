@@ -182,13 +182,15 @@ html.z a.g {
 	border-color: #af4;
 	box-shadow: 0 .3em 1em #7d0;
 }
+#x,
 input {
 	color: #a50;
 	background: #fff;
 	border: 1px solid #a50;
-	border-radius: .5em;
-	padding: .5em .7em;
-	margin: 0 .5em 0 0;
+	border-radius: .3em;
+	padding: .3em .6em;
+	margin: 0 .3em 0 0;
+	font-size: 1em;
 }
 input::placeholder {
 	font-size: 1.2em;
@@ -197,6 +199,7 @@ input::placeholder {
 	opacity: 0.64;
 	color: #930;
 }
+#x,
 html.z input {
 	color: #fff;
 	background: #626;

@@ -92,11 +92,14 @@
 
 		<h1 id="l">login for more:</h1>
 		<div>
-			<form method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
-				<input type="hidden" name="act" value="login" />
-				<input type="password" name="cppwd" placeholder=" password" />
+			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
+				<input type="hidden" id="la" name="act" value="login" />
+				<input type="password" id="lp" name="cppwd" placeholder=" password" />
 				<input type="hidden" name="uhash" id="uhash" value="x" />
-				<input type="submit" value="Login" />
+				<input type="submit" id="ls" value="Login" />
+				{% if chpw %}
+				<a id="x" href="#">change password</a>
+				{% endif %}
 				{% if ahttps %}
 				<a id="w" href="{{ ahttps }}">switch to https</a>
 				{% endif %}
