@@ -2101,11 +2101,18 @@ class AuthSrv(object):
         if uname == "*" or uname not in self.defpw:
             return False, "not logged in"
 
+        if uname in self.args.chpw_no:
+            return False, "not allowed for this account"
+
         if len(pw) < self.args.chpw_len:
             t = "minimum password length: %d characters"
             return False, t % (self.args.chpw_len,)
 
         hpw = self.ah.hash(pw) if self.ah.on else pw
+
+        if hpw == self.acct[uname]:
+            return False, "that's already your password my dude"
+
         if hpw in self.iacct:
             return False, "password is taken"
 
@@ -2141,12 +2148,13 @@ class AuthSrv(object):
         with open(ap, "r", encoding="utf-8") as f:
             pwdb = json.load(f)
 
-        u404 = set()
+        useen = set()
         urst = set()
         uok = set()
         for usr, orig, mod in pwdb:
+            useen.add(usr)
             if usr not in acct:
-                u404.add(usr)
+                # previous user, no longer known
                 continue
             if acct[usr] != orig:
                 urst.add(usr)
@@ -2154,32 +2162,38 @@ class AuthSrv(object):
             uok.add(usr)
             acct[usr] = mod
 
-        if self.args.chpw_q:
+        if not self.args.chpw_v:
             return
+
+        for usr in acct:
+            if usr not in useen:
+                urst.add(usr)
 
         for zs in uok:
             urst.discard(zs)
 
-        if not self.args.chpw_v:
-            t = "chpw: %d loaded, %d default, %d ignored"
-            self.log(t % (len(uok), len(urst), len(u404)))
+        if self.args.chpw_v == 1 or (self.args.chpw_v == 2 and not urst):
+            t = "chpw: %d changed, %d unchanged"
+            self.log(t % (len(uok), len(urst)))
+            return
+
+        elif self.args.chpw_v == 2:
+            t = "chpw: %d changed" % (len(uok))
+            if urst:
+                t += ", \033[0munchanged:\033[35m %s" % (", ".join(list(urst)))
+
+            self.log(t, 6)
             return
 
         msg = ""
         if uok:
-            t = "\033[0mloaded: \033[32m%s"
+            t = "\033[0mchanged: \033[32m%s"
             msg += t % (", ".join(list(uok)),)
         if urst:
-            t = "%s\033[0mdefault: \033[35m%s"
+            t = "%s\033[0munchanged: \033[35m%s"
             msg += t % (
                 ", " if msg else "",
                 ", ".join(list(urst)),
-            )
-        if u404:
-            t = "%s\033[0mignored: \033[35m%s"
-            msg += t % (
-                ", " if msg else "",
-                ", ".join(list(u404)),
             )
 
         self.log("chpw: " + msg, 6)

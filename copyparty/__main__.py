@@ -1072,8 +1072,7 @@ def add_chpw(ap):
     ap2.add_argument("--chpw-no", metavar="U,U,U", type=u, action="append", help="do not allow password-changes for this comma-separated list of usernames")
     ap2.add_argument("--chpw-db", metavar="PATH", type=u, default=db_path, help="where to store the passwords database (if you run multiple copyparty instances, make sure they use different DBs)")
     ap2.add_argument("--chpw-len", metavar="N", type=int, default=8, help="minimum password length")
-    ap2.add_argument("--chpw-v", action="store_true", help="verbose (when loading: list status of each user)")
-    ap2.add_argument("--chpw-q", action="store_true", help="quiet (when loading: don't print summary)")
+    ap2.add_argument("--chpw-v", metavar="LVL", type=int, default=2, help="verbosity of summary on config load [\033[32m0\033[0m] = nothing at all, [\033[32m1\033[0m] = number of users, [\033[32m2\033[0m] = list users with default-pw, [\033[32m3\033[0m] = list all users")
 
 
 def add_zeroconf(ap):

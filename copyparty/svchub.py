@@ -213,6 +213,12 @@ class SvcHub(object):
             self.log("root", t, 1)
             raise Exception(t)
 
+        noch = set()
+        for zs in args.chpw_no or []:
+            zsl = [x.strip() for x in zs.split(",")]
+            noch.update([x for x in zsl if x])
+        args.chpw_no = noch
+
         bri = "zy"[args.theme % 2 :][:1]
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
